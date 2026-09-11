@@ -357,6 +357,10 @@ export interface MnxPart {
       halfSteps: number;
       staffDistance?: number;
     };
+    keyFifthsFlipAt?: number;
+    /** Show written pitch even in a concert-pitch score — set on import for a
+     *  whole-octave transposition (guitar, bass, piccolo). */
+    prefersWrittenPitches?: boolean;
   };
   _x?: {
     mnxLab?: MnxPartExtension;

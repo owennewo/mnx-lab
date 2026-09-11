@@ -1581,13 +1581,17 @@ export class Aligner {
     // Build W3C MNX transposition metadata block (top-level on the part, not in _x).
     // MusicXML's <transpose> runs written → sounding; MNX's interval runs sounding →
     // written, so the values are negated (a guitar's -12/-7 becomes +12/+7).
+    // A whole-octave transposition (guitar, bass, piccolo) is what the spec
+    // says such instruments show written even in a concert-pitch score;
+    // MusicXML has no flag for that, so the convention supplies it.
+    const halfSteps = -state.transposeChromatic || 0;
+    const staffDistance = -state.transposeDiatonic || 0;
+    const octaveOnly = halfSteps !== 0 && halfSteps % 12 === 0 && staffDistance === (halfSteps / 12) * 7;
     const transpositionBlock = (state.transposeChromatic !== 0 || state.transposeDiatonic !== 0)
       ? {
           transposition: {
-            interval: {
-              halfSteps: -state.transposeChromatic || 0,
-              staffDistance: -state.transposeDiatonic || 0
-            }
+            interval: { halfSteps, staffDistance },
+            ...(octaveOnly ? { prefersWrittenPitches: true } : {})
           }
         }
       : {};
@@ -2065,15 +2069,11 @@ export class Aligner {
     const newStepIdx = ((newStepRaw % 7) + 7) % 7;
     const newStep = STEP_NAMES[newStepIdx];
 
-    // Determine new octave: find which octave places newStep closest to soundingAbsSemitone
+    // The octave follows the LETTER. Deriving it from the semitone total put
+    // a C-flat or B-sharp on the wrong side of the octave line: C♭5 down an
+    // octave came out as C3 raised eleven semitones instead of C♭4.
     const newStepSemitone = STEP_SEMITONES[newStep];
-    // Rough octave from absolute semitone
-    const roughOctave = Math.floor(soundingAbsSemitone / 12);
-    // Adjust if needed so new note semitone matches
-    let newOctave = roughOctave;
-    if (newStepSemitone > soundingAbsSemitone - roughOctave * 12 + 6) {
-      newOctave = roughOctave - 1;
-    }
+    const newOctave = pitch.octave + Math.floor(newStepRaw / 7);
 
     // Calculate alter: chromatic difference between sounding pitch and natural step
     const newAlter = soundingAbsSemitone - (newOctave * 12 + newStepSemitone);

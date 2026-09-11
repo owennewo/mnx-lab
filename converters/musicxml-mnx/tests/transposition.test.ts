@@ -91,12 +91,51 @@ describe('part.transposition runs sounding → written (the opposite of MusicXML
   it('gives a guitar with no declared transposition the octave-up default', async () => {
     const mnxPath = path.resolve(__dirname, '../../fixtures/House-of-the-Rising-Sun.mnx.json');
     const source = JSON.parse(await fs.readFile(mnxPath, 'utf-8'));
-    expect(source.parts[0].transposition).toBeUndefined();
+    // The fixture states its transposition, as Guitar Pro does; drop it to
+    // exercise the default.
+    delete source.parts[0].transposition;
 
     const xml = exportMusicXML(source, { splitNotationAndTab: true, divisions: 8 });
     expect(transposeValues(xml)).toEqual({ chromatic: -12, diatonic: -7 });
 
     const reimported = importMusicXML(xml, { mergeNotationAndTab: true });
-    expect(reimported.parts[0].transposition).toEqual({ interval: { halfSteps: 12, staffDistance: 7 } });
+    expect(reimported.parts[0].transposition).toEqual({
+      interval: { halfSteps: 12, staffDistance: 7 },
+      prefersWrittenPitches: true
+    });
+  });
+});
+
+describe('the guitar octave on import', () => {
+  // A guitar part: written an octave above sounding, with a C♭5 — the open B
+  // string, spelled for a flat key (Soundslice writes it this way).
+  const GUITAR_XML = `<?xml version="1.0" encoding="UTF-8"?>
+<score-partwise version="4.0">
+  <part-list><score-part id="P1"><part-name>Guitar</part-name></score-part></part-list>
+  <part id="P1">
+    <measure number="1">
+      <attributes>
+        <divisions>1</divisions>
+        <key><fifths>-3</fifths></key>
+        <time><beats>4</beats><beat-type>4</beat-type></time>
+        <clef><sign>G</sign><line>2</line></clef>
+        <transpose><chromatic>-12</chromatic></transpose>
+      </attributes>
+      <note><pitch><step>C</step><alter>-1</alter><octave>5</octave></pitch><duration>4</duration><voice>1</voice><type>whole</type></note>
+    </measure>
+  </part>
+</score-partwise>`;
+
+  it('marks a whole-octave transposition as shown written, and nothing else', () => {
+    expect(importMusicXML(GUITAR_XML).parts[0].transposition).toEqual({
+      interval: { halfSteps: 12, staffDistance: 7 },
+      prefersWrittenPitches: true
+    });
+    expect(importMusicXML(CLARINET_XML).parts[0].transposition).not.toHaveProperty('prefersWrittenPitches');
+  });
+
+  it('keeps an enharmonic letter on its own side of the octave line', () => {
+    // Written C♭5 sounds C♭4 — once imported as C3 with an alter of 11.
+    expect(firstPitch(importMusicXML(GUITAR_XML).parts[0])).toEqual({ step: 'C', octave: 4, alter: -1 });
   });
 });

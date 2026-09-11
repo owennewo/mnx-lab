@@ -70,6 +70,9 @@ export interface GpifTrack {
   /** Open-string MIDI values ordered low→high — GPIF string 0 is the LOWEST. */
   tuningLowToHigh: number[];
   capo: number;
+  /** Display transposition, WRITTEN → SOUNDING semitones (guitar -12); 0 when
+   *  unstated. See `common/transposition.ts`. */
+  transpositionPitch: number;
   /** Chord diagram id → chord name, from `DiagramCollection`. */
   chordNames: Map<number, string>;
 }
@@ -306,10 +309,18 @@ function parseTrack(node: Element): GpifTrack {
     }
   }
 
+  // GP7 states the display transposition as `<Transpose>`, GP6 as
+  // `<PartSounding>`; both sit directly on the track.
+  const transpose = child(node, 'Transpose');
+  const transpositionPitch = transpose
+    ? 12 * (int(text(transpose, 'Octave')) ?? 0) + (int(text(transpose, 'Chromatic')) ?? 0)
+    : (int(text(child(node, 'PartSounding'), 'TranspositionPitch')) ?? 0);
+
   return {
     name: (text(node, 'Name') ?? '').replace(/\n/g, '').trim(),
     tuningLowToHigh: tuning,
     capo,
+    transpositionPitch,
     chordNames
   };
 }

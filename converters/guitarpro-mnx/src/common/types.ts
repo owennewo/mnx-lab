@@ -345,11 +345,19 @@ export interface MnxPartMeasure {
   sequences: MnxSequence[];
 }
 
+/** MNX `part-transposition`: the interval from SOUNDING to WRITTEN pitch. */
+export interface MnxPartTransposition {
+  interval: { halfSteps: number; staffDistance: number };
+  keyFifthsFlipAt?: number;
+  prefersWrittenPitches?: boolean;
+}
+
 export interface MnxPart {
   id?: string;
   name?: string;
   staves?: number;
   measures: MnxPartMeasure[];
+  transposition?: MnxPartTransposition;
   _x?: { mnxLab?: MnxPartExtension };
 }
 

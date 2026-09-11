@@ -23,6 +23,7 @@ import { gpScoreInfoToWork, rootExtension } from '../common/scoreMetadata.js';
 import { swingFromTripletFeel } from '../common/swing.js';
 import { mnxDurationToWholes, tupletRatio, wholesToFraction } from '../common/duration.js';
 import { alphaTabTuningToMnx, midiToPitch, pitchToMidi } from '../common/tuning.js';
+import { gpTranspositionToMnx } from '../common/transposition.js';
 import {
   GpifDocument,
   GpifBeat,
@@ -421,10 +422,12 @@ function buildPart(
     if (slur.from) state.report('beat <Legato> slurring into nothing', slur.measureIndex);
   }
 
+  const transposition = gpTranspositionToMnx(track.transpositionPitch);
   const part: MnxPart = {
     id: `P${trackIndex + 1}`,
     name: track.name || 'Guitar',
-    measures
+    measures,
+    ...(transposition ? { transposition } : {})
   };
 
   if (stringCount > 0) {

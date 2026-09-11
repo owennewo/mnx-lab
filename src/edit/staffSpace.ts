@@ -7,6 +7,7 @@
 // `rest.staffPosition` uses), their mapping to pitches under a clef, and the
 // key-signature default alteration an entered position receives.
 import type { MnxPitch, MnxStructure } from '../model/mnx.ts';
+import { writtenOctaves } from '../model/transposition.ts';
 
 export interface ClefSpec {
   sign: string;
@@ -14,6 +15,9 @@ export interface ClefSpec {
   staffPosition: number;
   /** Octave displacement (treble-8 guitar clef = -1). */
   octave: number;
+  /** Octaves the part is written above sounding — its transposition, not the
+   *  clef's (`model/transposition.ts`). */
+  writtenOctaves?: number;
 }
 
 /** Conventional seat per sign, used when a clef omits `staffPosition`. */
@@ -30,7 +34,9 @@ export function clefAt(
   partIndex = 0,
   staffIndex = 1
 ): ClefSpec {
-  let current = DEFAULT_CLEF;
+  const written = writtenOctaves(doc.parts?.[partIndex]);
+  const part = written ? { writtenOctaves: written } : {};
+  let current: ClefSpec = { ...DEFAULT_CLEF, ...part };
   const measures = doc.parts?.[partIndex]?.measures ?? [];
   for (let i = 0; i <= measureIndex && i < measures.length; i++) {
     for (const positioned of measures[i].clefs ?? []) {
@@ -39,7 +45,8 @@ export function clefAt(
       current = {
         sign: clef.sign,
         staffPosition: clef.staffPosition ?? DEFAULT_SEAT[clef.sign] ?? 0,
-        octave: clef.octave ?? 0
+        octave: clef.octave ?? 0,
+        ...part
       };
     }
   }
@@ -63,7 +70,7 @@ const CLEF_REFERENCE: Record<string, { step: Step; octave: number }> = {
 
 function referenceDiatonic(clef: ClefSpec): number {
   const ref = CLEF_REFERENCE[clef.sign] ?? CLEF_REFERENCE.G;
-  return diatonic(ref.step, ref.octave) + clef.octave * 7;
+  return diatonic(ref.step, ref.octave) + (clef.octave - (clef.writtenOctaves ?? 0)) * 7;
 }
 
 /** The key signature governing a measure (fifths; persists until changed). */

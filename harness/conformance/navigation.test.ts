@@ -64,6 +64,24 @@ describe('staff space', () => {
     expect(staffPositionOfPitch(clef, { step: 'G', octave: 4 })).toBe(5);
     expect(keyFifthsAt(doc, 0)).toBe(0);
   });
+
+  it('seats a part written an octave up exactly as the treble-8 clef does', () => {
+    // The guitar's transposition on a plain treble clef: the octave belongs
+    // to the part, not the clef, and the staff reads the same either way.
+    const doc = playground();
+    doc.parts[0].measures[0].clefs = [{ clef: { sign: 'G', staffPosition: -2 } }];
+    doc.parts[0].transposition = {
+      interval: { halfSteps: 12, staffDistance: 7 },
+      prefersWrittenPitches: true
+    };
+    const clef = clefAt(doc, 0);
+    expect(clef).toEqual({ sign: 'G', staffPosition: -2, octave: 0, writtenOctaves: 1 });
+    expect(pitchAtStaffPosition(clef, 0)).toEqual({ step: 'B', octave: 3 });
+    expect(staffPositionOfPitch(clef, { step: 'E', octave: 4 })).toBe(3);
+    // Without prefersWrittenPitches a concert-pitch score shows it sounding.
+    delete doc.parts[0].transposition.prefersWrittenPitches;
+    expect(clefAt(doc, 0).writtenOctaves).toBeUndefined();
+  });
 });
 
 describe('note-level navigation (notation projection)', () => {

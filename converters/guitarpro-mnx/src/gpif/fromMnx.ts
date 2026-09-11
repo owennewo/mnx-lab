@@ -22,6 +22,7 @@ import {
 } from '../common/exportPlan.js';
 import { mnxDurationToWholes, tupletFlags, wholesToFraction } from '../common/duration.js';
 import { mnxTuningToAlphaTab, pitchToMidi, choosePosition } from '../common/tuning.js';
+import { mnxTranspositionToGp } from '../common/transposition.js';
 import { describeSwing, tripletFeelFromSwing, type GpTripletFeel } from '../common/swing.js';
 import { writeGpContainer } from './container.js';
 import { documentWork, workToGpScoreInfo } from '../common/scoreMetadata.js';
@@ -193,6 +194,8 @@ interface WriterTrack {
   /** Open-string MIDI values, low → high (GPIF order). */
   tuningLowToHigh: number[];
   capo: number;
+  /** WRITTEN → SOUNDING semitones, GP's sign (guitar -12). */
+  transpositionPitch: number;
   program: number;
   primaryChannel: number;
 }
@@ -310,6 +313,7 @@ export function mnxToGpifXml(mnx: MnxStructure, options: GpifExportOptions = {})
       name: part.name ?? 'Guitar',
       tuningLowToHigh: [...tunings].reverse(),
       capo: part._x?.mnxLab?.capo ?? 0,
+      transpositionPitch: mnxTranspositionToGp(part.transposition),
       program: options.midiProgram ?? DEFAULT_MIDI_PROGRAM,
       primaryChannel: channel
     };
@@ -1027,8 +1031,13 @@ function serialize(
         '<InputMidiNumbers/><OutputRSESound/><OutputMidiNumber>0</OutputMidiNumber>' +
         '</Articulation></Articulations></Element></Elements></InstrumentSet>'
     );
-    // Guitar notation sounds an octave below where it is written.
-    push('<Transpose><Chromatic>0</Chromatic><Octave>-1</Octave></Transpose>');
+    // The part's display transposition — a guitar sounds an octave below
+    // where it is written, which is also the default for a part that is silent.
+    const octave = Math.trunc(track.transpositionPitch / 12);
+    push(
+      `<Transpose><Chromatic>${track.transpositionPitch - octave * 12}</Chromatic>` +
+        `<Octave>${octave}</Octave></Transpose>`
+    );
     push('<ForcedSound>-1</ForcedSound>');
     push(
       `<MidiConnection><Port>1</Port><PrimaryChannel>${track.primaryChannel}</PrimaryChannel>` +

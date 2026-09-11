@@ -1159,3 +1159,19 @@ signature, as it always did. Bar 6 closes with a final barline.
 Worth flipping the clearance control while reviewing: the bar-3 cluster must stay
 welded to its barline at every level, which is the whole point — at wide
 clearance it used to drift up to 1.8sp clear of it.
+
+## The guitar octave lives in the part's transposition — 2026-09-11
+
+Owner: no roadmap doc — a direct fix: a Guitar Pro import whose track was not
+*named* guitar rendered an octave low. MNX pitch is sounding; the written octave now
+comes from `part.transposition` (+12/+7 with `prefersWrittenPitches`), which both
+importers write and the engine honours (`src/model/transposition.ts`), instead of a
+treble-8vb clef guessed from the part name. Parts that state no transposition keep
+the name fallback, so exactly one golden moved: `lab/22-tab-derivation/07-transposition-display-only`,
+already `rendered` and already listed above.
+
+**What a reviewer should look for.** A plain treble clef — **no "8" beneath it** —
+where the golden used to show the treble-8vb glyph. The two half notes (sounding C3
+and E3) sit exactly where they did, written C4 on a ledger line and E4 on the
+bottom line, and the tab still reads (5,3) then (4,2): the transposition is display
+metadata, so a moved fret would mean it leaked into derivation.

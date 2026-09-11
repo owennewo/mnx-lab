@@ -23,6 +23,7 @@ import {
   wholesToFraction
 } from '../common/duration.js';
 import { alphaTabStringToMnx, alphaTabTuningToMnx, midiToPitch } from '../common/tuning.js';
+import { gpTranspositionToMnx } from '../common/transposition.js';
 
 const M = alphaTab.model;
 
@@ -345,10 +346,12 @@ function buildPart(
     measures.push(measure);
   }
 
+  const transposition = gpTranspositionToMnx(staff?.displayTranspositionPitch ?? 0);
   const part: MnxPart = {
     id: `P${track.index + 1}`,
     name: track.name || 'Guitar',
-    measures
+    measures,
+    ...(transposition ? { transposition } : {})
   };
 
   if (stringCount > 0) {

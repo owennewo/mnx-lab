@@ -649,6 +649,17 @@ export interface MnxRootExtension {
   encoding?: MnxLabEncoding;
 }
 
+/** MNX `part-transposition`: the interval from SOUNDING to WRITTEN pitch (a
+ *  guitar is {halfSteps: 12, staffDistance: 7}). Display only — MNX pitch is
+ *  sounding. */
+export interface MnxPartTransposition {
+  interval: { halfSteps: number; staffDistance: number };
+  keyFifthsFlipAt?: number;
+  /** Show written pitch even in a concert-pitch score (piccolo, double bass,
+   *  guitar). */
+  prefersWrittenPitches?: boolean;
+}
+
 export interface MnxPart {
   // Optional per the MNX schema — `part` requires only `measures`.
   id?: string;
@@ -656,6 +667,7 @@ export interface MnxPart {
   /** Staves this part is notated on (grand staff = 2); default 1. */
   staves?: number;
   measures: MnxPartMeasure[];
+  transposition?: MnxPartTransposition;
   _x?: {
     mnxLab?: MnxPartExtension;
   };

@@ -5626,7 +5626,7 @@
         "evidence": "Two MusicXML parts, one with a TAB clef, repeated note pitches, harmony elements, and additional simultaneous MIDI pitches. Derived XML is not an independent authoring oracle."
       },
       "inputSha256": "9247eddab593315e113dbf7b7c2c264a11aee235a72e3253fc50e3857885a465",
-      "mnxSha256": "c40c0c7ae091d7513f26c9e055e23390786494ffe786084851352b1798c8156b",
+      "mnxSha256": "2474c67f7eb25782ab53c33be95c07154c57fa0599b7fbe21905c8120a981fcd",
       "externalMidiSha256": "7099a16f4ee19fe7b166d769e6f4ba3626fbb703e46c28a42771032c166acbdf",
       "external": {
         "ppq": 480,
@@ -14253,7 +14253,7 @@
         "evidence": "MusicXML notation/TAB part split and raw MIDI duplicate pitch multiplicities."
       },
       "inputSha256": "bd5113ea9288ecd0ddbe74429fa4680bc09d678476c689cafd41d57f67b2e63b",
-      "mnxSha256": "b3254138cf024d9706c8850c5d230891b38b98af974714ef6073cee9fd6a0bb1",
+      "mnxSha256": "71a4509bee0d4012b164b6417b78ded12de63650b4e0c0d940c39a6de716c870",
       "externalMidiSha256": "eea12132eef909ea4f2b2f945d52bdd2c9d7a24db3717acbf211d26cc02c8c1b",
       "external": {
         "ppq": 480,
@@ -25875,7 +25875,7 @@
         "evidence": "Two MusicXML parts, TAB clef, and doubled MIDI note attacks. Unmatched groups are counted as failures, not excluded."
       },
       "inputSha256": "7e8e64df97b7fd841d72df4902972cffb0785ea1a155cc7cffd4c128b3cd7423",
-      "mnxSha256": "d9821b8f7ed0f1cc57da1aac3b6db7d70e04579b51669662f26bc2aab0942a5f",
+      "mnxSha256": "e228b043c8103174f80f1ce9166de85d0d93cc8f565a5ee6b7743e31f22e2dad",
       "externalMidiSha256": "6d2f857a12c60640699ec807ece8b5c2508b6a19ed644c7f5b0a0eae702bfa90",
       "external": {
         "ppq": 480,
@@ -26638,7 +26638,7 @@
         "evidence": "MusicXML part split and harmony elements, with duplicate/additional pitches retained in raw MIDI."
       },
       "inputSha256": "be29e7454782dbd79c4e75b2958a6d9ed5af3b9bd8b416cf92e64f4f1890c405",
-      "mnxSha256": "cdbc7a850afa069fb33bb7f9007b0e07767df679bed1a7413ab7259e7efe651c",
+      "mnxSha256": "2e4341fee191330fb2682d6864fe6e5541ebc21a2a44feeccd1d2bb9bcceb0e7",
       "externalMidiSha256": "04e34ce782389180b94d7a8b65a19a81441eed35c05ae593342ee4ad457e2ca5",
       "external": {
         "ppq": 480,

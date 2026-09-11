@@ -35,6 +35,17 @@ shadow DOM. Do **not** reintroduce VexFlow or any notation library. The note↔J
 cross-highlight depends on `model/noteKeys.ts` and `model/jsonView.ts` mirroring the
 same traversal — keep them in lockstep.
 
+**Written octave.** MNX pitch is sounding. A part written above its sound — guitar,
+bass — says so in `part.transposition`; when the interval is whole octaves and
+`prefersWrittenPitches` is set, `src/model/transposition.ts` turns it into the active
+clef's `writtenOctaves`, and noteheads sit exactly where a treble-8vb clef would put
+them, with no octave figure drawn — the octave belongs to the part, not the clef. The
+editor's staff space (`src/edit/staffSpace.ts`) applies the same shift. Any other
+interval stays at concert pitch (the engine does not transpose key signatures). A part
+that states no transposition falls back to its name: one called *guitar* gets a
+treble-8vb clef. Both converters write the block — Guitar Pro from `<Transpose>` /
+`<PartSounding>` (GP3–5 from the MIDI program), MusicXML from `<transpose>`.
+
 
 Score display controls enter each layout as `display: DisplayOptions` and
 are normalized in `src/engine/displayOptions.ts`. Lyrics are filtered before

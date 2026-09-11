@@ -17620,6 +17620,13 @@
           ]
         }
       ],
+      "transposition": {
+        "interval": {
+          "halfSteps": 12,
+          "staffDistance": 7
+        },
+        "prefersWrittenPitches": true
+      },
       "_x": {
         "mnxLab": {
           "strings": [

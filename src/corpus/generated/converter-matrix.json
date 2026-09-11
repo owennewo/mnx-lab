@@ -205,8 +205,8 @@
         },
         "interval": {
           "verdict": "supported",
-          "carried": 1,
-          "survived": 1
+          "carried": 5,
+          "survived": 5
         },
         "jump": {
           "verdict": "supported",
@@ -354,8 +354,8 @@
         },
         "part-transposition": {
           "verdict": "supported",
-          "carried": 1,
-          "survived": 1
+          "carried": 5,
+          "survived": 5
         },
         "positioned-clef": {
           "verdict": "lossy",

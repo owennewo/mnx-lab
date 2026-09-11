@@ -20,6 +20,7 @@ import {
 } from '../../model/mnx.ts';
 import { durationValue } from '../../model/durations.ts';
 import { containerContent } from '../../model/noteWalk.ts';
+import { writtenOctaves } from '../../model/transposition.ts';
 import { dynamicWidthSp } from './dynamics.ts';
 import { clearanceSpacing } from '../clearance.ts';
 
@@ -733,6 +734,10 @@ export interface ActiveClef {
   /** MNX `clef.showOctave`: false hides the octave figure. */
   showOctave?: boolean;
   color?: string;
+  /** Octaves the PART is written above sounding (`model/transposition.ts`;
+   *  guitar 1). Moves noteheads as `octave` does, but belongs to the part,
+   *  not the clef, so it draws no octave figure. */
+  writtenOctaves?: number;
 }
 
 export interface EventSlot {
@@ -1350,14 +1355,19 @@ export function planHorizontal(
   // Pass 1 — per-measure state machine + natural event metrics.
   const clefState: ActiveClef[] = planStaves.map(st => {
     const src = clefSourceOf(st);
-    if ((src.part.name ?? '').toLowerCase().includes('guitar')) {
+    const written = writtenOctaves(src.part);
+    // A part that states its octave transposition carries the octave there,
+    // never also in the clef. Only a part that is silent falls back to its
+    // NAME: one called guitar is drawn 8vb.
+    if (!written && (src.part.name ?? '').toLowerCase().includes('guitar')) {
       return { sign: 'G' as const, octave: -1 };
     }
+    const part = written ? { writtenOctaves: written } : {};
     // An undeclared clef on a lower staff of a multi-staff part defaults to
     // bass — the keyboard/harp grand-staff convention. Declared clefs (the
     // usual case) replace this at measure 0.
-    if (src.staff >= 2) return { sign: 'F' as const, octave: 0 };
-    return { sign: 'G' as const, octave: 0 };
+    if (src.staff >= 2) return { sign: 'F' as const, octave: 0, ...part };
+    return { sign: 'G' as const, octave: 0, ...part };
   });
   let timeSig: { count: number; unit: number; display?: 'common' | 'cut' } = { count: 4, unit: 4 };
   let timeDeclared = false;
@@ -1375,6 +1385,7 @@ export function planHorizontal(
       const src = clefSourceOf(planStaves[s]);
       const partMeasureOf = src.part.measures[i] ?? { sequences: [] };
       const current = clefState[s];
+      const written = writtenOctaves(src.part);
       const measureClefs: ClefAt[] = (partMeasureOf.clefs ?? [])
         .filter(c => (c.staff ?? 1) === src.staff && c.clef)
         .map(c => {
@@ -1392,7 +1403,8 @@ export function planHorizontal(
               ...(c.clef.staffPosition !== undefined ? { staffPosition: c.clef.staffPosition } : {}),
               ...(c.clef.glyph ? { glyph: c.clef.glyph } : {}),
               ...(c.clef.showOctave !== undefined ? { showOctave: c.clef.showOctave } : {}),
-              ...(c.clef.color ? { color: c.clef.color } : {})
+              ...(c.clef.color ? { color: c.clef.color } : {}),
+              ...(written ? { writtenOctaves: written } : {})
             }
           };
         })

@@ -18,6 +18,7 @@ import { readBinaryMix } from './mix.js';
 import { splitBinaryLyrics } from './lyrics.js';
 import { readGpBinaryPreambleFromReader } from './song.js';
 import { sniffGpBinaryVersion } from './version.js';
+import { gp345TranspositionPitch } from '../common/transposition.js';
 
 interface ParsedTrack {
   percussion: boolean;
@@ -418,7 +419,13 @@ function readTrack(reader: GpBinaryReader, index: number, revision: number, majo
   const capo = reader.readInt32(`track ${index + 1} capo`);
   reader.skip(4, `track ${index + 1} color`);
   if (major < 5) return {
-    gpif: { name, tuningLowToHigh: percussion ? [] : tuningHighToLow.slice(0, stringCount).reverse(), capo: percussion ? 0 : capo, chordNames: new Map() },
+    gpif: {
+      name,
+      tuningLowToHigh: percussion ? [] : tuningHighToLow.slice(0, stringCount).reverse(),
+      capo: percussion ? 0 : capo,
+      transpositionPitch: gp345TranspositionPitch(instrument, percussion),
+      chordNames: new Map()
+    },
     percussion,
     stringCount,
     clef: bass && !percussion ? 'F4' : 'G2'
@@ -447,6 +454,7 @@ function readTrack(reader: GpBinaryReader, index: number, revision: number, majo
       name,
       tuningLowToHigh: percussion ? [] : tuningHighToLow.slice(0, stringCount).reverse(),
       capo: percussion ? 0 : capo,
+      transpositionPitch: gp345TranspositionPitch(instrument, percussion),
       chordNames: new Map()
     },
     stringCount,

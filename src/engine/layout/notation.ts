@@ -395,8 +395,9 @@ function clefLineY(clef: ActiveClef): number {
 }
 
 function pitchToStaffY(step: string, octave: number, clef: ActiveClef): number {
-  // MNX stores sounding pitch. Treble 8vb (clef.octave=-1) shifts written +1.
-  const writtenOctave = octave - clef.octave;
+  // MNX stores sounding pitch. Treble 8vb (clef.octave=-1) shifts written +1,
+  // and so does a part written an octave up (the guitar's transposition).
+  const writtenOctave = octave - clef.octave + (clef.writtenOctaves ?? 0);
   const noteIndex = diatonicStepIndex(step, writtenOctave);
   // The clef's reference pitch sits on the clef's line; every diatonic step
   // is half a space. Treble: G4 on y=3; bass: F3 on y=1; alto: C4 on y=2;

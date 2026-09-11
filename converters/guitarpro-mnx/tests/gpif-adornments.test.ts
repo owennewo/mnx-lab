@@ -17,7 +17,9 @@ import { normalizeIds } from './helpers/normalize.js';
  * alphaTab export, which is the oracle elsewhere and would mark its own work.
  */
 
-/** One track in standard tuning, 4/4, one voice; `bars` lists each bar's beats. */
+/** One track in standard tuning, 4/4, one voice; `bars` lists each bar's beats.
+ *  The track states the guitar octave as GP6 and Soundslice do — every real
+ *  file says it, and the writer supplies it for a part that is silent. */
 function score(bars: string[][], notes: string, masterBarExtra = ''): Uint8Array {
   let beatId = 0;
   const beats: string[] = [];
@@ -38,7 +40,7 @@ function score(bars: string[][], notes: string, masterBarExtra = ''): Uint8Array
   return writeGpContainer(`<GPIF>
     <Tracks><Track id="0"><Name>Guitar</Name><Properties>
       <Property name="Tuning"><Pitches>40 45 50 55 59 64</Pitches></Property>
-    </Properties></Track></Tracks>
+    </Properties><PartSounding><TranspositionPitch>-12</TranspositionPitch></PartSounding></Track></Tracks>
     <MasterBars>${masterBars.join('')}</MasterBars>
     <Bars>${barXml.join('')}</Bars>
     <Voices>${voices.join('')}</Voices>
