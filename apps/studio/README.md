@@ -22,17 +22,22 @@ studio/index.html        the face's HTML — Vite emits it at /studio/ (top-leve
 apps/studio/
   studio.css             document-level only: the SMuFL face and the page reset
   src/main.ts            registers the shell and the elements it mounts
-  src/StudioApp.ts       <mnx-studio> — hash router, fullscreen frame, the overlay bar
+  src/StudioApp.ts       <mnx-studio> — hash router; the header on every page but a piece
   src/LibraryPage.ts     #/              the tag-filtered browse over the library client
   src/PiecePage.ts       #/piece/<id>    the canonical .gp, converted in src/importers, into
-                                         <mnx-document-viewer> + <mnx-player>, one binding
+                                         <mnx-score-frame> holding <mnx-document-viewer> +
+                                         <mnx-player>, one binding
   src/session.ts         /api/library/me at boot; sign-in is re-entering the page
 ```
 
 `#/not-permitted` is the third route: Access admitted the address but D1 has it inactive.
-Piece URLs carry the library's piece id. The staff view (auto / notation / tab / both) is a
-per-browser localStorage preference, the one persistence a shell may own without a
-backend decision.
+Piece URLs carry the library's piece id. On a piece the page IS the score frame
+([roadmap/inprogress/core-score-frame.md](../../roadmap/inprogress/core-score-frame.md)):
+a title grip on the top edge and a pause grip on the bottom, drawn out into the library
+page's tools row (the way back, the title, the piece's chips, the staff view, Zoom,
+Settings, Tags, the menu) and the player's tray. A tap on the score is never a chrome
+toggle. The staff view, the display settings, zoom and spacing are per-browser localStorage
+preferences (`mnx-studio.*`), the one persistence a shell may own without a backend decision.
 
 ## The decisions that starting settled
 

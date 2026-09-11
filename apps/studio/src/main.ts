@@ -14,4 +14,5 @@ import '@fontsource/archivo/latin-700.css';
 import '../studio.css';
 import '../../../src/elements/DocumentViewer.ts';
 import '../../../src/elements/Player.ts';
+import '../../../src/elements/ScoreFrame.ts';
 import './StudioApp.ts';

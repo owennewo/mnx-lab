@@ -1,18 +1,15 @@
-// The studio shell: fullscreen by default — the score is the page. Two thin
-// overlays, both fading when the pointer is idle over a score: a top bar with
-// the piece title, the staff view, Library, the signed-in address and Sign
-// out; a bottom dock with the player's transport (the player element carries
-// its whole tray — transport, sound, rate, volume, the iteration table — which
-// is a dock's worth, not a bar's). Three hash routes
+// The studio shell: fullscreen by default — the score is the page. On a piece
+// the page IS the score frame (roadmap/inprogress/core-score-frame.md): the
+// frame's own grips carry the title, the way back, the tools and the player,
+// so the shell's header is for the other pages only. Nothing fades on a timer
+// any more — a tap never restarted it. Three hash routes
 // (roadmap/inprogress/studio-shell.md):
 //   #/                 the library (tag-filtered browse)
 //   #/piece/<id>       one piece, viewer + player filling the viewport
 //   #/not-permitted    Access admitted the address, D1 did not
 import { LitElement, css, html, nothing } from 'lit';
-import { customElement, query, state } from 'lit/decorators.js';
+import { customElement, state } from 'lit/decorators.js';
 import { LibraryClient } from '../../../src/storage/libraryClient.ts';
-import type { Player } from '../../../src/elements/Player.ts';
-import type { ViewSetting } from '../../../src/elements/DocumentViewer.ts';
 import { loadSession, signIn, type Session } from './session.ts';
 import './LibraryPage.ts';
 import './PiecePage.ts';
@@ -36,31 +33,11 @@ export const libraryHref = '#/';
 export const aliasesHref = '#/aliases';
 export const pieceHref = (id: string): string => `#/piece/${encodeURIComponent(id)}`;
 
-const VIEW_KEY = 'mnx-studio.view';
-const VIEWS: ViewSetting[] = ['auto', 'notation', 'tab', 'both'];
-const IDLE_MS = 3000;
-
-function storedView(): ViewSetting {
-  try {
-    const value = localStorage.getItem(VIEW_KEY);
-    return VIEWS.includes(value as ViewSetting) ? (value as ViewSetting) : 'auto';
-  } catch {
-    return 'auto';
-  }
-}
-
 @customElement('mnx-studio')
 export class StudioApp extends LitElement {
   private readonly client = new LibraryClient();
   @state() private session: Session | null = null;
   @state() private route: Route = parseHash(location.hash);
-  @state() private pieceTitle = '';
-  @state() private view: ViewSetting = storedView();
-  @state() private idle = false;
-  @state() private tagsOpen = false;
-  @state() private tagCount = 0;
-  @query('mnx-player') private player!: Player;
-  private idleTimer = 0;
 
   static styles = css`
     :host {
@@ -88,31 +65,6 @@ export class StudioApp extends LitElement {
       background: var(--bar);
       border-bottom: 1px solid var(--line);
       backdrop-filter: blur(6px);
-      transition: opacity 240ms ease, transform 240ms ease;
-    }
-    header.idle:not(:hover):not(:focus-within) {
-      opacity: 0;
-      transform: translateY(-100%);
-    }
-    footer {
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      z-index: 2;
-      max-height: 38vh;
-      overflow: auto;
-      background: var(--bar);
-      border-top: 1px solid var(--line);
-      backdrop-filter: blur(6px);
-      transition: opacity 240ms ease, transform 240ms ease;
-    }
-    footer.idle:not(:hover):not(:focus-within) {
-      opacity: 0;
-      transform: translateY(100%);
-    }
-    footer[hidden] {
-      display: none;
     }
     .brand {
       font-weight: 600;
@@ -131,10 +83,6 @@ export class StudioApp extends LitElement {
       text-overflow: ellipsis;
       white-space: nowrap;
       font-weight: 500;
-    }
-    mnx-player {
-      border-block: 0;
-      background: transparent;
     }
     .who {
       color: var(--ink-dim);
@@ -168,6 +116,10 @@ export class StudioApp extends LitElement {
       inset: 0;
       overflow: auto;
     }
+    /* A piece is the frame, and the frame is its own scroll container. */
+    main.piece {
+      overflow: hidden;
+    }
     .notice {
       max-width: 36rem;
       margin: 20vh auto 0;
@@ -190,49 +142,20 @@ export class StudioApp extends LitElement {
 
   private readonly onHashChange = () => {
     this.route = parseHash(location.hash);
-    if (this.route.page !== 'piece') { this.pieceTitle = ''; this.tagsOpen = false; this.tagCount = 0; }
-    this.wake();
-  };
-
-  private readonly wake = () => {
-    this.idle = false;
-    clearTimeout(this.idleTimer);
-    if (this.route.page === 'piece') this.idleTimer = window.setTimeout(() => (this.idle = true), IDLE_MS);
   };
 
   connectedCallback() {
     super.connectedCallback();
     window.addEventListener('hashchange', this.onHashChange);
-    window.addEventListener('pointermove', this.wake, { passive: true });
-    window.addEventListener('keydown', this.wake);
     void loadSession(this.client).then(session => {
       this.session = session;
       if (session.kind === 'not-permitted' && this.route.page !== 'not-permitted') location.hash = '#/not-permitted';
     });
-    this.wake();
   }
 
   disconnectedCallback() {
     window.removeEventListener('hashchange', this.onHashChange);
-    window.removeEventListener('pointermove', this.wake);
-    window.removeEventListener('keydown', this.wake);
-    clearTimeout(this.idleTimer);
     super.disconnectedCallback();
-  }
-
-  /** The piece page takes the player by reference; it exists only after the
-   *  header's first render, so one more pass hands it down. */
-  protected firstUpdated() {
-    this.requestUpdate();
-  }
-
-  private setView(event: Event) {
-    this.view = (event.target as HTMLSelectElement).value as ViewSetting;
-    try {
-      localStorage.setItem(VIEW_KEY, this.view);
-    } catch {
-      /* a per-browser convenience only; never required */
-    }
   }
 
   private signOut() {
@@ -241,26 +164,20 @@ export class StudioApp extends LitElement {
 
   render() {
     const email = this.session?.kind === 'signed-in' ? this.session.email : '';
-    const onPiece = this.route.page === 'piece';
+    const onPiece = this.route.page === 'piece' && this.session?.kind === 'signed-in';
     return html`
-      <header class=${this.idle && onPiece ? 'idle' : ''}>
-        <a class="brand" href=${libraryHref}>MNX <b>Studio</b></a>
-        <span class="title" title=${this.pieceTitle}>${this.pieceTitle}</span>
-        ${onPiece
-          ? html`<select aria-label="Staff view" .value=${this.view} @change=${this.setView}>
-              ${VIEWS.map(v => html`<option value=${v} ?selected=${v === this.view}>${v === 'auto' ? 'auto view' : v}</option>`)}
-            </select>`
-          : nothing}
-        ${onPiece ? html`<button aria-pressed=${this.tagsOpen} @click=${() => (this.tagsOpen = !this.tagsOpen)}>Tags · ${this.tagCount}</button>` : nothing}
-        ${onPiece ? html`<a class="button" href=${libraryHref}>Library</a>` : nothing}
-        ${this.route.page === 'aliases' ? html`<a class="button" href=${libraryHref}>Library</a>` : nothing}
-        ${email ? html`<span class="who">${email}</span>` : nothing}
-        ${email || this.session?.kind === 'not-permitted'
-          ? html`<button @click=${this.signOut}>Sign out</button>`
-          : nothing}
-      </header>
-      <main>${this.renderPage()}</main>
-      <footer class=${this.idle && onPiece ? 'idle' : ''} ?hidden=${!onPiece}><mnx-player></mnx-player></footer>
+      ${onPiece
+        ? nothing
+        : html`<header>
+            <a class="brand" href=${libraryHref}>MNX <b>Studio</b></a>
+            <span class="title"></span>
+            ${this.route.page === 'aliases' ? html`<a class="button" href=${libraryHref}>Library</a>` : nothing}
+            ${email ? html`<span class="who">${email}</span>` : nothing}
+            ${email || this.session?.kind === 'not-permitted'
+              ? html`<button @click=${this.signOut}>Sign out</button>`
+              : nothing}
+          </header>`}
+      <main class=${onPiece ? 'piece' : ''}>${this.renderPage()}</main>
     `;
   }
 
@@ -289,12 +206,7 @@ export class StudioApp extends LitElement {
       return html`<mnx-studio-piece
         .client=${this.client}
         .pieceId=${this.route.id}
-        .player=${this.player}
-        .view=${this.view}
-        .tagsOpen=${this.tagsOpen}
-        @piece-title=${(e: CustomEvent<string>) => (this.pieceTitle = e.detail)}
-        @piece-tags=${(e: CustomEvent<number>) => (this.tagCount = e.detail)}
-        @tags-close=${() => (this.tagsOpen = false)}
+        .email=${session.email}
       ></mnx-studio-piece>`;
     if (this.route.page === 'aliases') return html`<mnx-studio-aliases .client=${this.client}></mnx-studio-aliases>`;
     return html`<mnx-studio-library .client=${this.client}></mnx-studio-library>`;

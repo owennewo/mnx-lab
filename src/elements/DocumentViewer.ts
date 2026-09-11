@@ -1205,10 +1205,17 @@ export class DocumentViewer extends LitElement {
    * strings, or a host asking for it, gets notation rather than an empty
    * fretboard drawn on a guess.
    */
-  private resolvedView(): ViewMode {
+  resolvedView(): ViewMode {
     const asked = this.view === 'auto' ? declaredStaffKind(this.mnxDoc?.mnxJson) : this.view;
     if (asked !== 'tab' && asked !== 'both') return 'notation';
     return this.tabCapable() ? asked : 'notation';
+  }
+
+  /** The views this document can draw — every one when strings are known,
+   *  notation alone otherwise. Public (2026-09-12) for the score frame's staff
+   *  control, which greys what it cannot offer rather than hiding it. */
+  availableViews(): ViewMode[] {
+    return this.tabCapable() ? ['notation', 'tab', 'both'] : ['notation'];
   }
 
   /** Are there strings to fret? Declared by a part, or supplied by the host's

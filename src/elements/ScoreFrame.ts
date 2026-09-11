@@ -98,7 +98,8 @@ export class ScoreFrame extends LitElement {
     sharedChrome,
     css`
       :host {
-        display: block;
+        display: flex;
+        flex-direction: column;
         position: relative;
         container-type: inline-size;
         font-family: var(--sans);
@@ -112,21 +113,30 @@ export class ScoreFrame extends LitElement {
         --grip-shadow: 0 1px 2px var(--shadow-near), 0 3px 10px var(--shadow-far);
       }
 
-      /* ── the score ──
-         Padding keeps the first and last systems scrollable out from under the
-         grips; it grows when a strip is drawn out so nothing is trapped. */
-      .score {
-        min-height: 100%;
-        box-sizing: border-box;
-        padding: 44px 0 64px;
+      /* ── the pane ──
+         The frame is a column: an open strip is IN FLOW above or below the
+         pane, so the score moves out from under it rather than being covered;
+         the grips float over the pane's edges. The pane is the SCROLL
+         CONTAINER — the host gives the frame a height and the score scrolls
+         inside, so the grips sit on the pane's edges rather than the
+         document's. Bottom padding keeps the last system scrollable out from
+         under the pause grip. */
+      .pane {
+        position: relative;
+        flex: 1 1 auto;
+        min-height: 0;
       }
 
-      :host([data-top]) .score {
-        padding-top: 72px;
+      .score {
+        position: absolute;
+        inset: 0;
+        overflow: auto;
+        box-sizing: border-box;
+        padding: 0 0 64px;
       }
 
       :host([data-bottom]) .score {
-        padding-bottom: 96px;
+        padding-bottom: 0;
       }
 
       /* ── the grips ──
@@ -247,9 +257,8 @@ export class ScoreFrame extends LitElement {
          Drawn out, each edge is the library's tools row: the bar's ground, a
          hairline, blur; 40px controls. */
       .strip {
-        position: absolute;
-        left: 0;
-        right: 0;
+        position: relative;
+        flex: none;
         z-index: 3;
         display: flex;
         align-items: center;
@@ -262,12 +271,12 @@ export class ScoreFrame extends LitElement {
       }
 
       .strip.top {
-        top: 0;
+        /* Above the bottom strip, so an open pad paints over the tray. */
+        z-index: 4;
         border-bottom: 1px solid var(--line);
       }
 
       .strip.bottom {
-        bottom: 0;
         border-top: 1px solid var(--line);
         align-items: flex-start;
       }
@@ -719,12 +728,16 @@ export class ScoreFrame extends LitElement {
 
   render() {
     return html`
-      <div class="score"><slot></slot></div>
-      ${this.topOpen ? this.topStrip() : this.topGrip()}
-      ${this.bottomOpen ? this.bottomStrip() : this.bottomGrip()}
-      ${this.hasPerformance && !this.bottomOpen
-        ? html`<div class="progress" aria-hidden="true"><div style="width: ${this.progress * 100}%"></div></div>`
-        : nothing}
+      ${this.topOpen ? this.topStrip() : nothing}
+      <div class="pane">
+        <div class="score"><slot></slot></div>
+        ${this.topOpen ? nothing : this.topGrip()}
+        ${this.bottomOpen ? nothing : this.bottomGrip()}
+        ${this.hasPerformance && !this.bottomOpen
+          ? html`<div class="progress" aria-hidden="true"><div style="width: ${this.progress * 100}%"></div></div>`
+          : nothing}
+      </div>
+      ${this.bottomOpen ? this.bottomStrip() : nothing}
       <!-- The player is the host's light-DOM child in both poses: unmounting
            it would tear down its transport. Closed, it is parked here, out of
            the flow, and the grip speaks for it. -->
