@@ -44,7 +44,7 @@ try {
   const shot = await c.send('Page.captureScreenshot'); await fs.writeFile('/tmp/mnx-library-dialog.png',Buffer.from(shot.result.data,'base64'));
   await c.evaluate(`${dialog}.querySelector('li button').click()`);
   await wait(`location.hash==='#/document'`);
-  await wait(`!!${app}.querySelector('mnx-scenario-page')?.shadowRoot?.querySelector('mnx-document-viewer')`);
+  await wait(`!!${app}.querySelector('mnx-scenario-page')?.shadowRoot?.querySelector('mnx-document-viewer')?.shadowRoot?.querySelector('svg')`);
   assert.equal(await c.evaluate(`Object.values(localStorage).some(v=>v.includes('Local library smoke') || v.includes('local@example.test'))`),false);
   assert.equal(await c.evaluate(`${dialog}.querySelector('dialog').open`),false);
   console.log('Library smoke passed: sign-in prompt, signed local identity, tag completion/filter, MNX Load, no private localStorage.');

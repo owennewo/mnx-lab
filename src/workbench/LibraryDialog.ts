@@ -28,8 +28,8 @@ export class LibraryDialog extends LitElement {
     const generation = ++this.generation;
     this.busy = true;
     try { const { user } = await this.client.me(); if (generation !== this.generation) return; this.email = user.email; await this.search(); }
-    catch (error) { this.fail(error); }
-    finally { this.busy = false; }
+    catch (error) { if (generation === this.generation) this.fail(error); }
+    finally { if (generation === this.generation) this.busy = false; }
   }
   private fail(error: unknown) {
     if (!this.active) return;
@@ -50,7 +50,7 @@ export class LibraryDialog extends LitElement {
     this.query = (event.target as HTMLInputElement).value;
     const query = this.query; const generation = this.generation;
     try { const result = await this.client.tags(query); if (this.active && generation === this.generation && query === this.query) this.suggestions = result.tags; }
-    catch (error) { this.fail(error); }
+    catch (error) { if (generation === this.generation && query === this.query) this.fail(error); }
   }
   private addTag(event: Event) {
     event.preventDefault();
@@ -66,8 +66,8 @@ export class LibraryDialog extends LitElement {
       if (!this.active || generation !== this.generation) return;
       this.dispatchEvent(new CustomEvent('library-load', { detail: { document, name: piece.title ?? 'Library piece' }, bubbles: true, composed: true }));
       this.close();
-    } catch (error) { this.fail(error); }
-    finally { this.busy = false; }
+    } catch (error) { if (generation === this.generation) this.fail(error); }
+    finally { if (generation === this.generation) this.busy = false; }
   }
   render() {
     return html`<dialog aria-labelledby="library-title" @cancel=${(e: Event) => { e.preventDefault(); this.close(); }}>
