@@ -1,6 +1,6 @@
 # Studio storage read — private library Load
 
-Implementation loop. Item 4 of [studio storage](studio-campaign-storage.md), inheriting
+Implementation loop. Item 4 of [studio storage](../inprogress/studio-campaign-storage.md), inheriting
 its full contract and [storage design](../../docs/studio-storage.md).
 
 Create owner-scoped piece, tag-completion, rendition and canonical-MNX read routes,
@@ -23,7 +23,7 @@ Access gate with 30-day settings verified, real owner login and both pieces load
 operator ingest replay remains a no-op. Account credential/sign-in steps may await owner
 participation; do not mark built until production checks finish.
 
-## Implementation checkpoint
+## Completion — 2026-09-11
 
 Routes, typed client, Load dialog, JWT validation, operator bootstrap/user command and
 local signed identities are implemented. Auth tests use real RS256 signatures and local
@@ -35,4 +35,15 @@ The owner configured the global Access session to one month manually, verified i
 dashboard. The scoped API token is saved outside this worktree in the primary checkout's
 ignored secrets directory. Browser and machine applications, OTP provider and policies
 are provisioned; real audiences are committed in Wrangler config. Bootstrap rerun passed.
-Deployment, live browser sign-in and ingest replay checks remain before completion.
+Deployed version `ad82d1f4-88ae-41a4-a014-843ab5b17043`. The owner completed email
+sign-in; both uploaded pieces loaded and rendered, `capo:3` filtered to Blues Run The
+Game, and sign-out returned the library to its sign-in prompt. Production ingest replay
+left both pieces at revision 0 with unchanged canonical hashes. Anonymous reads and
+single-credential ingest requests were denied; public workbench remained available.
+
+All 1,725 tests, scenario checks and build passed after rebase. Local browser smoke and
+seven operator-script tests passed. API navigation now runs the Worker before SPA
+assets: otherwise the Access callback receives index.html instead of its redirect.
+Credentials are ignored, mode 0600, in the primary checkout so worktree retirement does
+not remove them. Landed and pushed through `b34cfc1`; worktree and branch retired before
+this completion record. Existing uncommitted dependency upgrades were preserved.

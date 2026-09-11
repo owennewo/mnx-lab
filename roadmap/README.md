@@ -156,7 +156,6 @@ back up to `proposed/` the moment it is.
 
 ### inprogress/
 
-- **[studio-storage-read.md](inprogress/studio-storage-read.md)** — item 4: Access authentication, owner-scoped library reads and optional Load dialog.
 
 
 
@@ -381,6 +380,8 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+
+- **[studio-storage-read.md](complete/studio-storage-read.md)** — storage campaign item 4, **built 2026-09-11**: Access email login, 30-day sessions, active-user enforcement, private owner-scoped reads and optional Load; both real pieces verified.
 
 - **[lab-library-ingest.md](complete/lab-library-ingest.md)** — storage campaign item 3, **built 2026-09-11**: mandatory-auth operator ingest; both real slices stored with ten renditions and four recording rows; production replay unchanged.
 - **[studio-storage-schema.md](complete/studio-storage-schema.md)** — storage campaign item 2, **built 2026-09-11**: local/remote D1 migration and owner-scoped Worker library writes; 19 D1/R2 invariant tests. Production application tables remain empty.

@@ -3,7 +3,7 @@
 > **A campaign** (see CLAUDE.md → Roadmap-driven development): this doc is an index over
 > normal proposals sharing one goal, the shared contract they follow, and the running log
 > of progress and learnings as items land. Indexed items are ordinary `studio-*` proposals
-> that name this campaign. **Opened 2026-09-11.** Items 1–3 are built; items 4–5 remain. The design it
+> that name this campaign. **Opened 2026-09-11.** Items 1–4 are built; item 5 remains. The design it
 > implements is [docs/studio-storage.md](../../docs/studio-storage.md); this doc owns the
 > order and the contract, that doc owns the shape.
 
@@ -120,7 +120,7 @@ Ordered; each item is a normal proposal doc written when it is picked up, not be
 | 1 | [studio-storage-provision](../complete/studio-storage-provision.md) | **built 2026-09-11** | Create the Cloudflare resources — one D1 database, one R2 bucket — and bind them: `wrangler.jsonc` bindings, `worker/env.ts` types, a Worker secret for the ingest script's write token, `.dev.vars` for local. **Tooling decision inside the item:** `wrangler d1 create` / `wrangler r2 bucket create` wrapped in one checked-in, idempotent bootstrap script, rather than Terraform — see *Why not Terraform (yet)* below. Done when `wrangler dev` starts with local D1 and R2 and `npm run deploy` reaches the real ones. |
 | 2 | [studio-storage-schema](../complete/studio-storage-schema.md) | built | The D1 migrations for the design doc's five tables (`migrations/`, applied with `wrangler d1 migrations apply`, local and remote), the R2 key layout, and a DOM-free `worker/library/` module: typed reads and writes that enforce the invariants (insert rendition → immutable; set canonical → one pointer; write MNX → re-derive tags). A harness test runs the module against local D1 via `wrangler dev`/Miniflare so the schema is exercised before any real data touches it. |
 | 3 | [lab-library-ingest](../complete/lab-library-ingest.md) | **built 2026-09-11** | A personal operator script, `tools/library-ingest.mjs` run as `npm run ingest:library -- <dir>` (`lab-` because it serves the repo's owner, not a shell). Reads a `soundslice-cli` `gp/files/` directory, builds one piece per slice (renditions from every notation file with role, producer — the cached `.gp` is `soundslice-cli`, header-injected, with the raw export's sha256 in `provenance` — filename and fetch time; recordings with syncpoints keyed by Soundslice recording id; asserted tags from `lists.json` as `unknown:<path>` with the list id as `source_ref`), derives MNX from the `.gp` **and** from the MusicXML with the converters built from the checkout (recording package version, git sha and flags as `producer_version`/`producer_options`), and pushes everything through the Worker's ingest route with the write token. `--dry-run` prints the plan; re-runs are no-ops by sha256 (contract 7). Done when both exported slices are in the real library and `Blues Run The Game` resolves through its canonical pointer to an MNX with title, artist and capo 3. |
-| 4 | [studio-storage-read](studio-storage-read.md) | in progress | Cloudflare Access email codes, 30-day sessions and pre-provisioned users; see the decision below. Add authenticated owner-scoped piece/tag/rendition reads and canonical MNX resolution, plus the workbench Load button with tag completion. No self-registration. The workbench remains usable without login; only its optional library access is protected. Write the item's proposal when implementation is picked up. |
+| 4 | [studio-storage-read](../complete/studio-storage-read.md) | built | Cloudflare Access email codes, 30-day sessions and pre-provisioned users; see the decision below. Add authenticated owner-scoped piece/tag/rendition reads and canonical MNX resolution, plus the workbench Load button with tag completion. No self-registration. The workbench remains usable without login; only its optional library access is protected. |
 | 5 | `studio-storage-rederive` | proposed | The payoff for keeping every format. A sweep (an ingest-script subcommand or a Worker cron) that, for every piece, derives a fresh MNX child from each source rendition with the converters at their current versions, stores it as a new rendition when its bytes differ from the previous child (with `_x.mnxLab.encoding` discounted in the comparison, per the converters' own rule), rebuilds derived tags from the canonical path, and reports the differences per piece and per converter. A converter regression is then a line in that report rather than a bug someone happens to notice. Also the home of the alias table's "apply to documents" action once editing exists — not before. |
 
 ## Item 4 authentication decision — 2026-09-11
@@ -401,3 +401,28 @@ Item 4 infrastructure revisit: use an idempotent Cloudflare API bootstrap for th
 Access applications, policies and OTP provider. Cloudflare and D1 hold resource and user
 inventory; private service credentials stay in ignored owner-only files. No Terraform
 state backend yet. Revisit for a second environment or broader DNS/network management.
+
+
+### 2026-09-11 — item 4 built: private library reads
+
+[studio-storage-read](../complete/studio-storage-read.md) landed through `b34cfc1` and
+was deployed as `ad82d1f4-88ae-41a4-a014-843ab5b17043`; its worktree is retired.
+Access email OTP verifies identity, browser sessions are 720h and global sessions are
+one month. Every read resolves an existing active D1 user; login never provisions one.
+The owner loaded both real scores, filtered by capo and signed out successfully. Ingest
+still requires both its separate Access service credential and write token, plus active
+operator membership; replay remained unchanged at revision 0. All 1,725 tests and the
+scenario/build gates passed, along with local browser and operator bootstrap checks.
+
+Learnings: SPA assets intercept navigation requests unless `/api/*` runs Worker-first;
+this matters for the login callback even when fetch-based API tests pass. Access adds a
+derived OTP callback URL that must be normalized narrowly for idempotent comparison.
+Keep service secrets outside disposable worktrees, ignored and mode 0600. Global session
+settings are operator-managed; the bootstrap needs no organization-settings permission.
+
+Item 5: reads select a child matching `worker/library/converter-versions.json` and fail
+explicitly when that conversion is missing. Update the version manifest with converter
+changes and derive matching immutable children before expecting Load to succeed. Retain
+owner scoping, canonical pointers, machine authentication and unchanged replay behavior;
+no read performs conversion or writes storage. The two real pieces remain the regression
+fixture, with ten renditions and four recording rows.
