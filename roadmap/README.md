@@ -156,7 +156,6 @@ back up to `proposed/` the moment it is.
 
 ### inprogress/
 
-- **[lab-library-ingest.md](inprogress/lab-library-ingest.md)** — storage campaign item 3: authenticated personal cache ingest, converter provenance and repeatable uploads.
 
 
 - **[studio-campaign-storage.md](inprogress/studio-campaign-storage.md)** — **campaign**: songs
@@ -381,6 +380,7 @@ back up to `proposed/` the moment it is.
 
 ### complete/
 
+- **[lab-library-ingest.md](complete/lab-library-ingest.md)** — storage campaign item 3, **built 2026-09-11**: mandatory-auth operator ingest; both real slices stored with ten renditions and four recording rows; production replay unchanged.
 - **[studio-storage-schema.md](complete/studio-storage-schema.md)** — storage campaign item 2, **built 2026-09-11**: local/remote D1 migration and owner-scoped Worker library writes; 19 D1/R2 invariant tests. Production application tables remain empty.
 - **[studio-storage-provision.md](complete/studio-storage-provision.md)** — storage campaign item 1, **built 2026-09-11**: idempotent Wrangler bootstrap, live D1/R2 bindings and private ingest write secret; local and production smoke passed. Stores remain empty for item 2.
 

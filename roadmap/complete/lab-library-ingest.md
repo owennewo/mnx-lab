@@ -1,8 +1,8 @@
 # Personal library ingest
 
-Item 3 of the [studio storage campaign](studio-campaign-storage.md), inheriting its
+Item 3 of the [studio storage campaign](../inprogress/studio-campaign-storage.md), inheriting its
 contract and [storage design](../../docs/studio-storage.md). Implementation loop.
-Started 2026-09-11.
+**Built 2026-09-11.**
 
 Create `tools/library-ingest.mjs` and a mandatory-auth Worker ingest route. Build the
 checkout converters before deriving MNX; keep every source rendition, upstream metadata,
@@ -77,6 +77,10 @@ The owner explicitly approved the production payload and destination after autom
 approval review requested that confirmation. Both pieces are now stored through the
 authenticated Worker: ten renditions, four recording rows (two uploads and two YouTube
 references), and their tags. Blues Run The Game resolves to title, artist and capo 3.
-The exact production replay is verified before landing. No cache files or credentials
+The exact production replay left both pieces unchanged at revision 0. No cache files or credentials
 are committed. Browser login remains item 4, with the newly confirmed mandatory
 pre-existing users-table record and no self-registration.
+
+Landed and pushed through `c435e53`. The worktree and branch were removed before
+this completion record. All 1,715 tests, scenario checks and build passed after the
+final rebase; existing user package upgrades were preserved and verified.

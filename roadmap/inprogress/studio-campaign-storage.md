@@ -3,7 +3,7 @@
 > **A campaign** (see CLAUDE.md → Roadmap-driven development): this doc is an index over
 > normal proposals sharing one goal, the shared contract they follow, and the running log
 > of progress and learnings as items land. Indexed items are ordinary `studio-*` proposals
-> that name this campaign. **Opened 2026-09-11.** Items 1–2 are built; items 3–5 remain. The design it
+> that name this campaign. **Opened 2026-09-11.** Items 1–3 are built; items 4–5 remain. The design it
 > implements is [docs/studio-storage.md](../../docs/studio-storage.md); this doc owns the
 > order and the contract, that doc owns the shape.
 
@@ -118,7 +118,7 @@ Ordered; each item is a normal proposal doc written when it is picked up, not be
 | --- | --- | --- | --- |
 | 1 | [studio-storage-provision](../complete/studio-storage-provision.md) | **built 2026-09-11** | Create the Cloudflare resources — one D1 database, one R2 bucket — and bind them: `wrangler.jsonc` bindings, `worker/env.ts` types, a Worker secret for the ingest script's write token, `.dev.vars` for local. **Tooling decision inside the item:** `wrangler d1 create` / `wrangler r2 bucket create` wrapped in one checked-in, idempotent bootstrap script, rather than Terraform — see *Why not Terraform (yet)* below. Done when `wrangler dev` starts with local D1 and R2 and `npm run deploy` reaches the real ones. |
 | 2 | [studio-storage-schema](../complete/studio-storage-schema.md) | built | The D1 migrations for the design doc's five tables (`migrations/`, applied with `wrangler d1 migrations apply`, local and remote), the R2 key layout, and a DOM-free `worker/library/` module: typed reads and writes that enforce the invariants (insert rendition → immutable; set canonical → one pointer; write MNX → re-derive tags). A harness test runs the module against local D1 via `wrangler dev`/Miniflare so the schema is exercised before any real data touches it. |
-| 3 | [lab-library-ingest](lab-library-ingest.md) | in progress | A personal operator script, `tools/library-ingest.mjs` run as `npm run ingest:library -- <dir>` (`lab-` because it serves the repo's owner, not a shell). Reads a `soundslice-cli` `gp/files/` directory, builds one piece per slice (renditions from every notation file with role, producer — the cached `.gp` is `soundslice-cli`, header-injected, with the raw export's sha256 in `provenance` — filename and fetch time; recordings with syncpoints keyed by Soundslice recording id; asserted tags from `lists.json` as `unknown:<path>` with the list id as `source_ref`), derives MNX from the `.gp` **and** from the MusicXML with the converters built from the checkout (recording package version, git sha and flags as `producer_version`/`producer_options`), and pushes everything through the Worker's ingest route with the write token. `--dry-run` prints the plan; re-runs are no-ops by sha256 (contract 7). Done when both exported slices are in the real library and `Blues Run The Game` resolves through its canonical pointer to an MNX with title, artist and capo 3. |
+| 3 | [lab-library-ingest](../complete/lab-library-ingest.md) | **built 2026-09-11** | A personal operator script, `tools/library-ingest.mjs` run as `npm run ingest:library -- <dir>` (`lab-` because it serves the repo's owner, not a shell). Reads a `soundslice-cli` `gp/files/` directory, builds one piece per slice (renditions from every notation file with role, producer — the cached `.gp` is `soundslice-cli`, header-injected, with the raw export's sha256 in `provenance` — filename and fetch time; recordings with syncpoints keyed by Soundslice recording id; asserted tags from `lists.json` as `unknown:<path>` with the list id as `source_ref`), derives MNX from the `.gp` **and** from the MusicXML with the converters built from the checkout (recording package version, git sha and flags as `producer_version`/`producer_options`), and pushes everything through the Worker's ingest route with the write token. `--dry-run` prints the plan; re-runs are no-ops by sha256 (contract 7). Done when both exported slices are in the real library and `Blues Run The Game` resolves through its canonical pointer to an MNX with title, artist and capo 3. |
 | 4 | `studio-storage-read` | **shell — discuss first** | Read routes (`GET /api/library/pieces?tag=…` filtered by any number of `dimension:value` tags; `GET /api/library/tags?dimension=&q=` for completion; `GET /api/library/renditions/<id>` streaming the blob; the piece's canonical MNX resolved server-side) and a workbench **Load** button with tag completion — type `tuning:` and see the values, stack several, pick a piece, open its canonical MNX in the viewer. **Blocked on an auth conversation** before it is designed: the candidates are Cloudflare Access as the identity gate (plus a Worker users-table check; a Terraform-shaped resource — see below), a per-user bearer credential, or studio's own auth seam (`worker/api/auth.ts`) brought forward. **Owner requirement, 2026-09-11:** no self-registration or automatic user creation at login; an existing users-table record is mandatory. Item 4 must add the users schema and enforce that requirement whichever identity mechanism is chosen. A shared operator token is not the browser login solution. The decision shapes items 1 and 5 too, so the conversation happens after item 3 lands and before this item is written. |
 | 5 | `studio-storage-rederive` | proposed | The payoff for keeping every format. A sweep (an ingest-script subcommand or a Worker cron) that, for every piece, derives a fresh MNX child from each source rendition with the converters at their current versions, stores it as a new rendition when its bytes differ from the previous child (with `_x.mnxLab.encoding` discounted in the comparison, per the converters' own rule), rebuilds derived tags from the canonical path, and reports the differences per piece and per converter. A converter regression is then a line in that report rather than a bug someone happens to notice. Also the home of the alias table's "apply to documents" action once editing exists — not before. |
 
@@ -272,3 +272,43 @@ What item 3 inherits:
 - **Authentication remains item 3's route responsibility.** Bind the existing private
   write token, fail closed when absent, and call the owner-scoped module. Item 2 adds
   no public route and needs no Worker application deploy on its own.
+
+
+### 5. 2026-09-11 — item 3: authenticated ingest live, both pieces stored
+
+[lab-library-ingest](../complete/lab-library-ingest.md) landed and was pushed through
+`c435e53`; its worktree and branch were retired before this entry. Production Worker
+version `a83ea21a-8df8-42dc-b99b-91402c676062` stores both approved slices: ten renditions,
+two uploaded recordings and two YouTube references. Blues Run The Game resolves through
+its canonical pointer to MNX with title, artist and capo 3. Production replay leaves
+both pieces at revision 0. All 1,715 tests, scenario checks and build passed.
+
+What item 4 inherits:
+
+- **No anonymous library access.** All `/api/library` paths authenticate before reading
+  bodies or storage; live unauthenticated reads and writes return 401. The current
+  bearer token is a private operator credential, mapped server-side to owner `operator`.
+  It is not browser login, and no client chooses an owner. Preserve that owner mapping
+  deliberately when introducing actual user identities.
+- **The owner ruled out self-registration.** Login requires an existing users-table
+  record. Identity-provider sign-in must never create a user automatically. Item 4
+  still needs to choose identity verification and add the users/session schema; even
+  Cloudflare Access would require the Worker membership check. No browser auth option
+  has been selected yet.
+- **Converters and storage had different schema assumptions.** Real cache conversion
+  exposed intentional section/rehearsal labels rejected by published MNX. Storage now
+  validates just those label shapes separately and the remaining structure against
+  published MNX, without modifying stored bytes. AI validation remains published-only;
+  the full experimental schema is not admitted by storage.
+- **Provenance must survive partial caches.** The optional SQLite index supplies exact
+  fetch times, file hashes, raw-export hashes and injected headers. A sidecar-only
+  replay preserves previously known indexed provenance. Converter versions include
+  package version and last converter-source commit, so unrelated commits are no-ops.
+- **The operator protocol is intentionally bounded.** One multipart piece per request,
+  at most 24 MiB. Replays retransmit bytes but do not rewrite existing blobs or unchanged
+  rows. Missing companions never delete rows; canonical choices and renamed lists stay
+  intact. General browsing, user login and larger staged uploads are not implemented.
+- **Deploy with matching build tooling.** The newer installed Wrangler rejected the
+  old Vite plugin's generated `legacy_env` field; the locked Wrangler deployed it.
+  The 52 reference PNGs were preserved from the clean pinned spec checkout. Existing
+  user package upgrades remain uncommitted and untouched.
