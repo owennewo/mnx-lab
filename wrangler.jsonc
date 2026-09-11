@@ -28,9 +28,10 @@
   },
   "compatibility_date": "2026-06-01",
   // API navigations (including the Access login callback) must reach the Worker.
-  // Other navigation paths fall back to the static SPA.
+  // No SPA fallback: every shell routes by hash under its own directory
+  // (/workbench/ today, /studio/ next), and a request no asset answers — the
+  // root included — falls through to the Worker, which owns the redirects.
   "assets": {
-    "not_found_handling": "single-page-application",
     "run_worker_first": ["/api/*"]
   },
   "routes": [

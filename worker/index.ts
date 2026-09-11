@@ -17,6 +17,12 @@ import type { Env } from './env.ts';
 
 const app = new Hono<{ Bindings: Env }>();
 
+// The root is nobody's page: each shell lives in its own directory
+// (/workbench/ today; studio takes /studio/ and this redirect with it —
+// roadmap/proposed/studio-shell.md). No asset answers `/`, so the request
+// falls through to the Worker; 302 because the target is about to change.
+app.get('/', c => c.redirect('/workbench/', 302));
+
 app.route('/api/edit-notation', editNotation);
 app.route('/api/models', modelsRoute);
 app.route('/api/documents', documents);

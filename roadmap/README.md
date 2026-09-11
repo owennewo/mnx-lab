@@ -45,14 +45,6 @@ proposals that name their campaign.
 
 ### proposed/
 
-- **[workbench-path-prefix.md](proposed/workbench-path-prefix.md)** — the workbench moves from
-  the root to **`/workbench/`** so studio can take `mnx-lab.totai.uk`, the address it was
-  always meant to have. Both shells route by hash, so the origin drops its SPA fallback and
-  the repo's top-level HTML files become the URL map (`workbench/index.html`,
-  `studio/index.html`, `embed.html`). Three things assume `/` — the library login redirect,
-  the Load dialog's back link, and six smoke scripts — all mechanical. Lands **before**
-  studio-shell.md; the root redirect belongs to that doc, so the move is invisible until
-  studio exists.
 - **[studio-shell.md](proposed/studio-shell.md)** — **studio starts**: a Lit shell in
   `apps/studio/` at `/studio/` on the same Worker, consuming `elements/` + `storage/` only
   (a new dependency-cruiser leaf). Three hash routes — the tag-filtered library, one piece
@@ -175,6 +167,13 @@ back up to `proposed/` the moment it is.
 
 ### inprogress/
 
+- **[workbench-path-prefix.md](inprogress/workbench-path-prefix.md)** — **built 2026-09-11**,
+  awaiting the deployed checks: the workbench serves at **`/workbench/`**
+  (`workbench/index.html`), the Worker 302s the root there until studio takes it, the SPA
+  fallback is gone, and the login redirect, the Load dialog's back link and six smoke
+  scripts follow. Groundwork for [studio-shell.md](proposed/studio-shell.md). Records that
+  `npm run dev` fails at startup on the untouched tree (vite plugin runner, Node 22.22) —
+  open, not this item's.
 
 
 

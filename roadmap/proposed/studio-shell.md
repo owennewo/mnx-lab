@@ -1,7 +1,7 @@
 # Studio first cut — browse, load, play, behind Access
 
 > **Status: proposed 2026-09-11.** Studio starts. Depends on
-> [workbench-path-prefix.md](workbench-path-prefix.md) (the workbench leaves the root
+> [workbench-path-prefix.md](../inprogress/workbench-path-prefix.md) (the workbench leaves the root
 > first) and on the built [studio storage campaign](../complete/studio-campaign-storage.md)
 > (the library it reads). Its editing phase is the **second consumer** that
 > [core-editor-element-promotion.md](core-editor-element-promotion.md) has been parked
@@ -34,8 +34,8 @@ same imports the `mnx-lab` package exports, never `src/workbench/`.
 
 **Hosting: the same Worker, a path prefix.** Storage contract clause 2 already put D1
 and R2 on the `mnx-lab` Worker; studio's pages sit beside them at `/studio/`. One
-config, one deploy, one Access hostname. The Worker gains exactly one route: `/`
-redirects to `/studio/`.
+config, one deploy, one Access hostname. The Worker's root redirect, which
+workbench-path-prefix.md pointed at `/workbench/` in the interim, flips to `/studio/`.
 
 **Auth: Cloudflare Access at the edge, and nothing else.** See below. `worker/api/auth.ts`
 stays a 501 seam — it is for a public sign-up that is a different product decision.

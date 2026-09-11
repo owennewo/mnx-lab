@@ -187,7 +187,7 @@ library.post('/ingest', async c => {
 
 function reader(c: { env: Env }) { return new Library(c.env.LIBRARY_DB, c.env.LIBRARY_BUCKET, converterVersions); }
 library.get('/me', c => c.json({ user: c.get('libraryUser') }));
-library.get('/login', c => c.redirect('/?library=1', 303));
+library.get('/login', c => c.redirect('/workbench/?library=1', 303));
 library.get('/pieces', async c => {
   const filters = c.req.queries('tag') ?? [];
   if (filters.length > 12 || filters.some(t => t.length > 512 || !t.includes(':'))) return c.json({ error: 'Invalid tag filters' }, 400);

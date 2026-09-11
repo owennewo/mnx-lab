@@ -1,8 +1,9 @@
 # Workbench at `/workbench/` — two faces on one origin
 
-> **Status: proposed 2026-09-11.** Lab-side groundwork for
-> [studio-shell.md](studio-shell.md), which takes `/studio/` and, once it exists, the root.
-> Lands first; studio depends on it, not the other way round. Implementation loop.
+> **Status: built 2026-09-11, in `inprogress/` until the deployed checks below pass.**
+> Lab-side groundwork for [studio-shell.md](../proposed/studio-shell.md), which takes
+> `/studio/` and, once it exists, the root. Lands first; studio depends on it, not the
+> other way round. Implementation loop.
 
 ## The problem
 
@@ -93,3 +94,40 @@ src/entries/main.ts`; both update.
 
 The root redirect, the studio face, Access on `/studio`, and any change to what the
 workbench does. This is a path move and nothing else; the diff should read as one.
+
+## Build record — 2026-09-11
+
+Built as one diff, in the shape the design predicted, with one deliberate departure:
+**the root redirects now, not later.** With the root `index.html` gone and no SPA
+fallback, a deployed `/` would have been a Hono 404 until studio landed. So the Worker
+answers `/` with a 302 to `/workbench/` today; studio-shell.md flips the target to
+`/studio/`. A request no asset answers falls through to the Worker on its own, so
+`run_worker_first` is unchanged (`/api/*` only) — the redirect is a route, not
+configuration. Covered by a Worker test beside the login-redirect one.
+
+**Not carried:** the `@cloudflare/vite-plugin` / `wrangler` / `workers-types` bump that
+was sitting uncommitted in the primary checkout. It was tried here because `npm run dev`
+fails at startup on the untouched tree (`ReferenceError: require is not defined` inside
+the vite plugin's runner worker, Node 22.22) and the bump looked like the attempted fix.
+It is not one: the dev server fails identically on the new versions, and they break
+`tsc -p worker` (workers-types 5 drops the `2023-07-01` subpath `library.ts` imports)
+and every Miniflare test (wrangler 4.131 rejects the harness's constructor options).
+Reverted; the item ships on the committed versions and the dev-server fault stays open
+as a pre-existing environment problem, not this item's. Verification went through the
+build output and the six smoke scripts instead.
+
+Verified locally: `npm run build` emits `dist/client/workbench/index.html` and no root
+page; the Worker test asserts `/` → 302 `/workbench/` and login → `/workbench/?library=1`;
+`smoke:csp`, `smoke:selection`, `smoke:inspector`, `smoke:focus`, `smoke:player` and
+`smoke:unrolled` pass against `/workbench/`; `npm test`, `check:scenarios` and `build`
+green after rebase.
+
+**Still open — the deployed checks**, which need the owner's `npm run deploy`:
+
+- [ ] `https://mnx-lab.totai.uk/` → 302 → `/workbench/`; `/workbench` → `/workbench/`.
+- [ ] Library Load round trip: sign-in button → Access OTP → `/workbench/?library=1` →
+      dialog open and signed in; sign out returns it to the prompt.
+- [ ] PKCE connect returns to `/workbench/#<route>`.
+- [ ] `npm run dev` works again (the plugin fault above), or its cause is recorded.
+
+When those are ticked, this doc moves to `complete/`.

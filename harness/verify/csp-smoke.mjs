@@ -98,10 +98,11 @@ const TYPES = {
 function serve(dir, headers) {
   const server = http.createServer((req, res) => {
     const rel = decodeURIComponent(new URL(req.url, 'http://x').pathname);
-    let file = path.join(dir, rel === '/' ? 'index.html' : rel);
-    // SPA fallback, matching wrangler's not_found_handling.
-    if (!fs.existsSync(file) || fs.statSync(file).isDirectory()) file = path.join(dir, 'index.html');
-    if (!file.startsWith(dir)) {
+    let file = path.join(dir, rel);
+    // A directory serves its index.html; a miss is a 404 — Workers Assets
+    // without the SPA fallback the deploy no longer declares.
+    if (fs.existsSync(file) && fs.statSync(file).isDirectory()) file = path.join(file, 'index.html');
+    if (!file.startsWith(dir) || !fs.existsSync(file)) {
       res.writeHead(404).end('not found');
       return;
     }
@@ -182,8 +183,8 @@ let chrome;
 let site;
 
 try {
-  if (!fs.existsSync(path.join(DIST, 'index.html'))) {
-    throw new Error('dist/client/index.html missing — run `npm run build` first');
+  if (!fs.existsSync(path.join(DIST, 'workbench/index.html'))) {
+    throw new Error('dist/client/workbench/index.html missing — run `npm run build` first');
   }
   if (!fs.existsSync(path.join(DIST, '_headers'))) {
     throw new Error('dist/client/_headers missing — public/_headers did not reach the build output');
@@ -205,7 +206,7 @@ try {
   }
 
   site = await serve(DIST, headers);
-  const pageUrl = `http://127.0.0.1:${site.port}/`;
+  const pageUrl = `http://127.0.0.1:${site.port}/workbench/`;
   console.log(`serving dist/client at ${pageUrl}`);
 
   const profile = fs.mkdtempSync('/tmp/mnx-csp-smoke-');

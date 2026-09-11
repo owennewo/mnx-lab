@@ -63,6 +63,8 @@ it('separates browser and machine authority and fails closed on storage/config e
   env.LIBRARY_ACCESS_AUD = 'browser-test'; await env.LIBRARY_DB.exec('DROP TABLE users'); expect((await request('/me')).status).toBe(503);
 });
 it('only redirects authenticated login to the fixed workbench landing', async () => {
-  const r = await request('/login?return=https://attacker.test'); expect(r.status).toBe(303); expect(r.headers.get('location')).toBe('/?library=1');
+  const r = await request('/login?return=https://attacker.test'); expect(r.status).toBe(303); expect(r.headers.get('location')).toBe('/workbench/?library=1');
+  // The root is nobody's page: the Worker sends it to the shell's directory (workbench-path-prefix).
+  const root = await app.request('http://localhost/', {}, env); expect(root.status).toBe(302); expect(root.headers.get('location')).toBe('/workbench/');
   expect((await app.request('https://mnx-lab.totai.uk/api/library/me', { headers: { 'Cf-Access-Jwt-Assertion': jwt } }, env)).status).toBe(503);
 });

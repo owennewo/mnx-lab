@@ -12,7 +12,7 @@ try{
   ws=new WebSocket(await connect(await devtoolsPort(profile)));await new Promise(r=>ws.addEventListener('open',r,{once:true}));const cdp=client(ws);
   await cdp.send('Runtime.enable');await cdp.send('Page.enable');
   await cdp.send('Page.addScriptToEvaluateOnNewDocument',{source:"localStorage.setItem('mnx-lab.view','notation');"});
-  await cdp.send('Page.navigate',{url:`http://127.0.0.1:${server.port}/#/scenario/spec/repeats-alternate-endings-simple?at=2`});
+  await cdp.send('Page.navigate',{url:`http://127.0.0.1:${server.port}/workbench/#/scenario/spec/repeats-alternate-endings-simple?at=2`});
   let ready=false;for(let i=0;i<100;i++){ready=await cdp.evaluate(`!!document.querySelector('mnx-workbench')?.shadowRoot?.querySelector('mnx-scenario-page')?.shadowRoot?.querySelector('mnx-player')?.performance`);if(ready)break;await new Promise(r=>setTimeout(r,100));}
   if(!ready)throw new Error('Workbench player did not load');
   console.log('workbench player',await cdp.evaluate(`(async()=>{

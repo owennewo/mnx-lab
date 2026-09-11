@@ -36,8 +36,14 @@ const near = (actual, expected, tolerance = 1.5) => Math.abs(actual - expected) 
 function serve(dir) {
   const server = http.createServer((req, res) => {
     const rel = decodeURIComponent(new URL(req.url, 'http://x').pathname);
-    let file = path.join(dir, rel === '/' ? 'index.html' : rel);
-    if (!fs.existsSync(file) || fs.statSync(file).isDirectory()) file = path.join(dir, 'index.html');
+    let file = path.join(dir, rel);
+    // A directory serves its index.html; a miss is a 404, as Workers Assets
+    // serves the deploy without an SPA fallback.
+    if (fs.existsSync(file) && fs.statSync(file).isDirectory()) file = path.join(file, 'index.html');
+    if (!file.startsWith(dir) || !fs.existsSync(file)) {
+      res.writeHead(404).end('not found');
+      return;
+    }
     res.writeHead(200, { 'content-type': TYPES[path.extname(file)] ?? 'application/octet-stream' });
     fs.createReadStream(file).pipe(res);
   });
@@ -172,8 +178,8 @@ const DUMP = `(() => {
 let chrome;
 let site;
 try {
-  if (!fs.existsSync(path.join(DIST, 'index.html'))) {
-    throw new Error('dist/client/index.html missing — run `npm run build` first');
+  if (!fs.existsSync(path.join(DIST, 'workbench/index.html'))) {
+    throw new Error('dist/client/workbench/index.html missing — run `npm run build` first');
   }
   site = await serve(DIST);
   const profile = fs.mkdtempSync('/tmp/mnx-focus-smoke-');
@@ -204,7 +210,7 @@ try {
   });
 
   const url =
-    `http://127.0.0.1:${site.port}/#/scenario/lab/document/twelve-bar-blues`;
+    `http://127.0.0.1:${site.port}/workbench/#/scenario/lab/document/twelve-bar-blues`;
   await cdp.send('Page.navigate', { url });
   await new Promise(resolve => setTimeout(resolve, 6500));
 

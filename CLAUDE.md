@@ -150,7 +150,7 @@ deliberately undecided.
 
 | Face | Entry | Artifact |
 |---|---|---|
-| Workbench | `index.html` → `src/entries/main.ts` | the deployed site + Worker |
+| Workbench | `workbench/index.html` → `src/entries/main.ts` | `/workbench/` on the deployed site + Worker |
 | Embed | `src/entries/embed.ts` (`embed.html` = mock host demo) | `dist/embed/mnx-lab.js` (IIFE+ESM) — registers `elements/` only |
 | Library | `src/entries/lib.ts` via `build:lib` | `mnx-lab` with subpath exports `mnx-lab/{model,engine,audio,elements}` + `mnx-lab/smufl/*` |
 

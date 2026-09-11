@@ -81,7 +81,7 @@ export class LibraryDialog extends LitElement {
       <ul>${this.pieces.map(p => html`<li><button ?disabled=${this.busy} @click=${() => this.load(p)}>${p.title ?? p.id}${p.artist ? html`<small>${p.artist}</small>` : nothing}</button></li>`)}</ul>
       ${!this.busy && this.email && !this.error && !this.pieces.length ? html`<p>No matching pieces.</p>` : nothing}
       ${this.next ? html`<button ?disabled=${this.busy} @click=${() => this.search(true)}>More</button>` : nothing}
-      <footer>${this.email ? html`<span>${this.email}</span><button @click=${() => { this.close(); this.client.signOut(); }}>Sign out</button>` : nothing}<a href="/" @click=${(e: Event) => { e.preventDefault(); this.close(); }}>Back to workbench</a></footer>
+      <footer>${this.email ? html`<span>${this.email}</span><button @click=${() => { this.close(); this.client.signOut(); }}>Sign out</button>` : nothing}<a href="/workbench/" @click=${(e: Event) => { e.preventDefault(); this.close(); }}>Back to workbench</a></footer>
     </dialog>`;
   }
 }

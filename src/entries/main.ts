@@ -1,4 +1,4 @@
-// Build face: the workbench (index.html → this entry). Registers the shell and
+// Build face: the workbench (workbench/index.html → this entry, served at /workbench/). Registers the shell and
 // bundles the one face the design tokens reference — no font CDN.
 //
 // ONE webfont, deliberately (roadmap/proposed/core-modernist-type.md). Archivo

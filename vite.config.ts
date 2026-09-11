@@ -110,7 +110,7 @@ export default defineConfig({
       build: {
         rollupOptions: {
           input: {
-            main: 'index.html',
+            main: 'workbench/index.html',
             // The embeddability demo (a mock third-party host page).
             embed: 'embed.html'
           }

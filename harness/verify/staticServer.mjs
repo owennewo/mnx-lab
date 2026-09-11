@@ -26,8 +26,10 @@ const TYPES = {
 export function serveStatic(dir, port = 0) {
   const server = http.createServer((req, res) => {
     const rel = decodeURIComponent(new URL(req.url, 'http://x').pathname);
-    const file = path.join(dir, rel === '/' ? 'index.html' : rel);
-    if (!file.startsWith(dir) || !fs.existsSync(file) || fs.statSync(file).isDirectory()) {
+    let file = path.join(dir, rel);
+    // A directory serves its index.html, so `/workbench/` resolves like it does on Workers Assets.
+    if (fs.existsSync(file) && fs.statSync(file).isDirectory()) file = path.join(file, 'index.html');
+    if (!file.startsWith(dir) || !fs.existsSync(file)) {
       res.writeHead(404).end('not found');
       return;
     }

@@ -5,7 +5,9 @@
 
 Home is the **attention queue** (blocked → stale → never-seen; current counted, not
 shown), derived from committed provenance in `src/workbench/queue.ts`. Every scenario
-has a stable deep link: `#/scenario/<id>`. The staff view (notation | tab | both) and
+has a stable deep link: `#/scenario/<id>`, under the shell's own directory — the
+workbench is served at **`/workbench/`** (`workbench/index.html`), the root redirects
+there until studio takes it, and nothing relies on an SPA fallback. The staff view (notation | tab | both) and
 the repeats mode are per-browser localStorage preferences like the zoom, not link
 state: with no view stored — or one this document cannot draw — the document's
 `tab.staffKind` hint decides. `?panel=compare|json` links (the queue's rows)
