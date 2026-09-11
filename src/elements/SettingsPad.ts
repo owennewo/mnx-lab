@@ -95,6 +95,15 @@ export class SettingsPad extends LitElement {
   @property({ type: Boolean, reflect: true }) suppressed = false;
 
   @state() private open = false;
+
+  /**
+   * Docked in a host's strip (roadmap/inprogress/core-score-frame.md): the
+   * host's button mounts and unmounts the card, so the card is always open,
+   * laid out in flow rather than hung from a corner mark, and the gear rides
+   * in its head cell as the mark it would otherwise have grown around.
+   */
+  @property({ type: Boolean, reflect: true }) pinned = false;
+
   /** Which row's list is open, if any. One at a time. */
   @state() private openList: string | null = null;
 
@@ -495,6 +504,28 @@ export class SettingsPad extends LitElement {
         margin: var(--rule-w) 0 0;
       }
 
+      /* Pinned: no mark to hang from. The anchor is the card's own box, the
+         card sits in flow, and the gear lands inside the head's slot cell. */
+      :host([pinned]) {
+        padding: 0;
+        margin: 0;
+      }
+
+      :host([pinned]) .anchor {
+        width: auto;
+        height: auto;
+        margin: 0;
+      }
+
+      :host([pinned]) .card {
+        position: static;
+      }
+
+      :host([pinned]) button.gear {
+        top: var(--rule-w);
+        right: var(--rule-w);
+      }
+
       /* ── the mark ──
          One button in both poses. Idle it is a bare glyph at 0.28 — no border,
          no ground, no shadow — because the crosshair beside it is a bare glyph
@@ -772,7 +803,7 @@ export class SettingsPad extends LitElement {
   ];
 
   updated() {
-    this.toggleAttribute('data-open', this.open && !this.suppressed);
+    this.toggleAttribute('data-open', (this.pinned || this.open) && !this.suppressed);
     this.toggleAttribute('data-off', this.offDefault);
   }
 
@@ -823,12 +854,12 @@ export class SettingsPad extends LitElement {
           type="button"
           title="Document settings"
           aria-label="Document settings"
-          aria-expanded=${this.open && !this.suppressed}
+          aria-expanded=${(this.pinned || this.open) && !this.suppressed}
           @click=${() => (this.open = true)}
         >
           ${this.gearGlyph()}
         </button>
-        ${this.open && !this.suppressed
+        ${(this.pinned || this.open) && !this.suppressed
           ? html`
               <div class="card">
                 <div class="head">

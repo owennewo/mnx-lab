@@ -162,6 +162,16 @@ export class ZoomPad extends LitElement {
   @property({ type: Boolean, reflect: true }) suppressed = false;
 
   @state() private open = false;
+
+  /**
+   * Docked in a host's strip rather than idling in a score corner
+   * (roadmap/inprogress/core-score-frame.md): the host's own button opens and
+   * closes the pad by mounting it, so the pad renders only its expanded pose —
+   * no idle mark, no hover morph, no leftward growth. Everything the arms and
+   * the footer do is unchanged; what changes is who owns the trigger.
+   */
+  @property({ type: Boolean, reflect: true }) pinned = false;
+
   /**
    * The pane has stopped giving the staff axis anything: the last increase in
    * the REQUEST left the DRAWN scale where it was. Above about 200% on a
@@ -226,6 +236,17 @@ export class ZoomPad extends LitElement {
         display: flex;
         align-items: flex-start;
         gap: 5px;
+      }
+
+      /* Pinned: the pad is a card in a strip, not a mark in a corner — the
+         grab padding and the right-edge anchor are the corner's, not the card's. */
+      :host([pinned]) {
+        padding: 0;
+        margin: 0;
+      }
+
+      :host([pinned]) .pad {
+        margin-left: 0;
       }
 
       /* The cluster is the score corner's chrome shelf, not just the zoom
@@ -1042,7 +1063,7 @@ export class ZoomPad extends LitElement {
 
   updated() {
     this.toggleAttribute('data-off', this.offDefault);
-    this.renderedExpanded = !this.suppressed && (this.open || this.dragging);
+    this.renderedExpanded = !this.suppressed && (this.pinned || this.open || this.dragging);
     this.noteSaturation();
   }
 
@@ -1278,7 +1299,7 @@ export class ZoomPad extends LitElement {
   render() {
     // Dragging holds the pad open even when the pointer leaves it, and the
     // tray's claim on attention beats both.
-    const expanded = !this.suppressed && (this.open || this.dragging);
+    const expanded = !this.suppressed && (this.pinned || this.open || this.dragging);
     const staffHot = this.staffScale !== null;
     const spaceHot = this.densityH !== null;
     const atStaffMax = this.requestedStaff >= MAX_STAFF_SCALE || this.staffSaturated;

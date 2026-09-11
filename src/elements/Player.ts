@@ -1,4 +1,5 @@
-import { LitElement, html, css, nothing } from 'lit';
+import { LitElement, html, css, svg, nothing } from 'lit';
+import { designTokens } from './tokens.ts';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { Performance } from '../audio/performanceTypes.ts';
 import {
@@ -41,63 +42,136 @@ export class Player extends LitElement {
   private playRequest = 0;
   private lastUpdate = '';
   private lastOrdinal: number | null = null;
-  static styles = css`
+  /**
+   * The tray, in the library page's vocabulary (roadmap/inprogress/core-score-frame.md,
+   * 2026-09-12): the shared tokens, 40px controls so the tray is catchable on
+   * glass, the transport as glyphs on the accent, and a scrubber over the
+   * performed order. The order table is closed by default — the frame it now
+   * lives in is a strip over the score, not a panel beside it.
+   */
+  static styles = [
+    designTokens,
+    css`
     :host {
       display: block;
-      font: 13px/1.4 system-ui;
-      color: light-dark(#242424, #eeeeee);
-      background: light-dark(#faf9f6, #252525);
-      border-block: 1px solid light-dark(#ddd, #555);
+      font: 14px/1.4 var(--sans);
+      color: var(--ink);
+      --player-ground: light-dark(oklch(0.9 0.004 60), oklch(0.26 0.006 60));
     }
     .controls {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
       flex-wrap: wrap;
-      padding: 10px;
     }
     button,
     select,
     input {
       font: inherit;
-      accent-color: light-dark(#245daa, #8cbbff);
+      color: inherit;
+      accent-color: var(--accent);
     }
     button,
-    select {
-      color: inherit;
+    select,
+    label.select {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      height: 40px;
+      box-sizing: border-box;
       background: transparent;
-      border: 1px solid light-dark(#aaa, #666);
+      border: 1px solid var(--line);
       border-radius: 3px;
-      padding: 5px 8px;
+      padding: 0 12px;
       cursor: pointer;
+      white-space: nowrap;
+    }
+    button:hover:not(:disabled) {
+      border-color: var(--ink-3);
+    }
+    button.icon {
+      width: 40px;
+      padding: 0;
+      justify-content: center;
+    }
+    button.primary {
+      width: 48px;
+      height: 48px;
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
     }
     button:disabled {
-      opacity: 0.5;
+      opacity: 0.4;
       cursor: default;
     }
     button:focus-visible,
     select:focus-visible,
     input:focus-visible {
-      outline: 2px solid light-dark(#245daa, #8cbbff);
+      outline: var(--rule-w) solid var(--focus-ring);
       outline-offset: 2px;
     }
+    label.select {
+      padding: 0 4px 0 12px;
+      color: var(--ink-3);
+    }
+    label.select select {
+      border: 0;
+      padding: 0 4px;
+      height: 100%;
+      color: var(--ink);
+    }
     output {
-      flex: 1;
-      min-width: 12em;
+      font: 500 13px/1 var(--mono);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
     }
-    input {
-      width: 75px;
+    output.none {
+      font: inherit;
+      color: var(--ink-3);
     }
-    label {
-      display: flex;
+    .scrub {
+      flex: 1 1 160px;
+      min-width: 120px;
+      height: 40px;
+      margin: 0;
+    }
+    label.volume {
+      display: inline-flex;
       align-items: center;
-      gap: 4px;
+      gap: 8px;
+      color: var(--ink-3);
+    }
+    label.volume input {
+      width: 110px;
     }
     details {
-      padding: 0 10px 8px;
+      margin-top: 8px;
     }
     summary {
       cursor: pointer;
+      color: var(--ink-2);
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      height: 36px;
+    }
+    summary::-webkit-details-marker {
+      display: none;
+    }
+    summary::after {
+      content: '';
+      width: 7px;
+      height: 7px;
+      border: solid currentColor;
+      border-width: 0 1.6px 1.6px 0;
+      transform: rotate(45deg);
+      margin-top: -4px;
+    }
+    details[open] summary::after {
+      transform: rotate(-135deg);
+      margin-top: 4px;
     }
     .table {
       max-height: 180px;
@@ -113,20 +187,29 @@ export class Player extends LitElement {
     th {
       text-align: left;
       padding: 4px;
-      border-bottom: 1px solid light-dark(#ddd, #444);
+      border-bottom: 1px solid var(--line);
+    }
+    th {
+      color: var(--ink-3);
+      font-weight: 400;
+      font-size: 12px;
     }
     tr[aria-current='true'] {
-      background: light-dark(#deebff, #304766);
+      background: var(--row-current);
     }
     td button {
       width: 100%;
+      height: 36px;
       text-align: left;
       border: 0;
+      padding: 0 4px;
     }
     p {
-      margin: 8px 10px;
+      margin: 8px 0 0;
+      color: var(--ink-2);
     }
-  `;
+  `
+  ];
   connectedCallback() {
     super.connectedCallback();
     try {
@@ -323,21 +406,48 @@ export class Player extends LitElement {
       localStorage.setItem('mnx-player-volume', String(this.volume));
     } catch {}
   }
+  private static glyph(d: string, px = 22) {
+    return svg`<svg width=${px} height=${px} viewBox="0 0 24 24" aria-hidden="true"><path d=${d} fill="currentColor"></path></svg>`;
+  }
+
+  private onScrub(event: Event) {
+    this.seek(Number((event.target as HTMLInputElement).value));
+  }
+
   render() {
     const playing = this.status?.state === 'playing';
+    const count = this.performance?.measures.length ?? 0;
     return html` <div class="controls">
         <button
+          class="primary"
           ?disabled=${!this.performance || this.loading}
+          aria-label=${this.loading ? 'Loading' : playing ? 'Pause' : 'Play'}
+          title=${this.loading ? 'Loading…' : playing ? 'Pause' : 'Play'}
           @click=${() => (playing ? this.pause() : void this.play())}
         >
-          ${this.loading ? 'Loading…' : playing ? 'Pause' : 'Play'}</button
-        ><button ?disabled=${!this.performance} @click=${() => this.stop()}>Stop</button>
-        <output aria-live="off"
+          ${playing ? Player.glyph('M7 5h3.5v14H7zM13.5 5H17v14h-3.5z') : Player.glyph('M8 5l11 7-11 7z')}
+        </button>
+        <button class="icon" ?disabled=${!this.performance} aria-label="Stop" title="Stop" @click=${() => this.stop()}>
+          ${Player.glyph('M6 6h12v12H6z', 18)}
+        </button>
+        <output aria-live="off" class=${this.performance ? '' : 'none'}
           >${this.performance
             ? formatPlaybackPosition(this.performance, this.position, this.document)
             : 'No performance available'}</output
         >
-        <label
+        ${count > 1
+          ? html`<input
+              class="scrub"
+              type="range"
+              min="0"
+              max=${count - 1}
+              step="1"
+              aria-label="Position"
+              .value=${String(this.lastOrdinal ?? 0)}
+              @input=${this.onScrub}
+            />`
+          : nothing}
+        <label class="select"
           >Sound<select
             aria-label="Playback sound"
             .value=${this.voicePreset}
@@ -354,15 +464,15 @@ export class Player extends LitElement {
             )}
           </select></label
         >
-        <label
+        <label class="select"
           >Rate<select aria-label="Playback rate" @change=${this.changeRate}>
             ${[0.5, 0.75, 1, 1.25, 1.5].map(
               (r) => html`<option value=${r} ?selected=${r === this.rate}>${r}×</option>`,
             )}
           </select></label
         >
-        <label
-          >Volume<input
+        <label class="volume" title="Volume">
+          ${Player.glyph('M4 9v6h4l5 4V5L8 9z', 18)}<input
             aria-label="Volume"
             type="range"
             min="0"
@@ -379,7 +489,7 @@ export class Player extends LitElement {
         : nothing}
       ${this.error ? html`<p role="alert">Playback unavailable: ${this.error}</p>` : nothing}
       ${this.performance
-        ? html`<details open>
+        ? html`<details>
             <summary>Performed order · ${this.performance.measures.length} visits</summary>
             <div class="table">
               <table>

@@ -11,3 +11,4 @@ export { bindPlayback } from '../../elements/playbackHost.ts';
 export { ZoomPad, type ZoomPadChange, type ZoomAxis } from '../../elements/ZoomPad.ts';
 export { SettingsPad } from '../../elements/SettingsPad.ts';
 export { DEFAULT_DISPLAY_PREFERENCES } from '../../elements/displayDefaults.ts';
+export { ScoreFrame } from '../../elements/ScoreFrame.ts';
