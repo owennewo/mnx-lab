@@ -84,8 +84,9 @@ later campaign; this one lays the storage they all stand on.
    "workbench reaches the Worker only through `assist/`" to "through `assist/` and
    `storage/`" — a CLAUDE.md edit that item 4 makes explicitly.
 6. **Nothing is public.** Every library route requires authentication from day one, in some
-   form; the tabs are copyrighted and the read routes serve them whole. Item 4 is a shell
-   until the auth conversation has happened. **No self-registration:** a person must
+   form; the tabs are copyrighted and the read routes serve them whole. **Chosen for
+   item 4: Cloudflare Access email codes, 30-day sessions, and an active users-table
+   check on every library request** (details below). **No self-registration:** a person must
    already have a users-table record before login is allowed; signing in must never
    create that record. Browser identity must resolve server-side to that user and owner.
    The operator ingest token is a separate machine credential, not a user login.
@@ -119,8 +120,61 @@ Ordered; each item is a normal proposal doc written when it is picked up, not be
 | 1 | [studio-storage-provision](../complete/studio-storage-provision.md) | **built 2026-09-11** | Create the Cloudflare resources — one D1 database, one R2 bucket — and bind them: `wrangler.jsonc` bindings, `worker/env.ts` types, a Worker secret for the ingest script's write token, `.dev.vars` for local. **Tooling decision inside the item:** `wrangler d1 create` / `wrangler r2 bucket create` wrapped in one checked-in, idempotent bootstrap script, rather than Terraform — see *Why not Terraform (yet)* below. Done when `wrangler dev` starts with local D1 and R2 and `npm run deploy` reaches the real ones. |
 | 2 | [studio-storage-schema](../complete/studio-storage-schema.md) | built | The D1 migrations for the design doc's five tables (`migrations/`, applied with `wrangler d1 migrations apply`, local and remote), the R2 key layout, and a DOM-free `worker/library/` module: typed reads and writes that enforce the invariants (insert rendition → immutable; set canonical → one pointer; write MNX → re-derive tags). A harness test runs the module against local D1 via `wrangler dev`/Miniflare so the schema is exercised before any real data touches it. |
 | 3 | [lab-library-ingest](../complete/lab-library-ingest.md) | **built 2026-09-11** | A personal operator script, `tools/library-ingest.mjs` run as `npm run ingest:library -- <dir>` (`lab-` because it serves the repo's owner, not a shell). Reads a `soundslice-cli` `gp/files/` directory, builds one piece per slice (renditions from every notation file with role, producer — the cached `.gp` is `soundslice-cli`, header-injected, with the raw export's sha256 in `provenance` — filename and fetch time; recordings with syncpoints keyed by Soundslice recording id; asserted tags from `lists.json` as `unknown:<path>` with the list id as `source_ref`), derives MNX from the `.gp` **and** from the MusicXML with the converters built from the checkout (recording package version, git sha and flags as `producer_version`/`producer_options`), and pushes everything through the Worker's ingest route with the write token. `--dry-run` prints the plan; re-runs are no-ops by sha256 (contract 7). Done when both exported slices are in the real library and `Blues Run The Game` resolves through its canonical pointer to an MNX with title, artist and capo 3. |
-| 4 | `studio-storage-read` | **shell — discuss first** | Read routes (`GET /api/library/pieces?tag=…` filtered by any number of `dimension:value` tags; `GET /api/library/tags?dimension=&q=` for completion; `GET /api/library/renditions/<id>` streaming the blob; the piece's canonical MNX resolved server-side) and a workbench **Load** button with tag completion — type `tuning:` and see the values, stack several, pick a piece, open its canonical MNX in the viewer. **Blocked on an auth conversation** before it is designed: the candidates are Cloudflare Access as the identity gate (plus a Worker users-table check; a Terraform-shaped resource — see below), a per-user bearer credential, or studio's own auth seam (`worker/api/auth.ts`) brought forward. **Owner requirement, 2026-09-11:** no self-registration or automatic user creation at login; an existing users-table record is mandatory. Item 4 must add the users schema and enforce that requirement whichever identity mechanism is chosen. A shared operator token is not the browser login solution. The decision shapes items 1 and 5 too, so the conversation happens after item 3 lands and before this item is written. |
+| 4 | `studio-storage-read` | auth chosen — ready to design | Cloudflare Access email codes, 30-day sessions and pre-provisioned users; see the decision below. Add authenticated owner-scoped piece/tag/rendition reads and canonical MNX resolution, plus the workbench Load button with tag completion. No self-registration. The workbench remains usable without login; only its optional library access is protected. Write the item's proposal when implementation is picked up. |
 | 5 | `studio-storage-rederive` | proposed | The payoff for keeping every format. A sweep (an ingest-script subcommand or a Worker cron) that, for every piece, derives a fresh MNX child from each source rendition with the converters at their current versions, stores it as a new rendition when its bytes differ from the previous child (with `_x.mnxLab.encoding` discounted in the comparison, per the converters' own rule), rebuilds derived tags from the canonical path, and reports the differences per piece and per converter. A converter regression is then a line in that report rather than a bug someone happens to notice. Also the home of the alias table's "apply to documents" action once editing exists — not before. |
+
+## Item 4 authentication decision — 2026-09-11
+
+**Chosen by the owner:** Cloudflare Access sends one-time email codes; keep the browser
+session for 30 days; require a pre-existing active D1 user. No passwords, social login,
+passkeys, custom email delivery or public registration in the initial implementation.
+
+Implementation defaults, to make the item concrete:
+
+- **Two checks, both mandatory.** Access verifies mailbox control. The Worker validates
+  the signed Access JWT (signature, issuer, application audience and expiry), then
+  matches its email to a pre-added active user. Never trust a bare email header or
+  create a user at login. Access authentication alone is not studio authorization.
+- **Admin provisioning first.** A checked-in operator command adds/disables users and
+  maintains Access's explicit email allowlist. No public add-user endpoint or admin UI
+  initially. D1 is authoritative even if the edge allowlist is temporarily stale; fail
+  closed on missing users, disabled users, missing auth configuration or database errors.
+- **Stable ownership.** Add users with a stable id, unique normalized email, active flag
+  and creation timestamp. Use the stable id as the library owner, never a client-supplied
+  email or id. Seed the existing account with id `operator` so its two imported pieces
+  retain ownership. Confirm the first permitted email at rollout; do not infer it from
+  the CLI's Cloudflare account login.
+- **Session and revocation.** Set global and application durations to 30 days (`720h`),
+  with policies inheriting the application duration. This is a fixed browser-session
+  policy, not a per-device checkbox or a rolling 30-day inactivity promise. Check user
+  activity on every library request; disabling a user blocks subsequent requests without
+  waiting for cookie expiry. Provide logout and a route back to the workbench.
+- **Protect the library, preserve the public workbench.** Cover library metadata and
+  blobs, plus a browser login entry point; leave the static corpus and assist demo as
+  they are. Use top-level navigation for the Access challenge, not a redirect hidden
+  inside a background fetch. Expiry/rejection must leave the viewer usable and offer
+  sign-in. Validate JWTs in the Worker even on alternate hostnames; keep R2 private.
+- **Keep machine ingest explicit.** Plan a separate Access Service Auth policy/application
+  scoped to the ingest paths, using an Access service token alongside the existing
+  Worker write token. Both remain operator secrets. Browser identity does not grant
+  operator ingest privileges; machine credentials do not grant general browser reads.
+  The ingest owner must also be active in D1. Verify path-policy precedence and repeat
+  the real ingest no-op smoke when Access is enabled; never add an anonymous bypass.
+- **Local and rollout checks.** Use local signed test identities with a local-only trust
+  configuration; production never accepts a development identity header. Test unknown
+  and disabled users, forged/expired/wrong-audience tokens, owner isolation, logout,
+  session settings and machine ingest. Only account setup, the initial permitted email
+  and real sign-in verification require the owner's participation.
+
+The Access choice **triggers the infrastructure tooling revisit** recorded below. Item 4
+must record its concrete choice (Terraform vs an idempotent Cloudflare API bootstrap),
+including state/secret handling, before provisioning Access resources. This decision
+updates the plan only; Access and the users table are not deployed yet.
+
+References: [Access email codes](https://developers.cloudflare.com/cloudflare-one/integrations/identity-providers/one-time-pin/),
+[session durations](https://developers.cloudflare.com/cloudflare-one/access-controls/access-settings/session-management/),
+[JWT validation](https://developers.cloudflare.com/cloudflare-one/access-controls/applications/http-apps/authorization-cookie/validating-json/),
+[service tokens](https://developers.cloudflare.com/cloudflare-one/access-controls/service-credentials/service-tokens/).
 
 Later, outside this campaign: the sync engine and Durable Object (the design doc's *When
 the Durable Object arrives*), sharing tiers, studio's front end.
@@ -140,8 +194,8 @@ toolchain for every agent working in the repo. A checked-in idempotent bootstrap
 over the wrangler commands, with the resulting ids committed in `wrangler.jsonc` (ids are
 not secrets), reproduces the account from nothing and reads in one screen.
 
-The honest trigger to revisit: **item 4's auth decision.** If it lands on Cloudflare Access,
-that is an Access application plus policies — resources outside wrangler's reach, exactly
+The trigger has now fired: **item 4 chose Cloudflare Access on 2026-09-11.**
+That adds an Access application plus policies — resources outside wrangler's reach, exactly
 the kind Terraform is for — and DNS or a second environment would tip the same way. Record
 the choice in item 1's doc so the revisit is a known cost, not a surprise.
 
@@ -312,3 +366,12 @@ What item 4 inherits:
   old Vite plugin's generated `legacy_env` field; the locked Wrangler deployed it.
   The 52 reference PNGs were preserved from the clean pinned spec checkout. Existing
   user package upgrades remain uncommitted and untouched.
+
+
+### 6. 2026-09-11 — browser auth selected
+
+The owner chose Cloudflare Access email codes, 30-day sessions and a pre-existing users
+table. Item 4 is ready to design against the decision above; the former open menu of
+identity mechanisms is closed for the initial implementation. User provisioning,
+revocation, stable ownership, machine ingest and the infrastructure tooling revisit
+are explicitly included. This is a planning update; no authentication resources changed.

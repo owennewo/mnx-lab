@@ -387,8 +387,8 @@ to make deliberately when the DO starts, in studio's own backend rules.
 - The sync protocol (push/pull, client replica, offline queue) and the DO's internal schema.
 - The sharing ladder (URL-fragment, tag-shares, publish tier) and copyright handling at the
   publish moment.
-- Auth. The workbench's read access and studio's accounts are the campaign's discussion
-  blocker, not a storage question.
+- Auth implementation. The chosen Access/user-table boundary is recorded below;
+  provisioning and browser integration belong to campaign item 4.
 - Cost. Everything here fits the Workers free plan for development; the $5/mo Workers Paid
   plan is the floor the day real users arrive (the free tier's ceilings are hard daily caps
   that fail writes rather than bill).
@@ -396,10 +396,17 @@ to make deliberately when the DO starts, in studio's own backend rules.
 
 ## User login boundary (item 4)
 
-Browser authentication is not selected yet. The owner's requirement (2026-09-11) is
-mandatory: a user must already exist in the users table to log in. There is no public
-registration and no automatic user creation on first identity-provider sign-in. The
-server resolves authenticated identity to the pre-existing user and its storage owner;
-clients cannot choose their owner. The users table and browser sessions are future
-item 4 work, not part of the five storage tables above. The current private ingest token
-is an operator credential and does not provide browser user login.
+The owner selected **Cloudflare Access email codes + 30-day sessions + a users-table
+check** on 2026-09-11. The [campaign's item 4 decision](../roadmap/inprogress/studio-campaign-storage.md#item-4-authentication-decision--2026-09-11)
+is the implementation contract. The Worker validates the Access JWT, matches its signed
+email to a pre-provisioned active user, and uses the stable user id as storage owner.
+There is no public registration or automatic user creation during login. Check user
+activity on every library request so disabling a user takes effect before cookie expiry.
+
+Item 4 adds the users migration (stable id, unique normalized email, active flag and
+creation timestamp) and an operator provisioning command. The first user's id remains
+`operator` to retain ownership of the two imported pieces; confirm its email at rollout.
+These additions are planned, not part of the five storage tables already deployed.
+Access manages browser sessions; no separate studio session store is initially planned.
+The private ingest token remains a machine credential, with a scoped Access service
+credential planned to keep the operator script working after the edge gate is enabled.
