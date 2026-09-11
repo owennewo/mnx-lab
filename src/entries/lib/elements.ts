@@ -6,3 +6,8 @@ export { playbackStateContext, initialPlaybackState, type PlaybackState, type Pl
 
 export { Player } from '../../elements/Player.ts';
 export { bindPlayback } from '../../elements/playbackHost.ts';
+
+// The score chrome both shells share (roadmap/inprogress/core-score-frame.md).
+export { ZoomPad, type ZoomPadChange, type ZoomAxis } from '../../elements/ZoomPad.ts';
+export { SettingsPad } from '../../elements/SettingsPad.ts';
+export { DEFAULT_DISPLAY_PREFERENCES } from '../../elements/displayDefaults.ts';

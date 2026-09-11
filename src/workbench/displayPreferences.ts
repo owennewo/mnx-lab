@@ -1,11 +1,9 @@
 import { normalizeDisplayOptions, type DisplayOptions } from '../engine/displayOptions.ts';
 
+import { DEFAULT_DISPLAY_PREFERENCES } from '../elements/displayDefaults.ts';
+
+export { DEFAULT_DISPLAY_PREFERENCES };
 export const DISPLAY_PREFERENCES_KEY = 'mnx-lab:display';
-/** Host defaults are explicit; omitted engine options retain legacy labels. */
-export const DEFAULT_DISPLAY_PREFERENCES: Readonly<DisplayOptions> = {
-  lyrics: 'all', timeSignatures: 'show', clefs: 'show', title: 'show',
-  barNumbers: 'every-system', instrumentNames: 'first-system', beams: 'slanted', clearance: 2
-};
 export function displayPreferences(input: unknown): DisplayOptions {
   const { selectedVerse: _transient, ...validated } = normalizeDisplayOptions(input);
   return { ...DEFAULT_DISPLAY_PREFERENCES, ...validated };

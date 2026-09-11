@@ -156,6 +156,12 @@ back up to `proposed/` the moment it is.
 
 ### inprogress/
 
+- **[core-score-frame.md](inprogress/core-score-frame.md)** — **started 2026-09-11**: the score
+  pane's **edge grips** — a title grip on the top edge, a pause grip on the bottom, a
+  hairline progress line — drawn out into the library page's tools row (staff view as the
+  sort control, Zoom and Settings hosting the promoted pads) and the player's tray. One
+  `<mnx-score-frame>` element in `elements/`, mounted by studio's piece page and the
+  workbench's scenario page; a tap on the score stays navigation. Five phases, pads first.
 - **[studio-library-navigation.md](inprogress/studio-library-navigation.md)** — **built 2026-09-11**, awaiting the deployed checks: the library made
   navigable: **Option A** from the design canvas — a rail where every dimension reads
   `Artist: All` until opened, values with counts, sort as one click (Recent · Title · Artist),

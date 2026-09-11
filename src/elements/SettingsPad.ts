@@ -1,9 +1,9 @@
 import { DISPLAY_CHOICES, type DisplayOptions } from '../engine/displayOptions.ts';
 import { LitElement, html, css, svg, nothing, type TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { DEFAULT_DISPLAY_PREFERENCES } from './displayPreferences.ts';
-import { designTokens, sharedChrome } from '../elements/tokens.ts';
-import type { ViewMode } from '../elements/DocumentViewer.ts';
+import { DEFAULT_DISPLAY_PREFERENCES } from './displayDefaults.ts';
+import { designTokens, sharedChrome } from './tokens.ts';
+import type { ViewMode } from './DocumentViewer.ts';
 
 /**
  * The document settings pad — the leftmost mark in the score-corner cluster,

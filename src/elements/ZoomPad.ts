@@ -1,6 +1,6 @@
 import { LitElement, html, css, svg } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { designTokens, sharedChrome } from '../elements/tokens.ts';
+import { designTokens, sharedChrome } from './tokens.ts';
 import {
   BASELINE_PX_PER_SP,
   MIN_STAFF_SCALE,
