@@ -3,7 +3,7 @@
 > **A campaign** (see CLAUDE.md → Roadmap-driven development): this doc is an index over
 > normal proposals sharing one goal, the shared contract they follow, and the running log
 > of progress and learnings as items land. Indexed items are ordinary `studio-*` proposals
-> that name this campaign. **Opened 2026-09-11.** Item 1 is in progress; nothing is deployed yet. The design it
+> that name this campaign. **Opened 2026-09-11.** Item 1 is built and deployed; items 2–5 remain. The design it
 > implements is [docs/studio-storage.md](../../docs/studio-storage.md); this doc owns the
 > order and the contract, that doc owns the shape.
 
@@ -113,7 +113,7 @@ Ordered; each item is a normal proposal doc written when it is picked up, not be
 
 | # | Item | Status | Summary |
 | --- | --- | --- | --- |
-| 1 | [studio-storage-provision](studio-storage-provision.md) | in progress | Create the Cloudflare resources — one D1 database, one R2 bucket — and bind them: `wrangler.jsonc` bindings, `worker/env.ts` types, a Worker secret for the ingest script's write token, `.dev.vars` for local. **Tooling decision inside the item:** `wrangler d1 create` / `wrangler r2 bucket create` wrapped in one checked-in, idempotent bootstrap script, rather than Terraform — see *Why not Terraform (yet)* below. Done when `wrangler dev` starts with local D1 and R2 and `npm run deploy` reaches the real ones. |
+| 1 | [studio-storage-provision](../complete/studio-storage-provision.md) | **built 2026-09-11** | Create the Cloudflare resources — one D1 database, one R2 bucket — and bind them: `wrangler.jsonc` bindings, `worker/env.ts` types, a Worker secret for the ingest script's write token, `.dev.vars` for local. **Tooling decision inside the item:** `wrangler d1 create` / `wrangler r2 bucket create` wrapped in one checked-in, idempotent bootstrap script, rather than Terraform — see *Why not Terraform (yet)* below. Done when `wrangler dev` starts with local D1 and R2 and `npm run deploy` reaches the real ones. |
 | 2 | `studio-storage-schema` | proposed | The D1 migrations for the design doc's five tables (`migrations/`, applied with `wrangler d1 migrations apply`, local and remote), the R2 key layout, and a DOM-free `worker/library/` module: typed reads and writes that enforce the invariants (insert rendition → immutable; set canonical → one pointer; write MNX → re-derive tags). A harness test runs the module against local D1 via `wrangler dev`/Miniflare so the schema is exercised before any real data touches it. |
 | 3 | `lab-library-ingest` | proposed | A personal operator script, `tools/library-ingest.mjs` run as `npm run ingest:library -- <dir>` (`lab-` because it serves the repo's owner, not a shell). Reads a `soundslice-cli` `gp/files/` directory, builds one piece per slice (renditions from every notation file with role, producer — the cached `.gp` is `soundslice-cli`, header-injected, with the raw export's sha256 in `provenance` — filename and fetch time; recordings with syncpoints keyed by Soundslice recording id; asserted tags from `lists.json` as `unknown:<path>` with the list id as `source_ref`), derives MNX from the `.gp` **and** from the MusicXML with the converters built from the checkout (recording package version, git sha and flags as `producer_version`/`producer_options`), and pushes everything through the Worker's ingest route with the write token. `--dry-run` prints the plan; re-runs are no-ops by sha256 (contract 7). Done when both exported slices are in the real library and `Blues Run The Game` resolves through its canonical pointer to an MNX with title, artist and capo 3. |
 | 4 | `studio-storage-read` | **shell — discuss first** | Read routes (`GET /api/library/pieces?tag=…` filtered by any number of `dimension:value` tags; `GET /api/library/tags?dimension=&q=` for completion; `GET /api/library/renditions/<id>` streaming the blob; the piece's canonical MNX resolved server-side) and a workbench **Load** button with tag completion — type `tuning:` and see the values, stack several, pick a piece, open its canonical MNX in the viewer. **Blocked on an auth conversation** before it is designed: the candidates are Cloudflare Access in front of `/api/library/*` (zero code, but a Terraform-shaped resource — see below), a bearer token held in the browser like the BYOK OpenRouter key, or studio's own auth seam (`worker/api/auth.ts`) brought forward. The decision shapes items 1 and 5 too, so the conversation happens after item 3 lands and before this item is written. |
@@ -199,3 +199,36 @@ already the case, and one claim was corrected. What the items inherit:
   uniformity, not necessity.
 - **Syncpoints reference no rendition.** The player checks performed-bar count against
   syncpoint count before syncing and refuses with a reason on a mismatch.
+
+### 3. 2026-09-11 — item 1: storage provisioned and deployed
+
+[studio-storage-provision](../complete/studio-storage-provision.md) landed: D1
+`mnx-studio-library` (`2e76025c-80d7-40b8-a2dd-c80f051b1867`), R2
+`mnx-studio-library`, and the `LIBRARY_WRITE_TOKEN` Worker secret. The existing Worker
+entry now deploys to `mnx-lab.totai.uk` with `LIBRARY_DB` and `LIBRARY_BUCKET`; neither
+store contains application data. All 1,683 tests and the scenario/build gates passed.
+
+What was learned, and what item 2 inherits:
+
+- **Account activation precedes bootstrap.** R2 initially returned `10042`; the owner
+  enabled R2, then the same script succeeded. Listing both resources before creation
+  avoided a partial provisioning attempt. A second successful run was a no-op.
+- **Names and UUIDs are the inventory.** Use `node tools/bootstrap-storage.mjs`; the
+  script refuses to replace a missing or mismatched committed D1 database. R2 is
+  identified by its name; Wrangler 4.99.0 lists it as labelled text, not JSON.
+- **Resource tags were explicitly skipped.** The beta API returned 403 for the OAuth
+  credential; the owner chose to omit tags rather than provision another credential.
+- **Secrets are separate from resources.** The private ingest copy is in the primary
+  checkout's ignored `.secrets/library-write-token` (0600), outside the retired worktree.
+  Local `.dev.vars` uses a development-only value. The account had no Worker; setting
+  the secret created its shell, and the first app deploy preserved the secret.
+- **Item 2 starts with empty stores.** Bindings and types exist; `migrations/`, the five
+  tables, the Worker library module and all invariant-enforcing writes are its work.
+  Keep local bindings local, apply remote migrations deliberately, and reject writes
+  when the token is absent. No public library route or ingest endpoint exists yet.
+- **Deployment assets need the reference engravings.** The worktree left `vendor/mnx`
+  empty as prescribed. The deploy included 52 images from the primary checkout's
+  verified clean pin as temporary public assets; live HTML and PNG bytes matched.
+
+Fast-forwarded and pushed through `a14f25d`; the worktree and branch were retired before
+this log entry. Production version: `e343f161-3383-40ca-a9d1-dbb91b53cf01`.

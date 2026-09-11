@@ -168,7 +168,6 @@ back up to `proposed/` the moment it is.
   report line. The schema lives in [docs/studio-storage.md](../docs/studio-storage.md), refocused
   2026-09-11 from the former `studio-storage-sync` proposal (sync engine and sharing ladder
   remain in that file's git history).
-- **[studio-storage-provision.md](inprogress/studio-storage-provision.md)** — storage campaign item 1, in progress: idempotent Wrangler bootstrap, D1/R2 bindings and ingest write secret; local smoke and first deployment.
 
 - **[core-campaign-player.md](inprogress/core-campaign-player.md)** — **campaign**: the player,
   **for the reviewer first** — hear what a scenario asserts, a cursor that knows its repeat
@@ -378,6 +377,8 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+
+- **[studio-storage-provision.md](complete/studio-storage-provision.md)** — storage campaign item 1, **built 2026-09-11**: idempotent Wrangler bootstrap, live D1/R2 bindings and private ingest write secret; local and production smoke passed. Stores remain empty for item 2.
 
 - **[core-player-piano-synth.md](complete/core-player-piano-synth.md)** — item 14: a CC0
   upright piano (26 roots, MIDI 24–107 — the first pack that spans the staff at both ends)
