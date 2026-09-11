@@ -392,3 +392,14 @@ to make deliberately when the DO starts, in studio's own backend rules.
 - Cost. Everything here fits the Workers free plan for development; the $5/mo Workers Paid
   plan is the floor the day real users arrive (the free tier's ceilings are hard daily caps
   that fail writes rather than bill).
+
+
+## User login boundary (item 4)
+
+Browser authentication is not selected yet. The owner's requirement (2026-09-11) is
+mandatory: a user must already exist in the users table to log in. There is no public
+registration and no automatic user creation on first identity-provider sign-in. The
+server resolves authenticated identity to the pre-existing user and its storage owner;
+clients cannot choose their owner. The users table and browser sessions are future
+item 4 work, not part of the five storage tables above. The current private ingest token
+is an operator credential and does not provide browser user login.
