@@ -378,7 +378,7 @@ revocation, stable ownership, machine ingest and the infrastructure tooling revi
 are explicitly included. This is a planning update; no authentication resources changed.
 
 
-### 7. 2026-09-11 — first user provisioning requested
+### 7. 2026-09-11 — first user provisioned
 
 The owner supplied the initial email explicitly and requested manual provisioning.
 `0002_users.sql` adds stable user ids, unique normalized emails, an active flag and a
@@ -387,3 +387,11 @@ already assigned to that identity. No ownership rewrite or blob mutation is need
 The email is account data, not a committed seed. Access setup, active-user enforcement
 and the reusable provisioning command remain item 4 work; this schema alone does not
 change the deployed private-token API or enable browser login.
+
+
+Completion: migration `0002_users.sql` is applied locally and in production. The owner's
+explicitly supplied email is provisioned as active user `operator`; a production join
+verified ownership of both `B2qHc` and `wJPHc`, with piece revisions, timestamps and
+canonical pointers unchanged. All 1,717 tests, scenario checks and build passed after
+rebase. Landed and pushed through `d5a49fc`; the worktree and branch were retired before
+this completion record. Browser login and active-user enforcement remain item 4 work.
