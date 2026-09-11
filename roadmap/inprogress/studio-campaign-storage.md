@@ -142,8 +142,8 @@ Implementation defaults, to make the item concrete:
 - **Stable ownership.** Add users with a stable id, unique normalized email, active flag
   and creation timestamp. Use the stable id as the library owner, never a client-supplied
   email or id. Seed the existing account with id `operator` so its two imported pieces
-  retain ownership. Confirm the first permitted email at rollout; do not infer it from
-  the CLI's Cloudflare account login.
+  retain ownership. The owner explicitly supplied the first permitted email for manual
+  provisioning; keep it as account data rather than a committed seed.
 - **Session and revocation.** Set global and application durations to 30 days (`720h`),
   with policies inheriting the application duration. This is a fixed browser-session
   policy, not a per-device checkbox or a rolling 30-day inactivity promise. Check user
@@ -169,7 +169,8 @@ Implementation defaults, to make the item concrete:
 The Access choice **triggers the infrastructure tooling revisit** recorded below. Item 4
 must record its concrete choice (Terraform vs an idempotent Cloudflare API bootstrap),
 including state/secret handling, before provisioning Access resources. This decision
-updates the plan only; Access and the users table are not deployed yet.
+does not configure Access. The owner has separately requested the users migration and
+manual provisioning before browser integration (see the progress log).
 
 References: [Access email codes](https://developers.cloudflare.com/cloudflare-one/integrations/identity-providers/one-time-pin/),
 [session durations](https://developers.cloudflare.com/cloudflare-one/access-controls/access-settings/session-management/),
@@ -375,3 +376,14 @@ table. Item 4 is ready to design against the decision above; the former open men
 identity mechanisms is closed for the initial implementation. User provisioning,
 revocation, stable ownership, machine ingest and the infrastructure tooling revisit
 are explicitly included. This is a planning update; no authentication resources changed.
+
+
+### 7. 2026-09-11 — first user provisioning requested
+
+The owner supplied the initial email explicitly and requested manual provisioning.
+`0002_users.sql` adds stable user ids, unique normalized emails, an active flag and a
+creation timestamp. The first user keeps id `operator`, so the two imported pieces are
+already assigned to that identity. No ownership rewrite or blob mutation is needed.
+The email is account data, not a committed seed. Access setup, active-user enforcement
+and the reusable provisioning command remain item 4 work; this schema alone does not
+change the deployed private-token API or enable browser login.

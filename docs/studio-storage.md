@@ -403,10 +403,28 @@ email to a pre-provisioned active user, and uses the stable user id as storage o
 There is no public registration or automatic user creation during login. Check user
 activity on every library request so disabling a user takes effect before cookie expiry.
 
-Item 4 adds the users migration (stable id, unique normalized email, active flag and
-creation timestamp) and an operator provisioning command. The first user's id remains
-`operator` to retain ownership of the two imported pieces; confirm its email at rollout.
-These additions are planned, not part of the five storage tables already deployed.
+Migration `0002_users.sql` adds the pre-provisioned identities table:
+
+```sql
+CREATE TABLE users (
+  id         TEXT PRIMARY KEY NOT NULL CHECK (length(trim(id)) > 0),
+  email      TEXT NOT NULL UNIQUE CHECK (length(email) > 0 AND email = lower(trim(email))),
+  active     INTEGER NOT NULL DEFAULT 1 CHECK (active IN (0, 1)),
+  created_at TEXT NOT NULL
+);
+```
+
+The first user's id remains `operator`, matching `pieces.owner`, `tags.owner` and
+`tag_aliases.owner` for the existing library. Provisioning that identity assigns the
+existing pieces without mutating their revisions or rewriting blobs. Email values are
+operator-managed account data, not committed seed migrations. Normalize email by trimming
+and lowercasing; do not collapse dots or plus-addresses. Existing owner columns remain
+logical references; this migration does not rebuild the five application tables.
+
+The owner requested manual provisioning before Access setup. The reusable provisioning
+command, edge allowlist synchronization and active-user enforcement are still item 4
+work. A users row alone does not enable browser login or enforce suspension: the current
+operator API still uses its private token until that integration is deployed.
 Access manages browser sessions; no separate studio session store is initially planned.
 The private ingest token remains a machine credential, with a scoped Access service
 credential planned to keep the operator script working after the edge gate is enabled.
