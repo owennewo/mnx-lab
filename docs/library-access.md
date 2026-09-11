@@ -6,7 +6,7 @@ Every `/api/library` route authenticates before storage; reads use the signed em
 active D1 user id. Browser login never inserts users. Static hosting omits Load.
 
 Access is configured for `mnx-labs-team.cloudflareaccess.com`. Browser application:
-`mnx-lab.totai.uk/api/library`, OTP provider only, 720h application/global sessions,
+`mnx-lab.totai.uk/api/library`, OTP provider only, 720h application sessions and an operator-configured one-month global session,
 policy duration inherited. Machine application: the more-specific `/api/library/ingest`,
 Service Auth only, separate audience and 1h token lifetime. Requests also require the
 Worker write token and active D1 `operator`. Neither credential grants browser reads.
@@ -17,7 +17,7 @@ D1 membership is checked on every request. Logout uses `/cdn-cgi/access/logout`.
 
 Use Python 3.11+, a current Wrangler D1 login, and an owner-only Access API token file.
 The token needs account-scoped **Access: Apps and Policies — Edit**, **Access:
-Organizations, Identity Providers, and Groups — Edit**, **Access: Service Tokens — Edit**.
+Identity Providers — Edit**, **Access: Service Tokens — Edit**.
 Never put credentials in command arguments or git. `.secrets/` and `.dev.vars` are ignored.
 
 ```sh
@@ -31,7 +31,7 @@ python3 tools/library-access.py sync --token-file /private/.secrets/cloudflare-a
 Bootstrap records resource IDs in `tools/library-access-resources.json`, audiences and
 issuer in `wrangler.jsonc`; service secrets are written once to a 0600 file. The default service file lives in the primary checkout’s ignored `.secrets/`, so retiring a task worktree cannot delete it. A rerun
 reads existing resources, refuses configuration drift and missing recorded resources,
-and updates only a changed allowlist/session setting. Existing service credentials are
+and updates only a changed allowlist. The global session duration is managed manually in Zero Trust; this command neither reads nor changes organization settings. Existing service credentials are
 never silently rotated. A missing local service secret requires deliberate recovery or
 rotation. User disable happens in D1 first; a subsequent edge-sync failure cannot keep
 that user authorized. Retry `sync` after correcting account access. Add never reassigns

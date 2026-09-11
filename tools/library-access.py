@@ -120,14 +120,8 @@ def sync_users(api, db, inventory):
 
 
 def bootstrap(api, db, inventory, service_file):
-    org = api.call('access/organizations')
-    if org['auth_domain'] != TEAM:
-        raise ValueError('Unexpected Access team domain')
-    if org.get('session_duration') != '720h':
-        # Preserve organization settings; only the declared duration changes.
-        org.pop('created_at', None); org.pop('updated_at', None)
-        org['session_duration'] = '720h'
-        api.call('access/organizations', 'PUT', org)
+    # The operator set the global duration to one month in the dashboard.
+    # Bootstrap manages application sessions only; no organization permission needed.
     otp = resource(api, inventory, 'otp', 'access/identity_providers',
                    {'name': 'MNX library email codes', 'type': 'onetimepin', 'config': {}})
     service_path = Path(service_file)
