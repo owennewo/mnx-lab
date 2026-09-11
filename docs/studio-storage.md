@@ -37,19 +37,24 @@ MusicXML exporter this way (no title, no capo, blank `<step>` on every flattened
 
 ### Multiple formats, one canonical pointer
 
-The on-disk canonical format is **not decided**, and the schema does not need it decided.
-Each piece carries a `canonical_rendition_id`. It may point at a `.gp5`, a `.gp` or an MNX.
-Everything that needs "the document" resolves through it:
+**MNX is the lab's working format, not — yet — its storage format** (decided 2026-09-11,
+[studio-storage-source-canonical](../roadmap/inprogress/studio-storage-source-canonical.md)):
+the spec is too incomplete to bet a library on. So the service stores what the source
+system exported and **nothing derived from it**. Each piece carries a
+`canonical_rendition_id`; for a Soundslice piece it is the Soundslice `.gp`, asserted by the
+ingest and enforced by the Worker. Everything that needs "the document" resolves through it:
 
-1. Take the canonical rendition.
-2. If it is not MNX, take its **current derived MNX child**: the `mnx` rendition whose
-   `derived_from` is the canonical one and whose `producer_version` is the converter
-   version in use. (The ingest script and the re-index sweep create that child; it is a stored
-   rendition like any other.)
-3. Read from that MNX.
+1. Take the canonical rendition — its bytes, in whatever format they are.
+2. **Convert where the music is read**: the shells run the clean-room importer
+   (`src/importers/`) in a browser worker, exactly as the workbench opens a `.gp` from disk.
+3. The MNX exists in memory, for that reader, and is never written back.
 
-So derived tags, the player, and the workbench all read MNX, while the file the owner
-regards as the source can be any format. Changing the canonical pointer is a row update.
+No derived MNX child is stored, no converter version is pinned on the service, and a
+converter change touches the service not at all. Derived tags (title, artist, capo,
+tuning) are a **projection** computed by the ingest tool — from the Soundslice sidecar and
+from a conversion it ran in *validation mode* and threw away — and sent with the manifest;
+the Worker accepts them and derives nothing itself. Changing the canonical pointer is a row
+update. (Rows of derived MNX stored before this decision remain, immutable and unused.)
 
 **The pointer is set explicitly and then belongs to the owner.** An import sets canonical
 only when the piece has none — for a Soundslice slice, to the Soundslice `.gp`, the most
@@ -196,11 +201,14 @@ Notes on the choices:
 
 ## Worker library API (item 2)
 
-`worker/library/index.ts` exports `Library(db, bucket, converterVersions)`. Callers
+`worker/library/index.ts` exports `Library(db, bucket)`. Callers
 supply the authenticated owner on every operation; this module exposes no HTTP routes.
 Item 3 must authenticate its write route before supplying that owner. `getPiece` reads
 one consistent snapshot; `findPiece` resolves upstream identity; `listPieces`,
-`readRendition`, `readCanonicalMnx` and the alias methods are owner-scoped.
+`readRendition`, `readCanonical` (the canonical rendition's bytes, any format) and the
+alias methods are owner-scoped. `writePiece` accepts `derived_tags`, the projection: when
+present it replaces the piece's derived tags wholesale, when absent they are retained;
+only derived dimensions are accepted, each with a `source_ref`.
 
 `writePiece(owner, input)` is the only piece mutation entry. Caller-supplied ids are
 stable across retries. `expected_revision: null` creates a piece at revision 0; existing
@@ -436,26 +444,14 @@ D1 user. Browser and machine audiences are separate; the machine also requires t
 write token and active operator. Account rollout verification is tracked in the item.
 
 
-## Re-derivation sweep (item 5)
+## Re-derivation sweep (item 5) — retired
 
-`npm run rederive:library` reads stored non-MNX renditions through the authenticated
-operator API, builds the checkout's Node converters and submits new MNX children through
-`Library.writePiece`. It does not depend on the local Soundslice cache. The deployed
-converter-version manifest must match the command; a mismatch stops before writes.
-The sweep is limited to the active operator's pieces, with paginated reads and bounded
-24 MiB uploads/responses. Each piece commits atomically under its observed revision;
-a failure is reported and other pieces continue. A rerun reads fresh revisions.
-
-Comparison removes only root `_x.mnxLab.encoding` and ignores object-key order. Changed
-JSON paths are reported with counts and a bounded path sample, without copying score
-content into logs. Encoding/serialization-only differences are separate from document
-changes. New producer versions still add evidence rows even for equal music, as required
-above; the fresh bytes retain the encoding stamp of the converter that produced them.
-Identical bytes share an R2 key. Existing matching version/options rows with equivalent documents are reused,
-and unchanged rows/tags do not bump revisions. No schema migration is needed.
-
-Every apply rebuilds derived tags from the canonical path, including pieces already
-canonical to MNX; asserted tags, recordings, aliases and pointers are untouched. Dry-run
-performs authenticated reads and conversion but no writes (tag changes are reported on
-apply). Alias application to documents is deferred until studio's editing authority
-exists; this sweep never rewrites originals or edits the canonical document.
+Built 2026-09-11 and retired the same day by
+[studio-storage-source-canonical](../roadmap/inprogress/studio-storage-source-canonical.md):
+with no derived MNX stored there is nothing for a sweep to keep current. Its job — judging
+every converter version against every stored source — moved into the ingest tool's
+validation mode: `npm run ingest:library` re-validates a slice whenever the projected
+tags no longer name the current converter version, prints every schema error per source
+per converter, exits nonzero if any conversion failed (having stored everything anyway),
+and moves no bytes for a slice the service already holds. `--dry-run` validates the whole
+cache without touching the network.

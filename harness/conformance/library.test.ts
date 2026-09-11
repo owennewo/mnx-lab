@@ -33,7 +33,7 @@ beforeEach(async () => {
   bucket = await mf.getR2Bucket('BUCKET');
   // Split only between this migration's CREATE statements, preserving the trigger body.
   await db.batch(migration.replace(/--[^\n]*/g, '').trim().split(/;\s*(?=CREATE\b)/).map(sql => db.prepare(sql)));
-  library = new Library(db, bucket, { 'guitarpro-mnx': '1' });
+  library = new Library(db, bucket);
 }, 15000);
 afterEach(async () => { await mf?.dispose(); });
 
@@ -44,19 +44,20 @@ it('keeps the migration equal to the documented five-table schema', async () => 
   expect(tables.results.map(r => r.name)).toEqual(['pieces','recordings','renditions','tag_aliases','tags']);
 });
 
-it('writes blobs and rows, derives document-only tags, and returns a true no-op on replay', async () => {
+it('writes blobs and rows, stores the projected tags, and returns a true no-op on replay', async () => {
   let puts = 0;
-  const observed = new Library(db, wrappedBucket({ put: async (...args: Parameters<R2Bucket['put']>) => { puts++; return bucket.put(...args); } }), { 'guitarpro-mnx': '1' });
-  const write = { ...create(), renditions: [mnx('mnx')], canonical: { mode: 'initialize' as const, rendition_id: 'mnx' }, tags: [{ dimension: 'unknown', value: 'My list', source_ref: 'list:1' }] };
+  const observed = new Library(db, wrappedBucket({ put: async (...args: Parameters<R2Bucket['put']>) => { puts++; return bucket.put(...args); } }));
+  const write = { ...create(), renditions: [mnx('mnx')], canonical: { mode: 'initialize' as const, rendition_id: 'mnx' }, tags: [{ dimension: 'unknown', value: 'My list', source_ref: 'list:1' }],
+    derived_tags: [{ dimension: 'title', value: 'Title', source_ref: 'sidecar' }, { dimension: 'capo', value: '3', source_ref: 'guitarpro-mnx@1' }] };
   const result = await observed.writePiece('alice', write);
   expect(result.piece.revision).toBe(0);
-  expect(result.tags.map(t => `${t.dimension}:${t.value}`)).toEqual(expect.arrayContaining(['title:Title','artist:Artist','capo:3','tuning:B3 E4','creator.composer:Composer','unknown:My list']));
+  expect(result.tags.map(t => `${t.dimension}:${t.value}:${t.origin}`)).toEqual(['capo:3:derived','title:Title:derived','unknown:My list:asserted']);
   expect(result.renditions[0].r2_key).toMatch(/^renditions\/[a-f0-9]{64}$/);
   const again = await observed.writePiece('alice', { ...write, expected_revision: 0 });
   expect(again).toEqual(await observed.getPiece('alice', 'piece'));
   expect(again.piece.revision).toBe(0);
   expect(puts).toBe(1);
-  expect((await observed.readCanonicalMnx('alice', 'piece'))?.document._x?.mnxLab?.work?.title).toBe('Title');
+  expect((await observed.readCanonical('alice', 'piece'))?.rendition.id).toBe('mnx');
   expect((await db.prepare('PRAGMA foreign_key_check').all()).results).toEqual([]);
 });
 
@@ -70,23 +71,29 @@ it('never overwrites a rendition, while identical bytes may have distinct produc
   expect((await bucket.list()).objects).toHaveLength(1);
 });
 
-it('resolves the chosen parent at the caller-selected version and preserves canonical on import', async () => {
+it('preserves canonical on import and replaces the projection only when one is supplied', async () => {
   const gp: RenditionInput = { id: 'gp', format: 'gp', role: 'export', producer: 'soundslice-cli', producer_version: null, producer_options: null, content: bytes('GP source') };
-  await library.writePiece('alice', { ...create(), renditions: [mnx('child', 'Old', { derived_from: 'gp' }), gp, mnx('other', 'Other')], canonical: { mode: 'initialize', rendition_id: 'gp' } });
-  const v2 = new Library(db, bucket, { 'guitarpro-mnx': '2' });
-  const next = await v2.writePiece('alice', { id: 'piece', expected_revision: 0, renditions: [mnx('child2', 'New', { derived_from: 'gp', producer_version: '2' })], canonical: { mode: 'initialize', rendition_id: 'other' } });
-  expect(next.piece.canonical_rendition_id).toBe('gp');
-  expect(next.tags.filter(t => t.dimension === 'title').map(t => t.value)).toEqual(['New']);
-  expect((await v2.readCanonicalMnx('alice', 'piece'))?.rendition.id).toBe('child2');
-  const changed = await v2.writePiece('alice', { id: 'piece', expected_revision: 1, canonical: { mode: 'replace', rendition_id: 'other' } });
-  expect(changed.tags.find(t => t.dimension === 'title')?.value).toBe('Other');
+  const title = (value: string, source_ref = 'sidecar') => ({ dimension: 'title', value, source_ref });
+  await library.writePiece('alice', { ...create(), renditions: [gp, mnx('other', 'Other')], canonical: { mode: 'initialize', rendition_id: 'gp' }, derived_tags: [title('Old')] });
+  // No projection supplied: the previous one is retained; initialize never moves a set pointer.
+  const kept = await library.writePiece('alice', { id: 'piece', expected_revision: 0, canonical: { mode: 'initialize', rendition_id: 'other' }, tags: [{ dimension: 'genre', value: 'Blues' }] });
+  expect(kept.piece.canonical_rendition_id).toBe('gp');
+  expect(kept.tags.filter(t => t.dimension === 'title').map(t => t.value)).toEqual(['Old']);
+  // A projection supplied replaces the whole derived set, never the asserted tags.
+  const replaced = await library.writePiece('alice', { id: 'piece', expected_revision: 1, derived_tags: [title('New'), { dimension: 'capo', value: '2', source_ref: 'guitarpro-mnx@2' }] });
+  expect(replaced.tags.map(t => `${t.dimension}:${t.value}`)).toEqual(['capo:2', 'genre:Blues', 'title:New']);
+  expect((await library.readCanonical('alice', 'piece'))?.rendition.format).toBe('gp');
+  expect(new TextDecoder().decode(await (await library.readCanonical('alice', 'piece'))!.object.arrayBuffer())).toBe('GP source');
+  const changed = await library.writePiece('alice', { id: 'piece', expected_revision: 2, canonical: { mode: 'replace', rendition_id: 'other' } });
+  expect(changed.piece.canonical_rendition_id).toBe('other');
+  await expect(library.readCanonical('alice', 'none')).rejects.toMatchObject({ code: 'not_found' });
 });
 
-it('requires a current converter version rather than silently clearing derived tags', async () => {
-  const gp: RenditionInput = { ...mnx('gp'), format: 'gp', content: bytes('gp') };
-  await library.writePiece('alice', { ...create(), renditions: [gp, mnx('child', 'Keep', { derived_from: 'gp' })], canonical: { mode: 'initialize', rendition_id: 'gp' } });
-  await expect(new Library(db, bucket).writePiece('alice', { id: 'piece', expected_revision: 0 })).rejects.toMatchObject({ code: 'invalid' });
-  expect((await library.getPiece('alice','piece'))?.tags.find(t => t.dimension === 'title')?.value).toBe('Keep');
+it('accepts only derived dimensions in a projection, each with a source reference', async () => {
+  await library.writePiece('alice', create());
+  await expect(library.writePiece('alice', { id: 'piece', expected_revision: 0, derived_tags: [{ dimension: 'genre', value: 'Blues', source_ref: 'sidecar' }] })).rejects.toMatchObject({ code: 'invalid' });
+  await expect(library.writePiece('alice', { id: 'piece', expected_revision: 0, derived_tags: [{ dimension: 'title', value: 'x', source_ref: '' }] })).rejects.toMatchObject({ code: 'invalid' });
+  expect((await library.getPiece('alice', 'piece'))?.tags).toEqual([]);
 });
 
 it('rejects foreign canonical pointers, foreign parents and cycles', async () => {
@@ -179,11 +186,8 @@ it('rejects the losing concurrent writer after its blob upload and commits the w
   expect((await bucket.list()).objects).toHaveLength(1);
 });
 
-it('does not invent document metadata, tuning or capo from layout labels or missing declarations', async () => {
-  const doc={...structuredClone(score),scores:[{name:'Layout title'}]};
-  // The valid standard document has no root work or part string/capo extension.
-  const plain={...mnx('plain'),content:bytes(JSON.stringify(doc))};
-  const result=await library.writePiece('alice',{...create(),renditions:[plain],canonical:{mode:'initialize',rendition_id:'plain'}});
+it('projects nothing on its own: without derived_tags the service derives no tag from any music', async () => {
+  const result=await library.writePiece('alice',{...create(),renditions:[mnx('rich')],canonical:{mode:'initialize',rendition_id:'rich'}});
   expect(result.tags).toEqual([]);
 });
 

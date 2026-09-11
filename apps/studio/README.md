@@ -24,7 +24,8 @@ apps/studio/
   src/main.ts            registers the shell and the elements it mounts
   src/StudioApp.ts       <mnx-studio> — hash router, fullscreen frame, the overlay bar
   src/LibraryPage.ts     #/              the tag-filtered browse over the library client
-  src/PiecePage.ts       #/piece/<id>    <mnx-document-viewer> + <mnx-player>, one binding
+  src/PiecePage.ts       #/piece/<id>    the canonical .gp, converted in src/importers, into
+                                         <mnx-document-viewer> + <mnx-player>, one binding
   src/session.ts         /api/library/me at boot; sign-in is re-entering the page
 ```
 
@@ -50,8 +51,9 @@ backend decision.
 
 ## The boundary (machine-enforced)
 
-`apps/studio/` may import only `src/model`, `src/engine`, `src/audio`, `src/elements` and
-`src/storage` (the typed library client). It must not import `src/workbench/`, `src/edit/`
+`apps/studio/` may import only `src/model`, `src/engine`, `src/audio`, `src/elements`,
+`src/storage` (the typed library client) and `src/importers` (the clean-room converters in
+a worker — promoted out of the workbench when the library stopped storing derived MNX). It must not import `src/workbench/`, `src/edit/`
 or `src/assist/`; nothing may import `apps/studio/`. `.dependency-cruiser.cjs` makes any of
 those a red build. Anything both shells want is first *promoted* into `elements/` or
 below — a deliberate, reviewed move.

@@ -79,7 +79,7 @@ idle over the score.
    title and artist. Empty library and "no matching pieces" states. The dialog's search
    and paging logic is the first promotion candidate; do it only if it is a real copy.
 2. **`#/piece/<id>`** — one piece. Fetches the canonical MNX through
-   `GET /api/library/pieces/:id/mnx`, mounts `<mnx-document-viewer>` filling the
+   `GET /api/library/pieces/:id/canonical` (converted in `src/importers/`), mounts `<mnx-document-viewer>` filling the
    viewport with `<mnx-player>` in the bar. The 409 the client already maps ("needs a
    current MNX conversion") shows as a page, not a toast. Staff view (notation / tab /
    both) follows the same rule as the workbench: tab only when the strings are known.
@@ -207,7 +207,5 @@ D1); the smoke has only one signed identity to work with.
 - [ ] A D1-disabled address that Access admits sees the not-permitted page
       (`tools/library-access.py disable`, then `enable`).
 - [ ] `core-editor-element-promotion.md` moves to `inprogress/` — its trigger is pulled.
-- [ ] The piece page moves from the `mnx` read route to the canonical `.gp` plus browser-side
-      conversion when [studio-storage-source-canonical.md](../proposed/studio-storage-source-canonical.md)
-      lands; until then a piece reads only while a derived MNX at the deployed converter
-      version exists.
+- [x] The piece page reads the canonical `.gp` and converts it in the browser
+      ([studio-storage-source-canonical.md](studio-storage-source-canonical.md), built the same day).

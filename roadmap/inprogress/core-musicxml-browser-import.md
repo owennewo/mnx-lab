@@ -55,6 +55,8 @@ touch it — so the block was re-checked against `git status` rather than truste
   `measureNum`, and a whole private method (`getEventDivisionDuration`) nothing called.
   All dead; removing them is behaviour-neutral and the converter suite and oracle agree.
 - **A converter commit is now a library event, even a behaviour-neutral one.**
+  *(Superseded 2026-09-11 by studio-storage-source-canonical: no derived MNX is stored, so
+  there is no version pin and no sweep; the lines below record what was true when written.)*
   `tools/library-converter-versions.mjs` (a `build` gate since the storage campaign)
   stamps each converter as `version+git.<last commit touching it>`, so the cleanup above
   moved `musicxml-mnx`'s stamp in `worker/library/converter-versions.json`. The deployed

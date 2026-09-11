@@ -39,12 +39,19 @@ export interface RecordingInput {
 export interface AssertedTag {
   dimension: string; value: string; sort_key?: number | null; source_ref?: string | null;
 }
+/** A projection computed OUTSIDE the service — by the ingest tool from the
+ *  Soundslice sidecar and from a validated conversion — never stored truth.
+ *  `source_ref` names what produced it (`sidecar`, `guitarpro-mnx@<version>`). */
+export interface DerivedTag { dimension: string; value: string; source_ref: string }
 export interface PieceWrite {
   id: string;
   // null creates a new piece, including all its rows in the same batch.
   expected_revision: number | null;
   source?: { kind: string; id: string; url?: string | null };
   renditions?: RenditionInput[]; recordings?: RecordingInput[]; tags?: AssertedTag[];
+  /** When present, REPLACES the piece's derived projection wholesale; when
+   *  absent, the previous projection is retained. Rebuildable, so replaceable. */
+  derived_tags?: DerivedTag[];
   canonical?: { mode: 'initialize' | 'replace'; rendition_id: string };
   rename_tags?: { dimension: string; value: string; to_dimension: string; to_value: string }[];
 }

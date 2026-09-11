@@ -22,7 +22,7 @@
   },
   "scripts": {
     "dev": "NODE_OPTIONS=--disable-warning=DEP0040 vite",
-    "build": "node tools/library-converter-versions.mjs && npm run compile-validator && npm run check:boundaries && tsc && tsc -p worker && vite build",
+    "build": "npm run compile-validator && npm run check:boundaries && tsc && tsc -p worker && vite build",
     "build:lib": "vite build -c vite.lib.config.ts",
     "build:embed": "vite build -c vite.embed.config.ts",
     "smoke:lib": "npm run build:lib && node harness/verify/lib-smoke.mjs",
@@ -49,7 +49,6 @@
     "update:roster": "UPDATE_ROSTER=1 vitest run harness/conformance/roster.test.ts",
     "refresh:catalog": "REFRESH_CATALOG=1 UPDATE_ROSTER=1 vitest run harness/conformance/roster.test.ts",
     "test": "vitest run",
-    "rederive:library": "node tools/library-rederive.mjs",
     "ingest:library": "node tools/library-ingest.mjs",
     "deploy": "npm run build && wrangler deploy",
     "update:traversal": "UPDATE_TRAVERSAL=1 vitest run harness/conformance/traversal.test.ts",

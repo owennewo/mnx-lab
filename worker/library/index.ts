@@ -1,7 +1,7 @@
 // DOM-free storage operations. Callers supply the authenticated owner; no HTTP surface here.
 import type { D1Database, D1PreparedStatement, R2Bucket } from '@cloudflare/workers-types';
 import { describeBlob, storeBlob, type PreparedBlob } from './blobs.ts';
-import { canonicalMnx, deriveTags, isDerivedDimension, parseMnx } from './tags.ts';
+import { isDerivedDimension, parseMnx } from './tags.ts';
 import {
   LibraryError, json, requireText, type Alias, type Json, type Piece, type PieceWrite,
   type Recording, type Rendition, type Snapshot, type Tag
@@ -16,11 +16,7 @@ function asserted(dimension: string, value: string) {
 }
 
 export class Library {
-  constructor(
-    private readonly db: D1Database,
-    private readonly bucket: R2Bucket,
-    private readonly converterVersions: Readonly<Record<string, string>> = {}
-  ) {}
+  constructor(private readonly db: D1Database, private readonly bucket: R2Bucket) {}
 
   private statement(sql: string, ...values: unknown[]) { return this.db.prepare(sql).bind(...values); }
   private insert(table: 'pieces' | 'renditions' | 'recordings' | 'tags', row: object) {
@@ -76,16 +72,14 @@ export class Library {
     return { rendition: row, object };
   }
 
-  async readCanonicalMnx(owner: string, id: string) {
+  /** The canonical rendition's bytes, whatever their format. Conversion to
+   *  MNX is the reader's job (the shells' importer worker), never the service's. */
+  async readCanonical(owner: string, id: string) {
     const snapshot = await this.getPiece(owner, id);
     if (!snapshot) throw new LibraryError('not_found', 'Piece not found');
-    const row = canonicalMnx(snapshot.piece.canonical_rendition_id, snapshot.renditions, this.converterVersions);
-    if (!row) return null;
-    const { object } = await this.readRendition(owner, row.id);
-    const content = await object.arrayBuffer();
-    await describeBlob('renditions', { content, sha256: row.sha256 });
-    const doc = parseMnx(content);
-    return { rendition: row, document: doc, revision: snapshot.piece.revision };
+    if (!snapshot.piece.canonical_rendition_id) return null;
+    const { rendition, object } = await this.readRendition(owner, snapshot.piece.canonical_rendition_id);
+    return { rendition, object, revision: snapshot.piece.revision };
   }
 
   async listAliases(owner: string): Promise<Alias[]> {
@@ -126,7 +120,6 @@ export class Library {
     const renditions = new Map((before?.renditions ?? []).map(r => [r.id, r]));
     const recordings = new Map((before?.recordings ?? []).map(r => [r.id, r]));
     const blobs = new Map<string, PreparedBlob>();
-    const documents = new Map<string, ReturnType<typeof parseMnx>>();
     const newRenditions: Rendition[] = [];
     const renditionUpdates: Rendition[] = [];
     const recordingUpdates: { row: Recording; exists: boolean }[] = [];
@@ -140,7 +133,8 @@ export class Library {
       if (inputRow.producer_version !== null) requireText(inputRow.producer_version, 'producer version');
       const blob = await describeBlob('renditions', inputRow);
       blobs.set(blob.r2_key, blob);
-      if (inputRow.format === 'mnx') documents.set(inputRow.id, parseMnx(blob.content));
+      // Stored MNX (an edit, one day) must match the storage schema; nothing is derived from it.
+      if (inputRow.format === 'mnx') parseMnx(blob.content);
       const old = renditions.get(inputRow.id);
       const row: Rendition = {
         id: inputRow.id, piece_id: piece.id, format: inputRow.format, role: inputRow.role,
@@ -237,15 +231,15 @@ export class Library {
       tags.set(tagKey(t), { owner, piece_id: piece.id, dimension: t.dimension, value: t.value,
         origin: 'asserted', sort_key: t.sort_key ?? null, source_ref: t.source_ref ?? null });
     }
-    const selected = canonicalMnx(piece.canonical_rendition_id, [...renditions.values()], this.converterVersions);
-    if (selected) {
-      let doc = documents.get(selected.id);
-      if (!doc) {
-        const content = await (await this.readRendition(owner, selected.id)).object.arrayBuffer();
-        await describeBlob('renditions', { content, sha256: selected.sha256 });
-        doc = parseMnx(content);
+    // The derived projection: replaced wholesale when supplied, retained when not.
+    if (input.derived_tags) {
+      for (const t of input.derived_tags) {
+        requireText(t.dimension, 'derived dimension'); requireText(t.value, 'derived value'); requireText(t.source_ref, 'derived tag source reference');
+        if (!isDerivedDimension(t.dimension)) throw new LibraryError('invalid', 'Only derived dimensions may be projected');
+        tags.set(tagKey(t), { owner, piece_id: piece.id, dimension: t.dimension, value: t.value.trim(), origin: 'derived', sort_key: null, source_ref: t.source_ref });
       }
-      for (const t of deriveTags(doc)) tags.set(tagKey(t), { ...t, owner, piece_id: piece.id, origin: 'derived', sort_key: null, source_ref: null });
+    } else {
+      for (const t of before?.tags ?? []) if (t.origin === 'derived') tags.set(tagKey(t), t);
     }
     const orderedTags = [...tags.values()].sort((a,b) => a.dimension.localeCompare(b.dimension) || a.value.localeCompare(b.value));
     const oldTags = [...(before?.tags ?? [])].sort((a,b) => a.dimension.localeCompare(b.dimension) || a.value.localeCompare(b.value));

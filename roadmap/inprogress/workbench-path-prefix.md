@@ -126,8 +126,8 @@ green after rebase.
 
 - [ ] `https://mnx-lab.totai.uk/workbench` → `/workbench/` and the page loads. (The root now
       302s to `/studio/` — studio-shell.md took the redirect, as planned.)
-- [ ] Library Load round trip: sign-in button → Access OTP → `/workbench/?library=1` →
-      dialog open and signed in; sign out returns it to the prompt.
+- [x] ~~Library Load round trip~~ — moot: the workbench's Load dialog was stripped on 2026-09-11
+      (studio-storage-source-canonical); the workbench never touches the service now.
 - [ ] PKCE connect returns to `/workbench/#<route>`.
 - [x] `npm run dev` works again — **fixed the same day, not a plugin fault after all.**
       Ajv's standalone output splices its runtime helpers in as CommonJS

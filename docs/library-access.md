@@ -1,9 +1,10 @@
 # Library access operations
 
-The optional workbench Load dialog calls `src/storage/libraryClient.ts`. The public
+Studio (`/studio/`) reads the library through `src/storage/libraryClient.ts`; the workbench
+(`/workbench/`) never touches the service — it is static and public, by rule. The public
 `/api/capabilities` flag advertises availability without exposing user/library data.
 Every `/api/library` route authenticates before storage; reads use the signed email's
-active D1 user id. Browser login never inserts users. Static hosting omits Load.
+active D1 user id. Browser login never inserts users.
 
 Access is configured for `mnx-labs-team.cloudflareaccess.com`. Browser application:
 `mnx-lab.totai.uk/api/library` **and** `mnx-lab.totai.uk/studio` (one application, one
@@ -49,7 +50,7 @@ an existing stable id or silently enables a disabled user.
 Bootstrap enables edge protection immediately. Deploy the matching Worker configuration
 next; until then requests can fail closed during this operator-controlled cutover.
 Verify the global/app durations, the exact policies, anonymous redirects, authenticated
-browser Load, and a machine ingest replay before marking rollout complete. Keep the
+studio's library page, and a machine ingest replay before marking rollout complete. Keep the
 original private write-token file. Ingest now also takes
 `--access-token-file /private/.secrets/library-access-service.json`, or the paired
 `CF_ACCESS_CLIENT_ID`/`CF_ACCESS_CLIENT_SECRET` environment variables. No redirects are
@@ -80,12 +81,13 @@ assets for testing. The harness uses synthetic scores with local D1/R2 and signe
 `GET /pieces` accepts up to twelve repeated `tag=dimension:value` filters (AND), and
 an `after` cursor; pages contain at most fifty pieces. `GET /tags?q=prefix` completes
 literal tag prefixes. `GET /pieces/:id` returns an owner-scoped snapshot;
-`GET /pieces/:id/mnx` resolves the canonical pointer; `GET /renditions/:id` streams an
+`GET /pieces/:id/canonical` streams the canonical file; `GET /renditions/:id` streams an
 owner-scoped attachment. All responses are private/no-store. Missing and other-owner
 objects are indistinguishable. No client selects an owner or raw R2 key.
 
-`worker/library/converter-versions.json` pins the current source revisions used for MNX
-resolution. Build checks it against the converters' last source commits. After changing
-a converter, run `node tools/library-converter-versions.mjs --write`; item 5 must create
-matching MNX children. Missing current conversions fail explicitly, never fall back to a
-stale child. Reading changes no canonical pointer or stored blob.
+`GET /pieces/:id/canonical` streams the canonical rendition's bytes with `X-Library-Format`,
+`X-Library-Rendition`, `X-Library-Revision` and a `Content-Disposition` filename; a piece
+with no canonical answers 409. The service converts nothing: the shells run the importer
+worker on those bytes (`src/importers/`). Nothing derived is stored and no converter version
+is pinned; a converter change needs no deploy and no sweep. Reading changes no canonical
+pointer or stored blob.

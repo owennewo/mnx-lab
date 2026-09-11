@@ -2,10 +2,8 @@
 import type { FormData as MultipartFormData } from '@cloudflare/workers-types/2023-07-01';
 import { Hono } from 'hono';
 import type { Env } from '../env.ts';
-import { Library, LibraryError, type Json, type PieceWrite, type RenditionInput, type RecordingInput } from '../library/index.ts';
+import { Library, LibraryError, type Json, type PieceWrite, type RenditionInput, type RecordingInput, type DerivedTag } from '../library/index.ts';
 import { accessIdentity, AccessError, type LibraryUser } from '../library/access.ts';
-import converterVersions from '../library/converter-versions.json';
-import { documentWork } from '../../src/model/mnx.ts';
 
 export const INGEST_OWNER = 'operator';
 export const MAX_INGEST_BYTES = 24 * 1024 * 1024;
@@ -28,7 +26,6 @@ function text(v: unknown): string {
 }
 function nullable(v: unknown): string | null { return v == null ? null : text(v); }
 function array(v: unknown): unknown[] { if (!Array.isArray(v) || v.length > 100) invalid('Expected at most 100 entries'); return v; }
-function versions(v: unknown): Record<string, string> { return Object.fromEntries(Object.entries(object(v)).map(([k,v]) => [text(k), text(v)])); }
 async function bounded(request: Request): Promise<ArrayBuffer> {
   if (Number(request.headers.get('content-length')) > MAX_INGEST_BYTES) throw new RangeError();
   const reader = request.body?.getReader();
@@ -79,54 +76,6 @@ library.onError((error, c) => {
   // Do not log request bodies, credentials or private score data.
   return c.json({ error: 'Library operation failed' }, 500);
 });
-// Operator sweep routes stay within the existing machine Access application's path.
-library.get('/ingest/rederive/pieces', async c => {
-  const after = c.req.query('after') ?? '';
-  if (after.length > 512) invalid('Invalid cursor');
-  return c.json({ ...await reader(c).browsePieces(INGEST_OWNER, [], after), converter_versions: converterVersions });
-});
-library.get('/ingest/rederive/pieces/:id', async c => {
-  const snapshot = await reader(c).getPiece(INGEST_OWNER, c.req.param('id'));
-  return snapshot ? c.json({ snapshot }) : c.json({ error: 'Piece not found' }, 404);
-});
-library.get('/ingest/rederive/renditions/:id', async c => {
-  const { object, rendition } = await reader(c).readRendition(INGEST_OWNER, c.req.param('id'));
-  c.header('Content-Type', 'application/octet-stream');
-  c.header('X-Content-Type-Options', 'nosniff');
-  c.header('Content-Length', String(rendition.bytes));
-  return c.body(object.body);
-});
-library.post('/ingest/rederive', async c => {
-  const { form, manifest } = await multipart(c.req.raw);
-  if (Object.keys(manifest).some(k => !['id','expected_revision','renditions','converter_versions'].includes(k))) invalid('Unsupported rederive field');
-  const requested = versions(manifest.converter_versions);
-  if (JSON.stringify(Object.entries(requested).sort()) !== JSON.stringify(Object.entries(converterVersions).sort())) {
-    throw new LibraryError('conflict', 'Deploy matching converter versions before rederiving');
-  }
-  const lib = reader(c); const id = text(manifest.id);
-  const before = await lib.getPiece(INGEST_OWNER, id);
-  if (!before) throw new LibraryError('not_found', 'Piece not found');
-  if (manifest.expected_revision !== before.piece.revision) throw new LibraryError('conflict', 'Piece revision changed; read it again');
-  const renditions: RenditionInput[] = [];
-  for (const value of array(manifest.renditions)) {
-    const r = object(value);
-    if (Object.keys(r).some(k => !['id','derived_from','producer','producer_version','producer_options','sha256','file'].includes(k))) invalid('Unsupported derived rendition field');
-    const parent = before.renditions.find(p => p.id === text(r.derived_from));
-    if (!parent || parent.format === 'mnx') invalid('Expected a non-MNX source in this piece');
-    const producer = parent.format === 'musicxml' ? 'musicxml-mnx' : 'guitarpro-mnx';
-    if (r.producer !== producer || r.producer_version !== requested[producer]) invalid('Converter identity does not match source');
-    const file = form.get(text(r.file));
-    if (!file || typeof file === 'string') invalid('Missing derived MNX upload');
-    // This route cannot alter existing rendition metadata or choose a canonical pointer.
-    if (before.renditions.some(old => old.id === text(r.id))) invalid('Rederive accepts new rendition ids only');
-    renditions.push({ id: text(r.id), format: 'mnx', role: 'derived', producer,
-      producer_version: text(r.producer_version), producer_options: (r.producer_options ?? null) as Json,
-      derived_from: parent.id, filename: `${parent.filename ?? parent.id}.mnx.json`,
-      provenance: { source_sha256: parent.sha256 }, content: await file.arrayBuffer(), sha256: text(r.sha256) });
-  }
-  const snapshot = await lib.writePiece(INGEST_OWNER, { id, expected_revision: before.piece.revision, renditions });
-  return c.json({ snapshot, unchanged: snapshot.piece.revision === before.piece.revision });
-});
 library.get('/ingest/:sourceId', async c => {
   const lib = new Library(c.env.LIBRARY_DB, c.env.LIBRARY_BUCKET);
   const piece = await lib.findPiece(INGEST_OWNER, 'soundslice', c.req.param('sourceId'));
@@ -134,7 +83,7 @@ library.get('/ingest/:sourceId', async c => {
 });
 library.post('/ingest', async c => {
   const { form, manifest } = await multipart(c.req.raw);
-  const allowed = ['id','expected_revision','source','renditions','recordings','tags','canonical','converter_versions'];
+  const allowed = ['id','expected_revision','source','renditions','recordings','tags','derived_tags','canonical'];
   if (Object.keys(manifest).some(k => !allowed.includes(k))) invalid('Unsupported manifest field');
   const source = object(manifest.source);
   if (source.kind !== 'soundslice') invalid('Only Soundslice operator imports are supported');
@@ -171,23 +120,32 @@ library.post('/ingest', async c => {
   }
   const canonical = object(manifest.canonical);
   if (canonical.mode !== 'initialize') invalid('Ingest may only initialize the canonical pointer');
+  const canonicalId = text(canonical.rendition_id);
+  const lib = new Library(c.env.LIBRARY_DB, c.env.LIBRARY_BUCKET);
+  // A Soundslice piece's canonical is the Soundslice .gp — asserted by the tool,
+  // enforced here, for the pointer being set now and for one already stored.
+  // MNX is not (yet) a storage format; nothing derived is stored, and the
+  // reader converts the .gp itself (roadmap: studio-storage-source-canonical).
+  const existing = await lib.getPiece(INGEST_OWNER, id);
+  const isSoundsliceGp = (r: { format: string; role: string } | undefined) => r?.format === 'gp' && r.role === 'export';
+  const pointer = existing?.piece.canonical_rendition_id ?? canonicalId;
+  const rows = [...(existing?.renditions ?? []), ...renditions];
+  if (!isSoundsliceGp(rows.find(r => r.id === pointer))) throw new LibraryError('conflict', 'A Soundslice piece keeps the Soundslice .gp as canonical');
+  const derived: DerivedTag[] | undefined = manifest.derived_tags === undefined ? undefined : array(manifest.derived_tags).map(value => {
+    const t = object(value); return { dimension: text(t.dimension), value: text(t.value), source_ref: text(t.source_ref) };
+  });
   const input: PieceWrite = { id, expected_revision: revision as number | null,
     source: { kind: 'soundslice', id: sourceId, url: `https://www.soundslice.com/slices/${sourceId}/` }, renditions, recordings,
-    canonical: { mode: 'initialize', rendition_id: text(canonical.rendition_id) },
+    canonical: { mode: 'initialize', rendition_id: canonicalId },
     tags: array(manifest.tags).map(value => { const t = object(value);
       if (t.dimension !== 'unknown') invalid('Imported lists use the unknown dimension');
       return { dimension: 'unknown', value: text(t.value), source_ref: text(t.source_ref) };
-    }) };
-  const lib = new Library(c.env.LIBRARY_DB, c.env.LIBRARY_BUCKET, versions(manifest.converter_versions));
-  const snapshot = await lib.writePiece(INGEST_OWNER, input);
-  const canonicalMnx = await lib.readCanonicalMnx(INGEST_OWNER, id);
-  return c.json({ snapshot, canonical: canonicalMnx ? { rendition_id: canonicalMnx.rendition.id,
-    work: documentWork(canonicalMnx.document), capos: canonicalMnx.document.parts.map(p => p._x?.mnxLab?.capo ?? null) } : null });
+    }), ...(derived ? { derived_tags: derived } : {}) };
+  return c.json({ snapshot: await lib.writePiece(INGEST_OWNER, input) });
 });
 
-function reader(c: { env: Env }) { return new Library(c.env.LIBRARY_DB, c.env.LIBRARY_BUCKET, converterVersions); }
+function reader(c: { env: Env }) { return new Library(c.env.LIBRARY_DB, c.env.LIBRARY_BUCKET); }
 library.get('/me', c => c.json({ user: c.get('libraryUser') }));
-library.get('/login', c => c.redirect('/workbench/?library=1', 303));
 library.get('/pieces', async c => {
   const filters = c.req.queries('tag') ?? [];
   if (filters.length > 12 || filters.some(t => t.length > 512 || !t.includes(':'))) return c.json({ error: 'Invalid tag filters' }, 400);
@@ -204,11 +162,20 @@ library.get('/pieces/:id', async c => {
   const snapshot = await reader(c).getPiece(c.get('libraryUser').id, c.req.param('id'));
   return snapshot ? c.json({ snapshot }) : c.json({ error: 'Piece not found' }, 404);
 });
-library.get('/pieces/:id/mnx', async c => {
-  let canonical;
-  try { canonical = await reader(c).readCanonicalMnx(c.get('libraryUser').id, c.req.param('id')); }
-  catch (error) { if (error instanceof LibraryError && error.code === 'invalid') return c.json({ error: 'Current MNX conversion unavailable' }, 409); throw error; }
-  return canonical ? c.json(canonical) : c.json({ error: 'Current MNX conversion unavailable' }, 409);
+// The canonical file, as stored, in whatever format the owner regards as the
+// source. The reader converts; the service never does.
+library.get('/pieces/:id/canonical', async c => {
+  const canonical = await reader(c).readCanonical(c.get('libraryUser').id, c.req.param('id'));
+  if (!canonical) return c.json({ error: 'This piece has no canonical rendition' }, 409);
+  const { rendition, object, revision } = canonical;
+  c.header('Content-Type', 'application/octet-stream');
+  c.header('X-Content-Type-Options', 'nosniff');
+  c.header('Content-Length', String(rendition.bytes));
+  c.header('Content-Disposition', `attachment; filename*=UTF-8''${encodeURIComponent(rendition.filename ?? `${rendition.id}.${rendition.format}`)}`);
+  c.header('X-Library-Format', rendition.format);
+  c.header('X-Library-Rendition', rendition.id);
+  c.header('X-Library-Revision', String(revision));
+  return c.body(object.body);
 });
 library.get('/renditions/:id', async c => {
   const { object, rendition } = await reader(c).readRendition(c.get('libraryUser').id, c.req.param('id'));

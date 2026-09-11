@@ -8,9 +8,6 @@
 // statically, while an explicitly opened local file remains in memory only.
 // Verification state is display-only (mutations happen through harness
 // scripts, in git).
-import { LibraryClient } from '../storage/libraryClient.ts';
-import './LibraryDialog.ts';
-import type { LibraryDialog } from './LibraryDialog.ts';
 import { LitElement, html, css, svg, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { corpus, corpusManifest, coverage, type ScenarioEntry } from '../corpus/corpus.ts';
@@ -33,7 +30,7 @@ import {
   LOCAL_FILE_ACCEPT,
   openLocalFile,
   type LocalDocumentSource
-} from './localFile.ts';
+} from '../importers/localFile.ts';
 
 /** A scenario-page side-panel tab a link may open (the queue's rows open
  *  `compare`). The staff view is NOT a link parameter — it is a stored
@@ -168,7 +165,6 @@ export class WorkbenchApp extends LitElement {
   @state() private documentFocus = false;
   @state() private focusHint = false;
   @state() private browserFullscreen = document.fullscreenElement !== null;
-  @state() private libraryAvailable = false;
   /** The current user-selected file. Deliberately transient: no IndexedDB,
    *  file handle, save path, or reload restoration. */
   @state() private localDocument: LocalDocumentSource | null = null;
@@ -778,13 +774,6 @@ export class WorkbenchApp extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
-    void new LibraryClient().available().then(async available => {
-      this.libraryAvailable = available;
-      if (available && new URLSearchParams(location.search).get('library') === '1') {
-        const url = new URL(location.href); url.searchParams.delete('library'); history.replaceState(null, '', url);
-        await this.updateComplete; void this.renderRoot.querySelector<LibraryDialog>('mnx-library-dialog')?.open();
-      }
-    });
     window.addEventListener('hashchange', this.onHashChange);
     window.addEventListener('keydown', this.onKeyDown);
     document.addEventListener('fullscreenchange', this.onFullscreenChange);
@@ -1161,11 +1150,6 @@ export class WorkbenchApp extends LitElement {
         >
           ${this.openingLocalFile ? 'opening…' : 'open…'}
         </button>
-        ${this.libraryAvailable ? html`<button class="file-open" @click=${() => this.renderRoot.querySelector<LibraryDialog>('mnx-library-dialog')?.open()}>Load…</button>
-          <mnx-library-dialog @library-load=${async (event: CustomEvent) => {
-            this.localDocument = await openLocalFile(new File([JSON.stringify(event.detail.document)], `${event.detail.name}.mnx.json`, { type: 'application/json' }));
-            if (location.hash === documentHref()) this.route = parseHash(location.hash); else location.hash = documentHref();
-          }}></mnx-library-dialog>` : nothing}
         <span class="facts">
           <span class="fact">
             <span class="fact-k">MNX</span>

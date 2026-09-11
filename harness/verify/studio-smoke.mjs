@@ -12,16 +12,15 @@ const root = new URL('../../', import.meta.url);
 const origin = process.env.LIBRARY_LOCAL_ORIGIN ?? 'http://127.0.0.1:8791';
 if (!['localhost','127.0.0.1'].includes(new URL(origin).hostname)) throw new Error('Smoke must target loopback only');
 const session = JSON.parse(await fs.readFile(new URL('.secrets/local-library-session.json',root)));
-const doc = JSON.parse(await fs.readFile(new URL('scenarios/lab/00-document/01-minimal-single-note/document.mnx.json',root)));
-doc._x = { mnxLab: { work: { title: 'Studio smoke piece', artist: 'Synthetic fixture' } } };
-const bytes = new TextEncoder().encode(JSON.stringify(doc));
+// The service stores the SOURCE — a real .gp — and the browser converts it.
+const bytes = new Uint8Array(await fs.readFile(new URL('converters/fixtures/Sun-did-glide.gp', root)));
 const sha256 = Buffer.from(await crypto.subtle.digest('SHA-256', bytes)).toString('hex');
 const headers = { Authorization: 'Bearer local-development-only', 'Cf-Access-Jwt-Assertion': session.machine };
 const before = await fetch(origin + '/api/library/ingest/StudioSmoke', { headers }); assert.equal(before.status,200);
 const { snapshot } = await before.json();
 const manifest = { id: 'soundslice:StudioSmoke', expected_revision: snapshot?.piece.revision ?? null,
-  source: { kind: 'soundslice', id: 'StudioSmoke' }, renditions: [{ id: 'studio-smoke-mnx', format: 'mnx', role: 'original', producer: 'synthetic-test', producer_version: null, producer_options: null, filename: 'studio-smoke.mnx.json', sha256, file: 'score' }], recordings: [], tags: [{ dimension: 'unknown', value: 'Studio collection', source_ref: 'test' }], canonical: { mode: 'initialize', rendition_id: 'studio-smoke-mnx' }, converter_versions: {} };
-const form = new FormData(); form.set('manifest',JSON.stringify(manifest)); form.set('score',new Blob([bytes]),'score.mnx.json');
+  source: { kind: 'soundslice', id: 'StudioSmoke' }, renditions: [{ id: 'StudioSmoke-gp', format: 'gp', role: 'export', producer: 'soundslice-cli', producer_version: null, producer_options: null, filename: 'Sun-did-glide.gp', sha256, file: 'score' }], recordings: [], tags: [{ dimension: 'unknown', value: 'Studio collection', source_ref: 'test' }], canonical: { mode: 'initialize', rendition_id: 'StudioSmoke-gp' }, derived_tags: [{ dimension: 'title', value: 'Studio smoke piece', source_ref: 'sidecar' }, { dimension: 'artist', value: 'Synthetic fixture', source_ref: 'sidecar' }] };
+const form = new FormData(); form.set('manifest',JSON.stringify(manifest)); form.set('score',new Blob([bytes]),'Sun-did-glide.gp');
 assert.equal((await fetch(origin+'/api/library/ingest',{method:'POST',headers,body:form})).status,200);
 // The root is studio's.
 const rootResponse = await fetch(origin + '/', { redirect: 'manual' });
@@ -66,6 +65,6 @@ try {
   await c.send('Page.navigate',{url:origin+'/studio/#/piece/soundslice%3ANoSuchPiece'});
   await wait(`${piece}?.textContent.includes('Could not open this piece')`);
   assert.equal(await c.evaluate(`Object.values(localStorage).some(v=>v.includes('Studio smoke piece') || v.includes('local@example.test'))`),false);
-  console.log('Studio smoke passed: root redirect, signed-out page, library list + filter, piece view + player, missing piece, no private localStorage.');
+  console.log('Studio smoke passed: root redirect, signed-out page, library list + filter, canonical .gp converted into the piece view + player, missing piece, no private localStorage.');
   if (c.logs.length) throw new Error('Browser console errors: '+c.logs.join('\n'));
 } finally { ws?.close(); chrome.kill(); await once(chrome,'exit'); await fs.rm(profile,{recursive:true,force:true}); }

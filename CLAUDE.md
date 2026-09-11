@@ -116,7 +116,7 @@ harness/             every way the evidence is exercised — conformance/, verif
                      (check-scenarios + verify-scenarios are the ONLY status writers),
                      render/ (PNG engravings; needs google-chrome), helpers/
 src/                 the apparatus — capability layers (order below)
-  model/  engine/  audio/  edit/  corpus/  storage/  assist/  elements/  workbench/  entries/
+  model/  engine/  audio/  edit/  corpus/  storage/  importers/  assist/  elements/  workbench/  entries/
 worker/              Hono; a DEMO for visitors with no key of their own, plus reserved
                      501 seams. generated/ is schema DATA precompiled from spec/,
                      importable from any layer
@@ -130,7 +130,8 @@ roadmap/ docs/ research/ vendor/mnx    unchanged at root
 
 ```
 model                                      (floor — imports nothing internal)
-model → engine · audio · edit · corpus · storage      (peers over the model)
+model → engine · audio · edit · corpus · storage · importers   (peers over the model;
+                                            importers also reach converters/)
 edit  → assist                             (assist carries ops; edit owns them)
 engine · audio · model → elements          (the embeddable surface)
 elements → workbench                       (workbench shell — leaf)
@@ -287,10 +288,12 @@ doctools/`uv` setup: [docs/mnx-spec-submodule.md](docs/mnx-spec-submodule.md).
 `converters/*` are npm workspaces; their CLIs are Node-only. **Home-grown importers may
 enter the app build** — the workbench opens `.gp`/`.gpx`/`.gp3-5` by running
 `guitarpro-mnx`'s clean-room importer (`src/cleanRoom.ts` → `gpif/`, `gp345/`) in a lazy
-web worker (`src/workbench/guitarProImporter.worker.ts`), and `.musicxml`/`.mxl`/`.xml`
+web worker (`src/importers/guitarProImporter.worker.ts`), and `.musicxml`/`.mxl`/`.xml`
 through `musicxml-mnx` in its own (`musicXmlImporter.worker.ts`, which imports
 `import/musicxml.ts` + `common/mxl.ts` directly — the package index drags in Node-only
-`fs`). **Third-party codecs may not:
+`fs`). `src/importers/` is the layer both shells open files through — a local file or a
+library piece's canonical `.gp`, since **the mnx-lab service stores sources, never derived
+MNX** (MNX is the working format, not yet the storage format; the reader converts). **Third-party codecs may not:
 alphaTab is a devDependency of `converters/guitarpro-mnx`, kept only as the
 differential-parity oracle for its tests (`src/import/gp.ts`, `src/export/gp.ts` — the
 live paths are `cleanRoom.ts` and `gpif/fromMnx.ts`), and must never reach `src/` or any

@@ -37,7 +37,7 @@ it('checks current membership on every call without creating users', async () =>
   expect((await request('/me', await identity.sign({ email: 'stranger@example.test' }))).status).toBe(403);
   expect((await env.LIBRARY_DB.prepare('SELECT count(*) AS n FROM users').first<{n:number}>())?.n).toBe(1);
   await env.LIBRARY_DB.prepare('UPDATE users SET active=0').run();
-  for (const path of ['/me','/pieces','/tags','/pieces/private','/renditions/private','/login']) expect((await request(path)).status).toBe(403);
+  for (const path of ['/me','/pieces','/tags','/pieces/private','/renditions/private']) expect((await request(path)).status).toBe(403);
   const response = await request('/ingest/ABC', await identity.sign({}, true), { Authorization: 'Bearer private-test' }); expect(response.status).toBe(403);
 });
 it('isolates owners across list, tag completion, metadata, canonical and raw bytes', async () => {
@@ -49,8 +49,9 @@ it('isolates owners across list, tag completion, metadata, canonical and raw byt
   expect((await (await request('/pieces?tag=list:other')).json()).pieces).toEqual([]);
   expect((await (await request('/tags')).json()).tags).toContainEqual({ dimension: 'list', value: 'operator' });
   expect(JSON.stringify(await (await request('/tags')).json())).not.toContain('other');
-  for (const path of ['/pieces/other','/pieces/other/mnx','/renditions/other-mnx']) expect((await request(path)).status).toBe(404);
-  const canonical = await request('/pieces/operator/mnx'); expect(canonical.status).toBe(200); expect(canonical.headers.get('cache-control')).toContain('no-store');
+  for (const path of ['/pieces/other','/pieces/other/canonical','/renditions/other-mnx']) expect((await request(path)).status).toBe(404);
+  const canonical = await request('/pieces/operator/canonical'); expect(canonical.status).toBe(200); expect(canonical.headers.get('cache-control')).toContain('no-store');
+  expect(canonical.headers.get('x-library-format')).toBe('mnx'); expect(await canonical.text()).toBe(JSON.stringify(score));
   expect((await (await request('/renditions/operator-mnx')).text())).toBe(JSON.stringify(score));
 });
 it('separates browser and machine authority and fails closed on storage/config errors', async () => {
@@ -62,8 +63,8 @@ it('separates browser and machine authority and fails closed on storage/config e
   env.LIBRARY_ACCESS_AUD = undefined; expect((await request('/me')).status).toBe(503);
   env.LIBRARY_ACCESS_AUD = 'browser-test'; await env.LIBRARY_DB.exec('DROP TABLE users'); expect((await request('/me')).status).toBe(503);
 });
-it('only redirects authenticated login to the fixed workbench landing', async () => {
-  const r = await request('/login?return=https://attacker.test'); expect(r.status).toBe(303); expect(r.headers.get('location')).toBe('/workbench/?library=1');
+it('has no login route — sign-in is the edge redirect on /studio/ — and sends the root to studio', async () => {
+  expect((await request('/login?return=https://attacker.test')).status).toBe(404);
   // The root is studio's; the workbench keeps its own directory (workbench-path-prefix, studio-shell).
   const root = await app.request('http://localhost/', {}, env); expect(root.status).toBe(302); expect(root.headers.get('location')).toBe('/studio/');
   expect((await app.request('https://mnx-lab.totai.uk/api/library/me', { headers: { 'Cf-Access-Jwt-Assertion': jwt } }, env)).status).toBe(503);

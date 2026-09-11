@@ -13,7 +13,7 @@ import type { Env } from '../../worker/env.ts';
 import { INGEST_OWNER, MAX_INGEST_BYTES } from '../../worker/api/library.ts';
 // Operator scripts are deliberately JavaScript and excluded from the app build.
 // @ts-expect-error No declaration file for the Node operator tool.
-import { planIngest, uploadPlan, endpointURL } from '../../tools/library-ingest.mjs';
+import { planIngest, uploadPlan, endpointURL, validateConversion } from '../../tools/library-ingest.mjs';
 import score from '../../scenarios/lab/00-document/01-minimal-single-note/document.mnx.json';
 
 let directory: string; let mf: Miniflare; let env: Env;
@@ -26,7 +26,8 @@ const converters = Object.fromEntries(['guitarpro-mnx','musicxml-mnx'].map(produ
   }
 }]));
 const fetcher: typeof fetch = (input, init) => app.request(String(input), init, env);
-const plan = async () => (await planIngest(directory, converters))[0];
+const plan = async () => (await planIngest(directory))[0];
+const upload = (p: Awaited<ReturnType<typeof plan>>, options: object = { converters }) => uploadPlan(p, 'http://localhost', token, fetcher, {}, options);
 async function form(manifest: object, files: Map<string, Uint8Array>) {
   const f = new FormData(); f.set('manifest', JSON.stringify(manifest));
   for (const [key, value] of files) f.set(key, new Blob([value]), key);
@@ -37,7 +38,7 @@ beforeEach(async () => {
   await writeFile(join(directory,'Song_ABC.gp'), 'synthetic GP input');
   await writeFile(join(directory,'Song_ABC.musicxml'), 'synthetic MusicXML input');
   await writeFile(join(directory,'Song_ABC.mp3'), 'synthetic recording');
-  await writeFile(join(directory,'Song_ABC.sync.json'), JSON.stringify({ id: 'ABC', score_file: 'Song_ABC.gp', fetched_at: '2026-09-11', recordings: [
+  await writeFile(join(directory,'Song_ABC.sync.json'), JSON.stringify({ id: 'ABC', title: 'Sidecar song', artist: 'Sidecar artist', score_file: 'Song_ABC.gp', fetched_at: '2026-09-11', recordings: [
     { id: 1, source: 1, source_data: 'youtube123', name: 'Video', syncpoints: [[0,0]] },
     { id: 2, source: 2, media_file: 'Song_ABC.mp3', name: 'Audio', syncpoints: [[0,0]], cropped_duration: 10 }
   ] }));
@@ -65,23 +66,61 @@ it('fails closed when the server secret is absent', async () => {
   const response = await app.request('/api/library/ingest/ABC', { headers: { Authorization: `Bearer ${token}` } }, {});
   expect(response.status).toBe(503);
 });
-it('imports through HTTP, derives canonical metadata and repeats without writes', async () => {
-  const p = await plan(); const first = await uploadPlan(p, 'http://localhost', token, fetcher);
-  expect(first.snapshot.piece.owner).toBe(INGEST_OWNER);
-  expect(first.snapshot.renditions).toHaveLength(4); expect(first.snapshot.recordings).toHaveLength(2);
-  expect(first.canonical.work).toEqual({ title: 'Test song', artist: 'Test artist' }); expect(first.canonical.capos).toEqual([3]);
-  const second = await uploadPlan(p, 'http://localhost', token, fetcher);
-  expect(second.unchanged).toBe(true); expect(second.snapshot).toEqual(first.snapshot);
+it('stores the sources only, projects tags from the sidecar and a validated conversion, and skips a replay', async () => {
+  const p = await plan(); const first = await upload(p);
+  expect(first.status).toBe('stored'); expect(first.snapshot.piece.owner).toBe(INGEST_OWNER);
+  // Nothing derived is stored: the .gp and the MusicXML, no MNX.
+  expect(first.snapshot.renditions.map((r: {format: string}) => r.format).sort()).toEqual(['gp', 'musicxml']);
+  expect(first.snapshot.recordings).toHaveLength(2);
+  expect(first.snapshot.renditions.find((r: {id: string}) => r.id === first.snapshot.piece.canonical_rendition_id).format).toBe('gp');
+  expect(first.validation.report.map((e: {valid: boolean}) => e.valid)).toEqual([true, true]);
+  expect(first.snapshot.tags.map((t: {dimension: string; value: string; origin: string; source_ref: string}) => `${t.dimension}:${t.value}:${t.origin}:${t.source_ref}`)).toEqual([
+    'artist:Sidecar artist:derived:sidecar', 'capo:3:derived:guitarpro-mnx@test-version', 'title:Sidecar song:derived:sidecar', 'unknown:Folder / List:asserted:L1']);
+  let posts = 0;
+  const second = await uploadPlan(p, 'http://localhost', token, (input, init) => { if (init?.method === 'POST') posts++; return fetcher(input, init); }, {}, { converters });
+  expect(second.status).toBe('skipped'); expect(posts).toBe(0); expect(second.snapshot).toEqual(first.snapshot);
+  expect(second.validation).toBeNull();
 });
-it('preserves canonical choices, renamed lists and missing recordings', async () => {
-  const p = await plan(); const first = await uploadPlan(p, 'http://localhost', token, fetcher);
-  const lib = new Library(env.LIBRARY_DB, env.LIBRARY_BUCKET, { 'guitarpro-mnx': 'test-version', 'musicxml-mnx': 'test-version' });
+it('re-validates and refreshes only the projection when the converter version changes, moving no bytes', async () => {
+  const p = await plan(); await upload(p);
+  const next = Object.fromEntries(Object.entries(converters).map(([k, v]) => [k, { ...v, version: 'v2', convert: () => { const d = v.convert(); Object.assign(d.parts[0], { _x: { mnxLab: { capo: 5 } } }); return d; } }]));
+  const files: string[] = [];
+  const result = await uploadPlan(p, 'http://localhost', token, async (input, init) => {
+    if (init?.method === 'POST') for (const key of (init.body as FormData).keys()) files.push(key);
+    return fetcher(input, init);
+  }, {}, { converters: next });
+  expect(result.status).toBe('stored'); expect(files).toEqual(['manifest']);
+  expect(result.snapshot.tags.filter((t: {dimension: string}) => t.dimension === 'capo').map((t: {value: string; source_ref: string}) => `${t.value}:${t.source_ref}`)).toEqual(['5:guitarpro-mnx@v2']);
+  expect(result.snapshot.renditions).toHaveLength(2);
+});
+it('stores a slice whose conversion does not validate, reports it, and projects no tag from it', async () => {
+  const broken = Object.fromEntries(Object.entries(converters).map(([k, v]) => [k, { ...v, convert: () => ({ mnx: { version: 1 }, global: { measures: [{ ending: { numbers: [1] } }] }, parts: [] }) }]));
+  const result = await upload(await plan(), { converters: broken });
+  expect(result.status).toBe('stored');
+  expect(result.validation.report.every((e: {valid: boolean}) => !e.valid)).toBe(true);
+  expect(result.validation.report[0].errors.join(' ')).toContain('duration');
+  expect(result.snapshot.tags.map((t: {dimension: string}) => t.dimension).sort()).toEqual(['artist', 'title', 'unknown']);
+  expect(validateConversion(score)).toEqual([]);
+});
+it('refuses a canonical that is not the Soundslice .gp, in the tool and in the Worker', async () => {
+  const p = await plan(); const first = await upload(p);
+  const lib = new Library(env.LIBRARY_DB, env.LIBRARY_BUCKET);
   const xml = first.snapshot.renditions.find((r: {format: string}) => r.format === 'musicxml');
-  await lib.writePiece(INGEST_OWNER, { id: p.manifest.id, expected_revision: 0, canonical: { mode: 'replace', rendition_id: xml.id },
+  await lib.writePiece(INGEST_OWNER, { id: p.manifest.id, expected_revision: 0, canonical: { mode: 'replace', rendition_id: xml.id } });
+  await expect(upload(await plan())).rejects.toThrow('not the Soundslice .gp');
+  const fresh = await plan(); fresh.manifest.canonical.rendition_id = fresh.manifest.renditions.find((r: {format: string}) => r.format === 'musicxml').id;
+  fresh.manifest.id = 'soundslice:XYZ'; fresh.manifest.source = { kind: 'soundslice', id: 'XYZ' };
+  const response = await app.request('/api/library/ingest', { method: 'POST', headers: { Authorization: `Bearer ${token}` }, body: await form(fresh.manifest, fresh.files) }, env);
+  expect(response.status).toBe(409);
+});
+it('preserves renamed lists and missing recordings across a replay', async () => {
+  const p = await plan(); await upload(p);
+  const lib = new Library(env.LIBRARY_DB, env.LIBRARY_BUCKET);
+  await lib.writePiece(INGEST_OWNER, { id: p.manifest.id, expected_revision: 0,
     rename_tags: [{ dimension: 'unknown', value: 'Folder / List', to_dimension: 'collection', to_value: 'Renamed' }] });
   await rm(join(directory,'Song_ABC.mp3'));
-  const second = await uploadPlan(await plan(), 'http://localhost', token, fetcher);
-  expect(second.unchanged).toBe(true); expect(second.snapshot.piece.canonical_rendition_id).toBe(xml.id);
+  const second = await upload(await plan());
+  expect(second.status).toBe('skipped');
   expect(second.snapshot.tags.some((t: {value: string}) => t.value === 'Renamed')).toBe(true);
   expect(second.snapshot.recordings).toHaveLength(2);
 });
@@ -100,7 +139,7 @@ it('operator metadata reads cannot see another owner', async () => {
   expect(await response.json()).toEqual({ snapshot: null });
 });
 it('rejects stale revisions and tampered uploads without partial rows', async () => {
-  const p = await plan(); await uploadPlan(p, 'http://localhost', token, fetcher);
+  const p = await plan(); await upload(p);
   const response = await app.request('/api/library/ingest', { method: 'POST', headers: { Authorization: `Bearer ${token}` }, body: await form(p.manifest, p.files) }, env);
   expect(response.status).toBe(409);
   p.manifest.expected_revision = 0; p.manifest.renditions[0].sha256 = '0'.repeat(64);
@@ -150,9 +189,9 @@ it('does not erase known raw-export provenance when the optional index is missin
   const exported = p.manifest.renditions.find((r: {format: string}) => r.format === 'gp');
   exported.provenance = { metadata_source: 'index.sqlite', source_sha256: 'a'.repeat(64), header: { Title: 'Test' } };
   exported.fetched_at = '2026-09-10';
-  const first = await uploadPlan(p, 'http://localhost', token, fetcher);
-  const second = await uploadPlan(await plan(), 'http://localhost', token, fetcher);
-  expect(second.unchanged).toBe(true); expect(second.snapshot).toEqual(first.snapshot);
+  const first = await upload(p);
+  const second = await upload(await plan());
+  expect(second.status).toBe('skipped'); expect(second.snapshot).toEqual(first.snapshot);
 });
 it('enforces the actual stream limit without trusting Content-Length', async () => {
   const response = await app.request('/api/library/ingest', { method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data; boundary=x' }, body: new Uint8Array(MAX_INGEST_BYTES+1) }, env);

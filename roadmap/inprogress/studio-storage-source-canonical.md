@@ -1,6 +1,7 @@
 # Store the source, convert on read — the library holds what Soundslice exported
 
-> **Status: proposed 2026-09-11.** Lineage: the
+> **Status: built 2026-09-11, in `inprogress/` until the deployed checks pass** (build record
+> at the end). Lineage: the
 > [studio storage campaign](../complete/studio-campaign-storage.md), whose contract clause 4
 > (*conversion stays in Node; the ingest derives MNX*) this item **reverses**, and whose
 > item 5 (the rederive sweep) it **retires**. Follows the first full cache sync of the same
@@ -106,7 +107,7 @@ its only other dependency — and dependency-cruiser learns the layer. This is t
   conversions of one stored source, run locally".
 - The nine cached sources become **converter fixtures** in `converters/fixtures/`, so the
   bug class that validation-at-ingest used to catch is caught at test time instead.
-- [studio-shell.md](../inprogress/studio-shell.md) §piece page reads the canonical route
+- [studio-shell.md](studio-shell.md) §piece page reads the canonical route
   and converts; its checklist gains the change.
 
 ## What is given up, stated plainly
@@ -141,3 +142,49 @@ All nine pieces' canonical pointers are already the `.gp`.
 
 Editing and the MNX rendition it will store, sharing, sync, a compact player, and any
 change to how Soundslice is exported.
+
+## Build record — 2026-09-11
+
+Built as designed, with three departures:
+
+- **The cached sources are not fixtures.** They are copyrighted transcriptions, and the
+  repo's rule is never to commit one. The regression coverage that stored-MNX validation
+  used to give lives in the tool instead: `npm run ingest:library -- <cache> --dry-run`
+  validates every source with both converters and exits nonzero on any error, without
+  the network. Run over the real cache today: nine slices, twenty conversions, zero errors.
+- **The workbench's Load dialog was stripped, not re-pointed.** The workbench has no backend
+  by rule; the dialog was its one thread to the service. The dialog, the `?library=1`
+  hand-off, the `/api/library/login` route and `library-smoke.mjs` are gone; `/workbench/`
+  never touches the service, and only `/studio/` is behind Access. The studio smoke is the
+  one end-to-end proof of the library path.
+- **The projection has a `tuning-name` dimension** beside `tuning` (standard, drop D, DADGAD,
+  open G/D/E/A, half- and whole-step down, bass and ukulele standard), and `title`/`artist`
+  come from the sidecar as designed; the workbench-era tuning format (`E[+1]3`) became
+  `F#3`.
+
+What is here: `Library(db, bucket)` with `readCanonical` and a `derived_tags` projection
+input (replace-when-present, retain-when-absent, derived dimensions only, each with a
+`source_ref`); the rederive routes, tool, version pin and build check deleted; `POST
+/ingest` enforcing the Soundslice `.gp` canonical for the pointer being set and one already
+stored; `GET /pieces/:id/canonical` streaming the file with format, rendition and revision
+headers; the ingest tool rewritten — plan without converting, skip by recorded SHA-256,
+validation mode, forgiving ingest / strict validator, projected tags, `--force`;
+`src/importers/` as a layer (the two clean-room workers, the protocol and the file opener,
+promoted from the workbench; dependency-cruiser and CLAUDE.md know it); studio's piece
+page and client reading the canonical file and converting it in that worker, naming the
+piece from the library's title/artist tags; docs revised. Verified: the full suite (1736),
+boundaries, both type checks, and the studio smoke against `wrangler dev` with local D1/R2
+— a real `.gp` stored, listed, opened and drawn with the player wired.
+
+**Already stored, unchanged:** nine pieces' derived MNX rows remain, immutable and unused;
+their canonical pointers were the `.gp` already. The first ingest run after this lands
+re-validates all nine (their projection predates `source_ref`) and posts nine manifests
+with no files.
+
+**Still open — the owner's steps**, then this doc moves to `complete/`:
+
+- [ ] `npm run deploy` (the Worker no longer serves `/pieces/:id/mnx`; studio needs the
+      canonical route); then `npm run ingest:library -- ~/dev/soundslice-cli/gp/files` to
+      refresh the projection — nine manifests, no bytes.
+- [ ] In deployed studio, the nine pieces open and play from their `.gp`.
+- [ ] A second ingest run reports nine `skipped`.

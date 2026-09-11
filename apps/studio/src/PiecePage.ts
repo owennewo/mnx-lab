@@ -1,12 +1,14 @@
-// #/piece/<id> — one piece, fullscreen. Fetches the canonical MNX through the
-// library's read route, mounts <mnx-document-viewer> filling the viewport and
-// wires it to the shell's <mnx-player> with the same plain-DOM host binding
-// the embed face exports. Nothing here edits or persists anything.
+// #/piece/<id> — one piece, fullscreen. Fetches the canonical FILE through the
+// library's read route (a .gp for a Soundslice piece), converts it in the
+// importers' clean-room worker — the service stores the source, the reader
+// converts — mounts <mnx-document-viewer> filling the viewport and wires it to
+// the shell's <mnx-player> with the plain-DOM host binding the embed face
+// exports. Nothing here edits or persists anything.
 import { LitElement, css, html, nothing } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { LibraryClient, LibraryRequestError } from '../../../src/storage/libraryClient.ts';
 import { documentTitle, documentArtist, type MnxDocument } from '../../../src/model/mnx.ts';
-import { upgradeTabExtension } from '../../../src/model/upgradeTabExtension.ts';
+import { openLocalFile } from '../../../src/importers/localFile.ts';
 import { bindPlayback } from '../../../src/elements/playbackHost.ts';
 import type { DocumentViewer, ViewSetting } from '../../../src/elements/DocumentViewer.ts';
 import type { Player } from '../../../src/elements/Player.ts';
@@ -79,17 +81,24 @@ export class PiecePage extends LitElement {
     this.loading = true;
     this.announce('');
     try {
-      const { document } = await this.client.mnx(this.pieceId);
+      const [{ bytes, filename }, named] = await Promise.all([
+        this.client.canonical(this.pieceId),
+        // The library's own name for the piece (its title/artist tags) outranks the file's header.
+        this.client.piece(this.pieceId).then(r => r.snapshot.tags, () => []),
+      ]);
       if (generation !== this.generation) return;
-      const mnxJson = upgradeTabExtension(document);
+      const tag = (dimension: string) => named.find(t => t.dimension === dimension)?.value ?? null;
+      const opened = await openLocalFile(new File([bytes], filename));
+      if (generation !== this.generation) return;
+      const mnxJson = opened.document;
       const doc: MnxDocument = {
         id: `library:${this.pieceId}`,
-        name: documentTitle(mnxJson) ?? this.pieceId,
+        name: tag('title') ?? documentTitle(mnxJson) ?? opened.name,
         lastUpdated: Date.now(),
         mnxJson,
       };
       this.doc = doc;
-      const artist = documentArtist(mnxJson);
+      const artist = tag('artist') ?? documentArtist(mnxJson);
       this.announce(artist ? `${doc.name} — ${artist}` : doc.name);
     } catch (error) {
       if (generation !== this.generation) return;

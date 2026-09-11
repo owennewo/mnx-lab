@@ -94,6 +94,8 @@ export class StudioApp extends LitElement {
       right: 0;
       bottom: 0;
       z-index: 2;
+      max-height: 38vh;
+      overflow: auto;
       background: var(--bar);
       border-top: 1px solid var(--line);
       backdrop-filter: blur(6px);

@@ -1,3 +1,8 @@
+// The importers layer: bytes in any format the lab reads → an in-memory MNX
+// document, converted off the main thread in a per-format clean-room worker.
+// Promoted out of the workbench (roadmap: studio-storage-source-canonical) so
+// that studio can open a library piece the way the workbench opens a local
+// file: the mnx-lab service stores the source, and the reader converts.
 import type { MnxStructure } from '../model/mnx.ts';
 import { upgradeTabExtension } from '../model/upgradeTabExtension.ts';
 import {
@@ -90,7 +95,7 @@ function importInWorker(
   });
 }
 
-/** Read one user-selected file into an in-memory workbench document. */
+/** Read one file — user-selected, or fetched from the library — into an in-memory document. */
 export async function openLocalFile(file: File): Promise<LocalDocumentSource> {
   let document: MnxStructure;
   let warnings: string[] = [];

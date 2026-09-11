@@ -45,17 +45,6 @@ proposals that name their campaign.
 
 ### proposed/
 
-- **[studio-storage-source-canonical.md](proposed/studio-storage-source-canonical.md)** — **MNX is
-  not yet a storage format.** The mnx-lab service holds what Soundslice exported and nothing
-  derived: the ingest stores bytes only, asserts the `.gp` as canonical, and runs each
-  converter in a **validation mode** — forgiving ingest (a verdict never blocks storing),
-  strict validator (every error printed, nonzero exit), tags only from a conversion that
-  validated (title/artist from the sidecar, capo/tuning from the fact sheet). Skips any slice
-  the library already holds by the SHA-256 the Worker recorded at upload, so a converter
-  change costs one snapshot read per piece and moves no bytes. Reads hand back the canonical
-  file and the shells convert in the promoted importer worker (`src/importers/`). Reverses
-  storage-campaign clause 4 and retires the rederive sweep, its routes, the version pin and
-  the build check. Names the one thing given up: validation moves off the service.
 - **[studio-player-practice.md](proposed/studio-player-practice.md)** — campaign item 13,
   studio's first player feature in `elements/`: loop the selection with the **written-range
   → performed-occurrences policy stated**, speed trainer, count-in, metronome, mute/solo.
@@ -167,6 +156,15 @@ back up to `proposed/` the moment it is.
 
 ### inprogress/
 
+- **[studio-storage-source-canonical.md](inprogress/studio-storage-source-canonical.md)** —
+  **built 2026-09-11**, awaiting the deploy: **MNX is not yet a storage format.** The service
+  holds what Soundslice exported and nothing derived; the ingest stores bytes only, asserts
+  the `.gp` as canonical, runs each converter in a **validation mode** (forgiving ingest,
+  strict validator, tags only from a validated conversion) and skips slices the library
+  already holds by recorded SHA-256. Reads stream the canonical file; both shells convert in
+  the promoted `src/importers/` worker. The rederive sweep, its routes, the version pin and
+  the build check are gone, and so is the workbench's Load dialog — `/workbench/` never
+  touches the service; only `/studio/` is behind Access.
 - **[studio-shell.md](inprogress/studio-shell.md)** — **studio started, built 2026-09-11**,
   awaiting the deployed checks: a Lit shell in `apps/studio/` at `/studio/` on the same
   Worker (a new dependency-cruiser leaf over `elements/` + `storage/`), the root redirected

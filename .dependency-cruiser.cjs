@@ -4,7 +4,8 @@
 //
 // The layer order:
 //   model                                   (floor — imports nothing internal)
-//   model → engine · audio · edit · corpus · storage   (peers over the model)
+//   model → engine · audio · edit · corpus · storage · importers   (peers over the model;
+//                                             importers also reach converters/)
 //   edit  → assist                          (assist carries ops; edit owns them)
 //   engine · audio · model → elements       (the embeddable surface)
 //   elements → workbench                    (workbench shell — leaf)
@@ -43,6 +44,7 @@ module.exports = {
     layerRule('edit-over-model', 'src/edit', ['src/model']),
     layerRule('corpus-over-model', 'src/corpus', ['src/model']),
     layerRule('storage-over-model', 'src/storage', ['src/model']),
+    layerRule('importers-over-model', 'src/importers', ['src/model']),
     layerRule('assist-carries-ops', 'src/assist', ['src/model', 'src/edit']),
     layerRule('elements-embeddable-surface', 'src/elements', [
       'src/model',
@@ -56,6 +58,7 @@ module.exports = {
       'src/edit',
       'src/corpus',
       'src/storage',
+      'src/importers',
       'src/assist',
       'src/elements'
     ]),
@@ -64,13 +67,13 @@ module.exports = {
       name: 'studio-consumes-neutral-surfaces',
       comment:
         'apps/studio is the consumer product (apps/studio/README.md). It reads elements/ ' +
-        'and below plus the typed library client — never the workbench, never assist ' +
+        'and below, the typed library client and the importers — never the workbench, never assist ' +
         'or edit until the editor is promoted (roadmap: core-editor-element-promotion).',
       severity: 'error',
       from: { path: '^apps/studio/' },
       to: {
         path: '^(src|worker)/',
-        pathNot: '^src/(model|engine|audio|elements|storage)/|^worker/generated/'
+        pathNot: '^src/(model|engine|audio|elements|storage|importers)/|^worker/generated/'
       }
     },
     {

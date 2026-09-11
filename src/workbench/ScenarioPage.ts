@@ -111,7 +111,7 @@ import {
   type RenderScale
 } from '../engine/render/scale.ts';
 import { MIN_DENSITY, MAX_DENSITY, neighbourSystemMeasure } from '../engine/layout/spacing.ts';
-import type { LocalDocumentSource } from './localFile.ts';
+import type { LocalDocumentSource } from '../importers/localFile.ts';
 
 /** The setup popovers, as data — one row per attribute rather than a ternary
  *  chain that grows a limb per campaign item. Label, placeholder and hint are
