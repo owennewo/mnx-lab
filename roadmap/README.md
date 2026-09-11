@@ -45,6 +45,25 @@ proposals that name their campaign.
 
 ### proposed/
 
+- **[workbench-path-prefix.md](proposed/workbench-path-prefix.md)** — the workbench moves from
+  the root to **`/workbench/`** so studio can take `mnx-lab.totai.uk`, the address it was
+  always meant to have. Both shells route by hash, so the origin drops its SPA fallback and
+  the repo's top-level HTML files become the URL map (`workbench/index.html`,
+  `studio/index.html`, `embed.html`). Three things assume `/` — the library login redirect,
+  the Load dialog's back link, and six smoke scripts — all mechanical. Lands **before**
+  studio-shell.md; the root redirect belongs to that doc, so the move is invisible until
+  studio exists.
+- **[studio-shell.md](proposed/studio-shell.md)** — **studio starts**: a Lit shell in
+  `apps/studio/` at `/studio/` on the same Worker, consuming `elements/` + `storage/` only
+  (a new dependency-cruiser leaf). Three hash routes — the tag-filtered library, one piece
+  fullscreen with `<mnx-document-viewer>` + `<mnx-player>`, and not-permitted. **Auth is
+  Cloudflare Access at the edge and nothing else**: `/studio` is added as a second path on
+  the existing browser application so one audience and one cookie cover the page and its
+  `/api/library` fetches; anonymous visits hit the OTP prompt before any HTML; the Worker's
+  JWT + D1 double gate is unchanged; sign-out is Access's logout; `worker/api/auth.ts`
+  stays a 501. Settles the README's three open decisions (Lit, same origin, shared-origin
+  auth). **Pulls trigger 2** of core-editor-element-promotion.md — studio is the real
+  second consumer — so editing is phase two, in memory only; persistence is the next item.
 - **[studio-player-practice.md](proposed/studio-player-practice.md)** — campaign item 13,
   studio's first player feature in `elements/`: loop the selection with the **written-range
   → performed-occurrences policy stated**, speed trainer, count-in, metronome, mute/solo.
