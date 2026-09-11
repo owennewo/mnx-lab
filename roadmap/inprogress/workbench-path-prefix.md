@@ -128,6 +128,15 @@ green after rebase.
 - [ ] Library Load round trip: sign-in button → Access OTP → `/workbench/?library=1` →
       dialog open and signed in; sign out returns it to the prompt.
 - [ ] PKCE connect returns to `/workbench/#<route>`.
-- [ ] `npm run dev` works again (the plugin fault above), or its cause is recorded.
+- [x] `npm run dev` works again — **fixed the same day, not a plugin fault after all.**
+      Ajv's standalone output splices its runtime helpers in as CommonJS
+      `require("ajv/dist/runtime/ucs2length")` even in ESM mode, and the extension
+      schema's string bounds put one at the top of `validate-extensions.mjs`, which the
+      Worker has imported statically since library ingest landed. workerd has no
+      `require`; the production bundler rewrote it, which is why only dev died.
+      `spec/tools/compile-validator.mjs` now inlines each helper's own source and fails
+      the build if a `require` survives. The unrolled smoke's pinned review counts
+      (16/18) were also stale against the corpus (17/19); it now counts scenarios that
+      declare `unrolled` and their committed `*.unrolled.svg` files instead of pinning.
 
 When those are ticked, this doc moves to `complete/`.

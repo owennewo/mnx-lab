@@ -171,9 +171,11 @@ back up to `proposed/` the moment it is.
   awaiting the deployed checks: the workbench serves at **`/workbench/`**
   (`workbench/index.html`), the Worker 302s the root there until studio takes it, the SPA
   fallback is gone, and the login redirect, the Load dialog's back link and six smoke
-  scripts follow. Groundwork for [studio-shell.md](proposed/studio-shell.md). Records that
-  `npm run dev` fails at startup on the untouched tree (vite plugin runner, Node 22.22) —
-  open, not this item's.
+  scripts follow. Groundwork for [studio-shell.md](proposed/studio-shell.md). Also fixed
+  on the way: `npm run dev` had died at startup since library ingest — Ajv's standalone
+  validators splice in a CommonJS `require` that workerd lacks; the compiler now inlines
+  the helper and forbids `require` in its output — and the unrolled smoke counts its
+  review evidence from the corpus instead of pinning 16/18.
 
 
 

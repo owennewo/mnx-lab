@@ -3,6 +3,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { serveStatic } from './staticServer.mjs';
+import { loadCorpus } from './check-scenarios.mjs';
 import { devtoolsPort, connect, client } from './browserHarness.mjs';
 const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'mnx-unrolled-'));
 let chrome, ws, server, review;
@@ -101,6 +102,15 @@ try {
   );
   const screenshot = await cdp.send('Page.captureScreenshot', { format: 'png' });
   fs.writeFileSync('/tmp/unrolled-workbench.png', Buffer.from(screenshot.result.data, 'base64'));
+  // The review page is one section per scenario that declares `unrolled`
+  // and one pair per committed `expected.unrolled*.svg`; count them from the corpus
+  // so a new navigation scenario grows the expectation instead of breaking it.
+  const expected = { sections: 0, pairs: 0 };
+  for (const scenario of loadCorpus()) {
+    if (!JSON.parse(fs.readFileSync(path.join(scenario.dir, 'meta.json'), 'utf8')).unrolled) continue;
+    expected.sections++;
+    expected.pairs += fs.readdirSync(scenario.dir).filter((name) => /^expected\.unrolled(\.tab)?\.svg$/.test(name)).length;
+  }
   await cdp.send('Page.navigate', {
     url: `http://127.0.0.1:${review.port}/unrolled.html#lab/navigation/ds-final-ending`,
   });
@@ -108,7 +118,7 @@ try {
   console.log(
     'Unrolled review',
     await cdp.evaluate(
-      `(async()=>{await document.fonts.ready;const sections=document.querySelectorAll('section'),pairs=document.querySelectorAll('.pair');if(sections.length!==16||pairs.length!==18)throw new Error('Review evidence missing');return {sections:sections.length,pairs:pairs.length};})()`,
+      `(async()=>{await document.fonts.ready;const sections=document.querySelectorAll('section'),pairs=document.querySelectorAll('.pair'),blocked=[...sections].filter(s=>s.textContent.includes('Blocked:'));if(sections.length!==${expected.sections}||pairs.length!==${expected.pairs}||blocked.length)throw new Error('Review evidence missing: '+sections.length+' sections, '+pairs.length+' pairs, '+blocked.length+' blocked (expected ${expected.sections}/${expected.pairs}/0)');return {sections:sections.length,pairs:pairs.length};})()`,
     ),
   );
   const reviewShot = await cdp.send('Page.captureScreenshot', { format: 'png' });

@@ -26,8 +26,33 @@ function loadSchema(rel) {
   return JSON.parse(fs.readFileSync(path.join(root, 'spec', rel), 'utf8'));
 }
 
-function writeModule(rel, code) {
+// Ajv emits ESM on request, but splices its runtime helpers in as
+// `require("ajv/dist/runtime/<name>").default` regardless — each helper's
+// `.code` string is hard-coded CJS. workerd has no `require`, so the Worker's
+// dev server died on the first schema keyword that needed one (`maxLength` →
+// ucs2length, arriving with the extension schema's string bounds) while the
+// production bundle, which rewrites the call, kept working. Inline each
+// helper's own source instead: the generated module stays dependency-free,
+// and a `require` that survives is a red build rather than a runtime surprise.
+async function inlineRuntimeHelpers(code) {
+  const pattern = /require\("ajv\/dist\/runtime\/([A-Za-z0-9_]+)"\)\.default/g;
+  let out = code;
+  for (const name of new Set([...code.matchAll(pattern)].map(m => m[1]))) {
+    const mod = await import(`ajv/dist/runtime/${name}.js`);
+    const helper = mod.default?.default ?? mod.default;
+    const source = String(helper);
+    if (typeof helper !== 'function' || !/^function\s/.test(source)) {
+      throw new Error(`ajv runtime helper "${name}" is not a plain function; cannot inline it`);
+    }
+    out = out.replaceAll(`require("ajv/dist/runtime/${name}").default`, `(${source})`);
+  }
+  if (/\brequire\(/.test(out)) throw new Error('generated validator still contains require()');
+  return out;
+}
+
+async function writeModule(rel, code) {
   const outPath = path.join(outDir, rel);
+  code = await inlineRuntimeHelpers(code);
   fs.writeFileSync(outPath, code);
   console.log(`Wrote ${path.relative(root, outPath)} (${(code.length / 1024).toFixed(1)} kB)`);
 }
@@ -39,7 +64,7 @@ function writeModule(rel, code) {
     code: { source: true, esm: true },
   });
   const validate = ajv.compile(loadSchema('mnx-schema.json'));
-  writeModule('validate-mnx.mjs', standaloneCode.default(ajv, validate));
+  await writeModule('validate-mnx.mjs', standaloneCode.default(ajv, validate));
 }
 
 // 1b. Proposed MNX schema, if a proposal is in flight. Optional by design: the
@@ -52,7 +77,7 @@ function writeModule(rel, code) {
       code: { source: true, esm: true },
     });
     const validate = ajv.compile(JSON.parse(fs.readFileSync(proposedPath, 'utf8')));
-    writeModule('validate-mnx-proposed.mjs', standaloneCode.default(ajv, validate));
+    await writeModule('validate-mnx-proposed.mjs', standaloneCode.default(ajv, validate));
   }
 }
 
@@ -69,7 +94,7 @@ function writeModule(rel, code) {
   const extSchema = loadSchema('mnx-lab-extensions.schema.json');
   ajv.addSchema(extSchema);
   const base = extSchema.$id;
-  writeModule(
+  await writeModule(
     'validate-extensions.mjs',
     standaloneCode.default(ajv, {
       validateNoteExt: `${base}#/$defs/note-ext`,
@@ -92,5 +117,5 @@ function writeModule(rel, code) {
     $defs: { ...published.$defs, section: proposed.$defs.section ?? false },
     $ref: '#/$defs/section'
   });
-  writeModule('validate-library-label.mjs', standaloneCode.default(ajv, validate));
+  await writeModule('validate-library-label.mjs', standaloneCode.default(ajv, validate));
 }
