@@ -1,7 +1,7 @@
 # Studio storage: schema and library module
 
-Item 2 of the [storage campaign](studio-campaign-storage.md); inherits its contract
-and [storage design](../../docs/studio-storage.md). Started 2026-09-11.
+Item 2 of the [storage campaign](../inprogress/studio-campaign-storage.md); inherits its contract
+and [storage design](../../docs/studio-storage.md). **Built 2026-09-11.**
 
 Build the five-table D1 migration, content-addressed R2 writes, and a DOM-free
 `worker/library/` module with owner-scoped reads and atomic piece writes. A revision
@@ -26,8 +26,18 @@ R2 puts use an absent-object condition plus checksum/size verification.
 Nineteen local Miniflare tests cover graph validation, canonical version selection,
 metadata projection, immutable rendition history, recording upserts, renamed list
 tags, owner isolation, no-op retries, corruption, late SQL failure, and competing SQL
-and R2 writers. Wrangler applied the migration locally successfully. Production
-migration follows the complete repository gates. No library HTTP route is added.
+and R2 writers. All 1,702 tests, scenario checks and the build passed after rebase.
+Migration `0001_library.sql` is applied locally and remotely; repeat application is a
+no-op. Remote verification found all five tables and the revision trigger, with zero
+application rows. No library HTTP route is added.
+
+Remote commands returned D1 error `7403` with Wrangler 4.99.0; the already installed
+4.131.0 succeeded for both a read-only probe and the migration. The cause was not
+established; package changes in the primary checkout were left untouched. Use a
+current Wrangler for remote operations if this recurs.
+
+Implementation landed and pushed through `4873c79`; its worktree and branch were
+removed before this completion record.
 
 Operator commands (from the checkout root):
 

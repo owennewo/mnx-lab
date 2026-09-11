@@ -156,7 +156,6 @@ back up to `proposed/` the moment it is.
 
 ### inprogress/
 
-- **[studio-storage-schema.md](inprogress/studio-storage-schema.md)** — storage campaign item 2: five-table migration and invariant-enforcing Worker library module, tested on local D1/R2.
 
 - **[studio-campaign-storage.md](inprogress/studio-campaign-storage.md)** — **campaign**: songs
   in Cloudflare, every format kept. One *piece* per item of music with immutable **renditions**
@@ -380,6 +379,7 @@ back up to `proposed/` the moment it is.
 
 ### complete/
 
+- **[studio-storage-schema.md](complete/studio-storage-schema.md)** — storage campaign item 2, **built 2026-09-11**: local/remote D1 migration and owner-scoped Worker library writes; 19 D1/R2 invariant tests. Production application tables remain empty.
 - **[studio-storage-provision.md](complete/studio-storage-provision.md)** — storage campaign item 1, **built 2026-09-11**: idempotent Wrangler bootstrap, live D1/R2 bindings and private ingest write secret; local and production smoke passed. Stores remain empty for item 2.
 
 - **[core-player-piano-synth.md](complete/core-player-piano-synth.md)** — item 14: a CC0
