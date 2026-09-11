@@ -234,6 +234,16 @@ export class Player extends LitElement {
     if (reinstall) {
       this.install();
       if (this.initialOrdinal !== null) this.seek(this.initialOrdinal);
+      // A performance arriving or leaving is a fact the chrome around the
+      // player needs (the score frame's grip enables on it), and the state
+      // frame it would ride on is deduplicated away when nothing else moved.
+      this.dispatchEvent(
+        new CustomEvent('performance-changed', {
+          detail: { documentId: this.documentId, available: this.performance !== null },
+          bubbles: true,
+          composed: true,
+        }),
+      );
     } else if (changed.has('initialOrdinal') && this.initialOrdinal !== null)
       this.seek(this.initialOrdinal);
     if (!reinstall && changed.has('voicePreset') && this.sink) {

@@ -25,10 +25,10 @@ with the keyboard must not move the panel out from under what you were reading.
 **Document focus** is transient workbench composition: `Ctrl+Alt+F` removes the app and
 scenario-page chrome without changing remembered rail/panel preferences, while `F11`
 remains browser-owned (the palette's separate browser-fullscreen action uses the Fullscreen
-API when available). The zoom pad remains over the document surface and carries the
-focus/exit toggle in its footer row; while focus is on, the pad's idle mark draws the exit
-glyph with an ink border in place of the crosshair, so the mode never hides both its control
-and its escape route. It is never a property of `<mnx-document-viewer>`.
+API when available). The score frame's grips remain on the pane's edges (below), and the
+frame's top strip carries a **Focus / Unfocus** button beside Zoom and Settings, so the
+mode never hides both its control and its escape route; the zoom pad's own footer toggle
+still works when the pad is open. It is never a property of `<mnx-document-viewer>`.
 **Theming is `light-dark()`, never an attribute** — the shell resolves `auto|light|dark`
 (remembered per browser, palette-switchable) onto `color-scheme`, and every token
 follows because `color-scheme` is inherited and crosses shadow roots. An
@@ -85,21 +85,30 @@ The real API layer (documents, auth, sync) belongs to **studio**
 (`worker/api/documents|auth` 501 stubs, `storage/cloudRepository.ts`).
 
 
-The score-corner settings card has eight rows: Show, Lyrics, Time signatures,
-Clefs, Title, Bar numbers, Instrument names, and Beams. Its display preferences
-are validated and stored under `mnx-lab:display`, across documents; projection
-remains URL-owned. The card holds what changes *what* is drawn; the layout levers
-— staff size, note spacing, the natural/fill spacing mode, clearance and document
-focus — all live on the zoom pad, whose expanded pose adds a 22px footer row under
-the readout and arms: focus toggle · spacing-mode glyph toggle · clearance slider.
-Clearance is labelled only by its tooltip and is stored with the other display
-preferences. Current verse uses the first used verse in established order
-until a host supplies a selected verse. That transient input is not persisted.
-A system means one horizontal row of music, including both staves in Both.
-The card stays available in document focus, supports keyboard navigation and
-Escape/focus return, dismisses on click-away, and scrolls on short screens.
+**The score pane is the score frame** (`src/elements/ScoreFrame.ts`,
+[roadmap/inprogress/core-score-frame.md](../roadmap/inprogress/core-score-frame.md), shared
+with studio): a title grip on the pane's top edge (scenario id · provenance) and a pause grip
+on the bottom (pause/play · the position readout), plus a hairline progress line. A tap on
+the score is never a chrome toggle. Drawn out, the top grip becomes the tools row — `← Queue`,
+the id, the staff view as a segmented control (unavailable views greyed with the reason),
+**Zoom** and **Settings** hosting the two pads *pinned* under their buttons, and **Focus** —
+and the bottom grip becomes the player's tray. The corner cluster the pads used to idle in
+is gone; the pads themselves are unchanged.
 
-**Playback** lives at the top of the existing side panel: controls and a performed-order
-table alongside the written score. The host keeps playback context separate from editor
-selection, stops/recompiles on edits, and accepts an optional zero-based `at=` ordinal
-in scenario links. [Player element and lifecycle](player-element.md).
+The settings card has nine rows: Staff, Repeats, Lyrics, Time signatures, Clefs, Title,
+Bar numbers, Instrument names, and Beams. Its display preferences are validated and stored
+under `mnx-lab:display`, across documents; projection remains URL-owned. The card holds
+what changes *what* is drawn; the layout levers — staff size, note spacing, the
+natural/fill spacing mode, clearance and document focus — all live on the zoom pad, whose
+footer row under the readout and arms holds: focus toggle · spacing-mode glyph toggle ·
+clearance slider. Clearance is labelled only by its tooltip and is stored with the other
+display preferences. Current verse uses the first used verse in established order until a
+host supplies a selected verse. That transient input is not persisted. A system means one
+horizontal row of music, including both staves in Both. The card supports keyboard
+navigation and Escape/focus return, and dismisses on click-away.
+
+**Playback** lives in the frame's bottom grip: the player's tray (transport, a scrubber over
+the performed order, sound, rate, volume, the performed-order table) draws out under the
+score. The host keeps playback context separate from editor selection, stops/recompiles on
+edits, and accepts an optional zero-based `at=` ordinal in scenario links.
+[Player element and lifecycle](player-element.md).

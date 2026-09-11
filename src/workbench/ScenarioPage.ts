@@ -88,9 +88,8 @@ import '../elements/DocumentViewer.ts';
 import './RungInspector.ts';
 import { buildInspectorView } from './inspectorRows.ts';
 import { fingerboardOf, parseInspectorLine } from '../edit/inspector.ts';
-import '../elements/ZoomPad.ts';
+import '../elements/ScoreFrame.ts';
 import type { ZoomPadChange } from '../elements/ZoomPad.ts';
-import '../elements/SettingsPad.ts';
 import './ModelPickerDialog.ts';
 import './LyricTextEditor.ts';
 import { lyricPlanOps, type LyricPlanEdit } from '../edit/lyricText.ts';
@@ -673,7 +672,9 @@ export class ScenarioPage extends LitElement {
       /* The page head is RETIRED (2026-09-01): its view tabs became the
          settings pad in the score corner, its focus button was a duplicate of
          the cluster's, and its panel chevron moved to the app header beside
-         its rail mirror. The page is the body alone now. */
+         its rail mirror. The page is the body alone now — and since 2026-09-12
+         the score pane is the score frame, whose top strip carries the view,
+         the pads and the focus button (core-score-frame.md). */
       :host {
         display: grid;
         grid-template-rows: 1fr;
@@ -1514,23 +1515,24 @@ export class ScenarioPage extends LitElement {
         z-index: 5;
       }
 
-      /* The zoom/density pad (core-zoom-density-pad.md). Top-RIGHT, pinned
-         while the score scrolls — the viewer scrolls itself one level down, so
-         an absolute child of .main simply stays put. z-index 4 puts it under
-         the popover layer (5) and the tray (30): everything that can cover it,
-         should. The panel needs no z-order at all, being a grid column rather
-         than an overlay.
-
-         The design's inset is 14px from this box; it is 28 here because the
-         paper now starts at 14 and the pad would otherwise straddle its
-         corner. Same 14px of clear space the design asked for — measured from
-         the paper it overlays, which is what it was measuring when the bench
-         behind it was empty. */
-      mnx-zoom-pad {
+      /* The score frame (roadmap/inprogress/core-score-frame.md) fills the
+         pane: its grips sit on the pane's edges, its strips draw out in flow
+         above and below the score, and the zoom pad and settings card hang
+         pinned under the strip's buttons — the corner cluster they used to
+         idle in is gone. z-index 4 keeps an open pad under the popover layer
+         (5) and the tray (30), as the cluster was. */
+      mnx-score-frame {
         position: absolute;
-        top: 28px;
-        right: 28px;
+        inset: 0;
         z-index: 4;
+      }
+
+      mnx-score-frame > a[slot='back'] {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--ink);
+        text-decoration: none;
       }
 
       /* The ops tab: the op queue as provenance rows — op · intent · key.
@@ -3063,39 +3065,51 @@ export class ScenarioPage extends LitElement {
         }px"
       >
         <div class="main">
-          ${this.viewer(entry, view)}
-          ${this.loadState === 'ready' && !entry.invalidByDesign
-            ? html`<mnx-zoom-pad
-                .staffScale=${this.staffScale}
-                .densityH=${this.densityH}
-                .spacingMode=${this.spacingMode}
-                .clearance=${this.displayPreferences.clearance ?? 2}
-                .densitySteps=${this.densitySteps}
-                .effectiveStaffScale=${this.effectiveStaffScale}
-                .documentFocus=${this.documentFocus}
-                @zoom-change=${this.onZoomChange}
-                @spacing-mode-change=${(event: CustomEvent<'natural' | 'fill'>) => {
-                  this.spacingMode = event.detail;
-                  localStorage.setItem(SPACING_MODE_KEY, this.spacingMode);
-                }}
-                @clearance-change=${(event: CustomEvent<number>) => {
-                  this.displayPreferences = writeDisplayPreferences({
-                    ...this.displayPreferences,
-                    clearance: event.detail
-                  });
-                }}
-              >
-                <mnx-settings-pad
-                  .display=${this.displayPreferences}
-                  @display-change=${(event: CustomEvent<DisplayOptions>) => {
-                    this.displayPreferences = writeDisplayPreferences(event.detail);
-                  }}
-                  .view=${view}
-                  .views=${views}
-                  .unrolled=${this.unrolled}
-                ></mnx-settings-pad>
-              </mnx-zoom-pad>`
-            : nothing}
+          <mnx-score-frame
+            .heading=${entry.id}
+            .subheading=${this.isLocalDocument() ? 'local document' : `${entry.ns} · ${entry.meta.status}`}
+            .view=${view}
+            .views=${views}
+            .display=${this.displayPreferences}
+            .unrolled=${this.unrolled}
+            .staffScale=${this.staffScale}
+            .densityH=${this.densityH}
+            .spacingMode=${this.spacingMode}
+            .clearance=${this.displayPreferences.clearance ?? 2}
+            .densitySteps=${this.densitySteps}
+            .effectiveStaffScale=${this.effectiveStaffScale}
+            .documentFocus=${this.documentFocus}
+            .pads=${this.loadState === 'ready' && !entry.invalidByDesign}
+            @zoom-change=${this.onZoomChange}
+            @spacing-mode-change=${(event: CustomEvent<'natural' | 'fill'>) => {
+              this.spacingMode = event.detail;
+              localStorage.setItem(SPACING_MODE_KEY, this.spacingMode);
+            }}
+            @clearance-change=${(event: CustomEvent<number>) => {
+              this.displayPreferences = writeDisplayPreferences({
+                ...this.displayPreferences,
+                clearance: event.detail
+              });
+            }}
+            @display-change=${(event: CustomEvent<DisplayOptions>) => {
+              this.displayPreferences = writeDisplayPreferences(event.detail);
+            }}
+          >
+            <a slot="back" href="#/">← Queue</a>
+            <button
+              slot="actions"
+              type="button"
+              aria-pressed=${this.documentFocus}
+              title=${this.documentFocus ? 'Exit document focus (Ctrl+Alt+F)' : 'Focus document (Ctrl+Alt+F)'}
+              @click=${() => this.dispatchEvent(new CustomEvent('document-focus-request', { bubbles: true, composed: true }))}
+            >
+              ${this.documentFocus ? 'Unfocus' : 'Focus'}
+            </button>
+            ${this.viewer(entry, view)}
+            <mnx-player slot="player" .performance=${this.performance} .document=${this.session?.doc}
+              .documentId=${this.scenarioId} .initialOrdinal=${this.routeSeekConsumed?null:this.at}
+              @seek=${()=>{this.routeSeekConsumed=true;}}></mnx-player>
+          </mnx-score-frame>
           ${this.inspectorOpen && this.session ? this.inspectorOverlay(entry) : nothing}
           ${this.modelPickerOpen
             ? html`<mnx-model-picker
@@ -3173,9 +3187,6 @@ export class ScenarioPage extends LitElement {
           title="drag to resize"
           @pointerdown=${this.onPanelDrag}
         ></div>
-        <mnx-player .performance=${this.performance} .document=${this.session?.doc}
-          .documentId=${this.scenarioId} .initialOrdinal=${this.routeSeekConsumed?null:this.at}
-          @seek=${()=>{this.routeSeekConsumed=true;}}></mnx-player>
         ${this.performanceError?html`<p role="alert">${this.performanceError}</p>`:nothing}
         <div class="panel-tabs">
           ${tabs.map(

@@ -114,13 +114,19 @@ const DUMP = `(() => {
   const page = appRoot?.querySelector('mnx-scenario-page');
   const pageRoot = page?.shadowRoot;
   const viewer = pageRoot?.querySelector('mnx-document-viewer');
-  const zoomPad = pageRoot?.querySelector('mnx-zoom-pad');
+  // The score pane is the score frame (core-score-frame.md): the focus button
+  // is in its top strip, the pads hang pinned under the strip's buttons, and
+  // the grips stay on the pane's edges in every mode.
+  const frame = pageRoot?.querySelector('mnx-score-frame');
+  const frameRoot = frame?.shadowRoot;
+  const gripTop = frameRoot?.querySelector('.grip.top');
+  const gripBottom = frameRoot?.querySelector('.grip.bottom');
+  const stripTop = frameRoot?.querySelector('.strip.top');
+  const score = frameRoot?.querySelector('.score');
+  const focusButton = pageRoot?.querySelector('button[slot=actions]');
+  const zoomPad = frameRoot?.querySelector('mnx-zoom-pad');
   const zoomRoot = zoomPad?.shadowRoot;
-  const zoomControl = zoomRoot?.querySelector('.pad');
-  const zoomReadout = zoomRoot?.querySelector('.readout');
   const zoomFocus = zoomRoot?.querySelector('.focus-toggle');
-  const zoomFoot = zoomRoot?.querySelector('.foot');
-  const zoomBadge = zoomRoot?.querySelector('.focus-badge');
   const rect = element => {
     if (!element) return null;
     const box = element.getBoundingClientRect();
@@ -144,20 +150,20 @@ const DUMP = `(() => {
       ? getComputedStyle(appRoot.querySelector('nav')).display
       : null,
     panel: !!pageRoot?.querySelector('.panel'),
+    frame: !!frame,
+    frameRect: rect(frame),
+    scoreRect: rect(score),
+    gripTopRect: rect(gripTop),
+    gripBottomRect: rect(gripBottom),
+    stripOpen: !!stripTop,
+    focusButton: !!focusButton,
+    focusLabel: focusButton?.textContent.trim() ?? null,
+    focusPressed: focusButton?.getAttribute('aria-pressed') ?? null,
     zoom: !!zoomPad,
-    zoomRect: rect(zoomPad),
-    zoomControlRect: rect(zoomControl),
-    zoomExpanded: zoomControl?.classList.contains('expanded') ?? false,
-    zoomReadoutRect: rect(zoomReadout),
-    zoomReadoutOpacity: zoomReadout ? Number(getComputedStyle(zoomReadout).opacity) : null,
-    zoomFocusRect: rect(zoomFocus),
-    zoomFootHeight: zoomFoot ? zoomFoot.getBoundingClientRect().height : null,
-    zoomBadgeOpacity: zoomBadge ? Number(getComputedStyle(zoomBadge).opacity) : null,
-    zoomControlOpacity: zoomControl ? Number(getComputedStyle(zoomControl).opacity) : null,
+    zoomPinned: zoomPad?.hasAttribute('pinned') ?? false,
     zoomFocusLabel: zoomFocus?.getAttribute('aria-label') ?? null,
     zoomFocusPressed: zoomFocus?.getAttribute('aria-pressed') ?? null,
     inspector: !!pageRoot?.querySelector('mnx-rung-inspector'),
-    focusButton: !!zoomFocus,
     appRect: rect(app),
     mainRect: rect(appRoot?.querySelector('main')),
     pageRect: rect(page),
@@ -228,26 +234,33 @@ try {
     await new Promise(resolve => setTimeout(resolve, settleMs));
   };
   const focusKey = () => press('f', 'KeyF', 70, 3);
+  const FRAME =
+    "document.querySelector('mnx-workbench').shadowRoot" +
+    ".querySelector('mnx-scenario-page').shadowRoot";
+  const drawOutTop = async () => {
+    await cdp.evaluate(`${FRAME}.querySelector('mnx-score-frame').shadowRoot.querySelector('.grip.top')?.click()`);
+    await new Promise(resolve => setTimeout(resolve, 300));
+  };
+  const clickFrameFocus = async () => {
+    await drawOutTop();
+    await cdp.evaluate(`${FRAME}.querySelector('button[slot=actions]').click()`);
+    await new Promise(resolve => setTimeout(resolve, 400));
+  };
+  const openZoom = async () => {
+    await drawOutTop();
+    await cdp.evaluate(
+      `[...${FRAME}.querySelector('mnx-score-frame').shadowRoot.querySelectorAll('.strip.top .btn')]` +
+        ".find(b => b.textContent.includes('Zoom')).click()"
+    );
+    await new Promise(resolve => setTimeout(resolve, 300));
+  };
   const clickZoomFocus = async () => {
     await cdp.evaluate(
-      "document.querySelector('mnx-workbench').shadowRoot" +
-        ".querySelector('mnx-scenario-page').shadowRoot" +
+      `${FRAME}.querySelector('mnx-score-frame').shadowRoot` +
         ".querySelector('mnx-zoom-pad').shadowRoot" +
         ".querySelector('.focus-toggle').click()"
     );
     await new Promise(resolve => setTimeout(resolve, 400));
-  };
-  const hoverZoomFocus = async focusRect => {
-    await cdp.send('Input.dispatchMouseEvent', {
-      type: 'mouseMoved',
-      x: focusRect.x + focusRect.width / 2,
-      y: focusRect.y + focusRect.height / 2
-    });
-    await new Promise(resolve => setTimeout(resolve, 300));
-  };
-  const movePointer = async (x, y) => {
-    await cdp.send('Input.dispatchMouseEvent', { type: 'mouseMoved', x, y });
-    await new Promise(resolve => setTimeout(resolve, 300));
   };
 
   let state = await dump();
@@ -255,7 +268,11 @@ try {
     state.documentHeading === 'Twelve-bar blues — the realistic navigation instrument',
     'the workbench supplies the scenario name as the document heading fallback'
   );
-  check(state.focusButton, 'normal mode exposes the document-focus button');
+  check(state.frame, 'the scenario page mounts the score frame');
+  check(
+    state.gripTopRect?.height > 0 && state.gripBottomRect?.height >= 44 && !state.stripOpen,
+    'at rest the frame shows its two grips and no strip'
+  );
   check(
     state.focusItems.some(item => item.hint === 'Ctrl+Alt+F'),
     'the command palette exposes document focus with its shortcut'
@@ -267,11 +284,15 @@ try {
   );
   check(state.fullscreenStateMatches, 'fullscreenchange state mirrors the browser-owned element');
 
-  // The page head retired (2026-09-01): the zoom cluster's toggle is the one
-  // focus button, in normal mode and inside focus alike.
-  await clickZoomFocus();
+  // The focus button lives in the frame's top strip (2026-09-12), beside Zoom
+  // and Settings — the one focus button, in normal mode and inside focus alike.
+  await drawOutTop();
   state = await dump();
-  check(state.appFocus && state.pageFocus, 'the normal-mode focus button enters document focus');
+  check(state.stripOpen && state.focusButton && state.focusLabel === 'Focus', 'the drawn-out top strip exposes the document-focus button');
+  await clickFrameFocus();
+  state = await dump();
+  check(state.appFocus && state.pageFocus, 'the strip\'s focus button enters document focus');
+  check(state.focusLabel === 'Unfocus' && state.focusPressed === 'true', 'inside focus the same button reads Unfocus, pressed');
   await focusKey();
   state = await dump();
   check(!state.appFocus, 'Ctrl+Alt+F exits focus entered through the button');
@@ -280,70 +301,30 @@ try {
   state = await dump();
   check(state.appFocus && state.pageFocus, 'Ctrl+Alt+F reflects focus state on shell and page');
   check(
-    !state.header && !state.nav && !state.panel && state.zoom,
-    'focus mode removes the shell panes but retains the document zoom pad'
+    !state.header && !state.nav && !state.panel && state.frame,
+    'focus mode removes the shell panes but retains the score frame'
   );
   check(
-    state.zoomRect?.width > 0 && state.zoomRect?.height > 0,
-    'the retained zoom pad is visibly laid out in focus mode'
+    state.gripBottomRect?.height >= 44 && state.gripBottomRect.y + state.gripBottomRect.height <= state.viewport.height + 1,
+    'the pause grip stays on the bottom edge in focus mode'
   );
+  check(
+    state.stripOpen ? state.focusLabel === 'Unfocus' : state.gripTopRect?.height > 0,
+    'focus mode keeps its way out on screen — the strip\'s Unfocus, or the grip that draws it'
+  );
+  await openZoom();
+  state = await dump();
+  check(state.zoom && state.zoomPinned, 'Zoom in the strip hangs the pad pinned under its button');
   check(
     state.zoomFocusLabel === 'Exit document focus' && state.zoomFocusPressed === 'true',
-    'the zoom pad carries a permanent, state-aware exit from document focus'
-  );
-  // The focus toggle lives in the pad's footer row (2026-09-09), which is
-  // closed at rest — so the idle mark itself must be the visible way out.
-  check(
-    near(state.zoomControlRect.width, state.zoomControlRect.height) &&
-      state.zoomReadoutRect.width < 1 &&
-      state.zoomReadoutOpacity === 0 &&
-      state.zoomFootHeight < 1,
-    'the off-default zoom control idles as a square with no readout and no footer'
-  );
-  check(
-    state.zoomBadgeOpacity === 1 && state.zoomControlOpacity === 1,
-    'in focus mode the idle mark draws the exit badge at full opacity'
-  );
-  await movePointer(
-    state.zoomControlRect.x + state.zoomControlRect.width / 2,
-    state.zoomControlRect.y + state.zoomControlRect.height / 2
-  );
-  state = await dump();
-  check(
-    state.zoomExpanded && state.zoomReadoutRect.width >= 50 && state.zoomReadoutOpacity === 1,
-    'hovering zoom restores the STAFF and SPACE readout'
-  );
-  check(
-    state.zoomFootHeight >= 20 &&
-      state.zoomFocusRect.height >= 20 &&
-      state.zoomFocusRect.y >= state.zoomReadoutRect.y + state.zoomReadoutRect.height - 1 &&
-      state.zoomBadgeOpacity === 0,
-    'the open pad exposes the focus toggle in a footer row under the readout'
-  );
-  await hoverZoomFocus(state.zoomFocusRect);
-  state = await dump();
-  check(state.zoomExpanded, 'hovering the focus toggle keeps the pad open');
-  await movePointer(0, 0);
-  state = await dump();
-  check(
-    !state.zoomExpanded &&
-      near(state.zoomControlRect.width, state.zoomControlRect.height) &&
-      state.zoomReadoutRect.width < 1 &&
-      state.zoomFootHeight < 1,
-    'leaving zoom returns it to the numberless square'
+    'the pinned zoom pad still carries its state-aware exit from document focus'
   );
   await clickZoomFocus();
   state = await dump();
-  check(
-    !state.appFocus && state.zoomFocusLabel === 'Focus document',
-    'the zoom-pad control exits document focus without the shortcut'
-  );
-  await clickZoomFocus();
+  check(!state.appFocus, 'the zoom-pad control exits document focus without the shortcut');
+  await clickFrameFocus();
   state = await dump();
-  check(
-    state.appFocus && state.zoomFocusLabel === 'Exit document focus',
-    'the same zoom-pad control re-enters document focus'
-  );
+  check(state.appFocus && state.focusLabel === 'Unfocus', 'the strip\'s button re-enters document focus');
   check(
     state.railPreference === '1' && state.panelPreference === '1',
     'entering focus mode does not mutate remembered pane preferences'
@@ -351,14 +332,20 @@ try {
   console.log(
     '  focused geometry',
     JSON.stringify({ viewport: state.viewport, main: state.mainRect, page: state.pageRect,
-      pageMain: state.pageMainRect, viewer: state.viewerRect, viewBox: state.viewBox })
+      pageMain: state.pageMainRect, frame: state.frameRect, viewer: state.viewerRect, viewBox: state.viewBox })
   );
+  // The strip is in flow above the pane, so with it drawn out the frame — not
+  // the viewer — is what fills the viewport; put it away for the geometry check.
+  await cdp.evaluate(`${FRAME}.querySelector('mnx-score-frame').shadowRoot.querySelector('.strip.top .btn.ghost').click()`);
+  await new Promise(resolve => setTimeout(resolve, 400));
+  state = await dump();
   for (const [name, rect] of [
     ['app', state.appRect],
     ['shell main', state.mainRect],
     ['scenario page', state.pageRect],
     ['scenario main', state.pageMainRect],
-    ['document viewer', state.viewerRect]
+    ['score frame', state.frameRect],
+    ['score pane', state.scoreRect]
   ]) {
     check(
       rect &&
@@ -369,6 +356,7 @@ try {
       `${name} occupies the browser viewport in document focus`
     );
   }
+  check(near(state.viewerRect.width, state.viewport.width), 'the document viewer spans the viewport width in document focus');
 
   const wideViewBox = state.viewBox;
   await cdp.send('Emulation.setDeviceMetricsOverride', {
@@ -380,8 +368,8 @@ try {
   await new Promise(resolve => setTimeout(resolve, 1300));
   state = await dump();
   check(
-    near(state.viewerRect.width, 820) && near(state.viewerRect.height, 520),
-    'viewer follows both width and height while focused'
+    near(state.viewerRect.width, 820) && near(state.scoreRect.width, 820) && near(state.scoreRect.height, 520),
+    'the pane follows both width and height while focused, the viewer its width'
   );
   check(state.viewBox && state.viewBox !== wideViewBox, 'ResizeObserver repacks the rendered document');
 

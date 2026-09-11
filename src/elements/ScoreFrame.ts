@@ -492,13 +492,17 @@ export class ScoreFrame extends LitElement {
     this.refreshReadout(detail.ordinal);
   };
 
+  private readonly onPerformance = () => this.refreshReadout(null);
+
   connectedCallback() {
     super.connectedCallback();
     this.addEventListener('playback-state-changed', this.onPlayback);
+    this.addEventListener('performance-changed', this.onPerformance);
   }
 
   disconnectedCallback() {
     this.removeEventListener('playback-state-changed', this.onPlayback);
+    this.removeEventListener('performance-changed', this.onPerformance);
     document.removeEventListener('pointerdown', this.onClickAway);
     super.disconnectedCallback();
   }

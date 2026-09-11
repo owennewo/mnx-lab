@@ -1,6 +1,6 @@
 # Score frame — edge grips for play, zoom and settings, one element for both shells
 
-> **Status: proposed and started 2026-09-11.** Implementation loop. Serves studio first
+> **Status: started 2026-09-11; phases 1–4 built 2026-09-12, phase 5 open.** Implementation loop. Serves studio first
 > (the piece page has no zoom or settings at all, and its player dock fades on a pointer
 > timer that touch never restarts) and the workbench second (the same element replaces its
 > corner cluster and moves the player out of the side panel). Design locked on the
@@ -78,3 +78,14 @@ restyling the pads; dark theme work beyond what `light-dark()` already gives the
 ## Build record
 
 - 2026-09-11 — worktree `core-score-frame` taken; phase 1 started.
+- 2026-09-12 — **phases 1–4 built.** Pads promoted (`elements/{ZoomPad,SettingsPad}.ts`,
+  `displayDefaults.ts`), both with a `pinned` mode so a host's button owns the trigger.
+  `elements/ScoreFrame.ts` is the frame; the player's tray adopted the shared tokens,
+  40px controls, glyph transport and a scrubber, and it now announces
+  `performance-changed` so the grip enables without waiting for a playback frame. Studio's
+  piece page and the workbench's scenario page both mount it; the shell header/footer and
+  idle timer are gone from the piece page, the corner cluster and the side panel's player
+  from the scenario page. Verified in a browser: `studio-smoke.mjs` (grips, both pads,
+  staff view, tray), `focus-mode-smoke.mjs` (rewritten to the frame),
+  `player-workbench-smoke.mjs`. Phase 5 (tap a bar to seek) is open — the viewer has no
+  measure hit-test yet.
