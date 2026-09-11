@@ -45,6 +45,18 @@ proposals that name their campaign.
 
 ### proposed/
 
+- **[studio-campaign-storage.md](proposed/studio-campaign-storage.md)** — **campaign**: songs
+  in Cloudflare, every format kept. One *piece* per item of music with immutable **renditions**
+  in every notation format it has (uploaded `.gp5`, Soundslice `.gp` and MusicXML, our derived
+  MNX from each), recordings with performed-bar syncpoints, and `dimension:value` tags (derived
+  from the canonical MNX, asserted by the owner). D1 index + R2 blobs, no Durable Object until a
+  document has two writers. Five items: provision (wrangler bootstrap, not Terraform — with the
+  trigger to revisit recorded), schema + Worker library module, the `soundslice-cli` → Cloudflare
+  sync tool (first code under `apps/studio/`), a **shell** read-route + workbench Load item blocked
+  on an auth conversation, and the re-derive-and-diff sweep that makes a converter regression a
+  report line. The schema lives in [docs/studio-storage.md](../docs/studio-storage.md), refocused
+  2026-09-11 from the former `studio-storage-sync` proposal (sync engine and sharing ladder
+  remain in that file's git history).
 - **[studio-player-practice.md](proposed/studio-player-practice.md)** — campaign item 13,
   studio's first player feature in `elements/`: loop the selection with the **written-range
   → performed-occurrences policy stated**, speed trainer, count-in, metronome, mute/solo.
@@ -142,16 +154,6 @@ back up to `proposed/` the moment it is.
   [core-editor-input-layer.md](complete/core-editor-input-layer.md); absorbed the
   **voice stage** (two-stage transcribe-review-submit, Worker-side transcription) from
   the retired [core-open-router.md](superseded/core-open-router.md) on 2026-08-20.
-- **[studio-storage-sync.md](proposed/low-priority/studio-storage-sync.md)** — **studio's storage, sync
-  and sharing**: a hand-rolled op-log sync engine in the Replicache mold (server-authoritative
-  rebase over `EditOp`/`applyOp` — CRDTs rejected with reasons), persisted as a SQLite Durable
-  Object per document + D1 library layer + R2 snapshots, IndexedDB demoted to replica. Library
-  model is **multi-dimensional tags** (path/setlist asserted; tuning/artist derived by the doc
-  DO, never stale) and **the tag is the unit of share** — live sets, materialized grants,
-  capability URLs — over a tier ladder (URL-fragment → tag-shares → git/jsDelivr publish →
-  Drive as export only). Records the adoption-day snapshot barrier, the worker/`applyOp`
-  boundary question, free-tier→$5 cost shape, and a five-stage build order starting with
-  whole-document LWW through the existing `DocumentRepository` seam.
 - **[core-lowvision-reflow.md](proposed/low-priority/core-lowvision-reflow.md)** — should the plan's
   line width be measured in **ink**, so growing the staff reflows the music instead of
   overflowing it? Left open by the 2026-08-21 low-vision range (staff ceiling 160% → 640%,

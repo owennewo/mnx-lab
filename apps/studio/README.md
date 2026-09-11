@@ -26,6 +26,13 @@ It must not import `src/workbench/` (the workbench shell is a leaf; dependency-c
 that a red build), and nothing may import studio. Anything both shells want is first
 *promoted* into `elements/` or below — a deliberate, reviewed move.
 
+## Storage
+
+How a piece of music is stored — D1 index, R2 renditions and recordings, tags, one canonical
+pointer — is designed in [docs/studio-storage.md](../../docs/studio-storage.md) and built by
+the [studio storage campaign](../../roadmap/proposed/studio-campaign-storage.md). Its sync
+tool is the first code that will land in this directory.
+
 ## Reserved seams, already in place
 
 | Seam | Where | Today |
