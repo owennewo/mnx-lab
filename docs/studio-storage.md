@@ -51,6 +51,11 @@ Everything that needs "the document" resolves through it:
 So derived tags, the player, and the workbench all read MNX, while the file the owner
 regards as the source can be any format. Changing the canonical pointer is a row update.
 
+**The pointer is set explicitly and then belongs to the owner.** An import sets canonical
+only when the piece has none — for a Soundslice slice, to the Soundslice `.gp`, the most
+complete rendition on hand — and never moves it afterwards. A later import adds renditions;
+the owner's choice stands.
+
 **Editing moves the pointer.** A `.gp5` cannot be edited in place. The first studio edit of a
 piece produces an MNX document, stored as a new rendition, and canonical moves to it. A
 `.gp` exported afterwards is another derived rendition, never a mutation of the original
@@ -61,7 +66,7 @@ upload. After the first edit, canonical is necessarily MNX.
 | Data | Store | Why there |
 | --- | --- | --- |
 | Piece identity, provenance, canonical pointer | **D1** | The one cross-piece query surface |
-| Rendition files (`.gp`, `.gp5`, `.gpx`, `.musicxml`, `.mnx.json`) | **R2** blob, **D1** row | Immutable, content-addressed; derived MNX runs 300 KB–1 MB, too large for a D1 text column |
+| Rendition files (`.gp`, `.gp5`, `.gpx`, `.musicxml`, `.mnx.json`) | **R2** blob, **D1** row | Immutable, content-addressed. Not because D1 could not hold a 1 MB MNX (its per-value cap is in the low megabytes) but so every rendition shares one store and D1 stays a small index |
 | Recordings (uploaded audio/video) | **R2** blob, **D1** row | Bulk of the bytes (10 MB of the first ingest's 12 MB); zero egress |
 | YouTube-linked recordings | **D1** row only | Nothing to store but the id |
 | Syncpoints | **D1**, JSON column on the recording | ~10 KB, read whole by the player |
@@ -87,8 +92,10 @@ CREATE TABLE pieces (
   source_kind            TEXT,                      -- 'soundslice' | 'upload'
   source_id              TEXT,                      -- e.g. the slice id 'wJPHc'
   source_url             TEXT,
+  revision               INTEGER NOT NULL DEFAULT 0,  -- compare-and-set on every write to the piece
   created_at             TEXT NOT NULL,
-  updated_at             TEXT NOT NULL
+  updated_at             TEXT NOT NULL,
+  UNIQUE (owner, source_kind, source_id)
 );
 
 CREATE TABLE renditions (
@@ -96,15 +103,17 @@ CREATE TABLE renditions (
   piece_id         TEXT NOT NULL REFERENCES pieces(id),
   format           TEXT NOT NULL,   -- 'gp' | 'gpx' | 'gp5' | 'gp4' | 'gp3' | 'musicxml' | 'mnx'
   role             TEXT NOT NULL,   -- 'original' | 'export' | 'derived'
+  filename         TEXT,            -- as uploaded / as exported; presentation, never identity
   sha256           TEXT NOT NULL,
-  r2_key           TEXT NOT NULL,
+  r2_key           TEXT NOT NULL,   -- 'renditions/<sha256>'; several rows may share one key
   bytes            INTEGER NOT NULL,
-  producer         TEXT NOT NULL,   -- 'user-upload' | 'soundslice-exporter' | 'guitarpro-mnx' | 'musicxml-mnx' | 'studio'
-  producer_version TEXT,
+  producer         TEXT NOT NULL,   -- 'user-upload' | 'soundslice-exporter' | 'soundslice-cli' | 'guitarpro-mnx' | 'musicxml-mnx' | 'studio'
+  producer_version TEXT,            -- package version, plus git sha when run from a checkout
+  producer_options TEXT,            -- JSON: the flags the producer ran with (e.g. encoding date off)
+  provenance       TEXT,            -- JSON, free-form: upstream sha256, injected header, fetch source
   derived_from     TEXT REFERENCES renditions(id),
   fetched_at       TEXT,
-  created_at       TEXT NOT NULL,
-  UNIQUE (piece_id, sha256)
+  created_at       TEXT NOT NULL
 );
 
 CREATE TABLE recordings (
@@ -120,8 +129,10 @@ CREATE TABLE recordings (
   duration_s  REAL,
   syncpoints  TEXT,                 -- JSON [[bar, seconds, pos?, hide?]]; PERFORMED bars, 0-based
   source_id   TEXT,                 -- e.g. the soundslice recording id
-  created_at  TEXT NOT NULL
+  created_at  TEXT NOT NULL,
+  updated_at  TEXT NOT NULL
 );
+CREATE UNIQUE INDEX recordings_by_source ON recordings (piece_id, source_id) WHERE source_id IS NOT NULL;
 
 CREATE TABLE tags (
   owner     TEXT NOT NULL,
@@ -130,6 +141,7 @@ CREATE TABLE tags (
   value     TEXT NOT NULL,
   origin    TEXT NOT NULL,          -- 'derived' | 'asserted'
   sort_key  INTEGER,                -- setlist order
+  source_ref TEXT,                  -- asserted-by-import only: e.g. 'soundslice-list:6YDH7'; survives a rename
   PRIMARY KEY (owner, piece_id, dimension, value)
 );
 CREATE INDEX tags_by_value ON tags (owner, dimension, value);
@@ -147,7 +159,17 @@ Notes on the choices:
 
 - **Pieces and renditions reference each other.** Insert the piece with a null canonical,
   insert the renditions, then set the pointer. D1 enforces foreign keys; the column stays
-  nullable.
+  nullable. The same-piece rule — the canonical pointer and every `derived_from` name a
+  rendition of *this* piece — is a cross-row check SQLite cannot express, so the Worker
+  library module enforces it on every write.
+- **No uniqueness on `(piece_id, sha256)`.** Blobs deduplicate by themselves because the R2
+  key is the hash; rows are cheap and carry the history. A re-derive that produces the same
+  bytes as last time still gets its own row — "converter X at version Y, same result" — which
+  is exactly the evidence the re-derive sweep reports.
+- **The Soundslice `.gp` is a transformed export, and says so.** Soundslice's export carries an
+  empty score header; `soundslice-cli` injects the title and artist before caching it. Its
+  producer is therefore `soundslice-cli`, with the raw export's sha256 and the injected header
+  in `provenance`. The raw bytes are not kept anywhere; the hash is the audit trail.
 - **`renditions.derived_from` is provenance and is not inferable from the canonical
   pointer.** A piece will have several derived renditions with different parents (MNX from
   the `.gp`, MNX from the MusicXML), and the canonical pointer moves while old renditions
@@ -160,6 +182,9 @@ Notes on the choices:
   only if a query by bar is ever needed.
 - **`owner` from day one** costs nothing and matches the tag shape the sharing design wants,
   so a second user is an auth change, not a schema migration.
+- **`revision` on pieces** is a compare-and-set token: a writer sends the revision it read
+  and the write fails if the piece has moved. It stops a stale ingest run from overwriting a
+  newer canonical choice today, and it is the same mechanism studio's saves will need.
 
 ## R2 key layout
 
@@ -171,9 +196,27 @@ renditions/<sha256>                 the file, any format; format and name live i
 recordings/<sha256>                 uploaded audio/video
 ```
 
-Object metadata carries the original filename and MIME type for download convenience; the
-row is the record. Nothing under either prefix is ever overwritten or deleted by the app;
-garbage collection of unreferenced blobs is an explicit, separate sweep.
+Filenames and MIME types live on the D1 row, not in object metadata; the row is the record
+and a blob may be shared by several rows. Nothing under either prefix is ever overwritten or
+deleted by the app; garbage collection of unreferenced blobs is an explicit, separate sweep.
+
+## Writes: order and atomicity
+
+Every write goes through the Worker library module, in this order:
+
+1. **Blobs first.** Put each new rendition or recording into R2 under its hash key, then
+   read its size back to verify. A blob with no row is harmless (the sweep collects it); a
+   row with no blob is a broken library.
+2. **Rows together.** Rendition rows, recording upserts, the canonical pointer, the derived
+   tags and the piece's `revision` bump go to D1 as **one batch**, which D1 applies
+   transactionally. A reader never sees a piece whose tags describe a rendition that is not
+   yet there.
+3. **Compare-and-set.** The batch carries the piece revision the writer read; a mismatch
+   rejects the whole batch and the writer re-reads. Nothing is ever silently replaced.
+
+The blob is immutable; the row is not. A recording's syncpoints and name may be corrected in
+place (upsert on `(piece_id, source_id)`), a rendition's `provenance` may be enriched, and
+a piece's pointer may move — each a row update under the revision, none a new blob.
 
 ## Tags: derived and asserted, one shape
 
@@ -182,7 +225,10 @@ it yet: an imported Soundslice list "80s" lands as `unknown:80s` and is renamed 
 `genre:80s` by a row update. A hierarchical list path ("tunings / drop d") lands as one
 value in a path dimension, not as nested rows.
 
-Two origins, and the direction of truth differs:
+A dimension is **either derived or asserted, never both**: `title`, `artist`, `tuning` and
+`capo` cannot be asserted, so there is never an asserted `artist:X` beside a derived
+`artist:Y`. A wrong derived value is corrected through an alias or an edit (below). Two
+origins, and the direction of truth differs:
 
 - **Derived** tags are read from the music: `title`, `artist` (and the rest of
   `_x.mnxLab.work`), `tuning` and `capo` from the part-level `strings[]`/`capo`. They are
@@ -190,7 +236,11 @@ Two origins, and the direction of truth differs:
   table, and are **never typed**. A re-index sweep rebuilds them from the blobs alone. The
   table is a cache of the documents, not a second source of truth.
 - **Asserted** tags exist only because a person typed them: lists, genre, setlists. D1 is
-  their system of record.
+  their system of record. Tags an import asserts on the owner's behalf (a Soundslice list
+  membership) carry a `source_ref` naming the upstream list, so that after the owner renames
+  `unknown:80s` to `genre:80s` the next import sees the list already represented and does
+  not resurrect the old row. **An import never deletes a tag**, and a companion missing from
+  a later export (a recording removed upstream, a list left) is not a deletion here.
 
 **Truth flows document → tag, never tag → document.** Renaming a derived tag therefore means
 one of two distinct things, and the design keeps them apart:
@@ -220,6 +270,13 @@ syncpoints (the last is an end marker). The column comment records this because 
 that maps them onto written bars will be wrong on any piece with a repeat. The player
 campaign's unroll (`core-campaign-player.md`, performed ordinals) is what turns a syncpoint
 into a position.
+
+Syncpoints belong to the recording, not to a rendition, and reference none. They were
+measured against the Soundslice rendition's bar structure, so before enabling synchronised
+playback against any rendition the player checks that the rendition's performed-bar count
+matches the syncpoint count (allowing the end marker) and refuses with a reason when it
+does not — a rendition that unrolls differently is a real finding, not something to paper
+over.
 
 ## When the Durable Object arrives
 
@@ -255,17 +312,20 @@ to make deliberately when the DO starts, in studio's own backend rules.
 
 ## Invariants
 
-1. **Renditions and recordings are immutable.** New bytes are a new row and a new key.
-   Nothing in R2 is overwritten by the application.
+1. **Blobs are immutable; rows are not.** New bytes are a new rendition row and, if unseen,
+   a new R2 key. Nothing in R2 is overwritten by the application. Row metadata — syncpoints,
+   filenames, provenance, the pointer — is corrected in place under the piece revision.
 2. **One canonical pointer per piece**, and it is the only thing that says which rendition
    is "the document".
 3. **Derived tags are a projection** of the canonical rendition seen through the current
    converter; they are never edited and always rebuildable. Asserted tags are data.
 4. **Originals are never rewritten.** A correction to metadata is an alias or an edit op on
    the canonical MNX; either way, the uploaded file stands.
-5. **Producer and version on every rendition**, including the ones third parties made
-   (Soundslice's exporter, an uploader's Guitar Pro). When two derived renditions disagree
-   you need to know which side to blame.
+5. **Producer, version and options on every rendition**, including the ones third parties
+   made (Soundslice's exporter, the CLI that injected its header, an uploader's Guitar Pro).
+   When two derived renditions disagree you need to know which side to blame.
+6. **Writes are ordered and atomic**: blobs first, then one D1 batch under compare-and-set.
+   An import never deletes.
 
 ## Out of scope here
 
