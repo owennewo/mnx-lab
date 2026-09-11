@@ -12,8 +12,9 @@
 **Studio has songs to play, and the workbench can borrow them.** A person's scores —
 notation in whatever formats exist for them, the recordings that go with them, the
 syncpoints that line the two up, and the lists they were filed in — live in Cloudflare
-under one *piece* each, and a Node tool keeps that library filled from the local
-`soundslice-cli` cache. Studio (not yet written) reads it as its library. The workbench
+under one *piece* each. Filling it is a **personal ingest script** — a lab tool, run by
+hand from the local `soundslice-cli` cache, not a product feature and not studio code.
+Studio (not yet written) reads the result as its library. The workbench
 gets a **Load** button that finds a piece by tags, "for testing", without acquiring a
 backend of its own.
 
@@ -67,12 +68,12 @@ later campaign; this one lays the storage they all stand on.
    one deploy, and the workbench's Load route needs that origin anyway. This settles
    studio's *storage* hosting, not its front end; the Worker-side library module is
    DOM-free and portable if studio later takes its own origin.
-3. **The Worker owns every write.** The sync tool, and later studio, write through Worker
+3. **The Worker owns every write.** The ingest script, and later studio, write through Worker
    routes, never to D1 or R2 directly. That is where the invariants are enforced and where
    derived tags are materialised, and it is the same code path an edit will use later. Local
    development runs against `wrangler dev`'s local D1 and R2, so nothing needs the account
    to test.
-4. **Conversion stays in Node.** Deriving MNX from `.gp`/MusicXML happens in the sync tool
+4. **Conversion stays in Node.** Deriving MNX from `.gp`/MusicXML happens in the ingest script
    with the converters as they are. The Worker reads `_x.mnxLab.work` and part-level
    `strings`/`capo` out of MNX JSON to derive tags; no converter enters the Worker bundle.
    The layer ceiling `worker: model + assist only` is unchanged.
@@ -86,10 +87,15 @@ later campaign; this one lays the storage they all stand on.
    form; the tabs are copyrighted and the read routes serve them whole. Item 4 is a shell
    until the auth conversation has happened.
 7. **Idempotent by content.** Renditions and recordings are keyed by sha256; a re-run of the
-   sync tool against unchanged files writes nothing. A piece is keyed by
+   ingest script against unchanged files writes nothing. A piece is keyed by
    `(source_kind, source_id)` so a re-export of the same slice updates the piece and adds
    renditions rather than creating a second piece.
-8. **Every item lands through the worktree recipe** (CLAUDE.md → Working in parallel) with
+8. **The ingest script is not a product surface.** It lives beside the repo's other
+   operator scripts (`spec/tools/*.mjs` is the precedent), runs only from a checkout by the
+   person who owns the Cloudflare account, enters no build face, and is not studio's: studio
+   reads the library, it never fills it this way. Nothing under `apps/studio/` changes in this
+   campaign.
+9. **Every item lands through the worktree recipe** (CLAUDE.md → Working in parallel) with
    the roadmap slug as the worktree name, and closes with a log entry here.
 
 ## The index
@@ -98,11 +104,11 @@ Ordered; each item is a normal proposal doc written when it is picked up, not be
 
 | # | Item | Status | Summary |
 | --- | --- | --- | --- |
-| 1 | `studio-storage-provision` | proposed | Create the Cloudflare resources — one D1 database, one R2 bucket — and bind them: `wrangler.jsonc` bindings, `worker/env.ts` types, a Worker secret for the sync tool's write token, `.dev.vars` for local. **Tooling decision inside the item:** `wrangler d1 create` / `wrangler r2 bucket create` wrapped in one checked-in, idempotent bootstrap script, rather than Terraform — see *Why not Terraform (yet)* below. Done when `wrangler dev` starts with local D1 and R2 and `npm run deploy` reaches the real ones. |
+| 1 | `studio-storage-provision` | proposed | Create the Cloudflare resources — one D1 database, one R2 bucket — and bind them: `wrangler.jsonc` bindings, `worker/env.ts` types, a Worker secret for the ingest script's write token, `.dev.vars` for local. **Tooling decision inside the item:** `wrangler d1 create` / `wrangler r2 bucket create` wrapped in one checked-in, idempotent bootstrap script, rather than Terraform — see *Why not Terraform (yet)* below. Done when `wrangler dev` starts with local D1 and R2 and `npm run deploy` reaches the real ones. |
 | 2 | `studio-storage-schema` | proposed | The D1 migrations for the design doc's five tables (`migrations/`, applied with `wrangler d1 migrations apply`, local and remote), the R2 key layout, and a DOM-free `worker/library/` module: typed reads and writes that enforce the invariants (insert rendition → immutable; set canonical → one pointer; write MNX → re-derive tags). A harness test runs the module against local D1 via `wrangler dev`/Miniflare so the schema is exercised before any real data touches it. |
-| 3 | `studio-storage-sync-tool` | proposed | A Node CLI, the first code under `apps/studio/` (`apps/studio/sync/`, a workspace package; the README's "no code here" line changes with it). Reads a `soundslice-cli` `gp/files/` directory, builds one piece per slice (renditions from every notation file with role and producer; recordings with syncpoints; asserted tags from `lists.json` as `unknown:<path>`), derives MNX from the `.gp` **and** from the MusicXML with the converters at their current versions, and pushes everything through the Worker's ingest route with the write token. `--dry-run` prints the plan; re-runs are no-ops by sha256 (contract 7). Done when both exported slices are in the real library and `Blues Run The Game` resolves through its canonical pointer to an MNX with title, artist and capo 3. |
+| 3 | `lab-library-ingest` | proposed | A personal operator script, `tools/library-ingest.mjs` run as `npm run ingest:library -- <dir>` (`lab-` because it serves the repo's owner, not a shell). Reads a `soundslice-cli` `gp/files/` directory, builds one piece per slice (renditions from every notation file with role and producer; recordings with syncpoints; asserted tags from `lists.json` as `unknown:<path>`), derives MNX from the `.gp` **and** from the MusicXML with the converters at their current versions, and pushes everything through the Worker's ingest route with the write token. `--dry-run` prints the plan; re-runs are no-ops by sha256 (contract 7). Done when both exported slices are in the real library and `Blues Run The Game` resolves through its canonical pointer to an MNX with title, artist and capo 3. |
 | 4 | `studio-storage-read` | **shell — discuss first** | Read routes (`GET /api/library/pieces?tag=…` filtered by any number of `dimension:value` tags; `GET /api/library/tags?dimension=&q=` for completion; `GET /api/library/renditions/<id>` streaming the blob; the piece's canonical MNX resolved server-side) and a workbench **Load** button with tag completion — type `tuning:` and see the values, stack several, pick a piece, open its canonical MNX in the viewer. **Blocked on an auth conversation** before it is designed: the candidates are Cloudflare Access in front of `/api/library/*` (zero code, but a Terraform-shaped resource — see below), a bearer token held in the browser like the BYOK OpenRouter key, or studio's own auth seam (`worker/api/auth.ts`) brought forward. The decision shapes items 1 and 5 too, so the conversation happens after item 3 lands and before this item is written. |
-| 5 | `studio-storage-rederive` | proposed | The payoff for keeping every format. A sweep (sync-tool subcommand or Worker cron) that, for every piece, derives a fresh MNX child from each source rendition with the converters at their current versions, stores it as a new rendition when its bytes differ from the previous child (with `_x.mnxLab.encoding` discounted in the comparison, per the converters' own rule), rebuilds derived tags from the canonical path, and reports the differences per piece and per converter. A converter regression is then a line in that report rather than a bug someone happens to notice. Also the home of the alias table's "apply to documents" action once editing exists — not before. |
+| 5 | `studio-storage-rederive` | proposed | The payoff for keeping every format. A sweep (an ingest-script subcommand or a Worker cron) that, for every piece, derives a fresh MNX child from each source rendition with the converters at their current versions, stores it as a new rendition when its bytes differ from the previous child (with `_x.mnxLab.encoding` discounted in the comparison, per the converters' own rule), rebuilds derived tags from the canonical path, and reports the differences per piece and per converter. A converter regression is then a line in that report rather than a bug someone happens to notice. Also the home of the alias table's "apply to documents" action once editing exists — not before. |
 
 Later, outside this campaign: the sync engine and Durable Object (the design doc's *When
 the Durable Object arrives*), sharing tiers, studio's front end.

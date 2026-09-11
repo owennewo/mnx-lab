@@ -51,8 +51,8 @@ proposals that name their campaign.
   MNX from each), recordings with performed-bar syncpoints, and `dimension:value` tags (derived
   from the canonical MNX, asserted by the owner). D1 index + R2 blobs, no Durable Object until a
   document has two writers. Five items: provision (wrangler bootstrap, not Terraform — with the
-  trigger to revisit recorded), schema + Worker library module, the `soundslice-cli` → Cloudflare
-  sync tool (first code under `apps/studio/`), a **shell** read-route + workbench Load item blocked
+  trigger to revisit recorded), schema + Worker library module, a personal `soundslice-cli` →
+  Cloudflare ingest script (a lab tool, not studio code), a **shell** read-route + workbench Load item blocked
   on an auth conversation, and the re-derive-and-diff sweep that makes a converter regression a
   report line. The schema lives in [docs/studio-storage.md](../docs/studio-storage.md), refocused
   2026-09-11 from the former `studio-storage-sync` proposal (sync engine and sharing ladder

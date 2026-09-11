@@ -44,7 +44,7 @@ Everything that needs "the document" resolves through it:
 1. Take the canonical rendition.
 2. If it is not MNX, take its **current derived MNX child**: the `mnx` rendition whose
    `derived_from` is the canonical one and whose `producer_version` is the converter
-   version in use. (The sync tool and the re-index sweep create that child; it is a stored
+   version in use. (The ingest script and the re-index sweep create that child; it is a stored
    rendition like any other.)
 3. Read from that MNX.
 
