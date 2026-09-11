@@ -30,7 +30,7 @@ that a red build), and nothing may import studio. Anything both shells want is f
 
 How a piece of music is stored — D1 index, R2 renditions and recordings, tags, one canonical
 pointer — is designed in [docs/studio-storage.md](../../docs/studio-storage.md) and built by
-the [studio storage campaign](../../roadmap/proposed/studio-campaign-storage.md). Studio
+the [studio storage campaign](../../roadmap/inprogress/studio-campaign-storage.md). Studio
 *reads* that library; filling it is a personal lab script outside this directory, so the
 campaign puts no code here.
 

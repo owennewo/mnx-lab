@@ -5,7 +5,7 @@ each part of it, the D1 schema, the R2 key layout, and the rules that keep the w
 honest (immutable renditions, one canonical pointer, tags as a projection). Sync protocol,
 sharing tiers and the editing authority are named only where they constrain the storage
 shape; they get their own documents when they start. The implementation order is the
-[studio storage campaign](../roadmap/proposed/studio-campaign-storage.md).
+[studio storage campaign](../roadmap/inprogress/studio-campaign-storage.md).
 
 History: this began as the roadmap proposal *studio-storage-sync* (2026-08-11, design only),
 which also carried the op-log sync engine and the sharing ladder. It was refocused into this

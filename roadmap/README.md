@@ -45,18 +45,6 @@ proposals that name their campaign.
 
 ### proposed/
 
-- **[studio-campaign-storage.md](proposed/studio-campaign-storage.md)** — **campaign**: songs
-  in Cloudflare, every format kept. One *piece* per item of music with immutable **renditions**
-  in every notation format it has (uploaded `.gp5`, Soundslice `.gp` and MusicXML, our derived
-  MNX from each), recordings with performed-bar syncpoints, and `dimension:value` tags (derived
-  from the canonical MNX, asserted by the owner). D1 index + R2 blobs, no Durable Object until a
-  document has two writers. Five items: provision (wrangler bootstrap, not Terraform — with the
-  trigger to revisit recorded), schema + Worker library module, a personal `soundslice-cli` →
-  Cloudflare ingest script (a lab tool, not studio code), a **shell** read-route + workbench Load item blocked
-  on an auth conversation, and the re-derive-and-diff sweep that makes a converter regression a
-  report line. The schema lives in [docs/studio-storage.md](../docs/studio-storage.md), refocused
-  2026-09-11 from the former `studio-storage-sync` proposal (sync engine and sharing ladder
-  remain in that file's git history).
 - **[studio-player-practice.md](proposed/studio-player-practice.md)** — campaign item 13,
   studio's first player feature in `elements/`: loop the selection with the **written-range
   → performed-occurrences policy stated**, speed trainer, count-in, metronome, mute/solo.
@@ -167,6 +155,20 @@ back up to `proposed/` the moment it is.
   the best precedent.
 
 ### inprogress/
+
+- **[studio-campaign-storage.md](inprogress/studio-campaign-storage.md)** — **campaign**: songs
+  in Cloudflare, every format kept. One *piece* per item of music with immutable **renditions**
+  in every notation format it has (uploaded `.gp5`, Soundslice `.gp` and MusicXML, our derived
+  MNX from each), recordings with performed-bar syncpoints, and `dimension:value` tags (derived
+  from the canonical MNX, asserted by the owner). D1 index + R2 blobs, no Durable Object until a
+  document has two writers. Five items: provision (wrangler bootstrap, not Terraform — with the
+  trigger to revisit recorded), schema + Worker library module, a personal `soundslice-cli` →
+  Cloudflare ingest script (a lab tool, not studio code), a **shell** read-route + workbench Load item blocked
+  on an auth conversation, and the re-derive-and-diff sweep that makes a converter regression a
+  report line. The schema lives in [docs/studio-storage.md](../docs/studio-storage.md), refocused
+  2026-09-11 from the former `studio-storage-sync` proposal (sync engine and sharing ladder
+  remain in that file's git history).
+- **[studio-storage-provision.md](inprogress/studio-storage-provision.md)** — storage campaign item 1, in progress: idempotent Wrangler bootstrap, D1/R2 bindings and ingest write secret; local smoke and first deployment.
 
 - **[core-campaign-player.md](inprogress/core-campaign-player.md)** — **campaign**: the player,
   **for the reviewer first** — hear what a scenario asserts, a cursor that knows its repeat

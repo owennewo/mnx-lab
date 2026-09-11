@@ -2,6 +2,24 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "mnx-lab",
   "main": "worker/index.ts",
+  "account_id": "e95cec11beeb0167dcd9f5c034f564ec",
+  // Studio storage: local in dev; bootstrap:storage records the real D1 UUID.
+  "d1_databases": [
+    {
+      "binding": "LIBRARY_DB",
+      "database_name": "mnx-studio-library",
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "migrations",
+      "remote": false
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "LIBRARY_BUCKET",
+      "bucket_name": "mnx-studio-library",
+      "remote": false
+    }
+  ],
   "compatibility_date": "2026-06-01",
   // Static assets (the Vite client build) are served in front of the Worker:
   // any request not matching an asset file invokes the Worker (/api/*), and

@@ -1,0 +1,3 @@
+# Copy to .dev.vars for local development only. Never deploy this value.
+LIBRARY_WRITE_TOKEN=local-development-only
+# OPENROUTER_API_KEY=
