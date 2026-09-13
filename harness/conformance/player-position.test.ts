@@ -1,5 +1,5 @@
 import { it, expect } from 'vitest';
-import { formatPlaybackPosition, measureAt, passesOf, playbackPositionParts, widestPlaybackPosition } from '../../src/audio/playbackPosition.ts';
+import { formatPlaybackPosition, measureAt, passesOf, playbackPositionParts, widestPlaceLabel, widestPlaybackPosition } from '../../src/audio/playbackPosition.ts';
 import { compilePerformance } from '../../src/audio/performance.ts';
 import { rational as q, ZERO } from '../../src/audio/time.ts';
 import fs from 'node:fs';
@@ -46,6 +46,9 @@ it('reserves the widest label a performance can print, so the readout never resi
     { kind: 'fermata', position: ZERO, duration: q(1n), metricPosition: ZERO, sources: [{ ordinal: 0, metricOffset: ZERO }] },
   ];
   expect(widestPlaybackPosition(p, doc)).toBe('# 128.4.5 · pass 3 of 3 · hold');
+  // The place alone, for a readout that reserves that segment by itself.
+  expect(widestPlaceLabel(p, doc)).toBe('# 128.4.5');
+  expect(widestPlaceLabel({ ...p, measures: [] }, doc)).toBe('');
   expect(widestPlaybackPosition({ ...p, measures: [] }, doc)).toBe('Ready');
 });
 it('counts a bar\'s passes and lists them in performed order', () => {

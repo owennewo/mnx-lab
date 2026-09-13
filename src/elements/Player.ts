@@ -18,7 +18,7 @@ import {
   type VoicePreset,
 } from '../audio/sampleSelection.ts';
 import type { SamplePackLoader } from '../audio/native/samplePacks.ts';
-import { formatPlaybackPosition, formatScorePlaybackPosition, measureAt, passLabel, passesOf, placeLabel, playbackPositionParts, scorePlaybackPositionParts, widestPlaybackPosition } from '../audio/playbackPosition.ts';
+import { formatPlaybackPosition, formatScorePlaybackPosition, measureAt, passLabel, passesOf, placeLabel, playbackPositionParts, scorePlaybackPositionParts, widestPlaceLabel, widestPlaybackPosition, type PlaybackPositionParts } from '../audio/playbackPosition.ts';
 import { ZERO, type Rational } from '../audio/time.ts';
 import type { MnxStructure } from '../model/mnx.ts';
 import type { PlaybackUpdate } from './mnxContext.ts';
@@ -139,11 +139,16 @@ export class Player extends LitElement {
       font-variant-numeric: tabular-nums;
       white-space: nowrap;
     }
-    output > span {
+    output > span,
+    .place > span {
       grid-area: 1 / 1;
     }
-    output > .widest {
+    output > .widest,
+    .place > .widest {
       visibility: hidden;
+    }
+    .place {
+      display: inline-grid;
     }
     output.none {
       font: inherit;
@@ -293,10 +298,12 @@ export class Player extends LitElement {
   }
   /** The widest readout label, refreshed only when the performance changes. */
   private widest = '';
+  private widestPlace = '';
 
   protected willUpdate(changed: Map<PropertyKey, unknown>) {
     if (changed.has('performance') || changed.has('document'))
       this.widest = this.performance ? widestPlaybackPosition(this.performance, this.document) : '';
+      this.widestPlace = this.performance ? widestPlaceLabel(this.performance, this.document) : '';
   }
 
   protected updated(changed: Map<PropertyKey, unknown>) {
@@ -406,6 +413,18 @@ export class Player extends LitElement {
   get playback() { return this.session?.snapshot; }
   get scorePosition() { return this.playback?.scorePosition ?? null; }
   get sourceId() { return this.session?.backend.id ?? 'synth'; }
+  /** The readout's fields when the position is a place in the score — the
+   *  synth's position, or recorded audio inside its sync — else null. */
+  get positionParts(): PlaybackPositionParts | null {
+    if (!this.performance) return null;
+    const status = this.playback;
+    if (!status || status.kind === 'synth') return playbackPositionParts(this.performance, this.position, this.document);
+    if (status.scorePosition) {
+      const parts = scorePlaybackPositionParts(this.performance, status.scorePosition, this.document);
+      return parts ? { ...parts, insertion: null } : null;
+    }
+    return null;
+  }
   get positionLabel() {
     if (!this.performance) return 'No performance available';
     const status = this.playback;
@@ -490,16 +509,17 @@ export class Player extends LitElement {
    *  a bar played once shows no pass at all. */
   private readout() {
     if (!this.performance) return nothing;
-    const parts = this.sourceId === 'synth' ? playbackPositionParts(this.performance, this.position, this.document)
-      : this.scorePosition ? scorePlaybackPositionParts(this.performance, this.scorePosition, this.document) : null;
+    const parts = this.positionParts;
     if (!parts) return this.positionLabel;
     const passes = passesOf(this.performance, parts.measureIndex);
     const pass = passLabel(parts);
     const tail = parts.insertion ? ` · ${parts.insertion}` : '';
-    if (!pass) return `${placeLabel(parts)}${tail}`;
-    const place = `${placeLabel(parts)} · `;
-    if (passes.length < 2) return `${place}${pass}${tail}`;
-    return html`${place}<span class="passes"
+    // The place sits in its own reserved cell so the tenth coming and going
+    // never moves the pass beside it.
+    const place = html`<span class="place"><span>${placeLabel(parts)}</span><span class="widest" aria-hidden="true">${this.widestPlace}</span></span>`;
+    if (!pass) return html`${place}${tail}`;
+    if (passes.length < 2) return html`${place} · ${pass}${tail}`;
+    return html`${place} · <span class="passes"
         ><button
           type="button"
           aria-haspopup="menu"

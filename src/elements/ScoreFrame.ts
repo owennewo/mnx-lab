@@ -5,7 +5,7 @@ import type { DisplayOptions } from '../engine/displayOptions.ts';
 import type { ViewMode } from './DocumentViewer.ts';
 import type { Player } from './Player.ts';
 import type { PlaybackUpdate } from './mnxContext.ts';
-import { widestPlaybackPosition } from '../audio/playbackPosition.ts';
+import { placeLabel, readoutSegments, widestPlaceLabel, widestPlaybackPosition } from '../audio/playbackPosition.ts';
 import './ZoomPad.ts';
 import './SettingsPad.ts';
 
@@ -96,6 +96,9 @@ export class ScoreFrame extends LitElement {
   @state() private pad: Pad = null;
   @state() private playing = false;
   @state() private positionText = '';
+  /** The place segment and its reserved width, when the position is a place in the score. */
+  @state() private placeText = '';
+  @state() private widestPlace = '';
   /** The widest label the readout can print — reserved so the chevron never moves. */
   @state() private widestText = '';
   @state() private progress = 0;
@@ -248,11 +251,16 @@ export class ScoreFrame extends LitElement {
         white-space: nowrap;
         margin: 0 6px;
       }
-      .readout > span {
+      .readout > span,
+      .place > span {
         grid-area: 1 / 1;
       }
-      .readout > .widest {
+      .readout > .widest,
+      .place > .widest {
         visibility: hidden;
+      }
+      .place {
+        display: inline-grid;
       }
 
       /* ── the progress line ── */
@@ -537,12 +545,17 @@ export class ScoreFrame extends LitElement {
     this.hasPerformance = performance !== null;
     if (!player || !performance) {
       this.positionText = '';
+      this.placeText = '';
       this.widestText = '';
+      this.widestPlace = '';
       this.progress = 0;
       return;
     }
-    this.positionText = player.positionLabel;
+    const parts = player.positionParts;
+    this.placeText = parts ? placeLabel(parts) : '';
+    this.positionText = parts ? readoutSegments(parts).slice(1).join(' · ') : player.positionLabel;
     this.widestText = widestPlaybackPosition(performance, player.document);
+    this.widestPlace = widestPlaceLabel(performance, player.document);
     const count = performance.measures.length;
     this.progress = ordinal === null || count === 0 ? 0 : Math.min(1, (ordinal + 0.5) / count);
   }
@@ -668,8 +681,14 @@ export class ScoreFrame extends LitElement {
   private bottomGrip() {
     return html`<div class="grip bottom" role="group" aria-label="Playback">
       ${this.primaryButton()}
-      ${this.positionText
-        ? html`<span class="readout"><span>${this.positionText}</span><span class="widest" aria-hidden="true">${this.widestText}</span></span>`
+      ${this.positionText || this.placeText
+        ? html`<span class="readout"
+            ><span
+              >${this.placeText
+                ? html`<span class="place"><span>${this.placeText}</span><span class="widest" aria-hidden="true">${this.widestPlace}</span></span>`
+                : nothing}${this.placeText && this.positionText ? ' · ' : ''}${this.positionText}</span
+            ><span class="widest" aria-hidden="true">${this.widestText}</span></span
+          >`
         : nothing}
       <button
         class="chev"

@@ -117,6 +117,16 @@ export function formatScorePlaybackPosition(performance: Performance, position: 
  */
 export function widestPlaybackPosition(performance: Performance, document?: MnxStructure): string {
   if (performance.measures.length === 0) return 'Ready';
+  return widestReadoutSegments(performance, document).join(' · ');
+}
+/** The widest place alone — `# 128.4.5` — so a readout can reserve that
+ *  segment's width by itself and keep what follows it from drifting as the
+ *  tenth comes and goes. */
+export function widestPlaceLabel(performance: Performance, document?: MnxStructure): string {
+  return widestReadoutSegments(performance, document)[0] ?? '';
+}
+function widestReadoutSegments(performance: Performance, document?: MnxStructure): string[] {
+  if (performance.measures.length === 0) return [];
   let bar = '';
   let iteration = 1;
   let beat = 1n;
@@ -137,7 +147,7 @@ export function widestPlaybackPosition(performance: Performance, document?: MnxS
     if (last > beat) beat = last;
   }
   const kinds = new Set(performance.sourceMap.map((s) => s.kind));
-  const suffix = kinds.has('makeTime') ? ' · grace' : kinds.has('fermata') ? ' · hold' : '';
+  const suffix = kinds.has('makeTime') ? 'grace' : kinds.has('fermata') ? 'hold' : '';
   const pass = passLabel({ iteration, iterations: iteration });
-  return `${placeLabel({ bar, beat: `${beat}.5` })}${pass ? ` · ${pass}` : ''}${suffix}`;
+  return [placeLabel({ bar, beat: `${beat}.5` }), pass, suffix].filter((s) => s !== '');
 }
