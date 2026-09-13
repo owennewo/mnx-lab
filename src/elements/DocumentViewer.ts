@@ -594,12 +594,17 @@ export class DocumentViewer extends LitElement {
       :host #projection-container svg [data-playback-voice="4"].playback-ink { --playback-voice: var(--playback-4); }
       /* The digit's paper mask is the lamp, not the digit: stretched to the
          note's release by the paint, tinted with the voice colour, the digit
-         above it in full colour. The tint is a mix with the paper so it
-         reads on either theme; the untinted mask would have hidden the digit
-         (both carried the note's id and both went blue). */
+         above it in full colour. The tint is a mix with the paper, and it is
+         STRONGER on dark paper: a 22% mix reads as a clear pill on white but
+         sinks into the dark ground, so dark takes 40% (reviewed 2026-09-13).
+         The untinted mask would have hidden the digit — both carried the
+         note's id and both went blue. */
       :host #projection-container svg [data-source-id].fret-bg.playback-ink,
       :host([selection-inactive]) #projection-container svg [data-source-id].fret-bg.playback-ink {
-        fill: color-mix(in oklab, var(--playback-voice) 22%, var(--paper, oklch(0.985 0.006 85))) !important;
+        fill: light-dark(
+          color-mix(in oklab, var(--playback-voice) 22%, var(--paper, oklch(0.985 0.006 85))),
+          color-mix(in oklab, var(--playback-voice) 40%, var(--paper, oklch(0.235 0.008 80)))
+        ) !important;
         rx: 3px;
       }
 

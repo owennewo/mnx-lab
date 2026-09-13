@@ -20,8 +20,18 @@
 /** Voices beyond this count wrap back to the first colour. */
 export const PLAYBACK_VOICE_COLOURS = 4;
 
-/** Air the stretched mask adds left of the digit, as a fraction of its height. */
-const MASK_PAD = 0.2;
+/**
+ * Air the stretched mask adds around the digit, as fractions of its height:
+ * generous on the left, where the digit's own mask ends flush with the
+ * glyph, and a sliver above and below. The vertical pad is deliberately
+ * over the limit at which two masks on ADJACENT strings touch — the layout
+ * caps the mask just short of the string spacing (`FRET_BG_HEIGHT_SP`), so
+ * any pad at all makes a chord's masks meet. Reviewed and accepted
+ * 2026-09-13: a chord reading as one block beats a mask that vanishes into
+ * the string line it sits on.
+ */
+const MASK_PAD_LEFT = 0.3;
+const MASK_PAD_VERTICAL = 0.1;
 
 /** The colour slot a 1-based voice paints with. */
 export function playbackVoiceSlot(voice: number): number {
@@ -54,23 +64,30 @@ export function stretchMask(rect: Element, on: boolean): void {
   const end = rect.getAttribute('data-span-end');
   const stashedX = rect.getAttribute('data-mask-x');
   if (on && end !== null) {
-    const x0 = stashedX !== null ? Number(stashedX) : Number(rect.getAttribute('x'));
-    const w0 = stashedX !== null ? Number(rect.getAttribute('data-mask-w')) : Number(rect.getAttribute('width'));
+    const read = (stash: string, live: string) =>
+      Number(stashedX !== null ? rect.getAttribute(stash) : rect.getAttribute(live));
+    const x0 = read('data-mask-x', 'x'), w0 = read('data-mask-w', 'width');
+    const y0 = read('data-mask-y', 'y'), h0 = read('data-mask-h', 'height');
     if (stashedX === null) {
       rect.setAttribute('data-mask-x', String(x0));
       rect.setAttribute('data-mask-w', String(w0));
+      rect.setAttribute('data-mask-y', String(y0));
+      rect.setAttribute('data-mask-h', String(h0));
     }
-    const pad = Number(rect.getAttribute('height')) * MASK_PAD;
-    const x = x0 - pad;
+    const padLeft = h0 * MASK_PAD_LEFT, padV = h0 * MASK_PAD_VERTICAL;
+    const x = x0 - padLeft;
     // Never narrower than the digit's own mask: a very short note keeps its
     // full digit legible even when its span ends before the digit does.
-    const w = Math.max(w0 + pad, Number(end) - x);
+    const w = Math.max(w0 + padLeft, Number(end) - x);
     rect.setAttribute('x', String(x));
     rect.setAttribute('width', String(w));
+    rect.setAttribute('y', String(y0 - padV));
+    rect.setAttribute('height', String(h0 + 2 * padV));
   } else if (stashedX !== null) {
     rect.setAttribute('x', stashedX);
     rect.setAttribute('width', rect.getAttribute('data-mask-w') ?? '0');
-    rect.removeAttribute('data-mask-x');
-    rect.removeAttribute('data-mask-w');
+    rect.setAttribute('y', rect.getAttribute('data-mask-y') ?? '0');
+    rect.setAttribute('height', rect.getAttribute('data-mask-h') ?? '0');
+    for (const stash of ['data-mask-x', 'data-mask-w', 'data-mask-y', 'data-mask-h']) rect.removeAttribute(stash);
   }
 }

@@ -145,33 +145,42 @@ class FakeRoot {
 }
 
 const mask = (id: string, x: number, w: number, end: number, extra: string[] = []) =>
-  new FakeNode({ 'data-source-id': id, x: String(x), width: String(w), height: '16', 'data-span-end': String(end) }, ['fret-bg', ...extra]);
+  new FakeNode({ 'data-source-id': id, x: String(x), width: String(w), y: '40', height: '16', 'data-span-end': String(end) }, ['fret-bg', ...extra]);
 const digit = (id: string, extra: string[] = []) => new FakeNode({ 'data-source-id': id }, ['fret-number', ...extra]);
 
 describe('the playback paint', () => {
-  it('stretches a sounding mask to its span and restores it afterwards', () => {
+  it('stretches a sounding mask to its span, pads it, and restores it afterwards', () => {
     const m = mask('m1', 100, 12, 160);
     const root = new FakeRoot([m]) as unknown as ParentNode;
     paintPlaybackInk(root, new Map([['m1', 1]]));
     expect(m.classes.has('playback-ink')).toBe(true);
     expect(m.getAttribute('data-playback-voice')).toBe('1');
     const x = Number(m.getAttribute('x')), w = Number(m.getAttribute('width'));
-    expect(x).toBeLessThan(100);                 // a little air left of the digit
+    const y = Number(m.getAttribute('y')), h = Number(m.getAttribute('height'));
+    expect(x).toBeLessThan(100);                 // air left of the digit
     expect(x + w).toBeCloseTo(160, 6);           // and the right edge at the release
+    expect(y).toBeLessThan(40);                  // a sliver above…
+    expect(y + h).toBeGreaterThan(56);           // …and below (the mask was 40–56)
+    expect(y + h - 56).toBeCloseTo(40 - y, 6);   // symmetric
     paintPlaybackInk(root, new Map());
     expect(m.classes.has('playback-ink')).toBe(false);
     expect(m.getAttribute('x')).toBe('100');
     expect(m.getAttribute('width')).toBe('12');
+    expect(m.getAttribute('y')).toBe('40');
+    expect(m.getAttribute('height')).toBe('16');
     expect(m.getAttribute('data-playback-voice')).toBeNull();
     expect(m.getAttribute('data-mask-x')).toBeNull();
+    expect(m.getAttribute('data-mask-y')).toBeNull();
   });
 
   it('a repaint while still sounding is idempotent', () => {
     const m = mask('m1', 100, 12, 160);
     for (let i = 0; i < 3; i++) stretchMask(m as unknown as Element, true);
     expect(Number(m.getAttribute('x')) + Number(m.getAttribute('width'))).toBeCloseTo(160, 6);
+    expect(Number(m.getAttribute('height'))).toBeCloseTo(16 * 1.2, 6); // padded once, not thrice
     stretchMask(m as unknown as Element, false);
     expect(m.getAttribute('x')).toBe('100');
+    expect(m.getAttribute('height')).toBe('16');
   });
 
   it('never narrows a mask below the digit it masks', () => {

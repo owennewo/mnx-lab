@@ -110,7 +110,10 @@ Two things ride on that paint (`src/engine/render/playbackInk.ts`):
   ends only when asked (`durationSpans`, which the viewer sets and the goldens never
   do — `RectPrim.spanEndX`, emitted as `data-span-end` in px); the paint stashes the
   emitter's geometry on the element and restores it when the note stops. A held bass
-  under a moving melody shows each string's own length. `revealOccurrence({noteKey, ordinal})` is public; it shares the
+  under a moving melody shows each string's own length. The stretched mask is padded
+  (0.3× its height on the left, 0.1× above and below — enough that a chord's masks on
+  adjacent strings meet, an accepted trade), and its tint is stronger on dark paper
+  (40%) than on white (22%), where a lighter mix already reads. `revealOccurrence({noteKey, ordinal})` is public; it shares the
 selection reveal's scroll calculation but never changes selection. Follow controls
 viewer reveal and verse choice; inspection retains its separate value.
 
