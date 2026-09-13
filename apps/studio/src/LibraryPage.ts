@@ -75,6 +75,7 @@ export class LibraryPage extends LitElement {
     .chip button { border: 0; padding: 0 2px; display: inline-flex; color: var(--ink-dim); }
     ul { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
     li { display: flex; align-items: center; gap: 16px; padding: 12px 4px; border-bottom: 1px solid var(--line); }
+    li:has(.who a:focus-visible) { background: var(--bar); outline: 2px solid var(--accent); outline-offset: -2px; }
     li .star { border: 0; padding: 2px; display: inline-flex; flex: none; }
     li .who { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
     li .who a { font-weight: 500; }
@@ -139,9 +140,32 @@ export class LibraryPage extends LitElement {
   private onSubmit(event: Event) {
     event.preventDefault();
     const tag = parseTag(this.query);
-    if (!tag) return;
+    if (!tag) {
+      const first = this.visible()[0];
+      if (first) location.hash = pieceHref(first.id);
+      return;
+    }
     if (!this.filters.includes(tagOf(tag.dimension, tag.value))) this.choose(tag.dimension, tag.value);
     this.query = ''; this.suggestions = [];
+  }
+
+  private onResultKeydown(event: KeyboardEvent, index = -1) {
+    if (event.isComposing || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+    if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
+    // Leave the native tag-completion menu in charge while entering a tag.
+    if (index === -1 && (parseTag(this.query) || this.query.trimEnd().endsWith(':'))) return;
+    const links = this.renderRoot.querySelectorAll<HTMLAnchorElement>('.who a');
+    if (!links.length) return;
+    event.preventDefault();
+    if (index === 0 && event.key === 'ArrowUp') {
+      this.renderRoot.querySelector<HTMLInputElement>('.search input')?.focus();
+      return;
+    }
+    const next = index === -1
+      ? (event.key === 'ArrowDown' ? 0 : links.length - 1)
+      : Math.min(links.length - 1, index + (event.key === 'ArrowDown' ? 1 : -1));
+    links[next].focus();
+    links[next].scrollIntoView({ block: 'nearest' });
   }
 
   private async toggleFavourite(piece: LibraryPiece) {
@@ -240,7 +264,7 @@ export class LibraryPage extends LitElement {
         <div class="tools">
           <form class="search" @submit=${this.onSubmit}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"></circle><path d="M20 20l-4.2-4.2"></path></svg>
-            <input aria-label="Search titles and artists, or type a tag" placeholder="Search, or type a tag — capo:3, tuning-name:drop D" list="suggest" maxlength="512" .value=${this.query} @input=${this.onInput} />
+            <input aria-label="Search titles and artists, or type a tag" placeholder="Search, or type a tag — capo:3, tuning-name:drop D" list="suggest" maxlength="512" .value=${this.query} @input=${this.onInput} @keydown=${(event: KeyboardEvent) => this.onResultKeydown(event)} />
             <datalist id="suggest">${this.suggestions.map(f => html`<option value=${tagOf(f.dimension, f.value)}>${f.pieces} piece${f.pieces === 1 ? '' : 's'}</option>`)}</datalist>
           </form>
           <div class="sort" role="group" aria-label="Sort">${SORTS.map(s => html`<button class=${this.sort === s.id ? 'on' : ''} @click=${() => this.setSort(s.id)}>${s.label}</button>`)}</div>
@@ -258,9 +282,9 @@ export class LibraryPage extends LitElement {
         ${this.busy && !this.pieces.length ? html`<p class="muted" role="status">Loading…</p>` : nothing}
         ${this.exportNotice ? html`<p class="muted" role="status">${this.exportNotice}</p>` : nothing}
         ${shown.length ? html`<div class="columns"><span>Actions</span></div>` : nothing}
-        <ul>${shown.map(p => html`<li>
+        <ul>${shown.map((p, index) => html`<li>
           <button class="star" aria-label=${p.favourite ? 'Remove from favourites' : 'Add to favourites'} aria-pressed=${p.favourite} @click=${() => this.toggleFavourite(p)}>${star(p.favourite)}</button>
-          <div class="who"><a href=${pieceHref(p.id)}>${p.title ?? p.id}</a>${p.artist ? html`<small>${p.artist}</small>` : nothing}</div>
+          <div class="who"><a href=${pieceHref(p.id)} @keydown=${(event: KeyboardEvent) => this.onResultKeydown(event, index)}>${p.title ?? p.id}</a>${p.artist ? html`<small>${p.artist}</small>` : nothing}</div>
           <div class="tags">${p.chips.map(c => html`<button title=${`Filter by ${dimensionLabel(c.dimension).toLowerCase()}`} @click=${() => this.choose(c.dimension, c.value)}>${chipText(c.dimension, c.value)}</button>`)}</div>
           <span class="when">${relativeTime(p.opened_at)}</span>
           <div class="actions"><select aria-label=${`Export ${p.title ?? p.id}`} ?disabled=${this.exporting !== null} @change=${(e: Event) => this.exportPiece(p, e)}>
