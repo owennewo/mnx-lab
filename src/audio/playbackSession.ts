@@ -20,6 +20,8 @@ export class PlaybackSession {
   private issue = '';
   private target: { position: ScorePosition | null; problem?: string; reset?: boolean; edge?: 'before' | 'after' } = { position: null };
   private targetVersion = 0;
+  private handoffRate = 1;
+  private handoffVolume = .7;
   constructor(initial: PlaybackBackend, private readonly factory: (id: string) => PlaybackBackend, private readonly changed: () => void) {
     this.active = initial;
     this.unsubscribe = initial.subscribe(() => this.notify());
@@ -44,7 +46,10 @@ export class PlaybackSession {
     let next: PlaybackBackend;
     try { next = this.factory(id); }
     catch (error) { this.pause(); this.issue = error instanceof Error ? error.message : String(error); this.notify(); return false; }
-    if (!this.selecting && !(replace && this.needsStart)) this.target = { position: before.scorePosition, problem: before.syncIssue };
+    if (!this.selecting && !(replace && this.needsStart)) {
+      this.target = { position: before.scorePosition, problem: before.syncIssue };
+      this.handoffRate = before.rate; this.handoffVolume = before.volume;
+    }
     ++this.targetVersion;
     this.intent = before.wantsPlayback && next.resumeOnSelect !== false;
     const generation = ++this.generation;
@@ -55,7 +60,7 @@ export class PlaybackSession {
     this.pendingPlay = false; this.selecting = true; this.issue = ''; this.needsStart = false;
     this.unsubscribe = next.subscribe(() => { if (generation === this.generation) this.notify(); });
     try {
-      next.setRate(before.rate); next.setVolume(before.volume);
+      next.setRate(this.handoffRate); next.setVolume(this.handoffVolume);
       this.notify();
       await next.prepare();
       if (this.closed || generation !== this.generation) return false;
@@ -148,8 +153,8 @@ export class PlaybackSession {
       return false;
     }
   }
-  setRate(value: number) { const rate = this.active.setRate(boundedRate(value, this.active.capabilities)); this.notify(); return rate; }
-  setVolume(value: number) { const volume = this.active.setVolume(Math.min(1, Math.max(0, Number.isFinite(value) ? value : 0.7))); this.notify(); return volume; }
+  setRate(value: number) { if (this.selecting) this.handoffRate = boundedRate(value, this.active.capabilities); const rate = this.active.setRate(boundedRate(value, this.active.capabilities)); this.notify(); return rate; }
+  setVolume(value: number) { if (this.selecting) this.handoffVolume = Math.min(1, Math.max(0, Number.isFinite(value) ? value : .7)); const volume = this.active.setVolume(Math.min(1, Math.max(0, Number.isFinite(value) ? value : 0.7))); this.notify(); return volume; }
   setLoop(loop?: ScoreLoop) { this.active.setLoop(loop); this.notify(); }
   dispose() {
     if (this.closed) return;
