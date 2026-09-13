@@ -45,6 +45,7 @@ proposals that name their campaign.
 
 ### proposed/
 
+- **[lab-performance-listening-bench.md](proposed/lab-performance-listening-bench.md)** — isolated experimental bench for future Studio tracking, assessment and guitar control: compare three detection strategies on player-rendered audio, held-out sounds and causal replay; first outcome is measured capabilities and failures, before product integration.
 - **[studio-player-practice.md](proposed/studio-player-practice.md)** — campaign item 13,
   studio's first player feature in `elements/`: loop the selection with the **written-range
   → performed-occurrences policy stated**, speed trainer, count-in, metronome, mute/solo.
