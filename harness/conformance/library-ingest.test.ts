@@ -261,3 +261,40 @@ it('derives distinct canonical part labels, filters each value, and preserves cl
   await upload(p, { converters: withParts, force: true });
   expect((await lib.listAliases(INGEST_OWNER)).some(a => a.dimension === 'part' && a.raw_value === 'Track 1' && a.canonical_value === 'Guitar')).toBe(true);
 });
+
+it.each([87.5, 36.5])('warns for %s BPM without rounding or blocking derived tags', async bpm => {
+  const doc = structuredClone(score);
+  Object.assign(doc.global.measures[0], { tempos: [{ bpm, value: { base: 'quarter' } }] });
+  Object.assign(doc.parts[0], { name: 'Guitar', _x: { mnxLab: { capo: 3 } } });
+  const before = structuredClone(doc);
+  const fractional = { ...converters, 'guitarpro-mnx': { ...converters['guitarpro-mnx'], convert: () => doc } };
+  const result = await upload(await plan(), { converters: fractional });
+  const report = result.validation.report.find((r: {producer: string}) => r.producer === 'guitarpro-mnx');
+  expect(report.valid).toBe(true);
+  expect(report.errors).toEqual([]);
+  expect(report.warnings).toEqual([`/global/measures/0/tempos/0/bpm fractional tempo ${bpm} BPM retained; published MNX requires integer BPM`]);
+  expect(result.snapshot.tags).toEqual(expect.arrayContaining([
+    expect.objectContaining({ dimension: 'part', value: 'Guitar', origin: 'derived' }),
+    expect.objectContaining({ dimension: 'capo', value: '3', origin: 'derived' })
+  ]));
+  expect(doc).toEqual(before);
+});
+it.each(['87.5', null, -0.5, Infinity, NaN])('does not exempt invalid tempo %j', bpm => {
+  const doc = structuredClone(score);
+  Object.assign(doc.global.measures[0], { tempos: [{ bpm, value: { base: 'quarter' } }] });
+  const warnings: string[] = [];
+  expect(validateConversion(doc, warnings).length).toBeGreaterThan(0);
+  expect(warnings).toEqual([]);
+});
+it('keeps unrelated validation errors blocking alongside a fractional-tempo warning', async () => {
+  const doc = structuredClone(score);
+  Object.assign(doc.global.measures[0], { tempos: [{ bpm: 87.5, value: { base: 'quarter' } }] });
+  Object.assign(doc.parts[0], { name: 'Guitar', measures: 'invalid' });
+  const broken = { ...converters, 'guitarpro-mnx': { ...converters['guitarpro-mnx'], convert: () => doc } };
+  const result = await upload(await plan(), { converters: broken });
+  const report = result.validation.report.find((r: {producer: string}) => r.producer === 'guitarpro-mnx');
+  expect(report.valid).toBe(false);
+  expect(report.errors.join(' ')).toContain('/parts/0/measures');
+  expect(report.warnings).toHaveLength(1);
+  expect(result.snapshot.tags.some((t: {dimension: string}) => t.dimension === 'part')).toBe(false);
+});

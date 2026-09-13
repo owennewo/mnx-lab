@@ -115,5 +115,8 @@ track names import as `unknown`. Multiple parts can give a piece multiple `part`
 repeated names produce one tag. Studio exposes Part in the browse rail and Tag aliases
 for correcting displayed labels without editing source names. Re-ingest the cache after
 a converter update to refresh these tags; original-upload and MusicXML part names do
-not override the canonical score. As with other converted facts, a conversion that fails
-validation contributes no Part tags.
+not override the canonical score. As with other converted facts, a conversion with blocking validation errors
+contributes no Part tags. Finite positive fractional tempos (such as 87.5 BPM) are
+reported as warnings during ingest: the original value is retained, derived tags
+are projected, and warnings alone do not make ingest exit unsuccessfully. This is
+a narrow ingest exception; the published MNX schema remains unchanged.

@@ -60,8 +60,9 @@ async function readIndex(directory) {
 // ---------------------------------------------------------------- validation mode
 // The Worker's own storage-schema rule, applied here to a conversion that is
 // never stored: proposed section/rehearsal labels are checked narrowly, the
-// rest against the published schema plus the _x.mnxLab vendor schema.
-export function validateConversion(doc) {
+// rest against the published schema plus the _x.mnxLab vendor schema, with
+// finite positive fractional BPM reported as non-blocking ingest warnings.
+export function validateConversion(doc, warnings = []) {
   const errors = [];
   const describe = (fn, where) => (fn.errors ?? []).map(e => `${where}${e.instancePath} ${e.message}`);
   if (!doc || typeof doc !== 'object' || !Array.isArray(doc.parts)) return ['not an MNX document object'];
@@ -72,7 +73,17 @@ export function validateConversion(doc) {
       delete measure[field];
     }
   });
-  if (!validateMnx(standard)) errors.push(...describe(validateMnx, ''));
+  if (!validateMnx(standard)) for (const error of validateMnx.errors ?? []) {
+    // The published schema requires integer BPM, but a finite positive fractional
+    // tempo is usable without rounding. Downgrade only that precise type error;
+    // every other schema error remains blocking. The document stays untouched.
+    const match = /^\/global\/measures\/(\d+)\/tempos\/(\d+)\/bpm$/.exec(error.instancePath);
+    const bpm = match ? standard.global.measures[Number(match[1])].tempos[Number(match[2])].bpm : undefined;
+    if (match && error.keyword === 'type' && error.params.type === 'integer' &&
+        typeof bpm === 'number' && Number.isFinite(bpm) && bpm > 0 && !Number.isInteger(bpm)) {
+      warnings.push(`${error.instancePath} fractional tempo ${bpm} BPM retained; published MNX requires integer BPM`);
+    } else errors.push(`${error.instancePath} ${error.message}`);
+  }
   if (doc._x?.mnxLab !== undefined && !validateRootExt(doc._x.mnxLab)) errors.push(...describe(validateRootExt, '/_x/mnxLab'));
   doc.parts.forEach((part, i) => { if (part?._x?.mnxLab !== undefined && !validatePartExt(part._x.mnxLab)) errors.push(...describe(validatePartExt, `/parts/${i}/_x/mnxLab`)); });
   return errors;
@@ -199,10 +210,10 @@ export async function validatePlan(plan, converters) {
   for (const source of plan.sources) {
     const converter = converters[source.format === 'musicxml' ? 'musicxml-mnx' : 'guitarpro-mnx'];
     if (!converter) throw new Error(`No converter for ${source.format}`);
-    const entry = { source: source.name, producer: converter.producer, version: converter.version, valid: false, errors: [] };
+    const entry = { source: source.name, producer: converter.producer, version: converter.version, valid: false, errors: [], warnings: [] };
     try {
       const doc = await converter.convert(source.bytes);
-      entry.errors = validateConversion(doc);
+      entry.errors = validateConversion(doc, entry.warnings);
       entry.valid = entry.errors.length === 0;
       if (entry.valid && source.id === plan.canonicalId) facts = conversionFacts(doc);
     } catch (error) { entry.errors = [`conversion failed: ${error instanceof Error ? error.message : String(error)}`]; }
@@ -324,7 +335,7 @@ async function main(args) {
     if (!validation) return;
     for (const entry of validation.report) {
       if (!entry.valid) invalid++;
-      console.log(JSON.stringify({ slice, source: entry.source, producer: entry.producer, valid: entry.valid, errors: entry.errors.slice(0, 20) }));
+      console.log(JSON.stringify({ slice, source: entry.source, producer: entry.producer, valid: entry.valid, errors: entry.errors.slice(0, 20), warnings: entry.warnings.slice(0, 20) }));
     }
   };
   if (dryRun) {
