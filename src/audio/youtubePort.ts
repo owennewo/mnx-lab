@@ -91,7 +91,7 @@ export class YouTubePort implements MediaPort {
             if (!this.visible()) { this.rejectPlay('Show the YouTube player before pressing Play.'); this.pause(); return; }
           }
           if (data===1) { this.fault=undefined; this.hasPlayed=true; clearTimeout(this.playTimer); this.playRequest?.resolve(); this.playRequest=undefined; }
-          if(data===5 && !this.hasPlayed && this.seekRequest){clearTimeout(this.seekTimer);this.seekingNow=false;this.seekRequest.resolve();this.seekRequest=undefined;this.emit('seeked');}
+          if(data===5 && !this.hasPlayed && this.seekRequest){this.setRate(this.requestedRate);clearTimeout(this.seekTimer);this.seekingNow=false;this.seekRequest.resolve();this.seekRequest=undefined;this.emit('seeked');}
           this.sample();
           this.emit(data===1?'playing':data===3?'waiting':data===0?'ended':data===2?'pause':'time');
         },

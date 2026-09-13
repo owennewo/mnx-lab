@@ -35,7 +35,7 @@ const fake=`window.__ytInstances=[];window.YT={Player:class{
  getCurrentTime(){const now=performance.now();if(this.state===1)this.time+=(now-this.last)/1000*this.rate;this.last=now;return this.time;}
  getDuration(){return 30;}getPlayerState(){return this.state;}getPlaybackRate(){return this.rate;}getAvailablePlaybackRates(){return [.5,1,1.5,2];}getVolume(){return this.volume;}
  setPlaybackRate(rate){this.rate=rate;queueMicrotask(()=>this.events.onPlaybackRateChange({data:rate}));}setVolume(volume){this.volume=volume;}
- cueVideoById({startSeconds}){this.time=startSeconds;this.state=5;queueMicrotask(()=>this.events.onStateChange({data:5}));}
+ cueVideoById({startSeconds}){this.time=startSeconds;this.state=5;this.rate=1;queueMicrotask(()=>{this.events.onPlaybackRateChange({data:1});this.events.onStateChange({data:5});});}
  seekTo(time){this.time=time;this.last=performance.now();}playVideo(){this.plays++;this.last=performance.now();this.state=1;queueMicrotask(()=>this.events.onStateChange({data:1}));}
  pauseVideo(){this.getCurrentTime();this.state=2;}destroy(){this.destroyed=true;this.frame.remove();}
 }};window.onYouTubeIframeAPIReady?.();`;
@@ -52,7 +52,7 @@ try{
  const wait=async(expr,seconds=20)=>{for(let i=0;i<seconds*10;i++){if(await c.evaluate(expr))return;await new Promise(r=>setTimeout(r,100));}throw new Error('Timed out: '+expr+'; '+await c.evaluate(`JSON.stringify({issue:test.player.playback?.issue,error:test.player.shadowRoot.textContent.slice(-800)})`));};
  await c.send('Emulation.setDeviceMetricsOverride',{width:1024,height:900,deviceScaleFactor:1,mobile:false});
  await c.send('Page.navigate',{url:`http://127.0.0.1:${server.address().port}/`});await wait('window.test?.ready');
- await c.evaluate(`test.player.seek(1);test.player.selectSource('youtube')`);await wait(`!!test.player.shadowRoot.querySelector('.youtube-notice')`);
+ await c.evaluate(`test.player.seek(1);const rate=test.player.shadowRoot.querySelector('[aria-label="Playback rate"]');rate.value='1.5';rate.dispatchEvent(new Event('input'));test.player.selectSource('youtube')`);await wait(`!!test.player.shadowRoot.querySelector('.youtube-notice')`);
  if(await c.evaluate(`!!document.querySelector('script[src*="youtube.com"]') || !!test.player.shadowRoot.querySelector('iframe')`))throw new Error('YouTube loaded before consent');
  await c.evaluate(`[...test.player.shadowRoot.querySelectorAll('button')].find(b=>b.textContent==='Agree and load YouTube').click()`);
  if(!live){
@@ -64,6 +64,7 @@ try{
  const ready=await c.evaluate(`({source:test.player.sourceId,issue:test.player.playback.issue,state:test.player.playback.state,time:test.player.playback.mediaTime,iframe:test.player.shadowRoot.querySelector('iframe')?.src})`);
  console.log('YouTube ready',JSON.stringify({live,format,...ready}));
  if(ready.issue)throw new Error(ready.issue);
+ await wait(`test.player.playback.rate===1.5`);
  const geometry=await c.evaluate(`(()=>{const f=test.player.shadowRoot.querySelector('iframe'),b=f.getBoundingClientRect();return {width:b.width,height:b.height,top:b.top,bottom:b.bottom,referrer:f.referrerPolicy,controls:new URL(f.src).searchParams.get('controls')};})()`);
  if(geometry.width<200||geometry.height<200||geometry.bottom>900||geometry.controls!=='1')throw new Error('Invalid video geometry '+JSON.stringify(geometry));
  if(live){
@@ -72,7 +73,7 @@ try{
   await c.send('Input.dispatchMouseEvent',{type:'mousePressed',...b,button:'left',clickCount:1});await c.send('Input.dispatchMouseEvent',{type:'mouseReleased',...b,button:'left',clickCount:1});
  }else await c.evaluate(`test.player.play()`);
  await wait(`test.player.playback.state==='playing'`,15);
- await new Promise(r=>setTimeout(r,1500));
+ await new Promise(r=>setTimeout(r,1000));
  const playing=await c.evaluate(`({time:test.player.playback.mediaTime,ordinal:test.player.scorePosition?.ordinal,highlight:test.viewer.playbackState.highlight.length,rates:test.player.playback.capabilities.rate.values,issue:test.player.playback.issue})`);
  console.log('YouTube playing',JSON.stringify(playing));
  if(!playing.highlight||playing.ordinal!==1)throw new Error('YouTube clock did not follow the mapped repeat');

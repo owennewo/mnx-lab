@@ -510,7 +510,8 @@ export class Player extends LitElement {
     return Math.round(clamped * perUnit) / perUnit;
   }
   private changeRate(event: Event) {
-    this.rate = Player.snapRate(Number((event.target as HTMLInputElement).value));
+    const requested = Number((event.target as HTMLInputElement).value);
+    this.rate = this.status?.kind === 'youtube' ? requested : Player.snapRate(requested);
     this.rate = this.session?.setRate(this.rate) ?? this.rate;
     try {
       localStorage.setItem('mnx-player-rate', String(this.rate));
