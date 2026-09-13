@@ -35,18 +35,26 @@ const recipes = [{ id: "F-000", config }];
 for (const threshold of plan.thresholds)
   for (const refractorySeconds of plan.refractorySeconds)
     for (const associationSeconds of plan.associationSeconds)
-      recipes.push({
-        id: `${plan.id}-${String(recipes.length).padStart(2, "0")}`,
-        config: {
-          ...config,
-          fusion: {
-            threshold,
-            refractorySeconds,
-            associationSeconds,
-            ...(plan.mode ? { mode: plan.mode } : {}),
+      for (const neighborRatio of plan.neighborRatios ?? [undefined])
+        recipes.push({
+          id: `${plan.id}-${String(recipes.length).padStart(2, "0")}`,
+          config: {
+            ...config,
+            fusion: {
+              threshold,
+              refractorySeconds,
+              associationSeconds,
+              ...(neighborRatio !== undefined ? { neighborRatio } : {}),
+              ...(plan.mode ? { mode: plan.mode } : {}),
+            },
           },
-        },
-      });
+        });
+for (const reference of plan.references ?? [])
+  recipes.push({
+    id: reference.id,
+    reference: true,
+    config: { ...config, fusion: reference.fusion },
+  });
 function loadAudio(name) {
   if (Array.isArray(name)) {
     const sources = name.map(loadAudio);
@@ -57,7 +65,7 @@ function loadAudio(name) {
       ...sources[0].manifest,
       sources: sources.map((s) => ({
         manifestHash: s.manifestHash,
-        manifest: s.manifest,
+        manifest: { ...s.manifest, records: undefined },
       })),
       records: records.map(({ pcm, ...r }) => r),
     };
@@ -86,15 +94,25 @@ function loadAudio(name) {
 const baselinePath =
   process.env.FUSION_PARENT_RESULTS ??
   path.join(bench, "output/run-v1/results.json");
-const archived = [
-  ...readJSON(baselinePath).results,
-  ...(plan.developmentAudio?.length > 1
-    ? readJSON(
-        process.env.FUSION_ADDITIONAL_PARENT_RESULTS ??
-          path.join(bench, "output/fusion-attack-v1/heldout-results.json"),
-      ).results
-    : []),
-];
+const archived = plan.parentArchives
+  ? plan.parentArchives.flatMap(
+      (file) =>
+        readJSON(
+          path.join(
+            process.env.FUSION_ARCHIVE_ROOT ?? path.join(bench, "output"),
+            file,
+          ),
+        ).results,
+    )
+  : [
+      ...readJSON(baselinePath).results,
+      ...(plan.developmentAudio?.length > 1
+        ? readJSON(
+            process.env.FUSION_ADDITIONAL_PARENT_RESULTS ??
+              path.join(bench, "output/fusion-attack-v1/heldout-results.json"),
+          ).results
+        : []),
+    ];
 const provenance = {
   createdAt: new Date().toISOString(),
   revision: execFileSync("git", ["rev-parse", "HEAD"], {
@@ -370,8 +388,11 @@ const rank = (a, b) =>
     a.categories.repeated.candidate.onset.f1 ||
   b.candidate.onset.f1 - a.candidate.onset.f1 ||
   a.id.localeCompare(b.id);
-const eligible = dev.summaries.filter((r) => r.eligible).sort(rank),
-  best = eligible[0] ?? [...dev.summaries].sort(rank)[0];
+const trials = dev.summaries.filter(
+  (r) => !recipes.find((recipe) => recipe.id === r.id).reference,
+);
+const eligible = trials.filter((r) => r.eligible).sort(rank),
+  best = eligible[0] ?? [...trials].sort(rank)[0];
 const selection = {
   id: best.id,
   developmentEligible: best.eligible,
@@ -384,15 +405,18 @@ writeJSON(path.join(output, "selection.json"), selection);
 console.log("Locked selection", selection);
 const held = await run(
   loadAudio(plan.heldoutAudio ?? "audio-fusion-heldout-v1"),
-  [recipes[0], recipes.find((r) => r.id === best.id)],
+  [
+    recipes[0],
+    recipes.find((r) => r.id === best.id),
+    ...recipes.filter((r) => r.reference),
+  ],
   "heldout",
 );
+const heldBest = held.summaries.find((r) => r.id === best.id);
 writeJSON(path.join(output, "decision.json"), {
   ...selection,
   disposition:
-    best.eligible && held.summaries[0].eligible
-      ? "keep-provisionally"
-      : "revise",
-  heldoutFailures: held.summaries[0].failures,
+    best.eligible && heldBest.eligible ? "keep-provisionally" : "revise",
+  heldoutFailures: heldBest.failures,
 });
 console.log("Done", output);

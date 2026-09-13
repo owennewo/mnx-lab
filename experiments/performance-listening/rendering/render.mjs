@@ -72,12 +72,15 @@ try {
     throw Error("MNX adapter disagrees with independent schedule");
   const heldoutV3 = process.argv.includes("--fusion-heldout-v3");
   const heldoutV2 = process.argv.includes("--fusion-heldout-v2");
-  const heldout = heldoutV3 || heldoutV2 || process.argv.includes("--fusion-heldout");
-  const fixtures = heldoutV3 ? fusionHeldoutV3() : heldoutV2
-    ? fusionHeldoutV2()
-    : heldout
-      ? fusionHeldout()
-      : [...cases(), mnx];
+  const heldout =
+    heldoutV3 || heldoutV2 || process.argv.includes("--fusion-heldout");
+  const fixtures = heldoutV3
+    ? fusionHeldoutV3()
+    : heldoutV2
+      ? fusionHeldoutV2()
+      : heldout
+        ? fusionHeldout()
+        : [...cases(), mnx];
   const records = [];
   for (const preset of config.presets) {
     const work = [

@@ -1,5 +1,5 @@
 import FFT from "fft.js";
-import { AttackEvidence } from "./attack.mjs";
+import { AttackEvidence, attributedAttack } from "./attack.mjs";
 import { spectrogramFrame } from "./spectral.mjs";
 // The detector only receives chunks. It cannot inspect the recording or its labels.
 export class StreamingDetector {
@@ -72,7 +72,10 @@ export class StreamingDetector {
             this.active.set(pitch, state);
           }
           if (this.restrikeOnly && state.decisionSample !== null) {
-            if (this.attack.permits(i, time)) {
+            if (
+              this.attack.permits(i, time) &&
+              attributedAttack(scores, i, c.fusion)
+            ) {
               this.attack.consume(i, time);
               this.restrikes.set(pitch, {
                 pitch,
@@ -85,7 +88,13 @@ export class StreamingDetector {
               });
             }
             const strike = this.restrikes.get(pitch);
-            if (strike) {
+            if (
+              strike &&
+              strike.decisionSample === null &&
+              !attributedAttack(scores, i, c.fusion)
+            ) {
+              this.restrikes.delete(pitch);
+            } else if (strike) {
               strike.count++;
               strike.end = time + c.hopSize / c.sampleRate;
               strike.confidence = Math.max(strike.confidence, score);

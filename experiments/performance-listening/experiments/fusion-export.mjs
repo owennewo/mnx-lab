@@ -20,7 +20,14 @@ for (const split of ["development", "heldout"]) {
     data.audioManifest,
   );
   const cases = data.results
-    .filter((r) => r.strategy === "F-000" || r.strategy === selected)
+    .filter(
+      (r) =>
+        r.strategy === "F-000" ||
+        r.strategy === selected ||
+        data.recipes.some(
+          (recipe) => recipe.reference && recipe.id === r.strategy,
+        ),
+    )
     .map(({ metrics, ...r }) => ({
       ...r,
       metrics: {

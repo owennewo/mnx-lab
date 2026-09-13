@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { AttackEvidence } from "./attack.mjs";
+import { AttackEvidence, attributedAttack } from "./attack.mjs";
 import { detectDSP, StreamingDetector } from "./stream.mjs";
 import { harmonicDictionary, createScorer } from "./spectral.mjs";
 const config = {
@@ -114,14 +114,30 @@ test("re-strike-only preserves every parent event and cannot create pitch presen
   const d = new StreamingDetector(scorer(), c);
   d.push(samples.slice(0, 8000));
   const starts = () =>
-    d
-      .finish()
-      .map(({ pitch, start, decisionSample }) => ({
-        pitch,
-        start,
-        decisionSample,
-      }));
+    d.finish().map(({ pitch, start, decisionSample }) => ({
+      pitch,
+      start,
+      decisionSample,
+    }));
   const old = starts();
   d.push(new Float32Array(4000));
   assert.deepEqual(starts().slice(0, old.length), old);
+});
+
+test("attack competition uses both neighbours, preserves ties at ratio one, and is opt-in", () => {
+  assert.equal(attributedAttack([0.3, 0.25, 0.8], 1, {}), true);
+  assert.equal(
+    attributedAttack([0.3, 0.25, 0.8], 1, { neighborRatio: 1 }),
+    false,
+  );
+  assert.equal(
+    attributedAttack([0.4, 0.4, 0.2], 1, { neighborRatio: 1 }),
+    true,
+  );
+  assert.equal(
+    attributedAttack([0.4, 0.4, 0.2], 1, { neighborRatio: 1.5 }),
+    false,
+  );
+  assert.equal(attributedAttack([0.6, 0.2], 0, { neighborRatio: 1.5 }), true);
+  assert.equal(attributedAttack([0.2, 0.6], 1, { neighborRatio: 1.5 }), true);
 });

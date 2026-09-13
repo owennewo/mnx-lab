@@ -52,3 +52,10 @@ export class AttackEvidence {
     this.lastStart[i] = time;
   }
 }
+
+// Compare only evidence already available on this frame. Coefficients are not probabilities.
+export function attributedAttack(scores, index, fusion) {
+  if (fusion.neighborRatio === undefined) return true;
+  const competitor = Math.max(scores[index - 1] ?? 0, scores[index + 1] ?? 0);
+  return scores[index] >= fusion.neighborRatio * competitor;
+}
