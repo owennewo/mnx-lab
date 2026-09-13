@@ -9,7 +9,8 @@
     "test": "node --test evaluation/*.test.mjs detectors/*.test.mjs",
     "inspect": "node inspector/serve.mjs",
     "check:boundaries": "node evaluation/boundaries.mjs",
-    "report": "node experiments/report.mjs"
+    "report": "node experiments/report.mjs",
+    "compare:renders": "node experiments/compare-renders.mjs"
   },
   "dependencies": {
     "@spotify/basic-pitch": "1.0.1",

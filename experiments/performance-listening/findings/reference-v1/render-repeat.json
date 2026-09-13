@@ -1,0 +1,209 @@
+{
+  "version": 1,
+  "leftBrowser": "Chrome/153.0.8010.36",
+  "rightBrowser": "Chrome/153.0.8010.36",
+  "totalRecordings": 151,
+  "differentRecordings": 28,
+  "changedRendererSources": [],
+  "changedSamples": 171411,
+  "maxAbs": 2.9802322387695312e-8,
+  "rmsOverDifferingRecordings": 1.5488826323646576e-9,
+  "differences": [
+    {
+      "file": "guitar/chord-4.wav",
+      "leftHash": "8373aa65051296f7ba9d63f6c763376c7e95fa22aed124f8f5ff55abf9dbec89",
+      "rightHash": "dbe42e6d726eb44c89d61dadc33f420b729ac4c3017668dbb22a0341c12c6038",
+      "changedSamples": 6968,
+      "maxAbs": 2.9802322387695312e-8
+    },
+    {
+      "file": "guitar/chord-5.wav",
+      "leftHash": "1390ff0037419eb8711b737fca2e83f9745eccfb31e87e070389b8bee648007b",
+      "rightHash": "442400b0361b23a1502a94ddd2ca9dcbfea5a541b7e74b5be07ee9028c0a3757",
+      "changedSamples": 7183,
+      "maxAbs": 2.9802322387695312e-8
+    },
+    {
+      "file": "guitar/chord-6.wav",
+      "leftHash": "f8b4e9ed9377add3840aacce9e1181718ac29896a3f9c9ed8ef06c346c5043a4",
+      "rightHash": "a2958808f024ed107f912dd084272f205c846cccfbd16b968f289267e908f84e",
+      "changedSamples": 8600,
+      "maxAbs": 2.9802322387695312e-8
+    },
+    {
+      "file": "guitar/duplicate-pitch-voices.wav",
+      "leftHash": "362744faf833c6c1e1188420c7b7d6b56b4620e71ebfb0abe6d6726262622f91",
+      "rightHash": "ae77be24646453c0b499ef80d1afd7e3e277f08ed92b3882c020a7e3eaa2f1a5",
+      "changedSamples": 8093,
+      "maxAbs": 2.9802322387695312e-8
+    },
+    {
+      "file": "guitar/quiet-inner.wav",
+      "leftHash": "d404f6f5b339d1f0a2e6f4a80ad24e8c8fb92097803a9a83fad271130d116240",
+      "rightHash": "072b9f2cc70ead3d24d5155e777498b1e8ed7e0c6eebf01c5e5049f4e5a61572",
+      "changedSamples": 5507,
+      "maxAbs": 7.450580596923828e-9
+    },
+    {
+      "file": "guitar/wrong-inner.wav",
+      "leftHash": "45c31d32ffbccb6ef4440de0830eb9faeb8b6438e66ff3813010a1dfe2eeafa6",
+      "rightHash": "b6b313dc8ad38dd970c9a8351d06c251f164520a1b5a985f58fa0cb19f1ce04e",
+      "changedSamples": 4843,
+      "maxAbs": 1.4901161193847656e-8
+    },
+    {
+      "file": "guitar/extra-note.wav",
+      "leftHash": "fc4ca77bd37122151f451faeb7c389887fb46db10bcd538925376a085948f5f4",
+      "rightHash": "8260f6657b5b0d417749ce6f6f0cefe7e5dcba871e0e9b68abb51777fa4e1712",
+      "changedSamples": 6736,
+      "maxAbs": 1.4901161193847656e-8
+    },
+    {
+      "file": "guitar/strum.wav",
+      "leftHash": "6a1a42c12ef633b4828e14f366fad604e90c033c37e68110049e9fb429287e5b",
+      "rightHash": "89fe5c5b084c693b02896f7a397ae95531a544f3ec5a75d3dbcb22e5d0e9d206",
+      "changedSamples": 9799,
+      "maxAbs": 2.9802322387695312e-8
+    },
+    {
+      "file": "guitar/arpeggio.wav",
+      "leftHash": "b8296f90ad78af49d9898e8f452be973ab102677e3e7a80e50259b61ba523017",
+      "rightHash": "ef8c923815630a8ab265afd6799a2a511d36d656a648efdf1477b66232be0836",
+      "changedSamples": 3106,
+      "maxAbs": 7.450580596923828e-9
+    },
+    {
+      "file": "guitar2/chord-3.wav",
+      "leftHash": "875038fc7a800a448465ce5db39e87d4bc05f9764743680975dd76bb62bfcfa5",
+      "rightHash": "b93f86e25c3dea6b0fd6dd5eb079c67bffe6f68e5a5699c5d0cec65cbce68d09",
+      "changedSamples": 5033,
+      "maxAbs": 1.4901161193847656e-8
+    },
+    {
+      "file": "guitar2/chord-4.wav",
+      "leftHash": "ab20bdec3dfc9dab4b6eaf7cf487131170d5354eea8d048680960f1acebe9c18",
+      "rightHash": "dda8e0789d6b484da542e7c835c170826c44487df14a931bbe9ed37626a3cb07",
+      "changedSamples": 6702,
+      "maxAbs": 1.4901161193847656e-8
+    },
+    {
+      "file": "guitar2/chord-5.wav",
+      "leftHash": "6da4e70b04c6c3c002b33419191903f1c01d1197cda876086d5f01f98284a4c2",
+      "rightHash": "b78a1cb8f6d2d5084c8ccd27aec08047335efc295704a64226d4bf7143e2d7f1",
+      "changedSamples": 3118,
+      "maxAbs": 2.9802322387695312e-8
+    },
+    {
+      "file": "guitar2/chord-6.wav",
+      "leftHash": "fbcc6341d839309524b00ac078bc3e74eb57e5ce1438967683ca58ce056f72ca",
+      "rightHash": "97859dfe6233594a87526f3a1af6fa2164fde9322af533ea8297097dabbbdc30",
+      "changedSamples": 8650,
+      "maxAbs": 2.9802322387695312e-8
+    },
+    {
+      "file": "guitar2/duplicate-pitch-voices.wav",
+      "leftHash": "8429548c4a1f35d7cef53a8788830149dac6a0fd0d370dcf0476074ddd2de1b3",
+      "rightHash": "9d0154f70cd3032fd748c12e495d3d3d60c1f12749c9d798134fd946d040da2b",
+      "changedSamples": 5107,
+      "maxAbs": 2.9802322387695312e-8
+    },
+    {
+      "file": "guitar2/quiet-wrong-inner.wav",
+      "leftHash": "82b25d8da7fc5083eb243c2a1f77bf37ca7030a9b0bc559b784789dbf34958fe",
+      "rightHash": "dd6a2ce73afa39cc59e179abbd58c71fa2b198e0e1d89f188833c2b44e1e6a85",
+      "changedSamples": 4762,
+      "maxAbs": 7.450580596923828e-9
+    },
+    {
+      "file": "guitar2/extra-note.wav",
+      "leftHash": "de97195faeda4cf4efaf291d9707976ac5950d146bf53aaddba2a10283e365f8",
+      "rightHash": "cf60527751c53d2e170b899aae9035d1adc826d0c1fa6c7bce05a8383225b8b9",
+      "changedSamples": 6453,
+      "maxAbs": 1.4901161193847656e-8
+    },
+    {
+      "file": "guitar2/strum.wav",
+      "leftHash": "55a5facefee2d1bf862425f5c9e19f9d7d34e9dccd10ebc835746c19f8df402f",
+      "rightHash": "0f310d0b40d02045d8075010f8154781a13b7291e5ce776973dc12732bbbc16c",
+      "changedSamples": 8269,
+      "maxAbs": 2.9802322387695312e-8
+    },
+    {
+      "file": "guitar2/arpeggio.wav",
+      "leftHash": "22f4e936a228fb056b4e4ddc80ec30e90e02be342e89ced19d3edb0cccc781f5",
+      "rightHash": "cb5fa736198c29ff6820e34a7c5e1d845d97d65d5c9761f7a9680b4098e5b150",
+      "changedSamples": 5648,
+      "maxAbs": 7.450580596923828e-9
+    },
+    {
+      "file": "piano/chord-3.wav",
+      "leftHash": "0620b07b52c4b43be68698aff0ce6a9159dffa090df750f7aea8a74bf845cdfc",
+      "rightHash": "6cefe188a4dbe755485ad80dacd327fb9ddc395cfddbe2e2da0ada8162d35eee",
+      "changedSamples": 5257,
+      "maxAbs": 1.4901161193847656e-8
+    },
+    {
+      "file": "piano/chord-4.wav",
+      "leftHash": "feb23eca9a414e390c47dbfb5a533e3ba724e237b1ca68f87e1c8d8d9bbba365",
+      "rightHash": "f81d3713a7ecf907ae51694a60e98899699bc766919180999e0251207c07e656",
+      "changedSamples": 3303,
+      "maxAbs": 2.9802322387695312e-8
+    },
+    {
+      "file": "piano/chord-5.wav",
+      "leftHash": "0b7c7c0c9e811d2ad0b07b18171fa2a81cd37af41520ba15856501cd96646f45",
+      "rightHash": "de1520d77b5b6908a99a13216fce0f8186d2ca23e4d76d2fed9bb411900ed856",
+      "changedSamples": 7254,
+      "maxAbs": 2.9802322387695312e-8
+    },
+    {
+      "file": "piano/chord-6.wav",
+      "leftHash": "13d4d11d62f80210525c7aba392d54c6dd0b38884902be41f40651a91eca8987",
+      "rightHash": "7a2e79ef5bc0d9d2dedb352e4f627066cc1929d54783014a10f9068b25ad59a2",
+      "changedSamples": 8415,
+      "maxAbs": 2.9802322387695312e-8
+    },
+    {
+      "file": "piano/duplicate-pitch-voices.wav",
+      "leftHash": "c285560ef663cf09f8895d18af59d64f962c20eea3cd370037f56c6e7603f1f4",
+      "rightHash": "c5e4b5d049ee01a6757789f250d551642ac633eb2e09e962a68a773271e034a9",
+      "changedSamples": 6425,
+      "maxAbs": 2.9802322387695312e-8
+    },
+    {
+      "file": "piano/quiet-inner.wav",
+      "leftHash": "f80e82c9b303e42ae878f9c522161ca9e19b2fe446d9da32a59f3f2f0a1f7935",
+      "rightHash": "318a48399fafa21e14784093092248cc70830dfb3d22cb28ba3e03d67b513065",
+      "changedSamples": 4106,
+      "maxAbs": 7.450580596923828e-9
+    },
+    {
+      "file": "piano/quiet-wrong-inner.wav",
+      "leftHash": "d466fd08195e0f52d441adc39fbcff3e620be7263c237c2dbc37c75992eb7c50",
+      "rightHash": "f3c2623a2d9a889efae21076f63534206657c897e669822046ff3c094897e4aa",
+      "changedSamples": 5137,
+      "maxAbs": 7.450580596923828e-9
+    },
+    {
+      "file": "piano/extra-note.wav",
+      "leftHash": "5af3c0a8a0e5f5239dcc21a74b399090fc39379e0cfad41e8edd5e4d8c0f389b",
+      "rightHash": "50acde251fbd729ccb5f18bba4fa057df22e45972f65ae66b869c80e6b2b81fa",
+      "changedSamples": 4173,
+      "maxAbs": 2.9802322387695312e-8
+    },
+    {
+      "file": "piano/strum.wav",
+      "leftHash": "d818a235b16829efdd1d0440fd13ca65667132cacb64ddb9750fefebd3a9f8aa",
+      "rightHash": "64e8f3968e61ffbc7c514f34684e8836b0151d452bfdf646a930bdedb8e75b12",
+      "changedSamples": 7389,
+      "maxAbs": 2.9802322387695312e-8
+    },
+    {
+      "file": "piano/arpeggio.wav",
+      "leftHash": "015274f34d0a830ba707cef15a8e5d76bc5146b3b876fa4f7e9fbd7757348d09",
+      "rightHash": "7fbd76a046f3af96a2c306b0e160ae51668ba87164eecf909909bf3e55e4dfd0",
+      "changedSamples": 5375,
+      "maxAbs": 1.4901161193847656e-8
+    }
+  ]
+}

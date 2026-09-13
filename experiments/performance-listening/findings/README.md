@@ -74,6 +74,21 @@ attack and an unmatched predicted attack. It is not necessarily an invented pitc
    evidence to investigate, not permission to select a test-set threshold and claim
    general reliability. Scores are not calibrated probabilities.
 
+## Repeat-render finding
+
+A second render with identical fixture identities, unchanged `src/audio` hashes and
+Chrome 153.0.8010.36 reproduced 123/151 audio hashes exactly. The other 28 recordings
+are polyphonic and differ by at most **2.9802322387695312e-8** per float sample; RMS
+difference over those recordings is **1.5488826323646576e-9**. This is consistent with
+floating-point mixing-order effects, but the underlying cause has not been isolated.
+See [repeat comparison](reference-v1/render-repeat.json) for every changed hash.
+
+The frozen input files were not replaced, and the full detector comparison still refers
+to their original hashes. No claim is made that detector results are invariant to every
+small input change. This validates separating rendering from comparison: re-rendering
+creates a new input version even when the source and browser version are unchanged.
+The compact reference report itself reproduces byte-identically from the saved full run.
+
 ## Reproduce and review a failure
 
 From the repository root, after rendering and comparison:
@@ -90,7 +105,7 @@ assertion that every acoustic attack boundary has been heard and labelled.
 
 The native adapter verifies every scheduled attack created a sample source, silence is
 zero, nonempty fixtures are audible and no fixture clips. The compiled MNX example is
-checked against an independently specified two-note schedule. Thirteen independent
+checked against an independently specified two-note schedule. Fourteen independent
 unit tests cover evaluator edge cases, a known sinusoid, a known template mixture and
 causal-prefix/chunk invariance. The benchmark uses no existing scenario verification
 records and changes no goldens.

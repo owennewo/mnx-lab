@@ -144,7 +144,14 @@ The exact npm dependency tree is locked here, separate from root dependencies. I
 manifests and compact measured reports are committed under `findings/`; bulky audio and
 full runs live under ignored `output/`. Preserve an output directory to reproduce identical
 PCM. Re-rendering may differ across browser/codec/platform versions: verify hashes rather
-than assuming equivalence. A new render is a new input version.
+than assuming equivalence. A new render is a new input version. The initial repeat-render check found 28/151
+polyphonic recordings differed at floating-point roundoff scale even with the same
+Chrome and renderer source. Preserve the original WAVs for exact input identity.
+Compare two generated sets without changing either:
+
+```bash
+npm --prefix experiments/performance-listening run compare:renders -- AUDIO_A AUDIO_B NEW_REPORT.json
+```
 
 Sample pack licenses and origins are retained from `public/samples/*/manifest.json` and
 in the audio manifest. Basic Pitch/model distribution: Apache-2.0; TensorFlow.js: Apache-2.0;
