@@ -14,10 +14,15 @@ held-out benefit. These two iterations stop here; octave attribution needs furth
 [Latest comparison](findings/fusion-harmonic-attribution-v1/README.md). Local budgets remain
 25% extra processing and 25 ms pooled/common-match p95 increase; target device unselected.
 
+Two agreed next experiments are **partial spectral whitening** and **flexible harmonic modelling**.
+Both are unimplemented and untried; measure separately before trying a combination.
+
 ## Technique index
 
 | Technique | Evidence / disposition | Current lesson or question |
 |---|---|---|
+| [Partial spectral whitening](fusion-techniques/spectral-whitening.md) | Agreed experiment; untried | Reduce timbre dependence through a smooth spectral envelope, with bounded gain |
+| [Flexible harmonic model](fusion-techniques/flexible-harmonic-model.md) | Agreed experiment; untried | Tolerate weak fundamentals while preserving genuinely played higher notes |
 | [Harmonic evidence](fusion-techniques/harmonic-evidence.md) | Measured baseline; candidate | Cheap, noisy attacks; retain as an analytical baseline |
 | [Recorded templates](fusion-techniques/recorded-templates.md) | Measured baseline; parked for general use | Large timbre-transfer loss; reconsider for an explicit personalisation experiment |
 | [Neural evidence](fusion-techniques/neural-evidence.md) | Measured offline baseline; candidate | Stronger attack recovery; current CPU path is slower than real time |
@@ -42,10 +47,11 @@ failure when a later configuration works.
 | FL-005 · 2026-09-13 | [F-002 re-strike-only: AR-003/004](fusion-techniques/attack-restrike.md) | 132 regression + 36 fresh cases; exact parent coverage; repeat gains at ~5–6% cost, but +14/+9 false accusations. Revise pitch attribution |
 | FL-006 · 2026-09-13 | [F-003 neighbour attribution: PA-001/002](fusion-techniques/pitch-attribution.md) | 168 regression + 42 fresh cases; removes 16/23 and 10/11 F-002 added false attacks; selected ratio 1, still revise |
 | FL-007 · 2026-09-13 | [F-004 lower-harmonic competition: PA-003/004](fusion-techniques/pitch-attribution.md) | 210 regression + 42 fresh cases; one regression false removed, identical held-out TP/FP/FN; park and stop this batch |
+| FL-008 · 2026-09-13 | Agree [whitening](fusion-techniques/spectral-whitening.md) and [flexible harmonic modelling](fusion-techniques/flexible-harmonic-model.md) experiments after private four-bar diagnosis | No implementation or trial yet; isolate each contribution, then consider combination; F-003 and defaults unchanged |
 
 ## Candidate next experiments
 
-These are questions, not scheduled work or new roadmap proposals.
+The two experiments above are agreed work. The remaining questions below are unscheduled ideas, not new roadmap proposals.
 
 - Seek independent evidence for remaining octave attribution errors, preserving the F-002 pitch-coverage contract; consider conditional spectral-change scoring as an untried hypothesis.
 - Isolate duplicate re-strike suppression on a played pitch if attribution alone is insufficient.

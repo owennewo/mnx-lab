@@ -63,3 +63,41 @@ and compare with/without it. Test repeated notes, short notes, gaps, releases, b
 quiet chord tones together. Record parameter combinations in frames AND milliseconds;
 require fewer false/missed attacks without hiding the loss through greater abstention or
 unacceptable delay. Choose the device/cost budget before accepting a fusion recipe.
+
+## Reading the current listener as a sequence of frames
+
+These numbers describe the current DSP listener, not every pitch-detection family:
+
+- **Audio sample rate:** 22,050 waveform measurements per second. One sample cannot
+  identify a musical pitch; it is one amplitude measurement.
+- **Analysis window:** 4,096 samples = 185.76 ms of recent audio (zero-padded at startup).
+- **Analysis hop:** 256 samples = 11.61 ms, or 86.13 pitch-evidence frames per second.
+  Adjacent windows share 93.75% of their samples; agreement is correlated evidence.
+- **Frame output:** evidence for multiple candidate pitches, not one winning note and
+  not a calibrated probability. The current dictionary covers MIDI 40–88.
+- **Confirmation:** two consecutive coefficients at least 0.22 confirm a parent pitch
+  event. The second qualifying frame is 11.61 ms after the first; the reported start is
+  the first frame's timestamp. It is not two non-overlapping 186 ms observations.
+- **Continuation/end:** qualifying frames extend the event. One frame below threshold
+  removes its active state; no gap allowance or separate exit threshold exists yet.
+- **A new strike on an existing pitch:** F-003 separately checks positive spectral
+  change, recent pitch association and neighbour attribution, then requires two frames
+  for the added re-strike. The 90 ms spacing guard applies to this attack machinery;
+  it is not a universal minimum gap between all parent pitch events.
+
+Analysis time, evidence availability and delivery time are distinct. A frame's timestamp
+is the centre of the trailing window, about 93 ms behind its latest audio. With 256-sample
+chunks, confirming a parent event on the next frame puts its initial emission about
+104 ms after its *reported* start, before processing cost. This is not a fixed latency
+from the physical attack: threshold crossing and timestamp error vary. Bigger delivery
+chunks can batch several frames and add delay without changing their musical estimates.
+UI/cursor refresh rate is another independent choice; the bench has no live cursor.
+
+For illustration, successive frame scores `0.10, 0.24, 0.30, 0.27, 0.18` yield
+`absent, tentative, confirmed, continuing, dropped` with current settings. Increasing
+confirmation can reject brief flicker but cannot fix a wrong octave persisting across
+many frames. Window length, hop, confirmation and dropout tolerance are separate knobs.
+
+The proposed [whitening](spectral-whitening.md) changes input evidence before scoring;
+[flexible harmonic modelling](flexible-harmonic-model.md) changes scoring itself. Their
+initial experiments hold the frame and event rules fixed so improvements are attributable.
