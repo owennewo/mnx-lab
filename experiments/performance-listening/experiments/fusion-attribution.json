@@ -1,0 +1,48 @@
+{
+  "id": "F-003",
+  "parent": "F-000",
+  "thresholds": [
+    0.15
+  ],
+  "refractorySeconds": [
+    0.09
+  ],
+  "associationSeconds": [
+    0.035
+  ],
+  "chunkSize": 256,
+  "timingRepeats": 3,
+  "budgets": {
+    "cpuRatio": 1.25,
+    "p95IncreaseSeconds": 0.025,
+    "regressionF1Drop": 0.02
+  },
+  "mode": "restrike-only",
+  "developmentAudio": [
+    "audio-v1",
+    "audio-fusion-heldout-v1",
+    "audio-fusion-heldout-v2"
+  ],
+  "heldoutAudio": "audio-fusion-heldout-v3",
+  "requireActiveIdentity": true,
+  "neighborRatios": [
+    1,
+    1.5
+  ],
+  "parentArchives": [
+    "run-v1/results.json",
+    "fusion-attack-v1/heldout-results.json",
+    "fusion-restrike-v1/heldout-results.json"
+  ],
+  "references": [
+    {
+      "id": "F-002-01",
+      "fusion": {
+        "threshold": 0.15,
+        "refractorySeconds": 0.09,
+        "associationSeconds": 0.035,
+        "mode": "restrike-only"
+      }
+    }
+  ]
+}
