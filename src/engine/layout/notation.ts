@@ -1038,7 +1038,7 @@ interface SegmentResult {
   packing: PackingInput;
   /** This segment's width at density 1 — see `LayoutResult.naturalWidthSp`. */
   naturalWidthSp?: number;
-  /** Local system row of each verse primitive — the row fit's ownership. */
+  /** Local system row of each verse and volta primitive — the row fit's ownership. */
   lyricOwners?: ReadonlyMap<Primitive, number>;
 }
 
@@ -2227,7 +2227,9 @@ function assembleSegment(
     });
   }
 
-  if (!args.entries) emitEndings(mnx, plan, row => displayTopOf(row, 0), primitives);
+  // Volta brackets belong to the row that drew them (endings.ts).
+  const endingOwners = new Map<Primitive, number>();
+  if (!args.entries) emitEndings(mnx, plan, row => displayTopOf(row, 0), primitives, undefined, endingOwners);
   if (ottavaOnsets && ottavaSpans.length) emitOttavas(performedSpans(ottavaSpans, plan), plan, staffTopOf, ottavaOnsets, primitives);
   if (ottavaOnsets && hairpinSpans.length) emitHairpins(performedSpans(hairpinSpans, plan), plan, staffTopOf, ottavaOnsets, primitives);
 
@@ -2290,6 +2292,7 @@ function assembleSegment(
   // score-text pass, whose midpoint scan must never mistake a deep verse for
   // the next system's ink. The fit takes their rows as fact.
   const lyricOwners = emitLyricRuns(lyricRuns.values(), primitives, clearanceSpacing(args.display.clearance, args.densityPad).lyricInk);
+  for (const [p, row] of endingOwners) lyricOwners.set(p, row);
 
   const heightSp = 2 * MARGIN_SP + systemHeightByRow.reduce((a, b) => a + b, 0);
   const rows = Array.from({ length: rowCount }, (_, r): RowBandSp => ({

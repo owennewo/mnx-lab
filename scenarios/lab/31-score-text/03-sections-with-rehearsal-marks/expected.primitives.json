@@ -296,9 +296,9 @@
       {
         "kind": "rect",
         "x": 5.6,
-        "y": 3.512,
-        "w": 2.116,
-        "h": 2.096,
+        "y": 3.728,
+        "w": 1.93,
+        "h": 1.88,
         "stroke": "currentColor",
         "thickness": 0.12,
         "className": "rehearsal-box"
@@ -309,7 +309,7 @@
         "x": 6.1,
         "y": 5.208,
         "font": "body",
-        "size": 1.8,
+        "size": 1.5,
         "weight": "bold",
         "anchor": "start",
         "className": "rehearsal-label"
@@ -317,10 +317,10 @@
       {
         "kind": "text",
         "text": "Intro",
-        "x": 8.216,
+        "x": 8.03,
         "y": 5.208,
         "font": "body",
-        "size": 1.8,
+        "size": 1.5,
         "weight": "bold",
         "anchor": "start",
         "className": "section-label"
@@ -328,9 +328,9 @@
       {
         "kind": "rect",
         "x": 38.65,
-        "y": 4.404,
-        "w": 2.116,
-        "h": 2.096,
+        "y": 4.62,
+        "w": 1.93,
+        "h": 1.88,
         "stroke": "currentColor",
         "thickness": 0.12,
         "className": "rehearsal-box"
@@ -341,7 +341,7 @@
         "x": 39.15,
         "y": 6.1,
         "font": "body",
-        "size": 1.8,
+        "size": 1.5,
         "weight": "bold",
         "anchor": "start",
         "className": "rehearsal-label"
@@ -349,10 +349,10 @@
       {
         "kind": "text",
         "text": "Verse",
-        "x": 41.266,
+        "x": 41.08,
         "y": 6.1,
         "font": "body",
-        "size": 1.8,
+        "size": 1.5,
         "weight": "bold",
         "anchor": "start",
         "className": "section-label"

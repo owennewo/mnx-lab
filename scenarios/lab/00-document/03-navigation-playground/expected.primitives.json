@@ -1722,7 +1722,7 @@
         "x": 6.1,
         "y": 5.608,
         "font": "body",
-        "size": 1.8,
+        "size": 1.5,
         "weight": "bold",
         "anchor": "start",
         "className": "section-label"
@@ -1731,9 +1731,9 @@
         "kind": "text",
         "text": "Verse",
         "x": 67.7658,
-        "y": 5.92,
+        "y": 6,
         "font": "body",
-        "size": 1.8,
+        "size": 1.5,
         "weight": "bold",
         "anchor": "start",
         "className": "section-label"

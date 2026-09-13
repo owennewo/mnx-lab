@@ -1212,3 +1212,26 @@ full-size gap. The full-size **2** to **5** shift slide across the barline is un
 for comparison. On the notation staff the same three marks spring from the small
 noteheads, the hammer-on slur on the side away from the grace's (always-up) stem, and
 the technique lane clears the grace's shorter stem. Bar 2 carries no technique.
+
+## Score labels at a lyric-relative size; voltas hold together under verses — 2026-09-13
+
+Owner: no roadmap doc — a direct fix from *Needle of Death*, a Guitar Pro import with
+verses under the tab and a volta in the next system. Two engine changes:
+
+- **Section and rehearsal labels drop from 1.8sp to 1.5sp** (`SCORE_LABEL_SIZE_SP`),
+  a step above the lyric/fret digits (1.25) and tempo text (1.3) instead of towering
+  over them. Nine goldens moved, every one of them `rendered` (none was verified):
+  `lab/00-document/03-navigation-playground`, `04-twelve-bar-blues`, and
+  `lab/31-score-text/01`, `02`, `03`, `06`, `09`, `10`, `11`.
+- **A volta bracket belongs to the row that drew it.** The row fit filed ink by its
+  midpoint, and a volta's horizontal line rode into the lyric band of the system above
+  while its short hooks stayed with their own — so the two moved apart (4.7sp in
+  *Needle of Death*). `emitEndings` now reports ownership beside the verses'. No golden
+  moved: no corpus scenario puts a volta under a verse row, so the regression lives in
+  `harness/conformance/lyric-placement.test.ts`.
+
+**What a reviewer should look for.** Every section name and rehearsal letter is visibly
+smaller than before but still reads above the tempo text, and a rehearsal box still hugs
+its letter (the box is sized from the same constant). In `10-labels-on-a-tab-staff` the
+labels sit clear of the tab staff's capo and technique ink on all three projections.
+Nothing else on these pages should have moved.

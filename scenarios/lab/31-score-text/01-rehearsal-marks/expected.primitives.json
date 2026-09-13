@@ -296,9 +296,9 @@
       {
         "kind": "rect",
         "x": 2.1,
-        "y": 3.512,
-        "w": 2.116,
-        "h": 2.096,
+        "y": 3.728,
+        "w": 1.93,
+        "h": 1.88,
         "stroke": "currentColor",
         "thickness": 0.12,
         "className": "rehearsal-box"
@@ -309,7 +309,7 @@
         "x": 2.6,
         "y": 5.208,
         "font": "body",
-        "size": 1.8,
+        "size": 1.5,
         "weight": "bold",
         "anchor": "start",
         "className": "rehearsal-label"
@@ -317,9 +317,9 @@
       {
         "kind": "rect",
         "x": 33.9,
-        "y": 4.404,
-        "w": 2.116,
-        "h": 2.096,
+        "y": 4.62,
+        "w": 1.93,
+        "h": 1.88,
         "stroke": "currentColor",
         "thickness": 0.12,
         "className": "rehearsal-box"
@@ -330,7 +330,7 @@
         "x": 34.4,
         "y": 6.1,
         "font": "body",
-        "size": 1.8,
+        "size": 1.5,
         "weight": "bold",
         "anchor": "start",
         "className": "rehearsal-label"

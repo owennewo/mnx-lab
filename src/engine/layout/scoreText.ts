@@ -249,7 +249,10 @@ export function emitNavigationMarkers(args: EmitNavigationMarkersArgs): void {
 /** The shared em size for rehearsal and section labels. Exported so document
  *  chrome that sits beside the SVG can match the engraving's typography at
  *  the actual on-screen staff scale. */
-export const SCORE_LABEL_SIZE_SP = 1.8;
+// In staff spaces like every other text, so it scales with the staff; kept a
+// step above the lyric/fret size (1.25) and the tempo text (1.3) rather than
+// towering over them.
+export const SCORE_LABEL_SIZE_SP = 1.5;
 // Body text has no metrics in layout, so the box is drawn around an estimated
 // CAP HEIGHT, not the em. Sizing it to the em leaves the ascender/descender
 // space inside the box and the letter sits visibly low in it.
@@ -394,7 +397,7 @@ const METRONOME_GLYPH_BY_BASE: Record<string, string> = {
 // little smaller than the notes in the score. Drawn at the full 4-sp music em
 // it is a staff-sized head with a full-height stem — visibly heavier than the
 // section label above it and the capo line below. Sized to sit between the
-// two: section label (1.8 bold) > tempo (1.3 semi-bold) > capo (1.1 semi-bold).
+// two: section label (1.5 bold) > tempo (1.3 semi-bold) > capo (1.1 semi-bold).
 const TEMPO_GLYPH_SCALE = 0.55; // multiplier on the 4-sp em
 const TEMPO_TEXT_SIZE_SP = 1.3;
 const TEMPO_TEXT_WEIGHT = 600; // matches the capo line

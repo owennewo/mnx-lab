@@ -299,7 +299,7 @@
         "x": 6.1,
         "y": 5.608,
         "font": "body",
-        "size": 1.8,
+        "size": 1.5,
         "weight": "bold",
         "anchor": "start",
         "className": "section-label"
@@ -310,7 +310,7 @@
         "x": 39.15,
         "y": 6.5,
         "font": "body",
-        "size": 1.8,
+        "size": 1.5,
         "weight": "bold",
         "anchor": "start",
         "className": "section-label"

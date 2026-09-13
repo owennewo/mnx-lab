@@ -119,3 +119,34 @@ describe('lyric placement hugs the system that owns it', () => {
     }
   }
 });
+
+// A volta over a system that sits under another system's verses: the row fit
+// once filed the bracket's line by its midpoint — inside the verse band above —
+// and moved it with that row while its hooks stayed with their own, so the
+// line floated clear of its hooks (Needle of Death, 2026-09-13).
+describe('a volta under a verse row holds together', () => {
+  const isEnding = (p: Primitive): p is Extract<Primitive, { kind: 'line' }> => p.kind === 'line' && p.className === 'ending';
+  for (const [docName, rel] of Object.entries(DOCS)) {
+    for (const [viewName, layout] of Object.entries(VIEWS)) {
+      it(`${docName}, ${viewName}: every hook meets its bracket line, at every level`, () => {
+        initSmufl();
+        const doc = read(rel);
+        // A one-bar ending on every bar after the first, so some start a system.
+        doc.global.measures.forEach((m, i) => { if (i > 0) m.ending = { numbers: [1], duration: 1 }; });
+        let hooks = 0;
+        for (const clearance of LEVELS) {
+          const result = layout({ mnx: doc, widthSp: WIDTH_SP, display: { clearance } } as never) as LayoutResult;
+          const lines = result.primitives.filter(isEnding);
+          const bars = lines.filter(l => l.y1 === l.y2);
+          for (const hook of lines.filter(l => l.x1 === l.x2 && l.y1 !== l.y2)) {
+            hooks++;
+            const top = Math.min(hook.y1, hook.y2);
+            const bar = bars.find(b => Math.min(b.x1, b.x2) <= hook.x1 + 1e-6 && hook.x1 <= Math.max(b.x1, b.x2) + 1e-6 && Math.abs(b.y1 - top) < 1e-6);
+            expect(bar, `hook at x=${hook.x1} y=${top} has no bracket line`).toBeDefined();
+          }
+        }
+        expect(hooks).toBeGreaterThan(0);
+      });
+    }
+  }
+});

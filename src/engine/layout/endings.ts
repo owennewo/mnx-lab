@@ -27,7 +27,12 @@ function emitEndings(
   /** Draw only the segments that fall on this row — the tab layout places
    *  its score text per row inside the measure loop, scanning the row's ink
    *  so far, so a row's voltas must be on the page before its labels. */
-  onlyRow?: number
+  onlyRow?: number,
+  /** Filled with the row each bracket primitive was drawn for. The row fit
+   *  files ink by its midpoint, and a volta's line rides high enough to land
+   *  in the lyric band of the system above while its short hooks stay below
+   *  the boundary — the two then move apart. Which row drew it is a fact. */
+  owners?: Map<Primitive, number>
 ): void {
   (mnx.global.measures ?? []).forEach((gm, i) => {
     const ending = gm?.ending;
@@ -43,6 +48,7 @@ function emitEndings(
         a = b + 1;
         continue;
       }
+      const start = primitives.length;
       const staffTop = rowStaffTop(row);
       const y = staffTop - VOLTA_RISE_SP;
       const x1 = plan.measures[a].x + 0.1;
@@ -83,6 +89,7 @@ function emitEndings(
           className: 'ending'
         });
       }
+      if (owners) for (const p of primitives.slice(start)) owners.set(p, row);
       a = b + 1;
     }
   });

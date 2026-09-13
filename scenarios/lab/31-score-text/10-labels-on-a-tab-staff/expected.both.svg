@@ -79,10 +79,10 @@
 <rect x="945.6" y="128" width="8" height="251.4288" fill="currentColor" class="barline barline-final-thick"></rect>
 <text x="97.6" y="84.7648" font-family="Bravura" font-size="35.2" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="tempo"></text>
 <text x="112.4864" y="84.7648" font-family="var(--font-family-sans)" font-size="20.8" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="600" class="tempo">= 96</text>
-<rect x="89.6" y="11.0112" width="33.856" height="33.536" fill="none" stroke="currentColor" stroke-width="1.92" class="rehearsal-box"></rect>
-<text x="97.6" y="38.1472" font-family="var(--font-family-sans)" font-size="28.8" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="bold" class="rehearsal-label">A</text>
-<text x="131.456" y="38.1472" font-family="var(--font-family-sans)" font-size="28.8" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="bold" class="section-label">Riff</text>
-<rect x="618.4" y="19.264" width="33.856" height="33.536" fill="none" stroke="currentColor" stroke-width="1.92" class="rehearsal-box"></rect>
-<text x="626.4" y="46.4" font-family="var(--font-family-sans)" font-size="28.8" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="bold" class="rehearsal-label">B</text>
-<text x="660.256" y="46.4" font-family="var(--font-family-sans)" font-size="28.8" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="bold" class="section-label">Solo</text>
+<rect x="89.6" y="14.4672" width="30.88" height="30.08" fill="none" stroke="currentColor" stroke-width="1.92" class="rehearsal-box"></rect>
+<text x="97.6" y="38.1472" font-family="var(--font-family-sans)" font-size="24" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="bold" class="rehearsal-label">A</text>
+<text x="128.48" y="38.1472" font-family="var(--font-family-sans)" font-size="24" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="bold" class="section-label">Riff</text>
+<rect x="618.4" y="22.72" width="30.88" height="30.08" fill="none" stroke="currentColor" stroke-width="1.92" class="rehearsal-box"></rect>
+<text x="626.4" y="46.4" font-family="var(--font-family-sans)" font-size="24" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="bold" class="rehearsal-label">B</text>
+<text x="657.28" y="46.4" font-family="var(--font-family-sans)" font-size="24" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" font-weight="bold" class="section-label">Solo</text>
 </svg>
