@@ -1,7 +1,8 @@
 import base from "../experiments/baseline.json";
 import { StreamingDetector } from "../detectors/stream.mjs";
 import { harmonicDictionary, createScorer } from "../detectors/spectral.mjs";
-let detector, config, chunks, sent, samples, cpuMs;
+import { MicrophonePolicy } from "./policy.mjs";
+let detector, config, chunks, sent, samples, cpuMs, policy;
 self.onmessage = ({ data }) => {
   try {
     if (data.type === "init") {
@@ -25,15 +26,18 @@ self.onmessage = ({ data }) => {
             }
           : {}),
       };
+      policy = new MicrophonePolicy(config, data.options);
       detector = new StreamingDetector(
-        createScorer(harmonicDictionary(config), "harmonic", config),
+        policy.wrap(
+          createScorer(harmonicDictionary(config), "harmonic", config),
+        ),
         config,
       );
       chunks = [];
       sent = 0;
       samples = 0;
       cpuMs = 0;
-      self.postMessage({ type: "ready", config });
+      self.postMessage({ type: "ready", config, policy: policy.summary() });
     } else if (data.type === "audio") {
       const start = performance.now();
       detector.push(data.samples);
@@ -48,6 +52,7 @@ self.onmessage = ({ data }) => {
       }
       self.postMessage({
         type: "update",
+        policy: policy.summary(),
         samples,
         cpuMs,
         rms: Math.sqrt(sum / data.samples.length),
@@ -55,12 +60,10 @@ self.onmessage = ({ data }) => {
         active: [...detector.active.values()]
           .filter((e) => e.decisionSample !== null)
           .map((e) => e.pitch),
-        events: detector.events
-          .slice(sent)
-          .map((e) => ({
-            ...e,
-            detectedAt: e.decisionSample / config.sampleRate,
-          })),
+        events: detector.events.slice(sent).map((e) => ({
+          ...e,
+          detectedAt: e.decisionSample / config.sampleRate,
+        })),
       });
       sent = detector.events.length;
       detector.frames.length = 0; // Frame scores are not an unbounded live recording.
@@ -72,7 +75,14 @@ self.onmessage = ({ data }) => {
         offset += chunk.length;
       }
       self.postMessage(
-        { type: "finished", pcm, config, events: detector.finish(), cpuMs },
+        {
+          type: "finished",
+          pcm,
+          config,
+          events: detector.finish(),
+          cpuMs,
+          policy: policy.summary(),
+        },
         [pcm.buffer],
       );
       chunks = [];

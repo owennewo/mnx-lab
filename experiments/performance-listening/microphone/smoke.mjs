@@ -13,8 +13,10 @@ fs.writeFileSync(
   input,
   wav(
     Float32Array.from(
-      { length: 44100 * 3 },
-      (_, i) => 0.2 * Math.sin((2 * Math.PI * 440 * i) / 44100),
+      { length: 44100 * 6 },
+      (_, i) =>
+        0.002 * Math.sin((2 * Math.PI * 110 * i) / 44100) +
+        (i < 44100 * 2.5 ? 0 : 0.2 * Math.sin((2 * Math.PI * 440 * i) / 44100)),
     ),
     44100,
   ),
@@ -72,6 +74,11 @@ try {
     };
   });
   assert.equal(result.notes.recipe, "F-006");
+  assert.equal(result.notes.microphonePolicy.calibrated, true);
+  assert.equal(result.notes.microphonePolicy.marginDb, 12);
+  assert.equal(result.notes.config.minFrames, 8);
+  assert.ok(result.notes.microphonePolicy.thresholdRms > 0.001);
+  assert.ok(result.notes.events.every((e) => e.decisionSample / 22050 > 2));
   assert.equal(result.rate, 22050);
   assert.ok(result.notes.events.some((e) => e.pitch === 69));
   assert.equal(
@@ -80,6 +87,8 @@ try {
   );
   assert.equal(await page.$eval("#record", (el) => el.disabled), false);
   await page.select("#recipe", "F-003");
+  await page.select("#noise", "0");
+  await page.select("#confirmation", "0");
   await page.click("#record");
   await page.waitForFunction(() =>
     document.querySelector("#status").textContent.startsWith("Recording —"),

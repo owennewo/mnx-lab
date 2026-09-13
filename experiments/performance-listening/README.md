@@ -47,8 +47,25 @@ is used: the pinned Basic Pitch npm distribution includes its model weights.
 
 Run `npm --prefix experiments/performance-listening run microphone`, then open
 http://127.0.0.1:5175/microphone/ (set `PORT` to choose another port). No existing benchmark
-outputs are needed. Press **Record microphone**, grant permission, and play. **Stop**
+outputs are needed. Press **Record microphone**, grant permission, and keep quiet for two seconds before playing. **Stop**
 releases the microphone and offers WAV playback/download and a JSON detection log.
+
+Microphone-only settings now default to a two-second background calibration with a +12 dB
+margin and 75 ms requested confirmation (eight frames, 81.3 ms from first to last evidence).
+The calibration takes the 90th percentile of full 4096-sample window RMS measurements,
+excluding startup padding. It sets a fixed take-level gate to max(−80 dBFS, background +
+margin). No notes are emitted during calibration; its audio remains in the WAV and event
+times retain the recording origin. This is an overall energy gate, not spectral noise
+subtraction or a calibrated probability. A constant hum above the gate can still mislead
+pitch detection. Playing during calibration can set the gate too high; restart to retry.
+
+Noise margins Off/6/12/18 dB and confirmation Original/50/75/100 ms can be varied independently
+between takes. Original restores two-frame confirmation; Off retains the original −80 dBFS
+floor. Longer confirmation requires consecutive qualifying pitch frames, including re-strikes;
+it may reject brief notes or unstable true pitches. It adds no FFT and does not validate
+harmonic attribution. No accuracy improvement on real guitar is claimed yet. JSON v2
+exports measured background, effective gate, actual confirmation span and browser AGC settings.
+The meter now covers −100…0 dBFS and reports numeric input and threshold levels.
 
 F-006 is preselected only on this experimental page; F-003 is available for another take.
 Production and benchmark defaults are unchanged. Current pitches and the newest 200

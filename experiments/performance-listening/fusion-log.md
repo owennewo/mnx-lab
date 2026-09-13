@@ -25,6 +25,7 @@ extra cost, but added false events and re-strike regression block adoption.
 
 | Technique | Evidence / disposition | Current lesson or question |
 |---|---|---|
+| [Microphone background gate](fusion-techniques/microphone-noise-gate.md) | Manual experiment; human trial pending | Reject room-level input before normalisation; independent from longer confirmation |
 | [Explicit fundamental evidence](fusion-techniques/fundamental-evidence.md) | F-006 measured; revise | Recovers all four missing passage bass attacks; extras and re-strikes still fail gates |
 | [Partial spectral whitening](fusion-techniques/spectral-whitening.md) | F-005 measured; revise | Recovers A2 and mixed A4; E2 remains missed; regressions/cost block adoption |
 | [Flexible harmonic model](fusion-techniques/flexible-harmonic-model.md) | Agreed experiment; untried | Tolerate weak fundamentals while preserving genuinely played higher notes |
@@ -56,6 +57,8 @@ failure when a later configuration works.
 | FL-009 · 2026-09-13 | [F-005 partial whitening: SW-001…003](fusion-techniques/spectral-whitening.md) | 252 development + 42 fresh; coverage improves, four-bar attacks 16→19/21; development extras/category regressions and +26.5% cost block adoption; keep optional |
 
 | FL-010 · 2026-09-13 | [F-006 fundamental evidence: FD-001…003](fusion-techniques/fundamental-evidence.md) | 294 development + 45 fresh; passage 16→20/21, fresh 66→77/96, cost ~unchanged; extra accusations and development re-strike regression block adoption |
+
+| FL-011 · 2026-09-13 | [Microphone-only noise calibration and longer confirmation](README.md#live-microphone-test) | Independent controls; default background +12 dB and 81 ms evidence span. Manual guitar assessment pending; frozen F-recipes unchanged |
 
 ## Candidate next experiments
 

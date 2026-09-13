@@ -1,3 +1,4 @@
+import { db } from "./policy.mjs";
 import captureURL from "./capture.mjs?url";
 const $ = (id) => document.getElementById(id);
 const rate = 22050,
@@ -26,6 +27,8 @@ function fail(s, message) {
   $("record").disabled = false;
   $("stop").disabled = true;
   $("recipe").disabled = false;
+  $("noise").disabled = false;
+  $("confirmation").disabled = false;
   $("status").textContent = message;
   $("active").textContent = "Not listening";
   $("level").value = 0;
@@ -92,11 +95,17 @@ $("record").onclick = async () => {
     lastPaint: 0,
     started: new Date().toISOString(),
     recipe: $("recipe").value,
+    options: {
+      marginDb: Number($("noise").value),
+      confirmationMs: Number($("confirmation").value),
+    },
   };
   session = s;
   $("record").disabled = true;
   $("stop").disabled = false;
   $("recipe").disabled = true;
+  $("noise").disabled = true;
+  $("confirmation").disabled = true;
   $("status").textContent = "Allow microphone access in your browser…";
   try {
     if (!navigator.mediaDevices?.getUserMedia || !window.AudioWorkletNode)
@@ -156,9 +165,11 @@ $("record").onclick = async () => {
         $("stream").replaceChildren();
         $("health").textContent = "";
         $("elapsed").textContent = "0:00";
-        $("device").textContent = track.label || "Default microphone";
-        $("status").textContent =
-          "Recording — pluck a note. Stop when you’re finished.";
+        $("device").textContent =
+          `${track.label || "Default microphone"} · Browser AGC: ${s.settings.autoGainControl === undefined ? "not reported" : s.settings.autoGainControl ? "ON" : "off"}`;
+        $("status").textContent = data.policy.calibrated
+          ? "Recording — pluck a note. Stop when you’re finished."
+          : "Measuring background — keep your guitar quiet for two seconds…";
         s.node = new AudioWorkletNode(s.context, "listening-capture");
         s.source = s.context.createMediaStreamSource(stream);
         s.node.port.onmessage = ({ data: pcm }) => {
@@ -180,6 +191,14 @@ $("record").onclick = async () => {
         };
       } else if (data.type === "update") {
         s.processed = data.samples;
+        if (!s.stopping) {
+          $("status").textContent = data.policy.calibrated
+            ? "Recording — pluck a note. Stop when you’re finished."
+            : `Measuring background — keep quiet (${data.policy.remainingSeconds.toFixed(1)} s)…`;
+          $("calibration").textContent = data.policy.calibrated
+            ? `${data.policy.noiseDb === null ? "Noise calibration off" : `Background ${data.policy.noiseDb.toFixed(1)} dBFS`} · Detection floor ${data.policy.thresholdDb.toFixed(1)} dBFS · Confirmation ${data.policy.confirmationSpanMs.toFixed(1)} ms (${data.policy.minFrames} frames)`
+            : "Measuring the room level; no notes are emitted during calibration.";
+        }
         for (const e of data.events) {
           const li = document.createElement("li"),
             time = document.createElement("time"),
@@ -195,16 +214,13 @@ $("record").onclick = async () => {
         if (!s.stopping && performance.now() - s.lastPaint > 80) {
           s.lastPaint = performance.now();
           $("elapsed").textContent = clock(data.samples / rate);
-          $("level").value = Math.max(
-            0,
-            (20 * Math.log10(Math.max(data.rms, 1e-8)) + 60) / 60,
-          );
+          $("level").value = Math.max(0, (db(data.rms) + 100) / 100);
           $("signal").textContent =
             data.peak >= 0.98
               ? "Clipping — move farther away"
-              : data.rms < 0.0001
-                ? "Very quiet / no input"
-                : "Signal received";
+              : data.rms < data.policy.thresholdRms
+                ? `Below detection floor · ${db(data.rms).toFixed(1)} dBFS`
+                : `Signal received · ${db(data.rms).toFixed(1)} dBFS`;
           $("active").replaceChildren(
             ...data.active
               .sort((a, b) => a - b)
@@ -216,7 +232,9 @@ $("record").onclick = async () => {
               }),
           );
           if (!data.active.length)
-            $("active").textContent = "No confirmed notes";
+            $("active").textContent = data.policy.calibrated
+              ? "No confirmed notes"
+              : "Measuring background…";
           $("health").textContent =
             `${Math.round(data.cpuMs / (data.samples / rate) / 10)}% processing time · ${Math.round(((s.received - s.processed) / rate) * 1000)} ms queued · latest 200 events shown`;
         }
@@ -237,13 +255,14 @@ $("record").onclick = async () => {
             [
               JSON.stringify(
                 {
-                  version: 1,
+                  version: 2,
                   recipe: s.recipe,
                   started: s.started,
                   sampleRate: rate,
                   duration: data.pcm.length / rate,
                   inputSettings: s.settings,
                   config: data.config,
+                  microphonePolicy: data.policy,
                   cpuMs: data.cpuMs,
                   events: data.events,
                 },
@@ -260,9 +279,15 @@ $("record").onclick = async () => {
           `${s.stopReason?.startsWith("Stopped.") ? "Stopped." : (s.stopReason ?? "Stopped.")} ${data.events.length} detected attacks. Listen back or download this take.`;
         $("record").disabled = false;
         $("recipe").disabled = false;
+        $("noise").disabled = false;
+        $("confirmation").disabled = false;
       }
     };
-    s.worker.postMessage({ type: "init", recipe: s.recipe });
+    s.worker.postMessage({
+      type: "init",
+      recipe: s.recipe,
+      options: s.options,
+    });
     s.watchdog = setTimeout(() => {
       if (!s.ready)
         fail(s, "The listener could not start. Please reload and try again.");

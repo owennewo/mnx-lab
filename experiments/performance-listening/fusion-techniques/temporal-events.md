@@ -105,3 +105,16 @@ initial experiments hold the frame and event rules fixed so improvements are att
 Future agreed timing experiments should vary analysis window length and hop size under
 a frozen pitch recipe. Frame rate and overlap follow from those two values; do not sweep
 them as independent knobs. No such timing trial was included in F-005.
+
+## Microphone-only confirmation trial
+
+The live microphone page now offers original two-frame confirmation or requested
+50/75/100 ms spans, rounded upward to 6/8/10 consecutive frames (58.0/81.3/104.5 ms
+from first to last evidence). This also applies to re-strikes; the FFT/window/hop and
+pitch thresholds are unchanged. A separate background-level gate can be enabled or
+bypassed independently. See [microphone configuration](../README.md#live-microphone-test).
+
+These are manual trial controls, not an accepted F-recipe or an accuracy result. Tests
+check delayed confirmation and cancellation of brief candidate evidence; a sustained
+wrong harmonic hypothesis can still pass. Short true notes, decays, re-strikes and
+unstable pitches may be lost. Re-evaluate recall alongside false detections.

@@ -147,8 +147,9 @@
     <div class="eyebrow">Listening bench · live experiment</div>
     <h1>Play a note. See what we hear.</h1>
     <p>
-      Press record, allow your microphone, then pluck a few notes or a chord.
-      Try open strings first: E2 · A2 · D3 · G3 · B3 · E4.
+      Press record, allow your microphone, and keep quiet for two seconds while
+      we measure the background. Then pluck a few notes or a chord. Try open
+      strings first: E2 · A2 · D3 · G3 · B3 · E4.
     </p>
     <section class="panel">
       <div class="controls">
@@ -162,6 +163,26 @@
           </select></label
         ><span id="elapsed">0:00</span>
       </div>
+      <div class="controls" style="margin-top: 14px">
+        <label
+          >Above background
+          <select id="noise">
+            <option value="0">Off (original floor)</option>
+            <option value="6">+6 dB</option>
+            <option value="12" selected>+12 dB</option>
+            <option value="18">+18 dB</option>
+          </select></label
+        >
+        <label
+          >Confirmation
+          <select id="confirmation">
+            <option value="0">Original (~12 ms)</option>
+            <option value="50">50 ms</option>
+            <option value="75" selected>75 ms</option>
+            <option value="100">100 ms</option>
+          </select></label
+        >
+      </div>
       <p id="status" role="status">
         Ready. Microphone access starts only when you press record.
       </p>
@@ -169,7 +190,9 @@
         <label>Input <meter id="level" min="0" max="1" value="0"></meter></label
         ><span id="signal">No input yet</span>
       </div>
-      <small id="device"></small>
+      <small id="device"></small><br /><small id="calibration"
+        >Two-second background calibration · longer confirmation enabled</small
+      >
     </section>
     <section class="panel">
       <h2>Detected now</h2>
@@ -202,6 +225,20 @@
         Recording and detection stay in this browser; nothing is uploaded. Each
         take is limited to five minutes. Download a take before starting another
         or closing the page.
+      </p>
+      <p>
+        Noise gating and longer confirmation are microphone experiments. The
+        gate uses the measured background level plus your chosen margin; it
+        stays fixed for each take. Restart to recalibrate if the room changes.
+        If you play during calibration, restart and keep quiet. Quiet notes and
+        short plucks may be missed. Change settings between takes; choose Off
+        and Original to compare the previous behaviour.
+      </p>
+      <p>
+        Confirmation is rounded up to whole analysis hops: 75 ms means 81 ms of
+        consecutive qualifying evidence. This is not total pluck-to-screen
+        latency. The input meter spans −100 to 0 dBFS; these are digital levels,
+        not room sound-pressure levels.
       </p>
       <p>
         The listener uses 22,050 Hz audio, a 186 ms analysis window and an 11.6
