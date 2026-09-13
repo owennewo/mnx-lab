@@ -20,6 +20,7 @@ import {
   emitTabClef,
   emitTabStaffLines,
   emitTabSystemHeader,
+  clearTabCapoTechniques,
   emitTabTimeSig,
   emitTabVoices,
   innerColumns
@@ -285,6 +286,7 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
   // Where each row's primitives begin — rows are emitted in order, so a row's
   // primitives are exactly the slice from its first measure onward.
   const rowStart: number[] = [];
+  let openingScoreText: Primitive[] = [];
   // Which bars declare a feel, and which of those are a change worth printing.
   const swingTimeline = resolveSwingTimeline(mnx.global.measures ?? []);
   for (let i = 0; i < numMeasures; i++) {
@@ -475,6 +477,7 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
     const gm = mnx.global.measures[writtenIndex(plan, i)] ?? {};
     // The text clears THIS ROW's ink only; the row above is tightenRows' job.
     if (!context || context.globalLabels) {
+    const scoreTextStart = primitives.length;
     emitHarmonies({ gm, m, stdSequences, staffTop, scan: primitives.slice(rowStart[m.row]), primitives });
     const tempoTop = emitTempoMark({
       gm, m, staffTop, scan: primitives.slice(rowStart[m.row]), primitives,
@@ -492,6 +495,7 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
       gm, m, staffTop, scan: primitives.slice(rowStart[m.row]),
       clearAbove: swingTop ?? tempoTop, primitives
     });
+    if (i === 0) openingScoreText = primitives.slice(scoreTextStart);
 
     }
 
@@ -543,6 +547,7 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
   // row actually needs. Emitted after, a bend arrow would hang off the page.
   if (hasTechniqueSites(technique)) {
     qualifyTechniques(technique, plan);
+    const techniqueStart = primitives.length;
     emitTabTechnique({
       sites: technique.sites,
       byNoteId: technique.byNoteId,
@@ -550,6 +555,8 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
       ink: plan.inkRatio,
       primitives
     });
+    const lift = clearTabCapoTechniques(primitives, primitives.slice(techniqueStart), plan.inkRatio);
+    if (lift) for (const p of openingScoreText) translatePrimitiveY(p, lift);
   }
 
   // Verse rows last, still before the frame is fitted: they are ink the fit

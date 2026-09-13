@@ -7,6 +7,8 @@ import {
   resolveEventPositions,
   TabPositionContext
 } from '../tab/guitarPositions.ts';
+import { inkEdgesSp } from '../render/bounds.ts';
+import { COHESION_CLEAR_SP } from './scoreText.ts';
 import { Primitive, SpatialIndex } from '../primitives.ts';
 import { noteKeyAt } from '../../model/noteWalk.ts';
 import { type AccidentalResolver, CORE_SP, EventSlot, GRACE_NOTE_ADVANCE_SP, tupletColumns } from './spacing.ts';
@@ -188,6 +190,39 @@ export function emitTabSystemHeader(
       className: 'tab-tuning-letter'
     });
   }
+}
+
+/** Clear setup text against techniques emitted after the note walk. Returns
+ * the lift so the standalone tab host can keep its existing score-text stack
+ * above the capo; the combined host places score text after this pass. */
+export function clearTabCapoTechniques(
+  primitives: readonly Primitive[], marks: readonly Primitive[], ink: number
+): number {
+  let lift = 0;
+  for (const capo of primitives) {
+    if (capo.kind !== 'text' || capo.className !== 'tab-capo') continue;
+    const box = inkEdgesSp(capo);
+    const left = capo.x + (box.left - capo.x) * ink;
+    const right = capo.x + (box.right - capo.x) * ink;
+    let bottom = box.bottom;
+    // Keep the old position when the technique is elsewhere (another string,
+    // system, or staff). Only marks touching this label's clearance move it.
+    for (let pass = 0; pass <= marks.length; pass++) {
+      const previous = bottom;
+      for (const mark of marks) {
+        const edge = inkEdgesSp(mark);
+        if (edge.right < left || edge.left > right) continue;
+        const top = bottom - (box.bottom - box.top);
+        if (edge.bottom < top - COHESION_CLEAR_SP || edge.top > bottom + COHESION_CLEAR_SP) continue;
+        bottom = Math.min(bottom, edge.top - COHESION_CLEAR_SP);
+      }
+      if (bottom === previous) break;
+    }
+    const dy = bottom - box.bottom;
+    capo.y += dy;
+    lift = Math.min(lift, dy);
+  }
+  return lift;
 }
 
 // ---------- Prefix emission ----------

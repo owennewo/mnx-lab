@@ -106,6 +106,7 @@ import {
   emitTabClef,
   emitTabStaffLines,
   emitTabSystemHeader,
+  clearTabCapoTechniques,
   emitTabTimeSig,
   emitTabVoices
 } from './tabStaff.ts';
@@ -2187,6 +2188,7 @@ function assembleSegment(
   for (const td of tabDisplays) {
     if (!hasTechniqueSites(td.technique)) continue;
     qualifyTechniques(td.technique, plan);
+    const techniqueStart = primitives.length;
     emitTabTechnique({
       sites: td.technique.sites,
       byNoteId: td.technique.byNoteId,
@@ -2194,6 +2196,7 @@ function assembleSegment(
       ink: plan.inkRatio,
       primitives
     });
+    clearTabCapoTechniques(primitives, primitives.slice(techniqueStart), plan.inkRatio);
   }
   const notationTechnique = collectNotationTechnique(segment, plan, curveAnchors, staffTopOf);
   if (hasTechniqueSites(notationTechnique)) {
