@@ -172,10 +172,37 @@ describe('unsupported or invalid maps produce reasons rather than fabricated pos
     for (const points of [[[0, 0], [1, 2], [0, 4]], [[0, 0], [1, 3], [2, 2]]])
       expect(diagnostic(createRecordingSync(points, { performance, writtenBarDurations }, passes))).toBe('nonsequential-sync');
   });
-  it('checks actual bar references, not array length', () => {
+  it('requires at least two in-range points after dropping beyond-boundary anchors', () => {
     const { performance, writtenBarDurations, passes } = compiled();
-    expect(diagnostic(createRecordingSync([[0, 0], [3, 4]], { performance, writtenBarDurations }, passes))).toBe('out-of-range');
-    expect(diagnostic(createRecordingSync([[0, 0], [2, 4, 1]], { performance, writtenBarDurations }, passes))).toBe('out-of-range');
+    expect(diagnostic(createRecordingSync([[0, 0], [3, 4]], { performance, writtenBarDurations }, passes))).toBe('no-sync');
+    expect(diagnostic(createRecordingSync([[0, 0], [2, 4, 1]], { performance, writtenBarDurations }, passes))).toBe('no-sync');
+  });
+  it('drops only anchors beyond the final performed boundary and preserves source evidence', () => {
+    const c = compiled();
+    const raw = [[0, 1], [1, 5], [2, 9], [2, 10, 1], [3, 12]];
+    const before = JSON.stringify(raw);
+    const result = createRecordingSync(raw, c, c.passes);
+    const map = unwrap(result);
+    expect(result.droppedPointIndices).toEqual([3, 4]);
+    expect(map.coverage).toBe('full');
+    expect(unwrap(map.secondsAt(pos(1, q(1n, 2n))))).toBe(7);
+    expect(unwrap(map.positionAt(7)).position).toEqual(pos(1, q(1n, 2n)));
+    expect(map.source.raw).toEqual(raw);
+    expect(JSON.stringify(raw)).toBe(before);
+    expect(diagnostic(map.positionAt(10))).toBe('outside-coverage');
+  });
+  it('keeps partial coverage and rejects invalid retained ordering after dropping', () => {
+    const c = compiled();
+    const partial = createRecordingSync([[0, 1], [1, 5], [3, 12]], c, c.passes);
+    expect(unwrap(partial).coverage).toBe('partial');
+    expect(partial.droppedPointIndices).toEqual([2]);
+    const bad = createRecordingSync([[0, 1], [3, 12], [1, 0]], c, c.passes);
+    expect(diagnostic(bad)).toBe('nonsequential-sync');
+    if (!bad.ok) expect(bad.diagnostic.point).toBe(2);
+    const empty = createRecordingSync([[3, 1], [4, 5]], c, c.passes);
+    expect(diagnostic(empty)).toBe('no-sync');
+    expect(empty.droppedPointIndices).toEqual([0, 1]);
+    expect(bind([[0, 1], [1, 9, 480], [3, 12]]).coverage).toBe('full');
   });
   it('rejects unknown or truncated traversals and mismatched identity', () => {
     const { performance, writtenBarDurations, passes } = compiled();

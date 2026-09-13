@@ -517,9 +517,14 @@ export class Player extends LitElement {
     } else if (changed.has('initialOrdinal') && this.initialOrdinal !== null)
       this.seek(this.initialOrdinal);
     if (!reinstall && changed.has('recordings') && this.session) {
-      const id = this.youtubeRequest ?? this.session.backend.id;
+      const id = this.session.backend.id;
       this.session.pause();
-      if (id !== 'synth') void this.selectSource(this.recordings.some(r => r.id === id) ? id : 'synth', true);
+      // A pending consent prompt does not own the audible backend yet. Refresh
+      // its active mapping too, without dismissing or accepting that prompt.
+      if (this.youtubeRequest) {
+        if (id !== 'synth') void this.session.select(this.recordings.some(r => r.id === id) ? id : 'synth', true);
+        if (!this.recordings.some(r => r.id === this.youtubeRequest)) void this.selectSource('synth');
+      } else if (id !== 'synth') void this.selectSource(this.recordings.some(r => r.id === id) ? id : 'synth', true);
     }
     if (!reinstall && changed.has('voicePreset') && this.session?.backend instanceof SynthBackend) {
       const resume = this.playback?.wantsPlayback;

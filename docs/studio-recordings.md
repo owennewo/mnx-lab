@@ -10,7 +10,10 @@ The selected recording can be renamed or deleted (with a named confirmation).
 Deletion returns playback to Synth and closes the panel. YouTube details include the
 full clickable URL. The panel displays read-only sync-point count, start and end
 locations (1-based performed bars, fractional bar position, and absolute media
-seconds), plus coverage diagnostics. Empty or invalid mappings are explained as sync warnings in this panel, including
+seconds), plus coverage diagnostics. Out-of-range sync points are dropped from the runtime map; the panel reports the
+number dropped and shows the count and bounds of points still in use. Remaining
+valid anchors continue to align playback. Stored timings are unchanged.
+Empty or invalid remaining mappings are explained as sync warnings in this panel, including
 live alignment diagnostics from the player. These warnings do not appear in the
 Studio playback tray or disable Play: an explicit Play starts unaligned media from
 its beginning. Actual media-loading errors remain visible beside playback controls.

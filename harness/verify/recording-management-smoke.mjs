@@ -58,10 +58,10 @@ try {
     const check=(v,m)=>{if(!v)throw new Error(m)},delay=ms=>new Promise(r=>setTimeout(r,ms));
     const page=document.querySelector('mnx-studio').shadowRoot.querySelector('mnx-studio-piece'),player=page.shadowRoot.querySelector('mnx-player');check(!!player.performance,'Score did not load');
     const sheet=()=>page.shadowRoot.querySelector('mnx-studio-recordings');
-    const select=async id=>{const el=player.shadowRoot.querySelector('[aria-label="Playback source"]');el.value=id;el.dispatchEvent(new Event('change',{bubbles:true}));await delay(150);await page.updateComplete;await sheet()?.updateComplete;};
+    const select=async id=>{const el=player.shadowRoot.querySelector('[aria-label="Playback source"]');el.value=id;el.dispatchEvent(new Event('change',{bubbles:true}));await delay(150);await page.updateComplete;await sheet()?.updateComplete;for(let i=0;i<100&&player.playback.loading;i++)await delay(50);};
     const input=async(label,value,type='input')=>{const el=sheet().shadowRoot.querySelector('[aria-label="'+label+'"]');el.value=value;el.dispatchEvent(new Event(type,{bubbles:true}));await sheet().updateComplete;};
     const button=text=>[...sheet().shadowRoot.querySelectorAll('button')].find(b=>b.textContent.trim()===text);
-    const saved=async n=>{for(let i=0;i<120;i++){await delay(50);if(page.snapshot.recordings.length===n&&!sheet()?.busy)break;}check(page.snapshot.recordings.length===n&&!sheet()?.error,sheet()?.error||'Recording did not save');};
+    const saved=async n=>{for(let i=0;i<120;i++){await delay(50);if(page.snapshot.recordings.length===n&&!sheet()?.busy&&!player.playback.loading)break;}check(page.snapshot.recordings.length===n&&!sheet()?.error,sheet()?.error||'Recording did not save');};
     check(!page.shadowRoot.querySelector('[slot=source-tools]'),'Synth has recording details');
     await select('add-recording');check(!!sheet(),'Empty library cannot add');
     check(player.sourceId==='synth','Add action changed playback source');
@@ -82,12 +82,14 @@ try {
     check(!sheet().shadowRoot.textContent.includes('YouTube take'),'Panel lists other recordings');
     await player.play();await delay(150);check(player.playback.state==='playing','Uploaded audio did not play');player.pause();
     // Out-of-range sync is a panel warning, never a playback-blocking alert.
-    await page.client.saveRecording('piece',audioId,page.snapshot.piece.revision,{name:'Uploaded take',rawSync:[[999,1],[1000,6]]});
+    await page.client.saveRecording('piece',audioId,page.snapshot.piece.revision,{name:'Uploaded take',rawSync:[[0,1],[1,6],[2,11],[999,12],[1000,13]]});
     await page.refreshSnapshot();await select(youtubeId);await select(audioId);
-    check(sheet().shadowRoot.textContent.includes('Sync warning:')&&sheet().shadowRoot.textContent.includes('beyond the performed score boundary'),'Missing panel sync warning');
+    check(sheet().shadowRoot.textContent.includes('Sync warning:')&&sheet().shadowRoot.textContent.includes('2 out-of-range sync points dropped'),'Missing panel sync warning');
     check(!player.shadowRoot.querySelector('[role="alert"]')&&!player.shadowRoot.textContent.includes('Score follow:'),'Sync warning leaked into playback tray');
     const play=player.shadowRoot.querySelector('[aria-label="Play"]');check(!play.disabled,'Sync warning disabled Play');play.click();await delay(200);
-    check(player.playback.state==='playing','Normal Play did not start unaligned recording');player.pause();
+    check(player.playback.state==='playing','Normal Play did not start recording');
+    check(await player.seekScorePosition({ordinal:1,metricOffset:{num:0n,den:1n}}),'Retained sync points cannot seek');
+    check(Math.abs(player.playback.mediaTime-6)<.1&&player.playback.scorePosition?.ordinal===1,'Retained alignment does not follow recording');player.pause();
     // An operator import supplies timings; the panel only reads them.
     await page.client.saveRecording('piece',audioId,page.snapshot.piece.revision,{name:'Uploaded take',rawSync:[[0,1],[1,6,240],[2,11]]});
     await page.refreshSnapshot();await select(youtubeId);check(sheet().recordingId===youtubeId,'Selection did not change details');await select(audioId);

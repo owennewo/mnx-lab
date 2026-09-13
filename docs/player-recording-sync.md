@@ -63,8 +63,8 @@ seconds retain their input number precision.
 `coverage: 'full'` means the final boundary of this supplied traversal is anchored.
 `'partial'` means some ending interval is unanchored. Neither proves that the recording
 and score have identical repeat structures. Missing anchors can conceal differences;
-point-count equality cannot validate correspondence. Out-of-range bar references are
-rejected. True partial navigation visits are unsupported, with an explicit reason,
+point-count equality cannot validate correspondence. Anchors beyond the final score boundary are excluded from playback alignment and
+reported through `droppedPointIndices`; all original tuples remain in `map.source`. True partial navigation visits are unsupported, with an explicit reason,
 until correspondence to Soundslice's whole-bar coordinates is established. Full-bar
 D.S./Fine boundaries are accepted because compiler metadata distinguishes them from
 partial stops. The caller must not pair an unrelated compilation and traversal.
@@ -125,3 +125,10 @@ byte-identical; no verification record or approval obligation is added.
 [Item 16](../roadmap/complete/core-player-recording-playback.md) consumes this map for
 HTML media playback and source switching. A real media clock must drive `positionAt`;
 running the synth clock silently beside it would violate this contract.
+
+Sync points beyond the final performed score boundary are dropped from the runtime
+map, with original indices reported in `droppedPointIndices`. The original source
+remains intact. The exact final boundary is retained, including an offset of 480
+on the last performed bar. At least two valid in-range points are still required;
+ordering, ambiguity and traversal checks remain in force. Dropping points never
+extrapolates a missing final interval.

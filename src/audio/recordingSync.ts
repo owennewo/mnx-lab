@@ -36,7 +36,7 @@ export interface RecordingSyncMap {
   /** An interior synthetic hold/grace has no uniquely measured recording time. */
   fromPerformance(position: Rational): RecordingSyncResult<RecordingScorePosition>;
 }
-interface Anchor { point: RecordingSyncpoint; coordinate: Rational; seconds: Rational }
+interface Anchor { sourceIndex: number; point: RecordingSyncpoint; coordinate: Rational; seconds: Rational }
 class SyncFailure extends Error {
   constructor(readonly diagnostic: RecordingSyncDiagnostic) { super(diagnostic.message); }
 }
@@ -67,13 +67,15 @@ const numberOf = (value: Rational) => Number(value.num) / Number(value.den);
 
 /** Bind to the exact compilation and traversal. Partial visits are unsupported
  *  until Soundslice correspondence is known; full-bar jumps remain supported.
- *  No supplied arrays are sorted, repaired or retained as mutable live state. */
+ *  Out-of-range anchors are excluded from the map, never removed from source evidence.
+ *  Retained anchors are neither sorted nor repaired. */
 export function createRecordingSync(
   input: unknown, compiled: CompiledPerformance, passes: PassModel,
-): RecordingSyncResult<RecordingSyncMap> {
+): RecordingSyncResult<RecordingSyncMap> & { readonly droppedPointIndices: readonly number[] } {
+  const droppedPointIndices: number[] = [];
   const decoded = decodeRecordingSync(input);
-  if (!decoded.ok) return decoded;
-  return attempt(() => {
+  if (!decoded.ok) return { ...decoded, droppedPointIndices: Object.freeze(droppedPointIndices) };
+  const result = attempt(() => {
     const source = decoded.value;
     const { performance, writtenBarDurations } = compiled;
     if (source.points.length < 2) fail('no-sync', 'At least two anchors are needed for a recording interval.');
@@ -98,22 +100,22 @@ export function createRecordingSync(
         fail('invalid-traversal', 'Performance and traversal bounds disagree.');
     });
     const endCoordinate = rational(BigInt(count));
-    const anchors: Anchor[] = source.points.map((point, i) => {
+    const anchors: Anchor[] = source.points.flatMap((point, i) => {
+      if (point.bar > count || (point.bar === count && point.offset > 0)) { droppedPointIndices.push(i); return []; }
       const coordinate = add(rational(BigInt(point.bar)), divide(fromDecimal(point.offset), rational(480n)));
-      if (compare(coordinate, endCoordinate) > 0)
-        fail('out-of-range', 'Syncpoint lies beyond the performed score boundary.', i);
-      return { point, coordinate, seconds: fromDecimal(point.seconds) };
+      return [{ sourceIndex: i, point, coordinate, seconds: fromDecimal(point.seconds) }];
     });
+    if (anchors.length < 2) fail('no-sync', 'At least two in-range sync points are needed for score alignment.');
     if (compare(anchors[0].coordinate, ZERO) !== 0)
-      fail('invalid-sync', 'The first syncpoint must identify the start of performed bar zero.', 0);
+      fail('invalid-sync', 'The first syncpoint must identify the start of performed bar zero.', anchors[0].sourceIndex);
     for (let i = 1; i < anchors.length; i++) {
       const before = anchors[i - 1], current = anchors[i];
       const timeOrder = compare(current.seconds, before.seconds);
       const scoreOrder = compare(current.coordinate, before.coordinate);
       if (timeOrder < 0 || scoreOrder < 0)
-        fail('nonsequential-sync', 'Backwards times or score positions are unsupported; raw syncpoints are preserved.', i);
+        fail('nonsequential-sync', 'Backwards times or score positions are unsupported; raw syncpoints are preserved.', current.sourceIndex);
       if (timeOrder === 0 || scoreOrder === 0)
-        fail('ambiguous-sync', 'Duplicate times or musical positions do not define a unique bidirectional map.', i);
+        fail('ambiguous-sync', 'Duplicate times or musical positions do not define a unique bidirectional map.', current.sourceIndex);
     }
     const first = anchors[0], last = anchors[anchors.length - 1];
     const scoreAt = (coordinate: Rational): RecordingScorePosition => {
@@ -192,4 +194,5 @@ export function createRecordingSync(
     };
     return Object.freeze(map);
   });
+  return { ...result, droppedPointIndices: Object.freeze(droppedPointIndices) };
 }

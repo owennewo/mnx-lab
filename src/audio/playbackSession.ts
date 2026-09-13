@@ -49,7 +49,7 @@ export class PlaybackSession {
     const before = this.snapshot;
     let next: PlaybackBackend;
     try { next = this.factory(id); }
-    catch (error) { this.pause(); this.alignmentIssue = undefined; this.alignmentIssue = undefined; this.issue = error instanceof Error ? error.message : String(error); this.notify(); return false; }
+    catch (error) { this.pause(); this.alignmentIssue = undefined; this.issue = error instanceof Error ? error.message : String(error); this.notify(); return false; }
     if (!this.selecting && !(replace && this.needsStart)) {
       this.target = { position: before.scorePosition, problem: before.syncIssue };
       this.handoffRate = before.rate; this.handoffVolume = before.volume;

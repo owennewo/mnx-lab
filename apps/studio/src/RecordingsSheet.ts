@@ -62,7 +62,8 @@ export class RecordingsSheet extends LitElement {
       const decoded = decodeRecordingSync(raw);
       if (!decoded.ok) return { points: [], message: decoded.diagnostic.message, warning: true };
       const mapped = this.compiled?.ok && this.passes ? createRecordingSync(raw, this.compiled, this.passes) : null;
-      return { points: decoded.value.points, warning: !mapped?.ok, message: mapped?.ok
+      const dropped = new Set(mapped?.droppedPointIndices ?? []);
+      return { points: decoded.value.points.filter((_, i) => !dropped.has(i)), dropped: dropped.size, warning: !mapped?.ok, message: mapped?.ok
         ? `${mapped.value.coverage === 'full' ? 'Full' : 'Partial'} score coverage.`
         : mapped ? mapped.diagnostic.message : 'Score timing is unavailable.' };
     } catch { return { points: [], message: 'Stored sync points could not be read.', warning: true }; }
@@ -125,8 +126,9 @@ export class RecordingsSheet extends LitElement {
           ${!this.editing ? html`<label>Source<select aria-label="Recording type" .value=${this.kind} @change=${(e: Event) => { this.changed(); this.kind = (e.target as HTMLSelectElement).value; }}><option value="youtube">YouTube link</option><option value="audio">Audio file</option></select></label>
             ${this.kind === 'youtube' ? html`<label>YouTube URL<input aria-label="YouTube URL" .value=${this.video} @input=${(e: Event) => { this.changed(); this.video = (e.target as HTMLInputElement).value; }}></label>` : html`<p class="hint">MP3, M4A, WAV, Ogg or FLAC, up to 64 MiB. Playback depends on your browser's codec support. Retry restarts the transfer; no partial recording is attached.</p><label>Audio file<input aria-label="Audio file" type="file" accept=".mp3,.m4a,.wav,.ogg,.flac" @change=${(e: Event) => { this.changed(); this.file = (e.target as HTMLInputElement).files?.[0] ?? null; }}></label>`}` : html`${this.sourceLink(this.editing)}<p class="hint">${this.editing.kind === 'youtube' ? 'YouTube recording' : 'Audio recording'}</p>`}
           <strong>Sync points</strong>
-          <dl aria-label="Sync point statistics"><dt>Count</dt><dd>${sync.points.length}</dd><dt>Start location</dt><dd>${this.location(sync.points[0])}</dd><dt>End location</dt><dd>${this.location(sync.points.at(-1))}</dd></dl>
+          <dl aria-label="Sync point statistics"><dt>Count in use</dt><dd>${sync.points.length}</dd><dt>Start location</dt><dd>${this.location(sync.points[0])}</dd><dt>End location</dt><dd>${this.location(sync.points.at(-1))}</dd></dl>
           <p class="hint">Locations count performed bars, including repeats, starting at 1. Times are measured from the start of the recording.</p>
+          ${sync.dropped ? html`<div class="diagnostic" role="status"><strong>Sync warning:</strong> ${sync.dropped} out-of-range sync ${sync.dropped === 1 ? 'point dropped' : 'points dropped'}. Original timings are preserved.</div>` : nothing}
           <div class="diagnostic" role="status">${this.syncWarning || sync.warning ? html`<strong>Sync warning:</strong> ${this.syncWarning || sync.message} You can still play this recording; score following and score seeking may be unavailable.` : sync.message}</div>
           <button ?disabled=${!this.name.trim()} @click=${this.save}>${this.editing ? 'Save changes' : 'Attach recording'}</button>
           ${this.editing ? html`<button @click=${() => this.removing = this.editing!.id}>Delete recording</button>
