@@ -50,6 +50,7 @@ export class Player extends LitElement {
   private session?: PlaybackSession;
   private revision = 0;
   private youtubeAccepted = false;
+  @state() private externalVideo = false;
   @state() private youtubeRequest: string | null = null;
   @state() private youtubeNotice = false;
   private lastUpdate = '';
@@ -545,11 +546,16 @@ export class Player extends LitElement {
       const sync = this.document && this.writtenBarDurations
         ? createRecordingSync(source.syncpoints, { performance, writtenBarDurations: this.writtenBarDurations }, linearizePasses(this.document)) : null;
       const media = source.kind === 'audio' ? new HtmlAudioPort(source.media) : new NativeYouTubePort(youtubeVideoId(source.video), async () => {
-        this.dispatchEvent(new CustomEvent('video-region-changed', { bubbles: true, composed: true }));
+        // A surrounding score frame supplies a stable mount before iframe creation.
+        // Standalone players retain their own inline surface.
+        const region: { mount?: Promise<HTMLElement> } = {};
+        this.dispatchEvent(new CustomEvent('video-region-changed', { detail: region, bubbles: true, composed: true }));
+        this.externalVideo = !!region.mount;
+        const external = await region.mount;
         await this.updateComplete;
         await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
         if (revision !== this.revision || this.sourceId !== id) throw new Error('YouTube selection cancelled.');
-        const container = this.renderRoot.querySelector<HTMLElement>('.youtube-surface');
+        const container = external ?? this.renderRoot.querySelector<HTMLElement>('.youtube-surface');
         if (!container) throw new Error('Show the YouTube video region before loading.');
         return container;
       });
@@ -931,7 +937,7 @@ export class Player extends LitElement {
         ${this.youtubeRequest ? html`<button @click=${() => void this.acceptYouTube()}>Agree and load YouTube</button><button @click=${() => { this.youtubeRequest = null; this.youtubeNotice = false; }}>Cancel</button>` : html`<button @click=${() => this.youtubeNotice = false}>Close notice</button>`}
       </section>` : nothing}
       ${this.status?.kind === 'youtube' ? html`<section class="youtube-panel" aria-label="YouTube recording">
-        <div class="youtube-surface"></div>
+        ${this.externalVideo ? nothing : html`<div class="youtube-surface"></div>`}
         <p>YouTube · <button @click=${() => this.youtubeNotice = !this.youtubeNotice}>Terms and privacy</button> · <button @click=${() => { this.pause(); void this.selectSource('synth'); }}>Close video</button></p>
       </section>` : nothing}
       ${this.loading

@@ -37,16 +37,23 @@ while retaining the intended handoff position. Native YouTube Play/Pause control
 also update the shared playback state.
 
 `ScoreFrame` now ships in both embed formats as well as the library. A frame opens its
-player strip when a YouTube source/notice is selected. The video lives in that strip,
-outside the score's scroll container. Collapsing pauses video; pressing Play from the
+player strip when a YouTube source/notice is selected. The video lives in a separate pane to the left of the score,
+outside the score's scroll container. Drag its divider to resize from 200 pixels to
+75% of the frame width. The focused divider also accepts Left/Right (20-pixel steps)
+and Home/End (minimum/maximum). The iframe stays mounted while resizing, with a
+minimum 200 × 200 viewport. Pointer dragging pauses playback and temporarily releases
+the iframe pointer target, so crossing the video cannot swallow the drag. Releasing
+the divider restores native interaction; Play resumes from the same position. Very narrow hosts below 267 pixels cannot satisfy both
+limits; the 200-pixel minimum takes precedence, and visibility checks still apply.
+Standalone players retain their inline video region. Collapsing pauses video; pressing Play from the
 collapsed grip first opens the strip. Standalone hosts must supply enough visible
 space and avoid clipping/covering the iframe. Small viewports with insufficient space
 cannot start playback until the entire minimum viewport can be shown.
 
 ## Visibility, clock and capabilities
 
-The iframe is normally 480 × 270 CSS pixels; narrow layouts keep both dimensions at
-least 200. Its native controls, branding, ads and fullscreen controls remain enabled.
+The frame initially reserves 320 pixels for video; a standalone player uses up to
+480 × 270 CSS pixels. Both layouts keep each iframe dimension at least 200. Its native controls, branding, ads and fullscreen controls remain enabled.
 Our controls are outside the iframe. Browser visibility checks include document
 visibility, composed ancestors, full viewport bounds and hit-testing for obscuring
 content. Hidden tabs, collapsed trays, offscreen/clipped frames or overlays pause

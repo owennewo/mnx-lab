@@ -93,6 +93,37 @@ export class ScoreFrame extends LitElement {
   /** Which strip is drawn out — the host's to pin (see the note above). */
   @property({ type: Boolean, attribute: 'top-open' }) topOpen = false;
   @property({ type: Boolean, attribute: 'bottom-open' }) bottomOpen = false;
+  @state() private videoOpen = false;
+  @state() private videoWidth = 320;
+  private videoObserver: ResizeObserver | null = null;
+  private get videoMaximum() { return Math.max(200, this.clientWidth * 0.75); }
+  private resizeVideo(width: number) { this.videoWidth = Math.max(200, Math.min(this.videoMaximum, width)); }
+  private readonly dragVideo = (event: PointerEvent) => {
+    if (event.button !== 0) return;
+    event.preventDefault();
+    const divider = event.currentTarget as HTMLElement;
+    // Cross-origin iframe hit-testing can swallow captured pointer moves.
+    // Suspend its pointer target only for the active drag, without an overlay.
+    this.player?.pause();
+    const video = this.renderRoot.querySelector<HTMLIFrameElement>('.video-surface iframe');
+    if (video) video.style.pointerEvents = 'none';
+    divider.setPointerCapture(event.pointerId);
+    const start = event.clientX, width = this.videoWidth;
+    const move = (e: PointerEvent) => this.resizeVideo(width + e.clientX - start);
+    const end = () => {
+      if (video) video.style.pointerEvents = '';
+      divider.removeEventListener('pointermove', move);
+      divider.removeEventListener('lostpointercapture', end);
+    };
+    divider.addEventListener('pointermove', move);
+    divider.addEventListener('lostpointercapture', end);
+  };
+  private readonly resizeVideoKey = (event: KeyboardEvent) => {
+    const width = event.key === 'Home' ? 200 : event.key === 'End' ? this.videoMaximum
+      : event.key === 'ArrowLeft' ? this.videoWidth - 20 : event.key === 'ArrowRight' ? this.videoWidth + 20 : null;
+    if (width === null) return;
+    event.preventDefault(); this.resizeVideo(width);
+  };
   @state() private pad: Pad = null;
   @state() private playing = false;
   @state() private positionText = '';
@@ -137,7 +168,14 @@ export class ScoreFrame extends LitElement {
          inside, so the grips sit on the pane's edges rather than the
          document's. Bottom padding keeps the last system scrollable out from
          under the playback grip. */
+      .workspace { display: flex; flex: 1 1 auto; min-height: 0; min-width: 0; }
+      .video-pane { flex: none; min-width: 200px; overflow: auto; }
+      .video-surface { width: 100%; height: min(100%, var(--video-height)); min-height: 200px; }
+      .video-divider { flex: 0 0 8px; cursor: col-resize; touch-action: none; background: var(--frame-ground); }
+      .video-divider:hover, .video-divider:focus-visible { background: var(--ink-muted); outline: 2px solid var(--ink); outline-offset: -2px; }
+      .video-pane[hidden], .video-divider[hidden] { display: none; }
       .pane {
+        min-width: 0;
         position: relative;
         flex: 1 1 auto;
         min-height: 0;
@@ -517,12 +555,23 @@ export class ScoreFrame extends LitElement {
   private readonly onPlayback = (event: Event) => {
     const detail = (event as CustomEvent<PlaybackUpdate>).detail;
     this.playing = detail.playing === true;
+    this.videoOpen = this.player?.playback?.kind === 'youtube';
     this.refreshReadout(detail.ordinal);
   };
 
-  private readonly onVideo = () => { this.setBottom(true); };
+  private readonly onVideo = (event: Event) => {
+    this.setBottom(true);
+    const region = (event as CustomEvent<{ mount?: Promise<HTMLElement> } | undefined>).detail;
+    if (!region) return; // Consent still appears in the playback strip.
+    this.videoOpen = true;
+    this.resizeVideo(this.videoWidth);
+    region.mount = this.updateComplete.then(() => this.renderRoot.querySelector<HTMLElement>('.video-surface')!);
+  };
 
-  private readonly onPosition = () => this.refreshReadout(this.player?.scorePosition?.ordinal ?? null);
+  private readonly onPosition = () => {
+    this.videoOpen = this.player?.playback?.kind === 'youtube';
+    this.refreshReadout(this.player?.scorePosition?.ordinal ?? null);
+  };
 
   private readonly onPerformance = () => this.refreshReadout(null);
 
@@ -532,6 +581,8 @@ export class ScoreFrame extends LitElement {
     this.addEventListener('performance-changed', this.onPerformance);
     this.addEventListener('playback-position', this.onPosition);
     this.addEventListener('video-region-changed', this.onVideo);
+    this.videoObserver = new ResizeObserver(() => { this.resizeVideo(this.videoWidth); this.requestUpdate(); });
+    this.videoObserver.observe(this);
   }
 
   disconnectedCallback() {
@@ -539,6 +590,8 @@ export class ScoreFrame extends LitElement {
     this.removeEventListener('performance-changed', this.onPerformance);
     this.removeEventListener('playback-position', this.onPosition);
     this.removeEventListener('video-region-changed', this.onVideo);
+    this.videoObserver?.disconnect();
+    this.videoObserver = null;
     document.removeEventListener('pointerdown', this.onClickAway);
     super.disconnectedCallback();
   }
@@ -800,6 +853,14 @@ export class ScoreFrame extends LitElement {
   render() {
     return html`
       ${this.topOpen ? this.topStrip() : nothing}
+      <div class="workspace">
+        <aside class="video-pane" aria-label="YouTube video" ?hidden=${!this.videoOpen}
+          style="width: ${this.videoWidth}px; --video-height: ${Math.max(200, this.videoWidth * 9 / 16)}px">
+          <div class="video-surface"></div>
+        </aside>
+        <div class="video-divider" role="separator" tabindex="0" aria-label="Video pane width" aria-orientation="vertical"
+          aria-valuemin="200" aria-valuemax=${Math.round(this.videoMaximum)} aria-valuenow=${Math.round(this.videoWidth)}
+          ?hidden=${!this.videoOpen} @pointerdown=${this.dragVideo} @keydown=${this.resizeVideoKey}></div>
       <div class="pane">
         <div class="score"><slot></slot></div>
         ${this.topOpen ? nothing : this.topGrip()}
@@ -807,6 +868,7 @@ export class ScoreFrame extends LitElement {
         ${this.hasPerformance && !this.bottomOpen
           ? html`<div class="progress" aria-hidden="true"><div style="width: ${this.progress * 100}%"></div></div>`
           : nothing}
+      </div>
       </div>
       ${this.bottomOpen ? this.bottomStrip() : nothing}
       <!-- The player is the host's light-DOM child in both poses: unmounting

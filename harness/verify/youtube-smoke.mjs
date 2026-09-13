@@ -52,8 +52,8 @@ try{
  const wait=async(expr,seconds=20)=>{for(let i=0;i<seconds*10;i++){if(await c.evaluate(expr))return;await new Promise(r=>setTimeout(r,100));}throw new Error('Timed out: '+expr+'; '+await c.evaluate(`JSON.stringify({issue:test.player.playback?.issue,error:test.player.shadowRoot.textContent.slice(-800)})`));};
  await c.send('Emulation.setDeviceMetricsOverride',{width:1024,height:900,deviceScaleFactor:1,mobile:false});
  await c.send('Page.navigate',{url:`http://127.0.0.1:${server.address().port}/`});await wait('window.test?.ready');
- await c.evaluate(`test.player.seek(1);const rate=test.player.shadowRoot.querySelector('[aria-label="Playback rate"]');rate.value='1.5';rate.dispatchEvent(new Event('input'));test.player.selectSource('youtube')`);await wait(`!!test.player.shadowRoot.querySelector('.youtube-notice')`);
- if(await c.evaluate(`!!document.querySelector('script[src*="youtube.com"]') || !!test.player.shadowRoot.querySelector('iframe')`))throw new Error('YouTube loaded before consent');
+ await c.evaluate(`test.player.seek(1);const rate=test.player.shadowRoot.querySelector('input[aria-label="Playback rate"]');rate.value='1.5';rate.dispatchEvent(new Event('input'));test.player.selectSource('youtube')`);await wait(`!!test.player.shadowRoot.querySelector('.youtube-notice')`);
+ if(await c.evaluate(`!!document.querySelector('script[src*="youtube.com"]') || !!test.frame.shadowRoot.querySelector('iframe')`))throw new Error('YouTube loaded before consent');
  await c.evaluate(`[...test.player.shadowRoot.querySelectorAll('button')].find(b=>b.textContent==='Agree and load YouTube').click()`);
  if(!live){
    await new Promise(r=>setTimeout(r,30));await c.evaluate(`test.player.selectSource('second');test.player.selectSource('youtube')`);
@@ -61,15 +61,31 @@ try{
    await c.evaluate(`[...test.player.shadowRoot.querySelectorAll('button')].find(b=>b.textContent==='Retry video').click()`);
  }
  await wait(`test.player.playback?.kind==='youtube' && !test.player.playback.loading`,25);
- const ready=await c.evaluate(`({source:test.player.sourceId,issue:test.player.playback.issue,state:test.player.playback.state,time:test.player.playback.mediaTime,iframe:test.player.shadowRoot.querySelector('iframe')?.src})`);
+ const ready=await c.evaluate(`({source:test.player.sourceId,issue:test.player.playback.issue,state:test.player.playback.state,time:test.player.playback.mediaTime,iframe:test.frame.shadowRoot.querySelector('iframe')?.src})`);
  console.log('YouTube ready',JSON.stringify({live,format,...ready}));
  if(ready.issue)throw new Error(ready.issue);
  await wait(`test.player.playback.rate===1.5`);
- const geometry=await c.evaluate(`(()=>{const f=test.player.shadowRoot.querySelector('iframe'),b=f.getBoundingClientRect();return {width:b.width,height:b.height,top:b.top,bottom:b.bottom,referrer:f.referrerPolicy,controls:new URL(f.src).searchParams.get('controls')};})()`);
+ const geometry=await c.evaluate(`(()=>{const f=test.frame.shadowRoot.querySelector('iframe'),b=f.getBoundingClientRect();return {width:b.width,height:b.height,top:b.top,bottom:b.bottom,referrer:f.referrerPolicy,controls:new URL(f.src).searchParams.get('controls')};})()`);
  if(geometry.width<200||geometry.height<200||geometry.bottom>900||geometry.controls!=='1')throw new Error('Invalid video geometry '+JSON.stringify(geometry));
+ const layout=await c.evaluate(`(()=>{const root=test.frame.shadowRoot, video=root.querySelector('iframe'), score=root.querySelector('.score');window.originalVideo=video;const divider=root.querySelector('.video-divider');divider.dispatchEvent(new KeyboardEvent('keydown',{key:'Home'}));return video.getBoundingClientRect().right<=score.getBoundingClientRect().left;})()`);
+ if(!layout)throw new Error('Video is not left of the score');
+ await new Promise(r=>setTimeout(r,100));
+ if(!await c.evaluate(`test.frame.shadowRoot.querySelector('iframe').getBoundingClientRect().width===200`))throw new Error('Minimum video width failed');
+ await c.evaluate(`test.frame.shadowRoot.querySelector('.video-divider').dispatchEvent(new KeyboardEvent('keydown',{key:'End'}))`);
+ await new Promise(r=>setTimeout(r,100));
+ if(!await c.evaluate(`Math.abs(test.frame.shadowRoot.querySelector('iframe').getBoundingClientRect().width-test.frame.clientWidth*.75)<1 && originalVideo===test.frame.shadowRoot.querySelector('iframe')`))throw new Error('Maximum width or stable iframe failed');
+ const divider=await c.evaluate(`(()=>{const b=test.frame.shadowRoot.querySelector('.video-divider').getBoundingClientRect();return {x:b.x+b.width/2,y:b.y+100};})()`);
+ await c.send('Input.dispatchMouseEvent',{type:'mouseMoved',...divider});
+ await c.send('Input.dispatchMouseEvent',{type:'mousePressed',...divider,button:'left',clickCount:1});
+ await c.send('Input.dispatchMouseEvent',{type:'mouseMoved',x:divider.x+1,y:divider.y,button:'left',buttons:1});
+ await new Promise(r=>setTimeout(r,100));
+ await c.send('Input.dispatchMouseEvent',{type:'mouseMoved',x:1,y:divider.y,button:'left',buttons:1});
+ await c.send('Input.dispatchMouseEvent',{type:'mouseReleased',x:1,y:divider.y,button:'left',clickCount:1});
+ await new Promise(r=>setTimeout(r,100));
+ if(!await c.evaluate(`test.frame.shadowRoot.querySelector('iframe').getBoundingClientRect().width===200 && originalVideo===test.frame.shadowRoot.querySelector('iframe') && originalVideo.style.pointerEvents==='' `))throw new Error('Pointer resize failed '+await c.evaluate(`JSON.stringify({width:test.frame.shadowRoot.querySelector('iframe').getBoundingClientRect().width,pointer:test.frame.shadowRoot.querySelector('iframe').style.pointerEvents})`));
  if(live){
   await new Promise(r=>setTimeout(r,2000));
-  const b=await c.evaluate(`(()=>{const b=test.player.shadowRoot.querySelector('iframe').getBoundingClientRect();return {x:b.x+b.width/2,y:b.y+b.height/2};})()`);
+  const b=await c.evaluate(`(()=>{const b=test.frame.shadowRoot.querySelector('iframe').getBoundingClientRect();return {x:b.x+b.width/2,y:b.y+b.height/2};})()`);
   await c.send('Input.dispatchMouseEvent',{type:'mousePressed',...b,button:'left',clickCount:1});await c.send('Input.dispatchMouseEvent',{type:'mouseReleased',...b,button:'left',clickCount:1});
  }else await c.evaluate(`test.player.play()`);
  await wait(`test.player.playback.state==='playing'`,15);
@@ -80,9 +96,10 @@ try{
  await c.evaluate(`test.player.pause()`);await c.evaluate(`test.player.seekScorePosition({ordinal:0,metricOffset:{num:0n,den:1n}})`);
  const sought=await c.evaluate(`({time:test.player.playback.mediaTime,ordinal:test.player.scorePosition?.ordinal,issue:test.player.playback.issue})`);console.log('YouTube seek',JSON.stringify(sought));
  if(sought.ordinal!==0)throw new Error('YouTube score seek failed');
+ await c.evaluate(`test.frame.shadowRoot.querySelector('.video-divider').dispatchEvent(new KeyboardEvent('keydown',{key:'End'}))`);
  await c.send('Emulation.setDeviceMetricsOverride',{width:360,height:800,deviceScaleFactor:1,mobile:true});await new Promise(r=>setTimeout(r,300));
- const mobile=await c.evaluate(`(()=>{const b=test.player.shadowRoot.querySelector('iframe').getBoundingClientRect();return {width:b.width,height:b.height,bottom:b.bottom};})()`);
- if(mobile.width<200||mobile.height<200||mobile.bottom>800)throw new Error('Invalid narrow viewport '+JSON.stringify(mobile));
+ const mobile=await c.evaluate(`(()=>{const b=test.frame.shadowRoot.querySelector('iframe').getBoundingClientRect();return {width:b.width,height:b.height,bottom:b.bottom};})()`);
+ if(mobile.width<200||mobile.width>270||mobile.height<200||mobile.bottom>800)throw new Error('Invalid narrow viewport '+JSON.stringify(mobile));
  await c.evaluate(`test.player.play()`);await wait(`test.player.playback.state==='playing'`);
  await c.evaluate(`test.frame.shadowRoot.querySelector('[aria-label="Hide the player"]').click()`);await wait(`!test.player.playback.wantsPlayback`);
  await c.evaluate(`test.frame.shadowRoot.querySelector('.grip.bottom .primary').click()`);await wait(`test.frame.bottomOpen && test.player.playback.state==='playing'`);
@@ -91,12 +108,12 @@ try{
   await c.send('Page.bringToFront');await c.send('Target.closeTarget',{targetId:tab.result.targetId});
   await new Promise(r=>setTimeout(r,150));if(await c.evaluate(`test.player.playback.wantsPlayback`))throw new Error('Hidden tab resumed automatically');
   await c.evaluate(`test.player.play()`);await wait(`test.player.playback.state==='playing'`);
-  await c.evaluate(`test.player.shadowRoot.querySelector('iframe').requestFullscreen()`);await new Promise(r=>setTimeout(r,150));
+  await c.evaluate(`test.frame.shadowRoot.querySelector('iframe').requestFullscreen()`);await new Promise(r=>setTimeout(r,150));
   if(!await c.evaluate(`test.player.playback.wantsPlayback`))throw new Error('Fullscreen incorrectly paused video');
   await c.evaluate(`document.exitFullscreen()`);
   await c.evaluate(`const cover=document.createElement('div');cover.id='cover';cover.style.cssText='position:fixed;inset:0;z-index:999999;background:white';document.body.append(cover)`);await wait(`!test.player.playback.wantsPlayback`);
   await c.evaluate(`document.getElementById('cover').remove();test.player.play()`);await wait(`test.player.playback.state==='playing'`);
-  await c.evaluate(`test.player.style.visibility='hidden'`);await wait(`!test.player.playback.wantsPlayback`);await c.evaluate(`test.player.style.visibility=''`);await new Promise(r=>setTimeout(r,150));
+  await c.evaluate(`test.frame.style.visibility='hidden'`);await wait(`!test.player.playback.wantsPlayback`);await c.evaluate(`test.frame.style.visibility=''`);await new Promise(r=>setTimeout(r,150));
   if(await c.evaluate(`test.player.playback.wantsPlayback`))throw new Error('Visibility resumed autoplay');
   await c.evaluate(`test.player.selectSource('second')`);await wait(`!test.player.playback.loading`);if(scripts!==2)throw new Error('API loaded more than once');
   await c.evaluate(`test.player.selectSource('synth');test.player.selectSource('youtube');test.player.selectSource('second')`);await wait(`test.player.sourceId==='second'&&!test.player.playback.loading`);
@@ -104,6 +121,7 @@ try{
  const shot=await c.send('Page.captureScreenshot');fs.writeFileSync(`/tmp/youtube-${live?'live':format}.png`,Buffer.from(shot.result.data,'base64'));
  await c.evaluate(`[...test.player.shadowRoot.querySelectorAll('button')].find(b=>b.textContent==='Close video').click()`);
  await wait(`test.player.sourceId==='synth' && !test.player.playback.wantsPlayback`);
+ if(!await c.evaluate(`test.frame.shadowRoot.querySelector('.video-pane').hidden && test.frame.shadowRoot.querySelector('.score').getBoundingClientRect().left===test.frame.getBoundingClientRect().left`))throw new Error('Video pane remained after switching to synth');
  await c.evaluate(`test.player.remove()`);
  if(!live && await c.evaluate(`__ytInstances.some(p=>!p.destroyed)`))throw new Error('YouTube instance leaked');
  if(c.logs.length)throw new Error(c.logs.join('\n'));
