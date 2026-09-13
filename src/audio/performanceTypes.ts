@@ -80,7 +80,13 @@ export interface Performance<T = Rational> {
   }[];
 }
 export type PerformanceJSON = Performance<RationalJSON>;
+/** Nonserialized compiler context. Full written spans distinguish an end-of-bar
+ * jump from a partial visit without changing the performance evidence format. */
+export interface CompiledPerformance {
+  performance: Performance;
+  writtenBarDurations: readonly Rational[];
+}
 /** Resource errors stop the whole affected compilation; no partial success. */
 export type PerformanceResult =
-  | { ok: true; performance: Performance }
+  | ({ ok: true } & CompiledPerformance)
   | { ok: false; diagnostics: TimingDiagnostic[] };

@@ -1,13 +1,14 @@
 # Recording sync — media seconds to performed score positions
 
-> **Status: proposed 2026-09-13.** Implementation loop. Campaign:
+> **Status: in progress 2026-09-13.** Implementation loop. Campaign:
 > [core-campaign-player.md](../inprogress/core-campaign-player.md), item 15.
 > Needs the existing traversal and performance source map (items 1, 3 and 5).
 
 ## Agreement block (campaign contract)
 
-- **Pure before audible.** A Node-safe decoder and bidirectional sync resolver in
-  `audio/`; no media objects, network, DOM or storage imports.
+- **Pure before audible.** A Node-safe tuple decoder in `model/`, shared with Worker
+  validation, and bidirectional score sync in `audio/`; no media objects, network,
+  DOM or storage imports. This promotion avoids a Worker → audio boundary violation.
 - **Rational time.** Score positions remain rational. Recording seconds are measured
   external input, preserved as such under the campaign's recording addendum. They do
   not replace the synth tempo map or enter existing performance goldens.
@@ -76,4 +77,34 @@ round-trip tolerances are declared. Existing synth performance and engraving gol
 remain byte-identical. Documentation distinguishes validated, partial and unsupported
 sync instead of claiming a match from counts alone.
 
-Next: [audio playback and source switching](core-player-recording-playback.md).
+Next: [audio playback and source switching](../proposed/core-player-recording-playback.md).
+
+## Implementation agreement — 2026-09-13
+
+The first map accepts the compilation result (Performance plus nonserialized full
+written bar durations) and its matching PassModel. Actual partial-stop bounds or
+nonzero partial-start bounds are diagnosed as unsupported:
+Soundslice's whole-bar fraction does not establish correspondence with our partial
+visits. Full-bar jumps and pickups use their resolved written span. The compiler
+returns full written durations beside the performance, leaving serialized goldens
+unchanged; this avoids duplicating its duration walker. Compiled
+source segments bridge metric offsets to synth positions only for handoff; no synth
+tempo, swing or inserted hold duration drives media-time interpolation. Seeking from
+inside a synthetic insertion is ambiguous; seeking to its metric anchor requires an
+explicit before/after edge when crossing to synth.
+
+Storage validates tuple shape only and retains valid but unsupported maps. Playback
+requires strictly increasing times and musical coordinates (no sorting or deduping),
+a first anchor at bar zero, and explicit coverage. Outside the anchored interval there
+is no extrapolation. Full coverage means the final boundary is anchored, not that a
+recording's unseen structure has been proved identical to this score.
+
+## Implementation and validation
+
+Implemented API and boundary policies are documented in
+[docs/player-recording-sync.md](../../docs/player-recording-sync.md). The targeted
+sync suite has 25 passing tests; storage conformance preserves optional fields and
+unsupported source evidence while refusing malformed numeric values. Regeneration
+passed all 188 primitive/performance/unrolled checks with a clean scenario diff.
+No human verification record or scenario golden changed. Full landing gates and
+worktree retirement precede moving this item to `complete/`.

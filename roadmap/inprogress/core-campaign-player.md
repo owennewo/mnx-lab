@@ -199,7 +199,7 @@ run any time before 6.
 | 12 | [Sampled guitar](../complete/core-player-sampled-guitar.md) | A sampled voice per string; the asset question is the item; per-voice pitch control verified for the chosen sampler first. | practice | ear | complete; listening review pending |
 | 14 | [Piano pack and the synth voice](../complete/core-player-piano-synth.md) | A CC0 upright piano — the first pack that spans the staff at both ends — and an oscillator worth defaulting to: harmonic spectrum, a filter that opens and closes, register-tilted level. Amplitude over time deliberately untouched, because two measured contracts depend on it. | reviewer | ear | **complete 2026-09-09; listening review pending** |
 | 13 | [Practice mode](../proposed/studio-player-practice.md) | Loop a selection — with the **written-range → performed-occurrences policy stated** — speed trainer, count-in, metronome, mute/solo. | practice | fake-clock tests | proposed — after reviewer items 1–10 |
-| 15 | [Recording sync](../proposed/core-player-recording-sync.md) | Pure Soundslice decoder, sparse/inner-bar timing map, coverage and traversal compatibility. | recording playback | Node conformance fixtures | proposed |
+| 15 | [Recording sync](../inprogress/core-player-recording-sync.md) | Pure Soundslice decoder, sparse/inner-bar timing map, coverage and traversal compatibility. | recording playback | Node conformance fixtures | in progress |
 | 16 | [Synth/audio switching](../proposed/core-player-recording-playback.md) | Shared backend interface, musical-position handoff, media-clock follow and authenticated audio reads. | recording playback | fake backends + browser media/embed checks | proposed |
 | 17 | [YouTube recordings](../proposed/core-player-youtube.md) | Visible official iframe, policy/layout lifecycle, API rates, seek and error handling. | recording playback | adapter/layout checks + live embed check | proposed |
 | 18 | [Recording attachments](../proposed/studio-recording-management.md) | Studio URL/audio attachment, sync import, upload and revision lifecycle. | recording playback | service + browser checks | proposed |
@@ -642,3 +642,25 @@ player feature. Rates come from its API, not Player.ts's assumed 0.05 grid. Item
 owns the visible panel, policy review and rate correction. Item 18 separates attaching
 new recordings from consuming existing imports. No implementation, scenario output
 or human verification record changed when these proposals were filed.
+
+### 2026-09-13 — item 15: recording sync implementation
+
+The shared tuple decoder lives in `model/recordingSync.ts` because both Worker
+validation and pure audio need it; the score map stays in `audio/recordingSync.ts`.
+The layer fence is retained. Malformed numeric/optional fields are rejected before
+storage serialization; valid unsupported maps remain source evidence.
+
+A partial-bound flag alone was insufficient: D.S./Fine writes an explicit stop even
+at the full bar boundary. The compiler now returns full written bar durations beside
+its performance, without adding fields to serialized evidence or duplicating the
+duration walker. This distinguishes full-bar jumps from unsupported partial visits.
+
+Recorded time maps directly to written metric offsets, with swing/insertions bridged
+only for synth handoff. Interior synthetic holds cannot reveal a recorded instant;
+that handoff is diagnosed, and a metric anchor with inserted time requires an explicit
+before/after synth edge. No final-bar duration is inferred from media length.
+
+Proof: 25 hand-stated sync tests, storage regression coverage, and 188 regenerated
+primitive/performance/unrolled checks with no scenario diff. The implementation
+contract is [docs/player-recording-sync.md](../../docs/player-recording-sync.md).
+Item 16 can consume the pure mapping API; no media playback UI is added by item 15.

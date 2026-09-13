@@ -1,6 +1,7 @@
 // DOM-free storage operations. Callers supply the authenticated owner; no HTTP surface here.
 import type { D1Database, D1PreparedStatement, R2Bucket } from '@cloudflare/workers-types';
 import { describeBlob, storeBlob, type PreparedBlob } from './blobs.ts';
+import { decodeRecordingSync } from '../../src/model/recordingSync.ts';
 import { isDerivedDimension, parseMnx } from './tags.ts';
 import {
   LibraryError, json, requireText, type Alias, type AliasReport, type Facet, type Json, type Piece, type PieceSort, type PieceWrite,
@@ -243,6 +244,11 @@ export class Library {
       requireText(r.id, 'recording id');
       if (!['audio','video','youtube'].includes(r.kind)) throw new LibraryError('invalid', 'Invalid recording kind');
       if (r.source_id != null) requireText(r.source_id, 'recording source id');
+      if (r.syncpoints !== undefined && r.syncpoints !== null) {
+        const sync = decodeRecordingSync(r.syncpoints);
+        if (!sync.ok) throw new LibraryError('invalid', `Invalid performed-bar syncpoints: ${sync.diagnostic.message}`);
+      }
+
       const sourceMatch = r.source_id == null ? undefined : [...recordings.values()].find(old => old.source_id === r.source_id);
       const byId = recordings.get(r.id);
       if (byId && sourceMatch && byId.id !== sourceMatch.id) throw new LibraryError('invalid', 'Recording identities disagree');
@@ -264,9 +270,6 @@ export class Library {
         created_at: old?.created_at ?? now, updated_at: old?.updated_at ?? now
       };
       if (row.duration_s !== null && (!Number.isFinite(row.duration_s) || row.duration_s < 0)) throw new LibraryError('invalid', 'Invalid recording duration');
-      if (r.syncpoints !== undefined && r.syncpoints !== null && (!Array.isArray(r.syncpoints) || r.syncpoints.some(p =>
-        !Array.isArray(p) || p.length < 2 || p.length > 4 || !Number.isInteger(p[0]) || Number(p[0]) < 0 ||
-        typeof p[1] !== 'number' || p[1] < 0))) throw new LibraryError('invalid', 'Invalid performed-bar syncpoints');
       if (r.kind === 'youtube') {
         requireText(row.external_id, 'YouTube id');
         if (r.blob) throw new LibraryError('invalid', 'YouTube recordings do not store blobs');

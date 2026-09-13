@@ -284,3 +284,26 @@ it('sorts by recently opened, most recent first, unopened last, and pages by off
   await expect(library.browsePieces('alice', [], '-1')).rejects.toMatchObject({ code: 'invalid' });
   expect((await library.browsePieces('alice', [], '2')).pieces.map(p => p.id)).toEqual(['c']);
 });
+
+it('validates syncpoint fields before serialization without rejecting unsupported but well-shaped maps', async () => {
+  const initial = await library.writePiece('alice', { ...create(), recordings: [
+    { id: 'rec', kind: 'youtube', external_id: 'video', syncpoints: [[0, 1], [1, 2.5, 106.66666666666666, 1]] },
+  ] });
+  for (const points of [[[0, NaN]], [[0, Infinity]], [[0, 1, 481]], [[0, 1, -1]],
+    [[0, 1, 0, 2]], [[0, 1, null]], [[Number.MAX_SAFE_INTEGER + 1, 1]]]) {
+    await expect(library.writePiece('alice', { id: 'piece', expected_revision: 0, recordings: [
+      { id: 'rec', kind: 'youtube', syncpoints: points },
+    ] })).rejects.toMatchObject({ code: 'invalid' });
+    expect(await library.getPiece('alice', 'piece')).toEqual(initial);
+  }
+  // Storage preserves source evidence; the player diagnoses nonsequential maps.
+  const raw = [[0, 1], [2, 4, 240, 1], [1, 6, 0, 0]];
+  const next = await library.writePiece('alice', { id: 'piece', expected_revision: 0, recordings: [
+    { id: 'rec', kind: 'youtube', syncpoints: raw },
+  ] });
+  expect(next.recordings[0].syncpoints).toBe(JSON.stringify(raw));
+  const cleared = await library.writePiece('alice', { id: 'piece', expected_revision: 1, recordings: [
+    { id: 'rec', kind: 'youtube', syncpoints: [] },
+  ] });
+  expect(cleared.recordings[0].syncpoints).toBe('[]');
+});

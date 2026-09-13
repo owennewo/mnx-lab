@@ -366,12 +366,20 @@ that maps them onto written bars will be wrong on any piece with a repeat. The p
 campaign's unroll (`core-campaign-player.md`, performed ordinals) is what turns a syncpoint
 into a position.
 
-Syncpoints belong to the recording, not to a rendition, and reference none. They were
-measured against the Soundslice rendition's bar structure, so before enabling synchronised
-playback against any rendition the player checks that the rendition's performed-bar count
-matches the syncpoint count (allowing the end marker) and refuses with a reason when it
-does not — a rendition that unrolls differently is a real finding, not something to paper
-over.
+Syncpoints belong to the recording, not to a rendition, and reference none. Their
+bar structure comes from the Soundslice rendition. The shared decoder validates
+`[performedBar, seconds, offset?, hidePlayhead?]` tuples without dropping fields or
+rewriting source data. Offset is 0–480 across a whole bar; sparse bars and multiple
+inner-bar anchors are valid, so **syncpoint count is not performed-bar count**.
+
+The [recording sync map](player-recording-sync.md) validates referenced ordinals,
+ordered times/positions, coverage and optional end markers against a compiled
+traversal. Full coverage means the supplied traversal's final boundary is anchored,
+not that all unseen repeat structure has been proved identical. Out-of-range references,
+ambiguous/nonsequential maps and unsupported partial visits produce explicit reasons.
+Partial coverage never invents a final-bar duration from total recording length.
+Storage preserves well-shaped source evidence even when the player cannot follow it;
+new malformed fields are rejected before JSON serialization.
 
 ## When the Durable Object arrives
 

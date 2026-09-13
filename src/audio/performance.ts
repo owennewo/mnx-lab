@@ -45,6 +45,7 @@ import { resolveSwingTimeline } from '../model/swing.ts';
 import type {
   Performance,
   PerformanceResult,
+  CompiledPerformance,
   WrittenOccurrence,
   SoundingEvent,
   PerformanceVoice,
@@ -94,7 +95,7 @@ export function compilePerformance(
   passes: PassModel = linearizePasses(doc),
 ): PerformanceResult {
   try {
-    return { ok: true, performance: compile(doc, passes) };
+    return { ok: true, ...compile(doc, passes) };
   } catch (error) {
     if (error instanceof TimingError) return { ok: false, diagnostics: [error.diagnostic] };
     if (error instanceof RangeError)
@@ -105,7 +106,7 @@ export function compilePerformance(
     throw error;
   }
 }
-function compile(doc: MnxStructure, passes: PassModel): Performance {
+function compile(doc: MnxStructure, passes: PassModel): CompiledPerformance {
   if (passes.truncated) limit();
   const diagnostics: Performance['diagnostics'] = passes.diagnostics.map((d) => ({
     code: d.code,
@@ -777,14 +778,17 @@ function compile(doc: MnxStructure, passes: PassModel): Performance {
   sourceMap.sort((a, b) => compare(a.position, b.position));
   const used = new Set(result.map((s) => s.voice));
   return {
-    formatVersion: 1,
-    written,
-    sounding: result,
-    voices: [...voices.values()].filter((v) => used.has(v.id)),
-    tempo: [...tempo],
-    measures,
-    sourceMap,
-    diagnostics,
+    writtenBarDurations: Object.freeze([...lengths]),
+    performance: {
+      formatVersion: 1,
+      written,
+      sounding: result,
+      voices: [...voices.values()].filter((v) => used.has(v.id)),
+      tempo: [...tempo],
+      measures,
+      sourceMap,
+      diagnostics,
+    },
   };
 }
 /** Canonical exact JSON: no floating seconds/ticks or BigInt in evidence. */

@@ -17,3 +17,5 @@ export async function validate(
   const valid = validateMnx(doc);
   return { valid, errors: valid ? [] : (validateMnx.errors ?? []) };
 }
+
+export * from '../../model/recordingSync.ts';

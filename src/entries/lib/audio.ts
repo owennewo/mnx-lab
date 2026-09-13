@@ -43,3 +43,6 @@ export {
   /** @deprecated renamed to `SamplePackLoader`. */
   type SamplePackLoader as GuitarSampleLoader,
 } from '../../audio/native/samplePacks.ts';
+
+export { createRecordingSync, decodeRecordingSync, type RecordingSyncMap, type RecordingSyncLocation,
+  type RecordingScorePosition, type RecordingSyncResult, type RecordingSyncDiagnostic } from '../../audio/recordingSync.ts';
