@@ -36,6 +36,17 @@ try {
  if (view !== 'notation') assert.ok(ink.masks.length > 0);
  for (const fill of ink.masks) assert.equal(fill, 'rgb(255, 255, 255)', `${theme} ${view}: white fret masks`);
  console.log(theme, view, result, ink);
+ // A preview must still print after Vite reloads (or the user leaves) Studio.
+ if (theme === 'light' && view === 'both') {
+   await p.evaluate(`window.print = () => { document.body.dataset.printCalled = 'yes'; }`);
+   await c.send('Page.navigate', {url: 'about:blank'});
+   for (let attempt = 0; attempt < 40; attempt++) {
+     if (await c.evaluate(`location.href === 'about:blank'`)) break;
+     await new Promise(resolve => setTimeout(resolve, 50));
+   }
+   await p.evaluate(`document.querySelector('button').click()`);
+   assert.equal(await p.evaluate(`document.body.dataset.printCalled`), 'yes', 'Print button survives opener navigation');
+ }
  const pdf=await p.send('Page.printToPDF',{printBackground:true,preferCSSPageSize:true});fs.writeFileSync(`/tmp/studio-export-${theme}-${view}.pdf`,Buffer.from(pdf.result.data,'base64'));
  const screenshot=await c.send('Page.captureScreenshot',{});fs.writeFileSync('/tmp/studio-export-library.png',Buffer.from(screenshot.result.data,'base64'));
  await p.send('Page.close'); pw.close();

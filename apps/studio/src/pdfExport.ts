@@ -70,7 +70,8 @@ export async function renderPdfView(preview: Window, mnx: MnxStructure, title: s
     const header = doc.createElement('header');
     const button = doc.createElement('button');
     button.textContent = 'Print / Save PDF';
-    button.addEventListener('click', () => preview.print());
+    button.dataset.printPreview = '';
+    button.disabled = true;
     header.append(button);
     const hint = doc.createElement('p');
     hint.textContent = `Staff: ${viewer.resolvedView() === 'tab' ? 'Tab' : viewer.resolvedView() === 'both' ? 'Staff + Tab' : 'Staff'}. Choose “Save as PDF” in the print dialog.`;
@@ -119,5 +120,13 @@ export async function renderPdfView(preview: Window, mnx: MnxStructure, title: s
     }
     await Promise.all([doc.fonts.load('16px Bravura'), doc.fonts.load('16px Archivo')]);
     await doc.fonts.ready;
+    // Own the handler in the preview, so a Studio reload cannot strand it.
+    await new Promise<void>((resolve, reject) => {
+      const script = doc.createElement('script');
+      script.src = new URL('/studio/print-preview.js', location.href).href;
+      script.onload = () => resolve();
+      script.onerror = () => reject(new Error('Could not load the PDF print control.'));
+      doc.head.append(script);
+    });
   } finally { viewer.remove(); }
 }
