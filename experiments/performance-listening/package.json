@@ -13,7 +13,9 @@
     "compare:renders": "node experiments/compare-renders.mjs",
     "fusion:attack": "node experiments/fusion-attack.mjs",
     "fusion:export": "node experiments/fusion-export.mjs",
-    "fusion:whitening": "node experiments/fusion-whitening.mjs"
+    "fusion:whitening": "node experiments/fusion-whitening.mjs",
+    "microphone": "node microphone/serve.mjs",
+    "test:microphone": "node microphone/smoke.mjs"
   },
   "dependencies": {
     "@spotify/basic-pitch": "1.0.1",

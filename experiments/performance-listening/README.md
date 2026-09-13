@@ -1,8 +1,8 @@
 # Performance listening bench
 
 Implementation-loop experiment for future Studio tracking, assessment and guitar control.
-This unit measures detection on digitally rendered player audio. It neither listens to a
-microphone nor claims to grade a real performer. Production cannot import it.
+This unit measures detection on digitally rendered player audio and offers a local
+microphone experiment. It does not grade a real performer. Production cannot import it.
 
 The [fused algorithm log](fusion-log.md) is the living index of techniques, configurations
 tried, decisions and possible next experiments. Detailed records use the
@@ -42,6 +42,35 @@ A quick adapter check can use `compare -- AUDIO RUN --limit=2`. The limit is rec
 that subset is not the reference comparison. Whole-file neural CPU inference takes several
 minutes for the full matrix. No paid service, native TensorFlow binary or model download
 is used: the pinned Basic Pitch npm distribution includes its model weights.
+
+## Live microphone test
+
+Run `npm --prefix experiments/performance-listening run microphone`, then open
+http://127.0.0.1:5175/microphone/ (set `PORT` to choose another port). No existing benchmark
+outputs are needed. Press **Record microphone**, grant permission, and play. **Stop**
+releases the microphone and offers WAV playback/download and a JSON detection log.
+
+F-006 is preselected only on this experimental page; F-003 is available for another take.
+Production and benchmark defaults are unchanged. Current pitches and the newest 200
+attack events are shown. All events and captured mono PCM are retained for download,
+with a five-minute take limit. A new take replaces the previous one. No audio is uploaded
+or persisted by the server. The browser's default microphone is used.
+
+Capture uses an AudioWorklet at the detector's 22,050 Hz rate, with pitch analysis in a
+separate Web Worker. Browser input processing is requested off; actual track settings
+are exported. The browser resamples device input into the requested AudioContext rate;
+unsupported rates fail explicitly. Worklet delivery uses 512 samples (~23 ms); stopping
+may omit the incomplete final block. Queue overflow stops the take rather than silently
+skipping chunks. Historical frame scores are discarded; active detector state is retained.
+The UI stream timestamps are audio decision times, not measured end-to-end latency.
+
+[AudioWorklet capture](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API/Using_AudioWorklet)
+and [AudioContext sample-rate behaviour](https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/AudioContext)
+follow browser APIs. Browser permission, scheduling, input hardware, room acoustics and
+real guitar tone are new variables; synthetic fixture accuracy is not a microphone score.
+
+Run `npm --prefix experiments/performance-listening run test:microphone` for the Chrome
+smoke check with a synthetic fake microphone (it never accesses a physical device).
 
 ## First fused iteration
 
@@ -249,5 +278,5 @@ sources. It has no dependency on Studio, elements, workbench, Worker, storage or
 status writers. No existing production package dependency or audio implementation changes.
 
 Read `findings/README.md` for measured capabilities and the next experiment justified by
-evidence. Score-informed following, real recordings, microphone capture, command gestures
-and production promotion need a subsequent decision; they are not implemented here.
+evidence. Score-informed following, command gestures and production promotion need a subsequent
+decision. Microphone capture is now a manual experiment, not validated player assessment.
