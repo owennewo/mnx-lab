@@ -1,0 +1,40 @@
+{
+  "id": "F-006",
+  "technique": "fundamental",
+  "parent": "F-003",
+  "strengths": [
+    0,
+    0.5,
+    0.75,
+    1
+  ],
+  "minContrast": 4,
+  "fullContrast": 16,
+  "relativeAmplitudeFloor": 0.002,
+  "designEvidence": "Local contrast and amplitude checks on the five known E2/E3/B3 recordings informed the design. They are development controls, not held-out evidence.",
+  "selection": "Highest pooled development onset F1 among nonzero candidates; tie prefers lower strength. Baseline remains the acceptance reference even if all candidates lose. Freeze before fresh evaluation.",
+  "developmentAudio": [
+    "audio-v1",
+    "audio-fusion-heldout-v1",
+    "audio-fusion-heldout-v2",
+    "audio-fusion-heldout-v3",
+    "audio-fusion-heldout-v4",
+    "audio-fusion-heldout-v5"
+  ],
+  "extraControlIds": [
+    "52",
+    "59",
+    "52-59",
+    "40-52-59"
+  ],
+  "costPasses": 3,
+  "acceptance": {
+    "maxCategoryF1Drop": 0.02,
+    "maxActiveF1Drop": 0.02,
+    "maxCpuRatio": 1.25,
+    "maxCommonMatchP95IncreaseSeconds": 0.025,
+    "preserveA4Alone": true
+  },
+  "notes": "Invoke only when strength*projection can reach the activity threshold and exceed the existing weight. Positive support floor strength * original harmonic projection * local peak prominence, after greedy pursuit. No whitening. Peak +/-1 bin, log-parabolic tuning check +/-0.5 semitone; background median offsets +/-3..7 bins; amplitude 4*peak/N compared with raw RMS. No support if a parent-selected lower pitch can explain the peak as partial 2..12. All pitches use the same rule. No veto on missing fundamentals; no automatic removal of upper pitches. Other F-003 timing, scorer and gates fixed. Fresh v6 public cases and seeded broadband-noise controls.",
+  "selectNonzero": true
+}

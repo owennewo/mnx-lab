@@ -12,6 +12,7 @@ import {
   wav,
   filesHash,
 } from "../evaluation/io.mjs";
+import { fusionHeldoutV6 } from "../fixtures/fusion-heldout-v6.mjs";
 import { fusionHeldoutV5 } from "../fixtures/fusion-heldout-v5.mjs";
 import { fusionHeldoutV4 } from "../fixtures/fusion-heldout-v4.mjs";
 import { fusionHeldoutV3 } from "../fixtures/fusion-heldout-v3.mjs";
@@ -71,27 +72,31 @@ try {
     ])
   )
     throw Error("MNX adapter disagrees with independent schedule");
+  const heldoutV6 = process.argv.includes("--fusion-heldout-v6");
   const heldoutV5 = process.argv.includes("--fusion-heldout-v5");
   const heldoutV4 = process.argv.includes("--fusion-heldout-v4");
   const heldoutV3 = process.argv.includes("--fusion-heldout-v3");
   const heldoutV2 = process.argv.includes("--fusion-heldout-v2");
   const heldout =
+    heldoutV6 ||
     heldoutV5 ||
     heldoutV4 ||
     heldoutV3 ||
     heldoutV2 ||
     process.argv.includes("--fusion-heldout");
-  const fixtures = heldoutV5
-    ? fusionHeldoutV5()
-    : heldoutV4
-      ? fusionHeldoutV4()
-      : heldoutV3
-        ? fusionHeldoutV3()
-        : heldoutV2
-          ? fusionHeldoutV2()
-          : heldout
-            ? fusionHeldout()
-            : [...cases(), mnx];
+  const fixtures = heldoutV6
+    ? fusionHeldoutV6()
+    : heldoutV5
+      ? fusionHeldoutV5()
+      : heldoutV4
+        ? fusionHeldoutV4()
+        : heldoutV3
+          ? fusionHeldoutV3()
+          : heldoutV2
+            ? fusionHeldoutV2()
+            : heldout
+              ? fusionHeldout()
+              : [...cases(), mnx];
   const records = [];
   for (const preset of config.presets) {
     const work = [

@@ -1,4 +1,5 @@
 import FFT from "fft.js";
+import { createFundamentalSupport } from "./fundamental.mjs";
 import { createWhitener } from "./whitening.mjs";
 export const hz = (midi) => 440 * 2 ** ((midi - 69) / 12);
 export function spectrogramFrame(
@@ -65,6 +66,7 @@ export function templateDictionary(recordings, config) {
 }
 export function createScorer(dictionary, kind, config) {
   const whiten = createWhitener(config);
+  const fundamental = createFundamentalSupport(config);
   const gram = dictionary.map((a) =>
     Float64Array.from(dictionary, (b) => dot(a, b)),
   );
@@ -100,6 +102,7 @@ export function createScorer(dictionary, kind, config) {
           weights[i] = Math.max(0, value / Math.max(gram[i][i], 1e-12));
         }
     }
+    if (kind === "harmonic") fundamental(weights, projection, magnitude, rms);
     return weights; // Relative spectral coefficients, NOT calibrated probabilities.
   };
 }

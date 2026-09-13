@@ -25,7 +25,13 @@ const mode = process.argv[2],
   );
 const archive =
   process.env.LISTENING_ARCHIVE_ROOT ?? path.join(bench, "output");
-const plan = readJSON(path.join(bench, "experiments/fusion-whitening.json")),
+const plan = readJSON(
+    path.join(
+      bench,
+      "experiments",
+      process.env.LISTENING_PLAN ?? "fusion-whitening.json",
+    ),
+  ),
   base = readJSON(path.join(bench, "experiments/baseline.json"));
 const config = (strength) => ({
   ...base,
@@ -36,7 +42,16 @@ const config = (strength) => ({
     mode: "restrike-only",
     neighborRatio: 1,
   },
-  whitening: { strength, floor: plan.floor, maxGain: plan.maxGain },
+  ...(plan.technique === "fundamental"
+    ? {
+        fundamental: {
+          strength,
+          minContrast: plan.minContrast,
+          fullContrast: plan.fullContrast,
+          relativeAmplitudeFloor: plan.relativeAmplitudeFloor,
+        },
+      }
+    : { whitening: { strength, floor: plan.floor, maxGain: plan.maxGain } }),
 });
 function loadSet(directory) {
   const m = readJSON(path.join(directory, "manifest.json"));
@@ -139,6 +154,7 @@ if (mode === "development") {
       encoding: "utf8",
     }).trim(),
     codeHashes: filesHash(path.join(bench, "detectors")),
+    runnerHash: hash(fs.readFileSync(new URL(import.meta.url))),
     planHash: hash(JSON.stringify(plan)),
     cpu: os.cpus()[0]?.model,
     node: process.version,
@@ -153,8 +169,8 @@ if (mode === "development") {
   // Rotate recipe order across cases to reduce systematic warmup/order bias.
   for (const [i, r] of records.entries()) {
     const strengths = plan.strengths
-      .slice(i % 4)
-      .concat(plan.strengths.slice(0, i % 4));
+      .slice(i % plan.strengths.length)
+      .concat(plan.strengths.slice(0, i % plan.strengths.length));
     for (const s of strengths) all.push(run(r, s));
     if (i % 24 === 23) console.log(`Development ${i + 1}/${records.length}`);
   }
@@ -165,7 +181,7 @@ if (mode === "development") {
   const ranked = summaries.toSorted(
       (a, b) => b.onset.f1 - a.onset.f1 || a.strength - b.strength,
     ),
-    selected = ranked[0].strength;
+    selected = ranked.find((r) => !plan.selectNonzero || r.strength !== 0).strength;
   writeJSON(path.join(out, "development.json"), { summaries, rows: all });
   writeJSON(path.join(out, "selection.json"), {
     selected,
@@ -292,6 +308,23 @@ if (mode === "development") {
       file,
       audioHash: readWav(path.join(isolationDirectory, file)).hash,
     });
+  }
+  if (plan.extraControlIds) {
+    const directory = path.join(archive, "e2-harmonics-v1");
+    for (const r of readJSON(path.join(directory, "isolation.json"))) {
+      if (!plan.extraControlIds.includes(r.fixture.id)) continue;
+      const file = `isolated-${r.fixture.id}.wav`;
+      records.push({
+        ...r.fixture,
+        target: r.fixture.actual,
+        category: "private-isolated",
+        preset: "guitar",
+        source: "extra-controls",
+        directory,
+        file,
+        audioHash: readWav(path.join(directory, file)).hash,
+      });
+    }
   }
   const full = readJSON(path.join(archive, "gymnopedie-v1/results.json")),
     end = full.fixture.measures[8].start + 0.15;
