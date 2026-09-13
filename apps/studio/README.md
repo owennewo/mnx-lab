@@ -15,7 +15,7 @@ never bleed together; that guard is structural, not vigilance.
 Sign in, browse the library and open a piece in the shared score frame. Tags and
 recording attachments can be edited and persisted; score editing is still a later
 item. [Recording management](../../docs/studio-recordings.md) adds YouTube links,
-audio uploads and Soundslice timing imports to the piece page.
+audio uploads, selected-recording details, deletion and read-only sync statistics to the piece page.
 
 ## Shape
 

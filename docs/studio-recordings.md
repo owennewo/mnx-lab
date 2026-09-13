@@ -1,30 +1,31 @@
 # Studio recording attachments
 
-Implementation loop, player campaign item 18. The piece page's **Recordings** button
-opens a sheet for attaching a named YouTube link or uploaded audio, importing timing
-JSON, renaming a recording, changing its timings and removing its association.
-Saved YouTube recordings show their full, clickable URL in both the list and the
-edit form. A missing or invalid stored link is identified explicitly.
+Implementation loop, player campaign item 18. The source dropdown selects the recording;
+its adjacent details button opens a panel for that recording alone. An open panel
+follows source selection. Synth has no recording details. **Add recording…** in the
+source dropdown opens a named YouTube-link or audio-upload form, even on an empty
+piece. Adding does not change playback source until the recording is saved.
+
+The selected recording can be renamed or deleted (with a named confirmation).
+Deletion returns playback to Synth and closes the panel. YouTube details include the
+full clickable URL. The panel displays read-only sync-point count, start and end
+locations (1-based performed bars, fractional bar position, and absolute media
+seconds), plus coverage diagnostics. Empty or invalid mappings are explained.
+There is no timing JSON upload or editor in Studio. New attachments have no sync
+points; renaming preserves existing sync points and provenance unchanged.
 
 Playback itself is shared with [audio](player-recordings.md) and
 [YouTube](player-youtube.md); attachment does not load YouTube resources.
 
 ## Timings and provenance
 
-The importer accepts a bare Soundslice tuple array or the exporter’s `.sync.json`
-wrapper. Wrapper recordings must have unique explicit IDs. The user selects an ID;
-names and array positions never choose a match. Original JSON survives in
-`recordings.provenance`, with its format and selected recording ID. `syncpoints`
-contains the validated original tuples, retaining optional inner-bar offsets and
-hide-playhead flags. No normalized timings are written back over the evidence.
-
-The sheet compiles the current score and uses `createRecordingSync` to show full or
-partial coverage, including performed repeats and inner-bar slowdown. It reports
-backwards/ambiguous/out-of-range mappings. Shape-invalid JSON cannot be saved;
-shape-valid but unusable mappings can be saved with explicit acknowledgement that
-following and score seeking will be unavailable. No timings is also an explicit
-unsynchronised attachment. Partial coverage is usable only within measured bounds.
-Matching coverage is not proof that two performances have the same bar structure.
+The storage API and operator importer still accept Soundslice tuples and wrapper
+provenance. Original JSON remains evidence; the panel reads the active `syncpoints`
+field, not historical provenance. It compiles the current score and uses
+`createRecordingSync` to report full/partial coverage or unusable alignment.
+A matching coverage range does not prove that performances share the same structure.
+Sync-point editing is deferred; new attachments play without score following or
+score seeking, as explained in the form.
 
 Opening the sheet refreshes the piece revision. A changed canonical pointer reloads
 the score. Revision conflicts require reload and review before another write. A
@@ -42,9 +43,8 @@ Neither exporter nor historical imports can reconstruct absent crop boundaries.
 
 New wrapper imports preserve available `crop_start`, `crop_end` and
 `cropped_duration`. Boundaries must be finite nonnegative absolute media seconds,
-with end after start when both exist. The sheet diagnoses duration-only legacy data.
-**Crop controls are not applied by this item**: the UI states that boundaries are
-preserved and playback uses the original media clock. No offset is inferred, and no
+with end after start when both exist. The stored metadata can contain duration-only legacy data.
+**Crop controls are not applied by this item**: playback uses the original media clock. No offset is inferred, and no
 cropped-playback parity with Soundslice is claimed. The player takes actual duration
 from the media API; it never uses imported cropped duration as its clock.
 

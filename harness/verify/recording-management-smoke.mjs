@@ -57,73 +57,54 @@ try {
   const result=await c.evaluate(`(async()=>{
     const check=(v,m)=>{if(!v)throw new Error(m)},delay=ms=>new Promise(r=>setTimeout(r,ms));
     const page=document.querySelector('mnx-studio').shadowRoot.querySelector('mnx-studio-piece'),player=page.shadowRoot.querySelector('mnx-player');check(!!player.performance,'Score did not load');
-    page.shadowRoot.querySelector('mnx-player > button[slot=source-tools]').click();
-    for(let i=0;i<50&&!page.shadowRoot.querySelector('mnx-studio-recordings');i++)await delay(50);
-    const sheet=page.shadowRoot.querySelector('mnx-studio-recordings');await sheet.updateComplete;
-    const input=async(label,value,type='input')=>{const el=sheet.shadowRoot.querySelector('[aria-label="'+label+'"]');el.value=value;el.dispatchEvent(new Event(type,{bubbles:true}));await sheet.updateComplete;};
-    const button=text=>[...sheet.shadowRoot.querySelectorAll('button')].find(b=>b.textContent.trim()===text);
-    const saved=async(n)=>{for(let i=0;i<120;i++){await delay(50);if(!sheet.busy&&sheet.snapshot.recordings.length===n)break;}check(sheet.snapshot.recordings.length===n&&!sheet.error,sheet.error||'Recording did not save');};
-    await input('Recording name','YouTube take');await input('YouTube URL','https://youtu.be/M7lc1UVf-VE');
-    const raw={recordings:[{id:7,name:'Same',syncpoints:[[0,0],[1,8]]},{id:8,name:'Same',syncpoints:[[0,1],[1,6],[2,11]],crop_start:1,crop_end:11}]};
-    await input('Sync JSON',JSON.stringify(raw));check(button('Attach recording').disabled,'Ambiguous wrapper allowed saving');
-    await input('Sync recording','8','change');check(sheet.shadowRoot.textContent.includes('Full coverage'),'Missing coverage');button('Attach recording').click();await saved(1);
-    check(JSON.parse(sheet.snapshot.recordings[0].syncpoints)[0][1]===1,'Timings bound to wrong recording');
-    const youtubeId=sheet.snapshot.recordings[0].id;
-    const savedLink=sheet.shadowRoot.querySelector('a.source-link');check(savedLink?.href==='https://www.youtube.com/watch?v=M7lc1UVf-VE','Saved YouTube link is hidden');
-    sheet.reset(sheet.snapshot.recordings[0]);await sheet.updateComplete;check(sheet.shadowRoot.querySelectorAll('a.source-link').length===2,'Edit hides the saved YouTube link');sheet.reset();await sheet.updateComplete;
-    await input('Recording name','Uploaded take');await input('Recording type','audio','change');
+    const sheet=()=>page.shadowRoot.querySelector('mnx-studio-recordings');
+    const select=async id=>{const el=player.shadowRoot.querySelector('[aria-label="Playback source"]');el.value=id;el.dispatchEvent(new Event('change',{bubbles:true}));await delay(150);await page.updateComplete;await sheet()?.updateComplete;};
+    const input=async(label,value,type='input')=>{const el=sheet().shadowRoot.querySelector('[aria-label="'+label+'"]');el.value=value;el.dispatchEvent(new Event(type,{bubbles:true}));await sheet().updateComplete;};
+    const button=text=>[...sheet().shadowRoot.querySelectorAll('button')].find(b=>b.textContent.trim()===text);
+    const saved=async n=>{for(let i=0;i<120;i++){await delay(50);if(page.snapshot.recordings.length===n&&!sheet()?.busy)break;}check(page.snapshot.recordings.length===n&&!sheet()?.error,sheet()?.error||'Recording did not save');};
+    check(!page.shadowRoot.querySelector('[slot=source-tools]'),'Synth has recording details');
+    await select('add-recording');check(!!sheet(),'Empty library cannot add');
+    check(player.sourceId==='synth','Add action changed playback source');
+    check(!sheet().shadowRoot.querySelector('textarea, [aria-label="Import sync JSON"]'),'Sync editor remains');
+    await input('Recording name','YouTube take');await input('YouTube URL','https://foreign.test/video');
+    button('Attach recording').click();await delay(100);check(sheet().error.includes('YouTube'),'Invalid URL accepted');
+    await input('YouTube URL','https://youtu.be/M7lc1UVf-VE');button('Attach recording').click();await saved(1);
+    const youtubeId=page.snapshot.recordings[0].id;
+    check(sheet().recordingId===youtubeId,'New recording was not selected');
+    check(sheet().shadowRoot.querySelector('a.source-link')?.href==='https://www.youtube.com/watch?v=M7lc1UVf-VE','Saved link hidden');
+    check(sheet().shadowRoot.textContent.includes('No sync points'),'Missing unsynced state');
+    await select('add-recording');await input('Recording name','Uploaded take');await input('Recording type','audio','change');
     const hz=48000,pcm=new Uint8Array(44+hz*300*2),v=new DataView(pcm.buffer);const str=(s,o)=>[...s].forEach((c,i)=>v.setUint8(o+i,c.charCodeAt(0)));str('RIFF',0);v.setUint32(4,pcm.length-8,true);str('WAVEfmt ',8);v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);v.setUint32(24,hz,true);v.setUint32(28,hz*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);str('data',36);v.setUint32(40,pcm.length-44,true);
-    const dt=new DataTransfer();dt.items.add(new File([pcm],'take.wav',{type:'audio/wav'}));const file=sheet.shadowRoot.querySelector('[aria-label="Audio file"]');file.files=dt.files;file.dispatchEvent(new Event('change',{bubbles:true}));await sheet.updateComplete;
-    await input('Sync JSON','[[0,1],[1,6],[2,11]]');button('Attach recording').click();await saved(2);
-    const audioId=sheet.snapshot.recordings.find(r=>r.kind==='audio').id;check(player.recordings.length===2,'Player was not refreshed');
-    await player.selectSource(audioId);await player.play();await delay(150);check(player.playback.state==='playing','Uploaded audio did not play');
-    await player.seekScorePosition({ordinal:1,metricOffset:{num:0n,den:1n}});check(Math.abs(player.playback.mediaTime-6)<.1,'Uploaded audio seek failed');
-    sheet.reset(sheet.snapshot.recordings.find(r=>r.id===audioId));await sheet.updateComplete;await input('Recording name','Renamed take');await input('Sync JSON','[[0,2],[1,7],[2,11]]');button('Save changes').click();await saved(2);await delay(100);
-    check(!player.playback.wantsPlayback,'Sync replacement revived playback');check(player.recordings.find(r=>r.id===audioId).syncpoints[0][1]===2,'Old mapping retained');
-    return {youtubeId,audioId};
+    const dt=new DataTransfer();dt.items.add(new File([pcm],'take.wav',{type:'audio/wav'}));const file=sheet().shadowRoot.querySelector('[aria-label="Audio file"]');file.files=dt.files;file.dispatchEvent(new Event('change',{bubbles:true}));await sheet().updateComplete;
+    button('Attach recording').click();await saved(2);
+    const audioId=page.snapshot.recordings.find(r=>r.kind==='audio').id;
+    check(sheet().recordingId===audioId,'Uploaded recording not selected');
+    check(!sheet().shadowRoot.textContent.includes('YouTube take'),'Panel lists other recordings');
+    await player.startSource();await delay(150);check(player.playback.state==='playing','Uploaded audio did not play');player.pause();
+    // An operator import supplies timings; the panel only reads them.
+    await page.client.saveRecording('piece',audioId,page.snapshot.piece.revision,{name:'Uploaded take',rawSync:[[0,1],[1,6,240],[2,11]]});
+    await page.refreshSnapshot();await select(youtubeId);check(sheet().recordingId===youtubeId,'Selection did not change details');await select(audioId);
+    const stats=[...sheet().shadowRoot.querySelectorAll('dd')].map(el=>el.textContent);
+    check(stats[0]==='3'&&stats[1].includes('Performed bar 1')&&stats[1].includes('1 s')&&stats[2].includes('Performed bar 3')&&stats[2].includes('11 s'),'Wrong sync statistics');
+    await input('Recording name','Renamed take');button('Save changes').click();await delay(300);await saved(2);
+    check(page.snapshot.recordings.find(r=>r.id===audioId).syncpoints==='[[0,1],[1,6,240],[2,11]]','Rename changed sync data');
+    await input('Recording name','Conflict draft');await page.client.changeTags('piece',sheet().snapshot.piece.revision,{add:[{dimension:'practice',value:'today'}]});
+    button('Save changes').click();await delay(250);check(sheet().conflict,'Stale write did not conflict');
+    button('Reload and review').click();await delay(250);check(!sheet().conflict&&sheet().name==='Renamed take','Reload did not restore saved recording');
+    await select(youtubeId);button('Delete recording').click();await sheet().updateComplete;button('Keep recording').click();await sheet().updateComplete;check(page.snapshot.recordings.length===2,'Cancel deleted recording');
+    button('Delete recording').click();await sheet().updateComplete;button('Confirm deletion').click();await saved(1);
+    check(!sheet()&&player.sourceId==='synth','Delete did not close details and return to synth');
+    await select(audioId);page.shadowRoot.querySelector('[slot=source-tools]').click();await delay(200);
+    check(sheet()?.recordingId===audioId,'Details button did not open selected recording');
+    page.shadowRoot.querySelector('button[slot=actions]').click();await page.updateComplete;check(!sheet()&&page.shadowRoot.querySelector('mnx-studio-tags'),'Tags did not replace panel');
+    return {audioId};
   })()`);
   await c.send('Page.reload');await new Promise(r=>setTimeout(r,1200));
-  const reloaded=await c.evaluate(`(async()=>{for(let i=0;i<100;i++){const page=document.querySelector('mnx-studio')?.shadowRoot?.querySelector('mnx-studio-piece'),p=page?.shadowRoot?.querySelector('mnx-player');if(p?.performance&&p.recordings.length===2)return p.recordings;await new Promise(r=>setTimeout(r,50));}return [];})()`);
-  assert.equal(reloaded.find(r=>r.id===result.audioId)?.name,'Renamed take');assert.equal(reloaded.find(r=>r.id===result.youtubeId)?.syncpoints[0][1],1);assert.equal(uploads,1);assert.ok(canonicalReads>=3,'Canonical identity mismatch was not retried before reload');
+  const reloaded=await c.evaluate(`(async()=>{for(let i=0;i<100;i++){const page=document.querySelector('mnx-studio')?.shadowRoot?.querySelector('mnx-studio-piece'),p=page?.shadowRoot?.querySelector('mnx-player');if(p?.performance&&p.recordings.length===1)return p.recordings;await new Promise(r=>setTimeout(r,50));}return [];})()`);
+  assert.equal(reloaded[0]?.id,result.audioId);assert.equal(reloaded[0]?.name,'Renamed take');assert.equal(reloaded[0]?.syncpoints.length,3);assert.equal(uploads,1);assert.ok(canonicalReads>=3);
   await c.send('Emulation.setDeviceMetricsOverride',{width:360,height:800,deviceScaleFactor:1,mobile:true});
-  await c.evaluate(`(async()=>{const p=document.querySelector('mnx-studio').shadowRoot.querySelector('mnx-studio-piece');p.shadowRoot.querySelector('mnx-player > button[slot=source-tools]').click();await new Promise(r=>setTimeout(r,200));})()`);
-  await c.evaluate(`(async()=>{
-    const check=(v,m)=>{if(!v)throw new Error(m)},delay=ms=>new Promise(r=>setTimeout(r,ms));
-    const page=document.querySelector('mnx-studio').shadowRoot.querySelector('mnx-studio-piece'),sheet=page.shadowRoot.querySelector('mnx-studio-recordings');
-    const button=text=>[...sheet.shadowRoot.querySelectorAll('button')].find(b=>b.textContent.trim()===text);
-    const input=async(label,value,type='input')=>{const el=sheet.shadowRoot.querySelector('[aria-label="'+label+'"]');el.value=value;el.dispatchEvent(new Event(type,{bubbles:true}));await sheet.updateComplete;};
-    sheet.reset(sheet.snapshot.recordings.find(r=>r.kind==='youtube'));await sheet.updateComplete;await input('Recording name','Revised video');
-    await page.client.changeTags('piece',sheet.snapshot.piece.revision,{add:[{dimension:'practice',value:'today'}]});
-    button('Save changes').click();for(let i=0;i<100;i++){await delay(50);if(!sheet.busy)break;}check(sheet.conflict,'Stale UI write did not conflict');
-    button('Reload and review').click();for(let i=0;i<100;i++){await delay(50);if(!sheet.busy&&!sheet.conflict)break;}
-    button('Save changes').click();for(let i=0;i<100;i++){await delay(50);if(!sheet.busy)break;}check(!sheet.error,sheet.error);
-    await input('Recording name','Unaligned');await input('YouTube URL','https://foreign.test/video');
-    const checkbox=sheet.shadowRoot.querySelector('[aria-label="Save without score sync"]');check(!!checkbox,'Missing unsynchronised acknowledgement');checkbox.click();await sheet.updateComplete;
-    button('Attach recording').click();await delay(100);check(sheet.error.includes('YouTube'),'Invalid URL accepted');
-    await input('YouTube URL','https://youtu.be/M7lc1UVf-VE');button('Attach recording').click();for(let i=0;i<100;i++){await delay(50);if(!sheet.busy)break;}check(sheet.snapshot.recordings.length===3&&!sheet.error,sheet.error||'Unsynchronised save failed');
-    const unaligned=sheet.snapshot.recordings.find(r=>r.name==='Unaligned');check(unaligned.syncpoints===null,'Sync invented');
-    sheet.removing=unaligned.id;await sheet.updateComplete;button('Confirm removal').click();for(let i=0;i<100;i++){await delay(50);if(!sheet.busy)break;}check(sheet.snapshot.recordings.length===2,'Detach failed');
-  })()`);
+  await c.evaluate(`(async()=>{const page=document.querySelector('mnx-studio').shadowRoot.querySelector('mnx-studio-piece'),player=page.shadowRoot.querySelector('mnx-player');await player.selectSource(player.recordings[0].id);await page.updateComplete;page.shadowRoot.querySelector('[slot=source-tools]').click();await new Promise(r=>setTimeout(r,250));const sheet=page.shadowRoot.querySelector('mnx-studio-recordings');if(sheet.getBoundingClientRect().width>360)throw Error('Panel overflows mobile');})()`);
   const shot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync('/tmp/recording-management-mobile.png',Buffer.from(shot.result.data,'base64'));
-  await c.evaluate(`(async()=>{
-    const check=(v,m)=>{if(!v)throw new Error(m)},delay=ms=>new Promise(r=>setTimeout(r,ms));
-    const page=document.querySelector('mnx-studio').shadowRoot.querySelector('mnx-studio-piece');
-    // The recordings sheet is reached from the player's tray, beside the source
-    // switcher whose sources it manages; the tools row carries no account menu
-    // (sign-out is the library page's) and no Recordings button.
-    const tools=page.shadowRoot.querySelector('mnx-player > button[slot=source-tools]');check(!!tools,'Recordings control missing from the tray');
-    check(tools.getAttribute('aria-label')==='Recordings · 2','Recordings control does not count the sources');
-    check(!page.shadowRoot.querySelector('.menu'),'Account menu still on the piece page');
-    check(![...page.shadowRoot.querySelectorAll('button')].some(b=>b.textContent.includes('Recordings ·')),'Recordings button still in the tools row');
-    page.toolsOpen=true;await page.updateComplete;const frame=page.shadowRoot.querySelector('mnx-score-frame');await frame.updateComplete;
-    check(!frame.shadowRoot.querySelector('.seg'),'Segmented staff view still in the tools row');
-    check(!!page.shadowRoot.querySelector('button[slot=menu]'),'Theme toggle missing');
-    tools.click();for(let i=0;i<50&&!page.shadowRoot.querySelector('mnx-studio-recordings');i++)await delay(50);check(!!page.shadowRoot.querySelector('mnx-studio-recordings'),'Tray control did not open the recording sheet');await page.updateComplete;
-    check(tools.getAttribute('aria-pressed')==='true','Tray control does not show the open sheet');
-    page.shadowRoot.querySelector('button[slot=actions]').click();await page.updateComplete;
-    check(!page.shadowRoot.querySelector('mnx-studio-recordings')&&!!page.shadowRoot.querySelector('mnx-studio-tags'),'Tags did not replace the recording sheet');
-    page.shadowRoot.querySelector('button[slot=actions]').click();await page.updateComplete;
-  })()`);
   assert.deepEqual(c.logs,[]);console.log('Recording management smoke OK',JSON.stringify({uploads,...result,reloaded:reloaded.length}));
 } catch(e) {if(c){const shot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync('/tmp/recording-management-failure.png',Buffer.from(shot.result.data,'base64'));}throw e;}
 finally {

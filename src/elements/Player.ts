@@ -36,6 +36,8 @@ export class Player extends LitElement {
   @property({ attribute: false }) sampleLoader: SamplePackLoader | undefined;
   @property({ attribute: false }) writtenBarDurations: readonly Rational[] | undefined;
   @property({ attribute: false }) recordings: readonly RecordingSource[] = [];
+  /** Host supplies recording management; standalone players omit the add action. */
+  @property({ type: Boolean }) canAddRecording = false;
   private get loading() { return this.status?.loading ?? false; }
   @property({ type: Number }) initialOrdinal: number | null = null;
   @state() private status: PlaybackSnapshot | undefined;
@@ -513,7 +515,7 @@ export class Player extends LitElement {
     } else if (changed.has('initialOrdinal') && this.initialOrdinal !== null)
       this.seek(this.initialOrdinal);
     if (!reinstall && changed.has('recordings') && this.session) {
-      const id = this.session.backend.id;
+      const id = this.youtubeRequest ?? this.session.backend.id;
       this.session.pause();
       if (id !== 'synth') void this.selectSource(this.recordings.some(r => r.id === id) ? id : 'synth', true);
     }
@@ -634,6 +636,10 @@ export class Player extends LitElement {
   async selectSource(id: string, replace = false) {
     this.localError = '';
     const source = this.recordings.find(r => r.id === id);
+    if (id !== 'synth' && !source) return false;
+    if (!replace || id !== (this.youtubeRequest ?? this.sourceId)) {
+      this.dispatchEvent(new CustomEvent('source-selected', { detail: { id }, bubbles: true, composed: true }));
+    }
     if (source?.kind === 'youtube' && !this.youtubeAccepted) {
       this.pause(); this.youtubeRequest = id; this.youtubeNotice = true;
       this.dispatchEvent(new CustomEvent('video-region-changed', { bubbles: true, composed: true }));
@@ -957,10 +963,17 @@ export class Player extends LitElement {
             : 'No performance available'}</output
         >
         ${this.rail()}
-        ${this.recordings.length ? html`<label class="select">Source<select aria-label="Playback source" ?disabled=${!this.performance}
-          .value=${this.sourceId} @change=${(event: Event) => void this.selectSource((event.target as HTMLSelectElement).value)}>
-          <option value="synth" ?selected=${this.sourceId === 'synth'}>Synth</option>
-          ${this.recordings.map(r => html`<option value=${r.id} ?selected=${this.sourceId === r.id}>${r.name}</option>`)}
+        ${this.recordings.length || this.canAddRecording ? html`<label class="select">Source<select aria-label="Playback source" ?disabled=${!this.performance}
+          .value=${this.youtubeRequest ?? this.sourceId} @change=${(event: Event) => {
+            const select = event.target as HTMLSelectElement;
+            if (select.value === 'add-recording') {
+              select.value = this.youtubeRequest ?? this.sourceId;
+              this.dispatchEvent(new CustomEvent('add-recording', { bubbles: true, composed: true }));
+            } else void this.selectSource(select.value);
+          }}>
+          <option value="synth" ?selected=${(this.youtubeRequest ?? this.sourceId) === 'synth'}>Synth</option>
+          ${this.recordings.map(r => html`<option value=${r.id} ?selected=${(this.youtubeRequest ?? this.sourceId) === r.id}>${r.name}</option>`)}
+          ${this.canAddRecording ? html`<option value="add-recording">Add recording…</option>` : nothing}
         </select></label>` : nothing}
         <slot name="source-tools"></slot>
         <span class="settings">

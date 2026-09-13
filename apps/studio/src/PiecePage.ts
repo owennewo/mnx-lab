@@ -18,6 +18,7 @@
 // out). Recordings moved to the player's tray, beside the source switcher whose
 // sources they are.
 import { LitElement, css, html, nothing } from 'lit';
+import { keyed } from 'lit/directives/keyed.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { LibraryClient, LibraryRequestError, type LibrarySnapshot } from '../../../src/storage/libraryClient.ts';
 import { documentTitle, documentArtist, type MnxDocument } from '../../../src/model/mnx.ts';
@@ -55,6 +56,8 @@ export class PiecePage extends LitElement {
   @state() private loading = true;
   @state() private tagsOpen = false;
   @state() private recordingsOpen = false;
+  @state() private selectedRecordingId: string | null = null;
+  @state() private addingRecording = false;
   @state() private theme: ThemeSetting = readTheme();
   @state() private view: ViewSetting = readView();
   @state() private display: DisplayOptions = readDisplay();
@@ -149,7 +152,7 @@ export class PiecePage extends LitElement {
     this.doc = null;
     this.error = '';
     this.loading = true;
-    this.tagsOpen = false; this.recordingsOpen = false;
+    this.tagsOpen = false; this.recordingsOpen = false; this.selectedRecordingId = null; this.addingRecording = false;
     try {
       const readPair = () => Promise.all([
         this.client.canonical(this.pieceId),
@@ -266,7 +269,7 @@ export class PiecePage extends LitElement {
   render() {
     const title = this.doc ? (this.tag('title') ?? this.doc.name) : '';
     const artist = this.doc ? (this.tag('artist') ?? documentArtist(this.doc.mnxJson) ?? '') : '';
-    const recordingCount = this.snapshot?.recordings.length ?? 0;
+    const selectedRecording = this.snapshot?.recordings.find(r => r.id === this.selectedRecordingId);
     const themeNext = nextTheme(this.theme);
     const themeSentence = `Theme: ${this.theme}${this.theme === 'auto' ? ` (now ${resolvedTheme(this.theme)})` : ''} — click for ${themeNext}`;
     // The viewer is queried, not stored: before the first render there is none.
@@ -333,17 +336,25 @@ export class PiecePage extends LitElement {
           .spacingMode=${this.spacingMode}
           @render-scale=${(e: CustomEvent<RenderScale>) => (this.effectiveStaffScale = e.detail.staffScale)}
         ></mnx-document-viewer>
-        <mnx-player slot="player" .recordings=${this.recordings}>
-          ${this.doc
+        <mnx-player slot="player" .recordings=${this.recordings} .canAddRecording=${!!this.snapshot}
+          @source-selected=${(e: CustomEvent<{ id: string }>) => {
+            this.selectedRecordingId = e.detail.id === 'synth' ? null : e.detail.id;
+            this.addingRecording = false;
+            if (!this.selectedRecordingId) this.recordingsOpen = false;
+          }}
+          @add-recording=${() => { this.player?.pause(); this.addingRecording = true; this.recordingsOpen = true; this.tagsOpen = false; void this.refreshSnapshot(); }}>
+          ${selectedRecording
             ? html`<button slot="source-tools" type="button" aria-pressed=${this.recordingsOpen}
-                title=${`Recordings · ${recordingCount}`} aria-label=${`Recordings · ${recordingCount}`}
-                @click=${async () => { this.player?.pause(); await this.refreshSnapshot(); this.recordingsOpen = !this.recordingsOpen; this.tagsOpen = false; }}>${infoGlyph}</button>`
+                title="Recording details" aria-label=${`Recording details: ${selectedRecording.name ?? 'Unnamed recording'}`}
+                @click=${async () => { const generation = this.generation; this.player?.pause(); await this.refreshSnapshot(); if (generation !== this.generation) return; this.recordingsOpen = !this.recordingsOpen || this.addingRecording; this.addingRecording = false; this.tagsOpen = false; }}>${infoGlyph}</button>`
             : nothing}
         </mnx-player>
       </mnx-score-frame>
-      ${this.recordingsOpen && this.snapshot && this.doc ? html`<mnx-studio-recordings .client=${this.client} .snapshot=${this.snapshot} .document=${this.doc}
-        @recordings-changed=${async (e: CustomEvent<LibrarySnapshot>) => { this.player?.pause(); if (this.snapshot?.piece.canonical_rendition_id !== e.detail.piece.canonical_rendition_id) { await this.load(); return; } this.snapshot = { ...e.detail, tags: this.snapshot?.tags ?? [] }; this.setRecordings(e.detail); await this.refreshSnapshot(); }}
-        @close=${() => this.recordingsOpen = false}></mnx-studio-recordings>` : nothing}
+      ${this.recordingsOpen && this.snapshot && this.doc ? keyed(this.addingRecording ? 'new' : this.selectedRecordingId, html`<mnx-studio-recordings .recordingId=${this.addingRecording ? null : this.selectedRecordingId} .client=${this.client} .snapshot=${this.snapshot} .document=${this.doc}
+        @recordings-changed=${async (e: CustomEvent<LibrarySnapshot>) => { this.player?.pause(); if (this.snapshot?.piece.canonical_rendition_id !== e.detail.piece.canonical_rendition_id) { await this.load(); return; } this.snapshot = { ...e.detail, tags: this.snapshot?.tags ?? [] }; this.setRecordings(e.detail); }}
+        @recording-saved=${async (e: CustomEvent<{ id: string }>) => { if (!this.snapshot?.recordings.some(r => r.id === e.detail.id)) return; this.addingRecording = false; this.selectedRecordingId = e.detail.id; await this.updateComplete; await this.player?.updateComplete; await this.player?.selectSource(e.detail.id); }}
+        @recording-deleted=${() => { this.recordingsOpen = false; this.selectedRecordingId = null; this.addingRecording = false; void this.player?.selectSource('synth'); }}
+        @close=${() => this.recordingsOpen = false}></mnx-studio-recordings>`) : nothing}
       ${this.tagsOpen ? html`<mnx-studio-tags .client=${this.client} .snapshot=${this.snapshot}
         @tags-changed=${(e: CustomEvent<TagsSnapshot>) => { if (this.snapshot) this.snapshot = { ...this.snapshot, ...e.detail, piece: { ...this.snapshot.piece, ...e.detail.piece } }; void this.refreshSnapshot(); }}
         @aliases-changed=${() => this.refreshSnapshot()}
