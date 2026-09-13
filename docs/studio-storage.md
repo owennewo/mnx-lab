@@ -65,7 +65,10 @@ schema's `-- ulid` comment predates this and is left as the migration wrote it.
 **The pointer is set explicitly and then belongs to the owner.** An import sets canonical
 only when the piece has none — for a Soundslice slice, to the Soundslice `.gp`, the most
 complete rendition on hand — and never moves it afterwards. A later import adds renditions;
-the owner's choice stands.
+the owner's choice stands. The one exception is a refetch of the same Soundslice export:
+while the pointer still names a Soundslice `.gp`, an import moves it to a Soundslice `.gp`
+fetched later (never earlier), so an edit made on Soundslice reaches the reader. A pointer
+the owner moved elsewhere is never followed off.
 
 **Editing moves the pointer.** A `.gp5` cannot be edited in place. The first studio edit of a
 piece produces an MNX document, stored as a new rendition, and canonical moves to it. A

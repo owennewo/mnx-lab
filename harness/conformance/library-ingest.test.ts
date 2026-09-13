@@ -151,6 +151,31 @@ it('drops a companion recording the request cannot carry and keeps the score', a
     expect(second.snapshot.recordings).toHaveLength(2);
   } finally { console.error = error; }
 });
+it('follows a refetched Soundslice .gp forward, never back to an older one', async () => {
+  const first = await upload(await plan());
+  const sidecar = async (gp: string, fetched_at: string) => {
+    await writeFile(join(directory, 'Song_ABC.gp'), gp);
+    const path = join(directory, 'Song_ABC.sync.json');
+    await writeFile(path, JSON.stringify({ ...JSON.parse(await readFile(path, 'utf8')), fetched_at }));
+    return plan();
+  };
+  const newer = await sidecar('refetched GP with sections', '2026-09-13');
+  const moved = await upload(newer);
+  expect(moved.status).toBe('stored');
+  expect(moved.snapshot.piece.canonical_rendition_id).toBe(newer.canonicalId);
+  expect(moved.snapshot.renditions.map((r: {id: string}) => r.id)).toContain(first.snapshot.piece.canonical_rendition_id);
+  // Already stored but not yet canonical (a run before the pointer followed): the tool does not skip it.
+  const lib = new Library(env.LIBRARY_DB, env.LIBRARY_BUCKET);
+  await lib.writePiece(INGEST_OWNER, { id: moved.snapshot.piece.id, expected_revision: moved.snapshot.piece.revision, canonical: { mode: 'replace', rendition_id: first.snapshot.piece.canonical_rendition_id } });
+  const caught = await upload(newer);
+  expect(caught.status).toBe('stored'); expect(caught.snapshot.piece.canonical_rendition_id).toBe(newer.canonicalId);
+  // A replayed older cache stores its bytes but leaves the pointer where it is.
+  const older = await sidecar('an older GP export', '2026-09-12');
+  const kept = await upload(older);
+  expect(kept.snapshot.renditions.map((r: {id: string}) => r.id)).toContain(older.canonicalId);
+  expect(kept.snapshot.piece.canonical_rendition_id).toBe(newer.canonicalId);
+  expect((await upload(older)).status).toBe('skipped');
+});
 it('accepts a hyphenated Soundslice slice id in the tool and the Worker', async () => {
   const p = await plan();
   p.manifest.source.id = '-gn-8c'; p.manifest.source.url = 'https://www.soundslice.com/slices/-gn-8c/';

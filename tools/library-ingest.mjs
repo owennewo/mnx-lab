@@ -251,10 +251,12 @@ export async function uploadPlan(plan, endpoint, token, fetcher = fetch, access 
     return response.json();
   };
   const { snapshot } = await request(`/ingest/${encodeURIComponent(plan.manifest.source.id)}`);
-  if (snapshot) {
-    const pointer = snapshot.renditions.find(r => r.id === snapshot.piece.canonical_rendition_id);
-    if (!pointer || pointer.format !== 'gp' || pointer.role !== 'export') throw new Error(`${plan.manifest.source.id}: stored canonical is not the Soundslice .gp; refusing`);
-  }
+  const pointer = snapshot?.renditions.find(r => r.id === snapshot.piece.canonical_rendition_id);
+  if (snapshot && (!pointer || pointer.format !== 'gp' || pointer.role !== 'export')) throw new Error(`${plan.manifest.source.id}: stored canonical is not the Soundslice .gp; refusing`);
+  // A newer Soundslice .gp than the stored canonical: the Worker moves the pointer forward to it.
+  const offered = plan.manifest.renditions.find(r => r.id === plan.canonicalId);
+  const fetched = value => (value ? Date.parse(value) : NaN);
+  const pointerStale = !!pointer && pointer.id !== plan.canonicalId && fetched(offered?.fetched_at) > fetched(pointer.fetched_at);
   const have = { renditions: new Set(snapshot?.renditions.map(r => r.id) ?? []), recordings: new Set(snapshot?.recordings.map(r => r.source_id) ?? []),
     tags: snapshot?.tags ?? [] };
   const missingRenditions = plan.manifest.renditions.filter(r => !have.renditions.has(r.id));
@@ -267,7 +269,7 @@ export async function uploadPlan(plan, endpoint, token, fetcher = fetch, access 
   let validation = null;
   const needValidation = converters && (force || !snapshot || missingRenditions.length || projectionStale);
   if (needValidation) validation = await validatePlan(plan, converters);
-  if (!force && snapshot && !missingRenditions.length && !missingRecordings.length && !listsStale && !projectionStale) {
+  if (!force && snapshot && !missingRenditions.length && !missingRecordings.length && !listsStale && !projectionStale && !pointerStale) {
     return { status: 'skipped', snapshot, unchanged: true, validation };
   }
   const manifest = { ...plan.manifest, renditions: missingRenditions, expected_revision: snapshot?.piece.revision ?? null,

@@ -139,13 +139,22 @@ library.post('/ingest', async c => {
   const isSoundsliceGp = (r: { format: string; role: string } | undefined) => r?.format === 'gp' && r.role === 'export';
   const pointer = existing?.piece.canonical_rendition_id ?? canonicalId;
   const rows = [...(existing?.renditions ?? []), ...renditions];
-  if (!isSoundsliceGp(rows.find(r => r.id === pointer))) throw new LibraryError('conflict', 'A Soundslice piece keeps the Soundslice .gp as canonical');
+  const current = rows.find(r => r.id === pointer);
+  if (!isSoundsliceGp(current)) throw new LibraryError('conflict', 'A Soundslice piece keeps the Soundslice .gp as canonical');
+  // A refetched Soundslice .gp is a newer copy of the same export, not a rival
+  // choice: the pointer follows it forward while it still names an older
+  // Soundslice .gp. Only forward — a replayed older cache never moves it back —
+  // and never off a pointer the owner moved elsewhere (refused above).
+  const offered = rows.find(r => r.id === canonicalId);
+  const fetched = (value: string | null | undefined) => (value ? Date.parse(value) : NaN);
+  const follow = !!existing && offered !== undefined && offered.id !== pointer && isSoundsliceGp(offered)
+    && fetched(offered.fetched_at) > fetched(current?.fetched_at);
   const derived: DerivedTag[] | undefined = manifest.derived_tags === undefined ? undefined : array(manifest.derived_tags).map(value => {
     const t = object(value); return { dimension: text(t.dimension), value: text(t.value), source_ref: text(t.source_ref) };
   });
   const input: PieceWrite = { id, expected_revision: revision as number | null,
     source: { kind: 'soundslice', id: sourceId, url: `https://www.soundslice.com/slices/${sourceId}/` }, renditions, recordings,
-    canonical: { mode: 'initialize', rendition_id: canonicalId },
+    canonical: { mode: follow ? 'replace' : 'initialize', rendition_id: canonicalId },
     tags: array(manifest.tags).map(value => { const t = object(value);
       if (t.dimension !== 'list') invalid('Imported lists use the list dimension');
       return { dimension: 'list', value: text(t.value), source_ref: text(t.source_ref) };
