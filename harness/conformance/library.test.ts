@@ -1,7 +1,7 @@
 // Implementation loop: real D1/R2 semantics are the oracle, never SQL mocks.
 import { beforeEach, afterEach, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { Miniflare } from 'miniflare'; // The local runtime installed by the locked Wrangler dependency.
+import { Miniflare, convertV4MiniflareOptions } from 'miniflare'; // The local runtime installed by the locked Wrangler dependency.
 import type { D1Database, R2Bucket } from '@cloudflare/workers-types';
 import { Library, type PieceWrite, type RenditionInput } from '../../worker/library/index.ts';
 import { describeBlob } from '../../worker/library/blobs.ts';
@@ -29,7 +29,7 @@ function wrappedBucket(overrides: Partial<R2Bucket>): R2Bucket {
   } });
 }
 beforeEach(async () => {
-  mf = new Miniflare({ modules: true, script: 'export default { fetch() { return new Response("test only") } }', compatibilityDate: '2026-06-01', d1Databases: ['DB'], r2Buckets: ['BUCKET'] });
+  mf = new Miniflare(convertV4MiniflareOptions({ modules: true, script: 'export default { fetch() { return new Response("test only") } }', compatibilityDate: '2026-06-01', d1Databases: ['DB'], r2Buckets: ['BUCKET'] }));
   db = await mf.getD1Database('DB');
   bucket = await mf.getR2Bucket('BUCKET');
   // Split only between this migration's CREATE statements, preserving the trigger body.

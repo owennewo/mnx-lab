@@ -6,7 +6,7 @@ import { Readable } from 'node:stream';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import assert from 'node:assert/strict';
-import { Miniflare } from 'miniflare';
+import { Miniflare, convertV4MiniflareOptions } from 'miniflare';
 import { generateKeyPair, exportJWK, SignJWT } from 'jose';
 import { serveStatic } from './staticServer.mjs';
 import { devtoolsPort, connect, client } from './browserHarness.mjs';
@@ -14,7 +14,7 @@ const root=fileURLToPath(new URL('../../',import.meta.url));
 const {privateKey,publicKey}=await generateKeyPair('RS256');
 const jwk={...await exportJWK(publicKey),kid:'smoke',alg:'RS256',use:'sig'};
 const jwt=await new SignJWT({type:'app',email:'owner@example.test'}).setProtectedHeader({alg:'RS256',kid:'smoke'}).setIssuer('urn:mnx-library-local').setAudience('smoke').setSubject('owner').setIssuedAt().setExpirationTime('1h').sign(privateKey);
-const mf=new Miniflare({modules:true,scriptPath:root+'dist/mnx_lab/index.js',compatibilityDate:'2026-06-01',d1Databases:['LIBRARY_DB'],r2Buckets:['LIBRARY_BUCKET'],bindings:{LIBRARY_ACCESS_ISSUER:'urn:mnx-library-local',LIBRARY_ACCESS_AUD:'smoke',LIBRARY_LOCAL_JWKS:JSON.stringify({keys:[jwk]})}});
+const mf=new Miniflare(convertV4MiniflareOptions({modules:true,scriptPath:root+'dist/mnx_lab/index.js',compatibilityDate:'2026-06-01',d1Databases:['LIBRARY_DB'],r2Buckets:['LIBRARY_BUCKET'],bindings:{LIBRARY_ACCESS_ISSUER:'urn:mnx-library-local',LIBRARY_ACCESS_AUD:'smoke',LIBRARY_LOCAL_JWKS:JSON.stringify({keys:[jwk]})}}));
 const db=await mf.getD1Database('LIBRARY_DB'), bucket=await mf.getR2Bucket('LIBRARY_BUCKET');
 for(const name of fs.readdirSync(root+'migrations').sort()) {const sql=fs.readFileSync(root+'migrations/'+name,'utf8').replace(/--[^\n]*/g,'').trim();await db.batch(sql.split(/;\s*(?=(?:CREATE|ALTER)\b)/).map(s=>db.prepare(s)));}
 await db.prepare('INSERT INTO users VALUES (?,?,1,?)').bind('alice','owner@example.test','now').run();

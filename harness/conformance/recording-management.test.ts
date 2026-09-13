@@ -1,6 +1,6 @@
 import { beforeEach, afterEach, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { Miniflare } from 'miniflare';
+import { Miniflare, convertV4MiniflareOptions } from 'miniflare';
 import type { D1Database, R2Bucket } from '@cloudflare/workers-types';
 import { Library } from '../../worker/library/index.ts';
 import { RecordingManager } from '../../worker/library/recordings.ts';
@@ -14,7 +14,7 @@ const payload = new TextEncoder().encode('RIFF test audio integrity');
 async function audio() { return { sha256: Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', payload)), b => b.toString(16).padStart(2,'0')).join(''), bytes: payload.length, mime: 'audio/wav' }; }
 function request(bytes = payload) { return new Request('http://localhost/upload', { method: 'PUT', headers: { 'content-length': String(bytes.length) }, body: bytes }); }
 beforeEach(async () => {
-  mf = new Miniflare({ modules: true, script: 'export default { fetch() { return new Response("test") } }', compatibilityDate: '2026-06-01', d1Databases: ['DB'], r2Buckets: ['BUCKET'] });
+  mf = new Miniflare(convertV4MiniflareOptions({ modules: true, script: 'export default { fetch() { return new Response("test") } }', compatibilityDate: '2026-06-01', d1Databases: ['DB'], r2Buckets: ['BUCKET'] }));
   db = await mf.getD1Database('DB'); const nativeBucket = await mf.getR2Bucket('BUCKET');
   // Miniflare's Node RPC drops a Node stream's known-length tag. Adapt only this
   // test boundary; recording-management-smoke exercises the real Worker stream.

@@ -68,14 +68,14 @@
     "lit": "^3.3.3"
   },
   "devDependencies": {
-    "@cloudflare/vite-plugin": "^1.40.1",
-    "@cloudflare/workers-types": "^4.20260609.1",
+    "@cloudflare/vite-plugin": "^1.54.7",
+    "@cloudflare/workers-types": "^5.20260911.1",
     "@types/node": "^26.1.2",
     "ajv": "^8.20.0",
     "dependency-cruiser": "^17.0.1",
     "typescript": "^5.4.5",
     "vite": "^8.0.14",
     "vitest": "^4.1.8",
-    "wrangler": "^4.99.0"
+    "wrangler": "^4.131.0"
   }
 }

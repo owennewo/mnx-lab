@@ -1,12 +1,12 @@
 // Implementation loop: pre-provisioned users preserve existing library owner identities.
 import { beforeEach, afterEach, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { Miniflare } from 'miniflare';
+import { Miniflare, convertV4MiniflareOptions } from 'miniflare';
 import type { D1Database } from '@cloudflare/workers-types';
 let mf: Miniflare;
 let db: D1Database;
 beforeEach(async () => {
-  mf = new Miniflare({ modules: true, script: 'export default {fetch(){return new Response("test")}}', compatibilityDate: '2026-06-01', d1Databases: ['DB'] });
+  mf = new Miniflare(convertV4MiniflareOptions({ modules: true, script: 'export default {fetch(){return new Response("test")}}', compatibilityDate: '2026-06-01', d1Databases: ['DB'] }));
   db = await mf.getD1Database('DB');
   for (const name of ['0001_library.sql', '0002_users.sql']) {
     const sql = readFileSync(new URL(`../../migrations/${name}`, import.meta.url), 'utf8');

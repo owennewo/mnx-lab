@@ -1,5 +1,4 @@
 // Personal operator API. All library paths authenticate before reading a body or storage.
-import type { FormData as MultipartFormData } from '@cloudflare/workers-types/2023-07-01';
 import { Hono } from 'hono';
 import type { Env } from '../env.ts';
 import { Library, LibraryError, pieceIdFor, type Json, type PieceWrite, type PieceSort, type RenditionInput, type RecordingInput, type DerivedTag } from '../library/index.ts';
@@ -46,10 +45,10 @@ async function bounded(request: Request): Promise<ArrayBuffer> {
 async function multipart(request: Request) {
   const contentType = request.headers.get('Content-Type') ?? '';
   if (!contentType.startsWith('multipart/form-data;')) invalid('Expected multipart/form-data');
-  let form: MultipartFormData; let manifest: Record<string, unknown>;
+  let form: FormData; let manifest: Record<string, unknown>;
   const body = await bounded(request);
   try {
-    form = await new Response(body, { headers: { 'Content-Type': contentType } }).formData() as MultipartFormData;
+    form = await new Response(body, { headers: { 'Content-Type': contentType } }).formData();
     const raw = form.get('manifest'); if (typeof raw !== 'string' || raw.length > 1024 * 1024) invalid('Invalid manifest');
     manifest = object(JSON.parse(raw));
   } catch { invalid('Invalid multipart manifest'); }
