@@ -115,3 +115,7 @@ See [the unrolled contract](player-unrolled.md).
 The Sound selector adds an explicit Guitar preset with lazy static samples.
 See [sample packs](player-sample-packs.md) for the pack, host loader/base URL,
 loading/error behavior and recorded-articulation limits.
+
+Recorded audio sources, musical-position handoffs, media delivery and the common
+`playback` snapshot are documented in [player-recordings.md](player-recordings.md).
+The pass menu seeks performed visits in either backend.

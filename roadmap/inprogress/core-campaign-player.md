@@ -690,3 +690,7 @@ paused source's state. Existing browser checks also needed their old rate-select
 selector updated to the current range input. Real PCM tests now cover both embeds
 and Studio; fake media tests cover readiness and rejected-play races. See
 [the runtime contract](../../docs/player-recordings.md). YouTube remains item 17.
+
+The landing rebase also preserved the concurrently added pass menu and iteration
+counts. Its structured readout now accepts either expanded synth time or a recording
+score position; browser checks exercise menu seeks against real audio.
