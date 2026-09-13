@@ -23,7 +23,7 @@ Studio supplies existing `youtube` rows using `external_id`; adding links is ite
 
 Before the first YouTube load in a player session, the component displays its YouTube
 terms/privacy notice and requires **Agree and load YouTube**. No API script or iframe
-loads before that action. Acceptance stays in memory, not localStorage. The notice
+loads before that action. Acceptance stays in memory, not localStorage. The notice uses a short summary with expandable **Privacy details**. It
 explains Google/YouTube requests, ads/cookies, local rate/volume preferences, the
 host's source data and Studio library records; it links YouTube's terms and Google's
 privacy policy and remains accessible beside the iframe. Integrators must cover
