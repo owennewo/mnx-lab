@@ -36,8 +36,9 @@ Piece URLs carry the library's piece id. On a piece the page IS the score frame
 a title grip on the top edge and a pause grip on the bottom, drawn out into the library
 page's tools row (the way back, the title, the piece's chips, the staff view, Zoom,
 Settings, Tags, the menu) and the player's tray. A tap on the score is never a chrome
-toggle. The staff view, the display settings, zoom and spacing are per-browser localStorage
-preferences (`mnx-studio.*`), the one persistence a shell may own without a backend decision.
+toggle. The staff view, the display settings, zoom and spacing, and whether each grip was
+left drawn out, are per-browser localStorage preferences (`mnx-studio.*`), the one
+persistence a shell may own without a backend decision.
 
 ## The decisions that starting settled
 

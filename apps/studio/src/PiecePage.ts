@@ -23,13 +23,14 @@ import { bindPlayback } from '../../../src/elements/playbackHost.ts';
 import { DEFAULT_DISPLAY_PREFERENCES } from '../../../src/elements/displayDefaults.ts';
 import type { DocumentViewer, ViewMode, ViewSetting } from '../../../src/elements/DocumentViewer.ts';
 import type { Player } from '../../../src/elements/Player.ts';
+import type { StripChange } from '../../../src/elements/ScoreFrame.ts';
 import type { ZoomPadChange } from '../../../src/elements/ZoomPad.ts';
 import { libraryHref } from './StudioApp.ts';
 import { chipText, dimensionLabel } from './labels.ts';
 import './TagsSheet.ts';
 import type { TagsSnapshot } from './TagsSheet.ts';
 
-import { VIEW_KEY, DISPLAY_KEY, UNROLLED_KEY, STAFF_SCALE_KEY, DENSITY_H_KEY, SPACING_MODE_KEY, read, write, readView, readDisplay, readNumber } from './scorePreferences.ts';
+import { VIEW_KEY, DISPLAY_KEY, UNROLLED_KEY, STAFF_SCALE_KEY, DENSITY_H_KEY, SPACING_MODE_KEY, TOOLS_OPEN_KEY, PLAYER_OPEN_KEY, read, write, readView, readDisplay, readNumber } from './scorePreferences.ts';
 
 const CHIP_DIMENSIONS = ['tuning-name', 'capo', 'key', 'genre', 'list'];
 
@@ -56,6 +57,9 @@ export class PiecePage extends LitElement {
   @state() private densityH: number | null = readNumber(DENSITY_H_KEY);
   @state() private spacingMode: 'natural' | 'fill' = read(SPACING_MODE_KEY) === 'natural' ? 'natural' : 'fill';
   @state() private effectiveStaffScale = 1;
+  /** The frame's strips as the reader last left them — a per-browser preference. */
+  @state() private toolsOpen = read(TOOLS_OPEN_KEY) === 'true';
+  @state() private playerOpen = read(PLAYER_OPEN_KEY) === 'true';
   @query('mnx-document-viewer') private viewer!: DocumentViewer;
   @query('mnx-player') private player!: Player;
   private binding: ReturnType<typeof bindPlayback> | null = null;
@@ -247,6 +251,17 @@ export class PiecePage extends LitElement {
   private onDisplayChange(event: CustomEvent<DisplayOptions>) {
     this.setDisplay(event.detail);
   }
+  private onStripChange(event: CustomEvent<StripChange>) {
+    const { strip, open } = event.detail;
+    if (strip === 'top') {
+      this.toolsOpen = open;
+      write(TOOLS_OPEN_KEY, String(open));
+    } else {
+      this.playerOpen = open;
+      write(PLAYER_OPEN_KEY, String(open));
+    }
+  }
+
   private onUnrolledChange(event: CustomEvent<boolean>) {
     this.unrolled = event.detail;
     write(UNROLLED_KEY, String(this.unrolled));
@@ -290,6 +305,9 @@ export class PiecePage extends LitElement {
         .effectiveStaffScale=${this.effectiveStaffScale}
         .densitySteps=${this.densitySteps}
         .pads=${!!this.doc}
+        .topOpen=${this.toolsOpen}
+        .bottomOpen=${this.playerOpen}
+        @strip-change=${this.onStripChange}
         @view-change=${this.onViewChange}
         @display-change=${this.onDisplayChange}
         @unrolled-change=${this.onUnrolledChange}

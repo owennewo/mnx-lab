@@ -34,12 +34,16 @@ import './SettingsPad.ts';
  * the workbench's pane beside its rail and side panel both hit it.
  *
  * ONE ELEMENT, TWO HOSTS. Studio mounts it on the piece page; the workbench on
- * the scenario page's score pane. The frame owns only which strip is open; every
- * value it shows comes in as a property and every change leaves as the pads'
- * own events (`view-change`, `display-change`, `unrolled-change`, `zoom-change`,
- * `spacing-mode-change`, `clearance-change`, `document-focus-toggle`), which
- * bubble composed through the frame for the host to store — the pads are
- * chrome, not surface, and so is this.
+ * the scenario page's score pane. Every value the frame shows comes in as a
+ * property and every change leaves as the pads' own events (`view-change`,
+ * `display-change`, `unrolled-change`, `zoom-change`, `spacing-mode-change`,
+ * `clearance-change`, `document-focus-toggle`), which bubble composed through
+ * the frame for the host to store — the pads are chrome, not surface, and so
+ * is this. Which strip is drawn out follows the same rule: `topOpen` and
+ * `bottomOpen` are properties the host may set (its remembered choice), and
+ * every toggle from a grip, a chevron or Escape leaves as `strip-change`
+ * (`{ strip: 'top' | 'bottom', open }`) for the host to remember or ignore.
+ * Which pad is up stays the frame's own — a popover is not a preference.
  *
  * The grip's pause and readout come from the slotted `<mnx-player>`: its
  * `playback-state-changed` frames bubble through the frame, and the grip calls
@@ -52,6 +56,12 @@ const VIEW_WORDS: Record<ViewMode, string> = { notation: 'Notation', tab: 'Tab',
 const NO_STRINGS = 'Needs known strings — declare strings[] in the document, or set an instrument override';
 
 type Pad = 'zoom' | 'settings' | null;
+
+/** The detail of `strip-change`: which strip the user drew out or put away. */
+export interface StripChange {
+  strip: 'top' | 'bottom';
+  open: boolean;
+}
 
 @customElement('mnx-score-frame')
 export class ScoreFrame extends LitElement {
@@ -80,8 +90,9 @@ export class ScoreFrame extends LitElement {
    *  the host cannot lay out, has nothing for them to change. */
   @property({ type: Boolean }) pads = true;
 
-  @state() private topOpen = false;
-  @state() private bottomOpen = false;
+  /** Which strip is drawn out — the host's to pin (see the note above). */
+  @property({ type: Boolean, attribute: 'top-open' }) topOpen = false;
+  @property({ type: Boolean, attribute: 'bottom-open' }) bottomOpen = false;
   @state() private pad: Pad = null;
   @state() private playing = false;
   @state() private positionText = '';
@@ -531,8 +542,20 @@ export class ScoreFrame extends LitElement {
   // ── the strips ──────────────────────────────────────────────────────────
 
   private setTop(open: boolean) {
-    this.topOpen = open;
     if (!open) this.pad = null;
+    if (this.topOpen === open) return;
+    this.topOpen = open;
+    this.emitStrip('top', open);
+  }
+
+  private setBottom(open: boolean) {
+    if (this.bottomOpen === open) return;
+    this.bottomOpen = open;
+    this.emitStrip('bottom', open);
+  }
+
+  private emitStrip(strip: 'top' | 'bottom', open: boolean) {
+    this.dispatchEvent(new CustomEvent<StripChange>('strip-change', { detail: { strip, open }, bubbles: true, composed: true }));
   }
 
   private togglePad(which: Exclude<Pad, null>) {
@@ -556,7 +579,7 @@ export class ScoreFrame extends LitElement {
       event.stopPropagation();
     } else if (this.topOpen || this.bottomOpen) {
       this.setTop(false);
-      this.bottomOpen = false;
+      this.setBottom(false);
       event.stopPropagation();
     }
   };
@@ -637,7 +660,7 @@ export class ScoreFrame extends LitElement {
         style="background: none; border: 0; cursor: pointer; padding: 0;"
         aria-expanded="false"
         aria-label="Show the player"
-        @click=${() => (this.bottomOpen = true)}
+        @click=${() => this.setBottom(true)}
       >${ScoreFrame.chevronUp}</button>
     </div>`;
   }
@@ -724,7 +747,7 @@ export class ScoreFrame extends LitElement {
   private bottomStrip() {
     return html`<div class="strip bottom">
       <slot name="player"></slot>
-      <button class="btn icon ghost" type="button" aria-label="Hide the player" @click=${() => (this.bottomOpen = false)}>
+      <button class="btn icon ghost" type="button" aria-label="Hide the player" @click=${() => this.setBottom(false)}>
         ${ScoreFrame.chevronDown}
       </button>
     </div>`;

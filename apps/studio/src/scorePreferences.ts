@@ -9,6 +9,9 @@ export const UNROLLED_KEY = 'mnx-studio.unrolled';
 export const STAFF_SCALE_KEY = 'mnx-studio.staff-scale';
 export const DENSITY_H_KEY = 'mnx-studio.density-h';
 export const SPACING_MODE_KEY = 'mnx-studio.spacing-mode';
+/** The score frame's strips: whether the tools row / the player tray was left drawn out. */
+export const TOOLS_OPEN_KEY = 'mnx-studio.tools-open';
+export const PLAYER_OPEN_KEY = 'mnx-studio.player-open';
 export const VIEWS: ViewSetting[] = ['auto', 'notation', 'tab', 'both'];
 
 export function read(key: string): string | null {
