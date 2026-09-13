@@ -24,14 +24,17 @@ await db.prepare('INSERT INTO pieces (id,owner,created_at,updated_at) VALUES (?,
 await db.prepare('INSERT INTO renditions (id,piece_id,format,role,filename,sha256,r2_key,bytes,producer,created_at) VALUES (?,?,?,?,?,?,?,?,?,?)').bind('score','piece','mnx','original','score.mnx.json','fixture','renditions/fixture',bytes.length,'test','now').run();
 await db.prepare('UPDATE pieces SET canonical_rendition_id=? WHERE id=?').bind('score','piece').run();
 const staticServer=await serveStatic(root+'dist/client');
-let uploads=0;
+let uploads=0, canonicalReads=0;
 const proxy=http.createServer(async(req,res)=>{try {
   const url=`http://127.0.0.1:${proxy.address().port}${req.url}`;
   const headers=new Headers(Object.entries(req.headers).filter(([,v])=>typeof v==='string'));
   if(req.url.startsWith('/api/')) {
     headers.set('Cf-Access-Jwt-Assertion',jwt); if(req.method==='PUT'&&req.url.startsWith('/api/library/uploads/'))uploads++;
     const r=await mf.dispatchFetch(url,{method:req.method,headers,...(!['GET','HEAD'].includes(req.method)?{body:Readable.toWeb(req),duplex:'half'}:{})});
-    res.writeHead(r.status,Object.fromEntries(r.headers));if(r.body)Readable.fromWeb(r.body).pipe(res);else res.end();
+    const responseHeaders=Object.fromEntries(r.headers);
+    // Simulate a canonical pointer changing between the paired metadata/file reads.
+    if(req.url.endsWith('/canonical') && ++canonicalReads===1)responseHeaders['x-library-rendition']='prior-score';
+    res.writeHead(r.status,responseHeaders);if(r.body)Readable.fromWeb(r.body).pipe(res);else res.end();
   } else {
     const r=await fetch(`http://127.0.0.1:${staticServer.port}${req.url}`);res.writeHead(r.status,Object.fromEntries(r.headers));if(r.body)Readable.fromWeb(r.body).pipe(res);else res.end();
   }
@@ -72,7 +75,7 @@ try {
   })()`);
   await c.send('Page.reload');await new Promise(r=>setTimeout(r,1200));
   const reloaded=await c.evaluate(`(async()=>{for(let i=0;i<100;i++){const page=document.querySelector('mnx-studio')?.shadowRoot?.querySelector('mnx-studio-piece'),p=page?.shadowRoot?.querySelector('mnx-player');if(p?.performance&&p.recordings.length===2)return p.recordings;await new Promise(r=>setTimeout(r,50));}return [];})()`);
-  assert.equal(reloaded.find(r=>r.id===result.audioId)?.name,'Renamed take');assert.equal(reloaded.find(r=>r.id===result.youtubeId)?.syncpoints[0][1],1);assert.equal(uploads,1);
+  assert.equal(reloaded.find(r=>r.id===result.audioId)?.name,'Renamed take');assert.equal(reloaded.find(r=>r.id===result.youtubeId)?.syncpoints[0][1],1);assert.equal(uploads,1);assert.ok(canonicalReads>=3,'Canonical identity mismatch was not retried before reload');
   await c.send('Emulation.setDeviceMetricsOverride',{width:360,height:800,deviceScaleFactor:1,mobile:true});
   await c.evaluate(`(async()=>{const p=document.querySelector('mnx-studio').shadowRoot.querySelector('mnx-studio-piece');[...p.shadowRoot.querySelectorAll('button')].find(b=>b.textContent.includes('Recordings ·')).click();await new Promise(r=>setTimeout(r,200));})()`);
   await c.evaluate(`(async()=>{
