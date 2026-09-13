@@ -74,7 +74,9 @@ try {
   for (const preset of config.presets) {
     const work = [
       ...fixtures,
-      ...(!heldout && preset === config.templatePreset ? templateCases(config) : []),
+      ...(!heldout && preset === config.templatePreset
+        ? templateCases(config)
+        : []),
     ];
     for (const fixture of work) {
       const rendered = await page.evaluate(

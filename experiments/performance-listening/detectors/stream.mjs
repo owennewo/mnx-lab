@@ -41,7 +41,12 @@ export class StreamingDetector {
           score = scores[i];
         let state = this.active.get(pitch);
         if (score >= c.activityThreshold) {
-          if (this.attack && state?.decisionSample !== null && state && this.attack.permits(i, time)) {
+          if (
+            this.attack &&
+            state?.decisionSample !== null &&
+            state &&
+            this.attack.permits(i, time)
+          ) {
             state.end = time;
             state = null;
           }
