@@ -44,7 +44,6 @@ No isolated marginal processing cost measured for this layer.
 |---|---|---|---|---|
 | TE-001 · 2026-09-13 | Both DSP pipelines, reference settings; offline/256/2048 chunks | [Frozen run](../findings/reference-v1/summary.json) | Matching musical results across modes; larger chunks increase availability delay | Retain causal replay controls; benefit of this gate alone unresolved |
 | TE-002 · 2026-09-13 | Focused reading of the same reference run: archtop templates + gate, `restrike-no-gap` | [Per-case outcomes](../findings/reference-v1/cases.jsonl) | All active pitch sets correct; only 1/3 attacks matched | Pitch continuity is insufficient for re-strikes; investigate attack evidence |
-
 | TE-003 · 2026-09-13 | F-001 pitch-associated attack gate, frozen 12-setting sweep | [AR-001/002](attack-restrike.md) | Repeat attacks improve at ~5% extra processing, but hard onset gating loses sustained/polyphonic coverage | Revise: separate ongoing pitch presence from attack decisions; retain F-000 default |
 
 ## What works, what does not, what is unknown

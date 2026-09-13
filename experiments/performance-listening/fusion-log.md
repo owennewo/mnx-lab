@@ -36,7 +36,6 @@ failure when a later configuration works.
 | FL-001 · 2026-09-13 | Retrospective: [reference-v1 separate pipelines](findings/README.md) | 714 measured outcomes, 204 unsupported neural-stream outcomes; technique histories below retain their exact scope |
 | FL-002 · 2026-09-13 | Adopt fused-listener development direction | Optimise whole-system accuracy/cost; component comparisons become diagnostics; no combined run yet |
 | FL-003 · 2026-09-13 | Start this log and structured technique records | Capture configurations and interactions so a bad setting is not mistaken for a bad technique |
-
 | FL-004 · 2026-09-13 | [F-001 attack association: AR-001/002](fusion-techniques/attack-restrike.md) | 12 settings + locked held-out run; ~5% cost, improved repeats, unacceptable pitch/strum regressions. Revise; keep F-000 default |
 
 ## Candidate next experiments
