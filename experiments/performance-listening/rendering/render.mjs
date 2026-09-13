@@ -12,6 +12,7 @@ import {
   wav,
   filesHash,
 } from "../evaluation/io.mjs";
+import { fusionHeldoutV2 } from "../fixtures/fusion-heldout-v2.mjs";
 import { fusionHeldout } from "../fixtures/fusion-heldout.mjs";
 import { cases, templateCases } from "../fixtures/cases.mjs";
 const output = path.resolve(
@@ -68,8 +69,9 @@ try {
     ])
   )
     throw Error("MNX adapter disagrees with independent schedule");
-  const heldout = process.argv.includes("--fusion-heldout");
-  const fixtures = heldout ? fusionHeldout() : [...cases(), mnx];
+  const heldoutV2 = process.argv.includes("--fusion-heldout-v2");
+  const heldout = heldoutV2 || process.argv.includes("--fusion-heldout");
+  const fixtures = heldoutV2 ? fusionHeldoutV2() : heldout ? fusionHeldout() : [...cases(), mnx];
   const records = [];
   for (const preset of config.presets) {
     const work = [
