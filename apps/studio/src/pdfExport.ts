@@ -3,6 +3,8 @@ import { DocumentViewer } from '../../../src/elements/DocumentViewer.ts';
 import { loadSmufl } from '../../../src/engine/smufl/smufl.ts';
 import { readView, readDisplay, read, readNumber, UNROLLED_KEY, STAFF_SCALE_KEY, DENSITY_H_KEY, SPACING_MODE_KEY } from './scorePreferences.ts';
 
+const PRINT_WIDTH_MM = 186;
+
 /** A printable vector preview: the browser supplies its native Save as PDF. */
 export function preparePdfView(title: string): Window {
   const preview = window.open('', '_blank');
@@ -52,6 +54,8 @@ export async function renderPdfView(preview: Window, mnx: MnxStructure, title: s
       if (sheet instanceof HTMLLinkElement) copy.setAttribute('href', sheet.href);
       doc.head.append(copy);
     }
+    // Keep the physical width used for pagination when Chrome changes margins.
+    // Expanding an SVG also increases its height and can orphan the title.
     const style = doc.createElement('style');
     style.textContent = `
       @font-face { font-family: Bravura; src: url('${location.origin}/smufl/Bravura.woff2') format('woff2'); }
@@ -60,11 +64,11 @@ export async function renderPdfView(preview: Window, mnx: MnxStructure, title: s
       body { margin: 0; height: auto; overflow: auto; background: #eee; color: #111; font-family: Archivo, sans-serif; }
       header { padding: 16px; text-align: center; }
       button { font: inherit; padding: 8px 16px; cursor: pointer; }
-      .page { box-sizing: border-box; width: 186mm; margin: 16px auto; padding: 0; background: white; break-after: page; }
+      .page { box-sizing: border-box; width: ${PRINT_WIDTH_MM}mm; margin: 16px auto; padding: 0; background: white; break-after: page; }
       .page:last-child { break-after: auto; }
       h1 { font-size: 18px; text-align: center; margin: 0 0 16px; }
       svg { display: block; width: 100%; height: auto; color: #111; --font-family-sans: Archivo, sans-serif; }
-      @media print { body { background: white; } header { display: none; } .page { margin: 0; width: 100%; } }
+      @media print { body { background: white; } header { display: none; } .page { margin: 0 auto; max-width: 100%; } }
     `;
     doc.head.append(style);
     const header = doc.createElement('header');
@@ -105,7 +109,7 @@ export async function renderPdfView(preview: Window, mnx: MnxStructure, title: s
     let first = true;
     while (y < end) {
       const heading = first && display.title !== 'hide' ? viewer.shadowRoot?.querySelector('h1')?.textContent?.trim() : '';
-      const capacity = box.width * (273 - (heading ? 14 : 0)) / 186;
+      const capacity = box.width * (273 - (heading ? 14 : 0)) / PRINT_WIDTH_MM;
       let cut = Math.min(end, y + capacity);
       const crossing = merged.find(b => b[0] < cut && b[1] > cut);
       if (crossing) cut = crossing[0] > y + 1 ? crossing[0] : Math.min(end, crossing[1]);
