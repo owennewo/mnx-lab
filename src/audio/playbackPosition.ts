@@ -33,7 +33,7 @@ export interface PlaybackPositionParts {
   bar: string;
   iteration: number;
   iterations: number;
-  /** The beat with its tenth when it has one: `3`, `4.5`. */
+  /** The beat with its tenth when it has one: `3`, `4.5` — printed after the bar as `# 21.4.5`. */
   beat: string;
   insertion: 'hold' | 'grace' | null;
 }
@@ -80,6 +80,11 @@ export function scorePlaybackPositionParts(performance: Performance, position: S
     insertion: null,
   };
 }
+/** The place in the written score as one dotted number — `# 21.4` is bar 21
+ *  beat 4, `# 21.4.5` half a beat in — so bar, beat and sub-beat read together. */
+export function placeLabel(parts: Pick<PlaybackPositionParts, 'bar' | 'beat'>): string {
+  return `# ${parts.bar}.${parts.beat}`;
+}
 export function formatPlaybackPosition(
   performance: Performance,
   position: Rational,
@@ -87,11 +92,11 @@ export function formatPlaybackPosition(
 ): string {
   const parts = playbackPositionParts(performance, position, document);
   if (!parts) return compare(position, ZERO) === 0 ? 'Ready' : 'End';
-  return `bar ${parts.bar} · iteration ${parts.iteration} of ${parts.iterations} · beat ${parts.beat}${parts.insertion ? ` · ${parts.insertion}` : ''}`;
+  return `${placeLabel(parts)} · iteration ${parts.iteration} of ${parts.iterations}${parts.insertion ? ` · ${parts.insertion}` : ''}`;
 }
 export function formatScorePlaybackPosition(performance: Performance, position: ScorePosition, document?: MnxStructure): string {
   const parts = scorePlaybackPositionParts(performance, position, document);
-  return parts ? `bar ${parts.bar} · iteration ${parts.iteration} of ${parts.iterations} · beat ${parts.beat}` : 'End';
+  return parts ? `${placeLabel(parts)} · iteration ${parts.iteration} of ${parts.iterations}` : 'End';
 }
 /**
  * The widest label `formatPlaybackPosition` can print for this performance,
@@ -124,5 +129,5 @@ export function widestPlaybackPosition(performance: Performance, document?: MnxS
   }
   const kinds = new Set(performance.sourceMap.map((s) => s.kind));
   const suffix = kinds.has('makeTime') ? ' · grace' : kinds.has('fermata') ? ' · hold' : '';
-  return `bar ${bar} · iteration ${iteration} of ${iteration} · beat ${beat}.5${suffix}`;
+  return `${placeLabel({ bar, beat: `${beat}.5` })} · iteration ${iteration} of ${iteration}${suffix}`;
 }

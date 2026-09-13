@@ -18,7 +18,7 @@ import {
   type VoicePreset,
 } from '../audio/sampleSelection.ts';
 import type { SamplePackLoader } from '../audio/native/samplePacks.ts';
-import { formatPlaybackPosition, formatScorePlaybackPosition, measureAt, passesOf, playbackPositionParts, scorePlaybackPositionParts, widestPlaybackPosition } from '../audio/playbackPosition.ts';
+import { formatPlaybackPosition, formatScorePlaybackPosition, measureAt, passesOf, placeLabel, playbackPositionParts, scorePlaybackPositionParts, widestPlaybackPosition } from '../audio/playbackPosition.ts';
 import { ZERO, type Rational } from '../audio/time.ts';
 import type { MnxStructure } from '../model/mnx.ts';
 import type { PlaybackUpdate } from './mnxContext.ts';
@@ -493,10 +493,11 @@ export class Player extends LitElement {
       : this.scorePosition ? scorePlaybackPositionParts(this.performance, this.scorePosition, this.document) : null;
     if (!parts) return this.positionLabel;
     const passes = passesOf(this.performance, parts.measureIndex);
+    const place = `${placeLabel(parts)} · `;
     const iteration = `iteration ${parts.iteration} of ${parts.iterations}`;
-    const tail = ` · beat ${parts.beat}${parts.insertion ? ` · ${parts.insertion}` : ''}`;
-    if (passes.length < 2) return `bar ${parts.bar} · ${iteration}${tail}`;
-    return html`bar ${parts.bar} · <span class="passes"
+    const tail = parts.insertion ? ` · ${parts.insertion}` : '';
+    if (passes.length < 2) return `${place}${iteration}${tail}`;
+    return html`${place}<span class="passes"
         ><button
           type="button"
           aria-haspopup="menu"
