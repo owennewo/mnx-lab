@@ -25,6 +25,13 @@ await db.prepare('INSERT INTO renditions (id,piece_id,format,role,filename,sha25
 await db.prepare('UPDATE pieces SET canonical_rendition_id=? WHERE id=?').bind('score','piece').run();
 const staticServer=await serveStatic(root+'dist/client');
 let uploads=0, canonicalReads=0;
+function sendBody(response, res) {
+  if (!response.body) { res.end(); return; }
+  const stream=Readable.fromWeb(response.body);
+  // Native audio cancels range requests on seek/source changes. Propagate that
+  // cancellation upstream, otherwise Miniflare waits for abandoned response bodies.
+  res.once('close',()=>stream.destroy()); stream.on('error',()=>res.destroy()); stream.pipe(res);
+}
 const proxy=http.createServer(async(req,res)=>{try {
   const url=`http://127.0.0.1:${proxy.address().port}${req.url}`;
   const headers=new Headers(Object.entries(req.headers).filter(([,v])=>typeof v==='string'));
@@ -34,9 +41,9 @@ const proxy=http.createServer(async(req,res)=>{try {
     const responseHeaders=Object.fromEntries(r.headers);
     // Simulate a canonical pointer changing between the paired metadata/file reads.
     if(req.url.endsWith('/canonical') && ++canonicalReads===1)responseHeaders['x-library-rendition']='prior-score';
-    res.writeHead(r.status,responseHeaders);if(r.body)Readable.fromWeb(r.body).pipe(res);else res.end();
+    res.writeHead(r.status,responseHeaders);sendBody(r,res);
   } else {
-    const r=await fetch(`http://127.0.0.1:${staticServer.port}${req.url}`);res.writeHead(r.status,Object.fromEntries(r.headers));if(r.body)Readable.fromWeb(r.body).pipe(res);else res.end();
+    const r=await fetch(`http://127.0.0.1:${staticServer.port}${req.url}`);res.writeHead(r.status,Object.fromEntries(r.headers));sendBody(r,res);
   }
 }catch(e){res.writeHead(500).end(String(e));}});
 await new Promise(r=>proxy.listen(0,'127.0.0.1',r));
