@@ -67,6 +67,11 @@ try{
  await wait(`test.player.playback.rate===1.5`);
  const geometry=await c.evaluate(`(()=>{const f=test.frame.shadowRoot.querySelector('iframe'),b=f.getBoundingClientRect();return {width:b.width,height:b.height,top:b.top,bottom:b.bottom,referrer:f.referrerPolicy,controls:new URL(f.src).searchParams.get('controls')};})()`);
  if(geometry.width<200||geometry.height<200||geometry.bottom>900||geometry.controls!=='1')throw new Error('Invalid video geometry '+JSON.stringify(geometry));
+ const controls=await c.evaluate(`(()=>{const root=test.frame.shadowRoot, video=root.querySelector('iframe').getBoundingClientRect(), buttons=root.querySelector('.video-controls').getBoundingClientRect();return buttons.top>=video.bottom && buttons.left>=video.left && buttons.right<=video.right && !test.player.shadowRoot.querySelector('.youtube-panel');})()`);
+ if(!controls)throw new Error('YouTube controls are not beneath the left video');
+ await c.evaluate(`[...test.frame.shadowRoot.querySelectorAll('button')].find(b=>b.textContent==='Terms and privacy').click()`);
+ await wait(`!!test.player.shadowRoot.querySelector('.youtube-notice')`);
+ await c.evaluate(`[...test.player.shadowRoot.querySelectorAll('button')].find(b=>b.textContent==='Close notice').click()`);
  const layout=await c.evaluate(`(()=>{const root=test.frame.shadowRoot, video=root.querySelector('iframe'), score=root.querySelector('.score');window.originalVideo=video;const divider=root.querySelector('.video-divider');divider.dispatchEvent(new KeyboardEvent('keydown',{key:'Home'}));return video.getBoundingClientRect().right<=score.getBoundingClientRect().left;})()`);
  if(!layout)throw new Error('Video is not left of the score');
  await new Promise(r=>setTimeout(r,100));
@@ -119,7 +124,7 @@ try{
   await c.evaluate(`test.player.selectSource('synth');test.player.selectSource('youtube');test.player.selectSource('second')`);await wait(`test.player.sourceId==='second'&&!test.player.playback.loading`);
  }
  const shot=await c.send('Page.captureScreenshot');fs.writeFileSync(`/tmp/youtube-${live?'live':format}.png`,Buffer.from(shot.result.data,'base64'));
- await c.evaluate(`[...test.player.shadowRoot.querySelectorAll('button')].find(b=>b.textContent==='Close video').click()`);
+ await c.evaluate(`[...test.frame.shadowRoot.querySelectorAll('button')].find(b=>b.textContent==='Close video').click()`);
  await wait(`test.player.sourceId==='synth' && !test.player.playback.wantsPlayback`);
  if(!await c.evaluate(`test.frame.shadowRoot.querySelector('.video-pane').hidden && test.frame.shadowRoot.querySelector('.score').getBoundingClientRect().left===test.frame.getBoundingClientRect().left`))throw new Error('Video pane remained after switching to synth');
  await c.evaluate(`test.player.remove()`);

@@ -169,8 +169,10 @@ export class ScoreFrame extends LitElement {
          document's. Bottom padding keeps the last system scrollable out from
          under the playback grip. */
       .workspace { display: flex; flex: 1 1 auto; min-height: 0; min-width: 0; }
-      .video-pane { flex: none; min-width: 200px; overflow: auto; }
-      .video-surface { width: 100%; height: min(100%, var(--video-height)); min-height: 200px; }
+      .video-pane { display: flex; flex-direction: column; flex: none; min-width: 200px; overflow: auto; }
+      .video-surface { width: 100%; height: var(--video-height); flex: 0 1 var(--video-height); min-height: 200px; }
+      .video-controls { display: flex; flex-wrap: wrap; gap: 8px; padding: 8px; flex: none; }
+      .video-controls .btn { white-space: normal; }
       .video-divider { flex: 0 0 8px; cursor: col-resize; touch-action: none; background: var(--frame-ground); }
       .video-divider:hover, .video-divider:focus-visible { background: var(--ink-muted); outline: 2px solid var(--ink); outline-offset: -2px; }
       .video-pane[hidden], .video-divider[hidden] { display: none; }
@@ -857,6 +859,10 @@ export class ScoreFrame extends LitElement {
         <aside class="video-pane" aria-label="YouTube video" ?hidden=${!this.videoOpen}
           style="width: ${this.videoWidth}px; --video-height: ${Math.max(200, this.videoWidth * 9 / 16)}px">
           <div class="video-surface"></div>
+          <div class="video-controls">
+            <button class="btn ghost" @click=${() => this.player?.showYouTubeNotice()}>Terms and privacy</button>
+            <button class="btn ghost" @click=${() => { this.player?.pause(); void this.player?.selectSource('synth'); }}>Close video</button>
+          </div>
         </aside>
         <div class="video-divider" role="separator" tabindex="0" aria-label="Video pane width" aria-orientation="vertical"
           aria-valuemin="200" aria-valuemax=${Math.round(this.videoMaximum)} aria-valuenow=${Math.round(this.videoWidth)}

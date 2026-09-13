@@ -616,6 +616,11 @@ export class Player extends LitElement {
     this.youtubeAccepted = true; this.youtubeRequest = null; this.youtubeNotice = false;
     if (id) await this.selectSource(id);
   }
+  /** Show the shared disclosure from either the inline player or a host video pane. */
+  showYouTubeNotice() {
+    this.youtubeNotice = true;
+    this.dispatchEvent(new CustomEvent('video-region-changed', { bubbles: true, composed: true }));
+  }
   async startSource() { this.localError = ''; await this.session?.start(); }
   seek(ordinal: number) {
     const measure = this.performance?.measures.find(m => m.ordinal === ordinal);
@@ -936,8 +941,8 @@ export class Player extends LitElement {
         <p>By using this YouTube feature you agree to be bound by the <a href="https://www.youtube.com/t/terms" target="_blank" rel="noopener">YouTube Terms of Service</a>. Select Agree and load to accept these terms and this privacy policy for this player session.</p>
         ${this.youtubeRequest ? html`<button @click=${() => void this.acceptYouTube()}>Agree and load YouTube</button><button @click=${() => { this.youtubeRequest = null; this.youtubeNotice = false; }}>Cancel</button>` : html`<button @click=${() => this.youtubeNotice = false}>Close notice</button>`}
       </section>` : nothing}
-      ${this.status?.kind === 'youtube' ? html`<section class="youtube-panel" aria-label="YouTube recording">
-        ${this.externalVideo ? nothing : html`<div class="youtube-surface"></div>`}
+      ${this.status?.kind === 'youtube' && !this.externalVideo ? html`<section class="youtube-panel" aria-label="YouTube recording">
+        <div class="youtube-surface"></div>
         <p>YouTube · <button @click=${() => this.youtubeNotice = !this.youtubeNotice}>Terms and privacy</button> · <button @click=${() => { this.pause(); void this.selectSource('synth'); }}>Close video</button></p>
       </section>` : nothing}
       ${this.loading
