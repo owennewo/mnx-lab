@@ -49,8 +49,10 @@ retain F-003 as the experiment's reference.
 
 ## Trial history
 
-No configurations have been tried. The weak-bass diagnosis is motivation, not a trial of
-this proposed model. No F-number is assigned before a concrete recipe is frozen.
+No replacement envelope configurations have been tried. [F-006 explicit fundamental
+support](fundamental-evidence.md) tests one ingredient while retaining the original 1/h
+dictionary. It recovers bass attacks but does not solve shared-harmonic allocation; its
+results are not evidence that a complete flexible model has been implemented.
 
 ## What works, what does not, what is unknown
 
