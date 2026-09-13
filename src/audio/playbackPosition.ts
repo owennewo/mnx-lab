@@ -9,6 +9,34 @@ export function measureAt(
     (m) => compare(position, m.position) >= 0 && compare(position, add(m.position, m.duration)) < 0,
   );
 }
+/** How many times the performance visits this written measure — the last
+ *  iteration it reaches, so a readout can say `iteration 2 of 3`. */
+export function iterationsOf(performance: Performance, measureIndex: number): number {
+  let last = 1;
+  for (const m of performance.measures)
+    if (m.measureIndex === measureIndex && m.iteration > last) last = m.iteration;
+  return last;
+}
+/**
+ * The previous and next visits to the same written measure, by performed
+ * order — the verse before and the verse after this one. Either is absent
+ * when this visit is the first or last pass through the bar.
+ */
+export function siblingVisits(
+  performance: Performance,
+  ordinal: number,
+): { prev: PerformanceMeasure | null; next: PerformanceMeasure | null } {
+  const here = performance.measures.find((m) => m.ordinal === ordinal);
+  if (!here) return { prev: null, next: null };
+  let prev: PerformanceMeasure | null = null;
+  let next: PerformanceMeasure | null = null;
+  for (const m of performance.measures) {
+    if (m.measureIndex !== here.measureIndex) continue;
+    if (m.ordinal < here.ordinal && (!prev || m.ordinal > prev.ordinal)) prev = m;
+    if (m.ordinal > here.ordinal && (!next || m.ordinal < next.ordinal)) next = m;
+  }
+  return { prev, next };
+}
 export function formatPlaybackPosition(
   performance: Performance,
   position: Rational,
@@ -36,7 +64,7 @@ export function formatPlaybackPosition(
   const beat = add(rational(1n), multiply(offset, rational(BigInt(unit))));
   const tenths = (beat.num * 10n) / beat.den;
   const label = `${tenths / 10n}${tenths % 10n ? '.' + (tenths % 10n) : ''}`;
-  return `bar ${document?.global.measures[measure.measureIndex]?.number ?? measure.measureIndex + 1} · iteration ${measure.iteration} · beat ${label}${segment && segment.kind !== 'metric' ? ` · ${segment.kind === 'fermata' ? 'hold' : 'grace'}` : ''}`;
+  return `bar ${document?.global.measures[measure.measureIndex]?.number ?? measure.measureIndex + 1} · iteration ${measure.iteration} of ${iterationsOf(performance, measure.measureIndex)} · beat ${label}${segment && segment.kind !== 'metric' ? ` · ${segment.kind === 'fermata' ? 'hold' : 'grace'}` : ''}`;
 }
 /**
  * The widest label `formatPlaybackPosition` can print for this performance,
@@ -69,5 +97,5 @@ export function widestPlaybackPosition(performance: Performance, document?: MnxS
   }
   const kinds = new Set(performance.sourceMap.map((s) => s.kind));
   const suffix = kinds.has('makeTime') ? ' · grace' : kinds.has('fermata') ? ' · hold' : '';
-  return `bar ${bar} · iteration ${iteration} · beat ${beat}.5${suffix}`;
+  return `bar ${bar} · iteration ${iteration} of ${iteration} · beat ${beat}.5${suffix}`;
 }

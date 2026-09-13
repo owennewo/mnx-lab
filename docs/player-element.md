@@ -5,10 +5,12 @@ embed formats and `mnx-lab/elements`. It consumes item 5's exact `Performance` a
 uses item 6's transport and native sink. There is no backend service or new runtime
 dependency. It does not own the viewer's context or the editor selection.
 
-The element supplies Play/Pause, Stop, rate (0.5–1.5), master volume and a scrollable
-performed-order table. Table visits are displayed from 1; API ordinals and `at=`
-links are zero-based. Each row identifies its written bar number and iteration.
-The current row follows playback. The position readout uses a pure helper, including
+The element supplies Play/Pause, Stop, a scrubber over the performed order, rate
+(0.25×–2× in 0.05 steps), and master volume. API ordinals and `at=` links are
+zero-based. The position readout names the written bar, which pass this is and how many
+the bar gets (`iteration 2 of 3`), and the beat; an up/down stepper beside it seeks to the
+same bar in the previous or next pass — the verse before, the verse after — which is what
+the performed-order table used to be for. The readout uses a pure helper, including
 inherited meter, authored bar numbers, and explicit hold/grace labels. Tenths of a
 beat are display formatting only; the readout is not an incessant live-region announcement.
 

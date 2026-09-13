@@ -16,7 +16,7 @@ import {
 } from '../audio/sampleSelection.ts';
 import type { SamplePackLoader } from '../audio/native/samplePacks.ts';
 import { NativeSink, nativeClock } from '../audio/native/sink.ts';
-import { formatPlaybackPosition, measureAt, widestPlaybackPosition } from '../audio/playbackPosition.ts';
+import { formatPlaybackPosition, measureAt, siblingVisits, widestPlaybackPosition } from '../audio/playbackPosition.ts';
 import { ZERO, compare, type Rational } from '../audio/time.ts';
 import type { MnxStructure } from '../model/mnx.ts';
 import type { PlaybackUpdate } from './mnxContext.ts';
@@ -50,8 +50,9 @@ export class Player extends LitElement {
    * The tray, in the library page's vocabulary (roadmap/inprogress/core-score-frame.md,
    * 2026-09-12): the shared tokens, 40px controls so the tray is catchable on
    * glass, the transport as glyphs on the accent, and a scrubber over the
-   * performed order. The order table is closed by default — the frame it now
-   * lives in is a strip over the score, not a panel beside it.
+   * performed order. The order table is gone: the readout says which pass
+   * this is of how many, and the stepper beside it walks the passes — the
+   * frame the tray lives in is a strip over the score, not a panel beside it.
    */
   static styles = [
     designTokens,
@@ -170,49 +171,25 @@ export class Player extends LitElement {
       color: var(--ink);
       min-width: 5ch;
     }
-    details {
-      margin-top: 8px;
+    /* The iteration stepper: two half-height buttons stacked beside the
+       readout, stepping to the same bar in the previous or next pass — the
+       verse before, the verse after. */
+    .iterations {
+      display: inline-flex;
+      flex-direction: column;
+      height: 40px;
+      margin-left: -4px;
     }
-    summary {
-      cursor: pointer;
-      color: var(--ink-2);
-      list-style: none;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      height: 36px;
+    .iterations button {
+      height: 20px;
+      width: 28px;
+      padding: 0;
+      justify-content: center;
+      border-radius: 3px 3px 0 0;
     }
-    summary::-webkit-details-marker {
-      display: none;
-    }
-    summary::after {
-      content: '';
-      width: 7px;
-      height: 7px;
-      border: solid currentColor;
-      border-width: 0 1.6px 1.6px 0;
-      transform: rotate(45deg);
-      margin-top: -4px;
-    }
-    details[open] summary::after {
-      transform: rotate(-135deg);
-      margin-top: 4px;
-    }
-    .table {
-      max-height: 180px;
-      overflow: auto;
-      margin-top: 6px;
-    }
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      font-variant-numeric: tabular-nums;
-    }
-    td,
-    th {
-      text-align: left;
-      padding: 4px;
-      border-bottom: 1px solid var(--line);
+    .iterations button + button {
+      border-top: 0;
+      border-radius: 0 0 3px 3px;
     }
     th {
       color: var(--ink-3);
@@ -285,16 +262,6 @@ export class Player extends LitElement {
       this.sink.setVoicePreset(this.sinkPreset(), this.requiredSamples());
       this.error = '';
       if (resume) void this.play();
-    }
-    if (changed.has('status')) {
-      const row = this.renderRoot.querySelector<HTMLElement>('tr[aria-current=true]'),
-        table = this.renderRoot.querySelector<HTMLElement>('.table');
-      if (row && table) {
-        const box = row.getBoundingClientRect(),
-          frame = table.getBoundingClientRect();
-        if (box.top < frame.top) table.scrollTop += box.top - frame.top;
-        else if (box.bottom > frame.bottom) table.scrollTop += box.bottom - frame.bottom;
-      }
     }
   }
   private publish() {
@@ -477,6 +444,32 @@ export class Player extends LitElement {
     return svg`<svg width=${px} height=${px} viewBox="0 0 24 24" aria-hidden="true"><path d=${d} fill="currentColor"></path></svg>`;
   }
 
+  /** Up/down beside the readout: the same bar in the previous or next pass. */
+  private iterationStepper() {
+    if (!this.performance) return nothing;
+    // From the position, as the readout is: before the first status frame
+    // there is no last ordinal yet, but there is a bar under the cursor.
+    const here = measureAt(this.performance, this.position)?.ordinal ?? this.lastOrdinal;
+    if (here === null) return nothing;
+    const { prev, next } = siblingVisits(this.performance, here);
+    if (!prev && !next) return nothing;
+    return html`<span class="iterations" role="group" aria-label="Iteration">
+      <button
+        type="button"
+        ?disabled=${!prev}
+        aria-label="Previous iteration of this bar"
+        title="Previous iteration of this bar"
+        @click=${() => prev && this.seek(prev.ordinal)}
+      >${Player.glyph('M12 8l6 6H6z', 14)}</button>
+      <button
+        type="button"
+        ?disabled=${!next}
+        aria-label="Next iteration of this bar"
+        title="Next iteration of this bar"
+        @click=${() => next && this.seek(next.ordinal)}
+      >${Player.glyph('M12 16l-6-6h12z', 14)}</button>
+    </span>`;
+  }
   private onScrub(event: Event) {
     this.seek(Number((event.target as HTMLInputElement).value));
   }
@@ -503,6 +496,7 @@ export class Player extends LitElement {
                 ><span class="widest" aria-hidden="true">${this.widest}</span>`
             : 'No performance available'}</output
         >
+        ${this.iterationStepper()}
         ${count > 1
           ? html`<input
               class="scrub"
@@ -560,42 +554,6 @@ export class Player extends LitElement {
             Preparing ${isSamplePreset(this.voicePreset) ? 'guitar samples' : 'audio'}…
           </p>`
         : nothing}
-      ${this.error ? html`<p role="alert">Playback unavailable: ${this.error}</p>` : nothing}
-      ${this.performance
-        ? html`<details>
-            <summary>Performed order · ${this.performance.measures.length} visits</summary>
-            <div class="table">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Visit</th>
-                    <th>Written bar</th>
-                    <th>Iteration</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${this.performance.measures.map(
-                    (m) =>
-                      html`<tr aria-current=${this.lastOrdinal === m.ordinal}>
-                        <td>
-                          <button
-                            @click=${() => this.seek(m.ordinal)}
-                            aria-label=${`Seek to visit ${m.ordinal + 1}`}
-                          >
-                            ${m.ordinal + 1}
-                          </button>
-                        </td>
-                        <td>
-                          ${this.document?.global.measures[m.measureIndex]?.number ??
-                          m.measureIndex + 1}
-                        </td>
-                        <td>${m.iteration}</td>
-                      </tr>`,
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </details>`
-        : nothing}`;
+      ${this.error ? html`<p role="alert">Playback unavailable: ${this.error}</p>` : nothing}`;
   }
 }
