@@ -45,7 +45,6 @@ proposals that name their campaign.
 
 ### proposed/
 
-- **[core-player-youtube.md](proposed/core-player-youtube.md)** — Player campaign item 17: visible policy-compliant YouTube embeds, capability-aware rates and recording sync.
 - **[studio-recording-management.md](proposed/studio-recording-management.md)** — Player campaign item 18: attach YouTube links or uploaded audio with Soundslice timing data; persistent uploads and recording lifecycle.
 
 - **[studio-player-practice.md](proposed/studio-player-practice.md)** — campaign item 13,
@@ -158,6 +157,8 @@ back up to `proposed/` the moment it is.
   the best precedent.
 
 ### inprogress/
+
+- **[core-player-youtube.md](inprogress/core-player-youtube.md)** — Player campaign item 17: visible policy-compliant YouTube embeds, capability-aware rates and recording sync.
 
 
 

@@ -520,6 +520,8 @@ export class ScoreFrame extends LitElement {
     this.refreshReadout(detail.ordinal);
   };
 
+  private readonly onVideo = () => { this.setBottom(true); };
+
   private readonly onPosition = () => this.refreshReadout(this.player?.scorePosition?.ordinal ?? null);
 
   private readonly onPerformance = () => this.refreshReadout(null);
@@ -529,12 +531,14 @@ export class ScoreFrame extends LitElement {
     this.addEventListener('playback-state-changed', this.onPlayback);
     this.addEventListener('performance-changed', this.onPerformance);
     this.addEventListener('playback-position', this.onPosition);
+    this.addEventListener('video-region-changed', this.onVideo);
   }
 
   disconnectedCallback() {
     this.removeEventListener('playback-state-changed', this.onPlayback);
     this.removeEventListener('performance-changed', this.onPerformance);
     this.removeEventListener('playback-position', this.onPosition);
+    this.removeEventListener('video-region-changed', this.onVideo);
     document.removeEventListener('pointerdown', this.onClickAway);
     super.disconnectedCallback();
   }
@@ -564,7 +568,10 @@ export class ScoreFrame extends LitElement {
     const player = this.player;
     if (!player) return;
     if (this.playing) player.pause();
-    else void player.play();
+    else {
+      if (player.playback?.kind === 'youtube') { this.setBottom(true); void this.updateComplete.then(() => player.play()); }
+      else void player.play();
+    }
   }
 
   // ── the strips ──────────────────────────────────────────────────────────
@@ -577,6 +584,7 @@ export class ScoreFrame extends LitElement {
   }
 
   private setBottom(open: boolean) {
+    if (!open && this.player?.playback?.kind === 'youtube') this.player.pause();
     if (this.bottomOpen === open) return;
     this.bottomOpen = open;
     this.emitStrip('bottom', open);

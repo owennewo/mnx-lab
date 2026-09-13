@@ -33,6 +33,7 @@ export class PlaybackSession {
   private notify() {
     if (this.closed) return;
     const state = this.active.snapshot;
+    if (state.state === 'paused' && !this.pendingPlay && !this.selecting) this.intent = false;
     if (state.error || (!this.pendingPlay && !this.selecting && state.state === 'stopped')) this.intent = false;
     this.changed();
   }
@@ -43,9 +44,9 @@ export class PlaybackSession {
     let next: PlaybackBackend;
     try { next = this.factory(id); }
     catch (error) { this.pause(); this.issue = error instanceof Error ? error.message : String(error); this.notify(); return false; }
-    if (!this.selecting) this.target = { position: before.scorePosition, problem: before.syncIssue };
+    if (!this.selecting && !(replace && this.needsStart)) this.target = { position: before.scorePosition, problem: before.syncIssue };
     ++this.targetVersion;
-    this.intent = before.wantsPlayback;
+    this.intent = before.wantsPlayback && next.resumeOnSelect !== false;
     const generation = ++this.generation;
     ++this.operation;
     this.unsubscribe();
@@ -54,7 +55,7 @@ export class PlaybackSession {
     this.pendingPlay = false; this.selecting = true; this.issue = ''; this.needsStart = false;
     this.unsubscribe = next.subscribe(() => { if (generation === this.generation) this.notify(); });
     try {
-      next.setRate(boundedRate(before.rate, next.capabilities)); next.setVolume(before.volume);
+      next.setRate(before.rate); next.setVolume(before.volume);
       this.notify();
       await next.prepare();
       if (this.closed || generation !== this.generation) return false;

@@ -2,8 +2,8 @@
 
 Implementation loop, player campaign item 16. The shared player can switch between
 Synth and audio recordings supplied by a host. Studio lists existing audio rows in
-the piece snapshot. Attaching recordings and the YouTube backend remain campaign
-items 18 and 17 respectively.
+the piece snapshot. Attaching recordings remains campaign item 18. YouTube playback is described in
+[player-youtube.md](player-youtube.md).
 
 ## Host API
 

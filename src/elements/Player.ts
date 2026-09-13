@@ -4,8 +4,10 @@ import { customElement, property, state } from 'lit/decorators.js';
 import type { Performance } from '../audio/performanceTypes.ts';
 import type { LoopRegion } from '../audio/transport.ts';
 import { PlaybackSession, type PlaybackSnapshot } from '../audio/playbackSession.ts';
-import { type AudioRecordingSource, type PlaybackBackend, type ScorePosition, type ScoreLoop } from '../audio/playbackBackend.ts';
+import { type RecordingSource, type PlaybackBackend, type ScorePosition, type ScoreLoop } from '../audio/playbackBackend.ts';
 import { RecordingBackend } from '../audio/recordingBackend.ts';
+import { NativeYouTubePort } from '../audio/native/youtube.ts';
+import { youtubeVideoId } from '../audio/youtubeUrl.ts';
 import { HtmlAudioPort } from '../audio/native/htmlAudio.ts';
 import { SynthBackend } from '../audio/native/synthBackend.ts';
 import { createRecordingSync } from '../audio/recordingSync.ts';
@@ -33,7 +35,7 @@ export class Player extends LitElement {
   @property({ attribute: false }) sampleBases: Partial<Record<SamplePreset, string>> | undefined;
   @property({ attribute: false }) sampleLoader: SamplePackLoader | undefined;
   @property({ attribute: false }) writtenBarDurations: readonly Rational[] | undefined;
-  @property({ attribute: false }) recordings: readonly AudioRecordingSource[] = [];
+  @property({ attribute: false }) recordings: readonly RecordingSource[] = [];
   private get loading() { return this.status?.loading ?? false; }
   @property({ type: Number }) initialOrdinal: number | null = null;
   @state() private status: PlaybackSnapshot | undefined;
@@ -47,6 +49,9 @@ export class Player extends LitElement {
   @state() private volume = 0.7;
   private session?: PlaybackSession;
   private revision = 0;
+  private youtubeAccepted = false;
+  @state() private youtubeRequest: string | null = null;
+  @state() private youtubeNotice = false;
   private lastUpdate = '';
   private lastOrdinal: number | null = null;
   /**
@@ -67,6 +72,11 @@ export class Player extends LitElement {
       color: var(--ink);
       --player-ground: light-dark(oklch(0.9 0.004 60), oklch(0.26 0.006 60));
     }
+    .youtube-panel { margin-top: 12px; }
+    .youtube-surface { width: min(100%, 480px); min-width: 200px; height: clamp(200px, 56.25vw, 270px); position: relative; z-index: 10; }
+    .youtube-panel p { max-width: 60ch; }
+    .youtube-panel a { color: inherit; }
+    .youtube-notice { max-width: 65ch; }
     .controls {
       display: flex;
       align-items: center;
@@ -365,6 +375,7 @@ export class Player extends LitElement {
     }
   }
   private teardown() {
+    this.youtubeRequest = null; this.youtubeNotice = false;
     this.revision++;
     this.session?.dispose(); this.session = undefined;
     this.status = undefined; this.lastOrdinal = null; this.publish();
@@ -391,12 +402,21 @@ export class Player extends LitElement {
           detail: { ...event, documentId: this.documentId }, bubbles: true, composed: true,
         }));
       });
-      const matches = this.recordings.filter(r => r.id === id && r.kind === 'audio');
+      const matches = this.recordings.filter(r => r.id === id);
       if (!id || matches.length !== 1) throw new Error('The selected recording is unavailable or has a duplicate identity.');
       const source = matches[0];
       const sync = this.document && this.writtenBarDurations
         ? createRecordingSync(source.syncpoints, { performance, writtenBarDurations: this.writtenBarDurations }, linearizePasses(this.document)) : null;
-      return new RecordingBackend(id, new HtmlAudioPort(source.media), performance, sync?.ok ? sync.value : null,
+      const media = source.kind === 'audio' ? new HtmlAudioPort(source.media) : new NativeYouTubePort(youtubeVideoId(source.video), async () => {
+        this.dispatchEvent(new CustomEvent('video-region-changed', { bubbles: true, composed: true }));
+        await this.updateComplete;
+        await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
+        if (revision !== this.revision || this.sourceId !== id) throw new Error('YouTube selection cancelled.');
+        const container = this.renderRoot.querySelector<HTMLElement>('.youtube-surface');
+        if (!container) throw new Error('Show the YouTube video region before loading.');
+        return container;
+      });
+      return new RecordingBackend(id, media, performance, sync?.ok ? sync.value : null,
         sync && !sync.ok ? sync.diagnostic.message : !sync ? 'Score timing information is unavailable for this recording.' : undefined);
     };
     this.session = new PlaybackSession(factory('synth'), factory, () => {
@@ -431,16 +451,28 @@ export class Player extends LitElement {
     if (!status || status.kind === 'synth') return formatPlaybackPosition(this.performance, this.position, this.document);
     if (status.scorePosition) return formatScorePlaybackPosition(this.performance, status.scorePosition, this.document);
     const time = Math.max(0, status.mediaTime ?? 0);
-    return `Audio ${Math.floor(time / 60)}:${Math.floor(time % 60).toString().padStart(2, '0')} · outside sync`;
+    return `${status.kind === 'youtube' ? 'YouTube' : 'Audio'} ${Math.floor(time / 60)}:${Math.floor(time % 60).toString().padStart(2, '0')} · outside sync`;
   }
   async selectSource(id: string, replace = false) {
     this.localError = '';
+    const source = this.recordings.find(r => r.id === id);
+    if (source?.kind === 'youtube' && !this.youtubeAccepted) {
+      this.pause(); this.youtubeRequest = id; this.youtubeNotice = true;
+      this.dispatchEvent(new CustomEvent('video-region-changed', { bubbles: true, composed: true }));
+      return false;
+    }
+    this.youtubeRequest = null; this.youtubeNotice = false;
     return await this.session?.select(id, replace) ?? false;
   }
   async play() { this.localError = ''; await this.session?.play(); }
   pause() { this.session?.pause(); }
   stop() { this.localError = ''; this.session?.stop(); }
   toggle() { if (this.playback?.wantsPlayback) this.pause(); else void this.play(); }
+  private async acceptYouTube() {
+    const id = this.youtubeRequest;
+    this.youtubeAccepted = true; this.youtubeRequest = null; this.youtubeNotice = false;
+    if (id) await this.selectSource(id);
+  }
   async startSource() { this.localError = ''; await this.session?.start(); }
   seek(ordinal: number) {
     const measure = this.performance?.measures.find(m => m.ordinal === ordinal);
@@ -605,7 +637,9 @@ export class Player extends LitElement {
           </select></label
         >
 ` : nothing}
-        <label class="rate" title="Playback rate — double-click for 1×"
+        ${this.status?.kind === 'youtube' ? html`<label class="select">Rate<select aria-label="Playback rate" .value=${String(this.rate)} @change=${this.changeRate}>
+          ${(this.status.capabilities.rate.values ?? [1]).map(rate => html`<option value=${String(rate)} ?selected=${rate === this.rate}>${rate}×</option>`)}
+        </select></label>` : html`        <label class="rate" title="Playback rate — double-click for 1×"
           >Rate<input
             aria-label="Playback rate"
             type="range"
@@ -616,7 +650,7 @@ export class Player extends LitElement {
             @input=${this.changeRate}
             @dblclick=${this.resetRate}
           /><output aria-live="off">${this.rate.toFixed(2)}×</output></label
-        >
+        >`}
         <label class="volume" title="Volume">
           ${Player.glyph('M4 9v6h4l5 4V5L8 9z', 18)}<input
             aria-label="Volume"
@@ -628,14 +662,25 @@ export class Player extends LitElement {
             @input=${this.changeVolume}
         /></label>
       </div>
+      ${this.youtubeRequest || this.youtubeNotice ? html`<section class="youtube-notice" aria-label="YouTube terms and privacy">
+        <h3>YouTube terms and privacy</h3>
+        <p>This player uses YouTube API Services. Loading a video connects your browser to YouTube and Google, which receive your IP address, browser information and this site's origin. YouTube may serve ads and access cookies or similar device storage under the <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google Privacy Policy</a>.</p>
+        <p>We use playback time and state in memory to follow the score; we do not save them or request YouTube account access. Rate and volume preferences are saved in this browser's localStorage; clearing site data resets them. The host supplies video links and score timings. Studio keeps those in your private library; contact your Studio operator for library deletion. Switching source or leaving the page destroys the video player. Browser privacy controls manage YouTube's cookies.</p>
+        <p>By using this YouTube feature you agree to be bound by the <a href="https://www.youtube.com/t/terms" target="_blank" rel="noopener">YouTube Terms of Service</a>. Select Agree and load to accept these terms and this privacy policy for this player session.</p>
+        ${this.youtubeRequest ? html`<button @click=${() => void this.acceptYouTube()}>Agree and load YouTube</button><button @click=${() => { this.youtubeRequest = null; this.youtubeNotice = false; }}>Cancel</button>` : html`<button @click=${() => this.youtubeNotice = false}>Close notice</button>`}
+      </section>` : nothing}
+      ${this.status?.kind === 'youtube' ? html`<section class="youtube-panel" aria-label="YouTube recording">
+        <div class="youtube-surface"></div>
+        <p>YouTube · <button @click=${() => this.youtubeNotice = !this.youtubeNotice}>Terms and privacy</button> · <button @click=${() => void this.selectSource('synth')}>Close video</button></p>
+      </section>` : nothing}
       ${this.loading
         ? html`<p role="status">
             Preparing ${this.sourceId === 'synth' && isSamplePreset(this.voicePreset) ? 'samples' : 'audio'}…
           </p>`
         : nothing}
       ${this.error ? html`<p role="alert">Playback unavailable: ${this.error}</p>` : nothing}
-      ${this.status?.needsStart ? html`<button @click=${() => void this.startSource()}>Start this source</button>` : nothing}
+      ${this.status?.kind === 'youtube' && this.status.error ? html`<button @click=${() => void this.selectSource(this.sourceId, true)}>Retry video</button>` : this.status?.needsStart ? html`<button @click=${() => void this.startSource()}>Start this source</button>` : nothing}
       ${!this.loading && this.status?.state === 'buffering' ? html`<p role="status">Buffering audio…</p>` : nothing}
-      ${this.status?.kind === 'audio' && this.status.syncIssue && !this.error ? html`<p role="status">Score follow: ${this.status.syncIssue}</p>` : nothing}`;
+      ${this.status?.kind !== 'synth' && this.status?.syncIssue && !this.error ? html`<p role="status">Score follow: ${this.status.syncIssue}</p>` : nothing}`;
   }
 }

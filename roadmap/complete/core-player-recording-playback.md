@@ -70,7 +70,7 @@ cover ownership and range reads; browser checks exercise a real seekable audio f
 No real account or private media is needed for routine tests.
 
 Persistent attachment creation is [item 18](../proposed/studio-recording-management.md).
-YouTube is [item 17](../proposed/core-player-youtube.md); neither is required to play existing audio.
+YouTube is [item 17](../inprogress/core-player-youtube.md); neither is required to play existing audio.
 
 ## Implementation agreement — 2026-09-13
 

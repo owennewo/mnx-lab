@@ -1,6 +1,6 @@
 # YouTube recordings — visible embedded playback with score sync
 
-> **Status: proposed 2026-09-13.** Implementation loop. Campaign:
+> **Status: in progress 2026-09-13.** Implementation loop. Campaign:
 > [core-campaign-player.md](../inprogress/core-campaign-player.md), item 17.
 > Needs [shared recording playback](../complete/core-player-recording-playback.md), item 16.
 
@@ -71,4 +71,24 @@ unobscured layout and visibility pause. A live eligible embed is checked under t
 production CSP with buffering/seeking and responsive behavior documented. Existing
 synth/audio checks pass. No YouTube media is downloaded, proxied or stored.
 
-Adding new links in Studio is [item 18](studio-recording-management.md).
+Adding new links in Studio is [item 18](../proposed/studio-recording-management.md).
+
+## Implementation agreement and findings — 2026-09-13
+
+YouTube selection is cue-only; Play is explicit. First use requires acceptance of the
+component's displayed terms/privacy notice before loading any YouTube resource.
+The shared frame opens a video-bearing strip; collapse/hidden-tab/offscreen/obscured
+states pause and never automatically resume. Hosts get the frame in both embed
+formats and must preserve visibility and their own privacy obligations.
+
+The injected official-API port reuses RecordingBackend. It handles asynchronous cue
+confirmation and accepted rates, and guards SDK getters which can be unpopulated
+immediately after onReady. A cued target is usable for a paused handoff; playing time
+comes from the API. Changing duration disables following rather than deriving a new
+timeline. The documented API has no ad-state signal, and the live run received no ad;
+that limitation is explicit in [the runtime contract](../../docs/player-youtube.md).
+
+The real official example played, followed the repeated visit, sought from the score,
+and retained valid desktop/narrow geometry under production CSP. Automated API/browser
+checks cover loading races, retry, rates, buffering, hidden tabs and disposal. Final
+landing evidence and embed sizes will be recorded at closeout.

@@ -201,7 +201,7 @@ run any time before 6.
 | 13 | [Practice mode](../proposed/studio-player-practice.md) | Loop a selection — with the **written-range → performed-occurrences policy stated** — speed trainer, count-in, metronome, mute/solo. | practice | fake-clock tests | proposed — after reviewer items 1–10 |
 | 15 | [Recording sync](../complete/core-player-recording-sync.md) | Pure Soundslice decoder, sparse/inner-bar timing map, coverage and traversal compatibility. | recording playback | Node conformance fixtures | complete |
 | 16 | [Synth/audio switching](../complete/core-player-recording-playback.md) | Shared backend interface, musical-position handoff, media-clock follow and authenticated audio reads. | recording playback | fake backends + browser media/embed checks | complete |
-| 17 | [YouTube recordings](../proposed/core-player-youtube.md) | Visible official iframe, policy/layout lifecycle, API rates, seek and error handling. | recording playback | adapter/layout checks + live embed check | proposed |
+| 17 | [YouTube recordings](../inprogress/core-player-youtube.md) | Visible official iframe, policy/layout lifecycle, API rates, seek and error handling. | recording playback | adapter/layout checks + live embed check | in progress |
 | 18 | [Recording attachments](../proposed/studio-recording-management.md) | Studio URL/audio attachment, sync import, upload and revision lifecycle. | recording playback | service + browser checks | proposed |
 
 ### Decisions still open
@@ -700,3 +700,19 @@ production build passed after rebase. Both embed formats, Studio HTTP media and
 workbench/review synth smoke passed. The implementation worktree was retired before
 the item moved to `complete/`. All 188 regenerated goldens stayed unchanged, with
 no new approval debt. Item 17 (YouTube) is next.
+
+### 2026-09-13 — item 17: YouTube implementation
+
+YouTube reuses the recording clock/sync backend via an injected official-API port.
+The source selector cues rather than autoplays; first use displays and requires the
+component's terms/privacy acceptance before loading the API. A visible video region
+sits in the frame's player strip, outside score scrolling; collapse, hidden tabs and
+occlusion pause it. The frame now ships in both embed formats.
+
+Live API behavior required guarding getters beyond onReady and separately awaiting
+cue confirmation. Accepted rate events, rather than requested rates, drive the
+controls. Retry retains the original musical handoff target after a load failure.
+A native Play gesture, repeated-visit following, score seek and narrow layout passed
+against the official example under production CSP. No ad was served; undocumented
+ad detection is deliberately absent and the reported-clock limit is recorded in
+[docs/player-youtube.md](../../docs/player-youtube.md).

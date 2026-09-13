@@ -13,6 +13,10 @@ export interface MediaPort {
   readonly rate: number;
   readonly volume: number;
   readonly error: string | undefined;
+  readonly kind?: 'audio' | 'youtube';
+  readonly capabilities?: import('./playbackBackend.ts').PlaybackCapabilities;
+  readonly clockReliable?: boolean;
+  readonly clockIssue?: string;
   subscribe(listener: (event: MediaEvent) => void): () => void;
   prepare(): Promise<void>;
   play(): Promise<void>;
@@ -23,7 +27,8 @@ export interface MediaPort {
   dispose(): void;
 }
 export class RecordingBackend implements PlaybackBackend {
-  readonly capabilities = AUDIO_CAPABILITIES;
+  get capabilities() { return this.media.capabilities ?? AUDIO_CAPABILITIES; }
+  get resumeOnSelect() { return this.media.kind !== 'youtube'; }
   private listeners = new Set<() => void>();
   private unsubscribe: () => void;
   private closed = false;
@@ -52,6 +57,8 @@ export class RecordingBackend implements PlaybackBackend {
     if (this.closed) return;
     if (event === 'waiting' || event === 'seeking') this.waiting = true;
     if (event === 'playing' || event === 'seeked' || event === 'pause') this.waiting = false;
+    if (event === 'playing') { this.stopped = false; this.intent = true; this.issue = undefined; }
+    if (event === 'pause') this.intent = false;
     if (event === 'error') { this.issue = this.media.error || 'The audio could not be loaded.'; this.intent = false; this.media.pause(); }
     if (this.loop && this.intent && this.media.currentTime >= this.loop.end && !this.wrapping) {
       void this.wrap();
@@ -61,7 +68,7 @@ export class RecordingBackend implements PlaybackBackend {
     this.emit();
   }
   get snapshot(): BackendSnapshot {
-    const location = this.sync && !this.invalidSync ? this.sync.positionAt(this.media.currentTime) : null;
+    const location = this.sync && !this.invalidSync && this.media.clockReliable !== false ? this.sync.positionAt(this.media.currentTime) : null;
     const position = location?.ok ? location.value.position : null;
     const hidden = location?.ok ? location.value.hidePlayhead : false;
     const state = this.stopped ? 'stopped' : this.media.paused ? 'paused'
@@ -69,18 +76,18 @@ export class RecordingBackend implements PlaybackBackend {
     const highlight = !position || hidden || state === 'stopped' ? [] : (this.written.get(position.ordinal) ?? [])
       .filter(w => compare(position.metricOffset, w.metricOffset) >= 0 && compare(position.metricOffset, add(w.metricOffset, w.metricDuration)) < 0)
       .map(w => ({ noteKey: w.noteKey, ordinal: w.ordinal }));
-    return { sourceId: this.id, kind: 'audio', state, scorePosition: position, highlight, hidePlayhead: hidden,
+    return { sourceId: this.id, kind: this.media.kind ?? 'audio', state, scorePosition: position, highlight, hidePlayhead: hidden,
       rate: this.media.rate, volume: this.media.volume, mediaTime: this.media.currentTime,
-      syncIssue: this.invalidSync || (location && !location.ok ? location.diagnostic.message : !this.sync ? 'This recording has no usable sync data.' : undefined),
+      syncIssue: this.media.clockIssue || this.invalidSync || (location && !location.ok ? location.diagnostic.message : !this.sync ? 'This recording has no usable sync data.' : undefined),
       error: this.issue || this.media.error };
   }
   async prepare() {
     if (this.closed) throw new Error('Audio source is disposed.');
     await this.media.prepare();
     if (this.closed) return;
-    if (!Number.isFinite(this.media.duration) || this.media.duration <= 0) throw new Error('This audio has no finite playable duration.');
+    if (this.media.kind !== 'youtube' && (!Number.isFinite(this.media.duration) || this.media.duration <= 0)) throw new Error('This audio has no finite playable duration.');
     this.prepared = true;
-    if (this.sync && this.sync.bounds.endSeconds > this.media.duration + 0.001)
+    if (this.sync && this.media.duration > 0 && this.sync.bounds.endSeconds > this.media.duration + 0.001)
       this.invalidSync = 'Sync timings extend beyond this audio file. Score following is unavailable.';
   }
   private get startTime() {
@@ -126,7 +133,7 @@ export class RecordingBackend implements PlaybackBackend {
     if (!this.sync || this.invalidSync) return this.invalidSync || 'This recording has no usable sync data.';
     const time = this.sync.secondsAt(position);
     if (!time.ok) return time.diagnostic.message;
-    if (this.prepared && time.value > this.media.duration) return 'The requested score position is outside this audio file.';
+    if (this.prepared && this.media.duration > 0 && time.value > this.media.duration) return 'The requested score position is outside this audio file.';
     return null;
   }
   async seek(position: ScorePosition) {

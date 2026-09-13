@@ -13,5 +13,5 @@ export { SettingsPad } from '../../elements/SettingsPad.ts';
 export { DEFAULT_DISPLAY_PREFERENCES } from '../../elements/displayDefaults.ts';
 export { ScoreFrame } from '../../elements/ScoreFrame.ts';
 
-export type { AudioRecordingSource, ScorePosition, ScoreLoop, PlaybackCapabilities } from '../../audio/playbackBackend.ts';
+export type { AudioRecordingSource, YouTubeRecordingSource, RecordingSource, ScorePosition, ScoreLoop, PlaybackCapabilities } from '../../audio/playbackBackend.ts';
 export type { PlaybackSnapshot } from '../../audio/playbackSession.ts';

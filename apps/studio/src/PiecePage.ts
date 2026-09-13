@@ -22,7 +22,7 @@ import { openLocalFile } from '../../../src/importers/localFile.ts';
 import { bindPlayback } from '../../../src/elements/playbackHost.ts';
 import { DEFAULT_DISPLAY_PREFERENCES } from '../../../src/elements/displayDefaults.ts';
 import type { DocumentViewer, ViewMode, ViewSetting } from '../../../src/elements/DocumentViewer.ts';
-import type { AudioRecordingSource } from '../../../src/audio/playbackBackend.ts';
+import type { RecordingSource } from '../../../src/audio/playbackBackend.ts';
 import type { Player } from '../../../src/elements/Player.ts';
 import type { StripChange } from '../../../src/elements/ScoreFrame.ts';
 import type { ZoomPadChange } from '../../../src/elements/ZoomPad.ts';
@@ -46,7 +46,7 @@ export class PiecePage extends LitElement {
   /** The signed-in address, for the menu; sign-out is Access's own logout. */
   @property({ type: String }) email = '';
   @state() private snapshot: TagsSnapshot | null = null;
-  @state() private recordings: readonly AudioRecordingSource[] = [];
+  @state() private recordings: readonly RecordingSource[] = [];
   @state() private doc: MnxDocument | null = null;
   @state() private error = '';
   @state() private loading = true;
@@ -242,10 +242,10 @@ export class PiecePage extends LitElement {
   }
 
   private setRecordings(snapshot: LibrarySnapshot | null) {
-    const recordings: AudioRecordingSource[] = (snapshot?.recordings ?? []).filter(r => r.kind === 'audio').map(r => {
+    const recordings: RecordingSource[] = (snapshot?.recordings ?? []).filter(r => r.kind === 'audio' || (r.kind === 'youtube' && r.external_id)).map(r => {
       let syncpoints: unknown = null;
       try { syncpoints = r.syncpoints === null ? null : JSON.parse(r.syncpoints); } catch { syncpoints = r.syncpoints; }
-      return { kind: 'audio', id: r.id, name: r.name || 'Audio recording', media: this.client.recordingUrl(r.id), syncpoints };
+      return r.kind === 'youtube' ? { kind: 'youtube', id: r.id, name: r.name || 'YouTube recording', video: r.external_id!, syncpoints } : { kind: 'audio', id: r.id, name: r.name || 'Audio recording', media: this.client.recordingUrl(r.id), syncpoints };
     });
     if (JSON.stringify(recordings) !== JSON.stringify(this.recordings)) this.recordings = recordings;
   }

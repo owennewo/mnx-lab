@@ -10,6 +10,15 @@ export interface AudioRecordingSource {
   readonly media: string | Blob;
   readonly syncpoints: unknown;
 }
+export interface YouTubeRecordingSource {
+  readonly kind: 'youtube';
+  readonly id: string;
+  readonly name: string;
+  /** A supported YouTube URL or an eleven-character video ID. */
+  readonly video: string;
+  readonly syncpoints: unknown;
+}
+export type RecordingSource = AudioRecordingSource | YouTubeRecordingSource;
 export interface PlaybackCapabilities {
   readonly rate: { readonly min: number; readonly max: number; readonly step: number; readonly values?: readonly number[] };
   readonly volume: boolean;
@@ -20,7 +29,7 @@ export const SYNTH_CAPABILITIES: PlaybackCapabilities = Object.freeze({ rate: { 
 export const AUDIO_CAPABILITIES: PlaybackCapabilities = Object.freeze({ ...SYNTH_CAPABILITIES, loop: 'seek', parts: false });
 export interface BackendSnapshot {
   readonly sourceId: string;
-  readonly kind: 'synth' | 'audio';
+  readonly kind: 'synth' | 'audio' | 'youtube';
   readonly state: 'stopped' | 'paused' | 'playing' | 'buffering';
   readonly scorePosition: ScorePosition | null;
   readonly highlight: readonly { noteKey: string; ordinal: number }[];
@@ -36,6 +45,7 @@ export interface BackendSnapshot {
 export interface ScoreLoop { readonly start: ScorePosition; readonly end: ScorePosition }
 export interface PlaybackBackend {
   readonly id: string;
+  readonly resumeOnSelect?: boolean;
   readonly capabilities: PlaybackCapabilities;
   readonly snapshot: BackendSnapshot;
   subscribe(listener: () => void): () => void;

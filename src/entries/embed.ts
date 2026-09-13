@@ -85,5 +85,7 @@ function registerBravura(url: string): void {
 export { Player } from '../elements/Player.ts';
 export { bindPlayback } from '../elements/playbackHost.ts';
 
-export type { AudioRecordingSource, ScorePosition, ScoreLoop, PlaybackCapabilities } from '../audio/playbackBackend.ts';
+export type { AudioRecordingSource, YouTubeRecordingSource, RecordingSource, ScorePosition, ScoreLoop, PlaybackCapabilities } from '../audio/playbackBackend.ts';
 export type { PlaybackSnapshot } from '../audio/playbackSession.ts';
+
+export { ScoreFrame } from '../elements/ScoreFrame.ts';

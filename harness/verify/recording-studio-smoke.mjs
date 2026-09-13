@@ -32,14 +32,15 @@ try {
    const check=(v,m)=>{if(!v)throw new Error(m);},delay=ms=>new Promise(r=>setTimeout(r,ms));
    document.body.replaceChildren();const page=document.createElement('mnx-studio-piece');page.style.height='800px';
    const score=${JSON.stringify(fixture)};score.global.measures[0].repeatStart={};score.global.measures.at(-1).repeatEnd={};
-   let gate;page.client={canonical:async id=>{if(id==='next')await new Promise(r=>gate=r);return {bytes:new TextEncoder().encode(JSON.stringify(score)),filename:'fixture.mnx.json'};},piece:async id=>({snapshot:{piece:{id,revision:0},tags:[],recordings:[{id:'audio',kind:'audio',name:'Studio take',syncpoints:JSON.stringify([[0,1],[1,6],[2,11]])},{id:'youtube',kind:'youtube',name:'Later item'}]}}),opened:async()=>{},recordingUrl:()=>${JSON.stringify(`http://127.0.0.1:${audio.address().port}/audio.wav`)}};
+   let gate;page.client={canonical:async id=>{if(id==='next')await new Promise(r=>gate=r);return {bytes:new TextEncoder().encode(JSON.stringify(score)),filename:'fixture.mnx.json'};},piece:async id=>({snapshot:{piece:{id,revision:0},tags:[],recordings:[{id:'audio',kind:'audio',name:'Studio take',syncpoints:JSON.stringify([[0,1],[1,6],[2,11]])},{id:'youtube',kind:'youtube',name:'Linked video',external_id:'M7lc1UVf-VE',syncpoints:'[[0,1],[1,6],[2,11]]'}]}}),opened:async()=>{},recordingUrl:()=>${JSON.stringify(`http://127.0.0.1:${audio.address().port}/audio.wav`)}};
    page.pieceId='first';document.body.append(page);
    for(let i=0;i<100&&!page.shadowRoot?.querySelector('mnx-player')?.performance;i++)await delay(50);
    const player=page.shadowRoot.querySelector('mnx-player'),viewer=page.shadowRoot.querySelector('mnx-document-viewer');
-   check(player.recordings.length===1&&player.recordings[0].name==='Studio take','Studio did not pass audio rows to player');
+   check(player.recordings.length===2&&player.recordings[0].name==='Studio take','Studio did not pass audio rows to player');
+   check(player.recordings[1].kind==='youtube'&&player.recordings[1].video==='M7lc1UVf-VE','Studio missed YouTube rows');
    check(await player.selectSource('audio'),'Studio source could not map');await player.play();await delay(150);
    check(player.playback.state==='playing'&&viewer.playbackState.highlight.length>0,'Studio media did not follow');
-   const frame=page.shadowRoot.querySelector('mnx-score-frame');check(frame.shadowRoot.querySelector('.readout').textContent.includes('bar'),'Frame did not read media position');
+   const frame=page.shadowRoot.querySelector('mnx-score-frame');check(frame.shadowRoot.querySelector('.readout').textContent.includes('#'),'Frame did not read media position');
    await player.seekScorePosition({ordinal:1,metricOffset:{num:0n,den:1n}});check(Math.abs(player.playback.mediaTime-6)<.1,'HTTP audio could not seek');
    page.pieceId='next';await page.updateComplete;await delay(60);check(!player.playback||!player.playback.wantsPlayback,'Old piece played during loading');
    gate();await delay(250);check(player.documentId==='library:next'&&player.sourceId==='synth','New piece retained old source');page.remove();

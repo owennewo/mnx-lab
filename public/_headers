@@ -5,7 +5,8 @@
 # The CSP is the precondition core-assist-byok.md named: once the user's
 # OpenRouter key lives in this origin's localStorage, an injected script is a
 # credential theft rather than a defacement. `script-src 'self'` is the
-# directive that matters, and the codebase already earns it — the only
+# directive that matters (YouTube's official API is an explicit trusted
+# exception), and the codebase already earns it — the only
 # `innerHTML` uses in src/ are clears, everything renders through Lit
 # templates (which escape), assistant markdown is parsed to an AST and emitted
 # as templates with no HTML sink, and the precompiled Ajv validators exist
@@ -20,6 +21,6 @@
 # connect-src names openrouter.ai because that is the point of BYOK: the
 # browser talks to the model provider directly, on the user's own key.
 /*
-  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; media-src 'self' blob:; connect-src 'self' https://openrouter.ai; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://www.youtube.com/iframe_api https://www.youtube.com/s/player/ https://s.ytimg.com/yts/jsbin/; frame-src https://www.youtube.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; media-src 'self' blob:; connect-src 'self' https://openrouter.ai; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
   Referrer-Policy: strict-origin-when-cross-origin
   X-Content-Type-Options: nosniff
