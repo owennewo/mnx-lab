@@ -16,7 +16,7 @@ import {
 } from '../audio/sampleSelection.ts';
 import type { SamplePackLoader } from '../audio/native/samplePacks.ts';
 import { NativeSink, nativeClock } from '../audio/native/sink.ts';
-import { formatPlaybackPosition, measureAt } from '../audio/playbackPosition.ts';
+import { formatPlaybackPosition, measureAt, widestPlaybackPosition } from '../audio/playbackPosition.ts';
 import { ZERO, compare, type Rational } from '../audio/time.ts';
 import type { MnxStructure } from '../model/mnx.ts';
 import type { PlaybackUpdate } from './mnxContext.ts';
@@ -121,10 +121,20 @@ export class Player extends LitElement {
       height: 100%;
       color: var(--ink);
     }
+    /* The readout is sized by the widest label the performance can print
+       (stacked under it, invisible) so the scrubber beside it never moves
+       as the beat ticks from 4 to 4.5. */
     output {
+      display: inline-grid;
       font: 500 13px/1 var(--mono);
       font-variant-numeric: tabular-nums;
       white-space: nowrap;
+    }
+    output > span {
+      grid-area: 1 / 1;
+    }
+    output > .widest {
+      visibility: hidden;
     }
     output.none {
       font: inherit;
@@ -224,6 +234,14 @@ export class Player extends LitElement {
     this.teardown();
     super.disconnectedCallback();
   }
+  /** The widest readout label, refreshed only when the performance changes. */
+  private widest = '';
+
+  protected willUpdate(changed: Map<PropertyKey, unknown>) {
+    if (changed.has('performance') || changed.has('document'))
+      this.widest = this.performance ? widestPlaybackPosition(this.performance, this.document) : '';
+  }
+
   protected updated(changed: Map<PropertyKey, unknown>) {
     const reinstall =
       changed.has('performance') ||
@@ -449,7 +467,8 @@ export class Player extends LitElement {
         </button>
         <output aria-live="off" class=${this.performance ? '' : 'none'}
           >${this.performance
-            ? formatPlaybackPosition(this.performance, this.position, this.document)
+            ? html`<span>${formatPlaybackPosition(this.performance, this.position, this.document)}</span
+                ><span class="widest" aria-hidden="true">${this.widest}</span>`
             : 'No performance available'}</output
         >
         ${count > 1

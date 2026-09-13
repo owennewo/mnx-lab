@@ -5,7 +5,7 @@ import type { DisplayOptions } from '../engine/displayOptions.ts';
 import type { ViewMode } from './DocumentViewer.ts';
 import type { Player } from './Player.ts';
 import type { PlaybackUpdate } from './mnxContext.ts';
-import { formatPlaybackPosition } from '../audio/playbackPosition.ts';
+import { formatPlaybackPosition, widestPlaybackPosition } from '../audio/playbackPosition.ts';
 import './ZoomPad.ts';
 import './SettingsPad.ts';
 
@@ -96,6 +96,8 @@ export class ScoreFrame extends LitElement {
   @state() private pad: Pad = null;
   @state() private playing = false;
   @state() private positionText = '';
+  /** The widest label the readout can print — reserved so the chevron never moves. */
+  @state() private widestText = '';
   @state() private progress = 0;
   @state() private hasPerformance = false;
 
@@ -240,10 +242,17 @@ export class ScoreFrame extends LitElement {
       }
 
       .readout {
+        display: inline-grid;
         font: 500 12px/1 var(--mono);
         font-variant-numeric: tabular-nums;
         white-space: nowrap;
         margin: 0 6px;
+      }
+      .readout > span {
+        grid-area: 1 / 1;
+      }
+      .readout > .widest {
+        visibility: hidden;
       }
 
       /* ── the progress line ── */
@@ -524,10 +533,12 @@ export class ScoreFrame extends LitElement {
     this.hasPerformance = performance !== null;
     if (!player || !performance) {
       this.positionText = '';
+      this.widestText = '';
       this.progress = 0;
       return;
     }
     this.positionText = formatPlaybackPosition(performance, player.position, player.document);
+    this.widestText = widestPlaybackPosition(performance, player.document);
     const count = performance.measures.length;
     this.progress = ordinal === null || count === 0 ? 0 : Math.min(1, (ordinal + 0.5) / count);
   }
@@ -653,7 +664,9 @@ export class ScoreFrame extends LitElement {
   private bottomGrip() {
     return html`<div class="grip bottom" role="group" aria-label="Playback">
       ${this.primaryButton()}
-      ${this.positionText ? html`<span class="readout">${this.positionText}</span>` : nothing}
+      ${this.positionText
+        ? html`<span class="readout"><span>${this.positionText}</span><span class="widest" aria-hidden="true">${this.widestText}</span></span>`
+        : nothing}
       <button
         class="chev"
         type="button"

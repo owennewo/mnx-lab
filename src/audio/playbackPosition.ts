@@ -38,3 +38,36 @@ export function formatPlaybackPosition(
   const label = `${tenths / 10n}${tenths % 10n ? '.' + (tenths % 10n) : ''}`;
   return `bar ${document?.global.measures[measure.measureIndex]?.number ?? measure.measureIndex + 1} · iteration ${measure.iteration} · beat ${label}${segment && segment.kind !== 'metric' ? ` · ${segment.kind === 'fermata' ? 'hold' : 'grace'}` : ''}`;
 }
+/**
+ * The widest label `formatPlaybackPosition` can print for this performance,
+ * so a readout can reserve its width once instead of nudging its neighbours
+ * every time the beat ticks from `4` to `4.5`. Every field is taken at its
+ * longest: the longest written bar number, the last iteration, the fullest
+ * beat of any measure with a tenth on it, and the longer insertion word when
+ * the performance holds or graces anywhere.
+ */
+export function widestPlaybackPosition(performance: Performance, document?: MnxStructure): string {
+  if (performance.measures.length === 0) return 'Ready';
+  let bar = '';
+  let iteration = 1;
+  let beat = 1n;
+  let unit = 4;
+  let nextUnitIndex = 0;
+  for (const measure of performance.measures) {
+    const number = String(document?.global.measures[measure.measureIndex]?.number ?? measure.measureIndex + 1);
+    if (number.length > bar.length) bar = number;
+    iteration = Math.max(iteration, measure.iteration);
+    for (let i = nextUnitIndex; i <= measure.measureIndex; i++)
+      unit = document?.global.measures[i]?.time?.unit ?? unit;
+    nextUnitIndex = Math.max(nextUnitIndex, measure.measureIndex + 1);
+    // The last beat label a measure prints has integer part ⌈until × unit⌉:
+    // offsets stop just short of `until`, so a whole-beat end prints that
+    // beat's tenths and a partial end rounds up into its final beat.
+    const scaled = multiply(measure.until, rational(BigInt(unit)));
+    const last = (scaled.num + scaled.den - 1n) / scaled.den;
+    if (last > beat) beat = last;
+  }
+  const kinds = new Set(performance.sourceMap.map((s) => s.kind));
+  const suffix = kinds.has('makeTime') ? ' · grace' : kinds.has('fermata') ? ' · hold' : '';
+  return `bar ${bar} · iteration ${iteration} · beat ${beat}.5${suffix}`;
+}
