@@ -92,13 +92,78 @@ function specMedia(): Plugin {
   };
 }
 
+/**
+ * Local library sign-in for the dev server: GET /__local-login sets the
+ * loopback CF_Authorization cookie from the signed test session in
+ * .secrets/ (renewing it first when it is missing or about to expire) and
+ * bounces to `next`; GET /__local-logout clears it. Dev only, and served only
+ * to a loopback client asking for a loopback host — the same two conditions
+ * under which worker/library/access.ts honours the local issuer, so this route
+ * can never hand out anything a deployed hostname would accept. It trusts no
+ * header: the cookie it sets is the one docs/library-access.md has the human
+ * set by hand, taken from the same file.
+ */
+function localLibraryLogin(): Plugin {
+  const LOOPBACK = new Set(['127.0.0.1', '::1', '::ffff:127.0.0.1']);
+  const LOCAL_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]']);
+  return {
+    name: 'mnx-lab:local-library-login',
+    apply: 'serve',
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        const url = new URL(req.url ?? '/', 'http://localhost');
+        if (url.pathname !== '/__local-login' && url.pathname !== '/__local-logout') return next();
+        const host = (req.headers.host ?? '').replace(/:\d+$/, '');
+        if (!LOOPBACK.has(req.socket.remoteAddress ?? '') || !LOCAL_HOSTS.has(host)) {
+          res.statusCode = 404;
+          res.end();
+          return;
+        }
+        const next_ = url.searchParams.get('next') ?? '/studio/';
+        const target = /^\/(?!\/)/.test(next_) ? next_ : '/studio/';
+        void (async () => {
+          if (url.pathname === '/__local-logout') {
+            res.setHeader('Set-Cookie', 'CF_Authorization=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax');
+            res.statusCode = 303;
+            res.setHeader('Location', target);
+            res.end();
+            return;
+          }
+          const auth = await import('./tools/library-local-auth.mjs');
+          const root = new URL('./', import.meta.url);
+          const expiry = await auth.localSessionExpiry(root);
+          let restart = false;
+          if (!expiry || expiry - Date.now() < 15 * 60 * 1000) {
+            const renewed = await auth.renewLocalSessions(root);
+            restart = renewed.varsChanged;
+          }
+          if (restart) {
+            res.statusCode = 503;
+            res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+            res.end('Local signing key created and .dev.vars updated. Restart `npm run dev`, then open /__local-login again.\n');
+            return;
+          }
+          const session = JSON.parse(
+            fs.readFileSync(path.join(ROOT, '.secrets/local-library-session.json'), 'utf8')
+          ) as { browser: string };
+          res.setHeader('Set-Cookie', `CF_Authorization=${session.browser}; Path=/; HttpOnly; SameSite=Lax`);
+          res.statusCode = 303;
+          res.setHeader('Location', target);
+          res.end();
+        })().catch(next);
+      });
+    }
+  };
+}
+
 export default defineConfig({
   plugins: [
     // Runs the Worker (worker/index.ts) inside the Vite dev server via
     // workerd, so `npm run dev` serves both the app and /api/* — no separate
     // backend process. Reads OPENROUTER_API_KEY from .dev.vars.
     cloudflare(),
-    specMedia()
+    specMedia(),
+    localLibraryLogin()
   ],
   build: {
     target: 'es2022',

@@ -123,10 +123,11 @@ for and it costs no application code.
 - **The workbench stays public.** Its Load dialog keeps the 401 → sign-in-button path it
   has; nothing about the workbench's static-functional rule changes.
 
-**Local development** uses the local trust in `docs/library-access.md`: the signed test
-session's `browser` field as a loopback cookie and `node tools/library-local-auth.mjs`.
-In dev there is no edge, so `/studio/` loads without a prompt and the `/me` call is what
-fails; the not-permitted page is the honest result and is how the page gets exercised.
+**Local development** uses the local trust in `docs/library-access.md`: `npm run dev:login`
+once, then `/__local-login` on the dev server sets the loopback cookie (studio's *Sign in*
+button goes there in dev). In dev there is no edge, so `/studio/` loads without a prompt
+and the `/me` call is what fails; the signed-out page is the honest result and is how the
+page gets exercised.
 
 ## Editing — phase two, and the trigger it pulls
 

@@ -29,5 +29,8 @@ export async function loadSession(client: LibraryClient): Promise<Session> {
 
 /** Re-entering the page is the sign-in: Access answers `/studio/` itself. */
 export function signIn(): void {
-  location.assign('/studio/');
+  // Behind the gate, reloading the page is the sign-in: the edge redirects to
+  // Access. In dev there is no edge, so the dev server's loopback-only login
+  // route sets the local session cookie instead (docs/library-access.md).
+  location.assign(import.meta.env.DEV ? `/__local-login?next=${encodeURIComponent(location.pathname + location.search + location.hash)}` : '/studio/');
 }

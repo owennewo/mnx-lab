@@ -60,21 +60,36 @@ explicitly before that date.
 
 ## Local development
 
-Run `node tools/library-local-auth.mjs` in the worktree. This creates local public-key
-trust in ignored `.dev.vars` and signed eight-hour test sessions in the ignored file
-`.secrets/local-library-session.json`. Apply both migrations with Wrangler **--local**,
-then insert a local user (`operator`, `local@example.test`, active 1, creation timestamp)
-in local D1. For the built browser smoke start `npx wrangler dev --config wrangler.jsonc --assets dist/client --port 8791 --local-upstream localhost`. Wrangler otherwise rewrites the request hostname to the production route, which correctly rejects local identities. A browser test can set its loopback-only
+`npm run dev:login` sets a fresh clone up in one go: it creates the local signing key
+under ignored `.secrets/` (once — the key is reused from then on), writes its public half
+into ignored `.dev.vars` as `LIBRARY_LOCAL_JWKS` with the local issuer and audiences,
+signs eight-hour browser and machine sessions into `.secrets/local-library-session.json`,
+applies the D1 migrations **--local** and inserts the local user (`operator`,
+`local@example.test`). Restart `npm run dev` the first time, because the Worker reads
+`.dev.vars` at start; after that a renewal never changes `.dev.vars`, so it never needs a
+restart. `node tools/library-local-auth.mjs` alone renews the sessions without touching D1.
+
+Signing the browser in is a URL: while `npm run dev` runs, open
+`http://localhost:5173/__local-login`. The dev server (a Vite-only middleware in
+`vite.config.ts`, absent from every build) renews the session file when it is missing or
+within fifteen minutes of expiry, sets the loopback `CF_Authorization` cookie from its
+`browser` field, and bounces to `?next=` (a same-origin path; default `/studio/`).
+`/__local-logout` clears the cookie. Studio's own *Sign in* button goes there in dev, so a
+`401` after the eight hours is one click to clear. The route answers only a loopback
+client asking for a loopback host — the two conditions under which the Worker honours the
+local issuer — and trusts no header: it hands out the same cookie the file already holds.
+
+For the built browser smoke start `npx wrangler dev --config wrangler.jsonc --assets dist/client --port 8791 --local-upstream localhost`. Wrangler otherwise rewrites the request hostname to the production route, which correctly rejects local identities. A browser test sets its loopback-only
 `CF_Authorization` cookie from the file's `browser` field; a local ingest request sends
 its `machine` field as `Cf-Access-Jwt-Assertion` alongside the local write token (the ingest CLI supports `--local-session-file .secrets/local-library-session.json --endpoint http://localhost:8791`). Local
 trust requires both the special configured issuer and a loopback URL; it cannot be used
 against deployed hostnames. No development identity header is trusted.
 
-Local logout clears the test cookie manually; production logout is handled by Access.
+Local logout is `/__local-logout`; production logout is handled by Access.
 `node harness/verify/studio-smoke.mjs` drives the built studio face against the same local
 setup (root redirect, signed-out page, library list and filter, piece view with player,
 missing piece), the studio counterpart of `library-smoke.mjs`.
-Never deploy `.dev.vars` or `LIBRARY_LOCAL_JWKS`. Do not copy private scores into public
+Never deploy `.dev.vars`, `LIBRARY_LOCAL_JWKS` or anything under `.secrets/`. Do not copy private scores into public
 assets for testing. The harness uses synthetic scores with local D1/R2 and signed keys.
 
 ## Browser writes
