@@ -74,11 +74,16 @@ test("fusion events are chunk-invariant and cannot revise emitted starts using f
   assert.deepEqual(starts().slice(0, old.length), old);
 });
 
-for (const neighborRatio of [undefined, 1, 1.5])
-  test(`re-strike-only preserves parent/prefix/chunks with neighbour ratio ${neighborRatio}`, () => {
+for (const attribution of [
+  {},
+  { neighborRatio: 1 },
+  { neighborRatio: 1.5 },
+  { neighborRatio: 1, harmonicRatio: 1 },
+])
+  test(`re-strike-only preserves parent/prefix/chunks with neighbour ratio ${JSON.stringify(attribution)}`, () => {
     const c = {
       ...config,
-      fusion: { ...config.fusion, mode: "restrike-only", neighborRatio },
+      fusion: { ...config.fusion, mode: "restrike-only", ...attribution },
     };
     const samples = Float32Array.from({ length: 12000 }, (_, i) => {
       if (i < 1600 || i >= 10000) return 0;

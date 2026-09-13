@@ -46,6 +46,7 @@ No isolated marginal processing cost measured for this layer.
 | TE-002 · 2026-09-13 | Focused reading of the same reference run: archtop templates + gate, `restrike-no-gap` | [Per-case outcomes](../findings/reference-v1/cases.jsonl) | All active pitch sets correct; only 1/3 attacks matched | Pitch continuity is insufficient for re-strikes; investigate attack evidence |
 | TE-003 · 2026-09-13 | F-001 pitch-associated attack gate, frozen 12-setting sweep | [AR-001/002](attack-restrike.md) | Repeat attacks improve at ~5% extra processing, but hard onset gating loses sustained/polyphonic coverage | Revise: separate ongoing pitch presence from attack decisions; retain F-000 default |
 | TE-004 · 2026-09-13 | F-002 additive, two-frame-confirmed re-strikes | [AR-003/004](attack-restrike.md) | All 168 cases retain exact parent events and active-pitch counts; repeat gains but extra false attacks | Preserve this contract in the next experiment; improve attribution |
+| TE-005 · 2026-09-13 | F-003/F-004 attribution filters | [PA-001…004](pitch-attribution.md) | Exact parent events/presence survive every case; new filters act only on pending extra attacks | Preserve contract; no added temporal confirmation delay |
 
 ## What works, what does not, what is unknown
 

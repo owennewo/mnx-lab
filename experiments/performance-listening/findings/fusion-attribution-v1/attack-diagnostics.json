@@ -1,0 +1,379 @@
+{
+  "development": {
+    "F-003-01": {
+      "unmatchedRestrikes": 7,
+      "pitchNeverScheduled": 4,
+      "events": [
+        {
+          "preset": "piano",
+          "fixture": "single-88-0.3",
+          "pitch": 88,
+          "start": 0.8475283446712019,
+          "pitchNeverScheduled": false
+        },
+        {
+          "preset": "piano",
+          "fixture": "single-88-0.8",
+          "pitch": 88,
+          "start": 0.8475283446712019,
+          "pitchNeverScheduled": false
+        },
+        {
+          "preset": "guitar",
+          "fixture": "hold-repeat",
+          "pitch": 85,
+          "start": 0.592108843537415,
+          "pitchNeverScheduled": true
+        },
+        {
+          "preset": "guitar",
+          "fixture": "hold-restrike",
+          "pitch": 81,
+          "start": 0.5688888888888889,
+          "pitchNeverScheduled": true
+        },
+        {
+          "preset": "guitar",
+          "fixture": "hold-restrike",
+          "pitch": 81,
+          "start": 0.8475283446712019,
+          "pitchNeverScheduled": true
+        },
+        {
+          "preset": "guitar",
+          "fixture": "v2-arpeggio",
+          "pitch": 62,
+          "start": 0.4876190476190476,
+          "pitchNeverScheduled": true
+        },
+        {
+          "preset": "guitar2",
+          "fixture": "v2-repeat-soft",
+          "pitch": 59,
+          "start": 0.33668934240362813,
+          "pitchNeverScheduled": false
+        }
+      ]
+    },
+    "F-003-02": {
+      "unmatchedRestrikes": 7,
+      "pitchNeverScheduled": 4,
+      "events": [
+        {
+          "preset": "piano",
+          "fixture": "single-88-0.3",
+          "pitch": 88,
+          "start": 0.8475283446712019,
+          "pitchNeverScheduled": false
+        },
+        {
+          "preset": "piano",
+          "fixture": "single-88-0.8",
+          "pitch": 88,
+          "start": 0.8475283446712019,
+          "pitchNeverScheduled": false
+        },
+        {
+          "preset": "guitar",
+          "fixture": "hold-repeat",
+          "pitch": 85,
+          "start": 0.592108843537415,
+          "pitchNeverScheduled": true
+        },
+        {
+          "preset": "guitar",
+          "fixture": "hold-restrike",
+          "pitch": 81,
+          "start": 0.5688888888888889,
+          "pitchNeverScheduled": true
+        },
+        {
+          "preset": "guitar",
+          "fixture": "hold-restrike",
+          "pitch": 81,
+          "start": 0.8475283446712019,
+          "pitchNeverScheduled": true
+        },
+        {
+          "preset": "guitar",
+          "fixture": "v2-arpeggio",
+          "pitch": 62,
+          "start": 0.4876190476190476,
+          "pitchNeverScheduled": true
+        },
+        {
+          "preset": "guitar2",
+          "fixture": "v2-repeat-soft",
+          "pitch": 59,
+          "start": 0.33668934240362813,
+          "pitchNeverScheduled": false
+        }
+      ]
+    },
+    "F-002-01": {
+      "unmatchedRestrikes": 23,
+      "pitchNeverScheduled": 19,
+      "events": [
+        {
+          "preset": "guitar",
+          "fixture": "repeated",
+          "pitch": 61,
+          "start": 1.0216780045351475,
+          "pitchNeverScheduled": true
+        },
+        {
+          "preset": "guitar2",
+          "fixture": "repeated",
+          "pitch": 61,
+          "start": 0.603718820861678,
+          "pitchNeverScheduled": true
+        },
+        {
+          "preset": "guitar2",
+          "fixture": "repeated",
+          "pitch": 59,
+          "start": 0.615328798185941,
+          "pitchNeverScheduled": true
+        },
+        {
+          "preset": "piano",
+          "fixture": "single-88-0.3",
+          "pitch": 88,
+          "start": 0.8475283446712019,
+          "pitchNeverScheduled": false
+        },
+        {
+          "preset": "piano",
+          "fixture": "single-88-0.8",
+          "pitch": 88,
+          "start": 0.8475283446712019,
+          "pitchNeverScheduled": false
+        },
+        {
+          "preset": "guitar",
+          "fixture": "hold-repeat",
+          "pitch": 85,
+          "start": 0.592108843537415,
+          "pitchNeverScheduled": true
+        },
+        {
+          "preset": "guitar",
+          "fixture": "hold-restrike",
+          "pitch": 81,
+          "start": 0.5688888888888889,
+          "pitchNeverScheduled": true
+        },
+        {
+          "preset": "guitar",
+          "fixture": "hold-restrike",
+          "pitch": 81,
+          "start": 0.8475283446712019,
+          "pitchNeverScheduled": true
+        },
+        {
+          "preset": "guitar2",
+          "fixture": "hold-repeat",
+          "pitch": 58,
+          "start": 0.592108843537415,
+          "pitchNeverScheduled": true
+        },
+        {
+          "preset": "guitar2",
+          "fixture": "hold-repeat",
+          "pitch": 58,
+          "start": 0.9171882086167801,
+          "pitchNeverScheduled": true
+        },
+        {
+          "preset": "piano",
+          "fixture": "hold-repeat",
+          "pitch": 56,
+          "start": 0.603718820861678,
+          "pitchNeverScheduled": true
+        },
+        {
+          "preset": "piano",
+          "fixture": "hold-repeat",
+          "pitch": 58,
+          "start": 0.615328798185941,
+          "pitchNeverScheduled": true
+        },
+        {
+          "preset": "piano",
+          "fixture": "hold-repeat",
+          "pitch": 56,
+          "start": 0.9404081632653061,
+          "pitchNeverScheduled": true
+        },
+        {
+          "preset": "piano",
+          "fixture": "hold-repeat",
+          "pitch": 58,
+          "start": 0.9520181405895691,
+          "pitchNeverScheduled": true
+        },
+        {
+          "preset": "guitar",
+          "fixture": "v2-repeat-soft",
+          "pitch": 58,
+          "start": 0.603718820861678,
+          "pitchNeverScheduled": true
+        },
+        {
+          "preset": "guitar",
+          "fixture": "v2-repeat-soft",
+          "pitch": 60,
+          "start": 0.9520181405895691,
+          "pitchNeverScheduled": true
+        },
+        {
+          "preset": "guitar",
+          "fixture": "v2-arpeggio",
+          "pitch": 62,
+          "start": 0.4876190476190476,
+          "pitchNeverScheduled": true
+        },
+        {
+          "preset": "guitar2",
+          "fixture": "v2-repeat-soft",
+          "pitch": 59,
+          "start": 0.33668934240362813,
+          "pitchNeverScheduled": false
+        },
+        {
+          "preset": "guitar2",
+          "fixture": "v2-repeat-soft",
+          "pitch": 60,
+          "start": 0.592108843537415,
+          "pitchNeverScheduled": true
+        },
+        {
+          "preset": "guitar2",
+          "fixture": "v2-repeat-soft",
+          "pitch": 58,
+          "start": 0.603718820861678,
+          "pitchNeverScheduled": true
+        },
+        {
+          "preset": "guitar2",
+          "fixture": "v2-repeat-soft",
+          "pitch": 59,
+          "start": 0.6849886621315193,
+          "pitchNeverScheduled": false
+        },
+        {
+          "preset": "guitar2",
+          "fixture": "v2-repeat-soft",
+          "pitch": 60,
+          "start": 0.9404081632653061,
+          "pitchNeverScheduled": true
+        },
+        {
+          "preset": "guitar2",
+          "fixture": "v2-repeat-soft",
+          "pitch": 58,
+          "start": 0.9520181405895691,
+          "pitchNeverScheduled": true
+        }
+      ]
+    }
+  },
+  "heldout": {
+    "F-003-01": {
+      "unmatchedRestrikes": 1,
+      "pitchNeverScheduled": 1,
+      "events": [
+        {
+          "preset": "guitar",
+          "fixture": "v3-restrike",
+          "pitch": 82,
+          "start": 0.615328798185941,
+          "pitchNeverScheduled": true
+        }
+      ]
+    },
+    "F-002-01": {
+      "unmatchedRestrikes": 11,
+      "pitchNeverScheduled": 11,
+      "events": [
+        {
+          "preset": "guitar",
+          "fixture": "v3-repeat",
+          "pitch": 57,
+          "start": 0.6385487528344671,
+          "pitchNeverScheduled": true
+        },
+        {
+          "preset": "guitar",
+          "fixture": "v3-repeat",
+          "pitch": 59,
+          "start": 0.6385487528344671,
+          "pitchNeverScheduled": true
+        },
+        {
+          "preset": "guitar",
+          "fixture": "v3-repeat",
+          "pitch": 57,
+          "start": 0.9752380952380952,
+          "pitchNeverScheduled": true
+        },
+        {
+          "preset": "guitar",
+          "fixture": "v3-repeat",
+          "pitch": 59,
+          "start": 0.9868480725623583,
+          "pitchNeverScheduled": true
+        },
+        {
+          "preset": "guitar",
+          "fixture": "v3-restrike",
+          "pitch": 82,
+          "start": 0.615328798185941,
+          "pitchNeverScheduled": true
+        },
+        {
+          "preset": "guitar2",
+          "fixture": "v3-repeat",
+          "pitch": 59,
+          "start": 0.615328798185941,
+          "pitchNeverScheduled": true
+        },
+        {
+          "preset": "guitar2",
+          "fixture": "v3-repeat",
+          "pitch": 57,
+          "start": 0.6385487528344671,
+          "pitchNeverScheduled": true
+        },
+        {
+          "preset": "piano",
+          "fixture": "v3-repeat",
+          "pitch": 57,
+          "start": 0.615328798185941,
+          "pitchNeverScheduled": true
+        },
+        {
+          "preset": "piano",
+          "fixture": "v3-repeat",
+          "pitch": 59,
+          "start": 0.626938775510204,
+          "pitchNeverScheduled": true
+        },
+        {
+          "preset": "piano",
+          "fixture": "v3-repeat",
+          "pitch": 57,
+          "start": 0.9752380952380952,
+          "pitchNeverScheduled": true
+        },
+        {
+          "preset": "piano",
+          "fixture": "v3-repeat",
+          "pitch": 59,
+          "start": 0.9868480725623583,
+          "pitchNeverScheduled": true
+        }
+      ]
+    }
+  }
+}

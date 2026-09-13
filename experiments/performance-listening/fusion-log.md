@@ -6,12 +6,13 @@ Living experiment index · implementation loop · started 2026-09-13.
 decision delay. Techniques earn their place through measured contribution to the whole
 listener. They may be combined, conditional, replaced or removed.
 
-**Current state:** F-000 remains default. F-002 preserves all parent pitch coverage and
-improves repeat recovery at ~5–6% extra processing, but adds false accusations on both
-regression and fresh held-out cases. **Revise**: next target is attribution of additional
-attacks to the correct pitch. F-001's failed coverage-gating trial remains in the history.
-Local budgets remain 25% extra processing and 25 ms pooled/common-match p95 increase;
-a production target device is unselected. [F-002 evidence](findings/fusion-restrike-v1/README.md).
+**Current state:** F-000 remains default. **F-003 is the preferred experimental candidate**:
+neighbour competition removes most F-002 extra false attacks with minimal loss of correct
+attacks and exact parent pitch coverage. It still fails the no-extra-accusations gate.
+F-004 lower-harmonic competition is parked: one regression false attack removed, no new
+held-out benefit. These two iterations stop here; octave attribution needs further evidence.
+[Latest comparison](findings/fusion-harmonic-attribution-v1/README.md). Local budgets remain
+25% extra processing and 25 ms pooled/common-match p95 increase; target device unselected.
 
 ## Technique index
 
@@ -21,7 +22,8 @@ a production target device is unselected. [F-002 evidence](findings/fusion-restr
 | [Recorded templates](fusion-techniques/recorded-templates.md) | Measured baseline; parked for general use | Large timbre-transfer loss; reconsider for an explicit personalisation experiment |
 | [Neural evidence](fusion-techniques/neural-evidence.md) | Measured offline baseline; candidate | Stronger attack recovery; current CPU path is slower than real time |
 | [Temporal event tracking](fusion-techniques/temporal-events.md) | Implemented in DSP baselines; not isolated by ablation | Stable pitch presence does not establish re-strikes |
-| [Attack and re-strike evidence](fusion-techniques/attack-restrike.md) | F-001/F-002 measured; revise | Pitch coverage now preserved; additional attacks still inherit incorrect pitch hypotheses |
+| [Attack and re-strike evidence](fusion-techniques/attack-restrike.md) | F-001…F-004 measured; revise | Exact coverage retained; additional octave errors still block acceptance |
+| [Pitch attribution](fusion-techniques/pitch-attribution.md) | F-003 useful candidate; F-004 parked | Neighbour competition helps; lower-harmonic score competition adds little |
 | [Confidence gating](fusion-techniques/confidence-gating.md) | Final-event threshold curves measured; live policy untried | Precision costs coverage; final confidence is not available at initial emission |
 | [Selective extra analysis](fusion-techniques/selective-analysis.md) | Proposed; untried | Can additional evidence pay for itself only when needed? |
 
@@ -38,12 +40,14 @@ failure when a later configuration works.
 | FL-003 · 2026-09-13 | Start this log and structured technique records | Capture configurations and interactions so a bad setting is not mistaken for a bad technique |
 | FL-004 · 2026-09-13 | [F-001 attack association: AR-001/002](fusion-techniques/attack-restrike.md) | 12 settings + locked held-out run; ~5% cost, improved repeats, unacceptable pitch/strum regressions. Revise; keep F-000 default |
 | FL-005 · 2026-09-13 | [F-002 re-strike-only: AR-003/004](fusion-techniques/attack-restrike.md) | 132 regression + 36 fresh cases; exact parent coverage; repeat gains at ~5–6% cost, but +14/+9 false accusations. Revise pitch attribution |
+| FL-006 · 2026-09-13 | [F-003 neighbour attribution: PA-001/002](fusion-techniques/pitch-attribution.md) | 168 regression + 42 fresh cases; removes 16/23 and 10/11 F-002 added false attacks; selected ratio 1, still revise |
+| FL-007 · 2026-09-13 | [F-004 lower-harmonic competition: PA-003/004](fusion-techniques/pitch-attribution.md) | 210 regression + 42 fresh cases; one regression false removed, identical held-out TP/FP/FN; park and stop this batch |
 
 ## Candidate next experiments
 
 These are questions, not scheduled work or new roadmap proposals.
 
-- Improve pitch attribution for additional attacks while preserving the F-002 parent-coverage contract.
+- Seek independent evidence for remaining octave attribution errors, preserving the F-002 pitch-coverage contract; consider conditional spectral-change scoring as an untried hypothesis.
 - Isolate duplicate re-strike suppression on a played pitch if attribution alone is insufficient.
 - Select a target device before treating the provisional local processing budget as a production budget.
 - Test [confidence gating](fusion-techniques/confidence-gating.md) using evidence available at decision time.

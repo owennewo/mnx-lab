@@ -139,3 +139,11 @@ coverage and strums regressed. Decision: revise; unchanged harmonic parent remai
 [F-002 results](fusion-restrike-v1/README.md): re-strike-only integration preserves all
 parent pitch coverage and improves repeat detection at ~5–6% processing overhead. Extra
 false accusations still fail acceptance; the next target is attack-to-pitch attribution.
+
+## Third and fourth fused iterations
+
+[F-003](fusion-attribution-v1/README.md) adds neighbour competition: it removes 16/23
+regression and 10/11 held-out F-002 extra false attacks, with one/zero lost correct attacks.
+[F-004](fusion-harmonic-attribution-v1/README.md) adds lower-harmonic competition: one
+regression false attack removed and no held-out accuracy gain. Stop this batch with F-003
+the preferred experimental candidate, F-004 parked, and F-000 still the default.

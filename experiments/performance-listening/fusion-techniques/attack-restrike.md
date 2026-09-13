@@ -83,8 +83,10 @@ release envelopes and instrument transients can still cause false local rises.
 ## Next experiment and acceptance question
 
 F-002 removes the coverage failure but retains incorrect pitch hypotheses from the parent.
-Test more selective attribution of additional attacks, particularly competing neighbouring
-pitches, with the exact pitch-preservation contract retained. Real close-interval chords
-and quiet notes must survive. Same-pitch duplicate triggers are a separate question. Keep
+[F-003 neighbour attribution](pitch-attribution.md) reduced most extra false attacks;
+F-004 lower-harmonic competition added little. Further work needs evidence for the
+remaining octave errors, with the exact pitch-preservation contract retained. Real
+close-interval chords and quiet notes must survive. Same-pitch duplicate triggers remain
+a separate question. Keep
 parameters/splits frozen and report accusation counts with recall; do not relax the failed
 gate retrospectively. [Diagnosis and exact cases](../findings/fusion-restrike-v1/README.md).

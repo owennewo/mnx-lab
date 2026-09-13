@@ -102,6 +102,7 @@ F-003 adds optional neighbouring-pitch competition to F-002's additional attacks
 node rendering/render.mjs output/audio-fusion-heldout-v3 --fusion-heldout-v3
 npm run fusion:attack -- output/fusion-attribution-v1 experiments/fusion-attribution.json
 npm run fusion:export -- output/fusion-attribution-v1 findings/fusion-attribution-v1
+node experiments/fusion-report.mjs output/fusion-attribution-v1 findings/fusion-attribution-v1
 ```
 
 `FUSION_ARCHIVE_ROOT` optionally locates archived parent runs outside this bench's `output`.
@@ -110,6 +111,14 @@ selected settings and diagnostic references are evaluated on the new split only 
 selection lock. References cannot be selected as candidates. Exports retain reference event
 streams as well as the parent and selected candidate. Merged manifests retain source hashes
 and metadata, with evaluation records once in the combined record list.
+
+F-004 uses `--fusion-heldout-v4`, `experiments/fusion-harmonic-attribution.json` and fresh
+`output/fusion-harmonic-attribution-v1` / `findings/fusion-harmonic-attribution-v1`
+destinations with the same commands. The compact report command adds a comparison table
+and exact unmatched re-strike diagnostics to an exported reference; it refuses existing
+report files. [F-003 results](findings/fusion-attribution-v1/README.md) and
+[F-004 results](findings/fusion-harmonic-attribution-v1/README.md) retain the stopping decision.
+No new recipe is enabled by default.
 
 ## What is independent
 
