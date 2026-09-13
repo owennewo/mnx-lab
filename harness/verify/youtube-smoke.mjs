@@ -109,4 +109,13 @@ try{
  if(c.logs.length)throw new Error(c.logs.join('\n'));
  console.log('YouTube smoke OK',JSON.stringify({live,format,geometry,mobile,scripts}));
 }catch(error){if(c){const shot=await c.send('Page.captureScreenshot');if(shot.result?.data)fs.writeFileSync(`/tmp/youtube-${live?'live':format}-failure.png`,Buffer.from(shot.result.data,'base64'));}console.error('YouTube smoke FAILED',error.message);process.exitCode=1;}
-finally{ws?.close();if(chrome.exitCode===null){const done=new Promise(r=>chrome.once('exit',r));chrome.kill();await done;}server.close();fs.rmSync(profile,{recursive:true,force:true,maxRetries:10,retryDelay:100});}
+finally{
+ if(chrome.exitCode===null){
+  const done=new Promise(r=>chrome.once('exit',r));
+  if(c&&ws?.readyState===WebSocket.OPEN)await Promise.race([c.send('Browser.close'),new Promise(r=>setTimeout(r,1000))]);
+  await Promise.race([done,new Promise(r=>setTimeout(r,2000))]);
+  if(chrome.exitCode===null){chrome.kill();await done;}
+ }
+ ws?.close();server.close();
+ await fs.promises.rm(profile,{recursive:true,force:true,maxRetries:10,retryDelay:100});
+}
