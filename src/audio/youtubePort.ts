@@ -87,6 +87,7 @@ export class YouTubePort implements MediaPort {
         onStateChange: ({data}) => {
           if (this.closed) return;
           this.state=data;
+          if (data===0) this.hasPlayed=false;
           if (data===1 || data===3) {
             if (!this.visible()) { this.rejectPlay('Show the YouTube player before pressing Play.'); this.pause(); return; }
           }

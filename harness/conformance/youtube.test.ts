@@ -44,6 +44,10 @@ describe('official IFrame API adapter',()=>{
     f.state(3);f.api.time=9;f.port.sample();expect(f.port.currentTime).toBe(4);expect(f.port.clockReliable).toBe(true);
     f.state(1);expect(f.port.currentTime).toBe(9);await f.port.seek(12);expect(f.port.currentTime).toBe(12);expect(f.port.seeking).toBe(false);f.port.dispose();
   });
+  it('cues again after ending so a reset cannot accidentally start video',async()=>{
+    const f=fixture();await f.port.prepare();f.state(1);f.state(0);await f.port.seek(3);
+    expect(f.api.cues).toEqual([3]);expect(f.api.plays).toBe(0);expect(f.port.paused).toBe(true);f.port.dispose();
+  });
   it('waits for an outstanding seek before starting paused playback',async()=>{
     const f=fixture();await f.port.prepare();f.state(1);f.port.pause();f.api.seekTo=()=>{};
     const seeking=f.port.seek(8);await flush();const playing=f.port.play();await flush();expect(f.api.plays).toBe(0);
