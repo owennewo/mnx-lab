@@ -1,0 +1,2675 @@
+[
+  {
+    "id": "F-003-01",
+    "parent": {
+      "cases": 168,
+      "onset": {
+        "tp": 288,
+        "fp": 1626,
+        "fn": 129,
+        "precision": 0.15047021943573669,
+        "recall": 0.6906474820143885,
+        "f1": 0.2471042471042471
+      },
+      "active": {
+        "tp": 8748,
+        "fp": 8181,
+        "fn": 4380,
+        "precision": 0.5167464114832536,
+        "recall": 0.6663619744058501,
+        "f1": 0.5820940213594171
+      },
+      "falseAccusations": 1625,
+      "missedUnexpectedAttacks": 3,
+      "unassessedTargetEvents": 143,
+      "latencyP95": 0.16361005164626224,
+      "maxBacklog": 0.009421100999999932,
+      "cpuMs": 15013.412510000335,
+      "duration": 263.13088435374146
+    },
+    "candidate": {
+      "cases": 168,
+      "onset": {
+        "tp": 327,
+        "fp": 1633,
+        "fn": 90,
+        "precision": 0.16683673469387755,
+        "recall": 0.7841726618705036,
+        "f1": 0.27513672696676483
+      },
+      "active": {
+        "tp": 8748,
+        "fp": 8181,
+        "fn": 4380,
+        "precision": 0.5167464114832536,
+        "recall": 0.6663619744058501,
+        "f1": 0.5820940213594171
+      },
+      "falseAccusations": 1632,
+      "missedUnexpectedAttacks": 3,
+      "unassessedTargetEvents": 104,
+      "latencyP95": 0.1599706329954631,
+      "maxBacklog": 0.006413781999995982,
+      "cpuMs": 15807.719932999895,
+      "duration": 263.13088435374146
+    },
+    "categories": {
+      "silence": {
+        "parent": {
+          "cases": 9,
+          "onset": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+            "precision": null,
+            "recall": null,
+            "f1": null
+          },
+          "active": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+            "precision": null,
+            "recall": null,
+            "f1": null
+          },
+          "falseAccusations": 0,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 0,
+          "latencyP95": null,
+          "maxBacklog": 0.004664579999999918,
+          "cpuMs": 530.2921670000017,
+          "duration": 14.099999999999996
+        },
+        "candidate": {
+          "cases": 9,
+          "onset": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+            "precision": null,
+            "recall": null,
+            "f1": null
+          },
+          "active": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+            "precision": null,
+            "recall": null,
+            "f1": null
+          },
+          "falseAccusations": 0,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 0,
+          "latencyP95": null,
+          "maxBacklog": 0.00133904100000104,
+          "cpuMs": 572.3752970000141,
+          "duration": 14.099999999999996
+        }
+      },
+      "single": {
+        "parent": {
+          "cases": 48,
+          "onset": {
+            "tp": 39,
+            "fp": 329,
+            "fn": 9,
+            "precision": 0.10597826086956522,
+            "recall": 0.8125,
+            "f1": 0.1875
+          },
+          "active": {
+            "tp": 1344,
+            "fp": 2186,
+            "fn": 381,
+            "precision": 0.38073654390934847,
+            "recall": 0.7791304347826087,
+            "f1": 0.5115128449096099
+          },
+          "falseAccusations": 329,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 9,
+          "latencyP95": 0.11067161405215392,
+          "maxBacklog": 0.004481898999998513,
+          "cpuMs": 4133.462494999876,
+          "duration": 73.3802721088435
+        },
+        "candidate": {
+          "cases": 48,
+          "onset": {
+            "tp": 39,
+            "fp": 331,
+            "fn": 9,
+            "precision": 0.10540540540540541,
+            "recall": 0.8125,
+            "f1": 0.18660287081339713
+          },
+          "active": {
+            "tp": 1344,
+            "fp": 2186,
+            "fn": 381,
+            "precision": 0.38073654390934847,
+            "recall": 0.7791304347826087,
+            "f1": 0.5115128449096099
+          },
+          "falseAccusations": 331,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 9,
+          "latencyP95": 0.11076523805215399,
+          "maxBacklog": 0.001620224000000281,
+          "cpuMs": 4340.419650999929,
+          "duration": 73.3802721088435
+        }
+      },
+      "dyad": {
+        "parent": {
+          "cases": 12,
+          "onset": {
+            "tp": 21,
+            "fp": 112,
+            "fn": 3,
+            "precision": 0.15789473684210525,
+            "recall": 0.875,
+            "f1": 0.267515923566879
+          },
+          "active": {
+            "tp": 631,
+            "fp": 599,
+            "fn": 209,
+            "precision": 0.5130081300813009,
+            "recall": 0.7511904761904762,
+            "f1": 0.6096618357487923
+          },
+          "falseAccusations": 112,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 3,
+          "latencyP95": 0.12236030237641615,
+          "maxBacklog": 0.0015913049999999318,
+          "cpuMs": 960.481432000025,
+          "duration": 16.8
+        },
+        "candidate": {
+          "cases": 12,
+          "onset": {
+            "tp": 21,
+            "fp": 112,
+            "fn": 3,
+            "precision": 0.15789473684210525,
+            "recall": 0.875,
+            "f1": 0.267515923566879
+          },
+          "active": {
+            "tp": 631,
+            "fp": 599,
+            "fn": 209,
+            "precision": 0.5130081300813009,
+            "recall": 0.7511904761904762,
+            "f1": 0.6096618357487923
+          },
+          "falseAccusations": 112,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 3,
+          "latencyP95": 0.12233471837641707,
+          "maxBacklog": 0.001577198999999363,
+          "cpuMs": 1004.9495269999834,
+          "duration": 16.8
+        }
+      },
+      "chord": {
+        "parent": {
+          "cases": 15,
+          "onset": {
+            "tp": 48,
+            "fp": 176,
+            "fn": 21,
+            "precision": 0.21428571428571427,
+            "recall": 0.6956521739130435,
+            "f1": 0.32764505119453924
+          },
+          "active": {
+            "tp": 1378,
+            "fp": 607,
+            "fn": 1037,
+            "precision": 0.6942065491183879,
+            "recall": 0.5706004140786749,
+            "f1": 0.6263636363636363
+          },
+          "falseAccusations": 176,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 21,
+          "latencyP95": 0.1456429940249424,
+          "maxBacklog": 0.0018118969999996182,
+          "cpuMs": 1209.2253089999822,
+          "duration": 20.999999999999996
+        },
+        "candidate": {
+          "cases": 15,
+          "onset": {
+            "tp": 48,
+            "fp": 176,
+            "fn": 21,
+            "precision": 0.21428571428571427,
+            "recall": 0.6956521739130435,
+            "f1": 0.32764505119453924
+          },
+          "active": {
+            "tp": 1378,
+            "fp": 607,
+            "fn": 1037,
+            "precision": 0.6942065491183879,
+            "recall": 0.5706004140786749,
+            "f1": 0.6263636363636363
+          },
+          "falseAccusations": 176,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 21,
+          "latencyP95": 0.14558178602494326,
+          "maxBacklog": 0.001954612999998051,
+          "cpuMs": 1302.1117120001418,
+          "duration": 20.999999999999996
+        }
+      },
+      "masking": {
+        "parent": {
+          "cases": 3,
+          "onset": {
+            "tp": 6,
+            "fp": 18,
+            "fn": 3,
+            "precision": 0.25,
+            "recall": 0.6666666666666666,
+            "f1": 0.36363636363636365
+          },
+          "active": {
+            "tp": 199,
+            "fp": 108,
+            "fn": 116,
+            "precision": 0.6482084690553745,
+            "recall": 0.6317460317460317,
+            "f1": 0.639871382636656
+          },
+          "falseAccusations": 18,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 3,
+          "latencyP95": 0.08747013740363052,
+          "maxBacklog": 0.00536417099999742,
+          "cpuMs": 245.21104199999172,
+          "duration": 4.199999999999999
+        },
+        "candidate": {
+          "cases": 3,
+          "onset": {
+            "tp": 6,
+            "fp": 18,
+            "fn": 3,
+            "precision": 0.25,
+            "recall": 0.6666666666666666,
+            "f1": 0.36363636363636365
+          },
+          "active": {
+            "tp": 199,
+            "fp": 108,
+            "fn": 116,
+            "precision": 0.6482084690553745,
+            "recall": 0.6317460317460317,
+            "f1": 0.639871382636656
+          },
+          "falseAccusations": 18,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 3,
+          "latencyP95": 0.08752934740362633,
+          "maxBacklog": 0.0015177220000005542,
+          "cpuMs": 257.55832500000815,
+          "duration": 4.199999999999999
+        }
+      },
+      "error": {
+        "parent": {
+          "cases": 24,
+          "onset": {
+            "tp": 56,
+            "fp": 187,
+            "fn": 4,
+            "precision": 0.23045267489711935,
+            "recall": 0.9333333333333333,
+            "f1": 0.3696369636963696
+          },
+          "active": {
+            "tp": 1713,
+            "fp": 1003,
+            "fn": 399,
+            "precision": 0.6307069219440353,
+            "recall": 0.8110795454545454,
+            "f1": 0.7096106048053024
+          },
+          "falseAccusations": 186,
+          "missedUnexpectedAttacks": 3,
+          "unassessedTargetEvents": 18,
+          "latencyP95": 0.16527027497052416,
+          "maxBacklog": 0.005273055999998166,
+          "cpuMs": 2052.585392999972,
+          "duration": 35.85006802721088
+        },
+        "candidate": {
+          "cases": 24,
+          "onset": {
+            "tp": 56,
+            "fp": 187,
+            "fn": 4,
+            "precision": 0.23045267489711935,
+            "recall": 0.9333333333333333,
+            "f1": 0.3696369636963696
+          },
+          "active": {
+            "tp": 1713,
+            "fp": 1003,
+            "fn": 399,
+            "precision": 0.6307069219440353,
+            "recall": 0.8110795454545454,
+            "f1": 0.7096106048053024
+          },
+          "falseAccusations": 186,
+          "missedUnexpectedAttacks": 3,
+          "unassessedTargetEvents": 18,
+          "latencyP95": 0.16525019697051552,
+          "maxBacklog": 0.0016982329999991608,
+          "cpuMs": 2179.8134559999216,
+          "duration": 35.85006802721088
+        }
+      },
+      "repeated": {
+        "parent": {
+          "cases": 24,
+          "onset": {
+            "tp": 31,
+            "fp": 266,
+            "fn": 47,
+            "precision": 0.10437710437710437,
+            "recall": 0.3974358974358974,
+            "f1": 0.16533333333333333
+          },
+          "active": {
+            "tp": 814,
+            "fp": 1318,
+            "fn": 11,
+            "precision": 0.3818011257035647,
+            "recall": 0.9866666666666667,
+            "f1": 0.5505579979709164
+          },
+          "falseAccusations": 266,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 47,
+          "latencyP95": 0.08220801542857115,
+          "maxBacklog": 0.0018161739999996152,
+          "cpuMs": 2305.092062000085,
+          "duration": 39.900136054421786
+        },
+        "candidate": {
+          "cases": 24,
+          "onset": {
+            "tp": 61,
+            "fp": 270,
+            "fn": 17,
+            "precision": 0.18429003021148035,
+            "recall": 0.782051282051282,
+            "f1": 0.2982885085574572
+          },
+          "active": {
+            "tp": 814,
+            "fp": 1318,
+            "fn": 11,
+            "precision": 0.3818011257035647,
+            "recall": 0.9866666666666667,
+            "f1": 0.5505579979709164
+          },
+          "falseAccusations": 270,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 17,
+          "latencyP95": 0.1487111107256227,
+          "maxBacklog": 0.006413781999995982,
+          "cpuMs": 2421.7258059999804,
+          "duration": 39.900136054421786
+        }
+      },
+      "sequence": {
+        "parent": {
+          "cases": 3,
+          "onset": {
+            "tp": 12,
+            "fp": 41,
+            "fn": 0,
+            "precision": 0.22641509433962265,
+            "recall": 1,
+            "f1": 0.36923076923076925
+          },
+          "active": {
+            "tp": 144,
+            "fp": 182,
+            "fn": 0,
+            "precision": 0.44171779141104295,
+            "recall": 1,
+            "f1": 0.6127659574468085
+          },
+          "falseAccusations": 41,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 0,
+          "latencyP95": 0.08173515237188234,
+          "maxBacklog": 0.0011776390000013404,
+          "cpuMs": 325.13820499996837,
+          "duration": 5.4
+        },
+        "candidate": {
+          "cases": 3,
+          "onset": {
+            "tp": 12,
+            "fp": 41,
+            "fn": 0,
+            "precision": 0.22641509433962265,
+            "recall": 1,
+            "f1": 0.36923076923076925
+          },
+          "active": {
+            "tp": 144,
+            "fp": 182,
+            "fn": 0,
+            "precision": 0.44171779141104295,
+            "recall": 1,
+            "f1": 0.6127659574468085
+          },
+          "falseAccusations": 41,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 0,
+          "latencyP95": 0.08147873937188321,
+          "maxBacklog": 0.0012405910000015674,
+          "cpuMs": 344.86674000003404,
+          "duration": 5.4
+        }
+      },
+      "strum": {
+        "parent": {
+          "cases": 9,
+          "onset": {
+            "tp": 30,
+            "fp": 165,
+            "fn": 24,
+            "precision": 0.15384615384615385,
+            "recall": 0.5555555555555556,
+            "f1": 0.24096385542168675
+          },
+          "active": {
+            "tp": 1135,
+            "fp": 545,
+            "fn": 1349,
+            "precision": 0.6755952380952381,
+            "recall": 0.45692431561996777,
+            "f1": 0.5451488952929875
+          },
+          "falseAccusations": 165,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 24,
+          "latencyP95": 0.15240243161904976,
+          "maxBacklog": 0.009421100999999932,
+          "cpuMs": 917.4715170001164,
+          "duration": 15.000136054421771
+        },
+        "candidate": {
+          "cases": 9,
+          "onset": {
+            "tp": 30,
+            "fp": 165,
+            "fn": 24,
+            "precision": 0.15384615384615385,
+            "recall": 0.5555555555555556,
+            "f1": 0.24096385542168675
+          },
+          "active": {
+            "tp": 1135,
+            "fp": 545,
+            "fn": 1349,
+            "precision": 0.6755952380952381,
+            "recall": 0.45692431561996777,
+            "f1": 0.5451488952929875
+          },
+          "falseAccusations": 165,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 24,
+          "latencyP95": 0.1524732066190499,
+          "maxBacklog": 0.0017124160000021593,
+          "cpuMs": 954.5289729999986,
+          "duration": 15.000136054421771
+        }
+      },
+      "arpeggio": {
+        "parent": {
+          "cases": 15,
+          "onset": {
+            "tp": 36,
+            "fp": 278,
+            "fn": 18,
+            "precision": 0.11464968152866242,
+            "recall": 0.6666666666666666,
+            "f1": 0.1956521739130435
+          },
+          "active": {
+            "tp": 1103,
+            "fp": 1351,
+            "fn": 865,
+            "precision": 0.44947025264873675,
+            "recall": 0.5604674796747967,
+            "f1": 0.49886928991406604
+          },
+          "falseAccusations": 278,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 18,
+          "latencyP95": 0.16880048161905314,
+          "maxBacklog": 0.0016483919999955576,
+          "cpuMs": 1731.0059170002478,
+          "duration": 27.60013605442176
+        },
+        "candidate": {
+          "cases": 15,
+          "onset": {
+            "tp": 45,
+            "fp": 279,
+            "fn": 9,
+            "precision": 0.1388888888888889,
+            "recall": 0.8333333333333334,
+            "f1": 0.23809523809523808
+          },
+          "active": {
+            "tp": 1103,
+            "fp": 1351,
+            "fn": 865,
+            "precision": 0.44947025264873675,
+            "recall": 0.5604674796747967,
+            "f1": 0.49886928991406604
+          },
+          "falseAccusations": 279,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 9,
+          "latencyP95": 0.1636151016462547,
+          "maxBacklog": 0.0019446489999991323,
+          "cpuMs": 1803.8137629998746,
+          "duration": 27.60013605442176
+        }
+      },
+      "bend": {
+        "parent": {
+          "cases": 3,
+          "onset": {
+            "tp": 3,
+            "fp": 31,
+            "fn": 0,
+            "precision": 0.08823529411764706,
+            "recall": 1,
+            "f1": 0.16216216216216217
+          },
+          "active": {
+            "tp": 138,
+            "fp": 149,
+            "fn": 12,
+            "precision": 0.4808362369337979,
+            "recall": 0.92,
+            "f1": 0.631578947368421
+          },
+          "falseAccusations": 31,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 0,
+          "latencyP95": 0.052675996430839866,
+          "maxBacklog": 0.0013464220000023452,
+          "cpuMs": 296.5834200000372,
+          "duration": 4.950068027210884
+        },
+        "candidate": {
+          "cases": 3,
+          "onset": {
+            "tp": 3,
+            "fp": 31,
+            "fn": 0,
+            "precision": 0.08823529411764706,
+            "recall": 1,
+            "f1": 0.16216216216216217
+          },
+          "active": {
+            "tp": 138,
+            "fp": 149,
+            "fn": 12,
+            "precision": 0.4808362369337979,
+            "recall": 0.92,
+            "f1": 0.631578947368421
+          },
+          "falseAccusations": 31,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 0,
+          "latencyP95": 0.05269506643083832,
+          "maxBacklog": 0.0014949080000005721,
+          "cpuMs": 308.44521199999144,
+          "duration": 4.950068027210884
+        }
+      },
+      "mnx": {
+        "parent": {
+          "cases": 3,
+          "onset": {
+            "tp": 6,
+            "fp": 23,
+            "fn": 0,
+            "precision": 0.20689655172413793,
+            "recall": 1,
+            "f1": 0.34285714285714286
+          },
+          "active": {
+            "tp": 149,
+            "fp": 133,
+            "fn": 1,
+            "precision": 0.5283687943262412,
+            "recall": 0.9933333333333333,
+            "f1": 0.6898148148148148
+          },
+          "falseAccusations": 23,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 0,
+          "latencyP95": 0.07510681202267555,
+          "maxBacklog": 0.003839246999999879,
+          "cpuMs": 306.8635510000313,
+          "duration": 4.950068027210884
+        },
+        "candidate": {
+          "cases": 3,
+          "onset": {
+            "tp": 6,
+            "fp": 23,
+            "fn": 0,
+            "precision": 0.20689655172413793,
+            "recall": 1,
+            "f1": 0.34285714285714286
+          },
+          "active": {
+            "tp": 149,
+            "fp": 133,
+            "fn": 1,
+            "precision": 0.5283687943262412,
+            "recall": 0.9933333333333333,
+            "f1": 0.6898148148148148
+          },
+          "falseAccusations": 23,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 0,
+          "latencyP95": 0.07517584502267538,
+          "maxBacklog": 0.0012696479999995125,
+          "cpuMs": 317.11147100001654,
+          "duration": 4.950068027210884
+        }
+      }
+    },
+    "byPreset": {
+      "guitar": {
+        "parent": {
+          "cases": 56,
+          "onset": {
+            "tp": 83,
+            "fp": 425,
+            "fn": 56,
+            "precision": 0.16338582677165353,
+            "recall": 0.5971223021582733,
+            "f1": 0.25656877897990726
+          },
+          "active": {
+            "tp": 2700,
+            "fp": 2717,
+            "fn": 1676,
+            "precision": 0.49843086579287427,
+            "recall": 0.6170018281535649,
+            "f1": 0.5514142755029102
+          },
+          "falseAccusations": 425,
+          "missedUnexpectedAttacks": 1,
+          "unassessedTargetEvents": 61,
+          "latencyP95": 0.15734367034920577,
+          "maxBacklog": 0.004664579999999918,
+          "cpuMs": 4987.436272000086,
+          "duration": 87.71029478458051
+        },
+        "candidate": {
+          "cases": 56,
+          "onset": {
+            "tp": 93,
+            "fp": 429,
+            "fn": 46,
+            "precision": 0.1781609195402299,
+            "recall": 0.6690647482014388,
+            "f1": 0.2813918305597579
+          },
+          "active": {
+            "tp": 2700,
+            "fp": 2717,
+            "fn": 1676,
+            "precision": 0.49843086579287427,
+            "recall": 0.6170018281535649,
+            "f1": 0.5514142755029102
+          },
+          "falseAccusations": 429,
+          "missedUnexpectedAttacks": 1,
+          "unassessedTargetEvents": 51,
+          "latencyP95": 0.15715475434920662,
+          "maxBacklog": 0.0019446489999991323,
+          "cpuMs": 5268.641900999879,
+          "duration": 87.71029478458051
+        }
+      },
+      "guitar2": {
+        "parent": {
+          "cases": 56,
+          "onset": {
+            "tp": 105,
+            "fp": 670,
+            "fn": 34,
+            "precision": 0.13548387096774195,
+            "recall": 0.7553956834532374,
+            "f1": 0.22975929978118162
+          },
+          "active": {
+            "tp": 3372,
+            "fp": 2601,
+            "fn": 1004,
+            "precision": 0.5645404319437468,
+            "recall": 0.7705667276051188,
+            "f1": 0.6516571649434728
+          },
+          "falseAccusations": 670,
+          "missedUnexpectedAttacks": 1,
+          "unassessedTargetEvents": 39,
+          "latencyP95": 0.16880048161905314,
+          "maxBacklog": 0.00536417099999742,
+          "cpuMs": 5012.745910999898,
+          "duration": 87.71029478458051
+        },
+        "candidate": {
+          "cases": 56,
+          "onset": {
+            "tp": 119,
+            "fp": 671,
+            "fn": 20,
+            "precision": 0.15063291139240506,
+            "recall": 0.8561151079136691,
+            "f1": 0.25618945102260493
+          },
+          "active": {
+            "tp": 3372,
+            "fp": 2601,
+            "fn": 1004,
+            "precision": 0.5645404319437468,
+            "recall": 0.7705667276051188,
+            "f1": 0.6516571649434728
+          },
+          "falseAccusations": 671,
+          "missedUnexpectedAttacks": 1,
+          "unassessedTargetEvents": 25,
+          "latencyP95": 0.16877215967347048,
+          "maxBacklog": 0.006413781999995982,
+          "cpuMs": 5272.194714999863,
+          "duration": 87.71029478458051
+        }
+      },
+      "piano": {
+        "parent": {
+          "cases": 56,
+          "onset": {
+            "tp": 100,
+            "fp": 531,
+            "fn": 39,
+            "precision": 0.15847860538827258,
+            "recall": 0.7194244604316546,
+            "f1": 0.2597402597402597
+          },
+          "active": {
+            "tp": 2676,
+            "fp": 2863,
+            "fn": 1700,
+            "precision": 0.48311969669615457,
+            "recall": 0.6115173674588665,
+            "f1": 0.5397881996974281
+          },
+          "falseAccusations": 530,
+          "missedUnexpectedAttacks": 1,
+          "unassessedTargetEvents": 43,
+          "latencyP95": 0.11242591461904694,
+          "maxBacklog": 0.009421100999999932,
+          "cpuMs": 5013.23032700035,
+          "duration": 87.71029478458051
+        },
+        "candidate": {
+          "cases": 56,
+          "onset": {
+            "tp": 115,
+            "fp": 533,
+            "fn": 24,
+            "precision": 0.17746913580246915,
+            "recall": 0.8273381294964028,
+            "f1": 0.29224904701397714
+          },
+          "active": {
+            "tp": 2676,
+            "fp": 2863,
+            "fn": 1700,
+            "precision": 0.48311969669615457,
+            "recall": 0.6115173674588665,
+            "f1": 0.5397881996974281
+          },
+          "falseAccusations": 532,
+          "missedUnexpectedAttacks": 1,
+          "unassessedTargetEvents": 28,
+          "latencyP95": 0.12232738737642368,
+          "maxBacklog": 0.0020444440000064734,
+          "cpuMs": 5266.883317000153,
+          "duration": 87.71029478458051
+        }
+      }
+    },
+    "timings": {
+      "parent": [
+        15013.412510000335,
+        16557.783110998884,
+        23970.64019800091
+      ],
+      "candidate": [
+        15807.719932999895,
+        17419.95414399953,
+        24948.95210599806
+      ]
+    },
+    "cpuRatio": 1.05207043885168,
+    "common": {
+      "count": 288,
+      "parentP95": 0.16361005164626224,
+      "candidateP95": 0.1636151016462547
+    },
+    "failures": [
+      "more false accusations"
+    ],
+    "eligible": false
+  },
+  {
+    "id": "F-003-02",
+    "parent": {
+      "cases": 168,
+      "onset": {
+        "tp": 288,
+        "fp": 1626,
+        "fn": 129,
+        "precision": 0.15047021943573669,
+        "recall": 0.6906474820143885,
+        "f1": 0.2471042471042471
+      },
+      "active": {
+        "tp": 8748,
+        "fp": 8181,
+        "fn": 4380,
+        "precision": 0.5167464114832536,
+        "recall": 0.6663619744058501,
+        "f1": 0.5820940213594171
+      },
+      "falseAccusations": 1625,
+      "missedUnexpectedAttacks": 3,
+      "unassessedTargetEvents": 143,
+      "latencyP95": 0.16361005164626224,
+      "maxBacklog": 0.009421100999999932,
+      "cpuMs": 15013.412510000335,
+      "duration": 263.13088435374146
+    },
+    "candidate": {
+      "cases": 168,
+      "onset": {
+        "tp": 326,
+        "fp": 1633,
+        "fn": 91,
+        "precision": 0.16641143440530884,
+        "recall": 0.7817745803357314,
+        "f1": 0.27441077441077444
+      },
+      "active": {
+        "tp": 8748,
+        "fp": 8181,
+        "fn": 4380,
+        "precision": 0.5167464114832536,
+        "recall": 0.6663619744058501,
+        "f1": 0.5820940213594171
+      },
+      "falseAccusations": 1632,
+      "missedUnexpectedAttacks": 3,
+      "unassessedTargetEvents": 105,
+      "latencyP95": 0.1599992709954665,
+      "maxBacklog": 0.004829783000000143,
+      "cpuMs": 15802.29691700014,
+      "duration": 263.13088435374146
+    },
+    "categories": {
+      "silence": {
+        "parent": {
+          "cases": 9,
+          "onset": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+            "precision": null,
+            "recall": null,
+            "f1": null
+          },
+          "active": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+            "precision": null,
+            "recall": null,
+            "f1": null
+          },
+          "falseAccusations": 0,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 0,
+          "latencyP95": null,
+          "maxBacklog": 0.004664579999999918,
+          "cpuMs": 530.2921670000017,
+          "duration": 14.099999999999996
+        },
+        "candidate": {
+          "cases": 9,
+          "onset": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+            "precision": null,
+            "recall": null,
+            "f1": null
+          },
+          "active": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+            "precision": null,
+            "recall": null,
+            "f1": null
+          },
+          "falseAccusations": 0,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 0,
+          "latencyP95": null,
+          "maxBacklog": 0.001135925000002258,
+          "cpuMs": 565.7944650000695,
+          "duration": 14.099999999999996
+        }
+      },
+      "single": {
+        "parent": {
+          "cases": 48,
+          "onset": {
+            "tp": 39,
+            "fp": 329,
+            "fn": 9,
+            "precision": 0.10597826086956522,
+            "recall": 0.8125,
+            "f1": 0.1875
+          },
+          "active": {
+            "tp": 1344,
+            "fp": 2186,
+            "fn": 381,
+            "precision": 0.38073654390934847,
+            "recall": 0.7791304347826087,
+            "f1": 0.5115128449096099
+          },
+          "falseAccusations": 329,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 9,
+          "latencyP95": 0.11067161405215392,
+          "maxBacklog": 0.004481898999998513,
+          "cpuMs": 4133.462494999876,
+          "duration": 73.3802721088435
+        },
+        "candidate": {
+          "cases": 48,
+          "onset": {
+            "tp": 39,
+            "fp": 331,
+            "fn": 9,
+            "precision": 0.10540540540540541,
+            "recall": 0.8125,
+            "f1": 0.18660287081339713
+          },
+          "active": {
+            "tp": 1344,
+            "fp": 2186,
+            "fn": 381,
+            "precision": 0.38073654390934847,
+            "recall": 0.7791304347826087,
+            "f1": 0.5115128449096099
+          },
+          "falseAccusations": 331,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 9,
+          "latencyP95": 0.11155223705215389,
+          "maxBacklog": 0.0018949079999993068,
+          "cpuMs": 4363.573896000077,
+          "duration": 73.3802721088435
+        }
+      },
+      "dyad": {
+        "parent": {
+          "cases": 12,
+          "onset": {
+            "tp": 21,
+            "fp": 112,
+            "fn": 3,
+            "precision": 0.15789473684210525,
+            "recall": 0.875,
+            "f1": 0.267515923566879
+          },
+          "active": {
+            "tp": 631,
+            "fp": 599,
+            "fn": 209,
+            "precision": 0.5130081300813009,
+            "recall": 0.7511904761904762,
+            "f1": 0.6096618357487923
+          },
+          "falseAccusations": 112,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 3,
+          "latencyP95": 0.12236030237641615,
+          "maxBacklog": 0.0015913049999999318,
+          "cpuMs": 960.481432000025,
+          "duration": 16.8
+        },
+        "candidate": {
+          "cases": 12,
+          "onset": {
+            "tp": 21,
+            "fp": 112,
+            "fn": 3,
+            "precision": 0.15789473684210525,
+            "recall": 0.875,
+            "f1": 0.267515923566879
+          },
+          "active": {
+            "tp": 631,
+            "fp": 599,
+            "fn": 209,
+            "precision": 0.5130081300813009,
+            "recall": 0.7511904761904762,
+            "f1": 0.6096618357487923
+          },
+          "falseAccusations": 112,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 3,
+          "latencyP95": 0.12237329637641675,
+          "maxBacklog": 0.004829783000000143,
+          "cpuMs": 1017.3317629999101,
+          "duration": 16.8
+        }
+      },
+      "chord": {
+        "parent": {
+          "cases": 15,
+          "onset": {
+            "tp": 48,
+            "fp": 176,
+            "fn": 21,
+            "precision": 0.21428571428571427,
+            "recall": 0.6956521739130435,
+            "f1": 0.32764505119453924
+          },
+          "active": {
+            "tp": 1378,
+            "fp": 607,
+            "fn": 1037,
+            "precision": 0.6942065491183879,
+            "recall": 0.5706004140786749,
+            "f1": 0.6263636363636363
+          },
+          "falseAccusations": 176,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 21,
+          "latencyP95": 0.1456429940249424,
+          "maxBacklog": 0.0018118969999996182,
+          "cpuMs": 1209.2253089999822,
+          "duration": 20.999999999999996
+        },
+        "candidate": {
+          "cases": 15,
+          "onset": {
+            "tp": 48,
+            "fp": 176,
+            "fn": 21,
+            "precision": 0.21428571428571427,
+            "recall": 0.6956521739130435,
+            "f1": 0.32764505119453924
+          },
+          "active": {
+            "tp": 1378,
+            "fp": 607,
+            "fn": 1037,
+            "precision": 0.6942065491183879,
+            "recall": 0.5706004140786749,
+            "f1": 0.6263636363636363
+          },
+          "falseAccusations": 176,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 21,
+          "latencyP95": 0.14553483002494494,
+          "maxBacklog": 0.0018452829999987541,
+          "cpuMs": 1273.575063000124,
+          "duration": 20.999999999999996
+        }
+      },
+      "masking": {
+        "parent": {
+          "cases": 3,
+          "onset": {
+            "tp": 6,
+            "fp": 18,
+            "fn": 3,
+            "precision": 0.25,
+            "recall": 0.6666666666666666,
+            "f1": 0.36363636363636365
+          },
+          "active": {
+            "tp": 199,
+            "fp": 108,
+            "fn": 116,
+            "precision": 0.6482084690553745,
+            "recall": 0.6317460317460317,
+            "f1": 0.639871382636656
+          },
+          "falseAccusations": 18,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 3,
+          "latencyP95": 0.08747013740363052,
+          "maxBacklog": 0.00536417099999742,
+          "cpuMs": 245.21104199999172,
+          "duration": 4.199999999999999
+        },
+        "candidate": {
+          "cases": 3,
+          "onset": {
+            "tp": 6,
+            "fp": 18,
+            "fn": 3,
+            "precision": 0.25,
+            "recall": 0.6666666666666666,
+            "f1": 0.36363636363636365
+          },
+          "active": {
+            "tp": 199,
+            "fp": 108,
+            "fn": 116,
+            "precision": 0.6482084690553745,
+            "recall": 0.6317460317460317,
+            "f1": 0.639871382636656
+          },
+          "falseAccusations": 18,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 3,
+          "latencyP95": 0.08779715740362753,
+          "maxBacklog": 0.0012586630000004373,
+          "cpuMs": 252.51155899998412,
+          "duration": 4.199999999999999
+        }
+      },
+      "error": {
+        "parent": {
+          "cases": 24,
+          "onset": {
+            "tp": 56,
+            "fp": 187,
+            "fn": 4,
+            "precision": 0.23045267489711935,
+            "recall": 0.9333333333333333,
+            "f1": 0.3696369636963696
+          },
+          "active": {
+            "tp": 1713,
+            "fp": 1003,
+            "fn": 399,
+            "precision": 0.6307069219440353,
+            "recall": 0.8110795454545454,
+            "f1": 0.7096106048053024
+          },
+          "falseAccusations": 186,
+          "missedUnexpectedAttacks": 3,
+          "unassessedTargetEvents": 18,
+          "latencyP95": 0.16527027497052416,
+          "maxBacklog": 0.005273055999998166,
+          "cpuMs": 2052.585392999972,
+          "duration": 35.85006802721088
+        },
+        "candidate": {
+          "cases": 24,
+          "onset": {
+            "tp": 56,
+            "fp": 187,
+            "fn": 4,
+            "precision": 0.23045267489711935,
+            "recall": 0.9333333333333333,
+            "f1": 0.3696369636963696
+          },
+          "active": {
+            "tp": 1713,
+            "fp": 1003,
+            "fn": 399,
+            "precision": 0.6307069219440353,
+            "recall": 0.8110795454545454,
+            "f1": 0.7096106048053024
+          },
+          "falseAccusations": 186,
+          "missedUnexpectedAttacks": 3,
+          "unassessedTargetEvents": 18,
+          "latencyP95": 0.16523298997051838,
+          "maxBacklog": 0.0019217360000002293,
+          "cpuMs": 2181.3102699999836,
+          "duration": 35.85006802721088
+        }
+      },
+      "repeated": {
+        "parent": {
+          "cases": 24,
+          "onset": {
+            "tp": 31,
+            "fp": 266,
+            "fn": 47,
+            "precision": 0.10437710437710437,
+            "recall": 0.3974358974358974,
+            "f1": 0.16533333333333333
+          },
+          "active": {
+            "tp": 814,
+            "fp": 1318,
+            "fn": 11,
+            "precision": 0.3818011257035647,
+            "recall": 0.9866666666666667,
+            "f1": 0.5505579979709164
+          },
+          "falseAccusations": 266,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 47,
+          "latencyP95": 0.08220801542857115,
+          "maxBacklog": 0.0018161739999996152,
+          "cpuMs": 2305.092062000085,
+          "duration": 39.900136054421786
+        },
+        "candidate": {
+          "cases": 24,
+          "onset": {
+            "tp": 60,
+            "fp": 270,
+            "fn": 18,
+            "precision": 0.18181818181818182,
+            "recall": 0.7692307692307693,
+            "f1": 0.29411764705882354
+          },
+          "active": {
+            "tp": 814,
+            "fp": 1318,
+            "fn": 11,
+            "precision": 0.3818011257035647,
+            "recall": 0.9866666666666667,
+            "f1": 0.5505579979709164
+          },
+          "falseAccusations": 270,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 18,
+          "latencyP95": 0.15545060607709882,
+          "maxBacklog": 0.0017812730000004162,
+          "cpuMs": 2410.7873649998473,
+          "duration": 39.900136054421786
+        }
+      },
+      "sequence": {
+        "parent": {
+          "cases": 3,
+          "onset": {
+            "tp": 12,
+            "fp": 41,
+            "fn": 0,
+            "precision": 0.22641509433962265,
+            "recall": 1,
+            "f1": 0.36923076923076925
+          },
+          "active": {
+            "tp": 144,
+            "fp": 182,
+            "fn": 0,
+            "precision": 0.44171779141104295,
+            "recall": 1,
+            "f1": 0.6127659574468085
+          },
+          "falseAccusations": 41,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 0,
+          "latencyP95": 0.08173515237188234,
+          "maxBacklog": 0.0011776390000013404,
+          "cpuMs": 325.13820499996837,
+          "duration": 5.4
+        },
+        "candidate": {
+          "cases": 3,
+          "onset": {
+            "tp": 12,
+            "fp": 41,
+            "fn": 0,
+            "precision": 0.22641509433962265,
+            "recall": 1,
+            "f1": 0.36923076923076925
+          },
+          "active": {
+            "tp": 144,
+            "fp": 182,
+            "fn": 0,
+            "precision": 0.44171779141104295,
+            "recall": 1,
+            "f1": 0.6127659574468085
+          },
+          "falseAccusations": 41,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 0,
+          "latencyP95": 0.08150325637188849,
+          "maxBacklog": 0.0016317320000016622,
+          "cpuMs": 346.7688239999734,
+          "duration": 5.4
+        }
+      },
+      "strum": {
+        "parent": {
+          "cases": 9,
+          "onset": {
+            "tp": 30,
+            "fp": 165,
+            "fn": 24,
+            "precision": 0.15384615384615385,
+            "recall": 0.5555555555555556,
+            "f1": 0.24096385542168675
+          },
+          "active": {
+            "tp": 1135,
+            "fp": 545,
+            "fn": 1349,
+            "precision": 0.6755952380952381,
+            "recall": 0.45692431561996777,
+            "f1": 0.5451488952929875
+          },
+          "falseAccusations": 165,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 24,
+          "latencyP95": 0.15240243161904976,
+          "maxBacklog": 0.009421100999999932,
+          "cpuMs": 917.4715170001164,
+          "duration": 15.000136054421771
+        },
+        "candidate": {
+          "cases": 9,
+          "onset": {
+            "tp": 30,
+            "fp": 165,
+            "fn": 24,
+            "precision": 0.15384615384615385,
+            "recall": 0.5555555555555556,
+            "f1": 0.24096385542168675
+          },
+          "active": {
+            "tp": 1135,
+            "fp": 545,
+            "fn": 1349,
+            "precision": 0.6755952380952381,
+            "recall": 0.45692431561996777,
+            "f1": 0.5451488952929875
+          },
+          "falseAccusations": 165,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 24,
+          "latencyP95": 0.15245619061904464,
+          "maxBacklog": 0.0015495479999954043,
+          "cpuMs": 957.2736790000527,
+          "duration": 15.000136054421771
+        }
+      },
+      "arpeggio": {
+        "parent": {
+          "cases": 15,
+          "onset": {
+            "tp": 36,
+            "fp": 278,
+            "fn": 18,
+            "precision": 0.11464968152866242,
+            "recall": 0.6666666666666666,
+            "f1": 0.1956521739130435
+          },
+          "active": {
+            "tp": 1103,
+            "fp": 1351,
+            "fn": 865,
+            "precision": 0.44947025264873675,
+            "recall": 0.5604674796747967,
+            "f1": 0.49886928991406604
+          },
+          "falseAccusations": 278,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 18,
+          "latencyP95": 0.16880048161905314,
+          "maxBacklog": 0.0016483919999955576,
+          "cpuMs": 1731.0059170002478,
+          "duration": 27.60013605442176
+        },
+        "candidate": {
+          "cases": 15,
+          "onset": {
+            "tp": 45,
+            "fp": 279,
+            "fn": 9,
+            "precision": 0.1388888888888889,
+            "recall": 0.8333333333333334,
+            "f1": 0.23809523809523808
+          },
+          "active": {
+            "tp": 1103,
+            "fp": 1351,
+            "fn": 865,
+            "precision": 0.44947025264873675,
+            "recall": 0.5604674796747967,
+            "f1": 0.49886928991406604
+          },
+          "falseAccusations": 279,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 9,
+          "latencyP95": 0.16386320864626142,
+          "maxBacklog": 0.0018332310000042096,
+          "cpuMs": 1796.8674740001115,
+          "duration": 27.60013605442176
+        }
+      },
+      "bend": {
+        "parent": {
+          "cases": 3,
+          "onset": {
+            "tp": 3,
+            "fp": 31,
+            "fn": 0,
+            "precision": 0.08823529411764706,
+            "recall": 1,
+            "f1": 0.16216216216216217
+          },
+          "active": {
+            "tp": 138,
+            "fp": 149,
+            "fn": 12,
+            "precision": 0.4808362369337979,
+            "recall": 0.92,
+            "f1": 0.631578947368421
+          },
+          "falseAccusations": 31,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 0,
+          "latencyP95": 0.052675996430839866,
+          "maxBacklog": 0.0013464220000023452,
+          "cpuMs": 296.5834200000372,
+          "duration": 4.950068027210884
+        },
+        "candidate": {
+          "cases": 3,
+          "onset": {
+            "tp": 3,
+            "fp": 31,
+            "fn": 0,
+            "precision": 0.08823529411764706,
+            "recall": 1,
+            "f1": 0.16216216216216217
+          },
+          "active": {
+            "tp": 138,
+            "fp": 149,
+            "fn": 12,
+            "precision": 0.4808362369337979,
+            "recall": 0.92,
+            "f1": 0.631578947368421
+          },
+          "falseAccusations": 31,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 0,
+          "latencyP95": 0.05266683943083944,
+          "maxBacklog": 0.0015019590000010519,
+          "cpuMs": 316.47392899996703,
+          "duration": 4.950068027210884
+        }
+      },
+      "mnx": {
+        "parent": {
+          "cases": 3,
+          "onset": {
+            "tp": 6,
+            "fp": 23,
+            "fn": 0,
+            "precision": 0.20689655172413793,
+            "recall": 1,
+            "f1": 0.34285714285714286
+          },
+          "active": {
+            "tp": 149,
+            "fp": 133,
+            "fn": 1,
+            "precision": 0.5283687943262412,
+            "recall": 0.9933333333333333,
+            "f1": 0.6898148148148148
+          },
+          "falseAccusations": 23,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 0,
+          "latencyP95": 0.07510681202267555,
+          "maxBacklog": 0.003839246999999879,
+          "cpuMs": 306.8635510000313,
+          "duration": 4.950068027210884
+        },
+        "candidate": {
+          "cases": 3,
+          "onset": {
+            "tp": 6,
+            "fp": 23,
+            "fn": 0,
+            "precision": 0.20689655172413793,
+            "recall": 1,
+            "f1": 0.34285714285714286
+          },
+          "active": {
+            "tp": 149,
+            "fp": 133,
+            "fn": 1,
+            "precision": 0.5283687943262412,
+            "recall": 0.9933333333333333,
+            "f1": 0.6898148148148148
+          },
+          "falseAccusations": 23,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 0,
+          "latencyP95": 0.07515135302267495,
+          "maxBacklog": 0.001594376999993985,
+          "cpuMs": 320.0286300000389,
+          "duration": 4.950068027210884
+        }
+      }
+    },
+    "byPreset": {
+      "guitar": {
+        "parent": {
+          "cases": 56,
+          "onset": {
+            "tp": 83,
+            "fp": 425,
+            "fn": 56,
+            "precision": 0.16338582677165353,
+            "recall": 0.5971223021582733,
+            "f1": 0.25656877897990726
+          },
+          "active": {
+            "tp": 2700,
+            "fp": 2717,
+            "fn": 1676,
+            "precision": 0.49843086579287427,
+            "recall": 0.6170018281535649,
+            "f1": 0.5514142755029102
+          },
+          "falseAccusations": 425,
+          "missedUnexpectedAttacks": 1,
+          "unassessedTargetEvents": 61,
+          "latencyP95": 0.15734367034920577,
+          "maxBacklog": 0.004664579999999918,
+          "cpuMs": 4987.436272000086,
+          "duration": 87.71029478458051
+        },
+        "candidate": {
+          "cases": 56,
+          "onset": {
+            "tp": 93,
+            "fp": 429,
+            "fn": 46,
+            "precision": 0.1781609195402299,
+            "recall": 0.6690647482014388,
+            "f1": 0.2813918305597579
+          },
+          "active": {
+            "tp": 2700,
+            "fp": 2717,
+            "fn": 1676,
+            "precision": 0.49843086579287427,
+            "recall": 0.6170018281535649,
+            "f1": 0.5514142755029102
+          },
+          "falseAccusations": 429,
+          "missedUnexpectedAttacks": 1,
+          "unassessedTargetEvents": 51,
+          "latencyP95": 0.15715053534920626,
+          "maxBacklog": 0.004829783000000143,
+          "cpuMs": 5281.475353000002,
+          "duration": 87.71029478458051
+        }
+      },
+      "guitar2": {
+        "parent": {
+          "cases": 56,
+          "onset": {
+            "tp": 105,
+            "fp": 670,
+            "fn": 34,
+            "precision": 0.13548387096774195,
+            "recall": 0.7553956834532374,
+            "f1": 0.22975929978118162
+          },
+          "active": {
+            "tp": 3372,
+            "fp": 2601,
+            "fn": 1004,
+            "precision": 0.5645404319437468,
+            "recall": 0.7705667276051188,
+            "f1": 0.6516571649434728
+          },
+          "falseAccusations": 670,
+          "missedUnexpectedAttacks": 1,
+          "unassessedTargetEvents": 39,
+          "latencyP95": 0.16880048161905314,
+          "maxBacklog": 0.00536417099999742,
+          "cpuMs": 5012.745910999898,
+          "duration": 87.71029478458051
+        },
+        "candidate": {
+          "cases": 56,
+          "onset": {
+            "tp": 118,
+            "fp": 671,
+            "fn": 21,
+            "precision": 0.14955640050697086,
+            "recall": 0.8489208633093526,
+            "f1": 0.2543103448275862
+          },
+          "active": {
+            "tp": 3372,
+            "fp": 2601,
+            "fn": 1004,
+            "precision": 0.5645404319437468,
+            "recall": 0.7705667276051188,
+            "f1": 0.6516571649434728
+          },
+          "falseAccusations": 671,
+          "missedUnexpectedAttacks": 1,
+          "unassessedTargetEvents": 26,
+          "latencyP95": 0.16875765067346993,
+          "maxBacklog": 0.0018484449999995878,
+          "cpuMs": 5243.449073999889,
+          "duration": 87.71029478458051
+        }
+      },
+      "piano": {
+        "parent": {
+          "cases": 56,
+          "onset": {
+            "tp": 100,
+            "fp": 531,
+            "fn": 39,
+            "precision": 0.15847860538827258,
+            "recall": 0.7194244604316546,
+            "f1": 0.2597402597402597
+          },
+          "active": {
+            "tp": 2676,
+            "fp": 2863,
+            "fn": 1700,
+            "precision": 0.48311969669615457,
+            "recall": 0.6115173674588665,
+            "f1": 0.5397881996974281
+          },
+          "falseAccusations": 530,
+          "missedUnexpectedAttacks": 1,
+          "unassessedTargetEvents": 43,
+          "latencyP95": 0.11242591461904694,
+          "maxBacklog": 0.009421100999999932,
+          "cpuMs": 5013.23032700035,
+          "duration": 87.71029478458051
+        },
+        "candidate": {
+          "cases": 56,
+          "onset": {
+            "tp": 115,
+            "fp": 533,
+            "fn": 24,
+            "precision": 0.17746913580246915,
+            "recall": 0.8273381294964028,
+            "f1": 0.29224904701397714
+          },
+          "active": {
+            "tp": 2676,
+            "fp": 2863,
+            "fn": 1700,
+            "precision": 0.48311969669615457,
+            "recall": 0.6115173674588665,
+            "f1": 0.5397881996974281
+          },
+          "falseAccusations": 532,
+          "missedUnexpectedAttacks": 1,
+          "unassessedTargetEvents": 28,
+          "latencyP95": 0.12233410837641429,
+          "maxBacklog": 0.0018452829999987541,
+          "cpuMs": 5277.372490000249,
+          "duration": 87.71029478458051
+        }
+      }
+    },
+    "timings": {
+      "parent": [
+        15013.412510000335,
+        16557.783110998884,
+        23970.64019800091
+      ],
+      "candidate": [
+        15802.29691700014,
+        17424.103400000437,
+        25196.455505000573
+      ]
+    },
+    "cpuRatio": 1.0523210313357758,
+    "common": {
+      "count": 288,
+      "parentP95": 0.16361005164626224,
+      "candidateP95": 0.16386320864626142
+    },
+    "failures": [
+      "more false accusations"
+    ],
+    "eligible": false
+  },
+  {
+    "id": "F-002-01",
+    "parent": {
+      "cases": 168,
+      "onset": {
+        "tp": 288,
+        "fp": 1626,
+        "fn": 129,
+        "precision": 0.15047021943573669,
+        "recall": 0.6906474820143885,
+        "f1": 0.2471042471042471
+      },
+      "active": {
+        "tp": 8748,
+        "fp": 8181,
+        "fn": 4380,
+        "precision": 0.5167464114832536,
+        "recall": 0.6663619744058501,
+        "f1": 0.5820940213594171
+      },
+      "falseAccusations": 1625,
+      "missedUnexpectedAttacks": 3,
+      "unassessedTargetEvents": 143,
+      "latencyP95": 0.16361005164626224,
+      "maxBacklog": 0.009421100999999932,
+      "cpuMs": 15013.412510000335,
+      "duration": 263.13088435374146
+    },
+    "candidate": {
+      "cases": 168,
+      "onset": {
+        "tp": 328,
+        "fp": 1649,
+        "fn": 89,
+        "precision": 0.16590794132524025,
+        "recall": 0.7865707434052758,
+        "f1": 0.27401837928153716
+      },
+      "active": {
+        "tp": 8748,
+        "fp": 8181,
+        "fn": 4380,
+        "precision": 0.5167464114832536,
+        "recall": 0.6663619744058501,
+        "f1": 0.5820940213594171
+      },
+      "falseAccusations": 1648,
+      "missedUnexpectedAttacks": 3,
+      "unassessedTargetEvents": 103,
+      "latencyP95": 0.15767924026757074,
+      "maxBacklog": 0.002490217999999045,
+      "cpuMs": 15796.818328999314,
+      "duration": 263.13088435374146
+    },
+    "categories": {
+      "silence": {
+        "parent": {
+          "cases": 9,
+          "onset": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+            "precision": null,
+            "recall": null,
+            "f1": null
+          },
+          "active": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+            "precision": null,
+            "recall": null,
+            "f1": null
+          },
+          "falseAccusations": 0,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 0,
+          "latencyP95": null,
+          "maxBacklog": 0.004664579999999918,
+          "cpuMs": 530.2921670000017,
+          "duration": 14.099999999999996
+        },
+        "candidate": {
+          "cases": 9,
+          "onset": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+            "precision": null,
+            "recall": null,
+            "f1": null
+          },
+          "active": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+            "precision": null,
+            "recall": null,
+            "f1": null
+          },
+          "falseAccusations": 0,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 0,
+          "latencyP95": null,
+          "maxBacklog": 0.0009153929999992094,
+          "cpuMs": 559.1937560000003,
+          "duration": 14.099999999999996
+        }
+      },
+      "single": {
+        "parent": {
+          "cases": 48,
+          "onset": {
+            "tp": 39,
+            "fp": 329,
+            "fn": 9,
+            "precision": 0.10597826086956522,
+            "recall": 0.8125,
+            "f1": 0.1875
+          },
+          "active": {
+            "tp": 1344,
+            "fp": 2186,
+            "fn": 381,
+            "precision": 0.38073654390934847,
+            "recall": 0.7791304347826087,
+            "f1": 0.5115128449096099
+          },
+          "falseAccusations": 329,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 9,
+          "latencyP95": 0.11067161405215392,
+          "maxBacklog": 0.004481898999998513,
+          "cpuMs": 4133.462494999876,
+          "duration": 73.3802721088435
+        },
+        "candidate": {
+          "cases": 48,
+          "onset": {
+            "tp": 39,
+            "fp": 331,
+            "fn": 9,
+            "precision": 0.10540540540540541,
+            "recall": 0.8125,
+            "f1": 0.18660287081339713
+          },
+          "active": {
+            "tp": 1344,
+            "fp": 2186,
+            "fn": 381,
+            "precision": 0.38073654390934847,
+            "recall": 0.7791304347826087,
+            "f1": 0.5115128449096099
+          },
+          "falseAccusations": 331,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 9,
+          "latencyP95": 0.11079886205215461,
+          "maxBacklog": 0.001768618000000055,
+          "cpuMs": 4370.0068999997175,
+          "duration": 73.3802721088435
+        }
+      },
+      "dyad": {
+        "parent": {
+          "cases": 12,
+          "onset": {
+            "tp": 21,
+            "fp": 112,
+            "fn": 3,
+            "precision": 0.15789473684210525,
+            "recall": 0.875,
+            "f1": 0.267515923566879
+          },
+          "active": {
+            "tp": 631,
+            "fp": 599,
+            "fn": 209,
+            "precision": 0.5130081300813009,
+            "recall": 0.7511904761904762,
+            "f1": 0.6096618357487923
+          },
+          "falseAccusations": 112,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 3,
+          "latencyP95": 0.12236030237641615,
+          "maxBacklog": 0.0015913049999999318,
+          "cpuMs": 960.481432000025,
+          "duration": 16.8
+        },
+        "candidate": {
+          "cases": 12,
+          "onset": {
+            "tp": 21,
+            "fp": 112,
+            "fn": 3,
+            "precision": 0.15789473684210525,
+            "recall": 0.875,
+            "f1": 0.267515923566879
+          },
+          "active": {
+            "tp": 631,
+            "fp": 599,
+            "fn": 209,
+            "precision": 0.5130081300813009,
+            "recall": 0.7511904761904762,
+            "f1": 0.6096618357487923
+          },
+          "falseAccusations": 112,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 3,
+          "latencyP95": 0.1223426353764197,
+          "maxBacklog": 0.001741943000000079,
+          "cpuMs": 1019.6359650000368,
+          "duration": 16.8
+        }
+      },
+      "chord": {
+        "parent": {
+          "cases": 15,
+          "onset": {
+            "tp": 48,
+            "fp": 176,
+            "fn": 21,
+            "precision": 0.21428571428571427,
+            "recall": 0.6956521739130435,
+            "f1": 0.32764505119453924
+          },
+          "active": {
+            "tp": 1378,
+            "fp": 607,
+            "fn": 1037,
+            "precision": 0.6942065491183879,
+            "recall": 0.5706004140786749,
+            "f1": 0.6263636363636363
+          },
+          "falseAccusations": 176,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 21,
+          "latencyP95": 0.1456429940249424,
+          "maxBacklog": 0.0018118969999996182,
+          "cpuMs": 1209.2253089999822,
+          "duration": 20.999999999999996
+        },
+        "candidate": {
+          "cases": 15,
+          "onset": {
+            "tp": 48,
+            "fp": 176,
+            "fn": 21,
+            "precision": 0.21428571428571427,
+            "recall": 0.6956521739130435,
+            "f1": 0.32764505119453924
+          },
+          "active": {
+            "tp": 1378,
+            "fp": 607,
+            "fn": 1037,
+            "precision": 0.6942065491183879,
+            "recall": 0.5706004140786749,
+            "f1": 0.6263636363636363
+          },
+          "falseAccusations": 176,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 21,
+          "latencyP95": 0.14569805302494448,
+          "maxBacklog": 0.0016902149999987182,
+          "cpuMs": 1269.7165049999758,
+          "duration": 20.999999999999996
+        }
+      },
+      "masking": {
+        "parent": {
+          "cases": 3,
+          "onset": {
+            "tp": 6,
+            "fp": 18,
+            "fn": 3,
+            "precision": 0.25,
+            "recall": 0.6666666666666666,
+            "f1": 0.36363636363636365
+          },
+          "active": {
+            "tp": 199,
+            "fp": 108,
+            "fn": 116,
+            "precision": 0.6482084690553745,
+            "recall": 0.6317460317460317,
+            "f1": 0.639871382636656
+          },
+          "falseAccusations": 18,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 3,
+          "latencyP95": 0.08747013740363052,
+          "maxBacklog": 0.00536417099999742,
+          "cpuMs": 245.21104199999172,
+          "duration": 4.199999999999999
+        },
+        "candidate": {
+          "cases": 3,
+          "onset": {
+            "tp": 6,
+            "fp": 18,
+            "fn": 3,
+            "precision": 0.25,
+            "recall": 0.6666666666666666,
+            "f1": 0.36363636363636365
+          },
+          "active": {
+            "tp": 199,
+            "fp": 108,
+            "fn": 116,
+            "precision": 0.6482084690553745,
+            "recall": 0.6317460317460317,
+            "f1": 0.639871382636656
+          },
+          "falseAccusations": 18,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 3,
+          "latencyP95": 0.08748310140362825,
+          "maxBacklog": 0.0020797539999993786,
+          "cpuMs": 254.64587799997935,
+          "duration": 4.199999999999999
+        }
+      },
+      "error": {
+        "parent": {
+          "cases": 24,
+          "onset": {
+            "tp": 56,
+            "fp": 187,
+            "fn": 4,
+            "precision": 0.23045267489711935,
+            "recall": 0.9333333333333333,
+            "f1": 0.3696369636963696
+          },
+          "active": {
+            "tp": 1713,
+            "fp": 1003,
+            "fn": 399,
+            "precision": 0.6307069219440353,
+            "recall": 0.8110795454545454,
+            "f1": 0.7096106048053024
+          },
+          "falseAccusations": 186,
+          "missedUnexpectedAttacks": 3,
+          "unassessedTargetEvents": 18,
+          "latencyP95": 0.16527027497052416,
+          "maxBacklog": 0.005273055999998166,
+          "cpuMs": 2052.585392999972,
+          "duration": 35.85006802721088
+        },
+        "candidate": {
+          "cases": 24,
+          "onset": {
+            "tp": 56,
+            "fp": 187,
+            "fn": 4,
+            "precision": 0.23045267489711935,
+            "recall": 0.9333333333333333,
+            "f1": 0.3696369636963696
+          },
+          "active": {
+            "tp": 1713,
+            "fp": 1003,
+            "fn": 399,
+            "precision": 0.6307069219440353,
+            "recall": 0.8110795454545454,
+            "f1": 0.7096106048053024
+          },
+          "falseAccusations": 186,
+          "missedUnexpectedAttacks": 3,
+          "unassessedTargetEvents": 18,
+          "latencyP95": 0.1652127159705234,
+          "maxBacklog": 0.0016387329999997813,
+          "cpuMs": 2163.090977999912,
+          "duration": 35.85006802721088
+        }
+      },
+      "repeated": {
+        "parent": {
+          "cases": 24,
+          "onset": {
+            "tp": 31,
+            "fp": 266,
+            "fn": 47,
+            "precision": 0.10437710437710437,
+            "recall": 0.3974358974358974,
+            "f1": 0.16533333333333333
+          },
+          "active": {
+            "tp": 814,
+            "fp": 1318,
+            "fn": 11,
+            "precision": 0.3818011257035647,
+            "recall": 0.9866666666666667,
+            "f1": 0.5505579979709164
+          },
+          "falseAccusations": 266,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 47,
+          "latencyP95": 0.08220801542857115,
+          "maxBacklog": 0.0018161739999996152,
+          "cpuMs": 2305.092062000085,
+          "duration": 39.900136054421786
+        },
+        "candidate": {
+          "cases": 24,
+          "onset": {
+            "tp": 62,
+            "fp": 286,
+            "fn": 16,
+            "precision": 0.1781609195402299,
+            "recall": 0.7948717948717948,
+            "f1": 0.29107981220657275
+          },
+          "active": {
+            "tp": 814,
+            "fp": 1318,
+            "fn": 11,
+            "precision": 0.3818011257035647,
+            "recall": 0.9866666666666667,
+            "f1": 0.5505579979709164
+          },
+          "falseAccusations": 286,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 16,
+          "latencyP95": 0.13051879015646217,
+          "maxBacklog": 0.0017344310000008134,
+          "cpuMs": 2400.0838049999074,
+          "duration": 39.900136054421786
+        }
+      },
+      "sequence": {
+        "parent": {
+          "cases": 3,
+          "onset": {
+            "tp": 12,
+            "fp": 41,
+            "fn": 0,
+            "precision": 0.22641509433962265,
+            "recall": 1,
+            "f1": 0.36923076923076925
+          },
+          "active": {
+            "tp": 144,
+            "fp": 182,
+            "fn": 0,
+            "precision": 0.44171779141104295,
+            "recall": 1,
+            "f1": 0.6127659574468085
+          },
+          "falseAccusations": 41,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 0,
+          "latencyP95": 0.08173515237188234,
+          "maxBacklog": 0.0011776390000013404,
+          "cpuMs": 325.13820499996837,
+          "duration": 5.4
+        },
+        "candidate": {
+          "cases": 3,
+          "onset": {
+            "tp": 12,
+            "fp": 41,
+            "fn": 0,
+            "precision": 0.22641509433962265,
+            "recall": 1,
+            "f1": 0.36923076923076925
+          },
+          "active": {
+            "tp": 144,
+            "fp": 182,
+            "fn": 0,
+            "precision": 0.44171779141104295,
+            "recall": 1,
+            "f1": 0.6127659574468085
+          },
+          "falseAccusations": 41,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 0,
+          "latencyP95": 0.08149588637188176,
+          "maxBacklog": 0.0019779930000003443,
+          "cpuMs": 350.37930499996037,
+          "duration": 5.4
+        }
+      },
+      "strum": {
+        "parent": {
+          "cases": 9,
+          "onset": {
+            "tp": 30,
+            "fp": 165,
+            "fn": 24,
+            "precision": 0.15384615384615385,
+            "recall": 0.5555555555555556,
+            "f1": 0.24096385542168675
+          },
+          "active": {
+            "tp": 1135,
+            "fp": 545,
+            "fn": 1349,
+            "precision": 0.6755952380952381,
+            "recall": 0.45692431561996777,
+            "f1": 0.5451488952929875
+          },
+          "falseAccusations": 165,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 24,
+          "latencyP95": 0.15240243161904976,
+          "maxBacklog": 0.009421100999999932,
+          "cpuMs": 917.4715170001164,
+          "duration": 15.000136054421771
+        },
+        "candidate": {
+          "cases": 9,
+          "onset": {
+            "tp": 30,
+            "fp": 165,
+            "fn": 24,
+            "precision": 0.15384615384615385,
+            "recall": 0.5555555555555556,
+            "f1": 0.24096385542168675
+          },
+          "active": {
+            "tp": 1135,
+            "fp": 545,
+            "fn": 1349,
+            "precision": 0.6755952380952381,
+            "recall": 0.45692431561996777,
+            "f1": 0.5451488952929875
+          },
+          "falseAccusations": 165,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 24,
+          "latencyP95": 0.15244357661904534,
+          "maxBacklog": 0.001801684999998554,
+          "cpuMs": 961.197549000015,
+          "duration": 15.000136054421771
+        }
+      },
+      "arpeggio": {
+        "parent": {
+          "cases": 15,
+          "onset": {
+            "tp": 36,
+            "fp": 278,
+            "fn": 18,
+            "precision": 0.11464968152866242,
+            "recall": 0.6666666666666666,
+            "f1": 0.1956521739130435
+          },
+          "active": {
+            "tp": 1103,
+            "fp": 1351,
+            "fn": 865,
+            "precision": 0.44947025264873675,
+            "recall": 0.5604674796747967,
+            "f1": 0.49886928991406604
+          },
+          "falseAccusations": 278,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 18,
+          "latencyP95": 0.16880048161905314,
+          "maxBacklog": 0.0016483919999955576,
+          "cpuMs": 1731.0059170002478,
+          "duration": 27.60013605442176
+        },
+        "candidate": {
+          "cases": 15,
+          "onset": {
+            "tp": 45,
+            "fp": 279,
+            "fn": 9,
+            "precision": 0.1388888888888889,
+            "recall": 0.8333333333333334,
+            "f1": 0.23809523809523808
+          },
+          "active": {
+            "tp": 1103,
+            "fp": 1351,
+            "fn": 865,
+            "precision": 0.44947025264873675,
+            "recall": 0.5604674796747967,
+            "f1": 0.49886928991406604
+          },
+          "falseAccusations": 279,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 9,
+          "latencyP95": 0.1636250076462613,
+          "maxBacklog": 0.0019434810000020786,
+          "cpuMs": 1794.1614839997583,
+          "duration": 27.60013605442176
+        }
+      },
+      "bend": {
+        "parent": {
+          "cases": 3,
+          "onset": {
+            "tp": 3,
+            "fp": 31,
+            "fn": 0,
+            "precision": 0.08823529411764706,
+            "recall": 1,
+            "f1": 0.16216216216216217
+          },
+          "active": {
+            "tp": 138,
+            "fp": 149,
+            "fn": 12,
+            "precision": 0.4808362369337979,
+            "recall": 0.92,
+            "f1": 0.631578947368421
+          },
+          "falseAccusations": 31,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 0,
+          "latencyP95": 0.052675996430839866,
+          "maxBacklog": 0.0013464220000023452,
+          "cpuMs": 296.5834200000372,
+          "duration": 4.950068027210884
+        },
+        "candidate": {
+          "cases": 3,
+          "onset": {
+            "tp": 3,
+            "fp": 31,
+            "fn": 0,
+            "precision": 0.08823529411764706,
+            "recall": 1,
+            "f1": 0.16216216216216217
+          },
+          "active": {
+            "tp": 138,
+            "fp": 149,
+            "fn": 12,
+            "precision": 0.4808362369337979,
+            "recall": 0.92,
+            "f1": 0.631578947368421
+          },
+          "falseAccusations": 31,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 0,
+          "latencyP95": 0.052696773430837784,
+          "maxBacklog": 0.0018622039999973694,
+          "cpuMs": 324.49125700004333,
+          "duration": 4.950068027210884
+        }
+      },
+      "mnx": {
+        "parent": {
+          "cases": 3,
+          "onset": {
+            "tp": 6,
+            "fp": 23,
+            "fn": 0,
+            "precision": 0.20689655172413793,
+            "recall": 1,
+            "f1": 0.34285714285714286
+          },
+          "active": {
+            "tp": 149,
+            "fp": 133,
+            "fn": 1,
+            "precision": 0.5283687943262412,
+            "recall": 0.9933333333333333,
+            "f1": 0.6898148148148148
+          },
+          "falseAccusations": 23,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 0,
+          "latencyP95": 0.07510681202267555,
+          "maxBacklog": 0.003839246999999879,
+          "cpuMs": 306.8635510000313,
+          "duration": 4.950068027210884
+        },
+        "candidate": {
+          "cases": 3,
+          "onset": {
+            "tp": 6,
+            "fp": 23,
+            "fn": 0,
+            "precision": 0.20689655172413793,
+            "recall": 1,
+            "f1": 0.34285714285714286
+          },
+          "active": {
+            "tp": 149,
+            "fp": 133,
+            "fn": 1,
+            "precision": 0.5283687943262412,
+            "recall": 0.9933333333333333,
+            "f1": 0.6898148148148148
+          },
+          "falseAccusations": 23,
+          "missedUnexpectedAttacks": 0,
+          "unassessedTargetEvents": 0,
+          "latencyP95": 0.07520394002267683,
+          "maxBacklog": 0.002490217999999045,
+          "cpuMs": 330.21494700000767,
+          "duration": 4.950068027210884
+        }
+      }
+    },
+    "byPreset": {
+      "guitar": {
+        "parent": {
+          "cases": 56,
+          "onset": {
+            "tp": 83,
+            "fp": 425,
+            "fn": 56,
+            "precision": 0.16338582677165353,
+            "recall": 0.5971223021582733,
+            "f1": 0.25656877897990726
+          },
+          "active": {
+            "tp": 2700,
+            "fp": 2717,
+            "fn": 1676,
+            "precision": 0.49843086579287427,
+            "recall": 0.6170018281535649,
+            "f1": 0.5514142755029102
+          },
+          "falseAccusations": 425,
+          "missedUnexpectedAttacks": 1,
+          "unassessedTargetEvents": 61,
+          "latencyP95": 0.15734367034920577,
+          "maxBacklog": 0.004664579999999918,
+          "cpuMs": 4987.436272000086,
+          "duration": 87.71029478458051
+        },
+        "candidate": {
+          "cases": 56,
+          "onset": {
+            "tp": 93,
+            "fp": 432,
+            "fn": 46,
+            "precision": 0.17714285714285713,
+            "recall": 0.6690647482014388,
+            "f1": 0.28012048192771083
+          },
+          "active": {
+            "tp": 2700,
+            "fp": 2717,
+            "fn": 1676,
+            "precision": 0.49843086579287427,
+            "recall": 0.6170018281535649,
+            "f1": 0.5514142755029102
+          },
+          "falseAccusations": 432,
+          "missedUnexpectedAttacks": 1,
+          "unassessedTargetEvents": 51,
+          "latencyP95": 0.15714317334920597,
+          "maxBacklog": 0.0020797539999993786,
+          "cpuMs": 5261.978534999804,
+          "duration": 87.71029478458051
+        }
+      },
+      "guitar2": {
+        "parent": {
+          "cases": 56,
+          "onset": {
+            "tp": 105,
+            "fp": 670,
+            "fn": 34,
+            "precision": 0.13548387096774195,
+            "recall": 0.7553956834532374,
+            "f1": 0.22975929978118162
+          },
+          "active": {
+            "tp": 3372,
+            "fp": 2601,
+            "fn": 1004,
+            "precision": 0.5645404319437468,
+            "recall": 0.7705667276051188,
+            "f1": 0.6516571649434728
+          },
+          "falseAccusations": 670,
+          "missedUnexpectedAttacks": 1,
+          "unassessedTargetEvents": 39,
+          "latencyP95": 0.16880048161905314,
+          "maxBacklog": 0.00536417099999742,
+          "cpuMs": 5012.745910999898,
+          "duration": 87.71029478458051
+        },
+        "candidate": {
+          "cases": 56,
+          "onset": {
+            "tp": 120,
+            "fp": 680,
+            "fn": 19,
+            "precision": 0.15,
+            "recall": 0.8633093525179856,
+            "f1": 0.25559105431309903
+          },
+          "active": {
+            "tp": 3372,
+            "fp": 2601,
+            "fn": 1004,
+            "precision": 0.5645404319437468,
+            "recall": 0.7705667276051188,
+            "f1": 0.6516571649434728
+          },
+          "falseAccusations": 680,
+          "missedUnexpectedAttacks": 1,
+          "unassessedTargetEvents": 24,
+          "latencyP95": 0.16880629167347116,
+          "maxBacklog": 0.0019146440000004095,
+          "cpuMs": 5233.723135999857,
+          "duration": 87.71029478458051
+        }
+      },
+      "piano": {
+        "parent": {
+          "cases": 56,
+          "onset": {
+            "tp": 100,
+            "fp": 531,
+            "fn": 39,
+            "precision": 0.15847860538827258,
+            "recall": 0.7194244604316546,
+            "f1": 0.2597402597402597
+          },
+          "active": {
+            "tp": 2676,
+            "fp": 2863,
+            "fn": 1700,
+            "precision": 0.48311969669615457,
+            "recall": 0.6115173674588665,
+            "f1": 0.5397881996974281
+          },
+          "falseAccusations": 530,
+          "missedUnexpectedAttacks": 1,
+          "unassessedTargetEvents": 43,
+          "latencyP95": 0.11242591461904694,
+          "maxBacklog": 0.009421100999999932,
+          "cpuMs": 5013.23032700035,
+          "duration": 87.71029478458051
+        },
+        "candidate": {
+          "cases": 56,
+          "onset": {
+            "tp": 115,
+            "fp": 537,
+            "fn": 24,
+            "precision": 0.17638036809815952,
+            "recall": 0.8273381294964028,
+            "f1": 0.29077117572692796
+          },
+          "active": {
+            "tp": 2676,
+            "fp": 2863,
+            "fn": 1700,
+            "precision": 0.48311969669615457,
+            "recall": 0.6115173674588665,
+            "f1": 0.5397881996974281
+          },
+          "falseAccusations": 536,
+          "missedUnexpectedAttacks": 1,
+          "unassessedTargetEvents": 28,
+          "latencyP95": 0.12234232037642223,
+          "maxBacklog": 0.002490217999999045,
+          "cpuMs": 5301.116657999653,
+          "duration": 87.71029478458051
+        }
+      }
+    },
+    "timings": {
+      "parent": [
+        15013.412510000335,
+        16557.783110998884,
+        23970.64019800091
+      ],
+      "candidate": [
+        15796.818328999314,
+        17485.861093000996,
+        25525.303115998104
+      ]
+    },
+    "cpuRatio": 1.0560508599358096,
+    "common": {
+      "count": 288,
+      "parentP95": 0.16361005164626224,
+      "candidateP95": 0.1636250076462613
+    },
+    "failures": [
+      "more false accusations"
+    ],
+    "eligible": false
+  }
+]

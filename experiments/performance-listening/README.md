@@ -93,6 +93,24 @@ The runner pools both previous audio sets for development, then locks dispositio
 scoring the fresh v2 set. There is one candidate and no parameter selection or retuning.
 Use new destinations for subsequent runs; preserve rendered WAVs for identical inputs.
 
+## Attribution iterations
+
+F-003 adds optional neighbouring-pitch competition to F-002's additional attacks. Run the
+[frozen plan](experiments/fusion-attribution-protocol.md) from the bench directory:
+
+```bash
+node rendering/render.mjs output/audio-fusion-heldout-v3 --fusion-heldout-v3
+npm run fusion:attack -- output/fusion-attribution-v1 experiments/fusion-attribution.json
+npm run fusion:export -- output/fusion-attribution-v1 findings/fusion-attribution-v1
+```
+
+`FUSION_ARCHIVE_ROOT` optionally locates archived parent runs outside this bench's `output`.
+The plan lists those archives explicitly. All prior frozen recordings are regression inputs;
+selected settings and diagnostic references are evaluated on the new split only after the
+selection lock. References cannot be selected as candidates. Exports retain reference event
+streams as well as the parent and selected candidate. Merged manifests retain source hashes
+and metadata, with evaluation records once in the combined record list.
+
 ## What is independent
 
 `rendering/browser.mjs` imports the production NativeSink and sample loader. A supplied

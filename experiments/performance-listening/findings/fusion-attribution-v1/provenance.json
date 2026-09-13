@@ -1,0 +1,297 @@
+{
+  "createdAt": "2026-09-13T15:54:09.629Z",
+  "revision": "a4f163759ee5802729ce17c201614f9436883241",
+  "sourceHashes": {
+    ".gitignore": "b5726d3ec9335a09c124469eca039523847a6b0f08a083efaefd002b83326600",
+    "detectors/attack.mjs": "e181d15666dfe0b3c4e8e4339cc9477ff16dcea81e143a43fa2310a2786ae8ab",
+    "detectors/attack.test.mjs": "f428b2e9068a7fbd16a610320a6ab86a25b1ce9017aa254e12ed24cc11759274",
+    "detectors/neural.mjs": "5b5af3c7830aab99f13c22195639ad00138bc10bf0692d17ade6d543a460b7b5",
+    "detectors/spectral.mjs": "d961de92f3afb05299679777bcfe8801b653be23a6222ebdfc7ec89f2c9881d6",
+    "detectors/stream.mjs": "9e7d470004663d3693c573f3314d1614bb0928601c2811ac7723afaeaf0ad347",
+    "detectors/stream.test.mjs": "fc955d302d7eaf9b1f7d2ba17182702a04e4c12a5e90e630213c7c62484b096f",
+    "evaluation/boundaries.mjs": "3c6385078a026991b1612bc06ade285c6cf1065ee5413dc309b82b2eafbaf258",
+    "evaluation/io.mjs": "1da35774e25653324a84b1d88a718e651928b1c3c14da616ac2e9a2bc90eb1ac",
+    "evaluation/io.test.mjs": "1023555a4614fb024ab4f11e4fa4c89345a55fe99367b9377fb7f58ebbf8311a",
+    "evaluation/metrics.mjs": "92020312db695ba76fbf8ecfb82176971541d5f885a51fa9eac7d9c4342c6beb",
+    "evaluation/metrics.test.mjs": "5967cdb02560ec6338dcfd309f8a1698e7c8423488d69e8fe247097013018a49",
+    "evaluation/render-repeat.mjs": "3580a3f1a21b41c63ecd3cf7b9922f8f3b352255fb66768426393aea56b9d669",
+    "experiments/baseline.json": "6b473f04344559140cab762a39d859efcd5592811432bee805ab22d65445b22f",
+    "experiments/compare-renders.mjs": "1c7db3f7b0af44cf3b3ab34ed2064f44f4008b1369e7fa30abcab60f119377cc",
+    "experiments/compare.mjs": "318b6aa66352c9f1c4e5646f1d86652cbad42d7027edce9639eff5f0d171037e",
+    "experiments/fusion-attack-protocol.md": "2b1699c2b9c411bb615fe51ac977d2c7871586b2e92af36ec917aa3efd5c649a",
+    "experiments/fusion-attack.json": "ec340a999e9edd89196f83096ab439c53bb08b90a06113ce035f7a6151d76363",
+    "experiments/fusion-attack.mjs": "8bd84bd08f2bcb500968f626239f54bc7351566a7c388cbe7f8243228e61827d",
+    "experiments/fusion-attribution-protocol.md": "1be223b61bc040ef9b602974f3dc7daf37520599f77576b9482ec88dc244f5f3",
+    "experiments/fusion-attribution.json": "73cf3cf654e240067e322ee22f2e57d778899b0f0fcf42f7ac5770be3581ffb9",
+    "experiments/fusion-export.mjs": "dafefdc33c1dae04d1f61839a64c0ec3ba5c212d79c384d1b000db0f8b1e2acb",
+    "experiments/fusion-restrike-protocol.md": "d2f982d4aafa560795e8938332ceea2949bf46fbaddccf3476e9051f1b8137f8",
+    "experiments/fusion-restrike.json": "6b7c22c03c0b6be0d4b87e29a1f2ba08b07bcff4661ae1ff3513f96836755d90",
+    "experiments/report.mjs": "0a46470aaa79402d51811fbc4d563f45ff8b1bafabac294940b4e4d3ff99e190",
+    "fixtures/cases.mjs": "ffc2a2bad8ccf929a88a41e8fa5ec5c987b63f436fa60a67a675d3e9a335913a",
+    "fixtures/fusion-heldout-v2.mjs": "696181c8e45991f58b78d2423b6242d6faf458bae056a999a6023dfcd73e5a84",
+    "fixtures/fusion-heldout-v3.mjs": "17243748ac91410fb68fe058e6a582d6ab8b095298f42cc2d11e68b1997596ad",
+    "fixtures/fusion-heldout.mjs": "c33735f37c2ad974ea8cb73672f47b5f5b700feb1c895dc3eff5677458033853",
+    "fixtures/two-notes.mnx.json": "250905589cb59c98af59865dd94e3d177cbc75bd7daba4568f2192091ae5d7a4",
+    "fusion-log.md": "597818a76625ac116e92dc10ca78b2bbfb9927f8258e439bacf351b5b9bc49f0",
+    "fusion-techniques/_template.md": "3408773cd10ec8de6351bbd1328805f5dbcea79355de83c53975093c746e79ad",
+    "fusion-techniques/attack-restrike.md": "9243588ff707820b20f981583581f036f5842fde848bc33901b031da554fccf6",
+    "fusion-techniques/confidence-gating.md": "715abb9d78b418e8055194b1799a021dac788c794f829081e2f998a06c5282be",
+    "fusion-techniques/harmonic-evidence.md": "3f227f380b02355487c785e428c36d3043aa6f0f0556beb5df7a566d6b5ae077",
+    "fusion-techniques/neural-evidence.md": "d06ef7152ddaeb55c786cd7a4c447a8a765ccc34ca90bc526ff7871788d6f79b",
+    "fusion-techniques/recorded-templates.md": "2f6dc85600f6c963a11f21326bba77e5257449fe09a5fae61f80eb4ff9c554f0",
+    "fusion-techniques/selective-analysis.md": "8783592b63a92da3b0b3ab32328a6b49719df6d691f93acfd8d7398dfb9a3a9d",
+    "fusion-techniques/temporal-events.md": "99a960696108b3df20fa10ecb70b8193af4c00662f971c4b536cf3f6f52c1be9",
+    "inspector/index.html": "106c48262bb1837c153d904c50bd260796cc384f5c40e8b77bdef3ae40da6418",
+    "inspector/serve.mjs": "f5a9e4a2fca709818edcf80c00194f1cc6f4403126a54c2f76ad07228cce5fd5",
+    "package-lock.json": "e8489d594b0a2fe24bd2966c66f5d3115bfe71ef429e08b280008dfa7460c760",
+    "package.json": "d04578aea035e1f3e94458bbbd39293b1187cd6268e890ef61c73199a82a96e0",
+    "README.md": "108693de65ad7f458307d95977aa00f7cc0a6d51182c86e05d312eb0893ae928",
+    "rendering/browser.mjs": "dd56a412bdb30b084c37f1995f35acc8681cd0dbbaa79a2a40f090f8e56ad293",
+    "rendering/render.mjs": "dfb3900225293c78dd2b2f1a2bee6e1f027f857a211a2609601ac25d9c49fc5d"
+  },
+  "plan": {
+    "id": "F-003",
+    "parent": "F-000",
+    "thresholds": [
+      0.15
+    ],
+    "refractorySeconds": [
+      0.09
+    ],
+    "associationSeconds": [
+      0.035
+    ],
+    "chunkSize": 256,
+    "timingRepeats": 3,
+    "budgets": {
+      "cpuRatio": 1.25,
+      "p95IncreaseSeconds": 0.025,
+      "regressionF1Drop": 0.02
+    },
+    "mode": "restrike-only",
+    "developmentAudio": [
+      "audio-v1",
+      "audio-fusion-heldout-v1",
+      "audio-fusion-heldout-v2"
+    ],
+    "heldoutAudio": "audio-fusion-heldout-v3",
+    "requireActiveIdentity": true,
+    "neighborRatios": [
+      1,
+      1.5
+    ],
+    "parentArchives": [
+      "run-v1/results.json",
+      "fusion-attack-v1/heldout-results.json",
+      "fusion-restrike-v1/heldout-results.json"
+    ],
+    "references": [
+      {
+        "id": "F-002-01",
+        "fusion": {
+          "threshold": 0.15,
+          "refractorySeconds": 0.09,
+          "associationSeconds": 0.035,
+          "mode": "restrike-only"
+        }
+      }
+    ]
+  },
+  "recipes": [
+    {
+      "id": "F-000",
+      "config": {
+        "version": 1,
+        "sampleRate": 22050,
+        "presets": [
+          "guitar",
+          "guitar2",
+          "piano"
+        ],
+        "templatePreset": "guitar",
+        "midiMin": 40,
+        "midiMax": 88,
+        "fftSize": 4096,
+        "hopSize": 256,
+        "streamChunks": [
+          256,
+          2048
+        ],
+        "attackTolerance": 0.1,
+        "pitchTolerance": 0.5,
+        "frameStep": 0.02,
+        "activityThreshold": 0.22,
+        "minFrames": 2,
+        "rmsFloor": 0.0001,
+        "templateIterations": 32,
+        "maxPolyphony": 6,
+        "seed": 0,
+        "neural": {
+          "onsetThreshold": 0.5,
+          "frameThreshold": 0.3,
+          "minNoteFrames": 5
+        },
+        "confidenceThresholds": [
+          0,
+          0.3,
+          0.5,
+          0.7,
+          0.9
+        ]
+      }
+    },
+    {
+      "id": "F-003-01",
+      "config": {
+        "version": 1,
+        "sampleRate": 22050,
+        "presets": [
+          "guitar",
+          "guitar2",
+          "piano"
+        ],
+        "templatePreset": "guitar",
+        "midiMin": 40,
+        "midiMax": 88,
+        "fftSize": 4096,
+        "hopSize": 256,
+        "streamChunks": [
+          256,
+          2048
+        ],
+        "attackTolerance": 0.1,
+        "pitchTolerance": 0.5,
+        "frameStep": 0.02,
+        "activityThreshold": 0.22,
+        "minFrames": 2,
+        "rmsFloor": 0.0001,
+        "templateIterations": 32,
+        "maxPolyphony": 6,
+        "seed": 0,
+        "neural": {
+          "onsetThreshold": 0.5,
+          "frameThreshold": 0.3,
+          "minNoteFrames": 5
+        },
+        "confidenceThresholds": [
+          0,
+          0.3,
+          0.5,
+          0.7,
+          0.9
+        ],
+        "fusion": {
+          "threshold": 0.15,
+          "refractorySeconds": 0.09,
+          "associationSeconds": 0.035,
+          "neighborRatio": 1,
+          "mode": "restrike-only"
+        }
+      }
+    },
+    {
+      "id": "F-003-02",
+      "config": {
+        "version": 1,
+        "sampleRate": 22050,
+        "presets": [
+          "guitar",
+          "guitar2",
+          "piano"
+        ],
+        "templatePreset": "guitar",
+        "midiMin": 40,
+        "midiMax": 88,
+        "fftSize": 4096,
+        "hopSize": 256,
+        "streamChunks": [
+          256,
+          2048
+        ],
+        "attackTolerance": 0.1,
+        "pitchTolerance": 0.5,
+        "frameStep": 0.02,
+        "activityThreshold": 0.22,
+        "minFrames": 2,
+        "rmsFloor": 0.0001,
+        "templateIterations": 32,
+        "maxPolyphony": 6,
+        "seed": 0,
+        "neural": {
+          "onsetThreshold": 0.5,
+          "frameThreshold": 0.3,
+          "minNoteFrames": 5
+        },
+        "confidenceThresholds": [
+          0,
+          0.3,
+          0.5,
+          0.7,
+          0.9
+        ],
+        "fusion": {
+          "threshold": 0.15,
+          "refractorySeconds": 0.09,
+          "associationSeconds": 0.035,
+          "neighborRatio": 1.5,
+          "mode": "restrike-only"
+        }
+      }
+    },
+    {
+      "id": "F-002-01",
+      "reference": true,
+      "config": {
+        "version": 1,
+        "sampleRate": 22050,
+        "presets": [
+          "guitar",
+          "guitar2",
+          "piano"
+        ],
+        "templatePreset": "guitar",
+        "midiMin": 40,
+        "midiMax": 88,
+        "fftSize": 4096,
+        "hopSize": 256,
+        "streamChunks": [
+          256,
+          2048
+        ],
+        "attackTolerance": 0.1,
+        "pitchTolerance": 0.5,
+        "frameStep": 0.02,
+        "activityThreshold": 0.22,
+        "minFrames": 2,
+        "rmsFloor": 0.0001,
+        "templateIterations": 32,
+        "maxPolyphony": 6,
+        "seed": 0,
+        "neural": {
+          "onsetThreshold": 0.5,
+          "frameThreshold": 0.3,
+          "minNoteFrames": 5
+        },
+        "confidenceThresholds": [
+          0,
+          0.3,
+          0.5,
+          0.7,
+          0.9
+        ],
+        "fusion": {
+          "threshold": 0.15,
+          "refractorySeconds": 0.09,
+          "associationSeconds": 0.035,
+          "mode": "restrike-only"
+        }
+      }
+    }
+  ],
+  "environment": {
+    "node": "v22.22.1",
+    "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+    "platform": "linux",
+    "arch": "x64"
+  }
+}

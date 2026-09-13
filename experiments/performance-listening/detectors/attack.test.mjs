@@ -74,8 +74,9 @@ test("fusion events are chunk-invariant and cannot revise emitted starts using f
   assert.deepEqual(starts().slice(0, old.length), old);
 });
 
-test("re-strike-only preserves every parent event and cannot create pitch presence", () => {
-  const c = { ...config, fusion: { ...config.fusion, mode: "restrike-only" } };
+for (const neighborRatio of [undefined, 1, 1.5])
+test(`re-strike-only preserves parent/prefix/chunks with neighbour ratio ${neighborRatio}`, () => {
+  const c = { ...config, fusion: { ...config.fusion, mode: "restrike-only", neighborRatio } };
   const samples = Float32Array.from({ length: 12000 }, (_, i) => {
     if (i < 1600 || i >= 10000) return 0;
     const amplitude = i < 4800 ? 0.06 : i < 7200 ? 0.25 : 0.5;
