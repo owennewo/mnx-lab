@@ -33,4 +33,3 @@ A lower pooled latency can reflect a changed match population. Parent and refere
 | F-002-01 | 154.99 ms | 155.60 ms → 154.99 ms (102) | 7.52 ms | more false accusations |
 
 A lower pooled latency can reflect a changed match population. Parent and reference details, all timings and category/preset results remain in the JSON summaries.
-

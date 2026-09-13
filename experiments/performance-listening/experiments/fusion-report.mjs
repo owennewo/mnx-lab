@@ -88,5 +88,5 @@ for (const split of ["development", "heldout"]) {
   }
 }
 writeJSON(diagnosis, diagnostics);
-fs.writeFileSync(table, lines.join("\n") + "\n");
+fs.writeFileSync(table, lines.join("\n").trimEnd() + "\n");
 console.log("Wrote comparison table and diagnostics", destination);
