@@ -672,7 +672,7 @@ export class Player extends LitElement {
       </section>` : nothing}
       ${this.status?.kind === 'youtube' ? html`<section class="youtube-panel" aria-label="YouTube recording">
         <div class="youtube-surface"></div>
-        <p>YouTube · <button @click=${() => this.youtubeNotice = !this.youtubeNotice}>Terms and privacy</button> · <button @click=${() => void this.selectSource('synth')}>Close video</button></p>
+        <p>YouTube · <button @click=${() => this.youtubeNotice = !this.youtubeNotice}>Terms and privacy</button> · <button @click=${() => { this.pause(); void this.selectSource('synth'); }}>Close video</button></p>
       </section>` : nothing}
       ${this.loading
         ? html`<p role="status">

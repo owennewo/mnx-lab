@@ -102,6 +102,8 @@ try{
   await c.evaluate(`test.player.selectSource('synth');test.player.selectSource('youtube');test.player.selectSource('second')`);await wait(`test.player.sourceId==='second'&&!test.player.playback.loading`);
  }
  const shot=await c.send('Page.captureScreenshot');fs.writeFileSync(`/tmp/youtube-${live?'live':format}.png`,Buffer.from(shot.result.data,'base64'));
+ await c.evaluate(`[...test.player.shadowRoot.querySelectorAll('button')].find(b=>b.textContent==='Close video').click()`);
+ await wait(`test.player.sourceId==='synth' && !test.player.playback.wantsPlayback`);
  await c.evaluate(`test.player.remove()`);
  if(!live && await c.evaluate(`__ytInstances.some(p=>!p.destroyed)`))throw new Error('YouTube instance leaked');
  if(c.logs.length)throw new Error(c.logs.join('\n'));
