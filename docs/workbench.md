@@ -87,7 +87,7 @@ The real API layer (documents, auth, sync) belongs to **studio**
 
 **The score pane is the score frame** (`src/elements/ScoreFrame.ts`,
 [roadmap/inprogress/core-score-frame.md](../roadmap/inprogress/core-score-frame.md), shared
-with studio): a title grip on the pane's top edge (scenario id · provenance) and a pause grip
+with studio): a title grip on the pane's top edge (scenario id · provenance) and a playback grip
 on the bottom (pause/play · the position readout), plus a hairline progress line. A tap on
 the score is never a chrome toggle. Drawn out, the top grip becomes the tools row — `← Queue`,
 the id, the staff view as a segmented control (unavailable views greyed with the reason),

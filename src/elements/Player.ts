@@ -35,6 +35,10 @@ export class Player extends LitElement {
   @state() private status: TransportSnapshot | undefined;
   @state() private error = '';
   @state() private rate = 1;
+  /** YouTube's range: 0.25× to 2× on a 0.05 grid; the slider snaps to it. */
+  static readonly RATE_MIN = 0.25;
+  static readonly RATE_MAX = 2;
+  static readonly RATE_STEP = 0.05;
   @state() private volume = 0.7;
   private transport?: Transport;
   private sink?: NativeSink;
@@ -146,7 +150,8 @@ export class Player extends LitElement {
       height: 40px;
       margin: 0;
     }
-    label.volume {
+    label.volume,
+    label.rate {
       display: inline-flex;
       align-items: center;
       gap: 8px;
@@ -154,6 +159,16 @@ export class Player extends LitElement {
     }
     label.volume input {
       width: 110px;
+    }
+    label.rate input {
+      width: 120px;
+    }
+    /* Two decimals always, so 1.00× and 0.25× are the same width and the
+       volume beside it holds still. */
+    label.rate output {
+      display: inline;
+      color: var(--ink);
+      min-width: 5ch;
     }
     details {
       margin-top: 8px;
@@ -226,7 +241,7 @@ export class Player extends LitElement {
       this.rate = Number(localStorage.getItem('mnx-player-rate')) || 1;
       this.volume = Number(localStorage.getItem('mnx-player-volume') ?? 0.7);
     } catch {}
-    this.rate = Math.min(1.5, Math.max(0.5, this.rate));
+    this.rate = Player.snapRate(this.rate);
     this.volume = Number.isFinite(this.volume) ? Math.min(1, Math.max(0, this.volume)) : 0.7;
     if (this.hasUpdated) this.install();
   }
@@ -427,11 +442,28 @@ export class Player extends LitElement {
   setLoop(loop?: LoopRegion) {
     this.transport?.setLoop(loop);
   }
+  /** Clamp to the slider's range and land on its 0.05 grid, so a stored or
+   *  dragged value never carries float noise into the readout. */
+  static snapRate(value: number): number {
+    if (!Number.isFinite(value)) return 1;
+    const clamped = Math.min(Player.RATE_MAX, Math.max(Player.RATE_MIN, value));
+    // Divide by the grid's reciprocal: 23 / 20 is the double nearest 1.15,
+    // where 23 * 0.05 is not.
+    const perUnit = Math.round(1 / Player.RATE_STEP);
+    return Math.round(clamped * perUnit) / perUnit;
+  }
   private changeRate(event: Event) {
-    this.rate = Number((event.target as HTMLSelectElement).value);
+    this.rate = Player.snapRate(Number((event.target as HTMLInputElement).value));
     this.transport?.setRate(this.rate);
     try {
       localStorage.setItem('mnx-player-rate', String(this.rate));
+    } catch {}
+  }
+  private resetRate() {
+    this.rate = 1;
+    this.transport?.setRate(1);
+    try {
+      localStorage.setItem('mnx-player-rate', '1');
     } catch {}
   }
   private changeVolume(event: Event) {
@@ -500,12 +532,17 @@ export class Player extends LitElement {
             )}
           </select></label
         >
-        <label class="select"
-          >Rate<select aria-label="Playback rate" @change=${this.changeRate}>
-            ${[0.5, 0.75, 1, 1.25, 1.5].map(
-              (r) => html`<option value=${r} ?selected=${r === this.rate}>${r}×</option>`,
-            )}
-          </select></label
+        <label class="rate" title="Playback rate — double-click for 1×"
+          >Rate<input
+            aria-label="Playback rate"
+            type="range"
+            min=${Player.RATE_MIN}
+            max=${Player.RATE_MAX}
+            step=${Player.RATE_STEP}
+            .value=${String(this.rate)}
+            @input=${this.changeRate}
+            @dblclick=${this.resetRate}
+          /><output aria-live="off">${this.rate.toFixed(2)}×</output></label
         >
         <label class="volume" title="Volume">
           ${Player.glyph('M4 9v6h4l5 4V5L8 9z', 18)}<input

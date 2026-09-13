@@ -25,7 +25,7 @@ that fade when the pointer is idle. Three things are wrong with it on glass:
 The score pane owns **two grips**, one on each horizontal edge, and a hairline progress
 line along the bottom edge. Nothing on the page listens for a tap to show chrome.
 
-- **Quiet.** A title grip on the top edge (title · a muted sub-line · a chevron); a pause
+- **Quiet.** A title grip on the top edge (title · a muted sub-line · a chevron); a playback
   grip on the bottom edge (pause/play · the position readout · a chevron); the progress
   line. Pause/play and the way back to the chrome are on screen at 44px at all times —
   the table stakes for a focused view.

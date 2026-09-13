@@ -9,7 +9,7 @@
 // without a backend decision).
 //
 // The chrome is the frame's (roadmap/inprogress/core-score-frame.md): a title
-// grip and a pause grip on the pane's edges, drawn out into the library page's
+// grip and a playback grip on the pane's edges, drawn out into the library page's
 // tools row and the player's tray. This page supplies what the frame prints
 // and stores what it changes.
 import { LitElement, css, html, nothing } from 'lit';

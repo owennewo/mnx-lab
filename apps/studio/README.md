@@ -33,7 +33,7 @@ apps/studio/
 `#/not-permitted` is the third route: Access admitted the address but D1 has it inactive.
 Piece URLs carry the library's piece id. On a piece the page IS the score frame
 ([roadmap/inprogress/core-score-frame.md](../../roadmap/inprogress/core-score-frame.md)):
-a title grip on the top edge and a pause grip on the bottom, drawn out into the library
+a title grip on the top edge and a playback grip on the bottom, drawn out into the library
 page's tools row (the way back, the title, the piece's chips, the staff view, Zoom,
 Settings, Tags, the menu) and the player's tray. A tap on the score is never a chrome
 toggle. The staff view, the display settings, zoom and spacing, and whether each grip was

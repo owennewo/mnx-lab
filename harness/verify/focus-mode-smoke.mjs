@@ -306,7 +306,7 @@ try {
   );
   check(
     state.gripBottomRect?.height >= 44 && state.gripBottomRect.y + state.gripBottomRect.height <= state.viewport.height + 1,
-    'the pause grip stays on the bottom edge in focus mode'
+    'the playback grip stays on the bottom edge in focus mode'
   );
   check(
     state.stripOpen ? state.focusLabel === 'Unfocus' : state.gripTopRect?.height > 0,

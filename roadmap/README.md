@@ -159,7 +159,7 @@ back up to `proposed/` the moment it is.
 
 
 - **[core-score-frame.md](inprogress/core-score-frame.md)** — **started 2026-09-11**: the score
-  pane's **edge grips** — a title grip on the top edge, a pause grip on the bottom, a
+  pane's **edge grips** — a title grip on the top edge, a playback grip on the bottom, a
   hairline progress line — drawn out into the library page's tools row (staff view as the
   sort control, Zoom and Settings hosting the promoted pads) and the player's tray. One
   `<mnx-score-frame>` element in `elements/`, mounted by studio's piece page and the

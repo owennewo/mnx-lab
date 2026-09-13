@@ -18,7 +18,7 @@ import './SettingsPad.ts';
  * a tap on the page is navigation (seek to a bar; later, select a note), and
  * the chrome is reached only through its grips.
  *
- *   quiet      — a title grip on the top edge, a pause grip on the bottom edge
+ *   quiet      — a title grip on the top edge, a playback grip on the bottom edge
  *                (pause/play · the position readout · a chevron). Pause and the
  *                way to the chrome are on screen at 44px at all times.
  *   drawn out  — the top grip becomes the library page's tools row: the way
@@ -133,7 +133,7 @@ export class ScoreFrame extends LitElement {
          CONTAINER — the host gives the frame a height and the score scrolls
          inside, so the grips sit on the pane's edges rather than the
          document's. Bottom padding keeps the last system scrollable out from
-         under the pause grip. */
+         under the playback grip. */
       .pane {
         position: relative;
         flex: 1 1 auto;
