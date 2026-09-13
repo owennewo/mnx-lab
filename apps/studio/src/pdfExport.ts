@@ -15,7 +15,9 @@ export function preparePdfView(title: string): Window {
 export async function renderPdfView(preview: Window, mnx: MnxStructure, title: string): Promise<void> {
   const display = readDisplay();
   const viewer = new DocumentViewer();
-  viewer.style.cssText = 'position:fixed;left:-10000px;top:0;width:794px;display:block;--font-family-sans:Archivo,sans-serif;--sans:Archivo,sans-serif;';
+  // Resolve the engraving in the print palette BEFORE copying computed SVG
+  // styles. Making only the preview light leaves dark-theme ink baked in.
+  viewer.style.cssText = 'position:fixed;left:-10000px;top:0;width:794px;display:block;color-scheme:light;--mnx-paper:#fff;--mnx-paper-ink:#111;--mnx-paper-line:#666;--font-family-sans:Archivo,sans-serif;--sans:Archivo,sans-serif;';
   viewer.view = readView();
   viewer.unrolled = read(UNROLLED_KEY) === 'true';
   viewer.zoom = readNumber(STAFF_SCALE_KEY);
