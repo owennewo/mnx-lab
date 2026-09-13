@@ -25,20 +25,49 @@ const output = path.resolve(
 );
 if (fs.existsSync(output)) throw Error("Refusing to overwrite " + output);
 const config = readJSON(path.join(bench, "experiments/baseline.json"));
-const plan = readJSON(path.join(bench, "experiments/fusion-attack.json"));
+const plan = readJSON(
+  process.argv[3]
+    ? path.resolve(process.argv[3])
+    : path.join(bench, "experiments/fusion-attack.json"),
+);
 const scorer = createScorer(harmonicDictionary(config), "harmonic", config);
 const recipes = [{ id: "F-000", config }];
 for (const threshold of plan.thresholds)
   for (const refractorySeconds of plan.refractorySeconds)
     for (const associationSeconds of plan.associationSeconds)
       recipes.push({
-        id: `F-001-${String(recipes.length).padStart(2, "0")}`,
+        id: `${plan.id}-${String(recipes.length).padStart(2, "0")}`,
         config: {
           ...config,
-          fusion: { threshold, refractorySeconds, associationSeconds },
+          fusion: {
+            threshold,
+            refractorySeconds,
+            associationSeconds,
+            ...(plan.mode ? { mode: plan.mode } : {}),
+          },
         },
       });
 function loadAudio(name) {
+  if (Array.isArray(name)) {
+    const sources = name.map(loadAudio);
+    const records = sources.flatMap((s, i) =>
+      s.records.map((r) => ({ ...r, file: `${name[i]}/${r.file}` })),
+    );
+    const manifest = {
+      ...sources[0].manifest,
+      sources: sources.map((s) => ({
+        manifestHash: s.manifestHash,
+        manifest: s.manifest,
+      })),
+      records: records.map(({ pcm, ...r }) => r),
+    };
+    return {
+      directory: path.join(bench, "output"),
+      manifest,
+      manifestHash: hash(JSON.stringify(manifest)),
+      records,
+    };
+  }
   const directory = path.join(bench, "output", name),
     bytes = fs.readFileSync(path.join(directory, "manifest.json")),
     manifest = JSON.parse(bytes);
@@ -57,7 +86,15 @@ function loadAudio(name) {
 const baselinePath =
   process.env.FUSION_PARENT_RESULTS ??
   path.join(bench, "output/run-v1/results.json");
-const archived = readJSON(baselinePath).results;
+const archived = [
+  ...readJSON(baselinePath).results,
+  ...(plan.developmentAudio?.length > 1
+    ? readJSON(
+        process.env.FUSION_ADDITIONAL_PARENT_RESULTS ??
+          path.join(bench, "output/fusion-attack-v1/heldout-results.json"),
+      ).results
+    : []),
+];
 const provenance = {
   createdAt: new Date().toISOString(),
   revision: execFileSync("git", ["rev-parse", "HEAD"], {
@@ -135,6 +172,33 @@ function compare(parent, candidate, timings) {
     parentP95: quantile(commonA, 0.95),
     candidateP95: quantile(commonB, 0.95),
   };
+  if (plan.requireActiveIdentity) {
+    parent.forEach((r, i) => {
+      const c = candidate[i];
+      for (const key of ["tp", "fp", "fn"])
+        if (r.metrics.active[key] !== c.metrics.active[key])
+          throw Error("Active presence changed: " + r.fixture);
+      if (
+        JSON.stringify(musical(r.detection.events)) !==
+        JSON.stringify(
+          musical(c.detection.events.filter((e) => e.kind !== "restrike")),
+        )
+      )
+        throw Error("Parent events changed: " + r.fixture);
+      for (const event of c.detection.events.filter(
+        (e) => e.kind === "restrike",
+      ))
+        if (
+          !r.detection.events.some(
+            (p) =>
+              p.pitch === event.pitch &&
+              p.start <= event.start &&
+              p.end >= event.end,
+          )
+        )
+          throw Error("Restrike extends parent presence: " + r.fixture);
+    });
+  }
   const failures = [];
   const repeat = categories.repeated;
   for (const metric of ["precision", "recall"])
@@ -222,32 +286,30 @@ async function run(audio, selected, label) {
               config,
             ),
             truth = attacks(record.actual);
-          outcomes
-            .get(recipe.id)
-            .push({
-              fixture: record.id,
-              preset: record.preset,
-              category: record.category,
-              strategy: recipe.id,
-              mode: "stream-256",
-              status: "ok",
-              audioHash: record.audioHash,
-              duration,
-              detection,
-              metrics,
-              assessment: assessment(
-                record.target,
-                record.actual,
-                detection.events,
-                config,
-              ),
-              latencies: metrics.matched.map((p) => ({
-                truth: p.expected,
-                seconds:
-                  detection.events[p.predicted].emittedAt -
-                  truth[p.expected].start,
-              })),
-            });
+          outcomes.get(recipe.id).push({
+            fixture: record.id,
+            preset: record.preset,
+            category: record.category,
+            strategy: recipe.id,
+            mode: "stream-256",
+            status: "ok",
+            audioHash: record.audioHash,
+            duration,
+            detection,
+            metrics,
+            assessment: assessment(
+              record.target,
+              record.actual,
+              detection.events,
+              config,
+            ),
+            latencies: metrics.matched.map((p) => ({
+              truth: p.expected,
+              seconds:
+                detection.events[p.predicted].emittedAt -
+                truth[p.expected].start,
+            })),
+          });
         }
       }
     }
@@ -259,15 +321,13 @@ async function run(audio, selected, label) {
     );
     console.log(`${label} pass ${pass + 1}/${plan.timingRepeats} complete`);
   }
-  const summaries = selected
-    .slice(1)
-    .map((r) => ({
-      id: r.id,
-      ...compare(outcomes.get("F-000"), outcomes.get(r.id), {
-        parent: timings.get("F-000"),
-        candidate: timings.get(r.id),
-      }),
-    }));
+  const summaries = selected.slice(1).map((r) => ({
+    id: r.id,
+    ...compare(outcomes.get("F-000"), outcomes.get(r.id), {
+      parent: timings.get("F-000"),
+      candidate: timings.get(r.id),
+    }),
+  }));
   writeJSON(path.join(output, label + "-results.json"), {
     ...provenance,
     audioDirectory: path.relative(output, audio.directory),
@@ -278,8 +338,7 @@ async function run(audio, selected, label) {
   writeJSON(path.join(output, label + "-summary.json"), summaries);
   return { summaries, outcomes };
 }
-const development = loadAudio("audio-v1");
-const dev = await run(development, recipes, "development");
+const development = loadAudio(plan.developmentAudio ?? "audio-v1");
 // Musical and decision-sample identity against the archived pre-fusion parent.
 const musical = (events) =>
   events.map(({ pitch, start, end, confidence, decisionSample }) => ({
@@ -289,10 +348,11 @@ const musical = (events) =>
     confidence,
     decisionSample,
   }));
+const dev = await run(development, recipes, "development");
 for (const result of dev.outcomes.get("F-000")) {
   const original = archived.find(
     (r) =>
-      r.strategy === "harmonic" &&
+      (r.strategy === "harmonic" || r.strategy === "F-000") &&
       r.mode === "stream-256" &&
       r.fixture === result.fixture &&
       r.preset === result.preset,
@@ -323,7 +383,7 @@ const selection = {
 writeJSON(path.join(output, "selection.json"), selection);
 console.log("Locked selection", selection);
 const held = await run(
-  loadAudio("audio-fusion-heldout-v1"),
+  loadAudio(plan.heldoutAudio ?? "audio-fusion-heldout-v1"),
   [recipes[0], recipes.find((r) => r.id === best.id)],
   "heldout",
 );

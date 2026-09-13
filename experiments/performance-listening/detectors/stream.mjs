@@ -12,6 +12,8 @@ export class StreamingDetector {
     this.next = config.hopSize;
     this.buffer = new Float32Array(config.fftSize);
     this.active = new Map();
+    this.restrikeOnly = config.fusion?.mode === "restrike-only";
+    this.restrikes = new Map();
     this.events = [];
     this.frames = [];
   }
@@ -43,6 +45,7 @@ export class StreamingDetector {
         if (score >= c.activityThreshold) {
           if (
             this.attack &&
+            !this.restrikeOnly &&
             state?.decisionSample !== null &&
             state &&
             this.attack.permits(i, time)
@@ -51,7 +54,12 @@ export class StreamingDetector {
             state = null;
           }
           if (!state) {
-            if (this.attack && !this.attack.permits(i, time)) continue;
+            if (
+              this.attack &&
+              !this.restrikeOnly &&
+              !this.attack.permits(i, time)
+            )
+              continue;
             this.attack?.consume(i, time);
             state = {
               pitch,
@@ -63,6 +71,30 @@ export class StreamingDetector {
             };
             this.active.set(pitch, state);
           }
+          if (this.restrikeOnly && state.decisionSample !== null) {
+            if (this.attack.permits(i, time)) {
+              this.attack.consume(i, time);
+              this.restrikes.set(pitch, {
+                pitch,
+                start: time,
+                end: time,
+                confidence: score,
+                count: 0,
+                decisionSample: null,
+                kind: "restrike",
+              });
+            }
+            const strike = this.restrikes.get(pitch);
+            if (strike) {
+              strike.count++;
+              strike.end = time + c.hopSize / c.sampleRate;
+              strike.confidence = Math.max(strike.confidence, score);
+              if (strike.count === c.minFrames) {
+                strike.decisionSample = this.received;
+                this.events.push(strike);
+              }
+            }
+          }
           state.count++;
           state.end = time + c.hopSize / c.sampleRate;
           state.confidence = Math.max(state.confidence, score);
@@ -70,7 +102,10 @@ export class StreamingDetector {
             state.decisionSample = this.received;
             this.events.push(state);
           }
-        } else this.active.delete(pitch);
+        } else {
+          this.active.delete(pitch);
+          this.restrikes.delete(pitch);
+        }
       }
       this.next += c.hopSize;
     }
