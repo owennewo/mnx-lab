@@ -14,7 +14,7 @@ export interface LibraryRecording {
   mime: string | null; duration_s: number | null; external_id: string | null; syncpoints: string | null;
 }
 export interface LibrarySnapshot { piece: { id: string; revision: number; canonical_rendition_id?: string | null }; tags: ShownTag[]; recordings: LibraryRecording[] }
-export interface CanonicalFile { bytes: ArrayBuffer; format: string; filename: string; revision: number }
+export interface CanonicalFile { bytes: ArrayBuffer; format: string; filename: string; revision: number; renditionId?: string }
 export class LibraryRequestError extends Error {
   constructor(readonly status: number, message?: string) { super(message ?? (status === 401 ? 'Sign in to load your library.' : status === 403 ? 'This account is not permitted. Contact the operator.' : status === 409 ? 'This piece has no canonical file to open.' : 'The library is unavailable. You can still open local files.')); }
 }
@@ -65,7 +65,7 @@ export class LibraryClient {
     const format = r.headers.get('x-library-format') ?? '';
     const encoded = /filename\*=UTF-8''([^;]+)/.exec(r.headers.get('content-disposition') ?? '')?.[1];
     const filename = encoded ? decodeURIComponent(encoded) : `piece.${format || 'bin'}`;
-    return { bytes: await r.arrayBuffer(), format, filename, revision: Number(r.headers.get('x-library-revision') ?? 0) };
+    return { bytes: await r.arrayBuffer(), format, filename, revision: Number(r.headers.get('x-library-revision') ?? 0), renditionId: r.headers.get('x-library-rendition') ?? undefined };
   }
   private async recordingRequest<T>(path: string, method: string, payload: unknown, signal?: AbortSignal, file?: File): Promise<T> {
     let response: Response;

@@ -202,11 +202,17 @@ export class PiecePage extends LitElement {
     this.tagsOpen = false; this.recordingsOpen = false;
     this.menuOpen = false;
     try {
-      const [{ bytes, filename }, snapshot] = await Promise.all([
+      const readPair = () => Promise.all([
         this.client.canonical(this.pieceId),
-        // The library's own name for the piece (its title/artist tags, as shown) outranks the file's header.
         this.client.piece(this.pieceId).then(r => r.snapshot, () => null),
       ]);
+      let [canonical, snapshot] = await readPair();
+      const mismatched = () => snapshot && canonical.renditionId !== undefined && canonical.renditionId !== snapshot.piece.canonical_rendition_id;
+      // Immutable rendition identity pairs the file with its metadata even when
+      // the canonical pointer changes between the two parallel reads.
+      for (let attempt = 0; mismatched() && attempt < 2; attempt++) [canonical, snapshot] = await readPair();
+      if (mismatched()) throw new Error('The score changed while opening. Reopen the piece to review its current timings.');
+      const { bytes, filename } = canonical;
       if (generation !== this.generation) return;
       this.snapshot = snapshot;
       this.setRecordings(snapshot);
@@ -393,7 +399,7 @@ export class PiecePage extends LitElement {
         @recordings-changed=${async (e: CustomEvent<LibrarySnapshot>) => { this.player?.pause(); if (this.snapshot?.piece.canonical_rendition_id !== e.detail.piece.canonical_rendition_id) { await this.load(); return; } this.snapshot = { ...e.detail, tags: this.snapshot?.tags ?? [] }; this.setRecordings(e.detail); await this.refreshSnapshot(); }}
         @close=${() => this.recordingsOpen = false}></mnx-studio-recordings>` : nothing}
       ${this.tagsOpen ? html`<mnx-studio-tags .client=${this.client} .snapshot=${this.snapshot}
-        @tags-changed=${(e: CustomEvent<TagsSnapshot>) => { if (this.snapshot) this.snapshot = { ...this.snapshot, ...e.detail }; void this.refreshSnapshot(); }}
+        @tags-changed=${(e: CustomEvent<TagsSnapshot>) => { if (this.snapshot) this.snapshot = { ...this.snapshot, ...e.detail, piece: { ...this.snapshot.piece, ...e.detail.piece } }; void this.refreshSnapshot(); }}
         @aliases-changed=${() => this.refreshSnapshot()}
         @close=${() => (this.tagsOpen = false)}></mnx-studio-tags>` : nothing}
     `;
