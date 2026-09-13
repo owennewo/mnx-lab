@@ -94,7 +94,7 @@ export class Player extends LitElement {
       }
       .rail .cell {
         grid-row: 1;
-        height: 18px;
+        height: max(18px, var(--rail-cell, 14px));
       }
       .settings {
         display: flex;
@@ -232,7 +232,7 @@ export class Player extends LitElement {
       display: flex;
       flex-direction: column;
       gap: 2px;
-      height: 14px;
+      height: var(--rail-cell, 14px);
     }
     .rail .cell.first {
       box-shadow: -2px 0 0 var(--line-strong);
@@ -685,6 +685,8 @@ export class Player extends LitElement {
   private railModel: {
     columns: number;
     gap: number;
+    /** The lane column's height in px — the deepest stack, capped. */
+    cell: number;
     labels: { at: number; span: number; text: string }[];
     cells: { first: boolean; lanes: { ordinal: number; tip: string; jumped: boolean; x: number; w: number }[] }[];
   } | null = null;
@@ -731,7 +733,14 @@ export class Player extends LitElement {
         }),
       };
     });
-    this.railModel = { columns, gap: columns > 80 ? 1 : 2, labels, cells };
+    // The cell height follows the deepest stack of visits (D2 on the Playback
+    // Tray canvas, 2026-09-13): 6px per lane plus 2px gaps, from the 14px of a
+    // piece without repeats up to a 38px cap — five passes at 6px — so the
+    // tray thickens only when the piece demands it. Past the cap the lanes
+    // share the height and the hover card carries the count.
+    const deepest = cells.reduce((max, c) => Math.max(max, c.lanes.length), 1);
+    const cell = Math.min(38, Math.max(14, deepest * 6 + (deepest - 1) * 2));
+    this.railModel = { columns, gap: columns > 80 ? 1 : 2, cell, labels, cells };
   }
 
   private rail() {
@@ -742,7 +751,7 @@ export class Player extends LitElement {
       class="rail"
       role="group"
       aria-label="Position"
-      style=${`grid-template-columns: repeat(${model.columns}, minmax(0, 1fr)); --rail-gap: ${model.gap}px;`}
+      style=${`grid-template-columns: repeat(${model.columns}, minmax(0, 1fr)); --rail-gap: ${model.gap}px; --rail-cell: ${model.cell}px;`}
     >
       ${model.labels.map((l) => html`<div class="lab" style=${`grid-column: ${l.at + 1} / span ${l.span};`}>${l.text}</div>`)}
       ${model.cells.map(

@@ -26,7 +26,11 @@ a column simply gains lanes, and a lane reached by the jump carries a thin inner
 a bar the walk never reaches keeps its column, empty; a visit that covers part of a bar
 (a jump or Fine mid-bar) draws a shorter lane when the host supplies `writtenBarDurations`.
 Section labels come from the global measures' `section` labels, with a hairline at each
-section's first bar. Below the score frame's ~1000px breakpoint the tray stacks: transport
+section's first bar.
+The lane column's height follows the piece's deepest stack of visits — 6px per lane plus
+2px gaps, from 14px for a piece without repeats up to a 38px cap (five passes) — so the
+tray thickens only when the piece demands it; past the cap the lanes share the height and
+the hover card carries the count. Below the score frame's ~1000px breakpoint the tray stacks: transport
 and readout, the rail on a line of its own without labels, then the settings.
 
 Sound, rate and volume are value buttons — a glyph and the current value — and each
