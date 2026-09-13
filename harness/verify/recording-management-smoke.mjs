@@ -80,7 +80,14 @@ try {
     const audioId=page.snapshot.recordings.find(r=>r.kind==='audio').id;
     check(sheet().recordingId===audioId,'Uploaded recording not selected');
     check(!sheet().shadowRoot.textContent.includes('YouTube take'),'Panel lists other recordings');
-    await player.startSource();await delay(150);check(player.playback.state==='playing','Uploaded audio did not play');player.pause();
+    await player.play();await delay(150);check(player.playback.state==='playing','Uploaded audio did not play');player.pause();
+    // Out-of-range sync is a panel warning, never a playback-blocking alert.
+    await page.client.saveRecording('piece',audioId,page.snapshot.piece.revision,{name:'Uploaded take',rawSync:[[999,1],[1000,6]]});
+    await page.refreshSnapshot();await select(youtubeId);await select(audioId);
+    check(sheet().shadowRoot.textContent.includes('Sync warning:')&&sheet().shadowRoot.textContent.includes('beyond the performed score boundary'),'Missing panel sync warning');
+    check(!player.shadowRoot.querySelector('[role="alert"]')&&!player.shadowRoot.textContent.includes('Score follow:'),'Sync warning leaked into playback tray');
+    const play=player.shadowRoot.querySelector('[aria-label="Play"]');check(!play.disabled,'Sync warning disabled Play');play.click();await delay(200);
+    check(player.playback.state==='playing','Normal Play did not start unaligned recording');player.pause();
     // An operator import supplies timings; the panel only reads them.
     await page.client.saveRecording('piece',audioId,page.snapshot.piece.revision,{name:'Uploaded take',rawSync:[[0,1],[1,6,240],[2,11]]});
     await page.refreshSnapshot();await select(youtubeId);check(sheet().recordingId===youtubeId,'Selection did not change details');await select(audioId);

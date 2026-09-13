@@ -14,6 +14,7 @@ export class RecordingsSheet extends LitElement {
   @property({ attribute: false }) snapshot!: LibrarySnapshot;
   @property({ attribute: false }) document!: MnxDocument;
   @property({ attribute: false }) recordingId: string | null = null;
+  @property() syncWarning = '';
   @state() private editing: LibraryRecording | null = null;
   @state() private name = '';
   @state() private kind = 'youtube';
@@ -59,12 +60,12 @@ export class RecordingsSheet extends LitElement {
     try {
       const raw: unknown = JSON.parse(this.editing.syncpoints);
       const decoded = decodeRecordingSync(raw);
-      if (!decoded.ok) return { points: [], message: decoded.diagnostic.message };
+      if (!decoded.ok) return { points: [], message: decoded.diagnostic.message, warning: true };
       const mapped = this.compiled?.ok && this.passes ? createRecordingSync(raw, this.compiled, this.passes) : null;
-      return { points: decoded.value.points, message: mapped?.ok
+      return { points: decoded.value.points, warning: !mapped?.ok, message: mapped?.ok
         ? `${mapped.value.coverage === 'full' ? 'Full' : 'Partial'} score coverage.`
         : mapped ? mapped.diagnostic.message : 'Score timing is unavailable.' };
-    } catch { return { points: [], message: 'Stored sync points could not be read.' }; }
+    } catch { return { points: [], message: 'Stored sync points could not be read.', warning: true }; }
   }
   private location(point: RecordingSyncpoint | undefined) {
     if (!point) return '—';
@@ -126,7 +127,7 @@ export class RecordingsSheet extends LitElement {
           <strong>Sync points</strong>
           <dl aria-label="Sync point statistics"><dt>Count</dt><dd>${sync.points.length}</dd><dt>Start location</dt><dd>${this.location(sync.points[0])}</dd><dt>End location</dt><dd>${this.location(sync.points.at(-1))}</dd></dl>
           <p class="hint">Locations count performed bars, including repeats, starting at 1. Times are measured from the start of the recording.</p>
-          <div class="diagnostic" role="status">${sync.message}</div>
+          <div class="diagnostic" role="status">${this.syncWarning || sync.warning ? html`<strong>Sync warning:</strong> ${this.syncWarning || sync.message} You can still play this recording; score following and score seeking may be unavailable.` : sync.message}</div>
           <button ?disabled=${!this.name.trim()} @click=${this.save}>${this.editing ? 'Save changes' : 'Attach recording'}</button>
           ${this.editing ? html`<button @click=${() => this.removing = this.editing!.id}>Delete recording</button>
             ${this.removing === this.editing.id ? html`<p>Delete “${this.editing.name ?? 'Unnamed recording'}” from this piece?</p><div class="row"><button @click=${() => this.detach(this.editing!)}>Confirm deletion</button><button @click=${() => this.removing = ''}>Keep recording</button></div>` : nothing}` : nothing}

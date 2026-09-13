@@ -90,8 +90,18 @@ describe('source handoff ownership', () => {
     session.dispose();
     const raw=new RecordingBackend('raw',new Media(),performance,null), c=backend();
     const second=new PlaybackSession(raw,()=>c.backend,()=>{}); expect(await second.select('a')).toBe(false);
-    expect(second.snapshot.needsStart).toBe(true); await second.play(); expect(c.media.plays).toBe(0);
-    await second.start(); expect(c.media.plays).toBe(1); second.dispose();
+    expect(second.snapshot.needsStart).toBe(true); expect(second.snapshot.alignmentIssue).toBeTruthy(); await second.play(); expect(c.media.plays).toBe(0);
+    await second.start(); expect(second.snapshot.alignmentIssue).toBeUndefined(); expect(c.media.plays).toBe(1); second.dispose();
+  });
+  it('keeps media preparation failures separate from alignment warnings', async () => {
+    const a=backend(), b=backend('b');
+    b.media.prepare = async () => { throw new Error('Media could not load'); };
+    const session=new PlaybackSession(a.backend,()=>b.backend,()=>{});
+    expect(await session.select('b')).toBe(false);
+    expect(session.snapshot.issue).toContain('Media could not load');
+    expect(session.snapshot.alignmentIssue).toBeUndefined();
+    expect(session.snapshot.needsStart).toBe(true);
+    session.dispose();
   });
   it('carries the original position through rapid switches and ignores the abandoned load', async () => {
     const a=backend(), b=backend('b'), c=backend('c'); await a.backend.play(); a.media.currentTime=9;

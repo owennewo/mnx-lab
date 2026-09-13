@@ -38,11 +38,13 @@ export class Player extends LitElement {
   @property({ attribute: false }) recordings: readonly RecordingSource[] = [];
   /** Host supplies recording management; standalone players omit the add action. */
   @property({ type: Boolean }) canAddRecording = false;
+  /** A host recording panel owns score-alignment warnings. */
+  @property({ type: Boolean }) syncWarningsInPanel = false;
   private get loading() { return this.status?.loading ?? false; }
   @property({ type: Number }) initialOrdinal: number | null = null;
   @state() private status: PlaybackSnapshot | undefined;
   @state() private localError = '';
-  private get error() { return this.localError || this.status?.issue || ''; }
+  private get error() { return this.localError || this.status?.error || (this.status?.alignmentIssue ? '' : this.status?.issue) || ''; }
   @state() private rate = 1;
   /** Default synth/audio controls; other backends advertise their own rates. */
   static readonly RATE_MIN = 0.25;
@@ -537,6 +539,7 @@ export class Player extends LitElement {
       playing: status?.wantsPlayback ?? false };
     this.dispatchEvent(new CustomEvent('playback-position', { detail: {
       documentId: this.documentId, sourceId: status?.sourceId, kind: status?.kind,
+      syncWarning: status?.alignmentIssue || status?.syncIssue,
       scorePosition: status?.scorePosition ?? null, mediaTime: status?.mediaTime,
     }, bubbles: true, composed: true }));
     const signature = JSON.stringify(detail);
@@ -648,7 +651,7 @@ export class Player extends LitElement {
     this.youtubeRequest = null; this.youtubeNotice = false;
     return await this.session?.select(id, replace) ?? false;
   }
-  async play() { this.localError = ''; await this.session?.play(); }
+  async play() { this.localError = ''; if (this.status?.needsStart && this.status.alignmentIssue) await this.session?.start(); else await this.session?.play(); }
   pause() { this.session?.pause(); }
   stop() { this.localError = ''; this.session?.stop(); }
   toggle() { if (this.playback?.wantsPlayback) this.pause(); else void this.play(); }
@@ -671,7 +674,7 @@ export class Player extends LitElement {
     // deliberately omit this edge because they must not guess within an insertion.
     const edge = this.session.backend instanceof SynthBackend ? 'before' : undefined;
     const problem = this.session.backend.canSeek(target, edge);
-    if (problem) { this.localError = problem; return false; }
+    if (problem) { this.localError = ''; void this.session.seek(target, edge); return false; }
     void this.session.seek(target, edge);
     this.localError = '';
     this.dispatchEvent(new CustomEvent('seek', { detail: { documentId: this.documentId, ordinal }, bubbles: true, composed: true }));
@@ -946,7 +949,7 @@ export class Player extends LitElement {
     return html` <div class="controls">
         <button
           class="primary"
-          ?disabled=${!this.performance || this.status?.needsStart}
+          ?disabled=${!this.performance || (this.status?.needsStart && !this.status.alignmentIssue)}
           aria-label=${playing ? 'Pause' : 'Play'}
           title=${playing ? 'Pause' : 'Play'}
           @click=${() => (playing ? this.pause() : void this.play())}
@@ -1009,8 +1012,8 @@ export class Player extends LitElement {
           </p>`
         : nothing}
       ${this.error ? html`<p role="alert">Playback unavailable: ${this.error}</p>` : nothing}
-      ${this.status?.kind === 'youtube' && this.status.error ? html`<button @click=${() => void this.selectSource(this.sourceId, true)}>Retry video</button>` : this.status?.needsStart ? html`<button @click=${() => void this.startSource()}>Start this source</button>` : nothing}
+      ${this.status?.kind === 'youtube' && this.status.error ? html`<button @click=${() => void this.selectSource(this.sourceId, true)}>Retry video</button>` : this.status?.needsStart && !this.status.alignmentIssue ? html`<button @click=${() => void this.startSource()}>Start this source</button>` : nothing}
       ${!this.loading && this.status?.state === 'buffering' ? html`<p role="status">Buffering audio…</p>` : nothing}
-      ${this.status?.kind !== 'synth' && this.status?.syncIssue && !this.error ? html`<p role="status">Score follow: ${this.status.syncIssue}</p>` : nothing}`;
+      ${!this.syncWarningsInPanel && (this.status?.alignmentIssue || this.status?.syncIssue) && !this.error ? html`<p role="status">Score follow: ${this.status?.alignmentIssue || this.status?.syncIssue}</p>` : nothing}`;
   }
 }

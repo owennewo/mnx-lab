@@ -1,11 +1,14 @@
 /** Owns exactly one audible backend, independent of DOM and any media API. */
 import { boundedRate, type BackendSnapshot, type PlaybackBackend, type PlaybackCapabilities, type ScoreLoop, type ScorePosition } from './playbackBackend.ts';
+class AlignmentUnavailable extends Error {}
 export interface PlaybackSnapshot extends BackendSnapshot {
   readonly capabilities: PlaybackCapabilities;
   readonly loading: boolean;
   readonly wantsPlayback: boolean;
   readonly needsStart: boolean;
   readonly issue: string;
+  /** Source alignment failed; the media can still be started explicitly. */
+  readonly alignmentIssue?: string;
 }
 export class PlaybackSession {
   private active: PlaybackBackend;
@@ -18,6 +21,7 @@ export class PlaybackSession {
   private closed = false;
   private needsStart = false;
   private issue = '';
+  private alignmentIssue: string | undefined;
   private target: { position: ScorePosition | null; problem?: string; reset?: boolean; edge?: 'before' | 'after' } = { position: null };
   private targetVersion = 0;
   private handoffRate = 1;
@@ -30,7 +34,7 @@ export class PlaybackSession {
   get snapshot(): PlaybackSnapshot {
     const state = this.active.snapshot;
     return { ...state, capabilities: this.active.capabilities, loading: this.selecting || this.pendingPlay,
-      wantsPlayback: this.intent || state.state === 'playing' || state.state === 'buffering', needsStart: this.needsStart, issue: this.issue || state.error || '' };
+      wantsPlayback: this.intent || state.state === 'playing' || state.state === 'buffering', needsStart: this.needsStart, alignmentIssue: this.alignmentIssue, issue: this.issue || state.error || '' };
   }
   private notify() {
     if (this.closed) return;
@@ -45,7 +49,7 @@ export class PlaybackSession {
     const before = this.snapshot;
     let next: PlaybackBackend;
     try { next = this.factory(id); }
-    catch (error) { this.pause(); this.issue = error instanceof Error ? error.message : String(error); this.notify(); return false; }
+    catch (error) { this.pause(); this.alignmentIssue = undefined; this.alignmentIssue = undefined; this.issue = error instanceof Error ? error.message : String(error); this.notify(); return false; }
     if (!this.selecting && !(replace && this.needsStart)) {
       this.target = { position: before.scorePosition, problem: before.syncIssue };
       this.handoffRate = before.rate; this.handoffVolume = before.volume;
@@ -57,7 +61,7 @@ export class PlaybackSession {
     this.unsubscribe();
     this.active.pause(); this.active.dispose();
     this.active = next;
-    this.pendingPlay = false; this.selecting = true; this.issue = ''; this.needsStart = false;
+    this.pendingPlay = false; this.selecting = true; this.issue = ''; this.alignmentIssue = undefined; this.needsStart = false;
     this.unsubscribe = next.subscribe(() => { if (generation === this.generation) this.notify(); });
     try {
       next.setRate(this.handoffRate); next.setVolume(this.handoffVolume);
@@ -71,7 +75,7 @@ export class PlaybackSession {
           if (target.reset) next.stop();
           else {
             const problem = target.position ? next.canSeek(target.position, target.edge) : target.problem || 'The current source has no mapped score position.';
-            if (problem) throw new Error(problem);
+            if (problem) throw new AlignmentUnavailable(problem);
             await next.seek(target.position!, target.edge);
           }
         } catch (error) { if (version === this.targetVersion) throw error; }
@@ -85,6 +89,7 @@ export class PlaybackSession {
       if (!this.closed && generation === this.generation) {
         this.intent = false; this.pendingPlay = false; this.selecting = false;
         next.pause(); this.needsStart = true;
+        this.alignmentIssue = error instanceof AlignmentUnavailable ? error.message : undefined;
         this.issue = `${error instanceof Error ? error.message : String(error)} Start this source explicitly to continue.`;
         this.notify();
       }
@@ -96,7 +101,7 @@ export class PlaybackSession {
     this.intent = true;
     if (this.selecting) { this.notify(); return; }
     const backend = this.active, generation = this.generation, operation = ++this.operation;
-    this.issue = '';
+    this.issue = ''; this.alignmentIssue = undefined;
     this.pendingPlay = true;
     this.notify();
     try { await backend.play(); }
@@ -125,7 +130,7 @@ export class PlaybackSession {
     if (this.closed) return;
     this.pause();
     this.needsStart = false;
-    this.issue = '';
+    this.issue = ''; this.alignmentIssue = undefined;
     this.target = { position: null, reset: true }; ++this.targetVersion;
     this.active.stop();
     this.notify();
@@ -134,7 +139,7 @@ export class PlaybackSession {
   async seek(position: ScorePosition, edge?: 'before' | 'after'): Promise<boolean> {
     if (this.closed) return false;
     const problem = this.active.canSeek(position, edge);
-    if (problem) { this.issue = problem; this.notify(); return false; }
+    if (problem) { this.issue = ''; this.alignmentIssue = problem; this.notify(); return false; }
     if (this.selecting) { this.target = { position, edge }; ++this.targetVersion; this.needsStart = false; return true; }
     // Seeking cancels a pending Play; normal live seeking preserves playback.
     if (this.pendingPlay) this.pause();
@@ -142,13 +147,13 @@ export class PlaybackSession {
     try {
       await this.active.seek(position, edge);
       if (this.closed || generation !== this.generation || operation !== this.operation) return false;
-      this.issue = '';
+      this.issue = ''; this.alignmentIssue = undefined;
       this.needsStart = false;
       this.notify();
       return true;
     } catch (error) {
       if (!this.closed && generation === this.generation && operation === this.operation) {
-        this.issue = error instanceof Error ? error.message : String(error); this.notify();
+        this.alignmentIssue = undefined; this.issue = error instanceof Error ? error.message : String(error); this.notify();
       }
       return false;
     }

@@ -58,6 +58,7 @@ export class PiecePage extends LitElement {
   @state() private recordingsOpen = false;
   @state() private selectedRecordingId: string | null = null;
   @state() private addingRecording = false;
+  @state() private recordingWarning: { id: string; message: string } | null = null;
   @state() private theme: ThemeSetting = readTheme();
   @state() private view: ViewSetting = readView();
   @state() private display: DisplayOptions = readDisplay();
@@ -336,7 +337,12 @@ export class PiecePage extends LitElement {
           .spacingMode=${this.spacingMode}
           @render-scale=${(e: CustomEvent<RenderScale>) => (this.effectiveStaffScale = e.detail.staffScale)}
         ></mnx-document-viewer>
-        <mnx-player slot="player" .recordings=${this.recordings} .canAddRecording=${!!this.snapshot}
+        <mnx-player slot="player" .recordings=${this.recordings} .canAddRecording=${!!this.snapshot} .syncWarningsInPanel=${true}
+          @playback-position=${(e: CustomEvent<{ sourceId?: string; syncWarning?: string }>) => {
+            const { sourceId, syncWarning } = e.detail;
+            if (this.recordingWarning?.id === sourceId && this.recordingWarning?.message === syncWarning) return;
+            this.recordingWarning = sourceId && syncWarning ? { id: sourceId, message: syncWarning } : null;
+          }}
           @source-selected=${(e: CustomEvent<{ id: string }>) => {
             this.selectedRecordingId = e.detail.id === 'synth' ? null : e.detail.id;
             this.addingRecording = false;
@@ -350,7 +356,7 @@ export class PiecePage extends LitElement {
             : nothing}
         </mnx-player>
       </mnx-score-frame>
-      ${this.recordingsOpen && this.snapshot && this.doc ? keyed(this.addingRecording ? 'new' : this.selectedRecordingId, html`<mnx-studio-recordings .recordingId=${this.addingRecording ? null : this.selectedRecordingId} .client=${this.client} .snapshot=${this.snapshot} .document=${this.doc}
+      ${this.recordingsOpen && this.snapshot && this.doc ? keyed(this.addingRecording ? 'new' : this.selectedRecordingId, html`<mnx-studio-recordings .syncWarning=${!this.addingRecording && this.recordingWarning?.id === this.selectedRecordingId ? this.recordingWarning.message : ''} .recordingId=${this.addingRecording ? null : this.selectedRecordingId} .client=${this.client} .snapshot=${this.snapshot} .document=${this.doc}
         @recordings-changed=${async (e: CustomEvent<LibrarySnapshot>) => { this.player?.pause(); if (this.snapshot?.piece.canonical_rendition_id !== e.detail.piece.canonical_rendition_id) { await this.load(); return; } this.snapshot = { ...e.detail, tags: this.snapshot?.tags ?? [] }; this.setRecordings(e.detail); }}
         @recording-saved=${async (e: CustomEvent<{ id: string }>) => { if (!this.snapshot?.recordings.some(r => r.id === e.detail.id)) return; this.addingRecording = false; this.selectedRecordingId = e.detail.id; await this.updateComplete; await this.player?.updateComplete; await this.player?.selectSource(e.detail.id); }}
         @recording-deleted=${() => { this.recordingsOpen = false; this.selectedRecordingId = null; this.addingRecording = false; void this.player?.selectSource('synth'); }}
