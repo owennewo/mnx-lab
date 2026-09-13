@@ -77,7 +77,7 @@ round-trip tolerances are declared. Existing synth performance and engraving gol
 remain byte-identical. Documentation distinguishes validated, partial and unsupported
 sync instead of claiming a match from counts alone.
 
-Next: [audio playback and source switching](../inprogress/core-player-recording-playback.md).
+Next: [audio playback and source switching](../complete/core-player-recording-playback.md).
 
 ## Implementation agreement — 2026-09-13
 

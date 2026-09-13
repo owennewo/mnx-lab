@@ -200,7 +200,7 @@ run any time before 6.
 | 14 | [Piano pack and the synth voice](../complete/core-player-piano-synth.md) | A CC0 upright piano — the first pack that spans the staff at both ends — and an oscillator worth defaulting to: harmonic spectrum, a filter that opens and closes, register-tilted level. Amplitude over time deliberately untouched, because two measured contracts depend on it. | reviewer | ear | **complete 2026-09-09; listening review pending** |
 | 13 | [Practice mode](../proposed/studio-player-practice.md) | Loop a selection — with the **written-range → performed-occurrences policy stated** — speed trainer, count-in, metronome, mute/solo. | practice | fake-clock tests | proposed — after reviewer items 1–10 |
 | 15 | [Recording sync](../complete/core-player-recording-sync.md) | Pure Soundslice decoder, sparse/inner-bar timing map, coverage and traversal compatibility. | recording playback | Node conformance fixtures | complete |
-| 16 | [Synth/audio switching](../inprogress/core-player-recording-playback.md) | Shared backend interface, musical-position handoff, media-clock follow and authenticated audio reads. | recording playback | fake backends + browser media/embed checks | in progress |
+| 16 | [Synth/audio switching](../complete/core-player-recording-playback.md) | Shared backend interface, musical-position handoff, media-clock follow and authenticated audio reads. | recording playback | fake backends + browser media/embed checks | complete |
 | 17 | [YouTube recordings](../proposed/core-player-youtube.md) | Visible official iframe, policy/layout lifecycle, API rates, seek and error handling. | recording playback | adapter/layout checks + live embed check | proposed |
 | 18 | [Recording attachments](../proposed/studio-recording-management.md) | Studio URL/audio attachment, sync import, upload and revision lifecycle. | recording playback | service + browser checks | proposed |
 
@@ -694,3 +694,9 @@ and Studio; fake media tests cover readiness and rejected-play races. See
 The landing rebase also preserved the concurrently added pass menu and iteration
 counts. Its structured readout now accepts either expanded synth time or a recording
 score position; browser checks exercise menu seeks against real audio.
+
+Item 16 landed as `c19e538` and `24eca08`; 1,803 tests, scenario checks and the
+production build passed after rebase. Both embed formats, Studio HTTP media and
+workbench/review synth smoke passed. The implementation worktree was retired before
+the item moved to `complete/`. All 188 regenerated goldens stayed unchanged, with
+no new approval debt. Item 17 (YouTube) is next.

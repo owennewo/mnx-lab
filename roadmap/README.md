@@ -159,7 +159,6 @@ back up to `proposed/` the moment it is.
 
 ### inprogress/
 
-- **[core-player-recording-playback.md](inprogress/core-player-recording-playback.md)** — In progress; player campaign item 16: shared synth/audio controls and musical-position handoff, media-clock score following and authenticated audio delivery.
 
 
 
@@ -449,6 +448,8 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+
+- **[core-player-recording-playback.md](complete/core-player-recording-playback.md)** — Complete; player campaign item 16: shared synth/audio controls and musical-position handoff, media-clock score following and authenticated audio delivery.
 
 - **[core-player-recording-sync.md](complete/core-player-recording-sync.md)** — Complete 2026-09-13; player campaign item 15: Soundslice sync decoding, sparse and inner-bar anchors, performed-position mapping and compatibility diagnostics.
 

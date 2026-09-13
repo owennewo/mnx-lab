@@ -1,6 +1,6 @@
 # Switch between synth and recorded audio
 
-> **Status: in progress 2026-09-13.** Implementation loop. Campaign:
+> **Status: complete 2026-09-13.** Implementation loop. Campaign:
 > [core-campaign-player.md](../inprogress/core-campaign-player.md), item 16.
 > Needs [recording sync](../complete/core-player-recording-sync.md), item 15, and the existing player.
 
@@ -101,5 +101,8 @@ Lifecycle and real D1/R2 tests cover cancellation, media clocks, explicit unmapp
 starts, authorization and ranges. Both embed formats exercise generated PCM and
 source handoffs, including repeat visits and Blob cleanup. Production Studio's
 fixture smoke covers HTTP seeking and navigation while audio is playing. Existing
-synth smoke and 188 regenerated corpus goldens remain unchanged. Landing gates and
-worktree retirement will be recorded at closeout.
+synth smoke and 188 regenerated corpus goldens remain unchanged. All 1,803 tests, scenario checks and the production build passed after rebase.
+Both embed formats, the Studio HTTP smoke and workbench/review synth smoke passed.
+Implementation commits `c19e538` and `24eca08` were fast-forwarded and pushed to
+`main`; the implementation worktree was removed before this document moved to
+`complete/`. No golden changes or human verification debt were added.

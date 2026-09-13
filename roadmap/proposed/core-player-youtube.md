@@ -2,7 +2,7 @@
 
 > **Status: proposed 2026-09-13.** Implementation loop. Campaign:
 > [core-campaign-player.md](../inprogress/core-campaign-player.md), item 17.
-> Needs [shared recording playback](../inprogress/core-player-recording-playback.md), item 16.
+> Needs [shared recording playback](../complete/core-player-recording-playback.md), item 16.
 
 ## Agreement block (campaign contract)
 
