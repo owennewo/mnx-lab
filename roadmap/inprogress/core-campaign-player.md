@@ -151,6 +151,31 @@ proposal opens with, and is reviewed on:
 8. **The cursor follows the audio clock.** Scheduling lookahead never drives the UI;
    onsets carry audio-clock times and the playhead moves when they arrive.
 
+## Recording playback addendum — 2026-09-13
+
+Items 15–18 extend this campaign to recorded performances. They inherit the shared
+contract with these explicit qualifications:
+
+- Clause 2's seconds/goldens restriction governs compiled synthetic performances.
+  Recording sync fixtures preserve externally measured seconds as source evidence;
+  musical coordinates remain rational and existing performance goldens do not change.
+- Clause 4 does not require introducing a scenario golden for these features: pure
+  sync fixtures, fake backends and browser checks are the named initial proof.
+- Clauses 4–5's synth transport/sink and dependency decisions do not force recordings
+  through a silent synth transport. HTML media or the official YouTube player owns
+  the clock; adapters reuse the musical-position and host-context contract. The lazy
+  official IFrame script is the explicit external player integration, not a new synth
+  library, and its loading, CSP and embed cost are owned by item 17.
+- Clause 7's human-verification start gate remains on practice item 13. Items 15–18
+  are separately requested recording playback work and may start on their technical
+  dependencies; they do not approve or waive existing reviewer debt.
+- Score-part mute/solo, metronome, count-in and speed training must use backend
+  capabilities. A recording does not expose synth voices; YouTube rates and seek
+  precision are constrained by its API. Item 13 must account for these backends.
+
+Delivery order: 15 → 16 → 17. Item 18 follows 15/16 and uses 17 for linked playback;
+playing existing ingested recordings does not depend on attachment authoring.
+
 ## The index
 
 Reviewer path: extend the traversal and fix identity → the timing and pitch contracts
@@ -174,6 +199,10 @@ run any time before 6.
 | 12 | [Sampled guitar](../complete/core-player-sampled-guitar.md) | A sampled voice per string; the asset question is the item; per-voice pitch control verified for the chosen sampler first. | practice | ear | complete; listening review pending |
 | 14 | [Piano pack and the synth voice](../complete/core-player-piano-synth.md) | A CC0 upright piano — the first pack that spans the staff at both ends — and an oscillator worth defaulting to: harmonic spectrum, a filter that opens and closes, register-tilted level. Amplitude over time deliberately untouched, because two measured contracts depend on it. | reviewer | ear | **complete 2026-09-09; listening review pending** |
 | 13 | [Practice mode](../proposed/studio-player-practice.md) | Loop a selection — with the **written-range → performed-occurrences policy stated** — speed trainer, count-in, metronome, mute/solo. | practice | fake-clock tests | proposed — after reviewer items 1–10 |
+| 15 | [Recording sync](../proposed/core-player-recording-sync.md) | Pure Soundslice decoder, sparse/inner-bar timing map, coverage and traversal compatibility. | recording playback | Node conformance fixtures | proposed |
+| 16 | [Synth/audio switching](../proposed/core-player-recording-playback.md) | Shared backend interface, musical-position handoff, media-clock follow and authenticated audio reads. | recording playback | fake backends + browser media/embed checks | proposed |
+| 17 | [YouTube recordings](../proposed/core-player-youtube.md) | Visible official iframe, policy/layout lifecycle, API rates, seek and error handling. | recording playback | adapter/layout checks + live embed check | proposed |
+| 18 | [Recording attachments](../proposed/studio-recording-management.md) | Studio URL/audio attachment, sync import, upload and revision lifecycle. | recording playback | service + browser checks | proposed |
 
 ### Decisions still open
 
@@ -593,3 +622,23 @@ The shipped viewer entry stays unchanged until item 7 consumes playback.
   no SFZ loops, and up to eight-second recorded tails. Measured pack-level gain
   supports comparison. [Listening feedback](lab-verify.md#additional-guitar-sources--2026-09-09)
   remains separate from scenario approval.
+
+### 2026-09-13 — recording playback scoped (items 15–18; not implemented)
+
+The user requested source switching between synth, YouTube and uploaded audio, then
+asked for roadmap documents. Existing performed ordinals, source maps and viewer
+context can carry the score position; Player currently constructs its synth directly.
+Recording rows/raw sync already exist, but media reads and attachment UI need work.
+
+The Soundslice API documents all four tuple fields, including inner-bar offsets on a
+0–480 scale and hide-playhead flags. Inspection of 84 local exports / 103 recordings
+found 9,375 two-field, 15 three-field and two four-field anchors. Romanza supplies a
+real fractional-offset final-bar slowdown fixture. Sparse and inner-bar points invalidate
+`docs/studio-storage.md`'s count-equality compatibility proposal; item 15 owns its
+correction. Equal bar counts are insufficient proof of structural alignment.
+
+YouTube's minimum viewport is 200 × 200, with no obscuring overlays or background
+player feature. Rates come from its API, not Player.ts's assumed 0.05 grid. Item 17
+owns the visible panel, policy review and rate correction. Item 18 separates attaching
+new recordings from consuming existing imports. No implementation, scenario output
+or human verification record changed when these proposals were filed.

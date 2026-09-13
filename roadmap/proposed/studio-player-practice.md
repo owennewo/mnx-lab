@@ -57,3 +57,13 @@ extra performed bars visible before the practice repetition starts.
 
 The dependencies named above are technical prerequisites. Campaign clause 7 additionally
 requires reviewer items 1–10 to be verified before this practice item starts.
+
+## Recording backend integration
+
+[Campaign items 15–18](../inprogress/core-campaign-player.md#recording-playback-addendum--2026-09-13)
+add playback of existing recordings; the exclusion of recording above means capture
+and analysis, not source selection. Practice features must respect backend capabilities:
+part mute/solo is synth-only; recording loops seek through sync mappings; YouTube rates
+come from the available-rate API and loop boundaries are not sample-accurate. Keep
+count-in/metronome behavior explicit per backend and do not promise the synth's
+onset-perfect loop guarantee for media. Item 13's existing verification gate remains.
