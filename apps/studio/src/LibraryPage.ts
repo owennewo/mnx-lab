@@ -8,6 +8,10 @@ import { LibraryClient, LibraryRequestError, type LibraryFacet, type LibraryPiec
 import { pieceHref, aliasesHref } from './StudioApp.ts';
 import { FAVOURITE, RAIL_HIDDEN, RAIL_ORDER, chipText, dimensionLabel, parseTag, relativeTime } from './labels.ts';
 
+import { openLocalFile } from '../../../src/importers/localFile.ts';
+import { exportDocument, type ExportFormat } from '../../../src/importers/exportFile.ts';
+import { preparePdfView, renderPdfView } from './pdfExport.ts';
+
 const SORTS: { id: LibrarySort; label: string }[] = [{ id: 'recent', label: 'Recent' }, { id: 'title', label: 'Title' }, { id: 'artist', label: 'Artist' }];
 const MAX_FILTERS = 12;
 const tagOf = (dimension: string, value: string) => `${dimension}:${value}`;
@@ -30,6 +34,8 @@ export class LibraryPage extends LitElement {
   @state() private busy = false;
   @state() private error = '';
   @state() private suggestions: LibraryFacet[] = [];
+  @state() private exporting: string | null = null;
+  @state() private exportNotice = '';
   private generation = 0;
 
   static styles = css`
@@ -76,6 +82,10 @@ export class LibraryPage extends LitElement {
     li .tags { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
     li .tags button { padding: 2px 8px; font-size: 12px; color: var(--ink-dim); }
     li .when { width: 88px; text-align: right; color: var(--ink-dim); font-size: 12px; flex: none; }
+    .actions { width: 130px; flex: none; }
+    .actions select { width: 100%; font: inherit; color: inherit; background: var(--bar); border: 1px solid var(--line); border-radius: 3px; padding: 6px; }
+    .columns { text-align: right; padding-right: 4px; color: var(--ink-dim); font-size: 12px; }
+    .columns span { display: inline-block; width: 130px; text-align: left; }
     .error { color: #b91c1c; }
     @media (max-width: 720px) { .rail { display: none; } }
   `;
@@ -146,6 +156,39 @@ export class LibraryPage extends LitElement {
     }
   }
 
+  private async exportPiece(piece: LibraryPiece, event: Event) {
+    const select = event.target as HTMLSelectElement;
+    const format = select.value as ExportFormat | 'pdf';
+    select.value = '';
+    if (!format || this.exporting) return;
+    this.exporting = piece.id;
+    this.error = ''; this.exportNotice = '';
+    let preview: Window | null = null;
+    try {
+      // Open synchronously in the user gesture, before fetching the source.
+      if (format === 'pdf') preview = preparePdfView(piece.title ?? piece.id);
+      const { bytes, filename } = await this.client.canonical(piece.id);
+      const source = await openLocalFile(new File([bytes], filename));
+      const title = piece.title ?? source.name;
+      if (preview) {
+        await renderPdfView(preview, source.document, title);
+        this.exportNotice = 'PDF view ready. Choose Print / Save PDF in the new tab.';
+      } else {
+        const result = await exportDocument(source.document, format as ExportFormat);
+        const url = URL.createObjectURL(result.blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `${title.replace(/[\\/:*?"<>|\x00-\x1f]/g, '_') || 'score'}${result.extension}`;
+        document.body.append(link); link.click(); link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 60_000);
+        this.exportNotice = result.warnings.length ? `Exported with warnings: ${result.warnings.join(' ')}` : 'Export ready.';
+      }
+    } catch (error) {
+      preview?.close();
+      this.error = error instanceof Error ? error.message : 'Could not export this piece.';
+    } finally { this.exporting = null; }
+  }
+
   /** The rail's dimensions: those the facets know, in the fixed order first. */
   private railDimensions(): string[] {
     const present = new Set(this.facets.map(f => f.dimension));
@@ -213,11 +256,18 @@ export class LibraryPage extends LitElement {
         </div>` : nothing}
         ${this.error ? html`<p class="error" role="alert">${this.error}</p>` : nothing}
         ${this.busy && !this.pieces.length ? html`<p class="muted" role="status">Loading…</p>` : nothing}
+        ${this.exportNotice ? html`<p class="muted" role="status">${this.exportNotice}</p>` : nothing}
+        ${shown.length ? html`<div class="columns"><span>Actions</span></div>` : nothing}
         <ul>${shown.map(p => html`<li>
           <button class="star" aria-label=${p.favourite ? 'Remove from favourites' : 'Add to favourites'} aria-pressed=${p.favourite} @click=${() => this.toggleFavourite(p)}>${star(p.favourite)}</button>
           <div class="who"><a href=${pieceHref(p.id)}>${p.title ?? p.id}</a>${p.artist ? html`<small>${p.artist}</small>` : nothing}</div>
           <div class="tags">${p.chips.map(c => html`<button title=${`Filter by ${dimensionLabel(c.dimension).toLowerCase()}`} @click=${() => this.choose(c.dimension, c.value)}>${chipText(c.dimension, c.value)}</button>`)}</div>
           <span class="when">${relativeTime(p.opened_at)}</span>
+          <div class="actions"><select aria-label=${`Export ${p.title ?? p.id}`} ?disabled=${this.exporting !== null} @change=${(e: Event) => this.exportPiece(p, e)}>
+            <option value="">${this.exporting === p.id ? 'Exporting…' : 'Export…'}</option>
+            <option value="mnx">MNX</option><option value="gp7">Guitar Pro 7</option>
+            <option value="musicxml">MusicXML</option><option value="pdf">PDF</option>
+          </select></div>
         </li>`)}</ul>
         ${!this.busy && !this.error && !shown.length ? html`<p class="muted">${this.filters.length || this.query ? 'No matching pieces.' : 'Your library is empty.'}</p>` : nothing}
         ${this.next && !this.query ? html`<div><button ?disabled=${this.busy} @click=${() => this.load(true)}>More</button></div>` : nothing}

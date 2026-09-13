@@ -29,38 +29,9 @@ import { chipText, dimensionLabel } from './labels.ts';
 import './TagsSheet.ts';
 import type { TagsSnapshot } from './TagsSheet.ts';
 
-const VIEW_KEY = 'mnx-studio.view';
-const DISPLAY_KEY = 'mnx-studio.display';
-const UNROLLED_KEY = 'mnx-studio.unrolled';
-const STAFF_SCALE_KEY = 'mnx-studio.staff-scale';
-const DENSITY_H_KEY = 'mnx-studio.density-h';
-const SPACING_MODE_KEY = 'mnx-studio.spacing-mode';
-const VIEWS: ViewSetting[] = ['auto', 'notation', 'tab', 'both'];
-/** Tags the chips row shows beside the title; title and artist ARE the title. */
-const CHIP_DIMENSIONS = ['tuning-name', 'capo', 'key', 'genre', 'list'];
+import { VIEW_KEY, DISPLAY_KEY, UNROLLED_KEY, STAFF_SCALE_KEY, DENSITY_H_KEY, SPACING_MODE_KEY, read, write, readView, readDisplay, readNumber } from './scorePreferences.ts';
 
-function read(key: string): string | null {
-  try { return localStorage.getItem(key); } catch { return null; }
-}
-function write(key: string, value: string | null) {
-  try { value === null ? localStorage.removeItem(key) : localStorage.setItem(key, value); } catch { /* a convenience only */ }
-}
-function readView(): ViewSetting {
-  const value = read(VIEW_KEY);
-  return VIEWS.includes(value as ViewSetting) ? (value as ViewSetting) : 'auto';
-}
-function readDisplay(): DisplayOptions {
-  try {
-    const { selectedVerse: _transient, ...validated } = normalizeDisplayOptions(JSON.parse(read(DISPLAY_KEY) ?? '{}'));
-    return { ...DEFAULT_DISPLAY_PREFERENCES, ...validated };
-  } catch { return { ...DEFAULT_DISPLAY_PREFERENCES }; }
-}
-function readNumber(key: string): number | null {
-  const raw = read(key);
-  if (raw === null) return null;
-  const value = Number(raw);
-  return Number.isFinite(value) ? value : null;
-}
+const CHIP_DIMENSIONS = ['tuning-name', 'capo', 'key', 'genre', 'list'];
 
 const back = html`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"></path></svg>`;
 const more = html`<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="12" r="1.8" fill="currentColor"></circle><circle cx="12" cy="12" r="1.8" fill="currentColor"></circle><circle cx="18" cy="12" r="1.8" fill="currentColor"></circle></svg>`;

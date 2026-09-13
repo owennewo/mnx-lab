@@ -78,3 +78,9 @@ is pure and could be consumed today; `src/workbench/assistCredentials.ts` (local
 the PKCE round trip) is shell-specific and stays behind the boundary until studio actually
 asks for assist — then it lifts to a layer both shells may import, with the storage keys
 and the callback-URL derivation as its only decisions.
+
+The library Actions column offers MNX, Guitar Pro 7 (`.gp`), MusicXML, and PDF.
+PDF opens a paginated vector preview; **Print / Save PDF** uses the browser print
+dialog. It reads the same saved staff, display, repeat, zoom, and spacing preferences
+as the piece page. A Tab setting renders only tab for pieces with known strings.
+The file exports preserve the whole document regardless of display settings.

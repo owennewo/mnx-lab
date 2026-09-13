@@ -2,12 +2,9 @@ import {
   MnxBeam,
   MnxBend,
   MnxEvent,
-  MnxGlobalMeasure,
   MnxHarmony,
   MnxHarmonyStep,
-  MnxNote,
   MnxPart,
-  MnxPartMeasure,
   MnxPitch,
   MnxStructure
 } from '../common/types.js';

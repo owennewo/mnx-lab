@@ -4,7 +4,6 @@ import {
   MnxNote,
   MnxSequence,
   MnxSequenceItem,
-  MnxTuplet,
   isGrace,
   isTimedEvent,
   isTuplet
