@@ -24,7 +24,8 @@ piano roll, and jump to the first unmatched attack. The inspector is read-only a
 only its selected run and recording files. Nothing is deployed.
 
 Rendering creates `output/audio-v1`; comparison creates `output/run-v1`. Both refuse to
-overwrite an existing directory. To create a new version:
+overwrite an existing directory. npm runs these scripts from the bench directory;
+use absolute paths for explicit input/output arguments. To create a new version:
 
 ```bash
 npm --prefix experiments/performance-listening run render -- /absolute/path/audio-v2

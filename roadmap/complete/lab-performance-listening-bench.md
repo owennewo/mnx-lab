@@ -1,6 +1,6 @@
 # Performance listening bench — earn the limits before Studio integration
 
-> **Status: in progress 2026-09-13.** Implementation loop: evidence about our audio
+> **Status: complete 2026-09-13.** Implementation loop: evidence about our audio
 > analysis, not a change to MNX. An isolated experimental unit in this repository,
 > serving future Studio tracking, assessment and guitar control. Not an item in the
 > existing player campaign; consumes its audio apparatus without expanding its contract.
@@ -234,6 +234,7 @@ measured and 204 explicitly unavailable neural-stream modes; no execution failur
 The template method loses accuracy on held-out sounds; the neural baseline is stronger
 on attack recovery but its CPU implementation is slower than real time. Pitch presence
 and attack recognition diverge sharply on re-strikes. No production promotion, microphone
-integration or score following is implied. The original implementation worktree must be
-retired before this document moves to complete. No goldens or approval records moved,
+integration or score following is implied. The original implementation worktree was retired before this document moved to
+complete. All 1,763 repository tests, 14 bench tests, scenario checks, build and
+boundary checks passed; re-earned existing goldens remained byte-identical. No goldens or approval records moved,
 so there is no verification batch to register.

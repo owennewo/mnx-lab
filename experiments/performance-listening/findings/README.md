@@ -87,7 +87,8 @@ The frozen input files were not replaced, and the full detector comparison still
 to their original hashes. No claim is made that detector results are invariant to every
 small input change. This validates separating rendering from comparison: re-rendering
 creates a new input version even when the source and browser version are unchanged.
-The compact reference report itself reproduces byte-identically from the saved full run.
+The five files exported by `report` reproduce byte-identically from the saved full
+run; the repeat-render diagnostic is exported separately by `compare:renders`.
 
 ## Reproduce and review a failure
 

@@ -156,7 +156,6 @@ back up to `proposed/` the moment it is.
 
 ### inprogress/
 
-- **[lab-performance-listening-bench.md](inprogress/lab-performance-listening-bench.md)** — isolated experimental bench for future Studio tracking, assessment and guitar control: compare three detection strategies on player-rendered audio, held-out sounds and causal replay; first outcome is measured capabilities and failures, before product integration.
 
 
 - **[core-score-frame.md](inprogress/core-score-frame.md)** — **started 2026-09-11**: the score
@@ -444,6 +443,9 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+
+- **[lab-performance-listening-bench.md](complete/lab-performance-listening-bench.md)** — completed 2026-09-13: isolated synthetic-audio bench, three detector adapters, causal replay, independent metrics and local inspector; 714 measured outcomes plus 204 explicit neural-stream limitations. Findings expose timbre transfer, attack/pitch differences and tiny repeat-render variation before any Studio integration.
+
 
 - **[studio-campaign-storage.md](complete/studio-campaign-storage.md)** — **campaign complete 2026-09-11**: all five items built; private D1/R2 library, operator ingest, Access login and Load, and converter regression sweep.
 - **[studio-storage-rederive.md](complete/studio-storage-rederive.md)** — storage item 5, **built 2026-09-11**: authenticated stored-source sweep, encoding-aware diffs and canonical tag rebuild; five real sources unchanged, production replay a no-op.
