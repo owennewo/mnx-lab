@@ -2,12 +2,15 @@ import { LitElement, html, css, svg, nothing } from 'lit';
 import { designTokens } from './tokens.ts';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { Performance } from '../audio/performanceTypes.ts';
-import {
-  Transport,
-  type TransportEvent,
-  type TransportSnapshot,
-  type LoopRegion,
-} from '../audio/transport.ts';
+import type { LoopRegion } from '../audio/transport.ts';
+import { PlaybackSession, type PlaybackSnapshot } from '../audio/playbackSession.ts';
+import { type AudioRecordingSource, type PlaybackBackend, type ScorePosition, type ScoreLoop } from '../audio/playbackBackend.ts';
+import { RecordingBackend } from '../audio/recordingBackend.ts';
+import { HtmlAudioPort } from '../audio/native/htmlAudio.ts';
+import { SynthBackend } from '../audio/native/synthBackend.ts';
+import { createRecordingSync } from '../audio/recordingSync.ts';
+import { scorePositionAt } from '../audio/scorePosition.ts';
+import { linearizePasses } from '../model/passes.ts';
 import {
   SAMPLE_PRESETS,
   isSamplePreset,
@@ -15,9 +18,8 @@ import {
   type VoicePreset,
 } from '../audio/sampleSelection.ts';
 import type { SamplePackLoader } from '../audio/native/samplePacks.ts';
-import { NativeSink, nativeClock } from '../audio/native/sink.ts';
-import { formatPlaybackPosition, measureAt, passesOf, playbackPositionParts, widestPlaybackPosition } from '../audio/playbackPosition.ts';
-import { ZERO, compare, type Rational } from '../audio/time.ts';
+import { formatPlaybackPosition, formatScorePlaybackPosition, measureAt, passesOf, playbackPositionParts, scorePlaybackPositionParts, widestPlaybackPosition } from '../audio/playbackPosition.ts';
+import { ZERO, type Rational } from '../audio/time.ts';
 import type { MnxStructure } from '../model/mnx.ts';
 import type { PlaybackUpdate } from './mnxContext.ts';
 
@@ -30,20 +32,21 @@ export class Player extends LitElement {
   @property({ attribute: 'sample-base' }) sampleBase: string | undefined;
   @property({ attribute: false }) sampleBases: Partial<Record<SamplePreset, string>> | undefined;
   @property({ attribute: false }) sampleLoader: SamplePackLoader | undefined;
-  @state() private loading = false;
+  @property({ attribute: false }) writtenBarDurations: readonly Rational[] | undefined;
+  @property({ attribute: false }) recordings: readonly AudioRecordingSource[] = [];
+  private get loading() { return this.status?.loading ?? false; }
   @property({ type: Number }) initialOrdinal: number | null = null;
-  @state() private status: TransportSnapshot | undefined;
-  @state() private error = '';
+  @state() private status: PlaybackSnapshot | undefined;
+  @state() private localError = '';
+  private get error() { return this.localError || this.status?.issue || ''; }
   @state() private rate = 1;
-  /** YouTube's range: 0.25× to 2× on a 0.05 grid; the slider snaps to it. */
+  /** Default synth/audio controls; other backends advertise their own rates. */
   static readonly RATE_MIN = 0.25;
   static readonly RATE_MAX = 2;
   static readonly RATE_STEP = 0.05;
   @state() private volume = 0.7;
-  private transport?: Transport;
-  private sink?: NativeSink;
+  private session?: PlaybackSession;
   private revision = 0;
-  private playRequest = 0;
   private lastUpdate = '';
   private lastOrdinal: number | null = null;
   /**
@@ -300,6 +303,8 @@ export class Player extends LitElement {
     const reinstall =
       changed.has('performance') ||
       changed.has('documentId') ||
+      changed.has('document') ||
+      changed.has('writtenBarDurations') ||
       changed.has('sampleBase') ||
       changed.has('sampleBases') ||
       changed.has('sampleLoader');
@@ -318,56 +323,44 @@ export class Player extends LitElement {
       );
     } else if (changed.has('initialOrdinal') && this.initialOrdinal !== null)
       this.seek(this.initialOrdinal);
-    if (!reinstall && changed.has('voicePreset') && this.sink) {
-      const resume = this.status?.state === 'playing' || this.loading;
+    if (!reinstall && changed.has('recordings') && this.session) {
+      const id = this.session.backend.id;
+      if (id !== 'synth') void this.selectSource(this.recordings.some(r => r.id === id) ? id : 'synth', true);
+    }
+    if (!reinstall && changed.has('voicePreset') && this.session?.backend instanceof SynthBackend) {
+      const resume = this.playback?.wantsPlayback;
       this.pause();
-      this.sink.setVoicePreset(this.sinkPreset(), this.requiredSamples());
-      this.error = '';
+      this.session.backend.sink.setVoicePreset(this.sinkPreset(), this.requiredSamples());
+      this.localError = '';
       if (resume) void this.play();
     }
   }
   private publish() {
-    const ordinal =
-      this.status &&
-      this.performance &&
-      (this.status.state !== 'stopped' || this.status.activeWritten.length > 0)
-        ? (measureAt(this.performance, this.status.position)?.ordinal ?? null)
-        : null;
-    const highlight =
-      this.status?.activeWritten.map((w) => ({ noteKey: w.noteKey, ordinal: w.ordinal })) ?? [];
-    const detail: PlaybackUpdate = {
-      documentId: this.documentId,
-      ordinal,
-      highlight,
-      playing: this.status?.state === 'playing',
-    };
+    const status = this.status;
+    const visible = status && !status.hidePlayhead && (status.state !== 'stopped' || status.highlight.length > 0);
+    const current = status?.transport && this.performance ? measureAt(this.performance, status.transport.position)?.ordinal
+      : status?.scorePosition?.ordinal;
+    const ordinal = visible && current !== undefined && current < (this.performance?.measures.length ?? 0) ? current : null;
+    const detail: PlaybackUpdate = { documentId: this.documentId, ordinal, highlight: [...(status?.highlight ?? [])],
+      playing: status?.wantsPlayback ?? false };
+    this.dispatchEvent(new CustomEvent('playback-position', { detail: {
+      documentId: this.documentId, sourceId: status?.sourceId, kind: status?.kind,
+      scorePosition: status?.scorePosition ?? null, mediaTime: status?.mediaTime,
+    }, bubbles: true, composed: true }));
     const signature = JSON.stringify(detail);
-    if (signature === this.lastUpdate) return;
-    this.lastUpdate = signature;
-    this.dispatchEvent(
-      new CustomEvent('playback-state-changed', { detail, bubbles: true, composed: true }),
-    );
+    if (signature !== this.lastUpdate) {
+      this.lastUpdate = signature;
+      this.dispatchEvent(new CustomEvent('playback-state-changed', { detail, bubbles: true, composed: true }));
+    }
     if (ordinal !== this.lastOrdinal) {
       this.lastOrdinal = ordinal;
-      this.dispatchEvent(
-        new CustomEvent('bar', {
-          detail: { documentId: this.documentId, ordinal },
-          bubbles: true,
-          composed: true,
-        }),
-      );
+      this.dispatchEvent(new CustomEvent('bar', { detail: { documentId: this.documentId, ordinal }, bubbles: true, composed: true }));
     }
   }
   private teardown() {
     this.revision++;
-    this.transport?.dispose();
-    this.transport = undefined;
-    this.sink?.dispose();
-    this.sink = undefined;
-    this.status = undefined;
-    this.loading = false;
-    this.lastOrdinal = null;
-    this.publish();
+    this.session?.dispose(); this.session = undefined;
+    this.status = undefined; this.lastOrdinal = null; this.publish();
   }
   private sinkPreset(): 'synth' | ((voice: string) => VoicePreset) {
     if (!isSamplePreset(this.voicePreset)) return 'synth';
@@ -379,97 +372,81 @@ export class Player extends LitElement {
     return isSamplePreset(this.voicePreset) ? [this.voicePreset] : [];
   }
   private install() {
-    this.teardown();
-    this.error = '';
+    this.teardown(); this.localError = '';
     if (!this.performance || !this.isConnected) return;
-    const revision = this.revision;
-    const sink = new NativeSink({
-      volume: this.volume,
-      voicePreset: this.sinkPreset(),
-      sampleBase: this.sampleBase,
-      sampleBases: this.sampleBases,
-      samplePresets: this.requiredSamples(),
-      sampleLoader: this.sampleLoader,
+    const revision = this.revision, performance = this.performance;
+    const factory = (id: string): PlaybackBackend => {
+      if (id === 'synth') return new SynthBackend(performance, {
+        volume: this.volume, voicePreset: this.sinkPreset(), sampleBase: this.sampleBase,
+        sampleBases: this.sampleBases, samplePresets: this.requiredSamples(), sampleLoader: this.sampleLoader,
+      }, event => {
+        if (revision === this.revision && event.kind === 'onset') this.dispatchEvent(new CustomEvent('onset', {
+          detail: { ...event, documentId: this.documentId }, bubbles: true, composed: true,
+        }));
+      });
+      const matches = this.recordings.filter(r => r.id === id && r.kind === 'audio');
+      if (!id || matches.length !== 1) throw new Error('The selected recording is unavailable or has a duplicate identity.');
+      const source = matches[0];
+      const sync = this.document && this.writtenBarDurations
+        ? createRecordingSync(source.syncpoints, { performance, writtenBarDurations: this.writtenBarDurations }, linearizePasses(this.document)) : null;
+      return new RecordingBackend(id, new HtmlAudioPort(source.media), performance, sync?.ok ? sync.value : null,
+        sync && !sync.ok ? sync.diagnostic.message : !sync ? 'Score timing information is unavailable for this recording.' : undefined);
+    };
+    this.session = new PlaybackSession(factory('synth'), factory, () => {
+      if (revision !== this.revision || !this.session) return;
+      this.status = this.session.snapshot; this.rate = this.status.rate; this.volume = this.status.volume; this.publish();
     });
-    this.sink = sink;
-    this.transport = new Transport(this.performance, nativeClock(sink), sink, {
-      onEvent: (event: TransportEvent) => {
-        if (revision !== this.revision) return;
-        if (event.kind === 'state') {
-          this.status = event.snapshot;
-          this.publish();
-        } else if (event.kind === 'onset')
-          this.dispatchEvent(
-            new CustomEvent('onset', {
-              detail: { ...event, documentId: this.documentId },
-              bubbles: true,
-              composed: true,
-            }),
-          );
-      },
-    });
-    if (this.rate !== 1) this.transport.setRate(this.rate);
-    this.status = undefined;
-    this.publish();
+    this.session.setRate(this.rate); this.session.setVolume(this.volume);
+    this.session.stop();
+    this.status = this.session.snapshot; this.publish();
   }
-  get snapshot() {
-    return this.status;
+  /** Legacy synth view. Use playback/scorePosition for all source kinds. */
+  get snapshot() { return this.session?.snapshot.transport; }
+  get position(): Rational { return this.snapshot?.position ?? ZERO; }
+  get playback() { return this.session?.snapshot; }
+  get scorePosition() { return this.playback?.scorePosition ?? null; }
+  get sourceId() { return this.session?.backend.id ?? 'synth'; }
+  get positionLabel() {
+    if (!this.performance) return 'No performance available';
+    const status = this.playback;
+    if (!status || status.kind === 'synth') return formatPlaybackPosition(this.performance, this.position, this.document);
+    if (status.scorePosition) return formatScorePlaybackPosition(this.performance, status.scorePosition, this.document);
+    const time = Math.max(0, status.mediaTime ?? 0);
+    return `Audio ${Math.floor(time / 60)}:${Math.floor(time % 60).toString().padStart(2, '0')} · outside sync`;
   }
-  get position(): Rational {
-    return this.transport?.position ?? ZERO;
+  async selectSource(id: string, replace = false) {
+    this.localError = '';
+    return await this.session?.select(id, replace) ?? false;
   }
-  async play() {
-    if (!this.transport) return;
-    const revision = this.revision;
-    const request = ++this.playRequest;
-    if (
-      this.status?.state === 'stopped' &&
-      compare(this.status.position, this.transport.duration) >= 0
-    )
-      this.transport.seek(ZERO);
-    this.error = '';
-    this.loading = true;
-    try {
-      await this.transport.play();
-    } catch (e) {
-      if (revision === this.revision && request === this.playRequest)
-        this.error = e instanceof Error ? e.message : String(e);
-    } finally {
-      if (revision === this.revision && request === this.playRequest) this.loading = false;
-    }
-  }
-  pause() {
-    this.playRequest++;
-    this.loading = false;
-    this.transport?.pause();
-  }
-  stop() {
-    this.playRequest++;
-    this.loading = false;
-    this.transport?.stop();
-  }
-  /** Play/pause as ONE verb, for callers that have no view of the state — the
-   *  two-finger tap gesture, and any host key binding. The button in `render()`
-   *  keeps its own branch because it also prints which it is about to do. */
-  toggle() {
-    if (this.status?.state === 'playing') this.pause();
-    else void this.play();
-  }
+  async play() { this.localError = ''; await this.session?.play(); }
+  pause() { this.session?.pause(); }
+  stop() { this.localError = ''; this.session?.stop(); }
+  toggle() { if (this.playback?.wantsPlayback) this.pause(); else void this.play(); }
+  async startSource() { this.localError = ''; await this.session?.start(); }
   seek(ordinal: number) {
-    const measure = this.performance?.measures.find((m) => m.ordinal === ordinal);
-    if (!measure || !this.transport) return false;
-    this.transport.seek(measure.position);
-    this.dispatchEvent(
-      new CustomEvent('seek', {
-        detail: { documentId: this.documentId, ordinal },
-        bubbles: true,
-        composed: true,
-      }),
-    );
+    const measure = this.performance?.measures.find(m => m.ordinal === ordinal);
+    if (!measure || !this.session) return false;
+    const target = { ordinal, metricOffset: measure.from };
+    // An explicit bar click includes the grace/hold at its start. Handoffs
+    // deliberately omit this edge because they must not guess within an insertion.
+    const edge = this.session.backend instanceof SynthBackend ? 'before' : undefined;
+    const problem = this.session.backend.canSeek(target, edge);
+    if (problem) { this.localError = problem; return false; }
+    void this.session.seek(target, edge);
+    this.localError = '';
+    this.dispatchEvent(new CustomEvent('seek', { detail: { documentId: this.documentId, ordinal }, bubbles: true, composed: true }));
     return true;
   }
+  async seekScorePosition(position: ScorePosition) { this.localError = ''; return await this.session?.seek(position) ?? false; }
+  setScoreLoop(loop?: ScoreLoop) { this.session?.setLoop(loop); }
+  /** Existing API takes expanded synth positions; media endpoints must map uniquely. */
   setLoop(loop?: LoopRegion) {
-    this.transport?.setLoop(loop);
+    if (!this.session || !this.performance) return;
+    if (this.session.backend instanceof SynthBackend) { this.session.backend.transport.setLoop(loop); return; }
+    if (!loop) { this.session.setLoop(); return; }
+    const start = scorePositionAt(this.performance, loop.start), end = scorePositionAt(this.performance, loop.end);
+    if (!start.ok || !end.ok) throw new Error(!start.ok ? start.diagnostic.message : !end.ok ? end.diagnostic.message : 'Invalid loop.');
+    this.session.setLoop({ start: start.value, end: end.value });
   }
   /** Clamp to the slider's range and land on its 0.05 grid, so a stored or
    *  dragged value never carries float noise into the readout. */
@@ -483,21 +460,21 @@ export class Player extends LitElement {
   }
   private changeRate(event: Event) {
     this.rate = Player.snapRate(Number((event.target as HTMLInputElement).value));
-    this.transport?.setRate(this.rate);
+    this.rate = this.session?.setRate(this.rate) ?? this.rate;
     try {
       localStorage.setItem('mnx-player-rate', String(this.rate));
     } catch {}
   }
   private resetRate() {
     this.rate = 1;
-    this.transport?.setRate(1);
+    this.rate = this.session?.setRate(1) ?? 1;
     try {
       localStorage.setItem('mnx-player-rate', '1');
     } catch {}
   }
   private changeVolume(event: Event) {
     this.volume = Number((event.target as HTMLInputElement).value);
-    this.sink?.setVolume(this.volume);
+    this.volume = this.session?.setVolume(this.volume) ?? this.volume;
     try {
       localStorage.setItem('mnx-player-volume', String(this.volume));
     } catch {}
@@ -512,8 +489,9 @@ export class Player extends LitElement {
   /** The live readout: the iteration becomes a menu of the bar's passes when it has more than one. */
   private readout() {
     if (!this.performance) return nothing;
-    const parts = playbackPositionParts(this.performance, this.position, this.document);
-    if (!parts) return formatPlaybackPosition(this.performance, this.position, this.document);
+    const parts = this.sourceId === 'synth' ? playbackPositionParts(this.performance, this.position, this.document)
+      : this.scorePosition ? scorePlaybackPositionParts(this.performance, this.scorePosition, this.document) : null;
+    if (!parts) return this.positionLabel;
     const passes = passesOf(this.performance, parts.measureIndex);
     const iteration = `iteration ${parts.iteration} of ${parts.iterations}`;
     const tail = ` · beat ${parts.beat}${parts.insertion ? ` · ${parts.insertion}` : ''}`;
@@ -548,14 +526,14 @@ export class Player extends LitElement {
   }
 
   render() {
-    const playing = this.status?.state === 'playing';
+    const playing = this.status?.wantsPlayback ?? false;
     const count = this.performance?.measures.length ?? 0;
     return html` <div class="controls">
         <button
           class="primary"
-          ?disabled=${!this.performance || this.loading}
-          aria-label=${this.loading ? 'Loading' : playing ? 'Pause' : 'Play'}
-          title=${this.loading ? 'Loading…' : playing ? 'Pause' : 'Play'}
+          ?disabled=${!this.performance || this.status?.needsStart}
+          aria-label=${playing ? 'Pause' : 'Play'}
+          title=${playing ? 'Pause' : 'Play'}
           @click=${() => (playing ? this.pause() : void this.play())}
         >
           ${playing ? Player.glyph('M7 5h3.5v14H7zM13.5 5H17v14h-3.5z') : Player.glyph('M8 5l11 7-11 7z')}
@@ -577,11 +555,16 @@ export class Player extends LitElement {
               max=${count - 1}
               step="1"
               aria-label="Position"
-              .value=${String(this.lastOrdinal ?? 0)}
+              .value=${String(Math.min(count - 1, this.scorePosition?.ordinal ?? this.lastOrdinal ?? 0))}
               @input=${this.onScrub}
             />`
           : nothing}
-        <label class="select"
+        ${this.recordings.length ? html`<label class="select">Source<select aria-label="Playback source" ?disabled=${!this.performance}
+          .value=${this.sourceId} @change=${(event: Event) => void this.selectSource((event.target as HTMLSelectElement).value)}>
+          <option value="synth" ?selected=${this.sourceId === 'synth'}>Synth</option>
+          ${this.recordings.map(r => html`<option value=${r.id} ?selected=${this.sourceId === r.id}>${r.name}</option>`)}
+        </select></label>` : nothing}
+        ${this.sourceId === 'synth' ? html`        <label class="select"
           >Sound<select
             aria-label="Playback sound"
             .value=${this.voicePreset}
@@ -598,13 +581,14 @@ export class Player extends LitElement {
             )}
           </select></label
         >
+` : nothing}
         <label class="rate" title="Playback rate — double-click for 1×"
           >Rate<input
             aria-label="Playback rate"
             type="range"
-            min=${Player.RATE_MIN}
-            max=${Player.RATE_MAX}
-            step=${Player.RATE_STEP}
+            min=${this.status?.capabilities.rate.min ?? Player.RATE_MIN}
+            max=${this.status?.capabilities.rate.max ?? Player.RATE_MAX}
+            step=${this.status?.capabilities.rate.step ?? Player.RATE_STEP}
             .value=${String(this.rate)}
             @input=${this.changeRate}
             @dblclick=${this.resetRate}
@@ -623,9 +607,12 @@ export class Player extends LitElement {
       </div>
       ${this.loading
         ? html`<p role="status">
-            Preparing ${isSamplePreset(this.voicePreset) ? 'guitar samples' : 'audio'}…
+            Preparing ${this.sourceId === 'synth' && isSamplePreset(this.voicePreset) ? 'samples' : 'audio'}…
           </p>`
         : nothing}
-      ${this.error ? html`<p role="alert">Playback unavailable: ${this.error}</p>` : nothing}`;
+      ${this.error ? html`<p role="alert">Playback unavailable: ${this.error}</p>` : nothing}
+      ${this.status?.needsStart ? html`<button @click=${() => void this.startSource()}>Start this source</button>` : nothing}
+      ${!this.loading && this.status?.state === 'buffering' ? html`<p role="status">Buffering audio…</p>` : nothing}
+      ${this.status?.kind === 'audio' && this.status.syncIssue && !this.error ? html`<p role="status">Score follow: ${this.status.syncIssue}</p>` : nothing}`;
   }
 }

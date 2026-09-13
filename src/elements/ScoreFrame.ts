@@ -5,7 +5,7 @@ import type { DisplayOptions } from '../engine/displayOptions.ts';
 import type { ViewMode } from './DocumentViewer.ts';
 import type { Player } from './Player.ts';
 import type { PlaybackUpdate } from './mnxContext.ts';
-import { formatPlaybackPosition, widestPlaybackPosition } from '../audio/playbackPosition.ts';
+import { widestPlaybackPosition } from '../audio/playbackPosition.ts';
 import './ZoomPad.ts';
 import './SettingsPad.ts';
 
@@ -512,17 +512,21 @@ export class ScoreFrame extends LitElement {
     this.refreshReadout(detail.ordinal);
   };
 
+  private readonly onPosition = () => this.refreshReadout(this.player?.scorePosition?.ordinal ?? null);
+
   private readonly onPerformance = () => this.refreshReadout(null);
 
   connectedCallback() {
     super.connectedCallback();
     this.addEventListener('playback-state-changed', this.onPlayback);
     this.addEventListener('performance-changed', this.onPerformance);
+    this.addEventListener('playback-position', this.onPosition);
   }
 
   disconnectedCallback() {
     this.removeEventListener('playback-state-changed', this.onPlayback);
     this.removeEventListener('performance-changed', this.onPerformance);
+    this.removeEventListener('playback-position', this.onPosition);
     document.removeEventListener('pointerdown', this.onClickAway);
     super.disconnectedCallback();
   }
@@ -537,7 +541,7 @@ export class ScoreFrame extends LitElement {
       this.progress = 0;
       return;
     }
-    this.positionText = formatPlaybackPosition(performance, player.position, player.document);
+    this.positionText = player.positionLabel;
     this.widestText = widestPlaybackPosition(performance, player.document);
     const count = performance.measures.length;
     this.progress = ordinal === null || count === 0 ? 0 : Math.min(1, (ordinal + 0.5) / count);

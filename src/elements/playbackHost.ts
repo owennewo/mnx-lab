@@ -84,6 +84,7 @@ export function bindPlayback(host: HTMLElement, viewer: DocumentViewer, player: 
       player.documentId = next.id;
       player.document = next.mnxJson;
       const result = compilePerformance(next.mnxJson, model);
+      player.writtenBarDurations = result.ok ? result.writtenBarDurations : undefined;
       player.performance = result.ok ? result.performance : null;
       publish();
       return result;

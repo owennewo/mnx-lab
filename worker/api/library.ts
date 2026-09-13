@@ -69,7 +69,7 @@ library.use('*', async (c, next) => {
     return c.json({ error: status === 403 ? 'User is not permitted' : 'Authentication required' }, status);
   }
   // A browser write is a same-origin fetch with a JSON body; a cross-site form cannot say that.
-  if (!machine && c.req.method !== 'GET' && !(c.req.header('Content-Type') ?? '').startsWith('application/json')) {
+  if (!machine && c.req.method !== 'GET' && c.req.method !== 'HEAD' && !(c.req.header('Content-Type') ?? '').startsWith('application/json')) {
     return c.json({ error: 'Writes are JSON' }, 415);
   }
   await next();
@@ -240,4 +240,21 @@ library.get('/renditions/:id', async c => {
   c.header('X-Content-Type-Options', 'nosniff');
   c.header('Content-Disposition', `attachment; filename*=UTF-8''${encodeURIComponent(rendition.filename ?? 'rendition')}`);
   return c.body(object.body);
+});
+
+// Native audio sends Range and same-origin Access cookies. Every request checks
+// membership/ownership, including HEAD; neither private keys nor signed blob URLs
+// are exposed. If-Range requests receive a full response (no validators advertised).
+library.on(['GET', 'HEAD'], '/recordings/:id/audio', async c => {
+  const { recording, range, body } = await reader(c).readRecording(c.get('libraryUser').id, c.req.param('id'), {
+    head: c.req.method === 'HEAD', range: c.req.header('If-Range') ? undefined : c.req.header('Range'),
+  });
+  c.header('Accept-Ranges', 'bytes');
+  c.header('X-Content-Type-Options', 'nosniff');
+  c.header('Content-Type', recording.mime && /^audio\/[a-z0-9.+-]+$/i.test(recording.mime) ? recording.mime : 'application/octet-stream');
+  c.header('Content-Disposition', 'inline');
+  c.header('Content-Length', String(range.length));
+  if (range.status === 416) c.header('Content-Range', `bytes */${recording.bytes}`);
+  if (range.status === 206) c.header('Content-Range', `bytes ${range.offset}-${range.offset + range.length - 1}/${recording.bytes}`);
+  return c.newResponse(body, range.status);
 });

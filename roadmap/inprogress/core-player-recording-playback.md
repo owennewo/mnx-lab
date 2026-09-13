@@ -1,6 +1,6 @@
 # Switch between synth and recorded audio
 
-> **Status: proposed 2026-09-13.** Implementation loop. Campaign:
+> **Status: in progress 2026-09-13.** Implementation loop. Campaign:
 > [core-campaign-player.md](../inprogress/core-campaign-player.md), item 16.
 > Needs [recording sync](../complete/core-player-recording-sync.md), item 15, and the existing player.
 
@@ -69,5 +69,37 @@ buffering, intro/outro, loops, stale callbacks, blocked play and disposal. API c
 cover ownership and range reads; browser checks exercise a real seekable audio fixture.
 No real account or private media is needed for routine tests.
 
-Persistent attachment creation is [item 18](studio-recording-management.md).
-YouTube is [item 17](core-player-youtube.md); neither is required to play existing audio.
+Persistent attachment creation is [item 18](../proposed/studio-recording-management.md).
+YouTube is [item 17](../proposed/core-player-youtube.md); neither is required to play existing audio.
+
+## Implementation agreement — 2026-09-13
+
+The shared backend snapshot reports a written score position, source-clock state and
+capabilities. A pure session owns source selection, readiness, musical-position
+handoff and cancellation. Native adapters own Transport/NativeSink or HTML audio;
+there is only one active adapter. Media emits position updates, never synth onsets.
+The existing `snapshot`/`position` getters retain their synth-only meaning; a new
+`playback` snapshot and `scorePosition` serve all sources. The shared frame uses the
+new position label rather than interpreting media seconds as expanded synth time.
+
+An unmappable handoff selects the target paused and requires an explicit start action;
+well-shaped recordings without usable sync can play with score-follow/seek disabled.
+Source switches clear loops; the existing expanded-position loop API maps endpoints
+to score positions for recordings and diagnoses ambiguous holds or missing coverage.
+Media loops are seek-based, with possible gaps. Typed host descriptors may use an
+HTTP/blob URL or a Blob whose object URL the adapter owns. Studio consumes existing
+audio rows; YouTube and attachment authoring remain items 17 and 18.
+
+## Implementation and evidence — 2026-09-13
+
+Implemented the pure backend/session contract, NativeSink/Transport adapter, HTML
+media adapter, common score-position bridge, source selector, portable descriptors,
+Studio row wiring and owner-checked R2 audio route. The host/API and behavioral
+contract is [docs/player-recordings.md](../../docs/player-recordings.md).
+
+Lifecycle and real D1/R2 tests cover cancellation, media clocks, explicit unmapped
+starts, authorization and ranges. Both embed formats exercise generated PCM and
+source handoffs, including repeat visits and Blob cleanup. Production Studio's
+fixture smoke covers HTTP seeking and navigation while audio is playing. Existing
+synth smoke and 188 regenerated corpus goldens remain unchanged. Landing gates and
+worktree retirement will be recorded at closeout.

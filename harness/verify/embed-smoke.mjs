@@ -24,6 +24,7 @@ import { fileURLToPath } from 'node:url';
 import { serveStatic } from './staticServer.mjs';
 import { devtoolsPort, connect, client } from './browserHarness.mjs';
 import { checkPlayer } from './player-embed-check.mjs';
+import { checkRecordings } from './recording-embed-check.mjs';
 const format=process.env.MNX_EMBED_FORMAT??'esm';
 
 const ROOT = path.dirname(path.dirname(path.dirname(fileURLToPath(import.meta.url))));
@@ -256,6 +257,7 @@ try {
   if (second && second.fonts > 1) fail(`Bravura registered ${second.fonts} times — registration is not idempotent`);
 
   await checkPlayer(cdp,artifactBase,format);
+  await checkRecordings(cdp,artifactBase,format);
 
   // 5. No console errors anywhere in the run.
   if (cdp.logs.length > 0) fail(`console errors: ${cdp.logs.slice(0, 3).join(' | ')}`);

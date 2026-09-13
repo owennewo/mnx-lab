@@ -52,8 +52,8 @@ export async function checkPlayer(cdp, base, format) {
       check(player.position.num*before.den>=before.num*player.position.den,'Preset reset playback position');
     }
     player.pause();const frozen=player.position;await delay(60);check(player.position.num===frozen.num && player.position.den===frozen.den,'Pause did not freeze');
-    const rate=player.shadowRoot.querySelector('select[aria-label="Playback rate"]');rate.value='1.5';rate.dispatchEvent(new Event('change'));await player.updateComplete;check(player.snapshot.rate===1.5,'Rate control did not reach transport');
-    const volume=player.shadowRoot.querySelector('input');volume.value='0';volume.dispatchEvent(new Event('input'));await player.play();
+    const rate=player.shadowRoot.querySelector('input[aria-label="Playback rate"]');rate.value='1.5';rate.dispatchEvent(new Event('input'));await player.updateComplete;check(player.snapshot.rate===1.5,'Rate control did not reach transport');
+    const volume=player.shadowRoot.querySelector('input[aria-label="Volume"]');volume.value='0';volume.dispatchEvent(new Event('input'));await player.play();
     const replaced=structuredClone(doc);replaced.id='replacement';binding.setDocument(replaced);await player.updateComplete;await delay(80);
     check(player.documentId==='replacement' && !viewer.playbackState.highlight.length && player.snapshot?.state!=='playing','Document replacement retained playback');
     await player.play();await delay(40);player.remove();await delay(40);

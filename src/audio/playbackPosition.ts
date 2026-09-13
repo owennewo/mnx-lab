@@ -1,4 +1,5 @@
 import type { Performance, PerformanceMeasure } from './performanceTypes.ts';
+import type { ScorePosition } from './scorePosition.ts';
 import type { MnxStructure } from '../model/mnx.ts';
 import { ZERO, add, subtract, multiply, divide, rational, compare, type Rational } from './time.ts';
 export function measureAt(
@@ -57,10 +58,16 @@ export function playbackPositionParts(
             : subtract(position, segment.position),
         )
       : (segment?.sources.find((s) => s.ordinal === measure.ordinal)?.metricOffset ?? measure.from);
+  const parts = scorePlaybackPositionParts(performance, { ordinal: measure.ordinal, metricOffset: offset }, document)!;
+  return { ...parts, insertion: segment && segment.kind !== 'metric' ? (segment.kind === 'fermata' ? 'hold' : 'grace') : null };
+}
+export function scorePlaybackPositionParts(performance: Performance, position: ScorePosition, document?: MnxStructure): PlaybackPositionParts | null {
+  const measure = performance.measures[position.ordinal];
+  if (!measure) return null;
   let unit = 4;
   for (let i = 0; i <= measure.measureIndex; i++)
     unit = document?.global.measures[i]?.time?.unit ?? unit;
-  const beat = add(rational(1n), multiply(offset, rational(BigInt(unit))));
+  const beat = add(rational(1n), multiply(position.metricOffset, rational(BigInt(unit))));
   const tenths = (beat.num * 10n) / beat.den;
   const label = `${tenths / 10n}${tenths % 10n ? '.' + (tenths % 10n) : ''}`;
   return {
@@ -70,7 +77,7 @@ export function playbackPositionParts(
     iteration: measure.iteration,
     iterations: iterationsOf(performance, measure.measureIndex),
     beat: label,
-    insertion: segment && segment.kind !== 'metric' ? (segment.kind === 'fermata' ? 'hold' : 'grace') : null,
+    insertion: null,
   };
 }
 export function formatPlaybackPosition(
@@ -81,6 +88,10 @@ export function formatPlaybackPosition(
   const parts = playbackPositionParts(performance, position, document);
   if (!parts) return compare(position, ZERO) === 0 ? 'Ready' : 'End';
   return `bar ${parts.bar} · iteration ${parts.iteration} of ${parts.iterations} · beat ${parts.beat}${parts.insertion ? ` · ${parts.insertion}` : ''}`;
+}
+export function formatScorePlaybackPosition(performance: Performance, position: ScorePosition, document?: MnxStructure): string {
+  const parts = scorePlaybackPositionParts(performance, position, document);
+  return parts ? `bar ${parts.bar} · iteration ${parts.iteration} of ${parts.iterations} · beat ${parts.beat}` : 'End';
 }
 /**
  * The widest label `formatPlaybackPosition` can print for this performance,

@@ -1,6 +1,7 @@
 // DOM-free storage operations. Callers supply the authenticated owner; no HTTP surface here.
 import type { D1Database, D1PreparedStatement, R2Bucket } from '@cloudflare/workers-types';
 import { describeBlob, storeBlob, type PreparedBlob } from './blobs.ts';
+import { audioRange } from './audioRange.ts';
 import { decodeRecordingSync } from '../../src/model/recordingSync.ts';
 import { isDerivedDimension, parseMnx } from './tags.ts';
 import {
@@ -133,6 +134,24 @@ export class Library {
     const object = await this.bucket.get(row.r2_key);
     if (!object || object.size !== row.bytes) throw new LibraryError('blob', 'Rendition blob missing or wrong size');
     return { rendition: row, object };
+  }
+
+  /** Authorized audio bytes only; the source key never comes from the URL. */
+  async readRecording(owner: string, id: string, options: { range?: string; head?: boolean } = {}) {
+    requireText(owner, 'owner'); requireText(id, 'recording id');
+    const recording = await this.statement('SELECT r.* FROM recordings r JOIN pieces p ON p.id=r.piece_id WHERE p.owner=? AND r.id=?', owner, id).first<Recording>();
+    if (!recording || recording.kind !== 'audio' || !recording.r2_key || recording.bytes === null)
+      throw new LibraryError('not_found', 'Audio recording not found');
+    const range = audioRange(options.head ? undefined : options.range, recording.bytes);
+    if (range.status === 416) return { recording, range, body: null };
+    if (options.head) {
+      const object = await this.bucket.head(recording.r2_key);
+      if (!object || object.size !== recording.bytes) throw new LibraryError('blob', 'Recording blob missing or wrong size');
+      return { recording, range, body: null };
+    }
+    const object = await this.bucket.get(recording.r2_key, range.status === 206 ? { range: { offset: range.offset, length: range.length } } : undefined);
+    if (!object || object.size !== recording.bytes) throw new LibraryError('blob', 'Recording blob missing or wrong size');
+    return { recording, range, body: object.body };
   }
 
   /** The canonical rendition's bytes, whatever their format. Conversion to

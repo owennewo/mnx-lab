@@ -3,9 +3,10 @@ import {
   type RecordingSyncDiagnostic, type RecordingSyncResult,
 } from '../model/recordingSync.ts';
 import type { PassModel } from '../model/passes.ts';
-import type { CompiledPerformance, SourceSegment } from './performanceTypes.ts';
+import type { CompiledPerformance } from './performanceTypes.ts';
+import { performancePositionAt, scorePositionAt } from './scorePosition.ts';
 import {
-  ZERO, ONE, rational, fromDecimal, add, subtract, multiply, divide, compare,
+  ZERO, rational, fromDecimal, add, subtract, multiply, divide, compare,
   TimingError, type Rational,
 } from './time.ts';
 
@@ -35,7 +36,6 @@ export interface RecordingSyncMap {
   /** An interior synthetic hold/grace has no uniquely measured recording time. */
   fromPerformance(position: Rational): RecordingSyncResult<RecordingScorePosition>;
 }
-type MetricSegment = Extract<SourceSegment, { kind: 'metric' }>;
 interface Anchor { point: RecordingSyncpoint; coordinate: Rational; seconds: Rational }
 class SyncFailure extends Error {
   constructor(readonly diagnostic: RecordingSyncDiagnostic) { super(diagnostic.message); }
@@ -140,20 +140,8 @@ export function createRecordingSync(
     };
     // Snapshot the compiler's bridge separately. No synth duration participates in
     // interpolation above; swing is applied ONLY when explicitly crossing to synth.
-    const metricByOrdinal: MetricSegment[][] = Array.from({ length: count }, () => []);
-    const metric: MetricSegment[] = [];
-    const insertions: Exclude<SourceSegment, MetricSegment>[] = [];
-    for (const segment of performance.sourceMap) {
-      if (segment.kind === 'metric') {
-        if (!metricByOrdinal[segment.ordinal]) fail('invalid-traversal', 'Source map references an absent performed ordinal.');
-        const copy = { ...segment };
-        metricByOrdinal[segment.ordinal].push(copy);
-        metric.push(copy);
-      } else insertions.push({ ...segment, sources: segment.sources.map(s => ({ ...s })) });
-    }
-    const finalMeasure = measures[count - 1];
-    const performanceEnd = add(finalMeasure.position, finalMeasure.duration);
-    const metricEnd = (s: MetricSegment) => add(s.metricOffset, divide(s.duration, s.scale ?? ONE));
+    const projection = { ...performance, measures, sourceMap: performance.sourceMap.map(s =>
+      s.kind === 'metric' ? { ...s } : { ...s, sources: s.sources.map(source => ({ ...source })) }) };
     const map: RecordingSyncMap = {
       source,
       coverage: compare(last.coordinate, endCoordinate) === 0 ? 'full' : 'partial',
@@ -187,36 +175,16 @@ export function createRecordingSync(
         return attempt(() => {
           const coordinate = coordinateAt(position);
           within(coordinate);
-          const canonical = scoreAt(coordinate);
-          // A barline hold belongs to the preceding ordinal, so compare its
-          // canonical bar coordinate, not only its source ordinal.
-          const at = insertions.filter(s => s.sources.some(source =>
-            compare(coordinateAt({ ordinal: source.ordinal, metricOffset: source.metricOffset }), coordinate) === 0));
-          if (at.length) {
-            if (!edge) fail('ambiguous-insertion', 'A synthetic hold/grace occupies this metric anchor; choose before or after explicitly.');
-            return edge === 'before' ? at[0].position : add(at[at.length - 1].position, at[at.length - 1].duration);
-          }
-          if (canonical.ordinal === count) return performanceEnd;
-          const segment = metricByOrdinal[canonical.ordinal].find(s =>
-            compare(canonical.metricOffset, s.metricOffset) >= 0 && compare(canonical.metricOffset, metricEnd(s)) < 0);
-          if (!segment) fail('invalid-traversal', 'No metric source segment covers this position.');
-          return add(segment.position, multiply(subtract(canonical.metricOffset, segment.metricOffset), segment.scale ?? ONE));
+          const result = performancePositionAt(projection, position, edge);
+          if (!result.ok) throw new SyncFailure(result.diagnostic);
+          return result.value;
         });
       },
       fromPerformance(position) {
         return attempt(() => {
-          if (compare(position, ZERO) < 0 || compare(position, performanceEnd) > 0)
-            fail('out-of-range', 'Position is outside the synthetic performance.');
-          if (insertions.some(s => compare(position, s.position) >= 0 && compare(position, add(s.position, s.duration)) < 0))
-            fail('ambiguous-insertion', 'An interior synthetic hold/grace has no unique measured recording time.');
-          let result: RecordingScorePosition;
-          if (compare(position, performanceEnd) === 0) result = { ordinal: count, metricOffset: ZERO };
-          else {
-            const segment = metric.find(s => compare(position, s.position) >= 0 && compare(position, add(s.position, s.duration)) < 0);
-            if (!segment) fail('invalid-traversal', 'No metric source segment covers this synthetic position.');
-            result = { ordinal: segment.ordinal, metricOffset: add(segment.metricOffset,
-              divide(subtract(position, segment.position), segment.scale ?? ONE)) };
-          }
+          const mapped = scorePositionAt(projection, position);
+          if (!mapped.ok) throw new SyncFailure(mapped.diagnostic);
+          const result = mapped.value;
           within(coordinateAt(result));
           return result;
         });

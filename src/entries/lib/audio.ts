@@ -46,3 +46,6 @@ export {
 
 export { createRecordingSync, decodeRecordingSync, type RecordingSyncMap, type RecordingSyncLocation,
   type RecordingScorePosition, type RecordingSyncResult, type RecordingSyncDiagnostic } from '../../audio/recordingSync.ts';
+
+export type { AudioRecordingSource, ScorePosition, ScoreLoop, PlaybackCapabilities } from '../../audio/playbackBackend.ts';
+export type { PlaybackSnapshot } from '../../audio/playbackSession.ts';

@@ -93,3 +93,31 @@ it('lets the signed-in person open, tag and alias their own pieces only, and onl
   expect((await (await send('/aliases', 'DELETE', { dimension: 'artist', raw_value: 'A-Ha' })).json()).aliases).toEqual([]);
   expect((await request('/pieces?sort=sideways')).status).toBe(400);
 });
+
+it('serves owner-checked audio with native byte ranges, HEAD and private cache headers', async () => {
+  const lib = new Library(env.LIBRARY_DB, env.LIBRARY_BUCKET);
+  for (const owner of ['operator','other']) await lib.writePiece(owner, { id: owner, expected_revision: null, recordings: [
+    { id: `${owner}-audio`, kind: 'audio', mime: 'audio/wav', blob: { content: new TextEncoder().encode('0123456789') } },
+    { id: `${owner}-youtube`, kind: 'youtube', external_id: 'example' },
+  ] });
+  const path='/recordings/operator-audio/audio';
+  const full=await request(path); expect(full.status).toBe(200); expect(await full.text()).toBe('0123456789');
+  expect(full.headers.get('content-type')).toBe('audio/wav'); expect(full.headers.get('content-length')).toBe('10');
+  expect(full.headers.get('cache-control')).toContain('private'); expect(full.headers.get('cache-control')).toContain('no-store');
+  expect(full.headers.get('accept-ranges')).toBe('bytes'); expect(full.headers.get('x-content-type-options')).toBe('nosniff');
+  for (const [range,body,contentRange] of [['bytes=2-4','234','bytes 2-4/10'],['bytes=8-','89','bytes 8-9/10'],['bytes=-3','789','bytes 7-9/10'],['bytes=7-99','789','bytes 7-9/10']]) {
+    const response=await request(path,jwt,{Range:range}); expect(response.status).toBe(206); expect(await response.text()).toBe(body);
+    expect(response.headers.get('content-range')).toBe(contentRange); expect(response.headers.get('content-length')).toBe(String(body.length));
+  }
+  for (const range of ['bytes=10-','bytes=5-2','bytes=-0']) {
+    const response=await request(path,jwt,{Range:range}); expect(response.status).toBe(416); expect(response.headers.get('content-range')).toBe('bytes */10'); expect(await response.text()).toBe('');
+  }
+  const head=await app.request(`http://localhost/api/library${path}`,{method:'HEAD',headers:{'Cf-Access-Jwt-Assertion':jwt,Range:'bytes=2-4'}},env);
+  expect(head.status).toBe(200); expect(head.headers.get('content-length')).toBe('10'); expect(await head.text()).toBe('');
+  expect((await request(path,jwt,{Range:'bytes=2-4','If-Range':'old'})).status).toBe(200);
+  expect((await request(path,jwt,{Range:'bytes=0-1,4-5'})).status).toBe(200);
+  expect((await request(path,'')).status).toBe(401);
+  expect((await request('/recordings/other-audio/audio')).status).toBe(404);
+  expect((await request('/recordings/operator-youtube/audio')).status).toBe(404);
+  await env.LIBRARY_DB.prepare('UPDATE users SET active=0').run(); expect((await request(path)).status).toBe(403);
+});

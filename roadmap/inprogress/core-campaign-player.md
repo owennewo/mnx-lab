@@ -200,7 +200,7 @@ run any time before 6.
 | 14 | [Piano pack and the synth voice](../complete/core-player-piano-synth.md) | A CC0 upright piano — the first pack that spans the staff at both ends — and an oscillator worth defaulting to: harmonic spectrum, a filter that opens and closes, register-tilted level. Amplitude over time deliberately untouched, because two measured contracts depend on it. | reviewer | ear | **complete 2026-09-09; listening review pending** |
 | 13 | [Practice mode](../proposed/studio-player-practice.md) | Loop a selection — with the **written-range → performed-occurrences policy stated** — speed trainer, count-in, metronome, mute/solo. | practice | fake-clock tests | proposed — after reviewer items 1–10 |
 | 15 | [Recording sync](../complete/core-player-recording-sync.md) | Pure Soundslice decoder, sparse/inner-bar timing map, coverage and traversal compatibility. | recording playback | Node conformance fixtures | complete |
-| 16 | [Synth/audio switching](../proposed/core-player-recording-playback.md) | Shared backend interface, musical-position handoff, media-clock follow and authenticated audio reads. | recording playback | fake backends + browser media/embed checks | proposed |
+| 16 | [Synth/audio switching](../inprogress/core-player-recording-playback.md) | Shared backend interface, musical-position handoff, media-clock follow and authenticated audio reads. | recording playback | fake backends + browser media/embed checks | in progress |
 | 17 | [YouTube recordings](../proposed/core-player-youtube.md) | Visible official iframe, policy/layout lifecycle, API rates, seek and error handling. | recording playback | adapter/layout checks + live embed check | proposed |
 | 18 | [Recording attachments](../proposed/studio-recording-management.md) | Studio URL/audio attachment, sync import, upload and revision lifecycle. | recording playback | service + browser checks | proposed |
 
@@ -669,3 +669,24 @@ Item 15 landed as `b281761`; all 1,790 tests, scenario checks and production bui
 passed after rebasing onto concurrent main changes. The Node library smoke and a
 built-export sync-map check passed. Its implementation worktree was retired before
 the proposal moved to `complete/`; no human review debt was added. Item 16 is next.
+
+### 2026-09-13 — item 16: recorded audio implementation
+
+The player now delegates to a single owned backend. Synth retains Transport/NativeSink;
+recordings read the HTML media clock and never manufacture synth onsets. The common
+score-position bridge is shared with item 15, keeping swing/insertions out of media
+interpolation. A cancellation-aware session preserves musical position and playback
+intent across source changes; an ambiguous or unmapped handoff requires explicit start.
+
+Studio supplies audio rows and authenticated URLs. The Worker streams owner-checked
+R2 ranges, including HEAD/206/416 behavior. Embed hosts can supply URLs or Blobs;
+owned Blob URLs are revoked on replacement/disconnect. Part control remains a synth
+capability, and audio loops explicitly report seek semantics.
+
+Browser evidence caught two distinctions that unit clocks did not: setting the saved
+synth rate reconstructs highlights, so document initialization must finish stopped;
+and a freshly selected synth must be paused before the handoff seek to preserve a
+paused source's state. Existing browser checks also needed their old rate-select
+selector updated to the current range input. Real PCM tests now cover both embeds
+and Studio; fake media tests cover readiness and rejected-play races. See
+[the runtime contract](../../docs/player-recordings.md). YouTube remains item 17.

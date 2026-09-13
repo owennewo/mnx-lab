@@ -6,6 +6,11 @@ export interface ShownTag { dimension: string; value: string; shown: string; ori
 export type LibrarySort = 'recent' | 'title' | 'artist';
 export interface TagChange { add?: { dimension: string; value: string }[]; remove?: { dimension: string; value: string }[]; rename?: { from: { dimension: string; value: string }; to: { dimension: string; value: string } }[] }
 export interface LibraryTag { dimension: string; value: string }
+export interface LibraryRecording {
+  id: string; kind: 'audio' | 'video' | 'youtube'; name: string | null;
+  mime: string | null; duration_s: number | null; external_id: string | null; syncpoints: string | null;
+}
+export interface LibrarySnapshot { piece: { id: string; revision: number }; tags: ShownTag[]; recordings: LibraryRecording[] }
 export interface CanonicalFile { bytes: ArrayBuffer; format: string; filename: string; revision: number }
 export class LibraryRequestError extends Error {
   constructor(readonly status: number) { super(status === 401 ? 'Sign in to load your library.' : status === 403 ? 'This account is not permitted. Contact the operator.' : status === 409 ? 'This piece has no canonical file to open.' : 'The library is unavailable. You can still open local files.'); }
@@ -42,7 +47,8 @@ export class LibraryClient {
   aliases() { return this.get<{ aliases: LibraryAlias[] }>('/aliases'); }
   setAlias(dimension: string, raw: string, canonical: string) { return this.send<{ aliases: LibraryAlias[] }>('PUT', '/aliases', { dimension, raw_value: raw, canonical_value: canonical }); }
   deleteAlias(dimension: string, raw: string) { return this.send<{ aliases: LibraryAlias[] }>('DELETE', '/aliases', { dimension, raw_value: raw }); }
-  piece(id: string) { return this.get<{ snapshot: { piece: { id: string; revision: number }; tags: ShownTag[] } }>(`/pieces/${encodeURIComponent(id)}`); }
+  piece(id: string) { return this.get<{ snapshot: LibrarySnapshot }>(`/pieces/${encodeURIComponent(id)}`); }
+  recordingUrl(id: string) { return `/api/library/recordings/${encodeURIComponent(id)}/audio`; }
   pieces(tags: string[], after = '', sort: LibrarySort = 'recent') { const q = new URLSearchParams({ after, sort }); tags.forEach(t => q.append('tag', t)); return this.get<{ pieces: LibraryPiece[]; next: string | null }>(`/pieces?${q}`); }
   tags(prefix: string, dimension?: string) { const q = new URLSearchParams({ q: prefix }); if (dimension) q.set('dimension', dimension); return this.get<{ tags: LibraryFacet[] }>(`/tags?${q}`); }
   /** The canonical file as stored — a .gp for a Soundslice piece. The caller

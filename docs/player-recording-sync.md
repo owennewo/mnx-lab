@@ -122,6 +122,6 @@ conformance proves invalid input leaves rows/revision unchanged and valid option
 fields/nonsequential data survive. Existing engraving and performance goldens remain
 byte-identical; no verification record or approval obligation is added.
 
-[Item 16](../roadmap/proposed/core-player-recording-playback.md) consumes this map for
+[Item 16](../roadmap/inprogress/core-player-recording-playback.md) consumes this map for
 HTML media playback and source switching. A real media clock must drive `positionAt`;
 running the synth clock silently beside it would violate this contract.

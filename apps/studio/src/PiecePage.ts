@@ -14,7 +14,7 @@
 // and stores what it changes.
 import { LitElement, css, html, nothing } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
-import { LibraryClient, LibraryRequestError } from '../../../src/storage/libraryClient.ts';
+import { LibraryClient, LibraryRequestError, type LibrarySnapshot } from '../../../src/storage/libraryClient.ts';
 import { documentTitle, documentArtist, type MnxDocument } from '../../../src/model/mnx.ts';
 import { normalizeDisplayOptions, type DisplayOptions } from '../../../src/engine/displayOptions.ts';
 import type { RenderScale } from '../../../src/engine/render/scale.ts';
@@ -22,6 +22,7 @@ import { openLocalFile } from '../../../src/importers/localFile.ts';
 import { bindPlayback } from '../../../src/elements/playbackHost.ts';
 import { DEFAULT_DISPLAY_PREFERENCES } from '../../../src/elements/displayDefaults.ts';
 import type { DocumentViewer, ViewMode, ViewSetting } from '../../../src/elements/DocumentViewer.ts';
+import type { AudioRecordingSource } from '../../../src/audio/playbackBackend.ts';
 import type { Player } from '../../../src/elements/Player.ts';
 import type { StripChange } from '../../../src/elements/ScoreFrame.ts';
 import type { ZoomPadChange } from '../../../src/elements/ZoomPad.ts';
@@ -45,6 +46,7 @@ export class PiecePage extends LitElement {
   /** The signed-in address, for the menu; sign-out is Access's own logout. */
   @property({ type: String }) email = '';
   @state() private snapshot: TagsSnapshot | null = null;
+  @state() private recordings: readonly AudioRecordingSource[] = [];
   @state() private doc: MnxDocument | null = null;
   @state() private error = '';
   @state() private loading = true;
@@ -167,6 +169,7 @@ export class PiecePage extends LitElement {
   `;
 
   disconnectedCallback() {
+    ++this.generation;
     this.binding?.dispose();
     this.binding = null;
     super.disconnectedCallback();
@@ -187,6 +190,10 @@ export class PiecePage extends LitElement {
 
   private async load() {
     const generation = ++this.generation;
+    this.binding?.dispose(); this.binding = null;
+    this.player?.stop();
+    if (this.player) this.player.performance = null;
+    this.recordings = []; this.snapshot = null;
     this.doc = null;
     this.error = '';
     this.loading = true;
@@ -196,10 +203,11 @@ export class PiecePage extends LitElement {
       const [{ bytes, filename }, snapshot] = await Promise.all([
         this.client.canonical(this.pieceId),
         // The library's own name for the piece (its title/artist tags, as shown) outranks the file's header.
-        this.client.piece(this.pieceId).then(r => r.snapshot as TagsSnapshot, () => null),
+        this.client.piece(this.pieceId).then(r => r.snapshot, () => null),
       ]);
       if (generation !== this.generation) return;
       this.snapshot = snapshot;
+      this.setRecordings(snapshot);
       // The library remembers what was opened; the recent sort reads it. Never blocking.
       void this.client.opened(this.pieceId).catch(() => {});
       const opened = await openLocalFile(new File([bytes], filename));
@@ -233,8 +241,21 @@ export class PiecePage extends LitElement {
     return this.snapshot?.tags.find(t => t.dimension === dimension)?.shown ?? null;
   }
 
+  private setRecordings(snapshot: LibrarySnapshot | null) {
+    const recordings: AudioRecordingSource[] = (snapshot?.recordings ?? []).filter(r => r.kind === 'audio').map(r => {
+      let syncpoints: unknown = null;
+      try { syncpoints = r.syncpoints === null ? null : JSON.parse(r.syncpoints); } catch { syncpoints = r.syncpoints; }
+      return { kind: 'audio', id: r.id, name: r.name || 'Audio recording', media: this.client.recordingUrl(r.id), syncpoints };
+    });
+    if (JSON.stringify(recordings) !== JSON.stringify(this.recordings)) this.recordings = recordings;
+  }
   private async refreshSnapshot() {
-    try { this.snapshot = (await this.client.piece(this.pieceId)).snapshot as TagsSnapshot; } catch { /* keep what we have */ }
+    const generation = this.generation;
+    try {
+      const snapshot = (await this.client.piece(this.pieceId)).snapshot;
+      if (generation !== this.generation) return;
+      this.snapshot = snapshot; this.setRecordings(snapshot);
+    } catch { /* keep what we have */ }
   }
 
   // ── what the frame changes, stored per browser ──────────────────────────
@@ -362,7 +383,7 @@ export class PiecePage extends LitElement {
           .spacingMode=${this.spacingMode}
           @render-scale=${(e: CustomEvent<RenderScale>) => (this.effectiveStaffScale = e.detail.staffScale)}
         ></mnx-document-viewer>
-        <mnx-player slot="player"></mnx-player>
+        <mnx-player slot="player" .recordings=${this.recordings}></mnx-player>
       </mnx-score-frame>
       ${this.tagsOpen ? html`<mnx-studio-tags .client=${this.client} .snapshot=${this.snapshot}
         @tags-changed=${(e: CustomEvent<TagsSnapshot>) => { this.snapshot = e.detail; void this.refreshSnapshot(); }}
