@@ -1,0 +1,19 @@
+{
+  "id": "F-001-01",
+  "developmentEligible": false,
+  "disposition": "revise",
+  "parentIdentityCases": 102,
+  "reason": [
+    "overall active F1 regression",
+    "arpeggio active F1 regression",
+    "strum onset F1 regression",
+    "strum active F1 regression"
+  ],
+  "lockedAt": "2026-09-13T15:03:17.241Z",
+  "heldoutFailures": [
+    "overall active F1 regression",
+    "arpeggio active F1 regression",
+    "strum onset F1 regression",
+    "strum active F1 regression"
+  ]
+}

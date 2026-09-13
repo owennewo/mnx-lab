@@ -6,8 +6,8 @@ microphone nor claims to grade a real performer. Production cannot import it.
 
 The [fused algorithm log](fusion-log.md) is the living index of techniques, configurations
 tried, decisions and possible next experiments. Detailed records use the
-[technique template](fusion-techniques/_template.md). The current implementation still
-runs separate detector baselines; no fused configuration has been adopted yet.
+[technique template](fusion-techniques/_template.md). The bench includes separate detector baselines and an optional fused attack experiment;
+no fused configuration has been adopted as the default.
 
 ## Run
 
@@ -42,6 +42,33 @@ A quick adapter check can use `compare -- AUDIO RUN --limit=2`. The limit is rec
 that subset is not the reference comparison. Whole-file neural CPU inference takes several
 minutes for the full matrix. No paid service, native TensorFlow binary or model download
 is used: the pinned Basic Pitch npm distribution includes its model weights.
+
+## First fused iteration
+
+The [F-001 protocol](experiments/fusion-attack-protocol.md) freezes a 12-setting attack
+sweep around the unchanged harmonic parent. From the bench directory, with original
+`output/audio-v1` and `output/run-v1/results.json` preserved:
+
+```bash
+node rendering/render.mjs output/audio-fusion-heldout-v1 --fusion-heldout
+npm run fusion:attack -- output/fusion-attack-v1
+npm run fusion:export -- output/fusion-attack-v1 findings/fusion-attack-v1
+```
+
+All three commands refuse existing destinations. Set `FUSION_PARENT_RESULTS` to an
+absolute archived baseline results path if it lives elsewhere. The runner checks all
+102 parent musical outputs and decision samples against that archive. It measures three
+counterbalanced processing passes, writes a selection lock, then evaluates only the
+locked candidate and parent on held-out audio. The held-out set tests new schedules and
+pitches using existing sample packs; it is not an unseen-instrument or microphone test.
+After the first run, keep both audio directories for later ablations; rerendering creates
+a new input version. Use a fresh run/export destination for every subsequent run.
+
+Full `development-results.json` / `heldout-results.json` retain events and evaluator
+outputs. To use the existing inspector, copy one split file into a fresh directory named
+`results.json`, updating `audioDirectory` to its relative audio path. The committed export
+retains all configuration summaries and parent/selected per-case evidence; ignored full
+outputs retain all settings. Read the [fusion log](fusion-log.md) for the decision.
 
 ## What is independent
 

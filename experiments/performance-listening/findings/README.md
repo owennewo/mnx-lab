@@ -127,3 +127,9 @@ these 102 recordings as regression evidence; they are no longer an unseen test s
 we use these results to choose improvements. After that, compare score-informed following
 and a small real-guitar recording set before choosing a Studio integration. None of those
 follow-ups has been implemented or automatically filed.
+
+## First fused iteration
+
+[F-001 results](fusion-attack-v1/README.md): twelve attack-association settings and a
+locked held-out run. Repeat detection improved at ~5% extra processing, but ongoing pitch
+coverage and strums regressed. Decision: revise; unchanged harmonic parent remains default.

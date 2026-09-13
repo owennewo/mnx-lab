@@ -6,11 +6,12 @@ Living experiment index · implementation loop · started 2026-09-13.
 decision delay. Techniques earn their place through measured contribution to the whole
 listener. They may be combined, conditional, replaced or removed.
 
-**Current state:** no fused implementation or selected fusion recipe yet. The existing
-bench measures three separate detector pipelines. Those runs are starting evidence, not
-proof that combining them improves accuracy. Historical technique entries refer to that
-same reference run, not newly executed experiments or isolated component gains. CPU/latency budgets and target devices for
-accepting a fused version remain to be chosen and recorded before its acceptance run.
+**Current state:** F-000 (fixed harmonic scorer + existing two-frame gate) remains the
+default. First fused experiment F-001 is implemented but **not adopted**: all 12 settings
+failed coverage/regression checks. Repeat detection improved at ~5% extra processing;
+held-out strums and ongoing pitch coverage regressed. The provisional local budgets were
+25% extra processing and 25 ms pooled/common-match p95 increase; a target device remains
+unselected. [Measured decision and next experiment](findings/fusion-attack-v1/README.md).
 
 ## Technique index
 
@@ -20,7 +21,7 @@ accepting a fused version remain to be chosen and recorded before its acceptance
 | [Recorded templates](fusion-techniques/recorded-templates.md) | Measured baseline; parked for general use | Large timbre-transfer loss; reconsider for an explicit personalisation experiment |
 | [Neural evidence](fusion-techniques/neural-evidence.md) | Measured offline baseline; candidate | Stronger attack recovery; current CPU path is slower than real time |
 | [Temporal event tracking](fusion-techniques/temporal-events.md) | Implemented in DSP baselines; not isolated by ablation | Stable pitch presence does not establish re-strikes |
-| [Attack and re-strike evidence](fusion-techniques/attack-restrike.md) | Proposed; untried | First candidate question: distinguish new strikes from resonance |
+| [Attack and re-strike evidence](fusion-techniques/attack-restrike.md) | F-001 measured; revise | Repeat gains are insufficient when hard onset gating loses ongoing pitch coverage |
 | [Confidence gating](fusion-techniques/confidence-gating.md) | Final-event threshold curves measured; live policy untried | Precision costs coverage; final confidence is not available at initial emission |
 | [Selective extra analysis](fusion-techniques/selective-analysis.md) | Proposed; untried | Can additional evidence pay for itself only when needed? |
 
@@ -36,12 +37,14 @@ failure when a later configuration works.
 | FL-002 · 2026-09-13 | Adopt fused-listener development direction | Optimise whole-system accuracy/cost; component comparisons become diagnostics; no combined run yet |
 | FL-003 · 2026-09-13 | Start this log and structured technique records | Capture configurations and interactions so a bad setting is not mistaken for a bad technique |
 
+| FL-004 · 2026-09-13 | [F-001 attack association: AR-001/002](fusion-techniques/attack-restrike.md) | 12 settings + locked held-out run; ~5% cost, improved repeats, unacceptable pitch/strum regressions. Revise; keep F-000 default |
+
 ## Candidate next experiments
 
 These are questions, not scheduled work or new roadmap proposals.
 
-- Establish an explicit fusion recipe and target-device budget; measure its unchanged baseline.
-- Add [attack/re-strike evidence](fusion-techniques/attack-restrike.md), holding the pitch estimator fixed.
+- Isolate re-strike evidence while preserving ongoing pitch presence; the hard onset prerequisite failed in F-001.
+- Select a target device before treating the provisional local processing budget as a production budget.
 - Test [confidence gating](fusion-techniques/confidence-gating.md) using evidence available at decision time.
 - Investigate [neural runtime/decoding](fusion-techniques/neural-evidence.md) and
   [selective analysis](fusion-techniques/selective-analysis.md) if their marginal cost fits.

@@ -1,0 +1,683 @@
+{
+  "createdAt": "2026-09-13T14:56:25.841Z",
+  "revision": "e6fd8c4b1da1b469bf42f3611ed10a58f3c7566e",
+  "sourceHashes": {
+    ".gitignore": "b5726d3ec9335a09c124469eca039523847a6b0f08a083efaefd002b83326600",
+    "detectors/attack.mjs": "16390659562e536a4a30f5ab9a45837864c6ed4f48ccb67b4404817982dc86eb",
+    "detectors/attack.test.mjs": "ab37a9eb280ae2d51dd415ab9304351373421b5d94f63d11074024e9cf56af4e",
+    "detectors/neural.mjs": "5b5af3c7830aab99f13c22195639ad00138bc10bf0692d17ade6d543a460b7b5",
+    "detectors/spectral.mjs": "d961de92f3afb05299679777bcfe8801b653be23a6222ebdfc7ec89f2c9881d6",
+    "detectors/stream.mjs": "30f4fffa979c96ae2729bf8b629e3f0d19055da2e48d2e1fbc0b60bcccc069b1",
+    "detectors/stream.test.mjs": "fc955d302d7eaf9b1f7d2ba17182702a04e4c12a5e90e630213c7c62484b096f",
+    "evaluation/boundaries.mjs": "3c6385078a026991b1612bc06ade285c6cf1065ee5413dc309b82b2eafbaf258",
+    "evaluation/io.mjs": "1da35774e25653324a84b1d88a718e651928b1c3c14da616ac2e9a2bc90eb1ac",
+    "evaluation/io.test.mjs": "1023555a4614fb024ab4f11e4fa4c89345a55fe99367b9377fb7f58ebbf8311a",
+    "evaluation/metrics.mjs": "92020312db695ba76fbf8ecfb82176971541d5f885a51fa9eac7d9c4342c6beb",
+    "evaluation/metrics.test.mjs": "5967cdb02560ec6338dcfd309f8a1698e7c8423488d69e8fe247097013018a49",
+    "evaluation/render-repeat.mjs": "3580a3f1a21b41c63ecd3cf7b9922f8f3b352255fb66768426393aea56b9d669",
+    "experiments/baseline.json": "6b473f04344559140cab762a39d859efcd5592811432bee805ab22d65445b22f",
+    "experiments/compare-renders.mjs": "1c7db3f7b0af44cf3b3ab34ed2064f44f4008b1369e7fa30abcab60f119377cc",
+    "experiments/compare.mjs": "318b6aa66352c9f1c4e5646f1d86652cbad42d7027edce9639eff5f0d171037e",
+    "experiments/fusion-attack-protocol.md": "2b1699c2b9c411bb615fe51ac977d2c7871586b2e92af36ec917aa3efd5c649a",
+    "experiments/fusion-attack.json": "ec340a999e9edd89196f83096ab439c53bb08b90a06113ce035f7a6151d76363",
+    "experiments/fusion-attack.mjs": "c5d7ea06b643ec1a61af74329d694dd55858037c62c47fe832c890cffafdda08",
+    "experiments/report.mjs": "0a46470aaa79402d51811fbc4d563f45ff8b1bafabac294940b4e4d3ff99e190",
+    "fixtures/cases.mjs": "ffc2a2bad8ccf929a88a41e8fa5ec5c987b63f436fa60a67a675d3e9a335913a",
+    "fixtures/fusion-heldout.mjs": "e0ff0b5e66d166730e556a11b4b0ba894c6bcc1e5c7407394ae53cf1bbd0ed5f",
+    "fixtures/two-notes.mnx.json": "250905589cb59c98af59865dd94e3d177cbc75bd7daba4568f2192091ae5d7a4",
+    "fusion-log.md": "e73acbb056c7f91933eedd82bee496b2223ed48b4dc9365ef26d085b72721bc1",
+    "fusion-techniques/_template.md": "3408773cd10ec8de6351bbd1328805f5dbcea79355de83c53975093c746e79ad",
+    "fusion-techniques/attack-restrike.md": "6d257c7be034bc91acc6c3a3d86ecb2ffe9568e1c103b1adbd18947ed1758a9d",
+    "fusion-techniques/confidence-gating.md": "715abb9d78b418e8055194b1799a021dac788c794f829081e2f998a06c5282be",
+    "fusion-techniques/harmonic-evidence.md": "3f227f380b02355487c785e428c36d3043aa6f0f0556beb5df7a566d6b5ae077",
+    "fusion-techniques/neural-evidence.md": "d06ef7152ddaeb55c786cd7a4c447a8a765ccc34ca90bc526ff7871788d6f79b",
+    "fusion-techniques/recorded-templates.md": "2f6dc85600f6c963a11f21326bba77e5257449fe09a5fae61f80eb4ff9c554f0",
+    "fusion-techniques/selective-analysis.md": "8783592b63a92da3b0b3ab32328a6b49719df6d691f93acfd8d7398dfb9a3a9d",
+    "fusion-techniques/temporal-events.md": "b57494a53da3e14ec1f9c013a9b842ea722d3fed372b75557b06ce108b009514",
+    "inspector/index.html": "106c48262bb1837c153d904c50bd260796cc384f5c40e8b77bdef3ae40da6418",
+    "inspector/serve.mjs": "f5a9e4a2fca709818edcf80c00194f1cc6f4403126a54c2f76ad07228cce5fd5",
+    "package-lock.json": "e8489d594b0a2fe24bd2966c66f5d3115bfe71ef429e08b280008dfa7460c760",
+    "package.json": "50487dd1b170bb887a6fcf61f203adc5cc20c1b698e7cb4a26a7bfd45c800ab2",
+    "README.md": "fcdf261d50fdeeab54c585e535b6a661e06edcd3b0d7083f172a5547d510fb81",
+    "rendering/browser.mjs": "dd56a412bdb30b084c37f1995f35acc8681cd0dbbaa79a2a40f090f8e56ad293",
+    "rendering/render.mjs": "11a35068137c31d0ba7ae6e1dfccae4fe22fb8dbb8dc47066c772cb25a7ad3d8"
+  },
+  "plan": {
+    "id": "F-001",
+    "parent": "F-000",
+    "thresholds": [
+      0.15,
+      0.3,
+      0.5
+    ],
+    "refractorySeconds": [
+      0.09,
+      0.16
+    ],
+    "associationSeconds": [
+      0.035,
+      0.07
+    ],
+    "chunkSize": 256,
+    "timingRepeats": 3,
+    "budgets": {
+      "cpuRatio": 1.25,
+      "p95IncreaseSeconds": 0.025,
+      "regressionF1Drop": 0.02
+    }
+  },
+  "recipes": [
+    {
+      "id": "F-000",
+      "config": {
+        "version": 1,
+        "sampleRate": 22050,
+        "presets": [
+          "guitar",
+          "guitar2",
+          "piano"
+        ],
+        "templatePreset": "guitar",
+        "midiMin": 40,
+        "midiMax": 88,
+        "fftSize": 4096,
+        "hopSize": 256,
+        "streamChunks": [
+          256,
+          2048
+        ],
+        "attackTolerance": 0.1,
+        "pitchTolerance": 0.5,
+        "frameStep": 0.02,
+        "activityThreshold": 0.22,
+        "minFrames": 2,
+        "rmsFloor": 0.0001,
+        "templateIterations": 32,
+        "maxPolyphony": 6,
+        "seed": 0,
+        "neural": {
+          "onsetThreshold": 0.5,
+          "frameThreshold": 0.3,
+          "minNoteFrames": 5
+        },
+        "confidenceThresholds": [
+          0,
+          0.3,
+          0.5,
+          0.7,
+          0.9
+        ]
+      }
+    },
+    {
+      "id": "F-001-01",
+      "config": {
+        "version": 1,
+        "sampleRate": 22050,
+        "presets": [
+          "guitar",
+          "guitar2",
+          "piano"
+        ],
+        "templatePreset": "guitar",
+        "midiMin": 40,
+        "midiMax": 88,
+        "fftSize": 4096,
+        "hopSize": 256,
+        "streamChunks": [
+          256,
+          2048
+        ],
+        "attackTolerance": 0.1,
+        "pitchTolerance": 0.5,
+        "frameStep": 0.02,
+        "activityThreshold": 0.22,
+        "minFrames": 2,
+        "rmsFloor": 0.0001,
+        "templateIterations": 32,
+        "maxPolyphony": 6,
+        "seed": 0,
+        "neural": {
+          "onsetThreshold": 0.5,
+          "frameThreshold": 0.3,
+          "minNoteFrames": 5
+        },
+        "confidenceThresholds": [
+          0,
+          0.3,
+          0.5,
+          0.7,
+          0.9
+        ],
+        "fusion": {
+          "threshold": 0.15,
+          "refractorySeconds": 0.09,
+          "associationSeconds": 0.035
+        }
+      }
+    },
+    {
+      "id": "F-001-02",
+      "config": {
+        "version": 1,
+        "sampleRate": 22050,
+        "presets": [
+          "guitar",
+          "guitar2",
+          "piano"
+        ],
+        "templatePreset": "guitar",
+        "midiMin": 40,
+        "midiMax": 88,
+        "fftSize": 4096,
+        "hopSize": 256,
+        "streamChunks": [
+          256,
+          2048
+        ],
+        "attackTolerance": 0.1,
+        "pitchTolerance": 0.5,
+        "frameStep": 0.02,
+        "activityThreshold": 0.22,
+        "minFrames": 2,
+        "rmsFloor": 0.0001,
+        "templateIterations": 32,
+        "maxPolyphony": 6,
+        "seed": 0,
+        "neural": {
+          "onsetThreshold": 0.5,
+          "frameThreshold": 0.3,
+          "minNoteFrames": 5
+        },
+        "confidenceThresholds": [
+          0,
+          0.3,
+          0.5,
+          0.7,
+          0.9
+        ],
+        "fusion": {
+          "threshold": 0.15,
+          "refractorySeconds": 0.09,
+          "associationSeconds": 0.07
+        }
+      }
+    },
+    {
+      "id": "F-001-03",
+      "config": {
+        "version": 1,
+        "sampleRate": 22050,
+        "presets": [
+          "guitar",
+          "guitar2",
+          "piano"
+        ],
+        "templatePreset": "guitar",
+        "midiMin": 40,
+        "midiMax": 88,
+        "fftSize": 4096,
+        "hopSize": 256,
+        "streamChunks": [
+          256,
+          2048
+        ],
+        "attackTolerance": 0.1,
+        "pitchTolerance": 0.5,
+        "frameStep": 0.02,
+        "activityThreshold": 0.22,
+        "minFrames": 2,
+        "rmsFloor": 0.0001,
+        "templateIterations": 32,
+        "maxPolyphony": 6,
+        "seed": 0,
+        "neural": {
+          "onsetThreshold": 0.5,
+          "frameThreshold": 0.3,
+          "minNoteFrames": 5
+        },
+        "confidenceThresholds": [
+          0,
+          0.3,
+          0.5,
+          0.7,
+          0.9
+        ],
+        "fusion": {
+          "threshold": 0.15,
+          "refractorySeconds": 0.16,
+          "associationSeconds": 0.035
+        }
+      }
+    },
+    {
+      "id": "F-001-04",
+      "config": {
+        "version": 1,
+        "sampleRate": 22050,
+        "presets": [
+          "guitar",
+          "guitar2",
+          "piano"
+        ],
+        "templatePreset": "guitar",
+        "midiMin": 40,
+        "midiMax": 88,
+        "fftSize": 4096,
+        "hopSize": 256,
+        "streamChunks": [
+          256,
+          2048
+        ],
+        "attackTolerance": 0.1,
+        "pitchTolerance": 0.5,
+        "frameStep": 0.02,
+        "activityThreshold": 0.22,
+        "minFrames": 2,
+        "rmsFloor": 0.0001,
+        "templateIterations": 32,
+        "maxPolyphony": 6,
+        "seed": 0,
+        "neural": {
+          "onsetThreshold": 0.5,
+          "frameThreshold": 0.3,
+          "minNoteFrames": 5
+        },
+        "confidenceThresholds": [
+          0,
+          0.3,
+          0.5,
+          0.7,
+          0.9
+        ],
+        "fusion": {
+          "threshold": 0.15,
+          "refractorySeconds": 0.16,
+          "associationSeconds": 0.07
+        }
+      }
+    },
+    {
+      "id": "F-001-05",
+      "config": {
+        "version": 1,
+        "sampleRate": 22050,
+        "presets": [
+          "guitar",
+          "guitar2",
+          "piano"
+        ],
+        "templatePreset": "guitar",
+        "midiMin": 40,
+        "midiMax": 88,
+        "fftSize": 4096,
+        "hopSize": 256,
+        "streamChunks": [
+          256,
+          2048
+        ],
+        "attackTolerance": 0.1,
+        "pitchTolerance": 0.5,
+        "frameStep": 0.02,
+        "activityThreshold": 0.22,
+        "minFrames": 2,
+        "rmsFloor": 0.0001,
+        "templateIterations": 32,
+        "maxPolyphony": 6,
+        "seed": 0,
+        "neural": {
+          "onsetThreshold": 0.5,
+          "frameThreshold": 0.3,
+          "minNoteFrames": 5
+        },
+        "confidenceThresholds": [
+          0,
+          0.3,
+          0.5,
+          0.7,
+          0.9
+        ],
+        "fusion": {
+          "threshold": 0.3,
+          "refractorySeconds": 0.09,
+          "associationSeconds": 0.035
+        }
+      }
+    },
+    {
+      "id": "F-001-06",
+      "config": {
+        "version": 1,
+        "sampleRate": 22050,
+        "presets": [
+          "guitar",
+          "guitar2",
+          "piano"
+        ],
+        "templatePreset": "guitar",
+        "midiMin": 40,
+        "midiMax": 88,
+        "fftSize": 4096,
+        "hopSize": 256,
+        "streamChunks": [
+          256,
+          2048
+        ],
+        "attackTolerance": 0.1,
+        "pitchTolerance": 0.5,
+        "frameStep": 0.02,
+        "activityThreshold": 0.22,
+        "minFrames": 2,
+        "rmsFloor": 0.0001,
+        "templateIterations": 32,
+        "maxPolyphony": 6,
+        "seed": 0,
+        "neural": {
+          "onsetThreshold": 0.5,
+          "frameThreshold": 0.3,
+          "minNoteFrames": 5
+        },
+        "confidenceThresholds": [
+          0,
+          0.3,
+          0.5,
+          0.7,
+          0.9
+        ],
+        "fusion": {
+          "threshold": 0.3,
+          "refractorySeconds": 0.09,
+          "associationSeconds": 0.07
+        }
+      }
+    },
+    {
+      "id": "F-001-07",
+      "config": {
+        "version": 1,
+        "sampleRate": 22050,
+        "presets": [
+          "guitar",
+          "guitar2",
+          "piano"
+        ],
+        "templatePreset": "guitar",
+        "midiMin": 40,
+        "midiMax": 88,
+        "fftSize": 4096,
+        "hopSize": 256,
+        "streamChunks": [
+          256,
+          2048
+        ],
+        "attackTolerance": 0.1,
+        "pitchTolerance": 0.5,
+        "frameStep": 0.02,
+        "activityThreshold": 0.22,
+        "minFrames": 2,
+        "rmsFloor": 0.0001,
+        "templateIterations": 32,
+        "maxPolyphony": 6,
+        "seed": 0,
+        "neural": {
+          "onsetThreshold": 0.5,
+          "frameThreshold": 0.3,
+          "minNoteFrames": 5
+        },
+        "confidenceThresholds": [
+          0,
+          0.3,
+          0.5,
+          0.7,
+          0.9
+        ],
+        "fusion": {
+          "threshold": 0.3,
+          "refractorySeconds": 0.16,
+          "associationSeconds": 0.035
+        }
+      }
+    },
+    {
+      "id": "F-001-08",
+      "config": {
+        "version": 1,
+        "sampleRate": 22050,
+        "presets": [
+          "guitar",
+          "guitar2",
+          "piano"
+        ],
+        "templatePreset": "guitar",
+        "midiMin": 40,
+        "midiMax": 88,
+        "fftSize": 4096,
+        "hopSize": 256,
+        "streamChunks": [
+          256,
+          2048
+        ],
+        "attackTolerance": 0.1,
+        "pitchTolerance": 0.5,
+        "frameStep": 0.02,
+        "activityThreshold": 0.22,
+        "minFrames": 2,
+        "rmsFloor": 0.0001,
+        "templateIterations": 32,
+        "maxPolyphony": 6,
+        "seed": 0,
+        "neural": {
+          "onsetThreshold": 0.5,
+          "frameThreshold": 0.3,
+          "minNoteFrames": 5
+        },
+        "confidenceThresholds": [
+          0,
+          0.3,
+          0.5,
+          0.7,
+          0.9
+        ],
+        "fusion": {
+          "threshold": 0.3,
+          "refractorySeconds": 0.16,
+          "associationSeconds": 0.07
+        }
+      }
+    },
+    {
+      "id": "F-001-09",
+      "config": {
+        "version": 1,
+        "sampleRate": 22050,
+        "presets": [
+          "guitar",
+          "guitar2",
+          "piano"
+        ],
+        "templatePreset": "guitar",
+        "midiMin": 40,
+        "midiMax": 88,
+        "fftSize": 4096,
+        "hopSize": 256,
+        "streamChunks": [
+          256,
+          2048
+        ],
+        "attackTolerance": 0.1,
+        "pitchTolerance": 0.5,
+        "frameStep": 0.02,
+        "activityThreshold": 0.22,
+        "minFrames": 2,
+        "rmsFloor": 0.0001,
+        "templateIterations": 32,
+        "maxPolyphony": 6,
+        "seed": 0,
+        "neural": {
+          "onsetThreshold": 0.5,
+          "frameThreshold": 0.3,
+          "minNoteFrames": 5
+        },
+        "confidenceThresholds": [
+          0,
+          0.3,
+          0.5,
+          0.7,
+          0.9
+        ],
+        "fusion": {
+          "threshold": 0.5,
+          "refractorySeconds": 0.09,
+          "associationSeconds": 0.035
+        }
+      }
+    },
+    {
+      "id": "F-001-10",
+      "config": {
+        "version": 1,
+        "sampleRate": 22050,
+        "presets": [
+          "guitar",
+          "guitar2",
+          "piano"
+        ],
+        "templatePreset": "guitar",
+        "midiMin": 40,
+        "midiMax": 88,
+        "fftSize": 4096,
+        "hopSize": 256,
+        "streamChunks": [
+          256,
+          2048
+        ],
+        "attackTolerance": 0.1,
+        "pitchTolerance": 0.5,
+        "frameStep": 0.02,
+        "activityThreshold": 0.22,
+        "minFrames": 2,
+        "rmsFloor": 0.0001,
+        "templateIterations": 32,
+        "maxPolyphony": 6,
+        "seed": 0,
+        "neural": {
+          "onsetThreshold": 0.5,
+          "frameThreshold": 0.3,
+          "minNoteFrames": 5
+        },
+        "confidenceThresholds": [
+          0,
+          0.3,
+          0.5,
+          0.7,
+          0.9
+        ],
+        "fusion": {
+          "threshold": 0.5,
+          "refractorySeconds": 0.09,
+          "associationSeconds": 0.07
+        }
+      }
+    },
+    {
+      "id": "F-001-11",
+      "config": {
+        "version": 1,
+        "sampleRate": 22050,
+        "presets": [
+          "guitar",
+          "guitar2",
+          "piano"
+        ],
+        "templatePreset": "guitar",
+        "midiMin": 40,
+        "midiMax": 88,
+        "fftSize": 4096,
+        "hopSize": 256,
+        "streamChunks": [
+          256,
+          2048
+        ],
+        "attackTolerance": 0.1,
+        "pitchTolerance": 0.5,
+        "frameStep": 0.02,
+        "activityThreshold": 0.22,
+        "minFrames": 2,
+        "rmsFloor": 0.0001,
+        "templateIterations": 32,
+        "maxPolyphony": 6,
+        "seed": 0,
+        "neural": {
+          "onsetThreshold": 0.5,
+          "frameThreshold": 0.3,
+          "minNoteFrames": 5
+        },
+        "confidenceThresholds": [
+          0,
+          0.3,
+          0.5,
+          0.7,
+          0.9
+        ],
+        "fusion": {
+          "threshold": 0.5,
+          "refractorySeconds": 0.16,
+          "associationSeconds": 0.035
+        }
+      }
+    },
+    {
+      "id": "F-001-12",
+      "config": {
+        "version": 1,
+        "sampleRate": 22050,
+        "presets": [
+          "guitar",
+          "guitar2",
+          "piano"
+        ],
+        "templatePreset": "guitar",
+        "midiMin": 40,
+        "midiMax": 88,
+        "fftSize": 4096,
+        "hopSize": 256,
+        "streamChunks": [
+          256,
+          2048
+        ],
+        "attackTolerance": 0.1,
+        "pitchTolerance": 0.5,
+        "frameStep": 0.02,
+        "activityThreshold": 0.22,
+        "minFrames": 2,
+        "rmsFloor": 0.0001,
+        "templateIterations": 32,
+        "maxPolyphony": 6,
+        "seed": 0,
+        "neural": {
+          "onsetThreshold": 0.5,
+          "frameThreshold": 0.3,
+          "minNoteFrames": 5
+        },
+        "confidenceThresholds": [
+          0,
+          0.3,
+          0.5,
+          0.7,
+          0.9
+        ],
+        "fusion": {
+          "threshold": 0.5,
+          "refractorySeconds": 0.16,
+          "associationSeconds": 0.07
+        }
+      }
+    }
+  ],
+  "environment": {
+    "node": "v22.22.1",
+    "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+    "platform": "linux",
+    "arch": "x64"
+  }
+}
