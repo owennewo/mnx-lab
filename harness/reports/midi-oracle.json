@@ -14252,7 +14252,7 @@
         "finding": "The derived MusicXML contains separate notation and TAB parts and MuseScore plays both, duplicating attacks. The MNX compiler plays the single-source score. No blanket pitch deduplication is applied.",
         "evidence": "MusicXML notation/TAB part split and raw MIDI duplicate pitch multiplicities."
       },
-      "inputSha256": "bd5113ea9288ecd0ddbe74429fa4680bc09d678476c689cafd41d57f67b2e63b",
+      "inputSha256": "9fc031fb970e7e76b9f2831a645bf39b43daff481e936b61f6d58b6ca19d4b2d",
       "mnxSha256": "71a4509bee0d4012b164b6417b78ded12de63650b4e0c0d940c39a6de716c870",
       "externalMidiSha256": "eea12132eef909ea4f2b2f945d52bdd2c9d7a24db3717acbf211d26cc02c8c1b",
       "external": {

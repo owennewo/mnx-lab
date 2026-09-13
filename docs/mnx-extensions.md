@@ -415,7 +415,8 @@ work around it; both are gone.
 | `<other-technical>palm-mute</other-technical>` | `Note.isPalmMute` | `technique.palmMute` |
 | `<technical><fingering>` | — | `fingering` |
 | `<direction-type><rehearsal>` | `MasterBar.section.marker` | `rehearsal.label` (standard, proposed) |
-| `<direction-type><words>` | `MasterBar.section.text` | `section.label` (standard, proposed) |
+| bold `<direction-type><words>` at the head of a bar | `MasterBar.section.text` | `section.label` (standard, proposed) |
+| any other `<direction-type><words>` (`placement`, `<staff>`) | `Beat.freeText` that is not a chord symbol (always above) | part-measure `directions[].text` (standard, proposed) |
 | `<harmony>` | `Beat.text` / `Beat.chord.name` | `harmonies[]` |
 | `<work-title>` | `<Title>` | `work.title` |
 | `<movement-title>` / `<credit credit-type="subtitle">` | `<SubTitle>` | `work.subtitle` |

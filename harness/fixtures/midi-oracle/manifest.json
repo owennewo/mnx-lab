@@ -253,7 +253,7 @@
       "id": "converter/Sun-did-glide",
       "xml": "converters/fixtures/Sun-did-glide.xml",
       "mnx": "converters/fixtures/Sun-did-glide.mnx.json",
-      "inputSha256": "bd5113ea9288ecd0ddbe74429fa4680bc09d678476c689cafd41d57f67b2e63b",
+      "inputSha256": "9fc031fb970e7e76b9f2831a645bf39b43daff481e936b61f6d58b6ca19d4b2d",
       "midi": "converter--Sun-did-glide.mid",
       "midiSha256": "eea12132eef909ea4f2b2f945d52bdd2c9d7a24db3717acbf211d26cc02c8c1b"
     },

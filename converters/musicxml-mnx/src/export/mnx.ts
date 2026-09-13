@@ -594,7 +594,8 @@ export function exportMusicXML(
 
       // Rehearsal mark and section name. MusicXML has `<rehearsal>` for the
       // index; the formal section name has no element of its own and goes in
-      // `<words>` of the same direction.
+      // BOLD `<words>` of the same direction — the importer reads plain words
+      // as a part direction, so the weight is what brings a section back.
       const rehearsal = globalM.rehearsal;
       const section = globalM.section;
       if (rehearsal || section) {
@@ -608,6 +609,7 @@ export function exportMusicXML(
         }
         if (section) {
           const wordsEl = doc.createElement('words');
+          wordsEl.setAttribute('font-weight', 'bold');
           wordsEl.textContent = section.label;
           typeEl.appendChild(wordsEl);
         }
@@ -734,6 +736,41 @@ export function exportMusicXML(
         if (direction.offset !== 0) {
           const offsetEl = doc.createElement('offset');
           offsetEl.textContent = `${direction.offset}`;
+          directionEl.appendChild(offsetEl);
+        }
+        if (direction.staff !== undefined) {
+          const staffEl = doc.createElement('staff');
+          staffEl.textContent = `${direction.staff}`;
+          directionEl.appendChild(staffEl);
+        }
+        measureEl.appendChild(directionEl);
+      }
+
+      // Text directions → plain `<words>`, on the same part as the dynamics.
+      for (const direction of source?.measures[m]?.directions ?? []) {
+        const where = `measure ${m + 1}`;
+        if (!direction.text) {
+          warn(`${where}: a symbolic direction (${(direction.glyphs ?? []).join(' ')}) has no MusicXML words and was not written.`);
+          continue;
+        }
+        const unwritten = (['voice', 'color'] as const).filter(key => direction[key] !== undefined);
+        if (direction.orient === 'between' || direction.orient === 'auto') unwritten.push('orient' as never);
+        if (unwritten.length) {
+          warn(`${where}: a direction's ${unwritten.join(', ')} has no MusicXML equivalent here and was not written.`);
+        }
+        const directionEl = doc.createElement('direction');
+        if (direction.orient === 'above' || direction.orient === 'below') {
+          directionEl.setAttribute('placement', direction.orient);
+        }
+        const typeEl = doc.createElement('direction-type');
+        const wordsEl = doc.createElement('words');
+        wordsEl.textContent = direction.text;
+        typeEl.appendChild(wordsEl);
+        directionEl.appendChild(typeEl);
+        const offset = offsetOf(direction.position.fraction);
+        if (offset !== 0) {
+          const offsetEl = doc.createElement('offset');
+          offsetEl.textContent = `${offset}`;
           directionEl.appendChild(offsetEl);
         }
         if (direction.staff !== undefined) {

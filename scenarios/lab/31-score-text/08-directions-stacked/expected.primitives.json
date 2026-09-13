@@ -164,7 +164,7 @@
         "x": 12.1,
         "y": 5.6,
         "font": "bodyItalic",
-        "size": 1.5,
+        "size": 1.25,
         "anchor": "middle",
         "className": "direction"
       },
@@ -174,7 +174,7 @@
         "x": 12.1,
         "y": 3.7,
         "font": "bodyItalic",
-        "size": 1.5,
+        "size": 1.25,
         "anchor": "middle",
         "className": "direction"
       },
@@ -184,7 +184,7 @@
         "x": 12.1,
         "y": 16.2,
         "font": "bodyItalic",
-        "size": 1.5,
+        "size": 1.25,
         "anchor": "middle",
         "className": "direction"
       },
@@ -194,7 +194,7 @@
         "x": 12.1,
         "y": 18.1,
         "font": "bodyItalic",
-        "size": 1.5,
+        "size": 1.25,
         "anchor": "middle",
         "className": "direction"
       }

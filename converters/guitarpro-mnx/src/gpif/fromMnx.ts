@@ -443,6 +443,7 @@ function buildTrackBars(
     const global = mnx.global?.measures?.[index];
     const harmonyText =
       trackIndex === 0 ? harmonyTextByOnset(global?._x?.mnxLab?.harmonies) : undefined;
+    const beatText = beatTextByOnset(measure?.directions, harmonyText, index, warn);
 
     for (const [voiceIndex, sequence] of sequences.entries()) {
       const voiceId = pools.voices.length;
@@ -464,7 +465,7 @@ function buildTrackBars(
         pools,
         lyricLineOrder,
         suppressed,
-        voiceIndex === 0 ? harmonyText : undefined,
+        voiceIndex === 0 ? beatText : undefined,
         noteIdsByMnxId,
         hammerTargets,
         warn,
@@ -583,6 +584,48 @@ function arpeggiosByEnd(arpeggios: MnxArpeggio[] | undefined): Map<string, MnxAr
     byEnd.set(arpeggio.span.end, arpeggio);
   }
   return byEnd;
+}
+
+/**
+ * A part measure's text directions, then the chord symbols, as one `FreeText`
+ * per onset — Guitar Pro holds a single text on a beat and gives it no
+ * placement, so a direction comes back drawn above, and a chord on the same
+ * beat wins it.
+ */
+function beatTextByOnset(
+  directions: import('../common/types.js').MnxDirection[] | undefined,
+  harmonyText: Map<string, string> | undefined,
+  measureIndex: number,
+  warn: (message: string) => void
+): Map<string, string> | undefined {
+  const where = `measure ${measureIndex + 1}`;
+  const map = new Map<string, string>();
+  for (const direction of directions ?? []) {
+    if (!direction.text) {
+      warn(`${where}: a symbolic direction (${(direction.glyphs ?? []).join(' ')}) has no Guitar Pro equivalent and was not written.`);
+      continue;
+    }
+    const unwritten: string[] = (['staff', 'voice', 'color'] as const).filter(key => direction[key] !== undefined);
+    if (direction.orient !== undefined && direction.orient !== 'above') unwritten.push('orient');
+    if (unwritten.length) {
+      warn(`${where}: a direction's ${unwritten.join(', ')} has no Guitar Pro equivalent and was not written.`);
+    }
+    const [numerator, denominator] = direction.position.fraction;
+    const [n, d] = wholesToFraction(numerator / denominator);
+    const key = `${n}/${d}`;
+    if (map.has(key)) {
+      warn(`${where}: "${direction.text}" shares a beat with "${map.get(key)}"; Guitar Pro holds one text per beat, and kept the first.`);
+      continue;
+    }
+    map.set(key, direction.text);
+  }
+  for (const [key, chord] of harmonyText ?? []) {
+    if (map.has(key)) {
+      warn(`${where}: "${map.get(key)}" shares a beat with the chord ${chord}; Guitar Pro holds one text per beat, and kept the chord.`);
+    }
+    map.set(key, chord);
+  }
+  return map.size ? map : undefined;
 }
 
 function buildVoiceBeats(

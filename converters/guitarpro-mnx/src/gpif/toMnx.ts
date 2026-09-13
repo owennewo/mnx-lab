@@ -16,6 +16,7 @@ import {
   MnxDynamic,
   MnxDynamicValue,
   MnxArpeggio,
+  MnxDirection,
   MnxEventMarkings
 } from '../common/types.js';
 import { parseChordSymbol } from '../common/harmony.js';
@@ -303,7 +304,10 @@ function applyHarmonies(doc: GpifDocument, measures: MnxGlobalMeasure[]): void {
           const rhythm = doc.rhythms.get(beat.rhythmRef);
 
           const chordName = beat.chordId !== null ? track.chordNames.get(beat.chordId) : undefined;
-          const symbol = chordName?.trim() || beat.freeText?.trim() || '';
+          const freeText = beat.freeText?.trim() ?? '';
+          // A diagram's name is a chord whatever it says; bare free text only
+          // when it spells one — otherwise it is a direction (buildSequence).
+          const symbol = chordName?.trim() || (spellsChord(freeText) ? freeText : '');
           const parsed = symbol ? parseChordSymbol(symbol) : null;
           if (parsed) {
             const fraction = onset;
@@ -331,6 +335,16 @@ function applyHarmonies(doc: GpifDocument, measures: MnxGlobalMeasure[]): void {
     );
     measure._x = { ...measure._x, mnxLab: { ...measure._x?.mnxLab, harmonies } };
   }
+}
+
+/**
+ * Does bare free text spell a chord symbol? `parseChordSymbol` never refuses —
+ * "Verse 1-4" comes back as an `other` chord — so the test is structural: a
+ * root and a quality the suffix table names, or N.C. Anything less is text.
+ */
+function spellsChord(text: string): boolean {
+  const parsed = text ? parseChordSymbol(text) : null;
+  return parsed !== null && (parsed.quality === 'none' || (parsed.root !== undefined && parsed.quality !== 'other'));
 }
 
 function buildPart(
@@ -362,7 +376,7 @@ function buildPart(
   for (const [measureIndex, masterBar] of doc.masterBars.entries()) {
     const fifths = fifthsByMeasure[measureIndex] ?? 0;
     const measure: MnxPartMeasure = { sequences: [] };
-    const marks: MeasureMarks = { dynamics: [], arpeggios: [] };
+    const marks: MeasureMarks = { dynamics: [], arpeggios: [], directions: [] };
 
     const bar = doc.bars.get(masterBar.barIds[trackIndex] ?? -1);
 
@@ -416,6 +430,7 @@ function buildPart(
       a.position.fraction[0] / a.position.fraction[1] - b.position.fraction[0] / b.position.fraction[1];
     if (marks.dynamics.length) measure.dynamics = marks.dynamics.sort(byPosition);
     if (marks.arpeggios.length) measure.arpeggios = marks.arpeggios.sort(byPosition);
+    if (marks.directions.length) measure.directions = marks.directions.sort(byPosition);
 
     measures.push(measure);
   }
@@ -471,6 +486,7 @@ interface SlurState {
 interface MeasureMarks {
   dynamics: MnxDynamic[];
   arpeggios: MnxArpeggio[];
+  directions: MnxDirection[];
 }
 
 function buildSequence(
@@ -583,6 +599,18 @@ function buildSequence(
         voice.partDynamic.current = beat.dynamic;
       }
       voice.dynamic.last = beat.dynamic;
+    }
+
+    // A beat's free text is a chord symbol when it spells one and no diagram
+    // names the chord (applyHarmonies); anything else — "Intro", "Verse 1-4",
+    // "let ring" — is text over the staff. Guitar Pro gives it no placement,
+    // and it draws above.
+    const freeText = beat.freeText?.trim();
+    if (freeText) {
+      const chordName = beat.chordId !== null ? track.chordNames.get(beat.chordId)?.trim() : undefined;
+      if (chordName || !spellsChord(freeText)) {
+        voice.marks.directions.push({ position: { fraction: at }, text: freeText, orient: 'above' });
+      }
     }
 
     if (beat.arpeggio && event.notes && event.notes.length > 1) {

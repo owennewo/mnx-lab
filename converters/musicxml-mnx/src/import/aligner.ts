@@ -375,6 +375,17 @@ export class Aligner {
     wedge?: { type: string; number: string };
   }[] = [];
 
+  /** Free `<words>` — neither a section name nor a jump's caption — in
+   *  document order, for `directions` on the part measure. */
+  private textMarks: {
+    measureIndex: number;
+    position: number;
+    divisions: number;
+    staff?: number;
+    orient?: 'above' | 'below';
+    text: string;
+  }[] = [];
+
   private harmonyMarks: {
     measureIndex: number;
     /** Position within the measure, in MusicXML divisions (per quarter note). */
@@ -589,6 +600,53 @@ export class Aligner {
         }
       }
     }
+  }
+
+  /**
+   * `<words>` inside a `<direction>` → a text direction. Skipped: a jump's
+   * printed caption (the jump is the fact), words riding with a metronome mark
+   * (the tempo's own text), and bold words at the head of the bar, which the
+   * measure pass has already read as a section name.
+   */
+  private collectDirectionWords(
+    directionEl: Element,
+    measureIndex: number,
+    position: number,
+    state: AttributeState,
+    headOfMeasure: boolean
+  ): void {
+    if (this.classifyJumpDirection(directionEl)) return;
+    const staff = state.staves > 1 ? (getChildInt(directionEl, 'staff') ?? undefined) : undefined;
+    const placement = directionEl.getAttribute('placement');
+    const orient = placement === 'above' || placement === 'below' ? placement : undefined;
+    const types = findDirectChildren(directionEl, 'direction-type');
+    if (types.some(typeEl => findDirectChild(typeEl, 'metronome'))) return;
+    for (const [index, typeEl] of types.entries()) {
+      for (const [wordsIndex, wordsEl] of findDirectChildren(typeEl, 'words').entries()) {
+        const text = wordsEl.textContent ?? '';
+        if (!text.trim()) continue;
+        const section = headOfMeasure && index === 0 && wordsIndex === 0 && wordsEl.getAttribute('font-weight') === 'bold';
+        if (section) continue;
+        this.textMarks.push({ measureIndex, position, divisions: state.divisions, staff, orient, text });
+      }
+    }
+  }
+
+  /** Text directions → `directions` on the part measure, in time order. */
+  private resolveTextDirections(measures: MnxPartMeasure[]): void {
+    for (const mark of this.textMarks) {
+      const measure = measures[mark.measureIndex];
+      if (!measure) continue;
+      (measure.directions ??= []).push({
+        position: { fraction: reduceFraction(mark.position, mark.divisions * 4) },
+        text: mark.text,
+        ...(mark.orient ? { orient: mark.orient } : {}),
+        ...(mark.staff ? { staff: mark.staff } : {})
+      });
+    }
+    const at = (d: { position: { fraction: [number, number] } }) => d.position.fraction[0] / d.position.fraction[1];
+    for (const measure of measures) measure.directions?.sort((a, b) => at(a) - at(b));
+    this.textMarks = [];
   }
 
   /** One `<dynamics>` element — from a `<direction>` or a note's `<notations>`. */
@@ -1416,6 +1474,12 @@ export class Aligner {
       // The two are separate objects, not one: `<rehearsal>` is an index into
       // the score, `<words>` here names a formal unit of the piece. See
       // docs/mnx-extensions.md §labels.
+      //
+      // MusicXML has no section element, so plain `<words>` cannot tell a
+      // section name from any other text ("Verse 1-4" over a volta, "let
+      // ring"). Only BOLD words at the head of a bar are read as a section —
+      // what this converter's own exporter writes; everything else is a part
+      // direction (collectDirectionWords).
       for (const child of Array.from(mEl.childNodes)) {
         if (child.nodeType !== 1) continue;
         const el = child as Element;
@@ -1428,7 +1492,9 @@ export class Aligner {
         // not the name of a formal section.
         if (this.classifyJumpDirection(el)) continue;
         const marker = getChildText(typeEl, 'rehearsal');
-        const sectionText = getChildText(typeEl, 'words');
+        const sectionText = findDirectChild(typeEl, 'words')?.getAttribute('font-weight') === 'bold'
+          ? getChildText(typeEl, 'words')
+          : null;
         if (marker) globalM.rehearsal = { label: marker };
         if (sectionText) globalM.section = { label: sectionText };
       }
@@ -1553,6 +1619,7 @@ export class Aligner {
     this.resolveJumps(globalMeasures);
     this.resolveOttavas(measures, globalMeasures);
     this.resolveDynamics(measures, globalMeasures);
+    this.resolveTextDirections(measures);
 
     const labExtension: any = {};
     if (state.tuning) {
@@ -1651,11 +1718,15 @@ export class Aligner {
     /** Which staff each event was written on, for multi-staff parts. */
     const eventStaves = new Map<MnxEvent, number>();
 
+    // Whether a note has been read yet: bold words before it are a section name.
+    let seenNote = false;
+
     // We iterate through XML child nodes to preserve exact document order
     for (let i = 0; i < measureEl.childNodes.length; i++) {
       const node = measureEl.childNodes[i];
       if (node.nodeType !== 1) continue;
       const el = node as Element;
+      if (el.tagName === 'note') seenNote = true;
 
       if (el.tagName === 'direction') {
         const shiftEl = findDirectChild(
@@ -1681,6 +1752,13 @@ export class Aligner {
           measureIdx,
           currentTime + (getChildInt(el, 'offset') || 0),
           state
+        );
+        this.collectDirectionWords(
+          el,
+          measureIdx,
+          currentTime + (getChildInt(el, 'offset') || 0),
+          state,
+          !seenNote
         );
         const kind = this.classifyJumpDirection(el);
         if (kind) {
@@ -2115,6 +2193,10 @@ export class Aligner {
       const tabDynamics = tabPart.measures[m].dynamics;
       if (tabDynamics?.length && !standardPart.measures[m].dynamics?.length) {
         standardPart.measures[m].dynamics = tabDynamics;
+      }
+      const tabDirections = tabPart.measures[m].directions;
+      if (tabDirections?.length && !standardPart.measures[m].directions?.length) {
+        standardPart.measures[m].directions = tabDirections;
       }
     }
 

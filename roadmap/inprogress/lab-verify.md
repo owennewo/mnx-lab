@@ -1235,3 +1235,30 @@ smaller than before but still reads above the tempo text, and a rehearsal box st
 its letter (the box is sized from the same constant). In `10-labels-on-a-tab-staff` the
 labels sit clear of the tab staff's capo and technique ink on all three projections.
 Nothing else on these pages should have moved.
+
+## Free text is text: plain words become directions, at the lyric size — 2026-09-13
+
+Owner: no roadmap doc — a direct fix from *Needle of Death*, whose "Verse 1-4" over a
+volta is Soundslice "outer text": plain MusicXML `<words>`, Guitar Pro beat free text.
+The MusicXML importer read every head-of-bar `<words>` as a **section** (bold, big) and
+the Guitar Pro importer read free text as an `other` **chord symbol**. Now:
+
+- MusicXML: only **bold** `<words>` at the head of a bar is a section (what our exporter
+  writes — `converters/fixtures/Sun-did-glide.xml` re-derived to match); every other
+  `<words>` is a part `directions[]` entry with its placement, onset and staff. The
+  exporter writes directions back as plain `<words>`.
+- Guitar Pro: free text is a chord only when it spells one (a root and a named quality,
+  or N.C.); anything else is a direction drawn above. The exporter writes text
+  directions back as beat `FreeText`.
+- Engine: direction text drops from 1.5sp to the lyric size, 1.25sp (`DIRECTION_SIZE_SP`).
+
+Five goldens moved, size only: `lab/31-score-text/04-directions` and
+`08-directions-stacked` (**both were verified — demoted by this change**), and
+`06-directions-across-parts`, `07-directions-multi-staff`,
+`lab/40-navigation/02-repeats-and-marks-on-tab` (rendered).
+
+**What a reviewer should look for.** Every italic direction ("Play 8x", "rit.", "R.H.",
+"cantabile", the stacked four) reads at the size of lyric syllables and fret digits —
+smaller than the tempo text, clearly smaller than a bold section name. Stacked directions
+in `08` still clear one another and the staff; `between` text in `07` still sits midway
+between the staves; on the tab staff in `40-navigation/02` the text clears the digits.

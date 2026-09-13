@@ -4,7 +4,7 @@ import type { PerformedEntry } from '../../model/passes.ts';
 import { clearanceSpacing, type ClearanceSpacing } from '../clearance.ts';
 import { emitMultirest } from './multirest.ts';
 import { measureHeadingX, repeatStartSuppliesBarline, instrumentLabelInset, LABEL_CHAR_SP, LABEL_PAD_SP } from './spacing.ts';
-import { selectedLyricLineIds } from './lyricRuns.ts';
+import { LYRIC_SIZE_SP, selectedLyricLineIds } from './lyricRuns.ts';
 import { displayedMeasureNumbers, instrumentName, normalizeDisplayOptions, type DisplayOptions } from '../displayOptions.ts';
 import { MnxStructure, MnxEvent, MnxNote, MnxEventMarkings, MnxGrace, MnxLayoutContent, MnxPart, MnxPartMeasure, MnxSequence, MnxTremolo, MnxTuplet, isGrace, isTremolo, isTuplet, isTimedEvent, sequenceItemKind } from '../../model/mnx.ts';
 import { emitMeasureDiagnostics, emitPositionedDiagnostics, MeasureIssue } from './diagnostics.ts';
@@ -324,7 +324,9 @@ const DYNAMIC_BASELINE_DROP_SP = 3.5; // glyph baseline below the bottom staff l
 // typing them: a rehearsal mark reads as the outermost index, the section name
 // sits under it, and part-level text sits closest to the notes. Nothing in the
 // document says so.
-const DIRECTION_SIZE_SP = 1.5;
+// Free text reads at the words' size, the lyric's: "Verse 1-4" or "let ring"
+// is an instruction beside the music, not a heading over it.
+const DIRECTION_SIZE_SP = LYRIC_SIZE_SP;
 const DIRECTION_RISE_SP = 2.4; // baseline above the staff's top line
 const DIRECTION_DROP_SP = 4.2; // baseline below the staff's bottom line, clearing a ledger note
 const DIRECTION_STACK_SP = 1.9; // extra offset per coincident direction
