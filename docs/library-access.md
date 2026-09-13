@@ -105,3 +105,15 @@ with no canonical answers 409. The service converts nothing: the shells run the 
 worker on those bytes (`src/importers/`). Nothing derived is stored and no converter version
 is pinned; a converter change needs no deploy and no sweep. Reading changes no canonical
 pointer or stored blob.
+
+## Part names
+
+The derived `part` dimension contains each distinct `parts[].name` from the validated
+canonical Guitar Pro conversion. It describes part labels, not inferred instruments:
+`Track 1`, `Lyrics`, and `Steel Guitar` remain as written. Missing or blank Guitar Pro
+track names import as `unknown`. Multiple parts can give a piece multiple `part` tags;
+repeated names produce one tag. Studio exposes Part in the browse rail and Tag aliases
+for correcting displayed labels without editing source names. Re-ingest the cache after
+a converter update to refresh these tags; original-upload and MusicXML part names do
+not override the canonical score. As with other converted facts, a conversion that fails
+validation contributes no Part tags.

@@ -5,9 +5,9 @@ import type { MnxEvent } from '../src/common/types.js';
 
 // Independently authored GPIF, not an alphaTab export or a converter round trip.
 function score(options: { slots?: string; voices?: string; beats?: string;
-  notes?: string; rhythms?: string } = {}) {
+  notes?: string; rhythms?: string; trackName?: string | null } = {}) {
   return writeGpContainer(`<GPIF>
-    <Tracks><Track id="0"><Name>Guitar</Name><Properties>
+    <Tracks><Track id="0">${options.trackName === null ? '' : `<Name>${options.trackName ?? 'Guitar'}</Name>`}<Properties>
       <Property name="Tuning"><Pitches>40 45 50 55 59 64</Pitches></Property>
     </Properties></Track></Tracks>
     <MasterBars><MasterBar><Time>4/4</Time><Bars>0</Bars></MasterBar></MasterBars>
@@ -145,4 +145,11 @@ it('preserves beat-authored lyrics on rests in their actual voice', () => {
     beats: '<Beat id="0"><Rhythm ref="0"/><Lyrics><Line>word</Line></Lyrics></Beat>' }));
   expect(result[0].voice).toBe('v2');
   expect(result[0].content[0]).toMatchObject({ rest: {}, lyrics: { lines: { '1': { text: 'word' } } } });
+});
+
+it.each([null, '', '   '])('imports an absent or blank track name (%j) as unknown', trackName => {
+  expect(importGuitarPro(score({ trackName })).parts[0].name).toBe('unknown');
+});
+it.each(['Ukulele', 'Track 1', 'Piste 1', 'Lyrics'])('preserves the authored part label %s', trackName => {
+  expect(importGuitarPro(score({ trackName })).parts[0].name).toBe(trackName);
 });

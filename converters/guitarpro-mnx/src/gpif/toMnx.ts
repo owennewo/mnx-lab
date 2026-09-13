@@ -428,7 +428,7 @@ function buildPart(
   const transposition = gpTranspositionToMnx(track.transpositionPitch);
   const part: MnxPart = {
     id: `P${trackIndex + 1}`,
-    name: track.name || 'Guitar',
+    name: track.name.trim() || 'unknown',
     measures,
     ...(transposition ? { transposition } : {})
   };

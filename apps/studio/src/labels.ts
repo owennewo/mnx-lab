@@ -1,10 +1,10 @@
 // Small shared vocabulary for the library shell: how a dimension is named in
 // the rail, which ones the rail hides, and how a time reads to a person.
 export const DIMENSION_LABELS: Record<string, string> = {
-  artist: 'Artist', 'tuning-name': 'Tuning', capo: 'Capo', list: 'List', title: 'Title', tuning: 'Tuning (pitches)', genre: 'Genre',
+  artist: 'Artist', part: 'Part', 'tuning-name': 'Tuning', capo: 'Capo', list: 'List', title: 'Title', tuning: 'Tuning (pitches)', genre: 'Genre',
 };
 /** Rail order for the dimensions that have a fixed place; anything else follows, alphabetically. */
-export const RAIL_ORDER = ['artist', 'tuning-name', 'capo', 'list'];
+export const RAIL_ORDER = ['artist', 'part', 'tuning-name', 'capo', 'list'];
 /** Not lines in the rail: the title is the row itself, the pitches duplicate the tuning name, and favourites have their own line. */
 export const RAIL_HIDDEN = new Set(['title', 'tuning', 'favourite']);
 export const FAVOURITE = { dimension: 'favourite', value: 'yes' };

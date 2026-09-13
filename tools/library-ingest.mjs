@@ -214,6 +214,7 @@ export async function validatePlan(plan, converters) {
     const add = (dimension, value) => { if (value != null && String(value).trim()) derived.push({ dimension, value: String(value).trim(), source_ref }); };
     for (const [field, value] of Object.entries(facts.work)) add(field, value);
     for (const c of facts.creators) add(`creator.${c.role}`, c.name);
+    for (const name of new Set(facts.parts)) add('part', name);
     for (const capo of facts.capos) add('capo', capo);
     for (const tuning of facts.tunings) { add('tuning', tuning); add('tuning-name', tuningName(tuning)); }
   }

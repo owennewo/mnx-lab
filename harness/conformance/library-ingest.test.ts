@@ -233,3 +233,31 @@ it('enforces the actual stream limit without trusting Content-Length', async () 
   const response = await app.request('/api/library/ingest', { method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data; boundary=x' }, body: new Uint8Array(MAX_INGEST_BYTES+1) }, env);
   expect(response.status).toBe(413);
 });
+
+it('derives distinct canonical part labels, filters each value, and preserves cleanup aliases on refresh', async () => {
+  const named = (names: string[]) => {
+    const doc = structuredClone(score);
+    doc.parts = names.map(name => ({ ...structuredClone(doc.parts[0]), name }));
+    return doc;
+  };
+  const withParts = {
+    ...converters,
+    'guitarpro-mnx': { ...converters['guitarpro-mnx'], convert: () => named(['Guitar', 'Guitar', 'Ukulele', 'Track 1', 'unknown']) },
+    'musicxml-mnx': { ...converters['musicxml-mnx'], convert: () => named(['Wrong source']) }
+  };
+  const p = await plan();
+  const first = await upload(p, { converters: withParts });
+  const partTags = first.snapshot.tags.filter((t: {dimension: string}) => t.dimension === 'part');
+  expect(partTags.map((t: {value: string}) => t.value)).toEqual(['Guitar', 'Track 1', 'Ukulele', 'unknown']);
+  expect(partTags.every((t: {origin: string; source_ref: string}) => t.origin === 'derived' && t.source_ref === 'guitarpro-mnx@test-version')).toBe(true);
+  const lib = new Library(env.LIBRARY_DB, env.LIBRARY_BUCKET);
+  for (const value of ['Guitar', 'Ukulele']) {
+    expect((await lib.facets(INGEST_OWNER, [`part:${value}`])).total).toBe(1);
+  }
+  expect((await lib.facets(INGEST_OWNER, [])).facets.filter(f => f.dimension === 'part').every(f => f.pieces === 1)).toBe(true);
+  await lib.setAlias(INGEST_OWNER, 'part', 'Track 1', 'Guitar');
+  expect((await lib.facets(INGEST_OWNER, [])).facets.find(f => f.dimension === 'part' && f.value === 'Guitar')?.pieces).toBe(1);
+  expect((await lib.facets(INGEST_OWNER, ['part:Track 1'])).total).toBe(0);
+  await upload(p, { converters: withParts, force: true });
+  expect((await lib.listAliases(INGEST_OWNER)).some(a => a.dimension === 'part' && a.raw_value === 'Track 1' && a.canonical_value === 'Guitar')).toBe(true);
+});

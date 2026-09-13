@@ -14,7 +14,7 @@ const WORK_FIELDS = ['title', 'subtitle', 'artist', 'album', 'copyright', 'sourc
  *  corrected through aliases, so a fixed converter or a re-read sidecar can
  *  rebuild them without losing a person's correction. */
 export function isDerivedDimension(dimension: string) {
-  return [...WORK_FIELDS, 'tuning', 'tuning-name', 'capo'].includes(dimension) || dimension.startsWith('creator.');
+  return [...WORK_FIELDS, 'tuning', 'tuning-name', 'capo', 'part'].includes(dimension) || dimension.startsWith('creator.');
 }
 export function parseMnx(content: ArrayBuffer): MnxStructure {
   let doc: MnxStructure;
