@@ -1,0 +1,24 @@
+{
+  "id": "F-001",
+  "parent": "F-000",
+  "thresholds": [
+    0.15,
+    0.3,
+    0.5
+  ],
+  "refractorySeconds": [
+    0.09,
+    0.16
+  ],
+  "associationSeconds": [
+    0.035,
+    0.07
+  ],
+  "chunkSize": 256,
+  "timingRepeats": 3,
+  "budgets": {
+    "cpuRatio": 1.25,
+    "p95IncreaseSeconds": 0.025,
+    "regressionF1Drop": 0.02
+  }
+}
