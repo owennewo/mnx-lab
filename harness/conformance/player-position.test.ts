@@ -1,5 +1,5 @@
 import { it, expect } from 'vitest';
-import { formatPlaybackPosition, measureAt, siblingVisits, widestPlaybackPosition } from '../../src/audio/playbackPosition.ts';
+import { formatPlaybackPosition, measureAt, passesOf, playbackPositionParts, widestPlaybackPosition } from '../../src/audio/playbackPosition.ts';
 import { compilePerformance } from '../../src/audio/performance.ts';
 import { rational as q, ZERO } from '../../src/audio/time.ts';
 import fs from 'node:fs';
@@ -48,7 +48,7 @@ it('reserves the widest label a performance can print, so the readout never resi
   expect(widestPlaybackPosition(p, doc)).toBe('bar 128 · iteration 3 of 3 · beat 4.5 · hold');
   expect(widestPlaybackPosition({ ...p, measures: [] }, doc)).toBe('Ready');
 });
-it('counts a bar\'s passes and steps between them by performed order', () => {
+it('counts a bar\'s passes and lists them in performed order', () => {
   const doc = JSON.parse(
     fs.readFileSync('scenarios/spec/repeats/document.mnx.json', 'utf8'),
   ) as MnxStructure;
@@ -60,7 +60,15 @@ it('counts a bar\'s passes and steps between them by performed order', () => {
   if (!repeated) throw new Error('expected a repeated bar in scenarios/spec/repeats');
   expect(formatPlaybackPosition(p, repeated.position, doc)).toMatch(/iteration 2 of 2/);
   const first = p.measures.find((m) => m.measureIndex === repeated.measureIndex && m.iteration === 1)!;
-  expect(siblingVisits(p, first.ordinal)).toEqual({ prev: null, next: repeated });
-  expect(siblingVisits(p, repeated.ordinal)).toEqual({ prev: first, next: null });
-  expect(siblingVisits(p, 999)).toEqual({ prev: null, next: null });
+  expect(passesOf(p, repeated.measureIndex)).toEqual([first, repeated]);
+  expect(passesOf(p, 999)).toEqual([]);
+  // The parts the tray renders the iteration control from agree with the label.
+  const parts = playbackPositionParts(p, repeated.position, doc)!;
+  expect(parts.ordinal).toBe(repeated.ordinal);
+  expect(parts.iteration).toBe(2);
+  expect(parts.iterations).toBe(2);
+  expect(formatPlaybackPosition(p, repeated.position, doc)).toBe(
+    `bar ${parts.bar} · iteration 2 of 2 · beat ${parts.beat}`,
+  );
+  expect(playbackPositionParts(p, q(-1n), doc)).toBeNull();
 });

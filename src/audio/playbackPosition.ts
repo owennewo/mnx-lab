@@ -17,33 +17,32 @@ export function iterationsOf(performance: Performance, measureIndex: number): nu
     if (m.measureIndex === measureIndex && m.iteration > last) last = m.iteration;
   return last;
 }
-/**
- * The previous and next visits to the same written measure, by performed
- * order — the verse before and the verse after this one. Either is absent
- * when this visit is the first or last pass through the bar.
- */
-export function siblingVisits(
-  performance: Performance,
-  ordinal: number,
-): { prev: PerformanceMeasure | null; next: PerformanceMeasure | null } {
-  const here = performance.measures.find((m) => m.ordinal === ordinal);
-  if (!here) return { prev: null, next: null };
-  let prev: PerformanceMeasure | null = null;
-  let next: PerformanceMeasure | null = null;
-  for (const m of performance.measures) {
-    if (m.measureIndex !== here.measureIndex) continue;
-    if (m.ordinal < here.ordinal && (!prev || m.ordinal > prev.ordinal)) prev = m;
-    if (m.ordinal > here.ordinal && (!next || m.ordinal < next.ordinal)) next = m;
-  }
-  return { prev, next };
+/** Every visit to a written measure, in performed order — the passes a
+ *  readout can offer as a menu (the verses of a bar). */
+export function passesOf(performance: Performance, measureIndex: number): PerformanceMeasure[] {
+  return performance.measures
+    .filter((m) => m.measureIndex === measureIndex)
+    .sort((a, b) => a.ordinal - b.ordinal);
 }
-export function formatPlaybackPosition(
+/** The readout's fields, for a host that renders one of them as a control. */
+export interface PlaybackPositionParts {
+  ordinal: number;
+  measureIndex: number;
+  /** The written bar number as printed. */
+  bar: string;
+  iteration: number;
+  iterations: number;
+  /** The beat with its tenth when it has one: `3`, `4.5`. */
+  beat: string;
+  insertion: 'hold' | 'grace' | null;
+}
+export function playbackPositionParts(
   performance: Performance,
   position: Rational,
   document?: MnxStructure,
-): string {
+): PlaybackPositionParts | null {
   const measure = measureAt(performance, position);
-  if (!measure) return compare(position, ZERO) === 0 ? 'Ready' : 'End';
+  if (!measure) return null;
   const segment = performance.sourceMap.find(
     (s) => compare(position, s.position) >= 0 && compare(position, add(s.position, s.duration)) < 0,
   );
@@ -64,7 +63,24 @@ export function formatPlaybackPosition(
   const beat = add(rational(1n), multiply(offset, rational(BigInt(unit))));
   const tenths = (beat.num * 10n) / beat.den;
   const label = `${tenths / 10n}${tenths % 10n ? '.' + (tenths % 10n) : ''}`;
-  return `bar ${document?.global.measures[measure.measureIndex]?.number ?? measure.measureIndex + 1} · iteration ${measure.iteration} of ${iterationsOf(performance, measure.measureIndex)} · beat ${label}${segment && segment.kind !== 'metric' ? ` · ${segment.kind === 'fermata' ? 'hold' : 'grace'}` : ''}`;
+  return {
+    ordinal: measure.ordinal,
+    measureIndex: measure.measureIndex,
+    bar: String(document?.global.measures[measure.measureIndex]?.number ?? measure.measureIndex + 1),
+    iteration: measure.iteration,
+    iterations: iterationsOf(performance, measure.measureIndex),
+    beat: label,
+    insertion: segment && segment.kind !== 'metric' ? (segment.kind === 'fermata' ? 'hold' : 'grace') : null,
+  };
+}
+export function formatPlaybackPosition(
+  performance: Performance,
+  position: Rational,
+  document?: MnxStructure,
+): string {
+  const parts = playbackPositionParts(performance, position, document);
+  if (!parts) return compare(position, ZERO) === 0 ? 'Ready' : 'End';
+  return `bar ${parts.bar} · iteration ${parts.iteration} of ${parts.iterations} · beat ${parts.beat}${parts.insertion ? ` · ${parts.insertion}` : ''}`;
 }
 /**
  * The widest label `formatPlaybackPosition` can print for this performance,

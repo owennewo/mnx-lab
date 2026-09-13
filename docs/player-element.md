@@ -8,9 +8,9 @@ dependency. It does not own the viewer's context or the editor selection.
 The element supplies Play/Pause, Stop, a scrubber over the performed order, rate
 (0.25×–2× in 0.05 steps), and master volume. API ordinals and `at=` links are
 zero-based. The position readout names the written bar, which pass this is and how many
-the bar gets (`iteration 2 of 3`), and the beat; an up/down stepper beside it seeks to the
-same bar in the previous or next pass — the verse before, the verse after — which is what
-the performed-order table used to be for. The readout uses a pure helper, including
+the bar gets (`iteration 2 of 3`), and the beat. On a repeated bar the iteration is a
+control: it opens a menu of the bar's passes — the verses — and picking one seeks to the
+same bar in that pass, which is what the performed-order table used to be for. The readout uses a pure helper, including
 inherited meter, authored bar numbers, and explicit hold/grace labels. Tenths of a
 beat are display formatting only; the readout is not an incessant live-region announcement.
 

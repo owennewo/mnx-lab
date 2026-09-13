@@ -16,7 +16,7 @@ import {
 } from '../audio/sampleSelection.ts';
 import type { SamplePackLoader } from '../audio/native/samplePacks.ts';
 import { NativeSink, nativeClock } from '../audio/native/sink.ts';
-import { formatPlaybackPosition, measureAt, siblingVisits, widestPlaybackPosition } from '../audio/playbackPosition.ts';
+import { formatPlaybackPosition, measureAt, passesOf, playbackPositionParts, widestPlaybackPosition } from '../audio/playbackPosition.ts';
 import { ZERO, compare, type Rational } from '../audio/time.ts';
 import type { MnxStructure } from '../model/mnx.ts';
 import type { PlaybackUpdate } from './mnxContext.ts';
@@ -51,8 +51,9 @@ export class Player extends LitElement {
    * 2026-09-12): the shared tokens, 40px controls so the tray is catchable on
    * glass, the transport as glyphs on the accent, and a scrubber over the
    * performed order. The order table is gone: the readout says which pass
-   * this is of how many, and the stepper beside it walks the passes — the
-   * frame the tray lives in is a strip over the score, not a panel beside it.
+   * this is of how many, and on a repeated bar that iteration opens a menu
+   * of the passes — the frame the tray lives in is a strip over the score,
+   * not a panel beside it.
    */
   static styles = [
     designTokens,
@@ -171,25 +172,69 @@ export class Player extends LitElement {
       color: var(--ink);
       min-width: 5ch;
     }
-    /* The iteration stepper: two half-height buttons stacked beside the
-       readout, stepping to the same bar in the previous or next pass — the
-       verse before, the verse after. */
-    .iterations {
-      display: inline-flex;
-      flex-direction: column;
-      height: 40px;
-      margin-left: -4px;
+    /* The iteration in the readout is a control on a repeated bar: a dotted
+       word that opens a menu of the bar's passes above the tray — the verses
+       — each seeking to that pass. The invisible widest copy carries the
+       same caret so the reserved width still matches. */
+    .passes {
+      position: relative;
+      display: inline;
     }
-    .iterations button {
-      height: 20px;
-      width: 28px;
+    .passes > button {
+      display: inline;
+      height: auto;
       padding: 0;
-      justify-content: center;
-      border-radius: 3px 3px 0 0;
+      border: 0;
+      border-radius: 0;
+      background: none;
+      font: inherit;
+      color: inherit;
+      text-decoration: underline dotted;
+      text-underline-offset: 3px;
     }
-    .iterations button + button {
-      border-top: 0;
-      border-radius: 0 0 3px 3px;
+    .passes > button:hover,
+    .passes > button[aria-expanded='true'] {
+      color: var(--accent);
+    }
+    .caret {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      vertical-align: -2px;
+      margin-left: 2px;
+    }
+    .pass-menu {
+      position: absolute;
+      bottom: calc(100% + 10px);
+      left: 0;
+      z-index: 5;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 150px;
+      max-height: 240px;
+      overflow: auto;
+      padding: 4px;
+      box-sizing: border-box;
+      background: var(--player-ground);
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18), 0 6px 18px rgba(0, 0, 0, 0.22);
+    }
+    .pass-menu button {
+      height: 32px;
+      padding: 0 10px;
+      border: 0;
+      border-radius: 3px;
+      justify-content: flex-start;
+      font: 500 13px/1 var(--mono);
+      font-variant-numeric: tabular-nums;
+    }
+    .pass-menu button:hover {
+      background: light-dark(rgba(0, 0, 0, 0.06), rgba(255, 255, 255, 0.08));
+    }
+    .pass-menu button[aria-current='true'] {
+      color: var(--accent);
     }
     th {
       color: var(--ink-3);
@@ -212,8 +257,23 @@ export class Player extends LitElement {
     }
   `
   ];
+  /** Whether the passes menu is open; it closes on a pick, click-away or Escape. */
+  @state() private passesOpen = false;
+  private readonly onClickAway = (event: PointerEvent) => {
+    if (!this.passesOpen) return;
+    const inside = event.composedPath().some((n) => n instanceof HTMLElement && n.classList.contains('passes'));
+    if (!inside) this.passesOpen = false;
+  };
+  private readonly onKeydown = (event: KeyboardEvent) => {
+    if (event.key === 'Escape' && this.passesOpen) {
+      this.passesOpen = false;
+      event.stopPropagation();
+    }
+  };
   connectedCallback() {
     super.connectedCallback();
+    document.addEventListener('pointerdown', this.onClickAway);
+    this.addEventListener('keydown', this.onKeydown);
     try {
       this.rate = Number(localStorage.getItem('mnx-player-rate')) || 1;
       this.volume = Number(localStorage.getItem('mnx-player-volume') ?? 0.7);
@@ -223,6 +283,8 @@ export class Player extends LitElement {
     if (this.hasUpdated) this.install();
   }
   disconnectedCallback() {
+    document.removeEventListener('pointerdown', this.onClickAway);
+    this.removeEventListener('keydown', this.onKeydown);
     this.teardown();
     super.disconnectedCallback();
   }
@@ -444,31 +506,42 @@ export class Player extends LitElement {
     return svg`<svg width=${px} height=${px} viewBox="0 0 24 24" aria-hidden="true"><path d=${d} fill="currentColor"></path></svg>`;
   }
 
-  /** Up/down beside the readout: the same bar in the previous or next pass. */
-  private iterationStepper() {
+  private static caret() {
+    return svg`<svg class="caret" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5z" fill="currentColor"></path></svg>`;
+  }
+  /** The live readout: the iteration becomes a menu of the bar's passes when it has more than one. */
+  private readout() {
     if (!this.performance) return nothing;
-    // From the position, as the readout is: before the first status frame
-    // there is no last ordinal yet, but there is a bar under the cursor.
-    const here = measureAt(this.performance, this.position)?.ordinal ?? this.lastOrdinal;
-    if (here === null) return nothing;
-    const { prev, next } = siblingVisits(this.performance, here);
-    if (!prev && !next) return nothing;
-    return html`<span class="iterations" role="group" aria-label="Iteration">
-      <button
-        type="button"
-        ?disabled=${!prev}
-        aria-label="Previous iteration of this bar"
-        title="Previous iteration of this bar"
-        @click=${() => prev && this.seek(prev.ordinal)}
-      >${Player.glyph('M12 8l6 6H6z', 14)}</button>
-      <button
-        type="button"
-        ?disabled=${!next}
-        aria-label="Next iteration of this bar"
-        title="Next iteration of this bar"
-        @click=${() => next && this.seek(next.ordinal)}
-      >${Player.glyph('M12 16l-6-6h12z', 14)}</button>
-    </span>`;
+    const parts = playbackPositionParts(this.performance, this.position, this.document);
+    if (!parts) return formatPlaybackPosition(this.performance, this.position, this.document);
+    const passes = passesOf(this.performance, parts.measureIndex);
+    const iteration = `iteration ${parts.iteration} of ${parts.iterations}`;
+    const tail = ` · beat ${parts.beat}${parts.insertion ? ` · ${parts.insertion}` : ''}`;
+    if (passes.length < 2) return `bar ${parts.bar} · ${iteration}${tail}`;
+    return html`bar ${parts.bar} · <span class="passes"
+        ><button
+          type="button"
+          aria-haspopup="menu"
+          aria-expanded=${this.passesOpen}
+          title="Choose which pass of this bar to play"
+          @click=${() => (this.passesOpen = !this.passesOpen)}
+        >${iteration}${Player.caret()}</button
+        >${this.passesOpen
+          ? html`<div class="pass-menu" role="menu" aria-label="Passes of this bar">
+              ${passes.map(
+                (m) => html`<button
+                  type="button"
+                  role="menuitem"
+                  aria-current=${m.ordinal === parts.ordinal}
+                  @click=${() => {
+                    this.passesOpen = false;
+                    this.seek(m.ordinal);
+                  }}
+                >iteration ${m.iteration}</button>`,
+              )}
+            </div>`
+          : nothing}</span
+      >${tail}`;
   }
   private onScrub(event: Event) {
     this.seek(Number((event.target as HTMLInputElement).value));
@@ -492,11 +565,10 @@ export class Player extends LitElement {
         </button>
         <output aria-live="off" class=${this.performance ? '' : 'none'}
           >${this.performance
-            ? html`<span>${formatPlaybackPosition(this.performance, this.position, this.document)}</span
-                ><span class="widest" aria-hidden="true">${this.widest}</span>`
+            ? html`<span>${this.readout()}</span
+                ><span class="widest" aria-hidden="true">${this.widest}${Player.caret()}</span>`
             : 'No performance available'}</output
         >
-        ${this.iterationStepper()}
         ${count > 1
           ? html`<input
               class="scrub"
