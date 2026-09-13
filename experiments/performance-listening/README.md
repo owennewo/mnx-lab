@@ -4,6 +4,11 @@ Implementation-loop experiment for future Studio tracking, assessment and guitar
 This unit measures detection on digitally rendered player audio. It neither listens to a
 microphone nor claims to grade a real performer. Production cannot import it.
 
+The [fused algorithm log](fusion-log.md) is the living index of techniques, configurations
+tried, decisions and possible next experiments. Detailed records use the
+[technique template](fusion-techniques/_template.md). The current implementation still
+runs separate detector baselines; no fused configuration has been adopted yet.
+
 ## Run
 
 Requires Node >=22.12, the root development dependencies, and installed Chrome
