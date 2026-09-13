@@ -36,11 +36,14 @@ apps/studio/
 Piece URLs carry the library's piece id. On a piece the page IS the score frame
 ([roadmap/inprogress/core-score-frame.md](../../roadmap/inprogress/core-score-frame.md)):
 a title grip on the top edge and a playback grip on the bottom, drawn out into the library
-page's tools row (the way back, the title, the piece's chips, the staff view, Zoom,
-Settings, Tags, the menu) and the player's tray. A tap on the score is never a chrome
-toggle. The staff view, the display settings, zoom and spacing, and whether each grip was
-left drawn out, are per-browser localStorage preferences (`mnx-studio.*`), the one
-persistence a shell may own without a backend decision.
+page's tools row (the way back, the title, Zoom, Settings, Tags, the theme toggle) and
+the player's tray, where the recordings sheet opens from beside the source switcher whose
+sources it manages. The staff view is the settings card's STAFF row alone (the frame's
+segmented control is off here), the tag chips are the Tags sheet's, and sign-out is the
+library page's — a piece is not where you leave. A tap on the score is never a chrome
+toggle. The staff view, the display settings, zoom and spacing, the theme, and whether
+each grip was left drawn out, are per-browser localStorage preferences (`mnx-studio.*`),
+the one persistence a shell may own without a backend decision.
 
 ## The decisions that starting settled
 

@@ -11,7 +11,12 @@
 // The chrome is the frame's (roadmap/inprogress/core-score-frame.md): a title
 // grip and a playback grip on the pane's edges, drawn out into the library page's
 // tools row and the player's tray. This page supplies what the frame prints
-// and stores what it changes.
+// and stores what it changes. Trimmed 2026-09-13: the tools row carries the way
+// back, the title, Zoom, Settings, Tags and the theme toggle — the tag chips
+// went (the Tags sheet shows them), the staff view lives in Settings alone,
+// and the account menu is the library page's (a piece is not where you sign
+// out). Recordings moved to the player's tray, beside the source switcher whose
+// sources they are.
 import { LitElement, css, html, nothing } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { LibraryClient, LibraryRequestError, type LibrarySnapshot } from '../../../src/storage/libraryClient.ts';
@@ -27,25 +32,22 @@ import type { Player } from '../../../src/elements/Player.ts';
 import type { StripChange } from '../../../src/elements/ScoreFrame.ts';
 import type { ZoomPadChange } from '../../../src/elements/ZoomPad.ts';
 import { libraryHref } from './StudioApp.ts';
-import { chipText, dimensionLabel } from './labels.ts';
+import { nextTheme, readTheme, resolvedTheme, setTheme, themeGlyph, type ThemeSetting } from './theme.ts';
 import './TagsSheet.ts';
 import './RecordingsSheet.ts';
 import type { TagsSnapshot } from './TagsSheet.ts';
 
 import { VIEW_KEY, DISPLAY_KEY, UNROLLED_KEY, STAFF_SCALE_KEY, DENSITY_H_KEY, SPACING_MODE_KEY, TOOLS_OPEN_KEY, PLAYER_OPEN_KEY, read, write, readView, readDisplay, readNumber } from './scorePreferences.ts';
 
-const CHIP_DIMENSIONS = ['tuning-name', 'capo', 'key', 'genre', 'list'];
-
 const back = html`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"></path></svg>`;
-const more = html`<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="12" r="1.8" fill="currentColor"></circle><circle cx="12" cy="12" r="1.8" fill="currentColor"></circle><circle cx="18" cy="12" r="1.8" fill="currentColor"></circle></svg>`;
+/** The recordings sheet's mark in the tray: an info ring beside the source switcher. */
+const infoGlyph = html`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5"></path><circle cx="12" cy="8" r="0.6" fill="currentColor" stroke="none"></circle></svg>`;
 const tagGlyph = html`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12V4h8l10 10-8 8z"></path><circle cx="7.5" cy="8.5" r="1.2" fill="currentColor" stroke="none"></circle></svg>`;
 
 @customElement('mnx-studio-piece')
 export class PiecePage extends LitElement {
   @property({ attribute: false }) client!: LibraryClient;
   @property({ type: String }) pieceId = '';
-  /** The signed-in address, for the menu; sign-out is Access's own logout. */
-  @property({ type: String }) email = '';
   @state() private snapshot: LibrarySnapshot | null = null;
   @state() private recordings: readonly RecordingSource[] = [];
   @state() private doc: MnxDocument | null = null;
@@ -53,7 +55,7 @@ export class PiecePage extends LitElement {
   @state() private loading = true;
   @state() private tagsOpen = false;
   @state() private recordingsOpen = false;
-  @state() private menuOpen = false;
+  @state() private theme: ThemeSetting = readTheme();
   @state() private view: ViewSetting = readView();
   @state() private display: DisplayOptions = readDisplay();
   @state() private unrolled = read(UNROLLED_KEY) === 'true';
@@ -105,99 +107,20 @@ export class PiecePage extends LitElement {
     .notice a {
       color: inherit;
     }
-    /* The chips row: the library page's chip, read-only here. */
-    .chips {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      height: 30px;
-      padding: 0 10px;
-      border: 1px solid var(--line);
-      border-radius: 3px;
-      background: light-dark(oklch(0.9 0.004 60), oklch(0.26 0.006 60));
-      font-size: 13px;
-      white-space: nowrap;
-    }
-    .chip .dim {
-      color: var(--ink-dim);
-    }
-    /* The menu: the signed-in address and the way out, under the … button. */
-    .menu {
-      position: relative;
-    }
-    .menu > div {
-      position: absolute;
-      top: calc(100% + 8px);
-      right: 0;
-      z-index: 6;
-      box-sizing: border-box;
-      min-width: min(220px, calc(100vw - 16px));
-      max-width: calc(100vw - 16px);
-      padding: 6px;
-      background: light-dark(oklch(0.985 0.002 60), oklch(0.22 0.004 60));
-      border: 1px solid var(--line);
-      border-radius: 3px;
-      box-shadow: 0 1px 2px rgba(0 0 0 / 0.1), 0 3px 10px rgba(0 0 0 / 0.12);
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-    .menu .who {
-      padding: 8px 10px;
-      color: var(--ink-dim);
-      font-size: 13px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .menu > div button {
-      height: 40px;
-      text-align: left;
-      padding: 0 10px;
-      border: 0;
-      border-radius: 3px;
-      background: transparent;
-      font: inherit;
-      color: inherit;
-      cursor: pointer;
-    }
-    .menu > div button:hover {
-      background: light-dark(oklch(0.9 0.004 60), oklch(0.26 0.006 60));
+    /* The theme toggle: a word and a mark, at the end of the tools row. The
+       word is part of the control — three settings cannot be read off an
+       icon, and auto has to say which way it currently resolves. */
+    .theme span {
+      text-transform: capitalize;
     }
   `;
 
-  connectedCallback() {
-    super.connectedCallback();
-    window.addEventListener('resize', this.positionMenu);
-    window.addEventListener('pointerdown', this.dismissMenu);
-  }
-
-  private readonly positionMenu = () => {
-    const panel = this.shadowRoot?.querySelector<HTMLElement>('.menu > div');
-    if (!panel) return;
-    panel.style.transform = '';
-    const rect = panel.getBoundingClientRect();
-    const shift = Math.max(8 - rect.left, Math.min(0, document.documentElement.clientWidth - 8 - rect.right));
-    panel.style.transform = `translateX(${shift}px)`;
-  };
-  private readonly dismissMenu = (event: PointerEvent) => {
-    const menu = this.shadowRoot?.querySelector('.menu');
-    if (this.menuOpen && menu && !event.composedPath().includes(menu)) this.menuOpen = false;
-  };
-  private toggleMenu() {
-    this.menuOpen = !this.menuOpen;
-    if (this.menuOpen) { this.recordingsOpen = false; this.tagsOpen = false; }
+  private cycleTheme() {
+    this.theme = nextTheme(this.theme);
+    setTheme(this.theme);
   }
 
   disconnectedCallback() {
-    window.removeEventListener('resize', this.positionMenu);
-    window.removeEventListener('pointerdown', this.dismissMenu);
     ++this.generation;
     this.binding?.dispose();
     this.binding = null;
@@ -208,7 +131,6 @@ export class PiecePage extends LitElement {
   // document arrives) so the binding is made once and survives piece-to-piece
   // navigation.
   protected updated(changed: Map<PropertyKey, unknown>) {
-    if (this.menuOpen) this.positionMenu();
     if (changed.has('pieceId')) void this.load();
     let fresh = false;
     if (!this.binding && this.player && this.viewer) {
@@ -228,7 +150,6 @@ export class PiecePage extends LitElement {
     this.error = '';
     this.loading = true;
     this.tagsOpen = false; this.recordingsOpen = false;
-    this.menuOpen = false;
     try {
       const readPair = () => Promise.all([
         this.client.canonical(this.pieceId),
@@ -345,7 +266,9 @@ export class PiecePage extends LitElement {
   render() {
     const title = this.doc ? (this.tag('title') ?? this.doc.name) : '';
     const artist = this.doc ? (this.tag('artist') ?? documentArtist(this.doc.mnxJson) ?? '') : '';
-    const chips = (this.snapshot?.tags ?? []).filter(t => CHIP_DIMENSIONS.includes(t.dimension)).slice(0, 4);
+    const recordingCount = this.snapshot?.recordings.length ?? 0;
+    const themeNext = nextTheme(this.theme);
+    const themeSentence = `Theme: ${this.theme}${this.theme === 'auto' ? ` (now ${resolvedTheme(this.theme)})` : ''} — click for ${themeNext}`;
     // The viewer is queried, not stored: before the first render there is none.
     const viewer = this.viewer as DocumentViewer | null;
     return html`
@@ -363,6 +286,7 @@ export class PiecePage extends LitElement {
         .effectiveStaffScale=${this.effectiveStaffScale}
         .densitySteps=${this.densitySteps}
         .pads=${!!this.doc}
+        .staffView=${false}
         .topOpen=${this.toolsOpen}
         .bottomOpen=${this.playerOpen}
         @strip-change=${this.onStripChange}
@@ -374,26 +298,14 @@ export class PiecePage extends LitElement {
         @clearance-change=${this.onClearanceChange}
       >
         <a slot="back" href=${libraryHref}>${back}<span>Library</span></a>
-        ${chips.length
-          ? html`<div slot="chips" class="chips">
-              ${chips.map(t => html`<span class="chip"><span class="dim">${dimensionLabel(t.dimension).toLowerCase()}</span><span>${chipText(t.dimension, t.shown)}</span></span>`)}
-            </div>`
-          : nothing}
         ${this.doc
-          ? html`<button slot="actions" type="button" aria-pressed=${this.tagsOpen} @click=${() => { this.tagsOpen = !this.tagsOpen; this.recordingsOpen = false; this.menuOpen = false; }}>
+          ? html`<button slot="actions" type="button" aria-pressed=${this.tagsOpen} @click=${() => { this.tagsOpen = !this.tagsOpen; this.recordingsOpen = false; }}>
               ${tagGlyph}<span>Tags · ${this.snapshot?.tags.length ?? 0}</span>
             </button>`
           : nothing}
-        ${this.doc ? html`<button slot="actions" type="button" aria-pressed=${this.recordingsOpen} @click=${async () => { this.player?.pause(); await this.refreshSnapshot(); this.recordingsOpen = !this.recordingsOpen; this.tagsOpen = false; this.menuOpen = false; }}>Recordings · ${this.snapshot?.recordings.length ?? 0}</button>` : nothing}
-        <div slot="menu" class="menu" @keydown=${(e: KeyboardEvent) => { if (e.key === 'Escape') { this.menuOpen = false; this.shadowRoot?.querySelector<HTMLButtonElement>('[aria-label="More"]')?.focus(); } }}>
-          <button type="button" aria-label="More" aria-expanded=${this.menuOpen} @click=${this.toggleMenu}>${more}</button>
-          ${this.menuOpen
-            ? html`<div>
-                ${this.email ? html`<span class="who">${this.email}</span>` : nothing}
-                <button type="button" @click=${() => this.client.signOut()}>Sign out</button>
-              </div>`
-            : nothing}
-        </div>
+        <button slot="menu" class="theme" type="button" title=${themeSentence} aria-label=${themeSentence} @click=${this.cycleTheme}>
+          ${themeGlyph(this.theme)}<span>${this.theme}</span>
+        </button>
 
         ${this.loading ? html`<p class="notice" role="status">Loading…</p>` : nothing}
         ${!this.loading && !this.doc
@@ -421,7 +333,13 @@ export class PiecePage extends LitElement {
           .spacingMode=${this.spacingMode}
           @render-scale=${(e: CustomEvent<RenderScale>) => (this.effectiveStaffScale = e.detail.staffScale)}
         ></mnx-document-viewer>
-        <mnx-player slot="player" .recordings=${this.recordings}></mnx-player>
+        <mnx-player slot="player" .recordings=${this.recordings}>
+          ${this.doc
+            ? html`<button slot="source-tools" type="button" aria-pressed=${this.recordingsOpen}
+                title=${`Recordings · ${recordingCount}`} aria-label=${`Recordings · ${recordingCount}`}
+                @click=${async () => { this.player?.pause(); await this.refreshSnapshot(); this.recordingsOpen = !this.recordingsOpen; this.tagsOpen = false; }}>${infoGlyph}</button>`
+            : nothing}
+        </mnx-player>
       </mnx-score-frame>
       ${this.recordingsOpen && this.snapshot && this.doc ? html`<mnx-studio-recordings .client=${this.client} .snapshot=${this.snapshot} .document=${this.doc}
         @recordings-changed=${async (e: CustomEvent<LibrarySnapshot>) => { this.player?.pause(); if (this.snapshot?.piece.canonical_rendition_id !== e.detail.piece.canonical_rendition_id) { await this.load(); return; } this.snapshot = { ...e.detail, tags: this.snapshot?.tags ?? [] }; this.setRecordings(e.detail); await this.refreshSnapshot(); }}

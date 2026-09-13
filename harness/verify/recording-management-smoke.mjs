@@ -57,7 +57,7 @@ try {
   const result=await c.evaluate(`(async()=>{
     const check=(v,m)=>{if(!v)throw new Error(m)},delay=ms=>new Promise(r=>setTimeout(r,ms));
     const page=document.querySelector('mnx-studio').shadowRoot.querySelector('mnx-studio-piece'),player=page.shadowRoot.querySelector('mnx-player');check(!!player.performance,'Score did not load');
-    [...page.shadowRoot.querySelectorAll('button')].find(b=>b.textContent.includes('Recordings ·')).click();
+    page.shadowRoot.querySelector('mnx-player > button[slot=source-tools]').click();
     for(let i=0;i<50&&!page.shadowRoot.querySelector('mnx-studio-recordings');i++)await delay(50);
     const sheet=page.shadowRoot.querySelector('mnx-studio-recordings');await sheet.updateComplete;
     const input=async(label,value,type='input')=>{const el=sheet.shadowRoot.querySelector('[aria-label="'+label+'"]');el.value=value;el.dispatchEvent(new Event(type,{bubbles:true}));await sheet.updateComplete;};
@@ -86,7 +86,7 @@ try {
   const reloaded=await c.evaluate(`(async()=>{for(let i=0;i<100;i++){const page=document.querySelector('mnx-studio')?.shadowRoot?.querySelector('mnx-studio-piece'),p=page?.shadowRoot?.querySelector('mnx-player');if(p?.performance&&p.recordings.length===2)return p.recordings;await new Promise(r=>setTimeout(r,50));}return [];})()`);
   assert.equal(reloaded.find(r=>r.id===result.audioId)?.name,'Renamed take');assert.equal(reloaded.find(r=>r.id===result.youtubeId)?.syncpoints[0][1],1);assert.equal(uploads,1);assert.ok(canonicalReads>=3,'Canonical identity mismatch was not retried before reload');
   await c.send('Emulation.setDeviceMetricsOverride',{width:360,height:800,deviceScaleFactor:1,mobile:true});
-  await c.evaluate(`(async()=>{const p=document.querySelector('mnx-studio').shadowRoot.querySelector('mnx-studio-piece');[...p.shadowRoot.querySelectorAll('button')].find(b=>b.textContent.includes('Recordings ·')).click();await new Promise(r=>setTimeout(r,200));})()`);
+  await c.evaluate(`(async()=>{const p=document.querySelector('mnx-studio').shadowRoot.querySelector('mnx-studio-piece');p.shadowRoot.querySelector('mnx-player > button[slot=source-tools]').click();await new Promise(r=>setTimeout(r,200));})()`);
   await c.evaluate(`(async()=>{
     const check=(v,m)=>{if(!v)throw new Error(m)},delay=ms=>new Promise(r=>setTimeout(r,ms));
     const page=document.querySelector('mnx-studio').shadowRoot.querySelector('mnx-studio-piece'),sheet=page.shadowRoot.querySelector('mnx-studio-recordings');
@@ -107,17 +107,22 @@ try {
   const shot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync('/tmp/recording-management-mobile.png',Buffer.from(shot.result.data,'base64'));
   await c.evaluate(`(async()=>{
     const check=(v,m)=>{if(!v)throw new Error(m)},delay=ms=>new Promise(r=>setTimeout(r,ms));
-    const page=document.querySelector('mnx-studio').shadowRoot.querySelector('mnx-studio-piece'),menu=page.shadowRoot.querySelector('.menu'),button=menu.querySelector('button');
-    page.toolsOpen=true;await page.updateComplete;await page.shadowRoot.querySelector('mnx-score-frame').updateComplete;
-    // Exercise the wrapped-row position at the left edge and the unwrapped right edge.
-    menu.style.position='fixed';menu.style.top='120px';menu.style.left='8px';button.click();await page.updateComplete;
-    check(!page.shadowRoot.querySelector('mnx-studio-recordings'),'Account menu did not dismiss the recording sheet');
-    let rect=menu.querySelector('div').getBoundingClientRect();check(rect.left>=7&&rect.right<=innerWidth-7,'Menu escaped the left viewport edge');
-    menu.style.left=(innerWidth-48)+'px';window.dispatchEvent(new Event('resize'));rect=menu.querySelector('div').getBoundingClientRect();check(rect.left>=7&&rect.right<=innerWidth-7,'Menu escaped the right viewport edge');
-    check([...menu.querySelectorAll('button')].some(b=>b.textContent.trim()==='Sign out'),'Account action inaccessible');
-    menu.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}));await page.updateComplete;check(!menu.querySelector('div'),'Escape did not dismiss menu');
-    button.click();await page.updateComplete;document.body.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true}));await page.updateComplete;check(!menu.querySelector('div'),'Outside click did not dismiss menu');
-    menu.removeAttribute('style');
+    const page=document.querySelector('mnx-studio').shadowRoot.querySelector('mnx-studio-piece');
+    // The recordings sheet is reached from the player's tray, beside the source
+    // switcher whose sources it manages; the tools row carries no account menu
+    // (sign-out is the library page's) and no Recordings button.
+    const tools=page.shadowRoot.querySelector('mnx-player > button[slot=source-tools]');check(!!tools,'Recordings control missing from the tray');
+    check(tools.getAttribute('aria-label')==='Recordings · 2','Recordings control does not count the sources');
+    check(!page.shadowRoot.querySelector('.menu'),'Account menu still on the piece page');
+    check(![...page.shadowRoot.querySelectorAll('button')].some(b=>b.textContent.includes('Recordings ·')),'Recordings button still in the tools row');
+    page.toolsOpen=true;await page.updateComplete;const frame=page.shadowRoot.querySelector('mnx-score-frame');await frame.updateComplete;
+    check(!frame.shadowRoot.querySelector('.seg'),'Segmented staff view still in the tools row');
+    check(!!page.shadowRoot.querySelector('button[slot=menu]'),'Theme toggle missing');
+    tools.click();for(let i=0;i<50&&!page.shadowRoot.querySelector('mnx-studio-recordings');i++)await delay(50);check(!!page.shadowRoot.querySelector('mnx-studio-recordings'),'Tray control did not open the recording sheet');await page.updateComplete;
+    check(tools.getAttribute('aria-pressed')==='true','Tray control does not show the open sheet');
+    page.shadowRoot.querySelector('button[slot=actions]').click();await page.updateComplete;
+    check(!page.shadowRoot.querySelector('mnx-studio-recordings')&&!!page.shadowRoot.querySelector('mnx-studio-tags'),'Tags did not replace the recording sheet');
+    page.shadowRoot.querySelector('button[slot=actions]').click();await page.updateComplete;
   })()`);
   assert.deepEqual(c.logs,[]);console.log('Recording management smoke OK',JSON.stringify({uploads,...result,reloaded:reloaded.length}));
 } catch(e) {if(c){const shot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync('/tmp/recording-management-failure.png',Buffer.from(shot.result.data,'base64'));}throw e;}

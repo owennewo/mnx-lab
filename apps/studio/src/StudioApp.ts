@@ -11,6 +11,7 @@ import { LitElement, css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { LibraryClient } from '../../../src/storage/libraryClient.ts';
 import { loadSession, signIn, type Session } from './session.ts';
+import { nextTheme, readTheme, resolvedTheme, setTheme, themeGlyph, type ThemeSetting } from './theme.ts';
 import './LibraryPage.ts';
 import './PiecePage.ts';
 import './AliasesPage.ts';
@@ -38,6 +39,9 @@ export class StudioApp extends LitElement {
   private readonly client = new LibraryClient();
   @state() private session: Session | null = null;
   @state() private route: Route = parseHash(location.hash);
+  /** The theme, read again whenever the header returns — the piece page has
+   *  its own toggle over the same stored setting. */
+  @state() private theme: ThemeSetting = readTheme();
 
   static styles = css`
     :host {
@@ -105,6 +109,12 @@ export class StudioApp extends LitElement {
     button:hover {
       border-color: var(--ink-dim);
     }
+    button.theme {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-transform: capitalize;
+    }
     a.button {
       border: 1px solid var(--line);
       border-radius: 3px;
@@ -142,7 +152,13 @@ export class StudioApp extends LitElement {
 
   private readonly onHashChange = () => {
     this.route = parseHash(location.hash);
+    this.theme = readTheme();
   };
+
+  private cycleTheme() {
+    this.theme = nextTheme(this.theme);
+    setTheme(this.theme);
+  }
 
   connectedCallback() {
     super.connectedCallback();
@@ -165,6 +181,7 @@ export class StudioApp extends LitElement {
   render() {
     const email = this.session?.kind === 'signed-in' ? this.session.email : '';
     const onPiece = this.route.page === 'piece' && this.session?.kind === 'signed-in';
+    const themeSentence = `Theme: ${this.theme}${this.theme === 'auto' ? ` (now ${resolvedTheme(this.theme)})` : ''} — click for ${nextTheme(this.theme)}`;
     return html`
       ${onPiece
         ? nothing
@@ -172,6 +189,7 @@ export class StudioApp extends LitElement {
             <a class="brand" href=${libraryHref}>MNX <b>Studio</b></a>
             <span class="title"></span>
             ${this.route.page === 'aliases' ? html`<a class="button" href=${libraryHref}>Library</a>` : nothing}
+            <button class="theme" title=${themeSentence} aria-label=${themeSentence} @click=${this.cycleTheme}>${themeGlyph(this.theme)}<span>${this.theme}</span></button>
             ${email ? html`<span class="who">${email}</span>` : nothing}
             ${email || this.session?.kind === 'not-permitted'
               ? html`<button @click=${this.signOut}>Sign out</button>`
@@ -206,7 +224,6 @@ export class StudioApp extends LitElement {
       return html`<mnx-studio-piece
         .client=${this.client}
         .pieceId=${this.route.id}
-        .email=${session.email}
       ></mnx-studio-piece>`;
     if (this.route.page === 'aliases') return html`<mnx-studio-aliases .client=${this.client}></mnx-studio-aliases>`;
     return html`<mnx-studio-library .client=${this.client}></mnx-studio-library>`;

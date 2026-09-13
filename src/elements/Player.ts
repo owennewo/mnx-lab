@@ -148,6 +148,30 @@ export class Player extends LitElement {
       padding: 0;
       justify-content: center;
     }
+    /* The host's own control beside the source switcher — studio's way into
+       its recordings sheet, where the sources the switcher lists are managed.
+       An empty slot is nothing; the workbench slots nothing. */
+    ::slotted([slot='source-tools']) {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      box-sizing: border-box;
+      padding: 0;
+      background: transparent;
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      color: inherit;
+      cursor: pointer;
+    }
+    ::slotted([slot='source-tools']:hover) {
+      border-color: var(--ink-3);
+    }
+    ::slotted([slot='source-tools'][aria-pressed='true']) {
+      background: var(--player-ground);
+      border-color: var(--ink-3);
+    }
     button.primary {
       width: 48px;
       height: 48px;
@@ -932,6 +956,7 @@ export class Player extends LitElement {
           <option value="synth" ?selected=${this.sourceId === 'synth'}>Synth</option>
           ${this.recordings.map(r => html`<option value=${r.id} ?selected=${this.sourceId === r.id}>${r.name}</option>`)}
         </select></label>` : nothing}
+        <slot name="source-tools"></slot>
         <span class="settings">
         ${this.sourceId === 'synth' ? html`<label class="select" title="Sound"
           >${Player.stroke('M3 12h2l2-6 3 12 3-9 2 5 2-2h4')}<select

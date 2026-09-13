@@ -44,7 +44,13 @@ line along the bottom edge. Nothing on the page listens for a tap to show chrome
 - **The pads keep their frame.** The zoom pad and settings card are the components both
   shells share; they are promoted, not restyled. The staff view is duplicated on purpose —
   the strip's segmented control and the card's STAFF row are the same setting — because
-  it is the switch a guitarist flips most and the strip is one tap nearer.
+  it is the switch a guitarist flips most and the strip is one tap nearer. *Revised for
+  studio, 2026-09-13:* the row was too busy; the frame's `staff-view` property turns the
+  segmented control off and studio leaves the view to the card. The workbench keeps it.
+  Studio's row also dropped the tag chips (the Tags sheet shows them), the `…` account
+  menu (sign-out is the library page's) and the Recordings button, which became a control
+  in the player's tray beside the source switcher (the player's `source-tools` slot); a
+  theme toggle (auto · light · dark, on `color-scheme`) took the end of the row.
 
 ## Phases
 

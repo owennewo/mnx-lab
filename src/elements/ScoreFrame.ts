@@ -24,11 +24,12 @@ import './SettingsPad.ts';
  *   drawn out  — the top grip becomes the library page's tools row: the way
  *                back (slot `back`), the title at h1 weight with the sub-line
  *                muted, the piece's chips (slot `chips`), then the staff view as
- *                the library's sort control, Zoom and Settings hosting the two
- *                pads *pinned* under their buttons, extra buttons (slot
- *                `actions` — the workbench's Focus), a menu (slot `menu`) and
- *                the collapse chevron. The bottom grip becomes the player's own
- *                tray (slot `player`).
+ *                the library's sort control (opt-out: `staff-view` false — the
+ *                settings card carries the same row, and studio shows only
+ *                that), Zoom and Settings hosting the two pads *pinned* under
+ *                their buttons, extra buttons (slot `actions` — the workbench's
+ *                Focus), a menu (slot `menu`) and the collapse chevron. The
+ *                bottom grip becomes the player's own tray (slot `player`).
  *
  * Below ~1000px of pane the tools row wraps to its stacked form; a phone and
  * the workbench's pane beside its rail and side panel both hit it.
@@ -72,6 +73,10 @@ export class ScoreFrame extends LitElement {
   /** The staff view, and the views this document can support. */
   @property({ type: String }) view: ViewMode = 'notation';
   @property({ attribute: false }) views: ViewMode[] = ['notation'];
+  /** Whether the tools row prints the segmented staff view beside the pads.
+   *  The settings card's STAFF row is the same setting, so a host may leave
+   *  the row to that alone (studio does) and keep the strip for its buttons. */
+  @property({ type: Boolean, attribute: 'staff-view' }) staffView = true;
 
   /** The settings card's inputs. */
   @property({ attribute: false }) display: DisplayOptions = {};
@@ -804,7 +809,7 @@ export class ScoreFrame extends LitElement {
       </div>
       <div class="spacer"></div>
       <div class="tools-row">
-        ${this.segmented()}
+        ${this.staffView ? this.segmented() : nothing}
         <div class="spacer"></div>
         ${this.pads
           ? html`

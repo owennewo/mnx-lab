@@ -64,16 +64,28 @@ try {
   await wait(`!!${piece}.querySelector('mnx-player').performance`);
   await wait(`!${frame}.querySelector('.grip.bottom .primary').disabled && ${frame}.querySelector('.grip.bottom .readout')?.textContent.length > 0`);
   const shot = await c.send('Page.captureScreenshot'); await fs.writeFile('/tmp/mnx-studio-piece.png',Buffer.from(shot.result.data,'base64'));
-  // Draw the top grip out: the tools row, the staff view as a segmented control,
-  // Zoom and Settings hosting the pads pinned under their buttons.
+  // Draw the top grip out: the tools row, Zoom and Settings hosting the pads
+  // pinned under their buttons. Studio leaves the staff view to the settings
+  // card's STAFF row — no segmented control in the strip.
   await c.evaluate(`${frame}.querySelector('.grip.top').click()`);
-  await wait(`!!${frame}.querySelector('.strip.top .head h1') && !!${frame}.querySelector('.seg button[aria-pressed=true]')`);
+  await wait(`!!${frame}.querySelector('.strip.top .head h1') && !${frame}.querySelector('.seg')`);
   await c.evaluate(`[...${frame}.querySelectorAll('.strip.top .btn')].find(b => b.textContent.includes('Zoom')).click()`);
   await wait(`!!${frame}.querySelector('mnx-zoom-pad[pinned]')`);
   await c.evaluate(`[...${frame}.querySelectorAll('.strip.top .btn')].find(b => b.textContent.includes('Settings')).click()`);
   await wait(`!${frame}.querySelector('mnx-zoom-pad') && !!${frame}.querySelector('mnx-settings-pad[pinned]')?.shadowRoot?.querySelector('.card')`);
-  await c.evaluate(`[...${frame}.querySelectorAll('.seg button')].find(b => b.textContent === 'Tab').click()`);
-  await wait(`${frame}.querySelector('.seg button[aria-pressed=true]')?.textContent === 'Tab' && localStorage.getItem('mnx-studio.view') === 'tab'`);
+  const pad = `${frame}.querySelector('mnx-settings-pad[pinned]').shadowRoot`;
+  await c.evaluate(`${pad}.querySelector('button[data-row=view]').click()`);
+  await wait(`!!${pad}.querySelector('.menu')`);
+  await c.evaluate(`[...${pad}.querySelectorAll('.menu .item')].find(i => i.textContent.trim() === 'Tab').click()`);
+  await wait(`${pad}.querySelector('button[data-row=view] .word')?.textContent === 'Tab' && localStorage.getItem('mnx-studio.view') === 'tab'`);
+  // The theme toggle at the row's end walks auto → light → dark, pinning the
+  // scheme on the document root so every light-dark() pair follows.
+  await c.evaluate(`${piece}.querySelector('button[slot=menu]').click()`);
+  await wait(`document.documentElement.style.colorScheme === 'light' && localStorage.getItem('mnx-studio.theme') === 'light'`);
+  await c.evaluate(`${piece}.querySelector('button[slot=menu]').click()`);
+  await wait(`document.documentElement.style.colorScheme === 'dark' && ${piece}.querySelector('button[slot=menu]').textContent.trim() === 'dark'`);
+  await c.evaluate(`${piece}.querySelector('button[slot=menu]').click()`);
+  await wait(`document.documentElement.style.colorScheme === '' && localStorage.getItem('mnx-studio.theme') === null`);
   // Draw the bottom grip out: the player's own tray, with its rail.
   await c.evaluate(`${frame}.querySelector('.grip.bottom .chev').click()`);
   await wait(`!!${frame}.querySelector('.strip.bottom') && !!${piece}.querySelector('mnx-player').shadowRoot.querySelector('.rail')`);

@@ -12,7 +12,12 @@ import '@fontsource/archivo/latin-600.css';
 import '@fontsource/archivo/latin-700.css';
 
 import '../studio.css';
+import { applyTheme, readTheme } from './theme.ts';
 import '../../../src/elements/DocumentViewer.ts';
 import '../../../src/elements/Player.ts';
 import '../../../src/elements/ScoreFrame.ts';
 import './StudioApp.ts';
+
+// The remembered theme, before the first paint: a pinned scheme must not
+// flash the machine's.
+applyTheme(readTheme());
