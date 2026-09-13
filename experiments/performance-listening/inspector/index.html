@@ -1,62 +1,289 @@
 <!doctype html>
-<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Performance listening bench</title>
-<style>
-:root{color-scheme:light dark;font:15px system-ui;background:light-dark(#f8f8f5,#141719);color:light-dark(#20292b,#e5e9e8)}
-body{max-width:1200px;margin:32px auto;padding:0 20px}h1{font-size:26px}p{line-height:1.5}label{display:inline-block;margin:8px 16px 8px 0}select,button{font:inherit;padding:7px;max-width:100%}svg{width:100%;background:light-dark(#fff,#1e2426);border:1px solid #8885}pre{white-space:pre-wrap;font:13px ui-monospace;max-height:240px;overflow:auto}audio{width:100%;margin:12px 0}#status{min-height:24px}table{border-collapse:collapse;width:100%;margin:12px 0}td,th{padding:7px;text-align:left;border-bottom:1px solid #8885}.legend span{margin-right:18px}.target{color:#8c939a}.actual{color:#269d84}.detected{color:#d68a34}#error{color:#d34}
-</style>
-<h1>Performance listening bench</h1>
-<p>Controlled player audio. Choose a result, listen, and compare the target, rendered events and detected notes. Detection scores are uncalibrated; an unmatched target is unassessed.</p>
-<div id="error" role="alert"></div>
-<label>Sound <select id="preset"></select></label><label>Case <select id="fixture"></select></label>
-<label>Strategy <select id="strategy"></select></label><label>Mode <select id="mode"></select></label>
-<p id="status" aria-live="polite"></p>
-<audio id="audio" controls preload="metadata"></audio>
-<button id="mismatch">Jump to first mismatch</button>
-<p class="legend"><span class="target">■ Target</span><span class="actual">■ Rendered</span><span class="detected">■ Detected</span></p>
-<svg id="plot" viewBox="0 0 1100 380" role="img" aria-label="Piano roll comparison of target, rendered and detected notes"></svg>
-<table><thead><tr><th>Strategy</th><th>Mode</th><th>Attack F1</th><th>Active-pitch F1</th><th>Decision p95</th><th>Compute / audio</th></tr></thead><tbody id="comparison"></tbody></table>
-<details><summary>Selected result and mismatches</summary><pre id="details"></pre></details>
-<script type="module">
-const $=id=>document.getElementById(id), ns='http://www.w3.org/2000/svg';
-let data,current,record,cursor;
-const percent=x=>x==null?'—':(x*100).toFixed(1)+'%';
-const seconds=x=>x==null?'—':x.toFixed(3)+' s';
-function options(id,values){for(const value of values){const option=document.createElement('option');option.value=value;option.textContent=value;$(id).append(option);}}
-function svg(tag,attrs,text){const e=document.createElementNS(ns,tag);for(const [k,v] of Object.entries(attrs))e.setAttribute(k,v);if(text)e.textContent=text;$('plot').append(e);return e;}
-function update(){
- current=data.results.find(r=>['preset','fixture','strategy','mode'].every(k=>r[k]===$(k).value));
- record=data.audioManifest.records.find(r=>r.preset===$('preset').value&&r.id===$('fixture').value&&r.split==='evaluation');
- if(!record||!current){$('status').textContent='This combination was not run.';return;}
- const audioURL='/audio?index='+data.audioManifest.records.indexOf(record);
- if($('audio').getAttribute('src')!==audioURL)$('audio').src=audioURL;
- $('status').textContent=current.status==='ok'?`${record.category} · ${current.detection.events.length} detected attacks · ${current.assessment.unassessedTargetEvents} target attacks unassessed`:`${current.status}: ${current.reason}`;
- $('details').textContent=JSON.stringify(current,null,2);
- $('plot').replaceChildren();
- const predicted=current.detection?.events??[];
- const pitches=[...record.target,...record.actual,...predicted].map(n=>n.pitch);
- const low=Math.min(38,...pitches)-1,high=Math.max(89,...pitches)+1;
- const x=t=>50+t/record.duration*1030,y=p=>345-(p-low)/(high-low)*320;
- for(let pitch=Math.ceil(low);pitch<=high;pitch+=4){svg('line',{x1:50,x2:1080,y1:y(pitch),y2:y(pitch),stroke:'#8883'});svg('text',{x:8,y:y(pitch)+4,fill:'currentColor','font-size':11},String(pitch));}
- for(let t=0;t<record.duration;t+=.25)svg('text',{x:x(t),y:372,fill:'currentColor','font-size':11},t.toFixed(2));
- for(const [notes,color,offset] of [[record.target,'#8c939a',-3],[record.actual,'#269d84',0],[predicted,'#d68a34',3]])for(const n of notes){
-  const rect=svg('rect',{x:x(n.start),y:y(n.pitch)+offset,width:Math.max(2,x(n.end)-x(n.start)),height:3,fill:color});
-  const title=document.createElementNS(ns,'title');title.textContent=`MIDI ${n.pitch}: ${n.start.toFixed(3)}–${n.end.toFixed(3)}s`;rect.append(title);
- }
- cursor=svg('line',{x1:50,x2:50,y1:5,y2:350,stroke:'#c44','stroke-width':1});
- $('comparison').replaceChildren();
- for(const result of data.results.filter(r=>r.preset===record.preset&&r.fixture===record.id)){
-  const tr=document.createElement('tr');
-  const values=[result.strategy,result.mode,percent(result.metrics?.onset.f1),percent(result.metrics?.active.f1),seconds(result.metrics?.latency.p95),result.detection?result.detection.realTimeFactor.toFixed(3)+'×':result.status];
-  for(const value of values){const td=document.createElement('td');td.textContent=value;tr.append(td);}$('comparison').append(tr);
- }
- $('mismatch').disabled=!current.metrics||!(current.metrics.missing.length+current.metrics.extra.length);
-}
-$('audio').addEventListener('timeupdate',()=>{if(cursor&&record){const x=50+$('audio').currentTime/record.duration*1030;cursor.setAttribute('x1',x);cursor.setAttribute('x2',x);}});
-$('mismatch').onclick=()=>{const times=[...current.metrics.missing,...current.metrics.extra].map(n=>n.start);$('audio').currentTime=Math.max(0,Math.min(...times)-.15);};
-try{
- data=await(await fetch('/results.json')).json();
- for(const id of ['preset','fixture','strategy','mode']){options(id,[...new Set(data.results.map(r=>r[id]))]);$(id).onchange=update;}
- update();
-}catch(e){$('error').textContent='Could not load this run: '+e;}
-</script></html>
+<html lang="en">
+  <meta charset="utf-8" /><meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  />
+  <title>Performance listening bench</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      font: 15px system-ui;
+      background: light-dark(#f8f8f5, #141719);
+      color: light-dark(#20292b, #e5e9e8);
+    }
+    body {
+      max-width: 1200px;
+      margin: 32px auto;
+      padding: 0 20px;
+    }
+    h1 {
+      font-size: 26px;
+    }
+    p {
+      line-height: 1.5;
+    }
+    label {
+      display: inline-block;
+      margin: 8px 16px 8px 0;
+    }
+    select,
+    button {
+      font: inherit;
+      padding: 7px;
+      max-width: 100%;
+    }
+    svg {
+      width: 100%;
+      background: light-dark(#fff, #1e2426);
+      border: 1px solid #8885;
+    }
+    pre {
+      white-space: pre-wrap;
+      font: 13px ui-monospace;
+      max-height: 240px;
+      overflow: auto;
+    }
+    audio {
+      width: 100%;
+      margin: 12px 0;
+    }
+    #status {
+      min-height: 24px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 12px 0;
+    }
+    td,
+    th {
+      padding: 7px;
+      text-align: left;
+      border-bottom: 1px solid #8885;
+    }
+    .legend span {
+      margin-right: 18px;
+    }
+    .target {
+      color: #8c939a;
+    }
+    .actual {
+      color: #269d84;
+    }
+    .detected {
+      color: #d68a34;
+    }
+    #error {
+      color: #d34;
+    }
+  </style>
+  <h1>Performance listening bench</h1>
+  <p>
+    Controlled player audio. Choose a result, listen, and compare the target,
+    rendered events and detected notes. Detection scores are uncalibrated; an
+    unmatched target is unassessed.
+  </p>
+  <div id="error" role="alert"></div>
+  <label
+    >Sound
+    <select id="preset"></select></label
+  ><label
+    >Case
+    <select id="fixture"></select
+  ></label>
+  <label
+    >Strategy
+    <select id="strategy"></select></label
+  ><label
+    >Mode
+    <select id="mode"></select
+  ></label>
+  <p id="status" aria-live="polite"></p>
+  <audio id="audio" controls preload="metadata"></audio>
+  <button id="mismatch">Jump to first mismatch</button>
+  <p class="legend">
+    <span class="target">■ Target</span><span class="actual">■ Rendered</span
+    ><span class="detected">■ Detected</span>
+  </p>
+  <svg
+    id="plot"
+    viewBox="0 0 1100 380"
+    role="img"
+    aria-label="Piano roll comparison of target, rendered and detected notes"
+  ></svg>
+  <table>
+    <thead>
+      <tr>
+        <th>Strategy</th>
+        <th>Mode</th>
+        <th>Attack F1</th>
+        <th>Active-pitch F1</th>
+        <th>Decision p95</th>
+        <th>Compute / audio</th>
+      </tr>
+    </thead>
+    <tbody id="comparison"></tbody>
+  </table>
+  <details>
+    <summary>Selected result and mismatches</summary>
+    <pre id="details"></pre>
+  </details>
+  <script type="module">
+    const $ = (id) => document.getElementById(id),
+      ns = "http://www.w3.org/2000/svg";
+    let data, current, record, cursor;
+    const percent = (x) => (x == null ? "—" : (x * 100).toFixed(1) + "%");
+    const seconds = (x) => (x == null ? "—" : x.toFixed(3) + " s");
+    function options(id, values) {
+      for (const value of values) {
+        const option = document.createElement("option");
+        option.value = value;
+        option.textContent = value;
+        $(id).append(option);
+      }
+    }
+    function svg(tag, attrs, text) {
+      const e = document.createElementNS(ns, tag);
+      for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+      if (text) e.textContent = text;
+      $("plot").append(e);
+      return e;
+    }
+    function update() {
+      current = data.results.find((r) =>
+        ["preset", "fixture", "strategy", "mode"].every(
+          (k) => r[k] === $(k).value,
+        ),
+      );
+      record = data.audioManifest.records.find(
+        (r) =>
+          r.preset === $("preset").value &&
+          r.id === $("fixture").value &&
+          r.split === "evaluation",
+      );
+      if (!record || !current) {
+        $("status").textContent = "This combination was not run.";
+        $("plot").replaceChildren();
+        $("comparison").replaceChildren();
+        $("details").textContent = "";
+        $("audio").pause();
+        $("audio").removeAttribute("src");
+        $("mismatch").disabled = true;
+        cursor = null;
+        return;
+      }
+      const audioURL =
+        "/audio?index=" + data.audioManifest.records.indexOf(record);
+      if ($("audio").getAttribute("src") !== audioURL)
+        $("audio").src = audioURL;
+      $("status").textContent =
+        current.status === "ok"
+          ? `${record.mutation ? "deliberate " + record.mutation + " event" : record.category} · ${current.detection.events.length} detected attacks · ${current.assessment.unassessedTargetEvents} target attacks unassessed`
+          : `${current.status}: ${current.reason}`;
+      $("details").textContent = JSON.stringify(current, null, 2);
+      $("plot").replaceChildren();
+      const predicted = current.detection?.events ?? [];
+      const pitches = [...record.target, ...record.actual, ...predicted].map(
+        (n) => n.pitch,
+      );
+      const low = Math.min(38, ...pitches) - 1,
+        high = Math.max(89, ...pitches) + 1;
+      const x = (t) => 50 + (t / record.duration) * 1030,
+        y = (p) => 345 - ((p - low) / (high - low)) * 320;
+      for (let pitch = Math.ceil(low); pitch <= high; pitch += 4) {
+        svg("line", {
+          x1: 50,
+          x2: 1080,
+          y1: y(pitch),
+          y2: y(pitch),
+          stroke: "#8883",
+        });
+        svg(
+          "text",
+          { x: 8, y: y(pitch) + 4, fill: "currentColor", "font-size": 11 },
+          String(pitch),
+        );
+      }
+      for (let t = 0; t < record.duration; t += 0.25)
+        svg(
+          "text",
+          { x: x(t), y: 372, fill: "currentColor", "font-size": 11 },
+          t.toFixed(2),
+        );
+      for (const [notes, color, offset] of [
+        [record.target, "#8c939a", -3],
+        [record.actual, "#269d84", 0],
+        [predicted, "#d68a34", 3],
+      ])
+        for (const n of notes) {
+          const rect = svg("rect", {
+            x: x(n.start),
+            y: y(n.pitch) + offset,
+            width: Math.max(2, x(n.end) - x(n.start)),
+            height: 3,
+            fill: color,
+          });
+          const title = document.createElementNS(ns, "title");
+          title.textContent = `MIDI ${n.pitch}: ${n.start.toFixed(3)}–${n.end.toFixed(3)}s`;
+          rect.append(title);
+        }
+      cursor = svg("line", {
+        x1: 50,
+        x2: 50,
+        y1: 5,
+        y2: 350,
+        stroke: "#c44",
+        "stroke-width": 1,
+      });
+      $("comparison").replaceChildren();
+      for (const result of data.results.filter(
+        (r) => r.preset === record.preset && r.fixture === record.id,
+      )) {
+        const tr = document.createElement("tr");
+        const values = [
+          result.strategy,
+          result.mode,
+          percent(result.metrics?.onset.f1),
+          percent(result.metrics?.active.f1),
+          seconds(result.metrics?.latency.p95),
+          result.detection
+            ? result.detection.realTimeFactor.toFixed(3) + "×"
+            : result.status,
+        ];
+        for (const value of values) {
+          const td = document.createElement("td");
+          td.textContent = value;
+          tr.append(td);
+        }
+        $("comparison").append(tr);
+      }
+      $("mismatch").disabled =
+        !current.metrics ||
+        !(current.metrics.missing.length + current.metrics.extra.length);
+    }
+    $("audio").addEventListener("timeupdate", () => {
+      if (cursor && record) {
+        const x = 50 + ($("audio").currentTime / record.duration) * 1030;
+        cursor.setAttribute("x1", x);
+        cursor.setAttribute("x2", x);
+      }
+    });
+    $("mismatch").onclick = () => {
+      const times = [...current.metrics.missing, ...current.metrics.extra].map(
+        (n) => n.start,
+      );
+      $("audio").currentTime = Math.max(0, Math.min(...times) - 0.15);
+    };
+    try {
+      data = await (await fetch("/results.json")).json();
+      for (const id of ["preset", "fixture", "strategy", "mode"]) {
+        options(id, [...new Set(data.results.map((r) => r[id]))]);
+        $(id).onchange = update;
+      }
+      update();
+    } catch (e) {
+      $("error").textContent = "Could not load this run: " + e;
+    }
+  </script>
+</html>

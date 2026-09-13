@@ -17,6 +17,10 @@
   "templateIterations": 32,
   "maxPolyphony": 6,
   "seed": 0,
-  "neural": {"onsetThreshold": 0.5, "frameThreshold": 0.3, "minNoteFrames": 5},
+  "neural": {
+    "onsetThreshold": 0.5,
+    "frameThreshold": 0.3,
+    "minNoteFrames": 5
+  },
   "confidenceThresholds": [0, 0.3, 0.5, 0.7, 0.9]
 }

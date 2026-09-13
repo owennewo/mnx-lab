@@ -8,12 +8,16 @@
     "compare": "node experiments/compare.mjs",
     "test": "node --test evaluation/*.test.mjs detectors/*.test.mjs",
     "inspect": "node inspector/serve.mjs",
-    "check:boundaries": "node evaluation/boundaries.mjs"
+    "check:boundaries": "node evaluation/boundaries.mjs",
+    "report": "node experiments/report.mjs"
   },
   "dependencies": {
     "@spotify/basic-pitch": "1.0.1",
     "@tensorflow/tfjs": "3.21.0",
     "fft.js": "4.0.4",
     "puppeteer-core": "25.10.0"
+  },
+  "engines": {
+    "node": ">=22.12.0"
   }
 }

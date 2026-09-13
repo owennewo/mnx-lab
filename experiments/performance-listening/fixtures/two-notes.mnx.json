@@ -1,1 +1,28 @@
-{"mnx":{"version":1},"global":{"measures":[{"time":{"count":4,"unit":4}}]},"parts":[{"measures":[{"sequences":[{"content":[{"type":"event","duration":{"base":"quarter"},"notes":[{"pitch":{"step":"C","octave":4}}]},{"type":"event","duration":{"base":"quarter"},"notes":[{"pitch":{"step":"E","octave":4}}]}]}]}]}]}
+{
+  "mnx": { "version": 1 },
+  "global": { "measures": [{ "time": { "count": 4, "unit": 4 } }] },
+  "parts": [
+    {
+      "measures": [
+        {
+          "sequences": [
+            {
+              "content": [
+                {
+                  "type": "event",
+                  "duration": { "base": "quarter" },
+                  "notes": [{ "pitch": { "step": "C", "octave": 4 } }]
+                },
+                {
+                  "type": "event",
+                  "duration": { "base": "quarter" },
+                  "notes": [{ "pitch": { "step": "E", "octave": 4 } }]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

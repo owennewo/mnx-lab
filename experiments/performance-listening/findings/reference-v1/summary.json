@@ -1,0 +1,3225 @@
+{
+  "version": 1,
+  "runHash": "4dcb687fec674d3e760a9fe52aa31eace6630a56c8fc94fab3f3b40802da4264",
+  "createdAt": "2026-09-13T13:27:37.699Z",
+  "revisionAtRun": "9a92d83017236fb77a661d53f57af4ec99b79d53",
+  "sourceHashes": {
+    ".gitignore": "b5726d3ec9335a09c124469eca039523847a6b0f08a083efaefd002b83326600",
+    "detectors/neural.mjs": "95b6b1ebab2fb5f43c454b64f0cce16940d65e36bca44f345361ede37e182da8",
+    "detectors/spectral.mjs": "8a9033197f36398ee722b87966aa8dcb77ae233eea1b94de4e870ed55bac6e3e",
+    "detectors/stream.mjs": "a1df492050e859bc8fb23a6dc8dc14abe32d4332349709d4a22f546c99401fb8",
+    "detectors/stream.test.mjs": "2f2e55e99cc9ad1df0b30616d19738b919195bc9aea05ada48dd38f13285d540",
+    "evaluation/boundaries.mjs": "a31a2d782194d34ea20920a24e7ac6ea6556a344590eabd1280c2c1622e5d5ac",
+    "evaluation/io.mjs": "fe9271e7e7f6d43d709798dea726bba0bacd757c649aa3dc1d3bca4ddc8cd1d6",
+    "evaluation/io.test.mjs": "505e1bcf0bf6849a26cca7502c86ffe8daac3c3e8e93720405f68d3fe1e8d91f",
+    "evaluation/metrics.mjs": "d4c79cfbd6c969b6e96e2a434f3c93044dc795451ffecfce7f1152f285c00493",
+    "evaluation/metrics.test.mjs": "ba2be2ae471127088ac0e6a115addd5bd326566eea592004083e558f3555c749",
+    "experiments/baseline.json": "20beef9c3ceca6756cf30887a48ed41bd505a81054f59cdfbaec2a7c0e06f264",
+    "experiments/compare.mjs": "532783f0ee446beee3bf596e3b254509c25a11f0fdf51912fa42c97d4e006f3d",
+    "fixtures/cases.mjs": "3022c5f61772260345cf4bb9389667dfab556b1de141e8bd36611eab1a145398",
+    "fixtures/two-notes.mnx.json": "e746cdbd8dc90ef7594e0c34b0869e157c7cd5a43b4ff31a72156ce7ea006505",
+    "package-lock.json": "c366f28da7b4fce097ed6026caa31ea3257a0e5e99eabf55bdabb38d2a1e4d90",
+    "package.json": "30c184be0f04398d2da063ddd0f24406af8d443717df0307466efff20da5081a",
+    "rendering/browser.mjs": "3d2adf172774136549ffc87d4f786517c679dc42071010808041611c8d0902f9",
+    "rendering/render.mjs": "3ab38959f15470a40360e463a0046b4f4a14235800d20e4d712dbb6d6674ef8e"
+  },
+  "manifestHash": "8cd2e16c96808cb8926696c4ea87e92869061755399c47386b7518b06f3a2e90",
+  "config": {
+    "version": 1,
+    "sampleRate": 22050,
+    "presets": [
+      "guitar",
+      "guitar2",
+      "piano"
+    ],
+    "templatePreset": "guitar",
+    "midiMin": 40,
+    "midiMax": 88,
+    "fftSize": 4096,
+    "hopSize": 256,
+    "streamChunks": [
+      256,
+      2048
+    ],
+    "attackTolerance": 0.1,
+    "pitchTolerance": 0.5,
+    "frameStep": 0.02,
+    "activityThreshold": 0.22,
+    "minFrames": 2,
+    "rmsFloor": 0.0001,
+    "templateIterations": 32,
+    "maxPolyphony": 6,
+    "seed": 0,
+    "neural": {
+      "onsetThreshold": 0.5,
+      "frameThreshold": 0.3,
+      "minNoteFrames": 5
+    },
+    "confidenceThresholds": [
+      0,
+      0.3,
+      0.5,
+      0.7,
+      0.9
+    ]
+  },
+  "environment": {
+    "node": "v22.22.1",
+    "platform": "linux",
+    "arch": "x64",
+    "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+    "cpuCount": 12
+  },
+  "neural": {
+    "package": "@spotify/basic-pitch",
+    "version": "1.0.1",
+    "backend": "cpu",
+    "tfjs": "3.21.0",
+    "license": "Apache-2.0",
+    "modelHash": "1ed1aaee3409ec1dc098c8b01f430c0911f6fe9412e7af8086750f9e8f302f68",
+    "weightsHash": "b142a95737a52e1e412d5f92e73d8bb80dfe8d04941acc0702f11f4524fb377c",
+    "mode": "offline-only",
+    "windowSeconds": 2,
+    "confidence": "uncalibrated mean frame activation"
+  },
+  "algorithms": {
+    "harmonic": "v1: twelve 1/h harmonics, Gaussian bin width .8, greedy matching pursuit",
+    "template": "v1: isolated archtop .45–.75s mean magnitude, nonnegative coordinate descent",
+    "shared": "Hann trailing FFT; two-frame activity gate; no restrike detector; coefficients uncalibrated"
+  },
+  "groups": {
+    "harmonic/offline/guitar": {
+      "runs": 34,
+      "unavailable": 0,
+      "failed": 0,
+      "onset": {
+        "tp": 54,
+        "fp": 223,
+        "fn": 27,
+        "precision": 0.19494584837545126,
+        "recall": 0.6666666666666666,
+        "f1": 0.3016759776536313
+      },
+      "active": {
+        "tp": 1789,
+        "fp": 1342,
+        "fn": 859,
+        "precision": 0.5713829447460875,
+        "recall": 0.6756042296072508,
+        "f1": 0.6191382592143969
+      },
+      "exactActiveFrames": 665,
+      "activeFrames": 1240,
+      "exactChordRate": 0.5362903225806451,
+      "latency": {
+        "matchedCount": 54,
+        "p50": 1.2315879309999944,
+        "p95": 1.5223511147369657
+      },
+      "realTimeFactor": 0.06287294227931296,
+      "maxBacklog": 0.13236851899999613,
+      "falseAccusations": 223,
+      "missedUnexpectedAttacks": 1,
+      "unassessedTargetEvents": 31,
+      "silentFalseFrames": 314,
+      "silentFrames": 1246,
+      "octaveConfusions": 6,
+      "confidence": [
+        {
+          "threshold": 0,
+          "tp": 54,
+          "fp": 223,
+          "fn": 27,
+          "precision": 0.19494584837545126,
+          "recall": 0.6666666666666666,
+          "f1": 0.3016759776536313
+        },
+        {
+          "threshold": 0.3,
+          "tp": 49,
+          "fp": 82,
+          "fn": 32,
+          "precision": 0.37404580152671757,
+          "recall": 0.6049382716049383,
+          "f1": 0.46226415094339623
+        },
+        {
+          "threshold": 0.5,
+          "tp": 37,
+          "fp": 16,
+          "fn": 44,
+          "precision": 0.6981132075471698,
+          "recall": 0.4567901234567901,
+          "f1": 0.5522388059701493
+        },
+        {
+          "threshold": 0.7,
+          "tp": 30,
+          "fp": 10,
+          "fn": 51,
+          "precision": 0.75,
+          "recall": 0.37037037037037035,
+          "f1": 0.49586776859504134
+        },
+        {
+          "threshold": 0.9,
+          "tp": 9,
+          "fp": 1,
+          "fn": 72,
+          "precision": 0.9,
+          "recall": 0.1111111111111111,
+          "f1": 0.1978021978021978
+        }
+      ],
+      "scoreBins": [
+        {
+          "from": 0,
+          "to": 0.2,
+          "count": 0,
+          "correct": 0
+        },
+        {
+          "from": 0.2,
+          "to": 0.4,
+          "count": 214,
+          "correct": 12
+        },
+        {
+          "from": 0.4,
+          "to": 0.6,
+          "count": 12,
+          "correct": 7
+        },
+        {
+          "from": 0.6,
+          "to": 0.8,
+          "count": 29,
+          "correct": 15
+        },
+        {
+          "from": 0.8,
+          "to": 1,
+          "count": 22,
+          "correct": 20
+        }
+      ]
+    },
+    "harmonic/stream-256/guitar": {
+      "runs": 34,
+      "unavailable": 0,
+      "failed": 0,
+      "onset": {
+        "tp": 54,
+        "fp": 223,
+        "fn": 27,
+        "precision": 0.19494584837545126,
+        "recall": 0.6666666666666666,
+        "f1": 0.3016759776536313
+      },
+      "active": {
+        "tp": 1789,
+        "fp": 1342,
+        "fn": 859,
+        "precision": 0.5713829447460875,
+        "recall": 0.6756042296072508,
+        "f1": 0.6191382592143969
+      },
+      "exactActiveFrames": 665,
+      "activeFrames": 1240,
+      "exactChordRate": 0.5362903225806451,
+      "latency": {
+        "matchedCount": 54,
+        "p50": 0.04133037610656953,
+        "p95": 0.122301895376423
+      },
+      "realTimeFactor": 0.06237161097168956,
+      "maxBacklog": 0.0021452029999999844,
+      "falseAccusations": 223,
+      "missedUnexpectedAttacks": 1,
+      "unassessedTargetEvents": 31,
+      "silentFalseFrames": 314,
+      "silentFrames": 1246,
+      "octaveConfusions": 6,
+      "confidence": [
+        {
+          "threshold": 0,
+          "tp": 54,
+          "fp": 223,
+          "fn": 27,
+          "precision": 0.19494584837545126,
+          "recall": 0.6666666666666666,
+          "f1": 0.3016759776536313
+        },
+        {
+          "threshold": 0.3,
+          "tp": 49,
+          "fp": 82,
+          "fn": 32,
+          "precision": 0.37404580152671757,
+          "recall": 0.6049382716049383,
+          "f1": 0.46226415094339623
+        },
+        {
+          "threshold": 0.5,
+          "tp": 37,
+          "fp": 16,
+          "fn": 44,
+          "precision": 0.6981132075471698,
+          "recall": 0.4567901234567901,
+          "f1": 0.5522388059701493
+        },
+        {
+          "threshold": 0.7,
+          "tp": 30,
+          "fp": 10,
+          "fn": 51,
+          "precision": 0.75,
+          "recall": 0.37037037037037035,
+          "f1": 0.49586776859504134
+        },
+        {
+          "threshold": 0.9,
+          "tp": 9,
+          "fp": 1,
+          "fn": 72,
+          "precision": 0.9,
+          "recall": 0.1111111111111111,
+          "f1": 0.1978021978021978
+        }
+      ],
+      "scoreBins": [
+        {
+          "from": 0,
+          "to": 0.2,
+          "count": 0,
+          "correct": 0
+        },
+        {
+          "from": 0.2,
+          "to": 0.4,
+          "count": 214,
+          "correct": 12
+        },
+        {
+          "from": 0.4,
+          "to": 0.6,
+          "count": 12,
+          "correct": 7
+        },
+        {
+          "from": 0.6,
+          "to": 0.8,
+          "count": 29,
+          "correct": 15
+        },
+        {
+          "from": 0.8,
+          "to": 1,
+          "count": 22,
+          "correct": 20
+        }
+      ]
+    },
+    "harmonic/stream-2048/guitar": {
+      "runs": 34,
+      "unavailable": 0,
+      "failed": 0,
+      "onset": {
+        "tp": 54,
+        "fp": 223,
+        "fn": 27,
+        "precision": 0.19494584837545126,
+        "recall": 0.6666666666666666,
+        "f1": 0.3016759776536313
+      },
+      "active": {
+        "tp": 1789,
+        "fp": 1342,
+        "fn": 859,
+        "precision": 0.5713829447460875,
+        "recall": 0.6756042296072508,
+        "f1": 0.6191382592143969
+      },
+      "exactActiveFrames": 665,
+      "activeFrames": 1240,
+      "exactChordRate": 0.5362903225806451,
+      "latency": {
+        "matchedCount": 54,
+        "p50": 0.12760266737641074,
+        "p95": 0.17936638953513406
+      },
+      "realTimeFactor": 0.06256643014744352,
+      "maxBacklog": 0.014994677000002454,
+      "falseAccusations": 223,
+      "missedUnexpectedAttacks": 1,
+      "unassessedTargetEvents": 31,
+      "silentFalseFrames": 314,
+      "silentFrames": 1246,
+      "octaveConfusions": 6,
+      "confidence": [
+        {
+          "threshold": 0,
+          "tp": 54,
+          "fp": 223,
+          "fn": 27,
+          "precision": 0.19494584837545126,
+          "recall": 0.6666666666666666,
+          "f1": 0.3016759776536313
+        },
+        {
+          "threshold": 0.3,
+          "tp": 49,
+          "fp": 82,
+          "fn": 32,
+          "precision": 0.37404580152671757,
+          "recall": 0.6049382716049383,
+          "f1": 0.46226415094339623
+        },
+        {
+          "threshold": 0.5,
+          "tp": 37,
+          "fp": 16,
+          "fn": 44,
+          "precision": 0.6981132075471698,
+          "recall": 0.4567901234567901,
+          "f1": 0.5522388059701493
+        },
+        {
+          "threshold": 0.7,
+          "tp": 30,
+          "fp": 10,
+          "fn": 51,
+          "precision": 0.75,
+          "recall": 0.37037037037037035,
+          "f1": 0.49586776859504134
+        },
+        {
+          "threshold": 0.9,
+          "tp": 9,
+          "fp": 1,
+          "fn": 72,
+          "precision": 0.9,
+          "recall": 0.1111111111111111,
+          "f1": 0.1978021978021978
+        }
+      ],
+      "scoreBins": [
+        {
+          "from": 0,
+          "to": 0.2,
+          "count": 0,
+          "correct": 0
+        },
+        {
+          "from": 0.2,
+          "to": 0.4,
+          "count": 214,
+          "correct": 12
+        },
+        {
+          "from": 0.4,
+          "to": 0.6,
+          "count": 12,
+          "correct": 7
+        },
+        {
+          "from": 0.6,
+          "to": 0.8,
+          "count": 29,
+          "correct": 15
+        },
+        {
+          "from": 0.8,
+          "to": 1,
+          "count": 22,
+          "correct": 20
+        }
+      ]
+    },
+    "template/offline/guitar": {
+      "runs": 34,
+      "unavailable": 0,
+      "failed": 0,
+      "onset": {
+        "tp": 64,
+        "fp": 81,
+        "fn": 17,
+        "precision": 0.4413793103448276,
+        "recall": 0.7901234567901234,
+        "f1": 0.5663716814159292
+      },
+      "active": {
+        "tp": 2134,
+        "fp": 577,
+        "fn": 514,
+        "precision": 0.7871634083364072,
+        "recall": 0.8058912386706949,
+        "f1": 0.7964172420227654
+      },
+      "exactActiveFrames": 860,
+      "activeFrames": 1240,
+      "exactChordRate": 0.6935483870967742,
+      "latency": {
+        "matchedCount": 64,
+        "p50": 1.2536988610000044,
+        "p95": 1.5626281557369597
+      },
+      "realTimeFactor": 0.07921425426603915,
+      "maxBacklog": 0.16753628999998904,
+      "falseAccusations": 81,
+      "missedUnexpectedAttacks": 1,
+      "unassessedTargetEvents": 21,
+      "silentFalseFrames": 259,
+      "silentFrames": 1246,
+      "octaveConfusions": 0,
+      "confidence": [
+        {
+          "threshold": 0,
+          "tp": 64,
+          "fp": 81,
+          "fn": 17,
+          "precision": 0.4413793103448276,
+          "recall": 0.7901234567901234,
+          "f1": 0.5663716814159292
+        },
+        {
+          "threshold": 0.3,
+          "tp": 57,
+          "fp": 26,
+          "fn": 24,
+          "precision": 0.6867469879518072,
+          "recall": 0.7037037037037037,
+          "f1": 0.6951219512195121
+        },
+        {
+          "threshold": 0.5,
+          "tp": 43,
+          "fp": 2,
+          "fn": 38,
+          "precision": 0.9555555555555556,
+          "recall": 0.5308641975308642,
+          "f1": 0.6825396825396826
+        },
+        {
+          "threshold": 0.7,
+          "tp": 28,
+          "fp": 2,
+          "fn": 53,
+          "precision": 0.9333333333333333,
+          "recall": 0.345679012345679,
+          "f1": 0.5045045045045045
+        },
+        {
+          "threshold": 0.9,
+          "tp": 20,
+          "fp": 1,
+          "fn": 61,
+          "precision": 0.9523809523809523,
+          "recall": 0.24691358024691357,
+          "f1": 0.39215686274509803
+        }
+      ],
+      "scoreBins": [
+        {
+          "from": 0,
+          "to": 0.2,
+          "count": 0,
+          "correct": 0
+        },
+        {
+          "from": 0.2,
+          "to": 0.4,
+          "count": 84,
+          "correct": 10
+        },
+        {
+          "from": 0.4,
+          "to": 0.6,
+          "count": 20,
+          "correct": 15
+        },
+        {
+          "from": 0.6,
+          "to": 0.8,
+          "count": 14,
+          "correct": 13
+        },
+        {
+          "from": 0.8,
+          "to": 1,
+          "count": 27,
+          "correct": 26
+        }
+      ]
+    },
+    "template/stream-256/guitar": {
+      "runs": 34,
+      "unavailable": 0,
+      "failed": 0,
+      "onset": {
+        "tp": 64,
+        "fp": 81,
+        "fn": 17,
+        "precision": 0.4413793103448276,
+        "recall": 0.7901234567901234,
+        "f1": 0.5663716814159292
+      },
+      "active": {
+        "tp": 2134,
+        "fp": 577,
+        "fn": 514,
+        "precision": 0.7871634083364072,
+        "recall": 0.8058912386706949,
+        "f1": 0.7964172420227654
+      },
+      "exactActiveFrames": 860,
+      "activeFrames": 1240,
+      "exactChordRate": 0.6935483870967742,
+      "latency": {
+        "matchedCount": 64,
+        "p50": 0.07803620751021356,
+        "p95": 0.1922194853219974
+      },
+      "realTimeFactor": 0.07903460249396677,
+      "maxBacklog": 0.0025476269999999412,
+      "falseAccusations": 81,
+      "missedUnexpectedAttacks": 1,
+      "unassessedTargetEvents": 21,
+      "silentFalseFrames": 259,
+      "silentFrames": 1246,
+      "octaveConfusions": 0,
+      "confidence": [
+        {
+          "threshold": 0,
+          "tp": 64,
+          "fp": 81,
+          "fn": 17,
+          "precision": 0.4413793103448276,
+          "recall": 0.7901234567901234,
+          "f1": 0.5663716814159292
+        },
+        {
+          "threshold": 0.3,
+          "tp": 57,
+          "fp": 26,
+          "fn": 24,
+          "precision": 0.6867469879518072,
+          "recall": 0.7037037037037037,
+          "f1": 0.6951219512195121
+        },
+        {
+          "threshold": 0.5,
+          "tp": 43,
+          "fp": 2,
+          "fn": 38,
+          "precision": 0.9555555555555556,
+          "recall": 0.5308641975308642,
+          "f1": 0.6825396825396826
+        },
+        {
+          "threshold": 0.7,
+          "tp": 28,
+          "fp": 2,
+          "fn": 53,
+          "precision": 0.9333333333333333,
+          "recall": 0.345679012345679,
+          "f1": 0.5045045045045045
+        },
+        {
+          "threshold": 0.9,
+          "tp": 20,
+          "fp": 1,
+          "fn": 61,
+          "precision": 0.9523809523809523,
+          "recall": 0.24691358024691357,
+          "f1": 0.39215686274509803
+        }
+      ],
+      "scoreBins": [
+        {
+          "from": 0,
+          "to": 0.2,
+          "count": 0,
+          "correct": 0
+        },
+        {
+          "from": 0.2,
+          "to": 0.4,
+          "count": 84,
+          "correct": 10
+        },
+        {
+          "from": 0.4,
+          "to": 0.6,
+          "count": 20,
+          "correct": 15
+        },
+        {
+          "from": 0.6,
+          "to": 0.8,
+          "count": 14,
+          "correct": 13
+        },
+        {
+          "from": 0.8,
+          "to": 1,
+          "count": 27,
+          "correct": 26
+        }
+      ]
+    },
+    "template/stream-2048/guitar": {
+      "runs": 34,
+      "unavailable": 0,
+      "failed": 0,
+      "onset": {
+        "tp": 64,
+        "fp": 81,
+        "fn": 17,
+        "precision": 0.4413793103448276,
+        "recall": 0.7901234567901234,
+        "f1": 0.5663716814159292
+      },
+      "active": {
+        "tp": 2134,
+        "fp": 577,
+        "fn": 514,
+        "precision": 0.7871634083364072,
+        "recall": 0.8058912386706949,
+        "f1": 0.7964172420227654
+      },
+      "exactActiveFrames": 860,
+      "activeFrames": 1240,
+      "exactChordRate": 0.6935483870967742,
+      "latency": {
+        "matchedCount": 64,
+        "p50": 0.13076309337641295,
+        "p95": 0.22402515297053116
+      },
+      "realTimeFactor": 0.08088493887453935,
+      "maxBacklog": 0.021204324999998803,
+      "falseAccusations": 81,
+      "missedUnexpectedAttacks": 1,
+      "unassessedTargetEvents": 21,
+      "silentFalseFrames": 259,
+      "silentFrames": 1246,
+      "octaveConfusions": 0,
+      "confidence": [
+        {
+          "threshold": 0,
+          "tp": 64,
+          "fp": 81,
+          "fn": 17,
+          "precision": 0.4413793103448276,
+          "recall": 0.7901234567901234,
+          "f1": 0.5663716814159292
+        },
+        {
+          "threshold": 0.3,
+          "tp": 57,
+          "fp": 26,
+          "fn": 24,
+          "precision": 0.6867469879518072,
+          "recall": 0.7037037037037037,
+          "f1": 0.6951219512195121
+        },
+        {
+          "threshold": 0.5,
+          "tp": 43,
+          "fp": 2,
+          "fn": 38,
+          "precision": 0.9555555555555556,
+          "recall": 0.5308641975308642,
+          "f1": 0.6825396825396826
+        },
+        {
+          "threshold": 0.7,
+          "tp": 28,
+          "fp": 2,
+          "fn": 53,
+          "precision": 0.9333333333333333,
+          "recall": 0.345679012345679,
+          "f1": 0.5045045045045045
+        },
+        {
+          "threshold": 0.9,
+          "tp": 20,
+          "fp": 1,
+          "fn": 61,
+          "precision": 0.9523809523809523,
+          "recall": 0.24691358024691357,
+          "f1": 0.39215686274509803
+        }
+      ],
+      "scoreBins": [
+        {
+          "from": 0,
+          "to": 0.2,
+          "count": 0,
+          "correct": 0
+        },
+        {
+          "from": 0.2,
+          "to": 0.4,
+          "count": 84,
+          "correct": 10
+        },
+        {
+          "from": 0.4,
+          "to": 0.6,
+          "count": 20,
+          "correct": 15
+        },
+        {
+          "from": 0.6,
+          "to": 0.8,
+          "count": 14,
+          "correct": 13
+        },
+        {
+          "from": 0.8,
+          "to": 1,
+          "count": 27,
+          "correct": 26
+        }
+      ]
+    },
+    "neural/offline/guitar": {
+      "runs": 34,
+      "unavailable": 0,
+      "failed": 0,
+      "onset": {
+        "tp": 73,
+        "fp": 56,
+        "fn": 8,
+        "precision": 0.5658914728682171,
+        "recall": 0.9012345679012346,
+        "f1": 0.6952380952380952
+      },
+      "active": {
+        "tp": 2439,
+        "fp": 456,
+        "fn": 209,
+        "precision": 0.8424870466321244,
+        "recall": 0.9210725075528701,
+        "f1": 0.8800288652354321
+      },
+      "exactActiveFrames": 822,
+      "activeFrames": 1240,
+      "exactChordRate": 0.6629032258064517,
+      "latency": {
+        "matchedCount": 73,
+        "p50": 4.039357695999999,
+        "p95": 8.089462823473925
+      },
+      "realTimeFactor": 2.5533754098150236,
+      "maxBacklog": null,
+      "falseAccusations": 56,
+      "missedUnexpectedAttacks": 0,
+      "unassessedTargetEvents": 13,
+      "silentFalseFrames": 90,
+      "silentFrames": 1246,
+      "octaveConfusions": 1,
+      "confidence": [
+        {
+          "threshold": 0,
+          "tp": 73,
+          "fp": 56,
+          "fn": 8,
+          "precision": 0.5658914728682171,
+          "recall": 0.9012345679012346,
+          "f1": 0.6952380952380952
+        },
+        {
+          "threshold": 0.3,
+          "tp": 73,
+          "fp": 54,
+          "fn": 8,
+          "precision": 0.5748031496062992,
+          "recall": 0.9012345679012346,
+          "f1": 0.7019230769230769
+        },
+        {
+          "threshold": 0.5,
+          "tp": 71,
+          "fp": 7,
+          "fn": 10,
+          "precision": 0.9102564102564102,
+          "recall": 0.8765432098765432,
+          "f1": 0.8930817610062893
+        },
+        {
+          "threshold": 0.7,
+          "tp": 40,
+          "fp": 2,
+          "fn": 41,
+          "precision": 0.9523809523809523,
+          "recall": 0.49382716049382713,
+          "f1": 0.6504065040650406
+        },
+        {
+          "threshold": 0.9,
+          "tp": 0,
+          "fp": 0,
+          "fn": 81,
+          "precision": null,
+          "recall": 0,
+          "f1": 0
+        }
+      ],
+      "scoreBins": [
+        {
+          "from": 0,
+          "to": 0.2,
+          "count": 0,
+          "correct": 0
+        },
+        {
+          "from": 0.2,
+          "to": 0.4,
+          "count": 42,
+          "correct": 0
+        },
+        {
+          "from": 0.4,
+          "to": 0.6,
+          "count": 25,
+          "correct": 14
+        },
+        {
+          "from": 0.6,
+          "to": 0.8,
+          "count": 53,
+          "correct": 51
+        },
+        {
+          "from": 0.8,
+          "to": 1,
+          "count": 9,
+          "correct": 8
+        }
+      ]
+    },
+    "neural/stream-256/guitar": {
+      "runs": 0,
+      "unavailable": 34,
+      "failed": 0,
+      "onset": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": null,
+        "recall": null,
+        "f1": null
+      },
+      "active": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": null,
+        "recall": null,
+        "f1": null
+      },
+      "exactActiveFrames": 0,
+      "activeFrames": 0,
+      "exactChordRate": null,
+      "latency": {
+        "matchedCount": 0,
+        "p50": null,
+        "p95": null
+      },
+      "realTimeFactor": null,
+      "maxBacklog": null,
+      "falseAccusations": 0,
+      "missedUnexpectedAttacks": 0,
+      "unassessedTargetEvents": 0,
+      "silentFalseFrames": 0,
+      "silentFrames": 0,
+      "octaveConfusions": 0,
+      "confidence": [
+        {
+          "threshold": 0,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        },
+        {
+          "threshold": 0.3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        },
+        {
+          "threshold": 0.5,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        },
+        {
+          "threshold": 0.7,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        },
+        {
+          "threshold": 0.9,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        }
+      ],
+      "scoreBins": [
+        {
+          "from": 0,
+          "to": 0.2,
+          "count": 0,
+          "correct": 0
+        },
+        {
+          "from": 0.2,
+          "to": 0.4,
+          "count": 0,
+          "correct": 0
+        },
+        {
+          "from": 0.4,
+          "to": 0.6,
+          "count": 0,
+          "correct": 0
+        },
+        {
+          "from": 0.6,
+          "to": 0.8,
+          "count": 0,
+          "correct": 0
+        },
+        {
+          "from": 0.8,
+          "to": 1,
+          "count": 0,
+          "correct": 0
+        }
+      ]
+    },
+    "neural/stream-2048/guitar": {
+      "runs": 0,
+      "unavailable": 34,
+      "failed": 0,
+      "onset": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": null,
+        "recall": null,
+        "f1": null
+      },
+      "active": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": null,
+        "recall": null,
+        "f1": null
+      },
+      "exactActiveFrames": 0,
+      "activeFrames": 0,
+      "exactChordRate": null,
+      "latency": {
+        "matchedCount": 0,
+        "p50": null,
+        "p95": null
+      },
+      "realTimeFactor": null,
+      "maxBacklog": null,
+      "falseAccusations": 0,
+      "missedUnexpectedAttacks": 0,
+      "unassessedTargetEvents": 0,
+      "silentFalseFrames": 0,
+      "silentFrames": 0,
+      "octaveConfusions": 0,
+      "confidence": [
+        {
+          "threshold": 0,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        },
+        {
+          "threshold": 0.3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        },
+        {
+          "threshold": 0.5,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        },
+        {
+          "threshold": 0.7,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        },
+        {
+          "threshold": 0.9,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        }
+      ],
+      "scoreBins": [
+        {
+          "from": 0,
+          "to": 0.2,
+          "count": 0,
+          "correct": 0
+        },
+        {
+          "from": 0.2,
+          "to": 0.4,
+          "count": 0,
+          "correct": 0
+        },
+        {
+          "from": 0.4,
+          "to": 0.6,
+          "count": 0,
+          "correct": 0
+        },
+        {
+          "from": 0.6,
+          "to": 0.8,
+          "count": 0,
+          "correct": 0
+        },
+        {
+          "from": 0.8,
+          "to": 1,
+          "count": 0,
+          "correct": 0
+        }
+      ]
+    },
+    "harmonic/offline/guitar2": {
+      "runs": 34,
+      "unavailable": 0,
+      "failed": 0,
+      "onset": {
+        "tp": 65,
+        "fp": 373,
+        "fn": 16,
+        "precision": 0.14840182648401826,
+        "recall": 0.8024691358024691,
+        "f1": 0.2504816955684008
+      },
+      "active": {
+        "tp": 2038,
+        "fp": 1476,
+        "fn": 610,
+        "precision": 0.5799658508821856,
+        "recall": 0.7696374622356495,
+        "f1": 0.6614735475494969
+      },
+      "exactActiveFrames": 784,
+      "activeFrames": 1240,
+      "exactChordRate": 0.632258064516129,
+      "latency": {
+        "matchedCount": 65,
+        "p50": 1.272510398000013,
+        "p95": 1.5173069767369682
+      },
+      "realTimeFactor": 0.0774692464107581,
+      "maxBacklog": 0.2710636099999828,
+      "falseAccusations": 373,
+      "missedUnexpectedAttacks": 1,
+      "unassessedTargetEvents": 20,
+      "silentFalseFrames": 302,
+      "silentFrames": 1246,
+      "octaveConfusions": 2,
+      "confidence": [
+        {
+          "threshold": 0,
+          "tp": 65,
+          "fp": 373,
+          "fn": 16,
+          "precision": 0.14840182648401826,
+          "recall": 0.8024691358024691,
+          "f1": 0.2504816955684008
+        },
+        {
+          "threshold": 0.3,
+          "tp": 64,
+          "fp": 232,
+          "fn": 17,
+          "precision": 0.21621621621621623,
+          "recall": 0.7901234567901234,
+          "f1": 0.3395225464190981
+        },
+        {
+          "threshold": 0.5,
+          "tp": 51,
+          "fp": 14,
+          "fn": 30,
+          "precision": 0.7846153846153846,
+          "recall": 0.6296296296296297,
+          "f1": 0.6986301369863014
+        },
+        {
+          "threshold": 0.7,
+          "tp": 31,
+          "fp": 5,
+          "fn": 50,
+          "precision": 0.8611111111111112,
+          "recall": 0.38271604938271603,
+          "f1": 0.5299145299145299
+        },
+        {
+          "threshold": 0.9,
+          "tp": 10,
+          "fp": 1,
+          "fn": 71,
+          "precision": 0.9090909090909091,
+          "recall": 0.12345679012345678,
+          "f1": 0.21739130434782608
+        }
+      ],
+      "scoreBins": [
+        {
+          "from": 0,
+          "to": 0.2,
+          "count": 0,
+          "correct": 0
+        },
+        {
+          "from": 0.2,
+          "to": 0.4,
+          "count": 347,
+          "correct": 8
+        },
+        {
+          "from": 0.4,
+          "to": 0.6,
+          "count": 42,
+          "correct": 17
+        },
+        {
+          "from": 0.6,
+          "to": 0.8,
+          "count": 24,
+          "correct": 18
+        },
+        {
+          "from": 0.8,
+          "to": 1,
+          "count": 25,
+          "correct": 22
+        }
+      ]
+    },
+    "harmonic/stream-256/guitar2": {
+      "runs": 34,
+      "unavailable": 0,
+      "failed": 0,
+      "onset": {
+        "tp": 65,
+        "fp": 373,
+        "fn": 16,
+        "precision": 0.14840182648401826,
+        "recall": 0.8024691358024691,
+        "f1": 0.2504816955684008
+      },
+      "active": {
+        "tp": 2038,
+        "fp": 1476,
+        "fn": 610,
+        "precision": 0.5799658508821856,
+        "recall": 0.7696374622356495,
+        "f1": 0.6614735475494969
+      },
+      "exactActiveFrames": 784,
+      "activeFrames": 1240,
+      "exactChordRate": 0.632258064516129,
+      "latency": {
+        "matchedCount": 65,
+        "p50": 0.06486190175510853,
+        "p95": 0.1472694110249601
+      },
+      "realTimeFactor": 0.07517809442033428,
+      "maxBacklog": 0.00536909399999419,
+      "falseAccusations": 373,
+      "missedUnexpectedAttacks": 1,
+      "unassessedTargetEvents": 20,
+      "silentFalseFrames": 302,
+      "silentFrames": 1246,
+      "octaveConfusions": 2,
+      "confidence": [
+        {
+          "threshold": 0,
+          "tp": 65,
+          "fp": 373,
+          "fn": 16,
+          "precision": 0.14840182648401826,
+          "recall": 0.8024691358024691,
+          "f1": 0.2504816955684008
+        },
+        {
+          "threshold": 0.3,
+          "tp": 64,
+          "fp": 232,
+          "fn": 17,
+          "precision": 0.21621621621621623,
+          "recall": 0.7901234567901234,
+          "f1": 0.3395225464190981
+        },
+        {
+          "threshold": 0.5,
+          "tp": 51,
+          "fp": 14,
+          "fn": 30,
+          "precision": 0.7846153846153846,
+          "recall": 0.6296296296296297,
+          "f1": 0.6986301369863014
+        },
+        {
+          "threshold": 0.7,
+          "tp": 31,
+          "fp": 5,
+          "fn": 50,
+          "precision": 0.8611111111111112,
+          "recall": 0.38271604938271603,
+          "f1": 0.5299145299145299
+        },
+        {
+          "threshold": 0.9,
+          "tp": 10,
+          "fp": 1,
+          "fn": 71,
+          "precision": 0.9090909090909091,
+          "recall": 0.12345679012345678,
+          "f1": 0.21739130434782608
+        }
+      ],
+      "scoreBins": [
+        {
+          "from": 0,
+          "to": 0.2,
+          "count": 0,
+          "correct": 0
+        },
+        {
+          "from": 0.2,
+          "to": 0.4,
+          "count": 347,
+          "correct": 8
+        },
+        {
+          "from": 0.4,
+          "to": 0.6,
+          "count": 42,
+          "correct": 17
+        },
+        {
+          "from": 0.6,
+          "to": 0.8,
+          "count": 24,
+          "correct": 18
+        },
+        {
+          "from": 0.8,
+          "to": 1,
+          "count": 25,
+          "correct": 22
+        }
+      ]
+    },
+    "harmonic/stream-2048/guitar2": {
+      "runs": 34,
+      "unavailable": 0,
+      "failed": 0,
+      "onset": {
+        "tp": 65,
+        "fp": 373,
+        "fn": 16,
+        "precision": 0.14840182648401826,
+        "recall": 0.8024691358024691,
+        "f1": 0.2504816955684008
+      },
+      "active": {
+        "tp": 2038,
+        "fp": 1476,
+        "fn": 610,
+        "precision": 0.5799658508821856,
+        "recall": 0.7696374622356495,
+        "f1": 0.6614735475494969
+      },
+      "exactActiveFrames": 784,
+      "activeFrames": 1240,
+      "exactChordRate": 0.632258064516129,
+      "latency": {
+        "matchedCount": 65,
+        "p50": 0.1302951993764117,
+        "p95": 0.22337562997053112
+      },
+      "realTimeFactor": 0.07344486797754596,
+      "maxBacklog": 0.01924917699999057,
+      "falseAccusations": 373,
+      "missedUnexpectedAttacks": 1,
+      "unassessedTargetEvents": 20,
+      "silentFalseFrames": 302,
+      "silentFrames": 1246,
+      "octaveConfusions": 2,
+      "confidence": [
+        {
+          "threshold": 0,
+          "tp": 65,
+          "fp": 373,
+          "fn": 16,
+          "precision": 0.14840182648401826,
+          "recall": 0.8024691358024691,
+          "f1": 0.2504816955684008
+        },
+        {
+          "threshold": 0.3,
+          "tp": 64,
+          "fp": 232,
+          "fn": 17,
+          "precision": 0.21621621621621623,
+          "recall": 0.7901234567901234,
+          "f1": 0.3395225464190981
+        },
+        {
+          "threshold": 0.5,
+          "tp": 51,
+          "fp": 14,
+          "fn": 30,
+          "precision": 0.7846153846153846,
+          "recall": 0.6296296296296297,
+          "f1": 0.6986301369863014
+        },
+        {
+          "threshold": 0.7,
+          "tp": 31,
+          "fp": 5,
+          "fn": 50,
+          "precision": 0.8611111111111112,
+          "recall": 0.38271604938271603,
+          "f1": 0.5299145299145299
+        },
+        {
+          "threshold": 0.9,
+          "tp": 10,
+          "fp": 1,
+          "fn": 71,
+          "precision": 0.9090909090909091,
+          "recall": 0.12345679012345678,
+          "f1": 0.21739130434782608
+        }
+      ],
+      "scoreBins": [
+        {
+          "from": 0,
+          "to": 0.2,
+          "count": 0,
+          "correct": 0
+        },
+        {
+          "from": 0.2,
+          "to": 0.4,
+          "count": 347,
+          "correct": 8
+        },
+        {
+          "from": 0.4,
+          "to": 0.6,
+          "count": 42,
+          "correct": 17
+        },
+        {
+          "from": 0.6,
+          "to": 0.8,
+          "count": 24,
+          "correct": 18
+        },
+        {
+          "from": 0.8,
+          "to": 1,
+          "count": 25,
+          "correct": 22
+        }
+      ]
+    },
+    "template/offline/guitar2": {
+      "runs": 34,
+      "unavailable": 0,
+      "failed": 0,
+      "onset": {
+        "tp": 54,
+        "fp": 221,
+        "fn": 27,
+        "precision": 0.19636363636363635,
+        "recall": 0.6666666666666666,
+        "f1": 0.30337078651685395
+      },
+      "active": {
+        "tp": 1522,
+        "fp": 1569,
+        "fn": 1126,
+        "precision": 0.4923972824328696,
+        "recall": 0.574773413897281,
+        "f1": 0.5304059940756229
+      },
+      "exactActiveFrames": 316,
+      "activeFrames": 1240,
+      "exactChordRate": 0.25483870967741934,
+      "latency": {
+        "matchedCount": 54,
+        "p50": 1.286229705000005,
+        "p95": 1.606858806473977
+      },
+      "realTimeFactor": 0.09131502589227627,
+      "maxBacklog": 0.20733976000000265,
+      "falseAccusations": 221,
+      "missedUnexpectedAttacks": 1,
+      "unassessedTargetEvents": 31,
+      "silentFalseFrames": 286,
+      "silentFrames": 1246,
+      "octaveConfusions": 10,
+      "confidence": [
+        {
+          "threshold": 0,
+          "tp": 54,
+          "fp": 221,
+          "fn": 27,
+          "precision": 0.19636363636363635,
+          "recall": 0.6666666666666666,
+          "f1": 0.30337078651685395
+        },
+        {
+          "threshold": 0.3,
+          "tp": 45,
+          "fp": 62,
+          "fn": 36,
+          "precision": 0.4205607476635514,
+          "recall": 0.5555555555555556,
+          "f1": 0.4787234042553192
+        },
+        {
+          "threshold": 0.5,
+          "tp": 27,
+          "fp": 6,
+          "fn": 54,
+          "precision": 0.8181818181818182,
+          "recall": 0.3333333333333333,
+          "f1": 0.47368421052631576
+        },
+        {
+          "threshold": 0.7,
+          "tp": 11,
+          "fp": 0,
+          "fn": 70,
+          "precision": 1,
+          "recall": 0.13580246913580246,
+          "f1": 0.2391304347826087
+        },
+        {
+          "threshold": 0.9,
+          "tp": 0,
+          "fp": 0,
+          "fn": 81,
+          "precision": null,
+          "recall": 0,
+          "f1": 0
+        }
+      ],
+      "scoreBins": [
+        {
+          "from": 0,
+          "to": 0.2,
+          "count": 0,
+          "correct": 0
+        },
+        {
+          "from": 0.2,
+          "to": 0.4,
+          "count": 223,
+          "correct": 19
+        },
+        {
+          "from": 0.4,
+          "to": 0.6,
+          "count": 36,
+          "correct": 21
+        },
+        {
+          "from": 0.6,
+          "to": 0.8,
+          "count": 11,
+          "correct": 9
+        },
+        {
+          "from": 0.8,
+          "to": 1,
+          "count": 5,
+          "correct": 5
+        }
+      ]
+    },
+    "template/stream-256/guitar2": {
+      "runs": 34,
+      "unavailable": 0,
+      "failed": 0,
+      "onset": {
+        "tp": 54,
+        "fp": 221,
+        "fn": 27,
+        "precision": 0.19636363636363635,
+        "recall": 0.6666666666666666,
+        "f1": 0.30337078651685395
+      },
+      "active": {
+        "tp": 1522,
+        "fp": 1569,
+        "fn": 1126,
+        "precision": 0.4923972824328696,
+        "recall": 0.574773413897281,
+        "f1": 0.5304059940756229
+      },
+      "exactActiveFrames": 316,
+      "activeFrames": 1240,
+      "exactChordRate": 0.25483870967741934,
+      "latency": {
+        "matchedCount": 54,
+        "p50": 0.0818762463718774,
+        "p95": 0.1820583849977514
+      },
+      "realTimeFactor": 0.09152593977990563,
+      "maxBacklog": 0.00304469000000962,
+      "falseAccusations": 221,
+      "missedUnexpectedAttacks": 1,
+      "unassessedTargetEvents": 31,
+      "silentFalseFrames": 286,
+      "silentFrames": 1246,
+      "octaveConfusions": 10,
+      "confidence": [
+        {
+          "threshold": 0,
+          "tp": 54,
+          "fp": 221,
+          "fn": 27,
+          "precision": 0.19636363636363635,
+          "recall": 0.6666666666666666,
+          "f1": 0.30337078651685395
+        },
+        {
+          "threshold": 0.3,
+          "tp": 45,
+          "fp": 62,
+          "fn": 36,
+          "precision": 0.4205607476635514,
+          "recall": 0.5555555555555556,
+          "f1": 0.4787234042553192
+        },
+        {
+          "threshold": 0.5,
+          "tp": 27,
+          "fp": 6,
+          "fn": 54,
+          "precision": 0.8181818181818182,
+          "recall": 0.3333333333333333,
+          "f1": 0.47368421052631576
+        },
+        {
+          "threshold": 0.7,
+          "tp": 11,
+          "fp": 0,
+          "fn": 70,
+          "precision": 1,
+          "recall": 0.13580246913580246,
+          "f1": 0.2391304347826087
+        },
+        {
+          "threshold": 0.9,
+          "tp": 0,
+          "fp": 0,
+          "fn": 81,
+          "precision": null,
+          "recall": 0,
+          "f1": 0
+        }
+      ],
+      "scoreBins": [
+        {
+          "from": 0,
+          "to": 0.2,
+          "count": 0,
+          "correct": 0
+        },
+        {
+          "from": 0.2,
+          "to": 0.4,
+          "count": 223,
+          "correct": 19
+        },
+        {
+          "from": 0.4,
+          "to": 0.6,
+          "count": 36,
+          "correct": 21
+        },
+        {
+          "from": 0.6,
+          "to": 0.8,
+          "count": 11,
+          "correct": 9
+        },
+        {
+          "from": 0.8,
+          "to": 1,
+          "count": 5,
+          "correct": 5
+        }
+      ]
+    },
+    "template/stream-2048/guitar2": {
+      "runs": 34,
+      "unavailable": 0,
+      "failed": 0,
+      "onset": {
+        "tp": 54,
+        "fp": 221,
+        "fn": 27,
+        "precision": 0.19636363636363635,
+        "recall": 0.6666666666666666,
+        "f1": 0.30337078651685395
+      },
+      "active": {
+        "tp": 1522,
+        "fp": 1569,
+        "fn": 1126,
+        "precision": 0.4923972824328696,
+        "recall": 0.574773413897281,
+        "f1": 0.5304059940756229
+      },
+      "exactActiveFrames": 316,
+      "activeFrames": 1240,
+      "exactChordRate": 0.25483870967741934,
+      "latency": {
+        "matchedCount": 54,
+        "p50": 0.1330325113763946,
+        "p95": 0.22862787197051887
+      },
+      "realTimeFactor": 0.09400940499238326,
+      "maxBacklog": 0.03163298600001141,
+      "falseAccusations": 221,
+      "missedUnexpectedAttacks": 1,
+      "unassessedTargetEvents": 31,
+      "silentFalseFrames": 286,
+      "silentFrames": 1246,
+      "octaveConfusions": 10,
+      "confidence": [
+        {
+          "threshold": 0,
+          "tp": 54,
+          "fp": 221,
+          "fn": 27,
+          "precision": 0.19636363636363635,
+          "recall": 0.6666666666666666,
+          "f1": 0.30337078651685395
+        },
+        {
+          "threshold": 0.3,
+          "tp": 45,
+          "fp": 62,
+          "fn": 36,
+          "precision": 0.4205607476635514,
+          "recall": 0.5555555555555556,
+          "f1": 0.4787234042553192
+        },
+        {
+          "threshold": 0.5,
+          "tp": 27,
+          "fp": 6,
+          "fn": 54,
+          "precision": 0.8181818181818182,
+          "recall": 0.3333333333333333,
+          "f1": 0.47368421052631576
+        },
+        {
+          "threshold": 0.7,
+          "tp": 11,
+          "fp": 0,
+          "fn": 70,
+          "precision": 1,
+          "recall": 0.13580246913580246,
+          "f1": 0.2391304347826087
+        },
+        {
+          "threshold": 0.9,
+          "tp": 0,
+          "fp": 0,
+          "fn": 81,
+          "precision": null,
+          "recall": 0,
+          "f1": 0
+        }
+      ],
+      "scoreBins": [
+        {
+          "from": 0,
+          "to": 0.2,
+          "count": 0,
+          "correct": 0
+        },
+        {
+          "from": 0.2,
+          "to": 0.4,
+          "count": 223,
+          "correct": 19
+        },
+        {
+          "from": 0.4,
+          "to": 0.6,
+          "count": 36,
+          "correct": 21
+        },
+        {
+          "from": 0.6,
+          "to": 0.8,
+          "count": 11,
+          "correct": 9
+        },
+        {
+          "from": 0.8,
+          "to": 1,
+          "count": 5,
+          "correct": 5
+        }
+      ]
+    },
+    "neural/offline/guitar2": {
+      "runs": 34,
+      "unavailable": 0,
+      "failed": 0,
+      "onset": {
+        "tp": 79,
+        "fp": 50,
+        "fn": 2,
+        "precision": 0.6124031007751938,
+        "recall": 0.9753086419753086,
+        "f1": 0.7523809523809524
+      },
+      "active": {
+        "tp": 2449,
+        "fp": 461,
+        "fn": 199,
+        "precision": 0.8415807560137457,
+        "recall": 0.9248489425981873,
+        "f1": 0.8812522490104354
+      },
+      "exactActiveFrames": 874,
+      "activeFrames": 1240,
+      "exactChordRate": 0.7048387096774194,
+      "latency": {
+        "matchedCount": 79,
+        "p50": 5.138991213000001,
+        "p95": 7.961237751999986
+      },
+      "realTimeFactor": 2.922564675223469,
+      "maxBacklog": null,
+      "falseAccusations": 50,
+      "missedUnexpectedAttacks": 1,
+      "unassessedTargetEvents": 6,
+      "silentFalseFrames": 82,
+      "silentFrames": 1246,
+      "octaveConfusions": 0,
+      "confidence": [
+        {
+          "threshold": 0,
+          "tp": 79,
+          "fp": 50,
+          "fn": 2,
+          "precision": 0.6124031007751938,
+          "recall": 0.9753086419753086,
+          "f1": 0.7523809523809524
+        },
+        {
+          "threshold": 0.3,
+          "tp": 79,
+          "fp": 47,
+          "fn": 2,
+          "precision": 0.626984126984127,
+          "recall": 0.9753086419753086,
+          "f1": 0.7632850241545893
+        },
+        {
+          "threshold": 0.5,
+          "tp": 72,
+          "fp": 15,
+          "fn": 9,
+          "precision": 0.8275862068965517,
+          "recall": 0.8888888888888888,
+          "f1": 0.8571428571428571
+        },
+        {
+          "threshold": 0.7,
+          "tp": 45,
+          "fp": 3,
+          "fn": 36,
+          "precision": 0.9375,
+          "recall": 0.5555555555555556,
+          "f1": 0.6976744186046512
+        },
+        {
+          "threshold": 0.9,
+          "tp": 0,
+          "fp": 0,
+          "fn": 81,
+          "precision": null,
+          "recall": 0,
+          "f1": 0
+        }
+      ],
+      "scoreBins": [
+        {
+          "from": 0,
+          "to": 0.2,
+          "count": 0,
+          "correct": 0
+        },
+        {
+          "from": 0.2,
+          "to": 0.4,
+          "count": 31,
+          "correct": 2
+        },
+        {
+          "from": 0.4,
+          "to": 0.6,
+          "count": 24,
+          "correct": 13
+        },
+        {
+          "from": 0.6,
+          "to": 0.8,
+          "count": 66,
+          "correct": 56
+        },
+        {
+          "from": 0.8,
+          "to": 1,
+          "count": 8,
+          "correct": 8
+        }
+      ]
+    },
+    "neural/stream-256/guitar2": {
+      "runs": 0,
+      "unavailable": 34,
+      "failed": 0,
+      "onset": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": null,
+        "recall": null,
+        "f1": null
+      },
+      "active": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": null,
+        "recall": null,
+        "f1": null
+      },
+      "exactActiveFrames": 0,
+      "activeFrames": 0,
+      "exactChordRate": null,
+      "latency": {
+        "matchedCount": 0,
+        "p50": null,
+        "p95": null
+      },
+      "realTimeFactor": null,
+      "maxBacklog": null,
+      "falseAccusations": 0,
+      "missedUnexpectedAttacks": 0,
+      "unassessedTargetEvents": 0,
+      "silentFalseFrames": 0,
+      "silentFrames": 0,
+      "octaveConfusions": 0,
+      "confidence": [
+        {
+          "threshold": 0,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        },
+        {
+          "threshold": 0.3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        },
+        {
+          "threshold": 0.5,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        },
+        {
+          "threshold": 0.7,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        },
+        {
+          "threshold": 0.9,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        }
+      ],
+      "scoreBins": [
+        {
+          "from": 0,
+          "to": 0.2,
+          "count": 0,
+          "correct": 0
+        },
+        {
+          "from": 0.2,
+          "to": 0.4,
+          "count": 0,
+          "correct": 0
+        },
+        {
+          "from": 0.4,
+          "to": 0.6,
+          "count": 0,
+          "correct": 0
+        },
+        {
+          "from": 0.6,
+          "to": 0.8,
+          "count": 0,
+          "correct": 0
+        },
+        {
+          "from": 0.8,
+          "to": 1,
+          "count": 0,
+          "correct": 0
+        }
+      ]
+    },
+    "neural/stream-2048/guitar2": {
+      "runs": 0,
+      "unavailable": 34,
+      "failed": 0,
+      "onset": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": null,
+        "recall": null,
+        "f1": null
+      },
+      "active": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": null,
+        "recall": null,
+        "f1": null
+      },
+      "exactActiveFrames": 0,
+      "activeFrames": 0,
+      "exactChordRate": null,
+      "latency": {
+        "matchedCount": 0,
+        "p50": null,
+        "p95": null
+      },
+      "realTimeFactor": null,
+      "maxBacklog": null,
+      "falseAccusations": 0,
+      "missedUnexpectedAttacks": 0,
+      "unassessedTargetEvents": 0,
+      "silentFalseFrames": 0,
+      "silentFrames": 0,
+      "octaveConfusions": 0,
+      "confidence": [
+        {
+          "threshold": 0,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        },
+        {
+          "threshold": 0.3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        },
+        {
+          "threshold": 0.5,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        },
+        {
+          "threshold": 0.7,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        },
+        {
+          "threshold": 0.9,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        }
+      ],
+      "scoreBins": [
+        {
+          "from": 0,
+          "to": 0.2,
+          "count": 0,
+          "correct": 0
+        },
+        {
+          "from": 0.2,
+          "to": 0.4,
+          "count": 0,
+          "correct": 0
+        },
+        {
+          "from": 0.4,
+          "to": 0.6,
+          "count": 0,
+          "correct": 0
+        },
+        {
+          "from": 0.6,
+          "to": 0.8,
+          "count": 0,
+          "correct": 0
+        },
+        {
+          "from": 0.8,
+          "to": 1,
+          "count": 0,
+          "correct": 0
+        }
+      ]
+    },
+    "harmonic/offline/piano": {
+      "runs": 34,
+      "unavailable": 0,
+      "failed": 0,
+      "onset": {
+        "tp": 64,
+        "fp": 300,
+        "fn": 17,
+        "precision": 0.17582417582417584,
+        "recall": 0.7901234567901234,
+        "f1": 0.2876404494382023
+      },
+      "active": {
+        "tp": 1720,
+        "fp": 1721,
+        "fn": 928,
+        "precision": 0.4998546934030805,
+        "recall": 0.649546827794562,
+        "f1": 0.5649531942847759
+      },
+      "exactActiveFrames": 293,
+      "activeFrames": 1240,
+      "exactChordRate": 0.23629032258064517,
+      "latency": {
+        "matchedCount": 64,
+        "p50": 1.2377351689999923,
+        "p95": 1.519397671736989
+      },
+      "realTimeFactor": 0.06618749023260993,
+      "maxBacklog": 0.1422246559999767,
+      "falseAccusations": 300,
+      "missedUnexpectedAttacks": 1,
+      "unassessedTargetEvents": 21,
+      "silentFalseFrames": 312,
+      "silentFrames": 1246,
+      "octaveConfusions": 9,
+      "confidence": [
+        {
+          "threshold": 0,
+          "tp": 64,
+          "fp": 300,
+          "fn": 17,
+          "precision": 0.17582417582417584,
+          "recall": 0.7901234567901234,
+          "f1": 0.2876404494382023
+        },
+        {
+          "threshold": 0.3,
+          "tp": 63,
+          "fp": 155,
+          "fn": 18,
+          "precision": 0.2889908256880734,
+          "recall": 0.7777777777777778,
+          "f1": 0.4214046822742475
+        },
+        {
+          "threshold": 0.5,
+          "tp": 44,
+          "fp": 37,
+          "fn": 37,
+          "precision": 0.5432098765432098,
+          "recall": 0.5432098765432098,
+          "f1": 0.5432098765432098
+        },
+        {
+          "threshold": 0.7,
+          "tp": 32,
+          "fp": 19,
+          "fn": 49,
+          "precision": 0.6274509803921569,
+          "recall": 0.3950617283950617,
+          "f1": 0.48484848484848486
+        },
+        {
+          "threshold": 0.9,
+          "tp": 5,
+          "fp": 0,
+          "fn": 76,
+          "precision": 1,
+          "recall": 0.06172839506172839,
+          "f1": 0.11627906976744186
+        }
+      ],
+      "scoreBins": [
+        {
+          "from": 0,
+          "to": 0.2,
+          "count": 0,
+          "correct": 0
+        },
+        {
+          "from": 0.2,
+          "to": 0.4,
+          "count": 266,
+          "correct": 9
+        },
+        {
+          "from": 0.4,
+          "to": 0.6,
+          "count": 31,
+          "correct": 18
+        },
+        {
+          "from": 0.6,
+          "to": 0.8,
+          "count": 43,
+          "correct": 15
+        },
+        {
+          "from": 0.8,
+          "to": 1,
+          "count": 24,
+          "correct": 22
+        }
+      ]
+    },
+    "harmonic/stream-256/piano": {
+      "runs": 34,
+      "unavailable": 0,
+      "failed": 0,
+      "onset": {
+        "tp": 64,
+        "fp": 300,
+        "fn": 17,
+        "precision": 0.17582417582417584,
+        "recall": 0.7901234567901234,
+        "f1": 0.2876404494382023
+      },
+      "active": {
+        "tp": 1720,
+        "fp": 1721,
+        "fn": 928,
+        "precision": 0.4998546934030805,
+        "recall": 0.649546827794562,
+        "f1": 0.5649531942847759
+      },
+      "exactActiveFrames": 293,
+      "activeFrames": 1240,
+      "exactChordRate": 0.23629032258064517,
+      "latency": {
+        "matchedCount": 64,
+        "p50": 0.07596202007932995,
+        "p95": 0.09909866872792833
+      },
+      "realTimeFactor": 0.06445328780105439,
+      "maxBacklog": 0.0018975710000377066,
+      "falseAccusations": 300,
+      "missedUnexpectedAttacks": 1,
+      "unassessedTargetEvents": 21,
+      "silentFalseFrames": 312,
+      "silentFrames": 1246,
+      "octaveConfusions": 9,
+      "confidence": [
+        {
+          "threshold": 0,
+          "tp": 64,
+          "fp": 300,
+          "fn": 17,
+          "precision": 0.17582417582417584,
+          "recall": 0.7901234567901234,
+          "f1": 0.2876404494382023
+        },
+        {
+          "threshold": 0.3,
+          "tp": 63,
+          "fp": 155,
+          "fn": 18,
+          "precision": 0.2889908256880734,
+          "recall": 0.7777777777777778,
+          "f1": 0.4214046822742475
+        },
+        {
+          "threshold": 0.5,
+          "tp": 44,
+          "fp": 37,
+          "fn": 37,
+          "precision": 0.5432098765432098,
+          "recall": 0.5432098765432098,
+          "f1": 0.5432098765432098
+        },
+        {
+          "threshold": 0.7,
+          "tp": 32,
+          "fp": 19,
+          "fn": 49,
+          "precision": 0.6274509803921569,
+          "recall": 0.3950617283950617,
+          "f1": 0.48484848484848486
+        },
+        {
+          "threshold": 0.9,
+          "tp": 5,
+          "fp": 0,
+          "fn": 76,
+          "precision": 1,
+          "recall": 0.06172839506172839,
+          "f1": 0.11627906976744186
+        }
+      ],
+      "scoreBins": [
+        {
+          "from": 0,
+          "to": 0.2,
+          "count": 0,
+          "correct": 0
+        },
+        {
+          "from": 0.2,
+          "to": 0.4,
+          "count": 266,
+          "correct": 9
+        },
+        {
+          "from": 0.4,
+          "to": 0.6,
+          "count": 31,
+          "correct": 18
+        },
+        {
+          "from": 0.6,
+          "to": 0.8,
+          "count": 43,
+          "correct": 15
+        },
+        {
+          "from": 0.8,
+          "to": 1,
+          "count": 24,
+          "correct": 22
+        }
+      ]
+    },
+    "harmonic/stream-2048/piano": {
+      "runs": 34,
+      "unavailable": 0,
+      "failed": 0,
+      "onset": {
+        "tp": 64,
+        "fp": 300,
+        "fn": 17,
+        "precision": 0.17582417582417584,
+        "recall": 0.7901234567901234,
+        "f1": 0.2876404494382023
+      },
+      "active": {
+        "tp": 1720,
+        "fp": 1721,
+        "fn": 928,
+        "precision": 0.4998546934030805,
+        "recall": 0.649546827794562,
+        "f1": 0.5649531942847759
+      },
+      "exactActiveFrames": 293,
+      "activeFrames": 1240,
+      "exactChordRate": 0.23629032258064517,
+      "latency": {
+        "matchedCount": 64,
+        "p50": 0.12872222237640824,
+        "p95": 0.14820990597048161
+      },
+      "realTimeFactor": 0.06479591186171645,
+      "maxBacklog": 0.012181249000015715,
+      "falseAccusations": 300,
+      "missedUnexpectedAttacks": 1,
+      "unassessedTargetEvents": 21,
+      "silentFalseFrames": 312,
+      "silentFrames": 1246,
+      "octaveConfusions": 9,
+      "confidence": [
+        {
+          "threshold": 0,
+          "tp": 64,
+          "fp": 300,
+          "fn": 17,
+          "precision": 0.17582417582417584,
+          "recall": 0.7901234567901234,
+          "f1": 0.2876404494382023
+        },
+        {
+          "threshold": 0.3,
+          "tp": 63,
+          "fp": 155,
+          "fn": 18,
+          "precision": 0.2889908256880734,
+          "recall": 0.7777777777777778,
+          "f1": 0.4214046822742475
+        },
+        {
+          "threshold": 0.5,
+          "tp": 44,
+          "fp": 37,
+          "fn": 37,
+          "precision": 0.5432098765432098,
+          "recall": 0.5432098765432098,
+          "f1": 0.5432098765432098
+        },
+        {
+          "threshold": 0.7,
+          "tp": 32,
+          "fp": 19,
+          "fn": 49,
+          "precision": 0.6274509803921569,
+          "recall": 0.3950617283950617,
+          "f1": 0.48484848484848486
+        },
+        {
+          "threshold": 0.9,
+          "tp": 5,
+          "fp": 0,
+          "fn": 76,
+          "precision": 1,
+          "recall": 0.06172839506172839,
+          "f1": 0.11627906976744186
+        }
+      ],
+      "scoreBins": [
+        {
+          "from": 0,
+          "to": 0.2,
+          "count": 0,
+          "correct": 0
+        },
+        {
+          "from": 0.2,
+          "to": 0.4,
+          "count": 266,
+          "correct": 9
+        },
+        {
+          "from": 0.4,
+          "to": 0.6,
+          "count": 31,
+          "correct": 18
+        },
+        {
+          "from": 0.6,
+          "to": 0.8,
+          "count": 43,
+          "correct": 15
+        },
+        {
+          "from": 0.8,
+          "to": 1,
+          "count": 24,
+          "correct": 22
+        }
+      ]
+    },
+    "template/offline/piano": {
+      "runs": 34,
+      "unavailable": 0,
+      "failed": 0,
+      "onset": {
+        "tp": 50,
+        "fp": 160,
+        "fn": 31,
+        "precision": 0.23809523809523808,
+        "recall": 0.6172839506172839,
+        "f1": 0.3436426116838488
+      },
+      "active": {
+        "tp": 1152,
+        "fp": 1796,
+        "fn": 1496,
+        "precision": 0.39077340569877883,
+        "recall": 0.4350453172205438,
+        "f1": 0.411722659042173
+      },
+      "exactActiveFrames": 224,
+      "activeFrames": 1240,
+      "exactChordRate": 0.18064516129032257,
+      "latency": {
+        "matchedCount": 50,
+        "p50": 1.2634840259999618,
+        "p95": 1.601836154999968
+      },
+      "realTimeFactor": 0.08181483868111213,
+      "maxBacklog": 0.17420673400000664,
+      "falseAccusations": 160,
+      "missedUnexpectedAttacks": 1,
+      "unassessedTargetEvents": 35,
+      "silentFalseFrames": 263,
+      "silentFrames": 1246,
+      "octaveConfusions": 17,
+      "confidence": [
+        {
+          "threshold": 0,
+          "tp": 50,
+          "fp": 160,
+          "fn": 31,
+          "precision": 0.23809523809523808,
+          "recall": 0.6172839506172839,
+          "f1": 0.3436426116838488
+        },
+        {
+          "threshold": 0.3,
+          "tp": 44,
+          "fp": 56,
+          "fn": 37,
+          "precision": 0.44,
+          "recall": 0.5432098765432098,
+          "f1": 0.4861878453038674
+        },
+        {
+          "threshold": 0.5,
+          "tp": 18,
+          "fp": 10,
+          "fn": 63,
+          "precision": 0.6428571428571429,
+          "recall": 0.2222222222222222,
+          "f1": 0.3302752293577982
+        },
+        {
+          "threshold": 0.7,
+          "tp": 10,
+          "fp": 3,
+          "fn": 71,
+          "precision": 0.7692307692307693,
+          "recall": 0.12345679012345678,
+          "f1": 0.2127659574468085
+        },
+        {
+          "threshold": 0.9,
+          "tp": 2,
+          "fp": 0,
+          "fn": 79,
+          "precision": 1,
+          "recall": 0.024691358024691357,
+          "f1": 0.04819277108433735
+        }
+      ],
+      "scoreBins": [
+        {
+          "from": 0,
+          "to": 0.2,
+          "count": 0,
+          "correct": 0
+        },
+        {
+          "from": 0.2,
+          "to": 0.4,
+          "count": 159,
+          "correct": 29
+        },
+        {
+          "from": 0.4,
+          "to": 0.6,
+          "count": 34,
+          "correct": 10
+        },
+        {
+          "from": 0.6,
+          "to": 0.8,
+          "count": 12,
+          "correct": 9
+        },
+        {
+          "from": 0.8,
+          "to": 1,
+          "count": 5,
+          "correct": 2
+        }
+      ]
+    },
+    "template/stream-256/piano": {
+      "runs": 34,
+      "unavailable": 0,
+      "failed": 0,
+      "onset": {
+        "tp": 50,
+        "fp": 160,
+        "fn": 31,
+        "precision": 0.23809523809523808,
+        "recall": 0.6172839506172839,
+        "f1": 0.3436426116838488
+      },
+      "active": {
+        "tp": 1152,
+        "fp": 1796,
+        "fn": 1496,
+        "precision": 0.39077340569877883,
+        "recall": 0.4350453172205438,
+        "f1": 0.411722659042173
+      },
+      "exactActiveFrames": 224,
+      "activeFrames": 1240,
+      "exactChordRate": 0.18064516129032257,
+      "latency": {
+        "matchedCount": 50,
+        "p50": 0.08798103640364224,
+        "p95": 0.1461769730249386
+      },
+      "realTimeFactor": 0.08229953805804986,
+      "maxBacklog": 0.002493155999982344,
+      "falseAccusations": 160,
+      "missedUnexpectedAttacks": 1,
+      "unassessedTargetEvents": 35,
+      "silentFalseFrames": 263,
+      "silentFrames": 1246,
+      "octaveConfusions": 17,
+      "confidence": [
+        {
+          "threshold": 0,
+          "tp": 50,
+          "fp": 160,
+          "fn": 31,
+          "precision": 0.23809523809523808,
+          "recall": 0.6172839506172839,
+          "f1": 0.3436426116838488
+        },
+        {
+          "threshold": 0.3,
+          "tp": 44,
+          "fp": 56,
+          "fn": 37,
+          "precision": 0.44,
+          "recall": 0.5432098765432098,
+          "f1": 0.4861878453038674
+        },
+        {
+          "threshold": 0.5,
+          "tp": 18,
+          "fp": 10,
+          "fn": 63,
+          "precision": 0.6428571428571429,
+          "recall": 0.2222222222222222,
+          "f1": 0.3302752293577982
+        },
+        {
+          "threshold": 0.7,
+          "tp": 10,
+          "fp": 3,
+          "fn": 71,
+          "precision": 0.7692307692307693,
+          "recall": 0.12345679012345678,
+          "f1": 0.2127659574468085
+        },
+        {
+          "threshold": 0.9,
+          "tp": 2,
+          "fp": 0,
+          "fn": 79,
+          "precision": 1,
+          "recall": 0.024691358024691357,
+          "f1": 0.04819277108433735
+        }
+      ],
+      "scoreBins": [
+        {
+          "from": 0,
+          "to": 0.2,
+          "count": 0,
+          "correct": 0
+        },
+        {
+          "from": 0.2,
+          "to": 0.4,
+          "count": 159,
+          "correct": 29
+        },
+        {
+          "from": 0.4,
+          "to": 0.6,
+          "count": 34,
+          "correct": 10
+        },
+        {
+          "from": 0.6,
+          "to": 0.8,
+          "count": 12,
+          "correct": 9
+        },
+        {
+          "from": 0.8,
+          "to": 1,
+          "count": 5,
+          "correct": 2
+        }
+      ]
+    },
+    "template/stream-2048/piano": {
+      "runs": 34,
+      "unavailable": 0,
+      "failed": 0,
+      "onset": {
+        "tp": 50,
+        "fp": 160,
+        "fn": 31,
+        "precision": 0.23809523809523808,
+        "recall": 0.6172839506172839,
+        "f1": 0.3436426116838488
+      },
+      "active": {
+        "tp": 1152,
+        "fp": 1796,
+        "fn": 1496,
+        "precision": 0.39077340569877883,
+        "recall": 0.4350453172205438,
+        "f1": 0.411722659042173
+      },
+      "exactActiveFrames": 224,
+      "activeFrames": 1240,
+      "exactChordRate": 0.18064516129032257,
+      "latency": {
+        "matchedCount": 50,
+        "p50": 0.1317920333764313,
+        "p95": 0.2241603549705361
+      },
+      "realTimeFactor": 0.0820369400657327,
+      "maxBacklog": 0.012108516999985997,
+      "falseAccusations": 160,
+      "missedUnexpectedAttacks": 1,
+      "unassessedTargetEvents": 35,
+      "silentFalseFrames": 263,
+      "silentFrames": 1246,
+      "octaveConfusions": 17,
+      "confidence": [
+        {
+          "threshold": 0,
+          "tp": 50,
+          "fp": 160,
+          "fn": 31,
+          "precision": 0.23809523809523808,
+          "recall": 0.6172839506172839,
+          "f1": 0.3436426116838488
+        },
+        {
+          "threshold": 0.3,
+          "tp": 44,
+          "fp": 56,
+          "fn": 37,
+          "precision": 0.44,
+          "recall": 0.5432098765432098,
+          "f1": 0.4861878453038674
+        },
+        {
+          "threshold": 0.5,
+          "tp": 18,
+          "fp": 10,
+          "fn": 63,
+          "precision": 0.6428571428571429,
+          "recall": 0.2222222222222222,
+          "f1": 0.3302752293577982
+        },
+        {
+          "threshold": 0.7,
+          "tp": 10,
+          "fp": 3,
+          "fn": 71,
+          "precision": 0.7692307692307693,
+          "recall": 0.12345679012345678,
+          "f1": 0.2127659574468085
+        },
+        {
+          "threshold": 0.9,
+          "tp": 2,
+          "fp": 0,
+          "fn": 79,
+          "precision": 1,
+          "recall": 0.024691358024691357,
+          "f1": 0.04819277108433735
+        }
+      ],
+      "scoreBins": [
+        {
+          "from": 0,
+          "to": 0.2,
+          "count": 0,
+          "correct": 0
+        },
+        {
+          "from": 0.2,
+          "to": 0.4,
+          "count": 159,
+          "correct": 29
+        },
+        {
+          "from": 0.4,
+          "to": 0.6,
+          "count": 34,
+          "correct": 10
+        },
+        {
+          "from": 0.6,
+          "to": 0.8,
+          "count": 12,
+          "correct": 9
+        },
+        {
+          "from": 0.8,
+          "to": 1,
+          "count": 5,
+          "correct": 2
+        }
+      ]
+    },
+    "neural/offline/piano": {
+      "runs": 34,
+      "unavailable": 0,
+      "failed": 0,
+      "onset": {
+        "tp": 77,
+        "fp": 37,
+        "fn": 4,
+        "precision": 0.6754385964912281,
+        "recall": 0.9506172839506173,
+        "f1": 0.7897435897435897
+      },
+      "active": {
+        "tp": 2348,
+        "fp": 318,
+        "fn": 300,
+        "precision": 0.8807201800450113,
+        "recall": 0.8867069486404834,
+        "f1": 0.8837034249153181
+      },
+      "exactActiveFrames": 792,
+      "activeFrames": 1240,
+      "exactChordRate": 0.6387096774193548,
+      "latency": {
+        "matchedCount": 77,
+        "p50": 4.229356475000037,
+        "p95": 8.021377725000027
+      },
+      "realTimeFactor": 2.646965474154084,
+      "maxBacklog": null,
+      "falseAccusations": 37,
+      "missedUnexpectedAttacks": 1,
+      "unassessedTargetEvents": 8,
+      "silentFalseFrames": 56,
+      "silentFrames": 1246,
+      "octaveConfusions": 2,
+      "confidence": [
+        {
+          "threshold": 0,
+          "tp": 77,
+          "fp": 37,
+          "fn": 4,
+          "precision": 0.6754385964912281,
+          "recall": 0.9506172839506173,
+          "f1": 0.7897435897435897
+        },
+        {
+          "threshold": 0.3,
+          "tp": 77,
+          "fp": 34,
+          "fn": 4,
+          "precision": 0.6936936936936937,
+          "recall": 0.9506172839506173,
+          "f1": 0.8020833333333334
+        },
+        {
+          "threshold": 0.5,
+          "tp": 65,
+          "fp": 5,
+          "fn": 16,
+          "precision": 0.9285714285714286,
+          "recall": 0.8024691358024691,
+          "f1": 0.8609271523178808
+        },
+        {
+          "threshold": 0.7,
+          "tp": 40,
+          "fp": 2,
+          "fn": 41,
+          "precision": 0.9523809523809523,
+          "recall": 0.49382716049382713,
+          "f1": 0.6504065040650406
+        },
+        {
+          "threshold": 0.9,
+          "tp": 0,
+          "fp": 0,
+          "fn": 81,
+          "precision": null,
+          "recall": 0,
+          "f1": 0
+        }
+      ],
+      "scoreBins": [
+        {
+          "from": 0,
+          "to": 0.2,
+          "count": 1,
+          "correct": 0
+        },
+        {
+          "from": 0.2,
+          "to": 0.4,
+          "count": 30,
+          "correct": 4
+        },
+        {
+          "from": 0.4,
+          "to": 0.6,
+          "count": 24,
+          "correct": 16
+        },
+        {
+          "from": 0.6,
+          "to": 0.8,
+          "count": 55,
+          "correct": 53
+        },
+        {
+          "from": 0.8,
+          "to": 1,
+          "count": 4,
+          "correct": 4
+        }
+      ]
+    },
+    "neural/stream-256/piano": {
+      "runs": 0,
+      "unavailable": 34,
+      "failed": 0,
+      "onset": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": null,
+        "recall": null,
+        "f1": null
+      },
+      "active": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": null,
+        "recall": null,
+        "f1": null
+      },
+      "exactActiveFrames": 0,
+      "activeFrames": 0,
+      "exactChordRate": null,
+      "latency": {
+        "matchedCount": 0,
+        "p50": null,
+        "p95": null
+      },
+      "realTimeFactor": null,
+      "maxBacklog": null,
+      "falseAccusations": 0,
+      "missedUnexpectedAttacks": 0,
+      "unassessedTargetEvents": 0,
+      "silentFalseFrames": 0,
+      "silentFrames": 0,
+      "octaveConfusions": 0,
+      "confidence": [
+        {
+          "threshold": 0,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        },
+        {
+          "threshold": 0.3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        },
+        {
+          "threshold": 0.5,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        },
+        {
+          "threshold": 0.7,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        },
+        {
+          "threshold": 0.9,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        }
+      ],
+      "scoreBins": [
+        {
+          "from": 0,
+          "to": 0.2,
+          "count": 0,
+          "correct": 0
+        },
+        {
+          "from": 0.2,
+          "to": 0.4,
+          "count": 0,
+          "correct": 0
+        },
+        {
+          "from": 0.4,
+          "to": 0.6,
+          "count": 0,
+          "correct": 0
+        },
+        {
+          "from": 0.6,
+          "to": 0.8,
+          "count": 0,
+          "correct": 0
+        },
+        {
+          "from": 0.8,
+          "to": 1,
+          "count": 0,
+          "correct": 0
+        }
+      ]
+    },
+    "neural/stream-2048/piano": {
+      "runs": 0,
+      "unavailable": 34,
+      "failed": 0,
+      "onset": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": null,
+        "recall": null,
+        "f1": null
+      },
+      "active": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "precision": null,
+        "recall": null,
+        "f1": null
+      },
+      "exactActiveFrames": 0,
+      "activeFrames": 0,
+      "exactChordRate": null,
+      "latency": {
+        "matchedCount": 0,
+        "p50": null,
+        "p95": null
+      },
+      "realTimeFactor": null,
+      "maxBacklog": null,
+      "falseAccusations": 0,
+      "missedUnexpectedAttacks": 0,
+      "unassessedTargetEvents": 0,
+      "silentFalseFrames": 0,
+      "silentFrames": 0,
+      "octaveConfusions": 0,
+      "confidence": [
+        {
+          "threshold": 0,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        },
+        {
+          "threshold": 0.3,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        },
+        {
+          "threshold": 0.5,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        },
+        {
+          "threshold": 0.7,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        },
+        {
+          "threshold": 0.9,
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        }
+      ],
+      "scoreBins": [
+        {
+          "from": 0,
+          "to": 0.2,
+          "count": 0,
+          "correct": 0
+        },
+        {
+          "from": 0.2,
+          "to": 0.4,
+          "count": 0,
+          "correct": 0
+        },
+        {
+          "from": 0.4,
+          "to": 0.6,
+          "count": 0,
+          "correct": 0
+        },
+        {
+          "from": 0.6,
+          "to": 0.8,
+          "count": 0,
+          "correct": 0
+        },
+        {
+          "from": 0.8,
+          "to": 1,
+          "count": 0,
+          "correct": 0
+        }
+      ]
+    }
+  },
+  "breakdownsFile": "breakdowns.jsonl"
+}

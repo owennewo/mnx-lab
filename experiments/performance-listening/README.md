@@ -89,8 +89,9 @@ invented; the recording includes release tail. Timing uses audio samples, not ti
 These replay measurements are algorithmic availability plus measured compute on the
 recorded machine. They exclude microphone, browser scheduling and display latency, and
 do not establish browser real-time performance. Neural latency is whole-file wait plus
-inference/postprocessing time. Startup/model load and dictionary construction are reported
-separately where measured, and excluded from steady-state compute.
+inference/postprocessing time. Startup/model load and dictionary construction are excluded from steady-state compute
+and are not benchmarked in v1. The output field `cpuMs` is wall-clock elapsed processing
+time, including GC and runtime overhead, not operating-system CPU accounting.
 
 ## Evaluation conventions
 
@@ -105,11 +106,18 @@ separately where measured, and excluded from steady-state compute.
   audible envelope has no human-labelled ground truth yet.
 - Raw counts accompany precision/recall/F1. Undefined ratios are `null`, not perfect
   scores. Category, preset and instantaneous pitch-count breakdowns expose weak cases.
+- Quantiles use the sorted observation at `floor(q * (n - 1))`; small per-case
+  populations have coarse quantiles. Aggregate latency pools matched attacks.
 - Latency only covers successfully matched attacks, so always read it with recall.
   Available time and emitted time are retained separately from estimated musical time.
 - Scores are uncalibrated coefficients/activations. Score bins expose empirical hit rates;
   threshold curves report retained detections, precision and recall. They do not claim
-  calibrated probabilities or that discarded target notes were assessed.
+  calibrated probabilities or that discarded target notes were assessed. These curves
+  use finalized event peak scores (DSP) or mean activations (neural), which may require
+  later audio than the initial attack decision. Do not combine threshold-filtered
+  precision with the unfiltered first-emission latency as a live acceptance guarantee.
+  Event ends and peak scores can grow with subsequent chunks; initial pitch, start and
+  decision-sample records do not change.
 - The conservative assessment probe only accuses unexpected observed attacks. A target
   attack without a match stays unassessed. Known missing-target errors are counted as
   such in ground truth but this policy cannot diagnose them. Wrong substitutions can
@@ -125,7 +133,10 @@ on the experimental detectors: disappointing measured accuracy remains a valid r
 `manifest.json` pins audio and fixture hashes, sample files, source-pack attribution,
 Chrome version and renderer source hashes. `results.json` retains actual/target labels,
 predictions, metrics, unavailable/failed outcomes and the input manifest. `summary.json`
-aggregates by strategy, mode, preset and case category. Changed or corrupted audio refuses
+aggregates by strategy, mode, preset and case category. `npm --prefix
+experiments/performance-listening run report -- RUN NEW_REFERENCE_DIRECTORY` creates a
+compact reference export with pitch-range, relative-level and confidence breakdowns;
+it refuses to overwrite the committed reference directory. Changed or corrupted audio refuses
 comparison. A partially failed run remains inspectable and exits nonzero; missing strategy
 support is explicit.
 

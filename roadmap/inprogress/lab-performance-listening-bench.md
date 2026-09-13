@@ -218,3 +218,22 @@ extension or new roadmap campaign is authorised by implementing this bench.
 - [GuitarSet](https://guitarset.weebly.com/): later external guitar-recording evidence.
 - [IRCAM score-following documentation](https://support.ircam.fr/docs/Antescofo/manuals/UserGuide/workflow_rehearsal/):
   precedent for score-informed following, not proof of our target operating conditions.
+
+
+## Implementation outcome — 2026-09-13
+
+The three bounded stages are implemented in
+[`experiments/performance-listening/`](../../experiments/performance-listening/README.md).
+The [findings](../../experiments/performance-listening/findings/README.md) retain the
+initial measurement, limitations and a recommendation to continue the isolated bench.
+There are 151 player-rendered recordings (102 evaluation cases and 49 templates), three
+detector adapters, independent evaluator/causality tests, a read-only local inspector,
+and committed audio hashes and reference reports. Of 918 requested outcomes, 714 are
+measured and 204 explicitly unavailable neural-stream modes; no execution failures.
+
+The template method loses accuracy on held-out sounds; the neural baseline is stronger
+on attack recovery but its CPU implementation is slower than real time. Pitch presence
+and attack recognition diverge sharply on re-strikes. No production promotion, microphone
+integration or score following is implied. The original implementation worktree must be
+retired before this document moves to complete. No goldens or approval records moved,
+so there is no verification batch to register.
