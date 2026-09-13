@@ -1,6 +1,6 @@
 # YouTube recordings — visible embedded playback with score sync
 
-> **Status: in progress 2026-09-13.** Implementation loop. Campaign:
+> **Status: complete 2026-09-13.** Implementation loop. Campaign:
 > [core-campaign-player.md](../inprogress/core-campaign-player.md), item 17.
 > Needs [shared recording playback](../complete/core-player-recording-playback.md), item 16.
 
@@ -90,5 +90,8 @@ that limitation is explicit in [the runtime contract](../../docs/player-youtube.
 
 The real official example played, followed the repeated visit, sought from the score,
 and retained valid desktop/narrow geometry under production CSP. Automated API/browser
-checks cover loading races, retry, rates, buffering, hidden tabs and disposal. Final
-landing evidence and embed sizes will be recorded at closeout.
+checks cover loading races, retry, rates, buffering, hidden tabs and disposal. The implementation landed through `04b80ba`; 1,815 tests, scenario checks and the
+production build passed. Both embed formats, Studio and workbench/review browser
+checks passed, including an unmodified live YouTube embed. All 188 regenerated
+goldens were unchanged, with no approval debt. The implementation worktree was
+retired before this closeout. Final embed sizes are in the runtime contract.

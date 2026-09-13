@@ -136,8 +136,8 @@ Embed measurement (2026-09-13, including the newly exported shared frame; bytes)
 
 | Artifact | Raw | Gzip |
 |---|---:|---:|
-| mnx-lab.js | 407,246 | 125,811 |
-| mnx-lab.esm.js | 502,387 | 140,304 |
+| mnx-lab.js | 408,883 | 126,199 |
+| mnx-lab.esm.js | 504,306 | 140,716 |
 
 No wrapper dependency or media asset was added. The frame and its existing control
 pads are included in both artifacts rather than relying on an unregistered host

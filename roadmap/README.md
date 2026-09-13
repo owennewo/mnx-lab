@@ -158,7 +158,6 @@ back up to `proposed/` the moment it is.
 
 ### inprogress/
 
-- **[core-player-youtube.md](inprogress/core-player-youtube.md)** — Player campaign item 17: visible policy-compliant YouTube embeds, capability-aware rates and recording sync.
 
 
 
@@ -449,6 +448,8 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+
+- **[core-player-youtube.md](complete/core-player-youtube.md)** — Player campaign item 17: visible policy-compliant YouTube embeds, capability-aware rates and recording sync.
 
 - **[core-player-recording-playback.md](complete/core-player-recording-playback.md)** — Complete; player campaign item 16: shared synth/audio controls and musical-position handoff, media-clock score following and authenticated audio delivery.
 

@@ -4,7 +4,7 @@
 > [core-campaign-player.md](../inprogress/core-campaign-player.md), item 18.
 > Needs [sync validation](../complete/core-player-recording-sync.md) and
 > [audio playback](../complete/core-player-recording-playback.md). YouTube playback needs
-> [item 17](core-player-youtube.md). This is Studio's persistent authoring surface.
+> [item 17](../complete/core-player-youtube.md). This is Studio's persistent authoring surface.
 
 ## Agreement block (campaign contract)
 

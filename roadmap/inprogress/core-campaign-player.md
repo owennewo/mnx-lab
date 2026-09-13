@@ -201,7 +201,7 @@ run any time before 6.
 | 13 | [Practice mode](../proposed/studio-player-practice.md) | Loop a selection — with the **written-range → performed-occurrences policy stated** — speed trainer, count-in, metronome, mute/solo. | practice | fake-clock tests | proposed — after reviewer items 1–10 |
 | 15 | [Recording sync](../complete/core-player-recording-sync.md) | Pure Soundslice decoder, sparse/inner-bar timing map, coverage and traversal compatibility. | recording playback | Node conformance fixtures | complete |
 | 16 | [Synth/audio switching](../complete/core-player-recording-playback.md) | Shared backend interface, musical-position handoff, media-clock follow and authenticated audio reads. | recording playback | fake backends + browser media/embed checks | complete |
-| 17 | [YouTube recordings](../inprogress/core-player-youtube.md) | Visible official iframe, policy/layout lifecycle, API rates, seek and error handling. | recording playback | adapter/layout checks + live embed check | in progress |
+| 17 | [YouTube recordings](../complete/core-player-youtube.md) | Visible official iframe, policy/layout lifecycle, API rates, seek and error handling. | recording playback | adapter/layout checks + live embed check | complete |
 | 18 | [Recording attachments](../proposed/studio-recording-management.md) | Studio URL/audio attachment, sync import, upload and revision lifecycle. | recording playback | service + browser checks | proposed |
 
 ### Decisions still open
@@ -716,3 +716,14 @@ A native Play gesture, repeated-visit following, score seek and narrow layout pa
 against the official example under production CSP. No ad was served; undocumented
 ad detection is deliberately absent and the reported-clock limit is recorded in
 [docs/player-youtube.md](../../docs/player-youtube.md).
+
+Item 17 landed through `04b80ba`: 1,815 tests, scenario checks and production build
+passed after rebase. Both embed formats, Studio and workbench/review browser checks
+passed, as did actual YouTube playback and score seeking under production CSP. All
+188 regenerated goldens stayed unchanged; no approval debt was added. The
+implementation worktree was retired before closeout. Item 18 is next.
+
+Cueing resets YouTube playback rate, so requested handoff controls survive loading
+retries and are reapplied after cue confirmation. An ended video must be cued before
+resetting position to avoid accidental playback. Closing the video explicitly pauses
+before switching to synth; source selection still uses the normal handoff policy.
