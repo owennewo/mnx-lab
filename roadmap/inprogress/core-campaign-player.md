@@ -199,7 +199,7 @@ run any time before 6.
 | 12 | [Sampled guitar](../complete/core-player-sampled-guitar.md) | A sampled voice per string; the asset question is the item; per-voice pitch control verified for the chosen sampler first. | practice | ear | complete; listening review pending |
 | 14 | [Piano pack and the synth voice](../complete/core-player-piano-synth.md) | A CC0 upright piano — the first pack that spans the staff at both ends — and an oscillator worth defaulting to: harmonic spectrum, a filter that opens and closes, register-tilted level. Amplitude over time deliberately untouched, because two measured contracts depend on it. | reviewer | ear | **complete 2026-09-09; listening review pending** |
 | 13 | [Practice mode](../proposed/studio-player-practice.md) | Loop a selection — with the **written-range → performed-occurrences policy stated** — speed trainer, count-in, metronome, mute/solo. | practice | fake-clock tests | proposed — after reviewer items 1–10 |
-| 15 | [Recording sync](../inprogress/core-player-recording-sync.md) | Pure Soundslice decoder, sparse/inner-bar timing map, coverage and traversal compatibility. | recording playback | Node conformance fixtures | in progress |
+| 15 | [Recording sync](../complete/core-player-recording-sync.md) | Pure Soundslice decoder, sparse/inner-bar timing map, coverage and traversal compatibility. | recording playback | Node conformance fixtures | complete |
 | 16 | [Synth/audio switching](../proposed/core-player-recording-playback.md) | Shared backend interface, musical-position handoff, media-clock follow and authenticated audio reads. | recording playback | fake backends + browser media/embed checks | proposed |
 | 17 | [YouTube recordings](../proposed/core-player-youtube.md) | Visible official iframe, policy/layout lifecycle, API rates, seek and error handling. | recording playback | adapter/layout checks + live embed check | proposed |
 | 18 | [Recording attachments](../proposed/studio-recording-management.md) | Studio URL/audio attachment, sync import, upload and revision lifecycle. | recording playback | service + browser checks | proposed |
@@ -664,3 +664,8 @@ Proof: 25 hand-stated sync tests, storage regression coverage, and 188 regenerat
 primitive/performance/unrolled checks with no scenario diff. The implementation
 contract is [docs/player-recording-sync.md](../../docs/player-recording-sync.md).
 Item 16 can consume the pure mapping API; no media playback UI is added by item 15.
+
+Item 15 landed as `b281761`; all 1,790 tests, scenario checks and production build
+passed after rebasing onto concurrent main changes. The Node library smoke and a
+built-export sync-map check passed. Its implementation worktree was retired before
+the proposal moved to `complete/`; no human review debt was added. Item 16 is next.

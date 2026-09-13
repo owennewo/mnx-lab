@@ -160,7 +160,6 @@ back up to `proposed/` the moment it is.
 
 ### inprogress/
 
-- **[core-player-recording-sync.md](inprogress/core-player-recording-sync.md)** — In progress; player campaign item 15: Soundslice sync decoding, sparse and inner-bar anchors, performed-position mapping and compatibility diagnostics.
 
 
 
@@ -449,6 +448,8 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+
+- **[core-player-recording-sync.md](complete/core-player-recording-sync.md)** — Complete 2026-09-13; player campaign item 15: Soundslice sync decoding, sparse and inner-bar anchors, performed-position mapping and compatibility diagnostics.
 
 - **[lab-performance-listening-bench.md](complete/lab-performance-listening-bench.md)** — completed 2026-09-13: isolated synthetic-audio bench, three detector adapters, causal replay, independent metrics and local inspector; 714 measured outcomes plus 204 explicit neural-stream limitations. Findings expose timbre transfer, attack/pitch differences and tiny repeat-render variation before any Studio integration.
 

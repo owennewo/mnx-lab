@@ -2,7 +2,7 @@
 
 > **Status: proposed 2026-09-13.** Implementation loop. Campaign:
 > [core-campaign-player.md](../inprogress/core-campaign-player.md), item 16.
-> Needs [recording sync](../inprogress/core-player-recording-sync.md), item 15, and the existing player.
+> Needs [recording sync](../complete/core-player-recording-sync.md), item 15, and the existing player.
 
 ## Agreement block (campaign contract)
 

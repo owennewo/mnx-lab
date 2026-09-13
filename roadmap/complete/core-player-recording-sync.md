@@ -1,6 +1,6 @@
 # Recording sync — media seconds to performed score positions
 
-> **Status: in progress 2026-09-13.** Implementation loop. Campaign:
+> **Status: complete 2026-09-13.** Implementation loop. Campaign:
 > [core-campaign-player.md](../inprogress/core-campaign-player.md), item 15.
 > Needs the existing traversal and performance source map (items 1, 3 and 5).
 
@@ -106,5 +106,8 @@ Implemented API and boundary policies are documented in
 sync suite has 25 passing tests; storage conformance preserves optional fields and
 unsupported source evidence while refusing malformed numeric values. Regeneration
 passed all 188 primitive/performance/unrolled checks with a clean scenario diff.
-No human verification record or scenario golden changed. Full landing gates and
-worktree retirement precede moving this item to `complete/`.
+No human verification record or scenario golden changed. Landed as `b281761` after
+rebasing onto concurrent main changes and rerunning all gates: 1,790 tests,
+`check:scenarios` and production build passed. The Node library smoke and a direct
+built-export recording-map check passed. The implementation worktree was removed
+before this document moved to `complete/`. Item 16 is the next implementation step.
