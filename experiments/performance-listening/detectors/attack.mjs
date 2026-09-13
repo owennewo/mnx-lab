@@ -55,7 +55,15 @@ export class AttackEvidence {
 
 // Compare only evidence already available on this frame. Coefficients are not probabilities.
 export function attributedAttack(scores, index, fusion) {
-  if (fusion.neighborRatio === undefined) return true;
-  const competitor = Math.max(scores[index - 1] ?? 0, scores[index + 1] ?? 0);
-  return scores[index] >= fusion.neighborRatio * competitor;
+  if (fusion.neighborRatio !== undefined) {
+    const competitor = Math.max(scores[index - 1] ?? 0, scores[index + 1] ?? 0);
+    if (scores[index] < fusion.neighborRatio * competitor) return false;
+  }
+  if (fusion.harmonicRatio !== undefined) {
+    for (const offset of [12, 19, 24, 28, 31]) {
+      if (scores[index] < fusion.harmonicRatio * (scores[index - offset] ?? 0))
+        return false;
+    }
+  }
+  return true;
 }

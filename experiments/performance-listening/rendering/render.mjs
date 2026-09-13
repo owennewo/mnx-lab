@@ -75,14 +75,19 @@ try {
   const heldoutV3 = process.argv.includes("--fusion-heldout-v3");
   const heldoutV2 = process.argv.includes("--fusion-heldout-v2");
   const heldout =
-    heldoutV4 || heldoutV3 || heldoutV2 || process.argv.includes("--fusion-heldout");
-  const fixtures = heldoutV4 ? fusionHeldoutV4() : heldoutV3
-    ? fusionHeldoutV3()
-    : heldoutV2
-      ? fusionHeldoutV2()
-      : heldout
-        ? fusionHeldout()
-        : [...cases(), mnx];
+    heldoutV4 ||
+    heldoutV3 ||
+    heldoutV2 ||
+    process.argv.includes("--fusion-heldout");
+  const fixtures = heldoutV4
+    ? fusionHeldoutV4()
+    : heldoutV3
+      ? fusionHeldoutV3()
+      : heldoutV2
+        ? fusionHeldoutV2()
+        : heldout
+          ? fusionHeldout()
+          : [...cases(), mnx];
   const records = [];
   for (const preset of config.presets) {
     const work = [

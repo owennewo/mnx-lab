@@ -75,55 +75,63 @@ test("fusion events are chunk-invariant and cannot revise emitted starts using f
 });
 
 for (const neighborRatio of [undefined, 1, 1.5])
-test(`re-strike-only preserves parent/prefix/chunks with neighbour ratio ${neighborRatio}`, () => {
-  const c = { ...config, fusion: { ...config.fusion, mode: "restrike-only", neighborRatio } };
-  const samples = Float32Array.from({ length: 12000 }, (_, i) => {
-    if (i < 1600 || i >= 10000) return 0;
-    const amplitude = i < 4800 ? 0.06 : i < 7200 ? 0.25 : 0.5;
-    return amplitude * Math.sin((2 * Math.PI * 440 * i) / c.sampleRate);
-  });
-  const scorer = () => createScorer(harmonicDictionary(c), "harmonic", c);
-  const parent = detectDSP(samples, scorer(), { ...c, fusion: undefined }, 128);
-  const a = detectDSP(samples, scorer(), c, 128),
-    b = detectDSP(samples, scorer(), c, 777);
-  const musical = (events) =>
-    events.map(({ pitch, start, end, confidence, decisionSample, kind }) => ({
-      pitch,
-      start,
-      end,
-      confidence,
-      decisionSample,
-      kind,
-    }));
-  assert.deepEqual(
-    musical(a.events.filter((e) => !e.kind)),
-    musical(parent.events),
-  );
-  assert.deepEqual(musical(a.events), musical(b.events));
-  const extra = a.events.filter((e) => e.kind === "restrike");
-  assert.ok(
-    extra.length,
-    "rises during sustained pitch must exercise extra attacks",
-  );
-  assert.ok(
-    extra.every((e) =>
-      parent.events.some(
-        (p) => p.pitch === e.pitch && p.start <= e.start && p.end >= e.end,
+  test(`re-strike-only preserves parent/prefix/chunks with neighbour ratio ${neighborRatio}`, () => {
+    const c = {
+      ...config,
+      fusion: { ...config.fusion, mode: "restrike-only", neighborRatio },
+    };
+    const samples = Float32Array.from({ length: 12000 }, (_, i) => {
+      if (i < 1600 || i >= 10000) return 0;
+      const amplitude = i < 4800 ? 0.06 : i < 7200 ? 0.25 : 0.5;
+      return amplitude * Math.sin((2 * Math.PI * 440 * i) / c.sampleRate);
+    });
+    const scorer = () => createScorer(harmonicDictionary(c), "harmonic", c);
+    const parent = detectDSP(
+      samples,
+      scorer(),
+      { ...c, fusion: undefined },
+      128,
+    );
+    const a = detectDSP(samples, scorer(), c, 128),
+      b = detectDSP(samples, scorer(), c, 777);
+    const musical = (events) =>
+      events.map(({ pitch, start, end, confidence, decisionSample, kind }) => ({
+        pitch,
+        start,
+        end,
+        confidence,
+        decisionSample,
+        kind,
+      }));
+    assert.deepEqual(
+      musical(a.events.filter((e) => !e.kind)),
+      musical(parent.events),
+    );
+    assert.deepEqual(musical(a.events), musical(b.events));
+    const extra = a.events.filter((e) => e.kind === "restrike");
+    assert.ok(
+      extra.length,
+      "rises during sustained pitch must exercise extra attacks",
+    );
+    assert.ok(
+      extra.every((e) =>
+        parent.events.some(
+          (p) => p.pitch === e.pitch && p.start <= e.start && p.end >= e.end,
+        ),
       ),
-    ),
-  );
-  const d = new StreamingDetector(scorer(), c);
-  d.push(samples.slice(0, 8000));
-  const starts = () =>
-    d.finish().map(({ pitch, start, decisionSample }) => ({
-      pitch,
-      start,
-      decisionSample,
-    }));
-  const old = starts();
-  d.push(new Float32Array(4000));
-  assert.deepEqual(starts().slice(0, old.length), old);
-});
+    );
+    const d = new StreamingDetector(scorer(), c);
+    d.push(samples.slice(0, 8000));
+    const starts = () =>
+      d.finish().map(({ pitch, start, decisionSample }) => ({
+        pitch,
+        start,
+        decisionSample,
+      }));
+    const old = starts();
+    d.push(new Float32Array(4000));
+    assert.deepEqual(starts().slice(0, old.length), old);
+  });
 
 test("attack competition uses both neighbours, preserves ties at ratio one, and is opt-in", () => {
   assert.equal(attributedAttack([0.3, 0.25, 0.8], 1, {}), true);
@@ -141,4 +149,20 @@ test("attack competition uses both neighbours, preserves ties at ratio one, and 
   );
   assert.equal(attributedAttack([0.6, 0.2], 0, { neighborRatio: 1.5 }), true);
   assert.equal(attributedAttack([0.2, 0.6], 1, { neighborRatio: 1.5 }), true);
+});
+
+test("harmonic attribution is opt-in and rejects weaker upper hypotheses for each tested partial", () => {
+  for (const offset of [12, 19, 24, 28, 31]) {
+    const scores = new Float64Array(49);
+    scores[40] = 0.3;
+    scores[40 - offset] = 0.7;
+    assert.equal(attributedAttack(scores, 40, { neighborRatio: 1 }), true);
+    assert.equal(
+      attributedAttack(scores, 40, { neighborRatio: 1, harmonicRatio: 1 }),
+      false,
+    );
+    scores[40] = 0.7;
+    assert.equal(attributedAttack(scores, 40, { harmonicRatio: 1 }), true);
+  }
+  assert.equal(attributedAttack([0.6, 0.2], 0, { harmonicRatio: 1 }), true);
 });

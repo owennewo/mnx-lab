@@ -46,6 +46,7 @@ for (const threshold of plan.thresholds)
               associationSeconds,
               ...(neighborRatio !== undefined ? { neighborRatio } : {}),
               ...(plan.mode ? { mode: plan.mode } : {}),
+              ...(plan.fusionPatch ?? {}),
             },
           },
         });
