@@ -1,4 +1,5 @@
 import FFT from "fft.js";
+import { createWhitener } from "./whitening.mjs";
 export const hz = (midi) => 440 * 2 ** ((midi - 69) / 12);
 export function spectrogramFrame(
   samples,
@@ -63,12 +64,13 @@ export function templateDictionary(recordings, config) {
   });
 }
 export function createScorer(dictionary, kind, config) {
+  const whiten = createWhitener(config);
   const gram = dictionary.map((a) =>
     Float64Array.from(dictionary, (b) => dot(a, b)),
   );
   return (magnitude, rms) => {
     if (rms < config.rmsFloor) return new Float64Array(dictionary.length);
-    const v = normalize(magnitude),
+    const v = normalize(whiten(magnitude)),
       projection = Float64Array.from(dictionary, (a) => dot(a, v));
     const weights = new Float64Array(dictionary.length);
     if (kind === "harmonic") {

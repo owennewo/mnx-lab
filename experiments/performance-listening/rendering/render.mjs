@@ -12,6 +12,7 @@ import {
   wav,
   filesHash,
 } from "../evaluation/io.mjs";
+import { fusionHeldoutV5 } from "../fixtures/fusion-heldout-v5.mjs";
 import { fusionHeldoutV4 } from "../fixtures/fusion-heldout-v4.mjs";
 import { fusionHeldoutV3 } from "../fixtures/fusion-heldout-v3.mjs";
 import { fusionHeldoutV2 } from "../fixtures/fusion-heldout-v2.mjs";
@@ -71,15 +72,19 @@ try {
     ])
   )
     throw Error("MNX adapter disagrees with independent schedule");
+  const heldoutV5 = process.argv.includes("--fusion-heldout-v5");
   const heldoutV4 = process.argv.includes("--fusion-heldout-v4");
   const heldoutV3 = process.argv.includes("--fusion-heldout-v3");
   const heldoutV2 = process.argv.includes("--fusion-heldout-v2");
   const heldout =
+    heldoutV5 ||
     heldoutV4 ||
     heldoutV3 ||
     heldoutV2 ||
     process.argv.includes("--fusion-heldout");
-  const fixtures = heldoutV4
+  const fixtures = heldoutV5
+    ? fusionHeldoutV5()
+    : heldoutV4
     ? fusionHeldoutV4()
     : heldoutV3
       ? fusionHeldoutV3()

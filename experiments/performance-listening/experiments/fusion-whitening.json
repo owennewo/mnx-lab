@@ -1,0 +1,15 @@
+{
+  "id": "F-005",
+  "parent": "F-003",
+  "strengths": [0, 0.25, 0.5, 0.67],
+  "floor": 0.0001,
+  "maxGain": 16,
+  "temporalSmoothing": false,
+  "thresholdRecalibration": false,
+  "selection": "Highest pooled development onset F1; tie prefers lower strength. Selection is not acceptance. Freeze before fresh evaluation.",
+  "developmentAudio": ["audio-v1", "audio-fusion-heldout-v1", "audio-fusion-heldout-v2", "audio-fusion-heldout-v3", "audio-fusion-heldout-v4"],
+  "privateControls": "Existing isolated A2, E2, A4 and E2+A4; guitar bars 1-8 causal prefix from the frozen full piece; report bars 5-8 separately. Diagnostics excluded from selection.",
+  "costPasses": 3,
+  "acceptance": {"onsetPrecisionAndRecallNondecreasing":true,"f1StrictlyImproves":true,"noMoreFalseAccusations":true,"maxCategoryF1Drop":0.02,"maxActiveF1Drop":0.02,"maxCpuRatio":1.25,"maxCommonMatchP95IncreaseSeconds":0.025,"preserveA4Alone":true},
+  "notes": "Whitening only on scorer input. Raw flux, 1/h dictionary, 4096 window, 256 hop, two-frame gate and F-003 attribution fixed. Fresh public v5 cases across three sample presets. No source score sent to detector."
+}
