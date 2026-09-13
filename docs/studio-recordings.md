@@ -3,6 +3,9 @@
 Implementation loop, player campaign item 18. The piece page's **Recordings** button
 opens a sheet for attaching a named YouTube link or uploaded audio, importing timing
 JSON, renaming a recording, changing its timings and removing its association.
+Saved YouTube recordings show their full, clickable URL in both the list and the
+edit form. A missing or invalid stored link is identified explicitly.
+
 Playback itself is shared with [audio](player-recordings.md) and
 [YouTube](player-youtube.md); attachment does not load YouTube resources.
 

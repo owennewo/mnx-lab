@@ -136,7 +136,9 @@ export class PiecePage extends LitElement {
       top: calc(100% + 8px);
       right: 0;
       z-index: 6;
-      min-width: 220px;
+      box-sizing: border-box;
+      min-width: min(220px, calc(100vw - 16px));
+      max-width: calc(100vw - 16px);
       padding: 6px;
       background: light-dark(oklch(0.985 0.002 60), oklch(0.22 0.004 60));
       border: 1px solid var(--line);
@@ -170,7 +172,32 @@ export class PiecePage extends LitElement {
     }
   `;
 
+  connectedCallback() {
+    super.connectedCallback();
+    window.addEventListener('resize', this.positionMenu);
+    window.addEventListener('pointerdown', this.dismissMenu);
+  }
+
+  private readonly positionMenu = () => {
+    const panel = this.shadowRoot?.querySelector<HTMLElement>('.menu > div');
+    if (!panel) return;
+    panel.style.transform = '';
+    const rect = panel.getBoundingClientRect();
+    const shift = Math.max(8 - rect.left, Math.min(0, document.documentElement.clientWidth - 8 - rect.right));
+    panel.style.transform = `translateX(${shift}px)`;
+  };
+  private readonly dismissMenu = (event: PointerEvent) => {
+    const menu = this.shadowRoot?.querySelector('.menu');
+    if (this.menuOpen && menu && !event.composedPath().includes(menu)) this.menuOpen = false;
+  };
+  private toggleMenu() {
+    this.menuOpen = !this.menuOpen;
+    if (this.menuOpen) { this.recordingsOpen = false; this.tagsOpen = false; }
+  }
+
   disconnectedCallback() {
+    window.removeEventListener('resize', this.positionMenu);
+    window.removeEventListener('pointerdown', this.dismissMenu);
     ++this.generation;
     this.binding?.dispose();
     this.binding = null;
@@ -181,6 +208,7 @@ export class PiecePage extends LitElement {
   // document arrives) so the binding is made once and survives piece-to-piece
   // navigation.
   protected updated(changed: Map<PropertyKey, unknown>) {
+    if (this.menuOpen) this.positionMenu();
     if (changed.has('pieceId')) void this.load();
     let fresh = false;
     if (!this.binding && this.player && this.viewer) {
@@ -352,13 +380,13 @@ export class PiecePage extends LitElement {
             </div>`
           : nothing}
         ${this.doc
-          ? html`<button slot="actions" type="button" aria-pressed=${this.tagsOpen} @click=${() => (this.tagsOpen = !this.tagsOpen)}>
+          ? html`<button slot="actions" type="button" aria-pressed=${this.tagsOpen} @click=${() => { this.tagsOpen = !this.tagsOpen; this.recordingsOpen = false; this.menuOpen = false; }}>
               ${tagGlyph}<span>Tags · ${this.snapshot?.tags.length ?? 0}</span>
             </button>`
           : nothing}
-        ${this.doc ? html`<button slot="actions" type="button" aria-pressed=${this.recordingsOpen} @click=${async () => { this.player?.pause(); await this.refreshSnapshot(); this.recordingsOpen = !this.recordingsOpen; this.tagsOpen = false; }}>Recordings · ${this.snapshot?.recordings.length ?? 0}</button>` : nothing}
-        <div slot="menu" class="menu">
-          <button type="button" aria-label="More" aria-expanded=${this.menuOpen} @click=${() => (this.menuOpen = !this.menuOpen)}>${more}</button>
+        ${this.doc ? html`<button slot="actions" type="button" aria-pressed=${this.recordingsOpen} @click=${async () => { this.player?.pause(); await this.refreshSnapshot(); this.recordingsOpen = !this.recordingsOpen; this.tagsOpen = false; this.menuOpen = false; }}>Recordings · ${this.snapshot?.recordings.length ?? 0}</button>` : nothing}
+        <div slot="menu" class="menu" @keydown=${(e: KeyboardEvent) => { if (e.key === 'Escape') { this.menuOpen = false; this.shadowRoot?.querySelector<HTMLButtonElement>('[aria-label="More"]')?.focus(); } }}>
+          <button type="button" aria-label="More" aria-expanded=${this.menuOpen} @click=${this.toggleMenu}>${more}</button>
           ${this.menuOpen
             ? html`<div>
                 ${this.email ? html`<span class="who">${this.email}</span>` : nothing}

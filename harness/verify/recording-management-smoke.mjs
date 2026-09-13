@@ -69,6 +69,8 @@ try {
     await input('Sync recording','8','change');check(sheet.shadowRoot.textContent.includes('Full coverage'),'Missing coverage');button('Attach recording').click();await saved(1);
     check(JSON.parse(sheet.snapshot.recordings[0].syncpoints)[0][1]===1,'Timings bound to wrong recording');
     const youtubeId=sheet.snapshot.recordings[0].id;
+    const savedLink=sheet.shadowRoot.querySelector('a.source-link');check(savedLink?.href==='https://www.youtube.com/watch?v=M7lc1UVf-VE','Saved YouTube link is hidden');
+    sheet.reset(sheet.snapshot.recordings[0]);await sheet.updateComplete;check(sheet.shadowRoot.querySelectorAll('a.source-link').length===2,'Edit hides the saved YouTube link');sheet.reset();await sheet.updateComplete;
     await input('Recording name','Uploaded take');await input('Recording type','audio','change');
     const hz=48000,pcm=new Uint8Array(44+hz*300*2),v=new DataView(pcm.buffer);const str=(s,o)=>[...s].forEach((c,i)=>v.setUint8(o+i,c.charCodeAt(0)));str('RIFF',0);v.setUint32(4,pcm.length-8,true);str('WAVEfmt ',8);v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);v.setUint32(24,hz,true);v.setUint32(28,hz*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);str('data',36);v.setUint32(40,pcm.length-44,true);
     const dt=new DataTransfer();dt.items.add(new File([pcm],'take.wav',{type:'audio/wav'}));const file=sheet.shadowRoot.querySelector('[aria-label="Audio file"]');file.files=dt.files;file.dispatchEvent(new Event('change',{bubbles:true}));await sheet.updateComplete;
@@ -103,6 +105,20 @@ try {
     sheet.removing=unaligned.id;await sheet.updateComplete;button('Confirm removal').click();for(let i=0;i<100;i++){await delay(50);if(!sheet.busy)break;}check(sheet.snapshot.recordings.length===2,'Detach failed');
   })()`);
   const shot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync('/tmp/recording-management-mobile.png',Buffer.from(shot.result.data,'base64'));
+  await c.evaluate(`(async()=>{
+    const check=(v,m)=>{if(!v)throw new Error(m)},delay=ms=>new Promise(r=>setTimeout(r,ms));
+    const page=document.querySelector('mnx-studio').shadowRoot.querySelector('mnx-studio-piece'),menu=page.shadowRoot.querySelector('.menu'),button=menu.querySelector('button');
+    page.toolsOpen=true;await page.updateComplete;await page.shadowRoot.querySelector('mnx-score-frame').updateComplete;
+    // Exercise the wrapped-row position at the left edge and the unwrapped right edge.
+    menu.style.position='fixed';menu.style.top='120px';menu.style.left='8px';button.click();await page.updateComplete;
+    check(!page.shadowRoot.querySelector('mnx-studio-recordings'),'Account menu did not dismiss the recording sheet');
+    let rect=menu.querySelector('div').getBoundingClientRect();check(rect.left>=7&&rect.right<=innerWidth-7,'Menu escaped the left viewport edge');
+    menu.style.left=(innerWidth-48)+'px';window.dispatchEvent(new Event('resize'));rect=menu.querySelector('div').getBoundingClientRect();check(rect.left>=7&&rect.right<=innerWidth-7,'Menu escaped the right viewport edge');
+    check([...menu.querySelectorAll('button')].some(b=>b.textContent.trim()==='Sign out'),'Account action inaccessible');
+    menu.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}));await page.updateComplete;check(!menu.querySelector('div'),'Escape did not dismiss menu');
+    button.click();await page.updateComplete;document.body.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true}));await page.updateComplete;check(!menu.querySelector('div'),'Outside click did not dismiss menu');
+    menu.removeAttribute('style');
+  })()`);
   assert.deepEqual(c.logs,[]);console.log('Recording management smoke OK',JSON.stringify({uploads,...result,reloaded:reloaded.length}));
 } catch(e) {if(c){const shot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync('/tmp/recording-management-failure.png',Buffer.from(shot.result.data,'base64'));}throw e;}
 finally {

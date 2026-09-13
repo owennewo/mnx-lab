@@ -41,6 +41,7 @@ export class RecordingsSheet extends LitElement {
     input, select, textarea, button { font:inherit; color:inherit; background:transparent; border:1px solid var(--line); border-radius:3px; padding:8px; min-width:0; }
     textarea { min-height:90px; resize:vertical; } button { cursor:pointer; } button:disabled { opacity:.5; cursor:default; }
     .row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; } .row strong { flex:1; overflow-wrap:anywhere; }
+    .source-link { font-size:13px; color:inherit; overflow-wrap:anywhere; }
     .hint { color:var(--ink-dim); font-size:12px; margin:0; line-height:1.5; } .error { color:light-dark(#a12121,#ffb4ab); } .check { display:flex; align-items:flex-start; }
     .diagnostic { font-size:13px; padding:10px; background:light-dark(#efeeeb,#343330); line-height:1.5; }
     fieldset { border:0; margin:0; padding:0; display:grid; gap:12px; min-width:0; }
@@ -118,11 +119,19 @@ export class RecordingsSheet extends LitElement {
     try { const { snapshot } = await this.client.removeRecording(this.snapshot.piece.id, row.id, this.snapshot.piece.revision); this.snapshot = snapshot; this.publish(snapshot); this.reset(); this.stage = 'Recording removed from this piece.'; }
     catch (e) { this.error = e instanceof Error ? e.message : 'Could not remove.'; this.conflict = e instanceof LibraryRequestError && e.status === 409; } finally { this.busy = false; }
   }
+  private sourceLink(row: LibraryRecording) {
+    if (row.kind !== 'youtube') return nothing;
+    let url: string;
+    try { url = `https://www.youtube.com/watch?v=${youtubeVideoId(row.external_id ?? '')}`; }
+    catch { return html`<p class="hint">This recording has no valid YouTube link.</p>`; }
+    return html`<a class="source-link" href=${url} target="_blank" rel="noopener noreferrer" aria-label=${`Open ${row.name ?? 'recording'} on YouTube`}>${url}</a>`;
+  }
   render() {
     if (!this.snapshot) return nothing;
     const d = this.diagnostic(), choices = this.choices();
     return html`<header><b>Recordings</b><button ?disabled=${this.busy} aria-label="Close recordings" @click=${() => this.dispatchEvent(new CustomEvent('close'))}>Close</button></header>
       <section>${this.snapshot.recordings.map(row => html`<div class="row"><strong>${row.name ?? 'Unnamed recording'}</strong><span class="hint">${row.kind}</span><button ?disabled=${this.busy} @click=${() => this.reset(row)}>Edit</button><button ?disabled=${this.busy} @click=${() => this.removing = row.id}>Remove</button></div>
+        ${this.sourceLink(row)}
         ${this.removing === row.id ? html`<p>Remove “${row.name ?? row.id}” from this piece?</p><div class="row"><button ?disabled=${this.busy} @click=${() => this.detach(row)}>Confirm removal</button><button @click=${() => this.removing = ''}>Keep recording</button></div>` : nothing}`)}
         ${!this.snapshot.recordings.length ? html`<p class="hint">No recordings attached yet.</p>` : nothing}
         <button ?disabled=${this.busy} @click=${() => this.reset()}>Add recording</button>
@@ -130,7 +139,7 @@ export class RecordingsSheet extends LitElement {
         <fieldset ?disabled=${this.busy}>
           <label>Name<input aria-label="Recording name" maxlength="200" .value=${this.name} @input=${(e: Event) => { this.changed(); this.name = (e.target as HTMLInputElement).value; }}></label>
           ${!this.editing ? html`<label>Source<select aria-label="Recording type" .value=${this.kind} @change=${(e: Event) => { this.changed(); this.kind = (e.target as HTMLSelectElement).value; }}><option value="youtube">YouTube link</option><option value="audio">Audio file</option></select></label>
-            ${this.kind === 'youtube' ? html`<label>YouTube URL<input aria-label="YouTube URL" .value=${this.video} @input=${(e: Event) => { this.changed(); this.video = (e.target as HTMLInputElement).value; }}></label>` : html`<p class="hint">MP3, M4A, WAV, Ogg or FLAC, up to 64 MiB. Playback depends on your browser's codec support. Retry restarts the transfer; no partial recording is attached.</p><label>Audio file<input aria-label="Audio file" type="file" accept=".mp3,.m4a,.wav,.ogg,.flac" @change=${(e: Event) => { this.changed(); this.file = (e.target as HTMLInputElement).files?.[0] ?? null; }}></label>`}` : html`<p class="hint">Media identity is retained. Attach a new recording to use a different file or video.</p>`}
+            ${this.kind === 'youtube' ? html`<label>YouTube URL<input aria-label="YouTube URL" .value=${this.video} @input=${(e: Event) => { this.changed(); this.video = (e.target as HTMLInputElement).value; }}></label>` : html`<p class="hint">MP3, M4A, WAV, Ogg or FLAC, up to 64 MiB. Playback depends on your browser's codec support. Retry restarts the transfer; no partial recording is attached.</p><label>Audio file<input aria-label="Audio file" type="file" accept=".mp3,.m4a,.wav,.ogg,.flac" @change=${(e: Event) => { this.changed(); this.file = (e.target as HTMLInputElement).files?.[0] ?? null; }}></label>`}` : html`${this.sourceLink(this.editing)}<p class="hint">Media identity is retained. Attach a new recording to use a different file or video.</p>`}
           <label>Import timings (JSON, up to 1 MiB)<input type="file" accept=".json" aria-label="Import sync JSON" @change=${this.importSync}></label>
           <label>Soundslice sync JSON<textarea aria-label="Sync JSON" .value=${this.rawText} @input=${(e: Event) => { this.changed(); this.rawText = (e.target as HTMLTextAreaElement).value; this.selectedId = ''; this.syncChanged = true; this.unsynchronised = false; }}></textarea></label>
           ${choices.length && !this.rawText.trim().startsWith('[') ? html`<label>Timings belong to<select aria-label="Sync recording" .value=${this.selectedId} @change=${(e: Event) => { this.changed(); this.selectedId = (e.target as HTMLSelectElement).value; this.syncChanged = true; }}><option value="">Choose recording by ID…</option>${choices.map(c => html`<option value=${c.id}>${c.label}</option>`)}</select></label>` : nothing}

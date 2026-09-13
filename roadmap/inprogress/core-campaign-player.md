@@ -763,3 +763,11 @@ preventing timing review against an old file with a new revision.
 Closeout exposed the existing audio-boundary subprocess test's five-second startup
 budget on a busy workstation. Both CLI verdict assertions remain intact; each child
 now has a ten-second ceiling and the pair a 25-second test allowance.
+
+### 2026-09-13 — recording disclosure and wrapped toolbar follow-up
+
+Existing YouTube rows now disclose their saved URL in the list and edit form; the
+empty URL field for a new attachment no longer stands as the only visible link
+field. The piece account menu clamps to the viewport after toolbar wrapping and on
+resize. Opening it dismisses other sheets, and Escape/outside click close it. The
+Studio browser check covers saved links and menu reachability at both screen edges.
