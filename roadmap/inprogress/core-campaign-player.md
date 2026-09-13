@@ -202,7 +202,7 @@ run any time before 6.
 | 15 | [Recording sync](../complete/core-player-recording-sync.md) | Pure Soundslice decoder, sparse/inner-bar timing map, coverage and traversal compatibility. | recording playback | Node conformance fixtures | complete |
 | 16 | [Synth/audio switching](../complete/core-player-recording-playback.md) | Shared backend interface, musical-position handoff, media-clock follow and authenticated audio reads. | recording playback | fake backends + browser media/embed checks | complete |
 | 17 | [YouTube recordings](../complete/core-player-youtube.md) | Visible official iframe, policy/layout lifecycle, API rates, seek and error handling. | recording playback | adapter/layout checks + live embed check | complete |
-| 18 | [Recording attachments](../proposed/studio-recording-management.md) | Studio URL/audio attachment, sync import, upload and revision lifecycle. | recording playback | service + browser checks | proposed |
+| 18 | [Recording attachments](../inprogress/studio-recording-management.md) | Studio URL/audio attachment, sync import, upload and revision lifecycle. | recording playback | service + browser checks | in progress |
 
 ### Decisions still open
 
@@ -727,3 +727,22 @@ Cueing resets YouTube playback rate, so requested handoff controls survive loadi
 retries and are reapplied after cue confirmation. An ended video must be cued before
 resetting position to avoid accidental playback. Closing the video explicitly pauses
 before switching to synth; source selection still uses the normal handoff policy.
+
+### 2026-09-13 — item 18: Studio recording management
+
+The piece page now owns recording attachment and maintenance, using the existing
+player. Pure import selection preserves raw Soundslice JSON and explicit recording
+IDs; the sheet checks coverage against performed bars before saving. A metadata
+change pauses the current source and rebuilds its mapping, including embed callers.
+
+A separate streamed upload path accepts audio up to 64 MiB with SHA-256 verification,
+owner-bound reservations, cancellation and revision-checked attachment. Browser
+proof uses the production Worker and real local D1/R2, including a 28.8 MB transfer.
+Miniflare's Node RPC loses stream length tags, so those unit fixtures adapt only the
+test boundary; the end-to-end check exercises actual Worker streaming. Shared blobs
+are detached by reference only and collected through the documented offline sweep.
+
+The crop audit found the exporter drops start/end boundaries and ingest stores only
+cropped duration. Available absolute boundaries are preserved, missing ones diagnosed;
+crop controls are not applied and no timing offset is guessed. Contract and rollout:
+[docs/studio-recordings.md](../../docs/studio-recordings.md).

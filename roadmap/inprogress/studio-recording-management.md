@@ -1,6 +1,6 @@
 # Studio recording attachments — YouTube links, uploaded audio and sync data
 
-> **Status: proposed 2026-09-13.** Implementation loop. Campaign:
+> **Status: in progress 2026-09-13.** Implementation loop. Campaign:
 > [core-campaign-player.md](../inprogress/core-campaign-player.md), item 18.
 > Needs [sync validation](../complete/core-player-recording-sync.md) and
 > [audio playback](../complete/core-player-recording-playback.md). YouTube playback needs
@@ -59,3 +59,23 @@ imports, absent/partial sync, mismatched score structure, crop metadata, interru
 uploads, ownership failures and concurrent updates have explicit outcomes. Changing
 sync data invalidates the live mapping without reviving old playback. Local-file
 preview and already-ingested recordings work independently of this authoring UI.
+
+## Implementation and evidence — 2026-09-13
+
+Built the Studio sheet and owner-authorized create/update/detach API. Audio uses a
+separate 64 MiB streamed, checksum-verified transfer with 24-hour reservations;
+revision and cancellation checks atomically gate attachment. Retry reuses identity.
+An offline, dry-run-first sweep handles orphaned blobs without deleting shared media.
+
+Sync imports retain the raw source and explicitly selected wrapper ID, plus available
+absolute crop metadata. Coverage uses the existing performed-score compiler/map. The
+exporter audit confirmed crop boundaries are currently omitted, so the UI preserves
+available fields and explicitly does not promise cropped-playback parity. See
+[the implemented contract](../../docs/studio-recordings.md), including rollout.
+
+Real D1/R2 tests cover ownership, stale writes, cancellation races and integrity. The
+built Studio/Worker smoke uploaded a 28.8 MB PCM file, attached a YouTube link, chose
+the correct wrapper entry, played/sought audio, changed sync without restarting, and
+reloaded both associations. Browser checks also cover invalid URLs, conflict review,
+unsynchronised saves and removal. All 188 regenerated goldens stayed unchanged.
+Migration 0004 must be applied before deployment; no production data was changed.

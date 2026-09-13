@@ -279,6 +279,7 @@ export class Library {
       const blob = r.blob ? await describeBlob('recordings', r.blob) : null;
       if (blob) blobs.set(blob.r2_key, blob);
       const row: Recording = {
+        ...(old && 'provenance' in old ? { provenance: old.provenance } : {}),
         id, piece_id: piece.id, kind: r.kind, name: r.name === undefined ? old?.name ?? null : r.name,
         source_id: old?.source_id ?? r.source_id ?? null,
         r2_key: blob?.r2_key ?? old?.r2_key ?? null, sha256: blob?.sha256 ?? old?.sha256 ?? null,

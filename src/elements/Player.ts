@@ -342,6 +342,7 @@ export class Player extends LitElement {
       this.seek(this.initialOrdinal);
     if (!reinstall && changed.has('recordings') && this.session) {
       const id = this.session.backend.id;
+      this.session.pause();
       if (id !== 'synth') void this.selectSource(this.recordings.some(r => r.id === id) ? id : 'synth', true);
     }
     if (!reinstall && changed.has('voicePreset') && this.session?.backend instanceof SynthBackend) {

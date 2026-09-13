@@ -12,8 +12,10 @@ slowdown, backing tracks). A **different product for different users** than the
 workbench (`src/workbench/`), which is the lab's internal review instrument. The two must
 never bleed together; that guard is structural, not vigilance.
 
-Today it is the first cut: sign in, see your library, open a piece, and it fills the
-screen with the score and the player. Nothing is edited or persisted yet.
+Sign in, browse the library and open a piece in the shared score frame. Tags and
+recording attachments can be edited and persisted; score editing is still a later
+item. [Recording management](../../docs/studio-recordings.md) adds YouTube links,
+audio uploads and Soundslice timing imports to the piece page.
 
 ## Shape
 

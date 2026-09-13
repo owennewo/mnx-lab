@@ -45,7 +45,6 @@ proposals that name their campaign.
 
 ### proposed/
 
-- **[studio-recording-management.md](proposed/studio-recording-management.md)** — Player campaign item 18: attach YouTube links or uploaded audio with Soundslice timing data; persistent uploads and recording lifecycle.
 
 - **[studio-player-practice.md](proposed/studio-player-practice.md)** — campaign item 13,
   studio's first player feature in `elements/`: loop the selection with the **written-range
@@ -157,6 +156,8 @@ back up to `proposed/` the moment it is.
   the best precedent.
 
 ### inprogress/
+
+- **[studio-recording-management.md](inprogress/studio-recording-management.md)** — Player campaign item 18: attach YouTube links or uploaded audio with Soundslice timing data; persistent uploads and recording lifecycle.
 
 
 

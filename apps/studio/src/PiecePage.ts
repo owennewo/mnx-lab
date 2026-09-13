@@ -29,6 +29,7 @@ import type { ZoomPadChange } from '../../../src/elements/ZoomPad.ts';
 import { libraryHref } from './StudioApp.ts';
 import { chipText, dimensionLabel } from './labels.ts';
 import './TagsSheet.ts';
+import './RecordingsSheet.ts';
 import type { TagsSnapshot } from './TagsSheet.ts';
 
 import { VIEW_KEY, DISPLAY_KEY, UNROLLED_KEY, STAFF_SCALE_KEY, DENSITY_H_KEY, SPACING_MODE_KEY, TOOLS_OPEN_KEY, PLAYER_OPEN_KEY, read, write, readView, readDisplay, readNumber } from './scorePreferences.ts';
@@ -45,12 +46,13 @@ export class PiecePage extends LitElement {
   @property({ type: String }) pieceId = '';
   /** The signed-in address, for the menu; sign-out is Access's own logout. */
   @property({ type: String }) email = '';
-  @state() private snapshot: TagsSnapshot | null = null;
+  @state() private snapshot: LibrarySnapshot | null = null;
   @state() private recordings: readonly RecordingSource[] = [];
   @state() private doc: MnxDocument | null = null;
   @state() private error = '';
   @state() private loading = true;
   @state() private tagsOpen = false;
+  @state() private recordingsOpen = false;
   @state() private menuOpen = false;
   @state() private view: ViewSetting = readView();
   @state() private display: DisplayOptions = readDisplay();
@@ -82,7 +84,7 @@ export class PiecePage extends LitElement {
     mnx-document-viewer[hidden] {
       display: none;
     }
-    mnx-studio-tags {
+    mnx-studio-tags, mnx-studio-recordings {
       position: fixed;
       top: 0;
       right: 0;
@@ -197,7 +199,7 @@ export class PiecePage extends LitElement {
     this.doc = null;
     this.error = '';
     this.loading = true;
-    this.tagsOpen = false;
+    this.tagsOpen = false; this.recordingsOpen = false;
     this.menuOpen = false;
     try {
       const [{ bytes, filename }, snapshot] = await Promise.all([
@@ -254,7 +256,8 @@ export class PiecePage extends LitElement {
     try {
       const snapshot = (await this.client.piece(this.pieceId)).snapshot;
       if (generation !== this.generation) return;
-      this.snapshot = snapshot; this.setRecordings(snapshot);
+      if (this.snapshot?.piece.canonical_rendition_id !== snapshot.piece.canonical_rendition_id) { await this.load(); return; }
+      this.player?.pause(); this.snapshot = snapshot; this.setRecordings(snapshot);
     } catch { /* keep what we have */ }
   }
 
@@ -347,6 +350,7 @@ export class PiecePage extends LitElement {
               ${tagGlyph}<span>Tags · ${this.snapshot?.tags.length ?? 0}</span>
             </button>`
           : nothing}
+        ${this.doc ? html`<button slot="actions" type="button" aria-pressed=${this.recordingsOpen} @click=${async () => { this.player?.pause(); await this.refreshSnapshot(); this.recordingsOpen = !this.recordingsOpen; this.tagsOpen = false; }}>Recordings · ${this.snapshot?.recordings.length ?? 0}</button>` : nothing}
         <div slot="menu" class="menu">
           <button type="button" aria-label="More" aria-expanded=${this.menuOpen} @click=${() => (this.menuOpen = !this.menuOpen)}>${more}</button>
           ${this.menuOpen
@@ -385,8 +389,11 @@ export class PiecePage extends LitElement {
         ></mnx-document-viewer>
         <mnx-player slot="player" .recordings=${this.recordings}></mnx-player>
       </mnx-score-frame>
+      ${this.recordingsOpen && this.snapshot && this.doc ? html`<mnx-studio-recordings .client=${this.client} .snapshot=${this.snapshot} .document=${this.doc}
+        @recordings-changed=${async (e: CustomEvent<LibrarySnapshot>) => { this.player?.pause(); if (this.snapshot?.piece.canonical_rendition_id !== e.detail.piece.canonical_rendition_id) { await this.load(); return; } this.snapshot = { ...e.detail, tags: this.snapshot?.tags ?? [] }; this.setRecordings(e.detail); await this.refreshSnapshot(); }}
+        @close=${() => this.recordingsOpen = false}></mnx-studio-recordings>` : nothing}
       ${this.tagsOpen ? html`<mnx-studio-tags .client=${this.client} .snapshot=${this.snapshot}
-        @tags-changed=${(e: CustomEvent<TagsSnapshot>) => { this.snapshot = e.detail; void this.refreshSnapshot(); }}
+        @tags-changed=${(e: CustomEvent<TagsSnapshot>) => { if (this.snapshot) this.snapshot = { ...this.snapshot, ...e.detail }; void this.refreshSnapshot(); }}
         @aliases-changed=${() => this.refreshSnapshot()}
         @close=${() => (this.tagsOpen = false)}></mnx-studio-tags>` : nothing}
     `;

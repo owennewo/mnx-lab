@@ -5,6 +5,8 @@ import type { Env } from '../env.ts';
 import { Library, LibraryError, pieceIdFor, type Json, type PieceWrite, type PieceSort, type RenditionInput, type RecordingInput, type DerivedTag } from '../library/index.ts';
 import { accessIdentity, AccessError, type LibraryUser } from '../library/access.ts';
 
+import { RecordingManager, type RecordingChange } from '../library/recordings.ts';
+
 export const INGEST_OWNER = 'operator';
 export const MAX_INGEST_BYTES = 24 * 1024 * 1024;
 const encoder = new TextEncoder();
@@ -69,7 +71,9 @@ library.use('*', async (c, next) => {
     return c.json({ error: status === 403 ? 'User is not permitted' : 'Authentication required' }, status);
   }
   // A browser write is a same-origin fetch with a JSON body; a cross-site form cannot say that.
-  if (!machine && c.req.method !== 'GET' && c.req.method !== 'HEAD' && !(c.req.header('Content-Type') ?? '').startsWith('application/json')) {
+  const audioUpload = c.req.method === 'PUT' && /^\/api\/library\/uploads\/studio-[0-9a-f-]{36}$/.test(c.req.path) && c.req.header('Content-Type') === 'application/octet-stream' && c.req.header('X-Recording-Upload') === '1';
+  if (!machine && c.req.header('Origin') && c.req.header('Origin') !== new URL(c.req.url).origin) return c.json({ error: 'Same-origin writes only' }, 403);
+  if (!machine && !audioUpload && c.req.method !== 'GET' && c.req.method !== 'HEAD' && !(c.req.header('Content-Type') ?? '').startsWith('application/json')) {
     return c.json({ error: 'Writes are JSON' }, 415);
   }
   await next();
@@ -258,3 +262,39 @@ library.on(['GET', 'HEAD'], '/recordings/:id/audio', async c => {
   if (range.status === 206) c.header('Content-Range', `bytes ${range.offset}-${range.offset + range.length - 1}/${recording.bytes}`);
   return c.newResponse(body, range.status);
 });
+
+// Browser recording authoring. The raw upload requires a non-simple header and
+// the same authenticated owner; CORS is not enabled on these routes.
+function recordingManager(c: { env: Env }) { return new RecordingManager(c.env.LIBRARY_DB, c.env.LIBRARY_BUCKET); }
+async function recordingBody(request: Request) {
+  const reader = request.body?.getReader(); if (!reader) invalid('Missing recording metadata.');
+  const chunks: Uint8Array[] = []; let length = 0;
+  for (;;) { const { done, value } = await reader.read(); if (done) break; length += value.length;
+    if (length > 2 * 1024 * 1024) { await reader.cancel(); invalid('Recording metadata exceeds 2 MiB.'); } chunks.push(value); }
+  const bytes = new Uint8Array(length); let offset = 0; for (const c of chunks) { bytes.set(c, offset); offset += c.length; }
+  try { return object(JSON.parse(new TextDecoder().decode(bytes))); } catch { invalid('Expected recording JSON.'); }
+}
+function recordingChange(value: Record<string, unknown>): RecordingChange {
+  if (Object.keys(value).some(k => !['expected_revision','name','rawSync','selectedId','video','sha256','bytes','mime'].includes(k))) invalid('Unsupported recording field.');
+  if (!Number.isSafeInteger(value.expected_revision)) invalid('Expected the piece revision.');
+  return { name: text(value.name), ...(value.rawSync === undefined ? {} : { rawSync: value.rawSync }),
+    selectedId: nullable(value.selectedId), ...(value.video === undefined ? {} : { video: text(value.video) }) };
+}
+library.put('/pieces/:piece/recordings/:id', async c => {
+  const b = await recordingBody(c.req.raw); const change = recordingChange(b);
+  return c.json({ snapshot: await recordingManager(c).save(c.get('libraryUser').id, c.req.param('piece'), c.req.param('id'), Number(b.expected_revision), change) });
+});
+library.delete('/pieces/:piece/recordings/:id', async c => {
+  const b = await recordingBody(c.req.raw);
+  if (!Number.isSafeInteger(b.expected_revision)) invalid('Expected the piece revision.');
+  return c.json({ snapshot: await recordingManager(c).remove(c.get('libraryUser').id, c.req.param('piece'), c.req.param('id'), Number(b.expected_revision)) });
+});
+library.post('/pieces/:piece/uploads/:id', async c => {
+  const b = await recordingBody(c.req.raw); const change = recordingChange(b);
+  return c.json(await recordingManager(c).begin(c.get('libraryUser').id, c.req.param('piece'), c.req.param('id'), Number(b.expected_revision), change, { sha256: text(b.sha256), bytes: Number(b.bytes), mime: text(b.mime) }));
+});
+library.put('/uploads/:id', async c => {
+  if (c.req.header('Content-Type') !== 'application/octet-stream' || c.req.header('X-Recording-Upload') !== '1') return c.json({ error: 'Expected an authenticated binary audio upload.' }, 415);
+  return c.json({ snapshot: await recordingManager(c).upload(c.get('libraryUser').id, c.req.param('id'), c.req.raw) });
+});
+library.delete('/uploads/:id', async c => c.json(await recordingManager(c).cancel(c.get('libraryUser').id, c.req.param('id'))));
