@@ -28,6 +28,8 @@ export interface RenderNotationOptions {
   mnx: MnxStructure;
   width: number;
   activeNoteIds?: string[];
+  /** Record fret-mask duration spans for the playback paint (`RectPrim.spanEndX`). */
+  durationSpans?: boolean;
   selectedNoteIds?: string[];
   /** Events lit by the selection — how a REST is highlighted. */
   selectedEventIds?: string[];
@@ -69,6 +71,7 @@ export function renderMnxToSvgNotation(opts: RenderNotationOptions): RenderOutco
     entries: opts.entries,
     widthSp: opts.width / basePxPerSp,
     activeNoteIds: opts.activeNoteIds,
+    durationSpans: opts.durationSpans,
     selectedNoteIds: opts.selectedNoteIds,
     selectedEventIds: opts.selectedEventIds,
     display: opts.display,

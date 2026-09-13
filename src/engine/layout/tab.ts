@@ -113,6 +113,8 @@ export interface LayoutTabOptions {
   widthSp: number;
   activeNoteIds?: readonly string[];
   selectedNoteIds?: readonly string[];
+  /** Record fret-mask duration spans for the playback paint (never for goldens). */
+  durationSpans?: boolean;
   /** Viewer-supplied instrument (strings/capo) — overrides the document's
    *  declaration for rendering; never written back. */
   tabSetup?: PartTabSetups;
@@ -431,6 +433,7 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
         performedNoteKeys: m.entry ? performedKeys(mnx, m.entry) : undefined,
         activeNoteIds,
         selectedNoteIds,
+        durationSpans: opts.durationSpans,
         // This layout IS the staff-1-of-first-part traversal jsonView mirrors.
         synthesizeKeys: true,
         keyPartIndex: context ? mnx.parts.indexOf(part) : 0,

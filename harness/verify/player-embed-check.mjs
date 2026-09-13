@@ -24,7 +24,9 @@ export async function checkPlayer(cdp, base, format) {
     check(viewer.playbackState.playbackIteration===1 && viewer.playbackState.inspectionIteration===2 && !viewer.playbackState.followPlayback,'Live playback overwrote inspection');
     check(viewer.playbackState.highlight.length>0,'Sibling viewer missed playback context');
     check(!!viewer.shadowRoot.querySelector('.playback-ink'),'Playback ink was not painted');
-    check(getComputedStyle(viewer.shadowRoot.querySelector('.playback-ink')).fill==='rgb(18, 52, 86)','Selection recolored playback ink');
+    // The digit or notehead takes the token itself; a fret mask (.fret-bg) takes a paper tint of it.
+    check(getComputedStyle(viewer.shadowRoot.querySelector('.playback-ink:not(.fret-bg)')).fill==='rgb(18, 52, 86)','Selection recolored playback ink');
+    check(!viewer.shadowRoot.querySelector('.playback-ink:not([data-playback-voice])'),'Playback ink carries no voice');
     const svg=viewer.shadowRoot.querySelector('svg');await delay(60);check(viewer.shadowRoot.querySelector('svg')===svg,'Clock ticks replaced the score SVG');
     for(const view of ['notation','tab','both']){viewer.view=view;await viewer.updateComplete;check(!!viewer.shadowRoot.querySelector('.playback-ink'),'Highlight missing in '+view);}
     binding.follow();check(viewer.playbackState.inspectionIteration===2 && viewer.playbackState.followPlayback,'Follow erased inspection');

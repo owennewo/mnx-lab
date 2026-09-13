@@ -143,6 +143,11 @@ describe('design tokens', () => {
           '--mnx-line',
           '--mnx-ink',
           '--mnx-focus-ring',
+          // Playback ink, per voice (docs/player-element.md).
+          '--mnx-playback',
+          '--mnx-playback-2',
+          '--mnx-playback-3',
+          '--mnx-playback-4',
         ])
       );
     });

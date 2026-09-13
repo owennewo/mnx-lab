@@ -82,6 +82,14 @@ const FRET_BG_HEIGHT_SP = Math.min(
   TAB_STRING_SPACING_SP - 0.12
 );
 
+/**
+ * How far short of the next column a stretched playback mask stops, in ink
+ * staff spaces: clear of a two-digit neighbour's own mask (half of 0.75sp·2)
+ * plus air. The layout records the span; the paint overlay draws it
+ * (`render/playbackInk.ts`), so the goldens never see it.
+ */
+const MASK_END_CLEAR_SP = 1.0;
+
 const ACTIVE_COLOR = 'oklch(0.65 0.22 274)';
 const SELECTED_COLOR = 'oklch(0.7 0.15 190)';
 // The fret digit's backing rect masks the string line under it, so it must be
@@ -342,6 +350,9 @@ export interface EmitTabVoicesArgs {
   performedNoteKeys?: Set<string>;
   activeNoteIds: readonly string[];
   selectedNoteIds: readonly string[];
+  /** Record each fret mask's duration end (`RectPrim.spanEndX`) for the
+   *  playback paint. Off for the goldens, on for the live viewer. */
+  durationSpans?: boolean;
   /**
    * Synthesize positional keys for id-less notes. Only a staff showing exactly
    * the staff-1-of-first-part traversal that jsonView mirrors may do this;
@@ -522,7 +533,7 @@ function emitTabTupletBracket(
 export function emitTabVoices(args: EmitTabVoicesArgs): void {
   const {
     voices, slots, staffTop, ink, measureIndex, positionContext,
-    activeNoteIds, selectedNoteIds, synthesizeKeys, primitives, index, onIssue,
+    activeNoteIds, selectedNoteIds, durationSpans, synthesizeKeys, primitives, index, onIssue,
     row, measureEndX, technique: techniqueSites, showTupletBrackets, accidentalOf, ties
   } = args;
   const laneY = tabTechniqueLaneY(staffTop);
@@ -651,7 +662,10 @@ export function emitTabVoices(args: EmitTabVoicesArgs): void {
         h: bgHeight,
         fill: FRET_BG_FILL,
         className: 'fret-bg',
-        sourceId: noteId
+        sourceId: noteId,
+        // The note's own duration — the next column in this voice, or the
+        // bar's end — is what the playback mask stretches to.
+        ...(durationSpans ? { spanEndX: eventEndX, spanEndDx: -MASK_END_CLEAR_SP } : {})
       });
       primitives.push({
         kind: 'text',

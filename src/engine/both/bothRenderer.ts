@@ -34,6 +34,8 @@ export interface RenderBothOptions {
   /** Total viewport width in pixels. */
   width: number;
   activeNoteIds?: string[];
+  /** Record fret-mask duration spans for the playback paint (`RectPrim.spanEndX`). */
+  durationSpans?: boolean;
   selectedNoteIds?: string[];
   /** Events lit by the selection — how a REST is highlighted. */
   selectedEventIds?: string[];
@@ -72,6 +74,7 @@ export function renderMnxToSvgBoth(opts: RenderBothOptions): RenderOutcome {
     entries: opts.entries,
     widthSp: opts.width / basePxPerSp,
     activeNoteIds: opts.activeNoteIds,
+    durationSpans: opts.durationSpans,
     selectedNoteIds: opts.selectedNoteIds,
     selectedEventIds: opts.selectedEventIds,
     tabSetup: opts.tabSetup,

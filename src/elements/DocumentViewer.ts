@@ -1,5 +1,8 @@
 import { engravingEntries } from '../engine/layout/unrolled.ts';
 import { occurrenceKey, parseOccurrenceKey } from '../model/noteKeys.ts';
+import { forEachNoteAddress } from '../model/noteWalk.ts';
+import type { MnxStructure } from '../model/mnx.ts';
+import { paintPlaybackInk } from '../engine/render/playbackInk.ts';
 import { normalizeDisplayOptions, type DisplayOptions } from '../engine/displayOptions.ts';
 import { LitElement, html, css, nothing } from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
@@ -578,9 +581,26 @@ export class DocumentViewer extends LitElement {
       }
 
       :host #projection-container svg .unperformed { opacity: 0.3; cursor: default; }
+      /* Playback ink (render/playbackInk.ts): one colour per voice, cycled
+         past four — the tokens are in tokens.ts (--playback, --playback-2…4);
+         voice 1 is the original blue, so a single-voice part looks as it
+         always did. Hosts override with --mnx-playback, --mnx-playback-2 … -4. */
       :host #projection-container svg [data-source-id].playback-ink,
       :host([selection-inactive]) #projection-container svg [data-source-id].playback-ink {
-        fill: var(--mnx-playback, light-dark(#245daa, #8ebcff)) !important;
+        fill: var(--playback-voice) !important;
+      }
+      :host #projection-container svg [data-playback-voice="2"].playback-ink { --playback-voice: var(--playback-2); }
+      :host #projection-container svg [data-playback-voice="3"].playback-ink { --playback-voice: var(--playback-3); }
+      :host #projection-container svg [data-playback-voice="4"].playback-ink { --playback-voice: var(--playback-4); }
+      /* The digit's paper mask is the lamp, not the digit: stretched to the
+         note's release by the paint, tinted with the voice colour, the digit
+         above it in full colour. The tint is a mix with the paper so it
+         reads on either theme; the untinted mask would have hidden the digit
+         (both carried the note's id and both went blue). */
+      :host #projection-container svg [data-source-id].fret-bg.playback-ink,
+      :host([selection-inactive]) #projection-container svg [data-source-id].fret-bg.playback-ink {
+        fill: color-mix(in oklab, var(--playback-voice) 22%, var(--paper, oklch(0.985 0.006 85))) !important;
+        rx: 3px;
       }
 
       /* Emit-side hide (docs/core-viewer-surface.md): diagnostic badges sit
@@ -919,6 +939,7 @@ export class DocumentViewer extends LitElement {
       entries: engravingEntries(this.mnxDoc.mnxJson, this.unrolled),
       width,
       activeNoteIds: [], // Playback is a paint overlay, independent of layout and selection.
+      durationSpans: true, // …but it stretches fret masks to the release the layout records.
       selectedNoteIds: this.selection?.selectedNoteIds ?? [],
       selectedEventIds: this.selection?.selectedEventIds ?? [],
       onNoteClick,
@@ -1268,11 +1289,26 @@ export class DocumentViewer extends LitElement {
   /** Queued by a property-driven repaint, consumed by that paint. */
   private followQueued = false;
 
+  /** Note key → 1-based voice (its sequence's index within the staff), built
+   *  once per document: the paint runs every beat and must not walk the
+   *  score each time. */
+  private voiceByKey: { doc: MnxStructure; voices: Map<string, number> } | null = null;
+  private playbackVoiceOf(noteKey: string): number {
+    const doc = this.mnxDoc?.mnxJson;
+    if (!doc) return 1;
+    if (this.voiceByKey?.doc !== doc) {
+      const voices = new Map<string, number>();
+      forEachNoteAddress(doc, address => voices.set(address.key, address.voiceIndex + 1));
+      this.voiceByKey = { doc, voices };
+    }
+    return this.voiceByKey.voices.get(noteKey) ?? 1;
+  }
   /** Follow the live ink without touching the selection or editor cursor. */
   private paintPlayback(){
-    const keys=new Set(this.playbackState?.highlight.map(w=>occurrenceKey(w.noteKey,this.unrolled?w.ordinal:undefined))??[]);
-    for(const ink of this.container?.querySelectorAll<SVGElement>('[data-source-id]')??[])
-      ink.classList.toggle('playback-ink',!ink.classList.contains('unperformed') && keys.has(ink.dataset.sourceId??''));
+    const sounding=new Map<string,number>();
+    for(const w of this.playbackState?.highlight??[])
+      sounding.set(occurrenceKey(w.noteKey,this.unrolled?w.ordinal:undefined),this.playbackVoiceOf(w.noteKey));
+    if(this.container)paintPlaybackInk(this.container,sounding);
   }
   private revealPlayback() {
     const occurrence=this.playbackState?.highlight[0];

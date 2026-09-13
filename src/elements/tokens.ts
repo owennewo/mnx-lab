@@ -40,6 +40,15 @@ export const notationTokens = css`
        See roadmap/proposed/core-modernist-tokens.md. */
     --accent: var(--mnx-accent, light-dark(oklch(0.611 0.225 31.5), oklch(0.7 0.19 31.5)));
     --paper: var(--mnx-paper, light-dark(oklch(1 0 0), oklch(0.235 0.008 80)));
+    /* Playback ink, one colour per voice (render/playbackInk.ts). Voice 1 is
+       the original playback blue; 2–4 step the hue at one lightness and
+       chroma, clear of the accent (31.5) and the selected state (190). The
+       viewer resolves --playback-voice per lit node from these. */
+    --playback: var(--mnx-playback, light-dark(#245daa, #8ebcff));
+    --playback-2: var(--mnx-playback-2, light-dark(oklch(0.5 0.14 150), oklch(0.8 0.13 150)));
+    --playback-3: var(--mnx-playback-3, light-dark(oklch(0.55 0.13 80), oklch(0.82 0.13 85)));
+    --playback-4: var(--mnx-playback-4, light-dark(oklch(0.5 0.16 330), oklch(0.8 0.13 330)));
+    --playback-voice: var(--playback);
     --paper-ink: var(--mnx-paper-ink, light-dark(oklch(0.237 0.004 60), oklch(0.92 0.008 85)));
     --paper-line: var(
       --mnx-paper-line,

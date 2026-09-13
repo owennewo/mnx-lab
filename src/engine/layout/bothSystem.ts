@@ -27,6 +27,8 @@ export interface LayoutBothOptions {
   activeNoteIds?: readonly string[];
   selectedNoteIds?: readonly string[];
   selectedEventIds?: readonly string[];
+  /** Record fret-mask duration spans for the playback paint. */
+  durationSpans?: boolean;
   /** Viewer-supplied instrument (strings/capo) — overrides each part's own
    *  declaration; never written back. */
   tabSetup?: PartTabSetups;

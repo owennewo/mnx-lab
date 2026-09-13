@@ -548,6 +548,9 @@ export interface LayoutNotationOptions {
   selectedNoteIds?: readonly string[];
   /** Events lit by the selection — a rest has no notes to carry it. */
   selectedEventIds?: readonly string[];
+  /** Record fret-mask duration spans on injected tab staves for the playback
+   *  paint (`RectPrim.spanEndX`). Never set by the goldens. */
+  durationSpans?: boolean;
   /**
    * Append each tab-bearing part's tab staff to its system (the `both` view):
    * one system walk, native shared barlines. Limitation: documents declaring
@@ -906,6 +909,7 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
         activeNoteIds,
         selectedNoteIds,
         selectedEventIds,
+        durationSpans: opts.durationSpans,
         index,
         diagnostics,
         includeTabStaves: opts.includeTabStaves === true && (opts.display !== undefined || (mnx.scores ?? []).length === 0),
@@ -1001,6 +1005,7 @@ interface RenderSegmentArgs {
   activeNoteIds: readonly string[];
   selectedNoteIds: readonly string[];
   selectedEventIds: readonly string[];
+  durationSpans?: boolean;
   index: SpatialIndex;
   diagnostics: LayoutDiagnostic[];
   includeTabStaves: boolean;
@@ -1186,7 +1191,7 @@ function assembleSegment(
   /** Probe pass: open every gap that will be measured to this width. */
   probeGapSp: number | null
 ): SegmentResult {
-  const { mnx, segment: originalSegment, collapse, drawValidation, widthSp, activeNoteIds, selectedNoteIds, selectedEventIds, index, diagnostics, includeTabStaves, tabSetup, display, selectedLyrics, measureNumbers, firstScoreSegment, densityH, densityPad, inkRatio, spacingMode } = args;
+  const { mnx, segment: originalSegment, collapse, drawValidation, widthSp, activeNoteIds, selectedNoteIds, selectedEventIds, durationSpans, index, diagnostics, includeTabStaves, tabSetup, display, selectedLyrics, measureNumbers, firstScoreSegment, densityH, densityPad, inkRatio, spacingMode } = args;
   const labelParts = originalSegment.staves.map((staff, s) => staff.sources.map(source => source.part).filter((part, index, parts) =>
     parts.indexOf(part) === index && !originalSegment.staves.slice(0, s).some(previous => previous.sources.some(source => source.part === part))));
   // Beams slant with the outer heads by default; the flat house style is a
@@ -2007,6 +2012,7 @@ function assembleSegment(
           performedNoteKeys: playableKeys,
           activeNoteIds,
           selectedNoteIds,
+          durationSpans,
           // Synthetic keys encode the staff-1-of-first-part traversal jsonView
           // mirrors — the tab staff may reuse them only when its notation
           // sibling is exactly that staff (cross-highlight then works on both).

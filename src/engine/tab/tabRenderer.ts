@@ -31,6 +31,8 @@ export interface RenderTabOptions {
   /** Total viewport width in pixels. */
   width: number;
   activeNoteIds?: string[];
+  /** Record fret-mask duration spans for the playback paint (`RectPrim.spanEndX`). */
+  durationSpans?: boolean;
   selectedNoteIds?: string[];
   onNoteClick?: (
     noteId: string,
@@ -68,6 +70,7 @@ export function renderMnxToSvgTab(opts: RenderTabOptions): RenderOutcome {
     entries: opts.entries,
     widthSp: opts.width / basePxPerSp,
     activeNoteIds: opts.activeNoteIds,
+    durationSpans: opts.durationSpans,
     selectedNoteIds: opts.selectedNoteIds,
     tabSetup: opts.tabSetup,
     spacingMode: opts.spacingMode,

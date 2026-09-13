@@ -152,6 +152,16 @@ export interface RectPrim extends PrimitiveBase {
   /** Stroke thickness in staff spaces (only meaningful when `stroke` is set). */
   thickness?: number;
   /**
+   * Where the masked note's DURATION ends — a layout x like `x`, with
+   * `spanEndDx` an ink-scale offset back from it like `dx`. Emitted as
+   * `data-span-end` (px) so the playback paint can stretch a fret mask to the
+   * note's release without a relayout (docs/player-element.md). Present only
+   * when the layout was asked for it (`durationSpans`); the goldens never ask,
+   * so the field is invisible to every committed primitive.
+   */
+  spanEndX?: number;
+  spanEndDx?: number;
+  /**
    * `w` is a HORIZONTAL DISTANCE in layout space — the gap between two musical
    * x positions — rather than ink measured in staff spaces.
    *

@@ -95,7 +95,22 @@ The viewer consumes the ancestor's context. Playback ink uses `--mnx-playback`, 
 a default blue from `light-dark()`, alongside the selection's enclosure/accent.
 Playback changes toggle ink classes rather than recomputing layout. A repaint for
 view, width, document or verse reapplies those classes. This works in notation, tab
-and combined views. `revealOccurrence({noteKey, ordinal})` is public; it shares the
+and combined views.
+
+Two things ride on that paint (`src/engine/render/playbackInk.ts`):
+
+- **One colour per voice.** Every lit node carries `data-playback-voice`, the note's
+  sequence index within its staff (1-based, cycling past four). Voice 1 is
+  `--mnx-playback`; voices 2–4 default to green, amber and magenta at the same
+  lightness and chroma, overridable with `--mnx-playback-2` … `-4`. A single-voice
+  part therefore looks as it always did.
+- **A fret mask as long as its note.** On a tab staff the digit's paper mask is the
+  lamp: the paint stretches it to the note's release, tinted with the voice colour,
+  and the digit sits on it in full colour. The layout records where each mask's note
+  ends only when asked (`durationSpans`, which the viewer sets and the goldens never
+  do — `RectPrim.spanEndX`, emitted as `data-span-end` in px); the paint stashes the
+  emitter's geometry on the element and restores it when the note stops. A held bass
+  under a moving melody shows each string's own length. `revealOccurrence({noteKey, ordinal})` is public; it shares the
 selection reveal's scroll calculation but never changes selection. Follow controls
 viewer reveal and verse choice; inspection retains its separate value.
 

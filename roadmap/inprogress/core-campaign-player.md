@@ -764,6 +764,22 @@ Closeout exposed the existing audio-boundary subprocess test's five-second start
 budget on a busy workstation. Both CLI verdict assertions remain intact; each child
 now has a ten-second ceiling and the pair a 25-second test allowance.
 
+### 2026-09-13 — playback ink by voice, masks as long as their notes
+
+- The screenshot that opened this was "white on blue is hard to see". It was not:
+  the paint rule matched every element carrying the note's id, and the fret digit's
+  paper mask carries the same id as the digit, so mask and digit both went blue and
+  the number vanished. A paint overlay that keys on `data-source-id` lights *every*
+  primitive of a note — check what else shares the id before recolouring.
+- The mask is now the lamp: stretched to the note's release, tinted by voice, digit
+  in full colour on top. The layout records the span (`RectPrim.spanEndX`) only when
+  the viewer asks (`durationSpans`), so the goldens did not move; the paint stashes
+  the emitter's geometry on the element and restores it, owning no state the SVG
+  does not carry. Voices colour from a once-per-document key→voice map
+  (`forEachNoteAddress`), never from the DOM.
+- Design canvas with the nine directions considered and the chosen one:
+  https://claude.ai/code/artifact/c92407d4-7856-4295-91df-cd07cba539e6.
+
 ### 2026-09-13 — recording disclosure and wrapped toolbar follow-up
 
 Existing YouTube rows now disclose their saved URL in the list and edit form; the

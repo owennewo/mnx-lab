@@ -318,6 +318,7 @@ function emitRect(p: RectPrim, kx: number, ky: number): SVGElement {
     attrs.rx = p.radius * ky;
     attrs.ry = p.radius * ky;
   }
+  if (p.spanEndX !== undefined) attrs['data-span-end'] = drawnX(p.spanEndX, p.spanEndDx, kx, ky);
   if (p.stroke) {
     attrs.stroke = p.stroke;
     // A zero thickness means "no border" and stays that way — the floor
