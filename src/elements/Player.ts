@@ -50,7 +50,9 @@ export class Player extends LitElement {
   private session?: PlaybackSession;
   private revision = 0;
   private youtubeAccepted = false;
-  @state() private externalVideo = false;
+  /** Set by a score frame that hosts video and disclosure together. */
+  @property({ attribute: false }) videoPaneHosted = false;
+  get youtubeRegionVisible() { return !!(this.youtubeRequest || this.youtubeNotice || this.playback?.kind === 'youtube'); }
   @state() private youtubeRequest: string | null = null;
   @state() private youtubeNotice = false;
   private lastUpdate = '';
@@ -454,6 +456,9 @@ export class Player extends LitElement {
   }
 
   protected updated(changed: Map<PropertyKey, unknown>) {
+    if (changed.has('youtubeRequest') || changed.has('youtubeNotice')) {
+      this.dispatchEvent(new CustomEvent('video-notice-changed', { bubbles: true, composed: true }));
+    }
     const reinstall =
       changed.has('performance') ||
       changed.has('documentId') ||
@@ -550,7 +555,7 @@ export class Player extends LitElement {
         // Standalone players retain their own inline surface.
         const region: { mount?: Promise<HTMLElement> } = {};
         this.dispatchEvent(new CustomEvent('video-region-changed', { detail: region, bubbles: true, composed: true }));
-        this.externalVideo = !!region.mount;
+        this.videoPaneHosted = !!region.mount;
         const external = await region.mount;
         await this.updateComplete;
         await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
@@ -885,6 +890,17 @@ export class Player extends LitElement {
     </span>`;
   }
 
+  /** One disclosure template, rendered by the player or its surrounding frame. */
+  renderYouTubeNotice() {
+    return this.youtubeRequest || this.youtubeNotice ? html`<section class="youtube-notice" aria-label="YouTube terms and privacy">
+        <h3>YouTube terms and privacy</h3>
+        <p>This player uses YouTube API Services. Loading a video connects your browser to YouTube and Google, which receive your IP address, browser information and this site's origin. YouTube may serve ads and access cookies or similar device storage under the <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google Privacy Policy</a>.</p>
+        <p>We use playback time and state in memory to follow the score; we do not save them or request YouTube account access. Rate and volume preferences are saved in this browser's localStorage; clearing site data resets them. The host supplies video links and score timings. Studio keeps those in your private library; contact your Studio operator for library deletion. Switching source or leaving the page destroys the video player. Browser privacy controls manage YouTube's cookies.</p>
+        <p>By using this YouTube feature you agree to be bound by the <a href="https://www.youtube.com/t/terms" target="_blank" rel="noopener">YouTube Terms of Service</a>. Select Agree and load to accept these terms and this privacy policy for this player session.</p>
+        ${this.youtubeRequest ? html`<button @click=${() => void this.acceptYouTube()}>Agree and load YouTube</button><button @click=${() => { this.youtubeRequest = null; this.youtubeNotice = false; }}>Cancel</button>` : html`<button @click=${() => this.youtubeNotice = false}>Close notice</button>`}
+      </section>` : nothing;
+  }
+
   render() {
     const playing = this.status?.wantsPlayback ?? false;
     return html` <div class="controls">
@@ -934,14 +950,8 @@ export class Player extends LitElement {
         ${this.volumeControl()}
         </span>
       </div>
-      ${this.youtubeRequest || this.youtubeNotice ? html`<section class="youtube-notice" aria-label="YouTube terms and privacy">
-        <h3>YouTube terms and privacy</h3>
-        <p>This player uses YouTube API Services. Loading a video connects your browser to YouTube and Google, which receive your IP address, browser information and this site's origin. YouTube may serve ads and access cookies or similar device storage under the <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google Privacy Policy</a>.</p>
-        <p>We use playback time and state in memory to follow the score; we do not save them or request YouTube account access. Rate and volume preferences are saved in this browser's localStorage; clearing site data resets them. The host supplies video links and score timings. Studio keeps those in your private library; contact your Studio operator for library deletion. Switching source or leaving the page destroys the video player. Browser privacy controls manage YouTube's cookies.</p>
-        <p>By using this YouTube feature you agree to be bound by the <a href="https://www.youtube.com/t/terms" target="_blank" rel="noopener">YouTube Terms of Service</a>. Select Agree and load to accept these terms and this privacy policy for this player session.</p>
-        ${this.youtubeRequest ? html`<button @click=${() => void this.acceptYouTube()}>Agree and load YouTube</button><button @click=${() => { this.youtubeRequest = null; this.youtubeNotice = false; }}>Cancel</button>` : html`<button @click=${() => this.youtubeNotice = false}>Close notice</button>`}
-      </section>` : nothing}
-      ${this.status?.kind === 'youtube' && !this.externalVideo ? html`<section class="youtube-panel" aria-label="YouTube recording">
+      ${this.videoPaneHosted ? nothing : this.renderYouTubeNotice()}
+      ${this.status?.kind === 'youtube' && !this.videoPaneHosted ? html`<section class="youtube-panel" aria-label="YouTube recording">
         <div class="youtube-surface"></div>
         <p>YouTube · <button @click=${() => this.youtubeNotice = !this.youtubeNotice}>Terms and privacy</button> · <button @click=${() => { this.pause(); void this.selectSource('synth'); }}>Close video</button></p>
       </section>` : nothing}

@@ -173,9 +173,13 @@ export class ScoreFrame extends LitElement {
       .video-surface { width: 100%; height: var(--video-height); flex: 0 1 var(--video-height); min-height: 200px; }
       .video-controls { display: flex; flex-wrap: wrap; gap: 8px; padding: 8px; flex: none; }
       .video-controls .btn { white-space: normal; }
+      .youtube-notice { padding: 12px; overflow-wrap: anywhere; }
+      .youtube-notice h3 { margin-top: 0; }
+      .youtube-notice a { color: inherit; text-decoration: underline; }
+      .youtube-notice button { margin: 4px 4px 0 0; padding: 8px; color: inherit; background: var(--frame-bar); border: 1px solid var(--ink-muted); border-radius: 3px; cursor: pointer; }
       .video-divider { flex: 0 0 8px; cursor: col-resize; touch-action: none; background: var(--frame-ground); }
       .video-divider:hover, .video-divider:focus-visible { background: var(--ink-muted); outline: 2px solid var(--ink); outline-offset: -2px; }
-      .video-pane[hidden], .video-divider[hidden] { display: none; }
+      .video-pane[hidden], .video-divider[hidden], .video-surface[hidden], .video-controls[hidden] { display: none; }
       .pane {
         min-width: 0;
         position: relative;
@@ -557,21 +561,28 @@ export class ScoreFrame extends LitElement {
   private readonly onPlayback = (event: Event) => {
     const detail = (event as CustomEvent<PlaybackUpdate>).detail;
     this.playing = detail.playing === true;
-    this.videoOpen = this.player?.playback?.kind === 'youtube';
+    this.videoOpen = this.player?.youtubeRegionVisible ?? false;
     this.refreshReadout(detail.ordinal);
   };
 
   private readonly onVideo = (event: Event) => {
     this.setBottom(true);
     const region = (event as CustomEvent<{ mount?: Promise<HTMLElement> } | undefined>).detail;
-    if (!region) return; // Consent still appears in the playback strip.
+    if (this.player) this.player.videoPaneHosted = true;
+    this.videoOpen = this.player?.youtubeRegionVisible ?? false;
+    if (!region) return;
     this.videoOpen = true;
     this.resizeVideo(this.videoWidth);
     region.mount = this.updateComplete.then(() => this.renderRoot.querySelector<HTMLElement>('.video-surface')!);
   };
 
+  private readonly onVideoNotice = () => {
+    this.videoOpen = this.player?.youtubeRegionVisible ?? false;
+    this.requestUpdate();
+  };
+
   private readonly onPosition = () => {
-    this.videoOpen = this.player?.playback?.kind === 'youtube';
+    this.videoOpen = this.player?.youtubeRegionVisible ?? false;
     this.refreshReadout(this.player?.scorePosition?.ordinal ?? null);
   };
 
@@ -583,6 +594,7 @@ export class ScoreFrame extends LitElement {
     this.addEventListener('performance-changed', this.onPerformance);
     this.addEventListener('playback-position', this.onPosition);
     this.addEventListener('video-region-changed', this.onVideo);
+    this.addEventListener('video-notice-changed', this.onVideoNotice);
     this.videoObserver = new ResizeObserver(() => { this.resizeVideo(this.videoWidth); this.requestUpdate(); });
     this.videoObserver.observe(this);
   }
@@ -592,6 +604,7 @@ export class ScoreFrame extends LitElement {
     this.removeEventListener('performance-changed', this.onPerformance);
     this.removeEventListener('playback-position', this.onPosition);
     this.removeEventListener('video-region-changed', this.onVideo);
+    this.removeEventListener('video-notice-changed', this.onVideoNotice);
     this.videoObserver?.disconnect();
     this.videoObserver = null;
     document.removeEventListener('pointerdown', this.onClickAway);
@@ -858,11 +871,12 @@ export class ScoreFrame extends LitElement {
       <div class="workspace">
         <aside class="video-pane" aria-label="YouTube video" ?hidden=${!this.videoOpen}
           style="width: ${this.videoWidth}px; --video-height: ${Math.max(200, this.videoWidth * 9 / 16)}px">
-          <div class="video-surface"></div>
-          <div class="video-controls">
+          <div class="video-surface" ?hidden=${this.player?.playback?.kind !== 'youtube'}></div>
+          <div class="video-controls" ?hidden=${this.player?.playback?.kind !== 'youtube'}>
             <button class="btn ghost" @click=${() => this.player?.showYouTubeNotice()}>Terms and privacy</button>
             <button class="btn ghost" @click=${() => { this.player?.pause(); void this.player?.selectSource('synth'); }}>Close video</button>
           </div>
+          ${this.player?.renderYouTubeNotice() ?? nothing}
         </aside>
         <div class="video-divider" role="separator" tabindex="0" aria-label="Video pane width" aria-orientation="vertical"
           aria-valuemin="200" aria-valuemax=${Math.round(this.videoMaximum)} aria-valuenow=${Math.round(this.videoWidth)}

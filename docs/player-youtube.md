@@ -39,8 +39,9 @@ also update the shared playback state.
 `ScoreFrame` now ships in both embed formats as well as the library. A frame opens its
 player strip when a YouTube source/notice is selected. The video lives in a separate pane to the left of the score,
 outside the score's scroll container. Terms and privacy and Close video controls
-sit directly beneath the embed in that pane; the disclosure opens in the playback
-strip. Drag its divider to resize from 200 pixels to
+sit directly beneath the embed in that pane. Before loading, the consent disclosure
+occupies that same left pane; Cancel restores the full score width. Reopening the
+disclosure also keeps it in the left pane, below the video controls. Drag its divider to resize from 200 pixels to
 75% of the frame width. The focused divider also accepts Left/Right (20-pixel steps)
 and Home/End (minimum/maximum). The iframe stays mounted while resizing, with a
 minimum 200 × 200 viewport. Pointer dragging pauses playback and temporarily releases
