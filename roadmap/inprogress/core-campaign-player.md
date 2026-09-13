@@ -759,3 +759,7 @@ a native audio range cancellation upstream, or local Worker shutdown waits forev
 for the abandoned response body. The smoke now exercises that cancellation and exits
 cleanly. Canonical file/metadata reads are also paired by immutable rendition ID,
 preventing timing review against an old file with a new revision.
+
+Closeout exposed the existing audio-boundary subprocess test's five-second startup
+budget on a busy workstation. Both CLI verdict assertions remain intact; each child
+now has a ten-second ceiling and the pair a 25-second test allowance.

@@ -34,7 +34,7 @@ it('rejects native backend imports from pure audio while admitting the browser h
           'rules.cjs',
           file,
         ],
-        { cwd: fixture, encoding: 'utf8' },
+        { cwd: fixture, encoding: 'utf8', timeout: 10_000 },
       );
     const denied = run('src/audio/probe.ts');
     expect(denied.status).toBe(1);
@@ -44,4 +44,6 @@ it('rejects native backend imports from pure audio while admitting the browser h
   } finally {
     fs.rmSync(fixture, { recursive: true, force: true });
   }
-});
+// Two independent CLI startups can exceed Vitest's five-second default on
+// a busy workstation. Bound each child and retain both boundary assertions.
+}, 25_000);
