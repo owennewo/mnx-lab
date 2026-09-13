@@ -199,6 +199,12 @@ export class Player extends LitElement {
       height: 100%;
       color: var(--ink);
     }
+    /* Native popups can use a light system background even in a dark host.
+       Pair the option text with an opaque surface in both themes. */
+    select option {
+      color: var(--ink);
+      background-color: var(--surface);
+    }
     /* The readout is sized by the widest label the performance can print
        (stacked under it, invisible) so the scrubber beside it never moves
        as the beat ticks from 4 to 4.5. */
