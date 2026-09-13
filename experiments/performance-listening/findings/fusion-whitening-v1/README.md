@@ -11,10 +11,13 @@ candidate, not a reliable player grader or a replacement default.
 
 ## Frozen experiment
 
-[Protocol and all summaries](summary.json) · [per-case public results](cases.json) ·
+[Protocol and all summaries](summary.json) · [per-case public results](cases.jsonl) ·
 [technique and configuration](../../fusion-techniques/spectral-whitening.md).
-Implementation/protocol commit: `18e2d9b`. The algorithm was frozen before running;
-subsequent source formatting does not change its behaviour. No threshold recalibration,
+Measured local pre-rebase implementation/protocol revision: `18e2d9b`, with detector
+hashes recorded in the protocol. The algorithm was frozen before running;
+subsequent source formatting was verified equivalent by syntax-tree comparison
+(disregarding empty statements). The committed source includes that formatting and
+a JSONL export change; neither changes the measured detector. No threshold recalibration,
 new harmonic model, analysis-window/hop adjustment or event-rule change was made.
 
 Thirty triangular bands follow Klapuri 2006 section 2.1. Envelope standard deviations

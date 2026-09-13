@@ -363,8 +363,10 @@ if (mode === "development") {
       onset: r.onset ?? r.metrics.onset,
     })),
   });
-  writeJSON(
-    path.join(destination, "cases.json"),
-    [...development.rows, ...heldout.rows].map(publicRow),
+  fs.writeFileSync(
+    path.join(destination, "cases.jsonl"),
+    [...development.rows, ...heldout.rows]
+      .map((r) => JSON.stringify(publicRow(r)))
+      .join("\n") + "\n",
   );
 } else throw Error("Use development | heldout | diagnostics | export");
