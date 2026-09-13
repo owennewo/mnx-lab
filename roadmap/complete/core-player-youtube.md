@@ -71,7 +71,7 @@ unobscured layout and visibility pause. A live eligible embed is checked under t
 production CSP with buffering/seeking and responsive behavior documented. Existing
 synth/audio checks pass. No YouTube media is downloaded, proxied or stored.
 
-Adding new links in Studio is [item 18](../inprogress/studio-recording-management.md).
+Adding new links in Studio is [item 18](../complete/studio-recording-management.md).
 
 ## Implementation agreement and findings — 2026-09-13
 

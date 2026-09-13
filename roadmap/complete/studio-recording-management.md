@@ -1,6 +1,6 @@
 # Studio recording attachments — YouTube links, uploaded audio and sync data
 
-> **Status: in progress 2026-09-13.** Implementation loop. Campaign:
+> **Status: complete 2026-09-13.** Implementation loop. Campaign:
 > [core-campaign-player.md](../inprogress/core-campaign-player.md), item 18.
 > Needs [sync validation](../complete/core-player-recording-sync.md) and
 > [audio playback](../complete/core-player-recording-playback.md). YouTube playback needs
@@ -79,3 +79,10 @@ the correct wrapper entry, played/sought audio, changed sync without restarting,
 reloaded both associations. Browser checks also cover invalid URLs, conflict review,
 unsynchronised saves and removal. All 188 regenerated goldens stayed unchanged.
 Migration 0004 must be applied before deployment; no production data was changed.
+
+Item 18 landed through `9fdad40`. All 1,824 tests, scenario checks and production
+build passed after rebase, as did the built Studio/Worker recording check, existing
+Studio audio check and both embed formats. The browser check also exercises a
+canonical-rendition read race; metadata and the score must name the same immutable
+rendition before diagnostics can be used. No verification debt was added. The
+implementation worktree was removed before this document moved to `complete/`.

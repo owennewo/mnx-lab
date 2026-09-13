@@ -202,7 +202,7 @@ run any time before 6.
 | 15 | [Recording sync](../complete/core-player-recording-sync.md) | Pure Soundslice decoder, sparse/inner-bar timing map, coverage and traversal compatibility. | recording playback | Node conformance fixtures | complete |
 | 16 | [Synth/audio switching](../complete/core-player-recording-playback.md) | Shared backend interface, musical-position handoff, media-clock follow and authenticated audio reads. | recording playback | fake backends + browser media/embed checks | complete |
 | 17 | [YouTube recordings](../complete/core-player-youtube.md) | Visible official iframe, policy/layout lifecycle, API rates, seek and error handling. | recording playback | adapter/layout checks + live embed check | complete |
-| 18 | [Recording attachments](../inprogress/studio-recording-management.md) | Studio URL/audio attachment, sync import, upload and revision lifecycle. | recording playback | service + browser checks | in progress |
+| 18 | [Recording attachments](../complete/studio-recording-management.md) | Studio URL/audio attachment, sync import, upload and revision lifecycle. | recording playback | service + browser checks | complete |
 
 ### Decisions still open
 
@@ -746,3 +746,16 @@ The crop audit found the exporter drops start/end boundaries and ingest stores o
 cropped duration. Available absolute boundaries are preserved, missing ones diagnosed;
 crop controls are not applied and no timing offset is guessed. Contract and rollout:
 [docs/studio-recordings.md](../../docs/studio-recordings.md).
+
+Item 18 landed through `9fdad40`: 1,824 tests, scenario checks and the production
+build passed after rebase, along with Studio/Worker attachment playback, existing
+Studio audio and both embed formats. All 188 regenerated goldens stayed unchanged;
+no human review debt was added. The implementation worktree was retired before
+closeout. Migration 0004 is required before deployment; no production data was
+changed. Items 15–18 now cover the recording sync, playback and authoring sequence.
+
+The final browser check caught an infrastructure distinction: a proxy must propagate
+a native audio range cancellation upstream, or local Worker shutdown waits forever
+for the abandoned response body. The smoke now exercises that cancellation and exits
+cleanly. Canonical file/metadata reads are also paired by immutable rendition ID,
+preventing timing review against an old file with a new revision.
