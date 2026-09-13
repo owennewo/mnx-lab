@@ -107,8 +107,8 @@ host supplies a selected verse. That transient input is not persisted. A system 
 horizontal row of music, including both staves in Both. The card supports keyboard
 navigation and Escape/focus return, and dismisses on click-away.
 
-**Playback** lives in the frame's bottom grip: the player's tray (transport, a scrubber over
-the performed order, the pass menu, sound, rate, volume) draws out under the
-score. The host keeps playback context separate from editor selection, stops/recompiles on
+**Playback** lives in the frame's bottom grip: the player's tray (transport, the readout, a
+rail over the written bars with a lane per pass, and the sound, rate and volume buttons with
+their overlays) draws out under the score. The host keeps playback context separate from editor selection, stops/recompiles on
 edits, and accepts an optional zero-based `at=` ordinal in scenario links.
 [Player element and lifecycle](player-element.md).

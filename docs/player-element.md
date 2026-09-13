@@ -5,16 +5,34 @@ embed formats and `mnx-lab/elements`. It consumes item 5's exact `Performance` a
 uses item 6's transport and native sink. There is no backend service or new runtime
 dependency. It does not own the viewer's context or the editor selection.
 
-The element supplies Play/Pause, Stop, a scrubber over the performed order, rate
+The element supplies Play/Pause, Stop, a rail over the written bars, rate
 (0.25×–2× in 0.05 steps), and master volume. API ordinals and `at=` links are
 zero-based. The position readout prints the place as one dotted number — `# 21.4` is
-bar 21 beat 4, `# 21.4.5` half a beat in, so bar, beat and sub-beat read together — then
-which pass this is and how many the bar gets (`pass 2 of 3`; a bar played once shows no pass
-at all). On a repeated bar the pass is a
-control: it opens a menu of the bar's passes — the verses — and picking one seeks to the
-same bar in that pass, which is what the performed-order table used to be for. The readout uses a pure helper, including
-inherited meter, authored bar numbers, and explicit hold/grace labels. Tenths of a
-beat are display formatting only; the readout is not an incessant live-region announcement.
+bar 21 beat 4, `# 21.4.5` half a beat in, so bar, beat and sub-beat read together — plus
+an explicit hold/grace label when the playhead is inside one. The readout uses a pure
+helper, including inherited meter and authored bar numbers. Tenths of a beat are display
+formatting only; the readout is not an incessant live-region announcement; its accessible
+name carries the full label, pass included.
+
+**The rail** (locked on the *Playback Tray* canvas, 2026-09-13) replaces the range slider:
+one column per written bar, one lane per visit to it, so the rail reads left to right like
+the page and a repeated bar stacks its passes. The lit lane is the playhead, played lanes
+carry the accent dimmed into the ground, and a click on any lane seeks to that visit —
+which is what the pass menu and, before it, the performed-order table were for. Hovering
+or focusing a lane shows its card: `Verse · # 10 · pass 1 of 2`. Lanes are keyed on the
+visit's `occurrence`, which counts from 1 and never repeats; the strain `iteration` resets
+when a jump fires, so a D.S. return would otherwise read `pass 2 of 2` twice. Under a jump
+a column simply gains lanes, and a lane reached by the jump carries a thin inner outline;
+a bar the walk never reaches keeps its column, empty; a visit that covers part of a bar
+(a jump or Fine mid-bar) draws a shorter lane when the host supplies `writtenBarDurations`.
+Section labels come from the global measures' `section` labels, with a hairline at each
+section's first bar. Below the score frame's ~1000px breakpoint the tray stacks: transport
+and readout, the rail on a line of its own without labels, then the settings.
+
+Sound, rate and volume are value buttons — a glyph and the current value — and each
+control opens in an overlay above the tray: rate has preset chips (`0.25×` … `2×`, or the
+backend's own discrete rates) and the fine slider; volume has a mute toggle and the slider.
+The overlays close on click-away or Escape.
 
 ## Public contract
 
@@ -120,4 +138,4 @@ loading/error behavior and recorded-articulation limits.
 
 Recorded audio sources, musical-position handoffs, media delivery and the common
 `playback` snapshot are documented in [player-recordings.md](player-recordings.md).
-The pass menu seeks performed visits in either backend.
+The rail seeks performed visits in either backend.

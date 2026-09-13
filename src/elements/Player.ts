@@ -1,7 +1,7 @@
 import { LitElement, html, css, svg, nothing } from 'lit';
 import { designTokens } from './tokens.ts';
 import { customElement, property, state } from 'lit/decorators.js';
-import type { Performance } from '../audio/performanceTypes.ts';
+import type { Performance, PerformanceMeasure } from '../audio/performanceTypes.ts';
 import type { LoopRegion } from '../audio/transport.ts';
 import { PlaybackSession, type PlaybackSnapshot } from '../audio/playbackSession.ts';
 import { type RecordingSource, type PlaybackBackend, type ScorePosition, type ScoreLoop } from '../audio/playbackBackend.ts';
@@ -20,7 +20,7 @@ import {
   type VoicePreset,
 } from '../audio/sampleSelection.ts';
 import type { SamplePackLoader } from '../audio/native/samplePacks.ts';
-import { formatPlaybackPosition, formatScorePlaybackPosition, measureAt, passLabel, passesOf, placeLabel, playbackPositionParts, scorePlaybackPositionParts, widestPlaceLabel, widestPlaybackPosition, type PlaybackPositionParts } from '../audio/playbackPosition.ts';
+import { formatPlaybackPosition, formatScorePlaybackPosition, measureAt, placeLabel, playbackPositionParts, scorePlaybackPositionParts, widestPlaceLabel, type PlaybackPositionParts } from '../audio/playbackPosition.ts';
 import { ZERO, type Rational } from '../audio/time.ts';
 import type { MnxStructure } from '../model/mnx.ts';
 import type { PlaybackUpdate } from './mnxContext.ts';
@@ -55,22 +55,54 @@ export class Player extends LitElement {
   private lastUpdate = '';
   private lastOrdinal: number | null = null;
   /**
-   * The tray, in the library page's vocabulary (roadmap/inprogress/core-score-frame.md,
-   * 2026-09-12): the shared tokens, 40px controls so the tray is catchable on
-   * glass, the transport as glyphs on the accent, and a scrubber over the
-   * performed order. The order table is gone: the readout says which pass
-   * this is of how many, and on a repeated bar that pass opens a menu
-   * of the passes — the frame the tray lives in is a strip over the score,
-   * not a panel beside it.
+   * The tray, in the library page's vocabulary (roadmap/inprogress/core-score-frame.md;
+   * redesigned on the Playback Tray canvas, 2026-09-13): the shared tokens,
+   * 40px controls so the tray is catchable on glass, the transport as glyphs
+   * on the accent, and a RAIL over the written bars in place of a slider —
+   * one column per bar, one lane per pass, so an exact bar and pass is one
+   * click and a hover names it. The readout prints the place alone; rate
+   * and volume are value buttons whose controls open in overlays above the
+   * tray — the frame the tray lives in is a strip over the score, not a
+   * panel beside it.
    */
   static styles = [
     designTokens,
     css`
     :host {
       display: block;
+      container-type: inline-size;
       font: 14px/1.4 var(--sans);
       color: var(--ink);
       --player-ground: light-dark(oklch(0.9 0.004 60), oklch(0.26 0.006 60));
+    }
+    /* Sound, rate and volume travel together: inline in the one-row tray,
+       a right-aligned line of their own in the stacked form. */
+    .settings {
+      display: contents;
+    }
+    /* The stacked form, below the score frame's breakpoint: transport and
+       readout, then the rail on a line of its own without its labels, then
+       the settings. */
+    @container (max-width: 1000px) {
+      .rail {
+        flex: 1 1 100%;
+        order: 1;
+        padding: 4px 0;
+      }
+      .rail .lab {
+        display: none;
+      }
+      .rail .cell {
+        grid-row: 1;
+        height: 18px;
+      }
+      .settings {
+        display: flex;
+        flex: 1 1 100%;
+        order: 2;
+        justify-content: flex-end;
+        gap: 10px;
+      }
     }
     .youtube-panel { margin-top: 12px; }
     .youtube-surface { width: min(100%, 480px); min-width: 200px; height: clamp(200px, 56.25vw, 270px); position: relative; z-index: 10; }
@@ -164,95 +196,194 @@ export class Player extends LitElement {
       font: inherit;
       color: var(--ink-3);
     }
-    .scrub {
+    /* ── the rail ──
+       A grid: section labels on the first row, one cell per written bar on
+       the second, each cell a column of lanes (one per visit). The lit lane
+       is the playhead; played lanes carry the accent dimmed into the ground;
+       a lane reached by a jump carries a thin inner outline. Hovering or
+       focusing a lane shows its card above the tray. */
+    .rail {
+      position: relative;
       flex: 1 1 160px;
       min-width: 120px;
-      height: 40px;
-      margin: 0;
+      align-self: stretch;
+      display: grid;
+      gap: 0 var(--rail-gap, 2px);
+      align-items: end;
+      padding: 2px 0;
+      box-sizing: border-box;
     }
-    label.volume,
-    label.rate {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
+    .rail .lab {
+      grid-row: 1;
+      font: 600 10px/1 var(--sans);
+      letter-spacing: 0.11em;
+      text-transform: uppercase;
       color: var(--ink-3);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      padding: 0 0 4px 4px;
+      border-left: 1px solid var(--line-strong);
+      pointer-events: none;
     }
-    label.volume input {
-      width: 110px;
-    }
-    label.rate input {
-      width: 120px;
-    }
-    /* Two decimals always, so 1.00× and 0.25× are the same width and the
-       volume beside it holds still. */
-    label.rate output {
-      display: inline;
-      color: var(--ink);
-      min-width: 5ch;
-    }
-    /* The pass in the readout is a control on a repeated bar: a dotted
-       word that opens a menu of the bar's passes above the tray — the verses
-       — each seeking to that pass. The invisible widest copy carries the
-       same caret so the reserved width still matches. */
-    .passes {
+    .rail .cell {
+      grid-row: 2;
       position: relative;
-      display: inline;
-    }
-    .passes > button {
-      display: inline;
-      height: auto;
-      padding: 0;
-      border: 0;
-      border-radius: 0;
-      background: none;
-      font: inherit;
-      color: inherit;
-      text-decoration: underline dotted;
-      text-underline-offset: 3px;
-    }
-    .passes > button:hover,
-    .passes > button[aria-expanded='true'] {
-      color: var(--accent);
-    }
-    .caret {
-      display: inline-block;
-      width: 12px;
-      height: 12px;
-      vertical-align: -2px;
-      margin-left: 2px;
-    }
-    .pass-menu {
-      position: absolute;
-      bottom: calc(100% + 10px);
-      left: 0;
-      z-index: 5;
       display: flex;
       flex-direction: column;
       gap: 2px;
-      min-width: 150px;
-      max-height: 240px;
-      overflow: auto;
-      padding: 4px;
+      height: 14px;
+    }
+    .rail .cell.first {
+      box-shadow: -2px 0 0 var(--line-strong);
+    }
+    .lane {
+      display: block;
+      position: relative;
+      flex: 1 1 0;
+      min-height: 2px;
+      height: auto;
+      width: 100%;
+      padding: 0;
+      border: 0;
+      border-radius: 1px;
+      background: var(--line);
+    }
+    .lane.partial {
+      width: var(--w);
+      margin-left: var(--x);
+    }
+    .lane.played {
+      background: color-mix(in oklab, var(--accent), var(--player-ground) 45%);
+    }
+    .lane.jumped {
+      box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--ink), transparent 60%);
+    }
+    .lane[aria-current='true'] {
+      background: var(--accent);
+      box-shadow: none;
+    }
+    .lane:hover,
+    .lane:focus-visible {
+      outline: 2px solid var(--ink);
+      outline-offset: 1px;
+      z-index: 2;
+    }
+    .lane::after {
+      content: attr(data-tip);
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 24px);
+      transform: translateX(-50%);
+      display: none;
+      padding: 6px 10px;
+      white-space: nowrap;
+      font: 500 12px/1 var(--mono);
+      font-variant-numeric: tabular-nums;
+      color: var(--ink);
+      background: var(--player-ground);
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18), 0 6px 18px rgba(0, 0, 0, 0.22);
+      z-index: 6;
+    }
+    .lane:hover::after,
+    .lane:focus-visible::after {
+      display: block;
+    }
+    /* Beside the rail's left edge a card would hang off the tray; keep the
+       first columns' cards inside it. */
+    .rail .cell:nth-child(-n + 4) .lane::after {
+      left: 0;
+      transform: none;
+    }
+    .rail .cell:nth-last-child(-n + 4) .lane::after {
+      left: auto;
+      right: 0;
+      transform: none;
+    }
+    /* ── rate and volume ──
+       A value button on the tray — glyph and the number — and its control
+       in an overlay above the tray: rate has preset chips and the fine
+       slider, volume a mute and the slider. */
+    button.value {
+      gap: 6px;
+      font: 500 13px/1 var(--mono);
+      font-variant-numeric: tabular-nums;
+    }
+    button.on {
+      background: var(--player-ground);
+    }
+    .anchor {
+      position: relative;
+      display: inline-flex;
+    }
+    .pop {
+      position: absolute;
+      bottom: calc(100% + 8px);
+      right: 0;
+      z-index: 5;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 12px;
       box-sizing: border-box;
       background: var(--player-ground);
       border: 1px solid var(--line);
       border-radius: 3px;
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18), 0 6px 18px rgba(0, 0, 0, 0.22);
     }
-    .pass-menu button {
-      height: 32px;
-      padding: 0 10px;
-      border: 0;
-      border-radius: 3px;
-      justify-content: flex-start;
-      font: 500 13px/1 var(--mono);
+    .pop[hidden] {
+      display: none !important;
+    }
+    .pop.rate {
+      width: min(400px, calc(100vw - 32px));
+    }
+    .pop.volume {
+      width: min(240px, calc(100vw - 32px));
+    }
+    .pop.line,
+    .pop .line {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 10px;
+    }
+    .pop input[type='range'] {
+      flex: 1 1 auto;
+      min-width: 0;
+      margin: 0;
+    }
+    .pop .val {
+      font: 500 12px/1 var(--mono);
       font-variant-numeric: tabular-nums;
+      color: var(--ink-3);
+      min-width: 5ch;
+      text-align: right;
     }
-    .pass-menu button:hover {
-      background: light-dark(rgba(0, 0, 0, 0.06), rgba(255, 255, 255, 0.08));
+    .chips {
+      display: flex;
+      gap: 4px;
     }
-    .pass-menu button[aria-current='true'] {
-      color: var(--accent);
+    .chip {
+      flex: 1 1 0;
+      height: 32px;
+      padding: 0 8px;
+      justify-content: center;
+      font: 500 12px/1 var(--mono);
+      color: var(--ink-2);
+    }
+    .chip.icon {
+      flex: none;
+      width: 32px;
+    }
+    .chip[aria-pressed='true'] {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+    label.select {
+      gap: 6px;
     }
     th {
       color: var(--ink-3);
@@ -275,16 +406,16 @@ export class Player extends LitElement {
     }
   `
   ];
-  /** Whether the passes menu is open; it closes on a pick, click-away or Escape. */
-  @state() private passesOpen = false;
+  /** Which overlay is open — rate or volume; it closes on click-away or Escape. */
+  @state() private openPop: 'rate' | 'volume' | null = null;
   private readonly onClickAway = (event: PointerEvent) => {
-    if (!this.passesOpen) return;
-    const inside = event.composedPath().some((n) => n instanceof HTMLElement && n.classList.contains('passes'));
-    if (!inside) this.passesOpen = false;
+    if (!this.openPop) return;
+    const inside = event.composedPath().some((n) => n instanceof HTMLElement && n.classList.contains('anchor'));
+    if (!inside) this.openPop = null;
   };
   private readonly onKeydown = (event: KeyboardEvent) => {
-    if (event.key === 'Escape' && this.passesOpen) {
-      this.passesOpen = false;
+    if (event.key === 'Escape' && this.openPop) {
+      this.openPop = null;
       event.stopPropagation();
     }
   };
@@ -306,14 +437,19 @@ export class Player extends LitElement {
     this.teardown();
     super.disconnectedCallback();
   }
-  /** The widest readout label, refreshed only when the performance changes. */
+  /** The widest readout label, refreshed only when the performance changes:
+   *  the widest place plus the longer insertion word when the performance
+   *  holds or graces anywhere, so the rail beside it never moves. */
   private widest = '';
   private widestPlace = '';
 
   protected willUpdate(changed: Map<PropertyKey, unknown>) {
-    if (changed.has('performance') || changed.has('document'))
-      this.widest = this.performance ? widestPlaybackPosition(this.performance, this.document) : '';
+    if (changed.has('performance') || changed.has('document') || changed.has('writtenBarDurations')) {
       this.widestPlace = this.performance ? widestPlaceLabel(this.performance, this.document) : '';
+      const kinds = new Set(this.performance?.sourceMap.map((s) => s.kind) ?? []);
+      this.widest = this.widestPlace + (kinds.has('makeTime') ? ' · grace' : kinds.has('fermata') ? ' · hold' : '');
+      this.buildRail();
+    }
   }
 
   protected updated(changed: Map<PropertyKey, unknown>) {
@@ -511,80 +647,226 @@ export class Player extends LitElement {
     return Math.round(clamped * perUnit) / perUnit;
   }
   private changeRate(event: Event) {
-    const requested = Number((event.target as HTMLInputElement).value);
-    this.rate = this.status?.kind === 'youtube' ? requested : Player.snapRate(requested);
-    this.rate = this.session?.setRate(this.rate) ?? this.rate;
-    try {
-      localStorage.setItem('mnx-player-rate', String(this.rate));
-    } catch {}
+    this.setRate(Number((event.target as HTMLInputElement).value));
   }
   private resetRate() {
-    this.rate = 1;
-    this.rate = this.session?.setRate(1) ?? 1;
-    try {
-      localStorage.setItem('mnx-player-rate', '1');
-    } catch {}
+    this.setRate(1);
   }
   private changeVolume(event: Event) {
-    this.volume = Number((event.target as HTMLInputElement).value);
-    this.volume = this.session?.setVolume(this.volume) ?? this.volume;
-    try {
-      localStorage.setItem('mnx-player-volume', String(this.volume));
-    } catch {}
+    this.setVolume(Number((event.target as HTMLInputElement).value));
   }
   private static glyph(d: string, px = 22) {
     return svg`<svg width=${px} height=${px} viewBox="0 0 24 24" aria-hidden="true"><path d=${d} fill="currentColor"></path></svg>`;
   }
 
-  private static caret() {
-    return svg`<svg class="caret" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5z" fill="currentColor"></path></svg>`;
+  private static stroke(d: string, px = 18) {
+    return svg`<svg width=${px} height=${px} viewBox="0 0 24 24" aria-hidden="true"><path d=${d} fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg>`;
   }
-  /** The live readout: the pass becomes a menu of the bar's passes when it has more than one;
-   *  a bar played once shows no pass at all. */
+  /** The live readout prints the place alone — `# 8.1` — plus a hold or
+   *  grace when the playhead is inside one. Which pass this is lives in
+   *  the rail (the lit lane), the lane's hover card and the output's
+   *  accessible name; the readout does not repeat it. */
   private readout() {
     if (!this.performance) return nothing;
     const parts = this.positionParts;
     if (!parts) return this.positionLabel;
-    const passes = passesOf(this.performance, parts.measureIndex);
-    const pass = passLabel(parts);
     const tail = parts.insertion ? ` · ${parts.insertion}` : '';
-    // The place sits in its own reserved cell so the tenth coming and going
-    // never moves the pass beside it.
-    const place = html`<span class="place"><span>${placeLabel(parts)}</span><span class="widest" aria-hidden="true">${this.widestPlace}</span></span>`;
-    if (!pass) return html`${place}${tail}`;
-    if (passes.length < 2) return html`${place} · ${pass}${tail}`;
-    return html`${place} · <span class="passes"
-        ><button
-          type="button"
-          aria-haspopup="menu"
-          aria-expanded=${this.passesOpen}
-          title="Choose which pass of this bar to play"
-          @click=${() => (this.passesOpen = !this.passesOpen)}
-        >${pass}${Player.caret()}</button
-        >${this.passesOpen
-          ? html`<div class="pass-menu" role="menu" aria-label="Passes of this bar">
-              ${passes.map(
-                (m) => html`<button
-                  type="button"
-                  role="menuitem"
-                  aria-current=${m.ordinal === parts.ordinal}
-                  @click=${() => {
-                    this.passesOpen = false;
-                    this.seek(m.ordinal);
-                  }}
-                >pass ${m.iteration}</button>`,
-              )}
-            </div>`
-          : nothing}</span
-      >${tail}`;
+    return html`<span class="place"><span>${placeLabel(parts)}</span><span class="widest" aria-hidden="true">${this.widestPlace}</span></span>${tail}`;
   }
-  private onScrub(event: Event) {
-    this.seek(Number((event.target as HTMLInputElement).value));
+
+  // ── the rail ────────────────────────────────────────────────────────────
+  // One column per WRITTEN bar, one lane per visit to it, so the rail reads
+  // left to right like the page and a repeated bar stacks its passes. Lanes
+  // are keyed on `occurrence`, which counts a bar's visits from 1 and never
+  // repeats — the strain `iteration` resets when a jump fires, so after a
+  // D.S. it would print "pass 2 of 2" twice. Sections come from the global
+  // measures' `section` labels; a bar the walk never reaches keeps its
+  // column, empty. Built once per performance, classed per frame.
+  private railModel: {
+    columns: number;
+    gap: number;
+    labels: { at: number; span: number; text: string }[];
+    cells: { first: boolean; lanes: { ordinal: number; tip: string; jumped: boolean; x: number; w: number }[] }[];
+  } | null = null;
+
+  private buildRail() {
+    const performance = this.performance;
+    if (!performance || performance.measures.length < 2) { this.railModel = null; return; }
+    const globals = this.document?.global.measures ?? [];
+    const maxIndex = performance.measures.reduce((max, m) => Math.max(max, m.measureIndex), 0);
+    const columns = Math.max(globals.length, maxIndex + 1);
+    const visits: PerformanceMeasure[][] = Array.from({ length: columns }, () => []);
+    for (const m of performance.measures) visits[m.measureIndex]?.push(m);
+    for (const list of visits) list.sort((a, b) => a.ordinal - b.ordinal);
+    // The first arrival by a jump; every later revisit is a return.
+    const entries = this.document ? linearizePasses(this.document).entries : [];
+    const jumpAt = entries.findIndex((e) => e.via === 'jump');
+    const sectionAt = (i: number) => globals[i]?.section?.label ?? '';
+    const sectionOf = (i: number) => { for (let k = i; k >= 0; k--) { const s = sectionAt(k); if (s) return s; if (globals[k]?.section !== undefined) return ''; } return ''; };
+    const labels: { at: number; span: number; text: string }[] = [];
+    for (let i = 0; i < columns; i++) {
+      const text = sectionAt(i);
+      if (!text) continue;
+      let span = 1;
+      while (i + span < columns && !sectionAt(i + span)) span++;
+      labels.push({ at: i, span, text: visits[i]!.length > 1 ? `${text} ×${visits[i]!.length}` : text });
+    }
+    const asNumber = (r: Rational) => Number(r.num) / Number(r.den);
+    const cells = visits.map((list, i) => {
+      const bar = String(globals[i]?.number ?? i + 1);
+      const section = sectionOf(i);
+      const written = this.writtenBarDurations?.[i];
+      return {
+        first: i > 0 && sectionOf(i - 1) !== section,
+        lanes: list.map((m) => {
+          const passes = list.length;
+          const jumped = jumpAt >= 0 && m.ordinal >= jumpAt && m.occurrence > 1;
+          const tip = `${section ? `${section} · ` : ''}# ${bar}${passes > 1 ? ` · pass ${m.occurrence} of ${passes}` : ''}${jumped ? ' · after the jump' : ''}`;
+          let x = 0, w = 1;
+          if (written && asNumber(written) > 0) {
+            x = asNumber(m.from) / asNumber(written);
+            w = Math.max(0.02, (asNumber(m.until) - asNumber(m.from)) / asNumber(written));
+          }
+          return { ordinal: m.ordinal, tip, jumped, x, w };
+        }),
+      };
+    });
+    this.railModel = { columns, gap: columns > 80 ? 1 : 2, labels, cells };
+  }
+
+  private rail() {
+    const model = this.railModel;
+    if (!model) return nothing;
+    const current = this.scorePosition?.ordinal ?? this.lastOrdinal ?? -1;
+    return html`<div
+      class="rail"
+      role="group"
+      aria-label="Position"
+      style=${`grid-template-columns: repeat(${model.columns}, minmax(0, 1fr)); --rail-gap: ${model.gap}px;`}
+    >
+      ${model.labels.map((l) => html`<div class="lab" style=${`grid-column: ${l.at + 1} / span ${l.span};`}>${l.text}</div>`)}
+      ${model.cells.map(
+        (cell, i) => html`<div class=${cell.first ? 'cell first' : 'cell'} style=${`grid-column: ${i + 1};`}>
+          ${cell.lanes.map(
+            (lane) => html`<button
+              type="button"
+              class=${[
+                'lane',
+                lane.ordinal < current ? 'played' : '',
+                lane.jumped ? 'jumped' : '',
+                lane.x > 0 || lane.w < 1 ? 'partial' : '',
+              ].join(' ')}
+              style=${lane.x > 0 || lane.w < 1 ? `--x: ${(lane.x * 100).toFixed(2)}%; --w: ${(lane.w * 100).toFixed(2)}%;` : nothing}
+              aria-label=${lane.tip}
+              aria-current=${lane.ordinal === current ? 'true' : nothing}
+              data-tip=${lane.tip}
+              @click=${() => this.seek(lane.ordinal)}
+            ></button>`,
+          )}
+        </div>`,
+      )}
+    </div>`;
+  }
+
+  // ── rate and volume: a value on the tray, the control in an overlay ─────
+  static readonly RATE_PRESETS = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2];
+
+  private setRate(value: number) {
+    this.rate = this.status?.kind === 'youtube' ? value : Player.snapRate(value);
+    this.rate = this.session?.setRate(this.rate) ?? this.rate;
+    try {
+      localStorage.setItem('mnx-player-rate', String(this.rate));
+    } catch {}
+  }
+
+  private rateControl() {
+    const caps = this.status?.capabilities.rate;
+    const min = caps?.min ?? Player.RATE_MIN, max = caps?.max ?? Player.RATE_MAX, step = caps?.step ?? Player.RATE_STEP;
+    const presets = caps?.values?.length ? [...caps.values] : Player.RATE_PRESETS.filter((r) => r >= min && r <= max);
+    const open = this.openPop === 'rate';
+    return html`<span class="anchor">
+      <div class="pop rate" role="dialog" aria-label="Playback rate" ?hidden=${!open}>
+        <div class="chips">
+          ${presets.map(
+            (r) => html`<button type="button" class="chip" aria-pressed=${Math.abs(r - this.rate) < 1e-9} @click=${() => this.setRate(r)}>${r}×</button>`,
+          )}
+        </div>
+        ${caps?.values?.length
+          ? nothing
+          : html`<div class="line">
+              <input
+                aria-label="Playback rate"
+                type="range"
+                min=${min}
+                max=${max}
+                step=${step}
+                .value=${String(this.rate)}
+                @input=${this.changeRate}
+                @dblclick=${this.resetRate}
+              /><span class="val">${this.rate.toFixed(2)}×</span>
+            </div>`}
+      </div>
+      <button
+        type="button"
+        class=${open ? 'value on' : 'value'}
+        aria-haspopup="dialog"
+        aria-expanded=${open}
+        aria-label=${`Change playback rate, ${this.rate.toFixed(2)}×`}
+        title="Playback rate"
+        @click=${() => (this.openPop = open ? null : 'rate')}
+      >${Player.stroke('M4.5 16.5a8.5 8.5 0 1 1 15 0M12 16.5l4-6')}<span>${this.rate.toFixed(2)}×</span></button>
+    </span>`;
+  }
+
+  /** The level before a mute, so unmuting lands back where it was. */
+  private volumeBeforeMute = 0.7;
+
+  private setVolume(value: number) {
+    this.volume = Math.min(1, Math.max(0, value));
+    this.volume = this.session?.setVolume(this.volume) ?? this.volume;
+    try {
+      localStorage.setItem('mnx-player-volume', String(this.volume));
+    } catch {}
+  }
+
+  private toggleMute() {
+    if (this.volume > 0) { this.volumeBeforeMute = this.volume; this.setVolume(0); }
+    else this.setVolume(this.volumeBeforeMute || 0.7);
+  }
+
+  private volumeControl() {
+    const open = this.openPop === 'volume';
+    const muted = this.volume === 0;
+    const speaker = muted
+      ? svg`<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"></path><path d="M16 9l5 6M21 9l-5 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path></svg>`
+      : svg`<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"></path><path d="M16 9a4 4 0 0 1 0 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path></svg>`;
+    return html`<span class="anchor">
+      <div class="pop volume line" role="dialog" aria-label="Volume" ?hidden=${!open}>
+        <button type="button" class="chip icon" aria-label=${muted ? 'Unmute' : 'Mute'} aria-pressed=${muted} @click=${() => this.toggleMute()}>${speaker}</button>
+        <input
+          aria-label="Volume"
+          type="range"
+          min="0"
+          max="1"
+          step=".05"
+          .value=${String(this.volume)}
+          @input=${this.changeVolume}
+        /><span class="val">${Math.round(this.volume * 100)}</span>
+      </div>
+      <button
+        type="button"
+        class=${open ? 'value on' : 'value'}
+        aria-haspopup="dialog"
+        aria-expanded=${open}
+        aria-label=${`Change volume, ${Math.round(this.volume * 100)}`}
+        title="Volume"
+        @click=${() => (this.openPop = open ? null : 'volume')}
+      >${speaker}<span>${Math.round(this.volume * 100)}</span></button>
+    </span>`;
   }
 
   render() {
     const playing = this.status?.wantsPlayback ?? false;
-    const count = this.performance?.measures.length ?? 0;
     return html` <div class="controls">
         <button
           class="primary"
@@ -598,31 +880,21 @@ export class Player extends LitElement {
         <button class="icon" ?disabled=${!this.performance} aria-label="Stop" title="Stop" @click=${() => this.stop()}>
           ${Player.glyph('M6 6h12v12H6z', 18)}
         </button>
-        <output aria-live="off" class=${this.performance ? '' : 'none'}
+        <output aria-live="off" class=${this.performance ? '' : 'none'} aria-label=${this.performance ? this.positionLabel : nothing}
           >${this.performance
             ? html`<span>${this.readout()}</span
-                ><span class="widest" aria-hidden="true">${this.widest}${Player.caret()}</span>`
+                ><span class="widest" aria-hidden="true">${this.widest}</span>`
             : 'No performance available'}</output
         >
-        ${count > 1
-          ? html`<input
-              class="scrub"
-              type="range"
-              min="0"
-              max=${count - 1}
-              step="1"
-              aria-label="Position"
-              .value=${String(Math.min(count - 1, this.scorePosition?.ordinal ?? this.lastOrdinal ?? 0))}
-              @input=${this.onScrub}
-            />`
-          : nothing}
+        ${this.rail()}
         ${this.recordings.length ? html`<label class="select">Source<select aria-label="Playback source" ?disabled=${!this.performance}
           .value=${this.sourceId} @change=${(event: Event) => void this.selectSource((event.target as HTMLSelectElement).value)}>
           <option value="synth" ?selected=${this.sourceId === 'synth'}>Synth</option>
           ${this.recordings.map(r => html`<option value=${r.id} ?selected=${this.sourceId === r.id}>${r.name}</option>`)}
         </select></label>` : nothing}
-        ${this.sourceId === 'synth' ? html`        <label class="select"
-          >Sound<select
+        <span class="settings">
+        ${this.sourceId === 'synth' ? html`<label class="select" title="Sound"
+          >${Player.stroke('M3 12h2l2-6 3 12 3-9 2 5 2-2h4')}<select
             aria-label="Playback sound"
             .value=${this.voicePreset}
             @change=${(event: Event) => {
@@ -637,32 +909,10 @@ export class Player extends LitElement {
                 </option>`,
             )}
           </select></label
-        >
-` : nothing}
-        ${this.status?.kind === 'youtube' ? html`<label class="select">Rate<select aria-label="Playback rate" .value=${String(this.rate)} @change=${this.changeRate}>
-          ${(this.status.capabilities.rate.values ?? [1]).map(rate => html`<option value=${String(rate)} ?selected=${rate === this.rate}>${rate}×</option>`)}
-        </select></label>` : html`        <label class="rate" title="Playback rate — double-click for 1×"
-          >Rate<input
-            aria-label="Playback rate"
-            type="range"
-            min=${this.status?.capabilities.rate.min ?? Player.RATE_MIN}
-            max=${this.status?.capabilities.rate.max ?? Player.RATE_MAX}
-            step=${this.status?.capabilities.rate.step ?? Player.RATE_STEP}
-            .value=${String(this.rate)}
-            @input=${this.changeRate}
-            @dblclick=${this.resetRate}
-          /><output aria-live="off">${this.rate.toFixed(2)}×</output></label
-        >`}
-        <label class="volume" title="Volume">
-          ${Player.glyph('M4 9v6h4l5 4V5L8 9z', 18)}<input
-            aria-label="Volume"
-            type="range"
-            min="0"
-            max="1"
-            step=".05"
-            .value=${String(this.volume)}
-            @input=${this.changeVolume}
-        /></label>
+        >` : nothing}
+        ${this.rateControl()}
+        ${this.volumeControl()}
+        </span>
       </div>
       ${this.youtubeRequest || this.youtubeNotice ? html`<section class="youtube-notice" aria-label="YouTube terms and privacy">
         <h3>YouTube terms and privacy</h3>

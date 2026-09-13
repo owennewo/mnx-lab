@@ -74,9 +74,9 @@ try {
   await wait(`!${frame}.querySelector('mnx-zoom-pad') && !!${frame}.querySelector('mnx-settings-pad[pinned]')?.shadowRoot?.querySelector('.card')`);
   await c.evaluate(`[...${frame}.querySelectorAll('.seg button')].find(b => b.textContent === 'Tab').click()`);
   await wait(`${frame}.querySelector('.seg button[aria-pressed=true]')?.textContent === 'Tab' && localStorage.getItem('mnx-studio.view') === 'tab'`);
-  // Draw the bottom grip out: the player's own tray, with its scrubber.
+  // Draw the bottom grip out: the player's own tray, with its rail.
   await c.evaluate(`${frame}.querySelector('.grip.bottom .chev').click()`);
-  await wait(`!!${frame}.querySelector('.strip.bottom') && !!${piece}.querySelector('mnx-player').shadowRoot.querySelector('.scrub')`);
+  await wait(`!!${frame}.querySelector('.strip.bottom') && !!${piece}.querySelector('mnx-player').shadowRoot.querySelector('.rail')`);
   const openShot = await c.send('Page.captureScreenshot'); await fs.writeFile('/tmp/mnx-studio-piece-open.png',Buffer.from(openShot.result.data,'base64'));
   // The Tags sheet: add a tag of your own, then correct how the artist shows with an alias.
   const sheet = `${piece}.querySelector('mnx-studio-tags').shadowRoot`;
