@@ -133,3 +133,9 @@ follow-ups has been implemented or automatically filed.
 [F-001 results](fusion-attack-v1/README.md): twelve attack-association settings and a
 locked held-out run. Repeat detection improved at ~5% extra processing, but ongoing pitch
 coverage and strums regressed. Decision: revise; unchanged harmonic parent remains default.
+
+## Second fused iteration
+
+[F-002 results](fusion-restrike-v1/README.md): re-strike-only integration preserves all
+parent pitch coverage and improves repeat detection at ~5–6% processing overhead. Extra
+false accusations still fail acceptance; the next target is attack-to-pitch attribution.

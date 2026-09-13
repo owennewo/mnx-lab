@@ -70,6 +70,29 @@ outputs. To use the existing inspector, copy one split file into a fresh directo
 retains all configuration summaries and parent/selected per-case evidence; ignored full
 outputs retain all settings. Read the [fusion log](fusion-log.md) for the decision.
 
+## Re-strike-only iteration
+
+[F-002's frozen protocol](experiments/fusion-restrike-protocol.md) holds the F-001-01
+parameters fixed and changes only their integration: preserve parent pitch tracks and
+emit additional, two-frame-confirmed re-strikes. It does not enable attack gating for
+new pitch tracks. Every original event and active-pitch set must survive unchanged.
+The overlapping event intervals are intentional: the evaluator deduplicates active pitches
+while matching each attack separately. This is bench machinery, not a production note API.
+
+From the bench directory, retaining the original and first held-out audio and full runs:
+
+```bash
+node rendering/render.mjs output/audio-fusion-heldout-v2 --fusion-heldout-v2
+npm run fusion:attack -- output/fusion-restrike-v1 experiments/fusion-restrike.json
+npm run fusion:export -- output/fusion-restrike-v1 findings/fusion-restrike-v1
+```
+
+`FUSION_ADDITIONAL_PARENT_RESULTS` can point to the original F-001 `heldout-results.json`
+when it lives elsewhere; `FUSION_PARENT_RESULTS` still points to the original baseline.
+The runner pools both previous audio sets for development, then locks disposition before
+scoring the fresh v2 set. There is one candidate and no parameter selection or retuning.
+Use new destinations for subsequent runs; preserve rendered WAVs for identical inputs.
+
 ## What is independent
 
 `rendering/browser.mjs` imports the production NativeSink and sample loader. A supplied

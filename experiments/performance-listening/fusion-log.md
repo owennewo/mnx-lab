@@ -6,12 +6,12 @@ Living experiment index · implementation loop · started 2026-09-13.
 decision delay. Techniques earn their place through measured contribution to the whole
 listener. They may be combined, conditional, replaced or removed.
 
-**Current state:** F-000 (fixed harmonic scorer + existing two-frame gate) remains the
-default. First fused experiment F-001 is implemented but **not adopted**: all 12 settings
-failed coverage/regression checks. Repeat detection improved at ~5% extra processing;
-held-out strums and ongoing pitch coverage regressed. The provisional local budgets were
-25% extra processing and 25 ms pooled/common-match p95 increase; a target device remains
-unselected. [Measured decision and next experiment](findings/fusion-attack-v1/README.md).
+**Current state:** F-000 remains default. F-002 preserves all parent pitch coverage and
+improves repeat recovery at ~5–6% extra processing, but adds false accusations on both
+regression and fresh held-out cases. **Revise**: next target is attribution of additional
+attacks to the correct pitch. F-001's failed coverage-gating trial remains in the history.
+Local budgets remain 25% extra processing and 25 ms pooled/common-match p95 increase;
+a production target device is unselected. [F-002 evidence](findings/fusion-restrike-v1/README.md).
 
 ## Technique index
 
@@ -21,7 +21,7 @@ unselected. [Measured decision and next experiment](findings/fusion-attack-v1/RE
 | [Recorded templates](fusion-techniques/recorded-templates.md) | Measured baseline; parked for general use | Large timbre-transfer loss; reconsider for an explicit personalisation experiment |
 | [Neural evidence](fusion-techniques/neural-evidence.md) | Measured offline baseline; candidate | Stronger attack recovery; current CPU path is slower than real time |
 | [Temporal event tracking](fusion-techniques/temporal-events.md) | Implemented in DSP baselines; not isolated by ablation | Stable pitch presence does not establish re-strikes |
-| [Attack and re-strike evidence](fusion-techniques/attack-restrike.md) | F-001 measured; revise | Repeat gains are insufficient when hard onset gating loses ongoing pitch coverage |
+| [Attack and re-strike evidence](fusion-techniques/attack-restrike.md) | F-001/F-002 measured; revise | Pitch coverage now preserved; additional attacks still inherit incorrect pitch hypotheses |
 | [Confidence gating](fusion-techniques/confidence-gating.md) | Final-event threshold curves measured; live policy untried | Precision costs coverage; final confidence is not available at initial emission |
 | [Selective extra analysis](fusion-techniques/selective-analysis.md) | Proposed; untried | Can additional evidence pay for itself only when needed? |
 
@@ -37,12 +37,14 @@ failure when a later configuration works.
 | FL-002 · 2026-09-13 | Adopt fused-listener development direction | Optimise whole-system accuracy/cost; component comparisons become diagnostics; no combined run yet |
 | FL-003 · 2026-09-13 | Start this log and structured technique records | Capture configurations and interactions so a bad setting is not mistaken for a bad technique |
 | FL-004 · 2026-09-13 | [F-001 attack association: AR-001/002](fusion-techniques/attack-restrike.md) | 12 settings + locked held-out run; ~5% cost, improved repeats, unacceptable pitch/strum regressions. Revise; keep F-000 default |
+| FL-005 · 2026-09-13 | [F-002 re-strike-only: AR-003/004](fusion-techniques/attack-restrike.md) | 132 regression + 36 fresh cases; exact parent coverage; repeat gains at ~5–6% cost, but +14/+9 false accusations. Revise pitch attribution |
 
 ## Candidate next experiments
 
 These are questions, not scheduled work or new roadmap proposals.
 
-- Isolate re-strike evidence while preserving ongoing pitch presence; the hard onset prerequisite failed in F-001.
+- Improve pitch attribution for additional attacks while preserving the F-002 parent-coverage contract.
+- Isolate duplicate re-strike suppression on a played pitch if attribution alone is insufficient.
 - Select a target device before treating the provisional local processing budget as a production budget.
 - Test [confidence gating](fusion-techniques/confidence-gating.md) using evidence available at decision time.
 - Investigate [neural runtime/decoding](fusion-techniques/neural-evidence.md) and
