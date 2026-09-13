@@ -1,0 +1,19 @@
+{
+  "name": "mnx-performance-listening-bench",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "render": "node rendering/render.mjs",
+    "compare": "node experiments/compare.mjs",
+    "test": "node --test evaluation/*.test.mjs detectors/*.test.mjs",
+    "inspect": "node inspector/serve.mjs",
+    "check:boundaries": "node evaluation/boundaries.mjs"
+  },
+  "dependencies": {
+    "@spotify/basic-pitch": "1.0.1",
+    "@tensorflow/tfjs": "3.21.0",
+    "fft.js": "4.0.4",
+    "puppeteer-core": "25.10.0"
+  }
+}

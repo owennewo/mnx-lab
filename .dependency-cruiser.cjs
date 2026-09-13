@@ -33,6 +33,15 @@ function layerRule(name, from, allowed) {
 module.exports = {
   forbidden: [
     {
+      name: 'production-does-not-import-experiments', severity: 'error',
+      from: { path: '^(src|worker|apps|converters)/' }, to: { path: '^experiments/' }
+    },
+    {
+      name: 'listening-bench-consumes-audio-and-model-only', severity: 'error',
+      from: { path: '^experiments/performance-listening/' },
+      to: { path: '^(src|worker|apps|harness|converters)/', pathNot: '^src/(audio|model)/' }
+    },
+    {
       name: 'native-audio-only-at-browser-boundary',
       severity: 'error',
       from: { path: '^(src|worker|harness)/', pathNot: '^src/(audio/native|elements|entries)/|^harness/browser/' },

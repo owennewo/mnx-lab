@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "sampleRate": 22050,
+  "presets": ["guitar", "guitar2", "piano"],
+  "templatePreset": "guitar",
+  "midiMin": 40,
+  "midiMax": 88,
+  "fftSize": 4096,
+  "hopSize": 256,
+  "streamChunks": [256, 2048],
+  "attackTolerance": 0.1,
+  "pitchTolerance": 0.5,
+  "frameStep": 0.02,
+  "activityThreshold": 0.22,
+  "minFrames": 2,
+  "rmsFloor": 0.0001,
+  "templateIterations": 32,
+  "maxPolyphony": 6,
+  "seed": 0,
+  "neural": {"onsetThreshold": 0.5, "frameThreshold": 0.3, "minNoteFrames": 5},
+  "confidenceThresholds": [0, 0.3, 0.5, 0.7, 0.9]
+}

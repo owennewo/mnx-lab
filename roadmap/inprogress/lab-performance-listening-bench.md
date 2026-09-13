@@ -1,6 +1,6 @@
 # Performance listening bench — earn the limits before Studio integration
 
-> **Status: proposed 2026-09-13.** Implementation loop: evidence about our audio
+> **Status: in progress 2026-09-13.** Implementation loop: evidence about our audio
 > analysis, not a change to MNX. An isolated experimental unit in this repository,
 > serving future Studio tracking, assessment and guitar control. Not an item in the
 > existing player campaign; consumes its audio apparatus without expanding its contract.
@@ -211,7 +211,7 @@ extension or new roadmap campaign is authorised by implementing this bench.
 
 - [Performance compiler](../../docs/player-performance.md) and
   [native playback](../../docs/player-transport.md): existing rendering and identities.
-- [Studio practice proposal](studio-player-practice.md): related consumer work, explicitly
+- [Studio practice proposal](../proposed/studio-player-practice.md): related consumer work, explicitly
   excluding recording/detection; neither proposal silently expands the other.
 - [Basic Pitch](https://github.com/spotify/basic-pitch): candidate polyphonic baseline,
   not a guarantee of causal low-latency behaviour.
