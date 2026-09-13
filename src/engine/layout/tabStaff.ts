@@ -631,9 +631,11 @@ export function emitTabVoices(args: EmitTabVoicesArgs): void {
 
       // The geometry the technique post-pass draws against — recorded even
       // when this note carries none, because another note's hammer-on may
-      // name it as its destination. A grace takes no ordinal, so it records
-      // no site: it is never a technique's origin or destination beat.
-      if (ordinal >= 0) {
+      // name it as its destination. A grace records a site too (ordinal -1):
+      // the slide or hammer-on INTO the beat it decorates is the commonest
+      // thing a guitar grace does, and the site is what lets the line start
+      // at the small digit.
+      {
         if (!args.performedNoteKeys || (noteId && args.performedNoteKeys.has(noteId))) recordSite(techniqueSites, {
           ...(args.entryIndex === undefined ? {} : {entryIndex: args.entryIndex}),
           x: eventX,
@@ -726,8 +728,9 @@ export function emitTabVoices(args: EmitTabVoicesArgs): void {
               scale: isGrace(item) ? GRACE_FRET_SCALE : 1,
               voiceKey,
               // Un-timed events take no technique ordinal: the ordinals number
-              // the beats a technique can travel between, and a grace is not
-              // one of them.
+              // the beats a palm-mute run spans, and a grace is not one of
+              // them. It still records a site, so a technique it carries
+              // (a slide or hammer-on into its principal) is drawn.
               ordinal: isGrace(item) ? -1 : nextOrdinal(techniqueSites, voiceKey),
               voiceIndex
             });

@@ -1,6 +1,6 @@
 {
   "title": "Grace notes on the fingerboard",
-  "description": "An acciaccatura before a two-note chord, and a two-note grace run before the closing chord, on a guitar part in staffKind both. Grace digits are drawn small (0.6, matching the notation staff's GRACE_SCALE) so they read as an ornament rather than as part of the beat they decorate, and they sit in the rigid small columns the plan already reserved for them — which is why the tab and notation staves stay in column across a grace. The graces take no technique ordinal: they are never the origin or destination beat of a hammer-on, and numbering them would shift every technique after them.",
+  "description": "An acciaccatura before a two-note chord, and a two-note grace run before the closing chord, on a guitar part in staffKind both. Grace digits are drawn small (0.6, matching the notation staff's GRACE_SCALE) so they read as an ornament rather than as part of the beat they decorate, and they sit in the rigid small columns the plan already reserved for them — which is why the tab and notation staves stay in column across a grace. The graces take no technique ordinal (numbering them would shift every palm-mute run after them) but still record technique sites, so a grace that slides or hammers into its principal draws the line — pinned by 25-tab-techniques/07-grace-into-the-beat; here the graces carry no technique and nothing is drawn for them.",
   "bars": 1,
   "tags": [
     "tab",

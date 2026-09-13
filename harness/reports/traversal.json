@@ -4249,6 +4249,48 @@
       ]
     ]
   },
+  "lab/tab-techniques/grace-into-the-beat": {
+    "order": [
+      0,
+      1
+    ],
+    "passCounts": [
+      1,
+      1
+    ],
+    "soundingPasses": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ],
+    "truncated": false,
+    "entries": [
+      {
+        "ordinal": 0,
+        "measureIndex": 0,
+        "occurrence": 1,
+        "iteration": 1
+      },
+      {
+        "ordinal": 1,
+        "measureIndex": 1,
+        "occurrence": 1,
+        "iteration": 1
+      }
+    ],
+    "diagnostics": [],
+    "availableIterations": [
+      [
+        1
+      ],
+      [
+        1
+      ]
+    ]
+  },
   "lab/tab-rhythm/triplets-on-tab": {
     "order": [
       0,

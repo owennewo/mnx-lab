@@ -1838,6 +1838,17 @@ function assembleSegment(
                 clef: posClef,
                 accidentalOf,
                 primitives,
+                // Keyed under the container's own curve key so the technique
+                // pass can find a grace by (event, raw inner index); nothing
+                // else reads the suffixed form.
+                onAnchor: (containerIndex, anchor) => {
+                  const notes = event.content[containerIndex]?.notes ?? [];
+                  curveAnchors.byKey.set(`${i}:${s}:${voiceIndex}:${eventIndex}#${containerIndex}`, {
+                    ...anchor,
+                    row: m.row,
+                    ...(playableKeys ? { performedNotes: notes.map(n => n.id !== undefined && playableKeys.has(n.id)) } : {})
+                  });
+                },
                 keyFor:
                   synthesizePartForStaff[s] !== null
                     ? (containerIndex, noteIndex) => {
@@ -2950,40 +2961,65 @@ function collectNotationTechnique(
       resolveStaffVoices(spec, writtenIndex(plan, mi)).forEach((rv, vi) => {
         const voiceKey = `${si}:${vi}`;
         rv.seq.content.forEach((item, ei) => {
+          // The plan's own slots, not the anchors, so a following REST still
+          // ends the note's duration where it actually ends.
+          const nextX = pm.staves[si]?.[vi]?.[ei + 1]?.x ?? pm.x + pm.width;
+          const record = (
+            start: EventCurveAnchor,
+            notes: readonly MnxNote[],
+            endX: number,
+            ordinal: number,
+            /** Notehead scale and stem length: full size, or a grace's own. */
+            headScale: number,
+            stemLengthSp: number
+          ) => {
+            // The lane clears the STAFF, this event's highest notehead, and its
+            // stem tip where the stem points up — a "P.M." run through a row of
+            // stems is not a mark, it is a smudge.
+            const stemTop =
+              start.stemDir === 1 ? Math.min(...start.headYs) - stemLengthSp : Infinity;
+            const laneY =
+              Math.min(staffTopOf(start.row, si), Math.min(...start.headYs), stemTop) -
+              TECHNIQUE_LANE_RISE_SP;
+            notes.forEach((note, ni) => {
+              const y = start.headYs[ni];
+              if (y === undefined || start.performedNotes?.[ni] === false) return;
+              const technique = techniqueOf(note);
+              recordSite(collector, {
+                ...(pm.entry ? {entryIndex: mi} : {}),
+                x: start.x,
+                endX,
+                y,
+                laneY,
+                row: start.row,
+                halfWidthSp: (NOTEHEAD_WIDTH_SP * headScale) / 2,
+                voiceKey,
+                ordinal,
+                stemDir: start.stemDir,
+                ...(note.id !== undefined ? { noteId: occurrenceKey(note.id, pm.entry?.ordinal) } : {}),
+                ...(technique ? { technique } : {})
+              });
+            });
+          };
+          if (isGrace(item)) {
+            // A grace takes no ordinal (it is not a beat a palm-mute run
+            // spans) but does take a site: the slide or hammer-on into its
+            // principal starts at the small notehead. Each inner event ends
+            // where the next grace column, or the principal's column, begins.
+            const starts = item.content.map((_, j) => anchors.byKey.get(`${mi}:${si}:${vi}:${ei}#${j}`));
+            item.content.forEach((inner, j) => {
+              const start = starts[j];
+              if (!start) return;
+              const endX = starts.slice(j + 1).find(Boolean)?.x ?? nextX;
+              record(start, inner.notes ?? [], endX, -1, GRACE_SCALE, GRACE_STEM_LENGTH_SP);
+            });
+            return;
+          }
           if (!isTimedEvent(item)) return;
           const ordinal = nextOrdinal(collector, voiceKey);
           const start = anchors.byKey.get(`${mi}:${si}:${vi}:${ei}`);
           if (!start) return; // a rest: its ordinal is spent, its site is not
-          // The plan's own slots, not the anchors, so a following REST still
-          // ends the note's duration where it actually ends.
-          const endX = pm.staves[si]?.[vi]?.[ei + 1]?.x ?? pm.x + pm.width;
-          // The lane clears the STAFF, this event's highest notehead, and its
-          // stem tip where the stem points up — a "P.M." run through a row of
-          // stems is not a mark, it is a smudge.
-          const stemTop =
-            start.stemDir === 1 ? Math.min(...start.headYs) - STEM_LENGTH_SP : Infinity;
-          const laneY =
-            Math.min(staffTopOf(start.row, si), Math.min(...start.headYs), stemTop) -
-            TECHNIQUE_LANE_RISE_SP;
-          (item.notes ?? []).forEach((note, ni) => {
-            const y = start.headYs[ni];
-            if (y === undefined || start.performedNotes?.[ni] === false) return;
-            const technique = techniqueOf(note);
-            recordSite(collector, {
-              ...(pm.entry ? {entryIndex: mi} : {}),
-              x: start.x,
-              endX,
-              y,
-              laneY,
-              row: start.row,
-              halfWidthSp: NOTEHEAD_WIDTH_SP / 2,
-              voiceKey,
-              ordinal,
-              stemDir: start.stemDir,
-              ...(note.id !== undefined ? { noteId: occurrenceKey(note.id, pm.entry?.ordinal) } : {}),
-              ...(technique ? { technique } : {})
-            });
-          });
+          record(start, item.notes ?? [], nextX, ordinal, 1, STEM_LENGTH_SP);
         });
       });
     }
@@ -3505,6 +3541,9 @@ interface EmitGraceGroupArgs {
   keyFor?: (containerIndex: number, noteIndex: number) => string | undefined;
   /** Total beam rise/fall cap across the group; 0 draws it flat. */
   beamSlantSp: number;
+  /** Each drawn inner event's notehead geometry, by RAW container index — the
+   *  technique post-pass draws a grace's slide or hammer-on from it. */
+  onAnchor?: (containerIndex: number, anchor: Omit<EventCurveAnchor, 'row'>) => void;
 }
 
 /**
@@ -3517,7 +3556,7 @@ interface EmitGraceGroupArgs {
  * principal.
  */
 function emitGraceGroup(args: EmitGraceGroupArgs): void {
-  const { grace, firstX, ink, staffTop, clef, accidentalOf, primitives, keyFor, beamSlantSp } = args;
+  const { grace, firstX, ink, staffTop, clef, accidentalOf, primitives, keyFor, beamSlantSp, onAnchor } = args;
   const rawIndex = new Map<MnxEvent, number>(grace.content.map((e, i) => [e, i]));
   const inner = grace.content.filter(e => !e.rest && (e.notes?.length ?? 0) > 0);
   if (inner.length === 0) return;
@@ -3546,6 +3585,7 @@ function emitGraceGroup(args: EmitGraceGroupArgs): void {
     const notes = event.notes!;
     const staffYs = notes.map(n => pitchToStaffY(n.pitch.step, n.pitch.octave, clef));
     const headGlyph = NOTEHEAD_GLYPH_BY_BASE[event.duration.base] ?? 'noteheadBlack';
+    onAnchor?.(rawIndex.get(event) ?? j, { x, stemDir: dir, headYs: staffYs.map(y => staffTop + y) });
 
     for (const ly of unionLedgerLines(staffYs)) {
       primitives.push({

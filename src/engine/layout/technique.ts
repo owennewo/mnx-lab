@@ -80,7 +80,9 @@ export interface TechniqueSite {
    * The event's index within its voice, counted across measures and counting
    * RESTS. Palm mute is a per-note flag that reads as a span, so its run is
    * "consecutive events" — and a rest has to break one, which is exactly what
-   * counting an ordinal the rest also consumes buys.
+   * counting an ordinal the rest also consumes buys. A grace note's site
+   * carries -1: it is not one of the beats a run spans, but it is still the
+   * origin of the slide or hammer-on into its principal.
    */
   ordinal: number;
   /** The note's own id, when it has one. */
@@ -377,6 +379,9 @@ function palmMuteRuns(
   const byVoice = new Map<string, Map<number, TechniqueSite>>();
   for (const s of sites) {
     if (!s.technique?.palmMute) continue;
+    // A grace has no ordinal of its own, so it cannot be a run's member: two
+    // graces bars apart would otherwise share ordinal -1 and read as a chord.
+    if (s.ordinal < 0) continue;
     const inVoice = byVoice.get(s.voiceKey) ?? new Map<number, TechniqueSite>();
     // A chord's members share one ordinal — one run, not one per string.
     if (!inVoice.has(s.ordinal)) inVoice.set(s.ordinal, s);

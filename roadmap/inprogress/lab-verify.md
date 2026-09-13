@@ -1191,3 +1191,24 @@ tied from the bar before: no digit there within a system. The second system open
 with **(0)** in parentheses on string 3 — a tie carried over the line break is shown,
 so the line never begins on a silent string. The notation staff is unchanged: every
 tie keeps its arc.
+
+## Grace notes slide and hammer into the beat — 2026-09-13
+
+Owner: no roadmap doc — a direct fix: the last bar of the *No Surprises (tutorial)*
+Guitar Pro import carries a shift slide from a grace note into the chord it decorates,
+and neither staff drew it. The converter was right; the engine gave graces no technique
+site at all (a rule from
+[core-tuplets-grace-notes](../complete/core-tuplets-grace-notes.md), written for
+palm-mute ordinals and over-applied). Graces still take no ordinal, but now record a
+site on both staves. One **never-seen** scenario,
+`lab/25-tab-techniques/07-grace-into-the-beat`, and **no moved golden** — nothing in
+the corpus had put a technique on a grace.
+
+**What a reviewer should look for.** Bar 1 has three acciaccaturas. On tab: a slanted
+slide line from the small **2** to the full **4** on string 1; a hammer-on slur from the
+small **0** to the **2** on string 4; a slide line plus the legato slur from the small
+**1** to the **3** on string 2. Each line starts clear of the small digit, not the
+full-size gap. The full-size **2** to **5** shift slide across the barline is unchanged,
+for comparison. On the notation staff the same three marks spring from the small
+noteheads, the hammer-on slur on the side away from the grace's (always-up) stem, and
+the technique lane clears the grace's shorter stem. Bar 2 carries no technique.

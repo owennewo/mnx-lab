@@ -1,0 +1,910 @@
+{
+  "widthSp": 80,
+  "notation": {
+    "widthSp": 80,
+    "heightSp": 20,
+    "primitives": [
+      {
+        "kind": "line",
+        "x1": 2,
+        "y1": 8,
+        "x2": 43.95,
+        "y2": 8,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 2,
+        "y1": 9,
+        "x2": 43.95,
+        "y2": 9,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 2,
+        "y1": 10,
+        "x2": 43.95,
+        "y2": 10,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 2,
+        "y1": 11,
+        "x2": 43.95,
+        "y2": 11,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 2,
+        "y1": 12,
+        "x2": 43.95,
+        "y2": 12,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "gClef8vb",
+        "x": 3.1,
+        "y": 11,
+        "className": "clef"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "timeSig4",
+        "x": 7.35,
+        "y": 9,
+        "anchor": "middle",
+        "className": "time-sig-num"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "timeSig4",
+        "x": 7.35,
+        "y": 11,
+        "anchor": "middle",
+        "className": "time-sig-den"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "accidentalSharp",
+        "x": 11.146,
+        "y": 8,
+        "scale": 0.6,
+        "className": "accidental grace"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 11.746,
+        "y": 8,
+        "scale": 0.6,
+        "className": "notehead grace",
+        "sourceId": "g1"
+      },
+      {
+        "kind": "line",
+        "x1": 12.454,
+        "y1": 5.5,
+        "x2": 12.454,
+        "y2": 7.8992,
+        "thickness": 0.12,
+        "className": "stem grace"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "flag8thUp",
+        "x": 12.454,
+        "y": 5.5,
+        "scale": 0.6,
+        "className": "flag grace"
+      },
+      {
+        "kind": "line",
+        "x1": 12.004,
+        "y1": 7.15,
+        "x2": 13.304,
+        "y2": 6.05,
+        "thickness": 0.12,
+        "className": "grace-slash"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "accidentalSharp",
+        "x": 13.31,
+        "y": 7.5,
+        "className": "accidental"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 14.46,
+        "y": 7.5,
+        "className": "notehead",
+        "sourceId": "n1"
+      },
+      {
+        "kind": "line",
+        "x1": 14.46,
+        "y1": 7.668,
+        "x2": 14.46,
+        "y2": 11,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 21.696,
+        "y": 12.5,
+        "scale": 0.6,
+        "className": "notehead grace",
+        "sourceId": "g2"
+      },
+      {
+        "kind": "line",
+        "x1": 22.404,
+        "y1": 10,
+        "x2": 22.404,
+        "y2": 12.3992,
+        "thickness": 0.12,
+        "className": "stem grace"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "flag8thUp",
+        "x": 22.404,
+        "y": 10,
+        "scale": 0.6,
+        "className": "flag grace"
+      },
+      {
+        "kind": "line",
+        "x1": 21.954,
+        "y1": 11.65,
+        "x2": 23.254,
+        "y2": 10.55,
+        "thickness": 0.12,
+        "className": "grace-slash"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 23.26,
+        "y": 12,
+        "className": "notehead",
+        "sourceId": "n2"
+      },
+      {
+        "kind": "line",
+        "x1": 24.44,
+        "y1": 8.5,
+        "x2": 24.44,
+        "y2": 11.832,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 30.496,
+        "y": 9.5,
+        "scale": 0.6,
+        "className": "notehead grace",
+        "sourceId": "g3"
+      },
+      {
+        "kind": "line",
+        "x1": 31.204,
+        "y1": 7,
+        "x2": 31.204,
+        "y2": 9.3992,
+        "thickness": 0.12,
+        "className": "stem grace"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "flag8thUp",
+        "x": 31.204,
+        "y": 7,
+        "scale": 0.6,
+        "className": "flag grace"
+      },
+      {
+        "kind": "line",
+        "x1": 30.754,
+        "y1": 8.65,
+        "x2": 32.054,
+        "y2": 7.55,
+        "thickness": 0.12,
+        "className": "grace-slash"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 32.06,
+        "y": 9,
+        "className": "notehead",
+        "sourceId": "n3"
+      },
+      {
+        "kind": "line",
+        "x1": 32.06,
+        "y1": 9.168,
+        "x2": 32.06,
+        "y2": 12.5,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 39.06,
+        "y": 12,
+        "className": "notehead",
+        "sourceId": "n4"
+      },
+      {
+        "kind": "line",
+        "x1": 40.24,
+        "y1": 8.5,
+        "x2": 40.24,
+        "y2": 11.832,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "line",
+        "x1": 43.95,
+        "y1": 8,
+        "x2": 43.95,
+        "y2": 12,
+        "thickness": 0.16,
+        "className": "barline"
+      },
+      {
+        "kind": "line",
+        "x1": 43.95,
+        "y1": 8,
+        "x2": 67.725,
+        "y2": 8,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 43.95,
+        "y1": 9,
+        "x2": 67.725,
+        "y2": 9,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 43.95,
+        "y1": 10,
+        "x2": 67.725,
+        "y2": 10,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 43.95,
+        "y1": 11,
+        "x2": 67.725,
+        "y2": 11,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 43.95,
+        "y1": 12,
+        "x2": 67.725,
+        "y2": 12,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 47.46,
+        "y": 11,
+        "className": "notehead",
+        "sourceId": "n5"
+      },
+      {
+        "kind": "line",
+        "x1": 48.64,
+        "y1": 7.5,
+        "x2": 48.64,
+        "y2": 10.832,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 54.46,
+        "y": 10.5,
+        "className": "notehead",
+        "sourceId": "r1"
+      },
+      {
+        "kind": "line",
+        "x1": 55.64,
+        "y1": 7,
+        "x2": 55.64,
+        "y2": 10.332,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "restHalf",
+        "x": 62.05,
+        "y": 10,
+        "anchor": "middle",
+        "className": "rest",
+        "sourceId": "@m1.v0.e2"
+      },
+      {
+        "kind": "line",
+        "x1": 66.925,
+        "y1": 8,
+        "x2": 66.925,
+        "y2": 12,
+        "thickness": 0.16,
+        "className": "barline barline-final-thin"
+      },
+      {
+        "kind": "rect",
+        "x": 67.225,
+        "y": 8,
+        "w": 0.5,
+        "h": 4,
+        "fill": "currentColor",
+        "className": "barline barline-final-thick"
+      },
+      {
+        "kind": "line",
+        "x1": 12.704,
+        "y1": 8,
+        "x2": 14.21,
+        "y2": 7.5,
+        "thickness": 0.12,
+        "className": "technique-slide technique-slide-shift"
+      },
+      {
+        "kind": "curve",
+        "points": [
+          {
+            "x": 22.05,
+            "y": 13.3
+          },
+          {
+            "x": 22.59,
+            "y": 14.1
+          },
+          {
+            "x": 23.31,
+            "y": 14.1
+          },
+          {
+            "x": 23.85,
+            "y": 13.3
+          }
+        ],
+        "thickness": 0.16,
+        "taper": true,
+        "className": "technique-slur technique-hammerPull"
+      },
+      {
+        "kind": "line",
+        "x1": 31.454,
+        "y1": 9.5,
+        "x2": 31.81,
+        "y2": 9,
+        "thickness": 0.12,
+        "className": "technique-slide technique-slide-legato"
+      },
+      {
+        "kind": "curve",
+        "points": [
+          {
+            "x": 31.454,
+            "y": 10.3
+          },
+          {
+            "x": 31.694,
+            "y": 11.1
+          },
+          {
+            "x": 31.57,
+            "y": 11.1
+          },
+          {
+            "x": 31.81,
+            "y": 10.3
+          }
+        ],
+        "thickness": 0.16,
+        "taper": true,
+        "className": "technique-slur technique-slide-legato-slur"
+      },
+      {
+        "kind": "line",
+        "x1": 40.49,
+        "y1": 12,
+        "x2": 47.21,
+        "y2": 11,
+        "thickness": 0.12,
+        "className": "technique-slide technique-slide-shift"
+      }
+    ]
+  },
+  "tab": {
+    "widthSp": 80,
+    "heightSp": 15.7143,
+    "primitives": [
+      {
+        "kind": "line",
+        "x1": 2,
+        "y1": 5,
+        "x2": 42.95,
+        "y2": 5,
+        "thickness": 0.1,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 2,
+        "y1": 6.1429,
+        "x2": 42.95,
+        "y2": 6.1429,
+        "thickness": 0.1,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 2,
+        "y1": 7.2857,
+        "x2": 42.95,
+        "y2": 7.2857,
+        "thickness": 0.1,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 2,
+        "y1": 8.4286,
+        "x2": 42.95,
+        "y2": 8.4286,
+        "thickness": 0.1,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 2,
+        "y1": 9.5714,
+        "x2": 42.95,
+        "y2": 9.5714,
+        "thickness": 0.1,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 2,
+        "y1": 10.7143,
+        "x2": 42.95,
+        "y2": 10.7143,
+        "thickness": 0.1,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 2,
+        "y1": 5,
+        "x2": 2,
+        "y2": 10.7143,
+        "thickness": 0.16,
+        "className": "barline barline-start"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "6stringTabClef",
+        "x": 3.1,
+        "y": 7.8571,
+        "className": "tab-clef"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "timeSig4",
+        "x": 6.35,
+        "y": 6.4286,
+        "anchor": "middle",
+        "className": "time-sig-num"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "timeSig4",
+        "x": 6.35,
+        "y": 9.2857,
+        "anchor": "middle",
+        "className": "time-sig-den"
+      },
+      {
+        "kind": "rect",
+        "x": 10.875,
+        "y": 4.6931,
+        "w": 0.45,
+        "h": 0.6137,
+        "fill": "var(--paper, oklch(0.985 0.006 85))",
+        "className": "fret-bg",
+        "sourceId": "g1"
+      },
+      {
+        "kind": "text",
+        "text": "2",
+        "x": 11.1,
+        "y": 5,
+        "font": "body",
+        "size": 0.75,
+        "anchor": "middle",
+        "baseline": "central",
+        "weight": 700,
+        "className": "fret-number",
+        "sourceId": "g1"
+      },
+      {
+        "kind": "rect",
+        "x": 13.675,
+        "y": 4.4886,
+        "w": 0.75,
+        "h": 1.0229,
+        "fill": "var(--paper, oklch(0.985 0.006 85))",
+        "className": "fret-bg",
+        "sourceId": "n1"
+      },
+      {
+        "kind": "text",
+        "text": "4",
+        "x": 14.05,
+        "y": 5,
+        "font": "body",
+        "size": 1.25,
+        "anchor": "middle",
+        "baseline": "central",
+        "weight": 700,
+        "className": "fret-number",
+        "sourceId": "n1"
+      },
+      {
+        "kind": "rect",
+        "x": 20.825,
+        "y": 8.1217,
+        "w": 0.45,
+        "h": 0.6137,
+        "fill": "var(--paper, oklch(0.985 0.006 85))",
+        "className": "fret-bg",
+        "sourceId": "g2"
+      },
+      {
+        "kind": "text",
+        "text": "0",
+        "x": 21.05,
+        "y": 8.4286,
+        "font": "body",
+        "size": 0.75,
+        "anchor": "middle",
+        "baseline": "central",
+        "weight": 700,
+        "className": "fret-number",
+        "sourceId": "g2"
+      },
+      {
+        "kind": "rect",
+        "x": 22.475,
+        "y": 7.9171,
+        "w": 0.75,
+        "h": 1.0229,
+        "fill": "var(--paper, oklch(0.985 0.006 85))",
+        "className": "fret-bg",
+        "sourceId": "n2"
+      },
+      {
+        "kind": "text",
+        "text": "2",
+        "x": 22.85,
+        "y": 8.4286,
+        "font": "body",
+        "size": 1.25,
+        "anchor": "middle",
+        "baseline": "central",
+        "weight": 700,
+        "className": "fret-number",
+        "sourceId": "n2"
+      },
+      {
+        "kind": "rect",
+        "x": 29.625,
+        "y": 5.836,
+        "w": 0.45,
+        "h": 0.6137,
+        "fill": "var(--paper, oklch(0.985 0.006 85))",
+        "className": "fret-bg",
+        "sourceId": "g3"
+      },
+      {
+        "kind": "text",
+        "text": "1",
+        "x": 29.85,
+        "y": 6.1429,
+        "font": "body",
+        "size": 0.75,
+        "anchor": "middle",
+        "baseline": "central",
+        "weight": 700,
+        "className": "fret-number",
+        "sourceId": "g3"
+      },
+      {
+        "kind": "rect",
+        "x": 31.275,
+        "y": 5.6314,
+        "w": 0.75,
+        "h": 1.0229,
+        "fill": "var(--paper, oklch(0.985 0.006 85))",
+        "className": "fret-bg",
+        "sourceId": "n3"
+      },
+      {
+        "kind": "text",
+        "text": "3",
+        "x": 31.65,
+        "y": 6.1429,
+        "font": "body",
+        "size": 1.25,
+        "anchor": "middle",
+        "baseline": "central",
+        "weight": 700,
+        "className": "fret-number",
+        "sourceId": "n3"
+      },
+      {
+        "kind": "rect",
+        "x": 38.275,
+        "y": 7.9171,
+        "w": 0.75,
+        "h": 1.0229,
+        "fill": "var(--paper, oklch(0.985 0.006 85))",
+        "className": "fret-bg",
+        "sourceId": "n4"
+      },
+      {
+        "kind": "text",
+        "text": "2",
+        "x": 38.65,
+        "y": 8.4286,
+        "font": "body",
+        "size": 1.25,
+        "anchor": "middle",
+        "baseline": "central",
+        "weight": 700,
+        "className": "fret-number",
+        "sourceId": "n4"
+      },
+      {
+        "kind": "line",
+        "x1": 42.95,
+        "y1": 5,
+        "x2": 42.95,
+        "y2": 10.7143,
+        "thickness": 0.16,
+        "className": "barline"
+      },
+      {
+        "kind": "line",
+        "x1": 42.95,
+        "y1": 5,
+        "x2": 66.725,
+        "y2": 5,
+        "thickness": 0.1,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 42.95,
+        "y1": 6.1429,
+        "x2": 66.725,
+        "y2": 6.1429,
+        "thickness": 0.1,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 42.95,
+        "y1": 7.2857,
+        "x2": 66.725,
+        "y2": 7.2857,
+        "thickness": 0.1,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 42.95,
+        "y1": 8.4286,
+        "x2": 66.725,
+        "y2": 8.4286,
+        "thickness": 0.1,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 42.95,
+        "y1": 9.5714,
+        "x2": 66.725,
+        "y2": 9.5714,
+        "thickness": 0.1,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 42.95,
+        "y1": 10.7143,
+        "x2": 66.725,
+        "y2": 10.7143,
+        "thickness": 0.1,
+        "className": "staff-line"
+      },
+      {
+        "kind": "rect",
+        "x": 46.675,
+        "y": 7.9171,
+        "w": 0.75,
+        "h": 1.0229,
+        "fill": "var(--paper, oklch(0.985 0.006 85))",
+        "className": "fret-bg",
+        "sourceId": "n5"
+      },
+      {
+        "kind": "text",
+        "text": "5",
+        "x": 47.05,
+        "y": 8.4286,
+        "font": "body",
+        "size": 1.25,
+        "anchor": "middle",
+        "baseline": "central",
+        "weight": 700,
+        "className": "fret-number",
+        "sourceId": "n5"
+      },
+      {
+        "kind": "rect",
+        "x": 53.675,
+        "y": 6.7743,
+        "w": 0.75,
+        "h": 1.0229,
+        "fill": "var(--paper, oklch(0.985 0.006 85))",
+        "className": "fret-bg",
+        "sourceId": "r1"
+      },
+      {
+        "kind": "text",
+        "text": "2",
+        "x": 54.05,
+        "y": 7.2857,
+        "font": "body",
+        "size": 1.25,
+        "anchor": "middle",
+        "baseline": "central",
+        "weight": 700,
+        "className": "fret-number",
+        "sourceId": "r1"
+      },
+      {
+        "kind": "line",
+        "x1": 65.925,
+        "y1": 5,
+        "x2": 65.925,
+        "y2": 10.7143,
+        "thickness": 0.16,
+        "className": "barline barline-final-thin"
+      },
+      {
+        "kind": "rect",
+        "x": 66.225,
+        "y": 5,
+        "w": 0.5,
+        "h": 5.7143,
+        "fill": "currentColor",
+        "className": "barline barline-final-thick"
+      },
+      {
+        "kind": "line",
+        "x1": 11.575,
+        "y1": 5.3,
+        "x2": 13.425,
+        "y2": 4.7,
+        "thickness": 0.12,
+        "className": "technique-slide technique-slide-shift"
+      },
+      {
+        "kind": "curve",
+        "points": [
+          {
+            "x": 21.05,
+            "y": 7.5786
+          },
+          {
+            "x": 21.59,
+            "y": 6.7786
+          },
+          {
+            "x": 22.31,
+            "y": 6.7786
+          },
+          {
+            "x": 22.85,
+            "y": 7.5786
+          }
+        ],
+        "thickness": 0.16,
+        "taper": true,
+        "className": "technique-slur technique-hammerPull"
+      },
+      {
+        "kind": "line",
+        "x1": 30.325,
+        "y1": 6.4429,
+        "x2": 31.025,
+        "y2": 5.8429,
+        "thickness": 0.12,
+        "className": "technique-slide technique-slide-legato"
+      },
+      {
+        "kind": "curve",
+        "points": [
+          {
+            "x": 30.325,
+            "y": 4.6
+          },
+          {
+            "x": 30.565,
+            "y": 3.8
+          },
+          {
+            "x": 30.785,
+            "y": 3.8
+          },
+          {
+            "x": 31.025,
+            "y": 4.6
+          }
+        ],
+        "thickness": 0.16,
+        "taper": true,
+        "className": "technique-slur technique-slide-legato-slur"
+      },
+      {
+        "kind": "line",
+        "x1": 39.275,
+        "y1": 8.7286,
+        "x2": 46.425,
+        "y2": 8.1286,
+        "thickness": 0.12,
+        "className": "technique-slide technique-slide-shift"
+      }
+    ]
+  }
+}

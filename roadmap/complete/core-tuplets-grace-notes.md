@@ -115,8 +115,11 @@ the staff above, and the golden would happily pin the wrong answer, which is why
 `tab-containers.test.ts` compares the two staves' column SPACING directly.
 
 - **Grace digits are small** (0.6, the notation staff's own `GRACE_SCALE`) and take no
-  technique ordinal: a grace is never the origin or destination beat of a hammer-on, and
-  numbering it would shift every technique after it.
+  technique ordinal: numbering a grace would shift every palm-mute run after it.
+  *Revised 2026-09-13:* a grace still takes no ordinal but **does record a technique
+  site** — the slide or hammer-on into its principal is the commonest thing a guitar
+  grace does, and the original rule silently dropped it (found on a Guitar Pro import;
+  pinned by `lab/25-tab-techniques/07-grace-into-the-beat`).
 - **The tuplet bracket is drawn once per system.** The standalone tab view draws its own —
   a tab staff has no beams, so the bracket is the only thing that can say where a group is.
   The `both` view does not, because the notation staff above draws it over the same

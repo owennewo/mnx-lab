@@ -1,0 +1,39 @@
+{
+  "title": "Grace notes that slide or hammer into the beat",
+  "description": "Three acciaccaturas, each carrying the technique that joins it to its principal: a shift slide up string 1 from a grace F#4 (fret 2) to G#4 (fret 4), a hammer-on up string 4 from a grace D3 (open) to E3 (fret 2), and a legato slide up string 2 from a grace C4 (fret 1) to D4 (fret 3) — the commonest thing a guitar grace does, and the shape a Guitar Pro import produces (the No Surprises tutorial's bar 45). A fourth, full-size shift slide crosses the barline into bar 2, so the grace slides are read against the ordinary one. A grace takes no technique ordinal (it is not a beat a palm-mute run spans) but does record a site, so the line or slur starts at the small digit on tab and at the small notehead on the notation staff, clear of the grace's own shorter stem.",
+  "bars": 2,
+  "tags": [
+    "tab",
+    "technique",
+    "technique:slide",
+    "technique:hammer-pull",
+    "grace-notes"
+  ],
+  "specRefs": [
+    "https://github.com/w3c-cg/mnx/issues/63",
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/objects/grace/"
+  ],
+  "coversDefs": [
+    "event",
+    "grace",
+    "grace-type",
+    "id",
+    "note",
+    "notes",
+    "pitch",
+    "time"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "valid"
+  },
+  "requires": [
+    "tab-techniques",
+    "grace-notes"
+  ],
+  "idRefs": true,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "rendered",
+  "performance": true
+}
