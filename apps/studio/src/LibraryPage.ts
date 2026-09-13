@@ -79,6 +79,7 @@ export class LibraryPage extends LitElement {
     li .star { border: 0; padding: 2px; display: inline-flex; flex: none; }
     li .who { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
     li .who a { font-weight: 500; }
+    li .who a:focus-visible { outline: none; }
     li .who small { color: var(--ink-dim); font-size: 13px; }
     li .tags { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
     li .tags button { padding: 2px 8px; font-size: 12px; color: var(--ink-dim); }
@@ -94,6 +95,10 @@ export class LibraryPage extends LitElement {
   connectedCallback() {
     super.connectedCallback();
     void this.load();
+  }
+
+  protected firstUpdated() {
+    this.renderRoot.querySelector<HTMLInputElement>('.search input')?.focus();
   }
 
   private async load(more = false) {
