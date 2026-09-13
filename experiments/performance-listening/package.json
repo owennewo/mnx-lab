@@ -12,7 +12,8 @@
     "report": "node experiments/report.mjs",
     "compare:renders": "node experiments/compare-renders.mjs",
     "fusion:attack": "node experiments/fusion-attack.mjs",
-    "fusion:export": "node experiments/fusion-export.mjs"
+    "fusion:export": "node experiments/fusion-export.mjs",
+    "fusion:whitening": "node experiments/fusion-whitening.mjs"
   },
   "dependencies": {
     "@spotify/basic-pitch": "1.0.1",

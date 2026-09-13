@@ -101,3 +101,7 @@ many frames. Window length, hop, confirmation and dropout tolerance are separate
 The proposed [whitening](spectral-whitening.md) changes input evidence before scoring;
 [flexible harmonic modelling](flexible-harmonic-model.md) changes scoring itself. Their
 initial experiments hold the frame and event rules fixed so improvements are attributable.
+
+Future agreed timing experiments should vary analysis window length and hop size under
+a frozen pitch recipe. Frame rate and overlap follow from those two values; do not sweep
+them as independent knobs. No such timing trial was included in F-005.

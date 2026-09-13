@@ -58,9 +58,8 @@ try {
     `http://127.0.0.1:${server.httpServer.address().port}/listening.html`,
   );
   await page.evaluate(async () => {
-    globalThis.adapter = await import(
-      "/experiments/performance-listening/rendering/browser.mjs"
-    );
+    globalThis.adapter =
+      await import("/experiments/performance-listening/rendering/browser.mjs");
   });
   const mnx = await page.evaluate(() => globalThis.adapter.compiledFixture());
   // Independent check of the simple 120 BPM score, not copied from compiler output.
@@ -85,14 +84,14 @@ try {
   const fixtures = heldoutV5
     ? fusionHeldoutV5()
     : heldoutV4
-    ? fusionHeldoutV4()
-    : heldoutV3
-      ? fusionHeldoutV3()
-      : heldoutV2
-        ? fusionHeldoutV2()
-        : heldout
-          ? fusionHeldout()
-          : [...cases(), mnx];
+      ? fusionHeldoutV4()
+      : heldoutV3
+        ? fusionHeldoutV3()
+        : heldoutV2
+          ? fusionHeldoutV2()
+          : heldout
+            ? fusionHeldout()
+            : [...cases(), mnx];
   const records = [];
   for (const preset of config.presets) {
     const work = [

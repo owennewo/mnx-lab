@@ -1,0 +1,3435 @@
+{
+  "protocol": {
+    "plan": {
+      "id": "F-005",
+      "parent": "F-003",
+      "strengths": [
+        0,
+        0.25,
+        0.5,
+        0.67
+      ],
+      "floor": 0.0001,
+      "maxGain": 16,
+      "temporalSmoothing": false,
+      "thresholdRecalibration": false,
+      "selection": "Highest pooled development onset F1; tie prefers lower strength. Selection is not acceptance. Freeze before fresh evaluation.",
+      "developmentAudio": [
+        "audio-v1",
+        "audio-fusion-heldout-v1",
+        "audio-fusion-heldout-v2",
+        "audio-fusion-heldout-v3",
+        "audio-fusion-heldout-v4"
+      ],
+      "privateControls": "Existing isolated A2, E2, A4 and E2+A4; guitar bars 1-8 causal prefix from the frozen full piece; report bars 5-8 separately. Diagnostics excluded from selection.",
+      "costPasses": 3,
+      "acceptance": {
+        "onsetPrecisionAndRecallNondecreasing": true,
+        "f1StrictlyImproves": true,
+        "noMoreFalseAccusations": true,
+        "maxCategoryF1Drop": 0.02,
+        "maxActiveF1Drop": 0.02,
+        "maxCpuRatio": 1.25,
+        "maxCommonMatchP95IncreaseSeconds": 0.025,
+        "preserveA4Alone": true
+      },
+      "notes": "Whitening only on scorer input. Raw flux, 1/h dictionary, 4096 window, 256 hop, two-frame gate and F-003 attribution fixed. Fresh public v5 cases across three sample presets. No source score sent to detector."
+    },
+    "base": {
+      "version": 1,
+      "sampleRate": 22050,
+      "presets": [
+        "guitar",
+        "guitar2",
+        "piano"
+      ],
+      "templatePreset": "guitar",
+      "midiMin": 40,
+      "midiMax": 88,
+      "fftSize": 4096,
+      "hopSize": 256,
+      "streamChunks": [
+        256,
+        2048
+      ],
+      "attackTolerance": 0.1,
+      "pitchTolerance": 0.5,
+      "frameStep": 0.02,
+      "activityThreshold": 0.22,
+      "minFrames": 2,
+      "rmsFloor": 0.0001,
+      "templateIterations": 32,
+      "maxPolyphony": 6,
+      "seed": 0,
+      "neural": {
+        "onsetThreshold": 0.5,
+        "frameThreshold": 0.3,
+        "minNoteFrames": 5
+      },
+      "confidenceThresholds": [
+        0,
+        0.3,
+        0.5,
+        0.7,
+        0.9
+      ]
+    },
+    "revision": "18e2d9b19e971d91405a77e599f6111f6ccb18cd",
+    "codeHashes": {
+      "attack.mjs": "5eff02cdeb2224607f777263edc9a4d947c89c72b072ae605c26ecc8dfb708c7",
+      "attack.test.mjs": "45bd8968437aa3e0036f5203947f4cbec75549847b919b7aee18a1840aae931a",
+      "neural.mjs": "5b5af3c7830aab99f13c22195639ad00138bc10bf0692d17ade6d543a460b7b5",
+      "spectral.mjs": "aa2cbfe40b53e36b234d91069469582f78df2101d2b6ca63d720c1e249cda4bd",
+      "stream.mjs": "9e7d470004663d3693c573f3314d1614bb0928601c2811ac7723afaeaf0ad347",
+      "stream.test.mjs": "fc955d302d7eaf9b1f7d2ba17182702a04e4c12a5e90e630213c7c62484b096f",
+      "whitening.mjs": "551786fdabdf3d658d32a7bb8c747679f0887b7a7ec8ad86642ce42a6f72fdec",
+      "whitening.test.mjs": "2c4a1ab1c970859632ace37677c8becabad2d05769bc17fc78707ae4c5c6ba68"
+    },
+    "planHash": "46b7296ca6d2d4b1a5a8f52ed0d54a16f1b5c18598bf49f6c64c338658d07977",
+    "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+    "node": "v22.22.1",
+    "inputHashes": [
+      {
+        "source": "audio-v1",
+        "id": "silence",
+        "preset": "guitar",
+        "audioHash": "8716a34cfbc8382080c30563fddfcba4eaf662ca869d1648d9c0fb3cd296dc5f"
+      },
+      {
+        "source": "audio-v1",
+        "id": "single-40-0.3",
+        "preset": "guitar",
+        "audioHash": "318657624af17b41403216bcc248a2e1596657c7df0c918d96a81519a9020672"
+      },
+      {
+        "source": "audio-v1",
+        "id": "single-40-0.8",
+        "preset": "guitar",
+        "audioHash": "e5733ff91b0c8d25c55a3e5030bfe8d942f56aca1262dc74c3bd9f8cc10d8fb6"
+      },
+      {
+        "source": "audio-v1",
+        "id": "single-52-0.3",
+        "preset": "guitar",
+        "audioHash": "ca1d80d3255f0dee962423a2bb282ac670d576abb9984e5322efa844ac583a14"
+      },
+      {
+        "source": "audio-v1",
+        "id": "single-52-0.8",
+        "preset": "guitar",
+        "audioHash": "b17367f5cf1163dedf1e4c9166e20494d10d974f55247e6abc12837a58e0948f"
+      },
+      {
+        "source": "audio-v1",
+        "id": "single-64-0.3",
+        "preset": "guitar",
+        "audioHash": "c827f57ff8cfbbc26885de073c58674529ff5a7779e8d7466e37cbac0cbf1d19"
+      },
+      {
+        "source": "audio-v1",
+        "id": "single-64-0.8",
+        "preset": "guitar",
+        "audioHash": "ce797a048b6faeacd9eb99cfe1fc993f054230fcee6ab35c0204f521545f6b96"
+      },
+      {
+        "source": "audio-v1",
+        "id": "single-76-0.3",
+        "preset": "guitar",
+        "audioHash": "5bdadcf5d4c4e6df7a51447672840f5fba21846ec925aa023c1a830f5b2e8ea7"
+      },
+      {
+        "source": "audio-v1",
+        "id": "single-76-0.8",
+        "preset": "guitar",
+        "audioHash": "8f8643cc27e41e41a564cb7cee899309e0271176e50001b05059de4a300a4e4b"
+      },
+      {
+        "source": "audio-v1",
+        "id": "single-88-0.3",
+        "preset": "guitar",
+        "audioHash": "4c1a6a9f5d6147d83d9db308d5ab8c52d5163121d1e2dc8a13ce6026ba5ccd6f"
+      },
+      {
+        "source": "audio-v1",
+        "id": "single-88-0.8",
+        "preset": "guitar",
+        "audioHash": "217c9b63276d50d434d733b073d344b1c90927af926465ab15a854058df74662"
+      },
+      {
+        "source": "audio-v1",
+        "id": "dyad-octave",
+        "preset": "guitar",
+        "audioHash": "67c482bbff586b4d9c0fe7fc97c790844473f84321fa3c1b8e7acc90bfecfe96"
+      },
+      {
+        "source": "audio-v1",
+        "id": "dyad-fifth",
+        "preset": "guitar",
+        "audioHash": "cdddc5c40e4d3ef239470e952741a80556948eaed1c3324cd95fc3a9811e0ca1"
+      },
+      {
+        "source": "audio-v1",
+        "id": "dyad-second",
+        "preset": "guitar",
+        "audioHash": "38b116833fda84c5400519a0af265c8efff34d0d9e5d4b591fc8d694a6ed2ce4"
+      },
+      {
+        "source": "audio-v1",
+        "id": "dyad-third",
+        "preset": "guitar",
+        "audioHash": "60c0d1a404979bc80b6e54a4c5e1eec3b7b5903b6c5b5a547845d427135ad957"
+      },
+      {
+        "source": "audio-v1",
+        "id": "chord-3",
+        "preset": "guitar",
+        "audioHash": "48f77ac8218232c8766c2922e9841107dcc93f875d86b1dc7b125d841a47b48c"
+      },
+      {
+        "source": "audio-v1",
+        "id": "chord-4",
+        "preset": "guitar",
+        "audioHash": "8373aa65051296f7ba9d63f6c763376c7e95fa22aed124f8f5ff55abf9dbec89"
+      },
+      {
+        "source": "audio-v1",
+        "id": "chord-5",
+        "preset": "guitar",
+        "audioHash": "1390ff0037419eb8711b737fca2e83f9745eccfb31e87e070389b8bee648007b"
+      },
+      {
+        "source": "audio-v1",
+        "id": "chord-6",
+        "preset": "guitar",
+        "audioHash": "f8b4e9ed9377add3840aacce9e1181718ac29896a3f9c9ed8ef06c346c5043a4"
+      },
+      {
+        "source": "audio-v1",
+        "id": "duplicate-pitch-voices",
+        "preset": "guitar",
+        "audioHash": "362744faf833c6c1e1188420c7b7d6b56b4620e71ebfb0abe6d6726262622f91"
+      },
+      {
+        "source": "audio-v1",
+        "id": "quiet-inner",
+        "preset": "guitar",
+        "audioHash": "d404f6f5b339d1f0a2e6f4a80ad24e8c8fb92097803a9a83fad271130d116240"
+      },
+      {
+        "source": "audio-v1",
+        "id": "wrong-inner",
+        "preset": "guitar",
+        "audioHash": "45c31d32ffbccb6ef4440de0830eb9faeb8b6438e66ff3813010a1dfe2eeafa6"
+      },
+      {
+        "source": "audio-v1",
+        "id": "quiet-wrong-inner",
+        "preset": "guitar",
+        "audioHash": "fcb54acad1ea469cdc6588a34a327f802bad5d047bed048c2cf44272d14c21b5"
+      },
+      {
+        "source": "audio-v1",
+        "id": "missing-inner",
+        "preset": "guitar",
+        "audioHash": "662ec6c6f79a7f7fbc633c58f0123e4d73746f41ebec8eb0081a43365de97167"
+      },
+      {
+        "source": "audio-v1",
+        "id": "extra-note",
+        "preset": "guitar",
+        "audioHash": "fc4ca77bd37122151f451faeb7c389887fb46db10bcd538925376a085948f5f4"
+      },
+      {
+        "source": "audio-v1",
+        "id": "early-note",
+        "preset": "guitar",
+        "audioHash": "fcd0203cec7fafa00f51d62f06b909491dba2faa92820de4f6ef758bd48f1669"
+      },
+      {
+        "source": "audio-v1",
+        "id": "late-note",
+        "preset": "guitar",
+        "audioHash": "bd21764c28fe9764ed68bcaa3bd170ab76f3a83f19a4ab7705a1c73194041f89"
+      },
+      {
+        "source": "audio-v1",
+        "id": "repeated",
+        "preset": "guitar",
+        "audioHash": "90a3b5186c0ce6bc0f06968c04855e6417595a751acdf75d67cb08426871178e"
+      },
+      {
+        "source": "audio-v1",
+        "id": "restrike-no-gap",
+        "preset": "guitar",
+        "audioHash": "a4542cd9f3e4bb770876e57d4be6d8fef602aa1def6c8cbb6db3c451b16db233"
+      },
+      {
+        "source": "audio-v1",
+        "id": "alternating",
+        "preset": "guitar",
+        "audioHash": "7d91c3940f1c3043eb2d3e3f876f16e61cade536a9d88eb77b8f5df0e4486cac"
+      },
+      {
+        "source": "audio-v1",
+        "id": "strum",
+        "preset": "guitar",
+        "audioHash": "6a1a42c12ef633b4828e14f366fad604e90c033c37e68110049e9fb429287e5b"
+      },
+      {
+        "source": "audio-v1",
+        "id": "arpeggio",
+        "preset": "guitar",
+        "audioHash": "b8296f90ad78af49d9898e8f452be973ab102677e3e7a80e50259b61ba523017"
+      },
+      {
+        "source": "audio-v1",
+        "id": "bend",
+        "preset": "guitar",
+        "audioHash": "53baedb8c2339de66a9a915d2e3ef5c9b48d7501dc2a4514c09b4775207f55e8"
+      },
+      {
+        "source": "audio-v1",
+        "id": "mnx-two-notes",
+        "preset": "guitar",
+        "audioHash": "6f8aea70a090440a8d576a648d9f1309de597f2ca26bed3e80483beb041a2a3a"
+      },
+      {
+        "source": "audio-v1",
+        "id": "silence",
+        "preset": "guitar2",
+        "audioHash": "8716a34cfbc8382080c30563fddfcba4eaf662ca869d1648d9c0fb3cd296dc5f"
+      },
+      {
+        "source": "audio-v1",
+        "id": "single-40-0.3",
+        "preset": "guitar2",
+        "audioHash": "58a6c99d1f22a3ebe84a6234c2c4d31aa04af8e7441cdfbbbe886f1887c5e381"
+      },
+      {
+        "source": "audio-v1",
+        "id": "single-40-0.8",
+        "preset": "guitar2",
+        "audioHash": "f495868b421beac9e37f554ac5ba95a02719c54dacfe310c64a4d315f4d73f9a"
+      },
+      {
+        "source": "audio-v1",
+        "id": "single-52-0.3",
+        "preset": "guitar2",
+        "audioHash": "fc98cab6f51929ba13ab468c50a1a76cb820faecf3743e2dd4e80f5ec8aae023"
+      },
+      {
+        "source": "audio-v1",
+        "id": "single-52-0.8",
+        "preset": "guitar2",
+        "audioHash": "76a75b844575e4106cb8b7ed06df13a9e307f7aad40934667ef6dc59b66937eb"
+      },
+      {
+        "source": "audio-v1",
+        "id": "single-64-0.3",
+        "preset": "guitar2",
+        "audioHash": "ad9f9a4f1f77ee99c02d159ff03d6c4de9a6b958b08fe2fb8a954f2c2ddd630e"
+      },
+      {
+        "source": "audio-v1",
+        "id": "single-64-0.8",
+        "preset": "guitar2",
+        "audioHash": "a32271ad47e43e83f14ef407ce9d1a27b3e9cacb7009c15752fa25f243d9cd9a"
+      },
+      {
+        "source": "audio-v1",
+        "id": "single-76-0.3",
+        "preset": "guitar2",
+        "audioHash": "dad6d4d81195bdc7f4688141814f17a81acc72389b4aa1c6ebf7954cb0e6fbf1"
+      },
+      {
+        "source": "audio-v1",
+        "id": "single-76-0.8",
+        "preset": "guitar2",
+        "audioHash": "2ae0fdcb41dae9708bbb2dc4a332636bca5f813ca9b1e29b3f0df8547fc765eb"
+      },
+      {
+        "source": "audio-v1",
+        "id": "single-88-0.3",
+        "preset": "guitar2",
+        "audioHash": "9989fc4a9138dbfcff031db604a553b6501488fdea73875c0b0e2cd3650ebe52"
+      },
+      {
+        "source": "audio-v1",
+        "id": "single-88-0.8",
+        "preset": "guitar2",
+        "audioHash": "d42d5a7ea4235212adb332766ae99ab3e90549b4f0ca593abe4c600c3e95f15a"
+      },
+      {
+        "source": "audio-v1",
+        "id": "dyad-octave",
+        "preset": "guitar2",
+        "audioHash": "f002cd55489243ff6c67063c6cdaf5b45cf3d65d03c92d08905e30654d237a64"
+      },
+      {
+        "source": "audio-v1",
+        "id": "dyad-fifth",
+        "preset": "guitar2",
+        "audioHash": "9e97cca7fd150a978cf61deadc97e33da79eba9bd2749a966e2b112851dcd883"
+      },
+      {
+        "source": "audio-v1",
+        "id": "dyad-second",
+        "preset": "guitar2",
+        "audioHash": "c36bd1940ecfda2f9b408e094bd05c46f15e0abb21e6c793b075765a0813b0f2"
+      },
+      {
+        "source": "audio-v1",
+        "id": "dyad-third",
+        "preset": "guitar2",
+        "audioHash": "c4fd3df40d8852f33fb0c4e65569d5ee69203becee4f0fe30c19e084222ec75a"
+      },
+      {
+        "source": "audio-v1",
+        "id": "chord-3",
+        "preset": "guitar2",
+        "audioHash": "875038fc7a800a448465ce5db39e87d4bc05f9764743680975dd76bb62bfcfa5"
+      },
+      {
+        "source": "audio-v1",
+        "id": "chord-4",
+        "preset": "guitar2",
+        "audioHash": "ab20bdec3dfc9dab4b6eaf7cf487131170d5354eea8d048680960f1acebe9c18"
+      },
+      {
+        "source": "audio-v1",
+        "id": "chord-5",
+        "preset": "guitar2",
+        "audioHash": "6da4e70b04c6c3c002b33419191903f1c01d1197cda876086d5f01f98284a4c2"
+      },
+      {
+        "source": "audio-v1",
+        "id": "chord-6",
+        "preset": "guitar2",
+        "audioHash": "fbcc6341d839309524b00ac078bc3e74eb57e5ce1438967683ca58ce056f72ca"
+      },
+      {
+        "source": "audio-v1",
+        "id": "duplicate-pitch-voices",
+        "preset": "guitar2",
+        "audioHash": "8429548c4a1f35d7cef53a8788830149dac6a0fd0d370dcf0476074ddd2de1b3"
+      },
+      {
+        "source": "audio-v1",
+        "id": "quiet-inner",
+        "preset": "guitar2",
+        "audioHash": "b8f54f812f71dced983b25ce9f22d62774b7f959f1807f462d87e1038eb72b6b"
+      },
+      {
+        "source": "audio-v1",
+        "id": "wrong-inner",
+        "preset": "guitar2",
+        "audioHash": "b187b2782c86ab08d559265bd4d14f32471b42b4eee71b148357bce7657c5787"
+      },
+      {
+        "source": "audio-v1",
+        "id": "quiet-wrong-inner",
+        "preset": "guitar2",
+        "audioHash": "82b25d8da7fc5083eb243c2a1f77bf37ca7030a9b0bc559b784789dbf34958fe"
+      },
+      {
+        "source": "audio-v1",
+        "id": "missing-inner",
+        "preset": "guitar2",
+        "audioHash": "79ac8cc34116281271d20842c82cc8536983d3519589927671ce3ce13ade543d"
+      },
+      {
+        "source": "audio-v1",
+        "id": "extra-note",
+        "preset": "guitar2",
+        "audioHash": "de97195faeda4cf4efaf291d9707976ac5950d146bf53aaddba2a10283e365f8"
+      },
+      {
+        "source": "audio-v1",
+        "id": "early-note",
+        "preset": "guitar2",
+        "audioHash": "fa0cd70741947a33115a8498bec8e9350a28cf099100f00da1352be819464437"
+      },
+      {
+        "source": "audio-v1",
+        "id": "late-note",
+        "preset": "guitar2",
+        "audioHash": "c826b9c905b6064c27163bbbd8cfdf7126cb0503c9ecdad9ca11e11f6a1c4fa4"
+      },
+      {
+        "source": "audio-v1",
+        "id": "repeated",
+        "preset": "guitar2",
+        "audioHash": "7170ad5e16eea534ecbc6a5510a905c2a2708495511fe878584180584eefc164"
+      },
+      {
+        "source": "audio-v1",
+        "id": "restrike-no-gap",
+        "preset": "guitar2",
+        "audioHash": "4730c74ec93f3752278982bbb1f44119bf782be8734c2bd53da17c7ea2c4f209"
+      },
+      {
+        "source": "audio-v1",
+        "id": "alternating",
+        "preset": "guitar2",
+        "audioHash": "d1a207755f053a5e7abe6e0f5fb16fe341a14940c333b40c1a598f4a2de49fde"
+      },
+      {
+        "source": "audio-v1",
+        "id": "strum",
+        "preset": "guitar2",
+        "audioHash": "55a5facefee2d1bf862425f5c9e19f9d7d34e9dccd10ebc835746c19f8df402f"
+      },
+      {
+        "source": "audio-v1",
+        "id": "arpeggio",
+        "preset": "guitar2",
+        "audioHash": "22f4e936a228fb056b4e4ddc80ec30e90e02be342e89ced19d3edb0cccc781f5"
+      },
+      {
+        "source": "audio-v1",
+        "id": "bend",
+        "preset": "guitar2",
+        "audioHash": "b58c253677621e135787c361614a5a527701eead1d65cbef892ba41eadb3b598"
+      },
+      {
+        "source": "audio-v1",
+        "id": "mnx-two-notes",
+        "preset": "guitar2",
+        "audioHash": "9eb67a71e55d531858c2c3ea545ad11a1bcded6daa08bfa913a217eba739c5c6"
+      },
+      {
+        "source": "audio-v1",
+        "id": "silence",
+        "preset": "piano",
+        "audioHash": "8716a34cfbc8382080c30563fddfcba4eaf662ca869d1648d9c0fb3cd296dc5f"
+      },
+      {
+        "source": "audio-v1",
+        "id": "single-40-0.3",
+        "preset": "piano",
+        "audioHash": "be28d55db4ec83e053a22dee182f0a9abd416bdfb1cf1e2fd512aaa60df213a7"
+      },
+      {
+        "source": "audio-v1",
+        "id": "single-40-0.8",
+        "preset": "piano",
+        "audioHash": "ab9ff0ff1eabfa73d703deeb4c18d660892486eb5f5804c471080866fb532d41"
+      },
+      {
+        "source": "audio-v1",
+        "id": "single-52-0.3",
+        "preset": "piano",
+        "audioHash": "00b7941acc102e18f6e3bdbdcf2cd4448e81be5d4ee50c2c848ca594b0279d79"
+      },
+      {
+        "source": "audio-v1",
+        "id": "single-52-0.8",
+        "preset": "piano",
+        "audioHash": "5aa4aedb12b28b1fb70a94701ebc0ca473bb3e4d2984f5a5da820bdebcf220c9"
+      },
+      {
+        "source": "audio-v1",
+        "id": "single-64-0.3",
+        "preset": "piano",
+        "audioHash": "e4609bf90f5d395a529e15b596eeece94220a1456fe259653381a420b64e2483"
+      },
+      {
+        "source": "audio-v1",
+        "id": "single-64-0.8",
+        "preset": "piano",
+        "audioHash": "e044a388b8b29f29bd1b3eb504b7cf20a0751095e3290940a0812211ab4d1d56"
+      },
+      {
+        "source": "audio-v1",
+        "id": "single-76-0.3",
+        "preset": "piano",
+        "audioHash": "b0658578b681d79c8ed23263a1ec6f0475a04c77ded2a9163076b67466d502bf"
+      },
+      {
+        "source": "audio-v1",
+        "id": "single-76-0.8",
+        "preset": "piano",
+        "audioHash": "297b5601e9933089b95494d69e548af58ba2cbb32b0c9350a063c5660e4deff2"
+      },
+      {
+        "source": "audio-v1",
+        "id": "single-88-0.3",
+        "preset": "piano",
+        "audioHash": "5db1ab48ed8b3fb41f95dce195c8a7721837317166dc18d7b8f8eaf541f8c509"
+      },
+      {
+        "source": "audio-v1",
+        "id": "single-88-0.8",
+        "preset": "piano",
+        "audioHash": "5810684ff226f2311614afa84d4bb06675aba164b1c13bf966f1a0e2d9d5d0de"
+      },
+      {
+        "source": "audio-v1",
+        "id": "dyad-octave",
+        "preset": "piano",
+        "audioHash": "e5429c622a17e2d2a6756be6cdc370344dffa80951566aa500cf87fad13de8ea"
+      },
+      {
+        "source": "audio-v1",
+        "id": "dyad-fifth",
+        "preset": "piano",
+        "audioHash": "bc8abb5781b529cc586018a2107daa627c712c5362c5e9d23172379d4ffef78b"
+      },
+      {
+        "source": "audio-v1",
+        "id": "dyad-second",
+        "preset": "piano",
+        "audioHash": "88809c5fb4c110e491bfe3449f27804343c54dc378928d2e18bf1e81e5aab2c2"
+      },
+      {
+        "source": "audio-v1",
+        "id": "dyad-third",
+        "preset": "piano",
+        "audioHash": "4300baf72ec3aa0f91d16bfecf713637f57879baddcaef92736173bc40e81ca5"
+      },
+      {
+        "source": "audio-v1",
+        "id": "chord-3",
+        "preset": "piano",
+        "audioHash": "0620b07b52c4b43be68698aff0ce6a9159dffa090df750f7aea8a74bf845cdfc"
+      },
+      {
+        "source": "audio-v1",
+        "id": "chord-4",
+        "preset": "piano",
+        "audioHash": "feb23eca9a414e390c47dbfb5a533e3ba724e237b1ca68f87e1c8d8d9bbba365"
+      },
+      {
+        "source": "audio-v1",
+        "id": "chord-5",
+        "preset": "piano",
+        "audioHash": "0b7c7c0c9e811d2ad0b07b18171fa2a81cd37af41520ba15856501cd96646f45"
+      },
+      {
+        "source": "audio-v1",
+        "id": "chord-6",
+        "preset": "piano",
+        "audioHash": "13d4d11d62f80210525c7aba392d54c6dd0b38884902be41f40651a91eca8987"
+      },
+      {
+        "source": "audio-v1",
+        "id": "duplicate-pitch-voices",
+        "preset": "piano",
+        "audioHash": "c285560ef663cf09f8895d18af59d64f962c20eea3cd370037f56c6e7603f1f4"
+      },
+      {
+        "source": "audio-v1",
+        "id": "quiet-inner",
+        "preset": "piano",
+        "audioHash": "f80e82c9b303e42ae878f9c522161ca9e19b2fe446d9da32a59f3f2f0a1f7935"
+      },
+      {
+        "source": "audio-v1",
+        "id": "wrong-inner",
+        "preset": "piano",
+        "audioHash": "323580857aa27767ac175d431785ee20c0eb7620e9230b4181035232fad3e2fc"
+      },
+      {
+        "source": "audio-v1",
+        "id": "quiet-wrong-inner",
+        "preset": "piano",
+        "audioHash": "d466fd08195e0f52d441adc39fbcff3e620be7263c237c2dbc37c75992eb7c50"
+      },
+      {
+        "source": "audio-v1",
+        "id": "missing-inner",
+        "preset": "piano",
+        "audioHash": "48f9beeb9fa9fce8eb315cf59de336725f735a74fe1863ccb38e0cdefb72f520"
+      },
+      {
+        "source": "audio-v1",
+        "id": "extra-note",
+        "preset": "piano",
+        "audioHash": "5af3c0a8a0e5f5239dcc21a74b399090fc39379e0cfad41e8edd5e4d8c0f389b"
+      },
+      {
+        "source": "audio-v1",
+        "id": "early-note",
+        "preset": "piano",
+        "audioHash": "682217ae713494434c1d7d8bdca77e8d057db7693076807f9c24b0837b60e2dc"
+      },
+      {
+        "source": "audio-v1",
+        "id": "late-note",
+        "preset": "piano",
+        "audioHash": "167055983919094ec1af93cde6cfd0b3dc22ebb8e2657b02bdec390dc59536cd"
+      },
+      {
+        "source": "audio-v1",
+        "id": "repeated",
+        "preset": "piano",
+        "audioHash": "bf98f06dd29e726abd301f213c94df145e7b58b1bba2b9f9afeffb178447e0f2"
+      },
+      {
+        "source": "audio-v1",
+        "id": "restrike-no-gap",
+        "preset": "piano",
+        "audioHash": "c2002de21bbf1d3bbe3b438db69d0d4cd0dae59ea11ad72b980ea28c62e7f6ae"
+      },
+      {
+        "source": "audio-v1",
+        "id": "alternating",
+        "preset": "piano",
+        "audioHash": "b73a542b7db0123eb8b683c5937caae01a22cb849fa2eb5dff43f5865927e2fd"
+      },
+      {
+        "source": "audio-v1",
+        "id": "strum",
+        "preset": "piano",
+        "audioHash": "d818a235b16829efdd1d0440fd13ca65667132cacb64ddb9750fefebd3a9f8aa"
+      },
+      {
+        "source": "audio-v1",
+        "id": "arpeggio",
+        "preset": "piano",
+        "audioHash": "015274f34d0a830ba707cef15a8e5d76bc5146b3b876fa4f7e9fbd7757348d09"
+      },
+      {
+        "source": "audio-v1",
+        "id": "bend",
+        "preset": "piano",
+        "audioHash": "4f14e1f31215be2c86d48e666cb70a18a5ac1bddb47c46c972facab57811b93e"
+      },
+      {
+        "source": "audio-v1",
+        "id": "mnx-two-notes",
+        "preset": "piano",
+        "audioHash": "9f6f0f201a3207e9fcbe4cc0162576009bac563584dd1ae83243740e72a3b3a9"
+      },
+      {
+        "source": "audio-fusion-heldout-v1",
+        "id": "hold-silence",
+        "preset": "guitar",
+        "audioHash": "9efcfc5cfcf03c4b5ce117ab70ea49e822a292cfe473e1fa17237f75efe22d65"
+      },
+      {
+        "source": "audio-fusion-heldout-v1",
+        "id": "hold-sustain-low",
+        "preset": "guitar",
+        "audioHash": "096e7de4c22bd563dd2debd1fb64efb21ef74cd5a15b5f0b89562cdf6c40efa9"
+      },
+      {
+        "source": "audio-fusion-heldout-v1",
+        "id": "hold-sustain-high",
+        "preset": "guitar",
+        "audioHash": "78012053cabb630f876eaeb9113fba98fadb7c0298c611983afdaa14b9bb05f0"
+      },
+      {
+        "source": "audio-fusion-heldout-v1",
+        "id": "hold-short",
+        "preset": "guitar",
+        "audioHash": "962f6340b8c80c6e3311a50c1df82bcf01d09dd7576a20fc63bad8d2bdede15b"
+      },
+      {
+        "source": "audio-fusion-heldout-v1",
+        "id": "hold-repeat",
+        "preset": "guitar",
+        "audioHash": "1d9b7de651a3319b4b3caac8f900d455d2ad3000a4efcad437f3c65b478a546f"
+      },
+      {
+        "source": "audio-fusion-heldout-v1",
+        "id": "hold-restrike",
+        "preset": "guitar",
+        "audioHash": "538191b57549c1dfb8cd4f8ec5b0ce120e8fbd4fae69d66a00ece006facd92c1"
+      },
+      {
+        "source": "audio-fusion-heldout-v1",
+        "id": "hold-fast",
+        "preset": "guitar",
+        "audioHash": "0a9503a5441c4e9cd5e7e9d8164d4171325da3ce4deaed4cef34174921e5b80b"
+      },
+      {
+        "source": "audio-fusion-heldout-v1",
+        "id": "hold-ringing",
+        "preset": "guitar",
+        "audioHash": "f53930d96cdf33fed83966da45d41ddac81b0cdf0b43d66bf1ee0cc0797e56b8"
+      },
+      {
+        "source": "audio-fusion-heldout-v1",
+        "id": "hold-arpeggio",
+        "preset": "guitar",
+        "audioHash": "b5f99c9dbf9de25825bfb2bf083d5b0cebfbc514f62dd07c472840cfab826331"
+      },
+      {
+        "source": "audio-fusion-heldout-v1",
+        "id": "hold-strum",
+        "preset": "guitar",
+        "audioHash": "8c4cf0df595f2b3aef920101c5726e3057a61aad9d58435b0eb7a0d112623a38"
+      },
+      {
+        "source": "audio-fusion-heldout-v1",
+        "id": "hold-silence",
+        "preset": "guitar2",
+        "audioHash": "9efcfc5cfcf03c4b5ce117ab70ea49e822a292cfe473e1fa17237f75efe22d65"
+      },
+      {
+        "source": "audio-fusion-heldout-v1",
+        "id": "hold-sustain-low",
+        "preset": "guitar2",
+        "audioHash": "c7f92cae79b4b9d4bafe2988bd2fb0701eb42afa0d397945205383b2d0288d55"
+      },
+      {
+        "source": "audio-fusion-heldout-v1",
+        "id": "hold-sustain-high",
+        "preset": "guitar2",
+        "audioHash": "1dcfcc882051b0ddc3857fd93baf0def8b014609d8ecdc508502fdfccb185f88"
+      },
+      {
+        "source": "audio-fusion-heldout-v1",
+        "id": "hold-short",
+        "preset": "guitar2",
+        "audioHash": "1fa6725e8bcd8607196b7f00d91a45440f9184ec68e95b3224eaed205d8b5af9"
+      },
+      {
+        "source": "audio-fusion-heldout-v1",
+        "id": "hold-repeat",
+        "preset": "guitar2",
+        "audioHash": "560aa91a28521925e59d2f6054221dc58cd2249d195490c43c748dfe36bcf8e9"
+      },
+      {
+        "source": "audio-fusion-heldout-v1",
+        "id": "hold-restrike",
+        "preset": "guitar2",
+        "audioHash": "caa9bdfe4a1959cf27aa6ac386e67714207a4c06735c7476b186f9ef0fcbd470"
+      },
+      {
+        "source": "audio-fusion-heldout-v1",
+        "id": "hold-fast",
+        "preset": "guitar2",
+        "audioHash": "5b6e3740d83c643e35d81e46c29b12cf18a442bc3898cb48fa1f9737887b4a42"
+      },
+      {
+        "source": "audio-fusion-heldout-v1",
+        "id": "hold-ringing",
+        "preset": "guitar2",
+        "audioHash": "c9061b9ca02038b5faa8fa276fa93672c80221d1ea887539ecc1ceb4b2d03e29"
+      },
+      {
+        "source": "audio-fusion-heldout-v1",
+        "id": "hold-arpeggio",
+        "preset": "guitar2",
+        "audioHash": "d9d51b2bb6a686c26dc4e1f09941cdb5d9683ca7d3c6914533b483b87fe93803"
+      },
+      {
+        "source": "audio-fusion-heldout-v1",
+        "id": "hold-strum",
+        "preset": "guitar2",
+        "audioHash": "95099de7d2aaeb268d9dc012229276d3f23ff93ef8d6804aa82d80119f5254ac"
+      },
+      {
+        "source": "audio-fusion-heldout-v1",
+        "id": "hold-silence",
+        "preset": "piano",
+        "audioHash": "9efcfc5cfcf03c4b5ce117ab70ea49e822a292cfe473e1fa17237f75efe22d65"
+      },
+      {
+        "source": "audio-fusion-heldout-v1",
+        "id": "hold-sustain-low",
+        "preset": "piano",
+        "audioHash": "b46fe244ff6c2a52dee8f47f06171af982d4b8e547ccd8e9a89cc52d3df145c7"
+      },
+      {
+        "source": "audio-fusion-heldout-v1",
+        "id": "hold-sustain-high",
+        "preset": "piano",
+        "audioHash": "38c4d56a5cfbe47cbd7a42d6ee8dddd7cfbea4c1a4e8a4f3ce0de27d4a618c53"
+      },
+      {
+        "source": "audio-fusion-heldout-v1",
+        "id": "hold-short",
+        "preset": "piano",
+        "audioHash": "18a218e67c1421a2dd551b158385c8ed828b8fe6450834fd5eea2db9a2a897d1"
+      },
+      {
+        "source": "audio-fusion-heldout-v1",
+        "id": "hold-repeat",
+        "preset": "piano",
+        "audioHash": "3b880b09b2160098a5b0948d08e5bd23c9b90bdfd723c22a24459a454934e8c9"
+      },
+      {
+        "source": "audio-fusion-heldout-v1",
+        "id": "hold-restrike",
+        "preset": "piano",
+        "audioHash": "2f5ecfbc60e38717967d2d61aca625bf4c9369304ae9d6fc67568f7e29e204e3"
+      },
+      {
+        "source": "audio-fusion-heldout-v1",
+        "id": "hold-fast",
+        "preset": "piano",
+        "audioHash": "c2c0942ba623c856dfef6b23c7107727f83dac296f062cfe98e7282f6d12b0a0"
+      },
+      {
+        "source": "audio-fusion-heldout-v1",
+        "id": "hold-ringing",
+        "preset": "piano",
+        "audioHash": "dbe7e102595b59e1ebd0974eb6cd31a714a036807d621bb606cba33aa377caa2"
+      },
+      {
+        "source": "audio-fusion-heldout-v1",
+        "id": "hold-arpeggio",
+        "preset": "piano",
+        "audioHash": "329b0f37716e905e019e0f1871ea03955ffae2030821e7c71a4ac7e28cc8f6e9"
+      },
+      {
+        "source": "audio-fusion-heldout-v1",
+        "id": "hold-strum",
+        "preset": "piano",
+        "audioHash": "cff47f64b8ab8ae48d01b913b6058e32ebac98dbe55828c0d71f50752f6563a4"
+      },
+      {
+        "source": "audio-fusion-heldout-v2",
+        "id": "v2-silence",
+        "preset": "guitar",
+        "audioHash": "b50a47cf7904d48e5f6885fbe55041f73584a43d9842701a745818d877c2ca41"
+      },
+      {
+        "source": "audio-fusion-heldout-v2",
+        "id": "v2-low-sustain",
+        "preset": "guitar",
+        "audioHash": "d90256e5a6a7ec326792e4575a02779b93c9c9ed10157f00e85d45318677e259"
+      },
+      {
+        "source": "audio-fusion-heldout-v2",
+        "id": "v2-high-sustain",
+        "preset": "guitar",
+        "audioHash": "ae12148d2998e57c95d1821ee83e2402073bf49e3f28d5bb601fa58f9b772746"
+      },
+      {
+        "source": "audio-fusion-heldout-v2",
+        "id": "v2-short",
+        "preset": "guitar",
+        "audioHash": "6359809790a73997f8ce8ac052444125a235ad34af0926a0a4cd667adfb09352"
+      },
+      {
+        "source": "audio-fusion-heldout-v2",
+        "id": "v2-repeat-soft",
+        "preset": "guitar",
+        "audioHash": "488eab230c43cbf19ece5d2da51958a8c2d05507e8d4c8469e65a336d2e83194"
+      },
+      {
+        "source": "audio-fusion-heldout-v2",
+        "id": "v2-restrike",
+        "preset": "guitar",
+        "audioHash": "d71b26ffca7f9581d1566403f76d9e13391bc5d9449eb1ab297bb621c8ffd182"
+      },
+      {
+        "source": "audio-fusion-heldout-v2",
+        "id": "v2-rapid",
+        "preset": "guitar",
+        "audioHash": "2133a3bad431d61b735e7b9733866021cff450cb40c4f79534a929d02328aa3e"
+      },
+      {
+        "source": "audio-fusion-heldout-v2",
+        "id": "v2-ringing",
+        "preset": "guitar",
+        "audioHash": "e269f4e5e4a16734d4e3569c3405c56136343fdace2912c09eaf1d54a0e2b9cb"
+      },
+      {
+        "source": "audio-fusion-heldout-v2",
+        "id": "v2-arpeggio",
+        "preset": "guitar",
+        "audioHash": "e48751f4a6aa501b84cb91e5d1ddf5ba9ec39d1d9da74add07c4c84341e1d5bc"
+      },
+      {
+        "source": "audio-fusion-heldout-v2",
+        "id": "v2-strum",
+        "preset": "guitar",
+        "audioHash": "a6507acb4286c22f8812ccf18252fbbaa0f1830a57165b14472918e82a4ee922"
+      },
+      {
+        "source": "audio-fusion-heldout-v2",
+        "id": "v2-wrong-inner",
+        "preset": "guitar",
+        "audioHash": "39be9993f60e848bd5258072986758924dd95782b0fbc20e539b9b878fd15c6e"
+      },
+      {
+        "source": "audio-fusion-heldout-v2",
+        "id": "v2-quiet-extra",
+        "preset": "guitar",
+        "audioHash": "23e6d9e6a9eb2b4c99738ab77345cefe5b2a0be90cc8519eebffbcd625a6658e"
+      },
+      {
+        "source": "audio-fusion-heldout-v2",
+        "id": "v2-silence",
+        "preset": "guitar2",
+        "audioHash": "b50a47cf7904d48e5f6885fbe55041f73584a43d9842701a745818d877c2ca41"
+      },
+      {
+        "source": "audio-fusion-heldout-v2",
+        "id": "v2-low-sustain",
+        "preset": "guitar2",
+        "audioHash": "f0520c7a1dd84db1ebffa31542e4e528d4b36dfeca925c6974b8fe86c3233568"
+      },
+      {
+        "source": "audio-fusion-heldout-v2",
+        "id": "v2-high-sustain",
+        "preset": "guitar2",
+        "audioHash": "cc7a3ab06d8cd19756ed671c0fd55deca9954592f938697d1b5b9212fc76b6f3"
+      },
+      {
+        "source": "audio-fusion-heldout-v2",
+        "id": "v2-short",
+        "preset": "guitar2",
+        "audioHash": "733c5f567e34dd4d37b7df4a6839b7263018dbed6b33d3d8fad3e30f5e7858c8"
+      },
+      {
+        "source": "audio-fusion-heldout-v2",
+        "id": "v2-repeat-soft",
+        "preset": "guitar2",
+        "audioHash": "c2ba984e29d918419c58de63f781026a2837700d2ce08c9d9a643abcb8f38346"
+      },
+      {
+        "source": "audio-fusion-heldout-v2",
+        "id": "v2-restrike",
+        "preset": "guitar2",
+        "audioHash": "f783826961ddb97032cfc0e0878f9c6207cc06b679fc1ef600abf644e2af779c"
+      },
+      {
+        "source": "audio-fusion-heldout-v2",
+        "id": "v2-rapid",
+        "preset": "guitar2",
+        "audioHash": "fc7f65c7da2c61018a066edcf7e850baf54d3ce284820e99b7c7b81a66be2ee0"
+      },
+      {
+        "source": "audio-fusion-heldout-v2",
+        "id": "v2-ringing",
+        "preset": "guitar2",
+        "audioHash": "c0dd9477b69cdb5187ccf44eca90790144141d740881f4ccdb3ed8332cd4a2ae"
+      },
+      {
+        "source": "audio-fusion-heldout-v2",
+        "id": "v2-arpeggio",
+        "preset": "guitar2",
+        "audioHash": "10bdb6295e35997b8616ebc4904090c59ff9b241ace9a0aa40bffd4f931fb977"
+      },
+      {
+        "source": "audio-fusion-heldout-v2",
+        "id": "v2-strum",
+        "preset": "guitar2",
+        "audioHash": "8932742e6d62fe703992bd4fa9e432f2d4ebec94301d72baef9c8bcbab305c43"
+      },
+      {
+        "source": "audio-fusion-heldout-v2",
+        "id": "v2-wrong-inner",
+        "preset": "guitar2",
+        "audioHash": "577d0000ba95c68b62c87a64a8735674fff074734cc07cc09902b51ed18f9555"
+      },
+      {
+        "source": "audio-fusion-heldout-v2",
+        "id": "v2-quiet-extra",
+        "preset": "guitar2",
+        "audioHash": "f11d35ea2ab2e4bed2f69e1a5a0bcc7bb930f4c805564207eac5b9efbaaf98fa"
+      },
+      {
+        "source": "audio-fusion-heldout-v2",
+        "id": "v2-silence",
+        "preset": "piano",
+        "audioHash": "b50a47cf7904d48e5f6885fbe55041f73584a43d9842701a745818d877c2ca41"
+      },
+      {
+        "source": "audio-fusion-heldout-v2",
+        "id": "v2-low-sustain",
+        "preset": "piano",
+        "audioHash": "990c172289d5f8aedf3be25413dfbd330443ac66aa7988cea3340c53595e1f46"
+      },
+      {
+        "source": "audio-fusion-heldout-v2",
+        "id": "v2-high-sustain",
+        "preset": "piano",
+        "audioHash": "674de70e4b054707d7787c01a09a197836c159186be1f8ceafa364540bd9c8ca"
+      },
+      {
+        "source": "audio-fusion-heldout-v2",
+        "id": "v2-short",
+        "preset": "piano",
+        "audioHash": "12e9bad658ea972a828ed8e790383fb4b20b908328c9e5315937d52ad58d046d"
+      },
+      {
+        "source": "audio-fusion-heldout-v2",
+        "id": "v2-repeat-soft",
+        "preset": "piano",
+        "audioHash": "ae008d9dcb0731700693710cb8106d1635b860e0352802128574daa3ac659742"
+      },
+      {
+        "source": "audio-fusion-heldout-v2",
+        "id": "v2-restrike",
+        "preset": "piano",
+        "audioHash": "37df2fbaa8673ac30ab9858ea13a423d5e99b6e556b52e9abc915fd919d308b8"
+      },
+      {
+        "source": "audio-fusion-heldout-v2",
+        "id": "v2-rapid",
+        "preset": "piano",
+        "audioHash": "3e2e3177c39f511c488f426495a8a54e7db77ba8424041bd49817489dd866a6a"
+      },
+      {
+        "source": "audio-fusion-heldout-v2",
+        "id": "v2-ringing",
+        "preset": "piano",
+        "audioHash": "3066ffb06447e00820039398d23f436b9b63d19d6075b08dc82330635158cff5"
+      },
+      {
+        "source": "audio-fusion-heldout-v2",
+        "id": "v2-arpeggio",
+        "preset": "piano",
+        "audioHash": "f31d9f8529843568c4d79e40fb67d2fc9c9b3497bcde5506da02838dd9109e8a"
+      },
+      {
+        "source": "audio-fusion-heldout-v2",
+        "id": "v2-strum",
+        "preset": "piano",
+        "audioHash": "db02ab4a45af70879c41a7eb809cafed736161a8af9c67d32dc043527eda9715"
+      },
+      {
+        "source": "audio-fusion-heldout-v2",
+        "id": "v2-wrong-inner",
+        "preset": "piano",
+        "audioHash": "463e5691530b1faae3ae8e30c8ed87c93aedb188671132a470adf3064576d1e8"
+      },
+      {
+        "source": "audio-fusion-heldout-v2",
+        "id": "v2-quiet-extra",
+        "preset": "piano",
+        "audioHash": "964547a1c79aea48a1e695cfaaf1477b935eb2baab44c52a9758cfc50c3d1b5b"
+      },
+      {
+        "source": "audio-fusion-heldout-v3",
+        "id": "v3-silence",
+        "preset": "guitar",
+        "audioHash": "97f5d970505ad98076335ade1b8b5ebe3c7e561fa29b60772fbe1fa98c795cde"
+      },
+      {
+        "source": "audio-fusion-heldout-v3",
+        "id": "v3-sustain-low",
+        "preset": "guitar",
+        "audioHash": "aee53eef6ec208116c45ba1773f41a29f60841326f48d70e5a4635b7b35619b7"
+      },
+      {
+        "source": "audio-fusion-heldout-v3",
+        "id": "v3-sustain-high",
+        "preset": "guitar",
+        "audioHash": "cec6b4b0d2f6ef613cac9227a9b5c6c141a188210028bda1af7858f1892671c7"
+      },
+      {
+        "source": "audio-fusion-heldout-v3",
+        "id": "v3-short",
+        "preset": "guitar",
+        "audioHash": "bd68794b1ce0637fedc6fbca24b3a6cf9b82739a9b14c3a627ae30a9fc76cb3d"
+      },
+      {
+        "source": "audio-fusion-heldout-v3",
+        "id": "v3-repeat",
+        "preset": "guitar",
+        "audioHash": "15caa82063abf03d441e9e05fcf0005e04671edffb7286eeb9bf3630aa2c0017"
+      },
+      {
+        "source": "audio-fusion-heldout-v3",
+        "id": "v3-restrike",
+        "preset": "guitar",
+        "audioHash": "b33d0e3e95e37bdd516e7fbbc49ef26db52b9234db598eada5bab31c37bc8b94"
+      },
+      {
+        "source": "audio-fusion-heldout-v3",
+        "id": "v3-rapid",
+        "preset": "guitar",
+        "audioHash": "4986bb9e0129797d1bdbbbc33adcf73e72d39ff59170ffddeca7c95a0a8ec319"
+      },
+      {
+        "source": "audio-fusion-heldout-v3",
+        "id": "v3-adjacent",
+        "preset": "guitar",
+        "audioHash": "f369b60ed1a76a768453836b57a90adda44e93b67c83716fbf5b1faf77158908"
+      },
+      {
+        "source": "audio-fusion-heldout-v3",
+        "id": "v3-quiet-adjacent",
+        "preset": "guitar",
+        "audioHash": "c05ce3f5b4cdcd0b66cd51ff7d4c1967c0363d954595eb956480f073fad0c10c"
+      },
+      {
+        "source": "audio-fusion-heldout-v3",
+        "id": "v3-ringing",
+        "preset": "guitar",
+        "audioHash": "cd0aba026069a5b166bf1071242af3987f85713f81a6a08b07817c67e0afb520"
+      },
+      {
+        "source": "audio-fusion-heldout-v3",
+        "id": "v3-arpeggio",
+        "preset": "guitar",
+        "audioHash": "17ff3db4900889940c8b83e71c23d3e06c2b1ab6a8e4b4e3d22ad2929ba582c2"
+      },
+      {
+        "source": "audio-fusion-heldout-v3",
+        "id": "v3-strum",
+        "preset": "guitar",
+        "audioHash": "aff6d55a5e3ece89ddfd6ebeedf3f753885fc35c26ecd4a39654def8a4da03fa"
+      },
+      {
+        "source": "audio-fusion-heldout-v3",
+        "id": "v3-wrong",
+        "preset": "guitar",
+        "audioHash": "8a202fcf8190282e67270448aeb90bb8d184ef79ea709c8bec67b89756ab25ee"
+      },
+      {
+        "source": "audio-fusion-heldout-v3",
+        "id": "v3-extra",
+        "preset": "guitar",
+        "audioHash": "a0f78dcae3ca5d542a269184b153a19d943bd132966b738f8f12540a754c0bf6"
+      },
+      {
+        "source": "audio-fusion-heldout-v3",
+        "id": "v3-silence",
+        "preset": "guitar2",
+        "audioHash": "97f5d970505ad98076335ade1b8b5ebe3c7e561fa29b60772fbe1fa98c795cde"
+      },
+      {
+        "source": "audio-fusion-heldout-v3",
+        "id": "v3-sustain-low",
+        "preset": "guitar2",
+        "audioHash": "6ed164e227a6e8c3be511e362492f4c1f1df261934aabb3b3a9a6f214efc515f"
+      },
+      {
+        "source": "audio-fusion-heldout-v3",
+        "id": "v3-sustain-high",
+        "preset": "guitar2",
+        "audioHash": "053ee9b52ec1110ca700349a194922768d87b28254d9c423259888a4a332c557"
+      },
+      {
+        "source": "audio-fusion-heldout-v3",
+        "id": "v3-short",
+        "preset": "guitar2",
+        "audioHash": "ed566e039d16aa9d8870b7a939b77121e503ea292e0e156c2b4978404b39c4dc"
+      },
+      {
+        "source": "audio-fusion-heldout-v3",
+        "id": "v3-repeat",
+        "preset": "guitar2",
+        "audioHash": "578faf898d8415c6e660e14d22675d093d44fe835a75b08b21172499cfdda700"
+      },
+      {
+        "source": "audio-fusion-heldout-v3",
+        "id": "v3-restrike",
+        "preset": "guitar2",
+        "audioHash": "003bac758c18b13c7df2f819f5a6102caf5e5da4965459731d3fc5af0053cac7"
+      },
+      {
+        "source": "audio-fusion-heldout-v3",
+        "id": "v3-rapid",
+        "preset": "guitar2",
+        "audioHash": "aae88e0625f385056afa25ec50ad0180740fbf60c58b919e15cf0bbf87e960e1"
+      },
+      {
+        "source": "audio-fusion-heldout-v3",
+        "id": "v3-adjacent",
+        "preset": "guitar2",
+        "audioHash": "c591b4d2609a8d282260b5eba84a3d1172657a3611b57da291e0de327c735a05"
+      },
+      {
+        "source": "audio-fusion-heldout-v3",
+        "id": "v3-quiet-adjacent",
+        "preset": "guitar2",
+        "audioHash": "aaf8b860529dc705035fec42022cbd83003679ee4f5badcc32a4887523047f3d"
+      },
+      {
+        "source": "audio-fusion-heldout-v3",
+        "id": "v3-ringing",
+        "preset": "guitar2",
+        "audioHash": "b449d9ae79a3e6f2c345e511e29cfd39bff826bb37ebc6b4334f82ad83b04275"
+      },
+      {
+        "source": "audio-fusion-heldout-v3",
+        "id": "v3-arpeggio",
+        "preset": "guitar2",
+        "audioHash": "4b1b187958f8356a931e5b92665dafd24be30275065304b7d297786c1acc3c97"
+      },
+      {
+        "source": "audio-fusion-heldout-v3",
+        "id": "v3-strum",
+        "preset": "guitar2",
+        "audioHash": "2eafc590933693cdae5f596506db17ecc96f7b5d9893bf7b0a603cb58bb98476"
+      },
+      {
+        "source": "audio-fusion-heldout-v3",
+        "id": "v3-wrong",
+        "preset": "guitar2",
+        "audioHash": "8b2a8b4fc7550ebfb97db658b891f6143981cf3d90ae788b6257e93957bd8f92"
+      },
+      {
+        "source": "audio-fusion-heldout-v3",
+        "id": "v3-extra",
+        "preset": "guitar2",
+        "audioHash": "cf10cc5fc33319a870f45e65e9b04531758788ebe41b8a4226893d0ea685c4b9"
+      },
+      {
+        "source": "audio-fusion-heldout-v3",
+        "id": "v3-silence",
+        "preset": "piano",
+        "audioHash": "97f5d970505ad98076335ade1b8b5ebe3c7e561fa29b60772fbe1fa98c795cde"
+      },
+      {
+        "source": "audio-fusion-heldout-v3",
+        "id": "v3-sustain-low",
+        "preset": "piano",
+        "audioHash": "053110e72955342db1f70b9d4c5dc90e8c77bb210f54d2251bcc91ab2b8d58d9"
+      },
+      {
+        "source": "audio-fusion-heldout-v3",
+        "id": "v3-sustain-high",
+        "preset": "piano",
+        "audioHash": "c6623dbbe2c81c9dcd8c65d0829fb2948e41413afd999033e52f7878125ba315"
+      },
+      {
+        "source": "audio-fusion-heldout-v3",
+        "id": "v3-short",
+        "preset": "piano",
+        "audioHash": "3689b7b04cfd58dd7f030ed1a8589f58fc744328fb4b22a28b933bb9e6a343f4"
+      },
+      {
+        "source": "audio-fusion-heldout-v3",
+        "id": "v3-repeat",
+        "preset": "piano",
+        "audioHash": "54b00c7b9796b18301e5fd43c1c121cbb8eb2f6f75fd01dfd33450b616b16b92"
+      },
+      {
+        "source": "audio-fusion-heldout-v3",
+        "id": "v3-restrike",
+        "preset": "piano",
+        "audioHash": "1d4ac2962107c36130b36f0c1b784fcf5bb1f2b9d25b787da9137a20746ef881"
+      },
+      {
+        "source": "audio-fusion-heldout-v3",
+        "id": "v3-rapid",
+        "preset": "piano",
+        "audioHash": "c4d356e3bddce8a89b0a70279e0dbae2f7e1a383082598897a512a9eeead0027"
+      },
+      {
+        "source": "audio-fusion-heldout-v3",
+        "id": "v3-adjacent",
+        "preset": "piano",
+        "audioHash": "4f931a36273714e40fb00b3bc0847b54125d316f961735a64407c64141c8c998"
+      },
+      {
+        "source": "audio-fusion-heldout-v3",
+        "id": "v3-quiet-adjacent",
+        "preset": "piano",
+        "audioHash": "2967e9f438ea352cc0d61cfd42b1b9d47c1394fb04f76ac9b74190e49190d013"
+      },
+      {
+        "source": "audio-fusion-heldout-v3",
+        "id": "v3-ringing",
+        "preset": "piano",
+        "audioHash": "6491774024f282980c5e59b474f0f35f30eb1b9c77084b937aff1b944c85810d"
+      },
+      {
+        "source": "audio-fusion-heldout-v3",
+        "id": "v3-arpeggio",
+        "preset": "piano",
+        "audioHash": "dace2319085db441aa088c9ee993320ada1e72e975dac322f284d6d308bb697d"
+      },
+      {
+        "source": "audio-fusion-heldout-v3",
+        "id": "v3-strum",
+        "preset": "piano",
+        "audioHash": "3f39fe86f77c5f3214e0a9ec90ea047dc9ed57080c905a2588831c7261132187"
+      },
+      {
+        "source": "audio-fusion-heldout-v3",
+        "id": "v3-wrong",
+        "preset": "piano",
+        "audioHash": "e0b436883d2784c0353e28f2008a32afae944bea7e93c1fffb4eb4508f23469d"
+      },
+      {
+        "source": "audio-fusion-heldout-v3",
+        "id": "v3-extra",
+        "preset": "piano",
+        "audioHash": "9f9382e72aaa547faade31761e243e2359945057aeed8965371d664a91271da4"
+      },
+      {
+        "source": "audio-fusion-heldout-v4",
+        "id": "v4-silence",
+        "preset": "guitar",
+        "audioHash": "92b11e29f979f9ef3c4c658f6a8a61138e8bafde1a2d2209bb21b034ff1a44a4"
+      },
+      {
+        "source": "audio-fusion-heldout-v4",
+        "id": "v4-low",
+        "preset": "guitar",
+        "audioHash": "50d944790c22420108b53070800ad3c29a8d22c26af89a4e68733a382624498b"
+      },
+      {
+        "source": "audio-fusion-heldout-v4",
+        "id": "v4-high",
+        "preset": "guitar",
+        "audioHash": "8d52d5c8a90f505f32559f5317cb48edcccc1c2caf654f2df59e8db153d981b8"
+      },
+      {
+        "source": "audio-fusion-heldout-v4",
+        "id": "v4-short",
+        "preset": "guitar",
+        "audioHash": "5c9df0f4854aab7f279f32f716e70f977b240d68fe699bf8323eac986ca7cc6b"
+      },
+      {
+        "source": "audio-fusion-heldout-v4",
+        "id": "v4-repeat",
+        "preset": "guitar",
+        "audioHash": "01c892278a32c187098d67ad2cadf5b65a91f4831cfaad987661b005b8bf872b"
+      },
+      {
+        "source": "audio-fusion-heldout-v4",
+        "id": "v4-restrike",
+        "preset": "guitar",
+        "audioHash": "005a70237b4bb5b4e23630f6e9cfb8ee3ee4b0a7a1dd236a29b5cecfb6d137aa"
+      },
+      {
+        "source": "audio-fusion-heldout-v4",
+        "id": "v4-rapid",
+        "preset": "guitar",
+        "audioHash": "eee58266a5b2d16e4b7a4bdf9ec6d32f21f3597eec6ecb249511b217b95c518e"
+      },
+      {
+        "source": "audio-fusion-heldout-v4",
+        "id": "v4-octaves",
+        "preset": "guitar",
+        "audioHash": "d969e8c0864a4d8a45ddd1150d954dd71450961db767ee3a352bd9d884576396"
+      },
+      {
+        "source": "audio-fusion-heldout-v4",
+        "id": "v4-fifths",
+        "preset": "guitar",
+        "audioHash": "93de4850ba3c5afb627ec16bd924619d7bd194289d17435f02a46bbd8dc0399b"
+      },
+      {
+        "source": "audio-fusion-heldout-v4",
+        "id": "v4-ringing-bass",
+        "preset": "guitar",
+        "audioHash": "7fe3d558ad15d13ffaa0d1196d460a8908affe7224722e0a1a6e91571ed0a81b"
+      },
+      {
+        "source": "audio-fusion-heldout-v4",
+        "id": "v4-arpeggio",
+        "preset": "guitar",
+        "audioHash": "c56ca063ba418abb1f74bcd08f7e3b4884bc31831362957e3057a2680862dc02"
+      },
+      {
+        "source": "audio-fusion-heldout-v4",
+        "id": "v4-strum",
+        "preset": "guitar",
+        "audioHash": "47e4d951011fef63dda5b562863648ae636549bca313c5650c78eb40781a728c"
+      },
+      {
+        "source": "audio-fusion-heldout-v4",
+        "id": "v4-wrong",
+        "preset": "guitar",
+        "audioHash": "6fc63cfdd0030582aef3f418868be28a38e6be3578a5fee5bb25d5c1c98d3afe"
+      },
+      {
+        "source": "audio-fusion-heldout-v4",
+        "id": "v4-extra",
+        "preset": "guitar",
+        "audioHash": "0f97c82c0b90e00dc41db8872e3b527d8dc356007e3283674611967884518762"
+      },
+      {
+        "source": "audio-fusion-heldout-v4",
+        "id": "v4-silence",
+        "preset": "guitar2",
+        "audioHash": "92b11e29f979f9ef3c4c658f6a8a61138e8bafde1a2d2209bb21b034ff1a44a4"
+      },
+      {
+        "source": "audio-fusion-heldout-v4",
+        "id": "v4-low",
+        "preset": "guitar2",
+        "audioHash": "bc71187559eac42f3824983fbcb7d9c205ffe23a7dec4c89c6ef69471a65556c"
+      },
+      {
+        "source": "audio-fusion-heldout-v4",
+        "id": "v4-high",
+        "preset": "guitar2",
+        "audioHash": "43f464be57b140b47da5a2c76b6c989068da5e18b65a2f9722a9f96a09832362"
+      },
+      {
+        "source": "audio-fusion-heldout-v4",
+        "id": "v4-short",
+        "preset": "guitar2",
+        "audioHash": "7e81e08a2cfa9d836027354f66d79aacad6f0176f43200970a8d89c8a19c7764"
+      },
+      {
+        "source": "audio-fusion-heldout-v4",
+        "id": "v4-repeat",
+        "preset": "guitar2",
+        "audioHash": "e16026c2e748407e8911d7e4064f9cb4b137f22258171bb2e4328c652d5bed70"
+      },
+      {
+        "source": "audio-fusion-heldout-v4",
+        "id": "v4-restrike",
+        "preset": "guitar2",
+        "audioHash": "22bbc9fad5ca5798fcfbf80853d53af7b61a3b9abb1bed83361704a83b7495a5"
+      },
+      {
+        "source": "audio-fusion-heldout-v4",
+        "id": "v4-rapid",
+        "preset": "guitar2",
+        "audioHash": "08d4b9533ab6a7fbf7182bee2c1c8a987c5cd1c1d7ad74217dc0aeeece76288e"
+      },
+      {
+        "source": "audio-fusion-heldout-v4",
+        "id": "v4-octaves",
+        "preset": "guitar2",
+        "audioHash": "93dcb858192b96b6a12871f2e8fe533b8daaefd71f823b1c2fac8c0e60ac4267"
+      },
+      {
+        "source": "audio-fusion-heldout-v4",
+        "id": "v4-fifths",
+        "preset": "guitar2",
+        "audioHash": "6e53e0f1f6ae95fa2e48b7234381bcc4d833468a7e189a5dd00e93e5b39e53b0"
+      },
+      {
+        "source": "audio-fusion-heldout-v4",
+        "id": "v4-ringing-bass",
+        "preset": "guitar2",
+        "audioHash": "762127e67daa64777e9e973f597133a886fc6e956aac0542b08454da9099940d"
+      },
+      {
+        "source": "audio-fusion-heldout-v4",
+        "id": "v4-arpeggio",
+        "preset": "guitar2",
+        "audioHash": "54149af2c1e25a03fbf32e2e25399d63157837b16b51a4a7b89cbe99a2a0cf39"
+      },
+      {
+        "source": "audio-fusion-heldout-v4",
+        "id": "v4-strum",
+        "preset": "guitar2",
+        "audioHash": "e6587fc0a91e543e3bba887b0804e92388d5f6b4a937a4b3cfb67606686d30e0"
+      },
+      {
+        "source": "audio-fusion-heldout-v4",
+        "id": "v4-wrong",
+        "preset": "guitar2",
+        "audioHash": "0f95a8b098ed563f84c3547f938534159423c5891c28c00ed17f819c6898fdfe"
+      },
+      {
+        "source": "audio-fusion-heldout-v4",
+        "id": "v4-extra",
+        "preset": "guitar2",
+        "audioHash": "a4795cc4361b427c1fb7ce949cd4e3441457d39b0dc8bf9db459ba24cd286f75"
+      },
+      {
+        "source": "audio-fusion-heldout-v4",
+        "id": "v4-silence",
+        "preset": "piano",
+        "audioHash": "92b11e29f979f9ef3c4c658f6a8a61138e8bafde1a2d2209bb21b034ff1a44a4"
+      },
+      {
+        "source": "audio-fusion-heldout-v4",
+        "id": "v4-low",
+        "preset": "piano",
+        "audioHash": "11f46ca605c2f92c1cea99ddbcbaac6cdcca5aede168b769bf8d3cc7c3a0c2fa"
+      },
+      {
+        "source": "audio-fusion-heldout-v4",
+        "id": "v4-high",
+        "preset": "piano",
+        "audioHash": "0e6d9992d8e68042fe3fcc5c53fa3f60f95747da48dd0f49d5dc61b819118a1e"
+      },
+      {
+        "source": "audio-fusion-heldout-v4",
+        "id": "v4-short",
+        "preset": "piano",
+        "audioHash": "8e03be13bb379ccc15d3a8f873996871777280d4425d3e40a891bfc78e303386"
+      },
+      {
+        "source": "audio-fusion-heldout-v4",
+        "id": "v4-repeat",
+        "preset": "piano",
+        "audioHash": "4166d6e5bb1bd47c57088c919ee12a55c072127798c1206236ced18de4ec4231"
+      },
+      {
+        "source": "audio-fusion-heldout-v4",
+        "id": "v4-restrike",
+        "preset": "piano",
+        "audioHash": "ac79d8a7ff541f2e2fb41f7f8a31c82fa3e995bd6a3f246c4e028888e1a88d61"
+      },
+      {
+        "source": "audio-fusion-heldout-v4",
+        "id": "v4-rapid",
+        "preset": "piano",
+        "audioHash": "dd3914d5636135b7d138accd5e6a232426a2652cb88597d9a7882c911bb1612e"
+      },
+      {
+        "source": "audio-fusion-heldout-v4",
+        "id": "v4-octaves",
+        "preset": "piano",
+        "audioHash": "460d46e102d1cec2dafe7f6bd4b1b5aae8398e46f7cd2b2f4f725300a1999fba"
+      },
+      {
+        "source": "audio-fusion-heldout-v4",
+        "id": "v4-fifths",
+        "preset": "piano",
+        "audioHash": "29170bbf13c8efecd26f8666c42e67564f88464eee747f305ae46bf365554d57"
+      },
+      {
+        "source": "audio-fusion-heldout-v4",
+        "id": "v4-ringing-bass",
+        "preset": "piano",
+        "audioHash": "8ecff766d9e6aee2ef39a3b7360c7878eb9d6299c0273476a91b6dc5caeaf4a6"
+      },
+      {
+        "source": "audio-fusion-heldout-v4",
+        "id": "v4-arpeggio",
+        "preset": "piano",
+        "audioHash": "93f42d424b10a10c4f7ed178c0723d698561777dc2a8edb45232d4c0d8626129"
+      },
+      {
+        "source": "audio-fusion-heldout-v4",
+        "id": "v4-strum",
+        "preset": "piano",
+        "audioHash": "ac59dc944736b22c95d6fb0f185d6ea3b1d141c3e364df9985fe3ce201e648b7"
+      },
+      {
+        "source": "audio-fusion-heldout-v4",
+        "id": "v4-wrong",
+        "preset": "piano",
+        "audioHash": "494b562e77143a01ca7a837cb1ba39f946b53f900bcb4525096a96cfa3e36f99"
+      },
+      {
+        "source": "audio-fusion-heldout-v4",
+        "id": "v4-extra",
+        "preset": "piano",
+        "audioHash": "bafaf4df0b693201e977be695edd64dd048af2edba9f240a1f6bc0450d389ecd"
+      }
+    ]
+  },
+  "selection": {
+    "selected": 0.67,
+    "rule": "Highest pooled development onset F1; tie prefers lower strength. Selection is not acceptance. Freeze before fresh evaluation.",
+    "developmentHash": "c7c1838adb62a138f13baec282f2e4fe9e2d70f664eff82744156bb40f5123b9",
+    "summaries": [
+      {
+        "strength": 0,
+        "onset": {
+          "tp": 541,
+          "fp": 2565,
+          "fn": 140,
+          "precision": 0.17417900837089503,
+          "recall": 0.7944199706314243,
+          "f1": 0.2857142857142857
+        },
+        "active": {
+          "tp": 13454,
+          "fp": 12855,
+          "fn": 6769,
+          "precision": 0.5113839370557604,
+          "recall": 0.665282104534441,
+          "f1": 0.578268718301384
+        },
+        "falseAccusations": 2563,
+        "missedUnexpected": 4,
+        "cpuMs": 28660.388505000028,
+        "categories": {
+          "silence": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+            "precision": null,
+            "recall": null,
+            "f1": null
+          },
+          "single": {
+            "tp": 54,
+            "fp": 465,
+            "fn": 12,
+            "precision": 0.10404624277456648,
+            "recall": 0.8181818181818182,
+            "f1": 0.18461538461538463
+          },
+          "dyad": {
+            "tp": 21,
+            "fp": 112,
+            "fn": 3,
+            "precision": 0.15789473684210525,
+            "recall": 0.875,
+            "f1": 0.267515923566879
+          },
+          "chord": {
+            "tp": 48,
+            "fp": 176,
+            "fn": 21,
+            "precision": 0.21428571428571427,
+            "recall": 0.6956521739130435,
+            "f1": 0.32764505119453924
+          },
+          "masking": {
+            "tp": 6,
+            "fp": 18,
+            "fn": 3,
+            "precision": 0.25,
+            "recall": 0.6666666666666666,
+            "f1": 0.36363636363636365
+          },
+          "error": {
+            "tp": 90,
+            "fp": 283,
+            "fn": 6,
+            "precision": 0.24128686327077747,
+            "recall": 0.9375,
+            "f1": 0.3837953091684435
+          },
+          "repeated": {
+            "tp": 163,
+            "fp": 653,
+            "fn": 38,
+            "precision": 0.19975490196078433,
+            "recall": 0.8109452736318408,
+            "f1": 0.32055063913470994
+          },
+          "sequence": {
+            "tp": 12,
+            "fp": 41,
+            "fn": 0,
+            "precision": 0.22641509433962265,
+            "recall": 1,
+            "f1": 0.36923076923076925
+          },
+          "strum": {
+            "tp": 54,
+            "fp": 266,
+            "fn": 36,
+            "precision": 0.16875,
+            "recall": 0.6,
+            "f1": 0.2634146341463415
+          },
+          "overlap": {
+            "tp": 10,
+            "fp": 41,
+            "fn": 2,
+            "precision": 0.19607843137254902,
+            "recall": 0.8333333333333334,
+            "f1": 0.31746031746031744
+          },
+          "bend": {
+            "tp": 3,
+            "fp": 31,
+            "fn": 0,
+            "precision": 0.08823529411764706,
+            "recall": 1,
+            "f1": 0.16216216216216217
+          },
+          "mnx": {
+            "tp": 6,
+            "fp": 23,
+            "fn": 0,
+            "precision": 0.20689655172413793,
+            "recall": 1,
+            "f1": 0.34285714285714286
+          },
+          "restrike": {
+            "tp": 7,
+            "fp": 11,
+            "fn": 2,
+            "precision": 0.3888888888888889,
+            "recall": 0.7777777777777778,
+            "f1": 0.5185185185185185
+          },
+          "arpeggio": {
+            "tp": 67,
+            "fp": 445,
+            "fn": 17,
+            "precision": 0.130859375,
+            "recall": 0.7976190476190477,
+            "f1": 0.22483221476510068
+          }
+        },
+        "presets": {
+          "guitar": {
+            "tp": 154,
+            "fp": 676,
+            "fn": 73,
+            "precision": 0.1855421686746988,
+            "recall": 0.6784140969162996,
+            "f1": 0.2913907284768212
+          },
+          "guitar2": {
+            "tp": 200,
+            "fp": 1047,
+            "fn": 27,
+            "precision": 0.16038492381716118,
+            "recall": 0.8810572687224669,
+            "f1": 0.27137042062415195
+          },
+          "piano": {
+            "tp": 187,
+            "fp": 842,
+            "fn": 40,
+            "precision": 0.18172983479105928,
+            "recall": 0.8237885462555066,
+            "f1": 0.29777070063694266
+          }
+        }
+      },
+      {
+        "strength": 0.25,
+        "onset": {
+          "tp": 560,
+          "fp": 2759,
+          "fn": 121,
+          "precision": 0.16872551973485989,
+          "recall": 0.8223201174743024,
+          "f1": 0.28
+        },
+        "active": {
+          "tp": 14388,
+          "fp": 12759,
+          "fn": 5835,
+          "precision": 0.5300033152834568,
+          "recall": 0.7114671413736834,
+          "f1": 0.6074730842305256
+        },
+        "falseAccusations": 2759,
+        "missedUnexpected": 3,
+        "cpuMs": 36410.94286199899,
+        "categories": {
+          "silence": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+            "precision": null,
+            "recall": null,
+            "f1": null
+          },
+          "single": {
+            "tp": 57,
+            "fp": 509,
+            "fn": 9,
+            "precision": 0.10070671378091872,
+            "recall": 0.8636363636363636,
+            "f1": 0.18037974683544303
+          },
+          "dyad": {
+            "tp": 22,
+            "fp": 120,
+            "fn": 2,
+            "precision": 0.15492957746478872,
+            "recall": 0.9166666666666666,
+            "f1": 0.26506024096385544
+          },
+          "chord": {
+            "tp": 54,
+            "fp": 176,
+            "fn": 15,
+            "precision": 0.23478260869565218,
+            "recall": 0.782608695652174,
+            "f1": 0.3612040133779264
+          },
+          "masking": {
+            "tp": 7,
+            "fp": 24,
+            "fn": 2,
+            "precision": 0.22580645161290322,
+            "recall": 0.7777777777777778,
+            "f1": 0.35
+          },
+          "error": {
+            "tp": 91,
+            "fp": 308,
+            "fn": 5,
+            "precision": 0.22807017543859648,
+            "recall": 0.9479166666666666,
+            "f1": 0.36767676767676766
+          },
+          "repeated": {
+            "tp": 167,
+            "fp": 730,
+            "fn": 34,
+            "precision": 0.18617614269788182,
+            "recall": 0.8308457711442786,
+            "f1": 0.30418943533697634
+          },
+          "sequence": {
+            "tp": 12,
+            "fp": 39,
+            "fn": 0,
+            "precision": 0.23529411764705882,
+            "recall": 1,
+            "f1": 0.38095238095238093
+          },
+          "strum": {
+            "tp": 58,
+            "fp": 280,
+            "fn": 32,
+            "precision": 0.17159763313609466,
+            "recall": 0.6444444444444445,
+            "f1": 0.27102803738317754
+          },
+          "overlap": {
+            "tp": 10,
+            "fp": 44,
+            "fn": 2,
+            "precision": 0.18518518518518517,
+            "recall": 0.8333333333333334,
+            "f1": 0.30303030303030304
+          },
+          "bend": {
+            "tp": 3,
+            "fp": 34,
+            "fn": 0,
+            "precision": 0.08108108108108109,
+            "recall": 1,
+            "f1": 0.15
+          },
+          "mnx": {
+            "tp": 6,
+            "fp": 25,
+            "fn": 0,
+            "precision": 0.1935483870967742,
+            "recall": 1,
+            "f1": 0.32432432432432434
+          },
+          "restrike": {
+            "tp": 7,
+            "fp": 11,
+            "fn": 2,
+            "precision": 0.3888888888888889,
+            "recall": 0.7777777777777778,
+            "f1": 0.5185185185185185
+          },
+          "arpeggio": {
+            "tp": 66,
+            "fp": 459,
+            "fn": 18,
+            "precision": 0.12571428571428572,
+            "recall": 0.7857142857142857,
+            "f1": 0.21674876847290642
+          }
+        },
+        "presets": {
+          "guitar": {
+            "tp": 161,
+            "fp": 716,
+            "fn": 66,
+            "precision": 0.18358038768529075,
+            "recall": 0.7092511013215859,
+            "f1": 0.2916666666666667
+          },
+          "guitar2": {
+            "tp": 200,
+            "fp": 1093,
+            "fn": 27,
+            "precision": 0.15467904098994587,
+            "recall": 0.8810572687224669,
+            "f1": 0.2631578947368421
+          },
+          "piano": {
+            "tp": 199,
+            "fp": 950,
+            "fn": 28,
+            "precision": 0.1731940818102698,
+            "recall": 0.8766519823788547,
+            "f1": 0.28924418604651164
+          }
+        }
+      },
+      {
+        "strength": 0.5,
+        "onset": {
+          "tp": 581,
+          "fp": 2786,
+          "fn": 100,
+          "precision": 0.17255717255717257,
+          "recall": 0.8531571218795888,
+          "f1": 0.28705533596837945
+        },
+        "active": {
+          "tp": 15318,
+          "fp": 11763,
+          "fn": 4905,
+          "precision": 0.5656364240611499,
+          "recall": 0.757454383622608,
+          "f1": 0.647640791476408
+        },
+        "falseAccusations": 2786,
+        "missedUnexpected": 3,
+        "cpuMs": 36390.98648500188,
+        "categories": {
+          "silence": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+            "precision": null,
+            "recall": null,
+            "f1": null
+          },
+          "single": {
+            "tp": 64,
+            "fp": 513,
+            "fn": 2,
+            "precision": 0.11091854419410745,
+            "recall": 0.9696969696969697,
+            "f1": 0.19906687402799378
+          },
+          "dyad": {
+            "tp": 22,
+            "fp": 136,
+            "fn": 2,
+            "precision": 0.13924050632911392,
+            "recall": 0.9166666666666666,
+            "f1": 0.24175824175824176
+          },
+          "chord": {
+            "tp": 55,
+            "fp": 178,
+            "fn": 14,
+            "precision": 0.23605150214592274,
+            "recall": 0.7971014492753623,
+            "f1": 0.36423841059602646
+          },
+          "masking": {
+            "tp": 7,
+            "fp": 28,
+            "fn": 2,
+            "precision": 0.2,
+            "recall": 0.7777777777777778,
+            "f1": 0.3181818181818182
+          },
+          "error": {
+            "tp": 92,
+            "fp": 317,
+            "fn": 4,
+            "precision": 0.22493887530562348,
+            "recall": 0.9583333333333334,
+            "f1": 0.36435643564356435
+          },
+          "repeated": {
+            "tp": 167,
+            "fp": 766,
+            "fn": 34,
+            "precision": 0.1789924973204716,
+            "recall": 0.8308457711442786,
+            "f1": 0.2945326278659612
+          },
+          "sequence": {
+            "tp": 12,
+            "fp": 42,
+            "fn": 0,
+            "precision": 0.2222222222222222,
+            "recall": 1,
+            "f1": 0.36363636363636365
+          },
+          "strum": {
+            "tp": 58,
+            "fp": 242,
+            "fn": 32,
+            "precision": 0.19333333333333333,
+            "recall": 0.6444444444444445,
+            "f1": 0.29743589743589743
+          },
+          "overlap": {
+            "tp": 10,
+            "fp": 52,
+            "fn": 2,
+            "precision": 0.16129032258064516,
+            "recall": 0.8333333333333334,
+            "f1": 0.2702702702702703
+          },
+          "bend": {
+            "tp": 3,
+            "fp": 35,
+            "fn": 0,
+            "precision": 0.07894736842105263,
+            "recall": 1,
+            "f1": 0.14634146341463414
+          },
+          "mnx": {
+            "tp": 6,
+            "fp": 29,
+            "fn": 0,
+            "precision": 0.17142857142857143,
+            "recall": 1,
+            "f1": 0.2926829268292683
+          },
+          "restrike": {
+            "tp": 7,
+            "fp": 15,
+            "fn": 2,
+            "precision": 0.3181818181818182,
+            "recall": 0.7777777777777778,
+            "f1": 0.45161290322580644
+          },
+          "arpeggio": {
+            "tp": 78,
+            "fp": 433,
+            "fn": 6,
+            "precision": 0.15264187866927592,
+            "recall": 0.9285714285714286,
+            "f1": 0.26218487394957984
+          }
+        },
+        "presets": {
+          "guitar": {
+            "tp": 174,
+            "fp": 647,
+            "fn": 53,
+            "precision": 0.21193666260657734,
+            "recall": 0.7665198237885462,
+            "f1": 0.3320610687022901
+          },
+          "guitar2": {
+            "tp": 204,
+            "fp": 1126,
+            "fn": 23,
+            "precision": 0.15338345864661654,
+            "recall": 0.8986784140969163,
+            "f1": 0.26204238921001927
+          },
+          "piano": {
+            "tp": 203,
+            "fp": 1013,
+            "fn": 24,
+            "precision": 0.1669407894736842,
+            "recall": 0.8942731277533039,
+            "f1": 0.28135828135828134
+          }
+        }
+      },
+      {
+        "strength": 0.67,
+        "onset": {
+          "tp": 598,
+          "fp": 2711,
+          "fn": 83,
+          "precision": 0.18071925052886068,
+          "recall": 0.8781204111600588,
+          "f1": 0.29974937343358393
+        },
+        "active": {
+          "tp": 15834,
+          "fp": 10677,
+          "fn": 4389,
+          "precision": 0.5972615140884916,
+          "recall": 0.7829698857736241,
+          "f1": 0.6776222878418282
+        },
+        "falseAccusations": 2711,
+        "missedUnexpected": 3,
+        "cpuMs": 36891.153775001294,
+        "categories": {
+          "silence": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+            "precision": null,
+            "recall": null,
+            "f1": null
+          },
+          "single": {
+            "tp": 65,
+            "fp": 549,
+            "fn": 1,
+            "precision": 0.10586319218241043,
+            "recall": 0.9848484848484849,
+            "f1": 0.19117647058823528
+          },
+          "dyad": {
+            "tp": 22,
+            "fp": 114,
+            "fn": 2,
+            "precision": 0.16176470588235295,
+            "recall": 0.9166666666666666,
+            "f1": 0.275
+          },
+          "chord": {
+            "tp": 57,
+            "fp": 166,
+            "fn": 12,
+            "precision": 0.2556053811659193,
+            "recall": 0.8260869565217391,
+            "f1": 0.3904109589041096
+          },
+          "masking": {
+            "tp": 7,
+            "fp": 29,
+            "fn": 2,
+            "precision": 0.19444444444444445,
+            "recall": 0.7777777777777778,
+            "f1": 0.3111111111111111
+          },
+          "error": {
+            "tp": 93,
+            "fp": 305,
+            "fn": 3,
+            "precision": 0.23366834170854273,
+            "recall": 0.96875,
+            "f1": 0.3765182186234818
+          },
+          "repeated": {
+            "tp": 172,
+            "fp": 793,
+            "fn": 29,
+            "precision": 0.17823834196891192,
+            "recall": 0.8557213930348259,
+            "f1": 0.2950257289879931
+          },
+          "sequence": {
+            "tp": 12,
+            "fp": 44,
+            "fn": 0,
+            "precision": 0.21428571428571427,
+            "recall": 1,
+            "f1": 0.35294117647058826
+          },
+          "strum": {
+            "tp": 64,
+            "fp": 216,
+            "fn": 26,
+            "precision": 0.22857142857142856,
+            "recall": 0.7111111111111111,
+            "f1": 0.34594594594594597
+          },
+          "overlap": {
+            "tp": 11,
+            "fp": 29,
+            "fn": 1,
+            "precision": 0.275,
+            "recall": 0.9166666666666666,
+            "f1": 0.4230769230769231
+          },
+          "bend": {
+            "tp": 3,
+            "fp": 38,
+            "fn": 0,
+            "precision": 0.07317073170731707,
+            "recall": 1,
+            "f1": 0.13636363636363635
+          },
+          "mnx": {
+            "tp": 6,
+            "fp": 34,
+            "fn": 0,
+            "precision": 0.15,
+            "recall": 1,
+            "f1": 0.2608695652173913
+          },
+          "restrike": {
+            "tp": 6,
+            "fp": 23,
+            "fn": 3,
+            "precision": 0.20689655172413793,
+            "recall": 0.6666666666666666,
+            "f1": 0.3157894736842105
+          },
+          "arpeggio": {
+            "tp": 80,
+            "fp": 371,
+            "fn": 4,
+            "precision": 0.17738359201773837,
+            "recall": 0.9523809523809523,
+            "f1": 0.29906542056074764
+          }
+        },
+        "presets": {
+          "guitar": {
+            "tp": 187,
+            "fp": 596,
+            "fn": 40,
+            "precision": 0.2388250319284802,
+            "recall": 0.8237885462555066,
+            "f1": 0.3702970297029703
+          },
+          "guitar2": {
+            "tp": 201,
+            "fp": 1061,
+            "fn": 26,
+            "precision": 0.15927099841521394,
+            "recall": 0.8854625550660793,
+            "f1": 0.2699798522498321
+          },
+          "piano": {
+            "tp": 210,
+            "fp": 1054,
+            "fn": 17,
+            "precision": 0.1661392405063291,
+            "recall": 0.9251101321585903,
+            "f1": 0.28169014084507044
+          }
+        }
+      }
+    ]
+  },
+  "development": [
+    {
+      "strength": 0,
+      "onset": {
+        "tp": 541,
+        "fp": 2565,
+        "fn": 140,
+        "precision": 0.17417900837089503,
+        "recall": 0.7944199706314243,
+        "f1": 0.2857142857142857
+      },
+      "active": {
+        "tp": 13454,
+        "fp": 12855,
+        "fn": 6769,
+        "precision": 0.5113839370557604,
+        "recall": 0.665282104534441,
+        "f1": 0.578268718301384
+      },
+      "falseAccusations": 2563,
+      "missedUnexpected": 4,
+      "cpuMs": 28660.388505000028,
+      "categories": {
+        "silence": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        },
+        "single": {
+          "tp": 54,
+          "fp": 465,
+          "fn": 12,
+          "precision": 0.10404624277456648,
+          "recall": 0.8181818181818182,
+          "f1": 0.18461538461538463
+        },
+        "dyad": {
+          "tp": 21,
+          "fp": 112,
+          "fn": 3,
+          "precision": 0.15789473684210525,
+          "recall": 0.875,
+          "f1": 0.267515923566879
+        },
+        "chord": {
+          "tp": 48,
+          "fp": 176,
+          "fn": 21,
+          "precision": 0.21428571428571427,
+          "recall": 0.6956521739130435,
+          "f1": 0.32764505119453924
+        },
+        "masking": {
+          "tp": 6,
+          "fp": 18,
+          "fn": 3,
+          "precision": 0.25,
+          "recall": 0.6666666666666666,
+          "f1": 0.36363636363636365
+        },
+        "error": {
+          "tp": 90,
+          "fp": 283,
+          "fn": 6,
+          "precision": 0.24128686327077747,
+          "recall": 0.9375,
+          "f1": 0.3837953091684435
+        },
+        "repeated": {
+          "tp": 163,
+          "fp": 653,
+          "fn": 38,
+          "precision": 0.19975490196078433,
+          "recall": 0.8109452736318408,
+          "f1": 0.32055063913470994
+        },
+        "sequence": {
+          "tp": 12,
+          "fp": 41,
+          "fn": 0,
+          "precision": 0.22641509433962265,
+          "recall": 1,
+          "f1": 0.36923076923076925
+        },
+        "strum": {
+          "tp": 54,
+          "fp": 266,
+          "fn": 36,
+          "precision": 0.16875,
+          "recall": 0.6,
+          "f1": 0.2634146341463415
+        },
+        "overlap": {
+          "tp": 10,
+          "fp": 41,
+          "fn": 2,
+          "precision": 0.19607843137254902,
+          "recall": 0.8333333333333334,
+          "f1": 0.31746031746031744
+        },
+        "bend": {
+          "tp": 3,
+          "fp": 31,
+          "fn": 0,
+          "precision": 0.08823529411764706,
+          "recall": 1,
+          "f1": 0.16216216216216217
+        },
+        "mnx": {
+          "tp": 6,
+          "fp": 23,
+          "fn": 0,
+          "precision": 0.20689655172413793,
+          "recall": 1,
+          "f1": 0.34285714285714286
+        },
+        "restrike": {
+          "tp": 7,
+          "fp": 11,
+          "fn": 2,
+          "precision": 0.3888888888888889,
+          "recall": 0.7777777777777778,
+          "f1": 0.5185185185185185
+        },
+        "arpeggio": {
+          "tp": 67,
+          "fp": 445,
+          "fn": 17,
+          "precision": 0.130859375,
+          "recall": 0.7976190476190477,
+          "f1": 0.22483221476510068
+        }
+      },
+      "presets": {
+        "guitar": {
+          "tp": 154,
+          "fp": 676,
+          "fn": 73,
+          "precision": 0.1855421686746988,
+          "recall": 0.6784140969162996,
+          "f1": 0.2913907284768212
+        },
+        "guitar2": {
+          "tp": 200,
+          "fp": 1047,
+          "fn": 27,
+          "precision": 0.16038492381716118,
+          "recall": 0.8810572687224669,
+          "f1": 0.27137042062415195
+        },
+        "piano": {
+          "tp": 187,
+          "fp": 842,
+          "fn": 40,
+          "precision": 0.18172983479105928,
+          "recall": 0.8237885462555066,
+          "f1": 0.29777070063694266
+        }
+      }
+    },
+    {
+      "strength": 0.25,
+      "onset": {
+        "tp": 560,
+        "fp": 2759,
+        "fn": 121,
+        "precision": 0.16872551973485989,
+        "recall": 0.8223201174743024,
+        "f1": 0.28
+      },
+      "active": {
+        "tp": 14388,
+        "fp": 12759,
+        "fn": 5835,
+        "precision": 0.5300033152834568,
+        "recall": 0.7114671413736834,
+        "f1": 0.6074730842305256
+      },
+      "falseAccusations": 2759,
+      "missedUnexpected": 3,
+      "cpuMs": 36410.94286199899,
+      "categories": {
+        "silence": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        },
+        "single": {
+          "tp": 57,
+          "fp": 509,
+          "fn": 9,
+          "precision": 0.10070671378091872,
+          "recall": 0.8636363636363636,
+          "f1": 0.18037974683544303
+        },
+        "dyad": {
+          "tp": 22,
+          "fp": 120,
+          "fn": 2,
+          "precision": 0.15492957746478872,
+          "recall": 0.9166666666666666,
+          "f1": 0.26506024096385544
+        },
+        "chord": {
+          "tp": 54,
+          "fp": 176,
+          "fn": 15,
+          "precision": 0.23478260869565218,
+          "recall": 0.782608695652174,
+          "f1": 0.3612040133779264
+        },
+        "masking": {
+          "tp": 7,
+          "fp": 24,
+          "fn": 2,
+          "precision": 0.22580645161290322,
+          "recall": 0.7777777777777778,
+          "f1": 0.35
+        },
+        "error": {
+          "tp": 91,
+          "fp": 308,
+          "fn": 5,
+          "precision": 0.22807017543859648,
+          "recall": 0.9479166666666666,
+          "f1": 0.36767676767676766
+        },
+        "repeated": {
+          "tp": 167,
+          "fp": 730,
+          "fn": 34,
+          "precision": 0.18617614269788182,
+          "recall": 0.8308457711442786,
+          "f1": 0.30418943533697634
+        },
+        "sequence": {
+          "tp": 12,
+          "fp": 39,
+          "fn": 0,
+          "precision": 0.23529411764705882,
+          "recall": 1,
+          "f1": 0.38095238095238093
+        },
+        "strum": {
+          "tp": 58,
+          "fp": 280,
+          "fn": 32,
+          "precision": 0.17159763313609466,
+          "recall": 0.6444444444444445,
+          "f1": 0.27102803738317754
+        },
+        "overlap": {
+          "tp": 10,
+          "fp": 44,
+          "fn": 2,
+          "precision": 0.18518518518518517,
+          "recall": 0.8333333333333334,
+          "f1": 0.30303030303030304
+        },
+        "bend": {
+          "tp": 3,
+          "fp": 34,
+          "fn": 0,
+          "precision": 0.08108108108108109,
+          "recall": 1,
+          "f1": 0.15
+        },
+        "mnx": {
+          "tp": 6,
+          "fp": 25,
+          "fn": 0,
+          "precision": 0.1935483870967742,
+          "recall": 1,
+          "f1": 0.32432432432432434
+        },
+        "restrike": {
+          "tp": 7,
+          "fp": 11,
+          "fn": 2,
+          "precision": 0.3888888888888889,
+          "recall": 0.7777777777777778,
+          "f1": 0.5185185185185185
+        },
+        "arpeggio": {
+          "tp": 66,
+          "fp": 459,
+          "fn": 18,
+          "precision": 0.12571428571428572,
+          "recall": 0.7857142857142857,
+          "f1": 0.21674876847290642
+        }
+      },
+      "presets": {
+        "guitar": {
+          "tp": 161,
+          "fp": 716,
+          "fn": 66,
+          "precision": 0.18358038768529075,
+          "recall": 0.7092511013215859,
+          "f1": 0.2916666666666667
+        },
+        "guitar2": {
+          "tp": 200,
+          "fp": 1093,
+          "fn": 27,
+          "precision": 0.15467904098994587,
+          "recall": 0.8810572687224669,
+          "f1": 0.2631578947368421
+        },
+        "piano": {
+          "tp": 199,
+          "fp": 950,
+          "fn": 28,
+          "precision": 0.1731940818102698,
+          "recall": 0.8766519823788547,
+          "f1": 0.28924418604651164
+        }
+      }
+    },
+    {
+      "strength": 0.5,
+      "onset": {
+        "tp": 581,
+        "fp": 2786,
+        "fn": 100,
+        "precision": 0.17255717255717257,
+        "recall": 0.8531571218795888,
+        "f1": 0.28705533596837945
+      },
+      "active": {
+        "tp": 15318,
+        "fp": 11763,
+        "fn": 4905,
+        "precision": 0.5656364240611499,
+        "recall": 0.757454383622608,
+        "f1": 0.647640791476408
+      },
+      "falseAccusations": 2786,
+      "missedUnexpected": 3,
+      "cpuMs": 36390.98648500188,
+      "categories": {
+        "silence": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        },
+        "single": {
+          "tp": 64,
+          "fp": 513,
+          "fn": 2,
+          "precision": 0.11091854419410745,
+          "recall": 0.9696969696969697,
+          "f1": 0.19906687402799378
+        },
+        "dyad": {
+          "tp": 22,
+          "fp": 136,
+          "fn": 2,
+          "precision": 0.13924050632911392,
+          "recall": 0.9166666666666666,
+          "f1": 0.24175824175824176
+        },
+        "chord": {
+          "tp": 55,
+          "fp": 178,
+          "fn": 14,
+          "precision": 0.23605150214592274,
+          "recall": 0.7971014492753623,
+          "f1": 0.36423841059602646
+        },
+        "masking": {
+          "tp": 7,
+          "fp": 28,
+          "fn": 2,
+          "precision": 0.2,
+          "recall": 0.7777777777777778,
+          "f1": 0.3181818181818182
+        },
+        "error": {
+          "tp": 92,
+          "fp": 317,
+          "fn": 4,
+          "precision": 0.22493887530562348,
+          "recall": 0.9583333333333334,
+          "f1": 0.36435643564356435
+        },
+        "repeated": {
+          "tp": 167,
+          "fp": 766,
+          "fn": 34,
+          "precision": 0.1789924973204716,
+          "recall": 0.8308457711442786,
+          "f1": 0.2945326278659612
+        },
+        "sequence": {
+          "tp": 12,
+          "fp": 42,
+          "fn": 0,
+          "precision": 0.2222222222222222,
+          "recall": 1,
+          "f1": 0.36363636363636365
+        },
+        "strum": {
+          "tp": 58,
+          "fp": 242,
+          "fn": 32,
+          "precision": 0.19333333333333333,
+          "recall": 0.6444444444444445,
+          "f1": 0.29743589743589743
+        },
+        "overlap": {
+          "tp": 10,
+          "fp": 52,
+          "fn": 2,
+          "precision": 0.16129032258064516,
+          "recall": 0.8333333333333334,
+          "f1": 0.2702702702702703
+        },
+        "bend": {
+          "tp": 3,
+          "fp": 35,
+          "fn": 0,
+          "precision": 0.07894736842105263,
+          "recall": 1,
+          "f1": 0.14634146341463414
+        },
+        "mnx": {
+          "tp": 6,
+          "fp": 29,
+          "fn": 0,
+          "precision": 0.17142857142857143,
+          "recall": 1,
+          "f1": 0.2926829268292683
+        },
+        "restrike": {
+          "tp": 7,
+          "fp": 15,
+          "fn": 2,
+          "precision": 0.3181818181818182,
+          "recall": 0.7777777777777778,
+          "f1": 0.45161290322580644
+        },
+        "arpeggio": {
+          "tp": 78,
+          "fp": 433,
+          "fn": 6,
+          "precision": 0.15264187866927592,
+          "recall": 0.9285714285714286,
+          "f1": 0.26218487394957984
+        }
+      },
+      "presets": {
+        "guitar": {
+          "tp": 174,
+          "fp": 647,
+          "fn": 53,
+          "precision": 0.21193666260657734,
+          "recall": 0.7665198237885462,
+          "f1": 0.3320610687022901
+        },
+        "guitar2": {
+          "tp": 204,
+          "fp": 1126,
+          "fn": 23,
+          "precision": 0.15338345864661654,
+          "recall": 0.8986784140969163,
+          "f1": 0.26204238921001927
+        },
+        "piano": {
+          "tp": 203,
+          "fp": 1013,
+          "fn": 24,
+          "precision": 0.1669407894736842,
+          "recall": 0.8942731277533039,
+          "f1": 0.28135828135828134
+        }
+      }
+    },
+    {
+      "strength": 0.67,
+      "onset": {
+        "tp": 598,
+        "fp": 2711,
+        "fn": 83,
+        "precision": 0.18071925052886068,
+        "recall": 0.8781204111600588,
+        "f1": 0.29974937343358393
+      },
+      "active": {
+        "tp": 15834,
+        "fp": 10677,
+        "fn": 4389,
+        "precision": 0.5972615140884916,
+        "recall": 0.7829698857736241,
+        "f1": 0.6776222878418282
+      },
+      "falseAccusations": 2711,
+      "missedUnexpected": 3,
+      "cpuMs": 36891.153775001294,
+      "categories": {
+        "silence": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": null,
+          "recall": null,
+          "f1": null
+        },
+        "single": {
+          "tp": 65,
+          "fp": 549,
+          "fn": 1,
+          "precision": 0.10586319218241043,
+          "recall": 0.9848484848484849,
+          "f1": 0.19117647058823528
+        },
+        "dyad": {
+          "tp": 22,
+          "fp": 114,
+          "fn": 2,
+          "precision": 0.16176470588235295,
+          "recall": 0.9166666666666666,
+          "f1": 0.275
+        },
+        "chord": {
+          "tp": 57,
+          "fp": 166,
+          "fn": 12,
+          "precision": 0.2556053811659193,
+          "recall": 0.8260869565217391,
+          "f1": 0.3904109589041096
+        },
+        "masking": {
+          "tp": 7,
+          "fp": 29,
+          "fn": 2,
+          "precision": 0.19444444444444445,
+          "recall": 0.7777777777777778,
+          "f1": 0.3111111111111111
+        },
+        "error": {
+          "tp": 93,
+          "fp": 305,
+          "fn": 3,
+          "precision": 0.23366834170854273,
+          "recall": 0.96875,
+          "f1": 0.3765182186234818
+        },
+        "repeated": {
+          "tp": 172,
+          "fp": 793,
+          "fn": 29,
+          "precision": 0.17823834196891192,
+          "recall": 0.8557213930348259,
+          "f1": 0.2950257289879931
+        },
+        "sequence": {
+          "tp": 12,
+          "fp": 44,
+          "fn": 0,
+          "precision": 0.21428571428571427,
+          "recall": 1,
+          "f1": 0.35294117647058826
+        },
+        "strum": {
+          "tp": 64,
+          "fp": 216,
+          "fn": 26,
+          "precision": 0.22857142857142856,
+          "recall": 0.7111111111111111,
+          "f1": 0.34594594594594597
+        },
+        "overlap": {
+          "tp": 11,
+          "fp": 29,
+          "fn": 1,
+          "precision": 0.275,
+          "recall": 0.9166666666666666,
+          "f1": 0.4230769230769231
+        },
+        "bend": {
+          "tp": 3,
+          "fp": 38,
+          "fn": 0,
+          "precision": 0.07317073170731707,
+          "recall": 1,
+          "f1": 0.13636363636363635
+        },
+        "mnx": {
+          "tp": 6,
+          "fp": 34,
+          "fn": 0,
+          "precision": 0.15,
+          "recall": 1,
+          "f1": 0.2608695652173913
+        },
+        "restrike": {
+          "tp": 6,
+          "fp": 23,
+          "fn": 3,
+          "precision": 0.20689655172413793,
+          "recall": 0.6666666666666666,
+          "f1": 0.3157894736842105
+        },
+        "arpeggio": {
+          "tp": 80,
+          "fp": 371,
+          "fn": 4,
+          "precision": 0.17738359201773837,
+          "recall": 0.9523809523809523,
+          "f1": 0.29906542056074764
+        }
+      },
+      "presets": {
+        "guitar": {
+          "tp": 187,
+          "fp": 596,
+          "fn": 40,
+          "precision": 0.2388250319284802,
+          "recall": 0.8237885462555066,
+          "f1": 0.3702970297029703
+        },
+        "guitar2": {
+          "tp": 201,
+          "fp": 1061,
+          "fn": 26,
+          "precision": 0.15927099841521394,
+          "recall": 0.8854625550660793,
+          "f1": 0.2699798522498321
+        },
+        "piano": {
+          "tp": 210,
+          "fp": 1054,
+          "fn": 17,
+          "precision": 0.1661392405063291,
+          "recall": 0.9251101321585903,
+          "f1": 0.28169014084507044
+        }
+      }
+    }
+  ],
+  "heldout": {
+    "selectionHash": "58b1115d56d34ca611a17fe7cf8552c139c14d49002550445b33d2d215874e7a",
+    "manifestHash": "43026ed63a17e63b79406ddf31872f648168f4cc9785385501339f22a2eef193",
+    "summaries": [
+      {
+        "strength": 0,
+        "onset": {
+          "tp": 64,
+          "fp": 462,
+          "fn": 32,
+          "precision": 0.12167300380228137,
+          "recall": 0.6666666666666666,
+          "f1": 0.2057877813504823
+        },
+        "active": {
+          "tp": 2464,
+          "fp": 3386,
+          "fn": 2114,
+          "precision": 0.4211965811965812,
+          "recall": 0.5382262996941896,
+          "f1": 0.47257383966244726
+        },
+        "falseAccusations": 462,
+        "missedUnexpected": 0,
+        "cpuMs": 6052.8160800000005,
+        "categories": {
+          "silence": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+            "precision": null,
+            "recall": null,
+            "f1": null
+          },
+          "single": {
+            "tp": 7,
+            "fp": 106,
+            "fn": 5,
+            "precision": 0.061946902654867256,
+            "recall": 0.5833333333333334,
+            "f1": 0.112
+          },
+          "mixture": {
+            "tp": 2,
+            "fp": 34,
+            "fn": 4,
+            "precision": 0.05555555555555555,
+            "recall": 0.3333333333333333,
+            "f1": 0.09523809523809523
+          },
+          "octave": {
+            "tp": 8,
+            "fp": 75,
+            "fn": 4,
+            "precision": 0.0963855421686747,
+            "recall": 0.6666666666666666,
+            "f1": 0.16842105263157894
+          },
+          "chord": {
+            "tp": 8,
+            "fp": 40,
+            "fn": 4,
+            "precision": 0.16666666666666666,
+            "recall": 0.6666666666666666,
+            "f1": 0.26666666666666666
+          },
+          "repeated": {
+            "tp": 6,
+            "fp": 34,
+            "fn": 3,
+            "precision": 0.15,
+            "recall": 0.6666666666666666,
+            "f1": 0.24489795918367346
+          },
+          "arpeggio": {
+            "tp": 5,
+            "fp": 49,
+            "fn": 4,
+            "precision": 0.09259259259259259,
+            "recall": 0.5555555555555556,
+            "f1": 0.15873015873015872
+          },
+          "strum": {
+            "tp": 11,
+            "fp": 64,
+            "fn": 7,
+            "precision": 0.14666666666666667,
+            "recall": 0.6111111111111112,
+            "f1": 0.23655913978494625
+          },
+          "error": {
+            "tp": 17,
+            "fp": 60,
+            "fn": 1,
+            "precision": 0.22077922077922077,
+            "recall": 0.9444444444444444,
+            "f1": 0.35789473684210527
+          }
+        },
+        "presets": {
+          "guitar": {
+            "tp": 18,
+            "fp": 139,
+            "fn": 14,
+            "precision": 0.11464968152866242,
+            "recall": 0.5625,
+            "f1": 0.19047619047619047
+          },
+          "guitar2": {
+            "tp": 26,
+            "fp": 175,
+            "fn": 6,
+            "precision": 0.12935323383084577,
+            "recall": 0.8125,
+            "f1": 0.22317596566523606
+          },
+          "piano": {
+            "tp": 20,
+            "fp": 148,
+            "fn": 12,
+            "precision": 0.11904761904761904,
+            "recall": 0.625,
+            "f1": 0.2
+          }
+        }
+      },
+      {
+        "strength": 0.67,
+        "onset": {
+          "tp": 85,
+          "fp": 430,
+          "fn": 11,
+          "precision": 0.1650485436893204,
+          "recall": 0.8854166666666666,
+          "f1": 0.27823240589198034
+        },
+        "active": {
+          "tp": 3391,
+          "fp": 2657,
+          "fn": 1187,
+          "precision": 0.560681216931217,
+          "recall": 0.7407164700742682,
+          "f1": 0.6382458121588557
+        },
+        "falseAccusations": 430,
+        "missedUnexpected": 0,
+        "cpuMs": 7659.770308000003,
+        "categories": {
+          "silence": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 0,
+            "precision": null,
+            "recall": null,
+            "f1": null
+          },
+          "single": {
+            "tp": 11,
+            "fp": 113,
+            "fn": 1,
+            "precision": 0.08870967741935484,
+            "recall": 0.9166666666666666,
+            "f1": 0.16176470588235295
+          },
+          "mixture": {
+            "tp": 5,
+            "fp": 57,
+            "fn": 1,
+            "precision": 0.08064516129032258,
+            "recall": 0.8333333333333334,
+            "f1": 0.14705882352941177
+          },
+          "octave": {
+            "tp": 11,
+            "fp": 80,
+            "fn": 1,
+            "precision": 0.12087912087912088,
+            "recall": 0.9166666666666666,
+            "f1": 0.21359223300970873
+          },
+          "chord": {
+            "tp": 9,
+            "fp": 29,
+            "fn": 3,
+            "precision": 0.23684210526315788,
+            "recall": 0.75,
+            "f1": 0.36
+          },
+          "repeated": {
+            "tp": 6,
+            "fp": 25,
+            "fn": 3,
+            "precision": 0.1935483870967742,
+            "recall": 0.6666666666666666,
+            "f1": 0.3
+          },
+          "arpeggio": {
+            "tp": 9,
+            "fp": 40,
+            "fn": 0,
+            "precision": 0.1836734693877551,
+            "recall": 1,
+            "f1": 0.3103448275862069
+          },
+          "strum": {
+            "tp": 16,
+            "fp": 44,
+            "fn": 2,
+            "precision": 0.26666666666666666,
+            "recall": 0.8888888888888888,
+            "f1": 0.41025641025641024
+          },
+          "error": {
+            "tp": 18,
+            "fp": 42,
+            "fn": 0,
+            "precision": 0.3,
+            "recall": 1,
+            "f1": 0.46153846153846156
+          }
+        },
+        "presets": {
+          "guitar": {
+            "tp": 25,
+            "fp": 138,
+            "fn": 7,
+            "precision": 0.15337423312883436,
+            "recall": 0.78125,
+            "f1": 0.2564102564102564
+          },
+          "guitar2": {
+            "tp": 29,
+            "fp": 161,
+            "fn": 3,
+            "precision": 0.15263157894736842,
+            "recall": 0.90625,
+            "f1": 0.26126126126126126
+          },
+          "piano": {
+            "tp": 31,
+            "fp": 131,
+            "fn": 1,
+            "precision": 0.19135802469135801,
+            "recall": 0.96875,
+            "f1": 0.31958762886597936
+          }
+        }
+      }
+    ],
+    "costs": [
+      {
+        "0": 6052.8160800000005,
+        "0.67": 7659.770308000003
+      },
+      {
+        "0": 6328.65976399976,
+        "0.67": 8138.29264600002
+      },
+      {
+        "0": 5939.644500999624,
+        "0.67": 7520.17279500021
+      }
+    ],
+    "cpuRatio": 1.2654886926615492,
+    "commonLatency": {
+      "matches": 63,
+      "parentP95": 0.16725172756462536,
+      "candidateP95": 0.12893649161904785,
+      "increase": -0.03831523594557751
+    },
+    "gates": {
+      "changed": true,
+      "precision": true,
+      "recall": true,
+      "f1": true,
+      "falseAccusations": true,
+      "active": true,
+      "categories": true,
+      "cpu": false,
+      "commonLatency": true
+    }
+  },
+  "diagnostics": [
+    {
+      "id": "45",
+      "strength": 0,
+      "onset": {
+        "tp": 0,
+        "fp": 14,
+        "fn": 1,
+        "precision": 0,
+        "recall": 0,
+        "f1": 0
+      }
+    },
+    {
+      "id": "40",
+      "strength": 0,
+      "onset": {
+        "tp": 0,
+        "fp": 12,
+        "fn": 1,
+        "precision": 0,
+        "recall": 0,
+        "f1": 0
+      }
+    },
+    {
+      "id": "69",
+      "strength": 0,
+      "onset": {
+        "tp": 1,
+        "fp": 2,
+        "fn": 0,
+        "precision": 0.3333333333333333,
+        "recall": 1,
+        "f1": 0.5
+      }
+    },
+    {
+      "id": "40-69",
+      "strength": 0,
+      "onset": {
+        "tp": 0,
+        "fp": 11,
+        "fn": 2,
+        "precision": 0,
+        "recall": 0,
+        "f1": 0
+      }
+    },
+    {
+      "id": "private-bars5-8",
+      "strength": 0,
+      "onset": {
+        "tp": 16,
+        "fp": 27,
+        "fn": 5,
+        "precision": 0.37209302325581395,
+        "recall": 0.7619047619047619,
+        "f1": 0.5
+      }
+    },
+    {
+      "id": "45",
+      "strength": 0.25,
+      "onset": {
+        "tp": 1,
+        "fp": 18,
+        "fn": 0,
+        "precision": 0.05263157894736842,
+        "recall": 1,
+        "f1": 0.1
+      }
+    },
+    {
+      "id": "40",
+      "strength": 0.25,
+      "onset": {
+        "tp": 0,
+        "fp": 12,
+        "fn": 1,
+        "precision": 0,
+        "recall": 0,
+        "f1": 0
+      }
+    },
+    {
+      "id": "69",
+      "strength": 0.25,
+      "onset": {
+        "tp": 1,
+        "fp": 1,
+        "fn": 0,
+        "precision": 0.5,
+        "recall": 1,
+        "f1": 0.6666666666666666
+      }
+    },
+    {
+      "id": "40-69",
+      "strength": 0.25,
+      "onset": {
+        "tp": 0,
+        "fp": 12,
+        "fn": 2,
+        "precision": 0,
+        "recall": 0,
+        "f1": 0
+      }
+    },
+    {
+      "id": "private-bars5-8",
+      "strength": 0.25,
+      "onset": {
+        "tp": 16,
+        "fp": 31,
+        "fn": 5,
+        "precision": 0.3404255319148936,
+        "recall": 0.7619047619047619,
+        "f1": 0.47058823529411764
+      }
+    },
+    {
+      "id": "45",
+      "strength": 0.5,
+      "onset": {
+        "tp": 1,
+        "fp": 17,
+        "fn": 0,
+        "precision": 0.05555555555555555,
+        "recall": 1,
+        "f1": 0.10526315789473684
+      }
+    },
+    {
+      "id": "40",
+      "strength": 0.5,
+      "onset": {
+        "tp": 0,
+        "fp": 16,
+        "fn": 1,
+        "precision": 0,
+        "recall": 0,
+        "f1": 0
+      }
+    },
+    {
+      "id": "69",
+      "strength": 0.5,
+      "onset": {
+        "tp": 1,
+        "fp": 1,
+        "fn": 0,
+        "precision": 0.5,
+        "recall": 1,
+        "f1": 0.6666666666666666
+      }
+    },
+    {
+      "id": "40-69",
+      "strength": 0.5,
+      "onset": {
+        "tp": 1,
+        "fp": 15,
+        "fn": 1,
+        "precision": 0.0625,
+        "recall": 0.5,
+        "f1": 0.1111111111111111
+      }
+    },
+    {
+      "id": "private-bars5-8",
+      "strength": 0.5,
+      "onset": {
+        "tp": 19,
+        "fp": 35,
+        "fn": 2,
+        "precision": 0.35185185185185186,
+        "recall": 0.9047619047619048,
+        "f1": 0.5066666666666667
+      }
+    },
+    {
+      "id": "45",
+      "strength": 0.67,
+      "onset": {
+        "tp": 1,
+        "fp": 18,
+        "fn": 0,
+        "precision": 0.05263157894736842,
+        "recall": 1,
+        "f1": 0.1
+      }
+    },
+    {
+      "id": "40",
+      "strength": 0.67,
+      "onset": {
+        "tp": 0,
+        "fp": 16,
+        "fn": 1,
+        "precision": 0,
+        "recall": 0,
+        "f1": 0
+      }
+    },
+    {
+      "id": "69",
+      "strength": 0.67,
+      "onset": {
+        "tp": 1,
+        "fp": 2,
+        "fn": 0,
+        "precision": 0.3333333333333333,
+        "recall": 1,
+        "f1": 0.5
+      }
+    },
+    {
+      "id": "40-69",
+      "strength": 0.67,
+      "onset": {
+        "tp": 1,
+        "fp": 19,
+        "fn": 1,
+        "precision": 0.05,
+        "recall": 0.5,
+        "f1": 0.09090909090909091
+      }
+    },
+    {
+      "id": "private-bars5-8",
+      "strength": 0.67,
+      "onset": {
+        "tp": 19,
+        "fp": 30,
+        "fn": 2,
+        "precision": 0.3877551020408163,
+        "recall": 0.9047619047619048,
+        "f1": 0.5428571428571428
+      }
+    }
+  ]
+}

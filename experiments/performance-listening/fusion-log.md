@@ -11,17 +11,19 @@ neighbour competition removes most F-002 extra false attacks with minimal loss o
 attacks and exact parent pitch coverage. It still fails the no-extra-accusations gate.
 F-004 lower-harmonic competition is parked: one regression false attack removed, no new
 held-out benefit. These two iterations stop here; octave attribution needs further evidence.
-[Latest comparison](findings/fusion-harmonic-attribution-v1/README.md). Local budgets remain
+[Latest comparison](findings/fusion-whitening-v1/README.md). Local budgets remain
 25% extra processing and 25 ms pooled/common-match p95 increase; target device unselected.
 
 Two agreed next experiments are **partial spectral whitening** and **flexible harmonic modelling**.
-Both are unimplemented and untried; measure separately before trying a combination.
+Whitening is now measured as F-005: improved coverage, but development regressions and
+26.5% fresh processing overhead block adoption. The flexible model remains untried;
+measure it separately before trying a combination.
 
 ## Technique index
 
 | Technique | Evidence / disposition | Current lesson or question |
 |---|---|---|
-| [Partial spectral whitening](fusion-techniques/spectral-whitening.md) | Agreed experiment; untried | Reduce timbre dependence through a smooth spectral envelope, with bounded gain |
+| [Partial spectral whitening](fusion-techniques/spectral-whitening.md) | F-005 measured; revise | Recovers A2 and mixed A4; E2 remains missed; regressions/cost block adoption |
 | [Flexible harmonic model](fusion-techniques/flexible-harmonic-model.md) | Agreed experiment; untried | Tolerate weak fundamentals while preserving genuinely played higher notes |
 | [Harmonic evidence](fusion-techniques/harmonic-evidence.md) | Measured baseline; candidate | Cheap, noisy attacks; retain as an analytical baseline |
 | [Recorded templates](fusion-techniques/recorded-templates.md) | Measured baseline; parked for general use | Large timbre-transfer loss; reconsider for an explicit personalisation experiment |
@@ -48,6 +50,7 @@ failure when a later configuration works.
 | FL-006 · 2026-09-13 | [F-003 neighbour attribution: PA-001/002](fusion-techniques/pitch-attribution.md) | 168 regression + 42 fresh cases; removes 16/23 and 10/11 F-002 added false attacks; selected ratio 1, still revise |
 | FL-007 · 2026-09-13 | [F-004 lower-harmonic competition: PA-003/004](fusion-techniques/pitch-attribution.md) | 210 regression + 42 fresh cases; one regression false removed, identical held-out TP/FP/FN; park and stop this batch |
 | FL-008 · 2026-09-13 | Agree [whitening](fusion-techniques/spectral-whitening.md) and [flexible harmonic modelling](fusion-techniques/flexible-harmonic-model.md) experiments after private four-bar diagnosis | No implementation or trial yet; isolate each contribution, then consider combination; F-003 and defaults unchanged |
+| FL-009 · 2026-09-13 | [F-005 partial whitening: SW-001…003](fusion-techniques/spectral-whitening.md) | 252 development + 42 fresh; coverage improves, four-bar attacks 16→19/21; development extras/category regressions and +26.5% cost block adoption; keep optional |
 
 ## Candidate next experiments
 
