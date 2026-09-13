@@ -9,7 +9,8 @@ The element supplies Play/Pause, Stop, a scrubber over the performed order, rate
 (0.25×–2× in 0.05 steps), and master volume. API ordinals and `at=` links are
 zero-based. The position readout prints the place as one dotted number — `# 21.4` is
 bar 21 beat 4, `# 21.4.5` half a beat in, so bar, beat and sub-beat read together — then
-which pass this is and how many the bar gets (`iteration 2 of 3`). On a repeated bar the iteration is a
+which pass this is and how many the bar gets (`pass 2 of 3`; a bar played once shows no pass
+at all). On a repeated bar the pass is a
 control: it opens a menu of the bar's passes — the verses — and picking one seeks to the
 same bar in that pass, which is what the performed-order table used to be for. The readout uses a pure helper, including
 inherited meter, authored bar numbers, and explicit hold/grace labels. Tenths of a

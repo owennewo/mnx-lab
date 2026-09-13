@@ -12,7 +12,7 @@ it('formats performed ordinals, written bar numbers, meter beats and inserted ho
   if (!result.ok) throw new Error('compile failed');
   const p = result.performance;
   doc.global.measures[0]!.number = 5;
-  expect(formatPlaybackPosition(p, q(1n, 2n), doc)).toBe('# 5.3 · iteration 1 of 1');
+  expect(formatPlaybackPosition(p, q(1n, 2n), doc)).toBe('# 5.3');
   p.measures[0]!.iteration = 2;
   p.sourceMap = [
     {
@@ -23,7 +23,7 @@ it('formats performed ordinals, written bar numbers, meter beats and inserted ho
       sources: [{ ordinal: 0, metricOffset: q(1n, 2n) }],
     },
   ];
-  expect(formatPlaybackPosition(p, q(1n, 2n), doc)).toBe('# 5.3 · iteration 2 of 2 · hold');
+  expect(formatPlaybackPosition(p, q(1n, 2n), doc)).toBe('# 5.3 · pass 2 of 2 · hold');
   expect(measureAt(p, q(1n))).toBeUndefined();
   expect(formatPlaybackPosition(p, q(1n), doc)).toBe('End');
 });
@@ -35,7 +35,7 @@ it('reserves the widest label a performance can print, so the readout never resi
   if (!result.ok) throw new Error('compile failed');
   const p = result.performance;
   // One 4/4 bar: the last beat label is 4.x, and every label fits inside.
-  expect(widestPlaybackPosition(p, doc)).toBe('# 1.4.5 · iteration 1 of 1');
+  expect(widestPlaybackPosition(p, doc)).toBe('# 1.4.5');
   for (const num of [0n, 1n, 2n, 3n]) {
     const label = formatPlaybackPosition(p, q(num, 4n), doc);
     expect(label.length).toBeLessThanOrEqual(widestPlaybackPosition(p, doc).length);
@@ -45,7 +45,7 @@ it('reserves the widest label a performance can print, so the readout never resi
   p.sourceMap = [
     { kind: 'fermata', position: ZERO, duration: q(1n), metricPosition: ZERO, sources: [{ ordinal: 0, metricOffset: ZERO }] },
   ];
-  expect(widestPlaybackPosition(p, doc)).toBe('# 128.4.5 · iteration 3 of 3 · hold');
+  expect(widestPlaybackPosition(p, doc)).toBe('# 128.4.5 · pass 3 of 3 · hold');
   expect(widestPlaybackPosition({ ...p, measures: [] }, doc)).toBe('Ready');
 });
 it('counts a bar\'s passes and lists them in performed order', () => {
@@ -58,17 +58,17 @@ it('counts a bar\'s passes and lists them in performed order', () => {
   // A bar under a repeat is visited twice; the readout says which pass this is.
   const repeated = p.measures.find((m) => m.iteration === 2);
   if (!repeated) throw new Error('expected a repeated bar in scenarios/spec/repeats');
-  expect(formatPlaybackPosition(p, repeated.position, doc)).toMatch(/iteration 2 of 2/);
+  expect(formatPlaybackPosition(p, repeated.position, doc)).toMatch(/pass 2 of 2/);
   const first = p.measures.find((m) => m.measureIndex === repeated.measureIndex && m.iteration === 1)!;
   expect(passesOf(p, repeated.measureIndex)).toEqual([first, repeated]);
   expect(passesOf(p, 999)).toEqual([]);
-  // The parts the tray renders the iteration control from agree with the label.
+  // The parts the tray renders the pass control from agree with the label.
   const parts = playbackPositionParts(p, repeated.position, doc)!;
   expect(parts.ordinal).toBe(repeated.ordinal);
   expect(parts.iteration).toBe(2);
   expect(parts.iterations).toBe(2);
   expect(formatPlaybackPosition(p, repeated.position, doc)).toBe(
-    `# ${parts.bar}.${parts.beat} · iteration 2 of 2`,
+    `# ${parts.bar}.${parts.beat} · pass 2 of 2`,
   );
   expect(playbackPositionParts(p, q(-1n), doc)).toBeNull();
 });

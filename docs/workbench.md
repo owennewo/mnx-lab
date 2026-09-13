@@ -108,7 +108,7 @@ horizontal row of music, including both staves in Both. The card supports keyboa
 navigation and Escape/focus return, and dismisses on click-away.
 
 **Playback** lives in the frame's bottom grip: the player's tray (transport, a scrubber over
-the performed order, the iteration's pass menu, sound, rate, volume) draws out under the
+the performed order, the pass menu, sound, rate, volume) draws out under the
 score. The host keeps playback context separate from editor selection, stops/recompiles on
 edits, and accepts an optional zero-based `at=` ordinal in scenario links.
 [Player element and lifecycle](player-element.md).

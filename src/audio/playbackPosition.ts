@@ -11,7 +11,7 @@ export function measureAt(
   );
 }
 /** How many times the performance visits this written measure — the last
- *  iteration it reaches, so a readout can say `iteration 2 of 3`. */
+ *  iteration it reaches, so a readout can say `pass 2 of 3`. */
 export function iterationsOf(performance: Performance, measureIndex: number): number {
   let last = 1;
   for (const m of performance.measures)
@@ -85,6 +85,15 @@ export function scorePlaybackPositionParts(performance: Performance, position: S
 export function placeLabel(parts: Pick<PlaybackPositionParts, 'bar' | 'beat'>): string {
   return `# ${parts.bar}.${parts.beat}`;
 }
+/** Which pass through the bar this is — `pass 2 of 3` — or nothing at all on
+ *  a bar the performance plays once: `pass 1 of 1` tells the reader nothing. */
+export function passLabel(parts: Pick<PlaybackPositionParts, 'iteration' | 'iterations'>): string {
+  return parts.iterations > 1 ? `pass ${parts.iteration} of ${parts.iterations}` : '';
+}
+/** The readout's segments in order, empties dropped: place · pass · hold/grace. */
+export function readoutSegments(parts: PlaybackPositionParts): string[] {
+  return [placeLabel(parts), passLabel(parts), parts.insertion ?? ''].filter((s) => s !== '');
+}
 export function formatPlaybackPosition(
   performance: Performance,
   position: Rational,
@@ -92,11 +101,11 @@ export function formatPlaybackPosition(
 ): string {
   const parts = playbackPositionParts(performance, position, document);
   if (!parts) return compare(position, ZERO) === 0 ? 'Ready' : 'End';
-  return `${placeLabel(parts)} · iteration ${parts.iteration} of ${parts.iterations}${parts.insertion ? ` · ${parts.insertion}` : ''}`;
+  return readoutSegments(parts).join(' · ');
 }
 export function formatScorePlaybackPosition(performance: Performance, position: ScorePosition, document?: MnxStructure): string {
   const parts = scorePlaybackPositionParts(performance, position, document);
-  return parts ? `${placeLabel(parts)} · iteration ${parts.iteration} of ${parts.iterations}` : 'End';
+  return parts ? readoutSegments({ ...parts, insertion: null }).join(' · ') : 'End';
 }
 /**
  * The widest label `formatPlaybackPosition` can print for this performance,
@@ -129,5 +138,6 @@ export function widestPlaybackPosition(performance: Performance, document?: MnxS
   }
   const kinds = new Set(performance.sourceMap.map((s) => s.kind));
   const suffix = kinds.has('makeTime') ? ' · grace' : kinds.has('fermata') ? ' · hold' : '';
-  return `${placeLabel({ bar, beat: `${beat}.5` })} · iteration ${iteration} of ${iteration}${suffix}`;
+  const pass = passLabel({ iteration, iterations: iteration });
+  return `${placeLabel({ bar, beat: `${beat}.5` })}${pass ? ` · ${pass}` : ''}${suffix}`;
 }

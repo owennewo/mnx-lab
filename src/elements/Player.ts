@@ -18,7 +18,7 @@ import {
   type VoicePreset,
 } from '../audio/sampleSelection.ts';
 import type { SamplePackLoader } from '../audio/native/samplePacks.ts';
-import { formatPlaybackPosition, formatScorePlaybackPosition, measureAt, passesOf, placeLabel, playbackPositionParts, scorePlaybackPositionParts, widestPlaybackPosition } from '../audio/playbackPosition.ts';
+import { formatPlaybackPosition, formatScorePlaybackPosition, measureAt, passLabel, passesOf, placeLabel, playbackPositionParts, scorePlaybackPositionParts, widestPlaybackPosition } from '../audio/playbackPosition.ts';
 import { ZERO, type Rational } from '../audio/time.ts';
 import type { MnxStructure } from '../model/mnx.ts';
 import type { PlaybackUpdate } from './mnxContext.ts';
@@ -54,7 +54,7 @@ export class Player extends LitElement {
    * 2026-09-12): the shared tokens, 40px controls so the tray is catchable on
    * glass, the transport as glyphs on the accent, and a scrubber over the
    * performed order. The order table is gone: the readout says which pass
-   * this is of how many, and on a repeated bar that iteration opens a menu
+   * this is of how many, and on a repeated bar that pass opens a menu
    * of the passes — the frame the tray lives in is a strip over the score,
    * not a panel beside it.
    */
@@ -175,7 +175,7 @@ export class Player extends LitElement {
       color: var(--ink);
       min-width: 5ch;
     }
-    /* The iteration in the readout is a control on a repeated bar: a dotted
+    /* The pass in the readout is a control on a repeated bar: a dotted
        word that opens a menu of the bar's passes above the tray — the verses
        — each seeking to that pass. The invisible widest copy carries the
        same caret so the reserved width still matches. */
@@ -486,17 +486,19 @@ export class Player extends LitElement {
   private static caret() {
     return svg`<svg class="caret" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5z" fill="currentColor"></path></svg>`;
   }
-  /** The live readout: the iteration becomes a menu of the bar's passes when it has more than one. */
+  /** The live readout: the pass becomes a menu of the bar's passes when it has more than one;
+   *  a bar played once shows no pass at all. */
   private readout() {
     if (!this.performance) return nothing;
     const parts = this.sourceId === 'synth' ? playbackPositionParts(this.performance, this.position, this.document)
       : this.scorePosition ? scorePlaybackPositionParts(this.performance, this.scorePosition, this.document) : null;
     if (!parts) return this.positionLabel;
     const passes = passesOf(this.performance, parts.measureIndex);
-    const place = `${placeLabel(parts)} · `;
-    const iteration = `iteration ${parts.iteration} of ${parts.iterations}`;
+    const pass = passLabel(parts);
     const tail = parts.insertion ? ` · ${parts.insertion}` : '';
-    if (passes.length < 2) return `${place}${iteration}${tail}`;
+    if (!pass) return `${placeLabel(parts)}${tail}`;
+    const place = `${placeLabel(parts)} · `;
+    if (passes.length < 2) return `${place}${pass}${tail}`;
     return html`${place}<span class="passes"
         ><button
           type="button"
@@ -504,7 +506,7 @@ export class Player extends LitElement {
           aria-expanded=${this.passesOpen}
           title="Choose which pass of this bar to play"
           @click=${() => (this.passesOpen = !this.passesOpen)}
-        >${iteration}${Player.caret()}</button
+        >${pass}${Player.caret()}</button
         >${this.passesOpen
           ? html`<div class="pass-menu" role="menu" aria-label="Passes of this bar">
               ${passes.map(
@@ -516,7 +518,7 @@ export class Player extends LitElement {
                     this.passesOpen = false;
                     this.seek(m.ordinal);
                   }}
-                >iteration ${m.iteration}</button>`,
+                >pass ${m.iteration}</button>`,
               )}
             </div>`
           : nothing}</span
