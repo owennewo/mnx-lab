@@ -297,7 +297,8 @@ export class LibraryPage extends LitElement {
   private visible(): LibraryPiece[] {
     const words = parseTag(this.query) ? '' : this.query.trim().toLowerCase();
     if (!words) return this.pieces;
-    return this.pieces.filter(p => (p.title ?? '').toLowerCase().includes(words) || (p.artist ?? '').toLowerCase().includes(words));
+    // Words find what a row shows: its title, its artist and its chips (part, tuning, capo, lists).
+    return this.pieces.filter(p => [p.title, p.artist, ...p.chips.map(c => chipText(c.dimension, c.value))].some(text => (text ?? '').toLowerCase().includes(words)));
   }
 
   render() {
@@ -330,7 +331,7 @@ export class LibraryPage extends LitElement {
         <div class="tools">
           <form class="search" @submit=${this.onSubmit}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"></circle><path d="M20 20l-4.2-4.2"></path></svg>
-            <input aria-label="Search titles and artists, or type a tag" placeholder="Search, or type a tag — capo:3, tuning-name:drop D" list="suggest" maxlength="512" .value=${this.query} @input=${this.onInput} @keydown=${(event: KeyboardEvent) => this.onResultKeydown(event)} />
+            <input aria-label="Search titles, artists and tags, or type a tag filter" placeholder="Search titles, artists, tags — or filter: capo:3, part:Ukulele" list="suggest" maxlength="512" .value=${this.query} @input=${this.onInput} @keydown=${(event: KeyboardEvent) => this.onResultKeydown(event)} />
             <datalist id="suggest">${this.suggestions.map(f => html`<option value=${tagOf(f.dimension, f.value)}>${f.pieces} piece${f.pieces === 1 ? '' : 's'}</option>`)}</datalist>
           </form>
           <div class="sort" role="group" aria-label="Sort">${SORTS.map(s => html`<button class=${this.sort === s.id ? 'on' : ''} @click=${() => this.setSort(s.id)}>${s.label}</button>`)}</div>

@@ -41,8 +41,9 @@ hash — effectively random.
 - **Tags read from the music are never edited in place.** The pencil on one creates an
   alias. Your own tags are added, removed and renamed freely; derived dimensions cannot be
   asserted (the module already refuses that).
-- **One search box does both jobs.** Words match title and artist; `dimension:value`
-  becomes a filter chip, the same chip the rail produces.
+- **One search box does both jobs.** Words match title, artist and the row's chips
+  (part, tuning name, capo, lists); `dimension:value` becomes a filter chip, the same
+  chip the rail produces.
 
 ## Backend
 
