@@ -5,7 +5,7 @@
 import { LitElement, css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { LibraryClient, LibraryRequestError, type LibraryFacet, type LibraryPiece, type LibrarySort } from '../../../src/storage/libraryClient.ts';
-import { pieceHref, aliasesHref } from './StudioApp.ts';
+import { pieceHref, aliasesHref, parseHash, parseLibraryHash, libraryViewHref, rememberLibraryHref } from './StudioApp.ts';
 import { FAVOURITE, RAIL_HIDDEN, RAIL_ORDER, chipText, dimensionLabel, parseTag, relativeTime } from './labels.ts';
 
 import { openLocalFile } from '../../../src/importers/localFile.ts';
@@ -15,6 +15,11 @@ import { preparePdfView, renderPdfView } from './pdfExport.ts';
 const SORTS: { id: LibrarySort; label: string }[] = [{ id: 'recent', label: 'Recent' }, { id: 'title', label: 'Title' }, { id: 'artist', label: 'Artist' }];
 const MAX_FILTERS = 12;
 const tagOf = (dimension: string, value: string) => `${dimension}:${value}`;
+
+/** The list as it was left, in memory only: opening a piece unmounts the page,
+ *  and coming back to the same view shows this at once — every page "More"
+ *  reached, at the same scroll — while a quiet reload catches up. */
+let kept: { href: string; pieces: LibraryPiece[]; next: string | null; facets: LibraryFacet[]; total: number; scroll: number } | null = null;
 
 const star = (filled: boolean) => html`<svg width="18" height="18" viewBox="0 0 24 24" fill=${filled ? 'var(--accent)' : 'none'} stroke=${filled ? 'var(--accent)' : 'var(--ink-dim)'} stroke-width="1.6" stroke-linejoin="round"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1.1 5.9L12 16.9l-5.3 2.8 1.1-5.9-4.3-4.1 5.9-.8z"></path></svg>`;
 const chevron = (open: boolean) => html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d=${open ? 'M6 9l6 6 6-6' : 'M9 6l6 6-6 6'}></path></svg>`;
@@ -92,16 +97,62 @@ export class LibraryPage extends LitElement {
     @media (max-width: 720px) { .rail { display: none; } }
   `;
 
+  /** The page's scroll container is the shell's <main>. */
+  private get scroller(): HTMLElement | null { return this.parentElement; }
+  private readonly onScroll = () => { if (kept) kept.scroll = this.scroller?.scrollTop ?? 0; };
+  private restoreScroll = 0;
+
   connectedCallback() {
     super.connectedCallback();
-    void this.load();
+    this.adopt(location.hash);
+    const href = this.href();
+    if (kept?.href === href) {
+      ({ pieces: this.pieces, next: this.next, facets: this.facets, total: this.total, scroll: this.restoreScroll } = kept);
+      void this.load(false, this.pieces.length);
+    } else {
+      kept = null;
+      void this.load();
+    }
+    window.addEventListener('hashchange', this.onHashChange);
+    this.scroller?.addEventListener('scroll', this.onScroll, { passive: true });
+  }
+
+  disconnectedCallback() {
+    window.removeEventListener('hashchange', this.onHashChange);
+    this.scroller?.removeEventListener('scroll', this.onScroll);
+    super.disconnectedCallback();
   }
 
   protected firstUpdated() {
-    this.renderRoot.querySelector<HTMLInputElement>('.search input')?.focus();
+    this.renderRoot.querySelector<HTMLInputElement>('.search input')?.focus({ preventScroll: true });
+    if (this.restoreScroll && this.scroller) this.scroller.scrollTop = this.restoreScroll;
   }
 
-  private async load(more = false) {
+  protected updated() {
+    // The URL follows the view in place — no history entry per filter — so the
+    // entry a piece was opened from is the list it was opened from.
+    const href = this.href();
+    rememberLibraryHref(href);
+    if (parseHash(location.hash).page === 'library' && (location.hash || '#/') !== href) history.replaceState(history.state, '', href);
+    kept = { href, pieces: this.pieces, next: this.next, facets: this.facets, total: this.total, scroll: kept?.href === href ? kept.scroll : 0 };
+  }
+
+  private href(): string { return libraryViewHref({ filters: this.filters, sort: this.sort, query: this.query }); }
+
+  private adopt(hash: string) {
+    const view = parseLibraryHash(hash);
+    this.filters = view.filters.slice(0, MAX_FILTERS); this.sort = view.sort; this.query = view.query;
+  }
+
+  /** A library address arriving while the page is up (the brand link, an edited URL). */
+  private readonly onHashChange = () => {
+    if (parseHash(location.hash).page !== 'library' || libraryViewHref(parseLibraryHash(location.hash)) === this.href()) return;
+    this.adopt(location.hash); this.open = null; this.suggestions = [];
+    void this.load();
+  };
+
+  /** `atLeast`: coming back to a longer list, fetch as far as it reached and swap once. */
+  private async load(more = false, atLeast = 0) {
     const generation = ++this.generation;
     this.busy = true; this.error = '';
     try {
@@ -109,10 +160,17 @@ export class LibraryPage extends LitElement {
         more ? Promise.resolve({ total: this.total, facets: this.facets }) : this.client.facets(this.filters),
         this.client.pieces(this.filters, more ? (this.next ?? '') : '', this.sort),
       ]);
+      let pieces = more ? [...this.pieces, ...page.pieces] : page.pieces;
+      let next = page.next;
+      while (next && pieces.length < atLeast) {
+        const further = await this.client.pieces(this.filters, next, this.sort);
+        if (generation !== this.generation) return;
+        pieces = [...pieces, ...further.pieces]; next = further.next;
+      }
       if (generation !== this.generation) return;
       this.total = total; this.facets = facets;
-      this.pieces = more ? [...this.pieces, ...page.pieces] : page.pieces;
-      this.next = page.next;
+      this.pieces = pieces;
+      this.next = next;
       // Plain words filter what is loaded; keep loading while a search has more to see.
       if (this.query && !parseTag(this.query) && this.next && this.pieces.length < 500) void this.load(true);
     } catch (error) {

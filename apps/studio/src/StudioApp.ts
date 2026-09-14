@@ -4,12 +4,13 @@
 // so the shell's header is for the other pages only. Nothing fades on a timer
 // any more — a tap never restarted it. Three hash routes
 // (roadmap/inprogress/studio-shell.md):
-//   #/                 the library (tag-filtered browse)
+//   #/                 the library (tag-filtered browse); its view rides along as
+//                      #/?tag=list:80s&sort=title&q=words, so a way back returns to it
 //   #/piece/<id>       one piece, viewer + player filling the viewport
 //   #/not-permitted    Access admitted the address, D1 did not
 import { LitElement, css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { LibraryClient } from '../../../src/storage/libraryClient.ts';
+import { LibraryClient, type LibrarySort } from '../../../src/storage/libraryClient.ts';
 import { loadSession, signIn, type Session } from './session.ts';
 import { nextTheme, readTheme, resolvedTheme, setTheme, themeGlyph, type ThemeSetting } from './theme.ts';
 import './LibraryPage.ts';
@@ -33,6 +34,40 @@ export function parseHash(hash: string): Route {
 export const libraryHref = '#/';
 export const aliasesHref = '#/aliases';
 export const pieceHref = (id: string): string => `#/piece/${encodeURIComponent(id)}`;
+
+/** What the library's URL carries: enough to put the same list back. */
+export interface LibraryView {
+  filters: string[];
+  sort: LibrarySort;
+  query: string;
+}
+
+export function parseLibraryHash(hash: string): LibraryView {
+  const params = new URLSearchParams(/^#\/\?(.*)$/.exec(hash)?.[1] ?? '');
+  const sort = params.get('sort');
+  return { filters: params.getAll('tag'), sort: sort === 'title' || sort === 'artist' ? sort : 'recent', query: params.get('q') ?? '' };
+}
+
+export function libraryViewHref(view: LibraryView): string {
+  const params = new URLSearchParams();
+  view.filters.forEach(tag => params.append('tag', tag));
+  if (view.sort !== 'recent') params.set('sort', view.sort);
+  if (view.query) params.set('q', view.query);
+  const search = params.toString();
+  return search ? `#/?${search}` : libraryHref;
+}
+
+// The way back to the library: the view it last showed, and whether the entry
+// behind this one in history IS that library — then back is history.back(), so
+// the app's link and the browser's button leave history in the same place.
+const libraryReturn = { href: libraryHref, behind: false };
+export const libraryReturnHref = (): string => libraryReturn.href;
+export const rememberLibraryHref = (href: string): void => void (libraryReturn.href = href);
+export function returnToLibrary(event: MouseEvent) {
+  if (!libraryReturn.behind || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+  event.preventDefault();
+  history.back();
+}
 
 @customElement('mnx-studio')
 export class StudioApp extends LitElement {
@@ -151,7 +186,9 @@ export class StudioApp extends LitElement {
   `;
 
   private readonly onHashChange = () => {
+    const from = this.route.page;
     this.route = parseHash(location.hash);
+    libraryReturn.behind = from === 'library' && this.route.page !== 'library';
     this.theme = readTheme();
   };
 
@@ -188,7 +225,7 @@ export class StudioApp extends LitElement {
         : html`<header>
             <a class="brand" href=${libraryHref}>MNX <b>Studio</b></a>
             <span class="title"></span>
-            ${this.route.page === 'aliases' ? html`<a class="button" href=${libraryHref}>Library</a>` : nothing}
+            ${this.route.page === 'aliases' ? html`<a class="button" href=${libraryReturnHref()} @click=${returnToLibrary}>Library</a>` : nothing}
             <button class="theme" title=${themeSentence} aria-label=${themeSentence} @click=${this.cycleTheme}>${themeGlyph(this.theme)}<span>${this.theme}</span></button>
             ${email ? html`<span class="who">${email}</span>` : nothing}
             ${email || this.session?.kind === 'not-permitted'

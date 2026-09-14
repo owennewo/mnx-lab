@@ -32,7 +32,7 @@ import type { RecordingSource } from '../../../src/audio/playbackBackend.ts';
 import type { Player } from '../../../src/elements/Player.ts';
 import type { StripChange } from '../../../src/elements/ScoreFrame.ts';
 import type { ZoomPadChange } from '../../../src/elements/ZoomPad.ts';
-import { libraryHref } from './StudioApp.ts';
+import { libraryReturnHref, returnToLibrary } from './StudioApp.ts';
 import { nextTheme, readTheme, resolvedTheme, setTheme, themeGlyph, type ThemeSetting } from './theme.ts';
 import './TagsSheet.ts';
 import './RecordingsSheet.ts';
@@ -301,7 +301,7 @@ export class PiecePage extends LitElement {
         @spacing-mode-change=${this.onSpacingModeChange}
         @clearance-change=${this.onClearanceChange}
       >
-        <a slot="back" href=${libraryHref}>${back}<span>Library</span></a>
+        <a slot="back" href=${libraryReturnHref()} @click=${returnToLibrary}>${back}<span>Library</span></a>
         ${this.doc
           ? html`<button slot="actions" type="button" aria-pressed=${this.tagsOpen} @click=${() => { this.tagsOpen = !this.tagsOpen; this.recordingsOpen = false; }}>
               ${tagGlyph}<span>Tags · ${this.snapshot?.tags.length ?? 0}</span>
@@ -316,7 +316,7 @@ export class PiecePage extends LitElement {
           ? html`<div class="notice">
               <h1>Could not open this piece</h1>
               <p role="alert">${this.error}</p>
-              <p><a href=${libraryHref}>Back to the library</a></p>
+              <p><a href=${libraryReturnHref()} @click=${returnToLibrary}>Back to the library</a></p>
             </div>`
           : nothing}
         ${this.doc && this.error ? html`<p class="notice" role="alert">${this.error}</p>` : nothing}
