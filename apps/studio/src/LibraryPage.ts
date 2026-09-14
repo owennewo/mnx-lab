@@ -15,6 +15,8 @@ import { preparePdfView, renderPdfView } from './pdfExport.ts';
 const SORTS: { id: LibrarySort; label: string }[] = [{ id: 'recent', label: 'Recent' }, { id: 'title', label: 'Title' }, { id: 'artist', label: 'Artist' }];
 const MAX_FILTERS = 12;
 const tagOf = (dimension: string, value: string) => `${dimension}:${value}`;
+/** A row's chips read in the rail's order, so a row and the rail agree. */
+const railRank = (dimension: string) => { const i = RAIL_ORDER.indexOf(dimension); return i < 0 ? RAIL_ORDER.length : i; };
 
 /** The list as it was left, in memory only: opening a piece unmounts the page,
  *  and coming back to the same view shows this at once — every page "More"
@@ -85,7 +87,8 @@ export class LibraryPage extends LitElement {
     li .who { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
     li .who a { font-weight: 500; }
     li .who a:focus-visible { outline: none; }
-    li .who small { color: var(--ink-dim); font-size: 13px; }
+    li .who .artist { align-self: flex-start; border: 0; padding: 0; text-align: left; color: var(--ink-dim); font-size: 13px; }
+    li .who .artist:hover { color: var(--accent); }
     li .tags { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
     li .tags button { padding: 2px 8px; font-size: 12px; color: var(--ink-dim); }
     li .when { width: 88px; text-align: right; color: var(--ink-dim); font-size: 12px; flex: none; }
@@ -347,8 +350,8 @@ export class LibraryPage extends LitElement {
         ${shown.length ? html`<div class="columns"><span>Actions</span></div>` : nothing}
         <ul>${shown.map((p, index) => html`<li>
           <button class="star" aria-label=${p.favourite ? 'Remove from favourites' : 'Add to favourites'} aria-pressed=${p.favourite} @click=${() => this.toggleFavourite(p)}>${star(p.favourite)}</button>
-          <div class="who"><a href=${pieceHref(p.id)} @keydown=${(event: KeyboardEvent) => this.onResultKeydown(event, index)}>${p.title ?? p.id}</a>${p.artist ? html`<small>${p.artist}</small>` : nothing}</div>
-          <div class="tags">${p.chips.map(c => html`<button title=${`Filter by ${dimensionLabel(c.dimension).toLowerCase()}`} @click=${() => this.choose(c.dimension, c.value)}>${chipText(c.dimension, c.value)}</button>`)}</div>
+          <div class="who"><a href=${pieceHref(p.id)} @keydown=${(event: KeyboardEvent) => this.onResultKeydown(event, index)}>${p.title ?? p.id}</a>${p.artist ? html`<button class="artist" title="Filter by artist" @click=${() => this.choose('artist', p.artist!)}>${p.artist}</button>` : nothing}</div>
+          <div class="tags">${[...p.chips].sort((a, b) => railRank(a.dimension) - railRank(b.dimension)).map(c => html`<button title=${`Filter by ${dimensionLabel(c.dimension).toLowerCase()}`} @click=${() => this.choose(c.dimension, c.value)}>${chipText(c.dimension, c.value)}</button>`)}</div>
           <span class="when">${relativeTime(p.opened_at)}</span>
           <div class="actions"><select aria-label=${`Export ${p.title ?? p.id}`} ?disabled=${this.exporting !== null} @change=${(e: Event) => this.exportPiece(p, e)}>
             <option value="">${this.exporting === p.id ? 'Exporting…' : 'Export…'}</option>

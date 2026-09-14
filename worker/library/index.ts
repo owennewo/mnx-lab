@@ -85,7 +85,7 @@ export class Library {
     const order = sort === 'title' ? 'title IS NULL, title COLLATE NOCASE, p.id' : sort === 'artist' ? 'artist IS NULL, artist COLLATE NOCASE, title COLLATE NOCASE, p.id'
       : 'opened_at IS NULL, opened_at DESC, p.updated_at DESC, p.id';
     // The row's chips: the shown values a person scans a list by.
-    const chips = `(SELECT json_group_array(json_array(e.dimension, e.value)) FROM (${EFFECTIVE_TAGS}) e WHERE e.owner=p.owner AND e.piece_id=p.id AND e.dimension IN ('tuning-name','capo','list'))`;
+    const chips = `(SELECT json_group_array(json_array(e.dimension, e.value)) FROM (${EFFECTIVE_TAGS}) e WHERE e.owner=p.owner AND e.piece_id=p.id AND e.dimension IN ('part','tuning-name','capo','list'))`;
     const rows = (await this.statement(`SELECT p.*, ${shown('title')} AS title, ${shown('artist')} AS artist,
       (SELECT opened_at FROM piece_views v WHERE v.owner=p.owner AND v.piece_id=p.id) AS opened_at,
       EXISTS (SELECT 1 FROM tags t WHERE t.owner=p.owner AND t.piece_id=p.id AND t.dimension='favourite' AND t.value='yes') AS favourite,

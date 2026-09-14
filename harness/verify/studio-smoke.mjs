@@ -118,7 +118,7 @@ try {
   // the row carries its chips and the star, and a list value narrows the list.
   await wait(`${library}?.textContent.includes('Artist:') && ${library}.textContent.includes('Genre:')`);
   await wait(`${library}.querySelector('li .who a')?.textContent.includes('Studio smoke piece') && ${library}.querySelector('li .when').textContent !== ''`);
-  await wait(`${library}.querySelector('li small')?.textContent === 'A synthetic fixture'`);
+  await wait(`${library}.querySelector('li .who .artist')?.textContent === 'A synthetic fixture'`);
   await c.evaluate(`[...${library}.querySelectorAll('.line')].find(l => l.textContent.includes('List:')).click()`);
   await wait(`!!${library}.querySelector('.group')`);
   await c.evaluate(`[...${library}.querySelectorAll('.option')].find(o => o.textContent.includes('Studio collection')).click()`);
