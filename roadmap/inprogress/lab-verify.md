@@ -1309,3 +1309,26 @@ Five goldens moved, size only: `lab/31-score-text/04-directions` and
 smaller than the tempo text, clearly smaller than a bold section name. Stacked directions
 in `08` still clear one another and the staff; `between` text in `07` still sits midway
 between the staves; on the tab staff in `40-navigation/02` the text clears the digits.
+
+## Tab columns reserve no accidentals; rolled chords reserve their wave — 2026-09-14
+
+Owner: no roadmap doc — a direct fix. A Soundslice import of "Baby Please Don't Go"
+put bar 15's first chord a quarter of the bar in on the tab view, where Soundslice sits
+it against the barline: the standalone tab plan priced accidental columns the tab staff
+never draws (the chord is spelled with six flats), the way it once priced a key
+signature. The same change reserves leading room for an arpeggio, which previously
+drew into the column before it — on both staves, since the tab staff began drawing
+arpeggios the same day. Five **rendered** scenarios moved, none of them previously
+verified: `lab/22-tab-derivation/05-drop-d`, `lab/22-tab-derivation/06-capo`,
+`lab/25-tab-techniques/07-grace-into-the-beat`, `lab/26-tab-rhythm/02-grace-on-tab`
+(`expected.tab.svg` + primitives) and `lab/32-articulations/04-arpeggiated-chords`
+(`expected.svg` + primitives).
+
+**What a reviewer should look for.** In the four tab scenarios: a digit whose note
+carries an accidental in notation no longer has a blank gap to its left — the first
+digit of a bar sits close to the barline, and every column's spacing is duration alone.
+Nothing overlaps as a result. In `04-arpeggiated-chords`: each rolled chord's wave (and
+arrowhead) has clear air between it and the previous notehead or barline, and the
+chord's own accidentals still sit between the wave and the notehead. The `both` view
+keeps its accidental columns — the notation staff draws them — so tab and notation stay
+column-aligned there.

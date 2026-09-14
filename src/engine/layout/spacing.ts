@@ -1,3 +1,4 @@
+import { ARPEGGIO_ROOM_SP, collectSpanMarks } from './arpeggio.ts';
 import { isPartialEntry } from './unrolled.ts';
 import type { PerformedEntry } from '../../model/passes.ts';
 import { normalizeDisplayOptions, type DisplayOptions } from '../displayOptions.ts';
@@ -637,6 +638,10 @@ export function noteAccidentalGlyph(
 
 /** Which accidental glyph (if any) a note of one measure prints. */
 export type AccidentalResolver = (note: MnxNote) => string | null;
+
+/** A tab staff draws no accidentals, so a tab-only plan reserves none: the
+ *  resolver both the plan and `tab.ts` price columns with. */
+export const NO_ACCIDENTALS: AccidentalResolver = () => null;
 
 /**
  * The accidentals one measure prints, decided ONCE for every layout that reads
@@ -1403,6 +1408,9 @@ export function planHorizontal(
   // rigid side, including the parts that were only ever air.
   const pad = clearance.prefixPad;
   const isTabOnly = options?.staffKind === 'tab';
+  const arpeggioStarts = new Set(
+    [...collectSpanMarks(mnx.parts ?? [])].filter(([, marks]) => marks.arpeggio).map(([id]) => id)
+  );
   const clefWidth = isTabOnly ? TAB_CLEF_WIDTH_SP : CLEF_WIDTH_SP;
   // Keep glyph positions/size fixed and vary only the slot's trailing air.
   const clefSlot = (ink: number) => clefWidth * ink + clearance.prefixGroupExtra;
@@ -1551,7 +1559,10 @@ export function planHorizontal(
 
     // Spacing prices the accidental columns with this; notation and tab build the
     // same resolver for the same measure (measureAccidentals is deterministic).
-    const accidentalOf = measureAccidentals(
+    // The STANDALONE tab view draws no accidentals, so it prices none — the
+    // same reasoning as its missing key-signature column. Priced anyway, a
+    // chord spelled with six flats pushed its digits a quarter of the bar in.
+    const accidentalOf = isTabOnly ? NO_ACCIDENTALS : measureAccidentals(
       uniquePartsOf(planStaves).map(part => part.measures?.[i]),
       keyFifths,
       useAccidentalDisplay,
@@ -1693,10 +1704,13 @@ export function planHorizontal(
               // same total rigid width, redistributed, so bar widths and
               // wrapping cannot move; only the wide event's own anchor does.
               const lyricW = lyricCoreSp(event, lyricLineIds);
+              // A rolled chord's wave sits left of its ink; without room it
+              // lands on the previous column.
+              const arpeggio = (event.notes ?? []).some(n => n.id !== undefined && arpeggioStarts.has(n.id));
               return withColumnExtras({
                 leading: (accidentals
                   ? accidentals * ACCIDENTAL_SLOT_WIDTH_SP + ACCIDENTAL_RIGHT_PAD_SP
-                  : 0) + Math.max(0, (lyricW - CORE_SP) / 2),
+                  : 0) + (arpeggio ? ARPEGGIO_ROOM_SP : 0) + Math.max(0, (lyricW - CORE_SP) / 2),
                 core: Math.max(
                   CORE_SP + (event.duration.dots ?? 0) * DOT_SP,
                   (CORE_SP + lyricW) / 2

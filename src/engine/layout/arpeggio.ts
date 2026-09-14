@@ -40,6 +40,17 @@ const ARROW_HALF_WIDTH_SP = 0.45;
 const ARROW_HEIGHT_SP = 0.6;
 const BRACKET_HOOK_SP = 0.7;
 const BRACKET_THICKNESS_SP = 0.13;
+/** Extra clearance a TAB staff gives the wave: the digits' knock-out masks
+ *  sit on the string lines, so it needs more air than a notehead would. */
+export const TAB_ARPEGGIO_EXTRA_GAP_SP = 0.35;
+/**
+ * How far left of a chord's ink an arpeggio reaches (wave or arrowhead, plus
+ * air before the previous column), for the plan to reserve as leading room.
+ * Priced at the tab gap in every view: the `both` system shares its columns
+ * between the two staves, and a bar must not move when a view is toggled.
+ */
+export const ARPEGGIO_ROOM_SP =
+  ARPEGGIO_GAP_SP + Math.max(ARPEGGIO_AMPLITUDE_SP, ARROW_HALF_WIDTH_SP) + TAB_ARPEGGIO_EXTRA_GAP_SP + 0.3;
 
 export interface EmitArpeggioArgs {
   /** Left edge of the chord's ink (its leftmost accidental, else its notehead). */

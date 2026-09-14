@@ -1,7 +1,7 @@
 import { occurrenceKey } from '../../model/noteKeys.ts';
 import type { ContainerIndex } from '../../model/noteKeys.ts';
 import { MnxEvent, MnxGrace, MnxSequence, MnxTuplet, isGrace, isTimedEvent, isTuplet } from '../../model/mnx.ts';
-import { emitSpanMarks, type SpanMarks } from './arpeggio.ts';
+import { emitSpanMarks, TAB_ARPEGGIO_EXTRA_GAP_SP, type SpanMarks } from './arpeggio.ts';
 import {
   GUITAR_TUNING,
   midiOfMnxPitch,
@@ -93,10 +93,6 @@ const MASK_END_CLEAR_SP = 1.0;
 
 const ACTIVE_COLOR = 'oklch(0.65 0.22 274)';
 const SELECTED_COLOR = 'oklch(0.7 0.15 190)';
-/** Extra clearance between a chord's digits and its arpeggio wave, beyond
- *  the notation gap `emitSpanMarks` applies. */
-const TAB_ARPEGGIO_EXTRA_GAP_SP = 0.35;
-
 // The fret digit's backing rect masks the string line under it, so it must be
 // the SCORE PAPER colour — which never inverts with the theme — not the app
 // chrome (`--bg-app`, which is dark in dark mode and undefined in the standalone
