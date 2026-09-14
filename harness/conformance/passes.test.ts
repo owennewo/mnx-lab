@@ -48,6 +48,20 @@ describe('linearizePasses', () => {
     expect(model.soundingPasses).toEqual([[1, 2], [1, 2], [1], [2], [1]]);
   });
 
+  it('chained voltas inside one strain: an inner exit does not reset the pass', () => {
+    // |: m0 (1.4.) | m1 (1.3.4.) | m2 (1.–4.) :|x4 | m3 — Guitar Pro's shape
+    const model = linearizePasses(docOf([
+      { repeatStart: {}, ending: { numbers: [1, 4], duration: 1 } },
+      { ending: { numbers: [1, 3, 4], duration: 1 } },
+      { ending: { numbers: [1, 2, 3, 4], duration: 1 }, repeatEnd: { times: 4 } },
+      {}
+    ]));
+    expect(model.truncated).toBe(false);
+    expect(model.order).toEqual([0, 1, 2, 2, 1, 2, 0, 1, 2, 3]);
+    expect(model.passCounts).toEqual([2, 3, 4, 1]);
+    expect(model.soundingPasses).toEqual([[1, 4], [1, 3, 4], [1, 2, 3, 4], [1]]);
+  });
+
   it('D.S. al fine: to the segno, no repeats on the return, stop at fine', () => {
     // m0 · m1 segno · m2 fine · m3 D.S. al fine · m4 (never reached)
     const model = linearizePasses(docOf([

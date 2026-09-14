@@ -193,8 +193,9 @@ export class PiecePage extends LitElement {
    *  viewer resolves the view, and the views it can offer, from the document
    *  it now has — so the frame is rendered once more to ask it. */
   private present(doc: MnxDocument) {
-    const result = this.binding!.setDocument(doc);
-    if (!result.ok) this.error = 'This piece has no playable performance; the score still shows.';
+    // A document without a performance needs no notice: the player's readout
+    // already says so, and the score shows either way.
+    this.binding!.setDocument(doc);
     this.requestUpdate();
   }
 

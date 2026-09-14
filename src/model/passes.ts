@@ -90,6 +90,8 @@ export function linearizePasses(doc: MnxStructure): PassModel {
   const cap = count * 64 + 64;
   const availableIterations: number[][] = Array.from({ length: count }, () => [1]);
   const inStrain = Array.from({ length: count }, () => false);
+  /** Per measure index: the last bar of the strain holding it, endings included. */
+  const strainEnd: (number | undefined)[] = Array.from({ length: count });
   const endingAt: (number | undefined)[] = Array.from({ length: count });
   for (let at = 0; at < count; at++) {
     if (!globals[at]?.ending) continue;
@@ -138,6 +140,7 @@ export function linearizePasses(doc: MnxStructure): PassModel {
     for (let k = start; k <= end; k++) {
       availableIterations[k] = offered;
       inStrain[k] = true;
+      strainEnd[k] = end;
       if (hasEndings) finalEndingIteration[k] = times;
       if (globals[k]?.ending?.numbers?.some(n => n > times))
         diagnose('unmatched-ending', k, `Ending numbers exceed the strain's ${times} iterations.`);
@@ -193,7 +196,10 @@ export function linearizePasses(doc: MnxStructure): PassModel {
       arrival = 'ending';
       continue;
     }
-    if (numbers && numbers.length > 0)
+    // Only the volta that closes its strain resolves it. Guitar Pro chains
+    // voltas through a strain (1.4. | 1.3.4. | 1.–4. :|x4), and resetting on
+    // an inner one's exit would loop the strain forever.
+    if (numbers && numbers.length > 0 && (strainEnd[i] === undefined || endingEnd >= strainEnd[i]!))
       endingExit = endingEnd;
 
     const entry: PerformedEntry = {
