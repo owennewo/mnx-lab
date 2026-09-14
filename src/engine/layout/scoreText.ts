@@ -438,8 +438,9 @@ export function emitTempoMark(args: EmitTempoMarkArgs): BoundsSp | null {
   tempos.forEach((tempo, index) => {
     const f = tempo.location?.fraction;
     const t = Array.isArray(f) && f[1] ? f[0] / f[1] : 0;
-    const x = tempo.location && onsetXs ? anchorAt(onsetXs, t, m).x - 0.6 : index === 0 ? x0 : x0 + 6 * index;
-    const placed = emitOneTempo(tempo, x, staffTop, [...scan, ...primitives.slice(before)], primitives);
+    const anchored = !!(tempo.location && onsetXs);
+    const x = anchored ? anchorAt(onsetXs!, t, m).x : index === 0 ? x0 : x0 + 6 * index;
+    const placed = emitOneTempo(tempo, x, anchored ? -0.6 : 0, staffTop, [...scan, ...primitives.slice(before)], primitives);
     if (placed && (!top || placed.y < top.y)) top = placed;
   });
   return top;
@@ -448,6 +449,7 @@ export function emitTempoMark(args: EmitTempoMarkArgs): BoundsSp | null {
 function emitOneTempo(
   tempo: NonNullable<MnxGlobalMeasure['tempos']>[number],
   x0: number,
+  lead: number,
   staffTop: number,
   scan: readonly Primitive[],
   primitives: Primitive[]
@@ -461,18 +463,21 @@ function emitOneTempo(
   const scale = TEMPO_GLYPH_SCALE;
   // Every metric read off the glyph box scales with the glyph.
   const belowBaseline = Math.max(0, -(glyphBBox(metGlyph)?.y ?? 0)) * scale;
-  primitives.push({ kind: 'glyph', glyph: metGlyph, x: x0, y, scale, className: 'tempo' });
+  // x0 is the mark's position; everything after it is ink laid out from it,
+  // so it rides in `dx` and keeps its spacing under a non-square scale.
+  primitives.push({ kind: 'glyph', glyph: metGlyph, x: x0, dx: lead, y, scale, className: 'tempo' });
   // Advance past the note glyph's actual right edge (incl. its stem) so the
   // augmentation dots and the "=" never collide with the stem.
-  let cursor = x0 + (glyphBBox(metGlyph)?.w ?? 1.33) * scale + TEMPO_GLYPH_TEXT_GAP_SP;
+  let cursor = lead + (glyphBBox(metGlyph)?.w ?? 1.33) * scale + TEMPO_GLYPH_TEXT_GAP_SP;
   for (let d = 0; d < (tempo.value.dots ?? 0); d++) {
-    primitives.push({ kind: 'glyph', glyph: 'metAugmentationDot', x: cursor, y, scale, className: 'tempo' });
+    primitives.push({ kind: 'glyph', glyph: 'metAugmentationDot', x: x0, dx: cursor, y, scale, className: 'tempo' });
     cursor += TEMPO_DOT_ADVANCE_SP * scale;
   }
   primitives.push({
     kind: 'text',
     text: `= ${tempo.bpm}`,
-    x: cursor,
+    x: x0,
+    dx: cursor,
     y,
     font: 'body',
     size: TEMPO_TEXT_SIZE_SP,
@@ -613,20 +618,26 @@ function swingRealisation(swing: ResolvedSwing): SwingRealisation | null {
   return null;
 }
 
-/** Draws one note of the equation at `x`, returning the cursor past its ink. */
+// The whole mark is ink laid out from one position, the bar's heading `ox`:
+// every distance within it is an INK OFFSET and rides in `dx`, so the notes,
+// beams and bracket keep their shape under a non-square scale.
+
+/** Draws one note of the equation at ink offset `dx` from `ox`, returning the
+ *  offset past its ink. */
 function emitSwingNote(
   note: SwingMarkNote,
-  x: number,
+  ox: number,
+  dx: number,
   y: number,
   primitives: Primitive[],
   glyph = METRONOME_GLYPH_BY_BASE[note.base] ?? 'metNoteQuarterUp'
 ): number {
-  primitives.push({ kind: 'glyph', glyph, x, y, scale: SWING_GLYPH_SCALE, className: 'swing' });
-  let cursor = x + (glyphBBox(glyph)?.w ?? 1.33) * SWING_GLYPH_SCALE;
+  primitives.push({ kind: 'glyph', glyph, x: ox, dx, y, scale: SWING_GLYPH_SCALE, className: 'swing' });
+  let cursor = dx + (glyphBBox(glyph)?.w ?? 1.33) * SWING_GLYPH_SCALE;
   for (let d = 0; d < note.dots; d++) {
     cursor += SWING_DOT_ADVANCE_SP * SWING_GLYPH_SCALE * 0.4;
     primitives.push({
-      kind: 'glyph', glyph: 'metAugmentationDot', x: cursor, y,
+      kind: 'glyph', glyph: 'metAugmentationDot', x: ox, dx: cursor, y,
       scale: SWING_GLYPH_SCALE, className: 'swing'
     });
     cursor += SWING_DOT_ADVANCE_SP * SWING_GLYPH_SCALE;
@@ -646,31 +657,32 @@ const swingBeams = (note: SwingMarkNote): number =>
  */
 function emitSwingPair(
   pair: [SwingMarkNote, SwingMarkNote],
-  x: number,
+  ox: number,
+  dx: number,
   y: number,
   primitives: Primitive[]
 ): number {
   const beams = pair.map(swingBeams);
   if (beams[0] === 0 || beams[1] === 0) {
-    const cursor = emitSwingNote(pair[0], x, y, primitives);
-    return emitSwingNote(pair[1], cursor + SWING_PAIR_GAP_SP, y, primitives);
+    const cursor = emitSwingNote(pair[0], ox, dx, y, primitives);
+    return emitSwingNote(pair[1], ox, cursor + SWING_PAIR_GAP_SP, y, primitives);
   }
   const bb = glyphBBox('metNoteQuarterUp') ?? { x: 0, y: -0.564, w: 1.328, h: 3.316 };
   const s = SWING_GLYPH_SCALE;
   // The glyph's stem is its right edge.
-  const stemX = (noteX: number) => noteX + (bb.x + bb.w - SWING_STEM_THICKNESS_SP / 2) * s;
-  const stem0 = stemX(x);
-  let cursor = emitSwingNote(pair[0], x, y, primitives, 'metNoteQuarterUp');
-  const x1 = cursor + SWING_BEAMED_PAIR_GAP_SP;
-  const stem1 = stemX(x1);
-  cursor = emitSwingNote(pair[1], x1, y, primitives, 'metNoteQuarterUp');
+  const stemX = (noteDx: number) => noteDx + (bb.x + bb.w - SWING_STEM_THICKNESS_SP / 2) * s;
+  const stem0 = stemX(dx);
+  let cursor = emitSwingNote(pair[0], ox, dx, y, primitives, 'metNoteQuarterUp');
+  const dx1 = cursor + SWING_BEAMED_PAIR_GAP_SP;
+  const stem1 = stemX(dx1);
+  cursor = emitSwingNote(pair[1], ox, dx1, y, primitives, 'metNoteQuarterUp');
   const thickness = SWING_BEAM_THICKNESS_SP * s;
   const half = (SWING_STEM_THICKNESS_SP * s) / 2;
   const hook = Math.min(SWING_BEAM_HOOK_SP * s, (stem1 - stem0) / 2);
   const bar = (xa: number, xb: number, level: number) => {
     const lineY = y - (bb.y + bb.h) * s + thickness / 2 + (level - 1) * (thickness + SWING_BEAM_GAP_SP * s);
     primitives.push({
-      kind: 'line', x1: xa - half, y1: lineY, x2: xb + half, y2: lineY,
+      kind: 'line', x1: ox, dx1: xa - half, y1: lineY, x2: ox, dx2: xb + half, y2: lineY,
       thickness, className: 'swing'
     });
   };
@@ -727,16 +739,16 @@ export function emitSwingMark(args: EmitSwingMarkArgs): BoundsSp | null {
 
   const notes = [...realisation.written, ...realisation.played];
   const bottom = Math.max(...notes.map(n => swingNoteExtent(n).bottom), 0);
-  let cursor = emitSwingPair(realisation.written, x0, y, primitives);
+  let cursor = emitSwingPair(realisation.written, x0, 0, y, primitives);
   primitives.push({
-    kind: 'text', text: '=', x: cursor + SWING_GROUP_GAP_SP, y, font: 'body',
+    kind: 'text', text: '=', x: x0, dx: cursor + SWING_GROUP_GAP_SP, y, font: 'body',
     size: SWING_TEXT_SIZE_SP, weight: TEMPO_TEXT_WEIGHT, className: 'swing'
   });
   cursor += SWING_GROUP_GAP_SP + SWING_TEXT_SIZE_SP * 0.6 + SWING_GROUP_GAP_SP;
   const playedFrom = cursor;
-  cursor = emitSwingPair(realisation.played, cursor, y, primitives);
+  cursor = emitSwingPair(realisation.played, x0, cursor, y, primitives);
   if (realisation.tuplet !== null)
-    emitSwingBracket(realisation, playedFrom, cursor, realisation.tuplet, primitives);
+    emitSwingBracket(realisation, x0, playedFrom, cursor, realisation.tuplet, primitives);
   return placeTextRun(primitives, firstNew, bottom, staffTop, scan, clearAbove);
 }
 
@@ -744,6 +756,7 @@ export function emitSwingMark(args: EmitSwingMarkArgs): BoundsSp | null {
  *  ticked down at both ends, clear of the stems it spans. */
 function emitSwingBracket(
   realisation: SwingRealisation,
+  ox: number,
   from: number,
   to: number,
   tuplet: number,
@@ -753,20 +766,20 @@ function emitSwingBracket(
   const line = top - SWING_BRACKET_RISE_SP;
   const middle = (from + to) / 2;
   const half = SWING_TUPLET_SIZE_SP * 0.45;
-  const rule = (x1: number, x2: number) =>
+  const rule = (dx1: number, dx2: number) =>
     primitives.push({
-      kind: 'line', x1, y1: line, x2, y2: line,
+      kind: 'line', x1: ox, dx1, y1: line, x2: ox, dx2, y2: line,
       thickness: SWING_BRACKET_THICKNESS_SP, className: 'swing'
     });
   rule(from, middle - half);
   rule(middle + half, to);
-  for (const x of [from, to])
+  for (const dx of [from, to])
     primitives.push({
-      kind: 'line', x1: x, y1: line, x2: x, y2: line + SWING_BRACKET_TICK_SP,
+      kind: 'line', x1: ox, dx1: dx, y1: line, x2: ox, dx2: dx, y2: line + SWING_BRACKET_TICK_SP,
       thickness: SWING_BRACKET_THICKNESS_SP, className: 'swing'
     });
   primitives.push({
-    kind: 'text', text: String(tuplet), x: middle, y: line + SWING_TUPLET_SIZE_SP * 0.35,
+    kind: 'text', text: String(tuplet), x: ox, dx: middle, y: line + SWING_TUPLET_SIZE_SP * 0.35,
     font: 'body', size: SWING_TUPLET_SIZE_SP, weight: TEMPO_TEXT_WEIGHT,
     anchor: 'middle', className: 'swing'
   });

@@ -236,6 +236,66 @@ describe('non-square scale — relationships the goldens cannot see', () => {
     expect(masks).toBeGreaterThan(0);
   });
 
+  it('a tempo or swing mark is ink laid off one position: its shape scales with the ink ratio', () => {
+    initSmufl();
+    // The reported case: a swing mark's beam missed the stems it joins and the
+    // metronome mark's "= 160" ran into its note, both only once a staff scale
+    // was set — every gap inside the mark had been written as a position.
+    // A mark is a run of primitives of one class, and consecutive bars' marks
+    // can abut in the list, so the run is cut by the mark's own shape: a
+    // metronome glyph opens a tempo mark, a swing equation is exactly four
+    // notes, and a swing mark in words is one text.
+    type Run = { cls: string; notes: number; words: boolean; spans: { l: number; r: number }[] };
+    const marks = (layout: LayoutResult, ink: number) => {
+      const runs: Run[] = [];
+      let prev = '';
+      for (const p of layout.primitives) {
+        const c = cls(p)[0];
+        if (c !== 'tempo' && c !== 'swing') {
+          prev = '';
+          continue;
+        }
+        const run = runs[runs.length - 1];
+        const note = p.kind === 'glyph' && p.glyph.startsWith('metNote');
+        const words = p.kind === 'text' && p.text !== '=' && !/^\d+$/.test(p.text);
+        const opens =
+          c !== prev ||
+          (c === 'tempo' && note) ||
+          (c === 'swing' && (run.words || (note && run.notes === 4) || (words && run.spans.length > 0)));
+        if (opens) runs.push({ cls: c, notes: 0, words: c === 'swing' && words, spans: [] });
+        if (note) runs[runs.length - 1].notes++;
+        prev = c;
+        const span = drawnSpan(p, ink);
+        if (span) runs[runs.length - 1].spans.push(span);
+      }
+      return runs;
+    };
+    let checked = 0;
+    for (const s of corpus) {
+      const base = layoutsOf(s.dir, 1).map(l => marks(l, 1));
+      for (const ink of RATIOS.filter(r => r !== 1)) {
+        layoutsOf(s.dir, ink).forEach((layout, i) => {
+          const at1 = base[i];
+          const now = marks(layout, ink);
+          if (!at1 || at1.length !== now.length) return;
+          now.forEach((run, k) => {
+            const b = at1[k];
+            if (run.spans.length !== b.spans.length || run.spans.length < 2) return;
+            const o = run.spans[0].l;
+            const o1 = b.spans[0].l;
+            run.spans.forEach((sp, j) => {
+              checked++;
+              const what = `${s.id} @ink ${ink}: ${run.cls} mark part ${j}`;
+              expect(sp.l - o, what).toBeCloseTo((b.spans[j].l - o1) * ink, 6);
+              expect(sp.r - o, what).toBeCloseTo((b.spans[j].r - o1) * ink, 6);
+            });
+          });
+        });
+      }
+    }
+    expect(checked).toBeGreaterThan(0);
+  });
+
   it('an event column is ink around its slot, so columns cannot converge', () => {
     initSmufl();
     // The same claim one level out: a notehead or fret digit is ink hanging off
