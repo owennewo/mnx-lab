@@ -245,6 +245,11 @@ const DOT_RIGHT_PAD_SP = 0.35;
 const ACTIVE_COLOR = 'oklch(0.65 0.22 274)';
 const SELECTED_COLOR = 'oklch(0.7 0.15 190)';
 
+/** A dead note's head: the same value, drawn as an x. */
+const X_NOTEHEAD_GLYPH_BY_BASE: Record<string, string> = {
+  whole: 'noteheadXWhole',
+  half: 'noteheadXHalf'
+};
 const NOTEHEAD_GLYPH_BY_BASE: Record<string, string> = {
   whole: 'noteheadWhole',
   half: 'noteheadHalf',
@@ -4359,14 +4364,19 @@ function emitEvent(args: EmitEventArgs): BeamedStem | null {
   });
 
   // Noteheads
-  notes.forEach((_n, idx) => {
+  notes.forEach((n, idx) => {
     const y = staffTop + staffYs[idx];
+    // A dead note keeps its pitch's line and swaps only the head's shape.
+    const glyph = techniqueOf(n)?.dead
+      ? X_NOTEHEAD_GLYPH_BY_BASE[base] ?? 'noteheadXBlack'
+      : noteheadGlyph;
+    const w = glyph === noteheadGlyph ? headW : glyphBBox(glyph)?.w ?? headW;
     primitives.push({
       kind: 'glyph',
-      glyph: noteheadGlyph,
+      glyph,
       // The scaled ink stays centred on the column: the plan priced the
       // column at the same ratio, so the centre is where the ink belongs.
-      x: eventX - (headW / 2) * ink,
+      x: eventX - (w / 2) * ink,
       y,
       fill: noteFill(idx),
       className: 'notehead' + noteColorClass(idx),

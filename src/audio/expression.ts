@@ -198,6 +198,12 @@ export function applyExpression(
     if (source.tremoloIndex !== undefined) s.velocity += source.tremoloIndex % 2 ? -4 : 4;
     // Ties retain their continuous gate. Staccato wins over tenuto on an untied note.
     if (marks?.staccato && s.writtenIds.length === 1) s.duration = multiply(s.duration, q(1n, 2n));
+    if (technique?.dead) {
+      // Struck, not stopped: a short damped click, not a pitch that rings.
+      s.duration = multiply(s.duration, q(1n, 8n));
+      s.velocity -= 20;
+      s.damped = true;
+    }
     if (technique?.palmMute) {
       s.duration = multiply(s.duration, q(3n, 5n));
       s.velocity -= 15;

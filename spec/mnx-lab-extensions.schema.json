@@ -183,6 +183,10 @@
         "palmMute": {
           "type": "boolean",
           "description": "Per-note, matching how Guitar Pro stores it. In standard MNX this should be a span on the part measure with `position` + `end`, like `ottava` — see docs/mnx-extensions.md."
+        },
+        "dead": {
+          "type": "boolean",
+          "description": "A dead (muted, percussive) note — struck but not stopped, so it sounds no pitch. Tab draws `x` in place of the fret; notation draws an x notehead. The note keeps its written pitch and string. Guitar Pro's `Muted` property / binary note type 3."
         }
       },
       "additionalProperties": false

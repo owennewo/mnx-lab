@@ -554,7 +554,8 @@ function readBeat(
         midi: track.percussion ? grace.fret : null, tone: null, octave: null,
         vibrato: false, palmMute: false, hopoOrigin: grace.transition === 3,
         slideFlags: grace.transition === 1 ? 2 : null,
-        bend: null, harmonicType: null
+        bend: null, harmonicType: null,
+        ...(grace.dead ? { dead: true } : {})
       });
       const graceKey = `${grace.onBeat}/${grace.duration}`;
       const existingGrace = graceGroups.get(graceKey);
@@ -576,7 +577,6 @@ function readBeat(
         graceBeatIds.push(graceBeatId);
       }
       if (grace.duration === 2) warn(`${where}: 24th-note grace duration is not representable; using 32nd-note display duration.`);
-      if (grace.dead) warn(`${where}: dead grace-note styling is not represented.`);
       if (grace.transition === 2) warn(`${where}: grace bend transition is not represented.`);
     }
     noteIds.push(noteId);
@@ -643,7 +643,6 @@ function readNote(
     ? readNoteEffects(reader, where, sourceString, warn, major)
     : { vibrato: false, palmMute: false, hopoOrigin: false, slideFlags: null, harmonicType: null, harmonicData: null, bend: null, grace: null };
   if (type < 1 || type > 3) throw unsupported(reader, where, `note type ${type}`);
-  if (type === 3) warn(`${where} string ${sourceString}: dead-note styling is not represented.`);
 
   if (flags & 0x02) warn(`${where} string ${sourceString}: heavy accent is not represented yet.`);
   if (flags & 0x04) warn(`${where} string ${sourceString}: ghost note is not represented yet.`);
@@ -662,6 +661,7 @@ function readNote(
     // Legacy file strings are 1-based high→low; GPIF uses 0-based low→high.
     string: track.percussion ? null : track.stringCount - sourceString,
     ...(type === 2 ? { tieDestination: true } : {}),
+    ...(type === 3 ? { dead: true } : {}),
     fret: track.percussion ? null : fret,
     midi: track.percussion ? fret : null,
     ...(soundingMidiOverride !== null ? { soundingMidiOverride } : {}),

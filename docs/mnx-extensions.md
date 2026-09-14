@@ -19,6 +19,7 @@ A live test bench rendering these documents runs at <https://mnx-lab.totai.uk>.
 | `tab.technique.slide` / `hammerPull` / `vibrato` | no articulation covers them | [#63](https://github.com/w3c-cg/mnx/issues/63) | ✅ both converters | ✅ both staves |
 | `tab.technique.harmonic` | nothing; MusicXML's `<harmonic>` is a redesign candidate | [#179](https://github.com/w3c-cg/mnx/issues/179) | ✅ both converters | ✅ both staves |
 | `tab.technique.palmMute` | nothing; MusicXML smuggles it through generic elements | [#63](https://github.com/w3c-cg/mnx/issues/63) | ✅ both converters | ✅ both staves |
+| `tab.technique.dead` | nothing; MusicXML says it only as a notehead shape (`<notehead>x</notehead>`) | [#63](https://github.com/w3c-cg/mnx/issues/63) | ✅ Guitar Pro (❌ MusicXML) | ✅ both staves |
 | `fingering` | no fingering on notes | — | ⚠️ schema only | ❌ |
 | `harmonies` | **no harmony concept anywhere** — no `root`, no `kind`, no chord | [#109](https://github.com/w3c-cg/mnx/issues/109) | ✅ both converters | ✅ |
 | `swing` | nothing; the reference reserves `struct-swing-*` for 1.0 and implements none of it | [notationref](https://github.com/w3c-cg/mnx) `struct-swing-ratio` | ✅ Guitar Pro (⚠️ MusicXML) | ✅ marking + playback |
@@ -413,6 +414,7 @@ work around it; both are gone.
 | `<ornaments><wavy-line>` | `Note.vibrato` | `technique.vibrato` |
 | `<technical><harmonic>` | `Note.harmonicType` | `technique.harmonic` |
 | `<other-technical>palm-mute</other-technical>` | `Note.isPalmMute` | `technique.palmMute` |
+| — (not yet mapped) | `Property Muted` / `Note.isDead` | `technique.dead` |
 | `<technical><fingering>` | — | `fingering` |
 | `<direction-type><rehearsal>` | `MasterBar.section.marker` | `rehearsal.label` (standard, proposed) |
 | bold `<direction-type><words>` at the head of a bar | `MasterBar.section.text` | `section.label` (standard, proposed) |
@@ -501,6 +503,12 @@ Cloudflare Workers cannot run `ajv.compile()`.
 
 ## History
 
+- **v6.3** (2026-09-14): additive — `technique.dead`, the dead (muted,
+  percussive) note Guitar Pro stores as `Property Muted` and binary note type 3.
+  Previously the importers reported it and dropped it, so the note drew as its
+  fret digit. Tab now draws `x` in the digit's place, notation an x notehead, and
+  playback a short damped click. The written pitch and string stay. No upgrade
+  hop; `$id` stays at `/v6`.
 - **v6.2** (2026-09-09): additive — **document metadata** at the root:
   `work` (title, subtitle, artist, album, typed `creators[]`, copyright, source,
   notes) and `encoding` (software, version, date), drafting the standard

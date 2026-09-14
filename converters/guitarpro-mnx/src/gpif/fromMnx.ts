@@ -124,6 +124,7 @@ interface WriterNote {
   fret: number;
   vibrato: boolean;
   palmMute: boolean;
+  dead: boolean;
   hopoOrigin: boolean;
   hopoDestination: boolean;
   slideFlags: number;
@@ -844,6 +845,7 @@ function buildBeat(
       fret: position.fret,
       vibrato: technique?.vibrato === true,
       palmMute: technique?.palmMute === true,
+      dead: technique?.dead === true,
       hopoOrigin: technique?.hammerPull !== undefined,
       hopoDestination: false,
       slideFlags: slideFlagsOf(technique?.slide),
@@ -1210,6 +1212,7 @@ function serialize(
     push(`<Property name="Fret"><Fret>${note.fret}</Fret></Property>`);
     push(`<Property name="Midi"><Number>${note.midi}</Number></Property>`);
     if (note.palmMute) push('<Property name="PalmMuted"><Enable/></Property>');
+    if (note.dead) push('<Property name="Muted"><Enable/></Property>');
     if (note.hopoOrigin) push('<Property name="HopoOrigin"><Enable/></Property>');
     if (note.hopoDestination) push('<Property name="HopoDestination"><Enable/></Property>');
     if (note.slideFlags) {

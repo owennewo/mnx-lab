@@ -44,6 +44,7 @@ export interface MnxTabTechnique {
   vibrato?: boolean;
   harmonic?: MnxHarmonic;
   palmMute?: boolean;
+  dead?: boolean;
 }
 
 /** Since v5 only `technique` remains under `tab`. */

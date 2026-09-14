@@ -623,9 +623,13 @@ export function emitTabVoices(args: EmitTabVoicesArgs): void {
       // fret is a node to touch, not a note to stop. Drawn here, with the
       // digit, so one mask still covers exactly one text.
       const technique = note ? techniqueOf(note) : undefined;
-      const digits = technique?.harmonic
-        ? harmonicFretText(String(pos.fret))
-        : String(pos.fret);
+      // A dead note replaces the digit outright: `x` says "struck, not
+      // stopped", and the fret it would have been is not the point.
+      const digits = technique?.dead
+        ? 'x'
+        : technique?.harmonic
+          ? harmonicFretText(String(pos.fret))
+          : String(pos.fret);
       const fretStr = carried ? `(${digits})` : digits;
       const charWidthSp = fontSize * 0.6 * Math.max(1, fretStr.length);
 

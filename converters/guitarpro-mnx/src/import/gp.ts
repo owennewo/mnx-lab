@@ -650,6 +650,10 @@ function readTechniques(note: alphaTab.model.Note): MnxTabTechnique | undefined 
     technique.palmMute = true;
     found = true;
   }
+  if (note.isDead) {
+    technique.dead = true;
+    found = true;
+  }
 
   return found ? technique : undefined;
 }

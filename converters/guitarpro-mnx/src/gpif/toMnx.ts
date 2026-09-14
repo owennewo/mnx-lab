@@ -864,7 +864,6 @@ function buildNote(
     }
   }
 
-  if (gpNote.dead) state.report('dead-note styling (Property Muted)', measureIndex);
   if (gpNote.ghost) state.report('ghost-note styling (<AntiAccent>)', measureIndex);
   for (const tag of gpNote.unrecognized ?? []) state.report(`note ${tag}`, measureIndex);
 
@@ -957,6 +956,10 @@ function readTechniques(note: GpifNote): {
   }
   if (note.palmMute) {
     technique.palmMute = true;
+    found = true;
+  }
+  if (note.dead) {
+    technique.dead = true;
     found = true;
   }
 

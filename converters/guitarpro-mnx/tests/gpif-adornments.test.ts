@@ -212,6 +212,21 @@ describe('slurs', () => {
   });
 });
 
+describe('dead notes', () => {
+  it('reads Property Muted as technique.dead and writes it back', () => {
+    const first = load(score(
+      [[beat('0'), beat('1'), beat(''), beat('')]],
+      note(0, 2, 2) + note(1, 1, 0, '', '<Property name="Muted"><Enable/></Property>')
+    ));
+    expect(first.events(0)[0].notes![0]._x?.mnxLab?.tab).toBeUndefined();
+    expect(first.events(0)[1].notes![0]._x?.mnxLab?.tab?.technique).toEqual({ dead: true });
+    expect(first.warnings).toEqual([]);
+    const second = load(exportGuitarPro(first.mnx));
+    expect(second.mnx).toEqual(first.mnx);
+    expect(second.warnings).toEqual([]);
+  });
+});
+
 describe('the tripwire', () => {
   it('names each kind of unread content once, with a count and where it first appears', () => {
     const { warnings } = load(score(
@@ -223,7 +238,6 @@ describe('the tripwire', () => {
     ));
     expect(warnings.sort()).toEqual([
       'measure 1: beat Property Brush is not represented (1 in the file).',
-      'measure 1: dead-note styling (Property Muted) is not represented (1 in the file).',
       'measure 1: master bar <Fermatas> is not represented (1 in the file).',
       'measure 1: note <LetRing> is not represented (2 in the file).'
     ]);

@@ -49,6 +49,10 @@ export interface MnxTabTechnique {
     touchingPitch?: MnxPitch;
   };
   palmMute?: boolean;
+  /** A dead (muted, percussive) note: the string is struck but not stopped,
+   *  so it has no pitch to ring. Drawn `x` in tab and as an x notehead; the
+   *  written pitch stays so a consumer that ignores the flag still has a note. */
+  dead?: boolean;
 }
 
 /** note._x.mnxLab.tab — v5+ keeps only `technique` here. */

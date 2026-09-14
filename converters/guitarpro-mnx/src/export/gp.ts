@@ -472,6 +472,7 @@ function applyTechniques(
   if (technique.vibrato) note.vibrato = M.VibratoType.Slight;
   if (technique.hammerPull) note.isHammerPullOrigin = true;
   if (technique.palmMute) note.isPalmMute = true;
+  if (technique.dead) note.isDead = true;
   if (technique.harmonic) {
     note.harmonicType = HARMONIC_TYPES[technique.harmonic.type] ?? M.HarmonicType.Natural;
   }

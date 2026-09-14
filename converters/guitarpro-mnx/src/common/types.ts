@@ -65,6 +65,7 @@ export interface MnxTabTechnique {
     touchingPitch?: MnxPitch;
   };
   palmMute?: boolean;
+  dead?: boolean;
 }
 
 /** A chord root or bass note: an MNX pitch minus the octave. */

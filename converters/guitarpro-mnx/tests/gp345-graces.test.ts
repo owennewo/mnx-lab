@@ -29,7 +29,7 @@ describe.each(['3.00', '4.00', '4.06', '5.00', '5.10'])('GP%s grace wire matrix'
     });
     expect(warnings.filter(message => message.includes('24th-note grace duration'))).toHaveLength(4);
     expect(warnings.filter(message => message.includes('grace bend transition'))).toHaveLength(3);
-    expect(warnings.filter(message => message.includes('dead grace-note'))).toHaveLength(revision.startsWith('5') ? 6 : 0);
+    expect(warnings.filter(message => message.includes('dead grace-note'))).toEqual([]);
     const oracle = normalizeIds(importGuitarPro(bytes));
     oracle.parts[0].measures.forEach((measure, index) => {
       const grace = measure.sequences![0].content[0] as MnxGrace;
