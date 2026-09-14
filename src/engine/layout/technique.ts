@@ -121,8 +121,11 @@ const SLUR_SP = 0.16;
 const CLEAR_SP = 0.25;
 /** "H", "P", "P.M.", "full" — one size for every technique label. */
 const LABEL_SP = 0.9;
-/** Ink height of `arrowheadBlackUp`/`Down` (Bravura), tail to tip. */
-const ARROWHEAD_SP = 1.196;
+/** A bend's arrowhead is drawn smaller than the glyph's natural size, which
+ *  stood a full staff space tall over a thin bend stroke. */
+const ARROWHEAD_SCALE = 0.6;
+/** Ink height of the drawn `arrowheadBlackUp`/`Down` (Bravura), tail to tip. */
+const ARROWHEAD_SP = 1.196 * ARROWHEAD_SCALE;
 /** Advance of one `guitarVibratoStroke`. */
 const VIBRATO_ADVANCE_SP = 0.608;
 /** Ink height of `stringsHarmonic`. */
@@ -257,6 +260,7 @@ function arrowhead(
     x,
     ...(dx === 0 ? {} : { dx }),
     y: dir === 'up' ? y + ARROWHEAD_SP : y,
+    scale: ARROWHEAD_SCALE,
     anchor: 'middle',
     className: 'technique-bend-arrow'
   });

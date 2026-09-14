@@ -81,6 +81,28 @@ Provenance answers "did this change?". This doc answers "should it have?".
 
 ## Open debt
 
+### Smaller bend arrowheads — 2026-09-14
+
+Owner: user-requested engraving tweak, landed directly on `main`; no roadmap doc. A
+bend's arrowhead drew `arrowheadBlackUp`/`Down` at natural size, a full staff space
+tall over a 0.12sp stroke. `technique.ts` now draws it at `ARROWHEAD_SCALE` 0.6
+(~0.72sp), and `ARROWHEAD_SP` follows the drawn size, so the curve still ends at the
+head's base and the bend label drops by the same amount.
+
+Two scenarios moved, all four goldens each. Both were `rendered`, so nothing was
+demoted.
+
+Look for: every bend, pre-bend and release head is visibly smaller and still sits
+exactly on the end of its curve or pre-bend line — no gap, no stroke poking past the
+tip. Labels ("full", "1/2") sit just above the up heads, a little lower than before.
+The release label in `06-bend-shapes` bar 1 still crowds its curve, as it did before
+this change.
+
+Scenario set (paths under `scenarios/`):
+
+- `lab/25-tab-techniques/01-bend-and-release`
+- `lab/25-tab-techniques/06-bend-shapes`
+
 ### Swing mark beams its eighth pairs — 2026-09-14
 
 Owner: user-reported engraving fix (a Soundslice comparison: the written pair of the

@@ -225,11 +225,11 @@
           },
           {
             "x": 16.315,
-            "y": 7.3176
+            "y": 7.0306
           },
           {
             "x": 16.315,
-            "y": 6.196
+            "y": 5.7176
           }
         ],
         "thickness": 0.12,
@@ -239,7 +239,8 @@
         "kind": "glyph",
         "glyph": "arrowheadBlackUp",
         "x": 16.315,
-        "y": 6.196,
+        "y": 5.7176,
+        "scale": 0.6,
         "anchor": "middle",
         "className": "technique-bend-arrow"
       },
@@ -247,7 +248,7 @@
         "kind": "text",
         "text": "full",
         "x": 16.315,
-        "y": 3.554,
+        "y": 4.0324,
         "font": "body",
         "size": 0.9,
         "anchor": "middle",
@@ -267,11 +268,11 @@
           },
           {
             "x": 18.315,
-            "y": 5.4824
+            "y": 5.7694
           },
           {
             "x": 18.315,
-            "y": 5.804
+            "y": 6.2824
           }
         ],
         "thickness": 0.12,
@@ -282,6 +283,7 @@
         "glyph": "arrowheadBlackDown",
         "x": 18.315,
         "y": 7,
+        "scale": 0.6,
         "anchor": "middle",
         "className": "technique-bend-arrow"
       },
@@ -289,7 +291,7 @@
         "kind": "text",
         "text": "1/2",
         "x": 18.315,
-        "y": 5.554,
+        "y": 6.0324,
         "font": "body",
         "size": 0.9,
         "anchor": "middle",
@@ -309,11 +311,11 @@
           },
           {
             "x": 24.9738,
-            "y": 7.3176
+            "y": 7.0306
           },
           {
             "x": 24.9738,
-            "y": 6.196
+            "y": 5.7176
           }
         ],
         "thickness": 0.12,
@@ -323,7 +325,8 @@
         "kind": "glyph",
         "glyph": "arrowheadBlackUp",
         "x": 24.9738,
-        "y": 6.196,
+        "y": 5.7176,
+        "scale": 0.6,
         "anchor": "middle",
         "className": "technique-bend-arrow"
       },
@@ -331,7 +334,7 @@
         "kind": "text",
         "text": "1/2",
         "x": 24.9738,
-        "y": 3.554,
+        "y": 4.0324,
         "font": "body",
         "size": 0.9,
         "anchor": "middle",
@@ -351,11 +354,11 @@
           },
           {
             "x": 25.8825,
-            "y": 6.6824
+            "y": 6.9694
           },
           {
             "x": 25.8825,
-            "y": 7.804
+            "y": 8.2824
           }
         ],
         "thickness": 0.12,
@@ -366,6 +369,7 @@
         "glyph": "arrowheadBlackDown",
         "x": 25.8825,
         "y": 9,
+        "scale": 0.6,
         "anchor": "middle",
         "className": "technique-bend-arrow"
       },
@@ -382,11 +386,11 @@
           },
           {
             "x": 26.7913,
-            "y": 7.3176
+            "y": 7.0306
           },
           {
             "x": 26.7913,
-            "y": 6.196
+            "y": 5.7176
           }
         ],
         "thickness": 0.12,
@@ -396,7 +400,8 @@
         "kind": "glyph",
         "glyph": "arrowheadBlackUp",
         "x": 26.7913,
-        "y": 6.196,
+        "y": 5.7176,
+        "scale": 0.6,
         "anchor": "middle",
         "className": "technique-bend-arrow"
       },
@@ -404,7 +409,7 @@
         "kind": "text",
         "text": "1/2",
         "x": 26.7913,
-        "y": 3.554,
+        "y": 4.0324,
         "font": "body",
         "size": 0.9,
         "anchor": "middle",
@@ -424,11 +429,11 @@
           },
           {
             "x": 27.7,
-            "y": 6.6824
+            "y": 6.9694
           },
           {
             "x": 27.7,
-            "y": 7.804
+            "y": 8.2824
           }
         ],
         "thickness": 0.12,
@@ -439,6 +444,7 @@
         "glyph": "arrowheadBlackDown",
         "x": 27.7,
         "y": 9,
+        "scale": 0.6,
         "anchor": "middle",
         "className": "technique-bend-arrow"
       },
@@ -455,11 +461,11 @@
           },
           {
             "x": 36.215,
-            "y": 7.3176
+            "y": 7.0306
           },
           {
             "x": 36.215,
-            "y": 6.196
+            "y": 5.7176
           }
         ],
         "thickness": 0.12,
@@ -469,7 +475,8 @@
         "kind": "glyph",
         "glyph": "arrowheadBlackUp",
         "x": 36.215,
-        "y": 6.196,
+        "y": 5.7176,
+        "scale": 0.6,
         "anchor": "middle",
         "className": "technique-bend-arrow"
       },
@@ -477,7 +484,7 @@
         "kind": "text",
         "text": "1/2",
         "x": 36.215,
-        "y": 3.554,
+        "y": 4.0324,
         "font": "body",
         "size": 0.9,
         "anchor": "middle",
@@ -506,11 +513,11 @@
           },
           {
             "x": 39.215,
-            "y": 6.6824
+            "y": 6.9694
           },
           {
             "x": 39.215,
-            "y": 7.804
+            "y": 8.2824
           }
         ],
         "thickness": 0.12,
@@ -521,6 +528,7 @@
         "glyph": "arrowheadBlackDown",
         "x": 39.215,
         "y": 9,
+        "scale": 0.6,
         "anchor": "middle",
         "className": "technique-bend-arrow"
       },
@@ -537,11 +545,11 @@
           },
           {
             "x": 45.8738,
-            "y": 7.3176
+            "y": 7.0306
           },
           {
             "x": 45.8738,
-            "y": 6.196
+            "y": 5.7176
           }
         ],
         "thickness": 0.12,
@@ -551,7 +559,8 @@
         "kind": "glyph",
         "glyph": "arrowheadBlackUp",
         "x": 45.8738,
-        "y": 6.196,
+        "y": 5.7176,
+        "scale": 0.6,
         "anchor": "middle",
         "className": "technique-bend-arrow"
       },
@@ -559,7 +568,7 @@
         "kind": "text",
         "text": "full",
         "x": 45.8738,
-        "y": 3.554,
+        "y": 4.0324,
         "font": "body",
         "size": 0.9,
         "anchor": "middle",
@@ -579,11 +588,11 @@
           },
           {
             "x": 48.6,
-            "y": 6.6824
+            "y": 6.9694
           },
           {
             "x": 48.6,
-            "y": 7.804
+            "y": 8.2824
           }
         ],
         "thickness": 0.12,
@@ -594,6 +603,7 @@
         "glyph": "arrowheadBlackDown",
         "x": 48.6,
         "y": 9,
+        "scale": 0.6,
         "anchor": "middle",
         "className": "technique-bend-arrow"
       }
@@ -601,68 +611,68 @@
   },
   "tab": {
     "widthSp": 80,
-    "heightSp": 17.0353,
+    "heightSp": 16.5569,
     "primitives": [
       {
         "kind": "line",
         "x1": 2,
-        "y1": 6.321,
+        "y1": 5.8426,
         "x2": 27.9,
-        "y2": 6.321,
+        "y2": 5.8426,
         "thickness": 0.1,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 2,
-        "y1": 7.4639,
+        "y1": 6.9855,
         "x2": 27.9,
-        "y2": 7.4639,
+        "y2": 6.9855,
         "thickness": 0.1,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 2,
-        "y1": 8.6067,
+        "y1": 8.1283,
         "x2": 27.9,
-        "y2": 8.6067,
+        "y2": 8.1283,
         "thickness": 0.1,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 2,
-        "y1": 9.7496,
+        "y1": 9.2712,
         "x2": 27.9,
-        "y2": 9.7496,
+        "y2": 9.2712,
         "thickness": 0.1,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 2,
-        "y1": 10.8924,
+        "y1": 10.414,
         "x2": 27.9,
-        "y2": 10.8924,
+        "y2": 10.414,
         "thickness": 0.1,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 2,
-        "y1": 12.0353,
+        "y1": 11.5569,
         "x2": 27.9,
-        "y2": 12.0353,
+        "y2": 11.5569,
         "thickness": 0.1,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 2,
-        "y1": 6.321,
+        "y1": 5.8426,
         "x2": 2,
-        "y2": 12.0353,
+        "y2": 11.5569,
         "thickness": 0.16,
         "className": "barline barline-start"
       },
@@ -670,14 +680,14 @@
         "kind": "glyph",
         "glyph": "6stringTabClef",
         "x": 3.1,
-        "y": 9.1781,
+        "y": 8.6997,
         "className": "tab-clef"
       },
       {
         "kind": "glyph",
         "glyph": "timeSig4",
         "x": 6.35,
-        "y": 7.7496,
+        "y": 7.2712,
         "anchor": "middle",
         "className": "time-sig-num"
       },
@@ -685,14 +695,14 @@
         "kind": "glyph",
         "glyph": "timeSig4",
         "x": 6.35,
-        "y": 10.6067,
+        "y": 10.1283,
         "anchor": "middle",
         "className": "time-sig-den"
       },
       {
         "kind": "rect",
         "x": 12.1,
-        "y": 8.0953,
+        "y": 7.6169,
         "w": 0.75,
         "h": 1.0229,
         "fill": "var(--paper, oklch(0.985 0.006 85))",
@@ -703,7 +713,7 @@
         "kind": "text",
         "text": "7",
         "x": 12.475,
-        "y": 8.6067,
+        "y": 8.1283,
         "font": "body",
         "size": 1.25,
         "anchor": "middle",
@@ -715,7 +725,7 @@
       {
         "kind": "rect",
         "x": 21.85,
-        "y": 8.0953,
+        "y": 7.6169,
         "w": 0.75,
         "h": 1.0229,
         "fill": "var(--paper, oklch(0.985 0.006 85))",
@@ -726,7 +736,7 @@
         "kind": "text",
         "text": "7",
         "x": 22.225,
-        "y": 8.6067,
+        "y": 8.1283,
         "font": "body",
         "size": 1.25,
         "anchor": "middle",
@@ -738,70 +748,70 @@
       {
         "kind": "line",
         "x1": 27.9,
-        "y1": 6.321,
+        "y1": 5.8426,
         "x2": 27.9,
-        "y2": 12.0353,
+        "y2": 11.5569,
         "thickness": 0.16,
         "className": "barline"
       },
       {
         "kind": "line",
         "x1": 27.9,
-        "y1": 6.321,
+        "y1": 5.8426,
         "x2": 48.8,
-        "y2": 6.321,
+        "y2": 5.8426,
         "thickness": 0.1,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 27.9,
-        "y1": 7.4639,
+        "y1": 6.9855,
         "x2": 48.8,
-        "y2": 7.4639,
+        "y2": 6.9855,
         "thickness": 0.1,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 27.9,
-        "y1": 8.6067,
+        "y1": 8.1283,
         "x2": 48.8,
-        "y2": 8.6067,
+        "y2": 8.1283,
         "thickness": 0.1,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 27.9,
-        "y1": 9.7496,
+        "y1": 9.2712,
         "x2": 48.8,
-        "y2": 9.7496,
+        "y2": 9.2712,
         "thickness": 0.1,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 27.9,
-        "y1": 10.8924,
+        "y1": 10.414,
         "x2": 48.8,
-        "y2": 10.8924,
+        "y2": 10.414,
         "thickness": 0.1,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 27.9,
-        "y1": 12.0353,
+        "y1": 11.5569,
         "x2": 48.8,
-        "y2": 12.0353,
+        "y2": 11.5569,
         "thickness": 0.1,
         "className": "staff-line"
       },
       {
         "kind": "rect",
         "x": 33,
-        "y": 8.0953,
+        "y": 7.6169,
         "w": 0.75,
         "h": 1.0229,
         "fill": "var(--paper, oklch(0.985 0.006 85))",
@@ -812,7 +822,7 @@
         "kind": "text",
         "text": "7",
         "x": 33.375,
-        "y": 8.6067,
+        "y": 8.1283,
         "font": "body",
         "size": 1.25,
         "anchor": "middle",
@@ -824,7 +834,7 @@
       {
         "kind": "rect",
         "x": 42.75,
-        "y": 8.0953,
+        "y": 7.6169,
         "w": 0.75,
         "h": 1.0229,
         "fill": "var(--paper, oklch(0.985 0.006 85))",
@@ -835,7 +845,7 @@
         "kind": "text",
         "text": "7",
         "x": 43.125,
-        "y": 8.6067,
+        "y": 8.1283,
         "font": "body",
         "size": 1.25,
         "anchor": "middle",
@@ -847,16 +857,16 @@
       {
         "kind": "line",
         "x1": 48,
-        "y1": 6.321,
+        "y1": 5.8426,
         "x2": 48,
-        "y2": 12.0353,
+        "y2": 11.5569,
         "thickness": 0.16,
         "className": "barline barline-final-thin"
       },
       {
         "kind": "rect",
         "x": 48.3,
-        "y": 6.321,
+        "y": 5.8426,
         "w": 0.5,
         "h": 5.7143,
         "fill": "currentColor",
@@ -867,19 +877,19 @@
         "points": [
           {
             "x": 13.1,
-            "y": 8.6067
+            "y": 8.1283
           },
           {
             "x": 14.2,
-            "y": 8.6067
+            "y": 8.1283
           },
           {
             "x": 15.1,
-            "y": 6.6329
+            "y": 5.8674
           },
           {
             "x": 15.1,
-            "y": 5.317
+            "y": 4.3602
           }
         ],
         "thickness": 0.12,
@@ -889,7 +899,8 @@
         "kind": "glyph",
         "glyph": "arrowheadBlackUp",
         "x": 15.1,
-        "y": 5.317,
+        "y": 4.3602,
+        "scale": 0.6,
         "anchor": "middle",
         "className": "technique-bend-arrow"
       },
@@ -909,15 +920,15 @@
         "points": [
           {
             "x": 15.1,
-            "y": 4.121
+            "y": 3.6426
           },
           {
             "x": 16.2,
-            "y": 4.121
+            "y": 3.6426
           },
           {
             "x": 17.1,
-            "y": 4.7491
+            "y": 4.5578
           },
           {
             "x": 17.1,
@@ -931,7 +942,8 @@
         "kind": "glyph",
         "glyph": "arrowheadBlackDown",
         "x": 17.1,
-        "y": 6.3639,
+        "y": 5.8855,
+        "scale": 0.6,
         "anchor": "middle",
         "className": "technique-bend-arrow"
       },
@@ -951,19 +963,19 @@
         "points": [
           {
             "x": 22.85,
-            "y": 8.6067
+            "y": 8.1283
           },
           {
             "x": 23.3794,
-            "y": 8.6067
+            "y": 8.1283
           },
           {
             "x": 23.8125,
-            "y": 6.6329
+            "y": 5.8674
           },
           {
             "x": 23.8125,
-            "y": 5.317
+            "y": 4.3602
           }
         ],
         "thickness": 0.12,
@@ -973,7 +985,8 @@
         "kind": "glyph",
         "glyph": "arrowheadBlackUp",
         "x": 23.8125,
-        "y": 5.317,
+        "y": 4.3602,
+        "scale": 0.6,
         "anchor": "middle",
         "className": "technique-bend-arrow"
       },
@@ -993,15 +1006,15 @@
         "points": [
           {
             "x": 23.8125,
-            "y": 4.121
+            "y": 3.6426
           },
           {
             "x": 24.3419,
-            "y": 4.121
+            "y": 3.6426
           },
           {
             "x": 24.775,
-            "y": 6.0948
+            "y": 5.9035
           },
           {
             "x": 24.775,
@@ -1015,7 +1028,8 @@
         "kind": "glyph",
         "glyph": "arrowheadBlackDown",
         "x": 24.775,
-        "y": 8.6067,
+        "y": 8.1283,
+        "scale": 0.6,
         "anchor": "middle",
         "className": "technique-bend-arrow"
       },
@@ -1024,19 +1038,19 @@
         "points": [
           {
             "x": 24.775,
-            "y": 8.6067
+            "y": 8.1283
           },
           {
             "x": 25.3044,
-            "y": 8.6067
+            "y": 8.1283
           },
           {
             "x": 25.7375,
-            "y": 6.6329
+            "y": 5.8674
           },
           {
             "x": 25.7375,
-            "y": 5.317
+            "y": 4.3602
           }
         ],
         "thickness": 0.12,
@@ -1046,7 +1060,8 @@
         "kind": "glyph",
         "glyph": "arrowheadBlackUp",
         "x": 25.7375,
-        "y": 5.317,
+        "y": 4.3602,
+        "scale": 0.6,
         "anchor": "middle",
         "className": "technique-bend-arrow"
       },
@@ -1066,15 +1081,15 @@
         "points": [
           {
             "x": 25.7375,
-            "y": 4.121
+            "y": 3.6426
           },
           {
             "x": 26.2669,
-            "y": 4.121
+            "y": 3.6426
           },
           {
             "x": 26.7,
-            "y": 6.0948
+            "y": 5.9035
           },
           {
             "x": 26.7,
@@ -1088,7 +1103,8 @@
         "kind": "glyph",
         "glyph": "arrowheadBlackDown",
         "x": 26.7,
-        "y": 8.6067,
+        "y": 8.1283,
+        "scale": 0.6,
         "anchor": "middle",
         "className": "technique-bend-arrow"
       },
@@ -1097,19 +1113,19 @@
         "points": [
           {
             "x": 34,
-            "y": 8.6067
+            "y": 8.1283
           },
           {
             "x": 34.55,
-            "y": 8.6067
+            "y": 8.1283
           },
           {
             "x": 35,
-            "y": 6.6329
+            "y": 5.8674
           },
           {
             "x": 35,
-            "y": 5.317
+            "y": 4.3602
           }
         ],
         "thickness": 0.12,
@@ -1119,7 +1135,8 @@
         "kind": "glyph",
         "glyph": "arrowheadBlackUp",
         "x": 35,
-        "y": 5.317,
+        "y": 4.3602,
+        "scale": 0.6,
         "anchor": "middle",
         "className": "technique-bend-arrow"
       },
@@ -1137,9 +1154,9 @@
       {
         "kind": "line",
         "x1": 35,
-        "y1": 4.121,
+        "y1": 3.6426,
         "x2": 37,
-        "y2": 4.121,
+        "y2": 3.6426,
         "thickness": 0.12,
         "className": "technique-bend technique-bend-hold"
       },
@@ -1148,15 +1165,15 @@
         "points": [
           {
             "x": 37,
-            "y": 4.121
+            "y": 3.6426
           },
           {
             "x": 37.55,
-            "y": 4.121
+            "y": 3.6426
           },
           {
             "x": 38,
-            "y": 6.0948
+            "y": 5.9035
           },
           {
             "x": 38,
@@ -1170,7 +1187,8 @@
         "kind": "glyph",
         "glyph": "arrowheadBlackDown",
         "x": 38,
-        "y": 8.6067,
+        "y": 8.1283,
+        "scale": 0.6,
         "anchor": "middle",
         "className": "technique-bend-arrow"
       },
@@ -1179,19 +1197,19 @@
         "points": [
           {
             "x": 43.75,
-            "y": 8.6067
+            "y": 8.1283
           },
           {
             "x": 44.2794,
-            "y": 8.6067
+            "y": 8.1283
           },
           {
             "x": 44.7125,
-            "y": 6.6329
+            "y": 5.8674
           },
           {
             "x": 44.7125,
-            "y": 5.317
+            "y": 4.3602
           }
         ],
         "thickness": 0.12,
@@ -1201,7 +1219,8 @@
         "kind": "glyph",
         "glyph": "arrowheadBlackUp",
         "x": 44.7125,
-        "y": 5.317,
+        "y": 4.3602,
+        "scale": 0.6,
         "anchor": "middle",
         "className": "technique-bend-arrow"
       },
@@ -1221,15 +1240,15 @@
         "points": [
           {
             "x": 44.7125,
-            "y": 4.121
+            "y": 3.6426
           },
           {
             "x": 46.3006,
-            "y": 4.121
+            "y": 3.6426
           },
           {
             "x": 47.6,
-            "y": 6.0948
+            "y": 5.9035
           },
           {
             "x": 47.6,
@@ -1243,7 +1262,8 @@
         "kind": "glyph",
         "glyph": "arrowheadBlackDown",
         "x": 47.6,
-        "y": 8.6067,
+        "y": 8.1283,
+        "scale": 0.6,
         "anchor": "middle",
         "className": "technique-bend-arrow"
       }
