@@ -111,6 +111,27 @@ try {
   await wait(`[...${sheet}.querySelectorAll('.row')].some(r => r.textContent.includes('A synthetic fixture') && r.textContent.includes('Synthetic fixture'))`);
   await c.evaluate(`${sheet}.querySelector('button[aria-label="Close tags"]').click()`);
   await wait(`!${piece}.querySelector('mnx-studio-tags')`);
+  // The Instruments sheet: in the frame's side slot, one row per part. The tray
+  // carries no Sound selector here — the sheet chooses each part's sound.
+  const player = `${piece}.querySelector('mnx-player')`;
+  assert.equal(await c.evaluate(`!!${player}.shadowRoot.querySelector('select[aria-label="Playback sound"]')`), false);
+  await c.evaluate(`[...${piece}.querySelectorAll('button[slot=actions]')].find(b => b.textContent.includes('Instruments · 1')).click()`);
+  const instruments = `${piece}.querySelector('mnx-studio-instruments[slot=side]')?.shadowRoot`;
+  await wait(`${instruments}?.querySelectorAll('.part').length === 1`);
+  // A lone part cannot leave the score; a mute and a sound reach the player's
+  // mix and the per-piece preference.
+  await wait(`${instruments}.querySelector('button[aria-label^="Hide"]').disabled`);
+  await c.evaluate(`${instruments}.querySelector('button[aria-label^="Mute"]').click()`);
+  await wait(`${player}.partMix[0]?.muted === true && JSON.parse(localStorage.getItem('mnx-studio.parts.${pieceId}')).mix[0].muted === true`);
+  await c.evaluate(`{ const s = ${instruments}.querySelector('select'); s.value = 'piano'; s.dispatchEvent(new Event('change')); }`);
+  await wait(`${player}.partMix[0]?.sound === 'piano'`);
+  const mixShot = await c.send('Page.captureScreenshot'); await fs.writeFile('/tmp/mnx-studio-instruments.png',Buffer.from(mixShot.result.data,'base64'));
+  // Put the mix back so the next run starts from the default.
+  await c.evaluate(`${instruments}.querySelector('button[aria-label^="Unmute"]').click()`);
+  await c.evaluate(`{ const s = ${instruments}.querySelector('select'); s.value = 'synth'; s.dispatchEvent(new Event('change')); }`);
+  await wait(`${player}.partMix[0]?.muted === false && ${player}.partMix[0]?.sound === 'synth'`);
+  await c.evaluate(`${instruments}.querySelector('button[aria-label="Close instruments"]').click()`);
+  await wait(`!${piece}.querySelector('mnx-studio-instruments')`);
   // Back to the library without a reload: the frame goes with the piece, the header returns.
   await c.evaluate(`${piece}.querySelector('a[slot=back]').click()`);
   await wait(`!!${app}.querySelector('mnx-studio-library') && !!${app}.querySelector('header') && !${app}.querySelector('mnx-studio-piece')`);
