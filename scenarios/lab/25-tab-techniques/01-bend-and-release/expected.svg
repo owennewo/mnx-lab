@@ -15,10 +15,10 @@
 <rect x="454.4" y="128" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
 <path d="M 229.04 144 C 264.24 144, 293.04 112.4896, 293.04 91.4816" fill="none" stroke="currentColor" stroke-width="1.92" class="technique-bend"></path>
 <text x="293.04" y="91.4816" font-family="Bravura" font-size="38.4" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="technique-bend-arrow"></text>
-<text x="293.04" y="64.5184" font-family="var(--font-family-sans)" font-size="14.4" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="technique-bend-label">full</text>
+<text x="293.04" y="74.4" font-family="var(--font-family-sans)" font-size="14.4" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="technique-bend-label">full</text>
 <line x1="385.04" y1="144" x2="385.04" y2="91.4816" stroke="currentColor" stroke-width="1.92" class="technique-bend technique-bend-prebend"></line>
 <text x="385.04" y="91.4816" font-family="Bravura" font-size="38.4" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="technique-bend-arrow"></text>
-<text x="385.04" y="64.5184" font-family="var(--font-family-sans)" font-size="14.4" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="technique-bend-label">full</text>
+<text x="385.04" y="74.4" font-family="var(--font-family-sans)" font-size="14.4" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="technique-bend-label">full</text>
 <line x1="385.04" y1="80" x2="414.12" y2="80" stroke="currentColor" stroke-width="1.92" class="technique-bend technique-bend-hold"></line>
 <path d="M 414.12 80 C 430.1136 80, 443.2 111.5104, 443.2 132.5184" fill="none" stroke="currentColor" stroke-width="1.92" class="technique-bend technique-bend-release"></path>
 <text x="443.2" y="144" font-family="Bravura" font-size="38.4" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="technique-bend-arrow"></text>

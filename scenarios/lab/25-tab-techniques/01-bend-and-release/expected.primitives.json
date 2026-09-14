@@ -160,7 +160,7 @@
         "kind": "text",
         "text": "full",
         "x": 18.315,
-        "y": 4.0324,
+        "y": 4.65,
         "font": "body",
         "size": 0.9,
         "anchor": "middle",
@@ -189,7 +189,7 @@
         "kind": "text",
         "text": "full",
         "x": 24.065,
-        "y": 4.0324,
+        "y": 4.65,
         "font": "body",
         "size": 0.9,
         "anchor": "middle",
@@ -241,68 +241,68 @@
   },
   "tab": {
     "widthSp": 80,
-    "heightSp": 16.5569,
+    "heightSp": 15.9393,
     "primitives": [
       {
         "kind": "line",
         "x1": 2,
-        "y1": 5.8426,
+        "y1": 5.225,
         "x2": 27.9,
-        "y2": 5.8426,
+        "y2": 5.225,
         "thickness": 0.1,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 2,
-        "y1": 6.9855,
+        "y1": 6.3679,
         "x2": 27.9,
-        "y2": 6.9855,
+        "y2": 6.3679,
         "thickness": 0.1,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 2,
-        "y1": 8.1283,
+        "y1": 7.5107,
         "x2": 27.9,
-        "y2": 8.1283,
+        "y2": 7.5107,
         "thickness": 0.1,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 2,
-        "y1": 9.2712,
+        "y1": 8.6536,
         "x2": 27.9,
-        "y2": 9.2712,
+        "y2": 8.6536,
         "thickness": 0.1,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 2,
-        "y1": 10.414,
+        "y1": 9.7964,
         "x2": 27.9,
-        "y2": 10.414,
+        "y2": 9.7964,
         "thickness": 0.1,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 2,
-        "y1": 11.5569,
+        "y1": 10.9393,
         "x2": 27.9,
-        "y2": 11.5569,
+        "y2": 10.9393,
         "thickness": 0.1,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 2,
-        "y1": 5.8426,
+        "y1": 5.225,
         "x2": 2,
-        "y2": 11.5569,
+        "y2": 10.9393,
         "thickness": 0.16,
         "className": "barline barline-start"
       },
@@ -310,14 +310,14 @@
         "kind": "glyph",
         "glyph": "6stringTabClef",
         "x": 3.1,
-        "y": 8.6997,
+        "y": 8.0821,
         "className": "tab-clef"
       },
       {
         "kind": "glyph",
         "glyph": "timeSig4",
         "x": 6.35,
-        "y": 7.2712,
+        "y": 6.6536,
         "anchor": "middle",
         "className": "time-sig-num"
       },
@@ -325,14 +325,14 @@
         "kind": "glyph",
         "glyph": "timeSig4",
         "x": 6.35,
-        "y": 10.1283,
+        "y": 9.5107,
         "anchor": "middle",
         "className": "time-sig-den"
       },
       {
         "kind": "rect",
         "x": 12.1,
-        "y": 7.6169,
+        "y": 6.9993,
         "w": 0.75,
         "h": 1.0229,
         "fill": "var(--paper, oklch(0.985 0.006 85))",
@@ -343,7 +343,7 @@
         "kind": "text",
         "text": "7",
         "x": 12.475,
-        "y": 8.1283,
+        "y": 7.5107,
         "font": "body",
         "size": 1.25,
         "anchor": "middle",
@@ -355,7 +355,7 @@
       {
         "kind": "rect",
         "x": 21.85,
-        "y": 7.6169,
+        "y": 6.9993,
         "w": 0.75,
         "h": 1.0229,
         "fill": "var(--paper, oklch(0.985 0.006 85))",
@@ -366,7 +366,7 @@
         "kind": "text",
         "text": "7",
         "x": 22.225,
-        "y": 8.1283,
+        "y": 7.5107,
         "font": "body",
         "size": 1.25,
         "anchor": "middle",
@@ -378,16 +378,16 @@
       {
         "kind": "line",
         "x1": 27.1,
-        "y1": 5.8426,
+        "y1": 5.225,
         "x2": 27.1,
-        "y2": 11.5569,
+        "y2": 10.9393,
         "thickness": 0.16,
         "className": "barline barline-final-thin"
       },
       {
         "kind": "rect",
         "x": 27.4,
-        "y": 5.8426,
+        "y": 5.225,
         "w": 0.5,
         "h": 5.7143,
         "fill": "currentColor",
@@ -398,19 +398,19 @@
         "points": [
           {
             "x": 13.1,
-            "y": 8.1283
+            "y": 7.5107
           },
           {
             "x": 15.3,
-            "y": 8.1283
+            "y": 7.5107
           },
           {
             "x": 17.1,
-            "y": 5.8674
+            "y": 5.2498
           },
           {
             "x": 17.1,
-            "y": 4.3602
+            "y": 3.7426
           }
         ],
         "thickness": 0.12,
@@ -420,7 +420,7 @@
         "kind": "glyph",
         "glyph": "arrowheadBlackUp",
         "x": 17.1,
-        "y": 4.3602,
+        "y": 3.7426,
         "scale": 0.6,
         "anchor": "middle",
         "className": "technique-bend-arrow"
@@ -439,9 +439,9 @@
       {
         "kind": "line",
         "x1": 22.85,
-        "y1": 8.1283,
+        "y1": 7.5107,
         "x2": 22.85,
-        "y2": 4.3602,
+        "y2": 3.7426,
         "thickness": 0.12,
         "className": "technique-bend technique-bend-prebend"
       },
@@ -449,7 +449,7 @@
         "kind": "glyph",
         "glyph": "arrowheadBlackUp",
         "x": 22.85,
-        "y": 4.3602,
+        "y": 3.7426,
         "scale": 0.6,
         "anchor": "middle",
         "className": "technique-bend-arrow"
@@ -468,9 +468,9 @@
       {
         "kind": "line",
         "x1": 22.85,
-        "y1": 3.6426,
+        "y1": 3.025,
         "x2": 24.775,
-        "y2": 3.6426,
+        "y2": 3.025,
         "thickness": 0.12,
         "className": "technique-bend technique-bend-hold"
       },
@@ -479,19 +479,19 @@
         "points": [
           {
             "x": 24.775,
-            "y": 3.6426
+            "y": 3.025
           },
           {
             "x": 25.8338,
-            "y": 3.6426
+            "y": 3.025
           },
           {
             "x": 26.7,
-            "y": 5.9035
+            "y": 5.2859
           },
           {
             "x": 26.7,
-            "y": 7.4107
+            "y": 6.7931
           }
         ],
         "thickness": 0.12,
@@ -501,7 +501,7 @@
         "kind": "glyph",
         "glyph": "arrowheadBlackDown",
         "x": 26.7,
-        "y": 8.1283,
+        "y": 7.5107,
         "scale": 0.6,
         "anchor": "middle",
         "className": "technique-bend-arrow"

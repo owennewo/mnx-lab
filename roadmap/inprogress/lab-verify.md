@@ -81,22 +81,26 @@ Provenance answers "did this change?". This doc answers "should it have?".
 
 ## Open debt
 
-### Smaller bend arrowheads — 2026-09-14
+### Smaller bend arrowheads, labels on the tip — 2026-09-14
 
-Owner: user-requested engraving tweak, landed directly on `main`; no roadmap doc. A
-bend's arrowhead drew `arrowheadBlackUp`/`Down` at natural size, a full staff space
-tall over a 0.12sp stroke. `technique.ts` now draws it at `ARROWHEAD_SCALE` 0.6
-(~0.72sp), and `ARROWHEAD_SP` follows the drawn size, so the curve still ends at the
-head's base and the bend label drops by the same amount.
+Owner: user-requested engraving tweaks, landed directly on `main` in two commits; no
+roadmap doc. A bend's arrowhead drew `arrowheadBlackUp`/`Down` at natural size, a
+full staff space tall over a 0.12sp stroke. `technique.ts` now draws it at
+`ARROWHEAD_SCALE` 0.6 (~0.72sp), and `ARROWHEAD_SP` follows the drawn size, so the
+curve still ends at the head's base. Then the labels: every bend label had been
+lifted a head-height above the arrow's TIP, but an up head hangs below its tip, so
+"full" floated a whole head clear of it. An up arrival or pre-bend now puts the label
+baseline `BEND_LABEL_GAP_SP` (0.35sp) above the tip; a release still clears its down
+head, which stands above the tip.
 
 Two scenarios moved, all four goldens each. Both were `rendered`, so nothing was
-demoted.
+demoted. The tab staff also sits higher in both, since the bends need less headroom.
 
 Look for: every bend, pre-bend and release head is visibly smaller and still sits
 exactly on the end of its curve or pre-bend line — no gap, no stroke poking past the
-tip. Labels ("full", "1/2") sit just above the up heads, a little lower than before.
-The release label in `06-bend-shapes` bar 1 still crowds its curve, as it did before
-this change.
+tip. Labels over up heads ("full", "1/2") sit just clear of the tip — close, but not
+touching, and the slash of "1/2" clear of it too. The release label in
+`06-bend-shapes` bar 1 still overlaps its curve, as it did before these changes.
 
 Scenario set (paths under `scenarios/`):
 

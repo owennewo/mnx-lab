@@ -150,6 +150,9 @@ const BEND_END_CLEAR_SP = 1.2;
 const STUB_SP = 0.9;
 /** Baseline drop of a label under the mark it names. */
 const LABEL_GAP_SP = 0.25;
+/** Baseline of a bend label above the ink it names — a shade more than
+ *  `LABEL_GAP_SP`, for the slash of "1/2" dipping below the baseline. */
+const BEND_LABEL_GAP_SP = 0.35;
 /** How far a hammer/pull slur bulges away from its endpoints. */
 const SLUR_BULGE_SP = 0.8;
 /** Clearance between a notehead and a technique slur's endpoint — the same
@@ -506,7 +509,7 @@ function emitBend(
       className: 'technique-bend technique-bend-prebend'
     });
     arrowhead('up', startX, 0, y, primitives);
-    laneLabel(bendLabel(points[0].alter), startX, y - ARROWHEAD_SP - LABEL_GAP_SP,
+    laneLabel(bendLabel(points[0].alter), startX, y - BEND_LABEL_GAP_SP,
       'technique-bend-label', primitives);
   }
 
@@ -551,8 +554,10 @@ function emitBend(
     // Every arrival OFF the written pitch is labelled, rising or falling —
     // without the falling label a partial release reads as a full one
     // (core-bend-stops.md, part B; bendLabel is '' at 0, so a landing on the
-    // string carries no label).
-    laneLabel(bendLabel(b.alter), to.x, to.y - ARROWHEAD_SP - LABEL_GAP_SP,
+    // string carries no label). An up head hangs BELOW its tip, so the label
+    // needs only its gap above the tip; a down head stands above its tip and
+    // the label clears the whole head.
+    laneLabel(bendLabel(b.alter), to.x, to.y - (rising ? 0 : ARROWHEAD_SP) - BEND_LABEL_GAP_SP,
       'technique-bend-label', primitives);
   }
 }
