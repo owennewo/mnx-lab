@@ -161,6 +161,9 @@ export interface NativeSinkOptions {
   sampleLoader?: SamplePackLoader;
   /** Master amplitude, independent of note velocities; defaults to 1. */
   volume?: number;
+  /** The bus a voice routes through before the master (its part); undefined
+   *  sends the voice straight to the master. See `setBusLevel`. */
+  voiceBus?: (voice: string) => string | undefined;
   /** A host-owned live or offline context. It is never closed by the sink. */
   context?: BaseAudioContext;
   /** Optional host routing, from the same context. */
@@ -173,6 +176,9 @@ export class NativeSink implements Sink {
   private owned = false;
   private output?: GainNode;
   private volume = 1;
+  /** One gain per bus between its voices and the master, made on first use. */
+  private buses = new Map<string, GainNode>();
+  private busLevels = new Map<string, number>();
   private disposed = false;
   private sampleBanks = new Map<SamplePreset, SamplePackBank>();
   private sampleRequests = new Map<SamplePreset, Promise<void>>();
@@ -253,6 +259,16 @@ export class NativeSink implements Sink {
     this.volume = volume;
     this.output?.gain.setTargetAtTime(volume, this.now(), 0.005);
   }
+  /** A bus's level beneath the master — a part's volume, 0 when muted. Held
+   *  until the bus exists, and smoothed like the master so a live change
+   *  never clicks. */
+  setBusLevel(bus: string, level: number): void {
+    this.live();
+    if (!Number.isFinite(level) || level < 0 || level > 1)
+      throw new RangeError('Bus level must be within [0, 1].');
+    this.busLevels.set(bus, level);
+    this.buses.get(bus)?.gain.setTargetAtTime(level, this.now(), 0.005);
+  }
   private destination(): AudioNode {
     if (!this.output) {
       this.output = this.context!.createGain();
@@ -260,6 +276,18 @@ export class NativeSink implements Sink {
       this.output.connect(this.options.destination ?? this.context!.destination);
     }
     return this.output;
+  }
+  private busFor(voice: string): AudioNode {
+    const key = this.options.voiceBus?.(voice);
+    if (key === undefined) return this.destination();
+    let bus = this.buses.get(key);
+    if (!bus) {
+      bus = this.context!.createGain();
+      bus.gain.value = this.busLevels.get(key) ?? 1;
+      bus.connect(this.destination());
+      this.buses.set(key, bus);
+    }
+    return bus;
   }
   private voiceAt(id: string, time: number): Voice | undefined {
     return [...this.voices]
@@ -379,7 +407,7 @@ export class NativeSink implements Sink {
           source.connect(filter);
           filter.connect(gain);
         } else source.connect(gain);
-        gain.connect(this.destination());
+        gain.connect(this.busFor(event.voice));
         voice = {
           id: event.voice,
           start: time,
@@ -458,6 +486,8 @@ export class NativeSink implements Sink {
       v.source.onended = null;
     }
     this.voices.clear();
+    for (const bus of this.buses.values()) bus.disconnect();
+    this.buses.clear();
     this.output?.disconnect();
     this.output = undefined;
     if (this.owned && this.context && 'close' in this.context)

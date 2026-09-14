@@ -1,6 +1,8 @@
 # Sample packs and the synth voice
 
-Choose an instrument from the **Sound** menu, then Play. Synth remains the default.
+Choose an instrument from the **Sound** menu, then Play — in studio, each part's sound in
+the **Instruments** sheet, where parts may use different packs and all of them load before
+playing ([the part mix](player-element.md#the-part-mix)). Synth remains the default.
 Changing sound during playback pauses at the current position, prepares the new
 preset and resumes there. Stop cancels that pending start. A load error is visible;
 retry Play or choose Synth. No samples are downloaded for ordinary synth playback.

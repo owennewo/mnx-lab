@@ -34,15 +34,20 @@ import type { StripChange } from '../../../src/elements/ScoreFrame.ts';
 import type { ZoomPadChange } from '../../../src/elements/ZoomPad.ts';
 import { libraryReturnHref, returnToLibrary } from './StudioApp.ts';
 import { nextTheme, readTheme, resolvedTheme, setTheme, themeGlyph, type ThemeSetting } from './theme.ts';
+import { isKitPart, type PartMix } from '../../../src/audio/partMix.ts';
 import './TagsSheet.ts';
 import './RecordingsSheet.ts';
+import './InstrumentsSheet.ts';
 import type { TagsSnapshot } from './TagsSheet.ts';
+import type { InstrumentPart } from './InstrumentsSheet.ts';
 
-import { VIEW_KEY, DISPLAY_KEY, UNROLLED_KEY, STAFF_SCALE_KEY, DENSITY_H_KEY, SPACING_MODE_KEY, TOOLS_OPEN_KEY, PLAYER_OPEN_KEY, read, write, readView, readDisplay, readNumber } from './scorePreferences.ts';
+import { VIEW_KEY, DISPLAY_KEY, UNROLLED_KEY, STAFF_SCALE_KEY, DENSITY_H_KEY, SPACING_MODE_KEY, TOOLS_OPEN_KEY, PLAYER_OPEN_KEY, read, write, readView, readDisplay, readNumber, readParts, writeParts } from './scorePreferences.ts';
 
 const back = html`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"></path></svg>`;
 /** The recordings sheet's mark in the tray: an info ring beside the source switcher. */
 const infoGlyph = html`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5"></path><circle cx="12" cy="8" r="0.6" fill="currentColor" stroke="none"></circle></svg>`;
+/** Instruments: three faders, each knob at its own level. */
+const mixerGlyph = html`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4v5M6 13v7M12 4v11M12 19v1M18 4v1M18 9v11"></path><circle cx="6" cy="11" r="2"></circle><circle cx="12" cy="17" r="2"></circle><circle cx="18" cy="7" r="2"></circle></svg>`;
 const tagGlyph = html`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12V4h8l10 10-8 8z"></path><circle cx="7.5" cy="8.5" r="1.2" fill="currentColor" stroke="none"></circle></svg>`;
 
 @customElement('mnx-studio-piece')
@@ -56,6 +61,12 @@ export class PiecePage extends LitElement {
   @state() private loading = true;
   @state() private tagsOpen = false;
   @state() private recordingsOpen = false;
+  @state() private instrumentsOpen = false;
+  /** The piece's parts as the reader left them: off the score, and the mix. */
+  @state() private hiddenParts: readonly number[] = [];
+  @state() private partMix: PartMix = {};
+  /** What is playing — a recording has no parts to mix. */
+  @state() private playbackKind: string | undefined;
   @state() private selectedRecordingId: string | null = null;
   @state() private addingRecording = false;
   @state() private recordingWarning: { id: string; message: string } | null = null;
@@ -154,6 +165,7 @@ export class PiecePage extends LitElement {
     this.error = '';
     this.loading = true;
     this.tagsOpen = false; this.recordingsOpen = false; this.selectedRecordingId = null; this.addingRecording = false;
+    ({ hidden: this.hiddenParts, mix: this.partMix } = readParts(this.pieceId));
     try {
       const readPair = () => Promise.all([
         this.client.canonical(this.pieceId),
@@ -268,6 +280,28 @@ export class PiecePage extends LitElement {
   }
   private readonly densitySteps = () => this.viewer?.densitySteps() ?? null;
 
+  // ── the Instruments sheet ───────────────────────────────────────────────
+
+  private setParts(hidden: readonly number[], mix: PartMix) {
+    this.hiddenParts = hidden;
+    this.partMix = mix;
+    writeParts(this.pieceId, { hidden, mix });
+  }
+  private instrumentParts(doc: MnxDocument): InstrumentPart[] {
+    const performance = this.player?.performance ?? null;
+    return doc.mnxJson.parts.map((part, index) => {
+      const lab = part._x?.mnxLab;
+      const kit = 'kit' in part || (performance ? isKitPart(performance, index) : false);
+      const strings = lab?.strings?.length;
+      const detail = kit
+        ? 'Percussion'
+        : [strings ? `${strings} strings` : '', lab?.capo ? `Capo ${lab.capo}` : '', (part.staves ?? 1) > 1 ? `${part.staves} staves` : '']
+            .filter(Boolean)
+            .join(' · ');
+      return { index, name: part.name || `Part ${index + 1}`, detail, kit };
+    });
+  }
+
   render() {
     const title = this.doc ? (this.tag('title') ?? this.doc.name) : '';
     const artist = this.doc ? (this.tag('artist') ?? documentArtist(this.doc.mnxJson) ?? '') : '';
@@ -304,8 +338,11 @@ export class PiecePage extends LitElement {
       >
         <a slot="back" href=${libraryReturnHref()} @click=${returnToLibrary}>${back}<span>Library</span></a>
         ${this.doc
-          ? html`<button slot="actions" type="button" aria-pressed=${this.tagsOpen} @click=${() => { this.tagsOpen = !this.tagsOpen; this.recordingsOpen = false; }}>
+          ? html`<button slot="actions" type="button" aria-pressed=${this.tagsOpen} @click=${() => { this.tagsOpen = !this.tagsOpen; this.recordingsOpen = false; this.instrumentsOpen = false; }}>
               ${tagGlyph}<span>Tags · ${this.snapshot?.tags.length ?? 0}</span>
+            </button>
+            <button slot="actions" type="button" aria-pressed=${this.instrumentsOpen} @click=${() => { this.instrumentsOpen = !this.instrumentsOpen; this.tagsOpen = false; this.recordingsOpen = false; }}>
+              ${mixerGlyph}<span>Instruments · ${this.doc.mnxJson.parts.length}</span>
             </button>`
           : nothing}
         <button slot="menu" class="theme" type="button" title=${themeSentence} aria-label=${themeSentence} @click=${this.cycleTheme}>
@@ -336,11 +373,14 @@ export class PiecePage extends LitElement {
           .zoom=${this.staffScale}
           .densityH=${this.densityH}
           .spacingMode=${this.spacingMode}
+          .hiddenParts=${this.hiddenParts}
           @render-scale=${(e: CustomEvent<RenderScale>) => (this.effectiveStaffScale = e.detail.staffScale)}
         ></mnx-document-viewer>
         <mnx-player slot="player" .recordings=${this.recordings} .canAddRecording=${!!this.snapshot} .syncWarningsInPanel=${true}
-          @playback-position=${(e: CustomEvent<{ sourceId?: string; syncWarning?: string }>) => {
-            const { sourceId, syncWarning } = e.detail;
+          .partMix=${this.partMix} .soundControl=${false}
+          @playback-position=${(e: CustomEvent<{ sourceId?: string; kind?: string; syncWarning?: string }>) => {
+            const { sourceId, kind, syncWarning } = e.detail;
+            if (kind !== this.playbackKind) this.playbackKind = kind;
             if (this.recordingWarning?.id === sourceId && this.recordingWarning?.message === syncWarning) return;
             this.recordingWarning = sourceId && syncWarning ? { id: sourceId, message: syncWarning } : null;
           }}
@@ -349,13 +389,24 @@ export class PiecePage extends LitElement {
             this.addingRecording = false;
             if (!this.selectedRecordingId) this.recordingsOpen = false;
           }}
-          @add-recording=${() => { this.player?.pause(); this.addingRecording = true; this.recordingsOpen = true; this.tagsOpen = false; void this.refreshSnapshot(); }}>
+          @add-recording=${() => { this.player?.pause(); this.addingRecording = true; this.recordingsOpen = true; this.tagsOpen = false; this.instrumentsOpen = false; void this.refreshSnapshot(); }}>
           ${selectedRecording
             ? html`<button slot="source-tools" type="button" aria-pressed=${this.recordingsOpen}
                 title="Recording details" aria-label=${`Recording details: ${selectedRecording.name ?? 'Unnamed recording'}`}
                 @click=${async () => { const generation = this.generation; this.player?.pause(); await this.refreshSnapshot(); if (generation !== this.generation) return; this.recordingsOpen = !this.recordingsOpen || this.addingRecording; this.addingRecording = false; this.tagsOpen = false; }}>${infoGlyph}</button>`
             : nothing}
         </mnx-player>
+        ${this.instrumentsOpen && this.doc
+          ? html`<mnx-studio-instruments slot="side"
+              .parts=${this.instrumentParts(this.doc)}
+              .hiddenParts=${this.hiddenParts}
+              .mix=${this.partMix}
+              .mixAvailable=${!this.playbackKind || this.playbackKind === 'synth'}
+              .sourceName=${this.recordings.find(r => r.id === this.player?.sourceId)?.name ?? ''}
+              @hidden-change=${(e: CustomEvent<number[]>) => this.setParts(e.detail, this.partMix)}
+              @mix-change=${(e: CustomEvent<PartMix>) => this.setParts(this.hiddenParts, e.detail)}
+              @close=${() => (this.instrumentsOpen = false)}></mnx-studio-instruments>`
+          : nothing}
       </mnx-score-frame>
       ${this.recordingsOpen && this.snapshot && this.doc ? keyed(this.addingRecording ? 'new' : this.selectedRecordingId, html`<mnx-studio-recordings .syncWarning=${!this.addingRecording && this.recordingWarning?.id === this.selectedRecordingId ? this.recordingWarning.message : ''} .recordingId=${this.addingRecording ? null : this.selectedRecordingId} .client=${this.client} .snapshot=${this.snapshot} .document=${this.doc}
         @recordings-changed=${async (e: CustomEvent<LibrarySnapshot>) => { this.player?.pause(); if (this.snapshot?.piece.canonical_rendition_id !== e.detail.piece.canonical_rendition_id) { await this.load(); return; } this.snapshot = { ...e.detail, tags: this.snapshot?.tags ?? [] }; this.setRecordings(e.detail); }}

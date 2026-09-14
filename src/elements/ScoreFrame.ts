@@ -545,6 +545,14 @@ export class ScoreFrame extends LitElement {
         z-index: 5;
       }
 
+      /* A host's side panel (studio's Instruments sheet): in flow beside the
+         pane, between the strips, so the score narrows rather than being
+         covered and the tray stays in reach. */
+      ::slotted([slot='side']) {
+        flex: none;
+        min-height: 0;
+      }
+
       /* The player fills the bottom strip; its own styles do the rest. */
       ::slotted([slot='player']) {
         flex: 1;
@@ -894,6 +902,7 @@ export class ScoreFrame extends LitElement {
           ? html`<div class="progress" aria-hidden="true"><div style="width: ${this.progress * 100}%"></div></div>`
           : nothing}
       </div>
+      <slot name="side"></slot>
       </div>
       ${this.bottomOpen ? this.bottomStrip() : nothing}
       <!-- The player is the host's light-DOM child in both poses: unmounting

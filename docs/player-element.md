@@ -33,10 +33,24 @@ tray thickens only when the piece demands it; past the cap the lanes share the h
 the hover card carries the count. Below the score frame's ~1000px breakpoint the tray stacks: transport
 and readout, the rail on a line of its own without labels, then the settings.
 
-Sound, rate and volume are value buttons — a glyph and the current value — and each
+Rate and volume are value buttons — a glyph and the current value — and each
 control opens in an overlay above the tray: rate has preset chips (`0.25×` … `2×`, or the
 backend's own discrete rates) and the fine slider; volume has a mute toggle and the slider.
-The overlays close on click-away or Escape.
+The overlays close on click-away or Escape. The Sound selector sits beside them unless the
+host sets `soundControl = false` — studio does, because its Instruments sheet chooses a
+sound per part, and the rail gets the room.
+
+## The part mix
+
+`partMix` (src/audio/partMix.ts) is a per-part level, mute and sound keyed by part index,
+beneath the master volume: the tray's volume stays the whole mix, a part's level sits
+under it. The native sink routes each voice through its part's bus (`voiceBus`, a gain
+per part, smoothed like the master), so a level or mute change is live and never pauses;
+a sound change pauses, loads the packs the parts now use and resumes, as the Sound
+selector always did. A part with no entry plays at full level in `voicePreset`; kit voices
+stay on the synth whatever the part chooses. Synth only — a recording has no parts
+(`capabilities.parts`), so a host disables its mix controls while one plays. Hiding a part
+from the score is the viewer's `hiddenParts`, and never silences it.
 
 ## Public contract
 
@@ -51,6 +65,8 @@ The overlays close on click-away or Escape.
   highlights are `{noteKey, ordinal}` written occurrences. Identical context updates
   are suppressed. `seek`, `onset` and `bar` are bubbling, composed events;
   onsets include the transport's scheduled audio time and written occurrence id.
+- `voicePreset`, `partMix` and `soundControl` — the sound every unmixed part plays, the
+  per-part mix above, and whether the tray offers the Sound selector.
 - Audio creation/unlock happens on Play. Errors appear in an alert. Rate and volume
   are the only localStorage preferences. Volume is a smoothed master gain owned by
   `NativeSink.setVolume()`, independent of note velocities. No AudioContext or audio

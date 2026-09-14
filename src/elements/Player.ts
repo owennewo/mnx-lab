@@ -15,11 +15,11 @@ import { scorePositionAt } from '../audio/scorePosition.ts';
 import { linearizePasses } from '../model/passes.ts';
 import {
   SAMPLE_PRESETS,
-  isSamplePreset,
   type SamplePreset,
   type VoicePreset,
 } from '../audio/sampleSelection.ts';
 import type { SamplePackLoader } from '../audio/native/samplePacks.ts';
+import { partBuses, partLevel, partSound, requiredPresets, voicePresetFor, type PartMix } from '../audio/partMix.ts';
 import { formatPlaybackPosition, formatScorePlaybackPosition, measureAt, placeLabel, playbackPositionParts, scorePlaybackPositionParts, widestPlaceLabel, type PlaybackPositionParts } from '../audio/playbackPosition.ts';
 import { ZERO, type Rational } from '../audio/time.ts';
 import type { MnxStructure } from '../model/mnx.ts';
@@ -30,7 +30,14 @@ export class Player extends LitElement {
   @property({ attribute: false }) performance: Performance | null = null;
   @property({ attribute: false }) document: MnxStructure | undefined;
   @property({ type: String }) documentId = '';
+  /** The sound for every part the mix does not choose one for. */
   @property({ attribute: 'voice-preset' }) voicePreset: VoicePreset = 'synth';
+  /** Per-part level, mute and sound beneath the master volume, keyed by part
+   *  index (src/audio/partMix.ts). Synth only: a recording has no parts. */
+  @property({ attribute: false }) partMix: PartMix = {};
+  /** Whether the tray offers the Sound selector. A host with its own
+   *  per-part sound control (studio's Instruments sheet) turns it off. */
+  @property({ attribute: false }) soundControl = true;
   @property({ attribute: 'sample-base' }) sampleBase: string | undefined;
   @property({ attribute: false }) sampleBases: Partial<Record<SamplePreset, string>> | undefined;
   @property({ attribute: false }) sampleLoader: SamplePackLoader | undefined;
@@ -526,7 +533,12 @@ export class Player extends LitElement {
         if (!this.recordings.some(r => r.id === this.youtubeRequest)) void this.selectSource('synth');
       } else if (id !== 'synth') void this.selectSource(this.recordings.some(r => r.id === id) ? id : 'synth', true);
     }
-    if (!reinstall && changed.has('voicePreset') && this.session?.backend instanceof SynthBackend) {
+    if (!reinstall && changed.has('partMix') && this.session?.backend instanceof SynthBackend)
+      this.applyPartLevels(this.session.backend);
+    const sounds = this.soundSignature();
+    const soundsMoved = sounds !== this.lastSounds;
+    this.lastSounds = sounds;
+    if (!reinstall && soundsMoved && this.session?.backend instanceof SynthBackend) {
       const resume = this.playback?.wantsPlayback;
       this.pause();
       this.session.backend.sink.setVoicePreset(this.sinkPreset(), this.requiredSamples());
@@ -563,28 +575,42 @@ export class Player extends LitElement {
     this.session?.dispose(); this.session = undefined;
     this.status = undefined; this.lastOrdinal = null; this.publish();
   }
-  private sinkPreset(): 'synth' | ((voice: string) => VoicePreset) {
-    if (!isSamplePreset(this.voicePreset)) return 'synth';
-    const kits = new Set(this.performance?.voices.filter((v) => v.kit).map((v) => v.id));
-    const preset = this.voicePreset;
-    return (voice: string) => (kits.has(voice) ? 'synth' : preset);
+  /** Each voice's timbre: its part's sound, kit voices always on the synth. */
+  private sinkPreset(): VoicePreset | ((voice: string) => VoicePreset) {
+    return this.performance ? voicePresetFor(this.performance, this.partMix, this.voicePreset) : 'synth';
   }
   private requiredSamples(): SamplePreset[] {
-    return isSamplePreset(this.voicePreset) ? [this.voicePreset] : [];
+    return this.performance ? requiredPresets(this.performance, this.partMix, this.voicePreset) : [];
+  }
+  /** What every voice plays, so a mix change that moves only a level never
+   *  pauses to swap sounds. */
+  private lastSounds = '';
+  private soundSignature(): string {
+    return JSON.stringify(this.performance?.voices.map((v) => (v.kit ? 'synth' : partSound(this.partMix, v.partIndex, this.voicePreset))) ?? []);
+  }
+  private applyPartLevels(backend: SynthBackend) {
+    for (const part of new Set(this.performance?.voices.map((v) => v.partIndex)))
+      backend.sink.setBusLevel(String(part), partLevel(this.partMix[part]));
   }
   private install() {
     this.teardown(); this.localError = '';
     if (!this.performance || !this.isConnected) return;
     const revision = this.revision, performance = this.performance;
+    const buses = partBuses(performance);
     const factory = (id: string): PlaybackBackend => {
-      if (id === 'synth') return new SynthBackend(performance, {
-        volume: this.volume, voicePreset: this.sinkPreset(), sampleBase: this.sampleBase,
-        sampleBases: this.sampleBases, samplePresets: this.requiredSamples(), sampleLoader: this.sampleLoader,
-      }, event => {
-        if (revision === this.revision && event.kind === 'onset') this.dispatchEvent(new CustomEvent('onset', {
-          detail: { ...event, documentId: this.documentId }, bubbles: true, composed: true,
-        }));
-      });
+      if (id === 'synth') {
+        const synth = new SynthBackend(performance, {
+          volume: this.volume, voicePreset: this.sinkPreset(), sampleBase: this.sampleBase,
+          sampleBases: this.sampleBases, samplePresets: this.requiredSamples(), sampleLoader: this.sampleLoader,
+          voiceBus: voice => buses.get(voice),
+        }, event => {
+          if (revision === this.revision && event.kind === 'onset') this.dispatchEvent(new CustomEvent('onset', {
+            detail: { ...event, documentId: this.documentId }, bubbles: true, composed: true,
+          }));
+        });
+        this.applyPartLevels(synth);
+        return synth;
+      }
       const matches = this.recordings.filter(r => r.id === id);
       if (!id || matches.length !== 1) throw new Error('The selected recording is unavailable or has a duplicate identity.');
       const source = matches[0];
@@ -985,7 +1011,7 @@ export class Player extends LitElement {
         </select></label>` : nothing}
         <slot name="source-tools"></slot>
         <span class="settings">
-        ${this.sourceId === 'synth' ? html`<label class="select" title="Sound"
+        ${this.soundControl && this.sourceId === 'synth' ? html`<label class="select" title="Sound"
           >${Player.stroke('M3 12h2l2-6 3 12 3-9 2 5 2-2h4')}<select
             aria-label="Playback sound"
             .value=${this.voicePreset}
@@ -1013,7 +1039,7 @@ export class Player extends LitElement {
       </section>` : nothing}
       ${this.loading
         ? html`<p role="status">
-            Preparing ${this.sourceId === 'synth' && isSamplePreset(this.voicePreset) ? 'samples' : 'audio'}…
+            Preparing ${this.sourceId === 'synth' && this.requiredSamples().length ? 'samples' : 'audio'}…
           </p>`
         : nothing}
       ${this.error ? html`<p role="alert">Playback unavailable: ${this.error}</p>` : nothing}

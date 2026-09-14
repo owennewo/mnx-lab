@@ -39,8 +39,10 @@
 ## Features
 
 Loop the selection on its iteration; speed trainer (start rate, step, ceiling);
-count-in and metronome as their own voice, never in the MIDI export; mute/solo per
-part in the element's tray; localStorage preferences (rate, metronome, last loop per
+count-in and metronome as their own voice, never in the MIDI export; solo per part
+(mute, per-part level and per-part sound shipped 2026-09-14 as studio's Instruments
+sheet over the player's `partMix` — docs/player-element.md#the-part-mix — so solo is a
+mix rule on that seam, not a new tray control); localStorage preferences (rate, metronome, last loop per
 document id) — UI preferences, which the no-backend rule permits.
 
 ## Out of scope

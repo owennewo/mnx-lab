@@ -2,6 +2,7 @@ import { engravingEntries } from '../engine/layout/unrolled.ts';
 import { occurrenceKey, parseOccurrenceKey } from '../model/noteKeys.ts';
 import { forEachNoteAddress } from '../model/noteWalk.ts';
 import type { MnxStructure } from '../model/mnx.ts';
+import { withHiddenParts, type VisibleParts } from '../model/partVisibility.ts';
 import { paintPlaybackInk } from '../engine/render/playbackInk.ts';
 import { normalizeDisplayOptions, type DisplayOptions } from '../engine/displayOptions.ts';
 import { LitElement, html, css, nothing } from 'lit';
@@ -176,6 +177,22 @@ export class DocumentViewer extends LitElement {
    * layout's job.
    */
   @property({ type: String, reflect: true }) hide = '';
+  /**
+   * Part indices (in the document) to leave off the score — a reader's choice,
+   * like `hide`, never a document field. The layout draws a copy without them
+   * whose notes keep their whole-document keys, so playback paint and seeking
+   * still address the right ink (src/model/partVisibility.ts). Hiding every
+   * part is ignored.
+   */
+  @property({ attribute: false }) hiddenParts: readonly number[] = [];
+  private visible: { doc: MnxStructure; key: string; result: VisibleParts } | null = null;
+  private visibleParts(): VisibleParts {
+    const doc = this.mnxDoc!.mnxJson;
+    const key = [...this.hiddenParts].sort((a, b) => a - b).join(',');
+    if (this.visible?.doc !== doc || this.visible.key !== key)
+      this.visible = { doc, key, result: withHiddenParts(doc, this.hiddenParts) };
+    return this.visible.result;
+  }
   @property({ type: String, attribute: 'lyrics', reflect: true }) lyrics: DisplayOptions['lyrics'] = 'all';
   @property({ type: String, attribute: 'time-signatures', reflect: true }) timeSignatures: DisplayOptions['timeSignatures'] = 'show';
   @property({ type: String, attribute: 'clefs', reflect: true }) clefs: DisplayOptions['clefs'] = 'show';
@@ -876,6 +893,7 @@ export class DocumentViewer extends LitElement {
       changed.has('beams') ||
       changed.has('selectedVerse') ||
       changed.has('hide') ||
+      changed.has('hiddenParts') ||
       changed.has('zoom') ||
       changed.has('stringsOverride') ||
       changed.has('capoOverride') ||
@@ -939,9 +957,10 @@ export class DocumentViewer extends LitElement {
       );
     };
 
+    const visible = this.visibleParts();
     const commonOpts = {
-      mnx: this.mnxDoc.mnxJson,
-      entries: engravingEntries(this.mnxDoc.mnxJson, this.unrolled),
+      mnx: visible.mnx,
+      entries: engravingEntries(visible.mnx, this.unrolled),
       width,
       activeNoteIds: [], // Playback is a paint overlay, independent of layout and selection.
       durationSpans: true, // …but it stretches fret masks to the release the layout records.
@@ -993,10 +1012,11 @@ export class DocumentViewer extends LitElement {
     const perPart = this.partTabSetups;
     const tabSetup: PartTabSetups | undefined = perPart
       ? (part: MnxPart) => {
-          const parts = this.mnxDoc?.mnxJson.parts ?? [];
+          // Index overrides name the part's place in the WHOLE document.
+          const at = visible.mnx.parts.indexOf(part);
           return (
             (part.id !== undefined ? perPart[part.id] : undefined) ??
-            perPart[String(parts.indexOf(part))] ??
+            perPart[String(at < 0 ? at : visible.originalIndex[at])] ??
             flatSetup
           );
         }
@@ -1007,7 +1027,8 @@ export class DocumentViewer extends LitElement {
     // editor state, the overlay reads what it drew.
     const renderedStaffOrdinals = (unit: NonNullable<SelectionContext['span']>['units'][number]) => {
       if (unit.partIndex === undefined || unit.staffIndex === undefined) return [];
-      const parts = this.mnxDoc?.mnxJson.parts ?? [];
+      // The laid-out parts, compared by their index in the whole document.
+      const parts = visible.mnx.parts ?? [];
       const resolved = this.resolvedView();
       if (resolved === 'tab') return unit.partIndex === 0 ? [0] : [];
       const anyDeclaredKind = parts.some(part => {
@@ -1016,7 +1037,8 @@ export class DocumentViewer extends LitElement {
       });
       let ordinal = 0;
       const found: number[] = [];
-      parts.forEach((part, partIndex) => {
+      parts.forEach((part, at) => {
+        const partIndex = visible.originalIndex[at];
         let staffCount = Math.max(1, part.staves ?? 1);
         for (const measure of part.measures) {
           for (const sequence of measure.sequences ?? []) {
