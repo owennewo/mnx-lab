@@ -14253,7 +14253,7 @@
         "evidence": "MusicXML notation/TAB part split and raw MIDI duplicate pitch multiplicities."
       },
       "inputSha256": "9fc031fb970e7e76b9f2831a645bf39b43daff481e936b61f6d58b6ca19d4b2d",
-      "mnxSha256": "71a4509bee0d4012b164b6417b78ded12de63650b4e0c0d940c39a6de716c870",
+      "mnxSha256": "64034772a80f15e4fc20054ee32ca11a207b8aeed06ec40d321b9afbe52259ae",
       "externalMidiSha256": "eea12132eef909ea4f2b2f945d52bdd2c9d7a24db3717acbf211d26cc02c8c1b",
       "external": {
         "ppq": 480,
@@ -16140,13 +16140,13 @@
               "pitches": [
                 45,
                 49,
-                59
+                57
               ]
             },
             {
               "attack": 308,
               "pitches": [
-                57
+                59
               ]
             },
             {
@@ -23363,13 +23363,13 @@
               "pitches": [
                 45,
                 49,
-                59
+                57
               ]
             },
             {
               "attack": 308,
               "pitches": [
-                57
+                59
               ]
             },
             {

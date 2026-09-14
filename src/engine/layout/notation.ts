@@ -2047,7 +2047,8 @@ function assembleSegment(
           // The notation staff above draws the bracket over the same columns.
           showTupletBrackets: false,
           accidentalOf,
-          ties: tabTies
+          ties: tabTies,
+          spanMarks
         });
       }
     }

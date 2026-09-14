@@ -166,14 +166,23 @@ describe('articulations', () => {
 });
 
 describe('arpeggios', () => {
-  it('spans the rolled chord bottom to top, in the direction written', () => {
+  it('spans the rolled chord bottom to top; a downstroke rolls up, with an arrow', () => {
     const { mnx } = load(score(
       [[beat(''), beat('0 1 2', '<Arpeggio>Down</Arpeggio>'), beat(''), beat('')]],
       note(0, 4, 0) + note(1, 0, 3) + note(2, 2, 2)
     ));
     expect(mnx.parts[0].measures[0].arpeggios).toEqual([
-      { position: { fraction: [1, 4] }, span: { start: 'n1', end: 'n0' }, direction: 'down' }
+      { position: { fraction: [1, 4] }, span: { start: 'n1', end: 'n0' }, direction: 'up', arrow: true }
     ]);
+  });
+
+  it('reads an upstroke as a falling roll and writes it back as one', () => {
+    const { mnx } = load(score(
+      [[beat('0 1', '<Arpeggio>Up</Arpeggio>'), beat(''), beat(''), beat('')]],
+      note(0, 4, 0) + note(1, 0, 3)
+    ));
+    expect(mnx.parts[0].measures[0].arpeggios?.[0]).toMatchObject({ direction: 'down', arrow: true });
+    expect(mnxToGpifXml(mnx)).toContain('<Arpeggio>Up</Arpeggio>');
   });
 });
 

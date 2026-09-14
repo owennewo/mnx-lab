@@ -805,10 +805,11 @@ function buildBeat(
     if (arpeggio.direction !== 'up' && arpeggio.direction !== 'down') {
       warn(
         `measure ${measureIndex + 1}: an arpeggio without a direction was written ` +
-          `as Guitar Pro's upward roll.`
+          `as a rising roll (Guitar Pro's downstroke).`
       );
     }
-    beat.arpeggio = arpeggio.direction === 'down' ? 'Down' : 'Up';
+    // The stroke, not the pitch: a falling roll is Guitar Pro's upstroke.
+    beat.arpeggio = arpeggio.direction === 'down' ? 'Up' : 'Down';
   }
 
   const stringCount = tuningsHighToLow.length;

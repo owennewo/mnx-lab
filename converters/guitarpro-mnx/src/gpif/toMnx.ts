@@ -614,7 +614,10 @@ function buildSequence(
     }
 
     if (beat.arpeggio && event.notes && event.notes.length > 1) {
-      const direction = beat.arpeggio === 'Up' ? 'up' : beat.arpeggio === 'Down' ? 'down' : null;
+      // Guitar Pro names the STROKE, MNX the pitch: `Up` is an upstroke, which
+      // meets the highest string first, so the roll falls — MNX `down`. alphaTab
+      // plays it that way and Soundslice exports it as <arpeggiate direction="down">.
+      const direction = beat.arpeggio === 'Up' ? 'down' : beat.arpeggio === 'Down' ? 'up' : null;
       if (!direction || grace) {
         state.report(`beat <Arpeggio>${beat.arpeggio}</Arpeggio>${grace ? ' on a grace note' : ''}`, measureIndex);
       } else {
@@ -623,7 +626,9 @@ function buildSequence(
         voice.marks.arpeggios.push({
           position: { fraction: at },
           span: { start: byPitch[0].id!, end: byPitch[byPitch.length - 1].id! },
-          direction
+          direction,
+          // Guitar Pro always prints the direction as an arrowhead.
+          arrow: true
         });
       }
     }

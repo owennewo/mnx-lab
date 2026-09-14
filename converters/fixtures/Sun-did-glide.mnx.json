@@ -13945,7 +13945,8 @@
                 "start": "n480",
                 "end": "n481"
               },
-              "direction": "down"
+              "direction": "up",
+              "arrow": true
             }
           ]
         },

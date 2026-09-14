@@ -54,7 +54,7 @@ import {
 import { emitHarmonies, emitNavigationMarkers, emitScoreLabels, emitSwingMark, emitTempoMark, measureOnsetXs } from './scoreText.ts';
 import { resolveSwingTimeline } from '../../model/swing.ts';
 import { emitMeasureFermata } from './fermata.ts';
-import { emitMeasureNumber } from './arpeggio.ts';
+import { collectSpanMarks, emitMeasureNumber } from './arpeggio.ts';
 import { ensureTopMargin, fitRowsToClearance, tightenRows } from './verticalDensity.ts';
 import { validateDocument } from './validate.ts';
 import {
@@ -175,6 +175,7 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
   const useAccidentalDisplay = mnx.mnx?.support?.useAccidentalDisplay === true;
   const tieTargets = tieTargetIds(mnx);
   const ties = { originOf: tieOrigins(mnx), rowOf: new Map<string, number>() };
+  const spanMarks = collectSpanMarks(mnx.parts ?? []);
 
   // The row height this DOCUMENT needs: the frame constant, plus the verse
   // block when lyrics exist — the reservation is explicit, exactly as the
@@ -452,7 +453,8 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
         // The plan priced this measure's tuplet columns with this; the walk
         // over them has to agree term for term.
         accidentalOf,
-        ties
+        ties,
+        spanMarks
       });
     }
 

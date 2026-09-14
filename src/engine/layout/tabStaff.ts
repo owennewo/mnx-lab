@@ -1,6 +1,7 @@
 import { occurrenceKey } from '../../model/noteKeys.ts';
 import type { ContainerIndex } from '../../model/noteKeys.ts';
 import { MnxEvent, MnxGrace, MnxSequence, MnxTuplet, isGrace, isTimedEvent, isTuplet } from '../../model/mnx.ts';
+import { emitSpanMarks, type SpanMarks } from './arpeggio.ts';
 import {
   GUITAR_TUNING,
   midiOfMnxPitch,
@@ -92,6 +93,10 @@ const MASK_END_CLEAR_SP = 1.0;
 
 const ACTIVE_COLOR = 'oklch(0.65 0.22 274)';
 const SELECTED_COLOR = 'oklch(0.7 0.15 190)';
+/** Extra clearance between a chord's digits and its arpeggio wave, beyond
+ *  the notation gap `emitSpanMarks` applies. */
+const TAB_ARPEGGIO_EXTRA_GAP_SP = 0.35;
+
 // The fret digit's backing rect masks the string line under it, so it must be
 // the SCORE PAPER colour — which never inverts with the theme — not the app
 // chrome (`--bg-app`, which is dark in dark mode and undefined in the standalone
@@ -400,6 +405,9 @@ export interface EmitTabVoicesArgs {
   accidentalOf: AccidentalResolver;
   /** Tie continuations, shared by every measure the layout walks. */
   ties: TabTies;
+  /** Arpeggio / non-arpeggio by the note id that starts the span — the same
+   *  map the notation staff draws from (`collectSpanMarks`). */
+  spanMarks?: ReadonlyMap<string, SpanMarks>;
 }
 
 /**
@@ -689,6 +697,33 @@ export function emitTabVoices(args: EmitTabVoicesArgs): void {
           (isSelected ? ' selected' : ''),
         sourceId: noteId
       });
+    }
+
+    // Arpeggio / non-arpeggio: beside the digits, from the span's first note to
+    // its last (the event's outermost digit when the end is not here). Tab
+    // stacks pitch the way notation does — highest string on top — so the
+    // wave and its arrowhead read the same on both staves.
+    if (args.spanMarks) {
+      const startIdx = event.notes.findIndex(n => n.id !== undefined && args.spanMarks!.has(n.id));
+      const drawn = positions.flatMap((pos, k) => (pos ? [{ k, y: staffTop + (pos.str - 1) * TAB_STRING_SPACING_SP, pos }] : []));
+      const start = drawn.find(d => d.k === startIdx);
+      if (start) {
+        const marks = args.spanMarks.get(event.notes[startIdx].id!)!;
+        const endId = marks.arpeggio?.span.end ?? marks.nonArpeggio?.span.end;
+        const end = drawn.find(d => event.notes![d.k].id === endId);
+        const ys = drawn.map(d => d.y);
+        const other = end?.y ?? (start.y === Math.max(...ys) ? Math.min(...ys) : Math.max(...ys));
+        const widest = Math.max(...drawn.map(d => fontSize * 0.6 * Math.max(1, String(d.pos!.fret).length)));
+        emitSpanMarks({
+          // The digits' knock-out masks sit on the string lines, so the wave
+          // needs more air than a notehead would to read as its own mark.
+          leftInkX: eventX - (widest / 2) * ink - TAB_ARPEGGIO_EXTRA_GAP_SP,
+          yTop: Math.min(start.y, other),
+          yBottom: Math.max(start.y, other),
+          marks,
+          primitives
+        });
+      }
     }
 
     if (primaryNoteId) {
