@@ -346,6 +346,39 @@ function slurSide(site: TechniqueSite): 1 | -1 {
   return site.stemDir === 1 ? 1 : -1;
 }
 
+/**
+ * Which side each tab hammer/pull arc takes — the chord-tie rule
+ * (Gould, *Behind Bars*), applied to the sources that share one column.
+ *
+ * A lone arc goes up: tab has no noteheads to avoid, and the stems (when
+ * drawn) hang below. Two or more in one column curve OUTWARD — the upper half
+ * up, the lower half down, an odd middle up — so the arcs bracket the chord
+ * instead of stacking into the one space between two string lines. When the
+ * column holds more than one voice, the voice decides instead: the first voice
+ * up, every other down.
+ */
+function tabHammerPullSides(sites: readonly TechniqueSite[]): Map<TechniqueSite, 1 | -1> {
+  const columns = new Map<string, TechniqueSite[]>();
+  for (const s of sites) {
+    if (!s.technique?.hammerPull) continue;
+    const key = `${s.row}|${s.x}`;
+    const column = columns.get(key) ?? [];
+    column.push(s);
+    columns.set(key, column);
+  }
+  const sides = new Map<TechniqueSite, 1 | -1>();
+  for (const column of columns.values()) {
+    if (new Set(column.map(s => s.voiceKey)).size > 1) {
+      for (const s of column) sides.set(s, s.voiceKey === '0' ? -1 : 1);
+      continue;
+    }
+    const byHeight = [...column].sort((a, b) => a.y - b.y);
+    const upCount = Math.ceil(byHeight.length / 2);
+    byHeight.forEach((s, i) => sides.set(s, i < upCount ? -1 : 1));
+  }
+  return sides;
+}
+
 /** A one-line technique label, centred over a column. */
 function laneLabel(
   text: string,
@@ -669,6 +702,7 @@ export function tabTechniqueLaneY(staffTop: number): number {
  */
 export function emitTabTechnique(input: TechniqueInput): void {
   const { sites, byNoteId, ink, primitives } = input;
+  const hammerPullSides = tabHammerPullSides(sites);
 
   for (const site of sites) {
     const t = site.technique;
@@ -698,8 +732,11 @@ export function emitTabTechnique(input: TechniqueInput): void {
     // implicit in the two pitches). The two digits sit on one string line, so
     // the arc springs from just above them and bulges up — close to the
     // gesture, not parked in the technique lane at the top of the staff
-    // (found hands-on, 2026-08-30).
+    // (found hands-on, 2026-08-30). In a chord the arcs split outward
+    // (`tabHammerPullSides`), the lower ones springing from just below.
     if (t.hammerPull) {
+      const dir = hammerPullSides.get(site) ?? -1;
+      const lift = dir * TAB_HP_LIFT_SP;
       const target = byNoteId.get(t.hammerPull.target);
       if (!target) {
         // The target is not on the page — an id naming nothing, or a note
@@ -707,16 +744,16 @@ export function emitTabTechnique(input: TechniqueInput): void {
         // dropping it: a short stub of the slur, over the note that carries
         // it.
         slur(
-          site.x, site.y - TAB_HP_LIFT_SP, site.x + DANGLING_STUB_SP, site.y - TAB_HP_LIFT_SP, -1,
+          site.x, site.y + lift, site.x + DANGLING_STUB_SP, site.y + lift, dir,
           'technique-slur technique-hammerPull', primitives
         );
       } else {
         drawSplit(
           input,
-          { x: site.x, y: site.y - TAB_HP_LIFT_SP, row: site.row },
-          { x: target.x, y: target.y - TAB_HP_LIFT_SP, row: target.row },
+          { x: site.x, y: site.y + lift, row: site.row },
+          { x: target.x, y: target.y + lift, row: target.row },
           (x0, y0, x1, y1) => {
-            slur(x0, y0, x1, y1, -1, 'technique-slur technique-hammerPull', primitives);
+            slur(x0, y0, x1, y1, dir, 'technique-slur technique-hammerPull', primitives);
           }
         );
       }

@@ -1,0 +1,32 @@
+{
+  "title": "Hammer-ons in a chord",
+  "description": "Two chords whose notes hammer on together: a two-note chord (strings 2 and 3), then a three-note chord (strings 1-3). One arc per column goes above its digits, but several in one column curve OUTWARD, the chord-tie rule from Gould's Behind Bars: the upper half arcs up, the lower half arcs down, and an odd middle note goes up. So the arcs bracket the chord instead of stacking in the one space between two string lines, which is how Soundslice engraves it. The notation staff is unchanged: its slurs still take the side away from the stem.",
+  "bars": 1,
+  "tags": [
+    "tab",
+    "technique",
+    "technique:hammer-pull"
+  ],
+  "specRefs": [
+    "https://github.com/w3c-cg/mnx/issues/63"
+  ],
+  "coversDefs": [
+    "event",
+    "id",
+    "note",
+    "notes",
+    "pitch",
+    "time"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "valid"
+  },
+  "requires": [
+    "tab-techniques"
+  ],
+  "idRefs": true,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "rendered"
+}
