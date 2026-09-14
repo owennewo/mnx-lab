@@ -895,7 +895,7 @@
       },
       {
         "kind": "glyph",
-        "glyph": "metNote8thUp",
+        "glyph": "metNoteQuarterUp",
         "x": 6.1,
         "y": 2.7312,
         "scale": 0.55,
@@ -903,16 +903,25 @@
       },
       {
         "kind": "glyph",
-        "glyph": "metNote8thUp",
-        "x": 7.4326,
+        "glyph": "metNoteQuarterUp",
+        "x": 7.7304,
         "y": 2.7312,
         "scale": 0.55,
         "className": "swing"
       },
       {
+        "kind": "line",
+        "x1": 6.7644,
+        "y1": 1.3551,
+        "x2": 8.4608,
+        "y2": 1.3551,
+        "thickness": 0.275,
+        "className": "swing"
+      },
+      {
         "kind": "text",
         "text": "=",
-        "x": 8.9052,
+        "x": 8.7608,
         "y": 2.7312,
         "font": "body",
         "size": 1.3,
@@ -922,7 +931,7 @@
       {
         "kind": "glyph",
         "glyph": "metNoteQuarterUp",
-        "x": 9.9852,
+        "x": 9.8408,
         "y": 2.7312,
         "scale": 0.55,
         "className": "swing"
@@ -930,43 +939,43 @@
       {
         "kind": "glyph",
         "glyph": "metNote8thUp",
-        "x": 10.8756,
+        "x": 10.7312,
         "y": 2.7312,
         "scale": 0.55,
         "className": "swing"
       },
       {
         "kind": "line",
-        "x1": 9.9852,
+        "x1": 9.8408,
         "y1": 0.9,
-        "x2": 10.5667,
+        "x2": 10.4223,
         "y2": 0.9,
         "thickness": 0.12,
         "className": "swing"
       },
       {
         "kind": "line",
-        "x1": 11.4667,
+        "x1": 11.3223,
         "y1": 0.9,
-        "x2": 12.0482,
+        "x2": 11.9038,
         "y2": 0.9,
         "thickness": 0.12,
         "className": "swing"
       },
       {
         "kind": "line",
-        "x1": 9.9852,
+        "x1": 9.8408,
         "y1": 0.9,
-        "x2": 9.9852,
+        "x2": 9.8408,
         "y2": 1.3,
         "thickness": 0.12,
         "className": "swing"
       },
       {
         "kind": "line",
-        "x1": 12.0482,
+        "x1": 11.9038,
         "y1": 0.9,
-        "x2": 12.0482,
+        "x2": 11.9038,
         "y2": 1.3,
         "thickness": 0.12,
         "className": "swing"
@@ -974,7 +983,7 @@
       {
         "kind": "text",
         "text": "3",
-        "x": 11.0167,
+        "x": 10.8723,
         "y": 1.25,
         "font": "body",
         "size": 1,
@@ -984,7 +993,7 @@
       },
       {
         "kind": "glyph",
-        "glyph": "metNote8thUp",
+        "glyph": "metNoteQuarterUp",
         "x": 55.1375,
         "y": 6.447,
         "scale": 0.55,
@@ -992,16 +1001,25 @@
       },
       {
         "kind": "glyph",
-        "glyph": "metNote8thUp",
-        "x": 56.4701,
+        "glyph": "metNoteQuarterUp",
+        "x": 56.7679,
         "y": 6.447,
         "scale": 0.55,
         "className": "swing"
       },
       {
+        "kind": "line",
+        "x1": 55.8019,
+        "y1": 5.0709,
+        "x2": 57.4983,
+        "y2": 5.0709,
+        "thickness": 0.275,
+        "className": "swing"
+      },
+      {
         "kind": "text",
         "text": "=",
-        "x": 57.9427,
+        "x": 57.7983,
         "y": 6.447,
         "font": "body",
         "size": 1.3,
@@ -1010,8 +1028,8 @@
       },
       {
         "kind": "glyph",
-        "glyph": "metNote8thUp",
-        "x": 59.0227,
+        "glyph": "metNoteQuarterUp",
+        "x": 58.8783,
         "y": 6.447,
         "scale": 0.55,
         "className": "swing"
@@ -1019,17 +1037,35 @@
       {
         "kind": "glyph",
         "glyph": "metAugmentationDot",
-        "x": 60.2943,
+        "x": 59.7077,
         "y": 6.447,
         "scale": 0.55,
         "className": "swing"
       },
       {
         "kind": "glyph",
-        "glyph": "metNote16thUp",
-        "x": 60.7018,
+        "glyph": "metNoteQuarterUp",
+        "x": 60.8552,
         "y": 6.447,
         "scale": 0.55,
+        "className": "swing"
+      },
+      {
+        "kind": "line",
+        "x1": 59.5427,
+        "y1": 5.0709,
+        "x2": 61.5856,
+        "y2": 5.0709,
+        "thickness": 0.275,
+        "className": "swing"
+      },
+      {
+        "kind": "line",
+        "x1": 60.9146,
+        "y1": 5.4834,
+        "x2": 61.5856,
+        "y2": 5.4834,
+        "thickness": 0.275,
         "className": "swing"
       },
       {
@@ -1338,7 +1374,7 @@
       },
       {
         "kind": "glyph",
-        "glyph": "metNote8thUp",
+        "glyph": "metNoteQuarterUp",
         "x": 5.1,
         "y": 4.2312,
         "scale": 0.55,
@@ -1346,16 +1382,25 @@
       },
       {
         "kind": "glyph",
-        "glyph": "metNote8thUp",
-        "x": 6.4326,
+        "glyph": "metNoteQuarterUp",
+        "x": 6.7304,
         "y": 4.2312,
         "scale": 0.55,
         "className": "swing"
       },
       {
+        "kind": "line",
+        "x1": 5.7644,
+        "y1": 2.8551,
+        "x2": 7.4608,
+        "y2": 2.8551,
+        "thickness": 0.275,
+        "className": "swing"
+      },
+      {
         "kind": "text",
         "text": "=",
-        "x": 7.9052,
+        "x": 7.7608,
         "y": 4.2312,
         "font": "body",
         "size": 1.3,
@@ -1365,7 +1410,7 @@
       {
         "kind": "glyph",
         "glyph": "metNoteQuarterUp",
-        "x": 8.9852,
+        "x": 8.8408,
         "y": 4.2312,
         "scale": 0.55,
         "className": "swing"
@@ -1373,43 +1418,43 @@
       {
         "kind": "glyph",
         "glyph": "metNote8thUp",
-        "x": 9.8756,
+        "x": 9.7312,
         "y": 4.2312,
         "scale": 0.55,
         "className": "swing"
       },
       {
         "kind": "line",
-        "x1": 8.9852,
+        "x1": 8.8408,
         "y1": 2.4,
-        "x2": 9.5667,
+        "x2": 9.4223,
         "y2": 2.4,
         "thickness": 0.12,
         "className": "swing"
       },
       {
         "kind": "line",
-        "x1": 10.4667,
+        "x1": 10.3223,
         "y1": 2.4,
-        "x2": 11.0482,
+        "x2": 10.9038,
         "y2": 2.4,
         "thickness": 0.12,
         "className": "swing"
       },
       {
         "kind": "line",
-        "x1": 8.9852,
+        "x1": 8.8408,
         "y1": 2.4,
-        "x2": 8.9852,
+        "x2": 8.8408,
         "y2": 2.8,
         "thickness": 0.12,
         "className": "swing"
       },
       {
         "kind": "line",
-        "x1": 11.0482,
+        "x1": 10.9038,
         "y1": 2.4,
-        "x2": 11.0482,
+        "x2": 10.9038,
         "y2": 2.8,
         "thickness": 0.12,
         "className": "swing"
@@ -1417,7 +1462,7 @@
       {
         "kind": "text",
         "text": "3",
-        "x": 10.0167,
+        "x": 9.8723,
         "y": 2.75,
         "font": "body",
         "size": 1,
@@ -1921,7 +1966,7 @@
       },
       {
         "kind": "glyph",
-        "glyph": "metNote8thUp",
+        "glyph": "metNoteQuarterUp",
         "x": 54.825,
         "y": 7.055,
         "scale": 0.55,
@@ -1929,16 +1974,25 @@
       },
       {
         "kind": "glyph",
-        "glyph": "metNote8thUp",
-        "x": 56.1576,
+        "glyph": "metNoteQuarterUp",
+        "x": 56.4554,
         "y": 7.055,
         "scale": 0.55,
         "className": "swing"
       },
       {
+        "kind": "line",
+        "x1": 55.4894,
+        "y1": 5.6789,
+        "x2": 57.1858,
+        "y2": 5.6789,
+        "thickness": 0.275,
+        "className": "swing"
+      },
+      {
         "kind": "text",
         "text": "=",
-        "x": 57.6302,
+        "x": 57.4858,
         "y": 7.055,
         "font": "body",
         "size": 1.3,
@@ -1947,8 +2001,8 @@
       },
       {
         "kind": "glyph",
-        "glyph": "metNote8thUp",
-        "x": 58.7102,
+        "glyph": "metNoteQuarterUp",
+        "x": 58.5658,
         "y": 7.055,
         "scale": 0.55,
         "className": "swing"
@@ -1956,17 +2010,35 @@
       {
         "kind": "glyph",
         "glyph": "metAugmentationDot",
-        "x": 59.9818,
+        "x": 59.3952,
         "y": 7.055,
         "scale": 0.55,
         "className": "swing"
       },
       {
         "kind": "glyph",
-        "glyph": "metNote16thUp",
-        "x": 60.3893,
+        "glyph": "metNoteQuarterUp",
+        "x": 60.5427,
         "y": 7.055,
         "scale": 0.55,
+        "className": "swing"
+      },
+      {
+        "kind": "line",
+        "x1": 59.2302,
+        "y1": 5.6789,
+        "x2": 61.2731,
+        "y2": 5.6789,
+        "thickness": 0.275,
+        "className": "swing"
+      },
+      {
+        "kind": "line",
+        "x1": 60.6021,
+        "y1": 6.0914,
+        "x2": 61.2731,
+        "y2": 6.0914,
+        "thickness": 0.275,
         "className": "swing"
       },
       {

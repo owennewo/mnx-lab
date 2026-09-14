@@ -544,6 +544,12 @@ export function emitHarmonies(args: EmitHarmoniesArgs): void {
 const SWING_GLYPH_SCALE = TEMPO_GLYPH_SCALE;
 const SWING_TEXT_SIZE_SP = TEMPO_TEXT_SIZE_SP;
 const SWING_PAIR_GAP_SP = 0.16; // between the two notes of a group
+const SWING_BEAMED_PAIR_GAP_SP = 0.9; // between beamed notes, which have no flag to space them
+// Beam metrics at scale 1, from Bravura's engravingDefaults; scaled with the glyph.
+const SWING_STEM_THICKNESS_SP = 0.12;
+const SWING_BEAM_THICKNESS_SP = 0.5;
+const SWING_BEAM_GAP_SP = 0.25;
+const SWING_BEAM_HOOK_SP = 1.1; // a level only one note carries
 const SWING_GROUP_GAP_SP = 0.3; // around the "="
 const SWING_DOT_ADVANCE_SP = 0.45; // at scale 1, as the tempo mark's dots
 const SWING_BRACKET_RISE_SP = 0.3; // bracket over the tallest stem in its group
@@ -608,8 +614,13 @@ function swingRealisation(swing: ResolvedSwing): SwingRealisation | null {
 }
 
 /** Draws one note of the equation at `x`, returning the cursor past its ink. */
-function emitSwingNote(note: SwingMarkNote, x: number, y: number, primitives: Primitive[]): number {
-  const glyph = METRONOME_GLYPH_BY_BASE[note.base] ?? 'metNoteQuarterUp';
+function emitSwingNote(
+  note: SwingMarkNote,
+  x: number,
+  y: number,
+  primitives: Primitive[],
+  glyph = METRONOME_GLYPH_BY_BASE[note.base] ?? 'metNoteQuarterUp'
+): number {
   primitives.push({ kind: 'glyph', glyph, x, y, scale: SWING_GLYPH_SCALE, className: 'swing' });
   let cursor = x + (glyphBBox(glyph)?.w ?? 1.33) * SWING_GLYPH_SCALE;
   for (let d = 0; d < note.dots; d++) {
@@ -619,6 +630,54 @@ function emitSwingNote(note: SwingMarkNote, x: number, y: number, primitives: Pr
       scale: SWING_GLYPH_SCALE, className: 'swing'
     });
     cursor += SWING_DOT_ADVANCE_SP * SWING_GLYPH_SCALE;
+  }
+  return cursor;
+}
+
+/** Beams a note carries when joined to a neighbour: its flag count. */
+const swingBeams = (note: SwingMarkNote): number =>
+  Math.max(0, SWING_NOTE_ORDER.indexOf(note.base) - SWING_NOTE_ORDER.indexOf('quarter'));
+
+/**
+ * One pair of the equation at `x`, returning the cursor past its ink. Two
+ * flagged values are beamed, as the rhythm would be written in the bar: black
+ * stemmed heads with the beams across their stem tops, a shared level running
+ * the full span and a level only one note has hooking in toward the other.
+ */
+function emitSwingPair(
+  pair: [SwingMarkNote, SwingMarkNote],
+  x: number,
+  y: number,
+  primitives: Primitive[]
+): number {
+  const beams = pair.map(swingBeams);
+  if (beams[0] === 0 || beams[1] === 0) {
+    const cursor = emitSwingNote(pair[0], x, y, primitives);
+    return emitSwingNote(pair[1], cursor + SWING_PAIR_GAP_SP, y, primitives);
+  }
+  const bb = glyphBBox('metNoteQuarterUp') ?? { x: 0, y: -0.564, w: 1.328, h: 3.316 };
+  const s = SWING_GLYPH_SCALE;
+  // The glyph's stem is its right edge.
+  const stemX = (noteX: number) => noteX + (bb.x + bb.w - SWING_STEM_THICKNESS_SP / 2) * s;
+  const stem0 = stemX(x);
+  let cursor = emitSwingNote(pair[0], x, y, primitives, 'metNoteQuarterUp');
+  const x1 = cursor + SWING_BEAMED_PAIR_GAP_SP;
+  const stem1 = stemX(x1);
+  cursor = emitSwingNote(pair[1], x1, y, primitives, 'metNoteQuarterUp');
+  const thickness = SWING_BEAM_THICKNESS_SP * s;
+  const half = (SWING_STEM_THICKNESS_SP * s) / 2;
+  const hook = Math.min(SWING_BEAM_HOOK_SP * s, (stem1 - stem0) / 2);
+  const bar = (xa: number, xb: number, level: number) => {
+    const lineY = y - (bb.y + bb.h) * s + thickness / 2 + (level - 1) * (thickness + SWING_BEAM_GAP_SP * s);
+    primitives.push({
+      kind: 'line', x1: xa - half, y1: lineY, x2: xb + half, y2: lineY,
+      thickness, className: 'swing'
+    });
+  };
+  for (let level = 1; level <= Math.max(...beams); level++) {
+    if (level <= Math.min(...beams)) bar(stem0, stem1, level);
+    else if (beams[0] >= level) bar(stem0, stem0 + hook, level);
+    else bar(stem1 - hook, stem1, level);
   }
   return cursor;
 }
@@ -668,16 +727,14 @@ export function emitSwingMark(args: EmitSwingMarkArgs): BoundsSp | null {
 
   const notes = [...realisation.written, ...realisation.played];
   const bottom = Math.max(...notes.map(n => swingNoteExtent(n).bottom), 0);
-  let cursor = emitSwingNote(realisation.written[0], x0, y, primitives);
-  cursor = emitSwingNote(realisation.written[1], cursor + SWING_PAIR_GAP_SP, y, primitives);
+  let cursor = emitSwingPair(realisation.written, x0, y, primitives);
   primitives.push({
     kind: 'text', text: '=', x: cursor + SWING_GROUP_GAP_SP, y, font: 'body',
     size: SWING_TEXT_SIZE_SP, weight: TEMPO_TEXT_WEIGHT, className: 'swing'
   });
   cursor += SWING_GROUP_GAP_SP + SWING_TEXT_SIZE_SP * 0.6 + SWING_GROUP_GAP_SP;
   const playedFrom = cursor;
-  cursor = emitSwingNote(realisation.played[0], cursor, y, primitives);
-  cursor = emitSwingNote(realisation.played[1], cursor + SWING_PAIR_GAP_SP, y, primitives);
+  cursor = emitSwingPair(realisation.played, cursor, y, primitives);
   if (realisation.tuplet !== null)
     emitSwingBracket(realisation, playedFrom, cursor, realisation.tuplet, primitives);
   return placeTextRun(primitives, firstNew, bottom, staffTop, scan, clearAbove);

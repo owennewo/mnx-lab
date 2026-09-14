@@ -81,6 +81,27 @@ Provenance answers "did this change?". This doc answers "should it have?".
 
 ## Open debt
 
+### Swing mark beams its eighth pairs — 2026-09-14
+
+Owner: user-reported engraving fix (a Soundslice comparison: the written pair of the
+swing equation drew as two flagged eighths), landed directly on `main`; no roadmap
+doc. `emitSwingPair` (`src/engine/layout/scoreText.ts`) now beams any pair of the
+equation whose two values both carry flags: stemmed black heads, a shared beam level
+across both stem tops, and a level only one note has hooking in toward the other.
+A pair with a quarter or longer in it stays unbeamed.
+
+One scenario moved, all four goldens. It is `draft`, so nothing was demoted.
+
+Look for: bars 1 and 2 — the written eighths are joined by one beam, not flagged. In
+bar 1 (2:1) the triplet side stays quarter + flagged eighth under its `3` bracket. In
+bar 2 (3:1) the played side is a dotted eighth beamed to a sixteenth, with a short
+second beam on the sixteenth pointing left; the dot sits under the beam and clears the
+next stem. The beams sit on the stem tops at the mark's glyph scale; nothing else moves.
+
+Scenario set (paths under `scenarios/`):
+
+- `lab/11-rhythm/05-swing-feel`
+
 ### Lyrics hang from their own system — 2026-09-10
 
 Owner: user-reported rendering fix, landed directly on `main`; no roadmap doc. A verse
