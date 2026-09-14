@@ -146,6 +146,10 @@ export interface GpifNote {
   soundingMidiOverride?: number | null;
   /** Authored sounding spelling; GPIF octaves converted to scientific notation. */
   concertPitch?: MnxPitch;
+  /** The note's own `<Accidental>` (`Sharp`, `Flat`, `Natural`, …): how the
+   *  author spelled it. Soundslice writes it against the FINGERED pitch — the
+   *  shape before the capo — and writes no ConcertPitch. */
+  accidental?: string;
   /** GP6 pitch alternative. */
   tone: number | null;
   octave: number | null;
@@ -388,6 +392,9 @@ function parseNote(node: Element): GpifNote {
     bend: null,
     harmonicType: null
   };
+
+  const accidental = child(node, 'Accidental')?.textContent?.trim();
+  if (accidental) note.accidental = accidental;
 
   let bendEnabled = false;
   const bend: GpifBend = {

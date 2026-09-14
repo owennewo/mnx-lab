@@ -639,6 +639,65 @@ export function noteAccidentalGlyph(
 /** Which accidental glyph (if any) a note of one measure prints. */
 export type AccidentalResolver = (note: MnxNote) => string | null;
 
+/** Each accidental glyph's vertical ink above and below its anchor, in staff
+ *  spaces (Bravura's bounding boxes). */
+const ACCIDENTAL_INK: Record<string, { above: number; below: number }> = {
+  accidentalFlat: { above: 1.756, below: 0.7 },
+  accidentalDoubleFlat: { above: 1.748, below: 0.7 },
+  accidentalSharp: { above: 1.4, below: 1.392 },
+  accidentalNatural: { above: 1.364, below: 1.34 },
+  accidentalDoubleSharp: { above: 0.508, below: 0.5 }
+};
+const ACCIDENTAL_INK_FALLBACK = { above: 1.8, below: 1.4 };
+/** Air two accidentals keep between them when they share a column. */
+const ACCIDENTAL_STACK_GAP_SP = 0.15;
+const DIATONIC_STEP: Record<string, number> = { C: 0, D: 1, E: 2, F: 3, G: 4, A: 5, B: 6 };
+
+/**
+ * Which column each of a chord's accidentals takes: 0 hugs the noteheads, each
+ * further column one `ACCIDENTAL_SLOT_WIDTH_SP` out; -1 for a note that prints
+ * none. Top to bottom, each takes the nearest column where its ink clears every
+ * accidental already there — so accidentals a seventh apart share one, and a
+ * six-flat chord needs two or three columns instead of six.
+ *
+ * Positions are diatonic steps, never staff y: the step distance between two
+ * notes is the same in every clef, so the plan (which knows no clef) and the
+ * notation staff (which does) reach the same answer.
+ */
+export function accidentalColumns(
+  notes: readonly MnxNote[],
+  accidentalOf: AccidentalResolver
+): { column: number[]; count: number } {
+  const column = notes.map(() => -1);
+  const marked = notes
+    .map((note, index) => ({ index, glyph: accidentalOf(note), step: note.pitch.octave * 7 + (DIATONIC_STEP[note.pitch.step] ?? 0) }))
+    .filter((entry): entry is { index: number; glyph: string; step: number } => entry.glyph !== null)
+    .sort((a, b) => b.step - a.step || a.index - b.index);
+  const columns: { glyph: string; step: number }[][] = [];
+  for (const entry of marked) {
+    const ink = ACCIDENTAL_INK[entry.glyph] ?? ACCIDENTAL_INK_FALLBACK;
+    let c = 0;
+    for (; c < columns.length; c++) {
+      const clear = columns[c].every(other => {
+        const otherInk = ACCIDENTAL_INK[other.glyph] ?? ACCIDENTAL_INK_FALLBACK;
+        const distance = Math.abs(other.step - entry.step) * 0.5;
+        const [upper, lower] = other.step > entry.step ? [otherInk, ink] : [ink, otherInk];
+        return distance >= upper.below + lower.above + ACCIDENTAL_STACK_GAP_SP;
+      });
+      if (clear) break;
+    }
+    (columns[c] ??= []).push(entry);
+    column[entry.index] = c;
+  }
+  return { column, count: columns.length };
+}
+
+/** The rigid room a chord's accidentals take left of its noteheads. */
+export function accidentalLeadingSp(notes: readonly MnxNote[], accidentalOf: AccidentalResolver): number {
+  const { count } = accidentalColumns(notes, accidentalOf);
+  return count ? count * ACCIDENTAL_SLOT_WIDTH_SP + ACCIDENTAL_RIGHT_PAD_SP : 0;
+}
+
 /** A tab staff draws no accidentals, so a tab-only plan reserves none: the
  *  resolver both the plan and `tab.ts` price columns with. */
 export const NO_ACCIDENTALS: AccidentalResolver = () => null;
@@ -796,12 +855,7 @@ export function tupletColumns(t: MnxTuplet, accidentalOf: AccidentalResolver): T
   const scale = innerSum > 0 ? tupletDuration(t) / innerSum : 1;
   return t.content.map(e => {
     if (!isTimedEvent(e)) return { leading: 0, advance: CORE_SP };
-    const accidentals = (e.notes ?? []).filter(
-      n => accidentalOf(n) !== null
-    ).length;
-    const leading = accidentals
-      ? accidentals * ACCIDENTAL_SLOT_WIDTH_SP + ACCIDENTAL_RIGHT_PAD_SP
-      : 0;
+    const leading = accidentalLeadingSp(e.notes ?? [], accidentalOf);
     return {
       leading,
       advance:
@@ -1692,9 +1746,6 @@ export function planHorizontal(
                 return withColumnExtras(placeholder());
               }
               onset += durationValue(event.duration);
-              const accidentals = (event.notes ?? []).filter(
-                n => accidentalOf(n) !== null
-              ).length;
               // A syllable is CENTRED on the note, but the anchor sits a
               // fixed half-core from the column start — so lyric width added
               // only to `core` lands entirely to the RIGHT of the note, and
@@ -1708,9 +1759,7 @@ export function planHorizontal(
               // lands on the previous column.
               const arpeggio = (event.notes ?? []).some(n => n.id !== undefined && arpeggioStarts.has(n.id));
               return withColumnExtras({
-                leading: (accidentals
-                  ? accidentals * ACCIDENTAL_SLOT_WIDTH_SP + ACCIDENTAL_RIGHT_PAD_SP
-                  : 0) + (arpeggio ? ARPEGGIO_ROOM_SP : 0) + Math.max(0, (lyricW - CORE_SP) / 2),
+                leading: accidentalLeadingSp(event.notes ?? [], accidentalOf) + (arpeggio ? ARPEGGIO_ROOM_SP : 0) + Math.max(0, (lyricW - CORE_SP) / 2),
                 core: Math.max(
                   CORE_SP + (event.duration.dots ?? 0) * DOT_SP,
                   (CORE_SP + lyricW) / 2

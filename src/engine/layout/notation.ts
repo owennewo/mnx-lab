@@ -54,6 +54,7 @@ import {
   PackingInput,
   ACCIDENTAL_SLOT_WIDTH_SP,
   ACCIDENTAL_RIGHT_PAD_SP,
+  accidentalColumns,
   KEY_SIG_GLYPH_ADVANCE_SP,
   GRACE_NOTE_ADVANCE_SP,
   TREMOLO_NOTE_ADVANCE_SP,
@@ -3990,13 +3991,14 @@ function emitTupletGroup(args: EmitTupletGroupArgs): void {
         className: 'ledger-line'
       });
     }
+    const stacked = accidentalColumns(notes, accidentalOf);
     notes.forEach((n, idx) => {
       const accGlyph = accidentalOf(n);
       if (accGlyph) {
         primitives.push({
           kind: 'glyph',
           glyph: accGlyph,
-          x: x - (NOTEHEAD_WIDTH_SP / 2) * ink - ACCIDENTAL_SLOT_WIDTH_SP * ink,
+          x: x - (NOTEHEAD_WIDTH_SP / 2) * ink - ((stacked.column[idx] + 1) * ACCIDENTAL_SLOT_WIDTH_SP + ACCIDENTAL_RIGHT_PAD_SP) * ink,
           y: staffTop + staffYs[idx],
           className: 'accidental'
         });
@@ -4343,24 +4345,21 @@ function emitEvent(args: EmitEventArgs): BeamedStem | null {
     });
   }
 
-  // Accidentals (left of the notehead column)
-  const accidentalEntries = notes
-    .map((n, idx) => ({
-      glyph: accidentalOf(n),
-      staffY: staffYs[idx],
-      noteIdx: idx
-    }))
-    .filter(e => e.glyph);
-  const accidentalsToLeft = accidentalEntries.length;
-  accidentalEntries.forEach((acc, idx) => {
-    const offset = (accidentalsToLeft - idx) * ACCIDENTAL_SLOT_WIDTH_SP + ACCIDENTAL_RIGHT_PAD_SP;
+  // Accidentals (left of the notehead column), stacked into the columns the
+  // plan priced (`accidentalColumns`): column 0 hugs the noteheads.
+  const stacked = accidentalColumns(notes, accidentalOf);
+  const accidentalsToLeft = stacked.count;
+  notes.forEach((n, idx) => {
+    const col = stacked.column[idx];
+    if (col < 0) return;
+    const offset = (col + 1) * ACCIDENTAL_SLOT_WIDTH_SP + ACCIDENTAL_RIGHT_PAD_SP;
     primitives.push({
       kind: 'glyph',
-      glyph: acc.glyph!,
+      glyph: accidentalOf(n)!,
       x: eventX - (NOTEHEAD_WIDTH_SP / 2) * ink - offset * ink,
-      y: staffTop + acc.staffY,
-      fill: noteFill(acc.noteIdx),
-      className: 'accidental' + noteColorClass(acc.noteIdx)
+      y: staffTop + staffYs[idx],
+      fill: noteFill(idx),
+      className: 'accidental' + noteColorClass(idx)
     });
   });
 

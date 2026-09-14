@@ -8,6 +8,7 @@ import {
   MnxEvent,
   MnxGrace,
   MnxNote,
+  MnxPitch,
   MnxTabTechnique,
   MnxEventLyricLine,
   MnxHarmony,
@@ -819,7 +820,10 @@ function buildNote(
   if (authored && !matches) {
     warn(`note ${sourceId}: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.`);
   }
-  const mnxNote: MnxNote = { id, pitch: matches ? { ...authored } : midiToPitch(midi, fifths) };
+  const mnxNote: MnxNote = {
+    id,
+    pitch: matches ? { ...authored } : spellAuthored(gpNote.accidental, midi, track.capo) ?? midiToPitch(midi, fifths)
+  };
   const stringCount = track.tuningLowToHigh.length;
   const onFingerboard = gpNote.string !== null && stringCount > 0;
   if (onFingerboard) {
@@ -885,6 +889,49 @@ function buildNote(
   });
 
   return mnxNote;
+}
+
+const AUTHORED_ALTERS: Record<string, number> = { Sharp: 1, Flat: -1, Natural: 0, DoubleSharp: 2, DoubleFlat: -2 };
+const STEPS = ['C', 'D', 'E', 'F', 'G', 'A', 'B'] as const;
+const STEP_PC: Record<string, number> = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+/** Diatonic steps a capo of N semitones moves a shape: 2 is a major second
+ *  (E → F♯), 3 a minor third (E → G), 6 an augmented fourth. */
+const CAPO_STEPS = [0, 1, 1, 2, 2, 3, 3, 4, 5, 5, 6, 6];
+
+/** `midi` spelled with exactly `alter`, or null when that alter lands on no step. */
+function spellWith(midi: number, alter: number): MnxPitch | null {
+  const natural = midi - alter;
+  const step = STEPS.find(s => STEP_PC[s] === ((natural % 12) + 12) % 12);
+  if (!step) return null;
+  const octave = Math.floor((natural - STEP_PC[step]) / 12) - 1;
+  return alter ? { step, octave, alter } : { step, octave };
+}
+
+/**
+ * The spelling a note's own `<Accidental>` asks for, carried to sounding pitch.
+ *
+ * Soundslice writes the accidental of the FINGERED note — the shape before the
+ * capo (Baby Please Don't Go, capo 2: 461 of 484 spell validly that way, 157
+ * as sounding) — so the shape is spelled first and moved up by the capo's
+ * interval, which keeps a chord's spelling coherent: an open-E shape at capo 2
+ * reads F♯–C♯–A♯, never G♭–D♭–B♭. An accidental that does not spell the shape
+ * is not a spelling at all — Guitar Pro's own files carry ones that fit neither
+ * reading reliably (Sun-did-glide.gpx: 77% shape, 56% sounding), and honouring
+ * them as sounding spelled its B's as C♭ — so the key decides instead.
+ */
+function spellAuthored(accidental: string | undefined, midi: number, capo: number): MnxPitch | null {
+  const alter = accidental === undefined ? undefined : AUTHORED_ALTERS[accidental];
+  if (alter === undefined) return null;
+  const shape = spellWith(midi - capo, alter);
+  if (shape) {
+    const steps = CAPO_STEPS[capo % 12] + 7 * Math.floor(capo / 12);
+    const index = shape.octave * 7 + STEPS.indexOf(shape.step) + steps;
+    const step = STEPS[((index % 7) + 7) % 7];
+    const octave = Math.floor(index / 7);
+    const moved = midi - ((octave + 1) * 12 + STEP_PC[step]);
+    if (Math.abs(moved) <= 2) return moved ? { step, octave, alter: moved } : { step, octave };
+  }
+  return null;
 }
 
 /**

@@ -20,7 +20,7 @@ import { normalizeIds } from './helpers/normalize.js';
 /** One track in standard tuning, 4/4, one voice; `bars` lists each bar's beats.
  *  The track states the guitar octave as GP6 and Soundslice do — every real
  *  file says it, and the writer supplies it for a part that is silent. */
-function score(bars: string[][], notes: string, masterBarExtra = ''): Uint8Array {
+function score(bars: string[][], notes: string, masterBarExtra = '', trackProperties = ''): Uint8Array {
   let beatId = 0;
   const beats: string[] = [];
   const voices: string[] = [];
@@ -39,7 +39,7 @@ function score(bars: string[][], notes: string, masterBarExtra = ''): Uint8Array
   });
   return writeGpContainer(`<GPIF>
     <Tracks><Track id="0"><Name>Guitar</Name><Properties>
-      <Property name="Tuning"><Pitches>40 45 50 55 59 64</Pitches></Property>
+      <Property name="Tuning"><Pitches>40 45 50 55 59 64</Pitches></Property>${trackProperties}
     </Properties><PartSounding><TranspositionPitch>-12</TranspositionPitch></PartSounding></Track></Tracks>
     <MasterBars>${masterBars.join('')}</MasterBars>
     <Bars>${barXml.join('')}</Bars>
@@ -218,6 +218,39 @@ describe('slurs', () => {
     expect(warnings).toEqual([
       'measure 1: beat <Legato> slurring into a rest is not represented (1 in the file).'
     ]);
+  });
+});
+
+describe('authored spelling', () => {
+  const capo2 = '<Property name="CapoFret"><Fret>2</Fret></Property>';
+  const accidental = (value: string) => `<Accidental>${value}</Accidental>`;
+
+  it('spells a capoed shape as written, moved up by the capo interval', () => {
+    // An open-E shape's low E, B and G♯ (Soundslice spells the shape) at capo 2.
+    const { events, warnings } = load(score(
+      [[beat('0 1 2'), beat(''), beat(''), beat('')]],
+      note(0, 0, 0, accidental('Natural')) + note(1, 1, 2, accidental('Natural')) + note(2, 3, 1, accidental('Sharp')),
+      '', capo2
+    ));
+    expect(events(0)[0].notes!.map(n => n.pitch)).toEqual([
+      { step: 'F', octave: 2, alter: 1 },
+      { step: 'C', octave: 3, alter: 1 },
+      { step: 'A', octave: 3, alter: 1 }
+    ]);
+    expect(warnings).toEqual([]);
+  });
+
+  it('lets the key spell a note whose accidental does not spell its shape', () => {
+    const { events } = load(score(
+      [[beat('0'), beat('1'), beat(''), beat('')]],
+      // The open A string at capo 2 sounds B2: Flat cannot spell the A shape, and
+      // reading it against the sounding note would print C♭3. Fret 1 sounds C3,
+      // which a double sharp cannot spell either. The key decides both.
+      note(0, 1, 0, accidental('Flat')) + note(1, 1, 1, accidental('DoubleSharp')),
+      '', capo2
+    ));
+    expect(events(0)[0].notes![0].pitch).toEqual({ step: 'B', octave: 2 });
+    expect(events(0)[1].notes![0].pitch).toEqual({ step: 'C', octave: 3 });
   });
 });
 
