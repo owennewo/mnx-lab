@@ -15,8 +15,9 @@
 // back, the title, Zoom, Settings, Tags and the theme toggle — the tag chips
 // went (the Tags sheet shows them), the staff view lives in Settings alone,
 // and the account menu is the library page's (a piece is not where you sign
-// out). Recordings moved to the player's tray, beside the source switcher whose
-// sources they are.
+// out). 2026-09-14: what plays left the tray for the tools row — a Source
+// button that names it, opening the Source sheet (choose, edit, add) in the
+// frame's side slot beside Instruments; the recording editor opens there too.
 import { LitElement, css, html, nothing } from 'lit';
 import { keyed } from 'lit/directives/keyed.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
@@ -38,14 +39,13 @@ import { isKitPart, type PartMix } from '../../../src/audio/partMix.ts';
 import './TagsSheet.ts';
 import './RecordingsSheet.ts';
 import './InstrumentsSheet.ts';
+import { sourceGlyph } from './SourceSheet.ts';
 import type { TagsSnapshot } from './TagsSheet.ts';
 import type { InstrumentPart } from './InstrumentsSheet.ts';
 
 import { VIEW_KEY, DISPLAY_KEY, UNROLLED_KEY, STAFF_SCALE_KEY, DENSITY_H_KEY, SPACING_MODE_KEY, TOOLS_OPEN_KEY, PLAYER_OPEN_KEY, read, write, readView, readDisplay, readNumber, readParts, writeParts } from './scorePreferences.ts';
 
 const back = html`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"></path></svg>`;
-/** The recordings sheet's mark in the tray: an info ring beside the source switcher. */
-const infoGlyph = html`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5"></path><circle cx="12" cy="8" r="0.6" fill="currentColor" stroke="none"></circle></svg>`;
 /** Instruments: three faders, each knob at its own level. */
 const mixerGlyph = html`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4v5M6 13v7M12 4v11M12 19v1M18 4v1M18 9v11"></path><circle cx="6" cy="11" r="2"></circle><circle cx="12" cy="17" r="2"></circle><circle cx="18" cy="7" r="2"></circle></svg>`;
 const tagGlyph = html`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12V4h8l10 10-8 8z"></path><circle cx="7.5" cy="8.5" r="1.2" fill="currentColor" stroke="none"></circle></svg>`;
@@ -60,8 +60,12 @@ export class PiecePage extends LitElement {
   @state() private error = '';
   @state() private loading = true;
   @state() private tagsOpen = false;
+  /** The recording editor (edit or add), in the side slot. */
   @state() private recordingsOpen = false;
+  @state() private sourceOpen = false;
   @state() private instrumentsOpen = false;
+  /** The recording the editor shows — not necessarily the one playing. */
+  @state() private editingRecordingId: string | null = null;
   /** The piece's parts as the reader left them: off the score, and the mix. */
   @state() private hiddenParts: readonly number[] = [];
   @state() private partMix: PartMix = {};
@@ -101,7 +105,7 @@ export class PiecePage extends LitElement {
     mnx-document-viewer[hidden] {
       display: none;
     }
-    mnx-studio-tags, mnx-studio-recordings {
+    mnx-studio-tags {
       position: fixed;
       top: 0;
       right: 0;
@@ -164,7 +168,7 @@ export class PiecePage extends LitElement {
     this.doc = null;
     this.error = '';
     this.loading = true;
-    this.tagsOpen = false; this.recordingsOpen = false; this.selectedRecordingId = null; this.addingRecording = false;
+    this.tagsOpen = false; this.recordingsOpen = false; this.sourceOpen = false; this.selectedRecordingId = null; this.editingRecordingId = null; this.addingRecording = false;
     ({ hidden: this.hiddenParts, mix: this.partMix } = readParts(this.pieceId));
     try {
       const readPair = () => Promise.all([
@@ -280,6 +284,32 @@ export class PiecePage extends LitElement {
   }
   private readonly densitySteps = () => this.viewer?.densitySteps() ?? null;
 
+  // ── the side panels: one at a time ──────────────────────────────────────
+
+  private openPanel(which: 'tags' | 'source' | 'instruments' | 'recording' | null) {
+    this.tagsOpen = which === 'tags';
+    this.sourceOpen = which === 'source';
+    this.instrumentsOpen = which === 'instruments';
+    this.recordingsOpen = which === 'recording';
+  }
+  /** The editor on one recording, read fresh so its revision is current. */
+  private async editRecording(id: string) {
+    const generation = this.generation;
+    this.player?.pause();
+    await this.refreshSnapshot();
+    if (generation !== this.generation) return;
+    this.addingRecording = false;
+    this.editingRecordingId = id;
+    this.openPanel('recording');
+  }
+  private addRecording() {
+    this.player?.pause();
+    this.addingRecording = true;
+    this.editingRecordingId = null;
+    this.openPanel('recording');
+    void this.refreshSnapshot();
+  }
+
   // ── the Instruments sheet ───────────────────────────────────────────────
 
   private setParts(hidden: readonly number[], mix: PartMix) {
@@ -305,7 +335,9 @@ export class PiecePage extends LitElement {
   render() {
     const title = this.doc ? (this.tag('title') ?? this.doc.name) : '';
     const artist = this.doc ? (this.tag('artist') ?? documentArtist(this.doc.mnxJson) ?? '') : '';
-    const selectedRecording = this.snapshot?.recordings.find(r => r.id === this.selectedRecordingId);
+    const activeId = this.selectedRecordingId ?? 'synth';
+    const activeRecording = this.snapshot?.recordings.find(r => r.id === this.selectedRecordingId);
+    const playable = this.snapshot?.recordings.filter(r => this.recordings.some(s => s.id === r.id)) ?? [];
     const themeNext = nextTheme(this.theme);
     const themeSentence = `Theme: ${this.theme}${this.theme === 'auto' ? ` (now ${resolvedTheme(this.theme)})` : ''} — click for ${themeNext}`;
     // The viewer is queried, not stored: before the first render there is none.
@@ -338,10 +370,14 @@ export class PiecePage extends LitElement {
       >
         <a slot="back" href=${libraryReturnHref()} @click=${returnToLibrary}>${back}<span>Library</span></a>
         ${this.doc
-          ? html`<button slot="actions" type="button" aria-pressed=${this.tagsOpen} @click=${() => { this.tagsOpen = !this.tagsOpen; this.recordingsOpen = false; this.instrumentsOpen = false; }}>
+          ? html`<button slot="actions" type="button" aria-pressed=${this.tagsOpen} @click=${() => this.openPanel(this.tagsOpen ? null : 'tags')}>
               ${tagGlyph}<span>Tags · ${this.snapshot?.tags.length ?? 0}</span>
             </button>
-            <button slot="actions" type="button" aria-pressed=${this.instrumentsOpen} @click=${() => { this.instrumentsOpen = !this.instrumentsOpen; this.tagsOpen = false; this.recordingsOpen = false; }}>
+            <button slot="actions" type="button" aria-pressed=${this.sourceOpen || this.recordingsOpen}
+              aria-label=${`Source: ${activeRecording?.name ?? 'Synth'}`} @click=${() => this.openPanel(this.sourceOpen ? null : 'source')}>
+              ${sourceGlyph(activeRecording ? (activeRecording.kind === 'youtube' ? 'youtube' : 'audio') : 'synth')}<span>Source · ${activeRecording?.name ?? 'Synth'}</span>
+            </button>
+            <button slot="actions" type="button" aria-pressed=${this.instrumentsOpen} @click=${() => this.openPanel(this.instrumentsOpen ? null : 'instruments')}>
               ${mixerGlyph}<span>Instruments · ${this.doc.mnxJson.parts.length}</span>
             </button>`
           : nothing}
@@ -376,8 +412,8 @@ export class PiecePage extends LitElement {
           .hiddenParts=${this.hiddenParts}
           @render-scale=${(e: CustomEvent<RenderScale>) => (this.effectiveStaffScale = e.detail.staffScale)}
         ></mnx-document-viewer>
-        <mnx-player slot="player" .recordings=${this.recordings} .canAddRecording=${!!this.snapshot} .syncWarningsInPanel=${true}
-          .partMix=${this.partMix} .soundControl=${false}
+        <mnx-player slot="player" .recordings=${this.recordings} .syncWarningsInPanel=${true}
+          .partMix=${this.partMix} .soundControl=${false} .sourceControl=${false}
           @playback-position=${(e: CustomEvent<{ sourceId?: string; kind?: string; syncWarning?: string }>) => {
             const { sourceId, kind, syncWarning } = e.detail;
             if (kind !== this.playbackKind) this.playbackKind = kind;
@@ -386,16 +422,31 @@ export class PiecePage extends LitElement {
           }}
           @source-selected=${(e: CustomEvent<{ id: string }>) => {
             this.selectedRecordingId = e.detail.id === 'synth' ? null : e.detail.id;
-            this.addingRecording = false;
-            if (!this.selectedRecordingId) this.recordingsOpen = false;
-          }}
-          @add-recording=${() => { this.player?.pause(); this.addingRecording = true; this.recordingsOpen = true; this.tagsOpen = false; this.instrumentsOpen = false; void this.refreshSnapshot(); }}>
-          ${selectedRecording
-            ? html`<button slot="source-tools" type="button" aria-pressed=${this.recordingsOpen}
-                title="Recording details" aria-label=${`Recording details: ${selectedRecording.name ?? 'Unnamed recording'}`}
-                @click=${async () => { const generation = this.generation; this.player?.pause(); await this.refreshSnapshot(); if (generation !== this.generation) return; this.recordingsOpen = !this.recordingsOpen || this.addingRecording; this.addingRecording = false; this.tagsOpen = false; }}>${infoGlyph}</button>`
-            : nothing}
+          }}>
         </mnx-player>
+        ${this.sourceOpen && this.doc
+          ? html`<mnx-studio-source slot="side"
+              .recordings=${playable}
+              .document=${this.doc}
+              .activeId=${activeId}
+              .syncWarning=${this.recordingWarning?.id === activeId ? this.recordingWarning.message : ''}
+              .canAdd=${!!this.snapshot}
+              @source-choose=${(e: CustomEvent<{ id: string }>) => void this.player?.selectSource(e.detail.id)}
+              @recording-edit=${(e: CustomEvent<{ id: string }>) => void this.editRecording(e.detail.id)}
+              @recording-add=${() => this.addRecording()}
+              @close=${() => (this.sourceOpen = false)}></mnx-studio-source>`
+          : nothing}
+        ${this.recordingsOpen && this.snapshot && this.doc ? keyed(this.addingRecording ? 'new' : this.editingRecordingId, html`<mnx-studio-recordings slot="side" .syncWarning=${!this.addingRecording && this.recordingWarning?.id === this.editingRecordingId ? this.recordingWarning.message : ''} .recordingId=${this.addingRecording ? null : this.editingRecordingId} .client=${this.client} .snapshot=${this.snapshot} .document=${this.doc}
+          @recordings-changed=${async (e: CustomEvent<LibrarySnapshot>) => { this.player?.pause(); if (this.snapshot?.piece.canonical_rendition_id !== e.detail.piece.canonical_rendition_id) { await this.load(); return; } this.snapshot = { ...e.detail, tags: this.snapshot?.tags ?? [] }; this.setRecordings(e.detail); }}
+          @recording-saved=${async (e: CustomEvent<{ id: string }>) => { if (!this.snapshot?.recordings.some(r => r.id === e.detail.id)) return; this.addingRecording = false; this.editingRecordingId = e.detail.id; this.selectedRecordingId = e.detail.id; await this.updateComplete; await this.player?.updateComplete; await this.player?.selectSource(e.detail.id); }}
+          @recording-deleted=${() => {
+            // Back to the list; playback falls back to Synth only when the deleted recording was playing.
+            const wasPlaying = this.editingRecordingId !== null && this.editingRecordingId === this.selectedRecordingId;
+            this.addingRecording = false; this.editingRecordingId = null; this.openPanel('source');
+            if (wasPlaying) { this.selectedRecordingId = null; void this.player?.selectSource('synth'); }
+          }}
+          @back=${() => this.openPanel('source')}
+          @close=${() => (this.recordingsOpen = false)}></mnx-studio-recordings>`) : nothing}
         ${this.instrumentsOpen && this.doc
           ? html`<mnx-studio-instruments slot="side"
               .parts=${this.instrumentParts(this.doc)}
@@ -408,11 +459,6 @@ export class PiecePage extends LitElement {
               @close=${() => (this.instrumentsOpen = false)}></mnx-studio-instruments>`
           : nothing}
       </mnx-score-frame>
-      ${this.recordingsOpen && this.snapshot && this.doc ? keyed(this.addingRecording ? 'new' : this.selectedRecordingId, html`<mnx-studio-recordings .syncWarning=${!this.addingRecording && this.recordingWarning?.id === this.selectedRecordingId ? this.recordingWarning.message : ''} .recordingId=${this.addingRecording ? null : this.selectedRecordingId} .client=${this.client} .snapshot=${this.snapshot} .document=${this.doc}
-        @recordings-changed=${async (e: CustomEvent<LibrarySnapshot>) => { this.player?.pause(); if (this.snapshot?.piece.canonical_rendition_id !== e.detail.piece.canonical_rendition_id) { await this.load(); return; } this.snapshot = { ...e.detail, tags: this.snapshot?.tags ?? [] }; this.setRecordings(e.detail); }}
-        @recording-saved=${async (e: CustomEvent<{ id: string }>) => { if (!this.snapshot?.recordings.some(r => r.id === e.detail.id)) return; this.addingRecording = false; this.selectedRecordingId = e.detail.id; await this.updateComplete; await this.player?.updateComplete; await this.player?.selectSource(e.detail.id); }}
-        @recording-deleted=${() => { this.recordingsOpen = false; this.selectedRecordingId = null; this.addingRecording = false; void this.player?.selectSource('synth'); }}
-        @close=${() => this.recordingsOpen = false}></mnx-studio-recordings>`) : nothing}
       ${this.tagsOpen ? html`<mnx-studio-tags .client=${this.client} .snapshot=${this.snapshot}
         @tags-changed=${(e: CustomEvent<TagsSnapshot>) => { if (this.snapshot) this.snapshot = { ...this.snapshot, ...e.detail, piece: { ...this.snapshot.piece, ...e.detail.piece } }; void this.refreshSnapshot(); }}
         @aliases-changed=${() => this.refreshSnapshot()}

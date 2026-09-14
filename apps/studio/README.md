@@ -36,9 +36,11 @@ apps/studio/
 Piece URLs carry the library's piece id. On a piece the page IS the score frame
 ([roadmap/inprogress/core-score-frame.md](../../roadmap/inprogress/core-score-frame.md)):
 a title grip on the top edge and a playback grip on the bottom, drawn out into the library
-page's tools row (the way back, the title, Zoom, Settings, Tags, Instruments, the theme
-toggle) and the player's tray, where the recordings sheet opens from beside the source
-switcher whose sources it manages. The Instruments sheet sits in the frame's side slot,
+page's tools row (the way back, the title, Zoom, Settings, Tags, Source, Instruments, the
+theme toggle) and the player's tray, which carries only transport, readout, rail, rate and
+volume. **Source · <what plays>** opens the Source sheet in the frame's side slot: Synth and
+each recording, choose one, edit or add a recording in the same slot
+([docs/studio-recordings.md](../../docs/studio-recordings.md)). The Instruments sheet sits in the frame's side slot,
 between the strips, and lists the parts: hide one from the score (it keeps playing), mute
 it, set its level beneath the tray's master volume and choose its sound — which is why the
 tray carries no Sound selector here. The mix is synth-only; while a recording plays only

@@ -38,6 +38,10 @@ export class Player extends LitElement {
   /** Whether the tray offers the Sound selector. A host with its own
    *  per-part sound control (studio's Instruments sheet) turns it off. */
   @property({ attribute: false }) soundControl = true;
+  /** Whether the tray offers the Source select and its `source-tools` slot. A
+   *  host that chooses sources elsewhere (studio's Source sheet) turns it off;
+   *  `selectSource()` is the same either way. */
+  @property({ attribute: false }) sourceControl = true;
   @property({ attribute: 'sample-base' }) sampleBase: string | undefined;
   @property({ attribute: false }) sampleBases: Partial<Record<SamplePreset, string>> | undefined;
   @property({ attribute: false }) sampleLoader: SamplePackLoader | undefined;
@@ -997,7 +1001,7 @@ export class Player extends LitElement {
             : 'No performance available'}</output
         >
         ${this.rail()}
-        ${this.recordings.length || this.canAddRecording ? html`<label class="select">Source<select aria-label="Playback source" ?disabled=${!this.performance}
+        ${this.sourceControl && (this.recordings.length || this.canAddRecording) ? html`<label class="select">Source<select aria-label="Playback source" ?disabled=${!this.performance}
           .value=${this.youtubeRequest ?? this.sourceId} @change=${(event: Event) => {
             const select = event.target as HTMLSelectElement;
             if (select.value === 'add-recording') {
@@ -1009,7 +1013,7 @@ export class Player extends LitElement {
           ${this.recordings.map(r => html`<option value=${r.id} ?selected=${(this.youtubeRequest ?? this.sourceId) === r.id}>${r.name}</option>`)}
           ${this.canAddRecording ? html`<option value="add-recording">Add recording…</option>` : nothing}
         </select></label>` : nothing}
-        <slot name="source-tools"></slot>
+        ${this.sourceControl ? html`<slot name="source-tools"></slot>` : nothing}
         <span class="settings">
         ${this.soundControl && this.sourceId === 'synth' ? html`<label class="select" title="Sound"
           >${Player.stroke('M3 12h2l2-6 3 12 3-9 2 5 2-2h4')}<select

@@ -1,12 +1,14 @@
 import { LitElement, css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { LibraryClient, LibraryRequestError, type LibrarySnapshot, type LibraryRecording, type RecordingChange } from '../../../src/storage/libraryClient.ts';
-import { decodeRecordingSync, type RecordingSyncpoint } from '../../../src/model/recordingSync.ts';
+import type { RecordingSyncpoint } from '../../../src/model/recordingSync.ts';
 import { youtubeVideoId } from '../../../src/model/youtubeUrl.ts';
 import type { MnxDocument } from '../../../src/model/mnx.ts';
 import { linearizePasses } from '../../../src/model/passes.ts';
 import { compilePerformance } from '../../../src/audio/performance.ts';
-import { createRecordingSync } from '../../../src/audio/recordingSync.ts';
+import { syncSummary } from './syncSummary.ts';
+
+const backGlyph = html`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg>`;
 
 @customElement('mnx-studio-recordings')
 export class RecordingsSheet extends LitElement {
@@ -33,13 +35,14 @@ export class RecordingsSheet extends LitElement {
   private compiled?: ReturnType<typeof compilePerformance>;
   private passes?: ReturnType<typeof linearizePasses>;
   static styles = css`
-    :host { box-sizing: border-box; display: flex; flex-direction: column; width: min(440px,100vw); height: 100%; overflow: auto; background: light-dark(#faf9f7,#292826); border-left: 1px solid var(--line); color: var(--ink); }
+    :host { box-sizing: border-box; display: flex; flex-direction: column; width: 380px; max-width: 100%; height: 100%; overflow: auto; background: light-dark(#faf9f7,#292826); border-left: 1px solid var(--line); color: var(--ink); }
     header, section { padding: 14px 18px; } header { display:flex; gap:12px; align-items:center; } header b { flex:1; }
     section { display:grid; gap:12px; border-top:1px solid var(--line); } label { display:grid; gap:5px; font-size:13px; }
     input, select, button { font:inherit; color:inherit; background:transparent; border:1px solid var(--line); border-radius:3px; padding:8px; min-width:0; }
     select option { color:var(--ink); background:light-dark(#faf9f7,#292826); }
     dl { display:grid; grid-template-columns:auto 1fr; gap:8px 16px; margin:0; font-size:13px; } dd { margin:0; overflow-wrap:anywhere; } button { cursor:pointer; } button:disabled { opacity:.5; cursor:default; }
     .row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    header button.back { display:inline-flex; border:0; padding:4px; color:var(--ink-dim); }
     .source-link { font-size:13px; color:inherit; overflow-wrap:anywhere; }
     .hint { color:var(--ink-dim); font-size:12px; margin:0; line-height:1.5; } .error { color:light-dark(#a12121,#ffb4ab); }
     .diagnostic { font-size:13px; padding:10px; background:light-dark(#efeeeb,#343330); line-height:1.5; }
@@ -56,17 +59,7 @@ export class RecordingsSheet extends LitElement {
     this.name = row?.name ?? ''; this.kind = row?.kind ?? 'youtube'; this.video = row?.external_id ?? ''; this.file = null; this.removing = '';
   }
   private syncDetails() {
-    if (!this.editing?.syncpoints) return { points: [], message: 'No sync points. Playback is available without score following or score seeking.' };
-    try {
-      const raw: unknown = JSON.parse(this.editing.syncpoints);
-      const decoded = decodeRecordingSync(raw);
-      if (!decoded.ok) return { points: [], message: decoded.diagnostic.message, warning: true };
-      const mapped = this.compiled?.ok && this.passes ? createRecordingSync(raw, this.compiled, this.passes) : null;
-      const dropped = new Set(mapped?.droppedPointIndices ?? []);
-      return { points: decoded.value.points.filter((_, i) => !dropped.has(i)), dropped: dropped.size, warning: !mapped?.ok, message: mapped?.ok
-        ? `${mapped.value.coverage === 'full' ? 'Full' : 'Partial'} score coverage.`
-        : mapped ? mapped.diagnostic.message : 'Score timing is unavailable.' };
-    } catch { return { points: [], message: 'Stored sync points could not be read.', warning: true }; }
+    return syncSummary(this.editing, this.compiled, this.passes);
   }
   private location(point: RecordingSyncpoint | undefined) {
     if (!point) return '—';
@@ -119,7 +112,7 @@ export class RecordingsSheet extends LitElement {
   render() {
     if (!this.snapshot) return nothing;
     const sync = this.syncDetails();
-    return html`<header><b>${this.editing ? 'Recording details' : 'Add recording'}</b><button ?disabled=${this.busy} aria-label="Close recordings" @click=${() => this.dispatchEvent(new CustomEvent('close'))}>Close</button></header>
+    return html`<header><button class="back" ?disabled=${this.busy} aria-label="Back to sources" title="Back to sources" @click=${() => this.dispatchEvent(new CustomEvent('back'))}>${backGlyph}</button><b>${this.editing ? 'Recording details' : 'Add recording'}</b><button ?disabled=${this.busy} aria-label="Close recordings" @click=${() => this.dispatchEvent(new CustomEvent('close'))}>Close</button></header>
       <section>
         <fieldset ?disabled=${this.busy}>
           <label>Name<input aria-label="Recording name" maxlength="200" .value=${this.name} @input=${(e: Event) => { this.changed(); this.name = (e.target as HTMLInputElement).value; }}></label>

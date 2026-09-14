@@ -1,13 +1,20 @@
 # Studio recording attachments
 
-Implementation loop, player campaign item 18. The source dropdown selects the recording;
-its adjacent details button opens a panel for that recording alone. An open panel
-follows source selection. Synth has no recording details. **Add recording…** in the
-source dropdown opens a named YouTube-link or audio-upload form, even on an empty
-piece. Adding does not change playback source until the recording is saved.
+Implementation loop, player campaign item 18. What plays is chosen in studio's **Source**
+sheet, not the playback tray (moved 2026-09-14, direction E of the *Playback Sources*
+design canvas): the tools row's **Source · <what plays>** button always names the source
+and opens the sheet in the score frame's side slot. The sheet lists Synth first, then each
+recording with its kind and how it follows the score (the whole score, part of it, no sync
+points, or a sync warning) and a pencil to edit it; the playing recording opens its sync
+points and warnings in place. **Add recording** at the end opens a named YouTube-link or
+audio-upload form, even on an empty piece. Adding does not change playback source until
+the recording is saved. The tray keeps no source control (`Player.sourceControl = false`);
+the embed's player still carries its own Source select.
 
-The selected recording can be renamed or deleted (with a named confirmation).
-Deletion returns playback to Synth and closes the panel. YouTube details include the
+The recording editor opens in the same side slot, with a way back to the list. Editing a
+recording does not change what plays. A recording can be renamed or deleted (with a named
+confirmation); deletion returns to the list, and falls back to Synth only when the deleted
+recording was the one playing. YouTube details include the
 full clickable URL. The panel displays read-only sync-point count, start and end
 locations (1-based performed bars, fractional bar position, and absolute media
 seconds), plus coverage diagnostics. Out-of-range sync points are dropped from the runtime map; the panel reports the

@@ -132,6 +132,17 @@ try {
   await wait(`${player}.partMix[0]?.muted === false && ${player}.partMix[0]?.sound === 'synth'`);
   await c.evaluate(`${instruments}.querySelector('button[aria-label="Close instruments"]').click()`);
   await wait(`!${piece}.querySelector('mnx-studio-instruments')`);
+  // The Source sheet: the tools row names what plays, the tray has no source
+  // control, and the sheet lists Synth (checked) with Add recording.
+  assert.equal(await c.evaluate(`!!${player}.shadowRoot.querySelector('select[aria-label="Playback source"]')`), false);
+  const sourceButton = `[...${piece}.querySelectorAll('button[slot=actions]')].find(b => b.textContent.includes('Source'))`;
+  await wait(`${sourceButton}?.textContent.includes('Source · Synth')`);
+  await c.evaluate(`${sourceButton}.click()`);
+  const source = `${piece}.querySelector('mnx-studio-source[slot=side]')?.shadowRoot`;
+  await wait(`${source}?.querySelector('[data-source="synth"]')?.getAttribute('aria-checked') === 'true' && !!${source}.querySelector('[aria-label="Add recording"]')`);
+  const sourceShot = await c.send('Page.captureScreenshot'); await fs.writeFile('/tmp/mnx-studio-source.png',Buffer.from(sourceShot.result.data,'base64'));
+  await c.evaluate(`${source}.querySelector('button[aria-label="Close source"]').click()`);
+  await wait(`!${piece}.querySelector('mnx-studio-source')`);
   // Back to the library without a reload: the frame goes with the piece, the header returns.
   await c.evaluate(`${piece}.querySelector('a[slot=back]').click()`);
   await wait(`!!${app}.querySelector('mnx-studio-library') && !!${app}.querySelector('header') && !${app}.querySelector('mnx-studio-piece')`);

@@ -51,6 +51,9 @@ line along the bottom edge. Nothing on the page listens for a tap to show chrome
   menu (sign-out is the library page's) and the Recordings button, which became a control
   in the player's tray beside the source switcher (the player's `source-tools` slot); a
   theme toggle (auto · light · dark, on `color-scheme`) took the end of the row.
+  *2026-09-14:* the source left the tray again — a **Source · <what plays>** button in the
+  row opens studio's Source sheet in the frame's `side` slot (beside Instruments), where
+  recordings are chosen, edited and added; studio's player sets `sourceControl = false`.
 
 ## Phases
 
