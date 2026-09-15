@@ -1,16 +1,19 @@
 # Touch gestures on the score — the minimal three
 
-> **Status: built 2026-09-12, awaiting the device checks.** Deliberately the
-> smallest set that is worth shipping: three gestures, no pinch. Opened from a
-> design conversation that started at "pinch should control staff and space
-> zoom" and narrowed once the costs were counted — the record of what was
-> dropped, and why, is as much the point of this doc as the three that survived.
+> **Status: built 2026-09-12; device-checked 2026-09-15; pinch added the same
+> day as a touch-only fourth gesture, awaiting its own device check.** Opened
+> from a design conversation that started at "pinch should control staff and
+> space zoom" and narrowed once the costs were counted — the record of what was
+> dropped, and why, is as much the point of this doc as what survived.
 >
-> It sits in `inprogress/` rather than `complete/` because the one thing that
-> decides whether the approach is sound **cannot be checked from this machine**:
-> whether `touch-action: pan-y` plus a non-passive `preventDefault()` really does
-> claim the second tap without costing native scrolling. See *The spike, skipped
-> on purpose* below.
+> **The device check passed** (a real Android tablet, 2026-09-15): one-finger
+> scrolling stays native, the double tap is claimed, the drag zooms. Two
+> defects came back with it, both fixed here: nothing showed that zoom mode had
+> been entered until the first step landed, and every step of the drag was too
+> slow to follow. The second is only partly a gesture problem — see
+> *Performance, measured* below — and it is what reopened the pinch: on a
+> touchscreen two fingers are two points, so the objection that a pinch is a
+> single scalar was only ever true of trackpads.
 
 ## The three
 
@@ -19,6 +22,7 @@
 | Double tap | Zoom reset | `zoom = null`, `densityH = null` — back to **fitted**, not to 1.0 |
 | Double tap, hold, drag | Staff × space zoom, diagonal drives both | `zoom` (0.6–6.4, `scale.ts:99`), `densityH` (0.01–8, `spacing.ts:172`) |
 | Two-finger tap | Play/pause | a `transport-toggle` event, not the player |
+| Pinch (touch only) | Staff × space zoom: fingers apart vertically grows the staff, apart horizontally opens the spacing; a diagonal drives both | the same two knobs, the same ladder, stepped by the change in the fingers' span at half the drag's rate (`PINCH_PX_PER_STEP = 12`) |
 
 A double-tap-drag is one finger: tap, lift, tap again within ~300ms and *don't*
 lift — the drag that follows is the control. The double-tap is only the unlock.
@@ -40,8 +44,15 @@ Pinch was the starting point and is not in the set. Three findings moved it out:
   `SPACE_STEP = 0.04` (`:77`). `src/elements/gestures.ts` carries those constants
   over unchanged, so a gesture and a click agree on what a step is.
 
-Pinch remains a reasonable *later* addition as a single-axis (staff)
-convenience — but see the two-finger-tap cost below, which it re-opens.
+Pinch was added on 2026-09-15 as exactly that later addition, but two-axis
+rather than single: the span between two fingers on a touchscreen is a 2D
+vector, so the vertical and horizontal spans map onto staff and space through
+the same snap cone the drag uses. The single-pointer path stays the primary
+one and the trackpad keeps the pad, so the first two findings still hold; the
+third is why a pinch steps the drag's ladder rather than owning a rate curve.
+The two-finger-tap cost it re-opens is paid in `gestures.ts`: a second finger
+opens a pinch *candidate* and a two-finger-tap candidate at once, and the
+first span change past the snap threshold settles it as a pinch.
 
 ## The spike, skipped on purpose
 
@@ -140,6 +151,48 @@ workbench-scoped, and studio deliberately gets no persistence in this cut; a
 gesture that silently writes a preference the shell has no control for would be
 worse than one that forgets.
 
+## Performance, measured (2026-09-15)
+
+Kind Hearted Woman (61 bars, two parts, 6,342 primitives in the both view),
+dev build, this laptop, the viewer at tablet-like widths:
+
+| | JS per paint | browser style+layout+paint |
+|---|---|---|
+| both view, zoom step | 300–540ms | 20–45ms |
+| notation, zoom step | 150–390ms | ~25ms |
+| tab, zoom step | 80–180ms | ~25ms |
+
+The browser is not the bottleneck; our JavaScript is, and it splits four ways:
+
+1. **Layout runs twice on every zoomed paint.** `bothRenderer.ts` lays out
+   square to find the fit, then again at the ink ratio. Each is ~170ms in Node
+   for this score; the profile is flat (`assembleSegment` 67% inclusive, no
+   single hot spot). Memoising the square layout across a drag would take a
+   staff-only step from two layouts to one.
+2. **The SVG emitter is `setAttribute`-bound**: 60% of `renderSvg`'s self time,
+   ~330ms for 6,345 nodes where the equivalent raw DOM build measures ~40ms.
+   Lines (3,288 of the primitives) carry half of it. Constant presentation
+   attributes (`font-family`, `fill`, `stroke`, `text-anchor`,
+   `dominant-baseline`) could move to one CSS rule per class — but the SVG
+   goldens are the same emitter through `harness/helpers/svgString.ts`, so
+   that is a golden-moving change and a `lab-verify` batch.
+3. **A third of a zoomed paint was selection chrome**: `drawEnclosure`'s
+   `getBBox` (22%) and the anchor event's `getBoundingClientRect` (9%), each
+   forcing layout on the fresh 7,000-node SVG, plus a smooth reveal scroll
+   queued on every step. **Fixed here**: while a gesture is active the viewer
+   re-engraves the score and skips the chrome; the release paints once with
+   everything and does not reveal.
+4. **The layout engine itself** — the remaining ~170ms — is the real ceiling,
+   and it is DOM-free by guarantee (`engine/headless.ts`), so it could run in
+   a worker with latest-wins coalescing without touching its code. That keeps
+   the finger and the readout responsive when a frame cannot.
+
+What none of this reaches on a slow tablet is a *glued* pinch: the step every
+other app takes is a CSS `transform: scale()` preview of the existing SVG
+between throttled real engraves, which is approximate (the horizontal axis
+re-fits on the real paint) but never blind. Not built; the candidate next
+step if 1–3 are not enough.
+
 ## Carried forward (known, deliberate)
 
 1. **`ZoomPad.ts` still has its own copy of the ladder walk.** The pure functions
@@ -174,8 +227,9 @@ worse than one that forgets.
 
 ## Not this
 
-- **No pinch.** Its cost is recorded above; adding it is a separate item that
-  must re-open the two-finger-tap discriminator.
+- **No pinch on a trackpad.** A trackpad pinch is a `wheel` with `ctrlKey`, a
+  scalar, and the pad is its control. The touchscreen pinch above is the
+  two-point case only.
 - **No clearance gesture.** Two-finger horizontal was considered for it and
   dropped: [core-lowvision-reflow.md](../proposed/low-priority/core-lowvision-reflow.md)
   measures a system at ×2.6 the line width at 640% staff scale, so horizontal

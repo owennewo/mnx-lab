@@ -274,6 +274,17 @@ export class DocumentViewer extends LitElement {
   @state() private gestureHud: string | null = null;
 
   private gestures: ScoreGestures | null = null;
+  /**
+   * A zoom gesture is in flight. Its paints take the fast path: the score is
+   * re-engraved every frame (a gesture you cannot see is unusable), but the
+   * selection enclosure, its tween, the anchor event and the reveal scroll —
+   * measured at a third of a zoomed paint on Kind Hearted Woman, all of it
+   * `getBBox`/`getBoundingClientRect` forcing layout on a 7,000-node SVG —
+   * wait for the release, which repaints once with everything.
+   */
+  private gesturing = false;
+  /** A fast-path paint happened, so the release owes a full one. */
+  private gesturePainted = false;
 
   private resizeHandler = () => this.renderProjection();
 
@@ -655,20 +666,32 @@ export class DocumentViewer extends LitElement {
       .gesture-hud {
         position: fixed;
         left: 50%;
-        bottom: 24px;
+        /* Near the top, not the bottom: the bottom edge is where both shells
+           keep their playback grip, and where the hand that is zooming
+           usually is. Large enough to read at arm's length on a tablet. */
+        top: 72px;
         transform: translateX(-50%);
         z-index: 2;
-        padding: 6px 12px;
+        padding: 10px 16px;
         border-radius: var(--radius-control);
         background: var(--surface);
         border: 1px solid var(--ink);
         color: var(--ink);
         font-family: var(--sans);
-        font-size: 12px;
+        font-size: 15px;
         font-variant-numeric: tabular-nums;
         white-space: nowrap;
         pointer-events: none;
         box-shadow: 0 2px 4px var(--shadow-far), 0 12px 30px var(--shadow-far);
+      }
+
+      /* Zoom mode, on the paper itself: a ring around the score for as long
+         as a gesture is armed or in flight. The readout alone was missed on a
+         tablet — it is small, at the edge, and under the hand. */
+      :host([data-zooming]) #projection-container {
+        outline: 3px solid var(--ink);
+        outline-offset: 2px;
+        border-radius: var(--radius-hair);
       }
 
       /* ── state panels (on paper — warm fixed colors, never themed) ── */
@@ -835,6 +858,20 @@ export class DocumentViewer extends LitElement {
         ),
       hud: text => {
         this.gestureHud = text;
+      },
+      active: on => {
+        if (on === this.gesturing) return;
+        this.gesturing = on;
+        // The attribute is what the paper's outline keys on: the mode has to
+        // be visible on the score itself, not only in a readout at the edge.
+        this.toggleAttribute('data-zooming', on);
+        if (on || !this.gesturePainted) return;
+        this.gesturePainted = false;
+        // The release paint draws the chrome the gesture skipped. It does NOT
+        // reveal: the reader just placed the score with a finger, and a scroll
+        // to the selection would undo exactly that.
+        this.followQueued = false;
+        this.renderProjection();
       }
     };
   }
@@ -919,8 +956,12 @@ export class DocumentViewer extends LitElement {
       return;
     }
 
+    // The gesture fast path — see `gesturing`.
+    const quick = this.gesturing;
+    if (quick) this.gesturePainted = true;
+
     const previousSvg = this.container.querySelector<SVGSVGElement>('svg');
-    const previousEnclosure = previousSvg ? snapshotEnclosure(previousSvg) : null;
+    const previousEnclosure = previousSvg && !quick ? snapshotEnclosure(previousSvg) : null;
     this.cancelEnclosureTween?.();
     this.cancelEnclosureTween = null;
 
@@ -1073,7 +1114,7 @@ export class DocumentViewer extends LitElement {
       // layer, drawn from note ids because nothing in the render is tagged
       // for it (the selection has not moved).
       const preview = this.selection?.preview;
-      if (preview && svg) {
+      if (preview && svg && !quick) {
         drawEnclosure(svg, preview.enclosure, {
           preview: true,
           entries: commonOpts.entries,
@@ -1083,7 +1124,7 @@ export class DocumentViewer extends LitElement {
       } else if (svg) {
         svg.querySelector(':scope > g.enclosure-preview')?.remove();
       }
-      if (kind && svg) {
+      if (kind && svg && !quick) {
         drawEnclosure(svg, kind, {
           entries: commonOpts.entries,
           noteIds: this.selection?.selectedNoteIds,
@@ -1184,6 +1225,7 @@ export class DocumentViewer extends LitElement {
     }
 
     this.paintPlayback();
+    if (quick) return;
     if (this.playbackState?.followPlayback && this.playbackState.ordinal !== null) this.revealPlayback();
     this.emitSelectionAnchor();
     if (this.followQueued) {
