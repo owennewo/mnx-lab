@@ -23,11 +23,11 @@ import { keyed } from 'lit/directives/keyed.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import { LibraryClient, LibraryRequestError, type LibrarySnapshot } from '../../../src/storage/libraryClient.ts';
 import { documentTitle, documentArtist, type MnxDocument } from '../../../src/model/mnx.ts';
-import { normalizeDisplayOptions, type DisplayOptions } from '../../../src/engine/displayOptions.ts';
+import { type DisplayOptions } from '../../../src/engine/displayOptions.ts';
 import type { RenderScale } from '../../../src/engine/render/scale.ts';
 import { openLocalFile } from '../../../src/importers/localFile.ts';
 import { bindPlayback } from '../../../src/elements/playbackHost.ts';
-import { DEFAULT_DISPLAY_PREFERENCES } from '../../../src/elements/displayDefaults.ts';
+import { normalizeDisplayPreferences } from '../../../src/elements/displayDefaults.ts';
 import type { DocumentViewer, ViewMode, ViewSetting } from '../../../src/elements/DocumentViewer.ts';
 import type { RecordingSource } from '../../../src/audio/playbackBackend.ts';
 import type { Player } from '../../../src/elements/Player.ts';
@@ -244,8 +244,7 @@ export class PiecePage extends LitElement {
     write(VIEW_KEY, this.view);
   }
   private setDisplay(next: DisplayOptions) {
-    const { selectedVerse: _transient, ...validated } = normalizeDisplayOptions(next);
-    this.display = { ...DEFAULT_DISPLAY_PREFERENCES, ...validated };
+    this.display = normalizeDisplayPreferences(next);
     write(DISPLAY_KEY, JSON.stringify(this.display));
   }
   private onDisplayChange(event: CustomEvent<DisplayOptions>) {
@@ -278,9 +277,6 @@ export class PiecePage extends LitElement {
   private onSpacingModeChange(event: CustomEvent<'natural' | 'fill'>) {
     this.spacingMode = event.detail;
     write(SPACING_MODE_KEY, this.spacingMode);
-  }
-  private onClearanceChange(event: CustomEvent<number>) {
-    this.setDisplay({ ...this.display, clearance: event.detail });
   }
   private readonly densitySteps = () => this.viewer?.densitySteps() ?? null;
 
@@ -353,7 +349,6 @@ export class PiecePage extends LitElement {
         .staffScale=${this.staffScale}
         .densityH=${this.densityH}
         .spacingMode=${this.spacingMode}
-        .clearance=${this.display.clearance ?? 2}
         .effectiveStaffScale=${this.effectiveStaffScale}
         .densitySteps=${this.densitySteps}
         .pads=${!!this.doc}
@@ -366,7 +361,6 @@ export class PiecePage extends LitElement {
         @unrolled-change=${this.onUnrolledChange}
         @zoom-change=${this.onZoomChange}
         @spacing-mode-change=${this.onSpacingModeChange}
-        @clearance-change=${this.onClearanceChange}
       >
         <a slot="back" href=${libraryReturnHref()} @click=${returnToLibrary}>${back}<span>Library</span></a>
         ${this.doc
@@ -405,7 +399,6 @@ export class PiecePage extends LitElement {
           .barNumbers=${this.display.barNumbers}
           .instrumentNames=${this.display.instrumentNames}
           .beams=${this.display.beams}
-          .clearance=${this.display.clearance ?? 2}
           .zoom=${this.staffScale}
           .densityH=${this.densityH}
           .spacingMode=${this.spacingMode}

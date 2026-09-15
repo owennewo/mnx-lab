@@ -580,7 +580,7 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
   const heightSp = fitted?.heightSp ?? baseHeightSp;
   const rows = fitted?.rows ?? baseRows;
 
-  const fitRows = opts.densityPad === undefined && display.clearance !== 2
+  const fitRows = opts.densityPad === undefined && (display.clearance ?? 2) !== 2
     ? fitRowsToClearance
     : tightenRows;
   const tightened = fitRows({
@@ -691,5 +691,5 @@ function layoutTabSystems(opts: LayoutTabOptions): LayoutResult {
     });
   }
   return { primitives, index, diagnostics, rows, displays, packings,
-    widthSp, usedWidthSp, naturalWidthSp, heightSp: cursorY + (opts.densityPad !== undefined || display.clearance === 2 ? MARGIN_SP : clearance.tabOuterMargin(MARGIN_SP + 3) - clearance.systemInk) };
+    widthSp, usedWidthSp, naturalWidthSp, heightSp: cursorY + (opts.densityPad !== undefined || (display.clearance ?? 2) === 2 ? MARGIN_SP : clearance.tabOuterMargin(MARGIN_SP + 3) - clearance.systemInk) };
 }

@@ -93,7 +93,11 @@ for (const [name, layout] of Object.entries(layouts)) describe(`${name} clearanc
   it('preserves default output and explicit legacy overrides', () => {
     const options = { mnx: blues, widthSp: 80, display: {} };
     const baseline = layout(options);
-    expect(layout({ ...options, display: { clearance: 2 } })).toEqual(baseline);
+    const explicit = layout({ ...options, display: { clearance: 2 } });
+    // Packing metadata distinguishes the legacy policy; the engraving is identical.
+    expect(explicit.primitives).toEqual(baseline.primitives);
+    expect(explicit.rows).toEqual(baseline.rows);
+    expect(explicit.heightSp).toEqual(baseline.heightSp);
     for (const densityPad of [0, 0.5, 1, 2, NaN]) {
       const legacy = layout({ ...options, densityPad });
       for (const clearance of [0, 2, 4]) {

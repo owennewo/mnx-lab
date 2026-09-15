@@ -120,19 +120,16 @@ describe('viewer surface', () => {
       expect(barsInFirstRow(1.5)).toBeLessThanOrEqual(barsInFirstRow(1));
     });
 
-    it('leaves the RIGID prefix alone — density is not zoom', () => {
+    it('moves prefix air with Space', () => {
       initSmufl();
-      // Clef + key + time occupy what they occupy at a given staff size. If
-      // this distance moved, we would be shrinking the music, not tightening
-      // it — which is zoom wearing density's name.
-      // clefX, not contentStartX: the latter sits AFTER the leading spring,
-      // which is stretchy by design. The clef anchor is pure prefix geometry.
+      // Barline-to-clef is discretionary padding, now owned by Space.
+      // Glyph dimensions are checked independently in staff-space.test.ts.
       const prefix = (densityH: number) => {
         const first = planHorizontal(twelveBars(), 80, { densityH }).measures[0];
         return Number((first.clefX - first.x).toFixed(6));
       };
-      expect(prefix(0.65)).toBe(prefix(1));
-      expect(prefix(1.5)).toBe(prefix(1));
+      expect(prefix(0.65)).toBeLessThan(prefix(1));
+      expect(prefix(1.5)).toBeGreaterThan(prefix(1));
     });
 
     it('clamps absurd values instead of producing an unrescuable plan', () => {

@@ -32,7 +32,6 @@ export async function renderPdfView(preview: Window, mnx: MnxStructure, title: s
   viewer.barNumbers = display.barNumbers;
   viewer.instrumentNames = display.instrumentNames;
   viewer.beams = display.beams;
-  viewer.clearance = display.clearance ?? 2;
   viewer.mnxDoc = { id: 'pdf-export', name: title, lastUpdated: Date.now(), mnxJson: mnx };
   try {
     await loadSmufl();

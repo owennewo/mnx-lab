@@ -99,10 +99,10 @@ The settings card has nine rows: Staff, Repeats, Lyrics, Time signatures, Clefs,
 Bar numbers, Instrument names, and Beams. Its display preferences are validated and stored
 under `mnx-lab:display`, across documents; projection remains URL-owned. The card holds
 what changes *what* is drawn; the layout levers — staff size, note spacing, the
-natural/fill spacing mode, clearance and document focus — all live on the zoom pad, whose
-footer row under the readout and arms holds: focus toggle · spacing-mode glyph toggle ·
-clearance slider. Clearance is labelled only by its tooltip and is stored with the other
-display preferences. Current verse uses the first used verse in established order until a
+natural/fill spacing mode and document focus — all live on the zoom pad, whose
+footer holds the focus and spacing-mode toggles. Staff scales symbols and vertical
+proportions; Space adjusts horizontal springs, margins and prefix/bar padding.
+Saved Clearance preferences are ignored: there is no third product control. Current verse uses the first used verse in established order until a
 host supplies a selected verse. That transient input is not persisted. A system means one
 horizontal row of music, including both staves in Both. The card supports keyboard
 navigation and Escape/focus return, and dismisses on click-away.

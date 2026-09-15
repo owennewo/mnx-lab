@@ -205,8 +205,8 @@ export class DocumentViewer extends LitElement {
   @property({ type: String, attribute: 'beams', reflect: true }) beams: DisplayOptions['beams'] = undefined;
   @property({ type: String, attribute: 'selected-verse', reflect: true }) selectedVerse: DisplayOptions['selectedVerse'] = undefined;
 
-  /** Global breathing room; the engine normalizes to half steps in [0, 4]. */
-  @property({ type: Number, reflect: true }) clearance = 2;
+  /** Legacy host override. Unset: Staff owns vertical gaps, Space horizontal air. */
+  @property({ type: Number, reflect: true }) clearance: number | undefined = undefined;
 
   private effectiveDisplay(): DisplayOptions {
     return normalizeDisplayOptions({
@@ -220,8 +220,8 @@ export class DocumentViewer extends LitElement {
    * Horizontal density — `normal` (default), `compact`, `spacious`
    * (roadmap/complete/core-render-density-zoom.md): how much music fits on a
    * line, WITHOUT shrinking the glyphs. Zoom changes how big the notes are;
-   * density changes how much air sits between them, which is why they are
-   * separate axes and compose freely.
+   * density changes how much horizontal air sits between and around them. Vertical gaps stay
+   * proportional to Staff; the axes compose freely.
    *
    * A preset, not a slider, because the element is a binding: the engine takes
    * a multiplier, and these are the three values worth naming. `density-h`
@@ -243,7 +243,7 @@ export class DocumentViewer extends LitElement {
 
   @property({ type: Number, attribute: 'density-h' }) densityH: number | null = null;
   /** Legacy whitespace multiplier. Explicit values override Clearance wholesale;
-   * unset uses Clearance (default 2). Neither control follows density-h. */
+   * unset uses Staff/Space unless a host explicitly supplies Clearance. */
   @property({ type: Number, attribute: 'density-pad' }) densityPad: number | null = null;
   /**
    * The selection overlay is showing where the cursor WAS, but keystrokes

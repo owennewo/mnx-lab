@@ -212,3 +212,12 @@ The [unrolled engraving](player-unrolled.md) adds optional performed entries to
 the shared horizontal plan. Written measure indexes remain document addresses;
 plan indexes address occurrence geometry. Its SVG source IDs and JSON-line
 mapping carry both identities. Omission is the byte-identical written path.
+
+## Staff and Space whitespace
+
+With no legacy override, Staff scales the fixed vertical relationship gaps once,
+along with the ink. Space owns horizontal margins and prefix/bar padding as well
+as rhythmic springs. `horizontalWhitespace()` in `layout/spacing.ts` resolves that
+policy; packing snapshots carry the source density and prefix-air descriptors so
+re-packing uses the same whitespace as placement. Clearance remains only as a
+legacy host override; see [the viewer contract](core-viewer-surface.md#whitespace-ownership-and-legacy-overrides).

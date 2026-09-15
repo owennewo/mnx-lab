@@ -1,6 +1,6 @@
 // Shared by the score page and library PDF export.
-import { normalizeDisplayOptions, type DisplayOptions } from '../../../src/engine/displayOptions.ts';
-import { DEFAULT_DISPLAY_PREFERENCES } from '../../../src/elements/displayDefaults.ts';
+import { type DisplayOptions } from '../../../src/engine/displayOptions.ts';
+import { DEFAULT_DISPLAY_PREFERENCES, normalizeDisplayPreferences } from '../../../src/elements/displayDefaults.ts';
 import type { ViewSetting } from '../../../src/elements/DocumentViewer.ts';
 import { isSamplePreset } from '../../../src/audio/sampleSelection.ts';
 import type { PartMix, PartMixEntry } from '../../../src/audio/partMix.ts';
@@ -28,8 +28,7 @@ export function readView(): ViewSetting {
 }
 export function readDisplay(): DisplayOptions {
   try {
-    const { selectedVerse: _transient, ...validated } = normalizeDisplayOptions(JSON.parse(read(DISPLAY_KEY) ?? '{}'));
-    return { ...DEFAULT_DISPLAY_PREFERENCES, ...validated };
+    return normalizeDisplayPreferences(JSON.parse(read(DISPLAY_KEY) ?? '{}'));
   } catch { return { ...DEFAULT_DISPLAY_PREFERENCES }; }
 }
 export function readNumber(key: string): number | null {

@@ -203,26 +203,14 @@ describe('zoom / density', () => {
       expect(new Set(ladder).size).toBe(ladder.length);
     });
 
-    it('the reported bug: a flat 4% step off the default draws NOTHING', () => {
+    it('Space changes horizontal padding even within a justified packing plateau', () => {
       initSmufl();
       const mnx = twelveBars();
-      // The control's old behavior, on a normal corpus score at a normal
-      // width. If this ever stops being true the ladder is no longer earning
-      // its keep — and that would be worth knowing.
-      expect(engraving(mnx, 0.96, 80)).toBe(engraving(mnx, 1, 80));
-      // The ladder agrees by omission: no rung sits in (0.96, 1], so a walk
-      // does not stop there…
-      const ladder = ladderFor(mnx, 80);
-      expect(ladder.filter(v => v > 0.96 && v <= 1)).toEqual([]);
-      // …and both neighbouring rungs — the run below, and the next one up —
-      // really do redraw the score.
-      const below = ladder.filter(v => v < 1).at(-2)!;
-      const above = ladder.find(v => v > 1)!;
-      expect(engraving(mnx, below, 80)).not.toBe(engraving(mnx, 1, 80));
-      expect(engraving(mnx, above, 80)).not.toBe(engraving(mnx, 1, 80));
+      expect(engraving(mnx, 0.96, 80)).not.toBe(engraving(mnx, 1, 80));
+      expect(ladderFor(mnx, 80)).toContain(1);
     });
 
-    it('the reported bug at high zoom: a page of full rows is ONE engraving', () => {
+    it('legacy clearance retains the high-zoom packing plateau', () => {
       initSmufl();
       // Staff 640% on a full-width pane leaves ~18sp of line, which in the tab
       // view is one bar per system: every row FULL, so every row justifies to
@@ -232,7 +220,7 @@ describe('zoom / density', () => {
       // final stranded bar was pinned at MAX_STRETCH, the one thing on the page
       // whose spacing still moved with density. With the leftover row spaced
       // like its page, the whole run collapses to the single rung it is.
-      const packings = layoutTab({ mnx: twelveBars(), widthSp: 1180 / 64 }).packings!;
+      const packings = layoutTab({ mnx: twelveBars(), widthSp: 1180 / 64, display: { clearance: 2 } }).packings!;
       const one = packingSignature(packings, 0.06);
       for (const density of [0.1, 0.14, 0.18, 0.5]) {
         expect(packingSignature(packings, density)).toBe(one);
@@ -446,7 +434,7 @@ describe('zoom / density', () => {
       initSmufl();
       for (const spacingMode of ['natural', 'fill'] as const) {
         for (const staffKind of ['notation', 'tab'] as const) {
-          const count = (inkRatio: number) => planHorizontal(blues(), 120, {
+          const count = (inkRatio: number) => planHorizontal(blues(), 80, {
             spacingMode, staffKind, inkRatio, densityH: 0.2
           }).measures.filter(m => m.row === 0 && !m.hidden).length;
           expect(count(0.6)).toBeGreaterThan(count(1));
@@ -458,7 +446,7 @@ describe('zoom / density', () => {
     it('the packing snapshot agrees with drawn natural widths at the chosen staff size', () => {
       for (const inkRatio of [0.6, 0.87, 1.4, 2.3]) {
         const densityH = 0.2;
-        const plan = planHorizontal(blues(), 120, { spacingMode: 'natural', inkRatio, densityH });
+        const plan = planHorizontal(blues(), 80, { spacingMode: 'natural', inkRatio, densityH });
         const rows = packSystems(plan.packing, densityH);
         for (const row of rows) {
           for (const [column, index] of row.measures.entries()) {

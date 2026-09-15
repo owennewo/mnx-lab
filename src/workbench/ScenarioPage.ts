@@ -2964,7 +2964,6 @@ export class ScenarioPage extends LitElement {
         .barNumbers=${this.displayPreferences.barNumbers}
         .instrumentNames=${this.displayPreferences.instrumentNames}
         .beams=${this.displayPreferences.beams}
-        .clearance=${this.displayPreferences.clearance ?? 2}
         .selectedVerse=${shownDoc ? verseForIteration(documentLyricLineIds(shownDoc.mnxJson), this.playback) : undefined}
         .mnxDoc=${shownDoc}
         .view=${viewMode}
@@ -3078,7 +3077,6 @@ export class ScenarioPage extends LitElement {
             .staffScale=${this.staffScale}
             .densityH=${this.densityH}
             .spacingMode=${this.spacingMode}
-            .clearance=${this.displayPreferences.clearance ?? 2}
             .densitySteps=${this.densitySteps}
             .effectiveStaffScale=${this.effectiveStaffScale}
             .documentFocus=${this.documentFocus}
@@ -3087,12 +3085,6 @@ export class ScenarioPage extends LitElement {
             @spacing-mode-change=${(event: CustomEvent<'natural' | 'fill'>) => {
               this.spacingMode = event.detail;
               localStorage.setItem(SPACING_MODE_KEY, this.spacingMode);
-            }}
-            @clearance-change=${(event: CustomEvent<number>) => {
-              this.displayPreferences = writeDisplayPreferences({
-                ...this.displayPreferences,
-                clearance: event.detail
-              });
             }}
             @display-change=${(event: CustomEvent<DisplayOptions>) => {
               this.displayPreferences = writeDisplayPreferences(event.detail);

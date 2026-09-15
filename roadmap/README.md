@@ -157,6 +157,8 @@ back up to `proposed/` the moment it is.
 
 ### inprogress/
 
+- **[core-staff-space-clearance.md](inprogress/core-staff-space-clearance.md)** — Staff owns vertical proportions; Space owns horizontal whitespace. Removes the third product control while retaining legacy host inputs.
+
 
 
 

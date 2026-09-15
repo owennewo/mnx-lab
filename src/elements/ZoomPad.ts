@@ -26,15 +26,15 @@ import {
  *   ↑ ↓  STAFF   — a true scale. Line gap, glyphs, text and stems multiply
  *                  together, because everything downstream is in staff spaces
  *                  and `pxPerSp` is the single multiplier.
- *   ← →  SPACE   — horizontal distance between events only. Glyphs untouched:
- *                  the engine scales the springs and never the rigid columns,
+ *   ← →  SPACE   — horizontal event spacing, margins and padding. Glyphs untouched:
+ *                  the engine adjusts springs and padding, preserving rigid columns,
  *                  which is what makes this axis independent of the other.
  *
  * The magnifier where the arms cross resets both.
  *
  * Under the two, a footer row (2026-09-09, from the design project's
  * `Zoom Pad Controls` canvas, option C): the document-focus toggle, the
- * spacing-mode toggle and the clearance slider, each a 22px cell. They used to
+ * spacing-mode toggle, each a 22px cell. They used to
  * be a sibling mark and two rows of the settings card; every one of them
  * changes how the same score is laid out on the same page, which is what the
  * pad is for, and the settings card keeps what changes WHAT is drawn.
@@ -120,8 +120,6 @@ export class ZoomPad extends LitElement {
   /** Spacing multiplier, or null for the preset. Mirrors `density-h`. */
   @property() spacingMode: 'natural' | 'fill' = 'fill';
   @property({ type: Number }) densityH: number | null = null;
-  /** Clearance level, 0–4 in halves; mirrors the viewer's `clearance`. */
-  @property({ type: Number }) clearance = 2;
 
   /**
    * What the last paint actually used, from the viewer's `render-scale`.
@@ -555,9 +553,8 @@ export class ZoomPad extends LitElement {
       }
 
       /* ── the footer row ──
-         Three cells at 22px under both columns: focus · spacing mode ·
-         clearance. Collapses with the readout — height, border and opacity
-         only — so the idle pose is still the bare crosshair. */
+         Two cells at 22px under both columns: focus · spacing mode. Collapses
+         with the readout — height, border and opacity only — so the idle pose is still the bare crosshair. */
       .foot {
         grid-column: 1 / -1;
         box-sizing: border-box;
@@ -627,61 +624,6 @@ export class ZoomPad extends LitElement {
          non-default spacing mode. */
       .foot button.hot {
         color: var(--accent);
-      }
-
-      .clearance-cell {
-        flex: 1;
-        display: flex;
-        align-items: center;
-        padding: 0 8px;
-      }
-
-      /* A 56px track for nine stops. The label is its tooltip: the row is
-         already a slider between a focus glyph and a paragraph glyph, and
-         CLEARANCE at 8px cost more width than the track. */
-      input.clearance {
-        appearance: none;
-        -webkit-appearance: none;
-        flex: none;
-        width: 56px;
-        height: 12px;
-        margin: 0;
-        padding: 0;
-        background: transparent;
-        cursor: pointer;
-      }
-
-      input.clearance::-webkit-slider-runnable-track {
-        height: 2px;
-        background: var(--line-strong);
-      }
-
-      input.clearance::-moz-range-track {
-        height: 2px;
-        background: var(--line-strong);
-      }
-
-      input.clearance::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        width: 10px;
-        height: 10px;
-        margin-top: -4px;
-        border: 0;
-        border-radius: 0;
-        background: var(--accent);
-      }
-
-      input.clearance::-moz-range-thumb {
-        width: 10px;
-        height: 10px;
-        border: 0;
-        border-radius: 0;
-        background: var(--accent);
-      }
-
-      input.clearance:focus-visible {
-        outline: var(--rule-w) solid var(--focus-ring);
-        outline-offset: 2px;
       }
 
       /* ── the idle focus badge ──
@@ -1163,18 +1105,6 @@ export class ZoomPad extends LitElement {
     );
   }
 
-  private onClearanceInput = (event: Event) => {
-    const value = Number((event.currentTarget as HTMLInputElement).value);
-    if (!Number.isFinite(value)) return;
-    this.dispatchEvent(
-      new CustomEvent<number>('clearance-change', {
-        detail: value,
-        bubbles: true,
-        composed: true
-      })
-    );
-  };
-
   private requestDocumentFocusToggle() {
     this.dispatchEvent(
       new CustomEvent('document-focus-request', { bubbles: true, composed: true })
@@ -1319,7 +1249,7 @@ export class ZoomPad extends LitElement {
           @pointerleave=${() => {
             // A text entry or a slider drag in progress holds the pad open:
             // collapsing the footer under a thumb mid-drag would drop it.
-            if (!this.shadowRoot?.activeElement?.matches('.space-input, .clearance')) this.open = false;
+            if (!this.shadowRoot?.activeElement?.matches('.space-input')) this.open = false;
           }}
           @focusin=${() => (this.open = true)}
           @focusout=${() => (this.open = false)}
@@ -1419,21 +1349,6 @@ export class ZoomPad extends LitElement {
             >
               ${this.spacingGlyph()}
             </button>
-            <div
-              class="clearance-cell"
-              title="Clearance — breathing room around the music. 0 is tightest, 2 the default, 4 very spacious."
-            >
-              <input
-                class="clearance"
-                type="range"
-                min="0"
-                max="4"
-                step="0.5"
-                aria-label="Clearance"
-                .value=${String(this.clearance)}
-                @input=${this.onClearanceInput}
-              />
-            </div>
           </div>
         </div>
       </div>

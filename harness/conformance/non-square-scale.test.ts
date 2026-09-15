@@ -437,7 +437,7 @@ describe('a full row reaches the margin, whatever the staff scale', () => {
             .map(p => Math.round(p.x1 * 1e4) / 1e4)
         )
       ].sort((a, b2) => a - b2);
-      return { width: xs[xs.length - 1] - xs[0], full: rows[r]?.full ?? false };
+      return { width: xs[xs.length - 1] - xs[0], margins: widthSp - packing.lineWidthSp, full: rows[r]?.full ?? false };
     });
   };
 
@@ -464,7 +464,7 @@ describe('a full row reaches the margin, whatever the staff scale', () => {
     expect(checked).toBeGreaterThan(0);
   });
 
-  it('so the music never narrows as the reader asks for more space', () => {
+  it('keeps full rows spanning the available width as Space changes margins', () => {
     initSmufl();
     // The reported symptom, at the staff scale that produced it: SPACE 3 → 7
     // used to take the system from 86.5sp to 80.2sp.
@@ -474,10 +474,10 @@ describe('a full row reaches the margin, whatever the staff scale', () => {
       for (const d of LADDER) {
         const first = rowWidths(mnx, 96.6, d, ink)[0];
         if (!first.full) continue;
-        expect(first.width, `ink ${ink}: system 1 narrowed at density ${d}`).toBeGreaterThanOrEqual(
-          previous - 1e-6
+        expect(first.width + first.margins, `ink ${ink}: system 1 narrowed at density ${d}`).toBeGreaterThanOrEqual(
+          previous - 1e-4
         );
-        previous = first.width;
+        previous = first.width + first.margins;
       }
     }
   });

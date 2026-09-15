@@ -1,4 +1,6 @@
-/** Discretionary score whitespace, in staff spaces. No glyph or spring scaling. */
+/** Vertical relationship defaults and legacy independent whitespace overrides.
+ * Unset uses the historical vertical proportions, scaled once by Staff in SVG.
+ * Default horizontal whitespace is owned by horizontalWhitespace in spacing.ts. */
 export const DEFAULT_CLEARANCE = 2;
 const TIGHT_MARGIN_SP = 0.1;
 

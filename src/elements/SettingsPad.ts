@@ -8,7 +8,7 @@ import type { ViewMode } from './DocumentViewer.ts';
 /**
  * The document settings pad — the leftmost mark in the score-corner cluster,
  * beside the zoom pad. The card holds what changes WHAT is drawn; spacing mode
- * and clearance — how the same score lays out on the same page — live in the
+ * — how the same score lays out on the same page — lives in the
  * zoom pad's footer row, where the other layout levers already were.
  *
  * **This is chrome, not surface** (docs/core-viewer-surface.md): the pad owns
@@ -133,8 +133,7 @@ export class SettingsPad extends LitElement {
    *
    * The VIEW is deliberately excluded. The paper itself shows which staff is
    * drawn, and the URL owns the choice; lighting the gear for it would mark a
-   * fresh deep link as modified. `clearance` is excluded for the neighbouring
-   * reason: it moved to the zoom pad's footer and belongs to that mark now.
+   * fresh deep link as modified. Legacy host `clearance` is not a product setting.
    */
   private get offDefault(): boolean {
     if (this.unrolled) return true;

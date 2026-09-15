@@ -1,12 +1,11 @@
-import { normalizeDisplayOptions, type DisplayOptions } from '../engine/displayOptions.ts';
+import { type DisplayOptions } from '../engine/displayOptions.ts';
 
-import { DEFAULT_DISPLAY_PREFERENCES } from '../elements/displayDefaults.ts';
+import { DEFAULT_DISPLAY_PREFERENCES, normalizeDisplayPreferences } from '../elements/displayDefaults.ts';
 
 export { DEFAULT_DISPLAY_PREFERENCES };
 export const DISPLAY_PREFERENCES_KEY = 'mnx-lab:display';
 export function displayPreferences(input: unknown): DisplayOptions {
-  const { selectedVerse: _transient, ...validated } = normalizeDisplayOptions(input);
-  return { ...DEFAULT_DISPLAY_PREFERENCES, ...validated };
+  return normalizeDisplayPreferences(input);
 }
 export function readDisplayPreferences(): DisplayOptions {
   try { return displayPreferences(JSON.parse(localStorage.getItem(DISPLAY_PREFERENCES_KEY) ?? '{}')); }

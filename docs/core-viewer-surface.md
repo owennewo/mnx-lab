@@ -76,9 +76,9 @@ outranks any `staffKind`, always.
 | `compact` | boolean | absent | tighter paper padding for small frames. |
 | `zoom` | number | *unset* | **staff scale** — a multiplier on `pxPerSp`, so line gap, glyphs, text and stems scale together. Clamped 0.6–1.6. **Unset is not `1`**: with no `pxPerSp` the renderer *fits* a short score to the viewport, and defaulting to `1` would silently retire fit-to-width for every host that never set it. Until 2026-08-15 this prop sized the paper card and never reached the engine. |
 | `density` | `normal` · `compact` · `spacious` | `normal` | **horizontal density** — how much music fits on a line, *without* shrinking glyphs. The engine scales the springs and never the rigid columns, which is what keeps this independent of `zoom` so the two compose. |
-| `density-h` | number | *unset* | the numeric form of the same axis; wins over `density` when set. Clamped by the engine's own `clampDensity` (0.5–2), so a host and a control get the same floor. The floor is **legibility, not collision** — no density can make ink overlap. |
-| `clearance` | 0–4 in 0.5 steps | `2` | breathing room around content and structural groups. Level 0 is tightest safe, 2 reproduces the historical layout, and 4 is deliberately generous. It changes margins, staff/system gaps, prefix air and bar-boundary padding without resizing ink or rhythmic springs. |
-| `density-pad` | number | *unset* | legacy frame-density multiplier, retained for host compatibility. When explicitly set it overrides `clearance` wholesale; when absent, Clearance owns these distances. It never follows `density-h` automatically. |
+| `density-h` | number | *unset* | numeric Space multiplier, 0.01–8; wins over the `density` preset. Adjusts springs and discretionary horizontal air without resizing symbols. |
+| `clearance` | 0–4 in 0.5 steps | *unset* | legacy independent whitespace override. Explicit values (including 2) retain the historical policy; absent, Staff owns vertical proportions and Space owns horizontal air. |
+| `density-pad` | number | *unset* | legacy frame multiplier. Explicit values override Clearance and automatic horizontal whitespace; rhythmic springs still follow Space. |
 
 #### How a `hide` member is sorted
 
@@ -139,42 +139,26 @@ engine would be irreversible; a control that couples them for the user is not
 [core-zoom-density-pad.md](../roadmap/complete/core-zoom-density-pad.md) — keeps
 them separate and shows both).
 
-**Vertical density is deliberately still absent.** Systems packing closer
-without shrinking the staff was a third axis, deferred because `ROW_HEIGHT_SP`
-is a module-level constant derived from the row pads. **It shipped 2026-08-15**
-as `density-pad` above — and the refactor that doc expected never happened,
-because the axis runs as a post-pass over a finished `LayoutResult` instead:
-`rows[]` says where each system sits, the primitives say where its ink reaches,
-and rows move by translation. One implementation serves notation, tab and the
-combined system, and no layout had to make its row arithmetic per-instance.
-[core-vertical-density.md](../roadmap/complete/core-vertical-density.md).
+#### Whitespace ownership and legacy overrides
 
-#### Clearance and legacy `density-pad`
+Staff scales symbol size and vertical proportions together. The measured gaps
+between notation and tab, other staves, systems and lyrics retain their historical
+default staff-space values, as do vertical margins and the visible crop. They are
+scaled once by the SVG emitter. Measured ink bounds and collision protection remain.
 
-Clearance is a level rather than a staff-space distance. Each relationship has
-its own tight, historical and spacious anchors, interpolated through levels 0,
-2 and 4. This preserves hierarchy: a notation/tab pair remains more cohesive
-than independent staves, and systems remain distinct. All distances resolve in
-staff spaces, so Staff scales the result visually without changing the chosen
-level. Space continues to own rhythmic springs alone.
+Space adjusts rhythmic springs and the discretionary air in horizontal margins,
+clef/key/time prefixes, and bar starts/ends. Padding follows the square root of the
+Space multiplier with a 0.15sp floor; score margins respond more gently and remain
+between 1sp and 3sp. Prefix slot tails use their existing tight/default/spacious
+anchors. At Space 1 the arithmetic and default engraving are unchanged. Symbol
+slots, repeat geometry and note columns remain ink, priced by Staff.
 
-`density-pad` predates Clearance and remains a public compatibility input. An
-explicit value keeps its old multiplier/floor behavior and wins over Clearance;
-the two are never multiplied together. The old `padDensityFor` helper remains
-available to hosts that deliberately want Space and frame density coupled, but
-the viewer does not call it automatically.
-
-The safety argument differs from `density-h`'s, and the difference matters.
-Horizontal density cannot make ink collide *structurally* — it scales springs
-and never the rigid columns. Vertically there is no such guarantee, because the
-row pads **are** the clearance. So this axis does not tighten toward a constant;
-it tightens toward each row's measured ink (through the same `computeBoundsSp`
-the snug crop uses, real SMuFL glyph boxes rather than baselines) and stops
-there. The space it reclaims is the space nothing was using: measured across
-the committed goldens, a notation staff reserves 6sp above itself and uses a
-median of 0.5sp, and a tab staff reserves 4sp and uses a median of 0.0sp.
-`harness/conformance/vertical-density.test.ts` asserts the non-overlap
-guarantee at and past the clamp.
+`clearance` and `density-pad` remain explicit legacy host overrides. Setting
+Clearance, including 2, selects its historical independent horizontal/vertical
+policy. Explicit `density-pad` takes precedence over it. Omitting both selects
+the new Staff/Space policy. Normalization preserves this distinction. Neither
+Studio nor Workbench forwards old saved Clearance values; PDF export uses the same
+preference policy. Hosts can restore automatic ownership by unsetting Clearance.
 
 The `density-h` range widened at the bottom on 2026-08-15 (`MIN_DENSITY`
 0.5 → 0.02): the old floor stopped a reader two systems short of what this
@@ -206,20 +190,15 @@ printed the request would tell a low-vision reader their staff is 640% while
 they look at 260%. `zoom` itself is unchanged — it is still the request, and
 still what the host set.
 
-`densitySteps()` — a method, not an event — returns the `density-h` values
-that would actually **change** the score as currently drawn, ascending from the
-engine's floor, or `null` before the first successful paint. Same principle as
-`render-scale`, one level up: a host cannot compose a *density* control without
-knowing which values do anything, and most of them do not. Every horizontal
-coordinate is `spring × densityH × stretch`, and inside the justifier's linear
-range `stretch` is inversely proportional to `densityH` — the two cancel, and
-the engraving is byte-identical until density repacks a system. A control
-stepping a flat percentage therefore spends most of its clicks drawing exactly
-what was already on screen. The answer depends on the document, the viewport
-width and the staff scale, so only the layer that just laid the score out can
-give it; the value is recomputed per paint and cached in between, so a host may
-call it on every render of its own. See
-[core-render-density-zoom.md](../roadmap/complete/core-render-density-zoom.md).
+`densitySteps()` returns the Space values that change the current packing
+signature, ascending from the engine floor, or `null` before the first paint.
+The default policy includes changing horizontal air as well as springs, so small
+steps can change a justified score even without moving a bar to another line.
+Legacy fixed-whitespace hosts still have justification plateaus. Packing snapshots
+carry serializable prefix descriptors and their source density so ladders can
+re-price the same margins/padding as fresh layouts. The existing approximation
+when non-square ink pricing changes the governing voice at another density remains;
+this does not re-plan event columns for each ladder rung. Results are cached per paint.
 
 > Gap, recorded honestly: the element also emits `note-selected` and
 > `selection-anchored`, which predate this contract and are not described here.
@@ -291,7 +270,7 @@ remain independent.
 | `barNumbers` | `bar-numbers` | `every-bar`, `every-system`, `hide` | Only declared measure numbers (legacy) |
 | `instrumentNames` | `instrument-names` | `every-system`, `first-system`, `hide` | Existing score-layout labels (legacy) |
 | `beams` | `beams` | `slanted`, `flat` | Slanted: beams follow the outer noteheads |
-| `clearance` | `clearance` | 0–4, normalized to 0.5 steps | 2: historical layout |
+| `clearance` | `clearance` | legacy 0–4, normalized to 0.5 steps | unset: Staff/Space ownership |
 | `selectedVerse` | `selected-verse` | Lyric-line ID | First used verse in established order |
 
 `scoreTitle` binds engine `display.title`; it avoids overloading HTML's native

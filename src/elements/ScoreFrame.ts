@@ -38,7 +38,7 @@ import './SettingsPad.ts';
  * the scenario page's score pane. Every value the frame shows comes in as a
  * property and every change leaves as the pads' own events (`view-change`,
  * `display-change`, `unrolled-change`, `zoom-change`, `spacing-mode-change`,
- * `clearance-change`, `document-focus-toggle`), which bubble composed through
+ * `document-focus-toggle`), which bubble composed through
  * the frame for the host to store — the pads are chrome, not surface, and so
  * is this. Which strip is drawn out follows the same rule: `topOpen` and
  * `bottomOpen` are properties the host may set (its remembered choice), and
@@ -86,7 +86,6 @@ export class ScoreFrame extends LitElement {
   @property({ type: Number }) staffScale: number | null = null;
   @property({ type: Number }) densityH: number | null = null;
   @property() spacingMode: 'natural' | 'fill' = 'fill';
-  @property({ type: Number }) clearance = 2;
   @property({ type: Number }) effectiveStaffScale = 1;
   @property({ attribute: false }) densitySteps: (() => number[] | null) | null = null;
   @property({ type: Boolean, reflect: true, attribute: 'document-focus' }) documentFocus = false;
@@ -832,7 +831,6 @@ export class ScoreFrame extends LitElement {
                         .staffScale=${this.staffScale}
                         .densityH=${this.densityH}
                         .spacingMode=${this.spacingMode}
-                        .clearance=${this.clearance}
                         .densitySteps=${this.densitySteps}
                         .effectiveStaffScale=${this.effectiveStaffScale}
                         .documentFocus=${this.documentFocus}

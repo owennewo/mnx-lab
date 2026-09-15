@@ -975,7 +975,7 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
   // the ink they hold rather than the headroom they reserved. At density 1 the
   // pass returns null and nothing moves — which is what keeps the goldens
   // byte-identical by construction rather than by arithmetic.
-  const fitRows = opts.densityPad === undefined && display.clearance !== 2
+  const fitRows = opts.densityPad === undefined && (display.clearance ?? 2) !== 2
     ? fitRowsToClearance
     : tightenRows;
   const tightened = fitRows({

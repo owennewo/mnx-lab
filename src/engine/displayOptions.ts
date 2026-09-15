@@ -2,7 +2,8 @@ import { normalizeClearance } from './clearance.ts';
 import type { MnxStructure, MnxPart } from '../model/mnx.ts';
 /** Pure presentation controls. Omitted label modes preserve historical engraving. */
 export interface DisplayOptions {
-  /** Breathing room: 0–4 in half steps, default 2. Explicit densityPad wins. */
+  /** Legacy independent breathing room, 0–4 in half steps. Unset: Staff owns
+   * vertical proportions and Space owns horizontal air. Explicit densityPad wins. */
   clearance?: number;
   lyrics?: 'all' | 'current' | 'hide';
   timeSignatures?: 'show' | 'hide';
@@ -34,7 +35,7 @@ export function normalizeDisplayOptions(input: unknown = {}, hide: readonly stri
   for (const [key, choices] of Object.entries(DISPLAY_CHOICES)) {
     if ((choices as readonly unknown[]).includes(source[key])) result[key] = source[key];
   }
-  result.clearance = normalizeClearance(source.clearance);
+  if (source.clearance != null) result.clearance = normalizeClearance(source.clearance);
   if (typeof source.selectedVerse === 'string' && source.selectedVerse.length) result.selectedVerse = source.selectedVerse;
   if (hide.includes('lyrics')) result.lyrics = 'hide';
   return result as DisplayOptions;

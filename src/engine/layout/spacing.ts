@@ -173,6 +173,39 @@ export function tupletDuration(t: MnxTuplet): number {
 export const MIN_DENSITY = 0.01;
 export const MAX_DENSITY = 8;
 
+/** Relationship-specific knobs; discretionary air responds more gently than time. */
+const HORIZONTAL_AIR = {
+  padFloorSp: 0.15,
+  marginNormalSp: 2,
+  marginMinSp: 1,
+  marginMaxSp: 3,
+  prefixTightExtraSp: -0.15,
+  prefixSpaciousExtraSp: 1.2
+};
+
+/** Horizontal breathing room follows Space, more gently than rhythmic springs.
+ * Vertical gaps remain staff-space constants and scale once in the SVG emitter. */
+export function horizontalWhitespace(densityH = 1) {
+  const density = clampDensity(densityH);
+  const factor = Math.sqrt(density);
+  const air = HORIZONTAL_AIR;
+  return {
+    horizontalMargin: Math.max(air.marginMinSp,
+      Math.min(air.marginMaxSp, air.marginNormalSp * Math.sqrt(factor))),
+    prefixPad: (normal: number) => density === 1 ? normal : Math.max(air.padFloorSp, normal * factor),
+    prefixGroupExtra: density === 1 ? 0 : density < 1
+      ? air.prefixTightExtraSp * (1 - factor) / (1 - Math.sqrt(MIN_DENSITY))
+      : air.prefixSpaciousExtraSp * (factor - 1) / (Math.sqrt(MAX_DENSITY) - 1)
+  };
+}
+
+type HorizontalWhitespace = ReturnType<typeof horizontalWhitespace>;
+interface PrefixAir { pads: number[]; groups: number }
+function prefixAir(air: PrefixAir, policy: HorizontalWhitespace): number {
+  return air.pads.reduce((sum, normal) => sum + policy.prefixPad(normal), 0)
+    + air.groups * policy.prefixGroupExtra;
+}
+
 export function clampDensity(value: number | undefined): number {
   if (value === undefined || !Number.isFinite(value)) return 1;
   return Math.min(MAX_DENSITY, Math.max(MIN_DENSITY, value));
@@ -298,6 +331,33 @@ export interface PackingInput {
    *  the same width the placement pass will. Absent ⇒ the unscaled default,
    *  which is what a ladder re-pack at density 1 wants. */
   contentRightPadSp?: number;
+  /** Re-price discretionary horizontal air when a ladder/gesture changes Space.
+   * Prefix descriptors align with measures; all data survives worker cloning. */
+  space?: { density: number; prefixes: { first: PrefixAir; rest: PrefixAir }[] };
+}
+
+/** Reuse measured ink and springs while resolving the new horizontal padding. */
+function packingAtSpace(packing: PackingInput, densityH: number): PackingInput {
+  if (!packing.space || packing.space.density === densityH) return packing;
+  const old = horizontalWhitespace(packing.space.density);
+  const next = horizontalWhitespace(densityH);
+  const marginDelta = 2 * (old.horizontalMargin - next.horizontalMargin);
+  return {
+    ...packing,
+    space: { ...packing.space, density: densityH },
+    lineWidthSp: packing.lineWidthSp + marginDelta,
+    ...(packing.subsequentLineWidthSp === undefined ? {} : {
+      subsequentLineWidthSp: packing.subsequentLineWidthSp + marginDelta
+    }),
+    contentRightPadSp: next.prefixPad(CONTENT_RIGHT_PAD_SP),
+    measures: packing.measures.map((m, i) => {
+      const air = packing.space!.prefixes[i];
+      return { ...m,
+        prefixFirst: m.prefixFirst + prefixAir(air.first, next) - prefixAir(air.first, old),
+        prefixRest: m.prefixRest + prefixAir(air.rest, next) - prefixAir(air.rest, old)
+      };
+    })
+  };
 }
 
 export interface PackedRow {
@@ -327,6 +387,7 @@ export interface PackedRow {
  * without moving a single coordinate.
  */
 export function packSystems(packing: PackingInput, densityH: number): PackedRow[] {
+  packing = packingAtSpace(packing, densityH);
   const packs = packing.measures;
   const widthAt = (row: number) => row === 0 ? packing.lineWidthSp : packing.subsequentLineWidthSp ?? packing.lineWidthSp;
   const contentRightPad = packing.contentRightPadSp ?? CONTENT_RIGHT_PAD_SP;
@@ -487,9 +548,9 @@ export const DENSITY_GRID = 1 / LADDER_GRID;
  * whole subtlety, and it is why most density values are invisible: inside the
  * justifier's linear range, `stretch` is inversely proportional to `densityH`,
  * so the product — and therefore the engraving — is *exactly* unchanged.
- * Density only bites where it moves a barline to another system, or where a
- * row is against the `MAX_STRETCH` / `MIN_SQUEEZE` clamp and the proportion
- * breaks.
+ * With legacy fixed whitespace, density only bites where packing changes or
+ * stretch reaches a clamp. The default Space policy also changes margins and
+ * prefix/bar padding; include those resolved widths in the signature.
  *
  * Rounded to 1e-6, i.e. sub-1e-4-staff-space differences count as identical.
  */
@@ -498,11 +559,14 @@ export function packingSignature(
   densityH: number
 ): string {
   return packings
-    .map(p =>
-      packSystems(p, densityH)
+    .map(p => {
+      const resolved = packingAtSpace(p, densityH);
+      const air = p.space ? `${resolved.lineWidthSp.toFixed(6)}:${resolved.contentRightPadSp?.toFixed(6)}:` +
+        resolved.measures.map(m => `${m.prefixFirst.toFixed(6)},${m.prefixRest.toFixed(6)}`).join('/') : '';
+      return air + packSystems(resolved, densityH)
         .map(row => `${row.measures.join(',')}@${(densityH * row.stretch).toFixed(6)}`)
-        .join('|')
-    )
+        .join('|');
+    })
     .join(';');
 }
 
@@ -1452,10 +1516,14 @@ export function planHorizontal(
   const tieTargets = tieTargetIds(mnx);
   const leftInset = options?.leftInsetSp ?? 0;
   const subsequentLeftInset = options?.subsequentLeftInsetSp ?? leftInset;
-  const clearance = clearanceSpacing(options?.display?.clearance, options?.densityPad);
+  const densityH = clampDensity(options?.densityH);
+  // Explicit legacy clearance and densityPad retain their independent policy.
+  const followsSpace = display.clearance === undefined && options?.densityPad == null;
+  const clearance = followsSpace ? horizontalWhitespace(densityH)
+    : clearanceSpacing(options?.display?.clearance, options?.densityPad);
   const marginSp = clearance.horizontalMargin;
-  // The prefix's PADS are whitespace and scale with the frame axis; the glyph
-  // SLOTS are rigid and do not (core-zoom-density-pad.md ruling 1 — a clef
+  // The prefix's PADS follow Space (or an explicit legacy frame override);
+  // glyph SLOTS are rigid and do not (core-zoom-density-pad.md ruling 1 — a clef
   // occupies the width it occupies at a given staff size). This is the line
   // between the two, and it is the whole reason the gap before the first note
   // used to ignore the spacing control entirely: every part of it was on the
@@ -1897,6 +1965,16 @@ export function planHorizontal(
     );
   };
 
+  const airFor = (m: MeasureMetrics, first: boolean, index: number): PrefixAir => ({
+    pads: [
+      ...(bareRepeat(m, first) && (first || !previousClosesWithInk(index))
+        ? [] : [CONTENT_LEFT_PAD_SP, ...(first ? [START_BARLINE_PAD_SP] : [])]),
+      ...(keySigGlyphs(m, first) ? [KEY_SIG_RIGHT_PAD_SP] : [])
+    ],
+    groups: Number(display.clefs !== 'hide' && (first || m.clefChanged))
+      + Number(display.timeSignatures !== 'hide' && m.timeSigShow)
+  });
+
   // The packer's input, captured BEFORE density is applied — the ladder needs
   // density-1 naturals to ask what any other value would draw.
   const packing: PackingInput = {
@@ -1904,6 +1982,8 @@ export function planHorizontal(
     lineWidthSp: lineWidth,
     ...(options?.subsequentLeftInsetSp === undefined ? {} : { subsequentLineWidthSp: widthSp - 2 * marginSp - subsequentLeftInset }),
     contentRightPadSp: contentRightPad,
+    ...(followsSpace ? { space: { density: densityH, prefixes: metrics.flatMap((m, i) =>
+      m.hidden || !inRange(i) ? [] : [{ first: airFor(m, true, i), rest: airFor(m, false, i) }]) } } : {}),
     measures: metrics.flatMap((m, i) =>
       m.hidden || !inRange(i)
         ? []
@@ -1927,7 +2007,6 @@ export function planHorizontal(
   // per-event cursor from the measure widths, since both read springs
   // independently. One pass over the finished metrics keeps every reader
   // consistent by construction.
-  const densityH = clampDensity(options?.densityH);
   if (densityH !== 1) {
     for (const m of metrics) {
       m.spring *= densityH;

@@ -1,4 +1,4 @@
-import type { DisplayOptions } from '../engine/displayOptions.ts';
+import { normalizeDisplayOptions, type DisplayOptions } from '../engine/displayOptions.ts';
 
 /**
  * The host defaults the settings card measures "off default" against. Lifted out of
@@ -8,5 +8,12 @@ import type { DisplayOptions } from '../engine/displayOptions.ts';
  */
 export const DEFAULT_DISPLAY_PREFERENCES: Readonly<DisplayOptions> = {
   lyrics: 'all', timeSignatures: 'show', clefs: 'show', title: 'show',
-  barNumbers: 'every-system', instrumentNames: 'first-system', beams: 'slanted', clearance: 2
+  barNumbers: 'every-system', instrumentNames: 'first-system', beams: 'slanted'
 };
+
+/** Shared product preference migration. Explicit viewer/engine overrides are
+ * separate: old saved Clearance must not silently keep a third layout axis. */
+export function normalizeDisplayPreferences(input: unknown): DisplayOptions {
+  const { selectedVerse: _transient, clearance: _legacyClearance, ...validated } = normalizeDisplayOptions(input);
+  return { ...DEFAULT_DISPLAY_PREFERENCES, ...validated };
+}
