@@ -1,7 +1,9 @@
 # Touch gestures on the score — the minimal three
 
 > **Status: built 2026-09-12; device-checked 2026-09-15; pinch added the same
-> day as a touch-only fourth gesture, awaiting its own device check.** Opened
+> day as a fourth gesture (two-finger on touch, ctrl+wheel on a trackpad),
+> with the four performance items below landed — awaiting the pinch's own
+> device check.** Opened
 > from a design conversation that started at "pinch should control staff and
 > space zoom" and narrowed once the costs were counted — the record of what was
 > dropped, and why, is as much the point of this doc as what survived.
@@ -22,7 +24,8 @@
 | Double tap | Zoom reset | `zoom = null`, `densityH = null` — back to **fitted**, not to 1.0 |
 | Double tap, hold, drag | Staff × space zoom, diagonal drives both | `zoom` (0.6–6.4, `scale.ts:99`), `densityH` (0.01–8, `spacing.ts:172`) |
 | Two-finger tap | Play/pause | a `transport-toggle` event, not the player |
-| Pinch (touch only) | Staff × space zoom: fingers apart vertically grows the staff, apart horizontally opens the spacing; a diagonal drives both | the same two knobs, the same ladder, stepped by the change in the fingers' span at half the drag's rate (`PINCH_PX_PER_STEP = 12`) |
+| Pinch (touch) | Staff × space zoom: fingers apart vertically grows the staff, apart horizontally opens the spacing; a diagonal drives both | the same two knobs, the same ladder, stepped by the change in the fingers' span at half the drag's rate (`PINCH_PX_PER_STEP = 12`) |
+| Pinch (trackpad) | Staff; **Shift**+pinch → space | arrives as `wheel` with `ctrlKey` — the browser's encoding of a pinch, which is why Ctrl cannot be the modifier — 10 units per step, mouse-wheel notches clamped |
 
 A double-tap-drag is one finger: tap, lift, tap again within ~300ms and *don't*
 lift — the drag that follows is the control. The double-tap is only the unlock.
@@ -164,34 +167,48 @@ dev build, this laptop, the viewer at tablet-like widths:
 
 The browser is not the bottleneck; our JavaScript is, and it splits four ways:
 
-1. **Layout runs twice on every zoomed paint.** `bothRenderer.ts` lays out
-   square to find the fit, then again at the ink ratio. Each is ~170ms in Node
-   for this score; the profile is flat (`assembleSegment` 67% inclusive, no
-   single hot spot). Memoising the square layout across a drag would take a
-   staff-only step from two layouts to one.
-2. **The SVG emitter is `setAttribute`-bound**: 60% of `renderSvg`'s self time,
-   ~330ms for 6,345 nodes where the equivalent raw DOM build measures ~40ms.
-   Lines (3,288 of the primitives) carry half of it. Constant presentation
-   attributes (`font-family`, `fill`, `stroke`, `text-anchor`,
-   `dominant-baseline`) could move to one CSS rule per class — but the SVG
-   goldens are the same emitter through `harness/helpers/svgString.ts`, so
-   that is a golden-moving change and a `lab-verify` batch.
+1. **Layout ran twice on every zoomed paint.** Every renderer lays out square
+   to find the fit, then again at the ink ratio. Each is ~170ms in Node for
+   this score; the profile is flat (`assembleSegment` 67% inclusive, no single
+   hot spot). **Landed**: `render/layoutCache.ts`, a caller-owned memo of the
+   square layout keyed on the document's identity, which the viewer hands over
+   only for the length of a gesture — the one span in which it can vouch the
+   document is not mutated underneath. A staff-only step is one layout.
+2. **The SVG emitter was `setAttribute`-bound**: 60% of `renderSvg`'s self
+   time, ~330ms for 6,345 nodes where the equivalent raw DOM build measures
+   ~40ms. **Landed, in two commits**: the emitter builds markup the browser
+   parses (`innerHTML`), byte-identical to the goldens; then each kind's
+   shared attributes moved into one `<style>` at the top of the SVG and
+   numbers print at four decimals. Measured attached to the page, same score:
+   322ms → 237ms per emit, 919KB → 643KB of markup, the paint after it
+   unchanged. The second commit moved every SVG golden and no primitives
+   golden; ten rasterised before and after differ in zero pixels; registered
+   in [lab-verify.md](lab-verify.md) (2026-09-15).
 3. **A third of a zoomed paint was selection chrome**: `drawEnclosure`'s
    `getBBox` (22%) and the anchor event's `getBoundingClientRect` (9%), each
    forcing layout on the fresh 7,000-node SVG, plus a smooth reveal scroll
-   queued on every step. **Fixed here**: while a gesture is active the viewer
+   queued on every step. **Landed**: while a gesture is active the viewer
    re-engraves the score and skips the chrome; the release paints once with
    everything and does not reveal.
-4. **The layout engine itself** — the remaining ~170ms — is the real ceiling,
-   and it is DOM-free by guarantee (`engine/headless.ts`), so it could run in
-   a worker with latest-wins coalescing without touching its code. That keeps
-   the finger and the readout responsive when a frame cannot.
+4. **The layout engine itself** — the remaining ~170ms — is the real ceiling.
+   **Landed**: it is DOM-free by guarantee (`engine/headless.ts`), so
+   `render/plan.ts` splits every render into a plan and an emit, and for the
+   length of a gesture the viewer runs the plan in
+   `src/elements/layout.worker.ts` — the document posted once per gesture so
+   the memo in 1 hits there, requests coalesced to latest-wins, a main-thread
+   paint bumping an epoch so a stale reply is never drawn over the release.
+   Synthetic pinches in headless Chrome show 0ms of main-thread paint per
+   step during a gesture and a ~250ms release paint. What this buys on a slow
+   device is not a faster frame but a main thread that never blocks: the
+   finger, the readout and the scroll keep responding while a plan is in
+   flight. A worker is never required — if it cannot be built or throws, the
+   viewer paints on the main thread as before.
 
 What none of this reaches on a slow tablet is a *glued* pinch: the step every
 other app takes is a CSS `transform: scale()` preview of the existing SVG
-between throttled real engraves, which is approximate (the horizontal axis
-re-fits on the real paint) but never blind. Not built; the candidate next
-step if 1–3 are not enough.
+between real engraves, which is approximate (the horizontal axis re-fits on
+the real paint) but never blind. Not built; the candidate next step if 1–4
+are not enough on the device.
 
 ## Carried forward (known, deliberate)
 
@@ -227,9 +244,9 @@ step if 1–3 are not enough.
 
 ## Not this
 
-- **No pinch on a trackpad.** A trackpad pinch is a `wheel` with `ctrlKey`, a
-  scalar, and the pad is its control. The touchscreen pinch above is the
-  two-point case only.
+- **No two-axis pinch on a trackpad.** A trackpad pinch is a `wheel` with
+  `ctrlKey`, a scalar — so it drives one axis at a time, staff by default and
+  space with Shift, and the pad remains the two-axis control there.
 - **No clearance gesture.** Two-finger horizontal was considered for it and
   dropped: [core-lowvision-reflow.md](../proposed/low-priority/core-lowvision-reflow.md)
   measures a system at ×2.6 the line width at 640% staff scale, so horizontal

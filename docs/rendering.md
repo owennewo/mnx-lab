@@ -5,7 +5,19 @@
 
 Pipeline: layout → primitives → SVG. `src/engine/layout/{notation,tab}.ts` are pure
 functions emitting staff-space primitives; `src/engine/render/svg.ts` is the dumb
-emitter. **All horizontal spacing** lives in `src/engine/layout/spacing.ts` (springs-
+emitter. **The emitter builds markup, not nodes** — one string the browser parses
+through `innerHTML`, which on a 61-bar score is a quarter faster than building 6,000
+elements by hand — and the goldens are that exact string (`harness/helpers/svgString.ts`
+adds nothing but `xmlns`). What every primitive of a kind shares (a glyph's font, a
+glyph's or a text's fill, a line's or curve's stroke) is declared **once**, in a
+`<style>` at the top of the SVG, at zero specificity (`:where(svg > text)`) so a host's
+class rules outrank it exactly as they outranked the attributes; the few that differ say
+so inline, because a presentation attribute loses to *any* rule. Numbers print at four
+decimals. A render is **two halves** (`src/engine/render/plan.ts`): the plan — layout,
+fit, crop; pure and DOM-free — and the emit. `renderMnxToSvgX` is `emitPlan(planX())`,
+and during a zoom gesture the viewer runs the plan half in a worker
+(`src/elements/layout.worker.ts`, latest-wins; see
+[roadmap/inprogress/core-touch-gestures.md](../roadmap/inprogress/core-touch-gestures.md)). **All horizontal spacing** lives in `src/engine/layout/spacing.ts` (springs-
 and-rods; tune the named knobs, never per-renderer grid math) — both layouts consume one
 plan so notation and tab stay column-aligned. The `both` view is **one native system**:
 `layoutNotation({includeTabStaves: true})` (seam: `src/engine/layout/bothSystem.ts`)
