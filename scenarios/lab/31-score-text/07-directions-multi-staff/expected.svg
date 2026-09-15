@@ -35,9 +35,8 @@
 <text x="547.36" y="424.224" font-size="64" class="notehead" data-source-id="@m0.s2.v0.e3.n0"></text>
 <line x1="566.24" y1="368.224" x2="566.24" y2="421.536" stroke-width="1.92" class="stem"></line>
 <line x1="625.6" y1="128" x2="625.6" y2="424.224" stroke-width="2.56" class="barline"></line>
-<text x="220.8" y="89.6" font-size="20" text-anchor="middle" font-style="italic" style="font-family:var(--font-family-sans)" class="direction">R.H.</text>
-<text x="220.8" y="286.112" font-size="20" text-anchor="middle" font-style="italic" style="font-family:var(--font-family-sans)" class="direction direction-between">cantabile</text>
-<text x="220.8" y="491.424" font-size="20" text-anchor="middle" font-style="italic" style="font-family:var(--font-family-sans)" class="direction">L.H.</text>
+<text x="220.8" y="286.112" font-size="20" font-style="italic" style="font-family:var(--font-family-sans)" class="direction direction-between">cantabile</text>
+<text x="220.8" y="491.424" font-size="20" font-style="italic" style="font-family:var(--font-family-sans)" class="direction">L.H.</text>
 <line x1="625.6" y1="128" x2="832" y2="128" stroke-width="2.08" class="staff-line"></line>
 <line x1="625.6" y1="144" x2="832" y2="144" stroke-width="2.08" class="staff-line"></line>
 <line x1="625.6" y1="160" x2="832" y2="160" stroke-width="2.08" class="staff-line"></line>
@@ -52,4 +51,5 @@
 <text x="721.696" y="400.224" font-size="64" class="notehead" data-source-id="@m1.s2.v0.e0.n0"></text>
 <line x1="819.2" y1="128" x2="819.2" y2="424.224" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="824" y="128" width="8" height="296.224" fill="currentColor" class="barline barline-final-thick"></rect>
+<text x="220.8" y="99" font-size="20" font-style="italic" style="font-family:var(--font-family-sans)" class="direction">R.H.</text>
 </svg>

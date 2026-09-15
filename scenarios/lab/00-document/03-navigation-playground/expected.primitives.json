@@ -1719,8 +1719,8 @@
       {
         "kind": "text",
         "text": "Intro",
-        "x": 6.1,
-        "y": 5.608,
+        "x": 11.1263,
+        "y": 2.94,
         "font": "body",
         "size": 1.5,
         "weight": "bold",
@@ -1730,8 +1730,8 @@
       {
         "kind": "text",
         "text": "Verse",
-        "x": 67.7658,
-        "y": 6,
+        "x": 68.5158,
+        "y": 5.92,
         "font": "body",
         "size": 1.5,
         "weight": "bold",

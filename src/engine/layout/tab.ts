@@ -467,7 +467,7 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
         primitives
       };
       emitDynamics(positionedArgs);
-      emitDirections({ ...positionedArgs, staffTops: [staffTop] });
+      emitDirections({ ...positionedArgs, staffTops: [staffTop], scan: primitives.slice(rowStart[m.row]) });
     }
 
     // Score-wide marks from the GLOBAL measure — the tempo, the navigation

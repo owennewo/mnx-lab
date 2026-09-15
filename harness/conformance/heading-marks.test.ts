@@ -4,12 +4,13 @@
 // under every combination of the two display switches that can empty a bar's
 // prefix.
 //
-// The bug it pins: the rule used to lead `contentStartX`, which is the start of
-// the STRETCHED leading spring, not the first ink. With a clef and a time
-// signature that reads correctly, because the prefix glyphs sit between the two.
-// With the prefix hidden — or simply absent, as in every mid-piece bar — the
-// mark floated in the empty left of the bar, and where the spring was short it
-// crossed the barline and read as belonging to the previous bar.
+// The bugs it pins: the rule used to lead `contentStartX`, which is the start
+// of the STRETCHED leading spring, not the first ink, so with the prefix hidden
+// — or simply absent, as in every mid-piece bar — the mark floated in the empty
+// left of the bar, and where the spring was short it crossed the barline and
+// read as belonging to the previous bar. And with a time signature on show it
+// led the numerals' centre, starting over or before them, so the heading read
+// as belonging to the prefix rather than to the bar's music.
 import fs from 'node:fs';
 import path from 'node:path';
 import { describe, it, expect } from 'vitest';
@@ -67,9 +68,9 @@ describe('heading-mark placement', () => {
     expect(checked).toBeGreaterThan(1000);
   });
 
-  it('leads the bar’s opening ink: the prefix when it has one, else the first onset', () => {
+  it('leads the bar’s first onset, and never starts on the prefix', () => {
     initSmufl();
-    let withPrefix = 0;
+    let pastPrefix = 0;
     let bare = 0;
     for (const scenario of corpus) {
       const doc = readDoc(scenario.dir);
@@ -81,30 +82,34 @@ describe('heading-mark placement', () => {
           continue;
         }
         for (const m of measures) {
-          if (m.repeatStart) continue; // the content anchor clears the `|:` cluster
           const heading = measureHeadingX(m);
-          if (m.showTimeSig || m.showClef || m.showKeySig) {
-            // Anchored to the prefix, which sits between the mark and the music.
-            expect(heading).toBeLessThan(m.contentStartX);
-            withPrefix++;
-            continue;
-          }
-          const onsets = m.voices.map(voice => voice[0]?.x).filter((x): x is number => x !== undefined);
-          if (!onsets.length) continue; // an empty bar draws no onset to lead
-          const first = Math.min(...onsets);
-          // A bare bar leads its FIRST NOTE, not the start of the spring that
-          // reaches it — the whole point of the rule.
+          // Never on the prefix: the content anchor is past the clef, the key,
+          // the time signature and a `|:` cluster's dots.
           expect(
             heading,
-            `${scenario.id} ${JSON.stringify(display ?? 'default')}: bare bar does not lead its first onset`
-          ).toBeCloseTo(Math.max(m.x, first - HEADING_LEAD_SP), 9);
+            `${scenario.id} ${JSON.stringify(display ?? 'default')}: heading starts on the prefix`
+          ).toBeGreaterThanOrEqual(m.contentStartX - 1e-9);
+          const onsets = m.voices.map(voice => voice[0]?.x).filter((x): x is number => x !== undefined);
+          if (!onsets.length) {
+            // An empty bar draws no onset to lead, so the content anchor stands in.
+            expect(heading).toBeCloseTo(Math.max(m.x, m.contentStartX), 9);
+            continue;
+          }
+          const first = Math.min(...onsets);
+          // Lead the FIRST NOTE, not the start of the spring that reaches it —
+          // the whole point of the rule — unless the prefix is in the way.
+          expect(
+            heading,
+            `${scenario.id} ${JSON.stringify(display ?? 'default')}: heading does not lead its first onset`
+          ).toBeCloseTo(Math.max(m.x, m.contentStartX, first - HEADING_LEAD_SP), 9);
           expect(heading).toBeLessThan(first);
-          bare++;
+          if (m.showTimeSig || m.showClef || m.showKeySig) pastPrefix++;
+          else bare++;
         }
       }
     }
     // Both arms of the rule are exercised, or the assertion above proves nothing.
-    expect(withPrefix).toBeGreaterThan(100);
+    expect(pastPrefix).toBeGreaterThan(100);
     expect(bare).toBeGreaterThan(100);
   });
 });

@@ -6,6 +6,14 @@
 >
 > Reported from the tab view of `lab/tab-derivation/capo` with the clef and time
 > signature hidden: *"capo starts too far to left"*.
+>
+> **Superseded in part, 2026-09-15.** The prefix arms below are gone: every bar now
+> leads its first onset, floored at the content anchor, so a heading mark starts after
+> the time signature rather than over or before its numerals. The bare-bar arm — the
+> bug this doc fixed — is unchanged. The rule and the reason are in
+> [docs/rendering.md](../../docs/rendering.md); the goldens
+> that moved are registered in
+> [lab-verify.md](../inprogress/lab-verify.md#heading-row-after-the-time-signature-tempo-and-feel-on-one-line-directions-clear-the-ink--2026-09-15).
 
 ## The complaint
 

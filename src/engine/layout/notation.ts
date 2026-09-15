@@ -98,6 +98,7 @@ import {
   emitSwingMark,
   emitTempoMark,
   measureOnsetXs,
+  placeTextRun,
   type OnsetX
 } from './scoreText.ts';
 import { noteKeyAt } from '../../model/noteWalk.ts';
@@ -333,7 +334,7 @@ const DYNAMIC_BASELINE_DROP_SP = 3.5; // glyph baseline below the bottom staff l
 // Free text reads at the words' size, the lyric's: "Verse 1-4" or "let ring"
 // is an instruction beside the music, not a heading over it.
 const DIRECTION_SIZE_SP = LYRIC_SIZE_SP;
-const DIRECTION_RISE_SP = 2.4; // baseline above the staff's top line
+const DIRECTION_RISE_SP = 2.4; // baseline above the staff's top line, where no row ink is given to clear
 const DIRECTION_DROP_SP = 4.2; // baseline below the staff's bottom line, clearing a ledger note
 const DIRECTION_STACK_SP = 1.9; // extra offset per coincident direction
 
@@ -1508,6 +1509,7 @@ function assembleSegment(
   // Where each row's primitives begin in the measure loop — rows are emitted
   // in order — so the text pass can scan exactly one row's ink.
   const rowLoopStart: number[] = [];
+  const aboveDirections: ((scan: readonly Primitive[]) => void)[][] = [];
   for (let i = 0; i < numMeasures; i++) {
     const m = plan.measures[i];
     if (m.hidden) continue;
@@ -2152,10 +2154,12 @@ function assembleSegment(
           primitives
         };
         emitDynamics(groupArgs);
-        emitDirections({
-          ...groupArgs,
-          staffTops: staffTops.slice(g.start, g.start + g.count)
-        });
+        const directionArgs = { ...groupArgs, staffTops: staffTops.slice(g.start, g.start + g.count) };
+        emitDirections({ ...directionArgs, phase: 'staffSide' });
+        // `above` directions clear the beams, which are drawn after the loop —
+        // so they wait for the score-text pass, where they are the first thing
+        // over the bar and the tempo mark stacks above them.
+        (aboveDirections[i] ??= []).push(scan => emitDirections({ ...directionArgs, scan, phase: 'above' }));
       }
     }
     if (!m.entry) emitNavigationMarkers({
@@ -2281,6 +2285,7 @@ function assembleSegment(
     const topSequence = (topSource?.part.measures?.[writtenIndex(plan, i)]?.sequences ?? []).find(
       seq => (seq.staff ?? 1) === (topSource?.staff ?? 1)
     );
+    for (const emit of aboveDirections[i] ?? []) emit(scan());
     emitHarmonies({ gm, m, stdSequences: topSequence ? [topSequence] : [], staffTop, scan: scan(), primitives });
     const tempoTop = emitTempoMark({
       gm, m, staffTop, scan: scan(), primitives,
@@ -3444,19 +3449,38 @@ interface EmitDirectionsArgs {
   staffTops: number[];
   staffBottoms: number[];
   primitives: Primitive[];
+  /**
+   * THIS ROW's ink drawn so far, for an `above` direction to clear: it sits one
+   * cohesion clearance over whatever rises above the staff under its own
+   * footprint — beams, stems, ledger notes — exactly as the tempo mark does,
+   * rather than at a fixed rise that a beamed chord on ledger lines overprints.
+   * Callers therefore emit `above` directions AFTER the beams (the notation
+   * layout defers them to its score-text pass, `phase: 'above'`). Without a
+   * scan the fixed rise stands.
+   */
+  scan?: readonly Primitive[];
+  /** Which directions this call draws: those outside the staff below or
+   *  between (`'staffSide'`), those above (`'above'`), or all (default). */
+  phase?: 'staffSide' | 'above';
 }
 
 /**
  * Draws a part's directions, each anchored to its column and placed by `orient`.
+ *
+ * Text starts at its beat and reads from it — "Tune down 1/2 step…" hangs off
+ * the note it is about, the way a direction is engraved — where a glyph is
+ * centred on it. Centred text spread half its width to the left of the beat,
+ * which on the first beat of a system ran it off the page's edge.
  *
  * `between` puts the text midway between this staff and the next, which is what
  * a two-way above/below cannot express — it belongs to the part rather than to
  * either staff. With one staff there is no "between", so it falls back to below.
  */
 export function emitDirections(args: EmitDirectionsArgs): void {
-  const { partMeasure, m, sequencesByStaff, staffTops, staffBottoms, primitives } = args;
+  const { partMeasure, m, sequencesByStaff, staffTops, staffBottoms, primitives, scan, phase } = args;
   const directions = partMeasure.directions ?? [];
   if (directions.length === 0) return;
+  const callStart = primitives.length;
 
   const onsetXsByStaff = new Map<number, OnsetX[]>();
   const onsetXsFor = (s: number) => {
@@ -3469,7 +3493,9 @@ export function emitDirections(args: EmitDirectionsArgs): void {
   };
 
   // Several directions may share a column; stack them outward from the staff so
-  // they cannot overprint. Counted per (staff, orient, column).
+  // they cannot overprint. Counted per (staff, orient, column). An `above`
+  // direction placed over the row's ink needs no count: the earlier one is in
+  // the ink the later one clears.
   const stackCount = new Map<string, number>();
 
   for (const dir of directions) {
@@ -3482,26 +3508,31 @@ export function emitDirections(args: EmitDirectionsArgs): void {
     const f = dir.position?.fraction;
     if (!Array.isArray(f) || !f[1]) continue;
 
+    const orient = dir.orient ?? 'below';
+    const between = orient === 'between' && s < lastStaff;
+    const above = orient === 'above';
+    if (phase === 'above' ? !above : phase === 'staffSide' ? above : false) continue;
+
     const onsetXs = onsetXsFor(s);
     const target = f[0] / f[1];
     const x =
       onsetXs.find(o => o.t >= target - 1e-6)?.x ??
       (onsetXs.length ? m.x + m.width - 2 : m.x + 2);
 
-    const orient = dir.orient ?? 'below';
-    const between = orient === 'between' && s < lastStaff;
-    const above = orient === 'above';
-
     const key = `${s}|${between ? 'between' : above ? 'above' : 'below'}|${x.toFixed(3)}`;
     const depth = stackCount.get(key) ?? 0;
     stackCount.set(key, depth + 1);
 
-    const y = between
-      ? (staffBottoms[s] + staffTops[s + 1]) / 2 + DIRECTION_SIZE_SP / 2 + depth * DIRECTION_STACK_SP
-      : above
-        ? staffTops[s] - DIRECTION_RISE_SP - depth * DIRECTION_STACK_SP
-        : staffBottoms[s] + DIRECTION_DROP_SP + depth * DIRECTION_STACK_SP;
+    const placed = above && scan !== undefined;
+    const y = placed
+      ? 0 // provisional — placed over the row's ink once its footprint is known
+      : between
+        ? (staffBottoms[s] + staffTops[s + 1]) / 2 + DIRECTION_SIZE_SP / 2 + depth * DIRECTION_STACK_SP
+        : above
+          ? staffTops[s] - DIRECTION_RISE_SP - depth * DIRECTION_STACK_SP
+          : staffBottoms[s] + DIRECTION_DROP_SP + depth * DIRECTION_STACK_SP;
 
+    const firstNew = primitives.length;
     primitives.push(
       glyph
         ? {
@@ -3522,13 +3553,22 @@ export function emitDirections(args: EmitDirectionsArgs): void {
             y,
             font: 'bodyItalic',
             size: DIRECTION_SIZE_SP,
-            anchor: 'middle',
+            anchor: 'start',
             ...(dir.color ? { fill: dir.color } : {}),
             // `between` is placed relative to the GAP, not to a staff — the
             // gap measurement has to know (see measureDisplayGaps).
             className: between ? 'direction direction-between' : 'direction'
           }
     );
+    if (placed) {
+      const box = computeBoundsSp(primitives.slice(firstNew));
+      if (box) {
+        placeTextRun(
+          primitives, firstNew, box.y + box.h, staffTops[s],
+          [...scan, ...primitives.slice(callStart, firstNew)], null
+        );
+      }
+    }
   }
 }
 

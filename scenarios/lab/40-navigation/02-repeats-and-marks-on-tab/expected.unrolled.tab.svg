@@ -14,7 +14,7 @@
 <rect x="293.9744" y="151.36" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="w0:@m0.v0.e1.n0" data-written-source-id="@m0.v0.e1.n0"></rect>
 <text x="299.9744" y="159.5424" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="w0:@m0.v0.e1.n0" data-written-source-id="@m0.v0.e1.n0">0</text>
 <text x="167.9808" y="233.8288" font-size="64" text-anchor="middle" class="dynamic"></text>
-<text x="167.9808" y="48" font-size="20" text-anchor="middle" font-style="italic" style="font-family:var(--font-family-sans)" class="direction">Swing</text>
+<text x="167.9808" y="57.4" font-size="20" font-style="italic" style="font-family:var(--font-family-sans)" class="direction">Swing</text>
 <line x1="359.1552" y1="86.4" x2="359.1552" y2="177.8288" stroke-width="2.56" class="barline"></line>
 <line x1="359.1552" y1="86.4" x2="567.0784" y2="86.4" stroke-width="1.6" class="staff-line"></line>
 <line x1="359.1552" y1="104.6864" x2="567.0784" y2="104.6864" stroke-width="1.6" class="staff-line"></line>
@@ -38,7 +38,7 @@
 <rect x="749.0528" y="151.36" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="w2:@m0.v0.e1.n0" data-written-source-id="@m0.v0.e1.n0"></rect>
 <text x="755.0528" y="159.5424" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="w2:@m0.v0.e1.n0" data-written-source-id="@m0.v0.e1.n0">0</text>
 <text x="623.0592" y="233.8288" font-size="64" text-anchor="middle" class="dynamic"></text>
-<text x="623.0592" y="48" font-size="20" text-anchor="middle" font-style="italic" style="font-family:var(--font-family-sans)" class="direction">Swing</text>
+<text x="623.0592" y="57.4" font-size="20" font-style="italic" style="font-family:var(--font-family-sans)" class="direction">Swing</text>
 <text x="611.0592" y="46.4" font-size="19.2" style="font-family:var(--font-family-sans)" class="occurrence-label">2×</text>
 <line x1="814.2336" y1="86.4" x2="814.2336" y2="177.8288" stroke-width="2.56" class="barline"></line>
 <line x1="814.2336" y1="86.4" x2="1022.1568" y2="86.4" stroke-width="1.6" class="staff-line"></line>

@@ -30,8 +30,8 @@
 <line x1="878.56" y1="154.688" x2="878.56" y2="208" stroke-width="1.92" class="stem"></line>
 <line x1="966" y1="128" x2="966" y2="192" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="970.8" y="128" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
-<text x="97.6" y="84.7648" font-size="35.2" class="tempo"></text>
-<text x="112.4864" y="84.7648" font-size="20.8" font-weight="600" style="font-family:var(--font-family-sans)" class="tempo">= 120</text>
+<text x="181.6" y="99.0368" font-size="35.2" class="tempo"></text>
+<text x="196.4864" y="99.0368" font-size="20.8" font-weight="600" style="font-family:var(--font-family-sans)" class="tempo">= 120</text>
 <text x="408" y="99.0368" font-size="35.2" class="tempo"></text>
 <text x="422.8864" y="99.0368" font-size="20.8" font-weight="600" style="font-family:var(--font-family-sans)" class="tempo">= 60</text>
 <text x="766.4" y="99.0368" font-size="35.2" class="tempo"></text>

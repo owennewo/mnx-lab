@@ -88,18 +88,33 @@ anchor, including when no tempo is printed. Section/rehearsal pairs stay togethe
 a standalone rehearsal mark retains its barline inset. Tuning letters stay beside
 the strings.
 
-`measureHeadingX` places that shared anchor, and what it leads depends on what the
-bar actually draws. A time signature: lead its centre, since the numerals are the
-widest thing in the prefix. A clef or key signature: lead the content, which is
-just past them. **Nothing at all** — the prefix hidden by `display`, or simply
-absent as in every mid-piece bar — lead the **first onset**. That last arm is the
-one that used to be wrong: it led `contentStartX`, which is the start of the
-stretched leading spring rather than the first ink, so the mark floated in the
-empty left of the bar, and where the spring was short it crossed the barline and
-read as belonging to the bar before. `m.x` is a floor, never a placement: a
-heading mark cannot precede its own barline whatever the geometry.
-`harness/conformance/heading-marks.test.ts` asserts both arms over the corpus
+`measureHeadingX` places that shared anchor: lead the bar's **first onset** by
+1.5sp, and never start before the content anchor. The anchor is what keeps the
+marks off the prefix — past the clef, the key, the time signature and a `|:`
+cluster's dots — so they start over the music, after the time signature, never
+over or before its numerals (a Soundslice comparison, 2026-09-15; the time
+signature used to be led by its centre). The onset is what keeps them on the
+music: with the prefix hidden by `display`, or simply absent as in every
+mid-piece bar, `contentStartX` is the start of the stretched leading spring
+rather than the first ink, so a mark leading IT floated in the empty left of the
+bar, and where the spring was short it crossed the barline and read as belonging
+to the bar before. `m.x` is a floor, never a placement: a heading mark cannot
+precede its own barline whatever the geometry.
+`harness/conformance/heading-marks.test.ts` asserts the rule over the corpus
 under every combination of the two display switches.
+
+**Part directions** (`emitDirections` in `notation.ts`, shared by the tab
+layout) sit outside their own staff, above or below as `orient` says, or
+midway between two staves for `between`. Text starts at its beat and reads
+from it, as a direction is engraved; a glyph is centred on it. An `above`
+direction is placed the way the tempo mark is: one cohesion clearance over
+whatever ink rises above the staff under its own footprint — beams, stems,
+ledger notes — so the notation layout draws it in the score-text pass, after
+the beams, and before the tempo, which then stacks above it. The stack from the
+top staff upward is therefore direction text, then the tempo and the feel, then
+the section label: part text closest to the notes, the score-wide index
+outermost (Gould's order; Soundslice puts the text above the tempo). `below`
+and `between` directions keep a fixed offset from the staff.
 
 **A forward repeat is a barline.** `|:` opens with a thick stroke standing
 exactly where the ordinary barline goes, so when its bar draws no prefix glyph
@@ -158,9 +173,13 @@ supplied legacy `densityPad` overrides the clearance policy wholesale.
 ## The swing marking
 
 `emitSwingMark` in `src/engine/layout/scoreText.ts` draws `_x.mnxLab.swing` in
-the tempo band, above the metronome mark, on **every** staff kind — notation,
-standalone tab and the `both` walk all call it, because a feel describes the bar
-and not a notation staff.
+the tempo band on **every** staff kind — notation, standalone tab and the
+`both` walk all call it, because a feel describes the bar and not a notation
+staff. Where the bar also prints a metronome mark the feel **follows it on the
+same line**, a gap past the mark's right ink — tempo, then feel, one statement
+about how the bar goes — rather than stacking a second row above it (the
+Soundslice comparison, 2026-09-15). Without a tempo it starts at the heading
+edge.
 
 A feel is a rhythmic equation, so the mark draws one rather than naming it: the
 written pair, an `=`, and the realisation the ratio implies, under a tuplet

@@ -313,16 +313,6 @@
         "className": "barline"
       },
       {
-        "kind": "text",
-        "text": "solo",
-        "x": 12.1,
-        "y": 5.6,
-        "font": "bodyItalic",
-        "size": 1.25,
-        "anchor": "middle",
-        "className": "direction"
-      },
-      {
         "kind": "line",
         "x1": 37.4,
         "y1": 8,
@@ -585,9 +575,19 @@
         "className": "barline barline-final-thick"
       },
       {
+        "kind": "text",
+        "text": "solo",
+        "x": 12.1,
+        "y": 6.1875,
+        "font": "bodyItalic",
+        "size": 1.25,
+        "anchor": "start",
+        "className": "direction"
+      },
+      {
         "kind": "rect",
-        "x": 5.6,
-        "y": 1.7825,
+        "x": 10.85,
+        "y": 2.37,
         "w": 1.93,
         "h": 1.88,
         "stroke": "currentColor",
@@ -597,8 +597,8 @@
       {
         "kind": "text",
         "text": "A",
-        "x": 6.1,
-        "y": 3.2625,
+        "x": 11.35,
+        "y": 3.85,
         "font": "body",
         "size": 1.5,
         "weight": "bold",
@@ -608,8 +608,8 @@
       {
         "kind": "text",
         "text": "Intro",
-        "x": 8.03,
-        "y": 3.2625,
+        "x": 13.28,
+        "y": 3.85,
         "font": "body",
         "size": 1.5,
         "weight": "bold",

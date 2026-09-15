@@ -47,7 +47,7 @@ export const TEXT_SIDE_CLEAR_SP = 0.5;
  * once they exist. `bottomInkAtZero` is the run's bottom ink in its own
  * provisional coordinates. Returns the run's top ink after placement.
  */
-function placeTextRun(
+export function placeTextRun(
   primitives: Primitive[],
   firstNew: number,
   bottomInkAtZero: number,
@@ -558,6 +558,8 @@ const SWING_BEAM_HOOK_SP = 1.1; // a level only one note carries
 const SWING_GROUP_GAP_SP = 0.3; // around the "="
 const SWING_DOT_ADVANCE_SP = 0.45; // at scale 1, as the tempo mark's dots
 const SWING_BRACKET_RISE_SP = 0.3; // bracket over the tallest stem in its group
+/** Between the metronome mark's right ink and the feel that follows it. */
+const SWING_AFTER_TEMPO_GAP_SP = 2;
 const SWING_BRACKET_THICKNESS_SP = 0.12;
 const SWING_BRACKET_TICK_SP = 0.4;
 const SWING_TUPLET_SIZE_SP = 1.0;
@@ -708,8 +710,11 @@ export interface EmitSwingMarkArgs {
   staffTop: number;
   scan: readonly Primitive[];
   primitives: Primitive[];
-  /** The metronome mark's box, so the feel stacks above it rather than
-   *  through it — both marks start at the bar's heading. */
+  /** The metronome mark's box. The feel FOLLOWS it on the same line — tempo,
+   *  then feel, one statement about how the bar goes — so with a tempo the
+   *  feel starts past the mark's right ink rather than at the bar's heading.
+   *  Handed on as the clearance too, for the case where the two still
+   *  overlap in x (they should not) rather than as the thing to stack over. */
   clearAbove: BoundsSp | null | undefined;
 }
 
@@ -721,7 +726,7 @@ export function emitSwingMark(args: EmitSwingMarkArgs): BoundsSp | null {
   const { swing, m, staffTop, scan, primitives, clearAbove } = args;
   if (!swing?.prints) return null;
   const firstNew = primitives.length;
-  const x0 = measureHeadingX(m);
+  const x0 = clearAbove ? clearAbove.x + clearAbove.w + SWING_AFTER_TEMPO_GAP_SP : measureHeadingX(m);
   const y = 0;
   const words = (text: string): BoundsSp | null => {
     primitives.push({

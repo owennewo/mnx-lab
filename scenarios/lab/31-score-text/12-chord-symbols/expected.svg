@@ -30,8 +30,8 @@
 <rect x="915.6" y="128" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
 <text x="206" y="104" font-size="28.8" font-weight="bold" style="font-family:var(--font-family-sans)" class="harmony">D</text>
 <text x="380.4" y="104" font-size="28.8" font-weight="bold" style="font-family:var(--font-family-sans)" class="harmony">A7/C♯</text>
-<text x="97.6" y="84.7648" font-size="35.2" class="tempo"></text>
-<text x="112.4864" y="84.7648" font-size="20.8" font-weight="600" style="font-family:var(--font-family-sans)" class="tempo">= 100</text>
+<text x="203.6" y="61.4368" font-size="35.2" class="tempo"></text>
+<text x="218.4864" y="61.4368" font-size="20.8" font-weight="600" style="font-family:var(--font-family-sans)" class="tempo">= 100</text>
 <text x="558.8" y="104" font-size="28.8" font-weight="bold" style="font-family:var(--font-family-sans)" class="harmony">Bm7b5</text>
 <text x="714.8" y="104" font-size="28.8" font-weight="bold" style="font-family:var(--font-family-sans)" class="harmony">N.C.</text>
 <text x="845.2" y="91.904" font-size="28.8" font-weight="bold" style="font-family:var(--font-family-sans)" class="harmony">E♭Δ7</text>

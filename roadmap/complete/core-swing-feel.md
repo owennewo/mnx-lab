@@ -90,8 +90,10 @@ is precisely what Guitar Pro prints over Anji's bar 1. A ratio with no rhythmic 
 prints its ratio as words rather than a wrong rhythm; a declaration's own `text` overrides
 the equation; a cancellation prints `Straight`.
 
-It sits in the tempo band above the metronome mark, on all three staff kinds, because a
-feel describes the bar and not a notation staff.
+It sits in the tempo band on all three staff kinds, because a feel describes the bar and
+not a notation staff. *(Since 2026-09-15 it follows the metronome mark on the same line
+rather than stacking above it — see
+[docs/rendering.md](../../docs/rendering.md#the-swing-marking).)*
 
 ## What building it taught
 

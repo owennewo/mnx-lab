@@ -36,6 +36,6 @@
 <text x="843.296" y="152" font-size="64" class="notehead" data-source-id="@m3.v0.e0.n0"></text>
 <line x1="940.8" y1="128" x2="940.8" y2="192" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="945.6" y="128" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
-<text x="626.4" y="99.0368" font-size="35.2" class="tempo"></text>
-<text x="641.2864" y="99.0368" font-size="20.8" font-weight="600" style="font-family:var(--font-family-sans)" class="tempo">= 96</text>
+<text x="638.4" y="99.0368" font-size="35.2" class="tempo"></text>
+<text x="653.2864" y="99.0368" font-size="20.8" font-weight="600" style="font-family:var(--font-family-sans)" class="tempo">= 96</text>
 </svg>

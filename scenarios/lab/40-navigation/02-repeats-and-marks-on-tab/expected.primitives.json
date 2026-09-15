@@ -195,16 +195,6 @@
         "className": "dynamic"
       },
       {
-        "kind": "text",
-        "text": "Swing",
-        "x": 14.1893,
-        "y": 5.6,
-        "font": "bodyItalic",
-        "size": 1.25,
-        "anchor": "middle",
-        "className": "direction"
-      },
-      {
         "kind": "line",
         "x1": 28.209,
         "y1": 8,
@@ -585,6 +575,16 @@
         "size": 1.4,
         "weight": "bold",
         "className": "ending-label"
+      },
+      {
+        "kind": "text",
+        "text": "Swing",
+        "x": 14.1893,
+        "y": 6.1875,
+        "font": "bodyItalic",
+        "size": 1.25,
+        "anchor": "start",
+        "className": "direction"
       }
     ]
   },
@@ -827,10 +827,10 @@
         "kind": "text",
         "text": "Swing",
         "x": 13.2518,
-        "y": 3.065,
+        "y": 3.6525,
         "font": "bodyItalic",
         "size": 1.25,
-        "anchor": "middle",
+        "anchor": "start",
         "className": "direction"
       },
       {

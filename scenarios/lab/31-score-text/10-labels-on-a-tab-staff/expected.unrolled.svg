@@ -40,12 +40,12 @@
 <text x="843.296" y="216" font-size="64" class="notehead" data-source-id="w3:@m3.v0.e0.n0" data-written-source-id="@m3.v0.e0.n0"></text>
 <line x1="940.8" y1="128" x2="940.8" y2="192" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="945.6" y="128" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
-<text x="97.6" y="84.7648" font-size="35.2" class="tempo"></text>
-<text x="112.4864" y="84.7648" font-size="20.8" font-weight="600" style="font-family:var(--font-family-sans)" class="tempo">= 96</text>
-<rect x="89.6" y="14.4672" width="30.88" height="30.08" fill="none" stroke="currentColor" stroke-width="1.92" class="rehearsal-box"></rect>
-<text x="97.6" y="38.1472" font-size="24" font-weight="bold" style="font-family:var(--font-family-sans)" class="rehearsal-label">A</text>
-<text x="128.48" y="38.1472" font-size="24" font-weight="bold" style="font-family:var(--font-family-sans)" class="section-label">Riff</text>
-<rect x="618.4" y="73.92" width="30.88" height="30.08" fill="none" stroke="currentColor" stroke-width="1.92" class="rehearsal-box"></rect>
-<text x="626.4" y="97.6" font-size="24" font-weight="bold" style="font-family:var(--font-family-sans)" class="rehearsal-label">B</text>
-<text x="657.28" y="97.6" font-size="24" font-weight="bold" style="font-family:var(--font-family-sans)" class="section-label">Solo</text>
+<text x="225.6" y="99.0368" font-size="35.2" class="tempo"></text>
+<text x="240.4864" y="99.0368" font-size="20.8" font-weight="600" style="font-family:var(--font-family-sans)" class="tempo">= 96</text>
+<rect x="217.6" y="28.7392" width="30.88" height="30.08" fill="none" stroke="currentColor" stroke-width="1.92" class="rehearsal-box"></rect>
+<text x="225.6" y="52.4192" font-size="24" font-weight="bold" style="font-family:var(--font-family-sans)" class="rehearsal-label">A</text>
+<text x="256.48" y="52.4192" font-size="24" font-weight="bold" style="font-family:var(--font-family-sans)" class="section-label">Riff</text>
+<rect x="630.4" y="73.92" width="30.88" height="30.08" fill="none" stroke="currentColor" stroke-width="1.92" class="rehearsal-box"></rect>
+<text x="638.4" y="97.6" font-size="24" font-weight="bold" style="font-family:var(--font-family-sans)" class="rehearsal-label">B</text>
+<text x="669.28" y="97.6" font-size="24" font-weight="bold" style="font-family:var(--font-family-sans)" class="section-label">Solo</text>
 </svg>

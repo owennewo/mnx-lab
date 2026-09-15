@@ -28,7 +28,7 @@
 <line x1="32" y1="386.3296" x2="616.8" y2="386.3296" stroke-width="1.6" class="staff-line"></line>
 <line x1="32" y1="404.6144" x2="616.8" y2="404.6144" stroke-width="1.6" class="staff-line"></line>
 <line x1="32" y1="422.9008" x2="616.8" y2="422.9008" stroke-width="1.6" class="staff-line"></line>
-<text x="97.6" y="307.472" font-size="17.6" dominant-baseline="central" font-weight="600" style="font-family:var(--font-family-sans)" class="tab-capo">Capo 2</text>
+<text x="188" y="307.472" font-size="17.6" dominant-baseline="central" font-weight="600" style="font-family:var(--font-family-sans)" class="tab-capo">Capo 2</text>
 <text x="49.6" y="377.1856" font-size="64" class="tab-clef"></text>
 <text x="117.6" y="354.3296" font-size="64" text-anchor="middle" class="time-sig-num"></text>
 <text x="117.6" y="400.0432" font-size="64" text-anchor="middle" class="time-sig-den"></text>

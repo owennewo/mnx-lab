@@ -2315,43 +2315,41 @@ export function instrumentLabelInset(names: readonly (string | null)[]): number 
 export const LABEL_CHAR_SP = 1.0;
 export const LABEL_PAD_SP = 0.6;
 
-/** Shared left edge for the measure's tempo, section and capo headings. */
 /** What a heading mark's placement needs to know about its bar. */
-export type MeasureHeading = Pick<
-  MeasurePlan,
-  'showTimeSig' | 'timeSigCentreX' | 'contentStartX' | 'repeatStart' | 'x' | 'showClef' | 'showKeySig' | 'voices'
->;
+export type MeasureHeading = Pick<MeasurePlan, 'contentStartX' | 'x' | 'voices'>;
 
 /** How far a heading mark leads the ink it belongs to. */
 const HEADING_LEAD_SP = 1.5;
-/** The same lead measured against a time signature's CENTRE rather than an edge. */
-const HEADING_TIME_SIG_LEAD_SP = 1.25;
 
 /**
  * Where a bar's heading marks start — the metronome mark, the swing marking,
  * the section/rehearsal labels, the tab capo line.
  *
- * All of them lead the bar's OPENING INK, and which ink that is depends on
- * what the bar actually draws:
- *
- *   - a forward repeat: the content anchor already clears the whole `|:`
- *     cluster and its dots, so it is the answer;
- *   - a time signature: lead its centre — the numerals are the widest thing in
- *     the prefix and the mark reads as sitting over them;
- *   - a clef or a key signature: lead the content, which is just past them;
- *   - **nothing at all**: lead the FIRST ONSET.
- *
- * That last case is the one that used to be wrong. With the prefix hidden (or
+ * All of them lead the bar's FIRST ONSET by `HEADING_LEAD_SP`, and never start
+ * before the content anchor. The anchor is what keeps the mark off the prefix:
+ * with a clef, a key or a time signature on show it sits just past them, and
+ * at a forward repeat it already clears the whole `|:` cluster and its dots.
+ * The onset is what keeps the mark on the music: with the prefix hidden (or
  * simply absent, as in every mid-piece bar) `contentStartX` is a stretched
- * leading spring away from the first note, so a mark leading IT floated in the
- * empty left of the bar — and on a mid-system bar, where the spring is short,
- * it crossed the barline and read as belonging to the bar before. Leading the
- * first onset instead puts the mark where it does in every other case: just
- * before the first thing the bar draws.
+ * leading spring away from the first note, and a mark leading IT floated in the
+ * empty left of the bar — on a mid-system bar, where the spring is short, it
+ * crossed the barline and read as belonging to the bar before.
+ *
+ * The time signature used to be an exception — the mark led the numerals'
+ * centre, and so started over or even before them — which read as the heading
+ * belonging to the prefix rather than to the bar's music. It leads the first
+ * note now, like every other bar.
  *
  * `m.x` is a floor, never a placement: a heading mark cannot precede its own
  * barline whatever the geometry.
  */
+export function measureHeadingX(m: MeasureHeading): number {
+  const onsets = (m.voices ?? []).map(voice => voice[0]?.x).filter((x): x is number => x !== undefined);
+  // An empty bar draws no onset to lead, so the content anchor stands in.
+  const lead = onsets.length ? Math.min(...onsets) - HEADING_LEAD_SP : m.contentStartX;
+  return Math.max(m.x, m.contentStartX, lead);
+}
+
 /**
  * True when the NEXT measure's forward repeat supplies THIS measure's end
  * barline. `|:` opens with a thick stroke standing exactly where the ordinary
@@ -2372,13 +2370,3 @@ export function repeatStartSuppliesBarline(
   return Boolean(next.repeatStart) && next.repeatStartX === next.x;
 }
 
-export function measureHeadingX(m: MeasureHeading): number {
-  // The content anchor already clears the complete repeat cluster and its dots.
-  if (m.repeatStart) return m.contentStartX;
-  if (m.showTimeSig) return Math.max(m.x, m.timeSigCentreX - HEADING_TIME_SIG_LEAD_SP);
-  if (m.showClef || m.showKeySig) return Math.max(m.x, m.contentStartX - HEADING_LEAD_SP);
-  const onsets = (m.voices ?? []).map(voice => voice[0]?.x).filter((x): x is number => x !== undefined);
-  // An empty bar draws no onset to lead, so the content anchor stands in.
-  const lead = onsets.length ? Math.min(...onsets) : m.contentStartX;
-  return Math.max(m.x, lead - HEADING_LEAD_SP);
-}

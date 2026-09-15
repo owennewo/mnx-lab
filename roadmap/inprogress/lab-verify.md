@@ -81,6 +81,62 @@ Provenance answers "did this change?". This doc answers "should it have?".
 
 ## Open debt
 
+### Heading row after the time signature, tempo and feel on one line, directions clear the ink — 2026-09-15
+
+Owner: user-reported engraving fixes from a Soundslice comparison of Kind Hearted Woman
+(*"the text line smashes into the beams"*, *"soundslice always put things above the bar
+after the time signature"*, *"soundslice is happy to place the swing glyph to the right
+of the tempo"*), landed directly on `main`; no roadmap doc. Three rules changed, all in
+`src/engine/layout/`:
+
+- `measureHeadingX` (`spacing.ts`) leads the bar's first onset by 1.5sp and never
+  starts before the content anchor, so the tempo, the feel, the section label and the
+  capo line start after the time signature, clef and key rather than over or before the
+  numerals. The bare-bar arm from
+  [core-heading-anchor.md](../complete/core-heading-anchor.md) is unchanged.
+- `emitSwingMark` (`scoreText.ts`) starts the feel past the metronome mark's right ink
+  when the bar prints one, so the two share a line instead of stacking.
+- `emitDirections` (`notation.ts`) anchors text directions `start` at their beat instead
+  of centring them, and places an `above` direction over the row's ink — beams, stems,
+  ledger notes — one cohesion clearance up, the way the tempo is placed; the notation
+  layout now draws them after the beams, before the tempo.
+
+Eighteen scenarios moved; none was `verified`, so nothing was demoted.
+
+Look for: every tempo mark, swing equation, section name (with its rehearsal box, when
+it has one) and `Capo` line starts just before the bar's first note and clear of the
+time signature — nothing over or left of the numerals; a rehearsal mark on its own
+still hugs the barline (`spec/tempo-markings`, `02-sections`, `06-capo`, the
+`40-navigation` set). In `05-swing-feel` bar 1 the `♩= 120` and the `♪♪ = ⌐3¬ ♩♪`
+sit on one baseline, the feel to the right with a clear gap; bar 3's feel, with no
+tempo, is at the heading edge as before. In `04-directions` and the other `31-score-text`
+direction scenarios, every text direction starts at its note rather than straddling it;
+`above` directions sit just over the tallest stem under them (`a tempo` over bar 2's
+first stem in `04-directions`), and in `08-directions-stacked` the two above-texts still
+stack without touching. Below and between directions have only shifted right by half
+their width.
+
+Scenario set (paths under `scenarios/`):
+
+- `lab/00-document/03-navigation-playground`
+- `lab/00-document/04-twelve-bar-blues`
+- `lab/11-rhythm/05-swing-feel`
+- `lab/22-tab-derivation/06-capo`
+- `lab/31-score-text/02-sections`
+- `lab/31-score-text/03-sections-with-rehearsal-marks`
+- `lab/31-score-text/04-directions`
+- `lab/31-score-text/06-directions-across-parts`
+- `lab/31-score-text/07-directions-multi-staff`
+- `lab/31-score-text/08-directions-stacked`
+- `lab/31-score-text/09-labels-with-navigation`
+- `lab/31-score-text/10-labels-on-a-tab-staff`
+- `lab/31-score-text/11-one-bar-sections`
+- `lab/31-score-text/12-chord-symbols`
+- `lab/40-navigation/02-repeats-and-marks-on-tab`
+- `lab/40-navigation/03-numbered-bars`
+- `lab/40-navigation/04-tempo-change-mid-bar`
+- `spec/tempo-markings`
+
 ### Smaller bend arrowheads, labels on the tip — 2026-09-14
 
 Owner: user-requested engraving tweaks, landed directly on `main` in two commits; no
