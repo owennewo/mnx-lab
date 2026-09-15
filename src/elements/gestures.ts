@@ -64,12 +64,28 @@ const SECOND_TAP_MS = 220;
 const TWO_FINGER_MS = 260;
 const TWO_FINGER_SLOP_PX = 16;
 
+/**
+ * A trackpad pinch reaches the page as `wheel` with `ctrlKey` set — the
+ * browser's own encoding, which is why Ctrl cannot be the modifier that
+ * picks the axis: a real Ctrl and a pinch are the same event. Shift is.
+ * Chrome's pinch deltas run a few units per event and sum to roughly the
+ * natural log of the zoom ×100, so 10 units per ×1.1 step keeps a pinch
+ * feeling like the browser's own; a mouse wheel's 100-unit notches are
+ * clamped so one notch is a few steps rather than a leap.
+ */
+const WHEEL_UNITS_PER_STEP = 10;
+const WHEEL_UNIT_CLAMP = 30;
+/** No wheel event for this long ends the pinch: the release the fingers
+ *  cannot report. */
+const WHEEL_IDLE_MS = 250;
+
 /** What the readout says the moment a zoom gesture is armed, before any
  *  travel. The earlier cut showed nothing until the first step had landed,
  *  which on a slow device meant a second of holding a finger on a score that
  *  gave no sign it had noticed (reported 2026-09-15 from a tablet). */
 const ARMED_HINT = 'Zoom — drag ↕ staff · ↔ space';
 const PINCH_HINT = 'Zoom — pinch ↕ staff · ↔ space';
+const WHEEL_HINT = 'Zoom — pinch staff · Shift+pinch space';
 const RESET_HINT = 'Reset — fitted';
 
 export interface ZoomValues {
@@ -182,6 +198,11 @@ export class ScoreGestures {
   private hudTimer: number | null = null;
   /** What the last commit carried, for the dedupe in `commitSteps`. */
   private lastCommit: { staff: number; space: number } | null = null;
+  /** The readout's last text, so a fading readout can repeat it. */
+  private lastHud: string | null = null;
+  /** A trackpad pinch in flight: one burst of ctrl+wheel events. */
+  private wheel: { axis: 'staff' | 'space'; acc: number; staff0: number; space0: number } | null = null;
+  private wheelTimer: number | null = null;
 
   constructor(
     private readonly host: HTMLElement,
@@ -208,6 +229,8 @@ export class ScoreGestures {
     // two-finger scroll — one-finger scrolling is untouched by that.
     this.host.addEventListener('touchstart', this.onTouchStart, { passive: false });
     this.host.addEventListener('touchmove', this.onTouchMove, { passive: false });
+    // Non-passive too: a pinch the page does not claim zooms the page.
+    this.host.addEventListener('wheel', this.onWheel, { passive: false });
   }
 
   detach() {
@@ -217,10 +240,14 @@ export class ScoreGestures {
     this.host.removeEventListener('pointercancel', this.onPointerCancel);
     this.host.removeEventListener('touchstart', this.onTouchStart);
     this.host.removeEventListener('touchmove', this.onTouchMove);
+    this.host.removeEventListener('wheel', this.onWheel);
     if (this.hudTimer !== null) clearTimeout(this.hudTimer);
     this.hudTimer = null;
+    if (this.wheelTimer !== null) clearTimeout(this.wheelTimer);
+    this.wheelTimer = null;
+    this.wheel = null;
     this.contacts.clear();
-    if (this.drag || this.pinch) this.targets.active(false);
+    if (this.drag || this.pinch || this.wheel) this.targets.active(false);
     this.drag = null;
     this.pinch = null;
     this.armed = false;
@@ -233,6 +260,42 @@ export class ScoreGestures {
     // landing: suppressing more than that would take scrolling away
     // wholesale, which is the outcome the pan-y choice exists to avoid.
     if ((this.armed && event.touches.length === 1) || event.touches.length === 2) event.preventDefault();
+  };
+
+  /** The trackpad's pinch (and a mouse's ctrl+wheel, which the browser
+   *  spells the same way): staff by default, space with Shift held. A burst
+   *  of events is one gesture, from the scale on screen when it began. */
+  private onWheel = (event: WheelEvent) => {
+    // A plain two-finger scroll is the browser's, untouched.
+    if (!event.ctrlKey) return;
+    event.preventDefault();
+    const axis: 'staff' | 'space' = event.shiftKey ? 'space' : 'staff';
+    // Some platforms move a shifted wheel onto the x axis.
+    let delta = event.deltaY !== 0 ? event.deltaY : event.deltaX;
+    if (event.deltaMode === 1) delta *= 16;
+    else if (event.deltaMode === 2) delta *= 400;
+    delta = Math.max(-WHEEL_UNIT_CLAMP, Math.min(WHEEL_UNIT_CLAMP, delta));
+
+    if (!this.wheel || this.wheel.axis !== axis) {
+      const from = this.targets.effective();
+      this.wheel = { axis, acc: 0, staff0: from.staffScale, space0: from.densityH };
+      this.lastCommit = null;
+      this.targets.active(true);
+      this.showHud(WHEEL_HINT, true);
+    }
+    // Fingers apart (a negative delta, like wheel-up) means bigger.
+    this.wheel.acc -= delta;
+    const steps = Math.round(this.wheel.acc / WHEEL_UNITS_PER_STEP);
+    this.commitSteps(axis, this.wheel.staff0, this.wheel.space0, axis === 'staff' ? steps : 0, axis === 'space' ? steps : 0);
+
+    if (this.wheelTimer !== null) clearTimeout(this.wheelTimer);
+    this.wheelTimer = setTimeout(() => {
+      this.wheelTimer = null;
+      this.wheel = null;
+      this.targets.active(false);
+      // Let the numbers linger, then fade, as a touch release does.
+      this.showHud(this.lastHud);
+    }, WHEEL_IDLE_MS) as unknown as number;
   };
 
   private onTouchMove = (event: TouchEvent) => {
@@ -504,6 +567,7 @@ export class ScoreGestures {
   private showHud(text: string | null, hold = false) {
     if (this.hudTimer !== null) clearTimeout(this.hudTimer);
     this.hudTimer = null;
+    this.lastHud = text;
     this.targets.hud(text);
     if (text === null || hold) return;
     this.hudTimer = setTimeout(() => {
