@@ -157,7 +157,6 @@ back up to `proposed/` the moment it is.
 
 ### inprogress/
 
-- **[core-staff-space-clearance.md](inprogress/core-staff-space-clearance.md)** — Staff owns vertical proportions; Space owns horizontal whitespace. Removes the third product control while retaining legacy host inputs.
 
 
 
@@ -450,6 +449,8 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+
+- **[core-staff-space-clearance.md](complete/core-staff-space-clearance.md)** — Staff owns vertical proportions; Space owns horizontal whitespace. Removes the third product control while retaining legacy host inputs.
 
 - **[studio-recording-management.md](complete/studio-recording-management.md)** — Player campaign item 18: attach YouTube links or uploaded audio with Soundslice timing data; persistent uploads and recording lifecycle.
 
