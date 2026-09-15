@@ -3,7 +3,7 @@ import { resolveSwingTimeline } from '../../model/swing.ts';
 import type { PerformedEntry } from '../../model/passes.ts';
 import { clearanceSpacing, type ClearanceSpacing } from '../clearance.ts';
 import { emitMultirest } from './multirest.ts';
-import { measureHeadingX, repeatStartSuppliesBarline, instrumentLabelInset, LABEL_CHAR_SP, LABEL_PAD_SP } from './spacing.ts';
+import { measureHeadingX, ONSET_TEXT_LEAD_SP, repeatStartSuppliesBarline, instrumentLabelInset, LABEL_CHAR_SP, LABEL_PAD_SP } from './spacing.ts';
 import { LYRIC_SIZE_SP, selectedLyricLineIds } from './lyricRuns.ts';
 import { displayedMeasureNumbers, instrumentName, normalizeDisplayOptions, type DisplayOptions } from '../displayOptions.ts';
 import { MnxStructure, MnxEvent, MnxNote, MnxEventMarkings, MnxGrace, MnxLayoutContent, MnxPart, MnxPartMeasure, MnxSequence, MnxTremolo, MnxTuplet, isGrace, isTremolo, isTuplet, isTimedEvent, sequenceItemKind } from '../../model/mnx.ts';
@@ -2135,7 +2135,7 @@ function assembleSegment(
       ottavaOnsets.set(
         i,
         resolvedByStaff.map((voices, s) =>
-          measureOnsetXs(voices[0]?.seq, m.staves[s]?.[0] ?? []))
+          measureOnsetXs(voices.map(v => v.seq), m.staves[s] ?? []))
       );
     }
 
@@ -2282,14 +2282,14 @@ function assembleSegment(
       ...primitives.slice(rowTextStart[m.row])
     ];
     const topSource = segment.staves[0]?.sources[segment.staves[0].sources.length - 1];
-    const topSequence = (topSource?.part.measures?.[writtenIndex(plan, i)]?.sequences ?? []).find(
+    const topSequences = (topSource?.part.measures?.[writtenIndex(plan, i)]?.sequences ?? []).filter(
       seq => (seq.staff ?? 1) === (topSource?.staff ?? 1)
     );
     for (const emit of aboveDirections[i] ?? []) emit(scan());
-    emitHarmonies({ gm, m, stdSequences: topSequence ? [topSequence] : [], staffTop, scan: scan(), primitives });
+    emitHarmonies({ gm, m, stdSequences: topSequences, staffTop, scan: scan(), primitives });
     const tempoTop = emitTempoMark({
       gm, m, staffTop, scan: scan(), primitives,
-      onsetXs: measureOnsetXs(topSequence, m.voices[0] ?? [])
+      onsetXs: measureOnsetXs(topSequences, m.voices)
     });
     const swingTop = emitSwingMark({
       swing: swingTimeline[writtenIndex(plan, i)], m, staffTop, scan: scan(),
@@ -3252,7 +3252,7 @@ export function emitDynamics(args: EmitDynamicsArgs): void {
   const onsetXsFor = (s: number) => {
     let xs = onsetXsByStaff.get(s);
     if (!xs) {
-      xs = measureOnsetXs(sequencesByStaff[s]?.[0], m.staves[s]?.[0] ?? []);
+      xs = measureOnsetXs(sequencesByStaff[s] ?? [], m.staves[s] ?? []);
       onsetXsByStaff.set(s, xs);
     }
     return xs;
@@ -3467,9 +3467,10 @@ interface EmitDirectionsArgs {
 /**
  * Draws a part's directions, each anchored to its column and placed by `orient`.
  *
- * Text starts at its beat and reads from it — "Tune down 1/2 step…" hangs off
- * the note it is about, the way a direction is engraved — where a glyph is
- * centred on it. Centred text spread half its width to the left of the beat,
+ * Text starts at its beat — the notehead's left edge, `ONSET_TEXT_LEAD_SP`
+ * before the column, the edge every text at a column shares — and reads from
+ * it: "Tune down 1/2 step…" hangs off the note it is about, the way a
+ * direction is engraved. A glyph is centred on the column. Centred text spread half its width to the left of the beat,
  * which on the first beat of a system ran it off the page's edge.
  *
  * `between` puts the text midway between this staff and the next, which is what
@@ -3486,7 +3487,7 @@ export function emitDirections(args: EmitDirectionsArgs): void {
   const onsetXsFor = (s: number) => {
     let xs = onsetXsByStaff.get(s);
     if (!xs) {
-      xs = measureOnsetXs(sequencesByStaff[s]?.[0], m.staves[s]?.[0] ?? []);
+      xs = measureOnsetXs(sequencesByStaff[s] ?? [], m.staves[s] ?? []);
       onsetXsByStaff.set(s, xs);
     }
     return xs;
@@ -3549,7 +3550,7 @@ export function emitDirections(args: EmitDirectionsArgs): void {
         : {
             kind: 'text',
             text,
-            x,
+            x: x - ONSET_TEXT_LEAD_SP,
             y,
             font: 'bodyItalic',
             size: DIRECTION_SIZE_SP,

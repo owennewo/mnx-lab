@@ -6,7 +6,7 @@
 <line x1="32" y1="134.8576" x2="582.4" y2="134.8576" stroke-width="1.6" class="staff-line"></line>
 <line x1="32" y1="153.1424" x2="582.4" y2="153.1424" stroke-width="1.6" class="staff-line"></line>
 <line x1="32" y1="171.4288" x2="582.4" y2="171.4288" stroke-width="1.6" class="staff-line"></line>
-<text x="165.6" y="56" font-size="17.6" dominant-baseline="central" font-weight="600" style="font-family:var(--font-family-sans)" class="tab-capo">Capo 2</text>
+<text x="168" y="56" font-size="17.6" dominant-baseline="central" font-weight="600" style="font-family:var(--font-family-sans)" class="tab-capo">Capo 2</text>
 <line x1="32" y1="80" x2="32" y2="171.4288" stroke-width="2.56" class="barline barline-start"></line>
 <text x="49.6" y="125.7136" font-size="64" class="tab-clef"></text>
 <text x="101.6" y="102.8576" font-size="64" text-anchor="middle" class="time-sig-num"></text>

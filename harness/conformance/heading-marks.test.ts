@@ -14,7 +14,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { describe, it, expect } from 'vitest';
-import { planHorizontal, measureHeadingX } from '../../src/engine/layout/spacing.ts';
+import { planHorizontal, measureHeadingX, ONSET_TEXT_LEAD_SP } from '../../src/engine/layout/spacing.ts';
 import type { DisplayOptions } from '../../src/engine/displayOptions.ts';
 import type { MnxStructure } from '../../src/model/mnx.ts';
 import { initSmufl, WIDTH_SP } from '../helpers/corpusPrimitives.ts';
@@ -33,7 +33,7 @@ const DISPLAYS: (DisplayOptions | undefined)[] = [
   { clefs: 'hide', timeSignatures: 'hide' }
 ];
 
-const HEADING_LEAD_SP = 1.5;
+const HEADING_LEAD_SP = ONSET_TEXT_LEAD_SP;
 
 function plans(doc: MnxStructure, display: DisplayOptions | undefined) {
   return planHorizontal(doc, WIDTH_SP, { display }).measures.filter(m => !m.hidden);

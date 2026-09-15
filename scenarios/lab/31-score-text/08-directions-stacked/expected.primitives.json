@@ -161,7 +161,7 @@
       {
         "kind": "text",
         "text": "nearest below",
-        "x": 12.1,
+        "x": 11.5,
         "y": 16.2,
         "font": "bodyItalic",
         "size": 1.25,
@@ -171,7 +171,7 @@
       {
         "kind": "text",
         "text": "furthest below",
-        "x": 12.1,
+        "x": 11.5,
         "y": 18.1,
         "font": "bodyItalic",
         "size": 1.25,
@@ -181,7 +181,7 @@
       {
         "kind": "text",
         "text": "nearest above",
-        "x": 12.1,
+        "x": 11.5,
         "y": 6.1875,
         "font": "bodyItalic",
         "size": 1.25,
@@ -191,7 +191,7 @@
       {
         "kind": "text",
         "text": "furthest above",
-        "x": 12.1,
+        "x": 11.5,
         "y": 3.9375,
         "font": "bodyItalic",
         "size": 1.25,

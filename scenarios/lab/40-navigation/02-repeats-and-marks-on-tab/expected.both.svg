@@ -112,5 +112,5 @@
 <line x1="727.456" y1="73.6" x2="976.368" y2="73.6" stroke-width="2.08" class="ending"></line>
 <line x1="727.456" y1="73.6" x2="727.456" y2="94.4" stroke-width="2.08" class="ending"></line>
 <text x="735.456" y="96" font-size="22.4" font-weight="bold" style="font-family:var(--font-family-sans)" class="ending-label">2.</text>
-<text x="227.0288" y="99" font-size="20" font-style="italic" style="font-family:var(--font-family-sans)" class="direction">Swing</text>
+<text x="217.4288" y="99" font-size="20" font-style="italic" style="font-family:var(--font-family-sans)" class="direction">Swing</text>
 </svg>

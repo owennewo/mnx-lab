@@ -66,8 +66,8 @@
 <rect x="1060.8" y="128" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
 <line x1="1056" y1="288.384" x2="1056" y2="352.384" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="1060.8" y="288.384" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
-<text x="193.6" y="99" font-size="20" font-style="italic" style="font-family:var(--font-family-sans)" class="direction">solo</text>
-<rect x="173.6" y="37.92" width="30.88" height="30.08" fill="none" stroke="currentColor" stroke-width="1.92" class="rehearsal-box"></rect>
-<text x="181.6" y="61.6" font-size="24" font-weight="bold" style="font-family:var(--font-family-sans)" class="rehearsal-label">A</text>
-<text x="212.48" y="61.6" font-size="24" font-weight="bold" style="font-family:var(--font-family-sans)" class="section-label">Intro</text>
+<text x="184" y="99" font-size="20" font-style="italic" style="font-family:var(--font-family-sans)" class="direction">solo</text>
+<rect x="176" y="37.92" width="30.88" height="30.08" fill="none" stroke="currentColor" stroke-width="1.92" class="rehearsal-box"></rect>
+<text x="184" y="61.6" font-size="24" font-weight="bold" style="font-family:var(--font-family-sans)" class="rehearsal-label">A</text>
+<text x="214.88" y="61.6" font-size="24" font-weight="bold" style="font-family:var(--font-family-sans)" class="section-label">Intro</text>
 </svg>

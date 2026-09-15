@@ -89,7 +89,9 @@ a standalone rehearsal mark retains its barline inset. Tuning letters stay besid
 the strings.
 
 `measureHeadingX` places that shared anchor: lead the bar's **first onset** by
-1.5sp, and never start before the content anchor. The anchor is what keeps the
+`ONSET_TEXT_LEAD_SP` — the black notehead's left edge, the one edge every text
+that starts at a column starts from, chord symbols, directions and a mid-bar
+tempo included — and never start before the content anchor. The anchor is what keeps the
 marks off the prefix — past the clef, the key, the time signature and a `|:`
 cluster's dots — so they start over the music, after the time signature, never
 over or before its numerals (a Soundslice comparison, 2026-09-15; the time
@@ -106,7 +108,14 @@ under every combination of the two display switches.
 **Part directions** (`emitDirections` in `notation.ts`, shared by the tab
 layout) sit outside their own staff, above or below as `orient` says, or
 midway between two staves for `between`. Text starts at its beat and reads
-from it, as a direction is engraved; a glyph is centred on it. An `above`
+from it, as a direction is engraved; a glyph is centred on it. The beat's
+column comes from `measureOnsetXs`, the onset map every measure-attached
+marking anchors through — tempo locations, chord symbols, dynamics, segno and
+fine — and it is the union over **every voice** on the staff: a marking at a
+position only the second voice sounds (the "I" on the bass voice's upbeat
+before "got a kind") has a column of its own, where a map read off the first
+voice alone snapped it forward onto the next first-voice column and whatever
+that column already carried. An `above`
 direction is placed the way the tempo mark is: one cohesion clearance over
 whatever ink rises above the staff under its own footprint — beams, stems,
 ledger notes — so the notation layout draws it in the score-text pass, after

@@ -33,6 +33,6 @@
 <text x="843.296" y="152" font-size="64" class="notehead" data-source-id="@m3.v0.e0.n0"></text>
 <line x1="940.8" y1="128" x2="940.8" y2="192" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="945.6" y="128" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
-<text x="225.6" y="104" font-size="24" font-weight="bold" style="font-family:var(--font-family-sans)" class="section-label">Intro</text>
-<text x="638.4" y="104" font-size="24" font-weight="bold" style="font-family:var(--font-family-sans)" class="section-label">Verse</text>
+<text x="228" y="104" font-size="24" font-weight="bold" style="font-family:var(--font-family-sans)" class="section-label">Intro</text>
+<text x="640.8" y="104" font-size="24" font-weight="bold" style="font-family:var(--font-family-sans)" class="section-label">Verse</text>
 </svg>

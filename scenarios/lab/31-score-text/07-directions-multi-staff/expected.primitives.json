@@ -305,7 +305,7 @@
       {
         "kind": "text",
         "text": "cantabile",
-        "x": 13.8,
+        "x": 13.2,
         "y": 17.882,
         "font": "bodyItalic",
         "size": 1.25,
@@ -315,7 +315,7 @@
       {
         "kind": "text",
         "text": "L.H.",
-        "x": 13.8,
+        "x": 13.2,
         "y": 30.714,
         "font": "bodyItalic",
         "size": 1.25,
@@ -449,7 +449,7 @@
       {
         "kind": "text",
         "text": "R.H.",
-        "x": 13.8,
+        "x": 13.2,
         "y": 6.1875,
         "font": "bodyItalic",
         "size": 1.25,

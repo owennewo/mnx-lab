@@ -195,27 +195,27 @@
 <line x1="373.2928" y1="499.248" x2="373.2928" y2="536.56" stroke-width="1.92" class="stem"></line>
 <line x1="417.16" y1="483.248" x2="417.16" y2="536.56" stroke-width="1.92" class="stem"></line>
 <line x1="284.6" y1="536.56" x2="418.12" y2="536.56" stroke-width="8" class="beam"></line>
-<text x="147.5328" y="99.0368" font-size="35.2" class="tempo"></text>
-<text x="162.4192" y="99.0368" font-size="20.8" font-weight="600" style="font-family:var(--font-family-sans)" class="tempo">= 120</text>
-<text x="256.8192" y="99.0368" font-size="35.2" class="swing"></text>
-<text x="282.9056" y="99.0368" font-size="35.2" class="swing"></text>
-<line x1="267.4496" y1="77.0192" x2="294.592" y2="77.0192" stroke-width="4.4" class="swing"></line>
-<text x="299.392" y="99.0368" font-size="20.8" font-weight="600" style="font-family:var(--font-family-sans)" class="swing">=</text>
-<text x="316.672" y="99.0368" font-size="35.2" class="swing"></text>
-<text x="330.9184" y="99.0368" font-size="35.2" class="swing"></text>
-<line x1="316.672" y1="69.7376" x2="325.976" y2="69.7376" stroke-width="1.92" class="swing"></line>
-<line x1="340.376" y1="69.7376" x2="349.68" y2="69.7376" stroke-width="1.92" class="swing"></line>
-<line x1="316.672" y1="69.7376" x2="316.672" y2="76.1376" stroke-width="1.92" class="swing"></line>
-<line x1="349.68" y1="69.7376" x2="349.68" y2="76.1376" stroke-width="1.92" class="swing"></line>
-<text x="333.176" y="75.3376" font-size="16" text-anchor="middle" font-weight="600" style="font-family:var(--font-family-sans)" class="swing">3</text>
-<text x="894.2" y="99.0368" font-size="35.2" class="swing"></text>
-<text x="920.2864" y="99.0368" font-size="35.2" class="swing"></text>
-<line x1="904.8304" y1="77.0192" x2="931.9728" y2="77.0192" stroke-width="4.4" class="swing"></line>
-<text x="936.7728" y="99.0368" font-size="20.8" font-weight="600" style="font-family:var(--font-family-sans)" class="swing">=</text>
-<text x="954.0528" y="99.0368" font-size="35.2" class="swing"></text>
-<text x="967.3232" y="99.0368" font-size="35.2" class="swing"></text>
-<text x="985.6832" y="99.0368" font-size="35.2" class="swing"></text>
-<line x1="964.6832" y1="77.0192" x2="997.3696" y2="77.0192" stroke-width="4.4" class="swing"></line>
-<line x1="986.6336" y1="83.6192" x2="997.3696" y2="83.6192" stroke-width="4.4" class="swing"></line>
-<text x="107.5328" y="424.56" font-size="20.8" font-weight="600" style="font-family:var(--font-family-sans)" class="swing">Straight</text>
+<text x="149.9328" y="99.0368" font-size="35.2" class="tempo"></text>
+<text x="164.8192" y="99.0368" font-size="20.8" font-weight="600" style="font-family:var(--font-family-sans)" class="tempo">= 120</text>
+<text x="259.2192" y="99.0368" font-size="35.2" class="swing"></text>
+<text x="285.3056" y="99.0368" font-size="35.2" class="swing"></text>
+<line x1="269.8496" y1="77.0192" x2="296.992" y2="77.0192" stroke-width="4.4" class="swing"></line>
+<text x="301.792" y="99.0368" font-size="20.8" font-weight="600" style="font-family:var(--font-family-sans)" class="swing">=</text>
+<text x="319.072" y="99.0368" font-size="35.2" class="swing"></text>
+<text x="333.3184" y="99.0368" font-size="35.2" class="swing"></text>
+<line x1="319.072" y1="69.7376" x2="328.376" y2="69.7376" stroke-width="1.92" class="swing"></line>
+<line x1="342.776" y1="69.7376" x2="352.08" y2="69.7376" stroke-width="1.92" class="swing"></line>
+<line x1="319.072" y1="69.7376" x2="319.072" y2="76.1376" stroke-width="1.92" class="swing"></line>
+<line x1="352.08" y1="69.7376" x2="352.08" y2="76.1376" stroke-width="1.92" class="swing"></line>
+<text x="335.576" y="75.3376" font-size="16" text-anchor="middle" font-weight="600" style="font-family:var(--font-family-sans)" class="swing">3</text>
+<text x="896.6" y="99.0368" font-size="35.2" class="swing"></text>
+<text x="922.6864" y="99.0368" font-size="35.2" class="swing"></text>
+<line x1="907.2304" y1="77.0192" x2="934.3728" y2="77.0192" stroke-width="4.4" class="swing"></line>
+<text x="939.1728" y="99.0368" font-size="20.8" font-weight="600" style="font-family:var(--font-family-sans)" class="swing">=</text>
+<text x="956.4528" y="99.0368" font-size="35.2" class="swing"></text>
+<text x="969.7232" y="99.0368" font-size="35.2" class="swing"></text>
+<text x="988.0832" y="99.0368" font-size="35.2" class="swing"></text>
+<line x1="967.0832" y1="77.0192" x2="999.7696" y2="77.0192" stroke-width="4.4" class="swing"></line>
+<line x1="989.0336" y1="83.6192" x2="999.7696" y2="83.6192" stroke-width="4.4" class="swing"></line>
+<text x="109.9328" y="424.56" font-size="20.8" font-weight="600" style="font-family:var(--font-family-sans)" class="swing">Straight</text>
 </svg>

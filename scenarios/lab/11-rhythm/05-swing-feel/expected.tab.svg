@@ -26,19 +26,19 @@
 <text x="411.0672" y="140.2336" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m0.v0.e6.n0">0</text>
 <rect x="449.6" y="113.7648" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e7.n0"></rect>
 <text x="455.6" y="121.9488" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m0.v0.e7.n0">0</text>
-<text x="131.8672" y="67.6992" font-size="35.2" class="tempo"></text>
-<text x="146.7536" y="67.6992" font-size="20.8" font-weight="600" style="font-family:var(--font-family-sans)" class="tempo">= 120</text>
-<text x="241.1536" y="67.6992" font-size="35.2" class="swing"></text>
-<text x="267.24" y="67.6992" font-size="35.2" class="swing"></text>
-<line x1="251.784" y1="45.6816" x2="278.9264" y2="45.6816" stroke-width="4.4" class="swing"></line>
-<text x="283.7264" y="67.6992" font-size="20.8" font-weight="600" style="font-family:var(--font-family-sans)" class="swing">=</text>
-<text x="301.0064" y="67.6992" font-size="35.2" class="swing"></text>
-<text x="315.2528" y="67.6992" font-size="35.2" class="swing"></text>
-<line x1="301.0064" y1="38.4" x2="310.3104" y2="38.4" stroke-width="1.92" class="swing"></line>
-<line x1="324.7104" y1="38.4" x2="334.0144" y2="38.4" stroke-width="1.92" class="swing"></line>
-<line x1="301.0064" y1="38.4" x2="301.0064" y2="44.8" stroke-width="1.92" class="swing"></line>
-<line x1="334.0144" y1="38.4" x2="334.0144" y2="44.8" stroke-width="1.92" class="swing"></line>
-<text x="317.5104" y="44" font-size="16" text-anchor="middle" font-weight="600" style="font-family:var(--font-family-sans)" class="swing">3</text>
+<text x="134.2672" y="67.6992" font-size="35.2" class="tempo"></text>
+<text x="149.1536" y="67.6992" font-size="20.8" font-weight="600" style="font-family:var(--font-family-sans)" class="tempo">= 120</text>
+<text x="243.5536" y="67.6992" font-size="35.2" class="swing"></text>
+<text x="269.64" y="67.6992" font-size="35.2" class="swing"></text>
+<line x1="254.184" y1="45.6816" x2="281.3264" y2="45.6816" stroke-width="4.4" class="swing"></line>
+<text x="286.1264" y="67.6992" font-size="20.8" font-weight="600" style="font-family:var(--font-family-sans)" class="swing">=</text>
+<text x="303.4064" y="67.6992" font-size="35.2" class="swing"></text>
+<text x="317.6528" y="67.6992" font-size="35.2" class="swing"></text>
+<line x1="303.4064" y1="38.4" x2="312.7104" y2="38.4" stroke-width="1.92" class="swing"></line>
+<line x1="327.1104" y1="38.4" x2="336.4144" y2="38.4" stroke-width="1.92" class="swing"></line>
+<line x1="303.4064" y1="38.4" x2="303.4064" y2="44.8" stroke-width="1.92" class="swing"></line>
+<line x1="336.4144" y1="38.4" x2="336.4144" y2="44.8" stroke-width="1.92" class="swing"></line>
+<text x="319.9104" y="44" font-size="16" text-anchor="middle" font-weight="600" style="font-family:var(--font-family-sans)" class="swing">3</text>
 <line x1="490.6672" y1="103.6624" x2="490.6672" y2="195.0912" stroke-width="2.56" class="barline"></line>
 <line x1="490.6672" y1="103.6624" x2="869.3328" y2="103.6624" stroke-width="1.6" class="staff-line"></line>
 <line x1="490.6672" y1="121.9488" x2="869.3328" y2="121.9488" stroke-width="1.6" class="staff-line"></line>
@@ -85,15 +85,15 @@
 <text x="1168.4" y="140.2336" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m2.v0.e6.n0">0</text>
 <rect x="1206.9328" y="113.7648" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m2.v0.e7.n0"></rect>
 <text x="1212.9328" y="121.9488" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m2.v0.e7.n0">0</text>
-<text x="889.2" y="67.6992" font-size="35.2" class="swing"></text>
-<text x="915.2864" y="67.6992" font-size="35.2" class="swing"></text>
-<line x1="899.8304" y1="45.6816" x2="926.9728" y2="45.6816" stroke-width="4.4" class="swing"></line>
-<text x="931.7728" y="67.6992" font-size="20.8" font-weight="600" style="font-family:var(--font-family-sans)" class="swing">=</text>
-<text x="949.0528" y="67.6992" font-size="35.2" class="swing"></text>
-<text x="962.3232" y="67.6992" font-size="35.2" class="swing"></text>
-<text x="980.6832" y="67.6992" font-size="35.2" class="swing"></text>
-<line x1="959.6832" y1="45.6816" x2="992.3696" y2="45.6816" stroke-width="4.4" class="swing"></line>
-<line x1="981.6336" y1="52.2816" x2="992.3696" y2="52.2816" stroke-width="4.4" class="swing"></line>
+<text x="891.6" y="67.6992" font-size="35.2" class="swing"></text>
+<text x="917.6864" y="67.6992" font-size="35.2" class="swing"></text>
+<line x1="902.2304" y1="45.6816" x2="929.3728" y2="45.6816" stroke-width="4.4" class="swing"></line>
+<text x="934.1728" y="67.6992" font-size="20.8" font-weight="600" style="font-family:var(--font-family-sans)" class="swing">=</text>
+<text x="951.4528" y="67.6992" font-size="35.2" class="swing"></text>
+<text x="964.7232" y="67.6992" font-size="35.2" class="swing"></text>
+<text x="983.0832" y="67.6992" font-size="35.2" class="swing"></text>
+<line x1="962.0832" y1="45.6816" x2="994.7696" y2="45.6816" stroke-width="4.4" class="swing"></line>
+<line x1="984.0336" y1="52.2816" x2="994.7696" y2="52.2816" stroke-width="4.4" class="swing"></line>
 <line x1="1248" y1="103.6624" x2="1248" y2="195.0912" stroke-width="2.56" class="barline"></line>
 <line x1="32" y1="291.848" x2="450.6672" y2="291.848" stroke-width="1.6" class="staff-line"></line>
 <line x1="32" y1="310.1344" x2="450.6672" y2="310.1344" stroke-width="1.6" class="staff-line"></line>
@@ -119,7 +119,7 @@
 <text x="371.0672" y="328.4208" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m3.v0.e6.n0">0</text>
 <rect x="409.6" y="301.952" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m3.v0.e7.n0"></rect>
 <text x="415.6" y="310.1344" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m3.v0.e7.n0">0</text>
-<text x="91.8672" y="260.848" font-size="20.8" font-weight="600" style="font-family:var(--font-family-sans)" class="swing">Straight</text>
+<text x="94.2672" y="260.848" font-size="20.8" font-weight="600" style="font-family:var(--font-family-sans)" class="swing">Straight</text>
 <line x1="437.8672" y1="291.848" x2="437.8672" y2="383.2768" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="442.6672" y="291.848" width="8" height="91.4288" fill="currentColor" class="barline barline-final-thick"></rect>
 </svg>

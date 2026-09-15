@@ -66,7 +66,7 @@
 <line x1="1235.2" y1="128" x2="1235.2" y2="192" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="1240" y="128" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
 <text x="1080.5376" y="248" font-size="64" text-anchor="middle" class="dynamic"></text>
-<text x="183.1808" y="99" font-size="20" font-style="italic" style="font-family:var(--font-family-sans)" class="direction">Swing</text>
-<text x="631.8592" y="99" font-size="20" font-style="italic" style="font-family:var(--font-family-sans)" class="direction">Swing</text>
+<text x="173.5808" y="99" font-size="20" font-style="italic" style="font-family:var(--font-family-sans)" class="direction">Swing</text>
+<text x="622.2592" y="99" font-size="20" font-style="italic" style="font-family:var(--font-family-sans)" class="direction">Swing</text>
 <text x="619.8592" y="88" font-size="19.2" style="font-family:var(--font-family-sans)" class="occurrence-label">2×</text>
 </svg>

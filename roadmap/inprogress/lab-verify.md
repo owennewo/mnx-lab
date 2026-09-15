@@ -101,11 +101,23 @@ of the tempo"*), landed directly on `main`; no roadmap doc. Three rules changed,
   ledger notes — one cohesion clearance up, the way the tempo is placed; the notation
   layout now draws them after the beams, before the tempo.
 
+A second commit the same day, from the same comparison (*"the text/glyphs above are
+not quite aligned"*, *"why is the 'I' below 'got'"*), moved the same set again:
+
+- One lead for every text that starts at a column, `ONSET_TEXT_LEAD_SP` (0.6sp, the
+  notehead's left edge — the chord symbol's existing lead). The heading row led by
+  1.5sp, which put it over the first note's accidental while the direction under it
+  started at the notehead's centre.
+- `measureOnsetXs` is the union over every voice on the staff. A direction, chord
+  symbol, dynamic, mid-bar tempo or navigation mark at a position only a second voice
+  sounds used to snap forward to the next first-voice column and stack on whatever it
+  carried.
+
 Eighteen scenarios moved; none was `verified`, so nothing was demoted.
 
 Look for: every tempo mark, swing equation, section name (with its rehearsal box, when
-it has one) and `Capo` line starts just before the bar's first note and clear of the
-time signature — nothing over or left of the numerals; a rehearsal mark on its own
+it has one), chord symbol and `Capo` line starts at the first note's left edge — one
+shared edge with any direction text under it — and clear of the time signature — nothing over or left of the numerals; a rehearsal mark on its own
 still hugs the barline (`spec/tempo-markings`, `02-sections`, `06-capo`, the
 `40-navigation` set). In `05-swing-feel` bar 1 the `♩= 120` and the `♪♪ = ⌐3¬ ♩♪`
 sit on one baseline, the feel to the right with a clear gap; bar 3's feel, with no

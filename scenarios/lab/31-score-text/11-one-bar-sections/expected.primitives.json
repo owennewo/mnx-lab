@@ -296,7 +296,7 @@
       {
         "kind": "text",
         "text": "Intro",
-        "x": 14.1,
+        "x": 14.25,
         "y": 6.5,
         "font": "body",
         "size": 1.5,
@@ -307,7 +307,7 @@
       {
         "kind": "text",
         "text": "Verse",
-        "x": 27,
+        "x": 27.15,
         "y": 6.5,
         "font": "body",
         "size": 1.5,
@@ -318,7 +318,7 @@
       {
         "kind": "text",
         "text": "Bridge",
-        "x": 39.9,
+        "x": 40.05,
         "y": 6.5,
         "font": "body",
         "size": 1.5,
@@ -329,7 +329,7 @@
       {
         "kind": "text",
         "text": "Coda",
-        "x": 52.8,
+        "x": 52.95,
         "y": 6.5,
         "font": "body",
         "size": 1.5,

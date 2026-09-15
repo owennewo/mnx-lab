@@ -2318,15 +2318,26 @@ export const LABEL_PAD_SP = 0.6;
 /** What a heading mark's placement needs to know about its bar. */
 export type MeasureHeading = Pick<MeasurePlan, 'contentStartX' | 'x' | 'voices'>;
 
+/**
+ * Where text that starts AT a column starts: this far left of the column's
+ * centre, which is the black notehead's left edge. One value for every such
+ * text — a heading mark over the first note, a chord symbol, a direction, a
+ * mid-bar tempo — so they share an edge. Two leads read as two alignments:
+ * the heading row used to lead by 1.5sp, which put "Intro" and the tempo over
+ * the first note's accidental while the direction under them started at the
+ * notehead's centre (the Soundslice comparison, 2026-09-15).
+ */
+export const ONSET_TEXT_LEAD_SP = 0.6;
 /** How far a heading mark leads the ink it belongs to. */
-const HEADING_LEAD_SP = 1.5;
+const HEADING_LEAD_SP = ONSET_TEXT_LEAD_SP;
 
 /**
  * Where a bar's heading marks start — the metronome mark, the swing marking,
  * the section/rehearsal labels, the tab capo line.
  *
- * All of them lead the bar's FIRST ONSET by `HEADING_LEAD_SP`, and never start
- * before the content anchor. The anchor is what keeps the mark off the prefix:
+ * All of them lead the bar's FIRST ONSET by `HEADING_LEAD_SP` — the notehead's
+ * left edge, the same edge every other text at a column starts from — and
+ * never start before the content anchor. The anchor is what keeps the mark off the prefix:
  * with a clef, a key or a time signature on show it sits just past them, and
  * at a forward repeat it already clears the whole `|:` cluster and its dots.
  * The onset is what keeps the mark on the music: with the prefix hidden (or

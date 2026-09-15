@@ -485,7 +485,7 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
     emitHarmonies({ gm, m, stdSequences, staffTop, scan: primitives.slice(rowStart[m.row]), primitives });
     const tempoTop = emitTempoMark({
       gm, m, staffTop, scan: primitives.slice(rowStart[m.row]), primitives,
-      onsetXs: measureOnsetXs(stdSequences[0], m.voices[0] ?? [])
+      onsetXs: measureOnsetXs(stdSequences, m.voices)
     });
     const swingTop = emitSwingMark({
       swing: swingTimeline[writtenIndex(plan, i)], m, staffTop,

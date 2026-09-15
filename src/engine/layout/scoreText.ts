@@ -9,7 +9,7 @@ import {
 import { Primitive, translatePrimitiveY } from '../primitives.ts';
 import { glyphBBox } from '../smufl/smufl.ts';
 import { computeBoundsSp, type BoundsSp } from '../render/bounds.ts';
-import { durationValue, tremoloDuration, tupletDuration, measureHeadingX, type MeasureHeading } from './spacing.ts';
+import { durationValue, tremoloDuration, tupletDuration, measureHeadingX, ONSET_TEXT_LEAD_SP, type MeasureHeading } from './spacing.ts';
 import { chordSymbolDisplay } from '../../model/harmony.ts';
 import type { ResolvedSwing, SwingTimelineEntry } from '../../model/swing.ts';
 
@@ -139,9 +139,8 @@ export interface OnsetX {
   x: number;
 }
 
-/** Onset → column x for the first staff-1 voice — the anchor map for
- *  measure-attached markings with a `position`/`location`. */
-export function measureOnsetXs(seq: MnxSequence | undefined, slots: { x: number }[]): OnsetX[] {
+/** Onset → column x for one voice. */
+function voiceOnsetXs(seq: MnxSequence | undefined, slots: { x: number }[]): OnsetX[] {
   const onsetXs: OnsetX[] = [];
   let t = 0;
   (seq?.content ?? []).forEach((item, idx) => {
@@ -150,6 +149,27 @@ export function measureOnsetXs(seq: MnxSequence | undefined, slots: { x: number 
     t += isGrace(item) ? 0 : isTremolo(item) ? tremoloDuration(item) : isTuplet(item) ? tupletDuration(item) : isTimedEvent(item) ? durationValue(item.duration) : 0.25;
   });
   return onsetXs;
+}
+
+/**
+ * Onset → column x over EVERY voice on a staff, in time order — the anchor
+ * map for measure-attached markings with a `position`/`location`. The union
+ * matters: a marking at a position only a second voice sounds (the "I" of
+ * "I got a kind…", on the bass voice's upbeat) has a column of its own, and
+ * a map read off the first voice alone snapped it forward to the next
+ * first-voice column, on top of whatever that column carried.
+ *
+ * Columns are onset-aligned across voices, so two voices at one onset share
+ * an x; the first voice's is kept where they differ within tolerance.
+ */
+export function measureOnsetXs(seqs: readonly (MnxSequence | undefined)[], slotsByVoice: readonly { x: number }[][]): OnsetX[] {
+  const merged: OnsetX[] = [];
+  seqs.forEach((seq, v) => {
+    for (const o of voiceOnsetXs(seq, slotsByVoice[v] ?? [])) {
+      if (!merged.some(m => Math.abs(m.t - o.t) < 1e-6)) merged.push(o);
+    }
+  });
+  return merged.sort((a, b) => a.t - b.t);
 }
 
 /** The column at (or first after) a metric position; positions past the last
@@ -188,7 +208,7 @@ export function emitNavigationMarkers(args: EmitNavigationMarkersArgs): void {
   const { gm, m, stdSequences, staffTop, primitives } = args;
   if (!gm.segno && !gm.fine && !gm.jump) return;
 
-  const onsetXs = measureOnsetXs(stdSequences[0], m.voices[0] ?? []);
+  const onsetXs = measureOnsetXs(stdSequences, m.voices);
   const y = staffTop - NAV_MARKER_RISE_SP;
   const place = (loc?: { fraction: [number, number] }) => {
     const f = loc?.fraction;
@@ -440,7 +460,7 @@ export function emitTempoMark(args: EmitTempoMarkArgs): BoundsSp | null {
     const t = Array.isArray(f) && f[1] ? f[0] / f[1] : 0;
     const anchored = !!(tempo.location && onsetXs);
     const x = anchored ? anchorAt(onsetXs!, t, m).x : index === 0 ? x0 : x0 + 6 * index;
-    const placed = emitOneTempo(tempo, x, anchored ? -0.6 : 0, staffTop, [...scan, ...primitives.slice(before)], primitives);
+    const placed = emitOneTempo(tempo, x, anchored ? -ONSET_TEXT_LEAD_SP : 0, staffTop, [...scan, ...primitives.slice(before)], primitives);
     if (placed && (!top || placed.y < top.y)) top = placed;
   });
   return top;
@@ -495,7 +515,6 @@ function emitOneTempo(
 // the tempo and the labels stack above it (they are emitted after it and scan
 // its ink). core-chord-symbols.md.
 const HARMONY_SIZE_SP = 1.8;
-const HARMONY_LEAD_SP = 0.6; // the symbol starts a touch left of the column
 
 export interface EmitHarmoniesArgs {
   gm: MnxGlobalMeasure;
@@ -511,7 +530,7 @@ export function emitHarmonies(args: EmitHarmoniesArgs): void {
   const { gm, m, stdSequences, staffTop, scan, primitives } = args;
   const harmonies = gm._x?.mnxLab?.harmonies ?? [];
   if (harmonies.length === 0) return;
-  const onsetXs = measureOnsetXs(stdSequences[0], m.voices[0] ?? []);
+  const onsetXs = measureOnsetXs(stdSequences, m.voices);
   const before = primitives.length;
   for (const harmony of harmonies) {
     const f = harmony.location?.fraction;
@@ -521,7 +540,7 @@ export function emitHarmonies(args: EmitHarmoniesArgs): void {
     primitives.push({
       kind: 'text',
       text: chordSymbolDisplay(harmony),
-      x: p.anchor === 'end' ? p.x : p.x - HARMONY_LEAD_SP,
+      x: p.anchor === 'end' ? p.x : p.x - ONSET_TEXT_LEAD_SP,
       y: 0,
       font: 'body',
       size: HARMONY_SIZE_SP,

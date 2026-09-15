@@ -4772,7 +4772,7 @@
       {
         "kind": "text",
         "text": "Head",
-        "x": 11.3156,
+        "x": 11.4656,
         "y": 5.44,
         "font": "body",
         "size": 1.5,
@@ -4783,7 +4783,7 @@
       {
         "kind": "text",
         "text": "Turnaround",
-        "x": 8.8156,
+        "x": 8.9656,
         "y": 59.105,
         "font": "body",
         "size": 1.5,

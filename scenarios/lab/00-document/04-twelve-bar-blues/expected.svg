@@ -548,6 +548,6 @@
 <line x1="435.5488" y1="573.632" x2="435.5488" y2="532.32" stroke-width="1.92" class="stem"></line>
 <line x1="478.8944" y1="565.632" x2="478.8944" y2="528.32" stroke-width="1.92" class="stem"></line>
 <line x1="434.5888" y1="532.32" x2="479.8544" y2="528.32" stroke-width="8" class="beam"></line>
-<text x="181.0496" y="87.04" font-size="24" font-weight="bold" style="font-family:var(--font-family-sans)" class="section-label">Head</text>
-<text x="141.0496" y="945.68" font-size="24" font-weight="bold" style="font-family:var(--font-family-sans)" class="section-label">Turnaround</text>
+<text x="183.4496" y="87.04" font-size="24" font-weight="bold" style="font-family:var(--font-family-sans)" class="section-label">Head</text>
+<text x="143.4496" y="945.68" font-size="24" font-weight="bold" style="font-family:var(--font-family-sans)" class="section-label">Turnaround</text>
 </svg>
