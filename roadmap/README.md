@@ -45,6 +45,12 @@ proposals that name their campaign.
 
 ### proposed/
 
+- **[core-space-units-sp.md](proposed/core-space-units-sp.md)** — Space becomes a number in
+  staff spaces (air after a quarter note), 0 to a calibrated ceiling, and every horizontal
+  consumer is one clamped line `max(0, m·x + c)`: the intercepts are the zero engraving,
+  margin included. A deliberate recalibration — goldens move, one corpus-wide batch. The
+  calibration decision [core-staff-space-clearance.md](complete/core-staff-space-clearance.md)
+  deferred; Staff waits its turn.
 
 - **[studio-player-practice.md](proposed/studio-player-practice.md)** — campaign item 13,
   studio's first player feature in `elements/`: loop the selection with the **written-range
