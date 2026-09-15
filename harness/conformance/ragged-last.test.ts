@@ -18,6 +18,7 @@ import {
   capLastRowStretch,
   MAX_STRETCH,
   MIN_SQUEEZE,
+  SPACE_DEFAULT_SP,
   type PackingInput
 } from '../../src/engine/layout/spacing.ts';
 import { initSmufl } from '../helpers/corpusPrimitives.ts';
@@ -105,7 +106,7 @@ describe('ragged last', () => {
         } catch {
           continue; // unsupported content — not this test's business
         }
-        const rows = packSystems(packing, 1);
+        const rows = packSystems(packing, SPACE_DEFAULT_SP);
         if (rows.length < 2) continue;
         multiSystem++;
         const others = rows.slice(0, -1).map(r => r.stretch);
@@ -127,7 +128,7 @@ describe('ragged last', () => {
     let bit = 0;
     for (let widthSp = 50; widthSp <= 140; widthSp += 5) {
       const packing = planHorizontal(mnx, widthSp).packing;
-      const rows = packSystems(packing, 1);
+      const rows = packSystems(packing, SPACE_DEFAULT_SP);
       if (rows.length < 2) continue;
       const raw = rawStretches(packing, rows);
       const last = rows[rows.length - 1].stretch;
@@ -143,14 +144,14 @@ describe('ragged last', () => {
 
   it('a LOOSE page keeps its leftover row: the ceiling is the page, not the constant', () => {
     initSmufl();
-    // 18.4sp of line is the staff at 640% on a full-width pane, and 6% density
-    // on top: one bar per system, every full row stretching far past
+    // 18.4sp of line is the staff at 640% on a full-width pane, and 0.3sp of
+    // Space on top: one bar per system, every full row stretching far past
     // MAX_STRETCH to reach the margin. The final stranded bar used to be
     // pinned at 2.5 — the TIGHTEST system on a very loose page, which is the
     // exact inversion of what this rule exists to prevent — and its stretch
     // was then the only thing on the page density could still move.
     const packing = planHorizontal(doc('lab/document/twelve-bar-blues'), 1180 / 64).packing;
-    const rows = packSystems(packing, 0.06);
+    const rows = packSystems(packing, 0.3);
     expect(rows.length).toBeGreaterThan(2);
     const others = rows.slice(0, -1).map(r => r.stretch);
     // The page IS loose — that is the premise, and the first system being
@@ -164,7 +165,7 @@ describe('ragged last', () => {
   it('a single-system score is untouched — one system is not a page', () => {
     initSmufl();
     const packing = planHorizontal(doc('lab/tab-positions/open-strings-chord'), 80).packing;
-    const rows = packSystems(packing, 1);
+    const rows = packSystems(packing, SPACE_DEFAULT_SP);
     expect(rows.length).toBe(1);
     expect(rows[0].stretch).toBe(ruledStretches(packing, [rows[0]])[0]);
   });
@@ -177,7 +178,7 @@ describe('ragged last', () => {
     let checked = 0;
     for (const widthSp of [70, 80, 100]) {
       const priced = planHorizontal(mnx, widthSp, { inkRatio: 1.3 });
-      const rows = packSystems(priced.packing, 1);
+      const rows = packSystems(priced.packing, SPACE_DEFAULT_SP);
       if (rows.length < 2) continue;
       const lead = (plan: typeof priced, i: number) =>
         plan.measures[i].contentStartX - plan.measures[i].repeatStartX;

@@ -109,7 +109,7 @@ import {
   MAX_STAFF_SCALE,
   type RenderScale
 } from '../engine/render/scale.ts';
-import { MIN_DENSITY, MAX_DENSITY, neighbourSystemMeasure } from '../engine/layout/spacing.ts';
+import { MIN_SPACE_SP, MAX_SPACE_SP, neighbourSystemMeasure } from '../engine/layout/spacing.ts';
 import type { LocalDocumentSource } from '../importers/localFile.ts';
 
 /** The setup popovers, as data — one row per attribute rather than a ternary
@@ -207,9 +207,14 @@ function storedFallbacks(): string[] {
    value: no staff scale means FITTED, which no number can express. */
 const STAFF_SCALE_KEY = 'mnx-lab.staff-scale';
 const SPACING_MODE_KEY = 'mnx-lab.spacing-mode';
-const DENSITY_H_KEY = 'mnx-lab.density-h';
+/* Space in staff spaces (core-space-units-sp.md, 2026-09-15). The multiplier
+   it replaced lived under `mnx-lab.density-h`; a browser still carrying that
+   key is tidied on load rather than converted — the value was a convenience. */
+const SPACE_SP_KEY = 'mnx-lab.space-sp';
+const RETIRED_DENSITY_H_KEY = 'mnx-lab.density-h';
 
 function storedScale(key: string, min: number, max: number): number | null {
+  localStorage.removeItem(RETIRED_DENSITY_H_KEY);
   const raw = localStorage.getItem(key);
   if (raw === null) return null;
   const n = Number(raw);
@@ -594,9 +599,9 @@ export class ScenarioPage extends LitElement {
   );
   @state() private spacingMode: 'natural' | 'fill' = localStorage.getItem(SPACING_MODE_KEY) === 'natural' ? 'natural' : 'fill';
   @state() private densityH: number | null = storedScale(
-    DENSITY_H_KEY,
-    MIN_DENSITY,
-    MAX_DENSITY
+    SPACE_SP_KEY,
+    MIN_SPACE_SP,
+    MAX_SPACE_SP
   );
   /** What the viewer's last paint actually used, so a fitted readout can print
    *  a true number instead of assuming 100%. */
@@ -3004,8 +3009,8 @@ export class ScenarioPage extends LitElement {
     // sentinel — otherwise the next load could not tell "fitted" from "1.0".
     if (staffScale === null) localStorage.removeItem(STAFF_SCALE_KEY);
     else localStorage.setItem(STAFF_SCALE_KEY, String(staffScale));
-    if (densityH === null) localStorage.removeItem(DENSITY_H_KEY);
-    else localStorage.setItem(DENSITY_H_KEY, String(densityH));
+    if (densityH === null) localStorage.removeItem(SPACE_SP_KEY);
+    else localStorage.setItem(SPACE_SP_KEY, String(densityH));
   }
 
   /** The invalid-by-design exhibit: pinned schema errors, each row locating

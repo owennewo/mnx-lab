@@ -9,7 +9,8 @@ export const VIEW_KEY = 'mnx-studio.view';
 export const DISPLAY_KEY = 'mnx-studio.display';
 export const UNROLLED_KEY = 'mnx-studio.unrolled';
 export const STAFF_SCALE_KEY = 'mnx-studio.staff-scale';
-export const DENSITY_H_KEY = 'mnx-studio.density-h';
+/** Space in staff spaces (core-space-units-sp.md). */
+export const SPACE_SP_KEY = 'mnx-studio.space-sp';
 export const SPACING_MODE_KEY = 'mnx-studio.spacing-mode';
 /** The score frame: whether the reader left the score focused, its strips hidden. */
 export const FOCUSED_KEY = 'mnx-studio.focused';
@@ -36,6 +37,13 @@ export function readFocused(): boolean {
   write('mnx-studio.tools-open', null);
   write('mnx-studio.player-open', null);
   return read(FOCUSED_KEY) === 'true';
+}
+/** The Space preference. The multiplier it replaced (2026-09-15) lived under
+ *  `mnx-studio.density-h`; a browser still carrying it is tidied here rather
+ *  than converted — the value was a convenience. */
+export function readSpaceSp(): number | null {
+  write('mnx-studio.density-h', null);
+  return readNumber(SPACE_SP_KEY);
 }
 export function readNumber(key: string): number | null {
   const raw = read(key);

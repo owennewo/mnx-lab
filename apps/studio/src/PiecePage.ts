@@ -43,7 +43,7 @@ import { sourceGlyph } from './SourceSheet.ts';
 import type { TagsSnapshot } from './TagsSheet.ts';
 import type { InstrumentPart } from './InstrumentsSheet.ts';
 
-import { VIEW_KEY, DISPLAY_KEY, UNROLLED_KEY, STAFF_SCALE_KEY, DENSITY_H_KEY, SPACING_MODE_KEY, FOCUSED_KEY, read, write, readView, readDisplay, readNumber, readFocused, readParts, writeParts } from './scorePreferences.ts';
+import { VIEW_KEY, DISPLAY_KEY, UNROLLED_KEY, STAFF_SCALE_KEY, SPACE_SP_KEY, SPACING_MODE_KEY, FOCUSED_KEY, read, write, readView, readDisplay, readNumber, readSpaceSp, readFocused, readParts, writeParts } from './scorePreferences.ts';
 
 const back = html`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"></path></svg>`;
 /** Instruments: three faders, each knob at its own level. */
@@ -79,7 +79,7 @@ export class PiecePage extends LitElement {
   @state() private display: DisplayOptions = readDisplay();
   @state() private unrolled = read(UNROLLED_KEY) === 'true';
   @state() private staffScale: number | null = readNumber(STAFF_SCALE_KEY);
-  @state() private densityH: number | null = readNumber(DENSITY_H_KEY);
+  @state() private densityH: number | null = readSpaceSp();
   @state() private spacingMode: 'natural' | 'fill' = read(SPACING_MODE_KEY) === 'natural' ? 'natural' : 'fill';
   @state() private effectiveStaffScale = 1;
   /** Whether the reader left the score focused (the frame's strips hidden) — a per-browser preference. */
@@ -269,7 +269,7 @@ export class PiecePage extends LitElement {
     // Absence is the "unset" state, so reset REMOVES rather than writing a
     // sentinel — otherwise the next load could not tell "fitted" from "1.0".
     write(STAFF_SCALE_KEY, staffScale === null ? null : String(staffScale));
-    write(DENSITY_H_KEY, densityH === null ? null : String(densityH));
+    write(SPACE_SP_KEY, densityH === null ? null : String(densityH));
   }
   private onSpacingModeChange(event: CustomEvent<'natural' | 'fill'>) {
     this.spacingMode = event.detail;

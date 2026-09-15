@@ -82,9 +82,11 @@ const MULTIREST_WIDTH_SP = 10;     // content width of a collapsed H-bar measure
 const LYRIC_CHAR_WIDTH_SP = LYRIC_SIZE_SP * 0.56;
 const LYRIC_SIDE_PAD_SP = 0.35;    // clearance either side of a syllable
 const ONSET_EPS = 1e-6;            // float tolerance for metric positions
-/** Ideal space after a quarter note, in staff spaces, at density 1 — the unit
- *  the SPACE axis is a multiplier ON, which is why it is exported: a control
- *  printing a percentage should be able to say what of. */
+/** Ideal space after a quarter note, in staff spaces, at the default Space —
+ *  and the DEFINITION of the Space unit: Space `x` IS the air after a quarter
+ *  note, so at `x = QUARTER_SPRING_SP` every spring is its base value
+ *  (`SPACE_LINES.spring` is the identity there). Exported so a control can say
+ *  what its number is. */
 export const QUARTER_SPRING_SP = 2.2;
 const MEASURE_LEAD_FACTOR = 0.5;   // barline→first-note spring, as a fraction of
                                    // the first event's spring — it stretches with
@@ -121,94 +123,134 @@ export function tupletDuration(t: MnxTuplet): number {
 }
 
 /**
- * Density clamp: enough range to be useful, bounded so a bad value cannot
- * produce a plan the justifier then has to rescue.
+ * The Space axis, in STAFF SPACES (roadmap/inprogress/core-space-units-sp.md).
  *
- * `MIN_DENSITY` is a LEGIBILITY floor, not a collision floor — and the
- * distinction is load-bearing (core-zoom-density-pad.md, ruling 1). Density
- * scales the springs and never the rigid columns, so no value here can make
- * two glyphs overlap; at the bottom of the range they simply abut. A control
- * offering this axis should show the floor rather than compute one.
+ * `x` is the air after a quarter note. The default is `QUARTER_SPRING_SP`
+ * (2.2sp), the floor is a true zero, and the ceiling is a calibration choice
+ * (see the ladder notes below). Every horizontal consumer of Space is one
+ * CLAMPED LINE in `x`, `max(0, m·x + c)`, written here as the pair
+ * `{ atZero, atDefault }` — what remains at `x = 0` and what the consumer is at
+ * the default — because the intercept vector IS the zero engraving, and that is
+ * the thing calibration starts from. A negative `atZero` is a consumer that
+ * runs out before the springs do (the clamp holds it at zero from there); a
+ * positive one keeps a floor.
  *
- * Exported because the clamp used to be silent: a host asking for 0.2 got 0.5
- * and was never told. A control has to know where the wall is to say it is
- * against it.
- *
- * **Retuned 0.5 → 0.02 on 2026-08-15**, the retune ruling 1 of
- * core-zoom-density-pad.md explicitly reserved for its own evidence rather
- * than letting it ride in on a control. Measured on `twelve-bar-blues` at the
- * workbench's own line width: 0.5 and 0.25 both pack it into three systems,
- * 0.1 into **two**, and 0.02 puts a **seventh bar on the first system**. Each
- * of those is a whole page-turn's worth of music, so the old floor was
- * bounding the *control*, not legibility.
- *
- * The floor is now 0.01 for direct Natural-spacing control. It is a stable
- * control bound, not a claim that every score has reached its packing limit.
- * Actual capacity depends on the score, symbol size, and available width.
- * Natural spacing can continue to shrink visible gaps even when line breaks
- * remain unchanged; Fill width can absorb that change in justification.
+ * The floor is a LEGIBILITY floor, not a collision floor — the distinction is
+ * load-bearing (core-zoom-density-pad.md ruling 1). Space scales the springs
+ * and the discretionary air and never the rigid columns, so no value here can
+ * make two glyphs overlap; at zero they simply abut. Its earlier life as a
+ * multiplier with a 0.01 floor made the springs effectively zero already; what
+ * kept "as tight as possible" out of reach was a 1sp margin floor and a 0.15sp
+ * pad floor, both gone with the root curves they lived in.
  *
  * The other cost at the bottom is *proportional* notation: springs carry
  * duration, so squeezing them squeezes the difference between a quarter's
- * space and an eighth's. Below ~0.2 that difference stops being legible and
- * rhythm is read from noteheads and beams. That is a trade a reader on a
- * tablet may want to make, and not one a constant should make for them. The
- * collision guarantee is untouched at any value — asserted at the floor and
- * below it in `zoom-density.test.ts`.
+ * space and an eighth's. Below roughly 0.4sp that difference stops being
+ * legible and rhythm is read from noteheads and beams — a trade a reader on a
+ * tablet may want to make, and not one a constant should make for them. If
+ * calibration decides some proportion must survive at zero, that is
+ * `SPACE_LINES.spring.atZero > 0`, not a higher floor.
+ *
+ * **The ceiling** is where a system holds one bar, then no further: a line
+ * cannot hold fewer than one bar, and inside a line the justifier normalizes
+ * what Space did. On a long score the top of the range is inert, the ladder
+ * reports it as inert, and the pad's arm greys out; on a short score it keeps
+ * spreading. Measured on `twelve-bar-blues` at the workbench's own line width
+ * the multiplier reached one bar per system at 4× ≈ 8.8sp.
  */
-/**
- * **Ceiling raised 2 → 8 on 2026-08-21, alongside the staff-scale ceiling, for
- * low-vision readers.** The floor's retune note above is about how far the
- * knob keeps *packing*; this end is about how far it keeps *spreading*, and
- * the honest answer is "until a system holds one bar, then no further" — a
- * line cannot hold fewer than one bar, and inside a line the justifier
- * normalizes what density did. So on a long score the top of this range is
- * inert, the ladder reports it as inert, and the pad's arm greys out; on a
- * score short enough to sit against `MAX_STRETCH` it keeps spreading all the
- * way. Both are honest, and neither is a reason for the CONSTANT to stop
- * short of what some score can use. Measured on `twelve-bar-blues` at the
- * workbench's own line width: the old ceiling of 2 left three bars on a
- * system, and 4 is where it reaches one.
- */
-export const MIN_DENSITY = 0.01;
-export const MAX_DENSITY = 8;
+export const SPACE_DEFAULT_SP = QUARTER_SPRING_SP;
+export const MIN_SPACE_SP = 0;
+export const MAX_SPACE_SP = 8;
 
-/** Relationship-specific knobs; discretionary air responds more gently than time. */
-const HORIZONTAL_AIR = {
-  padFloorSp: 0.15,
-  marginNormalSp: 2,
-  marginMinSp: 1,
-  marginMaxSp: 3,
-  prefixTightExtraSp: -0.15,
-  prefixSpaciousExtraSp: 1.2
+/** One consumer's response to Space: a clamped line through two named points. */
+export interface SpaceLine {
+  /** The value at `x = 0` — this consumer's share of the zero engraving. */
+  atZero: number;
+  /** The value at `x = SPACE_DEFAULT_SP`. */
+  atDefault: number;
+}
+
+/** `max(0, m·x + c)` for the line through the two points. Written so that the
+ *  default evaluates to `atDefault` EXACTLY in floating point when `atZero` is
+ *  0 — the ratio `x / SPACE_DEFAULT_SP` is 1 there, not 0.999…, which is what
+ *  lets the calibrated default keep byte-stable goldens. */
+export function spaceLineAt(line: SpaceLine, x: number): number {
+  return Math.max(0, line.atZero + (line.atDefault - line.atZero) * (x / SPACE_DEFAULT_SP));
+}
+
+/** The pads that follow Space. Glyph SLOTS are rigid and are not here. */
+export type PadKind = 'contentLeft' | 'startBarline' | 'keySigRight' | 'contentRight';
+
+/**
+ * The calibration table — every horizontal consumer and its two numbers.
+ * `spring` is a FACTOR on each duration's base spring (`springSp`), so the
+ * line per duration is `base(dur) × spring(x)`: `m` and `c` both shaped by
+ * duration, which is what keeps a whole note wider than an eighth at every
+ * `x` (including zero, if `atZero` is ever raised above 0). The leading spring
+ * is a fixed fraction of the first event's spring (`MEASURE_LEAD_FACTOR`) and
+ * so rides the same line.
+ */
+export const SPACE_LINES: { spring: SpaceLine; margin: SpaceLine } & Record<PadKind, SpaceLine> = {
+  spring: { atZero: 0, atDefault: 1 },
+  margin: { atZero: 0, atDefault: 2 },
+  contentLeft: { atZero: 0, atDefault: CONTENT_LEFT_PAD_SP },
+  startBarline: { atZero: 0, atDefault: START_BARLINE_PAD_SP },
+  keySigRight: { atZero: 0, atDefault: KEY_SIG_RIGHT_PAD_SP },
+  contentRight: { atZero: 0, atDefault: CONTENT_RIGHT_PAD_SP }
 };
 
-/** Horizontal breathing room follows Space, more gently than rhythmic springs.
- * Vertical gaps remain staff-space constants and scale once in the SVG emitter. */
-export function horizontalWhitespace(densityH = 1) {
-  const density = clampDensity(densityH);
-  const factor = Math.sqrt(density);
-  const air = HORIZONTAL_AIR;
+/** What Space resolves to at `x`: the spring factor, the page margin, each
+ *  pad, and the (legacy-only) spare tail on clef/time slots. The legacy
+ *  explicit-clearance frame produces the same shape (`legacySpacePolicy`), so
+ *  the planner and the packer read one interface. */
+export interface SpacePolicy {
+  spring: number;
+  horizontalMargin: number;
+  pad: (kind: PadKind) => number;
+  prefixGroupExtra: number;
+}
+
+export function spacePolicy(densityH = SPACE_DEFAULT_SP): SpacePolicy {
+  const x = clampSpace(densityH);
   return {
-    horizontalMargin: Math.max(air.marginMinSp,
-      Math.min(air.marginMaxSp, air.marginNormalSp * Math.sqrt(factor))),
-    prefixPad: (normal: number) => density === 1 ? normal : Math.max(air.padFloorSp, normal * factor),
-    prefixGroupExtra: density === 1 ? 0 : density < 1
-      ? air.prefixTightExtraSp * (1 - factor) / (1 - Math.sqrt(MIN_DENSITY))
-      : air.prefixSpaciousExtraSp * (factor - 1) / (Math.sqrt(MAX_DENSITY) - 1)
+    spring: spaceLineAt(SPACE_LINES.spring, x),
+    horizontalMargin: spaceLineAt(SPACE_LINES.margin, x),
+    pad: kind => spaceLineAt(SPACE_LINES[kind], x),
+    prefixGroupExtra: 0
   };
 }
 
-type HorizontalWhitespace = ReturnType<typeof horizontalWhitespace>;
-interface PrefixAir { pads: number[]; groups: number }
-function prefixAir(air: PrefixAir, policy: HorizontalWhitespace): number {
-  return air.pads.reduce((sum, normal) => sum + policy.prefixPad(normal), 0)
+const PAD_NORMAL_SP: Record<PadKind, number> = {
+  contentLeft: CONTENT_LEFT_PAD_SP,
+  startBarline: START_BARLINE_PAD_SP,
+  keySigRight: KEY_SIG_RIGHT_PAD_SP,
+  contentRight: CONTENT_RIGHT_PAD_SP
+};
+
+/** An explicit host `clearance`/`densityPad` keeps its historical pad and
+ *  margin policy; only the springs follow the Space line. */
+function legacySpacePolicy(densityH: number, clearance?: number, densityPad?: number | null): SpacePolicy {
+  const frame = clearanceSpacing(clearance, densityPad);
+  return {
+    spring: spaceLineAt(SPACE_LINES.spring, clampSpace(densityH)),
+    horizontalMargin: frame.horizontalMargin,
+    pad: kind => frame.prefixPad(PAD_NORMAL_SP[kind]),
+    prefixGroupExtra: frame.prefixGroupExtra
+  };
+}
+
+interface PrefixAir { pads: PadKind[]; groups: number }
+function prefixAir(air: PrefixAir, policy: SpacePolicy): number {
+  return air.pads.reduce((sum, kind) => sum + policy.pad(kind), 0)
     + air.groups * policy.prefixGroupExtra;
 }
 
-export function clampDensity(value: number | undefined): number {
-  if (value === undefined || !Number.isFinite(value)) return 1;
-  return Math.min(MAX_DENSITY, Math.max(MIN_DENSITY, value));
+/** A bad value degrades to the default rather than throwing. Exported because
+ *  the clamp used to be silent: a control has to know where the wall is to say
+ *  it is against it. */
+export function clampSpace(value: number | undefined): number {
+  if (value === undefined || !Number.isFinite(value)) return SPACE_DEFAULT_SP;
+  return Math.min(MAX_SPACE_SP, Math.max(MIN_SPACE_SP, value));
 }
 
 /**
@@ -233,9 +275,9 @@ export function clampInkRatio(value: number | undefined): number {
  * and temporary — adopting these functions there is the follow-up recorded in
  * roadmap/inprogress/core-touch-gestures.md.
  */
-export const DENSITY_STEP = 0.04;
+export const SPACE_STEP_SP = 0.1;
 
-/** Float slack when comparing against ladder rungs (they are 1% grid values). */
+/** Float slack when comparing against ladder rungs (they are 0.01sp grid values). */
 const RUNG_EPS = 1e-6;
 
 /**
@@ -249,12 +291,12 @@ const RUNG_EPS = 1e-6;
  * landing on the rung turns one step of "a bit tighter" into a collapse. The
  * walk lands on the near side instead. Going up, the rung IS the near side.
  *
- * With no ladder (`null`) it steps a flat percentage — the caller stays usable
+ * With no ladder (`null`) it steps a flat `SPACE_STEP_SP` — the caller stays usable
  * when there is nobody to ask.
  */
 export function nextDensity(from: number, dir: 1 | -1, ladder: number[] | null): number | null {
   if (!ladder || ladder.length === 0) {
-    const next = clampDensity(Math.round((from + dir * DENSITY_STEP) * 100) / 100);
+    const next = clampSpace(Math.round((from + dir * SPACE_STEP_SP) * 100) / 100);
     return next === from ? null : next;
   }
   let cur = -1;
@@ -262,17 +304,17 @@ export function nextDensity(from: number, dir: 1 | -1, ladder: number[] | null):
   if (dir > 0) {
     const ahead = ladder.slice(cur + 1);
     if (ahead.length === 0) return null;
-    return ahead.find(v => v - from >= DENSITY_STEP - RUNG_EPS) ?? ahead[0];
+    return ahead.find(v => v - from >= SPACE_STEP_SP - RUNG_EPS) ?? ahead[0];
   }
   const below = ladder.slice(0, Math.max(0, cur));
   if (below.length === 0) return null;
   const rung =
-    [...below].reverse().find(v => from - v >= DENSITY_STEP - RUNG_EPS) ?? below[below.length - 1];
+    [...below].reverse().find(v => from - v >= SPACE_STEP_SP - RUNG_EPS) ?? below[below.length - 1];
   const index = ladder.indexOf(rung);
   // The top of that run: one grid step under the next rung up. There is always
   // a next one — `rung` came from strictly below the current run.
-  const top = Math.round((ladder[index + 1] - DENSITY_GRID) * 100) / 100;
-  return Math.max(rung, Math.min(top, Math.round((from - DENSITY_STEP) * 100) / 100));
+  const top = Math.round((ladder[index + 1] - SPACE_GRID_SP) * 100) / 100;
+  return Math.max(rung, Math.min(top, Math.round((from - SPACE_STEP_SP) * 100) / 100));
 }
 
 /** `steps` rungs from `from`, stopping where the walk runs out. Absolute from a
@@ -295,8 +337,8 @@ export function walkDensity(
 // ---------- System packing (shared with the density ladder) ----------
 
 /**
- * One packable measure, captured at density 1: every number the system packer
- * reads, and nothing else.
+ * One packable measure, captured at the spring BASE (the default Space): every
+ * number the system packer reads, and nothing else.
  *
  * Split out because the packer has a second caller. `densityLadder` re-packs
  * the same score at other densities to find the values that actually change
@@ -312,9 +354,9 @@ export interface MeasurePack {
   /** Prefix width mid-system (only what this measure itself declares). */
   prefixRest: number;
   rigid: number;
-  /** Σ springs at density 1 — the packer applies the multiplier. */
+  /** Σ base springs — the packer applies the Space line's factor. */
   spring: number;
-  /** Barline→first-event spring at density 1. */
+  /** Barline→first-event base spring. */
   lead: number;
   repeatExtra: number;
   forcedBreak: boolean;
@@ -328,28 +370,28 @@ export interface PackingInput {
   subsequentLineWidthSp?: number;
   /** Trailing pad after a measure's content. Carried rather than read from the
    *  module constant because Clearance resolves it, and the packer must use
-   *  the same width the placement pass will. Absent ⇒ the unscaled default,
-   *  which is what a ladder re-pack at density 1 wants. */
+   *  the same width the placement pass will. Absent ⇒ the default. */
   contentRightPadSp?: number;
   /** Re-price discretionary horizontal air when a ladder/gesture changes Space.
-   * Prefix descriptors align with measures; all data survives worker cloning. */
-  space?: { density: number; prefixes: { first: PrefixAir; rest: PrefixAir }[] };
+   * `spaceSp` is the Space this snapshot was priced at; prefix descriptors
+   * align with measures; all data survives worker cloning. */
+  space?: { spaceSp: number; prefixes: { first: PrefixAir; rest: PrefixAir }[] };
 }
 
 /** Reuse measured ink and springs while resolving the new horizontal padding. */
 function packingAtSpace(packing: PackingInput, densityH: number): PackingInput {
-  if (!packing.space || packing.space.density === densityH) return packing;
-  const old = horizontalWhitespace(packing.space.density);
-  const next = horizontalWhitespace(densityH);
+  if (!packing.space || packing.space.spaceSp === densityH) return packing;
+  const old = spacePolicy(packing.space.spaceSp);
+  const next = spacePolicy(densityH);
   const marginDelta = 2 * (old.horizontalMargin - next.horizontalMargin);
   return {
     ...packing,
-    space: { ...packing.space, density: densityH },
+    space: { ...packing.space, spaceSp: densityH },
     lineWidthSp: packing.lineWidthSp + marginDelta,
     ...(packing.subsequentLineWidthSp === undefined ? {} : {
       subsequentLineWidthSp: packing.subsequentLineWidthSp + marginDelta
     }),
-    contentRightPadSp: next.prefixPad(CONTENT_RIGHT_PAD_SP),
+    contentRightPadSp: next.pad('contentRight'),
     measures: packing.measures.map((m, i) => {
       const air = packing.space!.prefixes[i];
       return { ...m,
@@ -388,6 +430,7 @@ export interface PackedRow {
  */
 export function packSystems(packing: PackingInput, densityH: number): PackedRow[] {
   packing = packingAtSpace(packing, densityH);
+  const springFactor = spacePolicy(densityH).spring;
   const packs = packing.measures;
   const widthAt = (row: number) => row === 0 ? packing.lineWidthSp : packing.subsequentLineWidthSp ?? packing.lineWidthSp;
   const contentRightPad = packing.contentRightPadSp ?? CONTENT_RIGHT_PAD_SP;
@@ -397,7 +440,7 @@ export function packSystems(packing: PackingInput, densityH: number): PackedRow[
   let currentWidth = 0;
   packs.forEach((m, k) => {
     const content =
-      m.lead * densityH + m.rigid + m.spring * densityH + contentRightPad + m.repeatExtra;
+      m.lead * springFactor + m.rigid + m.spring * springFactor + contentRightPad + m.repeatExtra;
     const natural = (current.length === 0 ? m.prefixFirst : m.prefixRest) + content;
     // Which of the two reasons ended the row is recorded, not just that one
     // did: only the overflow reason means the row is FULL.
@@ -421,7 +464,7 @@ export function packSystems(packing: PackingInput, densityH: number): PackedRow[
       const m = packs[k];
       rowRigid +=
         (j === 0 ? m.prefixFirst : m.prefixRest) + m.rigid + contentRightPad + m.repeatExtra;
-      rowSpring += m.spring * densityH + m.lead * densityH;
+      rowSpring += m.spring * springFactor + m.lead * springFactor;
     });
     return { measures, full, stretch: rowStretch(widthAt(row) - rowRigid, rowSpring) };
   });
@@ -529,25 +572,25 @@ function justifyRows(rows: readonly { full: boolean; stretch: number }[], mode?:
 // ---------- The density ladder ----------
 
 /**
- * Grid the ladder is scanned on: 1% of the density range. Finer than any step
- * a control offers, so no distinct engraving can hide between two grid points.
+ * Grid the ladder is scanned on: 0.01sp of Space. Finer than any step a
+ * control offers, so no distinct engraving can hide between two grid points.
  */
 const LADDER_GRID = 100;
 
-/** The same grid as a density INCREMENT — exported because a control walking
+/** The same grid as a Space INCREMENT — exported because a control walking
  *  the ladder needs it to name a run's top edge: run i is
- *  `[ladder[i], ladder[i + 1] - DENSITY_GRID]`. */
-export const DENSITY_GRID = 1 / LADDER_GRID;
+ *  `[ladder[i], ladder[i + 1] - SPACE_GRID_SP]`. */
+export const SPACE_GRID_SP = 1 / LADDER_GRID;
 
 /**
  * What a density value actually DRAWS, compressed to a string.
  *
- * Two densities engrave identically iff they pack the same bars onto the same
- * lines AND agree on `densityH × stretch` — because every horizontal
- * coordinate downstream is `spring × densityH × stretch`. That product is the
- * whole subtlety, and it is why most density values are invisible: inside the
- * justifier's linear range, `stretch` is inversely proportional to `densityH`,
- * so the product — and therefore the engraving — is *exactly* unchanged.
+ * Two Space values engrave identically iff they pack the same bars onto the
+ * same lines AND agree on `springFactor × stretch` — because every horizontal
+ * coordinate downstream is `spring × springFactor × stretch`. That product is
+ * the whole subtlety, and it is why most values are invisible: inside the
+ * justifier's linear range, `stretch` is inversely proportional to the spring
+ * factor, so the product — and therefore the engraving — is *exactly* unchanged.
  * With legacy fixed whitespace, density only bites where packing changes or
  * stretch reaches a clamp. The default Space policy also changes margins and
  * prefix/bar padding; include those resolved widths in the signature.
@@ -563,17 +606,18 @@ export function packingSignature(
       const resolved = packingAtSpace(p, densityH);
       const air = p.space ? `${resolved.lineWidthSp.toFixed(6)}:${resolved.contentRightPadSp?.toFixed(6)}:` +
         resolved.measures.map(m => `${m.prefixFirst.toFixed(6)},${m.prefixRest.toFixed(6)}`).join('/') : '';
+      const springFactor = spacePolicy(densityH).spring;
       return air + packSystems(resolved, densityH)
-        .map(row => `${row.measures.join(',')}@${(densityH * row.stretch).toFixed(6)}`)
+        .map(row => `${row.measures.join(',')}@${(springFactor * row.stretch).toFixed(6)}`)
         .join('|');
     })
     .join(';');
 }
 
 /**
- * Every density value in `[MIN_DENSITY, MAX_DENSITY]` that engraves this score
+ * Every Space value in `[MIN_SPACE_SP, MAX_SPACE_SP]` that engraves this score
  * differently from the one below it — ascending, always starting at
- * `MIN_DENSITY`.
+ * `MIN_SPACE_SP`.
  *
  * This is what lets a control step density and get a visible result every
  * time. Stepping by a fixed percentage does not: on a justified score most of
@@ -589,7 +633,7 @@ export function packingSignature(
 export function densityLadder(packings: readonly PackingInput[]): number[] {
   const steps: number[] = [];
   let previous: string | null = null;
-  for (let n = MIN_DENSITY * LADDER_GRID; n <= MAX_DENSITY * LADDER_GRID; n++) {
+  for (let n = MIN_SPACE_SP * LADDER_GRID; n <= MAX_SPACE_SP * LADDER_GRID; n++) {
     const densityH = n / LADDER_GRID;
     const signature = packingSignature(packings, densityH);
     if (signature !== previous) {
@@ -1516,11 +1560,11 @@ export function planHorizontal(
   const tieTargets = tieTargetIds(mnx);
   const leftInset = options?.leftInsetSp ?? 0;
   const subsequentLeftInset = options?.subsequentLeftInsetSp ?? leftInset;
-  const densityH = clampDensity(options?.densityH);
+  const densityH = clampSpace(options?.densityH);
   // Explicit legacy clearance and densityPad retain their independent policy.
   const followsSpace = display.clearance === undefined && options?.densityPad == null;
-  const clearance = followsSpace ? horizontalWhitespace(densityH)
-    : clearanceSpacing(options?.display?.clearance, options?.densityPad);
+  const clearance = followsSpace ? spacePolicy(densityH)
+    : legacySpacePolicy(densityH, options?.display?.clearance, options?.densityPad);
   const marginSp = clearance.horizontalMargin;
   // The prefix's PADS follow Space (or an explicit legacy frame override);
   // glyph SLOTS are rigid and do not (core-zoom-density-pad.md ruling 1 — a clef
@@ -1528,7 +1572,7 @@ export function planHorizontal(
   // between the two, and it is the whole reason the gap before the first note
   // used to ignore the spacing control entirely: every part of it was on the
   // rigid side, including the parts that were only ever air.
-  const pad = clearance.prefixPad;
+  const pad = clearance.pad;
   const isTabOnly = options?.staffKind === 'tab';
   const arpeggioStarts = new Set(
     [...collectSpanMarks(mnx.parts ?? [])].filter(([, marks]) => marks.arpeggio).map(([id]) => id)
@@ -1537,10 +1581,10 @@ export function planHorizontal(
   // Keep glyph positions/size fixed and vary only the slot's trailing air.
   const clefSlot = (ink: number) => clefWidth * ink + clearance.prefixGroupExtra;
   const timeSlot = (ink: number) => TIME_SIG_WIDTH_SP * ink + clearance.prefixGroupExtra;
-  const contentLeftPad = pad(CONTENT_LEFT_PAD_SP);
-  const startBarlinePad = pad(START_BARLINE_PAD_SP);
-  const keySigRightPad = pad(KEY_SIG_RIGHT_PAD_SP);
-  const contentRightPad = pad(CONTENT_RIGHT_PAD_SP);
+  const contentLeftPad = pad('contentLeft');
+  const startBarlinePad = pad('startBarline');
+  const keySigRightPad = pad('keySigRight');
+  const contentRightPad = pad('contentRight');
   const startX = marginSp + leftInset;
   const lineWidth = widthSp - 2 * marginSp - leftInset;
   const forcedBreaks = options?.entries ? new Set<number>() : options?.forcedBreaks ?? new Set<number>();
@@ -1968,21 +2012,22 @@ export function planHorizontal(
   const airFor = (m: MeasureMetrics, first: boolean, index: number): PrefixAir => ({
     pads: [
       ...(bareRepeat(m, first) && (first || !previousClosesWithInk(index))
-        ? [] : [CONTENT_LEFT_PAD_SP, ...(first ? [START_BARLINE_PAD_SP] : [])]),
-      ...(keySigGlyphs(m, first) ? [KEY_SIG_RIGHT_PAD_SP] : [])
+        ? [] : ['contentLeft' as const, ...(first ? ['startBarline' as const] : [])]),
+      ...(keySigGlyphs(m, first) ? ['keySigRight' as const] : [])
     ],
     groups: Number(display.clefs !== 'hide' && (first || m.clefChanged))
       + Number(display.timeSignatures !== 'hide' && m.timeSigShow)
   });
 
-  // The packer's input, captured BEFORE density is applied — the ladder needs
-  // density-1 naturals to ask what any other value would draw.
+  // The packer's input, captured BEFORE the Space line is applied to the
+  // springs — the ladder needs base naturals to ask what any other value would
+  // draw.
   const packing: PackingInput = {
     spacingMode: options?.spacingMode,
     lineWidthSp: lineWidth,
     ...(options?.subsequentLeftInsetSp === undefined ? {} : { subsequentLineWidthSp: widthSp - 2 * marginSp - subsequentLeftInset }),
     contentRightPadSp: contentRightPad,
-    ...(followsSpace ? { space: { density: densityH, prefixes: metrics.flatMap((m, i) =>
+    ...(followsSpace ? { space: { spaceSp: densityH, prefixes: metrics.flatMap((m, i) =>
       m.hidden || !inRange(i) ? [] : [{ first: airFor(m, true, i), rest: airFor(m, false, i) }]) } } : {}),
     measures: metrics.flatMap((m, i) =>
       m.hidden || !inRange(i)
@@ -1999,25 +2044,6 @@ export function planHorizontal(
           }]
     )
   };
-
-  // Horizontal density, applied ONCE here — after every spring is computed and
-  // before anything reads one (roadmap/complete/core-render-density-zoom.md).
-  // Scaling at the source would mean touching four springSp() call sites and
-  // trusting them to stay in step; scaling at consumption would desync the
-  // per-event cursor from the measure widths, since both read springs
-  // independently. One pass over the finished metrics keeps every reader
-  // consistent by construction.
-  if (densityH !== 1) {
-    for (const m of metrics) {
-      m.spring *= densityH;
-      m.leadingSpring *= densityH;
-      for (const staff of m.staves) {
-        for (const voice of staff) {
-          for (const event of voice) event.spring *= densityH;
-        }
-      }
-    }
-  }
 
   // Ink pricing, applied the same way density is — one pass over the finished
   // metrics, after the baseline packing input was captured and
@@ -2056,17 +2082,39 @@ export function planHorizontal(
     }
   }
 
-  // Packing and placement must price the same ink. Keep springs normalized
-  // to density 1 so the zoom ladder can reuse this snapshot at other settings.
+  // Packing and placement must price the same ink. Springs are still base
+  // values here, so the snapshot stays reusable by the ladder at any Space.
   if (inkRatio !== 1) {
     for (const entry of packing.measures) {
       const m = metrics[entry.index];
       entry.prefixFirst = prefixWidth(m, true, entry.index, inkRatio);
       entry.prefixRest = prefixWidth(m, false, entry.index, inkRatio);
       entry.rigid = m.rigid;
-      entry.spring = m.spring / densityH;
-      entry.lead = m.leadingSpring / densityH;
+      entry.spring = m.spring;
+      entry.lead = m.leadingSpring;
       entry.repeatExtra = m.repeatEnd ? REPEAT_END_EXTRA_SP * inkRatio : 0;
+    }
+  }
+
+  // The Space line, applied to the springs ONCE here — after every spring is
+  // computed, after the packing snapshot has captured the base values, and
+  // before anything reads one (roadmap/complete/core-render-density-zoom.md).
+  // Scaling at the source would mean touching four springSp() call sites and
+  // trusting them to stay in step; scaling at consumption would desync the
+  // per-event cursor from the measure widths, since both read springs
+  // independently. One pass over the finished metrics keeps every reader
+  // consistent by construction — and because it runs last, nothing ever has
+  // to divide by the factor, which is what lets Space reach zero.
+  const springFactor = clearance.spring;
+  if (springFactor !== 1) {
+    for (const m of metrics) {
+      m.spring *= springFactor;
+      m.leadingSpring *= springFactor;
+      for (const staff of m.staves) {
+        for (const voice of staff) {
+          for (const event of voice) event.spring *= springFactor;
+        }
+      }
     }
   }
 

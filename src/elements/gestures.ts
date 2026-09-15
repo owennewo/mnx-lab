@@ -476,7 +476,7 @@ export class ScoreGestures {
       staffScale: snap === 'space' ? null : staff,
       densityH: snap === 'staff' ? null : space
     });
-    this.showHud(`Staff ${Math.round(staff * 100)}% · Space ${Math.round(space * 100)}%`, true);
+    this.showHud(`Staff ${Math.round(staff * 100)}% · Space ${(Math.round(space * 10) / 10).toFixed(1)}sp`, true);
   }
 
   private onPointerUp = (event: PointerEvent) => {

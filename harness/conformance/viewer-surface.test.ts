@@ -17,7 +17,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { describe, it, expect } from 'vitest';
 import { layoutNotation } from '../../src/engine/layout/notation.ts';
-import { planHorizontal, MIN_DENSITY, MAX_DENSITY } from '../../src/engine/layout/spacing.ts';
+import { planHorizontal, MIN_SPACE_SP, MAX_SPACE_SP, SPACE_DEFAULT_SP } from '../../src/engine/layout/spacing.ts';
 import { declaredStaffKind, wantsTabView } from '../../src/model/mnx.ts';
 import type { MnxStructure } from '../../src/model/mnx.ts';
 import { initSmufl } from '../helpers/corpusPrimitives.ts';
@@ -128,8 +128,8 @@ describe('viewer surface', () => {
         const first = planHorizontal(twelveBars(), 80, { densityH }).measures[0];
         return Number((first.clefX - first.x).toFixed(6));
       };
-      expect(prefix(0.65)).toBeLessThan(prefix(1));
-      expect(prefix(1.5)).toBeGreaterThan(prefix(1));
+      expect(prefix(1.4)).toBeLessThan(prefix(SPACE_DEFAULT_SP));
+      expect(prefix(3.3)).toBeGreaterThan(prefix(SPACE_DEFAULT_SP));
     });
 
     it('clamps absurd values instead of producing an unrescuable plan', () => {
@@ -139,14 +139,14 @@ describe('viewer surface', () => {
       // floor moved 0.5 → 0.25 once the pad made the bottom of the range easy
       // to look at, and a test naming the number would have failed for the
       // wrong reason.
-      expect(w(0)).toBe(w(MIN_DENSITY));
-      expect(w(99)).toBe(w(MAX_DENSITY));
+      expect(w(-1)).toBe(w(MIN_SPACE_SP));
+      expect(w(99)).toBe(w(MAX_SPACE_SP));
     });
 
     it('default is byte-for-byte todays engraving', () => {
       initSmufl();
       const withOut = planHorizontal(twelveBars(), 80);
-      const withOne = planHorizontal(twelveBars(), 80, { densityH: 1 });
+      const withOne = planHorizontal(twelveBars(), 80, { densityH: SPACE_DEFAULT_SP });
       expect(JSON.stringify(withOne)).toBe(JSON.stringify(withOut));
     });
   });

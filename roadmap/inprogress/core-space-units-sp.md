@@ -1,6 +1,6 @@
 # Space in staff spaces — a clamped line per consumer, zero included
 
-Status: proposed (2026-09-15).
+Status: in progress — built 2026-09-15; the by-eye calibration pass is open.
 Serves: implementation loop — shared engine, `elements/`, both shells.
 
 The calibration decision that
@@ -134,3 +134,48 @@ dimension at a time"), the legacy clearance path, any vertical number.
 - Ladder, worker and fresh plans agree at 0, the default and the ceiling.
 - The corpus batch is registered in lab-verify with this doc linked both ways; the
   worktree is retired before this doc moves to `complete/`.
+
+## Outcome (2026-09-15)
+
+Built, in one landing. The engine, both shells and the harness now speak Space in
+staff spaces; the calibration *table* is still the identity, which is a deliberate
+first state, not a finding.
+
+- **Engine.** `SPACE_LINES` in `src/engine/layout/spacing.ts` is the table, one
+  `{ atZero, atDefault }` pair per consumer; `spacePolicy(x)` resolves it. Springs
+  are `base(dur) × line(x)` so `m` and `c` are both duration-shaped without any
+  change to the snapshot's arithmetic. Pads are keyed (`PadKind`) rather than
+  carried as normal values, so each can have its own line. The root curves, the
+  0.15sp pad floor and the 1–3sp margin bounds are gone. The spring pass now runs
+  after the packing snapshot is captured, so nothing divides by Space; the
+  snapshot re-prices to 0 and to the ceiling exactly as a fresh plan does. Floor
+  0, ceiling 8sp, ladder grid 0.01sp, pad minimum step 0.1sp. The legacy explicit
+  `clearance`/`densityPad` frame keeps its pads and margin; its springs follow the
+  line.
+- **Elements and shells.** The pad reads and writes `sp` to one decimal (MIN band
+  at `0.0sp`); presets are 1.4 / 2.2 / 3.3; the gesture HUD prints sp. Both shells
+  store the value under a new key (`mnx-lab.space-sp`, `mnx-studio.space-sp`) and
+  tidy the retired multiplier key on load rather than convert it. PDF export reads
+  the same preference.
+- **Verified in the browser** (dev server, workbench, twelve-bar-blues): the
+  readout fits its column, arrow steps are 0.1sp, the arm reports MIN at 0.0sp,
+  the natural-mode field accepts `0` and stores `0`, a stored `0` survives reload,
+  and a browser carrying the old key has it removed on load. At Space 0 the whole
+  score packs onto one system, edge to edge.
+- **Looked at** (PNG grid, three scores × three views × 80/50sp × Space 0 / 0.5 /
+  2.2 / 8): at zero nothing overlaps — margins are gone, the first column sits on
+  the barline, clef/key/time abut, lyrics stay legible because their columns are
+  rigid. On the short score one bar per system arrives at 6–7sp, which is why the
+  ceiling stayed at 8 rather than the 4 floated in the plan.
+- **Goldens: byte-identical**, by construction — every line evaluates to its
+  historical value at 2.2sp, and `x / SPACE_DEFAULT_SP` is exactly 1 there. All
+  1,872 tests, corpus policing and the build pass. No lab-verify batch is owed
+  *yet*: the first change to any `atZero`/`atDefault` is the recalibration this
+  doc licenses, and that landing registers the batch.
+
+**Open — the calibration pass.** The intercept vector is all zeros: Space 0 is
+airless everywhere, including note-to-note. Whether some rhythm proportion should
+survive at zero (`spring.atZero > 0`), where the margin should run out
+(`margin.atZero < 0`), and whether the default should stay at 2.2sp are decisions
+to make by looking, in the workbench, one number at a time. Staff is untouched and
+gets its own doc when its turn comes.

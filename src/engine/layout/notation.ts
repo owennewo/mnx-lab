@@ -37,7 +37,8 @@ import {
 import { validateDocument } from './validate.ts';
 import { dynamicGlyph, dynamicLabel } from './dynamics.ts';
 import {
-  clampDensity,
+  SPACE_DEFAULT_SP,
+  clampSpace,
   planHorizontal,
   resolveStaffVoices,
   PlanStaff,
@@ -1269,12 +1270,12 @@ function assembleSegment(
   };
   const plan = planHorizontal(mnx, widthSp, planOptions);
   // The score's natural extent, for the fit — see `LayoutResult.naturalWidthSp`.
-  // Skipped at density 1 (same number) and on the probe pass, whose only job is
-  // to find where the ink goes.
+  // Skipped at the default Space (same number) and on the probe pass, whose
+  // only job is to find where the ink goes.
   const naturalWidthSp =
-    probeGapSp !== null || clampDensity(densityH) === 1
+    probeGapSp !== null || clampSpace(densityH) === SPACE_DEFAULT_SP
       ? undefined
-      : planHorizontal(mnx, widthSp, { ...planOptions, densityH: 1 }).usedWidthSp;
+      : planHorizontal(mnx, widthSp, { ...planOptions, densityH: SPACE_DEFAULT_SP }).usedWidthSp;
   const numMeasures = plan.measures.length;
 
   // ---- Display staves: the plan's notation staves plus, in the `both` view,

@@ -76,7 +76,7 @@ outranks any `staffKind`, always.
 | `compact` | boolean | absent | tighter paper padding for small frames. |
 | `zoom` | number | *unset* | **staff scale** — a multiplier on `pxPerSp`, so line gap, glyphs, text and stems scale together. Clamped 0.6–1.6. **Unset is not `1`**: with no `pxPerSp` the renderer *fits* a short score to the viewport, and defaulting to `1` would silently retire fit-to-width for every host that never set it. Until 2026-08-15 this prop sized the paper card and never reached the engine. |
 | `density` | `normal` · `compact` · `spacious` | `normal` | **horizontal density** — how much music fits on a line, *without* shrinking glyphs. The engine scales the springs and never the rigid columns, which is what keeps this independent of `zoom` so the two compose. |
-| `density-h` | number | *unset* | numeric Space multiplier, 0.01–8; wins over the `density` preset. Adjusts springs and discretionary horizontal air without resizing symbols. |
+| `density-h` | number | *unset* | **Space, in staff spaces** — the air after a quarter note, 0–8 (default 2.2; the name predates the unit). Wins over the `density` preset. Adjusts springs and discretionary horizontal air without resizing symbols; 0 is a true zero, margins included ([core-space-units-sp.md](../roadmap/inprogress/core-space-units-sp.md)). |
 | `clearance` | 0–4 in 0.5 steps | *unset* | legacy independent whitespace override. Explicit values (including 2) retain the historical policy; absent, Staff owns vertical proportions and Space owns horizontal air. |
 | `density-pad` | number | *unset* | legacy frame multiplier. Explicit values override Clearance and automatic horizontal whitespace; rhythmic springs still follow Space. |
 
@@ -147,11 +147,16 @@ default staff-space values, as do vertical margins and the visible crop. They ar
 scaled once by the SVG emitter. Measured ink bounds and collision protection remain.
 
 Space adjusts rhythmic springs and the discretionary air in horizontal margins,
-clef/key/time prefixes, and bar starts/ends. Padding follows the square root of the
-Space multiplier with a 0.15sp floor; score margins respond more gently and remain
-between 1sp and 3sp. Prefix slot tails use their existing tight/default/spacious
-anchors. At Space 1 the arithmetic and default engraving are unchanged. Symbol
-slots, repeat geometry and note columns remain ink, priced by Staff.
+clef/key/time prefixes, and bar starts/ends. Space is a length in staff spaces —
+the air after a quarter note — and every consumer of it is one clamped line,
+`max(0, m·x + c)`, written in `SPACE_LINES` (`layout/spacing.ts`) as the pair
+`{ atZero, atDefault }`: the intercepts are the zero engraving, the slopes how each
+kind of air grows from it. Today every intercept is 0, so Space 0 draws no
+discretionary air at all — margins included — and rigid columns simply abut. At
+the default (2.2sp) every line evaluates to its historical value exactly, so the
+default engraving is unchanged. Symbol slots, repeat geometry and note columns
+remain ink, priced by Staff. Recalibrating the table moves goldens by design
+([core-space-units-sp.md](../roadmap/inprogress/core-space-units-sp.md)).
 
 `clearance` and `density-pad` remain explicit legacy host overrides. Setting
 Clearance, including 2, selects its historical independent horizontal/vertical
@@ -160,13 +165,13 @@ the new Staff/Space policy. Normalization preserves this distinction. Neither
 Studio nor Workbench forwards old saved Clearance values; PDF export uses the same
 preference policy. Hosts can restore automatic ownership by unsetting Clearance.
 
-The `density-h` range widened at the bottom on 2026-08-15 (`MIN_DENSITY`
-0.5 → 0.02): the old floor stopped a reader two systems short of what this
-engraver draws readably, and 0.02 is where packing bottoms out — rigid notehead
-columns fill the line and no lower value fits another bar. The clamp is still
-the engine's, so a host writing `density-h="0.001"` gets the floor rather than
-an error — and `densitySteps()` below is how a control finds out which values
-in the range are worth offering.
+The `density-h` floor is zero (`MIN_SPACE_SP`, 2026-09-15; it had been a
+multiplier with a 0.01 floor, which already made the springs effectively zero
+while a 1sp margin floor and a 0.15sp pad floor kept the tightest engraving out of
+reach). The ceiling is 8sp (`MAX_SPACE_SP`), where a short score reaches one bar
+per system. The clamp is still the engine's, so a host writing
+`density-h="-1"` gets the floor rather than an error — and `densitySteps()`
+below is how a control finds out which values in the range are worth offering.
 
 ### Reporting back
 
@@ -306,9 +311,9 @@ Natural keeps the duration spacing allowance, compressing only overfull systems;
 it uses the baseline horizontal scale rather than enlarging short scores to fit.
 The workbench exposes this as the paragraph-glyph toggle in the zoom pad's footer
 row (ragged-right = natural, justified = fill) and remembers the choice.
-Zoom readouts include `%`: spacing is a requested multiplier on duration spacing,
-not a measured gap. At 100%, a quarter-note spring is 2.2 staff spaces; symbol
-columns are additional. Fill-width justification can change the drawn allowance.
+The staff readout is a `%`; the Space readout is a length in `sp` — the requested
+air after a quarter note, not a measured gap. The default is 2.2sp; symbol columns
+are additional. Fill-width justification can change the drawn allowance.
 
 System packing uses the selected staff size's symbol widths in both spacing
 modes. Staff size and spacing remain independent preferences, but either can

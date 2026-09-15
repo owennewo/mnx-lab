@@ -39,15 +39,21 @@ import { layoutTab } from '../../src/engine/layout/tab.ts';
 import { layoutNotation } from '../../src/engine/layout/notation.ts';
 import {
   planHorizontal,
-  clampDensity,
+  clampSpace,
   clampInkRatio,
   densityLadder,
   packingSignature,
   packSystems,
+  spacePolicy,
+  spaceLineAt,
   CORE_SP,
   KEY_SIG_GLYPH_ADVANCE_SP,
-  MIN_DENSITY,
-  MAX_DENSITY
+  MIN_SPACE_SP,
+  MAX_SPACE_SP,
+  SPACE_DEFAULT_SP,
+  SPACE_LINES,
+  QUARTER_SPRING_SP,
+  type PadKind
 } from '../../src/engine/layout/spacing.ts';
 import { glyphBBox } from '../../src/engine/smufl/smufl.ts';
 import { fitPxPerSp } from '../../src/engine/render/svg.ts';
@@ -105,11 +111,11 @@ describe('zoom / density', () => {
       initSmufl();
       // Squeezed AND comfortable: the two rows behave differently, and the
       // guarantee has to hold on both.
-      expect(tightestGapSp(MIN_DENSITY)).toBeGreaterThanOrEqual(CORE_SP - 1e-9);
-      expect(tightestGapSp(MIN_DENSITY, 80)).toBeGreaterThanOrEqual(CORE_SP - 1e-9);
+      expect(tightestGapSp(MIN_SPACE_SP)).toBeGreaterThanOrEqual(CORE_SP - 1e-9);
+      expect(tightestGapSp(MIN_SPACE_SP, 80)).toBeGreaterThanOrEqual(CORE_SP - 1e-9);
       // Below the floor too: planHorizontal clamps internally, so an absurd
       // value is survivable rather than merely rejected.
-      expect(tightestGapSp(0.01)).toBeGreaterThanOrEqual(CORE_SP - 1e-9);
+      expect(tightestGapSp(-1)).toBeGreaterThanOrEqual(CORE_SP - 1e-9);
     });
 
     it('the springs really did shrink — the gap test is not vacuous', () => {
@@ -117,17 +123,19 @@ describe('zoom / density', () => {
       // Guards the assertions above: if density stopped tightening anything,
       // they would all pass while proving nothing. Read on a WIDE line, where
       // there is still spring left to remove.
-      expect(tightestGapSp(MIN_DENSITY, 80)).toBeLessThan(tightestGapSp(1, 80));
+      expect(tightestGapSp(MIN_SPACE_SP, 80)).toBeLessThan(tightestGapSp(SPACE_DEFAULT_SP, 80));
     });
 
     it('the floor still BITES, so a control has something to report', () => {
       initSmufl();
-      expect(clampDensity(0)).toBe(MIN_DENSITY);
-      expect(clampDensity(99)).toBe(MAX_DENSITY);
+      expect(clampSpace(-1)).toBe(MIN_SPACE_SP);
+      expect(clampSpace(99)).toBe(MAX_SPACE_SP);
       // Exported so the pad shows the engine's real bound instead of restating
-      // a number that could drift out of step with it.
-      expect(MIN_DENSITY).toBeLessThan(1);
-      expect(MAX_DENSITY).toBeGreaterThan(1);
+      // a number that could drift out of step with it. The floor is a TRUE
+      // zero (core-space-units-sp.md): no air at all, margins included.
+      expect(MIN_SPACE_SP).toBe(0);
+      expect(MIN_SPACE_SP).toBeLessThan(SPACE_DEFAULT_SP);
+      expect(MAX_SPACE_SP).toBeGreaterThan(SPACE_DEFAULT_SP);
     });
   });
 
@@ -175,7 +183,7 @@ describe('zoom / density', () => {
         let missedChanges = 0;
         let flatRungs = 0;
         let rung = ladder[0];
-        for (let n = MIN_DENSITY * 100; n <= MAX_DENSITY * 100; n++) {
+        for (let n = MIN_SPACE_SP * 100; n <= MAX_SPACE_SP * 100; n++) {
           const value = n / 100;
           const isRung = ladder.some(r => Math.abs(r - value) < 1e-9);
           if (isRung) {
@@ -197,8 +205,8 @@ describe('zoom / density', () => {
       // The first rung is the floor itself, which is what lets a control say
       // MIN honestly when the bottom arm runs out. The last one need NOT be
       // the ceiling: past it, nothing wider draws differently.
-      expect(ladder[0]).toBe(MIN_DENSITY);
-      expect(ladder[ladder.length - 1]).toBeLessThanOrEqual(MAX_DENSITY);
+      expect(ladder[0]).toBe(MIN_SPACE_SP);
+      expect(ladder[ladder.length - 1]).toBeLessThanOrEqual(MAX_SPACE_SP);
       expect(ladder).toEqual([...ladder].sort((a, b) => a - b));
       expect(new Set(ladder).size).toBe(ladder.length);
     });
@@ -206,8 +214,8 @@ describe('zoom / density', () => {
     it('Space changes horizontal padding even within a justified packing plateau', () => {
       initSmufl();
       const mnx = twelveBars();
-      expect(engraving(mnx, 0.96, 80)).not.toBe(engraving(mnx, 1, 80));
-      expect(ladderFor(mnx, 80)).toContain(1);
+      expect(engraving(mnx, 2.1, 80)).not.toBe(engraving(mnx, SPACE_DEFAULT_SP, 80));
+      expect(ladderFor(mnx, 80)).toContain(SPACE_DEFAULT_SP);
     });
 
     it('legacy clearance retains the high-zoom packing plateau', () => {
@@ -221,11 +229,13 @@ describe('zoom / density', () => {
       // whose spacing still moved with density. With the leftover row spaced
       // like its page, the whole run collapses to the single rung it is.
       const packings = layoutTab({ mnx: twelveBars(), widthSp: 1180 / 64, display: { clearance: 2 } }).packings!;
-      const one = packingSignature(packings, 0.06);
-      for (const density of [0.1, 0.14, 0.18, 0.5]) {
-        expect(packingSignature(packings, density)).toBe(one);
+      const one = packingSignature(packings, 0.13);
+      for (const spaceSp of [0.22, 0.31, 0.4, 1.1]) {
+        expect(packingSignature(packings, spaceSp)).toBe(one);
       }
-      expect(densityLadder(packings).filter(v => v > MIN_DENSITY && v <= 0.5)).toEqual([]);
+      // Zero is its own engraving — with no springs there is nothing to
+      // justify — so the plateau starts at the first grid value above it.
+      expect(densityLadder(packings).filter(v => v > 0.01 && v <= 1.1)).toEqual([]);
     });
 
     it('a score every value changes keeps every value', () => {
@@ -233,39 +243,33 @@ describe('zoom / density', () => {
       // The other half of "skip the degenerate ones": on a single-system score
       // the row is against MAX_STRETCH, the proportion breaks, and density
       // moves the music continuously. Nothing may be skipped there — the
-      // ladder holds all 176 grid values.
+      // ladder holds every 0.01sp grid value.
       const ladder = ladderFor(doc('lab/tab-positions/open-strings-chord'), 80);
-      expect(ladder.length).toBe((MAX_DENSITY - MIN_DENSITY) * 100 + 1);
+      expect(ladder.length).toBe((MAX_SPACE_SP - MIN_SPACE_SP) * 100 + 1);
     });
 
-    it('the retuned floor buys real packing, which is why it moved', () => {
+    it('the floor buys real packing, which is why it is zero', () => {
       initSmufl();
       // The evidence ruling 1 of core-zoom-density-pad.md asked for before
-      // touching this constant: at the old 0.5 floor, twelve-bar-blues packs
-      // exactly as it does at 1 — the floor was bounding the CONTROL, not
-      // legibility. The floor as it stands takes a system out of the score,
-      // and then packs another bar onto the first one.
+      // touching this constant: the floor must buy packing, or it is bounding
+      // the CONTROL rather than legibility. Zero takes systems out of the
+      // score and packs more bars onto the first one; on this score at 80sp
+      // it packs all twelve onto one system.
       const rows = (densityH: number) => planHorizontal(twelveBars(), 80, { densityH }).rowCount;
       const firstRow = (densityH: number) =>
         planHorizontal(twelveBars(), 80, { densityH }).measures.filter(m => m.row === 0).length;
-      expect(rows(0.5)).toBe(rows(1));
-      expect(rows(MIN_DENSITY)).toBeLessThan(rows(0.5));
-      // 0.1 → 0.15 when onset-aligned columns landed (2026-08-31): merging
-      // voices raised the multi-voice bars' rigid floor, so this score's
-      // packing now bottoms out by ~0.1 instead of at the floor itself. The
-      // floor still buys packing over the mid-range, which was the ruling's
-      // point; whether it should RISE to the new bottom-out is a product
-      // retune deliberately left open.
-      expect(firstRow(MIN_DENSITY)).toBeGreaterThan(firstRow(0.15));
-      expect(MIN_DENSITY).toBeLessThan(0.5);
+      expect(rows(1.1)).toBeLessThanOrEqual(rows(SPACE_DEFAULT_SP));
+      expect(rows(MIN_SPACE_SP)).toBeLessThan(rows(1.1));
+      expect(firstRow(MIN_SPACE_SP)).toBeGreaterThan(firstRow(0.33));
+      expect(rows(MIN_SPACE_SP)).toBe(1);
     });
 
     it('uses a stable lower bound rather than a score-dependent packing limit', () => {
       initSmufl();
-      expect(engraving(twelveBars(), MIN_DENSITY / 4, 80)).toBe(
-        engraving(twelveBars(), MIN_DENSITY, 80)
+      expect(engraving(twelveBars(), -1, 80)).toBe(
+        engraving(twelveBars(), MIN_SPACE_SP, 80)
       );
-      expect(clampDensity(MIN_DENSITY)).toBe(MIN_DENSITY);
+      expect(clampSpace(MIN_SPACE_SP)).toBe(MIN_SPACE_SP);
     });
   });
 
@@ -299,13 +303,16 @@ describe('zoom / density', () => {
   describe('the low-vision range', () => {
     it('both ceilings are four times what the design specified', () => {
       expect(MAX_STAFF_SCALE).toBe(6.4);
-      expect(MAX_DENSITY).toBe(8);
-      // The floors are untouched — this raised a ceiling, it did not re-centre
-      // the control.
+      // Space's ceiling is in staff spaces now (core-space-units-sp.md): 8sp
+      // after a quarter note, ~3.6× the default, which is where the short
+      // score below reaches one bar per system (measured 6–7sp).
+      expect(MAX_SPACE_SP).toBe(8);
+      // The staff floor is untouched — this raised a ceiling, it did not
+      // re-centre the control. The Space floor is zero by design.
       expect(MIN_STAFF_SCALE).toBe(0.6);
-      expect(MIN_DENSITY).toBe(0.01);
+      expect(MIN_SPACE_SP).toBe(0);
       expect(clampStaffScale(99)).toBe(MAX_STAFF_SCALE);
-      expect(clampDensity(99)).toBe(MAX_DENSITY);
+      expect(clampSpace(99)).toBe(MAX_SPACE_SP);
     });
 
     it('nothing collides at the top of the staff range — the reason it could be raised', () => {
@@ -340,18 +347,18 @@ describe('zoom / density', () => {
       const barsOnFirstSystem = (densityH: number) =>
         planHorizontal(doc('lab/document/twelve-bar-blues'), 90, { densityH, staffKind: 'tab' })
           .measures.filter(m => m.row === 0 && !m.hidden).length;
-      expect(barsOnFirstSystem(2)).toBeGreaterThan(1);
-      expect(barsOnFirstSystem(MAX_DENSITY)).toBe(1);
+      expect(barsOnFirstSystem(4.4)).toBeGreaterThan(1);
+      expect(barsOnFirstSystem(MAX_SPACE_SP)).toBe(1);
       // And one bar per system is the floor of the idea — past it the knob is
       // honestly inert, which the ladder reports rather than hides.
-      expect(barsOnFirstSystem(MAX_DENSITY / 2)).toBe(1);
+      expect(barsOnFirstSystem(7)).toBe(1);
     });
 
     it('large symbols reflow without requiring a spacing adjustment', () => {
       initSmufl();
       const mnx = doc('lab/document/twelve-bar-blues');
       const widthSp = 90;
-      for (const densityH of [1, MAX_DENSITY]) {
+      for (const densityH of [SPACE_DEFAULT_SP, MAX_SPACE_SP]) {
         const layout = layoutTab({ mnx, widthSp, inkRatio: MAX_STAFF_SCALE, densityH });
         expect(layout.usedWidthSp).toBeLessThan(widthSp * 1.25);
       }
@@ -365,8 +372,8 @@ describe('zoom / density', () => {
 
     it('compact narrows it and spacious widens it, as on the notation staff', () => {
       initSmufl();
-      expect(tabWidth(0.65)).toBeLessThan(tabWidth(1));
-      expect(tabWidth(1.5)).toBeGreaterThan(tabWidth(1));
+      expect(tabWidth(1.4)).toBeLessThan(tabWidth(SPACE_DEFAULT_SP));
+      expect(tabWidth(3.3)).toBeGreaterThan(tabWidth(SPACE_DEFAULT_SP));
     });
 
     it('default is byte-identical to passing nothing', () => {
@@ -381,7 +388,7 @@ describe('zoom / density', () => {
       const explicit = layoutTab({
         mnx: doc('lab/tab-positions/open-strings-chord'),
         widthSp: 80,
-        densityH: 1
+        densityH: SPACE_DEFAULT_SP
       });
       expect(JSON.stringify(explicit.primitives)).toBe(JSON.stringify(plain.primitives));
     });
@@ -452,7 +459,7 @@ describe('zoom / density', () => {
           for (const [column, index] of row.measures.entries()) {
             const entry = plan.packing.measures[index];
             const expectedWidth = (column === 0 ? entry.prefixFirst : entry.prefixRest) +
-              entry.rigid + (entry.spring + entry.lead) * densityH * row.stretch +
+              entry.rigid + (entry.spring + entry.lead) * spacePolicy(densityH).spring * row.stretch +
               plan.packing.contentRightPadSp! + entry.repeatExtra;
             expect(plan.measures[entry.index].width).toBeCloseTo(expectedWidth, 8);
           }
@@ -648,25 +655,25 @@ describe('the fit answers about the score, not about the density knob', () => {
     return (xs[1] - xs[0]) * pxPerSp;
   };
 
-  const LADDER = [0.02, 0.04, 0.06, 0.1, 0.14, 0.2, 0.3, 0.5, 1];
+  const LADDER = [0, 0.05, 0.1, 0.15, 0.2, 0.3, 0.45, 0.65, 1.1, SPACE_DEFAULT_SP];
 
   it('a bar never gets narrower as the reader asks for more space', () => {
     initSmufl();
     for (let i = 1; i < LADDER.length; i++) {
       expect(
         bar1Px(LADDER[i], true),
-        `SPACE ${LADDER[i] * 100} should not be tighter than ${LADDER[i - 1] * 100}`
+        `SPACE ${LADDER[i]}sp should not be tighter than ${LADDER[i - 1]}sp`
       ).toBeGreaterThanOrEqual(bar1Px(LADDER[i - 1], true) - 1e-9);
     }
     // …and it genuinely moves across the range, so the claim is not trivially
     // satisfied by a knob that does nothing.
-    expect(bar1Px(1, true)).toBeGreaterThan(bar1Px(0.02, true) * 1.5);
+    expect(bar1Px(SPACE_DEFAULT_SP, true)).toBeGreaterThan(bar1Px(0.05, true) * 1.5);
   });
 
   it('and that is not vacuous: fitting on the squeezed width ran backwards', () => {
     initSmufl();
     // The reported case, reproduced through the old rule.
-    expect(bar1Px(0.3, false)).toBeLessThan(bar1Px(0.02, false));
+    expect(bar1Px(0.65, false)).toBeLessThan(bar1Px(0.05, false));
   });
 
   it('a naturally short score is still scaled up — what the fit is for', () => {
@@ -684,13 +691,108 @@ describe('the fit answers about the score, not about the density knob', () => {
 });
 
 
+// Space in staff spaces (roadmap/inprogress/core-space-units-sp.md): `x` is the
+// air after a quarter note, every horizontal consumer is one clamped line in
+// it, and the intercept vector is the zero engraving.
+describe('Space in staff spaces', () => {
+  const blues = () => doc('lab/document/twelve-bar-blues');
+  const PADS: PadKind[] = ['contentLeft', 'startBarline', 'keySigRight', 'contentRight'];
+
+  it('the unit is the quarter-note spring, and the default is the identity', () => {
+    expect(SPACE_DEFAULT_SP).toBe(QUARTER_SPRING_SP);
+    const at = spacePolicy(SPACE_DEFAULT_SP);
+    // Exactly 1, not 0.999…: the ratio x / SPACE_DEFAULT_SP is what the line
+    // evaluates, so the default keeps byte-stable goldens.
+    expect(at.spring).toBe(1);
+    expect(at.horizontalMargin).toBe(SPACE_LINES.margin.atDefault);
+    for (const kind of PADS) expect(at.pad(kind)).toBe(SPACE_LINES[kind].atDefault);
+    expect(clampSpace(undefined)).toBe(SPACE_DEFAULT_SP);
+    expect(clampSpace(Number.NaN)).toBe(SPACE_DEFAULT_SP);
+  });
+
+  it('zero is the intercept vector — today, no air at all', () => {
+    const at = spacePolicy(0);
+    expect(at.spring).toBe(SPACE_LINES.spring.atZero);
+    expect(at.horizontalMargin).toBe(SPACE_LINES.margin.atZero);
+    for (const kind of PADS) expect(at.pad(kind)).toBe(SPACE_LINES[kind].atZero);
+    // The calibrated zero engraving is currently airless everywhere. A
+    // consumer that keeps a floor at zero is a calibration decision recorded
+    // in SPACE_LINES, and this assertion is the place it gets noticed.
+    expect(at.spring).toBe(0);
+    expect(at.horizontalMargin).toBe(0);
+    for (const kind of PADS) expect(at.pad(kind)).toBe(0);
+  });
+
+  it('a line is clamped at zero, so a consumer may run out before the springs do', () => {
+    const early = { atZero: -1, atDefault: 2 };
+    expect(spaceLineAt(early, 0)).toBe(0);
+    expect(spaceLineAt(early, SPACE_DEFAULT_SP / 3)).toBe(0);
+    expect(spaceLineAt(early, SPACE_DEFAULT_SP)).toBe(2);
+    expect(spaceLineAt(early, 2 * SPACE_DEFAULT_SP)).toBe(5);
+    const floored = { atZero: 0.5, atDefault: 2 };
+    expect(spaceLineAt(floored, 0)).toBe(0.5);
+    expect(spaceLineAt(floored, SPACE_DEFAULT_SP)).toBe(2);
+  });
+
+  it('at zero the margin is gone and the first column sits against the barline', () => {
+    initSmufl();
+    for (const staffKind of ['notation', 'tab'] as const) {
+      const plan = planHorizontal(blues(), 80, { densityH: 0, staffKind });
+      // The system starts at the pane edge …
+      expect(plan.measures[0].x).toBe(0);
+      // … and every coordinate is a real number: nothing divided by Space.
+      for (const m of plan.measures) {
+        expect(Number.isFinite(m.x) && Number.isFinite(m.width)).toBe(true);
+        for (const staff of m.staves) for (const voice of staff) for (const e of voice) expect(Number.isFinite(e.x)).toBe(true);
+      }
+      expect(Number.isFinite(plan.usedWidthSp)).toBe(true);
+    }
+  });
+
+  it('zero survives ink pricing — the divide-by-Space the old snapshot carried is gone', () => {
+    initSmufl();
+    for (const inkRatio of [0.6, 1.4, 2.3]) {
+      const plan = planHorizontal(blues(), 80, { densityH: 0, inkRatio, spacingMode: 'natural' });
+      for (const entry of plan.packing.measures) {
+        expect(Number.isFinite(entry.spring) && Number.isFinite(entry.lead)).toBe(true);
+      }
+      for (const m of plan.measures) expect(Number.isFinite(m.width)).toBe(true);
+      // And the snapshot still carries BASE springs at zero, so the ladder can
+      // ask what any other value would draw.
+      expect(plan.packing.measures.some(entry => entry.spring > 0)).toBe(true);
+    }
+  });
+
+  it('the packing snapshot re-prices to zero and to the ceiling exactly as a fresh plan does', () => {
+    initSmufl();
+    const snapshot = planHorizontal(blues(), 80).packing;
+    for (const spaceSp of [0, 0.3, 1.1, MAX_SPACE_SP]) {
+      const fresh = planHorizontal(blues(), 80, { densityH: spaceSp });
+      const rows = packSystems(snapshot, spaceSp).map(r => r.measures.map(k => snapshot.measures[k].index));
+      const freshRows = packSystems(fresh.packing, spaceSp).map(r => r.measures.map(k => fresh.packing.measures[k].index));
+      expect(rows).toEqual(freshRows);
+      expect(packingSignature([snapshot], spaceSp)).toBe(packingSignature([fresh.packing], spaceSp));
+    }
+  });
+
+  it('a legacy explicit clearance keeps its own pads and margin while the springs follow the line', () => {
+    initSmufl();
+    const tight = planHorizontal(blues(), 80, { densityH: 0, display: { clearance: 2 } });
+    const loose = planHorizontal(blues(), 80, { densityH: MAX_SPACE_SP, display: { clearance: 2 } });
+    expect(tight.measures[0].x).toBe(loose.measures[0].x);
+    expect(tight.measures[0].x).toBeGreaterThan(0);
+    expect(tight.packing.contentRightPadSp).toBe(loose.packing.contentRightPadSp);
+    expect(tight.usedWidthSp).toBeLessThan(loose.usedWidthSp);
+  });
+});
+
 describe('natural spacing', () => {
-  it('accepts 1% and draws less space than 2% without changing symbol widths', () => {
+  it('accepts zero and draws less space than 0.1sp without changing symbol widths', () => {
     const mnx = doc('lab/document/twelve-bar-blues');
     const plan = (densityH: number) => planHorizontal(mnx, 120, { spacingMode: 'natural', densityH });
-    const minimum = plan(0.01);
-    const previous = plan(0.02);
-    expect(clampDensity(0.01)).toBe(0.01);
+    const minimum = plan(0);
+    const previous = plan(0.1);
+    expect(clampSpace(0)).toBe(0);
     expect(minimum.measures[0].width).toBeLessThan(previous.measures[0].width);
     expect(minimum.packing.measures.map(m => m.rigid)).toEqual(previous.packing.measures.map(m => m.rigid));
   });

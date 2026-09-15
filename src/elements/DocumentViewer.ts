@@ -39,7 +39,7 @@ import {
   type RenderOutcome,
   type RenderScale
 } from '../engine/render/scale.ts';
-import { densityLadder, packedRowMeasures, type PackingInput } from '../engine/layout/spacing.ts';
+import { SPACE_DEFAULT_SP, densityLadder, packedRowMeasures, type PackingInput } from '../engine/layout/spacing.ts';
 import { ScoreGestures, type GestureTargets } from './gestures.ts';
 import { createLayoutCache } from '../engine/render/layoutCache.ts';
 import { SCORE_LABEL_SIZE_SP } from '../engine/layout/scoreText.ts';
@@ -61,14 +61,15 @@ export type ViewMode = 'notation' | 'tab' | 'both';
  *  (docs/core-viewer-surface.md). Unset is not a value; it is a deferral. */
 export type ViewSetting = ViewMode | 'auto';
 
-/** Named horizontal densities. The engine's knob is a multiplier; these are
- *  the three values worth a name (core-render-density-zoom.md). */
+/** Named horizontal densities. The engine's knob is Space in staff spaces —
+ *  the air after a quarter note (core-space-units-sp.md); these are the three
+ *  values worth a name (core-render-density-zoom.md). */
 export type DensityPreset = 'compact' | 'normal' | 'spacious';
 
 const DENSITY_H: Record<DensityPreset, number> = {
-  compact: 0.65,
-  normal: 1,
-  spacious: 1.5
+  compact: 1.4,
+  normal: SPACE_DEFAULT_SP,
+  spacious: 3.3
 };
 import { sharedChrome, scrollbars, viewerTokens } from './tokens.ts';
 import type { HideableFeature } from '../engine/layout/notation.ts';
@@ -224,20 +225,21 @@ export class DocumentViewer extends LitElement {
    * proportional to Staff; the axes compose freely.
    *
    * A preset, not a slider, because the element is a binding: the engine takes
-   * a multiplier, and these are the three values worth naming. `density-h`
+   * a length in staff spaces, and these are the three values worth naming. `density-h`
    * could accept a number later without breaking anyone — presets resolve to
    * numbers, so the vocabulary widens rather than changes.
    */
   @property({ type: String, reflect: true }) density: DensityPreset = 'normal';
   /**
-   * The numeric form of the same axis — `density-h="0.82"`. When set it wins
+   * The numeric form of the same axis — `density-h="1.4"`, in staff spaces. When set it wins
    * over `density`; unset (the default) the preset decides.
    *
    * The preset doc above reserved exactly this: *"`density-h` could accept a
    * number later without breaking anyone — presets resolve to numbers, so the
    * vocabulary widens rather than changes."* A continuous control
-   * (core-zoom-density-pad.md) is what needed it. Clamped by the engine's own
-   * `clampDensity`, so a host and the pad get the same floor.
+   * (core-zoom-density-pad.md) is what needed it. A number is Space in staff
+   * spaces (core-space-units-sp.md), clamped by the engine's own `clampSpace`,
+   * so a host and the pad get the same floor — which is zero.
    */
   @property({ attribute: 'spacing-mode' }) spacingMode: 'natural' | 'fill' = 'fill';
 
@@ -878,7 +880,7 @@ export class DocumentViewer extends LitElement {
       // fitted score that is the last paint's scale, not 1.
       effective: () => ({
         staffScale: this.zoom ?? this.lastStaffScale,
-        densityH: this.densityH ?? DENSITY_H[this.density] ?? 1
+        densityH: this.densityH ?? DENSITY_H[this.density] ?? SPACE_DEFAULT_SP
       }),
       // `natural` spacing has no ladder to walk — the same rule the pad
       // follows, so a gesture and a click agree on what a step is.
@@ -1226,7 +1228,7 @@ export class DocumentViewer extends LitElement {
     // Resolved once and remembered with the packing: `systemRows()` has to
     // re-pack at the value THIS paint used, not at whatever the properties say
     // when it is asked.
-    const densityH = this.densityH ?? DENSITY_H[this.density] ?? 1;
+    const densityH = this.densityH ?? DENSITY_H[this.density] ?? SPACE_DEFAULT_SP;
     // Preserve absence so the engine can choose Clearance or the legacy override.
     const densityPad = this.densityPad ?? undefined;
     const inputs: PlanInputs = {

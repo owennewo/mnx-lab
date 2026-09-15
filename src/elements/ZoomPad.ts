@@ -8,11 +8,11 @@ import {
   clampStaffScale
 } from '../engine/render/scale.ts';
 import {
-  MIN_DENSITY,
-  MAX_DENSITY,
-  DENSITY_GRID,
-  QUARTER_SPRING_SP,
-  clampDensity
+  MIN_SPACE_SP,
+  MAX_SPACE_SP,
+  SPACE_GRID_SP,
+  SPACE_DEFAULT_SP,
+  clampSpace
 } from '../engine/layout/spacing.ts';
 
 /**
@@ -26,9 +26,11 @@ import {
  *   ↑ ↓  STAFF   — a true scale. Line gap, glyphs, text and stems multiply
  *                  together, because everything downstream is in staff spaces
  *                  and `pxPerSp` is the single multiplier.
- *   ← →  SPACE   — horizontal event spacing, margins and padding. Glyphs untouched:
- *                  the engine adjusts springs and padding, preserving rigid columns,
- *                  which is what makes this axis independent of the other.
+ *   ← →  SPACE   — horizontal event spacing, margins and padding, in STAFF
+ *                  SPACES: the number is the air after a quarter note, 0 is a
+ *                  true zero (core-space-units-sp.md). Glyphs untouched: the
+ *                  engine adjusts springs and padding, preserving rigid
+ *                  columns, which is what makes this axis independent of the other.
  *
  * The magnifier where the arms cross resets both.
  *
@@ -57,9 +59,10 @@ import {
  * 100.
  */
 
-/** Design: staff step 5%, spacing step 4%. Both ranges are the ENGINE's.
+/** Design: staff step 5%, spacing step 4% — the latter now 0.1sp, since Space
+ *  is a number in staff spaces (2026-09-15). Both ranges are the ENGINE's.
  *
- *  SPACE_STEP is now a MINIMUM rather than the step: with a ladder supplied
+ *  SPACE_STEP is a MINIMUM rather than the step: with a ladder supplied
  *  (see `densitySteps`) the arm lands on the first rung at least this far away,
  *  so a click never does nothing and never does less than the design asked.
  *
@@ -74,9 +77,9 @@ import {
  *  end. 1.1 keeps the design's feel at the default — the first click off 100%
  *  moves 10%, against the old 5% — while staying honest at the top. */
 const STAFF_STEP_RATIO = 1.1;
-const SPACE_STEP = 0.04;
+const SPACE_STEP = 0.1;
 
-/** Float slack when comparing against ladder rungs (they are 1% grid values). */
+/** Float slack when comparing against ladder rungs (they are 0.01sp grid values). */
 const RUNG_EPS = 1e-6;
 
 /** Drag: ±1 step per 6px, halved with shift; axis-locks after 8px of travel
@@ -94,7 +97,7 @@ export type ZoomAxis = 'staff' | 'space';
 export interface ZoomPadChange {
   /** null = fitted: no pxPerSp is sent and the renderer fits to the viewport. */
   staffScale: number | null;
-  /** null = the element's `density` preset decides. */
+  /** Space in staff spaces; null = the element's `density` preset decides. */
   densityH: number | null;
 }
 
@@ -117,7 +120,7 @@ function staffAfterSteps(from: number, steps: number): number {
 export class ZoomPad extends LitElement {
   /** Staff scale, or null for fitted. Mirrors the viewer's `zoom`. */
   @property({ type: Number }) staffScale: number | null = null;
-  /** Spacing multiplier, or null for the preset. Mirrors `density-h`. */
+  /** Space in staff spaces, or null for the preset. Mirrors `density-h`. */
   @property() spacingMode: 'natural' | 'fill' = 'fill';
   @property({ type: Number }) densityH: number | null = null;
 
@@ -717,7 +720,7 @@ export class ZoomPad extends LitElement {
   }
 
   private get shownSpace(): number {
-    return this.densityH ?? 1;
+    return this.densityH ?? SPACE_DEFAULT_SP;
   }
 
   private get offDefault(): boolean {
@@ -786,12 +789,12 @@ export class ZoomPad extends LitElement {
    */
   private nextSpace(dir: 1 | -1, from: number): number | null {
     if (this.spacingMode === 'natural') {
-      const next = clampDensity(Math.round((from + dir * SPACE_STEP) * 100) / 100);
+      const next = clampSpace(Math.round((from + dir * SPACE_STEP) * 100) / 100);
       return next === from ? null : next;
     }
     const ladder = this.ladder();
     if (!ladder) {
-      const next = clampDensity(snap(from + dir * SPACE_STEP, SPACE_STEP));
+      const next = clampSpace(snap(from + dir * SPACE_STEP, SPACE_STEP));
       return next === from ? null : next;
     }
     let cur = -1;
@@ -808,7 +811,7 @@ export class ZoomPad extends LitElement {
     const index = ladder.indexOf(rung);
     // The top of that run: one grid step under the next rung up. There is
     // always a next one — `rung` came from strictly below the current run.
-    const top = Math.round((ladder[index + 1] - DENSITY_GRID) * 100) / 100;
+    const top = Math.round((ladder[index + 1] - SPACE_GRID_SP) * 100) / 100;
     return Math.max(rung, Math.min(top, Math.round((from - SPACE_STEP) * 100) / 100));
   }
 
@@ -846,14 +849,14 @@ export class ZoomPad extends LitElement {
 
   private onSpaceInput = (event: Event) => {
     const input = event.currentTarget as HTMLInputElement;
-    const raw = input.value.trim().replace(/%$/, '').trim();
-    const percent = Number(raw);
-    if (raw !== '' && Number.isFinite(percent)) {
-      const value = clampDensity(Math.round(percent) / 100);
+    const raw = input.value.trim().replace(/sp$/i, '').trim();
+    const sp = Number(raw);
+    if (raw !== '' && Number.isFinite(sp)) {
+      const value = clampSpace(Math.round(sp * 10) / 10);
       this.clamped = null;
       this.commit({ staffScale: this.staffScale, densityH: value });
     }
-    input.value = String(Math.round(this.shownSpace * 100));
+    input.value = this.spNumber(this.shownSpace);
   };
 
   private reset() {
@@ -1117,6 +1120,14 @@ export class ZoomPad extends LitElement {
     return `${Math.round(value * 100)}%`;
   }
 
+  /** Space prints in staff spaces to one decimal: the unit is the number. */
+  private spNumber(value: number) {
+    return (Math.round(value * 10) / 10).toFixed(1);
+  }
+  private sp(value: number) {
+    return `${this.spNumber(value)}sp`;
+  }
+
   /**
    * What the numbers MEAN, on hover — because a bare percentage does not say
    * what it is a percentage OF, and both axes are measured in staff spaces
@@ -1145,19 +1156,18 @@ export class ZoomPad extends LitElement {
   }
 
   /**
-   * Space: a multiplier on the SPRINGS, whose unit is also staff spaces —
-   * the ideal gap after a quarter note is `QUARTER_SPRING_SP` at 100%. The
+   * Space IS a length in staff spaces — the air after a quarter note, which
+   * margins and padding follow on their own lines and 0 removes entirely. The
    * sentence says "asks for" rather than naming the drawn gap on purpose: the
    * justifier stretches or squeezes every row to the line width afterwards, so
    * the sp figure is what the engraver requested, not what you can measure on
    * the page.
    */
   private spaceTitle(): string {
-    const sp = Math.round(this.shownSpace * QUARTER_SPRING_SP * 100) / 100;
     return (
-      `Note spacing — asks for ${sp} staff spaces after a quarter note ` +
-      `(100% = ${QUARTER_SPRING_SP}). ` +
-      (this.spacingMode === 'natural' ? 'Natural spacing keeps this allowance unless a bar overflows. ' : 'Fill width stretches this allowance; the percentage is requested, not measured. ') +
+      `Note spacing — asks for ${this.spNumber(this.shownSpace)} staff spaces after a quarter note ` +
+      `(default ${SPACE_DEFAULT_SP}; 0 is no air at all, margins included). ` +
+      (this.spacingMode === 'natural' ? 'Natural spacing keeps this allowance unless a bar overflows. ' : 'Fill width stretches this allowance; the figure is requested, not measured. ') +
       `Symbol widths are additional and depend on staff size.`
     );
   }
@@ -1176,15 +1186,15 @@ export class ZoomPad extends LitElement {
       // different — and calling that "MAX" would be claiming a clamp that
       // isn't there. Same band, honest word.
       const bound = clamp.at === 'min'
-        ? value <= MIN_DENSITY + RUNG_EPS
-        : value >= MAX_DENSITY - RUNG_EPS;
+        ? value <= MIN_SPACE_SP + RUNG_EPS
+        : value >= MAX_SPACE_SP - RUNG_EPS;
       const tag = clamp.at === 'min'
         ? (axis === 'staff' || bound ? 'MIN' : 'TIGHTEST')
         : (axis === 'staff' || bound ? 'MAX' : 'WIDEST');
       return html`
         <div class="half limit">
           <div class="lbl">${tag}</div>
-          <div class="val">${this.pct(value)}</div>
+          <div class="val">${axis === 'staff' ? this.pct(value) : this.sp(value)}</div>
         </div>
       `;
     }
@@ -1202,9 +1212,9 @@ export class ZoomPad extends LitElement {
         <div class="lbl">SPACE</div>
         <div class="val ${this.densityH === null ? '' : 'hot'}">${this.spacingMode === 'natural'
           ? html`<input class="space-input" type="text" inputmode="decimal"
-              aria-label="Natural spacing percentage"
-              title="Enter spacing from 1% to 800%. Arrows adjust by 4 percentage points."
-              .value=${String(Math.round(this.shownSpace * 100))}
+              aria-label="Natural spacing in staff spaces"
+              title="Enter spacing from ${MIN_SPACE_SP} to ${MAX_SPACE_SP} staff spaces after a quarter note. Arrows adjust by ${SPACE_STEP}."
+              .value=${this.spNumber(this.shownSpace)}
               @pointerdown=${(event: PointerEvent) => event.stopPropagation()}
               @click=${(event: MouseEvent) => event.stopPropagation()}
               @change=${this.onSpaceInput}
@@ -1217,11 +1227,11 @@ export class ZoomPad extends LitElement {
                   input.blur();
                 } else if (event.key === 'Escape') {
                   event.preventDefault();
-                  input.value = String(Math.round(this.shownSpace * 100));
+                  input.value = this.spNumber(this.shownSpace);
                   input.blur();
                 }
-              }} />%`
-          : this.pct(this.shownSpace)}</div>
+              }} />sp`
+          : this.sp(this.shownSpace)}</div>
       </div>
     `;
   }

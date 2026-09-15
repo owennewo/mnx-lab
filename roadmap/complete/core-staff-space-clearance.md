@@ -93,5 +93,5 @@ The implementation worktree was retired before this document moved to complete.
 The 0–8 control scale remains a separate calibration decision, as agreed in the
 implementation scope.
 That decision is now filed as
-[core-space-units-sp.md](../proposed/core-space-units-sp.md) (2026-09-15): Space in
+[core-space-units-sp.md](../inprogress/core-space-units-sp.md) (2026-09-15): Space in
 staff spaces with a clamped line per consumer, zero reachable, goldens recalibrated.

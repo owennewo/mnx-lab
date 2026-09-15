@@ -418,7 +418,7 @@ describe('minimum drawn ink — a line is always at least a line', () => {
 // density wrapped a bar away the row got SHORTER still: the music narrowed as
 // the reader asked for more space. Invisible to the goldens, which are square.
 describe('a full row reaches the margin, whatever the staff scale', () => {
-  const LADDER = [0.02, 0.03, 0.07, 0.16, 0.27, 0.5, 1];
+  const LADDER = [0, 0.05, 0.07, 0.15, 0.35, 0.6, 1.1, 2.2];
 
   const rowWidths = (mnx: MnxStructure, widthSp: number, densityH: number, ink: number) => {
     const l = layoutTab({ mnx, widthSp, densityH, inkRatio: ink });
@@ -474,8 +474,11 @@ describe('a full row reaches the margin, whatever the staff scale', () => {
       for (const d of LADDER) {
         const first = rowWidths(mnx, 96.6, d, ink)[0];
         if (!first.full) continue;
+        // Barline x is read back rounded to 1e-4, so a width (two rounded
+        // coordinates) carries up to 1e-4 of grain of its own on top of the
+        // unrounded margins; the tolerance is that grain, doubled.
         expect(first.width + first.margins, `ink ${ink}: system 1 narrowed at density ${d}`).toBeGreaterThanOrEqual(
-          previous - 1e-4
+          previous - 2e-4
         );
         previous = first.width + first.margins;
       }

@@ -13,7 +13,7 @@ import { selectedLyricLineIds } from './lyricRuns.ts';
 import { displayedMeasureNumbers, instrumentName, normalizeDisplayOptions, type DisplayOptions } from '../displayOptions.ts';
 import { MnxStructure, type MnxEvent, isGrace, isTimedEvent, isTuplet } from '../../model/mnx.ts';
 import { Primitive, LayoutResult, LayoutDiagnostic, RowBandSp, SpatialIndex } from '../primitives.ts';
-import { clampDensity, planHorizontal, staffOneSequences } from './spacing.ts';
+import { SPACE_DEFAULT_SP, clampSpace, planHorizontal, staffOneSequences } from './spacing.ts';
 import { emitMeasureDiagnostics, emitPositionedDiagnostics, MeasureIssue } from './diagnostics.ts';
 import {
   TAB_STAFF_HEIGHT_SP,
@@ -222,12 +222,12 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
   };
   const plan = context?.plan ?? planHorizontal(mnx, widthSp, planOptions);
   // The score's natural extent, for the fit — see `LayoutResult.naturalWidthSp`.
-  // Only when density has actually moved: at 1 it is the same number, and the
-  // default paint must not pay for a second plan.
+  // Only when Space has actually moved: at the default it is the same number,
+  // and the default paint must not pay for a second plan.
   const naturalWidthSp = context ? context.naturalWidthSp :
-    clampDensity(opts.densityH) === 1
+    clampSpace(opts.densityH) === SPACE_DEFAULT_SP
       ? undefined
-      : planHorizontal(mnx, widthSp, { ...planOptions, densityH: 1 }).usedWidthSp;
+      : planHorizontal(mnx, widthSp, { ...planOptions, densityH: SPACE_DEFAULT_SP }).usedWidthSp;
 
   // Semantic validation (user-fixable, e.g. bar duration arithmetic) — merged
   // into each measure's diagnostic markers alongside renderer-gap issues.
@@ -643,7 +643,7 @@ function layoutTabSystems(opts: LayoutTabOptions): LayoutResult {
         subsequentLeftInsetSp: display.instrumentNames === 'every-system' ? instrumentLabelInset(parts.map(part => instrumentName(part, false))) : 0
       };
       const plan = planHorizontal(mnx, widthSp, planOptions);
-      const natural = clampDensity(opts.densityH) === 1 ? undefined : planHorizontal(mnx, widthSp, { ...planOptions, densityH: 1 }).usedWidthSp;
+      const natural = clampSpace(opts.densityH) === SPACE_DEFAULT_SP ? undefined : planHorizontal(mnx, widthSp, { ...planOptions, densityH: SPACE_DEFAULT_SP }).usedWidthSp;
       packings.push(plan.packing);
       usedWidthSp = Math.max(usedWidthSp, plan.usedWidthSp);
       if (natural !== undefined) naturalWidthSp = Math.max(naturalWidthSp ?? 0, natural);

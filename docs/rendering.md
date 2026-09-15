@@ -245,7 +245,10 @@ mapping carry both identities. Omission is the byte-identical written path.
 
 With no legacy override, Staff scales the fixed vertical relationship gaps once,
 along with the ink. Space owns horizontal margins and prefix/bar padding as well
-as rhythmic springs. `horizontalWhitespace()` in `layout/spacing.ts` resolves that
-policy; packing snapshots carry the source density and prefix-air descriptors so
-re-packing uses the same whitespace as placement. Clearance remains only as a
+as rhythmic springs. Space is a length in staff spaces (the air after a quarter
+note; 0 is a true zero) and every consumer is a clamped line in it, tabled in
+`SPACE_LINES`; `spacePolicy()` in `layout/spacing.ts` resolves the table at a
+value. Packing snapshots carry the source Space and prefix-air descriptors so
+re-packing uses the same whitespace as placement, and the spring pass runs after
+the snapshot is captured so nothing divides by Space. Clearance remains only as a
 legacy host override; see [the viewer contract](core-viewer-surface.md#whitespace-ownership-and-legacy-overrides).
