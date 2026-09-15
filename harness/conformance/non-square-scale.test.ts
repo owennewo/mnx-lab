@@ -448,7 +448,9 @@ describe('a full row reaches the margin, whatever the staff scale', () => {
     const line = widthSp - 2 * 2; // the plan's line, inside its page margins
     let checked = 0;
     for (const ink of [0.6, 0.8, 1, 1.6]) {
-      for (const d of LADDER) {
+      // Not at Space 0: with no springs there is nothing to justify with, so
+      // a full row is honestly ragged there.
+      for (const d of LADDER.filter(v => v > 0)) {
         for (const row of rowWidths(mnx, widthSp, d, ink)) {
           if (!row.full) continue;
           checked++;

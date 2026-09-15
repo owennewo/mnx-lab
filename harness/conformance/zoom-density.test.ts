@@ -109,13 +109,22 @@ describe('zoom / density', () => {
 
     it('no glyph columns overlap, at the floor or below it', () => {
       initSmufl();
+      // The column is ink plus air and the air follows Space, so the floor
+      // of the guarantee is the INK: at Space 0 two centres come no closer
+      // than one notehead width (`plan.columns.core`), and at the default
+      // that is the historical CORE_SP.
+      const coreAt = (densityH: number) => planHorizontal(doc('lab/document/twelve-bar-blues'), 20, { densityH }).columns.core;
+      expect(coreAt(SPACE_DEFAULT_SP)).toBe(CORE_SP);
+      expect(coreAt(MIN_SPACE_SP)).toBeLessThan(CORE_SP);
+      expect(coreAt(MIN_SPACE_SP)).toBeGreaterThan(1);
       // Squeezed AND comfortable: the two rows behave differently, and the
       // guarantee has to hold on both.
-      expect(tightestGapSp(MIN_SPACE_SP)).toBeGreaterThanOrEqual(CORE_SP - 1e-9);
-      expect(tightestGapSp(MIN_SPACE_SP, 80)).toBeGreaterThanOrEqual(CORE_SP - 1e-9);
+      expect(tightestGapSp(MIN_SPACE_SP)).toBeGreaterThanOrEqual(coreAt(MIN_SPACE_SP) - 1e-9);
+      expect(tightestGapSp(MIN_SPACE_SP, 80)).toBeGreaterThanOrEqual(coreAt(MIN_SPACE_SP) - 1e-9);
+      expect(tightestGapSp(SPACE_DEFAULT_SP, 80)).toBeGreaterThanOrEqual(CORE_SP - 1e-9);
       // Below the floor too: planHorizontal clamps internally, so an absurd
       // value is survivable rather than merely rejected.
-      expect(tightestGapSp(-1)).toBeGreaterThanOrEqual(CORE_SP - 1e-9);
+      expect(tightestGapSp(-1)).toBeGreaterThanOrEqual(coreAt(MIN_SPACE_SP) - 1e-9);
     });
 
     it('the springs really did shrink — the gap test is not vacuous', () => {
@@ -442,7 +451,7 @@ describe('zoom / density', () => {
       for (const spacingMode of ['natural', 'fill'] as const) {
         for (const staffKind of ['notation', 'tab'] as const) {
           const count = (inkRatio: number) => planHorizontal(blues(), 80, {
-            spacingMode, staffKind, inkRatio, densityH: 0.2
+            spacingMode, staffKind, inkRatio, densityH: 1.1
           }).measures.filter(m => m.row === 0 && !m.hidden).length;
           expect(count(0.6)).toBeGreaterThan(count(1));
           expect(count(1)).toBeGreaterThan(count(2.3));
@@ -672,8 +681,10 @@ describe('the fit answers about the score, not about the density knob', () => {
 
   it('and that is not vacuous: fitting on the squeezed width ran backwards', () => {
     initSmufl();
-    // The reported case, reproduced through the old rule.
-    expect(bar1Px(0.65, false)).toBeLessThan(bar1Px(0.05, false));
+    // The reported case, reproduced through the old rule: more Space, a
+    // narrower bar, because the tighter score fitted onto fewer staff spaces
+    // and was scaled up harder.
+    expect(bar1Px(0.65, false)).toBeLessThan(bar1Px(0.3, false));
   });
 
   it('a naturally short score is still scaled up — what the fit is for', () => {
@@ -794,7 +805,14 @@ describe('natural spacing', () => {
     const previous = plan(0.1);
     expect(clampSpace(0)).toBe(0);
     expect(minimum.measures[0].width).toBeLessThan(previous.measures[0].width);
-    expect(minimum.packing.measures.map(m => m.rigid)).toEqual(previous.packing.measures.map(m => m.rigid));
+    // Symbol INK is untouched — only the air inside the columns moved, and
+    // by exactly what the column-air line says.
+    expect(minimum.columns.core).toBeLessThan(previous.columns.core);
+    const airDelta = spacePolicy(0.1).columnAir - spacePolicy(0).columnAir;
+    minimum.packing.measures.forEach((m, i) => {
+      const other = previous.packing.measures[i];
+      expect(other.rigid - m.rigid).toBeCloseTo((m.columnAir ?? 0) * airDelta, 9);
+    });
   });
   it('keeps springs unstretched, including at non-square staff scales', () => {
     const mnx = doc('lab/document/twelve-bar-blues');

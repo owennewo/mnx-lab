@@ -51,36 +51,98 @@ import { clearanceSpacing } from '../clearance.ts';
 const CONTENT_LEFT_PAD_SP = 0.6;
 const CONTENT_RIGHT_PAD_SP = 0.8;
 const START_BARLINE_PAD_SP = 0.5;
-const CLEF_WIDTH_SP = 3;
 /**
- * The tab clef's own slot. `6stringTabClef` is 1.64sp of ink against `gClef`'s
- * 2.68, so a tab-only system sized to the notation slot carries 1.36sp it can
- * never fill. 2.0 leaves it the same ~0.35sp of breathing room the notation
- * slot leaves its own glyph — the slot is right-sized, not tightened.
+ * Prefix glyph slots are INK plus a spare tail. The ink is the glyph's own
+ * width (`gClef` 2.68sp, `6stringTabClef` 1.64sp, a time-signature digit pair
+ * ~1.8sp); the tail is air, and air follows Space (`SPACE_LINES`), so at
+ * Space 0 the clef, key and time signature abut. The tab clef's slot is
+ * right-sized rather than tightened: the notation slot carries 1.36sp the
+ * smaller glyph could never fill.
  */
-const TAB_CLEF_WIDTH_SP = 2;
-const TIME_SIG_WIDTH_SP = 2.5;
+const CLEF_INK_SP = 2.7;
+const CLEF_TAIL_SP = 0.3;
+const TAB_CLEF_INK_SP = 1.65;
+const TAB_CLEF_TAIL_SP = 0.35;
+const TIME_SIG_INK_SP = 1.8;
+const TIME_SIG_TAIL_SP = 0.7;
 export const KEY_SIG_GLYPH_ADVANCE_SP = 1.0;
 const KEY_SIG_RIGHT_PAD_SP = 0.5;
 
 export const ACCIDENTAL_SLOT_WIDTH_SP = 1.0; // one stacked accidental column
-export const ACCIDENTAL_RIGHT_PAD_SP = 0.15;
+export const ACCIDENTAL_RIGHT_PAD_SP = 0.15; // air between the accidentals and the notehead
 
-export const CORE_SP = 1.5;        // notehead / fret-number column (rigid)
-const DOT_SP = 0.55;               // extra rigid width per augmentation dot
-export const GRACE_NOTE_ADVANCE_SP = 1.5; // rigid column per grace note (small scale)
+/**
+ * Event columns are INK plus AIR, and the air follows Space
+ * (`SPACE_LINES.columnAir`, roadmap/inprogress/core-space-units-sp.md). The
+ * exported sums are the DEFAULT geometry — what every column is at Space 2.2
+ * — and the ink parts are the floor: at Space 0 a notehead column is exactly
+ * a notehead wide, so columns still never overlap, they abut. `columnGeometry`
+ * resolves the set at a Space; readers take it from the plan, never from
+ * these constants, so placement and pricing cannot disagree.
+ */
+const CORE_INK_SP = 1.2;           // a notehead (noteheadBlack is 1.18sp)
+const CORE_AIR_SP = 0.3;
+export const CORE_SP = CORE_INK_SP + CORE_AIR_SP; // notehead / fret-number column at the default
+const DOT_INK_SP = 0.4;            // the augmentation dot and its gap from the head
+const DOT_AIR_SP = 0.15;
+const DOT_SP = DOT_INK_SP + DOT_AIR_SP;
+const GRACE_INK_SP = 0.9;          // a grace notehead (small scale)
+const GRACE_AIR_SP = 0.6;
+export const GRACE_NOTE_ADVANCE_SP = GRACE_INK_SP + GRACE_AIR_SP; // column per grace note at the default
 export const TREMOLO_NOTE_ADVANCE_SP = 5; // between a multi-note tremolo's two written notes
-const GRACE_RIGHT_PAD_SP = 0.3;    // gap between a grace group and its principal
+const GRACE_RIGHT_PAD_SP = 0.3;    // air between a grace group and its principal
 const MID_CLEF_WIDTH_SP = 2.4;     // rigid column for a mid-measure clef change
-const MID_CLEF_LEFT_PAD_SP = 0.3;  // gap between the previous column and the clef
-const DYNAMIC_SIDE_PAD_SP = 0.3;   // clearance either side of a dynamic mark
+const MID_CLEF_LEFT_PAD_SP = 0.3;  // air between the previous column and the clef
+const DYNAMIC_SIDE_PAD_SP = 0.3;   // air either side of a dynamic mark
+
+/** The column geometry the plan priced at, carried on the plan for every
+ *  reader that walks a column (tuplet inner notes, grace runs, accidental
+ *  offsets). Numbers in staff spaces at ink ratio 1. */
+export interface ColumnGeometry {
+  core: number;
+  grace: number;
+  dot: number;
+  accidentalRightPad: number;
+  graceRightPad: number;
+  midClefLeftPad: number;
+  dynamicSidePad: number;
+  lyricSidePad: number;
+}
+
+/** The geometry at the default Space — the constants above, exactly. */
+export const DEFAULT_COLUMNS: ColumnGeometry = {
+  core: CORE_SP,
+  grace: GRACE_NOTE_ADVANCE_SP,
+  dot: DOT_SP,
+  accidentalRightPad: ACCIDENTAL_RIGHT_PAD_SP,
+  graceRightPad: GRACE_RIGHT_PAD_SP,
+  midClefLeftPad: MID_CLEF_LEFT_PAD_SP,
+  dynamicSidePad: DYNAMIC_SIDE_PAD_SP,
+  lyricSidePad: 0.35
+};
+
+/** The geometry at a column-air factor (`SpacePolicy.columnAir`): ink plus
+ *  air × factor. Identity at 1, by construction rather than by arithmetic. */
+export function columnGeometry(air: number): ColumnGeometry {
+  if (air === 1) return DEFAULT_COLUMNS;
+  return {
+    core: CORE_INK_SP + CORE_AIR_SP * air,
+    grace: GRACE_INK_SP + GRACE_AIR_SP * air,
+    dot: DOT_INK_SP + DOT_AIR_SP * air,
+    accidentalRightPad: ACCIDENTAL_RIGHT_PAD_SP * air,
+    graceRightPad: GRACE_RIGHT_PAD_SP * air,
+    midClefLeftPad: MID_CLEF_LEFT_PAD_SP * air,
+    dynamicSidePad: DYNAMIC_SIDE_PAD_SP * air,
+    lyricSidePad: DEFAULT_COLUMNS.lyricSidePad * air
+  };
+}
 export const REPEAT_START_WIDTH_SP = 2.0; // |: cluster after the prefix glyphs
 export const REPEAT_END_EXTRA_SP = 1.4;   // room for the :| dots before the end barline
 const MULTIREST_WIDTH_SP = 10;     // content width of a collapsed H-bar measure
 // Syllable width estimate per character, as a fraction of the lyric em — so
 // the column tracks the drawn text when the lyric size moves.
 const LYRIC_CHAR_WIDTH_SP = LYRIC_SIZE_SP * 0.56;
-const LYRIC_SIDE_PAD_SP = 0.35;    // clearance either side of a syllable
+const LYRIC_SIDE_PAD_SP = DEFAULT_COLUMNS.lyricSidePad; // air either side of a syllable
 const ONSET_EPS = 1e-6;            // float tolerance for metric positions
 /** Ideal space after a quarter note, in staff spaces, at the default Space —
  *  and the DEFINITION of the Space unit: Space `x` IS the air after a quarter
@@ -179,7 +241,9 @@ export function spaceLineAt(line: SpaceLine, x: number): number {
 }
 
 /** The pads that follow Space. Glyph SLOTS are rigid and are not here. */
-export type PadKind = 'contentLeft' | 'startBarline' | 'keySigRight' | 'contentRight';
+export type PadKind =
+  | 'contentLeft' | 'startBarline' | 'keySigRight' | 'contentRight'
+  | 'clefTail' | 'tabClefTail' | 'timeTail';
 
 /**
  * The calibration table — every horizontal consumer and its two numbers.
@@ -188,15 +252,23 @@ export type PadKind = 'contentLeft' | 'startBarline' | 'keySigRight' | 'contentR
  * duration, which is what keeps a whole note wider than an eighth at every
  * `x` (including zero, if `atZero` is ever raised above 0). The leading spring
  * is a fixed fraction of the first event's spring (`MEASURE_LEAD_FACTOR`) and
- * so rides the same line.
+ * so rides the same line. `columnAir` is likewise a FACTOR, on every air
+ * constant inside a rigid column (`columnGeometry`): the notehead column's
+ * 0.3sp, the dot's, the grace run's, the accidental/grace/clef/dynamic/lyric
+ * pads. One row for all of them until calibration wants them apart — and
+ * the one row that is capped at its default (see `spacePolicy`).
  */
-export const SPACE_LINES: { spring: SpaceLine; margin: SpaceLine } & Record<PadKind, SpaceLine> = {
+export const SPACE_LINES: { spring: SpaceLine; columnAir: SpaceLine; margin: SpaceLine } & Record<PadKind, SpaceLine> = {
   spring: { atZero: 0, atDefault: 1 },
+  columnAir: { atZero: 0, atDefault: 1 },
   margin: { atZero: 0, atDefault: 2 },
   contentLeft: { atZero: 0, atDefault: CONTENT_LEFT_PAD_SP },
   startBarline: { atZero: 0, atDefault: START_BARLINE_PAD_SP },
   keySigRight: { atZero: 0, atDefault: KEY_SIG_RIGHT_PAD_SP },
-  contentRight: { atZero: 0, atDefault: CONTENT_RIGHT_PAD_SP }
+  contentRight: { atZero: 0, atDefault: CONTENT_RIGHT_PAD_SP },
+  clefTail: { atZero: 0, atDefault: CLEF_TAIL_SP },
+  tabClefTail: { atZero: 0, atDefault: TAB_CLEF_TAIL_SP },
+  timeTail: { atZero: 0, atDefault: TIME_SIG_TAIL_SP }
 };
 
 /** What Space resolves to at `x`: the spring factor, the page margin, each
@@ -205,6 +277,8 @@ export const SPACE_LINES: { spring: SpaceLine; margin: SpaceLine } & Record<PadK
  *  the planner and the packer read one interface. */
 export interface SpacePolicy {
   spring: number;
+  /** Factor on the air inside rigid columns — see `columnGeometry`. */
+  columnAir: number;
   horizontalMargin: number;
   pad: (kind: PadKind) => number;
   prefixGroupExtra: number;
@@ -214,6 +288,11 @@ export function spacePolicy(densityH = SPACE_DEFAULT_SP): SpacePolicy {
   const x = clampSpace(densityH);
   return {
     spring: spaceLineAt(SPACE_LINES.spring, x),
+    // Column air follows Space DOWN to zero and stops at its default above
+    // it: past the default the springs carry the spread, and a rigid column
+    // that kept growing (× the ink ratio, on a low-vision staff) would push
+    // a single bar past the pane. The one place a line is capped.
+    columnAir: Math.min(1, spaceLineAt(SPACE_LINES.columnAir, x)),
     horizontalMargin: spaceLineAt(SPACE_LINES.margin, x),
     pad: kind => spaceLineAt(SPACE_LINES[kind], x),
     prefixGroupExtra: 0
@@ -224,17 +303,23 @@ const PAD_NORMAL_SP: Record<PadKind, number> = {
   contentLeft: CONTENT_LEFT_PAD_SP,
   startBarline: START_BARLINE_PAD_SP,
   keySigRight: KEY_SIG_RIGHT_PAD_SP,
-  contentRight: CONTENT_RIGHT_PAD_SP
+  contentRight: CONTENT_RIGHT_PAD_SP,
+  clefTail: CLEF_TAIL_SP,
+  tabClefTail: TAB_CLEF_TAIL_SP,
+  timeTail: TIME_SIG_TAIL_SP
 };
+const SLOT_TAILS = new Set<PadKind>(['clefTail', 'tabClefTail', 'timeTail']);
 
-/** An explicit host `clearance`/`densityPad` keeps its historical pad and
- *  margin policy; only the springs follow the Space line. */
+/** An explicit host `clearance`/`densityPad` keeps its historical pad, slot
+ *  and margin policy and its column geometry; only the springs follow the
+ *  Space line. */
 function legacySpacePolicy(densityH: number, clearance?: number, densityPad?: number | null): SpacePolicy {
   const frame = clearanceSpacing(clearance, densityPad);
   return {
     spring: spaceLineAt(SPACE_LINES.spring, clampSpace(densityH)),
+    columnAir: 1,
     horizontalMargin: frame.horizontalMargin,
-    pad: kind => frame.prefixPad(PAD_NORMAL_SP[kind]),
+    pad: kind => SLOT_TAILS.has(kind) ? PAD_NORMAL_SP[kind] : frame.prefixPad(PAD_NORMAL_SP[kind]),
     prefixGroupExtra: frame.prefixGroupExtra
   };
 }
@@ -354,6 +439,11 @@ export interface MeasurePack {
   /** Prefix width mid-system (only what this measure itself declares). */
   prefixRest: number;
   rigid: number;
+  /** The part of `rigid` that is column AIR at the default (× ink ratio):
+   *  re-priced by `SpacePolicy.columnAir` when a ladder or gesture asks what
+   *  another Space would draw. Governing voice only — the same approximation
+   *  the springs already make. */
+  columnAir?: number;
   /** Σ base springs — the packer applies the Space line's factor. */
   spring: number;
   /** Barline→first-event base spring. */
@@ -384,6 +474,7 @@ function packingAtSpace(packing: PackingInput, densityH: number): PackingInput {
   const old = spacePolicy(packing.space.spaceSp);
   const next = spacePolicy(densityH);
   const marginDelta = 2 * (old.horizontalMargin - next.horizontalMargin);
+  const airDelta = next.columnAir - old.columnAir;
   return {
     ...packing,
     space: { ...packing.space, spaceSp: densityH },
@@ -395,6 +486,7 @@ function packingAtSpace(packing: PackingInput, densityH: number): PackingInput {
     measures: packing.measures.map((m, i) => {
       const air = packing.space!.prefixes[i];
       return { ...m,
+        rigid: m.rigid + (m.columnAir ?? 0) * airDelta,
         prefixFirst: m.prefixFirst + prefixAir(air.first, next) - prefixAir(air.first, old),
         prefixRest: m.prefixRest + prefixAir(air.rest, next) - prefixAir(air.rest, old)
       };
@@ -605,7 +697,7 @@ export function packingSignature(
     .map(p => {
       const resolved = packingAtSpace(p, densityH);
       const air = p.space ? `${resolved.lineWidthSp.toFixed(6)}:${resolved.contentRightPadSp?.toFixed(6)}:` +
-        resolved.measures.map(m => `${m.prefixFirst.toFixed(6)},${m.prefixRest.toFixed(6)}`).join('/') : '';
+        resolved.measures.map(m => `${m.prefixFirst.toFixed(6)},${m.prefixRest.toFixed(6)},${m.rigid.toFixed(6)}`).join('/') : '';
       const springFactor = spacePolicy(densityH).spring;
       return air + packSystems(resolved, densityH)
         .map(row => `${row.measures.join(',')}@${(springFactor * row.stretch).toFixed(6)}`)
@@ -801,9 +893,9 @@ export function accidentalColumns(
 }
 
 /** The rigid room a chord's accidentals take left of its noteheads. */
-export function accidentalLeadingSp(notes: readonly MnxNote[], accidentalOf: AccidentalResolver): number {
+export function accidentalLeadingSp(notes: readonly MnxNote[], accidentalOf: AccidentalResolver, columns: ColumnGeometry = DEFAULT_COLUMNS): number {
   const { count } = accidentalColumns(notes, accidentalOf);
-  return count ? count * ACCIDENTAL_SLOT_WIDTH_SP + ACCIDENTAL_RIGHT_PAD_SP : 0;
+  return count ? count * ACCIDENTAL_SLOT_WIDTH_SP + columns.accidentalRightPad : 0;
 }
 
 /** A tab staff draws no accidentals, so a tab-only plan reserves none: the
@@ -947,6 +1039,8 @@ export interface TupletColumn {
   leading: number;
   /** Full column width: leading + core (+ dots) + scaled duration space. */
   advance: number;
+  /** The column AIR inside `advance` at the default geometry (for re-pricing). */
+  air: number;
 }
 
 /**
@@ -955,22 +1049,24 @@ export interface TupletColumn {
  * room than its eighths). The renderer places inner notes with the same
  * columns; keep the two in lockstep by computing them only here.
  */
-export function tupletColumns(t: MnxTuplet, accidentalOf: AccidentalResolver): TupletColumn[] {
+export function tupletColumns(t: MnxTuplet, accidentalOf: AccidentalResolver, columns: ColumnGeometry = DEFAULT_COLUMNS): TupletColumn[] {
   const innerSum = t.content.reduce(
     (sum, e) => sum + (isTimedEvent(e) ? durationValue(e.duration) : 0),
     0
   );
   const scale = innerSum > 0 ? tupletDuration(t) / innerSum : 1;
   return t.content.map(e => {
-    if (!isTimedEvent(e)) return { leading: 0, advance: CORE_SP };
-    const leading = accidentalLeadingSp(e.notes ?? [], accidentalOf);
+    if (!isTimedEvent(e)) return { leading: 0, advance: columns.core, air: CORE_AIR_SP };
+    const leading = accidentalLeadingSp(e.notes ?? [], accidentalOf, columns);
+    const dots = e.duration.dots ?? 0;
     return {
       leading,
       advance:
         leading +
-        CORE_SP +
-        (e.duration.dots ?? 0) * DOT_SP +
-        springSp(durationValue(e.duration) * scale)
+        columns.core +
+        dots * columns.dot +
+        springSp(durationValue(e.duration) * scale),
+      air: (leading ? ACCIDENTAL_RIGHT_PAD_SP : 0) + CORE_AIR_SP + dots * DOT_AIR_SP
     };
   });
 }
@@ -1075,6 +1171,10 @@ export interface HorizontalPlan {
   /** This plan's packing input, at density 1 — enough to ask what ANOTHER
    *  density would draw without planning it (`densityLadder`). */
   packing: PackingInput;
+  /** The column geometry this plan priced at (`columnGeometry` of the Space
+   *  policy's column-air factor). Every reader that walks a column — tuplet
+   *  inner notes, grace runs, accidental offsets — takes it from here. */
+  columns: ColumnGeometry;
   /** The ink ratio this plan was priced at (clamped; 1 = square). Layouts
    *  read it back for the few glyph-run advances they draw inside a column
    *  (the key-signature run), so drawn runs fill the columns priced here. */
@@ -1122,13 +1222,13 @@ export function resolveStaffVoices(spec: PlanStaff, measureIndex: number): Resol
 }
 
 /** Column width a syllable needs (the widest of the event's lyric lines). */
-function lyricCoreSp(event: { lyrics?: { lines?: Record<string, { text: string }> } }, selected?: readonly string[]): number {
+function lyricCoreSp(event: { lyrics?: { lines?: Record<string, { text: string }> } }, selected: readonly string[] | undefined, columns: ColumnGeometry): number {
   const lines = event.lyrics?.lines;
   if (!lines) return 0;
   let w = 0;
   for (const [id, line] of Object.entries(lines)) {
     if (selected && !selected.includes(id)) continue;
-    w = Math.max(w, line.text.length * LYRIC_CHAR_WIDTH_SP + 2 * LYRIC_SIDE_PAD_SP);
+    w = Math.max(w, line.text.length * LYRIC_CHAR_WIDTH_SP + 2 * columns.lyricSidePad);
   }
   return w;
 }
@@ -1247,6 +1347,12 @@ export interface PlanOptions {
 interface EventMetrics {
   leading: number; // rigid: mid-measure clefs + accidental columns
   core: number;    // rigid: notehead/fret + dots
+  /** The column AIR inside leading + core at the default geometry — what a
+   *  ladder re-price at another Space moves. `airPre` is the part left of the
+   *  column centre (in `leading` and the first half of the core), so the
+   *  cross-voice merge can carry air along its longest path. */
+  air: number;
+  airPre: number;
   spring: number;  // stretchable: duration space
   /** Metric position within the bar (whole-note fraction) — the shared
    *  column identity for the cross-voice merge. Absent on grace containers,
@@ -1272,6 +1378,8 @@ interface MeasureMetrics {
   /** Σ rigid / Σ spring of the governing (widest) voice across all staves. */
   rigid: number;
   spring: number;
+  /** The column air inside that voice's `rigid`, at the default geometry. */
+  columnAir: number;
   /** Spring between the barline (or prefix glyphs) and the first event. */
   leadingSpring: number;
   clefTimelines: ClefAt[][];
@@ -1336,6 +1444,8 @@ interface MergedVoice {
 }
 
 interface MergedEdge {
+  /** Column air along this edge at the default geometry (see `EventMetrics.air`). */
+  air: number;
   from: number; // -1 = the bar's content start
   to: number;
   rigid: number;
@@ -1345,7 +1455,7 @@ interface MergedEdge {
 interface MergedModel {
   /** Anchor x per (flattened voice, entry), relative to content start, plus
    *  the merged content width, at one justification stretch. */
-  solve(stretch: number): { anchors: number[][]; width: number };
+  solve(stretch: number): { anchors: number[][]; width: number; air: number };
   /** The same anchors with the stretch SOLVED so the merged width lands on
    *  `width` exactly — parametric (no bisection), so positions respond to
    *  width with the same smooth linear arithmetic the legacy walk has, and
@@ -1354,13 +1464,13 @@ interface MergedModel {
   voices: MergedVoice[];
 }
 
-function halfCoreSp(e: EventMetrics, ink: number): number {
-  return ((e.graceCount ? GRACE_NOTE_ADVANCE_SP : CORE_SP) * ink) / 2;
+function halfCoreSp(e: EventMetrics, ink: number, columns: ColumnGeometry): number {
+  return ((e.graceCount ? columns.grace : columns.core) * ink) / 2;
 }
 
 /** Null when fewer than two voices carry entries — the legacy walk owns the
  *  single-voice case, floats and all. */
-function mergedModelOf(staves: EventMetrics[][][], ink: number): MergedModel | null {
+function mergedModelOf(staves: EventMetrics[][][], ink: number, columns: ColumnGeometry): MergedModel | null {
   const voices: MergedVoice[] = [];
   staves.forEach((staff, staffIndex) =>
     staff.forEach((entries, voiceIndex) => {
@@ -1400,12 +1510,18 @@ function mergedModelOf(staves: EventMetrics[][][], ink: number): MergedModel | n
   // The widest rigid halves at each shared column, across every voice.
   const maxPre = new Array<number>(nodeOnsets.length).fill(0);
   const maxPost = new Array<number>(nodeOnsets.length).fill(0);
+  // The air inside the winning half, so a re-price at another Space can move
+  // the merged width by what its longest path actually carries.
+  const maxPreAir = new Array<number>(nodeOnsets.length).fill(0);
+  const maxPostAir = new Array<number>(nodeOnsets.length).fill(0);
   voices.forEach((v, vi) =>
     v.entries.forEach((e, k) => {
       if (e.onset === undefined) return;
       const node = entryNode[vi][k];
-      maxPre[node] = Math.max(maxPre[node], e.leading + halfCoreSp(e, ink));
-      maxPost[node] = Math.max(maxPost[node], e.core - halfCoreSp(e, ink));
+      const pre = e.leading + halfCoreSp(e, ink, columns);
+      const post = e.core - halfCoreSp(e, ink, columns);
+      if (pre > maxPre[node]) { maxPre[node] = pre; maxPreAir[node] = e.airPre; }
+      if (post > maxPost[node]) { maxPost[node] = post; maxPostAir[node] = e.air - e.airPre; }
     })
   );
 
@@ -1416,14 +1532,15 @@ function mergedModelOf(staves: EventMetrics[][][], ink: number): MergedModel | n
     let prev: { node: number; e: EventMetrics } | null = null;
     v.entries.forEach((e, k) => {
       const node = entryNode[vi][k];
-      const pre = e.leading + halfCoreSp(e, ink);
+      const pre = e.leading + halfCoreSp(e, ink, columns);
       if (prev === null) {
-        edges.push({ from: -1, to: node, rigid: pre, spring: 0 });
+        edges.push({ from: -1, to: node, rigid: pre, air: e.airPre, spring: 0 });
       } else {
         edges.push({
           from: prev.node,
           to: node,
-          rigid: prev.e.core - halfCoreSp(prev.e, ink) + pre,
+          rigid: prev.e.core - halfCoreSp(prev.e, ink, columns) + pre,
+          air: prev.e.air - prev.e.airPre + e.airPre,
           spring: prev.e.spring
         });
       }
@@ -1434,7 +1551,8 @@ function mergedModelOf(staves: EventMetrics[][][], ink: number): MergedModel | n
       edges.push({
         from: last.node,
         to: endNode,
-        rigid: last.e.core - halfCoreSp(last.e, ink),
+        rigid: last.e.core - halfCoreSp(last.e, ink, columns),
+        air: last.e.air - last.e.airPre,
         spring: last.e.spring * MEASURE_TRAIL_FACTOR
       });
     }
@@ -1443,10 +1561,11 @@ function mergedModelOf(staves: EventMetrics[][][], ink: number): MergedModel | n
   // between it and the one before — the cross-voice guarantee that x stays
   // monotone in onset whatever any single voice demands.
   for (let j = 1; j < nodeOnsets.length; j++) {
-    edges.push({ from: j - 1, to: j, rigid: maxPost[j - 1] + maxPre[j], spring: 0 });
+    edges.push({ from: j - 1, to: j, rigid: maxPost[j - 1] + maxPre[j], air: maxPostAir[j - 1] + maxPreAir[j], spring: 0 });
   }
   if (nodeOnsets.length > 0) {
-    edges.push({ from: nodeOnsets.length - 1, to: endNode, rigid: maxPost[nodeOnsets.length - 1], spring: 0 });
+    const last = nodeOnsets.length - 1;
+    edges.push({ from: last, to: endNode, rigid: maxPost[last], air: maxPostAir[last], spring: 0 });
   }
 
   // Longest path by relaxation over (rigid, spring) PAIRS compared at one
@@ -1456,33 +1575,37 @@ function mergedModelOf(staves: EventMetrics[][][], ink: number): MergedModel | n
   const relax = (stretch: number) => {
     const rigidAt = new Array<number>(nodeCount).fill(0);
     const springAt = new Array<number>(nodeCount).fill(0);
+    const airAt = new Array<number>(nodeCount).fill(0);
     for (let pass = 0; pass < nodeCount + 1; pass++) {
       let moved = false;
       for (const edge of edges) {
         const fromRigid = edge.from === -1 ? 0 : rigidAt[edge.from];
         const fromSpring = edge.from === -1 ? 0 : springAt[edge.from];
+        const fromAir = edge.from === -1 ? 0 : airAt[edge.from];
         const rigid = fromRigid + edge.rigid;
         const spring = fromSpring + edge.spring;
         if (rigid + spring * stretch > rigidAt[edge.to] + springAt[edge.to] * stretch + 1e-12) {
           rigidAt[edge.to] = rigid;
           springAt[edge.to] = spring;
+          airAt[edge.to] = fromAir + edge.air;
           moved = true;
         }
       }
       if (!moved) break;
     }
-    return { rigidAt, springAt };
+    return { rigidAt, springAt, airAt };
   };
-  const anchorsFrom = (rigidAt: number[], springAt: number[], stretch: number) => ({
+  const anchorsFrom = (rigidAt: number[], springAt: number[], stretch: number, airAt: number[] = []) => ({
     anchors: voices.map((v, vi) =>
       v.entries.map((_, k) => rigidAt[entryNode[vi][k]] + springAt[entryNode[vi][k]] * stretch)
     ),
-    width: rigidAt[endNode] + springAt[endNode] * stretch
+    width: rigidAt[endNode] + springAt[endNode] * stretch,
+    air: airAt[endNode] ?? 0
   });
 
   const solve = (stretch: number) => {
-    const { rigidAt, springAt } = relax(stretch);
-    return anchorsFrom(rigidAt, springAt, stretch);
+    const { rigidAt, springAt, airAt } = relax(stretch);
+    return anchorsFrom(rigidAt, springAt, stretch, airAt);
   };
 
   const solveFor = (width: number) => {
@@ -1512,13 +1635,14 @@ function mergedModelOf(staves: EventMetrics[][][], ink: number): MergedModel | n
  *  when the cross-voice constraints bind beyond the widest single voice. */
 function mergedNaturalWidth(
   staves: EventMetrics[][][],
-  ink: number
-): { rigid: number; spring: number } | null {
-  const model = mergedModelOf(staves, ink);
+  ink: number,
+  columns: ColumnGeometry
+): { rigid: number; spring: number; air: number } | null {
+  const model = mergedModelOf(staves, ink, columns);
   if (!model) return null;
-  const rigid = model.solve(0).width;
+  const natural = model.solve(0);
   const atOne = model.solve(1).width;
-  return { rigid, spring: Math.max(0, atOne - rigid) };
+  return { rigid: natural.width, spring: Math.max(0, atOne - natural.width), air: natural.air };
 }
 
 export function planHorizontal(
@@ -1552,7 +1676,7 @@ export function planHorizontal(
   if (planStaves.length === 0) {
     return {
       measures: [], rowCount: 0, numStaves: 1, staffGroups: [], usedWidthSp: widthSp,
-      packing: { measures: [], lineWidthSp: widthSp }, inkRatio: 1
+      packing: { measures: [], lineWidthSp: widthSp }, columns: DEFAULT_COLUMNS, inkRatio: 1
     };
   }
 
@@ -1573,14 +1697,16 @@ export function planHorizontal(
   // used to ignore the spacing control entirely: every part of it was on the
   // rigid side, including the parts that were only ever air.
   const pad = clearance.pad;
+  const columns = columnGeometry(clearance.columnAir);
   const isTabOnly = options?.staffKind === 'tab';
   const arpeggioStarts = new Set(
     [...collectSpanMarks(mnx.parts ?? [])].filter(([, marks]) => marks.arpeggio).map(([id]) => id)
   );
-  const clefWidth = isTabOnly ? TAB_CLEF_WIDTH_SP : CLEF_WIDTH_SP;
-  // Keep glyph positions/size fixed and vary only the slot's trailing air.
-  const clefSlot = (ink: number) => clefWidth * ink + clearance.prefixGroupExtra;
-  const timeSlot = (ink: number) => TIME_SIG_WIDTH_SP * ink + clearance.prefixGroupExtra;
+  // Glyph ink scales with the ink ratio; the slot's spare tail is air and
+  // follows Space (or the legacy frame's group extra).
+  const clefSlot = (ink: number) => (isTabOnly ? TAB_CLEF_INK_SP : CLEF_INK_SP) * ink
+    + pad(isTabOnly ? 'tabClefTail' : 'clefTail') + clearance.prefixGroupExtra;
+  const timeSlot = (ink: number) => TIME_SIG_INK_SP * ink + pad('timeTail') + clearance.prefixGroupExtra;
   const contentLeftPad = pad('contentLeft');
   const startBarlinePad = pad('startBarline');
   const keySigRightPad = pad('keySigRight');
@@ -1747,7 +1873,9 @@ export function planHorizontal(
     // — one bad item must not take down the whole score.
     const placeholder = (): EventMetrics => ({
       leading: 0,
-      core: CORE_SP,
+      core: columns.core,
+      air: CORE_AIR_SP,
+      airPre: CORE_AIR_SP / 2,
       spring: springSp(0.25)
     });
     // Dynamics widen their host column (centred under the notehead), so
@@ -1759,7 +1887,7 @@ export function planHorizontal(
         const f = d.position?.fraction;
         return {
           t: Array.isArray(f) && f[1] ? f[0] / f[1] : 0,
-          w: dynamicWidthSp(d) + 2 * DYNAMIC_SIDE_PAD_SP
+          w: dynamicWidthSp(d) + 2 * columns.dynamicSidePad
         };
       })
       .sort((a, b) => a.t - b.t);
@@ -1799,7 +1927,9 @@ export function planHorizontal(
             const columnOnset = onset;
             const withColumnExtras = (m: EventMetrics): EventMetrics => {
               let out = m;
-              if (dynamicWidth > out.core) out = { ...out, core: dynamicWidth };
+              // A governing dynamic replaces the column's own air with its two
+              // side pads — the re-pricing approximation follows the winner.
+              if (dynamicWidth > out.core) out = { ...out, core: dynamicWidth, air: out.air - CORE_AIR_SP + 2 * DYNAMIC_SIDE_PAD_SP };
               if (midHere.length) {
                 out = { ...out, leading: out.leading + midHere.length * MID_CLEF_WIDTH_SP, midClefs: midHere };
               }
@@ -1814,7 +1944,9 @@ export function planHorizontal(
                 // glued to the following event.
                 return withColumnExtras({
                   leading: 0,
-                  core: event.content.length * GRACE_NOTE_ADVANCE_SP + GRACE_RIGHT_PAD_SP,
+                  core: event.content.length * columns.grace + columns.graceRightPad,
+                  air: event.content.length * GRACE_AIR_SP + GRACE_RIGHT_PAD_SP,
+                  airPre: GRACE_AIR_SP / 2,
                   spring: 0,
                   graceCount: event.content.length
                 });
@@ -1831,9 +1963,11 @@ export function planHorizontal(
                   .length;
                 return withColumnExtras({
                   leading: accidentals
-                    ? accidentals * ACCIDENTAL_SLOT_WIDTH_SP + ACCIDENTAL_RIGHT_PAD_SP
+                    ? accidentals * ACCIDENTAL_SLOT_WIDTH_SP + columns.accidentalRightPad
                     : 0,
-                  core: CORE_SP + TREMOLO_NOTE_ADVANCE_SP,
+                  core: columns.core + TREMOLO_NOTE_ADVANCE_SP,
+                  air: (accidentals ? ACCIDENTAL_RIGHT_PAD_SP : 0) + CORE_AIR_SP,
+                  airPre: (accidentals ? ACCIDENTAL_RIGHT_PAD_SP : 0) + CORE_AIR_SP / 2,
                   spring: springSp(dur)
                 });
               }
@@ -1842,10 +1976,12 @@ export function planHorizontal(
                 // Inner events get rigid columns with pre-scaled duration
                 // space (tupletColumns); the real metric time is `outer`.
                 onset += tupletDuration(event);
+                const inner = tupletColumns(event, accidentalOf, columns);
                 return withColumnExtras({
                   leading: 0,
-                  core: tupletColumns(event, accidentalOf)
-                    .reduce((sum, c) => sum + c.advance, 0),
+                  core: inner.reduce((sum, c) => sum + c.advance, 0),
+                  air: inner.reduce((sum, c) => sum + c.air, 0),
+                  airPre: CORE_AIR_SP / 2,
                   spring: 0
                 });
               }
@@ -1866,16 +2002,24 @@ export function planHorizontal(
               // the anchor instead: half into leading, half into core — the
               // same total rigid width, redistributed, so bar widths and
               // wrapping cannot move; only the wide event's own anchor does.
-              const lyricW = lyricCoreSp(event, lyricLineIds);
+              const lyricW = lyricCoreSp(event, lyricLineIds, columns);
               // A rolled chord's wave sits left of its ink; without room it
               // lands on the previous column.
               const arpeggio = (event.notes ?? []).some(n => n.id !== undefined && arpeggioStarts.has(n.id));
+              const accidentalLeading = accidentalLeadingSp(event.notes ?? [], accidentalOf, columns);
+              const dots = event.duration.dots ?? 0;
+              const headCore = columns.core + dots * columns.dot;
+              // The air the column carries: a governing syllable's two side
+              // pads replace the head's own air (the re-pricing follows the
+              // winner, the same approximation the governing voice makes).
+              const lyricGoverns = lyricW > headCore;
               return withColumnExtras({
-                leading: accidentalLeadingSp(event.notes ?? [], accidentalOf) + (arpeggio ? ARPEGGIO_ROOM_SP : 0) + Math.max(0, (lyricW - CORE_SP) / 2),
-                core: Math.max(
-                  CORE_SP + (event.duration.dots ?? 0) * DOT_SP,
-                  (CORE_SP + lyricW) / 2
-                ),
+                leading: accidentalLeading + (arpeggio ? ARPEGGIO_ROOM_SP : 0) + Math.max(0, (lyricW - columns.core) / 2),
+                core: Math.max(headCore, (columns.core + lyricW) / 2),
+                air: (accidentalLeading ? ACCIDENTAL_RIGHT_PAD_SP : 0)
+                  + (lyricGoverns ? 2 * LYRIC_SIDE_PAD_SP : CORE_AIR_SP + dots * DOT_AIR_SP),
+                airPre: (accidentalLeading ? ACCIDENTAL_RIGHT_PAD_SP : 0)
+                  + (lyricGoverns ? LYRIC_SIDE_PAD_SP : CORE_AIR_SP / 2),
                 spring: springSp(durationValue(event.duration))
               });
             } catch (e) {
@@ -1895,17 +2039,20 @@ export function planHorizontal(
     const allVoices = staves.flat();
     let rigid = multiRest ? MULTIREST_WIDTH_SP : collapsed ? 0 : EMPTY_CONTENT_SP;
     let spring = 0;
+    let columnAir = 0;
     for (const voice of allVoices) {
       const voiceRigid = voice.reduce((sum, e) => sum + e.leading + e.core, 0);
       const voiceSpring = voiceSpringSum(voice);
       if (voiceRigid + voiceSpring > rigid + spring) {
         rigid = voiceRigid;
         spring = voiceSpring;
+        columnAir = voice.reduce((sum, e) => sum + e.air, 0);
       }
     }
     {
-      const merged = mergedNaturalWidth(staves, 1);
+      const merged = mergedNaturalWidth(staves, 1, columns);
       if (merged && (merged.rigid > rigid + 1e-6 || merged.rigid + merged.spring > rigid + spring + 1e-6)) {
+        if (merged.rigid > rigid) columnAir = merged.air;
         rigid = Math.max(rigid, merged.rigid);
         spring = Math.max(spring, merged.spring);
       }
@@ -1922,7 +2069,7 @@ export function planHorizontal(
     return {
       clef: clefTimelines[0][0].clef, clefChanged, timeSig, timeSigShow,
       keyFifths, cancelledKeyFifths, keyChanged,
-      staves, rigid, spring, leadingSpring, clefTimelines,
+      staves, rigid, spring, columnAir, leadingSpring, clefTimelines,
       hasRepeatStart: !!globalMeasure.repeatStart,
       repeatEnd: globalMeasure.repeatEnd ?? null,
       barlineType: globalMeasure.barline?.type,
@@ -2009,15 +2156,21 @@ export function planHorizontal(
     );
   };
 
-  const airFor = (m: MeasureMetrics, first: boolean, index: number): PrefixAir => ({
-    pads: [
-      ...(bareRepeat(m, first) && (first || !previousClosesWithInk(index))
-        ? [] : ['contentLeft' as const, ...(first ? ['startBarline' as const] : [])]),
-      ...(keySigGlyphs(m, first) ? ['keySigRight' as const] : [])
-    ],
-    groups: Number(display.clefs !== 'hide' && (first || m.clefChanged))
-      + Number(display.timeSignatures !== 'hide' && m.timeSigShow)
-  });
+  const airFor = (m: MeasureMetrics, first: boolean, index: number): PrefixAir => {
+    const clef = display.clefs !== 'hide' && (first || m.clefChanged);
+    const time = display.timeSignatures !== 'hide' && m.timeSigShow;
+    return {
+      pads: [
+        ...(bareRepeat(m, first) && (first || !previousClosesWithInk(index))
+          ? [] : ['contentLeft' as const, ...(first ? ['startBarline' as const] : [])]),
+        ...(keySigGlyphs(m, first) ? ['keySigRight' as const] : []),
+        // The glyph slots' spare tails are air too (`clefSlot`/`timeSlot`).
+        ...(clef ? [isTabOnly ? 'tabClefTail' as const : 'clefTail' as const] : []),
+        ...(time ? ['timeTail' as const] : [])
+      ],
+      groups: Number(clef) + Number(time)
+    };
+  };
 
   // The packer's input, captured BEFORE the Space line is applied to the
   // springs — the ladder needs base naturals to ask what any other value would
@@ -2037,6 +2190,7 @@ export function planHorizontal(
             prefixFirst: prefixWidth(m, true, i),
             prefixRest: prefixWidth(m, false, i),
             rigid: m.rigid,
+            columnAir: m.columnAir,
             spring: m.spring,
             lead: m.leadingSpring,
             repeatExtra: m.repeatEnd ? REPEAT_END_EXTRA_SP : 0,
@@ -2064,21 +2218,28 @@ export function planHorizontal(
       // the widest voice can legitimately change once rigids re-price.
       let rigid = m.multiRest ? MULTIREST_WIDTH_SP : m.hidden ? 0 : EMPTY_CONTENT_SP;
       let spring = 0;
+      let columnAir = 0;
       for (const voice of m.staves.flat()) {
         const voiceRigid = voice.reduce((sum, e) => sum + e.leading + e.core, 0);
         const voiceSpring = voiceSpringSum(voice);
         if (voiceRigid + voiceSpring > rigid + spring) {
           rigid = voiceRigid;
           spring = voiceSpring;
+          // Ink scales leading and core, air included.
+          columnAir = voice.reduce((sum, e) => sum + e.air, 0) * inkRatio;
         }
       }
-      const merged = mergedNaturalWidth(m.staves, inkRatio);
+      const merged = mergedNaturalWidth(m.staves, inkRatio, columns);
       if (merged && (merged.rigid > rigid + 1e-6 || merged.rigid + merged.spring > rigid + spring + 1e-6)) {
+        // Merged edges are built from ink-scaled halves, so their air is
+        // already at this ratio.
+        if (merged.rigid > rigid) columnAir = merged.air * inkRatio;
         rigid = Math.max(rigid, merged.rigid);
         spring = Math.max(spring, merged.spring);
       }
       m.rigid = rigid;
       m.spring = spring;
+      m.columnAir = columnAir;
     }
   }
 
@@ -2090,6 +2251,7 @@ export function planHorizontal(
       entry.prefixFirst = prefixWidth(m, true, entry.index, inkRatio);
       entry.prefixRest = prefixWidth(m, false, entry.index, inkRatio);
       entry.rigid = m.rigid;
+      entry.columnAir = m.columnAir;
       entry.spring = m.spring;
       entry.lead = m.leadingSpring;
       entry.repeatExtra = m.repeatEnd ? REPEAT_END_EXTRA_SP * inkRatio : 0;
@@ -2147,7 +2309,8 @@ export function planHorizontal(
       const keySigWidth = keySigCount
         ? keySigCount * KEY_SIG_GLYPH_ADVANCE_SP * inkRatio + keySigRightPad
         : 0;
-      const timeSigCentreX = keySigX + keySigWidth + (TIME_SIG_WIDTH_SP * inkRatio) / 2;
+      // The glyph sits centred in ink + tail (the legacy group extra trails it).
+      const timeSigCentreX = keySigX + keySigWidth + (TIME_SIG_INK_SP * inkRatio + pad('timeTail')) / 2;
       // A forward repeat (|:) sits between the prefix glyphs and the content.
       const repeatStartX =
         keySigX + keySigWidth + (showTimeSig ? timeSlot(inkRatio) : 0);
@@ -2182,7 +2345,7 @@ export function planHorizontal(
             const colStart = cursor;
             const slotX =
               cursor + e.leading +
-              ((e.graceCount ? GRACE_NOTE_ADVANCE_SP : CORE_SP) * inkRatio) / 2;
+              ((e.graceCount ? columns.grace : columns.core) * inkRatio) / 2;
             cursor += e.leading + e.core + e.spring * voiceStretch;
             return { x: slotX, colStart };
           });
@@ -2192,7 +2355,7 @@ export function planHorizontal(
 
       // The onset-aligned overlay: shared columns across every voice and
       // staff of the bar, at a stretch solved against the packed width.
-      const model = mergedModelOf(m.staves, inkRatio);
+      const model = mergedModelOf(m.staves, inkRatio, columns);
       const mergedAt = (start: number, width: number) => {
         const solved = model!.solveFor(width);
         const anchorsBy = new Map<string, number[]>();
@@ -2209,7 +2372,7 @@ export function planHorizontal(
               // must engrave identically. Half a nanospace is far below
               // anything drawable; determinism is not.
               const x = Math.round((start + anchors[k]) * 1e9) / 1e9;
-              const half = ((e.graceCount ? GRACE_NOTE_ADVANCE_SP : CORE_SP) * inkRatio) / 2;
+              const half = ((e.graceCount ? columns.grace : columns.core) * inkRatio) / 2;
               return { x, colStart: x - e.leading - half };
             });
           })
@@ -2239,7 +2402,7 @@ export function planHorizontal(
               const key = `${s}:${mc.timelineIndex}`;
               if (!midClefXs.has(key)) {
                 midClefXs.set(key, {
-                  x: placed.colStart + j * MID_CLEF_WIDTH_SP * inkRatio + MID_CLEF_LEFT_PAD_SP,
+                  x: placed.colStart + j * MID_CLEF_WIDTH_SP * inkRatio + columns.midClefLeftPad,
                   clef: mc.clef,
                   staff: s + 1
                 });
@@ -2327,7 +2490,7 @@ export function planHorizontal(
   const usedWidthSp = measures.length
     ? Math.max(...measures.map(m => m.x + m.width)) + marginSp
     : widthSp;
-  return { measures, rowCount: packed.length, numStaves, staffGroups, usedWidthSp, packing, inkRatio };
+  return { measures, rowCount: packed.length, numStaves, staffGroups, usedWidthSp, packing, columns, inkRatio };
 }
 
 

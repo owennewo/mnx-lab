@@ -54,12 +54,10 @@ import {
   HorizontalPlan,
   PackingInput,
   ACCIDENTAL_SLOT_WIDTH_SP,
-  ACCIDENTAL_RIGHT_PAD_SP,
   accidentalColumns,
   KEY_SIG_GLYPH_ADVANCE_SP,
-  GRACE_NOTE_ADVANCE_SP,
   TREMOLO_NOTE_ADVANCE_SP,
-  CORE_SP,
+  type ColumnGeometry,
   tremoloDuration,
   tupletDuration,
   tupletColumns
@@ -1845,6 +1843,7 @@ function assembleSegment(
                 grace: event,
                 firstX: slot.x,
                 ink: plan.inkRatio,
+                columns: plan.columns,
                 staffTop: staffTops[s],
                 clef: posClef,
                 accidentalOf,
@@ -1884,6 +1883,7 @@ function assembleSegment(
                 tremolo: event,
                 firstX: slot.x,
                 ink: plan.inkRatio,
+                columns: plan.columns,
                 staffTop: staffTops[s],
                 clef: posClef,
                 accidentalOf,
@@ -1913,6 +1913,7 @@ function assembleSegment(
                 tuplet: event,
                 firstX: slot.x,
                 ink: plan.inkRatio,
+                columns: plan.columns,
                 staffTop: staffTops[s],
                 clef: posClef,
                 accidentalOf,
@@ -1942,6 +1943,7 @@ function assembleSegment(
               event,
               eventX: slot.x,
               ink: plan.inkRatio,
+              columns: plan.columns,
               staffTop: staffTops[s],
               clef: posClef,
               stemOverride,
@@ -2028,6 +2030,7 @@ function assembleSegment(
           slots: m.staves[td.planStaff] ?? [],
           staffTop: tabTop,
           ink: plan.inkRatio,
+          columns: plan.columns,
           measureIndex: writtenIndex(plan, i),
           entryIndex: m.entry ? i : undefined,
           occurrenceOrdinal: m.entry?.ordinal,
@@ -3584,6 +3587,9 @@ interface EmitGraceGroupArgs {
   /** The plan's ink ratio: every glyph-relative x offset in the cluster
    *  (head, stem, ledger, accidental, dot) is ink and scales by it. */
   ink: number;
+  /** The plan's column geometry (`plan.columns`): column widths and the
+   *  in-column pads at this Space — the same numbers the plan priced. */
+  columns: ColumnGeometry;
   staffTop: number;
   clef: ActiveClef;
   /** The measure's accidental resolver — spacing.ts decides carryover once. */
@@ -3610,7 +3616,7 @@ interface EmitGraceGroupArgs {
  * principal.
  */
 function emitGraceGroup(args: EmitGraceGroupArgs): void {
-  const { grace, firstX, ink, staffTop, clef, accidentalOf, primitives, keyFor, beamSlantSp, onAnchor } = args;
+  const { grace, firstX, ink, columns, staffTop, clef, accidentalOf, primitives, keyFor, beamSlantSp, onAnchor } = args;
   const rawIndex = new Map<MnxEvent, number>(grace.content.map((e, i) => [e, i]));
   const inner = grace.content.filter(e => !e.rest && (e.notes?.length ?? 0) > 0);
   if (inner.length === 0) return;
@@ -3635,7 +3641,7 @@ function emitGraceGroup(args: EmitGraceGroupArgs): void {
   const stems: GraceStem[] = [];
 
   inner.forEach((event, j) => {
-    const x = firstX + j * GRACE_NOTE_ADVANCE_SP * ink;
+    const x = firstX + j * columns.grace * ink;
     const notes = event.notes!;
     const staffYs = notes.map(n => pitchToStaffY(n.pitch.step, n.pitch.octave, clef));
     const headGlyph = NOTEHEAD_GLYPH_BY_BASE[event.duration.base] ?? 'noteheadBlack';
@@ -3795,6 +3801,9 @@ interface EmitTremoloGroupArgs {
   /** The plan's ink ratio: every glyph-relative x offset in the cluster
    *  (head, stem, ledger, accidental, dot) is ink and scales by it. */
   ink: number;
+  /** The plan's column geometry (`plan.columns`): column widths and the
+   *  in-column pads at this Space — the same numbers the plan priced. */
+  columns: ColumnGeometry;
   staffTop: number;
   clef: ActiveClef;
   /** The measure's accidental resolver — spacing.ts decides carryover once. */
@@ -3938,6 +3947,9 @@ interface EmitTupletGroupArgs {
   /** The plan's ink ratio: every glyph-relative x offset in the cluster
    *  (head, stem, ledger, accidental, dot) is ink and scales by it. */
   ink: number;
+  /** The plan's column geometry (`plan.columns`): column widths and the
+   *  in-column pads at this Space — the same numbers the plan priced. */
+  columns: ColumnGeometry;
   staffTop: number;
   clef: ActiveClef;
   /** The measure's accidental resolver — spacing.ts decides carryover once. */
@@ -3959,8 +3971,8 @@ interface EmitTupletGroupArgs {
  * `inner.multiple` number in a gap, as in the spec's reference engraving.
  */
 function emitTupletGroup(args: EmitTupletGroupArgs): void {
-  const { tuplet, firstX, ink, staffTop, clef, accidentalOf, primitives, keyFor, beamSlantSp } = args;
-  const cols = tupletColumns(tuplet, accidentalOf);
+  const { tuplet, firstX, ink, columns, staffTop, clef, accidentalOf, primitives, keyFor, beamSlantSp } = args;
+  const cols = tupletColumns(tuplet, accidentalOf, columns);
   const events = tuplet.content;
   if (events.length === 0) return;
 
@@ -3987,12 +3999,12 @@ function emitTupletGroup(args: EmitTupletGroupArgs): void {
   let lowestY = staffTop + STAFF_HEIGHT_SP; // bracket clearance (max y seen)
   // The inner columns are rigid ink, priced by the plan at the same ratio —
   // the walk here has to agree with it term for term.
-  let colStart = firstX - (CORE_SP / 2) * ink;
+  let colStart = firstX - (columns.core / 2) * ink;
   let lastX = firstX;
 
   events.forEach((event, j) => {
-    const col = cols[j] ?? { leading: 0, advance: CORE_SP };
-    const x = colStart + col.leading * ink + (CORE_SP / 2) * ink;
+    const col = cols[j] ?? { leading: 0, advance: columns.core, air: 0 };
+    const x = colStart + col.leading * ink + (columns.core / 2) * ink;
     colStart += col.advance * ink;
     lastX = x;
     if (!isTimedEvent(event)) return;
@@ -4040,7 +4052,7 @@ function emitTupletGroup(args: EmitTupletGroupArgs): void {
         primitives.push({
           kind: 'glyph',
           glyph: accGlyph,
-          x: x - (NOTEHEAD_WIDTH_SP / 2) * ink - ((stacked.column[idx] + 1) * ACCIDENTAL_SLOT_WIDTH_SP + ACCIDENTAL_RIGHT_PAD_SP) * ink,
+          x: x - (NOTEHEAD_WIDTH_SP / 2) * ink - ((stacked.column[idx] + 1) * ACCIDENTAL_SLOT_WIDTH_SP + columns.accidentalRightPad) * ink,
           y: staffTop + staffYs[idx],
           className: 'accidental'
         });
@@ -4195,6 +4207,9 @@ interface EmitEventArgs {
    *  grows with the vertical scale. Scaling them keeps the stem on the head
    *  and the ledger under it at any staff scale. */
   ink: number;
+  /** The plan's column geometry (`plan.columns`): column widths and the
+   *  in-column pads at this Space — the same numbers the plan priced. */
+  columns: ColumnGeometry;
   staffTop: number;
   clef: ActiveClef;
   stemOverride: 1 | -1 | null;
@@ -4234,7 +4249,7 @@ interface EmitEventArgs {
 /** Returns the deferred stem when the event is beamed, else null. */
 function emitEvent(args: EmitEventArgs): BeamedStem | null {
   const {
-    event, eventX, ink, staffTop, clef, stemOverride, beamDir, accidentalOf,
+    event, eventX, ink, columns, staffTop, clef, stemOverride, beamDir, accidentalOf,
     activeNoteIds, selectedNoteIds, selectedEventIds,
     primitives, index, measureIndex, voiceIndex, eventIndex,
     row, curveKey, curveAnchors, synthesizeKeys, keyPartIndex, keyStaffIndex
@@ -4394,7 +4409,7 @@ function emitEvent(args: EmitEventArgs): BeamedStem | null {
   notes.forEach((n, idx) => {
     const col = stacked.column[idx];
     if (col < 0) return;
-    const offset = (col + 1) * ACCIDENTAL_SLOT_WIDTH_SP + ACCIDENTAL_RIGHT_PAD_SP;
+    const offset = (col + 1) * ACCIDENTAL_SLOT_WIDTH_SP + columns.accidentalRightPad;
     primitives.push({
       kind: 'glyph',
       glyph: accidentalOf(n)!,
@@ -4595,7 +4610,7 @@ function emitEvent(args: EmitEventArgs): BeamedStem | null {
       const ys = [staffYs[startIdx], endIdx >= 0 ? staffYs[endIdx] : (staffYs[startIdx] === Math.max(...staffYs) ? Math.min(...staffYs) : Math.max(...staffYs))];
       const leftInkX =
         eventX - (headW / 2) * ink -
-        (accidentalsToLeft > 0 ? (accidentalsToLeft * ACCIDENTAL_SLOT_WIDTH_SP + ACCIDENTAL_RIGHT_PAD_SP) * ink : 0);
+        (accidentalsToLeft > 0 ? (accidentalsToLeft * ACCIDENTAL_SLOT_WIDTH_SP + columns.accidentalRightPad) * ink : 0);
       emitSpanMarks({
         leftInkX,
         yTop: staffTop + Math.min(...ys),

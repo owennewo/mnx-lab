@@ -12,7 +12,7 @@ import { inkEdgesSp } from '../render/bounds.ts';
 import { COHESION_CLEAR_SP } from './scoreText.ts';
 import { Primitive, SpatialIndex } from '../primitives.ts';
 import { noteKeyAt } from '../../model/noteWalk.ts';
-import { type AccidentalResolver, CORE_SP, EventSlot, GRACE_NOTE_ADVANCE_SP, tupletColumns } from './spacing.ts';
+import { type AccidentalResolver, type ColumnGeometry, DEFAULT_COLUMNS, EventSlot, tupletColumns } from './spacing.ts';
 import { FRET_FONT_SIZE_SP } from './textSizes.ts';
 import {
   harmonicFretText,
@@ -345,6 +345,9 @@ export interface EmitTabVoicesArgs {
    * and the fret number read as left-aligned against the string line.
    */
   ink: number;
+  /** The plan's column geometry (`plan.columns`) — the inner-column walk
+   *  reads the same widths the plan priced. */
+  columns: ColumnGeometry;
   measureIndex: number;
   entryIndex?: number;
   occurrenceOrdinal?: number;
@@ -440,7 +443,8 @@ export function innerColumns(
   container: MnxGrace | MnxTuplet,
   firstX: number,
   ink: number,
-  accidentalOf: AccidentalResolver
+  accidentalOf: AccidentalResolver,
+  columns: ColumnGeometry = DEFAULT_COLUMNS
 ): { event: MnxEvent; x: number; endX: number }[] {
   const events = container.content;
   // Nested tuplet geometry is not supported; do not invent child coordinates.
@@ -451,16 +455,16 @@ export function innerColumns(
     // The inner columns are rigid ink, priced by the plan at this ratio — so
     // the accidental leading and the core half-width are both scaled, term for
     // term as `emitTupletGroup` scales them.
-    const cols = tupletColumns(container, accidentalOf);
-    let colStart = firstX - (CORE_SP / 2) * ink;
+    const cols = tupletColumns(container, accidentalOf, columns);
+    let colStart = firstX - (columns.core / 2) * ink;
     for (let j = 0; j < events.length; j++) {
-      const col = cols[j] ?? { leading: 0, advance: CORE_SP };
-      xs.push(colStart + col.leading * ink + (CORE_SP / 2) * ink);
+      const col = cols[j] ?? { leading: 0, advance: columns.core, air: 0 };
+      xs.push(colStart + col.leading * ink + (columns.core / 2) * ink);
       colStart += col.advance * ink;
     }
   } else {
     for (let j = 0; j < events.length; j++) {
-      xs.push(firstX + j * GRACE_NOTE_ADVANCE_SP * ink);
+      xs.push(firstX + j * columns.grace * ink);
     }
   }
 
@@ -469,7 +473,7 @@ export function innerColumns(
     x: xs[j],
     // The last inner event ends where its own column does; there is no next
     // slot to ask, and the bar's end would be a lie for a grace note.
-    endX: xs[j + 1] ?? xs[j] + CORE_SP * ink
+    endX: xs[j + 1] ?? xs[j] + columns.core * ink
   }));
 }
 
@@ -536,7 +540,7 @@ function emitTabTupletBracket(
 
 export function emitTabVoices(args: EmitTabVoicesArgs): void {
   const {
-    voices, slots, staffTop, ink, measureIndex, positionContext,
+    voices, slots, staffTop, ink, columns, measureIndex, positionContext,
     activeNoteIds, selectedNoteIds, durationSpans, synthesizeKeys, primitives, index, onIssue,
     row, measureEndX, technique: techniqueSites, showTupletBrackets, accidentalOf, ties
   } = args;
@@ -748,7 +752,7 @@ export function emitTabVoices(args: EmitTabVoicesArgs): void {
       // `emitGraceGroup`), because both staves read the one plan and a walk
       // that disagreed with it by a term would slide the tab out of column.
       if (isGrace(item) || isTuplet(item)) {
-        const inner = innerColumns(item, slot.x, ink, accidentalOf);
+        const inner = innerColumns(item, slot.x, ink, accidentalOf, columns);
         inner.forEach(({ event, x, endX }, containerIndex) => {
           try {
             drawEvent({

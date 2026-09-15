@@ -144,14 +144,14 @@ describe('ragged last', () => {
 
   it('a LOOSE page keeps its leftover row: the ceiling is the page, not the constant', () => {
     initSmufl();
-    // 18.4sp of line is the staff at 640% on a full-width pane, and 0.3sp of
+    // 18.4sp of line is the staff at 640% on a full-width pane, and 0.5sp of
     // Space on top: one bar per system, every full row stretching far past
     // MAX_STRETCH to reach the margin. The final stranded bar used to be
     // pinned at 2.5 — the TIGHTEST system on a very loose page, which is the
     // exact inversion of what this rule exists to prevent — and its stretch
     // was then the only thing on the page density could still move.
     const packing = planHorizontal(doc('lab/document/twelve-bar-blues'), 1180 / 64).packing;
-    const rows = packSystems(packing, 0.3);
+    const rows = packSystems(packing, 0.5);
     expect(rows.length).toBeGreaterThan(2);
     const others = rows.slice(0, -1).map(r => r.stretch);
     // The page IS loose — that is the premise, and the first system being

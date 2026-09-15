@@ -66,6 +66,7 @@ the contract. Today's values are given only so the reader knows the starting poi
 | Content-left / start-barline / key-sig-right / content-right pads | 0.6 / 0.5 / 0.5 / 0.8, × √d, floor 0.15 | one line each, `c = 0` unless calibration says a glyph needs a floor |
 | Prefix group extra | 0 at d=1, −0.15 at the floor, +1.2 at the ceiling (V-shaped) | one line, or deleted — a V is not a line and its job was to soften the root curves |
 | Horizontal margin | `clamp(2·d^¼, 1, 3)` | one line with the clamp; expected `c < 0` so the margin reaches zero while notes keep a little air |
+| Column air (added 2026-09-16) | fixed inside the rigid columns: 0.3 of the 1.5sp notehead column, 0.15 of the dot, 0.6 of the grace advance, the accidental/grace/clef/dynamic/lyric pads, the clef/time slot tails | one factor line on all of them, 0 at zero, **capped at 1 above the default**; the ink parts (notehead 1.2, grace 0.9, dot 0.4, clef 2.7, tab clef 1.65, time 1.8) are the floor |
 | Ink pricing, justification stretch/squeeze, `MAX_STRETCH` | multiply or cap the springs after Space | not consumers — unchanged in kind |
 
 The intercept vector `c` **is** the zero engraving. Calibrating starts there.
@@ -172,6 +173,20 @@ first state, not a finding.
   1,872 tests, corpus policing and the build pass. No lab-verify batch is owed
   *yet*: the first change to any `atZero`/`atDefault` is the recalibration this
   doc licenses, and that landing registers the batch.
+
+**Column air (2026-09-16).** Looking at Space 0 showed 0.75sp still sitting either
+side of every note: the rigid notehead column was 1.5sp with the head centred,
+and the same was true of the dot, the grace run, the in-column pads and the
+clef/time slot tails — air that had never been split from ink. Each rigid column
+is now ink plus air (`columnGeometry`, carried as `plan.columns` so the notation
+and tab renderers walk the columns the plan priced), and one `columnAir` factor
+line takes all of it to zero. A bar of four quarters at Space 0 is four notehead
+widths; the clef, key and time signature abut. The snapshot carries each
+measure's column air (governing voice, × ink) and re-prices it with the rest.
+The row is capped at its default above 2.2sp: a rigid column that kept growing
+with Space, multiplied by a 6.4× low-vision ink ratio, pushed one bar past the
+pane, and above the default the springs are the spread. Goldens still
+byte-identical.
 
 **Open — the calibration pass.** The intercept vector is all zeros: Space 0 is
 airless everywhere, including note-to-note. Whether some rhythm proportion should

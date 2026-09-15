@@ -248,7 +248,9 @@ along with the ink. Space owns horizontal margins and prefix/bar padding as well
 as rhythmic springs. Space is a length in staff spaces (the air after a quarter
 note; 0 is a true zero) and every consumer is a clamped line in it, tabled in
 `SPACE_LINES`; `spacePolicy()` in `layout/spacing.ts` resolves the table at a
-value. Packing snapshots carry the source Space and prefix-air descriptors so
-re-packing uses the same whitespace as placement, and the spring pass runs after
-the snapshot is captured so nothing divides by Space. Clearance remains only as a
+value, and `columnGeometry()` resolves the rigid columns' own air (ink plus air,
+carried on the plan as `plan.columns` for every reader that walks a column).
+Packing snapshots carry the source Space, prefix-air descriptors and each
+measure's column air so re-packing uses the same whitespace as placement, and the
+spring pass runs after the snapshot is captured so nothing divides by Space. Clearance remains only as a
 legacy host override; see [the viewer contract](core-viewer-surface.md#whitespace-ownership-and-legacy-overrides).

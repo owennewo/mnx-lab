@@ -152,10 +152,15 @@ the air after a quarter note — and every consumer of it is one clamped line,
 `max(0, m·x + c)`, written in `SPACE_LINES` (`layout/spacing.ts`) as the pair
 `{ atZero, atDefault }`: the intercepts are the zero engraving, the slopes how each
 kind of air grows from it. Today every intercept is 0, so Space 0 draws no
-discretionary air at all — margins included — and rigid columns simply abut. At
-the default (2.2sp) every line evaluates to its historical value exactly, so the
-default engraving is unchanged. Symbol slots, repeat geometry and note columns
-remain ink, priced by Staff. Recalibrating the table moves goldens by design
+discretionary air at all — margins included. Rigid columns are split into glyph
+INK and AIR (`columnGeometry`): the notehead column, the dot, the grace run, the
+accidental/grace/clef/dynamic/lyric pads and the clef/time slot tails all carry
+air that follows Space down to zero, so at Space 0 noteheads abut at exactly one
+notehead width and the clef, key and time signature touch. Column air is the one
+row capped at its default: above 2.2sp the springs carry the spread. At the
+default every line evaluates to its historical value exactly, so the default
+engraving is unchanged. Glyph ink, repeat geometry and the accidental slots
+remain priced by Staff. Recalibrating the table moves goldens by design
 ([core-space-units-sp.md](../roadmap/inprogress/core-space-units-sp.md)).
 
 `clearance` and `density-pad` remain explicit legacy host overrides. Setting

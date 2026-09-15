@@ -399,7 +399,7 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
           const slot = m.voices[voiceIndex]?.[eventIndex];
           if (!slot) return;
           if (isGrace(item) || isTuplet(item)) {
-            innerColumns(item, slot.x, plan.inkRatio, accidentalOf)
+            innerColumns(item, slot.x, plan.inkRatio, accidentalOf, plan.columns)
               .forEach(({ event, x }) => addSyllables(event, x));
             return;
           }
@@ -427,6 +427,7 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
         slots: m.voices,
         staffTop,
         ink: plan.inkRatio,
+        columns: plan.columns,
         measureIndex: writtenIndex(plan, i),
         entryIndex: m.entry ? i : undefined,
         occurrenceOrdinal: m.entry?.ordinal,
