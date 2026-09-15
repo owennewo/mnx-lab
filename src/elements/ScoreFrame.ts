@@ -415,10 +415,16 @@ export class ScoreFrame extends LitElement {
         color: var(--ink);
       }
 
-      .btn:focus-visible,
-      .focus-mark:focus-visible {
+      .btn:focus-visible {
         outline: var(--rule-w) solid var(--focus-ring);
         outline-offset: 2px;
+      }
+
+      /* The mark hangs from two edges, so its ring is drawn inside the tab —
+         outside, the edges would clip it to three sides. */
+      .focus-mark:focus-visible {
+        outline: var(--rule-w) solid var(--focus-ring);
+        outline-offset: -4px;
       }
 
       /* The library's .line: borderless, for the way back. */
@@ -649,7 +655,13 @@ export class ScoreFrame extends LitElement {
       aria-pressed=${this.focused}
       aria-label=${label}
       title=${this.focusShortcut ? `${label} (${this.focusShortcut})` : label}
-      @click=${() => this.setFocused(!this.focused)}
+      @click=${(event: MouseEvent) => {
+        this.setFocused(!this.focused);
+        // A pointer leaves the mark unfocused: the next keypress (space to
+        // play, arrows to scroll) would otherwise light its ring and leave
+        // it lit. Keyboard activation (detail 0) keeps focus where it is.
+        if (event.detail > 0) (event.currentTarget as HTMLElement).blur();
+      }}
     >${this.focused ? ScoreFrame.focusOut : ScoreFrame.focusIn}</button>`;
   }
 
