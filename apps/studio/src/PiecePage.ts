@@ -97,9 +97,13 @@ export class PiecePage extends LitElement {
     mnx-score-frame {
       height: 100%;
     }
+    /* The viewer is its own scroll container at the pane's full height; its
+       5px of padding must count inside that height, or the pane overflows by
+       10px and grows a second scrollbar beside the viewer's own. */
     mnx-document-viewer {
       display: block;
-      min-height: 100%;
+      height: 100%;
+      box-sizing: border-box;
     }
     mnx-document-viewer[hidden] {
       display: none;

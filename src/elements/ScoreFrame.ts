@@ -98,6 +98,23 @@ export class ScoreFrame extends LitElement {
   @state() private videoOpen = false;
   @state() private videoWidth = 320;
   private videoObserver: ResizeObserver | null = null;
+  /** Watches the slotted scroller's content box: a vertical scrollbar coming
+   *  or going changes it without changing the element's size. */
+  private scrollerObserver: ResizeObserver | null = null;
+  private readonly onScoreSlot = (event: Event) => {
+    const slot = event.target as HTMLSlotElement;
+    this.scrollerObserver?.disconnect();
+    for (const element of slot.assignedElements()) this.scrollerObserver?.observe(element);
+    this.measureScrollbar(slot.assignedElements());
+  };
+  private measureScrollbar(elements: Element[]) {
+    let width = 0;
+    for (const element of elements) {
+      if (!(element instanceof HTMLElement)) continue;
+      width = Math.max(width, element.offsetWidth - element.clientWidth - 2 * element.clientLeft);
+    }
+    this.style.setProperty('--score-scrollbar', `${Math.max(0, width)}px`);
+  }
   private get videoMaximum() { return Math.max(200, this.clientWidth * 0.75); }
   private resizeVideo(width: number) { this.videoWidth = Math.max(200, Math.min(this.videoMaximum, width)); }
   private readonly dragVideo = (event: PointerEvent) => {
@@ -188,25 +205,31 @@ export class ScoreFrame extends LitElement {
       }
 
       /* ── the focus mark ──
-         One toggle for both strips, on the pane's top-right corner over the
-         score, in the bar's ground with a hairline. Faded at rest so it reads
-         as a fixture rather than a control; full strength when the pointer
-         reaches it or the keyboard lands on it. 40px, so it is catchable on
-         glass, where there is no hover and it stays faded. */
+         One toggle for both strips: a tab hanging from the pane's top-right
+         corner, squared on the two edges it hangs from (the grips' own
+         language), in the bar's ground with a hairline. It sits flush beside
+         the score's vertical scrollbar rather than over it — the frame
+         measures the slotted scroller's bar and sets --score-scrollbar.
+         Faded at rest so it reads as a fixture rather than a control; full
+         strength when the pointer reaches it or the keyboard lands on it.
+         40px, so it is catchable on glass, where there is no hover and it
+         stays faded. */
       .focus-mark {
         position: absolute;
-        top: 12px;
-        right: 28px;
+        top: 0;
+        right: var(--score-scrollbar, 0px);
         z-index: 3;
         display: grid;
         place-items: center;
-        width: 40px;
+        width: 44px;
         height: 40px;
         padding: 0;
         box-sizing: border-box;
         background: var(--frame-bar);
         border: 1px solid var(--line);
-        border-radius: var(--frame-radius);
+        border-top: 0;
+        border-right: 0;
+        border-radius: 0 0 0 var(--frame-radius);
         backdrop-filter: blur(6px);
         box-shadow: var(--frame-shadow);
         color: var(--ink);
@@ -519,6 +542,7 @@ export class ScoreFrame extends LitElement {
     this.addEventListener('video-notice-changed', this.onVideoNotice);
     this.videoObserver = new ResizeObserver(() => { this.resizeVideo(this.videoWidth); this.requestUpdate(); });
     this.videoObserver.observe(this);
+    this.scrollerObserver = new ResizeObserver(entries => this.measureScrollbar(entries.map(entry => entry.target)));
   }
 
   disconnectedCallback() {
@@ -529,6 +553,8 @@ export class ScoreFrame extends LitElement {
     this.removeEventListener('video-notice-changed', this.onVideoNotice);
     this.videoObserver?.disconnect();
     this.videoObserver = null;
+    this.scrollerObserver?.disconnect();
+    this.scrollerObserver = null;
     document.removeEventListener('pointerdown', this.onClickAway);
     super.disconnectedCallback();
   }
@@ -590,6 +616,8 @@ export class ScoreFrame extends LitElement {
     this.renderRoot.addEventListener('keydown', this.onKeydown as EventListener);
     document.addEventListener('pointerdown', this.onClickAway);
     this.refreshProgress(null);
+    const slot = this.renderRoot.querySelector<HTMLSlotElement>('.score slot');
+    if (slot) this.onScoreSlot({ target: slot } as unknown as Event);
   }
 
   // ── glyphs: the library page's round-capped strokes ─────────────────────
@@ -723,7 +751,7 @@ export class ScoreFrame extends LitElement {
           aria-valuemin="200" aria-valuemax=${Math.round(this.videoMaximum)} aria-valuenow=${Math.round(this.videoWidth)}
           ?hidden=${!this.videoOpen} @pointerdown=${this.dragVideo} @keydown=${this.resizeVideoKey}></div>
       <div class="pane">
-        <div class="score"><slot></slot></div>
+        <div class="score"><slot @slotchange=${this.onScoreSlot}></slot></div>
         ${this.focusMark()}
         ${this.hasPerformance && this.focused
           ? html`<div class="progress" aria-hidden="true"><div style="width: ${this.progress * 100}%"></div></div>`
