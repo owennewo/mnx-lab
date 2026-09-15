@@ -52,7 +52,7 @@
   "idRefs": false,
   "source": "hand-written",
   "origin": "local",
-  "status": "verified",
+  "status": "rendered",
   "verification": {
     "at": "2026-08-07",
     "primitivesHash": "sha256:e823590f8be0e82b",

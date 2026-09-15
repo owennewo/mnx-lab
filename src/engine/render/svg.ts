@@ -123,6 +123,29 @@ export interface SvgMarkupOptions {
   xmlns?: boolean;
 }
 
+/**
+ * What every primitive of a kind shares, declared once instead of on each.
+ *
+ * A glyph's font, a glyph's or a text's fill and a line's or curve's stroke
+ * used to ride on every element as presentation attributes — some 10,000
+ * attributes and a quarter of the markup on a 61-bar score. They are the
+ * same value on all but a handful, so they live here and only the handful
+ * says otherwise.
+ *
+ * The handful cannot say so with an attribute: a presentation attribute
+ * loses to ANY stylesheet rule, even one with no specificity, so an
+ * exception is written as an inline `style`. `:where()` keeps these rules at
+ * zero specificity, which is exactly the standing the attributes had — every
+ * rule a host writes against a class still wins, as it did before.
+ * `svg > …` keeps them off what a host draws into the same root inside its
+ * own groups (the selection enclosure, the cursor ghost).
+ */
+const KIND_DEFAULTS =
+  '<style>' +
+  `:where(svg>text){font-family:${FONT_FAMILY_MUSIC};fill:currentColor}` +
+  ':where(svg>line,svg>path){stroke:currentColor}' +
+  '</style>';
+
 export function renderSvgMarkup(opts: SvgMarkupOptions): string {
   const { primitives, widthSp, heightSp, pxPerSp, viewBoxSp, className } = opts;
   const pxPerSpY = opts.pxPerSpY ?? pxPerSp;
@@ -131,12 +154,22 @@ export function renderSvgMarkup(opts: SvgMarkupOptions): string {
   const widthPx = view.w * pxPerSp;
   const heightPx = view.h * pxPerSpY;
 
-  let out = `<svg width="${widthPx}" height="${heightPx}" viewBox="${view.x * pxPerSp} ${view.y * pxPerSpY} ${widthPx} ${heightPx}"`;
+  let out = `<svg width="${n(widthPx)}" height="${n(heightPx)}" viewBox="${n(view.x * pxPerSp)} ${n(view.y * pxPerSpY)} ${n(widthPx)} ${n(heightPx)}"`;
   if (className) out += ` class="${escapeXml(className)}"`;
   if (opts.xmlns) out += ` xmlns="${SVG_NS}"`;
-  out += '>';
+  out += '>' + KIND_DEFAULTS;
   for (const p of primitives) out += emitPrimitive(p, pxPerSp, pxPerSpY);
   return out + '</svg>';
+}
+
+/**
+ * A number for markup: four decimals, which is the precision the primitives
+ * themselves carry (`headless.ts` rounds them so). Under a fractional scale
+ * every coordinate is otherwise a seventeen-digit float, and the parser
+ * pays for each digit.
+ */
+function n(v: number): string {
+  return String(Math.round(v * 1e4) / 1e4);
 }
 
 export function renderSvg(opts: RenderSvgOptions): SVGSVGElement {
@@ -229,23 +262,25 @@ function drawnX(x: number, dx: number | undefined, kx: number, ky: number): numb
 }
 
 function emitGlyph(p: GlyphPrim, kx: number, ky: number): string {
-  const attrs =
-    // Position on the horizontal scale, ink offset on the vertical one — the
-    // two currencies of `PrimitiveBase`.
-    ` x="${drawnX(p.x, p.dx, kx, ky)}" y="${p.y * ky}"` +
-    ` font-family="${FONT_FAMILY_MUSIC}" font-size="${4 * ky * (p.scale ?? 1)}"` +
-    ` text-anchor="${p.anchor ?? 'start'}" dominant-baseline="${p.baseline ?? 'alphabetic'}"` +
-    ` fill="${escapeXml(p.fill ?? 'currentColor')}"` +
-    identity(p);
-  return element('text', attrs, glyphCodepoint(p.glyph), p);
+  // Position on the horizontal scale, ink offset on the vertical one — the
+  // two currencies of `PrimitiveBase`. The font and the fill are the kind's
+  // defaults; `start` and `alphabetic` are SVG's own initial values (`auto`
+  // is alphabetic for horizontal text), so only the others are written.
+  let attrs =
+    ` x="${n(drawnX(p.x, p.dx, kx, ky))}" y="${n(p.y * ky)}"` +
+    ` font-size="${n(4 * ky * (p.scale ?? 1))}"` +
+    textPlacement(p.anchor, p.baseline);
+  if (p.fill !== undefined && p.fill !== 'currentColor') attrs += ` style="fill:${escapeXml(p.fill)}"`;
+  return element('text', attrs + identity(p), glyphCodepoint(p.glyph), p);
 }
 
 function emitLine(p: LinePrim, kx: number, ky: number): string {
   let attrs =
-    ` x1="${drawnX(p.x1, p.dx1, kx, ky)}" y1="${p.y1 * ky}"` +
-    ` x2="${drawnX(p.x2, p.dx2, kx, ky)}" y2="${p.y2 * ky}"` +
-    ` stroke="${escapeXml(p.stroke ?? 'currentColor')}" stroke-width="${inkWidth(p.thickness, ky)}"`;
-  if (p.dash) attrs += ` stroke-dasharray="${p.dash * ky},${p.dash * ky}"`;
+    ` x1="${n(drawnX(p.x1, p.dx1, kx, ky))}" y1="${n(p.y1 * ky)}"` +
+    ` x2="${n(drawnX(p.x2, p.dx2, kx, ky))}" y2="${n(p.y2 * ky)}"` +
+    ` stroke-width="${n(inkWidth(p.thickness, ky))}"` +
+    strokeException(p.stroke);
+  if (p.dash) attrs += ` stroke-dasharray="${n(p.dash * ky)},${n(p.dash * ky)}"`;
   return element('line', attrs + identity(p), '', p);
 }
 
@@ -254,13 +289,13 @@ const CURVE_END_THICKNESS_SP = 0.1;
 
 function emitCurve(p: CurvePrim, kx: number, ky: number): string {
   const [p0, p1, p2, p3] = p.points;
-  const X = (pt: Point) => pt.x * kx;
-  const Y = (pt: Point) => pt.y * ky;
-  const stroke = escapeXml(p.stroke ?? 'currentColor');
+  const X = (pt: Point) => n(pt.x * kx);
+  const Y = (pt: Point) => n(pt.y * ky);
   if (!p.taper) {
     const d = `M ${X(p0)} ${Y(p0)} C ${X(p1)} ${Y(p1)}, ${X(p2)} ${Y(p2)}, ${X(p3)} ${Y(p3)}`;
     const attrs =
-      ` d="${d}" fill="none" stroke="${stroke}" stroke-width="${inkWidth(p.thickness, ky)}"` +
+      ` d="${d}" fill="none" stroke-width="${n(inkWidth(p.thickness, ky))}"` +
+      strokeException(p.stroke) +
       identity(p);
     return element('path', attrs, '', p);
   }
@@ -273,48 +308,74 @@ function emitCurve(p: CurvePrim, kx: number, ky: number): string {
   // direction — and so its normal — is a property of the drawn curve, not of
   // the sp-space one. At kx === ky both scales cancel and this is the same
   // normal the uniform math produced, to the last digit.
-  const dx = X(p3) - X(p0), dy = Y(p3) - Y(p0);
+  const px = (pt: Point) => pt.x * kx;
+  const py = (pt: Point) => pt.y * ky;
+  const dx = px(p3) - px(p0), dy = py(p3) - py(p0);
   const len = Math.hypot(dx, dy) || 1;
   let nx = -dy / len, ny = dx / len;
   // Point the normal toward the bulge (the control points' side of the chord).
-  if ((X(p1) - X(p0)) * nx + (Y(p1) - Y(p0)) * ny < 0) { nx = -nx; ny = -ny; }
+  if ((px(p1) - px(p0)) * nx + (py(p1) - py(p0)) * ny < 0) { nx = -nx; ny = -ny; }
   const s = (Math.max(0, p.thickness - CURVE_END_THICKNESS_SP) * ky) / 1.5;
-  const c = (pt: Point, sign: number) => `${(X(pt) + sign * nx * s)} ${(Y(pt) + sign * ny * s)}`;
+  const c = (pt: Point, sign: number) => `${n(px(pt) + sign * nx * s)} ${n(py(pt) + sign * ny * s)}`;
   const d =
     `M ${X(p0)} ${Y(p0)} C ${c(p1, 1)}, ${c(p2, 1)}, ${X(p3)} ${Y(p3)} ` +
     `C ${c(p2, -1)}, ${c(p1, -1)}, ${X(p0)} ${Y(p0)} Z`;
+  // The body is filled in the stroke's colour: the attribute is kept here
+  // because a path's fill has no kind default (an open curve is unfilled).
   const attrs =
-    ` d="${d}" fill="${stroke}" stroke="${stroke}"` +
-    ` stroke-width="${inkWidth(CURVE_END_THICKNESS_SP, ky)}" stroke-linejoin="round"` +
+    ` d="${d}" fill="${escapeXml(p.stroke ?? 'currentColor')}"` +
+    ` stroke-width="${n(inkWidth(CURVE_END_THICKNESS_SP, ky))}" stroke-linejoin="round"` +
+    strokeException(p.stroke) +
     identity(p);
   return element('path', attrs, '', p);
 }
 
 function emitText(p: TextPrim, kx: number, ky: number): string {
-  const family = p.font === 'bodyItalic' ? FONT_FAMILY_BODY : FONT_FAMILY_BODY;
+  // Body text is the exception to the glyph font, so it says so inline
+  // (see KIND_DEFAULTS for why an attribute could not).
+  let style = `font-family:${FONT_FAMILY_BODY}`;
+  if (p.fill !== undefined && p.fill !== 'currentColor') style += `;fill:${escapeXml(p.fill)}`;
   let attrs =
-    ` x="${drawnX(p.x, p.dx, kx, ky)}" y="${p.y * ky}"` +
-    ` font-family="${escapeXml(family)}" font-size="${p.size * ky}"` +
-    ` text-anchor="${p.anchor ?? 'start'}" dominant-baseline="${p.baseline ?? 'alphabetic'}"` +
-    ` fill="${escapeXml(p.fill ?? 'currentColor')}"`;
+    ` x="${n(drawnX(p.x, p.dx, kx, ky))}" y="${n(p.y * ky)}"` +
+    ` font-size="${n(p.size * ky)}"` +
+    textPlacement(p.anchor, p.baseline);
   if (p.font === 'bodyItalic') attrs += ` font-style="italic"`;
   if (p.weight !== undefined) attrs += ` font-weight="${p.weight}"`;
+  attrs += ` style="${style}"`;
   return element('text', attrs + identity(p), escapeXml(p.text), p);
 }
 
 function emitRect(p: RectPrim, kx: number, ky: number): string {
   let attrs =
-    ` x="${drawnX(p.x, p.dx, kx, ky)}" y="${p.y * ky}"` +
-    ` width="${p.w * (p.spanW ? kx : ky)}" height="${p.h * ky}"` +
+    ` x="${n(drawnX(p.x, p.dx, kx, ky))}" y="${n(p.y * ky)}"` +
+    ` width="${n(p.w * (p.spanW ? kx : ky))}" height="${n(p.h * ky)}"` +
     ` fill="${escapeXml(p.fill ?? 'none')}"`;
-  if (p.radius !== undefined) attrs += ` rx="${p.radius * ky}" ry="${p.radius * ky}"`;
-  if (p.spanEndX !== undefined) attrs += ` data-span-end="${drawnX(p.spanEndX, p.spanEndDx, kx, ky)}"`;
+  if (p.radius !== undefined) attrs += ` rx="${n(p.radius * ky)}" ry="${n(p.radius * ky)}"`;
+  if (p.spanEndX !== undefined) attrs += ` data-span-end="${n(drawnX(p.spanEndX, p.spanEndDx, kx, ky))}"`;
   if (p.stroke) {
     // A zero thickness means "no border" and stays that way — the floor
     // makes a hairline legible, it does not invent one.
-    attrs += ` stroke="${escapeXml(p.stroke)}" stroke-width="${p.thickness ? inkWidth(p.thickness, ky) : 0}"`;
+    attrs += ` stroke="${escapeXml(p.stroke)}" stroke-width="${p.thickness ? n(inkWidth(p.thickness, ky)) : 0}"`;
   }
   return element('rect', attrs + identity(p), '', p);
+}
+
+// ---------- Attribute helpers ----------
+
+/** Anchor and baseline, only when they differ from SVG's initial values. */
+function textPlacement(
+  anchor: 'start' | 'middle' | 'end' | undefined,
+  baseline: 'alphabetic' | 'middle' | 'central' | 'hanging' | undefined
+): string {
+  let out = '';
+  if (anchor !== undefined && anchor !== 'start') out += ` text-anchor="${anchor}"`;
+  if (baseline !== undefined && baseline !== 'alphabetic') out += ` dominant-baseline="${baseline}"`;
+  return out;
+}
+
+/** A stroke other than the kind default, inline (see KIND_DEFAULTS). */
+function strokeException(stroke: string | undefined): string {
+  return stroke !== undefined && stroke !== 'currentColor' ? ` style="stroke:${escapeXml(stroke)}"` : '';
 }
 
 // ---------- Text helper ----------

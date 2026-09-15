@@ -1,186 +1,187 @@
 <svg width="1280" height="3345.664" viewBox="0 0 1280 3345.664" xmlns="http://www.w3.org/2000/svg">
-<text x="379.2" y="54.4" font-family="var(--font-family-sans)" font-size="38.4" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="score-title">fullScore</text>
-<line x1="456" y1="201.6" x2="630.4" y2="201.6" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="456" y1="217.6" x2="630.4" y2="217.6" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="456" y1="233.6" x2="630.4" y2="233.6" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="456" y1="249.6" x2="630.4" y2="249.6" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="456" y1="265.6" x2="630.4" y2="265.6" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="456" y1="361.984" x2="630.4" y2="361.984" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="456" y1="377.984" x2="630.4" y2="377.984" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="456" y1="393.984" x2="630.4" y2="393.984" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="456" y1="409.984" x2="630.4" y2="409.984" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="456" y1="425.984" x2="630.4" y2="425.984" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="456" y1="522.368" x2="630.4" y2="522.368" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="456" y1="538.368" x2="630.4" y2="538.368" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="456" y1="554.368" x2="630.4" y2="554.368" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="456" y1="570.368" x2="630.4" y2="570.368" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="456" y1="586.368" x2="630.4" y2="586.368" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="456" y1="661.248" x2="630.4" y2="661.248" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="456" y1="677.248" x2="630.4" y2="677.248" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="456" y1="693.248" x2="630.4" y2="693.248" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="456" y1="709.248" x2="630.4" y2="709.248" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="456" y1="725.248" x2="630.4" y2="725.248" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="456" y1="795.52" x2="630.4" y2="795.52" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="456" y1="811.52" x2="630.4" y2="811.52" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="456" y1="827.52" x2="630.4" y2="827.52" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="456" y1="843.52" x2="630.4" y2="843.52" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="456" y1="859.52" x2="630.4" y2="859.52" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="456" y1="955.904" x2="630.4" y2="955.904" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="456" y1="971.904" x2="630.4" y2="971.904" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="456" y1="987.904" x2="630.4" y2="987.904" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="456" y1="1003.904" x2="630.4" y2="1003.904" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="456" y1="1019.904" x2="630.4" y2="1019.904" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="456" y1="1116.288" x2="630.4" y2="1116.288" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="456" y1="1132.288" x2="630.4" y2="1132.288" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="456" y1="1148.288" x2="630.4" y2="1148.288" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="456" y1="1164.288" x2="630.4" y2="1164.288" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="456" y1="1180.288" x2="630.4" y2="1180.288" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="456" y1="1276.672" x2="630.4" y2="1276.672" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="456" y1="1292.672" x2="630.4" y2="1292.672" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="456" y1="1308.672" x2="630.4" y2="1308.672" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="456" y1="1324.672" x2="630.4" y2="1324.672" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="456" y1="1340.672" x2="630.4" y2="1340.672" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="456" y1="1437.056" x2="630.4" y2="1437.056" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="456" y1="1453.056" x2="630.4" y2="1453.056" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="456" y1="1469.056" x2="630.4" y2="1469.056" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="456" y1="1485.056" x2="630.4" y2="1485.056" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="456" y1="1501.056" x2="630.4" y2="1501.056" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="456" y1="201.6" x2="456" y2="1501.056" stroke="currentColor" stroke-width="2.56" class="barline barline-start"></line>
-<text x="405.5456" y="425.984" font-family="Bravura" font-size="225.056" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="brace"></text>
+<style>:where(svg>text){font-family:Bravura;fill:currentColor}:where(svg>line,svg>path){stroke:currentColor}</style>
+<text x="379.2" y="54.4" font-size="38.4" text-anchor="middle" style="font-family:var(--font-family-sans)" class="score-title">fullScore</text>
+<line x1="456" y1="201.6" x2="630.4" y2="201.6" stroke-width="2.08" class="staff-line"></line>
+<line x1="456" y1="217.6" x2="630.4" y2="217.6" stroke-width="2.08" class="staff-line"></line>
+<line x1="456" y1="233.6" x2="630.4" y2="233.6" stroke-width="2.08" class="staff-line"></line>
+<line x1="456" y1="249.6" x2="630.4" y2="249.6" stroke-width="2.08" class="staff-line"></line>
+<line x1="456" y1="265.6" x2="630.4" y2="265.6" stroke-width="2.08" class="staff-line"></line>
+<line x1="456" y1="361.984" x2="630.4" y2="361.984" stroke-width="2.08" class="staff-line"></line>
+<line x1="456" y1="377.984" x2="630.4" y2="377.984" stroke-width="2.08" class="staff-line"></line>
+<line x1="456" y1="393.984" x2="630.4" y2="393.984" stroke-width="2.08" class="staff-line"></line>
+<line x1="456" y1="409.984" x2="630.4" y2="409.984" stroke-width="2.08" class="staff-line"></line>
+<line x1="456" y1="425.984" x2="630.4" y2="425.984" stroke-width="2.08" class="staff-line"></line>
+<line x1="456" y1="522.368" x2="630.4" y2="522.368" stroke-width="2.08" class="staff-line"></line>
+<line x1="456" y1="538.368" x2="630.4" y2="538.368" stroke-width="2.08" class="staff-line"></line>
+<line x1="456" y1="554.368" x2="630.4" y2="554.368" stroke-width="2.08" class="staff-line"></line>
+<line x1="456" y1="570.368" x2="630.4" y2="570.368" stroke-width="2.08" class="staff-line"></line>
+<line x1="456" y1="586.368" x2="630.4" y2="586.368" stroke-width="2.08" class="staff-line"></line>
+<line x1="456" y1="661.248" x2="630.4" y2="661.248" stroke-width="2.08" class="staff-line"></line>
+<line x1="456" y1="677.248" x2="630.4" y2="677.248" stroke-width="2.08" class="staff-line"></line>
+<line x1="456" y1="693.248" x2="630.4" y2="693.248" stroke-width="2.08" class="staff-line"></line>
+<line x1="456" y1="709.248" x2="630.4" y2="709.248" stroke-width="2.08" class="staff-line"></line>
+<line x1="456" y1="725.248" x2="630.4" y2="725.248" stroke-width="2.08" class="staff-line"></line>
+<line x1="456" y1="795.52" x2="630.4" y2="795.52" stroke-width="2.08" class="staff-line"></line>
+<line x1="456" y1="811.52" x2="630.4" y2="811.52" stroke-width="2.08" class="staff-line"></line>
+<line x1="456" y1="827.52" x2="630.4" y2="827.52" stroke-width="2.08" class="staff-line"></line>
+<line x1="456" y1="843.52" x2="630.4" y2="843.52" stroke-width="2.08" class="staff-line"></line>
+<line x1="456" y1="859.52" x2="630.4" y2="859.52" stroke-width="2.08" class="staff-line"></line>
+<line x1="456" y1="955.904" x2="630.4" y2="955.904" stroke-width="2.08" class="staff-line"></line>
+<line x1="456" y1="971.904" x2="630.4" y2="971.904" stroke-width="2.08" class="staff-line"></line>
+<line x1="456" y1="987.904" x2="630.4" y2="987.904" stroke-width="2.08" class="staff-line"></line>
+<line x1="456" y1="1003.904" x2="630.4" y2="1003.904" stroke-width="2.08" class="staff-line"></line>
+<line x1="456" y1="1019.904" x2="630.4" y2="1019.904" stroke-width="2.08" class="staff-line"></line>
+<line x1="456" y1="1116.288" x2="630.4" y2="1116.288" stroke-width="2.08" class="staff-line"></line>
+<line x1="456" y1="1132.288" x2="630.4" y2="1132.288" stroke-width="2.08" class="staff-line"></line>
+<line x1="456" y1="1148.288" x2="630.4" y2="1148.288" stroke-width="2.08" class="staff-line"></line>
+<line x1="456" y1="1164.288" x2="630.4" y2="1164.288" stroke-width="2.08" class="staff-line"></line>
+<line x1="456" y1="1180.288" x2="630.4" y2="1180.288" stroke-width="2.08" class="staff-line"></line>
+<line x1="456" y1="1276.672" x2="630.4" y2="1276.672" stroke-width="2.08" class="staff-line"></line>
+<line x1="456" y1="1292.672" x2="630.4" y2="1292.672" stroke-width="2.08" class="staff-line"></line>
+<line x1="456" y1="1308.672" x2="630.4" y2="1308.672" stroke-width="2.08" class="staff-line"></line>
+<line x1="456" y1="1324.672" x2="630.4" y2="1324.672" stroke-width="2.08" class="staff-line"></line>
+<line x1="456" y1="1340.672" x2="630.4" y2="1340.672" stroke-width="2.08" class="staff-line"></line>
+<line x1="456" y1="1437.056" x2="630.4" y2="1437.056" stroke-width="2.08" class="staff-line"></line>
+<line x1="456" y1="1453.056" x2="630.4" y2="1453.056" stroke-width="2.08" class="staff-line"></line>
+<line x1="456" y1="1469.056" x2="630.4" y2="1469.056" stroke-width="2.08" class="staff-line"></line>
+<line x1="456" y1="1485.056" x2="630.4" y2="1485.056" stroke-width="2.08" class="staff-line"></line>
+<line x1="456" y1="1501.056" x2="630.4" y2="1501.056" stroke-width="2.08" class="staff-line"></line>
+<line x1="456" y1="201.6" x2="456" y2="1501.056" stroke-width="2.56" class="barline barline-start"></line>
+<text x="405.5456" y="425.984" font-size="225.056" class="brace"></text>
 <rect x="433.6" y="200" width="8" height="227.584" fill="currentColor" class="bracket"></rect>
-<text x="433.6" y="200" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="bracket"></text>
-<text x="433.6" y="427.584" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="bracket"></text>
-<text x="432.9136" y="725.248" font-family="Bravura" font-size="203.488" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="brace"></text>
-<text x="405.5456" y="1019.904" font-family="Bravura" font-size="225.056" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="brace"></text>
+<text x="433.6" y="200" font-size="64" class="bracket"></text>
+<text x="433.6" y="427.584" font-size="64" class="bracket"></text>
+<text x="432.9136" y="725.248" font-size="203.488" class="brace"></text>
+<text x="405.5456" y="1019.904" font-size="225.056" class="brace"></text>
 <rect x="433.6" y="793.92" width="8" height="708.736" fill="currentColor" class="bracket"></rect>
-<text x="433.6" y="793.92" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="bracket"></text>
-<text x="433.6" y="1502.656" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="bracket"></text>
-<text x="393.6" y="243.2" font-family="var(--font-family-sans)" font-size="25.6" text-anchor="end" dominant-baseline="alphabetic" fill="currentColor" class="staff-label">2.</text>
-<text x="393.6" y="403.584" font-family="var(--font-family-sans)" font-size="25.6" text-anchor="end" dominant-baseline="alphabetic" fill="currentColor" class="staff-label">4.</text>
-<text x="393.6" y="837.12" font-family="var(--font-family-sans)" font-size="25.6" text-anchor="end" dominant-baseline="alphabetic" fill="currentColor" class="staff-label">1. Violine.</text>
-<text x="393.6" y="997.504" font-family="var(--font-family-sans)" font-size="25.6" text-anchor="end" dominant-baseline="alphabetic" fill="currentColor" class="staff-label">2. Violine.</text>
-<text x="393.6" y="1157.888" font-family="var(--font-family-sans)" font-size="25.6" text-anchor="end" dominant-baseline="alphabetic" fill="currentColor" class="staff-label">Viola.</text>
-<text x="393.6" y="1318.272" font-family="var(--font-family-sans)" font-size="25.6" text-anchor="end" dominant-baseline="alphabetic" fill="currentColor" class="staff-label">Violincell.</text>
-<text x="393.6" y="1478.656" font-family="var(--font-family-sans)" font-size="25.6" text-anchor="end" dominant-baseline="alphabetic" fill="currentColor" class="staff-label">Kontrabass</text>
-<text x="352" y="323.392" font-family="var(--font-family-sans)" font-size="25.6" text-anchor="end" dominant-baseline="alphabetic" fill="currentColor" class="group-label">Horns in F.</text>
-<text x="393.6" y="633.408" font-family="var(--font-family-sans)" font-size="25.6" text-anchor="end" dominant-baseline="alphabetic" fill="currentColor" class="group-label">1. Harfe.</text>
-<text x="473.6" y="249.6" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="clef"></text>
-<text x="473.6" y="409.984" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="clef"></text>
-<text x="473.6" y="570.368" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="clef"></text>
-<text x="473.6" y="677.248" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="clef"></text>
-<text x="473.6" y="843.52" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="clef"></text>
-<text x="473.6" y="1003.904" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="clef"></text>
-<text x="473.6" y="1164.288" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="clef"></text>
-<text x="473.6" y="1324.672" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="clef"></text>
-<text x="473.6" y="1485.056" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="clef"></text>
-<line x1="617.6" y1="201.6" x2="617.6" y2="425.984" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
+<text x="433.6" y="793.92" font-size="64" class="bracket"></text>
+<text x="433.6" y="1502.656" font-size="64" class="bracket"></text>
+<text x="393.6" y="243.2" font-size="25.6" text-anchor="end" style="font-family:var(--font-family-sans)" class="staff-label">2.</text>
+<text x="393.6" y="403.584" font-size="25.6" text-anchor="end" style="font-family:var(--font-family-sans)" class="staff-label">4.</text>
+<text x="393.6" y="837.12" font-size="25.6" text-anchor="end" style="font-family:var(--font-family-sans)" class="staff-label">1. Violine.</text>
+<text x="393.6" y="997.504" font-size="25.6" text-anchor="end" style="font-family:var(--font-family-sans)" class="staff-label">2. Violine.</text>
+<text x="393.6" y="1157.888" font-size="25.6" text-anchor="end" style="font-family:var(--font-family-sans)" class="staff-label">Viola.</text>
+<text x="393.6" y="1318.272" font-size="25.6" text-anchor="end" style="font-family:var(--font-family-sans)" class="staff-label">Violincell.</text>
+<text x="393.6" y="1478.656" font-size="25.6" text-anchor="end" style="font-family:var(--font-family-sans)" class="staff-label">Kontrabass</text>
+<text x="352" y="323.392" font-size="25.6" text-anchor="end" style="font-family:var(--font-family-sans)" class="group-label">Horns in F.</text>
+<text x="393.6" y="633.408" font-size="25.6" text-anchor="end" style="font-family:var(--font-family-sans)" class="group-label">1. Harfe.</text>
+<text x="473.6" y="249.6" font-size="64" class="clef"></text>
+<text x="473.6" y="409.984" font-size="64" class="clef"></text>
+<text x="473.6" y="570.368" font-size="64" class="clef"></text>
+<text x="473.6" y="677.248" font-size="64" class="clef"></text>
+<text x="473.6" y="843.52" font-size="64" class="clef"></text>
+<text x="473.6" y="1003.904" font-size="64" class="clef"></text>
+<text x="473.6" y="1164.288" font-size="64" class="clef"></text>
+<text x="473.6" y="1324.672" font-size="64" class="clef"></text>
+<text x="473.6" y="1485.056" font-size="64" class="clef"></text>
+<line x1="617.6" y1="201.6" x2="617.6" y2="425.984" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="622.4" y="201.6" width="8" height="224.384" fill="currentColor" class="barline barline-final-thick"></rect>
-<line x1="617.6" y1="201.6" x2="617.6" y2="425.984" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
+<line x1="617.6" y1="201.6" x2="617.6" y2="425.984" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="622.4" y="201.6" width="8" height="224.384" fill="currentColor" class="barline barline-final-thick"></rect>
-<line x1="617.6" y1="522.368" x2="617.6" y2="725.248" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
+<line x1="617.6" y1="522.368" x2="617.6" y2="725.248" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="622.4" y="522.368" width="8" height="202.88" fill="currentColor" class="barline barline-final-thick"></rect>
-<line x1="617.6" y1="795.52" x2="617.6" y2="1019.904" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
+<line x1="617.6" y1="795.52" x2="617.6" y2="1019.904" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="622.4" y="795.52" width="8" height="224.384" fill="currentColor" class="barline barline-final-thick"></rect>
-<line x1="617.6" y1="795.52" x2="617.6" y2="1501.056" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
+<line x1="617.6" y1="795.52" x2="617.6" y2="1501.056" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="622.4" y="795.52" width="8" height="705.536" fill="currentColor" class="barline barline-final-thick"></rect>
-<line x1="552" y1="1597.44" x2="726.4" y2="1597.44" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="1613.44" x2="726.4" y2="1613.44" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="1629.44" x2="726.4" y2="1629.44" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="1645.44" x2="726.4" y2="1645.44" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="1661.44" x2="726.4" y2="1661.44" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="1757.824" x2="726.4" y2="1757.824" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="1773.824" x2="726.4" y2="1773.824" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="1789.824" x2="726.4" y2="1789.824" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="1805.824" x2="726.4" y2="1805.824" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="1821.824" x2="726.4" y2="1821.824" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="1918.208" x2="726.4" y2="1918.208" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="1934.208" x2="726.4" y2="1934.208" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="1950.208" x2="726.4" y2="1950.208" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="1966.208" x2="726.4" y2="1966.208" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="1982.208" x2="726.4" y2="1982.208" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="2057.088" x2="726.4" y2="2057.088" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="2073.088" x2="726.4" y2="2073.088" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="2089.088" x2="726.4" y2="2089.088" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="2105.088" x2="726.4" y2="2105.088" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="2121.088" x2="726.4" y2="2121.088" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="2191.36" x2="726.4" y2="2191.36" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="2207.36" x2="726.4" y2="2207.36" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="2223.36" x2="726.4" y2="2223.36" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="2239.36" x2="726.4" y2="2239.36" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="2255.36" x2="726.4" y2="2255.36" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="2351.744" x2="726.4" y2="2351.744" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="2367.744" x2="726.4" y2="2367.744" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="2383.744" x2="726.4" y2="2383.744" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="2399.744" x2="726.4" y2="2399.744" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="2415.744" x2="726.4" y2="2415.744" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="2512.128" x2="726.4" y2="2512.128" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="2528.128" x2="726.4" y2="2528.128" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="2544.128" x2="726.4" y2="2544.128" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="2560.128" x2="726.4" y2="2560.128" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="2576.128" x2="726.4" y2="2576.128" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="2672.512" x2="726.4" y2="2672.512" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="2688.512" x2="726.4" y2="2688.512" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="2704.512" x2="726.4" y2="2704.512" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="2720.512" x2="726.4" y2="2720.512" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="2736.512" x2="726.4" y2="2736.512" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="2832.896" x2="726.4" y2="2832.896" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="2848.896" x2="726.4" y2="2848.896" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="2864.896" x2="726.4" y2="2864.896" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="2880.896" x2="726.4" y2="2880.896" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="2896.896" x2="726.4" y2="2896.896" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="2993.28" x2="726.4" y2="2993.28" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="3009.28" x2="726.4" y2="3009.28" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="3025.28" x2="726.4" y2="3025.28" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="3041.28" x2="726.4" y2="3041.28" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="3057.28" x2="726.4" y2="3057.28" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="3153.664" x2="726.4" y2="3153.664" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="3169.664" x2="726.4" y2="3169.664" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="3185.664" x2="726.4" y2="3185.664" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="3201.664" x2="726.4" y2="3201.664" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="3217.664" x2="726.4" y2="3217.664" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="552" y1="1597.44" x2="552" y2="3217.664" stroke="currentColor" stroke-width="2.56" class="barline barline-start"></line>
-<text x="540.336" y="1661.44" font-family="Bravura" font-size="64.192" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="brace"></text>
+<line x1="552" y1="1597.44" x2="726.4" y2="1597.44" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="1613.44" x2="726.4" y2="1613.44" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="1629.44" x2="726.4" y2="1629.44" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="1645.44" x2="726.4" y2="1645.44" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="1661.44" x2="726.4" y2="1661.44" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="1757.824" x2="726.4" y2="1757.824" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="1773.824" x2="726.4" y2="1773.824" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="1789.824" x2="726.4" y2="1789.824" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="1805.824" x2="726.4" y2="1805.824" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="1821.824" x2="726.4" y2="1821.824" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="1918.208" x2="726.4" y2="1918.208" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="1934.208" x2="726.4" y2="1934.208" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="1950.208" x2="726.4" y2="1950.208" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="1966.208" x2="726.4" y2="1966.208" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="1982.208" x2="726.4" y2="1982.208" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="2057.088" x2="726.4" y2="2057.088" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="2073.088" x2="726.4" y2="2073.088" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="2089.088" x2="726.4" y2="2089.088" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="2105.088" x2="726.4" y2="2105.088" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="2121.088" x2="726.4" y2="2121.088" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="2191.36" x2="726.4" y2="2191.36" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="2207.36" x2="726.4" y2="2207.36" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="2223.36" x2="726.4" y2="2223.36" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="2239.36" x2="726.4" y2="2239.36" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="2255.36" x2="726.4" y2="2255.36" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="2351.744" x2="726.4" y2="2351.744" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="2367.744" x2="726.4" y2="2367.744" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="2383.744" x2="726.4" y2="2383.744" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="2399.744" x2="726.4" y2="2399.744" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="2415.744" x2="726.4" y2="2415.744" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="2512.128" x2="726.4" y2="2512.128" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="2528.128" x2="726.4" y2="2528.128" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="2544.128" x2="726.4" y2="2544.128" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="2560.128" x2="726.4" y2="2560.128" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="2576.128" x2="726.4" y2="2576.128" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="2672.512" x2="726.4" y2="2672.512" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="2688.512" x2="726.4" y2="2688.512" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="2704.512" x2="726.4" y2="2704.512" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="2720.512" x2="726.4" y2="2720.512" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="2736.512" x2="726.4" y2="2736.512" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="2832.896" x2="726.4" y2="2832.896" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="2848.896" x2="726.4" y2="2848.896" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="2864.896" x2="726.4" y2="2864.896" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="2880.896" x2="726.4" y2="2880.896" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="2896.896" x2="726.4" y2="2896.896" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="2993.28" x2="726.4" y2="2993.28" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="3009.28" x2="726.4" y2="3009.28" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="3025.28" x2="726.4" y2="3025.28" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="3041.28" x2="726.4" y2="3041.28" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="3057.28" x2="726.4" y2="3057.28" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="3153.664" x2="726.4" y2="3153.664" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="3169.664" x2="726.4" y2="3169.664" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="3185.664" x2="726.4" y2="3185.664" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="3201.664" x2="726.4" y2="3201.664" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="3217.664" x2="726.4" y2="3217.664" stroke-width="2.08" class="staff-line"></line>
+<line x1="552" y1="1597.44" x2="552" y2="3217.664" stroke-width="2.56" class="barline barline-start"></line>
+<text x="540.336" y="1661.44" font-size="64.192" class="brace"></text>
 <rect x="529.6" y="1756.224" width="8" height="67.2" fill="currentColor" class="bracket"></rect>
-<text x="529.6" y="1756.224" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="bracket"></text>
-<text x="529.6" y="1823.424" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="bracket"></text>
-<text x="528.9136" y="2121.088" font-family="Bravura" font-size="203.488" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="brace"></text>
-<text x="501.5456" y="2415.744" font-family="Bravura" font-size="225.056" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="brace"></text>
-<text x="501.5456" y="2736.512" font-family="Bravura" font-size="225.056" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="brace"></text>
-<text x="501.5456" y="3057.28" font-family="Bravura" font-size="225.056" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="brace"></text>
+<text x="529.6" y="1756.224" font-size="64" class="bracket"></text>
+<text x="529.6" y="1823.424" font-size="64" class="bracket"></text>
+<text x="528.9136" y="2121.088" font-size="203.488" class="brace"></text>
+<text x="501.5456" y="2415.744" font-size="225.056" class="brace"></text>
+<text x="501.5456" y="2736.512" font-size="225.056" class="brace"></text>
+<text x="501.5456" y="3057.28" font-size="225.056" class="brace"></text>
 <rect x="529.6" y="2189.76" width="8" height="1029.504" fill="currentColor" class="bracket"></rect>
-<text x="529.6" y="2189.76" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="bracket"></text>
-<text x="529.6" y="3219.264" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="bracket"></text>
-<text x="489.6" y="1639.04" font-family="var(--font-family-sans)" font-size="25.6" text-anchor="end" dominant-baseline="alphabetic" fill="currentColor" class="staff-label">1.2.3. Klar. in A</text>
-<text x="489.6" y="1799.424" font-family="var(--font-family-sans)" font-size="25.6" text-anchor="end" dominant-baseline="alphabetic" fill="currentColor" class="staff-label">2. Hr in F.</text>
-<text x="489.6" y="2232.96" font-family="var(--font-family-sans)" font-size="25.6" text-anchor="end" dominant-baseline="alphabetic" fill="currentColor" class="staff-label">1. Vl.</text>
-<text x="489.6" y="2393.344" font-family="var(--font-family-sans)" font-size="25.6" text-anchor="end" dominant-baseline="alphabetic" fill="currentColor" class="staff-label">2. Vl.</text>
-<text x="489.6" y="3195.264" font-family="var(--font-family-sans)" font-size="25.6" text-anchor="end" dominant-baseline="alphabetic" fill="currentColor" class="staff-label">Kontrabass</text>
-<text x="489.6" y="2029.248" font-family="var(--font-family-sans)" font-size="25.6" text-anchor="end" dominant-baseline="alphabetic" fill="currentColor" class="group-label">1. Harfe.</text>
-<text x="489.6" y="2633.92" font-family="var(--font-family-sans)" font-size="25.6" text-anchor="end" dominant-baseline="alphabetic" fill="currentColor" class="group-label">Vla. (get.)</text>
-<text x="489.6" y="2954.688" font-family="var(--font-family-sans)" font-size="25.6" text-anchor="end" dominant-baseline="alphabetic" fill="currentColor" class="group-label">Vlc. (get.)</text>
-<text x="569.6" y="1645.44" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="clef"></text>
-<text x="569.6" y="1805.824" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="clef"></text>
-<text x="569.6" y="1966.208" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="clef"></text>
-<text x="569.6" y="2073.088" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="clef"></text>
-<text x="569.6" y="2239.36" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="clef"></text>
-<text x="569.6" y="2399.744" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="clef"></text>
-<text x="569.6" y="2560.128" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="clef"></text>
-<text x="569.6" y="2720.512" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="clef"></text>
-<text x="569.6" y="2880.896" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="clef"></text>
-<text x="569.6" y="3041.28" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="clef"></text>
-<text x="569.6" y="3201.664" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="clef"></text>
-<line x1="713.6" y1="1597.44" x2="713.6" y2="1661.44" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
+<text x="529.6" y="2189.76" font-size="64" class="bracket"></text>
+<text x="529.6" y="3219.264" font-size="64" class="bracket"></text>
+<text x="489.6" y="1639.04" font-size="25.6" text-anchor="end" style="font-family:var(--font-family-sans)" class="staff-label">1.2.3. Klar. in A</text>
+<text x="489.6" y="1799.424" font-size="25.6" text-anchor="end" style="font-family:var(--font-family-sans)" class="staff-label">2. Hr in F.</text>
+<text x="489.6" y="2232.96" font-size="25.6" text-anchor="end" style="font-family:var(--font-family-sans)" class="staff-label">1. Vl.</text>
+<text x="489.6" y="2393.344" font-size="25.6" text-anchor="end" style="font-family:var(--font-family-sans)" class="staff-label">2. Vl.</text>
+<text x="489.6" y="3195.264" font-size="25.6" text-anchor="end" style="font-family:var(--font-family-sans)" class="staff-label">Kontrabass</text>
+<text x="489.6" y="2029.248" font-size="25.6" text-anchor="end" style="font-family:var(--font-family-sans)" class="group-label">1. Harfe.</text>
+<text x="489.6" y="2633.92" font-size="25.6" text-anchor="end" style="font-family:var(--font-family-sans)" class="group-label">Vla. (get.)</text>
+<text x="489.6" y="2954.688" font-size="25.6" text-anchor="end" style="font-family:var(--font-family-sans)" class="group-label">Vlc. (get.)</text>
+<text x="569.6" y="1645.44" font-size="64" class="clef"></text>
+<text x="569.6" y="1805.824" font-size="64" class="clef"></text>
+<text x="569.6" y="1966.208" font-size="64" class="clef"></text>
+<text x="569.6" y="2073.088" font-size="64" class="clef"></text>
+<text x="569.6" y="2239.36" font-size="64" class="clef"></text>
+<text x="569.6" y="2399.744" font-size="64" class="clef"></text>
+<text x="569.6" y="2560.128" font-size="64" class="clef"></text>
+<text x="569.6" y="2720.512" font-size="64" class="clef"></text>
+<text x="569.6" y="2880.896" font-size="64" class="clef"></text>
+<text x="569.6" y="3041.28" font-size="64" class="clef"></text>
+<text x="569.6" y="3201.664" font-size="64" class="clef"></text>
+<line x1="713.6" y1="1597.44" x2="713.6" y2="1661.44" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="718.4" y="1597.44" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
-<line x1="713.6" y1="1757.824" x2="713.6" y2="1821.824" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
+<line x1="713.6" y1="1757.824" x2="713.6" y2="1821.824" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="718.4" y="1757.824" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
-<line x1="713.6" y1="1918.208" x2="713.6" y2="2121.088" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
+<line x1="713.6" y1="1918.208" x2="713.6" y2="2121.088" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="718.4" y="1918.208" width="8" height="202.88" fill="currentColor" class="barline barline-final-thick"></rect>
-<line x1="713.6" y1="2191.36" x2="713.6" y2="2415.744" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
+<line x1="713.6" y1="2191.36" x2="713.6" y2="2415.744" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="718.4" y="2191.36" width="8" height="224.384" fill="currentColor" class="barline barline-final-thick"></rect>
-<line x1="713.6" y1="2512.128" x2="713.6" y2="2736.512" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
+<line x1="713.6" y1="2512.128" x2="713.6" y2="2736.512" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="718.4" y="2512.128" width="8" height="224.384" fill="currentColor" class="barline barline-final-thick"></rect>
-<line x1="713.6" y1="2832.896" x2="713.6" y2="3057.28" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
+<line x1="713.6" y1="2832.896" x2="713.6" y2="3057.28" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="718.4" y="2832.896" width="8" height="224.384" fill="currentColor" class="barline barline-final-thick"></rect>
-<line x1="713.6" y1="2191.36" x2="713.6" y2="3217.664" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
+<line x1="713.6" y1="2191.36" x2="713.6" y2="3217.664" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="718.4" y="2191.36" width="8" height="1026.304" fill="currentColor" class="barline barline-final-thick"></rect>
 </svg>

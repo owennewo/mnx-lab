@@ -1,270 +1,271 @@
 <svg width="1280" height="1663.36" viewBox="0 0 1280 1663.36" xmlns="http://www.w3.org/2000/svg">
-<text x="640" y="54.4" font-family="var(--font-family-sans)" font-size="38.4" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="score-title">Full score</text>
-<line x1="32" y1="201.6" x2="408" y2="201.6" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="217.6" x2="408" y2="217.6" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="233.6" x2="408" y2="233.6" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="249.6" x2="408" y2="249.6" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="265.6" x2="408" y2="265.6" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="361.984" x2="408" y2="361.984" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="377.984" x2="408" y2="377.984" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="393.984" x2="408" y2="393.984" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="409.984" x2="408" y2="409.984" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="425.984" x2="408" y2="425.984" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="201.6" x2="32" y2="425.984" stroke="currentColor" stroke-width="2.56" class="barline barline-start"></line>
-<text x="49.6" y="249.6" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="clef"></text>
-<text x="49.6" y="409.984" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="clef"></text>
-<text x="117.6" y="217.6" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-num"></text>
-<text x="117.6" y="249.6" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-den"></text>
-<text x="117.6" y="377.984" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-num"></text>
-<text x="117.6" y="409.984" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-den"></text>
-<text x="189.6528" y="225.6" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m0.v0.e0.n0"></text>
-<line x1="189.6528" y1="228.288" x2="189.6528" y2="281.6" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<text x="263.1472" y="209.6" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m0.v0.e1.n0"></text>
-<line x1="263.1472" y1="212.288" x2="263.1472" y2="265.6" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<text x="336.64" y="193.6" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m0.v0.e2.n0"></text>
-<line x1="336.64" y1="196.288" x2="336.64" y2="249.6" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<text x="199.0928" y="377.984" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="rest" data-source-id="@p1.m0.v0.e0"></text>
-<line x1="408" y1="201.6" x2="408" y2="265.6" stroke="currentColor" stroke-width="2.56" class="barline"></line>
-<line x1="408" y1="361.984" x2="408" y2="425.984" stroke="currentColor" stroke-width="2.56" class="barline"></line>
-<line x1="408" y1="201.6" x2="688" y2="201.6" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="408" y1="217.6" x2="688" y2="217.6" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="408" y1="233.6" x2="688" y2="233.6" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="408" y1="249.6" x2="688" y2="249.6" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="408" y1="265.6" x2="688" y2="265.6" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="408" y1="361.984" x2="688" y2="361.984" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="408" y1="377.984" x2="688" y2="377.984" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="408" y1="393.984" x2="688" y2="393.984" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="408" y1="409.984" x2="688" y2="409.984" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="408" y1="425.984" x2="688" y2="425.984" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<text x="469.6528" y="225.6" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m1.v0.e0.n0"></text>
-<line x1="469.6528" y1="228.288" x2="469.6528" y2="281.6" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<text x="543.1472" y="209.6" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m1.v0.e1.n0"></text>
-<line x1="543.1472" y1="212.288" x2="543.1472" y2="265.6" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<text x="616.64" y="193.6" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m1.v0.e2.n0"></text>
-<line x1="616.64" y1="196.288" x2="616.64" y2="249.6" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<text x="479.0928" y="377.984" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="rest" data-source-id="@p1.m1.v0.e0"></text>
-<line x1="688" y1="201.6" x2="688" y2="265.6" stroke="currentColor" stroke-width="2.56" class="barline"></line>
-<line x1="688" y1="361.984" x2="688" y2="425.984" stroke="currentColor" stroke-width="2.56" class="barline"></line>
-<line x1="688" y1="201.6" x2="968" y2="201.6" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="688" y1="217.6" x2="968" y2="217.6" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="688" y1="233.6" x2="968" y2="233.6" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="688" y1="249.6" x2="968" y2="249.6" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="688" y1="265.6" x2="968" y2="265.6" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="688" y1="361.984" x2="968" y2="361.984" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="688" y1="377.984" x2="968" y2="377.984" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="688" y1="393.984" x2="968" y2="393.984" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="688" y1="409.984" x2="968" y2="409.984" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="688" y1="425.984" x2="968" y2="425.984" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<text x="759.0928" y="217.6" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="rest" data-source-id="@m2.v0.e0"></text>
-<text x="749.6528" y="369.984" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@p1.m2.v0.e0.n0"></text>
-<line x1="749.6528" y1="372.672" x2="749.6528" y2="425.984" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<text x="823.1472" y="377.984" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@p1.m2.v0.e1.n0"></text>
-<line x1="823.1472" y1="380.672" x2="823.1472" y2="433.984" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<text x="896.64" y="385.984" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@p1.m2.v0.e2.n0"></text>
-<line x1="896.64" y1="388.672" x2="896.64" y2="441.984" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<line x1="968" y1="201.6" x2="968" y2="265.6" stroke="currentColor" stroke-width="2.56" class="barline"></line>
-<line x1="968" y1="361.984" x2="968" y2="425.984" stroke="currentColor" stroke-width="2.56" class="barline"></line>
-<line x1="968" y1="201.6" x2="1248" y2="201.6" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="968" y1="217.6" x2="1248" y2="217.6" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="968" y1="233.6" x2="1248" y2="233.6" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="968" y1="249.6" x2="1248" y2="249.6" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="968" y1="265.6" x2="1248" y2="265.6" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="968" y1="361.984" x2="1248" y2="361.984" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="968" y1="377.984" x2="1248" y2="377.984" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="968" y1="393.984" x2="1248" y2="393.984" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="968" y1="409.984" x2="1248" y2="409.984" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="968" y1="425.984" x2="1248" y2="425.984" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<text x="1039.0928" y="217.6" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="rest" data-source-id="@m3.v0.e0"></text>
-<text x="1029.6528" y="369.984" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@p1.m3.v0.e0.n0"></text>
-<line x1="1029.6528" y1="372.672" x2="1029.6528" y2="425.984" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<text x="1103.1472" y="377.984" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@p1.m3.v0.e1.n0"></text>
-<line x1="1103.1472" y1="380.672" x2="1103.1472" y2="433.984" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<text x="1176.64" y="385.984" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@p1.m3.v0.e2.n0"></text>
-<line x1="1176.64" y1="388.672" x2="1176.64" y2="441.984" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<line x1="1248" y1="201.6" x2="1248" y2="265.6" stroke="currentColor" stroke-width="2.56" class="barline"></line>
-<line x1="1248" y1="361.984" x2="1248" y2="425.984" stroke="currentColor" stroke-width="2.56" class="barline"></line>
-<line x1="32" y1="522.368" x2="368" y2="522.368" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="538.368" x2="368" y2="538.368" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="554.368" x2="368" y2="554.368" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="570.368" x2="368" y2="570.368" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="586.368" x2="368" y2="586.368" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="682.752" x2="368" y2="682.752" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="698.752" x2="368" y2="698.752" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="714.752" x2="368" y2="714.752" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="730.752" x2="368" y2="730.752" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="746.752" x2="368" y2="746.752" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="522.368" x2="32" y2="746.752" stroke="currentColor" stroke-width="2.56" class="barline barline-start"></line>
-<text x="49.6" y="570.368" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="clef"></text>
-<text x="49.6" y="730.752" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="clef"></text>
-<text x="149.6528" y="546.368" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m4.v0.e0.n0"></text>
-<line x1="149.6528" y1="549.056" x2="149.6528" y2="602.368" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<text x="223.1472" y="530.368" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m4.v0.e1.n0"></text>
-<line x1="223.1472" y1="533.056" x2="223.1472" y2="586.368" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<text x="296.64" y="514.368" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m4.v0.e2.n0"></text>
-<line x1="296.64" y1="517.056" x2="296.64" y2="570.368" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<text x="159.0928" y="698.752" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="rest" data-source-id="@p1.m4.v0.e0"></text>
-<line x1="368" y1="522.368" x2="368" y2="586.368" stroke="currentColor" stroke-width="2.56" class="barline"></line>
-<line x1="368" y1="682.752" x2="368" y2="746.752" stroke="currentColor" stroke-width="2.56" class="barline"></line>
-<line x1="368" y1="522.368" x2="648" y2="522.368" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="368" y1="538.368" x2="648" y2="538.368" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="368" y1="554.368" x2="648" y2="554.368" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="368" y1="570.368" x2="648" y2="570.368" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="368" y1="586.368" x2="648" y2="586.368" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="368" y1="682.752" x2="648" y2="682.752" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="368" y1="698.752" x2="648" y2="698.752" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="368" y1="714.752" x2="648" y2="714.752" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="368" y1="730.752" x2="648" y2="730.752" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="368" y1="746.752" x2="648" y2="746.752" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<text x="429.6528" y="546.368" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m5.v0.e0.n0"></text>
-<line x1="429.6528" y1="549.056" x2="429.6528" y2="602.368" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<text x="503.1472" y="530.368" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m5.v0.e1.n0"></text>
-<line x1="503.1472" y1="533.056" x2="503.1472" y2="586.368" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<text x="576.64" y="514.368" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m5.v0.e2.n0"></text>
-<line x1="576.64" y1="517.056" x2="576.64" y2="570.368" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<text x="439.0928" y="698.752" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="rest" data-source-id="@p1.m5.v0.e0"></text>
-<line x1="648" y1="522.368" x2="648" y2="586.368" stroke="currentColor" stroke-width="2.56" class="barline"></line>
-<line x1="648" y1="682.752" x2="648" y2="746.752" stroke="currentColor" stroke-width="2.56" class="barline"></line>
-<line x1="648" y1="522.368" x2="815.8928" y2="522.368" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="648" y1="538.368" x2="815.8928" y2="538.368" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="648" y1="554.368" x2="815.8928" y2="554.368" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="648" y1="570.368" x2="815.8928" y2="570.368" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="648" y1="586.368" x2="815.8928" y2="586.368" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="648" y1="682.752" x2="815.8928" y2="682.752" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="648" y1="698.752" x2="815.8928" y2="698.752" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="648" y1="714.752" x2="815.8928" y2="714.752" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="648" y1="730.752" x2="815.8928" y2="730.752" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="648" y1="746.752" x2="815.8928" y2="746.752" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<text x="705.5888" y="530.368" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m6.v0.e0.n0"></text>
-<text x="705.5888" y="706.752" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@p1.m6.v0.e0.n0"></text>
-<line x1="803.0928" y1="522.368" x2="803.0928" y2="586.368" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
+<style>:where(svg>text){font-family:Bravura;fill:currentColor}:where(svg>line,svg>path){stroke:currentColor}</style>
+<text x="640" y="54.4" font-size="38.4" text-anchor="middle" style="font-family:var(--font-family-sans)" class="score-title">Full score</text>
+<line x1="32" y1="201.6" x2="408" y2="201.6" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="217.6" x2="408" y2="217.6" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="233.6" x2="408" y2="233.6" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="249.6" x2="408" y2="249.6" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="265.6" x2="408" y2="265.6" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="361.984" x2="408" y2="361.984" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="377.984" x2="408" y2="377.984" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="393.984" x2="408" y2="393.984" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="409.984" x2="408" y2="409.984" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="425.984" x2="408" y2="425.984" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="201.6" x2="32" y2="425.984" stroke-width="2.56" class="barline barline-start"></line>
+<text x="49.6" y="249.6" font-size="64" class="clef"></text>
+<text x="49.6" y="409.984" font-size="64" class="clef"></text>
+<text x="117.6" y="217.6" font-size="64" text-anchor="middle" class="time-sig-num"></text>
+<text x="117.6" y="249.6" font-size="64" text-anchor="middle" class="time-sig-den"></text>
+<text x="117.6" y="377.984" font-size="64" text-anchor="middle" class="time-sig-num"></text>
+<text x="117.6" y="409.984" font-size="64" text-anchor="middle" class="time-sig-den"></text>
+<text x="189.6528" y="225.6" font-size="64" class="notehead" data-source-id="@m0.v0.e0.n0"></text>
+<line x1="189.6528" y1="228.288" x2="189.6528" y2="281.6" stroke-width="1.92" class="stem"></line>
+<text x="263.1472" y="209.6" font-size="64" class="notehead" data-source-id="@m0.v0.e1.n0"></text>
+<line x1="263.1472" y1="212.288" x2="263.1472" y2="265.6" stroke-width="1.92" class="stem"></line>
+<text x="336.64" y="193.6" font-size="64" class="notehead" data-source-id="@m0.v0.e2.n0"></text>
+<line x1="336.64" y1="196.288" x2="336.64" y2="249.6" stroke-width="1.92" class="stem"></line>
+<text x="199.0928" y="377.984" font-size="64" text-anchor="middle" class="rest" data-source-id="@p1.m0.v0.e0"></text>
+<line x1="408" y1="201.6" x2="408" y2="265.6" stroke-width="2.56" class="barline"></line>
+<line x1="408" y1="361.984" x2="408" y2="425.984" stroke-width="2.56" class="barline"></line>
+<line x1="408" y1="201.6" x2="688" y2="201.6" stroke-width="2.08" class="staff-line"></line>
+<line x1="408" y1="217.6" x2="688" y2="217.6" stroke-width="2.08" class="staff-line"></line>
+<line x1="408" y1="233.6" x2="688" y2="233.6" stroke-width="2.08" class="staff-line"></line>
+<line x1="408" y1="249.6" x2="688" y2="249.6" stroke-width="2.08" class="staff-line"></line>
+<line x1="408" y1="265.6" x2="688" y2="265.6" stroke-width="2.08" class="staff-line"></line>
+<line x1="408" y1="361.984" x2="688" y2="361.984" stroke-width="2.08" class="staff-line"></line>
+<line x1="408" y1="377.984" x2="688" y2="377.984" stroke-width="2.08" class="staff-line"></line>
+<line x1="408" y1="393.984" x2="688" y2="393.984" stroke-width="2.08" class="staff-line"></line>
+<line x1="408" y1="409.984" x2="688" y2="409.984" stroke-width="2.08" class="staff-line"></line>
+<line x1="408" y1="425.984" x2="688" y2="425.984" stroke-width="2.08" class="staff-line"></line>
+<text x="469.6528" y="225.6" font-size="64" class="notehead" data-source-id="@m1.v0.e0.n0"></text>
+<line x1="469.6528" y1="228.288" x2="469.6528" y2="281.6" stroke-width="1.92" class="stem"></line>
+<text x="543.1472" y="209.6" font-size="64" class="notehead" data-source-id="@m1.v0.e1.n0"></text>
+<line x1="543.1472" y1="212.288" x2="543.1472" y2="265.6" stroke-width="1.92" class="stem"></line>
+<text x="616.64" y="193.6" font-size="64" class="notehead" data-source-id="@m1.v0.e2.n0"></text>
+<line x1="616.64" y1="196.288" x2="616.64" y2="249.6" stroke-width="1.92" class="stem"></line>
+<text x="479.0928" y="377.984" font-size="64" text-anchor="middle" class="rest" data-source-id="@p1.m1.v0.e0"></text>
+<line x1="688" y1="201.6" x2="688" y2="265.6" stroke-width="2.56" class="barline"></line>
+<line x1="688" y1="361.984" x2="688" y2="425.984" stroke-width="2.56" class="barline"></line>
+<line x1="688" y1="201.6" x2="968" y2="201.6" stroke-width="2.08" class="staff-line"></line>
+<line x1="688" y1="217.6" x2="968" y2="217.6" stroke-width="2.08" class="staff-line"></line>
+<line x1="688" y1="233.6" x2="968" y2="233.6" stroke-width="2.08" class="staff-line"></line>
+<line x1="688" y1="249.6" x2="968" y2="249.6" stroke-width="2.08" class="staff-line"></line>
+<line x1="688" y1="265.6" x2="968" y2="265.6" stroke-width="2.08" class="staff-line"></line>
+<line x1="688" y1="361.984" x2="968" y2="361.984" stroke-width="2.08" class="staff-line"></line>
+<line x1="688" y1="377.984" x2="968" y2="377.984" stroke-width="2.08" class="staff-line"></line>
+<line x1="688" y1="393.984" x2="968" y2="393.984" stroke-width="2.08" class="staff-line"></line>
+<line x1="688" y1="409.984" x2="968" y2="409.984" stroke-width="2.08" class="staff-line"></line>
+<line x1="688" y1="425.984" x2="968" y2="425.984" stroke-width="2.08" class="staff-line"></line>
+<text x="759.0928" y="217.6" font-size="64" text-anchor="middle" class="rest" data-source-id="@m2.v0.e0"></text>
+<text x="749.6528" y="369.984" font-size="64" class="notehead" data-source-id="@p1.m2.v0.e0.n0"></text>
+<line x1="749.6528" y1="372.672" x2="749.6528" y2="425.984" stroke-width="1.92" class="stem"></line>
+<text x="823.1472" y="377.984" font-size="64" class="notehead" data-source-id="@p1.m2.v0.e1.n0"></text>
+<line x1="823.1472" y1="380.672" x2="823.1472" y2="433.984" stroke-width="1.92" class="stem"></line>
+<text x="896.64" y="385.984" font-size="64" class="notehead" data-source-id="@p1.m2.v0.e2.n0"></text>
+<line x1="896.64" y1="388.672" x2="896.64" y2="441.984" stroke-width="1.92" class="stem"></line>
+<line x1="968" y1="201.6" x2="968" y2="265.6" stroke-width="2.56" class="barline"></line>
+<line x1="968" y1="361.984" x2="968" y2="425.984" stroke-width="2.56" class="barline"></line>
+<line x1="968" y1="201.6" x2="1248" y2="201.6" stroke-width="2.08" class="staff-line"></line>
+<line x1="968" y1="217.6" x2="1248" y2="217.6" stroke-width="2.08" class="staff-line"></line>
+<line x1="968" y1="233.6" x2="1248" y2="233.6" stroke-width="2.08" class="staff-line"></line>
+<line x1="968" y1="249.6" x2="1248" y2="249.6" stroke-width="2.08" class="staff-line"></line>
+<line x1="968" y1="265.6" x2="1248" y2="265.6" stroke-width="2.08" class="staff-line"></line>
+<line x1="968" y1="361.984" x2="1248" y2="361.984" stroke-width="2.08" class="staff-line"></line>
+<line x1="968" y1="377.984" x2="1248" y2="377.984" stroke-width="2.08" class="staff-line"></line>
+<line x1="968" y1="393.984" x2="1248" y2="393.984" stroke-width="2.08" class="staff-line"></line>
+<line x1="968" y1="409.984" x2="1248" y2="409.984" stroke-width="2.08" class="staff-line"></line>
+<line x1="968" y1="425.984" x2="1248" y2="425.984" stroke-width="2.08" class="staff-line"></line>
+<text x="1039.0928" y="217.6" font-size="64" text-anchor="middle" class="rest" data-source-id="@m3.v0.e0"></text>
+<text x="1029.6528" y="369.984" font-size="64" class="notehead" data-source-id="@p1.m3.v0.e0.n0"></text>
+<line x1="1029.6528" y1="372.672" x2="1029.6528" y2="425.984" stroke-width="1.92" class="stem"></line>
+<text x="1103.1472" y="377.984" font-size="64" class="notehead" data-source-id="@p1.m3.v0.e1.n0"></text>
+<line x1="1103.1472" y1="380.672" x2="1103.1472" y2="433.984" stroke-width="1.92" class="stem"></line>
+<text x="1176.64" y="385.984" font-size="64" class="notehead" data-source-id="@p1.m3.v0.e2.n0"></text>
+<line x1="1176.64" y1="388.672" x2="1176.64" y2="441.984" stroke-width="1.92" class="stem"></line>
+<line x1="1248" y1="201.6" x2="1248" y2="265.6" stroke-width="2.56" class="barline"></line>
+<line x1="1248" y1="361.984" x2="1248" y2="425.984" stroke-width="2.56" class="barline"></line>
+<line x1="32" y1="522.368" x2="368" y2="522.368" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="538.368" x2="368" y2="538.368" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="554.368" x2="368" y2="554.368" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="570.368" x2="368" y2="570.368" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="586.368" x2="368" y2="586.368" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="682.752" x2="368" y2="682.752" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="698.752" x2="368" y2="698.752" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="714.752" x2="368" y2="714.752" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="730.752" x2="368" y2="730.752" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="746.752" x2="368" y2="746.752" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="522.368" x2="32" y2="746.752" stroke-width="2.56" class="barline barline-start"></line>
+<text x="49.6" y="570.368" font-size="64" class="clef"></text>
+<text x="49.6" y="730.752" font-size="64" class="clef"></text>
+<text x="149.6528" y="546.368" font-size="64" class="notehead" data-source-id="@m4.v0.e0.n0"></text>
+<line x1="149.6528" y1="549.056" x2="149.6528" y2="602.368" stroke-width="1.92" class="stem"></line>
+<text x="223.1472" y="530.368" font-size="64" class="notehead" data-source-id="@m4.v0.e1.n0"></text>
+<line x1="223.1472" y1="533.056" x2="223.1472" y2="586.368" stroke-width="1.92" class="stem"></line>
+<text x="296.64" y="514.368" font-size="64" class="notehead" data-source-id="@m4.v0.e2.n0"></text>
+<line x1="296.64" y1="517.056" x2="296.64" y2="570.368" stroke-width="1.92" class="stem"></line>
+<text x="159.0928" y="698.752" font-size="64" text-anchor="middle" class="rest" data-source-id="@p1.m4.v0.e0"></text>
+<line x1="368" y1="522.368" x2="368" y2="586.368" stroke-width="2.56" class="barline"></line>
+<line x1="368" y1="682.752" x2="368" y2="746.752" stroke-width="2.56" class="barline"></line>
+<line x1="368" y1="522.368" x2="648" y2="522.368" stroke-width="2.08" class="staff-line"></line>
+<line x1="368" y1="538.368" x2="648" y2="538.368" stroke-width="2.08" class="staff-line"></line>
+<line x1="368" y1="554.368" x2="648" y2="554.368" stroke-width="2.08" class="staff-line"></line>
+<line x1="368" y1="570.368" x2="648" y2="570.368" stroke-width="2.08" class="staff-line"></line>
+<line x1="368" y1="586.368" x2="648" y2="586.368" stroke-width="2.08" class="staff-line"></line>
+<line x1="368" y1="682.752" x2="648" y2="682.752" stroke-width="2.08" class="staff-line"></line>
+<line x1="368" y1="698.752" x2="648" y2="698.752" stroke-width="2.08" class="staff-line"></line>
+<line x1="368" y1="714.752" x2="648" y2="714.752" stroke-width="2.08" class="staff-line"></line>
+<line x1="368" y1="730.752" x2="648" y2="730.752" stroke-width="2.08" class="staff-line"></line>
+<line x1="368" y1="746.752" x2="648" y2="746.752" stroke-width="2.08" class="staff-line"></line>
+<text x="429.6528" y="546.368" font-size="64" class="notehead" data-source-id="@m5.v0.e0.n0"></text>
+<line x1="429.6528" y1="549.056" x2="429.6528" y2="602.368" stroke-width="1.92" class="stem"></line>
+<text x="503.1472" y="530.368" font-size="64" class="notehead" data-source-id="@m5.v0.e1.n0"></text>
+<line x1="503.1472" y1="533.056" x2="503.1472" y2="586.368" stroke-width="1.92" class="stem"></line>
+<text x="576.64" y="514.368" font-size="64" class="notehead" data-source-id="@m5.v0.e2.n0"></text>
+<line x1="576.64" y1="517.056" x2="576.64" y2="570.368" stroke-width="1.92" class="stem"></line>
+<text x="439.0928" y="698.752" font-size="64" text-anchor="middle" class="rest" data-source-id="@p1.m5.v0.e0"></text>
+<line x1="648" y1="522.368" x2="648" y2="586.368" stroke-width="2.56" class="barline"></line>
+<line x1="648" y1="682.752" x2="648" y2="746.752" stroke-width="2.56" class="barline"></line>
+<line x1="648" y1="522.368" x2="815.8928" y2="522.368" stroke-width="2.08" class="staff-line"></line>
+<line x1="648" y1="538.368" x2="815.8928" y2="538.368" stroke-width="2.08" class="staff-line"></line>
+<line x1="648" y1="554.368" x2="815.8928" y2="554.368" stroke-width="2.08" class="staff-line"></line>
+<line x1="648" y1="570.368" x2="815.8928" y2="570.368" stroke-width="2.08" class="staff-line"></line>
+<line x1="648" y1="586.368" x2="815.8928" y2="586.368" stroke-width="2.08" class="staff-line"></line>
+<line x1="648" y1="682.752" x2="815.8928" y2="682.752" stroke-width="2.08" class="staff-line"></line>
+<line x1="648" y1="698.752" x2="815.8928" y2="698.752" stroke-width="2.08" class="staff-line"></line>
+<line x1="648" y1="714.752" x2="815.8928" y2="714.752" stroke-width="2.08" class="staff-line"></line>
+<line x1="648" y1="730.752" x2="815.8928" y2="730.752" stroke-width="2.08" class="staff-line"></line>
+<line x1="648" y1="746.752" x2="815.8928" y2="746.752" stroke-width="2.08" class="staff-line"></line>
+<text x="705.5888" y="530.368" font-size="64" class="notehead" data-source-id="@m6.v0.e0.n0"></text>
+<text x="705.5888" y="706.752" font-size="64" class="notehead" data-source-id="@p1.m6.v0.e0.n0"></text>
+<line x1="803.0928" y1="522.368" x2="803.0928" y2="586.368" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="807.8928" y="522.368" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
-<line x1="803.0928" y1="682.752" x2="803.0928" y2="746.752" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
+<line x1="803.0928" y1="682.752" x2="803.0928" y2="746.752" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="807.8928" y="682.752" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
-<text x="640" y="849.664" font-family="var(--font-family-sans)" font-size="38.4" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="score-title">Part A</text>
-<line x1="32" y1="996.864" x2="362.4" y2="996.864" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="1012.864" x2="362.4" y2="1012.864" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="1028.864" x2="362.4" y2="1028.864" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="1044.864" x2="362.4" y2="1044.864" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="1060.864" x2="362.4" y2="1060.864" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<text x="49.6" y="1044.864" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="clef"></text>
-<text x="117.6" y="1012.864" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-num"></text>
-<text x="117.6" y="1044.864" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-den"></text>
-<text x="161.6992" y="1020.864" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m0.v0.e0.n0"></text>
-<line x1="161.6992" y1="1023.552" x2="161.6992" y2="1076.864" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<text x="228.776" y="1004.864" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m0.v0.e1.n0"></text>
-<line x1="228.776" y1="1007.552" x2="228.776" y2="1060.864" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<text x="295.8528" y="988.864" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m0.v0.e2.n0"></text>
-<line x1="295.8528" y1="991.552" x2="295.8528" y2="1044.864" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<line x1="362.4" y1="996.864" x2="362.4" y2="1060.864" stroke="currentColor" stroke-width="2.56" class="barline"></line>
-<line x1="362.4" y1="996.864" x2="596.8" y2="996.864" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="362.4" y1="1012.864" x2="596.8" y2="1012.864" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="362.4" y1="1028.864" x2="596.8" y2="1028.864" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="362.4" y1="1044.864" x2="596.8" y2="1044.864" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="362.4" y1="1060.864" x2="596.8" y2="1060.864" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<text x="396.0992" y="1020.864" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m1.v0.e0.n0"></text>
-<line x1="396.0992" y1="1023.552" x2="396.0992" y2="1076.864" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<text x="463.176" y="1004.864" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m1.v0.e1.n0"></text>
-<line x1="463.176" y1="1007.552" x2="463.176" y2="1060.864" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<text x="530.2528" y="988.864" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m1.v0.e2.n0"></text>
-<line x1="530.2528" y1="991.552" x2="530.2528" y2="1044.864" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<line x1="596.8" y1="996.864" x2="596.8" y2="1060.864" stroke="currentColor" stroke-width="2.56" class="barline"></line>
-<line x1="596.8" y1="996.864" x2="779.2" y2="996.864" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="596.8" y1="1012.864" x2="779.2" y2="1012.864" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="596.8" y1="1028.864" x2="779.2" y2="1028.864" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="596.8" y1="1044.864" x2="779.2" y2="1044.864" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="596.8" y1="1060.864" x2="779.2" y2="1060.864" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
+<text x="640" y="849.664" font-size="38.4" text-anchor="middle" style="font-family:var(--font-family-sans)" class="score-title">Part A</text>
+<line x1="32" y1="996.864" x2="362.4" y2="996.864" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="1012.864" x2="362.4" y2="1012.864" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="1028.864" x2="362.4" y2="1028.864" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="1044.864" x2="362.4" y2="1044.864" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="1060.864" x2="362.4" y2="1060.864" stroke-width="2.08" class="staff-line"></line>
+<text x="49.6" y="1044.864" font-size="64" class="clef"></text>
+<text x="117.6" y="1012.864" font-size="64" text-anchor="middle" class="time-sig-num"></text>
+<text x="117.6" y="1044.864" font-size="64" text-anchor="middle" class="time-sig-den"></text>
+<text x="161.6992" y="1020.864" font-size="64" class="notehead" data-source-id="@m0.v0.e0.n0"></text>
+<line x1="161.6992" y1="1023.552" x2="161.6992" y2="1076.864" stroke-width="1.92" class="stem"></line>
+<text x="228.776" y="1004.864" font-size="64" class="notehead" data-source-id="@m0.v0.e1.n0"></text>
+<line x1="228.776" y1="1007.552" x2="228.776" y2="1060.864" stroke-width="1.92" class="stem"></line>
+<text x="295.8528" y="988.864" font-size="64" class="notehead" data-source-id="@m0.v0.e2.n0"></text>
+<line x1="295.8528" y1="991.552" x2="295.8528" y2="1044.864" stroke-width="1.92" class="stem"></line>
+<line x1="362.4" y1="996.864" x2="362.4" y2="1060.864" stroke-width="2.56" class="barline"></line>
+<line x1="362.4" y1="996.864" x2="596.8" y2="996.864" stroke-width="2.08" class="staff-line"></line>
+<line x1="362.4" y1="1012.864" x2="596.8" y2="1012.864" stroke-width="2.08" class="staff-line"></line>
+<line x1="362.4" y1="1028.864" x2="596.8" y2="1028.864" stroke-width="2.08" class="staff-line"></line>
+<line x1="362.4" y1="1044.864" x2="596.8" y2="1044.864" stroke-width="2.08" class="staff-line"></line>
+<line x1="362.4" y1="1060.864" x2="596.8" y2="1060.864" stroke-width="2.08" class="staff-line"></line>
+<text x="396.0992" y="1020.864" font-size="64" class="notehead" data-source-id="@m1.v0.e0.n0"></text>
+<line x1="396.0992" y1="1023.552" x2="396.0992" y2="1076.864" stroke-width="1.92" class="stem"></line>
+<text x="463.176" y="1004.864" font-size="64" class="notehead" data-source-id="@m1.v0.e1.n0"></text>
+<line x1="463.176" y1="1007.552" x2="463.176" y2="1060.864" stroke-width="1.92" class="stem"></line>
+<text x="530.2528" y="988.864" font-size="64" class="notehead" data-source-id="@m1.v0.e2.n0"></text>
+<line x1="530.2528" y1="991.552" x2="530.2528" y2="1044.864" stroke-width="1.92" class="stem"></line>
+<line x1="596.8" y1="996.864" x2="596.8" y2="1060.864" stroke-width="2.56" class="barline"></line>
+<line x1="596.8" y1="996.864" x2="779.2" y2="996.864" stroke-width="2.08" class="staff-line"></line>
+<line x1="596.8" y1="1012.864" x2="779.2" y2="1012.864" stroke-width="2.08" class="staff-line"></line>
+<line x1="596.8" y1="1028.864" x2="779.2" y2="1028.864" stroke-width="2.08" class="staff-line"></line>
+<line x1="596.8" y1="1044.864" x2="779.2" y2="1044.864" stroke-width="2.08" class="staff-line"></line>
+<line x1="596.8" y1="1060.864" x2="779.2" y2="1060.864" stroke-width="2.08" class="staff-line"></line>
 <rect x="616" y="1020.864" width="147.2" height="16" fill="currentColor" class="multirest-bar"></rect>
-<line x1="616" y1="1012.864" x2="616" y2="1044.864" stroke="currentColor" stroke-width="4" class="multirest-cap"></line>
-<line x1="763.2" y1="1012.864" x2="763.2" y2="1044.864" stroke="currentColor" stroke-width="4" class="multirest-cap"></line>
-<text x="689.6" y="984.064" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="multirest-count"></text>
-<line x1="779.2" y1="996.864" x2="779.2" y2="1060.864" stroke="currentColor" stroke-width="2.56" class="barline"></line>
-<line x1="779.2" y1="996.864" x2="1013.6" y2="996.864" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="779.2" y1="1012.864" x2="1013.6" y2="1012.864" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="779.2" y1="1028.864" x2="1013.6" y2="1028.864" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="779.2" y1="1044.864" x2="1013.6" y2="1044.864" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="779.2" y1="1060.864" x2="1013.6" y2="1060.864" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<text x="812.8992" y="1020.864" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m4.v0.e0.n0"></text>
-<line x1="812.8992" y1="1023.552" x2="812.8992" y2="1076.864" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<text x="879.976" y="1004.864" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m4.v0.e1.n0"></text>
-<line x1="879.976" y1="1007.552" x2="879.976" y2="1060.864" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<text x="947.0528" y="988.864" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m4.v0.e2.n0"></text>
-<line x1="947.0528" y1="991.552" x2="947.0528" y2="1044.864" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<line x1="1013.6" y1="996.864" x2="1013.6" y2="1060.864" stroke="currentColor" stroke-width="2.56" class="barline"></line>
-<line x1="1013.6" y1="996.864" x2="1248" y2="996.864" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="1013.6" y1="1012.864" x2="1248" y2="1012.864" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="1013.6" y1="1028.864" x2="1248" y2="1028.864" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="1013.6" y1="1044.864" x2="1248" y2="1044.864" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="1013.6" y1="1060.864" x2="1248" y2="1060.864" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<text x="1047.2992" y="1020.864" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m5.v0.e0.n0"></text>
-<line x1="1047.2992" y1="1023.552" x2="1047.2992" y2="1076.864" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<text x="1114.376" y="1004.864" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m5.v0.e1.n0"></text>
-<line x1="1114.376" y1="1007.552" x2="1114.376" y2="1060.864" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<text x="1181.4528" y="988.864" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m5.v0.e2.n0"></text>
-<line x1="1181.4528" y1="991.552" x2="1181.4528" y2="1044.864" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<line x1="1248" y1="996.864" x2="1248" y2="1060.864" stroke="currentColor" stroke-width="2.56" class="barline"></line>
-<line x1="32" y1="1157.248" x2="249.4768" y2="1157.248" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="1173.248" x2="249.4768" y2="1173.248" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="1189.248" x2="249.4768" y2="1189.248" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="1205.248" x2="249.4768" y2="1205.248" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="1221.248" x2="249.4768" y2="1221.248" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<text x="49.6" y="1205.248" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="clef"></text>
-<text x="139.1728" y="1165.248" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@m6.v0.e0.n0"></text>
-<line x1="236.6768" y1="1157.248" x2="236.6768" y2="1221.248" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
+<line x1="616" y1="1012.864" x2="616" y2="1044.864" stroke-width="4" class="multirest-cap"></line>
+<line x1="763.2" y1="1012.864" x2="763.2" y2="1044.864" stroke-width="4" class="multirest-cap"></line>
+<text x="689.6" y="984.064" font-size="64" text-anchor="middle" class="multirest-count"></text>
+<line x1="779.2" y1="996.864" x2="779.2" y2="1060.864" stroke-width="2.56" class="barline"></line>
+<line x1="779.2" y1="996.864" x2="1013.6" y2="996.864" stroke-width="2.08" class="staff-line"></line>
+<line x1="779.2" y1="1012.864" x2="1013.6" y2="1012.864" stroke-width="2.08" class="staff-line"></line>
+<line x1="779.2" y1="1028.864" x2="1013.6" y2="1028.864" stroke-width="2.08" class="staff-line"></line>
+<line x1="779.2" y1="1044.864" x2="1013.6" y2="1044.864" stroke-width="2.08" class="staff-line"></line>
+<line x1="779.2" y1="1060.864" x2="1013.6" y2="1060.864" stroke-width="2.08" class="staff-line"></line>
+<text x="812.8992" y="1020.864" font-size="64" class="notehead" data-source-id="@m4.v0.e0.n0"></text>
+<line x1="812.8992" y1="1023.552" x2="812.8992" y2="1076.864" stroke-width="1.92" class="stem"></line>
+<text x="879.976" y="1004.864" font-size="64" class="notehead" data-source-id="@m4.v0.e1.n0"></text>
+<line x1="879.976" y1="1007.552" x2="879.976" y2="1060.864" stroke-width="1.92" class="stem"></line>
+<text x="947.0528" y="988.864" font-size="64" class="notehead" data-source-id="@m4.v0.e2.n0"></text>
+<line x1="947.0528" y1="991.552" x2="947.0528" y2="1044.864" stroke-width="1.92" class="stem"></line>
+<line x1="1013.6" y1="996.864" x2="1013.6" y2="1060.864" stroke-width="2.56" class="barline"></line>
+<line x1="1013.6" y1="996.864" x2="1248" y2="996.864" stroke-width="2.08" class="staff-line"></line>
+<line x1="1013.6" y1="1012.864" x2="1248" y2="1012.864" stroke-width="2.08" class="staff-line"></line>
+<line x1="1013.6" y1="1028.864" x2="1248" y2="1028.864" stroke-width="2.08" class="staff-line"></line>
+<line x1="1013.6" y1="1044.864" x2="1248" y2="1044.864" stroke-width="2.08" class="staff-line"></line>
+<line x1="1013.6" y1="1060.864" x2="1248" y2="1060.864" stroke-width="2.08" class="staff-line"></line>
+<text x="1047.2992" y="1020.864" font-size="64" class="notehead" data-source-id="@m5.v0.e0.n0"></text>
+<line x1="1047.2992" y1="1023.552" x2="1047.2992" y2="1076.864" stroke-width="1.92" class="stem"></line>
+<text x="1114.376" y="1004.864" font-size="64" class="notehead" data-source-id="@m5.v0.e1.n0"></text>
+<line x1="1114.376" y1="1007.552" x2="1114.376" y2="1060.864" stroke-width="1.92" class="stem"></line>
+<text x="1181.4528" y="988.864" font-size="64" class="notehead" data-source-id="@m5.v0.e2.n0"></text>
+<line x1="1181.4528" y1="991.552" x2="1181.4528" y2="1044.864" stroke-width="1.92" class="stem"></line>
+<line x1="1248" y1="996.864" x2="1248" y2="1060.864" stroke-width="2.56" class="barline"></line>
+<line x1="32" y1="1157.248" x2="249.4768" y2="1157.248" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="1173.248" x2="249.4768" y2="1173.248" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="1189.248" x2="249.4768" y2="1189.248" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="1205.248" x2="249.4768" y2="1205.248" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="1221.248" x2="249.4768" y2="1221.248" stroke-width="2.08" class="staff-line"></line>
+<text x="49.6" y="1205.248" font-size="64" class="clef"></text>
+<text x="139.1728" y="1165.248" font-size="64" class="notehead" data-source-id="@m6.v0.e0.n0"></text>
+<line x1="236.6768" y1="1157.248" x2="236.6768" y2="1221.248" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="241.4768" y="1157.248" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
-<text x="640" y="1324.16" font-family="var(--font-family-sans)" font-size="38.4" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="score-title">Part B</text>
-<line x1="32" y1="1471.36" x2="310.4" y2="1471.36" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="1487.36" x2="310.4" y2="1487.36" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="1503.36" x2="310.4" y2="1503.36" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="1519.36" x2="310.4" y2="1519.36" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="1535.36" x2="310.4" y2="1535.36" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<text x="49.6" y="1519.36" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="clef"></text>
-<text x="117.6" y="1487.36" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-num"></text>
-<text x="117.6" y="1519.36" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-den"></text>
+<text x="640" y="1324.16" font-size="38.4" text-anchor="middle" style="font-family:var(--font-family-sans)" class="score-title">Part B</text>
+<line x1="32" y1="1471.36" x2="310.4" y2="1471.36" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="1487.36" x2="310.4" y2="1487.36" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="1503.36" x2="310.4" y2="1503.36" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="1519.36" x2="310.4" y2="1519.36" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="1535.36" x2="310.4" y2="1535.36" stroke-width="2.08" class="staff-line"></line>
+<text x="49.6" y="1519.36" font-size="64" class="clef"></text>
+<text x="117.6" y="1487.36" font-size="64" text-anchor="middle" class="time-sig-num"></text>
+<text x="117.6" y="1519.36" font-size="64" text-anchor="middle" class="time-sig-den"></text>
 <rect x="147.2" y="1495.36" width="147.2" height="16" fill="currentColor" class="multirest-bar"></rect>
-<line x1="147.2" y1="1487.36" x2="147.2" y2="1519.36" stroke="currentColor" stroke-width="4" class="multirest-cap"></line>
-<line x1="294.4" y1="1487.36" x2="294.4" y2="1519.36" stroke="currentColor" stroke-width="4" class="multirest-cap"></line>
-<text x="220.8" y="1458.56" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="multirest-count"></text>
-<line x1="310.4" y1="1471.36" x2="310.4" y2="1535.36" stroke="currentColor" stroke-width="2.56" class="barline"></line>
-<line x1="310.4" y1="1471.36" x2="598.9328" y2="1471.36" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="310.4" y1="1487.36" x2="598.9328" y2="1487.36" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="310.4" y1="1503.36" x2="598.9328" y2="1503.36" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="310.4" y1="1519.36" x2="598.9328" y2="1519.36" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="310.4" y1="1535.36" x2="598.9328" y2="1535.36" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<text x="352.4272" y="1479.36" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@p1.m2.v0.e0.n0"></text>
-<line x1="352.4272" y1="1482.048" x2="352.4272" y2="1535.36" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<text x="436.16" y="1487.36" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@p1.m2.v0.e1.n0"></text>
-<line x1="436.16" y1="1490.048" x2="436.16" y2="1543.36" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<text x="519.8928" y="1495.36" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@p1.m2.v0.e2.n0"></text>
-<line x1="519.8928" y1="1498.048" x2="519.8928" y2="1551.36" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<line x1="598.9328" y1="1471.36" x2="598.9328" y2="1535.36" stroke="currentColor" stroke-width="2.56" class="barline"></line>
-<line x1="598.9328" y1="1471.36" x2="887.4672" y2="1471.36" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="598.9328" y1="1487.36" x2="887.4672" y2="1487.36" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="598.9328" y1="1503.36" x2="887.4672" y2="1503.36" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="598.9328" y1="1519.36" x2="887.4672" y2="1519.36" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="598.9328" y1="1535.36" x2="887.4672" y2="1535.36" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<text x="640.96" y="1479.36" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@p1.m3.v0.e0.n0"></text>
-<line x1="640.96" y1="1482.048" x2="640.96" y2="1535.36" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<text x="724.6928" y="1487.36" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@p1.m3.v0.e1.n0"></text>
-<line x1="724.6928" y1="1490.048" x2="724.6928" y2="1543.36" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<text x="808.4272" y="1495.36" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@p1.m3.v0.e2.n0"></text>
-<line x1="808.4272" y1="1498.048" x2="808.4272" y2="1551.36" stroke="currentColor" stroke-width="1.92" class="stem"></line>
-<line x1="887.4672" y1="1471.36" x2="887.4672" y2="1535.36" stroke="currentColor" stroke-width="2.56" class="barline"></line>
-<line x1="887.4672" y1="1471.36" x2="1069.8672" y2="1471.36" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="887.4672" y1="1487.36" x2="1069.8672" y2="1487.36" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="887.4672" y1="1503.36" x2="1069.8672" y2="1503.36" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="887.4672" y1="1519.36" x2="1069.8672" y2="1519.36" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="887.4672" y1="1535.36" x2="1069.8672" y2="1535.36" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
+<line x1="147.2" y1="1487.36" x2="147.2" y2="1519.36" stroke-width="4" class="multirest-cap"></line>
+<line x1="294.4" y1="1487.36" x2="294.4" y2="1519.36" stroke-width="4" class="multirest-cap"></line>
+<text x="220.8" y="1458.56" font-size="64" text-anchor="middle" class="multirest-count"></text>
+<line x1="310.4" y1="1471.36" x2="310.4" y2="1535.36" stroke-width="2.56" class="barline"></line>
+<line x1="310.4" y1="1471.36" x2="598.9328" y2="1471.36" stroke-width="2.08" class="staff-line"></line>
+<line x1="310.4" y1="1487.36" x2="598.9328" y2="1487.36" stroke-width="2.08" class="staff-line"></line>
+<line x1="310.4" y1="1503.36" x2="598.9328" y2="1503.36" stroke-width="2.08" class="staff-line"></line>
+<line x1="310.4" y1="1519.36" x2="598.9328" y2="1519.36" stroke-width="2.08" class="staff-line"></line>
+<line x1="310.4" y1="1535.36" x2="598.9328" y2="1535.36" stroke-width="2.08" class="staff-line"></line>
+<text x="352.4272" y="1479.36" font-size="64" class="notehead" data-source-id="@p1.m2.v0.e0.n0"></text>
+<line x1="352.4272" y1="1482.048" x2="352.4272" y2="1535.36" stroke-width="1.92" class="stem"></line>
+<text x="436.16" y="1487.36" font-size="64" class="notehead" data-source-id="@p1.m2.v0.e1.n0"></text>
+<line x1="436.16" y1="1490.048" x2="436.16" y2="1543.36" stroke-width="1.92" class="stem"></line>
+<text x="519.8928" y="1495.36" font-size="64" class="notehead" data-source-id="@p1.m2.v0.e2.n0"></text>
+<line x1="519.8928" y1="1498.048" x2="519.8928" y2="1551.36" stroke-width="1.92" class="stem"></line>
+<line x1="598.9328" y1="1471.36" x2="598.9328" y2="1535.36" stroke-width="2.56" class="barline"></line>
+<line x1="598.9328" y1="1471.36" x2="887.4672" y2="1471.36" stroke-width="2.08" class="staff-line"></line>
+<line x1="598.9328" y1="1487.36" x2="887.4672" y2="1487.36" stroke-width="2.08" class="staff-line"></line>
+<line x1="598.9328" y1="1503.36" x2="887.4672" y2="1503.36" stroke-width="2.08" class="staff-line"></line>
+<line x1="598.9328" y1="1519.36" x2="887.4672" y2="1519.36" stroke-width="2.08" class="staff-line"></line>
+<line x1="598.9328" y1="1535.36" x2="887.4672" y2="1535.36" stroke-width="2.08" class="staff-line"></line>
+<text x="640.96" y="1479.36" font-size="64" class="notehead" data-source-id="@p1.m3.v0.e0.n0"></text>
+<line x1="640.96" y1="1482.048" x2="640.96" y2="1535.36" stroke-width="1.92" class="stem"></line>
+<text x="724.6928" y="1487.36" font-size="64" class="notehead" data-source-id="@p1.m3.v0.e1.n0"></text>
+<line x1="724.6928" y1="1490.048" x2="724.6928" y2="1543.36" stroke-width="1.92" class="stem"></line>
+<text x="808.4272" y="1495.36" font-size="64" class="notehead" data-source-id="@p1.m3.v0.e2.n0"></text>
+<line x1="808.4272" y1="1498.048" x2="808.4272" y2="1551.36" stroke-width="1.92" class="stem"></line>
+<line x1="887.4672" y1="1471.36" x2="887.4672" y2="1535.36" stroke-width="2.56" class="barline"></line>
+<line x1="887.4672" y1="1471.36" x2="1069.8672" y2="1471.36" stroke-width="2.08" class="staff-line"></line>
+<line x1="887.4672" y1="1487.36" x2="1069.8672" y2="1487.36" stroke-width="2.08" class="staff-line"></line>
+<line x1="887.4672" y1="1503.36" x2="1069.8672" y2="1503.36" stroke-width="2.08" class="staff-line"></line>
+<line x1="887.4672" y1="1519.36" x2="1069.8672" y2="1519.36" stroke-width="2.08" class="staff-line"></line>
+<line x1="887.4672" y1="1535.36" x2="1069.8672" y2="1535.36" stroke-width="2.08" class="staff-line"></line>
 <rect x="906.6672" y="1495.36" width="147.2" height="16" fill="currentColor" class="multirest-bar"></rect>
-<line x1="906.6672" y1="1487.36" x2="906.6672" y2="1519.36" stroke="currentColor" stroke-width="4" class="multirest-cap"></line>
-<line x1="1053.8672" y1="1487.36" x2="1053.8672" y2="1519.36" stroke="currentColor" stroke-width="4" class="multirest-cap"></line>
-<text x="980.2672" y="1458.56" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="multirest-count"></text>
-<line x1="1069.8672" y1="1471.36" x2="1069.8672" y2="1535.36" stroke="currentColor" stroke-width="2.56" class="barline"></line>
-<line x1="1069.8672" y1="1471.36" x2="1248" y2="1471.36" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="1069.8672" y1="1487.36" x2="1248" y2="1487.36" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="1069.8672" y1="1503.36" x2="1248" y2="1503.36" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="1069.8672" y1="1519.36" x2="1248" y2="1519.36" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="1069.8672" y1="1535.36" x2="1248" y2="1535.36" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<text x="1137.696" y="1495.36" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="@p1.m6.v0.e0.n0"></text>
-<line x1="1235.2" y1="1471.36" x2="1235.2" y2="1535.36" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
+<line x1="906.6672" y1="1487.36" x2="906.6672" y2="1519.36" stroke-width="4" class="multirest-cap"></line>
+<line x1="1053.8672" y1="1487.36" x2="1053.8672" y2="1519.36" stroke-width="4" class="multirest-cap"></line>
+<text x="980.2672" y="1458.56" font-size="64" text-anchor="middle" class="multirest-count"></text>
+<line x1="1069.8672" y1="1471.36" x2="1069.8672" y2="1535.36" stroke-width="2.56" class="barline"></line>
+<line x1="1069.8672" y1="1471.36" x2="1248" y2="1471.36" stroke-width="2.08" class="staff-line"></line>
+<line x1="1069.8672" y1="1487.36" x2="1248" y2="1487.36" stroke-width="2.08" class="staff-line"></line>
+<line x1="1069.8672" y1="1503.36" x2="1248" y2="1503.36" stroke-width="2.08" class="staff-line"></line>
+<line x1="1069.8672" y1="1519.36" x2="1248" y2="1519.36" stroke-width="2.08" class="staff-line"></line>
+<line x1="1069.8672" y1="1535.36" x2="1248" y2="1535.36" stroke-width="2.08" class="staff-line"></line>
+<text x="1137.696" y="1495.36" font-size="64" class="notehead" data-source-id="@p1.m6.v0.e0.n0"></text>
+<line x1="1235.2" y1="1471.36" x2="1235.2" y2="1535.36" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="1240" y="1471.36" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
 </svg>

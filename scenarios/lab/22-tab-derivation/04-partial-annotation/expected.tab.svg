@@ -1,20 +1,21 @@
 <svg width="1280" height="251.4288" viewBox="0 0 1280 251.4288" xmlns="http://www.w3.org/2000/svg">
-<line x1="32" y1="80" x2="318.4" y2="80" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="98.2864" x2="318.4" y2="98.2864" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="116.5712" x2="318.4" y2="116.5712" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="134.8576" x2="318.4" y2="134.8576" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="153.1424" x2="318.4" y2="153.1424" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="171.4288" x2="318.4" y2="171.4288" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="80" x2="32" y2="171.4288" stroke="currentColor" stroke-width="2.56" class="barline barline-start"></line>
-<text x="49.6" y="125.7136" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="tab-clef"></text>
-<text x="101.6" y="102.8576" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-num"></text>
-<text x="101.6" y="148.5712" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-den"></text>
+<style>:where(svg>text){font-family:Bravura;fill:currentColor}:where(svg>line,svg>path){stroke:currentColor}</style>
+<line x1="32" y1="80" x2="318.4" y2="80" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="98.2864" x2="318.4" y2="98.2864" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="116.5712" x2="318.4" y2="116.5712" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="134.8576" x2="318.4" y2="134.8576" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="153.1424" x2="318.4" y2="153.1424" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="171.4288" x2="318.4" y2="171.4288" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="80" x2="32" y2="171.4288" stroke-width="2.56" class="barline barline-start"></line>
+<text x="49.6" y="125.7136" font-size="64" class="tab-clef"></text>
+<text x="101.6" y="102.8576" font-size="64" text-anchor="middle" class="time-sig-num"></text>
+<text x="101.6" y="148.5712" font-size="64" text-anchor="middle" class="time-sig-den"></text>
 <rect x="215.6" y="108.3888" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e0.n0"></rect>
-<text x="221.6" y="116.5712" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="@m0.v0.e0.n0">5</text>
+<text x="221.6" y="116.5712" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m0.v0.e0.n0">5</text>
 <rect x="215.6" y="71.8176" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e0.n1"></rect>
-<text x="221.6" y="80" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="@m0.v0.e0.n1">0</text>
+<text x="221.6" y="80" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m0.v0.e0.n1">0</text>
 <rect x="215.6" y="126.6736" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e0.n2"></rect>
-<text x="221.6" y="134.8576" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="@m0.v0.e0.n2">5</text>
-<line x1="305.6" y1="80" x2="305.6" y2="171.4288" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
+<text x="221.6" y="134.8576" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m0.v0.e0.n2">5</text>
+<line x1="305.6" y1="80" x2="305.6" y2="171.4288" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="310.4" y="80" width="8" height="91.4288" fill="currentColor" class="barline barline-final-thick"></rect>
 </svg>

@@ -1,28 +1,29 @@
 <svg width="1280" height="507.4288" viewBox="0 0 1280 507.4288" xmlns="http://www.w3.org/2000/svg">
-<line x1="32" y1="128" x2="334.4" y2="128" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="144" x2="334.4" y2="144" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="160" x2="334.4" y2="160" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="176" x2="334.4" y2="176" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="192" x2="334.4" y2="192" stroke="currentColor" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="128" x2="32" y2="379.4288" stroke="currentColor" stroke-width="2.56" class="barline barline-start"></line>
-<text x="49.6" y="176" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="clef"></text>
-<text x="117.6" y="144" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-num"></text>
-<text x="117.6" y="176" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-den"></text>
-<line x1="217.696" y1="208" x2="257.504" y2="208" stroke="currentColor" stroke-width="2.56" class="ledger-line"></line>
-<line x1="217.696" y1="224" x2="257.504" y2="224" stroke="currentColor" stroke-width="2.56" class="ledger-line"></line>
-<line x1="217.696" y1="240" x2="257.504" y2="240" stroke="currentColor" stroke-width="2.56" class="ledger-line"></line>
-<text x="224.096" y="248" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="notehead" data-source-id="n1"></text>
-<line x1="32" y1="288" x2="334.4" y2="288" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="306.2864" x2="334.4" y2="306.2864" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="324.5712" x2="334.4" y2="324.5712" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="342.8576" x2="334.4" y2="342.8576" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="361.1424" x2="334.4" y2="361.1424" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="379.4288" x2="334.4" y2="379.4288" stroke="currentColor" stroke-width="1.6" class="staff-line"></line>
-<text x="49.6" y="333.7136" font-family="Bravura" font-size="64" text-anchor="start" dominant-baseline="alphabetic" fill="currentColor" class="tab-clef"></text>
-<text x="117.6" y="310.8576" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-num"></text>
-<text x="117.6" y="356.5712" font-family="Bravura" font-size="64" text-anchor="middle" dominant-baseline="alphabetic" fill="currentColor" class="time-sig-den"></text>
+<style>:where(svg>text){font-family:Bravura;fill:currentColor}:where(svg>line,svg>path){stroke:currentColor}</style>
+<line x1="32" y1="128" x2="334.4" y2="128" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="144" x2="334.4" y2="144" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="160" x2="334.4" y2="160" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="176" x2="334.4" y2="176" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="192" x2="334.4" y2="192" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="128" x2="32" y2="379.4288" stroke-width="2.56" class="barline barline-start"></line>
+<text x="49.6" y="176" font-size="64" class="clef"></text>
+<text x="117.6" y="144" font-size="64" text-anchor="middle" class="time-sig-num"></text>
+<text x="117.6" y="176" font-size="64" text-anchor="middle" class="time-sig-den"></text>
+<line x1="217.696" y1="208" x2="257.504" y2="208" stroke-width="2.56" class="ledger-line"></line>
+<line x1="217.696" y1="224" x2="257.504" y2="224" stroke-width="2.56" class="ledger-line"></line>
+<line x1="217.696" y1="240" x2="257.504" y2="240" stroke-width="2.56" class="ledger-line"></line>
+<text x="224.096" y="248" font-size="64" class="notehead" data-source-id="n1"></text>
+<line x1="32" y1="288" x2="334.4" y2="288" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="306.2864" x2="334.4" y2="306.2864" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="324.5712" x2="334.4" y2="324.5712" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="342.8576" x2="334.4" y2="342.8576" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="361.1424" x2="334.4" y2="361.1424" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="379.4288" x2="334.4" y2="379.4288" stroke-width="1.6" class="staff-line"></line>
+<text x="49.6" y="333.7136" font-size="64" class="tab-clef"></text>
+<text x="117.6" y="310.8576" font-size="64" text-anchor="middle" class="time-sig-num"></text>
+<text x="117.6" y="356.5712" font-size="64" text-anchor="middle" class="time-sig-den"></text>
 <rect x="231.6" y="371.2464" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n1"></rect>
-<text x="237.6" y="379.4288" font-family="var(--font-family-sans)" font-size="20" text-anchor="middle" dominant-baseline="central" fill="currentColor" font-weight="700" class="fret-number" data-source-id="n1">0</text>
-<line x1="321.6" y1="128" x2="321.6" y2="379.4288" stroke="currentColor" stroke-width="2.56" class="barline barline-final-thin"></line>
+<text x="237.6" y="379.4288" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n1">0</text>
+<line x1="321.6" y1="128" x2="321.6" y2="379.4288" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="326.4" y="128" width="8" height="251.4288" fill="currentColor" class="barline barline-final-thick"></rect>
 </svg>

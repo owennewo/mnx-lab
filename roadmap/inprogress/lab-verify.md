@@ -1332,3 +1332,30 @@ arrowhead) has clear air between it and the previous notehead or barline, and th
 chord's own accidentals still sit between the wave and the notehead. The `both` view
 keeps its accidental columns — the notation staff draws them — so tab and notation stay
 column-aligned there.
+
+## The SVG carries its kind defaults once; numbers at four decimals — 2026-09-15
+
+Owner: [core-touch-gestures.md](core-touch-gestures.md), *Performance, measured*. The
+emitter (`src/engine/render/svg.ts`) now builds markup rather than DOM nodes, and the
+markup declares what every primitive of a kind shares once, in a `<style>` at the top of
+the SVG, instead of on every element: a glyph's font and fill, a text's fill, a line's and
+a curve's stroke. The handful that differ say so inline. SVG's own initial values
+(`text-anchor="start"`, `dominant-baseline="alphabetic"`) are no longer written at all,
+and every number is printed at four decimals, the precision the primitives already carry.
+**Every `expected*.svg` moved and no `expected.primitives.json` did** — the layout is
+untouched; only the text of the drawing changed, by about a fifth of its bytes. Ten
+goldens rasterised before and after in headless Chrome differ in zero pixels
+(`hello-world`, `slurs`, `lyrics-multi-line`, `dynamics`, `06-capo` both, `06-bend-shapes`
+tab, `12-chord-symbols`, `02-coloured-marks-and-clef-forms`, `01-bar-duration-mismatch`,
+`02-repeats-and-marks-on-tab` unrolled tab). 33 previously verified scenarios
+demoted: `document/01-minimal-single-note`, `pitches/01-parenthesized-accidental`, `rhythm/03-sequence-space`, `dynamics/02-accent-prefix-suffix`, `score-text/05-directions-symbolic`, `articulations/01-rare-articulations`, `navigation/01-jumps-and-signs`, `percussion/01-minimal-kit`, `spec/accidentals`, `spec/articulations`, `spec/clef-changes`, `spec/dotted-notes`, `spec/dynamic-accents`, `spec/dynamics`, `spec/full-measure-rests`, `spec/grace-note`, `spec/jumps-dal-segno`, `spec/jumps-ds-al-fine`, `spec/key-signatures`, `spec/ottavas-8va`, `spec/repeats-alternate-endings-advanced`, `spec/repeats-alternate-endings-simple`, `spec/repeats-implied-start-repeat`, `spec/repeats-more-once-repeated`, `spec/repeats`, `spec/single-note-tremolos`, `spec/slurs-chords`, `spec/slurs-targeting-specific-notes`, `spec/slurs`, `spec/ties`, `spec/time-signature-glyphs`, `spec/time-signatures`, `spec/tremolos-multi-note`.
+
+**What a reviewer should look for.** Nothing should have moved or changed colour. The
+specific things that could: coloured marks (`02-coloured-marks-and-clef-forms`) and
+diagnostic badges (`01-bar-duration-mismatch`, `08-out-of-range`) keep their colours,
+which are now inline styles; chord symbols, lyrics, verse labels and directions are still
+in the body face, not Bravura; fret numbers stay centred on their strings (their anchor
+and baseline are still written, as non-defaults); slurs, ties and hairpins are still
+drawn in ink colour. In the app, selection and playback recolouring is unchanged: those
+rules carry classes or `!important` and outrank the zero-specificity defaults exactly as
+they outranked the attributes.
