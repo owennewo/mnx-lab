@@ -7,6 +7,7 @@ import { layoutBothSystem } from '../layout/bothSystem.ts';
 import type { HideableFeature } from '../layout/notation.ts';
 import { computeBoundsSp } from '../render/bounds.ts';
 import { fitPxPerSp, renderSvg } from '../render/svg.ts';
+import { squareLayout, type LayoutCache } from '../render/layoutCache.ts';
 import {
   projectionForSourceClass,
   type RenderedProjection
@@ -64,6 +65,9 @@ export interface RenderBothOptions {
   densityH?: number;
   /** Vertical/frame density multiplier (core-vertical-density.md). */
   densityPad?: number;
+  /** A caller-owned memo of the square layout across a zoom gesture
+   *  (`render/layoutCache.ts`). Absent, every paint lays out afresh. */
+  cache?: LayoutCache;
 }
 
 export function renderMnxToSvgBoth(opts: RenderBothOptions): RenderOutcome {
@@ -84,7 +88,7 @@ export function renderMnxToSvgBoth(opts: RenderBothOptions): RenderOutcome {
     densityH: opts.densityH,
     densityPad: opts.densityPad
   };
-  const square = layoutBothSystem(layoutArgs);
+  const square = squareLayout(opts.cache, layoutArgs, () => layoutBothSystem(layoutArgs));
 
   const fitted = opts.pxPerSp === undefined;
   const pxPerSp = fitted && opts.spacingMode !== 'natural' ? fitPxPerSp(opts.width, square.naturalWidthSp ?? square.usedWidthSp, basePxPerSp) : basePxPerSp;

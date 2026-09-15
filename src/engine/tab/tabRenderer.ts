@@ -6,6 +6,7 @@ import { PartTabSetups } from './guitarPositions.ts';
 import { layoutTab } from '../layout/tab.ts';
 import { computeBoundsSp } from '../render/bounds.ts';
 import { fitPxPerSp, renderSvg } from '../render/svg.ts';
+import { squareLayout, type LayoutCache } from '../render/layoutCache.ts';
 import type { RenderedProjection } from '../render/projection.ts';
 import {
   BASELINE_PX_PER_SP,
@@ -56,6 +57,9 @@ export interface RenderTabOptions {
   densityH?: number;
   /** Vertical/frame density multiplier (core-vertical-density.md). */
   densityPad?: number;
+  /** A caller-owned memo of the square layout across a zoom gesture
+   *  (`render/layoutCache.ts`). Absent, every paint lays out afresh. */
+  cache?: LayoutCache;
   /** Features the host asked to hide — forwarded to the layout, so
    *  `hide="lyrics"` means the same thing in every view. */
   display?: DisplayOptions;
@@ -79,7 +83,7 @@ export function renderMnxToSvgTab(opts: RenderTabOptions): RenderOutcome {
     display: opts.display,
     hide: opts.hide
   };
-  const square = layoutTab(layoutArgs);
+  const square = squareLayout(opts.cache, layoutArgs, () => layoutTab(layoutArgs));
 
   // The fit asks whether the SCORE is narrower than the viewport, so it reads
   // the natural extent — `usedWidthSp` moves with the density knob and would

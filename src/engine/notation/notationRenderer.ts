@@ -5,6 +5,7 @@ import { MnxStructure } from '../../model/mnx.ts';
 import { layoutNotation, type HideableFeature } from '../layout/notation.ts';
 import { computeBoundsSp } from '../render/bounds.ts';
 import { fitPxPerSp, renderSvg } from '../render/svg.ts';
+import { squareLayout, type LayoutCache } from '../render/layoutCache.ts';
 import type { RenderedProjection } from '../render/projection.ts';
 import {
   BASELINE_PX_PER_SP,
@@ -61,6 +62,9 @@ export interface RenderNotationOptions {
   densityH?: number;
   /** Vertical/frame density multiplier (core-vertical-density.md). */
   densityPad?: number;
+  /** A caller-owned memo of the square layout across a zoom gesture
+   *  (`render/layoutCache.ts`). Absent, every paint lays out afresh. */
+  cache?: LayoutCache;
 }
 
 export function renderMnxToSvgNotation(opts: RenderNotationOptions): RenderOutcome {
@@ -80,7 +84,7 @@ export function renderMnxToSvgNotation(opts: RenderNotationOptions): RenderOutco
     densityH: opts.densityH,
     densityPad: opts.densityPad
   };
-  const square = layoutNotation(layoutArgs);
+  const square = squareLayout(opts.cache, layoutArgs, () => layoutNotation(layoutArgs));
 
   // The fit asks whether the SCORE is narrower than the viewport, so it reads
   // the natural extent — `usedWidthSp` moves with the density knob and would

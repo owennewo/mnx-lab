@@ -39,6 +39,7 @@ import {
 } from '../engine/render/scale.ts';
 import { densityLadder, packedRowMeasures, type PackingInput } from '../engine/layout/spacing.ts';
 import { ScoreGestures, type GestureTargets } from './gestures.ts';
+import { createLayoutCache } from '../engine/render/layoutCache.ts';
 import { SCORE_LABEL_SIZE_SP } from '../engine/layout/scoreText.ts';
 import { revealScrollDelta } from '../engine/render/revealScroll.ts';
 import {
@@ -285,6 +286,22 @@ export class DocumentViewer extends LitElement {
   private gesturing = false;
   /** A fast-path paint happened, so the release owes a full one. */
   private gesturePainted = false;
+  /** The square layout across the gesture (`render/layoutCache.ts`); fresh
+   *  each gesture, so nothing stale can outlive one. */
+  private layoutCache = createLayoutCache();
+  /** The engraving entries for the document on screen. Memoised so their
+   *  identity holds from one paint to the next, which is what lets the
+   *  layout cache above hit; recomputed the moment the document or the
+   *  unrolling changes. */
+  private entriesMemo: { mnx: MnxStructure; unrolled: boolean; entries: ReturnType<typeof engravingEntries> } | null = null;
+
+  private entriesFor(mnx: MnxStructure): ReturnType<typeof engravingEntries> {
+    const memo = this.entriesMemo;
+    if (memo && memo.mnx === mnx && memo.unrolled === this.unrolled) return memo.entries;
+    const entries = engravingEntries(mnx, this.unrolled);
+    this.entriesMemo = { mnx, unrolled: this.unrolled, entries };
+    return entries;
+  }
 
   private resizeHandler = () => this.renderProjection();
 
@@ -862,6 +879,7 @@ export class DocumentViewer extends LitElement {
       active: on => {
         if (on === this.gesturing) return;
         this.gesturing = on;
+        if (on) this.layoutCache = createLayoutCache();
         // The attribute is what the paper's outline keys on: the mode has to
         // be visible on the score itself, not only in a readout at the edge.
         this.toggleAttribute('data-zooming', on);
@@ -1001,7 +1019,10 @@ export class DocumentViewer extends LitElement {
     const visible = this.visibleParts();
     const commonOpts = {
       mnx: visible.mnx,
-      entries: engravingEntries(visible.mnx, this.unrolled),
+      entries: this.entriesFor(visible.mnx),
+      // Only across a gesture: the memo is keyed on identity and a gesture is
+      // the one span in which the document provably does not change.
+      cache: this.gesturing ? this.layoutCache : undefined,
       width,
       activeNoteIds: [], // Playback is a paint overlay, independent of layout and selection.
       durationSpans: true, // …but it stretches fret masks to the release the layout records.
