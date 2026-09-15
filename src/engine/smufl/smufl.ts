@@ -67,6 +67,12 @@ export function isSmuflLoaded(): boolean {
   return glyphnames !== null && metadata !== null;
 }
 
+/** The loaded metadata, for handing to another context — a worker laying
+ *  out off the main thread injects it with `setSmuflData`. */
+export function getSmuflData(): { glyphnames: unknown; metadata: unknown } | null {
+  return glyphnames && metadata ? { glyphnames, metadata } : null;
+}
+
 /**
  * Injects preloaded SMuFL metadata directly, bypassing fetch. For non-browser
  * consumers (Node test runners, snapshot generation) that read the JSON files

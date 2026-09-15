@@ -31,7 +31,9 @@ import {
 import { renderMnxToSvgTab } from '../engine/tab/tabRenderer.ts';
 import { renderMnxToSvgNotation } from '../engine/notation/notationRenderer.ts';
 import { renderMnxToSvgBoth } from '../engine/both/bothRenderer.ts';
-import { isSmuflLoaded, loadSmufl } from '../engine/smufl/smufl.ts';
+import { getSmuflData, isSmuflLoaded, loadSmufl } from '../engine/smufl/smufl.ts';
+import { emitPlan, type RenderPlan } from '../engine/render/plan.ts';
+import type { LayoutReply, LayoutRequest, PlanInputs, PlanRequest } from './layout.worker.ts';
 import {
   clampStaffScale,
   type RenderOutcome,
@@ -289,6 +291,25 @@ export class DocumentViewer extends LitElement {
   /** The square layout across the gesture (`render/layoutCache.ts`); fresh
    *  each gesture, so nothing stale can outlive one. */
   private layoutCache = createLayoutCache();
+
+  /**
+   * The layout worker (`layout.worker.ts`), for the length of a gesture.
+   *
+   * Built on the first gesture and kept; never required. While a gesture is
+   * active a paint becomes a plan REQUEST: the worker lays out, the reply is
+   * emitted here, and requests coalesce to latest-wins — one in flight, at
+   * most one waiting, and the waiting one is always the newest. A paint on
+   * the main thread (the release, or anything else that repaints) bumps the
+   * epoch, so a reply from before it is dropped rather than drawn over it.
+   */
+  private worker: Worker | null = null;
+  private workerFailed = false;
+  private workerBusy = false;
+  private workerPending: PlanRequest | null = null;
+  private planSeq = 0;
+  private planEpoch = 0;
+  /** What each request was resolved at, for the reply's bookkeeping. */
+  private planMeta = new Map<number, { densityH: number }>();
   /** The engraving entries for the document on screen. Memoised so their
    *  identity holds from one paint to the next, which is what lets the
    *  layout cache above hit; recomputed the moment the document or the
@@ -830,6 +851,10 @@ export class DocumentViewer extends LitElement {
     this.cancelEnclosureTween = null;
     this.gestures?.detach();
     this.gestures = null;
+    this.worker?.terminate();
+    this.worker = null;
+    this.workerBusy = false;
+    this.workerPending = null;
   }
 
   /** Attach or drop the recogniser to match `no-gestures`. Called from
@@ -879,7 +904,10 @@ export class DocumentViewer extends LitElement {
       active: on => {
         if (on === this.gesturing) return;
         this.gesturing = on;
-        if (on) this.layoutCache = createLayoutCache();
+        if (on) {
+          this.layoutCache = createLayoutCache();
+          this.startPlanGesture();
+        }
         // The attribute is what the paper's outline keys on: the mode has to
         // be visible on the score itself, not only in a readout at the edge.
         this.toggleAttribute('data-zooming', on);
@@ -977,6 +1005,13 @@ export class DocumentViewer extends LitElement {
     // The gesture fast path — see `gesturing`.
     const quick = this.gesturing;
     if (quick) this.gesturePainted = true;
+    if (quick && this.workerReady()) {
+      this.requestPlan();
+      return;
+    }
+    // A main-thread paint supersedes any plan in flight.
+    this.planEpoch++;
+    this.workerPending = null;
 
     const previousSvg = this.container.querySelector<SVGSVGElement>('svg');
     const previousEnclosure = previousSvg && !quick ? snapshotEnclosure(previousSvg) : null;
@@ -987,68 +1022,20 @@ export class DocumentViewer extends LitElement {
     // What this paint was laid out for — the observer's comparison point.
     this.renderedWidth = width;
     const failures: { pane: string; message: string }[] = [];
-    const staffScale = clampStaffScale(this.zoom);
-    // Resolved once and remembered with the packing: `systemRows()` has to
-    // re-pack at the value THIS paint used, not at whatever the properties say
-    // when it is asked.
-    const densityH = this.densityH ?? DENSITY_H[this.density] ?? 1;
-    // Preserve absence so the engine can choose Clearance or the legacy override.
-    const densityPad = this.densityPad ?? undefined;
+    const { visible, densityH, inputs, tabSetup } = this.paintInputs(width);
     // Whichever pane actually drew: `both` is one render, and in the split
     // views notation and tab derive the same factor from the shared plan, so
     // there is never a second, disagreeing answer to report.
     let outcome: RenderOutcome | null = null;
 
-    const onNoteClick = (
-      noteId: string,
-      measureIdx: number,
-      noteIdx: number,
-      projection: RenderedProjection
-    ) => {
-      const occurrence = this.unrolled ? parseOccurrenceKey(noteId) : null;
-      if (occurrence) noteId = occurrence.noteKey;
-      this.dispatchEvent(
-        new CustomEvent('note-selected', {
-          detail: { noteId, measureIdx, noteIdx, projection, ...(occurrence ? { ordinal: occurrence.ordinal } : {}) },
-          bubbles: true,
-          composed: true
-        })
-      );
-    };
-
-    const visible = this.visibleParts();
     const commonOpts = {
+      ...inputs,
       mnx: visible.mnx,
       entries: this.entriesFor(visible.mnx),
       // Only across a gesture: the memo is keyed on identity and a gesture is
       // the one span in which the document provably does not change.
       cache: this.gesturing ? this.layoutCache : undefined,
-      width,
-      activeNoteIds: [], // Playback is a paint overlay, independent of layout and selection.
-      durationSpans: true, // …but it stretches fret masks to the release the layout records.
-      selectedNoteIds: this.selection?.selectedNoteIds ?? [],
-      selectedEventIds: this.selection?.selectedEventIds ?? [],
-      onNoteClick,
-      // Layout-side hides reach the engine so their space is reclaimed —
-      // every view honors them (the tab layout draws lyrics too).
-      display: this.effectiveDisplay(),
-      hide: this.hiddenFeatures(),
-      // The preset resolves to the engine's multiplier here — the element
-      // binds a behavior it does not implement (docs/core-viewer-surface.md).
-      // A numeric `density-h` outranks the preset; unset, the preset decides.
-      spacingMode: this.spacingMode,
-      densityH,
-      densityPad,
-      // Always undefined — the horizontal axis FITS, at every zoom level
-      // (core-zoom-density-pad.md, ruling 2). `zoom` used to arrive here as a
-      // pinned pxPerSp, which is exactly what coupled it to the horizontal
-      // axis: pinning changed `widthSp`, the plan re-packed, and the notes
-      // slid sideways under a control that claims to be vertical. It now
-      // travels as `staffScale` and touches nothing but the ink, so zooming
-      // and resizing stay separate events.
-      pxPerSp: undefined,
-      // null stays null: unset means FITTED, and a fitted paint is square.
-      staffScale: staffScale ?? undefined
+      onNoteClick: this.onNoteClick
     };
 
     // The layout engine throws on documents using features it doesn't support
@@ -1061,28 +1048,6 @@ export class DocumentViewer extends LitElement {
         failures.push({ pane: label, message: (err as Error).message });
       }
     };
-
-    const flatSetup: TabSetup | undefined =
-      this.stringsOverride || this.capoOverride !== null
-        ? {
-            ...(this.stringsOverride ? { strings: this.stringsOverride } : {}),
-            ...(this.capoOverride !== null ? { capo: this.capoOverride } : {})
-          }
-        : undefined;
-    // Per-part overrides resolve by part id, then index; a part without an
-    // entry falls back to the flat pair (which applies to every part).
-    const perPart = this.partTabSetups;
-    const tabSetup: PartTabSetups | undefined = perPart
-      ? (part: MnxPart) => {
-          // Index overrides name the part's place in the WHOLE document.
-          const at = visible.mnx.parts.indexOf(part);
-          return (
-            (part.id !== undefined ? perPart[part.id] : undefined) ??
-            perPart[String(at < 0 ? at : visible.originalIndex[at])] ??
-            flatSetup
-          );
-        }
-      : flatSetup;
 
     // The selection-ladder enclosure: drawn from the finished SVG's own
     // geometry, after the engine is done — the renderer never learns about
@@ -1219,31 +1184,7 @@ export class DocumentViewer extends LitElement {
     // is a better thing for a readout to keep showing than a fabricated 100%.
     // Cast, not annotation: every assignment above happens inside a callback,
     // so control-flow analysis has narrowed `outcome` to `never` by here.
-    const drawn = outcome as RenderOutcome | null;
-    if (drawn) {
-      const { pxPerSp, staffScale: used, fitted } = drawn;
-      // The packing rides along on the same paint, for `densitySteps()`. It is
-      // NOT in the event: the detail stays exactly `RenderScale`, because a
-      // host wants the answer ("which values do something?"), not the input.
-      this.lastPackings = drawn.packings;
-      this.lastDensityH = densityH;
-      this.lastStaffScale = used;
-      const shrink = this.shrinkToPane();
-      // A section label is 1.8sp in the SVG. The heading lives in ordinary
-      // DOM above it, so give it the same em converted through the EXACT
-      // on-screen vertical scale (including max-width's final shrink).
-      this.style.setProperty(
-        '--mnx-document-heading-size',
-        `${SCORE_LABEL_SIZE_SP * pxPerSp * shrink}px`
-      );
-      this.dispatchEvent(
-        new CustomEvent<RenderScale>('render-scale', {
-          detail: { pxPerSp: pxPerSp * shrink, staffScale: used * shrink, fitted },
-          bubbles: true,
-          composed: true
-        })
-      );
-    }
+    this.finishPaint(outcome as RenderOutcome | null, densityH);
 
     this.paintPlayback();
     if (quick) return;
@@ -1253,6 +1194,248 @@ export class DocumentViewer extends LitElement {
       this.followQueued = false;
       if (!this.playbackState?.followPlayback || this.playbackState.ordinal === null) this.revealSelection();
     }
+  }
+
+  /** The click that becomes a selection — shared by every emit path. */
+  private readonly onNoteClick = (
+    noteId: string,
+    measureIdx: number,
+    noteIdx: number,
+    projection: RenderedProjection
+  ) => {
+    const occurrence = this.unrolled ? parseOccurrenceKey(noteId) : null;
+    if (occurrence) noteId = occurrence.noteKey;
+    this.dispatchEvent(
+      new CustomEvent('note-selected', {
+        detail: { noteId, measureIdx, noteIdx, projection, ...(occurrence ? { ordinal: occurrence.ordinal } : {}) },
+        bubbles: true,
+        composed: true
+      })
+    );
+  };
+
+  /**
+   * Everything a paint needs besides the document, resolved once per paint.
+   * Shared by the main-thread render and the worker request, which is why
+   * `inputs` is DATA — no callbacks, no entries, no cache — and why the tab
+   * setup comes back both resolved (for here) and as its parts (for there).
+   */
+  private paintInputs(width: number) {
+    const visible = this.visibleParts();
+    const staffScale = clampStaffScale(this.zoom);
+    // Resolved once and remembered with the packing: `systemRows()` has to
+    // re-pack at the value THIS paint used, not at whatever the properties say
+    // when it is asked.
+    const densityH = this.densityH ?? DENSITY_H[this.density] ?? 1;
+    // Preserve absence so the engine can choose Clearance or the legacy override.
+    const densityPad = this.densityPad ?? undefined;
+    const inputs: PlanInputs = {
+      width,
+      activeNoteIds: [], // Playback is a paint overlay, independent of layout and selection.
+      durationSpans: true, // …but it stretches fret masks to the release the layout records.
+      selectedNoteIds: this.selection?.selectedNoteIds ?? [],
+      selectedEventIds: this.selection?.selectedEventIds ?? [],
+      // Layout-side hides reach the engine so their space is reclaimed —
+      // every view honors them (the tab layout draws lyrics too).
+      display: this.effectiveDisplay(),
+      hide: this.hiddenFeatures(),
+      // The preset resolves to the engine's multiplier here — the element
+      // binds a behavior it does not implement (docs/core-viewer-surface.md).
+      // A numeric `density-h` outranks the preset; unset, the preset decides.
+      spacingMode: this.spacingMode,
+      densityH,
+      densityPad,
+      // Always undefined — the horizontal axis FITS, at every zoom level
+      // (core-zoom-density-pad.md, ruling 2). `zoom` used to arrive here as a
+      // pinned pxPerSp, which is exactly what coupled it to the horizontal
+      // axis: pinning changed `widthSp`, the plan re-packed, and the notes
+      // slid sideways under a control that claims to be vertical. It now
+      // travels as `staffScale` and touches nothing but the ink, so zooming
+      // and resizing stay separate events.
+      pxPerSp: undefined,
+      // null stays null: unset means FITTED, and a fitted paint is square.
+      staffScale: staffScale ?? undefined
+    };
+
+    const flatSetup: TabSetup | undefined =
+      this.stringsOverride || this.capoOverride !== null
+        ? {
+            ...(this.stringsOverride ? { strings: this.stringsOverride } : {}),
+            ...(this.capoOverride !== null ? { capo: this.capoOverride } : {})
+          }
+        : undefined;
+    // Per-part overrides resolve by part id, then index; a part without an
+    // entry falls back to the flat pair (which applies to every part).
+    const perPart = this.partTabSetups;
+    const tabSetup: PartTabSetups | undefined = perPart
+      ? (part: MnxPart) => {
+          // Index overrides name the part's place in the WHOLE document.
+          const at = visible.mnx.parts.indexOf(part);
+          return (
+            (part.id !== undefined ? perPart[part.id] : undefined) ??
+            perPart[String(at < 0 ? at : visible.originalIndex[at])] ??
+            flatSetup
+          );
+        }
+      : flatSetup;
+    return { visible, densityH, inputs, flatSetup, perPart, tabSetup };
+  }
+
+  /**
+   * What every paint reports once it has drawn: the packing for
+   * `densitySteps()`, the heading size, and `render-scale`. A host cannot
+   * print an honest zoom readout without the last — `fitted` scales with the
+   * viewport, so the number moves on resize with nobody touching a control.
+   * Skipped when the layout threw: there is no scale to report, and the last
+   * good value is a better thing for a readout to keep showing than a
+   * fabricated 100%.
+   */
+  private finishPaint(drawn: RenderOutcome | null, densityH: number) {
+    if (!drawn) return;
+    const { pxPerSp, staffScale: used, fitted } = drawn;
+    // The packing rides along on the same paint, for `densitySteps()`. It is
+    // NOT in the event: the detail stays exactly `RenderScale`, because a
+    // host wants the answer ("which values do something?"), not the input.
+    this.lastPackings = drawn.packings;
+    this.lastDensityH = densityH;
+    this.lastStaffScale = used;
+    const shrink = this.shrinkToPane();
+    // A section label is 1.8sp in the SVG. The heading lives in ordinary
+    // DOM above it, so give it the same em converted through the EXACT
+    // on-screen vertical scale (including max-width's final shrink).
+    this.style.setProperty(
+      '--mnx-document-heading-size',
+      `${SCORE_LABEL_SIZE_SP * pxPerSp * shrink}px`
+    );
+    this.dispatchEvent(
+      new CustomEvent<RenderScale>('render-scale', {
+        detail: { pxPerSp: pxPerSp * shrink, staffScale: used * shrink, fitted },
+        bubbles: true,
+        composed: true
+      })
+    );
+  }
+
+  // ── the layout worker, for the length of a gesture ──────────────────────
+
+  /** The worker, built on first use; false when it cannot be, for good. */
+  private workerReady(): boolean {
+    if (this.workerFailed) return false;
+    if (this.worker) return true;
+    if (typeof Worker === 'undefined') {
+      this.workerFailed = true;
+      return false;
+    }
+    const smufl = getSmuflData();
+    if (!smufl) return false;
+    try {
+      // Written out literally: the bundler finds workers by this exact shape.
+      const worker = new Worker(new URL('./layout.worker.ts', import.meta.url), { type: 'module' });
+      worker.onmessage = (event: MessageEvent<LayoutReply>) => this.onWorkerReply(event.data);
+      worker.onerror = () => {
+        this.abandonWorker();
+        if (this.gesturing) this.renderProjection();
+      };
+      worker.postMessage({ type: 'smufl', ...smufl } satisfies LayoutRequest);
+      this.worker = worker;
+      return true;
+    } catch {
+      this.workerFailed = true;
+      return false;
+    }
+  }
+
+  /** The gesture's document, posted once so every request can refer to it —
+   *  and so its identity holds in the worker for the square-layout memo. */
+  private startPlanGesture() {
+    if (!this.mnxDoc || !this.workerReady()) return;
+    const visible = this.visibleParts();
+    this.planEpoch++;
+    this.worker!.postMessage({
+      type: 'doc',
+      mnx: visible.mnx,
+      originalIndex: visible.originalIndex
+    } satisfies LayoutRequest);
+  }
+
+  /** A paint as a request. Latest wins: one in flight, one waiting at most. */
+  private requestPlan() {
+    const width = this.container.getBoundingClientRect().width || 600;
+    this.renderedWidth = width;
+    const { densityH, inputs, flatSetup, perPart } = this.paintInputs(width);
+    const request: PlanRequest = {
+      type: 'plan',
+      seq: ++this.planSeq,
+      epoch: this.planEpoch,
+      view: this.resolvedView(),
+      unrolled: this.unrolled,
+      inputs,
+      flatSetup,
+      perPart
+    };
+    this.planMeta.set(request.seq, { densityH });
+    if (this.workerBusy) {
+      if (this.workerPending) this.planMeta.delete(this.workerPending.seq);
+      this.workerPending = request;
+      return;
+    }
+    this.workerBusy = true;
+    this.worker!.postMessage(request);
+  }
+
+  private onWorkerReply(reply: LayoutReply) {
+    this.workerBusy = false;
+    const meta = this.planMeta.get(reply.seq);
+    this.planMeta.delete(reply.seq);
+    // Start the waiting request before drawing this one, so the worker lays
+    // out the next step while the main thread emits this one.
+    const next = this.workerPending;
+    if (next && this.worker) {
+      this.workerPending = null;
+      this.workerBusy = true;
+      this.worker.postMessage(next);
+    }
+    // Superseded by a main-thread paint, or by a newer gesture.
+    if (reply.epoch !== this.planEpoch || !meta) return;
+    if (reply.type === 'error') {
+      // The main thread reports layout failures as the honest state panel;
+      // let it, and stop asking the worker.
+      this.abandonWorker();
+      this.renderProjection();
+      return;
+    }
+    this.applyPlan(reply.plan, meta.densityH);
+  }
+
+  /** The emit half of a worker paint — what a gesture paint does on the main
+   *  thread minus the layout, and minus the chrome the release owes. */
+  private applyPlan(plan: RenderPlan, densityH: number) {
+    if (!this.container) return;
+    this.container.innerHTML = '';
+    const pane = this.appendPane();
+    let outcome: RenderOutcome | null = null;
+    try {
+      outcome = emitPlan(plan, pane, this.onNoteClick);
+      const svg = pane.querySelector('svg');
+      if (svg) {
+        markProjectionEchoes(svg, this.resolvedView() === 'both' ? this.selection?.primaryProjection : null);
+      }
+      if (this.renderErrors.length) this.renderErrors = [];
+    } catch (err) {
+      pane.innerHTML = '';
+      this.renderErrors = [{ pane: this.resolvedView(), message: (err as Error).message }];
+    }
+    this.finishPaint(outcome, densityH);
+    this.paintPlayback();
+  }
+
+  private abandonWorker() {
+    this.worker?.terminate();
+    this.worker = null;
+    this.workerFailed = true;
+    this.workerBusy = false;
+    this.workerPending = null;
+    this.planMeta.clear();
   }
 
   /**

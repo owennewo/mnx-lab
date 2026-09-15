@@ -5,7 +5,8 @@ import { MnxStructure } from '../../model/mnx.ts';
 import { PartTabSetups } from './guitarPositions.ts';
 import { layoutTab } from '../layout/tab.ts';
 import { computeBoundsSp } from '../render/bounds.ts';
-import { fitPxPerSp, renderSvg } from '../render/svg.ts';
+import { fitPxPerSp } from '../render/svg.ts';
+import { emitPlan, type RenderPlan } from '../render/plan.ts';
 import { squareLayout, type LayoutCache } from '../render/layoutCache.ts';
 import type { RenderedProjection } from '../render/projection.ts';
 import {
@@ -66,7 +67,14 @@ export interface RenderTabOptions {
   hide?: readonly import('../layout/notation.ts').HideableFeature[];
 }
 
+/** The DOM-free half — see `render/plan.ts`. */
+export type PlanTabOptions = Omit<RenderTabOptions, 'container' | 'onNoteClick'>;
+
 export function renderMnxToSvgTab(opts: RenderTabOptions): RenderOutcome {
+  return emitPlan(planTab(opts), opts.container, opts.onNoteClick);
+}
+
+export function planTab(opts: PlanTabOptions): RenderPlan {
   const basePxPerSp = opts.pxPerSp ?? DEFAULT_PX_PER_SP;
 
   const layoutArgs = {
@@ -116,8 +124,7 @@ export function renderMnxToSvgTab(opts: RenderTabOptions): RenderOutcome {
   const bounds = computeBoundsSp(layout.primitives, clearanceSpacing(opts.display?.clearance, opts.densityPad).cropMargin);
   const viewBoxSp = bounds ? { x: 0, y: bounds.y, w: widthSp, h: bounds.h } : undefined;
 
-  renderSvg({
-    container: opts.container,
+  return {
     primitives: layout.primitives,
     widthSp,
     heightSp: layout.heightSp,
@@ -125,16 +132,9 @@ export function renderMnxToSvgTab(opts: RenderTabOptions): RenderOutcome {
     pxPerSpY,
     viewBoxSp,
     className: 'mnx-tab-svg',
-    onSourceActivate: opts.onNoteClick
-      ? sourceId => {
-          const loc = layout.index.get(sourceId);
-          if (loc) {
-            opts.onNoteClick!(sourceId, loc.measureIndex, loc.eventIndex, 'tab');
-          }
-        }
-      : undefined
-  });
-
-  // The ink scale is what a zoom readout means; see notationRenderer.ts.
-  return renderOutcome(pxPerSpY, fitted, layout.packings);
+    index: layout.index,
+    projection: 'tab',
+    // The ink scale is what a zoom readout means; see notationRenderer.ts.
+    outcome: renderOutcome(pxPerSpY, fitted, layout.packings)
+  };
 }

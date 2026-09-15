@@ -6,12 +6,10 @@ import { PartTabSetups } from '../tab/guitarPositions.ts';
 import { layoutBothSystem } from '../layout/bothSystem.ts';
 import type { HideableFeature } from '../layout/notation.ts';
 import { computeBoundsSp } from '../render/bounds.ts';
-import { fitPxPerSp, renderSvg } from '../render/svg.ts';
+import { fitPxPerSp } from '../render/svg.ts';
+import { emitPlan, type RenderPlan } from '../render/plan.ts';
 import { squareLayout, type LayoutCache } from '../render/layoutCache.ts';
-import {
-  projectionForSourceClass,
-  type RenderedProjection
-} from '../render/projection.ts';
+import type { RenderedProjection } from '../render/projection.ts';
 import {
   BASELINE_PX_PER_SP,
   clampStaffScale,
@@ -70,7 +68,14 @@ export interface RenderBothOptions {
   cache?: LayoutCache;
 }
 
+/** The DOM-free half — see `render/plan.ts`. */
+export type PlanBothOptions = Omit<RenderBothOptions, 'container' | 'onNoteClick'>;
+
 export function renderMnxToSvgBoth(opts: RenderBothOptions): RenderOutcome {
+  return emitPlan(planBoth(opts), opts.container, opts.onNoteClick);
+}
+
+export function planBoth(opts: PlanBothOptions): RenderPlan {
   const basePxPerSp = opts.pxPerSp ?? DEFAULT_PX_PER_SP;
 
   const layoutArgs = {
@@ -116,8 +121,7 @@ export function renderMnxToSvgBoth(opts: RenderBothOptions): RenderOutcome {
   const bounds = computeBoundsSp(layout.primitives, clearanceSpacing(opts.display?.clearance, opts.densityPad).cropMargin);
   const viewBoxSp = bounds ? { x: 0, y: bounds.y, w: widthSp, h: bounds.h } : undefined;
 
-  renderSvg({
-    container: opts.container,
+  return {
     primitives: layout.primitives,
     widthSp,
     heightSp: layout.heightSp,
@@ -125,24 +129,9 @@ export function renderMnxToSvgBoth(opts: RenderBothOptions): RenderOutcome {
     pxPerSpY,
     viewBoxSp,
     className: 'mnx-both-svg',
-    onSourceActivate: opts.onNoteClick
-      ? (sourceId, event) => {
-          const loc = layout.index.get(sourceId);
-          const target = event.target instanceof Element
-            ? event.target.closest('[data-source-id]')
-            : null;
-          if (loc && target) {
-            opts.onNoteClick!(
-              sourceId,
-              loc.measureIndex,
-              loc.eventIndex,
-              projectionForSourceClass(target.getAttribute('class') ?? '')
-            );
-          }
-        }
-      : undefined
-  });
-
-  // The ink scale is what a zoom readout means; see notationRenderer.ts.
-  return renderOutcome(pxPerSpY, fitted, layout.packings);
+    index: layout.index,
+    projection: 'both',
+    // The ink scale is what a zoom readout means; see notationRenderer.ts.
+    outcome: renderOutcome(pxPerSpY, fitted, layout.packings)
+  };
 }

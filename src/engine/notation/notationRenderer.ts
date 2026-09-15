@@ -4,7 +4,8 @@ import type { DisplayOptions } from '../displayOptions.ts';
 import { MnxStructure } from '../../model/mnx.ts';
 import { layoutNotation, type HideableFeature } from '../layout/notation.ts';
 import { computeBoundsSp } from '../render/bounds.ts';
-import { fitPxPerSp, renderSvg } from '../render/svg.ts';
+import { fitPxPerSp } from '../render/svg.ts';
+import { emitPlan, type RenderPlan } from '../render/plan.ts';
 import { squareLayout, type LayoutCache } from '../render/layoutCache.ts';
 import type { RenderedProjection } from '../render/projection.ts';
 import {
@@ -67,7 +68,14 @@ export interface RenderNotationOptions {
   cache?: LayoutCache;
 }
 
+/** The DOM-free half — see `render/plan.ts`. */
+export type PlanNotationOptions = Omit<RenderNotationOptions, 'container' | 'onNoteClick'>;
+
 export function renderMnxToSvgNotation(opts: RenderNotationOptions): RenderOutcome {
+  return emitPlan(planNotation(opts), opts.container, opts.onNoteClick);
+}
+
+export function planNotation(opts: PlanNotationOptions): RenderPlan {
   const basePxPerSp = opts.pxPerSp ?? DEFAULT_PX_PER_SP;
 
   const layoutArgs = {
@@ -118,8 +126,7 @@ export function renderMnxToSvgNotation(opts: RenderNotationOptions): RenderOutco
   const bounds = computeBoundsSp(layout.primitives, clearanceSpacing(opts.display?.clearance, opts.densityPad).cropMargin);
   const viewBoxSp = bounds ? { x: 0, y: bounds.y, w: widthSp, h: bounds.h } : undefined;
 
-  renderSvg({
-    container: opts.container,
+  return {
     primitives: layout.primitives,
     widthSp,
     heightSp: layout.heightSp,
@@ -127,15 +134,10 @@ export function renderMnxToSvgNotation(opts: RenderNotationOptions): RenderOutco
     pxPerSpY,
     viewBoxSp,
     className: 'mnx-notation-svg',
-    onSourceActivate: opts.onNoteClick
-      ? sourceId => {
-          const loc = layout.index.get(sourceId);
-          if (loc) opts.onNoteClick!(sourceId, loc.measureIndex, loc.eventIndex, 'notation');
-        }
-      : undefined
-  });
-
-  // The INK scale is what a zoom readout means by "how big is this", so that
-  // is the one reported — `pxPerSp` is now the horizontal axis's business.
-  return renderOutcome(pxPerSpY, fitted, layout.packings);
+    index: layout.index,
+    projection: 'notation',
+    // The INK scale is what a zoom readout means by "how big is this", so that
+    // is the one reported — `pxPerSp` is now the horizontal axis's business.
+    outcome: renderOutcome(pxPerSpY, fitted, layout.packings)
+  };
 }
