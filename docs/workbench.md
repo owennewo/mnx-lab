@@ -25,10 +25,11 @@ with the keyboard must not move the panel out from under what you were reading.
 **Document focus** is transient workbench composition: `Ctrl+Alt+F` removes the app and
 scenario-page chrome without changing remembered rail/panel preferences, while `F11`
 remains browser-owned (the palette's separate browser-fullscreen action uses the Fullscreen
-API when available). The score frame's grips remain on the pane's edges (below), and the
-frame's top strip carries a **Focus / Unfocus** button beside Zoom and Settings, so the
-mode never hides both its control and its escape route; the zoom pad's own footer toggle
-still works when the pad is open. It is never a property of `<mnx-document-viewer>`.
+API when available). In the workbench the score frame's **focus mark** (below) *is*
+document focus: the same mark that hides the frame's strips hides the shell's panes, and
+it stays on the pane's corner in both states, so the mode never hides both its control
+and its escape route; the zoom pad's own footer toggle still works when the pad is open.
+It is never a property of `<mnx-document-viewer>`.
 **Theming is `light-dark()`, never an attribute** — the shell resolves `auto|light|dark`
 (remembered per browser, palette-switchable) onto `color-scheme`, and every token
 follows because `color-scheme` is inherited and crosses shadow roots. An
@@ -87,13 +88,14 @@ The real API layer (documents, auth, sync) belongs to **studio**
 
 **The score pane is the score frame** (`src/elements/ScoreFrame.ts`,
 [roadmap/inprogress/core-score-frame.md](../roadmap/inprogress/core-score-frame.md), shared
-with studio): a title grip on the pane's top edge (scenario id · provenance) and a playback grip
-on the bottom (pause/play · the position readout), plus a hairline progress line. A tap on
-the score is never a chrome toggle. Drawn out, the top grip becomes the tools row — `← Queue`,
-the id, the staff view as a segmented control (unavailable views greyed with the reason),
-**Zoom** and **Settings** hosting the two pads *pinned* under their buttons, and **Focus** —
-and the bottom grip becomes the player's tray. The corner cluster the pads used to idle in
-is gone; the pads themselves are unchanged.
+with studio): the tools row above the score — `← Queue`, the id and provenance, the staff
+view as a segmented control (unavailable views greyed with the reason), **Zoom** and
+**Settings** hosting the two pads *pinned* under their buttons — and the player's tray
+below it. One **focus mark** on the pane's top-right corner, faded until the pointer
+reaches it, hides and shows both together; focused, a hairline progress line runs along
+the bottom edge. A tap on the score is never a chrome toggle. The edge grips (each strip
+drawn out on its own) were retired on 2026-09-15, and the corner cluster the pads used to
+idle in before that is gone; the pads themselves are unchanged.
 
 The settings card has nine rows: Staff, Repeats, Lyrics, Time signatures, Clefs, Title,
 Bar numbers, Instrument names, and Beams. Its display preferences are validated and stored
@@ -107,8 +109,8 @@ host supplies a selected verse. That transient input is not persisted. A system 
 horizontal row of music, including both staves in Both. The card supports keyboard
 navigation and Escape/focus return, and dismisses on click-away.
 
-**Playback** lives in the frame's bottom grip: the player's tray (transport, the readout, a
+**Playback** lives in the frame's bottom strip: the player's tray (transport, the readout, a
 rail over the written bars with a lane per pass, and the sound, rate and volume buttons with
-their overlays) draws out under the score. The host keeps playback context separate from editor selection, stops/recompiles on
+their overlays) sits under the score and goes with the tools row when the score is focused. The host keeps playback context separate from editor selection, stops/recompiles on
 edits, and accepts an optional zero-based `at=` ordinal in scenario links.
 [Player element and lifecycle](player-element.md).

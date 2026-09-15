@@ -48,8 +48,9 @@ minimum 200 × 200 viewport. Pointer dragging pauses playback and temporarily re
 the iframe pointer target, so crossing the video cannot swallow the drag. Releasing
 the divider restores native interaction; Play resumes from the same position. Very narrow hosts below 267 pixels cannot satisfy both
 limits; the 200-pixel minimum takes precedence, and visibility checks still apply.
-Standalone players retain their inline video region. Collapsing pauses video; pressing Play from the
-collapsed grip first opens the strip. Standalone hosts must supply enough visible
+Standalone players retain their inline video region. Focusing the score (the frame's mark
+takes the tray away) pauses video; a video coming up brings the strips back, and Play in
+the tray resumes. Standalone hosts must supply enough visible
 space and avoid clipping/covering the iframe. Small viewports with insufficient space
 cannot start playback until the entire minimum viewport can be shown.
 

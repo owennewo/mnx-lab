@@ -673,8 +673,9 @@ export class ScenarioPage extends LitElement {
          settings pad in the score corner, its focus button was a duplicate of
          the cluster's, and its panel chevron moved to the app header beside
          its rail mirror. The page is the body alone now — and since 2026-09-12
-         the score pane is the score frame, whose top strip carries the view,
-         the pads and the focus button (core-score-frame.md). */
+         the score pane is the score frame, whose top strip carries the view
+         and the pads, and whose focus mark IS document focus here
+         (core-score-frame.md). */
       :host {
         display: grid;
         grid-template-rows: 1fr;
@@ -1516,11 +1517,11 @@ export class ScenarioPage extends LitElement {
       }
 
       /* The score frame (roadmap/inprogress/core-score-frame.md) fills the
-         pane: its grips sit on the pane's edges, its strips draw out in flow
-         above and below the score, and the zoom pad and settings card hang
-         pinned under the strip's buttons — the corner cluster they used to
-         idle in is gone. z-index 4 keeps an open pad under the popover layer
-         (5) and the tray (30), as the cluster was. */
+         pane: its strips sit in flow above and below the score, its focus
+         mark on the pane's corner toggles document focus, and the zoom pad
+         and settings card hang pinned under the strip's buttons — the corner
+         cluster they used to idle in is gone. z-index 4 keeps an open pad
+         under the popover layer (5) and the tray (30), as the cluster was. */
       mnx-score-frame {
         position: absolute;
         inset: 0;
@@ -3080,7 +3081,10 @@ export class ScenarioPage extends LitElement {
             .densitySteps=${this.densitySteps}
             .effectiveStaffScale=${this.effectiveStaffScale}
             .documentFocus=${this.documentFocus}
+            .focused=${this.documentFocus}
+            focus-shortcut="Ctrl+Alt+F"
             .pads=${this.loadState === 'ready' && !entry.invalidByDesign}
+            @focus-change=${() => this.dispatchEvent(new CustomEvent('document-focus-request', { bubbles: true, composed: true }))}
             @zoom-change=${this.onZoomChange}
             @spacing-mode-change=${(event: CustomEvent<'natural' | 'fill'>) => {
               this.spacingMode = event.detail;
@@ -3091,15 +3095,6 @@ export class ScenarioPage extends LitElement {
             }}
           >
             <a slot="back" href="#/">← Queue</a>
-            <button
-              slot="actions"
-              type="button"
-              aria-pressed=${this.documentFocus}
-              title=${this.documentFocus ? 'Exit document focus (Ctrl+Alt+F)' : 'Focus document (Ctrl+Alt+F)'}
-              @click=${() => this.dispatchEvent(new CustomEvent('document-focus-request', { bubbles: true, composed: true }))}
-            >
-              ${this.documentFocus ? 'Unfocus' : 'Focus'}
-            </button>
             ${this.viewer(entry, view)}
             <mnx-player slot="player" .performance=${this.performance} .document=${this.session?.doc}
               .documentId=${this.scenarioId} .initialOrdinal=${this.routeSeekConsumed?null:this.at}

@@ -35,10 +35,10 @@ apps/studio/
 `#/not-permitted` is the third route: Access admitted the address but D1 has it inactive.
 Piece URLs carry the library's piece id. On a piece the page IS the score frame
 ([roadmap/inprogress/core-score-frame.md](../../roadmap/inprogress/core-score-frame.md)):
-a title grip on the top edge and a playback grip on the bottom, drawn out into the library
-page's tools row (the way back, the title, Zoom, Settings, Tags, Source, Instruments, the
-theme toggle) and the player's tray, which carries only transport, readout, rail, rate and
-volume. **Source · <what plays>** opens the Source sheet in the frame's side slot: Synth and
+the library page's tools row above the score (the way back, the title, Zoom, Settings,
+Tags, Source, Instruments, the theme toggle) and the player's tray below it, which carries
+only transport, readout, rail, rate and volume; one focus mark on the score's top-right
+corner, faded until hovered, hides and shows both together. **Source · <what plays>** opens the Source sheet in the frame's side slot: Synth and
 each recording, choose one, edit or add a recording in the same slot
 ([docs/studio-recordings.md](../../docs/studio-recordings.md)). The Instruments sheet sits in the frame's side slot,
 between the strips, and lists the parts: hide one from the score (it keeps playing), mute
@@ -48,7 +48,7 @@ hiding works. Hidden parts and the mix are remembered per piece (`mnx-studio.par
 segmented control is off here), the tag chips are the Tags sheet's, and sign-out is the
 library page's — a piece is not where you leave. A tap on the score is never a chrome
 toggle. The staff view, the display settings, zoom and spacing, the theme, and whether
-each grip was left drawn out, are per-browser localStorage preferences (`mnx-studio.*`),
+the score was left focused, are per-browser localStorage preferences (`mnx-studio.*`),
 the one persistence a shell may own without a backend decision.
 
 ## The decisions that starting settled

@@ -37,7 +37,7 @@ try {
   const library = `${app}.querySelector('mnx-studio-library').shadowRoot`;
   const piece = `${app}.querySelector('mnx-studio-piece').shadowRoot`;
   // The piece page IS the score frame (core-score-frame.md): the title sits in
-  // the frame's top grip, the player in its bottom grip, the shell header is gone.
+  // the frame's tools row, the player in its tray, the shell header is gone.
   const frame = `${piece}.querySelector('mnx-score-frame').shadowRoot`;
   // No identity: the shell reports it rather than showing an empty library.
   await c.send('Page.navigate',{url:origin+'/studio/'});
@@ -54,21 +54,20 @@ try {
   await c.evaluate(`${library}.querySelector('form').dispatchEvent(new Event('submit',{cancelable:true}));`);
   await wait(`${library}.querySelector('.chip')?.textContent.includes('Studio collection')`);
   await wait(`${library}.querySelector('li .who a')?.textContent.includes('Studio smoke piece') && !${library}.querySelector('[role=status]')`);
-  // Open it: the viewer draws, the player is wired, the top grip names the piece,
-  // the shell's header is gone, and the quiet view keeps pause on the bottom grip.
+  // Open it: the viewer draws, the player is wired, the tools row names the
+  // piece, the shell's header is gone, and the tray under the score has its rail.
   await c.evaluate(`${library}.querySelector('li .who a').click()`);
   await wait(`location.hash==='#/piece/${pieceId}'`);
   await wait(`!!${piece}?.querySelector('mnx-document-viewer')?.shadowRoot?.querySelector('svg')`);
-  await wait(`${frame}?.querySelector('.grip.top .name')?.textContent.includes('Studio smoke piece')`);
+  await wait(`${frame}?.querySelector('.strip.top .head h1')?.textContent.includes('Studio smoke piece')`);
   assert.equal(await c.evaluate(`!!${app}.querySelector('header')`), false);
   await wait(`!!${piece}.querySelector('mnx-player').performance`);
-  await wait(`!${frame}.querySelector('.grip.bottom .primary').disabled && ${frame}.querySelector('.grip.bottom .readout')?.textContent.length > 0`);
+  await wait(`!!${frame}.querySelector('.strip.bottom') && !!${piece}.querySelector('mnx-player').shadowRoot.querySelector('.rail')`);
   const shot = await c.send('Page.captureScreenshot'); await fs.writeFile('/tmp/mnx-studio-piece.png',Buffer.from(shot.result.data,'base64'));
-  // Draw the top grip out: the tools row, Zoom and Settings hosting the pads
-  // pinned under their buttons. Studio leaves the staff view to the settings
-  // card's STAFF row — no segmented control in the strip.
-  await c.evaluate(`${frame}.querySelector('.grip.top').click()`);
-  await wait(`!!${frame}.querySelector('.strip.top .head h1') && !${frame}.querySelector('.seg')`);
+  // The tools row: Zoom and Settings hosting the pads pinned under their
+  // buttons. Studio leaves the staff view to the settings card's STAFF row —
+  // no segmented control in the strip.
+  assert.equal(await c.evaluate(`!!${frame}.querySelector('.seg')`), false);
   await c.evaluate(`[...${frame}.querySelectorAll('.strip.top .btn')].find(b => b.textContent.includes('Zoom')).click()`);
   await wait(`!!${frame}.querySelector('mnx-zoom-pad[pinned]')`);
   await c.evaluate(`[...${frame}.querySelectorAll('.strip.top .btn')].find(b => b.textContent.includes('Settings')).click()`);
@@ -86,10 +85,14 @@ try {
   await wait(`document.documentElement.style.colorScheme === 'dark' && ${piece}.querySelector('button[slot=menu]').textContent.trim() === 'dark'`);
   await c.evaluate(`${piece}.querySelector('button[slot=menu]').click()`);
   await wait(`document.documentElement.style.colorScheme === '' && localStorage.getItem('mnx-studio.theme') === null`);
-  // Draw the bottom grip out: the player's own tray, with its rail.
-  await c.evaluate(`${frame}.querySelector('.grip.bottom .chev').click()`);
-  await wait(`!!${frame}.querySelector('.strip.bottom') && !!${piece}.querySelector('mnx-player').shadowRoot.querySelector('.rail')`);
-  const openShot = await c.send('Page.captureScreenshot'); await fs.writeFile('/tmp/mnx-studio-piece-open.png',Buffer.from(openShot.result.data,'base64'));
+  // The focus mark on the pane's corner hides both strips, remembers it, and
+  // brings them back; the player is parked, not torn down, while focused.
+  await c.evaluate(`${frame}.querySelector('.focus-mark').click()`);
+  await wait(`!${frame}.querySelector('.strip.top') && !${frame}.querySelector('.strip.bottom') && ${frame}.querySelector('.focus-mark').getAttribute('aria-pressed') === 'true' && localStorage.getItem('mnx-studio.focused') === 'true'`);
+  assert.equal(await c.evaluate(`!!${piece}.querySelector('mnx-player').performance`), true);
+  const focusedShot = await c.send('Page.captureScreenshot'); await fs.writeFile('/tmp/mnx-studio-piece-focused.png',Buffer.from(focusedShot.result.data,'base64'));
+  await c.evaluate(`${frame}.querySelector('.focus-mark').click()`);
+  await wait(`!!${frame}.querySelector('.strip.top') && !!${frame}.querySelector('.strip.bottom') && localStorage.getItem('mnx-studio.focused') === 'false'`);
   // The Tags sheet: add a tag of your own, then correct how the artist shows with an alias.
   const sheet = `${piece}.querySelector('mnx-studio-tags').shadowRoot`;
   // Local D1 keeps what earlier runs asserted (the tag, the favourite), so the
@@ -172,6 +175,6 @@ try {
   await c.send('Page.navigate',{url:origin+'/studio/#/piece/soundslice%3ANoSuchPiece'});
   await wait(`${piece}?.textContent.includes('Could not open this piece')`);
   assert.equal(await c.evaluate(`Object.values(localStorage).some(v=>v.includes('Studio smoke piece') || v.includes('local@example.test'))`),false);
-  console.log('Studio smoke passed: root redirect, signed-out page, library list + filter, canonical .gp converted into the score frame + player, the grips drawn out (staff view, Zoom, Settings, tray), Tags sheet add + alias, rail facets + favourite + sort, alias page, missing piece, no private localStorage.');
+  console.log('Studio smoke passed: root redirect, signed-out page, library list + filter, canonical .gp converted into the score frame + player, the tools row and tray (Zoom, Settings, the focus mark), Tags sheet add + alias, rail facets + favourite + sort, alias page, missing piece, no private localStorage.');
   if (c.logs.length) throw new Error('Browser console errors: '+c.logs.join('\n'));
 } finally { ws?.close(); chrome.kill(); await once(chrome,'exit'); await fs.rm(profile,{recursive:true,force:true}); }

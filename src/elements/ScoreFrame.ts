@@ -1,35 +1,38 @@
-import { LitElement, html, css, svg, nothing } from 'lit';
+import { LitElement, html, css, svg, nothing, type PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { designTokens, sharedChrome } from './tokens.ts';
 import type { DisplayOptions } from '../engine/displayOptions.ts';
 import type { ViewMode } from './DocumentViewer.ts';
 import type { Player } from './Player.ts';
 import type { PlaybackUpdate } from './mnxContext.ts';
-import { placeLabel, readoutSegments, widestPlaceLabel, widestPlaybackPosition } from '../audio/playbackPosition.ts';
 import './ZoomPad.ts';
 import './SettingsPad.ts';
 
 /**
  * The score frame — roadmap/inprogress/core-score-frame.md, from the *Studio
- * Controls* design canvas (edge grips, 2026-09-11).
+ * Controls* design canvas (2026-09-11), revised 2026-09-15 to one toggle.
  *
- * The score pane owns TWO GRIPS, one on each horizontal edge, and a hairline
- * progress line along the bottom. Nothing here listens for a tap on the score:
- * a tap on the page is navigation (seek to a bar; later, select a note), and
- * the chrome is reached only through its grips.
+ * The score pane sits between TWO STRIPS in the library page's vocabulary —
+ * the tools row above, the player's tray below — and ONE MARK on the pane's
+ * top-right corner, faded until the pointer reaches it, hides and shows both
+ * strips together. Nothing here listens for a tap on the score: a tap on the
+ * page is navigation (seek to a bar; later, select a note), and the chrome is
+ * reached only through the mark.
  *
- *   quiet      — a title grip on the top edge, a playback grip on the bottom edge
- *                (pause/play · the position readout · a chevron). Pause and the
- *                way to the chrome are on screen at 44px at all times.
- *   drawn out  — the top grip becomes the library page's tools row: the way
- *                back (slot `back`), the title at h1 weight with the sub-line
- *                muted, the piece's chips (slot `chips`), then the staff view as
- *                the library's sort control (opt-out: `staff-view` false — the
- *                settings card carries the same row, and studio shows only
- *                that), Zoom and Settings hosting the two pads *pinned* under
- *                their buttons, extra buttons (slot `actions` — the workbench's
- *                Focus), a menu (slot `menu`) and the collapse chevron. The
- *                bottom grip becomes the player's own tray (slot `player`).
+ *   unfocused — the tools row: the way back (slot `back`), the title at h1
+ *               weight with the sub-line muted, the piece's chips (slot
+ *               `chips`), then the staff view as the library's sort control
+ *               (opt-out: `staff-view` false — the settings card carries the
+ *               same row, and studio shows only that), Zoom and Settings
+ *               hosting the two pads *pinned* under their buttons, extra
+ *               buttons (slot `actions`) and a menu (slot `menu`). Under the
+ *               score, the player's own tray (slot `player`).
+ *   focused   — the score alone, a hairline progress line along the bottom
+ *               edge, and the mark to come back by.
+ *
+ * The edge grips the frame first shipped with — a title grip and a playback
+ * grip, each strip drawn out and put away on its own — were retired on
+ * 2026-09-15 for the one mark: the strips no longer have a reduced form.
  *
  * Below ~1000px of pane the tools row wraps to its stacked form; a phone and
  * the workbench's pane beside its rail and side panel both hit it.
@@ -40,16 +43,16 @@ import './SettingsPad.ts';
  * `display-change`, `unrolled-change`, `zoom-change`, `spacing-mode-change`,
  * `document-focus-toggle`), which bubble composed through
  * the frame for the host to store — the pads are chrome, not surface, and so
- * is this. Which strip is drawn out follows the same rule: `topOpen` and
- * `bottomOpen` are properties the host may set (its remembered choice), and
- * every toggle from a grip, a chevron or Escape leaves as `strip-change`
- * (`{ strip: 'top' | 'bottom', open }`) for the host to remember or ignore.
- * Which pad is up stays the frame's own — a popover is not a preference.
+ * is this. Focus follows the same rule: `focused` is a property the host may
+ * set (studio's remembered choice; the workbench's document focus), and every
+ * toggle from the mark leaves as `focus-change` (detail: the new boolean) for
+ * the host to remember or ignore. Which pad is up stays the frame's own — a
+ * popover is not a preference.
  *
- * The grip's pause and readout come from the slotted `<mnx-player>`: its
- * `playback-state-changed` frames bubble through the frame, and the grip calls
- * `play()`/`pause()` on it. The player is the host's — the frame never creates
- * one — so the binding the host already made (`bindPlayback`) is untouched.
+ * The progress line reads the slotted `<mnx-player>`: its
+ * `playback-state-changed` frames bubble through the frame. The player is the
+ * host's — the frame never creates one — so the binding the host already made
+ * (`bindPlayback`) is untouched.
  */
 
 const ALL_VIEWS: readonly ViewMode[] = ['notation', 'tab', 'both'];
@@ -58,15 +61,9 @@ const NO_STRINGS = 'Needs known strings — declare strings[] in the document, o
 
 type Pad = 'zoom' | 'settings' | null;
 
-/** The detail of `strip-change`: which strip the user drew out or put away. */
-export interface StripChange {
-  strip: 'top' | 'bottom';
-  open: boolean;
-}
-
 @customElement('mnx-score-frame')
 export class ScoreFrame extends LitElement {
-  /** What the title grip and the tools row print. */
+  /** What the tools row prints. */
   @property() heading = '';
   @property() subheading = '';
 
@@ -94,9 +91,10 @@ export class ScoreFrame extends LitElement {
    *  the host cannot lay out, has nothing for them to change. */
   @property({ type: Boolean }) pads = true;
 
-  /** Which strip is drawn out — the host's to pin (see the note above). */
-  @property({ type: Boolean, attribute: 'top-open' }) topOpen = false;
-  @property({ type: Boolean, attribute: 'bottom-open' }) bottomOpen = false;
+  /** Whether the strips are hidden — the host's to pin (see the note above). */
+  @property({ type: Boolean, reflect: true }) focused = false;
+  /** A shortcut the host binds to the same toggle, printed in the mark's tooltip. */
+  @property({ attribute: 'focus-shortcut' }) focusShortcut = '';
   @state() private videoOpen = false;
   @state() private videoWidth = 320;
   private videoObserver: ResizeObserver | null = null;
@@ -129,13 +127,6 @@ export class ScoreFrame extends LitElement {
     event.preventDefault(); this.resizeVideo(width);
   };
   @state() private pad: Pad = null;
-  @state() private playing = false;
-  @state() private positionText = '';
-  /** The place segment and its reserved width, when the position is a place in the score. */
-  @state() private placeText = '';
-  @state() private widestPlace = '';
-  /** The widest label the readout can print — reserved so the chevron never moves. */
-  @state() private widestText = '';
   @state() private progress = 0;
   @state() private hasPerformance = false;
 
@@ -161,17 +152,16 @@ export class ScoreFrame extends LitElement {
         --frame-ground: light-dark(oklch(0.9 0.004 60), oklch(0.26 0.006 60));
         --frame-bar: light-dark(oklch(0.985 0.002 60 / 0.92), oklch(0.22 0.004 60 / 0.92));
         --frame-radius: 3px;
-        --grip-shadow: 0 1px 2px var(--shadow-near), 0 3px 10px var(--shadow-far);
+        --frame-shadow: 0 1px 2px var(--shadow-near), 0 3px 10px var(--shadow-far);
       }
 
       /* ── the pane ──
-         The frame is a column: an open strip is IN FLOW above or below the
-         pane, so the score moves out from under it rather than being covered;
-         the grips float over the pane's edges. The pane is the SCROLL
-         CONTAINER — the host gives the frame a height and the score scrolls
-         inside, so the grips sit on the pane's edges rather than the
-         document's. Bottom padding keeps the last system scrollable out from
-         under the playback grip. */
+         The frame is a column: the strips are IN FLOW above and below the
+         pane, so the score moves out from under them rather than being
+         covered; the mark floats over the pane's corner. The pane is the
+         SCROLL CONTAINER — the host gives the frame a height and the score
+         scrolls inside, so the mark sits on the pane's corner rather than the
+         document's. */
       .workspace { display: flex; flex: 1 1 auto; min-height: 0; min-width: 0; }
       .video-pane { display: flex; flex-direction: column; flex: none; min-width: 200px; overflow: auto; }
       .video-surface { width: 100%; height: var(--video-height); flex: 0 1 var(--video-height); min-height: 200px; }
@@ -195,120 +185,45 @@ export class ScoreFrame extends LitElement {
         position: absolute;
         inset: 0;
         overflow: auto;
-        box-sizing: border-box;
-        padding: 0 0 64px;
       }
 
-      :host([data-bottom]) .score {
-        padding-bottom: 0;
-      }
-
-      /* ── the grips ──
-         Pills on the edges, in the bar's ground with a hairline, squared on
-         the edge they hang from. */
-      .grip {
+      /* ── the focus mark ──
+         One toggle for both strips, on the pane's top-right corner over the
+         score, in the bar's ground with a hairline. Faded at rest so it reads
+         as a fixture rather than a control; full strength when the pointer
+         reaches it or the keyboard lands on it. 40px, so it is catchable on
+         glass, where there is no hover and it stays faded. */
+      .focus-mark {
         position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
+        top: 12px;
+        right: 28px;
         z-index: 3;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        max-width: calc(100% - 32px);
+        display: grid;
+        place-items: center;
+        width: 40px;
+        height: 40px;
+        padding: 0;
         box-sizing: border-box;
         background: var(--frame-bar);
         border: 1px solid var(--line);
-        backdrop-filter: blur(6px);
-        box-shadow: var(--grip-shadow);
-        cursor: pointer;
-        font: inherit;
-        color: inherit;
-        padding: 0;
-        text-align: left;
-      }
-
-      .grip.top {
-        top: 0;
-        height: 36px;
-        padding: 0 8px 0 14px;
-        border-top: 0;
-        border-radius: 0 0 var(--frame-radius) var(--frame-radius);
-      }
-
-      .grip.bottom {
-        bottom: 3px;
-        padding: 4px 6px 4px 4px;
-        border-bottom: 0;
-        border-radius: var(--frame-radius) var(--frame-radius) 0 0;
-      }
-
-      .grip .name {
-        font-weight: 600;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-
-      .grip .sub {
-        color: var(--ink-3);
-        font-size: 13px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-
-      .grip .chev {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 36px;
-        height: 44px;
-        color: var(--ink-3);
-        flex: none;
-      }
-
-      .grip.top .chev {
-        height: 36px;
-        width: 28px;
-      }
-
-      /* ── the transport's primary: pause/play on the accent ── */
-      .primary {
-        display: grid;
-        place-items: center;
-        width: 44px;
-        height: 44px;
-        flex: none;
-        background: var(--accent);
-        color: #fff;
-        border: 0;
         border-radius: var(--frame-radius);
+        backdrop-filter: blur(6px);
+        box-shadow: var(--frame-shadow);
+        color: var(--ink);
         cursor: pointer;
-        padding: 0;
+        opacity: 0.3;
+        transition: opacity 0.12s ease;
       }
 
-      .primary:disabled {
-        opacity: 0.4;
-        cursor: default;
+      .focus-mark:hover,
+      .focus-mark:focus-visible {
+        opacity: 1;
       }
 
-      .readout {
-        display: inline-grid;
-        font: 500 12px/1 var(--mono);
-        font-variant-numeric: tabular-nums;
-        white-space: nowrap;
-        margin: 0 6px;
-      }
-      .readout > span,
-      .place > span {
-        grid-area: 1 / 1;
-      }
-      .readout > .widest,
-      .place > .widest {
-        visibility: hidden;
-      }
-      .place {
-        display: inline-grid;
+      @media (prefers-reduced-motion: reduce) {
+        .focus-mark {
+          transition: none;
+        }
       }
 
       /* ── the progress line ── */
@@ -330,8 +245,8 @@ export class ScoreFrame extends LitElement {
       }
 
       /* ── the strips ──
-         Drawn out, each edge is the library's tools row: the bar's ground, a
-         hairline, blur; 40px controls. */
+         Each edge is the library's tools row: the bar's ground, a hairline,
+         blur; 40px controls. */
       .strip {
         position: relative;
         flex: none;
@@ -478,8 +393,7 @@ export class ScoreFrame extends LitElement {
       }
 
       .btn:focus-visible,
-      .grip:focus-visible,
-      .primary:focus-visible {
+      .focus-mark:focus-visible {
         outline: var(--rule-w) solid var(--focus-ring);
         outline-offset: 2px;
       }
@@ -560,10 +474,6 @@ export class ScoreFrame extends LitElement {
         padding: 0;
         border: 0;
       }
-
-      .strip.bottom .btn.ghost {
-        margin-top: 4px;
-      }
     `
   ];
 
@@ -572,13 +482,13 @@ export class ScoreFrame extends LitElement {
 
   private readonly onPlayback = (event: Event) => {
     const detail = (event as CustomEvent<PlaybackUpdate>).detail;
-    this.playing = detail.playing === true;
     this.videoOpen = this.player?.youtubeRegionVisible ?? false;
-    this.refreshReadout(detail.ordinal);
+    this.refreshProgress(detail.ordinal);
   };
 
   private readonly onVideo = (event: Event) => {
-    this.setBottom(true);
+    // The video's controls are the tray's: a video coming up brings the strips back.
+    this.setFocused(false);
     const region = (event as CustomEvent<{ mount?: Promise<HTMLElement> } | undefined>).detail;
     if (this.player) this.player.videoPaneHosted = true;
     this.videoOpen = this.player?.youtubeRegionVisible ?? false;
@@ -595,10 +505,10 @@ export class ScoreFrame extends LitElement {
 
   private readonly onPosition = () => {
     this.videoOpen = this.player?.youtubeRegionVisible ?? false;
-    this.refreshReadout(this.player?.scorePosition?.ordinal ?? null);
+    this.refreshProgress(this.player?.scorePosition?.ordinal ?? null);
   };
 
-  private readonly onPerformance = () => this.refreshReadout(null);
+  private readonly onPerformance = () => this.refreshProgress(null);
 
   connectedCallback() {
     super.connectedCallback();
@@ -623,55 +533,27 @@ export class ScoreFrame extends LitElement {
     super.disconnectedCallback();
   }
 
-  private refreshReadout(ordinal: number | null) {
-    const player = this.player;
-    const performance = player?.performance ?? null;
+  private refreshProgress(ordinal: number | null) {
+    const performance = this.player?.performance ?? null;
     this.hasPerformance = performance !== null;
-    if (!player || !performance) {
-      this.positionText = '';
-      this.placeText = '';
-      this.widestText = '';
-      this.widestPlace = '';
+    if (!performance) {
       this.progress = 0;
       return;
     }
-    const parts = player.positionParts;
-    this.placeText = parts ? placeLabel(parts) : '';
-    this.positionText = parts ? readoutSegments(parts).slice(1).join(' · ') : player.positionLabel;
-    this.widestText = widestPlaybackPosition(performance, player.document);
-    this.widestPlace = widestPlaceLabel(performance, player.document);
     const count = performance.measures.length;
     this.progress = ordinal === null || count === 0 ? 0 : Math.min(1, (ordinal + 0.5) / count);
   }
 
-  private togglePlay() {
-    const player = this.player;
-    if (!player) return;
-    if (this.playing) player.pause();
-    else {
-      if (player.playback?.kind === 'youtube') { this.setBottom(true); void this.updateComplete.then(() => player.play()); }
-      else void player.play();
-    }
-  }
+  // ── focus ───────────────────────────────────────────────────────────────
 
-  // ── the strips ──────────────────────────────────────────────────────────
-
-  private setTop(open: boolean) {
-    if (!open) this.pad = null;
-    if (this.topOpen === open) return;
-    this.topOpen = open;
-    this.emitStrip('top', open);
-  }
-
-  private setBottom(open: boolean) {
-    if (!open && this.player?.playback?.kind === 'youtube') this.player.pause();
-    if (this.bottomOpen === open) return;
-    this.bottomOpen = open;
-    this.emitStrip('bottom', open);
-  }
-
-  private emitStrip(strip: 'top' | 'bottom', open: boolean) {
-    this.dispatchEvent(new CustomEvent<StripChange>('strip-change', { detail: { strip, open }, bubbles: true, composed: true }));
+  private setFocused(focused: boolean) {
+    // The tray goes with the strips, and a YouTube video's controls with it:
+    // the video pauses rather than play on with its tray gone
+    // (docs/player-youtube.md); Play in the tray resumes it.
+    if (focused && this.player?.playback?.kind === 'youtube') this.player.pause();
+    if (this.focused === focused) return;
+    this.focused = focused;
+    this.dispatchEvent(new CustomEvent<boolean>('focus-change', { detail: focused, bubbles: true, composed: true }));
   }
 
   private togglePad(which: Exclude<Pad, null>) {
@@ -683,27 +565,21 @@ export class ScoreFrame extends LitElement {
     this.dispatchEvent(new CustomEvent('view-change', { detail: value, bubbles: true, composed: true }));
   }
 
-  protected updated() {
-    this.toggleAttribute('data-top', this.topOpen);
-    this.toggleAttribute('data-bottom', this.bottomOpen);
+  protected willUpdate(changed: PropertyValues<this>) {
+    // A pad hangs under the tools row; focusing takes the row and the pad with it.
+    if (changed.has('focused') && this.focused) this.pad = null;
   }
 
   private readonly onKeydown = (event: KeyboardEvent) => {
-    if (event.key !== 'Escape') return;
-    if (this.pad) {
-      this.pad = null;
-      event.stopPropagation();
-    } else if (this.topOpen || this.bottomOpen) {
-      this.setTop(false);
-      this.setBottom(false);
-      event.stopPropagation();
-    }
+    if (event.key !== 'Escape' || !this.pad) return;
+    this.pad = null;
+    event.stopPropagation();
   };
 
   private readonly onClickAway = (event: PointerEvent) => {
     // A pad closes when the pointer lands outside its button and card; the
-    // strips stay — they are closed by their chevrons or Escape, never by
-    // a tap on the score, which is navigation.
+    // strips stay — they go only with the mark, never with a tap on the
+    // score, which is navigation.
     if (!this.pad) return;
     const path = event.composedPath();
     const inside = path.some(node => node instanceof HTMLElement && node.classList.contains('anchor'));
@@ -713,7 +589,7 @@ export class ScoreFrame extends LitElement {
   protected firstUpdated() {
     this.renderRoot.addEventListener('keydown', this.onKeydown as EventListener);
     document.addEventListener('pointerdown', this.onClickAway);
-    this.refreshReadout(null);
+    this.refreshProgress(null);
   }
 
   // ── glyphs: the library page's round-capped strokes ─────────────────────
@@ -722,14 +598,9 @@ export class ScoreFrame extends LitElement {
     return svg`<svg width=${px} height=${px} viewBox="0 0 24 24" aria-hidden="true"><path d=${d} fill="none" stroke="currentColor" stroke-width=${w} stroke-linecap="round" stroke-linejoin="round"></path></svg>`;
   }
 
-  private static filled(d: string, px = 22) {
-    return svg`<svg width=${px} height=${px} viewBox="0 0 24 24" aria-hidden="true"><path d=${d} fill="currentColor"></path></svg>`;
-  }
-
-  private static get chevronDown() { return ScoreFrame.glyph('M6 9l6 6 6-6'); }
-  private static get chevronUp() { return ScoreFrame.glyph('M6 15l6-6 6 6'); }
-  private static get pause() { return ScoreFrame.filled('M7 5h3.5v14H7zM13.5 5H17v14h-3.5z'); }
-  private static get play() { return ScoreFrame.filled('M8 5l11 7-11 7z'); }
+  /** The mark: corners drawn outward to focus on the score, inward to come back. */
+  private static get focusIn() { return ScoreFrame.glyph('M8 3H3v5M16 3h5v5M21 16v5h-5M8 21H3v-5', 18); }
+  private static get focusOut() { return ScoreFrame.glyph('M3 8h5V3M21 8h-5V3M3 16h5v5M21 16h-5v5', 18); }
 
   /** The pads' own marks, so the buttons say what they open. */
   private static get crosshair() {
@@ -742,51 +613,16 @@ export class ScoreFrame extends LitElement {
 
   // ── render ──────────────────────────────────────────────────────────────
 
-  private primaryButton() {
+  private focusMark() {
+    const label = this.focused ? 'Show the tools and the player' : 'Focus on the score';
     return html`<button
-      class="primary"
+      class="focus-mark"
       type="button"
-      ?disabled=${!this.hasPerformance}
-      aria-label=${this.playing ? 'Pause' : 'Play'}
-      @click=${this.togglePlay}
-    >${this.playing ? ScoreFrame.pause : ScoreFrame.play}</button>`;
-  }
-
-  private topGrip() {
-    return html`<button
-      class="grip top"
-      type="button"
-      aria-expanded="false"
-      aria-label=${`${this.heading || 'Score'} — show the tools`}
-      @click=${() => this.setTop(true)}
-    >
-      <span class="name">${this.heading}</span>
-      ${this.subheading ? html`<span class="sub">${this.subheading}</span>` : nothing}
-      <span class="chev">${ScoreFrame.chevronDown}</span>
-    </button>`;
-  }
-
-  private bottomGrip() {
-    return html`<div class="grip bottom" role="group" aria-label="Playback">
-      ${this.primaryButton()}
-      ${this.positionText || this.placeText
-        ? html`<span class="readout"
-            ><span
-              >${this.placeText
-                ? html`<span class="place"><span>${this.placeText}</span><span class="widest" aria-hidden="true">${this.widestPlace}</span></span>`
-                : nothing}${this.placeText && this.positionText ? ' · ' : ''}${this.positionText}</span
-            ><span class="widest" aria-hidden="true">${this.widestText}</span></span
-          >`
-        : nothing}
-      <button
-        class="chev"
-        type="button"
-        style="background: none; border: 0; cursor: pointer; padding: 0;"
-        aria-expanded="false"
-        aria-label="Show the player"
-        @click=${() => this.setBottom(true)}
-      >${ScoreFrame.chevronUp}</button>
-    </div>`;
+      aria-pressed=${this.focused}
+      aria-label=${label}
+      title=${this.focusShortcut ? `${label} (${this.focusShortcut})` : label}
+      @click=${() => this.setFocused(!this.focused)}
+    >${this.focused ? ScoreFrame.focusOut : ScoreFrame.focusIn}</button>`;
   }
 
   private segmented() {
@@ -860,9 +696,6 @@ export class ScoreFrame extends LitElement {
       </div>
       <div class="end">
         <slot name="menu"></slot>
-        <button class="btn icon ghost" type="button" aria-label="Hide the tools" @click=${() => this.setTop(false)}>
-          ${ScoreFrame.chevronUp}
-        </button>
       </div>
     </div>`;
   }
@@ -870,15 +703,12 @@ export class ScoreFrame extends LitElement {
   private bottomStrip() {
     return html`<div class="strip bottom">
       <slot name="player"></slot>
-      <button class="btn icon ghost" type="button" aria-label="Hide the player" @click=${() => this.setBottom(false)}>
-        ${ScoreFrame.chevronDown}
-      </button>
     </div>`;
   }
 
   render() {
     return html`
-      ${this.topOpen ? this.topStrip() : nothing}
+      ${this.focused ? nothing : this.topStrip()}
       <div class="workspace">
         <aside class="video-pane" aria-label="YouTube video" ?hidden=${!this.videoOpen}
           style="width: ${this.videoWidth}px; --video-height: ${Math.max(200, this.videoWidth * 9 / 16)}px">
@@ -894,19 +724,18 @@ export class ScoreFrame extends LitElement {
           ?hidden=${!this.videoOpen} @pointerdown=${this.dragVideo} @keydown=${this.resizeVideoKey}></div>
       <div class="pane">
         <div class="score"><slot></slot></div>
-        ${this.topOpen ? nothing : this.topGrip()}
-        ${this.bottomOpen ? nothing : this.bottomGrip()}
-        ${this.hasPerformance && !this.bottomOpen
+        ${this.focusMark()}
+        ${this.hasPerformance && this.focused
           ? html`<div class="progress" aria-hidden="true"><div style="width: ${this.progress * 100}%"></div></div>`
           : nothing}
       </div>
       <slot name="side"></slot>
       </div>
-      ${this.bottomOpen ? this.bottomStrip() : nothing}
+      ${this.focused ? nothing : this.bottomStrip()}
       <!-- The player is the host's light-DOM child in both poses: unmounting
-           it would tear down its transport. Closed, it is parked here, out of
-           the flow, and the grip speaks for it. -->
-      ${this.bottomOpen ? nothing : html`<div hidden><slot name="player"></slot></div>`}
+           it would tear down its transport. Focused, it is parked here, out of
+           the flow, and the progress line speaks for it. -->
+      ${this.focused ? html`<div hidden><slot name="player"></slot></div>` : nothing}
     `;
   }
 }

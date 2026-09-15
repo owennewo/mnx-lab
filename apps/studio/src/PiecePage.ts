@@ -2,15 +2,16 @@
 // library's read route (a .gp for a Soundslice piece), converts it in the
 // importers' clean-room worker — the service stores the source, the reader
 // converts — and mounts it in the score frame: <mnx-document-viewer> filling
-// the pane, <mnx-player> in the frame's bottom grip, wired through the
+// the pane, <mnx-player> in the frame's bottom strip, wired through the
 // plain-DOM host binding the embed face exports. Nothing here edits or
 // persists anything except per-browser preferences (the staff view, the
 // display settings, zoom and spacing — the one persistence a shell may own
 // without a backend decision).
 //
-// The chrome is the frame's (roadmap/inprogress/core-score-frame.md): a title
-// grip and a playback grip on the pane's edges, drawn out into the library page's
-// tools row and the player's tray. This page supplies what the frame prints
+// The chrome is the frame's (roadmap/inprogress/core-score-frame.md): the
+// library page's tools row above the score and the player's tray below, hidden
+// and shown together by the focus mark on the pane's corner (one toggle since
+// 2026-09-15; the edge grips went). This page supplies what the frame prints
 // and stores what it changes. Trimmed 2026-09-13: the tools row carries the way
 // back, the title, Zoom, Settings, Tags and the theme toggle — the tag chips
 // went (the Tags sheet shows them), the staff view lives in Settings alone,
@@ -31,7 +32,6 @@ import { normalizeDisplayPreferences } from '../../../src/elements/displayDefaul
 import type { DocumentViewer, ViewMode, ViewSetting } from '../../../src/elements/DocumentViewer.ts';
 import type { RecordingSource } from '../../../src/audio/playbackBackend.ts';
 import type { Player } from '../../../src/elements/Player.ts';
-import type { StripChange } from '../../../src/elements/ScoreFrame.ts';
 import type { ZoomPadChange } from '../../../src/elements/ZoomPad.ts';
 import { libraryReturnHref, returnToLibrary } from './StudioApp.ts';
 import { nextTheme, readTheme, resolvedTheme, setTheme, themeGlyph, type ThemeSetting } from './theme.ts';
@@ -43,7 +43,7 @@ import { sourceGlyph } from './SourceSheet.ts';
 import type { TagsSnapshot } from './TagsSheet.ts';
 import type { InstrumentPart } from './InstrumentsSheet.ts';
 
-import { VIEW_KEY, DISPLAY_KEY, UNROLLED_KEY, STAFF_SCALE_KEY, DENSITY_H_KEY, SPACING_MODE_KEY, TOOLS_OPEN_KEY, PLAYER_OPEN_KEY, read, write, readView, readDisplay, readNumber, readParts, writeParts } from './scorePreferences.ts';
+import { VIEW_KEY, DISPLAY_KEY, UNROLLED_KEY, STAFF_SCALE_KEY, DENSITY_H_KEY, SPACING_MODE_KEY, FOCUSED_KEY, read, write, readView, readDisplay, readNumber, readFocused, readParts, writeParts } from './scorePreferences.ts';
 
 const back = html`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"></path></svg>`;
 /** Instruments: three faders, each knob at its own level. */
@@ -82,9 +82,8 @@ export class PiecePage extends LitElement {
   @state() private densityH: number | null = readNumber(DENSITY_H_KEY);
   @state() private spacingMode: 'natural' | 'fill' = read(SPACING_MODE_KEY) === 'natural' ? 'natural' : 'fill';
   @state() private effectiveStaffScale = 1;
-  /** The frame's strips as the reader last left them — a per-browser preference. */
-  @state() private toolsOpen = read(TOOLS_OPEN_KEY) === 'true';
-  @state() private playerOpen = read(PLAYER_OPEN_KEY) === 'true';
+  /** Whether the reader left the score focused (the frame's strips hidden) — a per-browser preference. */
+  @state() private focused = readFocused();
   @query('mnx-document-viewer') private viewer!: DocumentViewer;
   @query('mnx-player') private player!: Player;
   private binding: ReturnType<typeof bindPlayback> | null = null;
@@ -250,15 +249,9 @@ export class PiecePage extends LitElement {
   private onDisplayChange(event: CustomEvent<DisplayOptions>) {
     this.setDisplay(event.detail);
   }
-  private onStripChange(event: CustomEvent<StripChange>) {
-    const { strip, open } = event.detail;
-    if (strip === 'top') {
-      this.toolsOpen = open;
-      write(TOOLS_OPEN_KEY, String(open));
-    } else {
-      this.playerOpen = open;
-      write(PLAYER_OPEN_KEY, String(open));
-    }
+  private onFocusChange(event: CustomEvent<boolean>) {
+    this.focused = event.detail;
+    write(FOCUSED_KEY, String(this.focused));
   }
 
   private onUnrolledChange(event: CustomEvent<boolean>) {
@@ -353,9 +346,8 @@ export class PiecePage extends LitElement {
         .densitySteps=${this.densitySteps}
         .pads=${!!this.doc}
         .staffView=${false}
-        .topOpen=${this.toolsOpen}
-        .bottomOpen=${this.playerOpen}
-        @strip-change=${this.onStripChange}
+        .focused=${this.focused}
+        @focus-change=${this.onFocusChange}
         @view-change=${this.onViewChange}
         @display-change=${this.onDisplayChange}
         @unrolled-change=${this.onUnrolledChange}

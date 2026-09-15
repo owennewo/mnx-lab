@@ -114,16 +114,15 @@ const DUMP = `(() => {
   const page = appRoot?.querySelector('mnx-scenario-page');
   const pageRoot = page?.shadowRoot;
   const viewer = pageRoot?.querySelector('mnx-document-viewer');
-  // The score pane is the score frame (core-score-frame.md): the focus button
-  // is in its top strip, the pads hang pinned under the strip's buttons, and
-  // the grips stay on the pane's edges in every mode.
+  // The score pane is the score frame (core-score-frame.md): its focus mark
+  // on the pane's corner IS document focus here, the strips go with it, and
+  // the pads hang pinned under the tools row's buttons.
   const frame = pageRoot?.querySelector('mnx-score-frame');
   const frameRoot = frame?.shadowRoot;
-  const gripTop = frameRoot?.querySelector('.grip.top');
-  const gripBottom = frameRoot?.querySelector('.grip.bottom');
   const stripTop = frameRoot?.querySelector('.strip.top');
+  const stripBottom = frameRoot?.querySelector('.strip.bottom');
   const score = frameRoot?.querySelector('.score');
-  const focusButton = pageRoot?.querySelector('button[slot=actions]');
+  const focusButton = frameRoot?.querySelector('.focus-mark');
   const zoomPad = frameRoot?.querySelector('mnx-zoom-pad');
   const zoomRoot = zoomPad?.shadowRoot;
   const zoomFocus = zoomRoot?.querySelector('.focus-toggle');
@@ -153,11 +152,12 @@ const DUMP = `(() => {
     frame: !!frame,
     frameRect: rect(frame),
     scoreRect: rect(score),
-    gripTopRect: rect(gripTop),
-    gripBottomRect: rect(gripBottom),
-    stripOpen: !!stripTop,
+    strips: !!stripTop && !!stripBottom,
+    anyStrip: !!stripTop || !!stripBottom,
     focusButton: !!focusButton,
-    focusLabel: focusButton?.textContent.trim() ?? null,
+    focusRect: rect(focusButton),
+    focusOpacity: focusButton ? Number(getComputedStyle(focusButton).opacity) : null,
+    focusLabel: focusButton?.getAttribute('aria-label') ?? null,
     focusPressed: focusButton?.getAttribute('aria-pressed') ?? null,
     zoom: !!zoomPad,
     zoomPinned: zoomPad?.hasAttribute('pinned') ?? false,
@@ -237,17 +237,11 @@ try {
   const FRAME =
     "document.querySelector('mnx-workbench').shadowRoot" +
     ".querySelector('mnx-scenario-page').shadowRoot";
-  const drawOutTop = async () => {
-    await cdp.evaluate(`${FRAME}.querySelector('mnx-score-frame').shadowRoot.querySelector('.grip.top')?.click()`);
-    await new Promise(resolve => setTimeout(resolve, 300));
-  };
   const clickFrameFocus = async () => {
-    await drawOutTop();
-    await cdp.evaluate(`${FRAME}.querySelector('button[slot=actions]').click()`);
+    await cdp.evaluate(`${FRAME}.querySelector('mnx-score-frame').shadowRoot.querySelector('.focus-mark').click()`);
     await new Promise(resolve => setTimeout(resolve, 400));
   };
   const openZoom = async () => {
-    await drawOutTop();
     await cdp.evaluate(
       `[...${FRAME}.querySelector('mnx-score-frame').shadowRoot.querySelectorAll('.strip.top .btn')]` +
         ".find(b => b.textContent.includes('Zoom')).click()"
@@ -269,9 +263,14 @@ try {
     'the workbench supplies the scenario name as the document heading fallback'
   );
   check(state.frame, 'the scenario page mounts the score frame');
+  check(state.strips, 'at rest the frame shows both strips — the tools row and the tray');
   check(
-    state.gripTopRect?.height > 0 && state.gripBottomRect?.height >= 44 && !state.stripOpen,
-    'at rest the frame shows its two grips and no strip'
+    state.focusButton && state.focusPressed === 'false' && state.focusOpacity < 0.5,
+    'the focus mark sits on the pane, faded, not pressed'
+  );
+  check(
+    state.focusRect && state.focusRect.y < 120 && state.focusRect.x + state.focusRect.width > state.viewport.width - 80,
+    'the focus mark is at the top right of the pane'
   );
   check(
     state.focusItems.some(item => item.hint === 'Ctrl+Alt+F'),
@@ -284,18 +283,20 @@ try {
   );
   check(state.fullscreenStateMatches, 'fullscreenchange state mirrors the browser-owned element');
 
-  // The focus button lives in the frame's top strip (2026-09-12), beside Zoom
-  // and Settings — the one focus button, in normal mode and inside focus alike.
-  await drawOutTop();
-  state = await dump();
-  check(state.stripOpen && state.focusButton && state.focusLabel === 'Focus', 'the drawn-out top strip exposes the document-focus button');
+  // The frame's focus mark (2026-09-15) is the one focus control, in normal
+  // mode and inside focus alike; it took over from the strip's Focus button.
+  check(state.focusLabel === 'Focus on the score', 'the mark offers to focus on the score');
   await clickFrameFocus();
   state = await dump();
-  check(state.appFocus && state.pageFocus, 'the strip\'s focus button enters document focus');
-  check(state.focusLabel === 'Unfocus' && state.focusPressed === 'true', 'inside focus the same button reads Unfocus, pressed');
+  check(state.appFocus && state.pageFocus, 'the mark enters document focus');
+  check(!state.anyStrip, 'focusing takes both strips away');
+  check(
+    state.focusLabel === 'Show the tools and the player' && state.focusPressed === 'true',
+    'inside focus the same mark offers the way back, pressed'
+  );
   await focusKey();
   state = await dump();
-  check(!state.appFocus, 'Ctrl+Alt+F exits focus entered through the button');
+  check(!state.appFocus && state.strips, 'Ctrl+Alt+F exits focus entered through the mark, and the strips return');
 
   await focusKey();
   state = await dump();
@@ -305,26 +306,22 @@ try {
     'focus mode removes the shell panes but retains the score frame'
   );
   check(
-    state.gripBottomRect?.height >= 44 && state.gripBottomRect.y + state.gripBottomRect.height <= state.viewport.height + 1,
-    'the playback grip stays on the bottom edge in focus mode'
+    !state.anyStrip && state.focusRect?.height >= 40 && state.focusRect.x + state.focusRect.width <= state.viewport.width + 1,
+    'focus mode keeps its way out on screen — the mark, on the pane\'s corner'
   );
-  check(
-    state.stripOpen ? state.focusLabel === 'Unfocus' : state.gripTopRect?.height > 0,
-    'focus mode keeps its way out on screen — the strip\'s Unfocus, or the grip that draws it'
-  );
+  await clickFrameFocus();
+  state = await dump();
+  check(!state.appFocus && state.strips, 'the mark leaves document focus');
   await openZoom();
   state = await dump();
-  check(state.zoom && state.zoomPinned, 'Zoom in the strip hangs the pad pinned under its button');
+  check(state.zoom && state.zoomPinned, 'Zoom in the tools row hangs the pad pinned under its button');
   check(
-    state.zoomFocusLabel === 'Exit document focus' && state.zoomFocusPressed === 'true',
-    'the pinned zoom pad still carries its state-aware exit from document focus'
+    state.zoomFocusLabel === 'Focus document' && state.zoomFocusPressed === 'false',
+    'the pinned zoom pad still carries its state-aware document-focus toggle'
   );
   await clickZoomFocus();
   state = await dump();
-  check(!state.appFocus, 'the zoom-pad control exits document focus without the shortcut');
-  await clickFrameFocus();
-  state = await dump();
-  check(state.appFocus && state.focusLabel === 'Unfocus', 'the strip\'s button re-enters document focus');
+  check(state.appFocus && !state.zoom, 'the zoom-pad control enters document focus, and the pad goes with the tools row');
   check(
     state.railPreference === '1' && state.panelPreference === '1',
     'entering focus mode does not mutate remembered pane preferences'
@@ -334,11 +331,7 @@ try {
     JSON.stringify({ viewport: state.viewport, main: state.mainRect, page: state.pageRect,
       pageMain: state.pageMainRect, frame: state.frameRect, viewer: state.viewerRect, viewBox: state.viewBox })
   );
-  // The strip is in flow above the pane, so with it drawn out the frame — not
-  // the viewer — is what fills the viewport; put it away for the geometry check.
-  await cdp.evaluate(`${FRAME}.querySelector('mnx-score-frame').shadowRoot.querySelector('.strip.top .btn.ghost').click()`);
-  await new Promise(resolve => setTimeout(resolve, 400));
-  state = await dump();
+  // Focused, the strips are gone, so the pane — not just the frame — fills the viewport.
   for (const [name, rect] of [
     ['app', state.appRect],
     ['shell main', state.mainRect],

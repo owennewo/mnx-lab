@@ -1,6 +1,6 @@
 // The studio shell: fullscreen by default — the score is the page. On a piece
 // the page IS the score frame (roadmap/inprogress/core-score-frame.md): the
-// frame's own grips carry the title, the way back, the tools and the player,
+// frame's own strips carry the title, the way back, the tools and the player,
 // so the shell's header is for the other pages only. Nothing fades on a timer
 // any more — a tap never restarted it. Three hash routes
 // (roadmap/inprogress/studio-shell.md):

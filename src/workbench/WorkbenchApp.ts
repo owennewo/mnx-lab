@@ -197,9 +197,10 @@ export class WorkbenchApp extends LitElement {
     this.setDocumentFocus(!this.documentFocus);
   }
 
-  /** The zoom cluster's focus button emits this from inside AND outside
-   *  focus mode, so one event is an honest toggle. (The page head's duplicate
-   *  button retired with the head, 2026-09-01.) */
+  /** The score frame's focus mark and the zoom pad's footer toggle emit this
+   *  from inside AND outside focus mode, so one event is an honest toggle.
+   *  (The page head's duplicate button retired with the head, 2026-09-01; the
+   *  frame's strip button became the frame's own mark, 2026-09-15.) */
   private requestDocumentFocus = () => this.toggleDocumentFocus();
 
   private toggleRailFromShell() {
@@ -602,9 +603,11 @@ export class WorkbenchApp extends LitElement {
         min-height: 0;
       }
 
+      /* Under the score frame's focus mark (top 12px, 40px tall, at the
+         pane's right), which in document focus is the pane's corner too. */
       .focus-hint {
         position: fixed;
-        top: 14px;
+        top: 64px;
         right: 14px;
         z-index: 100;
         pointer-events: none;

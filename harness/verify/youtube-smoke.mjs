@@ -111,8 +111,10 @@ try{
  const mobile=await c.evaluate(`(()=>{const b=test.frame.shadowRoot.querySelector('iframe').getBoundingClientRect();return {width:b.width,height:b.height,bottom:b.bottom};})()`);
  if(mobile.width<200||mobile.width>270||mobile.height<200||mobile.bottom>800)throw new Error('Invalid narrow viewport '+JSON.stringify(mobile));
  await c.evaluate(`test.player.play()`);await wait(`test.player.playback.state==='playing'`);
- await c.evaluate(`test.frame.shadowRoot.querySelector('[aria-label="Hide the player"]').click()`);await wait(`!test.player.playback.wantsPlayback`);
- await c.evaluate(`test.frame.shadowRoot.querySelector('.grip.bottom .primary').click()`);await wait(`test.frame.bottomOpen && test.player.playback.state==='playing'`);
+ // Focusing the score takes the tray away and pauses the video; the mark brings the tray back and Play resumes.
+ await c.evaluate(`test.frame.shadowRoot.querySelector('.focus-mark').click()`);await wait(`test.frame.focused && !test.frame.shadowRoot.querySelector('.strip.bottom') && !test.player.playback.wantsPlayback`);
+ await c.evaluate(`test.frame.shadowRoot.querySelector('.focus-mark').click()`);await wait(`!test.frame.focused && !!test.frame.shadowRoot.querySelector('.strip.bottom')`);
+ await c.evaluate(`test.player.play()`);await wait(`test.player.playback.state==='playing'`);
  if(!live){
   const tab=await c.send('Target.createTarget',{url:'about:blank'});await wait(`!test.player.playback.wantsPlayback`);
   await c.send('Page.bringToFront');await c.send('Target.closeTarget',{targetId:tab.result.targetId});

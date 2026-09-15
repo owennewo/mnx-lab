@@ -11,9 +11,8 @@ export const UNROLLED_KEY = 'mnx-studio.unrolled';
 export const STAFF_SCALE_KEY = 'mnx-studio.staff-scale';
 export const DENSITY_H_KEY = 'mnx-studio.density-h';
 export const SPACING_MODE_KEY = 'mnx-studio.spacing-mode';
-/** The score frame's strips: whether the tools row / the player tray was left drawn out. */
-export const TOOLS_OPEN_KEY = 'mnx-studio.tools-open';
-export const PLAYER_OPEN_KEY = 'mnx-studio.player-open';
+/** The score frame: whether the reader left the score focused, its strips hidden. */
+export const FOCUSED_KEY = 'mnx-studio.focused';
 export const VIEWS: ViewSetting[] = ['auto', 'notation', 'tab', 'both'];
 
 export function read(key: string): string | null {
@@ -30,6 +29,13 @@ export function readDisplay(): DisplayOptions {
   try {
     return normalizeDisplayPreferences(JSON.parse(read(DISPLAY_KEY) ?? '{}'));
   } catch { return { ...DEFAULT_DISPLAY_PREFERENCES }; }
+}
+export function readFocused(): boolean {
+  // The strips' own keys (each drawn out on its own) retired with the edge
+  // grips, 2026-09-15; a browser that still carries them is tidied here.
+  write('mnx-studio.tools-open', null);
+  write('mnx-studio.player-open', null);
+  return read(FOCUSED_KEY) === 'true';
 }
 export function readNumber(key: string): number | null {
   const raw = read(key);

@@ -1,6 +1,6 @@
 # Score frame — edge grips for play, zoom and settings, one element for both shells
 
-> **Status: started 2026-09-11; phases 1–4 built 2026-09-12, phase 5 open.** Implementation loop. Serves studio first
+> **Status: started 2026-09-11; phases 1–4 built 2026-09-12, phase 5 open; grips retired for one focus mark 2026-09-15.** Implementation loop. Serves studio first
 > (the piece page has no zoom or settings at all, and its player dock fades on a pointer
 > timer that touch never restarts) and the workbench second (the same element replaces its
 > corner cluster and moves the player out of the side panel). Design locked on the
@@ -54,6 +54,13 @@ line along the bottom edge. Nothing on the page listens for a tap to show chrome
   *2026-09-14:* the source left the tray again — a **Source · <what plays>** button in the
   row opens studio's Source sheet in the frame's `side` slot (beside Instruments), where
   recordings are chosen, edited and added; studio's player sets `sourceControl = false`.
+- **Revised 2026-09-15: the grips went.** The two strips no longer have a reduced form
+  or an open/closed state of their own. One **focus mark** on the pane's top-right
+  corner — the corner-bracket glyph the zoom pad's footer already used, faded until the
+  pointer reaches it — hides and shows the tools row and the tray together (`focused`
+  property, `focus-change` event; studio remembers it as `mnx-studio.focused`, the
+  workbench binds it to document focus so the strip's Focus button is gone too). Focused,
+  the score has only the progress line and the mark; the tap-on-score rule is unchanged.
 
 ## Phases
 
@@ -98,3 +105,8 @@ restyling the pads; dark theme work beyond what `light-dark()` already gives the
   staff view, tray), `focus-mode-smoke.mjs` (rewritten to the frame),
   `player-workbench-smoke.mjs`. Phase 5 (tap a bar to seek) is open — the viewer has no
   measure hit-test yet.
+- 2026-09-15 — **the grips retired** for the one focus mark (above): `ScoreFrame.ts` lost
+  its grips, chevrons, readout and play button; `topOpen`/`bottomOpen`/`strip-change`
+  became `focused`/`focus-change`; studio's two strip keys became one; the workbench's
+  strip Focus button went. `focus-mode-smoke.mjs`, `studio-smoke.mjs` and
+  `youtube-smoke.mjs` rewritten to the mark.
