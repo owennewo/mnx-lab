@@ -97,38 +97,53 @@ export interface RenderSvgOptions {
   onSourceClick?: (sourceId: string, event: MouseEvent) => void;
 }
 
-export function renderSvg(opts: RenderSvgOptions): SVGSVGElement {
-  const {
-    container,
-    primitives,
-    widthSp,
-    heightSp,
-    pxPerSp,
-    viewBoxSp,
-    className,
-    onSourceActivate,
-    onSourceClick
-  } = opts;
-  const pxPerSpY = opts.pxPerSpY ?? pxPerSp;
+/**
+ * The markup for a render, as one string.
+ *
+ * The emitter builds text rather than DOM nodes because that is what the
+ * browser parses fastest: on a 61-bar score `createElementNS` + seven
+ * `setAttribute`s per primitive measured ~330ms for 6,345 nodes, where the
+ * same markup through `innerHTML` parses in ~170ms
+ * (roadmap/inprogress/core-touch-gestures.md, *Performance, measured*).
+ * It is also what the goldens are: `harness/helpers/svgString.ts` used to
+ * fake the DOM slice the old emitter touched and serialise the result, and
+ * this is that serialisation, byte for byte — attributes in the order they
+ * were set, `String(number)` for every number, `&<>"` escaped.
+ */
+export interface SvgMarkupOptions {
+  primitives: readonly Primitive[];
+  widthSp: number;
+  heightSp: number;
+  pxPerSp: number;
+  pxPerSpY?: number;
+  viewBoxSp?: { x: number; y: number; w: number; h: number };
+  className?: string;
+  /** Declare the namespace on the root — a standalone SVG file needs it;
+   *  markup parsed into an HTML document does not. */
+  xmlns?: boolean;
+}
 
-  container.innerHTML = '';
+export function renderSvgMarkup(opts: SvgMarkupOptions): string {
+  const { primitives, widthSp, heightSp, pxPerSp, viewBoxSp, className } = opts;
+  const pxPerSpY = opts.pxPerSpY ?? pxPerSp;
 
   const view = viewBoxSp ?? { x: 0, y: 0, w: widthSp, h: heightSp };
   const widthPx = view.w * pxPerSp;
   const heightPx = view.h * pxPerSpY;
 
-  const svg = el('svg', {
-    width: widthPx,
-    height: heightPx,
-    viewBox: `${view.x * pxPerSp} ${view.y * pxPerSpY} ${widthPx} ${heightPx}`
-  }) as SVGSVGElement;
-  if (className) svg.setAttribute('class', className);
+  let out = `<svg width="${widthPx}" height="${heightPx}" viewBox="${view.x * pxPerSp} ${view.y * pxPerSpY} ${widthPx} ${heightPx}"`;
+  if (className) out += ` class="${escapeXml(className)}"`;
+  if (opts.xmlns) out += ` xmlns="${SVG_NS}"`;
+  out += '>';
+  for (const p of primitives) out += emitPrimitive(p, pxPerSp, pxPerSpY);
+  return out + '</svg>';
+}
 
-  for (const p of primitives) {
-    const node = emitPrimitive(p, pxPerSp, pxPerSpY);
-    if (p.opacity !== undefined) node.setAttribute('opacity', String(p.opacity));
-    svg.appendChild(node);
-  }
+export function renderSvg(opts: RenderSvgOptions): SVGSVGElement {
+  const { container, onSourceActivate, onSourceClick } = opts;
+
+  container.innerHTML = renderSvgMarkup(opts);
+  const svg = container.firstElementChild as SVGSVGElement;
 
   if (onSourceActivate) {
     let pointerSource: string | null = null;
@@ -161,28 +176,42 @@ export function renderSvg(opts: RenderSvgOptions): SVGSVGElement {
     });
   }
 
-  container.appendChild(svg);
   return svg;
 }
 
 // ---------- Per-primitive emit ----------
 
-function emitPrimitive(p: Primitive, kx: number, ky: number): SVGElement {
-  const node = (() => {
-    switch (p.kind) {
-      case 'glyph': return emitGlyph(p, kx, ky);
-      case 'line':  return emitLine(p, kx, ky);
-      case 'curve': return emitCurve(p, kx, ky);
-      case 'text':  return emitText(p, kx, ky);
-      case 'rect':  return emitRect(p, kx, ky);
-    }
-  })();
-  if (p.title) {
-    const title = el('title', {});
-    title.textContent = p.title;
-    node.appendChild(title);
+/** One element: the tag, its attributes in order, its text, an optional
+ *  `<title>` child, and — last, as the old emitter set it last — opacity. */
+function element(
+  name: string,
+  attrs: string,
+  text: string,
+  p: Primitive
+): string {
+  const title = p.title ? `<title>${escapeXml(p.title)}</title>` : '';
+  const opacity = p.opacity !== undefined ? ` opacity="${p.opacity}"` : '';
+  return `<${name}${attrs}${opacity}>${text}${title}</${name}>`;
+}
+
+/** The identity attributes every primitive may carry, in the order the old
+ *  emitter set them. */
+function identity(p: Primitive): string {
+  let out = '';
+  if (p.className) out += ` class="${escapeXml(p.className)}"`;
+  if (p.sourceId) out += ` data-source-id="${escapeXml(p.sourceId)}"`;
+  if (p.writtenSourceId !== undefined) out += ` data-written-source-id="${escapeXml(p.writtenSourceId)}"`;
+  return out;
+}
+
+function emitPrimitive(p: Primitive, kx: number, ky: number): string {
+  switch (p.kind) {
+    case 'glyph': return emitGlyph(p, kx, ky);
+    case 'line':  return emitLine(p, kx, ky);
+    case 'curve': return emitCurve(p, kx, ky);
+    case 'text':  return emitText(p, kx, ky);
+    case 'rect':  return emitRect(p, kx, ky);
   }
-  return node;
 }
 
 /**
@@ -199,60 +228,41 @@ function drawnX(x: number, dx: number | undefined, kx: number, ky: number): numb
   return dx === undefined ? x * kx : (x + dx * (ky / kx)) * kx;
 }
 
-function emitGlyph(p: GlyphPrim, kx: number, ky: number): SVGElement {
-  const node = el('text', {
+function emitGlyph(p: GlyphPrim, kx: number, ky: number): string {
+  const attrs =
     // Position on the horizontal scale, ink offset on the vertical one — the
     // two currencies of `PrimitiveBase`.
-    x: drawnX(p.x, p.dx, kx, ky),
-    y: p.y * ky,
-    'font-family': FONT_FAMILY_MUSIC,
-    'font-size': 4 * ky * (p.scale ?? 1),
-    'text-anchor': p.anchor ?? 'start',
-    'dominant-baseline': p.baseline ?? 'alphabetic',
-    fill: p.fill ?? 'currentColor'
-  });
-  if (p.className) node.setAttribute('class', p.className);
-  if (p.sourceId) node.setAttribute('data-source-id', p.sourceId);
-  if (p.writtenSourceId !== undefined) node.setAttribute('data-written-source-id', p.writtenSourceId);
-  node.textContent = glyphCodepoint(p.glyph);
-  return node;
+    ` x="${drawnX(p.x, p.dx, kx, ky)}" y="${p.y * ky}"` +
+    ` font-family="${FONT_FAMILY_MUSIC}" font-size="${4 * ky * (p.scale ?? 1)}"` +
+    ` text-anchor="${p.anchor ?? 'start'}" dominant-baseline="${p.baseline ?? 'alphabetic'}"` +
+    ` fill="${escapeXml(p.fill ?? 'currentColor')}"` +
+    identity(p);
+  return element('text', attrs, glyphCodepoint(p.glyph), p);
 }
 
-function emitLine(p: LinePrim, kx: number, ky: number): SVGElement {
-  const node = el('line', {
-    x1: drawnX(p.x1, p.dx1, kx, ky),
-    y1: p.y1 * ky,
-    x2: drawnX(p.x2, p.dx2, kx, ky),
-    y2: p.y2 * ky,
-    stroke: p.stroke ?? 'currentColor',
-    'stroke-width': inkWidth(p.thickness, ky)
-  });
-  if (p.dash) node.setAttribute('stroke-dasharray', `${p.dash * ky},${p.dash * ky}`);
-  if (p.className) node.setAttribute('class', p.className);
-  if (p.sourceId) node.setAttribute('data-source-id', p.sourceId);
-  if (p.writtenSourceId !== undefined) node.setAttribute('data-written-source-id', p.writtenSourceId);
-  return node;
+function emitLine(p: LinePrim, kx: number, ky: number): string {
+  let attrs =
+    ` x1="${drawnX(p.x1, p.dx1, kx, ky)}" y1="${p.y1 * ky}"` +
+    ` x2="${drawnX(p.x2, p.dx2, kx, ky)}" y2="${p.y2 * ky}"` +
+    ` stroke="${escapeXml(p.stroke ?? 'currentColor')}" stroke-width="${inkWidth(p.thickness, ky)}"`;
+  if (p.dash) attrs += ` stroke-dasharray="${p.dash * ky},${p.dash * ky}"`;
+  return element('line', attrs + identity(p), '', p);
 }
 
 /** Endpoint width of tapered curves (Bravura's slur/tie endpoint default). */
 const CURVE_END_THICKNESS_SP = 0.1;
 
-function emitCurve(p: CurvePrim, kx: number, ky: number): SVGElement {
+function emitCurve(p: CurvePrim, kx: number, ky: number): string {
   const [p0, p1, p2, p3] = p.points;
   const X = (pt: Point) => pt.x * kx;
   const Y = (pt: Point) => pt.y * ky;
+  const stroke = escapeXml(p.stroke ?? 'currentColor');
   if (!p.taper) {
     const d = `M ${X(p0)} ${Y(p0)} C ${X(p1)} ${Y(p1)}, ${X(p2)} ${Y(p2)}, ${X(p3)} ${Y(p3)}`;
-    const node = el('path', {
-      d,
-      fill: 'none',
-      stroke: p.stroke ?? 'currentColor',
-      'stroke-width': inkWidth(p.thickness, ky)
-    });
-    if (p.className) node.setAttribute('class', p.className);
-    if (p.sourceId) node.setAttribute('data-source-id', p.sourceId);
-  if (p.writtenSourceId !== undefined) node.setAttribute('data-written-source-id', p.writtenSourceId);
-    return node;
+    const attrs =
+      ` d="${d}" fill="none" stroke="${stroke}" stroke-width="${inkWidth(p.thickness, ky)}"` +
+      identity(p);
+    return element('path', attrs, '', p);
   }
 
   // Tapered body: fill between the spine's control points shifted to either
@@ -273,71 +283,46 @@ function emitCurve(p: CurvePrim, kx: number, ky: number): SVGElement {
   const d =
     `M ${X(p0)} ${Y(p0)} C ${c(p1, 1)}, ${c(p2, 1)}, ${X(p3)} ${Y(p3)} ` +
     `C ${c(p2, -1)}, ${c(p1, -1)}, ${X(p0)} ${Y(p0)} Z`;
-  const node = el('path', {
-    d,
-    fill: p.stroke ?? 'currentColor',
-    stroke: p.stroke ?? 'currentColor',
-    'stroke-width': inkWidth(CURVE_END_THICKNESS_SP, ky),
-    'stroke-linejoin': 'round'
-  });
-  if (p.className) node.setAttribute('class', p.className);
-  if (p.sourceId) node.setAttribute('data-source-id', p.sourceId);
-  if (p.writtenSourceId !== undefined) node.setAttribute('data-written-source-id', p.writtenSourceId);
-  return node;
+  const attrs =
+    ` d="${d}" fill="${stroke}" stroke="${stroke}"` +
+    ` stroke-width="${inkWidth(CURVE_END_THICKNESS_SP, ky)}" stroke-linejoin="round"` +
+    identity(p);
+  return element('path', attrs, '', p);
 }
 
-function emitText(p: TextPrim, kx: number, ky: number): SVGElement {
+function emitText(p: TextPrim, kx: number, ky: number): string {
   const family = p.font === 'bodyItalic' ? FONT_FAMILY_BODY : FONT_FAMILY_BODY;
-  const node = el('text', {
-    x: drawnX(p.x, p.dx, kx, ky),
-    y: p.y * ky,
-    'font-family': family,
-    'font-size': p.size * ky,
-    'text-anchor': p.anchor ?? 'start',
-    'dominant-baseline': p.baseline ?? 'alphabetic',
-    fill: p.fill ?? 'currentColor'
-  });
-  if (p.font === 'bodyItalic') node.setAttribute('font-style', 'italic');
-  if (p.weight !== undefined) node.setAttribute('font-weight', String(p.weight));
-  if (p.className) node.setAttribute('class', p.className);
-  if (p.sourceId) node.setAttribute('data-source-id', p.sourceId);
-  if (p.writtenSourceId !== undefined) node.setAttribute('data-written-source-id', p.writtenSourceId);
-  node.textContent = p.text;
-  return node;
+  let attrs =
+    ` x="${drawnX(p.x, p.dx, kx, ky)}" y="${p.y * ky}"` +
+    ` font-family="${escapeXml(family)}" font-size="${p.size * ky}"` +
+    ` text-anchor="${p.anchor ?? 'start'}" dominant-baseline="${p.baseline ?? 'alphabetic'}"` +
+    ` fill="${escapeXml(p.fill ?? 'currentColor')}"`;
+  if (p.font === 'bodyItalic') attrs += ` font-style="italic"`;
+  if (p.weight !== undefined) attrs += ` font-weight="${p.weight}"`;
+  return element('text', attrs + identity(p), escapeXml(p.text), p);
 }
 
-function emitRect(p: RectPrim, kx: number, ky: number): SVGElement {
-  const attrs: Record<string, string | number> = {
-    x: drawnX(p.x, p.dx, kx, ky),
-    y: p.y * ky,
-    width: p.w * (p.spanW ? kx : ky),
-    height: p.h * ky,
-    fill: p.fill ?? 'none'
-  };
-  if (p.radius !== undefined) {
-    attrs.rx = p.radius * ky;
-    attrs.ry = p.radius * ky;
-  }
-  if (p.spanEndX !== undefined) attrs['data-span-end'] = drawnX(p.spanEndX, p.spanEndDx, kx, ky);
+function emitRect(p: RectPrim, kx: number, ky: number): string {
+  let attrs =
+    ` x="${drawnX(p.x, p.dx, kx, ky)}" y="${p.y * ky}"` +
+    ` width="${p.w * (p.spanW ? kx : ky)}" height="${p.h * ky}"` +
+    ` fill="${escapeXml(p.fill ?? 'none')}"`;
+  if (p.radius !== undefined) attrs += ` rx="${p.radius * ky}" ry="${p.radius * ky}"`;
+  if (p.spanEndX !== undefined) attrs += ` data-span-end="${drawnX(p.spanEndX, p.spanEndDx, kx, ky)}"`;
   if (p.stroke) {
-    attrs.stroke = p.stroke;
     // A zero thickness means "no border" and stays that way — the floor
     // makes a hairline legible, it does not invent one.
-    attrs['stroke-width'] = p.thickness ? inkWidth(p.thickness, ky) : 0;
+    attrs += ` stroke="${escapeXml(p.stroke)}" stroke-width="${p.thickness ? inkWidth(p.thickness, ky) : 0}"`;
   }
-  const node = el('rect', attrs);
-  if (p.className) node.setAttribute('class', p.className);
-  if (p.sourceId) node.setAttribute('data-source-id', p.sourceId);
-  if (p.writtenSourceId !== undefined) node.setAttribute('data-written-source-id', p.writtenSourceId);
-  return node;
+  return element('rect', attrs + identity(p), '', p);
 }
 
-// ---------- DOM helper ----------
+// ---------- Text helper ----------
 
-function el(name: string, attrs: Record<string, string | number>): SVGElement {
-  const e = document.createElementNS(SVG_NS, name) as SVGElement;
-  for (const [k, v] of Object.entries(attrs)) {
-    e.setAttribute(k, String(v));
-  }
-  return e;
+/** The four characters markup cannot carry literally — the same four the
+ *  golden serialiser escaped, so goldens and browser markup agree. */
+function escapeXml(s: string): string {
+  return s.replace(/[&<>"]/g, ch =>
+    ch === '&' ? '&amp;' : ch === '<' ? '&lt;' : ch === '>' ? '&gt;' : '&quot;'
+  );
 }

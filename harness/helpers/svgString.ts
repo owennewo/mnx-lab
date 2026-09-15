@@ -1,47 +1,9 @@
-// Runs the real SVG emitter (src/engine/render/svg.ts) in Node by faking the tiny
-// slice of DOM it touches, then serializes the result to a string. Using the
-// real emitter means previews can't drift from what the browser renders.
-import { renderSvg } from '../../src/engine/render/svg.ts';
+// The SVG goldens: the real emitter's markup (src/engine/render/svg.ts), as a
+// standalone document. The emitter builds text, so there is nothing to fake —
+// this used to shim the DOM slice a node-building emitter touched and serialise
+// the result, and the emitter now IS that serialisation, byte for byte.
+import { renderSvgMarkup } from '../../src/engine/render/svg.ts';
 import type { Primitive } from '../../src/engine/primitives.ts';
-
-class FakeElement {
-  name: string;
-  attrs: [string, string][] = [];
-  children: FakeElement[] = [];
-  textContent = '';
-  innerHTML = '';
-
-  constructor(name: string) {
-    this.name = name;
-  }
-
-  setAttribute(key: string, value: string) {
-    this.attrs.push([key, String(value)]);
-  }
-
-  appendChild(child: FakeElement) {
-    this.children.push(child);
-    return child;
-  }
-
-  addEventListener() {
-    // renderSvg only registers listeners when an activation callback is passed; inert here.
-  }
-
-  serialize(): string {
-    const attrs = this.attrs.map(([k, v]) => ` ${k}="${escapeXml(v)}"`).join('');
-    // Text content and element children can coexist (e.g. a <text> node
-    // carrying a <title> tooltip child).
-    const body = escapeXml(this.textContent) + this.children.map(c => c.serialize()).join('');
-    return `<${this.name}${attrs}>${body}</${this.name}>`;
-  }
-}
-
-function escapeXml(s: string): string {
-  return s.replace(/[&<>"]/g, ch =>
-    ch === '&' ? '&amp;' : ch === '<' ? '&lt;' : ch === '>' ? '&gt;' : '&quot;'
-  );
-}
 
 export interface SvgStringOptions {
   primitives: readonly Primitive[];
@@ -54,26 +16,5 @@ export interface SvgStringOptions {
 }
 
 export function renderSvgToString(opts: SvgStringOptions): string {
-  const g = globalThis as any;
-  const hadDocument = 'document' in g;
-  const savedDocument = g.document;
-  g.document = { createElementNS: (_ns: string, name: string) => new FakeElement(name) };
-  try {
-    const container = new FakeElement('div');
-    renderSvg({
-      container: container as unknown as HTMLElement,
-      primitives: opts.primitives,
-      widthSp: opts.widthSp,
-      heightSp: opts.heightSp,
-      pxPerSp: opts.pxPerSp,
-      pxPerSpY: opts.pxPerSpY,
-      viewBoxSp: opts.viewBoxSp
-    });
-    const svg = container.children[0];
-    svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-    return svg.serialize();
-  } finally {
-    if (hadDocument) g.document = savedDocument;
-    else delete g.document;
-  }
+  return renderSvgMarkup({ ...opts, xmlns: true });
 }
