@@ -38,7 +38,9 @@ Piece URLs carry the library's piece id. On a piece the page IS the score frame
 the library page's tools row above the score (the way back, the title, Zoom, Settings,
 Tags, Source, Instruments, the theme toggle) and the player's tray below it, which carries
 only transport, readout, rail, rate and volume; one focus mark on the score's top-right
-corner, faded until hovered, hides and shows both together. **Source · <what plays>** opens the Source sheet in the frame's side slot: Synth and
+corner, faded until hovered, hides and shows both together and takes the browser into
+and out of fullscreen with them (a tap, not the remembered choice — fullscreen needs
+the gesture). **Source · <what plays>** opens the Source sheet in the frame's side slot: Synth and
 each recording, choose one, edit or add a recording in the same slot
 ([docs/studio-recordings.md](../../docs/studio-recordings.md)). The Instruments sheet sits in the frame's side slot,
 between the strips, and lists the parts: hide one from the score (it keeps playing), mute

@@ -28,7 +28,12 @@ import './SettingsPad.ts';
  *               buttons (slot `actions`) and a menu (slot `menu`). Under the
  *               score, the player's own tray (slot `player`).
  *   focused   — the score alone, a hairline progress line along the bottom
- *               edge, and the mark to come back by.
+ *               edge, and the mark to come back by. The mark also asks the
+ *               browser for fullscreen (the Fullscreen API — a phone's only
+ *               route to it, F11's on a laptop) and gives it back on the
+ *               way out, but only a fullscreen it entered itself: one the
+ *               host or the user already had is left alone, and leaving by
+ *               Esc or the back gesture leaves the strips as they were.
  *
  * The edge grips the frame first shipped with — a title grip and a playback
  * grip, each strip drawn out and put away on its own — were retired on
@@ -95,6 +100,8 @@ export class ScoreFrame extends LitElement {
   @property({ type: Boolean, reflect: true }) focused = false;
   /** A shortcut the host binds to the same toggle, printed in the mark's tooltip. */
   @property({ attribute: 'focus-shortcut' }) focusShortcut = '';
+  /** True while the mark's own focusing holds the browser fullscreen. */
+  private ownsFullscreen = false;
   @state() private videoOpen = false;
   @state() private videoWidth = 320;
   private videoObserver: ResizeObserver | null = null;
@@ -549,6 +556,7 @@ export class ScoreFrame extends LitElement {
     this.videoObserver = new ResizeObserver(() => { this.resizeVideo(this.videoWidth); this.requestUpdate(); });
     this.videoObserver.observe(this);
     this.scrollerObserver = new ResizeObserver(entries => this.measureScrollbar(entries.map(entry => entry.target)));
+    document.addEventListener('fullscreenchange', this.onFullscreenChange);
   }
 
   disconnectedCallback() {
@@ -562,6 +570,7 @@ export class ScoreFrame extends LitElement {
     this.scrollerObserver?.disconnect();
     this.scrollerObserver = null;
     document.removeEventListener('pointerdown', this.onClickAway);
+    document.removeEventListener('fullscreenchange', this.onFullscreenChange);
     super.disconnectedCallback();
   }
 
@@ -587,6 +596,28 @@ export class ScoreFrame extends LitElement {
     this.focused = focused;
     this.dispatchEvent(new CustomEvent<boolean>('focus-change', { detail: focused, bubbles: true, composed: true }));
   }
+
+  /** Browser fullscreen follows the mark: in with focus, out with unfocus.
+   *  It must be asked for inside the tap itself (user activation), so this
+   *  runs from the mark's click and not from the `focused` property — the
+   *  host's shortcut and remembered choice never touch the browser. */
+  private syncFullscreen(focused: boolean) {
+    if (focused) {
+      if (document.fullscreenElement) return; // the host's or the user's — not ours to leave
+      const root = document.documentElement;
+      if (typeof root.requestFullscreen !== 'function') return;
+      root.requestFullscreen({ navigationUI: 'hide' }).then(
+        () => { this.ownsFullscreen = true; },
+        () => { /* refused (no activation, iframe policy): the strips still went */ },
+      );
+    } else if (this.ownsFullscreen && document.fullscreenElement) {
+      document.exitFullscreen().catch(() => {});
+    }
+  }
+
+  private readonly onFullscreenChange = () => {
+    if (!document.fullscreenElement) this.ownsFullscreen = false;
+  };
 
   private togglePad(which: Exclude<Pad, null>) {
     this.pad = this.pad === which ? null : which;
@@ -656,7 +687,9 @@ export class ScoreFrame extends LitElement {
       aria-label=${label}
       title=${this.focusShortcut ? `${label} (${this.focusShortcut})` : label}
       @click=${(event: MouseEvent) => {
-        this.setFocused(!this.focused);
+        const focused = !this.focused;
+        this.setFocused(focused);
+        this.syncFullscreen(focused);
         // A pointer leaves the mark unfocused: the next keypress (space to
         // play, arrows to scroll) would otherwise light its ring and leave
         // it lit. Keyboard activation (detail 0) keeps focus where it is.

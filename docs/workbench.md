@@ -29,6 +29,9 @@ API when available). In the workbench the score frame's **focus mark** (below) *
 document focus: the same mark that hides the frame's strips hides the shell's panes, and
 it stays on the pane's corner in both states, so the mode never hides both its control
 and its escape route; the zoom pad's own footer toggle still works when the pad is open.
+A tap on the mark also asks the browser for fullscreen (a phone's only way there) and
+gives it back on unfocus — only a fullscreen the mark entered; the palette's own is left
+alone, and the shortcut never touches the browser.
 It is never a property of `<mnx-document-viewer>`.
 **Theming is `light-dark()`, never an attribute** — the shell resolves `auto|light|dark`
 (remembered per browser, palette-switchable) onto `color-scheme`, and every token
