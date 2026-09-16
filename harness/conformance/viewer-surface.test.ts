@@ -122,14 +122,21 @@ describe('viewer surface', () => {
 
     it('moves prefix air with Space', () => {
       initSmufl();
-      // Barline-to-clef is discretionary padding, now owned by Space.
-      // Glyph dimensions are checked independently in staff-space.test.ts.
+      // The prefix's slot tails and key-signature pad are discretionary air
+      // owned by Space; the opening barline-to-clef gap is a fixed frame
+      // (`SYSTEM_START_PAD_SP`, core-space-units-sp.md). Glyph dimensions are
+      // checked independently in staff-space.test.ts.
+      const first = (densityH: number) => planHorizontal(twelveBars(), 80, { densityH }).measures[0];
       const prefix = (densityH: number) => {
-        const first = planHorizontal(twelveBars(), 80, { densityH }).measures[0];
-        return Number((first.clefX - first.x).toFixed(6));
+        const m = first(densityH);
+        return Number((m.contentStartX - m.clefX).toFixed(6));
       };
       expect(prefix(1.4)).toBeLessThan(prefix(SPACE_DEFAULT_SP));
       expect(prefix(3.3)).toBeGreaterThan(prefix(SPACE_DEFAULT_SP));
+      for (const densityH of [1.4, SPACE_DEFAULT_SP, 3.3]) {
+        const m = first(densityH);
+        expect(m.clefX - m.x).toBeCloseTo(first(SPACE_DEFAULT_SP).clefX - first(SPACE_DEFAULT_SP).x, 9);
+      }
     });
 
     it('clamps absurd values instead of producing an unrescuable plan', () => {

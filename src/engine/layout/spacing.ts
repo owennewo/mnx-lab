@@ -50,7 +50,18 @@ import { clearanceSpacing } from '../clearance.ts';
 
 const CONTENT_LEFT_PAD_SP = 0.6;
 const CONTENT_RIGHT_PAD_SP = 0.8;
-const START_BARLINE_PAD_SP = 0.5;
+/**
+ * The gap between a system's opening barline and its clef. FIXED, not a
+ * Space consumer (2026-09-16): it used to be the content-left pad plus a
+ * 0.5sp system-start extra, both on Space lines, so the clef drifted away
+ * from the barline as Space grew and touched it at zero. A system's opening
+ * is a frame, not air between events, and the reader asked for it to hold
+ * still. Mid-system bars keep `CONTENT_LEFT_PAD_SP` on its line.
+ */
+export const SYSTEM_START_PAD_SP = 1.1;
+/** The legacy explicit-clearance frame keeps its historical pair (content-left
+ *  plus this system-start extra, both through the frame's own curve). */
+const LEGACY_START_BARLINE_PAD_SP = 0.5;
 /**
  * Prefix glyph slots are INK plus a spare tail. The ink is the glyph's own
  * width (`gClef` 2.68sp, `6stringTabClef` 1.64sp, a time-signature digit pair
@@ -242,7 +253,7 @@ export function spaceLineAt(line: SpaceLine, x: number): number {
 
 /** The pads that follow Space. Glyph SLOTS are rigid and are not here. */
 export type PadKind =
-  | 'contentLeft' | 'startBarline' | 'keySigRight' | 'contentRight'
+  | 'contentLeft' | 'keySigRight' | 'contentRight'
   | 'clefTail' | 'tabClefTail' | 'timeTail';
 
 /**
@@ -267,7 +278,6 @@ export const SPACE_LINES: { spring: SpaceLine; columnAir: SpaceLine; paperPad: S
   paperPad: { atZero: 0, atDefault: 1 },
   margin: { atZero: 0, atDefault: 2 },
   contentLeft: { atZero: 0, atDefault: CONTENT_LEFT_PAD_SP },
-  startBarline: { atZero: 0, atDefault: START_BARLINE_PAD_SP },
   keySigRight: { atZero: 0, atDefault: KEY_SIG_RIGHT_PAD_SP },
   contentRight: { atZero: 0, atDefault: CONTENT_RIGHT_PAD_SP },
   clefTail: { atZero: 0, atDefault: CLEF_TAIL_SP },
@@ -286,6 +296,8 @@ export interface SpacePolicy {
   /** Factor on a viewer's horizontal paper padding (px, outside the engine). */
   paperPad: number;
   horizontalMargin: number;
+  /** A system's opening barline-to-clef gap — fixed under the Space policy. */
+  systemStartPad: number;
   pad: (kind: PadKind) => number;
   prefixGroupExtra: number;
 }
@@ -303,6 +315,7 @@ export function spacePolicy(densityH = SPACE_DEFAULT_SP): SpacePolicy {
     // already widens the page edge, and the paper need not double it.
     paperPad: Math.min(1, spaceLineAt(SPACE_LINES.paperPad, x)),
     horizontalMargin: spaceLineAt(SPACE_LINES.margin, x),
+    systemStartPad: SYSTEM_START_PAD_SP,
     pad: kind => spaceLineAt(SPACE_LINES[kind], x),
     prefixGroupExtra: 0
   };
@@ -310,7 +323,6 @@ export function spacePolicy(densityH = SPACE_DEFAULT_SP): SpacePolicy {
 
 const PAD_NORMAL_SP: Record<PadKind, number> = {
   contentLeft: CONTENT_LEFT_PAD_SP,
-  startBarline: START_BARLINE_PAD_SP,
   keySigRight: KEY_SIG_RIGHT_PAD_SP,
   contentRight: CONTENT_RIGHT_PAD_SP,
   clefTail: CLEF_TAIL_SP,
@@ -329,6 +341,7 @@ function legacySpacePolicy(densityH: number, clearance?: number, densityPad?: nu
     columnAir: 1,
     paperPad: 1,
     horizontalMargin: frame.horizontalMargin,
+    systemStartPad: frame.prefixPad(CONTENT_LEFT_PAD_SP) + frame.prefixPad(LEGACY_START_BARLINE_PAD_SP),
     pad: kind => SLOT_TAILS.has(kind) ? PAD_NORMAL_SP[kind] : frame.prefixPad(PAD_NORMAL_SP[kind]),
     prefixGroupExtra: frame.prefixGroupExtra
   };
@@ -1718,7 +1731,6 @@ export function planHorizontal(
     + pad(isTabOnly ? 'tabClefTail' : 'clefTail') + clearance.prefixGroupExtra;
   const timeSlot = (ink: number) => TIME_SIG_INK_SP * ink + pad('timeTail') + clearance.prefixGroupExtra;
   const contentLeftPad = pad('contentLeft');
-  const startBarlinePad = pad('startBarline');
   const keySigRightPad = pad('keySigRight');
   const contentRightPad = pad('contentRight');
   const startX = marginSp + leftInset;
@@ -2149,7 +2161,7 @@ export function planHorizontal(
     // only a mid-system neighbour can contest the space.
     bareRepeat(m, firstInSystem) && (firstInSystem || !previousClosesWithInk(index))
       ? 0
-      : contentLeftPad + (firstInSystem ? startBarlinePad : 0);
+      : firstInSystem ? clearance.systemStartPad : contentLeftPad;
 
   // The prefix's PADS are air; its glyph SLOTS are ink and scale with the ink
   // ratio (the packing snapshot is updated after ink pricing).
@@ -2171,8 +2183,10 @@ export function planHorizontal(
     const time = display.timeSignatures !== 'hide' && m.timeSigShow;
     return {
       pads: [
-        ...(bareRepeat(m, first) && (first || !previousClosesWithInk(index))
-          ? [] : ['contentLeft' as const, ...(first ? ['startBarline' as const] : [])]),
+        // A system's opening pad is fixed (`SYSTEM_START_PAD_SP`), so only a
+        // mid-system bar carries a content-left pad to re-price.
+        ...(first || (bareRepeat(m, first) && !previousClosesWithInk(index))
+          ? [] : ['contentLeft' as const]),
         ...(keySigGlyphs(m, first) ? ['keySigRight' as const] : []),
         // The glyph slots' spare tails are air too (`clefSlot`/`timeSlot`).
         ...(clef ? [isTabOnly ? 'tabClefTail' as const : 'clefTail' as const] : []),

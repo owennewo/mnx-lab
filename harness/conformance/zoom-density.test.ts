@@ -53,6 +53,7 @@ import {
   SPACE_DEFAULT_SP,
   SPACE_LINES,
   QUARTER_SPRING_SP,
+  SYSTEM_START_PAD_SP,
   type PadKind
 } from '../../src/engine/layout/spacing.ts';
 import { glyphBBox } from '../../src/engine/smufl/smufl.ts';
@@ -707,7 +708,7 @@ describe('the fit answers about the score, not about the density knob', () => {
 // it, and the intercept vector is the zero engraving.
 describe('Space in staff spaces', () => {
   const blues = () => doc('lab/document/twelve-bar-blues');
-  const PADS: PadKind[] = ['contentLeft', 'startBarline', 'keySigRight', 'contentRight'];
+  const PADS: PadKind[] = ['contentLeft', 'keySigRight', 'contentRight'];
 
   it('the unit is the quarter-note spring, and the default is the identity', () => {
     expect(SPACE_DEFAULT_SP).toBe(QUARTER_SPRING_SP);
@@ -743,6 +744,22 @@ describe('Space in staff spaces', () => {
     const floored = { atZero: 0.5, atDefault: 2 };
     expect(spaceLineAt(floored, 0)).toBe(0.5);
     expect(spaceLineAt(floored, SPACE_DEFAULT_SP)).toBe(2);
+  });
+
+  it('the gap between a system\'s opening barline and its clef is fixed, not Space', () => {
+    initSmufl();
+    for (const spaceSp of [0, 1.1, SPACE_DEFAULT_SP, MAX_SPACE_SP]) {
+      const plan = planHorizontal(blues(), 80, { densityH: spaceSp });
+      const first = plan.measures[0];
+      expect(first.clefX - first.x).toBeCloseTo(SYSTEM_START_PAD_SP, 9);
+    }
+    // …while a mid-system bar's content-left pad still follows the line.
+    const gapAfterBarline = (spaceSp: number) => {
+      const plan = planHorizontal(blues(), 80, { densityH: spaceSp });
+      const m = plan.measures[1];
+      return m.contentStartX - m.x;
+    };
+    expect(gapAfterBarline(0)).toBeLessThan(gapAfterBarline(SPACE_DEFAULT_SP));
   });
 
   it('at zero the margin is gone and the first column sits against the barline', () => {
