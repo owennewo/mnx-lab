@@ -424,6 +424,15 @@ const TEMPO_TEXT_WEIGHT = 600; // matches the capo line
 const TEMPO_GLYPH_TEXT_GAP_SP = 0.2; // between the note's right ink and the "="
 const TEMPO_DOT_ADVANCE_SP = 0.45; // at scale 1
 
+interface TempoRun extends BoundsSp {
+  /** Baseline shared by the metronome glyph and its text. */
+  baseline: number;
+  /** Placement bottom: notehead ink, while text uses its baseline as before. */
+  bottomInk: number;
+  /** First primitive of this measure's tempo run in the output array. */
+  firstPrimitive: number;
+}
+
 export interface EmitTempoMarkArgs {
   gm: MnxGlobalMeasure;
   m: MeasureHeading & { width: number };
@@ -444,26 +453,30 @@ export interface EmitTempoMarkArgs {
  * Returns the box of the ink it drew (null when there is no tempo), for the
  * label pass to clear explicitly — see `EmitScoreLabelsArgs.clearAbove`.
  */
-export function emitTempoMark(args: EmitTempoMarkArgs): BoundsSp | null {
+export function emitTempoMark(args: EmitTempoMarkArgs): TempoRun | null {
   const { gm, m, staffTop, scan, primitives, onsetXs } = args;
   const tempos = gm.tempos ?? [];
   if (tempos.length === 0) return null;
   const x0 = measureHeadingX(m);
-  let top: BoundsSp | null = null;
+  let top: Omit<TempoRun, 'firstPrimitive'> | null = null;
+  let groupBottom = -Infinity;
   const before = primitives.length;
   // Every mark draws (core-measure-attributes-gaps.md: only the first used
   // to). One without a location sits at the bar's start; one with a location
   // starts at that column — a mid-bar tempo change. Each is its own run, so a
   // later mark clears the earlier ones like any other text over this bar.
-  tempos.forEach((tempo, index) => {
+  for (const [index, tempo] of tempos.entries()) {
     const f = tempo.location?.fraction;
     const t = Array.isArray(f) && f[1] ? f[0] / f[1] : 0;
     const anchored = !!(tempo.location && onsetXs);
     const x = anchored ? anchorAt(onsetXs!, t, m).x : index === 0 ? x0 : x0 + 6 * index;
     const placed = emitOneTempo(tempo, x, anchored ? -ONSET_TEXT_LEAD_SP : 0, staffTop, [...scan, ...primitives.slice(before)], primitives);
-    if (placed && (!top || placed.y < top.y)) top = placed;
-  });
-  return top;
+    if (placed) {
+      groupBottom = Math.max(groupBottom, placed.bottomInk);
+      if (!top || placed.y < top.y) top = placed;
+    }
+  }
+  return top ? { ...top, bottomInk: groupBottom, firstPrimitive: before } : null;
 }
 
 function emitOneTempo(
@@ -473,7 +486,7 @@ function emitOneTempo(
   staffTop: number,
   scan: readonly Primitive[],
   primitives: Primitive[]
-): BoundsSp | null {
+): Omit<TempoRun, 'firstPrimitive'> | null {
   const firstNew = primitives.length;
   const metGlyph = METRONOME_GLYPH_BY_BASE[tempo.value.base] ?? 'metNoteQuarterUp';
   // Drawn at a provisional baseline of 0 and placed once its footprint is
@@ -504,7 +517,11 @@ function emitOneTempo(
     weight: TEMPO_TEXT_WEIGHT,
     className: 'tempo'
   });
-  return placeTextRun(primitives, firstNew, belowBaseline, staffTop, scan, null);
+  const placed = placeTextRun(primitives, firstNew, belowBaseline, staffTop, scan, null);
+  const first = primitives[firstNew];
+  if (!placed || first.kind !== 'glyph') return null;
+  const baseline = first.y;
+  return { ...placed, baseline, bottomInk: baseline + belowBaseline };
 }
 
 // ---------- Chord symbols (`_x.mnxLab.harmonies`) ----------
@@ -561,7 +578,7 @@ export function emitHarmonies(args: EmitHarmoniesArgs): void {
 // needs one. Naming it ("Swing") is available through the declaration's own
 // `text`, because the word is a convention and the ratio is the fact.
 //
-// It sits in the tempo band, ABOVE the metronome mark, and prints only where
+// It sits in the tempo band, on the metronome mark's baseline, and prints only where
 // the feel CHANGES (`model/swing.ts` decides that). A bar restating the feel
 // it inherited draws nothing, which is why a Guitar Pro import that stamps
 // every bar still engraves the marking once.
@@ -578,7 +595,7 @@ const SWING_GROUP_GAP_SP = 0.3; // around the "="
 const SWING_DOT_ADVANCE_SP = 0.45; // at scale 1, as the tempo mark's dots
 const SWING_BRACKET_RISE_SP = 0.3; // bracket over the tallest stem in its group
 /** Between the metronome mark's right ink and the feel that follows it. */
-const SWING_AFTER_TEMPO_GAP_SP = 2;
+export const SWING_AFTER_TEMPO_GAP_SP = 0.5;
 const SWING_BRACKET_THICKNESS_SP = 0.12;
 const SWING_BRACKET_TICK_SP = 0.4;
 const SWING_TUPLET_SIZE_SP = 1.0;
@@ -734,7 +751,7 @@ export interface EmitSwingMarkArgs {
    *  feel starts past the mark's right ink rather than at the bar's heading.
    *  Handed on as the clearance too, for the case where the two still
    *  overlap in x (they should not) rather than as the thing to stack over. */
-  clearAbove: BoundsSp | null | undefined;
+  clearAbove: TempoRun | BoundsSp | null | undefined;
 }
 
 /**
@@ -747,12 +764,38 @@ export function emitSwingMark(args: EmitSwingMarkArgs): BoundsSp | null {
   const firstNew = primitives.length;
   const x0 = clearAbove ? clearAbove.x + clearAbove.w + SWING_AFTER_TEMPO_GAP_SP : measureHeadingX(m);
   const y = 0;
+  const tempoRun = clearAbove && 'baseline' in clearAbove && 'firstPrimitive' in clearAbove
+    ? clearAbove as TempoRun
+    : null;
+  const finish = (bottomInkAtZero: number): BoundsSp | null => {
+    if (!tempoRun) return placeTextRun(primitives, firstNew, bottomInkAtZero, staffTop, scan, clearAbove);
+
+    // Tempo + feel are one heading statement. Put the feel on the tempo's
+    // baseline first, then lift the WHOLE statement if the feel's wider
+    // footprint encounters taller musical ink. Moving only the feel is the
+    // bug this grouping prevents.
+    for (const p of primitives.slice(firstNew)) translatePrimitiveY(p, tempoRun.baseline);
+    const group = primitives.slice(tempoRun.firstPrimitive);
+    const groupSet = new Set(group);
+    const box = computeBoundsSp(group);
+    if (!box) return null;
+    const targetBottom = textBottomAbove(
+      scan.filter(p => !groupSet.has(p)),
+      box.x - TEXT_SIDE_CLEAR_SP,
+      box.x + box.w + TEXT_SIDE_CLEAR_SP,
+      staffTop
+    );
+    const currentBottom = Math.max(tempoRun.bottomInk, tempoRun.baseline + bottomInkAtZero);
+    const dy = Math.min(0, targetBottom - currentBottom);
+    if (dy !== 0) for (const p of group) translatePrimitiveY(p, dy);
+    return { ...box, y: box.y + dy };
+  };
   const words = (text: string): BoundsSp | null => {
     primitives.push({
       kind: 'text', text, x: x0, y, font: 'body', size: SWING_TEXT_SIZE_SP,
       weight: TEMPO_TEXT_WEIGHT, className: 'swing'
     });
-    return placeTextRun(primitives, firstNew, 0, staffTop, scan, clearAbove);
+    return finish(0);
   };
   // A cancellation resolves to nothing to play, but it is still a marking:
   // the bar where a swing stops has to say so.
@@ -773,7 +816,7 @@ export function emitSwingMark(args: EmitSwingMarkArgs): BoundsSp | null {
   cursor = emitSwingPair(realisation.played, x0, cursor, y, primitives);
   if (realisation.tuplet !== null)
     emitSwingBracket(realisation, x0, playedFrom, cursor, realisation.tuplet, primitives);
-  return placeTextRun(primitives, firstNew, bottom, staffTop, scan, clearAbove);
+  return finish(bottom);
 }
 
 /** The `⌐3¬` over the played group: two rules with the number between them,

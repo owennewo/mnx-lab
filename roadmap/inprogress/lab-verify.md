@@ -81,6 +81,29 @@ Provenance answers "did this change?". This doc answers "should it have?".
 
 ## Open debt
 
+### Tempo and swing form one aligned heading — 2026-09-16
+
+Owner: direct user-reported engraving adjustment from a score whose opening bend lifted the
+swing equation above the metronome mark; no roadmap work-item doc. The tempo and swing note
+glyphs already used the same 0.55 scale, but the two marks were placed as independent vertical
+runs. Ink under the swing footprint could therefore lift only the equation, making it look
+larger and disconnected. They now share one baseline and move together whenever either
+footprint needs more clearance. The swing starts 0.5sp after the tempo's right ink instead of
+leaving a 2sp void. `harness/conformance/swing-heading.test.ts` pins equal glyph scale, equal
+baseline, the measured horizontal gap, and the combined lift over tall ink.
+
+One scenario moved in all four visual goldens. It is `draft`, so nothing was demoted.
+
+Look for: in bar 1, `♩ = 120` and the swing equation read as one line, with equal-sized note
+glyphs, matching baselines and a compact but visible gap. The equation's tuplet bracket remains
+above its played pair; it is not a second text line. In a score with a bend, stem or other tall
+mark under the equation, both tempo and swing rise together rather than the swing floating
+above the tempo. Bars 2–4 otherwise retain their previous mark sizes and placement.
+
+Scenario set (path under `scenarios/`):
+
+- `lab/11-rhythm/05-swing-feel`
+
 ### Title and inter-system ink gaps tightened to 1.5sp — 2026-09-16
 
 Owner: direct user-requested engraving adjustment; no roadmap work-item doc. The title

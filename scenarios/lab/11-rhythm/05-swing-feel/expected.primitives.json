@@ -896,7 +896,7 @@
       {
         "kind": "glyph",
         "glyph": "metNoteQuarterUp",
-        "x": 15.3689,
+        "x": 13.8689,
         "y": 6.1898,
         "scale": 0.55,
         "className": "swing"
@@ -904,16 +904,16 @@
       {
         "kind": "glyph",
         "glyph": "metNoteQuarterUp",
-        "x": 16.9993,
+        "x": 15.4993,
         "y": 6.1898,
         "scale": 0.55,
         "className": "swing"
       },
       {
         "kind": "line",
-        "x1": 16.0333,
+        "x1": 14.5333,
         "y1": 4.8137,
-        "x2": 17.7297,
+        "x2": 16.2297,
         "y2": 4.8137,
         "thickness": 0.275,
         "className": "swing"
@@ -921,7 +921,7 @@
       {
         "kind": "text",
         "text": "=",
-        "x": 18.0297,
+        "x": 16.5297,
         "y": 6.1898,
         "font": "body",
         "size": 1.3,
@@ -931,7 +931,7 @@
       {
         "kind": "glyph",
         "glyph": "metNoteQuarterUp",
-        "x": 19.1097,
+        "x": 17.6097,
         "y": 6.1898,
         "scale": 0.55,
         "className": "swing"
@@ -939,43 +939,43 @@
       {
         "kind": "glyph",
         "glyph": "metNote8thUp",
-        "x": 20.0001,
+        "x": 18.5001,
         "y": 6.1898,
         "scale": 0.55,
         "className": "swing"
       },
       {
         "kind": "line",
-        "x1": 19.1097,
+        "x1": 17.6097,
         "y1": 4.3586,
-        "x2": 19.6912,
+        "x2": 18.1912,
         "y2": 4.3586,
         "thickness": 0.12,
         "className": "swing"
       },
       {
         "kind": "line",
-        "x1": 20.5912,
+        "x1": 19.0912,
         "y1": 4.3586,
-        "x2": 21.1727,
+        "x2": 19.6727,
         "y2": 4.3586,
         "thickness": 0.12,
         "className": "swing"
       },
       {
         "kind": "line",
-        "x1": 19.1097,
+        "x1": 17.6097,
         "y1": 4.3586,
-        "x2": 19.1097,
+        "x2": 17.6097,
         "y2": 4.7586,
         "thickness": 0.12,
         "className": "swing"
       },
       {
         "kind": "line",
-        "x1": 21.1727,
+        "x1": 19.6727,
         "y1": 4.3586,
-        "x2": 21.1727,
+        "x2": 19.6727,
         "y2": 4.7586,
         "thickness": 0.12,
         "className": "swing"
@@ -983,7 +983,7 @@
       {
         "kind": "text",
         "text": "3",
-        "x": 20.1412,
+        "x": 18.6412,
         "y": 4.7086,
         "font": "body",
         "size": 1,
@@ -1375,7 +1375,7 @@
       {
         "kind": "glyph",
         "glyph": "metNoteQuarterUp",
-        "x": 14.3898,
+        "x": 12.8898,
         "y": 4.2312,
         "scale": 0.55,
         "className": "swing"
@@ -1383,16 +1383,16 @@
       {
         "kind": "glyph",
         "glyph": "metNoteQuarterUp",
-        "x": 16.0202,
+        "x": 14.5202,
         "y": 4.2312,
         "scale": 0.55,
         "className": "swing"
       },
       {
         "kind": "line",
-        "x1": 15.0542,
+        "x1": 13.5542,
         "y1": 2.8551,
-        "x2": 16.7506,
+        "x2": 15.2506,
         "y2": 2.8551,
         "thickness": 0.275,
         "className": "swing"
@@ -1400,7 +1400,7 @@
       {
         "kind": "text",
         "text": "=",
-        "x": 17.0506,
+        "x": 15.5506,
         "y": 4.2312,
         "font": "body",
         "size": 1.3,
@@ -1410,7 +1410,7 @@
       {
         "kind": "glyph",
         "glyph": "metNoteQuarterUp",
-        "x": 18.1306,
+        "x": 16.6306,
         "y": 4.2312,
         "scale": 0.55,
         "className": "swing"
@@ -1418,43 +1418,43 @@
       {
         "kind": "glyph",
         "glyph": "metNote8thUp",
-        "x": 19.021,
+        "x": 17.521,
         "y": 4.2312,
         "scale": 0.55,
         "className": "swing"
       },
       {
         "kind": "line",
-        "x1": 18.1306,
+        "x1": 16.6306,
         "y1": 2.4,
-        "x2": 18.7121,
+        "x2": 17.2121,
         "y2": 2.4,
         "thickness": 0.12,
         "className": "swing"
       },
       {
         "kind": "line",
-        "x1": 19.6121,
+        "x1": 18.1121,
         "y1": 2.4,
-        "x2": 20.1936,
+        "x2": 18.6936,
         "y2": 2.4,
         "thickness": 0.12,
         "className": "swing"
       },
       {
         "kind": "line",
-        "x1": 18.1306,
+        "x1": 16.6306,
         "y1": 2.4,
-        "x2": 18.1306,
+        "x2": 16.6306,
         "y2": 2.8,
         "thickness": 0.12,
         "className": "swing"
       },
       {
         "kind": "line",
-        "x1": 20.1936,
+        "x1": 18.6936,
         "y1": 2.4,
-        "x2": 20.1936,
+        "x2": 18.6936,
         "y2": 2.8,
         "thickness": 0.12,
         "className": "swing"
@@ -1462,7 +1462,7 @@
       {
         "kind": "text",
         "text": "3",
-        "x": 19.1621,
+        "x": 17.6621,
         "y": 2.75,
         "font": "body",
         "size": 1,

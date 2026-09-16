@@ -60,8 +60,8 @@ const NAV_CLASSES = new Set(['segno', 'fine', 'jump']);
 const isLabel = (p: Primitive) => LABEL_CLASSES.has(cls(p));
 const isTempo = (p: Primitive) => cls(p) === 'tempo';
 const isNav = (p: Primitive) => NAV_CLASSES.has(cls(p));
-// The swing marking is placed AFTER the tempo mark and stacks above it, so the
-// tempo does not clear it — the same relationship the labels have to both.
+// A swing marking after a tempo is one same-baseline heading statement; when
+// no tempo prints it remains its own score-text run.
 const isSwing = (p: Primitive) => cls(p) === 'swing';
 /** `measureHeadingX`'s lead: how far left of its content a heading mark starts. */
 const HEADING_LEAD_SP = 1.5;
@@ -122,7 +122,7 @@ function barsOf(layout: LayoutResult, row: number): [number, number][] {
  * below it; everything else belongs to the row whose band is nearest by the
  * inter-row midpoint, `tightenRows`' rule. Two methods, one answer.
  */
-const TEXT_ROW_CLASSES = new Set([...LABEL_CLASSES, 'tempo', ...NAV_CLASSES]);
+const TEXT_ROW_CLASSES = new Set([...LABEL_CLASSES, 'tempo', 'swing', ...NAV_CLASSES]);
 function rowPrims(layout: LayoutResult, row: number): Primitive[] {
   const rows = layout.rows!;
   const bounds = rows.slice(0, -1).map((b, r) => (b.staffBottom + rows[r + 1].staffTop) / 2);
@@ -184,14 +184,17 @@ function checkLayout(layout: LayoutResult): Checked {
         out.labels++;
         assertGroup(labels, prims.filter(p => !isLabel(p)));
       }
-      if (tempos.length) {
+      if (tempos.length && swings.length) {
         out.tempos++;
+        out.swings++;
         assertGroup(
-          tempos,
+          [...tempos, ...swings],
           prims.filter(p => !isTempo(p) && !isLabel(p) && !isNav(p) && !isSwing(p))
         );
-      }
-      if (swings.length) {
+      } else if (tempos.length) {
+        out.tempos++;
+        assertGroup(tempos, prims.filter(p => !isTempo(p) && !isLabel(p) && !isNav(p)));
+      } else if (swings.length) {
         out.swings++;
         assertGroup(swings, prims.filter(p => !isSwing(p) && !isLabel(p) && !isNav(p)));
       }

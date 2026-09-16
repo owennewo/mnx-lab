@@ -197,17 +197,17 @@
 <line x1="273.5504" y1="512.56" x2="408.7696" y2="512.56" stroke-width="8" class="beam"></line>
 <text x="136.616" y="99.0368" font-size="35.2" class="tempo"></text>
 <text x="151.5024" y="99.0368" font-size="20.8" font-weight="600" style="font-family:var(--font-family-sans)" class="tempo">= 120</text>
-<text x="245.9024" y="99.0368" font-size="35.2" class="swing"></text>
-<text x="271.9888" y="99.0368" font-size="35.2" class="swing"></text>
-<line x1="256.5328" y1="77.0192" x2="283.6752" y2="77.0192" stroke-width="4.4" class="swing"></line>
-<text x="288.4752" y="99.0368" font-size="20.8" font-weight="600" style="font-family:var(--font-family-sans)" class="swing">=</text>
-<text x="305.7552" y="99.0368" font-size="35.2" class="swing"></text>
-<text x="320.0016" y="99.0368" font-size="35.2" class="swing"></text>
-<line x1="305.7552" y1="69.7376" x2="315.0592" y2="69.7376" stroke-width="1.92" class="swing"></line>
-<line x1="329.4592" y1="69.7376" x2="338.7632" y2="69.7376" stroke-width="1.92" class="swing"></line>
-<line x1="305.7552" y1="69.7376" x2="305.7552" y2="76.1376" stroke-width="1.92" class="swing"></line>
-<line x1="338.7632" y1="69.7376" x2="338.7632" y2="76.1376" stroke-width="1.92" class="swing"></line>
-<text x="322.2592" y="75.3376" font-size="16" text-anchor="middle" font-weight="600" style="font-family:var(--font-family-sans)" class="swing">3</text>
+<text x="221.9024" y="99.0368" font-size="35.2" class="swing"></text>
+<text x="247.9888" y="99.0368" font-size="35.2" class="swing"></text>
+<line x1="232.5328" y1="77.0192" x2="259.6752" y2="77.0192" stroke-width="4.4" class="swing"></line>
+<text x="264.4752" y="99.0368" font-size="20.8" font-weight="600" style="font-family:var(--font-family-sans)" class="swing">=</text>
+<text x="281.7552" y="99.0368" font-size="35.2" class="swing"></text>
+<text x="296.0016" y="99.0368" font-size="35.2" class="swing"></text>
+<line x1="281.7552" y1="69.7376" x2="291.0592" y2="69.7376" stroke-width="1.92" class="swing"></line>
+<line x1="305.4592" y1="69.7376" x2="314.7632" y2="69.7376" stroke-width="1.92" class="swing"></line>
+<line x1="281.7552" y1="69.7376" x2="281.7552" y2="76.1376" stroke-width="1.92" class="swing"></line>
+<line x1="314.7632" y1="69.7376" x2="314.7632" y2="76.1376" stroke-width="1.92" class="swing"></line>
+<text x="298.2592" y="75.3376" font-size="16" text-anchor="middle" font-weight="600" style="font-family:var(--font-family-sans)" class="swing">3</text>
 <text x="892.3504" y="99.0368" font-size="35.2" class="swing"></text>
 <text x="918.4368" y="99.0368" font-size="35.2" class="swing"></text>
 <line x1="902.9808" y1="77.0192" x2="930.1232" y2="77.0192" stroke-width="4.4" class="swing"></line>
