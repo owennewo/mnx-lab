@@ -530,6 +530,7 @@
         "glyph": "6stringTabClef",
         "x": 2.25,
         "y": 13.2731,
+        "scale": 0.94,
         "className": "tab-clef"
       },
       {

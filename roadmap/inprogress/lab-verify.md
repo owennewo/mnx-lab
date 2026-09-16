@@ -81,6 +81,61 @@ Provenance answers "did this change?". This doc answers "should it have?".
 
 ## Open debt
 
+### TAB clef fitted to the six-line staff — 2026-09-16
+
+Owner: direct user-reported engraving adjustment; no roadmap work-item doc. Bravura's
+natural `6stringTabClef` is 6.048sp tall while MNX Lab's six-line TAB staff is 5.714sp
+tall, so the letters visibly overhung and dominated the staff. The glyph now draws at
+94%, fitting its ink inside the outer string lines. Its existing horizontal slot is
+unchanged, so the opening barline, following time signature and first musical column do
+not move. `harness/conformance/ink-measured-gaps.test.ts` pins the scale and the fit.
+
+Thirty-one TAB scenarios moved in their primitives and TAB/both SVG goldens; the two
+unrolled TAB goldens moved where present. In composed `both` views, the smaller measured
+clef reach can tighten the notation-to-TAB vertical placement slightly; that is the
+ink-measured gap responding to the actual smaller ink. None was `verified`, so no scenario
+was demoted.
+
+Look for: the T and B sit visually inside the top and bottom string lines, remain centred
+on the six-line staff, and no longer overpower fret digits. The clef must stay clear of
+the opening barline; time signatures, fret columns, capo/tuning labels and all other ink
+retain their size. In `both` views, the slightly tighter inter-staff gap must remain clear
+of notation stems, lyrics, TAB techniques and the resized clef.
+
+Scenario set (paths under `scenarios/`):
+
+- `lab/00-document/02-empty-tab-canvas`
+- `lab/11-rhythm/05-swing-feel`
+- `lab/20-tab-part/01-standard-tuning-both`
+- `lab/21-tab-positions/01-open-strings-chord`
+- `lab/22-tab-derivation/01-bare-melody`
+- `lab/22-tab-derivation/02-bare-chord`
+- `lab/22-tab-derivation/03-string-only`
+- `lab/22-tab-derivation/04-partial-annotation`
+- `lab/22-tab-derivation/05-drop-d`
+- `lab/22-tab-derivation/06-capo`
+- `lab/22-tab-derivation/07-transposition-display-only`
+- `lab/22-tab-derivation/08-out-of-range`
+- `lab/22-tab-derivation/09-fret-mismatch`
+- `lab/22-tab-derivation/10-undeclared-strings`
+- `lab/23-tab-fingering/01-left-hand-fingers`
+- `lab/23-tab-fingering/02-right-hand-pima`
+- `lab/25-tab-techniques/01-bend-and-release`
+- `lab/25-tab-techniques/02-slides`
+- `lab/25-tab-techniques/03-hammer-pull-chain`
+- `lab/25-tab-techniques/04-vibrato-and-palm-mute`
+- `lab/25-tab-techniques/05-natural-harmonics`
+- `lab/25-tab-techniques/06-bend-shapes`
+- `lab/25-tab-techniques/07-grace-into-the-beat`
+- `lab/25-tab-techniques/08-hammer-pull-chord`
+- `lab/26-tab-rhythm/01-triplets-on-tab`
+- `lab/26-tab-rhythm/02-grace-on-tab`
+- `lab/26-tab-rhythm/03-unplayable-inside-a-tuplet`
+- `lab/26-tab-rhythm/04-tied-notes-on-tab`
+- `lab/31-score-text/10-labels-on-a-tab-staff`
+- `lab/40-navigation/02-repeats-and-marks-on-tab`
+- `lab/50-lyrics/02-tab-verses`
+
 ### Tempo and swing form one aligned heading — 2026-09-16
 
 Owner: direct user-reported engraving adjustment from a score whose opening bend lifted the

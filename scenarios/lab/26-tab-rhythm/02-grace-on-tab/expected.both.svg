@@ -37,7 +37,7 @@
 <line x1="32" y1="334.8176" x2="594.8" y2="334.8176" stroke-width="1.6" class="staff-line"></line>
 <line x1="32" y1="353.1024" x2="594.8" y2="353.1024" stroke-width="1.6" class="staff-line"></line>
 <line x1="32" y1="371.3888" x2="594.8" y2="371.3888" stroke-width="1.6" class="staff-line"></line>
-<text x="36" y="325.6736" font-size="64" class="tab-clef"></text>
+<text x="36" y="325.6736" font-size="60.16" class="tab-clef"></text>
 <text x="104" y="302.8176" font-size="64" text-anchor="middle" class="time-sig-num"></text>
 <text x="104" y="348.5312" font-size="64" text-anchor="middle" class="time-sig-den"></text>
 <rect x="176.4" y="311.6224" width="7.2" height="9.8192" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e0.c0.n0"></rect>

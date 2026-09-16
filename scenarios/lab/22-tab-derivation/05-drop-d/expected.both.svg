@@ -36,7 +36,7 @@
 <text x="26.4" y="350.8576" font-size="13.6" text-anchor="end" dominant-baseline="central" style="font-family:var(--font-family-sans)" class="tab-tuning-letter">D</text>
 <text x="26.4" y="369.1424" font-size="13.6" text-anchor="end" dominant-baseline="central" style="font-family:var(--font-family-sans)" class="tab-tuning-letter">A</text>
 <text x="26.4" y="387.4288" font-size="13.6" text-anchor="end" dominant-baseline="central" style="font-family:var(--font-family-sans)" class="tab-tuning-letter">D</text>
-<text x="36" y="341.7136" font-size="64" class="tab-clef"></text>
+<text x="36" y="341.7136" font-size="60.16" class="tab-clef"></text>
 <text x="104" y="318.8576" font-size="64" text-anchor="middle" class="time-sig-num"></text>
 <text x="104" y="364.5712" font-size="64" text-anchor="middle" class="time-sig-den"></text>
 <rect x="174" y="379.2464" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e0.n0"></rect>

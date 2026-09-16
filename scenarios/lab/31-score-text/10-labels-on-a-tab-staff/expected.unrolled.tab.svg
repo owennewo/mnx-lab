@@ -7,7 +7,7 @@
 <line x1="32" y1="204.4032" x2="304.8" y2="204.4032" stroke-width="1.6" class="staff-line"></line>
 <line x1="32" y1="222.6896" x2="304.8" y2="222.6896" stroke-width="1.6" class="staff-line"></line>
 <line x1="32" y1="131.2608" x2="32" y2="222.6896" stroke-width="2.56" class="barline barline-start"></line>
-<text x="36" y="176.9744" font-size="64" class="tab-clef"></text>
+<text x="36" y="176.9744" font-size="60.16" class="tab-clef"></text>
 <text x="88" y="154.1184" font-size="64" text-anchor="middle" class="time-sig-num"></text>
 <text x="88" y="199.832" font-size="64" text-anchor="middle" class="time-sig-den"></text>
 <rect x="202" y="214.5072" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="w0:@m0.v0.e0.n0" data-written-source-id="@m0.v0.e0.n0"></rect>

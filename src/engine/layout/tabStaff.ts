@@ -12,7 +12,13 @@ import { inkEdgesSp } from '../render/bounds.ts';
 import { COHESION_CLEAR_SP } from './scoreText.ts';
 import { Primitive, SpatialIndex } from '../primitives.ts';
 import { noteKeyAt } from '../../model/noteWalk.ts';
-import { type AccidentalResolver, type ColumnGeometry, DEFAULT_COLUMNS, EventSlot, tupletColumns } from './spacing.ts';
+import {
+  type AccidentalResolver,
+  type ColumnGeometry,
+  DEFAULT_COLUMNS,
+  EventSlot,
+  tupletColumns
+} from './spacing.ts';
 import { FRET_FONT_SIZE_SP } from './textSizes.ts';
 import {
   harmonicFretText,
@@ -62,6 +68,10 @@ export const TAB_STRING_SPACING_SP =
 export const TAB_STAFF_HEIGHT_SP = (TAB_STAFF_LINES - 1) * TAB_STRING_SPACING_SP;
 
 export const TAB_STAFF_LINE_THICKNESS_SP = 0.1;
+
+/** Bravura's natural TAB clef is 6.048sp tall against our 5.714sp six-line
+ * staff. Scale it to the staff rather than letting the letters dominate it. */
+export const TAB_CLEF_SCALE = 0.94;
 
 /**
  * Fret digits are the tab staff's ONLY musical content — the reader's eye goes
@@ -262,6 +272,7 @@ export function emitTabClef(clefX: number, staffTop: number, primitives: Primiti
     glyph: '6stringTabClef',
     x: clefX,
     y: staffTop + TAB_STAFF_HEIGHT_SP / 2,
+    scale: TAB_CLEF_SCALE,
     className: 'tab-clef'
   });
 }

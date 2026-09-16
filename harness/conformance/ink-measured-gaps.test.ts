@@ -24,7 +24,11 @@ import {
 } from '../../src/engine/layout/notation.ts';
 import { layoutTab } from '../../src/engine/layout/tab.ts';
 import { layoutBothSystem } from '../../src/engine/layout/bothSystem.ts';
-import { TAB_STAFF_HEIGHT_SP } from '../../src/engine/layout/tabStaff.ts';
+import {
+  emitTabClef,
+  TAB_CLEF_SCALE,
+  TAB_STAFF_HEIGHT_SP
+} from '../../src/engine/layout/tabStaff.ts';
 import { anchorY, rowBoundariesSp } from '../../src/engine/layout/verticalDensity.ts';
 import { lyricReachBelowRows } from '../../src/engine/layout/lyricRuns.ts';
 import {
@@ -65,6 +69,20 @@ const isNav = (p: Primitive) => NAV_CLASSES.has(cls(p));
 const isSwing = (p: Primitive) => cls(p) === 'swing';
 /** `measureHeadingX`'s lead: how far left of its content a heading mark starts. */
 const HEADING_LEAD_SP = 1.5;
+
+describe('TAB clef scale', () => {
+  it('fits the Bravura glyph to the six-line staff instead of overshooting it', () => {
+    initSmufl();
+    const primitives: Primitive[] = [];
+    emitTabClef(0, 0, primitives);
+    const clef = primitives[0];
+    expect(clef.kind).toBe('glyph');
+    if (clef.kind !== 'glyph') return;
+    expect(clef.scale).toBe(TAB_CLEF_SCALE);
+    const box = glyphBBox(clef.glyph)!;
+    expect(box.h * TAB_CLEF_SCALE).toBeLessThanOrEqual(TAB_STAFF_HEIGHT_SP);
+  });
+});
 
 /** The text's own bottom ink: a baseline for text, the rect bottom for the
  *  rehearsal box, the glyph's bbox bottom for a metronome note. */

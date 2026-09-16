@@ -19,7 +19,7 @@
 <line x1="32" y1="402.6944" x2="320.8" y2="402.6944" stroke-width="1.6" class="staff-line"></line>
 <line x1="32" y1="420.9792" x2="320.8" y2="420.9792" stroke-width="1.6" class="staff-line"></line>
 <line x1="32" y1="439.2656" x2="320.8" y2="439.2656" stroke-width="1.6" class="staff-line"></line>
-<text x="36" y="393.5504" font-size="64" class="tab-clef"></text>
+<text x="36" y="393.5504" font-size="60.16" class="tab-clef"></text>
 <text x="104" y="370.6944" font-size="64" text-anchor="middle" class="time-sig-num"></text>
 <text x="104" y="416.408" font-size="64" text-anchor="middle" class="time-sig-den"></text>
 <rect x="218" y="431.0832" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e0.n0"></rect>

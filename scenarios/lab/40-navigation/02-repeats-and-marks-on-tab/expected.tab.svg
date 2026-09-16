@@ -18,7 +18,7 @@
 <line x1="120.8" y1="87.44" x2="120.8" y2="178.8688" stroke-width="2.56" class="barline repeat-start"></line>
 <text x="127.2" y="119.44" font-size="76.8" class="repeat-dot"></text>
 <text x="127.2" y="135.44" font-size="76.8" class="repeat-dot"></text>
-<text x="36" y="133.1536" font-size="64" class="tab-clef"></text>
+<text x="36" y="133.1536" font-size="60.16" class="tab-clef"></text>
 <text x="88" y="133.1536" font-size="64" text-anchor="middle" class="time-sig"></text>
 <rect x="193.2784" y="170.6864" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e0.n0"></rect>
 <text x="199.2784" y="178.8688" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m0.v0.e0.n0">0</text>
