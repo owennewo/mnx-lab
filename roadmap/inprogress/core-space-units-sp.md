@@ -66,6 +66,7 @@ the contract. Today's values are given only so the reader knows the starting poi
 | Content-left / start-barline / key-sig-right / content-right pads | 0.6 / 0.5 / 0.5 / 0.8, × √d, floor 0.15 | one line each, `c = 0` unless calibration says a glyph needs a floor |
 | Prefix group extra | 0 at d=1, −0.15 at the floor, +1.2 at the ceiling (V-shaped) | one line, or deleted — a V is not a line and its job was to soften the root curves |
 | Horizontal margin | `clamp(2·d^¼, 1, 3)` | one line with the clamp; expected `c < 0` so the margin reaches zero while notes keep a little air |
+| Paper padding (added 2026-09-16) | viewer CSS: 26px each side (14px compact) plus the host's 5px, never a Space consumer | one factor line, 0 at zero, capped at 1 above the default, set on the paint as `--mnx-space-paper`; vertical padding stays Staff's |
 | Column air (added 2026-09-16) | fixed inside the rigid columns: 0.3 of the 1.5sp notehead column, 0.15 of the dot, 0.6 of the grace advance, the accidental/grace/clef/dynamic/lyric pads, the clef/time slot tails | one factor line on all of them, 0 at zero, **capped at 1 above the default**; the ink parts (notehead 1.2, grace 0.9, dot 0.4, clef 2.7, tab clef 1.65, time 1.8) are the floor |
 | Ink pricing, justification stretch/squeeze, `MAX_STRETCH` | multiply or cap the springs after Space | not consumers — unchanged in kind |
 
@@ -187,6 +188,13 @@ The row is capped at its default above 2.2sp: a rigid column that kept growing
 with Space, multiplied by a 6.4× low-vision ink ratio, pushed one bar past the
 pane, and above the default the springs are the spread. Goldens still
 byte-identical.
+
+**Paper padding (2026-09-16).** With the engine at zero the first barline still
+stood 26px from the pane: the viewer's paper card pads the engraving in CSS, and
+its host adds 5px more. Both horizontal paddings now follow a `paperPad` factor
+row (0 at zero, capped at 1 above the default) that the paint sets as
+`--mnx-space-paper`, so what the reader sees as the score margin is the same
+zero the engine draws. Vertical padding is Staff's and stays.
 
 **Open — the calibration pass.** The intercept vector is all zeros: Space 0 is
 airless everywhere, including note-to-note. Whether some rhythm proportion should

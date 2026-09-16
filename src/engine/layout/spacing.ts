@@ -255,12 +255,16 @@ export type PadKind =
  * so rides the same line. `columnAir` is likewise a FACTOR, on every air
  * constant inside a rigid column (`columnGeometry`): the notehead column's
  * 0.3sp, the dot's, the grace run's, the accidental/grace/clef/dynamic/lyric
- * pads. One row for all of them until calibration wants them apart — and
- * the one row that is capped at its default (see `spacePolicy`).
+ * pads. One row for all of them until calibration wants them apart.
+ * `paperPad` is the same kind of factor for the VIEWER's horizontal paper
+ * padding — the pixels between the pane edge and the engraving, which are
+ * horizontal whitespace like any other and so Space's to remove. Both factor
+ * rows are capped at their default (see `spacePolicy`).
  */
-export const SPACE_LINES: { spring: SpaceLine; columnAir: SpaceLine; margin: SpaceLine } & Record<PadKind, SpaceLine> = {
+export const SPACE_LINES: { spring: SpaceLine; columnAir: SpaceLine; paperPad: SpaceLine; margin: SpaceLine } & Record<PadKind, SpaceLine> = {
   spring: { atZero: 0, atDefault: 1 },
   columnAir: { atZero: 0, atDefault: 1 },
+  paperPad: { atZero: 0, atDefault: 1 },
   margin: { atZero: 0, atDefault: 2 },
   contentLeft: { atZero: 0, atDefault: CONTENT_LEFT_PAD_SP },
   startBarline: { atZero: 0, atDefault: START_BARLINE_PAD_SP },
@@ -279,6 +283,8 @@ export interface SpacePolicy {
   spring: number;
   /** Factor on the air inside rigid columns — see `columnGeometry`. */
   columnAir: number;
+  /** Factor on a viewer's horizontal paper padding (px, outside the engine). */
+  paperPad: number;
   horizontalMargin: number;
   pad: (kind: PadKind) => number;
   prefixGroupExtra: number;
@@ -293,6 +299,9 @@ export function spacePolicy(densityH = SPACE_DEFAULT_SP): SpacePolicy {
     // that kept growing (× the ink ratio, on a low-vision staff) would push
     // a single bar past the pane. The one place a line is capped.
     columnAir: Math.min(1, spaceLineAt(SPACE_LINES.columnAir, x)),
+    // Same cap, same reason: above the default the engine's own margin line
+    // already widens the page edge, and the paper need not double it.
+    paperPad: Math.min(1, spaceLineAt(SPACE_LINES.paperPad, x)),
     horizontalMargin: spaceLineAt(SPACE_LINES.margin, x),
     pad: kind => spaceLineAt(SPACE_LINES[kind], x),
     prefixGroupExtra: 0
@@ -318,6 +327,7 @@ function legacySpacePolicy(densityH: number, clearance?: number, densityPad?: nu
   return {
     spring: spaceLineAt(SPACE_LINES.spring, clampSpace(densityH)),
     columnAir: 1,
+    paperPad: 1,
     horizontalMargin: frame.horizontalMargin,
     pad: kind => SLOT_TAILS.has(kind) ? PAD_NORMAL_SP[kind] : frame.prefixPad(PAD_NORMAL_SP[kind]),
     prefixGroupExtra: frame.prefixGroupExtra

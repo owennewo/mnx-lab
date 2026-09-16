@@ -39,7 +39,7 @@ import {
   type RenderOutcome,
   type RenderScale
 } from '../engine/render/scale.ts';
-import { SPACE_DEFAULT_SP, densityLadder, packedRowMeasures, type PackingInput } from '../engine/layout/spacing.ts';
+import { SPACE_DEFAULT_SP, densityLadder, packedRowMeasures, spacePolicy, type PackingInput } from '../engine/layout/spacing.ts';
 import { ScoreGestures, type GestureTargets } from './gestures.ts';
 import { createLayoutCache } from '../engine/render/layoutCache.ts';
 import { SCORE_LABEL_SIZE_SP } from '../engine/layout/scoreText.ts';
@@ -382,7 +382,11 @@ export class DocumentViewer extends LitElement {
         display: block;
         height: 100%;
         overflow: auto;
-        padding: 5px;
+        /* Horizontal padding is whitespace Space owns (core-space-units-sp.md):
+           the paint sets --mnx-space-paper from the Space policy, 0 at Space 0
+           so the first barline meets the pane, 1 at and above the default.
+           Vertical padding is Staff's and does not move. */
+        padding: 5px calc(5px * var(--mnx-space-paper, 1));
         min-width: 0;
         background: var(--bg);
         /* pan-y, not none: the browser keeps one-finger vertical scrolling —
@@ -446,13 +450,13 @@ export class DocumentViewer extends LitElement {
         border-radius: var(--radius-panel);
         box-shadow: var(--shadow);
         border: 1px solid oklch(0.85 0.01 85 / 0.6);
-        padding: 30px 26px;
+        padding: 30px calc(26px * var(--mnx-space-paper, 1));
         margin: 0 auto;
         transition: width 0.15s ease;
       }
 
       :host([compact]) .paper {
-        padding: 16px 14px;
+        padding: 16px calc(14px * var(--mnx-space-paper, 1));
         border-radius: var(--radius-control);
       }
 
@@ -1301,6 +1305,9 @@ export class DocumentViewer extends LitElement {
     this.lastPackings = drawn.packings;
     this.lastDensityH = densityH;
     this.lastStaffScale = used;
+    // The paper's horizontal padding follows Space with the engraving it
+    // frames — set with the paint so the two never disagree for a frame.
+    this.style.setProperty('--mnx-space-paper', String(spacePolicy(densityH).paperPad));
     const shrink = this.shrinkToPane();
     // A section label is 1.8sp in the SVG. The heading lives in ordinary
     // DOM above it, so give it the same em converted through the EXACT

@@ -893,9 +893,11 @@ export class ScenarioPage extends LitElement {
       /* The paper fills the pane now, so the gutter around it is the page's
          call rather than the element's 5px embed default (an outer rule beats
          the shadow root's own :host). 14px is the inset the zoom pad already
-         sits at, which is why the two read as one decision. */
+         sits at, which is why the two read as one decision. Horizontally it
+         follows Space like the element's own padding does: the viewer sets
+         --mnx-space-paper on itself with each paint, 0 at Space 0. */
       mnx-document-viewer {
-        padding: 14px;
+        padding: 14px calc(14px * var(--mnx-space-paper, 1));
         box-sizing: border-box;
       }
 

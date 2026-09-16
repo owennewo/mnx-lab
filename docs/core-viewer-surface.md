@@ -156,8 +156,12 @@ discretionary air at all — margins included. Rigid columns are split into glyp
 INK and AIR (`columnGeometry`): the notehead column, the dot, the grace run, the
 accidental/grace/clef/dynamic/lyric pads and the clef/time slot tails all carry
 air that follows Space down to zero, so at Space 0 noteheads abut at exactly one
-notehead width and the clef, key and time signature touch. Column air is the one
-row capped at its default: above 2.2sp the springs carry the spread. At the
+notehead width and the clef, key and time signature touch. The viewer's own
+horizontal paper padding (26px, 14px compact, plus the host's 5px) is horizontal
+whitespace too and follows the `paperPad` row through `--mnx-space-paper`, so at
+Space 0 the first barline meets the pane edge. Column air and paper padding are
+the two rows capped at their default: above 2.2sp the springs and the margin line
+carry the spread. At the
 default every line evaluates to its historical value exactly, so the default
 engraving is unchanged. Glyph ink, repeat geometry and the accidental slots
 remain priced by Staff. Recalibrating the table moves goldens by design
