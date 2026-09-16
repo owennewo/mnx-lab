@@ -88,8 +88,10 @@ import {
   tightenRows,
   SEPARATION_CLEAR_SP
 } from './verticalDensity.ts';
-import { computeBoundsSp, inkEdgesSp, type InkEdgesSp } from '../render/bounds.ts';
+import { computeBoundsSp, inkEdgesSp, type BoundsSp, type InkEdgesSp } from '../render/bounds.ts';
 import {
+  COHESION_CLEAR_SP,
+  TEXT_SIDE_CLEAR_SP,
   anchorAt,
   emitHarmonies,
   emitNavigationMarkers,
@@ -3568,10 +3570,48 @@ export function emitDirections(args: EmitDirectionsArgs): void {
     if (placed) {
       const box = computeBoundsSp(primitives.slice(firstNew));
       if (box) {
-        placeTextRun(
+        const earlierThisCall = primitives.slice(callStart, firstNew);
+        const isAboveDirection = (p: Primitive): boolean => {
+          if (!(p.className ?? '').split(/\s+/).includes('direction')) return false;
+          const bounds = computeBoundsSp([p]);
+          return bounds !== null && bounds.y + bounds.h < staffTops[s];
+        };
+        const earlierDirections = [
+          ...scan.filter(isAboveDirection),
+          ...earlierThisCall.filter(isAboveDirection)
+        ];
+
+        // First find this phrase's natural height over the musical ink. Keep
+        // earlier phrases out of that skyline: folding them into its highest
+        // point makes an overlap chain ratchet forever upward (A lifts B,
+        // then elevated B lifts C), even when C can reuse A's lower lane.
+        let placedBox = placeTextRun(
           primitives, firstNew, box.y + box.h, staffTops[s],
-          [...scan, ...primitives.slice(callStart, firstNew)], null
+          scan.filter(p => !isAboveDirection(p)), null
         );
+        if (!placedBox) continue;
+
+        // Starting at that lowest lane, move upward only while it actually
+        // collides with an earlier phrase. Once clear, stop: a later phrase
+        // may therefore settle back down into a vacated lower lane.
+        const run = primitives.slice(firstNew);
+        while (true) {
+          const x0 = placedBox.x - TEXT_SIDE_CLEAR_SP;
+          const x1 = placedBox.x + placedBox.w + TEXT_SIDE_CLEAR_SP;
+          const collisions = earlierDirections
+            .map(p => computeBoundsSp([p]))
+            .filter((b): b is BoundsSp => b !== null)
+            .filter(b =>
+              b.x + b.w >= x0 && b.x <= x1 &&
+              placedBox!.y < b.y + b.h + COHESION_CLEAR_SP - 1e-9 &&
+              placedBox!.y + placedBox!.h > b.y - COHESION_CLEAR_SP + 1e-9
+            );
+          if (collisions.length === 0) break;
+          const bottom = Math.min(...collisions.map(b => b.y - COHESION_CLEAR_SP));
+          const dy: number = bottom - (placedBox.y + placedBox.h);
+          for (const p of run) translatePrimitiveY(p, dy);
+          placedBox = { ...placedBox, y: placedBox.y + dy };
+        }
       }
     }
   }
