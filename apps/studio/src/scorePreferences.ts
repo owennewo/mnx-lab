@@ -1,6 +1,11 @@
 // Shared by the score page and library PDF export.
 import { type DisplayOptions } from '../../../src/engine/displayOptions.ts';
-import { DEFAULT_DISPLAY_PREFERENCES, normalizeDisplayPreferences } from '../../../src/elements/displayDefaults.ts';
+import {
+  DEFAULT_DISPLAY_PREFERENCES,
+  DEFAULT_UNROLLED_PREFERENCE,
+  DEFAULT_VIEW_PREFERENCE,
+  normalizeDisplayPreferences
+} from '../../../src/elements/displayDefaults.ts';
 import type { ViewSetting } from '../../../src/elements/DocumentViewer.ts';
 import { isSamplePreset } from '../../../src/audio/sampleSelection.ts';
 import type { PartMix, PartMixEntry } from '../../../src/audio/partMix.ts';
@@ -26,12 +31,16 @@ export function write(key: string, value: string | null) {
 }
 export function readView(): ViewSetting {
   const value = read(VIEW_KEY);
-  return VIEWS.includes(value as ViewSetting) ? (value as ViewSetting) : 'auto';
+  return VIEWS.includes(value as ViewSetting) ? (value as ViewSetting) : DEFAULT_VIEW_PREFERENCE;
 }
 export function readDisplay(): DisplayOptions {
   try {
     return normalizeDisplayPreferences(JSON.parse(read(DISPLAY_KEY) ?? '{}'));
   } catch { return { ...DEFAULT_DISPLAY_PREFERENCES }; }
+}
+export function readUnrolled(): boolean {
+  const value = read(UNROLLED_KEY);
+  return value === null ? DEFAULT_UNROLLED_PREFERENCE : value === 'true';
 }
 export function readFocused(): boolean {
   // The strips' own keys (each drawn out on its own) retired with the edge

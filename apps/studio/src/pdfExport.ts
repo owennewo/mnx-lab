@@ -1,7 +1,7 @@
 import type { MnxStructure } from '../../../src/model/mnx.ts';
 import { DocumentViewer } from '../../../src/elements/DocumentViewer.ts';
 import { loadSmufl } from '../../../src/engine/smufl/smufl.ts';
-import { readView, readDisplay, read, readStaffSp, readSpaceSp, UNROLLED_KEY, SPACING_MODE_KEY } from './scorePreferences.ts';
+import { readView, readDisplay, readUnrolled, read, readStaffSp, readSpaceSp, SPACING_MODE_KEY } from './scorePreferences.ts';
 
 const PRINT_WIDTH_MM = 186;
 
@@ -21,7 +21,7 @@ export async function renderPdfView(preview: Window, mnx: MnxStructure, title: s
   // styles. Making only the preview light leaves dark-theme ink baked in.
   viewer.style.cssText = 'position:fixed;left:-10000px;top:0;width:794px;display:block;color-scheme:light;--mnx-paper:#fff;--mnx-paper-ink:#111;--mnx-paper-line:#666;--font-family-sans:Archivo,sans-serif;--sans:Archivo,sans-serif;';
   viewer.view = readView();
-  viewer.unrolled = read(UNROLLED_KEY) === 'true';
+  viewer.unrolled = readUnrolled();
   viewer.zoom = readStaffSp();
   viewer.densityH = readSpaceSp();
   viewer.spacingMode = read(SPACING_MODE_KEY) === 'natural' ? 'natural' : 'fill';

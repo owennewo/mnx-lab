@@ -43,7 +43,7 @@ import { sourceGlyph } from './SourceSheet.ts';
 import type { TagsSnapshot } from './TagsSheet.ts';
 import type { InstrumentPart } from './InstrumentsSheet.ts';
 
-import { VIEW_KEY, DISPLAY_KEY, UNROLLED_KEY, STAFF_SP_KEY, SPACE_SP_KEY, SPACING_MODE_KEY, FOCUSED_KEY, read, write, readView, readDisplay, readStaffSp, readSpaceSp, readFocused, readParts, writeParts } from './scorePreferences.ts';
+import { VIEW_KEY, DISPLAY_KEY, UNROLLED_KEY, STAFF_SP_KEY, SPACE_SP_KEY, SPACING_MODE_KEY, FOCUSED_KEY, read, write, readView, readDisplay, readUnrolled, readStaffSp, readSpaceSp, readFocused, readParts, writeParts } from './scorePreferences.ts';
 
 const back = html`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"></path></svg>`;
 /** Instruments: three faders, each knob at its own level. */
@@ -77,7 +77,7 @@ export class PiecePage extends LitElement {
   @state() private theme: ThemeSetting = readTheme();
   @state() private view: ViewSetting = readView();
   @state() private display: DisplayOptions = readDisplay();
-  @state() private unrolled = read(UNROLLED_KEY) === 'true';
+  @state() private unrolled = readUnrolled();
   @state() private staffSp: number | null = readStaffSp();
   @state() private densityH: number | null = readSpaceSp();
   @state() private spacingMode: 'natural' | 'fill' = read(SPACING_MODE_KEY) === 'natural' ? 'natural' : 'fill';

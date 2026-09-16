@@ -1,4 +1,4 @@
-import { normalizeDisplayOptions, type DisplayOptions } from '../engine/displayOptions.ts';
+import { DISPLAY_CHOICES, type DisplayOptions } from '../engine/displayOptions.ts';
 
 /**
  * The host defaults the settings card measures "off default" against. Lifted out of
@@ -7,13 +7,22 @@ import { normalizeDisplayOptions, type DisplayOptions } from '../engine/displayO
  * the localStorage read/write around them stays a shell decision.
  */
 export const DEFAULT_DISPLAY_PREFERENCES: Readonly<DisplayOptions> = {
-  lyrics: 'all', timeSignatures: 'show', clefs: 'show', title: 'show',
-  barNumbers: 'every-system', instrumentNames: 'first-system', beams: 'slanted'
+  lyrics: 'current', timeSignatures: 'hide', clefs: 'show', title: 'hide',
+  barNumbers: 'every-system', instrumentNames: 'hide', beams: 'slanted'
 };
+
+/** Shell-owned rows in the same settings card. Kept beside the engraving
+ * defaults so Studio and the workbench give a fresh browser the same score. */
+export const DEFAULT_VIEW_PREFERENCE = 'both' as const;
+export const DEFAULT_UNROLLED_PREFERENCE = false;
 
 /** Shared product preference migration. Explicit viewer/engine overrides are
  * separate: old saved Clearance must not silently keep a third layout axis. */
 export function normalizeDisplayPreferences(input: unknown): DisplayOptions {
-  const { selectedVerse: _transient, clearance: _legacyClearance, ...validated } = normalizeDisplayOptions(input);
-  return { ...DEFAULT_DISPLAY_PREFERENCES, ...validated };
+  const source = input && typeof input === 'object' ? input as Record<string, unknown> : {};
+  const result: Record<string, unknown> = { ...DEFAULT_DISPLAY_PREFERENCES };
+  for (const [key, choices] of Object.entries(DISPLAY_CHOICES)) {
+    if ((choices as readonly unknown[]).includes(source[key])) result[key] = source[key];
+  }
+  return result as DisplayOptions;
 }

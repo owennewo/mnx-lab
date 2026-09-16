@@ -15,6 +15,10 @@ import { groupScenarios } from '../corpus/groups.ts';
 import { buildQueue, classify } from './queue.ts';
 import { designTokens, sharedChrome, scrollbars } from '../elements/tokens.ts';
 import type { ViewMode } from '../elements/DocumentViewer.ts';
+import {
+  DEFAULT_UNROLLED_PREFERENCE,
+  DEFAULT_VIEW_PREFERENCE
+} from '../elements/displayDefaults.ts';
 import { resolveShellAction, strokeOf } from '../edit/keymap.ts';
 import { keyIsOurs } from './keyScope.ts';
 import type { EditorIntent } from '../edit/intents.ts';
@@ -106,15 +110,14 @@ const RAIL_HIDDEN_KEY = 'mnx-lab.rail-hidden';
 const PANEL_HIDDEN_KEY = 'mnx-lab.panel-hidden';
 const THEME_KEY = 'mnx-lab.theme';
 /** The staff view and repeats mode — how you like to read, not what the score
- *  is, so localStorage beside the zoom rather than the URL. The view stores
- *  "unset" by ABSENCE: unset means the document's own staffKind hint, which no
- *  stored view can express. */
+ *  is, so localStorage beside the zoom rather than the URL. An absent view gets
+ *  the shared product default; an explicit stored view always wins. */
 const STAFF_VIEW_KEY = 'mnx-lab.view';
 const UNROLLED_KEY = 'mnx-lab.unrolled';
 
-function readStaffView(): ViewMode | '' {
+function readStaffView(): ViewMode {
   const v = localStorage.getItem(STAFF_VIEW_KEY);
-  return v === 'notation' || v === 'tab' || v === 'both' ? v : '';
+  return v === 'notation' || v === 'tab' || v === 'both' ? v : DEFAULT_VIEW_PREFERENCE;
 }
 
 function readTheme(): ThemeSetting {
@@ -147,7 +150,9 @@ export class WorkbenchApp extends LitElement {
   /** The staff view and repeats mode, shell-owned so the palette and the
    *  settings pad write one value; the page resolves an unavailable view. */
   @state() private staffView = readStaffView();
-  @state() private unrolled = localStorage.getItem(UNROLLED_KEY) === '1';
+  @state() private unrolled = localStorage.getItem(UNROLLED_KEY) === '1'
+    ? true
+    : DEFAULT_UNROLLED_PREFERENCE;
 
   private setStaffView(view: ViewMode) {
     this.staffView = view;
