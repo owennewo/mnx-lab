@@ -77,10 +77,27 @@ export function staffLineAt(line: StaffLine, x: number): number {
  */
 export const MIN_STAFF_SP = 0.4;
 export const MAX_STAFF_SP = 8;
+/** One Staff control step, in the same direct unit as the value. */
+export const STAFF_STEP_SP = 0.1;
 
 export function clampStaffSp(value: number | null | undefined): number | null {
   if (value === null || value === undefined || !Number.isFinite(value)) return null;
   return Math.min(MAX_STAFF_SP, Math.max(MIN_STAFF_SP, value));
+}
+
+/**
+ * Walk the direct 0.1sp Staff grid, shared by buttons, drags and pinches.
+ * Fitted values need not already be on that grid, so the first step lands on
+ * the next rung in its direction rather than carrying hidden hundredths into
+ * every later value.
+ */
+export function staffSpAfterSteps(from: number, steps: number): number {
+  if (steps === 0) return from;
+  const grid = from / STAFF_STEP_SP;
+  const rung = steps > 0
+    ? Math.floor(grid + 1e-9) + steps
+    : Math.ceil(grid - 1e-9) + steps;
+  return Math.round(rung * STAFF_STEP_SP * 100) / 100;
 }
 
 export function staffPxPerSp(value: number): number {

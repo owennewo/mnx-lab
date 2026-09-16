@@ -6,7 +6,8 @@ import {
   BASELINE_PX_PER_SP,
   MIN_STAFF_SP,
   MAX_STAFF_SP,
-  clampStaffSp
+  clampStaffSp,
+  staffSpAfterSteps
 } from '../engine/render/scale.ts';
 import {
   MIN_SPACE_SP,
@@ -60,19 +61,15 @@ import {
  * 100.
  */
 
-/** Design: Staff takes perceptual steps, Space steps by 0.5sp. Both values are
+/** Design: Staff steps by 0.1sp, Space steps by 0.5sp. Both values are
  *  measured directly in staff spaces and both ranges are the ENGINE's.
  *
  *  SPACE_STEP is a MINIMUM rather than the step: with a ladder supplied
  *  (see `densitySteps`) the arm lands on the first rung at least this far away,
  *  so a click never does nothing and never does less than the design asked.
  *
- *  STAFF_STEP is a RATIO because Staff spans 0.4sp–8sp for low-vision readers.
- *  An additive step is coarse at the floor and invisible at the ceiling. A
- *  constant ratio gives equal perceptual steps at every size and crosses the
- *  20x range in about 32 clicks (or one drag). 1.1 keeps the established feel
- *  at 1sp while staying useful at both ends. */
-const STAFF_STEP_RATIO = 1.1;
+ *  Staff uses its direct unit here too: every arm click or gesture step adds
+ *  or removes exactly 0.1sp, independent of the current value. */
 const SPACE_STEP = 0.5;
 
 /** Float slack when comparing against ladder rungs (they are 0.01sp grid values). */
@@ -104,15 +101,6 @@ type ZoomPadCommit = Pick<ZoomPadChange, 'staffSp' | 'densityH'>;
 /** Round to the step grid so repeated ±0.05 cannot drift into 0.8500000001. */
 function snap(value: number, step: number): number {
   return Math.round(value / step) * step;
-}
-
-/**
- * `steps` geometric Staff steps from `from`, snapped to the 0.01sp grid the
- * readout prints. Rounding keeps repeated ×1.1 ÷1.1 from drifting, and the
- * grid is fine enough that the first step from the 0.4sp floor is 0.44sp.
- */
-function staffAfterSteps(from: number, steps: number): number {
-  return Math.round(from * Math.pow(STAFF_STEP_RATIO, steps) * 100) / 100;
 }
 
 @customElement('mnx-zoom-pad')
@@ -737,7 +725,7 @@ export class ZoomPad extends LitElement {
   private step(axis: ZoomAxis, steps: number) {
     if (steps === 0) return;
     if (axis === 'staff') {
-      const next = staffAfterSteps(this.requestedStaff, steps);
+      const next = staffSpAfterSteps(this.requestedStaff, steps);
       const clampedTo = clampStaffSp(next)!;
       this.noteClamp('staff', next, clampedTo, MIN_STAFF_SP, MAX_STAFF_SP);
       this.commit({ staffSp: clampedTo, densityH: this.densityH });
@@ -954,7 +942,7 @@ export class ZoomPad extends LitElement {
     const staffSteps = drag.lock === 'space' ? 0 : Math.round(-dy / rate);
     const spaceSteps = drag.lock === 'staff' ? 0 : Math.round(dx / rate);
 
-    const wantStaff = staffAfterSteps(drag.staff0, staffSteps);
+    const wantStaff = staffSpAfterSteps(drag.staff0, staffSteps);
     const gotStaff = clampStaffSp(wantStaff)!;
     // Same walk the arms take, so a drag and a click agree on what a step is:
     // rungs, not percentages.
@@ -1123,7 +1111,7 @@ export class ZoomPad extends LitElement {
   private sp(value: number) {
     return `${this.spNumber(value)}sp`;
   }
-  /** Staff's geometric walk needs hundredth precision at the 0.4sp floor. */
+  /** Fitted and post-shrink values can still require hundredth precision. */
   private staffSpNumber(value: number) {
     return String(Math.round(value * 100) / 100);
   }

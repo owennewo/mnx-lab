@@ -37,12 +37,9 @@
  * timing-and-threshold code against real PointerEvents. It ships the way
  * `ZoomPad.ts` ships.
  */
-import { clampStaffSp } from '../engine/render/scale.ts';
+import { clampStaffSp, staffSpAfterSteps } from '../engine/render/scale.ts';
 import { walkDensity } from '../engine/layout/spacing.ts';
 
-/** Staff steps are geometric — the pad's reasoning, unchanged: an additive
- *  step is invisible near 8sp and coarse near 0.4sp. */
-const STAFF_STEP_RATIO = 1.1;
 /** ±1 step per 6px of travel. */
 const DRAG_PX_PER_STEP = 6;
 /** ±1 step per 12px of span change — half the drag's rate, see above. */
@@ -68,10 +65,9 @@ const TWO_FINGER_SLOP_PX = 16;
  * A trackpad pinch reaches the page as `wheel` with `ctrlKey` set — the
  * browser's own encoding, which is why Ctrl cannot be the modifier that
  * picks the axis: a real Ctrl and a pinch are the same event. Shift is.
- * Chrome's pinch deltas run a few units per event and sum to roughly the
- * natural log of the zoom ×100, so 10 units per ×1.1 step keeps a pinch
- * feeling like the browser's own; a mouse wheel's 100-unit notches are
- * clamped so one notch is a few steps rather than a leap.
+ * Chrome's pinch deltas run a few units per event. Ten units advances one
+ * direct 0.1sp Staff step; a mouse wheel's 100-unit notches are clamped so one
+ * notch is a few steps rather than a leap.
  */
 const WHEEL_UNITS_PER_STEP = 10;
 const WHEEL_UNIT_CLAMP = 30;
@@ -156,12 +152,6 @@ interface Pinch {
   engaged: boolean;
   staff0: number;
   space0: number;
-}
-
-/** `steps` geometric staff steps from `from`, snapped to the 1% grid the pad's
- *  readout prints, so repeated ×1.1 ÷1.1 cannot drift. */
-function staffAfterSteps(from: number, steps: number): number {
-  return Math.round(from * Math.pow(STAFF_STEP_RATIO, steps) * 100) / 100;
 }
 
 /** The near-axis cone: pure-staff and pure-space stay easy targets, a clearly
@@ -459,7 +449,7 @@ export class ScoreGestures {
   private commitSteps(snap: Snap, staff0: number, space0: number, staffSteps: number, spaceSteps: number) {
     if (snap === 'space') staffSteps = 0;
     if (snap === 'staff') spaceSteps = 0;
-    const staff = clampStaffSp(staffAfterSteps(staff0, staffSteps))!;
+    const staff = clampStaffSp(staffSpAfterSteps(staff0, staffSteps))!;
     const space = walkDensity(
       space0,
       Math.abs(spaceSteps),

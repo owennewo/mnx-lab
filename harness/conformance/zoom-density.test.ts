@@ -66,12 +66,14 @@ import {
   MAX_STAFF_SP,
   MIN_STAFF_SCALE,
   MAX_STAFF_SCALE,
+  STAFF_STEP_SP,
   STAFF_LINES,
   clampStaffSp,
   clampStaffScale,
   renderScale,
   staffLineAt,
   staffPxPerSp,
+  staffSpAfterSteps,
   staffSpFromPxPerSp
 } from '../../src/engine/render/scale.ts';
 import { initSmufl } from '../helpers/corpusPrimitives.ts';
@@ -318,6 +320,17 @@ describe('zoom / density', () => {
       expect(staffLineAt(STAFF_LINES.inkPxPerSp, 2.2)).toBe(22);
       expect(staffPxPerSp(2.2)).toBe(22);
       expect(staffSpFromPxPerSp(22)).toBe(2.2);
+    });
+
+    it('moves every Staff control path by an additive 0.1sp per step', () => {
+      expect(STAFF_STEP_SP).toBe(0.1);
+      expect(staffSpAfterSteps(1, 1)).toBe(1.1);
+      expect(staffSpAfterSteps(2.2, -1)).toBe(2.1);
+      expect(staffSpAfterSteps(1.23, 1)).toBe(1.3);
+      expect(staffSpAfterSteps(1.23, -1)).toBe(1.2);
+      expect(staffSpAfterSteps(0.4, 3)).toBe(0.7);
+      expect(clampStaffSp(staffSpAfterSteps(MIN_STAFF_SP, -1))).toBe(MIN_STAFF_SP);
+      expect(clampStaffSp(staffSpAfterSteps(MAX_STAFF_SP, 1))).toBe(MAX_STAFF_SP);
     });
 
     it('keeps the scale-named API as a one-for-one compatibility alias', () => {

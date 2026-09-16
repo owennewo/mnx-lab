@@ -54,9 +54,10 @@ barline detached from the staff it crosses would be a regression.
    canonical code and event data use `staffSp`. Saved `staff-scale` preferences
    migrate one-for-one to `staff-sp` because the direct mapping preserves every
    stored value.
-8. **Geometric stepping stays.** Staff is perceptual zoom across a 20× range;
-   multiplying by 1.1 remains usable where additive sp steps would be coarse at
-   the floor and invisible at the ceiling.
+8. **Stepping uses the direct unit.** Each Staff step walks one `0.1sp` rung.
+   Buttons, drags and pinches share the same additive helper. A precise fitted
+   value first lands on the next tenth in the requested direction, then every
+   subsequent increment is exactly `0.1sp`.
 
 ### Consumers
 
@@ -89,8 +90,8 @@ globally affine outputs.
    `staffScale` as a lower-precedence compatibility input. Thread `staffSp`
    through the viewer, frame, pad, gesture protocol and shell state.
 3. Print Staff with up to two decimals and `sp`, including MIN/MAX and gesture
-   HUD. The hundredths are needed because geometric stepping from the 0.4sp
-   floor first lands at 0.44sp. Keep the fitted annotation and
+   HUD. Fitted and post-shrink reporting can still produce hundredths even
+   though explicit steps are `0.1sp`. Keep the fitted annotation and
    asked-versus-drawn explanation.
 4. Move Workbench and Studio preferences to `staff-sp`, migrating a finite
    stored `staff-scale` value one-for-one before clamping it to the new range.
@@ -127,3 +128,6 @@ readout, disabled floor arm and engraving all followed the new unit. The full
 1,877-test suite, scenario checks and production build passed after rebase.
 Primitive regeneration passed 191 checks and left `scenarios/` byte-clean, so
 the item creates no verification batch.
+
+Follow-up 2026-09-16: Staff stepping changed from multiplicative ×1.1 to an
+additive `0.1sp`. The pad and gesture paths now call the same engine helper.
