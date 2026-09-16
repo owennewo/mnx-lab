@@ -348,17 +348,17 @@ describe('zoom / density', () => {
     });
   });
 
-  // The low-vision range: Staff and Space now both reach 8sp. What has to hold
-  // for that to be an honest offer rather than a bigger number: the engine
-  // must still DRAW it, and the top of each range must still DO something.
+  // The low-vision ranges have independent ceilings. What has to hold for
+  // each to be an honest offer rather than a bigger number: the engine must
+  // still DRAW it, and the top of each range must still DO something.
   describe('the low-vision range', () => {
-    it('both ceilings reach 8sp', () => {
-      expect(MAX_STAFF_SP).toBe(8);
+    it('caps Staff before pane shrink defeats it while Space still reaches 8sp', () => {
+      expect(MAX_STAFF_SP).toBe(4);
       // Space's ceiling is in staff spaces now (core-space-units-sp.md): 8sp
       // after a quarter note, ~3.6× the default, which is where the short
       // score below reaches one bar per system (measured 6–7sp).
       expect(MAX_SPACE_SP).toBe(8);
-      // Staff now names its canonical-sp range directly; Space reaches zero
+      // Staff names its canonical-sp range directly; Space reaches zero
       // because air can disappear, while a zero-height staff is meaningless.
       expect(MIN_STAFF_SP).toBe(0.4);
       expect(MIN_SPACE_SP).toBe(0);

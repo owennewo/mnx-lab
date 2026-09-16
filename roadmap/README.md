@@ -458,7 +458,7 @@ back up to `proposed/` the moment it is.
 ### complete/
 
 - **[core-staff-units-sp.md](complete/core-staff-units-sp.md)** — **complete
-  2026-09-16** — Staff is a direct `0.4sp–8sp` control through one `10x + 0`
+  2026-09-16** — Staff is a direct `0.4sp–4sp` control through one `10x + 0`
   affine ink line. Fitted remains absence; old scale-named inputs, events and
   preferences migrate through compatibility aliases; goldens remain byte-clean.
 

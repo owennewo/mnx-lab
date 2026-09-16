@@ -113,7 +113,7 @@ export class DocumentViewer extends LitElement {
   /**
    * Staff in canonical staff spaces. `1sp` is the historical 100% request and
    * resolves through the engine's shared affine ink line, so line spacing,
-   * glyphs, text and stems scale together. Clamped 0.4–8sp.
+   * glyphs, text and stems scale together. Clamped 0.4–4sp.
    *
    * **`null` (the default) means FITTED, not 1.** Unset defers downward, per
    * the precedence chain: with no `pxPerSp` the renderers fit a short score up

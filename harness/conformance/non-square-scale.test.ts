@@ -35,12 +35,12 @@ const readDoc = (dir: string) =>
   JSON.parse(fs.readFileSync(path.join(dir, 'document.mnx.json'), 'utf8')) as MnxStructure;
 
 /**
- * The ratios swept. 1 proves the sweep agrees with the goldens; 4 is a
- * comfortable non-square; `MAX_STAFF_SP` is the worst case the viewer can
- * actually produce, since a fitted paint floors the horizontal scale at the
- * baseline and the ratio is then the staff scale itself.
+ * The ratios swept. 1 proves the sweep agrees with the goldens;
+ * `MAX_STAFF_SP` is the worst case the viewer can actually produce, since a
+ * fitted paint floors the horizontal scale at the baseline and the ratio is
+ * then the staff scale itself.
  */
-const RATIOS = [1, 4, MAX_STAFF_SP];
+const RATIOS = [1, MAX_STAFF_SP];
 
 const cls = (p: Primitive) => (p.className ?? '').split(' ');
 
@@ -374,12 +374,12 @@ describe('minimum drawn ink — a line is always at least a line', () => {
     // The floor is what closes that gap, and only there. At Staff 0.4sp the
     // thinnest stroke comes out exactly at the floor; at Staff 1sp a tab hairline is
     // already exactly a pixel on its own (0.1sp × 10px/sp), which is a neat
-    // reminder of how close to the edge the default sits; and by Staff 8sp the
+    // reminder of how close to the edge the default sits; and by Staff 4sp the
     // floor is nowhere near firing.
     expect(Math.min(...strokeWidths(blues(), 10, MIN_STAFF_SP * 10))).toBe(MIN_INK_PX);
     expect(Math.min(...strokeWidths(blues(), 10, 10))).toBe(MIN_INK_PX);
     expect(Math.min(...strokeWidths(blues(), 10, MAX_STAFF_SP * 10))).toBeGreaterThan(
-      MIN_INK_PX * 5
+      MIN_INK_PX * 3
     );
   });
 

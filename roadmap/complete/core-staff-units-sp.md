@@ -27,7 +27,7 @@ barline detached from the staff it crosses would be a regression.
 1. **The control value is Staff `x`, in canonical staff spaces.** `1sp` is the
    existing 100% request: one rendered line gap is ten CSS pixels before any
    final pane shrink. `2.2sp` is therefore the existing 220% request. The
-   supported range is **0.4sp–8sp**.
+   supported range is **0.4sp–4sp**.
 2. **Fitted stays absence.** `null` still means the renderer derives a square
    scale from the viewport. It is not replaced by `1sp`; the pad reports the
    fitted value actually drawn.
@@ -45,7 +45,7 @@ barline detached from the staff it crosses would be a regression.
    reporting converts the final on-screen pixel scale back through the Staff
    line rather than multiplying an assumed zero-intercept scale.
 6. **The vertical paper padding remains fixed.** It is frame chrome, not an
-   engraving measurement, and scaling 30px to 240px at `8sp` would waste the
+   engraving measurement, and scaling 30px to 120px at `4sp` would waste the
    low-vision reader's viewport. Space continues to own only its horizontal
    factor.
 7. **Public compatibility is numeric and named.** `<mnx-document-viewer
@@ -110,7 +110,7 @@ globally affine outputs.
 - Notation, tab and both resolve Staff through the same `10x + 0` line.
 - The drawn readout is obtained by inverting the affine line after pane shrink.
 - No stroke drops below one pixel and compound barlines remain separated at
-  `0.4sp`; rigid ink remains collision-safe at `8sp`.
+  `0.4sp`; rigid ink remains collision-safe at `4sp`.
 - Old saved preferences and public scale-named inputs continue to work.
 - `npm run update:primitives` leaves `scenarios/` clean; all landing gates pass.
 
@@ -131,3 +131,9 @@ the item creates no verification batch.
 
 Follow-up 2026-09-16: Staff stepping changed from multiplicative ×1.1 to an
 additive `0.1sp`. The pad and gesture paths now call the same engine helper.
+
+Follow-up 2026-09-16: The Staff ceiling changed from `8sp` to `4sp`. Above that
+point, ink-priced columns made the SVG overflow its pane and `max-width: 100%`
+scaled the whole page back down: further requests barely increased visible
+staff height while shrinking horizontal air. The lower ceiling avoids offering
+a range whose on-screen effect contradicts the control.

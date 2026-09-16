@@ -684,8 +684,9 @@ export class ZoomPad extends LitElement {
    * nowhere: a drawing wider than it is scaled down to fit (`max-width: 100%`
    * on the score's svg), and since a large Staff value prices the rigid
    * columns wider as well as taller, the shrink grows with the ask and the two
-   * nearly cancel. Asking 3.2sp drew 2.68sp, asking 6.4sp drew 2.97sp — reported as
-   * *"vertical spacing 320 doesn't seem half of 640"*, which it was not.
+   * nearly cancel. Before the Staff ceiling was capped at 4sp, asking 3.2sp
+   * drew 2.68sp and asking 6.4sp drew 2.97sp — reported as *"vertical spacing
+   * 320 doesn't seem half of 640"*, which it was not.
    * `<mnx-document-viewer>` measures the shrink and reports the product, so this
    * number is the staff in front of you.
    */
@@ -700,7 +701,8 @@ export class ZoomPad extends LitElement {
    * the request backwards the moment the two diverge — press ↑ at a pinned
    * 6.4sp that draws 2.97sp and the next value would be 3.27sp, i.e. a smaller ask
    * than the one already in force. The reader still sees the truth; the
-   * control still edits what they set.
+   * control still edits what they set. The 4sp ceiling now prevents the worst
+   * of this divergence, but narrow panes can still shrink below it.
    */
   private get requestedStaff(): number {
     return this.staffSp ?? this.effectiveStaffSp;

@@ -22,7 +22,7 @@
 | Gesture | Does | Knob |
 |---|---|---|
 | Double tap | Zoom reset | `zoom = null`, `densityH = null` — back to **fitted**, not to 1.0 |
-| Double tap, hold, drag | Staff × space zoom, diagonal drives both | `zoom` (0.6–6.4, `scale.ts:99`), `densityH` (0.01–8, `spacing.ts:172`) |
+| Double tap, hold, drag | Staff × space zoom, diagonal drives both | `zoom` (0.4–4sp), `densityH` (0–8sp) |
 | Two-finger tap | Play/pause | a `transport-toggle` event, not the player |
 | Pinch (touch) | Staff × space zoom: fingers apart vertically grows the staff, apart horizontally opens the spacing; a diagonal drives both | the same two knobs, the same ladder, stepped by the change in the fingers' span at half the drag's rate (`PINCH_PX_PER_STEP = 12`) |
 | Pinch (trackpad) | Staff; **Shift**+pinch → space | arrives as `wheel` with `ctrlKey` — the browser's encoding of a pinch, which is why Ctrl cannot be the modifier — 10 units per step, mouse-wheel notches clamped |

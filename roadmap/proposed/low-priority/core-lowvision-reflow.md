@@ -1,9 +1,10 @@
 # Reflow at high staff scale — should the line width know how big the ink is?
 
 > **Status: PROPOSED 2026-08-21.** Split out of the same session that raised
-> the staff-scale ceiling to 640% and the density ceiling to 8 for low-vision
-> readers. That change is landed and works; this is the one gap it leaves, and
-> it is a decision rather than a defect.
+> the former staff-scale ceiling to 640% and the density ceiling to 8 for
+> low-vision readers. Staff was subsequently capped at 4sp because pane shrink
+> made the range above it misleading. The underlying reflow question remains
+> relevant if a larger Staff range is restored.
 
 ## The gap, measured
 

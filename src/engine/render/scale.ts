@@ -69,14 +69,14 @@ export function staffLineAt(line: StaffLine, x: number): number {
 }
 
 /**
- * A zero-height staff is meaningless, so Staff stops at 0.4sp. The 8sp
- * ceiling extends the previous 6.4× low-vision range; rigid columns are ink
- * priced, so growth degrades to honest page overflow rather than collisions.
- * The viewer's max-width shrink can still make the drawn value lower than the
- * request, which is why reporting inverts the final pixel scale.
+ * A zero-height staff is meaningless, so Staff stops at 0.4sp. Above 4sp,
+ * ink-priced columns make the SVG wider than its pane and the viewer's
+ * max-width shrink largely cancels further vertical growth while compressing
+ * horizontal air. Stop before that misleading range. Reporting still inverts
+ * any final pane shrink because it can begin below the ceiling on narrow panes.
  */
 export const MIN_STAFF_SP = 0.4;
-export const MAX_STAFF_SP = 8;
+export const MAX_STAFF_SP = 4;
 /** One Staff control step, in the same direct unit as the value. */
 export const STAFF_STEP_SP = 0.1;
 
