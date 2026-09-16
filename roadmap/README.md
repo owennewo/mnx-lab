@@ -80,6 +80,7 @@ Still wanted, still described — just not next. Nothing here has been argued ag
 (that is `rejected/`); these are the items unlikely to be picked up soon. A doc moves
 back up to `proposed/` the moment it is.
 
+- **[core-guitarpro-free-text-lyrics.md](proposed/low-priority/core-guitarpro-free-text-lyrics.md)** — recover lyrics from malformed Guitar Pro sources such as “Kind Hearted Woman Blues”, where all 47 word fragments are generic beat `FreeText` on the guitar track, the track named `Lyrics` contains no words, and GPIF carries no formal lyric entries. Parked behind a second-source or product-need trigger because classification and phrase-to-event attachment would both be heuristic; explicitly forbids a title-specific fix.
 - **[core-assist-evals.md](proposed/low-priority/core-assist-evals.md)** — rank models on **our
   corpus instead of on reputation**. Split out of the model selector (2026-08-22) as
   the one thing it deliberately did not build. `MODEL_PRIORS` is seventeen families of

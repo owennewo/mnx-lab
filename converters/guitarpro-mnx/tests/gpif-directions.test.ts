@@ -28,6 +28,25 @@ describe('Guitar Pro free text', () => {
     expect(warnings).toEqual([]);
   });
 
+  it.each([
+    'got a kind',
+    'hearted woman',
+    "do anything'n this world for me",
+    'A-ain\'t but the one thing',
+    'Makes mister Johnson drink',
+    "Worried 'bout how you treat"
+  ])('does not mistake lyric-like prose for a chord: %s', async text => {
+    const mnx = await withText();
+    mnx.parts[0].measures[0].directions = [{ position: { fraction: [0, 1] }, text, orient: 'above' }];
+
+    const back = importGuitarProGpif(exportGuitarProGpif(mnx));
+
+    expect(back.global.measures[0]._x?.mnxLab?.harmonies ?? []).toEqual([]);
+    expect(back.parts[0].measures[0].directions).toEqual([
+      { position: { fraction: [0, 1] }, text, orient: 'above' }
+    ]);
+  });
+
   it('still reads a chord spelled as free text as a chord, not a direction', async () => {
     const source: MnxStructure = JSON.parse(await fs.readFile(path.join(SCORES, 'Vestapol.mnx.json'), 'utf-8'));
     const back = importGuitarProGpif(exportGuitarProGpif(source));
