@@ -59,7 +59,7 @@ import {
  * 100.
  */
 
-/** Design: staff step 5%, spacing step 4% — the latter now 0.1sp, since Space
+/** Design: staff step 5%, spacing step 0.5sp — Space is measured directly
  *  is a number in staff spaces (2026-09-15). Both ranges are the ENGINE's.
  *
  *  SPACE_STEP is a MINIMUM rather than the step: with a ladder supplied
@@ -77,7 +77,7 @@ import {
  *  end. 1.1 keeps the design's feel at the default — the first click off 100%
  *  moves 10%, against the old 5% — while staying honest at the top. */
 const STAFF_STEP_RATIO = 1.1;
-const SPACE_STEP = 0.1;
+const SPACE_STEP = 0.5;
 
 /** Float slack when comparing against ladder rungs (they are 0.01sp grid values). */
 const RUNG_EPS = 1e-6;

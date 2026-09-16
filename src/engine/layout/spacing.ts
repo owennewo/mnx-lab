@@ -364,13 +364,13 @@ export function clampInkRatio(value: number | undefined): number {
  * supplied the walk lands on the first rung at least this far away, so a step
  * never does nothing and never does less than the design asked.
  *
- * Mirrors `SPACE_STEP` in `src/workbench/ZoomPad.ts`, which still carries its
+ * Mirrors `SPACE_STEP` in `src/elements/ZoomPad.ts`, which still carries its
  * own copy of this walk. The pad is a tuned, untested control and moving it was
  * not worth the blast radius of a first cut, so the duplication is deliberate
  * and temporary — adopting these functions there is the follow-up recorded in
  * roadmap/inprogress/core-touch-gestures.md.
  */
-export const SPACE_STEP_SP = 0.1;
+export const SPACE_STEP_SP = 0.5;
 
 /** Float slack when comparing against ladder rungs (they are 0.01sp grid values). */
 const RUNG_EPS = 1e-6;
@@ -2601,4 +2601,3 @@ export function repeatStartSuppliesBarline(
   if (next.row !== measure.row) return false; // a row away is not a boundary
   return Boolean(next.repeatStart) && next.repeatStartX === next.x;
 }
-
