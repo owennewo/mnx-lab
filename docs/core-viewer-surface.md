@@ -153,7 +153,7 @@ the air after a quarter note — and every consumer of it is one clamped line,
 `{ atZero, atDefault }`: the intercepts are the zero engraving, the slopes how each
 kind of air grows from it. Today every intercept is 0, so Space 0 draws no
 discretionary air at all — margins included. One gap is deliberately NOT a
-consumer: a system's opening barline sits a fixed `SYSTEM_START_PAD_SP` (1.1sp)
+consumer: a system's opening barline sits a fixed `SYSTEM_START_PAD_SP` (0.25sp)
 from its clef at every Space, because a system's opening is a frame rather than
 air between events; mid-system bars keep their content-left pad on its line. Rigid columns are split into glyph
 INK and AIR (`columnGeometry`): the notehead column, the dot, the grace run, the

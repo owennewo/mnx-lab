@@ -1427,3 +1427,21 @@ and baseline are still written, as non-defaults); slurs, ties and hairpins are s
 drawn in ink colour. In the app, selection and playback recolouring is unchanged: those
 rules carry classes or `!important` and outrank the zero-specificity defaults exactly as
 they outranked the attributes.
+
+## System-start prefix at 0.25sp — 2026-09-16
+
+Owner: [core-space-units-sp.md](core-space-units-sp.md), *First calibration
+decision*. Visual calibration reduced the fixed gap between a system's opening
+barline and its clef to `0.25sp`. The gap remains independent of Space; only its
+fixed value changed. Goldens moved for all 124 golden-bearing, non-verified
+scenarios under `scenarios/lab/` and `scenarios/spec/` (121 `rendered`, three
+`draft`). The five `verified` schema-gap rejection scenarios have no engraving
+and did not move, so no verification record or status changed.
+
+**What a reviewer should look for.** At every system opening, the clef begins
+`0.25sp` after the left barline on notation, tab and both projections. The smaller
+prefix must not touch the barline, brace or bracket, and clef/key/time groups must
+retain their internal spacing. Mid-system bar starts are unchanged. Because the
+freed width is redistributed by row justification, later events may shift within
+the system; system membership and row breaks should remain unchanged unless the
+extra width legitimately lets another measure fit.

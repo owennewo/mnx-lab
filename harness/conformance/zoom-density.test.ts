@@ -748,6 +748,7 @@ describe('Space in staff spaces', () => {
 
   it('the gap between a system\'s opening barline and its clef is fixed, not Space', () => {
     initSmufl();
+    expect(SYSTEM_START_PAD_SP).toBe(0.25);
     for (const spaceSp of [0, 1.1, SPACE_DEFAULT_SP, MAX_SPACE_SP]) {
       const plan = planHorizontal(blues(), 80, { densityH: spaceSp });
       const first = plan.measures[0];

@@ -1,17 +1,17 @@
 <svg width="1280" height="251.4288" viewBox="0 0 1280 251.4288" xmlns="http://www.w3.org/2000/svg">
 <style>:where(svg>text){font-family:Bravura;fill:currentColor}:where(svg>line,svg>path){stroke:currentColor}</style>
-<line x1="32" y1="80" x2="446.4" y2="80" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="98.2864" x2="446.4" y2="98.2864" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="116.5712" x2="446.4" y2="116.5712" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="134.8576" x2="446.4" y2="134.8576" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="153.1424" x2="446.4" y2="153.1424" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="171.4288" x2="446.4" y2="171.4288" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="80" x2="432.8" y2="80" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="98.2864" x2="432.8" y2="98.2864" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="116.5712" x2="432.8" y2="116.5712" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="134.8576" x2="432.8" y2="134.8576" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="153.1424" x2="432.8" y2="153.1424" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="171.4288" x2="432.8" y2="171.4288" stroke-width="1.6" class="staff-line"></line>
 <line x1="32" y1="80" x2="32" y2="171.4288" stroke-width="2.56" class="barline barline-start"></line>
-<text x="49.6" y="125.7136" font-size="64" class="tab-clef"></text>
-<text x="101.6" y="102.8576" font-size="64" text-anchor="middle" class="time-sig-num"></text>
-<text x="101.6" y="148.5712" font-size="64" text-anchor="middle" class="time-sig-den"></text>
-<line x1="433.6" y1="80" x2="433.6" y2="171.4288" stroke-width="2.56" class="barline barline-final-thin"></line>
-<rect x="438.4" y="80" width="8" height="91.4288" fill="currentColor" class="barline barline-final-thick"></rect>
+<text x="36" y="125.7136" font-size="64" class="tab-clef"></text>
+<text x="88" y="102.8576" font-size="64" text-anchor="middle" class="time-sig-num"></text>
+<text x="88" y="148.5712" font-size="64" text-anchor="middle" class="time-sig-den"></text>
+<line x1="420" y1="80" x2="420" y2="171.4288" stroke-width="2.56" class="barline barline-final-thin"></line>
+<rect x="424.8" y="80" width="8" height="91.4288" fill="currentColor" class="barline barline-final-thick"></rect>
 <rect x="36.8" y="190.6288" width="17.6" height="17.6" fill="#b91c1c" rx="8.8" ry="8.8" class="diagnostic-marker diagnostic-validation">
 <title>validation — the part asks for a tab view (staffKind) but declares no strings — add _x.mnxLab.strings, or supply an instrument from the viewer</title></rect>
 <text x="45.6" y="199.4288" font-size="14.4" text-anchor="middle" dominant-baseline="central" font-weight="bold" style="font-family:var(--font-family-sans);fill:#fff" class="diagnostic-marker diagnostic-validation">!<title>validation — the part asks for a tab view (staffKind) but declares no strings — add _x.mnxLab.strings, or supply an instrument from the viewer</title></text>

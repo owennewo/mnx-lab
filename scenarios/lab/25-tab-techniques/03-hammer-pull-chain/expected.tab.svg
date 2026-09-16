@@ -1,26 +1,26 @@
 <svg width="1280" height="251.4288" viewBox="0 0 1280 251.4288" xmlns="http://www.w3.org/2000/svg">
 <style>:where(svg>text){font-family:Bravura;fill:currentColor}:where(svg>line,svg>path){stroke:currentColor}</style>
-<line x1="32" y1="80" x2="582.4" y2="80" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="98.2864" x2="582.4" y2="98.2864" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="116.5712" x2="582.4" y2="116.5712" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="134.8576" x2="582.4" y2="134.8576" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="153.1424" x2="582.4" y2="153.1424" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="171.4288" x2="582.4" y2="171.4288" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="80" x2="568.8" y2="80" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="98.2864" x2="568.8" y2="98.2864" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="116.5712" x2="568.8" y2="116.5712" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="134.8576" x2="568.8" y2="134.8576" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="153.1424" x2="568.8" y2="153.1424" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="171.4288" x2="568.8" y2="171.4288" stroke-width="1.6" class="staff-line"></line>
 <line x1="32" y1="80" x2="32" y2="171.4288" stroke-width="2.56" class="barline barline-start"></line>
-<text x="49.6" y="125.7136" font-size="64" class="tab-clef"></text>
-<text x="101.6" y="102.8576" font-size="64" text-anchor="middle" class="time-sig-num"></text>
-<text x="101.6" y="148.5712" font-size="64" text-anchor="middle" class="time-sig-den"></text>
-<rect x="171.6" y="108.3888" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n1"></rect>
-<text x="177.6" y="116.5712" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n1">0</text>
-<rect x="283.6" y="108.3888" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n2"></rect>
-<text x="289.6" y="116.5712" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n2">2</text>
-<rect x="395.6" y="108.3888" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n3"></rect>
-<text x="401.6" y="116.5712" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n3">0</text>
-<rect x="507.6" y="108.3888" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n4"></rect>
-<text x="513.6" y="116.5712" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n4">2</text>
-<line x1="569.6" y1="80" x2="569.6" y2="171.4288" stroke-width="2.56" class="barline barline-final-thin"></line>
-<rect x="574.4" y="80" width="8" height="91.4288" fill="currentColor" class="barline barline-final-thick"></rect>
-<path d="M 177.6 102.9712 C 211.2 89.5312, 256 89.5312, 289.6 102.9712 C 256 90.8112, 211.2 90.8112, 177.6 102.9712 Z" fill="currentColor" stroke-width="1.6" stroke-linejoin="round" class="technique-slur technique-hammerPull"></path>
-<path d="M 289.6 102.9712 C 323.2 89.5312, 368 89.5312, 401.6 102.9712 C 368 90.8112, 323.2 90.8112, 289.6 102.9712 Z" fill="currentColor" stroke-width="1.6" stroke-linejoin="round" class="technique-slur technique-hammerPull"></path>
-<path d="M 401.6 102.9712 C 435.2 89.5312, 480 89.5312, 513.6 102.9712 C 480 90.8112, 435.2 90.8112, 401.6 102.9712 Z" fill="currentColor" stroke-width="1.6" stroke-linejoin="round" class="technique-slur technique-hammerPull"></path>
+<text x="36" y="125.7136" font-size="64" class="tab-clef"></text>
+<text x="88" y="102.8576" font-size="64" text-anchor="middle" class="time-sig-num"></text>
+<text x="88" y="148.5712" font-size="64" text-anchor="middle" class="time-sig-den"></text>
+<rect x="158" y="108.3888" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n1"></rect>
+<text x="164" y="116.5712" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n1">0</text>
+<rect x="270" y="108.3888" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n2"></rect>
+<text x="276" y="116.5712" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n2">2</text>
+<rect x="382" y="108.3888" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n3"></rect>
+<text x="388" y="116.5712" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n3">0</text>
+<rect x="494" y="108.3888" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n4"></rect>
+<text x="500" y="116.5712" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n4">2</text>
+<line x1="556" y1="80" x2="556" y2="171.4288" stroke-width="2.56" class="barline barline-final-thin"></line>
+<rect x="560.8" y="80" width="8" height="91.4288" fill="currentColor" class="barline barline-final-thick"></rect>
+<path d="M 164 102.9712 C 197.6 89.5312, 242.4 89.5312, 276 102.9712 C 242.4 90.8112, 197.6 90.8112, 164 102.9712 Z" fill="currentColor" stroke-width="1.6" stroke-linejoin="round" class="technique-slur technique-hammerPull"></path>
+<path d="M 276 102.9712 C 309.6 89.5312, 354.4 89.5312, 388 102.9712 C 354.4 90.8112, 309.6 90.8112, 276 102.9712 Z" fill="currentColor" stroke-width="1.6" stroke-linejoin="round" class="technique-slur technique-hammerPull"></path>
+<path d="M 388 102.9712 C 421.6 89.5312, 466.4 89.5312, 500 102.9712 C 466.4 90.8112, 421.6 90.8112, 388 102.9712 Z" fill="currentColor" stroke-width="1.6" stroke-linejoin="round" class="technique-slur technique-hammerPull"></path>
 </svg>

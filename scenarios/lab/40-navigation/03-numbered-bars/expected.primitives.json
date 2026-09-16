@@ -8,7 +8,7 @@
         "kind": "line",
         "x1": 2,
         "y1": 8,
-        "x2": 20.9,
+        "x2": 20.05,
         "y2": 8,
         "thickness": 0.13,
         "className": "staff-line"
@@ -17,7 +17,7 @@
         "kind": "line",
         "x1": 2,
         "y1": 9,
-        "x2": 20.9,
+        "x2": 20.05,
         "y2": 9,
         "thickness": 0.13,
         "className": "staff-line"
@@ -26,7 +26,7 @@
         "kind": "line",
         "x1": 2,
         "y1": 10,
-        "x2": 20.9,
+        "x2": 20.05,
         "y2": 10,
         "thickness": 0.13,
         "className": "staff-line"
@@ -35,7 +35,7 @@
         "kind": "line",
         "x1": 2,
         "y1": 11,
-        "x2": 20.9,
+        "x2": 20.05,
         "y2": 11,
         "thickness": 0.13,
         "className": "staff-line"
@@ -44,7 +44,7 @@
         "kind": "line",
         "x1": 2,
         "y1": 12,
-        "x2": 20.9,
+        "x2": 20.05,
         "y2": 12,
         "thickness": 0.13,
         "className": "staff-line"
@@ -52,14 +52,14 @@
       {
         "kind": "glyph",
         "glyph": "gClef",
-        "x": 3.1,
+        "x": 2.25,
         "y": 11,
         "className": "clef"
       },
       {
         "kind": "glyph",
         "glyph": "timeSig4",
-        "x": 7.35,
+        "x": 6.5,
         "y": 9,
         "anchor": "middle",
         "className": "time-sig-num"
@@ -67,7 +67,7 @@
       {
         "kind": "glyph",
         "glyph": "timeSig4",
-        "x": 7.35,
+        "x": 6.5,
         "y": 11,
         "anchor": "middle",
         "className": "time-sig-den"
@@ -75,16 +75,16 @@
       {
         "kind": "glyph",
         "glyph": "noteheadWhole",
-        "x": 14.006,
+        "x": 13.156,
         "y": 11,
         "className": "notehead",
         "sourceId": "@m0.v0.e0.n0"
       },
       {
         "kind": "line",
-        "x1": 20.9,
+        "x1": 20.05,
         "y1": 8,
-        "x2": 20.9,
+        "x2": 20.05,
         "y2": 12,
         "thickness": 0.16,
         "className": "barline"
@@ -101,45 +101,45 @@
       },
       {
         "kind": "line",
-        "x1": 20.9,
+        "x1": 20.05,
         "y1": 8,
-        "x2": 33.8,
+        "x2": 32.95,
         "y2": 8,
         "thickness": 0.13,
         "className": "staff-line"
       },
       {
         "kind": "line",
-        "x1": 20.9,
+        "x1": 20.05,
         "y1": 9,
-        "x2": 33.8,
+        "x2": 32.95,
         "y2": 9,
         "thickness": 0.13,
         "className": "staff-line"
       },
       {
         "kind": "line",
-        "x1": 20.9,
+        "x1": 20.05,
         "y1": 10,
-        "x2": 33.8,
+        "x2": 32.95,
         "y2": 10,
         "thickness": 0.13,
         "className": "staff-line"
       },
       {
         "kind": "line",
-        "x1": 20.9,
+        "x1": 20.05,
         "y1": 11,
-        "x2": 33.8,
+        "x2": 32.95,
         "y2": 11,
         "thickness": 0.13,
         "className": "staff-line"
       },
       {
         "kind": "line",
-        "x1": 20.9,
+        "x1": 20.05,
         "y1": 12,
-        "x2": 33.8,
+        "x2": 32.95,
         "y2": 12,
         "thickness": 0.13,
         "className": "staff-line"
@@ -147,16 +147,16 @@
       {
         "kind": "glyph",
         "glyph": "noteheadWhole",
-        "x": 26.906,
+        "x": 26.056,
         "y": 10.5,
         "className": "notehead",
         "sourceId": "@m1.v0.e0.n0"
       },
       {
         "kind": "line",
-        "x1": 33.8,
+        "x1": 32.95,
         "y1": 8,
-        "x2": 33.8,
+        "x2": 32.95,
         "y2": 12,
         "thickness": 0.16,
         "className": "barline"
@@ -164,7 +164,7 @@
       {
         "kind": "glyph",
         "glyph": "segno",
-        "x": 27.75,
+        "x": 26.9,
         "y": 5.5,
         "anchor": "middle",
         "className": "segno"
@@ -172,7 +172,7 @@
       {
         "kind": "text",
         "text": "18",
-        "x": 21.1,
+        "x": 20.25,
         "y": 7.1,
         "font": "body",
         "size": 1.3,
@@ -181,45 +181,45 @@
       },
       {
         "kind": "line",
-        "x1": 33.8,
+        "x1": 32.95,
         "y1": 8,
-        "x2": 46.7,
+        "x2": 45.85,
         "y2": 8,
         "thickness": 0.13,
         "className": "staff-line"
       },
       {
         "kind": "line",
-        "x1": 33.8,
+        "x1": 32.95,
         "y1": 9,
-        "x2": 46.7,
+        "x2": 45.85,
         "y2": 9,
         "thickness": 0.13,
         "className": "staff-line"
       },
       {
         "kind": "line",
-        "x1": 33.8,
+        "x1": 32.95,
         "y1": 10,
-        "x2": 46.7,
+        "x2": 45.85,
         "y2": 10,
         "thickness": 0.13,
         "className": "staff-line"
       },
       {
         "kind": "line",
-        "x1": 33.8,
+        "x1": 32.95,
         "y1": 11,
-        "x2": 46.7,
+        "x2": 45.85,
         "y2": 11,
         "thickness": 0.13,
         "className": "staff-line"
       },
       {
         "kind": "line",
-        "x1": 33.8,
+        "x1": 32.95,
         "y1": 12,
-        "x2": 46.7,
+        "x2": 45.85,
         "y2": 12,
         "thickness": 0.13,
         "className": "staff-line"
@@ -227,16 +227,16 @@
       {
         "kind": "glyph",
         "glyph": "noteheadWhole",
-        "x": 39.806,
+        "x": 38.956,
         "y": 10,
         "className": "notehead",
         "sourceId": "@m2.v0.e0.n0"
       },
       {
         "kind": "line",
-        "x1": 46.7,
+        "x1": 45.85,
         "y1": 8,
-        "x2": 46.7,
+        "x2": 45.85,
         "y2": 12,
         "thickness": 0.16,
         "className": "barline"
@@ -244,7 +244,7 @@
       {
         "kind": "text",
         "text": "19",
-        "x": 34,
+        "x": 33.15,
         "y": 7.1,
         "font": "body",
         "size": 1.3,
@@ -253,45 +253,45 @@
       },
       {
         "kind": "line",
-        "x1": 46.7,
+        "x1": 45.85,
         "y1": 8,
-        "x2": 59.6,
+        "x2": 58.75,
         "y2": 8,
         "thickness": 0.13,
         "className": "staff-line"
       },
       {
         "kind": "line",
-        "x1": 46.7,
+        "x1": 45.85,
         "y1": 9,
-        "x2": 59.6,
+        "x2": 58.75,
         "y2": 9,
         "thickness": 0.13,
         "className": "staff-line"
       },
       {
         "kind": "line",
-        "x1": 46.7,
+        "x1": 45.85,
         "y1": 10,
-        "x2": 59.6,
+        "x2": 58.75,
         "y2": 10,
         "thickness": 0.13,
         "className": "staff-line"
       },
       {
         "kind": "line",
-        "x1": 46.7,
+        "x1": 45.85,
         "y1": 11,
-        "x2": 59.6,
+        "x2": 58.75,
         "y2": 11,
         "thickness": 0.13,
         "className": "staff-line"
       },
       {
         "kind": "line",
-        "x1": 46.7,
+        "x1": 45.85,
         "y1": 12,
-        "x2": 59.6,
+        "x2": 58.75,
         "y2": 12,
         "thickness": 0.13,
         "className": "staff-line"
@@ -299,23 +299,23 @@
       {
         "kind": "glyph",
         "glyph": "noteheadWhole",
-        "x": 52.706,
+        "x": 51.856,
         "y": 9.5,
         "className": "notehead",
         "sourceId": "@m3.v0.e0.n0"
       },
       {
         "kind": "line",
-        "x1": 58.8,
+        "x1": 57.95,
         "y1": 8,
-        "x2": 58.8,
+        "x2": 57.95,
         "y2": 12,
         "thickness": 0.16,
         "className": "barline barline-final-thin"
       },
       {
         "kind": "rect",
-        "x": 59.1,
+        "x": 58.25,
         "y": 8,
         "w": 0.5,
         "h": 4,
@@ -325,7 +325,7 @@
       {
         "kind": "glyph",
         "glyph": "metNoteQuarterUp",
-        "x": 40.05,
+        "x": 39.2,
         "y": 6.1898,
         "scale": 0.55,
         "className": "tempo"
@@ -333,7 +333,7 @@
       {
         "kind": "text",
         "text": "= 96",
-        "x": 40.9804,
+        "x": 40.1304,
         "y": 6.1898,
         "font": "body",
         "size": 1.3,

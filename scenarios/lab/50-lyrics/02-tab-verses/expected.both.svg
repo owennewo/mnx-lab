@@ -1,166 +1,166 @@
 <svg width="1280" height="926.0704" viewBox="0 0 1280 926.0704" xmlns="http://www.w3.org/2000/svg">
 <style>:where(svg>text){font-family:Bravura;fill:currentColor}:where(svg>line,svg>path){stroke:currentColor}</style>
-<line x1="32" y1="128" x2="534.9328" y2="128" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="144" x2="534.9328" y2="144" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="160" x2="534.9328" y2="160" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="176" x2="534.9328" y2="176" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="192" x2="534.9328" y2="192" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="128" x2="525.8672" y2="128" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="144" x2="525.8672" y2="144" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="160" x2="525.8672" y2="160" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="176" x2="525.8672" y2="176" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="192" x2="525.8672" y2="192" stroke-width="2.08" class="staff-line"></line>
 <line x1="32" y1="128" x2="32" y2="426.8208" stroke-width="2.56" class="barline barline-start"></line>
-<text x="49.6" y="176" font-size="64" class="clef"></text>
-<text x="117.6" y="144" font-size="64" text-anchor="middle" class="time-sig-num"></text>
-<text x="117.6" y="176" font-size="64" text-anchor="middle" class="time-sig-den"></text>
-<text x="174.8272" y="192" font-size="64" class="notehead" data-source-id="@m0.v0.e0.n0"></text>
-<line x1="193.7072" y1="136" x2="193.7072" y2="189.312" stroke-width="1.92" class="stem"></line>
-<text x="268.16" y="176" font-size="64" class="notehead" data-source-id="@m0.v0.e1.n0"></text>
-<line x1="287.04" y1="120" x2="287.04" y2="173.312" stroke-width="1.92" class="stem"></line>
-<text x="367.0928" y="168" font-size="64" class="notehead" data-source-id="@m0.v0.e2.n0"></text>
-<line x1="385.9728" y1="112" x2="385.9728" y2="165.312" stroke-width="1.92" class="stem"></line>
-<text x="466.0272" y="176" font-size="64" class="notehead" data-source-id="@m0.v0.e3.n0"></text>
-<line x1="484.9072" y1="120" x2="484.9072" y2="173.312" stroke-width="1.92" class="stem"></line>
-<line x1="32" y1="335.392" x2="534.9328" y2="335.392" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="353.6784" x2="534.9328" y2="353.6784" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="371.9632" x2="534.9328" y2="371.9632" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="390.2496" x2="534.9328" y2="390.2496" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="408.5344" x2="534.9328" y2="408.5344" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="426.8208" x2="534.9328" y2="426.8208" stroke-width="1.6" class="staff-line"></line>
-<text x="49.6" y="381.1056" font-size="64" class="tab-clef"></text>
-<text x="117.6" y="358.2496" font-size="64" text-anchor="middle" class="time-sig-num"></text>
-<text x="117.6" y="403.9632" font-size="64" text-anchor="middle" class="time-sig-den"></text>
-<rect x="178.2672" y="382.0656" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e0.n0"></rect>
-<text x="184.2672" y="390.2496" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m0.v0.e0.n0">2</text>
-<rect x="271.6" y="363.7808" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e1.n0"></rect>
-<text x="277.6" y="371.9632" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m0.v0.e1.n0">0</text>
-<rect x="370.5328" y="363.7808" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e2.n0"></rect>
-<text x="376.5328" y="371.9632" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m0.v0.e2.n0">2</text>
-<rect x="469.4672" y="363.7808" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e3.n0"></rect>
-<text x="475.4672" y="371.9632" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m0.v0.e3.n0">0</text>
-<line x1="534.9328" y1="128" x2="534.9328" y2="426.8208" stroke-width="2.56" class="barline"></line>
-<line x1="534.9328" y1="128" x2="885.8672" y2="128" stroke-width="2.08" class="staff-line"></line>
-<line x1="534.9328" y1="144" x2="885.8672" y2="144" stroke-width="2.08" class="staff-line"></line>
-<line x1="534.9328" y1="160" x2="885.8672" y2="160" stroke-width="2.08" class="staff-line"></line>
-<line x1="534.9328" y1="176" x2="885.8672" y2="176" stroke-width="2.08" class="staff-line"></line>
-<line x1="534.9328" y1="192" x2="885.8672" y2="192" stroke-width="2.08" class="staff-line"></line>
-<text x="570.56" y="192" font-size="64" class="notehead" data-source-id="@m1.v0.e0.n0"></text>
-<line x1="589.44" y1="136" x2="589.44" y2="189.312" stroke-width="1.92" class="stem"></line>
-<text x="647.0928" y="176" font-size="64" class="notehead" data-source-id="@m1.v0.e1.n0"></text>
-<line x1="665.9728" y1="120" x2="665.9728" y2="173.312" stroke-width="1.92" class="stem"></line>
-<text x="729.2272" y="168" font-size="64" class="notehead" data-source-id="@m1.v0.e2.n0"></text>
-<line x1="748.1072" y1="112" x2="748.1072" y2="165.312" stroke-width="1.92" class="stem"></line>
-<text x="816.96" y="176" font-size="64" class="notehead" data-source-id="@m1.v0.e3.n0"></text>
-<line x1="835.84" y1="120" x2="835.84" y2="173.312" stroke-width="1.92" class="stem"></line>
-<line x1="534.9328" y1="335.392" x2="885.8672" y2="335.392" stroke-width="1.6" class="staff-line"></line>
-<line x1="534.9328" y1="353.6784" x2="885.8672" y2="353.6784" stroke-width="1.6" class="staff-line"></line>
-<line x1="534.9328" y1="371.9632" x2="885.8672" y2="371.9632" stroke-width="1.6" class="staff-line"></line>
-<line x1="534.9328" y1="390.2496" x2="885.8672" y2="390.2496" stroke-width="1.6" class="staff-line"></line>
-<line x1="534.9328" y1="408.5344" x2="885.8672" y2="408.5344" stroke-width="1.6" class="staff-line"></line>
-<line x1="534.9328" y1="426.8208" x2="885.8672" y2="426.8208" stroke-width="1.6" class="staff-line"></line>
-<rect x="574" y="382.0656" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m1.v0.e0.n0"></rect>
-<text x="580" y="390.2496" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m1.v0.e0.n0">2</text>
-<rect x="650.5328" y="363.7808" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m1.v0.e1.n0"></rect>
-<text x="656.5328" y="371.9632" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m1.v0.e1.n0">0</text>
-<rect x="732.6672" y="363.7808" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m1.v0.e2.n0"></rect>
-<text x="738.6672" y="371.9632" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m1.v0.e2.n0">2</text>
-<rect x="820.4" y="363.7808" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m1.v0.e3.n0"></rect>
-<text x="826.4" y="371.9632" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m1.v0.e3.n0">0</text>
-<line x1="885.8672" y1="128" x2="885.8672" y2="426.8208" stroke-width="2.56" class="barline"></line>
-<line x1="885.8672" y1="128" x2="1248" y2="128" stroke-width="2.08" class="staff-line"></line>
-<line x1="885.8672" y1="144" x2="1248" y2="144" stroke-width="2.08" class="staff-line"></line>
-<line x1="885.8672" y1="160" x2="1248" y2="160" stroke-width="2.08" class="staff-line"></line>
-<line x1="885.8672" y1="176" x2="1248" y2="176" stroke-width="2.08" class="staff-line"></line>
-<line x1="885.8672" y1="192" x2="1248" y2="192" stroke-width="2.08" class="staff-line"></line>
-<text x="932.6928" y="192" font-size="64" class="notehead" data-source-id="@m2.v0.e0.n0"></text>
-<line x1="951.5728" y1="136" x2="951.5728" y2="189.312" stroke-width="1.92" class="stem"></line>
-<text x="1020.4272" y="176" font-size="64" class="notehead" data-source-id="@m2.v0.e1.n0"></text>
-<line x1="1039.3072" y1="120" x2="1039.3072" y2="173.312" stroke-width="1.92" class="stem"></line>
-<text x="1108.16" y="168" font-size="64" class="notehead" data-source-id="@m2.v0.e2.n0"></text>
-<line x1="1127.04" y1="112" x2="1127.04" y2="165.312" stroke-width="1.92" class="stem"></line>
-<text x="1190.2928" y="176" font-size="64" class="notehead" data-source-id="@m2.v0.e3.n0"></text>
-<line x1="1209.1728" y1="120" x2="1209.1728" y2="173.312" stroke-width="1.92" class="stem"></line>
-<line x1="885.8672" y1="335.392" x2="1248" y2="335.392" stroke-width="1.6" class="staff-line"></line>
-<line x1="885.8672" y1="353.6784" x2="1248" y2="353.6784" stroke-width="1.6" class="staff-line"></line>
-<line x1="885.8672" y1="371.9632" x2="1248" y2="371.9632" stroke-width="1.6" class="staff-line"></line>
-<line x1="885.8672" y1="390.2496" x2="1248" y2="390.2496" stroke-width="1.6" class="staff-line"></line>
-<line x1="885.8672" y1="408.5344" x2="1248" y2="408.5344" stroke-width="1.6" class="staff-line"></line>
-<line x1="885.8672" y1="426.8208" x2="1248" y2="426.8208" stroke-width="1.6" class="staff-line"></line>
-<rect x="936.1328" y="382.0656" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m2.v0.e0.n0"></rect>
-<text x="942.1328" y="390.2496" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m2.v0.e0.n0">2</text>
-<rect x="1023.8672" y="363.7808" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m2.v0.e1.n0"></rect>
-<text x="1029.8672" y="371.9632" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m2.v0.e1.n0">0</text>
-<rect x="1111.6" y="363.7808" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m2.v0.e2.n0"></rect>
-<text x="1117.6" y="371.9632" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m2.v0.e2.n0">2</text>
-<rect x="1193.7328" y="363.7808" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m2.v0.e3.n0"></rect>
-<text x="1199.7328" y="371.9632" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m2.v0.e3.n0">0</text>
+<text x="36" y="176" font-size="64" class="clef"></text>
+<text x="104" y="144" font-size="64" text-anchor="middle" class="time-sig-num"></text>
+<text x="104" y="176" font-size="64" text-anchor="middle" class="time-sig-den"></text>
+<text x="161.7936" y="192" font-size="64" class="notehead" data-source-id="@m0.v0.e0.n0"></text>
+<line x1="180.6736" y1="136" x2="180.6736" y2="189.312" stroke-width="1.92" class="stem"></line>
+<text x="256.2608" y="176" font-size="64" class="notehead" data-source-id="@m0.v0.e1.n0"></text>
+<line x1="275.1408" y1="120" x2="275.1408" y2="173.312" stroke-width="1.92" class="stem"></line>
+<text x="356.3264" y="168" font-size="64" class="notehead" data-source-id="@m0.v0.e2.n0"></text>
+<line x1="375.2064" y1="112" x2="375.2064" y2="165.312" stroke-width="1.92" class="stem"></line>
+<text x="456.3936" y="176" font-size="64" class="notehead" data-source-id="@m0.v0.e3.n0"></text>
+<line x1="475.2736" y1="120" x2="475.2736" y2="173.312" stroke-width="1.92" class="stem"></line>
+<line x1="32" y1="335.392" x2="525.8672" y2="335.392" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="353.6784" x2="525.8672" y2="353.6784" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="371.9632" x2="525.8672" y2="371.9632" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="390.2496" x2="525.8672" y2="390.2496" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="408.5344" x2="525.8672" y2="408.5344" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="426.8208" x2="525.8672" y2="426.8208" stroke-width="1.6" class="staff-line"></line>
+<text x="36" y="381.1056" font-size="64" class="tab-clef"></text>
+<text x="104" y="358.2496" font-size="64" text-anchor="middle" class="time-sig-num"></text>
+<text x="104" y="403.9632" font-size="64" text-anchor="middle" class="time-sig-den"></text>
+<rect x="165.2336" y="382.0656" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e0.n0"></rect>
+<text x="171.2336" y="390.2496" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m0.v0.e0.n0">2</text>
+<rect x="259.7008" y="363.7808" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e1.n0"></rect>
+<text x="265.7008" y="371.9632" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m0.v0.e1.n0">0</text>
+<rect x="359.7664" y="363.7808" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e2.n0"></rect>
+<text x="365.7664" y="371.9632" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m0.v0.e2.n0">2</text>
+<rect x="459.8336" y="363.7808" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e3.n0"></rect>
+<text x="465.8336" y="371.9632" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m0.v0.e3.n0">0</text>
+<line x1="525.8672" y1="128" x2="525.8672" y2="426.8208" stroke-width="2.56" class="barline"></line>
+<line x1="525.8672" y1="128" x2="881.3328" y2="128" stroke-width="2.08" class="staff-line"></line>
+<line x1="525.8672" y1="144" x2="881.3328" y2="144" stroke-width="2.08" class="staff-line"></line>
+<line x1="525.8672" y1="160" x2="881.3328" y2="160" stroke-width="2.08" class="staff-line"></line>
+<line x1="525.8672" y1="176" x2="881.3328" y2="176" stroke-width="2.08" class="staff-line"></line>
+<line x1="525.8672" y1="192" x2="881.3328" y2="192" stroke-width="2.08" class="staff-line"></line>
+<text x="562.0592" y="192" font-size="64" class="notehead" data-source-id="@m1.v0.e0.n0"></text>
+<line x1="580.9392" y1="136" x2="580.9392" y2="189.312" stroke-width="1.92" class="stem"></line>
+<text x="639.7264" y="176" font-size="64" class="notehead" data-source-id="@m1.v0.e1.n0"></text>
+<line x1="658.6064" y1="120" x2="658.6064" y2="173.312" stroke-width="1.92" class="stem"></line>
+<text x="722.9936" y="168" font-size="64" class="notehead" data-source-id="@m1.v0.e2.n0"></text>
+<line x1="741.8736" y1="112" x2="741.8736" y2="165.312" stroke-width="1.92" class="stem"></line>
+<text x="811.8592" y="176" font-size="64" class="notehead" data-source-id="@m1.v0.e3.n0"></text>
+<line x1="830.7392" y1="120" x2="830.7392" y2="173.312" stroke-width="1.92" class="stem"></line>
+<line x1="525.8672" y1="335.392" x2="881.3328" y2="335.392" stroke-width="1.6" class="staff-line"></line>
+<line x1="525.8672" y1="353.6784" x2="881.3328" y2="353.6784" stroke-width="1.6" class="staff-line"></line>
+<line x1="525.8672" y1="371.9632" x2="881.3328" y2="371.9632" stroke-width="1.6" class="staff-line"></line>
+<line x1="525.8672" y1="390.2496" x2="881.3328" y2="390.2496" stroke-width="1.6" class="staff-line"></line>
+<line x1="525.8672" y1="408.5344" x2="881.3328" y2="408.5344" stroke-width="1.6" class="staff-line"></line>
+<line x1="525.8672" y1="426.8208" x2="881.3328" y2="426.8208" stroke-width="1.6" class="staff-line"></line>
+<rect x="565.4992" y="382.0656" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m1.v0.e0.n0"></rect>
+<text x="571.4992" y="390.2496" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m1.v0.e0.n0">2</text>
+<rect x="643.1664" y="363.7808" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m1.v0.e1.n0"></rect>
+<text x="649.1664" y="371.9632" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m1.v0.e1.n0">0</text>
+<rect x="726.4336" y="363.7808" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m1.v0.e2.n0"></rect>
+<text x="732.4336" y="371.9632" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m1.v0.e2.n0">2</text>
+<rect x="815.3008" y="363.7808" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m1.v0.e3.n0"></rect>
+<text x="821.3008" y="371.9632" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m1.v0.e3.n0">0</text>
+<line x1="881.3328" y1="128" x2="881.3328" y2="426.8208" stroke-width="2.56" class="barline"></line>
+<line x1="881.3328" y1="128" x2="1248" y2="128" stroke-width="2.08" class="staff-line"></line>
+<line x1="881.3328" y1="144" x2="1248" y2="144" stroke-width="2.08" class="staff-line"></line>
+<line x1="881.3328" y1="160" x2="1248" y2="160" stroke-width="2.08" class="staff-line"></line>
+<line x1="881.3328" y1="176" x2="1248" y2="176" stroke-width="2.08" class="staff-line"></line>
+<line x1="881.3328" y1="192" x2="1248" y2="192" stroke-width="2.08" class="staff-line"></line>
+<text x="928.7264" y="192" font-size="64" class="notehead" data-source-id="@m2.v0.e0.n0"></text>
+<line x1="947.6064" y1="136" x2="947.6064" y2="189.312" stroke-width="1.92" class="stem"></line>
+<text x="1017.5936" y="176" font-size="64" class="notehead" data-source-id="@m2.v0.e1.n0"></text>
+<line x1="1036.4736" y1="120" x2="1036.4736" y2="173.312" stroke-width="1.92" class="stem"></line>
+<text x="1106.4608" y="168" font-size="64" class="notehead" data-source-id="@m2.v0.e2.n0"></text>
+<line x1="1125.3408" y1="112" x2="1125.3408" y2="165.312" stroke-width="1.92" class="stem"></line>
+<text x="1189.7264" y="176" font-size="64" class="notehead" data-source-id="@m2.v0.e3.n0"></text>
+<line x1="1208.6064" y1="120" x2="1208.6064" y2="173.312" stroke-width="1.92" class="stem"></line>
+<line x1="881.3328" y1="335.392" x2="1248" y2="335.392" stroke-width="1.6" class="staff-line"></line>
+<line x1="881.3328" y1="353.6784" x2="1248" y2="353.6784" stroke-width="1.6" class="staff-line"></line>
+<line x1="881.3328" y1="371.9632" x2="1248" y2="371.9632" stroke-width="1.6" class="staff-line"></line>
+<line x1="881.3328" y1="390.2496" x2="1248" y2="390.2496" stroke-width="1.6" class="staff-line"></line>
+<line x1="881.3328" y1="408.5344" x2="1248" y2="408.5344" stroke-width="1.6" class="staff-line"></line>
+<line x1="881.3328" y1="426.8208" x2="1248" y2="426.8208" stroke-width="1.6" class="staff-line"></line>
+<rect x="932.1664" y="382.0656" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m2.v0.e0.n0"></rect>
+<text x="938.1664" y="390.2496" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m2.v0.e0.n0">2</text>
+<rect x="1021.0336" y="363.7808" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m2.v0.e1.n0"></rect>
+<text x="1027.0336" y="371.9632" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m2.v0.e1.n0">0</text>
+<rect x="1109.9008" y="363.7808" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m2.v0.e2.n0"></rect>
+<text x="1115.9008" y="371.9632" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m2.v0.e2.n0">2</text>
+<rect x="1193.1664" y="363.7808" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m2.v0.e3.n0"></rect>
+<text x="1199.1664" y="371.9632" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m2.v0.e3.n0">0</text>
 <line x1="1248" y1="128" x2="1248" y2="426.8208" stroke-width="2.56" class="barline"></line>
-<line x1="32" y1="499.2496" x2="472.5328" y2="499.2496" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="515.2496" x2="472.5328" y2="515.2496" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="531.2496" x2="472.5328" y2="531.2496" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="547.2496" x2="472.5328" y2="547.2496" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="563.2496" x2="472.5328" y2="563.2496" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="499.2496" x2="463.4672" y2="499.2496" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="515.2496" x2="463.4672" y2="515.2496" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="531.2496" x2="463.4672" y2="531.2496" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="547.2496" x2="463.4672" y2="547.2496" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="563.2496" x2="463.4672" y2="563.2496" stroke-width="2.08" class="staff-line"></line>
 <line x1="32" y1="499.2496" x2="32" y2="798.0704" stroke-width="2.56" class="barline barline-start"></line>
-<text x="49.6" y="547.2496" font-size="64" class="clef"></text>
-<text x="134.8272" y="563.2496" font-size="64" class="notehead" data-source-id="@m3.v0.e0.n0"></text>
-<line x1="153.7072" y1="507.2496" x2="153.7072" y2="560.5616" stroke-width="1.92" class="stem"></line>
-<text x="228.16" y="547.2496" font-size="64" class="notehead" data-source-id="@m3.v0.e1.n0"></text>
-<line x1="247.04" y1="491.2496" x2="247.04" y2="544.5616" stroke-width="1.92" class="stem"></line>
-<text x="310.2928" y="539.2496" font-size="64" class="notehead" data-source-id="@m3.v0.e2.n0"></text>
-<line x1="329.1728" y1="483.2496" x2="329.1728" y2="536.5616" stroke-width="1.92" class="stem"></line>
-<text x="398.0272" y="547.2496" font-size="64" class="notehead" data-source-id="@m3.v0.e3.n0"></text>
-<line x1="416.9072" y1="491.2496" x2="416.9072" y2="544.5616" stroke-width="1.92" class="stem"></line>
-<line x1="32" y1="706.6416" x2="472.5328" y2="706.6416" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="724.928" x2="472.5328" y2="724.928" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="743.2144" x2="472.5328" y2="743.2144" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="761.4992" x2="472.5328" y2="761.4992" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="779.7856" x2="472.5328" y2="779.7856" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="798.0704" x2="472.5328" y2="798.0704" stroke-width="1.6" class="staff-line"></line>
-<text x="49.6" y="752.3568" font-size="64" class="tab-clef"></text>
-<rect x="138.2672" y="753.3168" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m3.v0.e0.n0"></rect>
-<text x="144.2672" y="761.4992" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m3.v0.e0.n0">2</text>
-<rect x="231.6" y="735.0304" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m3.v0.e1.n0"></rect>
-<text x="237.6" y="743.2144" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m3.v0.e1.n0">0</text>
-<rect x="313.7328" y="735.0304" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m3.v0.e2.n0"></rect>
-<text x="319.7328" y="743.2144" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m3.v0.e2.n0">2</text>
-<rect x="401.4672" y="735.0304" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m3.v0.e3.n0"></rect>
-<text x="407.4672" y="743.2144" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m3.v0.e3.n0">0</text>
-<line x1="459.7328" y1="499.2496" x2="459.7328" y2="798.0704" stroke-width="2.56" class="barline barline-final-thin"></line>
-<rect x="464.5328" y="499.2496" width="8" height="298.8208" fill="currentColor" class="barline barline-final-thick"></rect>
-<text x="184.2672" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">Sun</text>
-<text x="277.6" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">did</text>
-<text x="376.5328" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">glide</text>
-<text x="475.4672" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">down</text>
-<text x="580" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">on</text>
-<text x="656.5328" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">the</text>
-<text x="738.6672" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">riv</text>
-<text x="782.5328" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric-hyphen">-</text>
-<text x="826.4" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">er</text>
-<text x="942.1328" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">wa</text>
-<text x="986" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric-hyphen">-</text>
-<text x="1029.8672" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">ter</text>
-<text x="1117.6" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">car</text>
-<text x="1158.6672" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric-hyphen">-</text>
-<text x="1199.7328" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">ry</text>
-<text x="144.2672" y="634.4416" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">me</text>
-<text x="237.6" y="634.4416" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">safe</text>
-<text x="278.6672" y="634.4416" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric-hyphen">-</text>
-<text x="319.7328" y="634.4416" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">ly</text>
-<text x="407.4672" y="634.4416" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">home</text>
-<text x="184.2672" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">Moon</text>
-<text x="277.6" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">will</text>
-<text x="376.5328" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">drift</text>
-<text x="475.4672" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">by</text>
-<text x="580" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">un</text>
-<text x="618.2672" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric-hyphen">-</text>
-<text x="656.5328" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">der</text>
-<text x="738.6672" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">wil</text>
-<text x="782.5328" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric-hyphen">-</text>
-<text x="826.4" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">lows</text>
-<text x="942.1328" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">shad</text>
-<text x="986" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric-hyphen">-</text>
-<text x="1029.8672" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">ows</text>
-<text x="1117.6" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">soft</text>
-<text x="1158.6672" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric-hyphen">-</text>
-<text x="1199.7328" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">ly</text>
-<text x="144.2672" y="669.6416" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">sing</text>
-<text x="237.6" y="669.6416" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">me</text>
-<text x="319.7328" y="669.6416" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">to</text>
-<text x="407.4672" y="669.6416" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">sleep</text>
+<text x="36" y="547.2496" font-size="64" class="clef"></text>
+<text x="121.7936" y="563.2496" font-size="64" class="notehead" data-source-id="@m3.v0.e0.n0"></text>
+<line x1="140.6736" y1="507.2496" x2="140.6736" y2="560.5616" stroke-width="1.92" class="stem"></line>
+<text x="216.2608" y="547.2496" font-size="64" class="notehead" data-source-id="@m3.v0.e1.n0"></text>
+<line x1="235.1408" y1="491.2496" x2="235.1408" y2="544.5616" stroke-width="1.92" class="stem"></line>
+<text x="299.5264" y="539.2496" font-size="64" class="notehead" data-source-id="@m3.v0.e2.n0"></text>
+<line x1="318.4064" y1="483.2496" x2="318.4064" y2="536.5616" stroke-width="1.92" class="stem"></line>
+<text x="388.3936" y="547.2496" font-size="64" class="notehead" data-source-id="@m3.v0.e3.n0"></text>
+<line x1="407.2736" y1="491.2496" x2="407.2736" y2="544.5616" stroke-width="1.92" class="stem"></line>
+<line x1="32" y1="706.6416" x2="463.4672" y2="706.6416" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="724.928" x2="463.4672" y2="724.928" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="743.2144" x2="463.4672" y2="743.2144" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="761.4992" x2="463.4672" y2="761.4992" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="779.7856" x2="463.4672" y2="779.7856" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="798.0704" x2="463.4672" y2="798.0704" stroke-width="1.6" class="staff-line"></line>
+<text x="36" y="752.3568" font-size="64" class="tab-clef"></text>
+<rect x="125.2336" y="753.3168" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m3.v0.e0.n0"></rect>
+<text x="131.2336" y="761.4992" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m3.v0.e0.n0">2</text>
+<rect x="219.7008" y="735.0304" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m3.v0.e1.n0"></rect>
+<text x="225.7008" y="743.2144" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m3.v0.e1.n0">0</text>
+<rect x="302.9664" y="735.0304" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m3.v0.e2.n0"></rect>
+<text x="308.9664" y="743.2144" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m3.v0.e2.n0">2</text>
+<rect x="391.8336" y="735.0304" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m3.v0.e3.n0"></rect>
+<text x="397.8336" y="743.2144" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m3.v0.e3.n0">0</text>
+<line x1="450.6672" y1="499.2496" x2="450.6672" y2="798.0704" stroke-width="2.56" class="barline barline-final-thin"></line>
+<rect x="455.4672" y="499.2496" width="8" height="298.8208" fill="currentColor" class="barline barline-final-thick"></rect>
+<text x="171.2336" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">Sun</text>
+<text x="265.7008" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">did</text>
+<text x="365.7664" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">glide</text>
+<text x="465.8336" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">down</text>
+<text x="571.4992" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">on</text>
+<text x="649.1664" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">the</text>
+<text x="732.4336" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">riv</text>
+<text x="776.8672" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric-hyphen">-</text>
+<text x="821.3008" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">er</text>
+<text x="938.1664" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">wa</text>
+<text x="982.6" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric-hyphen">-</text>
+<text x="1027.0336" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">ter</text>
+<text x="1115.9008" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">car</text>
+<text x="1157.5328" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric-hyphen">-</text>
+<text x="1199.1664" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">ry</text>
+<text x="131.2336" y="634.4416" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">me</text>
+<text x="225.7008" y="634.4416" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">safe</text>
+<text x="267.3328" y="634.4416" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric-hyphen">-</text>
+<text x="308.9664" y="634.4416" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">ly</text>
+<text x="397.8336" y="634.4416" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">home</text>
+<text x="171.2336" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">Moon</text>
+<text x="265.7008" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">will</text>
+<text x="365.7664" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">drift</text>
+<text x="465.8336" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">by</text>
+<text x="571.4992" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">un</text>
+<text x="610.3328" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric-hyphen">-</text>
+<text x="649.1664" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">der</text>
+<text x="732.4336" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">wil</text>
+<text x="776.8672" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric-hyphen">-</text>
+<text x="821.3008" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">lows</text>
+<text x="938.1664" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">shad</text>
+<text x="982.6" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric-hyphen">-</text>
+<text x="1027.0336" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">ows</text>
+<text x="1115.9008" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">soft</text>
+<text x="1157.5328" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric-hyphen">-</text>
+<text x="1199.1664" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">ly</text>
+<text x="131.2336" y="669.6416" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">sing</text>
+<text x="225.7008" y="669.6416" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">me</text>
+<text x="308.9664" y="669.6416" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">to</text>
+<text x="397.8336" y="669.6416" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">sleep</text>
 </svg>

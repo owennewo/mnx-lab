@@ -1,32 +1,32 @@
 <svg width="1280" height="320" viewBox="0 0 1280 320" xmlns="http://www.w3.org/2000/svg">
 <style>:where(svg>text){font-family:Bravura;fill:currentColor}:where(svg>line,svg>path){stroke:currentColor}</style>
-<line x1="32" y1="128" x2="480.32" y2="128" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="144" x2="480.32" y2="144" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="160" x2="480.32" y2="160" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="176" x2="480.32" y2="176" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="192" x2="480.32" y2="192" stroke-width="2.08" class="staff-line"></line>
-<text x="49.6" y="176" font-size="64" class="clef"></text>
-<text x="117.6" y="144" font-size="64" text-anchor="middle" class="time-sig-num"></text>
-<text x="117.6" y="176" font-size="64" text-anchor="middle" class="time-sig-den"></text>
-<text x="206.16" y="176" font-size="64" class="notehead" data-source-id="@m0.v0.e0.n0"></text>
-<line x1="225.04" y1="120" x2="225.04" y2="173.312" stroke-width="1.92" class="stem"></line>
-<text x="380.08" y="192" font-size="64" class="notehead" data-source-id="@m0.v0.e1.n0"></text>
-<line x1="398.96" y1="136" x2="398.96" y2="189.312" stroke-width="1.92" class="stem"></line>
-<line x1="480.32" y1="128" x2="480.32" y2="192" stroke-width="2.56" class="barline"></line>
-<text x="215.6" y="248" font-size="64" text-anchor="middle" class="dynamic"></text>
-<line x1="480.32" y1="128" x2="829.44" y2="128" stroke-width="2.08" class="staff-line"></line>
-<line x1="480.32" y1="144" x2="829.44" y2="144" stroke-width="2.08" class="staff-line"></line>
-<line x1="480.32" y1="160" x2="829.44" y2="160" stroke-width="2.08" class="staff-line"></line>
-<line x1="480.32" y1="176" x2="829.44" y2="176" stroke-width="2.08" class="staff-line"></line>
-<line x1="480.32" y1="192" x2="829.44" y2="192" stroke-width="2.08" class="staff-line"></line>
-<text x="558.48" y="200" font-size="64" class="notehead" data-source-id="@m1.v0.e0.n0"></text>
-<line x1="577.36" y1="144" x2="577.36" y2="197.312" stroke-width="1.92" class="stem"></line>
-<line x1="708.08" y1="208" x2="739.76" y2="208" stroke-width="2.56" class="ledger-line"></line>
-<text x="714.48" y="208" font-size="64" class="notehead" data-source-id="@m1.v0.e1.n0"></text>
-<line x1="733.36" y1="152" x2="733.36" y2="205.312" stroke-width="1.92" class="stem"></line>
-<line x1="816.64" y1="128" x2="816.64" y2="192" stroke-width="2.56" class="barline barline-final-thin"></line>
-<rect x="821.44" y="128" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
-<text x="723.92" y="248" font-size="64" text-anchor="middle" class="dynamic"></text>
-<line x1="389.52" y1="224.8" x2="717.52" y2="236.8" stroke-width="1.92" class="hairpin hairpin-decreasing"></line>
-<line x1="389.52" y1="248.8" x2="717.52" y2="236.8" stroke-width="1.92" class="hairpin hairpin-decreasing"></line>
+<line x1="32" y1="128" x2="466.72" y2="128" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="144" x2="466.72" y2="144" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="160" x2="466.72" y2="160" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="176" x2="466.72" y2="176" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="192" x2="466.72" y2="192" stroke-width="2.08" class="staff-line"></line>
+<text x="36" y="176" font-size="64" class="clef"></text>
+<text x="104" y="144" font-size="64" text-anchor="middle" class="time-sig-num"></text>
+<text x="104" y="176" font-size="64" text-anchor="middle" class="time-sig-den"></text>
+<text x="192.56" y="176" font-size="64" class="notehead" data-source-id="@m0.v0.e0.n0"></text>
+<line x1="211.44" y1="120" x2="211.44" y2="173.312" stroke-width="1.92" class="stem"></line>
+<text x="366.48" y="192" font-size="64" class="notehead" data-source-id="@m0.v0.e1.n0"></text>
+<line x1="385.36" y1="136" x2="385.36" y2="189.312" stroke-width="1.92" class="stem"></line>
+<line x1="466.72" y1="128" x2="466.72" y2="192" stroke-width="2.56" class="barline"></line>
+<text x="202" y="248" font-size="64" text-anchor="middle" class="dynamic"></text>
+<line x1="466.72" y1="128" x2="815.84" y2="128" stroke-width="2.08" class="staff-line"></line>
+<line x1="466.72" y1="144" x2="815.84" y2="144" stroke-width="2.08" class="staff-line"></line>
+<line x1="466.72" y1="160" x2="815.84" y2="160" stroke-width="2.08" class="staff-line"></line>
+<line x1="466.72" y1="176" x2="815.84" y2="176" stroke-width="2.08" class="staff-line"></line>
+<line x1="466.72" y1="192" x2="815.84" y2="192" stroke-width="2.08" class="staff-line"></line>
+<text x="544.88" y="200" font-size="64" class="notehead" data-source-id="@m1.v0.e0.n0"></text>
+<line x1="563.76" y1="144" x2="563.76" y2="197.312" stroke-width="1.92" class="stem"></line>
+<line x1="694.48" y1="208" x2="726.16" y2="208" stroke-width="2.56" class="ledger-line"></line>
+<text x="700.88" y="208" font-size="64" class="notehead" data-source-id="@m1.v0.e1.n0"></text>
+<line x1="719.76" y1="152" x2="719.76" y2="205.312" stroke-width="1.92" class="stem"></line>
+<line x1="803.04" y1="128" x2="803.04" y2="192" stroke-width="2.56" class="barline barline-final-thin"></line>
+<rect x="807.84" y="128" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
+<text x="710.32" y="248" font-size="64" text-anchor="middle" class="dynamic"></text>
+<line x1="375.92" y1="224.8" x2="703.92" y2="236.8" stroke-width="1.92" class="hairpin hairpin-decreasing"></line>
+<line x1="375.92" y1="248.8" x2="703.92" y2="236.8" stroke-width="1.92" class="hairpin hairpin-decreasing"></line>
 </svg>

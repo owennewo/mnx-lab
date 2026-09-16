@@ -64,7 +64,7 @@ the contract. Today's values are given only so the reader knows the starting poi
 | Spring per duration | `max(0.8, 2.2·(1 + 0.5·log2(dur/¼))) × d` | `max(0, m(dur)·x + c(dur))` — both may depend on duration, so a small `c(dur)` can keep a whole note wider than an eighth even at zero |
 | Leading spring (barline → first event) | half the first event's spring × d | its own line, or a fixed ratio of the first event's line — one of the two, decided in calibration |
 | Content-left / key-sig-right / content-right pads | 0.6 / 0.5 / 0.8, × √d, floor 0.15 | one line each, `c = 0` unless calibration says a glyph needs a floor |
-| System-start pad (removed as a consumer 2026-09-16) | content-left 0.6 + start-barline 0.5, both on Space | **fixed** `SYSTEM_START_PAD_SP` 1.1sp: the opening barline-to-clef gap holds still at every Space; the first calibration decision taken by looking |
+| System-start pad (removed as a consumer 2026-09-16) | content-left 0.6 + start-barline 0.5, both on Space | **fixed** `SYSTEM_START_PAD_SP` 0.25sp: the opening barline-to-clef gap holds still at every Space; calibrated by looking |
 | Prefix group extra | 0 at d=1, −0.15 at the floor, +1.2 at the ceiling (V-shaped) | one line, or deleted — a V is not a line and its job was to soften the root curves |
 | Horizontal margin | `clamp(2·d^¼, 1, 3)` | one line with the clamp; expected `c < 0` so the margin reaches zero while notes keep a little air |
 | Paper padding (added 2026-09-16) | viewer CSS: 26px each side (14px compact) plus the host's 5px, never a Space consumer | one factor line, 0 at zero, capped at 1 above the default, set on the paint as `--mnx-space-paper`; vertical padding stays Staff's |
@@ -199,11 +199,12 @@ zero the engine draws. Vertical padding is Staff's and stays.
 
 **First calibration decision (2026-09-16).** Looking at the pad sweep, the gap
 between a system's opening barline and its clef read as a frame, not air, and it
-drifted with Space. It is no longer a consumer: `SYSTEM_START_PAD_SP` (1.1sp, its
-historical default, so the goldens did not move) replaces the content-left +
-start-barline pair at a system start; the `startBarline` row is gone. Mid-system
-bars keep the content-left line. The constant is one number to move — 1.0sp was
-the figure floated — and moving it is a corpus-wide golden batch.
+drifted with Space. It is no longer a consumer: `SYSTEM_START_PAD_SP` replaces
+the content-left + start-barline pair at a system start; the `startBarline` row
+is gone. Mid-system bars keep the content-left line. It was first frozen at its
+historical 1.1sp total so the structural change did not move goldens, then visual
+calibration set the fixed gap to 0.25sp. That calibration is tracked in the
+[verification ledger](lab-verify.md#system-start-prefix-at-025sp--2026-09-16).
 
 **Open — the calibration pass.** The intercept vector is all zeros: Space 0 is
 airless everywhere, including note-to-note. Whether some rhythm proportion should

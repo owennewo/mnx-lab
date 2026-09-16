@@ -38,7 +38,9 @@ function load(id: string): MnxStructure {
 
 /** Barline → first event of the first measure. */
 function prefixSp(mnx: MnxStructure, opts: Parameters<typeof planHorizontal>[2]): number {
-  const m = planHorizontal(mnx, WIDTH_SP, opts).measures[0];
+  // Measure the reserve before fill justification redistributes freed width
+  // back into the leading spring.
+  const m = planHorizontal(mnx, WIDTH_SP, { ...opts, spacingMode: 'natural' }).measures[0];
   return m.voices[0][0].x - m.x;
 }
 

@@ -56,12 +56,10 @@ const CONTENT_RIGHT_PAD_SP = 0.8;
  * 0.5sp system-start extra, both on Space lines, so the clef drifted away
  * from the barline as Space grew and touched it at zero. A system's opening
  * is a frame, not air between events, and the reader asked for it to hold
- * still. Mid-system bars keep `CONTENT_LEFT_PAD_SP` on its line.
+ * still. Visual calibration set that fixed gap to 0.25sp. Mid-system bars
+ * keep `CONTENT_LEFT_PAD_SP` on its line.
  */
-export const SYSTEM_START_PAD_SP = 1.1;
-/** The legacy explicit-clearance frame keeps its historical pair (content-left
- *  plus this system-start extra, both through the frame's own curve). */
-const LEGACY_START_BARLINE_PAD_SP = 0.5;
+export const SYSTEM_START_PAD_SP = 0.25;
 /**
  * Prefix glyph slots are INK plus a spare tail. The ink is the glyph's own
  * width (`gClef` 2.68sp, `6stringTabClef` 1.64sp, a time-signature digit pair
@@ -341,7 +339,9 @@ function legacySpacePolicy(densityH: number, clearance?: number, densityPad?: nu
     columnAir: 1,
     paperPad: 1,
     horizontalMargin: frame.horizontalMargin,
-    systemStartPad: frame.prefixPad(CONTENT_LEFT_PAD_SP) + frame.prefixPad(LEGACY_START_BARLINE_PAD_SP),
+    // Explicit legacy controls retain their curve around the new calibrated
+    // baseline; at their default, they must equal the normal Space policy.
+    systemStartPad: frame.prefixPad(SYSTEM_START_PAD_SP),
     pad: kind => SLOT_TAILS.has(kind) ? PAD_NORMAL_SP[kind] : frame.prefixPad(PAD_NORMAL_SP[kind]),
     prefixGroupExtra: frame.prefixGroupExtra
   };
