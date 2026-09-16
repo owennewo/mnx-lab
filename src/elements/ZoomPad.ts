@@ -4,9 +4,9 @@ import { designTokens, sharedChrome } from './tokens.ts';
 import { RESET_SPACE_SP } from './zoomDefaults.ts';
 import {
   BASELINE_PX_PER_SP,
-  MIN_STAFF_SCALE,
-  MAX_STAFF_SCALE,
-  clampStaffScale
+  MIN_STAFF_SP,
+  MAX_STAFF_SP,
+  clampStaffSp
 } from '../engine/render/scale.ts';
 import {
   MIN_SPACE_SP,
@@ -44,7 +44,7 @@ import {
  *
  * **This is chrome, not surface.** It composes `<mnx-document-viewer>`'s
  * attributes and implements no presentation behavior of its own — every value
- * it emits is clamped by the engine that owns it (`clampStaffScale`,
+ * it emits is clamped by the engine that owns it (`clampStaffSp`,
  * `clampDensity`). The layering rule is docs/core-viewer-surface.md's.
  *
  * The quiet state is the place the design was revised three times. The spec idles
@@ -60,23 +60,18 @@ import {
  * 100.
  */
 
-/** Design: staff step 5%, spacing step 0.5sp — Space is measured directly
- *  is a number in staff spaces (2026-09-15). Both ranges are the ENGINE's.
+/** Design: Staff takes perceptual steps, Space steps by 0.5sp. Both values are
+ *  measured directly in staff spaces and both ranges are the ENGINE's.
  *
  *  SPACE_STEP is a MINIMUM rather than the step: with a ladder supplied
  *  (see `densitySteps`) the arm lands on the first rung at least this far away,
  *  so a click never does nothing and never does less than the design asked.
  *
- *  STAFF_STEP became a RATIO on 2026-08-21, when the staff ceiling went to
- *  640% for low-vision readers. The design's 5% was additive, which is fine
- *  across 60–160% and wrong across 60–640%: additively, one click at 640% is a
- *  0.8% change (invisible) while at 60% it is 8% (coarse), and crossing the
- *  range takes 108 clicks — which would have made the new ceiling unreachable
- *  in practice, i.e. a fake fix for the reader it was raised for. A constant
- *  RATIO is what every zoom control in existence uses, for this reason: equal
- *  perceptual steps at every scale, and ~25 clicks (or one 150px drag) end to
- *  end. 1.1 keeps the design's feel at the default — the first click off 100%
- *  moves 10%, against the old 5% — while staying honest at the top. */
+ *  STAFF_STEP is a RATIO because Staff spans 0.4sp–8sp for low-vision readers.
+ *  An additive step is coarse at the floor and invisible at the ceiling. A
+ *  constant ratio gives equal perceptual steps at every size and crosses the
+ *  20x range in about 32 clicks (or one drag). 1.1 keeps the established feel
+ *  at 1sp while staying useful at both ends. */
 const STAFF_STEP_RATIO = 1.1;
 const SPACE_STEP = 0.5;
 
@@ -97,10 +92,14 @@ export type ZoomAxis = 'staff' | 'space';
 
 export interface ZoomPadChange {
   /** null = fitted: no pxPerSp is sent and the renderer fits to the viewport. */
+  staffSp: number | null;
+  /** @deprecated Compatibility alias for `staffSp`. */
   staffScale: number | null;
   /** Space in staff spaces; null = the element's `density` preset decides. */
   densityH: number | null;
 }
+
+type ZoomPadCommit = Pick<ZoomPadChange, 'staffSp' | 'densityH'>;
 
 /** Round to the step grid so repeated ±0.05 cannot drift into 0.8500000001. */
 function snap(value: number, step: number): number {
@@ -108,10 +107,9 @@ function snap(value: number, step: number): number {
 }
 
 /**
- * `steps` geometric staff steps from `from`, snapped to the 1% grid the
+ * `steps` geometric Staff steps from `from`, snapped to the 0.01sp grid the
  * readout prints. Rounding keeps repeated ×1.1 ÷1.1 from drifting, and the
- * grid is fine enough that a step is never swallowed by it (1% of the 60%
- * floor is 0.6 of a step).
+ * grid is fine enough that the first step from the 0.4sp floor is 0.44sp.
  */
 function staffAfterSteps(from: number, steps: number): number {
   return Math.round(from * Math.pow(STAFF_STEP_RATIO, steps) * 100) / 100;
@@ -119,23 +117,23 @@ function staffAfterSteps(from: number, steps: number): number {
 
 @customElement('mnx-zoom-pad')
 export class ZoomPad extends LitElement {
-  /** Staff scale, or null for fitted. Mirrors the viewer's `zoom`. */
-  @property({ type: Number }) staffScale: number | null = null;
+  /** Staff in canonical staff spaces, or null for fitted. Mirrors `zoom`. */
+  @property({ type: Number }) staffSp: number | null = null;
   /** Space in staff spaces, or null for the preset. Mirrors `density-h`. */
   @property() spacingMode: 'natural' | 'fill' = 'fill';
   @property({ type: Number }) densityH: number | null = null;
 
   /**
    * What the last paint actually used, from the viewer's `render-scale`.
-   * While `staffScale` is null this is the ONLY honest number to print — the
+   * While `staffSp` is null this is the ONLY honest number to print — the
    * renderer fitted the score and the value moves with the viewport.
    */
-  @property({ type: Number }) effectiveStaffScale = 1;
+  @property({ type: Number }) effectiveStaffSp = 1;
 
   /**
    * The spacing values that actually change the score on screen, ascending —
    * `<mnx-document-viewer>.densitySteps()`, passed in as a getter because it moves
-   * with every paint (viewport width, staff scale, the document itself).
+   * with every paint (viewport width, Staff, the document itself).
    *
    * The ← → arms walk THIS, not a fixed percentage. The reason is the whole
    * point of the axis: on a justified score most density values engrave
@@ -696,15 +694,15 @@ export class ZoomPad extends LitElement {
    * They can differ, and the case where they do is the one a reader is most
    * likely to be in when they care. The pane clips nothing and scrolls
    * nowhere: a drawing wider than it is scaled down to fit (`max-width: 100%`
-   * on the score's svg), and since a large staff scale prices the rigid
+   * on the score's svg), and since a large Staff value prices the rigid
    * columns wider as well as taller, the shrink grows with the ask and the two
-   * nearly cancel. Asking 320% drew 268%, asking 640% drew 297% — reported as
+   * nearly cancel. Asking 3.2sp drew 2.68sp, asking 6.4sp drew 2.97sp — reported as
    * *"vertical spacing 320 doesn't seem half of 640"*, which it was not.
    * `<mnx-document-viewer>` measures the shrink and reports the product, so this
    * number is the staff in front of you.
    */
   private get shownStaff(): number {
-    return this.effectiveStaffScale;
+    return this.effectiveStaffSp;
   }
 
   /**
@@ -712,12 +710,12 @@ export class ZoomPad extends LitElement {
    *
    * Deliberately not `shownStaff`. Stepping from the drawn number would walk
    * the request backwards the moment the two diverge — press ↑ at a pinned
-   * 640% that draws 297% and the next value would be 327%, i.e. a smaller ask
+   * 6.4sp that draws 2.97sp and the next value would be 3.27sp, i.e. a smaller ask
    * than the one already in force. The reader still sees the truth; the
    * control still edits what they set.
    */
   private get requestedStaff(): number {
-    return this.staffScale ?? this.effectiveStaffScale;
+    return this.staffSp ?? this.effectiveStaffSp;
   }
 
   private get shownSpace(): number {
@@ -725,7 +723,7 @@ export class ZoomPad extends LitElement {
   }
 
   private get offDefault(): boolean {
-    return this.staffScale !== null || this.densityH !== null;
+    return this.staffSp !== null || this.densityH !== null;
   }
 
   // ── stepping ────────────────────────────────────────────────────────────
@@ -734,21 +732,21 @@ export class ZoomPad extends LitElement {
    * Move one axis by `steps`, clamp through the ENGINE's own bounds, and
    * report a clamp that actually bit. Stepping from `requestedStaff` is what makes
    * the first click off a fitted score continue from what is on screen rather
-   * than jumping to 100%.
+   * than jumping to 1sp.
    */
   private step(axis: ZoomAxis, steps: number) {
     if (steps === 0) return;
     if (axis === 'staff') {
       const next = staffAfterSteps(this.requestedStaff, steps);
-      const clampedTo = clampStaffScale(next)!;
-      this.noteClamp('staff', next, clampedTo, MIN_STAFF_SCALE, MAX_STAFF_SCALE);
-      this.commit({ staffScale: clampedTo, densityH: this.densityH });
+      const clampedTo = clampStaffSp(next)!;
+      this.noteClamp('staff', next, clampedTo, MIN_STAFF_SP, MAX_STAFF_SP);
+      this.commit({ staffSp: clampedTo, densityH: this.densityH });
     } else {
       const dir = steps > 0 ? 1 : -1;
       const walk = this.walkSpace(this.shownSpace, Math.abs(steps), dir);
       this.clamped = walk.exhausted ? { axis: 'space', at: dir < 0 ? 'min' : 'max' } : null;
       if (walk.value !== this.densityH) {
-        this.commit({ staffScale: this.staffScale, densityH: walk.value });
+        this.commit({ staffSp: this.staffSp, densityH: walk.value });
       }
     }
   }
@@ -759,7 +757,7 @@ export class ZoomPad extends LitElement {
    * A ladder of ONE rung is not "nothing to walk", it is the answer: this
    * score has a single engraving across the entire density range, so both arms
    * are exhausted and must say so. It used to fall through to the flat step
-   * here, which is how the axis went dead-but-clickable at high staff scales —
+   * here, which is how the axis went dead-but-clickable at large Staff values —
    * where one bar fills a system, every row is justified to the margin and
    * density has nothing left to move (2026-08-21).
    */
@@ -836,12 +834,13 @@ export class ZoomPad extends LitElement {
     else this.clamped = null;
   }
 
-  private commit(change: ZoomPadChange) {
-    this.staffScale = change.staffScale;
+  private commit(change: ZoomPadCommit) {
+    this.staffSp = change.staffSp;
     this.densityH = change.densityH;
+    const detail: ZoomPadChange = { ...change, staffScale: change.staffSp };
     this.dispatchEvent(
       new CustomEvent<ZoomPadChange>('zoom-change', {
-        detail: change,
+        detail,
         bubbles: true,
         composed: true
       })
@@ -855,7 +854,7 @@ export class ZoomPad extends LitElement {
     if (raw !== '' && Number.isFinite(sp)) {
       const value = clampSpace(Math.round(sp * 10) / 10);
       this.clamped = null;
-      this.commit({ staffScale: this.staffScale, densityH: value });
+      this.commit({ staffSp: this.staffSp, densityH: value });
     }
     input.value = this.spNumber(this.shownSpace);
   };
@@ -863,7 +862,7 @@ export class ZoomPad extends LitElement {
   private reset() {
     this.clamped = null;
     // Staff returns to fitted; Space returns to the shared 4sp reset target.
-    this.commit({ staffScale: null, densityH: RESET_SPACE_SP });
+    this.commit({ staffSp: null, densityH: RESET_SPACE_SP });
   }
 
   // ── gestures ────────────────────────────────────────────────────────────
@@ -956,7 +955,7 @@ export class ZoomPad extends LitElement {
     const spaceSteps = drag.lock === 'staff' ? 0 : Math.round(dx / rate);
 
     const wantStaff = staffAfterSteps(drag.staff0, staffSteps);
-    const gotStaff = clampStaffScale(wantStaff)!;
+    const gotStaff = clampStaffSp(wantStaff)!;
     // Same walk the arms take, so a drag and a click agree on what a step is:
     // rungs, not percentages.
     const space = this.walkSpace(drag.space0, Math.abs(spaceSteps), spaceSteps >= 0 ? 1 : -1);
@@ -966,15 +965,15 @@ export class ZoomPad extends LitElement {
     if (drag.lock !== 'staff' && space.exhausted) {
       this.clamped = { axis: 'space', at: spaceSteps >= 0 ? 'max' : 'min' };
     } else if (drag.lock !== 'space' && gotStaff !== wantStaff) {
-      this.noteClamp('staff', wantStaff, gotStaff, MIN_STAFF_SCALE, MAX_STAFF_SCALE);
+      this.noteClamp('staff', wantStaff, gotStaff, MIN_STAFF_SP, MAX_STAFF_SP);
     } else {
       this.clamped = null;
     }
 
-    const nextStaff = drag.lock === 'space' ? this.staffScale : gotStaff;
+    const nextStaff = drag.lock === 'space' ? this.staffSp : gotStaff;
     const nextSpace = drag.lock === 'staff' ? this.densityH : gotSpace;
-    if (nextStaff !== this.staffScale || nextSpace !== this.densityH) {
-      this.commit({ staffScale: nextStaff, densityH: nextSpace });
+    if (nextStaff !== this.staffSp || nextSpace !== this.densityH) {
+      this.commit({ staffSp: nextStaff, densityH: nextSpace });
     }
   }
 
@@ -1018,7 +1017,7 @@ export class ZoomPad extends LitElement {
   private lastAsk: { request: number; drawn: string } | null = null;
 
   private noteSaturation() {
-    const seen = { request: this.requestedStaff, drawn: this.pct(this.effectiveStaffScale) };
+    const seen = { request: this.requestedStaff, drawn: this.staffSpText(this.effectiveStaffSp) };
     const previous = this.lastAsk;
     this.lastAsk = seen;
     if (!previous) return;
@@ -1117,10 +1116,6 @@ export class ZoomPad extends LitElement {
 
   // ── render ──────────────────────────────────────────────────────────────
 
-  private pct(value: number) {
-    return `${Math.round(value * 100)}%`;
-  }
-
   /** Space prints in staff spaces to one decimal: the unit is the number. */
   private spNumber(value: number) {
     return (Math.round(value * 10) / 10).toFixed(1);
@@ -1128,28 +1123,35 @@ export class ZoomPad extends LitElement {
   private sp(value: number) {
     return `${this.spNumber(value)}sp`;
   }
+  /** Staff's geometric walk needs hundredth precision at the 0.4sp floor. */
+  private staffSpNumber(value: number) {
+    return String(Math.round(value * 100) / 100);
+  }
+  private staffSpText(value: number) {
+    return `${this.staffSpNumber(value)}sp`;
+  }
 
   /**
    * What the numbers MEAN, on hover — because a bare percentage does not say
    * what it is a percentage OF, and both axes are measured in staff spaces
    * underneath.
    *
-   * Staff: 100% is 10 CSS px per staff space (`BASELINE_PX_PER_SP`), so the
-   * percentage IS the staff-space size — a four-space staff is 4× the number
-   * this spells out. Fitted says so too, because that number moves with the
-   * window rather than having been chosen.
+   * Staff is the requested line gap in canonical staff spaces: 1sp is the
+   * historical 100%, or 10 CSS px per drawn staff space before pane shrink.
+   * Fitted says so too, because that number moves with the window rather than
+   * having been chosen.
    */
   private staffTitle(fitted: boolean): string {
     const px = this.shownStaff * BASELINE_PX_PER_SP;
-    const size = `${Math.round(px * 10) / 10}px per staff space (100% = ${BASELINE_PX_PER_SP}px)`;
+    const size = `${Math.round(px * 10) / 10}px per drawn staff space (1sp = ${BASELINE_PX_PER_SP}px)`;
     const said = [`Staff size — ${size}.`];
     if (fitted) {
       said.push('Fitted to the window, so it moves when the window does.');
-    } else if (this.staffScale !== null && this.pct(this.staffScale) !== this.pct(this.shownStaff)) {
+    } else if (this.staffSp !== null && this.staffSpText(this.staffSp) !== this.staffSpText(this.shownStaff)) {
       // The gap is the whole point of printing the drawn number, so name it
-      // rather than leaving the reader to wonder why 640 says 297.
+      // rather than leaving the reader to wonder why 6.4sp draws as 2.97sp.
       said.push(
-        `You asked for ${this.pct(this.staffScale)}: at that size the page is wider ` +
+        `You asked for ${this.staffSpText(this.staffSp)}: at that size the page is wider ` +
           'than the pane, and it is scaled down to fit rather than scrolling sideways.'
       );
     }
@@ -1195,16 +1197,16 @@ export class ZoomPad extends LitElement {
       return html`
         <div class="half limit">
           <div class="lbl">${tag}</div>
-          <div class="val">${axis === 'staff' ? this.pct(value) : this.sp(value)}</div>
+          <div class="val">${axis === 'staff' ? this.staffSpText(value) : this.sp(value)}</div>
         </div>
       `;
     }
     if (axis === 'staff') {
-      const fitted = this.staffScale === null;
+      const fitted = this.staffSp === null;
       return html`
         <div class="half" title=${this.staffTitle(fitted)}>
           <div class="lbl">STAFF</div>
-          <div class="val ${fitted ? '' : 'hot'}">${this.pct(this.shownStaff)}</div>
+          <div class="val ${fitted ? '' : 'hot'}">${this.staffSpText(this.shownStaff)}</div>
         </div>
       `;
     }
@@ -1241,10 +1243,10 @@ export class ZoomPad extends LitElement {
     // Dragging holds the pad open even when the pointer leaves it, and the
     // tray's claim on attention beats both.
     const expanded = !this.suppressed && (this.pinned || this.open || this.dragging);
-    const staffHot = this.staffScale !== null;
+    const staffHot = this.staffSp !== null;
     const spaceHot = this.densityH !== null;
-    const atStaffMax = this.requestedStaff >= MAX_STAFF_SCALE || this.staffSaturated;
-    const atStaffMin = this.requestedStaff <= MIN_STAFF_SCALE;
+    const atStaffMax = this.requestedStaff >= MAX_STAFF_SP || this.staffSaturated;
+    const atStaffMin = this.requestedStaff <= MIN_STAFF_SP;
     // Greyed when the arm has nothing left to REACH, which on a ladder can
     // happen inside the engine's range: an arm that still moves a number the
     // score ignores is worse than an arm that says it is done.
@@ -1278,7 +1280,7 @@ export class ZoomPad extends LitElement {
             <button
               class="cell up ${staffHot ? 'hot' : ''}"
               ?disabled=${atStaffMax}
-              title=${this.staffSaturated && this.requestedStaff < MAX_STAFF_SCALE
+              title=${this.staffSaturated && this.requestedStaff < MAX_STAFF_SP
                 ? 'Larger staff — asking for more stopped changing the drawn size: the page is already being scaled down to fit the pane'
                 : 'Larger staff'}
               aria-label="Larger staff"

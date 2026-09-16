@@ -3,8 +3,8 @@
  *
  * Every renderer lays out twice when the staff is scaled: once square, to
  * find the fit, and again at the ink ratio (core-ink-priced-columns.md). The
- * square pass depends on nothing the staff scale changes, so across a drag
- * that only moves `staffScale` it is the same answer every frame — measured
+ * square pass depends on nothing the Staff value changes, so across a drag
+ * that only moves `staffSp` it is the same answer every frame — measured
  * at ~170ms of the ~300ms a zoomed paint of a 61-bar score costs
  * (core-touch-gestures.md, *Performance, measured*).
  *

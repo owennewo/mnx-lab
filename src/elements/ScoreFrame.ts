@@ -85,10 +85,10 @@ export class ScoreFrame extends LitElement {
   @property({ type: Boolean }) unrolled = false;
 
   /** The zoom pad's inputs — see ZoomPad for each. */
-  @property({ type: Number }) staffScale: number | null = null;
+  @property({ type: Number }) staffSp: number | null = null;
   @property({ type: Number }) densityH: number | null = null;
   @property() spacingMode: 'natural' | 'fill' = 'fill';
-  @property({ type: Number }) effectiveStaffScale = 1;
+  @property({ type: Number }) effectiveStaffSp = 1;
   @property({ attribute: false }) densitySteps: (() => number[] | null) | null = null;
   @property({ type: Boolean, reflect: true, attribute: 'document-focus' }) documentFocus = false;
 
@@ -737,11 +737,11 @@ export class ScoreFrame extends LitElement {
                   ? html`<div class="popover">
                       <mnx-zoom-pad
                         pinned
-                        .staffScale=${this.staffScale}
+                        .staffSp=${this.staffSp}
                         .densityH=${this.densityH}
                         .spacingMode=${this.spacingMode}
                         .densitySteps=${this.densitySteps}
-                        .effectiveStaffScale=${this.effectiveStaffScale}
+                        .effectiveStaffSp=${this.effectiveStaffSp}
                         .documentFocus=${this.documentFocus}
                       ></mnx-zoom-pad>
                     </div>`

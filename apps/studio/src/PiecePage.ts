@@ -43,7 +43,7 @@ import { sourceGlyph } from './SourceSheet.ts';
 import type { TagsSnapshot } from './TagsSheet.ts';
 import type { InstrumentPart } from './InstrumentsSheet.ts';
 
-import { VIEW_KEY, DISPLAY_KEY, UNROLLED_KEY, STAFF_SCALE_KEY, SPACE_SP_KEY, SPACING_MODE_KEY, FOCUSED_KEY, read, write, readView, readDisplay, readNumber, readSpaceSp, readFocused, readParts, writeParts } from './scorePreferences.ts';
+import { VIEW_KEY, DISPLAY_KEY, UNROLLED_KEY, STAFF_SP_KEY, SPACE_SP_KEY, SPACING_MODE_KEY, FOCUSED_KEY, read, write, readView, readDisplay, readStaffSp, readSpaceSp, readFocused, readParts, writeParts } from './scorePreferences.ts';
 
 const back = html`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"></path></svg>`;
 /** Instruments: three faders, each knob at its own level. */
@@ -78,10 +78,10 @@ export class PiecePage extends LitElement {
   @state() private view: ViewSetting = readView();
   @state() private display: DisplayOptions = readDisplay();
   @state() private unrolled = read(UNROLLED_KEY) === 'true';
-  @state() private staffScale: number | null = readNumber(STAFF_SCALE_KEY);
+  @state() private staffSp: number | null = readStaffSp();
   @state() private densityH: number | null = readSpaceSp();
   @state() private spacingMode: 'natural' | 'fill' = read(SPACING_MODE_KEY) === 'natural' ? 'natural' : 'fill';
-  @state() private effectiveStaffScale = 1;
+  @state() private effectiveStaffSp = 1;
   /** Whether the reader left the score focused (the frame's strips hidden) — a per-browser preference. */
   @state() private focused = readFocused();
   @query('mnx-document-viewer') private viewer!: DocumentViewer;
@@ -263,12 +263,12 @@ export class PiecePage extends LitElement {
     write(UNROLLED_KEY, String(this.unrolled));
   }
   private onZoomChange(event: CustomEvent<ZoomPadChange>) {
-    const { staffScale, densityH } = event.detail;
-    this.staffScale = staffScale;
+    const { staffSp, densityH } = event.detail;
+    this.staffSp = staffSp;
     this.densityH = densityH;
     // Absence is the "unset" state, so reset REMOVES rather than writing a
     // sentinel — otherwise the next load could not tell "fitted" from "1.0".
-    write(STAFF_SCALE_KEY, staffScale === null ? null : String(staffScale));
+    write(STAFF_SP_KEY, staffSp === null ? null : String(staffSp));
     write(SPACE_SP_KEY, densityH === null ? null : String(densityH));
   }
   private onSpacingModeChange(event: CustomEvent<'natural' | 'fill'>) {
@@ -343,10 +343,10 @@ export class PiecePage extends LitElement {
         .views=${viewer?.availableViews() ?? ['notation']}
         .display=${this.display}
         .unrolled=${this.unrolled}
-        .staffScale=${this.staffScale}
+        .staffSp=${this.staffSp}
         .densityH=${this.densityH}
         .spacingMode=${this.spacingMode}
-        .effectiveStaffScale=${this.effectiveStaffScale}
+        .effectiveStaffSp=${this.effectiveStaffSp}
         .densitySteps=${this.densitySteps}
         .pads=${!!this.doc}
         .staffView=${false}
@@ -395,11 +395,11 @@ export class PiecePage extends LitElement {
           .barNumbers=${this.display.barNumbers}
           .instrumentNames=${this.display.instrumentNames}
           .beams=${this.display.beams}
-          .zoom=${this.staffScale}
+          .zoom=${this.staffSp}
           .densityH=${this.densityH}
           .spacingMode=${this.spacingMode}
           .hiddenParts=${this.hiddenParts}
-          @render-scale=${(e: CustomEvent<RenderScale>) => (this.effectiveStaffScale = e.detail.staffScale)}
+          @render-scale=${(e: CustomEvent<RenderScale>) => (this.effectiveStaffSp = e.detail.staffSp)}
         ></mnx-document-viewer>
         <mnx-player slot="player" .recordings=${this.recordings} .syncWarningsInPanel=${true}
           .partMix=${this.partMix} .soundControl=${false} .sourceControl=${false}

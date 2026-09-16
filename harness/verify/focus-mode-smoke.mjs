@@ -211,7 +211,7 @@ try {
     source:
       "localStorage.setItem('mnx-lab.rail-hidden','1');" +
       "localStorage.setItem('mnx-lab.panel-hidden','1');" +
-      "localStorage.setItem('mnx-lab.staff-scale','1.2');" +
+      "localStorage.setItem('mnx-lab.staff-sp','1.2');" +
       "localStorage.setItem('mnx-lab.view','both');"
   });
 

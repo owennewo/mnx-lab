@@ -74,7 +74,7 @@ outranks any `staffKind`, always.
 | `hiddenParts` | property: part indices | empty | parts to leave off the score — a reader's choice, like `hide`, never a document field. The layout draws a copy without them (src/model/partVisibility.ts) whose id-less notes first take their whole-document keys as ids, so playback paint, click-to-seek and index-keyed `partTabSetups` still name the right parts. Hiding every part is ignored. It never touches the performance: a hidden part keeps playing. |
 | `hide` | comma-separated set: `lyrics`, `badges` | empty | features to omit. **One set-valued knob, not N booleans** — an options bag of `hideLyrics`/`hideBadges`/… turns every addition into a silent contract change. Unknown names are ignored, so a host naming a newer feature on an older artifact degrades to showing it rather than to a broken render. |
 | `compact` | boolean | absent | tighter paper padding for small frames. |
-| `zoom` | number | *unset* | **staff scale** — a multiplier on `pxPerSp`, so line gap, glyphs, text and stems scale together. Clamped 0.6–1.6. **Unset is not `1`**: with no `pxPerSp` the renderer *fits* a short score to the viewport, and defaulting to `1` would silently retire fit-to-width for every host that never set it. Until 2026-08-15 this prop sized the paper card and never reached the engine. |
+| `zoom` | number | *unset* | **Staff in canonical staff spaces** — `1sp` is the historical 100% request (10 CSS px per drawn staff space), and line gap, glyphs, text and stems follow the shared `10x + 0` ink line. Clamped 0.4–8sp. **Unset is not `1`**: with no value the renderer *fits* a short score to the viewport, and defaulting to `1` would silently retire fit-to-width for every host that never set it. Until 2026-08-15 this prop sized the paper card and never reached the engine. |
 | `density` | `normal` · `compact` · `spacious` | `normal` | **horizontal density** — how much music fits on a line, *without* shrinking glyphs. The engine scales the springs and never the rigid columns, which is what keeps this independent of `zoom` so the two compose. |
 | `density-h` | number | *unset* | **Space, in staff spaces** — the air after a quarter note, 0–8 (default 2.2; the name predates the unit). Wins over the `density` preset. Adjusts springs and discretionary horizontal air without resizing symbols; 0 is a true zero, margins included ([core-space-units-sp.md](../roadmap/inprogress/core-space-units-sp.md)). |
 | `clearance` | 0–4 in 0.5 steps | *unset* | legacy independent whitespace override. Explicit values (including 2) retain the historical policy; absent, Staff owns vertical proportions and Space owns horizontal air. |
@@ -187,24 +187,25 @@ below is how a control finds out which values in the range are worth offering.
 
 ### Reporting back
 
-`render-scale` fires after each paint with `{ pxPerSp, staffScale, fitted }`.
+`render-scale` fires after each paint with `{ pxPerSp, staffSp, fitted }` plus
+the deprecated numeric alias `staffScale`.
 It exists because **a host cannot compose a scale control without knowing the
 scale**: while `zoom` is unset the renderer picks the factor from the viewport,
 so the true number moves on resize with nobody touching a control, and any
-readout printing a hard-coded `100%` would be lying on first paint. `fitted`
+readout printing a hard-coded `1sp` would be lying on first paint. `fitted`
 is carried rather than inferred so a control can say the value was *derived*
 rather than chosen.
 
 The numbers are the ones **on the screen**, not the ones the engine asked for,
-and above about 200% staff scale those differ. The pane never scrolls
+and above about Staff 2sp those differ. The pane never scrolls
 sideways: `#projection-container svg` carries `max-width: 100%`, so a drawing wider
 than the pane is scaled down by the browser — both axes. Rigid columns are
 ink-priced, so a larger staff widens the drawing as well as heightening it, the
 shrink grows with the ask, and the two nearly cancel: measured 2026-08-21 in a
 658px pane, `zoom="3.2"` drew 2.34 and `zoom="6.4"` drew 2.60. The element
 measures that factor per paint and reports the product, because a control that
-printed the request would tell a low-vision reader their staff is 640% while
-they look at 260%. `zoom` itself is unchanged — it is still the request, and
+printed the request would tell a low-vision reader their staff is 6.4sp while
+they look at 2.6sp. `zoom` itself is unchanged — it is still the request, and
 still what the host set.
 
 `densitySteps()` returns the Space values that change the current packing

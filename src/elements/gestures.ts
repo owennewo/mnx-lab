@@ -37,11 +37,11 @@
  * timing-and-threshold code against real PointerEvents. It ships the way
  * `ZoomPad.ts` ships.
  */
-import { clampStaffScale } from '../engine/render/scale.ts';
+import { clampStaffSp } from '../engine/render/scale.ts';
 import { walkDensity } from '../engine/layout/spacing.ts';
 
 /** Staff steps are geometric — the pad's reasoning, unchanged: an additive
- *  step is invisible at 640% and coarse at 60%. */
+ *  step is invisible near 8sp and coarse near 0.4sp. */
 const STAFF_STEP_RATIO = 1.1;
 /** ±1 step per 6px of travel. */
 const DRAG_PX_PER_STEP = 6;
@@ -93,7 +93,7 @@ export interface ZoomValues {
    *  axis-snapped drag drives one axis and must leave the other exactly as it
    *  found it, including leaving it unset. Returning to fitted is `reset()`,
    *  never a null here. */
-  staffScale: number | null;
+  staffSp: number | null;
   densityH: number | null;
 }
 
@@ -103,7 +103,7 @@ export interface GestureTargets {
    * from what is on screen: starting a drag from 1.0 on a fitted score that
    * drew at 2.3 would jump before it moved.
    */
-  effective(): { staffScale: number; densityH: number };
+  effective(): { staffSp: number; densityH: number };
   /** The density ladder for this paint, or null to step a flat percentage. */
   ladder(): number[] | null;
   /** Apply and announce. */
@@ -278,7 +278,7 @@ export class ScoreGestures {
 
     if (!this.wheel || this.wheel.axis !== axis) {
       const from = this.targets.effective();
-      this.wheel = { axis, acc: 0, staff0: from.staffScale, space0: from.densityH };
+      this.wheel = { axis, acc: 0, staff0: from.staffSp, space0: from.densityH };
       this.lastCommit = null;
       this.targets.active(true);
       this.showHud(WHEEL_HINT, true);
@@ -333,7 +333,7 @@ export class ScoreGestures {
         dy0: Math.abs(a.cy - b.cy),
         snap: null,
         engaged: false,
-        staff0: from.staffScale,
+        staff0: from.staffSp,
         space0: from.densityH
       };
       return;
@@ -365,7 +365,7 @@ export class ScoreGestures {
       t0: now,
       snap: null,
       moved: false,
-      staff0: from.staffScale,
+      staff0: from.staffSp,
       space0: from.densityH
     };
     this.host.setPointerCapture?.(event.pointerId);
@@ -459,7 +459,7 @@ export class ScoreGestures {
   private commitSteps(snap: Snap, staff0: number, space0: number, staffSteps: number, spaceSteps: number) {
     if (snap === 'space') staffSteps = 0;
     if (snap === 'staff') spaceSteps = 0;
-    const staff = clampStaffScale(staffAfterSteps(staff0, staffSteps))!;
+    const staff = clampStaffSp(staffAfterSteps(staff0, staffSteps))!;
     const space = walkDensity(
       space0,
       Math.abs(spaceSteps),
@@ -473,10 +473,10 @@ export class ScoreGestures {
     this.lastCommit = { staff, space };
 
     this.targets.commit({
-      staffScale: snap === 'space' ? null : staff,
+      staffSp: snap === 'space' ? null : staff,
       densityH: snap === 'staff' ? null : space
     });
-    this.showHud(`Staff ${Math.round(staff * 100)}% · Space ${(Math.round(space * 10) / 10).toFixed(1)}sp`, true);
+    this.showHud(`Staff ${Math.round(staff * 100) / 100}sp · Space ${(Math.round(space * 10) / 10).toFixed(1)}sp`, true);
   }
 
   private onPointerUp = (event: PointerEvent) => {

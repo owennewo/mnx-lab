@@ -36,6 +36,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { describe, it, expect } from 'vitest';
 import { layoutTab } from '../../src/engine/layout/tab.ts';
+import { planTab } from '../../src/engine/tab/tabRenderer.ts';
 import { layoutNotation } from '../../src/engine/layout/notation.ts';
 import {
   planHorizontal,
@@ -61,10 +62,17 @@ import { fitPxPerSp } from '../../src/engine/render/svg.ts';
 import type { GlyphPrim, Primitive } from '../../src/engine/primitives.ts';
 import {
   BASELINE_PX_PER_SP,
+  MIN_STAFF_SP,
+  MAX_STAFF_SP,
   MIN_STAFF_SCALE,
   MAX_STAFF_SCALE,
+  STAFF_LINES,
+  clampStaffSp,
   clampStaffScale,
-  renderScale
+  renderScale,
+  staffLineAt,
+  staffPxPerSp,
+  staffSpFromPxPerSp
 } from '../../src/engine/render/scale.ts';
 import { initSmufl } from '../helpers/corpusPrimitives.ts';
 import type { MnxStructure } from '../../src/model/mnx.ts';
@@ -283,56 +291,76 @@ describe('zoom / density', () => {
     });
   });
 
-  describe('staff scale (ruling 2)', () => {
+  describe('Staff in canonical staff spaces (ruling 2)', () => {
     it('clamps to the design range, and passes null through as FITTED', () => {
-      expect(clampStaffScale(0.1)).toBe(MIN_STAFF_SCALE);
-      expect(clampStaffScale(9)).toBe(MAX_STAFF_SCALE);
-      expect(clampStaffScale(1.2)).toBe(1.2);
+      expect(clampStaffSp(0.1)).toBe(MIN_STAFF_SP);
+      expect(clampStaffSp(9)).toBe(MAX_STAFF_SP);
+      expect(clampStaffSp(1.2)).toBe(1.2);
       // null is not 1 and must never become 1: it is the absence that tells
       // the renderers to fit. A clamp that "helpfully" defaulted would retire
       // fit-to-width for every host that never set the prop.
-      expect(clampStaffScale(null)).toBeNull();
-      expect(clampStaffScale(undefined)).toBeNull();
-      expect(clampStaffScale(Number.NaN)).toBeNull();
+      expect(clampStaffSp(null)).toBeNull();
+      expect(clampStaffSp(undefined)).toBeNull();
+      expect(clampStaffSp(Number.NaN)).toBeNull();
     });
 
     it('reports scale against one baseline, so the three renderers agree', () => {
-      expect(renderScale(BASELINE_PX_PER_SP, false).staffScale).toBe(1);
+      expect(renderScale(BASELINE_PX_PER_SP, false).staffSp).toBe(1);
+      expect(renderScale(BASELINE_PX_PER_SP * 1.5, false).staffSp).toBe(1.5);
       expect(renderScale(BASELINE_PX_PER_SP * 1.5, false).staffScale).toBe(1.5);
       // `fitted` is carried, not inferred: a control has to say the number was
       // derived from the viewport rather than chosen.
       expect(renderScale(13.4, true).fitted).toBe(true);
     });
+
+    it('uses one affine ink line and can invert a final on-screen scale', () => {
+      expect(STAFF_LINES.inkPxPerSp).toEqual({ gain: 10, intercept: 0 });
+      expect(staffLineAt(STAFF_LINES.inkPxPerSp, 2.2)).toBe(22);
+      expect(staffPxPerSp(2.2)).toBe(22);
+      expect(staffSpFromPxPerSp(22)).toBe(2.2);
+    });
+
+    it('keeps the scale-named API as a one-for-one compatibility alias', () => {
+      expect(MIN_STAFF_SCALE).toBe(MIN_STAFF_SP);
+      expect(MAX_STAFF_SCALE).toBe(MAX_STAFF_SP);
+      expect(clampStaffScale(2.2)).toBe(clampStaffSp(2.2));
+      initSmufl();
+      const mnx = doc('lab/tab-positions/open-strings-chord');
+      const canonical = planTab({ mnx, width: 800, pxPerSp: 10, staffSp: 2.2 });
+      const legacy = planTab({ mnx, width: 800, pxPerSp: 10, staffScale: 2.2 });
+      expect(canonical.pxPerSpY).toBe(22);
+      expect(legacy.pxPerSpY).toBe(canonical.pxPerSpY);
+      expect(planTab({ mnx, width: 800, pxPerSp: 10, staffSp: 2.2, staffScale: 3 }).pxPerSpY)
+        .toBe(22);
+    });
   });
 
-  // The low-vision range (2026-08-21): both ceilings ×4, because 160% and 2
-  // were preference bounds and a reader who needs four times that again was
-  // simply told no. What has to hold for that to be an honest offer rather
-  // than a bigger number: the engine must still DRAW it, and the top of each
-  // range must still DO something.
+  // The low-vision range: Staff and Space now both reach 8sp. What has to hold
+  // for that to be an honest offer rather than a bigger number: the engine
+  // must still DRAW it, and the top of each range must still DO something.
   describe('the low-vision range', () => {
-    it('both ceilings are four times what the design specified', () => {
-      expect(MAX_STAFF_SCALE).toBe(6.4);
+    it('both ceilings reach 8sp', () => {
+      expect(MAX_STAFF_SP).toBe(8);
       // Space's ceiling is in staff spaces now (core-space-units-sp.md): 8sp
       // after a quarter note, ~3.6× the default, which is where the short
       // score below reaches one bar per system (measured 6–7sp).
       expect(MAX_SPACE_SP).toBe(8);
-      // The staff floor is untouched — this raised a ceiling, it did not
-      // re-centre the control. The Space floor is zero by design.
-      expect(MIN_STAFF_SCALE).toBe(0.6);
+      // Staff now names its canonical-sp range directly; Space reaches zero
+      // because air can disappear, while a zero-height staff is meaningless.
+      expect(MIN_STAFF_SP).toBe(0.4);
       expect(MIN_SPACE_SP).toBe(0);
-      expect(clampStaffScale(99)).toBe(MAX_STAFF_SCALE);
+      expect(clampStaffSp(99)).toBe(MAX_STAFF_SP);
       expect(clampSpace(99)).toBe(MAX_SPACE_SP);
     });
 
     it('nothing collides at the top of the staff range — the reason it could be raised', () => {
       initSmufl();
       // A fitted paint floors `pxPerSp` at the 10px/sp baseline, so the ink
-      // ratio at the ceiling is MAX_STAFF_SCALE itself — the worst case the
+      // ratio at the ceiling is MAX_STAFF_SP itself — the worst case the
       // viewer can produce. Ink-priced columns (core-ink-priced-columns.md)
       // are what make this safe; before that work the glyphs grew into each
       // other and this ceiling could not have moved at all.
-      const ink = MAX_STAFF_SCALE;
+      const ink = MAX_STAFF_SP;
       for (const staffKind of ['notation', 'tab'] as const) {
         const plan = planHorizontal(doc('lab/document/twelve-bar-blues'), 90, { inkRatio: ink, staffKind });
         let tightest = Infinity;
@@ -369,7 +397,7 @@ describe('zoom / density', () => {
       const mnx = doc('lab/document/twelve-bar-blues');
       const widthSp = 90;
       for (const densityH of [SPACE_DEFAULT_SP, MAX_SPACE_SP]) {
-        const layout = layoutTab({ mnx, widthSp, inkRatio: MAX_STAFF_SCALE, densityH });
+        const layout = layoutTab({ mnx, widthSp, inkRatio: MAX_STAFF_SP, densityH });
         expect(layout.usedWidthSp).toBeLessThan(widthSp * 1.25);
       }
     });
@@ -481,7 +509,7 @@ describe('zoom / density', () => {
     it('the TAB clef keeps clear of the time signature at the ratios a wide score reaches', () => {
       initSmufl();
       // 1.4 is the arm's FIRST click on a fitted wide score (kx≈7 against the
-      // 10px/sp baseline); 2.3 is that score at staffScale 1.6.
+      // 10px/sp baseline); 2.3 is that score at staffSp 1.6.
       for (const s of [1.4, 1.6, 2.3]) {
         const prims = layoutTab({ mnx: blues(), widthSp: 80, inkRatio: s }).primitives;
         const [, clefRight] = inkSpan(glyphs(prims, '6stringTabClef')[0], s);

@@ -17,8 +17,8 @@ const FONT_FAMILY_BODY = 'var(--font-family-sans)';
  * Ink scales with the STAFF (`pxPerSpY`), which is what keeps a barline's
  * weight matching the staff lines it crosses at every size. At the small end
  * of the staff range that arithmetic runs out of pixels rather than out of
- * correctness: at 60% a tab staff line and a tab barline are both 0.1sp × 6px
- * = **0.60px**, which a renderer can only draw as a smear of grey. The
+ * correctness: at Staff 0.4sp a tab staff line and a tab barline are both
+ * 0.1sp × 4px/sp = **0.4px**, which a renderer can only draw as a smear of grey. The
  * reported symptom was an illegible double barline; the giveaway was that the
  * staff lines were exactly as faint, because the whole engraving had dropped
  * under a pixel.
@@ -30,9 +30,8 @@ const FONT_FAMILY_BODY = 'var(--font-family-sans)';
  *
  * It also cannot resurrect the overlap it would be easy to fear. Flooring a
  * stroke widens it about its own centre, so two strokes of a compound barline
- * close on each other — but at the bottom of the supported staff range (60%)
- * the double barline still keeps 0.8px of clear space, and the two would only
- * meet below ~33%, which `MIN_STAFF_SCALE` does not reach.
+ * close on each other — but the 0.4sp Staff floor remains above the roughly
+ * 0.33sp point where the two would meet.
  */
 const MIN_INK_PX = 1;
 
@@ -64,12 +63,12 @@ export interface RenderSvgOptions {
   pxPerSp: number;
   /**
    * Vertical scale — defaults to `pxPerSp`, i.e. square, which is what every
-   * caller but the staff-scale one wants.
+   * caller but the non-square Staff path wants.
    *
    * The two are separable because the score's axes answer different questions:
    * horizontal position is a musical decision (the spacing plan), vertical
-   * extent is a legibility one (how big is the ink). Staff scale moves the
-   * second without disturbing the first — see `staffScale` on the renderers.
+   * extent is a legibility one (how big is the ink). Staff moves the second
+   * without disturbing the first — see `staffSp` on the renderers.
    *
    * Positions split by axis; every DIMENSION — glyph size, stroke width, rect
    * extent, dash — follows the VERTICAL scale, because those are ink, and ink

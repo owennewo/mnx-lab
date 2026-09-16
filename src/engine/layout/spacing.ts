@@ -364,7 +364,7 @@ export function clampSpace(value: number | undefined): number {
 /**
  * Ink-ratio guard: a bad value degrades to square rather than throwing. No
  * range clamp — the ratio is derived by the renderers from two scales the
- * engine already bounded (`clampStaffScale`, the fit), so any finite positive
+ * engine already bounded (`clampStaffSp`, the fit), so any finite positive
  * value is one the emitter is genuinely about to draw at.
  */
 export function clampInkRatio(value: number | undefined): number {

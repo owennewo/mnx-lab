@@ -105,8 +105,8 @@ import {
   takeLanding
 } from './assistCredentials.ts';
 import {
-  MIN_STAFF_SCALE,
-  MAX_STAFF_SCALE,
+  MIN_STAFF_SP,
+  MAX_STAFF_SP,
   type RenderScale
 } from '../engine/render/scale.ts';
 import { MIN_SPACE_SP, MAX_SPACE_SP, neighbourSystemMeasure } from '../engine/layout/spacing.ts';
@@ -205,7 +205,8 @@ function storedFallbacks(): string[] {
    score — looking at a document must not modify it. Both keys store "unset" by
    ABSENCE rather than a sentinel, because unset genuinely differs from any
    value: no staff scale means FITTED, which no number can express. */
-const STAFF_SCALE_KEY = 'mnx-lab.staff-scale';
+const STAFF_SP_KEY = 'mnx-lab.staff-sp';
+const RETIRED_STAFF_SCALE_KEY = 'mnx-lab.staff-scale';
 const SPACING_MODE_KEY = 'mnx-lab.spacing-mode';
 /* Space in staff spaces (core-space-units-sp.md, 2026-09-15). The multiplier
    it replaced lived under `mnx-lab.density-h`; a browser still carrying that
@@ -221,6 +222,14 @@ function storedScale(key: string, min: number, max: number): number | null {
   // CLAMP, don't reset — storedPanelWidth's rule, for the same reason: a value
   // saved under wider bounds means "as far as it goes", not "start over".
   return Number.isFinite(n) ? Math.min(max, Math.max(min, n)) : null;
+}
+
+function storedStaffSp(): number | null {
+  const current = localStorage.getItem(STAFF_SP_KEY);
+  const legacy = localStorage.getItem(RETIRED_STAFF_SCALE_KEY);
+  if (current === null && legacy !== null) localStorage.setItem(STAFF_SP_KEY, legacy);
+  localStorage.removeItem(RETIRED_STAFF_SCALE_KEY);
+  return storedScale(STAFF_SP_KEY, MIN_STAFF_SP, MAX_STAFF_SP);
 }
 
 function storedPanelWidth(): number {
@@ -592,11 +601,7 @@ export class ScenarioPage extends LitElement {
 
   /** The zoom pad's two axes. `null` staff scale means FITTED — the renderer
    *  gets no pxPerSp and sizes the score to the viewport. */
-  @state() private staffScale: number | null = storedScale(
-    STAFF_SCALE_KEY,
-    MIN_STAFF_SCALE,
-    MAX_STAFF_SCALE
-  );
+  @state() private staffSp: number | null = storedStaffSp();
   @state() private spacingMode: 'natural' | 'fill' = localStorage.getItem(SPACING_MODE_KEY) === 'natural' ? 'natural' : 'fill';
   @state() private densityH: number | null = storedScale(
     SPACE_SP_KEY,
@@ -605,7 +610,7 @@ export class ScenarioPage extends LitElement {
   );
   /** What the viewer's last paint actually used, so a fitted readout can print
    *  a true number instead of assuming 100%. */
-  @state() private effectiveStaffScale = 1;
+  @state() private effectiveStaffSp = 1;
   /** Previewed tab (row key), or null = the tab holding the selection. */
   /** The selection's box in `.main` coordinates, from `selection-anchored`. */
   @state() private trayAnchor: OverlayAnchor | null = null;
@@ -2976,7 +2981,7 @@ export class ScenarioPage extends LitElement {
         .mnxDoc=${shownDoc}
         .view=${viewMode}
         .unrolled=${this.unrolled}
-        .zoom=${this.staffScale}
+        .zoom=${this.staffSp}
         .densityH=${this.densityH}
         .spacingMode=${this.spacingMode}
         .partTabSetups=${this.partTabSetups()}
@@ -2993,7 +2998,7 @@ export class ScenarioPage extends LitElement {
   }
 
   private onRenderScale(event: CustomEvent<RenderScale>) {
-    this.effectiveStaffScale = event.detail.staffScale;
+    this.effectiveStaffSp = event.detail.staffSp;
   }
 
   /** Which spacing values actually change the score the viewer just drew — the
@@ -3004,13 +3009,13 @@ export class ScenarioPage extends LitElement {
     this.renderRoot?.querySelector<DocumentViewer>('mnx-document-viewer')?.densitySteps() ?? null;
 
   private onZoomChange(event: CustomEvent<ZoomPadChange>) {
-    const { staffScale, densityH } = event.detail;
-    this.staffScale = staffScale;
+    const { staffSp, densityH } = event.detail;
+    this.staffSp = staffSp;
     this.densityH = densityH;
     // Absence is the "unset" state, so reset REMOVES rather than writing a
     // sentinel — otherwise the next load could not tell "fitted" from "1.0".
-    if (staffScale === null) localStorage.removeItem(STAFF_SCALE_KEY);
-    else localStorage.setItem(STAFF_SCALE_KEY, String(staffScale));
+    if (staffSp === null) localStorage.removeItem(STAFF_SP_KEY);
+    else localStorage.setItem(STAFF_SP_KEY, String(staffSp));
     if (densityH === null) localStorage.removeItem(SPACE_SP_KEY);
     else localStorage.setItem(SPACE_SP_KEY, String(densityH));
   }
@@ -3082,11 +3087,11 @@ export class ScenarioPage extends LitElement {
             .views=${views}
             .display=${this.displayPreferences}
             .unrolled=${this.unrolled}
-            .staffScale=${this.staffScale}
+            .staffSp=${this.staffSp}
             .densityH=${this.densityH}
             .spacingMode=${this.spacingMode}
             .densitySteps=${this.densitySteps}
-            .effectiveStaffScale=${this.effectiveStaffScale}
+            .effectiveStaffSp=${this.effectiveStaffSp}
             .documentFocus=${this.documentFocus}
             .focused=${this.documentFocus}
             focus-shortcut="Ctrl+Alt+F"

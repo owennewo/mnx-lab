@@ -21,7 +21,7 @@ import { layoutNotation } from '../../src/engine/layout/notation.ts';
 import { layoutTab } from '../../src/engine/layout/tab.ts';
 import { layoutBothSystem } from '../../src/engine/layout/bothSystem.ts';
 import { glyphBBox } from '../../src/engine/smufl/smufl.ts';
-import { MAX_STAFF_SCALE, MIN_STAFF_SCALE } from '../../src/engine/render/scale.ts';
+import { MAX_STAFF_SP, MIN_STAFF_SP } from '../../src/engine/render/scale.ts';
 import { planHorizontal, packSystems } from '../../src/engine/layout/spacing.ts';
 import type { LayoutResult, Primitive } from '../../src/engine/primitives.ts';
 import { initSmufl, WIDTH_SP } from '../helpers/corpusPrimitives.ts';
@@ -36,11 +36,11 @@ const readDoc = (dir: string) =>
 
 /**
  * The ratios swept. 1 proves the sweep agrees with the goldens; 4 is a
- * comfortable non-square; `MAX_STAFF_SCALE` is the worst case the viewer can
+ * comfortable non-square; `MAX_STAFF_SP` is the worst case the viewer can
  * actually produce, since a fitted paint floors the horizontal scale at the
  * baseline and the ratio is then the staff scale itself.
  */
-const RATIOS = [1, 4, MAX_STAFF_SCALE];
+const RATIOS = [1, 4, MAX_STAFF_SP];
 
 const cls = (p: Primitive) => (p.className ?? '').split(' ');
 
@@ -185,7 +185,7 @@ describe('non-square scale — relationships the goldens cannot see', () => {
     const layout = layoutTab({
       mnx: readDoc(corpus.find(c => c.id.endsWith('twelve-bar-blues'))!.dir),
       widthSp: 90,
-      inkRatio: MAX_STAFF_SCALE
+      inkRatio: MAX_STAFF_SP
     });
     const doubles = [...barlineGroups(layout).values()].filter(
       parts => parts.length === 2 && cls(parts[0])[1] === 'barline-double'
@@ -193,7 +193,7 @@ describe('non-square scale — relationships the goldens cannot see', () => {
     expect(doubles.length).toBeGreaterThan(0);
     for (const parts of doubles) {
       const asIs = parts
-        .map(p => drawnSpan(p, MAX_STAFF_SCALE)!)
+        .map(p => drawnSpan(p, MAX_STAFF_SP)!)
         .sort((a, b) => a.l - b.l);
       expect(asIs[1].l - asIs[0].r).toBeGreaterThan(0);
       // The same strokes with their offsets in the old currency: dx applied
@@ -202,7 +202,7 @@ describe('non-square scale — relationships the goldens cannot see', () => {
         .map(p => {
           const line = p as Extract<Primitive, { kind: 'line' }>;
           const centre = line.x1 + (line.dx1 ?? 0); // <-- position-scaled: the bug
-          const half = (line.thickness * MAX_STAFF_SCALE) / 2;
+          const half = (line.thickness * MAX_STAFF_SP) / 2;
           return { l: centre - half, r: centre + half };
         })
         .sort((a, b) => a.l - b.l);
@@ -356,29 +356,29 @@ describe('minimum drawn ink — a line is always at least a line', () => {
 
   it('no stroke renders thinner than a device pixel, anywhere in the staff range', () => {
     initSmufl();
-    for (const staffScale of [MIN_STAFF_SCALE, 1, MAX_STAFF_SCALE]) {
-      const widths = strokeWidths(blues(), 10, staffScale * 10);
+    for (const staffSp of [MIN_STAFF_SP, 1, MAX_STAFF_SP]) {
+      const widths = strokeWidths(blues(), 10, staffSp * 10);
       expect(widths.length).toBeGreaterThan(0);
       for (const w of widths) {
-        expect(w, `staff ${staffScale}: stroke below a pixel`).toBeGreaterThanOrEqual(MIN_INK_PX);
+        expect(w, `staff ${staffSp}: stroke below a pixel`).toBeGreaterThanOrEqual(MIN_INK_PX);
       }
     }
   });
 
-  it('and that is not vacuous: unfloored, the smallest staff draws 0.6px hairlines', () => {
+  it('and that is not vacuous: unfloored, the smallest staff draws 0.4px hairlines', () => {
     initSmufl();
     // The reported case. A tab staff line and a tab barline are both 0.1sp,
-    // and at 60% the staff is 6px/sp.
-    expect(0.1 * MIN_STAFF_SCALE * 10).toBeCloseTo(0.6, 6);
-    expect(0.1 * MIN_STAFF_SCALE * 10).toBeLessThan(MIN_INK_PX);
-    // The floor is what closes that gap, and only there. At 60% the thinnest
-    // stroke comes out exactly at the floor; at 100% a tab hairline is
+    // and at Staff 0.4sp the drawn scale is 4px/sp.
+    expect(0.1 * MIN_STAFF_SP * 10).toBeCloseTo(0.4, 6);
+    expect(0.1 * MIN_STAFF_SP * 10).toBeLessThan(MIN_INK_PX);
+    // The floor is what closes that gap, and only there. At Staff 0.4sp the
+    // thinnest stroke comes out exactly at the floor; at Staff 1sp a tab hairline is
     // already exactly a pixel on its own (0.1sp × 10px/sp), which is a neat
-    // reminder of how close to the edge the default sits; and by 640% the
+    // reminder of how close to the edge the default sits; and by Staff 8sp the
     // floor is nowhere near firing.
-    expect(Math.min(...strokeWidths(blues(), 10, MIN_STAFF_SCALE * 10))).toBe(MIN_INK_PX);
+    expect(Math.min(...strokeWidths(blues(), 10, MIN_STAFF_SP * 10))).toBe(MIN_INK_PX);
     expect(Math.min(...strokeWidths(blues(), 10, 10))).toBe(MIN_INK_PX);
-    expect(Math.min(...strokeWidths(blues(), 10, MAX_STAFF_SCALE * 10))).toBeGreaterThan(
+    expect(Math.min(...strokeWidths(blues(), 10, MAX_STAFF_SP * 10))).toBeGreaterThan(
       MIN_INK_PX * 5
     );
   });
@@ -387,10 +387,10 @@ describe('minimum drawn ink — a line is always at least a line', () => {
     initSmufl();
     // Widening a stroke about its own centre brings the two strokes of a
     // double barline toward each other, so the floor has to be checked
-    // against the very thing the ink-offset work fixed. At 60% they keep
-    // 0.8px; they would only meet below ~33%, which the clamp never reaches.
-    const layout = layoutTab({ mnx: blues(), widthSp: 90, inkRatio: MIN_STAFF_SCALE });
-    const ky = MIN_STAFF_SCALE * 10;
+    // against the very thing the ink-offset work fixed. The two would only
+    // meet below roughly 0.33sp, which the clamp never reaches.
+    const layout = layoutTab({ mnx: blues(), widthSp: 90, inkRatio: MIN_STAFF_SP });
+    const ky = MIN_STAFF_SP * 10;
     const kx = 10;
     for (const parts of [...barlineGroups(layout).values()]) {
       if (parts.length < 2) continue;

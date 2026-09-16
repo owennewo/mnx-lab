@@ -304,7 +304,7 @@ try {
   // Raise the staff scale and the paper outgrows the pane — which is exactly
   // when a reader is moving about a score bar by bar and needs the thing they
   // are editing to still be on screen.
-  await cdp.evaluate("localStorage.setItem('mnx-lab.staff-scale', '3'); true");
+  await cdp.evaluate("localStorage.setItem('mnx-lab.staff-sp', '3'); true");
   await cdp.send('Emulation.setDeviceMetricsOverride', {
     width: 1400, height: 500, deviceScaleFactor: 1, mobile: false
   });

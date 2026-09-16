@@ -35,7 +35,8 @@ import { getSmuflData, isSmuflLoaded, loadSmufl } from '../engine/smufl/smufl.ts
 import { emitPlan, type RenderPlan } from '../engine/render/plan.ts';
 import type { LayoutReply, LayoutRequest, PlanInputs, PlanRequest } from './layout.worker.ts';
 import {
-  clampStaffScale,
+  clampStaffSp,
+  renderScale,
   type RenderOutcome,
   type RenderScale
 } from '../engine/render/scale.ts';
@@ -110,10 +111,9 @@ export class DocumentViewer extends LitElement {
    */
   @property({ type: String, reflect: true }) view: ViewSetting = 'auto';
   /**
-   * Staff scale — a multiplier on `pxPerSp`, so line spacing, glyphs, text and
-   * stems all scale together (core-zoom-density-pad.md). Clamped 0.6–6.4 — the
-   * ceiling is the low-vision range (core-accessible-range, 2026-08-21), not
-   * a preference bound.
+   * Staff in canonical staff spaces. `1sp` is the historical 100% request and
+   * resolves through the engine's shared affine ink line, so line spacing,
+   * glyphs, text and stems scale together. Clamped 0.4–8sp.
    *
    * **`null` (the default) means FITTED, not 1.** Unset defers downward, per
    * the precedence chain: with no `pxPerSp` the renderers fit a short score up
@@ -362,13 +362,13 @@ export class DocumentViewer extends LitElement {
   private ladder: { of: PackingInput[]; steps: number[] } | null = null;
   /** The density that packing was laid out at — `systemRows()`'s input. */
   private lastDensityH = 1;
-  /** The staff scale the last paint actually used, in ENGINE space (before the
+  /** The Staff value the last paint actually used, in ENGINE space (before the
    *  pane's shrink). A gesture must continue from what is on screen, and while
    *  `zoom` is null — fitted — this is the only answer to what that is. Not the
    *  shrunk figure `render-scale` reports: the drag moves the `zoom` property,
    *  which is the engine's request, and feeding back the post-shrink number
    *  would make every drag fight the fit. */
-  private lastStaffScale = 1;
+  private lastStaffSp = 1;
 
   static styles = [
     // The viewer carries its own tokens (core-viewer-embedded-app.md): on a
@@ -884,14 +884,14 @@ export class DocumentViewer extends LitElement {
       // Resolved, never null: a drag continues from what is on screen. On a
       // fitted score that is the last paint's scale, not 1.
       effective: () => ({
-        staffScale: this.zoom ?? this.lastStaffScale,
+        staffSp: this.zoom ?? this.lastStaffSp,
         densityH: this.densityH ?? DENSITY_H[this.density] ?? SPACE_DEFAULT_SP
       }),
       // `natural` spacing has no ladder to walk — the same rule the pad
       // follows, so a gesture and a click agree on what a step is.
       ladder: () => (this.spacingMode === 'natural' ? null : this.densitySteps()),
       commit: next => {
-        if (next.staffScale !== null) this.zoom = next.staffScale;
+        if (next.staffSp !== null) this.zoom = next.staffSp;
         if (next.densityH !== null) this.densityH = next.densityH;
         this.announceZoom();
       },
@@ -942,7 +942,7 @@ export class DocumentViewer extends LitElement {
   private announceZoom() {
     this.dispatchEvent(
       new CustomEvent('zoom-change', {
-        detail: { staffScale: this.zoom, densityH: this.densityH },
+        detail: { staffSp: this.zoom, staffScale: this.zoom, densityH: this.densityH },
         bubbles: true,
         composed: true
       })
@@ -1188,7 +1188,7 @@ export class DocumentViewer extends LitElement {
     // honest zoom readout without it — `fitted` scales with the viewport, so
     // the number moves on resize with nobody touching a control. Skipped when
     // the layout threw: there is no scale to report, and the last good value
-    // is a better thing for a readout to keep showing than a fabricated 100%.
+    // is a better thing for a readout to keep showing than a fabricated 1sp.
     // Cast, not annotation: every assignment above happens inside a callback,
     // so control-flow analysis has narrowed `outcome` to `never` by here.
     this.finishPaint(outcome as RenderOutcome | null, densityH);
@@ -1229,7 +1229,7 @@ export class DocumentViewer extends LitElement {
    */
   private paintInputs(width: number) {
     const visible = this.visibleParts();
-    const staffScale = clampStaffScale(this.zoom);
+    const staffSp = clampStaffSp(this.zoom);
     // Resolved once and remembered with the packing: `systemRows()` has to
     // re-pack at the value THIS paint used, not at whatever the properties say
     // when it is asked.
@@ -1257,11 +1257,11 @@ export class DocumentViewer extends LitElement {
       // pinned pxPerSp, which is exactly what coupled it to the horizontal
       // axis: pinning changed `widthSp`, the plan re-packed, and the notes
       // slid sideways under a control that claims to be vertical. It now
-      // travels as `staffScale` and touches nothing but the ink, so zooming
+      // travels as `staffSp` and touches nothing but the ink, so zooming
       // and resizing stay separate events.
       pxPerSp: undefined,
       // null stays null: unset means FITTED, and a fitted paint is square.
-      staffScale: staffScale ?? undefined
+      staffSp: staffSp ?? undefined
     };
 
     const flatSetup: TabSetup | undefined =
@@ -1295,17 +1295,17 @@ export class DocumentViewer extends LitElement {
    * viewport, so the number moves on resize with nobody touching a control.
    * Skipped when the layout threw: there is no scale to report, and the last
    * good value is a better thing for a readout to keep showing than a
-   * fabricated 100%.
+   * fabricated 1sp.
    */
   private finishPaint(drawn: RenderOutcome | null, densityH: number) {
     if (!drawn) return;
-    const { pxPerSp, staffScale: used, fitted } = drawn;
+    const { pxPerSp, staffSp: used, fitted } = drawn;
     // The packing rides along on the same paint, for `densitySteps()`. It is
     // NOT in the event: the detail stays exactly `RenderScale`, because a
     // host wants the answer ("which values do something?"), not the input.
     this.lastPackings = drawn.packings;
     this.lastDensityH = densityH;
-    this.lastStaffScale = used;
+    this.lastStaffSp = used;
     // The paper's horizontal padding follows Space with the engraving it
     // frames — set with the paint so the two never disagree for a frame.
     this.style.setProperty('--mnx-space-paper', String(spacePolicy(densityH).paperPad));
@@ -1319,7 +1319,7 @@ export class DocumentViewer extends LitElement {
     );
     this.dispatchEvent(
       new CustomEvent<RenderScale>('render-scale', {
-        detail: { pxPerSp: pxPerSp * shrink, staffScale: used * shrink, fitted },
+        detail: renderScale(pxPerSp * shrink, fitted),
         bubbles: true,
         composed: true
       })
@@ -1456,9 +1456,9 @@ export class DocumentViewer extends LitElement {
    * That is deliberate (the score fits the pane; nothing scrolls sideways),
    * but it means the engine's own answer stops being what is on screen exactly
    * where a reader most needs the truth: rigid columns are ink-priced, so a
-   * large staff scale widens the drawing as well as heightening it, the shrink
+   * large Staff value widens the drawing as well as heightening it, the shrink
    * grows with the ask, and the two nearly cancel. Measured 2026-08-21, tab
-   * view in a 658px pane: asking 320% draws 268%, asking 640% draws 297% —
+   * view in a 658px pane: asking 3.2sp draws 2.68sp, asking 6.4sp draws 2.97sp —
    * *"vertical spacing 320 doesn't seem half of 640"*, and it wasn't.
    *
    * So `render-scale` reports the scale the reader is looking at, and a
@@ -1487,7 +1487,7 @@ export class DocumentViewer extends LitElement {
    * moves a barline to another system. So the honest step is "the next value
    * that changes something", and only the layer that just laid the score out
    * can say which those are — it depends on the document, the viewport width
-   * and the staff scale, all of which move.
+   * and Staff, all of which move.
    *
    * Null until a paint has succeeded. Recomputed per paint, cached in between:
    * a host may call this on every render of its own.
@@ -1507,7 +1507,7 @@ export class DocumentViewer extends LitElement {
    *
    * Here for the same reason `densitySteps()` is: only the layer that just laid
    * the score out knows where the lines broke, and it depends on the viewport
-   * width and the staff scale, both of which move. The selection ladder's
+   * width and Staff, both of which move. The selection ladder's
    * measure rung navigates systems with ↑↓, and `src/edit` may import only
    * `src/model`, so the mount asks this and hands the session an already
    * resolved `goToMeasure` — the stage-1 pattern, keeping the session

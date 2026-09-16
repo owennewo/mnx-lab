@@ -11,9 +11,9 @@ import { emitPlan, type RenderPlan } from '../render/plan.ts';
 import { squareLayout, type LayoutCache } from '../render/layoutCache.ts';
 import type { RenderedProjection } from '../render/projection.ts';
 import {
-  BASELINE_PX_PER_SP,
-  clampStaffScale,
+  clampStaffSp,
   renderOutcome,
+  staffPxPerSp,
   type RenderOutcome
 } from '../render/scale.ts';
 
@@ -47,10 +47,12 @@ export interface RenderBothOptions {
   /** Pixels per staff space (zoom). Default 10. */
   pxPerSp?: number;
   /**
-   * Staff scale — how big the INK is, and nothing else. 1 (the default) is a
+   * Staff in canonical staff spaces — how big the INK is, and nothing else. 1sp is a
    * square scale and behaves exactly as it always did. See
    * `notationRenderer.ts` for why this is not folded into `pxPerSp`.
    */
+  staffSp?: number;
+  /** @deprecated Use `staffSp`. Values are identical: 1 = 1sp. */
   staffScale?: number;
   /** Viewer-supplied instrument (strings/capo) — overrides the document's
    *  declaration for rendering; never written back. */
@@ -97,14 +99,14 @@ export function planBoth(opts: PlanBothOptions): RenderPlan {
 
   const fitted = opts.pxPerSp === undefined;
   const pxPerSp = fitted && opts.spacingMode !== 'natural' ? fitPxPerSp(opts.width, square.naturalWidthSp ?? square.usedWidthSp, basePxPerSp) : basePxPerSp;
-  // Staff scale is ABSOLUTE against the baseline, not a multiplier on the
+  // Staff is ABSOLUTE through its affine ink line, not a multiplier on the
   // horizontal scale — 1.2 means the same size ink whatever the viewport did.
   // A control that seeds its first step from the last painted scale (the pad
   // does) needs that: multiplying would re-apply the fit it just read back.
   // Unset leaves the emitter square, which is every other caller and the
   // goldens.
-  const staffScale = clampStaffScale(opts.staffScale);
-  const pxPerSpY = staffScale === null ? pxPerSp : staffScale * BASELINE_PX_PER_SP;
+  const staffSp = clampStaffSp(opts.staffSp ?? opts.staffScale);
+  const pxPerSpY = staffSp === null ? pxPerSp : staffPxPerSp(staffSp);
 
   // Rigid columns are ink (core-ink-priced-columns.md): under a non-square
   // scale the plan is re-placed at the ink ratio so glyphs keep their columns.

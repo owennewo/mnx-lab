@@ -4,11 +4,13 @@ import { DEFAULT_DISPLAY_PREFERENCES, normalizeDisplayPreferences } from '../../
 import type { ViewSetting } from '../../../src/elements/DocumentViewer.ts';
 import { isSamplePreset } from '../../../src/audio/sampleSelection.ts';
 import type { PartMix, PartMixEntry } from '../../../src/audio/partMix.ts';
+import { clampStaffSp } from '../../../src/engine/render/scale.ts';
 
 export const VIEW_KEY = 'mnx-studio.view';
 export const DISPLAY_KEY = 'mnx-studio.display';
 export const UNROLLED_KEY = 'mnx-studio.unrolled';
-export const STAFF_SCALE_KEY = 'mnx-studio.staff-scale';
+export const STAFF_SP_KEY = 'mnx-studio.staff-sp';
+const RETIRED_STAFF_SCALE_KEY = 'mnx-studio.staff-scale';
 /** Space in staff spaces (core-space-units-sp.md). */
 export const SPACE_SP_KEY = 'mnx-studio.space-sp';
 export const SPACING_MODE_KEY = 'mnx-studio.spacing-mode';
@@ -45,6 +47,15 @@ export function readSpaceSp(): number | null {
   write('mnx-studio.density-h', null);
   return readNumber(SPACE_SP_KEY);
 }
+/** Staff in canonical staff spaces. The retired percentage multiplier has the
+ * same numeric meaning (`1sp` = 100%), so migrate it one-for-one. */
+export function readStaffSp(): number | null {
+  const current = read(STAFF_SP_KEY);
+  const legacy = read(RETIRED_STAFF_SCALE_KEY);
+  if (current === null && legacy !== null) write(STAFF_SP_KEY, legacy);
+  write(RETIRED_STAFF_SCALE_KEY, null);
+  return clampStaffSp(readNumber(STAFF_SP_KEY));
+}
 export function readNumber(key: string): number | null {
   const raw = read(key);
   if (raw === null) return null;
@@ -79,4 +90,3 @@ export function writeParts(pieceId: string, value: PartsPreference) {
   const empty = !value.hidden.length && !Object.keys(value.mix).length;
   write(partsKey(pieceId), empty ? null : JSON.stringify(value));
 }
-
