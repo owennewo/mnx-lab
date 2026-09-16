@@ -1,6 +1,7 @@
 import { LitElement, html, css, svg } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { designTokens, sharedChrome } from './tokens.ts';
+import { RESET_SPACE_SP } from './zoomDefaults.ts';
 import {
   BASELINE_PX_PER_SP,
   MIN_STAFF_SCALE,
@@ -861,8 +862,8 @@ export class ZoomPad extends LitElement {
 
   private reset() {
     this.clamped = null;
-    // Back to BOTH defaults — and the staff default is fitted, not 100%.
-    this.commit({ staffScale: null, densityH: null });
+    // Staff returns to fitted; Space returns to the shared 4sp reset target.
+    this.commit({ staffScale: null, densityH: RESET_SPACE_SP });
   }
 
   // ── gestures ────────────────────────────────────────────────────────────
@@ -1298,8 +1299,8 @@ export class ZoomPad extends LitElement {
             </button>
             <button
               class="cell mag"
-              title="Reset zoom and spacing"
-              aria-label="Reset zoom and spacing"
+              title="Reset to fitted staff and 4sp spacing"
+              aria-label="Reset to fitted staff and 4sp spacing"
               @pointerdown=${this.onMagnifier}
               @pointerup=${this.onMagnifierUp}
             >

@@ -41,6 +41,7 @@ import {
 } from '../engine/render/scale.ts';
 import { SPACE_DEFAULT_SP, densityLadder, packedRowMeasures, spacePolicy, type PackingInput } from '../engine/layout/spacing.ts';
 import { ScoreGestures, type GestureTargets } from './gestures.ts';
+import { RESET_SPACE_SP } from './zoomDefaults.ts';
 import { createLayoutCache } from '../engine/render/layoutCache.ts';
 import { SCORE_LABEL_SIZE_SP } from '../engine/layout/scoreText.ts';
 import { revealScrollDelta } from '../engine/render/revealScroll.ts';
@@ -895,9 +896,9 @@ export class DocumentViewer extends LitElement {
         this.announceZoom();
       },
       reset: () => {
-        // Both defaults — and the staff default is FITTED, not 100%.
+        // Match the pad: fitted staff with the shared 4sp spacing target.
         this.zoom = null;
-        this.densityH = null;
+        this.densityH = RESET_SPACE_SP;
         this.announceZoom();
       },
       toggleTransport: () =>

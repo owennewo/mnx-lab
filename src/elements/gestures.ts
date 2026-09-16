@@ -86,7 +86,7 @@ const WHEEL_IDLE_MS = 250;
 const ARMED_HINT = 'Zoom — drag ↕ staff · ↔ space';
 const PINCH_HINT = 'Zoom — pinch ↕ staff · ↔ space';
 const WHEEL_HINT = 'Zoom — pinch staff · Shift+pinch space';
-const RESET_HINT = 'Reset — fitted';
+const RESET_HINT = 'Reset — fitted · 4sp';
 
 export interface ZoomValues {
   /** The axis's new value, or null for "this gesture did not touch it" — an
