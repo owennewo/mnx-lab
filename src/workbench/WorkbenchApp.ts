@@ -202,8 +202,8 @@ export class WorkbenchApp extends LitElement {
     this.setDocumentFocus(!this.documentFocus);
   }
 
-  /** The score frame's focus mark and the zoom pad's footer toggle emit this
-   *  from inside AND outside focus mode, so one event is an honest toggle.
+  /** The score frame's focus mark emits this from inside AND outside focus
+   *  mode, so one event is an honest toggle.
    *  (The page head's duplicate button retired with the head, 2026-09-01; the
    *  frame's strip button became the frame's own mark, 2026-09-15.) */
   private requestDocumentFocus = () => this.toggleDocumentFocus();

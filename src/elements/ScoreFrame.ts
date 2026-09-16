@@ -7,6 +7,7 @@ import type { Player } from './Player.ts';
 import type { PlaybackUpdate } from './mnxContext.ts';
 import './ZoomPad.ts';
 import './SettingsPad.ts';
+import { DEFAULT_SPACE_SP, DEFAULT_SPACING_MODE, DEFAULT_STAFF_SP } from './zoomDefaults.ts';
 
 /**
  * The score frame — roadmap/inprogress/core-score-frame.md, from the *Studio
@@ -45,9 +46,9 @@ import './SettingsPad.ts';
  * ONE ELEMENT, TWO HOSTS. Studio mounts it on the piece page; the workbench on
  * the scenario page's score pane. Every value the frame shows comes in as a
  * property and every change leaves as the pads' own events (`view-change`,
- * `display-change`, `unrolled-change`, `zoom-change`, `spacing-mode-change`,
- * `document-focus-toggle`), which bubble composed through
- * the frame for the host to store — the pads are chrome, not surface, and so
+ * `display-change`, `unrolled-change`, `zoom-change`, `spacing-mode-change`),
+ * which bubble composed through the frame for the host to store — the pads
+ * are chrome, not surface, and so
  * is this. Focus follows the same rule: `focused` is a property the host may
  * set (studio's remembered choice; the workbench's document focus), and every
  * toggle from the mark leaves as `focus-change` (detail: the new boolean) for
@@ -85,12 +86,11 @@ export class ScoreFrame extends LitElement {
   @property({ type: Boolean }) unrolled = false;
 
   /** The zoom pad's inputs — see ZoomPad for each. */
-  @property({ type: Number }) staffSp: number | null = null;
-  @property({ type: Number }) densityH: number | null = null;
-  @property() spacingMode: 'natural' | 'fill' = 'fill';
+  @property({ type: Number }) staffSp: number | null = DEFAULT_STAFF_SP;
+  @property({ type: Number }) densityH: number | null = DEFAULT_SPACE_SP;
+  @property() spacingMode: 'natural' | 'fill' = DEFAULT_SPACING_MODE;
   @property({ type: Number }) effectiveStaffSp = 1;
   @property({ attribute: false }) densitySteps: (() => number[] | null) | null = null;
-  @property({ type: Boolean, reflect: true, attribute: 'document-focus' }) documentFocus = false;
 
   /** Whether Zoom and Settings are offered at all — a score still loading, or one
    *  the host cannot lay out, has nothing for them to change. */
@@ -742,7 +742,6 @@ export class ScoreFrame extends LitElement {
                         .spacingMode=${this.spacingMode}
                         .densitySteps=${this.densitySteps}
                         .effectiveStaffSp=${this.effectiveStaffSp}
-                        .documentFocus=${this.documentFocus}
                       ></mnx-zoom-pad>
                     </div>`
                   : nothing}
@@ -759,6 +758,7 @@ export class ScoreFrame extends LitElement {
                         .view=${this.view}
                         .views=${this.views}
                         .unrolled=${this.unrolled}
+                        .spacingMode=${this.spacingMode}
                       ></mnx-settings-pad>
                     </div>`
                   : nothing}

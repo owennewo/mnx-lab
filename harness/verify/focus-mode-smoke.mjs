@@ -161,8 +161,10 @@ const DUMP = `(() => {
     focusPressed: focusButton?.getAttribute('aria-pressed') ?? null,
     zoom: !!zoomPad,
     zoomPinned: zoomPad?.hasAttribute('pinned') ?? false,
-    zoomFocusLabel: zoomFocus?.getAttribute('aria-label') ?? null,
-    zoomFocusPressed: zoomFocus?.getAttribute('aria-pressed') ?? null,
+    zoomFocus: !!zoomFocus,
+    zoomValue: viewer?.zoom ?? null,
+    spaceValue: viewer?.densityH ?? null,
+    spacingMode: viewer?.spacingMode ?? null,
     inspector: !!pageRoot?.querySelector('mnx-rung-inspector'),
     appRect: rect(app),
     mainRect: rect(appRoot?.querySelector('main')),
@@ -248,21 +250,14 @@ try {
     );
     await new Promise(resolve => setTimeout(resolve, 300));
   };
-  const clickZoomFocus = async () => {
-    await cdp.evaluate(
-      `${FRAME}.querySelector('mnx-score-frame').shadowRoot` +
-        ".querySelector('mnx-zoom-pad').shadowRoot" +
-        ".querySelector('.focus-toggle').click()"
-    );
-    await new Promise(resolve => setTimeout(resolve, 400));
-  };
 
   let state = await dump();
-  check(
-    state.documentHeading === 'Twelve-bar blues — the realistic navigation instrument',
-    'the workbench supplies the scenario name as the document heading fallback'
-  );
+  check(state.documentHeading === null, 'the hidden-title default omits the document heading');
   check(state.frame, 'the scenario page mounts the score frame');
+  check(
+    state.zoomValue === 1.2 && state.spaceValue === 2 && state.spacingMode === 'fill',
+    'saved Staff wins while absent Space and alignment use 2sp and Fill width'
+  );
   check(state.strips, 'at rest the frame shows both strips — the tools row and the tray');
   check(
     state.focusButton && state.focusPressed === 'false' && state.focusOpacity < 0.5,
@@ -315,13 +310,10 @@ try {
   await openZoom();
   state = await dump();
   check(state.zoom && state.zoomPinned, 'Zoom in the tools row hangs the pad pinned under its button');
-  check(
-    state.zoomFocusLabel === 'Focus document' && state.zoomFocusPressed === 'false',
-    'the pinned zoom pad still carries its state-aware document-focus toggle'
-  );
-  await clickZoomFocus();
+  check(!state.zoomFocus, 'the Zoom panel has no duplicate document-focus control');
+  await focusKey();
   state = await dump();
-  check(state.appFocus && !state.zoom, 'the zoom-pad control enters document focus, and the pad goes with the tools row');
+  check(state.appFocus && !state.zoom, 'the focus shortcut enters document focus, and the pad goes with the tools row');
   check(
     state.railPreference === '1' && state.panelPreference === '1',
     'entering focus mode does not mutate remembered pane preferences'

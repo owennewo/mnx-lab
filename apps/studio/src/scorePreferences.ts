@@ -10,6 +10,11 @@ import type { ViewSetting } from '../../../src/elements/DocumentViewer.ts';
 import { isSamplePreset } from '../../../src/audio/sampleSelection.ts';
 import type { PartMix, PartMixEntry } from '../../../src/audio/partMix.ts';
 import { clampStaffSp } from '../../../src/engine/render/scale.ts';
+import {
+  DEFAULT_SPACE_SP,
+  DEFAULT_SPACING_MODE,
+  DEFAULT_STAFF_SP
+} from '../../../src/elements/zoomDefaults.ts';
 
 export const VIEW_KEY = 'mnx-studio.view';
 export const DISPLAY_KEY = 'mnx-studio.display';
@@ -42,6 +47,9 @@ export function readUnrolled(): boolean {
   const value = read(UNROLLED_KEY);
   return value === null ? DEFAULT_UNROLLED_PREFERENCE : value === 'true';
 }
+export function readSpacingMode(): 'natural' | 'fill' {
+  return read(SPACING_MODE_KEY) === 'natural' ? 'natural' : DEFAULT_SPACING_MODE;
+}
 export function readFocused(): boolean {
   // The strips' own keys (each drawn out on its own) retired with the edge
   // grips, 2026-09-15; a browser that still carries them is tidied here.
@@ -54,7 +62,7 @@ export function readFocused(): boolean {
  *  than converted — the value was a convenience. */
 export function readSpaceSp(): number | null {
   write('mnx-studio.density-h', null);
-  return readNumber(SPACE_SP_KEY);
+  return readNumber(SPACE_SP_KEY) ?? DEFAULT_SPACE_SP;
 }
 /** Staff in canonical staff spaces. The retired percentage multiplier has the
  * same numeric meaning (`1sp` = 100%), so migrate it one-for-one. */
@@ -63,7 +71,7 @@ export function readStaffSp(): number | null {
   const legacy = read(RETIRED_STAFF_SCALE_KEY);
   if (current === null && legacy !== null) write(STAFF_SP_KEY, legacy);
   write(RETIRED_STAFF_SCALE_KEY, null);
-  return clampStaffSp(readNumber(STAFF_SP_KEY));
+  return clampStaffSp(readNumber(STAFF_SP_KEY)) ?? DEFAULT_STAFF_SP;
 }
 export function readNumber(key: string): number | null {
   const raw = read(key);

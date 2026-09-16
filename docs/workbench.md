@@ -28,7 +28,7 @@ remains browser-owned (the palette's separate browser-fullscreen action uses the
 API when available). In the workbench the score frame's **focus mark** (below) *is*
 document focus: the same mark that hides the frame's strips hides the shell's panes, and
 it stays on the pane's corner in both states, so the mode never hides both its control
-and its escape route; the zoom pad's own footer toggle still works when the pad is open.
+and its escape route. The Zoom panel contains only Staff and Space controls.
 A tap on the mark also asks the browser for fullscreen (a phone's only way there) and
 gives it back on unfocus — only a fullscreen the mark entered; the palette's own is left
 alone, and the shortcut never touches the browser.
@@ -100,12 +100,12 @@ the bottom edge. A tap on the score is never a chrome toggle. The edge grips (ea
 drawn out on its own) were retired on 2026-09-15, and the corner cluster the pads used to
 idle in before that is gone; the pads themselves are unchanged.
 
-The settings card has nine rows: Staff, Repeats, Lyrics, Time signatures, Clefs, Title,
-Bar numbers, Instrument names, and Beams. Its display preferences are validated and stored
+The settings card has ten rows: Staff, Repeats, System alignment, Lyrics, Time signatures,
+Clefs, Title, Bar numbers, Instrument names, and Beams. Its display preferences are validated and stored
 under `mnx-lab:display`, across documents; projection remains URL-owned. The card holds
-what changes *what* is drawn; the layout levers — staff size, note spacing, the
-natural/fill spacing mode and document focus — all live on the zoom pad, whose
-footer holds the focus and spacing-mode toggles. Staff scales symbols and vertical
+what changes *what* is drawn plus whether systems use natural spacing or fill their width.
+Staff size and note spacing remain in Zoom; document focus has only the frame's corner mark.
+Staff scales symbols and vertical
 proportions; Space adjusts horizontal springs, margins and prefix/bar padding.
 Saved Clearance preferences are ignored: there is no third product control. Current verse uses the first used verse in established order until a
 host supplies a selected verse. That transient input is not persisted. A system means one

@@ -309,8 +309,9 @@ including changes and cancellations, and reclaims their spacing. Clef visibility
 mapping; time-signature visibility never changes duration or playback.
 
 The workbench owns localStorage key `mnx-lab:display`, shared across documents.
-Its explicit menu defaults are All verses, Show time signatures/clefs/title,
-Every system bar numbers, First system instrument names, and Clearance 2.
+Its product defaults are Both staves, repeats as written, Current verse, hidden time
+signatures/title/instrument names, shown clefs, Every system bar numbers, Slanted beams,
+Fill width system alignment, Staff 1sp, and Space 2sp.
 These label defaults intentionally differ from the no-options engine's historical output. Stored
 values are validated, invalid JSON falls back to defaults, and selected-verse
 context is never stored. The element itself never reads workbench storage.
@@ -322,11 +323,12 @@ The viewer's `spacing-mode` attribute (`spacingMode` property) accepts `fill`
 (default) or `natural`. Fill stretches full systems to their available width.
 Natural keeps the duration spacing allowance, compressing only overfull systems;
 it uses the baseline horizontal scale rather than enlarging short scores to fit.
-The workbench exposes this as the paragraph-glyph toggle in the zoom pad's footer
-row (ragged-right = natural, justified = fill) and remembers the choice.
-The staff readout is a `%`; the Space readout is a length in `sp` — the requested
-air after a quarter note, not a measured gap. The default is 2.2sp; symbol columns
-are additional. Fill-width justification can change the drawn allowance.
+The workbench exposes this as the System alignment row in Settings (ragged-right =
+natural, justified = fill) and remembers the choice. The Staff and Space readouts are
+lengths in `sp`; Space is the requested air after a quarter note, not a measured gap.
+The product starts at Staff 1sp and Space 2sp, while a bare viewer with no host preference
+retains the engine's 2.2sp spacing default. Symbol columns are additional. Fill-width
+justification can change the drawn allowance.
 
 System packing uses the selected staff size's symbol widths in both spacing
 modes. Staff size and spacing remain independent preferences, but either can

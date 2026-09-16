@@ -1,7 +1,7 @@
 import { LitElement, html, css, svg } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { designTokens, sharedChrome } from './tokens.ts';
-import { RESET_SPACE_SP } from './zoomDefaults.ts';
+import { DEFAULT_SPACE_SP, DEFAULT_STAFF_SP } from './zoomDefaults.ts';
 import {
   BASELINE_PX_PER_SP,
   MIN_STAFF_SP,
@@ -35,13 +35,6 @@ import {
  *                  columns, which is what makes this axis independent of the other.
  *
  * The magnifier where the arms cross resets both.
- *
- * Under the two, a footer row (2026-09-09, from the design project's
- * `Zoom Pad Controls` canvas, option C): the document-focus toggle, the
- * spacing-mode toggle, each a 22px cell. They used to
- * be a sibling mark and two rows of the settings card; every one of them
- * changes how the same score is laid out on the same page, which is what the
- * pad is for, and the settings card keeps what changes WHAT is drawn.
  *
  * **This is chrome, not surface.** It composes `<mnx-document-viewer>`'s
  * attributes and implements no presentation behavior of its own — every value
@@ -106,10 +99,10 @@ function snap(value: number, step: number): number {
 @customElement('mnx-zoom-pad')
 export class ZoomPad extends LitElement {
   /** Staff in canonical staff spaces, or null for fitted. Mirrors `zoom`. */
-  @property({ type: Number }) staffSp: number | null = null;
+  @property({ type: Number }) staffSp: number | null = DEFAULT_STAFF_SP;
   /** Space in staff spaces, or null for the preset. Mirrors `density-h`. */
   @property() spacingMode: 'natural' | 'fill' = 'fill';
-  @property({ type: Number }) densityH: number | null = null;
+  @property({ type: Number }) densityH: number | null = DEFAULT_SPACE_SP;
 
   /**
    * What the last paint actually used, from the viewer's `render-scale`.
@@ -136,12 +129,6 @@ export class ZoomPad extends LitElement {
    */
   @property({ attribute: false }) densitySteps: (() => number[] | null) | null = null;
 
-  /** Workbench composition state. The pad does not own focus mode; it only
-   *  reflects the host's state so its adjacent control can request the
-   *  opposite. This remains chrome around, not API on, the document viewer. */
-  @property({ type: Boolean, reflect: true, attribute: 'document-focus' })
-  documentFocus = false;
-
   /**
    * The tray is open over the score. The design: *"the pad drops to 0.28 for
    * as long as the tray is open — the selection is the more urgent thing."*
@@ -155,8 +142,8 @@ export class ZoomPad extends LitElement {
    * Docked in a host's strip rather than idling in a score corner
    * (roadmap/inprogress/core-score-frame.md): the host's own button opens and
    * closes the pad by mounting it, so the pad renders only its expanded pose —
-   * no idle mark, no hover morph, no leftward growth. Everything the arms and
-   * the footer do is unchanged; what changes is who owns the trigger.
+   * no idle mark, no hover morph, no leftward growth. The arms and readout are
+   * unchanged; only the trigger belongs to the host.
    */
   @property({ type: Boolean, reflect: true }) pinned = false;
 
@@ -258,9 +245,7 @@ export class ZoomPad extends LitElement {
          whole morph. Right edge is the anchor (margin-left: auto), so the pad
          grows leftward and downward from the mark.
 
-         A grid rather than a flex row because the footer spans both columns;
-         the readout and the arms keep their columns, so nothing above the
-         footer moved when it arrived. */
+         A grid keeps the readout and the arms in stable columns. */
       .pad {
         display: grid;
         grid-template-columns: max-content max-content;
@@ -542,118 +527,6 @@ export class ZoomPad extends LitElement {
         opacity: 0;
       }
 
-      /* ── the footer row ──
-         Two cells at 22px under both columns: focus · spacing mode. Collapses
-         with the readout — height, border and opacity only — so the idle pose is still the bare crosshair. */
-      .foot {
-        grid-column: 1 / -1;
-        box-sizing: border-box;
-        display: flex;
-        align-items: stretch;
-        height: 22px;
-        overflow: hidden;
-        /* Spanning both columns, the row's 124px of controls would otherwise
-           size the tracks — and the idle mark is a 24px square precisely
-           because the readout track is 0 wide. inline-size containment keeps
-           the footer's contents out of track sizing entirely; it takes the
-           width the two columns give it, which open is always enough. */
-        contain: inline-size;
-        border-top: var(--rule-w) solid transparent;
-        transition:
-          height 0.16s ease,
-          opacity 0.12s ease,
-          border-color 0.16s ease;
-      }
-
-      .pad.expanded .foot {
-        border-color: var(--ink);
-      }
-
-      .pad:not(.expanded) .foot {
-        height: 0;
-        border-top-width: 0;
-        opacity: 0;
-      }
-
-      .foot button {
-        appearance: none;
-        flex: none;
-        box-sizing: border-box;
-        width: 26px;
-        margin: 0;
-        padding: 0;
-        border: 0;
-        border-right: 1px solid var(--line);
-        border-radius: 0;
-        background: transparent;
-        color: var(--ink);
-        display: grid;
-        place-items: center;
-        cursor: pointer;
-        transition:
-          background-color 0.12s ease,
-          color 0.12s ease;
-      }
-
-      .foot button svg {
-        display: block;
-      }
-
-      .foot button:hover,
-      .foot button:focus-visible {
-        background: var(--row-current);
-        color: var(--accent);
-      }
-
-      .foot button:focus-visible {
-        outline: var(--rule-w) solid var(--focus-ring);
-        outline-offset: -2px;
-      }
-
-      /* Accent means "you chose this", as in the readout: focus on, or the
-         non-default spacing mode. */
-      .foot button.hot {
-        color: var(--accent);
-      }
-
-      /* ── the idle focus badge ──
-         A focus mode must carry its own visible way out, and the toggle now
-         lives in a footer that is closed at rest. So while focus is on, the
-         idle mark IS the way out: the crosshair's 24px square draws the exit
-         glyph with an ink border instead, at full opacity, and hover opens the
-         pad around it as always. Painted over the collapsed arms rather than
-         swapping them, so the open pose still morphs from the same box. */
-      .focus-badge {
-        position: absolute;
-        inset: 0;
-        box-sizing: border-box;
-        display: grid;
-        place-items: center;
-        border: var(--rule-w) solid var(--ink);
-        background: var(--surface);
-        color: var(--ink);
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.12s ease;
-      }
-
-      .focus-badge svg {
-        display: block;
-      }
-
-      :host([document-focus]) .pad:not(.expanded) {
-        opacity: 1;
-      }
-
-      :host([document-focus]) .pad:not(.expanded) .focus-badge {
-        opacity: 1;
-      }
-
-      /* The tray's claim beats the badge too — last, at matching weight. */
-      :host([suppressed]) .pad:not(.expanded) {
-        opacity: 0.28;
-      }
-
       @media (prefers-reduced-motion: reduce) {
         .pad,
         .readout,
@@ -663,10 +536,7 @@ export class ZoomPad extends LitElement {
         .grid,
         button.cell,
         .cell svg,
-        .mag svg,
-        .foot,
-        .foot button,
-        .focus-badge {
+        .mag svg {
           transition: none;
         }
       }
@@ -713,7 +583,7 @@ export class ZoomPad extends LitElement {
   }
 
   private get offDefault(): boolean {
-    return this.staffSp !== null || this.densityH !== null;
+    return this.staffSp !== DEFAULT_STAFF_SP || this.densityH !== DEFAULT_SPACE_SP;
   }
 
   // ── stepping ────────────────────────────────────────────────────────────
@@ -851,8 +721,7 @@ export class ZoomPad extends LitElement {
 
   private reset() {
     this.clamped = null;
-    // Staff returns to fitted; Space returns to the shared 4sp reset target.
-    this.commit({ staffSp: null, densityH: RESET_SPACE_SP });
+    this.commit({ staffSp: DEFAULT_STAFF_SP, densityH: DEFAULT_SPACE_SP });
   }
 
   // ── gestures ────────────────────────────────────────────────────────────
@@ -1050,60 +919,6 @@ export class ZoomPad extends LitElement {
     `;
   }
 
-  private focusGlyph() {
-    const path = this.documentFocus
-      ? 'M3 8h5V3M21 8h-5V3M3 16h5v5M21 16h-5v5'
-      : 'M8 3H3v5M16 3h5v5M21 16v5h-5M8 21H3v-5';
-    return svg`
-      <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
-        <path
-          d=${path}
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="square"
-        ></path>
-      </svg>
-    `;
-  }
-
-  /** The spacing mode as a paragraph: ragged-right for natural, justified
-   *  for fill width — the same picture every word processor uses for the same
-   *  choice. Shows the mode IN FORCE; the click swaps it. */
-  private spacingGlyph() {
-    const path = this.spacingMode === 'fill'
-      ? 'M1 1h12M1 4.33h12M1 7.67h12M1 11h12'
-      : 'M1 1h12M1 4.33h9M1 7.67h12M1 11h7';
-    return svg`
-      <svg width="14" height="12" viewBox="0 0 14 12" aria-hidden="true">
-        <path
-          d=${path}
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.6"
-          stroke-linecap="square"
-        ></path>
-      </svg>
-    `;
-  }
-
-  private requestSpacingModeToggle() {
-    const mode = this.spacingMode === 'natural' ? 'fill' : 'natural';
-    this.dispatchEvent(
-      new CustomEvent<'natural' | 'fill'>('spacing-mode-change', {
-        detail: mode,
-        bubbles: true,
-        composed: true
-      })
-    );
-  }
-
-  private requestDocumentFocusToggle() {
-    this.dispatchEvent(
-      new CustomEvent('document-focus-request', { bubbles: true, composed: true })
-    );
-  }
-
   // ── render ──────────────────────────────────────────────────────────────
 
   /** Space prints in staff spaces to one decimal: the unit is the number. */
@@ -1159,7 +974,7 @@ export class ZoomPad extends LitElement {
   private spaceTitle(): string {
     return (
       `Note spacing — asks for ${this.spNumber(this.shownSpace)} staff spaces after a quarter note ` +
-      `(default ${SPACE_DEFAULT_SP}; 0 is no air at all, margins included). ` +
+      `(default ${DEFAULT_SPACE_SP}; 0 is no air at all, margins included). ` +
       (this.spacingMode === 'natural' ? 'Natural spacing keeps this allowance unless a bar overflows. ' : 'Fill width stretches this allowance; the figure is requested, not measured. ') +
       `Symbol widths are additional and depend on staff size.`
     );
@@ -1196,14 +1011,14 @@ export class ZoomPad extends LitElement {
       return html`
         <div class="half" title=${this.staffTitle(fitted)}>
           <div class="lbl">STAFF</div>
-          <div class="val ${fitted ? '' : 'hot'}">${this.staffSpText(this.shownStaff)}</div>
+          <div class="val ${this.staffSp === DEFAULT_STAFF_SP ? '' : 'hot'}">${this.staffSpText(this.shownStaff)}</div>
         </div>
       `;
     }
     return html`
       <div class="half" title=${this.spaceTitle()}>
         <div class="lbl">SPACE</div>
-        <div class="val ${this.densityH === null ? '' : 'hot'}">${this.spacingMode === 'natural'
+        <div class="val ${this.densityH === DEFAULT_SPACE_SP ? '' : 'hot'}">${this.spacingMode === 'natural'
           ? html`<input class="space-input" type="text" inputmode="decimal"
               aria-label="Natural spacing in staff spaces"
               title="Enter spacing from ${MIN_SPACE_SP} to ${MAX_SPACE_SP} staff spaces after a quarter note. Arrows adjust by ${SPACE_STEP}."
@@ -1233,8 +1048,8 @@ export class ZoomPad extends LitElement {
     // Dragging holds the pad open even when the pointer leaves it, and the
     // tray's claim on attention beats both.
     const expanded = !this.suppressed && (this.pinned || this.open || this.dragging);
-    const staffHot = this.staffSp !== null;
-    const spaceHot = this.densityH !== null;
+    const staffHot = this.staffSp !== DEFAULT_STAFF_SP;
+    const spaceHot = this.densityH !== DEFAULT_SPACE_SP;
     const atStaffMax = this.requestedStaff >= MAX_STAFF_SP || this.staffSaturated;
     const atStaffMin = this.requestedStaff <= MIN_STAFF_SP;
     // Greyed when the arm has nothing left to REACH, which on a ladder can
@@ -1250,8 +1065,7 @@ export class ZoomPad extends LitElement {
           class="pad ${expanded ? 'expanded' : ''}"
           @pointerenter=${() => (this.open = true)}
           @pointerleave=${() => {
-            // A text entry or a slider drag in progress holds the pad open:
-            // collapsing the footer under a thumb mid-drag would drop it.
+            // A text entry or slider drag in progress holds the pad open.
             if (!this.shadowRoot?.activeElement?.matches('.space-input')) this.open = false;
           }}
           @focusin=${() => (this.open = true)}
@@ -1291,8 +1105,8 @@ export class ZoomPad extends LitElement {
             </button>
             <button
               class="cell mag"
-              title="Reset to fitted staff and 4sp spacing"
-              aria-label="Reset to fitted staff and 4sp spacing"
+              title="Reset to 1sp staff and 2sp spacing"
+              aria-label="Reset to 1sp staff and 2sp spacing"
               @pointerdown=${this.onMagnifier}
               @pointerup=${this.onMagnifierUp}
             >
@@ -1319,39 +1133,6 @@ export class ZoomPad extends LitElement {
               ${this.arrow('down')}
             </button>
             <div class="gap"></div>
-            <div class="focus-badge" aria-hidden="true">${this.focusGlyph()}</div>
-          </div>
-          <div
-            class="foot"
-            @keydown=${(event: KeyboardEvent) => {
-              // Native button and slider keys belong to these controls; the
-              // page listens on window and would edit the score instead.
-              event.stopPropagation();
-            }}
-          >
-            <button
-              class="focus-toggle ${this.documentFocus ? 'hot' : ''}"
-              title=${this.documentFocus
-                ? 'Exit document focus (Ctrl+Alt+F)'
-                : 'Focus document (Ctrl+Alt+F)'}
-              aria-label=${this.documentFocus ? 'Exit document focus' : 'Focus document'}
-              aria-pressed=${this.documentFocus}
-              @click=${this.requestDocumentFocusToggle}
-            >
-              ${this.focusGlyph()}
-            </button>
-            <button
-              class="spacing-toggle ${this.spacingMode === 'natural' ? 'hot' : ''}"
-              title=${this.spacingMode === 'natural'
-                ? 'Natural spacing — click for fill width'
-                : 'Fill width — click for natural spacing'}
-              aria-label=${this.spacingMode === 'natural'
-                ? 'Natural spacing; switch to fill width'
-                : 'Fill width; switch to natural spacing'}
-              @click=${this.requestSpacingModeToggle}
-            >
-              ${this.spacingGlyph()}
-            </button>
           </div>
         </div>
       </div>

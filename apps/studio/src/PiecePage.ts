@@ -43,7 +43,7 @@ import { sourceGlyph } from './SourceSheet.ts';
 import type { TagsSnapshot } from './TagsSheet.ts';
 import type { InstrumentPart } from './InstrumentsSheet.ts';
 
-import { VIEW_KEY, DISPLAY_KEY, UNROLLED_KEY, STAFF_SP_KEY, SPACE_SP_KEY, SPACING_MODE_KEY, FOCUSED_KEY, read, write, readView, readDisplay, readUnrolled, readStaffSp, readSpaceSp, readFocused, readParts, writeParts } from './scorePreferences.ts';
+import { VIEW_KEY, DISPLAY_KEY, UNROLLED_KEY, STAFF_SP_KEY, SPACE_SP_KEY, SPACING_MODE_KEY, FOCUSED_KEY, write, readView, readDisplay, readUnrolled, readSpacingMode, readStaffSp, readSpaceSp, readFocused, readParts, writeParts } from './scorePreferences.ts';
 
 const back = html`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"></path></svg>`;
 /** Instruments: three faders, each knob at its own level. */
@@ -80,7 +80,7 @@ export class PiecePage extends LitElement {
   @state() private unrolled = readUnrolled();
   @state() private staffSp: number | null = readStaffSp();
   @state() private densityH: number | null = readSpaceSp();
-  @state() private spacingMode: 'natural' | 'fill' = read(SPACING_MODE_KEY) === 'natural' ? 'natural' : 'fill';
+  @state() private spacingMode: 'natural' | 'fill' = readSpacingMode();
   @state() private effectiveStaffSp = 1;
   /** Whether the reader left the score focused (the frame's strips hidden) — a per-browser preference. */
   @state() private focused = readFocused();
@@ -266,8 +266,8 @@ export class PiecePage extends LitElement {
     const { staffSp, densityH } = event.detail;
     this.staffSp = staffSp;
     this.densityH = densityH;
-    // Absence is the "unset" state, so reset REMOVES rather than writing a
-    // sentinel — otherwise the next load could not tell "fitted" from "1.0".
+    // Null restores the product default on the next load; numeric choices are
+    // persisted exactly as requested.
     write(STAFF_SP_KEY, staffSp === null ? null : String(staffSp));
     write(SPACE_SP_KEY, densityH === null ? null : String(densityH));
   }

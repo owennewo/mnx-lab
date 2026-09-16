@@ -2,14 +2,14 @@ import { DISPLAY_CHOICES, type DisplayOptions } from '../engine/displayOptions.t
 import { LitElement, html, css, svg, nothing, type TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { DEFAULT_DISPLAY_PREFERENCES } from './displayDefaults.ts';
+import { DEFAULT_SPACING_MODE } from './zoomDefaults.ts';
 import { designTokens, sharedChrome } from './tokens.ts';
 import type { ViewMode } from './DocumentViewer.ts';
 
 /**
  * The document settings pad — the leftmost mark in the score-corner cluster,
- * beside the zoom pad. The card holds what changes WHAT is drawn; spacing mode
- * — how the same score lays out on the same page — lives in the
- * zoom pad's footer row, where the other layout levers already were.
+ * beside the zoom pad. The card holds what changes what is drawn and how each
+ * system aligns within the available width.
  *
  * **This is chrome, not surface** (docs/core-viewer-surface.md): the pad owns
  * no view state. The current view and the views a document can support come in
@@ -72,6 +72,9 @@ export class SettingsPad extends LitElement {
   /** Repeats drawn as written, or unrolled into their performed order. Owned
    *  by the shell, like the view: the pad asks, the shell stores it. */
   @property({ type: Boolean }) unrolled = false;
+
+  /** Natural system widths or systems expanded to fill their row. */
+  @property() spacingMode: 'natural' | 'fill' = DEFAULT_SPACING_MODE;
 
   /** The view the score is drawing now. */
   @property({ type: String }) view: ViewMode = 'notation';
@@ -137,6 +140,7 @@ export class SettingsPad extends LitElement {
    */
   private get offDefault(): boolean {
     if (this.unrolled) return true;
+    if (this.spacingMode !== DEFAULT_SPACING_MODE) return true;
     return Object.keys(DISPLAY_CHOICES).some(name => {
       const key = name as keyof DisplayOptions;
       const current = this.display[key];
@@ -168,10 +172,17 @@ export class SettingsPad extends LitElement {
     }));
   }
 
+  private emitSpacingMode(value: string) {
+    this.dispatchEvent(new CustomEvent<'natural' | 'fill'>('spacing-mode-change', {
+      detail: value as 'natural' | 'fill',
+      bubbles: true,
+      composed: true
+    }));
+  }
+
   // ── glyph primitives ────────────────────────────────────────────────────
   // Drawn, never imported — the cluster's rule. One 24-unit box, currentColor,
-  // square caps, so a value glyph sits beside the focus and spacing glyphs in
-  // the zoom pad's footer without looking borrowed from somewhere else.
+  // square caps, so every value glyph reads as part of one control vocabulary.
 
   private static stroke(d: string, w = 1.6) {
     return svg`<path d=${d} fill="none" stroke="currentColor" stroke-width=${w} stroke-linecap="square"></path>`;
@@ -237,6 +248,9 @@ export class SettingsPad extends LitElement {
         ${S.stroke('M12.5 4.5v15', 1.2)}${S.dot(8.5, 10.2, 1.4)}${S.dot(8.5, 13.8, 1.4)}`,
       'repeats.unrolled': svg`${quietStaff}${S.stroke('M8 4.5v15M16 4.5v15', 1.2)}
         ${S.stroke('M3 1.5h5M16 1.5h5', 1.4)}`,
+      // SYSTEM ALIGNMENT — ragged natural widths, or every line filled.
+      'systemAlignment.natural': svg`${S.stroke('M3 5h18M3 10h13M3 15h18M3 20h10', 1.6)}`,
+      'systemAlignment.fill': svg`${S.stroke('M3 5h18M3 10h18M3 15h18M3 20h18', 1.6)}`,
       // LYRICS — a note over the words under it.
       'lyrics.all': svg`${S.head(9.5, 5.6, 2.4, 1.7)}${S.stroke('M11.8 5V1', 1.4)}
         ${S.stroke('M4 12h16M4 16h16M4 20h9', 1.3)}`,
@@ -471,6 +485,21 @@ export class SettingsPad extends LitElement {
       this.unrolled ? 'unrolled' : 'as-written',
       value => this.emitUnrolled(value === 'unrolled'),
       this.unrolled
+    );
+  }
+
+  private systemAlignmentRow() {
+    const choices: Choice[] = [
+      { value: 'natural', word: 'Natural spacing' },
+      { value: 'fill', word: 'Fill width' }
+    ];
+    return this.row(
+      'systemAlignment',
+      'System alignment',
+      choices,
+      this.spacingMode,
+      value => this.emitSpacingMode(value),
+      this.spacingMode !== DEFAULT_SPACING_MODE
     );
   }
 
@@ -869,6 +898,7 @@ export class SettingsPad extends LitElement {
                   <div class="rows">
                     ${this.staffRow()}
                     ${this.repeatsRow()}
+                    ${this.systemAlignmentRow()}
                     ${this.displayRow('lyrics', 'Lyrics', ['All verses', 'Current verse', 'Hide'])}
                     ${this.displayRow('timeSignatures', 'Time signatures', ['Show', 'Hide'])}
                     ${this.displayRow('clefs', 'Clefs', ['Show', 'Hide'])}

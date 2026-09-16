@@ -1,7 +1,7 @@
 import type { MnxStructure } from '../../../src/model/mnx.ts';
 import { DocumentViewer } from '../../../src/elements/DocumentViewer.ts';
 import { loadSmufl } from '../../../src/engine/smufl/smufl.ts';
-import { readView, readDisplay, readUnrolled, read, readStaffSp, readSpaceSp, SPACING_MODE_KEY } from './scorePreferences.ts';
+import { readView, readDisplay, readUnrolled, readSpacingMode, readStaffSp, readSpaceSp } from './scorePreferences.ts';
 
 const PRINT_WIDTH_MM = 186;
 
@@ -24,7 +24,7 @@ export async function renderPdfView(preview: Window, mnx: MnxStructure, title: s
   viewer.unrolled = readUnrolled();
   viewer.zoom = readStaffSp();
   viewer.densityH = readSpaceSp();
-  viewer.spacingMode = read(SPACING_MODE_KEY) === 'natural' ? 'natural' : 'fill';
+  viewer.spacingMode = readSpacingMode();
   viewer.lyrics = display.lyrics;
   viewer.timeSignatures = display.timeSignatures;
   viewer.clefs = display.clefs;

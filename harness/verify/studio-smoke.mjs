@@ -59,6 +59,7 @@ try {
   await c.evaluate(`${library}.querySelector('li .who a').click()`);
   await wait(`location.hash==='#/piece/${pieceId}'`);
   await wait(`!!${piece}?.querySelector('mnx-document-viewer')?.shadowRoot?.querySelector('svg')`);
+  await wait(`${piece}.querySelector('mnx-document-viewer').zoom === 1 && ${piece}.querySelector('mnx-document-viewer').densityH === 2 && ${piece}.querySelector('mnx-document-viewer').spacingMode === 'fill'`);
   await wait(`${frame}?.querySelector('.strip.top .head h1')?.textContent.includes('Studio smoke piece')`);
   assert.equal(await c.evaluate(`!!${app}.querySelector('header')`), false);
   await wait(`!!${piece}.querySelector('mnx-player').performance`);
@@ -70,9 +71,11 @@ try {
   assert.equal(await c.evaluate(`!!${frame}.querySelector('.seg')`), false);
   await c.evaluate(`[...${frame}.querySelectorAll('.strip.top .btn')].find(b => b.textContent.includes('Zoom')).click()`);
   await wait(`!!${frame}.querySelector('mnx-zoom-pad[pinned]')`);
+  assert.equal(await c.evaluate(`!!${frame}.querySelector('mnx-zoom-pad').shadowRoot.querySelector('.focus-toggle, .spacing-toggle')`), false);
   await c.evaluate(`[...${frame}.querySelectorAll('.strip.top .btn')].find(b => b.textContent.includes('Settings')).click()`);
   await wait(`!${frame}.querySelector('mnx-zoom-pad') && !!${frame}.querySelector('mnx-settings-pad[pinned]')?.shadowRoot?.querySelector('.card')`);
   const pad = `${frame}.querySelector('mnx-settings-pad[pinned]').shadowRoot`;
+  await wait(`${pad}.querySelector('button[data-row=systemAlignment] .word')?.textContent === 'Fill width'`);
   await c.evaluate(`${pad}.querySelector('button[data-row=view]').click()`);
   await wait(`!!${pad}.querySelector('.menu')`);
   await c.evaluate(`[...${pad}.querySelectorAll('.menu .item')].find(i => i.textContent.trim() === 'Tab').click()`);

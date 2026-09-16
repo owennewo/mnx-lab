@@ -90,6 +90,7 @@ import { buildInspectorView } from './inspectorRows.ts';
 import { fingerboardOf, parseInspectorLine } from '../edit/inspector.ts';
 import '../elements/ScoreFrame.ts';
 import type { ZoomPadChange } from '../elements/ZoomPad.ts';
+import { DEFAULT_SPACE_SP, DEFAULT_SPACING_MODE, DEFAULT_STAFF_SP } from '../elements/zoomDefaults.ts';
 import './ModelPickerDialog.ts';
 import './LyricTextEditor.ts';
 import { lyricPlanOps, type LyricPlanEdit } from '../edit/lyricText.ts';
@@ -202,9 +203,8 @@ function storedFallbacks(): string[] {
 
 /* The zoom pad's two axes (core-zoom-density-pad.md). localStorage, not the
    document store: how big you like the staff is a property of you, not of the
-   score — looking at a document must not modify it. Both keys store "unset" by
-   ABSENCE rather than a sentinel, because unset genuinely differs from any
-   value: no staff scale means FITTED, which no number can express. */
+   score — looking at a document must not modify it. Absence selects the shared
+   product defaults; explicit stored values always win. */
 const STAFF_SP_KEY = 'mnx-lab.staff-sp';
 const RETIRED_STAFF_SCALE_KEY = 'mnx-lab.staff-scale';
 const SPACING_MODE_KEY = 'mnx-lab.spacing-mode';
@@ -599,15 +599,14 @@ export class ScenarioPage extends LitElement {
   @state() private inspectorMirrored = false;
   @state() private inspectorError: string | null = null;
 
-  /** The zoom pad's two axes. `null` staff scale means FITTED — the renderer
-   *  gets no pxPerSp and sizes the score to the viewport. */
-  @state() private staffSp: number | null = storedStaffSp();
-  @state() private spacingMode: 'natural' | 'fill' = localStorage.getItem(SPACING_MODE_KEY) === 'natural' ? 'natural' : 'fill';
+  /** The zoom pad's two axes. Saved choices win; absence uses product defaults. */
+  @state() private staffSp: number | null = storedStaffSp() ?? DEFAULT_STAFF_SP;
+  @state() private spacingMode: 'natural' | 'fill' = localStorage.getItem(SPACING_MODE_KEY) === 'natural' ? 'natural' : DEFAULT_SPACING_MODE;
   @state() private densityH: number | null = storedScale(
     SPACE_SP_KEY,
     MIN_SPACE_SP,
     MAX_SPACE_SP
-  );
+  ) ?? DEFAULT_SPACE_SP;
   /** What the viewer's last paint actually used, so a fitted readout can print
    *  a true number instead of assuming 100%. */
   @state() private effectiveStaffSp = 1;
@@ -3012,8 +3011,8 @@ export class ScenarioPage extends LitElement {
     const { staffSp, densityH } = event.detail;
     this.staffSp = staffSp;
     this.densityH = densityH;
-    // Absence is the "unset" state, so reset REMOVES rather than writing a
-    // sentinel — otherwise the next load could not tell "fitted" from "1.0".
+    // Null restores the product default on the next load; numeric choices are
+    // persisted exactly as requested.
     if (staffSp === null) localStorage.removeItem(STAFF_SP_KEY);
     else localStorage.setItem(STAFF_SP_KEY, String(staffSp));
     if (densityH === null) localStorage.removeItem(SPACE_SP_KEY);
@@ -3092,7 +3091,6 @@ export class ScenarioPage extends LitElement {
             .spacingMode=${this.spacingMode}
             .densitySteps=${this.densitySteps}
             .effectiveStaffSp=${this.effectiveStaffSp}
-            .documentFocus=${this.documentFocus}
             .focused=${this.documentFocus}
             focus-shortcut="Ctrl+Alt+F"
             .pads=${this.loadState === 'ready' && !entry.invalidByDesign}
