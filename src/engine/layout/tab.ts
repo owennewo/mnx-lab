@@ -286,6 +286,9 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
   const rowStart: number[] = [];
   // Volta brackets belong to the row that drew them (endings.ts).
   const endingOwners = new Map<Primitive, number>();
+  // Directions can hang past the midpoint to the next system; their emitting
+  // row is a fact, so carry it into the compaction pass like lyrics/voltas.
+  const directionOwners = new Map<Primitive, number>();
   let openingScoreText: Primitive[] = [];
   // Which bars declare a feel, and which of those are a change worth printing.
   const swingTimeline = resolveSwingTimeline(mnx.global.measures ?? []);
@@ -468,7 +471,13 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
         primitives
       };
       emitDynamics(positionedArgs);
-      emitDirections({ ...positionedArgs, staffTops: [staffTop], scan: primitives.slice(rowStart[m.row]) });
+      emitDirections({
+        ...positionedArgs,
+        staffTops: [staffTop],
+        scan: primitives.slice(rowStart[m.row]),
+        owners: directionOwners,
+        row: m.row
+      });
     }
 
     // Score-wide marks from the GLOBAL measure — the tempo, the navigation
@@ -568,6 +577,7 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
   // measures, and they sit under everything their staff hangs below itself,
   // technique lines included (lyricRuns.ts).
   const lyricOwners = emitLyricRuns(lyricRuns.values(), primitives, clearanceSpacing(display.clearance, opts.densityPad).lyricInk);
+  for (const [p, row] of directionOwners) lyricOwners.set(p, row);
   for (const [p, row] of endingOwners) lyricOwners.set(p, row);
 
   const baseHeightSp = 2 * MARGIN_SP + Math.max(1, plan.rowCount) * rowHeightSp;
@@ -586,8 +596,8 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
     : tightenRows;
   const tightened = fitRows({
     primitives, rows, heightSp, padDensity: opts.densityPad, clearance: display.clearance,
-    // Verses belong to the row they hang from — by fact, not by midpoint: one
-    // can hang deeper than the frame reserved (lyricRuns.ts). Voltas likewise.
+    // Deep ink belongs to the row that emitted it — by fact, not midpoint:
+    // verses and below-directions can hang past the frame. Voltas likewise.
     owners: lyricOwners,
     // The frame's reservation still files everything else as it always has.
     reservedBelowSp: lyricBlockSp

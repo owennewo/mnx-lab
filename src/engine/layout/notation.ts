@@ -960,7 +960,7 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
         for (const p of r.primitives) translatePrimitiveY(p, cursorY);
       }
       primitives.push(...r.primitives);
-      for (const [p, row] of r.lyricOwners ?? []) lyricOwners.set(p, rows.length + row);
+      for (const [p, row] of r.owners ?? []) lyricOwners.set(p, rows.length + row);
       for (const band of r.rows) {
         rows.push({ staffTop: band.staffTop + cursorY, staffBottom: band.staffBottom + cursorY });
       }
@@ -982,8 +982,8 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
     : tightenRows;
   const tightened = fitRows({
     primitives, rows, heightSp: cursorY, padDensity: opts.densityPad, clearance: display.clearance,
-    // Verses belong to the row they hang from — by fact, not by midpoint: one
-    // can hang deeper than the frame reserved (lyricRuns.ts).
+    // Deep ink belongs to the row that emitted it — by fact, not midpoint:
+    // verses and below-directions can hang beyond the provisional frame.
     owners: lyricOwners,
     // The frame's reservation still files everything else as it always has.
     reservedBelowSp: lyricBlockSpFor(selectedLyrics?.length ?? documentLyricLineCount(mnx))
@@ -1048,8 +1048,8 @@ interface SegmentResult {
   packing: PackingInput;
   /** This segment's width at density 1 — see `LayoutResult.naturalWidthSp`. */
   naturalWidthSp?: number;
-  /** Local system row of each verse and volta primitive — the row fit's ownership. */
-  lyricOwners?: ReadonlyMap<Primitive, number>;
+  /** Local system row of ink whose ownership was known when it was emitted. */
+  owners?: ReadonlyMap<Primitive, number>;
 }
 
 /**
@@ -1510,6 +1510,10 @@ function assembleSegment(
   // Where each row's primitives begin in the measure loop — rows are emitted
   // in order — so the text pass can scan exactly one row's ink.
   const rowLoopStart: number[] = [];
+  // Ink that can extend past a geometric row boundary keeps the row that
+  // emitted it. Directions join lyrics and voltas here: a deep below-staff
+  // stack must not be picked up by the following system when gaps tighten.
+  const explicitOwners = new Map<Primitive, number>();
   const aboveDirections: ((scan: readonly Primitive[]) => void)[][] = [];
   for (let i = 0; i < numMeasures; i++) {
     const m = plan.measures[i];
@@ -2160,7 +2164,12 @@ function assembleSegment(
           primitives
         };
         emitDynamics(groupArgs);
-        const directionArgs = { ...groupArgs, staffTops: staffTops.slice(g.start, g.start + g.count) };
+        const directionArgs = {
+          ...groupArgs,
+          staffTops: staffTops.slice(g.start, g.start + g.count),
+          owners: explicitOwners,
+          row: m.row
+        };
         emitDirections({ ...directionArgs, phase: 'staffSide' });
         // `above` directions clear the beams, which are drawn after the loop —
         // so they wait for the score-text pass, where they are the first thing
@@ -2310,8 +2319,9 @@ function assembleSegment(
   // Lyrics last of all (lyricRuns.ts): a verse sits under everything its staff
   // hangs below itself — hairpins and ottava brackets included — and after the
   // score-text pass, whose midpoint scan must never mistake a deep verse for
-  // the next system's ink. The fit takes their rows as fact.
+  // the next system's ink. The fit takes their rows, directions and voltas as fact.
   const lyricOwners = emitLyricRuns(lyricRuns.values(), primitives, clearanceSpacing(args.display.clearance, args.densityPad).lyricInk);
+  for (const [p, row] of explicitOwners) lyricOwners.set(p, row);
   for (const [p, row] of endingOwners) lyricOwners.set(p, row);
 
   const heightSp = 2 * MARGIN_SP + systemHeightByRow.reduce((a, b) => a + b, 0);
@@ -2328,7 +2338,7 @@ function assembleSegment(
 
   return {
     primitives, heightSp, usedWidthSp: plan.usedWidthSp, naturalWidthSp,
-    rows, displays, tabDisplayIndexes, packing: plan.packing, lyricOwners
+    rows, displays, tabDisplayIndexes, packing: plan.packing, owners: lyricOwners
   };
 }
 
@@ -3455,6 +3465,10 @@ interface EmitDirectionsArgs {
   staffTops: number[];
   staffBottoms: number[];
   primitives: Primitive[];
+  /** Row ownership known at emission time. Below directions can hang beyond
+   *  the midpoint to the next system, where geometry would mis-file them. */
+  owners?: Map<Primitive, number>;
+  row?: number;
   /**
    * THIS ROW's ink drawn so far, for an `above` direction to clear: it sits one
    * cohesion clearance over whatever rises above the staff under its own
@@ -3484,7 +3498,7 @@ interface EmitDirectionsArgs {
  * either staff. With one staff there is no "between", so it falls back to below.
  */
 export function emitDirections(args: EmitDirectionsArgs): void {
-  const { partMeasure, m, sequencesByStaff, staffTops, staffBottoms, primitives, scan, phase } = args;
+  const { partMeasure, m, sequencesByStaff, staffTops, staffBottoms, primitives, scan, phase, owners, row } = args;
   const directions = partMeasure.directions ?? [];
   if (directions.length === 0) return;
   const callStart = primitives.length;
@@ -3567,6 +3581,9 @@ export function emitDirections(args: EmitDirectionsArgs): void {
             className: between ? 'direction direction-between' : 'direction'
           }
     );
+    if (owners && row !== undefined) {
+      for (const p of primitives.slice(firstNew)) owners.set(p, row);
+    }
     if (placed) {
       const box = computeBoundsSp(primitives.slice(firstNew));
       if (box) {
