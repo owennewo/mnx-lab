@@ -595,7 +595,7 @@ const SWING_GROUP_GAP_SP = 0.3; // around the "="
 const SWING_DOT_ADVANCE_SP = 0.45; // at scale 1, as the tempo mark's dots
 const SWING_BRACKET_RISE_SP = 0.3; // bracket over the tallest stem in its group
 /** Between the metronome mark's right ink and the feel that follows it. */
-export const SWING_AFTER_TEMPO_GAP_SP = 0.5;
+export const SWING_AFTER_TEMPO_GAP_SP = 0.75;
 const SWING_BRACKET_THICKNESS_SP = 0.12;
 const SWING_BRACKET_TICK_SP = 0.4;
 const SWING_TUPLET_SIZE_SP = 1.0;

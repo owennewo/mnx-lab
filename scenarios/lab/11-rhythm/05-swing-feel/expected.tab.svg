@@ -28,17 +28,17 @@
 <text x="446.2496" y="121.9488" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m0.v0.e7.n0">0</text>
 <text x="120.9504" y="67.6992" font-size="35.2" class="tempo"></text>
 <text x="135.8368" y="67.6992" font-size="20.8" font-weight="600" style="font-family:var(--font-family-sans)" class="tempo">= 120</text>
-<text x="206.2368" y="67.6992" font-size="35.2" class="swing"></text>
-<text x="232.3232" y="67.6992" font-size="35.2" class="swing"></text>
-<line x1="216.8672" y1="45.6816" x2="244.0096" y2="45.6816" stroke-width="4.4" class="swing"></line>
-<text x="248.8096" y="67.6992" font-size="20.8" font-weight="600" style="font-family:var(--font-family-sans)" class="swing">=</text>
-<text x="266.0896" y="67.6992" font-size="35.2" class="swing"></text>
-<text x="280.336" y="67.6992" font-size="35.2" class="swing"></text>
-<line x1="266.0896" y1="38.4" x2="275.3936" y2="38.4" stroke-width="1.92" class="swing"></line>
-<line x1="289.7936" y1="38.4" x2="299.0976" y2="38.4" stroke-width="1.92" class="swing"></line>
-<line x1="266.0896" y1="38.4" x2="266.0896" y2="44.8" stroke-width="1.92" class="swing"></line>
-<line x1="299.0976" y1="38.4" x2="299.0976" y2="44.8" stroke-width="1.92" class="swing"></line>
-<text x="282.5936" y="44" font-size="16" text-anchor="middle" font-weight="600" style="font-family:var(--font-family-sans)" class="swing">3</text>
+<text x="210.2368" y="67.6992" font-size="35.2" class="swing"></text>
+<text x="236.3232" y="67.6992" font-size="35.2" class="swing"></text>
+<line x1="220.8672" y1="45.6816" x2="248.0096" y2="45.6816" stroke-width="4.4" class="swing"></line>
+<text x="252.8096" y="67.6992" font-size="20.8" font-weight="600" style="font-family:var(--font-family-sans)" class="swing">=</text>
+<text x="270.0896" y="67.6992" font-size="35.2" class="swing"></text>
+<text x="284.336" y="67.6992" font-size="35.2" class="swing"></text>
+<line x1="270.0896" y1="38.4" x2="279.3936" y2="38.4" stroke-width="1.92" class="swing"></line>
+<line x1="293.7936" y1="38.4" x2="303.0976" y2="38.4" stroke-width="1.92" class="swing"></line>
+<line x1="270.0896" y1="38.4" x2="270.0896" y2="44.8" stroke-width="1.92" class="swing"></line>
+<line x1="303.0976" y1="38.4" x2="303.0976" y2="44.8" stroke-width="1.92" class="swing"></line>
+<text x="286.5936" y="44" font-size="16" text-anchor="middle" font-weight="600" style="font-family:var(--font-family-sans)" class="swing">3</text>
 <line x1="481.6" y1="103.6624" x2="481.6" y2="195.0912" stroke-width="2.56" class="barline"></line>
 <line x1="481.6" y1="103.6624" x2="864.8" y2="103.6624" stroke-width="1.6" class="staff-line"></line>
 <line x1="481.6" y1="121.9488" x2="864.8" y2="121.9488" stroke-width="1.6" class="staff-line"></line>

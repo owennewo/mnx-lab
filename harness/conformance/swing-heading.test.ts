@@ -20,7 +20,8 @@ describe('tempo + swing heading', () => {
     const mnx = JSON.parse(readFileSync(
       'scenarios/lab/11-rhythm/05-swing-feel/document.mnx.json', 'utf8'
     )) as MnxStructure;
-    const gm = mnx.global.measures[0];
+    const gm = structuredClone(mnx.global.measures[0]);
+    gm.tempos![0].bpm = 150;
     const m = planHorizontal(mnx, 80).measures[0];
     const staffTop = 10;
 

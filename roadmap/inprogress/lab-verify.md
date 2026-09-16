@@ -88,9 +88,10 @@ swing equation above the metronome mark; no roadmap work-item doc. The tempo and
 glyphs already used the same 0.55 scale, but the two marks were placed as independent vertical
 runs. Ink under the swing footprint could therefore lift only the equation, making it look
 larger and disconnected. They now share one baseline and move together whenever either
-footprint needs more clearance. The swing starts 0.5sp after the tempo's right ink instead of
+footprint needs more clearance. The swing starts 0.75sp after the tempo's right ink instead of
 leaving a 2sp void. `harness/conformance/swing-heading.test.ts` pins equal glyph scale, equal
-baseline, the measured horizontal gap, and the combined lift over tall ink.
+baseline, the measured horizontal gap (with the reported three-digit `150`), and the combined
+lift over tall ink.
 
 One scenario moved in all four visual goldens. It is `draft`, so nothing was demoted.
 
