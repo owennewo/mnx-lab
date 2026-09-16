@@ -535,6 +535,28 @@ export interface PackedRow {
 }
 
 /**
+ * Fill-width justification needs a non-zero coefficient to distribute the
+ * line's remaining width. At Space 0 the public policy is deliberately zero,
+ * but multiplying every spring by literal zero leaves the justifier with no
+ * axis to move and makes the rendered SVG collapse to its rigid content.
+ *
+ * This epsilon is far below the primitive/output precision: it preserves the
+ * zero-space packing while allowing `factor * stretch` to resolve to the
+ * requested fill. Natural spacing remains exact zero.
+ */
+const MIN_FILL_SPRING_FACTOR = 1e-9;
+
+function justifiableSpringFactor(
+  factor: number,
+  mode: 'natural' | 'fill' | undefined,
+  followsSpace: boolean
+): number {
+  return followsSpace && factor === 0 && mode !== 'natural'
+    ? MIN_FILL_SPRING_FACTOR
+    : factor;
+}
+
+/**
  * Greedy system packing plus each row's justification factor — the whole of
  * "which bars land on which line, and how hard are their springs stretched".
  *
@@ -545,7 +567,11 @@ export interface PackedRow {
  */
 export function packSystems(packing: PackingInput, densityH: number): PackedRow[] {
   packing = packingAtSpace(packing, densityH);
-  const springFactor = spacePolicy(densityH).spring;
+  const springFactor = justifiableSpringFactor(
+    spacePolicy(densityH).spring,
+    packing.spacingMode,
+    packing.space !== undefined
+  );
   const packs = packing.measures;
   const widthAt = (row: number) => row === 0 ? packing.lineWidthSp : packing.subsequentLineWidthSp ?? packing.lineWidthSp;
   const contentRightPad = packing.contentRightPadSp ?? CONTENT_RIGHT_PAD_SP;
@@ -721,7 +747,11 @@ export function packingSignature(
       const resolved = packingAtSpace(p, densityH);
       const air = p.space ? `${resolved.lineWidthSp.toFixed(6)}:${resolved.contentRightPadSp?.toFixed(6)}:` +
         resolved.measures.map(m => `${m.prefixFirst.toFixed(6)},${m.prefixRest.toFixed(6)},${m.rigid.toFixed(6)}`).join('/') : '';
-      const springFactor = spacePolicy(densityH).spring;
+      const springFactor = justifiableSpringFactor(
+        spacePolicy(densityH).spring,
+        resolved.spacingMode,
+        resolved.space !== undefined
+      );
       return air + packSystems(resolved, densityH)
         .map(row => `${row.measures.join(',')}@${(springFactor * row.stretch).toFixed(6)}`)
         .join('|');
@@ -2291,7 +2321,11 @@ export function planHorizontal(
   // independently. One pass over the finished metrics keeps every reader
   // consistent by construction — and because it runs last, nothing ever has
   // to divide by the factor, which is what lets Space reach zero.
-  const springFactor = clearance.spring;
+  const springFactor = justifiableSpringFactor(
+    clearance.spring,
+    options?.spacingMode,
+    followsSpace
+  );
   if (springFactor !== 1) {
     for (const m of metrics) {
       m.spring *= springFactor;

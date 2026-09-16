@@ -819,6 +819,19 @@ describe('Space in staff spaces', () => {
     }
   });
 
+  it('at zero fill-width systems still reach the canvas edges', () => {
+    initSmufl();
+    for (const staffKind of ['notation', 'tab'] as const) {
+      const plan = planHorizontal(blues(), 20, {
+        densityH: 0,
+        spacingMode: 'fill',
+        staffKind
+      });
+      expect(plan.measures[0].x).toBe(0);
+      expect(plan.usedWidthSp).toBeCloseTo(20, 6);
+    }
+  });
+
   it('zero survives ink pricing — the divide-by-Space the old snapshot carried is gone', () => {
     initSmufl();
     for (const inkRatio of [0.6, 1.4, 2.3]) {
