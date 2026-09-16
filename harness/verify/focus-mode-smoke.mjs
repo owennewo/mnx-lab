@@ -122,7 +122,9 @@ const DUMP = `(() => {
   const stripTop = frameRoot?.querySelector('.strip.top');
   const stripBottom = frameRoot?.querySelector('.strip.bottom');
   const score = frameRoot?.querySelector('.score');
+  const focusControls = frameRoot?.querySelector('.focus-controls');
   const focusButton = frameRoot?.querySelector('.focus-mark');
+  const playButton = frameRoot?.querySelector('.focus-play');
   const zoomPad = frameRoot?.querySelector('mnx-zoom-pad');
   const zoomRoot = zoomPad?.shadowRoot;
   const zoomFocus = zoomRoot?.querySelector('.focus-toggle');
@@ -152,13 +154,21 @@ const DUMP = `(() => {
     frame: !!frame,
     frameRect: rect(frame),
     scoreRect: rect(score),
+    scoreScrollbar: frame ? Number.parseFloat(getComputedStyle(frame).getPropertyValue('--score-scrollbar')) || 0 : 0,
     strips: !!stripTop && !!stripBottom,
     anyStrip: !!stripTop || !!stripBottom,
+    focusControlsRect: rect(focusControls),
+    focusControlsOpacity: focusControls ? Number(getComputedStyle(focusControls).opacity) : null,
     focusButton: !!focusButton,
     focusRect: rect(focusButton),
     focusOpacity: focusButton ? Number(getComputedStyle(focusButton).opacity) : null,
     focusLabel: focusButton?.getAttribute('aria-label') ?? null,
     focusPressed: focusButton?.getAttribute('aria-pressed') ?? null,
+    playButton: !!playButton,
+    playRect: rect(playButton),
+    playLabel: playButton?.getAttribute('aria-label') ?? null,
+    playPressed: playButton?.getAttribute('aria-pressed') ?? null,
+    playDisabled: playButton?.disabled ?? null,
     zoom: !!zoomPad,
     zoomPinned: zoomPad?.hasAttribute('pinned') ?? false,
     zoomFocus: !!zoomFocus,
@@ -243,6 +253,10 @@ try {
     await cdp.evaluate(`${FRAME}.querySelector('mnx-score-frame').shadowRoot.querySelector('.focus-mark').click()`);
     await new Promise(resolve => setTimeout(resolve, 400));
   };
+  const clickFocusPlay = async () => {
+    await cdp.evaluate(`${FRAME}.querySelector('mnx-score-frame').shadowRoot.querySelector('.focus-play').click()`);
+    await new Promise(resolve => setTimeout(resolve, 400));
+  };
   const openZoom = async () => {
     await cdp.evaluate(
       `[...${FRAME}.querySelector('mnx-score-frame').shadowRoot.querySelectorAll('.strip.top .btn')]` +
@@ -260,13 +274,20 @@ try {
   );
   check(state.strips, 'at rest the frame shows both strips — the tools row and the tray');
   check(
-    state.focusButton && state.focusPressed === 'false' && state.focusOpacity < 0.5,
+    state.focusButton && state.focusPressed === 'false' && state.focusControlsOpacity < 0.5,
     'the focus mark sits on the pane, faded, not pressed'
   );
   check(
     state.focusRect && state.focusRect.y < 120 && state.focusRect.x + state.focusRect.width > state.viewport.width - 80,
     'the focus mark is at the top right of the pane'
   );
+  check(
+    state.focusRect && state.scoreRect && near(state.focusRect.y - state.scoreRect.y, 3) &&
+      near(state.scoreRect.x + state.scoreRect.width - state.focusRect.x - state.focusRect.width, 3 + state.scoreScrollbar) &&
+      near(state.focusRect.width, 40) && near(state.focusRect.height, 36),
+    'the focus mark is inset 3px and trims 2px from each side of its former box'
+  );
+  check(!state.playButton, 'the full player tray leaves no duplicate play control at rest');
   check(
     state.focusItems.some(item => item.hint === 'Ctrl+Alt+F'),
     'the command palette exposes document focus with its shortcut'
@@ -289,6 +310,17 @@ try {
     state.focusLabel === 'Show the tools and the player' && state.focusPressed === 'true',
     'inside focus the same mark offers the way back, pressed'
   );
+  check(
+    state.playButton && !state.playDisabled && state.playLabel === 'Play' &&
+      state.playRect.x + state.playRect.width < state.focusRect.x,
+    'focus mode adds an enabled Play toggle immediately left of the focus mark'
+  );
+  await clickFocusPlay();
+  state = await dump();
+  check(state.playLabel === 'Pause' && state.playPressed === 'true', 'the focus-mode toggle starts playback and becomes Pause');
+  await clickFocusPlay();
+  state = await dump();
+  check(state.playLabel === 'Play' && state.playPressed === 'false', 'the focus-mode toggle pauses playback and becomes Play');
   await focusKey();
   state = await dump();
   check(!state.appFocus && state.strips, 'Ctrl+Alt+F exits focus entered through the mark, and the strips return');
@@ -301,8 +333,8 @@ try {
     'focus mode removes the shell panes but retains the score frame'
   );
   check(
-    !state.anyStrip && state.focusRect?.height >= 40 && state.focusRect.x + state.focusRect.width <= state.viewport.width + 1,
-    'focus mode keeps its way out on screen — the mark, on the pane\'s corner'
+    !state.anyStrip && state.focusRect?.height === 36 && state.focusRect.x + state.focusRect.width <= state.viewport.width - 3,
+    'focus mode keeps both compact controls fully inside the pane'
   );
   await clickFrameFocus();
   state = await dump();

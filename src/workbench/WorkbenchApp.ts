@@ -608,8 +608,8 @@ export class WorkbenchApp extends LitElement {
         min-height: 0;
       }
 
-      /* Under the score frame's focus mark (top 12px, 40px tall, at the
-         pane's right), which in document focus is the pane's corner too. */
+      /* Under the score frame's compact corner controls, which in document
+         focus sit inside the pane's top-right corner. */
       .focus-hint {
         position: fixed;
         top: 64px;

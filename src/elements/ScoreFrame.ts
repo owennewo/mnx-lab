@@ -16,9 +16,10 @@ import { DEFAULT_SPACE_SP, DEFAULT_SPACING_MODE, DEFAULT_STAFF_SP } from './zoom
  * The score pane sits between TWO STRIPS in the library page's vocabulary —
  * the tools row above, the player's tray below — and ONE MARK on the pane's
  * top-right corner, faded until the pointer reaches it, hides and shows both
- * strips together. Nothing here listens for a tap on the score: a tap on the
- * page is navigation (seek to a bar; later, select a note), and the chrome is
- * reached only through the mark.
+ * strips together. In focus, Play/Pause sits beside that mark because the
+ * player tray is parked. Nothing here listens for a tap on the score: a tap
+ * on the page is navigation (seek to a bar; later, select a note), and the
+ * chrome is reached only through the corner controls.
  *
  *   unfocused — the tools row: the way back (slot `back`), the title at h1
  *               weight with the sub-line muted, the piece's chips (slot
@@ -28,9 +29,9 @@ import { DEFAULT_SPACE_SP, DEFAULT_SPACING_MODE, DEFAULT_STAFF_SP } from './zoom
  *               hosting the two pads *pinned* under their buttons, extra
  *               buttons (slot `actions`) and a menu (slot `menu`). Under the
  *               score, the player's own tray (slot `player`).
- *   focused   — the score alone, a hairline progress line along the bottom
- *               edge, and the mark to come back by. The mark also asks the
- *               browser for fullscreen (the Fullscreen API — a phone's only
+ *   focused   — the score, a hairline progress line along the bottom edge,
+ *               Play/Pause, and the mark to come back by. The mark also asks
+ *               the browser for fullscreen (the Fullscreen API — a phone's only
  *               route to it, F11's on a laptop) and gives it back on the
  *               way out, but only a fullscreen it entered itself: one the
  *               host or the user already had is left alone, and leaving by
@@ -153,6 +154,7 @@ export class ScoreFrame extends LitElement {
   @state() private pad: Pad = null;
   @state() private progress = 0;
   @state() private hasPerformance = false;
+  @state() private playing = false;
 
   /** The host's player, a light-DOM child in the `player` slot. */
   private get player(): Player | null {
@@ -211,47 +213,52 @@ export class ScoreFrame extends LitElement {
         overflow: auto;
       }
 
-      /* ── the focus mark ──
-         One toggle for both strips: a tab hanging from the pane's top-right
-         corner, squared on the two edges it hangs from (the grips' own
-         language), in the bar's ground with a hairline. It sits flush beside
-         the score's vertical scrollbar rather than over it — the frame
-         measures the slotted scroller's bar and sets --score-scrollbar.
-         Faded at rest so it reads as a fixture rather than a control; full
-         strength when the pointer reaches it or the keyboard lands on it.
-         40px, so it is catchable on glass, where there is no hover and it
-         stays faded. */
-      .focus-mark {
+      /* ── focus controls ──
+         The focus toggle sits inside the pane's top-right corner rather than
+         clipping its canvas edge. In focus mode, playback joins it on the
+         left because the normal player tray is parked. The frame measures
+         the slotted scroller's bar and sets --score-scrollbar, keeping this
+         group clear of it. */
+      .focus-controls {
         position: absolute;
-        top: 0;
-        right: var(--score-scrollbar, 0px);
+        top: 3px;
+        right: calc(var(--score-scrollbar, 0px) + 3px);
         z-index: 3;
-        display: grid;
-        place-items: center;
-        width: 44px;
-        height: 40px;
-        padding: 0;
-        box-sizing: border-box;
-        background: var(--frame-bar);
-        border: 1px solid var(--line);
-        border-top: 0;
-        border-right: 0;
-        border-radius: 0 0 0 var(--frame-radius);
-        backdrop-filter: blur(6px);
-        box-shadow: var(--frame-shadow);
-        color: var(--ink);
-        cursor: pointer;
+        display: flex;
+        gap: 3px;
         opacity: 0.3;
         transition: opacity 0.12s ease;
       }
 
-      .focus-mark:hover,
-      .focus-mark:focus-visible {
+      .focus-controls:hover,
+      .focus-controls:focus-within {
         opacity: 1;
       }
 
+      .focus-mark,
+      .focus-play {
+        display: grid;
+        place-items: center;
+        width: 40px;
+        height: 36px;
+        padding: 0;
+        box-sizing: border-box;
+        background: var(--frame-bar);
+        border: 1px solid var(--line);
+        border-radius: var(--frame-radius);
+        backdrop-filter: blur(6px);
+        box-shadow: var(--frame-shadow);
+        color: var(--ink);
+        cursor: pointer;
+      }
+
+      .focus-play:disabled {
+        cursor: default;
+        opacity: 0.4;
+      }
+
       @media (prefers-reduced-motion: reduce) {
-        .focus-mark {
+        .focus-controls {
           transition: none;
         }
       }
@@ -427,11 +434,10 @@ export class ScoreFrame extends LitElement {
         outline-offset: 2px;
       }
 
-      /* The mark hangs from two edges, so its ring is drawn inside the tab —
-         outside, the edges would clip it to three sides. */
-      .focus-mark:focus-visible {
+      .focus-mark:focus-visible,
+      .focus-play:focus-visible {
         outline: var(--rule-w) solid var(--focus-ring);
-        outline-offset: -4px;
+        outline-offset: -3px;
       }
 
       /* The library's .line: borderless, for the way back. */
@@ -518,6 +524,7 @@ export class ScoreFrame extends LitElement {
 
   private readonly onPlayback = (event: Event) => {
     const detail = (event as CustomEvent<PlaybackUpdate>).detail;
+    this.playing = detail.playing ?? false;
     this.videoOpen = this.player?.youtubeRegionVisible ?? false;
     this.refreshProgress(detail.ordinal);
   };
@@ -666,6 +673,8 @@ export class ScoreFrame extends LitElement {
   /** The mark: corners drawn outward to focus on the score, inward to come back. */
   private static get focusIn() { return ScoreFrame.glyph('M8 3H3v5M16 3h5v5M21 16v5h-5M8 21H3v-5', 18); }
   private static get focusOut() { return ScoreFrame.glyph('M3 8h5V3M21 8h-5V3M3 16h5v5M21 16h-5v5', 18); }
+  private static get play() { return ScoreFrame.glyph('M8 5l11 7-11 7z', 18); }
+  private static get pause() { return ScoreFrame.glyph('M7 5h3.5v14H7zM13.5 5H17v14h-3.5z', 18); }
 
   /** The pads' own marks, so the buttons say what they open. */
   private static get crosshair() {
@@ -680,22 +689,34 @@ export class ScoreFrame extends LitElement {
 
   private focusMark() {
     const label = this.focused ? 'Show the tools and the player' : 'Focus on the score';
-    return html`<button
-      class="focus-mark"
-      type="button"
-      aria-pressed=${this.focused}
-      aria-label=${label}
-      title=${this.focusShortcut ? `${label} (${this.focusShortcut})` : label}
-      @click=${(event: MouseEvent) => {
-        const focused = !this.focused;
-        this.setFocused(focused);
-        this.syncFullscreen(focused);
-        // A pointer leaves the mark unfocused: the next keypress (space to
-        // play, arrows to scroll) would otherwise light its ring and leave
-        // it lit. Keyboard activation (detail 0) keeps focus where it is.
-        if (event.detail > 0) (event.currentTarget as HTMLElement).blur();
-      }}
-    >${this.focused ? ScoreFrame.focusOut : ScoreFrame.focusIn}</button>`;
+    const playbackLabel = this.playing ? 'Pause' : 'Play';
+    return html`<div class="focus-controls">
+      ${this.focused ? html`<button
+        class="focus-play"
+        type="button"
+        ?disabled=${!this.hasPerformance}
+        aria-label=${playbackLabel}
+        aria-pressed=${this.playing}
+        title=${playbackLabel}
+        @click=${() => this.player?.toggle()}
+      >${this.playing ? ScoreFrame.pause : ScoreFrame.play}</button>` : nothing}
+      <button
+        class="focus-mark"
+        type="button"
+        aria-pressed=${this.focused}
+        aria-label=${label}
+        title=${this.focusShortcut ? `${label} (${this.focusShortcut})` : label}
+        @click=${(event: MouseEvent) => {
+          const focused = !this.focused;
+          this.setFocused(focused);
+          this.syncFullscreen(focused);
+          // A pointer leaves the mark unfocused: the next keypress (space to
+          // play, arrows to scroll) would otherwise light its ring and leave
+          // it lit. Keyboard activation (detail 0) keeps focus where it is.
+          if (event.detail > 0) (event.currentTarget as HTMLElement).blur();
+        }}
+      >${this.focused ? ScoreFrame.focusOut : ScoreFrame.focusIn}</button>
+    </div>`;
   }
 
   private segmented() {

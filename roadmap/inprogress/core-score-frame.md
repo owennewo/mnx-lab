@@ -1,6 +1,6 @@
 # Score frame — edge grips for play, zoom and settings, one element for both shells
 
-> **Status: started 2026-09-11; phases 1–4 built 2026-09-12, phase 5 open; grips retired for one focus mark 2026-09-15.** Implementation loop. Serves studio first
+> **Status: started 2026-09-11; phases 1–4 built 2026-09-12, phase 5 open; grips retired for compact focus controls 2026-09-15.** Implementation loop. Serves studio first
 > (the piece page has no zoom or settings at all, and its player dock fades on a pointer
 > timer that touch never restarts) and the workbench second (the same element replaces its
 > corner cluster and moves the player out of the side panel). Design locked on the
@@ -60,7 +60,10 @@ line along the bottom edge. Nothing on the page listens for a tap to show chrome
   pointer reaches it — hides and shows the tools row and the tray together (`focused`
   property, `focus-change` event; studio remembers it as `mnx-studio.focused`, the
   workbench binds it to document focus so the strip's Focus button is gone too). Focused,
-  the score has only the progress line and the mark; the tap-on-score rule is unchanged.
+  the score has the progress line, Play/Pause and the mark; the tap-on-score rule is
+  unchanged. *Revised 2026-09-16:* the controls sit 3px inside the canvas, use compact
+  40×36px boxes, and Play/Pause appears immediately left of the focus mark only while
+  the player tray is hidden.
 
 ## Phases
 
@@ -110,3 +113,7 @@ restyling the pads; dark theme work beyond what `light-dark()` already gives the
   became `focused`/`focus-change`; studio's two strip keys became one; the workbench's
   strip Focus button went. `focus-mode-smoke.mjs`, `studio-smoke.mjs` and
   `youtube-smoke.mjs` rewritten to the mark.
+- 2026-09-16 — **the focus controls moved fully inside the canvas:** a 3px inset and
+  40×36px boxes replace the edge-hanging 44×40px mark. Focus mode now restores the
+  missing Play/Pause toggle beside the mark, driven by the existing slotted player's
+  playback state. `focus-mode-smoke.mjs` pins the geometry and both toggle states.
