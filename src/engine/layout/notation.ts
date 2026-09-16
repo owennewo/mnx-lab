@@ -1,7 +1,7 @@
 import { qualifyMeasure, qualifyTechniques, occurrenceTarget, performedSpans, performedKeys, occurrenceKey, writtenIndex, emitOccurrenceLabel } from './unrolled.ts';
 import { resolveSwingTimeline } from '../../model/swing.ts';
 import type { PerformedEntry } from '../../model/passes.ts';
-import { clearanceSpacing, type ClearanceSpacing } from '../clearance.ts';
+import { clearanceSpacing, TITLE_SYSTEM_INK_SP, type ClearanceSpacing } from '../clearance.ts';
 import { emitMultirest } from './multirest.ts';
 import { measureHeadingX, ONSET_TEXT_LEAD_SP, repeatStartSuppliesBarline, instrumentLabelInset, LABEL_CHAR_SP, LABEL_PAD_SP } from './spacing.ts';
 import { LYRIC_SIZE_SP, selectedLyricLineIds } from './lyricRuns.ts';
@@ -608,7 +608,6 @@ export interface LayoutNotationOptions {
 export type HideableFeature = 'lyrics' | 'badges';
 
 const TITLE_SIZE_SP = 2.4;
-const TITLE_GAP_SP = 1.2;
 
 // Lyrics: verse rows stacked below the staff — geometry and emission shared
 // with the standalone tab layout (lyricRuns.ts).
@@ -942,7 +941,7 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
       : undefined;
     if (job.title !== null && display.title !== 'hide') {
       cursorY += TITLE_SIZE_SP + 1;
-      primitives.push({
+      const title: Primitive = {
         kind: 'text',
         text: job.title,
         x: jobUsed / 2,
@@ -951,8 +950,11 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
         size: TITLE_SIZE_SP,
         anchor: 'middle',
         className: 'score-title'
-      });
-      cursorY += TITLE_GAP_SP;
+      };
+      primitives.push(title);
+      const titleBottom = inkEdgesSp(title).bottom;
+      const firstSystemTop = computeBoundsSp(rs[0]?.primitives ?? [])?.y ?? 0;
+      cursorY = titleBottom + TITLE_SYSTEM_INK_SP - firstSystemTop;
     }
     for (const r of rs) {
       packings.push(r.packing);

@@ -49,10 +49,10 @@ import { computeBoundsSp } from '../render/bounds.ts';
  */
 
 /**
- * Clear space between two things that do NOT belong to each other: two staves
- * of one system (stage C), and — since stage D — two systems. Separation, not
- * cohesion, which is why it is three times the clearance a label keeps from
- * the staff it names (`COHESION_CLEAR_SP`).
+ * Clear space between two display staves that do NOT belong to each other
+ * inside one system (stage C). Inter-system air follows the independently
+ * tunable `clearance.systemInk`; the two relationships no longer share a
+ * numeric default.
  */
 export const SEPARATION_CLEAR_SP = 3;
 

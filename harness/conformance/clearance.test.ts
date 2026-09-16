@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, it, expect } from 'vitest';
-import { clearanceSpacing, normalizeClearance } from '../../src/engine/clearance.ts';
+import { clearanceSpacing, normalizeClearance, TITLE_SYSTEM_INK_SP } from '../../src/engine/clearance.ts';
 import { normalizeDisplayOptions } from '../../src/engine/displayOptions.ts';
 import { layoutNotation } from '../../src/engine/layout/notation.ts';
 import { layoutBothSystem } from '../../src/engine/layout/bothSystem.ts';
@@ -72,7 +72,7 @@ describe('clearance levels', () => {
     });
     expect(clearanceSpacing(0).verticalMargin(6, 2)).toBe(2.1);
     expect(clearanceSpacing(0).tabOuterMargin(2)).toBe(0.1);
-    expect(clearanceSpacing(2)).toMatchObject({ pairedInk: 2, pairedLines: 3, staffInk: 3, staffLines: 4, horizontalMargin: 2, cropMargin: 0.5 });
+    expect(clearanceSpacing(2)).toMatchObject({ pairedInk: 2, pairedLines: 3, staffInk: 3, staffLines: 4, systemInk: 1.5, horizontalMargin: 2, cropMargin: 0.5 });
   });
 
   it('retains ink and removes spare vertical reservation at the tight endpoint', () => {
@@ -84,9 +84,22 @@ describe('clearance levels', () => {
     const first = computeBoundsSp([primitives[0]])!;
     const second = computeBoundsSp([primitives[1]])!;
     expect(first.y).toBeCloseTo(0.1);
-    expect(second.y - first.y - first.h).toBeCloseTo(1.5);
+    expect(second.y - first.y - first.h).toBeCloseTo(clearanceSpacing(0).systemInk);
     expect(result.heightSp - second.y - second.h).toBeCloseTo(0.1);
   });
+});
+
+it('keeps 1.5sp of visible ink between a title and its first system', () => {
+  const titled = structuredClone(blues);
+  titled.scores = [{ name: 'Title' }];
+  for (const [name, layout] of Object.entries({ notation: layoutNotation, tab: layoutTab })) {
+    const result = layout({ mnx: titled, widthSp: 80, display: {} });
+    const title = result.primitives.find(p => (p as { className?: string }).className === 'score-title');
+    expect(title, name).toBeDefined();
+    const titleInk = computeBoundsSp([title!])!;
+    const musicInk = computeBoundsSp(result.primitives.filter(p => p !== title))!;
+    expect(musicInk.y - titleInk.y - titleInk.h, name).toBeCloseTo(TITLE_SYSTEM_INK_SP, 6);
+  }
 });
 
 for (const [name, layout] of Object.entries(layouts)) describe(`${name} clearance`, () => {

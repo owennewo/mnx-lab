@@ -4,6 +4,9 @@
 export const DEFAULT_CLEARANCE = 2;
 const TIGHT_MARGIN_SP = 0.1;
 
+/** Visible ink-to-ink air from a score title to its first system. */
+export const TITLE_SYSTEM_INK_SP = 1.5;
+
 /** API values snap to the same nine levels as the UI; ties round upwards. */
 export function normalizeClearance(value: unknown): number {
   return typeof value === 'number' && Number.isFinite(value)
@@ -42,10 +45,9 @@ export function clearanceSpacing(level?: number, densityPad?: number | null) {
     pairedLines: gap(3, 0.75, 1, 9),
     staffInk: gap(3, 0.75, 1, 9),
     staffLines: gap(4, 1, 1, 12),
-    // Row attribution has a 0.95sp tolerance around its midpoint for content
-    // that hangs into a gap. A 1.5sp request therefore leaves at least 0.5sp
-    // between independently measured row ink at the tight endpoint.
-    systemInk: gap(3, 1.5, 1, 10),
+    // Inter-system air is measured ink to ink. Normal is deliberately compact;
+    // the tight endpoint remains positive even after attribution tolerance.
+    systemInk: gap(1.5, 1, 1, 10),
     /** Air between a verse's ink top and the deepest ink of the staff it hangs
      *  from. The tight end all but touches: a verse must read as its own
      *  system's, never the next one's. */

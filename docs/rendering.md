@@ -163,15 +163,17 @@ lyrics, capo advice and other markings — but only for ink that STACKS: an item
 under the notation staff adds to one over the tab staff only where the two come
 within that clearance of each other along the staff, so a clef's octave `8` and
 a capo line at the other end of the bar no longer sum. All measures in a system
-share the resulting staff position. Gaps to other instruments and between
-systems retain their existing whole-system clearance
+share the resulting staff position. Gaps to other instruments retain their
+existing whole-system clearance
 ([ledger](../roadmap/inprogress/lab-verify.md#only-stacked-ink-spaces-a-tab-staff-from-its-notation--2026-09-10)).
 The affected Both-view engravings are recorded in the
 [verification ledger](../roadmap/inprogress/lab-verify.md#tighter-paired-notationtab-spacing-2026-09-08).
 
 `DisplayOptions.clearance` coordinates discretionary whitespace on a nine-level
-0–4 scale. Level 2 preserves those historical values and all default goldens;
-0 is the tightest collision-safe layout and 4 is deliberately generous. The
+0–4 scale. Level 2 is the default, 0 is the tightest collision-safe layout and
+4 is deliberately generous. The default visible gap from a score title to its
+first system is 1.5sp, measured bottom-ink to top-ink; the default gap between
+consecutive systems is likewise 1.5sp. The
 policy covers notation/tab and independent staff gaps, inter-system gaps,
 horizontal and vertical score margins, air after clef/signature groups, and
 bar-boundary padding. It does not resize glyphs, change staff-line spacing, or

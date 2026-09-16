@@ -1,6 +1,6 @@
 import { qualifyMeasure, qualifyTechniques, performedKeys, writtenIndex, emitOccurrenceLabel } from './unrolled.ts';
 import type { PerformedEntry } from '../../model/passes.ts';
-import { clearanceSpacing } from '../clearance.ts';
+import { clearanceSpacing, TITLE_SYSTEM_INK_SP } from '../clearance.ts';
 import { emitMultirest } from './multirest.ts';
 import type { MnxPart } from '../../model/mnx.ts';
 import type { HorizontalPlan, PlanOptions } from './spacing.ts';
@@ -631,9 +631,11 @@ function layoutTabSystems(opts: LayoutTabOptions): LayoutResult {
   for (const job of buildScoreJobs(mnx)) {
     if (job.title !== null && display.title !== 'hide') {
       cursorY += 2.4;
-      primitives.push({ kind: 'text', text: job.title, x: widthSp / 2, y: cursorY,
-        font: 'body', size: 2.4, anchor: 'middle', className: 'score-title' });
-      cursorY += 3;
+      const title: Primitive = { kind: 'text', text: job.title, x: widthSp / 2, y: cursorY,
+        font: 'body', size: 2.4, anchor: 'middle', className: 'score-title' };
+      primitives.push(title);
+      const titleInk = computeBoundsSp([title]);
+      cursorY = (titleInk ? titleInk.y + titleInk.h : cursorY) + TITLE_SYSTEM_INK_SP;
     }
     (opts.entries ? job.segments.slice(0, 1) : job.segments).forEach((segment, segmentIndex) => {
       const sources = segment.staves.flatMap(staff => staff.sources).filter(source => tabPositionContext(source.part, opts.tabSetup) !== null).filter((source, i, all) =>

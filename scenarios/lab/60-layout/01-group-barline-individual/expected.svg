@@ -1,30 +1,30 @@
-<svg width="1280" height="553.984" viewBox="0 0 1280 553.984" xmlns="http://www.w3.org/2000/svg">
+<svg width="1280" height="462.656" viewBox="0 0 1280 462.656" xmlns="http://www.w3.org/2000/svg">
 <style>:where(svg>text){font-family:Bravura;fill:currentColor}:where(svg>line,svg>path){stroke:currentColor}</style>
 <text x="190" y="54.4" font-size="38.4" text-anchor="middle" style="font-family:var(--font-family-sans)" class="score-title">Score</text>
-<line x1="59.2" y1="201.6" x2="348" y2="201.6" stroke-width="2.08" class="staff-line"></line>
-<line x1="59.2" y1="217.6" x2="348" y2="217.6" stroke-width="2.08" class="staff-line"></line>
-<line x1="59.2" y1="233.6" x2="348" y2="233.6" stroke-width="2.08" class="staff-line"></line>
-<line x1="59.2" y1="249.6" x2="348" y2="249.6" stroke-width="2.08" class="staff-line"></line>
-<line x1="59.2" y1="265.6" x2="348" y2="265.6" stroke-width="2.08" class="staff-line"></line>
-<line x1="59.2" y1="361.984" x2="348" y2="361.984" stroke-width="2.08" class="staff-line"></line>
-<line x1="59.2" y1="377.984" x2="348" y2="377.984" stroke-width="2.08" class="staff-line"></line>
-<line x1="59.2" y1="393.984" x2="348" y2="393.984" stroke-width="2.08" class="staff-line"></line>
-<line x1="59.2" y1="409.984" x2="348" y2="409.984" stroke-width="2.08" class="staff-line"></line>
-<line x1="59.2" y1="425.984" x2="348" y2="425.984" stroke-width="2.08" class="staff-line"></line>
-<line x1="59.2" y1="201.6" x2="59.2" y2="425.984" stroke-width="2.56" class="barline barline-start"></line>
-<rect x="36.8" y="200" width="8" height="227.584" fill="currentColor" class="bracket"></rect>
-<text x="36.8" y="200" font-size="64" class="bracket"></text>
-<text x="36.8" y="427.584" font-size="64" class="bracket"></text>
-<text x="63.2" y="249.6" font-size="64" class="clef"></text>
-<text x="63.2" y="409.984" font-size="64" class="clef"></text>
-<text x="131.2" y="217.6" font-size="64" text-anchor="middle" class="time-sig-num"></text>
-<text x="131.2" y="249.6" font-size="64" text-anchor="middle" class="time-sig-den"></text>
-<text x="131.2" y="377.984" font-size="64" text-anchor="middle" class="time-sig-num"></text>
-<text x="131.2" y="409.984" font-size="64" text-anchor="middle" class="time-sig-den"></text>
-<text x="237.696" y="209.6" font-size="64" class="notehead" data-source-id="@m0.v0.e0.n0"></text>
-<text x="237.696" y="409.984" font-size="64" class="notehead" data-source-id="@p1.m0.v0.e0.n0"></text>
-<line x1="335.2" y1="201.6" x2="335.2" y2="265.6" stroke-width="2.56" class="barline barline-final-thin"></line>
-<rect x="340" y="201.6" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
-<line x1="335.2" y1="361.984" x2="335.2" y2="425.984" stroke-width="2.56" class="barline barline-final-thin"></line>
-<rect x="340" y="361.984" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
+<line x1="59.2" y1="110.272" x2="348" y2="110.272" stroke-width="2.08" class="staff-line"></line>
+<line x1="59.2" y1="126.272" x2="348" y2="126.272" stroke-width="2.08" class="staff-line"></line>
+<line x1="59.2" y1="142.272" x2="348" y2="142.272" stroke-width="2.08" class="staff-line"></line>
+<line x1="59.2" y1="158.272" x2="348" y2="158.272" stroke-width="2.08" class="staff-line"></line>
+<line x1="59.2" y1="174.272" x2="348" y2="174.272" stroke-width="2.08" class="staff-line"></line>
+<line x1="59.2" y1="270.656" x2="348" y2="270.656" stroke-width="2.08" class="staff-line"></line>
+<line x1="59.2" y1="286.656" x2="348" y2="286.656" stroke-width="2.08" class="staff-line"></line>
+<line x1="59.2" y1="302.656" x2="348" y2="302.656" stroke-width="2.08" class="staff-line"></line>
+<line x1="59.2" y1="318.656" x2="348" y2="318.656" stroke-width="2.08" class="staff-line"></line>
+<line x1="59.2" y1="334.656" x2="348" y2="334.656" stroke-width="2.08" class="staff-line"></line>
+<line x1="59.2" y1="110.272" x2="59.2" y2="334.656" stroke-width="2.56" class="barline barline-start"></line>
+<rect x="36.8" y="108.672" width="8" height="227.584" fill="currentColor" class="bracket"></rect>
+<text x="36.8" y="108.672" font-size="64" class="bracket"></text>
+<text x="36.8" y="336.256" font-size="64" class="bracket"></text>
+<text x="63.2" y="158.272" font-size="64" class="clef"></text>
+<text x="63.2" y="318.656" font-size="64" class="clef"></text>
+<text x="131.2" y="126.272" font-size="64" text-anchor="middle" class="time-sig-num"></text>
+<text x="131.2" y="158.272" font-size="64" text-anchor="middle" class="time-sig-den"></text>
+<text x="131.2" y="286.656" font-size="64" text-anchor="middle" class="time-sig-num"></text>
+<text x="131.2" y="318.656" font-size="64" text-anchor="middle" class="time-sig-den"></text>
+<text x="237.696" y="118.272" font-size="64" class="notehead" data-source-id="@m0.v0.e0.n0"></text>
+<text x="237.696" y="318.656" font-size="64" class="notehead" data-source-id="@p1.m0.v0.e0.n0"></text>
+<line x1="335.2" y1="110.272" x2="335.2" y2="174.272" stroke-width="2.56" class="barline barline-final-thin"></line>
+<rect x="340" y="110.272" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
+<line x1="335.2" y1="270.656" x2="335.2" y2="334.656" stroke-width="2.56" class="barline barline-final-thin"></line>
+<rect x="340" y="270.656" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
 </svg>

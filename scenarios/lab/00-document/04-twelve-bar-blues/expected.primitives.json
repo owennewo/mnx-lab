@@ -2,7 +2,7 @@
   "widthSp": 80,
   "notation": {
     "widthSp": 80,
-    "heightSp": 89.785,
+    "heightSp": 86.785,
     "primitives": [
       {
         "kind": "line",
@@ -1758,99 +1758,99 @@
       {
         "kind": "line",
         "x1": 2,
-        "y1": 35.02,
+        "y1": 33.52,
         "x2": 23.4288,
-        "y2": 35.02,
+        "y2": 33.52,
         "thickness": 0.13,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 2,
-        "y1": 36.02,
+        "y1": 34.52,
         "x2": 23.4288,
-        "y2": 36.02,
+        "y2": 34.52,
         "thickness": 0.13,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 2,
-        "y1": 37.02,
+        "y1": 35.52,
         "x2": 23.4288,
-        "y2": 37.02,
+        "y2": 35.52,
         "thickness": 0.13,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 2,
-        "y1": 38.02,
+        "y1": 36.52,
         "x2": 23.4288,
-        "y2": 38.02,
+        "y2": 36.52,
         "thickness": 0.13,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 2,
-        "y1": 39.02,
+        "y1": 37.52,
         "x2": 23.4288,
-        "y2": 39.02,
+        "y2": 37.52,
         "thickness": 0.13,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 2,
-        "y1": 49.48,
+        "y1": 47.98,
         "x2": 23.4288,
-        "y2": 49.48,
+        "y2": 47.98,
         "thickness": 0.13,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 2,
-        "y1": 50.48,
+        "y1": 48.98,
         "x2": 23.4288,
-        "y2": 50.48,
+        "y2": 48.98,
         "thickness": 0.13,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 2,
-        "y1": 51.48,
+        "y1": 49.98,
         "x2": 23.4288,
-        "y2": 51.48,
+        "y2": 49.98,
         "thickness": 0.13,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 2,
-        "y1": 52.48,
+        "y1": 50.98,
         "x2": 23.4288,
-        "y2": 52.48,
+        "y2": 50.98,
         "thickness": 0.13,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 2,
-        "y1": 53.48,
+        "y1": 51.98,
         "x2": 23.4288,
-        "y2": 53.48,
+        "y2": 51.98,
         "thickness": 0.13,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 2,
-        "y1": 35.02,
+        "y1": 33.52,
         "x2": 2,
-        "y2": 53.48,
+        "y2": 51.98,
         "thickness": 0.16,
         "className": "barline barline-start"
       },
@@ -1858,44 +1858,44 @@
         "kind": "glyph",
         "glyph": "gClef8vb",
         "x": 2.25,
-        "y": 38.02,
+        "y": 36.52,
         "className": "clef"
       },
       {
         "kind": "glyph",
         "glyph": "fClef",
         "x": 2.25,
-        "y": 50.48,
+        "y": 48.98,
         "className": "clef"
       },
       {
         "kind": "glyph",
         "glyph": "accidentalSharp",
         "x": 5.25,
-        "y": 35.02,
+        "y": 33.52,
         "className": "key-sig"
       },
       {
         "kind": "glyph",
         "glyph": "accidentalSharp",
         "x": 5.25,
-        "y": 50.48,
+        "y": 48.98,
         "className": "key-sig"
       },
       {
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 8.1448,
-        "y": 37.52,
+        "y": 36.02,
         "className": "notehead",
         "sourceId": "l15"
       },
       {
         "kind": "line",
         "x1": 9.3248,
-        "y1": 34.02,
+        "y1": 32.52,
         "x2": 9.3248,
-        "y2": 37.352,
+        "y2": 35.852,
         "thickness": 0.12,
         "className": "stem"
       },
@@ -1903,16 +1903,16 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 12.1145,
-        "y": 37.02,
+        "y": 35.52,
         "className": "notehead",
         "sourceId": "l16"
       },
       {
         "kind": "line",
         "x1": 13.2945,
-        "y1": 33.52,
+        "y1": 32.02,
         "x2": 13.2945,
-        "y2": 36.852,
+        "y2": 35.352,
         "thickness": 0.12,
         "className": "stem"
       },
@@ -1920,659 +1920,15 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 16.0842,
-        "y": 36.02,
+        "y": 34.52,
         "className": "notehead",
         "sourceId": "l17"
       },
       {
         "kind": "line",
         "x1": 17.2642,
-        "y1": 32.52,
-        "x2": 17.2642,
-        "y2": 35.852,
-        "thickness": 0.12,
-        "className": "stem"
-      },
-      {
-        "kind": "glyph",
-        "glyph": "noteheadBlack",
-        "x": 20.0539,
-        "y": 35.52,
-        "className": "notehead",
-        "sourceId": "l18"
-      },
-      {
-        "kind": "line",
-        "x1": 21.2339,
-        "y1": 32.02,
-        "x2": 21.2339,
-        "y2": 35.352,
-        "thickness": 0.12,
-        "className": "stem"
-      },
-      {
-        "kind": "line",
-        "x1": 7.7448,
-        "y1": 40.02,
-        "x2": 9.7248,
-        "y2": 40.02,
-        "thickness": 0.16,
-        "className": "ledger-line"
-      },
-      {
-        "kind": "line",
-        "x1": 7.7448,
-        "y1": 41.02,
-        "x2": 9.7248,
-        "y2": 41.02,
-        "thickness": 0.16,
-        "className": "ledger-line"
-      },
-      {
-        "kind": "glyph",
-        "glyph": "noteheadBlack",
-        "x": 8.1448,
-        "y": 41.02,
-        "className": "notehead",
-        "sourceId": "l60"
-      },
-      {
-        "kind": "line",
-        "x1": 8.1448,
-        "y1": 41.188,
-        "x2": 8.1448,
-        "y2": 44.52,
-        "thickness": 0.12,
-        "className": "stem"
-      },
-      {
-        "kind": "glyph",
-        "glyph": "noteheadBlack",
-        "x": 12.1145,
-        "y": 39.02,
-        "className": "notehead",
-        "sourceId": "l61"
-      },
-      {
-        "kind": "line",
-        "x1": 12.1145,
-        "y1": 39.188,
-        "x2": 12.1145,
-        "y2": 42.52,
-        "thickness": 0.12,
-        "className": "stem"
-      },
-      {
-        "kind": "line",
-        "x1": 15.6842,
-        "y1": 40.02,
-        "x2": 17.6642,
-        "y2": 40.02,
-        "thickness": 0.16,
-        "className": "ledger-line"
-      },
-      {
-        "kind": "line",
-        "x1": 15.6842,
-        "y1": 41.02,
-        "x2": 17.6642,
-        "y2": 41.02,
-        "thickness": 0.16,
-        "className": "ledger-line"
-      },
-      {
-        "kind": "glyph",
-        "glyph": "noteheadBlack",
-        "x": 16.0842,
-        "y": 41.02,
-        "className": "notehead",
-        "sourceId": "l62"
-      },
-      {
-        "kind": "line",
-        "x1": 16.0842,
-        "y1": 41.188,
-        "x2": 16.0842,
-        "y2": 44.52,
-        "thickness": 0.12,
-        "className": "stem"
-      },
-      {
-        "kind": "glyph",
-        "glyph": "noteheadBlack",
-        "x": 20.0539,
-        "y": 39.02,
-        "className": "notehead",
-        "sourceId": "l63"
-      },
-      {
-        "kind": "line",
-        "x1": 20.0539,
-        "y1": 39.188,
-        "x2": 20.0539,
-        "y2": 42.52,
-        "thickness": 0.12,
-        "className": "stem"
-      },
-      {
-        "kind": "glyph",
-        "glyph": "noteheadBlack",
-        "x": 8.1448,
-        "y": 52.98,
-        "className": "notehead",
-        "sourceId": "b17"
-      },
-      {
-        "kind": "line",
-        "x1": 9.3248,
-        "y1": 49.48,
-        "x2": 9.3248,
-        "y2": 52.812,
-        "thickness": 0.12,
-        "className": "stem"
-      },
-      {
-        "kind": "glyph",
-        "glyph": "noteheadBlack",
-        "x": 12.1145,
-        "y": 52.98,
-        "className": "notehead",
-        "sourceId": "b18"
-      },
-      {
-        "kind": "line",
-        "x1": 13.2945,
-        "y1": 49.48,
-        "x2": 13.2945,
-        "y2": 52.812,
-        "thickness": 0.12,
-        "className": "stem"
-      },
-      {
-        "kind": "glyph",
-        "glyph": "noteheadBlack",
-        "x": 16.0842,
-        "y": 52.98,
-        "className": "notehead",
-        "sourceId": "b19"
-      },
-      {
-        "kind": "line",
-        "x1": 17.2642,
-        "y1": 49.48,
-        "x2": 17.2642,
-        "y2": 52.812,
-        "thickness": 0.12,
-        "className": "stem"
-      },
-      {
-        "kind": "glyph",
-        "glyph": "noteheadBlack",
-        "x": 20.0539,
-        "y": 52.98,
-        "className": "notehead",
-        "sourceId": "b20"
-      },
-      {
-        "kind": "line",
-        "x1": 21.2339,
-        "y1": 49.48,
-        "x2": 21.2339,
-        "y2": 52.812,
-        "thickness": 0.12,
-        "className": "stem"
-      },
-      {
-        "kind": "line",
-        "x1": 23.4288,
-        "y1": 35.02,
-        "x2": 23.4288,
-        "y2": 39.02,
-        "thickness": 0.16,
-        "className": "barline"
-      },
-      {
-        "kind": "line",
-        "x1": 23.4288,
-        "y1": 49.48,
-        "x2": 23.4288,
-        "y2": 53.48,
-        "thickness": 0.16,
-        "className": "barline"
-      },
-      {
-        "kind": "line",
-        "x1": 23.4288,
-        "y1": 35.02,
-        "x2": 42.2076,
-        "y2": 35.02,
-        "thickness": 0.13,
-        "className": "staff-line"
-      },
-      {
-        "kind": "line",
-        "x1": 23.4288,
-        "y1": 36.02,
-        "x2": 42.2076,
-        "y2": 36.02,
-        "thickness": 0.13,
-        "className": "staff-line"
-      },
-      {
-        "kind": "line",
-        "x1": 23.4288,
-        "y1": 37.02,
-        "x2": 42.2076,
-        "y2": 37.02,
-        "thickness": 0.13,
-        "className": "staff-line"
-      },
-      {
-        "kind": "line",
-        "x1": 23.4288,
-        "y1": 38.02,
-        "x2": 42.2076,
-        "y2": 38.02,
-        "thickness": 0.13,
-        "className": "staff-line"
-      },
-      {
-        "kind": "line",
-        "x1": 23.4288,
-        "y1": 39.02,
-        "x2": 42.2076,
-        "y2": 39.02,
-        "thickness": 0.13,
-        "className": "staff-line"
-      },
-      {
-        "kind": "line",
-        "x1": 23.4288,
-        "y1": 49.48,
-        "x2": 42.2076,
-        "y2": 49.48,
-        "thickness": 0.13,
-        "className": "staff-line"
-      },
-      {
-        "kind": "line",
-        "x1": 23.4288,
-        "y1": 50.48,
-        "x2": 42.2076,
-        "y2": 50.48,
-        "thickness": 0.13,
-        "className": "staff-line"
-      },
-      {
-        "kind": "line",
-        "x1": 23.4288,
-        "y1": 51.48,
-        "x2": 42.2076,
-        "y2": 51.48,
-        "thickness": 0.13,
-        "className": "staff-line"
-      },
-      {
-        "kind": "line",
-        "x1": 23.4288,
-        "y1": 52.48,
-        "x2": 42.2076,
-        "y2": 52.48,
-        "thickness": 0.13,
-        "className": "staff-line"
-      },
-      {
-        "kind": "line",
-        "x1": 23.4288,
-        "y1": 53.48,
-        "x2": 42.2076,
-        "y2": 53.48,
-        "thickness": 0.13,
-        "className": "staff-line"
-      },
-      {
-        "kind": "glyph",
-        "glyph": "noteheadBlack",
-        "x": 25.4236,
-        "y": 36.02,
-        "className": "notehead",
-        "sourceId": "l19"
-      },
-      {
-        "kind": "glyph",
-        "glyph": "noteheadBlack",
-        "x": 28.1585,
-        "y": 35.52,
-        "className": "notehead",
-        "sourceId": "l20"
-      },
-      {
-        "kind": "glyph",
-        "glyph": "noteheadBlack",
-        "x": 30.8933,
-        "y": 36.02,
-        "className": "notehead",
-        "sourceId": "l21"
-      },
-      {
-        "kind": "line",
-        "x1": 32.0733,
-        "y1": 32.52,
-        "x2": 32.0733,
-        "y2": 35.852,
-        "thickness": 0.12,
-        "className": "stem"
-      },
-      {
-        "kind": "glyph",
-        "glyph": "noteheadHalf",
-        "x": 34.863,
-        "y": 37.02,
-        "className": "notehead",
-        "sourceId": "l22"
-      },
-      {
-        "kind": "line",
-        "x1": 36.043,
-        "y1": 33.52,
-        "x2": 36.043,
-        "y2": 36.852,
-        "thickness": 0.12,
-        "className": "stem"
-      },
-      {
-        "kind": "line",
-        "x1": 25.0236,
-        "y1": 40.02,
-        "x2": 27.0036,
-        "y2": 40.02,
-        "thickness": 0.16,
-        "className": "ledger-line"
-      },
-      {
-        "kind": "line",
-        "x1": 25.0236,
-        "y1": 41.02,
-        "x2": 27.0036,
-        "y2": 41.02,
-        "thickness": 0.16,
-        "className": "ledger-line"
-      },
-      {
-        "kind": "glyph",
-        "glyph": "noteheadBlack",
-        "x": 25.4236,
-        "y": 41.02,
-        "className": "notehead",
-        "sourceId": "l64"
-      },
-      {
-        "kind": "line",
-        "x1": 25.4236,
-        "y1": 41.188,
-        "x2": 25.4236,
-        "y2": 44.52,
-        "thickness": 0.12,
-        "className": "stem"
-      },
-      {
-        "kind": "glyph",
-        "glyph": "noteheadBlack",
-        "x": 30.8933,
-        "y": 39.02,
-        "className": "notehead",
-        "sourceId": "l65"
-      },
-      {
-        "kind": "line",
-        "x1": 30.8933,
-        "y1": 39.188,
-        "x2": 30.8933,
-        "y2": 42.52,
-        "thickness": 0.12,
-        "className": "stem"
-      },
-      {
-        "kind": "line",
-        "x1": 34.463,
-        "y1": 40.02,
-        "x2": 36.443,
-        "y2": 40.02,
-        "thickness": 0.16,
-        "className": "ledger-line"
-      },
-      {
-        "kind": "line",
-        "x1": 34.463,
-        "y1": 41.02,
-        "x2": 36.443,
-        "y2": 41.02,
-        "thickness": 0.16,
-        "className": "ledger-line"
-      },
-      {
-        "kind": "glyph",
-        "glyph": "noteheadBlack",
-        "x": 34.863,
-        "y": 41.02,
-        "className": "notehead",
-        "sourceId": "l66"
-      },
-      {
-        "kind": "line",
-        "x1": 34.863,
-        "y1": 41.188,
-        "x2": 34.863,
-        "y2": 44.52,
-        "thickness": 0.12,
-        "className": "stem"
-      },
-      {
-        "kind": "glyph",
-        "glyph": "noteheadBlack",
-        "x": 38.8327,
-        "y": 39.02,
-        "className": "notehead",
-        "sourceId": "l67"
-      },
-      {
-        "kind": "line",
-        "x1": 38.8327,
-        "y1": 39.188,
-        "x2": 38.8327,
-        "y2": 42.52,
-        "thickness": 0.12,
-        "className": "stem"
-      },
-      {
-        "kind": "glyph",
-        "glyph": "noteheadBlack",
-        "x": 25.4236,
-        "y": 52.98,
-        "className": "notehead",
-        "sourceId": "b21"
-      },
-      {
-        "kind": "line",
-        "x1": 26.6036,
-        "y1": 49.48,
-        "x2": 26.6036,
-        "y2": 52.812,
-        "thickness": 0.12,
-        "className": "stem"
-      },
-      {
-        "kind": "glyph",
-        "glyph": "noteheadBlack",
-        "x": 30.8933,
-        "y": 52.98,
-        "className": "notehead",
-        "sourceId": "b22"
-      },
-      {
-        "kind": "line",
-        "x1": 32.0733,
-        "y1": 49.48,
-        "x2": 32.0733,
-        "y2": 52.812,
-        "thickness": 0.12,
-        "className": "stem"
-      },
-      {
-        "kind": "glyph",
-        "glyph": "noteheadBlack",
-        "x": 34.863,
-        "y": 52.98,
-        "className": "notehead",
-        "sourceId": "b23"
-      },
-      {
-        "kind": "line",
-        "x1": 36.043,
-        "y1": 49.48,
-        "x2": 36.043,
-        "y2": 52.812,
-        "thickness": 0.12,
-        "className": "stem"
-      },
-      {
-        "kind": "glyph",
-        "glyph": "noteheadBlack",
-        "x": 38.8327,
-        "y": 52.98,
-        "className": "notehead",
-        "sourceId": "b24"
-      },
-      {
-        "kind": "line",
-        "x1": 40.0127,
-        "y1": 49.48,
-        "x2": 40.0127,
-        "y2": 52.812,
-        "thickness": 0.12,
-        "className": "stem"
-      },
-      {
-        "kind": "line",
-        "x1": 42.2076,
-        "y1": 35.02,
-        "x2": 42.2076,
-        "y2": 39.02,
-        "thickness": 0.16,
-        "className": "barline"
-      },
-      {
-        "kind": "line",
-        "x1": 42.2076,
-        "y1": 49.48,
-        "x2": 42.2076,
-        "y2": 53.48,
-        "thickness": 0.16,
-        "className": "barline"
-      },
-      {
-        "kind": "line",
-        "x1": 42.2076,
-        "y1": 35.02,
-        "x2": 59.4864,
-        "y2": 35.02,
-        "thickness": 0.13,
-        "className": "staff-line"
-      },
-      {
-        "kind": "line",
-        "x1": 42.2076,
-        "y1": 36.02,
-        "x2": 59.4864,
-        "y2": 36.02,
-        "thickness": 0.13,
-        "className": "staff-line"
-      },
-      {
-        "kind": "line",
-        "x1": 42.2076,
-        "y1": 37.02,
-        "x2": 59.4864,
-        "y2": 37.02,
-        "thickness": 0.13,
-        "className": "staff-line"
-      },
-      {
-        "kind": "line",
-        "x1": 42.2076,
-        "y1": 38.02,
-        "x2": 59.4864,
-        "y2": 38.02,
-        "thickness": 0.13,
-        "className": "staff-line"
-      },
-      {
-        "kind": "line",
-        "x1": 42.2076,
-        "y1": 39.02,
-        "x2": 59.4864,
-        "y2": 39.02,
-        "thickness": 0.13,
-        "className": "staff-line"
-      },
-      {
-        "kind": "line",
-        "x1": 42.2076,
-        "y1": 49.48,
-        "x2": 59.4864,
-        "y2": 49.48,
-        "thickness": 0.13,
-        "className": "staff-line"
-      },
-      {
-        "kind": "line",
-        "x1": 42.2076,
-        "y1": 50.48,
-        "x2": 59.4864,
-        "y2": 50.48,
-        "thickness": 0.13,
-        "className": "staff-line"
-      },
-      {
-        "kind": "line",
-        "x1": 42.2076,
-        "y1": 51.48,
-        "x2": 59.4864,
-        "y2": 51.48,
-        "thickness": 0.13,
-        "className": "staff-line"
-      },
-      {
-        "kind": "line",
-        "x1": 42.2076,
-        "y1": 52.48,
-        "x2": 59.4864,
-        "y2": 52.48,
-        "thickness": 0.13,
-        "className": "staff-line"
-      },
-      {
-        "kind": "line",
-        "x1": 42.2076,
-        "y1": 53.48,
-        "x2": 59.4864,
-        "y2": 53.48,
-        "thickness": 0.13,
-        "className": "staff-line"
-      },
-      {
-        "kind": "glyph",
-        "glyph": "noteheadBlack",
-        "x": 44.2024,
-        "y": 34.52,
-        "className": "notehead",
-        "sourceId": "l23"
-      },
-      {
-        "kind": "line",
-        "x1": 45.3824,
         "y1": 31.02,
-        "x2": 45.3824,
+        "x2": 17.2642,
         "y2": 34.352,
         "thickness": 0.12,
         "className": "stem"
@@ -2580,17 +1936,661 @@
       {
         "kind": "glyph",
         "glyph": "noteheadBlack",
-        "x": 48.1721,
+        "x": 20.0539,
+        "y": 34.02,
+        "className": "notehead",
+        "sourceId": "l18"
+      },
+      {
+        "kind": "line",
+        "x1": 21.2339,
+        "y1": 30.52,
+        "x2": 21.2339,
+        "y2": 33.852,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "line",
+        "x1": 7.7448,
+        "y1": 38.52,
+        "x2": 9.7248,
+        "y2": 38.52,
+        "thickness": 0.16,
+        "className": "ledger-line"
+      },
+      {
+        "kind": "line",
+        "x1": 7.7448,
+        "y1": 39.52,
+        "x2": 9.7248,
+        "y2": 39.52,
+        "thickness": 0.16,
+        "className": "ledger-line"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 8.1448,
+        "y": 39.52,
+        "className": "notehead",
+        "sourceId": "l60"
+      },
+      {
+        "kind": "line",
+        "x1": 8.1448,
+        "y1": 39.688,
+        "x2": 8.1448,
+        "y2": 43.02,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 12.1145,
+        "y": 37.52,
+        "className": "notehead",
+        "sourceId": "l61"
+      },
+      {
+        "kind": "line",
+        "x1": 12.1145,
+        "y1": 37.688,
+        "x2": 12.1145,
+        "y2": 41.02,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "line",
+        "x1": 15.6842,
+        "y1": 38.52,
+        "x2": 17.6642,
+        "y2": 38.52,
+        "thickness": 0.16,
+        "className": "ledger-line"
+      },
+      {
+        "kind": "line",
+        "x1": 15.6842,
+        "y1": 39.52,
+        "x2": 17.6642,
+        "y2": 39.52,
+        "thickness": 0.16,
+        "className": "ledger-line"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 16.0842,
+        "y": 39.52,
+        "className": "notehead",
+        "sourceId": "l62"
+      },
+      {
+        "kind": "line",
+        "x1": 16.0842,
+        "y1": 39.688,
+        "x2": 16.0842,
+        "y2": 43.02,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 20.0539,
+        "y": 37.52,
+        "className": "notehead",
+        "sourceId": "l63"
+      },
+      {
+        "kind": "line",
+        "x1": 20.0539,
+        "y1": 37.688,
+        "x2": 20.0539,
+        "y2": 41.02,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 8.1448,
+        "y": 51.48,
+        "className": "notehead",
+        "sourceId": "b17"
+      },
+      {
+        "kind": "line",
+        "x1": 9.3248,
+        "y1": 47.98,
+        "x2": 9.3248,
+        "y2": 51.312,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 12.1145,
+        "y": 51.48,
+        "className": "notehead",
+        "sourceId": "b18"
+      },
+      {
+        "kind": "line",
+        "x1": 13.2945,
+        "y1": 47.98,
+        "x2": 13.2945,
+        "y2": 51.312,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 16.0842,
+        "y": 51.48,
+        "className": "notehead",
+        "sourceId": "b19"
+      },
+      {
+        "kind": "line",
+        "x1": 17.2642,
+        "y1": 47.98,
+        "x2": 17.2642,
+        "y2": 51.312,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 20.0539,
+        "y": 51.48,
+        "className": "notehead",
+        "sourceId": "b20"
+      },
+      {
+        "kind": "line",
+        "x1": 21.2339,
+        "y1": 47.98,
+        "x2": 21.2339,
+        "y2": 51.312,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "line",
+        "x1": 23.4288,
+        "y1": 33.52,
+        "x2": 23.4288,
+        "y2": 37.52,
+        "thickness": 0.16,
+        "className": "barline"
+      },
+      {
+        "kind": "line",
+        "x1": 23.4288,
+        "y1": 47.98,
+        "x2": 23.4288,
+        "y2": 51.98,
+        "thickness": 0.16,
+        "className": "barline"
+      },
+      {
+        "kind": "line",
+        "x1": 23.4288,
+        "y1": 33.52,
+        "x2": 42.2076,
+        "y2": 33.52,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 23.4288,
+        "y1": 34.52,
+        "x2": 42.2076,
+        "y2": 34.52,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 23.4288,
+        "y1": 35.52,
+        "x2": 42.2076,
+        "y2": 35.52,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 23.4288,
+        "y1": 36.52,
+        "x2": 42.2076,
+        "y2": 36.52,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 23.4288,
+        "y1": 37.52,
+        "x2": 42.2076,
+        "y2": 37.52,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 23.4288,
+        "y1": 47.98,
+        "x2": 42.2076,
+        "y2": 47.98,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 23.4288,
+        "y1": 48.98,
+        "x2": 42.2076,
+        "y2": 48.98,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 23.4288,
+        "y1": 49.98,
+        "x2": 42.2076,
+        "y2": 49.98,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 23.4288,
+        "y1": 50.98,
+        "x2": 42.2076,
+        "y2": 50.98,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 23.4288,
+        "y1": 51.98,
+        "x2": 42.2076,
+        "y2": 51.98,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 25.4236,
+        "y": 34.52,
+        "className": "notehead",
+        "sourceId": "l19"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 28.1585,
+        "y": 34.02,
+        "className": "notehead",
+        "sourceId": "l20"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 30.8933,
+        "y": 34.52,
+        "className": "notehead",
+        "sourceId": "l21"
+      },
+      {
+        "kind": "line",
+        "x1": 32.0733,
+        "y1": 31.02,
+        "x2": 32.0733,
+        "y2": 34.352,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadHalf",
+        "x": 34.863,
         "y": 35.52,
+        "className": "notehead",
+        "sourceId": "l22"
+      },
+      {
+        "kind": "line",
+        "x1": 36.043,
+        "y1": 32.02,
+        "x2": 36.043,
+        "y2": 35.352,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "line",
+        "x1": 25.0236,
+        "y1": 38.52,
+        "x2": 27.0036,
+        "y2": 38.52,
+        "thickness": 0.16,
+        "className": "ledger-line"
+      },
+      {
+        "kind": "line",
+        "x1": 25.0236,
+        "y1": 39.52,
+        "x2": 27.0036,
+        "y2": 39.52,
+        "thickness": 0.16,
+        "className": "ledger-line"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 25.4236,
+        "y": 39.52,
+        "className": "notehead",
+        "sourceId": "l64"
+      },
+      {
+        "kind": "line",
+        "x1": 25.4236,
+        "y1": 39.688,
+        "x2": 25.4236,
+        "y2": 43.02,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 30.8933,
+        "y": 37.52,
+        "className": "notehead",
+        "sourceId": "l65"
+      },
+      {
+        "kind": "line",
+        "x1": 30.8933,
+        "y1": 37.688,
+        "x2": 30.8933,
+        "y2": 41.02,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "line",
+        "x1": 34.463,
+        "y1": 38.52,
+        "x2": 36.443,
+        "y2": 38.52,
+        "thickness": 0.16,
+        "className": "ledger-line"
+      },
+      {
+        "kind": "line",
+        "x1": 34.463,
+        "y1": 39.52,
+        "x2": 36.443,
+        "y2": 39.52,
+        "thickness": 0.16,
+        "className": "ledger-line"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 34.863,
+        "y": 39.52,
+        "className": "notehead",
+        "sourceId": "l66"
+      },
+      {
+        "kind": "line",
+        "x1": 34.863,
+        "y1": 39.688,
+        "x2": 34.863,
+        "y2": 43.02,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 38.8327,
+        "y": 37.52,
+        "className": "notehead",
+        "sourceId": "l67"
+      },
+      {
+        "kind": "line",
+        "x1": 38.8327,
+        "y1": 37.688,
+        "x2": 38.8327,
+        "y2": 41.02,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 25.4236,
+        "y": 51.48,
+        "className": "notehead",
+        "sourceId": "b21"
+      },
+      {
+        "kind": "line",
+        "x1": 26.6036,
+        "y1": 47.98,
+        "x2": 26.6036,
+        "y2": 51.312,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 30.8933,
+        "y": 51.48,
+        "className": "notehead",
+        "sourceId": "b22"
+      },
+      {
+        "kind": "line",
+        "x1": 32.0733,
+        "y1": 47.98,
+        "x2": 32.0733,
+        "y2": 51.312,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 34.863,
+        "y": 51.48,
+        "className": "notehead",
+        "sourceId": "b23"
+      },
+      {
+        "kind": "line",
+        "x1": 36.043,
+        "y1": 47.98,
+        "x2": 36.043,
+        "y2": 51.312,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 38.8327,
+        "y": 51.48,
+        "className": "notehead",
+        "sourceId": "b24"
+      },
+      {
+        "kind": "line",
+        "x1": 40.0127,
+        "y1": 47.98,
+        "x2": 40.0127,
+        "y2": 51.312,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "line",
+        "x1": 42.2076,
+        "y1": 33.52,
+        "x2": 42.2076,
+        "y2": 37.52,
+        "thickness": 0.16,
+        "className": "barline"
+      },
+      {
+        "kind": "line",
+        "x1": 42.2076,
+        "y1": 47.98,
+        "x2": 42.2076,
+        "y2": 51.98,
+        "thickness": 0.16,
+        "className": "barline"
+      },
+      {
+        "kind": "line",
+        "x1": 42.2076,
+        "y1": 33.52,
+        "x2": 59.4864,
+        "y2": 33.52,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 42.2076,
+        "y1": 34.52,
+        "x2": 59.4864,
+        "y2": 34.52,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 42.2076,
+        "y1": 35.52,
+        "x2": 59.4864,
+        "y2": 35.52,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 42.2076,
+        "y1": 36.52,
+        "x2": 59.4864,
+        "y2": 36.52,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 42.2076,
+        "y1": 37.52,
+        "x2": 59.4864,
+        "y2": 37.52,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 42.2076,
+        "y1": 47.98,
+        "x2": 59.4864,
+        "y2": 47.98,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 42.2076,
+        "y1": 48.98,
+        "x2": 59.4864,
+        "y2": 48.98,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 42.2076,
+        "y1": 49.98,
+        "x2": 59.4864,
+        "y2": 49.98,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 42.2076,
+        "y1": 50.98,
+        "x2": 59.4864,
+        "y2": 50.98,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 42.2076,
+        "y1": 51.98,
+        "x2": 59.4864,
+        "y2": 51.98,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 44.2024,
+        "y": 33.02,
+        "className": "notehead",
+        "sourceId": "l23"
+      },
+      {
+        "kind": "line",
+        "x1": 45.3824,
+        "y1": 29.52,
+        "x2": 45.3824,
+        "y2": 32.852,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 48.1721,
+        "y": 34.02,
         "className": "notehead",
         "sourceId": "l24"
       },
       {
         "kind": "line",
         "x1": 49.3521,
-        "y1": 32.02,
+        "y1": 30.52,
         "x2": 49.3521,
-        "y2": 35.352,
+        "y2": 33.852,
         "thickness": 0.12,
         "className": "stem"
       },
@@ -2598,16 +2598,16 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 52.1418,
-        "y": 36.02,
+        "y": 34.52,
         "className": "notehead",
         "sourceId": "l25"
       },
       {
         "kind": "line",
         "x1": 53.3218,
-        "y1": 32.52,
+        "y1": 31.02,
         "x2": 53.3218,
-        "y2": 35.852,
+        "y2": 34.352,
         "thickness": 0.12,
         "className": "stem"
       },
@@ -2615,43 +2615,43 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 56.1115,
-        "y": 37.02,
+        "y": 35.52,
         "className": "notehead",
         "sourceId": "l26"
       },
       {
         "kind": "line",
         "x1": 57.2915,
-        "y1": 33.52,
+        "y1": 32.02,
         "x2": 57.2915,
-        "y2": 36.852,
+        "y2": 35.352,
         "thickness": 0.12,
         "className": "stem"
       },
       {
         "kind": "line",
         "x1": 43.8024,
-        "y1": 40.02,
+        "y1": 38.52,
         "x2": 45.7824,
-        "y2": 40.02,
+        "y2": 38.52,
         "thickness": 0.16,
         "className": "ledger-line"
       },
       {
         "kind": "line",
         "x1": 43.8024,
-        "y1": 41.02,
+        "y1": 39.52,
         "x2": 45.7824,
-        "y2": 41.02,
+        "y2": 39.52,
         "thickness": 0.16,
         "className": "ledger-line"
       },
       {
         "kind": "line",
         "x1": 43.8024,
-        "y1": 42.02,
+        "y1": 40.52,
         "x2": 45.7824,
-        "y2": 42.02,
+        "y2": 40.52,
         "thickness": 0.16,
         "className": "ledger-line"
       },
@@ -2659,25 +2659,25 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 44.2024,
-        "y": 42.52,
+        "y": 41.02,
         "className": "notehead",
         "sourceId": "l68"
       },
       {
         "kind": "line",
         "x1": 44.2024,
-        "y1": 42.688,
+        "y1": 41.188,
         "x2": 44.2024,
-        "y2": 46.02,
+        "y2": 44.52,
         "thickness": 0.12,
         "className": "stem"
       },
       {
         "kind": "line",
         "x1": 47.7721,
-        "y1": 40.02,
+        "y1": 38.52,
         "x2": 49.7521,
-        "y2": 40.02,
+        "y2": 38.52,
         "thickness": 0.16,
         "className": "ledger-line"
       },
@@ -2685,43 +2685,43 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 48.1721,
-        "y": 40.52,
+        "y": 39.02,
         "className": "notehead",
         "sourceId": "l69"
       },
       {
         "kind": "line",
         "x1": 48.1721,
-        "y1": 40.688,
+        "y1": 39.188,
         "x2": 48.1721,
-        "y2": 44.02,
+        "y2": 42.52,
         "thickness": 0.12,
         "className": "stem"
       },
       {
         "kind": "line",
         "x1": 51.7418,
-        "y1": 40.02,
+        "y1": 38.52,
         "x2": 53.7218,
-        "y2": 40.02,
+        "y2": 38.52,
         "thickness": 0.16,
         "className": "ledger-line"
       },
       {
         "kind": "line",
         "x1": 51.7418,
-        "y1": 41.02,
+        "y1": 39.52,
         "x2": 53.7218,
-        "y2": 41.02,
+        "y2": 39.52,
         "thickness": 0.16,
         "className": "ledger-line"
       },
       {
         "kind": "line",
         "x1": 51.7418,
-        "y1": 42.02,
+        "y1": 40.52,
         "x2": 53.7218,
-        "y2": 42.02,
+        "y2": 40.52,
         "thickness": 0.16,
         "className": "ledger-line"
       },
@@ -2729,25 +2729,25 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 52.1418,
-        "y": 42.52,
+        "y": 41.02,
         "className": "notehead",
         "sourceId": "l70"
       },
       {
         "kind": "line",
         "x1": 52.1418,
-        "y1": 42.688,
+        "y1": 41.188,
         "x2": 52.1418,
-        "y2": 46.02,
+        "y2": 44.52,
         "thickness": 0.12,
         "className": "stem"
       },
       {
         "kind": "line",
         "x1": 55.7115,
-        "y1": 40.02,
+        "y1": 38.52,
         "x2": 57.6915,
-        "y2": 40.02,
+        "y2": 38.52,
         "thickness": 0.16,
         "className": "ledger-line"
       },
@@ -2755,25 +2755,25 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 56.1115,
-        "y": 40.52,
+        "y": 39.02,
         "className": "notehead",
         "sourceId": "l71"
       },
       {
         "kind": "line",
         "x1": 56.1115,
-        "y1": 40.688,
+        "y1": 39.188,
         "x2": 56.1115,
-        "y2": 44.02,
+        "y2": 42.52,
         "thickness": 0.12,
         "className": "stem"
       },
       {
         "kind": "line",
         "x1": 43.8024,
-        "y1": 54.48,
+        "y1": 52.98,
         "x2": 45.7824,
-        "y2": 54.48,
+        "y2": 52.98,
         "thickness": 0.16,
         "className": "ledger-line"
       },
@@ -2781,25 +2781,25 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 44.2024,
-        "y": 54.48,
+        "y": 52.98,
         "className": "notehead",
         "sourceId": "b25"
       },
       {
         "kind": "line",
         "x1": 45.3824,
-        "y1": 50.98,
+        "y1": 49.48,
         "x2": 45.3824,
-        "y2": 54.312,
+        "y2": 52.812,
         "thickness": 0.12,
         "className": "stem"
       },
       {
         "kind": "line",
         "x1": 47.7721,
-        "y1": 54.48,
+        "y1": 52.98,
         "x2": 49.7521,
-        "y2": 54.48,
+        "y2": 52.98,
         "thickness": 0.16,
         "className": "ledger-line"
       },
@@ -2807,25 +2807,25 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 48.1721,
-        "y": 54.48,
+        "y": 52.98,
         "className": "notehead",
         "sourceId": "b26"
       },
       {
         "kind": "line",
         "x1": 49.3521,
-        "y1": 50.98,
+        "y1": 49.48,
         "x2": 49.3521,
-        "y2": 54.312,
+        "y2": 52.812,
         "thickness": 0.12,
         "className": "stem"
       },
       {
         "kind": "line",
         "x1": 51.7418,
-        "y1": 54.48,
+        "y1": 52.98,
         "x2": 53.7218,
-        "y2": 54.48,
+        "y2": 52.98,
         "thickness": 0.16,
         "className": "ledger-line"
       },
@@ -2833,25 +2833,25 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 52.1418,
-        "y": 54.48,
+        "y": 52.98,
         "className": "notehead",
         "sourceId": "b27"
       },
       {
         "kind": "line",
         "x1": 53.3218,
-        "y1": 50.98,
+        "y1": 49.48,
         "x2": 53.3218,
-        "y2": 54.312,
+        "y2": 52.812,
         "thickness": 0.12,
         "className": "stem"
       },
       {
         "kind": "line",
         "x1": 55.7115,
-        "y1": 54.48,
+        "y1": 52.98,
         "x2": 57.6915,
-        "y2": 54.48,
+        "y2": 52.98,
         "thickness": 0.16,
         "className": "ledger-line"
       },
@@ -2859,124 +2859,124 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 56.1115,
-        "y": 54.48,
+        "y": 52.98,
         "className": "notehead",
         "sourceId": "b28"
       },
       {
         "kind": "line",
         "x1": 57.2915,
-        "y1": 50.98,
+        "y1": 49.48,
         "x2": 57.2915,
-        "y2": 54.312,
+        "y2": 52.812,
         "thickness": 0.12,
         "className": "stem"
       },
       {
         "kind": "line",
         "x1": 59.4864,
-        "y1": 35.02,
+        "y1": 33.52,
         "x2": 59.4864,
-        "y2": 39.02,
+        "y2": 37.52,
         "thickness": 0.16,
         "className": "barline"
       },
       {
         "kind": "line",
         "x1": 59.4864,
-        "y1": 49.48,
+        "y1": 47.98,
         "x2": 59.4864,
-        "y2": 53.48,
+        "y2": 51.98,
         "thickness": 0.16,
         "className": "barline"
       },
       {
         "kind": "line",
         "x1": 59.4864,
-        "y1": 35.02,
+        "y1": 33.52,
         "x2": 78,
-        "y2": 35.02,
+        "y2": 33.52,
         "thickness": 0.13,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 59.4864,
-        "y1": 36.02,
+        "y1": 34.52,
         "x2": 78,
-        "y2": 36.02,
+        "y2": 34.52,
         "thickness": 0.13,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 59.4864,
-        "y1": 37.02,
+        "y1": 35.52,
         "x2": 78,
-        "y2": 37.02,
+        "y2": 35.52,
         "thickness": 0.13,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 59.4864,
-        "y1": 38.02,
+        "y1": 36.52,
         "x2": 78,
-        "y2": 38.02,
+        "y2": 36.52,
         "thickness": 0.13,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 59.4864,
-        "y1": 39.02,
+        "y1": 37.52,
         "x2": 78,
-        "y2": 39.02,
+        "y2": 37.52,
         "thickness": 0.13,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 59.4864,
-        "y1": 49.48,
+        "y1": 47.98,
         "x2": 78,
-        "y2": 49.48,
+        "y2": 47.98,
         "thickness": 0.13,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 59.4864,
-        "y1": 50.48,
+        "y1": 48.98,
         "x2": 78,
-        "y2": 50.48,
+        "y2": 48.98,
         "thickness": 0.13,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 59.4864,
-        "y1": 51.48,
+        "y1": 49.98,
         "x2": 78,
-        "y2": 51.48,
+        "y2": 49.98,
         "thickness": 0.13,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 59.4864,
-        "y1": 52.48,
+        "y1": 50.98,
         "x2": 78,
-        "y2": 52.48,
+        "y2": 50.98,
         "thickness": 0.13,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 59.4864,
-        "y1": 53.48,
+        "y1": 51.98,
         "x2": 78,
-        "y2": 53.48,
+        "y2": 51.98,
         "thickness": 0.13,
         "className": "staff-line"
       },
@@ -2984,34 +2984,34 @@
         "kind": "glyph",
         "glyph": "noteheadWhole",
         "x": 62.4621,
-        "y": 35.52,
+        "y": 34.02,
         "className": "notehead",
         "sourceId": "l27"
       },
       {
         "kind": "line",
         "x1": 62.3161,
-        "y1": 40.02,
+        "y1": 38.52,
         "x2": 64.2961,
-        "y2": 40.02,
+        "y2": 38.52,
         "thickness": 0.16,
         "className": "ledger-line"
       },
       {
         "kind": "line",
         "x1": 62.3161,
-        "y1": 41.02,
+        "y1": 39.52,
         "x2": 64.2961,
-        "y2": 41.02,
+        "y2": 39.52,
         "thickness": 0.16,
         "className": "ledger-line"
       },
       {
         "kind": "line",
         "x1": 62.3161,
-        "y1": 42.02,
+        "y1": 40.52,
         "x2": 64.2961,
-        "y2": 42.02,
+        "y2": 40.52,
         "thickness": 0.16,
         "className": "ledger-line"
       },
@@ -3019,25 +3019,25 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 62.7161,
-        "y": 42.52,
+        "y": 41.02,
         "className": "notehead",
         "sourceId": "l72"
       },
       {
         "kind": "line",
         "x1": 62.7161,
-        "y1": 42.688,
+        "y1": 41.188,
         "x2": 62.7161,
-        "y2": 46.02,
+        "y2": 44.52,
         "thickness": 0.12,
         "className": "stem"
       },
       {
         "kind": "line",
         "x1": 66.2858,
-        "y1": 40.02,
+        "y1": 38.52,
         "x2": 68.2658,
-        "y2": 40.02,
+        "y2": 38.52,
         "thickness": 0.16,
         "className": "ledger-line"
       },
@@ -3045,43 +3045,43 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 66.6858,
-        "y": 40.52,
+        "y": 39.02,
         "className": "notehead",
         "sourceId": "l73"
       },
       {
         "kind": "line",
         "x1": 66.6858,
-        "y1": 40.688,
+        "y1": 39.188,
         "x2": 66.6858,
-        "y2": 44.02,
+        "y2": 42.52,
         "thickness": 0.12,
         "className": "stem"
       },
       {
         "kind": "line",
         "x1": 70.2555,
-        "y1": 40.02,
+        "y1": 38.52,
         "x2": 72.2355,
-        "y2": 40.02,
+        "y2": 38.52,
         "thickness": 0.16,
         "className": "ledger-line"
       },
       {
         "kind": "line",
         "x1": 70.2555,
-        "y1": 41.02,
+        "y1": 39.52,
         "x2": 72.2355,
-        "y2": 41.02,
+        "y2": 39.52,
         "thickness": 0.16,
         "className": "ledger-line"
       },
       {
         "kind": "line",
         "x1": 70.2555,
-        "y1": 42.02,
+        "y1": 40.52,
         "x2": 72.2355,
-        "y2": 42.02,
+        "y2": 40.52,
         "thickness": 0.16,
         "className": "ledger-line"
       },
@@ -3089,25 +3089,25 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 70.6555,
-        "y": 42.52,
+        "y": 41.02,
         "className": "notehead",
         "sourceId": "l74"
       },
       {
         "kind": "line",
         "x1": 70.6555,
-        "y1": 42.688,
+        "y1": 41.188,
         "x2": 70.6555,
-        "y2": 46.02,
+        "y2": 44.52,
         "thickness": 0.12,
         "className": "stem"
       },
       {
         "kind": "line",
         "x1": 74.2252,
-        "y1": 40.02,
+        "y1": 38.52,
         "x2": 76.2052,
-        "y2": 40.02,
+        "y2": 38.52,
         "thickness": 0.16,
         "className": "ledger-line"
       },
@@ -3115,25 +3115,25 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 74.6252,
-        "y": 40.52,
+        "y": 39.02,
         "className": "notehead",
         "sourceId": "l75"
       },
       {
         "kind": "line",
         "x1": 74.6252,
-        "y1": 40.688,
+        "y1": 39.188,
         "x2": 74.6252,
-        "y2": 44.02,
+        "y2": 42.52,
         "thickness": 0.12,
         "className": "stem"
       },
       {
         "kind": "line",
         "x1": 62.3161,
-        "y1": 54.48,
+        "y1": 52.98,
         "x2": 64.2961,
-        "y2": 54.48,
+        "y2": 52.98,
         "thickness": 0.16,
         "className": "ledger-line"
       },
@@ -3141,25 +3141,25 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 62.7161,
-        "y": 54.48,
+        "y": 52.98,
         "className": "notehead",
         "sourceId": "b29"
       },
       {
         "kind": "line",
         "x1": 63.8961,
-        "y1": 50.98,
+        "y1": 49.48,
         "x2": 63.8961,
-        "y2": 54.312,
+        "y2": 52.812,
         "thickness": 0.12,
         "className": "stem"
       },
       {
         "kind": "line",
         "x1": 66.2858,
-        "y1": 54.48,
+        "y1": 52.98,
         "x2": 68.2658,
-        "y2": 54.48,
+        "y2": 52.98,
         "thickness": 0.16,
         "className": "ledger-line"
       },
@@ -3167,25 +3167,25 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 66.6858,
-        "y": 54.48,
+        "y": 52.98,
         "className": "notehead",
         "sourceId": "b30"
       },
       {
         "kind": "line",
         "x1": 67.8658,
-        "y1": 50.98,
+        "y1": 49.48,
         "x2": 67.8658,
-        "y2": 54.312,
+        "y2": 52.812,
         "thickness": 0.12,
         "className": "stem"
       },
       {
         "kind": "line",
         "x1": 70.2555,
-        "y1": 54.48,
+        "y1": 52.98,
         "x2": 72.2355,
-        "y2": 54.48,
+        "y2": 52.98,
         "thickness": 0.16,
         "className": "ledger-line"
       },
@@ -3193,25 +3193,25 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 70.6555,
-        "y": 54.48,
+        "y": 52.98,
         "className": "notehead",
         "sourceId": "b31"
       },
       {
         "kind": "line",
         "x1": 71.8355,
-        "y1": 50.98,
+        "y1": 49.48,
         "x2": 71.8355,
-        "y2": 54.312,
+        "y2": 52.812,
         "thickness": 0.12,
         "className": "stem"
       },
       {
         "kind": "line",
         "x1": 74.2252,
-        "y1": 54.48,
+        "y1": 52.98,
         "x2": 76.2052,
-        "y2": 54.48,
+        "y2": 52.98,
         "thickness": 0.16,
         "className": "ledger-line"
       },
@@ -3219,54 +3219,81 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 74.6252,
-        "y": 54.48,
+        "y": 52.98,
         "className": "notehead",
         "sourceId": "b32"
       },
       {
         "kind": "line",
         "x1": 75.8052,
-        "y1": 50.98,
+        "y1": 49.48,
         "x2": 75.8052,
-        "y2": 54.312,
+        "y2": 52.812,
         "thickness": 0.12,
         "className": "stem"
       },
       {
         "kind": "line",
         "x1": 77.7,
-        "y1": 35.02,
+        "y1": 33.52,
         "x2": 77.7,
-        "y2": 39.02,
+        "y2": 37.52,
         "thickness": 0.16,
         "className": "barline barline-double"
       },
       {
         "kind": "line",
         "x1": 78,
-        "y1": 35.02,
+        "y1": 33.52,
         "x2": 78,
-        "y2": 39.02,
+        "y2": 37.52,
         "thickness": 0.16,
         "className": "barline barline-double"
       },
       {
         "kind": "line",
         "x1": 77.7,
-        "y1": 49.48,
+        "y1": 47.98,
         "x2": 77.7,
-        "y2": 53.48,
+        "y2": 51.98,
         "thickness": 0.16,
         "className": "barline barline-double"
       },
       {
         "kind": "line",
         "x1": 78,
-        "y1": 49.48,
+        "y1": 47.98,
         "x2": 78,
-        "y2": 53.48,
+        "y2": 51.98,
         "thickness": 0.16,
         "className": "barline barline-double"
+      },
+      {
+        "kind": "line",
+        "x1": 2,
+        "y1": 60.165,
+        "x2": 23.4875,
+        "y2": 60.165,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 2,
+        "y1": 61.165,
+        "x2": 23.4875,
+        "y2": 61.165,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 2,
+        "y1": 62.165,
+        "x2": 23.4875,
+        "y2": 62.165,
+        "thickness": 0.13,
+        "className": "staff-line"
       },
       {
         "kind": "line",
@@ -3289,27 +3316,27 @@
       {
         "kind": "line",
         "x1": 2,
-        "y1": 65.165,
+        "y1": 74.785,
         "x2": 23.4875,
-        "y2": 65.165,
+        "y2": 74.785,
         "thickness": 0.13,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 2,
-        "y1": 66.165,
+        "y1": 75.785,
         "x2": 23.4875,
-        "y2": 66.165,
+        "y2": 75.785,
         "thickness": 0.13,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 2,
-        "y1": 67.165,
+        "y1": 76.785,
         "x2": 23.4875,
-        "y2": 67.165,
+        "y2": 76.785,
         "thickness": 0.13,
         "className": "staff-line"
       },
@@ -3334,36 +3361,9 @@
       {
         "kind": "line",
         "x1": 2,
-        "y1": 79.785,
-        "x2": 23.4875,
-        "y2": 79.785,
-        "thickness": 0.13,
-        "className": "staff-line"
-      },
-      {
-        "kind": "line",
-        "x1": 2,
-        "y1": 80.785,
-        "x2": 23.4875,
-        "y2": 80.785,
-        "thickness": 0.13,
-        "className": "staff-line"
-      },
-      {
-        "kind": "line",
-        "x1": 2,
-        "y1": 81.785,
-        "x2": 23.4875,
-        "y2": 81.785,
-        "thickness": 0.13,
-        "className": "staff-line"
-      },
-      {
-        "kind": "line",
-        "x1": 2,
-        "y1": 63.165,
+        "y1": 60.165,
         "x2": 2,
-        "y2": 81.785,
+        "y2": 78.785,
         "thickness": 0.16,
         "className": "barline barline-start"
       },
@@ -3371,44 +3371,44 @@
         "kind": "glyph",
         "glyph": "gClef8vb",
         "x": 2.25,
-        "y": 66.165,
+        "y": 63.165,
         "className": "clef"
       },
       {
         "kind": "glyph",
         "glyph": "fClef",
         "x": 2.25,
-        "y": 78.785,
+        "y": 75.785,
         "className": "clef"
       },
       {
         "kind": "glyph",
         "glyph": "accidentalSharp",
         "x": 5.25,
-        "y": 63.165,
+        "y": 60.165,
         "className": "key-sig"
       },
       {
         "kind": "glyph",
         "glyph": "accidentalSharp",
         "x": 5.25,
-        "y": 78.785,
+        "y": 75.785,
         "className": "key-sig"
       },
       {
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 8.1522,
-        "y": 65.165,
+        "y": 62.165,
         "className": "notehead",
         "sourceId": "l28"
       },
       {
         "kind": "line",
         "x1": 9.3322,
-        "y1": 61.665,
+        "y1": 58.665,
         "x2": 9.3322,
-        "y2": 64.997,
+        "y2": 61.997,
         "thickness": 0.12,
         "className": "stem"
       },
@@ -3416,15 +3416,362 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 12.1366,
-        "y": 64.165,
+        "y": 61.165,
         "className": "notehead",
         "sourceId": "l29"
       },
       {
         "kind": "line",
         "x1": 13.3166,
-        "y1": 60.665,
+        "y1": 57.665,
         "x2": 13.3166,
+        "y2": 60.997,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 16.1209,
+        "y": 60.665,
+        "className": "notehead",
+        "sourceId": "l30"
+      },
+      {
+        "kind": "line",
+        "x1": 17.3009,
+        "y1": 57.165,
+        "x2": 17.3009,
+        "y2": 60.497,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 20.1053,
+        "y": 60.165,
+        "className": "notehead",
+        "sourceId": "l31"
+      },
+      {
+        "kind": "line",
+        "x1": 21.2853,
+        "y1": 56.665,
+        "x2": 21.2853,
+        "y2": 59.997,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "line",
+        "x1": 7.7522,
+        "y1": 65.165,
+        "x2": 9.7322,
+        "y2": 65.165,
+        "thickness": 0.16,
+        "className": "ledger-line"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 8.1522,
+        "y": 65.665,
+        "className": "notehead",
+        "sourceId": "l76"
+      },
+      {
+        "kind": "line",
+        "x1": 8.1522,
+        "y1": 65.833,
+        "x2": 8.1522,
+        "y2": 69.165,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 12.1366,
+        "y": 63.665,
+        "className": "notehead",
+        "sourceId": "l77"
+      },
+      {
+        "kind": "line",
+        "x1": 12.1366,
+        "y1": 63.833,
+        "x2": 12.1366,
+        "y2": 67.165,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "line",
+        "x1": 15.7209,
+        "y1": 65.165,
+        "x2": 17.7009,
+        "y2": 65.165,
+        "thickness": 0.16,
+        "className": "ledger-line"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 16.1209,
+        "y": 65.665,
+        "className": "notehead",
+        "sourceId": "l78"
+      },
+      {
+        "kind": "line",
+        "x1": 16.1209,
+        "y1": 65.833,
+        "x2": 16.1209,
+        "y2": 69.165,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 20.1053,
+        "y": 63.665,
+        "className": "notehead",
+        "sourceId": "l79"
+      },
+      {
+        "kind": "line",
+        "x1": 20.1053,
+        "y1": 63.833,
+        "x2": 20.1053,
+        "y2": 67.165,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 8.1522,
+        "y": 77.785,
+        "className": "notehead",
+        "sourceId": "b33"
+      },
+      {
+        "kind": "line",
+        "x1": 9.3322,
+        "y1": 74.285,
+        "x2": 9.3322,
+        "y2": 77.617,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 12.1366,
+        "y": 77.785,
+        "className": "notehead",
+        "sourceId": "b34"
+      },
+      {
+        "kind": "line",
+        "x1": 13.3166,
+        "y1": 74.285,
+        "x2": 13.3166,
+        "y2": 77.617,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 16.1209,
+        "y": 77.785,
+        "className": "notehead",
+        "sourceId": "b35"
+      },
+      {
+        "kind": "line",
+        "x1": 17.3009,
+        "y1": 74.285,
+        "x2": 17.3009,
+        "y2": 77.617,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 20.1053,
+        "y": 77.785,
+        "className": "notehead",
+        "sourceId": "b36"
+      },
+      {
+        "kind": "line",
+        "x1": 21.2853,
+        "y1": 74.285,
+        "x2": 21.2853,
+        "y2": 77.617,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "line",
+        "x1": 23.4875,
+        "y1": 60.165,
+        "x2": 23.4875,
+        "y2": 64.165,
+        "thickness": 0.16,
+        "className": "barline"
+      },
+      {
+        "kind": "line",
+        "x1": 23.4875,
+        "y1": 74.785,
+        "x2": 23.4875,
+        "y2": 78.785,
+        "thickness": 0.16,
+        "className": "barline"
+      },
+      {
+        "kind": "line",
+        "x1": 23.4875,
+        "y1": 60.165,
+        "x2": 40.825,
+        "y2": 60.165,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 23.4875,
+        "y1": 61.165,
+        "x2": 40.825,
+        "y2": 61.165,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 23.4875,
+        "y1": 62.165,
+        "x2": 40.825,
+        "y2": 62.165,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 23.4875,
+        "y1": 63.165,
+        "x2": 40.825,
+        "y2": 63.165,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 23.4875,
+        "y1": 64.165,
+        "x2": 40.825,
+        "y2": 64.165,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 23.4875,
+        "y1": 74.785,
+        "x2": 40.825,
+        "y2": 74.785,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 23.4875,
+        "y1": 75.785,
+        "x2": 40.825,
+        "y2": 75.785,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 23.4875,
+        "y1": 76.785,
+        "x2": 40.825,
+        "y2": 76.785,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 23.4875,
+        "y1": 77.785,
+        "x2": 40.825,
+        "y2": 77.785,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 23.4875,
+        "y1": 78.785,
+        "x2": 40.825,
+        "y2": 78.785,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 25.4897,
+        "y": 62.665,
+        "className": "notehead",
+        "sourceId": "l32"
+      },
+      {
+        "kind": "line",
+        "x1": 26.6697,
+        "y1": 59.165,
+        "x2": 26.6697,
+        "y2": 62.497,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 29.4741,
+        "y": 63.165,
+        "className": "notehead",
+        "sourceId": "l33"
+      },
+      {
+        "kind": "line",
+        "x1": 30.6541,
+        "y1": 59.665,
+        "x2": 30.6541,
+        "y2": 62.997,
+        "thickness": 0.12,
+        "className": "stem"
+      },
+      {
+        "kind": "glyph",
+        "glyph": "noteheadBlack",
+        "x": 33.4584,
+        "y": 64.165,
+        "className": "notehead",
+        "sourceId": "l34"
+      },
+      {
+        "kind": "line",
+        "x1": 34.6384,
+        "y1": 60.665,
+        "x2": 34.6384,
         "y2": 63.997,
         "thickness": 0.12,
         "className": "stem"
@@ -3432,382 +3779,35 @@
       {
         "kind": "glyph",
         "glyph": "noteheadBlack",
-        "x": 16.1209,
-        "y": 63.665,
-        "className": "notehead",
-        "sourceId": "l30"
-      },
-      {
-        "kind": "line",
-        "x1": 17.3009,
-        "y1": 60.165,
-        "x2": 17.3009,
-        "y2": 63.497,
-        "thickness": 0.12,
-        "className": "stem"
-      },
-      {
-        "kind": "glyph",
-        "glyph": "noteheadBlack",
-        "x": 20.1053,
-        "y": 63.165,
-        "className": "notehead",
-        "sourceId": "l31"
-      },
-      {
-        "kind": "line",
-        "x1": 21.2853,
-        "y1": 59.665,
-        "x2": 21.2853,
-        "y2": 62.997,
-        "thickness": 0.12,
-        "className": "stem"
-      },
-      {
-        "kind": "line",
-        "x1": 7.7522,
-        "y1": 68.165,
-        "x2": 9.7322,
-        "y2": 68.165,
-        "thickness": 0.16,
-        "className": "ledger-line"
-      },
-      {
-        "kind": "glyph",
-        "glyph": "noteheadBlack",
-        "x": 8.1522,
-        "y": 68.665,
-        "className": "notehead",
-        "sourceId": "l76"
-      },
-      {
-        "kind": "line",
-        "x1": 8.1522,
-        "y1": 68.833,
-        "x2": 8.1522,
-        "y2": 72.165,
-        "thickness": 0.12,
-        "className": "stem"
-      },
-      {
-        "kind": "glyph",
-        "glyph": "noteheadBlack",
-        "x": 12.1366,
-        "y": 66.665,
-        "className": "notehead",
-        "sourceId": "l77"
-      },
-      {
-        "kind": "line",
-        "x1": 12.1366,
-        "y1": 66.833,
-        "x2": 12.1366,
-        "y2": 70.165,
-        "thickness": 0.12,
-        "className": "stem"
-      },
-      {
-        "kind": "line",
-        "x1": 15.7209,
-        "y1": 68.165,
-        "x2": 17.7009,
-        "y2": 68.165,
-        "thickness": 0.16,
-        "className": "ledger-line"
-      },
-      {
-        "kind": "glyph",
-        "glyph": "noteheadBlack",
-        "x": 16.1209,
-        "y": 68.665,
-        "className": "notehead",
-        "sourceId": "l78"
-      },
-      {
-        "kind": "line",
-        "x1": 16.1209,
-        "y1": 68.833,
-        "x2": 16.1209,
-        "y2": 72.165,
-        "thickness": 0.12,
-        "className": "stem"
-      },
-      {
-        "kind": "glyph",
-        "glyph": "noteheadBlack",
-        "x": 20.1053,
-        "y": 66.665,
-        "className": "notehead",
-        "sourceId": "l79"
-      },
-      {
-        "kind": "line",
-        "x1": 20.1053,
-        "y1": 66.833,
-        "x2": 20.1053,
-        "y2": 70.165,
-        "thickness": 0.12,
-        "className": "stem"
-      },
-      {
-        "kind": "glyph",
-        "glyph": "noteheadBlack",
-        "x": 8.1522,
-        "y": 80.785,
-        "className": "notehead",
-        "sourceId": "b33"
-      },
-      {
-        "kind": "line",
-        "x1": 9.3322,
-        "y1": 77.285,
-        "x2": 9.3322,
-        "y2": 80.617,
-        "thickness": 0.12,
-        "className": "stem"
-      },
-      {
-        "kind": "glyph",
-        "glyph": "noteheadBlack",
-        "x": 12.1366,
-        "y": 80.785,
-        "className": "notehead",
-        "sourceId": "b34"
-      },
-      {
-        "kind": "line",
-        "x1": 13.3166,
-        "y1": 77.285,
-        "x2": 13.3166,
-        "y2": 80.617,
-        "thickness": 0.12,
-        "className": "stem"
-      },
-      {
-        "kind": "glyph",
-        "glyph": "noteheadBlack",
-        "x": 16.1209,
-        "y": 80.785,
-        "className": "notehead",
-        "sourceId": "b35"
-      },
-      {
-        "kind": "line",
-        "x1": 17.3009,
-        "y1": 77.285,
-        "x2": 17.3009,
-        "y2": 80.617,
-        "thickness": 0.12,
-        "className": "stem"
-      },
-      {
-        "kind": "glyph",
-        "glyph": "noteheadBlack",
-        "x": 20.1053,
-        "y": 80.785,
-        "className": "notehead",
-        "sourceId": "b36"
-      },
-      {
-        "kind": "line",
-        "x1": 21.2853,
-        "y1": 77.285,
-        "x2": 21.2853,
-        "y2": 80.617,
-        "thickness": 0.12,
-        "className": "stem"
-      },
-      {
-        "kind": "line",
-        "x1": 23.4875,
-        "y1": 63.165,
-        "x2": 23.4875,
-        "y2": 67.165,
-        "thickness": 0.16,
-        "className": "barline"
-      },
-      {
-        "kind": "line",
-        "x1": 23.4875,
-        "y1": 77.785,
-        "x2": 23.4875,
-        "y2": 81.785,
-        "thickness": 0.16,
-        "className": "barline"
-      },
-      {
-        "kind": "line",
-        "x1": 23.4875,
-        "y1": 63.165,
-        "x2": 40.825,
-        "y2": 63.165,
-        "thickness": 0.13,
-        "className": "staff-line"
-      },
-      {
-        "kind": "line",
-        "x1": 23.4875,
-        "y1": 64.165,
-        "x2": 40.825,
-        "y2": 64.165,
-        "thickness": 0.13,
-        "className": "staff-line"
-      },
-      {
-        "kind": "line",
-        "x1": 23.4875,
-        "y1": 65.165,
-        "x2": 40.825,
-        "y2": 65.165,
-        "thickness": 0.13,
-        "className": "staff-line"
-      },
-      {
-        "kind": "line",
-        "x1": 23.4875,
-        "y1": 66.165,
-        "x2": 40.825,
-        "y2": 66.165,
-        "thickness": 0.13,
-        "className": "staff-line"
-      },
-      {
-        "kind": "line",
-        "x1": 23.4875,
-        "y1": 67.165,
-        "x2": 40.825,
-        "y2": 67.165,
-        "thickness": 0.13,
-        "className": "staff-line"
-      },
-      {
-        "kind": "line",
-        "x1": 23.4875,
-        "y1": 77.785,
-        "x2": 40.825,
-        "y2": 77.785,
-        "thickness": 0.13,
-        "className": "staff-line"
-      },
-      {
-        "kind": "line",
-        "x1": 23.4875,
-        "y1": 78.785,
-        "x2": 40.825,
-        "y2": 78.785,
-        "thickness": 0.13,
-        "className": "staff-line"
-      },
-      {
-        "kind": "line",
-        "x1": 23.4875,
-        "y1": 79.785,
-        "x2": 40.825,
-        "y2": 79.785,
-        "thickness": 0.13,
-        "className": "staff-line"
-      },
-      {
-        "kind": "line",
-        "x1": 23.4875,
-        "y1": 80.785,
-        "x2": 40.825,
-        "y2": 80.785,
-        "thickness": 0.13,
-        "className": "staff-line"
-      },
-      {
-        "kind": "line",
-        "x1": 23.4875,
-        "y1": 81.785,
-        "x2": 40.825,
-        "y2": 81.785,
-        "thickness": 0.13,
-        "className": "staff-line"
-      },
-      {
-        "kind": "glyph",
-        "glyph": "noteheadBlack",
-        "x": 25.4897,
-        "y": 65.665,
-        "className": "notehead",
-        "sourceId": "l32"
-      },
-      {
-        "kind": "line",
-        "x1": 26.6697,
-        "y1": 62.165,
-        "x2": 26.6697,
-        "y2": 65.497,
-        "thickness": 0.12,
-        "className": "stem"
-      },
-      {
-        "kind": "glyph",
-        "glyph": "noteheadBlack",
-        "x": 29.4741,
-        "y": 66.165,
-        "className": "notehead",
-        "sourceId": "l33"
-      },
-      {
-        "kind": "line",
-        "x1": 30.6541,
-        "y1": 62.665,
-        "x2": 30.6541,
-        "y2": 65.997,
-        "thickness": 0.12,
-        "className": "stem"
-      },
-      {
-        "kind": "glyph",
-        "glyph": "noteheadBlack",
-        "x": 33.4584,
-        "y": 67.165,
-        "className": "notehead",
-        "sourceId": "l34"
-      },
-      {
-        "kind": "line",
-        "x1": 34.6384,
-        "y1": 63.665,
-        "x2": 34.6384,
-        "y2": 66.997,
-        "thickness": 0.12,
-        "className": "stem"
-      },
-      {
-        "kind": "glyph",
-        "glyph": "noteheadBlack",
         "x": 37.4428,
-        "y": 67.665,
+        "y": 64.665,
         "className": "notehead",
         "sourceId": "l35"
       },
       {
         "kind": "line",
         "x1": 38.6228,
-        "y1": 64.165,
+        "y1": 61.165,
         "x2": 38.6228,
-        "y2": 67.497,
+        "y2": 64.497,
         "thickness": 0.12,
         "className": "stem"
       },
       {
         "kind": "line",
         "x1": 25.0897,
-        "y1": 68.165,
+        "y1": 65.165,
         "x2": 27.0697,
-        "y2": 68.165,
+        "y2": 65.165,
         "thickness": 0.16,
         "className": "ledger-line"
       },
       {
         "kind": "line",
         "x1": 25.0897,
-        "y1": 69.165,
+        "y1": 66.165,
         "x2": 27.0697,
-        "y2": 69.165,
+        "y2": 66.165,
         "thickness": 0.16,
         "className": "ledger-line"
       },
@@ -3815,16 +3815,16 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 25.4897,
-        "y": 69.165,
+        "y": 66.165,
         "className": "notehead",
         "sourceId": "l80"
       },
       {
         "kind": "line",
         "x1": 25.4897,
-        "y1": 69.333,
+        "y1": 66.333,
         "x2": 25.4897,
-        "y2": 72.665,
+        "y2": 69.665,
         "thickness": 0.12,
         "className": "stem"
       },
@@ -3832,34 +3832,34 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 29.4741,
-        "y": 67.165,
+        "y": 64.165,
         "className": "notehead",
         "sourceId": "l81"
       },
       {
         "kind": "line",
         "x1": 29.4741,
-        "y1": 67.333,
+        "y1": 64.333,
         "x2": 29.4741,
-        "y2": 70.665,
+        "y2": 67.665,
         "thickness": 0.12,
         "className": "stem"
       },
       {
         "kind": "line",
         "x1": 33.0584,
-        "y1": 68.165,
+        "y1": 65.165,
         "x2": 35.0384,
-        "y2": 68.165,
+        "y2": 65.165,
         "thickness": 0.16,
         "className": "ledger-line"
       },
       {
         "kind": "line",
         "x1": 33.0584,
-        "y1": 69.165,
+        "y1": 66.165,
         "x2": 35.0384,
-        "y2": 69.165,
+        "y2": 66.165,
         "thickness": 0.16,
         "className": "ledger-line"
       },
@@ -3867,16 +3867,16 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 33.4584,
-        "y": 69.165,
+        "y": 66.165,
         "className": "notehead",
         "sourceId": "l82"
       },
       {
         "kind": "line",
         "x1": 33.4584,
-        "y1": 69.333,
+        "y1": 66.333,
         "x2": 33.4584,
-        "y2": 72.665,
+        "y2": 69.665,
         "thickness": 0.12,
         "className": "stem"
       },
@@ -3884,16 +3884,16 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 37.4428,
-        "y": 67.165,
+        "y": 64.165,
         "className": "notehead",
         "sourceId": "l83"
       },
       {
         "kind": "line",
         "x1": 37.4428,
-        "y1": 67.333,
+        "y1": 64.333,
         "x2": 37.4428,
-        "y2": 70.665,
+        "y2": 67.665,
         "thickness": 0.12,
         "className": "stem"
       },
@@ -3901,16 +3901,16 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 25.4897,
-        "y": 81.285,
+        "y": 78.285,
         "className": "notehead",
         "sourceId": "b37"
       },
       {
         "kind": "line",
         "x1": 26.6697,
-        "y1": 77.785,
+        "y1": 74.785,
         "x2": 26.6697,
-        "y2": 81.117,
+        "y2": 78.117,
         "thickness": 0.12,
         "className": "stem"
       },
@@ -3918,16 +3918,16 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 29.4741,
-        "y": 81.285,
+        "y": 78.285,
         "className": "notehead",
         "sourceId": "b38"
       },
       {
         "kind": "line",
         "x1": 30.6541,
-        "y1": 77.785,
+        "y1": 74.785,
         "x2": 30.6541,
-        "y2": 81.117,
+        "y2": 78.117,
         "thickness": 0.12,
         "className": "stem"
       },
@@ -3935,16 +3935,16 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 33.4584,
-        "y": 81.285,
+        "y": 78.285,
         "className": "notehead",
         "sourceId": "b39"
       },
       {
         "kind": "line",
         "x1": 34.6384,
-        "y1": 77.785,
+        "y1": 74.785,
         "x2": 34.6384,
-        "y2": 81.117,
+        "y2": 78.117,
         "thickness": 0.12,
         "className": "stem"
       },
@@ -3952,36 +3952,63 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 37.4428,
-        "y": 81.285,
+        "y": 78.285,
         "className": "notehead",
         "sourceId": "b40"
       },
       {
         "kind": "line",
         "x1": 38.6228,
-        "y1": 77.785,
+        "y1": 74.785,
         "x2": 38.6228,
-        "y2": 81.117,
+        "y2": 78.117,
         "thickness": 0.12,
         "className": "stem"
       },
       {
         "kind": "line",
         "x1": 40.825,
-        "y1": 63.165,
+        "y1": 60.165,
         "x2": 40.825,
-        "y2": 67.165,
+        "y2": 64.165,
         "thickness": 0.16,
         "className": "barline"
       },
       {
         "kind": "line",
         "x1": 40.825,
-        "y1": 77.785,
+        "y1": 74.785,
         "x2": 40.825,
-        "y2": 81.785,
+        "y2": 78.785,
         "thickness": 0.16,
         "className": "barline"
+      },
+      {
+        "kind": "line",
+        "x1": 40.825,
+        "y1": 60.165,
+        "x2": 58.1625,
+        "y2": 60.165,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 40.825,
+        "y1": 61.165,
+        "x2": 58.1625,
+        "y2": 61.165,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 40.825,
+        "y1": 62.165,
+        "x2": 58.1625,
+        "y2": 62.165,
+        "thickness": 0.13,
+        "className": "staff-line"
       },
       {
         "kind": "line",
@@ -4004,27 +4031,27 @@
       {
         "kind": "line",
         "x1": 40.825,
-        "y1": 65.165,
+        "y1": 74.785,
         "x2": 58.1625,
-        "y2": 65.165,
+        "y2": 74.785,
         "thickness": 0.13,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 40.825,
-        "y1": 66.165,
+        "y1": 75.785,
         "x2": 58.1625,
-        "y2": 66.165,
+        "y2": 75.785,
         "thickness": 0.13,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 40.825,
-        "y1": 67.165,
+        "y1": 76.785,
         "x2": 58.1625,
-        "y2": 67.165,
+        "y2": 76.785,
         "thickness": 0.13,
         "className": "staff-line"
       },
@@ -4047,46 +4074,19 @@
         "className": "staff-line"
       },
       {
-        "kind": "line",
-        "x1": 40.825,
-        "y1": 79.785,
-        "x2": 58.1625,
-        "y2": 79.785,
-        "thickness": 0.13,
-        "className": "staff-line"
-      },
-      {
-        "kind": "line",
-        "x1": 40.825,
-        "y1": 80.785,
-        "x2": 58.1625,
-        "y2": 80.785,
-        "thickness": 0.13,
-        "className": "staff-line"
-      },
-      {
-        "kind": "line",
-        "x1": 40.825,
-        "y1": 81.785,
-        "x2": 58.1625,
-        "y2": 81.785,
-        "thickness": 0.13,
-        "className": "staff-line"
-      },
-      {
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 42.8272,
-        "y": 67.165,
+        "y": 64.165,
         "className": "notehead",
         "sourceId": "l36"
       },
       {
         "kind": "line",
         "x1": 44.0072,
-        "y1": 63.665,
+        "y1": 60.665,
         "x2": 44.0072,
-        "y2": 66.997,
+        "y2": 63.997,
         "thickness": 0.12,
         "className": "stem"
       },
@@ -4094,16 +4094,16 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 46.8116,
-        "y": 66.165,
+        "y": 63.165,
         "className": "notehead",
         "sourceId": "l37"
       },
       {
         "kind": "line",
         "x1": 47.9916,
-        "y1": 62.665,
+        "y1": 59.665,
         "x2": 47.9916,
-        "y2": 65.997,
+        "y2": 62.997,
         "thickness": 0.12,
         "className": "stem"
       },
@@ -4111,16 +4111,16 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 50.7959,
-        "y": 65.665,
+        "y": 62.665,
         "className": "notehead",
         "sourceId": "l38"
       },
       {
         "kind": "line",
         "x1": 51.9759,
-        "y1": 62.165,
+        "y1": 59.165,
         "x2": 51.9759,
-        "y2": 65.497,
+        "y2": 62.497,
         "thickness": 0.12,
         "className": "stem"
       },
@@ -4128,43 +4128,43 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 54.7803,
-        "y": 65.165,
+        "y": 62.165,
         "className": "notehead",
         "sourceId": "l39"
       },
       {
         "kind": "line",
         "x1": 55.9603,
-        "y1": 61.665,
+        "y1": 58.665,
         "x2": 55.9603,
-        "y2": 64.997,
+        "y2": 61.997,
         "thickness": 0.12,
         "className": "stem"
       },
       {
         "kind": "line",
         "x1": 42.4272,
-        "y1": 68.165,
+        "y1": 65.165,
         "x2": 44.4072,
-        "y2": 68.165,
+        "y2": 65.165,
         "thickness": 0.16,
         "className": "ledger-line"
       },
       {
         "kind": "line",
         "x1": 42.4272,
-        "y1": 69.165,
+        "y1": 66.165,
         "x2": 44.4072,
-        "y2": 69.165,
+        "y2": 66.165,
         "thickness": 0.16,
         "className": "ledger-line"
       },
       {
         "kind": "line",
         "x1": 42.4272,
-        "y1": 70.165,
+        "y1": 67.165,
         "x2": 44.4072,
-        "y2": 70.165,
+        "y2": 67.165,
         "thickness": 0.16,
         "className": "ledger-line"
       },
@@ -4172,25 +4172,25 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 42.8272,
-        "y": 70.665,
+        "y": 67.665,
         "className": "notehead",
         "sourceId": "l84"
       },
       {
         "kind": "line",
         "x1": 42.8272,
-        "y1": 70.833,
+        "y1": 67.833,
         "x2": 42.8272,
-        "y2": 74.165,
+        "y2": 71.165,
         "thickness": 0.12,
         "className": "stem"
       },
       {
         "kind": "line",
         "x1": 46.4116,
-        "y1": 68.165,
+        "y1": 65.165,
         "x2": 48.3916,
-        "y2": 68.165,
+        "y2": 65.165,
         "thickness": 0.16,
         "className": "ledger-line"
       },
@@ -4198,43 +4198,43 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 46.8116,
-        "y": 68.665,
+        "y": 65.665,
         "className": "notehead",
         "sourceId": "l85"
       },
       {
         "kind": "line",
         "x1": 46.8116,
-        "y1": 68.833,
+        "y1": 65.833,
         "x2": 46.8116,
-        "y2": 72.165,
+        "y2": 69.165,
         "thickness": 0.12,
         "className": "stem"
       },
       {
         "kind": "line",
         "x1": 50.3959,
-        "y1": 68.165,
+        "y1": 65.165,
         "x2": 52.3759,
-        "y2": 68.165,
+        "y2": 65.165,
         "thickness": 0.16,
         "className": "ledger-line"
       },
       {
         "kind": "line",
         "x1": 50.3959,
-        "y1": 69.165,
+        "y1": 66.165,
         "x2": 52.3759,
-        "y2": 69.165,
+        "y2": 66.165,
         "thickness": 0.16,
         "className": "ledger-line"
       },
       {
         "kind": "line",
         "x1": 50.3959,
-        "y1": 70.165,
+        "y1": 67.165,
         "x2": 52.3759,
-        "y2": 70.165,
+        "y2": 67.165,
         "thickness": 0.16,
         "className": "ledger-line"
       },
@@ -4242,25 +4242,25 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 50.7959,
-        "y": 70.665,
+        "y": 67.665,
         "className": "notehead",
         "sourceId": "l86"
       },
       {
         "kind": "line",
         "x1": 50.7959,
-        "y1": 70.833,
+        "y1": 67.833,
         "x2": 50.7959,
-        "y2": 74.165,
+        "y2": 71.165,
         "thickness": 0.12,
         "className": "stem"
       },
       {
         "kind": "line",
         "x1": 54.3803,
-        "y1": 68.165,
+        "y1": 65.165,
         "x2": 56.3603,
-        "y2": 68.165,
+        "y2": 65.165,
         "thickness": 0.16,
         "className": "ledger-line"
       },
@@ -4268,25 +4268,25 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 54.7803,
-        "y": 68.665,
+        "y": 65.665,
         "className": "notehead",
         "sourceId": "l87"
       },
       {
         "kind": "line",
         "x1": 54.7803,
-        "y1": 68.833,
+        "y1": 65.833,
         "x2": 54.7803,
-        "y2": 72.165,
+        "y2": 69.165,
         "thickness": 0.12,
         "className": "stem"
       },
       {
         "kind": "line",
         "x1": 42.4272,
-        "y1": 82.785,
+        "y1": 79.785,
         "x2": 44.4072,
-        "y2": 82.785,
+        "y2": 79.785,
         "thickness": 0.16,
         "className": "ledger-line"
       },
@@ -4294,25 +4294,25 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 42.8272,
-        "y": 82.785,
+        "y": 79.785,
         "className": "notehead",
         "sourceId": "b41"
       },
       {
         "kind": "line",
         "x1": 44.0072,
-        "y1": 79.285,
+        "y1": 76.285,
         "x2": 44.0072,
-        "y2": 82.617,
+        "y2": 79.617,
         "thickness": 0.12,
         "className": "stem"
       },
       {
         "kind": "line",
         "x1": 46.4116,
-        "y1": 82.785,
+        "y1": 79.785,
         "x2": 48.3916,
-        "y2": 82.785,
+        "y2": 79.785,
         "thickness": 0.16,
         "className": "ledger-line"
       },
@@ -4320,25 +4320,25 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 46.8116,
-        "y": 82.785,
+        "y": 79.785,
         "className": "notehead",
         "sourceId": "b42"
       },
       {
         "kind": "line",
         "x1": 47.9916,
-        "y1": 79.285,
+        "y1": 76.285,
         "x2": 47.9916,
-        "y2": 82.617,
+        "y2": 79.617,
         "thickness": 0.12,
         "className": "stem"
       },
       {
         "kind": "line",
         "x1": 50.3959,
-        "y1": 82.785,
+        "y1": 79.785,
         "x2": 52.3759,
-        "y2": 82.785,
+        "y2": 79.785,
         "thickness": 0.16,
         "className": "ledger-line"
       },
@@ -4346,25 +4346,25 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 50.7959,
-        "y": 82.785,
+        "y": 79.785,
         "className": "notehead",
         "sourceId": "b43"
       },
       {
         "kind": "line",
         "x1": 51.9759,
-        "y1": 79.285,
+        "y1": 76.285,
         "x2": 51.9759,
-        "y2": 82.617,
+        "y2": 79.617,
         "thickness": 0.12,
         "className": "stem"
       },
       {
         "kind": "line",
         "x1": 54.3803,
-        "y1": 82.785,
+        "y1": 79.785,
         "x2": 56.3603,
-        "y2": 82.785,
+        "y2": 79.785,
         "thickness": 0.16,
         "className": "ledger-line"
       },
@@ -4372,36 +4372,63 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 54.7803,
-        "y": 82.785,
+        "y": 79.785,
         "className": "notehead",
         "sourceId": "b44"
       },
       {
         "kind": "line",
         "x1": 55.9603,
-        "y1": 79.285,
+        "y1": 76.285,
         "x2": 55.9603,
-        "y2": 82.617,
+        "y2": 79.617,
         "thickness": 0.12,
         "className": "stem"
       },
       {
         "kind": "line",
         "x1": 58.1625,
-        "y1": 63.165,
+        "y1": 60.165,
         "x2": 58.1625,
-        "y2": 67.165,
+        "y2": 64.165,
         "thickness": 0.16,
         "className": "barline"
       },
       {
         "kind": "line",
         "x1": 58.1625,
-        "y1": 77.785,
+        "y1": 74.785,
         "x2": 58.1625,
-        "y2": 81.785,
+        "y2": 78.785,
         "thickness": 0.16,
         "className": "barline"
+      },
+      {
+        "kind": "line",
+        "x1": 58.1625,
+        "y1": 60.165,
+        "x2": 76.1211,
+        "y2": 60.165,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 58.1625,
+        "y1": 61.165,
+        "x2": 76.1211,
+        "y2": 61.165,
+        "thickness": 0.13,
+        "className": "staff-line"
+      },
+      {
+        "kind": "line",
+        "x1": 58.1625,
+        "y1": 62.165,
+        "x2": 76.1211,
+        "y2": 62.165,
+        "thickness": 0.13,
+        "className": "staff-line"
       },
       {
         "kind": "line",
@@ -4424,27 +4451,27 @@
       {
         "kind": "line",
         "x1": 58.1625,
-        "y1": 65.165,
+        "y1": 74.785,
         "x2": 76.1211,
-        "y2": 65.165,
+        "y2": 74.785,
         "thickness": 0.13,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 58.1625,
-        "y1": 66.165,
+        "y1": 75.785,
         "x2": 76.1211,
-        "y2": 66.165,
+        "y2": 75.785,
         "thickness": 0.13,
         "className": "staff-line"
       },
       {
         "kind": "line",
         "x1": 58.1625,
-        "y1": 67.165,
+        "y1": 76.785,
         "x2": 76.1211,
-        "y2": 67.165,
+        "y2": 76.785,
         "thickness": 0.13,
         "className": "staff-line"
       },
@@ -4463,33 +4490,6 @@
         "y1": 78.785,
         "x2": 76.1211,
         "y2": 78.785,
-        "thickness": 0.13,
-        "className": "staff-line"
-      },
-      {
-        "kind": "line",
-        "x1": 58.1625,
-        "y1": 79.785,
-        "x2": 76.1211,
-        "y2": 79.785,
-        "thickness": 0.13,
-        "className": "staff-line"
-      },
-      {
-        "kind": "line",
-        "x1": 58.1625,
-        "y1": 80.785,
-        "x2": 76.1211,
-        "y2": 80.785,
-        "thickness": 0.13,
-        "className": "staff-line"
-      },
-      {
-        "kind": "line",
-        "x1": 58.1625,
-        "y1": 81.785,
-        "x2": 76.1211,
-        "y2": 81.785,
         "thickness": 0.13,
         "className": "staff-line"
       },
@@ -4497,7 +4497,7 @@
         "kind": "glyph",
         "glyph": "noteheadHalf",
         "x": 60.7858,
-        "y": 63.665,
+        "y": 60.665,
         "className": "notehead",
         "sourceId": "l40"
       },
@@ -4505,16 +4505,16 @@
         "kind": "glyph",
         "glyph": "noteheadHalf",
         "x": 60.7858,
-        "y": 62.665,
+        "y": 59.665,
         "className": "notehead",
         "sourceId": "l41"
       },
       {
         "kind": "line",
         "x1": 61.9658,
-        "y1": 59.165,
+        "y1": 56.165,
         "x2": 61.9658,
-        "y2": 63.497,
+        "y2": 60.497,
         "thickness": 0.12,
         "className": "stem"
       },
@@ -4522,16 +4522,16 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 68.7545,
-        "y": 64.165,
+        "y": 61.165,
         "className": "notehead",
         "sourceId": "l42"
       },
       {
         "kind": "line",
         "x1": 69.9345,
-        "y1": 60.665,
+        "y1": 57.665,
         "x2": 69.9345,
-        "y2": 63.997,
+        "y2": 60.997,
         "thickness": 0.12,
         "className": "stem"
       },
@@ -4539,25 +4539,25 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 72.7389,
-        "y": 65.165,
+        "y": 62.165,
         "className": "notehead",
         "sourceId": "l43"
       },
       {
         "kind": "line",
         "x1": 73.9189,
-        "y1": 61.665,
+        "y1": 58.665,
         "x2": 73.9189,
-        "y2": 64.997,
+        "y2": 61.997,
         "thickness": 0.12,
         "className": "stem"
       },
       {
         "kind": "line",
         "x1": 60.3858,
-        "y1": 68.165,
+        "y1": 65.165,
         "x2": 62.3658,
-        "y2": 68.165,
+        "y2": 65.165,
         "thickness": 0.16,
         "className": "ledger-line"
       },
@@ -4565,16 +4565,16 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 60.7858,
-        "y": 68.665,
+        "y": 65.665,
         "className": "notehead",
         "sourceId": "l88"
       },
       {
         "kind": "line",
         "x1": 60.7858,
-        "y1": 68.833,
+        "y1": 65.833,
         "x2": 60.7858,
-        "y2": 72.165,
+        "y2": 69.165,
         "thickness": 0.12,
         "className": "stem"
       },
@@ -4582,25 +4582,25 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 64.7702,
-        "y": 66.665,
+        "y": 63.665,
         "className": "notehead",
         "sourceId": "l89"
       },
       {
         "kind": "line",
         "x1": 64.7702,
-        "y1": 66.833,
+        "y1": 63.833,
         "x2": 64.7702,
-        "y2": 70.165,
+        "y2": 67.165,
         "thickness": 0.12,
         "className": "stem"
       },
       {
         "kind": "line",
         "x1": 68.3545,
-        "y1": 68.165,
+        "y1": 65.165,
         "x2": 70.3345,
-        "y2": 68.165,
+        "y2": 65.165,
         "thickness": 0.16,
         "className": "ledger-line"
       },
@@ -4608,16 +4608,16 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 68.7545,
-        "y": 68.665,
+        "y": 65.665,
         "className": "notehead",
         "sourceId": "l90"
       },
       {
         "kind": "line",
         "x1": 68.7545,
-        "y1": 68.833,
+        "y1": 65.833,
         "x2": 68.7545,
-        "y2": 72.165,
+        "y2": 69.165,
         "thickness": 0.12,
         "className": "stem"
       },
@@ -4625,16 +4625,16 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 72.7389,
-        "y": 66.665,
+        "y": 63.665,
         "className": "notehead",
         "sourceId": "l91"
       },
       {
         "kind": "line",
         "x1": 72.7389,
-        "y1": 66.833,
+        "y1": 63.833,
         "x2": 72.7389,
-        "y2": 70.165,
+        "y2": 67.165,
         "thickness": 0.12,
         "className": "stem"
       },
@@ -4642,16 +4642,16 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 60.7858,
-        "y": 80.785,
+        "y": 77.785,
         "className": "notehead",
         "sourceId": "b45"
       },
       {
         "kind": "line",
         "x1": 61.9658,
-        "y1": 77.285,
+        "y1": 74.285,
         "x2": 61.9658,
-        "y2": 80.617,
+        "y2": 77.617,
         "thickness": 0.12,
         "className": "stem"
       },
@@ -4659,16 +4659,16 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 64.7702,
-        "y": 80.785,
+        "y": 77.785,
         "className": "notehead",
         "sourceId": "b46"
       },
       {
         "kind": "line",
         "x1": 65.9502,
-        "y1": 77.285,
+        "y1": 74.285,
         "x2": 65.9502,
-        "y2": 80.617,
+        "y2": 77.617,
         "thickness": 0.12,
         "className": "stem"
       },
@@ -4676,16 +4676,16 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 68.7545,
-        "y": 80.785,
+        "y": 77.785,
         "className": "notehead",
         "sourceId": "b47"
       },
       {
         "kind": "line",
         "x1": 69.9345,
-        "y1": 77.285,
+        "y1": 74.285,
         "x2": 69.9345,
-        "y2": 80.617,
+        "y2": 77.617,
         "thickness": 0.12,
         "className": "stem"
       },
@@ -4693,32 +4693,32 @@
         "kind": "glyph",
         "glyph": "noteheadBlack",
         "x": 72.7389,
-        "y": 80.785,
+        "y": 77.785,
         "className": "notehead",
         "sourceId": "b48"
       },
       {
         "kind": "line",
         "x1": 73.9189,
-        "y1": 77.285,
+        "y1": 74.285,
         "x2": 73.9189,
-        "y2": 80.617,
+        "y2": 77.617,
         "thickness": 0.12,
         "className": "stem"
       },
       {
         "kind": "line",
         "x1": 75.3211,
-        "y1": 63.165,
+        "y1": 60.165,
         "x2": 75.3211,
-        "y2": 67.165,
+        "y2": 64.165,
         "thickness": 0.16,
         "className": "barline barline-final-thin"
       },
       {
         "kind": "rect",
         "x": 75.6211,
-        "y": 63.165,
+        "y": 60.165,
         "w": 0.5,
         "h": 4,
         "fill": "currentColor",
@@ -4727,16 +4727,16 @@
       {
         "kind": "line",
         "x1": 75.3211,
-        "y1": 77.785,
+        "y1": 74.785,
         "x2": 75.3211,
-        "y2": 81.785,
+        "y2": 78.785,
         "thickness": 0.16,
         "className": "barline barline-final-thin"
       },
       {
         "kind": "rect",
         "x": 75.6211,
-        "y": 77.785,
+        "y": 74.785,
         "w": 0.5,
         "h": 4,
         "fill": "currentColor",
@@ -4745,27 +4745,27 @@
       {
         "kind": "line",
         "x1": 26.6036,
-        "y1": 35.852,
+        "y1": 34.352,
         "x2": 26.6036,
-        "y2": 33.27,
+        "y2": 31.77,
         "thickness": 0.12,
         "className": "stem"
       },
       {
         "kind": "line",
         "x1": 29.3385,
-        "y1": 35.352,
+        "y1": 33.852,
         "x2": 29.3385,
-        "y2": 33.02,
+        "y2": 31.52,
         "thickness": 0.12,
         "className": "stem"
       },
       {
         "kind": "line",
         "x1": 26.5436,
-        "y1": 33.27,
+        "y1": 31.77,
         "x2": 29.3985,
-        "y2": 33.02,
+        "y2": 31.52,
         "thickness": 0.5,
         "className": "beam"
       },
@@ -4784,7 +4784,7 @@
         "kind": "text",
         "text": "Turnaround",
         "x": 8.1422,
-        "y": 59.105,
+        "y": 56.105,
         "font": "body",
         "size": 1.5,
         "weight": "bold",

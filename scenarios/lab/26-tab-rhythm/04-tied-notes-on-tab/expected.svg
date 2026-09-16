@@ -1,4 +1,4 @@
-<svg width="1280" height="514.4256" viewBox="0 0 1280 514.4256" xmlns="http://www.w3.org/2000/svg">
+<svg width="1280" height="490.4256" viewBox="0 0 1280 490.4256" xmlns="http://www.w3.org/2000/svg">
 <style>:where(svg>text){font-family:Bravura;fill:currentColor}:where(svg>line,svg>path){stroke:currentColor}</style>
 <line x1="32" y1="128" x2="385.1376" y2="128" stroke-width="2.08" class="staff-line"></line>
 <line x1="32" y1="144" x2="385.1376" y2="144" stroke-width="2.08" class="staff-line"></line>
@@ -50,50 +50,50 @@
 <text x="1149.0672" y="160" font-size="64" class="notehead" data-source-id="n21"></text>
 <text x="1200.1952" y="176" font-size="64" class="notehead" data-source-id="n22"></text>
 <line x1="1248" y1="128" x2="1248" y2="192" stroke-width="2.56" class="barline"></line>
-<line x1="32" y1="322.4256" x2="465.6" y2="322.4256" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="338.4256" x2="465.6" y2="338.4256" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="354.4256" x2="465.6" y2="354.4256" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="370.4256" x2="465.6" y2="370.4256" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="386.4256" x2="465.6" y2="386.4256" stroke-width="2.08" class="staff-line"></line>
-<text x="36" y="370.4256" font-size="64" class="clef"></text>
-<text x="97.6096" y="370.4256" font-size="64" class="notehead" data-source-id="n23"></text>
-<text x="143.7104" y="394.4256" font-size="64" class="notehead" data-source-id="n24"></text>
-<text x="189.8096" y="354.4256" font-size="64" class="notehead" data-source-id="n25"></text>
-<text x="235.9104" y="394.4256" font-size="64" class="notehead" data-source-id="n26"></text>
-<text x="282.0096" y="370.4256" font-size="64" class="notehead" data-source-id="n27"></text>
-<text x="328.1104" y="394.4256" font-size="64" class="notehead" data-source-id="n28"></text>
-<text x="374.2096" y="354.4256" font-size="64" class="notehead" data-source-id="n29"></text>
-<text x="420.3104" y="370.4256" font-size="64" class="notehead" data-source-id="n30"></text>
-<line x1="465.6" y1="322.4256" x2="465.6" y2="386.4256" stroke-width="2.56" class="barline"></line>
-<line x1="465.6" y1="322.4256" x2="856.8" y2="322.4256" stroke-width="2.08" class="staff-line"></line>
-<line x1="465.6" y1="338.4256" x2="856.8" y2="338.4256" stroke-width="2.08" class="staff-line"></line>
-<line x1="465.6" y1="354.4256" x2="856.8" y2="354.4256" stroke-width="2.08" class="staff-line"></line>
-<line x1="465.6" y1="370.4256" x2="856.8" y2="370.4256" stroke-width="2.08" class="staff-line"></line>
-<line x1="465.6" y1="386.4256" x2="856.8" y2="386.4256" stroke-width="2.08" class="staff-line"></line>
-<text x="488.8096" y="370.4256" font-size="64" class="notehead" data-source-id="n31"></text>
-<text x="534.9104" y="394.4256" font-size="64" class="notehead" data-source-id="n32"></text>
-<text x="581.0096" y="354.4256" font-size="64" class="notehead" data-source-id="n33"></text>
-<text x="627.1104" y="394.4256" font-size="64" class="notehead" data-source-id="n34"></text>
-<text x="673.2096" y="370.4256" font-size="64" class="notehead" data-source-id="n35"></text>
-<text x="719.3104" y="394.4256" font-size="64" class="notehead" data-source-id="n36"></text>
-<text x="765.4096" y="354.4256" font-size="64" class="notehead" data-source-id="n37"></text>
-<text x="811.5104" y="370.4256" font-size="64" class="notehead" data-source-id="n38"></text>
-<line x1="856.8" y1="322.4256" x2="856.8" y2="386.4256" stroke-width="2.56" class="barline"></line>
-<line x1="856.8" y1="322.4256" x2="1248" y2="322.4256" stroke-width="2.08" class="staff-line"></line>
-<line x1="856.8" y1="338.4256" x2="1248" y2="338.4256" stroke-width="2.08" class="staff-line"></line>
-<line x1="856.8" y1="354.4256" x2="1248" y2="354.4256" stroke-width="2.08" class="staff-line"></line>
-<line x1="856.8" y1="370.4256" x2="1248" y2="370.4256" stroke-width="2.08" class="staff-line"></line>
-<line x1="856.8" y1="386.4256" x2="1248" y2="386.4256" stroke-width="2.08" class="staff-line"></line>
-<text x="880.0096" y="370.4256" font-size="64" class="notehead" data-source-id="n39"></text>
-<text x="926.1104" y="394.4256" font-size="64" class="notehead" data-source-id="n40"></text>
-<text x="972.2096" y="354.4256" font-size="64" class="notehead" data-source-id="n41"></text>
-<text x="1018.3104" y="394.4256" font-size="64" class="notehead" data-source-id="n42"></text>
-<text x="1064.4096" y="370.4256" font-size="64" class="notehead" data-source-id="n43"></text>
-<text x="1110.5104" y="394.4256" font-size="64" class="notehead" data-source-id="n44"></text>
-<text x="1156.6096" y="354.4256" font-size="64" class="notehead" data-source-id="n45"></text>
-<text x="1202.7104" y="370.4256" font-size="64" class="notehead" data-source-id="n46"></text>
-<line x1="1235.2" y1="322.4256" x2="1235.2" y2="386.4256" stroke-width="2.56" class="barline barline-final-thin"></line>
-<rect x="1240" y="322.4256" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
+<line x1="32" y1="298.4256" x2="465.6" y2="298.4256" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="314.4256" x2="465.6" y2="314.4256" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="330.4256" x2="465.6" y2="330.4256" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="346.4256" x2="465.6" y2="346.4256" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="362.4256" x2="465.6" y2="362.4256" stroke-width="2.08" class="staff-line"></line>
+<text x="36" y="346.4256" font-size="64" class="clef"></text>
+<text x="97.6096" y="346.4256" font-size="64" class="notehead" data-source-id="n23"></text>
+<text x="143.7104" y="370.4256" font-size="64" class="notehead" data-source-id="n24"></text>
+<text x="189.8096" y="330.4256" font-size="64" class="notehead" data-source-id="n25"></text>
+<text x="235.9104" y="370.4256" font-size="64" class="notehead" data-source-id="n26"></text>
+<text x="282.0096" y="346.4256" font-size="64" class="notehead" data-source-id="n27"></text>
+<text x="328.1104" y="370.4256" font-size="64" class="notehead" data-source-id="n28"></text>
+<text x="374.2096" y="330.4256" font-size="64" class="notehead" data-source-id="n29"></text>
+<text x="420.3104" y="346.4256" font-size="64" class="notehead" data-source-id="n30"></text>
+<line x1="465.6" y1="298.4256" x2="465.6" y2="362.4256" stroke-width="2.56" class="barline"></line>
+<line x1="465.6" y1="298.4256" x2="856.8" y2="298.4256" stroke-width="2.08" class="staff-line"></line>
+<line x1="465.6" y1="314.4256" x2="856.8" y2="314.4256" stroke-width="2.08" class="staff-line"></line>
+<line x1="465.6" y1="330.4256" x2="856.8" y2="330.4256" stroke-width="2.08" class="staff-line"></line>
+<line x1="465.6" y1="346.4256" x2="856.8" y2="346.4256" stroke-width="2.08" class="staff-line"></line>
+<line x1="465.6" y1="362.4256" x2="856.8" y2="362.4256" stroke-width="2.08" class="staff-line"></line>
+<text x="488.8096" y="346.4256" font-size="64" class="notehead" data-source-id="n31"></text>
+<text x="534.9104" y="370.4256" font-size="64" class="notehead" data-source-id="n32"></text>
+<text x="581.0096" y="330.4256" font-size="64" class="notehead" data-source-id="n33"></text>
+<text x="627.1104" y="370.4256" font-size="64" class="notehead" data-source-id="n34"></text>
+<text x="673.2096" y="346.4256" font-size="64" class="notehead" data-source-id="n35"></text>
+<text x="719.3104" y="370.4256" font-size="64" class="notehead" data-source-id="n36"></text>
+<text x="765.4096" y="330.4256" font-size="64" class="notehead" data-source-id="n37"></text>
+<text x="811.5104" y="346.4256" font-size="64" class="notehead" data-source-id="n38"></text>
+<line x1="856.8" y1="298.4256" x2="856.8" y2="362.4256" stroke-width="2.56" class="barline"></line>
+<line x1="856.8" y1="298.4256" x2="1248" y2="298.4256" stroke-width="2.08" class="staff-line"></line>
+<line x1="856.8" y1="314.4256" x2="1248" y2="314.4256" stroke-width="2.08" class="staff-line"></line>
+<line x1="856.8" y1="330.4256" x2="1248" y2="330.4256" stroke-width="2.08" class="staff-line"></line>
+<line x1="856.8" y1="346.4256" x2="1248" y2="346.4256" stroke-width="2.08" class="staff-line"></line>
+<line x1="856.8" y1="362.4256" x2="1248" y2="362.4256" stroke-width="2.08" class="staff-line"></line>
+<text x="880.0096" y="346.4256" font-size="64" class="notehead" data-source-id="n39"></text>
+<text x="926.1104" y="370.4256" font-size="64" class="notehead" data-source-id="n40"></text>
+<text x="972.2096" y="330.4256" font-size="64" class="notehead" data-source-id="n41"></text>
+<text x="1018.3104" y="370.4256" font-size="64" class="notehead" data-source-id="n42"></text>
+<text x="1064.4096" y="346.4256" font-size="64" class="notehead" data-source-id="n43"></text>
+<text x="1110.5104" y="370.4256" font-size="64" class="notehead" data-source-id="n44"></text>
+<text x="1156.6096" y="330.4256" font-size="64" class="notehead" data-source-id="n45"></text>
+<text x="1202.7104" y="346.4256" font-size="64" class="notehead" data-source-id="n46"></text>
+<line x1="1235.2" y1="298.4256" x2="1235.2" y2="362.4256" stroke-width="2.56" class="barline barline-final-thin"></line>
+<rect x="1240" y="298.4256" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
 <line x1="429.7424" y1="173.312" x2="429.7424" y2="120" stroke-width="1.92" class="stem"></line>
 <line x1="480.8704" y1="197.312" x2="480.8704" y2="120" stroke-width="1.92" class="stem"></line>
 <line x1="532" y1="157.312" x2="532" y2="120" stroke-width="1.92" class="stem"></line>
@@ -114,42 +114,42 @@
 <line x1="1167.9472" y1="157.312" x2="1167.9472" y2="120" stroke-width="1.92" class="stem"></line>
 <line x1="1219.0752" y1="173.312" x2="1219.0752" y2="120" stroke-width="1.92" class="stem"></line>
 <line x1="1064.7296" y1="120" x2="1220.0352" y2="120" stroke-width="8" class="beam"></line>
-<line x1="116.4896" y1="367.7376" x2="116.4896" y2="314.4256" stroke-width="1.92" class="stem"></line>
-<line x1="162.5904" y1="391.7376" x2="162.5904" y2="314.4256" stroke-width="1.92" class="stem"></line>
-<line x1="208.6896" y1="351.7376" x2="208.6896" y2="314.4256" stroke-width="1.92" class="stem"></line>
-<line x1="254.7904" y1="391.7376" x2="254.7904" y2="314.4256" stroke-width="1.92" class="stem"></line>
-<line x1="115.5296" y1="314.4256" x2="255.7504" y2="314.4256" stroke-width="8" class="beam"></line>
-<line x1="300.8896" y1="367.7376" x2="300.8896" y2="314.4256" stroke-width="1.92" class="stem"></line>
-<line x1="346.9904" y1="391.7376" x2="346.9904" y2="314.4256" stroke-width="1.92" class="stem"></line>
-<line x1="393.0896" y1="351.7376" x2="393.0896" y2="314.4256" stroke-width="1.92" class="stem"></line>
-<line x1="439.1904" y1="367.7376" x2="439.1904" y2="314.4256" stroke-width="1.92" class="stem"></line>
-<line x1="299.9296" y1="314.4256" x2="440.1504" y2="314.4256" stroke-width="8" class="beam"></line>
-<line x1="507.6896" y1="367.7376" x2="507.6896" y2="314.4256" stroke-width="1.92" class="stem"></line>
-<line x1="553.7904" y1="391.7376" x2="553.7904" y2="314.4256" stroke-width="1.92" class="stem"></line>
-<line x1="599.8896" y1="351.7376" x2="599.8896" y2="314.4256" stroke-width="1.92" class="stem"></line>
-<line x1="645.9904" y1="391.7376" x2="645.9904" y2="314.4256" stroke-width="1.92" class="stem"></line>
-<line x1="506.7296" y1="314.4256" x2="646.9504" y2="314.4256" stroke-width="8" class="beam"></line>
-<line x1="692.0896" y1="367.7376" x2="692.0896" y2="314.4256" stroke-width="1.92" class="stem"></line>
-<line x1="738.1904" y1="391.7376" x2="738.1904" y2="314.4256" stroke-width="1.92" class="stem"></line>
-<line x1="784.2896" y1="351.7376" x2="784.2896" y2="314.4256" stroke-width="1.92" class="stem"></line>
-<line x1="830.3904" y1="367.7376" x2="830.3904" y2="314.4256" stroke-width="1.92" class="stem"></line>
-<line x1="691.1296" y1="314.4256" x2="831.3504" y2="314.4256" stroke-width="8" class="beam"></line>
-<line x1="898.8896" y1="367.7376" x2="898.8896" y2="314.4256" stroke-width="1.92" class="stem"></line>
-<line x1="944.9904" y1="391.7376" x2="944.9904" y2="314.4256" stroke-width="1.92" class="stem"></line>
-<line x1="991.0896" y1="351.7376" x2="991.0896" y2="314.4256" stroke-width="1.92" class="stem"></line>
-<line x1="1037.1904" y1="391.7376" x2="1037.1904" y2="314.4256" stroke-width="1.92" class="stem"></line>
-<line x1="897.9296" y1="314.4256" x2="1038.1504" y2="314.4256" stroke-width="8" class="beam"></line>
-<line x1="1083.2896" y1="367.7376" x2="1083.2896" y2="314.4256" stroke-width="1.92" class="stem"></line>
-<line x1="1129.3904" y1="391.7376" x2="1129.3904" y2="314.4256" stroke-width="1.92" class="stem"></line>
-<line x1="1175.4896" y1="351.7376" x2="1175.4896" y2="314.4256" stroke-width="1.92" class="stem"></line>
-<line x1="1221.5904" y1="367.7376" x2="1221.5904" y2="314.4256" stroke-width="1.92" class="stem"></line>
-<line x1="1082.3296" y1="314.4256" x2="1222.5504" y2="314.4256" stroke-width="8" class="beam"></line>
+<line x1="116.4896" y1="343.7376" x2="116.4896" y2="290.4256" stroke-width="1.92" class="stem"></line>
+<line x1="162.5904" y1="367.7376" x2="162.5904" y2="290.4256" stroke-width="1.92" class="stem"></line>
+<line x1="208.6896" y1="327.7376" x2="208.6896" y2="290.4256" stroke-width="1.92" class="stem"></line>
+<line x1="254.7904" y1="367.7376" x2="254.7904" y2="290.4256" stroke-width="1.92" class="stem"></line>
+<line x1="115.5296" y1="290.4256" x2="255.7504" y2="290.4256" stroke-width="8" class="beam"></line>
+<line x1="300.8896" y1="343.7376" x2="300.8896" y2="290.4256" stroke-width="1.92" class="stem"></line>
+<line x1="346.9904" y1="367.7376" x2="346.9904" y2="290.4256" stroke-width="1.92" class="stem"></line>
+<line x1="393.0896" y1="327.7376" x2="393.0896" y2="290.4256" stroke-width="1.92" class="stem"></line>
+<line x1="439.1904" y1="343.7376" x2="439.1904" y2="290.4256" stroke-width="1.92" class="stem"></line>
+<line x1="299.9296" y1="290.4256" x2="440.1504" y2="290.4256" stroke-width="8" class="beam"></line>
+<line x1="507.6896" y1="343.7376" x2="507.6896" y2="290.4256" stroke-width="1.92" class="stem"></line>
+<line x1="553.7904" y1="367.7376" x2="553.7904" y2="290.4256" stroke-width="1.92" class="stem"></line>
+<line x1="599.8896" y1="327.7376" x2="599.8896" y2="290.4256" stroke-width="1.92" class="stem"></line>
+<line x1="645.9904" y1="367.7376" x2="645.9904" y2="290.4256" stroke-width="1.92" class="stem"></line>
+<line x1="506.7296" y1="290.4256" x2="646.9504" y2="290.4256" stroke-width="8" class="beam"></line>
+<line x1="692.0896" y1="343.7376" x2="692.0896" y2="290.4256" stroke-width="1.92" class="stem"></line>
+<line x1="738.1904" y1="367.7376" x2="738.1904" y2="290.4256" stroke-width="1.92" class="stem"></line>
+<line x1="784.2896" y1="327.7376" x2="784.2896" y2="290.4256" stroke-width="1.92" class="stem"></line>
+<line x1="830.3904" y1="343.7376" x2="830.3904" y2="290.4256" stroke-width="1.92" class="stem"></line>
+<line x1="691.1296" y1="290.4256" x2="831.3504" y2="290.4256" stroke-width="8" class="beam"></line>
+<line x1="898.8896" y1="343.7376" x2="898.8896" y2="290.4256" stroke-width="1.92" class="stem"></line>
+<line x1="944.9904" y1="367.7376" x2="944.9904" y2="290.4256" stroke-width="1.92" class="stem"></line>
+<line x1="991.0896" y1="327.7376" x2="991.0896" y2="290.4256" stroke-width="1.92" class="stem"></line>
+<line x1="1037.1904" y1="367.7376" x2="1037.1904" y2="290.4256" stroke-width="1.92" class="stem"></line>
+<line x1="897.9296" y1="290.4256" x2="1038.1504" y2="290.4256" stroke-width="8" class="beam"></line>
+<line x1="1083.2896" y1="343.7376" x2="1083.2896" y2="290.4256" stroke-width="1.92" class="stem"></line>
+<line x1="1129.3904" y1="367.7376" x2="1129.3904" y2="290.4256" stroke-width="1.92" class="stem"></line>
+<line x1="1175.4896" y1="327.7376" x2="1175.4896" y2="290.4256" stroke-width="1.92" class="stem"></line>
+<line x1="1221.5904" y1="343.7376" x2="1221.5904" y2="290.4256" stroke-width="1.92" class="stem"></line>
+<line x1="1082.3296" y1="290.4256" x2="1222.5504" y2="290.4256" stroke-width="8" class="beam"></line>
 <path d="M 176.7296 240.8 C 192.0464 251.6203, 212.4688 251.6203, 227.7872 240.8 C 212.4688 249.4869, 192.0464 249.4869, 176.7296 240.8 Z" fill="currentColor" stroke-width="1.6" stroke-linejoin="round" class="tie"></path>
 <path d="M 254.9872 208.8 C 270.304 219.6203, 290.7264 219.6203, 306.0448 208.8 C 290.7264 217.4869, 270.304 217.4869, 254.9872 208.8 Z" fill="currentColor" stroke-width="1.6" stroke-linejoin="round" class="tie"></path>
 <path d="M 333.2448 184.8 C 355.2816 196.7403, 384.6656 196.7403, 406.7024 184.8 C 384.6656 194.6069, 355.2816 194.6069, 333.2448 184.8 Z" fill="currentColor" stroke-width="1.6" stroke-linejoin="round" class="tie"></path>
 <path d="M 791.8048 184.8 C 805.7024 195.3835, 824.2352 195.3835, 838.1328 184.8 C 824.2352 193.2501, 805.7024 193.2501, 791.8048 184.8 Z" fill="currentColor" stroke-width="1.6" stroke-linejoin="round" class="tie"></path>
 <path d="M 1223.2352 184.8 C 1230.4352 194.2667, 1240.0352 194.2667, 1247.2352 184.8 C 1240.0352 192.1333, 1230.4352 192.1333, 1223.2352 184.8 Z" fill="currentColor" stroke-width="1.6" stroke-linejoin="round" class="tie"></path>
-<path d="M 69.4496 379.2256 C 76.6496 388.6923, 86.2496 388.6923, 93.4496 379.2256 C 86.2496 386.5589, 76.6496 386.5589, 69.4496 379.2256 Z" fill="currentColor" stroke-width="1.6" stroke-linejoin="round" class="tie"></path>
-<path d="M 443.3504 379.2256 C 455.7408 389.5563, 472.2608 389.5563, 484.6496 379.2256 C 472.2608 387.4229, 455.7408 387.4229, 443.3504 379.2256 Z" fill="currentColor" stroke-width="1.6" stroke-linejoin="round" class="tie"></path>
-<path d="M 834.5504 379.2256 C 846.9408 389.5563, 863.4608 389.5563, 875.8496 379.2256 C 863.4608 387.4229, 846.9408 387.4229, 834.5504 379.2256 Z" fill="currentColor" stroke-width="1.6" stroke-linejoin="round" class="tie"></path>
+<path d="M 69.4496 355.2256 C 76.6496 364.6923, 86.2496 364.6923, 93.4496 355.2256 C 86.2496 362.5589, 76.6496 362.5589, 69.4496 355.2256 Z" fill="currentColor" stroke-width="1.6" stroke-linejoin="round" class="tie"></path>
+<path d="M 443.3504 355.2256 C 455.7408 365.5563, 472.2608 365.5563, 484.6496 355.2256 C 472.2608 363.4229, 455.7408 363.4229, 443.3504 355.2256 Z" fill="currentColor" stroke-width="1.6" stroke-linejoin="round" class="tie"></path>
+<path d="M 834.5504 355.2256 C 846.9408 365.5563, 863.4608 365.5563, 875.8496 355.2256 C 863.4608 363.4229, 846.9408 363.4229, 834.5504 355.2256 Z" fill="currentColor" stroke-width="1.6" stroke-linejoin="round" class="tie"></path>
 </svg>

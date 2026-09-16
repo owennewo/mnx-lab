@@ -81,6 +81,51 @@ Provenance answers "did this change?". This doc answers "should it have?".
 
 ## Open debt
 
+### Title and inter-system ink gaps tightened to 1.5sp — 2026-09-16
+
+Owner: direct user-requested engraving adjustment; no roadmap work-item doc. The title
+previously used baseline arithmetic, which produced about 2.4sp of visible air in the TAB
+view, while consecutive systems used 3sp of ink-to-ink separation. The notation and composed
+TAB layouts now measure the title's bottom ink and place the first system exactly 1.5sp below
+it. The default `systemInk` clearance is likewise 1.5sp; row ownership remains the settled
+pre-move fact, so overhanging marks cannot be reassigned merely because the tighter midpoint
+passes them. Pinned by `harness/conformance/clearance.test.ts` and the corpus-wide identity in
+`harness/conformance/ink-measured-gaps.test.ts`.
+
+Eighteen scenarios moved. The affected files are notation primitives/SVGs, TAB/both SVGs
+where present, and unrolled SVGs where wrapping is rendered. None was `verified`, so no
+scenario was demoted.
+
+Look for: the bottom of every score title has 1.5 staff spaces of clear air before the
+highest mark belonging to its first system; adjacent systems have the same 1.5sp minimum
+between their closest ink. Section labels, tempo marks, endings, ties, bends, lyrics and
+dynamics must remain attached to their own systems and must not touch neighbouring ink. In
+multi-score documents (`multiple-layouts`, `multimeasure-rests`), each new title must remain
+visibly grouped with the system below it rather than the preceding score. The tighter page
+should remove empty vertical bands only: staff size, glyph size and horizontal positions do
+not change.
+
+Scenario set (paths under `scenarios/`):
+
+- `lab/00-document/03-navigation-playground`
+- `lab/00-document/04-twelve-bar-blues`
+- `lab/10-durations/01-rest-gallery`
+- `lab/11-rhythm/04-beamed-stem-lengths`
+- `lab/11-rhythm/05-swing-feel`
+- `lab/26-tab-rhythm/04-tied-notes-on-tab`
+- `lab/30-dynamics/01-all-dynamic-marks`
+- `lab/40-navigation/01-jumps-and-signs`
+- `lab/40-navigation/04-repeat-starts-mid-system`
+- `lab/50-lyrics/02-tab-verses`
+- `lab/60-layout/01-group-barline-individual`
+- `spec/jumps-dal-segno`
+- `spec/multimeasure-rests`
+- `spec/multiple-layouts`
+- `spec/orchestral-layout`
+- `spec/organ-layout`
+- `spec/system-layouts`
+- `spec/tie-targets`
+
 ### Heading row after the time signature, tempo and feel on one line, directions clear the ink — 2026-09-15
 
 Owner: user-reported engraving fixes from a Soundslice comparison of Kind Hearted Woman

@@ -1,4 +1,4 @@
-<svg width="1280" height="589.664" viewBox="0 0 1280 589.664" xmlns="http://www.w3.org/2000/svg">
+<svg width="1280" height="565.664" viewBox="0 0 1280 565.664" xmlns="http://www.w3.org/2000/svg">
 <style>:where(svg>text){font-family:Bravura;fill:currentColor}:where(svg>line,svg>path){stroke:currentColor}</style>
 <line x1="32" y1="128" x2="525.8672" y2="128" stroke-width="2.08" class="staff-line"></line>
 <line x1="32" y1="144" x2="525.8672" y2="144" stroke-width="2.08" class="staff-line"></line>
@@ -45,22 +45,22 @@
 <text x="1189.7264" y="176" font-size="64" class="notehead" data-source-id="@m2.v0.e3.n0"></text>
 <line x1="1208.6064" y1="120" x2="1208.6064" y2="173.312" stroke-width="1.92" class="stem"></line>
 <line x1="1248" y1="128" x2="1248" y2="192" stroke-width="2.56" class="barline"></line>
-<line x1="32" y1="373.664" x2="463.4672" y2="373.664" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="389.664" x2="463.4672" y2="389.664" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="405.664" x2="463.4672" y2="405.664" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="421.664" x2="463.4672" y2="421.664" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="437.664" x2="463.4672" y2="437.664" stroke-width="2.08" class="staff-line"></line>
-<text x="36" y="421.664" font-size="64" class="clef"></text>
-<text x="121.7936" y="437.664" font-size="64" class="notehead" data-source-id="@m3.v0.e0.n0"></text>
-<line x1="140.6736" y1="381.664" x2="140.6736" y2="434.976" stroke-width="1.92" class="stem"></line>
-<text x="216.2608" y="421.664" font-size="64" class="notehead" data-source-id="@m3.v0.e1.n0"></text>
-<line x1="235.1408" y1="365.664" x2="235.1408" y2="418.976" stroke-width="1.92" class="stem"></line>
-<text x="299.5264" y="413.664" font-size="64" class="notehead" data-source-id="@m3.v0.e2.n0"></text>
-<line x1="318.4064" y1="357.664" x2="318.4064" y2="410.976" stroke-width="1.92" class="stem"></line>
-<text x="388.3936" y="421.664" font-size="64" class="notehead" data-source-id="@m3.v0.e3.n0"></text>
-<line x1="407.2736" y1="365.664" x2="407.2736" y2="418.976" stroke-width="1.92" class="stem"></line>
-<line x1="450.6672" y1="373.664" x2="450.6672" y2="437.664" stroke-width="2.56" class="barline barline-final-thin"></line>
-<rect x="455.4672" y="373.664" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
+<line x1="32" y1="349.664" x2="463.4672" y2="349.664" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="365.664" x2="463.4672" y2="365.664" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="381.664" x2="463.4672" y2="381.664" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="397.664" x2="463.4672" y2="397.664" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="413.664" x2="463.4672" y2="413.664" stroke-width="2.08" class="staff-line"></line>
+<text x="36" y="397.664" font-size="64" class="clef"></text>
+<text x="121.7936" y="413.664" font-size="64" class="notehead" data-source-id="@m3.v0.e0.n0"></text>
+<line x1="140.6736" y1="357.664" x2="140.6736" y2="410.976" stroke-width="1.92" class="stem"></line>
+<text x="216.2608" y="397.664" font-size="64" class="notehead" data-source-id="@m3.v0.e1.n0"></text>
+<line x1="235.1408" y1="341.664" x2="235.1408" y2="394.976" stroke-width="1.92" class="stem"></line>
+<text x="299.5264" y="389.664" font-size="64" class="notehead" data-source-id="@m3.v0.e2.n0"></text>
+<line x1="318.4064" y1="333.664" x2="318.4064" y2="386.976" stroke-width="1.92" class="stem"></line>
+<text x="388.3936" y="397.664" font-size="64" class="notehead" data-source-id="@m3.v0.e3.n0"></text>
+<line x1="407.2736" y1="341.664" x2="407.2736" y2="394.976" stroke-width="1.92" class="stem"></line>
+<line x1="450.6672" y1="349.664" x2="450.6672" y2="413.664" stroke-width="2.56" class="barline barline-final-thin"></line>
+<rect x="455.4672" y="349.664" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
 <text x="171.2336" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">Sun</text>
 <text x="265.7008" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">did</text>
 <text x="365.7664" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">glide</text>
@@ -76,11 +76,11 @@
 <text x="1115.9008" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">car</text>
 <text x="1157.5328" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric-hyphen">-</text>
 <text x="1199.1664" y="263.192" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">ry</text>
-<text x="131.2336" y="508.856" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">me</text>
-<text x="225.7008" y="508.856" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">safe</text>
-<text x="267.3328" y="508.856" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric-hyphen">-</text>
-<text x="308.9664" y="508.856" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">ly</text>
-<text x="397.8336" y="508.856" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">home</text>
+<text x="131.2336" y="484.856" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">me</text>
+<text x="225.7008" y="484.856" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">safe</text>
+<text x="267.3328" y="484.856" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric-hyphen">-</text>
+<text x="308.9664" y="484.856" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">ly</text>
+<text x="397.8336" y="484.856" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">home</text>
 <text x="171.2336" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">Moon</text>
 <text x="265.7008" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">will</text>
 <text x="365.7664" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">drift</text>
@@ -97,8 +97,8 @@
 <text x="1115.9008" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">soft</text>
 <text x="1157.5328" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric-hyphen">-</text>
 <text x="1199.1664" y="298.392" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">ly</text>
-<text x="131.2336" y="544.056" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">sing</text>
-<text x="225.7008" y="544.056" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">me</text>
-<text x="308.9664" y="544.056" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">to</text>
-<text x="397.8336" y="544.056" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">sleep</text>
+<text x="131.2336" y="520.056" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">sing</text>
+<text x="225.7008" y="520.056" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">me</text>
+<text x="308.9664" y="520.056" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">to</text>
+<text x="397.8336" y="520.056" font-size="20" text-anchor="middle" style="font-family:var(--font-family-sans)" class="lyric">sleep</text>
 </svg>

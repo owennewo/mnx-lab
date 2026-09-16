@@ -1,4 +1,4 @@
-<svg width="1280" height="798.7584" viewBox="0 0 1280 798.7584" xmlns="http://www.w3.org/2000/svg">
+<svg width="1280" height="774.7584" viewBox="0 0 1280 774.7584" xmlns="http://www.w3.org/2000/svg">
 <style>:where(svg>text){font-family:Bravura;fill:currentColor}:where(svg>line,svg>path){stroke:currentColor}</style>
 <line x1="32" y1="128" x2="385.1376" y2="128" stroke-width="2.08" class="staff-line"></line>
 <line x1="32" y1="144" x2="385.1376" y2="144" stroke-width="2.08" class="staff-line"></line>
@@ -108,114 +108,114 @@
 <rect x="1203.6352" y="312.5408" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n22"></rect>
 <text x="1209.6352" y="320.7248" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n22">0</text>
 <line x1="1248" y1="128" x2="1248" y2="375.5808" stroke-width="2.56" class="barline"></line>
-<line x1="32" y1="454.0368" x2="465.6" y2="454.0368" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="470.0368" x2="465.6" y2="470.0368" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="486.0368" x2="465.6" y2="486.0368" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="502.0368" x2="465.6" y2="502.0368" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="518.0368" x2="465.6" y2="518.0368" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="454.0368" x2="32" y2="670.7584" stroke-width="2.56" class="barline barline-start"></line>
-<text x="36" y="502.0368" font-size="64" class="clef"></text>
-<text x="97.6096" y="502.0368" font-size="64" class="notehead" data-source-id="n23"></text>
-<text x="143.7104" y="526.0368" font-size="64" class="notehead" data-source-id="n24"></text>
-<text x="189.8096" y="486.0368" font-size="64" class="notehead" data-source-id="n25"></text>
-<text x="235.9104" y="526.0368" font-size="64" class="notehead" data-source-id="n26"></text>
-<text x="282.0096" y="502.0368" font-size="64" class="notehead" data-source-id="n27"></text>
-<text x="328.1104" y="526.0368" font-size="64" class="notehead" data-source-id="n28"></text>
-<text x="374.2096" y="486.0368" font-size="64" class="notehead" data-source-id="n29"></text>
-<text x="420.3104" y="502.0368" font-size="64" class="notehead" data-source-id="n30"></text>
-<line x1="32" y1="579.3296" x2="465.6" y2="579.3296" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="597.616" x2="465.6" y2="597.616" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="615.9008" x2="465.6" y2="615.9008" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="634.1872" x2="465.6" y2="634.1872" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="652.4736" x2="465.6" y2="652.4736" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="670.7584" x2="465.6" y2="670.7584" stroke-width="1.6" class="staff-line"></line>
-<text x="36" y="625.0448" font-size="64" class="tab-clef"></text>
-<rect x="89.0496" y="607.7184" width="36" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n23"></rect>
-<text x="107.0496" y="615.9008" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n23">(0)</text>
-<rect x="147.1504" y="626.0048" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n24"></rect>
-<text x="153.1504" y="634.1872" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n24">0</text>
-<rect x="193.2496" y="589.4336" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n25"></rect>
-<text x="199.2496" y="597.616" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n25">0</text>
-<rect x="239.3504" y="626.0048" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n26"></rect>
-<text x="245.3504" y="634.1872" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n26">0</text>
-<rect x="285.4496" y="607.7184" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n27"></rect>
-<text x="291.4496" y="615.9008" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n27">0</text>
-<rect x="331.5504" y="626.0048" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n28"></rect>
-<text x="337.5504" y="634.1872" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n28">0</text>
-<rect x="377.6496" y="589.4336" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n29"></rect>
-<text x="383.6496" y="597.616" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n29">0</text>
-<rect x="423.7504" y="607.7184" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n30"></rect>
-<text x="429.7504" y="615.9008" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n30">0</text>
-<line x1="465.6" y1="454.0368" x2="465.6" y2="670.7584" stroke-width="2.56" class="barline"></line>
-<line x1="465.6" y1="454.0368" x2="856.8" y2="454.0368" stroke-width="2.08" class="staff-line"></line>
-<line x1="465.6" y1="470.0368" x2="856.8" y2="470.0368" stroke-width="2.08" class="staff-line"></line>
-<line x1="465.6" y1="486.0368" x2="856.8" y2="486.0368" stroke-width="2.08" class="staff-line"></line>
-<line x1="465.6" y1="502.0368" x2="856.8" y2="502.0368" stroke-width="2.08" class="staff-line"></line>
-<line x1="465.6" y1="518.0368" x2="856.8" y2="518.0368" stroke-width="2.08" class="staff-line"></line>
-<text x="488.8096" y="502.0368" font-size="64" class="notehead" data-source-id="n31"></text>
-<text x="534.9104" y="526.0368" font-size="64" class="notehead" data-source-id="n32"></text>
-<text x="581.0096" y="486.0368" font-size="64" class="notehead" data-source-id="n33"></text>
-<text x="627.1104" y="526.0368" font-size="64" class="notehead" data-source-id="n34"></text>
-<text x="673.2096" y="502.0368" font-size="64" class="notehead" data-source-id="n35"></text>
-<text x="719.3104" y="526.0368" font-size="64" class="notehead" data-source-id="n36"></text>
-<text x="765.4096" y="486.0368" font-size="64" class="notehead" data-source-id="n37"></text>
-<text x="811.5104" y="502.0368" font-size="64" class="notehead" data-source-id="n38"></text>
-<line x1="465.6" y1="579.3296" x2="856.8" y2="579.3296" stroke-width="1.6" class="staff-line"></line>
-<line x1="465.6" y1="597.616" x2="856.8" y2="597.616" stroke-width="1.6" class="staff-line"></line>
-<line x1="465.6" y1="615.9008" x2="856.8" y2="615.9008" stroke-width="1.6" class="staff-line"></line>
-<line x1="465.6" y1="634.1872" x2="856.8" y2="634.1872" stroke-width="1.6" class="staff-line"></line>
-<line x1="465.6" y1="652.4736" x2="856.8" y2="652.4736" stroke-width="1.6" class="staff-line"></line>
-<line x1="465.6" y1="670.7584" x2="856.8" y2="670.7584" stroke-width="1.6" class="staff-line"></line>
-<rect x="538.3504" y="626.0048" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n32"></rect>
-<text x="544.3504" y="634.1872" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n32">0</text>
-<rect x="584.4496" y="589.4336" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n33"></rect>
-<text x="590.4496" y="597.616" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n33">0</text>
-<rect x="630.5504" y="626.0048" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n34"></rect>
-<text x="636.5504" y="634.1872" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n34">0</text>
-<rect x="676.6496" y="607.7184" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n35"></rect>
-<text x="682.6496" y="615.9008" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n35">0</text>
-<rect x="722.7504" y="626.0048" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n36"></rect>
-<text x="728.7504" y="634.1872" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n36">0</text>
-<rect x="768.8496" y="589.4336" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n37"></rect>
-<text x="774.8496" y="597.616" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n37">0</text>
-<rect x="814.9504" y="607.7184" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n38"></rect>
-<text x="820.9504" y="615.9008" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n38">0</text>
-<line x1="856.8" y1="454.0368" x2="856.8" y2="670.7584" stroke-width="2.56" class="barline"></line>
-<line x1="856.8" y1="454.0368" x2="1248" y2="454.0368" stroke-width="2.08" class="staff-line"></line>
-<line x1="856.8" y1="470.0368" x2="1248" y2="470.0368" stroke-width="2.08" class="staff-line"></line>
-<line x1="856.8" y1="486.0368" x2="1248" y2="486.0368" stroke-width="2.08" class="staff-line"></line>
-<line x1="856.8" y1="502.0368" x2="1248" y2="502.0368" stroke-width="2.08" class="staff-line"></line>
-<line x1="856.8" y1="518.0368" x2="1248" y2="518.0368" stroke-width="2.08" class="staff-line"></line>
-<text x="880.0096" y="502.0368" font-size="64" class="notehead" data-source-id="n39"></text>
-<text x="926.1104" y="526.0368" font-size="64" class="notehead" data-source-id="n40"></text>
-<text x="972.2096" y="486.0368" font-size="64" class="notehead" data-source-id="n41"></text>
-<text x="1018.3104" y="526.0368" font-size="64" class="notehead" data-source-id="n42"></text>
-<text x="1064.4096" y="502.0368" font-size="64" class="notehead" data-source-id="n43"></text>
-<text x="1110.5104" y="526.0368" font-size="64" class="notehead" data-source-id="n44"></text>
-<text x="1156.6096" y="486.0368" font-size="64" class="notehead" data-source-id="n45"></text>
-<text x="1202.7104" y="502.0368" font-size="64" class="notehead" data-source-id="n46"></text>
-<line x1="856.8" y1="579.3296" x2="1248" y2="579.3296" stroke-width="1.6" class="staff-line"></line>
-<line x1="856.8" y1="597.616" x2="1248" y2="597.616" stroke-width="1.6" class="staff-line"></line>
-<line x1="856.8" y1="615.9008" x2="1248" y2="615.9008" stroke-width="1.6" class="staff-line"></line>
-<line x1="856.8" y1="634.1872" x2="1248" y2="634.1872" stroke-width="1.6" class="staff-line"></line>
-<line x1="856.8" y1="652.4736" x2="1248" y2="652.4736" stroke-width="1.6" class="staff-line"></line>
-<line x1="856.8" y1="670.7584" x2="1248" y2="670.7584" stroke-width="1.6" class="staff-line"></line>
-<rect x="929.5504" y="626.0048" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n40"></rect>
-<text x="935.5504" y="634.1872" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n40">0</text>
-<rect x="975.6496" y="589.4336" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n41"></rect>
-<text x="981.6496" y="597.616" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n41">0</text>
-<rect x="1021.7504" y="626.0048" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n42"></rect>
-<text x="1027.7504" y="634.1872" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n42">0</text>
-<rect x="1067.8496" y="607.7184" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n43"></rect>
-<text x="1073.8496" y="615.9008" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n43">0</text>
-<rect x="1113.9504" y="626.0048" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n44"></rect>
-<text x="1119.9504" y="634.1872" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n44">0</text>
-<rect x="1160.0496" y="589.4336" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n45"></rect>
-<text x="1166.0496" y="597.616" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n45">0</text>
-<rect x="1206.1504" y="607.7184" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n46"></rect>
-<text x="1212.1504" y="615.9008" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n46">0</text>
-<line x1="1235.2" y1="454.0368" x2="1235.2" y2="670.7584" stroke-width="2.56" class="barline barline-final-thin"></line>
-<rect x="1240" y="454.0368" width="8" height="216.7216" fill="currentColor" class="barline barline-final-thick"></rect>
+<line x1="32" y1="430.0368" x2="465.6" y2="430.0368" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="446.0368" x2="465.6" y2="446.0368" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="462.0368" x2="465.6" y2="462.0368" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="478.0368" x2="465.6" y2="478.0368" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="494.0368" x2="465.6" y2="494.0368" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="430.0368" x2="32" y2="646.7584" stroke-width="2.56" class="barline barline-start"></line>
+<text x="36" y="478.0368" font-size="64" class="clef"></text>
+<text x="97.6096" y="478.0368" font-size="64" class="notehead" data-source-id="n23"></text>
+<text x="143.7104" y="502.0368" font-size="64" class="notehead" data-source-id="n24"></text>
+<text x="189.8096" y="462.0368" font-size="64" class="notehead" data-source-id="n25"></text>
+<text x="235.9104" y="502.0368" font-size="64" class="notehead" data-source-id="n26"></text>
+<text x="282.0096" y="478.0368" font-size="64" class="notehead" data-source-id="n27"></text>
+<text x="328.1104" y="502.0368" font-size="64" class="notehead" data-source-id="n28"></text>
+<text x="374.2096" y="462.0368" font-size="64" class="notehead" data-source-id="n29"></text>
+<text x="420.3104" y="478.0368" font-size="64" class="notehead" data-source-id="n30"></text>
+<line x1="32" y1="555.3296" x2="465.6" y2="555.3296" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="573.616" x2="465.6" y2="573.616" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="591.9008" x2="465.6" y2="591.9008" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="610.1872" x2="465.6" y2="610.1872" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="628.4736" x2="465.6" y2="628.4736" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="646.7584" x2="465.6" y2="646.7584" stroke-width="1.6" class="staff-line"></line>
+<text x="36" y="601.0448" font-size="64" class="tab-clef"></text>
+<rect x="89.0496" y="583.7184" width="36" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n23"></rect>
+<text x="107.0496" y="591.9008" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n23">(0)</text>
+<rect x="147.1504" y="602.0048" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n24"></rect>
+<text x="153.1504" y="610.1872" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n24">0</text>
+<rect x="193.2496" y="565.4336" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n25"></rect>
+<text x="199.2496" y="573.616" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n25">0</text>
+<rect x="239.3504" y="602.0048" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n26"></rect>
+<text x="245.3504" y="610.1872" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n26">0</text>
+<rect x="285.4496" y="583.7184" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n27"></rect>
+<text x="291.4496" y="591.9008" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n27">0</text>
+<rect x="331.5504" y="602.0048" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n28"></rect>
+<text x="337.5504" y="610.1872" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n28">0</text>
+<rect x="377.6496" y="565.4336" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n29"></rect>
+<text x="383.6496" y="573.616" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n29">0</text>
+<rect x="423.7504" y="583.7184" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n30"></rect>
+<text x="429.7504" y="591.9008" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n30">0</text>
+<line x1="465.6" y1="430.0368" x2="465.6" y2="646.7584" stroke-width="2.56" class="barline"></line>
+<line x1="465.6" y1="430.0368" x2="856.8" y2="430.0368" stroke-width="2.08" class="staff-line"></line>
+<line x1="465.6" y1="446.0368" x2="856.8" y2="446.0368" stroke-width="2.08" class="staff-line"></line>
+<line x1="465.6" y1="462.0368" x2="856.8" y2="462.0368" stroke-width="2.08" class="staff-line"></line>
+<line x1="465.6" y1="478.0368" x2="856.8" y2="478.0368" stroke-width="2.08" class="staff-line"></line>
+<line x1="465.6" y1="494.0368" x2="856.8" y2="494.0368" stroke-width="2.08" class="staff-line"></line>
+<text x="488.8096" y="478.0368" font-size="64" class="notehead" data-source-id="n31"></text>
+<text x="534.9104" y="502.0368" font-size="64" class="notehead" data-source-id="n32"></text>
+<text x="581.0096" y="462.0368" font-size="64" class="notehead" data-source-id="n33"></text>
+<text x="627.1104" y="502.0368" font-size="64" class="notehead" data-source-id="n34"></text>
+<text x="673.2096" y="478.0368" font-size="64" class="notehead" data-source-id="n35"></text>
+<text x="719.3104" y="502.0368" font-size="64" class="notehead" data-source-id="n36"></text>
+<text x="765.4096" y="462.0368" font-size="64" class="notehead" data-source-id="n37"></text>
+<text x="811.5104" y="478.0368" font-size="64" class="notehead" data-source-id="n38"></text>
+<line x1="465.6" y1="555.3296" x2="856.8" y2="555.3296" stroke-width="1.6" class="staff-line"></line>
+<line x1="465.6" y1="573.616" x2="856.8" y2="573.616" stroke-width="1.6" class="staff-line"></line>
+<line x1="465.6" y1="591.9008" x2="856.8" y2="591.9008" stroke-width="1.6" class="staff-line"></line>
+<line x1="465.6" y1="610.1872" x2="856.8" y2="610.1872" stroke-width="1.6" class="staff-line"></line>
+<line x1="465.6" y1="628.4736" x2="856.8" y2="628.4736" stroke-width="1.6" class="staff-line"></line>
+<line x1="465.6" y1="646.7584" x2="856.8" y2="646.7584" stroke-width="1.6" class="staff-line"></line>
+<rect x="538.3504" y="602.0048" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n32"></rect>
+<text x="544.3504" y="610.1872" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n32">0</text>
+<rect x="584.4496" y="565.4336" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n33"></rect>
+<text x="590.4496" y="573.616" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n33">0</text>
+<rect x="630.5504" y="602.0048" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n34"></rect>
+<text x="636.5504" y="610.1872" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n34">0</text>
+<rect x="676.6496" y="583.7184" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n35"></rect>
+<text x="682.6496" y="591.9008" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n35">0</text>
+<rect x="722.7504" y="602.0048" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n36"></rect>
+<text x="728.7504" y="610.1872" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n36">0</text>
+<rect x="768.8496" y="565.4336" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n37"></rect>
+<text x="774.8496" y="573.616" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n37">0</text>
+<rect x="814.9504" y="583.7184" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n38"></rect>
+<text x="820.9504" y="591.9008" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n38">0</text>
+<line x1="856.8" y1="430.0368" x2="856.8" y2="646.7584" stroke-width="2.56" class="barline"></line>
+<line x1="856.8" y1="430.0368" x2="1248" y2="430.0368" stroke-width="2.08" class="staff-line"></line>
+<line x1="856.8" y1="446.0368" x2="1248" y2="446.0368" stroke-width="2.08" class="staff-line"></line>
+<line x1="856.8" y1="462.0368" x2="1248" y2="462.0368" stroke-width="2.08" class="staff-line"></line>
+<line x1="856.8" y1="478.0368" x2="1248" y2="478.0368" stroke-width="2.08" class="staff-line"></line>
+<line x1="856.8" y1="494.0368" x2="1248" y2="494.0368" stroke-width="2.08" class="staff-line"></line>
+<text x="880.0096" y="478.0368" font-size="64" class="notehead" data-source-id="n39"></text>
+<text x="926.1104" y="502.0368" font-size="64" class="notehead" data-source-id="n40"></text>
+<text x="972.2096" y="462.0368" font-size="64" class="notehead" data-source-id="n41"></text>
+<text x="1018.3104" y="502.0368" font-size="64" class="notehead" data-source-id="n42"></text>
+<text x="1064.4096" y="478.0368" font-size="64" class="notehead" data-source-id="n43"></text>
+<text x="1110.5104" y="502.0368" font-size="64" class="notehead" data-source-id="n44"></text>
+<text x="1156.6096" y="462.0368" font-size="64" class="notehead" data-source-id="n45"></text>
+<text x="1202.7104" y="478.0368" font-size="64" class="notehead" data-source-id="n46"></text>
+<line x1="856.8" y1="555.3296" x2="1248" y2="555.3296" stroke-width="1.6" class="staff-line"></line>
+<line x1="856.8" y1="573.616" x2="1248" y2="573.616" stroke-width="1.6" class="staff-line"></line>
+<line x1="856.8" y1="591.9008" x2="1248" y2="591.9008" stroke-width="1.6" class="staff-line"></line>
+<line x1="856.8" y1="610.1872" x2="1248" y2="610.1872" stroke-width="1.6" class="staff-line"></line>
+<line x1="856.8" y1="628.4736" x2="1248" y2="628.4736" stroke-width="1.6" class="staff-line"></line>
+<line x1="856.8" y1="646.7584" x2="1248" y2="646.7584" stroke-width="1.6" class="staff-line"></line>
+<rect x="929.5504" y="602.0048" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n40"></rect>
+<text x="935.5504" y="610.1872" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n40">0</text>
+<rect x="975.6496" y="565.4336" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n41"></rect>
+<text x="981.6496" y="573.616" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n41">0</text>
+<rect x="1021.7504" y="602.0048" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n42"></rect>
+<text x="1027.7504" y="610.1872" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n42">0</text>
+<rect x="1067.8496" y="583.7184" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n43"></rect>
+<text x="1073.8496" y="591.9008" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n43">0</text>
+<rect x="1113.9504" y="602.0048" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n44"></rect>
+<text x="1119.9504" y="610.1872" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n44">0</text>
+<rect x="1160.0496" y="565.4336" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n45"></rect>
+<text x="1166.0496" y="573.616" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n45">0</text>
+<rect x="1206.1504" y="583.7184" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="n46"></rect>
+<text x="1212.1504" y="591.9008" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="n46">0</text>
+<line x1="1235.2" y1="430.0368" x2="1235.2" y2="646.7584" stroke-width="2.56" class="barline barline-final-thin"></line>
+<rect x="1240" y="430.0368" width="8" height="216.7216" fill="currentColor" class="barline barline-final-thick"></rect>
 <line x1="429.7424" y1="173.312" x2="429.7424" y2="120" stroke-width="1.92" class="stem"></line>
 <line x1="480.8704" y1="197.312" x2="480.8704" y2="120" stroke-width="1.92" class="stem"></line>
 <line x1="532" y1="157.312" x2="532" y2="120" stroke-width="1.92" class="stem"></line>
@@ -236,42 +236,42 @@
 <line x1="1167.9472" y1="157.312" x2="1167.9472" y2="120" stroke-width="1.92" class="stem"></line>
 <line x1="1219.0752" y1="173.312" x2="1219.0752" y2="120" stroke-width="1.92" class="stem"></line>
 <line x1="1064.7296" y1="120" x2="1220.0352" y2="120" stroke-width="8" class="beam"></line>
-<line x1="116.4896" y1="499.3488" x2="116.4896" y2="446.0368" stroke-width="1.92" class="stem"></line>
-<line x1="162.5904" y1="523.3488" x2="162.5904" y2="446.0368" stroke-width="1.92" class="stem"></line>
-<line x1="208.6896" y1="483.3488" x2="208.6896" y2="446.0368" stroke-width="1.92" class="stem"></line>
-<line x1="254.7904" y1="523.3488" x2="254.7904" y2="446.0368" stroke-width="1.92" class="stem"></line>
-<line x1="115.5296" y1="446.0368" x2="255.7504" y2="446.0368" stroke-width="8" class="beam"></line>
-<line x1="300.8896" y1="499.3488" x2="300.8896" y2="446.0368" stroke-width="1.92" class="stem"></line>
-<line x1="346.9904" y1="523.3488" x2="346.9904" y2="446.0368" stroke-width="1.92" class="stem"></line>
-<line x1="393.0896" y1="483.3488" x2="393.0896" y2="446.0368" stroke-width="1.92" class="stem"></line>
-<line x1="439.1904" y1="499.3488" x2="439.1904" y2="446.0368" stroke-width="1.92" class="stem"></line>
-<line x1="299.9296" y1="446.0368" x2="440.1504" y2="446.0368" stroke-width="8" class="beam"></line>
-<line x1="507.6896" y1="499.3488" x2="507.6896" y2="446.0368" stroke-width="1.92" class="stem"></line>
-<line x1="553.7904" y1="523.3488" x2="553.7904" y2="446.0368" stroke-width="1.92" class="stem"></line>
-<line x1="599.8896" y1="483.3488" x2="599.8896" y2="446.0368" stroke-width="1.92" class="stem"></line>
-<line x1="645.9904" y1="523.3488" x2="645.9904" y2="446.0368" stroke-width="1.92" class="stem"></line>
-<line x1="506.7296" y1="446.0368" x2="646.9504" y2="446.0368" stroke-width="8" class="beam"></line>
-<line x1="692.0896" y1="499.3488" x2="692.0896" y2="446.0368" stroke-width="1.92" class="stem"></line>
-<line x1="738.1904" y1="523.3488" x2="738.1904" y2="446.0368" stroke-width="1.92" class="stem"></line>
-<line x1="784.2896" y1="483.3488" x2="784.2896" y2="446.0368" stroke-width="1.92" class="stem"></line>
-<line x1="830.3904" y1="499.3488" x2="830.3904" y2="446.0368" stroke-width="1.92" class="stem"></line>
-<line x1="691.1296" y1="446.0368" x2="831.3504" y2="446.0368" stroke-width="8" class="beam"></line>
-<line x1="898.8896" y1="499.3488" x2="898.8896" y2="446.0368" stroke-width="1.92" class="stem"></line>
-<line x1="944.9904" y1="523.3488" x2="944.9904" y2="446.0368" stroke-width="1.92" class="stem"></line>
-<line x1="991.0896" y1="483.3488" x2="991.0896" y2="446.0368" stroke-width="1.92" class="stem"></line>
-<line x1="1037.1904" y1="523.3488" x2="1037.1904" y2="446.0368" stroke-width="1.92" class="stem"></line>
-<line x1="897.9296" y1="446.0368" x2="1038.1504" y2="446.0368" stroke-width="8" class="beam"></line>
-<line x1="1083.2896" y1="499.3488" x2="1083.2896" y2="446.0368" stroke-width="1.92" class="stem"></line>
-<line x1="1129.3904" y1="523.3488" x2="1129.3904" y2="446.0368" stroke-width="1.92" class="stem"></line>
-<line x1="1175.4896" y1="483.3488" x2="1175.4896" y2="446.0368" stroke-width="1.92" class="stem"></line>
-<line x1="1221.5904" y1="499.3488" x2="1221.5904" y2="446.0368" stroke-width="1.92" class="stem"></line>
-<line x1="1082.3296" y1="446.0368" x2="1222.5504" y2="446.0368" stroke-width="8" class="beam"></line>
+<line x1="116.4896" y1="475.3488" x2="116.4896" y2="422.0368" stroke-width="1.92" class="stem"></line>
+<line x1="162.5904" y1="499.3488" x2="162.5904" y2="422.0368" stroke-width="1.92" class="stem"></line>
+<line x1="208.6896" y1="459.3488" x2="208.6896" y2="422.0368" stroke-width="1.92" class="stem"></line>
+<line x1="254.7904" y1="499.3488" x2="254.7904" y2="422.0368" stroke-width="1.92" class="stem"></line>
+<line x1="115.5296" y1="422.0368" x2="255.7504" y2="422.0368" stroke-width="8" class="beam"></line>
+<line x1="300.8896" y1="475.3488" x2="300.8896" y2="422.0368" stroke-width="1.92" class="stem"></line>
+<line x1="346.9904" y1="499.3488" x2="346.9904" y2="422.0368" stroke-width="1.92" class="stem"></line>
+<line x1="393.0896" y1="459.3488" x2="393.0896" y2="422.0368" stroke-width="1.92" class="stem"></line>
+<line x1="439.1904" y1="475.3488" x2="439.1904" y2="422.0368" stroke-width="1.92" class="stem"></line>
+<line x1="299.9296" y1="422.0368" x2="440.1504" y2="422.0368" stroke-width="8" class="beam"></line>
+<line x1="507.6896" y1="475.3488" x2="507.6896" y2="422.0368" stroke-width="1.92" class="stem"></line>
+<line x1="553.7904" y1="499.3488" x2="553.7904" y2="422.0368" stroke-width="1.92" class="stem"></line>
+<line x1="599.8896" y1="459.3488" x2="599.8896" y2="422.0368" stroke-width="1.92" class="stem"></line>
+<line x1="645.9904" y1="499.3488" x2="645.9904" y2="422.0368" stroke-width="1.92" class="stem"></line>
+<line x1="506.7296" y1="422.0368" x2="646.9504" y2="422.0368" stroke-width="8" class="beam"></line>
+<line x1="692.0896" y1="475.3488" x2="692.0896" y2="422.0368" stroke-width="1.92" class="stem"></line>
+<line x1="738.1904" y1="499.3488" x2="738.1904" y2="422.0368" stroke-width="1.92" class="stem"></line>
+<line x1="784.2896" y1="459.3488" x2="784.2896" y2="422.0368" stroke-width="1.92" class="stem"></line>
+<line x1="830.3904" y1="475.3488" x2="830.3904" y2="422.0368" stroke-width="1.92" class="stem"></line>
+<line x1="691.1296" y1="422.0368" x2="831.3504" y2="422.0368" stroke-width="8" class="beam"></line>
+<line x1="898.8896" y1="475.3488" x2="898.8896" y2="422.0368" stroke-width="1.92" class="stem"></line>
+<line x1="944.9904" y1="499.3488" x2="944.9904" y2="422.0368" stroke-width="1.92" class="stem"></line>
+<line x1="991.0896" y1="459.3488" x2="991.0896" y2="422.0368" stroke-width="1.92" class="stem"></line>
+<line x1="1037.1904" y1="499.3488" x2="1037.1904" y2="422.0368" stroke-width="1.92" class="stem"></line>
+<line x1="897.9296" y1="422.0368" x2="1038.1504" y2="422.0368" stroke-width="8" class="beam"></line>
+<line x1="1083.2896" y1="475.3488" x2="1083.2896" y2="422.0368" stroke-width="1.92" class="stem"></line>
+<line x1="1129.3904" y1="499.3488" x2="1129.3904" y2="422.0368" stroke-width="1.92" class="stem"></line>
+<line x1="1175.4896" y1="459.3488" x2="1175.4896" y2="422.0368" stroke-width="1.92" class="stem"></line>
+<line x1="1221.5904" y1="475.3488" x2="1221.5904" y2="422.0368" stroke-width="1.92" class="stem"></line>
+<line x1="1082.3296" y1="422.0368" x2="1222.5504" y2="422.0368" stroke-width="8" class="beam"></line>
 <path d="M 176.7296 240.8 C 192.0464 251.6203, 212.4688 251.6203, 227.7872 240.8 C 212.4688 249.4869, 192.0464 249.4869, 176.7296 240.8 Z" fill="currentColor" stroke-width="1.6" stroke-linejoin="round" class="tie"></path>
 <path d="M 254.9872 208.8 C 270.304 219.6203, 290.7264 219.6203, 306.0448 208.8 C 290.7264 217.4869, 270.304 217.4869, 254.9872 208.8 Z" fill="currentColor" stroke-width="1.6" stroke-linejoin="round" class="tie"></path>
 <path d="M 333.2448 184.8 C 355.2816 196.7403, 384.6656 196.7403, 406.7024 184.8 C 384.6656 194.6069, 355.2816 194.6069, 333.2448 184.8 Z" fill="currentColor" stroke-width="1.6" stroke-linejoin="round" class="tie"></path>
 <path d="M 791.8048 184.8 C 805.7024 195.3835, 824.2352 195.3835, 838.1328 184.8 C 824.2352 193.2501, 805.7024 193.2501, 791.8048 184.8 Z" fill="currentColor" stroke-width="1.6" stroke-linejoin="round" class="tie"></path>
 <path d="M 1223.2352 184.8 C 1230.4352 194.2667, 1240.0352 194.2667, 1247.2352 184.8 C 1240.0352 192.1333, 1230.4352 192.1333, 1223.2352 184.8 Z" fill="currentColor" stroke-width="1.6" stroke-linejoin="round" class="tie"></path>
-<path d="M 69.4496 510.8368 C 76.6496 520.3035, 86.2496 520.3035, 93.4496 510.8368 C 86.2496 518.1701, 76.6496 518.1701, 69.4496 510.8368 Z" fill="currentColor" stroke-width="1.6" stroke-linejoin="round" class="tie"></path>
-<path d="M 443.3504 510.8368 C 455.7408 521.1675, 472.2608 521.1675, 484.6496 510.8368 C 472.2608 519.0341, 455.7408 519.0341, 443.3504 510.8368 Z" fill="currentColor" stroke-width="1.6" stroke-linejoin="round" class="tie"></path>
-<path d="M 834.5504 510.8368 C 846.9408 521.1675, 863.4608 521.1675, 875.8496 510.8368 C 863.4608 519.0341, 846.9408 519.0341, 834.5504 510.8368 Z" fill="currentColor" stroke-width="1.6" stroke-linejoin="round" class="tie"></path>
+<path d="M 69.4496 486.8368 C 76.6496 496.3035, 86.2496 496.3035, 93.4496 486.8368 C 86.2496 494.1701, 76.6496 494.1701, 69.4496 486.8368 Z" fill="currentColor" stroke-width="1.6" stroke-linejoin="round" class="tie"></path>
+<path d="M 443.3504 486.8368 C 455.7408 497.1675, 472.2608 497.1675, 484.6496 486.8368 C 472.2608 495.0341, 455.7408 495.0341, 443.3504 486.8368 Z" fill="currentColor" stroke-width="1.6" stroke-linejoin="round" class="tie"></path>
+<path d="M 834.5504 486.8368 C 846.9408 497.1675, 863.4608 497.1675, 875.8496 486.8368 C 863.4608 495.0341, 846.9408 495.0341, 834.5504 486.8368 Z" fill="currentColor" stroke-width="1.6" stroke-linejoin="round" class="tie"></path>
 </svg>

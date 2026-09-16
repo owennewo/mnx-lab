@@ -14,6 +14,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { describe, it, expect } from 'vitest';
+import { clearanceSpacing } from '../../src/engine/clearance.ts';
 import {
   layoutNotation,
   MIN_STAFF_GAP_SP,
@@ -501,8 +502,9 @@ describe('ink-measured gaps — stage B, display staves in the both view', () =>
 });
 
 // Stage D — the gap BETWEEN systems. The reserved row pads are no longer
-// consulted: a gap is the ink either side plus SEPARATION_CLEAR_SP, the same
-// constant stage C put between two staves of one system. The visible
+// consulted: a gap is the ink either side plus the resolved system clearance.
+// At the default level that is intentionally tighter than the separation used
+// between two staves inside one system. The visible
 // consequence, and the thing that was asked for: a system with a section
 // label above it keeps room for the label, and one without closes up — with
 // nobody encoding "unlabelled rows are closer".
@@ -515,6 +517,10 @@ describe('ink-measured gaps — stage D, between systems', () => {
    *  not (found by lab/lyrics/tab-verses, the first wrapped lyric doc). */
   function rowInk(layout: LayoutResult, reservedBelowSp = 0): { top: number; bottom: number }[] {
     const rows = layout.rows!;
+    // Once a compact gap moves its midpoint past overhanging ink, geometry can
+    // no longer rediscover which row emitted that primitive. The layout carries
+    // the ownership-preserving measurement from the pre-move pass.
+    if (layout.rowInkSp) return layout.rowInkSp;
     const bounds = rowBoundariesSp(rows, reservedBelowSp);
     const buckets: Primitive[][] = rows.map(() => []);
     for (const p of layout.primitives) {
@@ -562,6 +568,7 @@ describe('ink-measured gaps — stage D, between systems', () => {
 
   it('every inter-system gap is the ink either side plus one separation, corpus-wide', () => {
     initSmufl();
+    const systemInk = clearanceSpacing().systemInk;
     let checked = 0;
     let skipped = 0;
     for (const s of corpus) {
@@ -580,11 +587,11 @@ describe('ink-measured gaps — stage D, between systems', () => {
         if (holdsTitle(layout, r)) {
           skipped++;
           // Still bounded: a title never makes a gap TIGHTER than the rule.
-          expect(gap.inkGap).toBeGreaterThan(SEPARATION_CLEAR_SP - 1e-6);
+          expect(gap.inkGap).toBeGreaterThan(systemInk - 1e-6);
           return;
         }
         checked++;
-        expect(gap.inkGap).toBeCloseTo(SEPARATION_CLEAR_SP, 6);
+        expect(gap.inkGap).toBeCloseTo(systemInk, 6);
       });
     }
     expect(checked).toBeGreaterThan(0);
