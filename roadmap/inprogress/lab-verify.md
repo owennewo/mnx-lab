@@ -146,7 +146,11 @@ larger and disconnected. They now share one baseline and move together whenever 
 footprint needs more clearance. The swing starts 0.75sp after the tempo's right ink instead of
 leaving a 2sp void. `harness/conformance/swing-heading.test.ts` pins equal glyph scale, equal
 baseline, the measured horizontal gap (with the reported three-digit `150`), and the combined
-lift over tall ink.
+lift over tall ink. A same-day follow-up found that the handoff had converted the tempo's
+ink-scaled right edge into a horizontal position: the square golden stayed correct while a
+larger Staff setting collapsed the visible gap. Tempo and swing now share one musical anchor
+and carry the entire handoff in ink offsets; the BPM-150 regression pins that coordinate rule,
+and the non-square sweep covers the user-visible scale range.
 
 One scenario moved in all four visual goldens. It is `draft`, so nothing was demoted.
 
@@ -154,7 +158,8 @@ Look for: in bar 1, `♩ = 120` and the swing equation read as one line, with eq
 glyphs, matching baselines and a compact but visible gap. The equation's tuplet bracket remains
 above its played pair; it is not a second text line. In a score with a bend, stem or other tall
 mark under the equation, both tempo and swing rise together rather than the swing floating
-above the tempo. Bars 2–4 otherwise retain their previous mark sizes and placement.
+above the tempo. The gap must remain open when Staff and Space differ. Bars 2–4 otherwise
+retain their previous mark sizes and placement.
 
 Scenario set (path under `scenarios/`):
 

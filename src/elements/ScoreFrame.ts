@@ -247,7 +247,10 @@ export class ScoreFrame extends LitElement {
         border: 1px solid var(--line);
         border-radius: var(--frame-radius);
         backdrop-filter: blur(6px);
-        box-shadow: var(--frame-shadow);
+        /* The group already has a deliberate 3px canvas inset. A drop shadow
+           painted through that inset and made the controls visually touch the
+           edge even though their border box was correctly placed. */
+        box-shadow: none;
         color: var(--ink);
         cursor: pointer;
       }

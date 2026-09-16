@@ -53,9 +53,21 @@ describe('tempo + swing heading', () => {
     expect(swingInk.x - tempoInk.x - tempoInk.w).toBeCloseTo(SWING_AFTER_TEMPO_GAP_SP, 6);
 
     const tempoNote = tempoPrimitives.find(p => p.kind === 'glyph' && cls(p) === 'tempo');
+    const tempoText = tempoPrimitives.find(p => p.kind === 'text' && cls(p) === 'tempo');
     const swingNotes = swingPrimitives.filter(p => p.kind === 'glyph' && p.glyph.startsWith('metNote'));
     expect(tempoNote?.kind).toBe('glyph');
+    expect(tempoText?.kind).toBe('text');
     expect(swingNotes.length).toBe(4);
+    const firstSwingNote = swingNotes[0];
+    if (tempoText?.kind === 'text' && firstSwingNote?.kind === 'glyph') {
+      // Both marks hang from ONE musical position. Their handoff lives in dx,
+      // so Staff can scale it without Space scaling the two halves apart.
+      // This is the non-square BPM-150 failure the bounds-only assertion above
+      // could not see: the old code converted the tempo's ink edge into x.
+      expect(firstSwingNote.x).toBe(tempoText.x);
+      const tempoRightDx = (tempoText.dx ?? 0) + tempoText.text.length * tempoText.size * 0.6;
+      expect((firstSwingNote.dx ?? 0) - tempoRightDx).toBeCloseTo(SWING_AFTER_TEMPO_GAP_SP, 6);
+    }
     for (const note of swingNotes) {
       if (note.kind !== 'glyph' || tempoNote?.kind !== 'glyph') continue;
       expect(note.scale).toBe(tempoNote.scale);

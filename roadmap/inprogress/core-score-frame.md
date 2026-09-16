@@ -116,4 +116,6 @@ restyling the pads; dark theme work beyond what `light-dark()` already gives the
 - 2026-09-16 — **the focus controls moved fully inside the canvas:** a 3px inset and
   40×36px boxes replace the edge-hanging 44×40px mark. Focus mode now restores the
   missing Play/Pause toggle beside the mark, driven by the existing slotted player's
-  playback state. `focus-mode-smoke.mjs` pins the geometry and both toggle states.
+  playback state. The control shadow was then removed because it painted through the
+  otherwise-correct inset and visually touched the canvas edge. `focus-mode-smoke.mjs`
+  pins the clear margin, geometry and both toggle states.

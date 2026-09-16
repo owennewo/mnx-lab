@@ -431,6 +431,10 @@ interface TempoRun extends BoundsSp {
   bottomInk: number;
   /** First primitive of this measure's tempo run in the output array. */
   firstPrimitive: number;
+  /** Musical position shared by every primitive in this tempo run. */
+  originX: number;
+  /** Right edge of the tempo's measured ink, in ink-scaled offset space. */
+  rightInkDx: number;
 }
 
 export interface EmitTempoMarkArgs {
@@ -521,7 +525,12 @@ function emitOneTempo(
   const first = primitives[firstNew];
   if (!placed || first.kind !== 'glyph') return null;
   const baseline = first.y;
-  return { ...placed, baseline, bottomInk: baseline + belowBaseline };
+  // Body-text bounds use the same 0.6em advance in render/bounds.ts. Keep the
+  // handoff in the tempo's dx currency: converting this edge to a new x would
+  // multiply it by horizontal spacing while the text itself follows Staff.
+  const text = `= ${tempo.bpm}`;
+  const rightInkDx = cursor + text.length * TEMPO_TEXT_SIZE_SP * 0.6;
+  return { ...placed, baseline, bottomInk: baseline + belowBaseline, originX: x0, rightInkDx };
 }
 
 // ---------- Chord symbols (`_x.mnxLab.harmonies`) ----------
@@ -762,11 +771,14 @@ export function emitSwingMark(args: EmitSwingMarkArgs): BoundsSp | null {
   const { swing, m, staffTop, scan, primitives, clearAbove } = args;
   if (!swing?.prints) return null;
   const firstNew = primitives.length;
-  const x0 = clearAbove ? clearAbove.x + clearAbove.w + SWING_AFTER_TEMPO_GAP_SP : measureHeadingX(m);
-  const y = 0;
   const tempoRun = clearAbove && 'baseline' in clearAbove && 'firstPrimitive' in clearAbove
     ? clearAbove as TempoRun
     : null;
+  const x0 = tempoRun
+    ? tempoRun.originX
+    : clearAbove ? clearAbove.x + clearAbove.w + SWING_AFTER_TEMPO_GAP_SP : measureHeadingX(m);
+  const startDx = tempoRun ? tempoRun.rightInkDx + SWING_AFTER_TEMPO_GAP_SP : 0;
+  const y = 0;
   const finish = (bottomInkAtZero: number): BoundsSp | null => {
     if (!tempoRun) return placeTextRun(primitives, firstNew, bottomInkAtZero, staffTop, scan, clearAbove);
 
@@ -792,7 +804,7 @@ export function emitSwingMark(args: EmitSwingMarkArgs): BoundsSp | null {
   };
   const words = (text: string): BoundsSp | null => {
     primitives.push({
-      kind: 'text', text, x: x0, y, font: 'body', size: SWING_TEXT_SIZE_SP,
+      kind: 'text', text, x: x0, dx: startDx, y, font: 'body', size: SWING_TEXT_SIZE_SP,
       weight: TEMPO_TEXT_WEIGHT, className: 'swing'
     });
     return finish(0);
@@ -806,7 +818,7 @@ export function emitSwingMark(args: EmitSwingMarkArgs): BoundsSp | null {
 
   const notes = [...realisation.written, ...realisation.played];
   const bottom = Math.max(...notes.map(n => swingNoteExtent(n).bottom), 0);
-  let cursor = emitSwingPair(realisation.written, x0, 0, y, primitives);
+  let cursor = emitSwingPair(realisation.written, x0, startDx, y, primitives);
   primitives.push({
     kind: 'text', text: '=', x: x0, dx: cursor + SWING_GROUP_GAP_SP, y, font: 'body',
     size: SWING_TEXT_SIZE_SP, weight: TEMPO_TEXT_WEIGHT, className: 'swing'

@@ -162,6 +162,7 @@ const DUMP = `(() => {
     focusButton: !!focusButton,
     focusRect: rect(focusButton),
     focusOpacity: focusButton ? Number(getComputedStyle(focusButton).opacity) : null,
+    focusShadow: focusButton ? getComputedStyle(focusButton).boxShadow : null,
     focusLabel: focusButton?.getAttribute('aria-label') ?? null,
     focusPressed: focusButton?.getAttribute('aria-pressed') ?? null,
     playButton: !!playButton,
@@ -284,8 +285,8 @@ try {
   check(
     state.focusRect && state.scoreRect && near(state.focusRect.y - state.scoreRect.y, 3) &&
       near(state.scoreRect.x + state.scoreRect.width - state.focusRect.x - state.focusRect.width, 3 + state.scoreScrollbar) &&
-      near(state.focusRect.width, 40) && near(state.focusRect.height, 36),
-    'the focus mark is inset 3px and trims 2px from each side of its former box'
+      near(state.focusRect.width, 40) && near(state.focusRect.height, 36) && state.focusShadow === 'none',
+    'the focus mark has a clear 3px inset and trims 2px from each side of its former box'
   );
   check(!state.playButton, 'the full player tray leaves no duplicate play control at rest');
   check(
