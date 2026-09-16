@@ -1,10 +1,10 @@
 # Staff in staff spaces — one affine ink line, fitted preserved
 
-Status: in progress — implementation started 2026-09-16.
+Status: complete — implemented and landed 2026-09-16.
 Serves: implementation loop — shared engine, `elements/`, both shells.
 
 The Staff counterpart to
-[core-space-units-sp.md](core-space-units-sp.md). Space became a directly
+[core-space-units-sp.md](../inprogress/core-space-units-sp.md). Space became a directly
 measured horizontal length with a line per kind of discretionary air. Staff is
 simpler: the renderer deliberately has one vertical/ink currency, so its
 consumers share one affine line rather than receiving independently calibrated
@@ -112,3 +112,18 @@ globally affine outputs.
   `0.4sp`; rigid ink remains collision-safe at `8sp`.
 - Old saved preferences and public scale-named inputs continue to work.
 - `npm run update:primitives` leaves `scenarios/` clean; all landing gates pass.
+
+## Outcome
+
+Landed as one direct Staff unit across the engine, viewer chrome, gestures,
+Workbench and Studio. `STAFF_LINES.inkPxPerSp` is the shared `10x + 0` affine
+line; renderer plans accept `staffSp`, while the previous scale-named renderer
+inputs, outcome/event field and exported bounds/clamp remain deprecated
+one-for-one aliases. Both shells migrate their saved preference keys before
+clamping.
+
+The pad was exercised in-browser at fitted, 1.1sp and the 0.4sp floor; its
+readout, disabled floor arm and engraving all followed the new unit. The full
+1,877-test suite, scenario checks and production build passed after rebase.
+Primitive regeneration passed 191 checks and left `scenarios/` byte-clean, so
+the item creates no verification batch.

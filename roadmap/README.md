@@ -157,11 +157,6 @@ back up to `proposed/` the moment it is.
 
 ### inprogress/
 
-- **[core-staff-units-sp.md](inprogress/core-staff-units-sp.md)** — **in progress
-  2026-09-16** — Staff becomes a direct `0.4sp–8sp` control: `1sp` is today's
-  100% request and every ordinary consumer follows the shared affine ink line
-  `10x + 0` px/sp. Fitted remains absence, geometric stepping remains, and
-  scale-named public inputs/preferences migrate through compatibility aliases.
 - **[core-space-units-sp.md](inprogress/core-space-units-sp.md)** — **in progress 2026-09-15** — Space becomes a number in
   staff spaces (air after a quarter note), 0 to a calibrated ceiling, and every horizontal
   consumer is one clamped line `max(0, m·x + c)`: the intercepts are the zero engraving,
@@ -461,6 +456,11 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+
+- **[core-staff-units-sp.md](complete/core-staff-units-sp.md)** — **complete
+  2026-09-16** — Staff is a direct `0.4sp–8sp` control through one `10x + 0`
+  affine ink line. Fitted remains absence; old scale-named inputs, events and
+  preferences migrate through compatibility aliases; goldens remain byte-clean.
 
 - **[core-staff-space-clearance.md](complete/core-staff-space-clearance.md)** — Staff owns vertical proportions; Space owns horizontal whitespace. Removes the third product control while retaining legacy host inputs.
 
