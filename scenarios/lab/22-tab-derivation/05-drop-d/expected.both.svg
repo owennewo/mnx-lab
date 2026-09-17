@@ -1,11 +1,11 @@
-<svg width="1280" height="515.4288" viewBox="0 0 1280 515.4288" xmlns="http://www.w3.org/2000/svg">
+<svg width="1280" height="552.6288" viewBox="0 0 1280 552.6288" xmlns="http://www.w3.org/2000/svg">
 <style>:where(svg>text){font-family:Bravura;fill:currentColor}:where(svg>line,svg>path){stroke:currentColor}</style>
 <line x1="32" y1="128" x2="603.2" y2="128" stroke-width="2.08" class="staff-line"></line>
 <line x1="32" y1="144" x2="603.2" y2="144" stroke-width="2.08" class="staff-line"></line>
 <line x1="32" y1="160" x2="603.2" y2="160" stroke-width="2.08" class="staff-line"></line>
 <line x1="32" y1="176" x2="603.2" y2="176" stroke-width="2.08" class="staff-line"></line>
 <line x1="32" y1="192" x2="603.2" y2="192" stroke-width="2.08" class="staff-line"></line>
-<line x1="32" y1="128" x2="32" y2="387.4288" stroke-width="2.56" class="barline barline-start"></line>
+<line x1="32" y1="128" x2="32" y2="424.6288" stroke-width="2.56" class="barline barline-start"></line>
 <text x="36" y="176" font-size="64" class="clef"></text>
 <text x="104" y="144" font-size="64" text-anchor="middle" class="time-sig-num"></text>
 <text x="104" y="176" font-size="64" text-anchor="middle" class="time-sig-den"></text>
@@ -24,29 +24,24 @@
 <text x="506.56" y="184" font-size="64" class="accidental"></text>
 <text x="524.96" y="184" font-size="64" class="notehead" data-source-id="@m0.v0.e3.n0"></text>
 <line x1="543.84" y1="128" x2="543.84" y2="181.312" stroke-width="1.92" class="stem"></line>
-<line x1="32" y1="296" x2="603.2" y2="296" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="314.2864" x2="603.2" y2="314.2864" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="332.5712" x2="603.2" y2="332.5712" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="350.8576" x2="603.2" y2="350.8576" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="369.1424" x2="603.2" y2="369.1424" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="387.4288" x2="603.2" y2="387.4288" stroke-width="1.6" class="staff-line"></line>
-<text x="26.4" y="296" font-size="13.6" text-anchor="end" dominant-baseline="central" style="font-family:var(--font-family-sans)" class="tab-tuning-letter">E</text>
-<text x="26.4" y="314.2864" font-size="13.6" text-anchor="end" dominant-baseline="central" style="font-family:var(--font-family-sans)" class="tab-tuning-letter">B</text>
-<text x="26.4" y="332.5712" font-size="13.6" text-anchor="end" dominant-baseline="central" style="font-family:var(--font-family-sans)" class="tab-tuning-letter">G</text>
-<text x="26.4" y="350.8576" font-size="13.6" text-anchor="end" dominant-baseline="central" style="font-family:var(--font-family-sans)" class="tab-tuning-letter">D</text>
-<text x="26.4" y="369.1424" font-size="13.6" text-anchor="end" dominant-baseline="central" style="font-family:var(--font-family-sans)" class="tab-tuning-letter">A</text>
-<text x="26.4" y="387.4288" font-size="13.6" text-anchor="end" dominant-baseline="central" style="font-family:var(--font-family-sans)" class="tab-tuning-letter">D</text>
-<text x="36" y="341.7136" font-size="60.16" class="tab-clef"></text>
-<text x="104" y="318.8576" font-size="64" text-anchor="middle" class="time-sig-num"></text>
-<text x="104" y="364.5712" font-size="64" text-anchor="middle" class="time-sig-den"></text>
-<rect x="174" y="379.2464" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e0.n0"></rect>
-<text x="180" y="387.4288" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m0.v0.e0.n0">0</text>
-<rect x="286" y="360.96" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e1.n0"></rect>
-<text x="292" y="369.1424" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m0.v0.e1.n0">0</text>
-<rect x="398" y="342.6736" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e2.n0"></rect>
-<text x="404" y="350.8576" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m0.v0.e2.n0">0</text>
-<rect x="528.4" y="342.6736" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e3.n0"></rect>
-<text x="534.4" y="350.8576" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m0.v0.e3.n0">4</text>
-<line x1="590.4" y1="128" x2="590.4" y2="387.4288" stroke-width="2.56" class="barline barline-final-thin"></line>
-<rect x="595.2" y="128" width="8" height="259.4288" fill="currentColor" class="barline barline-final-thick"></rect>
+<line x1="32" y1="333.2" x2="603.2" y2="333.2" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="351.4864" x2="603.2" y2="351.4864" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="369.7712" x2="603.2" y2="369.7712" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="388.0576" x2="603.2" y2="388.0576" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="406.3424" x2="603.2" y2="406.3424" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="424.6288" x2="603.2" y2="424.6288" stroke-width="1.6" class="staff-line"></line>
+<text x="170.4" y="309.2" font-size="17.6" dominant-baseline="central" font-weight="600" style="font-family:var(--font-family-sans)" class="tab-tuning-letter">DADGBE</text>
+<text x="36" y="378.9136" font-size="60.16" class="tab-clef"></text>
+<text x="104" y="356.0576" font-size="64" text-anchor="middle" class="time-sig-num"></text>
+<text x="104" y="401.7712" font-size="64" text-anchor="middle" class="time-sig-den"></text>
+<rect x="174" y="416.4464" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e0.n0"></rect>
+<text x="180" y="424.6288" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m0.v0.e0.n0">0</text>
+<rect x="286" y="398.16" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e1.n0"></rect>
+<text x="292" y="406.3424" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m0.v0.e1.n0">0</text>
+<rect x="398" y="379.8736" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e2.n0"></rect>
+<text x="404" y="388.0576" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m0.v0.e2.n0">0</text>
+<rect x="528.4" y="379.8736" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m0.v0.e3.n0"></rect>
+<text x="534.4" y="388.0576" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m0.v0.e3.n0">4</text>
+<line x1="590.4" y1="128" x2="590.4" y2="424.6288" stroke-width="2.56" class="barline barline-final-thin"></line>
+<rect x="595.2" y="128" width="8" height="296.6288" fill="currentColor" class="barline barline-final-thick"></rect>
 </svg>

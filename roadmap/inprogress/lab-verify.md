@@ -81,6 +81,34 @@ Provenance answers "did this change?". This doc answers "should it have?".
 
 ## Open debt
 
+### Non-standard tuning moved into the setup heading — 2026-09-17
+
+Owner: direct user-reported engraving adjustment; no roadmap work-item doc. Non-standard
+tunings were previously rendered as six separate pitch letters beside the first TAB
+barline. A recording pre-roll bookend correctly occupies that outside-system region and
+could therefore obscure the tuning. The renderer now writes one conventional low-to-high
+tuning label above the first bar and places it before the capo on the same setup line—for
+example, `DADGAD` followed by `Capo 3`. Tuning and capo remain separate primitive classes
+and therefore retain their separate edit meanings. Technique clearance moves the pair
+together. `harness/conformance/tab-capo-clearance.test.ts` pins the order, single-label
+form and separation from the pre-roll at 0.6×, 1× and 4× Staff/Space ratios in TAB and
+combined projections.
+
+One scenario moved in its primitives and TAB/both SVG goldens. It was already `rendered`,
+so no scenario was demoted.
+
+Look for: the opening setup line says `DADGBE` once, in conventional lowest-to-highest
+string order, instead of placing six isolated letters down the left edge of the strings.
+It must sit above the first bar, remain clear of the TAB clef, time signature and first
+notes, and stay visible when a pre-roll bookend is present. In a score carrying both a
+non-standard tuning and a capo, the tuning must precede `Capo N` on one baseline and both
+labels must rise together over an opening bend or hammer/pull mark. Fret digits and all
+other spacing should remain unchanged.
+
+Scenario set (path under `scenarios/`):
+
+- `lab/22-tab-derivation/05-drop-d`
+
 ### TAB clef fitted to the six-line staff — 2026-09-16
 
 Owner: direct user-reported engraving adjustment; no roadmap work-item doc. Bravura's

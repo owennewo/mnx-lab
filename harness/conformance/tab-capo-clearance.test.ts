@@ -54,4 +54,44 @@ describe('capo clearance over opening hammer-ons', () => {
     };
     expect(capoY(withArc.primitives)).toBeCloseTo(capoY(withoutArc.primitives));
   });
+
+  it('prints a non-standard tuning once, before the capo and clear of pre-roll', () => {
+    const mnx = score();
+    mnx.parts[0]._x!.mnxLab!.strings = [
+      { string: 1, pitch: { step: 'D', octave: 4 } },
+      { string: 2, pitch: { step: 'A', octave: 3 } },
+      { string: 3, pitch: { step: 'G', octave: 3 } },
+      { string: 4, pitch: { step: 'D', octave: 3 } },
+      { string: 5, pitch: { step: 'A', octave: 2 } },
+      { string: 6, pitch: { step: 'D', octave: 2 } }
+    ];
+    for (const inkRatio of [0.6, 1, 4]) {
+      for (const layout of [layoutTab, layoutBothSystem]) {
+        const result = layout({
+          mnx,
+          widthSp: 80,
+          inkRatio,
+          systemBookends: { leading: { label: '0:01' } }
+        });
+        const tuning = result.primitives.find(p => p.kind === 'text' && p.className === 'tab-tuning-letter');
+        const capo = result.primitives.find(p => p.kind === 'text' && p.className === 'tab-capo');
+        const preRoll = result.primitives.find(p => p.kind === 'rect' && p.className?.includes('recording-bookend-leading'));
+        expect(tuning?.kind).toBe('text');
+        expect(capo?.kind).toBe('text');
+        expect(preRoll?.kind).toBe('rect');
+        if (tuning?.kind !== 'text' || capo?.kind !== 'text' || preRoll?.kind !== 'rect') continue;
+        expect(tuning.text).toBe('DADGAD');
+        expect(capo.text).toBe('Capo 3');
+        expect(tuning.y).toBe(capo.y);
+        const tuningBox = inkEdgesSp(tuning);
+        const capoBox = inkEdgesSp(capo);
+        const tuningLeft = tuning.x + (tuningBox.left - tuning.x) * inkRatio;
+        const tuningRight = tuning.x + (tuningBox.right - tuning.x) * inkRatio;
+        const capoLeft = capo.x + (capoBox.left - capo.x) * inkRatio;
+        const preRollRight = preRoll.x + (preRoll.dx ?? 0) * inkRatio + preRoll.w * inkRatio;
+        expect(preRollRight).toBeLessThan(tuningLeft);
+        expect(tuningRight).toBeLessThan(capoLeft);
+      }
+    }
+  });
 });

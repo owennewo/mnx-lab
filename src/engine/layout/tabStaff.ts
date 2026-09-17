@@ -140,8 +140,7 @@ const TAB_TUPLET_NUMBER_GAP_SP = 0.85;
 
 const CAPO_FONT_SIZE_SP = 1.1;
 const CAPO_RISE_SP = 1.5; // above the top string line
-const TUNING_LETTER_SIZE_SP = 0.85;
-const TUNING_LETTER_INSET_SP = 0.35; // gap between letter and the system start
+const SETUP_LABEL_GAP_SP = 0.7;
 
 /** "D" / "C#" / "Eb" — the letter a tuning peg is set to (octave omitted,
  *  like every printed tuning legend). */
@@ -151,22 +150,20 @@ function tuningLetter(pitch: { step: string; alter?: number }): string {
 }
 
 /**
- * The player-facing setup instructions, drawn once above/beside the FIRST bar
+ * The player-facing setup instructions, drawn once above the FIRST bar
  * (standard publishing practice — never repeated per system), from the
  * EFFECTIVE context — so a viewer-supplied instrument override renders
  * honestly, exactly like a document declaration:
  *
- *   - "Capo N" text above the top string line, when a capo is in effect.
- *   - Guitar-Pro-style open-string letters at the line starts, when the
- *     effective tuning differs from standard guitar — the letters appear
- *     exactly when the player must retune.
+ *   - A conventional low-to-high tuning label above the top string line when
+ *     the effective tuning differs from standard guitar.
+ *   - "Capo N" after the tuning label, when a capo is in effect.
  *
  * Letters show the PHYSICAL tuning (no capo shift): they are peg-setting
- * instructions, and the capo line above already carries the rest.
+ * instructions, and the capo label beside them already carries the rest.
  */
 export function emitTabSystemHeader(
   ctx: TabPositionContext,
-  x: number,
   staffTop: number,
   /** The plan's ink ratio — the insets either side of the system start are
    *  text clearances, so they are ink like every other glyph-relative gap. */
@@ -174,11 +171,18 @@ export function emitTabSystemHeader(
   primitives: Primitive[],
   headingX: number
 ): void {
-  const capo = ctx.capo;
-  if (capo > 0) {
-    primitives.push({
+  const strings = ctx.strings;
+  const standard =
+    strings.length === GUITAR_TUNING.length &&
+    strings.every(s => GUITAR_TUNING[s.string - 1] === midiOfMnxPitch(s.pitch));
+  let nextX = headingX;
+  if (!standard) {
+    const tuning: Primitive = {
       kind: 'text',
-      text: `Capo ${capo}`,
+      text: [...strings]
+        .sort((a, b) => b.string - a.string)
+        .map(entry => tuningLetter(entry.pitch))
+        .join(''),
       x: headingX,
       y: staffTop - CAPO_RISE_SP,
       font: 'body',
@@ -186,27 +190,26 @@ export function emitTabSystemHeader(
       anchor: 'start',
       baseline: 'central',
       weight: 600,
-      className: 'tab-capo'
-    });
+      className: 'tab-tuning-letter'
+    };
+    primitives.push(tuning);
+    const bounds = inkEdgesSp(tuning);
+    nextX = tuning.x + (bounds.right - tuning.x + SETUP_LABEL_GAP_SP) * ink;
   }
 
-  const strings = ctx.strings;
-  const standard =
-    strings.length === GUITAR_TUNING.length &&
-    strings.every(s => GUITAR_TUNING[s.string - 1] === midiOfMnxPitch(s.pitch));
-  if (standard) return;
-
-  for (const entry of strings) {
+  const capo = ctx.capo;
+  if (capo > 0) {
     primitives.push({
       kind: 'text',
-      text: tuningLetter(entry.pitch),
-      x: x - TUNING_LETTER_INSET_SP * ink,
-      y: staffTop + (entry.string - 1) * TAB_STRING_SPACING_SP,
+      text: `Capo ${capo}`,
+      x: nextX,
+      y: staffTop - CAPO_RISE_SP,
       font: 'body',
-      size: TUNING_LETTER_SIZE_SP,
-      anchor: 'end',
+      size: CAPO_FONT_SIZE_SP,
+      anchor: 'start',
       baseline: 'central',
-      className: 'tab-tuning-letter'
+      weight: 600,
+      className: 'tab-capo'
     });
   }
 }
@@ -218,12 +221,20 @@ export function clearTabCapoTechniques(
   primitives: readonly Primitive[], marks: readonly Primitive[], ink: number
 ): number {
   let lift = 0;
-  for (const capo of primitives) {
-    if (capo.kind !== 'text' || capo.className !== 'tab-capo') continue;
-    const box = inkEdgesSp(capo);
-    const left = capo.x + (box.left - capo.x) * ink;
-    const right = capo.x + (box.right - capo.x) * ink;
-    let bottom = box.bottom;
+  const rows = new Map<number, Array<Extract<Primitive, { kind: 'text' }>>>();
+  for (const primitive of primitives) {
+    if (primitive.kind !== 'text' || (primitive.className !== 'tab-capo' && primitive.className !== 'tab-tuning-letter')) continue;
+    const row = rows.get(primitive.y) ?? [];
+    row.push(primitive);
+    rows.set(primitive.y, row);
+  }
+  for (const setup of rows.values()) {
+    const boxes = setup.map(primitive => ({ primitive, box: inkEdgesSp(primitive) }));
+    const left = Math.min(...boxes.map(({ primitive, box }) => primitive.x + (box.left - primitive.x) * ink));
+    const right = Math.max(...boxes.map(({ primitive, box }) => primitive.x + (box.right - primitive.x) * ink));
+    const top = Math.min(...boxes.map(({ box }) => box.top));
+    const initialBottom = Math.max(...boxes.map(({ box }) => box.bottom));
+    let bottom = initialBottom;
     // Keep the old position when the technique is elsewhere (another string,
     // system, or staff). Only marks touching this label's clearance move it.
     for (let pass = 0; pass <= marks.length; pass++) {
@@ -231,14 +242,14 @@ export function clearTabCapoTechniques(
       for (const mark of marks) {
         const edge = inkEdgesSp(mark);
         if (edge.right < left || edge.left > right) continue;
-        const top = bottom - (box.bottom - box.top);
-        if (edge.bottom < top - COHESION_CLEAR_SP || edge.top > bottom + COHESION_CLEAR_SP) continue;
+        const shiftedTop = top + bottom - initialBottom;
+        if (edge.bottom < shiftedTop - COHESION_CLEAR_SP || edge.top > bottom + COHESION_CLEAR_SP) continue;
         bottom = Math.min(bottom, edge.top - COHESION_CLEAR_SP);
       }
       if (bottom === previous) break;
     }
-    const dy = bottom - box.bottom;
-    capo.y += dy;
+    const dy = bottom - initialBottom;
+    for (const primitive of setup) primitive.y += dy;
     lift = Math.min(lift, dy);
   }
   return lift;
