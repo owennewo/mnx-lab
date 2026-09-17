@@ -97,7 +97,27 @@ try {
    check(player.sourceId===row.id&&player.playback.state==='playing','The save echo re-cued the source');
    check(player.recordings[0].syncSegments.cuts.length===3,'Stored segments did not come back to the player');
    check(root.querySelector('button[aria-label="Click on the beats"]').getAttribute('aria-pressed')==='true','Click toggle');
-   player.pause();
+   player.pause();await delay(150);
+   // The zoomed window moves: by its minimap, by two fingers (a wheel), and after the playhead when it is sought away.
+   const mini=()=>sr.querySelector('.mini'),thumbAt=()=>parseFloat(sr.querySelector('.mini i').style.left);
+   check(mini().getBoundingClientRect().height>=12,'The minimap is too thin to catch: '+mini().getBoundingClientRect().height);
+   const pointer=(type,x,id=7)=>mini().dispatchEvent(new PointerEvent(type,{pointerId:id,clientX:x,clientY:mini().getBoundingClientRect().top+6,button:0,bubbles:true,composed:true}));
+   mini().setPointerCapture=()=>{}; // a synthetic pointer has nothing to capture
+   const box=mini().getBoundingClientRect(),start=thumbAt(),grab=box.left+box.width*(start+5)/100;
+   pointer('pointerdown',grab);pointer('pointermove',grab+box.width*.2);pointer('pointerup',grab+box.width*.2);await bar.updateComplete;
+   check(Math.abs(thumbAt()-start-20)<1,'Dragging the minimap did not move the window: '+start+' → '+thumbAt());
+   const dragged=thumbAt(),held=bar.time;await delay(300);
+   check(thumbAt()===dragged&&bar.time===held,'A window moved by hand did not stay where it was put');
+   const wheel=new WheelEvent('wheel',{deltaX:-sr.querySelector('.track').getBoundingClientRect().width/4,bubbles:true,composed:true,cancelable:true});
+   sr.querySelector('.track').dispatchEvent(wheel);await bar.updateComplete;
+   check(wheel.defaultPrevented&&thumbAt()<dragged-1,'A horizontal wheel did not pan the window: '+dragged+' → '+thumbAt());
+   const vertical=new WheelEvent('wheel',{deltaY:40,bubbles:true,composed:true,cancelable:true});sr.querySelector('.track').dispatchEvent(vertical);
+   check(!vertical.defaultPrevented,'A vertical wheel over the bar was taken from the page');
+   // A seek made elsewhere (the video's own scrubber) brings the window to the sound.
+   const far=thumbAt()<25?26:2;
+   bar.time=far;await bar.updateComplete;
+   const shownFrom=thumbAt()/100*bar.duration;
+   check(far>=shownFrom-.01&&far<=shownFrom+16.01,'The window did not follow the playhead to '+far+' (shows '+shownFrom.toFixed(1)+'…)');
    return {saves:saves.length,points:last.syncpoints.length};
  })()`);
  if(process.env.SYNC_BAR_SHOT){const shot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(process.env.SYNC_BAR_SHOT,Buffer.from(shot.result.data,'base64'));}

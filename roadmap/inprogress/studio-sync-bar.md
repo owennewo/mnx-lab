@@ -38,6 +38,15 @@ few is half a beat out at the midpoint, where a click over the recording makes i
   playhead (Enter) while the recording plays. Split lives in the selected segment's row.
   Selecting a cut zooms the bar around it and beat ticks appear; deselecting returns to the
   whole recording. A hairline under the bar shows where the zoomed window sits.
+  **Revised 2026-09-18, from the owner's first hands-on use:** the hairline read as a
+  scrollbar and could not be caught, because it was never one. It is now — a 12 px grab
+  area round the 2 px line, dragged to move the window — and two fingers over the bar (a
+  trackpad's horizontal wheel, or two touches) drag the window too; a vertical wheel still
+  scrolls the page. **The window follows the playhead**: a seek made anywhere (the video's
+  own scrubber, the score, the rail) brings the bar to the sound, and playback that runs
+  off the right edge turns the page. A window placed on purpose — round a selected cut, or
+  moved by hand — stays put until the playhead is back inside it or jumps. Still no zoom
+  button and no new chrome.
 - **Editing is one row above the tray**, in the rate and volume overlays' vocabulary. A
   selected segment: name, beats or tempo with minus and plus, Tap, Split at playhead. A
   selected cut: time, four nudges (±1 ms, ±10 ms), To playhead, Loop, Remove. Dragging is

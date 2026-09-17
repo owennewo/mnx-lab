@@ -36,6 +36,12 @@ export class SyncBar extends LitElement {
   @state() private selected: Selection = null;
   @state() private zoom: { from: number; to: number } | null = null;
   @state() private looping = false;
+  /** The window was moved by hand: it stays put until the playhead is seen inside it again, or is sought elsewhere. */
+  private panHeld = false;
+  private lastTime = 0;
+  private miniDrag: { pointer: number; x: number; from: number } | null = null;
+  /** Fingers on the bar. Two of them drag the zoomed window, the way they would scroll anything else. */
+  private touches = new Map<number, number>();
   private drag: { index: number | 'start' | 'end'; x: number; from: number; span: number; moved: boolean; pointer: number } | null = null;
   private taps: number[] = [];
 
@@ -167,18 +173,35 @@ export class SyncBar extends LitElement {
     .cut.parked { color: var(--ink-3); }
     .cut[aria-pressed='true'] { color: var(--accent); z-index: 4; }
     .cut:focus-visible { outline: var(--rule-w, 2px) solid var(--focus-ring, var(--ink)); }
+    /* Where the zoomed window sits in the whole recording — and the handle that moves it. The line is 2px; the
+       grab area is the 12px around it, because a scrollbar nobody can catch is worse than none. */
+    .bar { touch-action: pan-y; }
     .mini {
       position: absolute;
       left: 0;
       right: 0;
-      top: 38px;
+      top: 33px;
+      height: 12px;
+      cursor: grab;
+      touch-action: none;
+      z-index: 4;
+    }
+    .mini:active { cursor: grabbing; }
+    .mini::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 5px;
       height: 2px;
       background: var(--line-strong);
     }
     .mini i {
       position: absolute;
-      top: -1px;
-      height: 4px;
+      top: 3px;
+      height: 6px;
+      min-width: 12px;
+      border-radius: 1px;
       background: var(--ink);
     }
     .wait {
@@ -250,6 +273,34 @@ export class SyncBar extends LitElement {
     if (this.duration <= ZOOM_SPAN) { this.zoom = null; return; }
     const from = Math.min(this.duration - ZOOM_SPAN, Math.max(0, seconds - ZOOM_SPAN / 2));
     this.zoom = { from, to: from + ZOOM_SPAN };
+    // Put here on purpose, around a cut: a playhead that is somewhere else does not get to take it away.
+    this.panHeld = true;
+  }
+  /** Move the zoomed window by hand. It holds where it is put (`panHeld`) rather than snapping back to a playhead
+   *  that is still where it was. */
+  private panTo(from: number) {
+    if (!this.zoom) return;
+    const clamped = Math.min(this.duration - ZOOM_SPAN, Math.max(0, from));
+    if (clamped === this.zoom.from) return;
+    this.zoom = { from: clamped, to: clamped + ZOOM_SPAN };
+    this.panHeld = true;
+  }
+  /**
+   * The zoomed window follows the playhead: a seek made anywhere — the video's own scrubber, the score, the rail —
+   * brings the bar to where the sound now is, and playback that runs off the right edge turns the page. A window
+   * moved by hand is left alone until the playhead is back inside it or jumps; a drag in progress always is.
+   */
+  private followPlayhead() {
+    const jumped = Math.abs(this.time - this.lastTime) > 1.5;
+    this.lastTime = this.time;
+    if (!this.zoom || this.drag || this.miniDrag || this.touches.size > 1) return;
+    const inside = this.time >= this.zoom.from && this.time <= this.zoom.to;
+    if (inside) { this.panHeld = false; return; }
+    if (this.panHeld && !jumped) return;
+    // A quarter in: what is about to sound matters more than what just did.
+    const from = Math.min(this.duration - ZOOM_SPAN, Math.max(0, this.time - ZOOM_SPAN / 4));
+    this.zoom = { from, to: from + ZOOM_SPAN };
+    this.panHeld = false;
   }
   private select(next: Selection) {
     if (this.looping && !(next?.kind === 'cut')) this.setLoop(false);
@@ -259,6 +310,7 @@ export class SyncBar extends LitElement {
   }
 
   protected willUpdate(changed: Map<PropertyKey, unknown>) {
+    if (changed.has('time')) this.followPlayhead();
     if (!changed.has('segments') && !changed.has('duration')) return;
     // A selection that no longer names anything (another editor, a reload) lets go.
     const s = this.selected;
@@ -390,6 +442,49 @@ export class SyncBar extends LitElement {
     this.change(this.segments, true);
     if (this.selected?.kind === 'cut') { this.zoomTo(this.segments.cuts[this.selected.index]); if (this.looping) this.setLoop(true); }
   }
+  // Panning the zoomed window: the minimap is its scrollbar, and two fingers over the bar — a trackpad's wheel
+  // events, or two touches — drag it the way they would scroll anything else.
+  private trackWidth() { return this.renderRoot.querySelector('.track')!.getBoundingClientRect().width || 1; }
+  private onMiniDown(event: PointerEvent) {
+    if (event.button !== 0 || !this.zoom) return;
+    event.stopPropagation();
+    const strip = event.currentTarget as HTMLElement, box = strip.getBoundingClientRect();
+    strip.setPointerCapture(event.pointerId);
+    // A press off the thumb brings the window to the pointer first, so the drag continues from under it.
+    const at = (event.clientX - box.left) / box.width * this.duration;
+    if (at < this.zoom.from || at > this.zoom.to) this.panTo(at - ZOOM_SPAN / 2);
+    this.miniDrag = { pointer: event.pointerId, x: event.clientX, from: this.zoom.from };
+  }
+  private onMiniMove(event: PointerEvent) {
+    const drag = this.miniDrag;
+    if (!drag || event.pointerId !== drag.pointer) return;
+    const width = (event.currentTarget as HTMLElement).getBoundingClientRect().width || 1;
+    this.panTo(drag.from + (event.clientX - drag.x) / width * this.duration);
+  }
+  private onMiniUp(event: PointerEvent) { if (this.miniDrag?.pointer === event.pointerId) this.miniDrag = null; }
+  private onWheel(event: WheelEvent) {
+    // Horizontal intent only: a vertical wheel over the tray still scrolls the page.
+    const dx = event.shiftKey && !event.deltaX ? event.deltaY : event.deltaX;
+    if (!this.zoom || !dx || Math.abs(event.deltaY) > Math.abs(dx) && !event.shiftKey) return;
+    event.preventDefault();
+    this.panTo(this.zoom.from + dx / this.trackWidth() * ZOOM_SPAN);
+  }
+  private onTouchDown(event: PointerEvent) {
+    if (event.pointerType !== 'touch') return;
+    this.touches.set(event.pointerId, event.clientX);
+    // A second finger turns whatever the first began into a pan: let go of the cut, do not move it.
+    if (this.touches.size === 2 && this.drag) { if (this.drag.moved) this.change(this.segments, true); this.drag = null; }
+  }
+  private onTouchMove(event: PointerEvent) {
+    const before = this.touches.get(event.pointerId);
+    if (before === undefined) return;
+    this.touches.set(event.pointerId, event.clientX);
+    if (this.touches.size !== 2 || !this.zoom) return;
+    // Each finger carries half: two fingers moving together move the window one for one with the score under them.
+    this.panTo(this.zoom.from - (event.clientX - before) / 2 / this.trackWidth() * ZOOM_SPAN);
+  }
+  private onTouchUp(event: PointerEvent) { this.touches.delete(event.pointerId); }
+
   private onKey(event: KeyboardEvent) {
     if (event.target instanceof HTMLInputElement || event.metaKey || event.ctrlKey || event.altKey) return;
     const s = this.selected, key = event.key.length === 1 ? event.key.toLowerCase() : event.key;
@@ -464,7 +559,8 @@ export class SyncBar extends LitElement {
     const shown = this.regions().filter(r => r.to > from && r.from < to);
     const ticks = this.zoom ? beatTimes(this.segments, from, to, this.duration).filter(b => !b.cut).slice(0, 400) : [];
     const width = (a: number, b: number) => `${(Math.min(to, b) - Math.max(from, a)) / (to - from) * 100}%`;
-    return html`<div class="bar" tabindex="0" role="group" aria-label="Recording sync" @keydown=${this.onKey}>
+    return html`<div class="bar" tabindex="0" role="group" aria-label="Recording sync" @keydown=${this.onKey} @wheel=${this.onWheel}
+        @pointerdown=${this.onTouchDown} @pointermove=${this.onTouchMove} @pointerup=${this.onTouchUp} @pointercancel=${this.onTouchUp}>
         ${shown.map(r => r.index < 0
           ? html`<span class="lab" style=${`left:${this.pct(r.from)};width:${width(r.from, r.to)}`}>${r.name}</span>`
           : html`<button type="button" class="lab" style=${`left:${this.pct(r.from)};width:${width(r.from, r.to)}`}
@@ -482,7 +578,10 @@ export class SyncBar extends LitElement {
           i === 0 || (closed && i === cuts.length - 1), s?.kind === 'cut' && s.index === i))}
         ${closed || this.zoom ? nothing : this.cutButton('end', to, 'End handle, not placed', true, s?.kind === 'parked' && s.end === 'end')}
         ${this.time >= from && this.time <= to ? html`<div class="head" style=${`left:${this.pct(this.time)}`}></div>` : nothing}
-        ${this.zoom ? html`<div class="mini"><i style=${`left:${from / this.duration * 100}%;width:${(to - from) / this.duration * 100}%`}></i></div>` : nothing}
+        ${this.zoom ? html`<div class="mini" role="scrollbar" aria-orientation="horizontal" aria-label="The part of the recording shown"
+          aria-valuemin="0" aria-valuemax=${Math.round(this.duration)} aria-valuenow=${Math.round(from)}
+          @pointerdown=${this.onMiniDown} @pointermove=${this.onMiniMove} @pointerup=${this.onMiniUp} @pointercancel=${this.onMiniUp}
+          @click=${(e: Event) => e.stopPropagation()}><i style=${`left:${from / this.duration * 100}%;width:${(to - from) / this.duration * 100}%`}></i></div>` : nothing}
       </div>
       ${this.cutRow()}${this.segmentRow()}`;
   }
