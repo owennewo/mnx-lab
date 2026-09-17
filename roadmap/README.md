@@ -45,6 +45,11 @@ proposals that name their campaign.
 
 ### proposed/
 
+- **[core-recording-bookends.md](proposed/core-recording-bookends.md)** — Soundslice recording
+  sync anchors describe the scored interval, not the whole media file: model pre-roll and
+  post-roll as normal unanchored media, render duration-labelled system bookends, stop
+  calling them sync warnings, let Play/Stop include the pre-roll, and remove the mistaken
+  `cropped_duration` → full `duration_s` ingest claim.
 - **[studio-player-practice.md](proposed/studio-player-practice.md)** — campaign item 13,
   studio's first player feature in `elements/`: loop the selection with the **written-range
   → performed-occurrences policy stated**, speed trainer, count-in, metronome, mute/solo.
