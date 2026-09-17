@@ -1,0 +1,96 @@
+<svg width="1280" height="502.592" viewBox="0 0 1280 502.592" xmlns="http://www.w3.org/2000/svg">
+<style>:where(svg>text){font-family:Bravura;fill:currentColor}:where(svg>line,svg>path){stroke:currentColor}</style>
+<line x1="32" y1="128" x2="232.8" y2="128" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="144" x2="232.8" y2="144" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="160" x2="232.8" y2="160" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="176" x2="232.8" y2="176" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="192" x2="232.8" y2="192" stroke-width="2.08" class="staff-line"></line>
+<text x="36" y="176" font-size="64" class="clef"></text>
+<text x="104" y="144" font-size="64" text-anchor="middle" class="time-sig-num"></text>
+<text x="104" y="176" font-size="64" text-anchor="middle" class="time-sig-den"></text>
+<line x1="232.8" y1="128" x2="232.8" y2="192" stroke-width="2.56" class="barline"></line>
+<text x="178.4" y="144" font-size="64" text-anchor="middle" class="rest rest-full-measure"></text>
+<line x1="232.8" y1="128" x2="351.2" y2="128" stroke-width="2.08" class="staff-line"></line>
+<line x1="232.8" y1="144" x2="351.2" y2="144" stroke-width="2.08" class="staff-line"></line>
+<line x1="232.8" y1="160" x2="351.2" y2="160" stroke-width="2.08" class="staff-line"></line>
+<line x1="232.8" y1="176" x2="351.2" y2="176" stroke-width="2.08" class="staff-line"></line>
+<line x1="232.8" y1="192" x2="351.2" y2="192" stroke-width="2.08" class="staff-line"></line>
+<line x1="351.2" y1="128" x2="351.2" y2="192" stroke-width="2.56" class="barline"></line>
+<text x="296.8" y="144" font-size="64" text-anchor="middle" class="rest rest-full-measure"></text>
+<line x1="351.2" y1="128" x2="469.6" y2="128" stroke-width="2.08" class="staff-line"></line>
+<line x1="351.2" y1="144" x2="469.6" y2="144" stroke-width="2.08" class="staff-line"></line>
+<line x1="351.2" y1="160" x2="469.6" y2="160" stroke-width="2.08" class="staff-line"></line>
+<line x1="351.2" y1="176" x2="469.6" y2="176" stroke-width="2.08" class="staff-line"></line>
+<line x1="351.2" y1="192" x2="469.6" y2="192" stroke-width="2.08" class="staff-line"></line>
+<line x1="469.6" y1="128" x2="469.6" y2="192" stroke-width="2.56" class="barline"></line>
+<text x="415.2" y="144" font-size="64" text-anchor="middle" class="rest rest-full-measure"></text>
+<line x1="469.6" y1="128" x2="588" y2="128" stroke-width="2.08" class="staff-line"></line>
+<line x1="469.6" y1="144" x2="588" y2="144" stroke-width="2.08" class="staff-line"></line>
+<line x1="469.6" y1="160" x2="588" y2="160" stroke-width="2.08" class="staff-line"></line>
+<line x1="469.6" y1="176" x2="588" y2="176" stroke-width="2.08" class="staff-line"></line>
+<line x1="469.6" y1="192" x2="588" y2="192" stroke-width="2.08" class="staff-line"></line>
+<line x1="588" y1="128" x2="588" y2="192" stroke-width="2.56" class="barline"></line>
+<text x="533.6" y="144" font-size="64" text-anchor="middle" class="rest rest-full-measure"></text>
+<line x1="588" y1="128" x2="706.4" y2="128" stroke-width="2.08" class="staff-line"></line>
+<line x1="588" y1="144" x2="706.4" y2="144" stroke-width="2.08" class="staff-line"></line>
+<line x1="588" y1="160" x2="706.4" y2="160" stroke-width="2.08" class="staff-line"></line>
+<line x1="588" y1="176" x2="706.4" y2="176" stroke-width="2.08" class="staff-line"></line>
+<line x1="588" y1="192" x2="706.4" y2="192" stroke-width="2.08" class="staff-line"></line>
+<line x1="706.4" y1="128" x2="706.4" y2="192" stroke-width="2.56" class="barline"></line>
+<text x="652" y="144" font-size="64" text-anchor="middle" class="rest rest-full-measure"></text>
+<line x1="706.4" y1="128" x2="824.8" y2="128" stroke-width="2.08" class="staff-line"></line>
+<line x1="706.4" y1="144" x2="824.8" y2="144" stroke-width="2.08" class="staff-line"></line>
+<line x1="706.4" y1="160" x2="824.8" y2="160" stroke-width="2.08" class="staff-line"></line>
+<line x1="706.4" y1="176" x2="824.8" y2="176" stroke-width="2.08" class="staff-line"></line>
+<line x1="706.4" y1="192" x2="824.8" y2="192" stroke-width="2.08" class="staff-line"></line>
+<line x1="824.8" y1="128" x2="824.8" y2="192" stroke-width="2.56" class="barline"></line>
+<text x="770.4" y="144" font-size="64" text-anchor="middle" class="rest rest-full-measure"></text>
+<line x1="824.8" y1="128" x2="943.2" y2="128" stroke-width="2.08" class="staff-line"></line>
+<line x1="824.8" y1="144" x2="943.2" y2="144" stroke-width="2.08" class="staff-line"></line>
+<line x1="824.8" y1="160" x2="943.2" y2="160" stroke-width="2.08" class="staff-line"></line>
+<line x1="824.8" y1="176" x2="943.2" y2="176" stroke-width="2.08" class="staff-line"></line>
+<line x1="824.8" y1="192" x2="943.2" y2="192" stroke-width="2.08" class="staff-line"></line>
+<line x1="943.2" y1="128" x2="943.2" y2="192" stroke-width="2.56" class="barline"></line>
+<text x="888.8" y="144" font-size="64" text-anchor="middle" class="rest rest-full-measure"></text>
+<line x1="943.2" y1="128" x2="1061.6" y2="128" stroke-width="2.08" class="staff-line"></line>
+<line x1="943.2" y1="144" x2="1061.6" y2="144" stroke-width="2.08" class="staff-line"></line>
+<line x1="943.2" y1="160" x2="1061.6" y2="160" stroke-width="2.08" class="staff-line"></line>
+<line x1="943.2" y1="176" x2="1061.6" y2="176" stroke-width="2.08" class="staff-line"></line>
+<line x1="943.2" y1="192" x2="1061.6" y2="192" stroke-width="2.08" class="staff-line"></line>
+<line x1="1061.6" y1="128" x2="1061.6" y2="192" stroke-width="2.56" class="barline"></line>
+<text x="1007.2" y="144" font-size="64" text-anchor="middle" class="rest rest-full-measure"></text>
+<line x1="1061.6" y1="128" x2="1180" y2="128" stroke-width="2.08" class="staff-line"></line>
+<line x1="1061.6" y1="144" x2="1180" y2="144" stroke-width="2.08" class="staff-line"></line>
+<line x1="1061.6" y1="160" x2="1180" y2="160" stroke-width="2.08" class="staff-line"></line>
+<line x1="1061.6" y1="176" x2="1180" y2="176" stroke-width="2.08" class="staff-line"></line>
+<line x1="1061.6" y1="192" x2="1180" y2="192" stroke-width="2.08" class="staff-line"></line>
+<line x1="1180" y1="128" x2="1180" y2="192" stroke-width="2.56" class="barline"></line>
+<text x="1125.6" y="144" font-size="64" text-anchor="middle" class="rest rest-full-measure"></text>
+<line x1="32" y1="310.592" x2="192.8" y2="310.592" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="326.592" x2="192.8" y2="326.592" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="342.592" x2="192.8" y2="342.592" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="358.592" x2="192.8" y2="358.592" stroke-width="2.08" class="staff-line"></line>
+<line x1="32" y1="374.592" x2="192.8" y2="374.592" stroke-width="2.08" class="staff-line"></line>
+<text x="36" y="358.592" font-size="64" class="clef"></text>
+<line x1="192.8" y1="310.592" x2="192.8" y2="374.592" stroke-width="2.56" class="barline"></line>
+<text x="138.4" y="326.592" font-size="64" text-anchor="middle" class="rest rest-full-measure"></text>
+<line x1="192.8" y1="310.592" x2="311.2" y2="310.592" stroke-width="2.08" class="staff-line"></line>
+<line x1="192.8" y1="326.592" x2="311.2" y2="326.592" stroke-width="2.08" class="staff-line"></line>
+<line x1="192.8" y1="342.592" x2="311.2" y2="342.592" stroke-width="2.08" class="staff-line"></line>
+<line x1="192.8" y1="358.592" x2="311.2" y2="358.592" stroke-width="2.08" class="staff-line"></line>
+<line x1="192.8" y1="374.592" x2="311.2" y2="374.592" stroke-width="2.08" class="staff-line"></line>
+<line x1="311.2" y1="310.592" x2="311.2" y2="374.592" stroke-width="2.56" class="barline"></line>
+<text x="256.8" y="326.592" font-size="64" text-anchor="middle" class="rest rest-full-measure"></text>
+<line x1="311.2" y1="310.592" x2="429.6" y2="310.592" stroke-width="2.08" class="staff-line"></line>
+<line x1="311.2" y1="326.592" x2="429.6" y2="326.592" stroke-width="2.08" class="staff-line"></line>
+<line x1="311.2" y1="342.592" x2="429.6" y2="342.592" stroke-width="2.08" class="staff-line"></line>
+<line x1="311.2" y1="358.592" x2="429.6" y2="358.592" stroke-width="2.08" class="staff-line"></line>
+<line x1="311.2" y1="374.592" x2="429.6" y2="374.592" stroke-width="2.08" class="staff-line"></line>
+<line x1="416.8" y1="310.592" x2="416.8" y2="374.592" stroke-width="2.56" class="barline barline-final-thin"></line>
+<rect x="421.6" y="310.592" width="8" height="64" fill="currentColor" class="barline barline-final-thick"></rect>
+<text x="375.2" y="326.592" font-size="64" text-anchor="middle" class="rest rest-full-measure"></text>
+<text x="716" y="88" font-size="19.2" style="font-family:var(--font-family-sans)" class="occurrence-label">2×</text>
+<text x="834.4" y="88" font-size="19.2" style="font-family:var(--font-family-sans)" class="occurrence-label">2×</text>
+<text x="84" y="270.592" font-size="19.2" style="font-family:var(--font-family-sans)" class="occurrence-label">2×</text>
+<text x="202.4" y="270.592" font-size="19.2" style="font-family:var(--font-family-sans)" class="occurrence-label">2×</text>
+</svg>

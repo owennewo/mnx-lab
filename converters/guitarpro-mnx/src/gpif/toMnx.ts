@@ -18,7 +18,9 @@ import {
   MnxDynamicValue,
   MnxArpeggio,
   MnxDirection,
-  MnxEventMarkings
+  MnxEventMarkings,
+  MnxLabNavigationJump,
+  MnxLabNavigationMark
 } from '../common/types.js';
 import { parseChordSymbol } from '../common/harmony.js';
 import { gpScoreInfoToWork, rootExtension } from '../common/scoreMetadata.js';
@@ -185,6 +187,7 @@ function buildGlobalMeasures(
   report: ImportState['report']
 ): MnxGlobalMeasure[] {
   const measures: MnxGlobalMeasure[] = [];
+  const targetIds = directionTargetIds();
 
   // MNX declares attributes change-only; track what has been emitted.
   let lastTime = '';
@@ -216,6 +219,7 @@ function buildGlobalMeasures(
       measure.repeatEnd = { times: masterBar.repeatCount };
     }
     if (masterBar.doubleBar) measure.barline = { type: 'double' };
+    applyDirections(measure, masterBar, barIndex, targetIds, report);
 
     // Section / rehearsal labels: Guitar Pro conflates the two into one
     // `Section{Letter, Text}`; split, because a rehearsal mark is an index
@@ -243,6 +247,103 @@ function buildGlobalMeasures(
 
   collapseAlternateEndings(doc, measures);
   return measures;
+}
+
+type DirectionTargetToken = 'Segno' | 'SegnoSegno' | 'Coda' | 'DoubleCoda';
+
+const TARGET_IDS: Record<DirectionTargetToken, string> = {
+  Segno: 'segno', SegnoSegno: 'double-segno', Coda: 'coda', DoubleCoda: 'double-coda'
+};
+
+function directionTargetIds(): Map<string, string> {
+  // Predeclare all four IDs, including absent targets: a malformed file still
+  // retains what its jump intended to name, so traversal can diagnose the
+  // missing destination instead of silently turning it into an unqualified jump.
+  return new Map(Object.entries(TARGET_IDS));
+}
+
+function applyDirections(
+  measure: MnxGlobalMeasure,
+  masterBar: GpifDocument['masterBars'][number],
+  barIndex: number,
+  targetIds: Map<string, string>,
+  report: ImportState['report']
+): void {
+  const atStart = { fraction: [0, 1] as [number, number] };
+  const atEnd = { fraction: [1, 1] as [number, number] };
+  const navigation: { marks: MnxLabNavigationMark[]; jumps: MnxLabNavigationJump[] } = {
+    marks: [],
+    jumps: []
+  };
+
+  for (const token of masterBar.directionTargets) {
+    if (token === 'Fine') {
+      measure.fine = { location: atEnd };
+    } else if (token === 'Segno') {
+      measure.segno = { id: targetIds.get(token), location: atStart };
+    } else if (token === 'SegnoSegno' || token === 'Coda' || token === 'DoubleCoda') {
+      navigation.marks.push({
+        id: targetIds.get(token)!,
+        kind: token.includes('Coda') ? 'coda' : 'segno',
+        ...(token === 'SegnoSegno' || token === 'DoubleCoda' ? { count: 2 as const } : {}),
+        location: atStart
+      });
+    } else {
+      report(`master bar direction Target ${token || '(empty)'}`, barIndex);
+    }
+  }
+
+  const ref = (token: DirectionTargetToken) => targetIds.get(token);
+  for (const token of masterBar.directionJumps) {
+    if (token === 'DaSegno') measure.jump = { type: 'segno', location: atEnd };
+    else if (token === 'DaSegnoAlFine') measure.jump = { type: 'dsalfine', location: atEnd };
+    else {
+      const jump = gpifLabJump(token, ref, atEnd);
+      if (jump) navigation.jumps.push(jump);
+      else report(`master bar direction Jump ${token || '(empty)'}`, barIndex);
+    }
+  }
+
+  if (navigation.marks.length || navigation.jumps.length) {
+    measure._x = { mnxLab: {
+      ...measure._x?.mnxLab,
+      navigation: {
+        ...(navigation.marks.length ? { marks: navigation.marks } : {}),
+        ...(navigation.jumps.length ? { jumps: navigation.jumps } : {})
+      }
+    } };
+  }
+}
+
+function gpifLabJump(
+  token: string,
+  ref: (token: DirectionTargetToken) => string | undefined,
+  location: { fraction: [number, number] }
+): MnxLabNavigationJump | null {
+  const text: Record<string, string> = {
+    DaCapo: 'D.C.', DaCapoAlCoda: 'D.C. al Coda',
+    DaCapoAlDoubleCoda: 'D.C. al Double Coda', DaCapoAlFine: 'D.C. al Fine',
+    DaSegnoSegno: 'D.S.S.', DaSegnoAlCoda: 'D.S. al Coda',
+    DaSegnoAlDoubleCoda: 'D.S. al Double Coda', DaSegnoSegnoAlCoda: 'D.S.S. al Coda',
+    DaSegnoSegnoAlDoubleCoda: 'D.S.S. al Double Coda', DaSegnoSegnoAlFine: 'D.S.S. al Fine',
+    DaCoda: 'To Coda', DaDoubleCoda: 'To Double Coda'
+  };
+  const common = { location, text: text[token] };
+  switch (token) {
+    case 'DaCapo': return { type: 'daCapo', ...common };
+    case 'DaCapoAlFine': return { type: 'daCapoAlFine', ...common };
+    case 'DaCapoAlCoda': return { type: 'daCapoAlCoda', resumeAt: ref('Coda'), ...common };
+    case 'DaCapoAlDoubleCoda': return { type: 'daCapoAlCoda', resumeAt: ref('DoubleCoda'), ...common };
+    case 'DaSegnoSegno': return { type: 'dalSegno', target: ref('SegnoSegno'), ...common };
+    case 'DaSegnoSegnoAlFine': return { type: 'dalSegnoAlFine', target: ref('SegnoSegno'), ...common };
+    case 'DaSegnoAlCoda': return { type: 'dalSegnoAlCoda', target: ref('Segno'), resumeAt: ref('Coda'), ...common };
+    case 'DaSegnoAlDoubleCoda': return { type: 'dalSegnoAlCoda', target: ref('Segno'), resumeAt: ref('DoubleCoda'), ...common };
+    case 'DaSegnoSegnoAlCoda': return { type: 'dalSegnoAlCoda', target: ref('SegnoSegno'), resumeAt: ref('Coda'), ...common };
+    case 'DaSegnoSegnoAlDoubleCoda': return { type: 'dalSegnoAlCoda', target: ref('SegnoSegno'), resumeAt: ref('DoubleCoda'), ...common };
+    case 'DaCoda': return { type: 'toCoda', target: ref('Coda'), ...common };
+    case 'DaDoubleCoda': return { type: 'toCoda', target: ref('DoubleCoda'), ...common };
+    default: return null;
+  }
 }
 
 /**

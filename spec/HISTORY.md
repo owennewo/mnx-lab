@@ -110,12 +110,16 @@ The downloaded schema enforces the core concepts of the MNX format:
 
 ## Extension schema
 
-`mnx-lab-extensions.schema.json` (**v6.3**) holds everything this project carries that MNX cannot
+`mnx-lab-extensions.schema.json` (**v6.4**) holds everything this project carries that MNX cannot
 express, under the single vendor key `_x.mnxLab`. It is a `$defs` library, not a document schema:
 `spec/tools/compile-validator.mjs` compiles three sub-validators from it (`note-ext`, `part-ext`,
 `global-measure-ext`) and consumers walk the document. Register + rationale:
 [docs/mnx-extensions.md](../docs/mnx-extensions.md).
 
+- **v6.4 (2026-09-17)** — additive: `navigation` on global measures: named
+  single/double segno and coda marks, and structured D.C./D.S./Fine/Coda jumps
+  with explicit return and resume targets. Published MNX's `jump-type` enum is
+  unchanged. No migration; `$id` stays `/v6`.
 - **v6.3 (2026-09-09)** — additive: `swing` on the global measure, plus the `note-value` def
   it needs. A ratio (`[first, second]`) on a unit, mirroring MusicXML 3.1's `<sound><swing>`
   rather than any application's named-feel enum — the seven names Guitar Pro and Soundslice

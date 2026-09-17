@@ -1,0 +1,36 @@
+{
+  "title": "Coda and double-coda navigation",
+  "description": "The eight-direction route distilled from a real Guitar Pro score: double segno, To Double Coda, segno, To Coda, D.S. al Coda, coda, D.S.S. al Double Coda, and double coda. Pins the lab extension, both staff renderers, and the independently stated performed order without committing the source score.",
+  "bars": 8,
+  "tags": [
+    "navigation",
+    "coda",
+    "tab",
+    "spec-gap"
+  ],
+  "specRefs": [
+    "https://w3c-cg.github.io/mnx/docs/mnx-reference/objects/jump/"
+  ],
+  "coversDefs": [
+    "root",
+    "global",
+    "measure-global",
+    "segno",
+    "jump",
+    "jump-type",
+    "rhythmic-position"
+  ],
+  "expect": {
+    "standard": "valid",
+    "extension": "valid"
+  },
+  "requires": [
+    "tab-view"
+  ],
+  "idRefs": true,
+  "source": "hand-written",
+  "origin": "local",
+  "status": "rendered",
+  "performance": true,
+  "unrolled": true
+}

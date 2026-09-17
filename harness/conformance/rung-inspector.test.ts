@@ -82,6 +82,8 @@ const ONE_OF_EACH: MeasureAttribute[] = [
   { kind: 'harmony', text: 'D/F#', at: [1, 2] },
   { kind: 'jump', type: 'dsalfine' },
   { kind: 'jump', type: 'segno', at: [3, 4] },
+  { kind: 'navigationMark', id: 'double-coda', markKind: 'coda', count: 2 },
+  { kind: 'navigationJump', type: 'dalSegnoAlCoda', target: 'double-segno', resumeAt: 'double-coda', text: 'D.S.S. al Double Coda' },
   { kind: 'tempo', bpm: 120, base: 'quarter' },
   { kind: 'tempo', bpm: 60, base: 'quarter', dots: 1 },
   { kind: 'rehearsal', label: 'A' },

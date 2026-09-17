@@ -20,6 +20,10 @@ export interface MnxPitch {
   alter?: number;
 }
 
+export interface MnxRhythmicPosition {
+  fraction: [number, number];
+}
+
 export type MnxNoteValueBase =
   | 'duplexMaxima' | 'maxima' | 'longa' | 'breve'
   | 'whole' | 'half' | 'quarter' | 'eighth'
@@ -134,9 +138,40 @@ export interface MnxLabSwing {
   text?: string;
 }
 
+export const MNX_JUMP_TYPES = ['segno', 'dsalfine'] as const;
+export type MnxJumpType = typeof MNX_JUMP_TYPES[number];
+export const MNX_LAB_JUMP_TYPES = [
+  'toCoda', 'daCapo', 'daCapoAlFine', 'daCapoAlCoda',
+  'dalSegno', 'dalSegnoAlFine', 'dalSegnoAlCoda'
+] as const;
+export type MnxLabJumpType = typeof MNX_LAB_JUMP_TYPES[number];
+export type NavigationJumpType = MnxJumpType | MnxLabJumpType;
+
+export interface MnxLabNavigationMark {
+  id: string;
+  kind: 'segno' | 'coda';
+  count?: 1 | 2;
+  location: MnxRhythmicPosition;
+  color?: string;
+}
+
+export interface MnxLabNavigationJump {
+  type: MnxLabJumpType;
+  location: MnxRhythmicPosition;
+  target?: string;
+  resumeAt?: string;
+  text?: string;
+}
+
+export interface MnxLabNavigation {
+  marks?: MnxLabNavigationMark[];
+  jumps?: MnxLabNavigationJump[];
+}
+
 export interface MnxGlobalMeasureExtension {
   harmonies?: MnxHarmony[];
   swing?: MnxLabSwing;
+  navigation?: MnxLabNavigation;
 }
 
 export interface MnxTabNoteExtension {
@@ -370,6 +405,9 @@ export interface MnxGlobalMeasure {
   repeatStart?: object;
   repeatEnd?: { times?: number };
   ending?: { duration?: number; numbers?: number[]; open?: boolean };
+  segno?: { id?: string; location: MnxRhythmicPosition; glyph?: string; color?: string };
+  fine?: { location: MnxRhythmicPosition; color?: string };
+  jump?: { type: MnxJumpType; location: MnxRhythmicPosition };
   tempos?: {
     bpm: number;
     value: MnxNoteValue;

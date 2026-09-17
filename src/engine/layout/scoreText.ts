@@ -11,6 +11,7 @@ import { glyphBBox } from '../smufl/smufl.ts';
 import { computeBoundsSp, type BoundsSp } from '../render/bounds.ts';
 import { durationValue, tremoloDuration, tupletDuration, measureHeadingX, ONSET_TEXT_LEAD_SP, type MeasureHeading } from './spacing.ts';
 import { chordSymbolDisplay } from '../../model/harmony.ts';
+import { measureNavigation } from '../../model/navigation.ts';
 import type { ResolvedSwing, SwingTimelineEntry } from '../../model/swing.ts';
 
 // ---------- Ink-measured placement (core-ink-measured-gaps.md, stage A) ----------
@@ -190,7 +191,14 @@ const NAV_MARKER_RISE_SP = 2.5; // baseline above the top staff line
 
 const JUMP_TEXT: Record<string, string> = {
   segno: 'D.S.',
-  dsalfine: 'D.S. al Fine'
+  dsalfine: 'D.S. al Fine',
+  toCoda: 'To Coda',
+  daCapo: 'D.C.',
+  daCapoAlFine: 'D.C. al Fine',
+  daCapoAlCoda: 'D.C. al Coda',
+  dalSegno: 'D.S.',
+  dalSegnoAlFine: 'D.S. al Fine',
+  dalSegnoAlCoda: 'D.S. al Coda'
 };
 
 export interface EmitNavigationMarkersArgs {
@@ -206,7 +214,8 @@ export interface EmitNavigationMarkersArgs {
  *  as in the spec's reference engravings. */
 export function emitNavigationMarkers(args: EmitNavigationMarkersArgs): void {
   const { gm, m, stdSequences, staffTop, primitives } = args;
-  if (!gm.segno && !gm.fine && !gm.jump) return;
+  const navigation = measureNavigation(gm);
+  if (!navigation.marks.length && !navigation.jumps.length) return;
 
   const onsetXs = measureOnsetXs(stdSequences, m.voices);
   const y = staffTop - NAV_MARKER_RISE_SP;
@@ -216,37 +225,30 @@ export function emitNavigationMarkers(args: EmitNavigationMarkersArgs): void {
     return anchorAt(onsetXs, t, m);
   };
 
-  if (gm.segno) {
-    const p = place(gm.segno.location);
-    primitives.push({
-      kind: 'glyph',
-      glyph: gm.segno.glyph ?? 'segno',
-      x: p.x,
-      y,
-      anchor: p.anchor,
-      ...(gm.segno.color ? { fill: gm.segno.color } : {}),
-      className: 'segno'
+  for (const mark of navigation.marks) {
+    const p = place(mark.location);
+    if (mark.kind === 'fine') {
+      primitives.push({
+        kind: 'text', text: 'fine', x: p.x, y, font: 'bodyItalic', size: 1.6,
+        anchor: p.anchor, ...(mark.color ? { fill: mark.color } : {}), className: 'fine'
+      });
+      continue;
+    }
+    const glyph = mark.glyph ?? mark.kind;
+    const separation = (glyphBBox(glyph)?.w ?? 1.25) + 0.35;
+    const offsets = mark.count === 2
+      ? (p.anchor === 'end' ? [-separation, 0] : [-separation / 2, separation / 2])
+      : [0];
+    for (const offset of offsets) primitives.push({
+      kind: 'glyph', glyph, x: p.x + offset, y,
+      anchor: p.anchor, ...(mark.color ? { fill: mark.color } : {}), className: mark.kind
     });
   }
-  if (gm.fine) {
-    const p = place(gm.fine.location);
+  for (const jump of navigation.jumps) {
+    const p = place(jump.location);
     primitives.push({
       kind: 'text',
-      text: 'fine',
-      x: p.x,
-      y,
-      font: 'bodyItalic',
-      size: 1.6,
-      anchor: p.anchor,
-      ...(gm.fine.color ? { fill: gm.fine.color } : {}),
-      className: 'fine'
-    });
-  }
-  if (gm.jump) {
-    const p = place(gm.jump.location);
-    primitives.push({
-      kind: 'text',
-      text: JUMP_TEXT[gm.jump.type] ?? gm.jump.type,
+      text: jump.text ?? JUMP_TEXT[jump.type] ?? jump.type,
       x: p.x,
       y,
       font: 'body',

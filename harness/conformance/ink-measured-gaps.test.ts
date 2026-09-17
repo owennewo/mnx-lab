@@ -60,7 +60,7 @@ const LABEL_CLASSES = new Set(['rehearsal-label', 'section-label', 'rehearsal-bo
 // Navigation marks sit at their own rise and are placed AFTER the tempo mark
 // on the tab staff, so the tempo does not clear them (they share no x); the
 // labels, placed last, clear everything.
-const NAV_CLASSES = new Set(['segno', 'fine', 'jump']);
+const NAV_CLASSES = new Set(['segno', 'coda', 'fine', 'jump']);
 const isLabel = (p: Primitive) => LABEL_CLASSES.has(cls(p));
 const isTempo = (p: Primitive) => cls(p) === 'tempo';
 const isNav = (p: Primitive) => NAV_CLASSES.has(cls(p));

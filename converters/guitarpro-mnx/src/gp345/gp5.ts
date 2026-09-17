@@ -394,7 +394,9 @@ function readMeasureHeaders(
       sectionLetter: null,
       sectionText,
       alternateEndingsMask,
-      tripletFeel: measureTripletFeel
+      tripletFeel: measureTripletFeel,
+      directionTargets: [],
+      directionJumps: []
     });
   }
 

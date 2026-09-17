@@ -30,6 +30,9 @@ document contains none of the marks. Published MNX cannot carry the missing data
 This item closes the real-source gap without claiming that private vocabulary is
 published MNX.
 
+Implementation evidence is registered in the standing verification ledger:
+[Coda and double-coda navigation](../inprogress/lab-verify.md#coda-and-double-coda-navigation--2026-09-17).
+
 ## Agreement
 
 ### Oracle
@@ -115,6 +118,8 @@ export const MNX_LAB_JUMP_TYPES = [
   'daCapo',
   'daCapoAlFine',
   'daCapoAlCoda',
+  'dalSegno',
+  'dalSegnoAlFine',
   'dalSegnoAlCoda'
 ] as const;
 export type MnxLabJumpType = typeof MNX_LAB_JUMP_TYPES[number];
@@ -131,7 +136,9 @@ catch any incomplete retirement.
 The list above is semantic, not a promise to mirror every Guitar Pro token one-for-one.
 The parser owns the source-token table. In particular, double segno/double coda select a
 different referenced mark; they do not create `dalDoubleSegnoAlDoubleCoda` as another
-internal behavior.
+internal behavior. The lab `dalSegno` and `dalSegnoAlFine` values are used only when the
+jump must name an explicit target (notably a double segno); ordinary single-sign forms
+remain the published `segno` and `dsalfine` objects.
 
 ### Dependency and storage budget
 

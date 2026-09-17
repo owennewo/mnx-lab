@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://mnx-lab.totai.uk/schemas/mnx-lab-extensions.schema.json/v6",
-  "title": "MNX Lab vendor extensions (`_x.mnxLab`) — v6.3",
-  "description": "Everything MNX Lab carries that W3C MNX v19 cannot express: fretted-instrument tablature, chord symbols, swing feel, and document metadata (what the piece is, and what wrote the file). All of it lives under the single vendor key `_x.mnxLab`, which is how the MNX spec says extensions are namespaced (w3c-cg/mnx#63/#429: the `_x` key identifies an agent, vendor or community). Documents using these extensions remain fully valid against the official MNX schema. Each block is shaped like the standard MNX object it is a draft of, so adopting any of them upstream means deleting the `_x.mnxLab` wrapper rather than rewriting the data. Rationale and the proposals these draft: docs/mnx-extensions.md.",
+  "title": "MNX Lab vendor extensions (`_x.mnxLab`) — v6.4",
+  "description": "Everything MNX Lab carries that W3C MNX v19 cannot express: fretted-instrument tablature, chord symbols, swing feel, score navigation, and document metadata (what the piece is, and what wrote the file). All of it lives under the single vendor key `_x.mnxLab`, which is how the MNX spec says extensions are namespaced (w3c-cg/mnx#63/#429: the `_x` key identifies an agent, vendor or community). Documents using these extensions remain fully valid against the official MNX schema. Each block is shaped like the standard MNX object it is a draft of, so adopting any of them upstream means deleting the `_x.mnxLab` wrapper rather than rewriting the data. Rationale and the proposals these draft: docs/mnx-extensions.md.",
   "type": "object",
   "$defs": {
     "pitch": {
@@ -556,9 +556,95 @@
       },
       "additionalProperties": false
     },
+    "navigation-mark": {
+      "type": "object",
+      "description": "A named navigation target not fully expressible by published MNX. Double signs are one semantic target drawn twice, not a separate kind.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[\\x21-\\x7E]{1,256}$"
+        },
+        "kind": {
+          "enum": ["segno", "coda"]
+        },
+        "count": {
+          "enum": [1, 2]
+        },
+        "location": {
+          "$ref": "#/$defs/rhythmic-position"
+        },
+        "color": {
+          "type": "string"
+        }
+      },
+      "required": ["id", "kind", "location"],
+      "additionalProperties": false
+    },
+    "navigation-jump": {
+      "type": "object",
+      "description": "A navigation instruction absent from published MNX. `target` is the D.S. return mark, or the destination of `toCoda`; `resumeAt` is the coda armed by an al-Coda instruction.",
+      "properties": {
+        "type": {
+          "enum": [
+            "toCoda", "daCapo", "daCapoAlFine", "daCapoAlCoda",
+            "dalSegno", "dalSegnoAlFine", "dalSegnoAlCoda"
+          ]
+        },
+        "location": {
+          "$ref": "#/$defs/rhythmic-position"
+        },
+        "target": {
+          "type": "string",
+          "pattern": "^[\\x21-\\x7E]{1,256}$"
+        },
+        "resumeAt": {
+          "type": "string",
+          "pattern": "^[\\x21-\\x7E]{1,256}$"
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "required": ["type", "location"],
+      "allOf": [
+        {
+          "if": { "properties": { "type": { "const": "toCoda" } }, "required": ["type"] },
+          "then": { "required": ["target"] }
+        },
+        {
+          "if": { "properties": { "type": { "enum": ["dalSegno", "dalSegnoAlFine", "dalSegnoAlCoda"] } }, "required": ["type"] },
+          "then": { "required": ["target"] }
+        },
+        {
+          "if": { "properties": { "type": { "enum": ["daCapoAlCoda", "dalSegnoAlCoda"] } }, "required": ["type"] },
+          "then": { "required": ["resumeAt"] }
+        }
+      ],
+      "additionalProperties": false
+    },
+    "navigation": {
+      "type": "object",
+      "properties": {
+        "marks": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/navigation-mark" },
+          "minItems": 1
+        },
+        "jumps": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/navigation-jump" },
+          "minItems": 1
+        }
+      },
+      "anyOf": [
+        { "required": ["marks"] },
+        { "required": ["jumps"] }
+      ],
+      "additionalProperties": false
+    },
     "global-measure-ext": {
       "type": "object",
-      "description": "The whole vendor dict at global.measures[i]._x.mnxLab. Harmony and swing live here — on the GLOBAL timeline beside `key` and `tempos` — because two parts cannot legitimately disagree about the chord on a beat, which is the test that put dynamics and ottavas in the part measure and key/time/tempo in the global one. `rehearsal` and `section` were here in v3; v4 removed them in favour of the standard MNX objects proposed in roadmap/proposed/low-priority/spec-score-text.md — an extension should be a draft of the standard object, so once drafted it stops being an extension.",
+      "description": "The whole vendor dict at global.measures[i]._x.mnxLab. Harmony, swing and score navigation live here — on the GLOBAL timeline beside `key` and `tempos` — because two parts cannot legitimately disagree about them. `rehearsal` and `section` were here in v3; v4 removed them in favour of the standard MNX objects proposed in roadmap/proposed/low-priority/spec-score-text.md — an extension should be a draft of the standard object, so once drafted it stops being an extension.",
       "properties": {
         "harmonies": {
           "type": "array",
@@ -570,6 +656,9 @@
         },
         "swing": {
           "$ref": "#/$defs/swing"
+        },
+        "navigation": {
+          "$ref": "#/$defs/navigation"
         }
       },
       "additionalProperties": false

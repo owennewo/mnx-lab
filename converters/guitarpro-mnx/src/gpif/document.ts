@@ -62,6 +62,10 @@ export interface GpifMasterBar {
   /** `TripletFeel` — the played feel of this bar's pairs, verbatim. Guitar Pro
    *  stamps it on EVERY bar; `toMnx` states it only where it changes. */
   tripletFeel: string | null;
+  /** Literal GPIF navigation vocabulary. Musical interpretation belongs in
+   * `toMnx.ts`; retaining the token here keeps unknown values diagnosable. */
+  directionTargets: string[];
+  directionJumps: string[];
   unrecognized?: Unrecognized;
 }
 
@@ -180,7 +184,7 @@ export interface GpifNote {
  */
 const MASTER_BAR_CHILDREN = new Set([
   'Key', 'Time', 'Bars', 'Repeat', 'AlternateEndings', 'DoubleBar', 'Section',
-  'TripletFeel', 'XProperties'
+  'TripletFeel', 'Directions', 'XProperties'
 ]);
 const BEAT_CHILDREN = new Set([
   'Rhythm', 'Notes', 'GraceNotes', 'FreeText', 'Chord', 'Lyrics', 'Dynamic', 'Arpeggio', 'Legato',
@@ -257,6 +261,7 @@ function parseMasterBar(node: Element): GpifMasterBar {
   const key = child(node, 'Key');
   const repeat = child(node, 'Repeat');
   const section = child(node, 'Section');
+  const directions = child(node, 'Directions');
 
   let mask = 0;
   for (const token of (text(node, 'AlternateEndings') ?? '').split(/\s+/)) {
@@ -279,6 +284,8 @@ function parseMasterBar(node: Element): GpifMasterBar {
     sectionText: section ? (text(section, 'Text') ?? null) : null,
     alternateEndingsMask: mask,
     tripletFeel: text(node, 'TripletFeel') ?? null,
+    directionTargets: children(directions, 'Target').map(target => (target.textContent ?? '').trim()),
+    directionJumps: children(directions, 'Jump').map(jump => (jump.textContent ?? '').trim()),
     ...unrecognizedOf(node, MASTER_BAR_CHILDREN)
   };
 }

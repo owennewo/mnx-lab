@@ -128,9 +128,10 @@ a model for us.
 
 **The rest of the bar (AGREED).** `<DoubleBar/>` and `<FreeTime/>` are presence flags.
 `<TripletFeel>` is a string. `<Fermatas>` wraps typed fermatas with rhythmic offsets.
-`<Directions>` carries jump/target words from a fixed vocabulary (`Coda, Segno, Fine,
-DaCapo, DaCapoAlCoda, DaSegno…` — scorelib enumerates nineteen). None are in the
-current MNX subset; noted for completeness.
+`<Directions>` carries 19 fixed jump/target words: five targets (`Fine`, `Segno`,
+`SegnoSegno`, `Coda`, `DoubleCoda`) and fourteen D.C./D.S./Coda jumps. They map
+to published `segno`/`fine`/`jump` where that is exact and otherwise to
+`_x.mnxLab.navigation`; double signs select an identified `count: 2` mark.
 
 ## 5. Track: tuning, capo, strings
 

@@ -97,6 +97,10 @@ export function attributeText(attribute: MeasureAttribute): string {
       return `number ${attribute.value}`;
     case 'jump':
       return `jump ${attribute.type}${markAtText(attribute.at)}`;
+    case 'navigationMark':
+      return `navigation mark ${attribute.id} ${attribute.markKind}${attribute.count === 2 ? ' double' : ''}${markAtText(attribute.at)}`;
+    case 'navigationJump':
+      return `navigation jump ${attribute.type}${attribute.target ? ` target ${attribute.target}` : ''}${attribute.resumeAt ? ` resume ${attribute.resumeAt}` : ''}${attribute.text ? ` text ${JSON.stringify(attribute.text)}` : ''}${markAtText(attribute.at)}`;
     case 'tempo':
       return `tempo ${attribute.base}${'.'.repeat(attribute.dots ?? 0)}=${attribute.bpm}${markAtText(attribute.at)}`;
     case 'rehearsal':
@@ -227,6 +231,8 @@ const WORD_OF: Record<MeasureAttributeKind, string> = {
   fermata: 'fermata',
   number: 'number',
   jump: 'jump',
+  navigationMark: 'navigation mark',
+  navigationJump: 'navigation jump',
   tempo: 'tempo',
   rehearsal: 'rehearsal',
   section: 'section',
@@ -243,6 +249,8 @@ const HINT_OF: Record<MeasureAttributeKind, string> = {
   fermata: 'square · long · below',
   number: '12',
   jump: 'segno · dsalfine · at 1/2',
+  navigationMark: 'id coda · id segno double',
+  navigationJump: 'daCapo · toCoda target coda',
   tempo: '120 · half=80 · quarter.=60 · 96 at 1/2',
   rehearsal: 'A · 12',
   section: 'Verse 1',

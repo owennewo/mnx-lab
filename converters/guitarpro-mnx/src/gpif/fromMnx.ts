@@ -9,6 +9,7 @@ import {
   MnxDynamic,
   MnxArpeggio,
   MnxSequence,
+  MnxGlobalMeasure,
   isGrace,
   isTimedEvent,
   isTuplet
@@ -188,6 +189,8 @@ interface WriterMasterBar {
   /** The feel in force in this bar. Guitar Pro stamps every bar, so the
    *  writer carries the value forward the way it carries key and meter. */
   tripletFeel: GpTripletFeel | null;
+  directionTargets: string[];
+  directionJumps: string[];
 }
 
 interface WriterTrack {
@@ -259,6 +262,7 @@ export function mnxToGpifXml(mnx: MnxStructure, options: GpifExportOptions = {})
 
   const masterBars: WriterMasterBar[] = [];
   const tempoAutomations: { bar: number; bpm: number; reference: number }[] = [];
+  const navigationTargets = gpifNavigationTargets(globalMeasures);
 
   for (let index = 0; index < measureCount; index++) {
     const global = globalMeasures[index] ?? {};
@@ -294,7 +298,9 @@ export function mnxToGpifXml(mnx: MnxStructure, options: GpifExportOptions = {})
       doubleBar: global.barline?.type === 'double',
       endingNumbers,
       barIds: [],
-      tripletFeel
+      tripletFeel,
+      directionTargets: gpifDirectionTargets(global),
+      directionJumps: gpifDirectionJumps(global, navigationTargets, index, warn)
     });
 
     for (const tempo of global.tempos ?? []) {
@@ -360,6 +366,66 @@ export function mnxToGpifXml(mnx: MnxStructure, options: GpifExportOptions = {})
   }
 
   return serialize(masterBars, tracks, tempoAutomations, pools, scoreInfoXml(mnx, warn));
+}
+
+function gpifNavigationTargets(measures: readonly MnxGlobalMeasure[]): Map<string, string> {
+  const targets = new Map<string, string>();
+  for (const measure of measures) {
+    if (measure.segno?.id) targets.set(measure.segno.id, 'Segno');
+    for (const mark of measure._x?.mnxLab?.navigation?.marks ?? []) {
+      targets.set(mark.id,
+        mark.kind === 'coda'
+          ? (mark.count === 2 ? 'DoubleCoda' : 'Coda')
+          : (mark.count === 2 ? 'SegnoSegno' : 'Segno'));
+    }
+  }
+  return targets;
+}
+
+function gpifDirectionTargets(measure: MnxGlobalMeasure): string[] {
+  const targets: string[] = [];
+  if (measure.fine) targets.push('Fine');
+  if (measure.segno) targets.push('Segno');
+  for (const mark of measure._x?.mnxLab?.navigation?.marks ?? []) {
+    targets.push(mark.kind === 'coda'
+      ? (mark.count === 2 ? 'DoubleCoda' : 'Coda')
+      : (mark.count === 2 ? 'SegnoSegno' : 'Segno'));
+  }
+  return targets;
+}
+
+function gpifDirectionJumps(
+  measure: MnxGlobalMeasure,
+  targets: Map<string, string>,
+  measureIndex: number,
+  warn: (message: string) => void
+): string[] {
+  const jumps: string[] = [];
+  if (measure.jump) jumps.push(measure.jump.type === 'dsalfine' ? 'DaSegnoAlFine' : 'DaSegno');
+  for (const jump of measure._x?.mnxLab?.navigation?.jumps ?? []) {
+    const target = jump.target ? targets.get(jump.target) : undefined;
+    const resume = jump.resumeAt ? targets.get(jump.resumeAt) : undefined;
+    let token: string | undefined;
+    if (jump.type === 'daCapo') token = 'DaCapo';
+    else if (jump.type === 'daCapoAlFine') token = 'DaCapoAlFine';
+    else if (jump.type === 'toCoda' && (target === 'Coda' || target === 'DoubleCoda'))
+      token = target === 'DoubleCoda' ? 'DaDoubleCoda' : 'DaCoda';
+    else if (jump.type === 'daCapoAlCoda' && (resume === 'Coda' || resume === 'DoubleCoda'))
+      token = resume === 'DoubleCoda' ? 'DaCapoAlDoubleCoda' : 'DaCapoAlCoda';
+    else if ((jump.type === 'dalSegno' || jump.type === 'dalSegnoAlFine')
+        && (target === 'Segno' || target === 'SegnoSegno')) {
+      token = target === 'SegnoSegno' ? 'DaSegnoSegno' : 'DaSegno';
+      if (jump.type === 'dalSegnoAlFine') token += 'AlFine';
+    } else if (jump.type === 'dalSegnoAlCoda'
+        && (target === 'Segno' || target === 'SegnoSegno')
+        && (resume === 'Coda' || resume === 'DoubleCoda')) {
+      token = target === 'SegnoSegno' ? 'DaSegnoSegno' : 'DaSegno';
+      token += resume === 'DoubleCoda' ? 'AlDoubleCoda' : 'AlCoda';
+    }
+    if (token) jumps.push(token);
+    else warn(`Measure ${measureIndex + 1}: navigation jump ${jump.type} has no exact Guitar Pro target; it was dropped.`);
+  }
+  return jumps;
 }
 
 function buildTrackBars(
@@ -1141,6 +1207,12 @@ function serialize(
     }
     if (masterBar.endingNumbers.length) {
       push(`<AlternateEndings>${masterBar.endingNumbers.join(' ')}</AlternateEndings>`);
+    }
+    if (masterBar.directionTargets.length || masterBar.directionJumps.length) {
+      push('<Directions>');
+      for (const target of masterBar.directionTargets) push(`<Target>${target}</Target>`);
+      for (const jump of masterBar.directionJumps) push(`<Jump>${jump}</Jump>`);
+      push('</Directions>');
     }
     if (masterBar.rehearsal !== null || masterBar.sectionText !== null) {
       push(

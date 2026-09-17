@@ -1,4 +1,4 @@
-# MNX Lab extensions (`_x.mnxLab`) — v6.3
+# MNX Lab extensions (`_x.mnxLab`) — v6.4
 
 Everything this project carries that **W3C MNX v19 cannot express**, in one
 place: what it is, why standard MNX has no field for it, which CG issue it
@@ -23,6 +23,7 @@ A live test bench rendering these documents runs at <https://mnx-lab.totai.uk>.
 | `fingering` | no fingering on notes | — | ⚠️ schema only | ❌ |
 | `harmonies` | **no harmony concept anywhere** — no `root`, no `kind`, no chord | [#109](https://github.com/w3c-cg/mnx/issues/109) | ✅ both converters | ✅ |
 | `swing` | nothing; the reference reserves `struct-swing-*` for 1.0 and implements none of it | [notationref](https://github.com/w3c-cg/mnx) `struct-swing-ratio` | ✅ Guitar Pro (⚠️ MusicXML) | ✅ marking + playback |
+| `navigation` | no coda, D.C., double-sign, or explicitly targeted jump objects; `jump-type` is only `segno \| dsalfine` | [core-coda-navigation](../roadmap/proposed/core-coda-navigation.md) | ✅ Guitar Pro (⚠️ MusicXML) | ✅ both staves + playback |
 | `work` | **no document metadata at all** — no title, composer, rights or performer anywhere in 193 `$defs` | [#267](https://github.com/w3c-cg/mnx/issues/267), [#56](https://github.com/w3c/mnx/issues/56) | ✅ both converters | n/a — never printed |
 | `encoding` | nothing says what wrote the file | [#547](https://github.com/w3c-cg/mnx/issues/547) | ✅ both converters | n/a |
 
@@ -287,6 +288,42 @@ lying across a swung pair does not move. See
 [player-time.md](player-time.md#swing) for how the compiler applies it, and
 [rendering.md](rendering.md) for the drawn marking.
 
+### `navigation` preserves real-world roadmaps
+
+Published MNX v19 has one `segno`, one `fine`, and a `jump.type` of only
+`segno | dsalfine`. Coda signs, D.C. instructions, double signs, and explicit
+destinations therefore live in `_x.mnxLab.navigation`:
+
+```jsonc
+{
+  "navigation": {
+    "marks": [
+      { "id": "double-segno", "kind": "segno", "count": 2,
+        "location": { "fraction": [0, 1] } },
+      { "id": "coda", "kind": "coda",
+        "location": { "fraction": [0, 1] } }
+    ],
+    "jumps": [
+      { "type": "dalSegnoAlCoda", "target": "double-segno",
+        "resumeAt": "coda", "text": "D.S.S. al Coda",
+        "location": { "fraction": [1, 1] } }
+    ]
+  }
+}
+```
+
+`target` is the mark returned to by a D.S. instruction, or the coda destination
+of `toCoda`. `resumeAt` is the coda armed by `daCapoAlCoda` or
+`dalSegnoAlCoda`; the matching `toCoda` transfers there only while armed.
+An absent D.C. target means the beginning. `count: 2` selects a double printed
+and semantic target without multiplying the jump vocabulary.
+
+The published and lab jump literals are deliberately separate in
+`src/model/mnx.ts`; only `NavigationJumpType`, the normalized consumer view,
+is their union. Ordinary single-segno D.S. and D.S. al Fine continue to use
+the published object. The lab `dalSegno`/`dalSegnoAlFine` forms exist only when
+an explicit target ID is required, such as a double segno.
+
 ### `rehearsal` and `section` left in v4
 
 Both moved out of the vendor dict and into standard MNX shape — see
@@ -503,6 +540,11 @@ Cloudflare Workers cannot run `ajv.compile()`.
 
 ## History
 
+- **v6.4** (2026-09-17): additive — `navigation` on the global measure for
+  named single/double segno and coda targets plus D.C., targeted D.S., al-Fine
+  and al-Coda jumps. The published `jump-type` remains untouched. Guitar Pro's
+  complete 19-token master-bar vocabulary now round-trips; renderer and
+  traversal consume one normalized view. No upgrade hop; `$id` stays `/v6`.
 - **v6.3** (2026-09-14): additive — `technique.dead`, the dead (muted,
   percussive) note Guitar Pro stores as `Property Muted` and binary note type 3.
   Previously the importers reported it and dropped it, so the note drew as its

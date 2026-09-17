@@ -59,6 +59,8 @@ const MEASURE_ATTRIBUTE_KINDS: Partial<Record<ElementKind, MeasureAttributeKind>
   segno: 'segno',
   fine: 'fine',
   jump: 'jump',
+  'navigation-mark': 'navigationMark',
+  'navigation-jump': 'navigationJump',
   tempo: 'tempo',
   rehearsal: 'rehearsal',
   section: 'section'

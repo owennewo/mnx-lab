@@ -5,7 +5,7 @@ import type { ContainerIndex } from '../model/noteKeys.ts';
 // — DOM-free on purpose, so the workbench mount and the harness replay test
 // drive the exact same object. The session records every intent it handles;
 // that log IS the trace fixture ("recording is the same stream as undo").
-import type { MnxEvent, MnxNote, MnxNoteValueBase, MnxStructure } from '../model/mnx.ts';
+import type { MnxEvent, MnxGlobalMeasure, MnxNote, MnxNoteValueBase, MnxStructure } from '../model/mnx.ts';
 import type { EditorIntent } from './intents.ts';
 import { isNavigationIntent, MAX_ENTRY_FRET } from './intents.ts';
 import type { EditOp, EntryTarget, EventAddress, OpLogEntry } from './ops.ts';
@@ -1369,7 +1369,12 @@ export class EditorSession {
           const measure = this.doc.global?.measures?.[measureIndex] as
             | Record<string, unknown>
             | undefined;
-          return measure?.[field] === undefined ? [] : [{
+          const nested = field === 'navigationMarks'
+            ? (measure as MnxGlobalMeasure | undefined)?._x?.mnxLab?.navigation?.marks
+            : field === 'navigationJumps'
+              ? (measure as MnxGlobalMeasure | undefined)?._x?.mnxLab?.navigation?.jumps
+              : undefined;
+          return (nested ?? measure?.[field]) === undefined ? [] : [{
             type: 'removeMeasureAttribute',
             measureIndex,
             kind: intent.kind,

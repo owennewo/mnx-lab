@@ -1602,3 +1602,19 @@ retain their internal spacing. Mid-system bar starts are unchanged. Because the
 freed width is redistributed by row justification, later events may shift within
 the system; system membership and row breaks should remain unchanged unless the
 extra width legitimately lets another measure fit.
+
+## Coda and double-coda navigation — 2026-09-17
+
+Owner: [core-coda-navigation.md](../proposed/core-coda-navigation.md). One new
+synthetic scenario, `lab/navigation/coda-navigation`, carries the eight-direction
+graph distilled from the cached Blackbird source without retaining any of that
+score's notes or metadata. Its notation, tab, combined, performed and unrolled
+goldens are new; no existing scenario moved.
+
+**What a reviewer should look for.** The first and last bars show two segno and
+two coda glyphs respectively, with visible separation rather than overprinting.
+The single segno and coda each draw once. The four jump captions retain their
+source wording and sit at their closing barlines in notation, tab and both views.
+The performed view follows the hand-stated order in `notes.md`: each To-Coda is
+ignored on its first visit, the single-coda route fires after D.S. al Coda, and
+the double-coda route fires after D.S.S. al Double Coda.

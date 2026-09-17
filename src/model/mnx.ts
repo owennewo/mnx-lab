@@ -147,6 +147,53 @@ export interface MnxLabSwing {
   text?: string;
 }
 
+/** Published MNX jump vocabulary. Keep this list aligned with the pinned
+ * schema; private navigation values belong in `MNX_LAB_JUMP_TYPES` below. */
+export const MNX_JUMP_TYPES = ['segno', 'dsalfine'] as const;
+export type MnxJumpType = typeof MNX_JUMP_TYPES[number];
+
+/** Navigation behaviours that published MNX v19 cannot express. `dalSegno`
+ * and `dalSegnoAlFine` are present here only when an explicit mark ID is
+ * needed (notably a double segno); their ordinary single-segno forms continue
+ * to use the published `jump` object. */
+export const MNX_LAB_JUMP_TYPES = [
+  'toCoda',
+  'daCapo',
+  'daCapoAlFine',
+  'daCapoAlCoda',
+  'dalSegno',
+  'dalSegnoAlFine',
+  'dalSegnoAlCoda'
+] as const;
+export type MnxLabJumpType = typeof MNX_LAB_JUMP_TYPES[number];
+export type NavigationJumpType = MnxJumpType | MnxLabJumpType;
+
+export interface MnxLabNavigationMark {
+  id: string;
+  kind: 'segno' | 'coda';
+  /** One symbol by default; two symbols identify the double target. */
+  count?: 1 | 2;
+  location: { fraction: [number, number] };
+  color?: string;
+}
+
+export interface MnxLabNavigationJump {
+  type: MnxLabJumpType;
+  location: { fraction: [number, number] };
+  /** The return destination for D.S. instructions, or the coda destination
+   * for `toCoda`. An absent D.C. target means the beginning of the score. */
+  target?: string;
+  /** The coda destination armed by an `…AlCoda` instruction. */
+  resumeAt?: string;
+  /** Literal source caption; structured fields, never this string, drive playback. */
+  text?: string;
+}
+
+export interface MnxLabNavigation {
+  marks?: MnxLabNavigationMark[];
+  jumps?: MnxLabNavigationJump[];
+}
+
 /** A label on a global measure: `rehearsal` is an index into the score ("A"),
  *  `section` names a formal unit of the piece ("Verse 1"). A property OF the
  *  measure, like `key` and `time` — not positioned within it, because a
@@ -710,6 +757,7 @@ export interface MnxGlobalMeasure {
   };
   /** Segno sign at a metric position; `glyph` may pick a SMuFL variant. */
   segno?: {
+    id?: string;
     location: {
       fraction: [number, number];
     };
@@ -730,7 +778,7 @@ export interface MnxGlobalMeasure {
   /** Jump instruction — MNX v17 knows only D.S. (`segno`) and D.S. al Fine
    *  (`dsalfine`); there is no coda / D.C. vocabulary yet. */
   jump?: {
-    type: 'segno' | 'dsalfine';
+    type: MnxJumpType;
     location: {
       fraction: [number, number];
     };
@@ -755,13 +803,15 @@ export interface MnxGlobalMeasure {
    *  next one. Separate from `rehearsal` because it states what the music *is*
    *  rather than indexing it. **Proposed, not adopted** — see `rehearsal`. */
   section?: MnxMeasureLabel;
-  /** Vendor extensions. `harmonies` are chord symbols and `swing` is the
-   *  performed feel; standard MNX has neither concept. `_x` is declared in
+  /** Vendor extensions. `harmonies` are chord symbols, `swing` is the
+   *  performed feel, and `navigation` carries navigation that published MNX
+   *  cannot express. `_x` is declared in
    *  the schema's `global-attrs`. See docs/mnx-extensions.md. */
   _x?: {
     mnxLab?: {
       harmonies?: MnxHarmony[];
       swing?: MnxLabSwing;
+      navigation?: MnxLabNavigation;
     };
   };
 }

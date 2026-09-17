@@ -121,6 +121,17 @@ export interface MnxDirection {
 
 export interface MnxGlobalMeasureExtension {
   harmonies?: MnxHarmony[];
+  navigation?: {
+    marks?: { id: string; kind: 'segno' | 'coda'; count?: 1 | 2; location: MnxRhythmicPosition; color?: string }[];
+    jumps?: {
+      type: 'toCoda' | 'daCapo' | 'daCapoAlFine' | 'daCapoAlCoda'
+        | 'dalSegno' | 'dalSegnoAlFine' | 'dalSegnoAlCoda';
+      location: MnxRhythmicPosition;
+      target?: string;
+      resumeAt?: string;
+      text?: string;
+    }[];
+  };
 }
 
 /** A tie from the note that carries it to `target`, the note it ties into.

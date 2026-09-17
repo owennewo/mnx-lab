@@ -1,7 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { importGuitarProGpif, exportGuitarProGpif } from '../src/gpif/index.js';
+import {
+  importGuitarProGpif, exportGuitarProGpif, gpifToMnx, mnxToGpifXml, parseGpif
+} from '../src/gpif/index.js';
 import { MnxStructure } from '../src/common/types.js';
 
 /**
@@ -61,5 +63,45 @@ describe('Guitar Pro free text', () => {
     exportGuitarProGpif(mnx, { onWarning: m => warnings.push(m) });
     expect(warnings.some(w => w.includes('orient'))).toBe(true);
     expect(warnings.some(w => w.includes('one text per beat'))).toBe(true);
+  });
+});
+
+describe('Guitar Pro master-bar navigation', () => {
+  const targetTokens = ['Fine', 'Segno', 'SegnoSegno', 'Coda', 'DoubleCoda'];
+  const jumpTokens = [
+    'DaCapo', 'DaCapoAlCoda', 'DaCapoAlDoubleCoda', 'DaCapoAlFine',
+    'DaSegno', 'DaSegnoAlCoda', 'DaSegnoAlDoubleCoda', 'DaSegnoAlFine',
+    'DaSegnoSegno', 'DaSegnoSegnoAlCoda', 'DaSegnoSegnoAlDoubleCoda',
+    'DaSegnoSegnoAlFine', 'DaCoda', 'DaDoubleCoda'
+  ];
+
+  it('maps the complete 19-token GPIF vocabulary and writes every token back exactly', async () => {
+    const base: MnxStructure = JSON.parse(await fs.readFile(path.join(SCORES, 'Vestapol.mnx.json'), 'utf-8'));
+    const count = targetTokens.length + jumpTokens.length;
+    while (base.global.measures.length < count) base.global.measures.push({});
+    while (base.parts[0].measures.length < count) base.parts[0].measures.push({ sequences: [] });
+    let xml = mnxToGpifXml(base);
+    let ordinal = 0;
+    xml = xml.replace(/<MasterBar>([\s\S]*?)<\/MasterBar>/g, (whole, body) => {
+      const token = ordinal < targetTokens.length
+        ? `<Target>${targetTokens[ordinal]}</Target>`
+        : `<Jump>${jumpTokens[ordinal - targetTokens.length]}</Jump>`;
+      ordinal += 1;
+      return ordinal <= count ? `<MasterBar><Directions>${token}</Directions>${body}</MasterBar>` : whole;
+    });
+    const warnings: string[] = [];
+    const mnx = gpifToMnx(parseGpif(xml), { onWarning: warning => warnings.push(warning) });
+    expect(warnings.filter(warning => warning.includes('direction'))).toEqual([]);
+
+    expect(mnx.global.measures[2]._x?.mnxLab?.navigation?.marks?.[0])
+      .toMatchObject({ kind: 'segno', count: 2 });
+    expect(mnx.global.measures[6]._x?.mnxLab?.navigation?.jumps?.[0])
+      .toMatchObject({ type: 'daCapoAlCoda', resumeAt: 'coda' });
+    expect(mnx.global.measures[7]._x?.mnxLab?.navigation?.jumps?.[0])
+      .toMatchObject({ type: 'daCapoAlCoda', resumeAt: 'double-coda' });
+
+    const written = mnxToGpifXml(mnx);
+    for (const token of targetTokens) expect(written).toContain(`<Target>${token}</Target>`);
+    for (const token of jumpTokens) expect(written).toContain(`<Jump>${token}</Jump>`);
   });
 });

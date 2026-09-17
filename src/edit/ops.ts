@@ -916,6 +916,8 @@ export type MeasureAttribute =
   | ({ kind: 'fermata' } & MnxFermata)
   | { kind: 'number'; value: number }
   | { kind: 'jump'; type: 'segno' | 'dsalfine'; at?: MarkAt }
+  | { kind: 'navigationMark'; id: string; markKind: 'segno' | 'coda'; count?: 1 | 2; at?: MarkAt }
+  | { kind: 'navigationJump'; type: import('../model/mnx.ts').MnxLabJumpType; target?: string; resumeAt?: string; text?: string; at?: MarkAt }
   | { kind: 'tempo'; bpm: number; base: MnxNoteValueBase; dots?: number; at?: MarkAt }
   | { kind: 'rehearsal'; label: string }
   | { kind: 'section'; label: string }
@@ -953,6 +955,8 @@ export const MEASURE_ATTRIBUTE_FIELDS: Record<MeasureAttributeKind, string> = {
   fermata: 'fermata',
   number: 'number',
   jump: 'jump',
+  navigationMark: 'navigationMarks',
+  navigationJump: 'navigationJumps',
   tempo: 'tempos',
   rehearsal: 'rehearsal',
   section: 'section',
@@ -1005,6 +1009,20 @@ function measureAttributeValue(attribute: MeasureAttribute): unknown {
       return attribute.value;
     case 'jump':
       return { type: attribute.type, location: locationOf(attribute.at, 'end') };
+    case 'navigationMark':
+      return {
+        id: attribute.id, kind: attribute.markKind,
+        ...(attribute.count && attribute.count !== 1 ? { count: attribute.count } : {}),
+        location: locationOf(attribute.at, 'start')
+      };
+    case 'navigationJump':
+      return {
+        type: attribute.type,
+        ...(attribute.target ? { target: attribute.target } : {}),
+        ...(attribute.resumeAt ? { resumeAt: attribute.resumeAt } : {}),
+        ...(attribute.text ? { text: attribute.text } : {}),
+        location: locationOf(attribute.at, 'end')
+      };
     case 'tempo':
       return {
         bpm: attribute.bpm,
@@ -1072,6 +1090,18 @@ export function readMeasureAttributes(measure: MnxGlobalMeasure | undefined): Me
   if (measure.number !== undefined) out.push({ kind: 'number', value: measure.number });
   if (measure.jump !== undefined)
     out.push({ kind: 'jump', type: measure.jump.type, ...at(measure.jump.location, 'end') });
+  for (const mark of measure._x?.mnxLab?.navigation?.marks ?? [])
+    out.push({
+      kind: 'navigationMark', id: mark.id, markKind: mark.kind,
+      ...(mark.count ? { count: mark.count } : {}), ...at(mark.location, 'start')
+    });
+  for (const jump of measure._x?.mnxLab?.navigation?.jumps ?? [])
+    out.push({
+      kind: 'navigationJump', type: jump.type,
+      ...(jump.target ? { target: jump.target } : {}),
+      ...(jump.resumeAt ? { resumeAt: jump.resumeAt } : {}),
+      ...(jump.text ? { text: jump.text } : {}), ...at(jump.location, 'end')
+    });
   for (const tempo of measure.tempos ?? [])
     out.push({
       kind: 'tempo',
@@ -1528,6 +1558,13 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
         const harmonies = [...(lab.harmonies ?? [])];
         harmonies[Math.min(op.index ?? 0, harmonies.length)] = value;
         lab.harmonies = harmonies;
+      } else if (field === 'navigationMarks' || field === 'navigationJumps') {
+        const x = ((measure._x ??= {}) as { mnxLab?: { navigation?: { marks?: unknown[]; jumps?: unknown[] } } });
+        const navigation = ((x.mnxLab ??= {}).navigation ??= {});
+        const key = field === 'navigationMarks' ? 'marks' : 'jumps';
+        const values = [...(navigation[key] ?? [])];
+        values[Math.min(op.index ?? 0, values.length)] = value;
+        navigation[key] = values;
       } else measure[field] = value;
       return next;
     }
@@ -1556,6 +1593,19 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
           if (Object.keys(x.mnxLab).length === 0) delete x.mnxLab;
           if (Object.keys(x).length === 0) delete measure._x;
         }
+        return next;
+      }
+      if (field === 'navigationMarks' || field === 'navigationJumps') {
+        const x = measure._x as { mnxLab?: { navigation?: { marks?: unknown[]; jumps?: unknown[] } } } | undefined;
+        const navigation = x?.mnxLab?.navigation;
+        if (!navigation || !x?.mnxLab) return next;
+        const key = field === 'navigationMarks' ? 'marks' : 'jumps';
+        const kept = (navigation[key] ?? []).filter((_, i) => i !== (op.index ?? 0));
+        if (kept.length) navigation[key] = kept;
+        else delete navigation[key];
+        if (Object.keys(navigation).length === 0) delete x.mnxLab.navigation;
+        if (Object.keys(x.mnxLab).length === 0) delete x.mnxLab;
+        if (Object.keys(x).length === 0) delete measure._x;
         return next;
       }
       delete measure[field];

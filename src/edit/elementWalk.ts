@@ -39,7 +39,8 @@ export type ElementKind =
   | 'clef' | 'beam' | 'dynamic' | 'direction' | 'ottava' | 'arpeggio' | 'non-arpeggio'
   // global-measure level
   | 'time-signature' | 'key-signature' | 'barline' | 'repeat-start' | 'repeat-end'
-  | 'ending' | 'segno' | 'fine' | 'jump' | 'tempo' | 'rehearsal' | 'section' | 'harmony'
+  | 'ending' | 'segno' | 'fine' | 'jump' | 'navigation-mark' | 'navigation-jump'
+  | 'tempo' | 'rehearsal' | 'section' | 'harmony'
   | 'swing'
   | 'measure-number'
   // part level
@@ -288,6 +289,18 @@ export const ELEMENT_KINDS: Record<ElementKind, ElementKindSpec> = {
   jump: {
     classes: ['jump'],
     note: 'A D.S./D.S. al Fine instruction.',
+    construct: ['setMeasureAttribute'],
+    remove: ['removeMeasureAttribute']
+  },
+  'navigation-mark': {
+    classes: ['segno', 'coda'],
+    note: 'A named single or double segno/coda target in `_x.mnxLab.navigation`.',
+    construct: ['setMeasureAttribute'],
+    remove: ['removeMeasureAttribute']
+  },
+  'navigation-jump': {
+    classes: ['jump'],
+    note: 'A D.C., coda, or explicitly targeted D.S. instruction in `_x.mnxLab.navigation`.',
     construct: ['setMeasureAttribute'],
     remove: ['removeMeasureAttribute']
   },
@@ -691,6 +704,14 @@ export function walkElements(doc: MnxStructure): ElementRef[] {
     at('fermata', 'fermata');
     at('measure-number', 'number');
     at('jump', 'jump');
+    for (const [markIndex] of (measure._x?.mnxLab?.navigation?.marks ?? []).entries())
+      pushAtMeasure(out, 'navigation-mark', `${path}/navigation-mark${markIndex}`, [
+        ...json, '_x', 'mnxLab', 'navigation', 'marks', markIndex
+      ], measureIndex);
+    for (const [jumpIndex] of (measure._x?.mnxLab?.navigation?.jumps ?? []).entries())
+      pushAtMeasure(out, 'navigation-jump', `${path}/navigation-jump${jumpIndex}`, [
+        ...json, '_x', 'mnxLab', 'navigation', 'jumps', jumpIndex
+      ], measureIndex);
     at('rehearsal', 'rehearsal');
     at('section', 'section');
     for (const [tempoIndex] of (measure.tempos ?? []).entries())

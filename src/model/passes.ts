@@ -25,6 +25,7 @@
 // No repeats are retaken. This is a lab performance convention, not an MNX rule.
 
 import type { MnxStructure } from './mnx.ts';
+import { measureNavigation, navigationMarkById, type NavigationJump } from './navigation.ts';
 
 export interface PerformedEntry {
   ordinal: number;
@@ -39,7 +40,8 @@ export interface PerformedEntry {
 }
 
 export interface PassDiagnostic {
-  code: 'cap' | 'unmatched-ending' | 'jump-without-segno' | 'replaced-repeat-start';
+  code: 'cap' | 'unmatched-ending' | 'jump-without-segno' | 'jump-without-target'
+    | 'duplicate-target' | 'replaced-repeat-start';
   measureIndex: number;
   message: string;
 }
@@ -71,6 +73,7 @@ export function hasRepeatStructure(doc: MnxStructure): boolean {
   return (doc.global?.measures ?? []).some(
     m => m.repeatStart !== undefined || m.repeatEnd !== undefined
       || m.ending !== undefined || m.jump !== undefined
+      || (m._x?.mnxLab?.navigation?.jumps?.length ?? 0) > 0
   );
 }
 
@@ -103,6 +106,15 @@ export function linearizePasses(doc: MnxStructure): PassModel {
     if (!diagnostics.some(d => d.code === code && d.measureIndex === measureIndex))
       diagnostics.push({ code, measureIndex, message });
   };
+  const markIds = new Map<string, number>();
+  for (const [measureIndex, measure] of globals.entries()) {
+    for (const mark of measureNavigation(measure).marks) {
+      if (!mark.id) continue;
+      if (markIds.has(mark.id))
+        diagnose('duplicate-target', measureIndex, `Navigation target "${mark.id}" is duplicated; the first declaration wins.`);
+      else markIds.set(mark.id, measureIndex);
+    }
+  }
 
   // Read written strain structure independently of visits: skipped endings must
   // still offer the strain's iterations to an inspection cursor. Consecutive
@@ -157,8 +169,11 @@ export function linearizePasses(doc: MnxStructure): PassModel {
   let repeatStartIndex = 0;
   let iteration = 1;      // 1-based iteration of the current strain
   let viaLoop = false;    // arrived by looping back (do not re-read repeatStart)
-  let jumpTaken = false;  // a jump fires once; the return takes no repeats
-  let jumpKind: 'segno' | 'dsalfine' | null = null;
+  let returnJumpTaken = false; // after a return, written repeats are not retaken
+  let publishedJumpTaken = false; // published MNX defines one unqualified jump route
+  const takenJumps = new Set<string>();
+  let fineArmed = false;
+  let armedCoda: string | undefined;
   // The last bar of a numbered volta currently being played: walking past it
   // without looping means the strain resolved through its final ending, and
   // the music after it starts over at pass 1.
@@ -183,7 +198,7 @@ export function linearizePasses(doc: MnxStructure): PassModel {
       iteration = 1;
     }
     viaLoop = false;
-    if (jumpTaken) iteration = finalEndingIteration[i]!;
+    if (returnJumpTaken) iteration = finalEndingIteration[i]!;
     // A numbered volta not for this iteration: step over its whole span,
     // repeat barlines and all.
     const endingStart = endingAt[i];
@@ -212,25 +227,65 @@ export function linearizePasses(doc: MnxStructure): PassModel {
     arrival = undefined;
     if (!soundingPasses[i]!.includes(iteration)) soundingPasses[i]!.push(iteration);
 
-    if (jumpKind === 'dsalfine' && measure.fine !== undefined
-        && (!from || atOrAfter(measure.fine.location.fraction, from))) {
-      entry.until = [...measure.fine.location.fraction];
+    const navigation = measureNavigation(measure);
+    const fine = navigation.marks.find(mark => mark.kind === 'fine'
+      && (!from || atOrAfter(mark.location.fraction, from)));
+    if (fineArmed && fine) {
+      entry.until = [...fine.location.fraction];
       entry.via = 'fine';
       break;
     }
     from = undefined;
-    if (measure.jump !== undefined && !jumpTaken) {
-      jumpTaken = true;
-      jumpKind = measure.jump.type;
-      entry.until = [...measure.jump.location.fraction];
-      if (segno < 0) diagnose('jump-without-segno', i, 'Jump has no segno; returning to the beginning.');
-      i = segno >= 0 ? segno : 0;
-      from = globals[i]?.segno ? [...globals[i]!.segno!.location.fraction] : undefined;
+    const transfer = armedCoda
+      ? navigation.jumps.find(jump => jump.type === 'toCoda' && jump.target === armedCoda)
+      : undefined;
+    if (transfer) {
+      const destination = navigationMarkById(globals, armedCoda);
+      entry.until = [...transfer.location.fraction];
+      if (!destination) {
+        diagnose('jump-without-target', i, `To Coda references missing target "${armedCoda}"; continuing in written order.`);
+        armedCoda = undefined;
+      } else {
+        i = destination.measureIndex;
+        from = [...destination.mark.location.fraction];
+        armedCoda = undefined;
+        arrival = 'jump';
+        iteration = 1;
+        continue;
+      }
+    }
+    const returnJump = navigation.jumps
+      .map((jump, index) => ({ jump, key: `${i}:${index}` }))
+      .find(candidate => candidate.jump.type !== 'toCoda'
+        && !(candidate.jump.source === 'published' && publishedJumpTaken)
+        && !takenJumps.has(candidate.key));
+    if (returnJump) {
+      takenJumps.add(returnJump.key);
+      if (returnJump.jump.source === 'published') publishedJumpTaken = true;
+      returnJumpTaken = true;
+      const jump = returnJump.jump;
+      entry.until = [...jump.location.fraction];
+      fineArmed = jump.type === 'dsalfine' || jump.type === 'daCapoAlFine'
+        || jump.type === 'dalSegnoAlFine';
+      armedCoda = jump.type === 'daCapoAlCoda' || jump.type === 'dalSegnoAlCoda'
+        ? jump.resumeAt : undefined;
+      const destination = returnDestination(globals, jump, segno);
+      if (!destination) {
+        const needsSegno = jump.target === undefined
+          && (jump.type === 'segno' || jump.type === 'dsalfine'
+            || jump.type === 'dalSegno' || jump.type === 'dalSegnoAlFine'
+            || jump.type === 'dalSegnoAlCoda');
+        diagnose(needsSegno ? 'jump-without-segno' : 'jump-without-target', i,
+          needsSegno ? 'Jump has no matching segno; returning to the beginning.'
+            : 'Jump target is missing; returning to the beginning.');
+      }
+      i = destination?.measureIndex ?? 0;
+      from = destination ? [...destination.location] : undefined;
       arrival = 'jump';
       iteration = 1;
       continue;
     }
-    if (measure.repeatEnd !== undefined && !jumpTaken) {
+    if (measure.repeatEnd !== undefined && !returnJumpTaken) {
       const times = measure.repeatEnd.times ?? 2;
       if (iteration < times) {
         i = repeatStartIndex;
@@ -251,4 +306,21 @@ export function linearizePasses(doc: MnxStructure): PassModel {
   }
 
   return { order, passCounts, soundingPasses, truncated, entries, diagnostics, availableIterations };
+}
+
+function returnDestination(
+  measures: NonNullable<MnxStructure['global']>['measures'],
+  jump: NavigationJump,
+  firstSegno: number
+): { measureIndex: number; location: [number, number] } | undefined {
+  if (jump.type === 'daCapo' || jump.type === 'daCapoAlFine' || jump.type === 'daCapoAlCoda')
+    return { measureIndex: 0, location: [0, 1] };
+  const explicit = navigationMarkById(measures, jump.target);
+  if (jump.target !== undefined)
+    return explicit ? { measureIndex: explicit.measureIndex, location: explicit.mark.location.fraction } : undefined;
+  if (firstSegno >= 0) {
+    const mark = measureNavigation(measures[firstSegno]!).marks.find(candidate => candidate.kind === 'segno');
+    return { measureIndex: firstSegno, location: mark?.location.fraction ?? [0, 1] };
+  }
+  return undefined;
 }

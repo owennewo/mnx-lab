@@ -21,6 +21,11 @@ import type {
   PositionedAttribute
 } from './ops.ts';
 
+const LAB_JUMP_TYPES = new Set([
+  'toCoda', 'daCapo', 'daCapoAlFine', 'daCapoAlCoda',
+  'dalSegno', 'dalSegnoAlFine', 'dalSegnoAlCoda'
+]);
+
 /** "4/4", "6/8", "12/8" → an MNX time signature. Unit must be a power of two
  *  the notation can express. */
 export function parseTimeSignature(
@@ -319,9 +324,51 @@ export function parseBarAttribute(text: string): BarAttributeResult {
     if (rest === 'full-measure rest' || rest === 'full measure rest')
       return { rhythm: 'fullMeasureRest', remove: true };
     if (rest === 'measure repeat') return { rhythm: 'measureRepeat', remove: true };
+    if (rest === 'navigation mark') return { remove: 'navigationMark' };
+    if (rest === 'navigation jump') return { remove: 'navigationJump' };
     if (target === 'repeat') return { remove: 'repeatEnd' };
     const kind = ATTRIBUTE_WORDS[target];
     return kind ? { remove: kind } : null;
+  }
+
+  if (head === 'navigation' && (words[1] === 'mark' || words[1] === 'jump')) {
+    const navigationKind = words[1];
+    const raw = words.slice(2).join(' ');
+    const located = /^(.*?)\s+at\s+(start|end|\d+\/\d+)$/i.exec(raw);
+    let body = (located ? located[1] : raw).trim();
+    const at = located ? parseMarkAt(located[2]) : undefined;
+    if (Array.isArray(at) && !(at[0] >= 0 && at[1] > 0)) return null;
+    if (navigationKind === 'mark') {
+      const match = /^(\S+)\s+(segno|coda)(?:\s+(double))?$/i.exec(body);
+      if (!match) return null;
+      return { set: {
+        kind: 'navigationMark', id: match[1], markKind: match[2].toLowerCase() as 'segno' | 'coda',
+        ...(match[3] ? { count: 2 as const } : {}), ...(at ? { at } : {})
+      } };
+    }
+    let text: string | undefined;
+    const literal = /\s+text\s+("(?:[^"\\]|\\.)*")$/.exec(body);
+    if (literal) {
+      try { text = JSON.parse(literal[1]); } catch { return null; }
+      body = body.slice(0, literal.index).trim();
+    }
+    const tokens = body.split(' ');
+    const type = tokens.shift() ?? '';
+    if (!LAB_JUMP_TYPES.has(type)) return null;
+    let target: string | undefined;
+    let resumeAt: string | undefined;
+    while (tokens.length) {
+      const key = tokens.shift();
+      const value = tokens.shift();
+      if (!value || (key !== 'target' && key !== 'resume')) return null;
+      if (key === 'target') target = value;
+      else resumeAt = value;
+    }
+    return { set: {
+      kind: 'navigationJump', type: type as Extract<MeasureAttribute, { kind: 'navigationJump' }>['type'],
+      ...(target ? { target } : {}), ...(resumeAt ? { resumeAt } : {}),
+      ...(text ? { text } : {}), ...(at ? { at } : {})
+    } };
   }
 
   // `full-measure rest` — the bar declares its own silence.

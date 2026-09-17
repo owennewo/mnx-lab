@@ -34,7 +34,8 @@ const stated: Record<string, Stated[]> = {
   'lab/score-text/labels-with-navigation': [[0,1], [1,1], [2,1], [3,1]],
   'lab/score-text/labels-on-a-tab-staff': [[0,1], [1,1], [2,1], [3,1]],
   'lab/layout/coloured-marks-and-clef-forms': [[0,1], [1,1]],
-  'lab/navigation/ds-final-ending': [[0,1], [1,1], [0,2,'loop'], [2,2,'ending'], [3,1,undefined,undefined,[1,2]], [0,2,'jump',[1,4]], [2,2,'fine',undefined,[3,4]]]
+  'lab/navigation/ds-final-ending': [[0,1], [1,1], [0,2,'loop'], [2,2,'ending'], [3,1,undefined,undefined,[1,2]], [0,2,'jump',[1,4]], [2,2,'fine',undefined,[3,4]]],
+  'lab/navigation/coda-navigation': [[0,1], [1,1], [2,1], [3,1], [4,1,undefined,undefined,[1,1]], [2,1,'jump',[0,1]], [3,1,undefined,undefined,[1,1]], [5,1,'jump',[0,1]], [6,1,undefined,undefined,[1,1]], [0,1,'jump',[0,1]], [1,1,undefined,undefined,[1,1]], [7,1,'jump',[0,1]]]
 };
 function entries(rows: Stated[]): PerformedEntry[] {
   const counts = new Map<number, number>();
