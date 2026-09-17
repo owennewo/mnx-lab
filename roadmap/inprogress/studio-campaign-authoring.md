@@ -3,7 +3,7 @@
 > **A campaign** (see CLAUDE.md → Roadmap-driven development): this doc is an index over
 > normal proposals sharing one goal, the shared contract they follow, and the running log
 > of progress and learnings as items land. Indexed items are ordinary `studio-*` / `core-*`
-> proposals that name this campaign. **Opened 2026-09-17 from a design conversation; item 1
+> proposals that name this campaign. **Opened 2026-09-17 from a design conversation; items 1–2
 > built the same day, the rest not started.** Storage shape stays owned by
 > [docs/studio-storage.md](../../docs/studio-storage.md); the sync bar by
 > [docs/player-sync-bar.md](../../docs/player-sync-bar.md). This doc owns the order and
@@ -200,7 +200,7 @@ one.
 | # | Item | Status | Summary |
 | --- | --- | --- | --- |
 | 1 | [core-roundtrip-register](../complete/core-roundtrip-register.md) | **complete 2026-09-17** | **The comparator and the baseline loss register.** `src/model/documentCompare.ts` — pure; identity moved into the references (each rewritten to the path it resolves to, every `id` then dropped), `encoding` discounted, spliced arrays compared as multisets, differences collapsed to path shapes. Its reference inventory is checked against both schemas and goes red on a new one; equivalence under respelled and swapped ids is proved before anything is judged. `harness/fixtures/roundtrip-register.json` covers MNX → `.gp` → MNX over the corpus and `.gp` → MNX → `.gp` → MNX over the committed fixtures, with ranked `lostOrChanged` and `gained` lists; `npm run update:roundtrip-register`, and **git diff is the review**. An operator lane runs the same over a private library and writes outside the repo. Structured warnings (`{code, where}`) and a computed explained/unexplained verdict are its stated follow-up. Findings in log entry 3. |
-| 2 | `studio-piece-create` | proposed | **A piece made in studio.** Opens `apps/studio → src/edit` (clause 12). `POST /api/library/pieces` (browser-authenticated, `expected_revision: null`, reusing `writePiece`) with `source_kind: 'studio'` and a generated id; `createPiece` on `LibraryClient`. A **New piece** form — title, artist, tuning (preset, or custom through the existing `setupGrammar`; **not "none"** while storage is `.gp` — item 1 found a notation-only part reloads with six standard strings, `staffKind: both` and an octave transposition, so the form cannot honestly offer it until the exporter can write an unfretted track), capo, time signature, key, bar count — that replays a construct trace from `{}`, exports GP7 and stores it as the piece's first rendition. Lands on the piece page with the Source sheet one tap away, and makes the *add a recording to see the sync bar* step obvious (the toggle is hidden on the synth). Amends the three docs contract clause 1 reverses. Conformance tests for the route. |
+| 2 | [studio-piece-create](studio-piece-create.md) | **built 2026-09-17** | **A piece made in studio.** `#/new`: title, artist, tuning (the grammar's presets or a custom one — never "none", see open decision 6), capo, time, key, bars. `src/edit/newDocument.ts` builds the blank piece from `{}` through `applyOp`; `exportForStorage` writes the `.gp` with `STORAGE_EXPORT_OPTIONS`; `src/model/libraryTags.ts` reads the derived tags off the document (clause 9, one item early); `POST /api/library/pieces` stores it under `source_kind: 'studio'` with every id chosen by the service, reusing `writePiece` — no migration, no new role, the Worker still converting nothing. Opened `apps/studio → src/edit`. The piece page now asks for a recording when there is none. Amended `studio-shell.md`, `apps/studio/README.md`, `docs/studio-storage.md` and `docs/library-access.md`. Conformance over the real route on local D1/R2, and a real-browser smoke (`npm run smoke:piece-create`). |
 | 3 | `studio-save-pipeline` | proposed | **The save pipeline, proven on the smallest edit surface. Lands after item 1.** A `setWork` op (merge; an undefined field removes it) and a **Details** sheet offering the fields the Guitar Pro score header can hold — expected: title, subtitle, artist, album, composer, lyricist, transcriber, copyright, notes; item 1's register confirms. Then everything in contract clauses 2–9: `POST /pieces/:id/renditions` (bytes, `expected_revision`, `derived_from`, provenance with verdict/warnings/named/build, derived tags; pointer moved atomically), export (**with `STORAGE_EXPORT_OPTIONS`** — log entry 3) + round-trip check moved into a worker and **measured on Vestapol**, the IndexedDB recovery record (clause 5), checkpoint triggers, the save-state chip and **Save version…**, the single write queue, the Web Lock, the derived-tag projection promoted into `src/model/` and shared with the ingest tool. Import `warnings` get a quiet *conversion notes (n)* entry on the piece page — displayed, not stored. Conformance tests and a smoke script. **Recovery acceptance tests, named because each is a way the first design was wrong:** *edit → checkpoint → undo → crash* recovers the undone state; *checkpoint → more edits → crash* recovers a document byte-identical to the live one; edits made **while a checkpoint is in flight** survive and stay counted unsaved; undo back to the checkpointed state reads clean; a record written by another build opens or is offered for download, never half-applied; a record whose base is no longer canonical reaches the conflict prompt. |
 | 4 | `studio-sync-rederive` | proposed | **Sync first, bars later.** Contract clause 10: derive tuples from segments and the current bars on load and on bar-structure change (the derivation already lives in `src/model/syncSegments.ts`; it must run outside a sync-bar commit), write refreshed tuples back at a checkpoint, and flag imported tuple-only syncs whose traversal changed. Closes the hands-on checks [studio-sync-bar](../inprogress/studio-sync-bar.md) still owes — the click against a real YouTube clock, and the bar on touch — on a piece made by item 2. |
 | 5 | `studio-piece-lifecycle` | proposed | **Living with pieces.** Soft delete (`deleted_at`; hidden from lists, R2 untouched — *never deletes* holds). A versions route listing a piece's renditions from `derived_from` / `created_at` with automatic-or-named and the round-trip verdict; open an older version; **revert** as a pointer move plus revision bump, no new rendition. Rename is a Details edit. An operator listing of unexplained round-trip verdicts that pulls their defect reports into converter fixtures. |
@@ -351,4 +351,29 @@ should start knowing:
 - **Process:** an ad-hoc probe test that prints is silent under this repo's vitest config —
   write findings to a file. And a `\u0000` written through a heredoc lands as a literal NUL
   byte in the source; both new files had one, caught before commit.
+
+### 2026-09-17 — entry 4: item 2 built — a piece can exist
+
+[studio-piece-create](studio-piece-create.md). The priority flow now runs to the moment a
+recording is added: *New piece* → a nine-bar skeleton → the piece page → Source → Add
+recording → the sync bar, all on work that was already built and persisted.
+
+- **The storage model needed nothing.** No migration, no new rendition role, no invariant
+  amended: `writePiece` already meant "create" by `expected_revision: null`, a source kind is
+  free text, and a piece with no upstream is given one (`studio` + a UUID) so that identity,
+  uniqueness and the id's shape hold exactly as for an ingest. What was missing was only a
+  route a browser may call. Item 3's checkpoint route should expect the same.
+- **Browser writes are JSON, so the file is base64.** The middleware's CSRF argument (a
+  cross-site form cannot send `application/json`) is worth more than the 33% — a GP7 file is
+  tens of KB. Item 3's checkpoints take the same shape; the 1 MiB cap is the number to
+  revisit if a real piece ever nears it.
+- **Item 1 paid for itself at once.** "Survives its own first save" is one assertion because
+  the comparator exists, and it failed usefully on the first run (string order — now
+  canonicalised). Every later genesis or edit path can make the same assertion in a line.
+- **Clause 9's projection arrived early** (`src/model/libraryTags.ts`), and **sharing it with
+  the ingest tool is not free**: the tool is plain `.mjs`. Item 3 inherits a parity test, not
+  a shared import; whoever wants one module should move the tool to TypeScript first.
+- **Landing tip:** a real-browser smoke needs local auth (`npm run dev:login` inside the
+  worktree — it keeps its own key, `.dev.vars` and local D1, all ignored) and
+  `wrangler dev` on a spare port with `LIBRARY_LOCAL_ORIGIN`; 8791 may be another agent's.
 

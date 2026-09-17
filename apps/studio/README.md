@@ -71,9 +71,12 @@ the one persistence a shell may own without a backend decision.
 ## The boundary (machine-enforced)
 
 `apps/studio/` may import only `src/model`, `src/engine`, `src/audio`, `src/elements`,
-`src/storage` (the typed library client) and `src/importers` (the clean-room converters in
-a worker — promoted out of the workbench when the library stopped storing derived MNX). It must not import `src/workbench/`, `src/edit/`
-or `src/assist/`; nothing may import `apps/studio/`. `.dependency-cruiser.cjs` makes any of
+`src/storage` (the typed library client), `src/importers` (the clean-room converters in
+a worker — promoted out of the workbench when the library stopped storing derived MNX) and,
+since 2026-09-17, `src/edit` — the DOM-free ops layer, opened when studio began making
+pieces (`#/new` builds a document through `applyOp`). It must not import `src/workbench/`
+or `src/assist/`; nothing may import `apps/studio/`. The editor's *mount* — keymap, cursor,
+inspector — still arrives through `elements/`, by promotion. `.dependency-cruiser.cjs` makes any of
 those a red build. Anything both shells want is first *promoted* into `elements/` or
 below — a deliberate, reviewed move.
 
@@ -81,9 +84,11 @@ below — a deliberate, reviewed move.
 
 [roadmap/proposed/core-editor-element-promotion.md](../../roadmap/proposed/core-editor-element-promotion.md)
 was parked behind "a real second consumer asking for editing". Studio is that consumer.
-When the promotion lands, the piece page mounts the editor element and edits **in memory
-only**; the storage design already says the first saved edit becomes a new MNX rendition
-that takes the canonical pointer, and that write path is the next studio item.
+The [studio authoring campaign](../../roadmap/inprogress/studio-campaign-authoring.md)
+sequences it: pieces are made in studio first (`#/new`), then the save pipeline, then the
+promotion in three slices. **A saved edit is a new `.gp` rendition that takes the canonical
+pointer** — Guitar Pro stays the stored format even for studio's own edits, so no MNX
+migration ever runs on stored data, and every save is checked for what the round trip lost.
 
 ## Assist credentials — still a promotion waiting
 

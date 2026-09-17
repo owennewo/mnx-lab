@@ -76,13 +76,15 @@ module.exports = {
       name: 'studio-consumes-neutral-surfaces',
       comment:
         'apps/studio is the consumer product (apps/studio/README.md). It reads elements/ ' +
-        'and below, the typed library client and the importers — never the workbench, never assist ' +
-        'or edit until the editor is promoted (roadmap: core-editor-element-promotion).',
+        'and below, the typed library client, the importers and — since it makes pieces ' +
+        '(roadmap: studio-campaign-authoring) — the DOM-free edit layer. Never the workbench, ' +
+        'and never assist: the AI palette stays where it incubates. The editor\'s MOUNT still ' +
+        'arrives through elements/ (roadmap: core-editor-element-promotion).',
       severity: 'error',
       from: { path: '^apps/studio/' },
       to: {
         path: '^(src|worker)/',
-        pathNot: '^src/(model|engine|audio|elements|storage|importers)/|^worker/generated/'
+        pathNot: '^src/(model|engine|audio|edit|elements|storage|importers)/|^worker/generated/'
       }
     },
     {

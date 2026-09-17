@@ -76,6 +76,14 @@ describe('document comparison: what is not a difference', () => {
     expect(compareDocuments(score(), unstamped)).toEqual([]);
   });
 
+  it('a tuning is the same tuning whichever string is listed first', () => {
+    const strings = [{ string: 1, pitch: { step: 'E', octave: 4 } }, { string: 2, pitch: { step: 'B', octave: 3 } }, { string: 3, pitch: { step: 'G', octave: 3 } }];
+    const part = (order: typeof strings) => ({ ...score(), parts: [{ ...score().parts[0], _x: { mnxLab: { strings: order } } }] });
+    expect(compareDocuments(part(strings), part([...strings].reverse()))).toEqual([]);
+    const retuned = strings.map(s => (s.string === 3 ? { ...s, pitch: { step: 'F', octave: 3 } } : s));
+    expect(compareDocuments(part(strings), part(retuned)).length).toBeGreaterThan(0);
+  });
+
   it('key order is not a difference, and canonicalising never mutates', () => {
     const original = score();
     const before = JSON.stringify(original);

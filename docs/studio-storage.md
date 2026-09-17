@@ -62,6 +62,16 @@ reader's `#/piece/<id>` never names the source system, yet deterministic, so a r
 import lands on the same row. The source itself lives in `source_kind`/`source_id`. The
 schema's `-- ulid` comment predates this and is left as the migration wrote it.
 
+**A piece made in studio has no upstream, so the service invents one.** `POST
+/api/library/pieces` gives it `source_kind: 'studio'` and a fresh UUID as `source_id`, and
+derives the piece id from those exactly as for any other source — so the uniqueness rule,
+the immutability of source identity and the id's shape all hold unchanged, and making the
+same piece twice is two pieces (sharing one content-addressed blob). Its first rendition is
+the `.gp` the browser exported: `role: 'original'`, `producer: 'studio'`, canonical from the
+start. **`.gp` is the stored format for studio's own work too** (decided 2026-09-17,
+[studio authoring campaign](../roadmap/inprogress/studio-campaign-authoring.md)): a saved
+edit will be another `.gp` rendition with `derived_from` set, never stored MNX.
+
 **The pointer is set explicitly and then belongs to the owner.** An import sets canonical
 only when the piece has none — for a Soundslice slice, to the Soundslice `.gp`, the most
 complete rendition on hand — and never moves it afterwards. A later import adds renditions;
@@ -386,8 +396,8 @@ new malformed fields are rejected before JSON serialization.
 
 ## When the Durable Object arrives
 
-Nothing above needs one. A save today is a whole-document write of a new rendition and a
-pointer move. A **Durable Object** is a single-threaded actor with its own private SQLite,
+Nothing above needs one. A save is a whole-document write of a new rendition — a `.gp`,
+for studio's edits as for everything else — and a pointer move. A **Durable Object** is a single-threaded actor with its own private SQLite,
 so every request to one document runs one at a time and the object can validate an edit,
 apply it, append it to a log, bump a version and persist all of that in one transaction.
 Blobs cannot do that: an R2 write is a whole-object replace with no transaction and no logic

@@ -45,6 +45,14 @@ export class LibraryClient {
   }
   me() { return this.get<{ user: { id: string; email: string } }>('/me'); }
   facets(tags: string[]) { const q = new URLSearchParams(); tags.forEach(t => q.append('tag', t)); return this.get<{ total: number; facets: LibraryFacet[] }>(`/facets?${q}`); }
+  /** A piece made in Studio: the exported `.gp` and the tags read off the document
+   *  it came from. The service names the piece; the snapshot says what it chose. */
+  async createPiece(file: { filename: string; bytes: Uint8Array; producerVersion: string | null; producerOptions: Record<string, unknown> | null }, derivedTags: { dimension: string; value: string }[]) {
+    const sha256 = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', file.bytes as BufferSource)), b => b.toString(16).padStart(2, '0')).join('');
+    let binary = ''; for (let i = 0; i < file.bytes.length; i += 0x8000) binary += String.fromCharCode(...file.bytes.subarray(i, i + 0x8000));
+    return this.recordingRequest<{ snapshot: LibrarySnapshot }>('/pieces', 'POST', { rendition: { filename: file.filename, sha256, content: btoa(binary),
+      producer_version: file.producerVersion, producer_options: file.producerOptions }, derived_tags: derivedTags });
+  }
   opened(id: string) { return this.send<void>('POST', `/pieces/${encodeURIComponent(id)}/opened`, {}); }
   changeTags(id: string, revision: number, change: TagChange) { return this.send<{ snapshot: { piece: { id: string; revision: number; canonical_rendition_id?: string | null }; tags: ShownTag[] } }>('PATCH', `/pieces/${encodeURIComponent(id)}/tags`, { expected_revision: revision, ...change }); }
   aliases() { return this.get<{ aliases: LibraryAlias[] }>('/aliases'); }

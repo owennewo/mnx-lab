@@ -17,6 +17,9 @@
  *    documents built by ops carry none, importers carry one per note, and an
  *    event keeps its id only while a beam or slur still points at it (so
  *    keeping ids would report every lost beam twice).
+ *  - A part's `_x.mnxLab.strings` is ordered by string number: each entry names
+ *    its own string, so the array's order says nothing (the setup grammar
+ *    recites low string first, every importer writes string 1 first).
  *  - A reference that resolves to nothing is left exactly as spelled, so a
  *    dangling target still differs from a good one; a DUPLICATED id resolves to
  *    nothing in particular, so it and its references stay as spelled too.
@@ -105,6 +108,8 @@ export function canonicalizeDocument<T>(document: T): T {
   for (const id of ambiguous) declared.delete(id);
 
   walk(clone, [], object => {
+    if (Array.isArray(object.strings) && object.strings.every(s => isObject(s) && typeof s.string === 'number'))
+      object.strings = [...object.strings].sort((a, b) => (a as { string: number }).string - (b as { string: number }).string);
     eachReference(object, id => declared.get(id) ?? id);
     if (typeof object.id === 'string' && !ambiguous.has(object.id)) delete object.id;
   });

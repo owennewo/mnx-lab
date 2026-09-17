@@ -8,6 +8,8 @@ import { RecordingManager, type RecordingChange } from '../library/recordings.ts
 
 export const INGEST_OWNER = 'operator';
 export const MAX_INGEST_BYTES = 24 * 1024 * 1024;
+/** A score Studio wrote: a GP7 container is tens of KB, and it travels as base64 inside a JSON write. */
+export const MAX_STUDIO_SCORE_BYTES = 1024 * 1024;
 const encoder = new TextEncoder();
 async function authentic(candidate: string, secret: string) {
   const key = (value: string) => crypto.subtle.importKey('raw', encoder.encode(value), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign', 'verify']);
@@ -165,6 +167,15 @@ library.post('/ingest', async c => {
 });
 
 function reader(c: { env: Env }) { return new Library(c.env.LIBRARY_DB, c.env.LIBRARY_BUCKET); }
+/** A JSON object body read under a byte limit, whatever Content-Length claims. */
+async function boundedJson(request: Request, limit: number, what: string): Promise<Record<string, unknown>> {
+  const stream = request.body?.getReader(); if (!stream) invalid(`${what}: missing request body.`);
+  const chunks: Uint8Array[] = []; let length = 0;
+  for (;;) { const { done, value } = await stream.read(); if (done) break; length += value.length;
+    if (length > limit) { await stream.cancel(); invalid(`${what} exceeds ${limit / (1024 * 1024)} MiB.`); } chunks.push(value); }
+  const bytes = new Uint8Array(length); let offset = 0; for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.length; }
+  try { return object(JSON.parse(new TextDecoder().decode(bytes))); } catch { invalid(`${what}: expected a JSON object.`); }
+}
 library.get('/me', c => c.json({ user: c.get('libraryUser') }));
 function filtersOf(c: { req: { queries(name: string): string[] | undefined } }) {
   const filters = c.req.queries('tag') ?? [];
@@ -201,6 +212,45 @@ library.get('/pieces/:id', async c => {
 library.post('/pieces/:id/opened', async c => {
   await reader(c).recordView(c.get('libraryUser').id, c.req.param('id'));
   return c.body(null, 204);
+});
+// A piece made in Studio. The browser built a document, exported it as Guitar
+// Pro and read its tags off it; the service stores those bytes as the piece's
+// first rendition and NAMES everything — piece, source and rendition ids are
+// never the caller's. Like every browser write it is same-origin JSON, so the
+// file travels as base64. Nothing is converted or derived here (the Worker
+// holds no converter): `.gp` is the stored format and the reader converts
+// (roadmap: studio-campaign-authoring, studio-piece-create).
+library.post('/pieces', async c => {
+  const b = await boundedJson(c.req.raw, 2 * 1024 * 1024, 'A new piece');
+  if (Object.keys(b).some(k => !['rendition', 'derived_tags'].includes(k))) invalid('Unsupported field');
+  const r = object(b.rendition);
+  if (Object.keys(r).some(k => !['filename', 'sha256', 'content', 'producer_version', 'producer_options'].includes(k))) invalid('Unsupported rendition field');
+  const filename = text(r.filename);
+  if (filename.length > 255 || /[\\/\u0000-\u001f]/.test(filename) || !/\.gp$/i.test(filename)) invalid('Expected a plain .gp filename');
+  const sha256 = text(r.sha256);
+  if (!/^[0-9a-f]{64}$/.test(sha256)) invalid('Invalid SHA-256');
+  if (typeof r.content !== 'string' || r.content.length > Math.ceil(MAX_STUDIO_SCORE_BYTES / 3) * 4 || !/^[A-Za-z0-9+/]*={0,2}$/.test(r.content)) invalid('Expected the score as base64, at most 1 MiB');
+  let content: Uint8Array;
+  try { content = Uint8Array.from(atob(r.content), ch => ch.charCodeAt(0)); } catch { invalid('Expected the score as base64'); }
+  // GP7 is a zip container; anything else is not something a reader could open.
+  if (content.length < 4 || content.length > MAX_STUDIO_SCORE_BYTES || content[0] !== 0x50 || content[1] !== 0x4b || content[2] !== 0x03 || content[3] !== 0x04) invalid('Expected a Guitar Pro 7 file');
+  const version = nullable(r.producer_version);
+  const options = r.producer_options == null ? null : object(r.producer_options) as Json;
+  const derived: DerivedTag[] = array(b.derived_tags).map(value => {
+    const t = object(value);
+    if (Object.keys(t).some(k => !['dimension', 'value'].includes(k))) invalid('Unsupported tag field');
+    return { dimension: text(t.dimension), value: text(t.value), source_ref: `studio@${version ?? 'unversioned'}` };
+  });
+  if (!derived.some(t => t.dimension === 'title')) invalid('A piece needs a title');
+  const sourceId = crypto.randomUUID();
+  const id = await pieceIdFor('studio', sourceId);
+  const renditionId = `${id}-${sha256.slice(0, 16)}`;
+  const lib = reader(c); const owner = c.get('libraryUser').id;
+  const snapshot = await lib.writePiece(owner, { id, expected_revision: null, source: { kind: 'studio', id: sourceId },
+    renditions: [{ id: renditionId, format: 'gp', role: 'original', producer: 'studio', producer_version: version, producer_options: options,
+      filename, content: content.buffer as ArrayBuffer, sha256 }],
+    canonical: { mode: 'initialize', rendition_id: renditionId }, tags: [], derived_tags: derived });
+  return c.json({ snapshot: { ...snapshot, tags: Library.shown(snapshot.tags, await lib.listAliases(owner)) } }, 201);
 });
 // Your own tags: add, remove, rename — never a derived one (the module refuses).
 library.patch('/pieces/:id/tags', async c => {
@@ -276,14 +326,7 @@ library.on(['GET', 'HEAD'], '/recordings/:id/audio', async c => {
 // Browser recording authoring. The raw upload requires a non-simple header and
 // the same authenticated owner; CORS is not enabled on these routes.
 function recordingManager(c: { env: Env }) { return new RecordingManager(c.env.LIBRARY_DB, c.env.LIBRARY_BUCKET); }
-async function recordingBody(request: Request) {
-  const reader = request.body?.getReader(); if (!reader) invalid('Missing recording metadata.');
-  const chunks: Uint8Array[] = []; let length = 0;
-  for (;;) { const { done, value } = await reader.read(); if (done) break; length += value.length;
-    if (length > 2 * 1024 * 1024) { await reader.cancel(); invalid('Recording metadata exceeds 2 MiB.'); } chunks.push(value); }
-  const bytes = new Uint8Array(length); let offset = 0; for (const c of chunks) { bytes.set(c, offset); offset += c.length; }
-  try { return object(JSON.parse(new TextDecoder().decode(bytes))); } catch { invalid('Expected recording JSON.'); }
-}
+function recordingBody(request: Request) { return boundedJson(request, 2 * 1024 * 1024, 'Recording metadata'); }
 function recordingChange(value: Record<string, unknown>): RecordingChange {
   if (Object.keys(value).some(k => !['expected_revision','name','rawSync','selectedId','video','sha256','bytes','mime'].includes(k))) invalid('Unsupported recording field.');
   if (!Number.isSafeInteger(value.expected_revision)) invalid('Expected the piece revision.');

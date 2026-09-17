@@ -2,11 +2,12 @@
 // the page IS the score frame (roadmap/inprogress/core-score-frame.md): the
 // frame's own strips carry the title, the way back, the tools and the player,
 // so the shell's header is for the other pages only. Nothing fades on a timer
-// any more — a tap never restarted it. Three hash routes
+// any more — a tap never restarted it. Hash routes
 // (roadmap/inprogress/studio-shell.md):
 //   #/                 the library (tag-filtered browse); its view rides along as
 //                      #/?tag=list:80s&sort=title&q=words, so a way back returns to it
 //   #/piece/<id>       one piece, viewer + player filling the viewport
+//   #/new              make a piece (roadmap/inprogress/studio-piece-create.md)
 //   #/not-permitted    Access admitted the address, D1 did not
 import { LitElement, css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
@@ -16,11 +17,13 @@ import { nextTheme, readTheme, resolvedTheme, setTheme, themeGlyph, type ThemeSe
 import './LibraryPage.ts';
 import './PiecePage.ts';
 import './AliasesPage.ts';
+import './NewPiecePage.ts';
 
 export type Route =
   | { page: 'library' }
   | { page: 'piece'; id: string }
   | { page: 'aliases' }
+  | { page: 'new' }
   | { page: 'not-permitted' };
 
 export function parseHash(hash: string): Route {
@@ -28,11 +31,13 @@ export function parseHash(hash: string): Route {
   if (piece) return { page: 'piece', id: decodeURIComponent(piece[1]) };
   if (hash === '#/not-permitted') return { page: 'not-permitted' };
   if (hash === '#/aliases') return { page: 'aliases' };
+  if (hash === '#/new') return { page: 'new' };
   return { page: 'library' };
 }
 
 export const libraryHref = '#/';
 export const aliasesHref = '#/aliases';
+export const newPieceHref = '#/new';
 export const pieceHref = (id: string): string => `#/piece/${encodeURIComponent(id)}`;
 
 /** What the library's URL carries: enough to put the same list back. */
@@ -225,7 +230,8 @@ export class StudioApp extends LitElement {
         : html`<header>
             <a class="brand" href=${libraryHref}>MNX <b>Studio</b></a>
             <span class="title"></span>
-            ${this.route.page === 'aliases' ? html`<a class="button" href=${libraryReturnHref()} @click=${returnToLibrary}>Library</a>` : nothing}
+            ${this.route.page === 'aliases' || this.route.page === 'new' ? html`<a class="button" href=${libraryReturnHref()} @click=${returnToLibrary}>Library</a>` : nothing}
+            ${this.route.page === 'library' && email ? html`<a class="button" href=${newPieceHref}>New piece</a>` : nothing}
             <button class="theme" title=${themeSentence} aria-label=${themeSentence} @click=${this.cycleTheme}>${themeGlyph(this.theme)}<span>${this.theme}</span></button>
             ${email ? html`<span class="who">${email}</span>` : nothing}
             ${email || this.session?.kind === 'not-permitted'
@@ -263,6 +269,7 @@ export class StudioApp extends LitElement {
         .pieceId=${this.route.id}
       ></mnx-studio-piece>`;
     if (this.route.page === 'aliases') return html`<mnx-studio-aliases .client=${this.client}></mnx-studio-aliases>`;
+    if (this.route.page === 'new') return html`<mnx-studio-new-piece .client=${this.client}></mnx-studio-new-piece>`;
     return html`<mnx-studio-library .client=${this.client}></mnx-studio-library>`;
   }
 }

@@ -228,7 +228,8 @@ export class Library {
       if (inputRow.producer_version !== null) requireText(inputRow.producer_version, 'producer version');
       const blob = await describeBlob('renditions', inputRow);
       blobs.set(blob.r2_key, blob);
-      // Stored MNX (an edit, one day) must match the storage schema; nothing is derived from it.
+      // Stored MNX must match the storage schema; nothing is derived from it. (Studio's own
+      // pieces and edits are stored as .gp — roadmap: studio-campaign-authoring.)
       if (inputRow.format === 'mnx') parseMnx(blob.content);
       const old = renditions.get(inputRow.id);
       const row: Rendition = {

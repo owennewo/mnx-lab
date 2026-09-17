@@ -419,7 +419,7 @@ export class PiecePage extends LitElement {
             </button>
             <button slot="actions" type="button" aria-pressed=${this.sourceOpen || this.recordingsOpen}
               aria-label=${`Source: ${activeRecording?.name ?? 'Synth'}`} @click=${() => this.openPanel(this.sourceOpen ? null : 'source')}>
-              ${sourceGlyph(activeRecording ? (activeRecording.kind === 'youtube' ? 'youtube' : 'audio') : 'synth')}<span>Source · ${activeRecording?.name ?? 'Synth'}</span>
+              ${sourceGlyph(activeRecording ? (activeRecording.kind === 'youtube' ? 'youtube' : 'audio') : 'synth')}<span>Source · ${activeRecording?.name ?? (this.snapshot && !this.recordings.length ? 'Synth · add a recording' : 'Synth')}</span>
             </button>
             <button slot="actions" type="button" aria-pressed=${this.instrumentsOpen} @click=${() => this.openPanel(this.instrumentsOpen ? null : 'instruments')}>
               ${mixerGlyph}<span>Instruments · ${this.doc.mnxJson.parts.length}</span>

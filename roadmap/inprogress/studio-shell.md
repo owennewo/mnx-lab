@@ -15,8 +15,9 @@ fills the screen with the score and the player. Editing is possible as soon as t
 is promoted; nothing is persisted yet. The workbench lives on at `/workbench/`, public and
 unchanged.
 
-Not in scope, each its own later item: saving an edit (the storage design already says
-what that is — a new MNX rendition that takes the canonical pointer), sharing, sync,
+Not in scope, each its own later item: saving an edit (**decided 2026-09-17**, by the
+[studio authoring campaign](studio-campaign-authoring.md): a new **`.gp`** rendition that
+takes the canonical pointer — not the MNX rendition this doc first assumed), sharing, sync,
 recordings and syncpoints in the player, practice tools
 ([studio-player-practice.md](../proposed/studio-player-practice.md)), the BYOK assist flow
 ([apps/studio/README.md](../../apps/studio/README.md) records the promotion it needs).
@@ -141,9 +142,12 @@ story, code-splitting so viewers do not pay for the keymap).
 
 Once promoted, studio mounts the editor element on `#/piece/<id>` and edits **in memory
 only**: no write route exists, the storage contract says the Worker owns every write,
-and the design says the first saved edit becomes a new MNX rendition that takes the
-canonical pointer. Leaving the page discards the edit, and the page says so. Persistence
-is the next studio item, not a stretch goal of this one.
+and the first saved edit becomes a new rendition that takes the canonical pointer.
+*(Superseded 2026-09-17: the [studio authoring campaign](studio-campaign-authoring.md)
+sequences saving BEFORE the editor, stores that rendition as `.gp` rather than MNX, and
+makes pieces in studio — [studio-piece-create](studio-piece-create.md) — so there is
+something of one's own to edit.)* Persistence is the next studio item, not a stretch goal
+of this one.
 
 ## Acceptance
 
