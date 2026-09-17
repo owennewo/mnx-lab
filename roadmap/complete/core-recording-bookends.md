@@ -87,3 +87,13 @@ duration claim without replacing identity or bytes, and dry-run reports decoded 
 where `ffprobe` is available plus genuine media overruns. No production repair was run.
 The full 1,884-test suite, scenario check and production build passed; all 191 regenerated
 goldens remained byte-identical, so no verification batch was opened.
+
+A screenshot follow-up exposed two scale-edge mistakes in the first implementation. The
+bookend's staff-relative ink width was being spent as layout-space width, so non-square
+Staff/Space settings separated the block from its label and music edge. Bookends now anchor
+at the system edge and express their fixed ink geometry as primitive offsets, while layout
+reserves the corresponding `inkRatio`-adjusted space. Separately, the final-system trailing
+inset had been added after taking the maximum extent across every row, leaving a false right
+margin on earlier full rows; the inset is now priced only into the final row. Regression
+coverage exercises notation, tab and combined projections at 0.4× and 4× ink ratios, plus a
+multi-system Space 0 case. Non-zero sub-second roll durations display as `0:01`, not `0:00`.

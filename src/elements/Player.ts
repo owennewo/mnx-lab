@@ -679,7 +679,7 @@ export class Player extends LitElement {
       : status.mediaPhase === 'post-roll' && status.mediaBounds?.durationSeconds !== undefined
         ? status.mediaBounds.durationSeconds - status.mediaBounds.endSeconds : undefined;
     if ((status.mediaPhase === 'pre-roll' || status.mediaPhase === 'post-roll') && duration !== undefined) {
-      const seconds = Math.max(0, Math.round(duration));
+      const seconds = Math.max(1, Math.round(duration));
       return `${status.mediaPhase === 'pre-roll' ? 'Pre-roll' : 'Post-roll'} · ${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
     }
     return `${status.kind === 'youtube' ? 'YouTube' : 'Audio'} ${Math.floor(time / 60)}:${Math.floor(time % 60).toString().padStart(2, '0')} · no score position`;

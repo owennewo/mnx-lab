@@ -212,13 +212,13 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
   // instead, where the tab staff shares a system with a notation staff that
   // does draw one, and must keep agreeing with its columns.
   const showNames = display.instrumentNames === 'every-system' || display.instrumentNames === 'first-system';
-  const leadingBookendSp = context?.leadingBookendSp ?? systemBookendInsetSp(opts.systemBookends?.leading);
+  const leadingBookendSp = context?.leadingBookendSp ?? systemBookendInsetSp(opts.systemBookends?.leading, opts.inkRatio);
   const planOptions = {
     entries: opts.entries,
     leftInsetSp: (showNames ? instrumentLabelInset([instrumentName(part, true)]) : 0) +
       (!context ? leadingBookendSp : 0),
     subsequentLeftInsetSp: display.instrumentNames === undefined ? undefined : display.instrumentNames === 'every-system' ? instrumentLabelInset([instrumentName(part, false)]) : 0,
-    lastLineRightInsetSp: !context ? systemBookendInsetSp(opts.systemBookends?.trailing) : 0,
+    lastLineRightInsetSp: !context ? systemBookendInsetSp(opts.systemBookends?.trailing, opts.inkRatio) : 0,
     display,
     lyricLineIds: selectedLyrics,
     spacingMode: opts.spacingMode,
@@ -667,9 +667,9 @@ function layoutTabSystems(opts: LayoutTabOptions): LayoutResult {
         forcedBreaks: segment.forcedBreaks, measureRange: segment.range ?? undefined,
         minMeasures: segment.minMeasures, collapse: job.collapse,
         leftInsetSp: (names ? instrumentLabelInset(parts.map(part => instrumentName(part, first))) : 0) +
-          (ordinal === 0 ? systemBookendInsetSp(opts.systemBookends?.leading) : 0),
+          (ordinal === 0 ? systemBookendInsetSp(opts.systemBookends?.leading, opts.inkRatio) : 0),
         subsequentLeftInsetSp: display.instrumentNames === 'every-system' ? instrumentLabelInset(parts.map(part => instrumentName(part, false))) : 0,
-        lastLineRightInsetSp: ordinal === segmentCount - 1 ? systemBookendInsetSp(opts.systemBookends?.trailing) : 0
+        lastLineRightInsetSp: ordinal === segmentCount - 1 ? systemBookendInsetSp(opts.systemBookends?.trailing, opts.inkRatio) : 0
       };
       const plan = planHorizontal(mnx, widthSp, planOptions);
       const natural = clampSpace(opts.densityH) === SPACE_DEFAULT_SP ? undefined : planHorizontal(mnx, widthSp, { ...planOptions, densityH: SPACE_DEFAULT_SP }).usedWidthSp;
@@ -680,7 +680,7 @@ function layoutTabSystems(opts: LayoutTabOptions): LayoutResult {
         const result = layoutTabStaff(opts, {
           part: source.part, staffIndex: source.staff, globalLabels: staff === 0,
           firstScoreSegment: first, partLabel: sources.findIndex(candidate => candidate.part === source.part) === staff,
-          leadingBookendSp: ordinal === 0 ? systemBookendInsetSp(opts.systemBookends?.leading) : 0,
+          leadingBookendSp: ordinal === 0 ? systemBookendInsetSp(opts.systemBookends?.leading, opts.inkRatio) : 0,
           naturalWidthSp: natural,
           plan: { ...plan, measures: plan.measures.map(measure => ({ ...measure, voices: measure.staves[staff] ?? [] })) }
         });

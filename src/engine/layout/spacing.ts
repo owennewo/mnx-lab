@@ -2569,7 +2569,8 @@ export function planHorizontal(
   if (options?.entries) measures.forEach((measure, i) => { measure.entry = options.entries![i]; });
 
   const usedWidthSp = measures.length
-    ? Math.max(...measures.map(m => m.x + m.width)) + marginSp + (options?.lastLineRightInsetSp ?? 0)
+    ? Math.max(...measures.map(m => m.x + m.width + marginSp +
+        (m.row === packed.length - 1 ? options?.lastLineRightInsetSp ?? 0 : 0)))
     : widthSp;
   return { measures, rowCount: packed.length, numStaves, staffGroups, usedWidthSp, packing, columns, inkRatio };
 }

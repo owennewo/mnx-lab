@@ -13,8 +13,9 @@ export interface SystemBookends {
 export const SYSTEM_BOOKEND_WIDTH_SP = 9;
 const SYSTEM_BOOKEND_GAP_SP = 0.5;
 
-export function systemBookendInsetSp(bookend: SystemBookend | undefined): number {
-  return bookend ? SYSTEM_BOOKEND_WIDTH_SP + SYSTEM_BOOKEND_GAP_SP : 0;
+export function systemBookendInsetSp(bookend: SystemBookend | undefined, inkRatio = 1): number {
+  const ratio = Number.isFinite(inkRatio) && inkRatio > 0 ? inkRatio : 1;
+  return bookend ? (SYSTEM_BOOKEND_WIDTH_SP + SYSTEM_BOOKEND_GAP_SP) * ratio : 0;
 }
 
 /** Add host-labelled, system-height regions outside the first/last music.
@@ -44,13 +45,19 @@ export function appendSystemBookends(
     if (musicEdge === null) return;
     const top = Math.min(...bands.map(b => b.staffTop));
     const bottom = Math.max(...bands.map(b => b.staffBottom));
-    const x = side === 'leading'
-      ? musicEdge - SYSTEM_BOOKEND_GAP_SP - SYSTEM_BOOKEND_WIDTH_SP
-      : musicEdge + SYSTEM_BOOKEND_GAP_SP;
+    // The edge is a musical position (horizontal scale); block width/gap are
+    // staff-relative ink (vertical scale). Keep both currencies explicit so
+    // Staff and Space can move independently without separating label/block.
+    const dx = side === 'leading'
+      ? -SYSTEM_BOOKEND_GAP_SP - SYSTEM_BOOKEND_WIDTH_SP
+      : SYSTEM_BOOKEND_GAP_SP;
+    const labelDx = side === 'leading'
+      ? -SYSTEM_BOOKEND_GAP_SP - SYSTEM_BOOKEND_WIDTH_SP / 2
+      : SYSTEM_BOOKEND_GAP_SP + SYSTEM_BOOKEND_WIDTH_SP / 2;
     const className = `recording-bookend recording-bookend-${side}`;
-    primitives.push({ kind: 'rect', x, y: top, w: SYSTEM_BOOKEND_WIDTH_SP, h: bottom - top,
+    primitives.push({ kind: 'rect', x: musicEdge, dx, y: top, w: SYSTEM_BOOKEND_WIDTH_SP, h: bottom - top,
       radius: 0.15, className: `${className} recording-bookend-block`, title: bookend.title });
-    primitives.push({ kind: 'text', text: bookend.label, x: x + SYSTEM_BOOKEND_WIDTH_SP / 2,
+    primitives.push({ kind: 'text', text: bookend.label, x: musicEdge, dx: labelDx,
       y: (top + bottom) / 2, font: 'body', size: 1.45, anchor: 'middle', baseline: 'central',
       className: `${className} recording-bookend-label`, title: bookend.title });
   };

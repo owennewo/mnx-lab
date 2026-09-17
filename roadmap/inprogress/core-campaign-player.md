@@ -813,3 +813,11 @@ Item 19 landed through `cdb5504` and `dfa16d6`: 1,884 tests, scenario checks and
 production build passed after rebase. All 191 regenerated goldens stayed unchanged, so
 no human verification debt was added. The implementation worktree was retired before
 this closeout.
+
+The first real non-square Staff/Space screenshot supplied an important correction: fixed
+ink dimensions cannot be used directly as layout x-coordinates. System bookends now reserve
+`inkRatio`-adjusted layout space but draw from the music edge with ink-relative primitive
+offsets, keeping block, label and staff aligned at extreme ratios. It also exposed a width
+accounting bug: the last-system inset must be included while measuring that row, not appended
+to the global maximum for all rows, or full earlier systems acquire a phantom right margin.
+Tests now pin both rules at 0.4× and 4× ratios and with Space set to zero.

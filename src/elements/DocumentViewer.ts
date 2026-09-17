@@ -1624,7 +1624,7 @@ export class DocumentViewer extends LitElement {
     const durations = this.playbackState?.recordingBookends;
     if (!durations) return undefined;
     const label = (seconds: number) => {
-      const rounded = Math.max(0, Math.round(seconds));
+      const rounded = Math.max(1, Math.round(seconds));
       return `${Math.floor(rounded / 60)}:${String(rounded % 60).padStart(2, '0')}`;
     };
     return {
