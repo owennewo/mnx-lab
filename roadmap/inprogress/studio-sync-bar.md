@@ -47,6 +47,15 @@ few is half a beat out at the midpoint, where a click over the recording makes i
   off the right edge turns the page. A window placed on purpose — round a selected cut, or
   moved by hand — stays put until the playhead is back inside it or jumps. Still no zoom
   button and no new chrome.
+  **And the scale is a pinch** (the owner's suggestion, same day): the zoomed window was a
+  fixed 16 s, so moving a cut a minute meant a dozen drags. Two touches, or a trackpad's
+  pinch (which arrives as Ctrl+wheel), change the scale about the point under them, from 2 s
+  out to the whole recording; the scale sticks across selections because it is the person's,
+  not the cut's. Beat ticks drop out when there would be more than 160 of them.
+  **A bug found by the same session:** a drag was captured by the handle's own button, and
+  placing a parked handle replaces that button — the pointerup went with it, the drag stayed
+  armed, and every later hover over the cut moved it. Drags are captured and heard by the bar
+  now, and a mouse move with no button down ends one rather than following it.
 - **Editing is one row above the tray**, in the rate and volume overlays' vocabulary. A
   selected segment: name, beats or tempo with minus and plus, Tap, Split at playhead. A
   selected cut: time, four nudges (±1 ms, ±10 ms), To playhead, Loop, Remove. Dragging is

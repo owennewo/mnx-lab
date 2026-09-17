@@ -8,8 +8,11 @@ import {
 export interface SyncChange { segments: SyncSegments; /** False while a drag is still moving. */ commit: boolean }
 type Selection = { kind: 'cut'; index: number } | { kind: 'segment'; index: number } | { kind: 'parked'; end: 'start' | 'end' } | null;
 
-/** The zoomed window a selected cut is shown in, in media seconds. */
+/** The zoomed window a selected cut is first shown in, in media seconds; a pinch changes it, within these. */
 const ZOOM_SPAN = 16;
+const MIN_SPAN = 2;
+/** Beat ticks are for placing a cut by eye; past this many they are texture, not information. */
+const MAX_TICKS = 160;
 const stroke = (d: string) => svg`<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d=${d} fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg>`;
 const clock = (seconds: number) => `${Math.floor(seconds / 60)}:${(seconds % 60).toFixed(2).padStart(5, '0')}`;
 
@@ -42,7 +45,9 @@ export class SyncBar extends LitElement {
   private miniDrag: { pointer: number; x: number; from: number } | null = null;
   /** Fingers on the bar. Two of them drag the zoomed window, the way they would scroll anything else. */
   private touches = new Map<number, number>();
-  private drag: { index: number | 'start' | 'end'; x: number; from: number; span: number; moved: boolean; pointer: number } | null = null;
+  /** How many seconds the zoomed window shows. A pinch sets it and it sticks: the scale is the person's, not the cut's. */
+  private span = ZOOM_SPAN;
+  private drag: { index: number | 'start' | 'end'; origin: number | 'start' | 'end'; x: number; from: number; span: number; moved: boolean; pointer: number } | null = null;
   private taps: number[] = [];
 
   static styles = css`
@@ -270,19 +275,35 @@ export class SyncBar extends LitElement {
     return `${Math.min(100, Math.max(0, (seconds - from) / (to - from) * 100))}%`;
   }
   private zoomTo(seconds: number) {
-    if (this.duration <= ZOOM_SPAN) { this.zoom = null; return; }
-    const from = Math.min(this.duration - ZOOM_SPAN, Math.max(0, seconds - ZOOM_SPAN / 2));
-    this.zoom = { from, to: from + ZOOM_SPAN };
+    if (this.duration <= this.span) { this.zoom = null; return; }
+    const from = Math.min(this.duration - this.span, Math.max(0, seconds - this.span / 2));
+    this.zoom = { from, to: from + this.span };
     // Put here on purpose, around a cut: a playhead that is somewhere else does not get to take it away.
     this.panHeld = true;
+  }
+  /**
+   * Change the scale, keeping the moment under the pointer where it is. There is no zoom button: a pinch (two
+   * touches, or a trackpad's — which arrives as a Ctrl+wheel) is the gesture, and zooming all the way out is the
+   * whole recording again. Moving a cut a minute is a pinch out, a drag, and a pinch back in.
+   */
+  private zoomBy(factor: number, anchor: number) {
+    if (!(this.duration > 0) || !Number.isFinite(factor) || factor <= 0) return;
+    const { from, to } = this.view, old = to - from;
+    const span = Math.min(this.duration, Math.max(Math.min(MIN_SPAN, this.duration), old * factor));
+    if (span === old) return;
+    this.span = span;
+    this.panHeld = true;
+    if (span >= this.duration) { this.zoom = null; return; }
+    const next = Math.min(this.duration - span, Math.max(0, anchor - (anchor - from) / old * span));
+    this.zoom = { from: next, to: next + span };
   }
   /** Move the zoomed window by hand. It holds where it is put (`panHeld`) rather than snapping back to a playhead
    *  that is still where it was. */
   private panTo(from: number) {
     if (!this.zoom) return;
-    const clamped = Math.min(this.duration - ZOOM_SPAN, Math.max(0, from));
+    const clamped = Math.min(this.duration - this.span, Math.max(0, from));
     if (clamped === this.zoom.from) return;
-    this.zoom = { from: clamped, to: clamped + ZOOM_SPAN };
+    this.zoom = { from: clamped, to: clamped + this.span };
     this.panHeld = true;
   }
   /**
@@ -298,8 +319,8 @@ export class SyncBar extends LitElement {
     if (inside) { this.panHeld = false; return; }
     if (this.panHeld && !jumped) return;
     // A quarter in: what is about to sound matters more than what just did.
-    const from = Math.min(this.duration - ZOOM_SPAN, Math.max(0, this.time - ZOOM_SPAN / 4));
-    this.zoom = { from, to: from + ZOOM_SPAN };
+    const from = Math.min(this.duration - this.span, Math.max(0, this.time - this.span / 4));
+    this.zoom = { from, to: from + this.span };
     this.panHeld = false;
   }
   private select(next: Selection) {
@@ -396,22 +417,30 @@ export class SyncBar extends LitElement {
     const box = this.renderRoot.querySelector('.track')!.getBoundingClientRect(), { from, to } = this.view;
     return from + Math.min(1, Math.max(0, (event.clientX - box.left) / box.width)) * (to - from);
   }
+  /**
+   * A drag is captured by the BAR and heard there, never by the handle's own button: placing a parked handle
+   * replaces its button with a cut's, and a captured element that leaves the document takes the rest of the
+   * gesture with it — the pointerup was lost, the drag stayed armed, and every later hover over the cut moved it.
+   */
   private onCutDown(event: PointerEvent, index: number | 'start' | 'end') {
     if (event.button !== 0) return;
-    (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
+    // Capture can be refused (the pointer is already up by the time we ask); the drag still ends on the bar's own pointerup.
+    try { this.renderRoot.querySelector<HTMLElement>('.bar')!.setPointerCapture(event.pointerId); } catch { /* not capturable */ }
     const from = index === 'start' ? 0 : index === 'end' ? this.duration : this.segments.cuts[index];
     const { from: a, to: b } = typeof index === 'number' ? this.zoomWindowFor(from) : this.view;
-    this.drag = { index, x: event.clientX, from, span: b - a, moved: false, pointer: event.pointerId };
+    this.drag = { index, origin: index, x: event.clientX, from, span: b - a, moved: false, pointer: event.pointerId };
   }
   /** The window a cut will be shown in once selected — a drag is measured in it. */
   private zoomWindowFor(seconds: number) {
-    if (this.duration <= ZOOM_SPAN) return { from: 0, to: this.duration || 1 };
-    const from = Math.min(this.duration - ZOOM_SPAN, Math.max(0, seconds - ZOOM_SPAN / 2));
-    return { from, to: from + ZOOM_SPAN };
+    if (this.duration <= this.span) return { from: 0, to: this.duration || 1 };
+    const from = Math.min(this.duration - this.span, Math.max(0, seconds - this.span / 2));
+    return { from, to: from + this.span };
   }
   private onCutMove(event: PointerEvent) {
     const drag = this.drag;
     if (!drag || event.pointerId !== drag.pointer) return;
+    // No button is down: whatever ended this drag, we did not hear it. Let go rather than follow a hover.
+    if (event.pointerType === 'mouse' && event.buttons === 0) { this.endDrag(drag); return; }
     const dx = event.clientX - drag.x;
     if (!drag.moved && Math.abs(dx) < 3) return;
     const width = this.renderRoot.querySelector('.track')!.getBoundingClientRect().width;
@@ -429,9 +458,13 @@ export class SyncBar extends LitElement {
     this.selected = { kind: 'cut', index: drag.index };
     this.change(next, false);
   }
-  private onCutUp(event: PointerEvent, index: number | 'start' | 'end') {
+  private onCutUp(event: PointerEvent) {
     const drag = this.drag;
     if (!drag || event.pointerId !== drag.pointer) return;
+    this.endDrag(drag);
+  }
+  private endDrag(drag: NonNullable<SyncBar['drag']>) {
+    const index = drag.origin;
     this.drag = null;
     if (!drag.moved) {
       const same = typeof index === 'number' ? this.selected?.kind === 'cut' && this.selected.index === index
@@ -449,10 +482,10 @@ export class SyncBar extends LitElement {
     if (event.button !== 0 || !this.zoom) return;
     event.stopPropagation();
     const strip = event.currentTarget as HTMLElement, box = strip.getBoundingClientRect();
-    strip.setPointerCapture(event.pointerId);
+    try { strip.setPointerCapture(event.pointerId); } catch { /* not capturable */ }
     // A press off the thumb brings the window to the pointer first, so the drag continues from under it.
     const at = (event.clientX - box.left) / box.width * this.duration;
-    if (at < this.zoom.from || at > this.zoom.to) this.panTo(at - ZOOM_SPAN / 2);
+    if (at < this.zoom.from || at > this.zoom.to) this.panTo(at - this.span / 2);
     this.miniDrag = { pointer: event.pointerId, x: event.clientX, from: this.zoom.from };
   }
   private onMiniMove(event: PointerEvent) {
@@ -463,25 +496,39 @@ export class SyncBar extends LitElement {
   }
   private onMiniUp(event: PointerEvent) { if (this.miniDrag?.pointer === event.pointerId) this.miniDrag = null; }
   private onWheel(event: WheelEvent) {
+    // A trackpad pinch arrives as a Ctrl+wheel; taking it also keeps the browser from zooming the page instead.
+    if (event.ctrlKey) {
+      event.preventDefault();
+      this.zoomBy(Math.exp(event.deltaY * 0.01), this.timeAt(event));
+      return;
+    }
     // Horizontal intent only: a vertical wheel over the tray still scrolls the page.
     const dx = event.shiftKey && !event.deltaX ? event.deltaY : event.deltaX;
     if (!this.zoom || !dx || Math.abs(event.deltaY) > Math.abs(dx) && !event.shiftKey) return;
     event.preventDefault();
-    this.panTo(this.zoom.from + dx / this.trackWidth() * ZOOM_SPAN);
+    this.panTo(this.zoom.from + dx / this.trackWidth() * this.span);
   }
   private onTouchDown(event: PointerEvent) {
     if (event.pointerType !== 'touch') return;
     this.touches.set(event.pointerId, event.clientX);
-    // A second finger turns whatever the first began into a pan: let go of the cut, do not move it.
-    if (this.touches.size === 2 && this.drag) { if (this.drag.moved) this.change(this.segments, true); this.drag = null; }
+    // A second finger turns whatever the first began into a pan or a pinch: let go of the cut, do not move it.
+    if (this.touches.size === 2 && this.drag) { const drag = this.drag; this.drag = null; if (drag.moved) this.change(this.segments, true); }
   }
   private onTouchMove(event: PointerEvent) {
-    const before = this.touches.get(event.pointerId);
-    if (before === undefined) return;
+    if (!this.touches.has(event.pointerId)) return;
+    const before = [...this.touches.values()];
     this.touches.set(event.pointerId, event.clientX);
-    if (this.touches.size !== 2 || !this.zoom) return;
-    // Each finger carries half: two fingers moving together move the window one for one with the score under them.
-    this.panTo(this.zoom.from - (event.clientX - before) / 2 / this.trackWidth() * ZOOM_SPAN);
+    if (this.touches.size !== 2) return;
+    const after = [...this.touches.values()];
+    const box = this.renderRoot.querySelector('.track')!.getBoundingClientRect();
+    const mid = (xs: number[]) => (xs[0] + xs[1]) / 2, apart = (xs: number[]) => Math.abs(xs[0] - xs[1]);
+    // Fingers moving apart or together change the scale about the point between them…
+    if (apart(before) > 24 && apart(after) > 24) {
+      const { from, to } = this.view;
+      this.zoomBy(apart(before) / apart(after), from + Math.min(1, Math.max(0, (mid(before) - box.left) / box.width)) * (to - from));
+    }
+    // …and moving together they carry the window along, one for one with what is under them.
+    if (this.zoom) this.panTo(this.zoom.from - (mid(after) - mid(before)) / (box.width || 1) * this.span);
   }
   private onTouchUp(event: PointerEvent) { this.touches.delete(event.pointerId); }
 
@@ -513,8 +560,7 @@ export class SyncBar extends LitElement {
   private cutButton(index: number | 'start' | 'end', seconds: number, label: string, trim: boolean, pressed: boolean) {
     return html`<button type="button" class=${`cut${trim ? ' trim' : ''}${typeof index === 'number' ? '' : ' parked'}`} style=${`left:${this.pct(seconds)}`}
       aria-pressed=${pressed} aria-label=${label} title=${label}
-      @pointerdown=${(e: PointerEvent) => this.onCutDown(e, index)} @pointermove=${this.onCutMove}
-      @pointerup=${(e: PointerEvent) => this.onCutUp(e, index)} @pointercancel=${(e: PointerEvent) => this.onCutUp(e, index)}
+      @pointerdown=${(e: PointerEvent) => this.onCutDown(e, index)}
       @click=${(e: MouseEvent) => { if (e.detail === 0) this.select(typeof index === 'number' ? { kind: 'cut', index } : { kind: 'parked', end: index }); }}></button>`;
   }
   private cutRow() {
@@ -557,10 +603,13 @@ export class SyncBar extends LitElement {
     if (!(this.duration > 0)) return html`<div class="wait" role="status">Play the recording once to load its length.</div>`;
     const { from, to } = this.view, s = this.selected, { cuts, closed } = this.segments;
     const shown = this.regions().filter(r => r.to > from && r.from < to);
-    const ticks = this.zoom ? beatTimes(this.segments, from, to, this.duration).filter(b => !b.cut).slice(0, 400) : [];
+    const beats = this.zoom ? beatTimes(this.segments, from, to, this.duration).filter(b => !b.cut) : [];
+    const ticks = beats.length > MAX_TICKS ? [] : beats;
     const width = (a: number, b: number) => `${(Math.min(to, b) - Math.max(from, a)) / (to - from) * 100}%`;
     return html`<div class="bar" tabindex="0" role="group" aria-label="Recording sync" @keydown=${this.onKey} @wheel=${this.onWheel}
-        @pointerdown=${this.onTouchDown} @pointermove=${this.onTouchMove} @pointerup=${this.onTouchUp} @pointercancel=${this.onTouchUp}>
+        @pointerdown=${this.onTouchDown} @pointermove=${(e: PointerEvent) => { this.onCutMove(e); this.onTouchMove(e); }}
+        @pointerup=${(e: PointerEvent) => { this.onCutUp(e); this.onTouchUp(e); }} @pointercancel=${(e: PointerEvent) => { this.onCutUp(e); this.onTouchUp(e); }}
+        @lostpointercapture=${(e: PointerEvent) => this.onCutUp(e)}>
         ${shown.map(r => r.index < 0
           ? html`<span class="lab" style=${`left:${this.pct(r.from)};width:${width(r.from, r.to)}`}>${r.name}</span>`
           : html`<button type="button" class="lab" style=${`left:${this.pct(r.from)};width:${width(r.from, r.to)}`}

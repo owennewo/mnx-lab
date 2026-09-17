@@ -102,7 +102,6 @@ try {
    const mini=()=>sr.querySelector('.mini'),thumbAt=()=>parseFloat(sr.querySelector('.mini i').style.left);
    check(mini().getBoundingClientRect().height>=12,'The minimap is too thin to catch: '+mini().getBoundingClientRect().height);
    const pointer=(type,x,id=7)=>mini().dispatchEvent(new PointerEvent(type,{pointerId:id,clientX:x,clientY:mini().getBoundingClientRect().top+6,button:0,bubbles:true,composed:true}));
-   mini().setPointerCapture=()=>{}; // a synthetic pointer has nothing to capture
    const box=mini().getBoundingClientRect(),start=thumbAt(),grab=box.left+box.width*(start+5)/100;
    pointer('pointerdown',grab);pointer('pointermove',grab+box.width*.2);pointer('pointerup',grab+box.width*.2);await bar.updateComplete;
    check(Math.abs(thumbAt()-start-20)<1,'Dragging the minimap did not move the window: '+start+' → '+thumbAt());
@@ -118,6 +117,27 @@ try {
    bar.time=far;await bar.updateComplete;
    const shownFrom=thumbAt()/100*bar.duration;
    check(far>=shownFrom-.01&&far<=shownFrom+16.01,'The window did not follow the playhead to '+far+' (shows '+shownFrom.toFixed(1)+'…)');
+   // A pinch changes the scale (a trackpad's arrives as Ctrl+wheel): out far enough is the whole recording, and back.
+   const thumbWide=()=>parseFloat(sr.querySelector('.mini i')?.style.width??'100'),track=()=>sr.querySelector('.track');
+   const pinch=async dy=>{const t=track().getBoundingClientRect(),e=new WheelEvent('wheel',{deltaY:dy,ctrlKey:true,clientX:t.left+t.width/2,clientY:t.top+4,bubbles:true,composed:true,cancelable:true});track().dispatchEvent(e);await bar.updateComplete;return e;};
+   const narrow=thumbWide();check((await pinch(30)).defaultPrevented&&thumbWide()>narrow+5,'Pinching out did not widen the window: '+narrow+' → '+thumbWide());
+   await pinch(400);check(!sr.querySelector('.mini'),'Pinched all the way out, the bar is not the whole recording');
+   await pinch(-120);check(sr.querySelector('.mini')&&thumbWide()<60,'Pinching back in did not zoom: '+thumbWide());
+   // A drag is the bar's, not the handle's: it ends when the pointer comes up anywhere, and a hover never moves a cut.
+   const cut=()=>sr.querySelectorAll('button.cut')[1]??sr.querySelector('button.cut'),barEl=sr.querySelector('.bar');
+   const at=()=>cut().getBoundingClientRect().left+8,y=barEl.getBoundingClientRect().top+20;
+   const fire=(el,type,x,extra={})=>el.dispatchEvent(new PointerEvent(type,{pointerId:11,pointerType:'mouse',button:0,buttons:1,clientX:x,clientY:y,bubbles:true,composed:true,...extra}));
+   const x0=at(),cutsBefore=bar.segments.cuts.slice();
+   const cutsNow=()=>JSON.stringify(bar.segments.cuts);
+   fire(cut(),'pointerdown',x0);fire(barEl,'pointermove',x0+30);fire(barEl,'pointermove',x0+40);await bar.updateComplete;
+   check(cutsNow()!==JSON.stringify(cutsBefore),'Dragging a cut did not move it');
+   fire(track(),'pointerup',x0+40,{buttons:0});await bar.updateComplete;const dropped=cutsNow();
+   fire(barEl,'pointermove',x0+90,{buttons:0});fire(barEl,'pointermove',x0-60,{buttons:0});await bar.updateComplete;
+   check(cutsNow()===dropped,'Hovering after a drag moved the cut again');
+   // …and a pointerup that never arrives does not leave the drag armed.
+   fire(cut(),'pointerdown',at());fire(barEl,'pointermove',at()+20);await bar.updateComplete;const lost=cutsNow();
+   fire(barEl,'pointermove',at()+80,{buttons:0});fire(barEl,'pointermove',at()+120,{buttons:0});await bar.updateComplete;
+   check(cutsNow()===lost,'A drag whose pointerup was lost kept following the hover');
    return {saves:saves.length,points:last.syncpoints.length};
  })()`);
  if(process.env.SYNC_BAR_SHOT){const shot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(process.env.SYNC_BAR_SHOT,Buffer.from(shot.result.data,'base64'));}
