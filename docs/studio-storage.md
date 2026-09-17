@@ -94,6 +94,32 @@ Once the pointer is an `edit`, **the piece's projection is the owner's too**: an
 that slice still adds what Soundslice exported, and moves neither the pointer nor the
 derived tags.
 
+**Going back to a version is a pointer move** (`PUT /api/library/pieces/:id/canonical`,
+[studio-piece-lifecycle](../roadmap/inprogress/studio-piece-lifecycle.md)): no rendition is
+written, the version left behind is still there, and undoing the revert is another revert.
+Any `original`, `export` or `edit` of the piece can be made current; the next checkpoint is
+`derived_from` wherever the pointer is, so the lineage branches rather than rewrites. Like a
+checkpoint it is refused unless the caller names what is canonical now. If the pointer goes
+back to the Soundslice export, the piece is no longer "edited" and an ingest follows it
+again.
+
+**The projection keeps what only the sidecar knows.** A Soundslice piece's title and artist
+live in its sidecar, and its `.gp` may hold neither — so a save that re-projected tags from
+the document alone would erase them. Studio therefore sends such a tag marked `kept: true`,
+and the service carries it over **exactly as stored, source and all**; it must already be
+the library's. A tag Studio itself once projected is the document's to keep or drop: clear
+the artist and the tag goes, go back to a version without one and it goes too.
+
+**A lossy save leaves a defect report: a fifth role, `evidence`.** When the round trip
+through Guitar Pro lost or changed something, the browser offers the document the file was
+exported *from*, and the service keeps it as an `mnx` rendition `derived_from` the `edit` it
+explains. It is evidence for the operator (`npm run defects:library`), never canonical,
+never a version, never read back by a shell — which is why it does not reopen the decision
+that MNX is not a storage format: nothing depends on being able to read it later. It is sent
+once per new *kind* of loss per session, not per autosave; one that is too big or not valid
+MNX is noted in the edit's provenance (`evidence: kept | invalid | too-large | null`) and
+dropped, because evidence must never cost the owner their save.
+
 **The pointer is set explicitly and then belongs to the owner.** An import sets canonical
 only when the piece has none — for a Soundslice slice, to the Soundslice `.gp`, the most
 complete rendition on hand — and never moves it afterwards. A later import adds renditions;
@@ -239,6 +265,24 @@ Notes on the choices:
 - **`revision` on pieces** is a compare-and-set token: a writer sends the revision it read
   and the write fails if the piece has moved. It stops a stale ingest run from overwriting a
   newer canonical choice today, and it is the same mechanism studio's saves will need.
+
+## Deleted pieces — `pieces.deleted_at` (studio-piece-lifecycle, 2026-09-17)
+
+Deleting in Studio is **soft**, because nothing here ever deletes: the row, its renditions,
+recordings, tags and blobs all stay, and `deleted_at` hides the piece. Migration
+`0005_piece_lifecycle.sql`:
+
+```sql
+ALTER TABLE pieces ADD COLUMN deleted_at TEXT;
+```
+
+A deleted piece is *not found* by every read and every write — browse, facets, tag
+completion, alias counts, the piece, its canonical file, its renditions and audio, tags,
+recordings, checkpoints — and by everything but `GET /api/library/deleted` (newest first,
+with the title and artist it was shown by) and `POST /api/library/pieces/:id/restore`. Both
+moves bump the revision; the delete is revision-checked. **A deleted piece still owns its
+id**: an ingest of that slice is refused with *deleted in Studio; restore it first*, so it
+can neither collide with the row nor quietly bring the piece back.
 
 ## Recently opened — `piece_views` (studio-library-navigation, 2026-09-11)
 

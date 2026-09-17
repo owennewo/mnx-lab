@@ -5,7 +5,7 @@
 import { LitElement, css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { LibraryClient, LibraryRequestError, type LibraryFacet, type LibraryPiece, type LibrarySort } from '../../../src/storage/libraryClient.ts';
-import { pieceHref, aliasesHref, parseHash, parseLibraryHash, libraryViewHref, rememberLibraryHref } from './StudioApp.ts';
+import { pieceHref, aliasesHref, deletedHref, JUST_DELETED_KEY, parseHash, parseLibraryHash, libraryViewHref, rememberLibraryHref } from './StudioApp.ts';
 import { FAVOURITE, RAIL_HIDDEN, RAIL_ORDER, chipText, dimensionLabel, parseTag, relativeTime } from './labels.ts';
 
 import { openLocalFile } from '../../../src/importers/localFile.ts';
@@ -40,6 +40,8 @@ export class LibraryPage extends LitElement {
   @state() private open: string | null = null;
   @state() private busy = false;
   @state() private error = '';
+  /** A piece deleted a moment ago in this tab: one tap brings it back. */
+  @state() private justDeleted: { id: string; title: string } | null = null;
   @state() private suggestions: LibraryFacet[] = [];
   @state() private exporting: string | null = null;
   @state() private exportNotice = '';
@@ -63,7 +65,11 @@ export class LibraryPage extends LitElement {
     .option:hover, .option.chosen { background: light-dark(oklch(0.9 0.004 60), oklch(0.26 0.006 60)); }
     .option .count { color: var(--ink-dim); font-size: 12px; }
     .rule { height: 1px; background: var(--line); margin: 8px 0; }
-    .foot { margin-top: auto; display: flex; align-items: center; gap: 8px; padding: 5px 8px; color: var(--ink-dim); font-size: 13px; }
+    .foot { display: flex; align-items: center; gap: 8px; padding: 5px 8px; color: var(--ink-dim); font-size: 13px; }
+    .foot.first { margin-top: auto; }
+    .undo { display: flex; align-items: center; gap: 12px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 3px; background: light-dark(oklch(0.95 0.003 60), oklch(0.25 0.004 60)); }
+    .undo span { flex: 1; }
+    .undo button.plain { border: 0; padding: 4px; color: var(--ink-dim); display: inline-flex; }
     .main { flex: 1; min-width: 0; padding: 60px 32px 24px; display: flex; flex-direction: column; gap: 14px; overflow: auto; }
     .tools { display: flex; align-items: center; gap: 12px; }
     .search { flex: 1; display: flex; align-items: center; gap: 10px; border: 1px solid var(--line); border-radius: 3px; padding: 0 10px; }
@@ -107,6 +113,9 @@ export class LibraryPage extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
+    try { const raw = sessionStorage.getItem(JUST_DELETED_KEY); sessionStorage.removeItem(JUST_DELETED_KEY); this.justDeleted = raw ? JSON.parse(raw) : null; } catch { this.justDeleted = null; }
+    // What was kept for the way back still lists the piece that has just been deleted.
+    if (this.justDeleted) kept = null;
     this.adopt(location.hash);
     const href = this.href();
     if (kept?.href === href) {
@@ -155,6 +164,11 @@ export class LibraryPage extends LitElement {
   };
 
   /** `atLeast`: coming back to a longer list, fetch as far as it reached and swap once. */
+  private undoDelete = async () => {
+    const piece = this.justDeleted; if (!piece) return;
+    try { await this.client.restorePiece(piece.id); this.justDeleted = null; await this.load(); }
+    catch (error) { this.error = error instanceof Error && error.message ? error.message : 'The piece could not be restored.'; }
+  };
   private async load(more = false, atLeast = 0) {
     const generation = ++this.generation;
     this.busy = true; this.error = '';
@@ -322,12 +336,21 @@ export class LibraryPage extends LitElement {
               ${values.map(f => html`<button class="option" @click=${() => this.choose(dimension, f.value)}><span>${chipText(dimension, f.value)}</span><span class="count">${f.pieces}</span></button>`)}
             </div>` : line;
         })}
+        <a class="foot first" href=${deletedHref}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14M10 7V4h4v3M7 7l1 13h8l1-13"></path></svg>
+          <span>Deleted pieces</span>
+        </a>
         <a class="foot" href=${aliasesHref}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h11M4 12h16M4 17h8"></path></svg>
           <span>Tag aliases</span>
         </a>
       </nav>
       <div class="main">
+        ${this.justDeleted ? html`<div class="undo" role="status">
+          <span>Deleted “${this.justDeleted.title}”.</span>
+          <button type="button" @click=${this.undoDelete}>Undo</button>
+          <button type="button" class="plain" aria-label="Dismiss" @click=${() => (this.justDeleted = null)}>${cross}</button>
+        </div>` : nothing}
         <div class="tools">
           <form class="search" @submit=${this.onSubmit}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"></circle><path d="M20 20l-4.2-4.2"></path></svg>

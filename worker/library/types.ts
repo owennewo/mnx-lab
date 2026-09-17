@@ -4,10 +4,14 @@ export interface Piece {
   id: string; owner: string; canonical_rendition_id: string | null;
   source_kind: string | null; source_id: string | null; source_url: string | null;
   revision: number; created_at: string; updated_at: string;
+  /** Set when the owner deleted the piece in Studio; every read but the deleted list and restore skips it. */
+  deleted_at?: string | null;
 }
 export interface Rendition {
-  /** `edit`: a checkpoint Studio saved — the owner's own work, `derived_from` the rendition it was edited from. */
-  id: string; piece_id: string; format: Format; role: 'original' | 'export' | 'derived' | 'edit';
+  /** `edit`: a checkpoint Studio saved — the owner's own work, `derived_from` the rendition it was edited from.
+   *  `evidence`: the document an `edit` was exported FROM, kept only when the round trip lost something — a
+   *  converter defect report, `derived_from` the edit it explains. Never canonical, never read by a shell. */
+  id: string; piece_id: string; format: Format; role: 'original' | 'export' | 'derived' | 'edit' | 'evidence';
   filename: string | null; sha256: string; r2_key: string; bytes: number;
   producer: string; producer_version: string | null; producer_options: string | null;
   provenance: string | null; derived_from: string | null; fetched_at: string | null;

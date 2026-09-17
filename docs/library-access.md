@@ -108,12 +108,32 @@ optional `name` for a version the owner asked for. It answers `201` with the sna
 `unchanged: false`, or `200` with `unchanged: true` when those bytes are already canonical;
 it is a `409` when the revision moved **or** when `derived_from` is no longer the canonical
 rendition — another device saved first, and the caller must read the piece to tell which.
+`PUT /pieces/:id/canonical` `{expected_revision, from, rendition_id, derived_tags}` goes back
+to a version by moving the pointer (`from` is what the caller believes is canonical; a wrong
+belief is a `409`; evidence and derived files are not versions). A tag in any `derived_tags`
+may carry `kept: true` — *the document does not hold this and the library already does* — and
+is then carried over as stored; one the library does not hold is a `400`.
+`DELETE /pieces/:id` `{expected_revision}` deletes softly (`204`), `GET /deleted` lists what
+was deleted, `POST /pieces/:id/restore` brings one back.
 `POST /pieces/:id/opened` records the view.
 `PATCH /pieces/:id/tags` takes `expected_revision` plus `add`, `remove` and `rename` of
 asserted tags (a derived dimension is refused; a stale revision is 409). `GET /aliases`,
 `PUT /aliases` `{dimension, raw_value, canonical_value}` and `DELETE /aliases`
 `{dimension, raw_value}` manage how a value read from the music is shown; each alias
 reports the pieces it touches. Imported Soundslice lists carry the `list` dimension.
+
+## The operator's defect listing
+
+`GET /api/library/ingest/studio/defects` and `GET /api/library/ingest/studio/renditions/:id`
+are machine routes like the ingest — the write token plus an Access service token (or the
+local machine session) — and read the operator's own pieces, deleted ones included. The
+first lists every Studio save whose Guitar Pro round trip lost or changed something, with
+its check and the id of its evidence rendition when one was kept; the second serves a
+rendition's bytes. `npm run defects:library -- --list` prints the listing;
+`-- --out <dir>` writes each defect as `check.json`, `stored.gp` and (when kept)
+`saved.mnx.json`. **`--out` must be outside the repository**: this is private, mostly
+copyrighted music, and what becomes a committed converter fixture is a person's decision,
+made on a reduced example. Same credential flags as `npm run ingest:library`.
 
 ## Canonical reads
 

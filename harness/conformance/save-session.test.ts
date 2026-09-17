@@ -240,3 +240,31 @@ describe('the chip leads with the risk, then the freshness', () => {
   });
 });
 
+
+// roadmap/inprogress/studio-piece-lifecycle.md: the version list is a reading of rows that already exist.
+describe('a piece\'s versions', async () => {
+  const { pieceVersions } = await import('../../src/storage/versions.ts');
+  const row = (id: string, role: string, created_at: string, provenance: unknown = null, producer = 'studio') =>
+    ({ id, role, created_at, provenance: provenance === null ? null : JSON.stringify(provenance), producer, format: role === 'evidence' ? 'mnx' : 'gp', bytes: 1, derived_from: null, producer_version: null, filename: null }) as never;
+  const differs = { verdict: 'differs', warnings: [], differences: [{ path: 'a', kind: 'lost', count: 2 }, { path: 'b', kind: 'changed', count: 1 }, { path: 'c', kind: 'gained', count: 9 }] };
+
+  it('reads newest first: the start, every checkpoint, named or not — never evidence or derived files', () => {
+    const versions = pieceVersions([
+      row('r0', 'original', '2026-09-17T10:00:00Z'),
+      row('r1', 'edit', '2026-09-17T10:05:00Z', { kind: 'checkpoint', name: null, check: { verdict: 'clean', differences: [] } }),
+      row('r2', 'edit', '2026-09-17T10:09:00Z', { kind: 'checkpoint', name: ' Before the bridge ', check: differs }),
+      row('r2-saved', 'evidence', '2026-09-17T10:09:00Z', { kind: 'saved-document' }),
+      row('d1', 'derived', '2026-09-17T10:01:00Z')
+    ], 'r1');
+    expect(versions.map(v => [v.id, v.kind, v.label, v.current, v.unkept])).toEqual([
+      ['r2', 'named', 'Before the bridge', false, 3],
+      ['r1', 'automatic', 'Saved automatically', true, 0],
+      ['r0', 'start', 'As first made', false, 0]
+    ]);
+  });
+
+  it('calls an ingested start what it is, and survives provenance it cannot read', () => {
+    const versions = pieceVersions([row('s0', 'export', '2026-09-01T00:00:00Z', null, 'soundslice-exporter'), { ...(row('e1', 'edit', '2026-09-02T00:00:00Z') as object), provenance: 'not json' } as never], null);
+    expect(versions.map(v => [v.label, v.current, v.unkept])).toEqual([['Saved automatically', false, 0], ['As imported', false, 0]]);
+  });
+});

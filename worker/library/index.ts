@@ -24,7 +24,8 @@ const same = (a: unknown, b: unknown) => json(a as Json) === json(b as Json);
  *  read that a person sees goes through this — browse, filters, facets, completion —
  *  so an alias set once applies everywhere, and the stored tag never changes. */
 const EFFECTIVE_TAGS = `SELECT t.owner, t.piece_id, t.dimension, t.value AS raw_value, COALESCE(a.canonical_value, t.value) AS value, t.origin, t.source_ref
-  FROM tags t LEFT JOIN tag_aliases a ON a.owner=t.owner AND a.dimension=t.dimension AND a.raw_value=t.value`;
+  FROM tags t JOIN pieces live ON live.id=t.piece_id AND live.deleted_at IS NULL
+  LEFT JOIN tag_aliases a ON a.owner=t.owner AND a.dimension=t.dimension AND a.raw_value=t.value`;
 const PAGE = 50;
 export function parseFilters(filters: string[]): [string, string][] {
   return filters.map(t => { const colon = t.indexOf(':'); if (colon <= 0) throw new LibraryError('invalid', 'A filter is dimension:value'); return [t.slice(0, colon), t.slice(colon + 1)]; });
@@ -48,7 +49,8 @@ export class Library {
     requireText(owner, 'owner'); requireText(id, 'piece id');
     // One read transaction: rows and revision always describe the same state.
     const [p, r, recordings, tags] = await this.db.batch([
-      this.statement('SELECT * FROM pieces WHERE owner=? AND id=?', owner, id),
+      // A deleted piece is not found by anything but the deleted list and restore.
+      this.statement('SELECT * FROM pieces WHERE owner=? AND id=? AND deleted_at IS NULL', owner, id),
       this.statement('SELECT r.* FROM renditions r JOIN pieces p ON p.id=r.piece_id WHERE p.owner=? AND p.id=? ORDER BY r.id', owner, id),
       this.statement('SELECT r.* FROM recordings r JOIN pieces p ON p.id=r.piece_id WHERE p.owner=? AND p.id=? ORDER BY r.id', owner, id),
       this.statement('SELECT * FROM tags WHERE owner=? AND piece_id=? ORDER BY dimension,value', owner, id)
@@ -64,14 +66,14 @@ export class Library {
 
   async listPieces(owner: string): Promise<Piece[]> {
     requireText(owner, 'owner');
-    return (await this.statement('SELECT * FROM pieces WHERE owner=? ORDER BY id', owner).all<Piece>()).results;
+    return (await this.statement('SELECT * FROM pieces WHERE owner=? AND deleted_at IS NULL ORDER BY id', owner).all<Piece>()).results;
   }
 
   /** The WHERE for "pieces matching every filter", over effective (aliased) values. */
   private filtered(owner: string, filters: string[]) {
     const pairs = parseFilters(filters);
     const clauses = pairs.map(() => `EXISTS (SELECT 1 FROM (${EFFECTIVE_TAGS}) e WHERE e.owner=p.owner AND e.piece_id=p.id AND e.dimension=? AND e.value=?)`);
-    return { where: `p.owner=? ${clauses.length ? 'AND ' + clauses.join(' AND ') : ''}`, values: [owner, ...pairs.flat()] };
+    return { where: `p.owner=? AND p.deleted_at IS NULL ${clauses.length ? 'AND ' + clauses.join(' AND ') : ''}`, values: [owner, ...pairs.flat()] };
   }
 
   /** One page of pieces with their shown title and artist, their favourite flag and
@@ -121,7 +123,7 @@ export class Library {
   /** A piece was opened by this owner, now. The piece must be theirs. */
   async recordView(owner: string, pieceId: string, now = new Date().toISOString()) {
     requireText(owner, 'owner'); requireText(pieceId, 'piece id');
-    const piece = await this.statement('SELECT id FROM pieces WHERE owner=? AND id=?', owner, pieceId).first();
+    const piece = await this.statement('SELECT id FROM pieces WHERE owner=? AND id=? AND deleted_at IS NULL', owner, pieceId).first();
     if (!piece) throw new LibraryError('not_found', 'Piece not found');
     await this.statement(`INSERT INTO piece_views (owner,piece_id,opened_at) VALUES (?,?,?)
       ON CONFLICT(owner,piece_id) DO UPDATE SET opened_at=excluded.opened_at`, owner, pieceId, now).run();
@@ -129,7 +131,7 @@ export class Library {
 
   async readRendition(owner: string, id: string) {
     requireText(owner, 'owner');
-    const row = await this.statement('SELECT r.* FROM renditions r JOIN pieces p ON p.id=r.piece_id WHERE p.owner=? AND r.id=?', owner, id).first<Rendition>();
+    const row = await this.statement('SELECT r.* FROM renditions r JOIN pieces p ON p.id=r.piece_id WHERE p.owner=? AND r.id=? AND p.deleted_at IS NULL', owner, id).first<Rendition>();
     if (!row) throw new LibraryError('not_found', 'Rendition not found');
     const object = await this.bucket.get(row.r2_key);
     if (!object || object.size !== row.bytes) throw new LibraryError('blob', 'Rendition blob missing or wrong size');
@@ -139,7 +141,7 @@ export class Library {
   /** Authorized audio bytes only; the source key never comes from the URL. */
   async readRecording(owner: string, id: string, options: { range?: string; head?: boolean } = {}) {
     requireText(owner, 'owner'); requireText(id, 'recording id');
-    const recording = await this.statement('SELECT r.* FROM recordings r JOIN pieces p ON p.id=r.piece_id WHERE p.owner=? AND r.id=?', owner, id).first<Recording>();
+    const recording = await this.statement('SELECT r.* FROM recordings r JOIN pieces p ON p.id=r.piece_id WHERE p.owner=? AND r.id=? AND p.deleted_at IS NULL', owner, id).first<Recording>();
     if (!recording || recording.kind !== 'audio' || !recording.r2_key || recording.bytes === null)
       throw new LibraryError('not_found', 'Audio recording not found');
     const range = audioRange(options.head ? undefined : options.range, recording.bytes);
@@ -164,9 +166,64 @@ export class Library {
     return { rendition, object, revision: snapshot.piece.revision };
   }
 
+  // ── a piece's life in Studio (roadmap: studio-piece-lifecycle) ────────────
+  // Deleting is soft: `deleted_at` hides the piece from every read, and nothing —
+  // no row, no tag, no blob — is removed, because the storage contract never
+  // deletes. Both moves are revision-checked writes like any other.
+
+  async deletePiece(owner: string, id: string, expected: number, now = new Date().toISOString()): Promise<void> {
+    requireText(owner, 'owner'); requireText(id, 'piece id');
+    const done = await this.statement('UPDATE pieces SET deleted_at=?, updated_at=?, revision=revision+1 WHERE owner=? AND id=? AND revision=? AND deleted_at IS NULL', now, now, owner, id, expected).run();
+    if (done.meta.changes === 1) return;
+    if (!await this.getPiece(owner, id)) throw new LibraryError('not_found', 'Piece not found');
+    throw new LibraryError('conflict', 'Piece revision changed; read it again');
+  }
+
+  async restorePiece(owner: string, id: string, now = new Date().toISOString()): Promise<Snapshot> {
+    requireText(owner, 'owner'); requireText(id, 'piece id');
+    const done = await this.statement('UPDATE pieces SET deleted_at=NULL, updated_at=?, revision=revision+1 WHERE owner=? AND id=? AND deleted_at IS NOT NULL', now, owner, id).run();
+    const snapshot = await this.getPiece(owner, id);
+    if (!snapshot) throw new LibraryError('not_found', 'Piece not found');
+    if (done.meta.changes !== 1) throw new LibraryError('conflict', 'This piece is not deleted');
+    return snapshot;
+  }
+
+  /** What the owner deleted, newest first, with the title and artist it was shown by. */
+  async listDeleted(owner: string): Promise<{ id: string; revision: number; deleted_at: string; title: string | null; artist: string | null }[]> {
+    requireText(owner, 'owner');
+    const shown = (dimension: string) => `(SELECT COALESCE(a.canonical_value, t.value) FROM tags t LEFT JOIN tag_aliases a ON a.owner=t.owner AND a.dimension=t.dimension AND a.raw_value=t.value
+      WHERE t.owner=p.owner AND t.piece_id=p.id AND t.dimension='${dimension}' ORDER BY 1 LIMIT 1)`;
+    return (await this.statement(`SELECT p.id, p.revision, p.deleted_at, ${shown('title')} AS title, ${shown('artist')} AS artist
+      FROM pieces p WHERE p.owner=? AND p.deleted_at IS NOT NULL ORDER BY p.deleted_at DESC, p.id LIMIT 200`, owner).all<{ id: string; revision: number; deleted_at: string; title: string | null; artist: string | null }>()).results;
+  }
+
+  /**
+   * The converter's backlog, as the owner's own saves found it: every checkpoint
+   * whose round trip through Guitar Pro lost or changed something, newest first,
+   * with the evidence rendition (the document it was exported from) when one was
+   * kept. Deleted pieces included — a defect does not stop being one.
+   */
+  async listDefects(owner: string): Promise<{ rendition_id: string; piece_id: string; created_at: string; producer_version: string | null; provenance: string; evidence_id: string | null }[]> {
+    requireText(owner, 'owner');
+    return (await this.statement(`SELECT r.id AS rendition_id, r.piece_id, r.created_at, r.producer_version, r.provenance,
+        (SELECT e.id FROM renditions e WHERE e.derived_from=r.id AND e.role='evidence' LIMIT 1) AS evidence_id
+      FROM renditions r JOIN pieces p ON p.id=r.piece_id
+      WHERE p.owner=? AND r.role='edit' AND json_extract(r.provenance, '$.check.verdict')='differs'
+      ORDER BY r.created_at DESC, r.id LIMIT 500`, owner).all<{ rendition_id: string; piece_id: string; created_at: string; producer_version: string | null; provenance: string; evidence_id: string | null }>()).results;
+  }
+  /** A rendition's bytes for the operator, deleted piece or not. */
+  async readAnyRendition(owner: string, id: string) {
+    requireText(owner, 'owner');
+    const row = await this.statement('SELECT r.* FROM renditions r JOIN pieces p ON p.id=r.piece_id WHERE p.owner=? AND r.id=?', owner, id).first<Rendition>();
+    if (!row) throw new LibraryError('not_found', 'Rendition not found');
+    const object = await this.bucket.get(row.r2_key);
+    if (!object || object.size !== row.bytes) throw new LibraryError('blob', 'Rendition blob missing or wrong size');
+    return { rendition: row, object };
+  }
+
   async listAliases(owner: string): Promise<AliasReport[]> {
     requireText(owner, 'owner');
-    return (await this.statement(`SELECT a.*, (SELECT count(DISTINCT t.piece_id) FROM tags t WHERE t.owner=a.owner AND t.dimension=a.dimension AND t.value=a.raw_value) AS pieces
+    return (await this.statement(`SELECT a.*, (SELECT count(DISTINCT t.piece_id) FROM tags t JOIN pieces p ON p.id=t.piece_id AND p.deleted_at IS NULL WHERE t.owner=a.owner AND t.dimension=a.dimension AND t.value=a.raw_value) AS pieces
       FROM tag_aliases a WHERE a.owner=? ORDER BY a.dimension, a.raw_value`, owner).all<AliasReport>()).results;
   }
 
@@ -196,6 +253,9 @@ export class Library {
       throw new LibraryError('invalid', 'Expected revision must be nonnegative or null for creation');
     }
     const before = await this.getPiece(owner, input.id);
+    // A deleted piece still owns its id: an ingest of that slice must not collide with it or quietly bring it back.
+    if (!before && await this.statement('SELECT 1 FROM pieces WHERE owner=? AND id=? AND deleted_at IS NOT NULL', owner, input.id).first())
+      throw new LibraryError('conflict', 'This piece was deleted in Studio; restore it first');
     if (input.expected_revision === null ? before !== null : before?.piece.revision !== input.expected_revision) {
       throw new LibraryError('conflict', 'Piece revision changed; read it again');
     }
@@ -209,7 +269,7 @@ export class Library {
     const piece: Piece = before ? { ...before.piece } : {
       id: input.id, owner, canonical_rendition_id: null,
       source_kind: input.source?.kind ?? null, source_id: input.source?.id ?? null,
-      source_url: input.source?.url ?? null, revision: 0, created_at: now, updated_at: now
+      source_url: input.source?.url ?? null, revision: 0, created_at: now, updated_at: now, deleted_at: null
     };
     if (input.source?.url !== undefined) piece.source_url = input.source.url;
     const renditions = new Map((before?.renditions ?? []).map(r => [r.id, r]));
@@ -224,7 +284,7 @@ export class Library {
       if (seen.has(inputRow.id)) throw new LibraryError('invalid', 'Duplicate rendition id');
       seen.add(inputRow.id);
       if (!['gp','gpx','gp5','gp4','gp3','musicxml','mnx'].includes(inputRow.format) ||
-          !['original','export','derived','edit'].includes(inputRow.role)) throw new LibraryError('invalid', 'Invalid rendition format or role');
+          !['original','export','derived','edit','evidence'].includes(inputRow.role)) throw new LibraryError('invalid', 'Invalid rendition format or role');
       if (inputRow.producer_version !== null) requireText(inputRow.producer_version, 'producer version');
       const blob = await describeBlob('renditions', inputRow);
       blobs.set(blob.r2_key, blob);
@@ -304,6 +364,7 @@ export class Library {
       recordings.set(row.id, row);
     }
     if (input.canonical) {
+      if (renditions.get(input.canonical.rendition_id)?.role === 'evidence') throw new LibraryError('invalid', 'Evidence is never the canonical rendition');
       if (!['initialize','replace'].includes(input.canonical.mode) || !renditions.has(input.canonical.rendition_id)) {
         throw new LibraryError('invalid', 'Canonical rendition must belong to this piece');
       }

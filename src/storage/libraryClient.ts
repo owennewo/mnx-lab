@@ -15,10 +15,18 @@ export interface LibraryRecording {
   id: string; kind: 'audio' | 'video' | 'youtube'; name: string | null;
   mime: string | null; duration_s: number | null; external_id: string | null; syncpoints: string | null;
 }
-export interface LibrarySnapshot { piece: { id: string; revision: number; canonical_rendition_id?: string | null }; tags: ShownTag[]; recordings: LibraryRecording[] }
+/** One stored file of a piece. An `edit` is a version Studio saved; `evidence` is never a version. */
+export interface LibraryRendition { id: string; format: string; role: 'original' | 'export' | 'derived' | 'edit' | 'evidence'; created_at: string; bytes: number;
+  derived_from: string | null; producer: string; producer_version: string | null; provenance: string | null; filename: string | null }
+export interface LibrarySnapshot { piece: { id: string; revision: number; canonical_rendition_id?: string | null }; tags: ShownTag[]; recordings: LibraryRecording[]; renditions?: LibraryRendition[] }
+export interface DeletedPiece { id: string; revision: number; deleted_at: string; title: string | null; artist: string | null }
 /** A `.gp` Studio wrote, with what produced it. */
 export interface StudioScoreFile { filename: string; bytes: Uint8Array; producerVersion: string | null; producerOptions: Record<string, unknown> | null }
-export interface Checkpoint { expectedRevision: number; derivedFrom: string; file: StudioScoreFile; derivedTags: { dimension: string; value: string }[]; check: RoundTripCheck; name?: string | null }
+/** A tag of the projection. `kept`: the document does not hold it and the library already does (a Soundslice sidecar's title) — carried over as stored. */
+export interface ProjectedTag { dimension: string; value: string; kept?: true }
+export interface Checkpoint { expectedRevision: number; derivedFrom: string; file: StudioScoreFile; derivedTags: ProjectedTag[]; check: RoundTripCheck; name?: string | null;
+  /** The document the file was exported from, as JSON text — a defect report, offered when the round trip lost something. */
+  evidence?: string | null }
 export interface CanonicalFile { bytes: ArrayBuffer; format: string; filename: string; revision: number; renditionId?: string }
 export class LibraryRequestError extends Error {
   constructor(readonly status: number, message?: string) { super(message ?? (status === 401 ? 'Sign in to load your library.' : status === 403 ? 'This account is not permitted. Contact the operator.' : status === 409 ? 'This piece has no canonical file to open.' : 'The library is unavailable. You can still open local files.')); }
@@ -50,7 +58,7 @@ export class LibraryClient {
   }
   me() { return this.get<{ user: { id: string; email: string } }>('/me'); }
   facets(tags: string[]) { const q = new URLSearchParams(); tags.forEach(t => q.append('tag', t)); return this.get<{ total: number; facets: LibraryFacet[] }>(`/facets?${q}`); }
-  private async scoreBody(file: StudioScoreFile, derivedTags: { dimension: string; value: string }[]) {
+  private async scoreBody(file: StudioScoreFile, derivedTags: ProjectedTag[]) {
     const sha256 = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', file.bytes as BufferSource)), b => b.toString(16).padStart(2, '0')).join('');
     let binary = ''; for (let i = 0; i < file.bytes.length; i += 0x8000) binary += String.fromCharCode(...file.bytes.subarray(i, i + 0x8000));
     return { sha256, body: { rendition: { filename: file.filename, sha256, content: btoa(binary), producer_version: file.producerVersion, producer_options: file.producerOptions }, derived_tags: derivedTags } };
@@ -67,9 +75,27 @@ export class LibraryClient {
   async saveCheckpoint(piece: string, checkpoint: Checkpoint) {
     const { sha256, body } = await this.scoreBody(checkpoint.file, checkpoint.derivedTags);
     const saved = await this.recordingRequest<{ snapshot: LibrarySnapshot; unchanged: boolean }>(`/pieces/${encodeURIComponent(piece)}/renditions`, 'POST',
-      { ...body, expected_revision: checkpoint.expectedRevision, derived_from: checkpoint.derivedFrom, check: checkpoint.check, name: checkpoint.name ?? null });
+      { ...body, expected_revision: checkpoint.expectedRevision, derived_from: checkpoint.derivedFrom, check: checkpoint.check, name: checkpoint.name ?? null,
+        ...(checkpoint.evidence ? { evidence: checkpoint.evidence } : {}) });
     return { ...saved, sha256 };
   }
+  /** A version's bytes, as stored. The caller converts, as for the canonical file. */
+  async rendition(id: string): Promise<ArrayBuffer> {
+    let r: Response;
+    try { r = await this.transport(`/api/library/renditions/${encodeURIComponent(id)}`, { credentials: 'same-origin', cache: 'no-store', redirect: 'manual', signal: AbortSignal.timeout(30000) }); }
+    catch { throw new LibraryRequestError(0); }
+    if (r.type === 'opaqueredirect' || (r.status >= 300 && r.status < 400)) throw new LibraryRequestError(401);
+    if (!r.ok) throw new LibraryRequestError(r.status);
+    return r.arrayBuffer();
+  }
+  /** Go back to a version: the pointer moves, nothing is written over. `from` is what the caller believes is canonical now. */
+  revertTo(piece: string, revision: number, from: string, renditionId: string, derivedTags: ProjectedTag[]) {
+    return this.recordingRequest<{ snapshot: LibrarySnapshot }>(`/pieces/${encodeURIComponent(piece)}/canonical`, 'PUT', { expected_revision: revision, from, rendition_id: renditionId, derived_tags: derivedTags });
+  }
+  /** Soft: the piece leaves every list and can be restored. */
+  deletePiece(piece: string, revision: number) { return this.send<void>('DELETE', `/pieces/${encodeURIComponent(piece)}`, { expected_revision: revision }); }
+  restorePiece(piece: string) { return this.recordingRequest<{ snapshot: LibrarySnapshot }>(`/pieces/${encodeURIComponent(piece)}/restore`, 'POST', {}); }
+  deleted() { return this.get<{ pieces: DeletedPiece[] }>('/deleted'); }
   opened(id: string) { return this.send<void>('POST', `/pieces/${encodeURIComponent(id)}/opened`, {}); }
   changeTags(id: string, revision: number, change: TagChange) { return this.send<{ snapshot: { piece: { id: string; revision: number; canonical_rendition_id?: string | null }; tags: ShownTag[] } }>('PATCH', `/pieces/${encodeURIComponent(id)}/tags`, { expected_revision: revision, ...change }); }
   aliases() { return this.get<{ aliases: LibraryAlias[] }>('/aliases'); }

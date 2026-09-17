@@ -8,6 +8,7 @@
 //                      #/?tag=list:80s&sort=title&q=words, so a way back returns to it
 //   #/piece/<id>       one piece, viewer + player filling the viewport
 //   #/new              make a piece (roadmap/complete/studio-piece-create.md)
+//   #/deleted          what was deleted, restorable (roadmap/inprogress/studio-piece-lifecycle.md)
 //   #/not-permitted    Access admitted the address, D1 did not
 import { LitElement, css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
@@ -18,12 +19,14 @@ import './LibraryPage.ts';
 import './PiecePage.ts';
 import './AliasesPage.ts';
 import './NewPiecePage.ts';
+import './DeletedPage.ts';
 
 export type Route =
   | { page: 'library' }
   | { page: 'piece'; id: string }
   | { page: 'aliases' }
   | { page: 'new' }
+  | { page: 'deleted' }
   | { page: 'not-permitted' };
 
 export function parseHash(hash: string): Route {
@@ -32,12 +35,16 @@ export function parseHash(hash: string): Route {
   if (hash === '#/not-permitted') return { page: 'not-permitted' };
   if (hash === '#/aliases') return { page: 'aliases' };
   if (hash === '#/new') return { page: 'new' };
+  if (hash === '#/deleted') return { page: 'deleted' };
   return { page: 'library' };
 }
 
 export const libraryHref = '#/';
 export const aliasesHref = '#/aliases';
 export const newPieceHref = '#/new';
+export const deletedHref = '#/deleted';
+/** A piece deleted a moment ago, for the library's one-tap undo; this tab only. */
+export const JUST_DELETED_KEY = 'mnx-studio.just-deleted';
 export const pieceHref = (id: string): string => `#/piece/${encodeURIComponent(id)}`;
 
 /** What the library's URL carries: enough to put the same list back. */
@@ -230,7 +237,7 @@ export class StudioApp extends LitElement {
         : html`<header>
             <a class="brand" href=${libraryHref}>MNX <b>Studio</b></a>
             <span class="title"></span>
-            ${this.route.page === 'aliases' || this.route.page === 'new' ? html`<a class="button" href=${libraryReturnHref()} @click=${returnToLibrary}>Library</a>` : nothing}
+            ${this.route.page === 'aliases' || this.route.page === 'new' || this.route.page === 'deleted' ? html`<a class="button" href=${libraryReturnHref()} @click=${returnToLibrary}>Library</a>` : nothing}
             ${this.route.page === 'library' && email ? html`<a class="button" href=${newPieceHref}>New piece</a>` : nothing}
             <button class="theme" title=${themeSentence} aria-label=${themeSentence} @click=${this.cycleTheme}>${themeGlyph(this.theme)}<span>${this.theme}</span></button>
             ${email ? html`<span class="who">${email}</span>` : nothing}
@@ -270,6 +277,7 @@ export class StudioApp extends LitElement {
       ></mnx-studio-piece>`;
     if (this.route.page === 'aliases') return html`<mnx-studio-aliases .client=${this.client}></mnx-studio-aliases>`;
     if (this.route.page === 'new') return html`<mnx-studio-new-piece .client=${this.client}></mnx-studio-new-piece>`;
+    if (this.route.page === 'deleted') return html`<mnx-studio-deleted .client=${this.client}></mnx-studio-deleted>`;
     return html`<mnx-studio-library .client=${this.client}></mnx-studio-library>`;
   }
 }

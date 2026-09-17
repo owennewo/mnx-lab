@@ -10,7 +10,7 @@
 // page applies it through its history — so it can be undone, recovered and saved
 // like any other edit.
 import { LitElement, css, html, nothing } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import type { MnxLabWork } from '../../../src/model/mnx.ts';
 import type { WorkChange } from '../../../src/edit/ops.ts';
 
@@ -23,8 +23,13 @@ export class DetailsSheet extends LitElement {
   @property({ attribute: false }) work: MnxLabWork | undefined;
   /** Another tab holds this piece: look, do not touch. */
   @property({ type: Boolean }) readOnly = false;
+  /** Why, when it is not another tab holding the lock. */
+  @property() readOnlyReason = '';
   @property({ type: Boolean }) canUndo = false;
   @property({ type: Boolean }) canRedo = false;
+  /** Whether this piece can be deleted from here (a stored piece, in the tab that holds its lock). */
+  @property({ type: Boolean }) canDelete = false;
+  @state() private confirming = false;
 
   static styles = css`
     :host { box-sizing: border-box; display: flex; flex-direction: column; width: 380px; max-width: 100%; height: 100%; border-left: 1px solid var(--line); background: light-dark(oklch(0.975 0.003 60), oklch(0.2 0.004 60)); overflow-y: auto; }
@@ -39,6 +44,9 @@ export class DetailsSheet extends LitElement {
     input, textarea { font: inherit; font-size: 14px; font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--ink); background: transparent; border: 1px solid var(--line); border-radius: 3px; padding: 7px 9px; min-width: 0; resize: vertical; }
     input:read-only, textarea:read-only { color: var(--ink-dim); }
     p { margin: 0; color: var(--ink-dim); font-size: 12px; line-height: 1.5; }
+    .danger { margin-top: 8px; padding-top: 14px; border-top: 1px solid var(--line); display: grid; gap: 8px; }
+    .danger .row { display: flex; gap: 8px; }
+    button.delete { color: light-dark(#a12121, #ffb4ab); border-color: currentColor; }
   `;
 
   private emit(type: string, detail?: unknown) {
@@ -67,7 +75,7 @@ export class DetailsSheet extends LitElement {
         <button class="plain" type="button" aria-label="Close details" @click=${() => this.emit('close')}>${cross}</button>
       </header>
       <section>
-        ${this.readOnly ? html`<p role="status">This piece is open for editing in another tab. Close that tab to edit it here.</p>` : nothing}
+        ${this.readOnly ? html`<p role="status">${this.readOnlyReason || 'This piece is open for editing in another tab. Close that tab to edit it here.'}</p>` : nothing}
         ${TEXT.map(([field, label]) => html`<label>${label}
           <input maxlength="300" ?readonly=${this.readOnly} .value=${work[field] ?? ''} @change=${(e: Event) => this.commit({ [field]: value(e) }, work[field] ?? '', value(e))} /></label>`)}
         ${ROLES.map(([role, label]) => html`<label>${label}
@@ -77,6 +85,12 @@ export class DetailsSheet extends LitElement {
         <label>Notes
           <textarea rows="4" maxlength="4000" ?readonly=${this.readOnly} .value=${work.notes ?? ''} @change=${(e: Event) => this.commit({ notes: value(e) }, work.notes ?? '', value(e))}></textarea></label>
         <p>These belong to the score itself and are saved with it. The library's title, artist and other tags are read from them at each save.</p>
+        ${this.canDelete && !this.readOnly ? html`<div class="danger">
+          ${this.confirming
+            ? html`<p role="alert">Delete “${work.title ?? 'this piece'}”? It leaves your library. Nothing is destroyed — its score, versions and recordings are kept, and you can restore it from <em>Deleted pieces</em>.</p>
+                <div class="row"><button class="delete" type="button" @click=${() => this.emit('piece-delete')}>Delete the piece</button><button type="button" @click=${() => (this.confirming = false)}>Keep it</button></div>`
+            : html`<div class="row"><button type="button" @click=${() => (this.confirming = true)}>Delete this piece…</button></div>`}
+        </div>` : nothing}
       </section>
     `;
   }

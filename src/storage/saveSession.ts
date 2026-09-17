@@ -26,11 +26,13 @@
  * browser (harness/conformance/save-session.test.ts). `D` is the document;
  * the session never looks inside it.
  */
-import type { RoundTripCheck, StudioScoreFile } from './libraryClient.ts';
+import type { ProjectedTag, RoundTripCheck, StudioScoreFile } from './libraryClient.ts';
 import type { RecoveryRecord, RecoveryStore } from './recoveryStore.ts';
 
 /** A checkpoint ready to send: the file, what its round trip cost, and the tags read off the document. */
-export interface PreparedCheckpoint { file: StudioScoreFile; check: RoundTripCheck; derivedTags: { dimension: string; value: string }[] }
+export interface PreparedCheckpoint { file: StudioScoreFile; check: RoundTripCheck; derivedTags: ProjectedTag[];
+  /** A defect report to send with it: the document the file was exported from, as JSON text. The session only carries it. */
+  evidence?: string | null }
 /** What the service says the piece is now. */
 export interface PieceBase { renditionId: string | null }
 

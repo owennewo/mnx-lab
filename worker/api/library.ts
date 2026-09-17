@@ -1,6 +1,7 @@
 // Personal operator API. All library paths authenticate before reading a body or storage.
 import { Hono } from 'hono';
 import type { Env } from '../env.ts';
+import { parseMnx } from '../library/tags.ts';
 import { Library, LibraryError, pieceIdFor, type Json, type PieceWrite, type PieceSort, type RenditionInput, type RecordingInput, type DerivedTag } from '../library/index.ts';
 import { accessIdentity, AccessError, type LibraryUser } from '../library/access.ts';
 
@@ -84,6 +85,20 @@ library.onError((error, c) => {
   if (error instanceof LibraryError) return c.json({ error: error.message }, error.code === 'conflict' ? 409 : error.code === 'not_found' ? 404 : 400);
   // Do not log request bodies, credentials or private score data.
   return c.json({ error: 'Library operation failed' }, 500);
+});
+// The operator's view of what Studio's saves cost: checkpoints whose round trip
+// lost something, and the bytes to reproduce it — the stored `.gp` and, when it
+// was kept, the document it was exported from. Machine-only, like the ingest;
+// two path segments, so no slice id can be mistaken for it.
+library.get('/ingest/studio/defects', async c => {
+  const rows = await new Library(c.env.LIBRARY_DB, c.env.LIBRARY_BUCKET).listDefects(INGEST_OWNER);
+  return c.json({ defects: rows.map(r => ({ ...r, provenance: JSON.parse(r.provenance) as Json })) });
+});
+library.get('/ingest/studio/renditions/:id', async c => {
+  const { object, rendition } = await new Library(c.env.LIBRARY_DB, c.env.LIBRARY_BUCKET).readAnyRendition(INGEST_OWNER, c.req.param('id'));
+  c.header('Content-Type', 'application/octet-stream'); c.header('X-Content-Type-Options', 'nosniff');
+  c.header('X-Library-Format', rendition.format); c.header('X-Library-Sha256', rendition.sha256);
+  return c.body(object.body);
 });
 library.get('/ingest/:sourceId', async c => {
   const lib = new Library(c.env.LIBRARY_DB, c.env.LIBRARY_BUCKET);
@@ -239,18 +254,40 @@ function studioScore(b: Record<string, unknown>) {
   if (content.length < 4 || content.length > MAX_STUDIO_SCORE_BYTES || content[0] !== 0x50 || content[1] !== 0x4b || content[2] !== 0x03 || content[3] !== 0x04) invalid('Expected a Guitar Pro 7 file');
   const version = nullable(r.producer_version);
   const options = r.producer_options == null ? null : object(r.producer_options) as Json;
-  const derived: DerivedTag[] = array(b.derived_tags).map(value => {
-    const t = object(value);
-    if (Object.keys(t).some(k => !['dimension', 'value'].includes(k))) invalid('Unsupported tag field');
-    return { dimension: text(t.dimension), value: text(t.value), source_ref: `studio@${version ?? 'unversioned'}` };
-  });
-  if (!derived.some(t => t.dimension === 'title')) invalid('A piece needs a title');
+  const derived = studioTags(b.derived_tags, `studio@${version ?? 'unversioned'}`);
   return { filename, sha256, content, version, options, derived };
+}
+/**
+ * The projection Studio read off a document. `kept: true` marks a tag the
+ * DOCUMENT does not hold and the library already does — a Soundslice piece's
+ * title and artist live in its sidecar, not its `.gp` — so it is carried over
+ * exactly as stored, source and all, rather than restated as Studio's. A tag
+ * Studio once projected is the document's to keep or drop: clearing the artist
+ * clears the tag.
+ */
+type StudioTag = DerivedTag & { kept?: boolean };
+function studioTags(value: unknown, sourceRef: string): StudioTag[] {
+  const tags = array(value).map(entry => {
+    const t = object(entry);
+    if (Object.keys(t).some(k => !['dimension', 'value', 'kept'].includes(k)) || (t.kept !== undefined && t.kept !== true)) invalid('Unsupported tag field');
+    return { dimension: text(t.dimension), value: text(t.value), source_ref: sourceRef, ...(t.kept ? { kept: true } : {}) };
+  });
+  if (!tags.some(t => t.dimension === 'title')) invalid('A piece needs a title');
+  return tags;
+}
+function keepStored(tags: StudioTag[], stored: { dimension: string; value: string; origin: string; source_ref: string | null }[]): DerivedTag[] {
+  return tags.map(({ kept, ...tag }) => {
+    if (!kept) return tag;
+    const held = stored.find(t => t.origin === 'derived' && t.dimension === tag.dimension && t.value === tag.value);
+    if (!held?.source_ref) invalid('A kept tag must already be the library\'s');
+    return { ...tag, source_ref: held.source_ref };
+  });
 }
 library.post('/pieces', async c => {
   const b = await boundedJson(c.req.raw, 2 * 1024 * 1024, 'A new piece');
   if (Object.keys(b).some(k => !['rendition', 'derived_tags'].includes(k))) invalid('Unsupported field');
   const { filename, sha256, content, version, options, derived } = studioScore(b);
+  if (derived.some(t => t.kept)) invalid('A new piece has nothing to keep');
   const sourceId = crypto.randomUUID();
   const id = await pieceIdFor('studio', sourceId);
   const renditionId = `${id}-${sha256.slice(0, 16)}`;
@@ -269,8 +306,8 @@ library.post('/pieces', async c => {
 // bytes already canonical stores nothing. What the round trip cost is the
 // browser's finding — the Worker holds no converter — and rides as provenance.
 library.post('/pieces/:id/renditions', async c => {
-  const b = await boundedJson(c.req.raw, 2 * 1024 * 1024, 'A checkpoint');
-  if (Object.keys(b).some(k => !['expected_revision', 'derived_from', 'rendition', 'derived_tags', 'name', 'check'].includes(k))) invalid('Unsupported field');
+  const b = await boundedJson(c.req.raw, 3 * 1024 * 1024, 'A checkpoint');
+  if (Object.keys(b).some(k => !['expected_revision', 'derived_from', 'rendition', 'derived_tags', 'name', 'check', 'evidence'].includes(k))) invalid('Unsupported field');
   if (!Number.isSafeInteger(b.expected_revision) || Number(b.expected_revision) < 0) invalid('Expected the piece revision');
   const revision = Number(b.expected_revision);
   const derivedFrom = text(b.derived_from);
@@ -292,13 +329,56 @@ library.post('/pieces/:id/renditions', async c => {
   if (before.renditions.find(r => r.id === derivedFrom)?.sha256 === sha256) return c.json({ snapshot: await shown(before), unchanged: true });
   // Unique per checkpoint, not per content: undoing back to earlier bytes is a new version with a new parent.
   const renditionId = `${id}-${sha256.slice(0, 12)}-r${revision}`;
+  // A defect report: the document this `.gp` was exported FROM, offered by the
+  // browser when the round trip lost something. Evidence for the operator, never
+  // read back by a shell — so it must never cost the owner their save: one that
+  // is too big or not valid MNX is noted and dropped.
+  let evidence: ArrayBuffer | null = null; let evidenceNote: string | null = null;
+  if (b.evidence != null) {
+    if (typeof b.evidence !== 'string' || b.evidence.length > MAX_STUDIO_SCORE_BYTES) evidenceNote = 'too-large';
+    else { const bytes = new TextEncoder().encode(b.evidence); try { parseMnx(bytes.buffer as ArrayBuffer); evidence = bytes.buffer as ArrayBuffer; evidenceNote = 'kept'; } catch { evidenceNote = 'invalid'; } }
+  }
   const snapshot = await lib.writePiece(owner, { id, expected_revision: revision,
     renditions: [{ id: renditionId, format: 'gp', role: 'edit', producer: 'studio', producer_version: version, producer_options: options,
       filename, content: content.buffer as ArrayBuffer, sha256, derived_from: derivedFrom,
-      provenance: { kind: 'checkpoint', name, check: { verdict: String(check.verdict), differences, warnings } } }],
-    canonical: { mode: 'replace', rendition_id: renditionId }, tags: [], derived_tags: derived });
+      provenance: { kind: 'checkpoint', name, check: { verdict: String(check.verdict), differences, warnings }, evidence: evidenceNote } },
+      ...(evidence ? [{ id: `${renditionId}-saved`, format: 'mnx' as const, role: 'evidence' as const, producer: 'studio', producer_version: version, producer_options: null,
+        filename: filename.replace(/\.gp$/i, '.mnx.json'), content: evidence, derived_from: renditionId, provenance: { kind: 'saved-document' } }] : [])],
+    canonical: { mode: 'replace', rendition_id: renditionId }, tags: [], derived_tags: keepStored(derived, before.tags) });
   return c.json({ snapshot: await shown(snapshot), unchanged: false }, 201);
 });
+// Going back to a version: the pointer moves, nothing is written and nothing is
+// lost — the version left behind is still there, and "undo the revert" is
+// another revert. The tags are a projection of the canonical document, so the
+// browser, which has just opened that version, sends the projection with it.
+// Like a checkpoint it is refused unless the caller knows what is canonical NOW.
+library.put('/pieces/:id/canonical', async c => {
+  const b = await body(c);
+  if (Object.keys(b).some(k => !['expected_revision', 'from', 'rendition_id', 'derived_tags'].includes(k))) invalid('Unsupported field');
+  if (!Number.isSafeInteger(b.expected_revision) || Number(b.expected_revision) < 0) invalid('Expected the piece revision');
+  const lib = reader(c); const owner = c.get('libraryUser').id; const id = c.req.param('id');
+  const before = await lib.getPiece(owner, id);
+  if (!before) return c.json({ error: 'Piece not found' }, 404);
+  const target = before.renditions.find(r => r.id === text(b.rendition_id));
+  if (!target || target.role === 'evidence' || target.role === 'derived') invalid('Choose one of this piece\'s own versions');
+  if (before.piece.canonical_rendition_id !== text(b.from)) throw new LibraryError('conflict', 'This piece was saved somewhere else; read it again');
+  const derived = keepStored(studioTags(b.derived_tags, `studio-revert@${target.id}`), before.tags);
+  const snapshot = await lib.writePiece(owner, { id, expected_revision: Number(b.expected_revision), canonical: { mode: 'replace', rendition_id: target.id }, tags: [], derived_tags: derived });
+  return c.json({ snapshot: { ...snapshot, tags: Library.shown(snapshot.tags, await lib.listAliases(owner)) } });
+});
+// Deleting is soft and restorable; nothing is removed (docs/studio-storage.md).
+library.delete('/pieces/:id', async c => {
+  const b = await body(c);
+  if (Object.keys(b).some(k => k !== 'expected_revision') || !Number.isSafeInteger(b.expected_revision) || Number(b.expected_revision) < 0) invalid('Expected the piece revision');
+  await reader(c).deletePiece(c.get('libraryUser').id, c.req.param('id'), Number(b.expected_revision));
+  return c.body(null, 204);
+});
+library.post('/pieces/:id/restore', async c => {
+  const lib = reader(c); const owner = c.get('libraryUser').id;
+  const snapshot = await lib.restorePiece(owner, c.req.param('id'));
+  return c.json({ snapshot: { ...snapshot, tags: Library.shown(snapshot.tags, await lib.listAliases(owner)) } });
+});
+library.get('/deleted', async c => c.json({ pieces: await reader(c).listDeleted(c.get('libraryUser').id) }));
 // Your own tags: add, remove, rename — never a derived one (the module refuses).
 library.patch('/pieces/:id/tags', async c => {
   const owner = c.get('libraryUser').id; const id = c.req.param('id');

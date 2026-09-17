@@ -23,7 +23,7 @@ beforeEach(async () => {
     if (key === 'put') return async (key: string, value: Parameters<R2Bucket['put']>[1], options: Parameters<R2Bucket['put']>[2]) => nativeBucket.put(key, value instanceof ReadableStream ? await new Response(value).arrayBuffer() : value, options);
     const v=Reflect.get(target,key); return typeof v==='function' ? v.bind(target) : v;
   } });
-  for (const name of ['0001_library','0003_piece_views','0004_recording_management']) {
+  for (const name of ['0001_library','0003_piece_views','0004_recording_management','0005_piece_lifecycle']) {
     const sql = readFileSync(new URL(`../../migrations/${name}.sql`, import.meta.url), 'utf8').replace(/--[^\n]*/g,'').trim();
     await db.batch(sql.split(/;\s*(?=(?:CREATE|ALTER)\b)/).map(s => db.prepare(s)));
   }

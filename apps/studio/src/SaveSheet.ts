@@ -8,6 +8,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import type { SaveState } from '../../../src/storage/saveSession.ts';
 import { saveChip, savedAge, unkept } from '../../../src/storage/saveChip.ts';
 import type { StorageLoss } from '../../../src/importers/storageCheck.ts';
+import type { PieceVersion } from '../../../src/storage/versions.ts';
 
 const cross = html`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>`;
 
@@ -20,6 +21,10 @@ export class SaveSheet extends LitElement {
   @property({ attribute: false }) conversionNotes: readonly string[] = [];
   @property({ type: Number }) now = Date.now();
   @property({ type: Boolean }) readOnly = false;
+  /** Every save the service kept, newest first; the pointer names the current one. */
+  @property({ attribute: false }) versions: readonly PieceVersion[] = [];
+  /** The version on screen instead of the current document, if any. */
+  @property() viewingId: string | null = null;
   @state() private naming = '';
 
   static styles = css`
@@ -41,6 +46,12 @@ export class SaveSheet extends LitElement {
     li { padding: 8px 10px; background: light-dark(#efeeeb, #343330); line-height: 1.45; overflow-wrap: anywhere; }
     li code { font: 500 12px/1.4 ui-monospace, 'SF Mono', Menlo, monospace; }
     li .was { display: block; color: var(--ink-dim); font-size: 12px; }
+    li.version { display: flex; align-items: center; gap: 8px; background: transparent; padding: 8px 0; border-bottom: 1px solid light-dark(oklch(0.9 0.003 60), oklch(0.27 0.004 60)); }
+    li.version .what { flex: 1; min-width: 0; display: grid; gap: 1px; }
+    li.version .what b { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    li.version .what span { color: var(--ink-dim); font-size: 12px; }
+    li.version button { padding: 4px 9px; }
+    li.version.viewing .what b { color: var(--accent); }
   `;
 
   private emit(type: string, detail?: unknown) {
@@ -81,6 +92,18 @@ export class SaveSheet extends LitElement {
           <input aria-label="Version name" maxlength="120" placeholder="Before the bridge" .value=${this.naming} @input=${(e: Event) => (this.naming = (e.target as HTMLInputElement).value)} />
           <button ?disabled=${busy || !this.naming.trim()}>Save version</button>
         </form>
+      </section>` : nothing}
+      ${this.versions.length > 1 || this.viewingId ? html`<section>
+        <div class="label">Versions · ${this.versions.length}</div>
+        <p>Every save is kept. Look at an older one, and make it the current version if it is the one you want — nothing is lost either way.${save.status !== 'clean' && !this.viewingId ? ' Save your edits first.' : ''}</p>
+        <ul>${this.versions.map(v => { const viewing = v.id === this.viewingId; return html`<li class=${viewing ? 'version viewing' : 'version'} data-version=${v.id}>
+          <span class="what"><b>${v.label}</b><span>${v.current ? 'Current · ' : ''}${savedAge(Date.parse(v.createdAt), this.now)}${v.unkept ? ` · ${v.unkept} not kept` : ''}</span></span>
+          ${viewing
+            ? html`<button type="button" ?disabled=${this.readOnly || v.current} @click=${() => this.emit('version-restore', { id: v.id })}>Make current</button>
+                   <button type="button" @click=${() => this.emit('version-close')}>Back</button>`
+            : v.current && !this.viewingId ? nothing
+            : html`<button type="button" ?disabled=${busy || (save.status !== 'clean' && !this.viewingId)} @click=${() => this.emit(v.current ? 'version-close' : 'version-view', { id: v.id })}>View</button>`}
+        </li>`; })}</ul>
       </section>` : nothing}
       ${lost ? html`<section>
         <div class="label">Won’t persist · ${lost}</div>

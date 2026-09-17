@@ -28,13 +28,14 @@
 import { LitElement, css, html, nothing } from 'lit';
 import { keyed } from 'lit/directives/keyed.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
-import { LibraryClient, LibraryRequestError, type LibrarySnapshot } from '../../../src/storage/libraryClient.ts';
+import { LibraryClient, LibraryRequestError, type LibrarySnapshot, type ProjectedTag } from '../../../src/storage/libraryClient.ts';
 import { documentTitle, documentArtist, type MnxDocument, type MnxStructure } from '../../../src/model/mnx.ts';
 import { derivedLibraryTags } from '../../../src/model/libraryTags.ts';
 import { EditHistory, type EditOp, type WorkChange } from '../../../src/edit/ops.ts';
 import { SaveSession, StaleWriteError, type SaveState } from '../../../src/storage/saveSession.ts';
 import { indexedDbRecoveryStore } from '../../../src/storage/recoveryStore.ts';
-import { saveChip } from '../../../src/storage/saveChip.ts';
+import { saveChip, savedAge } from '../../../src/storage/saveChip.ts';
+import { pieceVersions } from '../../../src/storage/versions.ts';
 import { checkForStorage, type StorageLoss } from '../../../src/importers/storageCheck.ts';
 import { type DisplayOptions } from '../../../src/engine/displayOptions.ts';
 import type { RenderScale } from '../../../src/engine/render/scale.ts';
@@ -59,7 +60,7 @@ import './DetailsSheet.ts';
 import './SaveSheet.ts';
 import { BUILD } from './build.ts';
 import { pieceFilename } from './pieceFile.ts';
-import { pieceHref } from './StudioApp.ts';
+import { JUST_DELETED_KEY, libraryHref, pieceHref } from './StudioApp.ts';
 import type { TagsSnapshot } from './TagsSheet.ts';
 import type { InstrumentPart } from './InstrumentsSheet.ts';
 
@@ -98,6 +99,8 @@ export class PiecePage extends LitElement {
   @state() private conversionNotes: readonly string[] = [];
   /** The score as a recording sees it — each performed bar's length (src/audio/scoreShape.ts). */
   @state() private scoreShape = '';
+  /** An older version on screen instead of the current document. Looking changes nothing. */
+  @state() private viewing: { id: string; label: string; document: MnxStructure } | null = null;
   /** Another tab holds this piece's edit lock. */
   @state() private readOnly = false;
   /** The chip's clock; coarse, so the tray is not re-rendered every second. */
@@ -136,6 +139,9 @@ export class PiecePage extends LitElement {
   /** Once the document has been edited here, the heading reads the document, not the library's tags. */
   private touched = false;
   private pendingLosses: readonly StorageLoss[] = [];
+  /** The kinds of loss already reported with evidence this session: a defect report is sent once per new kind, not per autosave. */
+  private reportedLosses = new Set<string>();
+  private pendingLossKind: string | null = null;
   private releaseLock: (() => void) | null = null;
   private ticker: ReturnType<typeof setInterval> | undefined;
   /** Every write this page makes to the piece, one at a time: they all move one revision. */
@@ -218,6 +224,35 @@ export class PiecePage extends LitElement {
     button.save svg {
       width: 15px;
       height: 15px;
+    }
+    .viewing {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      margin: 0;
+      /* The frame's focus mark sits on the pane's top-right corner. */
+      padding: 8px 56px 8px 14px;
+      border-bottom: 1px solid var(--line);
+      background: light-dark(oklch(0.95 0.02 85), oklch(0.3 0.03 85));
+      font-size: 13px;
+    }
+    .viewing span {
+      flex: 1;
+      min-width: 12rem;
+    }
+    .viewing button {
+      font: inherit;
+      color: inherit;
+      background: transparent;
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      padding: 4px 10px;
+      cursor: pointer;
+    }
+    .viewing button:disabled {
+      opacity: 0.4;
+      cursor: default;
     }
     button.save.risk {
       color: var(--accent);
@@ -335,19 +370,16 @@ export class PiecePage extends LitElement {
       prepare: async doc => {
         const result = await checkForStorage(doc);
         this.pendingLosses = result.losses;
-        // A Soundslice piece can have its title in the sidecar only; the projection keeps what the library knew.
-        const derivedTags = derivedLibraryTags(doc);
-        for (const dimension of ['title', 'artist']) {
-          const known = this.tag(dimension);
-          if (known && !derivedTags.some(t => t.dimension === dimension)) derivedTags.push({ dimension, value: known });
-        }
+        const derivedTags = this.projection(doc);
         const title = derivedTags.find(t => t.dimension === 'title')?.value ?? 'Untitled';
-        return { file: { filename: pieceFilename(title), bytes: result.bytes, producerVersion: BUILD, producerOptions: result.options }, check: result.check, derivedTags };
+        return { file: { filename: pieceFilename(title), bytes: result.bytes, producerVersion: BUILD, producerOptions: result.options }, check: result.check, derivedTags,
+          evidence: this.evidenceFor(doc, result.check) };
       },
       save: checkpoint => this.enqueue(async () => {
         try {
           const saved = await this.client.saveCheckpoint(pieceId, { expectedRevision: await revisionOf(), derivedFrom: checkpoint.derivedFrom,
-            file: checkpoint.file, derivedTags: checkpoint.derivedTags, check: checkpoint.check, name: checkpoint.name });
+            file: checkpoint.file, derivedTags: checkpoint.derivedTags, check: checkpoint.check, name: checkpoint.name, evidence: checkpoint.evidence });
+          if (checkpoint.evidence && this.pendingLossKind) this.reportedLosses.add(this.pendingLossKind);
           if (this.pieceId === pieceId && this.session === session) { this.snapshot = saved.snapshot; this.losses = this.pendingLosses; }
           return { renditionId: saved.snapshot.piece.canonical_rendition_id!, unchanged: saved.unchanged };
         } catch (error) {
@@ -365,7 +397,7 @@ export class PiecePage extends LitElement {
     }, state => { if (this.session === session) { this.save = state; this.now = Date.now(); } });
     this.session = session;
     this.save = session.snapshot;
-    this.losses = []; this.touched = false;
+    this.losses = []; this.touched = false; this.viewing = null; this.reportedLosses.clear();
     let live = document;
     const found = this.readOnly ? null : await session.recoverable().catch(() => null);
     if (found) {
@@ -383,6 +415,38 @@ export class PiecePage extends LitElement {
     }
     this.history = new EditHistory(live);
     return live === document ? null : live;
+  }
+
+  /**
+   * A defect report for the operator: the document this save was exported from,
+   * sent only when the round trip lost or changed something, and only the first
+   * time this session that this KIND of loss is seen (or the save is a named
+   * version) — an autosave every half minute must not store the score each time.
+   */
+  private evidenceFor(doc: MnxStructure, check: { verdict: string; differences: { path: string; kind: string }[]; warnings: string[] }): string | null {
+    this.pendingLossKind = null;
+    if (check.verdict !== 'differs') return null;
+    const kind = JSON.stringify([check.differences.filter(d => d.kind !== 'gained').map(d => `${d.kind} ${d.path}`).sort(), [...check.warnings].map(w => w.replace(/\d+/g, '#')).sort()]);
+    if (this.reportedLosses.has(kind)) return null;
+    // Marked reported only when the save lands: a failed save retries with its evidence.
+    this.pendingLossKind = kind;
+    const text = JSON.stringify(doc);
+    return text.length <= 1024 * 1024 ? text : null;
+  }
+
+  /**
+   * The library's tags as this document says them. A Soundslice piece keeps its
+   * title and artist in the SIDECAR — its `.gp` may hold neither — so a tag that
+   * came from there and that the document does not contradict is kept, as stored.
+   * A tag Studio itself projected is the document's: clear the artist and the
+   * tag goes; go back to a version without one and it goes too.
+   */
+  private projection(doc: MnxStructure): ProjectedTag[] {
+    const tags: ProjectedTag[] = derivedLibraryTags(doc);
+    for (const held of this.snapshot?.tags ?? [])
+      if (held.origin === 'derived' && held.source_ref === 'sidecar' && ['title', 'artist'].includes(held.dimension) && !tags.some(t => t.dimension === held.dimension))
+        tags.push({ dimension: held.dimension, value: held.value, kept: true });
+    return tags;
   }
 
   /** Leaving the piece: save what is unsaved, then let go. The record stays until that save lands. */
@@ -420,11 +484,67 @@ export class PiecePage extends LitElement {
     this.session?.documentChanged(mnxJson);
   }
   private applyEdit(op: EditOp) {
-    if (this.readOnly || !this.history) return;
+    if (this.readOnly || this.viewing || !this.history) return;
     this.showDocument(this.history.apply(op));
   }
-  private undoEdit() { if (this.history?.canUndo && !this.readOnly) this.showDocument(this.history.undo()); }
-  private redoEdit() { if (this.history?.canRedo && !this.readOnly) this.showDocument(this.history.redo()); }
+  private undoEdit() { if (this.history?.canUndo && !this.readOnly && !this.viewing) this.showDocument(this.history.undo()); }
+  private redoEdit() { if (this.history?.canRedo && !this.readOnly && !this.viewing) this.showDocument(this.history.redo()); }
+
+  // ── versions: look at one, go back to one ───────────────────────────────
+  // The service keeps every save; the pointer names the current one. Looking at
+  // an older version puts ITS document on screen and tells the save session
+  // nothing; making it current moves the pointer and reopens the piece.
+
+  private versions() { return pieceVersions(this.snapshot?.renditions ?? [], this.snapshot?.piece.canonical_rendition_id); }
+
+  private async viewVersion(id: string) {
+    const version = this.versions().find(v => v.id === id), doc = this.doc, generation = this.generation;
+    if (!version || !doc || this.session?.dirty) return;
+    try {
+      this.player?.pause();
+      const opened = await openLocalFile(new File([await this.client.rendition(id)], `${id}.${version.format}`));
+      if (generation !== this.generation) return;
+      this.viewing = { id, label: `${version.label} · ${savedAge(Date.parse(version.createdAt), Date.now())}`, document: opened.document };
+      this.doc = { ...doc, name: documentTitle(opened.document) ?? doc.name, lastUpdated: Date.now(), mnxJson: opened.document };
+    } catch (error) {
+      this.error = `That version could not be opened: ${error instanceof Error && error.message ? error.message : 'the library is unavailable.'}`;
+    }
+  }
+  private closeVersion() {
+    const current = this.session?.document;
+    if (!this.viewing || !this.doc || !current) return;
+    this.viewing = null;
+    this.doc = { ...this.doc, name: documentTitle(current) ?? this.doc.name, lastUpdated: Date.now(), mnxJson: current };
+  }
+  private async makeVersionCurrent(id: string) {
+    const viewing = this.viewing, session = this.session, snapshot = this.snapshot;
+    if (!viewing || viewing.id !== id || !session || !snapshot || this.readOnly || session.dirty || !session.baseRenditionId) return;
+    const derivedTags = this.projection(viewing.document);
+    try {
+      await this.enqueue(() => this.client.revertTo(snapshot.piece.id, (this.snapshot ?? snapshot).piece.revision, session.baseRenditionId!, id, derivedTags));
+      this.session = null; session.dispose();
+      await this.load();
+    } catch (error) {
+      this.error = `That version was not made current: ${error instanceof LibraryRequestError && error.status === 409 ? 'this piece was saved somewhere else — reopen it.' : error instanceof Error && error.message ? error.message : 'the library is unavailable.'}`;
+    }
+  }
+
+  /** Delete the piece: save what is unsaved first (a restore brings back what was SAVED), then leave for the library, which offers the undo. */
+  private async deletePiece() {
+    const session = this.session, snapshot = this.snapshot;
+    if (!snapshot || this.readOnly) return;
+    const title = (this.doc ? documentTitle(this.doc.mnxJson) : null) ?? this.tag('title') ?? 'Untitled';
+    try {
+      await session?.flush();
+      await this.enqueue(() => this.client.deletePiece(snapshot.piece.id, (this.snapshot ?? snapshot).piece.revision));
+      await session?.discardRecovery().catch(() => {});
+      this.session = null; session?.dispose();
+      try { sessionStorage.setItem(JUST_DELETED_KEY, JSON.stringify({ id: snapshot.piece.id, title })); } catch { /* the Deleted pieces page still has it */ }
+      location.hash = libraryHref;
+    } catch (error) {
+      this.error = `The piece was not deleted: ${error instanceof Error && error.message ? error.message : 'the library is unavailable.'}`;
+    }
+  }
 
   /** A conflict, settled by keeping this device's document: it becomes a new piece, and the record goes. */
   private async saveMineAsCopy() {
@@ -650,8 +770,11 @@ export class PiecePage extends LitElement {
 
   render() {
     // Edited here, the heading reads the document; the library's tags catch up at the next save.
-    const title = this.doc ? ((this.touched ? documentTitle(this.doc.mnxJson) : null) ?? this.tag('title') ?? this.doc.name) : '';
-    const artist = this.doc ? ((this.touched ? documentArtist(this.doc.mnxJson) : null) ?? this.tag('artist') ?? documentArtist(this.doc.mnxJson) ?? '') : '';
+    // An older version on screen is read the same way: its own document, then what only the sidecar knows.
+    const fromDocument = this.touched || !!this.viewing;
+    const sidecar = (dimension: string) => this.snapshot?.tags.find(t => t.dimension === dimension && t.origin === 'derived' && t.source_ref === 'sidecar')?.shown ?? null;
+    const title = this.doc ? (fromDocument ? documentTitle(this.doc.mnxJson) ?? sidecar('title') : this.tag('title')) ?? this.doc.name : '';
+    const artist = this.doc ? (fromDocument ? documentArtist(this.doc.mnxJson) ?? sidecar('artist') : this.tag('artist') ?? documentArtist(this.doc.mnxJson)) ?? '' : '';
     const chip = this.save ? saveChip(this.save, this.now) : null;
     const activeId = this.selectedRecordingId ?? 'synth';
     const activeRecording = this.snapshot?.recordings.find(r => r.id === this.selectedRecordingId);
@@ -719,6 +842,9 @@ export class PiecePage extends LitElement {
             </div>`
           : nothing}
         ${this.doc && this.error ? html`<p class="notice" role="alert">${this.error}</p>` : nothing}
+        ${this.viewing ? html`<p class="viewing" role="status"><span>Looking at an older version: <b>${this.viewing.label}</b>. Nothing has changed.</span>
+          <button type="button" @click=${() => this.closeVersion()}>Back to current</button>
+          <button type="button" ?disabled=${this.readOnly} @click=${() => void this.makeVersionCurrent(this.viewing!.id)}>Make this the current version</button></p>` : nothing}
         <mnx-document-viewer
           ?hidden=${!this.doc}
           .view=${this.view}
@@ -776,12 +902,15 @@ export class PiecePage extends LitElement {
         ${this.detailsOpen && this.doc
           ? html`<mnx-studio-details slot="side"
               .work=${this.doc.mnxJson._x?.mnxLab?.work}
-              .readOnly=${this.readOnly}
+              .readOnly=${this.readOnly || !!this.viewing}
+              .readOnlyReason=${this.viewing ? 'This is an older version. Go back to the current one to edit, or make this one current.' : ''}
+              .canDelete=${!!this.snapshot && !!this.session && !this.viewing}
               .canUndo=${!!this.history?.canUndo}
               .canRedo=${!!this.history?.canRedo}
               @work-change=${(e: CustomEvent<WorkChange>) => this.applyEdit({ type: 'setWork', work: e.detail })}
               @undo=${() => this.undoEdit()}
               @redo=${() => this.redoEdit()}
+              @piece-delete=${() => void this.deletePiece()}
               @close=${() => (this.detailsOpen = false)}></mnx-studio-details>`
           : nothing}
         ${this.saveOpen && this.save
@@ -791,6 +920,11 @@ export class PiecePage extends LitElement {
               .conversionNotes=${this.conversionNotes}
               .now=${this.now}
               .readOnly=${this.readOnly}
+              .versions=${this.versions()}
+              .viewingId=${this.viewing?.id ?? null}
+              @version-view=${(e: CustomEvent<{ id: string }>) => void this.viewVersion(e.detail.id)}
+              @version-close=${() => this.closeVersion()}
+              @version-restore=${(e: CustomEvent<{ id: string }>) => void this.makeVersionCurrent(e.detail.id)}
               @save-now=${() => void this.session?.checkpoint()}
               @save-version=${(e: CustomEvent<{ name: string }>) => void this.session?.checkpoint(e.detail.name)}
               @save-copy=${() => void this.saveMineAsCopy()}

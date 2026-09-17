@@ -3,8 +3,9 @@
 > **A campaign** (see CLAUDE.md → Roadmap-driven development): this doc is an index over
 > normal proposals sharing one goal, the shared contract they follow, and the running log
 > of progress and learnings as items land. Indexed items are ordinary `studio-*` / `core-*`
-> proposals that name this campaign. **Opened 2026-09-17 from a design conversation; items 1–4
-> built the same day (4 owes two hands-on checks), the rest not started.** Storage shape stays owned by
+> proposals that name this campaign. **Opened 2026-09-17 from a design conversation; items 1–5
+> built the same day (4 owes two hands-on checks; 5 needs migration 0005 before deploy), the rest not
+> started.** Storage shape stays owned by
 > [docs/studio-storage.md](../../docs/studio-storage.md); the sync bar by
 > [docs/player-sync-bar.md](../../docs/player-sync-bar.md). This doc owns the order and
 > the contract.
@@ -203,7 +204,7 @@ one.
 | 2 | [studio-piece-create](../complete/studio-piece-create.md) | **complete 2026-09-17** | **A piece made in studio.** `#/new`: title, artist, tuning (the grammar's presets or a custom one — never "none", see open decision 6), capo, time, key, bars. `src/edit/newDocument.ts` builds the blank piece from `{}` through `applyOp`; `exportForStorage` writes the `.gp` with `STORAGE_EXPORT_OPTIONS`; `src/model/libraryTags.ts` reads the derived tags off the document (clause 9, one item early); `POST /api/library/pieces` stores it under `source_kind: 'studio'` with every id chosen by the service, reusing `writePiece` — no migration, no new role, the Worker still converting nothing. Opened `apps/studio → src/edit`. The piece page now asks for a recording when there is none. Amended `studio-shell.md`, `apps/studio/README.md`, `docs/studio-storage.md` and `docs/library-access.md`. Conformance over the real route on local D1/R2, and a real-browser smoke (`npm run smoke:piece-create`). |
 | 3 | [studio-save-pipeline](../complete/studio-save-pipeline.md) | **complete 2026-09-17** | **The save pipeline, proven on the smallest edit surface.** A `setWork` op and the **Details** sheet (the nine fields a Guitar Pro header holds) — studio's first editor. `src/storage/saveSession.ts`: the state machine of clauses 2–8 with every dependency a port — the recovery record *is* the live document (IndexedDB, `recoveryStore.ts`), dirty is by reference, a checkpoint captures one document while the record follows the live one, idle/ceiling/hidden triggers, retry, and stale-write-versus-conflict. `POST /pieces/:id/renditions`: a fourth rendition role `edit` (no migration), refused unless edited from the current canonical, the round-trip check as provenance, named versions, and ingest leaving an edited piece's pointer and projection alone. The save check runs in a worker (`src/importers/storageCheck*`; ~250 ms on Vestapol). The chip beside the title, the Save sheet (losses, *Save a version*, conflict → *Keep mine as a copy*, recovered edits, conversion notes), one write queue for the page's writes, a Web Lock per piece, a build stamp on everything written. Storage files are now deflated (520 KB → 18 KB). All six recovery acceptance tests, the route over local D1/R2, and a real-browser smoke including a reload-before-save recovery and a two-device conflict. |
 | 4 | [studio-sync-rederive](studio-sync-rederive.md) | **built 2026-09-17; two hands-on checks owed** | **Sync first, bars later.** `playingSyncpoints` (`src/model/syncSegments.ts`): when a source has segments the player derives its tuples from them and the bars *as they are now* — every time it builds the source's sync map, and again when the media's length is known — and never consults the stored ones; no bars is *not synchronised*. `sync-refresh` tells the host when what plays is not what is stored, and Studio writes it back through the sync-edit path. An imported sync cannot be re-derived, so it carries the **shape** it was last known good for (`performedShape`, `src/audio/scoreShape.ts` — `11x1/1,1x1/2`), merged into its provenance by the recording route, stamped by Studio on first sight, and shown as *may be out of date* in the Source sheet when the bars have moved. **Owed, by a person:** the click against a real YouTube clock, and the sync bar on touch. |
-| 5 | `studio-piece-lifecycle` | proposed | **Living with pieces.** Soft delete (`deleted_at`; hidden from lists, R2 untouched — *never deletes* holds). A versions route listing a piece's renditions from `derived_from` / `created_at` with automatic-or-named and the round-trip verdict; open an older version; **revert** as a pointer move plus revision bump, no new rendition. Rename is a Details edit. An operator listing of unexplained round-trip verdicts that pulls their defect reports into converter fixtures. |
+| 5 | [studio-piece-lifecycle](studio-piece-lifecycle.md) | **built 2026-09-17 — migration 0005 before deploy** | **Living with pieces.** Soft delete (`pieces.deleted_at`: not found by every read and write, nothing removed), an inline-confirmed *Delete this piece…*, the library's one-tap undo and `#/deleted` with Restore; an ingest of a deleted slice is refused rather than reviving it. **Versions** read off the renditions the snapshot already carries (`src/storage/versions.ts`), listed in the Save sheet; an older one *viewed* with nothing written, and made current by a **pointer move** (`PUT /pieces/:id/canonical`) — no rendition written, undoable, the next edit derived from where the pointer is. **Defect reports**: a lossy save carries the document it was exported from as an `evidence` rendition, once per new kind of loss; the operator lists and pulls them (`npm run defects:library`, never into the repo). Replaced item 3's tag fallback with an explicit `kept: true` for what only the Soundslice sidecar knows. |
 | 6 | `core-sync-interchange` | proposed, optional | **sync.json as interchange.** *Export sync* (none exists): the dense Soundslice-compatible array as derived, or a sparse wrapper with anchors only at the cuts and a wrapper-level `interpolation: "beat"` — never a fifth tuple element, which breaks Soundslice compatibility and the decoder's arity check. The reader option for beat-linear interpolation is built only if sparse export is wanted. **Lifting an imported Soundslice sync into segments** (lossless = one segment per anchor interval, crowded; merged = tidy, discards measured timing) is a decision the item owns. Pick up when a second consumer of a sync appears, not before. |
 | 7 | [core-editor-element-promotion](../proposed/core-editor-element-promotion.md) | proposed — trigger 2 **met** by this campaign | **The editor in studio, in slices.** That doc owns the promotion review; this campaign is the second consumer it was parked behind. Recommended shape, to be confirmed by a design pass over the mount code: a separate, code-split editor element that attaches to the viewer rather than an editing mode of `<mnx-document-viewer>` (embeds view, studio edits; viewers must not pay). **Slice 1:** cursor and selection overlay, keymap, note/fret entry, delete, undo. **Slice 2:** the setup popovers. **Slice 3:** lyric editor and rung inspector — last, because the inspector is still in progress in the workbench and promoting it early makes its churn public API. Workbench consumes the promoted element and deletes its mount. Every edit rides item 3's pipeline unchanged; items the register says cannot persist are marked in the score. |
 | 8 | `studio-editor-touch` | proposed | **Entry without a keyboard.** The workbench editor is keyboard-driven and studio is used on an Android tablet; a touch entry surface is new design, not a port. Decision 1 below says whether slice 1 of item 7 waits for it. |
@@ -438,4 +439,32 @@ uncomfortable one about playback: the cuts were kept, and the player ignored the
   bar's two outstanding checks. Both need a person — an ear on a real video, a finger on a
   tablet — so the item stays in `inprogress/` with them named, rather than moving to
   `complete/` with them implied.
+
+### 2026-09-17 — entry 7: item 5 built — and item 3 corrected by it
+
+[studio-piece-lifecycle](studio-piece-lifecycle.md).
+
+- **The version history was already there.** Every save had been an immutable rendition since
+  item 3, and the piece snapshot already returned them — the client's type just did not say
+  so. Listing versions needed no route; going back to one is a pointer move, which
+  `writePiece` has done since the storage campaign. The contract's "the server holds every
+  version" turned out to be a description, not a plan.
+- **A real-browser smoke found a logic bug four conformance suites had passed.** Item 3 kept
+  the library's known title and artist whenever the document had none. Reverting to a
+  version without an artist showed what that really meant: the artist came back, and could
+  never be cleared at all. The fallback is now a stated rule with a wire form — `kept: true`,
+  only for a tag whose source is the sidecar, carried over as stored. **The general lesson:
+  a fallback that guesses "missing means unknown" will sooner or later meet "missing means
+  removed".** Item 7 will have many more fields where that distinction matters.
+- **The defect report is where clause 1 had to be read carefully.** Storing the pre-save
+  document is storing MNX. It does not reopen the decision, because nothing depends on being
+  able to read it later: it is evidence for a person fixing a converter, never canonical,
+  never a version, and dropped without ceremony if it does not validate. And it is rationed —
+  once per new *kind* of loss — because the score is ~25× the size of its `.gp`.
+- **Soft delete touched every read.** The cheapest correct place was the two shared SQL
+  fragments (`EFFECTIVE_TAGS`, `filtered`) plus `getPiece`; the routes needed almost nothing.
+  The sharp edge was the ingest: a deleted piece still owns its id, so `writePiece` refuses to
+  create over it rather than failing on a primary key.
+- **This item is the first with a migration.** It cannot be deployed before
+  `0005_piece_lifecycle.sql` is applied; every library read now names `deleted_at`.
 
