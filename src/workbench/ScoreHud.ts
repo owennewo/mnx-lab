@@ -18,15 +18,8 @@ import { designTokens, scrollbars } from '../elements/tokens.ts';
 
 /** One containment level at the cursor. Rows carry no editor types — `key`
  *  is an opaque handle the host maps to a selection level. */
-export interface HudRow {
-  key: string;
-  label: string;
-  value: string;
-  /** The selection ladder's current rung sits on this row. */
-  active?: boolean;
-  /** Clicking asks the host to move the selection to this level. */
-  activatable?: boolean;
-}
+export type { HudPart, HudRow } from '../elements/hudRows.ts';
+import type { HudPart, HudRow } from '../elements/hudRows.ts';
 
 /** One cheatsheet line — keys and what they do at the CURRENT level. The
  *  shapes mirror keymapDocs' CheatRow/CheatGroup structurally, restated here
@@ -39,19 +32,6 @@ export interface HudCheatRow {
 export interface HudCheatGroup {
   label: string;
   rows: HudCheatRow[];
-}
-
-/** One line of the ensemble table (the part row's value). */
-export interface HudPart {
-  index: number;
-  name: string;
-  /** The document's own declaration, display-formatted; null = none. */
-  declared: string | null;
-  /** Override state: a tuning preset name, or 'document' = no override. */
-  instrument: string;
-  capo: number | null;
-  /** The editor cursor's part (only marked on multi-part scores). */
-  cursor?: boolean;
 }
 
 @customElement('mnx-score-hud')

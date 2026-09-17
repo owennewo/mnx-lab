@@ -24,9 +24,9 @@ try {
   // A headless page is not the focused window, and an unfocused page fires no focus events: emulate one, as a person's would be.
   await c.send('Emulation.setFocusEmulationEnabled',{enabled:true});
   const wait = async expression => { for (let i=0;i<200;i++) { if (await c.evaluate(expression)) return; await new Promise(r=>setTimeout(r,100)); } throw new Error('Browser assertion timed out: '+expression); };
-  const VK = { ArrowRight: 39, ArrowLeft: 37, Escape: 27, Delete: 46, KeyZ: 90, KeyY: 89, Digit1: 49, Digit2: 50, Digit3: 51, Digit5: 53 };
-  const key = async (code, { ctrl = false, text } = {}) => {
-    const base = { code, key: text ?? code, windowsVirtualKeyCode: VK[code], modifiers: ctrl ? 2 : 0 };
+  const VK = { ArrowRight: 39, ArrowLeft: 37, Escape: 27, Enter: 13, Delete: 46, KeyZ: 90, KeyY: 89, KeyL: 76, KeyC: 67, KeyV: 86, Digit1: 49, Digit2: 50, Digit3: 51, Digit5: 53 };
+  const key = async (code, { ctrl = false, shift = false, text } = {}) => {
+    const base = { code, key: text ?? code, windowsVirtualKeyCode: VK[code], modifiers: (ctrl ? 2 : 0) | (shift ? 8 : 0) };
     await c.send('Input.dispatchKeyEvent', { type: text && !ctrl ? 'keyDown' : 'rawKeyDown', ...base, ...(text && !ctrl ? { text } : {}) });
     await c.send('Input.dispatchKeyEvent', { type: 'keyUp', ...base });
   };
@@ -94,7 +94,53 @@ try {
   await c.evaluate(`${action('Keys')}.click()`); await wait(`!!${keys}?.querySelector('.row')`);
   const listed = await c.evaluate(`${keys}.textContent`);
   for (const expected of ['Note entry', 'a note', 'Ctrl+Z']) assert.ok(listed.includes(expected), `Keys sheet lacks "${expected}"`);
-  assert.ok(!/palette|Lyric text/i.test(listed), 'Keys sheet advertises a surface that is not mounted');
+  assert.ok(!/palette/i.test(listed), 'Keys sheet advertises a surface that is not mounted');
+  for (const mounted of ['Enter', 'Shift+L', '+C']) assert.ok(listed.includes(mounted), `Keys sheet lacks "${mounted}", which is mounted here`);
+
+  // ── slices 2–3: the surfaces ──────────────────────────────────────────────
+  // The rung inspector: Enter, over the selection, wearing the design system's tokens though studio declares none of them.
+  const inspector = `${piece}.querySelector('.editor-overlay mnx-editor-surfaces mnx-rung-inspector')`;
+  await c.evaluate(`${viewer}.focus()`);
+  await c.evaluate(`${page}.editor.handleIntent({ type: 'goToLevel', level: 'measure' })`);
+  await key('Enter');
+  await wait(`!!${inspector} && ${inspector}.crumbs.length > 0 && ${inspector}.anchor != null`);
+  assert.notEqual(await c.evaluate(`getComputedStyle(${inspector}).getPropertyValue('--surface').trim()`), '', 'the inspector has no palette here');
+  assert.equal(await c.evaluate(`${viewer}.selectionInactive`), false, 'the cursor dimmed although the inspector — ours — has the keyboard');
+  const inspectorShot = await c.send('Page.captureScreenshot'); await fs.writeFile('/tmp/mnx-studio-inspector.png',Buffer.from(inspectorShot.result.data,'base64'));
+  // A line the grammar cannot read is a sentence; one it can is an edit — and a meter is a change of shape, saved at once.
+  await c.evaluate(`${inspector}.dispatchEvent(new CustomEvent('inspector-apply', { detail: { word: 'time', text: 'nonsense' } }))`);
+  await wait(`typeof ${inspector}.error === 'string' && ${inspector}.error.length > 0`);
+  await c.evaluate(`${inspector}.dispatchEvent(new CustomEvent('inspector-apply', { detail: { word: 'time', text: '3/4' } }))`);
+  await wait(`${piece}.querySelector('mnx-player').document.global.measures[0].time.count === 3 && ${inspector}.error === null`);
+  assert.equal(await c.evaluate(`${page}.editor.session.selectionLevel`), 'measure', 'the inspector let the ladder fall off its rung');
+  await wait(`${chip}.dataset.save === 'clean' && ${chip}.textContent.includes('just now')`);
+  // Escape, typed into the inspector, closes it and hands the keyboard back to the score.
+  await key('Escape');
+  await wait(`!${inspector} && ${viewer}.selectionInactive === false`);
+
+  // The lyric text editor: Shift+L. A clean parse draws live on a scratch copy; nothing is edited until it is applied.
+  const lyrics = `${piece}.querySelector('.editor-overlay mnx-editor-surfaces mnx-lyric-text-editor')`;
+  const sung = doc => `JSON.stringify(${doc}.parts[0].measures[0].sequences[0].content.map(e => Object.values(e.lyrics?.lines ?? {}).map(l => l.text)).flat())`;
+  await c.evaluate(`${page}.editor.handleIntent({ type: 'goToLevel', level: 'note' })`);
+  await key('KeyL', { shift: true });
+  await wait(`!!${lyrics}?.shadowRoot?.querySelector('textarea')`);
+  await c.evaluate(`{ const t = ${lyrics}.shadowRoot.querySelector('textarea'); t.value = 'sing song'; t.dispatchEvent(new Event('input')); }`);
+  await wait(`${sung(`${piece}.querySelector('mnx-player').document`)} === '["sing","song"]'`);
+  assert.equal(await c.evaluate(sung(`${page}.editor.document`)), '[]', 'the preview edited the document');
+  assert.equal(await c.evaluate(`${chip}.dataset.save`), 'clean', 'the preview was told to the save session');
+  await c.evaluate(`${lyrics}.shadowRoot.querySelector('button.apply').click()`);
+  await wait(`!${lyrics} && ${sung(`${page}.editor.document`)} === '["sing","song"]'`);
+  // One edit, however many syllables: the chip counts history steps (and by now it knows when it last saved).
+  await wait(`${chip}.textContent.trim().startsWith('1 edit unsaved')`);
+
+  // Copy a note, paste it two beats on; the page says what happened.
+  await c.evaluate(`${viewer}.focus()`);
+  await c.evaluate(`${page}.editor.handleIntent({ type: 'goToEdge', edge: 'first' })`);
+  await key('KeyC', { ctrl: true });
+  await wait(`${piece}.querySelector('.clip-notice')?.textContent.length > 0`);
+  await key('ArrowRight'); await key('ArrowRight');
+  await key('KeyV', { ctrl: true });
+  await wait(`JSON.parse(${frets}).length === 3`);
 
   // Escape puts the cursor away; an arrow brings it back.
   await c.evaluate(`${viewer}.focus()`);
@@ -115,8 +161,10 @@ try {
   await c.send('Page.reload');
   await wait(`${chip}?.dataset.save === 'clean' && !!${page}.editor`);
   const reloaded = await fretsNow();
-  assert.deepEqual(reloaded.map(f => f.split(':')[2]).sort(), ['12', '3']);
+  assert.deepEqual(reloaded.map(f => f.split(':')[2]).sort(), ['12', '3', '3']);
   assert.equal(await c.evaluate(`${piece}.querySelector('mnx-player').document.global.measures.length`), 17);
-  console.log(`Studio editor smoke passed: ${pieceId} — a dimmed cursor made live by focus, fret 3 and a two-digit fret 12 entered from the keyboard, Ctrl+Z / Ctrl+Y, one undo history across notes and the Details sheet, a text field keeping its own keys, a Keys sheet of what is bound here, Escape and back, a bar added saved at once (${saved.check.verdict}), and the notes read back from the stored .gp after a reload.`);
+  assert.deepEqual(await c.evaluate(`JSON.stringify(${piece}.querySelector('mnx-player').document.global.measures[0].time)`), '{"count":3,"unit":4}');
+  assert.equal(await c.evaluate(sung(`${piece}.querySelector('mnx-player').document`)), '["sing","song"]', 'the lyrics did not survive the stored .gp');
+  console.log(`Studio editor smoke passed: ${pieceId} — a dimmed cursor made live by focus, fret 3 and a two-digit fret 12 entered from the keyboard, Ctrl+Z / Ctrl+Y, one undo history across notes and the Details sheet, a text field keeping its own keys, a Keys sheet of what is bound here, the rung inspector opened with Enter and a meter typed into it, lyrics previewed then applied from the text editor, a note copied and pasted, Escape and back, a bar added saved at once (${saved.check.verdict}), and the notes read back from the stored .gp after a reload.`);
   if (c.logs.length) throw new Error('Browser console errors: '+c.logs.join('\n'));
 } finally { ws?.close(); chrome.kill(); await once(chrome,'exit'); await fs.rm(profile,{recursive:true,force:true,maxRetries:10,retryDelay:200}); }

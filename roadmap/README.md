@@ -157,7 +157,8 @@ back up to `proposed/` the moment it is.
   from [studio-sync-bar](inprogress/studio-sync-bar.md): the click against a real YouTube
   clock, and the sync bar on touch.
 - **[core-editor-element-promotion.md](inprogress/core-editor-element-promotion.md)** — **in
-  progress: slice 1 (keyboard only) built 2026-09-17**, [studio authoring
+  progress: slices 1–3 built 2026-09-17 for studio; the workbench's adoption of the binding is
+  what is left**, [studio authoring
   campaign](inprogress/studio-campaign-authoring.md) item 7. The editor's mount, promoted out
   of the workbench as a plain-DOM host binding beside `bindPlayback` —
   `bindEditor(scope, viewer, document, options)` in `src/elements/editorHost.ts` — because the
@@ -167,10 +168,14 @@ back up to `proposed/` the moment it is.
   code. The workbench now shares the selection translation (`editorSelection.ts`) and the
   scope tests, and keeps its own mount until slices 2–3 (popovers, then the lyric editor and
   the rung inspector) give the binding the surfaces it has. Studio edits notes from the
-  keyboard, with one undo history across notes and metadata. Parked 2026-08-09 behind a
+  keyboard, with one undo history across notes and metadata. **Slices 2–3 (same day):** the
+  setup popovers had already retired into the rung inspector, so the two slices were one — the
+  inspector, its rows and placement and the lyric text editor moved to `elements/`, mounted by
+  the binding on Enter and Shift+L with copy/cut/paste, under a token-carrying
+  `<mnx-editor-surfaces>` because the inspector inherits its palette. Parked 2026-08-09 behind a
   second-consumer trigger that studio met.
 - **[studio-campaign-authoring.md](inprogress/studio-campaign-authoring.md)** — **campaign**,
-  opened 2026-09-17, **items 1–5 and slice 1 of 7 built the same day** (4 owes two hands-on checks; 5 needs migration 0005 before deploy): studio stops being read-only. Priority flow **new piece
+  opened 2026-09-17, **items 1–5 and item 7's three slices built the same day** (4 owes two hands-on checks; 5 needs migration 0005 before deploy): studio stops being read-only. Priority flow **new piece
   → YouTube → sync**, working before any note editing exists; editing last. Opens on the
   finding that adding a recording and the sync bar were already built and persisted — what
   was missing was any way for a piece to exist outside the operator ingest. The contract's

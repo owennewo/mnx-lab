@@ -23,7 +23,29 @@ import {
   type SelectionLevel
 } from '../edit/selection.ts';
 import { timeAt } from '../edit/inspector.ts';
-import type { HudPart, HudRow } from './ScoreHud.ts';
+/** One line of the HUD / the inspector's breadcrumb: a rung, its value, and whether the ladder sits on it. */
+export interface HudRow {
+  key: string;
+  label: string;
+  value: string;
+  /** The selection ladder's current rung sits on this row. */
+  active?: boolean;
+  /** Clicking asks the host to move the selection to this level. */
+  activatable?: boolean;
+}
+
+/** One part of the ensemble table. */
+export interface HudPart {
+  index: number;
+  name: string;
+  /** The document's own declaration, display-formatted; null = none. */
+  declared: string | null;
+  /** Override state: a tuning preset name, or 'document' = no override. */
+  instrument: string;
+  capo: number | null;
+  /** The editor cursor's part (only marked on multi-part scores). */
+  cursor?: boolean;
+}
 
 /** Row key ↔ selection level. The component never sees the right-hand side. */
 export const LEVEL_BY_ROW: Record<string, SelectionLevel> = {

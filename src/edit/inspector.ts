@@ -2,7 +2,7 @@
 // what a bar carries as pills, which siblings a crumb can go to, the words
 // the blank slot completes to, and the typed line read back into intents.
 // Lives in edit/ because it is a pure function of the document and the
-// typed unions — the shell (workbench/inspectorRows.ts) only glues it to the
+// typed unions — the mount (elements/inspectorRows.ts) only glues it to the
 // HUD's row labels, and the harness exercises THIS, headlessly.
 //
 // Stages 3–5: pills at every rung the session can edit, merged over a range.

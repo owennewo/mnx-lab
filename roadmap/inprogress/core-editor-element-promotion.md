@@ -1,7 +1,7 @@
 # Promoting the editor into `elements/` — the second-consumer move
 
-> **Status: in progress — slice 1 (keyboard only) built 2026-09-17; slices 2–3 not started.** See
-> *Slice 1* at the end. Originally **proposed (2026-08-09), deliberately parked.** Split out of
+> **Status: in progress — slices 1–3 built 2026-09-17 for studio; the workbench has not yet adopted the
+> binding** (work-list item 5, the one thing left). See *Slice 1* and *Slices 2–3* at the end. Originally **proposed (2026-08-09), deliberately parked.** Split out of
 > [core-editor-input-layer.md](../complete/core-editor-input-layer.md) as its one remaining
 > item, so that doc could close at its real scope (everything else shipped). This
 > doc owns the move that makes the editor consumable outside the workbench —
@@ -267,3 +267,87 @@ viewport) — identically on a clean build of `main` at `261a3398`. Reported, no
 - **Every edit re-hands the document to the player**, which recompiles and stops playback.
   Correct, and heavy for a keystroke; a lighter hand-off is still owed.
 - **Clicking a note does not move the cursor** — it never did in the workbench either.
+
+## Slices 2–3 — the surfaces (built 2026-09-17)
+
+### Slice 2 had already happened
+
+The campaign planned *slice 2: the setup popovers* and *slice 3: the lyric editor and the rung
+inspector*. Reading the workbench first showed the first of those was gone: the
+[one-surface campaign](../complete/workbench-campaign-one-surface.md) retired every
+Shift+letter popover **into the rung inspector** — `SETUP_POPOVER_COMMANDS` has one row
+left, and it is the lyric text editor. Time, key, clef, tuning, part, bar attributes,
+adornments and rhythm are all the inspector's words now. So the two slices are one: promote
+the inspector and the setup verbs come with it.
+
+### What moved
+
+- **`src/elements/RungInspector.ts`**, **`inspectorRows.ts`**, **`hudRows.ts`**,
+  **`overlayPlacement.ts`** and **`LyricTextEditor.ts`** — moved, not copied; the workbench
+  imports them from `elements/`. `hudRows.ts` now owns the `HudRow`/`HudPart` types it used
+  to import from the workbench's HUD element (which re-exports them), so nothing in
+  `elements/` looks up at a shell.
+- **`src/elements/inspectorMount.ts`** — what a mount does with the inspector besides
+  showing it: `inspectorLineIntent` (the typed line read against where the cursor stands),
+  `fireFromInspector` (the intent fired *and the ladder put back on its rung*, so applying an
+  event pill does not drop the cursor to the note rung under the pills) and `mirrorOverlayAt`.
+  The scenario page calls all three; they were its method bodies.
+- **`src/elements/EditorSurfaces.ts`** — `<mnx-editor-surfaces>`, the layer the surfaces
+  live in, which exists for one reason: **the inspector inherits the palette rather than
+  declaring it** (a `designTokens` block inside it would pin it light, and
+  `design-tokens.test.ts` holds it to that). In the workbench the tokens come down from the
+  app host; studio declares other tokens. This element is the ancestor that declares them.
+- **`bindEditor` mounts them** when the host gives it somewhere to (`overlay`): **Enter**
+  with nothing pending opens the inspector at the selection's anchor (from the viewer's
+  `selection-anchored`, in the overlay's coordinates); **Shift+L** the lyric text editor,
+  whose clean parses draw live on a scratch copy through `onPreview` — *drawn, never told to
+  the host as a change* — and land as one `applyLyricPlan`; **copy / cut / paste** when the
+  host supplies a `SelectionClipboardStore`, with the planner's sentence through `onNotice`.
+  A read-only binding refuses the inspector's mutations with a sentence; a suspended one
+  closes both surfaces. The cursor stays lit while the inspector has the keyboard — it is
+  ours. `keys()` lists Enter, Shift+L and the clipboard only when they are mounted.
+
+### Studio
+
+The piece page gives the binding an overlay over the score pane — a sibling of the viewer in
+the frame's slot, *not* a wrapper, because the frame measures its slotted scroller — a
+per-tab clipboard store (a bar copied in one piece pastes into the next), a lyric preview
+that draws without touching the save session, and a status line for what a paste did.
+
+### Proof
+
+`npm run smoke:studio-editor`, extended: Enter at the bar rung opens the inspector with its
+crumbs, an anchor and **a resolved `--surface`** (the palette reached it); the cursor is not
+dimmed while it has the keyboard; `time nonsense` is a sentence and `time 3/4` is an edit
+that leaves the ladder on the bar rung and — a change of shape — is saved at once; a real
+Escape typed into it closes it and hands the keyboard back. Shift+L opens the lyric editor;
+`sing song` shows in the score **while the editor's document has no lyrics and the chip
+stays clean**, then Apply makes it one edit. Ctrl+C, two arrows, Ctrl+V: a third note, and
+the page says so. After a reload the stored `.gp` gives back the 3/4 and the lyrics.
+With it: `smoke:inspector` and `smoke:focus` (the workbench, now importing the moved
+elements), the four other studio smokes and both sync smokes. The built embed bundles
+contain no `mnx-rung-inspector`, no `mnx-lyric-text-editor` and no `enterFret`.
+
+### What is left: work-list item 5
+
+**The workbench still has its own mount.** It now shares everything that *can* be shared
+without changing what it is — the selection translation, the scope tests, the inspector,
+its rows, its placement, its glue, the lyric editor — and the two mounts differ only in
+what is genuinely the workbench's: a window-scoped listener that also serves unclaimed
+focus, the HUD and the ops panel reading the session, construct-trace replay and the
+destruct sweep *replacing* the session, the iteration chip and playback seek, the command
+palette's intents, and ↑/↓ at the document rung walking the corpus rail. The scenario page
+touches its session in about a hundred places.
+
+Adopting `bindEditor` there is therefore a refactor of the workbench, not a promotion, and
+it wants three things from the binding first: a way to **replace the session** (replay and
+revert build new ones), a **document-rung escalation hook** for the rail, and a
+**host-owned preview channel** for the tray's rung preview beside the lyric caret's. None
+is hard; together they are their own piece of work, with `smoke:selection`,
+`smoke:inspector`, `smoke:focus` and the player smoke as its net. It is not started, and
+this doc stays in `inprogress/` until it is done.
+
+Also not here: the **command palette** (the workbench's own, and the only path to the AI
+prompt, which stays behind the closed `elements → assist` boundary), **touch** (campaign
+item 8), and **click-to-place** — a click still selects for playback and does not move the
+cursor, in either shell.

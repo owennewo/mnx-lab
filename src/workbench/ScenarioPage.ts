@@ -48,7 +48,7 @@ import {
 } from '../edit/clipboardFeedback.ts';
 import type { TabSetup } from '../engine/tab/guitarPositions.ts';
 import { cheatsheet } from '../edit/keymapDocs.ts';
-import { buildHudParts, buildHudRows, LEVEL_BY_ROW, ROW_BY_LEVEL } from './hudRows.ts';
+import { buildHudParts, buildHudRows, LEVEL_BY_ROW, ROW_BY_LEVEL } from '../elements/hudRows.ts';
 import { keyFifthsAt } from '../edit/staffSpace.ts';
 import { buildJsonView } from '../model/jsonView.ts';
 import { findNoteAddress } from '../model/noteWalk.ts';
@@ -74,20 +74,18 @@ import { editorHasKeyboard, keyIsOurs } from '../elements/keyScope.ts';
 import { enclosureFor, selectionContextFor } from '../elements/editorSelection.ts';
 import {
   OVERLAY_EDGE_GAP,
-  OVERLAY_MIRROR_MARGIN,
   OVERLAY_SHAFT_H,
-  OVERLAY_WIDTH,
   type OverlayAnchor
-} from './overlayPlacement.ts';
+} from '../elements/overlayPlacement.ts';
 import '../elements/DocumentViewer.ts';
-import './RungInspector.ts';
-import { buildInspectorView } from './inspectorRows.ts';
-import { fingerboardOf, parseInspectorLine } from '../edit/inspector.ts';
+import '../elements/RungInspector.ts';
+import { buildInspectorView } from '../elements/inspectorRows.ts';
+import { INSPECTOR_REFUSAL, fireFromInspector, inspectorLineIntent, mirrorOverlayAt } from '../elements/inspectorMount.ts';
 import '../elements/ScoreFrame.ts';
 import type { ZoomPadChange } from '../elements/ZoomPad.ts';
 import { DEFAULT_SPACE_SP, DEFAULT_SPACING_MODE, DEFAULT_STAFF_SP } from '../elements/zoomDefaults.ts';
 import './ModelPickerDialog.ts';
-import './LyricTextEditor.ts';
+import '../elements/LyricTextEditor.ts';
 import { lyricPlanOps, type LyricPlanEdit } from '../edit/lyricText.ts';
 import { applyOp } from '../edit/ops.ts';
 import { modelDisplayName } from '../assist/modelCatalog.ts';
@@ -2345,20 +2343,7 @@ export class ScenarioPage extends LitElement {
       this.inspectorError = null;
       return;
     }
-    const noteKey = this.session.selectedNoteKeys[0];
-    const pitch = noteKey ? findNoteAddress(this.session.doc, noteKey)?.note.pitch : undefined;
-    const bar = this.session.doc.global?.measures?.[this.session.cursor.measureIndex];
-    const tempoCount = bar?.tempos?.length ?? 0;
-    const harmonyCount = bar?._x?.mnxLab?.harmonies?.length ?? 0;
-    const parsed = parseInspectorLine(this.session.selectionLevel, word, text, {
-      ...(pitch ? { pitch } : {}),
-      fingerboard: noteKey ? fingerboardOf(this.session.doc, noteKey) : null,
-      ...(key ? { key } : {}),
-      tempoCount,
-      harmonyCount,
-      layoutIds: (this.session.doc.layouts ?? []).map(layout => layout.id),
-      scoreNames: (this.session.doc.scores ?? []).map(score => score.name)
-    });
+    const parsed = inspectorLineIntent(this.session, word, text, key);
     if ('error' in parsed) {
       this.inspectorError = parsed.error;
       return;
@@ -2370,22 +2355,7 @@ export class ScenarioPage extends LitElement {
     if (!this.session) return;
     this.flushPendingFret();
     this.cursorHidden = false;
-    const level = this.session.selectionLevel;
-    const ok = this.session.handleIntent(intent);
-    this.inspectorError = ok ? null : 'the document refused that — nothing to remove, or it does not fit';
-    // A point edit re-anchors the selection at the note (session.apply's
-    // rule). The inspector is a view of ONE rung, so it puts the ladder back
-    // where it was — otherwise applying an event pill would drop you to the
-    // note rung and the pills would change under your cursor.
-    const moved =
-      intent.type === 'relaxSelection' ||
-      intent.type === 'tightenSelection' ||
-      intent.type === 'goToLevel' ||
-      intent.type === 'extendSelection' ||
-      intent.type === 'nextPosition' ||
-      intent.type === 'prevPosition';
-    if (ok && !moved && this.session.selectionLevel !== level)
-      this.session.handleIntent({ type: 'goToLevel', level });
+    this.inspectorError = fireFromInspector(this.session, intent) ? null : INSPECTOR_REFUSAL;
     this.copied = false;
     this.syncFromSession();
   }
@@ -2399,11 +2369,7 @@ export class ScenarioPage extends LitElement {
    * follow the selection); the TRAY is handed the answer once, at open.
    */
   private mirrorAt(anchor: OverlayAnchor): boolean {
-    if (this.mainWidth <= 0) return false;
-    return (
-      anchor.x + OVERLAY_WIDTH > this.mainWidth - OVERLAY_MIRROR_MARGIN &&
-      anchor.x + anchor.width - OVERLAY_WIDTH >= OVERLAY_EDGE_GAP
-    );
+    return mirrorOverlayAt(anchor, this.mainWidth);
   }
 
   /**

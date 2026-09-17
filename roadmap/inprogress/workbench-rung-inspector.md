@@ -1,5 +1,9 @@
 # The rung inspector — the cursor's path as a breadcrumb, the rung's state as pills
 
+> **Moved 2026-09-17:** the element, its rows and its placement now live in `src/elements/` — promoted with
+> the editor's mount so studio shows the same inspector
+> ([core-editor-element-promotion](core-editor-element-promotion.md), slices 2–3). Its design is still owned here.
+>
 > **Status: IN PROGRESS 2026-08-28 — all five stages built and landed the same day; fingerboard pills + four-row frame landed 2026-08-30.**
 > What stays open is not a stage but a dependency: the container rung reads its spec
 > and cannot write it until the session grows a `setContainerProperties`-class verb
@@ -38,7 +42,7 @@ index the same ops on different axes:
   and the user feels an asymmetry they cannot name.
 
 Both are *verb-shaped*: they answer "what can I do?". Neither answers the question that
-precedes it — **"what is set on this thing?"** The HUD (`src/workbench/hudRows.ts`)
+precedes it — **"what is set on this thing?"** The HUD (`src/elements/hudRows.ts`)
 answers it read-only, as a wall of rows. Removal in the grammars is blind (`no section`
 strips something you cannot see), and two removal tokens (`no` / `inherit`) exist only
 to teach a taxonomy the surface hides.
@@ -254,7 +258,7 @@ Driven hands-on, the horizontal breadcrumb read as a second HUD. The
 ## What the build found (2026-08-28, stages 1–3)
 
 - **The machinery is `edit/`, not shell.** The first cut put pills, siblings, words
-  and the line parser in `workbench/inspectorRows.ts` beside `hudRows.ts` — and the
+  and the line parser in `elements/inspectorRows.ts` beside `hudRows.ts` — and the
   boundary checker refused the harness test (`harness-not-into-shells`). Right call:
   everything but the crumb *labels* is a pure function of the document and the typed
   unions, so it lives in **`src/edit/inspector.ts`** and
@@ -268,7 +272,7 @@ Driven hands-on, the horizontal breadcrumb read as a second HUD. The
   the kind's default (segno/fine start, jump end), or a `segno` written without one
   read back with one.
 - **Placement is one function.** `SelectionTray.place()` became
-  `workbench/overlayPlacement.ts`, consumed by both; the tray's behaviour is unchanged
+  `elements/overlayPlacement.ts`, consumed by both; the tray's behaviour is unchanged
   and the design-tokens test now runs its three joins over the inspector too.
 - **Hands-on caught what the joins could not.** `npm run smoke:inspector`
   (`harness/verify/inspector-smoke.mjs`, headless Chrome over CDP on the selection

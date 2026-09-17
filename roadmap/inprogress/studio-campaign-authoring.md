@@ -206,7 +206,7 @@ one.
 | 4 | [studio-sync-rederive](studio-sync-rederive.md) | **built 2026-09-17; two hands-on checks owed** | **Sync first, bars later.** `playingSyncpoints` (`src/model/syncSegments.ts`): when a source has segments the player derives its tuples from them and the bars *as they are now* — every time it builds the source's sync map, and again when the media's length is known — and never consults the stored ones; no bars is *not synchronised*. `sync-refresh` tells the host when what plays is not what is stored, and Studio writes it back through the sync-edit path. An imported sync cannot be re-derived, so it carries the **shape** it was last known good for (`performedShape`, `src/audio/scoreShape.ts` — `11x1/1,1x1/2`), merged into its provenance by the recording route, stamped by Studio on first sight, and shown as *may be out of date* in the Source sheet when the bars have moved. **Owed, by a person:** the click against a real YouTube clock, and the sync bar on touch. |
 | 5 | [studio-piece-lifecycle](../complete/studio-piece-lifecycle.md) | **complete 2026-09-17 — migration 0005 before deploy** | **Living with pieces.** Soft delete (`pieces.deleted_at`: not found by every read and write, nothing removed), an inline-confirmed *Delete this piece…*, the library's one-tap undo and `#/deleted` with Restore; an ingest of a deleted slice is refused rather than reviving it. **Versions** read off the renditions the snapshot already carries (`src/storage/versions.ts`), listed in the Save sheet; an older one *viewed* with nothing written, and made current by a **pointer move** (`PUT /pieces/:id/canonical`) — no rendition written, undoable, the next edit derived from where the pointer is. **Defect reports**: a lossy save carries the document it was exported from as an `evidence` rendition, once per new kind of loss; the operator lists and pulls them (`npm run defects:library`, never into the repo). Replaced item 3's tag fallback with an explicit `kept: true` for what only the Soundslice sidecar knows. |
 | 6 | `core-sync-interchange` | proposed, optional | **sync.json as interchange.** *Export sync* (none exists): the dense Soundslice-compatible array as derived, or a sparse wrapper with anchors only at the cuts and a wrapper-level `interpolation: "beat"` — never a fifth tuple element, which breaks Soundslice compatibility and the decoder's arity check. The reader option for beat-linear interpolation is built only if sparse export is wanted. **Lifting an imported Soundslice sync into segments** (lossless = one segment per anchor interval, crowded; merged = tidy, discards measured timing) is a decision the item owns. Pick up when a second consumer of a sync appears, not before. |
-| 7 | [core-editor-element-promotion](core-editor-element-promotion.md) | **slice 1 built 2026-09-17 (keyboard only); slices 2–3 not started** | **The editor in studio, in slices.** That doc owns the promotion review. Slice 1 settled its open design question as *neither* an editor element nor a viewer mode: the viewer already drew the cursor, so the mount is a plain-DOM host binding beside `bindPlayback` — `bindEditor` in `src/elements/editorHost.ts`, its own lazily loaded chunk, absent from the embed bundles. **Slice 1:** navigation and the ladder, fret and pitch entry, durations, ties, delete, undo, Escape/Enter; structural key scope; `setWork` as an intent so notes and metadata share one history; a Keys sheet; the structural checkpoint trigger item 3 owed. The workbench shares `editorSelection.ts` and `keyScope.ts` and keeps its own mount for now. **Slice 2:** the setup popovers. **Slice 3:** lyric editor and rung inspector — last, because the inspector is still in progress in the workbench and promoting it early makes its churn public API; the workbench adopts the binding then and deletes its mount. Every edit rides item 3's pipeline unchanged. |
+| 7 | [core-editor-element-promotion](core-editor-element-promotion.md) | **slices 1–3 built 2026-09-17 for studio; the workbench's adoption of the binding is left** | **The editor in studio.** That doc owns the promotion review. The mount is a plain-DOM host binding beside `bindPlayback` — `bindEditor` in `src/elements/editorHost.ts`, its own lazily loaded chunk, absent from the embed bundles. **Slice 1:** navigation and the ladder, fret and pitch entry, durations, ties, delete, undo, Escape/Enter; structural key scope; `setWork` as an intent; a Keys sheet; the structural checkpoint trigger. **Slice 2 turned out to have already happened** — the one-surface campaign retired every setup popover into the rung inspector — so **slices 2–3 are one:** the inspector, its rows and placement, and the lyric text editor moved to `elements/` (the workbench imports them from there), with shared glue (`inspectorMount.ts`) and a token-carrying layer (`<mnx-editor-surfaces>`); the binding mounts them on Enter and Shift+L and binds copy/cut/paste. **Left:** work-list item 5 — the workbench adopting `bindEditor` and deleting its own mount — which is a refactor of a page that touches its session in a hundred places, scoped in that doc and not started. |
 | 8 | `studio-editor-touch` | proposed | **Entry without a keyboard.** The workbench editor is keyboard-driven and studio is used on an Android tablet; a touch entry surface is new design, not a port. Decision 1 below says whether slice 1 of item 7 waits for it. |
 
 ### Decisions still open
@@ -496,4 +496,31 @@ call on open decision 1: **keyboard only**; touch is item 8.
 - **A stray `git stash` in a compound command** hid this item's working tree for one step.
   Popped at once with nothing lost, and the repo's other stash untouched — but it is the
   reason to keep read-only checks and state-changing commands in separate calls.
+
+### 2026-09-17 — entry 9: item 7, slices 2–3 — the surfaces, and a slice that had already happened
+
+[core-editor-element-promotion](core-editor-element-promotion.md), *Slices 2–3*.
+
+- **Read the other shell before planning against it.** This campaign's own index said
+  *slice 2: the setup popovers*. They no longer exist: the one-surface campaign folded all
+  nine Shift+letter popovers into the rung inspector weeks ago. The plan was written from a
+  sweep that described the workbench as it had been summarised, not as it was. Two slices
+  became one, and the larger one got smaller.
+- **An element that inherits its palette needs an ancestor that has one.** The inspector
+  must not declare `designTokens` (it would pin itself light, and a test holds it to that),
+  so in studio — which declares different tokens — it would have rendered with every colour
+  unset. `<mnx-editor-surfaces>` is that ancestor. The smoke asserts a resolved `--surface`
+  rather than trusting the screenshot. **Anything else promoted out of the workbench will
+  meet the same question.**
+- **A preview is not an edit.** The lyric editor draws clean parses live. In studio that had
+  to reach the score *without* reaching the save session, or every keystroke in a text box
+  would have been a checkpoint candidate; `onPreview` is a separate channel from `onChange`,
+  and the smoke checks the chip stays clean while the score shows the words.
+- **The frame measures what is slotted into it.** The overlay for the surfaces is a sibling
+  of the viewer in the score frame's slot, not a wrapper around it: the frame reads its
+  slotted scroller to place the focus mark.
+- **Promotion and adoption are different jobs.** Everything that can be shared now is, and
+  what remains in the workbench's mount is the workbench's — replay, the ops panel, the rail.
+  Adopting the binding there is a refactor with its own risks and its own net, written up in
+  the promotion doc as work-list item 5 rather than squeezed in behind a green smoke.
 

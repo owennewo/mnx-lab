@@ -34,6 +34,7 @@ import { derivedLibraryTags } from '../../../src/model/libraryTags.ts';
 import type { WorkChange } from '../../../src/edit/ops.ts';
 import type { EditorIntent } from '../../../src/edit/intents.ts';
 import type { EditorBinding } from '../../../src/elements/editorHost.ts';
+import { MemorySelectionClipboardStore } from '../../../src/edit/selectionClipboard.ts';
 import './KeysSheet.ts';
 import { SaveSession, StaleWriteError, type SaveState } from '../../../src/storage/saveSession.ts';
 import { indexedDbRecoveryStore } from '../../../src/storage/recoveryStore.ts';
@@ -75,6 +76,8 @@ const mixerGlyph = html`<svg width="18" height="18" viewBox="0 0 24 24" fill="no
 const detailsGlyph = html`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h14v16H5zM9 9h6M9 13h6M9 17h3"></path></svg>`;
 const keysGlyph = html`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7h18v10H3zM7 11h.01M11 11h.01M15 11h.01M8 14h8"></path></svg>`;
 const saveGlyph = html`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 18a4 4 0 0 1-.5-7.97A6 6 0 0 1 18 9a4.5 4.5 0 0 1-.5 9z"></path></svg>`;
+/** Cut and copied selections, for this tab: a bar copied in one piece can be pasted into the next. */
+const selectionClipboard = new MemorySelectionClipboardStore();
 /** The selection ladder's rungs, as a person would say them. */
 const RUNG_NAMES: Record<string, string> = { note: 'a note', event: 'a beat', voiceMeasure: 'a voice in a bar', partMeasure: 'a part’s bar', measure: 'a bar', document: 'the whole piece' };
 /** Unsaved edits, on this device only, until the next checkpoint. One store for every piece. */
@@ -98,6 +101,9 @@ export class PiecePage extends LitElement {
   @state() private detailsOpen = false;
   @state() private saveOpen = false;
   @state() private keysOpen = false;
+  /** What a copy, cut or paste did, or why it did not; it names the last outcome and leaves. */
+  @state() private clipboardNotice = '';
+  private noticeTimer: ReturnType<typeof setTimeout> | undefined;
   /** The save session's state, for the chip; null until a piece with a stored score is open. */
   @state() private save: SaveState | null = null;
   /** The last checkpoint's losses in full; the state carries their shapes. */
@@ -232,6 +238,27 @@ export class PiecePage extends LitElement {
     button.save svg {
       width: 15px;
       height: 15px;
+    }
+    /* Where the editor's surfaces hang: over the whole score pane, passing every pointer through. */
+    .editor-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 4;
+      pointer-events: none;
+    }
+    .clip-notice {
+      position: absolute;
+      z-index: 5;
+      left: 50%;
+      bottom: 12px;
+      transform: translateX(-50%);
+      margin: 0;
+      padding: 6px 12px;
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      background: var(--bar, light-dark(#fff, #222));
+      font-size: 13px;
+      pointer-events: none;
     }
     .viewing {
       display: flex;
@@ -431,6 +458,12 @@ export class PiecePage extends LitElement {
     this.editor?.dispose();
     const editor = bindEditor(this.viewer, this.viewer, live, {
       documentId: '', onChange: doc => this.showDocument(doc),
+      overlay: this.renderRoot.querySelector<HTMLElement>('.editor-overlay') ?? undefined,
+      title: () => (this.doc ? documentTitle(this.doc.mnxJson) : null) ?? this.tag('title') ?? 'Untitled',
+      // The lyric editor's live preview: drawn, never told to the save session.
+      onPreview: preview => { if (this.doc && this.editor) this.doc = { ...this.doc, lastUpdated: Date.now(), mnxJson: preview ?? this.editor.document }; },
+      clipboard: selectionClipboard,
+      onNotice: notice => { this.clipboardNotice = notice.message; clearTimeout(this.noticeTimer); this.noticeTimer = setTimeout(() => (this.clipboardNotice = ''), 4000); },
       onState: () => { if (this.keysOpen || this.detailsOpen) this.requestUpdate(); },
       readOnly: () => this.readOnly, suspended: () => !!this.viewing
     });
@@ -875,6 +908,8 @@ export class PiecePage extends LitElement {
         ${this.viewing ? html`<p class="viewing" role="status"><span>Looking at an older version: <b>${this.viewing.label}</b>. Nothing has changed.</span>
           <button type="button" @click=${() => this.closeVersion()}>Back to current</button>
           <button type="button" ?disabled=${this.readOnly} @click=${() => void this.makeVersionCurrent(this.viewing!.id)}>Make this the current version</button></p>` : nothing}
+        ${this.clipboardNotice ? html`<p class="clip-notice" role="status">${this.clipboardNotice}</p>` : nothing}
+        <div class="editor-overlay"></div>
         <mnx-document-viewer
           ?hidden=${!this.doc}
           .view=${this.view}

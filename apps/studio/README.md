@@ -77,7 +77,9 @@ since 2026-09-17, `src/edit` — the DOM-free ops layer, opened when studio bega
 pieces (`#/new` builds a document through `applyOp`). It must not import `src/workbench/`
 or `src/assist/`; nothing may import `apps/studio/`. The editor's *mount* arrives through
 `elements/`, by promotion: since 2026-09-17 the piece page binds
-`src/elements/editorHost.ts` (slice 1 — the keyboard's core) behind a dynamic `import()`. `.dependency-cruiser.cjs` makes any of
+`src/elements/editorHost.ts` behind a dynamic `import()` — the keyboard's core, then the rung
+inspector (Enter), the lyric text editor (Shift+L) and copy/cut/paste, mounted in an overlay the
+page supplies over the score pane. `.dependency-cruiser.cjs` makes any of
 those a red build. Anything both shells want is first *promoted* into `elements/` or
 below — a deliberate, reviewed move.
 

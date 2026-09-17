@@ -7,14 +7,18 @@
  * cursor and the session are `src/edit/`, pure and DOM-free. What lived in the
  * workbench's scenario page was the wiring — who hears the keys, who holds the
  * half-typed fret, who turns a session into what the viewer draws — and that is
- * what this is. Slice 1 carries the keyboard's core:
+ * what this is. The keyboard's core came first (slice 1):
  *
  *   navigation · the selection ladder · fret and pitch entry · durations ·
  *   ties · delete · undo / redo · Escape and Enter's pending pair
  *
- * and deliberately not yet the surfaces that hang off it — the rung inspector
- * and the typed popovers (slices 2–3), the lyric editor, the clipboard, the
- * command palette. Those keys are simply unbound here rather than half-working.
+ * and then the surfaces that hang off it (slices 2–3), mounted when the host
+ * gives the binding somewhere to put them (`overlay`): **Enter** opens the rung
+ * inspector over the selection — which is where every setup verb now lives; the
+ * Shift+letter popovers retired into it — **Shift+L** the lyric text editor,
+ * and copy / cut / paste work when the host supplies a clipboard store. Without
+ * an `overlay` those keys stay unbound rather than half-working. The command
+ * palette is the workbench's own and is not mounted here.
  *
  * **Scope is structural.** The listener is on `scope`, the host's own element,
  * not on `window`: a key reaches the editor because focus is inside it, which
@@ -35,11 +39,24 @@ import {
 } from '../edit/keymap.ts';
 import { KEY_DOCS, KEY_GROUP_LABELS, type CheatGroup } from '../edit/keymapDocs.ts';
 import { TabDigitResolver } from '../edit/tabDigitResolver.ts';
+import { lyricPlanOps, type LyricPlanEdit } from '../edit/lyricText.ts';
+import { applyOp } from '../edit/ops.ts';
+import type { SelectionClipboardStore } from '../edit/selectionClipboard.ts';
+import { copySelectionToStore, cutSelectionToStore, pasteSelectionFromStore } from '../edit/selectionClipboardActions.ts';
+import { copySelectionNotice, cutSelectionNotice, pasteSelectionNotice, type ClipboardNotice } from '../edit/clipboardFeedback.ts';
 import { neighbourSystemMeasure } from '../engine/layout/spacing.ts';
 import type { MnxStructure } from '../model/mnx.ts';
 import type { DocumentViewer } from './DocumentViewer.ts';
 import { focusWithin, isTextEntry, realTarget } from './keyScope.ts';
-import { selectionContextFor } from './editorSelection.ts';
+import { enclosureFor, selectionContextFor } from './editorSelection.ts';
+import { buildInspectorView } from './inspectorRows.ts';
+import { INSPECTOR_REFUSAL, fireFromInspector, inspectorLineIntent, mirrorOverlayAt } from './inspectorMount.ts';
+import type { OverlayAnchor } from './overlayPlacement.ts';
+import type { RungInspector } from './RungInspector.ts';
+import type { LyricTextEditor } from './LyricTextEditor.ts';
+import './RungInspector.ts';
+import './LyricTextEditor.ts';
+import './EditorSurfaces.ts';
 import type { SelectionContext } from './mnxContext.ts';
 
 export interface EditorBindingOptions {
@@ -51,6 +68,21 @@ export interface EditorBindingOptions {
   readOnly?(): boolean;
   /** The cursor or the history moved: a host showing either (a key list, an undo button) redraws. */
   onState?(): void;
+  /**
+   * Somewhere to put the editor's surfaces: a positioned box over the score
+   * pane. Given one, Enter opens the rung inspector at the selection and
+   * Shift+L the lyric text editor. The box must be the offset parent the
+   * viewer's rects can be measured against — the host's score pane.
+   */
+  overlay?: HTMLElement;
+  /** What the inspector's top crumb calls the document. Asked when it opens. */
+  title?(): string;
+  /** A document to DRAW without it becoming the document — the lyric editor's live preview; null puts the real one back. */
+  onPreview?(document: MnxStructure | null): void;
+  /** Where cut and copied selections go. Without one the clipboard keys are unbound. */
+  clipboard?: SelectionClipboardStore;
+  /** What a copy, cut or paste did, or the precise sentence for why it did not. */
+  onNotice?(notice: ClipboardNotice): void;
   /** The viewer is showing some OTHER document (an older version, say): no cursor, no keys, until it is not. */
   suspended?(): boolean;
 }
@@ -83,18 +115,31 @@ const NAVIGATION = new Set<EditorIntent['type']>([
 ]);
 
 export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document: MnxStructure, options: EditorBindingOptions): EditorBinding {
+  const document_ = scope.ownerDocument;
   const session = new EditorSession(document, options.documentId ?? '');
   let shown = session.doc;
   let cursorHidden = false;
   let pendingFret: number | null = null;
   let disposed = false;
+  /** A footprint lit without moving the session: the lyric editor's caret. */
+  let preview: { enclosure: ReturnType<typeof enclosureFor>; noteIds: string[] } | null = null;
+  let anchor: OverlayAnchor | null = null;
+  let paneWidth = 0;
+  let inspector: RungInspector | null = null;
+  let inspectorError: string | null = null;
+  let lyrics: LyricTextEditor | null = null;
+  const surfaces = options.overlay ? options.overlay.appendChild(document_.createElement('mnx-editor-surfaces')) : null;
 
   const suspended = () => options.suspended?.() ?? false;
   const draw = () => {
     if (disposed) return;
-    viewer.selection = suspended() ? NO_SELECTION : selectionContextFor(session, { cursorHidden, pendingFret });
-    // A cursor drawn while the keys go elsewhere is a lie about who owns the keyboard.
-    viewer.selectionInactive = !focusWithin(scope);
+    viewer.selection = suspended() ? NO_SELECTION : selectionContextFor(session, { cursorHidden, pendingFret, preview });
+    // A cursor drawn while the keys go elsewhere is a lie about who owns the keyboard. The inspector is ours too.
+    viewer.selectionInactive = !(focusWithin(scope) || (surfaces !== null && focusWithin(surfaces)));
+    if (inspector) {
+      const view = buildInspectorView(options.title?.() ?? '', session, cursorHidden);
+      Object.assign(inspector, { crumbs: view.crumbs, pills: view.pills, words: view.words, secondary: view.secondary, note: view.note, error: inspectorError, anchor });
+    }
     options.onState?.();
   };
   /** After anything that may have moved the session: report a new document, then redraw. */
@@ -109,6 +154,95 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     cursorHidden = false;
     settle();
     return handled;
+  };
+
+  // ── the surfaces: the rung inspector and the lyric text editor ───────────
+  const closeInspector = (refocus = true) => {
+    if (!inspector) return;
+    inspector.remove(); inspector = null; inspectorError = null;
+    if (refocus) scope.focus();
+    draw();
+  };
+  /** An intent FROM the inspector: through the same funnel as a key, and the ladder put back on its rung. */
+  const fromInspector = (intent: EditorIntent) => {
+    if (disposed || suspended() || (readOnly() && !NAVIGATION.has(intent.type))) { inspectorError = 'This piece is read-only here.'; draw(); return; }
+    tabDigits.flush();
+    cursorHidden = false;
+    inspectorError = fireFromInspector(session, intent) ? null : INSPECTOR_REFUSAL;
+    settle();
+  };
+  const openInspector = () => {
+    if (!surfaces || inspector || cursorHidden || suspended()) return;
+    closeLyrics(false);
+    followProjection();
+    const el = document_.createElement('mnx-rung-inspector');
+    el.mirrored = anchor ? mirrorOverlayAt(anchor, paneWidth) : false;
+    el.addEventListener('inspector-level', e => fromInspector({ type: (e as CustomEvent<{ direction: string }>).detail.direction === 'relax' ? 'relaxSelection' : 'tightenSelection' }));
+    el.addEventListener('inspector-step', e => fromInspector({ type: (e as CustomEvent<{ direction: string }>).detail.direction === 'next' ? 'nextPosition' : 'prevPosition' }));
+    el.addEventListener('inspector-extend', e => fromInspector({ type: 'extendSelection', direction: (e as CustomEvent<{ direction: 'previous' | 'next' }>).detail.direction }));
+    el.addEventListener('inspector-goto', e => fromInspector((e as CustomEvent<{ intent: EditorIntent }>).detail.intent));
+    el.addEventListener('inspector-remove', e => fromInspector((e as CustomEvent<{ intent: EditorIntent }>).detail.intent));
+    el.addEventListener('inspector-apply', e => {
+      const { word, text, key } = (e as CustomEvent<{ word: string | null; key?: string; text: string }>).detail;
+      const parsed = inspectorLineIntent(session, word, text, key);
+      if ('error' in parsed) { inspectorError = parsed.error; draw(); } else fromInspector(parsed.intent);
+    });
+    el.addEventListener('inspector-close', () => closeInspector());
+    inspector = el;
+    draw();
+    surfaces.append(el);
+  };
+  function closeLyrics(refocus = true) {
+    if (!lyrics) return;
+    lyrics.remove(); lyrics = null; preview = null;
+    options.onPreview?.(null);
+    if (refocus) scope.focus();
+    draw();
+  }
+  const openLyrics = () => {
+    if (!surfaces || lyrics || suspended() || readOnly()) return;
+    closeInspector(false);
+    const el = document_.createElement('mnx-lyric-text-editor');
+    const partIndex = session.cursor.partIndex ?? 0;
+    Object.assign(el, { doc: session.doc, partIndex, partLabel: session.doc.parts?.[partIndex]?.name ?? '', focusNoteKey: session.selectedNoteKeys[0] ?? '' });
+    // Clean parses draw live on a SCRATCH copy, through the very ops the session would use; nothing is edited until Apply.
+    el.addEventListener('lyric-editor-edits', e => {
+      const { edits } = (e as CustomEvent<{ edits: LyricPlanEdit[] }>).detail;
+      options.onPreview?.(edits.length === 0 ? null : lyricPlanOps(edits).reduce(applyOp, session.doc));
+    });
+    el.addEventListener('lyric-editor-preview', e => {
+      const noteIds = (e as CustomEvent<{ noteKeys: string[] }>).detail.noteKeys;
+      preview = noteIds.length ? { enclosure: enclosureFor('note'), noteIds } : null;
+      draw();
+    });
+    // The buffer's diff lands as ONE intent: the history records the syllables, never the keystrokes.
+    el.addEventListener('lyric-editor-apply', e => {
+      const { edits } = (e as CustomEvent<{ edits: LyricPlanEdit[] }>).detail;
+      closeLyrics();
+      dispatch({ type: 'applyLyricPlan', edits });
+    });
+    el.addEventListener('lyric-editor-close', () => closeLyrics());
+    lyrics = el;
+    surfaces.append(el);
+  };
+  /** The viewer's enclosure rect, in the overlay's own coordinates: where the inspector hangs. */
+  const onAnchored = (event: Event) => {
+    const rect = (event as CustomEvent<{ rect: DOMRect | null }>).detail.rect;
+    const box = options.overlay?.getBoundingClientRect();
+    anchor = rect && box ? { x: rect.left - box.left, y: rect.top - box.top, width: rect.width, height: rect.height } : null;
+    paneWidth = box?.width ?? 0;
+    if (inspector) inspector.anchor = anchor;
+  };
+  const clipboard = async (verb: 'copySelection' | 'cutSelection' | 'pasteSelection') => {
+    const store = options.clipboard;
+    if (!store || (verb !== 'copySelection' && readOnly())) return;
+    const notice = verb === 'copySelection' ? copySelectionNotice(await copySelectionToStore(session, store))
+      : verb === 'cutSelection' ? cutSelectionNotice(await cutSelectionToStore(session, store))
+      : pasteSelectionNotice(await pasteSelectionFromStore(session, store));
+    if (disposed) return;
+    options.onNotice?.(notice);
+    cursorHidden = false;
+    settle();
   };
 
   const tabDigits = new TabDigitResolver(
@@ -157,11 +291,21 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     if (shell === 'abandonPending' || shell === 'commitPending') {
       if (tabDigits.pending !== null) { event.preventDefault(); if (shell === 'commitPending') tabDigits.flush(); else { tabDigits.cancel(); pendingFret = null; draw(); } return; }
       if (shell === 'abandonPending' && !cursorHidden) { event.preventDefault(); cursorHidden = true; draw(); }
-      return; // Enter with nothing pending opens the rung inspector — slice 3.
+      // Enter with nothing pending is the inspector's door — last in the walk, so a half-typed fret never opens one.
+      else if (shell === 'commitPending' && surfaces && !cursorHidden) { event.preventDefault(); openInspector(); }
+      return;
+    }
+    if (shell === 'lyricTextEditor' && surfaces) { event.preventDefault(); tabDigits.flush(); openLyrics(); return; }
+    if ((shell === 'copySelection' || shell === 'cutSelection' || shell === 'pasteSelection') && options.clipboard) {
+      // A live TEXT selection means the person is addressing the prose, not the score.
+      const text = document_.getSelection();
+      if (shell !== 'pasteSelection' && text && !text.isCollapsed) return;
+      event.preventDefault(); tabDigits.flush(); void clipboard(shell);
+      return;
     }
     // Any other key ends the fret window first, so "1 then →" is fret 1, not a lost digit.
     if (action || shell) tabDigits.flush();
-    if (!action) return; // the clipboard, the lyric editor and the palette are not mounted here yet
+    if (!action) return; // the command palette is the workbench's own
     event.preventDefault();
     followProjection();
     let intent: EditorIntent = action;
@@ -177,6 +321,9 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
   scope.addEventListener('keydown', onKeyDown);
   scope.addEventListener('focusin', onFocusChange);
   scope.addEventListener('focusout', onFocusChange);
+  surfaces?.addEventListener('focusin', onFocusChange);
+  surfaces?.addEventListener('focusout', onFocusChange);
+  viewer.addEventListener('selection-anchored', onAnchored);
   followProjection();
   draw();
 
@@ -188,12 +335,15 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     handleIntent: intent => { tabDigits.flush(); return dispatch(intent); },
     undo: () => { tabDigits.flush(); return dispatch({ type: 'undo' }); },
     redo: () => { tabDigits.flush(); return dispatch({ type: 'redo' }); },
-    refresh: () => { followProjection(); draw(); },
+    refresh: () => { if (suspended()) { closeInspector(false); closeLyrics(false); } else if (readOnly()) closeLyrics(false); followProjection(); draw(); },
     keys: () => {
+      const mounted = (shell: ReturnType<typeof resolveShellAction>) => shell === 'abandonPending'
+        || (surfaces !== null && (shell === 'commitPending' || shell === 'lyricTextEditor'))
+        || (!!options.clipboard && (shell === 'copySelection' || shell === 'cutSelection' || shell === 'pasteSelection'));
       const active = layers(), level = session.selectionLevel, projection = session.projection;
       const tabPane = active.includes(TAB_DIGIT_LAYER);
       const bound = (doc: (typeof KEY_DOCS)[number]) => doc.strokes.some(stroke =>
-        resolveKeyAction(stroke, active) !== null || resolveShellAction(stroke) === 'abandonPending');
+        resolveKeyAction(stroke, active) !== null || mounted(resolveShellAction(stroke)));
       return KEY_GROUP_LABELS.map(([group, label]) => ({ label, rows: KEY_DOCS
         .filter(doc => doc.group === group && bound(doc) && !(doc.requires === 'tabPane' && !tabPane) && !(doc.requires === 'notationProjection' && projection !== 'notation'))
         .map(doc => ({ keys: doc.keys, meaning: doc.meaning[level] ?? doc.meaning.all ?? '' })).filter(row => row.meaning) }))
@@ -205,6 +355,10 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
       scope.removeEventListener('keydown', onKeyDown);
       scope.removeEventListener('focusin', onFocusChange);
       scope.removeEventListener('focusout', onFocusChange);
+      viewer.removeEventListener('selection-anchored', onAnchored);
+      inspector = null; lyrics = null;
+      surfaces?.remove();
+      options.onPreview?.(null);
       viewer.selection = NO_SELECTION;
     }
   };

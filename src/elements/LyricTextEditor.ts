@@ -15,7 +15,7 @@
 // channel via the lyric-editor-preview event.
 import { LitElement, html, css, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { designTokens, sharedChrome, scrollbars } from '../elements/tokens.ts';
+import { designTokens, sharedChrome, scrollbars } from './tokens.ts';
 import type { MnxStructure } from '../model/mnx.ts';
 import {
   lyricEventWalk,
