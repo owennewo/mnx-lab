@@ -95,7 +95,7 @@ that slice still adds what Soundslice exported, and moves neither the pointer no
 derived tags.
 
 **Going back to a version is a pointer move** (`PUT /api/library/pieces/:id/canonical`,
-[studio-piece-lifecycle](../roadmap/inprogress/studio-piece-lifecycle.md)): no rendition is
+[studio-piece-lifecycle](../roadmap/complete/studio-piece-lifecycle.md)): no rendition is
 written, the version left behind is still there, and undoing the revert is another revert.
 Any `original`, `export` or `edit` of the piece can be made current; the next checkpoint is
 `derived_from` wherever the pointer is, so the lineage branches rather than rewrites. Like a

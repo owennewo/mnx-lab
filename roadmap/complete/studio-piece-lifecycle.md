@@ -1,8 +1,8 @@
 # Living with pieces
 
-> **Status: built 2026-09-17. Needs migration `0005_piece_lifecycle.sql` applied before it is
+> **Status: complete 2026-09-17. Needs migration `0005_piece_lifecycle.sql` applied before it is
 > deployed** (`npx wrangler d1 migrations apply LIBRARY_DB --remote`). Item 5 of the
-> [studio authoring campaign](studio-campaign-authoring.md) and bound by its contract.
+> [studio authoring campaign](../inprogress/studio-campaign-authoring.md) and bound by its contract.
 > Implementation loop. No golden moved; no verification debt.
 
 ## Why

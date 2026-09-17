@@ -241,7 +241,7 @@ describe('the chip leads with the risk, then the freshness', () => {
 });
 
 
-// roadmap/inprogress/studio-piece-lifecycle.md: the version list is a reading of rows that already exist.
+// roadmap/complete/studio-piece-lifecycle.md: the version list is a reading of rows that already exist.
 describe('a piece\'s versions', async () => {
   const { pieceVersions } = await import('../../src/storage/versions.ts');
   const row = (id: string, role: string, created_at: string, provenance: unknown = null, producer = 'studio') =>

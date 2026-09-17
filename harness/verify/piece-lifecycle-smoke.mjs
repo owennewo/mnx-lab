@@ -1,5 +1,5 @@
 // A piece's life in a real browser against the local Worker/D1/R2
-// (roadmap/inprogress/studio-piece-lifecycle.md). Same preconditions as
+// (roadmap/complete/studio-piece-lifecycle.md). Same preconditions as
 // studio-smoke.mjs: local auth (docs/library-access.md → Local development) and
 // wrangler dev serving dist/client on LIBRARY_LOCAL_ORIGIN, migrations applied.
 //

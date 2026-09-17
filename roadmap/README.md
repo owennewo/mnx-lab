@@ -168,15 +168,6 @@ back up to `proposed/` the moment it is.
   out of date* in the Source sheet when the bars have moved. Owed by a person, inherited
   from [studio-sync-bar](inprogress/studio-sync-bar.md): the click against a real YouTube
   clock, and the sync bar on touch.
-- **[studio-piece-lifecycle.md](inprogress/studio-piece-lifecycle.md)** — **built 2026-09-17;
-  apply migration `0005_piece_lifecycle.sql` before deploying**,
-  [studio authoring campaign](inprogress/studio-campaign-authoring.md) item 5: soft delete
-  with the library's undo and a `#/deleted` page (nothing is ever removed; an ingest cannot
-  revive a deleted slice); the versions the service already kept, listed, viewed without a
-  write and made current by a pointer move; and **defect reports** — a lossy save keeps the
-  document it was exported from as an `evidence` rendition the operator pulls with
-  `npm run defects:library`. Its browser smoke caught a bug in item 3's tag fallback, now an
-  explicit `kept: true` for what only the Soundslice sidecar knows.
 - **[studio-campaign-authoring.md](inprogress/studio-campaign-authoring.md)** — **campaign**,
   opened 2026-09-17, **items 1–5 built the same day** (4 owes two hands-on checks; 5 needs migration 0005 before deploy): studio stops being read-only. Priority flow **new piece
   → YouTube → sync**, working before any note editing exists; editing last. Opens on the
@@ -504,6 +495,15 @@ back up to `proposed/` the moment it is.
 
 ### complete/
 
+- **[studio-piece-lifecycle.md](complete/studio-piece-lifecycle.md)** — **complete 2026-09-17;
+  apply migration `0005_piece_lifecycle.sql` before deploying**,
+  [studio authoring campaign](inprogress/studio-campaign-authoring.md) item 5: soft delete
+  with the library's undo and a `#/deleted` page (nothing is ever removed; an ingest cannot
+  revive a deleted slice); the versions the service already kept, listed, viewed without a
+  write and made current by a pointer move; and **defect reports** — a lossy save keeps the
+  document it was exported from as an `evidence` rendition the operator pulls with
+  `npm run defects:library`. Its browser smoke caught a bug in item 3's tag fallback, now an
+  explicit `kept: true` for what only the Soundslice sidecar knows.
 - **[studio-save-pipeline.md](complete/studio-save-pipeline.md)** — **complete 2026-09-17**,
   [studio authoring campaign](inprogress/studio-campaign-authoring.md) item 3: studio edits,
   and nobody is asked to save. A `setWork` op and the Details sheet (the document's own

@@ -8,7 +8,7 @@
 //                      #/?tag=list:80s&sort=title&q=words, so a way back returns to it
 //   #/piece/<id>       one piece, viewer + player filling the viewport
 //   #/new              make a piece (roadmap/complete/studio-piece-create.md)
-//   #/deleted          what was deleted, restorable (roadmap/inprogress/studio-piece-lifecycle.md)
+//   #/deleted          what was deleted, restorable (roadmap/complete/studio-piece-lifecycle.md)
 //   #/not-permitted    Access admitted the address, D1 did not
 import { LitElement, css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';

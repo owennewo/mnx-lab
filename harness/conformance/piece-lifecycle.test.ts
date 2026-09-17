@@ -1,5 +1,5 @@
 // Implementation loop: a piece's life in Studio, over the real routes on local D1/R2
-// (roadmap/inprogress/studio-piece-lifecycle.md, studio authoring campaign item 5):
+// (roadmap/complete/studio-piece-lifecycle.md, studio authoring campaign item 5):
 // deleting that removes nothing, going back to a version by moving the pointer,
 // and the defect report a lossy save leaves for the operator. The tests make dozens
 // of requests each through Miniflare, so they are given room for a loaded full run.
