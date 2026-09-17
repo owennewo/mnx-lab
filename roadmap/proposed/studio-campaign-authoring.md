@@ -27,7 +27,7 @@ save reports what did not survive, and an unexplained loss is a converter defect
 ready-made fixture.
 
 Not in scope: score-file upload as a creation path (rare; addable later as a second source
-kind without redesign), a server-side journal, multi-writer sync (the op-log engine of
+kind without redesign), a server-side recovery record, multi-writer sync (the op-log engine of
 `docs/studio-storage.md` → *When the Durable Object arrives*), sharing, AI editing in
 studio, layout authoring (system breaks, `scores[]`), thinning of automatic versions,
 public sign-up.
@@ -100,7 +100,8 @@ public sign-up.
    amended — there is no replaceable draft blob.
 3. **No save is silent about loss.** Every checkpoint runs export → re-import → compare
    against the in-memory document, in a worker, discounting only `_x.mnxLab.encoding` and
-   note-id spelling (ids compare by resolution). The verdict is recorded in the rendition's
+   the spelling of identities — **every** id kind, compared by what it resolves to (item 1
+   owns the rule). The verdict is recorded in the rendition's
    provenance with the exporter's warnings. The in-memory document is **kept**, never
    replaced by the round-tripped one; what will not persist is marked, not removed.
 4. **Every round-trip difference must be explained by a warning.** A difference with a
@@ -110,22 +111,41 @@ public sign-up.
    the ops since the last clean save) — a ready-made converter fixture. Until warnings are
    structured (`{code, where}`), the verdict is `clean | differs` and classification is by
    the committed register (item 1).
-5. **The journal is disposable, local and build-stamped.** Between checkpoints, committed
-   ops are written through to IndexedDB with a disposable MNX snapshot, stamped with the
-   base rendition's sha256 and the build id, and cleared on a successful checkpoint.
-   Recovery is *load the `.gp`, import, replay* — sound because import and `applyOp` are
-   deterministic, and single-writer linear replay needs no rebase. The journal format is
-   never versioned or migrated: a mismatched journal is tried, verified op by op, and the
-   user is told how far it got. Nothing outside the document may ever hold a note id —
-   ids change on every load.
+5. **The recovery record is the live document, not a replay.** *(Revised 2026-09-17 after
+   review — log entry 2.)* While a piece is dirty, the **live in-memory document** is
+   written through to IndexedDB (debounced ~1 s, and on `visibilitychange` → hidden), beside
+   the sha256 and revision of the checkpoint it was last saved as, the build id, and whether
+   it is dirty. **Recovery loads that snapshot and nothing else**: no re-import, no replay.
+   That is the only base that is exact, because a checkpoint does *not* leave the live
+   document equal to its own re-import — the importer regenerates note (`n…`), event (`e…`)
+   and part (`P…`) ids, and a lossy save differs in structure too — so ops recorded after a
+   checkpoint address a document the `.gp` cannot reproduce. It also makes undo a non-issue:
+   `EditHistory.undo()` restores a snapshot and emits no op, so an op list cannot represent
+   *edit → checkpoint → undo*, while the live document simply is the undone state. Edits
+   made while a checkpoint is in flight are covered the same way: the checkpoint captures
+   one immutable document (`applyOp` is pure) and the record keeps following the live one.
+   Dirty means *the live document is not the document last checkpointed* (by reference in
+   memory; the flag is persisted), so undoing back to the saved state is clean again.
+   The record is deleted when the piece is clean. It is disposable and never migrated: it
+   opens through the same upgrade path as any `.mnx.json`, and one that will not open is
+   offered as a download beside the last checkpoint rather than repaired. A recovered
+   record whose base checkpoint is no longer the server's canonical rendition goes to
+   clause 8's conflict prompt. **Recovery restores the document, not the undo history.**
+   **Ops are evidence, not the recovery path**: the history events since the last clean
+   checkpoint (`apply` / `undo` / `redo`, which is the shape a log must have — not a bare
+   op list) ride along for the defect report and the chip's count. They legitimately carry
+   note ids and `noteKey`s (`setTechnique`, `setSyllable`) because they sit beside the
+   document they address; what may never hold a note id is anything **durable or
+   server-side** — ids change on every load.
 6. **Hybrid autosave; nobody is asked to save.** Checkpoints fire on idle (~30 s), at a
    ceiling during continuous editing (~5 min), on `visibilitychange` → hidden, `pagehide`
-   and leaving the piece, at the journal's size cap, around structural ops (bars, repeats,
-   parts), and on a click. **Save version…** is the same checkpoint, named, showing the
+   and leaving the piece, around structural ops (bars, repeats, parts), and on a click. **Save version…** is the same checkpoint, named, showing the
    full round-trip report. Renditions are marked automatic or named from day one so a later
    thinning policy has something to key on.
-7. **One save-state chip, leading with risk.** It counts **undo steps** not yet
-   checkpointed (a paste is one edit), then the age of the last checkpoint:
+7. **One save-state chip, leading with risk.** It counts **history events** since the last
+   checkpoint — an undo step each, so a paste is one edit, and an undo or redo counts as a
+   change too — and reads zero whenever the live document *is* the checkpointed one (clause
+   5's definition of dirty), then the age of the last checkpoint:
    `Saved · 2 min ago` / `12 edits unsaved · last saved 4 min ago` / `Saving…` /
    `Saved · 2 items won't persist` / `Not saved · 31 edits on this device only · retrying` /
    `Recovered 9 edits from this device`. Age ticks coarsely. Sync and tag saves share it.
@@ -153,8 +173,9 @@ public sign-up.
     New routes are browser-authenticated behind Access with the existing same-origin and
     content-type guards, and size-capped as ingest is.
 12. **Boundaries open deliberately, one at a time.** `apps/studio → src/edit` opens at
-    item 3 (the first edit surface) — step 1 of the promotion review, taken early because
-    `applyOp` and `EditHistory` are DOM-free. `elements → edit` opens at item 7.
+    item 2 — the New piece form already needs `setupGrammar` and construct-trace replay
+    through `applyOp` — which is step 1 of the promotion review, taken early because
+    everything it reaches is DOM-free. `elements → edit` opens at item 7.
     `elements → assist` stays closed: the AI palette and model picker stay in the workbench.
 13. **Write paths get tests.** The Worker and UI have none by convention, but create and
     checkpoint are the first write paths for score content: harness conformance tests beside
@@ -168,14 +189,17 @@ public sign-up.
 ## The index
 
 Ordered by dependency; each item is a normal proposal doc **written when it is picked up,
-not before**. Item 1 has no UI and can run in parallel with 2–4. Items 2–4 deliver the
-priority flow; 5–6 make it durable to live with; 7 is the long one.
+not before**. **Landing order is not development order:** item 1 has no UI and can be
+*developed* alongside item 2, but **item 3 cannot land before item 1** — it consumes the
+comparator and the register's answer on which metadata fields persist. Item 4 depends on 2
+only. Items 2–4 deliver the priority flow; 5–6 make it durable to live with; 7 is the long
+one.
 
 | # | Item | Status | Summary |
 | --- | --- | --- | --- |
-| 1 | `core-roundtrip-register` | proposed | **The comparator and the baseline loss register.** A pure module in `src/model/` — canonicalise (strip `encoding`, rename note ids in traversal order with targets, promoting `normalizeIds` out of the converter's test helpers), then deep-diff to JSON paths collapsed by path shape with counts. Shared by the harness, `importers/` and studio; format-agnostic so MusicXML round trips get it later. A committed register under `harness/fixtures/` covers MNX → `.gp` → MNX over the lab corpus and `.gp` → MNX → `.gp` → MNX over the library pieces; a test fails when it changes and **git diff is the review** (the `update:edit-traces` mechanism). The register is both the converter backlog and the list of things the editor must flag as not persisting. Verdict v1 is `clean \| differs` beside the warnings; structured warnings (`{code, where}`) and a computed explained/unexplained verdict are this item's stated follow-up, not its gate. |
-| 2 | `studio-piece-create` | proposed | **A piece made in studio.** `POST /api/library/pieces` (browser-authenticated, `expected_revision: null`, reusing `writePiece`) with `source_kind: 'studio'` and a generated id; `createPiece` on `LibraryClient`. A **New piece** form — title, artist, tuning (preset, custom through the existing `setupGrammar`, or none = notation only — no instrument is assumed), capo, time signature, key, bar count — that replays a construct trace from `{}`, exports GP7 and stores it as the piece's first rendition. Lands on the piece page with the Source sheet one tap away, and makes the *add a recording to see the sync bar* step obvious (the toggle is hidden on the synth). Amends the three docs contract clause 1 reverses. Conformance tests for the route. |
-| 3 | `studio-save-pipeline` | proposed | **The save pipeline, proven on the smallest edit surface.** Opens `apps/studio → src/edit`. A `setWork` op (merge; an undefined field removes it) and a **Details** sheet offering the fields the Guitar Pro score header can hold — expected: title, subtitle, artist, album, composer, lyricist, transcriber, copyright, notes; item 1's register confirms. Then everything in contract clauses 2–9: `POST /pieces/:id/renditions` (bytes, `expected_revision`, `derived_from`, provenance with verdict/warnings/named/build, derived tags; pointer moved atomically), export + round-trip check moved into a worker and **measured on Vestapol**, the IndexedDB journal and recovery, checkpoint triggers, the save-state chip and **Save version…**, the single write queue, the Web Lock, the derived-tag projection promoted into `src/model/` and shared with the ingest tool. Import `warnings` get a quiet *conversion notes (n)* entry on the piece page — displayed, not stored. Conformance tests and a smoke script. |
+| 1 | `core-roundtrip-register` | proposed | **The comparator and the baseline loss register.** A pure module in `src/model/` — canonicalise, then deep-diff to JSON paths collapsed by path shape with counts. **Canonicalisation covers every identity, not only notes**: the importer regenerates part (`P…`), event (`e…` — given only when a slur targets the event) and note (`n…`) ids, and the converter's test helper `normalizeIds` renames note ids, ties, technique targets and arpeggio spans only, so a musically unchanged slur or beam would read as a defect. The rule: strip `encoding`; per id class, **rename referenced ids as a bijection in traversal order and rewrite every reference through it; drop ids nothing references** (an id matters only through what points at it, and documents built by ops may carry none); leave an unresolvable reference as spelled, so a dangling or crossed target still fails. The inventory of id-bearing and id-referencing fields is **derived from the schemas** (`id`, `id-list`, `id-pair` in `spec/mnx-schema.json`, plus the `_x.mnxLab` note-id references), with a test that goes red when a new one appears. **Proved before it judges anything**: equivalent documents with deliberately different and shuffled ids compare clean; crossed, dangling and retargeted references do not. Shared by the harness, `importers/` and studio; format-agnostic so MusicXML round trips get it later. A committed register under `harness/fixtures/` covers MNX → `.gp` → MNX over the lab corpus and `.gp` → MNX → `.gp` → MNX over the library pieces; a test fails when it changes and **git diff is the review** (the `update:edit-traces` mechanism). The register is both the converter backlog and the list of things the editor must flag as not persisting. Verdict v1 is `clean \| differs` beside the warnings; structured warnings (`{code, where}`) and a computed explained/unexplained verdict are this item's stated follow-up, not its gate. |
+| 2 | `studio-piece-create` | proposed | **A piece made in studio.** Opens `apps/studio → src/edit` (clause 12). `POST /api/library/pieces` (browser-authenticated, `expected_revision: null`, reusing `writePiece`) with `source_kind: 'studio'` and a generated id; `createPiece` on `LibraryClient`. A **New piece** form — title, artist, tuning (preset, custom through the existing `setupGrammar`, or none = notation only — no instrument is assumed), capo, time signature, key, bar count — that replays a construct trace from `{}`, exports GP7 and stores it as the piece's first rendition. Lands on the piece page with the Source sheet one tap away, and makes the *add a recording to see the sync bar* step obvious (the toggle is hidden on the synth). Amends the three docs contract clause 1 reverses. Conformance tests for the route. |
+| 3 | `studio-save-pipeline` | proposed | **The save pipeline, proven on the smallest edit surface. Lands after item 1.** A `setWork` op (merge; an undefined field removes it) and a **Details** sheet offering the fields the Guitar Pro score header can hold — expected: title, subtitle, artist, album, composer, lyricist, transcriber, copyright, notes; item 1's register confirms. Then everything in contract clauses 2–9: `POST /pieces/:id/renditions` (bytes, `expected_revision`, `derived_from`, provenance with verdict/warnings/named/build, derived tags; pointer moved atomically), export + round-trip check moved into a worker and **measured on Vestapol**, the IndexedDB recovery record (clause 5), checkpoint triggers, the save-state chip and **Save version…**, the single write queue, the Web Lock, the derived-tag projection promoted into `src/model/` and shared with the ingest tool. Import `warnings` get a quiet *conversion notes (n)* entry on the piece page — displayed, not stored. Conformance tests and a smoke script. **Recovery acceptance tests, named because each is a way the first design was wrong:** *edit → checkpoint → undo → crash* recovers the undone state; *checkpoint → more edits → crash* recovers a document byte-identical to the live one; edits made **while a checkpoint is in flight** survive and stay counted unsaved; undo back to the checkpointed state reads clean; a record written by another build opens or is offered for download, never half-applied; a record whose base is no longer canonical reaches the conflict prompt. |
 | 4 | `studio-sync-rederive` | proposed | **Sync first, bars later.** Contract clause 10: derive tuples from segments and the current bars on load and on bar-structure change (the derivation already lives in `src/model/syncSegments.ts`; it must run outside a sync-bar commit), write refreshed tuples back at a checkpoint, and flag imported tuple-only syncs whose traversal changed. Closes the hands-on checks [studio-sync-bar](../inprogress/studio-sync-bar.md) still owes — the click against a real YouTube clock, and the bar on touch — on a piece made by item 2. |
 | 5 | `studio-piece-lifecycle` | proposed | **Living with pieces.** Soft delete (`deleted_at`; hidden from lists, R2 untouched — *never deletes* holds). A versions route listing a piece's renditions from `derived_from` / `created_at` with automatic-or-named and the round-trip verdict; open an older version; **revert** as a pointer move plus revision bump, no new rendition. Rename is a Details edit. An operator listing of unexplained round-trip verdicts that pulls their defect reports into converter fixtures. |
 | 6 | `core-sync-interchange` | proposed, optional | **sync.json as interchange.** *Export sync* (none exists): the dense Soundslice-compatible array as derived, or a sparse wrapper with anchors only at the cuts and a wrapper-level `interpolation: "beat"` — never a fifth tuple element, which breaks Soundslice compatibility and the decoder's arity check. The reader option for beat-linear interpolation is built only if sparse export is wanted. **Lifting an imported Soundslice sync into segments** (lossless = one segment per anchor interval, crowded; merged = tidy, discards measured timing) is a decision the item owns. Pick up when a second consumer of a sync appears, not before. |
@@ -190,10 +214,12 @@ priority flow; 5–6 make it durable to live with; 7 is the long one.
    against R2's free 10 GB, so it waits; when it comes it deletes rows, which the storage
    invariants do not allow today — a deliberate later change. The automatic/named mark
    (clause 6) is what it will key on: keep the original, every named version and the latest.
-4. **A server-side journal row** (`journal(piece_id, base_rendition_id, build, ops,
-   updated_at)`, opaque to the Worker, mutable under invariant 1). Add it only if item 3's
-   measurement says checkpoints must be rarer than ~a minute, or a dead tablet losing one
-   checkpoint interval turns out to matter.
+4. **A server-side recovery row** (one mutable row per piece, opaque to the Worker, mutable
+   under invariant 1). Add it only if item 3's measurement says checkpoints must be rarer
+   than ~a minute, or a dead tablet losing one checkpoint interval turns out to matter. By
+   clause 5 it cannot be a bare op list against the `.gp`: it is either the live-document
+   snapshot (hundreds of KB per write) or a base snapshot plus `apply`/`undo`/`redo` events —
+   the item that adds it chooses, and inherits item 3's recovery tests.
 5. **Where layout state lives** if item 1's register confirms `.gp` cannot hold system
    breaks and `scores[]`. Until then the studio editor does not offer layout authoring and
    display stays a per-browser preference.
@@ -207,11 +233,14 @@ priority flow; 5–6 make it durable to live with; 7 is the long one.
   save is permanent**: a later converter fix improves later saves but cannot recover what an
   earlier one dropped, which is why every checkpoint is kept and defect reports carry the
   pre-save document.
-- **Ops, not intents, in the journal.** Intents are relative to cursor and selection state
-  and change meaning with the keymap and grammar; ops are the pure, deterministic stream
-  `EditHistory` already retains. Most ops address by `measureIndex`, which makes them poor
-  for multi-writer rebase and perfectly good for single-writer replay against an identical
-  base — so the journal is safe exactly where the stage-3 op-log engine is not yet.
+- **Ops, not intents, as the recorded evidence — and neither as the recovery path.**
+  Intents are relative to cursor and selection state and change meaning with the keymap and
+  grammar; ops are the pure, deterministic stream `EditHistory` already retains. But replay
+  is only as good as its base, and the one base a `.gp` checkpoint can reproduce is *not*
+  the live document (ids, and whatever the save lost). A snapshot of the live document is
+  exact, indifferent to undo, independent of importer determinism across builds, and
+  cheap locally — so it is the recovery record, and the ops are kept for the defect report
+  and the count.
 - **Why not a durable op log.** Note ids do not survive a `.gp` round trip, so a stored log
   would address ids that no longer exist on the next load; and a wire-and-storage op format
   owes a versioning discipline the ops (58, still growing) are not ready to pay. The
@@ -241,8 +270,8 @@ found the premise half wrong in a useful way: *add a recording* and *switch to t
 rail* were already built and persisted in studio — what was missing was any way for a piece
 to exist that did not come from the operator ingest. That reordered the work around
 creation and saving. The decisions above were taken in that conversation by the owner:
-`.gp` stays the stored format even for edits; hybrid autosave with a local-only journal to
-start; the chip shows edits and age; score-file upload is skipped because YouTube-first is
+`.gp` stays the stored format even for edits; hybrid autosave with a local-only recovery
+record to start; the chip shows edits and age; score-file upload is skipped because YouTube-first is
 the priority; segments stay the sync's truth and the stale-tuple gap is closed by
 re-derivation rather than by changing the stored format.
 
@@ -251,3 +280,35 @@ landing sync-bar follow-ups in `src/elements/Player.ts` and `apps/studio/src/Pie
 so item 3's write queue should be built as its own module and wired into `PiecePage` in one
 small, late commit; and `worker/api/library.ts` validates manifests against an `allowed`
 key list, so a new route is cleaner than widening ingest.
+
+### 2026-09-17 — entry 2: an outside review, four findings, all upheld
+
+Reviewed by another model before any code; each claim was checked against the tree and all
+four stood.
+
+1. **The replay base was wrong.** Clause 5 said recovery was *load the `.gp`, import,
+   replay*. But clause 3 keeps the live document after a save, and the importer regenerates
+   `n…`, `e…` and `P…` ids (`converters/guitarpro-mnx/src/gpif/toMnx.ts`), so after the
+   first checkpoint the live document is no longer what its own `.gp` re-imports to, and
+   later ops address ids the replay base does not have. Determinism helps only when the
+   starting document is identical. The old clause's "nothing outside the document may hold
+   a note id" also contradicted ops that carry `noteKey`.
+2. **Undo has no op.** `EditHistory.undo()` pops an entry and restores its `before`
+   snapshot; an append-only op list would resurrect an edit the user undid across a
+   checkpoint.
+
+   Both are answered by one change rather than by a remapping scheme: **the recovery record
+   is the live document**, ops become evidence. It removes replay, and with it every
+   dependency on ids, undo representation, in-flight timing and cross-build importer
+   determinism. The cost is a few hundred KB written locally per pause in editing, and that
+   recovery does not restore the undo stack. The lesson for later items: *a log is only as
+   good as its base, and the only exact base here is the thing itself.*
+3. **The comparator would have cried wolf.** Normalising note ids alone reports every
+   imported slur (event ids exist only as slur targets) and any part-id respelling as a
+   converter defect. Item 1 now specifies canonicalisation over every identity derived from
+   the schemas, drops unreferenced ids, and must prove equivalence on shuffled ids before it
+   judges a user's save.
+4. **The order contradicted itself.** Item 2 needs `src/edit` (`setupGrammar`, trace
+   replay), so the boundary opens there, not at item 3; and "item 1 runs in parallel with
+   2–4" blurred development with landing — item 3 lands after item 1.
+

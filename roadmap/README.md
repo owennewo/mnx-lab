@@ -55,7 +55,8 @@ proposals that name their campaign.
   rendition"); every save is a checkpoint and a new immutable rendition, so the server holds
   every version; **no save is silent about loss** — export → re-import → compare on every
   checkpoint, and a difference no exporter warning explains is a converter defect with a
-  ready-made fixture; hybrid autosave over a disposable, local, build-stamped ops journal;
+  ready-made fixture; hybrid autosave with a disposable local recovery record that **is the live document**
+  (ops ride along as evidence — revised after review, log entry 2);
   one save-state chip showing unsaved edits then age; **segments are the sync, tuples a
   cache** re-derived on load and on bar change. Eight items: the round-trip comparator and
   baseline loss register → create a piece → the save pipeline proven on a metadata sheet →
