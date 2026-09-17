@@ -7,7 +7,8 @@
 //   model → engine · audio · edit · corpus · storage · importers   (peers over the model;
 //                                             importers also reach converters/)
 //   edit  → assist                          (assist carries ops; edit owns them)
-//   engine · audio · model → elements       (the embeddable surface)
+//   engine · audio · edit · model → elements   (the embeddable surface; edit since the
+//                                             editor's mount was promoted — editorHost.ts)
 //   elements → workbench                    (workbench shell — leaf)
 //   workbench · elements → entries          (build faces)
 //   worker: model + assist only             (sibling ceiling; DOM-free)
@@ -55,10 +56,15 @@ module.exports = {
     layerRule('storage-over-model', 'src/storage', ['src/model']),
     layerRule('importers-over-model', 'src/importers', ['src/model']),
     layerRule('assist-carries-ops', 'src/assist', ['src/model', 'src/edit']),
+    // `src/edit` since 2026-09-17 (roadmap: core-editor-element-promotion): the
+    // editor's MOUNT lives in elements/ so both shells share one. The viewer and
+    // the player still import none of it — only editorHost.ts and
+    // editorSelection.ts do — so an embed that views pays nothing for the editor.
     layerRule('elements-embeddable-surface', 'src/elements', [
       'src/model',
       'src/engine',
-      'src/audio'
+      'src/audio',
+      'src/edit'
     ]),
     layerRule('workbench-is-a-leaf-consumer', 'src/workbench', [
       'src/model',

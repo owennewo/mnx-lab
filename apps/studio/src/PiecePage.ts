@@ -31,7 +31,10 @@ import { customElement, property, query, state } from 'lit/decorators.js';
 import { LibraryClient, LibraryRequestError, type LibrarySnapshot, type ProjectedTag } from '../../../src/storage/libraryClient.ts';
 import { documentTitle, documentArtist, type MnxDocument, type MnxStructure } from '../../../src/model/mnx.ts';
 import { derivedLibraryTags } from '../../../src/model/libraryTags.ts';
-import { EditHistory, type EditOp, type WorkChange } from '../../../src/edit/ops.ts';
+import type { WorkChange } from '../../../src/edit/ops.ts';
+import type { EditorIntent } from '../../../src/edit/intents.ts';
+import type { EditorBinding } from '../../../src/elements/editorHost.ts';
+import './KeysSheet.ts';
 import { SaveSession, StaleWriteError, type SaveState } from '../../../src/storage/saveSession.ts';
 import { indexedDbRecoveryStore } from '../../../src/storage/recoveryStore.ts';
 import { saveChip, savedAge } from '../../../src/storage/saveChip.ts';
@@ -70,7 +73,10 @@ const back = html`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" st
 /** Instruments: three faders, each knob at its own level. */
 const mixerGlyph = html`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4v5M6 13v7M12 4v11M12 19v1M18 4v1M18 9v11"></path><circle cx="6" cy="11" r="2"></circle><circle cx="12" cy="17" r="2"></circle><circle cx="18" cy="7" r="2"></circle></svg>`;
 const detailsGlyph = html`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h14v16H5zM9 9h6M9 13h6M9 17h3"></path></svg>`;
+const keysGlyph = html`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7h18v10H3zM7 11h.01M11 11h.01M15 11h.01M8 14h8"></path></svg>`;
 const saveGlyph = html`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 18a4 4 0 0 1-.5-7.97A6 6 0 0 1 18 9a4.5 4.5 0 0 1-.5 9z"></path></svg>`;
+/** The selection ladder's rungs, as a person would say them. */
+const RUNG_NAMES: Record<string, string> = { note: 'a note', event: 'a beat', voiceMeasure: 'a voice in a bar', partMeasure: 'a part’s bar', measure: 'a bar', document: 'the whole piece' };
 /** Unsaved edits, on this device only, until the next checkpoint. One store for every piece. */
 const recoveryStore = indexedDbRecoveryStore<MnxStructure>();
 const tagGlyph = html`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12V4h8l10 10-8 8z"></path><circle cx="7.5" cy="8.5" r="1.2" fill="currentColor" stroke="none"></circle></svg>`;
@@ -91,6 +97,7 @@ export class PiecePage extends LitElement {
   @state() private instrumentsOpen = false;
   @state() private detailsOpen = false;
   @state() private saveOpen = false;
+  @state() private keysOpen = false;
   /** The save session's state, for the chip; null until a piece with a stored score is open. */
   @state() private save: SaveState | null = null;
   /** The last checkpoint's losses in full; the state carries their shapes. */
@@ -134,7 +141,8 @@ export class PiecePage extends LitElement {
   private syncTimer: ReturnType<typeof setTimeout> | undefined;
   private syncSaving = false;
   // ── editing and saving (roadmap: studio-save-pipeline) ───────────────────
-  private history: EditHistory | null = null;
+  /** The editor's mount (src/elements/editorHost.ts), loaded only for a piece that can be edited: one history for notes and metadata alike. */
+  private editor: EditorBinding | null = null;
   private session: SaveSession<MnxStructure> | null = null;
   /** Once the document has been edited here, the heading reads the document, not the library's tags. */
   private touched = false;
@@ -300,6 +308,9 @@ export class PiecePage extends LitElement {
       fresh = true;
     }
     if (this.binding && this.doc && (fresh || changed.has('doc'))) this.present(this.doc);
+    // The pane, the lock or an older version on screen changed what the keys may do and where the cursor may show.
+    if (this.editor && (changed.has('view') || changed.has('viewing') || changed.has('readOnly')))
+      void this.viewer?.updateComplete.then(() => this.editor?.refresh());
   }
 
   private async load() {
@@ -313,7 +324,7 @@ export class PiecePage extends LitElement {
     this.doc = null;
     this.error = '';
     this.loading = true;
-    this.tagsOpen = false; this.recordingsOpen = false; this.sourceOpen = false; this.detailsOpen = false; this.saveOpen = false; this.selectedRecordingId = null; this.editingRecordingId = null; this.addingRecording = false;
+    this.tagsOpen = false; this.recordingsOpen = false; this.sourceOpen = false; this.detailsOpen = false; this.saveOpen = false; this.keysOpen = false; this.selectedRecordingId = null; this.editingRecordingId = null; this.addingRecording = false;
     ({ hidden: this.hiddenParts, mix: this.partMix } = readParts(this.pieceId));
     try {
       const readPair = () => Promise.all([
@@ -399,22 +410,34 @@ export class PiecePage extends LitElement {
     this.save = session.snapshot;
     this.losses = []; this.touched = false; this.viewing = null; this.reportedLosses.clear();
     let live = document;
-    const found = this.readOnly ? null : await session.recoverable().catch(() => null);
+    let found = this.readOnly ? null : await session.recoverable().catch(() => null);
     if (found) {
       const record = found.record.document as MnxStructure | undefined;
       if (record && typeof record === 'object' && record.mnx && Array.isArray(record.parts) && record.global) {
-        session.recover(found.record, found.stale);
         live = found.record.document; this.touched = true;
         if (found.stale) this.saveOpen = true;
       } else {
+        const unreadable = found; found = null;
         // Not something this build can open: hand it over as a file rather than guess at it.
-        this.download(new Blob([JSON.stringify(found.record.document, null, 2)], { type: 'application/json' }), `${pieceId}.recovered.json`);
+        this.download(new Blob([JSON.stringify(unreadable.record.document, null, 2)], { type: 'application/json' }), `${pieceId}.recovered.json`);
         await session.discardRecovery();
         this.error = 'Unsaved edits from this device could not be opened here, so they were downloaded as a file.';
       }
     }
-    this.history = new EditHistory(live);
-    return live === document ? null : live;
+    // The editor's mount is its own chunk: a piece that only plays never loads it. It copies the document it is
+    // given, so the save session is told which object IS the saved one (or the recovered one) from here on.
+    const { bindEditor } = await import('../../../src/elements/editorHost.ts');
+    if (this.session !== session) return null;
+    this.editor?.dispose();
+    const editor = bindEditor(this.viewer, this.viewer, live, {
+      documentId: '', onChange: doc => this.showDocument(doc),
+      onState: () => { if (this.keysOpen || this.detailsOpen) this.requestUpdate(); },
+      readOnly: () => this.readOnly, suspended: () => !!this.viewing
+    });
+    this.editor = editor;
+    if (found) session.recover({ ...found.record, document: editor.document }, found.stale);
+    else session.adopt(editor.document);
+    return editor.document;
   }
 
   /**
@@ -452,7 +475,8 @@ export class PiecePage extends LitElement {
   /** Leaving the piece: save what is unsaved, then let go. The record stays until that save lands. */
   private endSession() {
     const session = this.session;
-    this.session = null; this.history = null; this.save = null;
+    this.session = null; this.save = null;
+    this.editor?.dispose(); this.editor = null;
     if (session) void session.flush().finally(() => session.dispose());
     this.releaseLock?.(); this.releaseLock = null;
   }
@@ -483,12 +507,10 @@ export class PiecePage extends LitElement {
     this.doc = { ...this.doc, name: documentTitle(mnxJson) ?? this.doc.name, lastUpdated: Date.now(), mnxJson };
     this.session?.documentChanged(mnxJson);
   }
-  private applyEdit(op: EditOp) {
-    if (this.readOnly || this.viewing || !this.history) return;
-    this.showDocument(this.history.apply(op));
-  }
-  private undoEdit() { if (this.history?.canUndo && !this.readOnly && !this.viewing) this.showDocument(this.history.undo()); }
-  private redoEdit() { if (this.history?.canRedo && !this.readOnly && !this.viewing) this.showDocument(this.history.redo()); }
+  /** A sheet's edit goes through the same funnel as a key: the editor's session, which reports back through `showDocument`. */
+  private applyIntent(intent: EditorIntent) { this.editor?.handleIntent(intent); this.requestUpdate(); }
+  private undoEdit() { this.editor?.undo(); this.requestUpdate(); }
+  private redoEdit() { this.editor?.redo(); this.requestUpdate(); }
 
   // ── versions: look at one, go back to one ───────────────────────────────
   // The service keeps every save; the pointer names the current one. Looking at
@@ -580,7 +602,11 @@ export class PiecePage extends LitElement {
     // already says so, and the score shows either way.
     this.binding!.setDocument(doc);
     const { performance, writtenBarDurations } = this.player;
+    const shapeBefore = this.scoreShape;
     this.scoreShape = performance && writtenBarDurations ? performedShape(performance, writtenBarDurations) : '';
+    // A bar added or removed, a repeat, a meter: the edits a sync and a reader feel most. Save them at once
+    // rather than after the pause (studio authoring campaign, clause 6 — owed since the save pipeline).
+    if (shapeBefore && this.scoreShape !== shapeBefore && this.touched && !this.viewing && this.session?.dirty) void this.session.checkpoint();
     void this.stampImportedSyncs();
     this.requestUpdate();
   }
@@ -720,7 +746,8 @@ export class PiecePage extends LitElement {
 
   // ── the side panels: one at a time ──────────────────────────────────────
 
-  private openPanel(which: 'tags' | 'source' | 'instruments' | 'recording' | 'details' | 'save' | null) {
+  private openPanel(which: 'tags' | 'source' | 'instruments' | 'recording' | 'details' | 'save' | 'keys' | null) {
+    this.keysOpen = which === 'keys';
     this.detailsOpen = which === 'details';
     this.saveOpen = which === 'save';
     this.tagsOpen = which === 'tags';
@@ -822,6 +849,9 @@ export class PiecePage extends LitElement {
               ? html`<button slot="actions" type="button" aria-pressed=${this.detailsOpen} @click=${() => this.openPanel(this.detailsOpen ? null : 'details')}>
                   ${detailsGlyph}<span>Details</span>
                 </button>
+                <button slot="actions" type="button" aria-pressed=${this.keysOpen} @click=${() => this.openPanel(this.keysOpen ? null : 'keys')}>
+                  ${keysGlyph}<span>Keys</span>
+                </button>
                 <span slot="chips">
                   <button type="button" class=${`save ${chip!.tone}`} data-save=${this.save.status} aria-pressed=${this.saveOpen} @click=${() => this.openPanel(this.saveOpen ? null : 'save')}>
                     ${saveGlyph}<span>${this.readOnly ? 'Open in another tab · read only' : chip!.text}</span>
@@ -905,13 +935,20 @@ export class PiecePage extends LitElement {
               .readOnly=${this.readOnly || !!this.viewing}
               .readOnlyReason=${this.viewing ? 'This is an older version. Go back to the current one to edit, or make this one current.' : ''}
               .canDelete=${!!this.snapshot && !!this.session && !this.viewing}
-              .canUndo=${!!this.history?.canUndo}
-              .canRedo=${!!this.history?.canRedo}
-              @work-change=${(e: CustomEvent<WorkChange>) => this.applyEdit({ type: 'setWork', work: e.detail })}
+              .canUndo=${!!this.editor?.canUndo}
+              .canRedo=${!!this.editor?.canRedo}
+              @work-change=${(e: CustomEvent<WorkChange>) => this.applyIntent({ type: 'setWork', work: e.detail })}
               @undo=${() => this.undoEdit()}
               @redo=${() => this.redoEdit()}
               @piece-delete=${() => void this.deletePiece()}
               @close=${() => (this.detailsOpen = false)}></mnx-studio-details>`
+          : nothing}
+        ${this.keysOpen && this.editor
+          ? html`<mnx-studio-keys slot="side"
+              .groups=${this.editor.keys()}
+              .level=${RUNG_NAMES[this.editor.session.selectionLevel] ?? ''}
+              .readOnly=${this.readOnly || !!this.viewing}
+              @close=${() => (this.keysOpen = false)}></mnx-studio-keys>`
           : nothing}
         ${this.saveOpen && this.save
           ? html`<mnx-studio-save slot="side"

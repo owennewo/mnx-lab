@@ -135,7 +135,8 @@ model                                      (floor — imports nothing internal)
 model → engine · audio · edit · corpus · storage · importers   (peers over the model;
                                             importers also reach converters/)
 edit  → assist                             (assist carries ops; edit owns them)
-engine · audio · model → elements          (the embeddable surface)
+engine · audio · edit · model → elements   (the embeddable surface; the viewer and player
+                                            import no edit/ — only the editor's host binding)
 elements → workbench                       (workbench shell — leaf)
 workbench · elements → entries             (build faces)
 worker: model + assist only                (sibling ceiling; DOM-free)
@@ -147,7 +148,10 @@ anything two shells want is first *promoted* into `elements/` or below, a delibe
 reviewed move. `model`/`engine`/`audio` stay importable from Node — no DOM at module top
 level; `engine/headless.ts` is the guarantee and the harness's entry. Lit is load-bearing
 **only in `elements/`** (shadow DOM is the embeddability story); studio's framework is
-deliberately undecided.
+deliberately undecided. **The editor's mount is a host binding** — `bindEditor` in
+`src/elements/editorHost.ts`, beside `bindPlayback` — loaded by a shell behind a dynamic
+`import()`: the editing logic stays in `src/edit/`, and nothing the viewer or the player
+imports may reach it, so an embed that only views pays nothing for the editor.
 
 ### Build faces (one source tree)
 

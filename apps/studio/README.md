@@ -75,14 +75,15 @@ the one persistence a shell may own without a backend decision.
 a worker — promoted out of the workbench when the library stopped storing derived MNX) and,
 since 2026-09-17, `src/edit` — the DOM-free ops layer, opened when studio began making
 pieces (`#/new` builds a document through `applyOp`). It must not import `src/workbench/`
-or `src/assist/`; nothing may import `apps/studio/`. The editor's *mount* — keymap, cursor,
-inspector — still arrives through `elements/`, by promotion. `.dependency-cruiser.cjs` makes any of
+or `src/assist/`; nothing may import `apps/studio/`. The editor's *mount* arrives through
+`elements/`, by promotion: since 2026-09-17 the piece page binds
+`src/elements/editorHost.ts` (slice 1 — the keyboard's core) behind a dynamic `import()`. `.dependency-cruiser.cjs` makes any of
 those a red build. Anything both shells want is first *promoted* into `elements/` or
 below — a deliberate, reviewed move.
 
 ## Editing — the trigger this pulled
 
-[roadmap/proposed/core-editor-element-promotion.md](../../roadmap/proposed/core-editor-element-promotion.md)
+[roadmap/inprogress/core-editor-element-promotion.md](../../roadmap/inprogress/core-editor-element-promotion.md)
 was parked behind "a real second consumer asking for editing". Studio is that consumer.
 The [studio authoring campaign](../../roadmap/inprogress/studio-campaign-authoring.md)
 sequences it: pieces are made in studio first (`#/new`), then the save pipeline, then the

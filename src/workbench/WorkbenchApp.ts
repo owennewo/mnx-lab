@@ -20,7 +20,7 @@ import {
   DEFAULT_VIEW_PREFERENCE
 } from '../elements/displayDefaults.ts';
 import { resolveShellAction, strokeOf } from '../edit/keymap.ts';
-import { keyIsOurs } from './keyScope.ts';
+import { keyIsOurs } from '../elements/keyScope.ts';
 import type { EditorIntent } from '../edit/intents.ts';
 import { MemorySelectionClipboardStore } from '../edit/selectionClipboard.ts';
 import type { PaletteItem } from './CommandPalette.ts';

@@ -27,17 +27,11 @@ import { scenarioHref, objectsHref } from './WorkbenchApp.ts';
 import type { MnxDocument, MnxStructure } from '../model/mnx.ts';
 import { resolvePinnedErrors, type PinnedError } from '../model/pinnedErrors.ts';
 import type { DocumentViewer, ViewMode } from '../elements/DocumentViewer.ts';
-import type { EnclosureKind, SelectionContext, SelectionSpan } from '../elements/mnxContext.ts';
+import type { SelectionContext } from '../elements/mnxContext.ts';
 import { EditorSession, replayIntents } from '../edit/session.ts';
 import { elementKeys, runDestructWalk } from '../edit/destructWalk.ts';
 import { constructTraceByTarget, type ConstructTrace } from './constructTraces.ts';
-import {
-  type SelectionMember,
-  type SelectionLevel
-} from '../edit/selection.ts';
-import { measureSpans } from '../edit/cursor.ts';
-import { eventAtAddress } from '../edit/ops.ts';
-import { syntheticEventKey } from '../model/noteKeys.ts';
+import type { SelectionLevel } from '../edit/selection.ts';
 import type { EditorIntent } from '../edit/intents.ts';
 import type { SelectionClipboardStore } from '../edit/selectionClipboard.ts';
 import {
@@ -76,7 +70,8 @@ import {
   TUNING_PRESET_NAMES
 } from '../edit/setupGrammar.ts';
 import { buildOpRow } from './opRows.ts';
-import { editorHasKeyboard, keyIsOurs } from './keyScope.ts';
+import { editorHasKeyboard, keyIsOurs } from '../elements/keyScope.ts';
+import { enclosureFor, selectionContextFor } from '../elements/editorSelection.ts';
 import {
   OVERLAY_EDGE_GAP,
   OVERLAY_MIRROR_MARGIN,
@@ -286,135 +281,6 @@ function jsonInk(line: string) {
 
 /** How many object tags to show before collapsing the tail into a count. */
 const DEF_PREVIEW = 9;
-
-/** Ladder level → enclosure shape (roadmap/complete/core-selection-ladder.md).
- *  The mapping lives HERE so elements/ knows shapes, never editor levels. */
-const ENCLOSURE_BY_LEVEL: Record<SelectionLevel, EnclosureKind> = {
-  note: 'cell',
-  event: 'slice',
-  voiceMeasure: 'run',
-  partMeasure: 'panel',
-  measure: 'panel-wide',
-  document: 'frame'
-};
-
-/** Which rungs claim the section labels they enclose. Empty since the
- *  section rung retired (core-selection-range-grain.md); the channel stays
- *  for any future rung that owns a label strip. */
-const LIT_LABEL_LEVELS = new Set<SelectionLevel>();
-
-/** Translate editor membership into the deliberately smaller geometry
- * vocabulary accepted by `elements/`. Rests survive as onset-bearing moments;
- * empty voice/part/global bar copies survive as full-measure units. */
-/**
- * The keys of the selected events that are RESTS — the only ones that need
- * this channel, because every other event is lit through its notes.
- *
- * Real `event.id` first, exactly as notes prefer their own id; the synthetic
- * key otherwise, and the layout mints the same one from the same coordinates,
- * so the two sides meet without a shared table.
- */
-function selectedRestKeys(
-  doc: MnxStructure,
-  members: readonly SelectionMember[]
-): string[] {
-  const keys: string[] = [];
-  for (const member of members) {
-    if (member.kind !== 'note' && member.kind !== 'event') continue;
-    const event = eventAtAddress(doc, {
-      partIndex: member.partIndex,
-      staffIndex: member.staffIndex,
-      measureIndex: member.measureIndex,
-      voiceIndex: member.voiceIndex,
-      eventIndex: member.eventIndex,
-      ...(member.containerIndex === undefined ? {} : { containerIndex: member.containerIndex })
-    });
-    if (!event?.rest) continue;
-    keys.push(
-      event.id ??
-        syntheticEventKey({
-          partIndex: member.partIndex,
-          measureIndex: member.measureIndex,
-          staffIndex: member.staffIndex,
-          voiceIndex: member.voiceIndex,
-          eventIndex: member.eventIndex,
-          ...(member.containerIndex === undefined ? {} : { containerIndex: member.containerIndex })
-        })
-    );
-  }
-  return keys;
-}
-
-function presentationSpan(
-  doc: MnxStructure,
-  level: SelectionLevel,
-  members: readonly SelectionMember[]
-): SelectionSpan | null {
-  if (level === 'document') return null;
-  const spans = measureSpans(doc);
-  const coverage: SelectionSpan['coverage'] =
-    level === 'note' || level === 'event'
-      ? 'moment'
-      : level === 'voiceMeasure' || level === 'partMeasure'
-        ? 'staff-measure'
-        : 'measure';
-  const units: SelectionSpan['units'] = [];
-  const push = (
-    measureIndex: number,
-    partIndex?: number,
-    staffIndex?: number,
-    onset?: { num: number; den: number }
-  ) => {
-    const measure = spans[measureIndex] ?? { num: 1, den: 1 };
-    const raw = onset
-      ? (onset.num / onset.den) / Math.max(Number.EPSILON, measure.num / measure.den)
-      : undefined;
-    units.push({
-      measureIndex,
-      ...(partIndex === undefined ? {} : { partIndex }),
-      ...(staffIndex === undefined ? {} : { staffIndex }),
-      ...(raw === undefined ? {} : { position: Math.max(0, Math.min(1, raw)) })
-    });
-  };
-  for (const member of members) {
-    switch (member.kind) {
-      case 'note':
-      case 'event':
-        push(member.measureIndex, member.partIndex, member.staffIndex, member.onset);
-        break;
-      case 'voiceMeasure':
-        push(member.measureIndex, member.partIndex, member.staffIndex);
-        break;
-      case 'partMeasure':
-        // The whole part's bar: one unit per staff, so the enclosure's
-        // barline join merges them into ONE panel (the both-view precedent).
-        for (
-          let staff = 1;
-          staff <= Math.max(1, doc.parts?.[member.partIndex]?.staves ?? 1);
-          staff++
-        ) {
-          push(member.measureIndex, member.partIndex, staff);
-        }
-        break;
-      case 'measure':
-        push(member.measureIndex);
-        break;
-      case 'document':
-        break;
-    }
-  }
-  // Chords and coincident container members share one presentation anchor.
-  const seen = new Set<string>();
-  return {
-    coverage,
-    units: units.filter(unit => {
-      const key = [unit.measureIndex, unit.partIndex ?? '', unit.staffIndex ?? '', unit.position ?? ''].join(':');
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    })
-  };
-}
 
 @customElement('mnx-scenario-page')
 export class ScenarioPage extends LitElement {
@@ -2067,52 +1933,11 @@ export class ScenarioPage extends LitElement {
     this.refreshPassModel(session.doc);
     this.doc = { ...this.doc, mnxJson: session.doc };
     this.rawDocument = JSON.stringify(session.doc, null, 2);
-    const cursor = session.cursor;
-    const partIndex = cursor.partIndex ?? 0;
-    const staffIndex = cursor.staffIndex ?? 1;
-    const measureSpan = measureSpans(session.doc)[cursor.measureIndex] ?? { num: 1, den: 1 };
-    const rawPosition =
-      (cursor.onset.num / cursor.onset.den) /
-      Math.max(Number.EPSILON, measureSpan.num / measureSpan.den);
-    const activePart = session.doc.parts?.[partIndex];
-    const cursorGhost: NonNullable<SelectionContext['cursor']> = {
-      ...session.cursorContext(),
-      measureIndex: cursor.measureIndex,
-      partIndex,
-      staffIndex,
-      position: Math.max(0, Math.min(1, rawPosition)),
-      pendingFret: session.projection === 'tab' ? this.pendingFret : null,
-      ...(
-        activePart &&
-        (session.doc.global?.measures?.length ?? 0) === 0 &&
-        (activePart.measures?.length ?? 0) === 0
-          ? { structuralEmpty: 'part-measure' as const }
-          // The ghost bar past the end (core-rung-insert.md): the cursor is
-          // standing where the next bar would go, and the vacancy is drawn
-          // there instead of a cell in a bar that does not exist.
-          : session.pastEnd
-            ? { structuralEmpty: 'past-end' as const }
-            : {}
-      )
-    };
-    this.selection = {
-      activePartId: activePart?.id ?? null,
-      activeMeasureIndex: cursor.measureIndex,
-      activeVoiceIndex: null,
-      activeEventIndex: null,
-      selectedNoteIds: this.cursorHidden ? [] : session.selectedNoteKeys,
-      selectedEventIds: this.cursorHidden
-        ? []
-        : selectedRestKeys(session.doc, session.resolvedSelection.members),
-      primaryProjection: session.projection,
-      enclosure: this.cursorHidden ? null : ENCLOSURE_BY_LEVEL[session.selectionLevel],
-      litLabels: !this.cursorHidden && LIT_LABEL_LEVELS.has(session.selectionLevel),
-      span: this.cursorHidden
-        ? null
-        : presentationSpan(session.doc, session.selectionLevel, session.resolvedSelection.members),
-      cursor: this.cursorHidden ? null : cursorGhost,
+    this.selection = selectionContextFor(session, {
+      cursorHidden: this.cursorHidden,
+      pendingFret: this.pendingFret,
       preview: this.previewScope()
-    };
+    });
   }
 
   /** The tray's previewed scope as a drawable footprint: the rung's own note
@@ -2125,7 +1950,7 @@ export class ScenarioPage extends LitElement {
     // tray previews rungs with (one-surface item 6, phase 2).
     if (session && this.lyricEditorOpen)
       return this.lyricPreviewKeys.length > 0
-        ? { enclosure: ENCLOSURE_BY_LEVEL['note'], noteIds: this.lyricPreviewKeys }
+        ? { enclosure: enclosureFor('note'), noteIds: this.lyricPreviewKeys }
         : null;
     return null;
   }

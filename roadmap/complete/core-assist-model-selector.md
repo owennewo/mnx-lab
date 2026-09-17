@@ -318,7 +318,7 @@ answering a different question — so the fix is a filter at the surface
   measured on our own corpus, replacing reputation.
 - **The `elements/` promotion.** Gated on studio being real, which is the same
   gate — trigger 2, a real second consumer — that
-  [core-editor-element-promotion.md](../proposed/core-editor-element-promotion.md)
+  [core-editor-element-promotion.md](../inprogress/core-editor-element-promotion.md)
   already holds for the editor and the palette. The dialog travels with them
   rather than opening a second promotion conversation; the scoring core being
   pure, DOM-free and fetchless is what keeps that cheap whichever way the

@@ -134,6 +134,16 @@ export class SaveSession<D> {
     this.arm();
   }
 
+  /**
+   * The host holds the saved document under another identity — an editor copies
+   * what it is given — so THIS object is the checkpointed one from here on. Only
+   * while clean: adopting over unsaved edits would call them saved.
+   */
+  adopt(document: D): void {
+    if (this.dirty) throw new Error('Cannot adopt a document over unsaved edits.');
+    this.live = this.saved = document;
+  }
+
   async discardRecovery(): Promise<void> { await this.ports.recovery.clear(this.pieceId); }
 
   /** The document changed — an edit, an undo, a redo. One history event. */

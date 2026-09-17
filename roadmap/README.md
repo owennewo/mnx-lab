@@ -62,19 +62,7 @@ proposals that name their campaign.
   Contract clause 2 makes every item declare standard-object-vs-`_x.mnxLab` before code, so
   the "implemented as extension" cell feeds `spec/proposals/` instead of accumulating
   silently.
-- **[core-editor-element-promotion.md](proposed/core-editor-element-promotion.md)** — promoting the
-  editor's mount layer out of `workbench/` into `elements/`, making it consumable by the
-  embed face and studio. Split out of [core-editor-input-layer.md](complete/core-editor-input-layer.md)
-  when that closed. **Trigger 2 met 2026-09-17**: it is item 7 of the
-  [studio authoring campaign](inprogress/studio-campaign-authoring.md), sequenced last there.
-  Until then it was **deliberately parked** behind a two-part trigger — the intent
-  vocabulary stabilising AND a real second consumer asking for editing (a check, not a
-  debate) — with the costs of moving early recorded (API pressure on the public surface,
-  the shadow-DOM focus story coming due, embed bundle weight; testing is unchanged either
-  way). The promotion review's work list: the `elements/ → edit/` boundary change, the
-  element contract under [core-viewer-surface.md](complete/core-viewer-surface.md)'s layered rule,
-  focus story, code-splitting, and the palette's `elements → assist` question from
-  [core-editor-ai-prompt.md](proposed/low-priority/core-editor-ai-prompt.md).
+
 
 
 ### proposed/low-priority/
@@ -168,8 +156,21 @@ back up to `proposed/` the moment it is.
   out of date* in the Source sheet when the bars have moved. Owed by a person, inherited
   from [studio-sync-bar](inprogress/studio-sync-bar.md): the click against a real YouTube
   clock, and the sync bar on touch.
+- **[core-editor-element-promotion.md](inprogress/core-editor-element-promotion.md)** — **in
+  progress: slice 1 (keyboard only) built 2026-09-17**, [studio authoring
+  campaign](inprogress/studio-campaign-authoring.md) item 7. The editor's mount, promoted out
+  of the workbench as a plain-DOM host binding beside `bindPlayback` —
+  `bindEditor(scope, viewer, document, options)` in `src/elements/editorHost.ts` — because the
+  viewer already drew the cursor and there was nothing to put in a new element but wiring.
+  Navigation, the ladder, fret and pitch entry, durations, ties, delete, undo; scope is
+  structural (the listener is on the host, not `window`); the embed bundles contain no editor
+  code. The workbench now shares the selection translation (`editorSelection.ts`) and the
+  scope tests, and keeps its own mount until slices 2–3 (popovers, then the lyric editor and
+  the rung inspector) give the binding the surfaces it has. Studio edits notes from the
+  keyboard, with one undo history across notes and metadata. Parked 2026-08-09 behind a
+  second-consumer trigger that studio met.
 - **[studio-campaign-authoring.md](inprogress/studio-campaign-authoring.md)** — **campaign**,
-  opened 2026-09-17, **items 1–5 built the same day** (4 owes two hands-on checks; 5 needs migration 0005 before deploy): studio stops being read-only. Priority flow **new piece
+  opened 2026-09-17, **items 1–5 and slice 1 of 7 built the same day** (4 owes two hands-on checks; 5 needs migration 0005 before deploy): studio stops being read-only. Priority flow **new piece
   → YouTube → sync**, working before any note editing exists; editing last. Opens on the
   finding that adding a recording and the sync bar were already built and persisted — what
   was missing was any way for a piece to exist outside the operator ingest. The contract's
@@ -184,7 +185,7 @@ back up to `proposed/` the moment it is.
   cache** re-derived on load and on bar change. Eight items: the round-trip comparator and
   baseline loss register → create a piece → the save pipeline proven on a metadata sheet →
   sync re-derivation → piece lifecycle → sync.json interchange (optional) →
-  [core-editor-element-promotion](proposed/core-editor-element-promotion.md) in three slices
+  [core-editor-element-promotion](inprogress/core-editor-element-promotion.md) in three slices
   → touch entry. Score-file upload is deliberately skipped.
 - **[core-space-units-sp.md](inprogress/core-space-units-sp.md)** — **in progress 2026-09-15** — Space becomes a number in
   staff spaces (air after a quarter note), 0 to a calibrated ceiling, and every horizontal
@@ -1065,7 +1066,7 @@ back up to `proposed/` the moment it is.
   bar says *served by* whenever the answer came from further down. Eval-fed quality and
   the `elements/` promotion were handed off rather than built — to
   [core-assist-evals.md](proposed/low-priority/core-assist-evals.md) and
-  [core-editor-element-promotion.md](proposed/core-editor-element-promotion.md)'s existing
+  [core-editor-element-promotion.md](inprogress/core-editor-element-promotion.md)'s existing
   gate — because neither was this item's work waiting, but other items' triggers not yet
   met.
 - **[core-assist-byok.md](complete/core-assist-byok.md)** — **bring your own
@@ -1391,7 +1392,7 @@ back up to `proposed/` the moment it is.
   the reference pane, legacy `?view=compare|json` links opening the matching panel tab.
   Incubates in `workbench/` against a neutral contract (`elements/` never imports
   `edit/`); the selection half promotes with the editor
-  ([core-editor-element-promotion.md](proposed/core-editor-element-promotion.md)), the
+  ([core-editor-element-promotion.md](inprogress/core-editor-element-promotion.md)), the
   instrument half is viewer-tier and may promote earlier. **Remaining: stage 4** — rung
   property edits through ops, parked behind the ladder's per-level pass.
 - **[core-zoom-density-pad.md](complete/core-zoom-density-pad.md)** — campaign item 9, and the UI
@@ -1781,7 +1782,7 @@ back up to `proposed/` the moment it is.
   `lab/document/empty-tab-canvas` template and the from-scratch flagship trace. Both
   descendants live in proposed/: the AI mode
   ([core-editor-ai-prompt.md](proposed/low-priority/core-editor-ai-prompt.md)) and the `elements/` promotion
-  ([core-editor-element-promotion.md](proposed/core-editor-element-promotion.md)). Grounded in
+  ([core-editor-element-promotion.md](inprogress/core-editor-element-promotion.md)). Grounded in
   [research/notation-editor-keyboard-models.md](../research/notation-editor-keyboard-models.md).
 - **[core-guitar-pro.md](complete/core-guitar-pro.md)** — **Guitar Pro ⇄ MNX** conversion at
   `converters/guitarpro-mnx/`, using **alphaTab** as a headless format codec (no binary

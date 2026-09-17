@@ -1,7 +1,7 @@
 # `viewer-embedded` — the third app, and the embed contract's first real consumer
 
 > Raised 2026-08-14. Answers the fork left open by
-> [core-editor-element-promotion.md](../proposed/core-editor-element-promotion.md)'s
+> [core-editor-element-promotion.md](../inprogress/core-editor-element-promotion.md)'s
 > "getting it moving" section, and gives
 > [core-viewer-surface.md](core-viewer-surface.md) the consumer it has been
 > waiting for.

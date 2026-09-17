@@ -12,6 +12,7 @@ import type { EditOp, EntryTarget, EventAddress, OpLogEntry } from './ops.ts';
 import type { PasteLanding } from './selectionPastePlanner.ts';
 import {
   POSITIONED_FIELDS,
+  applyOp,
   beamRunBetween,
   beamEndingAt,
   beamStartingAt,
@@ -968,6 +969,15 @@ export class EditorSession {
           type: 'removeFingering',
           noteKey
         })));
+      }
+      case 'setWork': {
+        // The document is the address; the cursor and the selection stay where they are.
+        // A merge that changes nothing is not an edit: no history entry, nothing to save.
+        const op: EditOp = { type: 'setWork', work: intent.work };
+        const work = (doc: MnxStructure) => JSON.stringify(doc._x?.mnxLab?.work ?? null);
+        if (work(applyOp(this.doc, op)) === work(this.doc)) return false;
+        this.apply(op, true);
+        return true;
       }
       case 'setPartDeclaration': {
         const partIndex = this.cursorState.partIndex ?? 0;

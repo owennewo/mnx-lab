@@ -1,13 +1,14 @@
 # Promoting the editor into `elements/` — the second-consumer move
 
-> **Status: proposed (2026-08-09), deliberately parked.** Split out of
+> **Status: in progress — slice 1 (keyboard only) built 2026-09-17; slices 2–3 not started.** See
+> *Slice 1* at the end. Originally **proposed (2026-08-09), deliberately parked.** Split out of
 > [core-editor-input-layer.md](../complete/core-editor-input-layer.md) as its one remaining
 > item, so that doc could close at its real scope (everything else shipped). This
 > doc owns the move that makes the editor consumable outside the workbench —
 > and, just as deliberately, the reasons not to make it yet.
 >
 > **Trigger 2 met, 2026-09-17.** Studio is the second consumer: this doc is item 7 of the
-> [studio authoring campaign](../inprogress/studio-campaign-authoring.md) and inherits its contract. The
+> [studio authoring campaign](studio-campaign-authoring.md) and inherits its contract. The
 > campaign sequences it last (creation, the save pipeline and sync come first), recommends
 > promoting in three slices with the rung inspector last, keeps `elements → assist` closed,
 > and opens `apps/studio → src/edit` earlier, at its item 3. The re-check below is kept as
@@ -108,7 +109,7 @@ trace fixtures, root vitest), before and after.
 5. **Workbench consumes the promoted element** and its own mount code is
    deleted — one editor surface, not two.
 6. **The palette question travels along**:
-   [core-editor-ai-prompt.md](low-priority/core-editor-ai-prompt.md) already flags that a promoted
+   [core-editor-ai-prompt.md](../proposed/low-priority/core-editor-ai-prompt.md) already flags that a promoted
    palette pulls the `elements → assist` boundary into question (embeds
    probably should **not** ship an AI prompt; that mode may stay
    workbench-only by configuration). Decide it here if the palette is part of
@@ -172,3 +173,97 @@ build.
   its host's problem (studio's seams).
 - **No new trace machinery** — traces stay intent-based harness fixtures;
   promotion must not add a second capture path.
+
+## Slice 1 — the keyboard's core (built 2026-09-17)
+
+Item 7 of the [studio authoring campaign](studio-campaign-authoring.md), which sequences the
+promotion in three slices. The owner's call on the open question: **slice 1 ships
+keyboard-only**; touch entry is its own item (campaign item 8).
+
+### The decision this doc left open: a binding, not an element and not a viewer mode
+
+The work list asked *editor element vs editing mode on `<mnx-document-viewer>`*. Neither.
+The drawing was already in the viewer — it has taken a `.selection` and drawn the cursor,
+the enclosure and the span since the selection ladder — so there was nothing to put in a
+new element but event wiring, and the repo already has the shape for that:
+`bindPlayback(host, viewer, player)`. So the mount is **`bindEditor(scope, viewer, document,
+options)`** in `src/elements/editorHost.ts`: a plain-DOM host binding that owns an
+`EditorSession`, listens on the host's own element, and sets `viewer.selection`. It satisfies
+both of this doc's constraints at once — *viewers must not pay* (nothing the viewer or the
+player imports reaches it; it is its own chunk behind a dynamic `import()`, and the built
+embed bundles contain no editor code — checked: no `enterFret`, no `tabDigit`) and *the
+editing logic does not move* (it is still `src/edit/`, untouched).
+
+### What moved, and what both mounts now share
+
+- **`src/elements/editorHost.ts`** — the binding. Navigation and the selection ladder, fret
+  entry through `TabDigitResolver` with its 500 ms window, pitch entry, durations, ties,
+  slurs, beams, transposition, insert, delete, undo/redo, and Escape/Enter's pending pair
+  (a half-typed fret first; then Escape puts the cursor away). The pane-owned layer rule
+  (digits are frets only while a tab pane is on screen and the part has strings), the
+  projection following the pane, and the system-row resolution of ↑/↓ at the bar rungs all
+  came across. `readOnly()` holds a binding to navigation only; `suspended()` takes the
+  cursor and the keys away while the viewer shows some other document; `keys()` is the
+  keymap's meaning table filtered to the rung, the pane **and the keys this mount really
+  binds**, so a host's key list never advertises a surface that is not mounted.
+- **Scope is structural now** (work-list item 3). The listener is on `scope`, not `window`;
+  a key reaches the editor because focus is inside it. `keyScope.ts` moved to `elements/`
+  with it; the binding uses `focusWithin` for the dimmed-cursor rule and needs neither
+  `focusUnclaimed` nor the window listener.
+- **`src/elements/editorSelection.ts`** — `selectionContextFor(session, view)`: the body of
+  the workbench's `syncFromSession`, with the enclosure-by-level table, the rest-key
+  channel and the presentation span, moved out **verbatim**. The workbench's scenario page
+  now calls it (−230 lines there), so a cursor looks the same wherever it is drawn and
+  there is one copy of the translation. This is the one module in `elements/` that knows
+  both vocabularies; the viewer still knows shapes and never editor levels.
+- **The boundary** (work-list item 1): `elements → edit` is open in
+  `.dependency-cruiser.cjs`. `elements → assist` stays closed: the AI palette and the model
+  picker stay in the workbench (items 6–7, decided *not now*).
+- **`setWork` is an intent.** Studio had its own `EditHistory` for the Details sheet; two
+  histories on one page would have made Undo mean two things. The sheet's edits now go
+  through the session, so notes and metadata share one undo stack. A merge that changes
+  nothing is not an edit.
+
+### Studio
+
+`apps/studio/src/PiecePage.ts` loads the binding for a piece that can be saved, hands it the
+viewer as both scope and surface, and takes every document change through the save pipeline
+it already had — `SaveSession.adopt()` tells the session which object *is* the saved one,
+because an editor copies what it is given. A **Keys** sheet lists what the keyboard can do on
+the rung the cursor is on. A change to the score's **shape** — a bar added, a repeat, a
+meter — is checkpointed at once rather than after the pause: the structural-op trigger the
+save pipeline owed.
+
+### Proof
+
+`harness/verify/studio-editor-smoke.mjs` (`npm run smoke:studio-editor`), real key events
+through the DevTools protocol in a real browser against the local Worker: a dimmed cursor
+made live by focusing the score; fret 3, then a two-digit fret 12 inside the window; Ctrl+Z
+and Ctrl+Y; **the Details sheet's Undo taking back an artist and then a fret** — one history;
+**a digit typed into a text field not reaching the editor** — structural scope; the Keys sheet
+naming the rung and listing no unmounted surface; Escape and back; a bar added saved at once;
+and after a reload the notes read back from the stored `.gp`. Run and passed 2026-09-17,
+with `smoke:inspector`, `smoke:focus`, `smoke:piece-create`, `smoke:save-pipeline`,
+`smoke:piece-lifecycle` and `smoke:sync-rederive`. The harness may not import `elements/`
+(`harness-not-into-shells`), so the binding's proof is this smoke and the workbench's own
+smokes over the shared selection code; `testing is unchanged either way`, as this doc said.
+
+**Pre-existing, not from this work:** `smoke:selection` fails two reveal-scroll checks
+(*the selection is off screen at the first/last bar*, a 218 px selection in a 191 px
+viewport) — identically on a clean build of `main` at `261a3398`. Reported, not chased here.
+
+### What slice 1 deliberately is not
+
+- **The workbench still has its own mount.** Work-list item 5 — *one editor surface, not
+  two* — is not done: the scenario page keeps its window listener, HUD, tray, palette,
+  clipboard, lyric editor and rail escalation. What it shares today is the selection
+  translation and the scope tests. It adopts `bindEditor` when slices 2–3 give the binding
+  the surfaces the workbench's mount has; promoting the inspector now would have made an
+  in-progress surface's churn public API.
+- **Unbound here, rather than half-working:** Enter's rung inspector and the typed popovers
+  (slices 2–3), the lyric text editor, copy/cut/paste, the command palette, and ↑/↓ at the
+  document rung (the neighbouring *document* is the host's collection).
+- **No touch.** Keys only; campaign item 8.
+- **Every edit re-hands the document to the player**, which recompiles and stops playback.
+  Correct, and heavy for a keystroke; a lighter hand-off is still owed.
+- **Clicking a note does not move the cursor** — it never did in the workbench either.

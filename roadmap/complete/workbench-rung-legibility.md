@@ -53,7 +53,7 @@ is needed less often.
   `selection-anchored` event (the tray shaft's anchor — already follows every
   render *and* scroll), so `elements/` learns nothing new and the boundary
   "elements knows shapes, never editor levels" holds. When the editor
-  promotes ([core-editor-element-promotion.md](../proposed/core-editor-element-promotion.md)),
+  promotes ([core-editor-element-promotion.md](../inprogress/core-editor-element-promotion.md)),
   the chip either travels with the mount or the promoted element grows a
   label slot — that item's call.
 - **Rejected: a colour ladder.** Four strikes: the repo's own precedent

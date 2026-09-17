@@ -768,7 +768,7 @@ arrow doing nothing beats one doing something arbitrary.
 - **Not a renderer change.** Enclosures are the existing overlay pattern,
   grown; `expected.primitives.json` and every golden are untouched by design.
 - **Not the `elements/` promotion** — the ladder lands in the workbench mount
-  first ([core-editor-element-promotion.md](../proposed/core-editor-element-promotion.md) keeps its
+  first ([core-editor-element-promotion.md](../inprogress/core-editor-element-promotion.md) keeps its
   own trigger).
 - **Not discontiguous multi-select** (Ctrl+click collections) — the ladder is
   one ordered interval or one derived closure at one level, never an arbitrary

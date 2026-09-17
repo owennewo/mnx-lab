@@ -12,7 +12,8 @@ import type {
   PartDeclaration,
   PartDeclarationKind,
   PositionedAttribute,
-  TechniqueChoice
+  TechniqueChoice,
+  WorkChange
 } from './ops.ts';
 import type {
   MnxFermata, MnxLayout, MnxNoteValueBase, MnxScore, MnxTuningEntry } from '../model/mnx.ts';
@@ -201,6 +202,9 @@ export type MutationIntent =
   /** Play the note on this string, pitch kept (the inspector's string pill). */
   | { type: 'setStringAnnotation'; string: number }
   | { type: 'setPartDeclaration'; declaration: PartDeclaration }
+  /** The document's own metadata — `_x.mnxLab.work`. No cursor involved: the document IS the
+   *  address. A merge (see the `setWork` op); emitted by studio's Details sheet. */
+  | { type: 'setWork'; work: WorkChange }
   | { type: 'removePartDeclaration'; kind: PartDeclarationKind }
   // Document-level presentation: no cursor involved, the document IS the
   // address (as with lyric lines).

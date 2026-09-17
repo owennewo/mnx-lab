@@ -5,12 +5,13 @@
 // owns the two middle tests both workbench listeners share; the tag-name test
 // is the innermost scope (a text field always wins, even inside us).
 //
-// The listeners are still window-scoped because the mount lives in
-// `workbench/`; the focus test is what makes them behave as if they were
-// host-scoped. When the editor promotes to `elements/`
-// (core-editor-element-promotion.md), the listener moves onto the host
-// element and `focusWithin` disappears — containment becomes structural
-// rather than tested.
+// Two mounts use this. The WORKBENCH's listeners are still window-scoped, and
+// the focus test is what makes them behave as if they were host-scoped. The
+// promoted mount (`editorHost.ts`, core-editor-element-promotion.md slice 1)
+// listens on the host element itself, so containment is structural there — it
+// keeps `focusWithin` only to dim a cursor the keyboard has left, and needs
+// neither `focusUnclaimed` nor the window. The workbench follows when it
+// adopts the binding.
 
 /** The real event target: shadow-DOM retargeting makes a window-level
  *  `event.target` the outermost host, so the composed path's head is the node

@@ -1,0 +1,122 @@
+// Writing notes in Studio, in a real browser against the local Worker/D1/R2
+// (roadmap/inprogress/core-editor-element-promotion.md, slice 1 — keyboard only).
+// Same preconditions as studio-smoke.mjs. Real key events through the DevTools
+// protocol, because the point is who hears them: the editor's listener is on the
+// viewer, so keys typed into a text field must not reach it.
+import fs from 'node:fs/promises';
+import { spawn } from 'node:child_process';
+import { once } from 'node:events';
+import assert from 'node:assert/strict';
+import { devtoolsPort, connect, client } from './browserHarness.mjs';
+const root = new URL('../../', import.meta.url);
+const origin = process.env.LIBRARY_LOCAL_ORIGIN ?? 'http://127.0.0.1:8791';
+if (!['localhost','127.0.0.1'].includes(new URL(origin).hostname)) throw new Error('Smoke must target loopback only');
+const session = JSON.parse(await fs.readFile(new URL('.secrets/local-library-session.json',root)));
+const api = async path => fetch(`${origin}/api/library${path}`, { headers: { 'Cf-Access-Jwt-Assertion': session.browser } });
+const title = `Editor smoke ${Date.now()}`;
+const profile = await fs.mkdtemp('/tmp/mnx-studio-editor-browser-');
+const chrome = spawn(process.env.CHROME_BIN ?? 'google-chrome',['--headless=new','--no-sandbox','--disable-dev-shm-usage','--window-size=1280,900','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],{stdio:'ignore'});
+let ws;
+try {
+  ws = new WebSocket(await connect(await devtoolsPort(profile))); await once(ws,'open');
+  const c = client(ws); await c.send('Runtime.enable'); await c.send('Page.enable'); await c.send('Network.enable');
+  await c.send('Emulation.setDeviceMetricsOverride',{width:1280,height:900,deviceScaleFactor:1,mobile:false});
+  // A headless page is not the focused window, and an unfocused page fires no focus events: emulate one, as a person's would be.
+  await c.send('Emulation.setFocusEmulationEnabled',{enabled:true});
+  const wait = async expression => { for (let i=0;i<200;i++) { if (await c.evaluate(expression)) return; await new Promise(r=>setTimeout(r,100)); } throw new Error('Browser assertion timed out: '+expression); };
+  const VK = { ArrowRight: 39, ArrowLeft: 37, Escape: 27, Delete: 46, KeyZ: 90, KeyY: 89, Digit1: 49, Digit2: 50, Digit3: 51, Digit5: 53 };
+  const key = async (code, { ctrl = false, text } = {}) => {
+    const base = { code, key: text ?? code, windowsVirtualKeyCode: VK[code], modifiers: ctrl ? 2 : 0 };
+    await c.send('Input.dispatchKeyEvent', { type: text && !ctrl ? 'keyDown' : 'rawKeyDown', ...base, ...(text && !ctrl ? { text } : {}) });
+    await c.send('Input.dispatchKeyEvent', { type: 'keyUp', ...base });
+  };
+  const app = "document.querySelector('mnx-studio')?.shadowRoot";
+  const form = `${app}?.querySelector('mnx-studio-new-piece')?.shadowRoot`;
+  const page = `${app}?.querySelector('mnx-studio-piece')`;
+  const piece = `${page}?.shadowRoot`;
+  const viewer = `${piece}?.querySelector('mnx-document-viewer')`;
+  const details = `${piece}?.querySelector('mnx-studio-details[slot=side]')?.shadowRoot`;
+  const saving = `${piece}?.querySelector('mnx-studio-save[slot=side]')?.shadowRoot`;
+  const keys = `${piece}?.querySelector('mnx-studio-keys[slot=side]')?.shadowRoot`;
+  const chip = `${piece}?.querySelector('button.save')`;
+  const action = text => `[...${piece}.querySelectorAll('button[slot=actions]')].find(b => b.textContent.includes(${JSON.stringify(text)}))`;
+  // Every fretted note in the live document, as "bar:string:fret".
+  const frets = `JSON.stringify(${piece}.querySelector('mnx-player').document.parts[0].measures.flatMap((m, bar) => m.sequences.flatMap(s => s.content.flatMap(e => (e.notes ?? []).map(n => bar + ':' + n._x?.mnxLab?.string + ':' + n._x?.mnxLab?.fret)))))`;
+  const fretsNow = async () => JSON.parse(await c.evaluate(frets));
+
+  await c.send('Network.setCookie',{name:'CF_Authorization',value:session.browser,url:origin,httpOnly:true,sameSite:'Lax'});
+  await c.send('Page.navigate',{url:origin+'/studio/#/new'}); await c.send('Page.reload');
+  await wait(`!!${form}?.querySelector('form')`);
+  await c.evaluate(`{ const i = ${form}.querySelector('label input'); i.value = ${JSON.stringify(title)}; i.dispatchEvent(new Event('input')); ${form}.querySelector('form').requestSubmit(); }`);
+  await wait(`/^#\\/piece\\/[0-9a-f]{16}$/.test(location.hash)`);
+  const pieceId = (await c.evaluate('location.hash')).slice('#/piece/'.length);
+  await wait(`${chip}?.dataset.save === 'clean' && !!${page}.editor`);
+
+  // Until the score has the keyboard the cursor is dimmed; focus it and it is live.
+  await wait(`${viewer}.selection?.cursor != null && ${viewer}.selectionInactive === true`);
+  await c.evaluate(`${viewer}.focus()`);
+  await wait(`${viewer}.selectionInactive === false`);
+  assert.deepEqual(await fretsNow(), []);
+
+  // A fret: the digit waits out its window (is "1" the start of "12"?), then becomes a note where the cursor stands.
+  await key('Digit3', { text: '3' });
+  await wait(`${frets} !== '[]'`);
+  const first = await fretsNow();
+  assert.equal(first.length, 1); assert.match(first[0], /^0:\d:3$/);
+  await wait(`${chip}.textContent.trim() === '1 edit unsaved'`);
+  // Two digits inside the window are one fret.
+  await key('ArrowRight'); await key('Digit1', { text: '1' }); await key('Digit2', { text: '2' });
+  await wait(`JSON.parse(${frets}).some(f => f.endsWith(':12'))`);
+  assert.equal((await fretsNow()).length, 2);
+  const shot = await c.send('Page.captureScreenshot'); await fs.writeFile('/tmp/mnx-studio-editor.png',Buffer.from(shot.result.data,'base64'));
+
+  // Undo and redo from the keyboard.
+  await key('KeyZ', { ctrl: true }); await wait(`JSON.parse(${frets}).length === 1`);
+  await key('KeyY', { ctrl: true }); await wait(`JSON.parse(${frets}).length === 2`);
+
+  // One history for notes and metadata: the Details sheet's Undo takes back the artist, then the fret.
+  await c.evaluate(`${action('Details')}.click()`); await wait(`!!${details}?.querySelector('input')`);
+  await c.evaluate(`{ const i = [...${details}.querySelectorAll('label')].find(l => l.textContent.trim().startsWith('Artist')).querySelector('input'); i.focus(); i.value = 'A synthetic author'; i.dispatchEvent(new Event('change')); }`);
+  await wait(`${piece}.querySelector('mnx-player').document._x.mnxLab.work.artist === 'A synthetic author'`);
+  // A digit typed INTO the text field is the field's: the editor's listener is on the viewer, and never hears it.
+  await key('Digit5', { text: '5' });
+  await new Promise(r => setTimeout(r, 800));
+  assert.equal((await fretsNow()).length, 2, 'a key typed in a text field reached the editor');
+  const undo = `[...${details}.querySelectorAll('button')].find(b => b.textContent === 'Undo')`;
+  await c.evaluate(`${undo}.click()`);
+  await wait(`${piece}.querySelector('mnx-player').document._x.mnxLab.work.artist === undefined`);
+  await c.evaluate(`${undo}.click()`);
+  await wait(`JSON.parse(${frets}).length === 1`);
+  await c.evaluate(`[...${details}.querySelectorAll('button')].find(b => b.textContent === 'Redo').click()`);
+  await wait(`JSON.parse(${frets}).length === 2`);
+
+  // The Keys sheet lists what is bound HERE, for the rung the cursor is on.
+  await c.evaluate(`${action('Keys')}.click()`); await wait(`!!${keys}?.querySelector('.row')`);
+  const listed = await c.evaluate(`${keys}.textContent`);
+  for (const expected of ['Note entry', 'a note', 'Ctrl+Z']) assert.ok(listed.includes(expected), `Keys sheet lacks "${expected}"`);
+  assert.ok(!/palette|Lyric text/i.test(listed), 'Keys sheet advertises a surface that is not mounted');
+
+  // Escape puts the cursor away; an arrow brings it back.
+  await c.evaluate(`${viewer}.focus()`);
+  await key('Escape'); await wait(`${viewer}.selection.cursor == null`);
+  await key('ArrowLeft'); await wait(`${viewer}.selection.cursor != null`);
+
+  // A bar added is saved at once, not after the pause: the chip goes clean without anyone asking.
+  const before = (await (await api(`/pieces/${pieceId}`)).json()).snapshot;
+  await c.evaluate(`${page}.editor.handleIntent({ type: 'appendMeasure' })`);
+  await wait(`${piece}.querySelector('mnx-player').document.global.measures.length === 17`);
+  await wait(`${chip}.dataset.save === 'clean' && ${chip}.textContent.includes('just now')`);
+  const after = (await (await api(`/pieces/${pieceId}`)).json()).snapshot;
+  assert.notEqual(after.piece.canonical_rendition_id, before.piece.canonical_rendition_id);
+  const saved = JSON.parse(after.renditions.find(r => r.id === after.piece.canonical_rendition_id).provenance);
+  assert.equal(saved.kind, 'checkpoint');
+
+  // And it is really there: reload, and the stored .gp gives the notes back.
+  await c.send('Page.reload');
+  await wait(`${chip}?.dataset.save === 'clean' && !!${page}.editor`);
+  const reloaded = await fretsNow();
+  assert.deepEqual(reloaded.map(f => f.split(':')[2]).sort(), ['12', '3']);
+  assert.equal(await c.evaluate(`${piece}.querySelector('mnx-player').document.global.measures.length`), 17);
+  console.log(`Studio editor smoke passed: ${pieceId} — a dimmed cursor made live by focus, fret 3 and a two-digit fret 12 entered from the keyboard, Ctrl+Z / Ctrl+Y, one undo history across notes and the Details sheet, a text field keeping its own keys, a Keys sheet of what is bound here, Escape and back, a bar added saved at once (${saved.check.verdict}), and the notes read back from the stored .gp after a reload.`);
+  if (c.logs.length) throw new Error('Browser console errors: '+c.logs.join('\n'));
+} finally { ws?.close(); chrome.kill(); await once(chrome,'exit'); await fs.rm(profile,{recursive:true,force:true,maxRetries:10,retryDelay:200}); }

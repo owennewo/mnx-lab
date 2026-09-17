@@ -5,7 +5,7 @@
 > [workbench-path-prefix.md](workbench-path-prefix.md) (the workbench leaves the root
 > first) and on the built [studio storage campaign](../complete/studio-campaign-storage.md)
 > (the library it reads). Its editing phase is the **second consumer** that
-> [core-editor-element-promotion.md](../proposed/core-editor-element-promotion.md) has been
+> [core-editor-element-promotion.md](../inprogress/core-editor-element-promotion.md) has been
 > parked behind. Implementation loop.
 
 ## The goal
@@ -133,7 +133,7 @@ page gets exercised.
 ## Editing — phase two, and the trigger it pulls
 
 The editor mount lives in `src/workbench/`, a leaf; studio cannot import it and must not.
-[core-editor-element-promotion.md](../proposed/core-editor-element-promotion.md) recorded on
+[core-editor-element-promotion.md](../inprogress/core-editor-element-promotion.md) recorded on
 2026-08-14 that trigger 1 (a stable intent vocabulary) is met and trigger 2 — **a real
 second consumer asking for editing** — is the sole blocker. This item is that consumer
 asking. When phase one is deployed, that doc moves to `inprogress/` and runs to its own

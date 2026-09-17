@@ -48,7 +48,7 @@
 >
 > **Stage 4** landed with stage 1 (`harness/conformance/key-scope.test.ts`).
 >
-> Feeds [core-editor-element-promotion.md](../proposed/core-editor-element-promotion.md)'s
+> Feeds [core-editor-element-promotion.md](../inprogress/core-editor-element-promotion.md)'s
 > "the shadow-DOM focus story coming due" line item, and hands
 > [core-viewer-surface.md](core-viewer-surface.md) one public token
 > (`--mnx-focus-ring`). Raised 2026-08-14 from an embed question: *on a random
@@ -196,7 +196,7 @@ element-tier layer) so the split cannot rot.
    listener lives in `workbench/`, which embeds never load. Stage 1 stops the
    workbench from over-claiming; stage 2 is what makes an embed *work*.
 2. **Move the listener to the host element** — with
-   [core-editor-element-promotion.md](../proposed/core-editor-element-promotion.md), when
+   [core-editor-element-promotion.md](../inprogress/core-editor-element-promotion.md), when
    the mount layer becomes `elements/`-tier. Deletes the window listener and
    the focus test together: containment becomes structural.
    **RETIRED as "not wanted" (2026-08-14)**: the fork below was answered by
