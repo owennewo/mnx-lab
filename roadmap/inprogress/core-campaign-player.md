@@ -205,7 +205,7 @@ run any time before 6.
 | 17 | [YouTube recordings](../complete/core-player-youtube.md) | Visible official iframe, policy/layout lifecycle, API rates, seek and error handling. | recording playback | adapter/layout checks + live embed check | complete |
 | 18 | [Recording attachments](../complete/studio-recording-management.md) | Studio URL/audio attachment, sync import, upload and revision lifecycle. | recording playback | service + browser checks | complete |
 | 19 | [Recording bookends](../complete/core-recording-bookends.md) | Treat media outside the anchored performance as pre/post-roll, render duration-labelled system bookends and repair cropped-duration provenance. | recording playback | fake media + layout projections + ingest repair | complete |
-| 20 | [Coda navigation](../proposed/core-coda-navigation.md) | Preserve Guitar Pro Coda, Double Coda, D.C. and compound D.S. directions through a typed `_x.mnxLab.navigation` extension; one normalized consumer model feeds engraving, editing and performed-order traversal. Cached *Blackbird* is the implementation-time oracle, distilled into synthetic and corpus evidence before landing. | reviewer | synthetic GPIF fixture + notation/tab/unrolled goldens + hand-stated traversal + local Blackbird review | proposed |
+| 20 | [Coda navigation](../complete/core-coda-navigation.md) | Preserve Guitar Pro Coda, Double Coda, D.C. and compound D.S. directions through a typed `_x.mnxLab.navigation` extension; one normalized consumer model feeds engraving, editing and performed-order traversal. Cached *Blackbird* is the implementation-time oracle, distilled into synthetic and corpus evidence before landing. | reviewer | synthetic GPIF fixture + notation/tab/unrolled goldens + hand-stated traversal + local Blackbird review | complete; engraving review pending |
 
 ### Decisions still open
 
@@ -826,3 +826,26 @@ offsets, keeping block, label and staff aligned at extreme ratios. It also expos
 accounting bug: the last-system inset must be included while measuring that row, not appended
 to the global maximum for all rows, or full earlier systems acquire a phantom right margin.
 Tests now pin both rules at 0.4× and 4× ratios and with Space set to zero.
+
+### 2026-09-17 — item 20: coda navigation from a real score
+
+The missing marks were not a cache or SVG-emitter failure. GPIF retained all eight
+Blackbird directions, but the importer deliberately skipped the `Directions` container;
+published MNX v19 still has no coda or D.C. vocabulary. The fix keeps that boundary
+visible: published and lab enums are disjoint, while one normalized view serves the
+renderer, traversal and editor.
+
+Source tokens and musical behaviours are different taxonomies. Nineteen GPIF tokens
+collapse into seven private jump behaviours plus referenced single/double marks; “double”
+belongs to target identity, not another playback opcode. Literal captions preserve source
+spelling, but structured references alone drive playback. Predeclaring canonical target
+IDs also lets an incomplete source survive conversion so traversal can report the missing
+destination instead of silently changing its meaning.
+
+Cached Blackbird was valuable as an implementation oracle but unsuitable as a permanent
+fixture. The durable replacement is an eight-bar rest-only score carrying the same graph,
+with independently stated performed order, notation/tab/both/unrolled goldens, and a GPIF
+test covering all 19 tokens. It is also constructible from `{}` and destructible through
+the normal measure-attribute machinery. Item 20 landed in `36b4d3c`: 1,905 root tests,
+351 Guitar Pro converter tests, scenario checks and the production build passed after
+rebase. The new engraving batch is registered in `lab-verify.md`; no existing golden moved.

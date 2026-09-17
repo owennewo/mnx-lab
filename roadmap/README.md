@@ -45,13 +45,6 @@ proposals that name their campaign.
 
 ### proposed/
 
-- **[core-coda-navigation.md](proposed/core-coda-navigation.md)** — player campaign item 20:
-  preserve Guitar Pro's Coda, Double Coda, D.C. and D.S. vocabulary in a typed
-  `_x.mnxLab.navigation` extension without widening published MNX. Keeps published and lab
-  jump enums separate and unions them only in the normalized consumer model; uses cached
-  *Blackbird* as the implementation-time end-to-end oracle, then distils it into a
-  synthetic GPIF fixture, corpus engraving and hand-stated performed order without
-  committing the copyrighted score.
 - **[studio-player-practice.md](proposed/studio-player-practice.md)** — campaign item 13,
   studio's first player feature in `elements/`: loop the selection with the **written-range
   → performed-occurrences policy stated**, speed trainer, count-in, metronome, mute/solo.
@@ -464,6 +457,10 @@ back up to `proposed/` the moment it is.
 
 ### complete/
 
+- **[core-coda-navigation.md](complete/core-coda-navigation.md)** — complete 2026-09-17;
+  player campaign item 20: typed private coda/D.C./compound-D.S. navigation, complete
+  GPIF direction preservation, shared normalization, engraving, traversal and authoring,
+  proven against cached *Blackbird* and distilled into synthetic corpus evidence.
 - **[core-recording-bookends.md](complete/core-recording-bookends.md)** — **complete
   2026-09-17** — Player campaign item 19: normal pre/post-roll states, accessible
   duration-labelled system bookends, media-zero transport, and an honest

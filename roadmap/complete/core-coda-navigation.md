@@ -1,6 +1,6 @@
 # Coda navigation — preserve, engrave and perform the vocabulary real scores use
 
-**Status:** proposed. **Player campaign item 20.** Raised by the cached Soundslice
+**Status:** complete 2026-09-17. **Player campaign item 20.** Raised by the cached Soundslice
 export of the Beatles' *Blackbird*, whose eight GPIF master-bar `Directions` survive in
 the canonical `.gp` but are all deliberately reported as unrepresented by
 `guitarpro-mnx`.
@@ -206,3 +206,14 @@ under the standard `_x` hook.
 - Committing Blackbird or using its title as converter logic.
 - Posting the upstream proposal. This item produces a proposal-ready schema shape and
   evidence bundle; publication remains a deliberate spec-loop action.
+
+## Outcome
+
+Landed in `36b4d3c`. The converter now preserves and exactly round-trips all 19 known
+GPIF direction tokens. Published and lab jump enums remain separate and meet only in the
+normalized navigation view used by engraving, traversal and editing. Cached *Blackbird*
+imported without a Directions warning, rendered all eight marks/instructions on notation
+and tab, and traversed its 58 performed entries without diagnostics. The private score
+was not committed; the durable oracle is the synthetic eight-bar scenario and its
+hand-stated route. The new golden batch remains queued for human review in
+`lab-verify.md`.

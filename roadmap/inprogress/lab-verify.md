@@ -1605,7 +1605,7 @@ extra width legitimately lets another measure fit.
 
 ## Coda and double-coda navigation — 2026-09-17
 
-Owner: [core-coda-navigation.md](../proposed/core-coda-navigation.md). One new
+Owner: [core-coda-navigation.md](../complete/core-coda-navigation.md). One new
 synthetic scenario, `lab/navigation/coda-navigation`, carries the eight-direction
 graph distilled from the cached Blackbird source without retaining any of that
 score's notes or metadata. Its notation, tab, combined, performed and unrolled
