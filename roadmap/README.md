@@ -45,6 +45,23 @@ proposals that name their campaign.
 
 ### proposed/
 
+- **[studio-campaign-authoring.md](proposed/studio-campaign-authoring.md)** — **campaign**,
+  opened 2026-09-17, nothing built: studio stops being read-only. Priority flow **new piece
+  → YouTube → sync**, working before any note editing exists; editing last. Opens on the
+  finding that adding a recording and the sync bar were already built and persisted — what
+  was missing was any way for a piece to exist outside the operator ingest. The contract's
+  founding decisions: **`.gp` stays the only durable score format, even for studio edits**
+  (no MNX migrations on stored data; reverses "the first saved edit becomes an MNX
+  rendition"); every save is a checkpoint and a new immutable rendition, so the server holds
+  every version; **no save is silent about loss** — export → re-import → compare on every
+  checkpoint, and a difference no exporter warning explains is a converter defect with a
+  ready-made fixture; hybrid autosave over a disposable, local, build-stamped ops journal;
+  one save-state chip showing unsaved edits then age; **segments are the sync, tuples a
+  cache** re-derived on load and on bar change. Eight items: the round-trip comparator and
+  baseline loss register → create a piece → the save pipeline proven on a metadata sheet →
+  sync re-derivation → piece lifecycle → sync.json interchange (optional) →
+  [core-editor-element-promotion](proposed/core-editor-element-promotion.md) in three slices
+  → touch entry. Score-file upload is deliberately skipped.
 - **[studio-player-practice.md](proposed/studio-player-practice.md)** — campaign item 13,
   studio's first player feature in `elements/`: loop the selection with the **written-range
   → performed-occurrences policy stated**, speed trainer, count-in, metronome, mute/solo.
@@ -65,7 +82,9 @@ proposals that name their campaign.
 - **[core-editor-element-promotion.md](proposed/core-editor-element-promotion.md)** — promoting the
   editor's mount layer out of `workbench/` into `elements/`, making it consumable by the
   embed face and studio. Split out of [core-editor-input-layer.md](complete/core-editor-input-layer.md)
-  when that closed. **Deliberately parked** behind a two-part trigger — the intent
+  when that closed. **Trigger 2 met 2026-09-17**: it is item 7 of the
+  [studio authoring campaign](proposed/studio-campaign-authoring.md), sequenced last there.
+  Until then it was **deliberately parked** behind a two-part trigger — the intent
   vocabulary stabilising AND a real second consumer asking for editing (a check, not a
   debate) — with the costs of moving early recorded (API pressure on the public surface,
   the shadow-DOM focus story coming due, embed bundle weight; testing is unchanged either

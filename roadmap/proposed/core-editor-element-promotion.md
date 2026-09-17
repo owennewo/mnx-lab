@@ -6,6 +6,13 @@
 > doc owns the move that makes the editor consumable outside the workbench —
 > and, just as deliberately, the reasons not to make it yet.
 >
+> **Trigger 2 met, 2026-09-17.** Studio is the second consumer: this doc is item 7 of the
+> [studio authoring campaign](studio-campaign-authoring.md) and inherits its contract. The
+> campaign sequences it last (creation, the save pipeline and sync come first), recommends
+> promoting in three slices with the rung inspector last, keeps `elements → assist` closed,
+> and opens `apps/studio → src/edit` earlier, at its item 3. The re-check below is kept as
+> the record of how the gate stood until then.
+>
 > **Trigger re-check, 2026-08-14** (prompted by
 > [core-editor-focus-scope.md](../complete/core-editor-focus-scope.md), whose stage 2 is
 > blocked on this doc and cannot proceed without it):
