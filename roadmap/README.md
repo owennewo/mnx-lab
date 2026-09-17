@@ -216,6 +216,15 @@ back up to `proposed/` the moment it is.
   the promoted `src/importers/` worker. The rederive sweep, its routes, the version pin and
   the build check are gone, and so is the workbench's Load dialog — `/workbench/` never
   touches the service; only `/studio/` is behind Access.
+- **[studio-sync-bar.md](inprogress/studio-sync-bar.md)** — [player campaign](inprogress/core-campaign-player.md)
+  item 21, **built 2026-09-17**, awaiting the hands-on checks (a real YouTube clock, touch):
+  a recording's sync made **inside the tray**. A toggle swaps the rail for a time-shaped
+  **sync bar** of the same size; two trim handles leave pre-roll and post-roll unsynced, the
+  segment between them is a **whole number of beats** (tempo follows from the count, a click
+  over the recording proves it), further cuts split on the nearest beat. No cut button, no
+  zoom button. The segments are stored as the sync's `provenance` beside the derived
+  one-point-per-bar tuples — no migration. Ramps, the beat-unit control and creating bars
+  from a sync are named out of scope.
 - **[studio-shell.md](inprogress/studio-shell.md)** — **studio started, built 2026-09-11**,
   awaiting the deployed checks: a Lit shell in `apps/studio/` at `/studio/` on the same
   Worker (a new dependency-cruiser leaf over `elements/` + `storage/`), the root redirected

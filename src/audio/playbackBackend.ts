@@ -9,6 +9,8 @@ export interface AudioRecordingSource {
   /** URLs belong to the host; Blob object URLs are created/revoked by the adapter. */
   readonly media: string | Blob;
   readonly syncpoints: unknown;
+  /** The sync bar's authoring model, when this sync was made in Studio. */
+  readonly syncSegments?: unknown;
 }
 export interface YouTubeRecordingSource {
   readonly kind: 'youtube';
@@ -17,6 +19,7 @@ export interface YouTubeRecordingSource {
   /** A supported YouTube URL or an eleven-character video ID. */
   readonly video: string;
   readonly syncpoints: unknown;
+  readonly syncSegments?: unknown;
 }
 export type RecordingSource = AudioRecordingSource | YouTubeRecordingSource;
 export interface PlaybackCapabilities {
@@ -46,6 +49,8 @@ export interface BackendSnapshot {
     readonly endSeconds: number;
     readonly durationSeconds?: number;
   };
+  /** The decoded media length once prepared, with or without a sync. */
+  readonly mediaDuration?: number;
   readonly syncIssue?: string;
   readonly error?: string;
   /** Present only for synth. No synthetic onsets/clock are fabricated for media. */

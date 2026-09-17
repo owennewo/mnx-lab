@@ -24,6 +24,14 @@ import { formatPlaybackPosition, formatScorePlaybackPosition, measureAt, placeLa
 import { ZERO, type Rational } from '../audio/time.ts';
 import type { MnxStructure } from '../model/mnx.ts';
 import type { PlaybackUpdate } from './mnxContext.ts';
+import { ClickTrack } from '../audio/native/click.ts';
+import { beatTimes, decodeSyncSegments, defaultBeatUnit, emptySyncSegments, syncpointsFromSegments, type SyncSegments } from '../model/syncSegments.ts';
+import type { SoundsliceSyncpoint } from '../model/recordingSync.ts';
+import type { SyncChange } from './SyncBar.ts';
+import './SyncBar.ts';
+
+/** What a host persists when the sync bar commits an edit. */
+export interface SyncEdit { sourceId: string; segments: SyncSegments; syncpoints: SoundsliceSyncpoint[] | null }
 
 @customElement('mnx-player')
 export class Player extends LitElement {
@@ -51,6 +59,19 @@ export class Player extends LitElement {
   @property({ type: Boolean }) canAddRecording = false;
   /** A host recording panel owns score-alignment warnings. */
   @property({ type: Boolean }) syncWarningsInPanel = false;
+  /** A host that stores what the sync bar makes (`sync-edit`) opts in; the
+   *  tray then offers the rail/sync toggle while a recording is the source. */
+  @property({ type: Boolean }) syncEditable = false;
+  /** The tray's bar shows the recording's time and its cut lines, not the rail. */
+  @state() private syncMode = false;
+  @state() private clickOn = false;
+  /** The active recording's segments as edited here; the host's copy follows. */
+  @state() private liveSegments: SyncSegments | null = null;
+  private liveSegmentsFor = '';
+  /** Syncpoints already applied in place, so the host echoing them back in
+   *  `recordings` does not tear the source down. */
+  private appliedSync = new Map<string, string>();
+  private clickTrack?: ClickTrack;
   private get loading() { return this.status?.loading ?? false; }
   @property({ type: Number }) initialOrdinal: number | null = null;
   @state() private status: PlaybackSnapshot | undefined;
@@ -101,7 +122,8 @@ export class Player extends LitElement {
        readout, then the rail on a line of its own without its labels, then
        the settings. */
     @container (max-width: 1000px) {
-      .rail {
+      .rail,
+      mnx-sync-bar {
         flex: 1 1 100%;
         order: 1;
         padding: 4px 0;
@@ -361,6 +383,23 @@ export class Player extends LitElement {
     button.on {
       background: var(--player-ground);
     }
+    /* Rail or sync bar: two joined icon buttons beside the readout. */
+    .bar-toggle {
+      display: inline-flex;
+    }
+    .bar-toggle button + button {
+      margin-left: -1px;
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+    .bar-toggle button:first-child {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+    .bar-toggle button[aria-pressed='true'] {
+      background: var(--player-ground);
+      border-color: var(--ink-3);
+    }
     .anchor {
       position: relative;
       display: inline-flex;
@@ -492,6 +531,7 @@ export class Player extends LitElement {
   private widestPlace = '';
 
   protected willUpdate(changed: Map<PropertyKey, unknown>) {
+    if (this.syncMode && this.liveSegmentsFor !== this.sourceId) this.loadSegments();
     if (changed.has('performance') || changed.has('document') || changed.has('writtenBarDurations')) {
       this.widestPlace = this.performance ? widestPlaceLabel(this.performance, this.document) : '';
       const kinds = new Set(this.performance?.sourceMap.map((s) => s.kind) ?? []);
@@ -529,9 +569,12 @@ export class Player extends LitElement {
       this.seek(this.initialOrdinal);
     if (!reinstall && changed.has('recordings') && this.session) {
       const id = this.session.backend.id;
-      this.session.pause();
-      if (id !== 'synth') void this.selectSource(this.recordings.some(r => r.id === id) ? id : 'synth', true);
+      if (!this.sameMediaWithAppliedSync(id, changed.get('recordings') as readonly RecordingSource[] | undefined)) {
+        this.session.pause();
+        if (id !== 'synth') void this.selectSource(this.recordings.some(r => r.id === id) ? id : 'synth', true);
+      }
     }
+    if (this.syncMode && (this.sourceId === 'synth' || !this.syncEditable)) this.setSyncMode(false);
     if (!reinstall && changed.has('partMix') && this.session?.backend instanceof SynthBackend)
       this.applyPartLevels(this.session.backend);
     const sounds = this.soundSignature();
@@ -575,6 +618,8 @@ export class Player extends LitElement {
     }
   }
   private teardown() {
+    this.clickTrack?.dispose(); this.clickTrack = undefined; this.clickOn = false;
+    this.syncMode = false; this.liveSegments = null; this.liveSegmentsFor = ''; this.appliedSync.clear();
     this.youtubeNotice = false;
     this.revision++;
     this.session?.dispose(); this.session = undefined;
@@ -759,6 +804,10 @@ export class Player extends LitElement {
   private changeVolume(event: Event) {
     this.setVolume(Number((event.target as HTMLInputElement).value));
   }
+  private static mediaClock(seconds: number) {
+    const t = Math.max(0, seconds);
+    return `${Math.floor(t / 60)}:${(t % 60).toFixed(1).padStart(4, '0')}`;
+  }
   private static glyph(d: string, px = 22) {
     return svg`<svg width=${px} height=${px} viewBox="0 0 24 24" aria-hidden="true"><path d=${d} fill="currentColor"></path></svg>`;
   }
@@ -879,6 +928,87 @@ export class Player extends LitElement {
         </div>`,
       )}
     </div>`;
+  }
+
+  // ── the sync bar ────────────────────────────────────────────────────────
+  // The rail's slot, toggled to recording time, where a host that stores the
+  // result lets a sync be made (roadmap/inprogress/studio-sync-bar.md). The
+  // bar edits segments; this derives the tuples, applies them to the live
+  // backend in place and reports both.
+  private get recordingBackend() { return this.session?.backend instanceof RecordingBackend ? this.session.backend : null; }
+  private get activeRecording() { return this.recordings.find(r => r.id === this.sourceId); }
+  /** True when `recordings` changed only by echoing back a sync applied here. */
+  private sameMediaWithAppliedSync(id: string, before: readonly RecordingSource[] | undefined) {
+    const was = before?.find(r => r.id === id), now = this.recordings.find(r => r.id === id);
+    if (!was || !now || was.kind !== now.kind || !this.appliedSync.has(id)) return false;
+    const media = (r: RecordingSource) => r.kind === 'youtube' ? r.video : r.media;
+    return media(was) === media(now) && JSON.stringify(now.syncpoints ?? null) === this.appliedSync.get(id);
+  }
+  private loadSegments() {
+    const id = this.sourceId, stored = decodeSyncSegments(this.activeRecording?.syncSegments);
+    this.liveSegmentsFor = id;
+    this.liveSegments = stored.ok ? stored.value : emptySyncSegments(defaultBeatUnit(this.document?.global.measures[0]?.time));
+  }
+  /** Each performed bar's length in the segments' beats. */
+  private barBeats(segments: SyncSegments): number[] {
+    const durations = this.writtenBarDurations, unit = segments.beat[0] / segments.beat[1];
+    if (!this.performance || !durations) return [];
+    return this.performance.measures.map(m => { const d = durations[m.measureIndex]; return d ? Number(d.num) / Number(d.den) / unit : 0; });
+  }
+  private setSyncMode(on: boolean) {
+    if (on === this.syncMode) return;
+    this.syncMode = on; this.openPop = null;
+    if (on) this.loadSegments();
+    else { this.recordingBackend?.setMediaLoop(); this.setClick(false); }
+  }
+  private setClick(on: boolean) {
+    this.clickOn = on;
+    if (!on) { this.clickTrack?.stop(); return; }
+    this.clickTrack ??= new ClickTrack(() => {
+      const status = this.session?.snapshot;
+      return !status || status.kind === 'synth' || status.mediaTime === undefined ? null
+        : { mediaTime: status.mediaTime, rate: status.rate, playing: status.state === 'playing' };
+    }, (from, to) => this.liveSegments ? beatTimes(this.liveSegments, from, to, this.status?.mediaDuration) : []);
+    this.clickTrack.start();
+  }
+  private onSyncChange(event: CustomEvent<SyncChange>) {
+    const { segments, commit } = event.detail, backend = this.recordingBackend;
+    this.liveSegments = segments;
+    if (!commit || !backend || !this.performance) return;
+    const syncpoints = syncpointsFromSegments(segments, this.barBeats(segments), this.status?.mediaDuration);
+    this.appliedSync.set(backend.id, JSON.stringify(syncpoints));
+    const sync = syncpoints && this.document && this.writtenBarDurations
+      ? createRecordingSync(syncpoints, { performance: this.performance, writtenBarDurations: this.writtenBarDurations }, linearizePasses(this.document)) : null;
+    backend.replaceSync(sync?.ok ? sync.value : null, sync && !sync.ok ? sync.diagnostic.message : undefined);
+    this.dispatchEvent(new CustomEvent<SyncEdit>('sync-edit', { detail: { sourceId: backend.id, segments, syncpoints }, bubbles: true, composed: true }));
+  }
+  private syncToggle() {
+    if (!this.syncEditable || this.sourceId === 'synth') return nothing;
+    return html`<span class="bar-toggle" role="group" aria-label="The bar shows">
+      <button type="button" class="icon" aria-pressed=${!this.syncMode} aria-label="Rail: written bars" title="Rail: written bars"
+        @click=${() => this.setSyncMode(false)}>${Player.stroke('M5 8v8M9.7 8v8M14.3 8v8M19 8v8')}</button>
+      <button type="button" class="icon" aria-pressed=${this.syncMode} aria-label="Sync bar: recording time" title="Sync bar: recording time"
+        @click=${() => this.setSyncMode(true)}>${Player.stroke('M3 12h18M8 6v12M16 6v12')}</button>
+    </span>`;
+  }
+  private syncBar() {
+    return html`<mnx-sync-bar
+        .segments=${this.liveSegments ?? emptySyncSegments()}
+        .duration=${this.status?.mediaDuration ?? 0}
+        .time=${this.status?.mediaTime ?? 0}
+        .rate=${this.rate}
+        @sync-change=${this.onSyncChange}
+        @sync-seek=${(e: CustomEvent<{ seconds: number }>) => void this.recordingBackend?.seekMedia(e.detail.seconds)}
+        @sync-loop=${(e: CustomEvent<{ start: number; end: number } | null>) => this.recordingBackend?.setMediaLoop(e.detail ?? undefined)}
+      ></mnx-sync-bar>
+      <button type="button" class=${this.clickOn ? 'icon on' : 'icon'} aria-pressed=${this.clickOn} aria-label="Click on the beats" title="Click on the beats"
+        @click=${() => this.setClick(!this.clickOn)}>${Player.stroke('M9 3h6l4 18H5zM12 15l5-9')}</button>`;
+  }
+  /** An imported sync has no segments to reopen: placing the start handle replaces it. */
+  private get replacesImportedSync() {
+    const source = this.activeRecording;
+    return this.syncMode && !!source && Array.isArray(source.syncpoints) && source.syncpoints.length > 0
+      && !source.syncSegments && !this.liveSegments?.cuts.length;
   }
 
   // ── rate and volume: a value on the tray, the control in an overlay ─────
@@ -1009,12 +1139,15 @@ export class Player extends LitElement {
           ${Player.glyph('M6 6h12v12H6z', 18)}
         </button>
         <output aria-live="off" class=${this.performance ? '' : 'none'} aria-label=${this.performance ? this.positionLabel : nothing}
-          >${this.performance
+          >${this.performance && this.syncMode
+            ? html`<span>${Player.mediaClock(this.status?.mediaTime ?? 0)}</span><span class="widest" aria-hidden="true">88:88.8</span>`
+            : this.performance
             ? html`<span>${this.readout()}</span
                 ><span class="widest" aria-hidden="true">${this.widest}</span>`
             : 'No performance available'}</output
         >
-        ${this.rail()}
+        ${this.syncToggle()}
+        ${this.syncMode ? this.syncBar() : this.rail()}
         ${this.sourceControl && (this.recordings.length || this.canAddRecording) ? html`<label class="select">Source<select aria-label="Playback source" ?disabled=${!this.performance}
           .value=${this.sourceId} @change=${(event: Event) => {
             const select = event.target as HTMLSelectElement;
@@ -1062,6 +1195,7 @@ export class Player extends LitElement {
         : nothing}
       ${this.error ? html`<p role="alert">Playback unavailable: ${this.error}</p>` : nothing}
       ${this.status?.kind === 'youtube' && this.status.error ? html`<button @click=${() => void this.selectSource(this.sourceId, true)}>Retry video</button>` : this.status?.needsStart && !this.status.alignmentIssue ? html`<button @click=${() => void this.startSource()}>Start this source</button>` : nothing}
+      ${this.replacesImportedSync ? html`<p role="status">This recording's imported sync has no segments to reopen. Placing the start handle replaces it.</p>` : nothing}
       ${!this.loading && this.status?.state === 'buffering' ? html`<p role="status">Buffering audio…</p>` : nothing}
       ${!this.syncWarningsInPanel && (this.status?.alignmentIssue || this.status?.syncIssue) && !this.error ? html`<p role="status">Score follow: ${this.status?.alignmentIssue || this.status?.syncIssue}</p>` : nothing}`;
   }

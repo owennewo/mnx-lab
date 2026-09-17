@@ -43,7 +43,7 @@ export class RecordingBackend implements PlaybackBackend {
   private invalidSync?: string;
   private written = new Map<number, WrittenOccurrence[]>();
   constructor(readonly id: string, private readonly media: MediaPort, performance: Performance,
-    private readonly sync: RecordingSyncMap | null, syncIssue?: string) {
+    private sync: RecordingSyncMap | null, syncIssue?: string) {
     this.invalidSync = syncIssue;
     for (const w of performance.written) {
       const group = this.written.get(w.ordinal) ?? [];
@@ -88,6 +88,7 @@ export class RecordingBackend implements PlaybackBackend {
       mediaPhase,
       ...(this.sync ? { mediaBounds: { startSeconds: this.sync.bounds.startSeconds,
         endSeconds: this.sync.bounds.endSeconds, ...(durationSeconds === undefined ? {} : { durationSeconds }) } } : {}),
+      ...(durationSeconds === undefined ? {} : { mediaDuration: durationSeconds }),
       syncIssue: this.media.clockIssue || this.invalidSync,
       error: this.issue || this.media.error };
   }
@@ -150,6 +151,35 @@ export class RecordingBackend implements PlaybackBackend {
     ++this.generation; this.issue = undefined; this.stopped = false;
     const seconds = this.loop && (time.value < this.loop.start || time.value >= this.loop.end) ? this.loop.start : time.value;
     await this.media.seek(seconds); this.emit();
+  }
+  /** Media-time seek, for a host that edits the sync itself: it cannot go
+   *  through score positions, because the map is what is being made. */
+  async seekMedia(seconds: number) {
+    if (this.closed || !Number.isFinite(seconds)) return;
+    ++this.generation; this.issue = undefined;
+    await this.prepare();
+    if (this.closed) return;
+    this.stopped = false;
+    const end = this.media.duration > 0 ? this.media.duration : Infinity;
+    await this.media.seek(Math.min(Math.max(0, seconds), end)); this.emit();
+  }
+  /** A loop in media seconds; shares the score loop's wrap. */
+  setMediaLoop(loop?: { start: number; end: number }) {
+    ++this.generation;
+    if (!loop) { this.loop = undefined; return; }
+    if (!(loop.end - loop.start >= 0.001) || loop.start < 0) throw new Error('A media loop must cover at least one millisecond.');
+    this.loop = { start: loop.start, end: loop.end };
+    if (this.media.currentTime < loop.start || this.media.currentTime >= loop.end) void this.seekMedia(loop.start).catch(() => {});
+  }
+  /** Swap the sync map in place: the score follows an edit without the source
+   *  being torn down and cued again. A loop is held in media seconds, so it
+   *  stays where it was heard. */
+  replaceSync(sync: RecordingSyncMap | null, syncIssue?: string) {
+    if (this.closed) return;
+    this.sync = sync;
+    this.invalidSync = sync && this.prepared && this.media.duration > 0 && sync.bounds.endSeconds > this.media.duration + 0.001
+      ? 'Sync timings extend beyond this audio file. Score following is unavailable.' : syncIssue;
+    this.emit();
   }
   setRate(rate: number) { const value = this.media.setRate(rate); this.emit(); return value; }
   setVolume(volume: number) { const value = this.media.setVolume(volume); this.emit(); return value; }

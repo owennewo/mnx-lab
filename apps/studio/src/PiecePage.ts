@@ -19,6 +19,9 @@
 // out). 2026-09-14: what plays left the tray for the tools row — a Source
 // button that names it, opening the Source sheet (choose, edit, add) in the
 // frame's side slot beside Instruments; the recording editor opens there too.
+// 2026-09-17: the tray's sync bar makes a recording's sync here; this page is
+// the host that stores it (roadmap/inprogress/studio-sync-bar.md) — the one
+// thing besides recordings and tags that a piece page writes to the library.
 import { LitElement, css, html, nothing } from 'lit';
 import { keyed } from 'lit/directives/keyed.js';
 import { customElement, property, query, state } from 'lit/decorators.js';
@@ -31,7 +34,9 @@ import { bindPlayback } from '../../../src/elements/playbackHost.ts';
 import { normalizeDisplayPreferences } from '../../../src/elements/displayDefaults.ts';
 import type { DocumentViewer, ViewMode, ViewSetting } from '../../../src/elements/DocumentViewer.ts';
 import type { RecordingSource } from '../../../src/audio/playbackBackend.ts';
-import type { Player } from '../../../src/elements/Player.ts';
+import type { Player, SyncEdit } from '../../../src/elements/Player.ts';
+import { storedSyncSegments } from '../../../src/model/recordingAttachment.ts';
+import { SYNC_SEGMENTS_FORMAT, type StudioSyncPayload } from '../../../src/model/syncSegments.ts';
 import type { ZoomPadChange } from '../../../src/elements/ZoomPad.ts';
 import { libraryReturnHref, returnToLibrary } from './StudioApp.ts';
 import { nextTheme, readTheme, resolvedTheme, setTheme, themeGlyph, type ThemeSetting } from './theme.ts';
@@ -88,6 +93,10 @@ export class PiecePage extends LitElement {
   @query('mnx-player') private player!: Player;
   private binding: ReturnType<typeof bindPlayback> | null = null;
   private generation = 0;
+  /** The sync bar's latest unsaved edit; saves are debounced and serial. */
+  private pendingSync: (SyncEdit & { piece: string }) | null = null;
+  private syncTimer: ReturnType<typeof setTimeout> | undefined;
+  private syncSaving = false;
 
   static styles = css`
     :host {
@@ -143,6 +152,7 @@ export class PiecePage extends LitElement {
   }
 
   disconnectedCallback() {
+    void this.flushSync();
     ++this.generation;
     this.binding?.dispose();
     this.binding = null;
@@ -163,6 +173,7 @@ export class PiecePage extends LitElement {
   }
 
   private async load() {
+    void this.flushSync();
     const generation = ++this.generation;
     this.binding?.dispose(); this.binding = null;
     this.player?.stop();
@@ -226,7 +237,8 @@ export class PiecePage extends LitElement {
     const recordings: RecordingSource[] = (snapshot?.recordings ?? []).filter(r => r.kind === 'audio' || (r.kind === 'youtube' && r.external_id)).map(r => {
       let syncpoints: unknown = null;
       try { syncpoints = r.syncpoints === null ? null : JSON.parse(r.syncpoints); } catch { syncpoints = r.syncpoints; }
-      return r.kind === 'youtube' ? { kind: 'youtube', id: r.id, name: r.name || 'YouTube recording', video: r.external_id!, syncpoints } : { kind: 'audio', id: r.id, name: r.name || 'Audio recording', media: this.client.recordingUrl(r.id), syncpoints };
+      const syncSegments = storedSyncSegments(r.provenance) ?? undefined;
+      return r.kind === 'youtube' ? { kind: 'youtube', id: r.id, name: r.name || 'YouTube recording', video: r.external_id!, syncpoints, syncSegments } : { kind: 'audio', id: r.id, name: r.name || 'Audio recording', media: this.client.recordingUrl(r.id), syncpoints, syncSegments };
     });
     if (JSON.stringify(recordings) !== JSON.stringify(this.recordings)) this.recordings = recordings;
   }
@@ -238,6 +250,48 @@ export class PiecePage extends LitElement {
       if (this.snapshot?.piece.canonical_rendition_id !== snapshot.piece.canonical_rendition_id) { await this.load(); return; }
       this.player?.pause(); this.snapshot = snapshot; this.setRecordings(snapshot);
     } catch { /* keep what we have */ }
+  }
+
+  // ── the sync bar's edits, stored in the library ─────────────────────────
+  // The player has already applied the edit to what is playing; this only
+  // persists it. The segments ride as the sync's provenance beside the derived
+  // tuples, through the same route a recording's name is saved by.
+  private onSyncEdit(event: CustomEvent<SyncEdit>) {
+    this.pendingSync = { ...event.detail, piece: this.snapshot?.piece.id ?? this.pieceId };
+    clearTimeout(this.syncTimer);
+    this.syncTimer = setTimeout(() => void this.flushSync(), 700);
+  }
+  private async flushSync() {
+    clearTimeout(this.syncTimer);
+    const edit = this.pendingSync, snapshot = this.snapshot;
+    if (this.syncSaving || !edit || !snapshot) return;
+    const piece = edit.piece;
+    const row = snapshot.recordings.find(r => r.id === edit.sourceId);
+    this.pendingSync = null;
+    if (!row || snapshot.piece.id !== piece) return;
+    this.syncSaving = true;
+    const generation = this.generation;
+    const rawSync: StudioSyncPayload = { format: SYNC_SEGMENTS_FORMAT, segments: edit.segments, syncpoints: edit.syncpoints };
+    const save = (revision: number) => this.client.saveRecording(piece, row.id, revision, { name: row.name || 'Recording', rawSync });
+    try {
+      let saved: { snapshot: LibrarySnapshot };
+      try { saved = await save(snapshot.piece.revision); }
+      catch (error) {
+        // Another save (a tag, the recording's name) moved the revision: the
+        // segments are still this reader's latest intent, so retry on the new one.
+        if (!(error instanceof LibraryRequestError) || error.status !== 409) throw error;
+        saved = await save((await this.client.piece(piece)).snapshot.piece.revision);
+      }
+      if (generation !== this.generation) return;
+      this.snapshot = { ...saved.snapshot, tags: saved.snapshot.tags ?? this.snapshot?.tags ?? [] };
+      this.setRecordings(this.snapshot);
+      if (this.error.startsWith('The sync was not saved')) this.error = '';
+    } catch (error) {
+      if (generation === this.generation) this.error = `The sync was not saved: ${error instanceof Error ? error.message : 'the library is unavailable.'}`;
+    } finally {
+      this.syncSaving = false;
+      if (this.pendingSync && generation === this.generation) void this.flushSync();
+    }
   }
 
   // ── what the frame changes, stored per browser ──────────────────────────
@@ -403,6 +457,7 @@ export class PiecePage extends LitElement {
         ></mnx-document-viewer>
         <mnx-player slot="player" .recordings=${this.recordings} .syncWarningsInPanel=${true}
           .partMix=${this.partMix} .soundControl=${false} .sourceControl=${false}
+          .syncEditable=${!!this.snapshot} @sync-edit=${this.onSyncEdit}
           @playback-position=${(e: CustomEvent<{ sourceId?: string; kind?: string; syncWarning?: string }>) => {
             const { sourceId, kind, syncWarning } = e.detail;
             if (kind !== this.playbackKind) this.playbackKind = kind;

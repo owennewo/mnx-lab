@@ -128,3 +128,27 @@ describe('source handoff ownership', () => {
     b.media.blocked=false; await session.play(); expect(b.media.plays).toBe(1); expect(a.media.disposed).toBe(true); session.dispose();
   });
 });
+describe('sync editing: media time, not score positions', () => {
+  it('seeks and loops in media seconds with no sync at all', async () => {
+    const media=new Media(), b=new RecordingBackend('a',media,performance,null);
+    expect(b.canSeek(pos(0))).toBeTruthy();
+    await b.seekMedia(7.5); expect(media.currentTime).toBe(7.5); expect(b.snapshot.state).toBe('paused');
+    expect(b.snapshot.mediaDuration).toBe(20); expect(b.snapshot.mediaPhase).toBe('unmapped'); expect(b.snapshot.syncIssue).toBeUndefined();
+    await b.seekMedia(99); expect(media.currentTime).toBe(20); await b.seekMedia(-4); expect(media.currentTime).toBe(0);
+    b.setMediaLoop({start:4,end:6}); await flush(); expect(media.currentTime).toBe(4);
+    await b.play(); media.currentTime=6.01; media.emit('time'); await flush(); expect(media.currentTime).toBe(4); expect(media.paused).toBe(false);
+    b.setMediaLoop(); media.currentTime=6.5; media.emit('time'); await flush(); expect(media.currentTime).toBe(6.5);
+    expect(()=>b.setMediaLoop({start:5,end:5})).toThrow('millisecond');
+  });
+  it('replaces the sync in place: the score follows, the source and its loop stay', async () => {
+    const media=new Media(), b=new RecordingBackend('a',media,performance,null);
+    let notified=0; b.subscribe(()=>notified++);
+    await b.play(); media.currentTime=9; expect(b.snapshot.scorePosition).toBeNull();
+    b.setMediaLoop({start:8,end:11}); await flush();
+    b.replaceSync(map()); expect(notified).toBeGreaterThan(0);
+    expect(b.snapshot.scorePosition).toEqual(pos(1,q(1n,2n))); expect(b.snapshot.mediaPhase).toBe('mapped'); expect(media.disposed).toBe(false); expect(media.paused).toBe(false);
+    media.currentTime=11.2; media.emit('time'); await flush(); expect(media.currentTime).toBe(8);
+    b.replaceSync(map([[0,2],[1,6],[2,30]])); expect(b.snapshot.syncIssue).toContain('beyond');
+    b.replaceSync(null); expect(b.snapshot.mediaPhase).toBe('unmapped'); expect(b.snapshot.syncIssue).toBeUndefined();
+  });
+});

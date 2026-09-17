@@ -4,7 +4,8 @@ import { Miniflare, convertV4MiniflareOptions } from 'miniflare';
 import type { D1Database, R2Bucket } from '@cloudflare/workers-types';
 import { Library } from '../../worker/library/index.ts';
 import { RecordingManager } from '../../worker/library/recordings.ts';
-import { attachmentSync, recordingSyncChoices, MAX_AUDIO_BYTES } from '../../src/model/recordingAttachment.ts';
+import { attachmentSync, recordingSyncChoices, storedSyncSegments, MAX_AUDIO_BYTES } from '../../src/model/recordingAttachment.ts';
+import { SYNC_SEGMENTS_FORMAT, emptySyncSegments, placeEnd, placeStart, setBpm } from '../../src/model/syncSegments.ts';
 import realApp from '../../worker/index.ts';
 import { testIdentity } from '../helpers/libraryIdentity.ts';
 let mf: Miniflare, db: D1Database, bucket: R2Bucket, manager: RecordingManager, library: Library;
@@ -38,6 +39,22 @@ it('requires explicit stable selection from wrappers and retains raw event timin
   expect(attachmentSync(raw,'9').provenance).toMatchObject({crop_start:null,crop_end:null,cropped_duration:10});
   expect(()=>recordingSyncChoices({recordings:[{id:1},{id:'1'}]})).toThrow('unique');
   expect(()=>attachmentSync([[0,-1]],null)).toThrow();
+});
+it('stores a sync authored in Studio: the segments as provenance beside the derived tuples', async () => {
+  const segments=placeEnd(setBpm(placeStart(emptySyncSegments(),2),0,120),10), syncpoints=[[0,2],[1,4],[2,6]];
+  const authored=attachmentSync({format:SYNC_SEGMENTS_FORMAT,segments,syncpoints},null);
+  expect(authored.syncpoints).toEqual(syncpoints); expect(authored.provenance).toMatchObject({format:SYNC_SEGMENTS_FORMAT,raw:segments,selectedId:null});
+  // A score with no bars yet keeps its segments and has no tuples.
+  expect(attachmentSync({format:SYNC_SEGMENTS_FORMAT,segments,syncpoints:null},null).syncpoints).toBeNull();
+  expect(()=>attachmentSync({format:SYNC_SEGMENTS_FORMAT,segments:{...segments,cuts:[10,2]},syncpoints},null)).toThrow('increase');
+  expect(()=>attachmentSync({format:SYNC_SEGMENTS_FORMAT,segments,syncpoints:[[0,-1]]},null)).toThrow();
+  const recording=id(); await manager.save('alice','piece',recording,0,change);
+  const saved=await manager.save('alice','piece',recording,1,{name:change.name,rawSync:{format:SYNC_SEGMENTS_FORMAT,segments,syncpoints}});
+  expect(JSON.parse(saved.recordings[0].syncpoints!)).toEqual(syncpoints);
+  expect(storedSyncSegments(saved.recordings[0].provenance)).toEqual(segments);
+  // The same edit again is a lost-response retry, not a second revision.
+  expect((await manager.save('alice','piece',recording,1,{name:change.name,rawSync:{format:SYNC_SEGMENTS_FORMAT,segments,syncpoints}})).piece.revision).toBe(2);
+  expect(storedSyncSegments(null)).toBeNull(); expect(storedSyncSegments('{"format":"soundslice-sync-array","raw":[]}')).toBeNull(); expect(storedSyncSegments('not json')).toBeNull();
 });
 it('creates and edits YouTube while retaining recording identity, source bytes and stale-write protection', async () => {
   const recording=id(); const a=await manager.save('alice','piece',recording,0,change);

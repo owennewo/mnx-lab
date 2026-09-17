@@ -206,6 +206,7 @@ run any time before 6.
 | 18 | [Recording attachments](../complete/studio-recording-management.md) | Studio URL/audio attachment, sync import, upload and revision lifecycle. | recording playback | service + browser checks | complete |
 | 19 | [Recording bookends](../complete/core-recording-bookends.md) | Treat media outside the anchored performance as pre/post-roll, render duration-labelled system bookends and repair cropped-duration provenance. | recording playback | fake media + layout projections + ingest repair | complete |
 | 20 | [Coda navigation](../complete/core-coda-navigation.md) | Preserve Guitar Pro Coda, Double Coda, D.C. and compound D.S. directions through a typed `_x.mnxLab.navigation` extension; one normalized consumer model feeds engraving, editing and performed-order traversal. Cached *Blackbird* is the implementation-time oracle, distilled into synthetic and corpus evidence before landing. | reviewer | synthetic GPIF fixture + notation/tab/unrolled goldens + hand-stated traversal + local Blackbird review | complete; engraving review pending |
+| 21 | [Sync bar](studio-sync-bar.md) | Author a recording's sync in the tray: the rail toggles to a time-shaped bar of cut lines and whole-beat segments; a click over the recording proves the count; segments stored as provenance beside derived one-point-per-bar tuples. | recording playback | pure model + click-schedule tests, fake media, production-Studio browser smoke | built 2026-09-17; hands-on checks pending |
 
 ### Decisions still open
 
@@ -849,3 +850,36 @@ test covering all 19 tokens. It is also constructible from `{}` and destructible
 the normal measure-attribute machinery. Item 20 landed in `36b4d3c`: 1,905 root tests,
 351 Guitar Pro converter tests, scenario checks and the production build passed after
 rebase. The new engraving batch is registered in `lab-verify.md`; no existing golden moved.
+
+### 2026-09-17 — item 21: a sync is a beat count, and the tray is big enough
+
+Soundslice's authoring flow is a tap per bar and a second pass to nudge every tap. Item 21
+replaces the tempo knob with an integer. Between two fixed times the tempo follows from a
+whole number of beats, candidates are about 0.3 bpm apart over three minutes, and the wrong
+one is half a beat out at the midpoint — audible against a click, where a decimal bpm error
+is not audible until the end. The model is cut lines and whole-beat segments
+(`src/model/syncSegments.ts`), score-independent; the tuples are derived from it and the
+written bar durations.
+
+- **The first design was rejected for its size, not its ideas.** A full-screen, three-step
+  editor was drawn first and the user's answer was that it all took too much space: the
+  tray already has a bar, and the ask was to toggle it. The result is the rail's slot at the
+  rail's height. The lesson for later player items is to start from the chrome that exists.
+- **Every button was asked to justify itself.** A Cut button became two trim handles parked
+  at the bar's ends (the first cut leaves the left unsynced, the second the right) plus Split
+  in the selected segment's row. A Zoom button became "selecting a cut zooms to it".
+- **Two derived points are wrong; one per bar is right.** The sync map divides time evenly
+  across sparse bars by design, so a steady recording still needs a point per bar the moment
+  there is a pickup or a 2/4 bar. The derivation writes them all, and an inner-bar point
+  where the beats end inside a bar.
+- **Editing must not re-cue the source.** The backend's map is replaced in place, and the
+  player recognises its own syncpoints coming back through `recordings` after the host's
+  save. Without the second half every save paused playback.
+- **No migration.** The segments are honest provenance for the tuples beside them, so they
+  ride in the existing `provenance` column under a new format name.
+- **`click` and `remove` are taken.** A private member of those names on a custom element
+  collides with `HTMLElement`; the class decorator's error does not say so plainly.
+- Unchecked by any automated proof: the click against a real YouTube clock (the estimator is
+  tested on synthetic jitter only) and the bar on touch, where the segment labels are a
+  16 px target.
+- Spec findings: none. Playback stays outside the spec loop.

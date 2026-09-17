@@ -1,9 +1,10 @@
 import { decodeRecordingSync } from './recordingSync.ts';
+import { SYNC_SEGMENTS_FORMAT, decodeSyncSegments } from './syncSegments.ts';
 export const MAX_AUDIO_BYTES = 64 * 1024 * 1024;
 export const MAX_SYNC_BYTES = 1024 * 1024;
 export const AUDIO_FORMATS: Readonly<Record<string, string>> = { mp3: 'audio/mpeg', m4a: 'audio/mp4', wav: 'audio/wav', ogg: 'audio/ogg', flac: 'audio/flac' };
 export interface SyncImportChoice { id: string; label: string; syncpoints: unknown; raw: unknown; crop_start: number | null; crop_end: number | null; cropped_duration: number | null }
-export interface RecordingProvenance { format: 'soundslice-sync-array' | 'soundslice-sync-wrapper' | 'studio-unsynchronised'; raw: unknown; selectedId: string | null; crop_start: number | null; crop_end: number | null; cropped_duration: number | null }
+export interface RecordingProvenance { format: 'soundslice-sync-array' | 'soundslice-sync-wrapper' | 'studio-unsynchronised' | typeof SYNC_SEGMENTS_FORMAT; raw: unknown; selectedId: string | null; crop_start: number | null; crop_end: number | null; cropped_duration: number | null }
 function object(value: unknown): Record<string, unknown> { if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('Expected a sync object.'); return value as Record<string, unknown>; }
 function seconds(v: unknown): number | null { if (v == null) return null; if (typeof v !== 'number' || !Number.isFinite(v) || v < 0) throw new Error('Crop times must be nonnegative seconds.'); return v; }
 /** Preserve the entire input, with an explicit stable recording identity for wrappers. */
@@ -23,9 +24,27 @@ export function recordingSyncChoices(raw: unknown): SyncImportChoice[] {
 }
 export function attachmentSync(raw: unknown, selectedId: string | null): { syncpoints: unknown; provenance: RecordingProvenance } {
   if (raw === null) return { syncpoints: null, provenance: { format: 'studio-unsynchronised', raw: null, selectedId: null, crop_start: null, crop_end: null, cropped_duration: null } };
+  // Authored in Studio's sync bar: the segments are the provenance, and the
+  // tuples beside them were derived from those segments and the score's bars.
+  if (raw && typeof raw === 'object' && !Array.isArray(raw) && (raw as Record<string, unknown>).format === SYNC_SEGMENTS_FORMAT) {
+    const { segments, syncpoints = null } = raw as Record<string, unknown>;
+    const decodedSegments = decodeSyncSegments(segments);
+    if (!decodedSegments.ok) throw new Error(decodedSegments.message);
+    if (syncpoints !== null) { const decoded = decodeRecordingSync(syncpoints); if (!decoded.ok) throw new Error(decoded.diagnostic.message); }
+    return { syncpoints, provenance: { format: SYNC_SEGMENTS_FORMAT, raw: decodedSegments.value, selectedId: null, crop_start: null, crop_end: null, cropped_duration: null } };
+  }
   const choices = recordingSyncChoices(raw);
   const choice = Array.isArray(raw) ? choices[0] : choices.find(c => c.id === selectedId);
   if (!choice) throw new Error('Choose the recording whose timings should be attached.');
   if (choice.syncpoints !== null) { const decoded = decodeRecordingSync(choice.syncpoints); if (!decoded.ok) throw new Error(decoded.diagnostic.message); }
   return { syncpoints: choice.syncpoints, provenance: { format: Array.isArray(raw) ? 'soundslice-sync-array' : 'soundslice-sync-wrapper', raw, selectedId: Array.isArray(raw) ? null : choice.id, crop_start: choice.crop_start, crop_end: choice.crop_end, cropped_duration: choice.cropped_duration } };
+}
+/** The segments a Studio-authored sync was derived from, read back out of a
+ *  stored provenance value; null for an imported or unsynchronised recording. */
+export function storedSyncSegments(provenance: unknown) {
+  let value = provenance;
+  if (typeof value === 'string') { try { value = JSON.parse(value); } catch { return null; } }
+  if (!value || typeof value !== 'object' || (value as Record<string, unknown>).format !== SYNC_SEGMENTS_FORMAT) return null;
+  const decoded = decodeSyncSegments((value as Record<string, unknown>).raw);
+  return decoded.ok ? decoded.value : null;
 }
