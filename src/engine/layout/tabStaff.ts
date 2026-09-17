@@ -201,7 +201,9 @@ export function emitTabSystemHeader(
   if (capo > 0) {
     primitives.push({
       kind: 'text',
-      text: `Capo ${capo}`,
+      // SVG collapses ordinary boundary whitespace between separate text
+      // nodes. Keep an explicit non-breaking space when a tuning precedes us.
+      text: `${standard ? '' : '\u00a0'}Capo ${capo}`,
       x: nextX,
       y: staffTop - CAPO_RISE_SP,
       font: 'body',

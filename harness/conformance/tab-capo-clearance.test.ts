@@ -4,6 +4,7 @@ import type { MnxStructure, MnxEvent } from '../../src/model/mnx.ts';
 import { layoutTab } from '../../src/engine/layout/tab.ts';
 import { layoutBothSystem } from '../../src/engine/layout/bothSystem.ts';
 import { inkEdgesSp } from '../../src/engine/render/bounds.ts';
+import { renderSvgMarkup } from '../../src/engine/render/svg.ts';
 import { initSmufl } from '../helpers/corpusPrimitives.ts';
 
 function score(string = 1): MnxStructure {
@@ -81,7 +82,14 @@ describe('capo clearance over opening hammer-ons', () => {
         expect(preRoll?.kind).toBe('rect');
         if (tuning?.kind !== 'text' || capo?.kind !== 'text' || preRoll?.kind !== 'rect') continue;
         expect(tuning.text).toBe('DADGAD');
-        expect(capo.text).toBe('Capo 3');
+        expect(capo.text).toBe('\u00a0Capo 3');
+        expect(renderSvgMarkup({
+          primitives: result.primitives,
+          widthSp: result.widthSp,
+          heightSp: result.heightSp,
+          pxPerSp: 16,
+          pxPerSpY: 16 * inkRatio
+        })).toContain('>\u00a0Capo 3</text>');
         expect(tuning.y).toBe(capo.y);
         const tuningBox = inkEdgesSp(tuning);
         const capoBox = inkEdgesSp(capo);
