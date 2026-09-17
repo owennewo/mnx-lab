@@ -14,7 +14,7 @@
 <text x="104" y="176" font-size="64" text-anchor="middle" class="time-sig-den"></text>
 <text x="242.496" y="176" font-size="64" class="notehead" data-source-id="@m0.v0.e0.n0"></text>
 <line x1="352.8" y1="128" x2="352.8" y2="192" stroke-width="2.56" class="barline"></line>
-<text x="352.8" y="88" font-size="64" text-anchor="end" class="segno"></text>
+<text x="352.8" y="110.272" font-size="64" text-anchor="end" class="segno"></text>
 <line x1="352.8" y1="128" x2="581.6" y2="128" stroke-width="2.08" class="staff-line"></line>
 <line x1="352.8" y1="144" x2="581.6" y2="144" stroke-width="2.08" class="staff-line"></line>
 <line x1="352.8" y1="160" x2="581.6" y2="160" stroke-width="2.08" class="staff-line"></line>

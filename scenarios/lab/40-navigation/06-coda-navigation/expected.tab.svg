@@ -1,74 +1,74 @@
-<svg width="1280" height="292.0048" viewBox="0 0 1280 292.0048" xmlns="http://www.w3.org/2000/svg">
+<svg width="1280" height="287.0128" viewBox="0 0 1280 287.0128" xmlns="http://www.w3.org/2000/svg">
 <style>:where(svg>text){font-family:Bravura;fill:currentColor}:where(svg>line,svg>path){stroke:currentColor}</style>
-<line x1="32" y1="120.576" x2="216.8" y2="120.576" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="138.8624" x2="216.8" y2="138.8624" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="157.1472" x2="216.8" y2="157.1472" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="175.4336" x2="216.8" y2="175.4336" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="193.7184" x2="216.8" y2="193.7184" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="212.0048" x2="216.8" y2="212.0048" stroke-width="1.6" class="staff-line"></line>
-<line x1="32" y1="120.576" x2="32" y2="212.0048" stroke-width="2.56" class="barline barline-start"></line>
-<text x="36" y="166.2896" font-size="60.16" class="tab-clef"></text>
-<text x="88" y="143.4336" font-size="64" text-anchor="middle" class="time-sig-num"></text>
-<text x="88" y="189.1472" font-size="64" text-anchor="middle" class="time-sig-den"></text>
-<text x="176.256" y="80.576" font-size="64" text-anchor="end" class="segno"></text>
-<text x="216.8" y="80.576" font-size="64" text-anchor="end" class="segno"></text>
-<line x1="216.8" y1="120.576" x2="216.8" y2="212.0048" stroke-width="2.56" class="barline"></line>
-<line x1="216.8" y1="120.576" x2="335.2" y2="120.576" stroke-width="1.6" class="staff-line"></line>
-<line x1="216.8" y1="138.8624" x2="335.2" y2="138.8624" stroke-width="1.6" class="staff-line"></line>
-<line x1="216.8" y1="157.1472" x2="335.2" y2="157.1472" stroke-width="1.6" class="staff-line"></line>
-<line x1="216.8" y1="175.4336" x2="335.2" y2="175.4336" stroke-width="1.6" class="staff-line"></line>
-<line x1="216.8" y1="193.7184" x2="335.2" y2="193.7184" stroke-width="1.6" class="staff-line"></line>
-<line x1="216.8" y1="212.0048" x2="335.2" y2="212.0048" stroke-width="1.6" class="staff-line"></line>
-<text x="335.2" y="80.576" font-size="25.6" text-anchor="end" style="font-family:var(--font-family-sans)" class="jump">To Double Coda</text>
-<line x1="335.2" y1="120.576" x2="335.2" y2="212.0048" stroke-width="2.56" class="barline"></line>
-<line x1="335.2" y1="120.576" x2="453.6" y2="120.576" stroke-width="1.6" class="staff-line"></line>
-<line x1="335.2" y1="138.8624" x2="453.6" y2="138.8624" stroke-width="1.6" class="staff-line"></line>
-<line x1="335.2" y1="157.1472" x2="453.6" y2="157.1472" stroke-width="1.6" class="staff-line"></line>
-<line x1="335.2" y1="175.4336" x2="453.6" y2="175.4336" stroke-width="1.6" class="staff-line"></line>
-<line x1="335.2" y1="193.7184" x2="453.6" y2="193.7184" stroke-width="1.6" class="staff-line"></line>
-<line x1="335.2" y1="212.0048" x2="453.6" y2="212.0048" stroke-width="1.6" class="staff-line"></line>
-<text x="453.6" y="80.576" font-size="64" text-anchor="end" class="segno"></text>
-<line x1="453.6" y1="120.576" x2="453.6" y2="212.0048" stroke-width="2.56" class="barline"></line>
-<line x1="453.6" y1="120.576" x2="572" y2="120.576" stroke-width="1.6" class="staff-line"></line>
-<line x1="453.6" y1="138.8624" x2="572" y2="138.8624" stroke-width="1.6" class="staff-line"></line>
-<line x1="453.6" y1="157.1472" x2="572" y2="157.1472" stroke-width="1.6" class="staff-line"></line>
-<line x1="453.6" y1="175.4336" x2="572" y2="175.4336" stroke-width="1.6" class="staff-line"></line>
-<line x1="453.6" y1="193.7184" x2="572" y2="193.7184" stroke-width="1.6" class="staff-line"></line>
-<line x1="453.6" y1="212.0048" x2="572" y2="212.0048" stroke-width="1.6" class="staff-line"></line>
-<text x="572" y="80.576" font-size="25.6" text-anchor="end" style="font-family:var(--font-family-sans)" class="jump">To Coda</text>
-<line x1="572" y1="120.576" x2="572" y2="212.0048" stroke-width="2.56" class="barline"></line>
-<line x1="572" y1="120.576" x2="690.4" y2="120.576" stroke-width="1.6" class="staff-line"></line>
-<line x1="572" y1="138.8624" x2="690.4" y2="138.8624" stroke-width="1.6" class="staff-line"></line>
-<line x1="572" y1="157.1472" x2="690.4" y2="157.1472" stroke-width="1.6" class="staff-line"></line>
-<line x1="572" y1="175.4336" x2="690.4" y2="175.4336" stroke-width="1.6" class="staff-line"></line>
-<line x1="572" y1="193.7184" x2="690.4" y2="193.7184" stroke-width="1.6" class="staff-line"></line>
-<line x1="572" y1="212.0048" x2="690.4" y2="212.0048" stroke-width="1.6" class="staff-line"></line>
-<text x="690.4" y="80.576" font-size="25.6" text-anchor="end" style="font-family:var(--font-family-sans)" class="jump">D.S. al Coda</text>
-<line x1="690.4" y1="120.576" x2="690.4" y2="212.0048" stroke-width="2.56" class="barline"></line>
-<line x1="690.4" y1="120.576" x2="808.8" y2="120.576" stroke-width="1.6" class="staff-line"></line>
-<line x1="690.4" y1="138.8624" x2="808.8" y2="138.8624" stroke-width="1.6" class="staff-line"></line>
-<line x1="690.4" y1="157.1472" x2="808.8" y2="157.1472" stroke-width="1.6" class="staff-line"></line>
-<line x1="690.4" y1="175.4336" x2="808.8" y2="175.4336" stroke-width="1.6" class="staff-line"></line>
-<line x1="690.4" y1="193.7184" x2="808.8" y2="193.7184" stroke-width="1.6" class="staff-line"></line>
-<line x1="690.4" y1="212.0048" x2="808.8" y2="212.0048" stroke-width="1.6" class="staff-line"></line>
-<text x="808.8" y="94.464" font-size="64" text-anchor="end" class="coda"></text>
-<line x1="808.8" y1="120.576" x2="808.8" y2="212.0048" stroke-width="2.56" class="barline"></line>
-<line x1="808.8" y1="120.576" x2="927.2" y2="120.576" stroke-width="1.6" class="staff-line"></line>
-<line x1="808.8" y1="138.8624" x2="927.2" y2="138.8624" stroke-width="1.6" class="staff-line"></line>
-<line x1="808.8" y1="157.1472" x2="927.2" y2="157.1472" stroke-width="1.6" class="staff-line"></line>
-<line x1="808.8" y1="175.4336" x2="927.2" y2="175.4336" stroke-width="1.6" class="staff-line"></line>
-<line x1="808.8" y1="193.7184" x2="927.2" y2="193.7184" stroke-width="1.6" class="staff-line"></line>
-<line x1="808.8" y1="212.0048" x2="927.2" y2="212.0048" stroke-width="1.6" class="staff-line"></line>
-<text x="927.2" y="80.576" font-size="25.6" text-anchor="end" style="font-family:var(--font-family-sans)" class="jump">D.S.S. al Double Coda</text>
-<line x1="927.2" y1="120.576" x2="927.2" y2="212.0048" stroke-width="2.56" class="barline"></line>
-<line x1="927.2" y1="120.576" x2="1045.6" y2="120.576" stroke-width="1.6" class="staff-line"></line>
-<line x1="927.2" y1="138.8624" x2="1045.6" y2="138.8624" stroke-width="1.6" class="staff-line"></line>
-<line x1="927.2" y1="157.1472" x2="1045.6" y2="157.1472" stroke-width="1.6" class="staff-line"></line>
-<line x1="927.2" y1="175.4336" x2="1045.6" y2="175.4336" stroke-width="1.6" class="staff-line"></line>
-<line x1="927.2" y1="193.7184" x2="1045.6" y2="193.7184" stroke-width="1.6" class="staff-line"></line>
-<line x1="927.2" y1="212.0048" x2="1045.6" y2="212.0048" stroke-width="1.6" class="staff-line"></line>
-<text x="978.624" y="94.464" font-size="64" text-anchor="end" class="coda"></text>
-<text x="1045.6" y="94.464" font-size="64" text-anchor="end" class="coda"></text>
-<line x1="1032.8" y1="120.576" x2="1032.8" y2="212.0048" stroke-width="2.56" class="barline barline-final-thin"></line>
-<rect x="1037.6" y="120.576" width="8" height="91.4288" fill="currentColor" class="barline barline-final-thick"></rect>
+<line x1="32" y1="115.584" x2="216.8" y2="115.584" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="133.8704" x2="216.8" y2="133.8704" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="152.1552" x2="216.8" y2="152.1552" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="170.4416" x2="216.8" y2="170.4416" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="188.7264" x2="216.8" y2="188.7264" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="207.0128" x2="216.8" y2="207.0128" stroke-width="1.6" class="staff-line"></line>
+<line x1="32" y1="115.584" x2="32" y2="207.0128" stroke-width="2.56" class="barline barline-start"></line>
+<text x="36" y="161.2976" font-size="60.16" class="tab-clef"></text>
+<text x="88" y="138.4416" font-size="64" text-anchor="middle" class="time-sig-num"></text>
+<text x="88" y="184.1552" font-size="64" text-anchor="middle" class="time-sig-den"></text>
+<text x="176.256" y="97.856" font-size="64" text-anchor="end" class="segno"></text>
+<text x="216.8" y="97.856" font-size="64" text-anchor="end" class="segno"></text>
+<line x1="216.8" y1="115.584" x2="216.8" y2="207.0128" stroke-width="2.56" class="barline"></line>
+<line x1="216.8" y1="115.584" x2="335.2" y2="115.584" stroke-width="1.6" class="staff-line"></line>
+<line x1="216.8" y1="133.8704" x2="335.2" y2="133.8704" stroke-width="1.6" class="staff-line"></line>
+<line x1="216.8" y1="152.1552" x2="335.2" y2="152.1552" stroke-width="1.6" class="staff-line"></line>
+<line x1="216.8" y1="170.4416" x2="335.2" y2="170.4416" stroke-width="1.6" class="staff-line"></line>
+<line x1="216.8" y1="188.7264" x2="335.2" y2="188.7264" stroke-width="1.6" class="staff-line"></line>
+<line x1="216.8" y1="207.0128" x2="335.2" y2="207.0128" stroke-width="1.6" class="staff-line"></line>
+<text x="335.2" y="75.584" font-size="25.6" text-anchor="end" style="font-family:var(--font-family-sans)" class="jump">To Double Coda</text>
+<line x1="335.2" y1="115.584" x2="335.2" y2="207.0128" stroke-width="2.56" class="barline"></line>
+<line x1="335.2" y1="115.584" x2="453.6" y2="115.584" stroke-width="1.6" class="staff-line"></line>
+<line x1="335.2" y1="133.8704" x2="453.6" y2="133.8704" stroke-width="1.6" class="staff-line"></line>
+<line x1="335.2" y1="152.1552" x2="453.6" y2="152.1552" stroke-width="1.6" class="staff-line"></line>
+<line x1="335.2" y1="170.4416" x2="453.6" y2="170.4416" stroke-width="1.6" class="staff-line"></line>
+<line x1="335.2" y1="188.7264" x2="453.6" y2="188.7264" stroke-width="1.6" class="staff-line"></line>
+<line x1="335.2" y1="207.0128" x2="453.6" y2="207.0128" stroke-width="1.6" class="staff-line"></line>
+<text x="453.6" y="97.856" font-size="64" text-anchor="end" class="segno"></text>
+<line x1="453.6" y1="115.584" x2="453.6" y2="207.0128" stroke-width="2.56" class="barline"></line>
+<line x1="453.6" y1="115.584" x2="572" y2="115.584" stroke-width="1.6" class="staff-line"></line>
+<line x1="453.6" y1="133.8704" x2="572" y2="133.8704" stroke-width="1.6" class="staff-line"></line>
+<line x1="453.6" y1="152.1552" x2="572" y2="152.1552" stroke-width="1.6" class="staff-line"></line>
+<line x1="453.6" y1="170.4416" x2="572" y2="170.4416" stroke-width="1.6" class="staff-line"></line>
+<line x1="453.6" y1="188.7264" x2="572" y2="188.7264" stroke-width="1.6" class="staff-line"></line>
+<line x1="453.6" y1="207.0128" x2="572" y2="207.0128" stroke-width="1.6" class="staff-line"></line>
+<text x="572" y="75.584" font-size="25.6" text-anchor="end" style="font-family:var(--font-family-sans)" class="jump">To Coda</text>
+<line x1="572" y1="115.584" x2="572" y2="207.0128" stroke-width="2.56" class="barline"></line>
+<line x1="572" y1="115.584" x2="690.4" y2="115.584" stroke-width="1.6" class="staff-line"></line>
+<line x1="572" y1="133.8704" x2="690.4" y2="133.8704" stroke-width="1.6" class="staff-line"></line>
+<line x1="572" y1="152.1552" x2="690.4" y2="152.1552" stroke-width="1.6" class="staff-line"></line>
+<line x1="572" y1="170.4416" x2="690.4" y2="170.4416" stroke-width="1.6" class="staff-line"></line>
+<line x1="572" y1="188.7264" x2="690.4" y2="188.7264" stroke-width="1.6" class="staff-line"></line>
+<line x1="572" y1="207.0128" x2="690.4" y2="207.0128" stroke-width="1.6" class="staff-line"></line>
+<text x="690.4" y="75.584" font-size="25.6" text-anchor="end" style="font-family:var(--font-family-sans)" class="jump">D.S. al Coda</text>
+<line x1="690.4" y1="115.584" x2="690.4" y2="207.0128" stroke-width="2.56" class="barline"></line>
+<line x1="690.4" y1="115.584" x2="808.8" y2="115.584" stroke-width="1.6" class="staff-line"></line>
+<line x1="690.4" y1="133.8704" x2="808.8" y2="133.8704" stroke-width="1.6" class="staff-line"></line>
+<line x1="690.4" y1="152.1552" x2="808.8" y2="152.1552" stroke-width="1.6" class="staff-line"></line>
+<line x1="690.4" y1="170.4416" x2="808.8" y2="170.4416" stroke-width="1.6" class="staff-line"></line>
+<line x1="690.4" y1="188.7264" x2="808.8" y2="188.7264" stroke-width="1.6" class="staff-line"></line>
+<line x1="690.4" y1="207.0128" x2="808.8" y2="207.0128" stroke-width="1.6" class="staff-line"></line>
+<text x="808.8" y="89.472" font-size="64" text-anchor="end" class="coda"></text>
+<line x1="808.8" y1="115.584" x2="808.8" y2="207.0128" stroke-width="2.56" class="barline"></line>
+<line x1="808.8" y1="115.584" x2="927.2" y2="115.584" stroke-width="1.6" class="staff-line"></line>
+<line x1="808.8" y1="133.8704" x2="927.2" y2="133.8704" stroke-width="1.6" class="staff-line"></line>
+<line x1="808.8" y1="152.1552" x2="927.2" y2="152.1552" stroke-width="1.6" class="staff-line"></line>
+<line x1="808.8" y1="170.4416" x2="927.2" y2="170.4416" stroke-width="1.6" class="staff-line"></line>
+<line x1="808.8" y1="188.7264" x2="927.2" y2="188.7264" stroke-width="1.6" class="staff-line"></line>
+<line x1="808.8" y1="207.0128" x2="927.2" y2="207.0128" stroke-width="1.6" class="staff-line"></line>
+<text x="927.2" y="75.584" font-size="25.6" text-anchor="end" style="font-family:var(--font-family-sans)" class="jump">D.S.S. al Double Coda</text>
+<line x1="927.2" y1="115.584" x2="927.2" y2="207.0128" stroke-width="2.56" class="barline"></line>
+<line x1="927.2" y1="115.584" x2="1045.6" y2="115.584" stroke-width="1.6" class="staff-line"></line>
+<line x1="927.2" y1="133.8704" x2="1045.6" y2="133.8704" stroke-width="1.6" class="staff-line"></line>
+<line x1="927.2" y1="152.1552" x2="1045.6" y2="152.1552" stroke-width="1.6" class="staff-line"></line>
+<line x1="927.2" y1="170.4416" x2="1045.6" y2="170.4416" stroke-width="1.6" class="staff-line"></line>
+<line x1="927.2" y1="188.7264" x2="1045.6" y2="188.7264" stroke-width="1.6" class="staff-line"></line>
+<line x1="927.2" y1="207.0128" x2="1045.6" y2="207.0128" stroke-width="1.6" class="staff-line"></line>
+<text x="978.624" y="89.472" font-size="64" text-anchor="end" class="coda"></text>
+<text x="1045.6" y="89.472" font-size="64" text-anchor="end" class="coda"></text>
+<line x1="1032.8" y1="115.584" x2="1032.8" y2="207.0128" stroke-width="2.56" class="barline barline-final-thin"></line>
+<rect x="1037.6" y="115.584" width="8" height="91.4288" fill="currentColor" class="barline barline-final-thick"></rect>
 </svg>

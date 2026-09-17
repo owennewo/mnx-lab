@@ -155,7 +155,7 @@
         "kind": "glyph",
         "glyph": "segno",
         "x": 24.7167,
-        "y": 5.5,
+        "y": 6.892,
         "anchor": "middle",
         "className": "segno"
       },
@@ -225,7 +225,7 @@
         "kind": "glyph",
         "glyph": "segnoSerpent2",
         "x": 36.525,
-        "y": 5.5,
+        "y": 6.868,
         "anchor": "middle",
         "className": "segno"
       },

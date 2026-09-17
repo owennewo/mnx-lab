@@ -1605,11 +1605,11 @@ extra width legitimately lets another measure fit.
 
 ## Coda and double-coda navigation — 2026-09-17
 
-Owner: [core-coda-navigation.md](../complete/core-coda-navigation.md). One new
-synthetic scenario, `lab/navigation/coda-navigation`, carries the eight-direction
-graph distilled from the cached Blackbird source without retaining any of that
-score's notes or metadata. Its notation, tab, combined, performed and unrolled
-goldens are new; no existing scenario moved.
+Owner: [core-coda-navigation.md](../complete/core-coda-navigation.md). The initial
+batch added one synthetic scenario, `lab/navigation/coda-navigation`, carrying the
+eight-direction graph distilled from the cached Blackbird source without retaining
+any of that score's notes or metadata. Its notation, tab, combined, performed and
+unrolled goldens were new.
 
 **What a reviewer should look for.** The first and last bars show two segno and
 two coda glyphs respectively, with visible separation rather than overprinting.
@@ -1625,3 +1625,15 @@ SMuFL baseline. Above-staff labels and navigation marks are also retained by the
 system they name during vertical tightening, preventing a section such as
 Blackbird's “Bridge” from being carried into the preceding system. The same new
 scenario goldens were regenerated; this remains one pending review batch.
+
+Second visual correction: the reported “coda glyphs” in the Blackbird screenshot
+were segnos, which still used the old baseline and left 2.4 spaces below their
+ink. Segnos and codas now share the same bbox-derived one-space bottom clearance;
+their differing SMuFL origins no longer determine visible placement. This expanded
+the same pending batch to the existing scenarios `lab/score-text/labels-with-navigation`,
+`lab/score-text/labels-on-a-tab-staff`, `lab/navigation/jumps-and-signs`,
+`lab/navigation/numbered-bars`, `lab/navigation/ds-final-ending`,
+`lab/layout/coloured-marks-and-clef-forms`, `spec/jumps-dal-segno`, and
+`spec/jumps-ds-al-fine`. Review that segnos moved down without touching their staff,
+and that any section/tempo stack above them moved with the target rather than
+changing its internal clearance.

@@ -18,7 +18,7 @@
 <line x1="320.8" y1="192" x2="527.2" y2="192" stroke-width="2.08" class="staff-line"></line>
 <text x="416.896" y="168" font-size="64" class="notehead" data-source-id="@m1.v0.e0.n0"></text>
 <line x1="527.2" y1="128" x2="527.2" y2="192" stroke-width="2.56" class="barline"></line>
-<text x="430.4" y="88" font-size="64" text-anchor="middle" class="segno"></text>
+<text x="430.4" y="110.272" font-size="64" text-anchor="middle" class="segno"></text>
 <text x="324" y="113.6" font-size="20.8" style="font-family:var(--font-family-sans)" class="measure-number">18</text>
 <line x1="527.2" y1="128" x2="733.6" y2="128" stroke-width="2.08" class="staff-line"></line>
 <line x1="527.2" y1="144" x2="733.6" y2="144" stroke-width="2.08" class="staff-line"></line>

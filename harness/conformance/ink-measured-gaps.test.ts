@@ -33,7 +33,7 @@ import { anchorY, rowBoundariesSp } from '../../src/engine/layout/verticalDensit
 import { lyricReachBelowRows } from '../../src/engine/layout/lyricRuns.ts';
 import {
   COHESION_CLEAR_SP,
-  CODA_BOTTOM_RISE_SP,
+  NAV_TARGET_BOTTOM_RISE_SP,
   TEXT_MIN_RISE_SP,
   TEXT_SIDE_CLEAR_SP
 } from '../../src/engine/layout/scoreText.ts';
@@ -86,16 +86,16 @@ describe('TAB clef scale', () => {
 });
 
 describe('navigation glyph placement', () => {
-  it('places coda bottom ink one space above its staff', () => {
+  it('places segno and coda bottom ink one space above their staff', () => {
     initSmufl();
     const s = corpus.find(c => c.id === 'lab/navigation/coda-navigation')!;
     for (const layout of [layoutNotation({ mnx: readDoc(s.dir), widthSp: WIDTH_SP }), layoutTab({ mnx: readDoc(s.dir), widthSp: WIDTH_SP })]) {
-      const codas = layout.primitives.filter(p => cls(p) === 'coda');
-      expect(codas.length).toBeGreaterThan(0);
-      for (const coda of codas) {
-        const staff = layout.rows.find(row => row.staffTop > anchorY(coda))!;
-        expect(staff.staffTop - computeBoundsSp([coda])!.y - computeBoundsSp([coda])!.h)
-          .toBeCloseTo(CODA_BOTTOM_RISE_SP, 6);
+      const targets = layout.primitives.filter(p => cls(p) === 'segno' || cls(p) === 'coda');
+      expect(new Set(targets.map(cls))).toEqual(new Set(['segno', 'coda']));
+      for (const target of targets) {
+        const staff = layout.rows.find(row => row.staffTop > anchorY(target))!;
+        expect(staff.staffTop - computeBoundsSp([target])!.y - computeBoundsSp([target])!.h)
+          .toBeCloseTo(NAV_TARGET_BOTTOM_RISE_SP, 6);
       }
     }
   });
