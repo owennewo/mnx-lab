@@ -1,5 +1,13 @@
 # Studio first cut — browse, load, play, behind Access
 
+> **Read this first (2026-09-17).** This doc describes studio's FIRST cut — browse, open, play,
+> behind Access — and its sentences about editing ("nothing is persisted yet", "in memory
+> only") were true then and are not now. Studio makes pieces, edits them from the keyboard and
+> saves them as `.gp` versions: see the
+> [studio authoring campaign](studio-campaign-authoring.md) and its
+> [pickup note](studio-campaign-authoring-pickup.md). What is still owed HERE is only this
+> doc's own deployed checks.
+
 > **Status: built 2026-09-11, in `inprogress/` until the deployed checks pass** (build
 > record at the end). Studio starts. Depends on
 > [workbench-path-prefix.md](workbench-path-prefix.md) (the workbench leaves the root

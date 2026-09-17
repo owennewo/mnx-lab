@@ -3,10 +3,10 @@
 // importers' clean-room worker — the service stores the source, the reader
 // converts — and mounts it in the score frame: <mnx-document-viewer> filling
 // the pane, <mnx-player> in the frame's bottom strip, wired through the
-// plain-DOM host binding the embed face exports. Nothing here edits or
-// persists anything except per-browser preferences (the staff view, the
-// display settings, zoom and spacing — the one persistence a shell may own
-// without a backend decision).
+// plain-DOM host binding the embed face exports. It began read-only; it now
+// EDITS and SAVES (see the dated notes below) — what it still owns for itself
+// is only per-browser preferences: the staff view, the display settings, zoom
+// and spacing.
 //
 // The chrome is the frame's (roadmap/inprogress/core-score-frame.md): the
 // library page's tools row above the score and the player's tray below, hidden
@@ -21,10 +21,15 @@
 // frame's side slot beside Instruments; the recording editor opens there too.
 // 2026-09-17: the tray's sync bar makes a recording's sync here; this page is
 // the host that stores it (roadmap/inprogress/studio-sync-bar.md).
-// 2026-09-17, later: the page EDITS. "Nothing here edits or persists anything"
-// above stopped being true with the Details sheet — studio's first editor, over
-// the document's own metadata — and the save session that stores its work as
-// `.gp` checkpoints with nobody asked to save (roadmap/complete/studio-save-pipeline.md).
+// 2026-09-17, later: the page EDITS. The Details sheet (the document's own
+// metadata) came first, with the save session that stores its work as `.gp`
+// checkpoints with nobody asked to save (roadmap/complete/studio-save-pipeline.md);
+// then versions, revert and delete (roadmap/complete/studio-piece-lifecycle.md);
+// then the editor's mount — notes from the keyboard, the rung inspector on Enter,
+// the lyric editor on Shift+L (roadmap/inprogress/core-editor-element-promotion.md).
+// Every document change arrives through ONE door, `showDocument`, from the
+// editor binding's `onChange`; previews (an older version, the lyric editor's
+// scratch) set `this.doc` directly and are never told to the save session.
 import { LitElement, css, html, nothing } from 'lit';
 import { keyed } from 'lit/directives/keyed.js';
 import { customElement, property, query, state } from 'lit/decorators.js';

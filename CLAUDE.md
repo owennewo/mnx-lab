@@ -110,7 +110,8 @@ Why outside the repo, why rebase, why goldens are regenerated rather than merged
 ```
 spec/                the standard + our proposals. mnx-schema.json is a verbatim copy
                      of the pinned upstream release — NEVER hand-edited;
-                     mnx-lab-extensions.schema.json is the _x.mnxLab vendor schema (v6);
+                     mnx-lab-extensions.schema.json is the _x.mnxLab vendor schema (v6.x —
+                     point releases keep the /v6 $id; docs/mnx-extensions.md names the current one);
                      proposals/<topic>/ are evidence bundles; tools/ syncs down, pushes up
 scenarios/           ONE corpus format, two axes (below); manifest.json, meta.schema.json
 harness/             every way the evidence is exercised — conformance/, verify/
@@ -118,9 +119,11 @@ harness/             every way the evidence is exercised — conformance/, verif
                      render/ (PNG engravings; needs google-chrome), helpers/
 src/                 the apparatus — capability layers (order below)
   model/  engine/  audio/  edit/  corpus/  storage/  importers/  assist/  elements/  workbench/  entries/
-worker/              Hono; a DEMO for visitors with no key of their own, plus reserved
-                     501 seams. generated/ is schema DATA precompiled from spec/,
-                     importable from any layer
+worker/              Hono. The assist DEMO for visitors with no key of their own; studio's
+                     LIBRARY API (api/library.ts + library/, over D1 + R2, behind Cloudflare
+                     Access — pieces, renditions, recordings, tags; migrations/ is its schema);
+                     and two reserved 501 seams (documents, auth). generated/ is schema DATA
+                     precompiled from spec/, importable from any layer
 converters/          npm-workspace sub-packages + fixtures/ (the three scores)
 apps/studio/         the consumer product — a Lit shell over elements/ + storage/ (+ edit/'s
                      DOM-free ops, to make pieces), at /studio/
@@ -248,12 +251,15 @@ or any notation library.
 The `both` single-system walk, the fret/string derivation ladder, diagnostic severities
 and the note↔JSON cross-highlight: [docs/rendering.md](docs/rendering.md).
 
-## MNX types and `_x.mnxLab` (v6.2)
+## MNX types and `_x.mnxLab` (v6.x)
 
 Types: `src/model/mnx.ts`. **Documents are written as `.mnx.json`** (`.json`/`.mnx`
 accepted on read; helpers in `converters/musicxml-mnx/src/common/mnxFile.ts`).
-Everything MNX v19 can't express lives under the one vendor key **`_x.mnxLab`** (the
-`_x` sub-key names a vendor, not a feature). **Extend `_x.mnxLab` and its schema — never
+Everything published MNX can't express lives under the one vendor key **`_x.mnxLab`** (the
+`_x` sub-key names a vendor, not a feature). Version numbers drift in prose: the pinned
+`spec/mnx-schema.json` says which MNX release it is in its `$id`, and
+[docs/mnx-extensions.md](docs/mnx-extensions.md)'s title says which `_x.mnxLab` point release
+is current — trust those over any "v19" or "v6.2" written elsewhere, including below. **Extend `_x.mnxLab` and its schema — never
 standard MNX fields.**
 
 The invariants: note-level **flat** `string`/`fret`/`fingering`, where the **string is
@@ -337,7 +343,14 @@ output names refuse to overwrite).
   don't flip to standard decorators without testing the whole tree.
 - The clean-room shell is plain Lit — no Web Awesome, no other UI kit.
 - Tests: root vitest = `harness/`; converter packages run their own
-  (`npm -w @mnx-editor/<name> test`). The Worker and UI have no tests.
+  (`npm -w @mnx-editor/<name> test`). The Worker's **library routes are tested** in
+  `harness/conformance/` over Miniflare's local D1/R2 with signed identities
+  (`library*.test.ts`, `piece-*.test.ts`, `recording-management.test.ts`); the assist demo
+  and the UI have no unit tests. The UI's proof is the real-browser smokes in
+  `harness/verify/*-smoke.mjs` (`npm run smoke:*`) — **not part of the gates**, so run the
+  relevant ones by hand after touching a shell or an element. Those that need the library
+  want `npm run dev:login` and `wrangler dev` on a free port
+  ([docs/library-access.md](docs/library-access.md) → Local development).
 - `dist/` is gitignored build output. The scratch site for proposal verification comes
   from `makesite` in the worktree, not from this repo.
 - **Git**: one worktree per agent, rebase, `--ff-only` self-merge to `main`, worktree

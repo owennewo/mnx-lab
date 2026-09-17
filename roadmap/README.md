@@ -174,6 +174,13 @@ back up to `proposed/` the moment it is.
   the binding on Enter and Shift+L with copy/cut/paste, under a token-carrying
   `<mnx-editor-surfaces>` because the inspector inherits its palette. Parked 2026-08-09 behind a
   second-consumer trigger that studio met.
+- **[studio-campaign-authoring-pickup.md](inprogress/studio-campaign-authoring-pickup.md)** —
+  **start here to continue the studio authoring campaign.** A handoff note written
+  2026-09-17 at the end of the session that built items 1–5 and item 7's three slices: what is
+  left and in what order (apply migration 0005 then deploy; the owner's two hands-on sync
+  checks; the workbench adopting `bindEditor`; touch entry), the owner's decisions not to
+  reopen, the layer rules and tooling traps that cost time, how to run the browser smokes,
+  and a file map. Delete it when the campaign closes.
 - **[studio-campaign-authoring.md](inprogress/studio-campaign-authoring.md)** — **campaign**,
   opened 2026-09-17, **items 1–5 and item 7's three slices built the same day** (4 owes two hands-on checks; 5 needs migration 0005 before deploy): studio stops being read-only. Priority flow **new piece
   → YouTube → sync**, working before any note editing exists; editing last. Opens on the

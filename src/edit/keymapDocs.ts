@@ -164,7 +164,7 @@ export const KEY_DOCS: KeyDoc[] = [
     strokes: [{ code: 'Escape' }],
     group: 'selection',
     meaning: {
-      all: 'abandon the innermost pending thing — an open popover or inspector, or a half-typed fret — or deselect when there is none'
+      all: 'abandon the innermost pending thing — an open inspector, or a half-typed fret — or deselect when there is none'
     }
   },
   {
@@ -172,7 +172,7 @@ export const KEY_DOCS: KeyDoc[] = [
     strokes: [{ code: 'Enter' }, { code: 'NumpadEnter' }],
     group: 'selection',
     meaning: {
-      all: 'commit the innermost pending thing — apply the popover, enter the fret now, complete the armed slur/beam — or, with nothing pending, open the rung inspector'
+      all: 'commit the innermost pending thing — enter a half-typed fret now — or, with nothing pending, open the rung inspector'
     }
   },
   {

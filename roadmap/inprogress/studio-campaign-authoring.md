@@ -3,9 +3,13 @@
 > **A campaign** (see CLAUDE.md → Roadmap-driven development): this doc is an index over
 > normal proposals sharing one goal, the shared contract they follow, and the running log
 > of progress and learnings as items land. Indexed items are ordinary `studio-*` / `core-*`
-> proposals that name this campaign. **Opened 2026-09-17 from a design conversation; items 1–5
-> built the same day (4 owes two hands-on checks; 5 needs migration 0005 before deploy), the rest not
-> started.** Storage shape stays owned by
+> proposals that name this campaign. **Opened 2026-09-17 from a design conversation. Built the
+> same day: items 1–5 and item 7's three slices for studio. Open: item 4's two hands-on checks,
+> item 7's last work-list item (the workbench adopting the binding), item 8 (touch), item 6
+> (optional). Nothing is deployed, and migration 0005 must be applied before anything is.**
+> **Picking this up? Start at the [pickup note](studio-campaign-authoring-pickup.md)** — what
+> is left, in what order, and what a new session will not find written anywhere else.
+> Storage shape stays owned by
 > [docs/studio-storage.md](../../docs/studio-storage.md); the sync bar by
 > [docs/player-sync-bar.md](../../docs/player-sync-bar.md). This doc owns the order and
 > the contract.
@@ -34,6 +38,9 @@ studio, layout authoring (system breaks, `scores[]`), thinning of automatic vers
 public sign-up.
 
 ## Baseline at campaign opening
+
+*Historical: the state of the tree on the morning of 2026-09-17, kept because it is what the
+contract was written against. Most of these gaps are closed — the index says which.*
 
 - **Recordings and sync already work in studio — for a piece that exists.** The Source
   sheet's Add takes a YouTube link or an audio file (`apps/studio/src/RecordingsSheet.ts`),
@@ -154,6 +161,10 @@ public sign-up.
    `Recovered 9 edits from this device`. Age ticks coarsely. Sync and tag saves share it.
 8. **One revision-ordered write queue per piece.** Checkpoints, sync saves and tag changes
    all bump the same piece revision, so they serialise through one queue in the piece page.
+   *(As built: the queue carries the PAGE's own writes — checkpoints, sync saves, sync
+   refreshes, shape stamps, reverts, deletes. The Tags and Recordings sheets still write with
+   the snapshot's revision themselves; a collision with an autosave is a 409 that one side
+   retries. Joining them to the queue is open, and only worth doing if those 409s show up.)*
    A second tab on the same piece opens read-only behind a Web Lock; a 409 from another
    device offers *reload, or save mine as a copy* — never a silent overwrite.
 9. **The document is authoritative for metadata; tags are a projection.** `_x.mnxLab.work`
@@ -211,7 +222,8 @@ one.
 
 ### Decisions still open
 
-1. **Does item 7's slice 1 ship keyboard-only, or is it blocked on item 8?** A product call.
+1. ~~Does item 7's slice 1 ship keyboard-only, or is it blocked on item 8?~~ **Decided
+   2026-09-17 by the owner: keyboard-only.** Touch entry is item 8, on its own.
 2. **Lifting imported syncs** (item 6): lossless-and-crowded or merged-and-lossy.
 3. **Thinning automatic versions.** Dozens of ~24 KB renditions per session is ~1–2 MB
    against R2's free 10 GB, so it waits; when it comes it deletes rows, which the storage
