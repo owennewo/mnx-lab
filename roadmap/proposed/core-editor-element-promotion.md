@@ -7,7 +7,7 @@
 > and, just as deliberately, the reasons not to make it yet.
 >
 > **Trigger 2 met, 2026-09-17.** Studio is the second consumer: this doc is item 7 of the
-> [studio authoring campaign](studio-campaign-authoring.md) and inherits its contract. The
+> [studio authoring campaign](../inprogress/studio-campaign-authoring.md) and inherits its contract. The
 > campaign sequences it last (creation, the save pipeline and sync come first), recommends
 > promoting in three slices with the rung inspector last, keeps `elements → assist` closed,
 > and opens `apps/studio → src/edit` earlier, at its item 3. The re-check below is kept as

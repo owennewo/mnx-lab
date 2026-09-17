@@ -45,24 +45,6 @@ proposals that name their campaign.
 
 ### proposed/
 
-- **[studio-campaign-authoring.md](proposed/studio-campaign-authoring.md)** — **campaign**,
-  opened 2026-09-17, nothing built: studio stops being read-only. Priority flow **new piece
-  → YouTube → sync**, working before any note editing exists; editing last. Opens on the
-  finding that adding a recording and the sync bar were already built and persisted — what
-  was missing was any way for a piece to exist outside the operator ingest. The contract's
-  founding decisions: **`.gp` stays the only durable score format, even for studio edits**
-  (no MNX migrations on stored data; reverses "the first saved edit becomes an MNX
-  rendition"); every save is a checkpoint and a new immutable rendition, so the server holds
-  every version; **no save is silent about loss** — export → re-import → compare on every
-  checkpoint, and a difference no exporter warning explains is a converter defect with a
-  ready-made fixture; hybrid autosave with a disposable local recovery record that **is the live document**
-  (ops ride along as evidence — revised after review, log entry 2);
-  one save-state chip showing unsaved edits then age; **segments are the sync, tuples a
-  cache** re-derived on load and on bar change. Eight items: the round-trip comparator and
-  baseline loss register → create a piece → the save pipeline proven on a metadata sheet →
-  sync re-derivation → piece lifecycle → sync.json interchange (optional) →
-  [core-editor-element-promotion](proposed/core-editor-element-promotion.md) in three slices
-  → touch entry. Score-file upload is deliberately skipped.
 - **[studio-player-practice.md](proposed/studio-player-practice.md)** — campaign item 13,
   studio's first player feature in `elements/`: loop the selection with the **written-range
   → performed-occurrences policy stated**, speed trainer, count-in, metronome, mute/solo.
@@ -84,7 +66,7 @@ proposals that name their campaign.
   editor's mount layer out of `workbench/` into `elements/`, making it consumable by the
   embed face and studio. Split out of [core-editor-input-layer.md](complete/core-editor-input-layer.md)
   when that closed. **Trigger 2 met 2026-09-17**: it is item 7 of the
-  [studio authoring campaign](proposed/studio-campaign-authoring.md), sequenced last there.
+  [studio authoring campaign](inprogress/studio-campaign-authoring.md), sequenced last there.
   Until then it was **deliberately parked** behind a two-part trigger — the intent
   vocabulary stabilising AND a real second consumer asking for editing (a check, not a
   debate) — with the costs of moving early recorded (API pressure on the public surface,
@@ -177,6 +159,33 @@ back up to `proposed/` the moment it is.
 
 ### inprogress/
 
+- **[studio-campaign-authoring.md](inprogress/studio-campaign-authoring.md)** — **campaign**,
+  opened 2026-09-17, **item 1 built the same day**: studio stops being read-only. Priority flow **new piece
+  → YouTube → sync**, working before any note editing exists; editing last. Opens on the
+  finding that adding a recording and the sync bar were already built and persisted — what
+  was missing was any way for a piece to exist outside the operator ingest. The contract's
+  founding decisions: **`.gp` stays the only durable score format, even for studio edits**
+  (no MNX migrations on stored data; reverses "the first saved edit becomes an MNX
+  rendition"); every save is a checkpoint and a new immutable rendition, so the server holds
+  every version; **no save is silent about loss** — export → re-import → compare on every
+  checkpoint, and a difference no exporter warning explains is a converter defect with a
+  ready-made fixture; hybrid autosave with a disposable local recovery record that **is the live document**
+  (ops ride along as evidence — revised after review, log entry 2);
+  one save-state chip showing unsaved edits then age; **segments are the sync, tuples a
+  cache** re-derived on load and on bar change. Eight items: the round-trip comparator and
+  baseline loss register → create a piece → the save pipeline proven on a metadata sheet →
+  sync re-derivation → piece lifecycle → sync.json interchange (optional) →
+  [core-editor-element-promotion](proposed/core-editor-element-promotion.md) in three slices
+  → touch entry. Score-file upload is deliberately skipped.
+- **[core-roundtrip-register.md](inprogress/core-roundtrip-register.md)** — **built 2026-09-17**,
+  [studio authoring campaign](inprogress/studio-campaign-authoring.md) item 1: the judge of
+  what a `.gp` round trip loses (`src/model/documentCompare.ts` — identity moved into the
+  references, `encoding` discounted, inventory checked against both schemas) and the
+  committed register over the corpus and the Guitar Pro fixtures
+  (`npm run update:roundtrip-register`; git diff is the review). Found on day one: the
+  exporter's unison collapse turns a second voice into rests (hence
+  `STORAGE_EXPORT_OPTIONS`), a fourth verdict `gains`, 76 silent losses in the corpus lane,
+  and that a notation-only part reloads as a guitar.
 - **[core-space-units-sp.md](inprogress/core-space-units-sp.md)** — **in progress 2026-09-15** — Space becomes a number in
   staff spaces (air after a quarter note), 0 to a calibrated ceiling, and every horizontal
   consumer is one clamped line `max(0, m·x + c)`: the intercepts are the zero engraving,

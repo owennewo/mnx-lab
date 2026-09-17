@@ -29,6 +29,7 @@ npm test                   # harness suites over the corpus (root vitest)
 npm run check:scenarios    # corpus police
 npm run verify:scenarios   # attention queue / approval writer — drive via /verify
 npm run update:primitives  # regenerate layout goldens; keeps statuses honest
+npm run update:roundtrip-register   # what a .gp save loses, remeasured; git diff is the review
 npm run sync:spec          # pinned spec fixture → scenarios/spec/ (owns that tree)
 npm run push:proposal -- <topic>   # inject a topic's evidence into the proposal branch
 npm run update:roster      # worker/models.query.json → worker/models.json (stored queries)

@@ -1,0 +1,6364 @@
+{
+  "generatedBy": "npm run update:roundtrip-register",
+  "verdicts": {
+    "clean": 7,
+    "gains": 30,
+    "differs": 101,
+    "error": 0
+  },
+  "lostOrChanged": [
+    {
+      "path": "parts/[]/measures/[]/clefs/[]/clef/octave",
+      "kind": "lost",
+      "documents": 26,
+      "count": 26
+    },
+    {
+      "path": "global/measures/[]/barline",
+      "kind": "lost",
+      "documents": 14,
+      "count": 14
+    },
+    {
+      "path": "mnx/support",
+      "kind": "lost",
+      "documents": 14,
+      "count": 14
+    },
+    {
+      "path": "parts/[]/measures/[]/beams",
+      "kind": "lost",
+      "documents": 11,
+      "count": 19
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x/mnxLab/string",
+      "kind": "changed",
+      "documents": 8,
+      "count": 15
+    },
+    {
+      "path": "layouts",
+      "kind": "lost",
+      "documents": 6,
+      "count": 6
+    },
+    {
+      "path": "parts/[]/staves",
+      "kind": "lost",
+      "documents": 6,
+      "count": 6
+    },
+    {
+      "path": "scores",
+      "kind": "lost",
+      "documents": 6,
+      "count": 6
+    },
+    {
+      "path": "parts/[]/measures/[]/dynamics",
+      "kind": "lost",
+      "documents": 5,
+      "count": 10
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]",
+      "kind": "lost",
+      "documents": 4,
+      "count": 16
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/staff",
+      "kind": "lost",
+      "documents": 4,
+      "count": 14
+    },
+    {
+      "path": "parts/[]/measures/[]/clefs/[]",
+      "kind": "lost",
+      "documents": 4,
+      "count": 8
+    },
+    {
+      "path": "global/measures/[]/ending/open",
+      "kind": "lost",
+      "documents": 4,
+      "count": 5
+    },
+    {
+      "path": "parts/[]/measures/[]/clefs/[]/clef/staffPosition",
+      "kind": "changed",
+      "documents": 4,
+      "count": 4
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/markings",
+      "kind": "lost",
+      "documents": 3,
+      "count": 10
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/fullMeasure",
+      "kind": "lost",
+      "documents": 3,
+      "count": 10
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/accidentalDisplay",
+      "kind": "lost",
+      "documents": 3,
+      "count": 7
+    },
+    {
+      "path": "global/measures/[]/fine/location/fraction/[]",
+      "kind": "changed",
+      "documents": 3,
+      "count": 6
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes",
+      "kind": "lost",
+      "documents": 3,
+      "count": 6
+    },
+    {
+      "path": "global/measures/[]/segno/location/fraction/[]",
+      "kind": "changed",
+      "documents": 3,
+      "count": 4
+    },
+    {
+      "path": "parts/[]/shortName",
+      "kind": "lost",
+      "documents": 2,
+      "count": 9
+    },
+    {
+      "path": "parts/[]/measures/[]/dynamics/[]",
+      "kind": "lost",
+      "documents": 2,
+      "count": 8
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x/mnxLab/fingering",
+      "kind": "lost",
+      "documents": 2,
+      "count": 7
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/type",
+      "kind": "lost",
+      "documents": 2,
+      "count": 7
+    },
+    {
+      "path": "parts/[]/measures/[]/directions/[]",
+      "kind": "lost",
+      "documents": 2,
+      "count": 6
+    },
+    {
+      "path": "parts/[]/measures/[]/measureRepeat",
+      "kind": "lost",
+      "documents": 2,
+      "count": 6
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/fermata",
+      "kind": "lost",
+      "documents": 2,
+      "count": 6
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/ties",
+      "kind": "lost",
+      "documents": 2,
+      "count": 6
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x/mnxLab/tab/technique/bend/points/[]",
+      "kind": "lost",
+      "documents": 2,
+      "count": 4
+    },
+    {
+      "path": "global/measures/[]/time/display",
+      "kind": "lost",
+      "documents": 2,
+      "count": 3
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/pitch/step",
+      "kind": "changed",
+      "documents": 2,
+      "count": 3
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/slurs/[]/side",
+      "kind": "lost",
+      "documents": 2,
+      "count": 3
+    },
+    {
+      "path": "global/lyrics/lineMetadata",
+      "kind": "lost",
+      "documents": 2,
+      "count": 2
+    },
+    {
+      "path": "parts/[]/measures/[]/clefs",
+      "kind": "lost",
+      "documents": 2,
+      "count": 2
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x/mnxLab/tab/technique/slide/target",
+      "kind": "lost",
+      "documents": 2,
+      "count": 2
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/duration/base",
+      "kind": "changed",
+      "documents": 1,
+      "count": 6
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/kitNotes",
+      "kind": "lost",
+      "documents": 1,
+      "count": 4
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/voice",
+      "kind": "changed",
+      "documents": 1,
+      "count": 4
+    },
+    {
+      "path": "global/measures/[]/number",
+      "kind": "lost",
+      "documents": 1,
+      "count": 3
+    },
+    {
+      "path": "parts/[]/measures/[]/dynamics/[]/position/fraction/[]",
+      "kind": "changed",
+      "documents": 1,
+      "count": 3
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/slurs/[]",
+      "kind": "lost",
+      "documents": 1,
+      "count": 3
+    },
+    {
+      "path": "global/lyrics/lineOrder/[]",
+      "kind": "changed",
+      "documents": 1,
+      "count": 2
+    },
+    {
+      "path": "global/measures/[]/fermata",
+      "kind": "lost",
+      "documents": 1,
+      "count": 2
+    },
+    {
+      "path": "global/measures/[]/tempos/[]/location",
+      "kind": "lost",
+      "documents": 1,
+      "count": 2
+    },
+    {
+      "path": "parts/[]/measures/[]/directions",
+      "kind": "lost",
+      "documents": 1,
+      "count": 2
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/verse1",
+      "kind": "lost",
+      "documents": 1,
+      "count": 2
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/verse2",
+      "kind": "lost",
+      "documents": 1,
+      "count": 2
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x/mnxLab/tab/technique/slide/direction",
+      "kind": "lost",
+      "documents": 1,
+      "count": 2
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/pitch/octave",
+      "kind": "changed",
+      "documents": 1,
+      "count": 2
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/rest/staffPosition",
+      "kind": "lost",
+      "documents": 1,
+      "count": 2
+    },
+    {
+      "path": "_x/mnxLab/work/creators/[]",
+      "kind": "lost",
+      "documents": 1,
+      "count": 1
+    },
+    {
+      "path": "_x/mnxLab/work/source",
+      "kind": "lost",
+      "documents": 1,
+      "count": 1
+    },
+    {
+      "path": "global/measures/[]/ending/color",
+      "kind": "lost",
+      "documents": 1,
+      "count": 1
+    },
+    {
+      "path": "global/measures/[]/fine/color",
+      "kind": "lost",
+      "documents": 1,
+      "count": 1
+    },
+    {
+      "path": "global/measures/[]/harmonies",
+      "kind": "lost",
+      "documents": 1,
+      "count": 1
+    },
+    {
+      "path": "global/measures/[]/jump/location/fraction/[]",
+      "kind": "changed",
+      "documents": 1,
+      "count": 1
+    },
+    {
+      "path": "global/measures/[]/key/color",
+      "kind": "lost",
+      "documents": 1,
+      "count": 1
+    },
+    {
+      "path": "global/measures/[]/segno/color",
+      "kind": "lost",
+      "documents": 1,
+      "count": 1
+    },
+    {
+      "path": "global/measures/[]/segno/glyph",
+      "kind": "lost",
+      "documents": 1,
+      "count": 1
+    },
+    {
+      "path": "global/measures/[]/tempos/[]/bpm",
+      "kind": "changed",
+      "documents": 1,
+      "count": 1
+    },
+    {
+      "path": "global/measures/[]/tempos/[]/value/base",
+      "kind": "changed",
+      "documents": 1,
+      "count": 1
+    },
+    {
+      "path": "global/sounds",
+      "kind": "lost",
+      "documents": 1,
+      "count": 1
+    },
+    {
+      "path": "parts/[]/_x/mnxLab/tab/staffKind",
+      "kind": "changed",
+      "documents": 1,
+      "count": 1
+    },
+    {
+      "path": "parts/[]/capo",
+      "kind": "lost",
+      "documents": 1,
+      "count": 1
+    },
+    {
+      "path": "parts/[]/kit",
+      "kind": "lost",
+      "documents": 1,
+      "count": 1
+    },
+    {
+      "path": "parts/[]/measures/[]/clefs/[]/clef/glyph",
+      "kind": "lost",
+      "documents": 1,
+      "count": 1
+    },
+    {
+      "path": "parts/[]/measures/[]/clefs/[]/clef/showOctave",
+      "kind": "lost",
+      "documents": 1,
+      "count": 1
+    },
+    {
+      "path": "parts/[]/measures/[]/clefs/[]/clef/sign",
+      "kind": "changed",
+      "documents": 1,
+      "count": 1
+    },
+    {
+      "path": "parts/[]/measures/[]/directions/[]/orient",
+      "kind": "changed",
+      "documents": 1,
+      "count": 1
+    },
+    {
+      "path": "parts/[]/measures/[]/nonArpeggios",
+      "kind": "lost",
+      "documents": 1,
+      "count": 1
+    },
+    {
+      "path": "parts/[]/measures/[]/ottavas",
+      "kind": "lost",
+      "documents": 1,
+      "count": 1
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/content",
+      "kind": "lost",
+      "documents": 1,
+      "count": 1
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/content/[]/notes",
+      "kind": "lost",
+      "documents": 1,
+      "count": 1
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/marks",
+      "kind": "lost",
+      "documents": 1,
+      "count": 1
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_c",
+      "kind": "lost",
+      "documents": 1,
+      "count": 1
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x/mnxLab/tab/technique/slide/target",
+      "kind": "changed",
+      "documents": 1,
+      "count": 1
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/fingering",
+      "kind": "lost",
+      "documents": 1,
+      "count": 1
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/fret",
+      "kind": "lost",
+      "documents": 1,
+      "count": 1
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/string",
+      "kind": "lost",
+      "documents": 1,
+      "count": 1
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/ties/[]/targetType",
+      "kind": "lost",
+      "documents": 1,
+      "count": 1
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/outer",
+      "kind": "lost",
+      "documents": 1,
+      "count": 1
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/outer/duration/base",
+      "kind": "changed",
+      "documents": 1,
+      "count": 1
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/outer/multiple",
+      "kind": "changed",
+      "documents": 1,
+      "count": 1
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/showNumber",
+      "kind": "lost",
+      "documents": 1,
+      "count": 1
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/slash",
+      "kind": "lost",
+      "documents": 1,
+      "count": 1
+    },
+    {
+      "path": "parts/[]/strings",
+      "kind": "lost",
+      "documents": 1,
+      "count": 1
+    }
+  ],
+  "gained": [
+    {
+      "path": "parts/[]/transposition",
+      "kind": "gained",
+      "documents": 128,
+      "count": 154
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/voice",
+      "kind": "gained",
+      "documents": 127,
+      "count": 368
+    },
+    {
+      "path": "global/measures/[]/key",
+      "kind": "gained",
+      "documents": 123,
+      "count": 123
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+      "kind": "gained",
+      "documents": 102,
+      "count": 866
+    },
+    {
+      "path": "parts/[]/_x",
+      "kind": "gained",
+      "documents": 98,
+      "count": 122
+    },
+    {
+      "path": "parts/[]/name",
+      "kind": "gained",
+      "documents": 63,
+      "count": 76
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x/mnxLab/fret",
+      "kind": "gained",
+      "documents": 15,
+      "count": 101
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]",
+      "kind": "gained",
+      "documents": 11,
+      "count": 32
+    },
+    {
+      "path": "global/measures/[]/time",
+      "kind": "gained",
+      "documents": 8,
+      "count": 8
+    },
+    {
+      "path": "global/measures/[]/repeatEnd/times",
+      "kind": "gained",
+      "documents": 7,
+      "count": 8
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/content/[]/notes/[]/_x",
+      "kind": "gained",
+      "documents": 5,
+      "count": 15
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/rest",
+      "kind": "gained",
+      "documents": 5,
+      "count": 11
+    },
+    {
+      "path": "parts/[]/measures/[]/clefs",
+      "kind": "gained",
+      "documents": 5,
+      "count": 5
+    },
+    {
+      "path": "parts/[]/measures/[]/clefs/[]",
+      "kind": "gained",
+      "documents": 4,
+      "count": 4
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/1/type",
+      "kind": "gained",
+      "documents": 3,
+      "count": 7
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/graceType",
+      "kind": "gained",
+      "documents": 3,
+      "count": 5
+    },
+    {
+      "path": "parts/[]/measures/[]",
+      "kind": "gained",
+      "documents": 2,
+      "count": 55
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/2/type",
+      "kind": "gained",
+      "documents": 2,
+      "count": 5
+    },
+    {
+      "path": "parts/[]/measures/[]/dynamics/[]",
+      "kind": "gained",
+      "documents": 2,
+      "count": 3
+    },
+    {
+      "path": "global/lyrics",
+      "kind": "gained",
+      "documents": 2,
+      "count": 2
+    },
+    {
+      "path": "parts/[]/_x/mnxLab/tab",
+      "kind": "gained",
+      "documents": 2,
+      "count": 2
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/content/[]/notes/[]/_x/mnxLab/fret",
+      "kind": "gained",
+      "documents": 1,
+      "count": 3
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/4/type",
+      "kind": "gained",
+      "documents": 1,
+      "count": 3
+    },
+    {
+      "path": "global/measures/[]/segno/id",
+      "kind": "gained",
+      "documents": 1,
+      "count": 2
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/1",
+      "kind": "gained",
+      "documents": 1,
+      "count": 2
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/2",
+      "kind": "gained",
+      "documents": 1,
+      "count": 2
+    },
+    {
+      "path": "global/measures/[]",
+      "kind": "gained",
+      "documents": 1,
+      "count": 1
+    },
+    {
+      "path": "parts/[]/_x/mnxLab/strings",
+      "kind": "gained",
+      "documents": 1,
+      "count": 1
+    },
+    {
+      "path": "parts/[]/measures/[]/directions/[]",
+      "kind": "gained",
+      "documents": 1,
+      "count": 1
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/content/[]/notes/[]/pitch/alter",
+      "kind": "gained",
+      "documents": 1,
+      "count": 1
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/content/[]/rest",
+      "kind": "gained",
+      "documents": 1,
+      "count": 1
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/duration",
+      "kind": "gained",
+      "documents": 1,
+      "count": 1
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/3/type",
+      "kind": "gained",
+      "documents": 1,
+      "count": 1
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x/mnxLab/tab/technique/bend/points/[]",
+      "kind": "gained",
+      "documents": 1,
+      "count": 1
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/ties",
+      "kind": "gained",
+      "documents": 1,
+      "count": 1
+    },
+    {
+      "path": "parts/[]/measures/[]/sequences/[]/content/[]/slurs/[]",
+      "kind": "gained",
+      "documents": 1,
+      "count": 1
+    }
+  ],
+  "lanes": {
+    "corpus": {
+      "spec/accidentals": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "mnx/support",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_c",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 8
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/accidentalDisplay",
+            "kind": "lost",
+            "count": 3
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 3
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "spec/articulations": {
+        "verdict": "gains",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "spec/beam-hooks": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "mnx/support",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/beams",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 10
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "spec/beams": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "mnx/support",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/beams",
+            "kind": "lost",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 15
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "spec/beams-across-barlines": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "mnx/support",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/beams",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "spec/beams-inner-grace-notes": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "mnx/support",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/beams",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/graceType",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "spec/beams-secondary-beam-breaks": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "mnx/support",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/beams",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 16
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "spec/beams-secondary-beam-breaks-implied": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "mnx/support",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/beams",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 16
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "spec/clef-changes": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs/[]",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs/[]",
+            "kind": "lost",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "spec/dotted-notes": {
+        "verdict": "gains",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 6
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "spec/dynamic-accents": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/dynamics",
+            "kind": "lost",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 6
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ],
+        "warnings": [
+          {
+            "message": "measure #: a dynamic of type \"…\" has no Guitar Pro equivalent; it was not written.",
+            "count": 6
+          }
+        ]
+      },
+      "spec/dynamics": {
+        "verdict": "gains",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 7
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "spec/full-measure-rests": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "mnx/support",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 7
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/fullMeasure",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "spec/grace-note": {
+        "verdict": "gains",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/graceType",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "spec/grace-notes-beamed": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "mnx/support",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/beams",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 9
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/graceType",
+            "kind": "gained",
+            "count": 3
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "spec/grand-staff": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "mnx/support",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/beams",
+            "kind": "lost",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs/[]",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs/[]",
+            "kind": "lost",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 23
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/staff",
+            "kind": "lost",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/staves",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "spec/hello-world": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/barline",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "spec/jumps-dal-segno": {
+        "verdict": "gains",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 5
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 5
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "spec/jumps-ds-al-fine": {
+        "verdict": "gains",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 5
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 5
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "spec/key-signatures": {
+        "verdict": "gains",
+        "differences": [
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 10
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "spec/lyric-line-metadata": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/lyrics/lineMetadata",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/1/type",
+            "kind": "gained",
+            "count": 3
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/2/type",
+            "kind": "gained",
+            "count": 3
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/3/type",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/4/type",
+            "kind": "gained",
+            "count": 3
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 3
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "spec/lyrics-basic": {
+        "verdict": "gains",
+        "differences": [
+          {
+            "path": "global/lyrics",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/1/type",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "spec/lyrics-multi-line": {
+        "verdict": "gains",
+        "differences": [
+          {
+            "path": "global/lyrics",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/1/type",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/2/type",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "spec/measure-repeats": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/measureRepeat",
+            "kind": "lost",
+            "count": 3
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 8
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "spec/measure-repeats-with-counters": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/measureRepeat",
+            "kind": "lost",
+            "count": 3
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]",
+            "kind": "gained",
+            "count": 3
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "spec/multimeasure-rests": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/barline",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "layouts",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 20
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 14
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "scores",
+            "kind": "lost",
+            "count": 1
+          }
+        ]
+      },
+      "spec/multiple-layouts": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "layouts",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs/[]/clef/octave",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs/[]/clef/showOctave",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs/[]/clef/staffPosition",
+            "kind": "changed",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 29
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 8
+          },
+          {
+            "path": "parts/[]/shortName",
+            "kind": "lost",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "scores",
+            "kind": "lost",
+            "count": 1
+          }
+        ]
+      },
+      "spec/multiple-voices": {
+        "verdict": "gains",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 10
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "spec/orchestral-layout": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "layouts",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 13
+          },
+          {
+            "path": "parts/[]/measures/[]",
+            "kind": "gained",
+            "count": 13
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 13
+          },
+          {
+            "path": "parts/[]/staves",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 13
+          },
+          {
+            "path": "scores",
+            "kind": "lost",
+            "count": 1
+          }
+        ]
+      },
+      "spec/organ-layout": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "layouts",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "mnx/support",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 7
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/accidentalDisplay",
+            "kind": "lost",
+            "count": 3
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/ties",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/staff",
+            "kind": "lost",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "changed",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/staves",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "scores",
+            "kind": "lost",
+            "count": 1
+          }
+        ],
+        "warnings": [
+          {
+            "message": "a tie into note \"…\" has no written destination; the tie was dropped.",
+            "count": 1
+          }
+        ]
+      },
+      "spec/ottavas-8va": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/ottavas",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes",
+            "kind": "lost",
+            "count": 3
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 3
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/rest",
+            "kind": "gained",
+            "count": 3
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ],
+        "warnings": [
+          {
+            "message": "measure #: pitch is outside the instrument's range on this tuning; the note was skipped.",
+            "count": 3
+          }
+        ]
+      },
+      "spec/parts": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "mnx/support",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/measures/[]/beams",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 14
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 2
+          }
+        ]
+      },
+      "spec/repeats": {
+        "verdict": "gains",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "global/measures/[]/repeatEnd/times",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "spec/repeats-alternate-endings-advanced": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/ending/open",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "global/measures/[]/repeatEnd/times",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 8
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 6
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "spec/repeats-alternate-endings-simple": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/ending/open",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "global/measures/[]/repeatEnd/times",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "spec/repeats-implied-start-repeat": {
+        "verdict": "gains",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "global/measures/[]/repeatEnd/times",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "spec/repeats-more-once-repeated": {
+        "verdict": "gains",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "spec/rest-positions": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 7
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/rest/staffPosition",
+            "kind": "lost",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "spec/single-note-tremolos": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/markings",
+            "kind": "lost",
+            "count": 3
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ],
+        "warnings": [
+          {
+            "message": "measure #: the tremolo marking has no Guitar Pro equivalent; it was not written.",
+            "count": 3
+          }
+        ]
+      },
+      "spec/slurs": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 8
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/slurs/[]/side",
+            "kind": "lost",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "spec/slurs-chords": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 8
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/slurs/[]/side",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "spec/slurs-targeting-specific-notes": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 6
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/slurs/[]",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/slurs/[]",
+            "kind": "lost",
+            "count": 3
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ],
+        "warnings": [
+          {
+            "message": "measure #: a slur overlapping another in the same voice has no Guitar Pro equivalent; it was not written.",
+            "count": 2
+          }
+        ]
+      },
+      "spec/system-layouts": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "global/measures/[]/time",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "layouts",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 6
+          },
+          {
+            "path": "parts/[]/measures/[]",
+            "kind": "gained",
+            "count": 42
+          },
+          {
+            "path": "parts/[]/shortName",
+            "kind": "lost",
+            "count": 5
+          },
+          {
+            "path": "parts/[]/staves",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 6
+          },
+          {
+            "path": "scores",
+            "kind": "lost",
+            "count": 1
+          }
+        ]
+      },
+      "spec/tempo-markings": {
+        "verdict": "gains",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 8
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "spec/three-note-chord-and-half-rest": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/barline",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 3
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "spec/tie-targets": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/ending/open",
+            "kind": "lost",
+            "count": 2
+          },
+          {
+            "path": "global/measures/[]/repeatEnd/times",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs/[]/clef/glyph",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs/[]/clef/octave",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]",
+            "kind": "gained",
+            "count": 5
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]",
+            "kind": "lost",
+            "count": 6
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 15
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/pitch/octave",
+            "kind": "changed",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/pitch/step",
+            "kind": "changed",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/ties",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/ties",
+            "kind": "lost",
+            "count": 5
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/ties/[]/targetType",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 6
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ],
+        "warnings": [
+          {
+            "message": "measure #: a tie with no target note (let-ring) has no Guitar Pro tie equivalent; it was not written.",
+            "count": 1
+          },
+          {
+            "message": "measure #: duration \"…\" has no Guitar Pro equivalent; the event was skipped.",
+            "count": 1
+          }
+        ]
+      },
+      "spec/ties": {
+        "verdict": "gains",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 6
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "spec/time-signature-glyphs": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "global/measures/[]/time/display",
+            "kind": "lost",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 6
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/type",
+            "kind": "lost",
+            "count": 6
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "spec/time-signatures": {
+        "verdict": "gains",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 10
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 3
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "spec/tremolos-multi-note": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]",
+            "kind": "lost",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/content",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/duration",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/marks",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/outer",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/rest",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/type",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ],
+        "warnings": [
+          {
+            "message": "measure #: skipped an unsupported \"…\" container.",
+            "count": 3
+          }
+        ]
+      },
+      "spec/tuplets": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "mnx/support",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/beams",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]",
+            "kind": "gained",
+            "count": 5
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]",
+            "kind": "lost",
+            "count": 5
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "spec/two-bar-c-major-scale": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/barline",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 8
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/document/minimal-single-note": {
+        "verdict": "gains",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "global/measures/[]/time",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/document/empty-tab-canvas": {
+        "verdict": "gains",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "global/measures/[]/time",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/document/navigation-playground": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/barline",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x/mnxLab/tab",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs/[]/clef/octave",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 40
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 17
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 2
+          }
+        ]
+      },
+      "lab/document/twelve-bar-blues": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/barline",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x/mnxLab/tab",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs/[]/clef/octave",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs/[]/clef/staffPosition",
+            "kind": "changed",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 139
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 36
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 2
+          }
+        ]
+      },
+      "lab/document/score-metadata": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "_x/mnxLab/work/creators/[]",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "_x/mnxLab/work/source",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ],
+        "warnings": [
+          {
+            "message": "Guitar Pro has no field for `work.source`; it is not written.",
+            "count": 1
+          },
+          {
+            "message": "Guitar Pro has no field for a \"…\" credit; \"…\" is not written.",
+            "count": 1
+          }
+        ]
+      },
+      "lab/pitches/parenthesized-accidental": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/accidentalDisplay",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/pitches/alto-and-tenor-clefs": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs/[]/clef/staffPosition",
+            "kind": "changed",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 8
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/durations/rest-gallery": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/duration/base",
+            "kind": "changed",
+            "count": 6
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 18
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/fullMeasure",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 17
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ],
+        "warnings": [
+          {
+            "message": "measure #: duration \"…\" has no Guitar Pro equivalent; the event was skipped.",
+            "count": 6
+          }
+        ]
+      },
+      "lab/rhythm/appoggiatura": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/slash",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/rhythm/tuplet-number-hidden": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 3
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/outer/duration/base",
+            "kind": "changed",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/outer/multiple",
+            "kind": "changed",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/showNumber",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/rhythm/sequence-space": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]",
+            "kind": "lost",
+            "count": 3
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ],
+        "warnings": [
+          {
+            "message": "measure #: duration \"…\" has no Guitar Pro equivalent; the event was skipped.",
+            "count": 1
+          }
+        ]
+      },
+      "lab/rhythm/beamed-stem-lengths": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "mnx/support",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/beams",
+            "kind": "lost",
+            "count": 7
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 74
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 7
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/rhythm/swing-feel": {
+        "verdict": "gains",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/tab-part/standard-tuning-both": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs/[]/clef/octave",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/tab-positions/open-strings-chord": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs/[]/clef/octave",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/tab-derivation/bare-melody": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs/[]/clef/octave",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/tab-derivation/bare-chord": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs/[]/clef/octave",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 5
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/tab-derivation/string-only": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs/[]/clef/octave",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x/mnxLab/fret",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x/mnxLab/string",
+            "kind": "changed",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/tab-derivation/partial-annotation": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs/[]/clef/octave",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x/mnxLab/fret",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x/mnxLab/string",
+            "kind": "changed",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/tab-derivation/drop-d": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs/[]/clef/octave",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/tab-derivation/capo": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs/[]/clef/octave",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/tab-derivation/transposition-display-only": {
+        "verdict": "gains",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/tab-derivation/out-of-range": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs/[]/clef/octave",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x/mnxLab/fret",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x/mnxLab/string",
+            "kind": "changed",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/rest",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ],
+        "warnings": [
+          {
+            "message": "measure #: pitch is outside the instrument's range on this tuning; the note was skipped.",
+            "count": 1
+          }
+        ]
+      },
+      "lab/tab-derivation/fret-mismatch": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs/[]/clef/octave",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/pitch/step",
+            "kind": "changed",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/tab-derivation/undeclared-strings": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x/mnxLab/strings",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs/[]/clef/octave",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/tab-fingering/left-hand-fingers": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs/[]/clef/octave",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x/mnxLab/fingering",
+            "kind": "lost",
+            "count": 3
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x/mnxLab/fret",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/tab-fingering/right-hand-pima": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs/[]/clef/octave",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x/mnxLab/fingering",
+            "kind": "lost",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x/mnxLab/fret",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/tab-spec-gaps/tab-clef-rejected": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "global/measures/[]/time",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs/[]/clef/sign",
+            "kind": "changed",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs/[]/clef/staffPosition",
+            "kind": "changed",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/tab-spec-gaps/note-position-rejected": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "global/measures/[]/time",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/fret",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/string",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/tab-spec-gaps/part-tuning-rejected": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "global/measures/[]/time",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/capo",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/strings",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/tab-spec-gaps/fingering-rejected": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "global/measures/[]/time",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/fingering",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/tab-spec-gaps/harmony-rejected": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/harmonies",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "global/measures/[]/time",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/tab-techniques/bend-and-release": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs/[]/clef/octave",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x/mnxLab/fret",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x/mnxLab/string",
+            "kind": "changed",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/tab-techniques/slides": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs/[]/clef/octave",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x/mnxLab/fret",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x/mnxLab/string",
+            "kind": "changed",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x/mnxLab/tab/technique/slide/direction",
+            "kind": "lost",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x/mnxLab/tab/technique/slide/target",
+            "kind": "changed",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x/mnxLab/tab/technique/slide/target",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/tab-techniques/hammer-pull-chain": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs/[]/clef/octave",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x/mnxLab/fret",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/tab-techniques/vibrato-and-palm-mute": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs/[]/clef/octave",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x/mnxLab/fret",
+            "kind": "gained",
+            "count": 3
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/tab-techniques/natural-harmonics": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs/[]/clef/octave",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x/mnxLab/fret",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x/mnxLab/string",
+            "kind": "changed",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/tab-techniques/bend-shapes": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x/mnxLab/fret",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x/mnxLab/string",
+            "kind": "changed",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x/mnxLab/tab/technique/bend/points/[]",
+            "kind": "lost",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ],
+        "warnings": [
+          {
+            "message": "measure #: a bend curve with more turns than Guitar Pro's origin/middle/destination model was simplified.",
+            "count": 1
+          }
+        ]
+      },
+      "lab/tab-techniques/grace-into-the-beat": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs/[]/clef/octave",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/content/[]/notes/[]/_x/mnxLab/fret",
+            "kind": "gained",
+            "count": 3
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x/mnxLab/fret",
+            "kind": "gained",
+            "count": 6
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x/mnxLab/string",
+            "kind": "changed",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x/mnxLab/tab/technique/slide/target",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/tab-techniques/hammer-pull-chord": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs/[]/clef/octave",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x/mnxLab/fret",
+            "kind": "gained",
+            "count": 10
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/tab-rhythm/triplets-on-tab": {
+        "verdict": "gains",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/tab-rhythm/grace-on-tab": {
+        "verdict": "gains",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/tab-rhythm/unplayable-inside-a-tuplet": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/content/[]/notes",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/content/[]/notes/[]/pitch/alter",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/content/[]/rest",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ],
+        "warnings": [
+          {
+            "message": "measure #: pitch is outside the instrument's range on this tuning; the note was skipped.",
+            "count": 1
+          }
+        ]
+      },
+      "lab/tab-rhythm/tied-notes-on-tab": {
+        "verdict": "gains",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x/mnxLab/fret",
+            "kind": "gained",
+            "count": 46
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 6
+          }
+        ]
+      },
+      "lab/dynamics/all-dynamic-marks": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/dynamics",
+            "kind": "lost",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/measures/[]/dynamics/[]",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/measures/[]/dynamics/[]",
+            "kind": "lost",
+            "count": 6
+          },
+          {
+            "path": "parts/[]/measures/[]/dynamics/[]/position/fraction/[]",
+            "kind": "changed",
+            "count": 3
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 28
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 7
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ],
+        "warnings": [
+          {
+            "message": "measure #: a dynamic of type \"…\" has no Guitar Pro equivalent; it was not written.",
+            "count": 18
+          },
+          {
+            "message": "measure #: dynamic \"…\" has no Guitar Pro equivalent; it was not written.",
+            "count": 1
+          }
+        ]
+      },
+      "lab/dynamics/accent-prefix-suffix": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/dynamics",
+            "kind": "lost",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 6
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ],
+        "warnings": [
+          {
+            "message": "measure #: a dynamic of type \"…\" has no Guitar Pro equivalent; it was not written.",
+            "count": 6
+          }
+        ]
+      },
+      "lab/dynamics/hairpin-and-relative": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/dynamics",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ],
+        "warnings": [
+          {
+            "message": "measure #: a dynamic of type \"…\" has no Guitar Pro equivalent; it was not written.",
+            "count": 2
+          }
+        ]
+      },
+      "lab/dynamics/diminuendo-across-bars": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/dynamics/[]",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/dynamics/[]",
+            "kind": "lost",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ],
+        "warnings": [
+          {
+            "message": "measure #: a dynamic of type \"…\" has no Guitar Pro equivalent; it was not written.",
+            "count": 1
+          }
+        ]
+      },
+      "lab/score-text/rehearsal-marks": {
+        "verdict": "gains",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/score-text/sections": {
+        "verdict": "gains",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/score-text/sections-with-rehearsal-marks": {
+        "verdict": "gains",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/score-text/directions": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/directions/[]/orient",
+            "kind": "changed",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 8
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ],
+        "warnings": [
+          {
+            "message": "measure #: a direction's orient has no Guitar Pro equivalent and was not written.",
+            "count": 1
+          }
+        ]
+      },
+      "lab/score-text/directions-symbolic": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/directions",
+            "kind": "lost",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 8
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ],
+        "warnings": [
+          {
+            "message": "measure #: a symbolic direction (keyboardPedalPed) has no Guitar Pro equivalent and was not written.",
+            "count": 1
+          },
+          {
+            "message": "measure #: a symbolic direction (keyboardPedalUp) has no Guitar Pro equivalent and was not written.",
+            "count": 1
+          }
+        ]
+      },
+      "lab/score-text/directions-across-parts": {
+        "verdict": "gains",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 16
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 2
+          }
+        ]
+      },
+      "lab/score-text/directions-multi-staff": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs/[]",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs/[]",
+            "kind": "lost",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/measures/[]/directions/[]",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/directions/[]",
+            "kind": "lost",
+            "count": 3
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 10
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/staff",
+            "kind": "lost",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/staves",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ],
+        "warnings": [
+          {
+            "message": "measure #: \"…\" shares a beat with \"…\"; Guitar Pro holds one text per beat, and kept the first.",
+            "count": 2
+          },
+          {
+            "message": "measure #: a direction's orient has no Guitar Pro equivalent and was not written.",
+            "count": 1
+          },
+          {
+            "message": "measure #: a direction's staff has no Guitar Pro equivalent and was not written.",
+            "count": 1
+          },
+          {
+            "message": "measure #: a direction's staff, orient has no Guitar Pro equivalent and was not written.",
+            "count": 1
+          }
+        ]
+      },
+      "lab/score-text/directions-stacked": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/directions/[]",
+            "kind": "lost",
+            "count": 3
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ],
+        "warnings": [
+          {
+            "message": "measure #: \"…\" shares a beat with \"…\"; Guitar Pro holds one text per beat, and kept the first.",
+            "count": 3
+          },
+          {
+            "message": "measure #: a direction's orient has no Guitar Pro equivalent and was not written.",
+            "count": 2
+          }
+        ]
+      },
+      "lab/score-text/labels-with-navigation": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/fine/location/fraction/[]",
+            "kind": "changed",
+            "count": 2
+          },
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "global/measures/[]/segno/location/fraction/[]",
+            "kind": "changed",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/score-text/labels-on-a-tab-staff": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/fine/location/fraction/[]",
+            "kind": "changed",
+            "count": 2
+          },
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "global/measures/[]/segno/location/fraction/[]",
+            "kind": "changed",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x/mnxLab/tab/staffKind",
+            "kind": "changed",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs/[]/clef/octave",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/score-text/one-bar-sections": {
+        "verdict": "gains",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/score-text/chord-symbols": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/barline",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 5
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/articulations/rare-articulations": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/markings",
+            "kind": "lost",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ],
+        "warnings": [
+          {
+            "message": "measure #: the softAccent marking has no Guitar Pro equivalent; it was not written.",
+            "count": 1
+          },
+          {
+            "message": "measure #: the staccatissimo marking has no Guitar Pro equivalent; it was not written.",
+            "count": 1
+          },
+          {
+            "message": "measure #: the stress marking has no Guitar Pro equivalent; it was not written.",
+            "count": 1
+          },
+          {
+            "message": "measure #: the unstress marking has no Guitar Pro equivalent; it was not written.",
+            "count": 1
+          }
+        ]
+      },
+      "lab/articulations/unrendered-marks": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/markings",
+            "kind": "lost",
+            "count": 3
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 3
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ],
+        "warnings": [
+          {
+            "message": "measure #: the bowDirection marking has no Guitar Pro equivalent; it was not written.",
+            "count": 1
+          },
+          {
+            "message": "measure #: the breath marking has no Guitar Pro equivalent; it was not written.",
+            "count": 1
+          },
+          {
+            "message": "measure #: the spiccato marking has no Guitar Pro equivalent; it was not written.",
+            "count": 1
+          }
+        ]
+      },
+      "lab/articulations/fermata": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/fermata",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/articulations/arpeggiated-chords": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/nonArpeggios",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 6
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/articulations/fermatas-on-bars-and-rests": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/barline",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "global/measures/[]/fermata",
+            "kind": "lost",
+            "count": 2
+          },
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/fermata",
+            "kind": "lost",
+            "count": 5
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 3
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/navigation/jumps-and-signs": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "global/measures/[]/segno/glyph",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "global/measures/[]/segno/id",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 6
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 6
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/navigation/repeats-and-marks-on-tab": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/barline",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "global/measures/[]/ending/open",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "global/measures/[]/time/display",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs/[]/clef/octave",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/dynamics",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x/mnxLab/fret",
+            "kind": "gained",
+            "count": 8
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/navigation/numbered-bars": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/barline",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "global/measures/[]/number",
+            "kind": "lost",
+            "count": 3
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/navigation/repeat-starts-mid-system": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/barline",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "global/measures/[]/repeatEnd/times",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 6
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 6
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/navigation/tempo-change-mid-bar": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/barline",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "global/measures/[]/tempos/[]/bpm",
+            "kind": "changed",
+            "count": 1
+          },
+          {
+            "path": "global/measures/[]/tempos/[]/location",
+            "kind": "lost",
+            "count": 2
+          },
+          {
+            "path": "global/measures/[]/tempos/[]/value/base",
+            "kind": "changed",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 7
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/navigation/ds-final-ending": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/fine/location/fraction/[]",
+            "kind": "changed",
+            "count": 2
+          },
+          {
+            "path": "global/measures/[]/jump/location/fraction/[]",
+            "kind": "changed",
+            "count": 1
+          },
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "global/measures/[]/repeatEnd/times",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "global/measures/[]/segno/location/fraction/[]",
+            "kind": "changed",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/navigation/coda-navigation": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/barline",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]",
+            "kind": "gained",
+            "count": 8
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/fullMeasure",
+            "kind": "lost",
+            "count": 8
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 8
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/lyrics/verse-labels": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/lyrics/lineMetadata",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "global/lyrics/lineOrder/[]",
+            "kind": "changed",
+            "count": 2
+          },
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/1",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/2",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/verse1",
+            "kind": "lost",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/lyrics/lines/verse2",
+            "kind": "lost",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/lyrics/tab-verses": {
+        "verdict": "gains",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 16
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/layout/group-barline-individual": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "layouts",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "scores",
+            "kind": "lost",
+            "count": 1
+          }
+        ]
+      },
+      "lab/layout/coloured-marks-and-clef-forms": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/barline",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "global/measures/[]/ending/color",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "global/measures/[]/fine/color",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "global/measures/[]/key/color",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "global/measures/[]/segno/color",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs/[]",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs/[]",
+            "kind": "lost",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes",
+            "kind": "lost",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 3
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/rest",
+            "kind": "gained",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/staff",
+            "kind": "lost",
+            "count": 2
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/staves",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ],
+        "warnings": [
+          {
+            "message": "measure #: pitch is outside the instrument's range on this tuning; the note was skipped.",
+            "count": 2
+          }
+        ]
+      },
+      "lab/percussion/minimal-kit": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "global/sounds",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/kit",
+            "kind": "lost",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/clefs",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/kitNotes",
+            "kind": "lost",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/rest",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      },
+      "lab/edge-cases/bar-duration-mismatch": {
+        "verdict": "gains",
+        "differences": [
+          {
+            "path": "global/measures/[]/key",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/_x",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x",
+            "kind": "gained",
+            "count": 9
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/voice",
+            "kind": "gained",
+            "count": 4
+          },
+          {
+            "path": "parts/[]/name",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/transposition",
+            "kind": "gained",
+            "count": 1
+          }
+        ]
+      }
+    },
+    "fixture": {
+      "Binary-suite.gp3": {
+        "verdict": "clean"
+      },
+      "Binary-suite.gp4": {
+        "verdict": "clean"
+      },
+      "Binary-suite.gp5": {
+        "verdict": "differs",
+        "differences": [
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x/mnxLab/tab/technique/bend/points/[]",
+            "kind": "gained",
+            "count": 1
+          },
+          {
+            "path": "parts/[]/measures/[]/sequences/[]/content/[]/notes/[]/_x/mnxLab/tab/technique/bend/points/[]",
+            "kind": "lost",
+            "count": 2
+          }
+        ],
+        "warnings": [
+          {
+            "message": "measure #: a bend curve with more turns than Guitar Pro's origin/middle/destination model was simplified.",
+            "count": 1
+          }
+        ]
+      },
+      "House-of-the-Rising-Sun.gpx": {
+        "verdict": "clean"
+      },
+      "Sun-did-glide.gp": {
+        "verdict": "clean"
+      },
+      "Sun-did-glide.gpx": {
+        "verdict": "clean"
+      },
+      "Triplets-and-graces.gp": {
+        "verdict": "clean"
+      },
+      "Vestapol.gpx": {
+        "verdict": "clean"
+      }
+    }
+  }
+}

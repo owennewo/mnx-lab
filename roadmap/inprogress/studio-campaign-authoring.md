@@ -3,8 +3,8 @@
 > **A campaign** (see CLAUDE.md → Roadmap-driven development): this doc is an index over
 > normal proposals sharing one goal, the shared contract they follow, and the running log
 > of progress and learnings as items land. Indexed items are ordinary `studio-*` / `core-*`
-> proposals that name this campaign. **Opened 2026-09-17 from a design conversation;
-> nothing is built.** Storage shape stays owned by
+> proposals that name this campaign. **Opened 2026-09-17 from a design conversation; item 1
+> built the same day, the rest not started.** Storage shape stays owned by
 > [docs/studio-storage.md](../../docs/studio-storage.md); the sync bar by
 > [docs/player-sync-bar.md](../../docs/player-sync-bar.md). This doc owns the order and
 > the contract.
@@ -109,8 +109,10 @@ public sign-up.
    with none is **a converter defect**: the save still happens, and a defect report is
    captured (document before, `.gp` bytes, re-imported document, the difference as paths,
    the ops since the last clean save) — a ready-made converter fixture. Until warnings are
-   structured (`{code, where}`), the verdict is `clean | differs` and classification is by
-   the committed register (item 1).
+   structured (`{code, where}`), the verdict is `clean | gains | differs | error` — `gains`
+   being a document that comes back saying *more* than was saved, which Guitar Pro's
+   mandatory fields make common — and classification is by the committed register (item 1).
+   Every save exports with the converter's `STORAGE_EXPORT_OPTIONS`, never the defaults.
 5. **The recovery record is the live document, not a replay.** *(Revised 2026-09-17 after
    review — log entry 2.)* While a piece is dirty, the **live in-memory document** is
    written through to IndexedDB (debounced ~1 s, and on `visibilitychange` → hidden), beside
@@ -197,13 +199,13 @@ one.
 
 | # | Item | Status | Summary |
 | --- | --- | --- | --- |
-| 1 | `core-roundtrip-register` | proposed | **The comparator and the baseline loss register.** A pure module in `src/model/` — canonicalise, then deep-diff to JSON paths collapsed by path shape with counts. **Canonicalisation covers every identity, not only notes**: the importer regenerates part (`P…`), event (`e…` — given only when a slur targets the event) and note (`n…`) ids, and the converter's test helper `normalizeIds` renames note ids, ties, technique targets and arpeggio spans only, so a musically unchanged slur or beam would read as a defect. The rule: strip `encoding`; per id class, **rename referenced ids as a bijection in traversal order and rewrite every reference through it; drop ids nothing references** (an id matters only through what points at it, and documents built by ops may carry none); leave an unresolvable reference as spelled, so a dangling or crossed target still fails. The inventory of id-bearing and id-referencing fields is **derived from the schemas** (`id`, `id-list`, `id-pair` in `spec/mnx-schema.json`, plus the `_x.mnxLab` note-id references), with a test that goes red when a new one appears. **Proved before it judges anything**: equivalent documents with deliberately different and shuffled ids compare clean; crossed, dangling and retargeted references do not. Shared by the harness, `importers/` and studio; format-agnostic so MusicXML round trips get it later. A committed register under `harness/fixtures/` covers MNX → `.gp` → MNX over the lab corpus and `.gp` → MNX → `.gp` → MNX over the library pieces; a test fails when it changes and **git diff is the review** (the `update:edit-traces` mechanism). The register is both the converter backlog and the list of things the editor must flag as not persisting. Verdict v1 is `clean \| differs` beside the warnings; structured warnings (`{code, where}`) and a computed explained/unexplained verdict are this item's stated follow-up, not its gate. |
-| 2 | `studio-piece-create` | proposed | **A piece made in studio.** Opens `apps/studio → src/edit` (clause 12). `POST /api/library/pieces` (browser-authenticated, `expected_revision: null`, reusing `writePiece`) with `source_kind: 'studio'` and a generated id; `createPiece` on `LibraryClient`. A **New piece** form — title, artist, tuning (preset, custom through the existing `setupGrammar`, or none = notation only — no instrument is assumed), capo, time signature, key, bar count — that replays a construct trace from `{}`, exports GP7 and stores it as the piece's first rendition. Lands on the piece page with the Source sheet one tap away, and makes the *add a recording to see the sync bar* step obvious (the toggle is hidden on the synth). Amends the three docs contract clause 1 reverses. Conformance tests for the route. |
-| 3 | `studio-save-pipeline` | proposed | **The save pipeline, proven on the smallest edit surface. Lands after item 1.** A `setWork` op (merge; an undefined field removes it) and a **Details** sheet offering the fields the Guitar Pro score header can hold — expected: title, subtitle, artist, album, composer, lyricist, transcriber, copyright, notes; item 1's register confirms. Then everything in contract clauses 2–9: `POST /pieces/:id/renditions` (bytes, `expected_revision`, `derived_from`, provenance with verdict/warnings/named/build, derived tags; pointer moved atomically), export + round-trip check moved into a worker and **measured on Vestapol**, the IndexedDB recovery record (clause 5), checkpoint triggers, the save-state chip and **Save version…**, the single write queue, the Web Lock, the derived-tag projection promoted into `src/model/` and shared with the ingest tool. Import `warnings` get a quiet *conversion notes (n)* entry on the piece page — displayed, not stored. Conformance tests and a smoke script. **Recovery acceptance tests, named because each is a way the first design was wrong:** *edit → checkpoint → undo → crash* recovers the undone state; *checkpoint → more edits → crash* recovers a document byte-identical to the live one; edits made **while a checkpoint is in flight** survive and stay counted unsaved; undo back to the checkpointed state reads clean; a record written by another build opens or is offered for download, never half-applied; a record whose base is no longer canonical reaches the conflict prompt. |
+| 1 | [core-roundtrip-register](core-roundtrip-register.md) | **built 2026-09-17** | **The comparator and the baseline loss register.** `src/model/documentCompare.ts` — pure; identity moved into the references (each rewritten to the path it resolves to, every `id` then dropped), `encoding` discounted, spliced arrays compared as multisets, differences collapsed to path shapes. Its reference inventory is checked against both schemas and goes red on a new one; equivalence under respelled and swapped ids is proved before anything is judged. `harness/fixtures/roundtrip-register.json` covers MNX → `.gp` → MNX over the corpus and `.gp` → MNX → `.gp` → MNX over the committed fixtures, with ranked `lostOrChanged` and `gained` lists; `npm run update:roundtrip-register`, and **git diff is the review**. An operator lane runs the same over a private library and writes outside the repo. Structured warnings (`{code, where}`) and a computed explained/unexplained verdict are its stated follow-up. Findings in log entry 3. |
+| 2 | `studio-piece-create` | proposed | **A piece made in studio.** Opens `apps/studio → src/edit` (clause 12). `POST /api/library/pieces` (browser-authenticated, `expected_revision: null`, reusing `writePiece`) with `source_kind: 'studio'` and a generated id; `createPiece` on `LibraryClient`. A **New piece** form — title, artist, tuning (preset, or custom through the existing `setupGrammar`; **not "none"** while storage is `.gp` — item 1 found a notation-only part reloads with six standard strings, `staffKind: both` and an octave transposition, so the form cannot honestly offer it until the exporter can write an unfretted track), capo, time signature, key, bar count — that replays a construct trace from `{}`, exports GP7 and stores it as the piece's first rendition. Lands on the piece page with the Source sheet one tap away, and makes the *add a recording to see the sync bar* step obvious (the toggle is hidden on the synth). Amends the three docs contract clause 1 reverses. Conformance tests for the route. |
+| 3 | `studio-save-pipeline` | proposed | **The save pipeline, proven on the smallest edit surface. Lands after item 1.** A `setWork` op (merge; an undefined field removes it) and a **Details** sheet offering the fields the Guitar Pro score header can hold — expected: title, subtitle, artist, album, composer, lyricist, transcriber, copyright, notes; item 1's register confirms. Then everything in contract clauses 2–9: `POST /pieces/:id/renditions` (bytes, `expected_revision`, `derived_from`, provenance with verdict/warnings/named/build, derived tags; pointer moved atomically), export (**with `STORAGE_EXPORT_OPTIONS`** — log entry 3) + round-trip check moved into a worker and **measured on Vestapol**, the IndexedDB recovery record (clause 5), checkpoint triggers, the save-state chip and **Save version…**, the single write queue, the Web Lock, the derived-tag projection promoted into `src/model/` and shared with the ingest tool. Import `warnings` get a quiet *conversion notes (n)* entry on the piece page — displayed, not stored. Conformance tests and a smoke script. **Recovery acceptance tests, named because each is a way the first design was wrong:** *edit → checkpoint → undo → crash* recovers the undone state; *checkpoint → more edits → crash* recovers a document byte-identical to the live one; edits made **while a checkpoint is in flight** survive and stay counted unsaved; undo back to the checkpointed state reads clean; a record written by another build opens or is offered for download, never half-applied; a record whose base is no longer canonical reaches the conflict prompt. |
 | 4 | `studio-sync-rederive` | proposed | **Sync first, bars later.** Contract clause 10: derive tuples from segments and the current bars on load and on bar-structure change (the derivation already lives in `src/model/syncSegments.ts`; it must run outside a sync-bar commit), write refreshed tuples back at a checkpoint, and flag imported tuple-only syncs whose traversal changed. Closes the hands-on checks [studio-sync-bar](../inprogress/studio-sync-bar.md) still owes — the click against a real YouTube clock, and the bar on touch — on a piece made by item 2. |
 | 5 | `studio-piece-lifecycle` | proposed | **Living with pieces.** Soft delete (`deleted_at`; hidden from lists, R2 untouched — *never deletes* holds). A versions route listing a piece's renditions from `derived_from` / `created_at` with automatic-or-named and the round-trip verdict; open an older version; **revert** as a pointer move plus revision bump, no new rendition. Rename is a Details edit. An operator listing of unexplained round-trip verdicts that pulls their defect reports into converter fixtures. |
 | 6 | `core-sync-interchange` | proposed, optional | **sync.json as interchange.** *Export sync* (none exists): the dense Soundslice-compatible array as derived, or a sparse wrapper with anchors only at the cuts and a wrapper-level `interpolation: "beat"` — never a fifth tuple element, which breaks Soundslice compatibility and the decoder's arity check. The reader option for beat-linear interpolation is built only if sparse export is wanted. **Lifting an imported Soundslice sync into segments** (lossless = one segment per anchor interval, crowded; merged = tidy, discards measured timing) is a decision the item owns. Pick up when a second consumer of a sync appears, not before. |
-| 7 | [core-editor-element-promotion](core-editor-element-promotion.md) | proposed — trigger 2 **met** by this campaign | **The editor in studio, in slices.** That doc owns the promotion review; this campaign is the second consumer it was parked behind. Recommended shape, to be confirmed by a design pass over the mount code: a separate, code-split editor element that attaches to the viewer rather than an editing mode of `<mnx-document-viewer>` (embeds view, studio edits; viewers must not pay). **Slice 1:** cursor and selection overlay, keymap, note/fret entry, delete, undo. **Slice 2:** the setup popovers. **Slice 3:** lyric editor and rung inspector — last, because the inspector is still in progress in the workbench and promoting it early makes its churn public API. Workbench consumes the promoted element and deletes its mount. Every edit rides item 3's pipeline unchanged; items the register says cannot persist are marked in the score. |
+| 7 | [core-editor-element-promotion](../proposed/core-editor-element-promotion.md) | proposed — trigger 2 **met** by this campaign | **The editor in studio, in slices.** That doc owns the promotion review; this campaign is the second consumer it was parked behind. Recommended shape, to be confirmed by a design pass over the mount code: a separate, code-split editor element that attaches to the viewer rather than an editing mode of `<mnx-document-viewer>` (embeds view, studio edits; viewers must not pay). **Slice 1:** cursor and selection overlay, keymap, note/fret entry, delete, undo. **Slice 2:** the setup popovers. **Slice 3:** lyric editor and rung inspector — last, because the inspector is still in progress in the workbench and promoting it early makes its churn public API. Workbench consumes the promoted element and deletes its mount. Every edit rides item 3's pipeline unchanged; items the register says cannot persist are marked in the score. |
 | 8 | `studio-editor-touch` | proposed | **Entry without a keyboard.** The workbench editor is keyboard-driven and studio is used on an Android tablet; a touch entry surface is new design, not a port. Decision 1 below says whether slice 1 of item 7 waits for it. |
 
 ### Decisions still open
@@ -220,9 +222,14 @@ one.
    clause 5 it cannot be a bare op list against the `.gp`: it is either the live-document
    snapshot (hundreds of KB per write) or a base snapshot plus `apply`/`undo`/`redo` events —
    the item that adds it chooses, and inherits item 3's recovery tests.
-5. **Where layout state lives** if item 1's register confirms `.gp` cannot hold system
-   breaks and `scores[]`. Until then the studio editor does not offer layout authoring and
-   display stays a per-browser preference.
+5. **Where layout state lives.** Item 1's register confirmed it: `layouts`, `scores` and
+   `parts[].staves` are lost wherever they appear. The studio editor does not offer layout
+   authoring over `.gp` storage and display stays a per-browser preference; a home for
+   layout state is a decision for whoever first needs one.
+6. **Notation-only pieces** (log entry 3): Guitar Pro has no "unstated", so a part with no
+   strings comes back as a guitar. Either the exporter learns to write an unfretted track
+   and the importer to read one back without strings, or studio pieces are fretted by
+   definition. Blocks nothing until someone wants a lead sheet.
 
 ## Why these choices — the arguments, so they can be re-litigated honestly
 
@@ -311,4 +318,37 @@ four stood.
 4. **The order contradicted itself.** Item 2 needs `src/edit` (`setupGrammar`, trace
    replay), so the boundary opens there, not at item 3; and "item 1 runs in parallel with
    2–4" blurred development with landing — item 3 lands after item 1.
+
+### 2026-09-17 — entry 3: item 1 built — the judge, and what it found on day one
+
+[core-roundtrip-register](core-roundtrip-register.md) carries the detail; what later items
+should start knowing:
+
+- **The first design of the comparator cried wolf twice, and the register showed it within
+  minutes.** Renaming referenced ids and dropping the rest still reported 160 "lost ids" —
+  an event keeps its id only while a beam or slur points at it, so every lost beam was
+  counted twice. Identity now lives *only* in the references. And 132 of 138 documents
+  "differed" until gains were split from losses: Guitar Pro has no "unstated", so a track
+  always returns with a tuning, a key, a transposition and a voice name. **`gains` is a
+  verdict of its own** (clause 4 amended), not a loss and not nothing.
+- **Export for storage is not export for a person.** The exporter's default collapses a
+  unison held in two voices; the second voice re-imports as a rest — 386 events across 9
+  files of the private library. `STORAGE_EXPORT_OPTIONS` (in the converter, because the
+  converter knows which of its options trade fidelity for tidiness) is what item 3 exports
+  with. Expect more switches to join it.
+- **The library's case is in good shape; authoring in MNX is not.** Committed `.gp`
+  fixtures: 7 of 8 clean, the eighth explained by its warning. Private library with storage
+  options: 86 clean / 7 gains / 30 differing of 123, and **22 of those 30 carry no warning** —
+  silent chord-symbol loss (123 entries, 8 files), lyric syllable types, directions changing
+  homes, tie and hammer-on targets resolving elsewhere. Corpus: 0 clean / 30 gains / 100
+  differing, 76 silent. Pieces made in studio are authored in MNX, so the corpus lane is the
+  one that predicts what item 3's chip will say. **Each silent shape owes a fix or a
+  warning before the editor (item 7) makes it reachable.**
+- **Item 3's metadata question is answered:** `_x.mnxLab.work` loses only `source` and a
+  `creators[]` role the Guitar Pro header has no field for. The Details sheet's field list
+  stands. **Open decision 5 is answered** (layout state does not survive) and **decision 6 is
+  new** (a notation-only part comes back as a guitar — item 2's form changed to match).
+- **Process:** an ad-hoc probe test that prints is silent under this repo's vitest config —
+  write findings to a file. And a `\u0000` written through a heredoc lands as a literal NUL
+  byte in the source; both new files had one, caught before commit.
 

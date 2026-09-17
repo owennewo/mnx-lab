@@ -51,6 +51,15 @@ export interface GpifExportOptions {
   collapseTabUnisons?: boolean;
 }
 
+/**
+ * The options for writing a file that will be READ BACK as the document —
+ * studio's stored `.gp` — rather than handed to a person. The defaults favour a
+ * tidy Guitar Pro score; these favour getting the same MNX out again. Today that
+ * is one switch: a unison collapsed across two voices re-imports as a rest in
+ * the second voice (harness/fixtures/roundtrip-register.json is the evidence).
+ */
+export const STORAGE_EXPORT_OPTIONS: Readonly<GpifExportOptions> = { collapseTabUnisons: false };
+
 /** General MIDI program 25 — Acoustic Guitar (steel). */
 const DEFAULT_MIDI_PROGRAM = 25;
 
