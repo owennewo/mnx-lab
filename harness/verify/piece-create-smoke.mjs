@@ -1,5 +1,5 @@
 // Making a piece in a real browser against the local Worker/D1/R2
-// (roadmap/inprogress/studio-piece-create.md). Same preconditions as
+// (roadmap/complete/studio-piece-create.md). Same preconditions as
 // studio-smoke.mjs: local auth set up (docs/library-access.md → Local
 // development) and wrangler dev serving dist/client on LIBRARY_LOCAL_ORIGIN.
 //

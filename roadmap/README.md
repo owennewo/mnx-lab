@@ -159,15 +159,6 @@ back up to `proposed/` the moment it is.
 
 ### inprogress/
 
-- **[studio-piece-create.md](inprogress/studio-piece-create.md)** — **built 2026-09-17**,
-  [studio authoring campaign](inprogress/studio-campaign-authoring.md) item 2: studio can make
-  a piece. `#/new` builds a blank document from `{}` through `applyOp`
-  (`src/edit/newDocument.ts`), exports the `.gp` studio stores, reads its library tags off
-  the document and posts both to `POST /api/library/pieces`, which names everything itself
-  (`source_kind: 'studio'`) and reuses `writePiece` — no migration, no invariant amended.
-  Opens `apps/studio → src/edit`. Proved over the real route on local D1/R2 and in a real
-  browser (`npm run smoke:piece-create`), including that a blank piece survives its own
-  first save with nothing lost.
 - **[studio-campaign-authoring.md](inprogress/studio-campaign-authoring.md)** — **campaign**,
   opened 2026-09-17, **items 1–2 built the same day**: studio stops being read-only. Priority flow **new piece
   → YouTube → sync**, working before any note editing exists; editing last. Opens on the
@@ -495,6 +486,15 @@ back up to `proposed/` the moment it is.
 
 ### complete/
 
+- **[studio-piece-create.md](complete/studio-piece-create.md)** — **complete 2026-09-17**,
+  [studio authoring campaign](inprogress/studio-campaign-authoring.md) item 2: studio can make
+  a piece. `#/new` builds a blank document from `{}` through `applyOp`
+  (`src/edit/newDocument.ts`), exports the `.gp` studio stores, reads its library tags off
+  the document and posts both to `POST /api/library/pieces`, which names everything itself
+  (`source_kind: 'studio'`) and reuses `writePiece` — no migration, no invariant amended.
+  Opens `apps/studio → src/edit`. Proved over the real route on local D1/R2 and in a real
+  browser (`npm run smoke:piece-create`), including that a blank piece survives its own
+  first save with nothing lost.
 - **[core-roundtrip-register.md](complete/core-roundtrip-register.md)** — **complete 2026-09-17**,
   [studio authoring campaign](inprogress/studio-campaign-authoring.md) item 1: the judge of
   what a `.gp` round trip loses (`src/model/documentCompare.ts` — identity moved into the

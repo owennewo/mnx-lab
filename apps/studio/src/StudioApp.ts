@@ -7,7 +7,7 @@
 //   #/                 the library (tag-filtered browse); its view rides along as
 //                      #/?tag=list:80s&sort=title&q=words, so a way back returns to it
 //   #/piece/<id>       one piece, viewer + player filling the viewport
-//   #/new              make a piece (roadmap/inprogress/studio-piece-create.md)
+//   #/new              make a piece (roadmap/complete/studio-piece-create.md)
 //   #/not-permitted    Access admitted the address, D1 did not
 import { LitElement, css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';

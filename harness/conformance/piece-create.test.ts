@@ -1,5 +1,5 @@
 // Implementation loop: a piece made in Studio, end to end without a browser
-// (roadmap/inprogress/studio-piece-create.md, studio authoring campaign item 2).
+// (roadmap/complete/studio-piece-create.md, studio authoring campaign item 2).
 //
 // The form's work is three pure steps and one write, and each is pinned here:
 // build a blank document from ops, export it as the `.gp` Studio stores, read

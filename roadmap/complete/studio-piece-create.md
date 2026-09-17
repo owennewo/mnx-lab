@@ -1,7 +1,7 @@
 # A piece made in studio
 
-> **Status: built 2026-09-17.** Item 2 of the
-> [studio authoring campaign](studio-campaign-authoring.md) and bound by its contract
+> **Status: complete 2026-09-17.** Item 2 of the
+> [studio authoring campaign](../inprogress/studio-campaign-authoring.md) and bound by its contract
 > (clause 1: `.gp` is the only durable score format; clause 11: the Worker owns every write
 > and holds no converter; clause 12: boundaries open one at a time; clause 13: write paths
 > get tests). Implementation loop. No golden moved; no verification debt.

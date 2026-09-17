@@ -145,7 +145,7 @@ only**: no write route exists, the storage contract says the Worker owns every w
 and the first saved edit becomes a new rendition that takes the canonical pointer.
 *(Superseded 2026-09-17: the [studio authoring campaign](studio-campaign-authoring.md)
 sequences saving BEFORE the editor, stores that rendition as `.gp` rather than MNX, and
-makes pieces in studio — [studio-piece-create](studio-piece-create.md) — so there is
+makes pieces in studio — [studio-piece-create](../complete/studio-piece-create.md) — so there is
 something of one's own to edit.)* Persistence is the next studio item, not a stretch goal
 of this one.
 
