@@ -1,5 +1,5 @@
 // Editing and saving in a real browser against the local Worker/D1/R2
-// (roadmap/inprogress/studio-save-pipeline.md). Same preconditions as
+// (roadmap/complete/studio-save-pipeline.md). Same preconditions as
 // studio-smoke.mjs: local auth (docs/library-access.md → Local development) and
 // wrangler dev serving dist/client on LIBRARY_LOCAL_ORIGIN.
 //

@@ -1,5 +1,5 @@
 // Implementation loop: the save check — export, read straight back, compare
-// (roadmap/inprogress/studio-save-pipeline.md). The browser runs this in a
+// (roadmap/complete/studio-save-pipeline.md). The browser runs this in a
 // worker; the work itself is pure, so it is proved and timed here.
 import fs from 'node:fs';
 import path from 'node:path';

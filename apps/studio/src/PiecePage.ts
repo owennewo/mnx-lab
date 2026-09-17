@@ -24,7 +24,7 @@
 // 2026-09-17, later: the page EDITS. "Nothing here edits or persists anything"
 // above stopped being true with the Details sheet — studio's first editor, over
 // the document's own metadata — and the save session that stores its work as
-// `.gp` checkpoints with nobody asked to save (roadmap/inprogress/studio-save-pipeline.md).
+// `.gp` checkpoints with nobody asked to save (roadmap/complete/studio-save-pipeline.md).
 import { LitElement, css, html, nothing } from 'lit';
 import { keyed } from 'lit/directives/keyed.js';
 import { customElement, property, query, state } from 'lit/decorators.js';

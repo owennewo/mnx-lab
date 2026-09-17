@@ -1,5 +1,5 @@
 // Implementation loop: saving an edit, over the real route on local D1/R2
-// (roadmap/inprogress/studio-save-pipeline.md, studio authoring campaign item 3).
+// (roadmap/complete/studio-save-pipeline.md, studio authoring campaign item 3).
 //
 // A checkpoint is another immutable `.gp` rendition that takes the canonical
 // pointer — so the service keeps every version — and it is refused unless it

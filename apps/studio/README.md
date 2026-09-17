@@ -91,7 +91,7 @@ pointer** — Guitar Pro stays the stored format even for studio's own edits, so
 migration ever runs on stored data, and every save is checked for what the round trip lost.
 
 **The piece page edits and saves** (since 2026-09-17,
-[studio-save-pipeline](../../roadmap/inprogress/studio-save-pipeline.md)). Its first editor
+[studio-save-pipeline](../../roadmap/complete/studio-save-pipeline.md)). Its first editor
 is the Details sheet — the document's own metadata, through a `setWork` op and an
 `EditHistory` — and nobody is asked to save: `src/storage/saveSession.ts` keeps the live
 document in a local IndexedDB recovery record while edits are unsaved, checkpoints after a

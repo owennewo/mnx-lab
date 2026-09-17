@@ -1,7 +1,7 @@
 # The save pipeline, proven on the smallest editor
 
-> **Status: built 2026-09-17.** Item 3 of the
-> [studio authoring campaign](studio-campaign-authoring.md) and bound by its contract —
+> **Status: complete 2026-09-17.** Item 3 of the
+> [studio authoring campaign](../inprogress/studio-campaign-authoring.md) and bound by its contract —
 > clauses 2–9 are this item. Implementation loop. No golden moved; no verification debt.
 
 ## Why

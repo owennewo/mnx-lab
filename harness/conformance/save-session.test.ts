@@ -1,5 +1,5 @@
 // Implementation loop: the save session's promises, with no browser
-// (roadmap/inprogress/studio-save-pipeline.md, studio authoring campaign item 3).
+// (roadmap/complete/studio-save-pipeline.md, studio authoring campaign item 3).
 //
 // The first six are the campaign's recovery acceptance tests — named there
 // because each is a way the FIRST design of recovery (replay ops against the
