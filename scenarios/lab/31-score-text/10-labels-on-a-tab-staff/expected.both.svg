@@ -60,7 +60,7 @@
 <rect x="630.8" y="390.5248" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m2.v0.e0.n0"></rect>
 <text x="636.8" y="398.7072" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m2.v0.e0.n0">0</text>
 <line x1="733.6" y1="165.5648" x2="733.6" y2="416.9936" stroke-width="2.56" class="barline"></line>
-<text x="636.8" y="125.5648" font-size="25.6" text-anchor="middle" font-style="italic" style="font-family:var(--font-family-sans)" class="fine">fine</text>
+<text x="636.8" y="143.1648" font-size="25.6" text-anchor="middle" font-style="italic" style="font-family:var(--font-family-sans)" class="fine">fine</text>
 <line x1="733.6" y1="165.5648" x2="940" y2="165.5648" stroke-width="2.08" class="staff-line"></line>
 <line x1="733.6" y1="181.5648" x2="940" y2="181.5648" stroke-width="2.08" class="staff-line"></line>
 <line x1="733.6" y1="197.5648" x2="940" y2="197.5648" stroke-width="2.08" class="staff-line"></line>
@@ -83,7 +83,7 @@
 <rect x="206.4" y="8" width="30.88" height="30.08" fill="none" stroke="currentColor" stroke-width="1.92" class="rehearsal-box"></rect>
 <text x="214.4" y="31.68" font-size="24" font-weight="bold" style="font-family:var(--font-family-sans)" class="rehearsal-label">A</text>
 <text x="245.28" y="31.68" font-size="24" font-weight="bold" style="font-family:var(--font-family-sans)" class="section-label">Riff</text>
-<rect x="619.2" y="60.2848" width="30.88" height="30.08" fill="none" stroke="currentColor" stroke-width="1.92" class="rehearsal-box"></rect>
-<text x="627.2" y="83.9648" font-size="24" font-weight="bold" style="font-family:var(--font-family-sans)" class="rehearsal-label">B</text>
-<text x="658.08" y="83.9648" font-size="24" font-weight="bold" style="font-family:var(--font-family-sans)" class="section-label">Solo</text>
+<rect x="619.2" y="77.8848" width="30.88" height="30.08" fill="none" stroke="currentColor" stroke-width="1.92" class="rehearsal-box"></rect>
+<text x="627.2" y="101.5648" font-size="24" font-weight="bold" style="font-family:var(--font-family-sans)" class="rehearsal-label">B</text>
+<text x="658.08" y="101.5648" font-size="24" font-weight="bold" style="font-family:var(--font-family-sans)" class="section-label">Solo</text>
 </svg>

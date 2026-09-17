@@ -187,12 +187,17 @@ export function anchorAt(
 
 // ---------- Navigation markers (segno / fine / jump) ----------
 
-const NAV_MARKER_RISE_SP = 2.5; // baseline above the top staff line
 /** Navigation glyph origins differ substantially: on Bravura the segno's
  * bottom is 0.108sp below its origin and the coda's is 0.632sp below. A shared
- * baseline therefore leaves both targets floating at different heights.
- * Place their bottom ink explicitly instead. */
-export const NAV_TARGET_BOTTOM_RISE_SP = 1;
+ * baseline therefore leaves targets floating at different heights. Text has
+ * its own baseline convention too. Place the bottom ink of every navigation
+ * mark explicitly so a jump caption and its destination signs share a row. */
+export const NAV_BOTTOM_RISE_SP = 1;
+const NAV_TEXT_SIZE_SP = 1.6;
+// `render/bounds.ts` reserves 0.25em below an alphabetic text baseline. Lift
+// the baseline by that descent so the text's bottom ink, rather than its
+// baseline, lands on NAV_BOTTOM_RISE_SP.
+const NAV_TEXT_DESCENT_SP = NAV_TEXT_SIZE_SP * 0.25;
 
 const JUMP_TEXT: Record<string, string> = {
   segno: 'D.S.',
@@ -223,7 +228,7 @@ export function emitNavigationMarkers(args: EmitNavigationMarkersArgs): void {
   if (!navigation.marks.length && !navigation.jumps.length) return;
 
   const onsetXs = measureOnsetXs(stdSequences, m.voices);
-  const y = staffTop - NAV_MARKER_RISE_SP;
+  const textY = staffTop - NAV_BOTTOM_RISE_SP - NAV_TEXT_DESCENT_SP;
   const place = (loc?: { fraction: [number, number] }) => {
     const f = loc?.fraction;
     const t = Array.isArray(f) && f[1] ? f[0] / f[1] : 0;
@@ -234,13 +239,13 @@ export function emitNavigationMarkers(args: EmitNavigationMarkersArgs): void {
     const p = place(mark.location);
     if (mark.kind === 'fine') {
       primitives.push({
-        kind: 'text', text: 'fine', x: p.x, y, font: 'bodyItalic', size: 1.6,
+        kind: 'text', text: 'fine', x: p.x, y: textY, font: 'bodyItalic', size: NAV_TEXT_SIZE_SP,
         anchor: p.anchor, ...(mark.color ? { fill: mark.color } : {}), className: 'fine'
       });
       continue;
     }
     const glyph = mark.glyph ?? mark.kind;
-    const glyphY = staffTop - NAV_TARGET_BOTTOM_RISE_SP + (glyphBBox(glyph)?.y ?? 0);
+    const glyphY = staffTop - NAV_BOTTOM_RISE_SP + (glyphBBox(glyph)?.y ?? 0);
     const separation = (glyphBBox(glyph)?.w ?? 1.25) + 0.35;
     const offsets = mark.count === 2
       ? (p.anchor === 'end' ? [-separation, 0] : [-separation / 2, separation / 2])
@@ -256,9 +261,9 @@ export function emitNavigationMarkers(args: EmitNavigationMarkersArgs): void {
       kind: 'text',
       text: jump.text ?? JUMP_TEXT[jump.type] ?? jump.type,
       x: p.x,
-      y,
+      y: textY,
       font: 'body',
-      size: 1.6,
+      size: NAV_TEXT_SIZE_SP,
       anchor: p.anchor,
       className: 'jump'
     });

@@ -36,10 +36,10 @@
 <line x1="511.2" y1="235.8128" x2="717.6" y2="235.8128" stroke-width="1.6" class="staff-line"></line>
 <rect x="614.8" y="209.344" width="12" height="16.3664" fill="var(--paper, oklch(0.985 0.006 85))" class="fret-bg" data-source-id="@m2.v0.e0.n0"></rect>
 <text x="620.8" y="217.5264" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" style="font-family:var(--font-family-sans)" class="fret-number" data-source-id="@m2.v0.e0.n0">0</text>
-<text x="620.8" y="104.384" font-size="25.6" text-anchor="middle" font-style="italic" style="font-family:var(--font-family-sans)" class="fine">fine</text>
-<rect x="603.2" y="39.104" width="30.88" height="30.08" fill="none" stroke="currentColor" stroke-width="1.92" class="rehearsal-box"></rect>
-<text x="611.2" y="62.784" font-size="24" font-weight="bold" style="font-family:var(--font-family-sans)" class="rehearsal-label">B</text>
-<text x="642.08" y="62.784" font-size="24" font-weight="bold" style="font-family:var(--font-family-sans)" class="section-label">Solo</text>
+<text x="620.8" y="121.984" font-size="25.6" text-anchor="middle" font-style="italic" style="font-family:var(--font-family-sans)" class="fine">fine</text>
+<rect x="603.2" y="56.704" width="30.88" height="30.08" fill="none" stroke="currentColor" stroke-width="1.92" class="rehearsal-box"></rect>
+<text x="611.2" y="80.384" font-size="24" font-weight="bold" style="font-family:var(--font-family-sans)" class="rehearsal-label">B</text>
+<text x="642.08" y="80.384" font-size="24" font-weight="bold" style="font-family:var(--font-family-sans)" class="section-label">Solo</text>
 <line x1="717.6" y1="144.384" x2="717.6" y2="235.8128" stroke-width="2.56" class="barline"></line>
 <line x1="717.6" y1="144.384" x2="924" y2="144.384" stroke-width="1.6" class="staff-line"></line>
 <line x1="717.6" y1="162.6704" x2="924" y2="162.6704" stroke-width="1.6" class="staff-line"></line>

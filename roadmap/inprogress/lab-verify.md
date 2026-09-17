@@ -1637,3 +1637,16 @@ the same pending batch to the existing scenarios `lab/score-text/labels-with-nav
 `spec/jumps-ds-al-fine`. Review that segnos moved down without touching their staff,
 and that any section/tempo stack above them moved with the target rather than
 changing its internal clearance.
+
+Third visual correction: navigation direction text (`D.S.`, `D.S. al Fine`,
+`D.S.S. al Double Coda`, and the other jump captions) and `fine` now align by
+their bottom ink to the same one-space-above-staff row as segno and coda glyphs.
+The previous fixed baseline left captions roughly two staff spaces above the
+staff; the new baseline explicitly accounts for the body font's descent. This
+updates the same pending batch in `lab/score-text/labels-with-navigation`,
+`lab/score-text/labels-on-a-tab-staff`, `lab/navigation/jumps-and-signs`,
+`lab/navigation/ds-final-ending`, `lab/navigation/coda-navigation`,
+`lab/layout/coloured-marks-and-clef-forms`, `spec/jumps-dal-segno`, and
+`spec/jumps-ds-al-fine`. Review that captions and nearby destination signs read
+as one row without touching the staff, and that labels stacked above them retain
+their clearance.

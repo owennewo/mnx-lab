@@ -35,7 +35,7 @@
 <line x1="232.8" y1="355.8688" x2="351.2" y2="355.8688" stroke-width="1.6" class="staff-line"></line>
 <line x1="351.2" y1="128" x2="351.2" y2="355.8688" stroke-width="2.56" class="barline"></line>
 <text x="296.8" y="144" font-size="64" text-anchor="middle" class="rest rest-full-measure"></text>
-<text x="351.2" y="88" font-size="25.6" text-anchor="end" style="font-family:var(--font-family-sans)" class="jump">To Double Coda</text>
+<text x="351.2" y="105.6" font-size="25.6" text-anchor="end" style="font-family:var(--font-family-sans)" class="jump">To Double Coda</text>
 <line x1="351.2" y1="128" x2="469.6" y2="128" stroke-width="2.08" class="staff-line"></line>
 <line x1="351.2" y1="144" x2="469.6" y2="144" stroke-width="2.08" class="staff-line"></line>
 <line x1="351.2" y1="160" x2="469.6" y2="160" stroke-width="2.08" class="staff-line"></line>
@@ -63,7 +63,7 @@
 <line x1="469.6" y1="355.8688" x2="588" y2="355.8688" stroke-width="1.6" class="staff-line"></line>
 <line x1="588" y1="128" x2="588" y2="355.8688" stroke-width="2.56" class="barline"></line>
 <text x="533.6" y="144" font-size="64" text-anchor="middle" class="rest rest-full-measure"></text>
-<text x="588" y="88" font-size="25.6" text-anchor="end" style="font-family:var(--font-family-sans)" class="jump">To Coda</text>
+<text x="588" y="105.6" font-size="25.6" text-anchor="end" style="font-family:var(--font-family-sans)" class="jump">To Coda</text>
 <line x1="588" y1="128" x2="706.4" y2="128" stroke-width="2.08" class="staff-line"></line>
 <line x1="588" y1="144" x2="706.4" y2="144" stroke-width="2.08" class="staff-line"></line>
 <line x1="588" y1="160" x2="706.4" y2="160" stroke-width="2.08" class="staff-line"></line>
@@ -77,7 +77,7 @@
 <line x1="588" y1="355.8688" x2="706.4" y2="355.8688" stroke-width="1.6" class="staff-line"></line>
 <line x1="706.4" y1="128" x2="706.4" y2="355.8688" stroke-width="2.56" class="barline"></line>
 <text x="652" y="144" font-size="64" text-anchor="middle" class="rest rest-full-measure"></text>
-<text x="706.4" y="88" font-size="25.6" text-anchor="end" style="font-family:var(--font-family-sans)" class="jump">D.S. al Coda</text>
+<text x="706.4" y="105.6" font-size="25.6" text-anchor="end" style="font-family:var(--font-family-sans)" class="jump">D.S. al Coda</text>
 <line x1="706.4" y1="128" x2="824.8" y2="128" stroke-width="2.08" class="staff-line"></line>
 <line x1="706.4" y1="144" x2="824.8" y2="144" stroke-width="2.08" class="staff-line"></line>
 <line x1="706.4" y1="160" x2="824.8" y2="160" stroke-width="2.08" class="staff-line"></line>
@@ -105,7 +105,7 @@
 <line x1="824.8" y1="355.8688" x2="943.2" y2="355.8688" stroke-width="1.6" class="staff-line"></line>
 <line x1="943.2" y1="128" x2="943.2" y2="355.8688" stroke-width="2.56" class="barline"></line>
 <text x="888.8" y="144" font-size="64" text-anchor="middle" class="rest rest-full-measure"></text>
-<text x="943.2" y="88" font-size="25.6" text-anchor="end" style="font-family:var(--font-family-sans)" class="jump">D.S.S. al Double Coda</text>
+<text x="943.2" y="105.6" font-size="25.6" text-anchor="end" style="font-family:var(--font-family-sans)" class="jump">D.S.S. al Double Coda</text>
 <line x1="943.2" y1="128" x2="1061.6" y2="128" stroke-width="2.08" class="staff-line"></line>
 <line x1="943.2" y1="144" x2="1061.6" y2="144" stroke-width="2.08" class="staff-line"></line>
 <line x1="943.2" y1="160" x2="1061.6" y2="160" stroke-width="2.08" class="staff-line"></line>

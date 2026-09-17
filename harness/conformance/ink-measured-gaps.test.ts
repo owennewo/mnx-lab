@@ -33,7 +33,7 @@ import { anchorY, rowBoundariesSp } from '../../src/engine/layout/verticalDensit
 import { lyricReachBelowRows } from '../../src/engine/layout/lyricRuns.ts';
 import {
   COHESION_CLEAR_SP,
-  NAV_TARGET_BOTTOM_RISE_SP,
+  NAV_BOTTOM_RISE_SP,
   TEXT_MIN_RISE_SP,
   TEXT_SIDE_CLEAR_SP
 } from '../../src/engine/layout/scoreText.ts';
@@ -85,8 +85,8 @@ describe('TAB clef scale', () => {
   });
 });
 
-describe('navigation glyph placement', () => {
-  it('places segno and coda bottom ink one space above their staff', () => {
+describe('navigation placement', () => {
+  it('places target glyph and direction-text bottom ink one space above their staff', () => {
     initSmufl();
     const s = corpus.find(c => c.id === 'lab/navigation/coda-navigation')!;
     for (const layout of [layoutNotation({ mnx: readDoc(s.dir), widthSp: WIDTH_SP }), layoutTab({ mnx: readDoc(s.dir), widthSp: WIDTH_SP })]) {
@@ -95,7 +95,14 @@ describe('navigation glyph placement', () => {
       for (const target of targets) {
         const staff = layout.rows.find(row => row.staffTop > anchorY(target))!;
         expect(staff.staffTop - computeBoundsSp([target])!.y - computeBoundsSp([target])!.h)
-          .toBeCloseTo(NAV_TARGET_BOTTOM_RISE_SP, 6);
+          .toBeCloseTo(NAV_BOTTOM_RISE_SP, 6);
+      }
+      const jumps = layout.primitives.filter(p => cls(p) === 'jump');
+      expect(jumps.length).toBeGreaterThan(0);
+      for (const jump of jumps) {
+        const staff = layout.rows.find(row => row.staffTop > anchorY(jump))!;
+        const ink = computeBoundsSp([jump])!;
+        expect(staff.staffTop - ink.y - ink.h).toBeCloseTo(NAV_BOTTOM_RISE_SP, 6);
       }
     }
   });
