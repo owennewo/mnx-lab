@@ -40,7 +40,8 @@ export function bindPlayback(host: HTMLElement, viewer: DocumentViewer, player: 
   const update = (event: Event) => {
     const detail = (event as CustomEvent<PlaybackUpdate>).detail;
     if (!model || detail.documentId !== player.documentId) return;
-    state = { ...withPlaybackOrdinal(state, model, detail.ordinal), highlight: detail.highlight };
+    state = { ...withPlaybackOrdinal(state, model, detail.ordinal), highlight: detail.highlight,
+      recordingBookends: detail.recordingBookends ?? null, mediaPhase: detail.mediaPhase ?? null };
     publish();
   };
   const select = (event: Event) => {

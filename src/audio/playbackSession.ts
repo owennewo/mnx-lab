@@ -51,7 +51,12 @@ export class PlaybackSession {
     try { next = this.factory(id); }
     catch (error) { this.pause(); this.alignmentIssue = undefined; this.issue = error instanceof Error ? error.message : String(error); this.notify(); return false; }
     if (!this.selecting && !(replace && this.needsStart)) {
-      this.target = { position: before.scorePosition, problem: before.syncIssue };
+      // A stopped synth and a recording still in pre-roll select the new
+      // source at its own beginning. Other live/paused handoffs preserve a
+      // musical position; an actually unmapped recording remains explicit.
+      this.target = (before.state === 'stopped' && before.kind === 'synth') || before.mediaPhase === 'pre-roll'
+        ? { position: null, reset: true }
+        : { position: before.scorePosition, problem: before.syncIssue };
       this.handoffRate = before.rate; this.handoffVolume = before.volume;
     }
     ++this.targetVersion;

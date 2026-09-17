@@ -11,6 +11,12 @@ export interface PlaybackOccurrence {
 
 export interface PlaybackState extends PlaybackPositionState {
   highlight: PlaybackOccurrence[];
+  recordingBookends: RecordingBookends | null;
+  mediaPhase: 'pre-roll' | 'mapped' | 'post-roll' | 'unmapped' | null;
+}
+export interface RecordingBookends {
+  preRollSeconds: number;
+  postRollSeconds: number;
 }
 /** Item 7 emits this from the player. Its common ancestor owns the provider. */
 export interface PlaybackUpdate {
@@ -18,9 +24,11 @@ export interface PlaybackUpdate {
   documentId: string;
   ordinal: number | null;
   highlight: PlaybackOccurrence[];
+  recordingBookends?: RecordingBookends | null;
+  mediaPhase?: PlaybackState['mediaPhase'];
 }
 export function initialPlaybackState(): PlaybackState {
-  return { ...initialPlaybackPosition(), highlight: [] };
+  return { ...initialPlaybackPosition(), highlight: [], recordingBookends: null, mediaPhase: null };
 }
 
 export const mnxDocumentContext = createContext<MnxDocument | null>(Symbol('mnx-document'));

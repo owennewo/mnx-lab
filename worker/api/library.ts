@@ -125,7 +125,9 @@ library.post('/ingest', async c => {
     if (r.duration_s != null && (typeof r.duration_s !== 'number' || !Number.isFinite(r.duration_s) || r.duration_s < 0)) invalid('Invalid duration');
     recordings.push({ id: text(r.id), kind: r.kind as RecordingInput['kind'], source_id: text(r.source_id),
       name: nullable(r.name), mime: nullable(r.mime), external_id: nullable(r.external_id), duration_s: r.duration_s as number | null,
-      syncpoints: (r.syncpoints ?? null) as Json, ...(r.file === undefined ? {} : { blob: await readBlob(r) }) });
+      syncpoints: (r.syncpoints ?? null) as Json,
+      ...(r.provenance === undefined ? {} : { provenance: r.provenance as Json }),
+      ...(r.file === undefined ? {} : { blob: await readBlob(r) }) });
   }
   const canonical = object(manifest.canonical);
   if (canonical.mode !== 'initialize') invalid('Ingest may only initialize the canonical pointer');

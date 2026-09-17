@@ -114,6 +114,33 @@ export function conversionFacts(doc) {
 }
 export const tuningName = tuning => TUNING_NAMES[tuning] ?? null;
 
+export function recordingAuditRows(plan, decodedDurations = new Map()) {
+  return plan.recordingAudits.map(audit => {
+    const seconds = (audit.syncpoints ?? []).map(point => Array.isArray(point) ? point[1] : null)
+      .filter(value => typeof value === 'number' && Number.isFinite(value));
+    const decoded = decodedDurations.get(audit.source_id) ?? null;
+    const last = seconds.length ? seconds[seconds.length - 1] : null;
+    return {
+      recording: audit.source_id,
+      first_anchor_s: seconds[0] ?? null,
+      last_anchor_s: last,
+      cropped_duration_s: audit.cropped_duration,
+      decoded_duration_s: decoded,
+      genuine_media_overrun: decoded !== null && last !== null ? last > decoded + 0.001 : null,
+      clears_mislabelled_duration: audit.cropped_duration !== null
+    };
+  });
+}
+
+function probeDuration(path) {
+  if (!path) return null;
+  try {
+    const value = Number(execFileSync('ffprobe', ['-v', 'error', '-show_entries', 'format=duration',
+      '-of', 'default=noprint_wrappers=1:nokey=1', path], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim());
+    return Number.isFinite(value) && value > 0 ? value : null;
+  } catch { return null; }
+}
+
 // ---------------------------------------------------------------- planning
 /** What the cache says about each slice — bytes, identities, sidecar facts —
  *  with no conversion. Conversion is validatePlan's, and only when needed. */
@@ -134,7 +161,7 @@ export async function planIngest(inputDirectory) {
     seen.add(sourceId);
     if (sync && lists && (sync.id !== lists.id || sync.score_file !== lists.score_file)) throw new Error('Sidecar identities disagree');
     if (meta.score_file !== `${stem}.gp`) throw new Error('Sidecar score filename disagrees with bundle');
-    const files = new Map(); const renditions = []; const recordings = []; const sources = [];
+    const files = new Map(); const renditions = []; const recordings = []; const sources = []; const recordingAudits = [];
     const attach = bytes => { const sha256 = hash(bytes); const file = `blob-${sha256}`; files.set(file, bytes); return { file, sha256 }; };
     const checked = (bytes, entry) => { if (entry?.sha256 && hash(bytes) !== entry.sha256) throw new Error(`Cache checksum mismatch for ${entry.file}`); };
     const sourceNames = names.filter(n => n === `${stem}.gp` || n === `${stem}.musicxml` || new RegExp(`^${stem.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\.original\\.(gp|gpx|gp3|gp4|gp5|musicxml|mnx)$`).test(n)).sort();
@@ -159,7 +186,15 @@ export async function planIngest(inputDirectory) {
       const source_id = String(r.id);
       if (!/^\d+$/.test(source_id)) throw new Error('Invalid recording source id');
       const row = { id: identity(sourceId, 'recording', source_id), source_id, name: r.name ?? null,
-        duration_s: r.cropped_duration ?? null, syncpoints: r.syncpoints ?? null };
+        // Soundslice's cropped duration describes its export/crop metadata,
+        // not the media element's decoded duration. Keep it as provenance and
+        // let playback learn the authoritative full duration from the medium.
+        duration_s: null, syncpoints: r.syncpoints ?? null,
+        provenance: { source: 'soundslice-sync-wrapper', cropped_duration: r.cropped_duration ?? null,
+          crop_start: r.crop_start ?? null, crop_end: r.crop_end ?? null } };
+      recordingAudits.push({ source_id, syncpoints: r.syncpoints ?? null,
+        cropped_duration: r.cropped_duration ?? null,
+        mediaPath: r.media_file ? join(directory, r.media_file) : null });
       if (r.source === 1) recordings.push({ ...row, kind: 'youtube', external_id: required(r.source_data, 'YouTube id') });
       else if (r.media_file) {
         const bytes = await cacheFile(directory, r.media_file);
@@ -197,7 +232,7 @@ export async function planIngest(inputDirectory) {
       console.error(`Skipping recording ${dropped.source_id} of ${sourceId} (${(bytes / 1048576).toFixed(1)} MiB bundle exceeds the 24 MiB request); existing recording is retained`);
       bytes = size();
     }
-    plans.push({ manifest, files, bytes, sources, sidecarTags, canonicalId: canonical.id });
+    plans.push({ manifest, files, bytes, sources, sidecarTags, canonicalId: canonical.id, recordingAudits });
   }
   return plans;
 }
@@ -261,6 +296,14 @@ export async function uploadPlan(plan, endpoint, token, fetcher = fetch, access 
     tags: snapshot?.tags ?? [] };
   const missingRenditions = plan.manifest.renditions.filter(r => !have.renditions.has(r.id));
   const missingRecordings = plan.manifest.recordings.filter(r => !have.recordings.has(r.source_id));
+  const recordingMetadataStale = plan.manifest.recordings.some(offered => {
+    const stored = snapshot?.recordings.find(r => r.source_id === offered.source_id);
+    if (!stored) return false;
+    const provenance = stored.provenance ? JSON.parse(stored.provenance) : null;
+    return stored.duration_s !== offered.duration_s || stored.name !== offered.name ||
+      stored.syncpoints !== JSON.stringify(offered.syncpoints) ||
+      Object.entries(offered.provenance ?? {}).some(([key, value]) => provenance?.[key] !== value);
+  });
   const listsStale = plan.manifest.tags.some(t => !have.tags.some(s => s.source_ref === t.source_ref));
   const derivedNow = have.tags.filter(t => t.origin === 'derived');
   const currentRef = converters ? `${converters['guitarpro-mnx'].producer}@${converters['guitarpro-mnx'].version}` : null;
@@ -269,7 +312,7 @@ export async function uploadPlan(plan, endpoint, token, fetcher = fetch, access 
   let validation = null;
   const needValidation = converters && (force || !snapshot || missingRenditions.length || projectionStale);
   if (needValidation) validation = await validatePlan(plan, converters);
-  if (!force && snapshot && !missingRenditions.length && !missingRecordings.length && !listsStale && !projectionStale && !pointerStale) {
+  if (!force && snapshot && !missingRenditions.length && !missingRecordings.length && !recordingMetadataStale && !listsStale && !projectionStale && !pointerStale) {
     return { status: 'skipped', snapshot, unchanged: true, validation };
   }
   const manifest = { ...plan.manifest, renditions: missingRenditions, expected_revision: snapshot?.piece.revision ?? null,
@@ -341,7 +384,11 @@ async function main(args) {
     }
   };
   if (dryRun) {
-    for (const p of plans) show(p.manifest.source.id, await validatePlan(p, converters));
+    for (const p of plans) {
+      show(p.manifest.source.id, await validatePlan(p, converters));
+      const durations = new Map(p.recordingAudits.map(audit => [audit.source_id, probeDuration(audit.mediaPath)]));
+      for (const audit of recordingAuditRows(p, durations)) console.log(JSON.stringify({ slice: p.manifest.source.id, ...audit }));
+    }
     console.log(`Dry run: no network requests or storage writes.${invalid ? ` ${invalid} conversion(s) invalid.` : ''}`);
     if (invalid) process.exitCode = 1;
     return;

@@ -40,7 +40,7 @@ export interface RenditionInput extends BlobInput {
 export interface RecordingInput {
   id: string; kind: Recording['kind']; name?: string | null; blob?: BlobInput;
   mime?: string | null; external_id?: string | null; duration_s?: number | null;
-  syncpoints?: Json; source_id?: string | null;
+  syncpoints?: Json; source_id?: string | null; provenance?: Json;
 }
 export interface AssertedTag {
   dimension: string; value: string; sort_key?: number | null; source_ref?: string | null;

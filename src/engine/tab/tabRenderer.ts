@@ -8,6 +8,7 @@ import { computeBoundsSp } from '../render/bounds.ts';
 import { fitPxPerSp } from '../render/svg.ts';
 import { emitPlan, type RenderPlan } from '../render/plan.ts';
 import { squareLayout, type LayoutCache } from '../render/layoutCache.ts';
+import type { SystemBookends } from '../layout/systemBookends.ts';
 import type { RenderedProjection } from '../render/projection.ts';
 import {
   clampStaffSp,
@@ -67,6 +68,8 @@ export interface RenderTabOptions {
    *  `hide="lyrics"` means the same thing in every view. */
   display?: DisplayOptions;
   hide?: readonly import('../layout/notation.ts').HideableFeature[];
+  /** Optional host-owned regions before/after the first/last system. */
+  systemBookends?: SystemBookends;
 }
 
 /** The DOM-free half — see `render/plan.ts`. */
@@ -91,7 +94,8 @@ export function planTab(opts: PlanTabOptions): RenderPlan {
     densityH: opts.densityH,
     densityPad: opts.densityPad,
     display: opts.display,
-    hide: opts.hide
+    hide: opts.hide,
+    systemBookends: opts.systemBookends
   };
   const square = squareLayout(opts.cache, layoutArgs, () => layoutTab(layoutArgs));
 

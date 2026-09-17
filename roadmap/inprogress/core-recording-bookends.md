@@ -1,7 +1,7 @@
 # Recording bookends — pre-roll, post-roll and honest sync diagnostics
 
-> **Status: proposed 2026-09-17.** Implementation loop. Follow-up to player campaign
-> items 15–18: recording sync, playback, YouTube and Studio recording management.
+> **Status: in progress 2026-09-17.** Implementation loop. Player campaign item 19;
+> follow-up to recording sync, playback, YouTube and Studio recording management.
 
 Soundslice sync points anchor score positions inside a recording; they do not claim that
 the score begins at media time zero or continues to the end of the file. Time before the

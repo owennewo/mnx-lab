@@ -50,9 +50,10 @@ mapping, including for embed hosts, so changing timings cannot restart old playb
 
 The local `soundslice-cli/soundslice_cli/api.py` recording field list contains
 `cropped_duration` but omits `crop_start` and `crop_end`. Its README documents seconds
-from the original recording start. `tools/library-ingest.mjs` currently puts
-`cropped_duration` in `duration_s`; that field is not a trustworthy full-media duration.
-Neither exporter nor historical imports can reconstruct absent crop boundaries.
+from the original recording start. `tools/library-ingest.mjs` therefore keeps all
+available crop fields in recording provenance and writes `duration_s: null`; a crop
+duration is not a trustworthy full-media duration. Neither exporter nor historical
+imports can reconstruct absent crop boundaries.
 
 New wrapper imports preserve available `crop_start`, `crop_end` and
 `cropped_duration`. Boundaries must be finite nonnegative absolute media seconds,
@@ -60,6 +61,13 @@ with end after start when both exist. The stored metadata can contain duration-o
 **Crop controls are not applied by this item**: playback uses the original media clock. No offset is inferred, and no
 cropped-playback parity with Soundslice is claimed. The player takes actual duration
 from the media API; it never uses imported cropped duration as its clock.
+
+`npm run ingest:library -- <cache> --dry-run` prints one recording-audit JSON row with
+first/last anchor, reported cropped duration, decoded duration when local `ffprobe` can
+read the companion, and `genuine_media_overrun`. `clears_mislabelled_duration: true`
+identifies rows whose old generic duration claim a normal re-ingest will repair. The
+repair preserves recording identity and bytes; it does not infer crop boundaries or
+shift sync seconds.
 
 ## Upload and write contract
 

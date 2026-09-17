@@ -37,6 +37,15 @@ export interface BackendSnapshot {
   readonly rate: number;
   readonly volume: number;
   readonly mediaTime?: number;
+  /** Where the media clock is relative to the score anchors. Unanchored
+   *  pre/post-roll is normal playback state, never a sync diagnostic. */
+  readonly mediaPhase?: 'pre-roll' | 'mapped' | 'post-roll' | 'unmapped';
+  /** The anchored media interval and, once prepared, the decoded file end. */
+  readonly mediaBounds?: {
+    readonly startSeconds: number;
+    readonly endSeconds: number;
+    readonly durationSeconds?: number;
+  };
   readonly syncIssue?: string;
   readonly error?: string;
   /** Present only for synth. No synthetic onsets/clock are fabricated for media. */

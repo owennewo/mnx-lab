@@ -481,6 +481,8 @@ export interface PackingInput {
   lineWidthSp: number;
   /** Available width after the first system (part-name gutter can change). */
   subsequentLineWidthSp?: number;
+  /** Space held after the last system only (for a host-owned bookend). */
+  lastLineRightInsetSp?: number;
   /** Trailing pad after a measure's content. Carried rather than read from the
    *  module constant because Clearance resolves it, and the packer must use
    *  the same width the placement pass will. Absent ⇒ the default. */
@@ -598,6 +600,23 @@ export function packSystems(packing: PackingInput, densityH: number): PackedRow[
   // The score simply ran out: the last row holds what was left, not what fits.
   if (current.length > 0) rows.push({ measures: current, full: false });
 
+  // A trailing bookend belongs only after the final system. If the ordinary
+  // greedy row used that room, peel its last measure onto a new final row.
+  const naturalWidth = (measures: readonly number[]) => measures.reduce((sum, k, j) => {
+    const m = packs[k];
+    return sum + (j === 0 ? m.prefixFirst : m.prefixRest) +
+      m.lead * springFactor + m.rigid + m.spring * springFactor + contentRightPad + m.repeatExtra;
+  }, 0);
+  const finalInset = packing.lastLineRightInsetSp ?? 0;
+  if (finalInset > 0 && rows.length) {
+    const last = rows[rows.length - 1];
+    if (last.measures.length > 1 && naturalWidth(last.measures) > widthAt(rows.length - 1) - finalInset) {
+      const tail = last.measures.pop()!;
+      last.full = true;
+      rows.push({ measures: [tail], full: false });
+    }
+  }
+
   const wanted = rows.map(({ measures, full }, row) => {
     let rowRigid = 0;
     let rowSpring = 0;
@@ -607,7 +626,8 @@ export function packSystems(packing: PackingInput, densityH: number): PackedRow[
         (j === 0 ? m.prefixFirst : m.prefixRest) + m.rigid + contentRightPad + m.repeatExtra;
       rowSpring += m.spring * springFactor + m.lead * springFactor;
     });
-    return { measures, full, stretch: rowStretch(widthAt(row) - rowRigid, rowSpring) };
+    const available = widthAt(row) - (row === rows.length - 1 ? finalInset : 0);
+    return { measures, full, stretch: rowStretch(available - rowRigid, rowSpring) };
   });
   const capped = justifyRows(wanted, packing.spacingMode);
   return wanted.map((r, i) => ({ measures: r.measures, stretch: capped[i], full: r.full }));
@@ -1324,6 +1344,8 @@ export interface PlanOptions {
   /** Extra left room (staff labels / group brackets), inside the margin. */
   leftInsetSp?: number;
   subsequentLeftInsetSp?: number;
+  /** Extra room after the final system, without narrowing earlier systems. */
+  lastLineRightInsetSp?: number;
   /** Multimeasure-rest collapses: `count` measures from `startIndex` shown as
    *  one H-bar measure (the tail measures become hidden stubs). */
   collapse?: { startIndex: number; count: number }[];
@@ -2233,6 +2255,7 @@ export function planHorizontal(
     spacingMode: options?.spacingMode,
     lineWidthSp: lineWidth,
     ...(options?.subsequentLeftInsetSp === undefined ? {} : { subsequentLineWidthSp: widthSp - 2 * marginSp - subsequentLeftInset }),
+    ...(options?.lastLineRightInsetSp === undefined ? {} : { lastLineRightInsetSp: options.lastLineRightInsetSp }),
     contentRightPadSp: contentRightPad,
     ...(followsSpace ? { space: { spaceSp: densityH, prefixes: metrics.flatMap((m, i) =>
       m.hidden || !inRange(i) ? [] : [{ first: airFor(m, true, i), rest: airFor(m, false, i) }]) } } : {}),
@@ -2546,7 +2569,7 @@ export function planHorizontal(
   if (options?.entries) measures.forEach((measure, i) => { measure.entry = options.entries![i]; });
 
   const usedWidthSp = measures.length
-    ? Math.max(...measures.map(m => m.x + m.width)) + marginSp
+    ? Math.max(...measures.map(m => m.x + m.width)) + marginSp + (options?.lastLineRightInsetSp ?? 0)
     : widthSp;
   return { measures, rowCount: packed.length, numStaves, staffGroups, usedWidthSp, packing, columns, inkRatio };
 }

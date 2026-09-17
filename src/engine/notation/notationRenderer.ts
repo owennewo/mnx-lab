@@ -7,6 +7,7 @@ import { computeBoundsSp } from '../render/bounds.ts';
 import { fitPxPerSp } from '../render/svg.ts';
 import { emitPlan, type RenderPlan } from '../render/plan.ts';
 import { squareLayout, type LayoutCache } from '../render/layoutCache.ts';
+import type { SystemBookends } from '../layout/systemBookends.ts';
 import type { RenderedProjection } from '../render/projection.ts';
 import {
   clampStaffSp,
@@ -68,6 +69,8 @@ export interface RenderNotationOptions {
   /** A caller-owned memo of the square layout across a zoom gesture
    *  (`render/layoutCache.ts`). Absent, every paint lays out afresh. */
   cache?: LayoutCache;
+  /** Optional host-owned regions before/after the first/last system. */
+  systemBookends?: SystemBookends;
 }
 
 /** The DOM-free half — see `render/plan.ts`. */
@@ -92,7 +95,8 @@ export function planNotation(opts: PlanNotationOptions): RenderPlan {
     hide: opts.hide,
     spacingMode: opts.spacingMode,
     densityH: opts.densityH,
-    densityPad: opts.densityPad
+    densityPad: opts.densityPad,
+    systemBookends: opts.systemBookends
   };
   const square = squareLayout(opts.cache, layoutArgs, () => layoutNotation(layoutArgs));
 

@@ -33,6 +33,7 @@ import {
   type LyricSyllable
 } from './lyricRuns.ts';
 import type { HideableFeature } from './notation.ts';
+import { appendSystemBookends, systemBookendInsetSp, type SystemBookends } from './systemBookends.ts';
 import { emitMeasureRepeat, measureRepeatX, type MeasureRepeatMark } from './measureRepeat.ts';
 import { emitEndings } from './endings.ts';
 import { emitDirections, emitDynamics } from './notation.ts';
@@ -135,6 +136,8 @@ export interface LayoutTabOptions {
   /** Features the host asked to hide — honored here so `hide="lyrics"` means
    *  the same thing it means on the notation view. */
   hide?: readonly HideableFeature[];
+  /** Generic host-owned regions before/after the laid-out score. */
+  systemBookends?: SystemBookends;
 }
 
 interface TabStaffContext {
@@ -145,6 +148,7 @@ interface TabStaffContext {
   globalLabels: boolean;
   firstScoreSegment: boolean;
   partLabel: boolean;
+  leadingBookendSp?: number;
 }
 
 export function layoutTab(opts: LayoutTabOptions): LayoutResult {
@@ -208,10 +212,13 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
   // instead, where the tab staff shares a system with a notation staff that
   // does draw one, and must keep agreeing with its columns.
   const showNames = display.instrumentNames === 'every-system' || display.instrumentNames === 'first-system';
+  const leadingBookendSp = context?.leadingBookendSp ?? systemBookendInsetSp(opts.systemBookends?.leading);
   const planOptions = {
     entries: opts.entries,
-    leftInsetSp: showNames ? instrumentLabelInset([instrumentName(part, true)]) : 0,
+    leftInsetSp: (showNames ? instrumentLabelInset([instrumentName(part, true)]) : 0) +
+      (!context ? leadingBookendSp : 0),
     subsequentLeftInsetSp: display.instrumentNames === undefined ? undefined : display.instrumentNames === 'every-system' ? instrumentLabelInset([instrumentName(part, false)]) : 0,
+    lastLineRightInsetSp: !context ? systemBookendInsetSp(opts.systemBookends?.trailing) : 0,
     display,
     lyricLineIds: selectedLyrics,
     spacingMode: opts.spacingMode,
@@ -317,7 +324,7 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
     emitTabStaffLines(m.x, m.width, staffTop, primitives);
     if (m.firstInSystem && showNames && context?.partLabel !== false && (display.instrumentNames === 'every-system' || (m.row === 0 && context?.firstScoreSegment !== false))) {
       const name = instrumentName(part, m.row === 0 && context?.firstScoreSegment !== false);
-      if (name) primitives.push({ kind: 'text', text: name, x: m.x - LABEL_PAD_SP,
+      if (name) primitives.push({ kind: 'text', text: name, x: m.x - LABEL_PAD_SP - (m.row === 0 ? leadingBookendSp : 0),
         y: staffTop + STAFF_HEIGHT_SP / 2 + 0.6, font: 'body', size: 1.6,
         anchor: 'end', className: 'staff-label' });
     }
@@ -603,10 +610,13 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
     reservedBelowSp: lyricBlockSp
   });
 
+  const finalRows = tightened?.rows ?? rows;
+  const finalDisplays = finalRows.map(row => [row]);
+  if (!context) appendSystemBookends(primitives, finalDisplays, opts.systemBookends);
   return {
     primitives, widthSp, heightSp: tightened?.heightSp ?? heightSp,
     usedWidthSp: plan.usedWidthSp, naturalWidthSp,
-    index, diagnostics, rows: tightened?.rows ?? rows,
+    index, diagnostics, rows: finalRows, displays: finalDisplays,
     ...(tightened ? { rowInkSp: tightened.ink } : {}),
     packings: [plan.packing]
   };
@@ -628,7 +638,10 @@ function layoutTabSystems(opts: LayoutTabOptions): LayoutResult {
   let cursorY = clearance.tabOuterMargin(MARGIN_SP);
   let usedWidthSp = 0;
   let naturalWidthSp: number | undefined;
-  for (const job of buildScoreJobs(mnx)) {
+  const jobs = buildScoreJobs(mnx);
+  const segmentCount = jobs.reduce((sum, job) => sum + (opts.entries ? Math.min(1, job.segments.length) : job.segments.length), 0);
+  let segmentOrdinal = 0;
+  for (const job of jobs) {
     if (job.title !== null && display.title !== 'hide') {
       cursorY += 2.4;
       const title: Primitive = { kind: 'text', text: job.title, x: widthSp / 2, y: cursorY,
@@ -641,6 +654,7 @@ function layoutTabSystems(opts: LayoutTabOptions): LayoutResult {
       const sources = segment.staves.flatMap(staff => staff.sources).filter(source => tabPositionContext(source.part, opts.tabSetup) !== null).filter((source, i, all) =>
         all.findIndex(candidate => candidate.part === source.part && candidate.staff === source.staff) === i);
       if (!sources.length) return;
+      const ordinal = segmentOrdinal++;
       const parts = [...new Set(sources.map(source => source.part))];
       const first = segmentIndex === 0;
       const names = display.instrumentNames === 'every-system' || (display.instrumentNames === 'first-system' && first);
@@ -652,8 +666,10 @@ function layoutTabSystems(opts: LayoutTabOptions): LayoutResult {
     densityH: opts.densityH, densityPad: opts.densityPad, inkRatio: opts.inkRatio,
         forcedBreaks: segment.forcedBreaks, measureRange: segment.range ?? undefined,
         minMeasures: segment.minMeasures, collapse: job.collapse,
-        leftInsetSp: names ? instrumentLabelInset(parts.map(part => instrumentName(part, first))) : 0,
-        subsequentLeftInsetSp: display.instrumentNames === 'every-system' ? instrumentLabelInset(parts.map(part => instrumentName(part, false))) : 0
+        leftInsetSp: (names ? instrumentLabelInset(parts.map(part => instrumentName(part, first))) : 0) +
+          (ordinal === 0 ? systemBookendInsetSp(opts.systemBookends?.leading) : 0),
+        subsequentLeftInsetSp: display.instrumentNames === 'every-system' ? instrumentLabelInset(parts.map(part => instrumentName(part, false))) : 0,
+        lastLineRightInsetSp: ordinal === segmentCount - 1 ? systemBookendInsetSp(opts.systemBookends?.trailing) : 0
       };
       const plan = planHorizontal(mnx, widthSp, planOptions);
       const natural = clampSpace(opts.densityH) === SPACE_DEFAULT_SP ? undefined : planHorizontal(mnx, widthSp, { ...planOptions, densityH: SPACE_DEFAULT_SP }).usedWidthSp;
@@ -664,6 +680,7 @@ function layoutTabSystems(opts: LayoutTabOptions): LayoutResult {
         const result = layoutTabStaff(opts, {
           part: source.part, staffIndex: source.staff, globalLabels: staff === 0,
           firstScoreSegment: first, partLabel: sources.findIndex(candidate => candidate.part === source.part) === staff,
+          leadingBookendSp: ordinal === 0 ? systemBookendInsetSp(opts.systemBookends?.leading) : 0,
           naturalWidthSp: natural,
           plan: { ...plan, measures: plan.measures.map(measure => ({ ...measure, voices: measure.staves[staff] ?? [] })) }
         });
@@ -703,6 +720,7 @@ function layoutTabSystems(opts: LayoutTabOptions): LayoutResult {
       }
     });
   }
+  appendSystemBookends(primitives, displays, opts.systemBookends);
   return { primitives, index, diagnostics, rows, displays, packings,
     widthSp, usedWidthSp, naturalWidthSp, heightSp: cursorY + (opts.densityPad !== undefined || (display.clearance ?? 2) === 2 ? MARGIN_SP : clearance.tabOuterMargin(MARGIN_SP + 3) - clearance.systemInk) };
 }

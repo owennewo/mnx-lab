@@ -14,7 +14,7 @@ import { INGEST_OWNER, MAX_INGEST_BYTES } from '../../worker/api/library.ts';
 import { pieceIdFor } from '../../worker/library/index.ts';
 // Operator scripts are deliberately JavaScript and excluded from the app build.
 // @ts-expect-error No declaration file for the Node operator tool.
-import { planIngest, uploadPlan, endpointURL, validateConversion } from '../../tools/library-ingest.mjs';
+import { planIngest, uploadPlan, endpointURL, validateConversion, recordingAuditRows } from '../../tools/library-ingest.mjs';
 import score from '../../scenarios/lab/00-document/01-minimal-single-note/document.mnx.json';
 
 let directory: string; let mf: Miniflare; let env: Env;
@@ -41,14 +41,14 @@ beforeEach(async () => {
   await writeFile(join(directory,'Song_ABC.mp3'), 'synthetic recording');
   await writeFile(join(directory,'Song_ABC.sync.json'), JSON.stringify({ id: 'ABC', title: 'Sidecar song', artist: 'Sidecar artist', score_file: 'Song_ABC.gp', fetched_at: '2026-09-11', recordings: [
     { id: 1, source: 1, source_data: 'youtube123', name: 'Video', syncpoints: [[0,0]] },
-    { id: 2, source: 2, media_file: 'Song_ABC.mp3', name: 'Audio', syncpoints: [[0,0]], cropped_duration: 10 }
+    { id: 2, source: 2, media_file: 'Song_ABC.mp3', name: 'Audio', syncpoints: [[0,0]], cropped_duration: 10, crop_start: 1, crop_end: 11 }
   ] }));
   await writeFile(join(directory,'Song_ABC.lists.json'), JSON.stringify({ id: 'ABC', score_file: 'Song_ABC.gp', lists: [{ id: 'L1', path: 'Folder / List' }] }));
   mf = new Miniflare(convertV4MiniflareOptions({ modules: true, script: 'export default {fetch(){return new Response("test")}}', compatibilityDate: '2026-06-01', d1Databases: ['DB'], r2Buckets: ['BUCKET'] }));
   env = { LIBRARY_DB: await mf.getD1Database('DB'), LIBRARY_BUCKET: await mf.getR2Bucket('BUCKET'), LIBRARY_WRITE_TOKEN: token };
   const identity = await testIdentity(); Object.assign(env, identity.config); assertion = await identity.sign({}, true);
   await env.LIBRARY_DB.exec("CREATE TABLE users(id TEXT PRIMARY KEY,email TEXT,active INTEGER); INSERT INTO users VALUES('operator','owner@example.test',1)");
-  for (const name of ['0001_library.sql', '0003_piece_views.sql']) {
+  for (const name of ['0001_library.sql', '0003_piece_views.sql', '0004_recording_management.sql']) {
     const sql = await readFile(new URL(`../../migrations/${name}`, import.meta.url),'utf8');
     await env.LIBRARY_DB.batch(sql.replace(/--[^\n]*/g,'').trim().split(/;\s*(?=CREATE\b)/).map(s => env.LIBRARY_DB.prepare(s)));
   }
@@ -80,6 +80,14 @@ it('stores the sources only, projects tags from the sidecar and a validated conv
   // Nothing derived is stored: the .gp and the MusicXML, no MNX.
   expect(first.snapshot.renditions.map((r: {format: string}) => r.format).sort()).toEqual(['gp', 'musicxml']);
   expect(first.snapshot.recordings).toHaveLength(2);
+  const audio = first.snapshot.recordings.find((r: {kind: string}) => r.kind === 'audio');
+  expect(audio.duration_s).toBeNull();
+  expect(JSON.parse(audio.provenance)).toEqual({ crop_end: 11, crop_start: 1, cropped_duration: 10, source: 'soundslice-sync-wrapper' });
+  expect(recordingAuditRows(p, new Map([['2', 12]]))).toContainEqual({ recording: '2', first_anchor_s: 0,
+    last_anchor_s: 0, cropped_duration_s: 10, decoded_duration_s: 12,
+    genuine_media_overrun: false, clears_mislabelled_duration: true });
+  expect(recordingAuditRows({ recordingAudits: [{ source_id: 'over', syncpoints: [[0, 2], [1, 7]],
+    cropped_duration: null, mediaPath: null }] }, new Map([['over', 6]]))[0].genuine_media_overrun).toBe(true);
   expect(first.snapshot.renditions.find((r: {id: string}) => r.id === first.snapshot.piece.canonical_rendition_id).format).toBe('gp');
   expect(first.validation.report.map((e: {valid: boolean}) => e.valid)).toEqual([true, true]);
   expect(first.snapshot.tags.map((t: {dimension: string; value: string; origin: string; source_ref: string}) => `${t.dimension}:${t.value}:${t.origin}:${t.source_ref}`)).toEqual([
@@ -100,6 +108,17 @@ it('re-validates and refreshes only the projection when the converter version ch
   expect(result.status).toBe('stored'); expect(files).toEqual(['manifest']);
   expect(result.snapshot.tags.filter((t: {dimension: string}) => t.dimension === 'capo').map((t: {value: string; source_ref: string}) => `${t.value}:${t.source_ref}`)).toEqual(['5:guitarpro-mnx@v2']);
   expect(result.snapshot.renditions).toHaveLength(2);
+});
+it('repairs a historical cropped duration claim on normal re-ingest without replacing media', async () => {
+  const p = await plan(); const first = await upload(p);
+  const audio = first.snapshot.recordings.find((r: {kind: string}) => r.kind === 'audio');
+  await env.LIBRARY_DB.prepare('UPDATE recordings SET duration_s=10,provenance=NULL WHERE id=?').bind(audio.id).run();
+  const repaired = await upload(await plan());
+  expect(repaired.status).toBe('stored');
+  const row = repaired.snapshot.recordings.find((r: {id: string}) => r.id === audio.id);
+  expect(row.duration_s).toBeNull();
+  expect(JSON.parse(row.provenance)).toMatchObject({ cropped_duration: 10, crop_start: 1, crop_end: 11 });
+  expect(row.sha256).toBe(audio.sha256); expect(row.r2_key).toBe(audio.r2_key);
 });
 it('stores a slice whose conversion does not validate, reports it, and projects no tag from it', async () => {
   const broken = Object.fromEntries(Object.entries(converters).map(([k, v]) => [k, { ...v, convert: () => ({ mnx: { version: 1 }, global: { measures: [{ ending: { numbers: [1] } }] }, parts: [] }) }]));

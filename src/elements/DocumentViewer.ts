@@ -344,6 +344,8 @@ export class DocumentViewer extends LitElement {
    */
   private containerObserver: ResizeObserver | null = null;
   private renderedWidth = 0;
+  /** Layout identity of the selected recording's pre/post-roll regions. */
+  private renderedBookends = '';
 
   /** One-shot re-render when the Bravura font file finishes loading: the
    *  enclosure overlay measures glyph boxes, and a first paint that races the
@@ -654,6 +656,24 @@ export class DocumentViewer extends LitElement {
       }
 
       :host #projection-container svg .unperformed { opacity: 0.3; cursor: default; }
+      :host #projection-container svg .recording-bookend-block {
+        fill: color-mix(in oklab, var(--paper-ink) 7%, var(--paper));
+        stroke: color-mix(in oklab, var(--paper-ink) 22%, transparent);
+        stroke-width: 1px;
+        transition: fill 0.12s ease, stroke 0.12s ease;
+      }
+      :host #projection-container svg .recording-bookend-label {
+        fill: var(--ink-3);
+        pointer-events: none;
+      }
+      :host #projection-container svg .recording-bookend.active.recording-bookend-block {
+        fill: color-mix(in oklab, var(--playback) 18%, var(--paper));
+        stroke: color-mix(in oklab, var(--playback) 62%, transparent);
+      }
+      :host #projection-container svg .recording-bookend.active.recording-bookend-label {
+        fill: var(--paper-ink);
+        font-weight: 700;
+      }
       /* Playback ink (render/playbackInk.ts): one colour per voice, cycled
          past four — the tokens are in tokens.ts (--playback, --playback-2…4);
          voice 1 is the original blue, so a single-voice part looks as it
@@ -962,7 +982,11 @@ export class DocumentViewer extends LitElement {
   }
 
   updated(changed: Map<string | number | symbol, unknown>) {
-    if(changed.has('playbackState')){this.paintPlayback();if(this.playbackState?.followPlayback)this.revealPlayback();}
+    if(changed.has('playbackState')){
+      if(this.bookendSignature()!==this.renderedBookends)this.renderProjection();
+      else {this.paintPlayback();this.paintBookends();}
+      if(this.playbackState?.followPlayback)this.revealPlayback();
+    }
     if (changed.has('noGestures')) this.syncGestures();
     this.toggleAttribute('data-hide-badges', this.hiddenFeatures().includes('badges'));
     if (
@@ -1193,7 +1217,9 @@ export class DocumentViewer extends LitElement {
     // so control-flow analysis has narrowed `outcome` to `never` by here.
     this.finishPaint(outcome as RenderOutcome | null, densityH);
 
+    this.renderedBookends = this.bookendSignature();
     this.paintPlayback();
+    this.paintBookends();
     if (quick) return;
     if (this.playbackState?.followPlayback && this.playbackState.ordinal !== null) this.revealPlayback();
     this.emitSelectionAnchor();
@@ -1261,7 +1287,8 @@ export class DocumentViewer extends LitElement {
       // and resizing stay separate events.
       pxPerSp: undefined,
       // null stays null: unset means FITTED, and a fitted paint is square.
-      staffSp: staffSp ?? undefined
+      staffSp: staffSp ?? undefined,
+      systemBookends: this.systemBookends()
     };
 
     const flatSetup: TabSetup | undefined =
@@ -1592,6 +1619,31 @@ export class DocumentViewer extends LitElement {
     for(const w of this.playbackState?.highlight??[])
       sounding.set(occurrenceKey(w.noteKey,this.unrolled?w.ordinal:undefined),this.playbackVoiceOf(w.noteKey));
     if(this.container)paintPlaybackInk(this.container,sounding);
+  }
+  private systemBookends() {
+    const durations = this.playbackState?.recordingBookends;
+    if (!durations) return undefined;
+    const label = (seconds: number) => {
+      const rounded = Math.max(0, Math.round(seconds));
+      return `${Math.floor(rounded / 60)}:${String(rounded % 60).padStart(2, '0')}`;
+    };
+    return {
+      ...(durations.preRollSeconds > 0.001 ? { leading: {
+        label: label(durations.preRollSeconds), title: `Pre-roll: ${label(durations.preRollSeconds)}`
+      } } : {}),
+      ...(durations.postRollSeconds > 0.001 ? { trailing: {
+        label: label(durations.postRollSeconds), title: `Post-roll: ${label(durations.postRollSeconds)}`
+      } } : {})
+    };
+  }
+  private bookendSignature(): string { return JSON.stringify(this.systemBookends() ?? null); }
+  private paintBookends() {
+    const phase = this.playbackState?.mediaPhase;
+    for (const node of this.container?.querySelectorAll<SVGElement>('.recording-bookend') ?? []) {
+      const active = (phase === 'pre-roll' && node.classList.contains('recording-bookend-leading')) ||
+        (phase === 'post-roll' && node.classList.contains('recording-bookend-trailing'));
+      node.classList.toggle('active', active);
+    }
   }
   private revealPlayback() {
     const occurrence=this.playbackState?.highlight[0];

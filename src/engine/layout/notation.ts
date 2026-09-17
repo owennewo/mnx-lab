@@ -24,6 +24,7 @@ import {
   type LyricSyllable
 } from './lyricRuns.ts';
 import { timeSigDigitDx } from './tabStaff.ts';
+import { appendSystemBookends, systemBookendInsetSp, type SystemBookends } from './systemBookends.ts';
 import {
   emitRepeatDots,
   emitRepeatEndStrokes,
@@ -600,6 +601,8 @@ export interface LayoutNotationOptions {
    * against arithmetic they derive themselves. Never set by a renderer.
    */
   displayGapProbeSp?: number;
+  /** Generic host-owned regions before/after the laid-out score. */
+  systemBookends?: SystemBookends;
 }
 
 /** What a host may hide. Layout-side members must be honored HERE (space
@@ -906,9 +909,12 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
   // separately, and a density value is only degenerate when it changes NONE of
   // them.
   const packings: PackingInput[] = [];
+  const segmentCount = jobs.reduce((sum, job) => sum + job.segments.length, 0);
+  let segmentOrdinal = 0;
   for (const job of jobs) {
-    const rs = job.segments.map((segment, segmentIndex) =>
-      renderSegment({
+    const rs = job.segments.map((segment, segmentIndex) => {
+      const ordinal = segmentOrdinal++;
+      return renderSegment({
         mnx,
         entries: opts.entries,
         segment,
@@ -928,13 +934,15 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
         selectedLyrics,
         measureNumbers,
         firstScoreSegment: segmentIndex === 0,
+        leadingBookendSp: ordinal === 0 ? systemBookendInsetSp(opts.systemBookends?.leading) : 0,
+        trailingBookendSp: ordinal === segmentCount - 1 ? systemBookendInsetSp(opts.systemBookends?.trailing) : 0,
         spacingMode: opts.spacingMode,
     densityH: opts.densityH,
         densityPad: opts.densityPad,
         inkRatio: opts.inkRatio,
         displayGapProbeSp: opts.displayGapProbeSp
-      })
-    );
+      });
+    });
     const jobUsed = Math.max(...rs.map(r => r.usedWidthSp));
     const jobNatural = rs.some(r => r.naturalWidthSp !== undefined)
       ? Math.max(...rs.map(r => r.naturalWidthSp ?? r.usedWidthSp))
@@ -991,18 +999,21 @@ export function layoutNotation(opts: LayoutNotationOptions): LayoutResult {
     reservedBelowSp: lyricBlockSpFor(selectedLyrics?.length ?? documentLyricLineCount(mnx))
   });
 
+  const finalDisplays = tightened
+    ? displays.map((bands, r) => {
+        const dy = tightened.rows[r].staffTop - rows[r].staffTop;
+        return bands.map(b => ({ staffTop: b.staffTop + dy, staffBottom: b.staffBottom + dy }));
+      })
+    : displays;
+  appendSystemBookends(primitives, finalDisplays, opts.systemBookends);
+
   return {
     primitives, widthSp, heightSp: tightened?.heightSp ?? cursorY, usedWidthSp, naturalWidthSp,
     index, diagnostics,
     ...(tightened ? { rowInkSp: tightened.ink } : {}),
     rows: tightened?.rows ?? rows,
     // Display bands ride with their rows when the density pass moves them.
-    displays: tightened
-      ? displays.map((bands, r) => {
-          const dy = tightened.rows[r].staffTop - rows[r].staffTop;
-          return bands.map(b => ({ staffTop: b.staffTop + dy, staffBottom: b.staffBottom + dy }));
-        })
-      : displays,
+    displays: finalDisplays,
     packings
   };
 }
@@ -1027,6 +1038,8 @@ interface RenderSegmentArgs {
   selectedLyrics?: string[];
   measureNumbers: number[];
   firstScoreSegment: boolean;
+  leadingBookendSp: number;
+  trailingBookendSp: number;
   spacingMode?: 'natural' | 'fill';
   densityH?: number;
   densityPad?: number;
@@ -1247,7 +1260,7 @@ function assembleSegment(
     : 0;
   const staffLabelW = maxStaffSpan ? maxStaffSpan + LABEL_PAD_SP : 0;
   const groupLabelW = groupLabelLen ? groupLabelLen * LABEL_CHAR_SP + LABEL_PAD_SP : 0;
-  const leftInsetSp = decorWidthSp + staffLabelW + groupLabelW;
+  const leftInsetSp = decorWidthSp + staffLabelW + groupLabelW + args.leadingBookendSp;
   const subsequentLeftInsetSp = display.instrumentNames === undefined ? undefined :
     decorWidthSp + (display.instrumentNames === 'every-system' ? instrumentLabelInset(labelParts.map(parts => parts.map(part => instrumentName(part, false)).filter(Boolean).join(' / '))) : 0);
 
@@ -1265,6 +1278,7 @@ function assembleSegment(
     staves: segment.staves,
     leftInsetSp,
     subsequentLeftInsetSp,
+    lastLineRightInsetSp: args.trailingBookendSp,
     collapse,
     forcedBreaks: segment.forcedBreaks,
     measureRange: segment.range ?? undefined,
@@ -1595,7 +1609,7 @@ function assembleSegment(
       // Staff labels (and stacked per-source labels for merged staves),
       // right-aligned left of all decorations; a staff carrying both puts
       // its label left of the source-label stack ("Oboes 1/2").
-      const labelX = m.x - decorWidthSp - LABEL_PAD_SP;
+      const labelX = m.x - decorWidthSp - LABEL_PAD_SP - (m.row === 0 ? args.leadingBookendSp : 0);
       segment.labels.forEach((label, s) => {
         if (!label || (display.instrumentNames === 'first-system' && m.row !== 0)) return;
         if (display.instrumentNames === 'every-system' && (m.row > 0 || !firstScoreSegment)) {

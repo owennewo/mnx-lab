@@ -556,12 +556,18 @@ export class Player extends LitElement {
     const current = status?.transport && this.performance ? measureAt(this.performance, status.transport.position)?.ordinal
       : status?.scorePosition?.ordinal;
     const ordinal = visible && current !== undefined && current < (this.performance?.measures.length ?? 0) ? current : null;
+    const bounds = status?.mediaBounds;
+    const recordingBookends = bounds && !status?.syncIssue ? {
+      preRollSeconds: Math.max(0, bounds.startSeconds),
+      postRollSeconds: Math.max(0, (bounds.durationSeconds ?? bounds.endSeconds) - bounds.endSeconds)
+    } : null;
     const detail: PlaybackUpdate = { documentId: this.documentId, ordinal, highlight: [...(status?.highlight ?? [])],
-      playing: status?.wantsPlayback ?? false };
+      playing: status?.wantsPlayback ?? false, recordingBookends, mediaPhase: status?.mediaPhase ?? null };
     this.dispatchEvent(new CustomEvent('playback-position', { detail: {
       documentId: this.documentId, sourceId: status?.sourceId, kind: status?.kind,
       syncWarning: status?.alignmentIssue || status?.syncIssue,
       scorePosition: status?.scorePosition ?? null, mediaTime: status?.mediaTime,
+      mediaPhase: status?.mediaPhase, mediaBounds: status?.mediaBounds,
     }, bubbles: true, composed: true }));
     const signature = JSON.stringify(detail);
     if (signature !== this.lastUpdate) {
@@ -669,7 +675,14 @@ export class Player extends LitElement {
     if (!status || status.kind === 'synth') return formatPlaybackPosition(this.performance, this.position, this.document);
     if (status.scorePosition) return formatScorePlaybackPosition(this.performance, status.scorePosition, this.document);
     const time = Math.max(0, status.mediaTime ?? 0);
-    return `${status.kind === 'youtube' ? 'YouTube' : 'Audio'} ${Math.floor(time / 60)}:${Math.floor(time % 60).toString().padStart(2, '0')} · outside sync`;
+    const duration = status.mediaPhase === 'pre-roll' ? status.mediaBounds?.startSeconds
+      : status.mediaPhase === 'post-roll' && status.mediaBounds?.durationSeconds !== undefined
+        ? status.mediaBounds.durationSeconds - status.mediaBounds.endSeconds : undefined;
+    if ((status.mediaPhase === 'pre-roll' || status.mediaPhase === 'post-roll') && duration !== undefined) {
+      const seconds = Math.max(0, Math.round(duration));
+      return `${status.mediaPhase === 'pre-roll' ? 'Pre-roll' : 'Post-roll'} · ${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
+    }
+    return `${status.kind === 'youtube' ? 'YouTube' : 'Audio'} ${Math.floor(time / 60)}:${Math.floor(time % 60).toString().padStart(2, '0')} · no score position`;
   }
   async selectSource(id: string, replace = false) {
     this.localError = '';

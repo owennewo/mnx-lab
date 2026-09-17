@@ -42,8 +42,8 @@ snapshot or `scorePosition`, as the shared score frame does.
 
 `playback-state-changed` retains the score-follow contract, including performed visit
 identity and written-note highlights. The new `playback-position` event carries
-`documentId`, `sourceId`, `kind`, `scorePosition` and optional `mediaTime` at clock
-updates. Audio never emits a synth `onset` event. Inspection and editing selection
+`documentId`, `sourceId`, `kind`, `scorePosition`, optional `mediaTime`, `mediaPhase`
+and anchored media bounds at clock updates. Audio never emits a synth `onset` event. Inspection and editing selection
 remain independent of the playback context; clock updates repaint ink without
 replacing the score SVG.
 
@@ -55,17 +55,21 @@ new one, and resumes only if playback was wanted. Rapid changes retain the origi
 handoff position; Pause, Stop and a new seek during preparation supersede that intent
 or position. A rejected browser Play leaves a paused source with a retry message.
 
-A handoff outside sync coverage or within an ambiguous synth hold/grace does not
-invent a position. The selected source stays paused and offers **Start this source**.
-That explicit action starts mapped audio at its first anchor, unsynced audio at zero,
-or Synth at its beginning. Unsynced audio is playable with following and score seek
-disabled. Sync extending beyond the decoded file duration is treated as unusable.
-An ordinary Play at natural completion restarts the source.
+A handoff without a usable musical position, or within an ambiguous synth hold/grace,
+does not invent one. The selected source stays paused and offers **Start this source**.
+That explicit action starts audio and Synth at media/performance time zero. A recording
+switched while its current clock is still in pre-roll likewise starts the new source at
+zero and preserves playing intent. Unsynced audio is playable with following and score
+seek disabled. Sync extending beyond the decoded file duration is treated as unusable.
+An ordinary Play at natural completion restarts the source at zero.
 
 The media clock is authoritative; no silent synth transport accompanies audio.
 HTML media events and a 40 ms playing poll read `currentTime`. Buffering does not
-advance an independent clock. Intro/outro outside anchor coverage has no score
-position or highlights, and hidden intervals suppress score-follow ink. Bar-only
+advance an independent clock. Intro/outro outside anchor coverage is normal
+**pre-roll/post-roll**, has no score position or highlights, and never becomes a sync
+warning. The selected recording shows fixed-width, duration-labelled bookends before
+the first and after the last system in notation, tab and combined views; the current
+bookend is highlighted. Hidden intervals suppress score-follow ink. Bar-only
 sync estimates note highlights by interpolation; event-level anchors refine it.
 See [player-recording-sync.md](player-recording-sync.md) for tuple semantics,
 performed bar numbering, coverage and insertion diagnostics.

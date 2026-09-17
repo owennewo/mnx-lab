@@ -71,6 +71,13 @@ export class RecordingBackend implements PlaybackBackend {
     const location = this.sync && !this.invalidSync && this.media.clockReliable !== false ? this.sync.positionAt(this.media.currentTime) : null;
     const position = location?.ok ? location.value.position : null;
     const hidden = location?.ok ? location.value.hidePlayhead : false;
+    const mediaPhase = !this.sync || this.invalidSync || this.media.clockReliable === false
+      ? 'unmapped'
+      : location?.ok
+        ? 'mapped'
+        : this.media.currentTime < this.sync.bounds.startSeconds ? 'pre-roll' : 'post-roll';
+    const durationSeconds = this.prepared && Number.isFinite(this.media.duration) && this.media.duration > 0
+      ? this.media.duration : undefined;
     const state = this.stopped ? 'stopped' : this.media.paused ? 'paused'
       : this.waiting || this.media.seeking ? 'buffering' : 'playing';
     const highlight = !position || hidden || state === 'stopped' ? [] : (this.written.get(position.ordinal) ?? [])
@@ -78,7 +85,10 @@ export class RecordingBackend implements PlaybackBackend {
       .map(w => ({ noteKey: w.noteKey, ordinal: w.ordinal }));
     return { sourceId: this.id, kind: this.media.kind ?? 'audio', state, scorePosition: position, highlight, hidePlayhead: hidden,
       rate: this.media.rate, volume: this.media.volume, mediaTime: this.media.currentTime,
-      syncIssue: this.media.clockIssue || this.invalidSync || (location && !location.ok ? location.diagnostic.message : !this.sync ? 'This recording has no usable sync data.' : undefined),
+      mediaPhase,
+      ...(this.sync ? { mediaBounds: { startSeconds: this.sync.bounds.startSeconds,
+        endSeconds: this.sync.bounds.endSeconds, ...(durationSeconds === undefined ? {} : { durationSeconds }) } } : {}),
+      syncIssue: this.media.clockIssue || this.invalidSync,
       error: this.issue || this.media.error };
   }
   async prepare() {
@@ -90,9 +100,6 @@ export class RecordingBackend implements PlaybackBackend {
     if (this.sync && this.media.duration > 0 && this.sync.bounds.endSeconds > this.media.duration + 0.001)
       this.invalidSync = 'Sync timings extend beyond this audio file. Score following is unavailable.';
   }
-  private get startTime() {
-    return this.sync && !this.invalidSync ? this.sync.bounds.startSeconds : 0;
-  }
   async play() {
     if (this.intent && !this.media.paused && !this.media.ended) return;
     const generation = ++this.generation;
@@ -101,7 +108,7 @@ export class RecordingBackend implements PlaybackBackend {
     await this.prepare();
     if (this.closed || generation !== this.generation || !this.intent) return;
     if (this.media.ended || this.stopped) {
-      await this.media.seek(this.loop?.start ?? this.startTime);
+      await this.media.seek(this.loop?.start ?? 0);
       if (this.closed || generation !== this.generation || !this.intent) return;
     }
     this.stopped = false;
@@ -123,7 +130,7 @@ export class RecordingBackend implements PlaybackBackend {
     this.pause(); this.stopped = true; this.issue = undefined;
     if (this.prepared) {
       const generation = this.generation;
-      void this.media.seek(this.startTime).then(() => this.emit(), error => {
+      void this.media.seek(0).then(() => this.emit(), error => {
         if (!this.closed && generation === this.generation) { this.issue = String(error); this.emit(); }
       });
     }

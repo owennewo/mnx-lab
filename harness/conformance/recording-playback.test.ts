@@ -40,17 +40,18 @@ describe('recording clock and score following', () => {
     expect(media.plays).toBe(1); expect(b.snapshot.state).toBe('playing');
     media.currentTime=20; media.ended=true; media.paused=true; media.emit('ended');
     expect(b.snapshot.state).toBe('stopped'); expect(b.snapshot.highlight).toEqual([]);
-    await b.play(); expect(media.currentTime).toBe(2); expect(media.plays).toBe(2);
+    await b.play(); expect(media.currentTime).toBe(0); expect(media.plays).toBe(2);
   });
   it('reads actual media time, freezes while waiting, and clears intro/outro highlights', async () => {
     const {media,backend:b}=backend(); await b.play();
-    expect(media.currentTime).toBe(2); media.currentTime=9; media.emit('time');
+    expect(media.currentTime).toBe(0); expect(b.snapshot.mediaPhase).toBe('pre-roll');
+    expect(b.snapshot.syncIssue).toBeUndefined(); media.currentTime=9; media.emit('time');
     expect(b.snapshot.scorePosition).toEqual(pos(1,q(1n,2n))); expect(b.snapshot.highlight).toHaveLength(1);
     media.emit('waiting'); expect(b.snapshot.state).toBe('buffering');
     expect(b.snapshot.scorePosition).toEqual(pos(1,q(1n,2n)));
-    media.currentTime=1; expect(b.snapshot.highlight).toEqual([]); expect(b.snapshot.scorePosition).toBeNull();
-    media.currentTime=15; expect(b.snapshot.highlight).toEqual([]); expect(b.snapshot.transport).toBeUndefined();
-    b.pause(); expect(b.snapshot.state).toBe('paused'); b.stop(); expect(b.snapshot.highlight).toEqual([]);
+    media.currentTime=1; expect(b.snapshot.highlight).toEqual([]); expect(b.snapshot.scorePosition).toBeNull(); expect(b.snapshot.mediaPhase).toBe('pre-roll');
+    media.currentTime=15; expect(b.snapshot.highlight).toEqual([]); expect(b.snapshot.transport).toBeUndefined(); expect(b.snapshot.mediaPhase).toBe('post-roll');
+    b.pause(); expect(b.snapshot.state).toBe('paused'); b.stop(); await flush(); expect(b.snapshot.highlight).toEqual([]); expect(media.currentTime).toBe(0);
   });
   it('uses event timings and hides intervals without inventing onsets', async () => {
     const {media,backend:b}=backend('a',map([[0,2],[1,6,0,1],[1,10,240],[2,12]]));
@@ -116,7 +117,7 @@ describe('source handoff ownership', () => {
       const gate=deferred(); b.media.gate=gate.promise;
       const session=new PlaybackSession(a.backend,()=>b.backend,()=>{}); const selected=session.select('b');
       if(action==='seek') await session.seek(pos(1)); else session[action]();
-      gate.resolve(); await selected; expect(b.media.currentTime).toBe(action==='stop'?2:action==='seek'?6:9);
+      gate.resolve(); await selected; expect(b.media.currentTime).toBe(action==='stop'?0:action==='seek'?6:9);
       expect(b.media.plays).toBe(action==='seek'?1:0); session.dispose();
     }
   });

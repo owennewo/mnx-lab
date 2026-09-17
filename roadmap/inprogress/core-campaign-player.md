@@ -153,7 +153,7 @@ proposal opens with, and is reviewed on:
 
 ## Recording playback addendum — 2026-09-13
 
-Items 15–18 extend this campaign to recorded performances. They inherit the shared
+Items 15–19 extend this campaign to recorded performances. They inherit the shared
 contract with these explicit qualifications:
 
 - Clause 2's seconds/goldens restriction governs compiled synthetic performances.
@@ -166,7 +166,7 @@ contract with these explicit qualifications:
   the clock; adapters reuse the musical-position and host-context contract. The lazy
   official IFrame script is the explicit external player integration, not a new synth
   library, and its loading, CSP and embed cost are owned by item 17.
-- Clause 7's human-verification start gate remains on practice item 13. Items 15–18
+- Clause 7's human-verification start gate remains on practice item 13. Items 15–19
   are separately requested recording playback work and may start on their technical
   dependencies; they do not approve or waive existing reviewer debt.
 - Score-part mute/solo, metronome, count-in and speed training must use backend
@@ -174,7 +174,8 @@ contract with these explicit qualifications:
   precision are constrained by its API. Item 13 must account for these backends.
 
 Delivery order: 15 → 16 → 17. Item 18 follows 15/16 and uses 17 for linked playback;
-playing existing ingested recordings does not depend on attachment authoring.
+playing existing ingested recordings does not depend on attachment authoring. Item 19
+corrects the media-edge semantics exposed by all four and follows them.
 
 ## The index
 
@@ -203,6 +204,7 @@ run any time before 6.
 | 16 | [Synth/audio switching](../complete/core-player-recording-playback.md) | Shared backend interface, musical-position handoff, media-clock follow and authenticated audio reads. | recording playback | fake backends + browser media/embed checks | complete |
 | 17 | [YouTube recordings](../complete/core-player-youtube.md) | Visible official iframe, policy/layout lifecycle, API rates, seek and error handling. | recording playback | adapter/layout checks + live embed check | complete |
 | 18 | [Recording attachments](../complete/studio-recording-management.md) | Studio URL/audio attachment, sync import, upload and revision lifecycle. | recording playback | service + browser checks | complete |
+| 19 | [Recording bookends](core-recording-bookends.md) | Treat media outside the anchored performance as pre/post-roll, render duration-labelled system bookends and repair cropped-duration provenance. | recording playback | fake media + layout projections + ingest repair | in progress |
 
 ### Decisions still open
 

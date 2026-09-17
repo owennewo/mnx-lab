@@ -4,6 +4,7 @@ import { MnxStructure } from '../../model/mnx.ts';
 import { layoutNotation, type HideableFeature } from './notation.ts';
 import { LayoutResult } from '../primitives.ts';
 import { PartTabSetups } from '../tab/guitarPositions.ts';
+import type { SystemBookends } from './systemBookends.ts';
 
 /**
  * The `both` view as ONE system, natively: the notation layout's system
@@ -42,6 +43,8 @@ export interface LayoutBothOptions {
   /** Ink ratio (core-ink-priced-columns.md) — one ratio serves both staves,
    *  which is what keeps them column-aligned under a non-square scale. */
   inkRatio?: number;
+  /** Generic host-owned regions before/after the laid-out score. */
+  systemBookends?: SystemBookends;
 }
 
 export function layoutBothSystem(opts: LayoutBothOptions): LayoutResult {
