@@ -329,10 +329,10 @@ function layoutTabStaff(opts: LayoutTabOptions, context?: TabStaffContext): Layo
         anchor: 'end', className: 'staff-label' });
     }
 
-    // Setup instructions — capo text and (non-standard) tuning letters,
-    // above/beside the FIRST bar only.
+    // Setup instructions — capo text and a non-standard tuning label,
+    // above the FIRST bar only.
     if (i === 0 && positionContext) {
-      emitTabSystemHeader(positionContext, staffTop, plan.inkRatio, primitives, measureHeadingX(m));
+      emitTabSystemHeader(positionContext, staffTop, primitives, measureHeadingX(m));
     }
 
     // An opening repeat at the left edge supplies the system-start strokes.

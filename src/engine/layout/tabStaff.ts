@@ -165,9 +165,6 @@ function tuningLetter(pitch: { step: string; alter?: number }): string {
 export function emitTabSystemHeader(
   ctx: TabPositionContext,
   staffTop: number,
-  /** The plan's ink ratio — the insets either side of the system start are
-   *  text clearances, so they are ink like every other glyph-relative gap. */
-  ink: number,
   primitives: Primitive[],
   headingX: number
 ): void {
@@ -175,14 +172,14 @@ export function emitTabSystemHeader(
   const standard =
     strings.length === GUITAR_TUNING.length &&
     strings.every(s => GUITAR_TUNING[s.string - 1] === midiOfMnxPitch(s.pitch));
-  let nextX = headingX;
+  let capoDx: number | undefined;
   if (!standard) {
     const tuning: Primitive = {
       kind: 'text',
       text: [...strings]
         .sort((a, b) => b.string - a.string)
         .map(entry => tuningLetter(entry.pitch))
-        .join(''),
+        .join('') + (ctx.capo > 0 ? '\u00a0' : ''),
       x: headingX,
       y: staffTop - CAPO_RISE_SP,
       font: 'body',
@@ -194,17 +191,19 @@ export function emitTabSystemHeader(
     };
     primitives.push(tuning);
     const bounds = inkEdgesSp(tuning);
-    nextX = tuning.x + (bounds.right - tuning.x + SETUP_LABEL_GAP_SP) * ink;
+    // Both labels share the musical heading anchor. Their handoff is ink, so
+    // keep it in dx; the trailing NBSP contributes a preserved space advance
+    // to the measured handoff instead of relying on leading SVG whitespace.
+    capoDx = bounds.right - tuning.x + SETUP_LABEL_GAP_SP;
   }
 
   const capo = ctx.capo;
   if (capo > 0) {
     primitives.push({
       kind: 'text',
-      // SVG collapses ordinary boundary whitespace between separate text
-      // nodes. Keep an explicit non-breaking space when a tuning precedes us.
-      text: `${standard ? '' : '\u00a0'}Capo ${capo}`,
-      x: nextX,
+      text: `Capo ${capo}`,
+      x: headingX,
+      dx: capoDx,
       y: staffTop - CAPO_RISE_SP,
       font: 'body',
       size: CAPO_FONT_SIZE_SP,

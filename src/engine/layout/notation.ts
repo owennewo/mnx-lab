@@ -2026,9 +2026,9 @@ function assembleSegment(
     for (const td of tabDisplays) {
       const tabTop = displayTopOf(m.row, td.displayIndex);
       emitTabStaffLines(m.x, m.width, tabTop, primitives);
-      // Setup instructions (capo, non-standard tuning letters) on the FIRST
+      // Setup instructions (capo, non-standard tuning label) on the FIRST
       // bar only — same emission as the standalone tab view.
-      if (i === 0) emitTabSystemHeader(td.ctx, tabTop, plan.inkRatio, primitives, measureHeadingX(m));
+      if (i === 0) emitTabSystemHeader(td.ctx, tabTop, primitives, measureHeadingX(m));
       if (m.firstInSystem && display.clefs !== 'hide') emitTabClef(m.clefX, tabTop, primitives);
       if (m.showTimeSig) emitTabTimeSig(m.timeSig, m.timeSigCentreX, tabTop, primitives);
       {
