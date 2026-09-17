@@ -75,8 +75,9 @@ Adding new links in Studio is [item 18](../complete/studio-recording-management.
 
 ## Implementation agreement and findings — 2026-09-13
 
-YouTube selection is cue-only; Play is explicit. First use requires acceptance of the
-component's displayed terms/privacy notice before loading any YouTube resource.
+YouTube selection is cue-only; Play is explicit. As amended on 2026-09-17, first use
+loads immediately with the component's terms/privacy notice displayed below the video;
+**Hide** stores a browser-local preference that suppresses future automatic notices.
 The shared frame opens a video-bearing strip; collapse/hidden-tab/offscreen/obscured
 states pause and never automatically resume. Hosts get the frame in both embed
 formats and must preserve visibility and their own privacy obligations.

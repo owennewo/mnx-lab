@@ -21,9 +21,10 @@ short, shorts or embed URL. Playlist and `/live` links are rejected. URL time of
 are ignored: supplied sync anchors determine the recording's musical position.
 Studio supplies existing `youtube` rows using `external_id`; adding links is item 18.
 
-Before the first YouTube load in a player session, the component displays its YouTube
-terms/privacy notice and requires **Agree and load YouTube**. No API script or iframe
-loads before that action. Acceptance stays in memory, not localStorage. The notice uses a short summary with expandable **Privacy details**. It
+The first YouTube selection loads immediately and displays a terms/privacy notice beneath
+the video. The notice is informational rather than a consent gate: **Hide** dismisses it
+and saves that preference in localStorage, while **Terms and privacy** makes it available
+again. The notice uses a short summary with expandable **Privacy details**. It
 explains Google/YouTube requests, ads/cookies, local rate/volume preferences, the
 host's source data and Studio library records; it links YouTube's terms and Google's
 privacy policy and remains accessible beside the iframe. Integrators must cover
@@ -39,9 +40,9 @@ also update the shared playback state.
 `ScoreFrame` now ships in both embed formats as well as the library. A frame opens its
 player strip when a YouTube source/notice is selected. The video lives in a separate pane to the left of the score,
 outside the score's scroll container. Terms and privacy and Close video controls
-sit directly beneath the embed in that pane. Before loading, the consent disclosure
-occupies that same left pane; Cancel restores the full score width. Reopening the
-disclosure also keeps it in the left pane, below the video controls. Drag its divider to resize from 200 pixels to
+sit directly beneath the embed in that pane. The initial disclosure shares that left
+pane beneath the video controls while the video loads. Reopening it keeps the same
+position. Drag its divider to resize from 200 pixels to
 75% of the frame width. The focused divider also accepts Left/Right (20-pixel steps)
 and Home/End (minimum/maximum). The iframe stays mounted while resizing, with a
 minimum 200 × 200 viewport. Pointer dragging pauses playback and temporarily releases
@@ -92,7 +93,8 @@ Reviewed 2026-09-13 against the official
 [developer policies](https://developers.google.com/youtube/terms/developer-policies) and
 [IFrame API](https://developers.google.com/youtube/iframe_api_reference).
 The implementation retains native presentation, requires visible playback, supplies
-origin/referrer identity, and provides terms/privacy acceptance before loading.
+origin/referrer identity, and keeps its terms/privacy disclosure available beneath the
+video without blocking the initial load.
 This records the engineering review; external hosts remain responsible for their
 own terms, privacy practices and layout.
 

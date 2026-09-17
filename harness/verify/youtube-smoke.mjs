@@ -52,16 +52,17 @@ try{
  const wait=async(expr,seconds=20)=>{for(let i=0;i<seconds*10;i++){if(await c.evaluate(expr))return;await new Promise(r=>setTimeout(r,100));}throw new Error('Timed out: '+expr+'; '+await c.evaluate(`JSON.stringify({issue:test.player.playback?.issue,error:test.player.shadowRoot.textContent.slice(-800)})`));};
  await c.send('Emulation.setDeviceMetricsOverride',{width:1024,height:900,deviceScaleFactor:1,mobile:false});
  await c.send('Page.navigate',{url:`http://127.0.0.1:${server.address().port}/`});await wait('window.test?.ready');
- await c.evaluate(`test.player.seek(1);const rate=test.player.shadowRoot.querySelector('input[aria-label="Playback rate"]');rate.value='1.5';rate.dispatchEvent(new Event('input'));test.player.selectSource('youtube')`);await wait(`!!test.frame.shadowRoot.querySelector('.youtube-notice')`);
- if(!await c.evaluate(`(()=>{const root=test.frame.shadowRoot,notice=root.querySelector('.youtube-notice'),pane=root.querySelector('.video-pane');return !pane.hidden && pane.contains(notice) && !test.player.shadowRoot.querySelector('.youtube-notice') && root.querySelector('.video-surface').hidden;})()`))throw new Error('Consent did not appear in the left pane');
- await c.evaluate(`[...test.frame.shadowRoot.querySelectorAll('button')].find(b=>b.textContent==='Cancel').click()`);
- await wait(`test.frame.shadowRoot.querySelector('.video-pane').hidden`);
+ await c.evaluate(`test.player.seek(1);const rate=test.player.shadowRoot.querySelector('input[aria-label="Playback rate"]');rate.value='1.5';rate.dispatchEvent(new Event('input'))`);
+ await wait(`test.player.position.num===1n`);
  await c.evaluate(`test.player.selectSource('youtube')`);
  await wait(`!!test.frame.shadowRoot.querySelector('.youtube-notice')`);
- if(await c.evaluate(`!!document.querySelector('script[src*="youtube.com"]') || !!test.frame.shadowRoot.querySelector('iframe')`))throw new Error('YouTube loaded before consent');
- await c.evaluate(`[...test.frame.shadowRoot.querySelectorAll('button')].find(b=>b.textContent==='Agree and load YouTube').click()`);
+ if(!await c.evaluate(`(()=>{const root=test.frame.shadowRoot,notice=root.querySelector('.youtube-notice'),pane=root.querySelector('.video-pane');return !pane.hidden && pane.contains(notice) && !test.player.shadowRoot.querySelector('.youtube-notice') && notice.getBoundingClientRect().top>=root.querySelector('.video-controls').getBoundingClientRect().bottom;})()`))throw new Error('Terms notice did not appear beneath the video controls');
+ if(live)await wait(`!!document.querySelector('script[src*="youtube.com"]') || !!test.frame.shadowRoot.querySelector('iframe')`);
+ else if(!scripts)throw new Error('YouTube did not begin loading with the terms notice');
+ await c.evaluate(`[...test.frame.shadowRoot.querySelectorAll('button')].find(b=>b.textContent==='Hide').click()`);
+ await wait(`!test.frame.shadowRoot.querySelector('.youtube-notice')`);
+ if(!await c.evaluate(`localStorage.getItem('mnx-player-youtube-terms-hidden')==='true'`))throw new Error('Terms dismissal was not saved');
  if(!live){
-   await new Promise(r=>setTimeout(r,30));await c.evaluate(`test.player.selectSource('second');test.player.selectSource('youtube')`);
    await wait(`test.player.playback?.kind==='youtube' && !test.player.playback.loading`,25);
    await c.evaluate(`[...test.player.shadowRoot.querySelectorAll('button')].find(b=>b.textContent==='Retry video').click()`);
  }
@@ -76,7 +77,7 @@ try{
  if(!controls)throw new Error('YouTube controls are not beneath the left video');
  await c.evaluate(`[...test.frame.shadowRoot.querySelectorAll('button')].find(b=>b.textContent==='Terms and privacy').click()`);
  await wait(`!!test.frame.shadowRoot.querySelector('.youtube-notice')`);
- await c.evaluate(`[...test.frame.shadowRoot.querySelectorAll('button')].find(b=>b.textContent==='Close notice').click()`);
+ await c.evaluate(`[...test.frame.shadowRoot.querySelectorAll('button')].find(b=>b.textContent==='Hide').click()`);
  const layout=await c.evaluate(`(()=>{const root=test.frame.shadowRoot, video=root.querySelector('iframe'), score=root.querySelector('.score');window.originalVideo=video;const divider=root.querySelector('.video-divider');divider.dispatchEvent(new KeyboardEvent('keydown',{key:'Home'}));return video.getBoundingClientRect().right<=score.getBoundingClientRect().left;})()`);
  if(!layout)throw new Error('Video is not left of the score');
  await new Promise(r=>setTimeout(r,100));

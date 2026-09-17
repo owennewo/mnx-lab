@@ -64,11 +64,10 @@ export class Player extends LitElement {
   @state() private volume = 0.7;
   private session?: PlaybackSession;
   private revision = 0;
-  private youtubeAccepted = false;
+  private youtubeNoticeHidden = false;
   /** Set by a score frame that hosts video and disclosure together. */
   @property({ attribute: false }) videoPaneHosted = false;
-  get youtubeRegionVisible() { return !!(this.youtubeRequest || this.youtubeNotice || this.playback?.kind === 'youtube'); }
-  @state() private youtubeRequest: string | null = null;
+  get youtubeRegionVisible() { return !!(this.youtubeNotice || this.playback?.kind === 'youtube'); }
   @state() private youtubeNotice = false;
   private lastUpdate = '';
   private lastOrdinal: number | null = null;
@@ -474,6 +473,7 @@ export class Player extends LitElement {
     try {
       this.rate = Number(localStorage.getItem('mnx-player-rate')) || 1;
       this.volume = Number(localStorage.getItem('mnx-player-volume') ?? 0.7);
+      this.youtubeNoticeHidden = localStorage.getItem('mnx-player-youtube-terms-hidden') === 'true';
     } catch {}
     this.rate = Player.snapRate(this.rate);
     this.volume = Number.isFinite(this.volume) ? Math.min(1, Math.max(0, this.volume)) : 0.7;
@@ -501,7 +501,7 @@ export class Player extends LitElement {
   }
 
   protected updated(changed: Map<PropertyKey, unknown>) {
-    if (changed.has('youtubeRequest') || changed.has('youtubeNotice')) {
+    if (changed.has('youtubeNotice')) {
       this.dispatchEvent(new CustomEvent('video-notice-changed', { bubbles: true, composed: true }));
     }
     const reinstall =
@@ -530,12 +530,7 @@ export class Player extends LitElement {
     if (!reinstall && changed.has('recordings') && this.session) {
       const id = this.session.backend.id;
       this.session.pause();
-      // A pending consent prompt does not own the audible backend yet. Refresh
-      // its active mapping too, without dismissing or accepting that prompt.
-      if (this.youtubeRequest) {
-        if (id !== 'synth') void this.session.select(this.recordings.some(r => r.id === id) ? id : 'synth', true);
-        if (!this.recordings.some(r => r.id === this.youtubeRequest)) void this.selectSource('synth');
-      } else if (id !== 'synth') void this.selectSource(this.recordings.some(r => r.id === id) ? id : 'synth', true);
+      if (id !== 'synth') void this.selectSource(this.recordings.some(r => r.id === id) ? id : 'synth', true);
     }
     if (!reinstall && changed.has('partMix') && this.session?.backend instanceof SynthBackend)
       this.applyPartLevels(this.session.backend);
@@ -580,7 +575,7 @@ export class Player extends LitElement {
     }
   }
   private teardown() {
-    this.youtubeRequest = null; this.youtubeNotice = false;
+    this.youtubeNotice = false;
     this.revision++;
     this.session?.dispose(); this.session = undefined;
     this.status = undefined; this.lastOrdinal = null; this.publish();
@@ -688,25 +683,31 @@ export class Player extends LitElement {
     this.localError = '';
     const source = this.recordings.find(r => r.id === id);
     if (id !== 'synth' && !source) return false;
-    if (!replace || id !== (this.youtubeRequest ?? this.sourceId)) {
+    if (!replace || id !== this.sourceId) {
       this.dispatchEvent(new CustomEvent('source-selected', { detail: { id }, bubbles: true, composed: true }));
     }
-    if (source?.kind === 'youtube' && !this.youtubeAccepted) {
-      this.pause(); this.youtubeRequest = id; this.youtubeNotice = true;
-      this.dispatchEvent(new CustomEvent('video-region-changed', { bubbles: true, composed: true }));
-      return false;
+    if (source?.kind === 'youtube') {
+      // YouTube selection is cue-only. Pausing first both prevents an automatic
+      // start and preserves the current score position for the handoff.
+      this.pause();
+      if (!this.youtubeNoticeHidden) {
+        this.youtubeNotice = true;
+        this.dispatchEvent(new CustomEvent('video-region-changed', { bubbles: true, composed: true }));
+      }
     }
-    this.youtubeRequest = null; this.youtubeNotice = false;
+    if (source?.kind !== 'youtube') this.youtubeNotice = false;
     return await this.session?.select(id, replace) ?? false;
   }
   async play() { this.localError = ''; if (this.status?.needsStart && this.status.alignmentIssue) await this.session?.start(); else await this.session?.play(); }
   pause() { this.session?.pause(); }
   stop() { this.localError = ''; this.session?.stop(); }
   toggle() { if (this.playback?.wantsPlayback) this.pause(); else void this.play(); }
-  private async acceptYouTube() {
-    const id = this.youtubeRequest;
-    this.youtubeAccepted = true; this.youtubeRequest = null; this.youtubeNotice = false;
-    if (id) await this.selectSource(id);
+  private hideYouTubeNotice() {
+    this.youtubeNoticeHidden = true;
+    this.youtubeNotice = false;
+    try {
+      localStorage.setItem('mnx-player-youtube-terms-hidden', 'true');
+    } catch {}
   }
   /** Show the shared disclosure from either the inline player or a host video pane. */
   showYouTubeNotice() {
@@ -979,16 +980,16 @@ export class Player extends LitElement {
 
   /** One disclosure template, rendered by the player or its surrounding frame. */
   renderYouTubeNotice() {
-    return this.youtubeRequest || this.youtubeNotice ? html`<section class="youtube-notice" aria-label="YouTube terms and privacy">
-        <h3>${this.youtubeRequest ? 'Load YouTube video' : 'YouTube terms and privacy'}</h3>
+    return this.youtubeNotice ? html`<section class="youtube-notice" aria-label="YouTube terms and privacy">
+        <h3>YouTube terms and privacy</h3>
         <p>Loading connects to YouTube and Google, which may use cookies and show ads.</p>
-        <p>By loading, you agree to <a href="https://www.youtube.com/t/terms" target="_blank" rel="noopener">YouTube's Terms</a> and the privacy details below. See <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google's Privacy Policy</a>.</p>
+        <p>By using YouTube, you agree to <a href="https://www.youtube.com/t/terms" target="_blank" rel="noopener">YouTube's Terms</a>. See <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google's Privacy Policy</a>.</p>
         <details>
           <summary>Privacy details</summary>
           <p>This player uses YouTube API Services. YouTube and Google receive your IP address, browser information and this site's origin. Browser privacy controls manage YouTube's cookies.</p>
-          <p>Playback time and state stay in memory to follow the score; we do not save them or request YouTube account access. Rate and volume preferences are saved in this browser; clearing site data resets them. The host supplies video links and score timings. Studio keeps these in your private library; contact your Studio operator for library deletion. Switching source or leaving the page destroys the video player. Acceptance lasts for this player session.</p>
+          <p>Playback time and state stay in memory to follow the score; we do not save them or request YouTube account access. Rate, volume and whether this notice is hidden are saved in this browser; clearing site data resets them. The host supplies video links and score timings. Studio keeps these in your private library; contact your Studio operator for library deletion. Switching source or leaving the page destroys the video player.</p>
         </details>
-        ${this.youtubeRequest ? html`<button @click=${() => void this.acceptYouTube()}>Agree and load YouTube</button><button @click=${() => { this.youtubeRequest = null; this.youtubeNotice = false; }}>Cancel</button>` : html`<button @click=${() => this.youtubeNotice = false}>Close notice</button>`}
+        <button @click=${() => this.hideYouTubeNotice()}>Hide</button>
       </section>` : nothing;
   }
 
@@ -1015,15 +1016,15 @@ export class Player extends LitElement {
         >
         ${this.rail()}
         ${this.sourceControl && (this.recordings.length || this.canAddRecording) ? html`<label class="select">Source<select aria-label="Playback source" ?disabled=${!this.performance}
-          .value=${this.youtubeRequest ?? this.sourceId} @change=${(event: Event) => {
+          .value=${this.sourceId} @change=${(event: Event) => {
             const select = event.target as HTMLSelectElement;
             if (select.value === 'add-recording') {
-              select.value = this.youtubeRequest ?? this.sourceId;
+              select.value = this.sourceId;
               this.dispatchEvent(new CustomEvent('add-recording', { bubbles: true, composed: true }));
             } else void this.selectSource(select.value);
           }}>
-          <option value="synth" ?selected=${(this.youtubeRequest ?? this.sourceId) === 'synth'}>Synth</option>
-          ${this.recordings.map(r => html`<option value=${r.id} ?selected=${(this.youtubeRequest ?? this.sourceId) === r.id}>${r.name}</option>`)}
+          <option value="synth" ?selected=${this.sourceId === 'synth'}>Synth</option>
+          ${this.recordings.map(r => html`<option value=${r.id} ?selected=${this.sourceId === r.id}>${r.name}</option>`)}
           ${this.canAddRecording ? html`<option value="add-recording">Add recording…</option>` : nothing}
         </select></label>` : nothing}
         ${this.sourceControl ? html`<slot name="source-tools"></slot>` : nothing}
@@ -1049,11 +1050,11 @@ export class Player extends LitElement {
         ${this.volumeControl()}
         </span>
       </div>
-      ${this.videoPaneHosted ? nothing : this.renderYouTubeNotice()}
       ${this.status?.kind === 'youtube' && !this.videoPaneHosted ? html`<section class="youtube-panel" aria-label="YouTube recording">
         <div class="youtube-surface"></div>
         <p>YouTube · <button @click=${() => this.youtubeNotice = !this.youtubeNotice}>Terms and privacy</button> · <button @click=${() => { this.pause(); void this.selectSource('synth'); }}>Close video</button></p>
       </section>` : nothing}
+      ${this.videoPaneHosted ? nothing : this.renderYouTubeNotice()}
       ${this.loading
         ? html`<p role="status">
             Preparing ${this.sourceId === 'synth' && this.requiredSamples().length ? 'samples' : 'audio'}…

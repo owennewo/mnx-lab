@@ -725,6 +725,10 @@ passed, as did actual YouTube playback and score seeking under production CSP. A
 188 regenerated goldens stayed unchanged; no approval debt was added. The
 implementation worktree was retired before closeout. Item 18 is next.
 
+On 2026-09-17 the disclosure changed from a pre-load acceptance gate to an informational
+notice below the immediately loaded video. **Hide** persists the dismissal in localStorage;
+the existing **Terms and privacy** control can always reopen it.
+
 Cueing resets YouTube playback rate, so requested handoff controls survive loading
 retries and are reapplied after cue confirmation. An ended video must be cued before
 resetting position to avoid accidental playback. Closing the video explicitly pauses
