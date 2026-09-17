@@ -1,6 +1,6 @@
 # Recording bookends — pre-roll, post-roll and honest sync diagnostics
 
-> **Status: in progress 2026-09-17.** Implementation loop. Player campaign item 19;
+> **Status: complete 2026-09-17.** Implementation loop. Player campaign item 19;
 > follow-up to recording sync, playback, YouTube and Studio recording management.
 
 Soundslice sync points anchor score positions inside a recording; they do not claim that
@@ -73,3 +73,17 @@ all projections. Genuine sync failures remain visible and actionable. No runtime
 uses `cropped_duration` as full media length, operator dry-run identifies the existing repair
 set, all tests/build/scenario checks pass, and primitive regeneration leaves `scenarios/`
 clean.
+
+## Outcome
+
+Landed as `cdb5504` (agreement) and `dfa16d6` (implementation). The media adapter now
+reports pre-roll, mapped, post-roll and unmapped independently of real sync failures;
+Play/Stop use media zero while score seeks remain anchored. The selected recording adds
+accessible, duration-labelled first/last-system bookends through one generic engine seam,
+including notation, tab and combined projections.
+
+Soundslice crop metadata now stays provenance, normal re-ingest clears the old generic
+duration claim without replacing identity or bytes, and dry-run reports decoded duration
+where `ffprobe` is available plus genuine media overruns. No production repair was run.
+The full 1,884-test suite, scenario check and production build passed; all 191 regenerated
+goldens remained byte-identical, so no verification batch was opened.

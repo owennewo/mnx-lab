@@ -157,10 +157,6 @@ back up to `proposed/` the moment it is.
 
 ### inprogress/
 
-- **[core-recording-bookends.md](inprogress/core-recording-bookends.md)** — **in progress
-  2026-09-17** — Soundslice sync anchors describe the scored interval, not the whole media
-  file: normal pre/post-roll states, duration-labelled system bookends, media-zero transport
-  and an honest `cropped_duration` provenance/repair path.
 - **[core-space-units-sp.md](inprogress/core-space-units-sp.md)** — **in progress 2026-09-15** — Space becomes a number in
   staff spaces (air after a quarter note), 0 to a calibrated ceiling, and every horizontal
   consumer is one clamped line `max(0, m·x + c)`: the intercepts are the zero engraving,
@@ -460,6 +456,11 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+
+- **[core-recording-bookends.md](complete/core-recording-bookends.md)** — **complete
+  2026-09-17** — Player campaign item 19: normal pre/post-roll states, accessible
+  duration-labelled system bookends, media-zero transport, and an honest
+  `cropped_duration` provenance/audit/repair path.
 
 - **[core-staff-units-sp.md](complete/core-staff-units-sp.md)** — **complete
   2026-09-16** — Staff is a direct `0.4sp–4sp` control through one `10x + 0`

@@ -204,7 +204,7 @@ run any time before 6.
 | 16 | [Synth/audio switching](../complete/core-player-recording-playback.md) | Shared backend interface, musical-position handoff, media-clock follow and authenticated audio reads. | recording playback | fake backends + browser media/embed checks | complete |
 | 17 | [YouTube recordings](../complete/core-player-youtube.md) | Visible official iframe, policy/layout lifecycle, API rates, seek and error handling. | recording playback | adapter/layout checks + live embed check | complete |
 | 18 | [Recording attachments](../complete/studio-recording-management.md) | Studio URL/audio attachment, sync import, upload and revision lifecycle. | recording playback | service + browser checks | complete |
-| 19 | [Recording bookends](core-recording-bookends.md) | Treat media outside the anchored performance as pre/post-roll, render duration-labelled system bookends and repair cropped-duration provenance. | recording playback | fake media + layout projections + ingest repair | in progress |
+| 19 | [Recording bookends](../complete/core-recording-bookends.md) | Treat media outside the anchored performance as pre/post-roll, render duration-labelled system bookends and repair cropped-duration provenance. | recording playback | fake media + layout projections + ingest repair | complete |
 
 ### Decisions still open
 
@@ -789,3 +789,27 @@ empty URL field for a new attachment no longer stands as the only visible link
 field. The piece account menu clamps to the viewport after toolbar wrapping and on
 resize. Opening it dismisses other sheets, and Escape/outside click close it. The
 Studio browser check covers saved links and menu reachability at both screen edges.
+
+### 2026-09-17 — item 19: media edges are not sync failures
+
+Soundslice anchors describe the performed interval inside a recording, not a promise
+that media begins and ends there. The adapter now owns that distinction explicitly:
+pre-roll and post-roll clear score following without becoming warnings, while malformed
+maps, unreliable clocks and a retained anchor beyond decoded duration remain failures.
+Transport follows the medium—normal Play and Stop use zero; only score seeks use anchors.
+
+The visual corollary is a fixed system bookend, not a fabricated measure or a proportional
+timeline. One generic engine seam reserves and decorates the first/last system across
+notation, tab and combined views; recording state remains in `elements/`. Instrument
+labels stay outside the leading block, narrow final systems reserve the trailing block,
+and omitting the option leaves every golden byte-identical.
+
+The metadata bug was separate but adjacent: `cropped_duration` is crop provenance, never
+full media duration. Normal operator re-ingest now repairs old rows without sending media
+bytes, and dry-run distinguishes missing decoded evidence from a genuine anchor overrun.
+No production data was changed.
+
+Item 19 landed through `cdb5504` and `dfa16d6`: 1,884 tests, scenario checks and the
+production build passed after rebase. All 191 regenerated goldens stayed unchanged, so
+no human verification debt was added. The implementation worktree was retired before
+this closeout.
