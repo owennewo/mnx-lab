@@ -1618,3 +1618,10 @@ source wording and sit at their closing barlines in notation, tab and both views
 The performed view follows the hand-stated order in `notes.md`: each To-Coda is
 ignored on its first visit, the single-coda route fires after D.S. al Coda, and
 the double-coda route fires after D.S.S. al Double Coda.
+
+Follow-up placement correction, 2026-09-17: coda glyphs now place their bottom
+ink one staff space above the staff instead of inheriting the segno's mismatched
+SMuFL baseline. Above-staff labels and navigation marks are also retained by the
+system they name during vertical tightening, preventing a section such as
+Blackbird's “Bridge” from being carried into the preceding system. The same new
+scenario goldens were regenerated; this remains one pending review batch.

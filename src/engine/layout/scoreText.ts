@@ -188,6 +188,11 @@ export function anchorAt(
 // ---------- Navigation markers (segno / fine / jump) ----------
 
 const NAV_MARKER_RISE_SP = 2.5; // baseline above the top staff line
+/** The coda's design origin sits unusually far below its visual centre. Giving
+ * it the segno's baseline leaves almost two spaces of blank paper under its
+ * bottom ink, so it reads as floating in the inter-system gap. Place its
+ * bottom ink explicitly instead. */
+export const CODA_BOTTOM_RISE_SP = 1;
 
 const JUMP_TEXT: Record<string, string> = {
   segno: 'D.S.',
@@ -235,12 +240,15 @@ export function emitNavigationMarkers(args: EmitNavigationMarkersArgs): void {
       continue;
     }
     const glyph = mark.glyph ?? mark.kind;
+    const glyphY = mark.kind === 'coda'
+      ? staffTop - CODA_BOTTOM_RISE_SP + (glyphBBox(glyph)?.y ?? 0)
+      : y;
     const separation = (glyphBBox(glyph)?.w ?? 1.25) + 0.35;
     const offsets = mark.count === 2
       ? (p.anchor === 'end' ? [-separation, 0] : [-separation / 2, separation / 2])
       : [0];
     for (const offset of offsets) primitives.push({
-      kind: 'glyph', glyph, x: p.x + offset, y,
+      kind: 'glyph', glyph, x: p.x + offset, y: glyphY,
       anchor: p.anchor, ...(mark.color ? { fill: mark.color } : {}), className: mark.kind
     });
   }

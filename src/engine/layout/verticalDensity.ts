@@ -59,6 +59,16 @@ export const SEPARATION_CLEAR_SP = 3;
 export const MIN_PAD_DENSITY = 0;
 export const MAX_PAD_DENSITY = 2;
 
+/** Global marks emitted above a staff belong to the first system below their
+ * anchor, even when a tall navigation stack reaches past the geometric
+ * midpoint of the inter-system gap. Treating them like ordinary primitives
+ * can file a section heading with the system above, which then carries the
+ * heading away from the staff it names during tightening. */
+const ABOVE_STAFF_CLASSES = new Set([
+  'rehearsal-label', 'rehearsal-box', 'section-label', 'tempo', 'swing',
+  'segno', 'coda', 'fine', 'jump'
+]);
+
 /**
  * Bounded like `clampDensity`, and for the same reason: a bad value should
  * degrade to something drawable rather than throw. The floor can be 0 because
@@ -149,6 +159,13 @@ export function tightenRows(args: TightenRowsArgs): TightenedRows | null {
     while (r < boundaries.length && y >= boundaries[r]) r++;
     return r;
   };
+  const rowOfPrimitive = (p: Primitive): number => {
+    const y = anchorY(p);
+    const className = (p.className ?? '').split(' ')[0];
+    if (!ABOVE_STAFF_CLASSES.has(className)) return rowOf(y);
+    const below = rows.findIndex(row => row.staffTop > y);
+    return below < 0 ? rows.length - 1 : below;
+  };
 
   // Ink extents per row, through the same measurement the snug-crop viewport
   // already uses (`computeBoundsSp`) — glyph extents from the font's own SMuFL
@@ -163,7 +180,7 @@ export function tightenRows(args: TightenRowsArgs): TightenedRows | null {
     // attribution was actually valid for; re-deriving it here would re-file
     // ink against rows this loop has since moved.
     const prior = args.owners?.get(p);
-    const r = prior !== undefined && prior < rows.length ? prior : rowOf(anchorY(p));
+    const r = prior !== undefined && prior < rows.length ? prior : rowOfPrimitive(p);
     owner.set(p, r);
     buckets[r].push(p);
   }

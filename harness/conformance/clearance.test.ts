@@ -87,6 +87,24 @@ describe('clearance levels', () => {
     expect(second.y - first.y - first.h).toBeCloseTo(clearanceSpacing(0).systemInk);
     expect(result.heightSp - second.y - second.h).toBeCloseTo(0.1);
   });
+
+  it('keeps an above-staff heading with the system it names', () => {
+    const heading: Primitive = {
+      kind: 'text', text: 'Bridge', x: 2, y: 14, size: 1.5,
+      font: 'body', anchor: 'start', className: 'section-label'
+    };
+    const upper: Primitive = { kind: 'rect', x: 0, y: 6, w: 5, h: 4, className: 'content' };
+    const lower: Primitive = { kind: 'rect', x: 0, y: 26, w: 5, h: 4, className: 'content' };
+    const result = tightenRows({
+      primitives: [upper, heading, lower],
+      rows: [{ staffTop: 6, staffBottom: 10 }, { staffTop: 26, staffBottom: 30 }],
+      heightSp: 40,
+      clearance: 0
+    })!;
+
+    expect((heading as { y: number }).y - result.rows[1].staffTop).toBeCloseTo(14 - 26);
+    expect((heading as { y: number }).y).toBeGreaterThan(result.rows[0].staffBottom);
+  });
 });
 
 it('keeps 1.5sp of visible ink between a title and its first system', () => {

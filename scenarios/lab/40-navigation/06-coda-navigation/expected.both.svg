@@ -91,7 +91,7 @@
 <line x1="706.4" y1="355.8688" x2="824.8" y2="355.8688" stroke-width="1.6" class="staff-line"></line>
 <line x1="824.8" y1="128" x2="824.8" y2="355.8688" stroke-width="2.56" class="barline"></line>
 <text x="770.4" y="144" font-size="64" text-anchor="middle" class="rest rest-full-measure"></text>
-<text x="824.8" y="88" font-size="64" text-anchor="end" class="coda"></text>
+<text x="824.8" y="101.888" font-size="64" text-anchor="end" class="coda"></text>
 <line x1="824.8" y1="128" x2="943.2" y2="128" stroke-width="2.08" class="staff-line"></line>
 <line x1="824.8" y1="144" x2="943.2" y2="144" stroke-width="2.08" class="staff-line"></line>
 <line x1="824.8" y1="160" x2="943.2" y2="160" stroke-width="2.08" class="staff-line"></line>
@@ -120,6 +120,6 @@
 <line x1="1048.8" y1="128" x2="1048.8" y2="355.8688" stroke-width="2.56" class="barline barline-final-thin"></line>
 <rect x="1053.6" y="128" width="8" height="227.8688" fill="currentColor" class="barline barline-final-thick"></rect>
 <text x="1007.2" y="144" font-size="64" text-anchor="middle" class="rest rest-full-measure"></text>
-<text x="994.624" y="88" font-size="64" text-anchor="end" class="coda"></text>
-<text x="1061.6" y="88" font-size="64" text-anchor="end" class="coda"></text>
+<text x="994.624" y="101.888" font-size="64" text-anchor="end" class="coda"></text>
+<text x="1061.6" y="101.888" font-size="64" text-anchor="end" class="coda"></text>
 </svg>
