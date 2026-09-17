@@ -38,6 +38,7 @@
     "smoke:save-pipeline": "npm run build && node harness/verify/save-pipeline-smoke.mjs",
     "smoke:piece-lifecycle": "npm run build && node harness/verify/piece-lifecycle-smoke.mjs",
     "smoke:studio-editor": "npm run build && node harness/verify/studio-editor-smoke.mjs",
+    "smoke:workbench-editor": "npm run build && node harness/verify/workbench-editor-smoke.mjs",
     "dev:embed-app": "npm run build:embed && node harness/verify/serve-embed-app.mjs",
     "preview": "vite preview",
     "compile-validator": "node spec/tools/compile-validator.mjs",

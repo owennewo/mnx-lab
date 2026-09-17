@@ -5,13 +5,14 @@
 // owns the two middle tests both workbench listeners share; the tag-name test
 // is the innermost scope (a text field always wins, even inside us).
 //
-// Two mounts use this. The WORKBENCH's listeners are still window-scoped, and
-// the focus test is what makes them behave as if they were host-scoped. The
-// promoted mount (`editorHost.ts`, core-editor-element-promotion.md slice 1)
-// listens on the host element itself, so containment is structural there — it
-// keeps `focusWithin` only to dim a cursor the keyboard has left, and needs
-// neither `focusUnclaimed` nor the window. The workbench follows when it
-// adopts the binding.
+// The editor's mount (`editorHost.ts`, core-editor-element-promotion.md)
+// listens on the host element itself, so containment is structural there: it
+// keeps `focusWithin` to dim a cursor the keyboard has left, and reaches for
+// `focusUnclaimed` and the window only for a host that opts in
+// (`claimUnfocused` — the workbench, where the score is the only thing a
+// keystroke could be meant for). The workbench SHELL's own bindings stay
+// window-scoped behind `keyIsOurs(event, null)`: the rail and the palette are
+// page-level by nature.
 
 /** The real event target: shadow-DOM retargeting makes a window-level
  *  `event.target` the outermost host, so the composed path's head is the node
@@ -48,8 +49,8 @@ export function focusWithin(host: Element): boolean {
  * document's state on load and after a click on dead space. Editor keys must
  * still work then — a workbench user who has not clicked anything yet is
  * unambiguously addressing the score — so unclaimed focus counts as ours.
- * This is precisely the leniency an EMBED must not have, and it disappears
- * with the host-scoped listener in stage 2.
+ * This is precisely the leniency an EMBED must not have, which is why the
+ * binding asks for it by name (`claimUnfocused`) and no element assumes it.
  */
 export function focusUnclaimed(): boolean {
   const active = document.activeElement;

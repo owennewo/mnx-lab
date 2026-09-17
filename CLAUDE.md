@@ -152,9 +152,12 @@ reviewed move. `model`/`engine`/`audio` stay importable from Node — no DOM at 
 level; `engine/headless.ts` is the guarantee and the harness's entry. Lit is load-bearing
 **only in `elements/`** (shadow DOM is the embeddability story); studio's framework is
 deliberately undecided. **The editor's mount is a host binding** — `bindEditor` in
-`src/elements/editorHost.ts`, beside `bindPlayback` — loaded by a shell behind a dynamic
-`import()`: the editing logic stays in `src/edit/`, and nothing the viewer or the player
-imports may reach it, so an embed that only views pays nothing for the editor.
+`src/elements/editorHost.ts`, beside `bindPlayback` — and it is the ONE editor surface: both
+shells sit on it, and what a host keeps (which session is in force, the neighbouring
+document, its own inspector words) plugs in through the binding's options, never a second
+mount. Studio loads it behind a dynamic `import()`; the workbench, which always edits,
+imports it directly. The editing logic stays in `src/edit/`, and nothing the viewer or the
+player imports may reach it, so an embed that only views pays nothing for the editor.
 
 ### Build faces (one source tree)
 

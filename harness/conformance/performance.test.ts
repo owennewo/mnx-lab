@@ -203,3 +203,8 @@ it('stealing from a tremolo trims every alternating child on its original subdiv
   expect(p.sounding.find((s) => s.writtenIds[0] === 'w0:a')?.duration).toEqual(q(1n, 32n));
   expect(p.sounding.find((s) => s.writtenIds[0] === 'w0:b')?.position).toEqual(q(1n, 16n));
 });
+it('compiles a document under construction as silence: the editor shows `{}` and a part with no bars', () => {
+  for (const d of [{}, { parts: [{ id: 'p' }] }] as unknown as MnxStructure[]) {
+    expect(compile(d).sounding).toEqual([]);
+  }
+});

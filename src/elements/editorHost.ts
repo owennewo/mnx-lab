@@ -20,10 +20,17 @@
  * an `overlay` those keys stay unbound rather than half-working. The command
  * palette is the workbench's own and is not mounted here.
  *
+ * Both shells sit on this — it is the one editor surface. What a HOST keeps is
+ * what is genuinely its own, and the options are where it plugs in: which
+ * session is in force (`session`; a host that replaces its session disposes and
+ * rebinds), the neighbouring document at the top rung (`onEscalate`), inspector
+ * words that address the host's state rather than the document (`inspector`),
+ * and whether keys typed with nothing focused are the editor's (`claimUnfocused`).
+ *
  * **Scope is structural.** The listener is on `scope`, the host's own element,
  * not on `window`: a key reaches the editor because focus is inside it, which
- * is the containment the workbench's window listener could only test for
- * (`keyScope.ts`). Two editors on a page do not fight, and an embed that never
+ * is the containment a window listener could only test for (`keyScope.ts`).
+ * Two editors on a page do not fight, and an embed that never
  * binds one pays nothing — nothing in the viewer or the player imports this
  * module, so it is its own chunk behind a dynamic `import()`.
  *
@@ -43,13 +50,13 @@ import { lyricPlanOps, type LyricPlanEdit } from '../edit/lyricText.ts';
 import { applyOp } from '../edit/ops.ts';
 import type { SelectionClipboardStore } from '../edit/selectionClipboard.ts';
 import { copySelectionToStore, cutSelectionToStore, pasteSelectionFromStore } from '../edit/selectionClipboardActions.ts';
-import { copySelectionNotice, cutSelectionNotice, pasteSelectionNotice, type ClipboardNotice } from '../edit/clipboardFeedback.ts';
+import { copySelectionNotice, cutSelectionNotice, deleteSelectionNotice, pasteSelectionNotice, type ClipboardNotice } from '../edit/clipboardFeedback.ts';
 import { neighbourSystemMeasure } from '../engine/layout/spacing.ts';
 import type { MnxStructure } from '../model/mnx.ts';
 import type { DocumentViewer } from './DocumentViewer.ts';
-import { focusWithin, isTextEntry, realTarget } from './keyScope.ts';
+import { focusUnclaimed, focusWithin, isTextEntry, realTarget } from './keyScope.ts';
 import { enclosureFor, selectionContextFor } from './editorSelection.ts';
-import { buildInspectorView } from './inspectorRows.ts';
+import { buildInspectorView, type InspectorView } from './inspectorRows.ts';
 import { INSPECTOR_REFUSAL, fireFromInspector, inspectorLineIntent, mirrorOverlayAt } from './inspectorMount.ts';
 import type { OverlayAnchor } from './overlayPlacement.ts';
 import type { RungInspector } from './RungInspector.ts';
@@ -85,6 +92,42 @@ export interface EditorBindingOptions {
   onNotice?(notice: ClipboardNotice): void;
   /** The viewer is showing some OTHER document (an older version, say): no cursor, no keys, until it is not. */
   suspended?(): boolean;
+  /**
+   * A session the host already built — a replay from `{}`, a rung carried in
+   * from the neighbouring document. The binding adopts it instead of making
+   * one, and `document` is not read. A binding holds ONE session for its whole
+   * life: a host that replaces its session (revert, replay) disposes the
+   * binding and binds the new one.
+   */
+  session?: EditorSession;
+  /**
+   * ↑/↓ at the document rung: the neighbouring DOCUMENT, which belongs to the
+   * host's collection — the workbench walks its rail, studio would walk the
+   * library. It leaves the document entirely, so it is a hook and not an
+   * intent: there is nothing for a trace to replay. Unset, the keys do nothing.
+   */
+  onEscalate?(delta: 1 | -1): void;
+  /** The session declined an intent that came from a key or a host surface — a rung this document does not present, say. */
+  onRefused?(intent: EditorIntent): void;
+  /**
+   * This editor is the only thing on the page a keystroke could be meant for,
+   * so keys typed while NOTHING is focused (the page on load, a click on dead
+   * space) are its keys too. Precisely the leniency an embed must not have, so
+   * it is opt-in: the binding then also listens on the window, for unclaimed
+   * keys and for the causes of a focus change it could not otherwise see.
+   */
+  claimUnfocused?: boolean;
+  /**
+   * Words the HOST answers in the rung inspector, beside the editor's own —
+   * the workbench's `iteration`, which addresses its pass model and not the
+   * document. `extend` adds them to the view; `apply` is offered every typed
+   * line first and returns undefined when the line is not the host's, null when
+   * it took it, or the sentence that says why not.
+   */
+  inspector?: {
+    extend?(view: InspectorView): InspectorView;
+    apply?(word: string | null, text: string, key?: string): string | null | undefined;
+  };
 }
 
 export interface EditorBinding {
@@ -93,8 +136,20 @@ export interface EditorBinding {
   readonly document: MnxStructure;
   readonly canUndo: boolean;
   readonly canRedo: boolean;
+  /** Escape put the cursor away; the next intent brings it back. A host drawing the ladder (a HUD, a chip) asks. */
+  readonly cursorHidden: boolean;
+  /** Will the next keystroke reach this editor? The one predicate behind both the key gate and the dimmed cursor. */
+  readonly hasKeyboard: boolean;
   /** An intent from a surface the host owns (a sheet, a button): same funnel as a key. */
   handleIntent(intent: EditorIntent): boolean;
+  /** The host drove the SESSION itself (a sweep, a walk through the op queue): end the fret window, show the cursor, report. */
+  sessionMoved(): void;
+  /** Enter's door, for a host surface that opens it by pointer. Needs an `overlay`. */
+  openInspector(): void;
+  /** Shift+L's door, for a host's palette. Needs an `overlay`. */
+  openLyrics(): void;
+  /** A host overlay is taking the keyboard: two surfaces wanting the same keys is one too many. */
+  closeSurfaces(): void;
   undo(): boolean;
   redo(): boolean;
   /** Redraw the cursor — after the host changed the view, or took the keyboard away and gave it back. */
@@ -116,7 +171,7 @@ const NAVIGATION = new Set<EditorIntent['type']>([
 
 export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document: MnxStructure, options: EditorBindingOptions): EditorBinding {
   const document_ = scope.ownerDocument;
-  const session = new EditorSession(document, options.documentId ?? '');
+  const session = options.session ?? new EditorSession(document, options.documentId ?? '');
   let shown = session.doc;
   let cursorHidden = false;
   let pendingFret: number | null = null;
@@ -131,13 +186,16 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
   const surfaces = options.overlay ? options.overlay.appendChild(document_.createElement('mnx-editor-surfaces')) : null;
 
   const suspended = () => options.suspended?.() ?? false;
+  /** The inspector is ours too; unclaimed focus only for a host that asked for it. */
+  const hasKeyboard = () => focusWithin(scope) || (surfaces !== null && focusWithin(surfaces)) || (!!options.claimUnfocused && focusUnclaimed());
   const draw = () => {
     if (disposed) return;
     viewer.selection = suspended() ? NO_SELECTION : selectionContextFor(session, { cursorHidden, pendingFret, preview });
-    // A cursor drawn while the keys go elsewhere is a lie about who owns the keyboard. The inspector is ours too.
-    viewer.selectionInactive = !(focusWithin(scope) || (surfaces !== null && focusWithin(surfaces)));
+    // A cursor drawn while the keys go elsewhere is a lie about who owns the keyboard.
+    viewer.selectionInactive = !hasKeyboard();
     if (inspector) {
-      const view = buildInspectorView(options.title?.() ?? '', session, cursorHidden);
+      const built = buildInspectorView(options.title?.() ?? '', session, cursorHidden);
+      const view = options.inspector?.extend?.(built) ?? built;
       Object.assign(inspector, { crumbs: view.crumbs, pills: view.pills, words: view.words, secondary: view.secondary, note: view.note, error: inspectorError, anchor });
     }
     options.onState?.();
@@ -152,6 +210,11 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     if (disposed || suspended() || (readOnly() && !NAVIGATION.has(intent.type))) return false;
     const handled = session.handleIntent(intent);
     cursorHidden = false;
+    // Delete is the one verb whose two presses mean different things, so it says which one this was — including
+    // when it declined. Everything else that returns false is a navigation edge, where silence is the right answer.
+    const deleted = intent.type === 'delete' ? session.lastDelete : null;
+    if (deleted) options.onNotice?.(deleteSelectionNotice(deleted));
+    if (!handled) options.onRefused?.(intent);
     settle();
     return handled;
   };
@@ -173,6 +236,7 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
   };
   const openInspector = () => {
     if (!surfaces || inspector || cursorHidden || suspended()) return;
+    tabDigits.flush();
     closeLyrics(false);
     followProjection();
     const el = document_.createElement('mnx-rung-inspector');
@@ -184,6 +248,8 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     el.addEventListener('inspector-remove', e => fromInspector((e as CustomEvent<{ intent: EditorIntent }>).detail.intent));
     el.addEventListener('inspector-apply', e => {
       const { word, text, key } = (e as CustomEvent<{ word: string | null; key?: string; text: string }>).detail;
+      const hosts = options.inspector?.apply?.(word, text, key);
+      if (hosts !== undefined) { inspectorError = hosts; draw(); return; }
       const parsed = inspectorLineIntent(session, word, text, key);
       if ('error' in parsed) { inspectorError = parsed.error; draw(); } else fromInspector(parsed.intent);
     });
@@ -201,6 +267,7 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
   }
   const openLyrics = () => {
     if (!surfaces || lyrics || suspended() || readOnly()) return;
+    tabDigits.flush();
     closeInspector(false);
     const el = document_.createElement('mnx-lyric-text-editor');
     const partIndex = session.cursor.partIndex ?? 0;
@@ -276,6 +343,8 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
   };
 
   const onKeyDown = (event: KeyboardEvent) => {
+    // Tab moves focus with no pointer event, so a keydown is also a focus-change cause — re-ask after it settles.
+    if (event.code === 'Tab') onFocusChange();
     if (disposed || suspended() || event.defaultPrevented || event.isComposing || isTextEntry(realTarget(event))) return;
     const stroke = strokeOf(event);
     const action = resolveKeyAction(stroke, layers());
@@ -309,14 +378,46 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     event.preventDefault();
     followProjection();
     let intent: EditorIntent = action;
-    // The document rung's ↑/↓ is the neighbouring DOCUMENT, which belongs to the host's collection. Not bound yet.
-    if ((intent.type === 'lineUp' || intent.type === 'lineDown') && session.selectionLevel === 'document' && !cursorHidden) return;
+    // The document rung's ↑/↓ is the neighbouring DOCUMENT, which belongs to the host's collection.
+    if ((intent.type === 'lineUp' || intent.type === 'lineDown') && session.selectionLevel === 'document' && !cursorHidden) {
+      options.onEscalate?.(intent.type === 'lineDown' ? 1 : -1);
+      return;
+    }
     const step = systemStep(intent);
     if (step === null) return;
     if (step) intent = step;
     dispatch(intent);
   };
-  const onFocusChange = () => setTimeout(() => { if (!disposed) { if (!focusWithin(scope)) tabDigits.flush(); draw(); } }, 0);
+  /**
+   * Focus may have moved — re-ask the ownership predicate. Deferred a task, not a microtask: `focusout` and
+   * `pointerdown` both fire BEFORE the new element is active, so an immediate read would see the outgoing state.
+   * The inspector goes with the keyboard: a surface for acting on the selection with keys it no longer receives
+   * is the same lie the dimmed cursor exists to avoid.
+   */
+  function onFocusChange() {
+    setTimeout(() => {
+      if (disposed) return;
+      if (!hasKeyboard()) { tabDigits.flush(); closeInspector(false); }
+      draw();
+    }, 0);
+  }
+  /** A pointer went down somewhere: close the inspector unless it landed inside it. Capture phase and
+   *  `composedPath`, so it sees through shadow roots — and nothing is prevented, so the click still lands. */
+  const onPointerDown = (event: Event) => {
+    if (inspector && !event.composedPath().includes(inspector)) closeInspector(false);
+    onFocusChange();
+  };
+  /** Unclaimed focus: the key never passed through `scope`, so the window hands it over. */
+  const onUnclaimedKey = (event: KeyboardEvent) => { if (focusUnclaimed()) onKeyDown(event); };
+  /** A click in the combined score chooses which rendering owns subsequent spatial input. Membership is model
+   *  state and does not fork: switching projection remaps the selection in place. Not a reason to show a cursor. */
+  const onNoteSelected = (event: Event) => {
+    const projection = (event as CustomEvent<{ projection?: 'notation' | 'tab' }>).detail.projection;
+    if (disposed || suspended() || !projection || projection === session.projection) return;
+    tabDigits.flush();
+    if (session.handleIntent({ type: 'setProjection', projection })) settle();
+  };
+  const win = document_.defaultView;
 
   scope.addEventListener('keydown', onKeyDown);
   scope.addEventListener('focusin', onFocusChange);
@@ -324,6 +425,15 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
   surfaces?.addEventListener('focusin', onFocusChange);
   surfaces?.addEventListener('focusout', onFocusChange);
   viewer.addEventListener('selection-anchored', onAnchored);
+  viewer.addEventListener('note-selected', onNoteSelected);
+  win?.addEventListener('pointerdown', onPointerDown, true);
+  if (options.claimUnfocused) {
+    // Focus events are the obvious trigger but are not dependable everywhere (headless Chrome delivers none to
+    // `window`, even for real clicks, while activeElement updates correctly) — pointerdown above covers clicks.
+    win?.addEventListener('keydown', onUnclaimedKey);
+    win?.addEventListener('focusin', onFocusChange);
+    win?.addEventListener('focusout', onFocusChange);
+  }
   followProjection();
   draw();
 
@@ -332,10 +442,16 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     get document() { return session.doc; },
     get canUndo() { return session.canUndo; },
     get canRedo() { return session.canRedo; },
+    get cursorHidden() { return cursorHidden; },
+    get hasKeyboard() { return hasKeyboard(); },
+    sessionMoved: () => { tabDigits.flush(); cursorHidden = false; settle(); },
+    openInspector: () => { if (hasKeyboard()) openInspector(); },
+    openLyrics,
+    closeSurfaces: () => { closeInspector(false); closeLyrics(false); },
     handleIntent: intent => { tabDigits.flush(); return dispatch(intent); },
     undo: () => { tabDigits.flush(); return dispatch({ type: 'undo' }); },
     redo: () => { tabDigits.flush(); return dispatch({ type: 'redo' }); },
-    refresh: () => { if (suspended()) { closeInspector(false); closeLyrics(false); } else if (readOnly()) closeLyrics(false); followProjection(); draw(); },
+    refresh: () => { tabDigits.flush(); if (suspended()) { closeInspector(false); closeLyrics(false); } else if (readOnly()) closeLyrics(false); followProjection(); draw(); },
     keys: () => {
       const mounted = (shell: ReturnType<typeof resolveShellAction>) => shell === 'abandonPending'
         || (surfaces !== null && (shell === 'commitPending' || shell === 'lyricTextEditor'))
@@ -356,6 +472,11 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
       scope.removeEventListener('focusin', onFocusChange);
       scope.removeEventListener('focusout', onFocusChange);
       viewer.removeEventListener('selection-anchored', onAnchored);
+      viewer.removeEventListener('note-selected', onNoteSelected);
+      win?.removeEventListener('pointerdown', onPointerDown, true);
+      win?.removeEventListener('keydown', onUnclaimedKey);
+      win?.removeEventListener('focusin', onFocusChange);
+      win?.removeEventListener('focusout', onFocusChange);
       inspector = null; lyrics = null;
       surfaces?.remove();
       options.onPreview?.(null);

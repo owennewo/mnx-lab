@@ -126,10 +126,13 @@ function compile(doc: MnxStructure, passes: PassModel): CompiledPerformance {
     if (m.time) meter = fromSafeFraction({ num: m.time.count, den: m.time.unit });
     return meter;
   });
-  const measureCount = Math.max(lengths.length, ...doc.parts.map((p) => p.measures.length));
+  // A document under construction (the editor's `{}` genesis, a part not yet given bars) has neither: it is
+  // silent, not an error — the workbench compiles every revision it shows, including those.
+  const parts = doc.parts ?? [];
+  const measureCount = Math.max(lengths.length, ...parts.map((p) => p.measures?.length ?? 0));
   for (let i = 0; i < measureCount; i++) lengths[i] = ZERO;
-  doc.parts.forEach((part, pi) =>
-    part.measures.forEach((measure, mi) => {
+  parts.forEach((part, pi) =>
+    (part.measures ?? []).forEach((measure, mi) => {
       const voices = new Map<number, number>();
       measure.sequences?.forEach((sequence, si) => {
         const staff = sequence.staff ?? 1,

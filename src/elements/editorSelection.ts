@@ -7,9 +7,8 @@
  * Promoted out of the workbench's scenario page with the editor's mount
  * (roadmap: core-editor-element-promotion, slice 1), where it was the body of
  * `syncFromSession`. This is the ONE module in `elements/` that knows both
- * vocabularies; the viewer still knows shapes and never editor levels. Both
- * mounts — the workbench's and `editorHost.ts` — call it, so a cursor looks the
- * same wherever it is drawn.
+ * vocabularies; the viewer still knows shapes and never editor levels. The
+ * binding (`editorHost.ts`) is its one caller now that both shells sit on it.
  */
 import type { EnclosureKind, SelectionContext, SelectionSpan } from './mnxContext.ts';
 import type { MnxStructure } from '../model/mnx.ts';

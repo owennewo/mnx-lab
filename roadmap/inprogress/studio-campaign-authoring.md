@@ -217,7 +217,7 @@ one.
 | 4 | [studio-sync-rederive](studio-sync-rederive.md) | **built 2026-09-17; two hands-on checks owed** | **Sync first, bars later.** `playingSyncpoints` (`src/model/syncSegments.ts`): when a source has segments the player derives its tuples from them and the bars *as they are now* — every time it builds the source's sync map, and again when the media's length is known — and never consults the stored ones; no bars is *not synchronised*. `sync-refresh` tells the host when what plays is not what is stored, and Studio writes it back through the sync-edit path. An imported sync cannot be re-derived, so it carries the **shape** it was last known good for (`performedShape`, `src/audio/scoreShape.ts` — `11x1/1,1x1/2`), merged into its provenance by the recording route, stamped by Studio on first sight, and shown as *may be out of date* in the Source sheet when the bars have moved. **Owed, by a person:** the click against a real YouTube clock, and the sync bar on touch. |
 | 5 | [studio-piece-lifecycle](../complete/studio-piece-lifecycle.md) | **complete 2026-09-17 — migration 0005 before deploy** | **Living with pieces.** Soft delete (`pieces.deleted_at`: not found by every read and write, nothing removed), an inline-confirmed *Delete this piece…*, the library's one-tap undo and `#/deleted` with Restore; an ingest of a deleted slice is refused rather than reviving it. **Versions** read off the renditions the snapshot already carries (`src/storage/versions.ts`), listed in the Save sheet; an older one *viewed* with nothing written, and made current by a **pointer move** (`PUT /pieces/:id/canonical`) — no rendition written, undoable, the next edit derived from where the pointer is. **Defect reports**: a lossy save carries the document it was exported from as an `evidence` rendition, once per new kind of loss; the operator lists and pulls them (`npm run defects:library`, never into the repo). Replaced item 3's tag fallback with an explicit `kept: true` for what only the Soundslice sidecar knows. |
 | 6 | `core-sync-interchange` | proposed, optional | **sync.json as interchange.** *Export sync* (none exists): the dense Soundslice-compatible array as derived, or a sparse wrapper with anchors only at the cuts and a wrapper-level `interpolation: "beat"` — never a fifth tuple element, which breaks Soundslice compatibility and the decoder's arity check. The reader option for beat-linear interpolation is built only if sparse export is wanted. **Lifting an imported Soundslice sync into segments** (lossless = one segment per anchor interval, crowded; merged = tidy, discards measured timing) is a decision the item owns. Pick up when a second consumer of a sync appears, not before. |
-| 7 | [core-editor-element-promotion](core-editor-element-promotion.md) | **slices 1–3 built 2026-09-17 for studio; the workbench's adoption of the binding is left** | **The editor in studio.** That doc owns the promotion review. The mount is a plain-DOM host binding beside `bindPlayback` — `bindEditor` in `src/elements/editorHost.ts`, its own lazily loaded chunk, absent from the embed bundles. **Slice 1:** navigation and the ladder, fret and pitch entry, durations, ties, delete, undo, Escape/Enter; structural key scope; `setWork` as an intent; a Keys sheet; the structural checkpoint trigger. **Slice 2 turned out to have already happened** — the one-surface campaign retired every setup popover into the rung inspector — so **slices 2–3 are one:** the inspector, its rows and placement, and the lyric text editor moved to `elements/` (the workbench imports them from there), with shared glue (`inspectorMount.ts`) and a token-carrying layer (`<mnx-editor-surfaces>`); the binding mounts them on Enter and Shift+L and binds copy/cut/paste. **Left:** work-list item 5 — the workbench adopting `bindEditor` and deleting its own mount — which is a refactor of a page that touches its session in a hundred places, scoped in that doc and not started. |
+| 7 | [core-editor-element-promotion](core-editor-element-promotion.md) | **built 2026-09-17: slices 1–3 for studio, then the workbench's adoption of the binding — one editor surface** | **The editor in studio.** That doc owns the promotion review. The mount is a plain-DOM host binding beside `bindPlayback` — `bindEditor` in `src/elements/editorHost.ts`, its own lazily loaded chunk, absent from the embed bundles. **Slice 1:** navigation and the ladder, fret and pitch entry, durations, ties, delete, undo, Escape/Enter; structural key scope; `setWork` as an intent; a Keys sheet; the structural checkpoint trigger. **Slice 2 turned out to have already happened** — the one-surface campaign retired every setup popover into the rung inspector — so **slices 2–3 are one:** the inspector, its rows and placement, and the lyric text editor moved to `elements/` (the workbench imports them from there), with shared glue (`inspectorMount.ts`) and a token-carrying layer (`<mnx-editor-surfaces>`); the binding mounts them on Enter and Shift+L and binds copy/cut/paste. **Work-list item 5:** the workbench's scenario page deleted its own mount and sits on `bindEditor`; the binding grew the host's seams for it (`session`, `onEscalate`, `claimUnfocused`, `inspector`, `onRefused`, `sessionMoved`), and `smoke:workbench-editor` proves them. |
 | 8 | `studio-editor-touch` | proposed | **Entry without a keyboard.** The workbench editor is keyboard-driven and studio is used on an Android tablet; a touch entry surface is new design, not a port. Decision 1 below says whether slice 1 of item 7 waits for it. |
 
 ### Decisions still open
@@ -535,4 +535,31 @@ call on open decision 1: **keyboard only**; touch is item 8.
   what remains in the workbench's mount is the workbench's — replay, the ops panel, the rail.
   Adopting the binding there is a refactor with its own risks and its own net, written up in
   the promotion doc as work-list item 5 rather than squeezed in behind a green smoke.
+
+### 2026-09-17 — entry 10: item 7 closed — the workbench adopts the binding
+
+[core-editor-element-promotion](core-editor-element-promotion.md), *Work-list item 5*.
+
+- **"Touches its session in a hundred places" was mostly reads.** The HUD, the ops panel,
+  the chip and the JSON pane *read* the session; only a dozen sites drove it. Keeping
+  `this.session` as the page's statement of which session is in force, and letting one
+  `syncBinding()` after every render keep the binding in step with it, left every reader
+  untouched. The refactor was deleting a mount, not rewriting a page.
+- **Adopt a session; do not ask how to make one.** The scoping note offered `reset(document,
+  options)` or dispose-and-rebind. Construct replay settles it: `replayIntents` returns a
+  session that already has a history, which no `reset(document)` could express. So the
+  binding takes `options.session`, and replacing one is dispose-and-rebind.
+- **Re-check a scoping note against the code, as entry 9 said.** The "host-owned preview
+  channel" was for the tray's rung preview, and the tray is gone; it was not built. Four
+  seams the note did not list were needed instead (unclaimed focus, the `iteration` word,
+  the refusal flash, a host driving the session directly).
+- **A smoke for the seams found a bug on `main` in its first run.** The destruct sweep ends
+  at `{}`, `compilePerformance({})` threw inside the page's document sync, and the page kept
+  showing the old score over an empty session. Nothing had ever driven that button in a
+  browser. Host-specific paths (revert, replay, the sweep, the rail) had no browser proof at
+  all before this item; the existing smokes all exercise the *shared* surface.
+- **Behaviour that both shells should have belongs in the binding, even when only one asked.**
+  Pointer-outside closing the inspector, the projection following a click, and delete's
+  sentence moved in rather than being re-plumbed as workbench options; `smoke:studio-editor`
+  was re-run because of it.
 

@@ -287,7 +287,7 @@ export class ModelPickerDialog extends LitElement {
 
   private onKey(event: KeyboardEvent) {
     // A modal owns its keystrokes: nothing the dialog sees may reach the
-    // page's window-scoped keymap (Escape would also walk the selection
+    // page's keymap (Escape would also walk the selection
     // ladder; letters would fire shortcuts under the backdrop).
     event.stopPropagation();
     const inField = (event.composedPath()[0] as HTMLElement | undefined)?.tagName === 'INPUT';

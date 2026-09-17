@@ -1,7 +1,8 @@
 # Promoting the editor into `elements/` — the second-consumer move
 
-> **Status: in progress — slices 1–3 built 2026-09-17 for studio; the workbench has not yet adopted the
-> binding** (work-list item 5, the one thing left). See *Slice 1* and *Slices 2–3* at the end. Originally **proposed (2026-08-09), deliberately parked.** Split out of
+> **Status: built — slices 1–3 (2026-09-17) and work-list item 5, the workbench's adoption of the
+> binding (2026-09-17): one editor surface, not two.** See *Slice 1*, *Slices 2–3* and *Work-list
+> item 5* at the end. Originally **proposed (2026-08-09), deliberately parked.** Split out of
 > [core-editor-input-layer.md](../complete/core-editor-input-layer.md) as its one remaining
 > item, so that doc could close at its real scope (everything else shipped). This
 > doc owns the move that makes the editor consumable outside the workbench —
@@ -254,12 +255,10 @@ viewport) — identically on a clean build of `main` at `261a3398`. Reported, no
 
 ### What slice 1 deliberately is not
 
-- **The workbench still has its own mount.** Work-list item 5 — *one editor surface, not
-  two* — is not done: the scenario page keeps its window listener, HUD, tray, palette,
-  clipboard, lyric editor and rail escalation. What it shares today is the selection
-  translation and the scope tests. It adopts `bindEditor` when slices 2–3 give the binding
-  the surfaces the workbench's mount has; promoting the inspector now would have made an
-  in-progress surface's churn public API.
+- **The workbench still had its own mount** at this point (work-list item 5, since done —
+  see the end). What it shared then was the selection translation and the scope tests;
+  promoting the inspector in slice 1 would have made an in-progress surface's churn public
+  API.
 - **Unbound here, rather than half-working:** Enter's rung inspector and the typed popovers
   (slices 2–3), the lyric text editor, copy/cut/paste, the command palette, and ↑/↓ at the
   document rung (the neighbouring *document* is the host's collection).
@@ -328,26 +327,76 @@ With it: `smoke:inspector` and `smoke:focus` (the workbench, now importing the m
 elements), the four other studio smokes and both sync smokes. The built embed bundles
 contain no `mnx-rung-inspector`, no `mnx-lyric-text-editor` and no `enterFret`.
 
-### What is left: work-list item 5
+## Work-list item 5 — the workbench adopts the binding (built 2026-09-17)
 
-**The workbench still has its own mount.** It now shares everything that *can* be shared
-without changing what it is — the selection translation, the scope tests, the inspector,
-its rows, its placement, its glue, the lyric editor — and the two mounts differ only in
-what is genuinely the workbench's: a window-scoped listener that also serves unclaimed
-focus, the HUD and the ops panel reading the session, construct-trace replay and the
-destruct sweep *replacing* the session, the iteration chip and playback seek, the command
-palette's intents, and ↑/↓ at the document rung walking the corpus rail. The scenario page
-touches its session in about a hundred places.
+*One editor surface, not two.* `src/workbench/ScenarioPage.ts` no longer has a mount: no key
+listener, no fret resolver, no pending pair, no inspector or lyric-editor template, no
+clipboard verbs, no focus tracking — the page is some 480 lines shorter and the binding 130
+longer. It calls `bindEditor(this, viewer,
+…)` with its `.main` as the overlay, and keeps what is genuinely the workbench's.
 
-Adopting `bindEditor` there is therefore a refactor of the workbench, not a promotion, and
-it wants three things from the binding first: a way to **replace the session** (replay and
-revert build new ones), a **document-rung escalation hook** for the rail, and a
-**host-owned preview channel** for the tray's rung preview beside the lyric caret's. None
-is hard; together they are their own piece of work, with `smoke:selection`,
-`smoke:inspector`, `smoke:focus` and the player smoke as its net. It is not started, and
-this doc stays in `inprogress/` until it is done.
+### What the binding grew, and what it did not
 
-Also not here: the **command palette** (the workbench's own, and the only path to the AI
-prompt, which stays behind the closed `elements → assist` boundary), **touch** (campaign
-item 8), and **click-to-place** — a click still selects for playback and does not move the
-cursor, in either shell.
+The scoping note asked for three things. Two were needed; one had retired before it was built.
+
+- **Replace the session → `options.session`, and dispose-and-rebind.** A binding holds one
+  session for its whole life. The page states WHICH session is in force (`this.session` — a
+  load, a revert and a construct replay each build a new one, the last through
+  `replayIntents`, which is why the binding *adopts* a session rather than being told how to
+  make one) and `syncBinding()`, run after every render, rebinds when the session, the viewer
+  element or the overlay is a different object. The rail's carried rung needs nothing: the
+  page builds the session with its `level`.
+- **The document-rung hook → `onEscalate(delta)`.** A hook and not an intent — it leaves the
+  document, so there is nothing for a trace to replay. Studio can bind the same gesture to
+  the library when it wants to.
+- **A host-owned preview channel → not built.** Its only other user was the tray's rung
+  preview, and the tray retired in the one-surface campaign; `previewScope()` had been
+  returning the lyric caret and nothing else. The binding already owns that.
+
+And four the note did not list, found by reading the page against the binding:
+
+- **`claimUnfocused`** — the window fallback, decided deliberately: the binding's listener
+  stays on the host element, and a host that opts in also gets keys typed while *nothing* is
+  focused, plus the window-level focus and pointer tracking that keeps the dimmed cursor
+  honest. It is the leniency an embed must not have, so it is asked for by name.
+- **`inspector.extend` / `inspector.apply`** — the `iteration` word addresses the workbench's
+  pass model, not the document, so it is the host's word: added to the view, and offered
+  every typed line first.
+- **`onRefused`** — the chip's refusal flash for a rung the document does not present, now
+  wired where the digit keys actually land; and **delete's sentence** goes out through
+  `onNotice`, so studio says it too.
+- **`sessionMoved()`**, for a host that drove the session directly (the destruct sweep, the
+  ops panel's walk through the queue), plus `openInspector()`, `openLyrics()` and
+  `closeSurfaces()` for the chip and the palette, and `cursorHidden` / `hasKeyboard` for the
+  HUD and the chip that draw the ladder.
+
+Two behaviours moved INTO the binding so both shells have them: a **pointer outside the
+inspector closes it**, as does losing the keyboard; and a **click in the combined score
+chooses the projection** (the viewer's `note-selected`), without being a reason to show a
+hidden cursor. The seek on that click stays the workbench's.
+
+### Proof
+
+`npm run smoke:workbench-editor` (`harness/verify/workbench-editor-smoke.mjs`), new, for the
+seams nothing else touched: an arrow typed with nothing focused; a fret shown by the page
+and walked from the ops panel; **revert and construct replay rebinding the editor to a new
+session** with one surfaces layer and live keys; the destruct sweep; delete's sentence; a
+refused rung flashing the chip; the inspector closed by a pointer outside and opened from
+the chip's word; and ↑/↓ at the document rung walking the rail **with the rung carried
+across**. With it, unchanged and green: `smoke:inspector`, `smoke:focus`, `smoke:player`,
+`smoke:studio-editor` (the binding changed under studio too). `smoke:selection` fails the
+same two reveal-scroll checks it fails on `main`, to the pixel (*190…408 in a viewport of
+190…381*) — pre-existing, see *Slice 1*.
+
+**Found by the new smoke, fixed here:** the destruct sweep dissolves the score to `{}`, and
+`compilePerformance({})` threw on `doc.parts.map` — inside the page's document sync, so the
+page silently kept showing the last score while the session held an empty one. On `main`
+too; nothing drove the sweep in a browser. A document under construction now compiles as
+silence (`performance.test.ts`).
+
+### Still not here
+
+The **command palette** (the workbench's own, and the only path to the AI prompt, which
+stays behind the closed `elements → assist` boundary), **touch** (campaign item 8), and
+**click-to-place** — a click still selects for playback and does not move the cursor, in
+either shell.

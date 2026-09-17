@@ -255,8 +255,8 @@ export function applyExpression(
     s.velocity = clamp(s.velocity);
   }
   // Roll only the marked pitch span, including notes on other voices/staves.
-  for (const [pi, part] of doc.parts.entries())
-    for (const [mi, measure] of part.measures.entries())
+  for (const [pi, part] of (doc.parts ?? []).entries())
+    for (const [mi, measure] of (part.measures ?? []).entries())
       for (const mark of measure.arpeggios ?? []) {
         const candidates = sounds.filter((s) => {
           const a = sources.get(s.writtenIds[0])!;

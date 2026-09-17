@@ -27,42 +27,20 @@ import { scenarioHref, objectsHref } from './WorkbenchApp.ts';
 import type { MnxDocument, MnxStructure } from '../model/mnx.ts';
 import { resolvePinnedErrors, type PinnedError } from '../model/pinnedErrors.ts';
 import type { DocumentViewer, ViewMode } from '../elements/DocumentViewer.ts';
-import type { SelectionContext } from '../elements/mnxContext.ts';
 import { EditorSession, replayIntents } from '../edit/session.ts';
 import { elementKeys, runDestructWalk } from '../edit/destructWalk.ts';
 import { constructTraceByTarget, type ConstructTrace } from './constructTraces.ts';
 import type { SelectionLevel } from '../edit/selection.ts';
 import type { EditorIntent } from '../edit/intents.ts';
 import type { SelectionClipboardStore } from '../edit/selectionClipboard.ts';
-import {
-  copySelectionToStore,
-  cutSelectionToStore,
-  pasteSelectionFromStore
-} from '../edit/selectionClipboardActions.ts';
-import {
-  copySelectionNotice,
-  cutSelectionNotice,
-  deleteSelectionNotice,
-  pasteSelectionNotice,
-  type ClipboardNotice
-} from '../edit/clipboardFeedback.ts';
+import type { ClipboardNotice } from '../edit/clipboardFeedback.ts';
 import type { TabSetup } from '../engine/tab/guitarPositions.ts';
 import { cheatsheet } from '../edit/keymapDocs.ts';
 import { buildHudParts, buildHudRows, LEVEL_BY_ROW, ROW_BY_LEVEL } from '../elements/hudRows.ts';
 import { keyFifthsAt } from '../edit/staffSpace.ts';
 import { buildJsonView } from '../model/jsonView.ts';
 import { findNoteAddress } from '../model/noteWalk.ts';
-import {
-  EDIT_LAYER,
-  NAVIGATION_LAYER,
-  TAB_DIGIT_LAYER,
-  resolveKeyAction,
-  resolveShellAction,
-  strokeOf,
-  type KeymapLayer,
-  type ShellAction
-} from '../edit/keymap.ts';
-import { TabDigitResolver } from '../edit/tabDigitResolver.ts';
+import type { ShellAction } from '../edit/keymap.ts';
 import {
   // Still consumed by the VIEWER's instrument-override overlay (TabSetup) —
   // presentation, not document editing; it outlived the tuning popover.
@@ -70,24 +48,19 @@ import {
   TUNING_PRESET_NAMES
 } from '../edit/setupGrammar.ts';
 import { buildOpRow } from './opRows.ts';
-import { editorHasKeyboard, keyIsOurs } from '../elements/keyScope.ts';
-import { enclosureFor, selectionContextFor } from '../elements/editorSelection.ts';
+import { bindEditor, type EditorBinding } from '../elements/editorHost.ts';
 import {
   OVERLAY_EDGE_GAP,
   OVERLAY_SHAFT_H,
   type OverlayAnchor
 } from '../elements/overlayPlacement.ts';
 import '../elements/DocumentViewer.ts';
-import '../elements/RungInspector.ts';
-import { buildInspectorView } from '../elements/inspectorRows.ts';
-import { INSPECTOR_REFUSAL, fireFromInspector, inspectorLineIntent, mirrorOverlayAt } from '../elements/inspectorMount.ts';
+import type { InspectorView } from '../elements/inspectorRows.ts';
+import { mirrorOverlayAt } from '../elements/inspectorMount.ts';
 import '../elements/ScoreFrame.ts';
 import type { ZoomPadChange } from '../elements/ZoomPad.ts';
 import { DEFAULT_SPACE_SP, DEFAULT_SPACING_MODE, DEFAULT_STAFF_SP } from '../elements/zoomDefaults.ts';
 import './ModelPickerDialog.ts';
-import '../elements/LyricTextEditor.ts';
-import { lyricPlanOps, type LyricPlanEdit } from '../edit/lyricText.ts';
-import { applyOp } from '../edit/ops.ts';
 import { modelDisplayName } from '../assist/modelCatalog.ts';
 import { fetchKeyInfo, keyFingerprint, streamChat, type ChatMessage } from '../assist/openrouter.ts';
 import { renderMarkdown } from './markdownLit.ts';
@@ -103,7 +76,7 @@ import {
   MAX_STAFF_SP,
   type RenderScale
 } from '../engine/render/scale.ts';
-import { MIN_SPACE_SP, MAX_SPACE_SP, neighbourSystemMeasure } from '../engine/layout/spacing.ts';
+import { MIN_SPACE_SP, MAX_SPACE_SP } from '../engine/layout/spacing.ts';
 import type { LocalDocumentSource } from '../importers/localFile.ts';
 
 /** The setup popovers, as data — one row per attribute rather than a ternary
@@ -339,7 +312,12 @@ export class ScenarioPage extends LitElement {
   // in-memory only — the workbench has no backend, and this page is a bench
   // for testing the editor, not for authoring corpus files.
   @state() private session: EditorSession | null = null;
-  @state() private selection: SelectionContext | null = null;
+  /** The editor's mount, bound to `session` and the viewer on screen (see `syncBinding`). */
+  private editor: EditorBinding | null = null;
+  private boundViewer: DocumentViewer | null = null;
+  private boundOverlay: HTMLElement | null = null;
+  /** How long the trace was when `copied` was last true of it. */
+  private tracedIntents = 0;
   @state() private playback: PlaybackState = initialPlaybackState();
   private readonly playbackProvider = new ContextProvider(this, {
     context: playbackStateContext, initialValue: this.playback
@@ -375,15 +353,6 @@ export class ScenarioPage extends LitElement {
     this.setPlayback(inspectIteration(this.playback, iteration));
   }
 
-  /** One uncommitted tab digit, painted at the cursor for the 500 ms window. */
-  @state() private pendingFret: number | null = null;
-  private readonly tabDigits = new TabDigitResolver(
-    fret => this.commitResolvedFret(fret),
-    candidate => {
-      this.pendingFret = candidate;
-      this.syncFromSession();
-    }
-  );
   @state() private copied = false;
   /** The clipboard's transient strip over the score (stage 6): clip kind,
    *  member count and detached references on success, the planner's precise
@@ -415,17 +384,10 @@ export class ScenarioPage extends LitElement {
    *  it is not always the one you picked once a chain is in play. */
   @state() private servedModel = '';
   @state() private modelPickerOpen = false;
-  /** The lyric text editor (one-surface item 6 phase 2): a modal over the
-   *  score; the buffer is its own state, so the page only owns the boolean
-   *  and the caret's preview keys. */
-  @state() private lyricEditorOpen = false;
-  @state() private lyricPreviewKeys: string[] = [];
   /** The drawer's live render: the buffer's current diff applied to a
    *  SCRATCH document (the same lyricPlanOps the session would apply), shown
    *  by the viewer while the drawer is open. Never touches the session.
-   *  Stored as the COMPLETE wrapper the viewer binds, built once per diff —
-   *  minting it in render() gave the viewer a fresh identity every pass,
-   *  and relayout → render-scale → state → render is a loop. */
+   *  The binding's `onPreview` sets it; null puts the real document back. */
   @state() private lyricPreviewDoc: MnxDocument | null = null;
   /** BYOK state (core-assist-byok.md): the key is read from the shell's
    *  store and re-read on its change event, so a PKCE landing in the app
@@ -442,26 +404,10 @@ export class ScenarioPage extends LitElement {
     this.apiKey = storedApiKey();
     void this.refreshFingerprint();
   };
-  /** Esc hides the cursor highlight until the next intent (review sense-0). */
-  private cursorHidden = false;
-
-  /** Does the editor own the keyboard right now (core-editor-focus-scope.md
-   *  stage 3)? Drives the overlay's dimming through the SAME predicate the
-   *  key handler gates on, so the cursor can never claim a keystroke that
-   *  would land elsewhere. Starts true: unclaimed focus counts as ours. */
-  @state() private hasKeyboard = true;
-
   /** The side panel's active tab; falls back when the tab isn't available
    *  (hud/actions need a session). */
   @state() private panelTab: PanelTab = 'hud';
   private landingFocus = false;
-
-  /** The rung inspector (roadmap/inprogress/workbench-rung-inspector.md):
-   *  Enter with nothing pending opens it over the selection, where the tray
-   *  sits. It and the tray are never open together — both want the keys. */
-  @state() private inspectorOpen = false;
-  @state() private inspectorMirrored = false;
-  @state() private inspectorError: string | null = null;
 
   /** The zoom pad's two axes. Saved choices win; absence uses product defaults. */
   @state() private staffSp: number | null = storedStaffSp() ?? DEFAULT_STAFF_SP;
@@ -1739,7 +1685,6 @@ export class ScenarioPage extends LitElement {
   willUpdate(changed: Map<string, unknown>) {
     if(changed.has('at'))this.routeSeekConsumed=false;
     const sourceChanged = changed.has('scenarioId') || changed.has('localDocument');
-    if (changed.has('view') || sourceChanged) this.flushPendingFret();
     // ?panel=compare|json links (the queue's rows) open the matching panel
     // tab — the main pane keeps the stored score view.
     if (changed.has('panel') || sourceChanged) {
@@ -1767,7 +1712,6 @@ export class ScenarioPage extends LitElement {
       this.jsonScope = 'whole';
       this.jsonFind = '';
       this.session = null;
-      this.selection = null;
       this.renderRoot.querySelector<Player>('mnx-player')?.stop();
       this.performance=null;this.routeSeekConsumed=false;
       this.passDocument = null;
@@ -1775,7 +1719,6 @@ export class ScenarioPage extends LitElement {
       this.setPlayback(initialPlaybackState());
       this.copied = false;
       this.showClipboardNotice(null);
-      this.cursorHidden = false;
       this.trayAnchor = null;
       // Overrides are per-part by INDEX, so carrying them to a different
       // document would misapply them.
@@ -1809,80 +1752,31 @@ export class ScenarioPage extends LitElement {
       this.connectNotice = `connect failed: ${landing.reason}`;
       this.landingFocus = true;
     }
-    window.addEventListener('keydown', this.onKeyDown);
     window.addEventListener('mnx-palette-intent', this.onPaletteIntent);
     window.addEventListener('mnx-palette-action', this.onPaletteAction);
-    // Keyboard-ownership tracking re-reads `document.activeElement`, which is
-    // always accurate; the only question is WHEN. Focus events are the
-    // obvious trigger but are not dependable everywhere (headless Chrome
-    // delivers none of the four to `window`, even for real clicks, while
-    // activeElement updates correctly) — so the causes of focus change are
-    // watched too: pointerdown (clicks) and keydown (Tab). Cheap, and it
-    // keeps the overlay honest where focus events are silent.
-    window.addEventListener('focusin', this.onFocusChange);
-    window.addEventListener('focusout', this.onFocusChange);
-    window.addEventListener('focus', this.onFocusChange, true);
-    window.addEventListener('blur', this.onFocusChange, true);
-    window.addEventListener('pointerdown', this.onFocusChange, true);
-    window.addEventListener('pointerdown', this.onPointerDownOutside, true);
+    // A page put back in the document has no binding until a render gives it one.
+    this.requestUpdate();
   }
 
   disconnectedCallback() {
-    this.flushPendingFret();
     super.disconnectedCallback();
+    this.editor?.dispose();
+    this.editor = null;
     this.removeEventListener('playback-state-changed', this.onPlaybackUpdate);
     window.removeEventListener('assist-credentials-change', this.onCredentialsChange);
     this.chatAbort?.abort();
     this.showClipboardNotice(null);
     clearTimeout(this.chipTimer);
-    window.removeEventListener('keydown', this.onKeyDown);
     window.removeEventListener('mnx-palette-intent', this.onPaletteIntent);
     window.removeEventListener('mnx-palette-action', this.onPaletteAction);
-    window.removeEventListener('focusin', this.onFocusChange);
-    window.removeEventListener('focusout', this.onFocusChange);
-    window.removeEventListener('focus', this.onFocusChange, true);
-    window.removeEventListener('blur', this.onFocusChange, true);
-    window.removeEventListener('pointerdown', this.onFocusChange, true);
-    window.removeEventListener('pointerdown', this.onPointerDownOutside, true);
   }
 
-  /** Focus may have moved — re-ask the ownership predicate. Deferred a task,
-   *  not a microtask: `focusout` and `pointerdown` both fire BEFORE the new
-   *  element is active, so an immediate read would see the outgoing state
-   *  and every transition would flicker as "lost". */
-  private onFocusChange = () => {
-    setTimeout(() => {
-      if (!this.isConnected) return;
-      const nextHasKeyboard = editorHasKeyboard(this);
-      if (!nextHasKeyboard) this.flushPendingFret();
-      this.hasKeyboard = nextHasKeyboard;
-      // The tray goes with the keyboard. It is a surface for acting on the
-      // selection with keys it no longer receives, and one that advertises
-      // shortcuts it cannot honour is the same lie the dimmed cursor exists
-      // to avoid (core-editor-focus-scope.md, stage 3).
-      if (!this.hasKeyboard) {
-        this.inspectorOpen = false;
-      }
-    }, 0);
-  };
-
-  /** A pointer went down somewhere: close the tray unless it landed inside
-   *  it. Capture phase and `composedPath`, so the check survives a handler
-   *  that stops propagation and sees through the tray's shadow root — and
-   *  nothing is prevented, so the click still reaches whatever it hit. */
-  private onPointerDownOutside = (event: Event) => {
-    if (!this.inspectorOpen) return;
-    const inOverlay = event
-      .composedPath()
-      .some(
-        node =>
-          node instanceof HTMLElement &&
-          node.tagName === 'MNX-RUNG-INSPECTOR'
-      );
-    if (!inOverlay) {
-      this.inspectorOpen = false;
-    }
-  };
+  /** After every render: keep the editor's binding in step with the session and the viewer on screen, and let it
+   *  follow a change of pane once the viewer has taken it. */
+  updated(changed: Map<string, unknown>) {
+    this.syncBinding();
+    if (this.editor && changed.has('view')) void this.boundViewer?.updateComplete.then(() => this.editor?.refresh());
+  }
 
   private async loadDocument() {
     const entry = this.entry();
@@ -1924,38 +1818,98 @@ export class ScenarioPage extends LitElement {
     }
   }
 
-  /** Pull doc/selection out of the session after it changed. */
+  /**
+   * The editor's mount is the promoted binding (`src/elements/editorHost.ts`,
+   * core-editor-element-promotion.md work-list item 5): it hears the keys,
+   * holds the half-typed fret, draws the cursor and mounts the rung inspector
+   * and the lyric editor. What stays here is the workbench's: WHICH session is
+   * in force (`this.session` — a load, a revert and a construct replay each
+   * build a new one), the HUD, the ops panel and the chip that read it, the
+   * pass model, and the rail.
+   *
+   * A binding holds one session for its whole life, so this keeps the two in
+   * step after every render: a new session, a new viewer element or a new
+   * `.main` disposes the binding and binds again. The page already survived a
+   * session swap; this is the same swap, stated once.
+   */
+  private syncBinding() {
+    const viewer = this.renderRoot.querySelector<DocumentViewer>('mnx-document-viewer');
+    const overlay = this.renderRoot.querySelector<HTMLElement>('.main');
+    const session = this.session;
+    if (this.editor && (this.editor.session !== session || this.boundViewer !== viewer || this.boundOverlay !== overlay)) {
+      this.editor.dispose();
+      this.editor = null;
+      this.lyricPreviewDoc = null;
+    }
+    if (this.editor || !session || !viewer || !overlay) return;
+    this.boundViewer = viewer;
+    this.boundOverlay = overlay;
+    this.tracedIntents = session.intentLog.length;
+    this.editor = bindEditor(this, viewer, session.doc, {
+      session,
+      overlay,
+      // A workbench reader who has clicked nothing yet is unambiguously addressing the score.
+      claimUnfocused: true,
+      ...(this.selectionClipboard ? { clipboard: this.selectionClipboard } : {}),
+      title: () => this.entry()?.meta.title ?? '',
+      onChange: () => this.syncFromSession(),
+      onState: () => this.onEditorState(),
+      onNotice: notice => this.showClipboardNotice(notice),
+      // A rung this document does not present, asked for by name: a dead key with no feedback is what teaches
+      // people a shortcut cannot be trusted. Every other refusal is a navigation edge, where silence is right.
+      onRefused: intent => { if (intent.type === 'goToLevel') this.flashRungRefusal(); },
+      onEscalate: delta => this.escalateToRail(delta),
+      // The drawer's clean parses render live on a scratch copy. Stored as the COMPLETE wrapper the viewer
+      // binds, built once per diff — minting it in render() gave the viewer a fresh identity every pass, and
+      // relayout → render-scale → state → render is a loop.
+      onPreview: preview => { this.lyricPreviewDoc = preview && this.doc ? { ...this.doc, mnxJson: preview } : null; },
+      inspector: {
+        extend: view => this.withIterationWord(view),
+        apply: (word, text) => this.applyIterationLine(word, text)
+      }
+    });
+    // The binding's first draw ran before `this.editor` was assigned, so the chip has not seen it yet.
+    this.requestUpdate();
+  }
+
+  /** The cursor, the history or the keyboard's owner moved: everything here that reads the session redraws. */
+  private onEditorState() {
+    const traced = this.session?.intentLog.length ?? 0;
+    // A copied trace is stale the moment the trace grows.
+    if (traced !== this.tracedIntents) { this.tracedIntents = traced; this.copied = false; }
+    this.requestUpdate();
+  }
+
+  /** Pull the document out of the session after it changed. */
   private syncFromSession() {
     const session = this.session;
     if (!session || !this.doc) return;
     this.refreshPassModel(session.doc);
     this.doc = { ...this.doc, mnxJson: session.doc };
     this.rawDocument = JSON.stringify(session.doc, null, 2);
-    this.selection = selectionContextFor(session, {
-      cursorHidden: this.cursorHidden,
-      pendingFret: this.pendingFret,
-      preview: this.previewScope()
-    });
   }
 
-  /** The tray's previewed scope as a drawable footprint: the rung's own note
-   *  keys computed WITHOUT moving the session, so previewing costs the
-   *  document nothing and Escape has nothing to undo. Null unless a tray tab
-   *  other than the selection's own is on display. */
-  private previewScope(): SelectionContext['preview'] {
-    const session = this.session;
-    // The lyric editor's caret lights its note through the same channel the
-    // tray previews rungs with (one-surface item 6, phase 2).
-    if (session && this.lyricEditorOpen)
-      return this.lyricPreviewKeys.length > 0
-        ? { enclosure: enclosureFor('note'), noteIds: this.lyricPreviewKeys }
-        : null;
-    return null;
+  /** A NEW session is in force — a revert, a construct replay. `updated()` rebinds the editor to it. */
+  private adoptSession(session: EditorSession) {
+    this.session = session;
+    this.copied = false;
+    this.syncFromSession();
   }
 
-  /** A click in the combined score chooses which rendering owns subsequent
-   * spatial input. Note membership is still model state and therefore does
-   * not fork: switching projection remaps the existing selection in place. */
+  /** Esc hides the cursor highlight until the next intent (review sense-0). The binding's, read here. */
+  private get cursorHidden(): boolean {
+    return this.editor?.cursorHidden ?? false;
+  }
+
+  /** Does the editor own the keyboard right now (core-editor-focus-scope.md stage 3)? The binding's predicate —
+   *  the SAME one its key handler gates on. True before it binds: unclaimed focus counts as ours. */
+  private get hasKeyboard(): boolean {
+    return this.editor?.hasKeyboard ?? true;
+  }
+
+  /** A click on a note seeks playback to it. Which rendering owns subsequent
+   * spatial input — the click's other meaning in the combined score — is the
+   * binding's, because it is the session's projection. */
   private onNoteSelected = (
     event: CustomEvent<{ projection?: 'notation' | 'tab'; noteId?: string; ordinal?: number }>
   ) => {
@@ -1965,235 +1919,7 @@ export class ScenarioPage extends LitElement {
       const ordinal=event.detail.ordinal ?? chooseOrdinal(candidates,this.playback.ordinal,{explicitSeek:true,cycle:this.clickedPlaybackKey===key});
       this.clickedPlaybackKey=key;if(ordinal!==null)this.renderRoot.querySelector<Player>('mnx-player')?.seek(ordinal);
     }
-    const projection = event.detail.projection;
-    if (!this.session || !projection || projection === this.session.projection) return;
-    this.flushPendingFret();
-    if (this.session.handleIntent({ type: 'setProjection', projection })) {
-      this.syncFromSession();
-    }
   };
-
-  /** Keep the session's projection following the pane on screen: notation
-   *  pane → staff space, tab pane → fingerboard; the both view keeps its
-   *  last (tab by default on tab documents). Recorded as an intent so traces
-   *  replay navigation faithfully. */
-  private followProjection() {
-    const entry = this.entry();
-    if (!entry || !this.session) return;
-    const view = this.activeView(entry);
-    const desired =
-      view === 'tab' ? 'tab' : view === 'notation' ? 'notation' : null;
-    if (!desired || desired === this.session.projection) return;
-    if (desired === 'tab' && this.session.mode !== 'string') return;
-    this.session.handleIntent({ type: 'setProjection', projection: desired });
-  }
-
-  /**
-   * The pane-owned layer rule (survey §6.1, adopted in the roadmap doc):
-   * digits belong to the pane on screen — frets when a tab pane is visible.
-   * Bare arrows never mutate, so navigation is active on every score view.
-   */
-  private activeLayers(): KeymapLayer[] {
-    const entry = this.entry();
-    if (!entry || !this.session) return [];
-    const view = this.activeView(entry);
-    const layers: KeymapLayer[] = [];
-    if (entry.hasTab && (view === 'tab' || view === 'both')) layers.push(TAB_DIGIT_LAYER);
-    layers.push(NAVIGATION_LAYER, EDIT_LAYER);
-    return layers;
-  }
-
-  private commitResolvedFret(fret: number) {
-    if (!this.session) return;
-    this.session.handleIntent({ type: 'enterFret', fret });
-    this.cursorHidden = false;
-    this.copied = false;
-    this.syncFromSession();
-  }
-
-  private flushPendingFret(): boolean {
-    return this.tabDigits.flush();
-  }
-
-  /**
-   * Escape and Enter — the pending-gesture pair (`PENDING_PRECEDENCE` in
-   * keymap.ts, which states the contract). Escape abandons the innermost
-   * pending thing, Enter commits it, and they walk the same list in the same
-   * order so neither can drift from the other.
-   *
-   * Levels 1–2 (popovers, tray, palette) never arrive here: overlays own
-   * their keydown and `preventDefault()` before the page listener runs. This
-   * is levels 3–5, and it is the whole reason these are shell actions rather
-   * than intents — the fret resolver is the MOUNT's, the anchor is the
-   * SESSION's, and deselection is neither.
-   */
-  private handlePending(action: 'abandonPending' | 'commitPending') {
-    if (!this.session) return;
-    const commit = action === 'commitPending';
-    // 3. a half-typed fret. Enter ends the 500 ms window early rather than
-    //    making the player wait it out; Escape drops the digit, the one path
-    //    `TabDigitResolver.cancel()` has been waiting for a key to reach.
-    if (this.tabDigits.pending !== null) {
-      if (commit) this.flushPendingFret();
-      else this.tabDigits.cancel();
-      return;
-    }
-    // 4. nothing pending. (The armed spanner anchor that used to sit here
-    //    retired with the two-press gesture — core-selection-range-grain.md
-    //    decision 5, the user's call.) Escape deselects — view chrome,
-    //    deliberately not session history, so it is never recorded and never
-    //    replayed. Enter opens the rung inspector — LAST in the walk, so a
-    //    half-typed fret never opens one (the roadmap's agreement 1).
-    if (!commit) {
-      this.cursorHidden = true;
-      this.syncFromSession();
-    } else {
-      this.openInspector();
-    }
-  }
-
-  private onKeyDown = (event: KeyboardEvent) => {
-    // Tab moves focus with no pointer event, so a keydown is also a
-    // focus-change cause — re-ask after it settles.
-    if (event.code === 'Tab') this.onFocusChange();
-    // Scope (core-editor-focus-scope.md): the editor's keys are ours while
-    // focus is inside this page (or unclaimed — nothing focused yet). The
-    // listener is still window-scoped because the mount lives in
-    // `workbench/`; the promotion moves it onto the host element and this
-    // test becomes structural.
-    if (!keyIsOurs(event, this)) return;
-    const layers = this.activeLayers();
-    const keyAction = this.session && layers.length > 0
-      ? resolveKeyAction(strokeOf(event), layers)
-      : null;
-    if (keyAction?.type === 'tabDigit') {
-      if (!this.session) return;
-      event.preventDefault();
-      if (this.session.projection !== 'tab' && this.session.mode === 'string') {
-        this.session.handleIntent({ type: 'setProjection', projection: 'tab' });
-      } else {
-        this.followProjection();
-      }
-      this.cursorHidden = false;
-      this.copied = false;
-      this.tabDigits.push(keyAction.digit);
-      return;
-    }
-    if (this.session && layers.length > 0) {
-      const action = resolveShellAction(strokeOf(event));
-      // The pending pair is excluded from the blanket flush: abandoning a
-      // half-typed fret is the whole point of Escape, and flushing here would
-      // commit it before Escape ever ran. Enter flushes too, but as its OWN
-      // act (`handlePending` below), not as a side effect of arriving.
-      const pending = action === 'abandonPending' || action === 'commitPending';
-      if ((action || keyAction) && !pending) this.flushPendingFret();
-      if (pending && action) {
-        event.preventDefault();
-        this.handlePending(action);
-        return;
-      }
-      // The clipboard verbs (stage 6): resolved here because the store I/O is
-      // the mount's — the session only ever sees the materialized plan. The
-      // focus gate above is the whole scope story; text fields never reach
-      // this point, so native copy/paste inside inputs is untouched.
-      if (action === 'copySelection' || action === 'cutSelection' || action === 'pasteSelection') {
-        if (!this.selectionClipboard) return;
-        // Innermost open thing first (the Escape doctrine, applied to copy):
-        // a live TEXT selection means the user is addressing the prose, not
-        // the score — unclaimed focus counts as ours, so without this test a
-        // mouse-selected paragraph would Ctrl+C the score instead.
-        const text = window.getSelection();
-        if (action !== 'pasteSelection' && text && !text.isCollapsed) return;
-        event.preventDefault();
-        if (action === 'copySelection') void this.copyCurrentSelection();
-        else if (action === 'cutSelection') void this.cutCurrentSelection();
-        else void this.pasteCurrentSelection();
-        return;
-      }
-      if (action === 'lyricTextEditor') {
-        event.preventDefault();
-        this.openLyricEditor();
-        return;
-      }
-    }
-    let intent: EditorIntent | null = keyAction;
-    if (!intent || !this.session) return;
-    event.preventDefault();
-    this.followProjection();
-    // The ladder does not end at the document (the navigation map's score
-    // row): at the top rung the vertical neighbour is the next SCORE, which
-    // the session cannot know and the element must not assume. The workbench
-    // binds it to the rail; studio will bind the same gesture to its own
-    // collection. Handled here rather than as an intent because it leaves the
-    // document entirely — there is nothing for a trace to replay.
-    if (
-      (intent.type === 'lineUp' || intent.type === 'lineDown') &&
-      this.session.selectionLevel === 'document' &&
-      !this.cursorHidden
-    ) {
-      this.escalateToRail(intent.type === 'lineDown' ? 1 : -1);
-      return;
-    }
-    // The system rungs, resolved HERE and dispatched as `goToMeasure` — the
-    // stage-1 pattern: this layer already owns environment-dependent
-    // interpretation, and it emits the RESOLVED intent so the session stays
-    // deterministic and the trace records a bar, never a paint. `src/edit` may
-    // import only `src/model`, so where the renderer wrapped the score is a
-    // fact it structurally cannot see.
-    // The absolute rung keys land in the SAME funnel as the chip's ▲▼, the
-    // HUD's rows and the tray's ladder — `walkToLevel` — so a refusal flashes
-    // identically however the rung was asked for.
-    if (intent.type === 'goToLevel') {
-      this.walkToLevel(intent.level);
-      return;
-    }
-    const systemStep = this.resolveSystemStep(intent);
-    if (systemStep !== undefined) {
-      if (systemStep === null) return; // no neighbouring system — the arrow dies here
-      intent = systemStep;
-    }
-    this.session.handleIntent(intent);
-    // Every intent re-shows the cursor. Widening past the top used to fall
-    // through to deselect here, because Escape was the widen key and had to
-    // keep its universal meaning somehow; deselect is Escape's outright now
-    // (`handlePending`), so relaxing is just navigation like the rest and the
-    // top rung is simply where it stops (core-rung-addressing.md).
-    this.cursorHidden = false;
-    // Delete is the one verb whose two presses mean different things, so it
-    // says which one this was — including when it declined. Everything else
-    // that returns false is a navigation edge, where silence is the right
-    // answer (core-delete-clears-then-removes.md).
-    const deleted = intent.type === 'delete' ? this.session.lastDelete : null;
-    if (deleted) this.showClipboardNotice(deleteSelectionNotice(deleted));
-    this.copied = false;
-    this.syncFromSession();
-  };
-
-  /**
-   * The two rungs whose vertical arrow means "the neighbouring SYSTEM": bare
-   * ↑↓ at the measure rung, and the Ctrl climb from part-measure (whose own
-   * ↑↓ is the staff step, so the climb lands one rung further up).
-   *
-   * Returns the resolved `goToMeasure` intent, `null` when there is no
-   * neighbouring system to move to, or `undefined` when this stroke is not a
-   * system step at all — three answers, because "not mine" and "mine, but
-   * nowhere to go" have to act differently at the call site.
-   */
-  private resolveSystemStep(intent: EditorIntent): EditorIntent | null | undefined {
-    const session = this.session;
-    if (!session || this.cursorHidden) return undefined;
-    const level = session.selectionLevel;
-    const vertical =
-      (level === 'measure' && (intent.type === 'lineUp' || intent.type === 'lineDown')) ||
-      (level === 'partMeasure' && (intent.type === 'jumpUp' || intent.type === 'jumpDown'));
-    if (!vertical) return undefined;
-
-    const rows = this.renderRoot?.querySelector<DocumentViewer>('mnx-document-viewer')?.systemRows();
-    if (!rows || rows.length === 0) return null; // nothing painted yet
-    const delta = intent.type === 'lineDown' || intent.type === 'jumpDown' ? 1 : -1;
-    const target = neighbourSystemMeasure(rows, session.cursor.measureIndex, delta);
-    return target === null ? null : { type: 'goToMeasure', measureIndex: target };
-  }
 
   /**
    * The score rung's vertical neighbour: the prev/next scenario in the RAIL's
@@ -2215,73 +1941,24 @@ export class ScenarioPage extends LitElement {
     location.hash = scenarioHref(next.id);
   }
 
-
   /** Palette items act on the editor through the same funnels as keys: the
    *  intent channel feeds the session (recorded in traces), the action
-   *  channel drives page chrome (popovers, copy trace, revert). */
+   *  channel drives page chrome (copy trace, revert, the lyric editor). */
   private onPaletteIntent = (event: Event) => {
     // The palette took over (a global command ran from go-to's `>` list):
     // two overlays wanting the same keys is one too many.
-    this.inspectorOpen = false;
+    this.editor?.closeSurfaces();
     this.stripIntent((event as CustomEvent<EditorIntent>).detail);
   };
 
   private onPaletteAction = (event: Event) => {
-    this.flushPendingFret();
     const action = (event as CustomEvent<string>).detail;
     if (action === 'copyTrace') void this.copyTrace();
     else if (action === 'revert') this.revertEdits();
-    else if (action === 'lyricTextEditor') this.openLyricEditor();
+    else if (action === 'lyricTextEditor') this.editor?.openLyrics();
   };
 
-  // ── The lyric text editor's mount (one-surface item 6, phase 2) ──────────
-
-  /** One door for Shift+L and the palette row. A drawer under the score: the
-   *  tray and inspector close first — two overlays wanting the keyboard is
-   *  one too many. */
-  private openLyricEditor() {
-    if (!this.session || this.loadState !== 'ready') return;
-    this.flushPendingFret();
-    this.inspectorOpen = false;
-    this.lyricEditorOpen = true;
-  }
-
-  private onLyricEditorClose = () => {
-    this.lyricEditorOpen = false;
-    this.lyricPreviewKeys = [];
-    this.lyricPreviewDoc = null;
-    this.syncFromSession();
-    this.renderRoot.querySelector<HTMLElement>('mnx-document-viewer')?.focus();
-  };
-
-  /** The drawer's clean parses render live: apply the diff to a scratch copy
-   *  through the very ops the session would use, and let the viewer draw it.
-   *  An empty diff clears the scratch — the committed document IS the
-   *  preview then, and holding a stale copy would hide real edits. */
-  private onLyricEditorEdits = (event: Event) => {
-    if (!this.session || !this.doc) return;
-    const { edits } = (event as CustomEvent<{ edits: LyricPlanEdit[] }>).detail;
-    this.lyricPreviewDoc = edits.length === 0
-      ? null
-      : { ...this.doc, mnxJson: lyricPlanOps(edits).reduce(applyOp, this.session.doc) };
-  };
-
-  /** The buffer's diff lands as ONE intent through the same funnel as keys —
-   *  the trace records the syllables, never the keystrokes. */
-  private onLyricEditorApply = (event: Event) => {
-    const { edits } = (event as CustomEvent<{ edits: LyricPlanEdit[] }>).detail;
-    this.stripIntent({ type: 'applyLyricPlan', edits });
-    this.onLyricEditorClose();
-  };
-
-  /** Caret → notehead, over the selection context's preview channel: costs
-   *  the session nothing, and closing has nothing to undo. */
-  private onLyricEditorPreview = (event: Event) => {
-    this.lyricPreviewKeys = (event as CustomEvent<{ noteKeys: string[] }>).detail.noteKeys;
-    this.syncFromSession();
-  };
-
-  // ── The selection command tray's mount ─────────────────────────────────────
+  // ── The rung chip's anchor ─────────────────────────────────────────────────
 
   /** The viewer's enclosure rect (viewport coords) → `.main` coords. */
   private mainHeight = 0;
@@ -2304,60 +1981,29 @@ export class ScenarioPage extends LitElement {
     };
   };
 
-  /** Enter's door (handlePending, level 5). The inspector follows the pane
-   *  and takes its side once, exactly as the tray does — it is the tray's
-   *  sibling and hangs off the same anchor. */
-  private openInspector() {
-    if (!this.session || !this.hasKeyboard || this.loadState !== 'ready') return;
-    if (this.cursorHidden) return;
-    this.flushPendingFret();
-    this.followProjection();
-    this.inspectorError = null;
-    this.inspectorMirrored = this.trayAnchor ? this.mirrorAt(this.trayAnchor) : false;
-    this.inspectorOpen = true;
-    this.syncFromSession();
+  // ── The inspector's one workbench word ─────────────────────────────────────
+
+  /** `iteration` addresses the PASS MODEL, not the document — inspection is a
+   *  preference of this page — so it is the host's word, offered to the
+   *  binding's inspector beside the editor's own. */
+  private withIterationWord(view: InspectorView): InspectorView {
+    if (!this.session || !this.passModel || !hasRepeatStructure(this.session.doc)) return view;
+    const iterations = [...new Set(this.passModel.availableIterations.flat())];
+    return { ...view, words: [...view.words, { word: 'iteration', hint: 'inspection iteration (does not seek)', values: iterations.map(String) }] };
   }
 
-  private closeInspector() {
-    this.inspectorOpen = false;
-    this.inspectorError = null;
-    this.renderRoot.querySelector<HTMLElement>('mnx-document-viewer')?.focus();
-  }
-
-  /** The inspector's line, applied: parse, fire, and either clear the error
-   *  or say why not. A refusal by the session (a time signature that does
-   *  not fit, a key nothing declared) is said too — the keystroke must not
-   *  read as broken. */
-  private applyInspectorLine(word: string | null, text: string, key?: string) {
-    if (!this.session) return;
+  /** Undefined: not this page's line. Null: taken. Otherwise the sentence that says why not. */
+  private applyIterationLine(word: string | null, text: string): string | null | undefined {
     const command = word === 'iteration' ? `iteration ${text}` : text.trim();
-    if (/^iteration\b/i.test(command)) {
-      const match = /^iteration\s+([1-9]\d*)$/i.exec(command);
-      const iteration = match ? Number(match[1]) : NaN;
-      if (!hasRepeatStructure(this.session.doc) || !Number.isSafeInteger(iteration)
-          || !this.passModel?.availableIterations.some(available => available.includes(iteration))) {
-        this.inspectorError = 'Use iteration N with an iteration declared in this document.';
-        return;
-      }
-      this.chooseInspection(iteration);
-      this.inspectorError = null;
-      return;
+    if (!/^iteration\b/i.test(command)) return undefined;
+    const match = /^iteration\s+([1-9]\d*)$/i.exec(command);
+    const iteration = match ? Number(match[1]) : NaN;
+    if (!this.session || !hasRepeatStructure(this.session.doc) || !Number.isSafeInteger(iteration)
+        || !this.passModel?.availableIterations.some(available => available.includes(iteration))) {
+      return 'Use iteration N with an iteration declared in this document.';
     }
-    const parsed = inspectorLineIntent(this.session, word, text, key);
-    if ('error' in parsed) {
-      this.inspectorError = parsed.error;
-      return;
-    }
-    this.fireFromInspector(parsed.intent);
-  }
-
-  private fireFromInspector(intent: EditorIntent) {
-    if (!this.session) return;
-    this.flushPendingFret();
-    this.cursorHidden = false;
-    this.inspectorError = fireFromInspector(this.session, intent) ? null : INSPECTOR_REFUSAL;
-    this.copied = false;
-    this.syncFromSession();
+    this.chooseInspection(iteration);
+    return null;
   }
 
   /**
@@ -2458,7 +2104,7 @@ export class ScenarioPage extends LitElement {
         class="chip-word"
         title="inspect this rung (Enter)"
         aria-live="polite"
-        @click=${() => this.openInspector()}
+        @click=${() => this.editor?.openInspector()}
       >
         ${ROW_BY_LEVEL[this.chipLevel]}
       </button>
@@ -2491,53 +2137,6 @@ export class ScenarioPage extends LitElement {
         @click=${() => this.setPlayback(followPlayback(this.playback))}>Follow</button>`;
   }
 
-  private inspectorOverlay(entry: ScenarioEntry) {
-    if (!this.session) return nothing;
-    const view = buildInspectorView(entry.meta.title, this.session, this.cursorHidden);
-    if (hasRepeatStructure(this.session.doc) && this.passModel) {
-      const iterations = [...new Set(this.passModel.availableIterations.flat())];
-      view.words = [...view.words, { word: 'iteration', hint: 'inspection iteration (does not seek)', values: iterations.map(String) }];
-    }
-    return html`
-      <mnx-rung-inspector
-        .crumbs=${view.crumbs}
-        .pills=${view.pills}
-        .words=${view.words}
-        .secondary=${view.secondary}
-        .note=${view.note}
-        .error=${this.inspectorError}
-        .anchor=${this.trayAnchor}
-        ?mirrored=${this.inspectorMirrored}
-        @inspector-level=${(e: CustomEvent<{ direction: 'relax' | 'tighten' }>) => {
-          this.fireFromInspector({
-            type: e.detail.direction === 'relax' ? 'relaxSelection' : 'tightenSelection'
-          });
-        }}
-        @inspector-step=${(e: CustomEvent<{ direction: 'previous' | 'next' }>) => {
-          this.fireFromInspector({ type: e.detail.direction === 'next' ? 'nextPosition' : 'prevPosition' });
-        }}
-        @inspector-extend=${(e: CustomEvent<{ direction: 'previous' | 'next' }>) => {
-          this.fireFromInspector({ type: 'extendSelection', direction: e.detail.direction });
-        }}
-        @inspector-goto=${(e: CustomEvent<{ intent: EditorIntent }>) => {
-          this.fireFromInspector(e.detail.intent);
-        }}
-        @inspector-apply=${(e: CustomEvent<{ word: string | null; key?: string; text: string }>) => {
-          this.applyInspectorLine(e.detail.word, e.detail.text, e.detail.key);
-        }}
-        @inspector-remove=${(e: CustomEvent<{ key: string; intent: EditorIntent }>) => {
-          this.fireFromInspector(e.detail.intent);
-        }}
-        @inspector-widen=${() => {
-          // `/` used to widen to the tray; the tray is gone (one-surface
-          // 11b) and every verb has its key, so widening now has nowhere
-          // truer to go than staying put.
-        }}
-        @inspector-close=${() => this.closeInspector()}
-      ></mnx-rung-inspector>
-    `;
-  }
-
   /** A HUD row click moves the selection to that row's level by walking
    *  relax/tighten intents — clicks go through the same funnel as keys, so
    *  traces replay them. Bounded: every step must actually move (the
@@ -2557,9 +2156,7 @@ export class ScenarioPage extends LitElement {
    * the trace as the one ladder move they are.
    */
   private walkToLevel(target: SelectionLevel | undefined) {
-    if (!this.session || !target) return;
-    this.flushPendingFret();
-    this.cursorHidden = false;
+    if (!target) return;
     // One intent, not a walk. The loop this replaced stepped relax/tighten
     // until a step failed to move, which PARKED on the nearest reachable rung
     // when the target was absent — tolerable while every caller was stepping
@@ -2567,9 +2164,9 @@ export class ScenarioPage extends LitElement {
     // session owns the presence rule now and refuses; a refusal flashes the
     // chip, because a dead key with no feedback is what teaches people a
     // shortcut cannot be trusted. The trace gets one jump per gesture.
-    if (!this.session.handleIntent({ type: 'goToLevel', level: target })) this.flashRungRefusal();
-    this.copied = false;
-    this.syncFromSession();
+    // The binding reports the refusal (`onRefused`), which is where the flash is wired — so the digit keys,
+    // which never pass through here, flash identically.
+    this.editor?.handleIntent({ type: 'goToLevel', level: target });
   }
 
   /** A rung this document does not present, asked for by name. */
@@ -2589,24 +2186,19 @@ export class ScenarioPage extends LitElement {
   /** Button-driven intents go through the same funnel as keys, so they are
    *  recorded in the trace too — a recording must replay clicks as well. */
   private stripIntent(intent: EditorIntent) {
-    if (!this.session) return;
-    this.flushPendingFret();
-    this.cursorHidden = false;
-    this.session.handleIntent(intent);
-    this.copied = false;
-    this.syncFromSession();
+    this.editor?.handleIntent(intent);
   }
 
   private async copyTrace() {
     if (!this.session) return;
+    this.editor?.refresh(); // a half-typed fret belongs in the trace it is about to become
     await navigator.clipboard.writeText(JSON.stringify(this.session.trace(), null, 2) + '\n');
     this.copied = true;
   }
 
-  /** The clipboard surface: Ctrl/⌘+C/X/V and the tray's explicit actions,
-   *  both landing here. Every outcome — success or precise refusal — becomes
-   *  the transient notice; a refusal must be SAID, or the keystroke reads as
-   *  broken rather than conservative. */
+  /** What the binding's clipboard verbs and its delete did. Every outcome —
+   *  success or precise refusal — becomes the transient notice; a refusal must
+   *  be SAID, or the keystroke reads as broken rather than conservative. */
   private showClipboardNotice(notice: ClipboardNotice | null) {
     clearTimeout(this.clipboardNoticeTimer);
     this.clipboardNotice = notice;
@@ -2615,32 +2207,6 @@ export class ScenarioPage extends LitElement {
         this.clipboardNotice = null;
       }, 5000);
     }
-  }
-
-  private async copyCurrentSelection() {
-    if (!this.session || !this.selectionClipboard) return;
-    const result = await copySelectionToStore(this.session, this.selectionClipboard);
-    this.showClipboardNotice(copySelectionNotice(result));
-  }
-
-  private async pasteCurrentSelection() {
-    if (!this.session || !this.selectionClipboard) return;
-    const result = await pasteSelectionFromStore(this.session, this.selectionClipboard);
-    this.showClipboardNotice(pasteSelectionNotice(result));
-    if (!result.ok) return;
-    this.cursorHidden = false;
-    this.copied = false;
-    this.syncFromSession();
-  }
-
-  private async cutCurrentSelection() {
-    if (!this.session || !this.selectionClipboard) return;
-    const result = await cutSelectionToStore(this.session, this.selectionClipboard);
-    this.showClipboardNotice(cutSelectionNotice(result));
-    if (!result.ok) return;
-    this.cursorHidden = false;
-    this.copied = false;
-    this.syncFromSession();
   }
 
   /** The id is the thing you paste into a `/verify` sentence or a commit
@@ -2652,9 +2218,7 @@ export class ScenarioPage extends LitElement {
 
   private revertEdits() {
     if (!this.session) return;
-    this.session = new EditorSession(this.session.initial, this.scenarioId);
-    this.copied = false;
-    this.syncFromSession();
+    this.adoptSession(new EditorSession(this.session.initial, this.scenarioId));
   }
 
   // Tab/both exist only when the strings are KNOWN — declared by the document
@@ -2757,7 +2321,7 @@ export class ScenarioPage extends LitElement {
     // — the committed one is untouched underneath and returns on close. The
     // wrapper's identity is stable per diff (see lyricPreviewDoc), so the
     // viewer relayouts only when the preview actually changes.
-    const shownDoc = (this.lyricEditorOpen && this.lyricPreviewDoc) || this.doc;
+    const shownDoc = this.lyricPreviewDoc ?? this.doc;
     return html`
       <mnx-document-viewer
         .lyrics=${this.displayPreferences.lyrics}
@@ -2775,8 +2339,6 @@ export class ScenarioPage extends LitElement {
         .densityH=${this.densityH}
         .spacingMode=${this.spacingMode}
         .partTabSetups=${this.partTabSetups()}
-        .selection=${this.selection}
-        .selectionInactive=${!this.hasKeyboard}
         @note-selected=${this.onNoteSelected}
         @selection-anchored=${this.onSelectionAnchored}
         @render-scale=${this.onRenderScale}
@@ -2901,25 +2463,12 @@ export class ScenarioPage extends LitElement {
               .documentId=${this.scenarioId} .initialOrdinal=${this.routeSeekConsumed?null:this.at}
               @seek=${()=>{this.routeSeekConsumed=true;}}></mnx-player>
           </mnx-score-frame>
-          ${this.inspectorOpen && this.session ? this.inspectorOverlay(entry) : nothing}
           ${this.modelPickerOpen
             ? html`<mnx-model-picker
                 .currentModel=${this.assistModel}
                 @picker-close=${() => (this.modelPickerOpen = false)}
                 @model-pick=${this.onModelPick}
               ></mnx-model-picker>`
-            : nothing}
-          ${this.lyricEditorOpen && this.session
-            ? html`<mnx-lyric-text-editor
-                .doc=${this.session.doc}
-                .partIndex=${this.session.cursor.partIndex ?? 0}
-                .partLabel=${this.session.doc.parts?.[this.session.cursor.partIndex ?? 0]?.name ?? ''}
-                .focusNoteKey=${this.session.selectedNoteKeys[0] ?? ''}
-                @lyric-editor-close=${this.onLyricEditorClose}
-                @lyric-editor-apply=${this.onLyricEditorApply}
-                @lyric-editor-preview=${this.onLyricEditorPreview}
-                @lyric-editor-edits=${this.onLyricEditorEdits}
-              ></mnx-lyric-text-editor>`
             : nothing}
           ${this.clipboardNotice
             ? html`<div
@@ -3593,10 +3142,7 @@ export class ScenarioPage extends LitElement {
    *  queue becomes the construct sequence, undoable back to genesis. The
    *  committed corpus file is untouched (edits are in-memory by rule). */
   private replayConstructTrace(trace: ConstructTrace) {
-    this.session = replayIntents({} as MnxStructure, trace.intents);
-    this.cursorHidden = false;
-    this.copied = false;
-    this.syncFromSession();
+    this.adoptSession(replayIntents({} as MnxStructure, trace.intents));
   }
 
   /** Run the destruct walk on THIS session (the construct mirror: no
@@ -3607,30 +3153,28 @@ export class ScenarioPage extends LitElement {
    *  sweep. */
   private runDestructSweep() {
     if (!this.session) return;
-    this.flushPendingFret();
+    this.editor?.refresh(); // end the fret window first
     const result = runDestructWalk(this.session);
     if (result.unaddressed.length > 0) {
       // A campaign finding, not a silent skip — v0 surfaces it to the console
       // (the harness asserts it; the panel stays a viewer).
       console.warn('destruct sweep: unaddressable elements', result.unaddressed);
     }
-    this.cursorHidden = false;
-    this.copied = false;
-    this.syncFromSession();
+    this.editor?.sessionMoved();
   }
 
   /** Undo/redo until the applied queue holds `target` ops — through
    *  handleIntent, so panel clicks are recorded like keys. */
   private jumpToOp(target: number) {
     if (!this.session) return;
-    this.flushPendingFret();
+    this.editor?.refresh(); // end the fret window first
     for (let guard = 0; this.session.opQueue.applied.length > target && this.session.canUndo && guard < 128; guard++) {
       this.session.handleIntent({ type: 'undo' });
     }
     for (let guard = 0; this.session.opQueue.applied.length < target && this.session.canRedo && guard < 128; guard++) {
       this.session.handleIntent({ type: 'redo' });
     }
-    this.syncFromSession();
+    this.editor?.sessionMoved();
   }
 
   /** Selection level → the JSON pointer whose span is worth showing.

@@ -18,7 +18,7 @@
 | 4 | Sync re-derivation, shape stamp | built (`f2de86f1`); **two hands-on checks owed by the owner** | [studio-sync-rederive](studio-sync-rederive.md) |
 | 5 | Delete, versions, revert, defect reports | complete (`7ddd02d5`); **migration 0005 before deploy** | [studio-piece-lifecycle](../complete/studio-piece-lifecycle.md) |
 | 6 | sync.json interchange | not started, optional — wait for a second consumer | (index row only) |
-| 7 | Editor promotion | slices 1–3 built for studio (`a394e7bc`, `7b38b743`); **the workbench's adoption is left** | [core-editor-element-promotion](core-editor-element-promotion.md) |
+| 7 | Editor promotion | complete — slices 1–3 (`a394e7bc`, `7b38b743`), then the workbench's adoption of the binding | [core-editor-element-promotion](core-editor-element-promotion.md) |
 | 8 | Touch entry | not started — needs design first | (index row only) |
 
 All of it is on `main` and pushed. **None of it is deployed.**
@@ -61,42 +61,14 @@ Best done on a piece made with `#/new`, which is the first time the priority flo
 walked end to end. When the owner reports both, move that doc (and
 [studio-sync-bar](studio-sync-bar.md), if its own status agrees) to `complete/`.
 
-### 3. Item 7's last work-list item: the workbench adopts `bindEditor`
+### 3. ~~Item 7's last work-list item: the workbench adopts `bindEditor`~~ — done
 
-Scoped in [core-editor-element-promotion](core-editor-element-promotion.md) → *What is left:
-work-list item 5*. The short version: everything that *can* be shared between the two mounts
-already is (`src/elements/editorSelection.ts`, `keyScope.ts`, `RungInspector.ts`,
-`inspectorRows.ts`, `hudRows.ts`, `overlayPlacement.ts`, `LyricTextEditor.ts`,
-`inspectorMount.ts`). What remains in `src/workbench/ScenarioPage.ts` is genuinely the
-workbench's, and the page touches `this.session` in about a hundred places. The binding needs
-three things before the page can sit on it:
-
-1. **Replace the session.** `revertEdits()`, `replayConstructTrace()` and the scenario load
-   each build a *new* `EditorSession` (the last two from `{}` or with a `level` option). The
-   binding constructs exactly one, in `bindEditor`. Either a `reset(document, options)` on the
-   binding, or dispose-and-rebind — the second is simpler and the page already survives it.
-2. **A document-rung escalation hook.** ↑/↓ at the `document` rung means *the neighbouring
-   document*, which is the host's collection: the workbench walks the corpus rail
-   (`escalateToRail`, carrying the rung across via the session's `level` option); studio would
-   walk the library. Today the binding simply returns on those keys — search `editorHost.ts`
-   for "neighbouring DOCUMENT".
-3. **A host-owned preview channel.** The binding owns `preview` for the lyric caret; the
-   workbench also lights a footprint for the inspector's iteration word and used to for the
-   tray. Let the host pass one in, merged with the binding's own.
-
-Also the workbench's and staying put: the HUD and the ops panel (they *read* the session —
-expose it, which the binding already does), the `iteration` inspector word (pass-model
-inspection; see `applyInspectorLine`), playback seek on `note-selected`, the command palette's
-intents (call `binding.handleIntent`), and its window-scoped listener's leniency for
-*unclaimed* focus — a workbench user who has clicked nothing still types at the score. The
-binding's listener is on the host element; decide deliberately whether the workbench keeps a
-window fallback or focuses the viewer on load.
-
-**The net:** `node harness/verify/inspector-smoke.mjs`, `focus-mode-smoke.mjs`,
-`selection-smoke.mjs`, and `performance-review.mjs && player-workbench-smoke.mjs` (after
-`npm run build`; they serve `dist/` themselves and need no Worker). The conformance suites
-`edit-traces`, `construct-traces`, `destruct-sweep`, `keymap-docs` and `rung-inspector` cover
-the logic underneath and are in `npm test`.
+Both shells sit on the one binding now; what was built and why is in
+[core-editor-element-promotion](core-editor-element-promotion.md) → *Work-list item 5*
+and campaign log entry 10. `npm run smoke:workbench-editor` is the net for the workbench's
+side of the seam (revert, replay, the sweep, the rail); run it with `smoke:inspector`,
+`smoke:focus`, `smoke:selection`, `smoke:player` **and `smoke:studio-editor`** after touching
+`src/elements/editorHost.ts` — the binding is under both shells.
 
 > **`smoke:selection` is already red on `main`** — two reveal-scroll checks (*the selection is
 > off screen at the first/last bar*: a 218 px selection in a 191 px viewport). Verified on a
@@ -195,7 +167,8 @@ LIBRARY_LOCAL_ORIGIN=http://127.0.0.1:8795 node harness/verify/studio-editor-smo
 
 Need the local Worker: `piece-create`, `save-pipeline`, `piece-lifecycle`, `studio-editor`,
 `studio`, `library`. Serve `dist/` themselves, no Worker: `sync-bar`, `sync-rederive`,
-`inspector`, `focus-mode`, `selection`, `player-workbench` (after `performance-review.mjs`).
+`inspector`, `focus-mode`, `selection`, `workbench-editor`, `player-workbench` (after
+`performance-review.mjs`).
 Port 8791 may be another agent's — check with `ss -ltn` first. Screenshots land in `/tmp/mnx-*.png`;
 look at them — three real bugs in this campaign were only visible there.
 
