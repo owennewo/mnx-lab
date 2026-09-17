@@ -49,16 +49,20 @@ export interface GpifExportOptions {
   /** Collapse a note written in two voices at one fingerboard position down to
    *  a single note (default true) — see `exportPlan.planUnisonCollapse`. */
   collapseTabUnisons?: boolean;
+  /** Deflate the score inside the container, as Guitar Pro does (default false:
+   *  stored, the form the parity tests and fixtures were proven against). */
+  compress?: boolean;
 }
 
 /**
  * The options for writing a file that will be READ BACK as the document —
  * studio's stored `.gp` — rather than handed to a person. The defaults favour a
- * tidy Guitar Pro score; these favour getting the same MNX out again. Today that
- * is one switch: a unison collapsed across two voices re-imports as a rest in
- * the second voice (harness/fixtures/roundtrip-register.json is the evidence).
+ * tidy Guitar Pro score; these favour getting the same MNX out again, in a file
+ * small enough to save every half minute. A unison collapsed across two voices
+ * re-imports as a rest in the second voice (harness/fixtures/roundtrip-register.json
+ * is the evidence); and stored, not deflated, an 82-bar score is 520 KB.
  */
-export const STORAGE_EXPORT_OPTIONS: Readonly<GpifExportOptions> = { collapseTabUnisons: false };
+export const STORAGE_EXPORT_OPTIONS: Readonly<GpifExportOptions> = { collapseTabUnisons: false, compress: true };
 
 /** General MIDI program 25 — Acoustic Guitar (steel). */
 const DEFAULT_MIDI_PROGRAM = 25;
@@ -238,7 +242,7 @@ export function exportGuitarProGpif(
   mnx: MnxStructure,
   options: GpifExportOptions = {}
 ): Uint8Array {
-  return writeGpContainer(mnxToGpifXml(mnx, options));
+  return writeGpContainer(mnxToGpifXml(mnx, options), { compress: options.compress });
 }
 
 /** The GPIF XML alone — exposed for tests and debugging. */

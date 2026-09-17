@@ -90,6 +90,16 @@ promotion in three slices. **A saved edit is a new `.gp` rendition that takes th
 pointer** — Guitar Pro stays the stored format even for studio's own edits, so no MNX
 migration ever runs on stored data, and every save is checked for what the round trip lost.
 
+**The piece page edits and saves** (since 2026-09-17,
+[studio-save-pipeline](../../roadmap/inprogress/studio-save-pipeline.md)). Its first editor
+is the Details sheet — the document's own metadata, through a `setWork` op and an
+`EditHistory` — and nobody is asked to save: `src/storage/saveSession.ts` keeps the live
+document in a local IndexedDB recovery record while edits are unsaved, checkpoints after a
+pause, and measures the Guitar Pro round trip in a worker every time. The chip beside the
+title says what is at risk, then how fresh the last save is; the Save sheet says what a save
+could not keep, names a version, and settles a conflict with another device by keeping this
+one's work as a copy. One tab per piece edits (a Web Lock); a second one reads.
+
 ## Assist credentials — still a promotion waiting
 
 Studio will want the workbench's BYOK flow (core-assist-byok.md). `src/assist/openrouter.ts`

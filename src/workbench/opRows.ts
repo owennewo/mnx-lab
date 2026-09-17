@@ -245,6 +245,8 @@ function opLabel(op: EditOp): string {
       return `remove score ${op.index + 1}`;
     case 'removeMultimeasureRest':
       return `remove multimeasure rest ${op.index + 1} (score ${op.scoreIndex + 1})`;
+    case 'setWork':
+      return `work · ${Object.entries(op.work).map(([field, value]) => (value === null || value === '' ? `no ${field}` : field === 'creators' ? 'creators' : `${field} “${value}”`)).join(' · ')}`;
     case 'setPartDeclaration':
       return `part ${op.declaration.kind} ${op.declaration.value}`;
     case 'removePartDeclaration':

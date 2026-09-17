@@ -1,4 +1,6 @@
 import { MAX_AUDIO_BYTES, AUDIO_FORMATS } from '../model/recordingAttachment.ts';
+import type { RoundTripCheck } from '../model/documentCompare.ts';
+export type { RoundTripCheck } from '../model/documentCompare.ts';
 // Optional same-origin library access. No credentials or private documents are persisted.
 export interface LibraryPiece { id: string; revision: number; title: string | null; artist: string | null; favourite: boolean; opened_at: string | null; chips: { dimension: string; value: string }[] }
 export interface LibraryFacet { dimension: string; value: string; pieces: number }
@@ -14,6 +16,9 @@ export interface LibraryRecording {
   mime: string | null; duration_s: number | null; external_id: string | null; syncpoints: string | null;
 }
 export interface LibrarySnapshot { piece: { id: string; revision: number; canonical_rendition_id?: string | null }; tags: ShownTag[]; recordings: LibraryRecording[] }
+/** A `.gp` Studio wrote, with what produced it. */
+export interface StudioScoreFile { filename: string; bytes: Uint8Array; producerVersion: string | null; producerOptions: Record<string, unknown> | null }
+export interface Checkpoint { expectedRevision: number; derivedFrom: string; file: StudioScoreFile; derivedTags: { dimension: string; value: string }[]; check: RoundTripCheck; name?: string | null }
 export interface CanonicalFile { bytes: ArrayBuffer; format: string; filename: string; revision: number; renditionId?: string }
 export class LibraryRequestError extends Error {
   constructor(readonly status: number, message?: string) { super(message ?? (status === 401 ? 'Sign in to load your library.' : status === 403 ? 'This account is not permitted. Contact the operator.' : status === 409 ? 'This piece has no canonical file to open.' : 'The library is unavailable. You can still open local files.')); }
@@ -45,13 +50,25 @@ export class LibraryClient {
   }
   me() { return this.get<{ user: { id: string; email: string } }>('/me'); }
   facets(tags: string[]) { const q = new URLSearchParams(); tags.forEach(t => q.append('tag', t)); return this.get<{ total: number; facets: LibraryFacet[] }>(`/facets?${q}`); }
-  /** A piece made in Studio: the exported `.gp` and the tags read off the document
-   *  it came from. The service names the piece; the snapshot says what it chose. */
-  async createPiece(file: { filename: string; bytes: Uint8Array; producerVersion: string | null; producerOptions: Record<string, unknown> | null }, derivedTags: { dimension: string; value: string }[]) {
+  private async scoreBody(file: StudioScoreFile, derivedTags: { dimension: string; value: string }[]) {
     const sha256 = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', file.bytes as BufferSource)), b => b.toString(16).padStart(2, '0')).join('');
     let binary = ''; for (let i = 0; i < file.bytes.length; i += 0x8000) binary += String.fromCharCode(...file.bytes.subarray(i, i + 0x8000));
-    return this.recordingRequest<{ snapshot: LibrarySnapshot }>('/pieces', 'POST', { rendition: { filename: file.filename, sha256, content: btoa(binary),
-      producer_version: file.producerVersion, producer_options: file.producerOptions }, derived_tags: derivedTags });
+    return { sha256, body: { rendition: { filename: file.filename, sha256, content: btoa(binary), producer_version: file.producerVersion, producer_options: file.producerOptions }, derived_tags: derivedTags } };
+  }
+  /** A piece made in Studio: the exported `.gp` and the tags read off the document
+   *  it came from. The service names the piece; the snapshot says what it chose. */
+  async createPiece(file: StudioScoreFile, derivedTags: { dimension: string; value: string }[]) {
+    return this.recordingRequest<{ snapshot: LibrarySnapshot }>('/pieces', 'POST', (await this.scoreBody(file, derivedTags)).body);
+  }
+  /** Save the owner's edit: a new `.gp` rendition, edited from `derivedFrom`, that
+   *  takes the canonical pointer. A 409 means the revision moved OR another
+   *  device's checkpoint got there first — read the piece again to tell which.
+   *  `unchanged` means these bytes were already canonical and nothing was stored. */
+  async saveCheckpoint(piece: string, checkpoint: Checkpoint) {
+    const { sha256, body } = await this.scoreBody(checkpoint.file, checkpoint.derivedTags);
+    const saved = await this.recordingRequest<{ snapshot: LibrarySnapshot; unchanged: boolean }>(`/pieces/${encodeURIComponent(piece)}/renditions`, 'POST',
+      { ...body, expected_revision: checkpoint.expectedRevision, derived_from: checkpoint.derivedFrom, check: checkpoint.check, name: checkpoint.name ?? null });
+    return { ...saved, sha256 };
   }
   opened(id: string) { return this.send<void>('POST', `/pieces/${encodeURIComponent(id)}/opened`, {}); }
   changeTags(id: string, revision: number, change: TagChange) { return this.send<{ snapshot: { piece: { id: string; revision: number; canonical_rendition_id?: string | null }; tags: ShownTag[] } }>('PATCH', `/pieces/${encodeURIComponent(id)}/tags`, { expected_revision: revision, ...change }); }

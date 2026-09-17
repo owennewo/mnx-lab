@@ -6,7 +6,8 @@ export interface Piece {
   revision: number; created_at: string; updated_at: string;
 }
 export interface Rendition {
-  id: string; piece_id: string; format: Format; role: 'original' | 'export' | 'derived';
+  /** `edit`: a checkpoint Studio saved — the owner's own work, `derived_from` the rendition it was edited from. */
+  id: string; piece_id: string; format: Format; role: 'original' | 'export' | 'derived' | 'edit';
   filename: string | null; sha256: string; r2_key: string; bytes: number;
   producer: string; producer_version: string | null; producer_options: string | null;
   provenance: string | null; derived_from: string | null; fetched_at: string | null;

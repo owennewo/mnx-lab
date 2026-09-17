@@ -144,14 +144,18 @@ library.post('/ingest', async c => {
   const pointer = existing?.piece.canonical_rendition_id ?? canonicalId;
   const rows = [...(existing?.renditions ?? []), ...renditions];
   const current = rows.find(r => r.id === pointer);
-  if (!isSoundsliceGp(current)) throw new LibraryError('conflict', 'A Soundslice piece keeps the Soundslice .gp as canonical');
+  // Once the owner has saved an edit in Studio the pointer is theirs, and so is
+  // the projection read off their document: a later ingest still adds what
+  // Soundslice exported, and moves neither.
+  const edited = current?.role === 'edit';
+  if (!edited && !isSoundsliceGp(current)) throw new LibraryError('conflict', 'A Soundslice piece keeps the Soundslice .gp as canonical');
   // A refetched Soundslice .gp is a newer copy of the same export, not a rival
   // choice: the pointer follows it forward while it still names an older
   // Soundslice .gp. Only forward — a replayed older cache never moves it back —
   // and never off a pointer the owner moved elsewhere (refused above).
   const offered = rows.find(r => r.id === canonicalId);
   const fetched = (value: string | null | undefined) => (value ? Date.parse(value) : NaN);
-  const follow = !!existing && offered !== undefined && offered.id !== pointer && isSoundsliceGp(offered)
+  const follow = !edited && !!existing && offered !== undefined && offered.id !== pointer && isSoundsliceGp(offered)
     && fetched(offered.fetched_at) > fetched(current?.fetched_at);
   const derived: DerivedTag[] | undefined = manifest.derived_tags === undefined ? undefined : array(manifest.derived_tags).map(value => {
     const t = object(value); return { dimension: text(t.dimension), value: text(t.value), source_ref: text(t.source_ref) };
@@ -162,7 +166,7 @@ library.post('/ingest', async c => {
     tags: array(manifest.tags).map(value => { const t = object(value);
       if (t.dimension !== 'list') invalid('Imported lists use the list dimension');
       return { dimension: 'list', value: text(t.value), source_ref: text(t.source_ref) };
-    }), ...(derived ? { derived_tags: derived } : {}) };
+    }), ...(derived && !edited ? { derived_tags: derived } : {}) };
   return c.json({ snapshot: await lib.writePiece(INGEST_OWNER, input) });
 });
 
@@ -220,9 +224,8 @@ library.post('/pieces/:id/opened', async c => {
 // file travels as base64. Nothing is converted or derived here (the Worker
 // holds no converter): `.gp` is the stored format and the reader converts
 // (roadmap: studio-campaign-authoring, studio-piece-create).
-library.post('/pieces', async c => {
-  const b = await boundedJson(c.req.raw, 2 * 1024 * 1024, 'A new piece');
-  if (Object.keys(b).some(k => !['rendition', 'derived_tags'].includes(k))) invalid('Unsupported field');
+/** The `.gp` Studio wrote and the tags it read off the document, as every Studio score write carries them. */
+function studioScore(b: Record<string, unknown>) {
   const r = object(b.rendition);
   if (Object.keys(r).some(k => !['filename', 'sha256', 'content', 'producer_version', 'producer_options'].includes(k))) invalid('Unsupported rendition field');
   const filename = text(r.filename);
@@ -242,6 +245,12 @@ library.post('/pieces', async c => {
     return { dimension: text(t.dimension), value: text(t.value), source_ref: `studio@${version ?? 'unversioned'}` };
   });
   if (!derived.some(t => t.dimension === 'title')) invalid('A piece needs a title');
+  return { filename, sha256, content, version, options, derived };
+}
+library.post('/pieces', async c => {
+  const b = await boundedJson(c.req.raw, 2 * 1024 * 1024, 'A new piece');
+  if (Object.keys(b).some(k => !['rendition', 'derived_tags'].includes(k))) invalid('Unsupported field');
+  const { filename, sha256, content, version, options, derived } = studioScore(b);
   const sourceId = crypto.randomUUID();
   const id = await pieceIdFor('studio', sourceId);
   const renditionId = `${id}-${sha256.slice(0, 16)}`;
@@ -251,6 +260,44 @@ library.post('/pieces', async c => {
       filename, content: content.buffer as ArrayBuffer, sha256 }],
     canonical: { mode: 'initialize', rendition_id: renditionId }, tags: [], derived_tags: derived });
   return c.json({ snapshot: { ...snapshot, tags: Library.shown(snapshot.tags, await lib.listAliases(owner)) } }, 201);
+});
+// A checkpoint: Studio saving the owner's edit. Another immutable `.gp` rendition,
+// `derived_from` the one it was edited from, taking the canonical pointer — so
+// the service keeps every version and the pointer names the current one. It is
+// refused unless it was edited from the CURRENT canonical (a checkpoint from
+// another device got there first) and the revision still stands; saving the
+// bytes already canonical stores nothing. What the round trip cost is the
+// browser's finding — the Worker holds no converter — and rides as provenance.
+library.post('/pieces/:id/renditions', async c => {
+  const b = await boundedJson(c.req.raw, 2 * 1024 * 1024, 'A checkpoint');
+  if (Object.keys(b).some(k => !['expected_revision', 'derived_from', 'rendition', 'derived_tags', 'name', 'check'].includes(k))) invalid('Unsupported field');
+  if (!Number.isSafeInteger(b.expected_revision) || Number(b.expected_revision) < 0) invalid('Expected the piece revision');
+  const revision = Number(b.expected_revision);
+  const derivedFrom = text(b.derived_from);
+  const { filename, sha256, content, version, options, derived } = studioScore(b);
+  const name = b.name == null ? null : text(b.name).trim();
+  if (name !== null && (!name || name.length > 120)) invalid('A version name is 1 to 120 characters');
+  const check = object(b.check);
+  if (Object.keys(check).some(k => !['verdict', 'differences', 'warnings'].includes(k)) || !['clean', 'gains', 'differs'].includes(String(check.verdict))) invalid('Invalid round-trip check');
+  const differences = array(check.differences ?? []).map(value => { const d = object(value);
+    if (!['lost', 'gained', 'changed'].includes(String(d.kind)) || !Number.isSafeInteger(d.count) || Number(d.count) < 1) invalid('Invalid round-trip difference');
+    return { path: text(d.path), kind: String(d.kind), count: Number(d.count) }; });
+  const warnings = array(check.warnings ?? []).map(text);
+  const lib = reader(c); const owner = c.get('libraryUser').id; const id = c.req.param('id');
+  const before = await lib.getPiece(owner, id);
+  if (!before) return c.json({ error: 'Piece not found' }, 404);
+  const shown = async (snapshot: typeof before) => ({ ...snapshot, tags: Library.shown(snapshot.tags, await lib.listAliases(owner)) });
+  if (before.piece.canonical_rendition_id !== derivedFrom) throw new LibraryError('conflict', 'This piece was saved somewhere else; read it again');
+  if (before.piece.revision !== revision) throw new LibraryError('conflict', 'Piece revision changed; read it again');
+  if (before.renditions.find(r => r.id === derivedFrom)?.sha256 === sha256) return c.json({ snapshot: await shown(before), unchanged: true });
+  // Unique per checkpoint, not per content: undoing back to earlier bytes is a new version with a new parent.
+  const renditionId = `${id}-${sha256.slice(0, 12)}-r${revision}`;
+  const snapshot = await lib.writePiece(owner, { id, expected_revision: revision,
+    renditions: [{ id: renditionId, format: 'gp', role: 'edit', producer: 'studio', producer_version: version, producer_options: options,
+      filename, content: content.buffer as ArrayBuffer, sha256, derived_from: derivedFrom,
+      provenance: { kind: 'checkpoint', name, check: { verdict: String(check.verdict), differences, warnings } } }],
+    canonical: { mode: 'replace', rendition_id: renditionId }, tags: [], derived_tags: derived });
+  return c.json({ snapshot: await shown(snapshot), unchanged: false }, 201);
 });
 // Your own tags: add, remove, rename — never a derived one (the module refuses).
 library.patch('/pieces/:id/tags', async c => {

@@ -312,6 +312,12 @@ lossless and tested. Five traps, all of which have bitten:
 - Tuplets and grace notes are **containers in MNX, per-beat/per-note flags in both file
   formats**, so each direction collapses or expands a run — the same asymmetry as voltas,
   solved the same way ([roadmap/complete/core-tuplets-grace-notes.md](roadmap/complete/core-tuplets-grace-notes.md)).
+- **A `.gp` studio STORES is not the `.gp` it hands a person.** Storage exports go through
+  `exportForStorage` / `checkStorage` (`src/importers/`), which use the converter's
+  `STORAGE_EXPORT_OPTIONS` — the download defaults tidy a score for a reader, and a tidied
+  file does not read back as the document that was saved
+  (`harness/fixtures/roundtrip-register.json` is the evidence, `npm run
+  update:roundtrip-register` remeasures it).
 - **`_x.mnxLab.encoding` is stamped by whoever writes the file, never forwarded** — so a
   round trip replaces it, and comparisons of a committed document against a re-import
   must discount it. Its **date is opt-in** (`--encoding-date`): derived files are

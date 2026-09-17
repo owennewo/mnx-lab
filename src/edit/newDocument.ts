@@ -5,9 +5,7 @@
  * Genesis is OPS, not a template: the document is built from the literal `{}`
  * through `applyOp`, the way the construct traces build every corpus scenario,
  * so a new piece is exactly what the editor could have made by hand and nothing
- * the editor cannot then address. The one thing written directly is
- * `_x.mnxLab.work` — no op owns document metadata yet (the campaign's save
- * pipeline item adds it), and at genesis there is no history for it to be in.
+ * the editor cannot then address — its title and artist included (`setWork`).
  *
  * A piece has strings. Guitar Pro — studio's stored format — cannot say "no
  * instrument": a part written without a tuning reloads as a six-string guitar
@@ -69,6 +67,5 @@ export function buildNewDocument(spec: NewDocumentSpec): MnxStructure {
   while (document.global.measures.length < spec.bars) document = applyOp(document, { type: 'appendMeasure' });
   document = applyOp(document, { type: 'setTimeSignature', measureIndex: 0, time: spec.time });
   document = applyOp(document, { type: 'setKeySignature', measureIndex: 0, fifths: spec.fifths });
-  const work = { title: spec.title.trim(), ...(spec.artist?.trim() ? { artist: spec.artist.trim() } : {}) };
-  return { ...document, _x: { ...document._x, mnxLab: { ...document._x?.mnxLab, work } } };
+  return applyOp(document, { type: 'setWork', work: { title: spec.title, artist: spec.artist ?? null } });
 }

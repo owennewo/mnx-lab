@@ -1,4 +1,4 @@
-import { inflateSync } from 'fflate';
+import { deflateSync, inflateSync } from 'fflate';
 
 /** ZIP's standard reflected CRC-32, independent of Node's zlib binding. */
 export function crc32(data: Uint8Array): number {
@@ -79,35 +79,41 @@ function decodeXml(bytes: Uint8Array): string {
 }
 
 /**
- * Wraps GPIF XML as a `.gp`: a stored-only zip of `VERSION` + `Content/score.gpif`
- * — the minimal container Guitar Pro and alphaTab both accept (the
- * `Triplets-and-graces` fixture is the proof). Stored entries with fixed
- * timestamps keep the bytes a pure function of the score.
+ * Wraps GPIF XML as a `.gp`: a zip of `VERSION` + `Content/score.gpif` — the
+ * minimal container Guitar Pro and alphaTab both accept (the
+ * `Triplets-and-graces` fixture is the proof). Stored by default; `compress`
+ * deflates the score, as Guitar Pro itself does — GPIF is XML, and an 82-bar
+ * piece is 520 KB stored and a twentieth of that deflated, which matters to a
+ * writer that saves every half minute. Fixed timestamps (and fflate's
+ * deterministic deflate) keep the bytes a pure function of the score.
  */
-export function writeGpContainer(gpifXml: string): Uint8Array {
-  return writeStoredZip([
+export function writeGpContainer(gpifXml: string, options: { compress?: boolean } = {}): Uint8Array {
+  return writeZip([
     { name: 'VERSION', data: new TextEncoder().encode('7.0') },
-    { name: 'Content/score.gpif', data: new TextEncoder().encode(gpifXml) }
+    { name: 'Content/score.gpif', data: new TextEncoder().encode(gpifXml), compress: options.compress }
   ]);
 }
 
-function writeStoredZip(entries: { name: string; data: Uint8Array }[]): Uint8Array {
+function writeZip(entries: { name: string; data: Uint8Array; compress?: boolean }[]): Uint8Array {
   const chunks: Uint8Array[] = [];
   const central: Uint8Array[] = [];
   let offset = 0;
 
-  for (const { name, data } of entries) {
+  for (const { name, data, compress } of entries) {
     const nameBytes = new TextEncoder().encode(name);
     const sum = crc32(data);
+    const stored = compress ? deflateSync(data, { level: 9 }) : data;
+    const method = compress ? 8 : 0;
 
     const local = new Uint8Array(30);
     const localView = new DataView(local.buffer);
     localView.setUint32(0, ZIP_LOCAL, true);
-    localView.setUint16(4, 10, true); // version needed
+    localView.setUint16(4, compress ? 20 : 10, true); // version needed
+    localView.setUint16(8, method, true);
     localView.setUint16(10, 0, true); // mod time — fixed, so bytes are stable
     localView.setUint16(12, 33, true); // mod date — 1980-01-01
     localView.setUint32(14, sum, true);
-    localView.setUint32(18, data.length, true);
+    localView.setUint32(18, stored.length, true);
     localView.setUint32(22, data.length, true);
     localView.setUint16(26, nameBytes.length, true);
 
@@ -115,17 +121,18 @@ function writeStoredZip(entries: { name: string; data: Uint8Array }[]): Uint8Arr
     const headerView = new DataView(header.buffer);
     headerView.setUint32(0, ZIP_CENTRAL, true);
     headerView.setUint16(4, 20, true); // version made by
-    headerView.setUint16(6, 10, true);
+    headerView.setUint16(6, compress ? 20 : 10, true);
+    headerView.setUint16(10, method, true);
     headerView.setUint16(14, 33, true);
     headerView.setUint32(16, sum, true);
-    headerView.setUint32(20, data.length, true);
+    headerView.setUint32(20, stored.length, true);
     headerView.setUint32(24, data.length, true);
     headerView.setUint16(28, nameBytes.length, true);
     headerView.setUint32(42, offset, true);
 
-    chunks.push(local, nameBytes, data);
+    chunks.push(local, nameBytes, stored);
     central.push(header, nameBytes);
-    offset += local.length + nameBytes.length + data.length;
+    offset += local.length + nameBytes.length + stored.length;
   }
 
   const directorySize = central.reduce((sum, part) => sum + part.length, 0);

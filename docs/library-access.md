@@ -100,7 +100,15 @@ browser exported: `{rendition: {filename, sha256, content, producer_version,
 producer_options}, derived_tags: [{dimension, value}]}`, the file as base64 (at most 1 MiB,
 and it must be a GP7 container), answered `201` with the snapshot. **The service names
 everything** — a caller-supplied piece, rendition or source id, or a `source_ref` on a tag,
-is a 400 — and a `title` tag is required. `POST /pieces/:id/opened` records the view.
+is a 400 — and a `title` tag is required. `POST /pieces/:id/renditions` saves an edit: the
+same `rendition` and `derived_tags`, plus `expected_revision`, `derived_from` (the rendition
+it was edited from), `check` (`{verdict: clean|gains|differs, differences: [{path, kind,
+count}], warnings}` — what the browser measured the Guitar Pro round trip to cost) and an
+optional `name` for a version the owner asked for. It answers `201` with the snapshot and
+`unchanged: false`, or `200` with `unchanged: true` when those bytes are already canonical;
+it is a `409` when the revision moved **or** when `derived_from` is no longer the canonical
+rendition — another device saved first, and the caller must read the piece to tell which.
+`POST /pieces/:id/opened` records the view.
 `PATCH /pieces/:id/tags` takes `expected_revision` plus `add`, `remove` and `rename` of
 asserted tags (a derived dimension is refused; a stale revision is 409). `GET /aliases`,
 `PUT /aliases` `{dimension, raw_value, canonical_value}` and `DELETE /aliases`

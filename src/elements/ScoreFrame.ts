@@ -370,6 +370,9 @@ export class ScoreFrame extends LitElement {
           gap: 8px;
           flex-basis: 100%;
           order: 3;
+          /* A host's actions are its own business and may outnumber the width:
+             wrap them rather than clip the last one off the pane. */
+          flex-wrap: wrap;
         }
 
         .strip.top .spacer {

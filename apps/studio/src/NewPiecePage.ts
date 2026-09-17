@@ -10,13 +10,14 @@
 // not offer what the first save would quietly replace.
 import { LitElement, css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { version } from '../../../package.json';
 import { LibraryClient } from '../../../src/storage/libraryClient.ts';
 import { exportForStorage } from '../../../src/importers/exportFile.ts';
 import { derivedLibraryTags } from '../../../src/model/libraryTags.ts';
 import { buildNewDocument, newDocumentProblem, MAX_NEW_BARS, type NewDocumentSpec } from '../../../src/edit/newDocument.ts';
 import { TUNING_PRESET_NAMES, parseKeySignature, parseTimeSignature, parseTuning } from '../../../src/edit/setupGrammar.ts';
 import { libraryReturnHref, pieceHref, returnToLibrary } from './StudioApp.ts';
+import { pieceFilename } from './pieceFile.ts';
+import { BUILD } from './build.ts';
 
 const CUSTOM = 'custom';
 const KEYS = ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'C#', 'F', 'Bb', 'Eb', 'Ab', 'Db', 'Gb', 'Cb'];
@@ -24,8 +25,6 @@ const keyLabel = (name: string) => {
   const fifths = (parseKeySignature(name) as { fifths: number }).fifths;
   return `${name} major${fifths ? ` · ${Math.abs(fifths)} ${fifths > 0 ? 'sharp' : 'flat'}${Math.abs(fifths) > 1 ? 's' : ''}` : ''}`;
 };
-/** A filename the service will accept: the title, without what a path or a header could misread. */
-export const pieceFilename = (title: string) => `${title.trim().replace(/[\\/\x00-\x1f"<>|:*?]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 120) || 'Untitled'}.gp`;
 
 @customElement('mnx-studio-new-piece')
 export class NewPiecePage extends LitElement {
@@ -73,7 +72,7 @@ export class NewPiecePage extends LitElement {
       const document = buildNewDocument(spec);
       const { bytes, options } = await exportForStorage(document);
       const { snapshot } = await this.client.createPiece(
-        { filename: pieceFilename(spec.title), bytes, producerVersion: version, producerOptions: options }, derivedLibraryTags(document));
+        { filename: pieceFilename(spec.title), bytes, producerVersion: BUILD, producerOptions: options }, derivedLibraryTags(document));
       location.hash = pieceHref(snapshot.piece.id);
     } catch (error) {
       this.error = error instanceof Error && error.message ? error.message : 'The piece could not be made.';

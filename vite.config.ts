@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { execSync } from 'node:child_process';
 import { defineConfig, type Plugin } from 'vite';
 import { cloudflare } from '@cloudflare/vite-plugin';
 
@@ -156,7 +157,13 @@ function localLibraryLogin(): Plugin {
   };
 }
 
+/** The commit a build was made from — stamped on the scores and recovery records studio writes. */
+function commit(): string {
+  try { return execSync('git rev-parse --short HEAD', { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim(); } catch { return ''; }
+}
+
 export default defineConfig({
+  define: { __MNX_COMMIT__: JSON.stringify(commit()) },
   plugins: [
     // Runs the Worker (worker/index.ts) inside the Vite dev server via
     // workerd, so `npm run dev` serves both the app and /api/* — no separate

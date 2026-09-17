@@ -165,6 +165,14 @@ export function compareDocuments(before: Json, after: Json): DocumentDifference[
 
 export interface DifferenceShape { path: string; kind: DocumentDifference['kind']; count: number }
 
+/**
+ * What a converter round trip cost, summarised: the verdict, the difference
+ * shapes, and what the writer warned about. `gains` — nothing lost or changed,
+ * but the document came back saying MORE — is its own verdict because Guitar Pro
+ * has no "unstated" and makes it the common case.
+ */
+export interface RoundTripCheck { verdict: 'clean' | 'gains' | 'differs'; differences: DifferenceShape[]; warnings: string[] }
+
 /** Differences grouped by path SHAPE (array indices become `[]`), sorted. */
 export function collapseDifferences(differences: readonly DocumentDifference[]): DifferenceShape[] {
   const counts = new Map<string, DifferenceShape>();

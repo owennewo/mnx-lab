@@ -16,6 +16,7 @@ import type {
   MnxEvent,
   MnxFermata,
   MnxGrace,
+  MnxLabCreator,
   MnxTremolo,
   MnxNote,
   MnxNoteValueBase,
@@ -420,6 +421,14 @@ export type EditOp =
       targetType?: 'nextNote' | 'crossVoice' | 'arpeggio' | 'crossJump';
       lv?: boolean;
     }
+  // Document metadata (roadmap: studio-save-pipeline): what the piece IS —
+  // `_x.mnxLab.work`, the one block whose owner is the document itself. A MERGE,
+  // because a sheet edits one field at a time: a string sets the field (trimmed;
+  // an empty one removes it), `null` removes it, an absent key is untouched.
+  // `creators` has no field to merge by, so the list is replaced whole. A `work`
+  // left empty is removed with the wrappers it emptied — no `{}` residue, the
+  // rule every removal here follows.
+  | { type: 'setWork'; work: WorkChange }
   // Lyrics (campaign item 12, roadmap/complete/core-element-ops-lyrics.md).
   // A syllable is a key on the EVENT's lyric line; the line's metadata is a
   // key on the document. Two owners, so two pairs — item 7's test.
@@ -845,6 +854,10 @@ export type ContainerSpec =
     }
   | { type: 'grace'; graceType?: MnxGrace['graceType']; slash?: boolean }
   | { type: 'tremolo'; marks?: number; outer?: MnxTremolo['outer'] };
+
+/** The plain-text fields of `_x.mnxLab.work`. */
+export const WORK_TEXT_FIELDS = ['title', 'subtitle', 'artist', 'album', 'copyright', 'source', 'notes'] as const;
+export type WorkChange = { [K in (typeof WORK_TEXT_FIELDS)[number]]?: string | null } & { creators?: MnxLabCreator[] | null };
 
 export type PartDeclaration =
   | { kind: 'capo'; value: number }
@@ -1713,6 +1726,28 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       const existing = note.ties?.[0];
       if (!existing) return next;
       if (op.targetType) existing.targetType = op.targetType;
+      return next;
+    }
+    case 'setWork': {
+      const lab = ((next._x ??= {}).mnxLab ??= {});
+      const work = { ...lab.work };
+      for (const field of WORK_TEXT_FIELDS) {
+        const value = op.work[field];
+        if (value === undefined) continue;
+        if (value === null || !value.trim()) delete work[field];
+        else work[field] = value.trim();
+      }
+      if (op.work.creators !== undefined) {
+        const creators = (op.work.creators ?? [])
+          .map(c => ({ role: c.role.trim(), name: c.name.trim() }))
+          .filter(c => c.role && c.name);
+        if (creators.length) work.creators = creators;
+        else delete work.creators;
+      }
+      if (Object.keys(work).length) lab.work = work;
+      else delete lab.work;
+      if (!Object.keys(lab).length) delete next._x!.mnxLab;
+      if (!Object.keys(next._x!).length) delete next._x;
       return next;
     }
     case 'setSyllable': {

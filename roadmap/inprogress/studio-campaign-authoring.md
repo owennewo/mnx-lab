@@ -3,7 +3,7 @@
 > **A campaign** (see CLAUDE.md → Roadmap-driven development): this doc is an index over
 > normal proposals sharing one goal, the shared contract they follow, and the running log
 > of progress and learnings as items land. Indexed items are ordinary `studio-*` / `core-*`
-> proposals that name this campaign. **Opened 2026-09-17 from a design conversation; items 1–2
+> proposals that name this campaign. **Opened 2026-09-17 from a design conversation; items 1–3
 > built the same day, the rest not started.** Storage shape stays owned by
 > [docs/studio-storage.md](../../docs/studio-storage.md); the sync bar by
 > [docs/player-sync-bar.md](../../docs/player-sync-bar.md). This doc owns the order and
@@ -201,7 +201,7 @@ one.
 | --- | --- | --- | --- |
 | 1 | [core-roundtrip-register](../complete/core-roundtrip-register.md) | **complete 2026-09-17** | **The comparator and the baseline loss register.** `src/model/documentCompare.ts` — pure; identity moved into the references (each rewritten to the path it resolves to, every `id` then dropped), `encoding` discounted, spliced arrays compared as multisets, differences collapsed to path shapes. Its reference inventory is checked against both schemas and goes red on a new one; equivalence under respelled and swapped ids is proved before anything is judged. `harness/fixtures/roundtrip-register.json` covers MNX → `.gp` → MNX over the corpus and `.gp` → MNX → `.gp` → MNX over the committed fixtures, with ranked `lostOrChanged` and `gained` lists; `npm run update:roundtrip-register`, and **git diff is the review**. An operator lane runs the same over a private library and writes outside the repo. Structured warnings (`{code, where}`) and a computed explained/unexplained verdict are its stated follow-up. Findings in log entry 3. |
 | 2 | [studio-piece-create](../complete/studio-piece-create.md) | **complete 2026-09-17** | **A piece made in studio.** `#/new`: title, artist, tuning (the grammar's presets or a custom one — never "none", see open decision 6), capo, time, key, bars. `src/edit/newDocument.ts` builds the blank piece from `{}` through `applyOp`; `exportForStorage` writes the `.gp` with `STORAGE_EXPORT_OPTIONS`; `src/model/libraryTags.ts` reads the derived tags off the document (clause 9, one item early); `POST /api/library/pieces` stores it under `source_kind: 'studio'` with every id chosen by the service, reusing `writePiece` — no migration, no new role, the Worker still converting nothing. Opened `apps/studio → src/edit`. The piece page now asks for a recording when there is none. Amended `studio-shell.md`, `apps/studio/README.md`, `docs/studio-storage.md` and `docs/library-access.md`. Conformance over the real route on local D1/R2, and a real-browser smoke (`npm run smoke:piece-create`). |
-| 3 | `studio-save-pipeline` | proposed | **The save pipeline, proven on the smallest edit surface. Lands after item 1.** A `setWork` op (merge; an undefined field removes it) and a **Details** sheet offering the fields the Guitar Pro score header can hold — expected: title, subtitle, artist, album, composer, lyricist, transcriber, copyright, notes; item 1's register confirms. Then everything in contract clauses 2–9: `POST /pieces/:id/renditions` (bytes, `expected_revision`, `derived_from`, provenance with verdict/warnings/named/build, derived tags; pointer moved atomically), export (**with `STORAGE_EXPORT_OPTIONS`** — log entry 3) + round-trip check moved into a worker and **measured on Vestapol**, the IndexedDB recovery record (clause 5), checkpoint triggers, the save-state chip and **Save version…**, the single write queue, the Web Lock, the derived-tag projection promoted into `src/model/` and shared with the ingest tool. Import `warnings` get a quiet *conversion notes (n)* entry on the piece page — displayed, not stored. Conformance tests and a smoke script. **Recovery acceptance tests, named because each is a way the first design was wrong:** *edit → checkpoint → undo → crash* recovers the undone state; *checkpoint → more edits → crash* recovers a document byte-identical to the live one; edits made **while a checkpoint is in flight** survive and stay counted unsaved; undo back to the checkpointed state reads clean; a record written by another build opens or is offered for download, never half-applied; a record whose base is no longer canonical reaches the conflict prompt. |
+| 3 | [studio-save-pipeline](studio-save-pipeline.md) | **built 2026-09-17** | **The save pipeline, proven on the smallest edit surface.** A `setWork` op and the **Details** sheet (the nine fields a Guitar Pro header holds) — studio's first editor. `src/storage/saveSession.ts`: the state machine of clauses 2–8 with every dependency a port — the recovery record *is* the live document (IndexedDB, `recoveryStore.ts`), dirty is by reference, a checkpoint captures one document while the record follows the live one, idle/ceiling/hidden triggers, retry, and stale-write-versus-conflict. `POST /pieces/:id/renditions`: a fourth rendition role `edit` (no migration), refused unless edited from the current canonical, the round-trip check as provenance, named versions, and ingest leaving an edited piece's pointer and projection alone. The save check runs in a worker (`src/importers/storageCheck*`; ~250 ms on Vestapol). The chip beside the title, the Save sheet (losses, *Save a version*, conflict → *Keep mine as a copy*, recovered edits, conversion notes), one write queue for the page's writes, a Web Lock per piece, a build stamp on everything written. Storage files are now deflated (520 KB → 18 KB). All six recovery acceptance tests, the route over local D1/R2, and a real-browser smoke including a reload-before-save recovery and a two-device conflict. |
 | 4 | `studio-sync-rederive` | proposed | **Sync first, bars later.** Contract clause 10: derive tuples from segments and the current bars on load and on bar-structure change (the derivation already lives in `src/model/syncSegments.ts`; it must run outside a sync-bar commit), write refreshed tuples back at a checkpoint, and flag imported tuple-only syncs whose traversal changed. Closes the hands-on checks [studio-sync-bar](../inprogress/studio-sync-bar.md) still owes — the click against a real YouTube clock, and the bar on touch — on a piece made by item 2. |
 | 5 | `studio-piece-lifecycle` | proposed | **Living with pieces.** Soft delete (`deleted_at`; hidden from lists, R2 untouched — *never deletes* holds). A versions route listing a piece's renditions from `derived_from` / `created_at` with automatic-or-named and the round-trip verdict; open an older version; **revert** as a pointer move plus revision bump, no new rendition. Rename is a Details edit. An operator listing of unexplained round-trip verdicts that pulls their defect reports into converter fixtures. |
 | 6 | `core-sync-interchange` | proposed, optional | **sync.json as interchange.** *Export sync* (none exists): the dense Soundslice-compatible array as derived, or a sparse wrapper with anchors only at the cuts and a wrapper-level `interpolation: "beat"` — never a fifth tuple element, which breaks Soundslice compatibility and the decoder's arity check. The reader option for beat-linear interpolation is built only if sparse export is wanted. **Lifting an imported Soundslice sync into segments** (lossless = one segment per anchor interval, crowded; merged = tidy, discards measured timing) is a decision the item owns. Pick up when a second consumer of a sync appears, not before. |
@@ -376,4 +376,42 @@ recording → the sync bar, all on work that was already built and persisted.
 - **Landing tip:** a real-browser smoke needs local auth (`npm run dev:login` inside the
   worktree — it keeps its own key, `.dev.vars` and local D1, all ignored) and
   `wrangler dev` on a spare port with `LIBRARY_LOCAL_ORIGIN`; 8791 may be another agent's.
+
+### 2026-09-17 — entry 5: item 3 built — studio edits, and nobody is asked to save
+
+[studio-save-pipeline](studio-save-pipeline.md). Studio's first editor is nine text fields,
+and everything the campaign promised about saving is true of them.
+
+- **The ports paid for themselves.** `SaveSession` imports only types; its world is handed
+  to it. That is why all six recovery acceptance tests — including *edit → checkpoint → undo
+  → crash* and *edits during an in-flight save* — run in 40 ms with a hand-cranked clock,
+  and why the one mutation tried (marking the live document saved instead of the captured
+  one) was caught. **Item 7 should mount the editor on this session unchanged**: it calls
+  `documentChanged` and nothing else.
+- **`gains` is a first-crossing verdict.** A document read from a `.gp` already says what
+  Guitar Pro makes explicit, so its saves are `clean`. The corpus lane's 30 `gains` describe
+  authoring in MNX from scratch — a new piece's *first* save — not the steady state.
+- **Storage files were 20× too big, and the cap would have found out the hard way.** Stored
+  (not deflated) GPIF put an 82-bar piece at 520 KB against a 1 MiB route cap. Now 18 KB.
+  The general lesson for the rest of the campaign: *measure the largest committed score
+  before choosing a limit* — item 2 chose 1 MiB from a fixture Guitar Pro had written.
+- **The ingest had to learn about edits.** "A Soundslice piece keeps the Soundslice `.gp` as
+  canonical" would have turned the operator's next re-export of any edited slice into a
+  conflict. Once the pointer is an `edit` rendition, ingest adds what Soundslice exported and
+  moves neither the pointer nor the derived tags. **Any future writer of the pointer owes the
+  same check against the ingest.**
+- **A piece can have its title only in the sidecar.** Soundslice pieces carry title and
+  artist as sidecar tags, and the `.gp` may hold neither; a checkpoint that re-projected
+  tags from the document alone would have erased them (and been refused: a title is
+  required). The projection keeps what the library knew for those two dimensions until the
+  document says otherwise.
+- **The chip belongs beside the title.** Two more actions clipped it off a tablet-width
+  pane. It sits in the frame's `chips` slot now; the tools row wraps.
+- **Owed by later items:** the structural-op checkpoint trigger and a lighter document
+  hand-off than `setDocument` (item 7); the version list over the named versions this item
+  already stores (item 5); the Tags and Recordings sheets joining the write queue, if 409s
+  between them and an autosave ever show up in practice.
+- **Landing tip:** `pkill -f "<pattern>"` from a shell whose own command line contains the
+  pattern kills the shell. Stop a local `wrangler dev` by PID (`pgrep -af "port <n>"`), and
+  check the port is free before starting one — another agent may hold 8791.
 

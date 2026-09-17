@@ -224,7 +224,7 @@ export class Library {
       if (seen.has(inputRow.id)) throw new LibraryError('invalid', 'Duplicate rendition id');
       seen.add(inputRow.id);
       if (!['gp','gpx','gp5','gp4','gp3','musicxml','mnx'].includes(inputRow.format) ||
-          !['original','export','derived'].includes(inputRow.role)) throw new LibraryError('invalid', 'Invalid rendition format or role');
+          !['original','export','derived','edit'].includes(inputRow.role)) throw new LibraryError('invalid', 'Invalid rendition format or role');
       if (inputRow.producer_version !== null) requireText(inputRow.producer_version, 'producer version');
       const blob = await describeBlob('renditions', inputRow);
       blobs.set(blob.r2_key, blob);

@@ -159,8 +159,19 @@ back up to `proposed/` the moment it is.
 
 ### inprogress/
 
+- **[studio-save-pipeline.md](inprogress/studio-save-pipeline.md)** — **built 2026-09-17**,
+  [studio authoring campaign](inprogress/studio-campaign-authoring.md) item 3: studio edits,
+  and nobody is asked to save. A `setWork` op and the Details sheet (the document's own
+  metadata) are the first editor; `src/storage/saveSession.ts` keeps the **live document** in
+  an IndexedDB recovery record while edits are unsaved, checkpoints after a pause, and tells a
+  moved revision from a score saved on another device; `POST /pieces/:id/renditions` stores
+  each save as an immutable `edit` rendition that takes the pointer (no migration), with the
+  Guitar Pro round trip — measured in a worker — as its provenance. The chip beside the title
+  leads with the risk; the Save sheet names versions and settles a conflict as a copy.
+  Storage `.gp` files are now deflated (520 KB → 18 KB). All six recovery acceptance tests,
+  the route on local D1/R2, and a real-browser smoke with a reload-before-save recovery.
 - **[studio-campaign-authoring.md](inprogress/studio-campaign-authoring.md)** — **campaign**,
-  opened 2026-09-17, **items 1–2 built the same day**: studio stops being read-only. Priority flow **new piece
+  opened 2026-09-17, **items 1–3 built the same day**: studio stops being read-only. Priority flow **new piece
   → YouTube → sync**, working before any note editing exists; editing last. Opens on the
   finding that adding a recording and the sync bar were already built and persisted — what
   was missing was any way for a piece to exist outside the operator ingest. The contract's

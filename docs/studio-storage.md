@@ -69,8 +69,30 @@ the immutability of source identity and the id's shape all hold unchanged, and m
 same piece twice is two pieces (sharing one content-addressed blob). Its first rendition is
 the `.gp` the browser exported: `role: 'original'`, `producer: 'studio'`, canonical from the
 start. **`.gp` is the stored format for studio's own work too** (decided 2026-09-17,
-[studio authoring campaign](../roadmap/inprogress/studio-campaign-authoring.md)): a saved
-edit will be another `.gp` rendition with `derived_from` set, never stored MNX.
+[studio authoring campaign](../roadmap/inprogress/studio-campaign-authoring.md)).
+
+**A saved edit is a checkpoint: a fourth rendition role, `edit`.** `POST
+/api/library/pieces/:id/renditions` stores the `.gp` the browser exported as a new immutable
+rendition — `role: 'edit'`, `producer: 'studio'`, `derived_from` the rendition it was edited
+from — and moves the canonical pointer to it, in one revision-checked write. So the service
+holds **every version** of an edited piece, `derived_from` is its lineage, and the pointer
+names the current one. The role is validated in the library module, not by a column
+constraint, so it needed no migration; the schema comment below is left as the migration
+wrote it. Three rules came with it:
+
+- **It must have been edited from what is canonical now.** A checkpoint whose `derived_from`
+  is not the current pointer is a conflict, exactly like a stale revision: another device
+  saved first, and nothing is overwritten.
+- **Saving the bytes already canonical stores nothing**; saving bytes an *older* version had
+  (an undo, then a save) is a new version with a new parent sharing the old blob. The
+  rendition id is unique per checkpoint, not per content.
+- **What the save cost rides as provenance** — `{kind: 'checkpoint', name, check}` — where
+  `check` is the browser's measurement of the Guitar Pro round trip. The Worker holds no
+  converter and vouches for none of it.
+
+Once the pointer is an `edit`, **the piece's projection is the owner's too**: an ingest of
+that slice still adds what Soundslice exported, and moves neither the pointer nor the
+derived tags.
 
 **The pointer is set explicitly and then belongs to the owner.** An import sets canonical
 only when the piece has none — for a Soundslice slice, to the Soundslice `.gp`, the most

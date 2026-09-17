@@ -116,7 +116,7 @@ describe('POST /api/library/pieces', () => {
     expect(String(row!.source_id)).toMatch(/^[0-9a-f-]{36}$/);
     const rendition = await env.LIBRARY_DB.prepare('SELECT * FROM renditions WHERE piece_id = ?').bind(snapshot.piece.id).first<Record<string, unknown>>();
     expect(rendition).toMatchObject({ id: row!.canonical_rendition_id, format: 'gp', role: 'original', producer: 'studio', producer_version: '0.3.0', filename: 'Anji.gp', derived_from: null });
-    expect(JSON.parse(String(rendition!.producer_options))).toEqual({ collapseTabUnisons: false });
+    expect(JSON.parse(String(rendition!.producer_options))).toEqual({ collapseTabUnisons: false, compress: true });
 
     const canonical = await client().canonical(snapshot.piece.id);
     expect(canonical.format).toBe('gp');
