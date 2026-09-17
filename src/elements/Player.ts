@@ -25,7 +25,7 @@ import { ZERO, type Rational } from '../audio/time.ts';
 import type { MnxStructure } from '../model/mnx.ts';
 import type { PlaybackUpdate } from './mnxContext.ts';
 import { ClickTrack } from '../audio/native/click.ts';
-import { beatTimes, decodeSyncSegments, defaultBeatUnit, emptySyncSegments, syncpointsFromSegments, type SyncSegments } from '../model/syncSegments.ts';
+import { beatTimes, decodeSyncSegments, defaultBeatUnit, emptySyncSegments, playingSyncpoints, syncpointsFromSegments, type SyncSegments } from '../model/syncSegments.ts';
 import type { SoundsliceSyncpoint } from '../model/recordingSync.ts';
 import type { SyncChange } from './SyncBar.ts';
 import './SyncBar.ts';
@@ -619,7 +619,7 @@ export class Player extends LitElement {
   }
   private teardown() {
     this.clickTrack?.dispose(); this.clickTrack = undefined; this.clickOn = false;
-    this.syncMode = false; this.liveSegments = null; this.liveSegmentsFor = ''; this.appliedSync.clear();
+    this.syncMode = false; this.liveSegments = null; this.liveSegmentsFor = ''; this.appliedSync.clear(); this.derivedFor.clear();
     this.youtubeNotice = false;
     this.revision++;
     this.session?.dispose(); this.session = undefined;
@@ -664,8 +664,14 @@ export class Player extends LitElement {
       const matches = this.recordings.filter(r => r.id === id);
       if (!id || matches.length !== 1) throw new Error('The selected recording is unavailable or has a duplicate identity.');
       const source = matches[0];
+      // A Studio sync plays by its SEGMENTS, derived against the bars as they are
+      // now — the stored tuples are a cache that bars written since leave stale.
+      // The recording's length is not known yet; `refreshDerivedSync` derives
+      // again when it is, because an open last segment runs to the media's end.
+      const playing = playingSyncpoints(source, segments => this.barBeats(segments));
+      if (playing.segments) { this.appliedSync.set(id, JSON.stringify(playing.syncpoints)); this.derivedFor.delete(id); }
       const sync = this.document && this.writtenBarDurations
-        ? createRecordingSync(source.syncpoints, { performance, writtenBarDurations: this.writtenBarDurations }, linearizePasses(this.document)) : null;
+        ? createRecordingSync(playing.syncpoints, { performance, writtenBarDurations: this.writtenBarDurations }, linearizePasses(this.document)) : null;
       const media = source.kind === 'audio' ? new HtmlAudioPort(source.media) : new NativeYouTubePort(youtubeVideoId(source.video), async () => {
         // A surrounding score frame supplies a stable mount before iframe creation.
         // Standalone players retain their own inline surface.
@@ -685,7 +691,7 @@ export class Player extends LitElement {
     };
     this.session = new PlaybackSession(factory('synth'), factory, () => {
       if (revision !== this.revision || !this.session) return;
-      this.status = this.session.snapshot; this.rate = this.status.rate; this.volume = this.status.volume; this.publish();
+      this.status = this.session.snapshot; this.rate = this.status.rate; this.volume = this.status.volume; this.refreshDerivedSync(); this.publish();
     });
     this.session.setRate(this.rate); this.session.setVolume(this.volume);
     this.session.stop();
@@ -943,6 +949,31 @@ export class Player extends LitElement {
     if (!was || !now || was.kind !== now.kind || !this.appliedSync.has(id)) return false;
     const media = (r: RecordingSource) => r.kind === 'youtube' ? r.video : r.media;
     return media(was) === media(now) && JSON.stringify(now.syncpoints ?? null) === this.appliedSync.get(id);
+  }
+  /** The media length each source's tuples were last derived for. */
+  private derivedFor = new Map<string, number>();
+  /**
+   * Once the playing recording's length is known: derive its tuples again (an
+   * open last segment runs to the media's end), apply them if they moved, and
+   * tell the host when what is STORED is not what plays — `sync-refresh`, the
+   * same detail as `sync-edit`, so the host persists it the same way. Nothing
+   * is announced while the sync bar is open: its own commits speak for it.
+   */
+  private refreshDerivedSync() {
+    const backend = this.recordingBackend, duration = this.status?.mediaDuration, source = this.activeRecording;
+    if (!backend || !source || !duration || !this.performance || this.derivedFor.get(backend.id) === duration) return;
+    this.derivedFor.set(backend.id, duration);
+    const playing = playingSyncpoints(source, segments => this.barBeats(segments), duration);
+    if (!playing.segments || this.liveSegmentsFor === backend.id) return;
+    const derived = JSON.stringify(playing.syncpoints);
+    if (derived !== this.appliedSync.get(backend.id)) {
+      this.appliedSync.set(backend.id, derived);
+      const sync = playing.syncpoints && this.document && this.writtenBarDurations
+        ? createRecordingSync(playing.syncpoints, { performance: this.performance, writtenBarDurations: this.writtenBarDurations }, linearizePasses(this.document)) : null;
+      backend.replaceSync(sync?.ok ? sync.value : null, sync && !sync.ok ? sync.diagnostic.message : undefined);
+    }
+    if (this.syncEditable && derived !== JSON.stringify(source.syncpoints ?? null))
+      this.dispatchEvent(new CustomEvent<SyncEdit>('sync-refresh', { detail: { sourceId: backend.id, segments: playing.segments, syncpoints: playing.syncpoints as SyncEdit['syncpoints'] }, bubbles: true, composed: true }));
   }
   private loadSegments() {
     const id = this.sourceId, stored = decodeSyncSegments(this.activeRecording?.syncSegments);

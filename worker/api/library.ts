@@ -375,10 +375,11 @@ library.on(['GET', 'HEAD'], '/recordings/:id/audio', async c => {
 function recordingManager(c: { env: Env }) { return new RecordingManager(c.env.LIBRARY_DB, c.env.LIBRARY_BUCKET); }
 function recordingBody(request: Request) { return boundedJson(request, 2 * 1024 * 1024, 'Recording metadata'); }
 function recordingChange(value: Record<string, unknown>): RecordingChange {
-  if (Object.keys(value).some(k => !['expected_revision','name','rawSync','selectedId','video','sha256','bytes','mime'].includes(k))) invalid('Unsupported recording field.');
+  if (Object.keys(value).some(k => !['expected_revision','name','rawSync','selectedId','video','scoreShape','sha256','bytes','mime'].includes(k))) invalid('Unsupported recording field.');
   if (!Number.isSafeInteger(value.expected_revision)) invalid('Expected the piece revision.');
   return { name: text(value.name), ...(value.rawSync === undefined ? {} : { rawSync: value.rawSync }),
-    selectedId: nullable(value.selectedId), ...(value.video === undefined ? {} : { video: text(value.video) }) };
+    selectedId: nullable(value.selectedId), ...(value.video === undefined ? {} : { video: text(value.video) }),
+    ...(value.scoreShape === undefined ? {} : { scoreShape: nullable(value.scoreShape) }) };
 }
 library.put('/pieces/:piece/recordings/:id', async c => {
   const b = await recordingBody(c.req.raw); const change = recordingChange(b);

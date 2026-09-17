@@ -242,6 +242,27 @@ export function syncpointsFromSegments(doc: SyncSegments, barBeats: readonly num
   return points.length < 2 ? null : points;
 }
 
+/**
+ * The tuples a recording PLAYS BY. A sync made in Studio is its segments — a
+ * beat count over time — and the stored tuples beside them are a cache derived
+ * from those segments and the bars the score had when the sync was last touched.
+ * Bars written since (or a meter changed, or a repeat added) leave that cache
+ * stale, so whenever segments exist the tuples are derived again from the
+ * segments and the bars as they are NOW, and the stored ones are not consulted:
+ * no bars yet is "not synchronised", never yesterday's tuples. An imported sync
+ * has no segments and plays by its stored tuples, which are its only evidence.
+ * `barBeats` takes the segments because the beat unit is theirs.
+ */
+export function playingSyncpoints(
+  source: { syncpoints: unknown; syncSegments?: unknown },
+  barBeats: (segments: SyncSegments) => readonly number[],
+  mediaEnd?: number
+): { syncpoints: unknown; segments: SyncSegments | null } {
+  const decoded = source.syncSegments == null ? null : decodeSyncSegments(source.syncSegments);
+  if (!decoded?.ok || !decoded.value.cuts.length) return { syncpoints: source.syncpoints, segments: null };
+  return { syncpoints: syncpointsFromSegments(decoded.value, barBeats(decoded.value), mediaEnd), segments: decoded.value };
+}
+
 export type SyncSegmentsResult = { readonly ok: true; readonly value: SyncSegments } | { readonly ok: false; readonly message: string };
 /** Shape and invariant validation for stored or received segments. */
 export function decodeSyncSegments(input: unknown): SyncSegmentsResult {

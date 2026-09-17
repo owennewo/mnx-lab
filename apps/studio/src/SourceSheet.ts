@@ -10,6 +10,7 @@ import type { MnxDocument } from '../../../src/model/mnx.ts';
 import { linearizePasses } from '../../../src/model/passes.ts';
 import { compilePerformance } from '../../../src/audio/performance.ts';
 import { syncSummary, type SyncSummary } from './syncSummary.ts';
+import { isImportedSync, storedScoreShape } from '../../../src/model/recordingAttachment.ts';
 
 const line = (d: string, px: number) => svg`<svg width=${px} height=${px} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d=${d}></path></svg>`;
 
@@ -35,6 +36,8 @@ export class SourceSheet extends LitElement {
   /** The live score-follow warning for the active recording. */
   @property() syncWarning = '';
   @property({ type: Boolean }) canAdd = false;
+  /** The score as a recording sees it now; an imported sync stamped with another shape may be out of date. */
+  @property() scoreShape = '';
   private compiled?: ReturnType<typeof compilePerformance>;
   private passes?: ReturnType<typeof linearizePasses>;
 
@@ -79,9 +82,15 @@ export class SourceSheet extends LitElement {
     this.dispatchEvent(new CustomEvent(type, { detail, bubbles: true, composed: true }));
   }
 
+  /** An imported sync whose bars have moved since it was last known good. */
+  private outOfDate(row: LibraryRecording): boolean {
+    const stamped = isImportedSync(row) ? storedScoreShape(row.provenance) : null;
+    return !!stamped && !!this.scoreShape && stamped !== this.scoreShape;
+  }
   /** The sub-line: what the recording is, and how it follows this score. */
-  private follows(summary: SyncSummary, active: boolean) {
+  private follows(summary: SyncSummary, active: boolean, outOfDate = false) {
     if (summary.warning || (active && this.syncWarning)) return 'sync warning';
+    if (outOfDate) return 'may be out of date';
     if (!summary.points.length) return 'no sync points';
     return summary.coverage === 'full' ? 'follows the whole score' : 'follows part of the score';
   }
@@ -91,14 +100,15 @@ export class SourceSheet extends LitElement {
     const summary = syncSummary(row, this.compiled, this.passes);
     const kind = row.kind === 'youtube' ? 'youtube' : 'audio';
     const name = row.name ?? 'Unnamed recording';
-    const follows = this.follows(summary, active);
+    const outOfDate = this.outOfDate(row);
+    const follows = this.follows(summary, active, outOfDate);
     const warning = active && (this.syncWarning || summary.warning || summary.dropped);
     const first = summary.points[0], last = summary.points.at(-1);
     return html`<div class="source">
       <div class="top">
         <button class="pick" type="button" role="radio" aria-checked=${active} data-source=${row.id} @click=${() => this.emit('source-choose', { id: row.id })}>
           <span class="dot"></span>
-          <span class="text"><b>${name}</b><span class=${follows === 'sync warning' ? 'sub warn' : 'sub'}>${sourceGlyph(kind, 14)}${kind === 'youtube' ? 'Video' : 'Audio'} · ${follows}</span></span>
+          <span class="text"><b>${name}</b><span class=${follows === 'sync warning' || follows === 'may be out of date' ? 'sub warn' : 'sub'}>${sourceGlyph(kind, 14)}${kind === 'youtube' ? 'Video' : 'Audio'} · ${follows}</span></span>
         </button>
         <button class="square" type="button" data-edit=${row.id} aria-label=${`Edit ${name}`} title="Edit details" @click=${() => this.emit('recording-edit', { id: row.id })}>${pencil}</button>
       </div>
@@ -106,6 +116,9 @@ export class SourceSheet extends LitElement {
         ? html`<div class="details">
             ${first && last
               ? html`<span class="stats">${summary.points.length} sync ${summary.points.length === 1 ? 'point' : 'points'} · performed bars ${first.bar + 1}–${last.bar + 1}</span>`
+              : nothing}
+            ${outOfDate
+              ? html`<div class="diagnostic" role="status" data-out-of-date><strong>May be out of date:</strong> the score's bars have changed since this sync was made. It counts bars by number, so everything after the change may now be early or late. Make a new sync in the sync bar to replace it.</div>`
               : nothing}
             ${warning
               ? html`<div class="diagnostic" role="status"><strong>Sync warning:</strong> ${this.syncWarning || (summary.warning ? summary.message : `${summary.dropped} out-of-range sync ${summary.dropped === 1 ? 'point' : 'points'} dropped.`)} Score following and seeking may be unavailable.</div>`

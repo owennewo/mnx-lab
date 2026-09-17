@@ -44,7 +44,8 @@ import { normalizeDisplayPreferences } from '../../../src/elements/displayDefaul
 import type { DocumentViewer, ViewMode, ViewSetting } from '../../../src/elements/DocumentViewer.ts';
 import type { RecordingSource } from '../../../src/audio/playbackBackend.ts';
 import type { Player, SyncEdit } from '../../../src/elements/Player.ts';
-import { storedSyncSegments } from '../../../src/model/recordingAttachment.ts';
+import { isImportedSync, storedScoreShape, storedSyncSegments } from '../../../src/model/recordingAttachment.ts';
+import { performedShape } from '../../../src/audio/scoreShape.ts';
 import { SYNC_SEGMENTS_FORMAT, type StudioSyncPayload } from '../../../src/model/syncSegments.ts';
 import type { ZoomPadChange } from '../../../src/elements/ZoomPad.ts';
 import { libraryReturnHref, returnToLibrary } from './StudioApp.ts';
@@ -95,6 +96,8 @@ export class PiecePage extends LitElement {
   @state() private losses: readonly StorageLoss[] = [];
   /** What the importer said when the stored file was opened. Shown, never stored. */
   @state() private conversionNotes: readonly string[] = [];
+  /** The score as a recording sees it — each performed bar's length (src/audio/scoreShape.ts). */
+  @state() private scoreShape = '';
   /** Another tab holds this piece's edit lock. */
   @state() private readOnly = false;
   /** The chip's clock; coarse, so the tray is not re-rendered every second. */
@@ -456,7 +459,34 @@ export class PiecePage extends LitElement {
     // A document without a performance needs no notice: the player's readout
     // already says so, and the score shows either way.
     this.binding!.setDocument(doc);
+    const { performance, writtenBarDurations } = this.player;
+    this.scoreShape = performance && writtenBarDurations ? performedShape(performance, writtenBarDurations) : '';
+    void this.stampImportedSyncs();
     this.requestUpdate();
+  }
+
+  // ── imported syncs: remember the bars they were good for ────────────────
+  // A Soundslice sync addresses performed bars by index and has nothing to
+  // re-derive from, so the only way to know the bars moved under it is to
+  // remember the shape it was last known good for. Nothing stamps them on the
+  // way in (the operator ingest knows no score), so Studio does on first sight:
+  // the sync plays today, and from here on a bar inserted, a repeat added or a
+  // re-export with different bars shows in the Source sheet. Once per recording.
+  private async stampImportedSyncs() {
+    const piece = this.snapshot?.piece.id, shape = this.scoreShape, generation = this.generation;
+    if (!piece || !shape || this.readOnly) return;
+    for (const row of this.snapshot!.recordings.filter(r => isImportedSync(r) && storedScoreShape(r.provenance) === null)) {
+      try {
+        const saved = await this.enqueue(async () => {
+          const current = this.snapshot?.piece.id === piece ? this.snapshot : null;
+          if (!current || generation !== this.generation) return null;
+          return this.client.saveRecording(piece, row.id, current.piece.revision, { name: row.name || 'Recording', scoreShape: shape });
+        });
+        if (!saved || generation !== this.generation) return;
+        this.snapshot = { ...saved.snapshot, tags: saved.snapshot.tags ?? this.snapshot?.tags ?? [] };
+        this.setRecordings(this.snapshot);
+      } catch { return; /* a stamp is a convenience: the next open tries again */ }
+    }
   }
 
   private tag(dimension: string): string | null {
@@ -491,6 +521,7 @@ export class PiecePage extends LitElement {
   // persists it. The segments ride as the sync's provenance beside the derived
   // tuples, through the same route a recording's name is saved by.
   private onSyncEdit(event: CustomEvent<SyncEdit>) {
+    if (this.readOnly) return;
     this.pendingSync = { ...event.detail, piece: this.snapshot?.piece.id ?? this.pieceId };
     clearTimeout(this.syncTimer);
     this.syncTimer = setTimeout(() => void this.flushSync(), 700);
@@ -707,7 +738,7 @@ export class PiecePage extends LitElement {
         ></mnx-document-viewer>
         <mnx-player slot="player" .recordings=${this.recordings} .syncWarningsInPanel=${true}
           .partMix=${this.partMix} .soundControl=${false} .sourceControl=${false}
-          .syncEditable=${!!this.snapshot} @sync-edit=${this.onSyncEdit}
+          .syncEditable=${!!this.snapshot} @sync-edit=${this.onSyncEdit} @sync-refresh=${this.onSyncEdit}
           @playback-position=${(e: CustomEvent<{ sourceId?: string; kind?: string; syncWarning?: string }>) => {
             const { sourceId, kind, syncWarning } = e.detail;
             if (kind !== this.playbackKind) this.playbackKind = kind;
@@ -725,6 +756,7 @@ export class PiecePage extends LitElement {
               .activeId=${activeId}
               .syncWarning=${this.recordingWarning?.id === activeId ? this.recordingWarning.message : ''}
               .canAdd=${!!this.snapshot}
+              .scoreShape=${this.scoreShape}
               @source-choose=${(e: CustomEvent<{ id: string }>) => void this.player?.selectSource(e.detail.id)}
               @recording-edit=${(e: CustomEvent<{ id: string }>) => void this.editRecording(e.detail.id)}
               @recording-add=${() => this.addRecording()}

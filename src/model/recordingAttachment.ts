@@ -39,6 +39,23 @@ export function attachmentSync(raw: unknown, selectedId: string | null): { syncp
   if (choice.syncpoints !== null) { const decoded = decodeRecordingSync(choice.syncpoints); if (!decoded.ok) throw new Error(decoded.diagnostic.message); }
   return { syncpoints: choice.syncpoints, provenance: { format: Array.isArray(raw) ? 'soundslice-sync-array' : 'soundslice-sync-wrapper', raw, selectedId: Array.isArray(raw) ? null : choice.id, crop_start: choice.crop_start, crop_end: choice.crop_end, cropped_duration: choice.cropped_duration } };
 }
+/**
+ * The score shape an imported sync was last known good for (src/audio/scoreShape.ts),
+ * kept beside whatever else the provenance holds. A bar-indexed sync has nothing
+ * to re-derive from, so this is how a reader learns the bars moved under it.
+ * Null when it was never stamped — an ingested recording Studio has not opened yet.
+ */
+export function storedScoreShape(provenance: unknown): string | null {
+  let value = provenance;
+  if (typeof value === 'string') { try { value = JSON.parse(value); } catch { return null; } }
+  const shape = value && typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, unknown>).scoreShape : null;
+  return typeof shape === 'string' && shape ? shape : null;
+}
+/** True for a sync with tuples and no segments: imported, bar-indexed, nothing to re-derive from. */
+export function isImportedSync(recording: { syncpoints: string | null; provenance?: unknown }): boolean {
+  if (!recording.syncpoints || recording.syncpoints === 'null' || recording.syncpoints === '[]') return false;
+  return storedSyncSegments(recording.provenance) === null;
+}
 /** The segments a Studio-authored sync was derived from, read back out of a
  *  stored provenance value; null for an imported or unsynchronised recording. */
 export function storedSyncSegments(provenance: unknown) {

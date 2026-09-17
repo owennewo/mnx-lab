@@ -101,6 +101,30 @@ A score with no bars yet saves `syncpoints: null` and keeps its segments. Saves 
 700 ms and serial; a revision conflict is retried once on the fresh revision, because the
 segments are still the reader's latest intent.
 
+**The segments are the sync; the tuples are a cache** (2026-09-17,
+[studio-sync-rederive](../roadmap/inprogress/studio-sync-rederive.md)). The tuples were
+derived against the bars the score had when the sync was last touched, so bars written since
+— or a meter changed, or a repeat added — leave them stale. Whenever a source has segments,
+the player ignores its stored tuples and derives them again from the segments and the bars
+as they are now (`playingSyncpoints`, `src/model/syncSegments.ts`): when it builds the
+source's sync map, which it does again for every new performance, and once more when the
+media's length is known, because an open last segment runs to the media's end. No bars yet
+is *not synchronised*, never yesterday's tuples. When what plays is not what is stored, the
+player emits **`sync-refresh`** — the same detail as `sync-edit` — and Studio writes it back
+through the same debounced path, so the row stays honest for a reader that has the recording
+and not the score. Playback never waits for that write.
+
+**An imported sync cannot be re-derived** — Soundslice tuples address performed bars by
+index — so it carries the *shape* it was last known good for instead: each performed bar's
+length, run-length encoded (`performedShape`, `src/audio/scoreShape.ts`; a 12-bar blues with
+a 2/4 turnaround is `11x1/1,1x1/2`), kept as `scoreShape` in the recording's provenance
+beside whatever else is there. Nothing stamps it on the way in — the operator ingest knows no
+score — so Studio does on first sight (`PUT …/recordings/:id` with `scoreShape`, which
+touches neither the tuples nor the rest of the provenance; a new sync forgets the stamp).
+From then on a bar inserted, a repeat added or a re-export with different bars shows in the
+Source sheet as *may be out of date*, with the way out: make a new sync in the sync bar. The
+stored evidence is never rewritten.
+
 ## Evidence
 
 - `harness/conformance/sync-segments.test.ts`, `click-schedule.test.ts`, and the added cases

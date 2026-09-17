@@ -159,8 +159,17 @@ back up to `proposed/` the moment it is.
 
 ### inprogress/
 
+- **[studio-sync-rederive.md](inprogress/studio-sync-rederive.md)** — **built 2026-09-17, two
+  hands-on checks owed**, [studio authoring campaign](inprogress/studio-campaign-authoring.md)
+  item 4: sync first, bars later. A Studio sync now **plays by its segments**, derived
+  against the bars as they are now (`playingSyncpoints`), and the stored tuples are a cache
+  the player never consults and Studio refreshes (`sync-refresh`). An imported sync, which
+  cannot be re-derived, carries the score **shape** it was last good for and reads *may be
+  out of date* in the Source sheet when the bars have moved. Owed by a person, inherited
+  from [studio-sync-bar](inprogress/studio-sync-bar.md): the click against a real YouTube
+  clock, and the sync bar on touch.
 - **[studio-campaign-authoring.md](inprogress/studio-campaign-authoring.md)** — **campaign**,
-  opened 2026-09-17, **items 1–3 built the same day**: studio stops being read-only. Priority flow **new piece
+  opened 2026-09-17, **items 1–4 built the same day** (4 owes two hands-on checks): studio stops being read-only. Priority flow **new piece
   → YouTube → sync**, working before any note editing exists; editing last. Opens on the
   finding that adding a recording and the sync bar were already built and persisted — what
   was missing was any way for a piece to exist outside the operator ingest. The contract's

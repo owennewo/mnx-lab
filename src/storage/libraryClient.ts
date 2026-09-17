@@ -9,7 +9,7 @@ export interface ShownTag { dimension: string; value: string; shown: string; ori
 export type LibrarySort = 'recent' | 'title' | 'artist';
 export interface TagChange { add?: { dimension: string; value: string }[]; remove?: { dimension: string; value: string }[]; rename?: { from: { dimension: string; value: string }; to: { dimension: string; value: string } }[] }
 export interface LibraryTag { dimension: string; value: string }
-export interface RecordingChange { name: string; rawSync?: unknown; selectedId?: string | null; video?: string }
+export interface RecordingChange { name: string; rawSync?: unknown; selectedId?: string | null; video?: string; scoreShape?: string | null }
 export interface LibraryRecording {
   provenance?: string | null;
   id: string; kind: 'audio' | 'video' | 'youtube'; name: string | null;

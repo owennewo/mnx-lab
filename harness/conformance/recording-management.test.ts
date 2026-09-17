@@ -118,3 +118,27 @@ it('authenticates HTTP uploads and rejects cross-site/non-JSON writes', async ()
   expect((await realApp.request('/api/library/uploads/'+id(),{method:'PUT',body:payload},env)).status).toBe(401);
   expect((await realApp.request('/api/library/uploads/'+id(),{method:'PUT',headers:{'Content-Type':'application/json','Cf-Access-Jwt-Assertion':jwt},body:'{}'},env)).status).toBe(415);
 });
+// roadmap/inprogress/studio-sync-rederive.md: the shape an imported sync is known good for.
+it('stamps a score shape into whatever provenance a recording has, without touching its sync', async () => {
+  const take = id();
+  const before = await manager.save('alice','piece',take,0,change);
+  const row = () => db.prepare('SELECT name,syncpoints,provenance FROM recordings WHERE id=?').bind(take).first<{ name: string; syncpoints: string; provenance: string }>();
+  const imported = await row();
+  const stamped = await manager.save('alice','piece',take,before.piece.revision,{ name: 'Take', scoreShape: '12x1/1' });
+  expect(stamped.piece.revision).toBe(before.piece.revision + 1);
+  const after = await row();
+  expect(after!.syncpoints).toBe(imported!.syncpoints);
+  expect(JSON.parse(after!.provenance)).toEqual({ ...JSON.parse(imported!.provenance), scoreShape: '12x1/1' });
+  // The same stamp again is nothing to write; a new sync forgets the old shape; null forgets it on request.
+  expect((await manager.save('alice','piece',take,stamped.piece.revision,{ name: 'Take', scoreShape: '12x1/1' })).piece.revision).toBe(stamped.piece.revision);
+  const cleared = await manager.save('alice','piece',take,stamped.piece.revision,{ name: 'Take', scoreShape: null });
+  expect(JSON.parse((await row())!.provenance)).not.toHaveProperty('scoreShape');
+  await manager.save('alice','piece',take,cleared.piece.revision,{ name: 'Take', scoreShape: '8x3/4' });
+  const resynced = await manager.save('alice','piece',take,cleared.piece.revision + 1,{ name: 'Take', rawSync: [[0,0],[1,3]] });
+  expect(JSON.parse((await row())!.provenance)).not.toHaveProperty('scoreShape');
+  await expect(manager.save('alice','piece',take,resynced.piece.revision,{ name: 'Take', scoreShape: 'x'.repeat(4097) })).rejects.toThrow('score shape');
+  // An ingested recording may have no provenance at all: the stamp stands alone.
+  await db.prepare('UPDATE recordings SET provenance=NULL WHERE id=?').bind(take).run();
+  await manager.save('alice','piece',take,resynced.piece.revision,{ name: 'Take', scoreShape: '4x1/1' });
+  expect(JSON.parse((await row())!.provenance)).toEqual({ scoreShape: '4x1/1' });
+});

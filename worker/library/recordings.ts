@@ -4,7 +4,9 @@ import { youtubeVideoId } from '../../src/model/youtubeUrl.ts';
 import { Library } from './index.ts';
 import { LibraryError, json, type Json, type Recording, type Snapshot } from './types.ts';
 
-export interface RecordingChange { name: string; rawSync?: unknown; selectedId?: string | null; video?: string }
+export interface RecordingChange { name: string; rawSync?: unknown; selectedId?: string | null; video?: string;
+  /** The score shape this sync is known good for; null forgets it. Rides in the provenance, whatever else is there. */
+  scoreShape?: string | null }
 interface Metadata { name: string; syncpoints: string | null; provenance: string | null; external_id: string | null }
 interface Upload { id: string; owner: string; piece_id: string; expected_revision: number; metadata: string; sha256: string; bytes: number; mime: string; state: 'pending' | 'complete' | 'cancelled'; expires_at: string }
 function invalid(message: string): never { throw new LibraryError('invalid', message); }
@@ -20,6 +22,13 @@ function metadata(change: RecordingChange, old?: Recording): Metadata {
       syncpoints = parsed.syncpoints === null ? null : json(parsed.syncpoints as Json);
       provenance = json(JSON.parse(JSON.stringify(parsed.provenance)) as Json);
     } catch (e) { invalid(e instanceof Error ? e.message : 'Invalid sync data.'); }
+  }
+  if (change.scoreShape !== undefined) {
+    if (change.scoreShape !== null && (typeof change.scoreShape !== 'string' || !change.scoreShape || change.scoreShape.length > 4096)) invalid('A score shape is up to 4096 characters.');
+    let held: Record<string, Json> = {};
+    try { const parsed = provenance === null ? null : JSON.parse(provenance); if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) held = parsed; } catch { /* unreadable provenance is replaced by the stamp alone */ }
+    if (change.scoreShape === null) delete held.scoreShape; else held.scoreShape = change.scoreShape;
+    provenance = Object.keys(held).length ? json(held) : null;
   }
   let external_id = old?.external_id ?? null;
   if (change.video !== undefined) { try { external_id = youtubeVideoId(change.video); } catch (e) { invalid(String(e instanceof Error ? e.message : e)); } }

@@ -33,6 +33,7 @@
     "smoke:inspector": "npm run build && node harness/verify/inspector-smoke.mjs",
     "smoke:focus": "npm run build && node harness/verify/focus-mode-smoke.mjs",
     "smoke:sync-bar": "npm run build && node harness/verify/sync-bar-smoke.mjs",
+    "smoke:sync-rederive": "npm run build && node harness/verify/sync-rederive-smoke.mjs",
     "smoke:piece-create": "npm run build && node harness/verify/piece-create-smoke.mjs",
     "smoke:save-pipeline": "npm run build && node harness/verify/save-pipeline-smoke.mjs",
     "dev:embed-app": "npm run build:embed && node harness/verify/serve-embed-app.mjs",
