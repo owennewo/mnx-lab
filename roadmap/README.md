@@ -177,15 +177,6 @@ back up to `proposed/` the moment it is.
   sync re-derivation → piece lifecycle → sync.json interchange (optional) →
   [core-editor-element-promotion](proposed/core-editor-element-promotion.md) in three slices
   → touch entry. Score-file upload is deliberately skipped.
-- **[core-roundtrip-register.md](inprogress/core-roundtrip-register.md)** — **built 2026-09-17**,
-  [studio authoring campaign](inprogress/studio-campaign-authoring.md) item 1: the judge of
-  what a `.gp` round trip loses (`src/model/documentCompare.ts` — identity moved into the
-  references, `encoding` discounted, inventory checked against both schemas) and the
-  committed register over the corpus and the Guitar Pro fixtures
-  (`npm run update:roundtrip-register`; git diff is the review). Found on day one: the
-  exporter's unison collapse turns a second voice into rests (hence
-  `STORAGE_EXPORT_OPTIONS`), a fourth verdict `gains`, 76 silent losses in the corpus lane,
-  and that a notation-only part reloads as a guitar.
 - **[core-space-units-sp.md](inprogress/core-space-units-sp.md)** — **in progress 2026-09-15** — Space becomes a number in
   staff spaces (air after a quarter note), 0 to a calibrated ceiling, and every horizontal
   consumer is one clamped line `max(0, m·x + c)`: the intercepts are the zero engraving,
@@ -495,6 +486,15 @@ back up to `proposed/` the moment it is.
 
 ### complete/
 
+- **[core-roundtrip-register.md](complete/core-roundtrip-register.md)** — **complete 2026-09-17**,
+  [studio authoring campaign](inprogress/studio-campaign-authoring.md) item 1: the judge of
+  what a `.gp` round trip loses (`src/model/documentCompare.ts` — identity moved into the
+  references, `encoding` discounted, inventory checked against both schemas) and the
+  committed register over the corpus and the Guitar Pro fixtures
+  (`npm run update:roundtrip-register`; git diff is the review). Found on day one: the
+  exporter's unison collapse turns a second voice into rests (hence
+  `STORAGE_EXPORT_OPTIONS`), a fourth verdict `gains`, 76 silent losses in the corpus lane,
+  and that a notation-only part reloads as a guitar.
 - **[core-coda-navigation.md](complete/core-coda-navigation.md)** — complete 2026-09-17;
   player campaign item 20: typed private coda/D.C./compound-D.S. navigation, complete
   GPIF direction preservation, shared normalization, engraving, traversal and authoring,

@@ -1,7 +1,7 @@
 # The round-trip comparator and the Guitar Pro loss register
 
-> **Status: built 2026-09-17.** Item 1 of the
-> [studio authoring campaign](studio-campaign-authoring.md) and bound by its contract
+> **Status: complete 2026-09-17.** Item 1 of the
+> [studio authoring campaign](../inprogress/studio-campaign-authoring.md) and bound by its contract
 > (clauses 3–4: no save is silent about loss; every difference must be explained by a
 > warning). Implementation loop. No golden moved; no verification debt.
 

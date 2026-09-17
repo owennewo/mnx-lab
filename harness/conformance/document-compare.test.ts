@@ -1,5 +1,5 @@
 // The round-trip judge, proved before it judges anything
-// (roadmap/inprogress/core-roundtrip-register.md).
+// (roadmap/complete/core-roundtrip-register.md).
 //
 // `src/model/documentCompare.ts` decides whether a converter round trip lost
 // something. A judge that cries wolf is worse than none — studio will show its

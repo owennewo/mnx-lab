@@ -1,5 +1,5 @@
 // The Guitar Pro round-trip register: what a save would lose, as evidence
-// (roadmap/inprogress/core-roundtrip-register.md, studio authoring campaign item 1).
+// (roadmap/complete/core-roundtrip-register.md, studio authoring campaign item 1).
 //
 // Studio stores `.gp` and works in MNX, so every save crosses the exporter and
 // every load crosses the importer. This register is what that crossing costs
