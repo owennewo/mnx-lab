@@ -92,7 +92,7 @@ few is half a beat out at the midpoint, where a click over the recording makes i
 ## Out of scope, named so they are not rediscovered
 
 Ramps and tapped segments; a beat-unit control; creating empty bars from a sync (needs the
-editor, [core-editor-element-promotion.md](../inprogress/core-editor-element-promotion.md));
+editor, [core-editor-element-promotion.md](../complete/core-editor-element-promotion.md));
 marking an odd bar from the sync bar; beat tracking or score-to-audio alignment for uploaded
 audio; tab-audio capture for YouTube. Each was discussed on the canvas or in the design
 conversation and none is filed as a proposal.

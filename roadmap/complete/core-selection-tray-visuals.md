@@ -50,7 +50,7 @@
 > rungs the tabs are), [core-campaign-element-ops.md](core-campaign-element-ops.md)
 > (the verbs the tiles will fire),
 > [core-editor-focus-scope.md](../complete/core-editor-focus-scope.md) (who owns the keystroke
-> while the tray is open), [core-editor-element-promotion.md](../inprogress/core-editor-element-promotion.md)
+> while the tray is open), [core-editor-element-promotion.md](core-editor-element-promotion.md)
 > (why it incubates in `workbench/`),
 > [core-viewer-surface.md](core-viewer-surface.md) (the one
 > element-surface addition it needs — that contract is now real, stages 1–5
@@ -185,7 +185,7 @@ while the tray is open it owns the keys it names and nothing else.
 `<mnx-selection-tray>`, incubating at `src/workbench/SelectionTray.ts` with the
 ScoreHud posture stated in its header: deliberately dumb, speaking a **neutral data
 contract** — no `edit/` types in its props — so the eventual promotion to
-`elements/` ([core-editor-element-promotion.md](../inprogress/core-editor-element-promotion.md),
+`elements/` ([core-editor-element-promotion.md](core-editor-element-promotion.md),
 parked on studio) is a move, not a rewrite.
 
 Properties (down):

@@ -91,7 +91,7 @@ line along the bottom edge. Nothing on the page listens for a tap to show chrome
 ## Out of scope
 
 Practice features (loop, speed trainer — [studio-player-practice.md](../proposed/studio-player-practice.md));
-the editor's promotion ([core-editor-element-promotion.md](../inprogress/core-editor-element-promotion.md));
+the editor's promotion ([core-editor-element-promotion.md](../complete/core-editor-element-promotion.md));
 restyling the pads; dark theme work beyond what `light-dark()` already gives the strips.
 
 ## Build record

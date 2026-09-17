@@ -29,7 +29,7 @@
 > [roadmap/proposed/low-priority/core-editor-ai-prompt.md](../proposed/low-priority/core-editor-ai-prompt.md), and
 > the one item that outlived this doc — the **`elements/` promotion**, gated on
 > the intent vocabulary stabilising and a real second consumer — is split out to
-> [roadmap/inprogress/core-editor-element-promotion.md](../inprogress/core-editor-element-promotion.md)
+> [roadmap/inprogress/core-editor-element-promotion.md](core-editor-element-promotion.md)
 > with its own trigger and brief. The keybinding research behind it is
 > [research/notation-editor-keyboard-models.md](../../research/notation-editor-keyboard-models.md)
 > (the survey, and §6 for its MNX Lab implications). The input layer is expected to stay

@@ -69,7 +69,7 @@
 > `<mnx-score-viewer>`. Builds on
 > [core-selection-ladder.md](../complete/core-selection-ladder.md) (the rungs and the
 > walk), takes its promotion discipline from
-> [core-editor-element-promotion.md](../inprogress/core-editor-element-promotion.md), keeps the
+> [core-editor-element-promotion.md](core-editor-element-promotion.md), keeps the
 > viewer's prop surface small per [core-viewer-surface.md](core-viewer-surface.md),
 > and owns the **per-part strings/capo override** gap left open by
 > [core-derived-positions.md](../complete/core-derived-positions.md)'s instrument-neutrality work.
@@ -186,7 +186,7 @@ promotion:
    row-data contract from day one** — the workbench maps session → `HudRow[]`; the
    component renders rows and emits `row-activated` / `tab-setup-changed`. Same
    pattern as the enclosure vocabulary: `elements/` draws, `workbench/` interprets.
-2. **The promotion gate** ([core-editor-element-promotion.md](../inprogress/core-editor-element-promotion.md))
+2. **The promotion gate** ([core-editor-element-promotion.md](core-editor-element-promotion.md))
    applies to the selection half — it renders session state, so it promotes when the
    editor does (a check, not a debate).
 3. **The instrument half is viewer-tier** — a read-only embed could want the ensemble

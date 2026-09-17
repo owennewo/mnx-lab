@@ -1,5 +1,5 @@
 // Writing notes in Studio, in a real browser against the local Worker/D1/R2
-// (roadmap/inprogress/core-editor-element-promotion.md, slice 1 — keyboard only).
+// (roadmap/complete/core-editor-element-promotion.md, slice 1 — keyboard only).
 // Same preconditions as studio-smoke.mjs. Real key events through the DevTools
 // protocol, because the point is who hears them: the editor's listener is on the
 // viewer, so keys typed into a text field must not reach it.

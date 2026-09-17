@@ -1,22 +1,22 @@
 # Promoting the editor into `elements/` — the second-consumer move
 
-> **Status: built — slices 1–3 (2026-09-17) and work-list item 5, the workbench's adoption of the
+> **Status: complete 2026-09-17 — slices 1–3 (2026-09-17) and work-list item 5, the workbench's adoption of the
 > binding (2026-09-17): one editor surface, not two.** See *Slice 1*, *Slices 2–3* and *Work-list
 > item 5* at the end. Originally **proposed (2026-08-09), deliberately parked.** Split out of
-> [core-editor-input-layer.md](../complete/core-editor-input-layer.md) as its one remaining
+> [core-editor-input-layer.md](core-editor-input-layer.md) as its one remaining
 > item, so that doc could close at its real scope (everything else shipped). This
 > doc owns the move that makes the editor consumable outside the workbench —
 > and, just as deliberately, the reasons not to make it yet.
 >
 > **Trigger 2 met, 2026-09-17.** Studio is the second consumer: this doc is item 7 of the
-> [studio authoring campaign](studio-campaign-authoring.md) and inherits its contract. The
+> [studio authoring campaign](../inprogress/studio-campaign-authoring.md) and inherits its contract. The
 > campaign sequences it last (creation, the save pipeline and sync come first), recommends
 > promoting in three slices with the rung inspector last, keeps `elements → assist` closed,
 > and opens `apps/studio → src/edit` earlier, at its item 3. The re-check below is kept as
 > the record of how the gate stood until then.
 >
 > **Trigger re-check, 2026-08-14** (prompted by
-> [core-editor-focus-scope.md](../complete/core-editor-focus-scope.md), whose stage 2 is
+> [core-editor-focus-scope.md](core-editor-focus-scope.md), whose stage 2 is
 > blocked on this doc and cannot proceed without it):
 >
 > - **Trigger 1 — the intent vocabulary: MET, on the trigger's literal terms.**
@@ -36,14 +36,14 @@
 > - **Cost 2 is substantially retired.** The doc recorded "the shadow-DOM
 >   focus story comes due immediately" as a reason to wait; that story is now
 >   designed and half-built ahead of the move
->   ([core-editor-focus-scope.md](../complete/core-editor-focus-scope.md): the scope
+>   ([core-editor-focus-scope.md](core-editor-focus-scope.md): the scope
 >   ladder, `keyScope.ts`, the ring, the ownership predicate, the
 >   binding-split assertion). What remains of it *is* item 3 below. The
 >   promotion is therefore **cheaper than when this doc was written** — the
 >   gate held while the expensive part got paid down early, which is the
 >   incubation design working as intended.
 > - **Caveat that cuts the other way**: the
->   [element-ops campaign](../complete/core-campaign-element-ops.md) will add
+>   [element-ops campaign](core-campaign-element-ops.md) will add
 >   intents for ~10 more item families. All additive on current evidence, but
 >   promoting mid-campaign means each item's new verbs land on a *public*
 >   surface. Not a blocker — additive is non-breaking — but it argues for
@@ -99,7 +99,7 @@ trace fixtures, root vitest), before and after.
    docs prescribe — the review *is* this list.
 2. **The element contract**: editor element vs editing mode on
    `<mnx-document-viewer>`; its attributes/properties/events, designed under
-   [core-viewer-surface.md](../complete/core-viewer-surface.md)'s layered rule (engine options →
+   [core-viewer-surface.md](core-viewer-surface.md)'s layered rule (engine options →
    element bindings → workbench chrome). Intents become the event vocabulary;
    the op log / trace capture needs a host-visible seam.
 3. **The shadow-DOM focus story** (survey §6.3), now unavoidable: where key
@@ -116,7 +116,7 @@ trace fixtures, root vitest), before and after.
    workbench-only by configuration). Decide it here if the palette is part of
    what moves.
 7. **So does the model picker** (added 2026-08-22).
-   [core-assist-model-selector.md](../complete/core-assist-model-selector.md) closed with
+   [core-assist-model-selector.md](core-assist-model-selector.md) closed with
    `<mnx-model-picker>` incubating in `workbench/` on exactly this gate — both
    shells want the selection mechanism, and trigger 2 is unmet for the same
    reason. It rides the same `elements → assist` decision as the palette and
@@ -128,7 +128,7 @@ trace fixtures, root vitest), before and after.
 ## Getting it moving (2026-08-14)
 
 > **Answered the same day**: option 1 was taken —
-> [core-viewer-embedded-app.md](../complete/core-viewer-embedded-app.md) establishes
+> [core-viewer-embedded-app.md](core-viewer-embedded-app.md) establishes
 > **embeds view; studio edits**. So trigger 2 is *not* met by the new
 > `viewer-embedded` app (a read-only consumer needs no editing) and now belongs
 > squarely to **studio**, when studio is real. The gate did not move; what
@@ -177,7 +177,7 @@ build.
 
 ## Slice 1 — the keyboard's core (built 2026-09-17)
 
-Item 7 of the [studio authoring campaign](studio-campaign-authoring.md), which sequences the
+Item 7 of the [studio authoring campaign](../inprogress/studio-campaign-authoring.md), which sequences the
 promotion in three slices. The owner's call on the open question: **slice 1 ships
 keyboard-only**; touch entry is its own item (campaign item 8).
 
@@ -273,7 +273,7 @@ viewport) — identically on a clean build of `main` at `261a3398`. Reported, no
 
 The campaign planned *slice 2: the setup popovers* and *slice 3: the lyric editor and the rung
 inspector*. Reading the workbench first showed the first of those was gone: the
-[one-surface campaign](../complete/workbench-campaign-one-surface.md) retired every
+[one-surface campaign](workbench-campaign-one-surface.md) retired every
 Shift+letter popover **into the rung inspector** — `SETUP_POPOVER_COMMANDS` has one row
 left, and it is the lyric text editor. Time, key, clef, tuning, part, bar attributes,
 adornments and rhythm are all the inspector's words now. So the two slices are one: promote

@@ -18,7 +18,7 @@
 | 4 | Sync re-derivation, shape stamp | built (`f2de86f1`); **two hands-on checks owed by the owner** | [studio-sync-rederive](studio-sync-rederive.md) |
 | 5 | Delete, versions, revert, defect reports | complete (`7ddd02d5`); **migration 0005 before deploy** | [studio-piece-lifecycle](../complete/studio-piece-lifecycle.md) |
 | 6 | sync.json interchange | not started, optional — wait for a second consumer | (index row only) |
-| 7 | Editor promotion | complete — slices 1–3 (`a394e7bc`, `7b38b743`), then the workbench's adoption of the binding | [core-editor-element-promotion](core-editor-element-promotion.md) |
+| 7 | Editor promotion | complete — slices 1–3 (`a394e7bc`, `7b38b743`), then the workbench's adoption of the binding | [core-editor-element-promotion](../complete/core-editor-element-promotion.md) |
 | 8 | Touch entry | not started — needs design first | (index row only) |
 
 All of it is on `main` and pushed. **None of it is deployed.**
@@ -64,7 +64,7 @@ walked end to end. When the owner reports both, move that doc (and
 ### 3. ~~Item 7's last work-list item: the workbench adopts `bindEditor`~~ — done
 
 Both shells sit on the one binding now; what was built and why is in
-[core-editor-element-promotion](core-editor-element-promotion.md) → *Work-list item 5*
+[core-editor-element-promotion](../complete/core-editor-element-promotion.md) → *Work-list item 5*
 and campaign log entry 10. `npm run smoke:workbench-editor` is the net for the workbench's
 side of the seam (revert, replay, the sweep, the rail); run it with `smoke:inspector`,
 `smoke:focus`, `smoke:selection`, `smoke:player` **and `smoke:studio-editor`** after touching

@@ -384,7 +384,7 @@ wire.
 Three surface gaps outlive the tiles and are not triage rows either: the dashed
 on-score preview of a scope **wider** than the enclosure can draw; the promoted
 score-rung `score-navigate` event; and the tray in the **embed / studio**, which waits
-on [core-editor-element-promotion.md](core-editor-element-promotion.md) and its
+on [core-editor-element-promotion.md](../complete/core-editor-element-promotion.md) and its
 deliberately parked trigger.
 
 ✔ when: every placement carries all three marks, no tile renders purple, and the

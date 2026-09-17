@@ -85,7 +85,7 @@ below — a deliberate, reviewed move.
 
 ## Editing — the trigger this pulled
 
-[roadmap/inprogress/core-editor-element-promotion.md](../../roadmap/inprogress/core-editor-element-promotion.md)
+[roadmap/complete/core-editor-element-promotion.md](../../roadmap/complete/core-editor-element-promotion.md)
 was parked behind "a real second consumer asking for editing". Studio is that consumer.
 The [studio authoring campaign](../../roadmap/inprogress/studio-campaign-authoring.md)
 sequences it: pieces are made in studio first (`#/new`), then the save pipeline, then the

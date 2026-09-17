@@ -26,7 +26,7 @@
 // checkpoints with nobody asked to save (roadmap/complete/studio-save-pipeline.md);
 // then versions, revert and delete (roadmap/complete/studio-piece-lifecycle.md);
 // then the editor's mount — notes from the keyboard, the rung inspector on Enter,
-// the lyric editor on Shift+L (roadmap/inprogress/core-editor-element-promotion.md).
+// the lyric editor on Shift+L (roadmap/complete/core-editor-element-promotion.md).
 // Every document change arrives through ONE door, `showDocument`, from the
 // editor binding's `onChange`; previews (an older version, the lyric editor's
 // scratch) set `this.doc` directly and are never told to the save session.

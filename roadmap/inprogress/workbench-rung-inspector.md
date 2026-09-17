@@ -2,7 +2,7 @@
 
 > **Moved 2026-09-17:** the element, its rows and its placement now live in `src/elements/` — promoted with
 > the editor's mount so studio shows the same inspector
-> ([core-editor-element-promotion](core-editor-element-promotion.md), slices 2–3). Its design is still owned here.
+> ([core-editor-element-promotion](../complete/core-editor-element-promotion.md), slices 2–3). Its design is still owned here.
 >
 > **Status: IN PROGRESS 2026-08-28 — all five stages built and landed the same day; fingerboard pills + four-row frame landed 2026-08-30.**
 > What stays open is not a stage but a dependency: the container rung reads its spec
