@@ -45,6 +45,13 @@ proposals that name their campaign.
 
 ### proposed/
 
+- **[core-coda-navigation.md](proposed/core-coda-navigation.md)** — player campaign item 20:
+  preserve Guitar Pro's Coda, Double Coda, D.C. and D.S. vocabulary in a typed
+  `_x.mnxLab.navigation` extension without widening published MNX. Keeps published and lab
+  jump enums separate and unions them only in the normalized consumer model; uses cached
+  *Blackbird* as the implementation-time end-to-end oracle, then distils it into a
+  synthetic GPIF fixture, corpus engraving and hand-stated performed order without
+  committing the copyrighted score.
 - **[studio-player-practice.md](proposed/studio-player-practice.md)** — campaign item 13,
   studio's first player feature in `elements/`: loop the selection with the **written-range
   → performed-occurrences policy stated**, speed trainer, count-in, metronome, mute/solo.

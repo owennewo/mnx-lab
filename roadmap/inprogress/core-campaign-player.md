@@ -205,6 +205,7 @@ run any time before 6.
 | 17 | [YouTube recordings](../complete/core-player-youtube.md) | Visible official iframe, policy/layout lifecycle, API rates, seek and error handling. | recording playback | adapter/layout checks + live embed check | complete |
 | 18 | [Recording attachments](../complete/studio-recording-management.md) | Studio URL/audio attachment, sync import, upload and revision lifecycle. | recording playback | service + browser checks | complete |
 | 19 | [Recording bookends](../complete/core-recording-bookends.md) | Treat media outside the anchored performance as pre/post-roll, render duration-labelled system bookends and repair cropped-duration provenance. | recording playback | fake media + layout projections + ingest repair | complete |
+| 20 | [Coda navigation](../proposed/core-coda-navigation.md) | Preserve Guitar Pro Coda, Double Coda, D.C. and compound D.S. directions through a typed `_x.mnxLab.navigation` extension; one normalized consumer model feeds engraving, editing and performed-order traversal. Cached *Blackbird* is the implementation-time oracle, distilled into synthetic and corpus evidence before landing. | reviewer | synthetic GPIF fixture + notation/tab/unrolled goldens + hand-stated traversal + local Blackbird review | proposed |
 
 ### Decisions still open
 
