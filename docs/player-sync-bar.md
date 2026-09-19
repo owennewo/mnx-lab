@@ -48,8 +48,12 @@ is still moving), `sync-seek` `{ seconds }`, `sync-loop` `{ start, end } | null`
   A split keeps the zoomed window it was made in; selecting a segment by its label zooms out.
 - The two trim handles are parked at the bar's ends until placed. A handle or cut is
   dragged, or selected and sent to the playhead. There is no cut button.
-- Selecting a placed cut **zooms** the bar to a 16-second window around it and draws beat
-  ticks; a hairline under the bar shows where the window sits. There is no zoom button. A
+- Beat ticks are drawn whenever the window holds 160 or fewer, zoomed or not — past that they
+  would be a grey wash, so a whole song shows none until it is zoomed. A mouse over the track
+  shows a card over the label strip: the segment, the beat within it and its count, the time,
+  and the tempo (or the unsynced region's name and the time). A finger never shows it.
+- Selecting a placed cut **zooms** the bar to a 16-second window around it; a hairline under
+  the bar shows where the window sits. There is no zoom button. A
   drag is measured as a delta in the window the cut will be shown in, so selecting and
   dragging in one gesture does not jump.
 - The selection's controls are one row above the tray. Cut: time, ±1 and ±10 ms, To

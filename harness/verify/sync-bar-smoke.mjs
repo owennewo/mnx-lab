@@ -72,6 +72,12 @@ try {
    check(bar.segments.segments[0].beats>40,'Tapping set no tempo');
    while(bar.segments.segments[0].beats>22)await press('One beat fewer');
    check(bar.segments.segments[0].beats===22,'Count did not step to 22');
+   // Ticks draw un-zoomed when they fit: 22 beats is 21 inner ticks. A mouse over the track names the beat.
+   check(!sr.querySelector('.mini')&&sr.querySelectorAll('.tick').length===21,'Un-zoomed ticks: '+sr.querySelectorAll('.tick').length);
+   const hover=async s=>{const t=sr.querySelector('.track').getBoundingClientRect(),v=bar.view;t.width;sr.querySelector('.track').dispatchEvent(new PointerEvent('pointermove',{clientX:t.left+t.width*(s-v.from)/(v.to-v.from),bubbles:true,composed:true,pointerType:'mouse'}));await bar.updateComplete;return sr.querySelector('.tip')?.textContent??null;};
+   const tip=await hover(a+6.5*(z-a)/22);check(tip&&tip.startsWith('Segment 1 · beat 7 of 22 · ')&&tip.endsWith(' bpm'),'Hover card: '+tip);
+   check((await hover(0.5))==='Pre-roll · 0:00.50','Pre-roll hover: '+await hover(0.5));
+   sr.querySelector('.track').dispatchEvent(new PointerEvent('pointerleave',{bubbles:true,composed:true}));await bar.updateComplete;check(!sr.querySelector('.tip'),'Hover card stayed');
    // The score follows the new sync in place.
    await seekTo(15);await until(()=>player.playback.scorePosition,'Score did not follow the authored sync');
    check(player.playback.scorePosition.ordinal===3,'Bar 4 (2/4) is not where its beats put it: '+player.playback.scorePosition.ordinal);

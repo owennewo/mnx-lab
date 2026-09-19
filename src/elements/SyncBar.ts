@@ -45,6 +45,8 @@ export class SyncBar extends LitElement {
   @state() private selected: Selection = null;
   @state() private zoom: { from: number; to: number } | null = null;
   @state() private looping = false;
+  /** Where a mouse or pen is over the track, in media seconds; the hover card reads it. Never a finger. */
+  @state() private hover: number | null = null;
   /** The window was moved by hand: it stays put until the playhead is seen inside it again, or is sought elsewhere. */
   private panHeld = false;
   private lastTime = 0;
@@ -125,6 +127,27 @@ export class SyncBar extends LitElement {
       background: color-mix(in oklab, var(--ink), transparent 50%);
       pointer-events: none;
     }
+    /* What is under the pointer: segment, beat, time and tempo. It sits over the label strip, where nothing
+       else needs the room, rather than above the bar where the selection's row is. */
+    .tip {
+      position: absolute;
+      top: -2px;
+      height: 18px;
+      box-sizing: border-box;
+      padding: 0 6px;
+      transform: translateX(-50%);
+      font: 500 11px/16px var(--mono);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+      color: var(--ink);
+      background: var(--player-ground, var(--surface, #fff));
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      pointer-events: none;
+      z-index: 5;
+    }
+    .tip.l { transform: none; }
+    .tip.r { transform: translateX(-100%); }
     .played {
       position: absolute;
       top: 0;
@@ -557,6 +580,15 @@ export class SyncBar extends LitElement {
   }
 
   // ── render ──────────────────────────────────────────────────────────────
+  /** The hover card's line: `Verse · beat 7 of 11 · 0:13.20 · 120.0 bpm`, or the unsynced region's name and time. */
+  private tipText(seconds: number) {
+    const i = segmentAt(this.segments, seconds), at = clock(seconds);
+    if (i < 0) return `${this.regions().find(r => r.index < 0 && seconds >= r.from && seconds < r.to)?.name ?? 'Unsynced'} · ${at}`;
+    const segment = this.segments.segments[i], tempo = segmentTempo(this.segments, i);
+    if (tempo === null) return `${segment.name} · ${at} · no tempo`;
+    const beat = Math.floor((seconds - this.segments.cuts[i]) * tempo / 60 + 1e-6) + 1;
+    return `${segment.name} · beat ${beat}${segment.beats !== null ? ` of ${segment.beats}` : ''} · ${at} · ${tempo.toFixed(1)} bpm`;
+  }
   private regions() {
     const { cuts, segments, closed } = this.segments, end = this.duration;
     if (!cuts.length) return [{ from: 0, to: end, name: 'Unsynced', index: -1 }];
@@ -611,8 +643,11 @@ export class SyncBar extends LitElement {
     if (!(this.duration > 0)) return html`<div class="wait" role="status">Play the recording once to load its length.</div>`;
     const { from, to } = this.view, s = this.selected, { cuts, closed } = this.segments;
     const shown = this.regions().filter(r => r.to > from && r.from < to);
-    const beats = this.zoom ? beatTimes(this.segments, from, to, this.duration).filter(b => !b.cut) : [];
+    // Beat ticks whenever they can be told apart: past MAX_TICKS in the window they would be a grey wash.
+    const beats = beatTimes(this.segments, from, to, this.duration).filter(b => !b.cut);
     const ticks = beats.length > MAX_TICKS ? [] : beats;
+    const tip = this.hover !== null && !this.drag && !this.miniDrag && this.hover >= from && this.hover <= to ? this.tipText(this.hover) : null;
+    const tipAt = (this.hover! - from) / (to - from);
     const width = (a: number, b: number) => `${(Math.min(to, b) - Math.max(from, a)) / (to - from) * 100}%`;
     return html`<div class="bar" tabindex="0" role="group" aria-label="Recording sync" @keydown=${this.onKey} @wheel=${this.onWheel}
         @pointerdown=${this.onTouchDown} @pointermove=${(e: PointerEvent) => { this.onCutMove(e); this.onTouchMove(e); }}
@@ -623,7 +658,9 @@ export class SyncBar extends LitElement {
           : html`<button type="button" class="lab" style=${`left:${this.pct(r.from)};width:${width(r.from, r.to)}`}
               aria-pressed=${s?.kind === 'segment' && s.index === r.index} title=${`Edit ${r.name}`}
               @click=${() => this.select(s?.kind === 'segment' && s.index === r.index ? null : { kind: 'segment', index: r.index })}>${r.name}</button>`)}
-        <div class="track" @click=${(e: MouseEvent) => this.seek(this.timeAt(e))} @dblclick=${(e: MouseEvent) => this.split(this.timeAt(e))}>
+        <div class="track" @click=${(e: MouseEvent) => this.seek(this.timeAt(e))} @dblclick=${(e: MouseEvent) => this.split(this.timeAt(e))}
+          @pointermove=${(e: PointerEvent) => { if (e.pointerType !== 'touch') this.hover = this.timeAt(e); }}
+          @pointerleave=${() => (this.hover = null)}>
           ${shown.map(r => html`<div class=${`seg${r.index < 0 ? ' un' : ''}${s?.kind === 'segment' && s.index === r.index ? ' sel' : ''}`}
             style=${`left:calc(${this.pct(r.from)} + 1px);width:calc(${width(r.from, r.to)} - 2px)`}></div>`)}
           ${ticks.map(b => html`<i class="tick" style=${`left:${this.pct(b.time)}`}></i>`)}
@@ -635,6 +672,8 @@ export class SyncBar extends LitElement {
           i === 0 || (closed && i === cuts.length - 1), s?.kind === 'cut' && s.index === i))}
         ${closed || this.zoom ? nothing : this.cutButton('end', to, 'End handle, not placed', true, s?.kind === 'parked' && s.end === 'end')}
         ${this.time >= from && this.time <= to ? html`<div class="head" style=${`left:${this.pct(this.time)}`}></div>` : nothing}
+        ${tip === null ? nothing : html`<div class=${`tip${tipAt < 0.15 ? ' l' : tipAt > 0.85 ? ' r' : ''}`} aria-hidden="true"
+          style=${tipAt < 0.15 ? 'left:0' : tipAt > 0.85 ? 'left:100%' : `left:${this.pct(this.hover!)}`}>${tip}</div>`}
         ${this.zoom ? html`<div class="mini" role="scrollbar" aria-orientation="horizontal" aria-label="The part of the recording shown"
           aria-valuemin="0" aria-valuemax=${Math.round(this.duration)} aria-valuenow=${Math.round(from)}
           @pointerdown=${this.onMiniDown} @pointermove=${this.onMiniMove} @pointerup=${this.onMiniUp} @pointercancel=${this.onMiniUp}

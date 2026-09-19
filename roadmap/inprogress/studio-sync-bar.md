@@ -114,6 +114,10 @@ few is half a beat out at the midpoint, where a click over the recording makes i
   not the bar, so the rail gets it too and the editor's provisional Space (toggleNote, score-focused)
   is untouched. Owner's first hands-on note: after clicking in the bar there was no way to play
   without leaving it.
+- 2026-09-19 — Beat ticks draw whenever 160 or fewer fit the window, not only when zoomed; a
+  mouse over the track shows a card (segment, beat n of m, time, bpm) over the label strip, the
+  one place it cannot collide with the selection row. Owner asked why the whole-recording view
+  had no ticks and for hover information.
 
 ## Out of scope, named so they are not rediscovered
 
