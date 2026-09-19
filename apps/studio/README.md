@@ -46,7 +46,7 @@ each recording, choose one, edit or add a recording in the same slot
 between the strips, and lists the parts: hide one from the score (it keeps playing), mute
 it, set its level beneath the tray's master volume and choose its sound — which is why the
 tray carries no Sound selector here. The mix is synth-only; while a recording plays only
-hiding works. Hidden parts and the mix are remembered per piece (`mnx-studio.parts.<id>`). The staff view is the settings card's STAFF row alone (the frame's
+hiding works. Hidden parts, the mix and the source last played are remembered per piece in the LIBRARY (`piece_views.prefs`, docs/studio-storage.md), so they hold across devices; `mnx-studio.parts.<id>` stays as the local cache that paints the sheet before the snapshot lands. The staff view is the settings card's STAFF row alone (the frame's
 segmented control is off here), the tag chips are the Tags sheet's, and sign-out is the
 library page's — a piece is not where you leave. A tap on the score is never a chrome
 toggle. The staff view, the display settings, zoom and spacing, the theme, and whether

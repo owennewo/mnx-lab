@@ -11,6 +11,8 @@ export const INGEST_OWNER = 'operator';
 export const MAX_INGEST_BYTES = 24 * 1024 * 1024;
 /** A score Studio wrote: a GP7 container is tens of KB, and it travels as base64 inside a JSON write. */
 export const MAX_STUDIO_SCORE_BYTES = 1024 * 1024;
+/** One piece's preferences: a source id and a mix of a handful of parts. Room to spare, and a bound. */
+export const MAX_PIECE_PREFS_BYTES = 8 * 1024;
 const encoder = new TextEncoder();
 async function authentic(candidate: string, secret: string) {
   const key = (value: string) => crypto.subtle.importKey('raw', encoder.encode(value), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign', 'verify']);
@@ -230,6 +232,16 @@ library.get('/pieces/:id', async c => {
 // The piece page says it opened; the recent sort reads it.
 library.post('/pieces/:id/opened', async c => {
   await reader(c).recordView(c.get('libraryUser').id, c.req.param('id'));
+  return c.body(null, 204);
+});
+// How the owner has this piece set up — the source they last played, the
+// Instruments sheet's mix. It rides in the piece snapshot on the way out. No
+// expected revision: a preference is not an edit of the piece, so it never
+// moves the revision and the last write wins (docs/studio-storage.md).
+library.put('/pieces/:id/prefs', async c => {
+  const prefs = object((await body(c)).prefs);
+  if (encoder.encode(JSON.stringify(prefs)).byteLength > MAX_PIECE_PREFS_BYTES) invalid('Preferences are too large');
+  await reader(c).writePrefs(c.get('libraryUser').id, c.req.param('id'), prefs as Json);
   return c.body(null, 204);
 });
 // A piece made in Studio. The browser built a document, exported it as Guitar

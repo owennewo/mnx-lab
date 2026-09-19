@@ -14,9 +14,9 @@ beforeEach(async () => {
   identity = await testIdentity(); jwt = await identity.sign();
   mf = new Miniflare(convertV4MiniflareOptions({ modules: true, script: 'export default {fetch(){return new Response("test")}}', compatibilityDate: '2026-06-01', d1Databases: ['DB'], r2Buckets: ['BUCKET'] }));
   env = { LIBRARY_DB: await mf.getD1Database('DB'), LIBRARY_BUCKET: await mf.getR2Bucket('BUCKET'), LIBRARY_WRITE_TOKEN: 'private-test', ...identity.config };
-  for (const name of ['0001_library.sql','0002_users.sql', '0003_piece_views.sql', '0005_piece_lifecycle.sql']) {
+  for (const name of ['0001_library.sql','0002_users.sql', '0003_piece_views.sql', '0005_piece_lifecycle.sql', '0006_piece_prefs.sql']) {
     const sql = await readFile(new URL(`../../migrations/${name}`, import.meta.url), 'utf8');
-    await env.LIBRARY_DB.batch(sql.replace(/--[^\n]*/g,'').trim().split(/;\s*(?=CREATE\b)/).map(s => env.LIBRARY_DB.prepare(s)));
+    await env.LIBRARY_DB.batch(sql.replace(/--[^\n]*/g,'').trim().split(/;\s*(?=(?:CREATE|ALTER)\b)/).map(s => env.LIBRARY_DB.prepare(s)));
   }
   await env.LIBRARY_DB.prepare("INSERT INTO users VALUES ('operator','owner@example.test',1,'now')").run();
 }, 15000);

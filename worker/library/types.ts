@@ -34,7 +34,9 @@ export interface AliasReport extends Alias { pieces: number }
 /** A facet: one effective dimension:value and how many pieces (under the current filters) carry it. */
 export interface Facet { dimension: string; value: string; pieces: number }
 export type PieceSort = 'recent' | 'title' | 'artist';
-export interface Snapshot { piece: Piece; renditions: Rendition[]; recordings: Recording[]; tags: Tag[] }
+/** The owner's own setup for this piece (`piece_views.prefs`): opaque to the
+ *  service, normalized by the shell that wrote it. Null until they change something. */
+export interface Snapshot { piece: Piece; renditions: Rendition[]; recordings: Recording[]; tags: Tag[]; prefs: Json | null }
 export interface BlobInput { content: ArrayBuffer; sha256?: string }
 export interface RenditionInput extends BlobInput {
   id: string; format: Format; role: Rendition['role']; producer: string;

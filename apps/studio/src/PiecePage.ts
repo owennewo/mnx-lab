@@ -73,7 +73,7 @@ import { JUST_DELETED_KEY, libraryHref, pieceHref } from './StudioApp.ts';
 import type { TagsSnapshot } from './TagsSheet.ts';
 import type { InstrumentPart } from './InstrumentsSheet.ts';
 
-import { VIEW_KEY, DISPLAY_KEY, UNROLLED_KEY, STAFF_SP_KEY, SPACE_SP_KEY, SPACING_MODE_KEY, FOCUSED_KEY, write, readView, readDisplay, readUnrolled, readSpacingMode, readStaffSp, readSpaceSp, readFocused, readParts, writeParts } from './scorePreferences.ts';
+import { VIEW_KEY, DISPLAY_KEY, UNROLLED_KEY, STAFF_SP_KEY, SPACE_SP_KEY, SPACING_MODE_KEY, FOCUSED_KEY, write, readView, readDisplay, readUnrolled, readSpacingMode, readStaffSp, readSpaceSp, readFocused, readParts, writeParts, normalizePiecePrefs, canonicalJson, type PiecePreferences } from './scorePreferences.ts';
 
 const back = html`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"></path></svg>`;
 /** Instruments: three faders, each knob at its own level. */
@@ -151,6 +151,11 @@ export class PiecePage extends LitElement {
   private pendingSync: (SyncEdit & { piece: string }) | null = null;
   private syncTimer: ReturnType<typeof setTimeout> | undefined;
   private syncSaving = false;
+  /** The owner's setup for this piece, debounced the same way; the last write wins. */
+  private pendingPrefs: { piece: string; prefs: PiecePreferences } | null = null;
+  private prefsTimer: ReturnType<typeof setTimeout> | undefined;
+  /** What the library holds, canonically serialized, so an unchanged setup writes nothing. */
+  private savedPrefs = '';
   // ── editing and saving (roadmap: studio-save-pipeline) ───────────────────
   /** The editor's mount (src/elements/editorHost.ts), loaded only for a piece that can be edited: one history for notes and metadata alike. */
   private editor: EditorBinding | null = null;
@@ -323,6 +328,7 @@ export class PiecePage extends LitElement {
     clearInterval(this.ticker);
     this.endSession();
     void this.flushSync();
+    void this.flushPrefs();
     ++this.generation;
     this.binding?.dispose();
     this.binding = null;
@@ -348,6 +354,7 @@ export class PiecePage extends LitElement {
   private async load() {
     this.endSession();
     void this.flushSync();
+    void this.flushPrefs();
     const generation = ++this.generation;
     this.binding?.dispose(); this.binding = null;
     this.player?.stop();
@@ -390,6 +397,7 @@ export class PiecePage extends LitElement {
         lastUpdated: Date.now(),
         mnxJson,
       };
+      void this.applyPrefs(snapshot, mnxJson.parts.length, generation);
     } catch (error) {
       if (generation !== this.generation) return;
       this.error = error instanceof Error ? error.message : 'The library is unavailable.';
@@ -811,12 +819,79 @@ export class PiecePage extends LitElement {
     void this.refreshSnapshot();
   }
 
+  // ── the owner's own setup for this piece ────────────────────────────────
+  // Which source they last played and how they left the Instruments sheet,
+  // kept per owner and piece in the library beside `opened_at` (docs/studio-
+  // storage.md) so it holds across devices and survives a cleared browser.
+  // localStorage stays the cache underneath: it paints the sheet before the
+  // snapshot lands, and it is the whole story for a shell with no library.
+
+  /** What the library kept, applied once the document's parts are known. */
+  private async applyPrefs(snapshot: LibrarySnapshot | null, partCount: number, generation: number) {
+    const stored = normalizePiecePrefs(snapshot?.prefs);
+    this.savedPrefs = canonicalJson(stored);
+    if (stored.parts && stored.parts.count === partCount) {
+      this.hiddenParts = stored.parts.hidden;
+      this.partMix = stored.parts.mix;
+      writeParts(this.pieceId, { hidden: stored.parts.hidden, mix: stored.parts.mix });
+    } else if (!stored.parts && (this.hiddenParts.length || Object.keys(this.partMix).length)) {
+      // Nothing stored yet and this browser remembers a mix: seed the library
+      // from it, so the setup made before preferences moved up is not lost.
+      this.schedulePrefs();
+    }
+    await this.cueStoredSource(stored.source, generation);
+  }
+  /** The source they last played, CUED and left paused — opening a piece never
+   *  starts anything. A recording since deleted is ignored, and the player's own
+   *  reconciliation leaves the synth selected. */
+  private async cueStoredSource(id: string | undefined, generation: number) {
+    if (!id || id === 'synth' || !this.recordings.some(r => r.id === id)) return;
+    await this.updateComplete;
+    await this.player?.updateComplete;
+    if (generation !== this.generation) return;
+    await this.player?.selectSource(id);
+    // Selecting carries the intent to play — that is what makes switching source
+    // mid-piece continue — so opening a piece pauses after the handoff. A piece
+    // that opens playing is never what was asked for.
+    this.player?.pause();
+  }
+  private currentPrefs(): PiecePreferences {
+    const touched = this.hiddenParts.length > 0 || Object.keys(this.partMix).length > 0;
+    return {
+      ...(this.selectedRecordingId ? { source: this.selectedRecordingId } : {}),
+      // The rendition the mix was left against — provenance for `count`, and
+      // meaningless without it.
+      ...(touched && this.snapshot?.piece.canonical_rendition_id ? { rendition: this.snapshot.piece.canonical_rendition_id } : {}),
+      ...(touched ? { parts: { hidden: [...this.hiddenParts], mix: this.partMix, count: this.doc?.mnxJson.parts.length ?? 0 } } : {}),
+    };
+  }
+  private schedulePrefs() {
+    if (!this.snapshot) return;
+    this.pendingPrefs = { piece: this.pieceId, prefs: this.currentPrefs() };
+    clearTimeout(this.prefsTimer);
+    this.prefsTimer = setTimeout(() => void this.flushPrefs(), 700);
+  }
+  private async flushPrefs() {
+    clearTimeout(this.prefsTimer);
+    const pending = this.pendingPrefs;
+    this.pendingPrefs = null;
+    if (!pending) return;
+    const text = canonicalJson(pending.prefs);
+    if (text === this.savedPrefs) return;
+    this.savedPrefs = text;
+    // A convenience, never a gate: a failed write is retried by the next change
+    // and is never shown — the piece and its edits are unaffected either way.
+    try { await this.client.savePrefs(pending.piece, pending.prefs); }
+    catch { if (this.pieceId === pending.piece) this.savedPrefs = ''; }
+  }
+
   // ── the Instruments sheet ───────────────────────────────────────────────
 
   private setParts(hidden: readonly number[], mix: PartMix) {
     this.hiddenParts = hidden;
     this.partMix = mix;
     writeParts(this.pieceId, { hidden, mix });
+    this.schedulePrefs();
   }
   private instrumentParts(doc: MnxDocument): InstrumentPart[] {
     const performance = this.player?.performance ?? null;
@@ -943,6 +1018,7 @@ export class PiecePage extends LitElement {
           }}
           @source-selected=${(e: CustomEvent<{ id: string }>) => {
             this.selectedRecordingId = e.detail.id === 'synth' ? null : e.detail.id;
+            this.schedulePrefs();
           }}>
         </mnx-player>
         ${this.sourceOpen && this.doc

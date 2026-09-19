@@ -31,6 +31,13 @@ export function parseFilters(filters: string[]): [string, string][] {
   return filters.map(t => { const colon = t.indexOf(':'); if (colon <= 0) throw new LibraryError('invalid', 'A filter is dimension:value'); return [t.slice(0, colon), t.slice(colon + 1)]; });
 }
 const tagKey = (t: { dimension: string; value: string }) => JSON.stringify([t.dimension, t.value]);
+/** Stored preferences, read back. Unreadable text is treated as absent: the
+ *  shell can write them again, and a piece must still open when they are junk. */
+function readPrefs(row: { prefs: string | null } | undefined): Json | null {
+  if (!row?.prefs) return null;
+  try { const value: unknown = JSON.parse(row.prefs); return value && typeof value === 'object' && !Array.isArray(value) ? value as Json : null; }
+  catch { return null; }
+}
 function asserted(dimension: string, value: string) {
   requireText(dimension, 'dimension'); requireText(value, 'value');
   if (isDerivedDimension(dimension)) throw new LibraryError('invalid', 'Derived dimensions cannot be asserted');
@@ -48,15 +55,17 @@ export class Library {
   async getPiece(owner: string, id: string): Promise<Snapshot | null> {
     requireText(owner, 'owner'); requireText(id, 'piece id');
     // One read transaction: rows and revision always describe the same state.
-    const [p, r, recordings, tags] = await this.db.batch([
+    const [p, r, recordings, tags, prefs] = await this.db.batch([
       // A deleted piece is not found by anything but the deleted list and restore.
       this.statement('SELECT * FROM pieces WHERE owner=? AND id=? AND deleted_at IS NULL', owner, id),
       this.statement('SELECT r.* FROM renditions r JOIN pieces p ON p.id=r.piece_id WHERE p.owner=? AND p.id=? ORDER BY r.id', owner, id),
       this.statement('SELECT r.* FROM recordings r JOIN pieces p ON p.id=r.piece_id WHERE p.owner=? AND p.id=? ORDER BY r.id', owner, id),
-      this.statement('SELECT * FROM tags WHERE owner=? AND piece_id=? ORDER BY dimension,value', owner, id)
+      this.statement('SELECT * FROM tags WHERE owner=? AND piece_id=? ORDER BY dimension,value', owner, id),
+      this.statement('SELECT prefs FROM piece_views WHERE owner=? AND piece_id=?', owner, id)
     ]);
     if (!p.results.length) return null;
-    return { piece: p.results[0] as Piece, renditions: r.results as Rendition[], recordings: recordings.results as Recording[], tags: tags.results as Tag[] };
+    return { piece: p.results[0] as Piece, renditions: r.results as Rendition[], recordings: recordings.results as Recording[], tags: tags.results as Tag[],
+      prefs: readPrefs(prefs.results[0] as { prefs: string | null } | undefined) };
   }
 
   async findPiece(owner: string, sourceKind: string, sourceId: string): Promise<Piece | null> {
@@ -127,6 +136,19 @@ export class Library {
     if (!piece) throw new LibraryError('not_found', 'Piece not found');
     await this.statement(`INSERT INTO piece_views (owner,piece_id,opened_at) VALUES (?,?,?)
       ON CONFLICT(owner,piece_id) DO UPDATE SET opened_at=excluded.opened_at`, owner, pieceId, now).run();
+  }
+
+  /** The owner's setup for this piece, as the shell hands it over. Preferences
+   *  never bump the piece's revision — a sound or a source is not an edit — so
+   *  there is no expected revision and the last write wins. The row is the one
+   *  `recordView` keeps, created here when a preference beats the first open. */
+  async writePrefs(owner: string, pieceId: string, prefs: Json, now = new Date().toISOString()) {
+    requireText(owner, 'owner'); requireText(pieceId, 'piece id');
+    const piece = await this.statement('SELECT id FROM pieces WHERE owner=? AND id=? AND deleted_at IS NULL', owner, pieceId).first();
+    if (!piece) throw new LibraryError('not_found', 'Piece not found');
+    await this.statement(`INSERT INTO piece_views (owner,piece_id,opened_at,prefs,prefs_updated_at) VALUES (?,?,?,?,?)
+      ON CONFLICT(owner,piece_id) DO UPDATE SET prefs=excluded.prefs, prefs_updated_at=excluded.prefs_updated_at`,
+      owner, pieceId, now, json(prefs), now).run();
   }
 
   async readRendition(owner: string, id: string) {
@@ -441,6 +463,8 @@ export class Library {
       if (/library_revision_conflict|UNIQUE constraint failed/.test(message)) throw new LibraryError('conflict', 'Piece revision or identity changed; read it again');
       throw error;
     }
-    return { piece, renditions: [...renditions.values()].sort((a,b) => a.id.localeCompare(b.id)), recordings: [...recordings.values()].sort((a,b) => a.id.localeCompare(b.id)), tags: orderedTags };
+    // Nothing here touches piece_views, so the owner's setup is what the read
+    // at the top of this write found — and nothing for a piece just created.
+    return { piece, renditions: [...renditions.values()].sort((a,b) => a.id.localeCompare(b.id)), recordings: [...recordings.values()].sort((a,b) => a.id.localeCompare(b.id)), tags: orderedTags, prefs: before?.prefs ?? null };
   }
 }

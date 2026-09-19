@@ -18,7 +18,13 @@ export interface LibraryRecording {
 /** One stored file of a piece. An `edit` is a version Studio saved; `evidence` is never a version. */
 export interface LibraryRendition { id: string; format: string; role: 'original' | 'export' | 'derived' | 'edit' | 'evidence'; created_at: string; bytes: number;
   derived_from: string | null; producer: string; producer_version: string | null; provenance: string | null; filename: string | null }
-export interface LibrarySnapshot { piece: { id: string; revision: number; canonical_rendition_id?: string | null }; tags: ShownTag[]; recordings: LibraryRecording[]; renditions?: LibraryRendition[] }
+/** The owner's own setup for one piece — which source they last played, how the
+ *  Instruments sheet was left. Opaque here on purpose: this layer may not import
+ *  `src/audio`, so the shell that writes a shape is the one that normalizes it. */
+export type PiecePrefs = Record<string, unknown>;
+export interface LibrarySnapshot { piece: { id: string; revision: number; canonical_rendition_id?: string | null }; tags: ShownTag[]; recordings: LibraryRecording[]; renditions?: LibraryRendition[];
+  /** Absent on a snapshot from a route that does not carry them; null until the owner changes something. */
+  prefs?: PiecePrefs | null }
 export interface DeletedPiece { id: string; revision: number; deleted_at: string; title: string | null; artist: string | null }
 /** A `.gp` Studio wrote, with what produced it. */
 export interface StudioScoreFile { filename: string; bytes: Uint8Array; producerVersion: string | null; producerOptions: Record<string, unknown> | null }
@@ -97,6 +103,9 @@ export class LibraryClient {
   restorePiece(piece: string) { return this.recordingRequest<{ snapshot: LibrarySnapshot }>(`/pieces/${encodeURIComponent(piece)}/restore`, 'POST', {}); }
   deleted() { return this.get<{ pieces: DeletedPiece[] }>('/deleted'); }
   opened(id: string) { return this.send<void>('POST', `/pieces/${encodeURIComponent(id)}/opened`, {}); }
+  /** Store the owner's setup for a piece. No revision: preferences are not an
+   *  edit of the piece, so they never conflict — the last write wins. */
+  savePrefs(id: string, prefs: PiecePrefs) { return this.send<void>('PUT', `/pieces/${encodeURIComponent(id)}/prefs`, { prefs }); }
   changeTags(id: string, revision: number, change: TagChange) { return this.send<{ snapshot: { piece: { id: string; revision: number; canonical_rendition_id?: string | null }; tags: ShownTag[] } }>('PATCH', `/pieces/${encodeURIComponent(id)}/tags`, { expected_revision: revision, ...change }); }
   aliases() { return this.get<{ aliases: LibraryAlias[] }>('/aliases'); }
   setAlias(dimension: string, raw: string, canonical: string) { return this.send<{ aliases: LibraryAlias[] }>('PUT', '/aliases', { dimension, raw_value: raw, canonical_value: canonical }); }

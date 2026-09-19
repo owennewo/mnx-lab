@@ -14,6 +14,7 @@ let library: Library;
 const migration = readFileSync(new URL('../../migrations/0001_library.sql', import.meta.url), 'utf8');
 const views = readFileSync(new URL('../../migrations/0003_piece_views.sql', import.meta.url), 'utf8');
 const lifecycle = readFileSync(new URL('../../migrations/0005_piece_lifecycle.sql', import.meta.url), 'utf8');
+const prefs = readFileSync(new URL('../../migrations/0006_piece_prefs.sql', import.meta.url), 'utf8');
 const bytes = (text: string) => new TextEncoder().encode(text).buffer;
 function mnx(id: string, title = 'Title', extras: Partial<RenditionInput> = {}): RenditionInput {
   const doc = structuredClone(score);
@@ -34,7 +35,7 @@ beforeEach(async () => {
   db = await mf.getD1Database('DB');
   bucket = await mf.getR2Bucket('BUCKET');
   // Split only between this migration's CREATE statements, preserving the trigger body.
-  await db.batch([migration, views, lifecycle].map(m => m.replace(/--[^\n]*/g, '').trim().split(/;\s*(?=CREATE\b)/).map(sql => db.prepare(sql))).flat());
+  await db.batch([migration, views, lifecycle, prefs].map(m => m.replace(/--[^\n]*/g, '').trim().split(/;\s*(?=(?:CREATE|ALTER)\b)/).map(sql => db.prepare(sql))).flat());
   library = new Library(db, bucket);
 }, 15000);
 afterEach(async () => { await mf?.dispose(); });

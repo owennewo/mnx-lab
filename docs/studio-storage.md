@@ -299,6 +299,46 @@ CREATE TABLE piece_views (
 );
 ```
 
+## The owner's setup for a piece — `piece_views.prefs` (2026-09-19)
+
+Beside WHEN a piece was last opened, the same row keeps HOW it was last set up: the source
+that was playing (`synth` or a recording id) and the Instruments sheet's hidden parts and
+mix, the sound of each part included. Server-side for the reason `opened_at` is — a nylon
+guitar chosen on the laptop is still chosen on the tablet — and per owner, because it is a
+preference, not a property of the piece that everyone sharing it would see. Migration
+`0006_piece_prefs.sql` adds two columns to `piece_views`; a preference on a piece never
+opened creates the row.
+
+```sql
+ALTER TABLE piece_views ADD COLUMN prefs TEXT;
+ALTER TABLE piece_views ADD COLUMN prefs_updated_at TEXT;
+```
+
+**The service keeps it opaque.** `PUT /api/library/pieces/:id/prefs` takes a JSON object,
+caps it at `MAX_PIECE_PREFS_BYTES` (8 KiB) and stores the text; `getPiece` hands it back on
+the snapshot, treating anything unreadable as absent so a junk value can never stop a piece
+opening. The Worker's ceiling is `model` + `assist`, and a part mix and a sample preset live
+in `src/audio`, so the shell that writes a shape is the one that checks it
+(`normalizePiecePrefs` in `apps/studio/src/scorePreferences.ts`). A new sample pack is
+therefore never a migration.
+
+**A preference is not an edit.** The write carries no expected revision, never moves the
+piece's revision, and the last write wins — otherwise choosing a sound would conflict with
+another device's save and read as a change to the score. Studio debounces it at 700 ms, the
+way the sync bar debounces its own saves, and a failed write is retried by the next change
+rather than shown.
+
+**What survives a new version of the score.** The mix is keyed by part INDEX, which a new
+canonical rendition can renumber, so it is stored with the `count` of parts it was left
+against (and the `rendition` it came from, as provenance). On open, the mix applies only
+while that count still matches the document; the source, named by id, survives regardless,
+and a recording since deleted falls back to the synth. The source is CUED, never started.
+
+`mnx-studio.parts.<pieceId>` stays in localStorage underneath as a cache — it paints the
+Instruments sheet before the snapshot arrives, it is all a shell without the library has,
+and on the first open after this landed it seeds the library from what that browser
+remembered.
+
 ## Worker library API (item 2)
 
 `worker/library/index.ts` exports `Library(db, bucket)`. Callers

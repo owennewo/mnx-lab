@@ -85,23 +85,59 @@ export function readNumber(key: string): number | null {
  *  pieces; an untouched piece stores nothing. */
 export interface PartsPreference { hidden: readonly number[]; mix: PartMix }
 const partsKey = (pieceId: string) => `mnx-studio.parts.${pieceId}`;
+/** Parts as stored, checked value by value. The same function serves this
+ *  browser's copy and the library's, because neither is trusted: localStorage is
+ *  editable and the service keeps preferences opaque (it may not import
+ *  `src/audio`, so a sample preset means nothing to it). */
+export function normalizeParts(raw: unknown): PartsPreference {
+  const source = (raw && typeof raw === 'object' ? raw : {}) as { hidden?: unknown; mix?: unknown };
+  const hidden = Array.isArray(source.hidden) ? source.hidden.filter((i): i is number => Number.isInteger(i) && i >= 0) : [];
+  const mix: Record<number, PartMixEntry> = {};
+  for (const [key, value] of Object.entries(source.mix && typeof source.mix === 'object' ? source.mix : {})) {
+    const index = Number(key);
+    if (!Number.isInteger(index) || index < 0 || !value || typeof value !== 'object') continue;
+    const { volume, muted, sound } = value as Record<string, unknown>;
+    mix[index] = {
+      ...(typeof volume === 'number' && volume >= 0 && volume <= 1 ? { volume } : {}),
+      ...(muted === true ? { muted } : {}),
+      ...(sound === 'synth' || isSamplePreset(sound) ? { sound } : {}),
+    };
+  }
+  return { hidden, mix };
+}
 export function readParts(pieceId: string): PartsPreference {
-  try {
-    const raw = JSON.parse(read(partsKey(pieceId)) ?? '{}') as { hidden?: unknown; mix?: unknown };
-    const hidden = Array.isArray(raw.hidden) ? raw.hidden.filter((i): i is number => Number.isInteger(i) && i >= 0) : [];
-    const mix: Record<number, PartMixEntry> = {};
-    for (const [key, value] of Object.entries(raw.mix && typeof raw.mix === 'object' ? raw.mix : {})) {
-      const index = Number(key);
-      if (!Number.isInteger(index) || index < 0 || !value || typeof value !== 'object') continue;
-      const { volume, muted, sound } = value as Record<string, unknown>;
-      mix[index] = {
-        ...(typeof volume === 'number' && volume >= 0 && volume <= 1 ? { volume } : {}),
-        ...(muted === true ? { muted } : {}),
-        ...(sound === 'synth' || isSamplePreset(sound) ? { sound } : {}),
-      };
-    }
-    return { hidden, mix };
-  } catch { return { hidden: [], mix: {} }; }
+  try { return normalizeParts(JSON.parse(read(partsKey(pieceId)) ?? '{}')); }
+  catch { return { hidden: [], mix: {} }; }
+}
+/** What the library keeps for this owner and piece (`piece_views.prefs`): the
+ *  source they last played and how they left the Instruments sheet. A plain
+ *  object type, not an interface, so it travels as the client's opaque JSON.
+ *
+ *  `parts.count` is the number of parts the mix was left against. A mix is keyed
+ *  by part INDEX, which a new canonical rendition can renumber, so a mix whose
+ *  count no longer matches the document is dropped rather than misapplied — the
+ *  source, which is named by id, survives that. */
+export type PiecePreferences = {
+  source?: string;
+  rendition?: string;
+  parts?: { hidden: readonly number[]; mix: PartMix; count: number };
+};
+export function normalizePiecePrefs(raw: unknown): PiecePreferences {
+  const source = (raw && typeof raw === 'object' ? raw : {}) as Record<string, unknown>;
+  const parts = source.parts && typeof source.parts === 'object' ? source.parts as { count?: unknown } : null;
+  const count = typeof parts?.count === 'number' && Number.isInteger(parts.count) && parts.count >= 0 ? parts.count : null;
+  return {
+    ...(typeof source.source === 'string' && source.source ? { source: source.source } : {}),
+    ...(typeof source.rendition === 'string' && source.rendition ? { rendition: source.rendition } : {}),
+    ...(parts && count !== null ? { parts: { ...normalizeParts(parts), count } } : {}),
+  };
+}
+/** Key order never decides whether preferences changed. */
+export function canonicalJson(value: unknown): string {
+  return JSON.stringify(value, (_key, v: unknown) =>
+    v && typeof v === 'object' && !Array.isArray(v)
+      ? Object.fromEntries(Object.entries(v as Record<string, unknown>).sort(([a], [b]) => (a < b ? -1 : 1)))
+      : v);
 }
 export function writeParts(pieceId: string, value: PartsPreference) {
   const empty = !value.hidden.length && !Object.keys(value.mix).length;

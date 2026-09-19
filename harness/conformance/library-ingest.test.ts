@@ -48,9 +48,9 @@ beforeEach(async () => {
   env = { LIBRARY_DB: await mf.getD1Database('DB'), LIBRARY_BUCKET: await mf.getR2Bucket('BUCKET'), LIBRARY_WRITE_TOKEN: token };
   const identity = await testIdentity(); Object.assign(env, identity.config); assertion = await identity.sign({}, true);
   await env.LIBRARY_DB.exec("CREATE TABLE users(id TEXT PRIMARY KEY,email TEXT,active INTEGER); INSERT INTO users VALUES('operator','owner@example.test',1)");
-  for (const name of ['0001_library.sql', '0003_piece_views.sql', '0004_recording_management.sql', '0005_piece_lifecycle.sql']) {
+  for (const name of ['0001_library.sql', '0003_piece_views.sql', '0004_recording_management.sql', '0005_piece_lifecycle.sql', '0006_piece_prefs.sql']) {
     const sql = await readFile(new URL(`../../migrations/${name}`, import.meta.url),'utf8');
-    await env.LIBRARY_DB.batch(sql.replace(/--[^\n]*/g,'').trim().split(/;\s*(?=CREATE\b)/).map(s => env.LIBRARY_DB.prepare(s)));
+    await env.LIBRARY_DB.batch(sql.replace(/--[^\n]*/g,'').trim().split(/;\s*(?=(?:CREATE|ALTER)\b)/).map(s => env.LIBRARY_DB.prepare(s)));
   }
 }, 15000);
 afterEach(async () => { await mf?.dispose(); await rm(directory, { recursive: true, force: true }); });
