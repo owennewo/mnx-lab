@@ -28,6 +28,7 @@ import { ClickTrack } from '../audio/native/click.ts';
 import { beatTimes, decodeSyncSegments, defaultBeatUnit, emptySyncSegments, playingSyncpoints, syncpointsFromSegments, type SyncSegments } from '../model/syncSegments.ts';
 import type { SoundsliceSyncpoint } from '../model/recordingSync.ts';
 import type { SyncChange } from './SyncBar.ts';
+import { isTextEntry, realTarget } from './keyScope.ts';
 import './SyncBar.ts';
 
 /** What a host persists when the sync bar commits an edit. */
@@ -273,6 +274,7 @@ export class Player extends LitElement {
        focusing a lane shows its card above the tray. */
     .rail {
       position: relative;
+      outline: none; /* focusable so a click in it lets Space play; never reached by Tab, so no ring to draw */
       flex: 1 1 160px;
       min-width: 120px;
       align-self: stretch;
@@ -504,11 +506,26 @@ export class Player extends LitElement {
       this.openPop = null;
       event.stopPropagation();
     }
+    if (this.isSpaceForUs(event)) { event.preventDefault(); event.stopPropagation(); this.toggle(); }
   };
+  /** Chrome activates a focused button on Space's keydown being unprevented, Firefox on its keyup: both are taken. */
+  private readonly onKeyup = (event: KeyboardEvent) => { if (this.isSpaceForUs(event)) { event.preventDefault(); event.stopPropagation(); } };
+  /**
+   * Space plays or pauses wherever focus is inside the player — the rail, the sync bar, a tray button — with two
+   * exceptions: a text field (a segment's name) keeps its space, and a modified stroke is somebody else's. It
+   * overrides a focused button's own activation on purpose: after clicking a segment label or a rail lane, Space
+   * means play, not "press that again" (Enter still presses it). Focus outside the player never reaches here,
+   * so the editor's own Space — toggleNote, a provisional binding — is untouched.
+   */
+  private isSpaceForUs(event: KeyboardEvent) {
+    return event.key === ' ' && !event.defaultPrevented && !event.isComposing && !event.metaKey && !event.ctrlKey && !event.altKey
+      && !isTextEntry(realTarget(event));
+  }
   connectedCallback() {
     super.connectedCallback();
     document.addEventListener('pointerdown', this.onClickAway);
     this.addEventListener('keydown', this.onKeydown);
+    this.addEventListener('keyup', this.onKeyup);
     try {
       this.rate = Number(localStorage.getItem('mnx-player-rate')) || 1;
       this.volume = Number(localStorage.getItem('mnx-player-volume') ?? 0.7);
@@ -521,6 +538,7 @@ export class Player extends LitElement {
   disconnectedCallback() {
     document.removeEventListener('pointerdown', this.onClickAway);
     this.removeEventListener('keydown', this.onKeydown);
+    this.removeEventListener('keyup', this.onKeyup);
     this.teardown();
     super.disconnectedCallback();
   }
@@ -910,6 +928,7 @@ export class Player extends LitElement {
       class="rail"
       role="group"
       aria-label="Position"
+      tabindex="-1"
       style=${`grid-template-columns: repeat(${model.columns}, minmax(0, 1fr)); --rail-gap: ${model.gap}px; --rail-cell: ${model.cell}px;`}
     >
       ${model.labels.map((l) => html`<div class="lab" style=${`grid-column: ${l.at + 1} / span ${l.span};`}>${l.text}</div>`)}

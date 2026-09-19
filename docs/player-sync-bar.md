@@ -57,7 +57,8 @@ is still moving), `sync-seek` `{ seconds }`, `sync-loop` `{ start, end } | null`
   rate, so tapping against a slowed recording gives the recording's own tempo.
 - Keys, while focus is in the bar: arrows nudge 25 ms (Shift 100 ms), Enter sends the cut or
   handle to the playhead, Delete removes, S splits at the playhead, T taps, L loops, Escape
-  lets go. Nothing is bound globally.
+  lets go. Space plays or pauses — the player's binding, which holds anywhere in the tray. Nothing
+  is bound globally.
 
 ## The player
 

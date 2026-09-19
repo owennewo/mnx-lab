@@ -36,7 +36,10 @@ and readout, the rail on a line of its own without labels, then the settings.
 Rate and volume are value buttons — a glyph and the current value — and each
 control opens in an overlay above the tray: rate has preset chips (`0.25×` … `2×`, or the
 backend's own discrete rates) and the fine slider; volume has a mute toggle and the slider.
-The overlays close on click-away or Escape. The Sound selector sits beside them unless the
+The overlays close on click-away or Escape. **Space plays or pauses** whenever focus is inside the
+player — after a click on the rail (it takes focus), in the sync bar, or on any tray button — except
+in a text field. It overrides a focused button's own Space activation on purpose (Enter still presses
+the button); focus outside the player, in the score, is the editor's. The Sound selector sits beside them unless the
 host sets `soundControl = false` — studio does, because its Instruments sheet chooses a
 sound per part, and the rail gets the room. Likewise the Source select (and the host's
 `source-tools` slot beside it) shows unless `sourceControl = false`; studio chooses what

@@ -82,6 +82,11 @@ try {
    check(bar.segments.segments.map(s=>s.beats).join()==='11,11','Split did not divide the count');
    const name=sr.querySelector('.pop input');name.value='Verse';name.dispatchEvent(new Event('change'));await bar.updateComplete;
    check(bar.segments.segments[1].name==='Verse','Rename did not land');
+   // Space plays or pauses from inside the bar; a text field keeps its space.
+   const space=el=>{el.focus();el.dispatchEvent(new KeyboardEvent('keydown',{key:' ',bubbles:true,composed:true,cancelable:true}));};
+   space(sr.querySelector('.bar'));await until(()=>player.playback.state==='playing','Space in the bar did not play');
+   space(name);await delay(50);check(player.playback.state==='playing','Space in the name field paused');
+   space(sr.querySelector('.bar'));await until(()=>player.playback.state!=='playing','Space in the bar did not pause');
    await player.play();
    // Selecting a cut zooms to it; a nudge moves it 25 ms and keeps both counts.
    const cuts=sr.querySelectorAll('button.cut');cuts[1].click();await bar.updateComplete;

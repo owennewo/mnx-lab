@@ -107,6 +107,14 @@ few is half a beat out at the midpoint, where a click over the recording makes i
   fixture client and real PCM: toggle, place both handles, set the count, split, nudge,
   score follows the new sync, the save payload carries segments and one point per bar.
 
+## Log
+
+- 2026-09-19 — Space plays or pauses anywhere focus is inside the player: the sync bar, the rail
+  (now focusable by click) and the tray's buttons, a text field excepted. Bound on `<mnx-player>`,
+  not the bar, so the rail gets it too and the editor's provisional Space (toggleNote, score-focused)
+  is untouched. Owner's first hands-on note: after clicking in the bar there was no way to play
+  without leaving it.
+
 ## Out of scope, named so they are not rediscovered
 
 Ramps and tapped segments; a beat-unit control; creating empty bars from a sync (needs the
