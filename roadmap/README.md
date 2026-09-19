@@ -566,6 +566,14 @@ back up to `proposed/` the moment it is.
 
 - **[studio-recording-management.md](complete/studio-recording-management.md)** — Player campaign item 18: attach YouTube links or uploaded audio with Soundslice timing data; persistent uploads and recording lifecycle.
 
+- **[core-player-live-edit.md](complete/core-player-live-edit.md)** — **complete 2026-09-19**;
+  [player campaign](inprogress/core-campaign-player.md) item 22: the player keeps its session
+  across an edit. The same document id with a new performance hands the live backend the
+  performance **in place** — the recording backend rebuilds its written index and re-derived
+  sync map with the media untouched; the synth rebuilds its transport over the **same sink**,
+  the place carried by bar and offset (`src/audio/carryPlace.ts`, pure, under Node). Source,
+  rate, volume, sync mode and live segments survive; a new document id still installs afresh.
+  Found when a tab-view keystroke closed the YouTube video.
 - **[core-player-youtube.md](complete/core-player-youtube.md)** — Player campaign item 17: visible policy-compliant YouTube embeds, capability-aware rates and recording sync.
 
 - **[core-player-recording-playback.md](complete/core-player-recording-playback.md)** — Complete; player campaign item 16: shared synth/audio controls and musical-position handoff, media-clock score following and authenticated audio delivery.

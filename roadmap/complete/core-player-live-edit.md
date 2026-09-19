@@ -1,10 +1,11 @@
 # Live edit — the player keeps its session when the score changes
 
-> **Status: in progress, opened 2026-09-19.** Implementation loop. Reference:
-> [docs/player-element.md](../../docs/player-element.md) → *An edit keeps the session*.
-> [Player campaign](core-campaign-player.md) item 22; follows the editor's promotion into
-> studio ([core-editor-element-promotion](../complete/core-editor-element-promotion.md)),
-> which is what exposed this, and the sync bar (21), which it must not disturb.
+> **Status: complete 2026-09-19** (opened and landed the same day, 1579bcf2). Implementation
+> loop. Reference: [docs/player-element.md](../../docs/player-element.md) → *An edit keeps the
+> session*. [Player campaign](../inprogress/core-campaign-player.md) item 22; follows the
+> editor's promotion into studio ([core-editor-element-promotion](core-editor-element-promotion.md)),
+> which is what exposed this, and the sync bar ([studio-sync-bar](../inprogress/studio-sync-bar.md),
+> 21), which it must not disturb.
 
 Every edit hands the player a new performance, and the player treats a new performance the
 way it treats a new file: it disposes the playback session and starts a fresh one on the
@@ -43,7 +44,7 @@ written-occurrence index, the sync map. None of it owns a resource.
   sync is derived again against the bars as they are now — the sync bar's segments, live or
   stored, and an imported sync's tuples as they were — exactly as the factory does when the
   source is first selected, and the host is told through `sync-refresh` when the stored
-  tuples no longer match, as [studio-sync-rederive](studio-sync-rederive.md) requires.
+  tuples no longer match, as [studio-sync-rederive](../inprogress/studio-sync-rederive.md) requires.
 - **Later selects see the new score.** The session's factory reads the player's current
   performance when it is called, never the one captured when the session was made.
 - **Pure before audible.** Where playback continues is a pure decision,

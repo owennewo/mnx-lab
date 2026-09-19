@@ -207,7 +207,7 @@ run any time before 6.
 | 19 | [Recording bookends](../complete/core-recording-bookends.md) | Treat media outside the anchored performance as pre/post-roll, render duration-labelled system bookends and repair cropped-duration provenance. | recording playback | fake media + layout projections + ingest repair | complete |
 | 20 | [Coda navigation](../complete/core-coda-navigation.md) | Preserve Guitar Pro Coda, Double Coda, D.C. and compound D.S. directions through a typed `_x.mnxLab.navigation` extension; one normalized consumer model feeds engraving, editing and performed-order traversal. Cached *Blackbird* is the implementation-time oracle, distilled into synthetic and corpus evidence before landing. | reviewer | synthetic GPIF fixture + notation/tab/unrolled goldens + hand-stated traversal + local Blackbird review | complete; engraving review pending |
 | 21 | [Sync bar](studio-sync-bar.md) | Author a recording's sync in the tray: the rail toggles to a time-shaped bar of cut lines and whole-beat segments; a click over the recording proves the count; segments stored as provenance beside derived one-point-per-bar tuples. | recording playback | pure model + click-schedule tests, fake media, production-Studio browser smoke | built 2026-09-17; hands-on checks pending |
-| 22 | [Live edit](core-player-live-edit.md) | The player keeps its session across an edit: same document id, new performance → each backend takes it in place (recording: written index + sync map, media untouched; synth: new transport over the same sink, place carried by score position). Source, rate, volume, sync mode and live segments survive; a new document id still installs afresh. | reviewer, recording playback | Node tests on both backends' `replacePerformance`; the sync-bar smoke edits mid-playback | in progress 2026-09-19 |
+| 22 | [Live edit](../complete/core-player-live-edit.md) | The player keeps its session across an edit: same document id, new performance → each backend takes it in place (recording: written index + sync map, media untouched; synth: new transport over the same sink, place carried by score position). Source, rate, volume, sync mode and live segments survive; a new document id still installs afresh. | reviewer, recording playback | Node tests on both backends' `replacePerformance`; the sync-bar smoke edits mid-playback | complete 2026-09-19 |
 
 ### Decisions still open
 
@@ -883,4 +883,36 @@ written bar durations.
 - Unchecked by any automated proof: the click against a real YouTube clock (the estimator is
   tested on synthetic jitter only) and the bar on touch, where the segment labels are a
   16 px target.
+- Spec findings: none. Playback stays outside the spec loop.
+
+### 2026-09-19 — item 22: the player keeps its session across an edit
+
+The editor's promotion into studio exposed a path written for opening a file: every edit
+handed the player a new performance, and a new performance disposed the session and started
+a fresh one on the synth. The owner met it as a `2` typed in the tab view that closed the
+YouTube video while the Source button still said video. The question that decided the shape
+was the owner's: is rebuilding the session necessary at all? It was not.
+
+- **Separate what changes from what owns a resource.** An edit changes the performance and
+  the bar durations; everything derived from them is pure and cheap. The session, the sink
+  with its context and sample banks, the media port and the source choice own resources and
+  change for no reason. The fix keeps the second group and re-derives the first.
+- **The document id is the discriminator that was already there.** Same id, new performance
+  is an edit; a new id, a performance appearing or vanishing, or new sample options is a new
+  document and takes the old path unchanged. The playback host makes the same distinction.
+- **The musical decision went into a pure function because the fence made it.** A first test
+  of the synth backend under Node was refused by the campaign's own rule — `harness/conformance/`
+  may not import `src/audio/native/` — and the refusal was right: where playback continues
+  after an edit (bar and offset carried with the state, nothing when stopped or the bar is
+  gone) is `carryPlace` in `src/audio/carryPlace.ts`, tested under Node, and the backend only
+  applies it. What only a browser can prove (the sink object survives, a paused place is kept,
+  a playing recording keeps its source, media time and sync bar) is in the sync-bar smoke.
+- **A factory must read state when called, not when made.** The session's factory captured
+  the performance at install; with the session now outliving edits, a later source change
+  would have played yesterday's score.
+- **A check's message is evaluated even when the check passes.** `JSON.stringify` on a score
+  position (BigInt rationals) threw inside a passing check's message and read as a failure.
+- Not carried on purpose: a loop region (its bars may have moved). Not done: making the
+  transport itself accept a new performance while scheduling ahead — the rebuild is cheap; the
+  sink was the cost.
 - Spec findings: none. Playback stays outside the spec loop.
