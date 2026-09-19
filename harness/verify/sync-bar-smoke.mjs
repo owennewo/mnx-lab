@@ -47,6 +47,11 @@ try {
    await until(()=>page.shadowRoot?.querySelector('mnx-player')?.performance,'no performance');
    const player=page.shadowRoot.querySelector('mnx-player'),root=player.shadowRoot;
    check(!root.querySelector('.bar-toggle'),'The toggle showed for the synth');
+   // On the synth, an edit keeps the sink and a paused place (core-player-live-edit).
+   player.seek(1);player.pause();await player.updateComplete;const sinkBefore=player.session.backend.sink;
+   page.binding.setDocument({...page.doc,mnxJson:JSON.parse(JSON.stringify(page.doc.mnxJson))});await page.updateComplete;await player.updateComplete;
+   check(player.session.backend.sink===sinkBefore,'An edit made a new sink');
+   check(player.playback.state==='paused'&&player.playback.scorePosition?.ordinal===1,'An edit lost the paused place: '+player.playback.state+' bar '+player.playback.scorePosition?.ordinal);
    check(await player.selectSource(row.id)!==undefined,'source');await until(()=>player.sourceId===row.id&&player.playback.mediaDuration>0,'audio did not prepare');
    await player.updateComplete;const toggle=root.querySelector('.bar-toggle');check(toggle,'No rail/sync toggle for a recording');
    toggle.querySelector('button[aria-label^="Sync bar"]').click();await player.updateComplete;
@@ -115,6 +120,12 @@ try {
    check(last.syncpoints.length===7&&last.syncpoints.every((p,i)=>p[0]===i)&&last.syncpoints[0][1]===a&&last.syncpoints[6][1]===z,'Save did not carry one point per bar: '+JSON.stringify(last.syncpoints));
    check(player.sourceId===row.id&&player.playback.state==='playing','The save echo re-cued the source');
    check(player.recordings[0].syncSegments.cuts.length===4,'Stored segments did not come back to the player');
+   // An edit mid-playback keeps the source, the playing state and the sync bar (core-player-live-edit).
+   const mediaBefore=player.playback.mediaTime;
+   page.binding.setDocument({...page.doc,mnxJson:JSON.parse(JSON.stringify(page.doc.mnxJson))});await page.updateComplete;await player.updateComplete;await delay(150);
+   check(player.sourceId===row.id&&player.playback.state==='playing','An edit re-cued the source: '+player.sourceId+' '+player.playback.state);
+   check(player.playback.mediaTime>=mediaBefore,'An edit moved the recording back: '+mediaBefore+' → '+player.playback.mediaTime);
+   check(root.querySelector('mnx-sync-bar')===bar&&bar.segments.cuts.length===4,'An edit dropped the sync bar');
    check(root.querySelector('button[aria-label="Click on the beats"]').getAttribute('aria-pressed')==='true','Click toggle');
    player.pause();await delay(150);
    // The zoomed window moves: by its minimap, by two fingers (a wheel), and after the playhead when it is sought away.

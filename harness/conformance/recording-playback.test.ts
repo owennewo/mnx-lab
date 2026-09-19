@@ -34,7 +34,23 @@ class Media implements MediaPort {
   dispose() { this.disposed=true; this.pause(); this.listeners.clear(); }
 }
 function backend(id='a', sync=map()) { const media=new Media(); return { media, backend:new RecordingBackend(id,media,performance,sync) }; }
+/** The same score with the second note renamed: a different written index, the same timing. */
+const edited: MnxStructure = JSON.parse(JSON.stringify(document));
+(edited.parts[0].measures[1].sequences[0].content[0] as { notes: { id: string }[] }).notes[0].id = 'b2';
+const editedPasses = linearizePasses(edited), editedCompiled = compilePerformance(edited, editedPasses);
+if (!editedCompiled.ok) throw new Error('edited fixture did not compile');
 describe('recording clock and score following', () => {
+  it('takes a new performance for the same media without touching it (core-player-live-edit)', async () => {
+    const {media,backend:b}=backend(); await b.play(); media.currentTime=9; media.emit('time');
+    const before=b.snapshot.highlight[0].noteKey; expect(before).toBeDefined();
+    const sync=createRecordingSync([[0,2],[1,6],[2,12]], editedCompiled, editedPasses); if(!sync.ok) throw new Error('sync');
+    b.replacePerformance(editedCompiled.performance, sync.value);
+    expect(media.disposed).toBe(false); expect(media.plays).toBe(1); expect(media.currentTime).toBe(9);
+    expect(b.snapshot.state).toBe('playing'); expect(b.snapshot.scorePosition).toEqual(pos(1,q(1n,2n)));
+    expect(b.snapshot.highlight).toHaveLength(1); expect(b.snapshot.highlight[0].noteKey).not.toBe(before);
+    b.replacePerformance(editedCompiled.performance, null, 'no sync');
+    expect(b.snapshot.scorePosition).toBeNull(); expect(b.snapshot.syncIssue).toBe('no sync'); expect(b.snapshot.state).toBe('playing');
+  });
   it('keeps Play idempotent and restarts after natural completion', async () => {
     const {media,backend:b}=backend(); await b.play(); await b.play();
     expect(media.plays).toBe(1); expect(b.snapshot.state).toBe('playing');

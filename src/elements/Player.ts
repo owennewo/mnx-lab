@@ -562,14 +562,17 @@ export class Player extends LitElement {
     if (changed.has('youtubeNotice')) {
       this.dispatchEvent(new CustomEvent('video-notice-changed', { bubbles: true, composed: true }));
     }
+    // An edit — the same document, a new performance — keeps the session and hands the
+    // backend the performance in place (core-player-live-edit). Another document, a
+    // performance appearing or vanishing, or new sample options install afresh.
+    const scoreMoved = changed.has('performance') || changed.has('document') || changed.has('writtenBarDurations');
     const reinstall =
-      changed.has('performance') ||
       changed.has('documentId') ||
-      changed.has('document') ||
-      changed.has('writtenBarDurations') ||
       changed.has('sampleBase') ||
       changed.has('sampleBases') ||
-      changed.has('sampleLoader');
+      changed.has('sampleLoader') ||
+      (scoreMoved && (!this.session || !this.performance));
+    if (!reinstall && scoreMoved) this.replacePerformance();
     if (reinstall) {
       this.install();
       if (this.initialOrdinal !== null) this.seek(this.initialOrdinal);
@@ -583,6 +586,10 @@ export class Player extends LitElement {
           composed: true,
         }),
       );
+    } else if (scoreMoved) {
+      this.dispatchEvent(new CustomEvent('performance-changed', {
+        detail: { documentId: this.documentId, available: this.performance !== null }, bubbles: true, composed: true,
+      }));
     } else if (changed.has('initialOrdinal') && this.initialOrdinal !== null)
       this.seek(this.initialOrdinal);
     if (!reinstall && changed.has('recordings') && this.session) {
@@ -663,10 +670,14 @@ export class Player extends LitElement {
   private install() {
     this.teardown(); this.localError = '';
     if (!this.performance || !this.isConnected) return;
-    const revision = this.revision, performance = this.performance;
-    const buses = partBuses(performance);
+    const revision = this.revision;
+    // The factory reads the performance when it is CALLED: after an edit the session is kept
+    // (`replacePerformance`) and a later select must see the score as it is now.
     const factory = (id: string): PlaybackBackend => {
+      const performance = this.performance;
+      if (!performance) throw new Error('There is no performance to play.');
       if (id === 'synth') {
+        const buses = partBuses(performance);
         const synth = new SynthBackend(performance, {
           volume: this.volume, voicePreset: this.sinkPreset(), sampleBase: this.sampleBase,
           sampleBases: this.sampleBases, samplePresets: this.requiredSamples(), sampleLoader: this.sampleLoader,
@@ -714,6 +725,39 @@ export class Player extends LitElement {
     this.session.setRate(this.rate); this.session.setVolume(this.volume);
     this.session.stop();
     this.status = this.session.snapshot; this.publish();
+  }
+  /**
+   * An edit: the same document with a new performance. The session and its backend stay;
+   * the backend takes the performance in place. A recording's sync is derived again against
+   * the bars as they are now — the sync bar's live segments, the stored segments, or an
+   * imported sync's tuples as they were — exactly as the factory derives it on first
+   * selection, and the host hears through `sync-refresh` when the stored tuples went stale.
+   */
+  private replacePerformance() {
+    const session = this.session, performance = this.performance;
+    if (!session || !performance) return;
+    const backend = session.backend;
+    if (backend instanceof SynthBackend) backend.replacePerformance(performance);
+    else if (backend instanceof RecordingBackend) {
+      const source = this.activeRecording, id = backend.id, duration = this.status?.mediaDuration;
+      if (!source) return;
+      const live = this.liveSegmentsFor === id ? this.liveSegments : null;
+      const derived = live
+        ? { segments: live, syncpoints: syncpointsFromSegments(live, this.barBeats(live), duration) }
+        : playingSyncpoints(source, segments => this.barBeats(segments), duration);
+      const points = derived.syncpoints;
+      const sync = points && this.document && this.writtenBarDurations
+        ? createRecordingSync(points, { performance, writtenBarDurations: this.writtenBarDurations }, linearizePasses(this.document)) : null;
+      backend.replacePerformance(performance, sync?.ok ? sync.value : null, sync && !sync.ok ? sync.diagnostic.message : undefined);
+      if (derived.segments) {
+        const json = JSON.stringify(points);
+        this.appliedSync.set(id, json);
+        if (duration) this.derivedFor.set(id, duration);
+        if (this.syncEditable && json !== JSON.stringify(source.syncpoints ?? null))
+          this.dispatchEvent(new CustomEvent<SyncEdit>('sync-refresh', { detail: { sourceId: id, segments: derived.segments, syncpoints: points as SyncEdit['syncpoints'] }, bubbles: true, composed: true }));
+      }
+    }
+    this.status = session.snapshot; this.publish();
   }
   /** Legacy synth view. Use playback/scorePosition for all source kinds. */
   get snapshot() { return this.session?.snapshot.transport; }

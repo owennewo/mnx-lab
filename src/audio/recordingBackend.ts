@@ -45,11 +45,23 @@ export class RecordingBackend implements PlaybackBackend {
   constructor(readonly id: string, private readonly media: MediaPort, performance: Performance,
     private sync: RecordingSyncMap | null, syncIssue?: string) {
     this.invalidSync = syncIssue;
+    this.index(performance);
+    this.unsubscribe = media.subscribe(event => this.onMedia(event));
+  }
+  private index(performance: Performance) {
+    this.written = new Map();
     for (const w of performance.written) {
       const group = this.written.get(w.ordinal) ?? [];
       group.push(w); this.written.set(w.ordinal, group);
     }
-    this.unsubscribe = media.subscribe(event => this.onMedia(event));
+  }
+  /** An edit: a new performance for the same media. The written index is
+   *  rebuilt and the sync swapped; the port — an element, an iframe — is not
+   *  touched, and position is media time, so nothing moves. */
+  replacePerformance(performance: Performance, sync: RecordingSyncMap | null, syncIssue?: string) {
+    if (this.closed) return;
+    this.index(performance);
+    this.replaceSync(sync, syncIssue);
   }
   subscribe(listener: () => void) { this.listeners.add(listener); return () => { this.listeners.delete(listener); }; }
   private emit() { if (!this.closed) for (const listener of this.listeners) listener(); }

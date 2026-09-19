@@ -60,8 +60,10 @@ from the score is the viewer's `hiddenParts`, and never silences it.
 ## Public contract
 
 - `performance: Performance | null`, `documentId: string`, and optional
-  `document: MnxStructure` (meter/bar-number formatting). Replacing the performance
-  or document identity disposes the old transport and sources before installing new ones.
+  `document: MnxStructure` (meter/bar-number formatting). A new performance for the **same**
+  `documentId` is an edit and keeps the session (below); a new `documentId`, a performance
+  appearing or vanishing, or new sample options dispose the old transport and sources
+  before installing new ones.
 - `play(): Promise<void>`, `pause()`, `stop()`, `seek(ordinal): boolean`,
   `setLoop(region?)`, plus read-only `position` and `snapshot`. Seek selects the start
   of that performed measure; an absent ordinal returns false. Natural completion can
@@ -78,6 +80,33 @@ from the score is the viewer's `hiddenParts`, and never silences it.
   nodes are created by importing or constructing the player.
 - Disconnect invalidates callbacks, clears live state, stops sources and disposes the
   owned sink/context. Reconnection installs a fresh transport; it never resumes itself.
+
+## An edit keeps the session
+
+[core-player-live-edit](../roadmap/complete/core-player-live-edit.md). Every edit hands the
+player a new performance. Until 2026-09-19 that took the same path as opening another file:
+the session was disposed and a fresh one started on the synth — the AudioContext closed and
+its sample packs refetched, the audio element or YouTube iframe removed, the source silently
+reset. Now the player tells an edit (same `documentId`) from a new document and, for an edit,
+keeps the session and hands the live backend the performance in place:
+
+- `RecordingBackend.replacePerformance` rebuilds the written index and swaps the sync map.
+  The media port is untouched and position is media time, so nothing moves. The player
+  derives the sync again against the bars as they are now — the sync bar's live segments,
+  the stored segments, or an imported sync's tuples — as the factory does on first
+  selection, and emits `sync-refresh` when the stored tuples no longer match.
+- `SynthBackend.replacePerformance` rebuilds the transport (pure derivation) over the same
+  sink, keeping the context and the sample banks. The place carries over by score position,
+  bar and offset, and the state with it: playing plays on, paused stays. A place the new
+  performance no longer has, or a stopped transport, starts at the beginning, stopped. A
+  loop is not carried.
+- The session's factory reads the player's performance when it is called, so a later
+  source change sees the score as it is now. Source, rate, volume, sync mode and live
+  segments are untouched.
+
+The playback host (`bindPlayback`'s `setDocument`) makes the same distinction: an edit no
+longer stops the player or nulls its performance, and re-derives the playback ordinal's
+iteration against the new traversal.
 
 ## A plain-DOM host
 

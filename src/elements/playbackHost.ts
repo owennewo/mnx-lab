@@ -70,14 +70,20 @@ export function bindPlayback(host: HTMLElement, viewer: DocumentViewer, player: 
       return state;
     },
     setDocument(next: MnxDocument) {
-      player.stop();
-      player.performance = null;
-      state = {
-        ...initialPlaybackState(),
-        inspectionIteration: state.inspectionIteration,
-        followPlayback: state.followPlayback,
-      };
-      publish();
+      // An edit — the same document, a new revision — keeps the player's session, its
+      // source and its place (core-player-live-edit); only another document stops the
+      // player and starts the playback state over.
+      const edit = document !== undefined && next.id === document.id;
+      if (!edit) {
+        player.stop();
+        player.performance = null;
+        state = {
+          ...initialPlaybackState(),
+          inspectionIteration: state.inspectionIteration,
+          followPlayback: state.followPlayback,
+        };
+        publish();
+      }
       document = next;
       model = linearizePasses(next.mnxJson);
       lastKey = '';
@@ -87,6 +93,8 @@ export function bindPlayback(host: HTMLElement, viewer: DocumentViewer, player: 
       const result = compilePerformance(next.mnxJson, model);
       player.writtenBarDurations = result.ok ? result.writtenBarDurations : undefined;
       player.performance = result.ok ? result.performance : null;
+      // The traversal may have changed under the ordinal it holds; the player's next frame corrects it.
+      if (edit) state = withPlaybackOrdinal(state, model, state.ordinal);
       publish();
       return result;
     },
