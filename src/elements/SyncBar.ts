@@ -14,6 +14,12 @@ const MIN_SPAN = 2;
 /** Beat ticks are for placing a cut by eye; past this many they are texture, not information. */
 const MAX_TICKS = 160;
 const stroke = (d: string) => svg`<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d=${d} fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg>`;
+/** Nudge steps, in seconds. A cut is placed against what a person can HEAR:
+ *  two sounds read as together until roughly 25 ms apart, a tapped downbeat
+ *  carries more error than that, the readout prints hundredths, and a YouTube
+ *  clock is coarser still — so a finer step would move nothing anyone could
+ *  judge. The coarse step crosses an audible flam in one press. */
+const FINE_NUDGE = 0.025, COARSE_NUDGE = 0.1;
 const clock = (seconds: number) => `${Math.floor(seconds / 60)}:${(seconds % 60).toFixed(2).padStart(5, '0')}`;
 
 /**
@@ -537,7 +543,7 @@ export class SyncBar extends LitElement {
     const s = this.selected, key = event.key.length === 1 ? event.key.toLowerCase() : event.key;
     let used = true;
     if ((key === 'ArrowLeft' || key === 'ArrowRight') && s?.kind === 'cut')
-      this.moveSelectedCut(this.segments.cuts[s.index] + (key === 'ArrowLeft' ? -1 : 1) * (event.shiftKey ? 0.001 : 0.01));
+      this.moveSelectedCut(this.segments.cuts[s.index] + (key === 'ArrowLeft' ? -1 : 1) * (event.shiftKey ? COARSE_NUDGE : FINE_NUDGE));
     else if (key === 'Enter' && (s?.kind === 'cut' || s?.kind === 'parked')) this.toPlayhead();
     else if ((key === 'Delete' || key === 'Backspace') && s?.kind === 'cut') this.removeSelectedCut();
     else if (key === 'Escape' && s) this.select(null);
@@ -576,7 +582,7 @@ export class SyncBar extends LitElement {
     const nudge = (ms: number) => html`<button type="button" class="mono" aria-label=${`Nudge ${ms} milliseconds`} @click=${() => this.moveSelectedCut(at + ms / 1000)}>${ms > 0 ? '+' : '−'}${Math.abs(ms)}</button>`;
     return html`<div class="pop" role="group" aria-label="Cut line">
       <span class="time">${clock(at)}</span>
-      <span class="join" role="group" aria-label="Nudge, milliseconds">${nudge(-10)}${nudge(-1)}${nudge(1)}${nudge(10)}</span><span class="hint">ms</span>
+      <span class="join" role="group" aria-label="Nudge, milliseconds">${nudge(-100)}${nudge(-25)}${nudge(25)}${nudge(100)}</span><span class="hint">ms</span>
       <button type="button" @click=${() => this.toPlayhead()}>To playhead <kbd>Enter</kbd></button>
       <button type="button" aria-pressed=${this.looping} @click=${() => this.setLoop(!this.looping)}>${stroke('M17 3l3 3-3 3M4 11V9a3 3 0 0 1 3-3h13M7 21l-3-3 3-3M20 13v2a3 3 0 0 1-3 3H4')}Loop</button>
       <button type="button" aria-label="Remove this cut" title="Remove this cut" @click=${() => this.removeSelectedCut()}>${stroke('M5 7h14M10 7V4h4v3M7 7l1 13h8l1-13')}</button>

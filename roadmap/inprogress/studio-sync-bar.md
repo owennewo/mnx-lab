@@ -58,7 +58,7 @@ few is half a beat out at the midpoint, where a click over the recording makes i
   now, and a mouse move with no button down ends one rather than following it.
 - **Editing is one row above the tray**, in the rate and volume overlays' vocabulary. A
   selected segment: name, beats or tempo with minus and plus, Tap, Split at playhead. A
-  selected cut: time, four nudges (±1 ms, ±10 ms), To playhead, Loop, Remove. Dragging is
+  selected cut: time, four nudges (±25 ms, ±100 ms — the audible floor, not the clock's), To playhead, Loop, Remove. Dragging is
   coarse, nudging is fine. Moving a cut keeps each neighbour's tempo as nearly as a whole
   beat count allows, so a nudge never changes a count and a long drag re-counts.
 - **The click is the proof.** A click sounds on every beat of every segment that has a

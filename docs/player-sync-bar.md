@@ -55,7 +55,7 @@ is still moving), `sync-seek` `{ seconds }`, `sync-loop` `{ start, end } | null`
   playhead, Loop (1.5 s before to 1 s after), Remove. Segment: name, the count or the tempo
   with minus and plus, Tap, Split at playhead. A tapped tempo is divided by the playback
   rate, so tapping against a slowed recording gives the recording's own tempo.
-- Keys, while focus is in the bar: arrows nudge 10 ms (Shift 1 ms), Enter sends the cut or
+- Keys, while focus is in the bar: arrows nudge 25 ms (Shift 100 ms), Enter sends the cut or
   handle to the playhead, Delete removes, S splits at the playhead, T taps, L loops, Escape
   lets go. Nothing is bound globally.
 

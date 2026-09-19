@@ -83,11 +83,11 @@ try {
    const name=sr.querySelector('.pop input');name.value='Verse';name.dispatchEvent(new Event('change'));await bar.updateComplete;
    check(bar.segments.segments[1].name==='Verse','Rename did not land');
    await player.play();
-   // Selecting a cut zooms to it; a nudge moves it 10 ms and keeps both counts.
+   // Selecting a cut zooms to it; a nudge moves it 25 ms and keeps both counts.
    const cuts=sr.querySelectorAll('button.cut');cuts[1].click();await bar.updateComplete;
    check(sr.querySelector('.mini')&&sr.querySelectorAll('.tick').length>10,'Selecting a cut did not zoom to the beats');
-   const before=bar.segments.cuts[1];await press('Nudge 10 milliseconds');
-   check(Math.abs(bar.segments.cuts[1]-before-.01)<1e-6&&bar.segments.segments.map(s=>s.beats).join()==='11,11','Nudge');
+   const before=bar.segments.cuts[1];await press('Nudge 25 milliseconds');
+   check(Math.abs(bar.segments.cuts[1]-before-.025)<1e-6&&bar.segments.segments.map(s=>s.beats).join()==='11,11','Nudge');
    root.querySelector('button[aria-label="Click on the beats"]').click();await player.updateComplete;
    // The debounced save, and its echo through the snapshot, must not re-cue the source.
    await delay(1100);await page.updateComplete;await player.updateComplete;await delay(100);
