@@ -50,8 +50,9 @@ is still moving), `sync-seek` `{ seconds }`, `sync-loop` `{ start, end } | null`
   dragged, or selected and sent to the playhead. There is no cut button.
 - Beat ticks are drawn whenever the window holds 160 or fewer, zoomed or not — past that they
   would be a grey wash, so a whole song shows none until it is zoomed. A mouse over the track
-  shows a card over the label strip: the segment, the beat within it and its count, the time,
-  and the tempo (or the unsynced region's name and the time). A finger never shows it.
+  shows a card over the label strip: the beat within the segment and its count, the time, and
+  the tempo (or the unsynced region's name and the time). The segment's name is not repeated —
+  its label is beside the card. A finger never shows it.
 - Selecting a placed cut **zooms** the bar to a 16-second window around it; a hairline under
   the bar shows where the window sits. There is no zoom button. A
   drag is measured as a delta in the window the cut will be shown in, so selecting and

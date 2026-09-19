@@ -580,14 +580,15 @@ export class SyncBar extends LitElement {
   }
 
   // ── render ──────────────────────────────────────────────────────────────
-  /** The hover card's line: `Verse · beat 7 of 11 · 0:13.20 · 120.0 bpm`, or the unsynced region's name and time. */
+  /** The hover card's line: `beat 7 of 11 · 0:13.20 · 120.0 bpm`, or the unsynced region's name and time. The
+   *  segment's name is not repeated — its label is on the strip beside the card. */
   private tipText(seconds: number) {
     const i = segmentAt(this.segments, seconds), at = clock(seconds);
     if (i < 0) return `${this.regions().find(r => r.index < 0 && seconds >= r.from && seconds < r.to)?.name ?? 'Unsynced'} · ${at}`;
     const segment = this.segments.segments[i], tempo = segmentTempo(this.segments, i);
-    if (tempo === null) return `${segment.name} · ${at} · no tempo`;
+    if (tempo === null) return `${at} · no tempo`;
     const beat = Math.floor((seconds - this.segments.cuts[i]) * tempo / 60 + 1e-6) + 1;
-    return `${segment.name} · beat ${beat}${segment.beats !== null ? ` of ${segment.beats}` : ''} · ${at} · ${tempo.toFixed(1)} bpm`;
+    return `beat ${beat}${segment.beats !== null ? ` of ${segment.beats}` : ''} · ${at} · ${tempo.toFixed(1)} bpm`;
   }
   private regions() {
     const { cuts, segments, closed } = this.segments, end = this.duration;
