@@ -97,6 +97,9 @@
       "type": "nextPosition"
     },
     {
+      "type": "nextPosition"
+    },
+    {
       "type": "toggleBeam"
     },
     {

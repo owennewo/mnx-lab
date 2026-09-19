@@ -47,6 +47,8 @@ import {
   onsetsEqual,
   onsetLess,
   pinEventSlot,
+  settleEventPin,
+  inPinnedEvent,
   positionAt,
   slotAt,
   type EditorCursor,
@@ -460,6 +462,7 @@ export class EditorSession {
           duration: { base: this.entryDuration, ...(this.entryDots ? { dots: this.entryDots } : {}) },
           ...this.entryTarget
         });
+        this.standOnEntered();
         return true;
       }
       case 'delete': {
@@ -1468,8 +1471,16 @@ export class EditorSession {
         duration: { base: this.entryDuration, ...(this.entryDots ? { dots: this.entryDots } : {}) },
         ...this.entryTarget
       });
+      this.standOnEntered();
     }
     return true;
+  }
+  /** After an entry the cursor stands on the note it made: a pin that still
+   *  named a coincident event (the grace whose host just took the note) moves
+   *  to the event holding the new ink on this line (core-note-address move 3). */
+  private standOnEntered(): void {
+    const settled = settleEventPin(this.grid, this.cursorState, this.activeProjection);
+    if (settled !== this.cursorState) { this.cursorState = settled; this.reanchorSelection(); }
   }
 
   /** How many notes share the cursor's moment and line — more than one means
@@ -1787,10 +1798,11 @@ export class EditorSession {
   }
 
   private setSelectionLevel(level: SelectionLevel): void {
-    const pin = (cursor: EditorCursor) =>
-      level === 'event'
-        ? pinEventSlot(this.grid, cursor, this.activeProjection)
-        : withoutEventPin(cursor);
+    // The pin — which of the voice's coincident events (a grace, its host) the
+    // cursor means — is part of WHERE the cursor is at every rung, since the
+    // arrows walk those events one by one; it is dropped only where nothing is
+    // coincident (`pinEventSlot`).
+    const pin = (cursor: EditorCursor) => pinEventSlot(this.grid, cursor, this.activeProjection);
     this.cursorState = pin(this.cursorState);
     this.selectionState = {
       ...this.selectionState,
@@ -1995,15 +2007,15 @@ export class EditorSession {
         // string-sticky); notation walks this voice's ink, landing on the
         // nearest-pitch member (snap-to-ink, the working default).
         return this.activeProjection === 'tab' && this.grid.mode === 'string'
-          ? movePosition(this.grid, before, delta)
-          : movePositionInk(this.grid, before, delta, 'nearest');
+          ? movePosition(this.grid, before, delta, 'tab')
+          : movePositionInk(this.grid, before, delta, 'nearest', this.activeProjection);
       case 'event':
         // "Prev/next event IN THIS VOICE, rests included" — the same walk in
         // both projections. Walking every column instead (which is what this
         // did) stepped onto onsets where the anchor voice has no event, and
         // the event rung has nothing to address there: the slice went blank at
         // a position the cursor had just been told to select.
-        return movePositionInk(this.grid, before, delta, 'keep');
+        return movePositionInk(this.grid, before, delta, 'keep', this.activeProjection);
       case 'voiceMeasure':
       case 'partMeasure':
       case 'measure':
@@ -2075,7 +2087,7 @@ export class EditorSession {
   private nextNoteKeyInVoice(): string | null {
     let cursor = this.cursorState;
     for (let guard = 0; guard < this.grid.positions.length + 1; guard++) {
-      const stepped = movePositionInk(this.grid, cursor, 1, 'keep');
+      const stepped = movePositionInk(this.grid, cursor, 1, 'keep', this.activeProjection);
       if (cursorAddressesEqual(stepped, cursor)) return null;
       cursor = stepped;
       const slot = positionAt(this.grid, cursor)?.slots.find(
@@ -2342,7 +2354,7 @@ export class EditorSession {
     // inserting `after` needs one step along this voice's own events, which is
     // exactly where the new one was spliced.
     if (side === 'after') {
-      this.cursorState = movePositionInk(this.grid, this.cursorState, 1, 'keep');
+      this.cursorState = movePositionInk(this.grid, this.cursorState, 1, 'keep', this.activeProjection);
       this.reanchorSelection('note');
     }
     return true;
@@ -2453,11 +2465,7 @@ export class EditorSession {
    * only the active extent; until those intents exist, every cursor move is a
    * conventional collapse/re-anchor at the current rung. */
   private reanchorSelection(level: SelectionLevel = this.selectionState.level): void {
-    if (level === 'event') {
-      this.cursorState = pinEventSlot(this.grid, this.cursorState, this.activeProjection);
-    } else {
-      this.cursorState = withoutEventPin(this.cursorState);
-    }
+    this.cursorState = pinEventSlot(this.grid, this.cursorState, this.activeProjection);
     this.selectionState = pointSelection(level, this.cursorState);
   }
 
@@ -2812,10 +2820,13 @@ function pasteLandingCursor(
     base.line = projection === 'tab' && grid.mode === 'string'
       ? matchedSlot.line
       : matchedSlot.staffPosition;
+    // The ordinal counts within the PINNED event's notes on this line, as
+    // `coincidentSlots` scopes them (core-note-address move 3).
     const sameLine = voiceSlots.filter(candidate =>
       (projection === 'tab' && grid.mode === 'string'
         ? candidate.line === base.line
-        : candidate.staffPosition === base.line)
+        : candidate.staffPosition === base.line) &&
+      (!event || inPinnedEvent(candidate, event))
     );
     const slotIndex = sameLine.indexOf(matchedSlot);
     if (slotIndex > 0) base.slotIndex = slotIndex;

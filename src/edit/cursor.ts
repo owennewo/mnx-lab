@@ -68,6 +68,9 @@ export interface EventSlot {
   voiceIndex: number;
   eventIndex: number;
   containerIndex?: ContainerIndex;
+  /** A tremolo member: its members sound as one written event and are ONE
+   *  stop for the arrows (a grace's notes are separate stops). */
+  together?: true;
 }
 
 /** One stop on the beat grid. Slots are in VISUAL order, top line first, so
@@ -335,13 +338,14 @@ export function buildGrid(doc: MnxStructure, partIndex = 0, staffIndex = 1): Pos
       if (sequenceStaff !== staffIndex) return;
       let onset: Onset = { num: 0, den: 1 };
       sequence.content.forEach((item, eventIndex) => {
-        const push = (event: MnxEvent, at_: Onset, containerIndex?: ContainerIndex) => {
+        const push = (event: MnxEvent, at_: Onset, containerIndex?: ContainerIndex, together = false) => {
           const position = at(at_);
           position.voices.add(voiceIndex);
           position.events.push({
             voiceIndex,
             eventIndex,
-            ...(containerIndex === undefined ? {} : { containerIndex })
+            ...(containerIndex === undefined ? {} : { containerIndex }),
+            ...(together ? { together: true as const } : {})
           });
           (event.notes ?? []).forEach((note, noteIndex) => {
             position.raw.push({
@@ -395,13 +399,14 @@ export function buildGrid(doc: MnxStructure, partIndex = 0, staffIndex = 1): Pos
           // so they become their own columns. Grace and tremolo content shares
           // the host moment, which is addressable now that the cursor carries a
           // discriminator (core-note-address.md move 2).
-          const visit = (child: MnxSequenceItem, at_: Onset, scale: Onset, path: number[]) => {
-            if (isTimedEvent(child)) { push(child, at_, path.length === 1 ? path[0] : path); return; }
+          const visit = (child: MnxSequenceItem, at_: Onset, scale: Onset, path: number[], together = false) => {
+            if (isTimedEvent(child)) { push(child, at_, path.length === 1 ? path[0] : path, together); return; }
             const ownScale = tupletScale(child);
             const nextScale = ownScale ? scaleOnset(scale, ownScale) : scale;
             let position = at_;
+            const tremolo = together || (child as { type?: string }).type === 'tremolo';
             containerEvents(child)?.forEach((inner, index) => {
-              visit(inner, position, nextScale, [...path, index]);
+              visit(inner, position, nextScale, [...path, index], tremolo);
               if (ownScale) position = addOnsets(position, scaleOnset(itemSpan(inner), nextScale));
             });
           };
@@ -586,6 +591,11 @@ export function coincidentSlots(
     projection === 'tab' && grid.mode === 'string'
       ? position.slots.filter(s => s.line === cursor.line)
       : position.slots.filter(s => s.staffPosition === cursor.line);
+  // A pinned EVENT scopes the notes too: standing on the host of a grace, the
+  // grace's note on this line is not "the note here" — the host has none, and
+  // a digit typed now must enter into the host, not re-fret the grace.
+  const pinnedEvent = cursor.eventSlotIndex === undefined ? undefined : position.events[cursor.eventSlotIndex];
+  const scoped = pinnedEvent ? onLine.filter(s => inPinnedEvent(s, pinnedEvent)) : onLine;
   // The cursor's voice scopes what it sees, FULL STOP; the ordinal then
   // disambiguates WITHIN that voice (two chord members derived onto one
   // string). Switching voice is the voice jump's job, not the cycle key's.
@@ -597,7 +607,115 @@ export function coincidentSlots(
   // same hole from the other side — the pending duration would not step,
   // because a rest looked like ink. An empty line in YOUR voice is empty.
   const voice = cursor.voiceIndex ?? 0;
-  return onLine.filter(s => s.voiceIndex === voice);
+  return scoped.filter(s => s.voiceIndex === voice);
+}
+
+/** The cursor's voice's events at a position, in DATA order: a grace's notes
+ *  come before the host they lead into, a tremolo's members in turn. */
+export function voiceEventsAt(position: Position, voice: number): EventSlot[] {
+  return position.events.filter(e => e.voiceIndex === voice);
+}
+
+/** The arrows' STOPS at a position for a voice: every event, except that a
+ *  tremolo's members are one stop (its first member stands for it). */
+function stopsAt(position: Position, voice: number): EventSlot[] {
+  const events = voiceEventsAt(position, voice);
+  return events.filter((e, i) => !(e.together && i > 0 && events[i - 1].together && events[i - 1].eventIndex === e.eventIndex));
+}
+/** Which stop holds `event`: itself, or the tremolo it is a member of. */
+function stopOf(stops: EventSlot[], event: EventSlot): number {
+  const own = stops.findIndex(s => sameEvent(s, event));
+  return own >= 0 || !event.together ? own : stops.findIndex(s => s.together && s.eventIndex === event.eventIndex);
+}
+
+function sameEvent(a: EventSlot, b: EventSlot): boolean {
+  return a.voiceIndex === b.voiceIndex && a.eventIndex === b.eventIndex && sameContainerIndex(a.containerIndex, b.containerIndex);
+}
+/** Whether a note belongs to the pinned event — or, for a tremolo member, to
+ *  any member of the same tremolo, since they are one stop and one event to
+ *  the line's notes. */
+export function inPinnedEvent(slot: EventSlot, pinned: EventSlot): boolean {
+  return slot.voiceIndex === pinned.voiceIndex && slot.eventIndex === pinned.eventIndex
+    && (!!pinned.together || sameContainerIndex(slot.containerIndex, pinned.containerIndex));
+}
+
+/** Pin the cursor to `event` at `position` — only where the voice has more
+ *  than one event there; a lone event needs no discriminator. */
+function pinnedTo(cursor: EditorCursor, position: Position, event: EventSlot | undefined): EditorCursor {
+  const { eventSlotIndex: _drop, ...rest } = cursor;
+  if (!event || voiceEventsAt(position, event.voiceIndex).length < 2) return rest;
+  const index = position.events.indexOf(event);
+  return index < 0 ? rest : { ...rest, eventSlotIndex: index };
+}
+
+/** The line a step lands on: 'nearest' re-aims at the arriving event's
+ *  nearest note (staff position), 'keep' holds the line. */
+function landingLine(cursor: EditorCursor, position: Position, event: EventSlot | undefined, landing: 'nearest' | 'keep'): number {
+  if (landing === 'keep') return cursor.line;
+  const voice = cursor.voiceIndex ?? 0;
+  const mine = position.slots.filter(s => s.voiceIndex === voice && (!event || sameEvent(s, event)));
+  if (mine.length === 0) return cursor.line;
+  let best = mine[0];
+  for (const slot of mine) {
+    const dist = Math.abs(slot.staffPosition - cursor.line);
+    const bestDist = Math.abs(best.staffPosition - cursor.line);
+    if (dist < bestDist || (dist === bestDist && slot.staffPosition > best.staffPosition)) best = slot;
+  }
+  return best.staffPosition;
+}
+
+/**
+ * A step that stays on this moment: the voice's NEXT (or previous) event here,
+ * in data order. A grace note and the host it leads into share an onset, but a
+ * reader walks them as two notes — → from the grace lands on the host, ← from
+ * the host lands on the grace — so the arrows do too, and only past the last
+ * (or first) of them does the walk leave the moment. Null when there is
+ * nothing coincident to step to.
+ */
+function stepWithinMoment(
+  grid: PositionGrid,
+  cursor: EditorCursor,
+  delta: 1 | -1,
+  projection: Projection,
+  landing: 'nearest' | 'keep'
+): EditorCursor | null {
+  const position = positionAt(grid, cursor);
+  if (!position) return null;
+  const stops = stopsAt(position, cursor.voiceIndex ?? 0);
+  if (stops.length < 2) return null;
+  const current = eventSlotAt(grid, cursor, projection);
+  const ordinal = current ? stopOf(stops, current) : -1;
+  const next = ordinal < 0 ? undefined : stops[ordinal + delta];
+  if (!next) return null;
+  const { slotIndex: _slot, ...rest } = cursor;
+  return pinnedTo({ ...rest, line: landingLine(cursor, position, next, landing) }, position, next);
+}
+
+/** Arriving at a position from a direction: the voice's first event there
+ *  when coming from the left, its last when coming from the right. */
+function arriveAt(cursor: EditorCursor, position: Position, delta: 1 | -1): EditorCursor {
+  const stops = stopsAt(position, cursor.voiceIndex ?? 0);
+  return pinnedTo(cursor, position, delta > 0 ? stops[0] : stops[stops.length - 1]);
+}
+
+/**
+ * After an ENTRY: the pin says which coincident event the cursor means, and
+ * the entry may have put ink on the cursor's line in a different event — a
+ * note entered into the host of a grace while the pin still named the grace.
+ * Ink on the line wins: the cursor stands on what it just made. A pin whose
+ * event does have a note here, or a line with no note at all, is kept. Only
+ * entry asks: after a clear, an emptied grace stays selected beside its host.
+ */
+export function settleEventPin(grid: PositionGrid, cursor: EditorCursor, projection: Projection): EditorCursor {
+  const position = positionAt(grid, cursor);
+  if (!position || cursor.eventSlotIndex === undefined) return cursor;
+  const voice = cursor.voiceIndex ?? 0, pinned = position.events[cursor.eventSlotIndex];
+  const onLine = (projection === 'tab' && grid.mode === 'string'
+    ? position.slots.filter(s => s.line === cursor.line)
+    : position.slots.filter(s => s.staffPosition === cursor.line)).filter(s => s.voiceIndex === voice);
+  if (onLine.length === 0 || (pinned && onLine.some(s => inPinnedEvent(s, pinned)))) return cursor;
+  const { slotIndex: _slot, ...rest } = cursor;
+  return pinnedTo(rest, position, voiceEventsAt(position, voice).find(e => sameEvent(e, onLine[0])));
 }
 
 /** Step to the next note sharing this moment and line, wrapping. Returns the
@@ -607,10 +725,24 @@ export function cycleSlot(
   cursor: EditorCursor,
   projection: Projection
 ): EditorCursor {
-  const count = coincidentSlots(grid, cursor, projection).length;
-  if (count < 2) return cursor;
-  const { eventSlotIndex: _drop, ...rest } = cursor;
-  return { ...rest, slotIndex: ((cursor.slotIndex ?? 0) + 1) % count };
+  // The cycle runs over EVERY note of the voice on this line at this moment,
+  // across the events that share it — a grace note and its host's note on one
+  // string are both stops — and re-pins the cursor to the event it lands in,
+  // with the ordinal counted inside that event as `coincidentSlots` scopes it.
+  const position = positionAt(grid, cursor);
+  if (!position) return cursor;
+  const voice = cursor.voiceIndex ?? 0;
+  const onLine = (projection === 'tab' && grid.mode === 'string'
+    ? position.slots.filter(s => s.line === cursor.line)
+    : position.slots.filter(s => s.staffPosition === cursor.line)).filter(s => s.voiceIndex === voice);
+  if (onLine.length < 2) return cursor;
+  const current = slotAt(grid, cursor, projection);
+  const index = current ? onLine.findIndex(s => s.noteKey === current.noteKey) : -1;
+  const next = onLine[(index + 1) % onLine.length];
+  const { slotIndex: _slot, ...rest } = cursor;
+  const pinned = pinnedTo(rest, position, voiceEventsAt(position, voice).find(e => sameEvent(e, next)));
+  const slotIndex = coincidentSlots(grid, pinned, projection).findIndex(s => s.noteKey === next.noteKey);
+  return slotIndex > 0 ? { ...pinned, slotIndex } : pinned;
 }
 
 /**
@@ -620,7 +752,14 @@ export function cycleSlot(
  */
 export function clampCursor(grid: PositionGrid, cursor: EditorCursor): EditorCursor {
   if (grid.positions.length === 0) return initialCursor(grid);
-  if (positionIndexOf(grid.positions, cursor) >= 0) return cursor;
+  const index = positionIndexOf(grid.positions, cursor);
+  if (index >= 0) {
+    // The pin indexes the position's events, which an edit may have reshaped.
+    const pinned = cursor.eventSlotIndex === undefined ? undefined : grid.positions[index].events[cursor.eventSlotIndex];
+    if (cursor.eventSlotIndex === undefined || (pinned && pinned.voiceIndex === (cursor.voiceIndex ?? 0))) return cursor;
+    const { eventSlotIndex: _drop, ...rest } = cursor;
+    return rest;
+  }
   const inMeasure = grid.positions.filter(p => p.measureIndex === cursor.measureIndex);
   const target = inMeasure[inMeasure.length - 1] ?? grid.positions[grid.positions.length - 1];
   return {
@@ -651,10 +790,12 @@ function toPosition(cursor: EditorCursor, position: Position): EditorCursor {
   };
 }
 
-export function movePosition(grid: PositionGrid, cursor: EditorCursor, delta: 1 | -1): EditorCursor {
+export function movePosition(grid: PositionGrid, cursor: EditorCursor, delta: 1 | -1, projection: Projection = 'tab'): EditorCursor {
+  const within = stepWithinMoment(grid, cursor, delta, projection, 'keep');
+  if (within) return within;
   const index = positionIndexOf(grid.positions, cursor);
   const next = grid.positions[index + delta];
-  return next ? toPosition(cursor, next) : cursor;
+  return next ? arriveAt(toPosition(cursor, next), next, delta) : cursor;
 }
 
 /**
@@ -669,8 +810,11 @@ export function movePositionInk(
   grid: PositionGrid,
   cursor: EditorCursor,
   delta: 1 | -1,
-  landing: 'nearest' | 'keep'
+  landing: 'nearest' | 'keep',
+  projection: Projection = 'notation'
 ): EditorCursor {
+  const within = stepWithinMoment(grid, cursor, delta, projection, landing);
+  if (within) return within;
   const index = positionIndexOf(grid.positions, cursor);
   if (index < 0) return cursor;
   // THE ANCHOR IS THE CURSOR'S, not whichever slot happens to sit on this line:
@@ -680,21 +824,13 @@ export function movePositionInk(
   for (let i = index + delta; i >= 0 && i < grid.positions.length; i += delta) {
     const position = grid.positions[i];
     if (!position.voices.includes(anchor)) continue;
-    let line = cursor.line;
-    if (landing === 'nearest') {
-      const mine = position.slots.filter(s => s.voiceIndex === anchor);
-      if (mine.length > 0) {
-        let best = mine[0];
-        for (const slot of mine) {
-          const dist = Math.abs(slot.staffPosition - cursor.line);
-          const bestDist = Math.abs(best.staffPosition - cursor.line);
-          if (dist < bestDist || (dist === bestDist && slot.staffPosition > best.staffPosition))
-            best = slot;
-        }
-        line = best.staffPosition;
-      }
-    }
-    return { measureIndex: position.measureIndex, onset: position.onset, line, ...carry(cursor) };
+    // Arrive on the voice's first event here (last, walking backwards), and
+    // aim the line at THAT event's nearest note — a grace and its host may
+    // sit on different staff positions.
+    const stops = stopsAt(position, anchor);
+    const event = delta > 0 ? stops[0] : stops[stops.length - 1];
+    const line = landingLine(cursor, position, event, landing);
+    return pinnedTo({ measureIndex: position.measureIndex, onset: position.onset, line, ...carry(cursor) }, position, event);
   }
   return cursor;
 }
@@ -752,7 +888,8 @@ export function moveToMeasure(
     ? wanted
     : ([...available].reverse().find(v => v < wanted) ?? available[0] ?? 0);
   const first = inMeasure.find(p => p.voices.includes(voice)) ?? inMeasure[0];
-  return withVoice(toPosition(cursor, first), voice);
+  // The bar's first stop in data order — a grace before the first note is it.
+  return arriveAt(withVoice(toPosition(cursor, first), voice), first, 1);
 }
 
 /** How far the notation cursor may leave the staff, in staff positions
@@ -776,7 +913,10 @@ export function moveLine(
   const next = tab
     ? Math.min(Math.max(cursor.line + delta, 1), grid.lineCount)
     : Math.min(Math.max(cursor.line - delta, -STAFF_POSITION_RANGE), STAFF_POSITION_RANGE);
-  const moved = { measureIndex: cursor.measureIndex, onset: cursor.onset, line: next, ...carry(cursor) };
+  const moved = {
+    measureIndex: cursor.measureIndex, onset: cursor.onset, line: next, ...carry(cursor),
+    ...(cursor.eventSlotIndex === undefined ? {} : { eventSlotIndex: cursor.eventSlotIndex })
+  };
   return adoptedVoice(grid, moved, projection);
 }
 

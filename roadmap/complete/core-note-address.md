@@ -103,3 +103,41 @@ carries `voiceIndex`, completing the address this doc set out to complete —
 part, staff, voice, measure, onset, line, and the ordinal for what is found
 there. Whether `Alt+V` is the right key for stepping coincident notes, or
 whether it should fall out of the ladder's vertical axis, stays with the ladder.
+
+## Move 3 — the arrows walk coincident events in data order (built 2026-09-19)
+
+Move 2 made a grace note addressable at its host's moment, through `slotIndex` and
+`Alt+V`. It left the host unreachable when the host is a **rest**: the cycle key cycles
+coincident *notes* on a line, a rest has none, and the tab staff does not draw rests, so
+there was nothing to click either. Found in bar 1 of *Ain't No Sunshine* — a grace `2` in
+front of an eighth rest, and `→` from the grace landed on the `5` an eighth later. The
+owner's rule, which decided the shape: *a composer expects `→` to move to the next note
+even when it is coincident in time.*
+
+So `→` and `←` at the note and event rungs now walk the cursor's voice in **data order**.
+A grace's notes and the host they lead into are consecutive stops although they share an
+onset (`stepWithinMoment` in `src/edit/cursor.ts`); only past the last (or first) of them
+does the walk leave the moment, and arriving at a moment from the left lands on the voice's
+first event there, from the right on its last. The event pin (`eventSlotIndex`) is what
+says which stop the cursor means, so it is now part of *where the cursor is* at every rung,
+not only at the event rung: `reanchorSelection` keeps it, `moveLine` carries it across a
+string change, `clampCursor` drops it only when an edit reshaped the moment's events, and
+`coincidentSlots` scopes the notes on a line to the pinned event — standing on the host of
+a grace, the grace's note on this string is not "the note here", so a digit typed there
+enters into the rest and Delete at the event rung removes the rest.
+Three edges the first cut got wrong, each caught by an existing suite: a **tremolo's**
+members sound as one written event, so they stay ONE stop (`together` on the grid's event
+slot; `tremolos-multi-note`'s construct trace would otherwise have entered a chord into
+the second member); **arriving at a bar** (`goToMeasure`) lands on its first stop in data
+order, so a grace before the first note is reachable at all; and **after an entry** the pin
+settles onto ink on the cursor's line (`settleEventPin`, entry only — a cleared grace stays selected) — entering the host of a grace
+must leave the cursor on the note it made, not on the grace (`beams-inner-grace-notes`'s
+trace, which also needed one more `→` now that the grace is a stop). The destruct sweep's
+driver (`src/edit/destructWalk.ts`) presses `→` again within a moment, as a player would.
+
+The entry op had the same blind spot from the other side: `eventAtOnset` in `src/edit/ops.ts`
+stopped at the un-timed grace container, so a digit typed on the host rest inserted a new
+note in front of it. It now looks past grace containers to the timed host at that onset.
+`harness/conformance/grace-host-walk.test.ts` is the bar itself, walked both ways in both
+projections and at both rungs, with a digit entered into the rest and the rest deleted.
+

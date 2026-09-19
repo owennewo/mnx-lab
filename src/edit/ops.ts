@@ -3504,7 +3504,15 @@ function eventAtOnset(
   for (let index = 0; index < seq.content.length; index++) {
     const item = seq.content[index];
     if (onsetsEqual(onset, target)) {
-      return isTimedEvent(item) ? { event: item, index } : { index };
+      // A grace container is un-timed and sits at its host's onset: the event
+      // AT this onset is the host on its far side, not the grace — the same
+      // side `pastGraceContainers` puts a new event on. Before this, a digit
+      // typed on a rest that a grace leads into inserted a new note in front
+      // of the rest instead of entering into it (core-note-address move 3).
+      let at = index;
+      while (at < seq.content.length && (seq.content[at] as { type?: string }).type === 'grace') at++;
+      const host = seq.content[at];
+      return host && isTimedEvent(host) ? { event: host, index: at } : { index };
     }
     onset = addOnsets(onset, itemSpan(item));
     if (onsetLess(target, onset)) return undefined; // inside the item just passed

@@ -323,22 +323,25 @@ function driveWithinProjection(session: EditorSession, key: string): boolean {
   }
   if (session.selectionLevel !== 'note') return false;
   const line = session.projection === 'tab' ? target.slot.line : target.slot.staffPosition;
-  for (let guard = 0; session.cursor.line !== line && guard < 64; guard++) {
-    // lineDown decreases staff position / increases string number.
-    session.handleIntent({
-      type: session.cursor.line > line === (session.projection === 'tab') ? 'lineUp' : 'lineDown'
-    });
-  }
-  if (slotAt(session.positions, session.cursor, session.projection)?.noteKey === key) return true;
-
-  // Coincidence: several notes can share this moment and line (two voices on
-  // one string, two chord members the derivation stacks there). The cursor
-  // carries a discriminator for exactly this, so step through them — the same
-  // `Alt+V` a player would press (core-note-address.md move 2).
-  const coincident = coincidentSlots(session.positions, session.cursor, session.projection).length;
-  for (let step = 1; step < coincident; step++) {
-    if (!session.handleIntent({ type: 'cycleSlot' })) break;
+  // A moment can hold several STOPS for the arrows — a grace's notes, then the
+  // host they lead into (core-note-address.md move 3) — so the walk may need
+  // `→` again without leaving the onset. At each stop: the line, then the
+  // coincident notes on it (`Alt+V`, move 2).
+  for (let stop = 0; stop < 8; stop++) {
+    for (let guard = 0; session.cursor.line !== line && guard < 64; guard++) {
+      // lineDown decreases staff position / increases string number.
+      session.handleIntent({
+        type: session.cursor.line > line === (session.projection === 'tab') ? 'lineUp' : 'lineDown'
+      });
+    }
     if (slotAt(session.positions, session.cursor, session.projection)?.noteKey === key) return true;
+    const coincident = coincidentSlots(session.positions, session.cursor, session.projection).length;
+    for (let step = 1; step < coincident; step++) {
+      if (!session.handleIntent({ type: 'cycleSlot' })) break;
+      if (slotAt(session.positions, session.cursor, session.projection)?.noteKey === key) return true;
+    }
+    const onset = session.cursor.onset;
+    if (!session.handleIntent({ type: 'nextPosition' }) || !onsetsEqual(session.cursor.onset, onset)) return false;
   }
   return false;
 }
