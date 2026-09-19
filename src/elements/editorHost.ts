@@ -214,8 +214,6 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     // when it declined. Everything else that returns false is a navigation edge, where silence is the right answer.
     const deleted = intent.type === 'delete' ? session.lastDelete : null;
     if (deleted) options.onNotice?.(deleteSelectionNotice(deleted));
-    // A key that an op refused must say why — a silent no-op reads as a lost key.
-    if (!handled && session.lastRefusal) options.onNotice?.({ ok: false, message: session.lastRefusal });
     if (!handled) options.onRefused?.(intent);
     settle();
     return handled;

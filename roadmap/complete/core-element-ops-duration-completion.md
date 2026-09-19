@@ -108,9 +108,11 @@ the smaller cost, and it is what Guitar Pro asks of a player anyway.
 
 So: entry on a rest keeps the rest's value (`insertNote`, `insertPitchNote`); the duration
 keys, the dot and `setEventDuration` re-value the rest the cursor stands on, **in place** —
-a shorter rest leaves its surplus beside it, a longer one takes the rests that follow and
-refuses out loud when a note stands in the way (`restResizeRefusal`, `session.lastRefusal`,
-the host's `onNotice`); `insertAtRung` gives the new note its neighbour's value; the pending
+a shorter rest leaves its surplus beside it, a longer one absorbs the rests that follow and
+past them the bar overfills — the notes behind slide later, the tail's rests give way, the
+bar-duration badge reports the rest. **The editor never refuses a duration** (the owner's
+second rule, same day): there is already a mechanism to report an under- or overfilled bar,
+and a duration is easy to correct after and hard to fix before entry. `insertAtRung` gives the new note its neighbour's value; the pending
 duration, its HUD line and the dot's "over absence" rule are gone. The construct and edit
 traces, which were keypress scripts for the pending mode, were converted mechanically: every
 duration key once pressed over absence now lands on the rest it meant, just before the

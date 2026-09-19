@@ -1606,22 +1606,29 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       if (!seq) return next;
       const found = eventAtOnset(seq, { num: op.onset[0], den: op.onset[1] });
       if (found?.event?.rest) {
-        // Re-valuing SILENCE moves no sound: a shorter rest leaves its surplus
-        // beside it, a longer one takes the rests that follow, and it refuses
-        // when a note stands in the way — never consume ink, the entry rule.
-        // (`restResizeRefusal` names the refusal before this is applied.)
+        // Re-valuing SILENCE: a shorter rest leaves its surplus beside it; a
+        // longer one absorbs the rests that follow it, as far as they go, and
+        // past them the bar simply overfills — the notes behind slide later,
+        // the tail's rests give way (`padMeasureRests`), and the bar-duration
+        // badge reports what is left. The editor never refuses a duration
+        // (the owner's rule, 2026-09-19): a bar is easy to correct after and
+        // hard to fix before.
         const want = durationSpan(op.duration), have = itemSpan(found.event);
         if (onsetLess(want, have)) {
           found.event.duration = { ...op.duration };
           seq.content.splice(found.index + 1, 0, ...restsSpanning(subtractOnsets(have, want)));
-        } else if (onsetLess(have, want)) {
-          const eaten = restsCovering(seq, found.index, want);
-          if (eaten === null) return next;
-          seq.content.splice(found.index + 1, eaten.count - 1);
-          found.event.duration = { ...op.duration };
-          const surplus = subtractOnsets(eaten.span, want);
-          if (surplus.num > 0) seq.content.splice(found.index + 1, 0, ...restsSpanning(surplus));
-        } else found.event.duration = { ...op.duration };
+          return next;
+        }
+        let span = have, end = found.index + 1;
+        while (onsetLess(span, want) && end < seq.content.length) {
+          const item = seq.content[end];
+          if (!isTimedEvent(item) || !item.rest) break;
+          span = addOnsets(span, itemSpan(item)); end++;
+        }
+        seq.content.splice(found.index + 1, end - found.index - 1);
+        found.event.duration = { ...op.duration };
+        if (onsetLess(want, span)) seq.content.splice(found.index + 1, 0, ...restsSpanning(subtractOnsets(span, want)));
+        else if (onsetLess(span, want)) padMeasureRests(next, op.measureIndex, op);
         return next;
       }
       if (found?.event) {
@@ -3487,26 +3494,6 @@ function entrySequence(
  *  entry reads like one a person wrote. */
 function newSequence(staffIndex: number): MnxSequence {
   return staffIndex === 1 ? { content: [] } : { staff: staffIndex, content: [] };
-}
-
-/**
- * Why `setDuration` on the REST at this onset would change nothing: growing it
- * needs the rests that follow, and a note stands in the way — the rest never
- * consumes ink. Named before the op is applied, so the host can say so.
- * Read-only: the sequence is looked up, never created.
- */
-export function restResizeRefusal(
-  doc: MnxStructure,
-  op: { measureIndex: number; onset: [number, number]; duration: { base: MnxNoteValueBase; dots?: number }; partIndex?: number; staffIndex?: number; voiceIndex?: number }
-): 'note-in-the-way' | null {
-  const measure = doc.parts?.[op.partIndex ?? 0]?.measures?.[op.measureIndex];
-  const seq = measure?.sequences?.filter(s => (s.staff ?? 1) === (op.staffIndex ?? 1))[op.voiceIndex ?? 0];
-  if (!seq) return null;
-  const found = eventAtOnset(seq, { num: op.onset[0], den: op.onset[1] });
-  if (!found?.event?.rest) return null;
-  const want = durationSpan(op.duration);
-  if (!onsetLess(itemSpan(found.event), want)) return null;
-  return restsCovering(seq, found.index, want) ? null : 'note-in-the-way';
 }
 
 /** The timed event starting exactly at `target`, or (event: undefined) with

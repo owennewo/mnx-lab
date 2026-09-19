@@ -1,4 +1,3 @@
-import { restResizeRefusal } from './ops.ts';
 import { sameContainerIndex } from '../model/noteKeys.ts';
 import type { ContainerIndex } from '../model/noteKeys.ts';
 // The editor session: intent + (doc, cursor) → cursor move or EditOp.
@@ -335,7 +334,6 @@ export class EditorSession {
    * exactly as it happened, no-ops included.
    */
   handleIntent(intent: EditorIntent): boolean {
-    this.refusalState = null;
     this.intents.push(intent);
     // Delete's outcome describes ONE keystroke, so anything else discards it.
     // A notice that outlived its keystroke would report the previous press.
@@ -627,16 +625,17 @@ export class EditorSession {
         // reversing campaign item 11b's "a rest is absence"): the duration keys
         // re-value whatever stands here, rest or note, and a fret typed on a
         // rest keeps that value. The empty bar past the end holds nothing to
-        // re-value. A rest re-values IN PLACE — its surplus stays beside it —
-        // so a run of eighths into beat-rest padding is `−` then the fret, twice
-        // a beat, and never moves a note.
+        // re-value. A rest re-values IN PLACE — its surplus stays beside it;
+        // growing it absorbs the rests after it, and past them the bar
+        // overfills, which the badge reports: the editor never refuses a
+        // duration (the owner's rule: easy to correct after, hard before).
         if (!event) return false;
         const next = stepLadder(event.duration.base, step);
         if (next === event.duration.base) return false;
         // Dots survive a re-value: stepping a dotted quarter gives a dotted
         // eighth, not a plain one. The dot is a property of the value the
         // player is writing, and the ladder steps the value.
-        return this.setDurationHere({ base: next, ...(event.duration.dots ? { dots: event.duration.dots } : {}) }, !!event.rest);
+        return this.setDurationHere({ base: next, ...(event.duration.dots ? { dots: event.duration.dots } : {}) });
       }
       case 'toggleDots': {
         // The same split the duration ladder makes: ink is re-valued, absence
@@ -647,7 +646,7 @@ export class EditorSession {
         const cycle = (dots: number) => (dots + 1) % 3;
         if (!event) return false;
         const dots = cycle(event.duration.dots ?? 0);
-        return this.setDurationHere({ base: event.duration.base, ...(dots ? { dots } : {}) }, !!event.rest);
+        return this.setDurationHere({ base: event.duration.base, ...(dots ? { dots } : {}) });
       }
       case 'setTimeSignature': {
         this.apply({
@@ -867,7 +866,7 @@ export class EditorSession {
         if (!event) return false;
         if (event.duration.base === intent.base && (event.duration.dots ?? 0) === (intent.dots ?? 0))
           return false;
-        if (event.rest) return this.setDurationHere(duration, true);
+        if (event.rest) return this.setDurationHere(duration);
         this.apply({
           type: 'setDuration',
           measureIndex: this.cursorState.measureIndex,
@@ -1420,24 +1419,16 @@ export class EditorSession {
   }
 
   /** A complete, timer-free fret resolved by the workbench's stage-1 input. */
-  /** Why the last keystroke changed nothing, in words for the host; null unless an op refused. Cleared per intent. */
-  private refusalState: string | null = null;
-  get lastRefusal(): string | null { return this.refusalState; }
-  /** Re-value the event under the cursor. A rest that would have to grow past a note refuses, and says so. */
-  private setDurationHere(duration: { base: MnxNoteValueBase; dots?: number }, rest: boolean): boolean {
-    const op = {
-      type: 'setDuration' as const,
+  /** Re-value the event under the cursor, rest or note. Never refused for
+   *  duration: an overfilled bar is the badge's to report. */
+  private setDurationHere(duration: { base: MnxNoteValueBase; dots?: number }): boolean {
+    this.apply({
+      type: 'setDuration',
       measureIndex: this.cursorState.measureIndex,
-      onset: [this.cursorState.onset.num, this.cursorState.onset.den] as [number, number],
+      onset: [this.cursorState.onset.num, this.cursorState.onset.den],
       duration,
       ...this.entryTarget
-    };
-    if (rest && restResizeRefusal(this.doc, op)) {
-      const value = `${duration.base}${'.'.repeat(duration.dots ?? 0)}`;
-      this.refusalState = `This rest cannot become a ${value}: a note stands in the way.`;
-      return false;
-    }
-    this.apply(op);
+    });
     return true;
   }
   private enterFret(fret: number): boolean {

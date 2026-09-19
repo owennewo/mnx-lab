@@ -73,22 +73,22 @@ describe('a grace and its host are two stops', () => {
     expect(describeStop(session)).toBe('5/8 fret 7');
     expect(walk(session, 'nextPosition', 1)).toEqual(['3/4 fret 5']);
   });
-  it('lengthening the rest past the note behind it is refused out loud', () => {
+  it('lengthening the rest past the note behind it is never refused: the note slides, the tail gives way', () => {
     const session = new EditorSession(bar());
     walk(session, 'nextPosition', 5);
-    const before = JSON.stringify(session.doc);
-    expect(session.lastRefusal).toBeNull();
-    // The rest is an eighth and the 5 stands right behind it: it cannot become a quarter.
-    expect(session.handleIntent({ type: 'longerDuration' })).toBe(false);
-    expect(session.lastRefusal).toMatch(/cannot become a quarter/);
-    expect(JSON.stringify(session.doc)).toBe(before);
-    expect(session.canUndo).toBe(false);
+    const shape = () => (session.doc.parts[0].measures[0].sequences![0].content as MnxEvent[]).slice(4).map(e => (e as { type?: string }).type ?? `${e.duration!.base}${e.rest ? 'R' : ''}`);
+    // The rest is an eighth and the 5 stands right behind it: the quarter is granted, the 5 moves to the
+    // last beat, and the bar's trailing eighth rest is what gives way. The bar stays full.
+    expect(session.handleIntent({ type: 'longerDuration' })).toBe(true);
+    expect(shape()).toEqual(['grace', 'quarterR', 'eighth']);
+    // Once more, and the bar overfills — the badge's business, not a refusal.
+    expect(session.handleIntent({ type: 'longerDuration' })).toBe(true);
+    expect(shape()).toEqual(['grace', 'halfR', 'eighth']);
+    session.handleIntent({ type: 'undo' }); session.handleIntent({ type: 'undo' });
     // Shortening it splits it in place, and a fret keeps the 16th.
     expect(session.handleIntent({ type: 'shorterDuration' })).toBe(true);
-    expect(session.lastRefusal).toBeNull();
     expect(session.handleIntent({ type: 'enterFret', fret: 7 })).toBe(true);
-    const content = session.doc.parts[0].measures[0].sequences![0].content as MnxEvent[];
-    expect(content.slice(5, 8).map(e => `${e.duration!.base}${e.rest ? 'R' : ''}`)).toEqual(['16th', '16thR', 'eighth']);
+    expect(shape().slice(0, 4)).toEqual(['grace', '16th', '16thR', 'eighth']);
   });
   it('the cursor ghost anchors to the event the cursor means, not to the grace sharing its moment', () => {
     const session = new EditorSession(bar());
