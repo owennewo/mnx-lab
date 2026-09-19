@@ -33,13 +33,13 @@
       }
     },
     {
-      "type": "longerDuration"
-    },
-    {
-      "type": "longerDuration"
-    },
-    {
       "type": "lineUp"
+    },
+    {
+      "type": "longerDuration"
+    },
+    {
+      "type": "longerDuration"
     },
     {
       "type": "toggleNote"
@@ -69,6 +69,12 @@
     },
     {
       "type": "lineUp"
+    },
+    {
+      "type": "longerDuration"
+    },
+    {
+      "type": "longerDuration"
     },
     {
       "type": "toggleNote"
@@ -109,6 +115,12 @@
       "type": "lineDown"
     },
     {
+      "type": "longerDuration"
+    },
+    {
+      "type": "longerDuration"
+    },
+    {
       "type": "toggleNote"
     },
     {
@@ -134,6 +146,12 @@
     },
     {
       "type": "lineUp"
+    },
+    {
+      "type": "longerDuration"
+    },
+    {
+      "type": "longerDuration"
     },
     {
       "type": "toggleNote"

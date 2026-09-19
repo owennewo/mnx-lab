@@ -95,3 +95,24 @@ the dot when the cursor is over absence and entry then carries it, and
 
 Goldens byte-identical; the corpus reports do not move, because a dot is not an
 element kind — item 4 buys **traceability**, not coverage.
+
+## Reversed 2026-09-19 — a rest is a note without a pitch
+
+The owner, transcribing on tab, met the pending value as a lost keystroke: a fret typed on
+an eighth rest showed and vanished, because the hidden pending value was still a quarter and
+the entry refused rather than consume the note behind the rest. Asked whether the note was
+"trying to change the rest's duration", the owner's rule was: *a rest is a note without a
+frequency — typing 5 replaces its frequency; the duration remains.* The item's own reason
+for the pending value — a run of short notes needed every rest re-valued first — was judged
+the smaller cost, and it is what Guitar Pro asks of a player anyway.
+
+So: entry on a rest keeps the rest's value (`insertNote`, `insertPitchNote`); the duration
+keys, the dot and `setEventDuration` re-value the rest the cursor stands on, **in place** —
+a shorter rest leaves its surplus beside it, a longer one takes the rests that follow and
+refuses out loud when a note stands in the way (`restResizeRefusal`, `session.lastRefusal`,
+the host's `onNotice`); `insertAtRung` gives the new note its neighbour's value; the pending
+duration, its HUD line and the dot's "over absence" rule are gone. The construct and edit
+traces, which were keypress scripts for the pending mode, were converted mechanically: every
+duration key once pressed over absence now lands on the rest it meant, just before the
+entry. See [core-note-address.md](core-note-address.md) move 3 for the finding.
+

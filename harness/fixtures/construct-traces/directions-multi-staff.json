@@ -69,13 +69,13 @@
       "measureIndex": 1
     },
     {
-      "type": "longerDuration"
-    },
-    {
-      "type": "longerDuration"
-    },
-    {
       "type": "lineUp"
+    },
+    {
+      "type": "longerDuration"
+    },
+    {
+      "type": "longerDuration"
     },
     {
       "type": "toggleNote"
@@ -121,12 +121,6 @@
       "type": "setClef",
       "sign": "F",
       "staffPosition": 2
-    },
-    {
-      "type": "shorterDuration"
-    },
-    {
-      "type": "shorterDuration"
     },
     {
       "type": "lineDown"
@@ -184,12 +178,6 @@
       "measureIndex": 1
     },
     {
-      "type": "longerDuration"
-    },
-    {
-      "type": "longerDuration"
-    },
-    {
       "type": "lineUp"
     },
     {
@@ -200,6 +188,12 @@
     },
     {
       "type": "toggleNote"
+    },
+    {
+      "type": "longerDuration"
+    },
+    {
+      "type": "longerDuration"
     }
   ]
 }

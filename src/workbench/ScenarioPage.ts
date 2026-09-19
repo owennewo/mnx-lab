@@ -3095,10 +3095,6 @@ export class ScenarioPage extends LitElement {
           </button>
         </span>`,
       body: html`
-      <div class="entry-state">
-        entry duration:
-        ${session.entryDurationBase}${'.'.repeat(session.entryDurationDots)}
-      </div>
       <ol class="ops">
         <li
           class="baseline row-state ${applied.length === 0 ? 'row-current' : ''}"

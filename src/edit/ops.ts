@@ -1350,24 +1350,13 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       if (found?.event) {
         const event = found.event;
         if (event.rest) {
-          // A rest is absence, so entry does not inherit its duration: the
-          // note takes the PENDING one, and any surplus stays as rest AFTER
-          // it (never by shortening in place, which would drag every later
-          // event earlier). Campaign item 11b — before this, the second note
-          // of a short run always came out as long as the rest it landed on.
-          // Longer than the rest it lands on? Eat the FOLLOWING rests to make
-          // room — a dotted quarter over beat-rest padding is the ordinary
-          // case (campaign item 4), and clamping it to the rest's own value
-          // would be exactly the silent clamp this codebase refuses. Ink is
-          // never consumed: if a note stands in the way, the entry refuses.
-          const eaten = restsCovering(seq, found.index, durationSpan(op.duration));
-          if (eaten === null) return next;
-          const surplus = subtractOnsets(eaten.span, durationSpan(op.duration));
-          seq.content.splice(found.index + 1, eaten.count - 1);
+          // A REST IS A NOTE WITHOUT A PITCH (2026-09-19, reversing campaign item
+          // 11b's "a rest is absence"): typing a fret gives it one, and its
+          // duration stays. The op's `duration` plays no part here — the
+          // duration keys, pressed on the rest, are what change what a note
+          // typed here will be, and they re-value the rest in place.
           delete event.rest;
           event.notes = [note];
-          event.duration = { ...op.duration };
-          if (surplus.num > 0) seq.content.splice(found.index + 1, 0, ...restsSpanning(surplus));
           return next;
         }
         event.notes ??= [];
@@ -1401,22 +1390,10 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       if (found?.event) {
         const event = found.event;
         if (event.rest) {
-          // Same rule as `insertNote` above (campaign item 11b): a rest is
-          // absence, so the note takes the PENDING duration and the surplus
-          // stays as rest after it.
-          // Longer than the rest it lands on? Eat the FOLLOWING rests to make
-          // room — a dotted quarter over beat-rest padding is the ordinary
-          // case (campaign item 4), and clamping it to the rest's own value
-          // would be exactly the silent clamp this codebase refuses. Ink is
-          // never consumed: if a note stands in the way, the entry refuses.
-          const eaten = restsCovering(seq, found.index, durationSpan(op.duration));
-          if (eaten === null) return next;
-          const surplus = subtractOnsets(eaten.span, durationSpan(op.duration));
-          seq.content.splice(found.index + 1, eaten.count - 1);
+          // Same rule as `insertNote` above: the rest is a note without a
+          // pitch, and keeps its duration.
           delete event.rest;
           event.notes = [note];
-          event.duration = { ...op.duration };
-          if (surplus.num > 0) seq.content.splice(found.index + 1, 0, ...restsSpanning(surplus));
           return next;
         }
         event.notes ??= [];
@@ -1628,6 +1605,25 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       const seq = entrySequence(next, op.measureIndex, op);
       if (!seq) return next;
       const found = eventAtOnset(seq, { num: op.onset[0], den: op.onset[1] });
+      if (found?.event?.rest) {
+        // Re-valuing SILENCE moves no sound: a shorter rest leaves its surplus
+        // beside it, a longer one takes the rests that follow, and it refuses
+        // when a note stands in the way — never consume ink, the entry rule.
+        // (`restResizeRefusal` names the refusal before this is applied.)
+        const want = durationSpan(op.duration), have = itemSpan(found.event);
+        if (onsetLess(want, have)) {
+          found.event.duration = { ...op.duration };
+          seq.content.splice(found.index + 1, 0, ...restsSpanning(subtractOnsets(have, want)));
+        } else if (onsetLess(have, want)) {
+          const eaten = restsCovering(seq, found.index, want);
+          if (eaten === null) return next;
+          seq.content.splice(found.index + 1, eaten.count - 1);
+          found.event.duration = { ...op.duration };
+          const surplus = subtractOnsets(eaten.span, want);
+          if (surplus.num > 0) seq.content.splice(found.index + 1, 0, ...restsSpanning(surplus));
+        } else found.event.duration = { ...op.duration };
+        return next;
+      }
       if (found?.event) {
         found.event.duration = { ...op.duration };
         // Shrinking opens a gap at the end (later events slide earlier) —
@@ -3494,22 +3490,23 @@ function newSequence(staffIndex: number): MnxSequence {
 }
 
 /**
- * Why `insertNote` / `insertPitchNote` would change NOTHING at this onset: the
- * pending duration is longer than the rest it lands on and ink follows, so the
- * entry refuses rather than consume a note (the rule above in `insertNote`).
- * Named before the op is applied, so the host can say so — a silent no-op reads
- * as a lost keystroke. Read-only: the sequence is looked up, never created.
+ * Why `setDuration` on the REST at this onset would change nothing: growing it
+ * needs the rests that follow, and a note stands in the way — the rest never
+ * consumes ink. Named before the op is applied, so the host can say so.
+ * Read-only: the sequence is looked up, never created.
  */
-export function entryRefusal(
+export function restResizeRefusal(
   doc: MnxStructure,
   op: { measureIndex: number; onset: [number, number]; duration: { base: MnxNoteValueBase; dots?: number }; partIndex?: number; staffIndex?: number; voiceIndex?: number }
-): 'longer-than-rest' | null {
+): 'note-in-the-way' | null {
   const measure = doc.parts?.[op.partIndex ?? 0]?.measures?.[op.measureIndex];
   const seq = measure?.sequences?.filter(s => (s.staff ?? 1) === (op.staffIndex ?? 1))[op.voiceIndex ?? 0];
   if (!seq) return null;
   const found = eventAtOnset(seq, { num: op.onset[0], den: op.onset[1] });
   if (!found?.event?.rest) return null;
-  return restsCovering(seq, found.index, durationSpan(op.duration)) ? null : 'longer-than-rest';
+  const want = durationSpan(op.duration);
+  if (!onsetLess(itemSpan(found.event), want)) return null;
+  return restsCovering(seq, found.index, want) ? null : 'note-in-the-way';
 }
 
 /** The timed event starting exactly at `target`, or (event: undefined) with

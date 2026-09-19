@@ -106,17 +106,27 @@ describe('the dot', () => {
     expect(event.duration).toEqual({ base: 'eighth', dots: 1 });
   });
 
-  it('over absence it moves the PENDING duration, and entry carries it', () => {
+  it('a rest is a note without a pitch: the dot dots it in place, and entry keeps its value', () => {
+    // Reversed 2026-09-19 (the owner's rule): the dot and the duration keys
+    // re-value the REST the cursor stands on, its surplus stays beside it, and
+    // a pitch typed there keeps that value. There is no hidden pending value.
     const session = new EditorSession(emptyBar(), '');
     session.handleIntent({ type: 'setProjection', projection: 'notation' });
-    expect(session.entryDurationDots).toBe(0);
+    const content = () => session.doc.parts![0].measures![0].sequences![0].content as MnxEvent[];
     session.handleIntent({ type: 'toggleDots' });
-    expect(session.entryDurationDots).toBe(1);
-    // Nothing was written — a rest is absence, so there was nothing to dot.
-    expect(session.doc).toEqual(emptyBar());
+    expect(content()[0].duration).toEqual({ base: 'quarter', dots: 1 });
+    expect(content()[0].rest).toBeDefined();
+    expect(content().map(e => e.duration)).toEqual([{ base: 'quarter', dots: 1 }, { base: 'eighth' }, { base: 'quarter' }, { base: 'quarter' }]);
     session.handleIntent({ type: 'toggleNote' });
-    const event = session.doc.parts![0].measures![0].sequences![0].content[0] as MnxEvent;
-    expect(event.duration).toEqual({ base: 'quarter', dots: 1 });
+    expect(content()[0].rest).toBeUndefined();
+    expect(content()[0].duration).toEqual({ base: 'quarter', dots: 1 });
+    // Shortening a rest splits it in place; a fret then keeps the short value.
+    session.handleIntent({ type: 'nextPosition' });
+    expect(content()[1].rest).toBeDefined();
+    session.handleIntent({ type: 'shorterDuration' });
+    expect(content().slice(1, 3).map(e => e.duration)).toEqual([{ base: '16th' }, { base: '16th' }]);
+    session.handleIntent({ type: 'toggleNote' });
+    expect(content()[1].rest).toBeUndefined(); expect(content()[1].duration).toEqual({ base: '16th' });
   });
 
   it('a dotted REST is reached by the spelling verb, not the dot key', () => {

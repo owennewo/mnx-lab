@@ -296,7 +296,7 @@ export const KEY_DOCS: KeyDoc[] = [
     ],
     group: 'editing',
     meaning: {
-      note: 'shorter/longer duration (on an empty cell: the pending entry duration)',
+      note: 'shorter/longer duration — a rest too: it re-values in place, its surplus beside it',
       event: 'shorter/longer duration'
     }
   },
@@ -313,7 +313,7 @@ export const KEY_DOCS: KeyDoc[] = [
     strokes: [{ code: 'Period' }, { code: 'NumpadDecimal' }],
     group: 'editing',
     meaning: {
-      note: 'dot the note (cycles 0 → 1 → 2 → none); on an empty cell: the pending entry duration',
+      note: 'dot the note or rest (cycles 0 → 1 → 2 → none)',
       event: 'dot the event (cycles 0 → 1 → 2 → none)'
     }
   },

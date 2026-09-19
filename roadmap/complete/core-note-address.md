@@ -143,10 +143,12 @@ projections and at both rungs, with a digit entered into the rest and the rest d
 
 Two more from the owner's first use of it (same day): the digit's preview showed and
 vanished, because the pending entry duration (a quarter by default) was longer than the
-eighth rest with a note behind it, and the entry op refused **silently**. The refusal is now
-named before the op is applied (`entryRefusal` in `src/edit/ops.ts`, read-only), `enterFret`
-and `toggleNote` return false with `lastEntryRefusal` in words, and the host binding passes it
-to `onNotice` — studio shows it where the clipboard notices go. And the cursor ghost, the
+eighth rest with a note behind it, and the entry op refused **silently**. That led to the
+owner's rule — *a rest is a note without a frequency* — and the pending value's retirement
+([core-element-ops-duration-completion.md](core-element-ops-duration-completion.md), reversed
+2026-09-19): a fret typed on a rest keeps the rest's value, and the duration keys re-value
+the rest in place. What still refuses (a rest asked to grow past a note) says so through
+`session.lastRefusal` and the host's `onNotice`. And the cursor ghost, the
 dashed cell drawn on the host rest, sat on top of the grace's digit: its anchor keys now lead
 with the event the cursor *means*, so in the both view it borrows the notation rest's column.
 A tab-only view still has no rest element and falls back to the metric interpolation.

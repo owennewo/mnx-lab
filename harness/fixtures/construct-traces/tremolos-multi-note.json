@@ -21,13 +21,13 @@
       "staffPosition": -2
     },
     {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
       "type": "longerDuration"
-    },
-    {
-      "type": "lineDown"
-    },
-    {
-      "type": "lineDown"
     },
     {
       "type": "toggleNote"
@@ -49,6 +49,9 @@
     },
     {
       "type": "lineUp"
+    },
+    {
+      "type": "longerDuration"
     },
     {
       "type": "toggleNote"
@@ -68,25 +71,25 @@
       "type": "nextPosition"
     },
     {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
       "type": "shorterDuration"
-    },
-    {
-      "type": "lineDown"
-    },
-    {
-      "type": "lineDown"
-    },
-    {
-      "type": "lineDown"
-    },
-    {
-      "type": "lineDown"
-    },
-    {
-      "type": "lineDown"
-    },
-    {
-      "type": "lineDown"
     },
     {
       "type": "toggleNote"
@@ -137,10 +140,10 @@
       "measureIndex": 1
     },
     {
-      "type": "longerDuration"
+      "type": "lineDown"
     },
     {
-      "type": "lineDown"
+      "type": "longerDuration"
     },
     {
       "type": "toggleNote"
@@ -162,6 +165,9 @@
     },
     {
       "type": "lineUp"
+    },
+    {
+      "type": "longerDuration"
     },
     {
       "type": "toggleNote"

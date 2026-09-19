@@ -62,8 +62,7 @@ describe('a grace and its host are two stops', () => {
     session.handleIntent({ type: 'lineUp' });
     expect(session.cursor.line).toBe(3);
     expect(describeStop(session)).toBe('5/8 rest');
-    // The pending entry duration (a quarter by default) is what the note takes; an eighth fills the rest exactly.
-    session.handleIntent({ type: 'shorterDuration' });
+    // A rest is a note without a pitch: the fret pitches it and the eighth stays an eighth.
     expect(session.handleIntent({ type: 'enterFret', fret: 7 })).toBe(true);
     const content = session.doc.parts[0].measures[0].sequences![0].content as MnxEvent[];
     expect((content[4] as unknown as { type: string }).type).toBe('grace');
@@ -74,19 +73,22 @@ describe('a grace and its host are two stops', () => {
     expect(describeStop(session)).toBe('5/8 fret 7');
     expect(walk(session, 'nextPosition', 1)).toEqual(['3/4 fret 5']);
   });
-  it('a longer duration typed on the rest is refused out loud, since a note follows', () => {
+  it('lengthening the rest past the note behind it is refused out loud', () => {
     const session = new EditorSession(bar());
     walk(session, 'nextPosition', 5);
     const before = JSON.stringify(session.doc);
-    expect(session.lastEntryRefusal).toBeNull();
-    // The pending duration is a quarter; the rest is an eighth and the 5 stands in the way.
-    expect(session.handleIntent({ type: 'enterFret', fret: 7 })).toBe(false);
-    expect(session.lastEntryRefusal).toMatch(/quarter does not fit.*Shorten/);
+    expect(session.lastRefusal).toBeNull();
+    // The rest is an eighth and the 5 stands right behind it: it cannot become a quarter.
+    expect(session.handleIntent({ type: 'longerDuration' })).toBe(false);
+    expect(session.lastRefusal).toMatch(/cannot become a quarter/);
     expect(JSON.stringify(session.doc)).toBe(before);
     expect(session.canUndo).toBe(false);
-    session.handleIntent({ type: 'shorterDuration' });
+    // Shortening it splits it in place, and a fret keeps the 16th.
+    expect(session.handleIntent({ type: 'shorterDuration' })).toBe(true);
+    expect(session.lastRefusal).toBeNull();
     expect(session.handleIntent({ type: 'enterFret', fret: 7 })).toBe(true);
-    expect(session.lastEntryRefusal).toBeNull();
+    const content = session.doc.parts[0].measures[0].sequences![0].content as MnxEvent[];
+    expect(content.slice(5, 8).map(e => `${e.duration!.base}${e.rest ? 'R' : ''}`)).toEqual(['16th', '16thR', 'eighth']);
   });
   it('the cursor ghost anchors to the event the cursor means, not to the grace sharing its moment', () => {
     const session = new EditorSession(bar());

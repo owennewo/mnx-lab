@@ -18,10 +18,10 @@
       "staffPosition": -2
     },
     {
-      "type": "shorterDuration"
+      "type": "lineUp"
     },
     {
-      "type": "lineUp"
+      "type": "shorterDuration"
     },
     {
       "type": "toggleNote"
@@ -48,6 +48,12 @@
       "type": "lineUp"
     },
     {
+      "type": "nextPosition"
+    },
+    {
+      "type": "shorterDuration"
+    },
+    {
       "type": "toggleNote"
     },
     {
@@ -64,6 +70,9 @@
     },
     {
       "type": "lineUp"
+    },
+    {
+      "type": "shorterDuration"
     },
     {
       "type": "toggleNote"

@@ -177,6 +177,12 @@
       "type": "lineDown"
     },
     {
+      "type": "shorterDuration"
+    },
+    {
+      "type": "shorterDuration"
+    },
+    {
       "type": "enterFret",
       "fret": 12
     },
@@ -199,6 +205,9 @@
     },
     {
       "type": "nextPosition"
+    },
+    {
+      "type": "shorterDuration"
     },
     {
       "type": "enterFret",

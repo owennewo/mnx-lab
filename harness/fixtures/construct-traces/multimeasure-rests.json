@@ -70,13 +70,13 @@
       "type": "nextPosition"
     },
     {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
       "type": "longerDuration"
-    },
-    {
-      "type": "lineUp"
-    },
-    {
-      "type": "lineUp"
     },
     {
       "type": "toggleNote"
@@ -86,9 +86,6 @@
       "measureIndex": 1
     },
     {
-      "type": "shorterDuration"
-    },
-    {
       "type": "lineDown"
     },
     {
@@ -117,15 +114,15 @@
     },
     {
       "type": "nextPosition"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
     },
     {
       "type": "longerDuration"
-    },
-    {
-      "type": "lineUp"
-    },
-    {
-      "type": "lineUp"
     },
     {
       "type": "toggleNote"
@@ -133,6 +130,9 @@
     {
       "type": "goToMeasure",
       "measureIndex": 2
+    },
+    {
+      "type": "longerDuration"
     },
     {
       "type": "longerDuration"
@@ -148,6 +148,12 @@
       "measureIndex": 3
     },
     {
+      "type": "longerDuration"
+    },
+    {
+      "type": "longerDuration"
+    },
+    {
       "type": "toggleNote"
     },
     {
@@ -158,12 +164,6 @@
       "measureIndex": 4
     },
     {
-      "type": "shorterDuration"
-    },
-    {
-      "type": "shorterDuration"
-    },
-    {
       "type": "lineDown"
     },
     {
@@ -192,15 +192,15 @@
     },
     {
       "type": "nextPosition"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
     },
     {
       "type": "longerDuration"
-    },
-    {
-      "type": "lineUp"
-    },
-    {
-      "type": "lineUp"
     },
     {
       "type": "toggleNote"
@@ -210,9 +210,6 @@
       "measureIndex": 5
     },
     {
-      "type": "shorterDuration"
-    },
-    {
       "type": "lineDown"
     },
     {
@@ -241,15 +238,15 @@
     },
     {
       "type": "nextPosition"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
     },
     {
       "type": "longerDuration"
-    },
-    {
-      "type": "lineUp"
-    },
-    {
-      "type": "lineUp"
     },
     {
       "type": "toggleNote"
@@ -259,13 +256,16 @@
       "measureIndex": 6
     },
     {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
       "type": "longerDuration"
     },
     {
-      "type": "lineDown"
-    },
-    {
-      "type": "lineDown"
+      "type": "longerDuration"
     },
     {
       "type": "toggleNote"
@@ -296,6 +296,12 @@
       "type": "toggleNote"
     },
     {
+      "type": "longerDuration"
+    },
+    {
+      "type": "longerDuration"
+    },
+    {
       "type": "toggleNote"
     },
     {
@@ -306,6 +312,12 @@
       "type": "toggleNote"
     },
     {
+      "type": "longerDuration"
+    },
+    {
+      "type": "longerDuration"
+    },
+    {
       "type": "toggleNote"
     },
     {
@@ -313,12 +325,6 @@
       "measureIndex": 2
     },
     {
-      "type": "shorterDuration"
-    },
-    {
-      "type": "shorterDuration"
-    },
-    {
       "type": "toggleNote"
     },
     {
@@ -332,12 +338,12 @@
     },
     {
       "type": "nextPosition"
+    },
+    {
+      "type": "lineDown"
     },
     {
       "type": "longerDuration"
-    },
-    {
-      "type": "lineDown"
     },
     {
       "type": "toggleNote"
@@ -347,9 +353,6 @@
       "measureIndex": 3
     },
     {
-      "type": "shorterDuration"
-    },
-    {
       "type": "lineUp"
     },
     {
@@ -369,12 +372,12 @@
     },
     {
       "type": "nextPosition"
+    },
+    {
+      "type": "lineDown"
     },
     {
       "type": "longerDuration"
-    },
-    {
-      "type": "lineDown"
     },
     {
       "type": "toggleNote"
@@ -384,10 +387,13 @@
       "measureIndex": 4
     },
     {
+      "type": "toggleNote"
+    },
+    {
       "type": "longerDuration"
     },
     {
-      "type": "toggleNote"
+      "type": "longerDuration"
     },
     {
       "type": "toggleNote"
@@ -400,6 +406,12 @@
       "type": "toggleNote"
     },
     {
+      "type": "longerDuration"
+    },
+    {
+      "type": "longerDuration"
+    },
+    {
       "type": "toggleNote"
     },
     {
@@ -408,6 +420,12 @@
     },
     {
       "type": "toggleNote"
+    },
+    {
+      "type": "longerDuration"
+    },
+    {
+      "type": "longerDuration"
     },
     {
       "type": "setLayout",

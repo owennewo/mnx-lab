@@ -84,19 +84,16 @@
       "measureIndex": 1
     },
     {
-      "type": "longerDuration"
+      "type": "lineUp"
     },
     {
-      "type": "lineUp"
+      "type": "longerDuration"
     },
     {
       "type": "toggleNote"
     },
     {
       "type": "nextPosition"
-    },
-    {
-      "type": "shorterDuration"
     },
     {
       "type": "lineUp"

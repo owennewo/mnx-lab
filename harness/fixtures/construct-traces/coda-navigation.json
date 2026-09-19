@@ -1,30 +1,102 @@
 {
   "target": "lab/navigation/coda-navigation",
   "intents": [
-    { "type": "addPart", "partId": "guitar", "name": "Guitar" },
+    {
+      "type": "addPart",
+      "partId": "guitar",
+      "name": "Guitar"
+    },
     {
       "type": "setTuning",
       "tuning": [
-        { "string": 1, "pitch": { "step": "E", "octave": 4 } },
-        { "string": 2, "pitch": { "step": "B", "octave": 3 } },
-        { "string": 3, "pitch": { "step": "G", "octave": 3 } },
-        { "string": 4, "pitch": { "step": "D", "octave": 3 } },
-        { "string": 5, "pitch": { "step": "A", "octave": 2 } },
-        { "string": 6, "pitch": { "step": "E", "octave": 2 } }
+        {
+          "string": 1,
+          "pitch": {
+            "step": "E",
+            "octave": 4
+          }
+        },
+        {
+          "string": 2,
+          "pitch": {
+            "step": "B",
+            "octave": 3
+          }
+        },
+        {
+          "string": 3,
+          "pitch": {
+            "step": "G",
+            "octave": 3
+          }
+        },
+        {
+          "string": 4,
+          "pitch": {
+            "step": "D",
+            "octave": 3
+          }
+        },
+        {
+          "string": 5,
+          "pitch": {
+            "step": "A",
+            "octave": 2
+          }
+        },
+        {
+          "string": 6,
+          "pitch": {
+            "step": "E",
+            "octave": 2
+          }
+        }
       ]
     },
-    { "type": "setStaffKind", "kind": "both" },
-    { "type": "appendMeasure" },
-    { "type": "appendMeasure" },
-    { "type": "appendMeasure" },
-    { "type": "appendMeasure" },
-    { "type": "appendMeasure" },
-    { "type": "appendMeasure" },
-    { "type": "appendMeasure" },
-    { "type": "appendMeasure" },
-    { "type": "setTimeSignature", "count": 4, "unit": 4 },
-    { "type": "setClef", "sign": "G", "staffPosition": -2 },
-    { "type": "setFullMeasureRest", "visualDuration": { "base": "whole" } },
+    {
+      "type": "setStaffKind",
+      "kind": "both"
+    },
+    {
+      "type": "appendMeasure"
+    },
+    {
+      "type": "appendMeasure"
+    },
+    {
+      "type": "appendMeasure"
+    },
+    {
+      "type": "appendMeasure"
+    },
+    {
+      "type": "appendMeasure"
+    },
+    {
+      "type": "appendMeasure"
+    },
+    {
+      "type": "appendMeasure"
+    },
+    {
+      "type": "appendMeasure"
+    },
+    {
+      "type": "setTimeSignature",
+      "count": 4,
+      "unit": 4
+    },
+    {
+      "type": "setClef",
+      "sign": "G",
+      "staffPosition": -2
+    },
+    {
+      "type": "setFullMeasureRest",
+      "visualDuration": {
+        "base": "whole"
+      }
+    },
     {
       "type": "setMeasureAttribute",
       "attribute": {
@@ -34,8 +106,16 @@
         "count": 2
       }
     },
-    { "type": "goToMeasure", "measureIndex": 1 },
-    { "type": "setFullMeasureRest", "visualDuration": { "base": "whole" } },
+    {
+      "type": "goToMeasure",
+      "measureIndex": 1
+    },
+    {
+      "type": "setFullMeasureRest",
+      "visualDuration": {
+        "base": "whole"
+      }
+    },
     {
       "type": "setMeasureAttribute",
       "attribute": {
@@ -45,11 +125,32 @@
         "text": "To Double Coda"
       }
     },
-    { "type": "goToMeasure", "measureIndex": 2 },
-    { "type": "setFullMeasureRest", "visualDuration": { "base": "whole" } },
-    { "type": "setMeasureAttribute", "attribute": { "kind": "segno" } },
-    { "type": "goToMeasure", "measureIndex": 3 },
-    { "type": "setFullMeasureRest", "visualDuration": { "base": "whole" } },
+    {
+      "type": "goToMeasure",
+      "measureIndex": 2
+    },
+    {
+      "type": "setFullMeasureRest",
+      "visualDuration": {
+        "base": "whole"
+      }
+    },
+    {
+      "type": "setMeasureAttribute",
+      "attribute": {
+        "kind": "segno"
+      }
+    },
+    {
+      "type": "goToMeasure",
+      "measureIndex": 3
+    },
+    {
+      "type": "setFullMeasureRest",
+      "visualDuration": {
+        "base": "whole"
+      }
+    },
     {
       "type": "setMeasureAttribute",
       "attribute": {
@@ -59,8 +160,16 @@
         "text": "To Coda"
       }
     },
-    { "type": "goToMeasure", "measureIndex": 4 },
-    { "type": "setFullMeasureRest", "visualDuration": { "base": "whole" } },
+    {
+      "type": "goToMeasure",
+      "measureIndex": 4
+    },
+    {
+      "type": "setFullMeasureRest",
+      "visualDuration": {
+        "base": "whole"
+      }
+    },
     {
       "type": "setMeasureAttribute",
       "attribute": {
@@ -71,8 +180,16 @@
         "text": "D.S. al Coda"
       }
     },
-    { "type": "goToMeasure", "measureIndex": 5 },
-    { "type": "setFullMeasureRest", "visualDuration": { "base": "whole" } },
+    {
+      "type": "goToMeasure",
+      "measureIndex": 5
+    },
+    {
+      "type": "setFullMeasureRest",
+      "visualDuration": {
+        "base": "whole"
+      }
+    },
     {
       "type": "setMeasureAttribute",
       "attribute": {
@@ -81,8 +198,16 @@
         "markKind": "coda"
       }
     },
-    { "type": "goToMeasure", "measureIndex": 6 },
-    { "type": "setFullMeasureRest", "visualDuration": { "base": "whole" } },
+    {
+      "type": "goToMeasure",
+      "measureIndex": 6
+    },
+    {
+      "type": "setFullMeasureRest",
+      "visualDuration": {
+        "base": "whole"
+      }
+    },
     {
       "type": "setMeasureAttribute",
       "attribute": {
@@ -93,8 +218,16 @@
         "text": "D.S.S. al Double Coda"
       }
     },
-    { "type": "goToMeasure", "measureIndex": 7 },
-    { "type": "setFullMeasureRest", "visualDuration": { "base": "whole" } },
+    {
+      "type": "goToMeasure",
+      "measureIndex": 7
+    },
+    {
+      "type": "setFullMeasureRest",
+      "visualDuration": {
+        "base": "whole"
+      }
+    },
     {
       "type": "setMeasureAttribute",
       "attribute": {
@@ -106,7 +239,10 @@
     },
     {
       "type": "setMeasureAttribute",
-      "attribute": { "kind": "barline", "type": "final" }
+      "attribute": {
+        "kind": "barline",
+        "type": "final"
+      }
     }
   ]
 }

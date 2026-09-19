@@ -42,43 +42,43 @@
       "type": "nextPosition"
     },
     {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
+      "type": "lineUp"
+    },
+    {
       "type": "longerDuration"
-    },
-    {
-      "type": "lineUp"
-    },
-    {
-      "type": "lineUp"
-    },
-    {
-      "type": "lineUp"
-    },
-    {
-      "type": "lineUp"
-    },
-    {
-      "type": "lineUp"
-    },
-    {
-      "type": "lineUp"
-    },
-    {
-      "type": "lineUp"
-    },
-    {
-      "type": "lineUp"
-    },
-    {
-      "type": "lineUp"
-    },
-    {
-      "type": "lineUp"
-    },
-    {
-      "type": "lineUp"
-    },
-    {
-      "type": "lineUp"
     },
     {
       "type": "toggleNote"
@@ -102,13 +102,13 @@
       "type": "lineUp"
     },
     {
+      "type": "longerDuration"
+    },
+    {
       "type": "toggleNote"
     },
     {
       "type": "nextPosition"
-    },
-    {
-      "type": "shorterDuration"
     },
     {
       "type": "lineDown"

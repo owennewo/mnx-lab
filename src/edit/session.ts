@@ -1,4 +1,4 @@
-import { entryRefusal } from './ops.ts';
+import { restResizeRefusal } from './ops.ts';
 import { sameContainerIndex } from '../model/noteKeys.ts';
 import type { ContainerIndex } from '../model/noteKeys.ts';
 // The editor session: intent + (doc, cursor) → cursor move or EditOp.
@@ -124,12 +124,10 @@ export class EditorSession {
   private cursorState: EditorCursor;
   private intents: EditorIntent[] = [];
   /** Duration a fresh entry event gets; `-`/`=` on an entry ghost step it. */
-  private entryDuration: MnxNoteValueBase = 'quarter';
   /** Dots on the PENDING entry duration (campaign item 4). Separate from the
    *  base because the ladder steps one and the dot key the other, and a
    *  dotted quarter stepping to an eighth stays dotted — as it does in every
    *  editor a player has used. */
-  private entryDots = 0;
   private lastDeleteOutcome: DeleteOutcome | null = null;
   /** The armed end of a spanner-in-progress (campaign item 10): a note key, or
    *  null. The keyboard names two places in two presses because the ladder
@@ -198,14 +196,6 @@ export class EditorSession {
     return this.grid.mode;
   }
 
-  get entryDurationBase(): MnxNoteValueBase {
-    return this.entryDuration;
-  }
-
-  /** Dots the next entered note will carry. */
-  get entryDurationDots(): number {
-    return this.entryDots;
-  }
 
   get canUndo(): boolean {
     return this.history.canUndo;
@@ -345,6 +335,7 @@ export class EditorSession {
    * exactly as it happened, no-ops included.
    */
   handleIntent(intent: EditorIntent): boolean {
+    this.refusalState = null;
     this.intents.push(intent);
     // Delete's outcome describes ONE keystroke, so anything else discards it.
     // A notice that outlived its keystroke would report the previous press.
@@ -463,17 +454,14 @@ export class EditorSession {
           this.cursorState.staffIndex ?? 1
         );
         const fifths = keyFifthsAt(this.doc, this.cursorState.measureIndex);
-        this.entryRefusalState = null;
-        const op = {
-          type: 'insertPitchNote' as const,
+        this.applyEntry({
+          type: 'insertPitchNote',
           measureIndex: this.cursorState.measureIndex,
-          onset: [this.cursorState.onset.num, this.cursorState.onset.den] as [number, number],
+          onset: [this.cursorState.onset.num, this.cursorState.onset.den],
           pitch: pitchAtStaffPosition(clef, this.cursorState.line, fifths),
-          duration: { base: this.entryDuration, ...(this.entryDots ? { dots: this.entryDots } : {}) },
+          duration: { base: 'quarter' },
           ...this.entryTarget
-        };
-        if (!this.pastEnd && this.refusesEntry(op)) return false;
-        this.applyEntry(op);
+        });
         this.standOnEntered();
         return true;
       }
@@ -635,31 +623,20 @@ export class EditorSession {
         const ranged = this.stepDurationOverRange(step);
         if (ranged !== null) return ranged;
         const event = this.eventUnderCursor();
-        // A REST IS ABSENCE (§8.11), so there is nothing there to re-value:
-        // the duration keys step the PENDING entry duration over a rest or an
-        // entry ghost alike, and only re-value an event that has ink. Before
-        // campaign item 11b this re-valued the rest instead, which made a run
-        // of short notes unenterable — every rest after the first stayed a
-        // quarter, so every note after the first came out a quarter.
-        if (!event || (event.notes?.length ?? 0) === 0) {
-          const next = stepLadder(this.entryDuration, step);
-          if (next === this.entryDuration) return false;
-          this.entryDuration = next;
-          return true;
-        }
+        // A REST IS A NOTE WITHOUT A PITCH (2026-09-19, the owner's rule,
+        // reversing campaign item 11b's "a rest is absence"): the duration keys
+        // re-value whatever stands here, rest or note, and a fret typed on a
+        // rest keeps that value. The empty bar past the end holds nothing to
+        // re-value. A rest re-values IN PLACE — its surplus stays beside it —
+        // so a run of eighths into beat-rest padding is `−` then the fret, twice
+        // a beat, and never moves a note.
+        if (!event) return false;
         const next = stepLadder(event.duration.base, step);
         if (next === event.duration.base) return false;
-        this.apply({
-          type: 'setDuration',
-          measureIndex: this.cursorState.measureIndex,
-          onset: [this.cursorState.onset.num, this.cursorState.onset.den],
-          // Dots survive a re-value: stepping a dotted quarter gives a dotted
-          // eighth, not a plain one. The dot is a property of the value the
-          // player is writing, and the ladder steps the value.
-          duration: { base: next, ...(event.duration.dots ? { dots: event.duration.dots } : {}) },
-          ...this.entryTarget
-        });
-        return true;
+        // Dots survive a re-value: stepping a dotted quarter gives a dotted
+        // eighth, not a plain one. The dot is a property of the value the
+        // player is writing, and the ladder steps the value.
+        return this.setDurationHere({ base: next, ...(event.duration.dots ? { dots: event.duration.dots } : {}) }, !!event.rest);
       }
       case 'toggleDots': {
         // The same split the duration ladder makes: ink is re-valued, absence
@@ -668,19 +645,9 @@ export class EditorSession {
         // verb — for exactly that reason.
         const event = this.eventUnderCursor();
         const cycle = (dots: number) => (dots + 1) % 3;
-        if (!event || (event.notes?.length ?? 0) === 0) {
-          this.entryDots = cycle(this.entryDots);
-          return true;
-        }
+        if (!event) return false;
         const dots = cycle(event.duration.dots ?? 0);
-        this.apply({
-          type: 'setDuration',
-          measureIndex: this.cursorState.measureIndex,
-          onset: [this.cursorState.onset.num, this.cursorState.onset.den],
-          duration: { base: event.duration.base, ...(dots ? { dots } : {}) },
-          ...this.entryTarget
-        });
-        return true;
+        return this.setDurationHere({ base: event.duration.base, ...(dots ? { dots } : {}) }, !!event.rest);
       }
       case 'setTimeSignature': {
         this.apply({
@@ -896,13 +863,11 @@ export class EditorSession {
       case 'setEventDuration': {
         const event = this.eventUnderCursor();
         const duration = { base: intent.base, ...(intent.dots ? { dots: intent.dots } : {}) };
-        if (!event || (event.notes?.length ?? 0) === 0) {
-          if (this.entryDuration === intent.base) return false;
-          this.entryDuration = intent.base;
-          return true;
-        }
+        // A rest is re-valued like a note (in place); the empty bar past the end holds nothing.
+        if (!event) return false;
         if (event.duration.base === intent.base && (event.duration.dots ?? 0) === (intent.dots ?? 0))
           return false;
+        if (event.rest) return this.setDurationHere(duration, true);
         this.apply({
           type: 'setDuration',
           measureIndex: this.cursorState.measureIndex,
@@ -1455,19 +1420,27 @@ export class EditorSession {
   }
 
   /** A complete, timer-free fret resolved by the workbench's stage-1 input. */
-  /** Why the last entry keystroke changed nothing, in words for the host; null when it did not refuse. */
-  private entryRefusalState: string | null = null;
-  get lastEntryRefusal(): string | null { return this.entryRefusalState; }
-  /** The entry op's own refusal, named before it is applied. */
-  private refusesEntry(op: { measureIndex: number; onset: [number, number]; duration: { base: MnxNoteValueBase; dots?: number }; partIndex?: number; staffIndex?: number; voiceIndex?: number }): boolean {
-    const why = entryRefusal(this.doc, op);
-    if (!why) return false;
-    const value = `${this.entryDuration}${'.'.repeat(this.entryDots)}`;
-    this.entryRefusalState = `A ${value} does not fit here: the rest is shorter and a note follows. Shorten the entry duration (−) first.`;
+  /** Why the last keystroke changed nothing, in words for the host; null unless an op refused. Cleared per intent. */
+  private refusalState: string | null = null;
+  get lastRefusal(): string | null { return this.refusalState; }
+  /** Re-value the event under the cursor. A rest that would have to grow past a note refuses, and says so. */
+  private setDurationHere(duration: { base: MnxNoteValueBase; dots?: number }, rest: boolean): boolean {
+    const op = {
+      type: 'setDuration' as const,
+      measureIndex: this.cursorState.measureIndex,
+      onset: [this.cursorState.onset.num, this.cursorState.onset.den] as [number, number],
+      duration,
+      ...this.entryTarget
+    };
+    if (rest && restResizeRefusal(this.doc, op)) {
+      const value = `${duration.base}${'.'.repeat(duration.dots ?? 0)}`;
+      this.refusalState = `This rest cannot become a ${value}: a note stands in the way.`;
+      return false;
+    }
+    this.apply(op);
     return true;
   }
   private enterFret(fret: number): boolean {
-    this.entryRefusalState = null;
     if (!Number.isInteger(fret) || fret < 0 || fret > MAX_ENTRY_FRET) return false;
     const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
     const note = this.selectedNote();
@@ -1486,17 +1459,17 @@ export class EditorSession {
       // Nothing on this string at this position: insert. Only meaningful on
       // the fingerboard — in ordinal mode (no tab part) digits need a note.
       if (!tab) return false;
-      const op = {
-        type: 'insertNote' as const,
+      // A rest keeps its own duration when it takes a pitch; `duration` is
+      // only for an onset with nothing at all, which padded bars do not have.
+      this.applyEntry({
+        type: 'insertNote',
         measureIndex: this.cursorState.measureIndex,
-        onset: [this.cursorState.onset.num, this.cursorState.onset.den] as [number, number],
+        onset: [this.cursorState.onset.num, this.cursorState.onset.den],
         string: this.cursorState.line,
         fret,
-        duration: { base: this.entryDuration, ...(this.entryDots ? { dots: this.entryDots } : {}) },
+        duration: { base: 'quarter' },
         ...this.entryTarget
-      };
-      if (!this.pastEnd && this.refusesEntry(op)) return false;
-      this.applyEntry(op);
+      });
       this.standOnEntered();
     }
     return true;
@@ -2330,8 +2303,8 @@ export class EditorSession {
    *
    * The new note takes the cursor's own line, so it arrives where you were
    * looking: a staff position in the notation projection, the string you are
-   * standing on in tab. The pending entry duration governs, as it does for
-   * every other entry gesture.
+   * standing on in tab. It takes its neighbour's duration — the event the
+   * cursor stands on — the way a new beat in Guitar Pro inherits the last one.
    */
   private insertEventHere(side: 'before' | 'after'): boolean {
     const cursor = this.cursorState;
@@ -2339,10 +2312,8 @@ export class EditorSession {
     // reported success, pushing a history entry that changed no bytes — an
     // undo that does nothing is worse than a refusal that says so.
     if (!this.doc.global?.measures?.[cursor.measureIndex]) return false;
-    const duration = {
-      base: this.entryDuration,
-      ...(this.entryDots ? { dots: this.entryDots } : {})
-    };
+    const beside = this.eventUnderCursor()?.duration;
+    const duration = { base: beside?.base ?? 'quarter', ...(beside?.dots ? { dots: beside.dots } : {}) };
     const tab = this.activeProjection === 'tab' && this.grid.mode === 'string';
     let pitch: { step: 'C' | 'D' | 'E' | 'F' | 'G' | 'A' | 'B'; octave: number; alter?: number };
     let fingerboard: { string?: number; fret?: number } = {};

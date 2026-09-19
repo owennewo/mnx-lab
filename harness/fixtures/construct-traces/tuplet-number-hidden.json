@@ -19,27 +19,27 @@
       "staffPosition": -2
     },
     {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
+      "type": "lineDown"
+    },
+    {
       "type": "shorterDuration"
     },
     {
-      "type": "lineDown"
-    },
-    {
-      "type": "lineDown"
-    },
-    {
-      "type": "lineDown"
-    },
-    {
-      "type": "lineDown"
-    },
-    {
-      "type": "lineDown"
-    },
-    {
-      "type": "lineDown"
-    },
-    {
       "type": "toggleNote"
     },
     {
@@ -56,6 +56,9 @@
     },
     {
       "type": "lineUp"
+    },
+    {
+      "type": "shorterDuration"
     },
     {
       "type": "toggleNote"
@@ -93,10 +96,10 @@
       "type": "nextPosition"
     },
     {
-      "type": "longerDuration"
+      "type": "lineUp"
     },
     {
-      "type": "lineUp"
+      "type": "longerDuration"
     },
     {
       "type": "toggleNote"
