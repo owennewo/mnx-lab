@@ -3493,6 +3493,25 @@ function newSequence(staffIndex: number): MnxSequence {
   return staffIndex === 1 ? { content: [] } : { staff: staffIndex, content: [] };
 }
 
+/**
+ * Why `insertNote` / `insertPitchNote` would change NOTHING at this onset: the
+ * pending duration is longer than the rest it lands on and ink follows, so the
+ * entry refuses rather than consume a note (the rule above in `insertNote`).
+ * Named before the op is applied, so the host can say so — a silent no-op reads
+ * as a lost keystroke. Read-only: the sequence is looked up, never created.
+ */
+export function entryRefusal(
+  doc: MnxStructure,
+  op: { measureIndex: number; onset: [number, number]; duration: { base: MnxNoteValueBase; dots?: number }; partIndex?: number; staffIndex?: number; voiceIndex?: number }
+): 'longer-than-rest' | null {
+  const measure = doc.parts?.[op.partIndex ?? 0]?.measures?.[op.measureIndex];
+  const seq = measure?.sequences?.filter(s => (s.staff ?? 1) === (op.staffIndex ?? 1))[op.voiceIndex ?? 0];
+  if (!seq) return null;
+  const found = eventAtOnset(seq, { num: op.onset[0], den: op.onset[1] });
+  if (!found?.event?.rest) return null;
+  return restsCovering(seq, found.index, durationSpan(op.duration)) ? null : 'longer-than-rest';
+}
+
 /** The timed event starting exactly at `target`, or (event: undefined) with
  *  the content index where a new event at `target` belongs. Returns undefined
  *  when `target` falls INSIDE an item's span — phase 2 does not split events. */

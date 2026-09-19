@@ -214,6 +214,9 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     // when it declined. Everything else that returns false is a navigation edge, where silence is the right answer.
     const deleted = intent.type === 'delete' ? session.lastDelete : null;
     if (deleted) options.onNotice?.(deleteSelectionNotice(deleted));
+    // An entry that changed nothing must say why: the digit's preview has just vanished, and silence reads as a lost key.
+    if (!handled && (intent.type === 'enterFret' || intent.type === 'toggleNote') && session.lastEntryRefusal)
+      options.onNotice?.({ ok: false, message: session.lastEntryRefusal });
     if (!handled) options.onRefused?.(intent);
     settle();
     return handled;

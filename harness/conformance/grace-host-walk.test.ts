@@ -74,6 +74,29 @@ describe('a grace and its host are two stops', () => {
     expect(describeStop(session)).toBe('5/8 fret 7');
     expect(walk(session, 'nextPosition', 1)).toEqual(['3/4 fret 5']);
   });
+  it('a longer duration typed on the rest is refused out loud, since a note follows', () => {
+    const session = new EditorSession(bar());
+    walk(session, 'nextPosition', 5);
+    const before = JSON.stringify(session.doc);
+    expect(session.lastEntryRefusal).toBeNull();
+    // The pending duration is a quarter; the rest is an eighth and the 5 stands in the way.
+    expect(session.handleIntent({ type: 'enterFret', fret: 7 })).toBe(false);
+    expect(session.lastEntryRefusal).toMatch(/quarter does not fit.*Shorten/);
+    expect(JSON.stringify(session.doc)).toBe(before);
+    expect(session.canUndo).toBe(false);
+    session.handleIntent({ type: 'shorterDuration' });
+    expect(session.handleIntent({ type: 'enterFret', fret: 7 })).toBe(true);
+    expect(session.lastEntryRefusal).toBeNull();
+  });
+  it('the cursor ghost anchors to the event the cursor means, not to the grace sharing its moment', () => {
+    const session = new EditorSession(bar());
+    walk(session, 'nextPosition', 4);
+    expect(describeStop(session)).toBe('5/8 fret 2');
+    expect(session.cursorContext().anchorKeys[0]).toMatch(/e4\.c0/);
+    walk(session, 'nextPosition', 1);
+    expect(describeStop(session)).toBe('5/8 rest');
+    expect(session.cursorContext().anchorKeys[0]).toBe('@m0.v0.e5');
+  });
   it('Delete at the event rung removes the rest, and the note after it takes its place', () => {
     const session = new EditorSession(bar());
     walk(session, 'nextPosition', 5);

@@ -141,3 +141,13 @@ note in front of it. It now looks past grace containers to the timed host at tha
 `harness/conformance/grace-host-walk.test.ts` is the bar itself, walked both ways in both
 projections and at both rungs, with a digit entered into the rest and the rest deleted.
 
+Two more from the owner's first use of it (same day): the digit's preview showed and
+vanished, because the pending entry duration (a quarter by default) was longer than the
+eighth rest with a note behind it, and the entry op refused **silently**. The refusal is now
+named before the op is applied (`entryRefusal` in `src/edit/ops.ts`, read-only), `enterFret`
+and `toggleNote` return false with `lastEntryRefusal` in words, and the host binding passes it
+to `onNotice` — studio shows it where the clipboard notices go. And the cursor ghost, the
+dashed cell drawn on the host rest, sat on top of the grace's digit: its anchor keys now lead
+with the event the cursor *means*, so in the both view it borrows the notation rest's column.
+A tab-only view still has no rest element and falls back to the metric interpolation.
+

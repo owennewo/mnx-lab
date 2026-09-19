@@ -1,3 +1,4 @@
+import { entryRefusal } from './ops.ts';
 import { sameContainerIndex } from '../model/noteKeys.ts';
 import type { ContainerIndex } from '../model/noteKeys.ts';
 // The editor session: intent + (doc, cursor) → cursor move or EditOp.
@@ -47,6 +48,7 @@ import {
   onsetsEqual,
   onsetLess,
   pinEventSlot,
+  eventSlotAt,
   settleEventPin,
   inPinnedEvent,
   positionAt,
@@ -299,11 +301,18 @@ export class EditorSession {
     //
     // Within a voice, notes lead: a column with ink anchors more precisely
     // than the rest that shares it.
+    // And the event the cursor MEANS leads everything: a grace and its host
+    // share the moment, and standing on the host rest must not anchor the
+    // ghost to the grace's digit (core-note-address move 3).
     const voice = this.cursorState.voiceIndex ?? 0;
+    const meant = eventSlotAt(this.grid, this.cursorState, this.activeProjection);
+    const isMeant = (e: { voiceIndex: number; eventIndex: number; containerIndex?: ContainerIndex }) =>
+      !!meant && inPinnedEvent(e, meant);
+    const first: string[] = [];
     const mine: string[] = [];
     const theirs: string[] = [];
     for (const slot of position?.slots ?? [])
-      (slot.voiceIndex === voice ? mine : theirs).push(slot.noteKey);
+      (isMeant(slot) ? first : slot.voiceIndex === voice ? mine : theirs).push(slot.noteKey);
     for (const event of position?.events ?? []) {
       const address = {
         partIndex: this.cursorState.partIndex ?? 0,
@@ -315,11 +324,11 @@ export class EditorSession {
       };
       const resolved = eventAtAddress(this.doc, address);
       if (resolved?.rest)
-        (event.voiceIndex === voice ? mine : theirs).push(
+        (isMeant(event) ? first : event.voiceIndex === voice ? mine : theirs).push(
           resolved.id ?? syntheticEventKey(address)
         );
     }
-    const anchorKeys = [...mine, ...theirs];
+    const anchorKeys = [...first, ...mine, ...theirs];
     return {
       occupied: !!slotAt(this.grid, this.cursorState, this.activeProjection),
       staffPosition: this.activeProjection === 'notation' ? this.cursorState.line : null,
@@ -454,14 +463,17 @@ export class EditorSession {
           this.cursorState.staffIndex ?? 1
         );
         const fifths = keyFifthsAt(this.doc, this.cursorState.measureIndex);
-        this.applyEntry({
-          type: 'insertPitchNote',
+        this.entryRefusalState = null;
+        const op = {
+          type: 'insertPitchNote' as const,
           measureIndex: this.cursorState.measureIndex,
-          onset: [this.cursorState.onset.num, this.cursorState.onset.den],
+          onset: [this.cursorState.onset.num, this.cursorState.onset.den] as [number, number],
           pitch: pitchAtStaffPosition(clef, this.cursorState.line, fifths),
           duration: { base: this.entryDuration, ...(this.entryDots ? { dots: this.entryDots } : {}) },
           ...this.entryTarget
-        });
+        };
+        if (!this.pastEnd && this.refusesEntry(op)) return false;
+        this.applyEntry(op);
         this.standOnEntered();
         return true;
       }
@@ -1443,7 +1455,19 @@ export class EditorSession {
   }
 
   /** A complete, timer-free fret resolved by the workbench's stage-1 input. */
+  /** Why the last entry keystroke changed nothing, in words for the host; null when it did not refuse. */
+  private entryRefusalState: string | null = null;
+  get lastEntryRefusal(): string | null { return this.entryRefusalState; }
+  /** The entry op's own refusal, named before it is applied. */
+  private refusesEntry(op: { measureIndex: number; onset: [number, number]; duration: { base: MnxNoteValueBase; dots?: number }; partIndex?: number; staffIndex?: number; voiceIndex?: number }): boolean {
+    const why = entryRefusal(this.doc, op);
+    if (!why) return false;
+    const value = `${this.entryDuration}${'.'.repeat(this.entryDots)}`;
+    this.entryRefusalState = `A ${value} does not fit here: the rest is shorter and a note follows. Shorten the entry duration (−) first.`;
+    return true;
+  }
   private enterFret(fret: number): boolean {
+    this.entryRefusalState = null;
     if (!Number.isInteger(fret) || fret < 0 || fret > MAX_ENTRY_FRET) return false;
     const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
     const note = this.selectedNote();
@@ -1462,15 +1486,17 @@ export class EditorSession {
       // Nothing on this string at this position: insert. Only meaningful on
       // the fingerboard — in ordinal mode (no tab part) digits need a note.
       if (!tab) return false;
-      this.applyEntry({
-        type: 'insertNote',
+      const op = {
+        type: 'insertNote' as const,
         measureIndex: this.cursorState.measureIndex,
-        onset: [this.cursorState.onset.num, this.cursorState.onset.den],
+        onset: [this.cursorState.onset.num, this.cursorState.onset.den] as [number, number],
         string: this.cursorState.line,
         fret,
         duration: { base: this.entryDuration, ...(this.entryDots ? { dots: this.entryDots } : {}) },
         ...this.entryTarget
-      });
+      };
+      if (!this.pastEnd && this.refusesEntry(op)) return false;
+      this.applyEntry(op);
       this.standOnEntered();
     }
     return true;
