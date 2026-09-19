@@ -156,7 +156,7 @@ export const ELEMENT_KINDS: Record<ElementKind, ElementKindSpec> = {
   },
   grace: {
     classes: ['grace-slash'],
-    note: 'An un-timed container. Its only ink of its own is the slash — the `grace` token merely sizes the notes it holds. Removable once those notes are gone.',
+    note: 'An un-timed container. Its only ink of its own is the slash — the `grace` token merely sizes the notes it holds. Removing it unwraps it: the notes stay at their written values and the bar may overfill, which the badge reports.',
     construct: ['wrapInContainer'],
     remove: ['removeContainer']
   },

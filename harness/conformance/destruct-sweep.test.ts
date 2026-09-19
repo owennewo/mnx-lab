@@ -23,7 +23,10 @@
 //   applies          the document changed
 //   validity         RELATIVE: the schema error set must not GROW (five
 //                    scenarios are invalid by design and must stay judgeable)
-//   diagnostics      no renderer diagnostics beyond the untouched baseline
+//   diagnostics      no renderer diagnostics beyond the untouched baseline —
+//                    except after a CONTAINER removal, which unwraps and may
+//                    overfill the bar on purpose (2026-09-19: the editor never
+//                    refuses for duration reasons; the badge is the report)
 //   references       RELATIVE: no reference dangles, and none goes inkless —
 //                    an emptied event keeps its id, so a beam does not dangle,
 //                    it beams a rest (src/model/references.ts)
@@ -236,8 +239,9 @@ function sweepScenario(scenario: Scenario): ScenarioResult {
     if (freshErrors.length) failures.push(`new schema errors: ${freshErrors.slice(0, 2).join('; ')}`);
 
     const diagnostics = diagnosticCount(after);
+    const unwraps = element.kind === 'tuplet' || element.kind === 'grace' || element.kind === 'tremolo';
     if (diagnostics === null) failures.push('layout crashed after removal');
-    else if (baseline.diagnostics !== null && diagnostics > baseline.diagnostics)
+    else if (!unwraps && baseline.diagnostics !== null && diagnostics > baseline.diagnostics)
       failures.push(`diagnostics ${baseline.diagnostics} → ${diagnostics}`);
 
     const freshBroken = newlyPresent(baseline.broken, brokenReferenceKeys(after));

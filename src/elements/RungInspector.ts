@@ -619,6 +619,14 @@ export class RungInspector extends LitElement {
       this.openUnderCursor();
       return true;
     }
+    if (code === 'Delete') {
+      // One press: the pill goes — the same removal Backspace reaches in two.
+      const item = this.itemAt(this.cursor);
+      if (item.kind !== 'pill') return true;
+      const pill = this.pills[item.index];
+      if (pill?.remove) this.emit('inspector-remove', { key: pill.key, intent: pill.remove });
+      return true;
+    }
     if (code === 'Backspace') {
       const item = this.itemAt(this.cursor);
       if (item.kind !== 'pill') return true;

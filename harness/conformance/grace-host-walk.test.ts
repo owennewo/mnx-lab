@@ -99,6 +99,17 @@ describe('a grace and its host are two stops', () => {
     expect(describeStop(session)).toBe('5/8 rest');
     expect(session.cursorContext().anchorKeys[0]).toBe('@m0.v0.e5');
   });
+  it('unwrapping the grace keeps its note, at its written value, and the bar overfills for the badge', () => {
+    const session = new EditorSession(bar());
+    walk(session, 'nextPosition', 4);
+    expect(describeStop(session)).toBe('5/8 fret 2');
+    // The grace pill's removal: the container goes, its quarter note stands in its place.
+    expect(session.handleIntent({ type: 'removeContainer', sequenceIndex: 0, eventIndex: 4 })).toBe(true);
+    const content = session.doc.parts[0].measures[0].sequences![0].content as MnxEvent[];
+    expect(content.map(e => (e as { type?: string }).type ?? `${e.duration!.base}${e.rest ? 'R' : ''}`))
+      .toEqual(['quarter', 'eighth', 'eighth', 'eighth', 'quarter', 'eighthR', 'eighth', 'eighthR']);
+    expect(content[4].notes![0]._x!.mnxLab!.fret).toBe(2);
+  });
   it('Delete at the event rung removes the rest, and the note after it takes its place', () => {
     const session = new EditorSession(bar());
     walk(session, 'nextPosition', 5);

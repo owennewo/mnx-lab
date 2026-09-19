@@ -4,9 +4,9 @@
     "scenarios": 130,
     "elements": 2143,
     "verdicts": {
-      "removed": 2093,
+      "removed": 2116,
       "no-op": 17,
-      "refused": 33
+      "refused": 10
     },
     "unaddressableWithAnOp": 14
   },
@@ -55,7 +55,7 @@
       "removed": 10
     },
     "grace": {
-      "refused": 12
+      "removed": 12
     },
     "harmony": {
       "no-op": 5
@@ -164,10 +164,10 @@
       "refused": 4
     },
     "tremolo": {
-      "refused": 3
+      "removed": 3
     },
     "tuplet": {
-      "refused": 8
+      "removed": 8
     }
   },
   "scenarios": {
@@ -771,7 +771,7 @@
         "removed": 1
       },
       "grace": {
-        "refused": 1
+        "removed": 1
       },
       "note": {
         "removed": 3
@@ -857,7 +857,7 @@
         "removed": 1
       },
       "tuplet": {
-        "refused": 1
+        "removed": 1
       }
     },
     "lab/score-text/chord-symbols": {
@@ -1397,7 +1397,7 @@
         "removed": 1
       },
       "grace": {
-        "refused": 2
+        "removed": 2
       },
       "note": {
         "removed": 9
@@ -1467,7 +1467,7 @@
         "removed": 1
       },
       "tuplet": {
-        "refused": 3
+        "removed": 3
       }
     },
     "lab/tab-rhythm/unplayable-inside-a-tuplet": {
@@ -1475,7 +1475,7 @@
         "removed": 1
       },
       "grace": {
-        "refused": 1
+        "removed": 1
       },
       "note": {
         "removed": 6
@@ -1496,7 +1496,7 @@
         "removed": 1
       },
       "tuplet": {
-        "refused": 1
+        "removed": 1
       }
     },
     "lab/tab-spec-gaps/fingering-rejected": {
@@ -1608,7 +1608,7 @@
         "removed": 1
       },
       "grace": {
-        "refused": 3
+        "removed": 3
       },
       "note": {
         "removed": 9
@@ -1843,7 +1843,7 @@
         "removed": 1
       },
       "grace": {
-        "refused": 1
+        "removed": 1
       },
       "note": {
         "removed": 5
@@ -1949,7 +1949,7 @@
         "removed": 1
       },
       "grace": {
-        "refused": 1
+        "removed": 1
       },
       "note": {
         "removed": 2
@@ -1966,7 +1966,7 @@
         "removed": 1
       },
       "grace": {
-        "refused": 3
+        "removed": 3
       },
       "note": {
         "removed": 13
@@ -2532,7 +2532,7 @@
         "removed": 1
       },
       "tremolo": {
-        "refused": 3
+        "removed": 3
       }
     },
     "spec/tuplets": {
@@ -2549,7 +2549,7 @@
         "removed": 1
       },
       "tuplet": {
-        "refused": 3
+        "removed": 3
       }
     },
     "spec/two-bar-c-major-scale": {

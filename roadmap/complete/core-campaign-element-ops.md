@@ -1087,3 +1087,17 @@ bar entry touches, so a spec example that underfills is unreachable by
 construction. A fourth class beside `traced` / `ops-reachable` / `blocked` /
 `expected-unreachable` — not invalid, just not writable by a full-bar editor —
 and it has exactly one member, so it is recorded here rather than given a tier.
+
+### 2026-09-19 — the container rule reversed: unwrapping is allowed, the badge reports
+
+The owner, removing a grace from the selection tray: *unwrapping a tuplet should work even
+if the bar gets overfilled* — and, more generally, *the editor should not refuse entry for
+duration reasons; there is already a mechanism to report under/overfilled bars, and duration
+is easy to correct after and hard to fix before.* So `removeContainer` now unwraps: the
+content stays where it stood at its written values, the bar overfills where the grouping had
+compressed it, and the bar-duration badge is the report. The container pill in the tray is
+removable (Backspace twice, or Delete once), which is how the grace in front of a note is
+taken off. The destruct sweep's oracle accepts the duration diagnostic an unwrap makes, and
+only that one. The same day's rule retired the pending entry duration
+([core-element-ops-duration-completion.md](core-element-ops-duration-completion.md)).
+

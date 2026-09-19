@@ -757,14 +757,19 @@ export function pillsFor(scope: InspectorScope): InspectorPill[] {
       const item = doc.parts?.[hit.partIndex]?.measures?.[hit.measureIndex]
         ?.sequences?.[hit.sequenceIndex]?.content?.[hit.eventIndex];
       if (item && 'type' in item && item.type === 'tuplet') {
-        pills.push(derived('container', 'tuplet', `${item.inner.multiple}:${item.outer.multiple} ${item.inner.duration.base}`));
+        // The container pill REMOVES the container — unwraps it, content
+        // staying where it stood (the bar may overfill; the badge reports).
+        const unwrap = { type: 'removeContainer' as const, sequenceIndex: hit.sequenceIndex, eventIndex: hit.eventIndex };
+        pills.push(annotation('container', 'tuplet', `${item.inner.multiple}:${item.outer.multiple} ${item.inner.duration.base}`, unwrap));
         if (item.bracket) pills.push(annotation('bracket', 'bracket', item.bracket, { type: 'setContainerProperties', clear: ['bracket'] }));
         if (item.showNumber) pills.push(annotation('number', 'number', item.showNumber, { type: 'setContainerProperties', clear: ['showNumber'] }));
       } else if (item && 'type' in item && item.type === 'grace') {
-        pills.push(derived('container', 'grace', item.graceType ?? 'stealFollowing'));
+        const unwrap = { type: 'removeContainer' as const, sequenceIndex: hit.sequenceIndex, eventIndex: hit.eventIndex };
+        pills.push(annotation('container', 'grace', item.graceType ?? 'stealFollowing', unwrap));
         if (item.slash !== undefined) pills.push(annotation('slash', 'slash', item.slash ? 'yes' : 'no', { type: 'setContainerProperties', clear: ['slash'] }));
       } else if (item && 'type' in item && item.type === 'tremolo') {
-        pills.push(derived('container', 'tremolo', `${item.marks ?? 3} marks`));
+        const unwrap = { type: 'removeContainer' as const, sequenceIndex: hit.sequenceIndex, eventIndex: hit.eventIndex };
+        pills.push(annotation('container', 'tremolo', `${item.marks ?? 3} marks`, unwrap));
         if (item.marks !== undefined) pills.push(annotation('marks', 'marks', `${item.marks}`, { type: 'setContainerProperties', clear: ['marks'] }));
       }
     }

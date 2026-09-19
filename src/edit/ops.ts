@@ -475,15 +475,16 @@ export type EditOp =
   // here — removal lands now, authoring waits for a surface that can express a
   // tree without pretending a one-line grammar is one.
   | {
-      /** Remove a CONTAINER (tuplet, grace, tremolo, space) from a sequence.
+      /** Remove a CONTAINER (tuplet, grace, tremolo, space) from a sequence:
+       * UNWRAP it — its content stays where it stood, the grouping goes.
        *
-       * The campaign's container rule, third application: **removable only
-       * once it holds no ink**. Unwrapping — keeping the notes and dropping the
-       * grouping — is the tempting reading and it is refused, because it
-       * RE-TIMES the music: three eighths written in the time of two become
-       * three plain eighths, and the bar overfills. An editor may not reshape
-       * time as a side effect of removing a bracket, which is the same rule
-       * that refused a time-signature removal that would have reshaped bars.
+       * Reversed 2026-09-19 (the owner's rule: the editor never refuses for
+       * duration reasons). The campaign's container rule had refused this
+       * while the container held ink, because unwrapping RE-TIMES the music —
+       * three eighths written in the time of two become three plain eighths,
+       * a grace's notes take their written values — and the bar overfills.
+       * It does, and the bar-duration badge reports it: a duration is easy to
+       * correct after and hard to fix before. An underfilled voice is padded.
        */
       type: 'removeContainer';
       measureIndex: number;
@@ -1895,11 +1896,11 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       ];
       const item = seq?.content?.[op.eventIndex] as { type?: string; content?: MnxEvent[] } | undefined;
       if (!seq || !item?.type) return next;
-      // Ink first: a container goes only when it holds none.
-      const holdsInk = (item.content ?? []).some(event => eventHasInk(event));
-      if (holdsInk) return next;
-
-      seq.content = seq.content.filter((_, i) => i !== op.eventIndex);
+      // A grace is un-timed, so an inner event that holds no ink (a cleared
+      // grace) carries nothing into the bar and goes with the grouping; a
+      // tuplet's rests carry time and stay.
+      const kept = item.type === 'grace' ? (item.content ?? []).filter(event => eventHasInk(event)) : (item.content ?? []);
+      seq.content.splice(op.eventIndex, 1, ...(kept as MnxSequence['content']));
       // Pad THIS sequence, not the entry one: a container can live in any
       // voice, and `padMeasureRests` only fills voice 0 — which is how the
       // first version left voice 2 three beats long in a 4/4 bar.

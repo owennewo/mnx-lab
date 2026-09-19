@@ -873,7 +873,7 @@ describe('the wider rungs', () => {
     const shown = pillsFor({ doc: session.doc, level: 'event', members: session.resolvedSelection.members }).map(
       pill => `${pill.word}: ${pill.value} [${pill.pillClass}]`
     );
-    expect(shown).toContain('tuplet: 3:1 eighth [derived]');
+    expect(shown).toContain('tuplet: 3:1 eighth [annotation]');
     expect(shown).toContain('bracket: yes [annotation]');
     expect(session.handleIntent({ type: 'setContainerProperties', clear: ['bracket'] })).toBe(true);
     session.handleIntent({ type: 'goToLevel', level: 'event' });
