@@ -329,11 +329,13 @@ export class SyncBar extends LitElement {
     this.zoom = { from, to: from + this.span };
     this.panHeld = false;
   }
-  private select(next: Selection) {
+  /** Selecting a cut zooms to it; selecting anything else zooms out — except a split, which keeps the window it
+   *  was made in (`keepZoom`): the person is looking at the beats there and has just chosen one. */
+  private select(next: Selection, keepZoom = false) {
     if (this.looping && !(next?.kind === 'cut')) this.setLoop(false);
     this.selected = next;
     if (next?.kind === 'cut') { this.zoomTo(this.segments.cuts[next.index]); if (this.looping) this.setLoop(true); }
-    else this.zoom = null;
+    else if (!keepZoom) this.zoom = null;
   }
 
   protected willUpdate(changed: Map<PropertyKey, unknown>) {
@@ -396,7 +398,7 @@ export class SyncBar extends LitElement {
     const result = splitAt(this.segments, seconds);
     if (!result) return;
     this.change(result.doc);
-    this.select({ kind: 'segment', index: result.cut });
+    this.select({ kind: 'segment', index: result.cut }, true);
   }
   private tap() {
     const s = this.selected;

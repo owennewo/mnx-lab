@@ -93,14 +93,22 @@ try {
    check(sr.querySelector('.mini')&&sr.querySelectorAll('.tick').length>10,'Selecting a cut did not zoom to the beats');
    const before=bar.segments.cuts[1];await press('Nudge 25 milliseconds');
    check(Math.abs(bar.segments.cuts[1]-before-.025)<1e-6&&bar.segments.segments.map(s=>s.beats).join()==='11,11','Nudge');
+   // A split made in the zoomed window (S, with the cut still selected) keeps it.
+   player.pause();const s2=bar.segments.cuts[1]+3*(z-a)/22,v=bar.view,t2=sr.querySelector('.track').getBoundingClientRect();
+   sr.querySelector('.track').dispatchEvent(new MouseEvent('click',{clientX:t2.left+t2.width*(s2-v.from)/(v.to-v.from),bubbles:true,composed:true}));
+   await until(()=>Math.abs(bar.time-s2)<.05,'zoomed seek');sr.querySelector('.bar').focus();
+   sr.querySelector('.bar').dispatchEvent(new KeyboardEvent('keydown',{key:'s',bubbles:true,composed:true,cancelable:true}));await bar.updateComplete;
+   check(bar.segments.cuts.length===4&&sr.querySelector('.mini')&&sr.querySelectorAll('.tick').length>10,'Split zoomed out');
+   check(bar.segments.segments.map(s=>s.beats).join()==='11,3,8','Second split did not divide the count: '+bar.segments.segments.map(s=>s.beats).join());
+   await player.play();await until(()=>player.playback.state==='playing','did not resume after the split');
    root.querySelector('button[aria-label="Click on the beats"]').click();await player.updateComplete;
    // The debounced save, and its echo through the snapshot, must not re-cue the source.
    await delay(1100);await page.updateComplete;await player.updateComplete;await delay(100);
    check(saves.length>=1,'Nothing was saved');const last=saves.at(-1).rawSync;
-   check(last.format==='studio-sync-segments'&&last.segments.cuts.length===3,'Save did not carry the segments');
+   check(last.format==='studio-sync-segments'&&last.segments.cuts.length===4,'Save did not carry the segments');
    check(last.syncpoints.length===7&&last.syncpoints.every((p,i)=>p[0]===i)&&last.syncpoints[0][1]===a&&last.syncpoints[6][1]===z,'Save did not carry one point per bar: '+JSON.stringify(last.syncpoints));
    check(player.sourceId===row.id&&player.playback.state==='playing','The save echo re-cued the source');
-   check(player.recordings[0].syncSegments.cuts.length===3,'Stored segments did not come back to the player');
+   check(player.recordings[0].syncSegments.cuts.length===4,'Stored segments did not come back to the player');
    check(root.querySelector('button[aria-label="Click on the beats"]').getAttribute('aria-pressed')==='true','Click toggle');
    player.pause();await delay(150);
    // The zoomed window moves: by its minimap, by two fingers (a wheel), and after the playhead when it is sought away.

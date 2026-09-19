@@ -45,6 +45,7 @@ It edits a `segments` value and owns nothing else. Properties: `segments`, `dura
 is still moving), `sync-seek` `{ seconds }`, `sync-loop` `{ start, end } | null`.
 
 - A click on the bar seeks; a double-click splits there. A segment's **label** selects it.
+  A split keeps the zoomed window it was made in; selecting a segment by its label zooms out.
 - The two trim handles are parked at the bar's ends until placed. A handle or cut is
   dragged, or selected and sent to the playhead. There is no cut button.
 - Selecting a placed cut **zooms** the bar to a 16-second window around it and draws beat
