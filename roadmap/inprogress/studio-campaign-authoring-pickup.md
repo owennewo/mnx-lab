@@ -19,7 +19,7 @@
 | 5 | Delete, versions, revert, defect reports | complete (`7ddd02d5`); **migration 0005 before deploy** | [studio-piece-lifecycle](../complete/studio-piece-lifecycle.md) |
 | 6 | sync.json interchange | **skipped 2026-09-20** by the owner | (index row only) |
 | 7 | Editor promotion | complete — slices 1–3 (`a394e7bc`, `7b38b743`), then the workbench's adoption of the binding | [core-editor-element-promotion](../complete/core-editor-element-promotion.md) |
-| 8 | Touch entry | not started — needs design first | (index row only) |
+| 8 | Touch entry | doc written 2026-09-20; **blocked on one owner decision** (side panel vs a bar over the score) | [studio-editor-touch](../proposed/studio-editor-touch.md) |
 | 9 | Pointer placement (a press places the cursor) | complete 2026-09-20 (`5b97fbb7`) | [core-editor-pointer-placement](../complete/core-editor-pointer-placement.md) |
 
 All of it is on `main` and pushed. **None of it is deployed.**
@@ -94,10 +94,16 @@ Not designed. What is known:
 - Fret entry is the easy half: a fret pad calls `binding.handleIntent({ type: 'enterFret',
   fret })`. Duration, tie, delete and undo are single intents too. The Keys sheet
   (`apps/studio/src/KeysSheet.ts`, fed by `binding.keys()`) already knows what is possible on
-  the current rung — a touch palette can be generated from the same table.
-- Write the item doc (`roadmap/proposed/studio-editor-touch.md`) and get the design agreed
-  before building; the owner has rejected several tray designs on sight (memory: `sync-bar`,
-  `playback-tray-locked`).
+  the current rung — but **a palette cannot be generated from it as written**: `CheatRow` is
+  `{keys, meaning}`, both display strings, and the join that resolves a stroke to an intent
+  happens inside the binding and is discarded. Generating one needs a new export, which the
+  item doc owns.
+- ~~Write the item doc~~ — **written 2026-09-20**
+  ([studio-editor-touch](../proposed/studio-editor-touch.md)). It names one decision for the
+  owner (a 380px side panel, the idiom five sheets already use, versus a bar inside the
+  editor overlay that survives focus mode) and six traps found by survey. Nothing is built
+  until the shape is agreed; the owner has rejected several tray designs on sight (memory:
+  `sync-bar`, `playback-tray-locked`).
 
 ### 5. Follow-ups the item docs name, none of them blocking
 

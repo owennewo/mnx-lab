@@ -167,7 +167,7 @@ const NO_SELECTION: SelectionContext = { activePartId: null, activeMeasureIndex:
 const NAVIGATION = new Set<EditorIntent['type']>([
   'nextPosition', 'prevPosition', 'nextMeasure', 'prevMeasure', 'lineDown', 'lineUp', 'goToMeasure', 'goToEdge',
   'relaxSelection', 'tightenSelection', 'goToLevel', 'extendSelection', 'closeSelection', 'setProjection', 'cycleSlot',
-  'setPart', 'setStaff', 'jumpNext', 'jumpPrev', 'jumpUp', 'jumpDown'
+  'setPart', 'setStaff', 'jumpNext', 'jumpPrev', 'jumpUp', 'jumpDown', 'goToPointer'
 ]);
 
 export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document: MnxStructure, options: EditorBindingOptions): EditorBinding {
@@ -425,15 +425,23 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
    *
    * Placement does not gate on the keyboard the way a keystroke does: pointing
    * at a bar is how a reader TAKES the keyboard, so it also reveals a cursor
-   * Escape had put away. It still respects read-only and suspension — a host
-   * showing some other document has no cursor to move.
+   * Escape had put away.
+   *
+   * It goes through `dispatch` like every other intent, which is what makes it
+   * work on a READ-ONLY score: placing the cursor is navigation, and a reader
+   * who can walk an old version with the arrows can point at it too. Gating
+   * this on `readOnly()` instead — as it first did — left a score where the
+   * arrows moved and a tap did nothing.
    */
   const onPositionSelected = (event: Event) => {
-    if (disposed || suspended() || readOnly()) return;
+    if (disposed) return;
     const detail = (event as CustomEvent<PointerPlacement>).detail;
     if (!detail) return;
     tabDigits.flush();
-    const moved = session.handleIntent({
+    // Even a refused placement un-hides the cursor: the reader pointed at the
+    // score, so showing them where they already are beats showing nothing.
+    cursorHidden = false;
+    if (!dispatch({
       type: 'goToPointer',
       measureIndex: detail.measureIndex,
       partIndex: detail.partIndex,
@@ -442,12 +450,7 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
       projection: detail.projection,
       fraction: detail.fraction,
       ...(detail.noteKey === undefined ? {} : { noteKey: detail.noteKey })
-    });
-    // Even a refused placement un-hides the cursor: the reader pointed at the
-    // score, so showing them where they already are beats showing nothing.
-    cursorHidden = false;
-    if (moved) settle();
-    else draw();
+    })) draw();
   };
   const win = document_.defaultView;
 

@@ -26,6 +26,7 @@ import {
   measurePositionX,
   measurePositionAt
 } from '../../src/engine/render/selectionGeometry.ts';
+import { isNavigationIntent } from '../../src/edit/intents.ts';
 import type { MnxStructure } from '../../src/model/mnx.ts';
 // @ts-expect-error — plain .mjs module without type declarations
 import { loadCorpus } from '../verify/check-scenarios.mjs';
@@ -208,6 +209,18 @@ describe('moveToPointer on a bar with no ink', () => {
       expect(landed.measureIndex).toBe(8);
       expect(landed.line).toBe(1);
     }
+  });
+
+  // Placing the cursor is NAVIGATION, so it must survive a read-only binding
+  // exactly as the arrows do. The mount decides this from one set, and the
+  // session's own predicate is the other half of the same rule; a `goToPointer`
+  // missing from either leaves a score whose arrows move and whose taps do not.
+  it('is navigation, so a read-only host may still place the cursor', () => {
+    expect(isNavigationIntent({
+      type: 'goToPointer',
+      measureIndex: 0, partIndex: 0, staffIndex: 1,
+      line: 1, projection: 'tab', fraction: 0.5
+    })).toBe(true);
   });
 
   it('refuses a bar the grid does not cover, by identity', () => {
