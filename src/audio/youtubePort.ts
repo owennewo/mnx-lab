@@ -7,6 +7,7 @@ export interface YouTubePlayerApi {
   getCurrentTime(): number; getDuration(): number; getPlayerState(): number;
   getPlaybackRate(): number; getAvailablePlaybackRates(): number[]; setPlaybackRate(rate: number): void;
   getVolume(): number; setVolume(volume: number): void;
+  mute(): void; unMute(): void; isMuted(): boolean;
   destroy(): void;
 }
 export interface YouTubeEvents {
@@ -47,6 +48,9 @@ export class YouTubePort implements MediaPort {
   private seekDone?: Promise<void>;
   private durationSeen = 0;
   private unstableDuration = false;
+  private priming = false;
+  private primed?: Promise<boolean>;
+  private primeFinish?: (started: boolean) => void;
   constructor(private readonly videoId: string, private readonly factory: YouTubeFactory,
     private readonly visible: () => boolean) {}
   get capabilities(): PlaybackCapabilities {
@@ -67,7 +71,7 @@ export class YouTubePort implements MediaPort {
   get clockIssue() { return this.unstableDuration ? 'The video duration is changing. Live or interrupted content cannot be followed reliably.' : undefined; }
   subscribe(listener: (event: MediaEvent) => void) { this.listeners.add(listener); return () => { this.listeners.delete(listener); }; }
   private emit(event: MediaEvent) { if (!this.closed) for (const listener of this.listeners) listener(event); }
-  private fail(message: string) { this.fault = message; clearTimeout(this.seekTimer); this.seekRequest?.reject(new Error(message)); this.seekRequest=undefined; this.rejectPlay(message); this.pause(); this.emit('error'); }
+  private fail(message: string) { this.primeFinish?.(false); this.fault = message; clearTimeout(this.seekTimer); this.seekRequest?.reject(new Error(message)); this.seekRequest=undefined; this.rejectPlay(message); this.pause(); this.emit('error'); }
   private rejectPlay(message: string) { clearTimeout(this.playTimer); this.playRequest?.reject(new Error(message)); this.playRequest = undefined; }
   prepare() {
     if (this.closed) return Promise.reject(new Error('YouTube source is disposed.'));
@@ -86,6 +90,9 @@ export class YouTubePort implements MediaPort {
         onReady: () => { announced=true; ready(); },
         onStateChange: ({data}) => {
           if (this.closed) return;
+          // A prime's own play is not playback: it never reaches this.state, so
+          // nothing downstream can read the player as started.
+          if (this.priming) { if (data===1) this.primeFinish?.(true); return; }
           this.state=data;
           if (data===0) this.hasPlayed=false;
           if (data===1 || data===3) {
@@ -98,14 +105,15 @@ export class YouTubePort implements MediaPort {
         },
         onPlaybackRateChange: () => { if (this.closed) return; const rate=this.apiReady ? this.api!.getPlaybackRate() : 1; if(Number.isFinite(rate) && rate>0)this.acceptedRate=rate; this.emit('rate'); },
         onError: ({data}) => { const message=errors[data] ?? `YouTube playback failed (${data}).`; finish(new Error(message)); if (!this.closed) this.fail(message); },
-        onAutoplayBlocked: () => { if (!this.closed) this.fail('YouTube playback was blocked. Press Play in the visible YouTube player.'); },
+        onAutoplayBlocked: () => { if (this.closed) return; if (this.priming) { this.primeFinish?.(false); return; } this.fail('YouTube playback was blocked. Press Play in the visible YouTube player.'); },
       }).then(api => { if (this.closed || failed) { api.destroy(); return; } this.api=api; ready(); }, error => finish(error instanceof Error?error:new Error(String(error))));
     });
   }
   /** Called by the browser adapter. Only the reported content clock drives sync. */
   sample() {
     if (this.closed || !this.apiReady || !this.api) return;
-    if (!this.visible()) { if (!this.paused || this.playRequest) this.pause(); return; }
+    if (!this.visible()) { this.primeFinish?.(false); if (!this.paused || this.playRequest) this.pause(); return; }
+    if (this.priming) return;
     const duration=this.api.getDuration();
     if (this.hasPlayed && duration>0) {
       if (this.durationSeen && Math.abs(duration-this.durationSeen)>2) this.unstableDuration=true;
@@ -137,32 +145,74 @@ export class YouTubePort implements MediaPort {
   }
   pause() {
     if (this.closed) return;
+    this.primeFinish?.(false);
     ++this.generation; this.rejectPlay('Playback paused.'); if(this.apiReady)this.api!.pauseVideo(); this.state=2; this.emit('pause');
+  }
+  /** A cued video renders no frame, so a cold seek can only move our own clock:
+   *  the picture stays on the poster until the player has played once. One
+   *  muted play, paused the moment it starts, leaves it in the paused state
+   *  where seekTo repaints without starting anything. Attempted once, on the
+   *  first seek — where the frame is provably visible and a gesture just
+   *  happened — and refusing it simply leaves the cue path in force.
+   */
+  private prime(): Promise<boolean> {
+    if (this.primed) return this.primed;
+    // A moment that cannot be primed is not an answer about autoplay: only a
+    // real attempt is remembered, so a click made with the video away does not
+    // cost the next one its picture.
+    if (this.closed || !this.apiReady || this.state===0 || !this.visible()) return Promise.resolve(false);
+    return this.primed = new Promise<boolean>(resolve => {
+      const wasMuted=this.api!.isMuted();
+      this.priming=true;
+      const finish=(started: boolean) => {
+        if (!this.priming) return;
+        this.priming=false; clearTimeout(timer); this.primeFinish=undefined;
+        if (!this.closed) {
+          this.api!.pauseVideo(); if(!wasMuted)this.api!.unMute(); this.api!.setVolume(this.gain*100);
+          if (started) { this.hasPlayed=true; this.state=2; }
+        }
+        resolve(started);
+      };
+      this.primeFinish=finish;
+      const timer=setTimeout(()=>finish(false),6000);
+      this.api!.mute(); this.api!.playVideo();
+    });
   }
   async seek(seconds: number) {
     const version=++this.seekVersion;
     await this.prepare();
     if (this.closed || version!==this.seekVersion) return;
     if (!Number.isFinite(seconds) || seconds<0 || (this.duration>0 && seconds>this.duration)) throw new Error('Seek is outside this YouTube recording.');
+    // Covers the prime as well as the seek, so a Play arriving mid-prime waits
+    // rather than racing the pause that ends it.
+    const running = this.seekDone = this.runSeek(seconds,version);
+    try { await running; } finally { if (this.seekDone === running) this.seekDone = undefined; }
+  }
+  private async runSeek(seconds: number, version: number) {
     clearTimeout(this.seekTimer); this.seekRequest?.reject(new Error('YouTube seek superseded.')); this.seekRequest=undefined;
     this.seekTarget=seconds; this.clock=seconds; this.clockKnown=true;
     if (!this.hasPlayed) {
+      // The cursor moves on our clock first: a refused or slow prime must not
+      // hold the score at the old position while it decides.
+      this.emit('time');
+      await this.prime();
+      if (this.closed || version!==this.seekVersion) return;
+    }
+    if (!this.hasPlayed) {
       // seekTo on a merely cued video may start it. Cue with an offset instead.
-      const pending = this.seekDone = new Promise<void>((resolve,reject)=>{
+      await new Promise<void>((resolve,reject)=>{
         this.seekRequest={resolve,reject};
         this.seekTimer=setTimeout(()=>{this.seekRequest=undefined;reject(new Error('YouTube did not cue this position. Retry the video.'));},10000);
         this.api!.cueVideoById({videoId:this.videoId,startSeconds:seconds});
       });
-      try { await pending; } finally { if (this.seekDone === pending) this.seekDone = undefined; }
       this.seekingNow=false;
     } else {
       this.seekingNow=true;
-      const pending = this.seekDone = new Promise<void>((resolve,reject)=>{
+      await new Promise<void>((resolve,reject)=>{
         this.seekRequest={resolve,reject};
         this.seekTimer=setTimeout(()=>{this.seekRequest=undefined;this.seekingNow=false;reject(new Error('YouTube seek timed out.'));},10000);
         this.api!.seekTo(seconds,true); this.emit('seeking'); this.sample();
       });
-      try { await pending; } finally { if (this.seekDone === pending) this.seekDone = undefined; }
     }
     this.emit('time');
   }
@@ -171,9 +221,10 @@ export class YouTubePort implements MediaPort {
     if (this.apiReady) this.api!.setPlaybackRate(boundedRate(rate,this.capabilities));
     return this.acceptedRate;
   }
-  setVolume(volume: number) { this.gain=volume; if(this.apiReady)this.api!.setVolume(volume*100); return this.volume; }
+  setVolume(volume: number) { this.gain=volume; if(this.apiReady&&!this.priming)this.api!.setVolume(volume*100); return this.volume; }
   dispose() {
     if (this.closed) return;
+    this.primeFinish?.(false);
     this.closed=true; ++this.generation; ++this.seekVersion; clearTimeout(this.seekTimer); this.seekRequest?.reject(new Error('YouTube source disposed.')); this.seekRequest=undefined; this.readyCancel?.(); this.rejectPlay('YouTube source disposed.');
     this.listeners.clear(); this.api?.destroy(); this.api=undefined;
   }

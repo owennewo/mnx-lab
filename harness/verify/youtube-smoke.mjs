@@ -35,6 +35,7 @@ const fake=`window.__ytInstances=[];window.YT={Player:class{
  getCurrentTime(){const now=performance.now();if(this.state===1)this.time+=(now-this.last)/1000*this.rate;this.last=now;return this.time;}
  getDuration(){return 30;}getPlayerState(){return this.state;}getPlaybackRate(){return this.rate;}getAvailablePlaybackRates(){return [.5,1,1.5,2];}getVolume(){return this.volume;}
  setPlaybackRate(rate){this.rate=rate;queueMicrotask(()=>this.events.onPlaybackRateChange({data:rate}));}setVolume(volume){this.volume=volume;}
+ mute(){this.muted=true;}unMute(){this.muted=false;}isMuted(){return !!this.muted;}
  cueVideoById({startSeconds}){this.time=startSeconds;this.state=5;this.rate=1;queueMicrotask(()=>{this.events.onPlaybackRateChange({data:1});this.events.onStateChange({data:5});});}
  seekTo(time){this.time=time;this.last=performance.now();}playVideo(){this.plays++;this.last=performance.now();this.state=1;queueMicrotask(()=>this.events.onStateChange({data:1}));}
  pauseVideo(){this.getCurrentTime();this.state=2;}destroy(){this.destroyed=true;this.frame.remove();}

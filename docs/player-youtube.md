@@ -32,6 +32,22 @@ their own additional collection/sharing and deletion practices in their host pol
 
 Selecting YouTube cues at the mapped position and requires explicit Play, even when
 the previous source was playing. This is a deliberate stricter autoplay policy.
+
+A cued player renders no frame — only its poster — so a seek made before the video
+has ever played could move our clock but not the picture. The first seek therefore
+**primes** the player: one muted `playVideo`, paused the instant it reports playing,
+with the native mute state and volume restored. That leaves it in the paused state,
+where `seekTo` repaints at the target without starting playback, so every seek from
+then on shows the position it claims. The prime is suppressed end to end — it never
+reaches the port's state, emits no `playing`, and moves no cursor — and our clock is
+emitted before it runs, so the score never waits on it. It is attempted **once**, on
+the first seek, where the frame is provably visible and a user gesture has just
+happened; a blocked or timed-out attempt is remembered and simply leaves the cue path
+in force with no error shown. A moment that cannot be primed at all (video away,
+player not ready, video ended) is not counted as the attempt. Priming registers one
+playback with YouTube for a session in which the user seeks, which is why it is not
+done on load. It cannot tell an ad from the video, so a prime that lands on a
+pre-roll pauses on the ad; the same limitation as everywhere else below.
 Leaving YouTube uses the ordinary mapped handoff to synth/audio. Unmapped positions
 retain the session's explicit-start behavior. Retry video replaces a failed adapter
 while retaining the intended handoff position. Native YouTube Play/Pause controls
@@ -117,7 +133,10 @@ videos and blocked/script-timeout states have separate actionable messages.
 
 `harness/conformance/youtube.test.ts` covers URL validation, unavailable initial
 metadata, accepted rates, native pause, blocked play, disposal, readiness cancellation,
-clock changes and event-level sync at a repeated bar. Existing recording tests cover
+clock changes and event-level sync at a repeated bar. Priming has its own three: a
+primed first seek that moves the picture without ever reporting playback, a refused
+prime that falls back to cueing while leaving a native mute alone and asking only
+once, and a cold seek made with the video hidden, which must not spend the attempt. Existing recording tests cover
 the shared handoff/session logic.
 
 After `npm run build:embed`, run:

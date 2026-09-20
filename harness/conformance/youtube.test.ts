@@ -18,9 +18,9 @@ describe('YouTube source parsing',()=>{
 });
 function fixture() {
   let events!:YouTubeEvents, visible=true;
-  const api={time:0,duration:20,state:5,rate:1,volume:70,destroyed:false,plays:0,cues:[] as number[],rates:[.5,1,1.5,2],requestedRate:1,
-    playVideo(){this.plays++;},pauseVideo(){this.state=2;},seekTo(time:number){this.time=time;},cueVideoById({startSeconds}:{startSeconds:number}){this.cues.push(startSeconds);this.time=startSeconds;this.state=5;events.onStateChange({data:5});},
-    getCurrentTime(){return this.time;},getDuration(){return this.duration;},getPlayerState(){return this.state;},getPlaybackRate(){return this.rate;},getAvailablePlaybackRates(){return this.rates;},setPlaybackRate(rate:number){this.requestedRate=rate;},getVolume(){return this.volume;},setVolume(volume:number){this.volume=volume;},destroy(){this.destroyed=true;},
+  const api={time:0,duration:20,state:5,rate:1,volume:70,destroyed:false,plays:0,cues:[] as number[],rates:[.5,1,1.5,2],requestedRate:1,muted:false,onPlay:'idle' as 'idle'|'start'|'block',
+    playVideo(){this.plays++;if(this.onPlay==='start'){this.state=1;queueMicrotask(()=>events.onStateChange({data:1}));}else if(this.onPlay==='block')queueMicrotask(()=>events.onAutoplayBlocked());},pauseVideo(){this.state=2;},seekTo(time:number){this.time=time;},cueVideoById({startSeconds}:{startSeconds:number}){this.cues.push(startSeconds);this.time=startSeconds;this.state=5;events.onStateChange({data:5});},
+    getCurrentTime(){return this.time;},getDuration(){return this.duration;},getPlayerState(){return this.state;},getPlaybackRate(){return this.rate;},getAvailablePlaybackRates(){return this.rates;},setPlaybackRate(rate:number){this.requestedRate=rate;},getVolume(){return this.volume;},setVolume(volume:number){this.volume=volume;},mute(){this.muted=true;},unMute(){this.muted=false;},isMuted(){return this.muted;},destroy(){this.destroyed=true;},
   } satisfies YouTubePlayerApi & Record<string,unknown>;
   const port=new YouTubePort(id,async next=>{events=next;queueMicrotask(()=>events.onReady());return api;},()=>visible);
   return {api,port,get events(){return events;},hide(){visible=false;},show(){visible=true;},state(data:number){api.state=data;events.onStateChange({data});}};
@@ -32,11 +32,32 @@ describe('official IFrame API adapter',()=>{
     await f.port.prepare();expect(f.port.capabilities.rate.values).toEqual([1]);expect(f.port.volume).toBe(.7);f.port.dispose();
   });
   it('cues without playback and applies only accepted rate events',async()=>{
-    const f=fixture();f.port.setRate(1.4);await f.port.prepare();
+    const f=fixture();f.api.onPlay='block';f.port.setRate(1.4);await f.port.prepare();
     expect(f.api.requestedRate).toBe(1.5);expect(f.port.rate).toBe(1);
     f.api.rate=1.5;f.events.onPlaybackRateChange();expect(f.port.rate).toBe(1.5);
-    await f.port.seek(6);expect(f.api.cues).toEqual([6]);expect(f.api.plays).toBe(0);expect(f.port.currentTime).toBe(6);
+    await f.port.seek(6);expect(f.api.cues).toEqual([6]);expect(f.port.paused).toBe(true);expect(f.port.error).toBeUndefined();expect(f.port.currentTime).toBe(6);
     expect(f.port.capabilities.rate.values).toEqual([.5,1,1.5,2]);f.port.setVolume(.25);expect(f.api.volume).toBe(25);f.port.dispose();
+  });
+  it('primes a cold player so the first seek moves the picture, not only the clock',async()=>{
+    const f=fixture();f.api.onPlay='start';await f.port.prepare();
+    const seen:string[]=[];f.port.subscribe(event=>seen.push(event));
+    await f.port.seek(6);
+    expect(f.api.cues).toEqual([]);expect(f.api.time).toBe(6);expect(f.api.state).toBe(2);
+    expect(f.port.paused).toBe(true);expect(f.port.currentTime).toBe(6);
+    expect(seen).not.toContain('playing');
+    expect(f.api.muted).toBe(false);expect(f.api.volume).toBe(70);
+    await f.port.seek(11);expect(f.api.time).toBe(11);expect(f.api.plays).toBe(1);f.port.dispose();
+  });
+  it('leaves a native mute alone and asks autoplay only once',async()=>{
+    const f=fixture();f.api.onPlay='block';f.api.muted=true;await f.port.prepare();
+    await f.port.seek(3);expect(f.api.muted).toBe(true);expect(f.port.error).toBeUndefined();
+    await f.port.seek(5);expect(f.api.plays).toBe(1);expect(f.api.cues).toEqual([3,5]);f.port.dispose();
+  });
+  it('does not spend the one attempt on a moment it cannot use',async()=>{
+    const f=fixture();await f.port.prepare();f.hide();
+    await f.port.seek(4);expect(f.api.plays).toBe(0);expect(f.api.cues).toEqual([4]);
+    f.show();f.api.onPlay='start';await f.port.seek(7);
+    expect(f.api.plays).toBe(1);expect(f.api.time).toBe(7);expect(f.port.paused).toBe(true);f.port.dispose();
   });
   it('uses actual media time, freezes buffering and waits for confirmed seeks',async()=>{
     const f=fixture();await f.port.prepare();const play=f.port.play();await flush();f.state(1);await play;
@@ -81,7 +102,7 @@ describe('official IFrame API adapter',()=>{
     const passes=linearizePasses(document),compiled=compilePerformance(document,passes);if(!compiled.ok)throw new Error('fixture');
     const mapped=createRecordingSync([[0,0],[1,4],[1,8,240],[2,12]],compiled,passes);if(!mapped.ok)throw new Error(mapped.diagnostic.message);
     const f=fixture();const backend=new RecordingBackend('yt',f.port,compiled.performance,mapped.value);
-    const session=new PlaybackSession(backend,()=>backend,()=>{});await backend.prepare();await session.seek({ordinal:1,metricOffset:ZERO});
+    const session=new PlaybackSession(backend,()=>backend,()=>{});f.api.onPlay='start';await backend.prepare();await session.seek({ordinal:1,metricOffset:ZERO});
     expect(backend.resumeOnSelect).toBe(false);const playing=session.play();await flush();f.state(1);await playing;
     f.api.time=10;f.port.sample();expect(session.snapshot.scorePosition).toEqual({ordinal:1,metricOffset:q(3n,4n)});
     backend.setLoop({start:{ordinal:0,metricOffset:ZERO},end:{ordinal:1,metricOffset:ZERO}});await flush();
