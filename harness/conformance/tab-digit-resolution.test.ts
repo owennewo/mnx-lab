@@ -69,16 +69,41 @@ describe('the 500 ms tab digit composition window', () => {
     expect(resolveIntent({ code: 'Digit1' }, layers)).toBeNull();
   });
 
-  it('holds one digit until exactly 500 ms, then commits it once', () => {
+  it('holds an AMBIGUOUS digit until exactly 500 ms, then commits it once', () => {
     const h = resolverHarness();
-    h.resolver.push(7);
-    expect(h.resolver.pending).toBe(7);
+    h.resolver.push(1);
+    expect(h.resolver.pending).toBe(1);
     expect(h.commits).toEqual([]);
     h.clock.advance(ENTRY_DIGIT_WINDOW_MS - 1);
     expect(h.commits).toEqual([]);
     h.clock.advance(1);
-    expect(h.commits).toEqual([7]);
-    expect(h.pending).toEqual([7, null]);
+    expect(h.commits).toEqual([1]);
+    expect(h.pending).toEqual([1, null]);
+  });
+
+  // The window buys one thing: the chance that a second digit makes a bigger
+  // fret. Only 1 and 2 can begin one below a 24-fret ceiling, so the other
+  // eight digits used to buy half a second of nothing — visibly, because the
+  // pending digit paints as a ghost and the rung only settles at the commit.
+  it('commits a digit that cannot open a pair on the keystroke itself', () => {
+    for (const digit of [0, 3, 4, 5, 6, 7, 8, 9]) {
+      const h = resolverHarness();
+      h.resolver.push(digit);
+      expect(h.commits).toEqual([digit]);
+      expect(h.resolver.pending).toBeNull();
+      expect(h.pending).toEqual([]); // nothing was ever painted as pending
+      h.clock.advance(ENTRY_DIGIT_WINDOW_MS);
+      expect(h.commits).toEqual([digit]); // and no timer fires behind it
+    }
+  });
+
+  it('still waits on the two digits that can open a pair', () => {
+    for (const digit of [1, 2]) {
+      const h = resolverHarness();
+      h.resolver.push(digit);
+      expect(h.commits).toEqual([]);
+      expect(h.resolver.pending).toBe(digit);
+    }
   });
 
   it('commits valid 12 and 24 pairs immediately and cancels their timers', () => {
@@ -93,15 +118,27 @@ describe('the 500 ms tab digit composition window', () => {
     }
   });
 
-  it('commits an unextendable first digit, then starts the second candidate', () => {
+  it('commits an unextendable pair as two frets, in order', () => {
     const h = resolverHarness();
     h.resolver.push(2);
-    h.resolver.push(5);
-    expect(h.commits).toEqual([2]);
-    expect(h.resolver.pending).toBe(5);
+    h.resolver.push(5); // 25 is past the ceiling, so this is a fret of its own
+    expect(h.commits).toEqual([2, 5]); // and 5 cannot open a pair, so it lands too
+    expect(h.resolver.pending).toBeNull();
     h.clock.advance(ENTRY_DIGIT_WINDOW_MS);
     expect(h.commits).toEqual([2, 5]);
-    expect(h.pending).toEqual([2, null, 5, null]);
+    expect(h.pending).toEqual([2, null]);
+  });
+
+  it('keeps waiting when the second digit could itself open a pair', () => {
+    const h = resolverHarness();
+    h.resolver.push(2);
+    h.resolver.push(1); // 21 is legal — the pair wins before the restart does
+    expect(h.commits).toEqual([21]);
+    const restart = resolverHarness();
+    restart.resolver.push(9); // commits at once
+    restart.resolver.push(1); // ...and the new candidate waits, as 1 always does
+    expect(restart.commits).toEqual([9]);
+    expect(restart.resolver.pending).toBe(1);
   });
 
   it('flushes before the following action and leaves no stale callback', () => {
@@ -112,12 +149,12 @@ describe('the 500 ms tab digit composition window', () => {
       () => undefined,
       h.clock
     );
-    resolver.push(3);
+    resolver.push(1);
     expect(resolver.flush()).toBe(true);
     order.push('next position');
-    expect(order).toEqual(['fret 3', 'next position']);
+    expect(order).toEqual(['fret 1', 'next position']);
     h.clock.advance(ENTRY_DIGIT_WINDOW_MS);
-    expect(order).toEqual(['fret 3', 'next position']);
+    expect(order).toEqual(['fret 1', 'next position']);
     expect(resolver.flush()).toBe(false);
   });
 

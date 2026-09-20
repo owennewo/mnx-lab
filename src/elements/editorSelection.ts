@@ -189,19 +189,43 @@ export function selectionContextFor(session: EditorSession, view: EditorSelectio
           : {}
     )
   };
+  /**
+   * A HALF-TYPED FRET PAINTS WHERE IT WILL LAND, NOT THE RUNG IT LEAVES.
+   *
+   * The pending digit never touches the document, so everything derived from
+   * the document still describes what is standing there — and on a rest that
+   * is the EVENT rung, whose `slice` spans the whole beat. The commit then
+   * re-anchors at the note rung (`apply` → `reanchorSelection('note')`) and
+   * the enclosure visibly tweens from that slice down onto the new notehead:
+   * one keystroke, two shapes, a shrink to watch. The digit already names its
+   * own cell — the cursor's string and beat — so the paint shows that cell for
+   * the whole window and the commit changes nothing but the ink.
+   *
+   * Only the SHAPE is pinned. A fret typed over existing ink keeps that ink
+   * lit, because there the cell is already the right one and blanking it
+   * would trade this flicker for another.
+   */
+  const pendingEntry = cursorGhost.pendingFret !== null && cursorGhost.pendingFret !== undefined;
+  // Nothing under the cursor means nothing to keep lit: the ghost cell is the
+  // whole mark, and the rest about to be replaced stops claiming the beat.
+  const pendingEmptyCell = pendingEntry && !cursorGhost.occupied;
   return {
     activePartId: activePart?.id ?? null,
     activeMeasureIndex: cursor.measureIndex,
     activeVoiceIndex: null,
     activeEventIndex: null,
     selectedNoteIds: view.cursorHidden ? [] : session.selectedNoteKeys,
-    selectedEventIds: view.cursorHidden
+    selectedEventIds: view.cursorHidden || pendingEmptyCell
       ? []
       : selectedRestKeys(session.doc, session.resolvedSelection.members),
     primaryProjection: session.projection,
-    enclosure: view.cursorHidden ? null : ENCLOSURE_BY_LEVEL[session.selectionLevel],
+    enclosure: view.cursorHidden
+      ? null
+      : pendingEntry
+        ? ENCLOSURE_BY_LEVEL.note
+        : ENCLOSURE_BY_LEVEL[session.selectionLevel],
     litLabels: !view.cursorHidden && LIT_LABEL_LEVELS.has(session.selectionLevel),
-    span: view.cursorHidden
+    span: view.cursorHidden || pendingEmptyCell
       ? null
       : presentationSpan(session.doc, session.selectionLevel, session.resolvedSelection.members),
     cursor: view.cursorHidden ? null : cursorGhost,

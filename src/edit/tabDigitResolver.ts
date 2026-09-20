@@ -12,6 +12,13 @@ const browserClock: TabDigitClock = {
   clearTimeout: handle => clearTimeout(handle)
 };
 
+/** Could this digit be the TENS of a fret this instrument can reach? `0` never
+ *  can — `0x` is just `x` — and above the ceiling's tens digit neither can
+ *  anything else, so the pair is the exception rather than the rule. */
+function opensPair(digit: number): boolean {
+  return digit >= 1 && digit * 10 <= MAX_ENTRY_FRET;
+}
+
 /** Pure stage-1 state machine; the workbench mount owns its real clock and lifecycle. */
 export class TabDigitResolver {
   private candidate: number | null = null;
@@ -32,22 +39,24 @@ export class TabDigitResolver {
     if (!Number.isInteger(digit) || digit < 0 || digit > 9) {
       throw new RangeError(`tab digit must be an integer from 0 to 9; got ${digit}`);
     }
-    if (this.candidate === null) {
-      this.begin(digit);
-      return;
+    if (this.candidate !== null) {
+      const combined = this.candidate * 10 + digit;
+      if (combined >= 10 && combined <= MAX_ENTRY_FRET) {
+        this.clearCandidate();
+        this.commit(combined);
+        return;
+      }
+      // The new digit cannot extend the first. Commit the first, then resolve
+      // the new one against the cursor resulting from that edit.
+      this.flush();
     }
-
-    const combined = this.candidate * 10 + digit;
-    if (combined >= 10 && combined <= MAX_ENTRY_FRET) {
-      this.clearCandidate();
-      this.commit(combined);
-      return;
-    }
-
-    // The new digit cannot extend the first. Commit the first, then start a
-    // new candidate against the cursor resulting from that edit.
-    this.flush();
-    this.begin(digit);
+    // ONLY AN AMBIGUOUS DIGIT IS WORTH WAITING FOR. The window exists to let a
+    // second digit arrive, and only a digit that could be the TENS of a legal
+    // fret has one to wait for — `1` and `2` against a 24-fret ceiling. Every
+    // other digit is already the whole answer, so holding it bought nothing
+    // but half a second of a paint the reader had to watch settle.
+    if (opensPair(digit)) this.begin(digit);
+    else this.commit(digit);
   }
 
   /** Commit a pending digit before a non-digit action or lifecycle edge. */

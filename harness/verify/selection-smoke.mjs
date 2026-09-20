@@ -121,6 +121,12 @@ const DUMP = `(() => {
     rests: ink('.rest'),
     enclosure: [...svg.querySelectorAll('g[class*=enc-] rect')]
       .map(r => ({ x: +r.getAttribute('x'), w: +r.getAttribute('width') })),
+    // Which SHAPE the enclosure is wearing, settled groups only — the tween's
+    // stand-in carries the target's class while it still sits on the geometry
+    // it is leaving, which is precisely the twitch these assertions watch for.
+    encKinds: [...svg.querySelectorAll('g.enclosure:not(.enclosure-transition)')]
+      .flatMap(g => [...g.classList].filter(cls => cls.startsWith('enc-'))),
+    pendingFret: svg.querySelector('text.pending-fret')?.textContent ?? null,
     ghostPanels: [...svg.querySelectorAll('g.cursor-ghost rect[data-ghost-scope]')]
       .map(r => ({
         scope: r.dataset.ghostScope,
@@ -225,6 +231,39 @@ try {
       );
     }
   }
+  // A HALF-TYPED FRET MUST NOT MAKE THE BOX MOVE TWICE. The digit is held for
+  // 500 ms in case a second one follows, and for that whole window the
+  // document still holds the rest above — so the rung, and with it the
+  // enclosure, described the beat the reader was LEAVING. The commit then
+  // re-anchored at the note rung and the slice tweened down onto the new
+  // notehead: one keystroke, two shapes. The paint now shows the cell the
+  // fret will land in for the whole window, so only the ink changes at the
+  // commit. Judged in a browser because it is a fact about the drawn overlay.
+  console.log('\ntype a fret over that rest — the box must not move when it commits');
+  await press('1', 'Digit1', 49, 200); // inside the 500 ms window
+  const typing = JSON.parse(await cdp.evaluate(DUMP));
+  if (typing.pendingFret !== '1') {
+    fail(`no pending fret is painted (got ${JSON.stringify(typing.pendingFret)})`);
+  } else {
+    pass('the half-typed fret is painted at the cursor');
+    if (typing.encKinds.includes('enc-slice')) {
+      fail('the enclosure is still the rest\'s slice — it will visibly shrink at the commit');
+    } else {
+      pass(`the enclosure is already the fret's own cell (${typing.encKinds.join(' ') || 'ghost only'})`);
+    }
+    if (typing.selected.some(el => /\brest\b/.test(el.cls ?? ''))) {
+      fail('the rest is still lit while its replacement is being typed');
+    } else {
+      pass('the rest has stopped claiming the beat');
+    }
+  }
+  await new Promise(r => setTimeout(r, 700)); // past the window: the fret lands
+  const landed = JSON.parse(await cdp.evaluate(DUMP));
+  if (landed.pendingFret !== null) fail('the fret never committed — still pending');
+  else if (landed.encKinds.length && !landed.encKinds.includes('enc-cell')) {
+    fail(`the committed fret is enclosed as ${landed.encKinds.join(' ')}, not a cell`);
+  } else pass('the committed fret is enclosed by the same cell');
+
   // THE GHOST BAR PAST THE END. `End` lands on the last bar and `→` walks off
   // the end of the score onto a bar that does not exist — the arrow must
   // ALWAYS do something there, and what it does must be visible. Written from
