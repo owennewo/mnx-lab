@@ -2610,6 +2610,22 @@ export class EditorSession {
       this.activeProjection
     );
     if (present.has(level) && this.resolvedSelection.members.length > 0) return true;
+    // TAKING ONE NOTE OUT OF A CHORD DOES NOT COST YOU THE NOTE RUNG. The
+    // cursor has not moved, and the line it stands on is an ordinary empty
+    // line — exactly what ↑/↓ leaves you on all day without ever relaxing the
+    // rung. Relaxing here instead made the chord's SURVIVORS light up, so the
+    // gesture answered "I removed that note" with "here is the whole event",
+    // and the next Delete meant the whole event.
+    //
+    // The line is drawn where the meaning changes rather than where the
+    // members run out: while the event still holds notes you are standing in
+    // a chord with a gap in it, and a fret keystroke fills the gap back in.
+    // Empty the event and there is no chord left to stand in — the rest that
+    // replaces it is an EVENT, so the rung below it really has gone and the
+    // relax below is right.
+    if (level === 'note' && noteRungSurvives(
+      this.doc, this.grid, this.cursorState, this.activeProjection
+    )) return true;
     // A SCORE WITH NO BARS STOPS AT THE BAR RUNG. `measure` holds no member
     // there, so the rule above would climb to `document` — honest by the
     // letter of "relax until something resolves", and wrong here: `document`
@@ -2800,9 +2816,26 @@ function pasteLandingSelection(
   };
 }
 
+/** Does the note rung still make sense where the cursor is standing, after a
+ *  removal took the note that was under it? It does while the event still
+ *  holds notes: the cursor is in a chord with a gap in it, which is the same
+ *  state navigating onto an empty line leaves you in. An emptied event is a
+ *  rest, and a rest is an EVENT — there the rung has genuinely gone. */
+function noteRungSurvives(
+  doc: MnxStructure,
+  grid: PositionGrid,
+  cursor: EditorCursor,
+  projection: Projection
+): boolean {
+  const event = eventAtCursor(doc, grid, cursor, projection);
+  return !!event && eventHoldsInk(event);
+}
+
 /** Re-resolve Cut's former selection against the removed document, matching
  * applyDestructive's presence rule: retain a surviving rung, otherwise relax
- * to the nearest present ancestor at the clamped active edge. */
+ * to the nearest present ancestor at the clamped active edge — including the
+ * chord-with-a-gap rule, so cutting one note of a chord lands exactly where
+ * deleting it does. */
 function cutLandingSelection(
   doc: MnxStructure,
   before: SelectionState,
@@ -2839,6 +2872,10 @@ function cutLandingSelection(
     present.has(candidate.level) &&
     resolveSelection(doc, candidate, projection).members.length > 0
   ) return candidate;
+  if (
+    candidate.level === 'note' &&
+    noteRungSurvives(doc, grid, cursor, projection)
+  ) return pointSelection('note', cursor);
   const ancestor = relaxLevel(present, candidate.level);
   return pointSelection(ancestor ?? 'document', cursor);
 }

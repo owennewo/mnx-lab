@@ -309,6 +309,36 @@ describe('selection ladder', () => {
     expect(wider.whole).toHaveLength(1);
   });
 
+  it('keeps the note rung when one note of a chord goes, and gives it up when the chord does', () => {
+    // Bar 0 opens on a two-note chord with the cursor on the top string.
+    // Delete took the note (right) and then relaxed to the event rung
+    // (wrong): the chord's SURVIVOR lit up, so removing one note answered
+    // with the whole event — and the next Delete would have meant the whole
+    // event too. The cursor never moved, and the line it is left on is an
+    // ordinary empty line, which navigation sits on at the note rung all day.
+    const session = new EditorSession(makeDoc());
+    expect(session.selectedNoteKeys).toEqual(['n1']);
+    expect(session.handleIntent({ type: 'delete' })).toBe(true);
+    expect(session.selectionLevel).toBe('note');
+    expect(session.cursor.line).toBe(1);
+    expect(session.selectedNoteKeys, 'a gap in the chord, not the chord').toEqual([]);
+
+    // Standing in the gap, a fret keystroke fills it straight back in.
+    expect(session.handleIntent({ type: 'enterFret', fret: 5 })).toBe(true);
+    expect(session.selectionLevel).toBe('note');
+    expect(session.selectedNoteKeys).toHaveLength(1);
+
+    // Empty the event and the rung really has gone: what is left is a rest,
+    // and a rest is an EVENT.
+    expect(session.handleIntent({ type: 'delete' })).toBe(true);
+    session.handleIntent({ type: 'lineDown' });
+    expect(session.selectedNoteKeys).toEqual(['n2']);
+    expect(session.handleIntent({ type: 'delete' })).toBe(true);
+    expect(session.selectionLevel).toBe('event');
+    expect(session.doc.parts[0].measures![0].sequences[0].content[0])
+      .toMatchObject({ rest: {} });
+  });
+
   it('clears an event to an equal-duration rest and unlinks its ink', () => {
     const doc = makeDoc();
     const measure = doc.parts[0].measures![0];
