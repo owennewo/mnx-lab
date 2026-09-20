@@ -218,7 +218,7 @@ one.
 | 5 | [studio-piece-lifecycle](../complete/studio-piece-lifecycle.md) | **complete 2026-09-17 — migration 0005 before deploy** | **Living with pieces.** Soft delete (`pieces.deleted_at`: not found by every read and write, nothing removed), an inline-confirmed *Delete this piece…*, the library's one-tap undo and `#/deleted` with Restore; an ingest of a deleted slice is refused rather than reviving it. **Versions** read off the renditions the snapshot already carries (`src/storage/versions.ts`), listed in the Save sheet; an older one *viewed* with nothing written, and made current by a **pointer move** (`PUT /pieces/:id/canonical`) — no rendition written, undoable, the next edit derived from where the pointer is. **Defect reports**: a lossy save carries the document it was exported from as an `evidence` rendition, once per new kind of loss; the operator lists and pulls them (`npm run defects:library`, never into the repo). Replaced item 3's tag fallback with an explicit `kept: true` for what only the Soundslice sidecar knows. |
 | 6 | `core-sync-interchange` | **skipped 2026-09-20** by the owner (was optional) | **sync.json as interchange.** *Export sync* (none exists): the dense Soundslice-compatible array as derived, or a sparse wrapper with anchors only at the cuts and a wrapper-level `interpolation: "beat"` — never a fifth tuple element, which breaks Soundslice compatibility and the decoder's arity check. The reader option for beat-linear interpolation is built only if sparse export is wanted. **Lifting an imported Soundslice sync into segments** (lossless = one segment per anchor interval, crowded; merged = tidy, discards measured timing) is a decision the item owns. Pick up when a second consumer of a sync appears, not before. |
 | 7 | [core-editor-element-promotion](../complete/core-editor-element-promotion.md) | **built 2026-09-17: slices 1–3 for studio, then the workbench's adoption of the binding — one editor surface** | **The editor in studio.** That doc owns the promotion review. The mount is a plain-DOM host binding beside `bindPlayback` — `bindEditor` in `src/elements/editorHost.ts`, its own lazily loaded chunk, absent from the embed bundles. **Slice 1:** navigation and the ladder, fret and pitch entry, durations, ties, delete, undo, Escape/Enter; structural key scope; `setWork` as an intent; a Keys sheet; the structural checkpoint trigger. **Slice 2 turned out to have already happened** — the one-surface campaign retired every setup popover into the rung inspector — so **slices 2–3 are one:** the inspector, its rows and placement, and the lyric text editor moved to `elements/` (the workbench imports them from there), with shared glue (`inspectorMount.ts`) and a token-carrying layer (`<mnx-editor-surfaces>`); the binding mounts them on Enter and Shift+L and binds copy/cut/paste. **Work-list item 5:** the workbench's scenario page deleted its own mount and sits on `bindEditor`; the binding grew the host's seams for it (`session`, `onEscalate`, `claimUnfocused`, `inspector`, `onRefused`, `sessionMoved`), and `smoke:workbench-editor` proves them. |
-| 8 | [studio-editor-touch](../proposed/studio-editor-touch.md) | **doc written 2026-09-20 — one decision open, the owner's** | **Entry without a keyboard.** The workbench editor is keyboard-driven and studio is used on an Android tablet; a touch entry surface is new design, not a port. Decision 1 below says whether slice 1 of item 7 waits for it. |
+| 8 | [studio-editor-touch](../proposed/studio-editor-touch.md) | **pass one built 2026-09-20** | **Entry without a keyboard.** The workbench editor is keyboard-driven and studio is used on an Android tablet; a touch entry surface is new design, not a port. Decision 1 below says whether slice 1 of item 7 waits for it. |
 | 9 | [core-editor-pointer-placement](../complete/core-editor-pointer-placement.md) | **complete 2026-09-20** (`5b97fbb7`) | **A click or a tap places the edit cursor.** Item 8's first missing piece, usable from a mouse now: a `goToPosition` intent the session snaps to its own grid (nearest string or staff position, nearest event column; an empty bar lands on its rest), a `position-selected` event the viewer emits only while an editor is bound, a hover ghost on a mouse, and the click still seeks playback — to the bar when it lands on empty space. The two cursors stay two; this is the first seeding rule between them. |
 
 ### Decisions still open
@@ -620,4 +620,45 @@ nobody's item, and still worth someone finding out which landing moved that geom
 Item 8 (touch entry) is now the only thing between this campaign and its goal, and its
 first missing piece is no longer missing: a tap is a press, so placement already works
 there. What is left for 8 is the entry surface itself, which is design, not port.
+
+### 2026-09-20 — entry 13: item 8, pass one — the verbs by thumb
+
+The owner chose shape **B**: a bar inside the editor's overlay, over the score, not a panel
+in the chrome. The reason is the one the doc led with — the tablet edits in focus mode,
+focus mode is fullscreen, and the tools row is not rendered there.
+
+`<mnx-entry-bar>` is an editor surface beside the rung inspector, mounted by `bindEditor`,
+so **both shells get it from one implementation**. It follows the POINTER rather than a
+setting: coarse primary pointer, bar. Frets are one tap each (0–12, shifted to 24) because
+the keyboard's two-digit window is a keystroke device; durations are typed values rather
+than the shorter/longer ladder for the same reason. On a notation staff the fret row
+becomes toggle-a-note plus nudges, since there is no "type a pitch" intent and never was.
+
+Three things the build settled:
+
+1. **Everything goes through `dispatch`.** A verb by thumb and a verb by keystroke are the
+   same funnel, so read-only, the refusal report and delete's notice need no second path,
+   and nothing on the bar is unreachable from the keyboard.
+2. **A control that takes focus would dim the cursor it is about to move**, since
+   `hasKeyboard()` is focus-inside-viewer-or-surfaces. Every button refuses focus on the
+   press, and the smoke asserts the cursor is never drawn dimmed — that assertion is the
+   one most likely to catch a careless future button.
+3. **The bar is an editing surface, not "somewhere else".** The binding's window-capture
+   listener closes the inspector on any press outside it; the bar is excluded, because
+   tapping a fret while the inspector is open is still working on the same rung. The bar
+   could not have opted out itself — capture runs first.
+
+`npm run smoke:entry-bar` drives it with real touch events and no keystroke at all, and
+counts the fret **in the music rather than the op log** (`enterFret` is the intent,
+`insertNote` the op — only one is evidence). Absent on a mouse, brought by a coarse pointer
+alone, a tap placing the cursor, a fret and a duration written by thumb, undo walking them
+back. No golden moved.
+
+Known and left: the bar covers the foot of the pane and reveal-scroll does not know about
+it, so a cursor down there can sit behind it. The fix is an inset the reveal path honours,
+and that path is already carrying `smoke:selection`'s unrelated failures — worth doing
+next, and worth doing on its own.
+
+**This closes the campaign's last item to a first pass.** What remains is the owner's
+hands-on verdict on the bar, on the tablet, in anger.
 

@@ -1,15 +1,14 @@
 # Entry without a keyboard — the editor on a tablet
 
-> **Status: proposed 2026-09-20 — a design to agree, not a plan to run.**
+> **Status: pass one built 2026-09-20.**
 > [Studio authoring campaign](../inprogress/studio-campaign-authoring.md) item 8, the last
-> item between the campaign and its goal. Needs
-> [core-editor-pointer-placement](../complete/core-editor-pointer-placement.md) (item 9,
-> complete), which was its stated blocker. Inherits the campaign contract; clauses 12–14
-> are the ones that bite.
+> item between the campaign and its goal. Needed
+> [core-editor-pointer-placement](../complete/core-editor-pointer-placement.md) (item 9),
+> which was its stated blocker. Implementation loop; no golden moves.
 >
-> **Nothing here should be built before the owner has picked between the two shapes in
-> *The one real decision*.** The campaign's own note says so, and the record says why:
-> several tray designs have been rejected on sight.
+> **The owner chose shape B on 2026-09-20**: a bar inside the editor's overlay, over the
+> score, rather than a panel in the shell's chrome. The argument that decided it is below,
+> and the rejected alternatives are kept because the reasoning outlives the choice.
 
 ## Where this starts
 
@@ -72,9 +71,11 @@ not.
   exactly the kind of rule that has been rejected before. And it must not take focus, or
   the cursor dims and the inspector closes (see the traps below).
 
-**My recommendation is B**, for one reason: the tablet is used in fullscreen, and a
-palette you cannot reach in fullscreen is a palette for a different device. But A is
-genuinely cheaper and more consistent, and this is the owner's call, not mine.
+**The owner chose B on 2026-09-20.** The reason that decided it: the tablet edits in focus
+mode, focus mode is browser fullscreen, and the tools row is not rendered there — so a
+palette in the chrome is a palette for a different device. A remains the cheaper and more
+consistent option and is kept here because that trade is real; if covering music turns out
+to cost more than the width would have, this is the doc that says what A was.
 
 A third option exists and I do not recommend it: **no palette at all**, with long-press on
 the score opening a radial or context menu at the cursor. It keeps the score uncovered and
@@ -139,3 +140,56 @@ Found while surveying the surfaces, and none of them is guessable from the outsi
 - Techniques, tuplets, grace notes, slurs, beams, lyrics — all have intents and can come
   later, once the shape is proven.
 - Handwriting or audio input of any kind.
+
+## What pass one actually is
+
+`src/elements/EntryBar.ts` — `<mnx-entry-bar>`, an editor surface beside the rung
+inspector and the lyric editor, mounted by `bindEditor` into `<mnx-editor-surfaces>` and
+therefore present in **both** shells from one implementation. Neutral like the inspector:
+it renders what the binding hands it and emits the intent the user asked for, and touches
+no document.
+
+- **It follows the pointer, not a setting.** Undefined, the `entryBar` binding option shows
+  the bar wherever the primary pointer is coarse — a finger has no keyboard. A host may
+  force it either way, which is also how a shell opts out.
+- **The fingerboard is one tap per fret**, 0–12 with a shift to 12–24. Deliberately not the
+  keyboard's two-digit timing window: that is a keystroke device, and a pad has room to
+  show the number. On a notation staff the row becomes the staff verbs instead — toggle a
+  note, then nudge it by semitone or octave — because there is no "type a pitch" intent and
+  never was.
+- **Durations are destinations, not directions**: five typed values plus a dot, rather than
+  the shorter/longer ladder, which is a keyboard shape. Then tie, delete, undo, redo.
+- **Every control refuses focus on the press.** `hasKeyboard()` is "focus is inside the
+  viewer or the surfaces", so a button that took focus would dim the cursor it is about to
+  move. The smoke asserts the cursor is never drawn dimmed.
+- **Tapping the bar does not close the rung inspector.** The binding's window-level
+  listener closes it on any press outside it; the bar is an editing surface, not
+  "somewhere else", so it is excluded. That listener is on capture, so the bar could not
+  have opted out by stopping propagation.
+- **Everything goes through `dispatch`**, the same funnel as a key — so read-only, the
+  refusal report and the delete notice all behave identically whether a verb arrived by
+  thumb or by keystroke, and nothing the bar can do is unreachable from the keyboard.
+
+### Proof
+
+`npm run smoke:entry-bar` drives the workbench with **real touch events and no keystroke at
+all**: the bar is absent on a mouse, appears on a coarse pointer with no setting anywhere,
+a tap places the cursor, a tap on fret 5 puts a 5 on the fingerboard, a duration re-values
+it, undo walks it back, and the cursor is never dimmed. It counts the fret **in the music,
+not in the op log** — `enterFret` is the intent and `insertNote` is the op it records, and
+only one of those is evidence.
+
+### Known, and deliberately left
+
+- **The bar covers the bottom of the score.** Reveal-scroll does not know about it, so a
+  cursor near the foot of the pane can end up behind it. The fix is an inset the viewer
+  honours when revealing; it is not in pass one because it touches the reveal path, which
+  is already carrying `smoke:selection`'s unrelated failures.
+- **The upper fingerboard is a shift, not a second row.** Twenty-five thumb-sized targets
+  do not fit a tablet's width.
+- **Techniques, tuplets, grace notes, slurs, beams and lyrics are not here.** Every one has
+  an intent ready; none earns width until the bar itself has been used in anger.
+- **`keys()` still cannot generate a palette**, and pass one does not try: the buttons are
+  written out, because the useful set for a thumb is not the same set as the keyboard's and
+  an auto-generated bar would be a worse bar. The export is still the right idea the day a
+  second palette wants it.

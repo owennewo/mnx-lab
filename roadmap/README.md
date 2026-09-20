@@ -46,14 +46,15 @@ proposals that name their campaign.
 ### proposed/
 
 - **[studio-editor-touch.md](proposed/studio-editor-touch.md)** — [studio authoring
-  campaign](inprogress/studio-campaign-authoring.md) item 8, **a design to agree, written
-  2026-09-20**: entry without a keyboard, on the tablet. Item 9 removed its blocker — a tap
-  is a press, so placing the cursor already works — leaving the verbs: a fret pad, durations,
-  tie, rest, delete, undo, all through intents that already exist. **One decision is the
-  owner's**: a 380px side panel, the idiom five sheets already follow, or a bar inside the
-  editor's overlay that survives focus mode (which on Android is fullscreen, where the tools
-  row is hidden). Six traps named, including that a control taking focus dims the cursor and
-  closes the inspector, and that `keys()` returns labels rather than actions.
+  campaign](inprogress/studio-campaign-authoring.md) item 8, **pass one built 2026-09-20**:
+  entry without a keyboard, on the tablet. `<mnx-entry-bar>` is an editor surface beside the
+  rung inspector, mounted by `bindEditor`, so both shells get it from one implementation.
+  The owner chose a bar **inside the editor's overlay** over a panel in the chrome, because
+  the tablet edits in focus mode and the tools row is not rendered there. It follows the
+  pointer rather than a setting; frets are one tap each and durations are typed values,
+  because the keyboard's shapes are keystroke devices. Every verb goes through the same
+  `dispatch` a key does. `smoke:entry-bar` drives it with real touch events and no keystroke,
+  counting the fret in the music rather than the op log.
 - **[studio-player-practice.md](proposed/studio-player-practice.md)** — campaign item 13,
   studio's first player feature in `elements/`: loop the selection with the **written-range
   → performed-occurrences policy stated**, speed trainer, count-in, metronome, mute/solo.
