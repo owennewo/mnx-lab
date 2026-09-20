@@ -157,8 +157,15 @@ const IN_VIEW = `(() => {
   };
   const viewer = find(document, 0);
   if (!viewer) return JSON.stringify({ error: 'no document viewer on the page' });
-  const g = viewer.shadowRoot.querySelector('svg > g.enclosure:not(.enclosure-transition)');
-  if (!g) return JSON.stringify({ error: 'nothing is enclosed — no selection to keep in view' });
+  // THE ENCLOSURE, OR THE GHOST WHERE THERE IS NONE. A cell the cursor has
+  // moved to but nothing occupies draws no enclosure at all — standing on the
+  // last bar's fourth string is an ordinary thing to do, and the reader is
+  // still looking at something. DocumentViewer.revealSelection follows the
+  // same order for the same reason; asking only for the enclosure made this
+  // report "nothing is enclosed" for a cursor that was perfectly well placed.
+  const g = viewer.shadowRoot.querySelector('svg > g.enclosure:not(.enclosure-transition)')
+    ?? viewer.shadowRoot.querySelector('svg > g.cursor-ghost');
+  if (!g) return JSON.stringify({ error: 'neither an enclosure nor a cursor ghost is drawn — nothing to keep in view' });
   const box = g.getBoundingClientRect();
   const view = viewer.getBoundingClientRect();
   return JSON.stringify({
@@ -359,6 +366,16 @@ try {
   await cdp.send('Emulation.setDeviceMetricsOverride', {
     width: 1400, height: 500, deviceScaleFactor: 1, mobile: false
   });
+  // THROUGH about:blank, because this URL carries a fragment and the page is
+  // already sitting on it: navigating to the same #hash is a same-document
+  // navigation, so nothing reloads. Everything below then ran against the page
+  // the previous act left behind — a cursor parked at the far end of the score
+  // and a viewer already scrolled most of the way down, so `End` had nowhere
+  // further to go and the assertion reported it as the viewer refusing to
+  // follow. (`smoke:workbench-editor` hops through about:blank for the same
+  // reason.) The staff scale set just above is only read on a real load, too.
+  await cdp.send('Page.navigate', { url: 'about:blank' });
+  await new Promise(r => setTimeout(r, 300));
   await cdp.send('Page.navigate', { url });
   await new Promise(r => setTimeout(r, 7000));
 
