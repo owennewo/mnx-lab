@@ -38,6 +38,7 @@ import { documentTitle, documentArtist, type MnxDocument, type MnxStructure } fr
 import { derivedLibraryTags } from '../../../src/model/libraryTags.ts';
 import type { WorkChange } from '../../../src/edit/ops.ts';
 import type { EditorIntent } from '../../../src/edit/intents.ts';
+import { refusalNotice, type RefusalReason } from '../../../src/edit/clipboardFeedback.ts';
 import type { EditorBinding } from '../../../src/elements/editorHost.ts';
 import { MemorySelectionClipboardStore } from '../../../src/edit/selectionClipboard.ts';
 import './KeysSheet.ts';
@@ -476,8 +477,9 @@ export class PiecePage extends LitElement {
       // The lyric editor's live preview: drawn, never told to the save session.
       onPreview: preview => { if (this.doc && this.editor) this.doc = { ...this.doc, lastUpdated: Date.now(), mnxJson: preview ?? this.editor.document }; },
       clipboard: selectionClipboard,
-      onNotice: notice => { this.clipboardNotice = notice.message; clearTimeout(this.noticeTimer); this.noticeTimer = setTimeout(() => (this.clipboardNotice = ''), 4000); },
+      onNotice: notice => this.showNotice(notice.message),
       onState: () => { if (this.keysOpen || this.detailsOpen) this.requestUpdate(); },
+      onRefused: (intent, reason) => this.sayRefused(intent, reason),
       readOnly: () => this.readOnly, suspended: () => !!this.viewing
     });
     this.editor = editor;
@@ -554,6 +556,29 @@ export class PiecePage extends LitElement {
     this.session?.documentChanged(mnxJson);
   }
   /** A sheet's edit goes through the same funnel as a key: the editor's session, which reports back through `showDocument`. */
+  /**
+   * Why an edit did not happen, in the line the page already uses for delete's
+   * sentence. It exists because the opposite was genuinely baffling: on a piece
+   * held open in another tab the cursor still moved — navigation is allowed
+   * read-only — so a fret typed at a cursor sitting exactly where you put it
+   * vanished, and the only clue was a chip beside the title.
+   *
+   * Navigation that simply ran out of score is NOT a refusal and says nothing;
+   * a notice on every press of the last bar would be noise. Everything that
+   * means *you cannot do that* speaks.
+   */
+  private sayRefused(intent: EditorIntent, reason: RefusalReason) {
+    const notice = refusalNotice(intent, reason);
+    if (notice) this.showNotice(notice.message);
+  }
+
+  /** One line, one timer — delete's sentence, a refusal and the clipboard share it. */
+  private showNotice(message: string) {
+    this.clipboardNotice = message;
+    clearTimeout(this.noticeTimer);
+    this.noticeTimer = setTimeout(() => (this.clipboardNotice = ''), 4000);
+  }
+
   private applyIntent(intent: EditorIntent) { this.editor?.handleIntent(intent); this.requestUpdate(); }
   private undoEdit() { this.editor?.undo(); this.requestUpdate(); }
   private redoEdit() { this.editor?.redo(); this.requestUpdate(); }

@@ -51,7 +51,7 @@ import { lyricPlanOps, type LyricPlanEdit } from '../edit/lyricText.ts';
 import { applyOp } from '../edit/ops.ts';
 import type { SelectionClipboardStore } from '../edit/selectionClipboard.ts';
 import { copySelectionToStore, cutSelectionToStore, pasteSelectionFromStore } from '../edit/selectionClipboardActions.ts';
-import { copySelectionNotice, cutSelectionNotice, deleteSelectionNotice, pasteSelectionNotice, type ClipboardNotice } from '../edit/clipboardFeedback.ts';
+import { copySelectionNotice, cutSelectionNotice, deleteSelectionNotice, pasteSelectionNotice, type ClipboardNotice, type RefusalReason } from '../edit/clipboardFeedback.ts';
 import { neighbourSystemMeasure } from '../engine/layout/spacing.ts';
 import type { MnxStructure } from '../model/mnx.ts';
 import type { DocumentViewer } from './DocumentViewer.ts';
@@ -119,8 +119,25 @@ export interface EditorBindingOptions {
    * intent: there is nothing for a trace to replay. Unset, the keys do nothing.
    */
   onEscalate?(delta: 1 | -1): void;
-  /** The session declined an intent that came from a key or a host surface — a rung this document does not present, say. */
-  onRefused?(intent: EditorIntent): void;
+  /**
+   * An intent was declined, and WHY — so a host can say something useful
+   * instead of leaving a keystroke to vanish.
+   *
+   *  - `read-only` — this piece cannot be edited here at all (another tab holds
+   *    it). The mount used to swallow this one entirely: it returned before
+   *    reaching the session, so the single most confusing refusal there is —
+   *    a cursor sitting exactly where you put it, taking nothing you type —
+   *    was the one nothing could report.
+   *  - `suspended` — the host is showing some other document, so there is no
+   *    session to edit.
+   *  - `unavailable` — the session itself declined: a rung this document does
+   *    not present, an edit this position cannot take.
+   *
+   * A host is expected to stay quiet about `unavailable` on NAVIGATION, which
+   * is an edge rather than a refusal — walking off the end of the score should
+   * not nag.
+   */
+  onRefused?(intent: EditorIntent, reason: RefusalReason): void;
   /**
    * This editor is the only thing on the page a keystroke could be meant for,
    * so keys typed while NOTHING is focused (the page on load, a click on dead
@@ -263,14 +280,19 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
   };
   const readOnly = () => options.readOnly?.() ?? false;
   const dispatch = (intent: EditorIntent): boolean => {
-    if (disposed || suspended() || (readOnly() && !NAVIGATION.has(intent.type))) return false;
+    if (disposed) return false;
+    // Say WHY, rather than returning quietly. A read-only refusal used to leave
+    // this function before anything could observe it, which is why typing a
+    // fret into a locked piece did nothing and explained nothing.
+    if (suspended()) { options.onRefused?.(intent, 'suspended'); return false; }
+    if (readOnly() && !NAVIGATION.has(intent.type)) { options.onRefused?.(intent, 'read-only'); return false; }
     const handled = session.handleIntent(intent);
     cursorHidden = false;
     // Delete is the one verb whose two presses mean different things, so it says which one this was — including
     // when it declined. Everything else that returns false is a navigation edge, where silence is the right answer.
     const deleted = intent.type === 'delete' ? session.lastDelete : null;
     if (deleted) options.onNotice?.(deleteSelectionNotice(deleted));
-    if (!handled) options.onRefused?.(intent);
+    if (!handled) options.onRefused?.(intent, 'unavailable');
     settle();
     return handled;
   };

@@ -11,6 +11,7 @@
 // transient notice, and this module owns its words. DOM-free and beside the
 // planners it describes, so the texts are pinned by conformance tests rather
 // than read out of a rendered page.
+import { isNavigationIntent, type EditorIntent } from './intents.ts';
 import type { SelectionClip } from './selectionClip.ts';
 import type { SelectionLevel } from './selection.ts';
 import type { DeleteOutcome } from './session.ts';
@@ -168,4 +169,38 @@ export function deleteSelectionNotice(outcome: DeleteOutcome): ClipboardNotice {
         message: `nothing left to delete at the ${RUNG_NOUN[outcome.level]} rung`
       };
   }
+}
+
+/**
+ * Why an intent was declined.
+ *
+ *  - `read-only` — the piece cannot be edited here at all (another tab holds it).
+ *  - `suspended` — the host is showing some other document, so there is no
+ *    session to edit.
+ *  - `unavailable` — the session declined: a rung this document does not
+ *    present, an edit this position cannot take.
+ */
+export type RefusalReason = 'read-only' | 'suspended' | 'unavailable';
+
+/**
+ * One sentence for a refusal, or NOTHING where silence is the honest answer.
+ *
+ * This module exists because a keystroke whose result is invisible needs a
+ * sentence, and a refusal is the purest case of that: on a piece held open in
+ * another tab the cursor still moves — navigation is allowed read-only — so a
+ * fret typed at a cursor sitting exactly where you put it simply vanished.
+ *
+ * The one thing that stays quiet is navigation that ran out of score. Pressing
+ * → at the last bar is an EDGE, not a refusal, and a notice every time would be
+ * noise in the place a reader spends most of their time. The decision lives
+ * here rather than in a shell so that both the rule and its words are pinned by
+ * the same conformance test.
+ */
+export function refusalNotice(intent: EditorIntent, reason: RefusalReason): ClipboardNotice | null {
+  if (reason === 'unavailable' && isNavigationIntent(intent)) return null;
+  if (reason === 'suspended')
+    return { ok: false, message: 'This is an older version — go back to the current one to edit it, or make this one current.' };
+  if (reason === 'read-only')
+    return { ok: false, message: 'This piece is open in another tab, so it is read only here. Close the other tab and reload to edit.' };
+  return { ok: false, message: 'That can\u2019t be done here.' };
 }
