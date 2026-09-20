@@ -35,7 +35,10 @@ try {
   const page = `${app}?.querySelector('mnx-studio-piece')`;
   const piece = `${page}?.shadowRoot`;
   const viewer = `${piece}?.querySelector('mnx-document-viewer')`;
-  const details = `${piece}?.querySelector('mnx-studio-details[slot=side]')?.shadowRoot`;
+  const details = `${piece}?.querySelector('mnx-studio-edit-piece[slot=side]')?.shadowRoot`;
+  // The pencil beside the title, not a tools-row button: one panel holds the
+  // score's header, what was read from the notes, and your own values.
+  const editPiece = `${piece}.querySelector('button[slot=title-action]')`;
   const saving = `${piece}?.querySelector('mnx-studio-save[slot=side]')?.shadowRoot`;
   const keys = `${piece}?.querySelector('mnx-studio-keys[slot=side]')?.shadowRoot`;
   const chip = `${piece}?.querySelector('button.save')`;
@@ -75,7 +78,7 @@ try {
   await key('KeyY', { ctrl: true }); await wait(`JSON.parse(${frets}).length === 2`);
 
   // One history for notes and metadata: the Details sheet's Undo takes back the artist, then the fret.
-  await c.evaluate(`${action('Details')}.click()`); await wait(`!!${details}?.querySelector('input')`);
+  await c.evaluate(`${editPiece}.click()`); await wait(`!!${details}?.querySelector('input')`);
   await c.evaluate(`{ const i = [...${details}.querySelectorAll('label')].find(l => l.textContent.trim().startsWith('Artist')).querySelector('input'); i.focus(); i.value = 'A synthetic author'; i.dispatchEvent(new Event('change')); }`);
   await wait(`${piece}.querySelector('mnx-player').document._x.mnxLab.work.artist === 'A synthetic author'`);
   // A digit typed INTO the text field is the field's: the editor's listener is on the viewer, and never hears it.
@@ -165,6 +168,6 @@ try {
   assert.equal(await c.evaluate(`${piece}.querySelector('mnx-player').document.global.measures.length`), 17);
   assert.deepEqual(await c.evaluate(`JSON.stringify(${piece}.querySelector('mnx-player').document.global.measures[0].time)`), '{"count":3,"unit":4}');
   assert.equal(await c.evaluate(sung(`${piece}.querySelector('mnx-player').document`)), '["sing","song"]', 'the lyrics did not survive the stored .gp');
-  console.log(`Studio editor smoke passed: ${pieceId} — a dimmed cursor made live by focus, fret 3 and a two-digit fret 12 entered from the keyboard, Ctrl+Z / Ctrl+Y, one undo history across notes and the Details sheet, a text field keeping its own keys, a Keys sheet of what is bound here, the rung inspector opened with Enter and a meter typed into it, lyrics previewed then applied from the text editor, a note copied and pasted, Escape and back, a bar added saved at once (${saved.check.verdict}), and the notes read back from the stored .gp after a reload.`);
+  console.log(`Studio editor smoke passed: ${pieceId} — a dimmed cursor made live by focus, fret 3 and a two-digit fret 12 entered from the keyboard, Ctrl+Z / Ctrl+Y, one undo history across notes and the Edit piece panel, a text field keeping its own keys, a Keys sheet of what is bound here, the rung inspector opened with Enter and a meter typed into it, lyrics previewed then applied from the text editor, a note copied and pasted, Escape and back, a bar added saved at once (${saved.check.verdict}), and the notes read back from the stored .gp after a reload.`);
   if (c.logs.length) throw new Error('Browser console errors: '+c.logs.join('\n'));
 } finally { ws?.close(); chrome.kill(); await once(chrome,'exit'); await fs.rm(profile,{recursive:true,force:true,maxRetries:10,retryDelay:200}); }

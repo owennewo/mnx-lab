@@ -29,7 +29,10 @@ try {
   const form = `${app}?.querySelector('mnx-studio-new-piece')?.shadowRoot`;
   const piece = `${app}?.querySelector('mnx-studio-piece')?.shadowRoot`;
   const frame = `${piece}?.querySelector('mnx-score-frame')?.shadowRoot`;
-  const details = `${piece}?.querySelector('mnx-studio-details[slot=side]')?.shadowRoot`;
+  const details = `${piece}?.querySelector('mnx-studio-edit-piece[slot=side]')?.shadowRoot`;
+  // The pencil beside the title, not a tools-row button: one panel holds the
+  // score's header, what was read from the notes, and your own values.
+  const editPiece = `${piece}.querySelector('button[slot=title-action]')`;
   const saving = `${piece}?.querySelector('mnx-studio-save[slot=side]')?.shadowRoot`;
   const action = text => `[...${piece}.querySelectorAll('button[slot=actions]')].find(b => b.textContent.includes(${JSON.stringify(text)}))`;
   const chip = `${piece}?.querySelector('button.save')`;
@@ -51,7 +54,7 @@ try {
   const first = await snapshot(pieceId);
 
   // An edit: the heading follows the document at once, the chip counts the risk, the record lands on this device.
-  await c.evaluate(`${action('Details')}.click()`);
+  await c.evaluate(`${editPiece}.click()`);
   await wait(`!!${details}?.querySelector('input')`);
   await field('Title', `${title} (edited)`);
   await wait(`${heading}?.includes('(edited)')`);
@@ -84,7 +87,7 @@ try {
   assert.equal(await record(pieceId), null);
 
   // Undo back to the saved document is clean again — nothing to save, nothing kept.
-  await c.evaluate(`${action('Details')}.click()`);
+  await c.evaluate(`${editPiece}.click()`);
   await wait(`!!${details}?.querySelector('input')`);
   await field('Artist', 'A synthetic author');
   await wait(`${chip}.textContent.trim().startsWith('1 edit unsaved')`);
@@ -115,7 +118,7 @@ try {
     rendition: { filename: 'elsewhere.gp', sha256, content: Buffer.from(older).toString('base64'), producer_version: 'another-device', producer_options: null },
     derived_tags: [{ dimension: 'title', value: `${title} (the tablet's)` }] }) });
   assert.equal(elsewhere.status, 201);
-  await c.evaluate(`${action('Details')}.click()`);
+  await c.evaluate(`${editPiece}.click()`);
   await wait(`!!${details}?.querySelector('input')`);
   await field('Subtitle', 'written on the desktop');
   await c.evaluate(`${chip}.click()`);
@@ -133,6 +136,6 @@ try {
   assert.equal(copy.piece.source_kind, 'studio');
   assert.ok(copy.tags.some(t => t.dimension === 'subtitle' && t.value === 'written on the desktop'));
   assert.equal(await record(pieceId), null);
-  console.log(`Save-pipeline smoke passed: ${pieceId} edited in the Details sheet; the unsaved edit recovered from IndexedDB after a reload; Save now → an edit rendition with a 'clean' check and the tags following; undo back to clean; a named version; and another device's save met as a conflict, kept as copy ${copyId}.`);
+  console.log(`Save-pipeline smoke passed: ${pieceId} edited in the Edit piece panel; the unsaved edit recovered from IndexedDB after a reload; Save now → an edit rendition with a 'clean' check and the tags following; undo back to clean; a named version; and another device's save met as a conflict, kept as copy ${copyId}.`);
   if (c.logs.length) throw new Error('Browser console errors: '+c.logs.join('\n'));
 } finally { ws?.close(); chrome.kill(); await once(chrome,'exit'); await fs.rm(profile,{recursive:true,force:true,maxRetries:10,retryDelay:200}); }

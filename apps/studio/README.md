@@ -47,7 +47,7 @@ between the strips, and lists the parts: hide one from the score (it keeps playi
 it, set its level beneath the tray's master volume and choose its sound — which is why the
 tray carries no Sound selector here. The mix is synth-only; while a recording plays only
 hiding works. Hidden parts, the mix and the source last played are remembered per piece in the LIBRARY (`piece_views.prefs`, docs/studio-storage.md), so they hold across devices; `mnx-studio.parts.<id>` stays as the local cache that paints the sheet before the snapshot lands. The staff view is the settings card's STAFF row alone (the frame's
-segmented control is off here), the tag chips are the Tags sheet's, and sign-out is the
+segmented control is off here), the piece's own values are the Edit piece panel's, and sign-out is the
 library page's — a piece is not where you leave. A tap on the score is never a chrome
 toggle. The staff view, the display settings, zoom and spacing, the theme, and whether
 the score was left focused, are per-browser localStorage preferences (`mnx-studio.*`),
@@ -97,9 +97,9 @@ migration ever runs on stored data, and every save is checked for what the round
 
 **A touch device is a player.** Where the primary pointer is coarse
 (`(pointer: coarse)`), the piece page **does not bind the editor at all**: no cursor, no
-keymap, no editor chunk loaded, no write lock taken, and the Details sheet and the save chip
+keymap, no editor chunk loaded, no write lock taken, and the Edit piece panel and the save chip
 say why rather than offering verbs that do nothing. Everything else is unchanged — the
-score, zoom, the player, sources and recordings, instruments, tags and focus mode are the
+score, zoom, the player, sources and recordings, instruments, the piece's own values and focus mode are the
 whole point of the device.
 
 This is a **decided rule, not a gap**. A touch entry bar was built on 2026-09-20 and
@@ -121,13 +121,22 @@ knows nothing about what kind of machine it is on, and no layer below `elements/
 **`npm run smoke:play-only` guards it** — a rule that is an absence rots quietly, so that
 smoke drives studio as a tablet (touch emulation, real touch events, no keystroke) and
 asserts the absence: no binding, the editor chunk never even fetched, a tap leaving no
-cursor, no Keys sheet, and the chip and the Details sheet saying why. Break the rule and it
+cursor, no Keys sheet, and the chip and the Edit piece panel saying why. Break the rule and it
 fails on the first assertion.
 
 **The piece page edits and saves** (since 2026-09-17,
 [studio-save-pipeline](../../roadmap/complete/studio-save-pipeline.md)). Its first editor
-is the Details sheet — the document's own metadata, through a `setWork` op and an
-`EditHistory` — and nobody is asked to save: `src/storage/saveSession.ts` keeps the live
+is the **Edit piece** panel — opened by the pencil beside the title, not by a button in the
+tools row, because it edits what the title SAYS rather than acting on the score. It holds
+everything a piece is, in three bands ordered by what you can do about each: the score's own
+header as fields (a `setWork` op through an `EditHistory`), then what the engine read off
+the notes — parts, capo, tuning, correctable only by an alias, which renames a value
+library-wide without touching the file — then your own values. It replaced the separate
+Details and Tags sheets, which split one subject in two: Details owned the header fields
+while Tags showed the same values again, read-only, under “From the music”, with a pencil
+that could only rename the echo. `fromWorkHeader` (`src/model/libraryTags.ts`) is the line
+between the first two bands, and a header value the score itself never stated — a title read
+from a sidecar at ingest — shows as the field's placeholder rather than vanishing. Nobody is asked to save: `src/storage/saveSession.ts` keeps the live
 document in a local IndexedDB recovery record while edits are unsaved, checkpoints after a
 pause, and measures the Guitar Pro round trip in a worker every time. The chip beside the
 title says what is at risk, then how fresh the last save is; the Save sheet says what a save

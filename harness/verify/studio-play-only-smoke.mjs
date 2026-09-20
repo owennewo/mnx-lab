@@ -52,7 +52,9 @@ try {
   const page = `${app}?.querySelector('mnx-studio-piece')`;
   const piece = `${page}?.shadowRoot`;
   const viewer = `${piece}?.querySelector('mnx-document-viewer')`;
-  const details = `${piece}?.querySelector('mnx-studio-details[slot=side]')?.shadowRoot`;
+  const details = `${piece}?.querySelector('mnx-studio-edit-piece[slot=side]')?.shadowRoot`;
+  // The pencil beside the title: one Edit piece panel in place of Details + Tags.
+  const editPiece = `${piece}.querySelector('button[slot=title-action]')`;
   const chip = `${piece}?.querySelector('button.save')`;
   const actions = `[...${piece}.querySelectorAll('button[slot=actions]')].map(b => b.textContent.trim())`;
   const action = text => `[...${piece}.querySelectorAll('button[slot=actions]')].find(b => b.textContent.includes(${JSON.stringify(text)}))`;
@@ -96,7 +98,7 @@ try {
   for (const kept of ['Tags', 'Source', 'Instruments', 'Details'])
     assert.ok(row.some(label => label.includes(kept)), `the tools row lost ${kept}, which touch keeps`);
 
-  await c.evaluate(`${action('Details')}.click()`);
+  await c.evaluate(`${editPiece}.click()`);
   await wait(`!!${details}?.querySelector('input')`);
   assert.match(await c.evaluate(`${details}.textContent`), /Open the piece on a computer with a keyboard/, 'the Details sheet does not say why it cannot be edited');
   assert.equal(await c.evaluate(`[...${details}.querySelectorAll('input')].every(i => i.disabled || i.readOnly)`), true, 'the Details sheet offers live fields on a play-only device');

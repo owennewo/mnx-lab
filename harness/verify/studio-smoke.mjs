@@ -19,7 +19,10 @@ const headers = { Authorization: 'Bearer local-development-only', 'Cf-Access-Jwt
 const before = await fetch(origin + '/api/library/ingest/StudioSmoke', { headers }); assert.equal(before.status,200);
 const { snapshot } = await before.json();
 const manifest = { expected_revision: snapshot?.piece.revision ?? null,
-  source: { kind: 'soundslice', id: 'StudioSmoke' }, renditions: [{ id: 'StudioSmoke-gp', format: 'gp', role: 'export', producer: 'soundslice-cli', producer_version: null, producer_options: null, filename: 'Sun-did-glide.gp', sha256, file: 'score' }], recordings: [], tags: [{ dimension: 'list', value: 'Studio collection', source_ref: 'test' }], canonical: { mode: 'initialize', rendition_id: 'StudioSmoke-gp' }, derived_tags: [{ dimension: 'title', value: 'Studio smoke piece', source_ref: 'sidecar' }, { dimension: 'artist', value: 'Synthetic fixture', source_ref: 'sidecar' }] };
+  source: { kind: 'soundslice', id: 'StudioSmoke' }, renditions: [{ id: 'StudioSmoke-gp', format: 'gp', role: 'export', producer: 'soundslice-cli', producer_version: null, producer_options: null, filename: 'Sun-did-glide.gp', sha256, file: 'score' }], recordings: [], tags: [{ dimension: 'list', value: 'Studio collection', source_ref: 'test' }], canonical: { mode: 'initialize', rendition_id: 'StudioSmoke-gp' }, // Title and artist are HEADER dimensions this score never states itself, so the
+  // Edit piece panel shows them as placeholders; the tuning is read off the music,
+  // so it is a row there, correctable only by an alias. One fixture, both halves.
+  derived_tags: [{ dimension: 'title', value: 'Studio smoke piece', source_ref: 'sidecar' }, { dimension: 'artist', value: 'Synthetic fixture', source_ref: 'sidecar' }, { dimension: 'tuning-name', value: 'open G', source_ref: 'sidecar' }] };
 const form = new FormData(); form.set('manifest',JSON.stringify(manifest)); form.set('score',new Blob([bytes]),'Sun-did-glide.gp');
 const stored = await fetch(origin+'/api/library/ingest',{method:'POST',headers,body:form}); assert.equal(stored.status,200);
 const pieceId = (await stored.json()).snapshot.piece.id; assert.match(pieceId, /^[0-9a-f]{16}$/);
@@ -97,26 +100,37 @@ try {
   await c.evaluate(`${frame}.querySelector('.focus-mark').click()`);
   await wait(`!!${frame}.querySelector('.strip.top') && !!${frame}.querySelector('.strip.bottom') && localStorage.getItem('mnx-studio.focused') === 'false'`);
   // The Tags sheet: add a tag of your own, then correct how the artist shows with an alias.
-  const sheet = `${piece}.querySelector('mnx-studio-tags').shadowRoot`;
-  // Local D1 keeps what earlier runs asserted (the tag, the favourite), so the
-  // count is checked relative to what the sheet shows, not as a literal.
-  const tagsBefore = Number((await c.evaluate(`${piece}.querySelector('button[slot=actions]').textContent`)).match(/\d+/)[0]);
-  await c.evaluate(`${piece}.querySelector('button[slot=actions]').click()`);
-  await wait(`${sheet}?.textContent.includes('From the music') && ${sheet}.textContent.includes('Synthetic fixture')`);
-  const hadFolk = await c.evaluate(`[...${sheet}.querySelectorAll('.chip')].some(ch => ch.textContent.includes('folk'))`);
-  await c.evaluate(`${sheet}.querySelector('input[aria-label="Add a tag"]').value = 'genre: folk'; ${sheet}.querySelector('input[aria-label="Add a tag"]').dispatchEvent(new Event('input'));`);
-  await c.evaluate(`${sheet}.querySelector('form').dispatchEvent(new Event('submit', { cancelable: true }))`);
+  // ONE panel for what the piece IS, opened by the pencil beside the title.
+  // Its three bands say where each value came from — the score's header as
+  // fields, what the engine read off the notes, and your own — so the artist
+  // here is an INPUT, not a read-only row: the old Tags sheet echoed the field
+  // the Details sheet owned, and only the echo could be renamed.
+  const sheet = `${piece}.querySelector('mnx-studio-edit-piece[slot=side]').shadowRoot`;
+  await c.evaluate(`${piece}.querySelector('button[slot=title-action]').click()`);
+  await wait(`${sheet}?.textContent.includes('From the music') && ${sheet}.textContent.includes('Read from the notes')`);
+  // The artist this fixture shows was read at ingest, not stated by the score,
+  // so the field carries it as a PLACEHOLDER: visible, and replaced the moment
+  // one is typed. Hiding header dimensions from the rows below must not lose it.
+  assert.deepEqual(await c.evaluate(`(() => { const i = [...${sheet}.querySelectorAll('label')].find(l => l.textContent.trim().startsWith('Artist')).querySelector('input'); return [i.value, i.placeholder]; })()`), ['', 'Synthetic fixture']);
+  assert.equal(await c.evaluate(`${sheet}.textContent.toLowerCase().includes('tag')`), false, 'the panel still calls something a tag');
+  // Your own values: dimensions nobody reads from the music.
+  await c.evaluate(`${sheet}.querySelector('input[aria-label="Add a value"]').value = 'genre: folk'; ${sheet}.querySelector('input[aria-label="Add a value"]').dispatchEvent(new Event('input'));`);
+  await c.evaluate(`[...${sheet}.querySelectorAll('form')].find(f => f.querySelector('input[aria-label="Add a value"]')).dispatchEvent(new Event('submit', { cancelable: true }))`);
   await wait(`[...${sheet}.querySelectorAll('.chip')].some(ch => ch.textContent.includes('folk'))`);
-  await wait(`${piece}.querySelector('button[slot=actions]').textContent.includes('Tags · ${tagsBefore + (hadFolk ? 0 : 1)}')`);
   // The sheet is busy until the write lands; a click on a disabled button is nothing.
-  await wait(`!${sheet}.querySelector('input[aria-label="Add a tag"]').disabled`);
-  await c.evaluate(`[...${sheet}.querySelectorAll('.row')].find(r => r.textContent.includes('artist')).querySelector('button').click()`);
+  await wait(`!${sheet}.querySelector('input[aria-label="Add a value"]').disabled`);
+  // What the notes say can only be corrected by an alias — and the header's own
+  // dimensions are NOT among these rows, because they are the fields above.
+  assert.equal(await c.evaluate(`[...${sheet}.querySelectorAll('.row')].some(r => r.textContent.includes('artist'))`), false, 'a header field appeared as a read-only row as well');
+  // Whichever the file gave — a part here; a named tuning or a capo elsewhere.
+  // The point is the correction, not the dimension.
+  assert.ok(await c.evaluate(`${sheet}.querySelectorAll('.row').length > 0`), 'nothing was read from the notes');
+  await c.evaluate(`${sheet}.querySelector('.row button').click()`);
   await wait(`!!${sheet}.querySelector('input[aria-label="Shown as"]')`);
-  await c.evaluate(`const i = ${sheet}.querySelector('input[aria-label="Shown as"]'); i.value = 'A synthetic fixture'; i.dispatchEvent(new Event('input')); [...${sheet}.querySelectorAll('button')].find(b => b.textContent === 'Save alias').click()`);
-  await wait(`${frame}.querySelector('.strip.top .head .sub')?.textContent.includes('A synthetic fixture')`);
-  await wait(`[...${sheet}.querySelectorAll('.row')].some(r => r.textContent.includes('A synthetic fixture') && r.textContent.includes('Synthetic fixture'))`);
-  await c.evaluate(`${sheet}.querySelector('button[aria-label="Close tags"]').click()`);
-  await wait(`!${piece}.querySelector('mnx-studio-tags')`);
+  await c.evaluate(`const i = ${sheet}.querySelector('input[aria-label="Shown as"]'); i.value = 'A synthetic reading'; i.dispatchEvent(new Event('input')); [...${sheet}.querySelectorAll('button')].find(b => b.textContent === 'Save').click()`);
+  await wait(`[...${sheet}.querySelectorAll('.row')].some(r => r.textContent.includes('A synthetic reading'))`);
+  await c.evaluate(`${sheet}.querySelector('button[aria-label="Close"]').click()`);
+  await wait(`!${piece}.querySelector('mnx-studio-edit-piece')`);
   // The Instruments sheet: in the frame's side slot, one row per part. The tray
   // carries no Sound selector here — the sheet chooses each part's sound.
   const player = `${piece}.querySelector('mnx-player')`;
@@ -152,11 +166,14 @@ try {
   // Back to the library without a reload: the frame goes with the piece, the header returns.
   await c.evaluate(`${piece}.querySelector('a[slot=back]').click()`);
   await wait(`!!${app}.querySelector('mnx-studio-library') && !!${app}.querySelector('header') && !${app}.querySelector('mnx-studio-piece')`);
-  // Option A's rail: the alias shows in the artist line, the opened piece is the top row under Recent,
-  // the row carries its chips and the star, and a list value narrows the list.
+  // Option A's rail: the opened piece is the top row under Recent, the row
+  // carries its chips and the star, and a list value narrows the list. The
+  // artist reads as the sidecar gave it — the panel no longer offers to alias a
+  // header value, because it offers the FIELD instead, and this score never
+  // stated one; correcting it library-wide is the Aliases page's business.
   await wait(`${library}?.textContent.includes('Artist:') && ${library}.textContent.includes('Genre:')`);
   await wait(`${library}.querySelector('li .who a')?.textContent.includes('Studio smoke piece') && ${library}.querySelector('li .when').textContent !== ''`);
-  await wait(`${library}.querySelector('li .who .artist')?.textContent === 'A synthetic fixture'`);
+  await wait(`${library}.querySelector('li .who .artist')?.textContent === 'Synthetic fixture'`);
   await c.evaluate(`[...${library}.querySelectorAll('.line')].find(l => l.textContent.includes('List:')).click()`);
   await wait(`!!${library}.querySelector('.group')`);
   await c.evaluate(`[...${library}.querySelectorAll('.option')].find(o => o.textContent.includes('Studio collection')).click()`);
@@ -168,9 +185,9 @@ try {
   const railShot = await c.send('Page.captureScreenshot'); await fs.writeFile('/tmp/mnx-studio-library.png',Buffer.from(railShot.result.data,'base64'));
   await c.evaluate(`[...${library}.querySelectorAll('.sort button')].find(b => b.textContent === 'Title').click()`);
   await wait(`${library}.querySelector('.sort button.on').textContent === 'Title' && ${library}.querySelectorAll('li').length === 1`);
-  // The alias page lists what the sheet set.
+  // The alias page lists what the panel set — the reading it corrected.
   await c.evaluate(`${library}.querySelector('a.foot').click()`);
-  await wait(`!!${app}.querySelector('mnx-studio-aliases')?.shadowRoot?.textContent.includes('A synthetic fixture')`);
+  await wait(`!!${app}.querySelector('mnx-studio-aliases')?.shadowRoot?.textContent.includes('A synthetic reading')`);
   const aliases = `${app}.querySelector('mnx-studio-aliases').shadowRoot`;
   await c.evaluate(`${aliases}.querySelector('button[aria-label="Remove alias"]').click()`);
   await wait(`${aliases}.textContent.includes('No aliases yet')`);

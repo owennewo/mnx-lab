@@ -31,7 +31,9 @@ try {
   const library = `${app}?.querySelector('mnx-studio-library')?.shadowRoot`;
   const deleted = `${app}?.querySelector('mnx-studio-deleted')?.shadowRoot`;
   const frame = `${piece}?.querySelector('mnx-score-frame')?.shadowRoot`;
-  const details = `${piece}?.querySelector('mnx-studio-details[slot=side]')?.shadowRoot`;
+  const details = `${piece}?.querySelector('mnx-studio-edit-piece[slot=side]')?.shadowRoot`;
+  // The pencil beside the title: one Edit piece panel in place of Details + Tags.
+  const editPiece = `${piece}.querySelector('button[slot=title-action]')`;
   const saving = `${piece}?.querySelector('mnx-studio-save[slot=side]')?.shadowRoot`;
   const action = text => `[...${piece}.querySelectorAll('button[slot=actions]')].find(b => b.textContent.includes(${JSON.stringify(text)}))`;
   const chip = `${piece}?.querySelector('button.save')`;
@@ -51,11 +53,11 @@ try {
   const first = await snapshot(pieceId);
 
   // Two more saves: an automatic one and a named one.
-  await c.evaluate(`${action('Details')}.click()`); await wait(`!!${details}?.querySelector('input')`);
+  await c.evaluate(`${editPiece}.click()`); await wait(`!!${details}?.querySelector('input')`);
   await field('Title', `${title} v2`);
   await c.evaluate(`${chip}.click()`); await wait(`!!${saving}`);
   await press(saving, 'Save now'); await wait(`${chip}.dataset.save === 'clean' && ${chip}.textContent.includes('just now')`);
-  await c.evaluate(`${action('Details')}.click()`); await wait(`!!${details}?.querySelector('input')`);
+  await c.evaluate(`${editPiece}.click()`); await wait(`!!${details}?.querySelector('input')`);
   await field('Artist', 'A synthetic author');
   await c.evaluate(`${chip}.click()`); await wait(`!!${saving}?.querySelector('input[aria-label="Version name"]')`);
   await c.evaluate(`{ const i = ${saving}.querySelector('input[aria-label="Version name"]'); i.value = 'With an author'; i.dispatchEvent(new Event('input')); }`);
@@ -73,7 +75,7 @@ try {
   await wait(`${heading} === ${JSON.stringify(title)}`);
   await wait(`${saving}.querySelector('li.version.viewing b').textContent === 'As first made'`);
   assert.equal(await c.evaluate(`${chip}.dataset.save`), 'clean');
-  await c.evaluate(`${action('Details')}.click()`); await wait(`!!${details}?.querySelector('input')`);
+  await c.evaluate(`${editPiece}.click()`); await wait(`!!${details}?.querySelector('input')`);
   assert.equal(await c.evaluate(`[...${details}.querySelectorAll('input')].every(i => i.readOnly) && !${details}.querySelector('.danger')`), true);
   assert.deepEqual([(await snapshot(pieceId)).piece.revision, (await snapshot(pieceId)).piece.canonical_rendition_id], [before.piece.revision, before.piece.canonical_rendition_id]);
   const viewingShot = await c.send('Page.captureScreenshot'); await fs.writeFile('/tmp/mnx-studio-version-viewing.png',Buffer.from(viewingShot.result.data,'base64'));
@@ -90,7 +92,7 @@ try {
   assert.equal(reverted.renditions.length, 3);
   assert.ok(reverted.tags.some(t => t.dimension === 'title' && t.value === title) && !reverted.tags.some(t => t.dimension === 'artist'));
   // The next edit is edited FROM where the pointer is.
-  await c.evaluate(`${action('Details')}.click()`); await wait(`!!${details}?.querySelector('input')`);
+  await c.evaluate(`${editPiece}.click()`); await wait(`!!${details}?.querySelector('input')`);
   await field('Subtitle', 'after going back');
   await c.evaluate(`${chip}.click()`); await wait(`!!${saving}`);
   await press(saving, 'Save now'); await wait(`${chip}.dataset.save === 'clean' && ${chip}.textContent.includes('just now')`);
@@ -98,7 +100,7 @@ try {
   assert.equal(fourth.renditions.find(r => r.id === fourth.piece.canonical_rendition_id).derived_from, first.piece.canonical_rendition_id);
 
   // Delete: out of the library, nothing destroyed; the library offers the undo.
-  await c.evaluate(`${action('Details')}.click()`); await wait(`!!${details}?.querySelector('.danger')`);
+  await c.evaluate(`${editPiece}.click()`); await wait(`!!${details}?.querySelector('.danger')`);
   await press(details, 'Delete this piece…');
   await wait(`${details}.querySelector('.danger [role=alert]')?.textContent.includes('Nothing is destroyed')`);
   await press(details, 'Delete the piece');

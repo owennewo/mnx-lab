@@ -25,6 +25,20 @@ const WORK_FIELDS = ['title', 'artist', 'subtitle', 'album', 'copyright', 'sourc
 const pitchName = ({ step, alter, octave }: MnxPitch) =>
   `${step}${(alter ?? 0) > 0 ? '#'.repeat(alter!) : (alter ?? 0) < 0 ? 'b'.repeat(-alter!) : ''}${octave}`;
 
+/**
+ * Is this derived dimension read from the score's HEADER — the `_x.mnxLab.work`
+ * fields and creator roles above — rather than from the notation itself?
+ *
+ * The distinction is what a person can DO about a value. A header field is
+ * typed: editing it is an ordinary, undoable edit to the document, and the
+ * projection follows at the next save. Parts, capo and tuning are read off the
+ * notes; there is nothing to type, so the only correction is an alias, which
+ * renames the value across the library without touching the file.
+ */
+export function fromWorkHeader(dimension: string): boolean {
+  return (WORK_FIELDS as readonly string[]).includes(dimension) || dimension.startsWith('creator.');
+}
+
 export function derivedLibraryTags(document: MnxStructure): DerivedLibraryTag[] {
   const tags: DerivedLibraryTag[] = [];
   const add = (dimension: string, value: unknown) => {

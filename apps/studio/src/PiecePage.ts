@@ -62,16 +62,15 @@ import type { ZoomPadChange } from '../../../src/elements/ZoomPad.ts';
 import { libraryReturnHref, returnToLibrary } from './StudioApp.ts';
 import { nextTheme, readTheme, resolvedTheme, setTheme, themeGlyph, type ThemeSetting } from './theme.ts';
 import { isKitPart, type PartMix } from '../../../src/audio/partMix.ts';
-import './TagsSheet.ts';
+import './EditPieceSheet.ts';
 import './RecordingsSheet.ts';
 import './InstrumentsSheet.ts';
 import { sourceGlyph } from './SourceSheet.ts';
-import './DetailsSheet.ts';
 import './SaveSheet.ts';
 import { BUILD } from './build.ts';
 import { pieceFilename } from './pieceFile.ts';
 import { JUST_DELETED_KEY, libraryHref, pieceHref } from './StudioApp.ts';
-import type { TagsSnapshot } from './TagsSheet.ts';
+import type { EditPieceSnapshot } from './EditPieceSheet.ts';
 import type { InstrumentPart } from './InstrumentsSheet.ts';
 
 import { VIEW_KEY, DISPLAY_KEY, UNROLLED_KEY, STAFF_SP_KEY, SPACE_SP_KEY, SPACING_MODE_KEY, FOCUSED_KEY, write, readView, readDisplay, readUnrolled, readSpacingMode, readStaffSp, readSpaceSp, readFocused, readParts, writeParts, normalizePiecePrefs, canonicalJson, type PiecePreferences } from './scorePreferences.ts';
@@ -79,7 +78,6 @@ import { VIEW_KEY, DISPLAY_KEY, UNROLLED_KEY, STAFF_SP_KEY, SPACE_SP_KEY, SPACIN
 const back = html`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"></path></svg>`;
 /** Instruments: three faders, each knob at its own level. */
 const mixerGlyph = html`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4v5M6 13v7M12 4v11M12 19v1M18 4v1M18 9v11"></path><circle cx="6" cy="11" r="2"></circle><circle cx="12" cy="17" r="2"></circle><circle cx="18" cy="7" r="2"></circle></svg>`;
-const detailsGlyph = html`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h14v16H5zM9 9h6M9 13h6M9 17h3"></path></svg>`;
 const keysGlyph = html`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7h18v10H3zM7 11h.01M11 11h.01M15 11h.01M8 14h8"></path></svg>`;
 const saveGlyph = html`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 18a4 4 0 0 1-.5-7.97A6 6 0 0 1 18 9a4.5 4.5 0 0 1-.5 9z"></path></svg>`;
 /** Cut and copied selections, for this tab: a bar copied in one piece can be pasted into the next. */
@@ -88,7 +86,7 @@ const selectionClipboard = new MemorySelectionClipboardStore();
 const RUNG_NAMES: Record<string, string> = { note: 'a note', event: 'a beat', voiceMeasure: 'a voice in a bar', partMeasure: 'a part’s bar', measure: 'a bar', document: 'the whole piece' };
 /** Unsaved edits, on this device only, until the next checkpoint. One store for every piece. */
 const recoveryStore = indexedDbRecoveryStore<MnxStructure>();
-const tagGlyph = html`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12V4h8l10 10-8 8z"></path><circle cx="7.5" cy="8.5" r="1.2" fill="currentColor" stroke="none"></circle></svg>`;
+const pencilGlyph = html`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4l10-10-4-4L4 16v4z"></path><path d="M13 7l4 4"></path></svg>`;
 
 @customElement('mnx-studio-piece')
 export class PiecePage extends LitElement {
@@ -99,12 +97,11 @@ export class PiecePage extends LitElement {
   @state() private doc: MnxDocument | null = null;
   @state() private error = '';
   @state() private loading = true;
-  @state() private tagsOpen = false;
+  @state() private editOpen = false;
   /** The recording editor (edit or add), in the side slot. */
   @state() private recordingsOpen = false;
   @state() private sourceOpen = false;
   @state() private instrumentsOpen = false;
-  @state() private detailsOpen = false;
   @state() private saveOpen = false;
   @state() private keysOpen = false;
   /** What a copy, cut or paste did, or why it did not; it names the last outcome and leaves. */
@@ -206,13 +203,6 @@ export class PiecePage extends LitElement {
     }
     mnx-document-viewer[hidden] {
       display: none;
-    }
-    mnx-studio-tags {
-      position: fixed;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      z-index: 6;
     }
     .notice {
       max-width: 36rem;
@@ -373,7 +363,7 @@ export class PiecePage extends LitElement {
     this.doc = null;
     this.error = '';
     this.loading = true;
-    this.tagsOpen = false; this.recordingsOpen = false; this.sourceOpen = false; this.detailsOpen = false; this.saveOpen = false; this.keysOpen = false; this.selectedRecordingId = null; this.editingRecordingId = null; this.addingRecording = false;
+    this.editOpen = false; this.recordingsOpen = false; this.sourceOpen = false; this.saveOpen = false; this.keysOpen = false; this.selectedRecordingId = null; this.editingRecordingId = null; this.addingRecording = false;
     ({ hidden: this.hiddenParts, mix: this.partMix } = readParts(this.pieceId));
     try {
       const readPair = () => Promise.all([
@@ -495,7 +485,7 @@ export class PiecePage extends LitElement {
       onPreview: preview => { if (this.doc && this.editor) this.doc = { ...this.doc, lastUpdated: Date.now(), mnxJson: preview ?? this.editor.document }; },
       clipboard: selectionClipboard,
       onNotice: notice => this.showNotice(notice.message),
-      onState: () => { if (this.keysOpen || this.detailsOpen) this.requestUpdate(); },
+      onState: () => { if (this.keysOpen || this.editOpen) this.requestUpdate(); },
       onRefused: (intent, reason) => this.sayRefused(intent, reason),
       readOnly: () => this.readOnly, suspended: () => !!this.viewing
     });
@@ -834,11 +824,10 @@ export class PiecePage extends LitElement {
 
   // ── the side panels: one at a time ──────────────────────────────────────
 
-  private openPanel(which: 'tags' | 'source' | 'instruments' | 'recording' | 'details' | 'save' | 'keys' | null) {
+  private openPanel(which: 'edit' | 'source' | 'instruments' | 'recording' | 'save' | 'keys' | null) {
     this.keysOpen = which === 'keys';
-    this.detailsOpen = which === 'details';
     this.saveOpen = which === 'save';
-    this.tagsOpen = which === 'tags';
+    this.editOpen = which === 'edit';
     this.sourceOpen = which === 'source';
     this.instrumentsOpen = which === 'instruments';
     this.recordingsOpen = which === 'recording';
@@ -990,9 +979,8 @@ export class PiecePage extends LitElement {
       >
         <a slot="back" href=${libraryReturnHref()} @click=${returnToLibrary}>${back}<span>Library</span></a>
         ${this.doc
-          ? html`<button slot="actions" type="button" aria-pressed=${this.tagsOpen} @click=${() => this.openPanel(this.tagsOpen ? null : 'tags')}>
-              ${tagGlyph}<span>Tags · ${this.snapshot?.tags.length ?? 0}</span>
-            </button>
+          ? html`<button slot="title-action" class="edit-piece" type="button" aria-label="Edit piece"
+              aria-expanded=${this.editOpen} @click=${() => this.openPanel(this.editOpen ? null : 'edit')}>${pencilGlyph}</button>
             <button slot="actions" type="button" aria-pressed=${this.sourceOpen || this.recordingsOpen}
               aria-label=${`Source: ${activeRecording?.name ?? 'Synth'}`} @click=${() => this.openPanel(this.sourceOpen ? null : 'source')}>
               ${sourceGlyph(activeRecording ? (activeRecording.kind === 'youtube' ? 'youtube' : 'audio') : 'synth')}<span>Source · ${activeRecording?.name ?? (this.snapshot && !this.recordings.length ? 'Synth · add a recording' : 'Synth')}</span>
@@ -1001,10 +989,7 @@ export class PiecePage extends LitElement {
               ${mixerGlyph}<span>Instruments · ${this.doc.mnxJson.parts.length}</span>
             </button>
             ${this.save
-              ? html`<button slot="actions" type="button" aria-pressed=${this.detailsOpen} @click=${() => this.openPanel(this.detailsOpen ? null : 'details')}>
-                  ${detailsGlyph}<span>Details</span>
-                </button>
-                ${this.playOnly ? nothing : html`<button slot="actions" type="button" aria-pressed=${this.keysOpen} @click=${() => this.openPanel(this.keysOpen ? null : 'keys')}>
+              ? html`${this.playOnly ? nothing : html`<button slot="actions" type="button" aria-pressed=${this.keysOpen} @click=${() => this.openPanel(this.keysOpen ? null : 'keys')}>
                   ${keysGlyph}<span>Keys</span>
                 </button>`}
                 <span slot="chips">
@@ -1087,8 +1072,10 @@ export class PiecePage extends LitElement {
           }}
           @back=${() => this.openPanel('source')}
           @close=${() => (this.recordingsOpen = false)}></mnx-studio-recordings>`) : nothing}
-        ${this.detailsOpen && this.doc
-          ? html`<mnx-studio-details slot="side"
+        ${this.editOpen && this.doc
+          ? html`<mnx-studio-edit-piece slot="side"
+              .client=${this.client}
+              .snapshot=${this.snapshot}
               .work=${this.doc.mnxJson._x?.mnxLab?.work}
               .readOnly=${this.readOnly || !!this.viewing}
               .readOnlyReason=${this.viewing ? 'This is an older version. Go back to the current one to edit, or make this one current.' : this.playOnly ? 'This device plays. Open the piece on a computer with a keyboard to edit it.' : ''}
@@ -1096,10 +1083,12 @@ export class PiecePage extends LitElement {
               .canUndo=${!!this.editor?.canUndo}
               .canRedo=${!!this.editor?.canRedo}
               @work-change=${(e: CustomEvent<WorkChange>) => this.applyIntent({ type: 'setWork', work: e.detail })}
+              @tags-changed=${(e: CustomEvent<EditPieceSnapshot>) => { if (this.snapshot) this.snapshot = { ...this.snapshot, ...e.detail, piece: { ...this.snapshot.piece, ...e.detail.piece } }; void this.refreshSnapshot(); }}
+              @aliases-changed=${() => this.refreshSnapshot()}
               @undo=${() => this.undoEdit()}
               @redo=${() => this.redoEdit()}
               @piece-delete=${() => void this.deletePiece()}
-              @close=${() => (this.detailsOpen = false)}></mnx-studio-details>`
+              @close=${() => (this.editOpen = false)}></mnx-studio-edit-piece>`
           : nothing}
         ${this.keysOpen && this.editor
           ? html`<mnx-studio-keys slot="side"
@@ -1138,10 +1127,6 @@ export class PiecePage extends LitElement {
               @close=${() => (this.instrumentsOpen = false)}></mnx-studio-instruments>`
           : nothing}
       </mnx-score-frame>
-      ${this.tagsOpen ? html`<mnx-studio-tags .client=${this.client} .snapshot=${this.snapshot}
-        @tags-changed=${(e: CustomEvent<TagsSnapshot>) => { if (this.snapshot) this.snapshot = { ...this.snapshot, ...e.detail, piece: { ...this.snapshot.piece, ...e.detail.piece } }; void this.refreshSnapshot(); }}
-        @aliases-changed=${() => this.refreshSnapshot()}
-        @close=${() => (this.tagsOpen = false)}></mnx-studio-tags>` : nothing}
     `;
   }
 }

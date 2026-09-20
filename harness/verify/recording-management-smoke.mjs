@@ -116,7 +116,7 @@ try {
     check(sheet()?.recordingId===audioId,'Edit details did not open the playing recording');
     sheet().shadowRoot.querySelector('[aria-label="Back to sources"]').click();await page.updateComplete;check(!sheet()&&!!src(),'Back did not return to the source list');
     await edit(audioId);
-    page.shadowRoot.querySelector('button[slot=actions]').click();await page.updateComplete;check(!sheet()&&page.shadowRoot.querySelector('mnx-studio-tags'),'Tags did not replace panel');
+    page.shadowRoot.querySelector('button[slot=title-action]').click();await page.updateComplete;check(!sheet()&&page.shadowRoot.querySelector('mnx-studio-edit-piece'),'Edit piece did not replace panel');
     return {audioId};
   })()`);
   await c.send('Page.reload');await new Promise(r=>setTimeout(r,1200));

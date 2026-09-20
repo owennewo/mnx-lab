@@ -343,6 +343,39 @@ export class ScoreFrame extends LitElement {
         white-space: nowrap;
       }
 
+      /* Faint until wanted: the mark is always there, so it never has to be
+         found, and never competes with the title it sits beside. Smaller and
+         quieter than a tools-row button, which is the point — it belongs to the
+         title, not to the row of things you do to the score. */
+      .head ::slotted([slot='title-action']) {
+        align-self: center;
+        flex: none;
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        border-color: transparent;
+        color: var(--ink-3);
+        opacity: 0.55;
+        transition: opacity 120ms ease;
+      }
+
+      .head ::slotted([slot='title-action']:hover) {
+        border-color: var(--line);
+        color: var(--ink);
+      }
+
+      .head:hover ::slotted([slot='title-action']),
+      .head ::slotted([slot='title-action']:focus),
+      .head ::slotted([slot='title-action'][aria-expanded='true']) {
+        opacity: 1;
+      }
+
+      .head ::slotted([slot='title-action'][aria-expanded='true']) {
+        border-color: var(--line);
+        background: var(--frame-ground);
+        color: var(--ink);
+      }
+
       .spacer {
         flex: 1;
       }
@@ -747,6 +780,10 @@ export class ScoreFrame extends LitElement {
         <div class="head">
           <h1>${this.heading}</h1>
           ${this.subheading ? html`<span class="sub">${this.subheading}</span>` : nothing}
+          <!-- Beside the words it edits: a host action ON the title, as opposed
+               to the tools row, which is what you DO to the score. Empty in
+               every host that supplies nothing. -->
+          <slot name="title-action"></slot>
         </div>
         <slot name="chips"></slot>
       </div>
