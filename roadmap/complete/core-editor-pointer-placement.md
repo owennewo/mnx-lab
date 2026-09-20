@@ -1,6 +1,6 @@
 # Pointer placement — a click or a tap puts the edit cursor where it landed
 
-> **Status: built 2026-09-20.** Serves the **implementation loop**.
+> **Status: complete 2026-09-20.** Serves the **implementation loop**.
 > [Studio authoring campaign](../inprogress/studio-campaign-authoring.md) item 9, and the
 > named prerequisite of item 8 (touch entry): the pickup note's
 > *there is no click-to-place*. Inherits the campaign contract; clauses 12–14 are the ones

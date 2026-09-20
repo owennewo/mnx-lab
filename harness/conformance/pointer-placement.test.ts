@@ -1,5 +1,5 @@
 // Pointer placement: the grid is what a click resolves against.
-// roadmap/proposed/core-editor-pointer-placement.md (studio authoring item 9).
+// roadmap/complete/core-editor-pointer-placement.md (studio authoring item 9).
 //
 // The viewer measures geometry; only the grid knows where a cursor may STAND.
 // So the contract this file holds is the resolver's, over the whole corpus:

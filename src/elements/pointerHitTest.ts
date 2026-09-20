@@ -1,6 +1,6 @@
 /**
  * Where a pointer landed on the engraved score
- * (roadmap/proposed/core-editor-pointer-placement.md).
+ * (roadmap/complete/core-editor-pointer-placement.md).
  *
  * This is the enclosure's questions asked in reverse. The enclosure is handed a
  * model address and finds the ink; here a point on the page has to become an

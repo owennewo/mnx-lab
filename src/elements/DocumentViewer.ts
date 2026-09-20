@@ -283,7 +283,7 @@ export class DocumentViewer extends LitElement {
 
   /**
    * Whether a pointer may place the edit cursor
-   * (roadmap/proposed/core-editor-pointer-placement.md). OFF by default and
+   * (roadmap/complete/core-editor-pointer-placement.md). OFF by default and
    * turned on by `bindEditor`, so a viewer with no editor — the embed, the
    * player-only piece page, a read-only score — emits no `position-selected`
    * and draws no hover ghost. Placement is a capability the host grants, not

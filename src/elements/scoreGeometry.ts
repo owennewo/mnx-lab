@@ -11,7 +11,7 @@
  * numbers. The arithmetic that needs no DOM lives in
  * `engine/render/selectionGeometry.ts`; the drawing that needs both lives in
  * `enclosure.ts`, which is where all of this came from. It was pulled out when
- * pointer placement (roadmap/proposed/core-editor-pointer-placement.md) became
+ * pointer placement (roadmap/complete/core-editor-pointer-placement.md) became
  * a second reader: a hit-test asks exactly the questions the enclosure asks,
  * in reverse, and two copies of these rules would drift.
  */

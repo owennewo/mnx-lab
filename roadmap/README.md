@@ -45,13 +45,6 @@ proposals that name their campaign.
 
 ### proposed/
 
-- **[core-editor-pointer-placement.md](proposed/core-editor-pointer-placement.md)** — [studio
-  authoring campaign](inprogress/studio-campaign-authoring.md) item 9, proposed 2026-09-20:
-  **a click or a tap places the edit cursor** — a `goToPosition` intent the session snaps to
-  its own grid, a `position-selected` viewer event that exists only while an editor is
-  bound, a hover ghost on a mouse, and the click still seeks playback. The two cursors stay
-  two, by the player campaign's clause 3; this is the first seeding rule between them, and
-  the named prerequisite of touch entry (item 8).
 - **[studio-player-practice.md](proposed/studio-player-practice.md)** — campaign item 13,
   studio's first player feature in `elements/`: loop the selection with the **written-range
   → performed-occurrences policy stated**, speed trainer, count-in, metronome, mute/solo.
@@ -495,6 +488,18 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+
+- **[core-editor-pointer-placement.md](complete/core-editor-pointer-placement.md)** — [studio
+  authoring campaign](inprogress/studio-campaign-authoring.md) item 9, **complete 2026-09-20**:
+  **a press places the edit cursor where it landed.** A `goToPointer` intent the session
+  snaps to its own grid — a named note is exact, an x is a neighbourhood — so an empty bar
+  of rests is clickable, which is what the owner needed to write a chorus at bar 9. A
+  `position-selected` event the viewer emits only while an editor is bound, a hover ghost
+  on a mouse, and the press still seeks playback (to the bar, when it lands on empty
+  space). **`pointerdown`, not `click`**: a press that re-engraves the score leaves
+  mouse-down and mouse-up on different nodes and no click is synthesised at all. The two
+  cursors stay two, by the player campaign's clause 3; this is the first seeding rule
+  between them, and it was the named prerequisite of touch entry (item 8).
 
 - **[core-editor-element-promotion.md](complete/core-editor-element-promotion.md)** — **complete
   2026-09-17: one editor surface under both shells**, [studio authoring

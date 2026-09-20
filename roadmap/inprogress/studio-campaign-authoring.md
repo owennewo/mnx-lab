@@ -219,7 +219,7 @@ one.
 | 6 | `core-sync-interchange` | **skipped 2026-09-20** by the owner (was optional) | **sync.json as interchange.** *Export sync* (none exists): the dense Soundslice-compatible array as derived, or a sparse wrapper with anchors only at the cuts and a wrapper-level `interpolation: "beat"` — never a fifth tuple element, which breaks Soundslice compatibility and the decoder's arity check. The reader option for beat-linear interpolation is built only if sparse export is wanted. **Lifting an imported Soundslice sync into segments** (lossless = one segment per anchor interval, crowded; merged = tidy, discards measured timing) is a decision the item owns. Pick up when a second consumer of a sync appears, not before. |
 | 7 | [core-editor-element-promotion](../complete/core-editor-element-promotion.md) | **built 2026-09-17: slices 1–3 for studio, then the workbench's adoption of the binding — one editor surface** | **The editor in studio.** That doc owns the promotion review. The mount is a plain-DOM host binding beside `bindPlayback` — `bindEditor` in `src/elements/editorHost.ts`, its own lazily loaded chunk, absent from the embed bundles. **Slice 1:** navigation and the ladder, fret and pitch entry, durations, ties, delete, undo, Escape/Enter; structural key scope; `setWork` as an intent; a Keys sheet; the structural checkpoint trigger. **Slice 2 turned out to have already happened** — the one-surface campaign retired every setup popover into the rung inspector — so **slices 2–3 are one:** the inspector, its rows and placement, and the lyric text editor moved to `elements/` (the workbench imports them from there), with shared glue (`inspectorMount.ts`) and a token-carrying layer (`<mnx-editor-surfaces>`); the binding mounts them on Enter and Shift+L and binds copy/cut/paste. **Work-list item 5:** the workbench's scenario page deleted its own mount and sits on `bindEditor`; the binding grew the host's seams for it (`session`, `onEscalate`, `claimUnfocused`, `inspector`, `onRefused`, `sessionMoved`), and `smoke:workbench-editor` proves them. |
 | 8 | `studio-editor-touch` | proposed | **Entry without a keyboard.** The workbench editor is keyboard-driven and studio is used on an Android tablet; a touch entry surface is new design, not a port. Decision 1 below says whether slice 1 of item 7 waits for it. |
-| 9 | [core-editor-pointer-placement](../proposed/core-editor-pointer-placement.md) | proposed 2026-09-20 | **A click or a tap places the edit cursor.** Item 8's first missing piece, usable from a mouse now: a `goToPosition` intent the session snaps to its own grid (nearest string or staff position, nearest event column; an empty bar lands on its rest), a `position-selected` event the viewer emits only while an editor is bound, a hover ghost on a mouse, and the click still seeks playback — to the bar when it lands on empty space. The two cursors stay two; this is the first seeding rule between them. |
+| 9 | [core-editor-pointer-placement](../complete/core-editor-pointer-placement.md) | **complete 2026-09-20** (`5b97fbb7`) | **A click or a tap places the edit cursor.** Item 8's first missing piece, usable from a mouse now: a `goToPosition` intent the session snaps to its own grid (nearest string or staff position, nearest event column; an empty bar lands on its rest), a `position-selected` event the viewer emits only while an editor is bound, a hover ghost on a mouse, and the click still seeks playback — to the bar when it lands on empty space. The two cursors stay two; this is the first seeding rule between them. |
 
 ### Decisions still open
 
@@ -572,7 +572,7 @@ made — the owner keeps testing on the live site and did not want the campaign 
 [studio-sync-bar](../complete/studio-sync-bar.md) (player campaign 21), which owed the same two
 checks, closed with it. **Item 6 is skipped**: it was optional and waited for a second consumer
 of a sync that has not appeared. **Item 9 is filed**,
-[core-editor-pointer-placement](../proposed/core-editor-pointer-placement.md): the owner met the
+[core-editor-pointer-placement](../complete/core-editor-pointer-placement.md): the owner met the
 gap on a real piece (a synced 28-bar skeleton, the chorus at bar 9, no way to click there), and
 the discussion that opened it settled that the edit cursor and the playback position stay two
 states joined by seeding rules — the pickup note's *no click-to-place* is now the first of them.
@@ -583,4 +583,41 @@ deploy. Corrected there.
 
 What closes the campaign now: deploy (migration 0005 first, the owner's to trigger), item 9,
 then item 8's design and build.
+
+### 2026-09-20 — entry 12: item 9 built — a press places the cursor
+
+Built and landed the same day it was filed (`5b97fbb7`). `goToPointer`: the viewer
+measures where a press landed, the session snaps it to its own grid. A named note is
+exact and carries its own line and voice; an x is only a neighbourhood, because musical
+spacing is not linear — and the neighbourhood is what makes an empty bar clickable, which
+was the whole point. A press on ink still seeks playback and now also places; a press on
+empty space places and seeks to that bar through the iteration the chip is showing.
+
+**Three things worth carrying forward.**
+
+1. **`pointerdown`, not `click` — measured, not chosen.** Selecting a note can re-engrave
+   the score during the press, so mouse-down and mouse-up land on different nodes and the
+   browser synthesises *no click at all* — not one a capture-phase listener on `document`
+   can see. A trace is in the item doc. `engine/render/svg.ts` already selected on the
+   press for its own reason; nothing said why it had to. Now something does.
+2. **The engraved SVG has no structural identity.** No staff, system or bar carries a
+   `data-` attribute; only note ink does. So any overlay that must go from a point back to
+   an address needs the *paint's* own knowledge of what it drew. The staff table now
+   answers both directions and the enclosure reads it too, so the forward and reverse
+   walks cannot drift. The geometry readers were private to `enclosure.ts` and moved to
+   `src/elements/scoreGeometry.ts`.
+3. **A UI test must not trust coordinates it read a round trip ago.** Placing the cursor
+   can reveal-scroll the score, so a rect measured before the press may name a different
+   note by the time it lands — which is exactly how the first version of the smoke lied.
+   It now compares the placement against what was under the pointer *in that dispatch*.
+
+Proof: 395 corpus-wide assertions on the snap, the geometry inverse against its forward
+map, and the chain end to end in `smoke:workbench-editor`. No golden moved.
+`smoke:inspector` and `smoke:focus` pass; `smoke:selection`'s four reveal-scroll failures
+are **unchanged from main**, confirmed against a clean build of `origin/main` — still
+nobody's item, and still worth someone finding out which landing moved that geometry.
+
+Item 8 (touch entry) is now the only thing between this campaign and its goal, and its
+first missing piece is no longer missing: a tap is a press, so placement already works
+there. What is left for 8 is the entry surface itself, which is design, not port.
 
