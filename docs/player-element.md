@@ -91,7 +91,17 @@ player a new performance. Until 2026-09-19 that took the same path as opening an
 the session was disposed and a fresh one started on the synth — the AudioContext closed and
 its sample packs refetched, the audio element or YouTube iframe removed, the source silently
 reset. Now the player tells an edit (same `documentId`) from a new document and, for an edit,
-keeps the session and hands the live backend the performance in place:
+keeps the session and hands the live backend the performance in place.
+
+**A host must not stop it on the host's side either.** Only `playbackHost.ts` was converted
+in 2026-09-19; the workbench's scenario page kept its own pre-item-22 path and went on
+calling `stop()` and nulling the ordinal on every keystroke, so a workbench edit silently
+ended playback. It was also self-defeating: the stop published its own frame after the clear
+and put the ordinal straight back, so the state that path asked for never survived its own
+call. Fixed 2026-09-20 — both shells now re-resolve the ordinal and leave the transport
+alone.
+
+The backends:
 
 - `RecordingBackend.replacePerformance` rebuilds the written index and swaps the sync map.
   The media port is untouched and position is media time, so nothing moves. The player

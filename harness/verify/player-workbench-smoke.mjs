@@ -26,7 +26,20 @@ try{
     check(viewer.playbackState.ordinal===1,'Same-score route update did not seek');
     const beforeEdit=viewer.mnxDoc.mnxJson;await player.play();viewer.focus();viewer.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowUp',code:'ArrowUp',altKey:true,bubbles:true,composed:true}));await delay(100);
     check(viewer.mnxDoc.mnxJson!==beforeEdit,'Edit input did not change the document');
-    check(player.snapshot?.state!=='playing' && !viewer.playbackState.highlight.length,'An edit retained positional playback highlights');
+    await delay(200);
+    // AN EDIT KEEPS THE SESSION (core-player-live-edit.md, campaign item 22):
+    // the transport carries its state and its place across a keystroke instead
+    // of being stopped and rewound. This used to assert the opposite — the
+    // pre-item-22 contract, which only playbackHost.ts was converted away from,
+    // so the workbench went on stopping playback on every edit.
+    check(player.snapshot?.state==='playing','An edit stopped the transport: live edit keeps the session');
+    // What must NOT survive is a highlight belonging to the OLD revision. The
+    // ink is the proof: a key the edited score no longer draws paints nothing.
+    const lit=[...viewer.shadowRoot.querySelectorAll('.playback-ink')];
+    check(viewer.playbackState.highlight.length>0,'An edit left the playhead with nothing highlighted');
+    check(viewer.playbackState.highlight.every(o=>o.ordinal===viewer.playbackState.ordinal),
+      'A highlight outlived the traversal it was positioned in');
+    check(lit.length>0,'The highlight names notes the edited score does not draw: a stale revision');
     location.hash='#/scenario/spec/jumps-dal-segno';
     for(let i=0;i<100 && player.documentId!=='spec/jumps-dal-segno';i++)await delay(50);
     for(let i=0;i<100 && !player.performance;i++)await delay(50);

@@ -329,18 +329,30 @@ export class ScenarioPage extends LitElement {
     this.playback = state;
     this.playbackProvider.setValue(state);
   }
+  /**
+   * AN EDIT IS NOT A NEW DOCUMENT (core-player-live-edit.md). The player tells
+   * the two apart by `documentId` — unchanged here across a keystroke, changed
+   * across a route — and replaces the performance in place, carrying the place
+   * and the state, playing or paused, with it. This used to stop the transport
+   * and null the ordinal on every edit, the path item 22 retired; only
+   * `playbackHost.ts` was converted then, and the workbench kept the old one,
+   * so a keystroke silently stopped playback. Worse, the stop published its own
+   * frame AFTER the clear below and put the ordinal straight back, so the state
+   * this method asked for never survived its own call.
+   *
+   * The ordinal is re-resolved rather than dropped: the traversal may have moved
+   * under it, and the player's next frame corrects it either way. Inspection is
+   * a preference and rides through untouched.
+   */
   private refreshPassModel(document: MnxStructure) {
     if (this.passDocument === document) return;
-    this.renderRoot.querySelector<Player>('mnx-player')?.stop();
-    this.performance=null;this.clickedPlaybackKey='';
+    this.clickedPlaybackKey='';
     this.passDocument = document;
     this.passModel = linearizePasses(document);
     const compiled=compilePerformance(document,this.passModel);
     this.performance=compiled.ok?compiled.performance:null;
     this.performanceError=compiled.ok?'':compiled.diagnostics.map(d=>d.message).join('; ');
-    // Ordinals belong to one document revision. Inspection is a preference,
-    // retained through edits; live playback must be recompiled by item 7.
-    this.setPlayback({ ...withPlaybackOrdinal(this.playback, this.passModel, null), highlight: [] });
+    this.setPlayback(withPlaybackOrdinal(this.playback, this.passModel, this.playback.ordinal));
   }
   private onPlaybackUpdate = (event: Event) => {
     const update = (event as CustomEvent<PlaybackUpdate>).detail;
