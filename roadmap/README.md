@@ -45,6 +45,13 @@ proposals that name their campaign.
 
 ### proposed/
 
+- **[core-editor-pointer-placement.md](proposed/core-editor-pointer-placement.md)** — [studio
+  authoring campaign](inprogress/studio-campaign-authoring.md) item 9, proposed 2026-09-20:
+  **a click or a tap places the edit cursor** — a `goToPosition` intent the session snaps to
+  its own grid, a `position-selected` viewer event that exists only while an editor is
+  bound, a hover ghost on a mouse, and the click still seeks playback. The two cursors stay
+  two, by the player campaign's clause 3; this is the first seeding rule between them, and
+  the named prerequisite of touch entry (item 8).
 - **[studio-player-practice.md](proposed/studio-player-practice.md)** — campaign item 13,
   studio's first player feature in `elements/`: loop the selection with the **written-range
   → performed-occurrences policy stated**, speed trainer, count-in, metronome, mute/solo.

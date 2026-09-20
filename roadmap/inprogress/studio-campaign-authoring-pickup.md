@@ -20,6 +20,7 @@
 | 6 | sync.json interchange | not started, optional — wait for a second consumer | (index row only) |
 | 7 | Editor promotion | complete — slices 1–3 (`a394e7bc`, `7b38b743`), then the workbench's adoption of the binding | [core-editor-element-promotion](../complete/core-editor-element-promotion.md) |
 | 8 | Touch entry | not started — needs design first | (index row only) |
+| 9 | Pointer placement (click/tap places the cursor) | proposed 2026-09-20 — item 8's first piece | [core-editor-pointer-placement](../proposed/core-editor-pointer-placement.md) |
 
 All of it is on `main` and pushed. **None of it is deployed.**
 
@@ -83,7 +84,8 @@ Not designed. What is known:
 - The owner works on an **Android tablet**; the score frame's focus mark takes the browser
   fullscreen there, and a tap on the score is *never* a chrome toggle (memory:
   `score-frame-edge-grips`).
-- **There is no click-to-place.** The viewer emits `note-selected {noteId, projection,
+- **There is no click-to-place** — now planned as item 9,
+  [core-editor-pointer-placement](../proposed/core-editor-pointer-placement.md). The viewer emits `note-selected {noteId, projection,
   ordinal}` and both shells use it only to seek playback; no intent moves the cursor to a
   note. That is the first missing piece for touch, and it is a `src/edit/` change (a
   `goToNote`-shaped navigation intent, plus the inverse of `selectionContextFor` for rests and
