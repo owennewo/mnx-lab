@@ -39,7 +39,10 @@ backend's own discrete rates) and the fine slider; volume has a mute toggle and 
 The overlays close on click-away or Escape. **Space plays or pauses** whenever focus is inside the
 player — after a click on the rail (it takes focus), in the sync bar, or on any tray button — except
 in a text field. It overrides a focused button's own Space activation on purpose (Enter still presses
-the button); focus outside the player, in the score, is the editor's. The Sound selector sits beside them unless the
+the button). Focus in the SCORE plays too, by the same rule and for the same reason: the viewer
+reports the keystroke as `transport-toggle` — the two-finger tap's event — and the host calls
+`toggle()`. The two scopes are disjoint, so nothing fires twice, and the editor keeps `N` for
+note entry rather than Space (`src/edit/keymap.ts`). The Sound selector sits beside them unless the
 host sets `soundControl = false` — studio does, because its Instruments sheet chooses a
 sound per part, and the rail gets the room. Likewise the Source select (and the host's
 `source-tools` slot beside it) shows unless `sourceControl = false`; studio chooses what

@@ -24,6 +24,7 @@
 | Double tap | Zoom reset | `zoom = null`, `densityH = null` — back to **fitted**, not to 1.0 |
 | Double tap, hold, drag | Staff × space zoom, diagonal drives both | `zoom` (0.4–4sp), `densityH` (0–8sp) |
 | Two-finger tap | Play/pause | a `transport-toggle` event, not the player |
+| Space (keyboard) | Play/pause | the same event — see Carried forward 3 |
 | Pinch (touch) | Staff × space zoom: fingers apart vertically grows the staff, apart horizontally opens the spacing; a diagonal drives both | the same two knobs, the same ladder, stepped by the change in the fingers' span at half the drag's rate (`PINCH_PX_PER_STEP = 12`) |
 | Pinch (trackpad) | Staff; **Shift**+pinch → space | arrives as `wheel` with `ctrlKey` — the browser's encoding of a pinch, which is why Ctrl cannot be the modifier — 10 units per step, mouse-wheel notches clamped |
 
@@ -221,10 +222,12 @@ are not enough on the device.
    `data-source-id` each frame. Related pre-existing defect: `revealBox`'s
    `this.scrollBy` (`DocumentViewer.ts:1160`) scrolls the viewer host, which is
    no longer the scroller in either shell — see 5.
-3. **No keyboard play/pause.** The button (`Player.ts:331`) remains the
-   non-gesture path, which satisfies the accessibility requirement; a key binding
-   would have to negotiate with the editor keymap, where `Space` is `toggleNote`
-   (`src/edit/keymap.ts:169`).
+3. ~~**No keyboard play/pause.**~~ **Resolved 2026-09-20.** The negotiation with
+   the editor keymap went the way the convention does: `Space` is play/pause and
+   `toggleNote` moved to `N`, the letter MuseScore and Sibelius give note input.
+   The viewer emits `transport-toggle` on Space — **this gesture's own event**,
+   so the keyboard path and the two-finger tap are the same seam and the host
+   wiring was already in place. The button remains the accessible path.
 4. **No tests**, by convention — `harness/` may not import `elements/`, and this
    is timing-and-threshold code against real PointerEvents. It ships the way
    `ZoomPad.ts` ships.

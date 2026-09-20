@@ -34,6 +34,7 @@ import { renderMnxToSvgBoth } from '../engine/both/bothRenderer.ts';
 import { getSmuflData, isSmuflLoaded, loadSmufl } from '../engine/smufl/smufl.ts';
 import { emitPlan, type RenderPlan } from '../engine/render/plan.ts';
 import type { LayoutReply, LayoutRequest, PlanInputs, PlanRequest } from './layout.worker.ts';
+import { isTextEntry } from './keyScope.ts';
 import {
   clampStaffSp,
   renderScale,
@@ -905,6 +906,8 @@ export class DocumentViewer extends LitElement {
     if (!this.hasAttribute('tabindex')) this.setAttribute('tabindex', '0');
     window.addEventListener('resize', this.resizeHandler);
     this.addEventListener('scroll', this.onAnchorScroll);
+    this.addEventListener('keydown', this.onTransportKey);
+    this.addEventListener('keyup', this.onTransportKeyup);
     this.syncGestures();
   }
 
@@ -916,6 +919,8 @@ export class DocumentViewer extends LitElement {
     this.boundContainer = null;
     window.removeEventListener('resize', this.resizeHandler);
     this.removeEventListener('scroll', this.onAnchorScroll);
+    this.removeEventListener('keydown', this.onTransportKey);
+    this.removeEventListener('keyup', this.onTransportKeyup);
     this.containerObserver?.disconnect();
     this.containerObserver = null;
     this.cancelEnclosureTween?.();
@@ -1892,6 +1897,34 @@ export class DocumentViewer extends LitElement {
     if (!box) return;
     this.revealBox(box,globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches?'auto':'smooth');
   }
+
+  /**
+   * Space is play/pause at the score, the convention every notation package
+   * keeps (MuseScore, Sibelius, Finale, Dorico, Guitar Pro all hold it) and the
+   * reason `toggleNote` moved to `N`. The viewer does not know a player exists:
+   * it reports the keystroke as the same `transport-toggle` the two-finger tap
+   * emits, and the host decides what that means — with no player bound it is a
+   * no-op, never an error.
+   *
+   * It overrides a focused button's own activation on purpose, exactly as the
+   * player's tray does: after clicking a badge, Space means play, not "press
+   * that again" (Enter still presses it). A text field keeps its space, and a
+   * modified stroke is somebody else's.
+   */
+  private spaceIsTransport(event: KeyboardEvent) {
+    return event.key === ' ' && !event.defaultPrevented && !event.isComposing
+      && !event.metaKey && !event.ctrlKey && !event.altKey && !event.shiftKey
+      && !isTextEntry(event.composedPath()[0]);
+  }
+
+  private onTransportKey = (event: KeyboardEvent) => {
+    if (!this.spaceIsTransport(event)) return;
+    event.preventDefault();
+    this.dispatchEvent(new CustomEvent('transport-toggle', { bubbles: true, composed: true }));
+  };
+
+  /** Chrome activates a focused button on Space's keydown being unprevented, Firefox on its keyup: both are taken. */
+  private onTransportKeyup = (event: KeyboardEvent) => { if (this.spaceIsTransport(event)) event.preventDefault(); };
 
   private anchorScrollQueued = false;
 

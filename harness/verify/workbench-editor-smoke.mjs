@@ -324,7 +324,25 @@ try {
   assert.equal(rebound.observer, true, 'the returning container got no resize observer, so the score would not re-engrave on a width change');
   assert.ok(rebound.fired, 'a press on a viewer whose container arrived late emitted no placement');
 
-  console.log(`Workbench editor smoke passed: unclaimed keys, an edit shown and walked from the ops panel, revert and construct replay rebinding the editor, the destruct sweep, delete's sentence, ${refusals} refused rung(s) flashed, the inspector closed by a pointer outside and opened from the chip, the rail walked from the document rung with the rung carried across, a pointer placing the cursor on the note it clicked with a hover ghost before it, and a viewer whose document arrived late still binding its score surface.`);
+  // ── Space at the score is the transport, not an editor key ────────────────
+  // The viewer reports it as `transport-toggle` (the two-finger tap's event)
+  // and the host calls toggle(), so the keystroke never has to know a player
+  // exists. `toggleNote` moved to `N` to make room; that binding is pinned in
+  // harness/conformance/keymap-docs.test.ts, along with Space resolving to
+  // NOTHING in the keymap — which is what lets the event reach the surface.
+  await open('lab/document/twelve-bar-blues');
+  await until(`find(document, 'mnx-player')?.performance`, 'the scenario page never loaded a performance');
+  await run(`viewer().focus(); return true;`);
+  assert.equal(await run(`return find(document, 'mnx-document-viewer') === page().shadowRoot.activeElement;`), true,
+    'the score did not take focus, so this proves nothing about a key pressed at it');
+  await press(' ', 'Space', 32);
+  await until(`find(document, 'mnx-player').snapshot?.state === 'playing'`, 'Space at the score did not start playback');
+  await press(' ', 'Space', 32);
+  await until(`find(document, 'mnx-player').snapshot?.state !== 'playing'`, 'Space again did not pause');
+  assert.equal(await run(`return window.scrollY === 0 && document.documentElement.scrollTop === 0;`), true,
+    'Space scrolled the page: the surface did not take the keystroke');
+
+  console.log(`Workbench editor smoke passed: unclaimed keys, an edit shown and walked from the ops panel, revert and construct replay rebinding the editor, the destruct sweep, delete's sentence, ${refusals} refused rung(s) flashed, the inspector closed by a pointer outside and opened from the chip, the rail walked from the document rung with the rung carried across, a pointer placing the cursor on the note it clicked with a hover ghost before it, and a viewer whose document arrived late still binding its score surface, and Space at the score playing and pausing the transport.`);
 } finally {
   ws?.close();
   chrome.kill();

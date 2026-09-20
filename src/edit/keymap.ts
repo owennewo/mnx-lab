@@ -164,9 +164,13 @@ export const EDIT_LAYER: KeymapLayer = {
     // `B` beams in notation, bends in tab.
     { code: 'KeyB', intent: { type: 'toggleBeam' } },
     // The notation projection's entry action: toggle a notehead at the
-    // cursor's (staff position × beat) cell. Binding provisional — Space is
-    // the play/pause convention elsewhere; the ladder review owns the call.
-    { code: 'Space', intent: { type: 'toggleNote' } },
+    // cursor's (staff position × beat) cell. `N` is the letter MuseScore and
+    // Sibelius both give to note input, and taking it settles the question the
+    // provisional Space binding left open: Space is play/pause, here as
+    // everywhere else, and the score surface reports it as a transport gesture
+    // (`DocumentViewer`'s `transport-toggle`, beside the two-finger tap).
+    // Ours toggles a cell rather than opening a mode, so it stays one key.
+    { code: 'KeyN', intent: { type: 'toggleNote' } },
     { code: 'KeyZ', ctrl: true, intent: { type: 'undo' } },
     { code: 'KeyY', ctrl: true, intent: { type: 'redo' } },
     { code: 'KeyZ', ctrl: true, shift: true, intent: { type: 'redo' } }

@@ -11,6 +11,7 @@ import {
 } from '../../src/edit/keymapDocs.ts';
 import {
   LADDER_JUMP_LEVELS,
+  EDIT_LAYER,
   NAVIGATION_LAYER,
   TAB_DIGIT_LAYER,
   resolveIntent,
@@ -206,12 +207,23 @@ describe('keymap docs — the guard mirrors', () => {
   });
 
   it('toggleNote: documented notation-only, and the tab projection refuses', () => {
-    const doc = KEY_DOCS.find(d => d.strokes.some(s => s.code === 'Space'))!;
+    const doc = KEY_DOCS.find(d => d.strokes.some(s => s.code === 'KeyN'))!;
     expect(doc.requires).toBe('notationProjection');
 
     const session = new EditorSession(makeDoc()); // string mode ⇒ tab projection
     expect(session.projection).toBe('tab');
     expect(session.handleIntent({ type: 'toggleNote' })).toBe(false);
+  });
+
+  /** Space belongs to the transport, at the score as in the player's own tray:
+   *  the editor must resolve it to NOTHING so the keystroke reaches the score
+   *  surface, which reports it as `transport-toggle`. This is the guard on that
+   *  — a binding added here would silently take play/pause back. */
+  it('Space is nobody’s editor key, in either projection', () => {
+    for (const layers of [[NAVIGATION_LAYER, EDIT_LAYER], [NAVIGATION_LAYER, EDIT_LAYER, TAB_DIGIT_LAYER]])
+      expect(resolveKeyAction({ code: 'Space' }, layers)).toBeNull();
+    expect(allBindingStrokes().some(s => s.code === 'Space')).toBe(false);
+    expect(KEY_DOCS.some(d => d.strokes.some(s => s.code === 'Space'))).toBe(false);
   });
 
   it('the clipboard: copy/paste at every rung, cut documented everywhere but score — and the planner refuses there', () => {
@@ -264,13 +276,13 @@ describe('the cheatsheet render', () => {
     ).toBe(true);
   });
 
-  it('is context-dependent: no fret row without a tab pane, no Space in tab', () => {
+  it('is context-dependent: no fret row without a tab pane, no N in tab', () => {
     const notation = cheatsheet('note', { tabPane: false, projection: 'notation' });
     expect(notation.flatMap(g => g.rows).some(r => r.keys === '0–9')).toBe(false);
-    expect(notation.flatMap(g => g.rows).some(r => r.keys === 'Space')).toBe(true);
+    expect(notation.flatMap(g => g.rows).some(r => r.keys === 'N')).toBe(true);
 
     const tab = cheatsheet('note', { tabPane: true, projection: 'tab' });
-    expect(tab.flatMap(g => g.rows).some(r => r.keys === 'Space')).toBe(false);
+    expect(tab.flatMap(g => g.rows).some(r => r.keys === 'N')).toBe(false);
   });
 
   it('groups arrive in display order with no empty groups', () => {

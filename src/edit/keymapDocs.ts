@@ -249,8 +249,8 @@ export const KEY_DOCS: KeyDoc[] = [
     meaning: { note: 'enter a fret on the cursor’s string (digits compose for 500 ms: 1,2 → 12)' }
   },
   {
-    keys: 'Space',
-    strokes: [{ code: 'Space' }],
+    keys: 'N',
+    strokes: [{ code: 'KeyN' }],
     group: 'entry',
     requires: 'notationProjection',
     meaning: { note: 'toggle a notehead at this staff-position × beat cell' }
