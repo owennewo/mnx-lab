@@ -39,14 +39,22 @@ export function playbackVoiceSlot(voice: number): number {
 }
 
 /**
- * Paint `sounding` (DOM source id → 1-based voice) onto every inked node under
+ * Paint `sounding` (DOM id → 1-based voice) onto every inked node under
  * `root`. Ink outside the performed slice (`unperformed`) never lights.
+ *
+ * Two names are read, not one. `data-source-id` is the score's shared
+ * vocabulary — the selection, the hit test and this paint all speak it.
+ * `data-playback-id` belongs to ink that exists for the playhead ALONE: the
+ * tab staff's rest pill, which must light like any other mark and must not
+ * join a selection or answer a click (`layout/tabStaff.ts`). A node carrying
+ * either one is lit the same way.
  */
 export function paintPlaybackInk(root: ParentNode, sounding: ReadonlyMap<string, number>): void {
-  for (const ink of root.querySelectorAll<SVGElement>('[data-source-id]')) {
+  for (const ink of root.querySelectorAll<SVGElement>('[data-source-id], [data-playback-id]')) {
+    const key = ink.getAttribute('data-source-id') ?? ink.getAttribute('data-playback-id') ?? '';
     const voice = ink.classList.contains('unperformed')
       ? undefined
-      : sounding.get(ink.getAttribute('data-source-id') ?? '');
+      : sounding.get(key);
     ink.classList.toggle('playback-ink', voice !== undefined);
     if (voice === undefined) ink.removeAttribute('data-playback-voice');
     else ink.setAttribute('data-playback-voice', String(playbackVoiceSlot(voice)));

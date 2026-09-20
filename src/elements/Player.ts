@@ -13,6 +13,7 @@ import { SynthBackend } from '../audio/native/synthBackend.ts';
 import { createRecordingSync } from '../audio/recordingSync.ts';
 import { scorePositionAt } from '../audio/scorePosition.ts';
 import { linearizePasses } from '../model/passes.ts';
+import { restSpansOf, restsAt, type RestSpan } from '../model/restSpans.ts';
 import {
   SAMPLE_PRESETS,
   type SamplePreset,
@@ -23,7 +24,7 @@ import { partBuses, partLevel, partSound, requiredPresets, voicePresetFor, type 
 import { formatPlaybackPosition, formatScorePlaybackPosition, measureAt, placeLabel, playbackPositionParts, scorePlaybackPositionParts, widestPlaceLabel, type PlaybackPositionParts } from '../audio/playbackPosition.ts';
 import { ZERO, type Rational } from '../audio/time.ts';
 import type { MnxStructure } from '../model/mnx.ts';
-import type { PlaybackUpdate } from './mnxContext.ts';
+import type { PlaybackOccurrence, PlaybackUpdate } from './mnxContext.ts';
 import { ClickTrack } from '../audio/native/click.ts';
 import { beatTimes, decodeSyncSegments, defaultBeatUnit, emptySyncSegments, playingSyncpoints, syncpointsFromSegments, type SyncSegments } from '../model/syncSegments.ts';
 import type { SoundsliceSyncpoint } from '../model/recordingSync.ts';
@@ -613,6 +614,36 @@ export class Player extends LitElement {
       if (resume) void this.play();
     }
   }
+  /** Rests built once per document; the publish runs every beat. */
+  private restCache: { doc: MnxStructure; spans: readonly RestSpan[] } | null = null;
+
+  /**
+   * THE SILENCE UNDER THE PLAYHEAD, as occurrences the paint can light.
+   *
+   * A rest sounds nothing, so it is not in the backend's `highlight` — that
+   * list comes from note attacks and releases, and always will. But a reader
+   * following the music wants to see WHERE the beat is during a bar's rest as
+   * much as during its notes, so the written position the backend already
+   * reports is intersected with the document's rests here and the result
+   * joins the same channel. A rest lights exactly like a note, in its own
+   * voice's colour, on whichever staves drew it.
+   *
+   * Nothing is published while the playhead is hidden or parked: `visible`
+   * already decides that for the bar readout, and a rest lit by a stopped
+   * transport would be a cursor pretending to be a performance.
+   */
+  private restsUnderPlayhead(position: ScorePosition | null): PlaybackOccurrence[] {
+    const doc = this.document;
+    if (!position || !doc || !this.performance) return [];
+    // `ScorePosition.ordinal` names a performed VISIT; the rests are written,
+    // so the visit is resolved back to the bar it is a copy of.
+    const measure = this.performance.measures[position.ordinal];
+    if (!measure) return [];
+    if (this.restCache?.doc !== doc) this.restCache = { doc, spans: restSpansOf(doc) };
+    return restsAt(this.restCache.spans, measure.measureIndex, position.metricOffset)
+      .map(span => ({ noteKey: span.key, ordinal: position.ordinal }));
+  }
+
   private publish() {
     const status = this.status;
     const visible = status && !status.hidePlayhead && (status.state !== 'stopped' || status.highlight.length > 0);
@@ -624,7 +655,8 @@ export class Player extends LitElement {
       preRollSeconds: Math.max(0, bounds.startSeconds),
       postRollSeconds: Math.max(0, (bounds.durationSeconds ?? bounds.endSeconds) - bounds.endSeconds)
     } : null;
-    const detail: PlaybackUpdate = { documentId: this.documentId, ordinal, highlight: [...(status?.highlight ?? [])],
+    const detail: PlaybackUpdate = { documentId: this.documentId, ordinal,
+      highlight: [...(status?.highlight ?? []), ...this.restsUnderPlayhead(visible ? status?.scorePosition ?? null : null)],
       playing: status?.wantsPlayback ?? false, recordingBookends, mediaPhase: status?.mediaPhase ?? null };
     this.dispatchEvent(new CustomEvent('playback-position', { detail: {
       documentId: this.documentId, sourceId: status?.sourceId, kind: status?.kind,

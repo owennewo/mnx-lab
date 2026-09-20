@@ -1,6 +1,7 @@
 import { engravingEntries } from '../engine/layout/unrolled.ts';
 import { occurrenceKey, parseOccurrenceKey } from '../model/noteKeys.ts';
 import { forEachNoteAddress } from '../model/noteWalk.ts';
+import { restSpansOf } from '../model/restSpans.ts';
 import type { MnxStructure } from '../model/mnx.ts';
 import { withHiddenParts, type VisibleParts } from '../model/partVisibility.ts';
 import { paintPlaybackInk } from '../engine/render/playbackInk.ts';
@@ -740,6 +741,25 @@ export class DocumentViewer extends LitElement {
           color-mix(in oklab, var(--playback-voice) 40%, var(--paper, oklch(0.235 0.008 80)))
         ) !important;
         rx: 3px;
+      }
+
+      /* THE TAB STAFF'S REST PILL. Tab draws no rest, so a reader following
+         a performance on the fingerboard has nothing to follow through one —
+         and a blank staff is also what held notes look like. The layout puts
+         an invisible pill on the centre band spanning the rest's duration
+         (layout/tabStaff.ts); it appears only under the playhead, hollow, so
+         it reads as "the beat is here and nothing is fretted" rather than as
+         a note. Dashed, because a rest is a silence and the sounding mark is
+         a solid tinted pill — the shapes must not be confused at a glance. */
+      :host #projection-container svg .tab-rest-pill { display: none; }
+      :host #projection-container svg .tab-rest-pill.playback-ink,
+      :host([selection-inactive]) #projection-container svg .tab-rest-pill.playback-ink {
+        display: inline;
+        fill: none !important;
+        stroke: var(--playback-voice);
+        stroke-width: 1.25px;
+        stroke-dasharray: 3 2.5;
+        opacity: 0.85;
       }
 
       /* Emit-side hide (docs/core-viewer-surface.md): diagnostic badges sit
@@ -1830,6 +1850,10 @@ export class DocumentViewer extends LitElement {
     if (this.voiceByKey?.doc !== doc) {
       const voices = new Map<string, number>();
       forEachNoteAddress(doc, address => voices.set(address.key, address.voiceIndex + 1));
+      // Rests are lit by the playhead too, and they are not notes — without
+      // their keys here every rest would come back voice 1 and a second
+      // voice's silence would light in the first voice's blue.
+      for (const span of restSpansOf(doc)) voices.set(span.key, span.voiceIndex + 1);
       this.voiceByKey = { doc, voices };
     }
     return this.voiceByKey.voices.get(noteKey) ?? 1;

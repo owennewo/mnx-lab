@@ -144,9 +144,77 @@ class FakeRoot {
   querySelectorAll() { return this.nodes as unknown as NodeListOf<SVGElement>; }
 }
 
+const pill = (id: string, extra: string[] = []) =>
+  new FakeNode({ 'data-playback-id': id }, ['tab-rest-pill', ...extra]);
 const mask = (id: string, x: number, w: number, end: number, extra: string[] = []) =>
   new FakeNode({ 'data-source-id': id, x: String(x), width: String(w), y: '40', height: '16', 'data-span-end': String(end) }, ['fret-bg', ...extra]);
 const digit = (id: string, extra: string[] = []) => new FakeNode({ 'data-source-id': id }, ['fret-number', ...extra]);
+
+/** The tab staff's rest pill: the playhead's only foothold where tab draws
+ *  nothing (layout/tabStaff.ts). It must be as invisible to the goldens as
+ *  the duration spans are, and as invisible to the SELECTION as it is to
+ *  them — hence a name of its own rather than a `sourceId`. */
+describe('the tab rest pill', () => {
+  initSmufl();
+  /** One 4/4 bar on a tab part: a quarter, a half rest, a quarter. */
+  const doc = {
+    mnx: { version: 1 },
+    global: { measures: [{ time: { count: 4, unit: 4 } }] },
+    parts: [{
+      id: 'guitar',
+      _x: { mnxLab: { strings: STRINGS, tab: { staffKind: 'both' } } },
+      measures: [{
+        clefs: [{ clef: { sign: 'G', staffPosition: -2, octave: -1 } }],
+        sequences: [{ content: [
+          note('a1', 1, 'quarter'),
+          { duration: { base: 'half' }, rest: {} },
+          note('a2', 1, 'quarter')
+        ] }]
+      }]
+    }]
+  } as unknown as MnxStructure;
+  const pills = (primitives: readonly { kind: string; className?: string }[]) =>
+    primitives.filter((p): p is Rect =>
+      p.kind === 'rect' && (p.className ?? '').split(' ').includes('tab-rest-pill'));
+
+  it('is absent from an unasked layout — the goldens never see it', () => {
+    for (const layout of [layoutTab({ mnx: doc, widthSp: WIDTH_SP }), layoutBothSystem({ mnx: doc, widthSp: WIDTH_SP })]) {
+      expect(pills(layout.primitives)).toEqual([]);
+    }
+  });
+
+  it('spans the rest and is named for the playhead alone', () => {
+    const layout = layoutTab({ mnx: doc, widthSp: WIDTH_SP, durationSpans: true });
+    const found = pills(layout.primitives);
+    expect(found).toHaveLength(1);
+    const [rest] = found;
+    // The name notation gives the same rest, so ONE lookup lights both staves.
+    expect(rest.playbackId).toBe('@m0.v0.e1');
+    // Never the shared vocabulary: no selection may enclose it, no click find it.
+    expect(rest.sourceId).toBeUndefined();
+    // It reaches from its own column towards the next one.
+    const digits = layout.primitives.filter((p): p is Rect =>
+      p.kind === 'rect' && (p.className ?? '').split(' ').includes('fret-bg'));
+    const after = digits.find(d => d.sourceId === 'a2')!;
+    expect(rest.w).toBeGreaterThan(0);
+    expect(rest.x).toBeGreaterThan(digits.find(d => d.sourceId === 'a1')!.x);
+    expect(rest.x + rest.w).toBeLessThan(after.x + after.w);
+  });
+
+  it('the notation staff grows none of its own — it draws the rest itself', () => {
+    const layout = layoutNotation({ mnx: doc, widthSp: WIDTH_SP, durationSpans: true });
+    expect(pills(layout.primitives)).toEqual([]);
+  });
+
+  it('the emitter surfaces the name as data-playback-id, and only when asked', () => {
+    const layout = layoutTab({ mnx: doc, widthSp: WIDTH_SP, durationSpans: true });
+    const svg = renderSvgToString({ primitives: layout.primitives, widthSp: layout.widthSp, heightSp: layout.heightSp, pxPerSp: 16 });
+    expect(svg).toContain('data-playback-id="@m0.v0.e1"');
+    const plain = layoutTab({ mnx: doc, widthSp: WIDTH_SP });
+    expect(renderSvgToString({ primitives: plain.primitives, widthSp: plain.widthSp, heightSp: plain.heightSp, pxPerSp: 16 }))
+      .not.toContain('data-playback-id');
+  });
+});
 
 describe('the playback paint', () => {
   it('stretches a sounding mask to its span, pads it, and restores it afterwards', () => {
@@ -171,6 +239,19 @@ describe('the playback paint', () => {
     expect(m.getAttribute('data-playback-voice')).toBeNull();
     expect(m.getAttribute('data-mask-x')).toBeNull();
     expect(m.getAttribute('data-mask-y')).toBeNull();
+  });
+
+  it('lights ink named for the playhead alone, beside ink named for everyone', () => {
+    const rest = pill('@m0.v0.e1');
+    const m = digit('m1');
+    const root = new FakeRoot([m, rest]) as unknown as ParentNode;
+    paintPlaybackInk(root, new Map([['@m0.v0.e1', 2]]));
+    expect(rest.classes.has('playback-ink')).toBe(true);
+    expect(rest.getAttribute('data-playback-voice')).toBe('2'); // its own voice's colour
+    expect(m.classes.has('playback-ink')).toBe(false);
+    paintPlaybackInk(root, new Map());
+    expect(rest.classes.has('playback-ink')).toBe(false);
+    expect(rest.getAttribute('data-playback-voice')).toBeNull();
   });
 
   it('a repaint while still sounding is idempotent', () => {

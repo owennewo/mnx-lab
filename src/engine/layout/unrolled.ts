@@ -223,6 +223,12 @@ export function qualifyMeasure(
     if (address.measureIndex === entry.measureIndex) locations.set(address.key, address);
   });
   for (const primitive of primitives.slice(start)) {
+    // The tab rest pill is named for the PLAYHEAD only, and the playhead
+    // speaks occurrence keys in this layout like everything else — so its
+    // name is stamped here too, beside the ids it sits among.
+    if (primitive.kind === 'rect' && primitive.playbackId !== undefined) {
+      primitive.playbackId = occurrenceKey(primitive.playbackId, entry.ordinal);
+    }
     if (!primitive.sourceId) continue;
     const key = primitive.sourceId;
     primitive.sourceId = occurrenceKey(key, entry.ordinal);

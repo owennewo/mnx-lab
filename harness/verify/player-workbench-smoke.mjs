@@ -50,6 +50,44 @@ try{
     check(page.shadowRoot.querySelector('mnx-document-viewer').playbackState.ordinal===measures[back].ordinal,'Viewer missed D.S. return');player.stop();
     return {routing:true,selection:true,editReset:true,dalSegno:true};
   })()`));
+  // THE PLAYHEAD STANDS IN A REST. A rest sounds nothing, so it is absent
+  // from the backend's highlight — which is built from note attacks — and the
+  // page went blank at every silence: on the notation staff the rest simply
+  // never lit, and the tab staff, which draws no rest at all, had nothing to
+  // light. `model/restSpans.ts` resolves the written position the backend
+  // already reports into the drawn rests there, and this proves the two ends
+  // meet in a real browser: the rest glyph takes the voice colour, and the tab
+  // staff's pill (invisible until now, by stylesheet) appears beside it.
+  console.log('rest under the playhead',await cdp.evaluate(`(async()=>{
+    const check=(v,m)=>{if(!v)throw new Error(m);},delay=ms=>new Promise(r=>setTimeout(r,ms));
+    const page=document.querySelector('mnx-workbench').shadowRoot.querySelector('mnx-scenario-page');
+    location.hash='#/scenario/lab/document/navigation-playground';
+    const player=page.shadowRoot.querySelector('mnx-player');
+    for(let i=0;i<120 && player.documentId!=='lab/document/navigation-playground';i++)await delay(50);
+    for(let i=0;i<120 && !player.performance;i++)await delay(50);
+    const viewer=page.shadowRoot.querySelector('mnx-document-viewer');
+    viewer.view='both'; // the tab staff has to be on the page to be judged
+    await delay(400);
+    // Bar 3 (index 2) opens with a whole rest in the fingerboard part — long
+    // enough that the playhead is still inside it when this looks.
+    const at=player.performance.measures.findIndex(m=>m.measureIndex===2);
+    check(at>=0,'The fixture no longer performs the bar that holds the rest');
+    player.seek(at);await player.play();await delay(300);
+    const rest=viewer.shadowRoot.querySelector('.rest.playback-ink');
+    check(rest,'The notation rest under the playhead never took the playback colour');
+    const pill=viewer.shadowRoot.querySelector('.tab-rest-pill.playback-ink');
+    check(pill,'The tab staff showed nothing where the playhead was resting');
+    // Hollow, so it cannot be read as a note, and coloured like the voice.
+    const painted=getComputedStyle(pill);
+    check(painted.fill==='none','The rest pill is filled — it reads as a sounding note');
+    check(painted.display!=='none','The rest pill is still hidden while lit');
+    check(painted.strokeDasharray && painted.strokeDasharray!=='none','The rest pill is not dashed');
+    // And it goes away again: silence marked only while the playhead is in it.
+    player.stop();await delay(300);
+    check(!viewer.shadowRoot.querySelector('.tab-rest-pill.playback-ink'),'The rest pill outlived the playhead');
+    check(!viewer.shadowRoot.querySelector('.rest.playback-ink'),'The lit rest outlived the playhead');
+    return {notationRest:true,tabPill:true,cleared:true};
+  })()`));
   await cdp.send('Page.navigate',{url:`http://127.0.0.1:${review.port}/performance.html`});
   let listen=false;for(let i=0;i<100;i++){listen=await cdp.evaluate(`!!document.querySelector('mnx-player')?.performance`);if(listen)break;await new Promise(r=>setTimeout(r,100));}
   if(!listen)throw new Error('Static review Listen did not initialize');

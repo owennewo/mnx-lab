@@ -162,6 +162,19 @@ export interface RectPrim extends PrimitiveBase {
   spanEndX?: number;
   spanEndDx?: number;
   /**
+   * A PLAYBACK-ONLY name, emitted as `data-playback-id`.
+   *
+   * Deliberately not `sourceId`: that attribute is the selection's and the
+   * hit-test's vocabulary as well as the paint's, so a rect carrying it would
+   * join the enclosure the editor draws around a selected rest and become a
+   * click target the reader cannot see. This rect exists for the playhead
+   * alone — `render/playbackInk.ts` lights it, nothing else looks.
+   *
+   * Present only when the layout was asked for `durationSpans`, so — like
+   * `spanEndX` above — the goldens never see it.
+   */
+  playbackId?: string;
+  /**
    * `w` is a HORIZONTAL DISTANCE in layout space — the gap between two musical
    * x positions — rather than ink measured in staff spaces.
    *

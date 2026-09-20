@@ -1,4 +1,4 @@
-import { occurrenceKey } from '../../model/noteKeys.ts';
+import { occurrenceKey, syntheticEventKey } from '../../model/noteKeys.ts';
 import type { ContainerIndex } from '../../model/noteKeys.ts';
 import { MnxEvent, MnxGrace, MnxSequence, MnxTuplet, isGrace, isTimedEvent, isTuplet } from '../../model/mnx.ts';
 import { emitSpanMarks, TAB_ARPEGGIO_EXTRA_GAP_SP, type SpanMarks } from './arpeggio.ts';
@@ -100,6 +100,11 @@ const FRET_BG_HEIGHT_SP = Math.min(
  * (`render/playbackInk.ts`), so the goldens never see it.
  */
 const MASK_END_CLEAR_SP = 1.0;
+
+/** How far ahead of its column the rest pill starts, in ink staff spaces —
+ *  the same air `render/playbackInk.ts` gives a stretched fret mask on its
+ *  left, so the two marks begin at the same distance from their beat. */
+const REST_PILL_LEAD_SP = 0.4;
 
 const ACTIVE_COLOR = 'oklch(0.65 0.22 274)';
 const SELECTED_COLOR = 'oklch(0.7 0.15 190)';
@@ -604,6 +609,45 @@ export function emitTabVoices(args: EmitTabVoicesArgs): void {
     if (event.rest) {
       // Tab convention: rests in tab-only view consume time but aren't
       // drawn. (When tab pairs with a notation staff, rests live there.)
+      //
+      // The PLAYHEAD still has to be able to stand here. A tab reader
+      // following a performance otherwise loses it at every rest: the staff
+      // goes blank, and blank is also what a bar of held notes looks like.
+      // So the rest gets an invisible pill on the centre band — the same
+      // shape as a sounding digit's mask, at the same height, spanning the
+      // rest's own duration, drawn hollow by the viewer's stylesheet only
+      // while the playhead is inside it (`render/playbackInk.ts`).
+      //
+      // It is emitted under `durationSpans`, the flag the viewer passes and
+      // the goldens never do, so the committed engraving is untouched — and
+      // it carries `playbackId`, not `sourceId`, so it joins no selection
+      // and answers no click (see `primitives.ts`).
+      if (durationSpans) {
+        // The key notation spells for the same rest (`layout/notation.ts`),
+        // so one playhead lookup lights both staves of the combined view.
+        const restKey = event.id ?? (synthesizeKeys
+          ? syntheticEventKey({
+              partIndex: args.keyPartIndex ?? 0,
+              measureIndex,
+              staffIndex: args.keyStaffIndex ?? 1,
+              voiceIndex,
+              eventIndex
+            })
+          : undefined);
+        if (restKey !== undefined) {
+          primitives.push({
+            kind: 'rect',
+            x: eventX - REST_PILL_LEAD_SP * ink,
+            y: staffTop + TAB_STAFF_HEIGHT_SP / 2 - FRET_BG_HEIGHT_SP / 2,
+            w: eventEndX - MASK_END_CLEAR_SP - (eventX - REST_PILL_LEAD_SP * ink),
+            h: FRET_BG_HEIGHT_SP,
+            spanW: true,
+            radius: FRET_BG_HEIGHT_SP / 2,
+            className: 'tab-rest-pill',
+            playbackId: restKey
+          });
+        }
+      }
       return;
     }
     if (!event.notes || event.notes.length === 0) return;
