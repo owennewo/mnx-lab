@@ -80,7 +80,14 @@ from the score is the viewer's `hiddenParts`, and never silences it.
   from the compiled performance, and the player intersects the written position it
   already reports with the document's rests (`model/restSpans.ts`) so the playhead can
   stand in a silence. A rest's key is the one the layouts stamp on its glyph, so the
-  same paint lights it, in its own voice's colour. Identical context updates
+  same paint lights it, in its own voice's colour. The TAB staff draws no rest by
+  convention, so it would have nothing to light: the layout puts an invisible pill on
+  its centre band spanning the rest's duration, drawn hollow and dashed by the viewer's
+  stylesheet only while the playhead is inside it. The pill carries `data-playback-id`
+  rather than `data-source-id` — it exists for the playhead alone, joins no selection
+  and answers no click — and is emitted under `durationSpans`, the flag the viewer
+  passes and the goldens never do, so the committed engraving is untouched.
+  Identical context updates
   are suppressed. `seek`, `onset` and `bar` are bubbling, composed events;
   onsets include the transport's scheduled audio time and written occurrence id.
 - `voicePreset`, `partMix` and `soundControl` — the sound every unmixed part plays, the

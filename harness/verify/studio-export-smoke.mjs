@@ -75,4 +75,8 @@ try {
  await p.send('Page.close'); pw.close();
  }
  }
-}finally{ws?.close();chrome.kill();await new Promise(r=>chrome.once('exit',r));server.server.close();fs.rmSync(profile,{recursive:true,force:true,maxRetries:3,retryDelay:100});}
+}finally{ws?.close();chrome.kill();await new Promise(r=>chrome.once('exit',r));server.server.close();
+  // Litter, not a failure: a throw here from `finally` would replace whatever
+  // the smoke was reporting (docs/browser-smokes.md).
+  try{fs.rmSync(profile,{recursive:true,force:true,maxRetries:5,retryDelay:100});}catch{}
+}

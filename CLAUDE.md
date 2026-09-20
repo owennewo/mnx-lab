@@ -355,9 +355,14 @@ output names refuse to overwrite).
   `harness/conformance/` over Miniflare's local D1/R2 with signed identities
   (`library*.test.ts`, `piece-*.test.ts`, `recording-management.test.ts`); the assist demo
   and the UI have no unit tests. The UI's proof is the real-browser smokes in
-  `harness/verify/*-smoke.mjs` (`npm run smoke:*`) — **not part of the gates**, so run the
-  relevant ones by hand after touching a shell or an element. Those that need the library
-  want `npm run dev:login` and `wrangler dev` on a free port
+  `harness/verify/*-smoke.mjs` (`npm run smoke:*`, and five that have no script and are
+  run with `node` after a build) — **not part of the gates**, so run the relevant ones by
+  hand after touching a shell or an element. Their traps are all harness facts rather
+  than facts about the code, and every one has cost a debugging session: a glyph's box is
+  its whole em square, navigating to the same `#fragment` does not reload, scrolling
+  detaches a held node, and a throw from `finally` replaces the failure being reported —
+  [docs/browser-smokes.md](docs/browser-smokes.md). Those that need the library want
+  `npm run dev:login` and `wrangler dev` on a free port
   ([docs/library-access.md](docs/library-access.md) → Local development).
 - `dist/` is gitignored build output. The scratch site for proposal verification comes
   from `makesite` in the worktree, not from this repo.

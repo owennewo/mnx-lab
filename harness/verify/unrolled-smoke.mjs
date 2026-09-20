@@ -134,5 +134,8 @@ try {
   }
   server?.server.close();
   review?.server.close();
-  fs.rmSync(profile, { recursive: true, force: true });
+  // Litter, not a failure: Chrome goes on flushing its cache after it reports
+  // exit, so this races and sometimes loses. Throwing here from `finally`
+  // REPLACES whatever the smoke was reporting — see docs/browser-smokes.md.
+  try { fs.rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 }); } catch {}
 }
