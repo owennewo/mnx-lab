@@ -53,6 +53,16 @@ import {
   snapshotEnclosure,
   tweenEnclosure
 } from './enclosure.ts';
+import {
+  buildPointerMap,
+  drawPointerGhost,
+  hitTest,
+  ordinalsOf,
+  type PointerPlacement,
+  type RenderedStaff,
+  type ScorePointerMap
+} from './pointerHitTest.ts';
+import { unitsPerSp } from './scoreGeometry.ts';
 import type { RenderedProjection } from '../engine/render/projection.ts';
 // The view-mode axis belongs to the embeddable surface: the shell's toolbar
 // imports it from here, never the other way around.
@@ -270,6 +280,25 @@ export class DocumentViewer extends LitElement {
    */
   @property({ type: Boolean, reflect: true, attribute: 'no-gestures' })
   noGestures = false;
+
+  /**
+   * Whether a pointer may place the edit cursor
+   * (roadmap/proposed/core-editor-pointer-placement.md). OFF by default and
+   * turned on by `bindEditor`, so a viewer with no editor — the embed, the
+   * player-only piece page, a read-only score — emits no `position-selected`
+   * and draws no hover ghost. Placement is a capability the host grants, not
+   * something the score does on its own.
+   */
+  @property({ type: Boolean, attribute: 'pointer-placement' })
+  pointerPlacement = false;
+
+  /** The measured page, rebuilt on demand after each paint. */
+  private pointerMap: ScorePointerMap | null = null;
+  /** Rendered staves in system order — built while painting, where the model is in scope. */
+  private staffTable: RenderedStaff[] = [];
+  /** The hover ghost's last landing, so an unchanged hover redraws nothing. */
+  private hoverSignature = '';
+  private hoverQueued = false;
 
   @query('#projection-container')
   container!: HTMLElement;
@@ -644,6 +673,17 @@ export class DocumentViewer extends LitElement {
          overlay reads as "where you were", not "where your next keystroke
          lands". Faded, not hidden: losing the place entirely makes refocus
          disorienting, and the point is to stop the CLAIM, not the memory. */
+      /* The hover ghost (pointerHitTest.ts): where a click WOULD put the
+         cursor. The cursor ghost's own shape and colour, at half its
+         presence — the same object proposed rather than placed. Fainter than
+         the dimmed cursor, so the two are never confused when both show. */
+      :host #projection-container svg .pointer-ghost { pointer-events: none; }
+      :host #projection-container svg .pointer-ghost rect {
+        fill: none;
+        stroke: var(--accent);
+        stroke-opacity: 0.4;
+      }
+      :host([selection-inactive]) #projection-container svg .pointer-ghost,
       :host([selection-inactive]) #projection-container svg .enclosure,
       :host([selection-inactive]) #projection-container svg .cursor-ghost {
         opacity: 0.3;
@@ -870,6 +910,9 @@ export class DocumentViewer extends LitElement {
 
   disconnectedCallback() {
     super.disconnectedCallback();
+    this.container?.removeEventListener('pointerdown', this.onPointerPlace);
+    this.container?.removeEventListener('pointermove', this.onPointerHover);
+    this.container?.removeEventListener('pointerleave', this.onPointerLeave);
     window.removeEventListener('resize', this.resizeHandler);
     this.removeEventListener('scroll', this.onAnchorScroll);
     this.containerObserver?.disconnect();
@@ -970,6 +1013,12 @@ export class DocumentViewer extends LitElement {
   }
 
   firstUpdated() {
+    // Placement listens on the CONTAINER, not the host: the pointer must be
+    // over the paper, and nothing else is bound here, so the gesture layer on
+    // the host is untouched.
+    this.container?.addEventListener('pointerdown', this.onPointerPlace);
+    this.container?.addEventListener('pointermove', this.onPointerHover);
+    this.container?.addEventListener('pointerleave', this.onPointerLeave);
     if (!this.container || typeof ResizeObserver === 'undefined') return;
     this.containerObserver = new ResizeObserver(() => {
       const width = this.container.getBoundingClientRect().width;
@@ -1083,18 +1132,26 @@ export class DocumentViewer extends LitElement {
     // The selection-ladder enclosure: drawn from the finished SVG's own
     // geometry, after the engine is done — the renderer never learns about
     // editor state, the overlay reads what it drew.
-    const renderedStaffOrdinals = (unit: NonNullable<SelectionContext['span']>['units'][number]) => {
-      if (unit.partIndex === undefined || unit.staffIndex === undefined) return [];
-      // The laid-out parts, compared by their index in the whole document.
-      const parts = visible.mnx.parts ?? [];
-      const resolved = this.resolvedView();
-      if (resolved === 'tab') return unit.partIndex === 0 ? [0] : [];
-      const anyDeclaredKind = parts.some(part => {
-        const kind = part._x?.mnxLab?.tab?.staffKind;
-        return kind === 'both' || kind === 'tab';
-      });
-      let ordinal = 0;
-      const found: number[] = [];
+    //
+    // The walk is done ONCE, into a table of the staves this paint draws, in
+    // the order they go down a system — so the ordinal the enclosure speaks in
+    // is just an index into it. The enclosure reads it forwards (address →
+    // ordinal) and pointer placement reads it backwards (ordinal → address);
+    // two separate walks would be two chances to disagree about a `both`-view
+    // part whose tab staff is conditional.
+    const resolved = this.resolvedView();
+    const tabOnly = resolved === 'tab';
+    const parts = visible.mnx.parts ?? [];
+    const anyDeclaredKind = parts.some(part => {
+      const kind = part._x?.mnxLab?.tab?.staffKind;
+      return kind === 'both' || kind === 'tab';
+    });
+    const table: RenderedStaff[] = [];
+    if (tabOnly) {
+      // The tab-only view draws exactly one staff, for the first part.
+      if (parts.length > 0)
+        table.push({ partIndex: 0, staffIndex: 1, projection: 'tab', staffCount: 1 });
+    } else {
       parts.forEach((part, at) => {
         const partIndex = visible.originalIndex[at];
         let staffCount = Math.max(1, part.staves ?? 1);
@@ -1103,22 +1160,19 @@ export class DocumentViewer extends LitElement {
             staffCount = Math.max(staffCount, sequence.staff ?? 1);
           }
         }
-        if (partIndex === unit.partIndex) {
-          found.push(ordinal + Math.max(0, Math.min(staffCount - 1, unit.staffIndex! - 1)));
-        }
-        ordinal += staffCount;
+        for (let staffIndex = 1; staffIndex <= staffCount; staffIndex++)
+          table.push({ partIndex, staffIndex, projection: 'notation', staffCount });
         if (resolved === 'both') {
           const kind = resolveTabSetup(tabSetup, part)?.staffKind ?? part._x?.mnxLab?.tab?.staffKind;
           const opted = kind === 'both' || kind === 'tab';
           const hasTab = (opted || !anyDeclaredKind) && tabPositionContext(part, tabSetup) !== null;
-          if (hasTab) {
-            if (partIndex === unit.partIndex && unit.staffIndex === 1) found.push(ordinal);
-            ordinal++;
-          }
+          if (hasTab) table.push({ partIndex, staffIndex: 1, projection: 'tab', staffCount });
         }
       });
-      return found;
-    };
+    }
+    this.staffTable = table;
+    const renderedStaffOrdinals = (unit: NonNullable<SelectionContext['span']>['units'][number]) =>
+      ordinalsOf(table, unit.partIndex, unit.staffIndex, tabOnly);
 
     const enclosed = (pane: HTMLElement, paint: RenderOutcome) => {
       const kind = this.selection?.enclosure;
@@ -1229,6 +1283,121 @@ export class DocumentViewer extends LitElement {
     }
   }
 
+  /**
+   * The measured page, built lazily after each paint and kept until the next
+   * one. A hover asks this on every frame it moves, so the reads behind it
+   * happen once, not per event.
+   */
+  private measuredPage(): { svg: SVGSVGElement; map: ScorePointerMap } | null {
+    const svg = this.container?.querySelector<SVGSVGElement>('svg');
+    const rows = this.systemRows();
+    if (!svg || !rows) return null;
+    if (!this.pointerMap)
+      this.pointerMap = buildPointerMap(svg, rows, this.staffTable, unitsPerSp(svg));
+    return { svg, map: this.pointerMap };
+  }
+
+  /** A point in the page's own coordinates, or null off-screen geometry. */
+  private scorePointOf(event: PointerEvent | MouseEvent, svg: SVGSVGElement) {
+    const ctm = svg.getScreenCTM();
+    if (!ctm) return null;
+    const point = svg.createSVGPoint();
+    point.x = event.clientX;
+    point.y = event.clientY;
+    const local = point.matrixTransform(ctm.inverse());
+    return { x: local.x, y: local.y };
+  }
+
+  /** The note under a pointer, when there is one — the same ink the click
+   *  path already resolves, unwrapped from its occurrence in an unrolled view. */
+  private noteKeyUnder(event: Event): string | undefined {
+    const target = event.target;
+    if (!(target instanceof Element)) return undefined;
+    const raw = target.closest('[data-source-id]')?.getAttribute('data-source-id');
+    if (!raw) return undefined;
+    const occurrence = this.unrolled ? parseOccurrenceKey(raw) : null;
+    return occurrence ? occurrence.noteKey : raw;
+  }
+
+  /**
+   * A press places the cursor (core-editor-pointer-placement.md). It is
+   * emitted beside `note-selected`, never instead of it: a press on a note
+   * still seeks playback, and now also moves the cursor, which is how the two
+   * positions stay together until the reader presses play.
+   *
+   * **`pointerdown`, not `click`** — and not as a preference. Selecting a note
+   * can re-engrave the score (a press in the combined view switches which
+   * rendering owns spatial input, which repaints), so the element under the
+   * pointer is *gone* by the time the mouse-up arrives: down and up land on
+   * different nodes and the browser synthesises no `click` at all. Measured in
+   * a real browser, 2026-09-20. `engine/render/svg.ts` already selects on the
+   * press for its own reasons and says so; this is the same rule, met from the
+   * other side.
+   */
+  private readonly onPointerPlace = (event: PointerEvent) => {
+    if (!this.pointerPlacement || this.gesturing) return;
+    // The primary button only: a right-click opens a menu, and a second
+    // finger belongs to the gesture layer.
+    if (event.button !== 0 || !event.isPrimary) return;
+    const page = this.measuredPage();
+    if (!page) return;
+    const point = this.scorePointOf(event, page.svg);
+    const placement = point && hitTest(page.map, point, this.noteKeyUnder(event));
+    if (!placement) return;
+    drawPointerGhost(page.svg, page.map, null);
+    this.hoverSignature = '';
+    this.dispatchEvent(
+      new CustomEvent<PointerPlacement>('position-selected', {
+        detail: placement,
+        bubbles: true,
+        composed: true
+      })
+    );
+  };
+
+  /**
+   * The hover ghost: where a click would land. Mouse only — touch has no
+   * hover, and the snap is what makes a tap self-evident there instead.
+   *
+   * Coalesced to one frame and skipped when the landing has not changed, so
+   * moving the mouse across a bar costs one redraw per cell, not per pixel.
+   */
+  private readonly onPointerHover = (event: PointerEvent) => {
+    if (!this.pointerPlacement || event.pointerType !== 'mouse' || this.gesturing) return;
+    if (this.hoverQueued) return;
+    this.hoverQueued = true;
+    const { clientX, clientY, target } = event;
+    requestAnimationFrame(() => {
+      this.hoverQueued = false;
+      if (!this.pointerPlacement || this.gesturing) return;
+      const page = this.measuredPage();
+      if (!page) return;
+      const point = this.scorePointOf(
+        { clientX, clientY } as MouseEvent,
+        page.svg
+      );
+      const placement =
+        point &&
+        hitTest(
+          page.map,
+          point,
+          target instanceof Element ? this.noteKeyUnder({ target } as unknown as Event) : undefined
+        );
+      const signature = placement
+        ? `${placement.measureIndex}:${placement.partIndex}:${placement.staffIndex}:${placement.projection}:${placement.line}:${placement.fraction.toFixed(3)}`
+        : '';
+      if (signature === this.hoverSignature) return;
+      this.hoverSignature = signature;
+      drawPointerGhost(page.svg, page.map, placement ?? null);
+    });
+  };
+
+  private readonly onPointerLeave = () => {
+    const svg = this.container?.querySelector<SVGSVGElement>('svg');
+    if (svg) svg.querySelector(':scope > g.pointer-ghost')?.remove();
+    this.hoverSignature = '';
+  };
+
   /** The click that becomes a selection — shared by every emit path. */
   private readonly onNoteClick = (
     noteId: string,
@@ -1333,6 +1502,10 @@ export class DocumentViewer extends LitElement {
     this.lastPackings = drawn.packings;
     this.lastDensityH = densityH;
     this.lastStaffSp = used;
+    // The page was rebuilt, so every measurement taken off it is stale —
+    // including the hover ghost, which was drawn into the SVG that just went.
+    this.pointerMap = null;
+    this.hoverSignature = '';
     // The paper's horizontal padding follows Space with the engraving it
     // frames — set with the paint so the two never disagree for a frame.
     this.style.setProperty('--mnx-space-paper', String(spacePolicy(densityH).paperPad));

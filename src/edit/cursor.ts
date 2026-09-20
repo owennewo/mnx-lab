@@ -953,3 +953,116 @@ function withVoice(cursor: EditorCursor, voice: number): EditorCursor {
   const { voiceIndex: _drop, eventSlotIndex: _event, ...rest } = cursor;
   return voice ? { ...rest, voiceIndex: voice } : rest;
 }
+
+/**
+ * Where a POINTER landed, in the terms the viewer can actually measure
+ * (core-editor-pointer-placement.md). The viewer owns geometry; only the grid
+ * knows where a cursor may STAND, so nothing here is resolved on that side.
+ */
+export interface PointerTarget {
+  measureIndex: number;
+  /** The vertical line under the pointer, in the active projection's own
+   *  terms: a string number (1 = top) on tab, else a staff position. */
+  line: number;
+  /** The note the pointer was actually on, when it was on one. */
+  noteKey?: string;
+  /** Where along the bar the pointer fell, 0…1 of its metric span. */
+  fraction: number;
+}
+
+/**
+ * Resolve a pointer landing against the grid.
+ *
+ * Two ways in, and the order matters. **A named note is exact**: the reader
+ * clicked that notehead or that fret digit, so its slot supplies the stop, the
+ * line and the voice — better than re-deriving a line from a y that rounding
+ * may leave a half-space out. **A fraction is a neighbourhood**: musical
+ * spacing is not linear, so it names a region of the bar and the nearest stop
+ * wins, ties going to the earlier one.
+ *
+ * The fraction path is what makes an EMPTY bar clickable, which is the whole
+ * point of the item: a bar of rests has no ink to name, but it has stops — its
+ * rest, and the entry ghost holding the un-filled remainder — so a click
+ * anywhere in it lands somewhere the next note can be typed.
+ *
+ * Refusal is by identity: a measure the grid does not cover returns the cursor
+ * it was given, exactly as every other move does.
+ */
+export function moveToPointer(
+  grid: PositionGrid,
+  cursor: EditorCursor,
+  target: PointerTarget,
+  span: Onset,
+  projection: Projection
+): EditorCursor {
+  const inMeasure = grid.positions.filter(p => p.measureIndex === target.measureIndex);
+  if (inMeasure.length === 0) return cursor;
+
+  let landing: Position | undefined;
+  let slot: NoteSlot | undefined;
+  if (target.noteKey !== undefined) {
+    for (const position of inMeasure) {
+      const found = position.slots.find(s => s.noteKey === target.noteKey);
+      if (found) {
+        landing = position;
+        slot = found;
+        break;
+      }
+    }
+  }
+  if (!landing) {
+    const wanted = Math.max(0, Math.min(1, target.fraction));
+    const denominator = Math.max(Number.EPSILON, span.num / span.den);
+    let best = Number.POSITIVE_INFINITY;
+    for (const position of inMeasure) {
+      const at = position.onset.num / position.onset.den / denominator;
+      const distance = Math.abs(at - wanted);
+      if (distance < best - 1e-9) {
+        best = distance;
+        landing = position;
+      }
+    }
+  }
+  if (!landing) return cursor;
+
+  const tab = projection === 'tab' && grid.mode === 'string';
+  const line = slot
+    ? tab
+      ? slot.line
+      : slot.staffPosition
+    : tab
+      ? Math.min(Math.max(Math.round(target.line), 1), grid.lineCount)
+      : Math.min(Math.max(Math.round(target.line), -STAFF_POSITION_RANGE), STAFF_POSITION_RANGE);
+
+  // The voice follows what was clicked, then what is ON the line here, and
+  // only then the bar's first — never a voice with nothing at this stop,
+  // which would leave the cursor addressing music it is not in.
+  const onLine = landing.slots.filter(s => (tab ? s.line : s.staffPosition) === line);
+  const voice =
+    slot?.voiceIndex ??
+    onLine[0]?.voiceIndex ??
+    (landing.voices.includes(cursor.voiceIndex ?? 0)
+      ? (cursor.voiceIndex ?? 0)
+      : (landing.voices[0] ?? 0));
+
+  const placed = arriveAt(
+    withVoice(toPosition({ ...cursor, line }, landing), voice),
+    landing,
+    1
+  );
+  if (!slot) return { ...placed, line };
+
+  // A clicked note names its own event and its own place among the notes
+  // coincident on this line — the discriminators the arrows would otherwise
+  // have to be driven through one at a time.
+  const event = landing.events.find(
+    e =>
+      e.voiceIndex === slot.voiceIndex &&
+      e.eventIndex === slot.eventIndex &&
+      sameContainerIndex(e.containerIndex, slot.containerIndex)
+  );
+  const pinned = { ...pinnedTo(placed, landing, event), line };
+  const coincident = coincidentSlots(grid, pinned, projection);
+  const index = coincident.findIndex(s => s.noteKey === slot.noteKey);
+  return index > 0 ? { ...pinned, slotIndex: index } : pinned;
+}

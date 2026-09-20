@@ -40,6 +40,7 @@
  * a host can tell "back to what I saved" without comparing scores.
  */
 import { EditorSession } from '../edit/session.ts';
+import type { PointerPlacement } from './pointerHitTest.ts';
 import type { EditorIntent } from '../edit/intents.ts';
 import {
   EDIT_LAYER, NAVIGATION_LAYER, TAB_DIGIT_LAYER, resolveKeyAction, resolveShellAction, strokeOf, type KeymapLayer
@@ -417,6 +418,37 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     tabDigits.flush();
     if (session.handleIntent({ type: 'setProjection', projection })) settle();
   };
+  /**
+   * A POINTER placed the cursor (core-editor-pointer-placement.md). The viewer
+   * measured where it landed; the session decides what that means, because only
+   * the grid knows where a cursor may stand.
+   *
+   * Placement does not gate on the keyboard the way a keystroke does: pointing
+   * at a bar is how a reader TAKES the keyboard, so it also reveals a cursor
+   * Escape had put away. It still respects read-only and suspension — a host
+   * showing some other document has no cursor to move.
+   */
+  const onPositionSelected = (event: Event) => {
+    if (disposed || suspended() || readOnly()) return;
+    const detail = (event as CustomEvent<PointerPlacement>).detail;
+    if (!detail) return;
+    tabDigits.flush();
+    const moved = session.handleIntent({
+      type: 'goToPointer',
+      measureIndex: detail.measureIndex,
+      partIndex: detail.partIndex,
+      staffIndex: detail.staffIndex,
+      line: detail.line,
+      projection: detail.projection,
+      fraction: detail.fraction,
+      ...(detail.noteKey === undefined ? {} : { noteKey: detail.noteKey })
+    });
+    // Even a refused placement un-hides the cursor: the reader pointed at the
+    // score, so showing them where they already are beats showing nothing.
+    cursorHidden = false;
+    if (moved) settle();
+    else draw();
+  };
   const win = document_.defaultView;
 
   scope.addEventListener('keydown', onKeyDown);
@@ -426,6 +458,9 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
   surfaces?.addEventListener('focusout', onFocusChange);
   viewer.addEventListener('selection-anchored', onAnchored);
   viewer.addEventListener('note-selected', onNoteSelected);
+  viewer.addEventListener('position-selected', onPositionSelected);
+  // Placement is the host's to grant: a viewer with no editor bound emits nothing and draws no hover ghost.
+  viewer.pointerPlacement = true;
   win?.addEventListener('pointerdown', onPointerDown, true);
   if (options.claimUnfocused) {
     // Focus events are the obvious trigger but are not dependable everywhere (headless Chrome delivers none to
@@ -473,6 +508,8 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
       scope.removeEventListener('focusout', onFocusChange);
       viewer.removeEventListener('selection-anchored', onAnchored);
       viewer.removeEventListener('note-selected', onNoteSelected);
+      viewer.removeEventListener('position-selected', onPositionSelected);
+      viewer.pointerPlacement = false;
       win?.removeEventListener('pointerdown', onPointerDown, true);
       win?.removeEventListener('keydown', onUnclaimedKey);
       win?.removeEventListener('focusin', onFocusChange);

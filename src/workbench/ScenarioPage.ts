@@ -6,7 +6,7 @@ import { chooseOrdinal } from '../model/playback.ts';
 import { ContextProvider } from '@lit/context';
 import { playbackStateContext, initialPlaybackState, type PlaybackState, type PlaybackUpdate } from '../elements/mnxContext.ts';
 import { linearizePasses, hasRepeatStructure, type PassModel } from '../model/passes.ts';
-import { resolveIteration, inspectIteration, followPlayback, withPlaybackOrdinal, nextInspectionIteration, verseForIteration } from '../model/playback.ts';
+import { resolveIteration, activeIteration, inspectIteration, followPlayback, withPlaybackOrdinal, nextInspectionIteration, verseForIteration } from '../model/playback.ts';
 import { documentLyricLineIds } from '../engine/layout/lyricRuns.ts';
 import { readDisplayPreferences, writeDisplayPreferences } from './displayPreferences.ts';
 import type { DisplayOptions } from '../engine/displayOptions.ts';
@@ -1910,6 +1910,21 @@ export class ScenarioPage extends LitElement {
   /** A click on a note seeks playback to it. Which rendering owns subsequent
    * spatial input — the click's other meaning in the combined score — is the
    * binding's, because it is the session's projection. */
+  /** A click on empty space seeks to that bar (core-editor-pointer-placement.md).
+   *  Ink is `onNoteSelected`'s, above, so the two never race for one click. */
+  private onPositionSelected = (
+    event: CustomEvent<{ measureIndex?: number; noteKey?: string }>
+  ) => {
+    const { measureIndex, noteKey } = event.detail ?? {};
+    if (noteKey !== undefined || measureIndex === undefined || !this.passModel) return;
+    const { ordinals } = resolveIteration(this.passModel, measureIndex, activeIteration(this.playback));
+    const candidates = ordinals.length > 0
+      ? ordinals
+      : this.passModel.entries.filter(entry => entry.measureIndex === measureIndex).map(entry => entry.ordinal);
+    const ordinal = chooseOrdinal(candidates, this.playback.ordinal, { explicitSeek: true });
+    if (ordinal !== null) this.renderRoot.querySelector<Player>('mnx-player')?.seek(ordinal);
+  };
+
   private onNoteSelected = (
     event: CustomEvent<{ projection?: 'notation' | 'tab'; noteId?: string; ordinal?: number }>
   ) => {
@@ -2340,6 +2355,7 @@ export class ScenarioPage extends LitElement {
         .spacingMode=${this.spacingMode}
         .partTabSetups=${this.partTabSetups()}
         @note-selected=${this.onNoteSelected}
+        @position-selected=${this.onPositionSelected}
         @selection-anchored=${this.onSelectionAnchored}
         @render-scale=${this.onRenderScale}
         @zoom-change=${this.onZoomChange}

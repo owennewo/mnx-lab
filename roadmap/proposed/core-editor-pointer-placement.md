@@ -1,6 +1,6 @@
 # Pointer placement — a click or a tap puts the edit cursor where it landed
 
-> **Status: proposed 2026-09-20.** Serves the **implementation loop**.
+> **Status: built 2026-09-20.** Serves the **implementation loop**.
 > [Studio authoring campaign](../inprogress/studio-campaign-authoring.md) item 9, and the
 > named prerequisite of item 8 (touch entry): the pickup note's
 > *there is no click-to-place*. Inherits the campaign contract; clauses 12–14 are the ones
@@ -53,6 +53,17 @@ is living with the two cursors for a while before deciding on those.
 
 ## Design
 
+> **As built, three refinements to what follows.** The intent is
+> **`goToPointer`**, not `goToPosition` — the name says what produced it, and the
+> session already has `goToMeasure` for the deliberate kind. Its `at:` union
+> collapsed to a flat optional `noteKey` beside an always-present `fraction`: a
+> superset, and simpler, because the fraction is measured anyway and a rest
+> needs no key when the snap already lands on it. And the geometry helpers the
+> hit-test wanted were all private to `enclosure.ts`, so they moved wholesale
+> into **`src/elements/scoreGeometry.ts`**, which both readers now import —
+> the enclosure asks these questions forwards and the hit-test asks them
+> backwards, and two copies would drift.
+
 ### The intent — `goToPosition`, and the session snaps
 
 One new navigation intent, beside `goToMeasure`:
@@ -98,6 +109,37 @@ has a unit test.
 invalidated where the enclosure's geometry is; the hover path must never query the SVG on
 `pointermove`. In the combined view the click also names its projection, exactly as the
 note click does today, so the editor's existing projection switch runs first.
+
+### The press, not the click — measured, not chosen
+
+The plan said "a click". A click is the wrong event here, and the reason is
+worth keeping because nothing in the code says it out loud.
+
+Selecting a note can re-engrave the score: in the combined view a press decides
+which rendering owns spatial input, the session settles, and the viewer repaints
+— `container.innerHTML = ''` and a fresh SVG. That happens **during the
+pointerdown**, so by the time the mouse-up arrives the element under the pointer
+no longer exists. Mouse-down and mouse-up land on different nodes and the
+browser synthesises **no `click` at all**. Traced in a real browser on
+2026-09-20:
+
+```
+pointerdown -> text.notehead
+mousedown   -> DIV            (the SVG was rebuilt in between)
+mouseup     -> text.notehead
+```
+
+Not one `click` reached even a capture-phase listener on `document`. So
+placement listens on `pointerdown`, primary button only — which is what
+`engine/render/svg.ts` already does for note selection, for its own stated
+reason ("deliberately not deferred, because a 300ms lag on note selection is a
+worse defect"). The same rule, met from the other side.
+
+The same trap governs the smoke: a rect measured a round trip before the press
+may name a different note by the time it lands, because placing the cursor can
+reveal-scroll the score. The test therefore captures what was under the pointer
+*in the dispatch* and asserts the placement named that, rather than trusting
+coordinates read in advance.
 
 ### The event — the viewer stays ignorant of `edit/`
 

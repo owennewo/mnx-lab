@@ -44,6 +44,8 @@ import {
   movePosition,
   movePositionInk,
   moveToMeasure,
+  moveToPointer,
+  measureSpans,
   onsetsEqual,
   onsetLess,
   pinEventSlot,
@@ -1647,6 +1649,53 @@ export class EditorSession {
       case 'goToMeasure':
         this.cursorState = moveToMeasure(this.grid, before, intent.measureIndex);
         break;
+      case 'goToPointer': {
+        // A pointer can cross the whole address at once — another part, another
+        // staff, another projection — which no keyboard move can do. Each of
+        // those is the SAME change the deliberate intent makes, taken here in
+        // the order the grid needs: the part and staff choose the grid, the
+        // projection chooses how `line` is read, and only then is the landing
+        // resolved against it.
+        const parts = this.doc.parts ?? [];
+        if (intent.partIndex < 0 || intent.partIndex >= parts.length) return false;
+        const staves = parts[intent.partIndex]?.staves ?? 1;
+        if (intent.staffIndex < 1 || intent.staffIndex > staves) return false;
+        const rebuild =
+          intent.partIndex !== (before.partIndex ?? 0) ||
+          intent.staffIndex !== (before.staffIndex ?? 1);
+        const grid = rebuild
+          ? buildGrid(this.doc, intent.partIndex, intent.staffIndex)
+          : this.grid;
+        // A tab projection over a part with no strings is not a refusal here
+        // the way `setProjection` makes it one: the reader clicked a staff that
+        // IS being drawn, so the grid's own mode decides how the line reads.
+        const projection: Projection =
+          intent.projection === 'tab' && grid.mode === 'string' ? 'tab' : 'notation';
+        const span = measureSpans(this.doc)[intent.measureIndex] ?? { num: 1, den: 1 };
+        const from: EditorCursor = rebuild
+          ? { ...before, partIndex: intent.partIndex, staffIndex: intent.staffIndex }
+          : before;
+        const placed = moveToPointer(
+          grid,
+          from,
+          {
+            measureIndex: intent.measureIndex,
+            line: intent.line,
+            fraction: intent.fraction,
+            ...(intent.noteKey === undefined ? {} : { noteKey: intent.noteKey })
+          },
+          span,
+          projection
+        );
+        // The grid found no stop there: leave everything as it was, including
+        // the grid itself, rather than half-moving into a bar we cannot stand in.
+        if (placed === from && !rebuild && projection === this.activeProjection) return false;
+        this.grid = grid;
+        this.activeProjection = projection;
+        this.cursorState = placed;
+        this.reanchorSelection();
+        return true;
+      }
       case 'goToEdge': {
         // The keymap cannot name the last bar, so the EDGE is the intent and
         // the count is read here. `moveToMeasure` clamps and resolves the

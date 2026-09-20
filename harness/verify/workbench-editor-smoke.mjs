@@ -176,7 +176,115 @@ try {
   await press('z', 'KeyZ', 90, 2);
   assert.equal(await run(`const s = page().editor.session; return s.canRedo && page().doc.mnxJson === s.doc;`), true, 'Ctrl+Z after the sweep did not rebuild through the binding');
 
-  console.log(`Workbench editor smoke passed: unclaimed keys, an edit shown and walked from the ops panel, revert and construct replay rebinding the editor, the destruct sweep, delete's sentence, ${refusals} refused rung(s) flashed, the inspector closed by a pointer outside and opened from the chip, and the rail walked from the document rung with the rung carried across.`);
+  // ── a pointer places the cursor (core-editor-pointer-placement.md) ────────
+  //
+  // The whole chain in a real browser: the viewer measures the page, the host
+  // turns that into an intent, the session lands, and the overlay redraws.
+  //
+  // The assertion compares the placement against what was under the pointer AT
+  // THE MOMENT OF THE PRESS, captured by a listener rather than measured
+  // beforehand. Coordinates read in advance are not trustworthy here: placing
+  // the cursor can reveal-scroll the score, so a rect measured one round trip
+  // earlier may name a different note by the time the press is dispatched.
+  // (That is also why placement listens on `pointerdown` and not `click` — a
+  // press that re-engraves the score leaves mouse-down and mouse-up on
+  // different nodes, and no `click` is synthesised at all.)
+  await c.send('Page.navigate', { url: 'about:blank' });
+  await open('lab/document/twelve-bar-blues');
+  assert.equal(await run(`return viewer().pointerPlacement;`), true, 'bindEditor did not turn placement on');
+
+  await run(`
+    window.__placed = [];
+    const v = viewer();
+    v.addEventListener('position-selected', e => {
+      window.__placed.push({ detail: JSON.parse(JSON.stringify(e.detail)) });
+    });
+    // What the pointer was actually over, read in the same dispatch.
+    v.container.addEventListener('pointerdown', e => {
+      const el = e.composedPath().find(n => n.getAttribute && n.getAttribute('data-source-id'));
+      const last = window.__placed.length;
+      window.__under = el ? el.getAttribute('data-source-id') : null;
+    }, true);
+    return 'armed';`);
+
+  // Aim at a notehead on screen; whichever note is under the pointer when the
+  // press lands is the one the cursor must end up on.
+  const aim = await run(`
+    const svg = viewer().renderRoot.querySelector('#projection-container svg');
+    const glyphs = [...svg.querySelectorAll('.notehead[data-source-id], .fret-number[data-source-id]')];
+    const vis = glyphs.filter(g => {
+      const r = g.getBoundingClientRect();
+      return r.top > 60 && r.bottom < window.innerHeight - 60 && r.left > 60 && r.right < window.innerWidth - 60;
+    });
+    const el = vis[Math.floor(vis.length * 0.6)];
+    if (!el) return null;
+    const r = el.getBoundingClientRect();
+    return JSON.stringify({ x: r.x + r.width / 2, y: r.y + r.height / 2 });
+  `);
+  assert.ok(aim, 'the score drew no on-screen note ink to aim at');
+  const at = JSON.parse(aim);
+  await clickAt(at.x, at.y);
+
+  const placed = JSON.parse(await run(`return JSON.stringify({ placed: window.__placed, under: window.__under });`));
+  assert.equal(placed.placed.length, 1, 'a press on the score emitted no placement');
+  assert.ok(placed.under, 'the press did not land on note ink at all');
+  assert.equal(placed.placed[0].detail.noteKey, placed.under, 'the placement named a different note than the one pressed');
+  assert.equal(
+    await run(`return (viewer().selection.selectedNoteIds ?? []).includes(${JSON.stringify(placed.under)});`),
+    true,
+    'the cursor did not land on the note that was pressed'
+  );
+  assert.equal(
+    await run(`return page().editor.session.cursor.measureIndex;`),
+    placed.placed[0].detail.measureIndex,
+    'the session landed in a different bar than the placement named'
+  );
+
+  // A press on empty staff space places too — the owner's case is a skeleton
+  // of rests with no ink to aim at. Here: the same staff, a space above its
+  // top line, where no glyph sits.
+  await run(`window.__placed = []; window.__under = undefined;`);
+  const blank = await run(`
+    const svg = viewer().renderRoot.querySelector('#projection-container svg');
+    const box = svg.getBoundingClientRect();
+    const view = svg.viewBox.baseVal;
+    const scale = box.height / (view.height || 1);
+    const ys = [...svg.querySelectorAll('line.staff-line')]
+      .map(l => box.y + (l.y1.baseVal.value - view.y) * scale)
+      .filter(y => y > 80 && y < window.innerHeight - 80)
+      .sort((a, b) => a - b);
+    if (ys.length < 2) return null;
+    return JSON.stringify({ x: box.x + box.width * 0.45, y: (ys[0] + ys[1]) / 2 });
+  `);
+  assert.ok(blank, 'no staff lines on screen to aim between');
+  const gap = JSON.parse(blank);
+  await clickAt(gap.x, gap.y);
+  const onBlank = JSON.parse(await run(`return JSON.stringify(window.__placed);`));
+  assert.equal(onBlank.length, 1, 'a press on empty staff space emitted no placement');
+  assert.equal(
+    await run(`return page().editor.session.cursor.measureIndex;`),
+    onBlank[0].detail.measureIndex,
+    'a press on empty staff space did not move the cursor to the bar it named'
+  );
+
+  // The hover ghost: a mouse over the paper proposes a landing, and leaving
+  // takes it away. Touch never sees it, which is why the snap has to be enough.
+  await c.send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: gap.x + 30, y: gap.y, button: 'none' });
+  await delay(300);
+  assert.equal(
+    await run(`const svg = viewer().renderRoot.querySelector('#projection-container svg'); return !!svg.querySelector(':scope > g.pointer-ghost');`),
+    true,
+    'a mouse over the score drew no hover ghost'
+  );
+  await run(`viewer().container.dispatchEvent(new PointerEvent('pointerleave'));`);
+  await delay(150);
+  assert.equal(
+    await run(`const svg = viewer().renderRoot.querySelector('#projection-container svg'); return !!svg.querySelector(':scope > g.pointer-ghost');`),
+    false,
+    'the hover ghost outlived the pointer'
+  );
+
+  console.log(`Workbench editor smoke passed: unclaimed keys, an edit shown and walked from the ops panel, revert and construct replay rebinding the editor, the destruct sweep, delete's sentence, ${refusals} refused rung(s) flashed, the inspector closed by a pointer outside and opened from the chip, the rail walked from the document rung with the rung carried across, and a pointer placing the cursor on the note it clicked with a hover ghost before it.`);
 } finally {
   ws?.close();
   chrome.kill();

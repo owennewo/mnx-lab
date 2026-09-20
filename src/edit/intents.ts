@@ -45,6 +45,27 @@ export type NavigationIntent =
    * you on the last bar, and `I` at the measure rung inserts after it.
    */
   | { type: 'goToEdge'; edge: 'first' | 'last' }
+  /**
+   * Where a POINTER landed (core-editor-pointer-placement.md): a click or a
+   * tap, resolved against the grid rather than on the viewer's side, because
+   * only the grid knows where a cursor may stand.
+   *
+   * It carries the whole address because a pointer can cross every part of it
+   * at once — another part, another staff, another projection in the combined
+   * score — which no keyboard move can do. `line` is read in `projection`'s
+   * own terms, and `noteKey`, when the pointer was on ink, outranks `fraction`.
+   */
+  | {
+      type: 'goToPointer';
+      measureIndex: number;
+      partIndex: number;
+      staffIndex: number;
+      line: number;
+      projection: 'notation' | 'tab';
+      noteKey?: string;
+      /** Where along the bar, 0…1 of its metric span. */
+      fraction: number;
+    }
   /** The selection ladder (roadmap/complete/core-selection-ladder.md): relax
    *  widens one rung (note → … → score; past the top the MOUNT deselects),
    *  tighten narrows back down the same containment chain. Navigation, not
@@ -275,6 +296,7 @@ const NAVIGATION_TYPES: ReadonlySet<string> = new Set([
   'lineUp',
   'goToMeasure',
   'goToEdge',
+  'goToPointer',
   'relaxSelection',
   'tightenSelection',
   'goToLevel',

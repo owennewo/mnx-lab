@@ -114,3 +114,31 @@ export function sectionLabelChips(
       height: label.height + 2 * padY
     }));
 }
+
+/**
+ * The inverse of `measurePositionX` (core-editor-pointer-placement.md): where
+ * along a rendered measure cell a POINTER fell, as a fraction of the bar's
+ * metric span.
+ *
+ * It is the last resort, not the first: musical spacing is not linear, so a
+ * fraction only ever names a neighbourhood. The cursor grid decides which stop
+ * that neighbourhood belongs to, and where the cell has ink the caller names
+ * the note instead and never comes here at all.
+ *
+ * The inset is the same structure/candidate boundary the forward map draws, so
+ * a click on a header or a barline reads as the nearest end of the bar rather
+ * than overshooting into its neighbour. A cell with no usable span (a sliver
+ * between two barlines) is all one place: position 0.
+ */
+export function measurePositionAt(
+  left: number,
+  right: number,
+  x: number,
+  staffSpace: number
+): number {
+  const width = Math.max(0, right - left);
+  const inset = Math.min(1.2 * staffSpace, width * 0.18);
+  const usable = Math.max(0, width - 2 * inset);
+  if (usable <= 0) return 0;
+  return Math.max(0, Math.min(1, (x - left - inset) / usable));
+}

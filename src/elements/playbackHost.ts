@@ -3,7 +3,9 @@ import { ContextProvider } from '@lit/context';
 import { playbackStateContext, initialPlaybackState, type PlaybackUpdate } from './mnxContext.ts';
 import { linearizePasses } from '../model/passes.ts';
 import {
+  activeIteration,
   chooseOrdinal,
+  resolveIteration,
   withPlaybackOrdinal,
   inspectIteration,
   followPlayback,
@@ -58,12 +60,34 @@ export function bindPlayback(host: HTMLElement, viewer: DocumentViewer, player: 
     lastKey = key;
     if (ordinal !== null) player.seek(ordinal);
   };
+  /**
+   * A click that landed on EMPTY space still seeks — to the bar it fell in
+   * (core-editor-pointer-placement.md), so the playhead and the edit cursor
+   * stay together until the reader presses play. A click on ink is already a
+   * seek through `note-selected` above and is ignored here, or the two would
+   * race for the same click.
+   *
+   * Which pass of a repeated bar: the one being inspected or played, exactly
+   * as the chip reads it — never bar 9's first visit when the reader is
+   * looking at its second.
+   */
+  const place = (event: Event) => {
+    const detail = (event as CustomEvent<{ measureIndex?: number; noteKey?: string }>).detail;
+    if (!model || !detail || detail.noteKey !== undefined || detail.measureIndex === undefined) return;
+    const { ordinals } = resolveIteration(model, detail.measureIndex, activeIteration(state));
+    const candidates = ordinals.length > 0
+      ? ordinals
+      : model.entries.filter(entry => entry.measureIndex === detail.measureIndex).map(entry => entry.ordinal);
+    const ordinal = chooseOrdinal(candidates, state.ordinal, { explicitSeek: true });
+    if (ordinal !== null) player.seek(ordinal);
+  };
   // The viewer must not know about the player: it reports a two-finger tap and
   // the host decides what that means, exactly as `note-selected` becomes a seek
   // above. With no player bound the gesture is a no-op, never an error.
   const toggle = () => player.toggle();
   player.addEventListener('playback-state-changed', update);
   viewer.addEventListener('note-selected', select);
+  viewer.addEventListener('position-selected', place);
   viewer.addEventListener('transport-toggle', toggle);
   return {
     get state() {
@@ -113,6 +137,7 @@ export function bindPlayback(host: HTMLElement, viewer: DocumentViewer, player: 
       publish();
       player.removeEventListener('playback-state-changed', update);
       viewer.removeEventListener('note-selected', select);
+      viewer.removeEventListener('position-selected', place);
       viewer.removeEventListener('transport-toggle', toggle);
       provider.clearCallbacks();
       host.removeEventListener('context-request', provider.onContextRequest);
