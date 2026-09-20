@@ -284,7 +284,47 @@ try {
     'the hover ghost outlived the pointer'
   );
 
-  console.log(`Workbench editor smoke passed: unclaimed keys, an edit shown and walked from the ops panel, revert and construct replay rebinding the editor, the destruct sweep, delete's sentence, ${refusals} refused rung(s) flashed, the inspector closed by a pointer outside and opened from the chip, the rail walked from the document rung with the rung carried across, and a pointer placing the cursor on the note it clicked with a hover ghost before it.`);
+  // ── the container may arrive LATE, and must still be bound ────────────────
+  //
+  // The studio bug, as a test. With no document the viewer renders a "no
+  // document" panel and NO score container, so a host that loads its piece
+  // asynchronously first-updates with nothing to bind to. Binding once in
+  // `firstUpdated` bound nothing and never tried again: in studio a click on
+  // the score did nothing at all, while the workbench — which has its scenario
+  // at first render — worked, which is why this hid. Here the document is
+  // taken away and given back, which destroys and rebuilds that container.
+  const rebound = JSON.parse(await run(`
+    const v = viewer();
+    const doc = v.mnxDoc;
+    v.mnxDoc = undefined;
+    await v.updateComplete;
+    const gone = { container: !!v.container, bound: !!v.boundContainer };
+    v.mnxDoc = doc;
+    await v.updateComplete;
+    await new Promise(r => setTimeout(r, 700));
+    let fired = null;
+    const onPlace = e => { fired = JSON.parse(JSON.stringify(e.detail)); };
+    v.addEventListener('position-selected', onPlace);
+    const svg = v.container && v.container.querySelector('svg');
+    if (svg) {
+      const r = svg.getBoundingClientRect();
+      v.container.dispatchEvent(new PointerEvent('pointerdown', {
+        clientX: r.x + r.width * 0.35, clientY: r.y + r.height * 0.35,
+        button: 0, isPrimary: true, pointerType: 'mouse', bubbles: true, composed: true
+      }));
+    }
+    v.removeEventListener('position-selected', onPlace);
+    return JSON.stringify({ gone, container: !!v.container, bound: !!v.boundContainer,
+                            observer: !!v.containerObserver, fired });
+  `));
+  assert.equal(rebound.gone.container, false, 'a document-less viewer drew a score container after all — this no longer reproduces the bug');
+  assert.equal(rebound.gone.bound, false, 'the viewer still held a container it no longer has');
+  assert.equal(rebound.container, true, 'the returning document drew no score container');
+  assert.equal(rebound.bound, true, 'the container came back but was never re-bound: a click on the score would do nothing');
+  assert.equal(rebound.observer, true, 'the returning container got no resize observer, so the score would not re-engrave on a width change');
+  assert.ok(rebound.fired, 'a press on a viewer whose container arrived late emitted no placement');
+
+  console.log(`Workbench editor smoke passed: unclaimed keys, an edit shown and walked from the ops panel, revert and construct replay rebinding the editor, the destruct sweep, delete's sentence, ${refusals} refused rung(s) flashed, the inspector closed by a pointer outside and opened from the chip, the rail walked from the document rung with the rung carried across, a pointer placing the cursor on the note it clicked with a hover ghost before it, and a viewer whose document arrived late still binding its score surface.`);
 } finally {
   ws?.close();
   chrome.kill();

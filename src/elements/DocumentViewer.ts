@@ -910,9 +910,10 @@ export class DocumentViewer extends LitElement {
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    this.container?.removeEventListener('pointerdown', this.onPointerPlace);
-    this.container?.removeEventListener('pointermove', this.onPointerHover);
-    this.container?.removeEventListener('pointerleave', this.onPointerLeave);
+    this.boundContainer?.removeEventListener('pointerdown', this.onPointerPlace);
+    this.boundContainer?.removeEventListener('pointermove', this.onPointerHover);
+    this.boundContainer?.removeEventListener('pointerleave', this.onPointerLeave);
+    this.boundContainer = null;
     window.removeEventListener('resize', this.resizeHandler);
     this.removeEventListener('scroll', this.onAnchorScroll);
     this.containerObserver?.disconnect();
@@ -1012,25 +1013,58 @@ export class DocumentViewer extends LitElement {
     );
   }
 
-  firstUpdated() {
+  /**
+   * The score container is bound HERE and not in `firstUpdated`, because it
+   * does not necessarily exist then: with no document the element renders a
+   * "No document loaded" panel and no `#projection-container` at all. A host
+   * that loads its document asynchronously — studio, which fetches the piece —
+   * therefore first-updates with nothing to bind to, and a one-shot attach in
+   * `firstUpdated` silently did nothing and never tried again. The workbench
+   * has its scenario at first render, which is why it never showed this.
+   *
+   * Two things were lost that way in studio: pointer placement (a click on the
+   * score did nothing at all) and the resize observer (the score never
+   * re-engraved when the pane changed width). Both are re-bound whenever the
+   * container appears, changes identity, or goes away.
+   */
+  private boundContainer: HTMLElement | null = null;
+  private bindScoreSurface() {
+    const container = (this.container ?? null) as HTMLElement | null;
+    if (container === this.boundContainer) return;
+    if (this.boundContainer) {
+      this.boundContainer.removeEventListener('pointerdown', this.onPointerPlace);
+      this.boundContainer.removeEventListener('pointermove', this.onPointerHover);
+      this.boundContainer.removeEventListener('pointerleave', this.onPointerLeave);
+    }
+    this.containerObserver?.disconnect();
+    this.containerObserver = null;
+    this.boundContainer = container;
+    if (!container) return;
     // Placement listens on the CONTAINER, not the host: the pointer must be
     // over the paper, and nothing else is bound here, so the gesture layer on
     // the host is untouched.
-    this.container?.addEventListener('pointerdown', this.onPointerPlace);
-    this.container?.addEventListener('pointermove', this.onPointerHover);
-    this.container?.addEventListener('pointerleave', this.onPointerLeave);
-    if (!this.container || typeof ResizeObserver === 'undefined') return;
+    container.addEventListener('pointerdown', this.onPointerPlace);
+    container.addEventListener('pointermove', this.onPointerHover);
+    container.addEventListener('pointerleave', this.onPointerLeave);
+    if (typeof ResizeObserver === 'undefined') return;
     this.containerObserver = new ResizeObserver(() => {
-      const width = this.container.getBoundingClientRect().width;
+      const width = container.getBoundingClientRect().width;
       // Sub-pixel jitter is not a new line width; ignore it rather than
       // re-engraving the score on a rounding difference.
       if (Math.abs(width - this.renderedWidth) < 1) return;
       this.renderProjection();
     });
-    this.containerObserver.observe(this.container);
+    this.containerObserver.observe(container);
+  }
+
+  firstUpdated() {
+    this.bindScoreSurface();
   }
 
   updated(changed: Map<string | number | symbol, unknown>) {
+    // The container may have just appeared (the first document) or gone (a
+    // host clearing it), so the surface is re-bound before anything reads it.
+    this.bindScoreSurface();
     if(changed.has('playbackState')){
       if(this.bookendSignature()!==this.renderedBookends)this.renderProjection();
       else {this.paintPlayback();this.paintBookends();}
