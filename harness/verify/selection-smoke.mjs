@@ -286,15 +286,27 @@ try {
     if (state.error) throw new Error(state.error);
     return state;
   };
+  // A selection TALLER than the pane cannot be brought inside it, and zoomed
+  // into a small pane that is an ordinary thing to ask for. `revealScrollDelta`
+  // answers by aligning its top to the viewport top — you get the start of the
+  // thing you moved to, and scrolling further would only push that off the
+  // other side. So the rule has two halves: what fits must be wholly inside;
+  // what does not must begin at the top edge.
   const inView = (state, where) => {
-    if (state.box.top >= state.view.top && state.box.bottom <= state.view.bottom) {
+    const height = state.box.bottom - state.box.top, room = state.view.bottom - state.view.top;
+    const sits =
+      `it sits at ${state.box.top.toFixed(0)}…${state.box.bottom.toFixed(0)} ` +
+      `in a viewport of ${state.view.top.toFixed(0)}…${state.view.bottom.toFixed(0)}`;
+    if (height > room) {
+      if (Math.abs(state.box.top - state.view.top) <= 2) {
+        pass(`the selection is taller than the pane ${where}, and starts at its top edge`);
+      } else {
+        fail(`the selection is taller than the pane ${where} but does not start at its top edge: ${sits}`);
+      }
+    } else if (state.box.top >= state.view.top && state.box.bottom <= state.view.bottom) {
       pass(`the selection is on screen ${where}`);
     } else {
-      fail(
-        `the selection is off screen ${where}: it sits at ` +
-        `${state.box.top.toFixed(0)}…${state.box.bottom.toFixed(0)} ` +
-        `in a viewport of ${state.view.top.toFixed(0)}…${state.view.bottom.toFixed(0)}`
-      );
+      fail(`the selection is off screen ${where}: ${sits}`);
     }
   };
 

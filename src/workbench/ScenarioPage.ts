@@ -346,7 +346,8 @@ export class ScenarioPage extends LitElement {
     const update = (event as CustomEvent<PlaybackUpdate>).detail;
     if (!this.passModel || update.documentId !== this.scenarioId) return;
     const state = withPlaybackOrdinal(this.playback, this.passModel, update.ordinal);
-    this.setPlayback({ ...state, highlight: state.ordinal === null ? []
+    this.setPlayback({ ...state, playing: update.playing ?? false,
+      highlight: state.ordinal === null ? []
       : update.highlight.filter(occurrence => occurrence.ordinal === state.ordinal) });
   };
   private chooseInspection(iteration: number) {

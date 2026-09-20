@@ -1314,11 +1314,20 @@ export class DocumentViewer extends LitElement {
     this.paintPlayback();
     this.paintBookends();
     if (quick) return;
-    if (this.playbackState?.followPlayback && this.playbackState.ordinal !== null) this.revealPlayback();
+    // WHO OWNS THE SCROLL. A moving playhead does: while the transport runs,
+    // a paint chases it and the selection waits. A PARKED one does not, and
+    // that is the whole of this condition — `followPlayback` is true by
+    // default and stays true with the transport stopped, so gating on it alone
+    // meant every paint re-revealed a playhead that had not moved and the
+    // selection was never followed at all. Keyboard navigation could not
+    // scroll the score: End walked to the last bar off screen and stayed there.
+    const chasing = this.playbackState?.playing === true
+      && this.playbackState.followPlayback && this.playbackState.ordinal !== null;
+    if (chasing) this.revealPlayback();
     this.emitSelectionAnchor();
     if (this.followQueued) {
       this.followQueued = false;
-      if (!this.playbackState?.followPlayback || this.playbackState.ordinal === null) this.revealSelection();
+      if (!chasing) this.revealSelection();
     }
   }
 

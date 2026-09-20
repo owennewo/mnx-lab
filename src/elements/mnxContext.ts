@@ -10,6 +10,13 @@ export interface PlaybackOccurrence {
 }
 
 export interface PlaybackState extends PlaybackPositionState {
+  /** Is the transport RUNNING — not merely parked somewhere. `followPlayback`
+   *  says the view is tracking the playhead, which is true by default and says
+   *  nothing about whether the playhead is moving; this says whether there is
+   *  anything to track. The viewer needs the difference to know who owns a
+   *  scroll: a moving playhead does, a parked one must not outrank the reader
+   *  moving the selection with the keyboard. */
+  playing: boolean;
   highlight: PlaybackOccurrence[];
   recordingBookends: RecordingBookends | null;
   mediaPhase: 'pre-roll' | 'mapped' | 'post-roll' | 'unmapped' | null;
@@ -28,7 +35,7 @@ export interface PlaybackUpdate {
   mediaPhase?: PlaybackState['mediaPhase'];
 }
 export function initialPlaybackState(): PlaybackState {
-  return { ...initialPlaybackPosition(), highlight: [], recordingBookends: null, mediaPhase: null };
+  return { ...initialPlaybackPosition(), playing: false, highlight: [], recordingBookends: null, mediaPhase: null };
 }
 
 export const mnxDocumentContext = createContext<MnxDocument | null>(Symbol('mnx-document'));

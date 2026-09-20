@@ -219,9 +219,14 @@ are not enough on the device.
    of a first cut that may be backed out wholesale.
 2. **No anchor-preserving zoom.** The drag does not hold the tapped note under
    the finger. `densityH` reflows, so a real anchor means re-scrolling to a
-   `data-source-id` each frame. Related pre-existing defect: `revealBox`'s
-   `this.scrollBy` (`DocumentViewer.ts:1160`) scrolls the viewer host, which is
-   no longer the scroller in either shell — see 5.
+   `data-source-id` each frame. ~~Related pre-existing defect: `revealBox`'s
+   `this.scrollBy` scrolls the viewer host, which is no longer the scroller in
+   either shell.~~ **Wrong, checked 2026-09-20.** Measured in a real browser, the
+   viewer IS the scroller: `overflow-y: auto` with a live `scrollTop`, inside the
+   frame's `.score`, which does not scroll. `revealBox` scrolls the right element.
+   The reveal defect this suspicion was standing in for was elsewhere and is
+   fixed — a parked playhead outranked the selection on every paint, so nothing
+   ever followed the cursor (`docs/core-viewer-surface.md` → who owns the scroll).
 3. ~~**No keyboard play/pause.**~~ **Resolved 2026-09-20.** The negotiation with
    the editor keymap went the way the convention does: `Space` is play/pause and
    `toggleNote` moved to `N`, the letter MuseScore and Sibelius give note input.

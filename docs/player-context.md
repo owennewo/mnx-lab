@@ -16,7 +16,12 @@ The host maintains live `ordinal` and derived `playbackIteration` separately fro
 `inspectionIteration`. Stopped playback uses null for both live fields and an
 empty highlight list. Highlights carry `{ noteKey, ordinal }`; they never write
 selection. `followPlayback` defaults true. Choosing inspection switches it off;
-Follow restores it without seeking. While following live playback, the viewer
+Follow restores it without seeking. It says the view is TRACKING the playhead,
+not that the playhead is moving, so it is paired with `playing` — whether the
+transport is actually running — wherever the two would disagree: the viewer
+scrolls to the playhead only while `playing`, or a parked playhead would outrank
+the reader's own keyboard navigation and the score would never follow the cursor.
+While following live playback, the viewer
 reveals highlighted ink; the later player element owns the public position reveal
 API, including rests. The host sets `selectedVerse` from `verseForIteration` and
 must assign undefined when the verse index is absent, clearing stale selection.

@@ -241,7 +241,14 @@ Three rules keep that from becoming a page that moves on its own:
   somewhere unusual in the viewport is left where it is; one already spanning
   the whole viewport is the most in view a selection can be.
 - **The minimum scroll**, plus a little context either side, smoothly unless
-  the reader asked for reduced motion.
+  the reader asked for reduced motion. A selection taller than the pane cannot
+  be brought inside it, so it is aligned to the top edge — you get the start of
+  the thing you moved to, and scrolling further would push that off the other side.
+- **A MOVING playhead outranks the selection; a parked one does not.** While the
+  transport runs, a paint chases the playhead and the selection waits its turn.
+  Stopped, the reader owns the scroll. `followPlayback` cannot make this
+  decision alone — it is true by default and stays true with the transport
+  stopped, so `PlaybackState.playing` is what the viewer reads.
 
 There is nothing to configure. A host that wants to place its own chrome on
 the selection listens for `selection-anchored`, which fires on the resulting
