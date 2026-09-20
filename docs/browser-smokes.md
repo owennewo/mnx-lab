@@ -10,11 +10,8 @@ out page. Only a browser can answer those.
 
 They are **not part of the gates**. Run the relevant ones by hand after
 touching a shell or an element — and check the one you are about to rely on is
-green *before* you change anything, because some are not. `unrolled-smoke`
-reaches for the settings pad where it no longer lives (it moved inside
-`<mnx-score-frame>`, and is rendered there conditionally), and
-`studio-export-smoke` fails a print-margin assertion; both were already red on
-2026-09-20 and neither has been triaged as smoke or product.
+green *before* you change anything, so a failure you inherit is not mistaken for
+one you caused.
 
 ## Running one
 
@@ -42,6 +39,16 @@ assertion message and all, and leaves you staring at an unrelated stack. The
 specific offender is the profile directory: Chrome goes on flushing its cache
 after it reports exit, so `fs.rmSync(profile)` races and sometimes loses with
 `ENOTEMPTY`. A temp directory left behind is litter, not a failure — wrap it.
+
+### Shadow roots move
+
+An element the smoke reaches by `page.shadowRoot.querySelector(...)` may have
+moved inside another component, or become conditional. `unrolled-smoke` died
+for a year's worth of releases on `settings.open = true` — not because the
+settings pad was gone but because it now lives inside `<mnx-score-frame>` and
+is rendered only while its pad is open, so the query returned null and the
+smoke never reached what it was testing. Query through the owning component and
+assert each hop, so the message names the hop that broke.
 
 ### A glyph's box is its whole em square
 
@@ -89,6 +96,15 @@ The viewer repaints on scroll and on resize. A node captured before
 and **swallows a synthetic press in silence** rather than erroring. Re-query the
 SVG and the element after anything that can repaint, and assert the rect is
 non-zero before aiming at it.
+
+### The page-side code is inside a template literal
+
+Everything passed to `cdp.evaluate` is a JavaScript template literal in the
+smoke file. A **backtick anywhere inside it — including in a comment — ends the
+string**, and the file dies with `SyntaxError: missing ) after argument list`
+pointing at the opening line rather than at the offending one. `${` is
+interpolated by the smoke rather than the page for the same reason. Write inner
+comments in plain prose, and run `node --check` after editing one.
 
 ### The default headless window is 800×600
 

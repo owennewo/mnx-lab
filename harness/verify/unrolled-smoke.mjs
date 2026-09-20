@@ -72,7 +72,21 @@ try {
     viewer.selection={...viewer.selection,selectedNoteIds:[key]};await viewer.updateComplete;await delay(50);
     const selected=[...viewer.shadowRoot.querySelectorAll('.notehead.selected')];
     check(selected.length===2,'Written selection did not light both visits');
-    const settings=page.shadowRoot.querySelector('mnx-settings-pad');settings.open=true;await settings.updateComplete;
+    // THROUGH THE SCORE FRAME, AND THROUGH ITS BUTTON. The settings pad moved
+    // inside <mnx-score-frame> (core-score-frame.md) and is rendered there only
+    // while its pad is open — so the page's own root has not held one for some
+    // time, and this read null and died on setting .open, before testing
+    // anything it is here for. smoke:focus reaches the frame's chrome the same
+    // way. The pad arrives pinned; opening it is the button's job now.
+    const frame=page.shadowRoot.querySelector('mnx-score-frame');
+    check(frame,'The scenario page has no score frame');
+    const gear=[...frame.shadowRoot.querySelectorAll('.tools-row .btn')]
+      .find(b=>(b.textContent||'').includes('Settings'));
+    check(gear,'The score frame offers no Settings button');
+    gear.click();await frame.updateComplete;await delay(50);
+    const settings=frame.shadowRoot.querySelector('mnx-settings-pad');
+    check(settings,'The Settings button opened no pad');
+    await settings.updateComplete;
     // The REPEATS row is a two-way field now, not a checkbox: one click
     // flips it (roadmap/proposed/workbench-settings-card.md).
     const toggle=settings.shadowRoot.querySelector('.field[data-row="repeats"]');toggle.click();await delay(100);

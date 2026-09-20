@@ -57,6 +57,30 @@ try {
  if (longScore) {
    await p.send('Emulation.setEmulatedMedia', {media:'print'});
    await p.send('Emulation.setDeviceMetricsOverride', {width:794,height:1123,deviceScaleFactor:1,mobile:false});
+   // EVERY PAGE SHOWS MUSIC. Each `.page` holds a clone of the whole score SVG
+   // windowed by its own viewBox, so counting ink in the page's DOM proves
+   // nothing — all of it is in every clone. What matters is the WINDOW: a page
+   // whose viewBox lands on blank paper prints a sheet with nothing on it.
+   //
+   // This used to be asserted by extracting text from the PDF and looking for
+   // the part name. It could only ever have passed by accident: a part label
+   // is drawn from a layout tree's label/labelref and this fixture declares no
+   // `scores`, so "Guitar" is nowhere in the preview either. pdftotext is no
+   // basis for it in any case — of 35 fret digits in a window it recovers two.
+   const windows = JSON.parse(await p.evaluate(`JSON.stringify([...document.querySelectorAll('.page')].map(pg => {
+     const svg = pg.querySelector('svg');
+     const box = svg.getAttribute('viewBox').split(/\\s+/).map(Number);
+     const inWindow = sel => [...svg.querySelectorAll(sel)].filter(el => {
+       const y = el.y && el.y.baseVal.numberOfItems ? el.y.baseVal.getItem(0).value : NaN;
+       return y >= box[1] && y <= box[1] + box[3];
+     }).length;
+     return { top: box[1], height: box[3], ink: inWindow('.fret-number') + inWindow('.notehead') };
+   }))`));
+   assert.equal(windows.length, result.pages, 'Every paginated page has a window');
+   for (const [index, w] of windows.entries()) {
+     assert.ok(w.height > 0, `Page ${index + 1} has a window of some height`);
+     assert.ok(w.ink > 0, `Page ${index + 1} shows music (window ${w.top}…${w.top + w.height} holds no ink)`);
+   }
    const printWidth = await p.evaluate(`document.querySelector('.page').getBoundingClientRect().width`);
    assert.ok(Math.abs(printWidth - 186 * 96 / 25.4) < 1, 'Print width matches pagination width even without page margins');
    // Match Chrome's Margins controls: they override the author @page margin.
@@ -67,8 +91,6 @@ try {
      fs.writeFileSync(filename, Buffer.from(printed.result.data, 'base64'));
      const info = execFileSync('pdfinfo', [filename], {encoding:'utf8'});
      assert.equal(Number(info.match(/Pages:\s+(\d+)/)[1]), result.pages, `No extra printed pages at ${margin}mm margins`);
-     const firstPage = execFileSync('pdftotext', ['-f','1','-l','1',filename,'-'], {encoding:'utf8'});
-     assert.ok(firstPage.includes('Guitar'), `First page includes music at ${margin}mm margins`);
    }
  }
  const screenshot=await c.send('Page.captureScreenshot',{});fs.writeFileSync('/tmp/studio-export-library.png',Buffer.from(screenshot.result.data,'base64'));
