@@ -27,6 +27,8 @@ import {
   measurePositionAt
 } from '../../src/engine/render/selectionGeometry.ts';
 import { isNavigationIntent } from '../../src/edit/intents.ts';
+import { layoutBothSystem } from '../../src/engine/layout/bothSystem.ts';
+import { initSmufl } from '../helpers/corpusPrimitives.ts';
 import type { MnxStructure } from '../../src/model/mnx.ts';
 // @ts-expect-error — plain .mjs module without type declarations
 import { loadCorpus } from '../verify/check-scenarios.mjs';
@@ -37,6 +39,13 @@ const corpus = (loadCorpus() as Scenario[]).slice().sort((a, b) => a.id.localeCo
 function documentOf(dir: string): MnxStructure {
   return JSON.parse(fs.readFileSync(path.join(dir, 'document.mnx.json'), 'utf8')) as MnxStructure;
 }
+
+/** Standard tuning, for the engraved-geometry case at the end. */
+const STRINGS = [
+  { string: 1, pitch: { step: 'E', octave: 4 } }, { string: 2, pitch: { step: 'B', octave: 3 } },
+  { string: 3, pitch: { step: 'G', octave: 3 } }, { string: 4, pitch: { step: 'D', octave: 3 } },
+  { string: 5, pitch: { step: 'A', octave: 2 } }, { string: 6, pitch: { step: 'E', octave: 2 } }
+];
 
 /** A cursor that addresses nothing in particular — every test moves it. */
 function start(partIndex = 0, staffIndex = 1): EditorCursor {
@@ -229,5 +238,108 @@ describe('moveToPointer on a bar with no ink', () => {
     expect(
       moveToPointer(grid, cursor, { measureIndex: 999, line: 1, fraction: 0.5 }, { num: 1, den: 1 }, 'notation')
     ).toBe(cursor);
+  });
+});
+
+/**
+ * THE ESTIMATE VS THE ENGRAVING.
+ *
+ * Everything above proves the pointer model self-consistent: the forward map
+ * and its inverse compose, and a fraction an onset produced snaps back to that
+ * onset. Both halves are linear in the bar's width — and so the pair agreed
+ * with each other while disagreeing with the page, which is why a click on the
+ * first rest of a bar of rests landed on the second.
+ *
+ * Music is not spaced linearly. A bar carrying a clef and a time signature
+ * starts its ink a quarter of the way in, and the columns after it are spread
+ * by springs and rods rather than by their share of the meter. So this asks
+ * the question the other way round: from where a rest is actually DRAWN, does
+ * a click on it reach that rest?
+ */
+describe('a click on drawn ink reaches the ink it was on', () => {
+  initSmufl();
+  const quarters = () => [0, 1, 2, 3].map(() => ({ duration: { base: 'quarter' }, rest: {} }));
+  const doc = {
+    mnx: { version: 1 },
+    global: { measures: [{ time: { count: 4, unit: 4 } }, {}] },
+    parts: [{
+      id: 'g',
+      _x: { mnxLab: { strings: STRINGS, tab: { staffKind: 'both' } } },
+      measures: [
+        { clefs: [{ clef: { sign: 'G', staffPosition: -2, octave: -1 } }],
+          sequences: [{ content: quarters() }] },
+        { sequences: [{ content: quarters() }] }
+      ]
+    }]
+  } as unknown as MnxStructure;
+
+  /** Where each rest is engraved, and the bar it belongs to. */
+  const engraved = () => {
+    const layout = layoutBothSystem({ mnx: doc, widthSp: 120, durationSpans: true });
+    const bars = layout.primitives
+      .filter((p): p is { kind: 'line'; x1: number } =>
+        p.kind === 'line' && /barline/.test((p as { className?: string }).className ?? ''))
+      .map(p => p.x1)
+      .sort((a, b) => a - b);
+    const rests = layout.primitives
+      .filter((p): p is { kind: 'glyph'; x: number; sourceId: string } =>
+        p.kind === 'glyph' && /\brest\b/.test((p as { className?: string }).className ?? '') &&
+        typeof (p as { sourceId?: string }).sourceId === 'string')
+      .map(p => ({ key: p.sourceId, x: p.x }));
+    return { bars, rests };
+  };
+
+  const grid = () => buildGrid(doc, 0, 1);
+  const span = measureSpans(doc)[0];
+
+  it('lands on the very rest that was clicked, in every bar', () => {
+    const { bars, rests } = engraved();
+    expect(rests.length).toBe(8);
+    for (const rest of rests) {
+      const measureIndex = rest.key.startsWith('@m0') ? 0 : 1;
+      const left = bars[measureIndex], right = bars[measureIndex + 1];
+      const placed = moveToPointer(
+        grid(),
+        start(),
+        {
+          measureIndex,
+          line: 3,
+          columnKey: rest.key,
+          // The estimate travels with it and must not be consulted.
+          fraction: measurePositionAt(left, right, rest.x, 1)
+        },
+        span,
+        'tab' as Projection
+      );
+      // `@m0.v0.e2` is the third quarter: onset 2/4.
+      const wanted = Number(rest.key.slice(rest.key.lastIndexOf('e') + 1));
+      expect(
+        placed.onset.num / placed.onset.den,
+        `a click on ${rest.key} landed on beat ${placed.onset.num}/${placed.onset.den}`
+      ).toBeCloseTo(wanted / 4, 9);
+      // The clicked LINE is kept: a rest has no string of its own, and the
+      // reader pointed at one.
+      expect(placed.line).toBe(3);
+    }
+  });
+
+  it('is why the column is measured: the linear estimate alone misses', () => {
+    const { bars, rests } = engraved();
+    const missed = rests.filter(rest => {
+      const measureIndex = rest.key.startsWith('@m0') ? 0 : 1;
+      const left = bars[measureIndex], right = bars[measureIndex + 1];
+      const placed = moveToPointer(
+        grid(), start(),
+        { measureIndex, line: 3, fraction: measurePositionAt(left, right, rest.x, 1) },
+        span, 'tab' as Projection
+      );
+      const wanted = Number(rest.key.slice(rest.key.lastIndexOf('e') + 1)) / 4;
+      return Math.abs(placed.onset.num / placed.onset.den - wanted) > 1e-9;
+    });
+    // Five of the eight, when this was written — every rest of the bar that
+    // carries the clef, and one of the bar that does not. If engraving ever
+    // becomes linear enough that this is empty, the measured column has stopped
+    // earning its keep and this test should be the one that says so.
+    expect(missed.length).toBeGreaterThan(0);
   });
 });

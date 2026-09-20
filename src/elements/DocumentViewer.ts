@@ -1451,8 +1451,12 @@ export class DocumentViewer extends LitElement {
           point,
           target instanceof Element ? this.noteKeyUnder({ target } as unknown as Event) : undefined
         );
+      // Keyed by where the ghost will be DRAWN, so a mouse sliding across one
+      // beat's neighbourhood redraws nothing: the column is the landing when
+      // there is one, and the fraction only where there is no ink to measure.
       const signature = placement
-        ? `${placement.measureIndex}:${placement.partIndex}:${placement.staffIndex}:${placement.projection}:${placement.line}:${placement.fraction.toFixed(3)}`
+        ? `${placement.measureIndex}:${placement.partIndex}:${placement.staffIndex}:${placement.projection}:${placement.line}:` +
+          (placement.columnKey ?? placement.fraction.toFixed(3))
         : '';
       if (signature === this.hoverSignature) return;
       this.hoverSignature = signature;

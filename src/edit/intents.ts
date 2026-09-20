@@ -53,7 +53,9 @@ export type NavigationIntent =
    * It carries the whole address because a pointer can cross every part of it
    * at once — another part, another staff, another projection in the combined
    * score — which no keyboard move can do. `line` is read in `projection`'s
-   * own terms, and `noteKey`, when the pointer was on ink, outranks `fraction`.
+   * own terms. `noteKey` (the pointer was ON ink) outranks `columnKey` (the
+   * nearest drawn moment), which outranks `fraction` (a linear guess at a
+   * non-linear engraving, right only where there is no ink to measure).
    */
   | {
       type: 'goToPointer';
@@ -63,7 +65,11 @@ export type NavigationIntent =
       line: number;
       projection: 'notation' | 'tab';
       noteKey?: string;
-      /** Where along the bar, 0…1 of its metric span. */
+      /** The nearest drawn moment in the bar, measured off the engraving —
+       *  the honest answer to "which beat", and it outranks `fraction`. */
+      columnKey?: string;
+      /** Where along the bar, 0…1 of its metric span. The estimate of last
+       *  resort: it is linear and the engraving is not. */
       fraction: number;
     }
   /** The selection ladder (roadmap/complete/core-selection-ladder.md): relax

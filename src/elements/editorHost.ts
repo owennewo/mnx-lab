@@ -476,7 +476,8 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
       line: detail.line,
       projection: detail.projection,
       fraction: detail.fraction,
-      ...(detail.noteKey === undefined ? {} : { noteKey: detail.noteKey })
+      ...(detail.noteKey === undefined ? {} : { noteKey: detail.noteKey }),
+      ...(detail.columnKey === undefined ? {} : { columnKey: detail.columnKey })
     })) draw();
   };
   const win = document_.defaultView;

@@ -240,6 +240,67 @@ try {
     'the session landed in a different bar than the placement named'
   );
 
+  // ── A PRESS ON A BLANK STRING LANDS ON THE BEAT BESIDE IT ────────────────
+  //
+  // The tab staff draws no rests and most of its strings are empty, so a press
+  // there is usually over no ink at all — and it used to be resolved by a
+  // LINEAR fraction of the bar's width. Engraving is not linear (a bar with a
+  // clef and a time signature starts its ink a quarter of the way in), so the
+  // press drifted to the next beat: the owner's report was that clicking the
+  // first rest of a bar of rests entered the note on the second.
+  //
+  // The invariant needs no knowledge of the document. Press a fret digit, then
+  // press the SAME x on a string with nothing on it: both are the same beat, so
+  // the cursor must not move along the bar. Before the columns were measured,
+  // the second press walked off the first.
+  await run(`window.__placed = []; window.__under = undefined;`);
+  const column = await run(`
+    const svg = viewer().renderRoot.querySelector('#projection-container svg');
+    const onScreen = r => r.top > 80 && r.bottom < window.innerHeight - 80 && r.left > 80 && r.right < window.innerWidth - 80;
+    const digits = [...svg.querySelectorAll('.fret-number[data-source-id]')]
+      .map(el => ({ el, r: el.getBoundingClientRect() }))
+      .filter(d => onScreen(d.r));
+    const ink = [...svg.querySelectorAll('[data-source-id]')].map(el => el.getBoundingClientRect());
+    const clear = (x, y) => !ink.some(r => x > r.left - 4 && x < r.right + 4 && y > r.top - 4 && y < r.bottom + 4);
+    for (const d of digits) {
+      const x = d.r.x + d.r.width / 2, y = d.r.y + d.r.height / 2;
+      // One or two strings away, whichever side has nothing drawn on it.
+      for (const dy of [d.r.height * 1.4, -d.r.height * 1.4, d.r.height * 2.8, -d.r.height * 2.8]) {
+        if (!clear(x, y + dy)) continue;
+        if (!onScreen({ top: y + dy - 4, bottom: y + dy + 4, left: x - 4, right: x + 4 })) continue;
+        return JSON.stringify({ key: d.el.getAttribute('data-source-id'), x, y, blankY: y + dy });
+      }
+    }
+    return null;
+  `);
+  assert.ok(column, 'found no fret digit with a blank string beside it to press');
+  const col = JSON.parse(column);
+
+  await clickAt(col.x, col.y); // on the digit itself: the exact path
+  const onInk = JSON.parse(await run(`
+    const c = page().editor.session.cursor;
+    return JSON.stringify({ measureIndex: c.measureIndex, num: c.onset.num, den: c.onset.den });
+  `));
+
+  await run(`window.__placed = []; window.__under = undefined;`);
+  await clickAt(col.x, col.blankY); // the same beat, on a string with nothing on it
+  const offInk = JSON.parse(await run(`
+    const c = page().editor.session.cursor;
+    return JSON.stringify({ measureIndex: c.measureIndex, num: c.onset.num, den: c.onset.den });
+  `));
+  const blankPress = JSON.parse(await run(`return JSON.stringify(window.__placed[0]?.detail ?? null);`));
+  assert.ok(blankPress, 'a press on a blank string emitted no placement');
+  assert.equal(blankPress.projection, 'tab', 'the press did not land on the fingerboard');
+  assert.ok(
+    blankPress.columnKey,
+    'the press fell back to the linear fraction: no drawn column was measured'
+  );
+  assert.equal(
+    `${offInk.measureIndex}:${offInk.num}/${offInk.den}`,
+    `${onInk.measureIndex}:${onInk.num}/${onInk.den}`,
+    'pressing a blank string beside a fret digit landed on a different beat than the digit itself'
+  );
+
   // A press on empty staff space places too — the owner's case is a skeleton
   // of rests with no ink to aim at. Here: the same staff, a space above its
   // top line, where no glyph sits.

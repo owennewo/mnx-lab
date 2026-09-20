@@ -1,5 +1,5 @@
 import { eventAtContainer } from '../model/noteWalk.ts';
-import { sameContainerIndex } from '../model/noteKeys.ts';
+import { sameContainerIndex, syntheticEventKey } from '../model/noteKeys.ts';
 import type { ContainerIndex } from '../model/noteKeys.ts';
 // The position cursor — roadmap/complete/core-editor-input-layer.md.
 //
@@ -68,6 +68,10 @@ export interface EventSlot {
   voiceIndex: number;
   eventIndex: number;
   containerIndex?: ContainerIndex;
+  /** The key the RENDERER stamps on this event's own ink — a rest's glyph.
+   *  Spelled as `layout/notation.ts` spells it, so a pointer landing that
+   *  names drawn ink can be resolved back to the stop it belongs to. */
+  key?: string;
   /** A tremolo member: its members sound as one written event and are ONE
    *  stop for the arrows (a grace's notes are separate stops). */
   together?: true;
@@ -346,6 +350,16 @@ export function buildGrid(doc: MnxStructure, partIndex = 0, staffIndex = 1): Pos
             eventIndex,
             ...(containerIndex === undefined ? {} : { containerIndex }),
             ...(together ? { together: true as const } : {})
+            ,
+            // The renderer's spelling, container index and all omitted — which
+            // is how notation spells a rest's `sourceId`, so the two meet.
+            key: event.id ?? syntheticEventKey({
+              partIndex,
+              measureIndex,
+              staffIndex: sequenceStaff,
+              voiceIndex,
+              eventIndex
+            })
           });
           (event.notes ?? []).forEach((note, noteIndex) => {
             position.raw.push({
@@ -966,6 +980,12 @@ export interface PointerTarget {
   line: number;
   /** The note the pointer was actually on, when it was on one. */
   noteKey?: string;
+  /**
+   * The nearest DRAWN moment in the bar, measured off the engraving by the
+   * viewer — a note's key or a rest's. It names a COLUMN and nothing else:
+   * the line remains the one that was pointed at.
+   */
+  columnKey?: string;
   /** Where along the bar the pointer fell, 0…1 of its metric span. */
   fraction: number;
 }
@@ -973,17 +993,28 @@ export interface PointerTarget {
 /**
  * Resolve a pointer landing against the grid.
  *
- * Two ways in, and the order matters. **A named note is exact**: the reader
- * clicked that notehead or that fret digit, so its slot supplies the stop, the
- * line and the voice — better than re-deriving a line from a y that rounding
- * may leave a half-space out. **A fraction is a neighbourhood**: musical
- * spacing is not linear, so it names a region of the bar and the nearest stop
- * wins, ties going to the earlier one.
+ * Three ways in, and the order matters.
  *
- * The fraction path is what makes an EMPTY bar clickable, which is the whole
- * point of the item: a bar of rests has no ink to name, but it has stops — its
- * rest, and the entry ghost holding the un-filled remainder — so a click
- * anywhere in it lands somewhere the next note can be typed.
+ * **A named note is exact**: the reader clicked that notehead or that fret
+ * digit, so its slot supplies the stop, the line and the voice — better than
+ * re-deriving a line from a y that rounding may leave a half-space out. A
+ * named REST resolves the same way but only as far as its stop: a rest has no
+ * line of its own on the fingerboard, so the pointer's own line stands.
+ *
+ * **A named column is the measured beat.** The viewer reads the nearest drawn
+ * moment off the engraving and sends its key; it fixes the stop and leaves the
+ * line alone, so clicking the empty fourth string above a chord puts the
+ * cursor on the fourth string AT THAT BEAT.
+ *
+ * **A fraction is a last resort**, and a poor one: it is linear in the bar's
+ * width and music is not spaced linearly, so it names a region and the nearest
+ * stop wins, ties going to the earlier one. It used to be the only path for
+ * anything that was not a notehead, and it drifted by a whole event — a bar
+ * carrying a clef and a time signature starts its ink a quarter of the way in,
+ * so clicking the first rest of a bar of rests landed on the second. It now
+ * answers only where there is no ink at all to measure: an empty bar, or the
+ * ghost bar past the end — which is still the case that makes an EMPTY bar
+ * clickable, so a click anywhere in one lands somewhere a note can be typed.
  *
  * Refusal is by identity: a measure the grid does not cover returns the cursor
  * it was given, exactly as every other move does.
@@ -1000,6 +1031,8 @@ export function moveToPointer(
 
   let landing: Position | undefined;
   let slot: NoteSlot | undefined;
+  /** The event a key names, when it names one — a rest carries its own. */
+  let namedEvent: EventSlot | undefined;
   if (target.noteKey !== undefined) {
     for (const position of inMeasure) {
       const found = position.slots.find(s => s.noteKey === target.noteKey);
@@ -1008,6 +1041,20 @@ export function moveToPointer(
         slot = found;
         break;
       }
+    }
+  }
+  // A REST IS INK THE READER CAN CLICK, and it is not a note, so it has no
+  // slot to be found in. Without this the click fell through to the fraction
+  // and the drift below put the cursor on the neighbouring beat — on the very
+  // ink that was pointed at.
+  for (const key of [target.noteKey, target.columnKey]) {
+    if (landing) break;
+    if (key === undefined) continue; // a pointer over no ink still has a column
+    for (const position of inMeasure) {
+      const slotted = position.slots.find(s => s.noteKey === key);
+      if (slotted) { landing = position; namedEvent = undefined; break; }
+      const found = position.events.find(e => e.key === key);
+      if (found) { landing = position; namedEvent = found; break; }
     }
   }
   if (!landing) {
@@ -1041,6 +1088,7 @@ export function moveToPointer(
   const voice =
     slot?.voiceIndex ??
     onLine[0]?.voiceIndex ??
+    namedEvent?.voiceIndex ??
     (landing.voices.includes(cursor.voiceIndex ?? 0)
       ? (cursor.voiceIndex ?? 0)
       : (landing.voices[0] ?? 0));

@@ -22,6 +22,7 @@
  */
 import {
   assignSystems,
+  collectInkColumns,
   bandDistance,
   bandLineGap,
   collectBarlines,
@@ -30,6 +31,7 @@ import {
   isTabBand,
   measureBoundaries,
   tabBandMarkers,
+  type InkColumn,
   type StaffBand,
   type SystemBand
 } from './scoreGeometry.ts';
@@ -58,10 +60,24 @@ export interface PointerPlacement {
   projection: 'notation' | 'tab';
   /** A string number (tab) or a staff position (notation). */
   line: number;
-  /** Where along the bar, 0…1 of its metric span. */
+  /**
+   * Where along the bar, 0…1 of its metric span — LINEARLY, which the
+   * engraving is not. It is the last resort now: a bar with drawn ink reports
+   * `columnKey` instead, and only a bar with none (an empty bar, a ghost bar
+   * past the end) falls back to this estimate.
+   */
   fraction: number;
   /** The note the pointer was actually over, when it was over one. */
   noteKey?: string;
+  /**
+   * The nearest DRAWN moment in the bar — a note's key or a rest's.
+   *
+   * The pointer's honest answer to "which beat is this?", because it is the
+   * one the reader was looking at. It names a column, not a note: the line
+   * stays the one that was pointed at, so clicking the empty fourth string
+   * over a chord puts the cursor on the fourth string at that beat.
+   */
+  columnKey?: string;
 }
 
 /** The measured page, built once per paint and asked many times. */
@@ -77,6 +93,8 @@ export interface ScorePointerMap {
   /** Per-band line spacing, by band index. */
   gaps: number[];
   boundaries: (number | undefined)[][];
+  /** Every drawn moment on the page — the ruler the fraction is not. */
+  columns: InkColumn[];
 }
 
 /**
@@ -99,7 +117,10 @@ export function buildPointerMap(
     const count = rows[rowIndex]?.length ?? 0;
     return count > 0 ? measureBoundaries(system, barlines, count, unitsPerSp) : [];
   });
-  return { sp: unitsPerSp, staves, systems, markers, rows, table, gaps, boundaries };
+  return {
+    sp: unitsPerSp, staves, systems, markers, rows, table, gaps, boundaries,
+    columns: collectInkColumns(svg, unitsPerSp)
+  };
 }
 
 /**
@@ -178,6 +199,11 @@ export function hitTest(
     ? Math.round((point.y - band.top) / Math.max(gap, 1e-6)) + 1
     : Math.round(((band.top + band.bottom) / 2 - point.y) / Math.max(gap / 2, 1e-6));
 
+  // WHICH BEAT, measured rather than estimated. The columns inside this bar
+  // are the moments the reader can see; the nearest one is the one they meant.
+  // Restricted to this SYSTEM's vertical extent so a bar in the row below,
+  // which shares an x range, cannot answer for this one.
+  const column = nearestColumn(map, rowIndex, left, right, point.x);
   return {
     measureIndex,
     partIndex: staff.partIndex,
@@ -185,8 +211,44 @@ export function hitTest(
     projection: tab ? 'tab' : 'notation',
     line,
     fraction: measurePositionAt(left, right, point.x, map.sp),
-    ...(noteKey === undefined ? {} : { noteKey })
+    ...(noteKey === undefined ? {} : { noteKey }),
+    ...(column === undefined ? {} : { columnKey: column })
   };
+}
+
+/**
+ * The drawn moment closest to `x` inside one bar of one system, if any.
+ *
+ * A column is attributed to a system the same way the POINT was — by nearest
+ * band — rather than by falling inside its staff lines: a notehead three
+ * ledger lines up is outside every band and still plainly belongs to the
+ * system it hangs off. Two rows share an x range, so without this a bar in the
+ * row below could answer for the one that was clicked.
+ */
+function nearestColumn(
+  map: ScorePointerMap,
+  rowIndex: number,
+  left: number,
+  right: number,
+  x: number
+): string | undefined {
+  let best = Number.POSITIVE_INFINITY;
+  let key: string | undefined;
+  for (const candidate of map.columns) {
+    if (candidate.x < left || candidate.x > right) continue;
+    const distance = Math.abs(candidate.x - x);
+    if (distance >= best) continue;
+    let ownerRow = 0;
+    let closest = Number.POSITIVE_INFINITY;
+    map.systems.forEach((band, index) => {
+      const gap = bandDistance(band, candidate.y);
+      if (gap < closest) { closest = gap; ownerRow = index; }
+    });
+    if (ownerRow !== rowIndex) continue;
+    best = distance;
+    key = candidate.key;
+  }
+  return key;
 }
 
 /**
@@ -252,7 +314,15 @@ export function drawPointerGhost(
   const left = boundaries[cell] ?? system.x1;
   const right = boundaries[cell + 1] ?? system.x2;
   const gap = map.gaps[bandIndex] || map.sp;
-  const x = measurePositionX(left, right, placement.fraction, map.sp);
+  // WHERE THE CLICK WILL ACTUALLY LAND. The ghost promises a landing, so it
+  // has to be drawn by the same rule that decides one: on the measured column
+  // when there is one, and only otherwise on the linear estimate — which is
+  // what it always used, and what made it point between the beats of a bar
+  // whose ink starts past a clef.
+  const column = placement.columnKey === undefined
+    ? undefined
+    : map.columns.find(candidate => candidate.key === placement.columnKey);
+  const x = column ? column.x : measurePositionX(left, right, placement.fraction, map.sp);
   const y =
     placement.projection === 'tab'
       ? band.top + (placement.line - 1) * gap

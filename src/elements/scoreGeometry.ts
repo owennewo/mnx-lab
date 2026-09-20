@@ -74,6 +74,45 @@ export function union(boxes: Box[]): Box {
   return { x: x0, y: y0, w: x1 - x0, h: y1 - y0 };
 }
 
+/** One engraved column of a voice's ink: where a moment was actually DRAWN. */
+export interface InkColumn {
+  /** The centre of the ink, in page units. */
+  x: number;
+  /** Vertical centre, so a column can be attributed to the band it sits in. */
+  y: number;
+  /** The key the renderer stamped on it — a note's or a rest's. */
+  key: string;
+}
+
+/**
+ * Where the moments of this score are actually drawn.
+ *
+ * MUSIC IS NOT SPACED LINEARLY, and the pointer used to pretend it was:
+ * an x became a fraction of the bar's width and the session snapped that to
+ * the nearest metric onset. A bar's ink does not start at its barline — a
+ * clef and a time signature can push the first column a quarter of the way in
+ * — and the columns after it are spread by springs and rods rather than by
+ * their share of the meter, so clicking a rest landed on its neighbour. The
+ * drawn columns are the honest ruler, and they are right here in the SVG.
+ *
+ * Noteheads, fret digits and rests only: the marks that ARE a moment. A stem,
+ * a beam or a slur carries its event's id too and would drag the column's
+ * centre off the beat it belongs to.
+ */
+export function collectInkColumns(svg: SVGSVGElement, sp: number): InkColumn[] {
+  const columns: InkColumn[] = [];
+  for (const el of svg.querySelectorAll<SVGGraphicsElement>(
+    '.notehead[data-source-id], .fret-number[data-source-id], .rest[data-source-id]'
+  )) {
+    if (el.classList.contains('unperformed')) continue;
+    const key = el.getAttribute('data-source-id');
+    if (!key) continue;
+    const box = inkBox(el, sp);
+    columns.push({ x: box.x + box.w / 2, y: box.y + box.h / 2, key });
+  }
+  return columns;
+}
+
 /** Staff lines grouped into staves; a gap > 2.5 sp starts the next staff. */
 export function collectStaves(svg: SVGSVGElement, sp: number): Omit<StaffBand, 'system'>[] {
   const lines = [...svg.querySelectorAll<SVGLineElement>('line.staff-line')]

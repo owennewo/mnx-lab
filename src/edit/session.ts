@@ -1706,7 +1706,8 @@ export class EditorSession {
             measureIndex: intent.measureIndex,
             line: intent.line,
             fraction: intent.fraction,
-            ...(intent.noteKey === undefined ? {} : { noteKey: intent.noteKey })
+            ...(intent.noteKey === undefined ? {} : { noteKey: intent.noteKey }),
+            ...(intent.columnKey === undefined ? {} : { columnKey: intent.columnKey })
           },
           span,
           projection
