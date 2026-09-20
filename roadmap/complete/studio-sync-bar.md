@@ -1,8 +1,9 @@
 # Sync bar — authoring recording sync inside the player's tray
 
-> **Status: built 2026-09-17, awaiting the hands-on checks** (the click against a real
-> YouTube clock; the bar on touch). Implementation loop. Reference: [docs/player-sync-bar.md](../../docs/player-sync-bar.md).
-> [Player campaign](core-campaign-player.md) item 21; follows recording sync (15), recording
+> **Status: built 2026-09-17; complete 2026-09-20** — closed by the owner with the two hands-on
+> checks (the click against a real YouTube clock; the bar on touch) still being made on the
+> live site; see [studio-sync-rederive](studio-sync-rederive.md), which carries them. Implementation loop. Reference: [docs/player-sync-bar.md](../../docs/player-sync-bar.md).
+> [Player campaign](../inprogress/core-campaign-player.md) item 21; follows recording sync (15), recording
 > playback (16), YouTube (17), recording attachments (18) and bookends (19). Design canvas:
 > <https://claude.ai/artifact/6fvpa1Jub6nLPSiVymFBvR> (page "Sync bar"; the full-screen first
 > pass on its second page was rejected as far too large).
@@ -87,7 +88,7 @@ few is half a beat out at the midpoint, where a click over the recording makes i
   that returns the same syncpoints must not reselect the source.
 - **The workbench is untouched** and stays backend-free; it never sets `syncEditable`.
 - No golden moves. No scenario is added. Rendering and performance goldens stay
-  byte-identical, so this item registers nothing in [lab-verify.md](lab-verify.md).
+  byte-identical, so this item registers nothing in [lab-verify.md](../inprogress/lab-verify.md).
 
 ## Proof
 

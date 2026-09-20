@@ -1,7 +1,9 @@
 # Sync first, bars later
 
-> **Status: built 2026-09-17; two hands-on checks still owed (below).** Item 4 of the
-> [studio authoring campaign](studio-campaign-authoring.md), bound by its clause 10 — *the
+> **Status: built 2026-09-17; complete 2026-09-20.** The owner closed it with the two hands-on
+> checks below still in progress — testing continues on the live site, and a finding reopens
+> nothing here: it is a defect against the built thing. Item 4 of the
+> [studio authoring campaign](../inprogress/studio-campaign-authoring.md), bound by its clause 10 — *the
 > segments are the sync; the tuples are a cache*. Implementation loop. No golden moved; no
 > verification debt.
 
@@ -63,17 +65,19 @@ into something else?"* — and the honest answer was: no, but what plays is not 
   score* for those two and *may be out of date* for the one stamped `4x1/1`. Run and passed
   2026-09-17, as was `smoke:sync-bar` after the player change.
 
-## Still owed — and not by a machine
+## The hands-on checks — not a machine's, and not a gate
 
 The campaign folded [studio-sync-bar](studio-sync-bar.md)'s two outstanding checks into this
-item. Neither can be made from here, and neither is claimed:
+item. Neither can be made from here, and neither is claimed by this doc. **On 2026-09-20 the
+owner marked the item complete with both still open**, to keep testing on the live site rather
+than hold the campaign on them:
 
 - **The click against a real YouTube clock** — a judgement by ear, on a real video.
 - **The sync bar on touch** — its 16 px segment-label targets, on the tablet.
 
 They are best made on a piece created with item 2, which is the first time the flow can be
-walked end to end: *New piece → Add recording (YouTube) → Sync bar*. This doc stays in
-`inprogress/` until they are.
+walked end to end: *New piece → Add recording (YouTube) → Sync bar*. Both can be walked
+locally — YouTube plays under `wrangler dev` — so nothing about them needs the deployment.
 
 ## Not done here
 

@@ -4,7 +4,7 @@
 // from its segments, not read from the stale tuples beside them — and the
 // refreshed tuples are written back. An imported sync Studio has not seen is
 // stamped with the score's shape; one stamped for other bars says so
-// (roadmap/inprogress/studio-sync-rederive.md).
+// (roadmap/complete/studio-sync-rederive.md).
 import fs from 'node:fs';
 import http from 'node:http';
 import { spawn } from 'node:child_process';

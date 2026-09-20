@@ -1001,7 +1001,7 @@ export class Player extends LitElement {
 
   // ── the sync bar ────────────────────────────────────────────────────────
   // The rail's slot, toggled to recording time, where a host that stores the
-  // result lets a sync be made (roadmap/inprogress/studio-sync-bar.md). The
+  // result lets a sync be made (roadmap/complete/studio-sync-bar.md). The
   // bar edits segments; this derives the tuples, applies them to the live
   // backend in place and reports both.
   private get recordingBackend() { return this.session?.backend instanceof RecordingBackend ? this.session.backend : null; }

@@ -23,7 +23,7 @@ const FINE_NUDGE = 0.025, COARSE_NUDGE = 0.1;
 const clock = (seconds: number) => `${Math.floor(seconds / 60)}:${(seconds % 60).toFixed(2).padStart(5, '0')}`;
 
 /**
- * The SYNC BAR (roadmap/inprogress/studio-sync-bar.md): the recording's whole
+ * The SYNC BAR (roadmap/complete/studio-sync-bar.md): the recording's whole
  * length in the rail's slot and at the rail's size, divided by cut lines into
  * segments of whole beats. It edits a `SyncSegments` value and owns nothing
  * else — the player seeks, loops, clicks and derives; the host stores.

@@ -154,20 +154,19 @@ back up to `proposed/` the moment it is.
 
 ### inprogress/
 
-- **[studio-sync-rederive.md](inprogress/studio-sync-rederive.md)** — **built 2026-09-17, two
-  hands-on checks owed**, [studio authoring campaign](inprogress/studio-campaign-authoring.md)
+- **[studio-sync-rederive.md](complete/studio-sync-rederive.md)** — **built 2026-09-17, complete
+  2026-09-20** (closed by the owner; the two hands-on checks continue on the live site), [studio authoring campaign](inprogress/studio-campaign-authoring.md)
   item 4: sync first, bars later. A Studio sync now **plays by its segments**, derived
   against the bars as they are now (`playingSyncpoints`), and the stored tuples are a cache
   the player never consults and Studio refreshes (`sync-refresh`). An imported sync, which
   cannot be re-derived, carries the score **shape** it was last good for and reads *may be
-  out of date* in the Source sheet when the bars have moved. Owed by a person, inherited
-  from [studio-sync-bar](inprogress/studio-sync-bar.md): the click against a real YouTube
-  clock, and the sync bar on touch.
+  out of date* in the Source sheet when the bars have moved. The checks a person makes,
+  inherited from [studio-sync-bar](complete/studio-sync-bar.md): the click against a real
+  YouTube clock, and the sync bar on touch.
 - **[studio-campaign-authoring-pickup.md](inprogress/studio-campaign-authoring-pickup.md)** —
   **start here to continue the studio authoring campaign.** A handoff note written
   2026-09-17 at the end of the session that built items 1–5 and item 7's three slices: what is
-  left and in what order (apply migration 0005 then deploy; the owner's two hands-on sync
-  checks; touch entry — the workbench's adoption of `bindEditor` has since landed), the owner's decisions not to
+  left and in what order (apply migration 0005 then deploy; pointer placement, then touch entry — the workbench's adoption of `bindEditor` has since landed), the owner's decisions not to
   reopen, the layer rules and tooling traps that cost time, how to run the browser smokes,
   and a file map. Delete it when the campaign closes.
 - **[studio-campaign-authoring.md](inprogress/studio-campaign-authoring.md)** — **campaign**,
@@ -247,8 +246,8 @@ back up to `proposed/` the moment it is.
   the promoted `src/importers/` worker. The rederive sweep, its routes, the version pin and
   the build check are gone, and so is the workbench's Load dialog — `/workbench/` never
   touches the service; only `/studio/` is behind Access.
-- **[studio-sync-bar.md](inprogress/studio-sync-bar.md)** — [player campaign](inprogress/core-campaign-player.md)
-  item 21, **built 2026-09-17**, awaiting the hands-on checks (a real YouTube clock, touch):
+- **[studio-sync-bar.md](complete/studio-sync-bar.md)** — [player campaign](inprogress/core-campaign-player.md)
+  item 21, **built 2026-09-17, complete 2026-09-20** (the hands-on checks — a real YouTube clock, touch — continue on the live site):
   a recording's sync made **inside the tray**. A toggle swaps the rail for a time-shaped
   **sync bar** of the same size; two trim handles leave pre-roll and post-roll unsynced, the
   segment between them is a **whole number of beats** (tempo follows from the count, a click

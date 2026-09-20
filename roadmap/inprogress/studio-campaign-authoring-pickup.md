@@ -15,9 +15,9 @@
 | 1 | Round-trip comparator + loss register | complete (`966fe6c7`) | [core-roundtrip-register](../complete/core-roundtrip-register.md) |
 | 2 | Make a piece (`#/new`) | complete (`5feeb2fc`) | [studio-piece-create](../complete/studio-piece-create.md) |
 | 3 | Save pipeline, Details sheet | complete (`2cfc0280`) | [studio-save-pipeline](../complete/studio-save-pipeline.md) |
-| 4 | Sync re-derivation, shape stamp | built (`f2de86f1`); **two hands-on checks owed by the owner** | [studio-sync-rederive](studio-sync-rederive.md) |
+| 4 | Sync re-derivation, shape stamp | complete 2026-09-20 (`f2de86f1`); the owner keeps testing the two hands-on checks on the live site | [studio-sync-rederive](../complete/studio-sync-rederive.md) |
 | 5 | Delete, versions, revert, defect reports | complete (`7ddd02d5`); **migration 0005 before deploy** | [studio-piece-lifecycle](../complete/studio-piece-lifecycle.md) |
-| 6 | sync.json interchange | not started, optional — wait for a second consumer | (index row only) |
+| 6 | sync.json interchange | **skipped 2026-09-20** by the owner | (index row only) |
 | 7 | Editor promotion | complete — slices 1–3 (`a394e7bc`, `7b38b743`), then the workbench's adoption of the binding | [core-editor-element-promotion](../complete/core-editor-element-promotion.md) |
 | 8 | Touch entry | not started — needs design first | (index row only) |
 | 9 | Pointer placement (click/tap places the cursor) | proposed 2026-09-20 — item 8's first piece | [core-editor-pointer-placement](../proposed/core-editor-pointer-placement.md) |
@@ -37,8 +37,10 @@ npx wrangler d1 migrations apply LIBRARY_DB --remote    # FIRST
 npm run deploy
 ```
 
-This is outward-facing and the owner's to trigger — ask, do not just run it. After it,
-the things worth looking at on the real site, because nothing local can show them:
+This is outward-facing and the owner's to trigger — ask, do not just run it. The things worth
+walking after it — **all of which can be walked locally first**, since YouTube plays under
+`wrangler dev` (the owner corrected this note on 2026-09-20; the earlier claim that only the
+real site could show them was wrong):
 
 - `#/new` → make a piece → it opens; **Source → Add recording → a YouTube link** → the rail /
   sync-bar toggle appears (it is hidden while the synth is the source).
@@ -50,17 +52,17 @@ the things worth looking at on the real site, because nothing local can show the
 - `npm run defects:library -- --list` against production (same credential flags as the
   ingest). Expect nothing until someone edits something Guitar Pro cannot hold.
 
-### 2. The owner's two hands-on checks (item 4 inherits them from the sync bar)
+### 2. ~~The owner's two hands-on checks (item 4 inherits them from the sync bar)~~ — closed 2026-09-20
 
-Neither can be closed by a machine, and [studio-sync-rederive](studio-sync-rederive.md) stays
-in `inprogress/` until both are:
+The owner marked item 4 complete with both checks still in progress, to keep testing on the
+live site; [studio-sync-rederive](../complete/studio-sync-rederive.md) records it. They were:
 
 - **the click against a real YouTube clock** — by ear, on a real video;
 - **the sync bar on touch** — its 16 px segment-label targets, on the Android tablet.
 
 Best done on a piece made with `#/new`, which is the first time the priority flow can be
-walked end to end. When the owner reports both, move that doc (and
-[studio-sync-bar](studio-sync-bar.md), if its own status agrees) to `complete/`.
+walked end to end. Both docs (and [studio-sync-bar](../complete/studio-sync-bar.md)) are in
+`complete/`; a finding from either check is a defect against the built thing, not a reopening.
 
 ### 3. ~~Item 7's last work-list item: the workbench adopts `bindEditor`~~ — done
 

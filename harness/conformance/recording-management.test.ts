@@ -118,7 +118,7 @@ it('authenticates HTTP uploads and rejects cross-site/non-JSON writes', async ()
   expect((await realApp.request('/api/library/uploads/'+id(),{method:'PUT',body:payload},env)).status).toBe(401);
   expect((await realApp.request('/api/library/uploads/'+id(),{method:'PUT',headers:{'Content-Type':'application/json','Cf-Access-Jwt-Assertion':jwt},body:'{}'},env)).status).toBe(415);
 });
-// roadmap/inprogress/studio-sync-rederive.md: the shape an imported sync is known good for.
+// roadmap/complete/studio-sync-rederive.md: the shape an imported sync is known good for.
 it('stamps a score shape into whatever provenance a recording has, without touching its sync', async () => {
   const take = id();
   const before = await manager.save('alice','piece',take,0,change);

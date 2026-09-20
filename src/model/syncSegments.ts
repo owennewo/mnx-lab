@@ -1,4 +1,4 @@
-/** The sync bar's authoring model (roadmap/inprogress/studio-sync-bar.md).
+/** The sync bar's authoring model (roadmap/complete/studio-sync-bar.md).
  *
  *  A recording made to a steady pulse is described by where its beats start,
  *  where they stop and how many there are. The model is therefore a row of CUT

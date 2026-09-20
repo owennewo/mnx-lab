@@ -1,5 +1,5 @@
 // Implementation loop: sync first, bars later
-// (roadmap/inprogress/studio-sync-rederive.md, studio authoring campaign item 4).
+// (roadmap/complete/studio-sync-rederive.md, studio authoring campaign item 4).
 //
 // A sync made in Studio is its SEGMENTS — a beat count over time. The tuples
 // stored beside them are a cache of those segments against the bars the score

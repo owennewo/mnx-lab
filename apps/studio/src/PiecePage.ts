@@ -20,7 +20,7 @@
 // button that names it, opening the Source sheet (choose, edit, add) in the
 // frame's side slot beside Instruments; the recording editor opens there too.
 // 2026-09-17: the tray's sync bar makes a recording's sync here; this page is
-// the host that stores it (roadmap/inprogress/studio-sync-bar.md).
+// the host that stores it (roadmap/complete/studio-sync-bar.md).
 // 2026-09-17, later: the page EDITS. The Details sheet (the document's own
 // metadata) came first, with the save session that stores its work as `.gp`
 // checkpoints with nobody asked to save (roadmap/complete/studio-save-pipeline.md);

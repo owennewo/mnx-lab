@@ -1,4 +1,4 @@
-/** The sync bar's click, as arithmetic (roadmap/inprogress/studio-sync-bar.md).
+/** The sync bar's click, as arithmetic (roadmap/complete/studio-sync-bar.md).
  *
  *  A recording's clock is read, not owned: HTML media reports it in coarse
  *  steps and YouTube in jittery ones, so a click scheduled straight off a

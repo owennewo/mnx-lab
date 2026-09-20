@@ -1,7 +1,7 @@
 # The sync bar — making a recording's sync in the tray
 
 Implementation loop, player campaign item 21
-([roadmap/inprogress/studio-sync-bar.md](../roadmap/inprogress/studio-sync-bar.md)).
+([roadmap/complete/studio-sync-bar.md](../roadmap/complete/studio-sync-bar.md)).
 Recording playback is [player-recordings.md](player-recordings.md); the tuple format and
 the sync map are [player-recording-sync.md](player-recording-sync.md).
 
@@ -109,7 +109,7 @@ A score with no bars yet saves `syncpoints: null` and keeps its segments. Saves 
 segments are still the reader's latest intent.
 
 **The segments are the sync; the tuples are a cache** (2026-09-17,
-[studio-sync-rederive](../roadmap/inprogress/studio-sync-rederive.md)). The tuples were
+[studio-sync-rederive](../roadmap/complete/studio-sync-rederive.md)). The tuples were
 derived against the bars the score had when the sync was last touched, so bars written since
 — or a meter changed, or a repeat added — leave them stale. Whenever a source has segments,
 the player ignores its stored tuples and derives them again from the segments and the bars

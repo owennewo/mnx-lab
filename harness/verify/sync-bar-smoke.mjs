@@ -1,7 +1,7 @@
 // Run after npm run build. Production Studio with a fixture LibraryClient and
 // real PCM: the tray's sync bar makes a sync from nothing, the score follows it
 // without the source being re-cued, and the save carries segments plus one
-// point per bar (roadmap/inprogress/studio-sync-bar.md).
+// point per bar (roadmap/complete/studio-sync-bar.md).
 // SYNC_BAR_SHOT=<path.png> also writes a screenshot of the zoomed bar.
 import fs from 'node:fs';
 import http from 'node:http';
