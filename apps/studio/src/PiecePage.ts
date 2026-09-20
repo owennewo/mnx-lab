@@ -160,6 +160,15 @@ export class PiecePage extends LitElement {
   // ── editing and saving (roadmap: studio-save-pipeline) ───────────────────
   /** The editor's mount (src/elements/editorHost.ts), loaded only for a piece that can be edited: one history for notes and metadata alike. */
   private editor: EditorBinding | null = null;
+  /**
+   * A touch device plays; it does not edit
+   * ([studio-editor-touch](../../../roadmap/rejected/studio-editor-touch.md)).
+   * Studio's editing is a keyboard instrument — every verb is a keystroke — so
+   * where the primary pointer is coarse this page never binds the editor at
+   * all: no cursor, no lock, no chunk loaded, and the sheets that edit say why.
+   * Read once, because the answer is what kind of machine this is.
+   */
+  private readonly playOnly = window.matchMedia?.('(pointer: coarse)').matches ?? false;
   private session: SaveSession<MnxStructure> | null = null;
   /** Once the document has been edited here, the heading reads the document, not the library's tags. */
   private touched = false;
@@ -416,7 +425,8 @@ export class PiecePage extends LitElement {
 
   /** Start saving for the piece just opened. Returns this device's unsaved edits, if it has any to continue from. */
   private async beginSession(pieceId: string, document: MnxStructure, renditionId: string): Promise<MnxStructure | null> {
-    this.readOnly = !(await this.takeLock(pieceId));
+    // A play-only device takes no lock: holding it would lock a real editor out from elsewhere.
+    this.readOnly = this.playOnly || !(await this.takeLock(pieceId));
     const revisionOf = async () => (this.snapshot?.piece.id === pieceId ? this.snapshot : (await this.client.piece(pieceId)).snapshot).piece.revision;
     const session = new SaveSession<MnxStructure>(pieceId, document, { renditionId }, {
       prepare: async doc => {
@@ -465,8 +475,15 @@ export class PiecePage extends LitElement {
         this.error = 'Unsaved edits from this device could not be opened here, so they were downloaded as a file.';
       }
     }
-    // The editor's mount is its own chunk: a piece that only plays never loads it. It copies the document it is
-    // given, so the save session is told which object IS the saved one (or the recovered one) from here on.
+    // The editor's mount is its own chunk: a piece that only plays never loads it — which on a
+    // touch device is every piece. The session still exists, and stays idle with nothing to save.
+    if (this.playOnly) {
+      this.editor?.dispose(); this.editor = null;
+      session.adopt(live);
+      return null;
+    }
+    // It copies the document it is given, so the save session is told which object IS the saved
+    // one (or the recovered one) from here on.
     const { bindEditor } = await import('../../../src/elements/editorHost.ts');
     if (this.session !== session) return null;
     this.editor?.dispose();
@@ -987,12 +1004,12 @@ export class PiecePage extends LitElement {
               ? html`<button slot="actions" type="button" aria-pressed=${this.detailsOpen} @click=${() => this.openPanel(this.detailsOpen ? null : 'details')}>
                   ${detailsGlyph}<span>Details</span>
                 </button>
-                <button slot="actions" type="button" aria-pressed=${this.keysOpen} @click=${() => this.openPanel(this.keysOpen ? null : 'keys')}>
+                ${this.playOnly ? nothing : html`<button slot="actions" type="button" aria-pressed=${this.keysOpen} @click=${() => this.openPanel(this.keysOpen ? null : 'keys')}>
                   ${keysGlyph}<span>Keys</span>
-                </button>
+                </button>`}
                 <span slot="chips">
                   <button type="button" class=${`save ${chip!.tone}`} data-save=${this.save.status} aria-pressed=${this.saveOpen} @click=${() => this.openPanel(this.saveOpen ? null : 'save')}>
-                    ${saveGlyph}<span>${this.readOnly ? 'Open in another tab · read only' : chip!.text}</span>
+                    ${saveGlyph}<span>${this.playOnly ? 'Play only on this device' : this.readOnly ? 'Open in another tab · read only' : chip!.text}</span>
                   </button>
                 </span>`
               : nothing}`
@@ -1074,7 +1091,7 @@ export class PiecePage extends LitElement {
           ? html`<mnx-studio-details slot="side"
               .work=${this.doc.mnxJson._x?.mnxLab?.work}
               .readOnly=${this.readOnly || !!this.viewing}
-              .readOnlyReason=${this.viewing ? 'This is an older version. Go back to the current one to edit, or make this one current.' : ''}
+              .readOnlyReason=${this.viewing ? 'This is an older version. Go back to the current one to edit, or make this one current.' : this.playOnly ? 'This device plays. Open the piece on a computer with a keyboard to edit it.' : ''}
               .canDelete=${!!this.snapshot && !!this.session && !this.viewing}
               .canUndo=${!!this.editor?.canUndo}
               .canRedo=${!!this.editor?.canRedo}

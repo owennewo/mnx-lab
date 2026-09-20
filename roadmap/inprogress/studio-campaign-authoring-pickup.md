@@ -19,7 +19,7 @@
 | 5 | Delete, versions, revert, defect reports | complete (`7ddd02d5`); **migration 0005 before deploy** | [studio-piece-lifecycle](../complete/studio-piece-lifecycle.md) |
 | 6 | sync.json interchange | **skipped 2026-09-20** by the owner | (index row only) |
 | 7 | Editor promotion | complete — slices 1–3 (`a394e7bc`, `7b38b743`), then the workbench's adoption of the binding | [core-editor-element-promotion](../complete/core-editor-element-promotion.md) |
-| 8 | Touch entry | **pass one built 2026-09-20** — a bar in the editor overlay; awaiting the owner's hands-on verdict | [studio-editor-touch](../proposed/studio-editor-touch.md) |
+| 8 | Touch entry | **built and REJECTED 2026-09-20** by the owner, on the tablet — the bar is deleted and **studio is play-only on a touch device** | [studio-editor-touch](../rejected/studio-editor-touch.md) |
 | 9 | Pointer placement (a press places the cursor) | complete 2026-09-20 (`5b97fbb7`) | [core-editor-pointer-placement](../complete/core-editor-pointer-placement.md) |
 
 All of it is on `main` and pushed. **None of it is deployed.**
@@ -98,12 +98,16 @@ Not designed. What is known:
   `{keys, meaning}`, both display strings, and the join that resolves a stroke to an intent
   happens inside the binding and is discarded. Generating one needs a new export, which the
   item doc owns.
-- ~~Write the item doc~~ — **written 2026-09-20**
-  ([studio-editor-touch](../proposed/studio-editor-touch.md)). It names one decision for the
-  owner (a 380px side panel, the idiom five sheets already use, versus a bar inside the
-  editor overlay that survives focus mode) and six traps found by survey. Nothing is built
-  until the shape is agreed; the owner has rejected several tray designs on sight (memory:
-  `sync-bar`, `playback-tray-locked`).
+- ~~Write the item doc~~ ~~build pass one~~ — **closed 2026-09-20 as rejected**
+  ([studio-editor-touch](../rejected/studio-editor-touch.md)). The doc named two shapes; the
+  owner chose the bar in the editor overlay, it was built as `<mnx-entry-bar>` with a touch
+  smoke, and the owner rejected it the same day on the tablet: a bar over the score is a bar
+  over the score, and the tablet's whole point is focus mode with the music as the page.
+  **The standing rule now is that studio on a touch device plays and does not edit** — the
+  piece page binds no editor where the primary pointer is coarse. Do not rebuild a palette
+  without reading the rejected doc; its traps and its survey are still accurate. (The owner
+  has now rejected a bottom-edge surface on sight three times: memory `sync-bar`,
+  `playback-tray-locked`, and this.)
 
 ### 5. Follow-ups the item docs name, none of them blocking
 

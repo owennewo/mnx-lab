@@ -1,16 +1,54 @@
 # Entry without a keyboard — the editor on a tablet
 
-> **Status: pass one built 2026-09-20.**
-> [Studio authoring campaign](../inprogress/studio-campaign-authoring.md) item 8, the last
-> item between the campaign and its goal. Needed
-> [core-editor-pointer-placement](../complete/core-editor-pointer-placement.md) (item 9),
-> which was its stated blocker. Implementation loop; no golden moves.
+> **Status: built, then REJECTED by the owner on 2026-09-20**, the same day, after using
+> pass one on the tablet. The bar is removed (`src/elements/EntryBar.ts` and its mount are
+> deleted) and the verdict is now a product rule: **on a touch device studio plays, it does
+> not edit.** The piece page does not bind the editor at all where the primary pointer is
+> coarse — see [apps/studio/README.md](../../apps/studio/README.md).
 >
-> **The owner chose shape B on 2026-09-20**: a bar inside the editor's overlay, over the
-> score, rather than a panel in the shell's chrome. The argument that decided it is below,
-> and the rejected alternatives are kept because the reasoning outlives the choice.
+> What decided it: **a bar over the score is a bar over the score.** It sat at the foot of
+> the pane whether or not anything was being edited, and the tablet's reason for existing
+> is focus mode — full screen, the chrome gone, the music the whole page. An editor in
+> permanent residence at the bottom of that is the wrong trade even when the verbs work.
+> Hiding it behind a mode would have been the rule this repo has rejected before.
+>
+> Kept as the case against, per `rejected/`'s purpose: the whole design survey is below,
+> unchanged, because **the next person to want touch entry needs the traps and the shapes**
+> — and needs to know that shape B was not rejected on a guess but on a build.
+> [Studio authoring campaign](../inprogress/studio-campaign-authoring.md) item 8, closed
+> this way. Implementation loop; no golden ever moved.
 
-## Where this starts
+## What was built, and what removing it took
+
+`<mnx-entry-bar>` was an editor surface beside the rung inspector, mounted by `bindEditor`
+into `<mnx-editor-surfaces>` wherever `(pointer: coarse)` matched, emitting the same
+intents a key does. It worked, and `smoke:entry-bar` proved it with real touch events and
+no keystroke at all. That is not what it was judged on.
+
+Removing it was a clean subtraction — the element, the `entryBar` binding option, the
+`syncEntryBar` call in `draw`, the pointer-down exclusion and the smoke — because
+everything went through `dispatch` and nothing else had grown to depend on it. The one
+thing kept is the `undoAction`/`redoAction` pair in `editorHost.ts`, which is a plain
+de-duplication the bar happened to occasion.
+
+The rule that replaced it has a proof of its own: **`npm run smoke:play-only`** drives
+studio as a tablet and asserts the absence — no editor bound, the editor chunk never
+fetched, a tap leaving no cursor, no Keys sheet, and the chip and the Details sheet saying
+why. An absence needs a test more than a feature does; nothing else would notice a refactor
+that quietly re-bound.
+
+**Pointer placement (item 9) stays.** A press placing the edit cursor is a mouse feature
+that a tap also reaches, it is already filed complete, and on a play-only device the same
+tap still seeks playback. Nothing about this rejection touches it.
+
+## Why not just keep it for the people who want it
+
+Considered and refused: a setting. A per-device toggle would make the bar's presence a
+preference to remember, a row in the settings card, and a second answer to "can this
+device edit" — for a surface the owner does not want on the device it was built for. The
+single answer is cheaper and it is the truthful one.
+
+## Where this started
 
 Item 9 closed the gap that made touch impossible: **a tap is a press, and a press places
 the cursor**. On the tablet today you can already open a piece, tap a bar, and have the
@@ -141,7 +179,12 @@ Found while surveying the surfaces, and none of them is guessable from the outsi
   later, once the shape is proven.
 - Handwriting or audio input of any kind.
 
-## What pass one actually is
+## What pass one actually was — kept for the record, and deleted from the tree
+
+Everything below describes the bar **as it was built and removed on 2026-09-20**. None of
+these files exist any more; they are described because the shape and its traps are the
+value this doc keeps.
+
 
 `src/elements/EntryBar.ts` — `<mnx-entry-bar>`, an editor surface beside the rung
 inspector and the lyric editor, mounted by `bindEditor` into `<mnx-editor-surfaces>` and
@@ -179,7 +222,7 @@ it, undo walks it back, and the cursor is never dimmed. It counts the fret **in 
 not in the op log** — `enterFret` is the intent and `insertNote` is the op it records, and
 only one of those is evidence.
 
-### Known, and deliberately left
+### Known at the time, and deliberately left
 
 - **The bar covers the bottom of the score.** Reveal-scroll does not know about it, so a
   cursor near the foot of the pane can end up behind it. The fix is an inset the viewer

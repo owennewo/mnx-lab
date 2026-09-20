@@ -4,9 +4,10 @@
 > normal proposals sharing one goal, the shared contract they follow, and the running log
 > of progress and learnings as items land. Indexed items are ordinary `studio-*` / `core-*`
 > proposals that name this campaign. **Opened 2026-09-17 from a design conversation. Built the
-> same day: items 1–5 and item 7's three slices for studio. Open: item 4's two hands-on checks,
-> item 7's last work-list item (the workbench adopting the binding), item 8 (touch), item 6
-> (optional). Nothing is deployed, and migration 0005 must be applied before anything is.**
+> same day: items 1–5 and item 7's three slices for studio. Item 7's last work-list item
+> landed and item 6 was skipped; **item 8 (touch) was built and rejected on 2026-09-20 —
+> studio plays and does not edit on a touch device.** Open: item 4's two hands-on checks.
+> Nothing is deployed, and migration 0005 must be applied before anything is.**
 > **Picking this up? Start at the [pickup note](studio-campaign-authoring-pickup.md)** — what
 > is left, in what order, and what a new session will not find written anywhere else.
 > Storage shape stays owned by
@@ -218,7 +219,7 @@ one.
 | 5 | [studio-piece-lifecycle](../complete/studio-piece-lifecycle.md) | **complete 2026-09-17 — migration 0005 before deploy** | **Living with pieces.** Soft delete (`pieces.deleted_at`: not found by every read and write, nothing removed), an inline-confirmed *Delete this piece…*, the library's one-tap undo and `#/deleted` with Restore; an ingest of a deleted slice is refused rather than reviving it. **Versions** read off the renditions the snapshot already carries (`src/storage/versions.ts`), listed in the Save sheet; an older one *viewed* with nothing written, and made current by a **pointer move** (`PUT /pieces/:id/canonical`) — no rendition written, undoable, the next edit derived from where the pointer is. **Defect reports**: a lossy save carries the document it was exported from as an `evidence` rendition, once per new kind of loss; the operator lists and pulls them (`npm run defects:library`, never into the repo). Replaced item 3's tag fallback with an explicit `kept: true` for what only the Soundslice sidecar knows. |
 | 6 | `core-sync-interchange` | **skipped 2026-09-20** by the owner (was optional) | **sync.json as interchange.** *Export sync* (none exists): the dense Soundslice-compatible array as derived, or a sparse wrapper with anchors only at the cuts and a wrapper-level `interpolation: "beat"` — never a fifth tuple element, which breaks Soundslice compatibility and the decoder's arity check. The reader option for beat-linear interpolation is built only if sparse export is wanted. **Lifting an imported Soundslice sync into segments** (lossless = one segment per anchor interval, crowded; merged = tidy, discards measured timing) is a decision the item owns. Pick up when a second consumer of a sync appears, not before. |
 | 7 | [core-editor-element-promotion](../complete/core-editor-element-promotion.md) | **built 2026-09-17: slices 1–3 for studio, then the workbench's adoption of the binding — one editor surface** | **The editor in studio.** That doc owns the promotion review. The mount is a plain-DOM host binding beside `bindPlayback` — `bindEditor` in `src/elements/editorHost.ts`, its own lazily loaded chunk, absent from the embed bundles. **Slice 1:** navigation and the ladder, fret and pitch entry, durations, ties, delete, undo, Escape/Enter; structural key scope; `setWork` as an intent; a Keys sheet; the structural checkpoint trigger. **Slice 2 turned out to have already happened** — the one-surface campaign retired every setup popover into the rung inspector — so **slices 2–3 are one:** the inspector, its rows and placement, and the lyric text editor moved to `elements/` (the workbench imports them from there), with shared glue (`inspectorMount.ts`) and a token-carrying layer (`<mnx-editor-surfaces>`); the binding mounts them on Enter and Shift+L and binds copy/cut/paste. **Work-list item 5:** the workbench's scenario page deleted its own mount and sits on `bindEditor`; the binding grew the host's seams for it (`session`, `onEscalate`, `claimUnfocused`, `inspector`, `onRefused`, `sessionMoved`), and `smoke:workbench-editor` proves them. |
-| 8 | [studio-editor-touch](../proposed/studio-editor-touch.md) | **pass one built 2026-09-20** | **Entry without a keyboard.** The workbench editor is keyboard-driven and studio is used on an Android tablet; a touch entry surface is new design, not a port. Decision 1 below says whether slice 1 of item 7 waits for it. |
+| 8 | [studio-editor-touch](../rejected/studio-editor-touch.md) | **built, then REJECTED 2026-09-20** by the owner | **Entry without a keyboard — closed as won't-do.** `<mnx-entry-bar>` was built and removed the same day: a bar over the score is a bar over the score, and the tablet edits in focus mode where the music is meant to be the whole page. The campaign's answer for touch is now **play only** — studio binds no editor where the primary pointer is coarse. Item 9's pointer placement stays; it is a mouse feature a tap also reaches. |
 | 9 | [core-editor-pointer-placement](../complete/core-editor-pointer-placement.md) | **complete 2026-09-20** (`5b97fbb7`) | **A click or a tap places the edit cursor.** Item 8's first missing piece, usable from a mouse now: a `goToPosition` intent the session snaps to its own grid (nearest string or staff position, nearest event column; an empty bar lands on its rest), a `position-selected` event the viewer emits only while an editor is bound, a hover ghost on a mouse, and the click still seeks playback — to the bar when it lands on empty space. The two cursors stay two; this is the first seeding rule between them. |
 
 ### Decisions still open
@@ -623,6 +624,10 @@ there. What is left for 8 is the entry surface itself, which is design, not port
 
 ### 2026-09-20 — entry 13: item 8, pass one — the verbs by thumb
 
+> **Superseded the same day by entry 14: the bar was rejected and removed.** Kept unedited,
+> because what the build settled is still true about the binding, and entry 14 is only
+> legible next to it.
+
 The owner chose shape **B**: a bar inside the editor's overlay, over the score, not a panel
 in the chrome. The reason is the one the doc led with — the tablet edits in focus mode,
 focus mode is fullscreen, and the tools row is not rendered there.
@@ -661,4 +666,43 @@ next, and worth doing on its own.
 
 **This closes the campaign's last item to a first pass.** What remains is the owner's
 hands-on verdict on the bar, on the tablet, in anger.
+
+### 2026-09-20 — entry 14: item 8 rejected on the tablet; studio is play-only on touch
+
+The verdict entry 13 was waiting for came back the same day, and it is **no**. The bar
+worked; that was never the question. **A bar over the score is a bar over the score** — it
+holds the foot of the pane whether or not anything is being edited, and the tablet's reason
+for existing is focus mode, where the music is supposed to be the whole page. Shape A would
+have cost width instead of height, which on a portrait tablet is worse, so this is not a
+"try the other shape" rejection: it is the honest finding that **the editor is a keyboard
+instrument and the tablet is where you play**.
+
+So item 8 closes as won't-do, and the answer is now a product rule rather than an absence:
+
+- **`<mnx-entry-bar>`, the `entryBar` binding option and `smoke:entry-bar` are deleted.**
+  The removal was a clean subtraction because every verb went through `dispatch` — the
+  discipline from entry 13's first finding paid for itself on the way out, which is the
+  argument for keeping it on the next surface that is not sure of its welcome.
+- **Studio binds no editor at all where `(pointer: coarse)` matches.** Not read-only with
+  a cursor: not bound, and the chunk never loaded. The page takes no write lock there
+  either — a tablet holding the piece lock against a desk would be the worst of both. The
+  Details sheet says the reason and the save chip reads *Play only on this device*.
+- **The absence is tested.** `npm run smoke:play-only` drives studio as a tablet and
+  asserts that nothing is there: no binding, no editor chunk fetched, no cursor after a
+  tap, no Keys sheet, and the words that explain it. Campaign clause 13 wanted a smoke for
+  the bar; the rule that replaced the bar inherits it, because a rule shaped like an
+  absence is the kind that decays without one.
+- **Pointer placement (item 9) is untouched**, and needs no defence: it is a mouse feature
+  a tap also reaches, and on a play-only device the tap still seeks playback.
+
+Three things worth carrying forward. **A surface that lives at the bottom edge has now been
+rejected on sight three times** (the sync bar's full-screen editor, tray redesigns, and this
+bar) — the next proposal for one should lead with why this time is different rather than
+with its controls. **Building it was still the cheapest way to find out**: the doc could not
+have settled it, and what took a day to build took an hour to remove. And **the device test
+belongs to the shell, not the binding** — `editorHost.ts` is back to knowing nothing about
+what kind of machine it is on, which is where a layer below `elements/` should be.
+
+**The campaign's editing goal is met on the desk and closed on touch.** What remains is
+item 4's hands-on checks and migration 0005 before any deploy — neither of them this item.
 

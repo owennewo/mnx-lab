@@ -45,16 +45,6 @@ proposals that name their campaign.
 
 ### proposed/
 
-- **[studio-editor-touch.md](proposed/studio-editor-touch.md)** — [studio authoring
-  campaign](inprogress/studio-campaign-authoring.md) item 8, **pass one built 2026-09-20**:
-  entry without a keyboard, on the tablet. `<mnx-entry-bar>` is an editor surface beside the
-  rung inspector, mounted by `bindEditor`, so both shells get it from one implementation.
-  The owner chose a bar **inside the editor's overlay** over a panel in the chrome, because
-  the tablet edits in focus mode and the tools row is not rendered there. It follows the
-  pointer rather than a setting; frets are one tap each and durations are typed values,
-  because the keyboard's shapes are keystroke devices. Every verb goes through the same
-  `dispatch` a key does. `smoke:entry-bar` drives it with real touch events and no keystroke,
-  counting the fret in the music rather than the op log.
 - **[studio-player-practice.md](proposed/studio-player-practice.md)** — campaign item 13,
   studio's first player feature in `elements/`: loop the selection with the **written-range
   → performed-occurrences policy stated**, speed trainer, count-in, metronome, mute/solo.
@@ -1921,6 +1911,17 @@ back up to `proposed/` the moment it is.
   stage. Do not build from this document.
 
 ### rejected/
+
+- **[studio-editor-touch.md](rejected/studio-editor-touch.md)** — [studio authoring
+  campaign](inprogress/studio-campaign-authoring.md) item 8: entry without a keyboard, on
+  the tablet. **Built as `<mnx-entry-bar>` and rejected by the owner the same day**
+  (2026-09-20), on the tablet, after use: a bar over the score is a bar over the score, and
+  the tablet's reason for existing is focus mode with the music as the whole page. The
+  verdict became a product rule — **on a touch device studio plays, it does not edit**; the
+  piece page binds no editor where the primary pointer is coarse. The element, its binding
+  option and `smoke:entry-bar` are deleted; pointer placement (item 9) is untouched. The
+  full design survey, both shapes and the six traps are kept, because shape B was rejected
+  on a build rather than a guess.
 
 - **[core-player-webmidi.md](rejected/core-player-webmidi.md)** — item 11: user chose won’t-do on 2026-09-09.
 

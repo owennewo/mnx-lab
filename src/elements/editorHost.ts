@@ -65,8 +65,6 @@ import type { LyricTextEditor } from './LyricTextEditor.ts';
 import './RungInspector.ts';
 import './LyricTextEditor.ts';
 import './EditorSurfaces.ts';
-import './EntryBar.ts';
-import type { EntryBar } from './EntryBar.ts';
 import type { SelectionContext } from './mnxContext.ts';
 
 export interface EditorBindingOptions {
@@ -93,15 +91,6 @@ export interface EditorBindingOptions {
   clipboard?: SelectionClipboardStore;
   /** What a copy, cut or paste did, or the precise sentence for why it did not. */
   onNotice?(notice: ClipboardNotice): void;
-  /**
-   * The entry bar (roadmap/proposed/studio-editor-touch.md): the verbs as touch
-   * targets, over the score. Left undefined it follows the POINTER — shown where
-   * the primary one is coarse, which is the tablet and not the desk. A host may
-   * force it either way; `false` is how a shell opts out entirely.
-   *
-   * It needs an `overlay`, like every other surface.
-   */
-  readonly entryBar?: boolean | (() => boolean);
   /** The viewer is showing some OTHER document (an older version, say): no cursor, no keys, until it is not. */
   suspended?(): boolean;
   /**
@@ -212,7 +201,6 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
   let inspector: RungInspector | null = null;
   let inspectorError: string | null = null;
   let lyrics: LyricTextEditor | null = null;
-  let entryBar: EntryBar | null = null;
   const surfaces = options.overlay ? options.overlay.appendChild(document_.createElement('mnx-editor-surfaces')) : null;
 
   const suspended = () => options.suspended?.() ?? false;
@@ -228,50 +216,7 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
       const view = options.inspector?.extend?.(built) ?? built;
       Object.assign(inspector, { crumbs: view.crumbs, pills: view.pills, words: view.words, secondary: view.secondary, note: view.note, error: inspectorError, anchor });
     }
-    syncEntryBar();
     options.onState?.();
-  };
-
-  /**
-   * Whether the verbs should be reachable by thumb. Undefined follows the
-   * POINTER rather than the screen: a coarse primary pointer is a finger, and
-   * a finger has no keyboard. A host that knows better says so outright.
-   */
-  const wantsEntryBar = () => {
-    if (options.entryBar !== undefined)
-      return typeof options.entryBar === 'function' ? options.entryBar() : options.entryBar;
-    return win?.matchMedia?.('(pointer: coarse)').matches ?? false;
-  };
-
-  /** Mount, feed or remove the bar — driven from `draw`, so it follows the
-   *  session without anything having to remember to tell it. */
-  const syncEntryBar = () => {
-    const wanted = !!surfaces && !suspended() && !readOnly() && wantsEntryBar();
-    if (!wanted) {
-      entryBar?.remove();
-      entryBar = null;
-      return;
-    }
-    if (!entryBar) {
-      const el = document_.createElement('mnx-entry-bar');
-      // Through the SAME funnel as a key, so nothing it can do is unreachable
-      // from the keyboard and nothing bypasses read-only or the refusal report.
-      el.addEventListener('entry-action', event => {
-        const { intent } = (event as CustomEvent<{ intent: EditorIntent }>).detail;
-        tabDigits.flush();
-        if (intent.type === 'undo') undoAction();
-        else if (intent.type === 'redo') redoAction();
-        else dispatch(intent);
-      });
-      entryBar = el;
-      surfaces!.append(el);
-    }
-    Object.assign(entryBar, {
-      projection: session.projection,
-      canUndo: session.canUndo,
-      canRedo: session.canRedo,
-      pendingFret
-    });
   };
   /** After anything that may have moved the session: report a new document, then redraw. */
   const settle = () => {
@@ -302,7 +247,7 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
   const undoAction = () => { tabDigits.flush(); return dispatch({ type: 'undo' }); };
   const redoAction = () => { tabDigits.flush(); return dispatch({ type: 'redo' }); };
 
-  // ── the surfaces: the rung inspector, the lyric text editor, the entry bar ──
+  // ── the surfaces: the rung inspector and the lyric text editor ───────────
   const closeInspector = (refocus = true) => {
     if (!inspector) return;
     inspector.remove(); inspector = null; inspectorError = null;
@@ -487,13 +432,7 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
   /** A pointer went down somewhere: close the inspector unless it landed inside it. Capture phase and
    *  `composedPath`, so it sees through shadow roots — and nothing is prevented, so the click still lands. */
   const onPointerDown = (event: Event) => {
-    const path = event.composedPath();
-    // The entry bar is an editing surface, not "somewhere else": tapping a fret
-    // while the inspector is open is still working on the same rung, so the
-    // inspector stays. This listener is on CAPTURE, so it runs before the bar's
-    // own handler — the bar cannot opt out by stopping propagation.
-    if (inspector && !path.includes(inspector) && !(entryBar && path.includes(entryBar)))
-      closeInspector(false);
+    if (inspector && !event.composedPath().includes(inspector)) closeInspector(false);
     onFocusChange();
   };
   /** Unclaimed focus: the key never passed through `scope`, so the window hands it over. */
@@ -607,7 +546,6 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
       win?.removeEventListener('focusout', onFocusChange);
       inspector = null; lyrics = null;
       surfaces?.remove();
-      entryBar = null;
       options.onPreview?.(null);
       viewer.selection = NO_SELECTION;
     }

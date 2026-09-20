@@ -158,6 +158,11 @@ document, its own inspector words) plugs in through the binding's options, never
 mount. Studio loads it behind a dynamic `import()`; the workbench, which always edits,
 imports it directly. The editing logic stays in `src/edit/`, and nothing the viewer or the
 player imports may reach it, so an embed that only views pays nothing for the editor.
+**The binding knows nothing about what device it is on** — a touch entry bar was built and
+rejected on 2026-09-20 ([roadmap/rejected/studio-editor-touch.md](roadmap/rejected/studio-editor-touch.md)),
+and the standing rule is that **studio plays and does not edit on a touch device**: the
+piece page declines to bind at all where the primary pointer is coarse, and that test lives
+in the shell. Read the rejected doc before proposing any touch-editing surface.
 
 ### Build faces (one source tree)
 

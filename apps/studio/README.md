@@ -93,6 +93,37 @@ promotion in three slices. **A saved edit is a new `.gp` rendition that takes th
 pointer** — Guitar Pro stays the stored format even for studio's own edits, so no MNX
 migration ever runs on stored data, and every save is checked for what the round trip lost.
 
+### On a tablet or a phone, studio plays — it does not edit
+
+**A touch device is a player.** Where the primary pointer is coarse
+(`(pointer: coarse)`), the piece page **does not bind the editor at all**: no cursor, no
+keymap, no editor chunk loaded, no write lock taken, and the Details sheet and the save chip
+say why rather than offering verbs that do nothing. Everything else is unchanged — the
+score, zoom, the player, sources and recordings, instruments, tags and focus mode are the
+whole point of the device.
+
+This is a **decided rule, not a gap**. A touch entry bar was built on 2026-09-20 and
+rejected by the owner the same day, on the tablet, after use: a bar over the score holds the
+foot of the pane whether or not anything is being edited, and the tablet edits in focus mode
+where the music is meant to be the whole page. The case, both shapes and the six traps are
+kept in
+[roadmap/rejected/studio-editor-touch.md](../../roadmap/rejected/studio-editor-touch.md) —
+**read it before proposing a palette, a sheet or a mode toggle**, and note that a setting was
+considered and refused: a per-device toggle is a second answer to "can this device edit".
+
+A tap still **places the edit cursor** on a device that edits and still **seeks playback**
+everywhere ([core-editor-pointer-placement](../../roadmap/complete/core-editor-pointer-placement.md));
+that is navigation, and it is not affected. `#/new` is a form, so a piece can still be made
+on a tablet — the music goes in on a computer.
+
+The test lives in `PiecePage.ts`, in the shell, deliberately: `src/elements/editorHost.ts`
+knows nothing about what kind of machine it is on, and no layer below `elements/` should.
+**`npm run smoke:play-only` guards it** — a rule that is an absence rots quietly, so that
+smoke drives studio as a tablet (touch emulation, real touch events, no keystroke) and
+asserts the absence: no binding, the editor chunk never even fetched, a tap leaving no
+cursor, no Keys sheet, and the chip and the Details sheet saying why. Break the rule and it
+fails on the first assertion.
+
 **The piece page edits and saves** (since 2026-09-17,
 [studio-save-pipeline](../../roadmap/complete/studio-save-pipeline.md)). Its first editor
 is the Details sheet — the document's own metadata, through a `setWork` op and an

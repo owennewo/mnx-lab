@@ -1,4 +1,4 @@
-// A refusal has to say something — roadmap/proposed/studio-editor-touch.md's
+// A refusal has to say something — roadmap/rejected/studio-editor-touch.md's
 // sibling finding, met on the owner's own piece on 2026-09-20.
 //
 // A piece held open in a second tab is read-only, and read-only still allows
