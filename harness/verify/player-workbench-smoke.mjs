@@ -88,6 +88,100 @@ try{
     check(!viewer.shadowRoot.querySelector('.rest.playback-ink'),'The lit rest outlived the playhead');
     return {notationRest:true,tabPill:true,cleared:true};
   })()`));
+  // A PRESS ON THE SCORE MOVES THE SCRUBBER TO THE BEAT IT NAMED.
+  //
+  // Seeking used to be bar-shaped: `seek(ordinal)` landed on the bar's first
+  // beat whatever was pressed, so pressing beat 3 of the bar already playing
+  // looked like the scrubber ignoring the press. The assertion needs no
+  // arithmetic on the performance — two presses in ONE bar, at different
+  // written offsets, must leave the transport in two different places. Under
+  // the old rule both landed on the barline and these were equal.
+  //
+  // And a press on a REST moved nothing at all: a rest is not in the layout's
+  // activation index so it never became a note seek, while the host's own
+  // fallback stood down because something carrying a name was under the
+  // pointer. That was the owner's report.
+  console.log('a press seeks to its beat',await cdp.evaluate(`(async()=>{
+    const check=(v,m)=>{if(!v)throw new Error(m);},delay=ms=>new Promise(r=>setTimeout(r,ms));
+    const page=document.querySelector('mnx-workbench').shadowRoot.querySelector('mnx-scenario-page');
+    location.hash='#/scenario/lab/document/twelve-bar-blues';
+    const player=page.shadowRoot.querySelector('mnx-player');
+    for(let i=0;i<120 && player.documentId!=='lab/document/twelve-bar-blues';i++)await delay(50);
+    for(let i=0;i<120 && !player.performance;i++)await delay(50);
+    const viewer=page.shadowRoot.querySelector('mnx-document-viewer');
+    viewer.view='both';await delay(600);
+    const svg=viewer.renderRoot.querySelector('#projection-container svg');
+    const press=el=>{
+      const r=el.getBoundingClientRect();
+      el.dispatchEvent(new PointerEvent('pointerdown',{clientX:r.x+r.width/2,clientY:r.y+r.height/2,
+        button:0,isPrimary:true,bubbles:true,composed:true,cancelable:true}));
+    };
+    // Where the transport stands, as a comparable rational.
+    const at=()=>player.snapshot?.position ?? null;
+    const cmp=(a,b)=>{const d=a.num*b.den-b.num*a.den;return d<0n?-1:d>0n?1:0;};
+    // Two noteheads in ONE bar, at different written offsets. Not filtered for
+    // visibility: the press carries its own measured coordinates and the hit
+    // test reads the engraving, not what happens to be scrolled into view — and
+    // at the default headless window almost nothing is.
+    const notes=[...svg.querySelectorAll('.notehead[data-source-id]')]
+      .map(el=>({el,w:player.performance.written.find(w=>w.noteKey===el.getAttribute('data-source-id'))}))
+      .filter(n=>n.w);
+    let pair=null;
+    for(const a of notes){
+      const b=notes.find(x=>x.w.ordinal===a.w.ordinal && cmp(x.w.metricOffset,a.w.metricOffset)>0);
+      if(b){pair={first:a,second:b};break;}
+    }
+    check(pair,'no two on-screen noteheads share a bar at different beats');
+
+    press(pair.first.el);await delay(400);
+    const early=at();
+    check(early,'a press on a notehead left the transport nowhere');
+    press(pair.second.el);await delay(400);
+    const late=at();
+    check(cmp(late,early)>0,
+      'two beats of one bar seeked to the same place — the press is still bar-shaped');
+
+    // A REST: it must move the scrubber at all, and to its own bar.
+    const rest=[...svg.querySelectorAll('.rest[data-source-id]')][0];
+    check(rest,'the fixture drew no rest to press');
+    // Scrolled to, not filtered for: this fixture holds exactly one rest and it
+    // is below the viewer's fold. Its own box is no guide — a SMuFL glyph's
+    // rect is the whole em square, several staves tall.
+    rest.scrollIntoView({block:'center'});await delay(700);
+    // Re-queried: scrolling re-engraves, and the node held across it is
+    // detached — it reports a zero rect and swallows the press in silence.
+    const svg2=viewer.renderRoot.querySelector('#projection-container svg');
+    const rest2=[...svg2.querySelectorAll('.rest[data-source-id]')][0];
+    check(rest2,'the rest was gone after scrolling to it');
+    check(rest2.getBoundingClientRect().width>0,'the rest measured as detached ink');
+    const restBar=Number(rest.getAttribute('data-source-id').match(/@m(\\d+)/)[1]);
+    // Aimed at the glyph's own BASELINE, not the centre of its rect: a SMuFL
+    // text box is the whole em square, several staves tall, so its midpoint can
+    // sit on the system below — and the bar at that x down there is a different
+    // bar. scoreGeometry.inkBox reads the baseline for the same reason.
+    const ctm=svg2.getScreenCTM(),pt=svg2.createSVGPoint();
+    pt.x=rest2.x.baseVal.getItem(0).value;
+    pt.y=rest2.y.baseVal.getItem(0).value;
+    const aim=pt.matrixTransform(ctm);
+    rest2.dispatchEvent(new PointerEvent('pointerdown',{
+      clientX:aim.x,clientY:aim.y,
+      button:0,isPrimary:true,bubbles:true,composed:true,cancelable:true}));
+    await delay(400);
+    const onRest=at();
+    check(cmp(onRest,late)!==0,'a press on a rest moved the scrubber nowhere at all');
+    // SOME performed visit of that bar — a repeated bar has several, and which
+    // one an explicit seek chooses is the pass model's business, not this
+    // test's. What must hold is that the transport is inside one of them.
+    const add=(a,b)=>({num:a.num*b.den+b.num*a.den,den:a.den*b.den});
+    const visits=player.performance.measures.filter(m=>m.measureIndex===restBar);
+    check(visits.length>0,'the fixture no longer performs the bar holding the rest');
+    const R=r=>String(r.num)+'/'+String(r.den);
+    check(visits.some(m=>cmp(onRest,m.position)>=0 && cmp(onRest,add(m.position,m.duration))<0),
+      'a press on the rest in bar '+restBar+' left the transport at '+R(onRest)+
+      ', outside every performed copy of it ('+visits.map(m=>R(m.position)+'+'+R(m.duration)).join(', ')+')');
+    player.stop();
+    return {twoBeats:true,restSeeks:restBar};
+  })()`));
   await cdp.send('Page.navigate',{url:`http://127.0.0.1:${review.port}/performance.html`});
   let listen=false;for(let i=0;i<100;i++){listen=await cdp.evaluate(`!!document.querySelector('mnx-player')?.performance`);if(listen)break;await new Promise(r=>setTimeout(r,100));}
   if(!listen)throw new Error('Static review Listen did not initialize');
@@ -99,5 +193,10 @@ try{
   console.log('Player workbench/review smoke OK');
 }finally{
   ws?.close();if(chrome && chrome.exitCode===null){const done=new Promise(r=>chrome.once('exit',r));chrome.kill();await done;}
-  server?.server.close();review?.server.close();fs.rmSync(profile,{recursive:true,force:true,maxRetries:5,retryDelay:100});
+  server?.server.close();review?.server.close();
+  // A temp profile left behind is litter, not a failure. Chrome goes on
+  // flushing its cache for a moment after it reports exit, so this races and
+  // loses — and when it threw from `finally` it REPLACED whatever the smoke
+  // was actually reporting, assertion message and all.
+  try{fs.rmSync(profile,{recursive:true,force:true,maxRetries:5,retryDelay:100});}catch{}
 }

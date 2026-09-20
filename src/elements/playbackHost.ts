@@ -13,6 +13,7 @@ import {
 } from '../model/playback.ts';
 import { documentLyricLineIds } from '../engine/layout/lyricRuns.ts';
 import { compilePerformance } from '../audio/performance.ts';
+import { beatOfKey } from './scoreSeek.ts';
 import type { MnxDocument } from '../model/mnx.ts';
 import type { Player } from './Player.ts';
 import type { DocumentViewer } from './DocumentViewer.ts';
@@ -58,7 +59,12 @@ export function bindPlayback(host: HTMLElement, viewer: DocumentViewer, player: 
       cycle: lastKey === key,
     });
     lastKey = key;
-    if (ordinal !== null) player.seek(ordinal);
+    // THE NOTE'S OWN BEAT, not its bar's first. A press names a moment, and
+    // seeking to the barline instead reads as the scrubber ignoring a press
+    // that was already inside the bar it is playing.
+    if (ordinal !== null) {
+      player.seek(ordinal, beatOfKey(player.performance, document?.mnxJson, key, ordinal) ?? undefined);
+    }
   };
   /**
    * A click that landed on EMPTY space still seeks — to the bar it fell in
@@ -72,14 +78,24 @@ export function bindPlayback(host: HTMLElement, viewer: DocumentViewer, player: 
    * looking at its second.
    */
   const place = (event: Event) => {
-    const detail = (event as CustomEvent<{ measureIndex?: number; noteKey?: string }>).detail;
+    const detail = (event as CustomEvent<
+      { measureIndex?: number; noteKey?: string; columnKey?: string }
+    >).detail;
     if (!model || !detail || detail.noteKey !== undefined || detail.measureIndex === undefined) return;
     const { ordinals } = resolveIteration(model, detail.measureIndex, activeIteration(state));
     const candidates = ordinals.length > 0
       ? ordinals
       : model.entries.filter(entry => entry.measureIndex === detail.measureIndex).map(entry => entry.ordinal);
     const ordinal = chooseOrdinal(candidates, state.ordinal, { explicitSeek: true });
-    if (ordinal !== null) player.seek(ordinal);
+    if (ordinal === null) return;
+    // The drawn moment the press was nearest to — a rest, or a neighbour's
+    // notehead on the same beat. It is the same column the edit cursor lands
+    // on, so the playhead and the cursor arrive at one place rather than at
+    // the beat and the barline respectively.
+    const beat = detail.columnKey === undefined
+      ? null
+      : beatOfKey(player.performance, document?.mnxJson, detail.columnKey, ordinal);
+    player.seek(ordinal, beat ?? undefined);
   };
   // The viewer must not know about the player: it reports a two-finger tap and
   // the host decides what that means, exactly as `note-selected` becomes a seek

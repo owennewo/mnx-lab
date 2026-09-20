@@ -1381,7 +1381,19 @@ export class DocumentViewer extends LitElement {
   private noteKeyUnder(event: Event): string | undefined {
     const target = event.target;
     if (!(target instanceof Element)) return undefined;
-    const raw = target.closest('[data-source-id]')?.getAttribute('data-source-id');
+    // A NOTE, not merely something with a name. Rests, stems and beams all
+    // carry their event's id, and this field means "the pointer was on a
+    // notehead" to everything that reads it: the session takes the slot's own
+    // line and voice from it, and the playback host stands down from its own
+    // seek because a note press seeks through `note-selected` instead.
+    //
+    // A rest never does — it is not in the layout's activation index, so the
+    // click bridge drops it — and naming one here made the press fall between
+    // the two: no note seek, and no bar seek either, because this said one had
+    // happened. A rest is found through `columnKey` now, which is where ink
+    // that is not a notehead belongs.
+    const hit = target.closest<Element>('.notehead[data-source-id], .fret-number[data-source-id]');
+    const raw = hit?.getAttribute('data-source-id');
     if (!raw) return undefined;
     const occurrence = this.unrolled ? parseOccurrenceKey(raw) : null;
     return occurrence ? occurrence.noteKey : raw;

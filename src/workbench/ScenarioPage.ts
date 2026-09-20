@@ -1,5 +1,6 @@
 import '../elements/Player.ts';
 import type { Player } from '../elements/Player.ts';
+import { beatOfKey } from '../elements/scoreSeek.ts';
 import { compilePerformance } from '../audio/performance.ts';
 import type { Performance } from '../audio/performanceTypes.ts';
 import { chooseOrdinal } from '../model/playback.ts';
@@ -1926,16 +1927,23 @@ export class ScenarioPage extends LitElement {
   /** A click on empty space seeks to that bar (core-editor-pointer-placement.md).
    *  Ink is `onNoteSelected`'s, above, so the two never race for one click. */
   private onPositionSelected = (
-    event: CustomEvent<{ measureIndex?: number; noteKey?: string }>
+    event: CustomEvent<{ measureIndex?: number; noteKey?: string; columnKey?: string }>
   ) => {
-    const { measureIndex, noteKey } = event.detail ?? {};
+    const { measureIndex, noteKey, columnKey } = event.detail ?? {};
     if (noteKey !== undefined || measureIndex === undefined || !this.passModel) return;
     const { ordinals } = resolveIteration(this.passModel, measureIndex, activeIteration(this.playback));
     const candidates = ordinals.length > 0
       ? ordinals
       : this.passModel.entries.filter(entry => entry.measureIndex === measureIndex).map(entry => entry.ordinal);
     const ordinal = chooseOrdinal(candidates, this.playback.ordinal, { explicitSeek: true });
-    if (ordinal !== null) this.renderRoot.querySelector<Player>('mnx-player')?.seek(ordinal);
+    if (ordinal === null) return;
+    // The drawn moment the press was nearest to — a rest, or a neighbour's
+    // notehead on the same beat. The edit cursor lands on that same column, so
+    // the two arrive together instead of at the beat and the barline.
+    const beat = columnKey === undefined
+      ? null
+      : beatOfKey(this.performance, this.doc?.mnxJson, columnKey, ordinal);
+    this.renderRoot.querySelector<Player>('mnx-player')?.seek(ordinal, beat ?? undefined);
   };
 
   private onNoteSelected = (
@@ -1945,7 +1953,12 @@ export class ScenarioPage extends LitElement {
     if(key && this.performance){
       const candidates=this.performance.written.filter(w=>w.noteKey===key).map(w=>w.ordinal);
       const ordinal=event.detail.ordinal ?? chooseOrdinal(candidates,this.playback.ordinal,{explicitSeek:true,cycle:this.clickedPlaybackKey===key});
-      this.clickedPlaybackKey=key;if(ordinal!==null)this.renderRoot.querySelector<Player>('mnx-player')?.seek(ordinal);
+      this.clickedPlaybackKey=key;
+      // The note's OWN beat, not its bar's first.
+      if(ordinal!==null){
+        const beat = beatOfKey(this.performance, this.doc?.mnxJson, key, ordinal);
+        this.renderRoot.querySelector<Player>('mnx-player')?.seek(ordinal, beat ?? undefined);
+      }
     }
   };
 

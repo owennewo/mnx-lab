@@ -22,7 +22,7 @@ import {
 import type { SamplePackLoader } from '../audio/native/samplePacks.ts';
 import { partBuses, partLevel, partSound, requiredPresets, voicePresetFor, type PartMix } from '../audio/partMix.ts';
 import { formatPlaybackPosition, formatScorePlaybackPosition, measureAt, placeLabel, playbackPositionParts, scorePlaybackPositionParts, widestPlaceLabel, type PlaybackPositionParts } from '../audio/playbackPosition.ts';
-import { ZERO, type Rational } from '../audio/time.ts';
+import { ZERO, compare, type Rational } from '../audio/time.ts';
 import type { MnxStructure } from '../model/mnx.ts';
 import type { PlaybackOccurrence, PlaybackUpdate } from './mnxContext.ts';
 import { ClickTrack } from '../audio/native/click.ts';
@@ -860,10 +860,30 @@ export class Player extends LitElement {
     this.dispatchEvent(new CustomEvent('video-region-changed', { bubbles: true, composed: true }));
   }
   async startSource() { this.localError = ''; await this.session?.start(); }
-  seek(ordinal: number) {
+  /**
+   * Seek to a bar, or to a BEAT inside it.
+   *
+   * `metricOffset` is where in the written bar to land. It is what a press on
+   * the score means — the reader pointed at a moment, not at a barline — and
+   * without it a click halfway through a bar rewound the recording to the
+   * bar's start, which reads as the scrubber refusing to move at all when the
+   * press was already in the current bar.
+   *
+   * Clamped to the visit's own written slice: a mid-bar segno makes a bar's
+   * copy start somewhere other than zero, and an offset outside `from…until`
+   * is not a position this visit contains.
+   */
+  seek(ordinal: number, metricOffset?: Rational) {
     const measure = this.performance?.measures.find(m => m.ordinal === ordinal);
     if (!measure || !this.session) return false;
-    const target = { ordinal, metricOffset: measure.from };
+    const within = metricOffset === undefined
+      ? measure.from
+      : compare(metricOffset, measure.from) < 0
+        ? measure.from
+        : compare(metricOffset, measure.until) > 0
+          ? measure.until
+          : metricOffset;
+    const target = { ordinal, metricOffset: within };
     // An explicit bar click includes the grace/hold at its start. Handoffs
     // deliberately omit this edge because they must not guess within an insertion.
     const edge = this.session.backend instanceof SynthBackend ? 'before' : undefined;
