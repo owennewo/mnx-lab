@@ -67,12 +67,20 @@ from the score is the viewer's `hiddenParts`, and never silences it.
   `documentId` is an edit and keeps the session (below); a new `documentId`, a performance
   appearing or vanishing, or new sample options dispose the old transport and sources
   before installing new ones.
-- `play(): Promise<void>`, `pause()`, `stop()`, `seek(ordinal): boolean`,
-  `setLoop(region?)`, plus read-only `position` and `snapshot`. Seek selects the start
-  of that performed measure; an absent ordinal returns false. Natural completion can
+- `play(): Promise<void>`, `pause()`, `stop()`, `seek(ordinal, metricOffset?): boolean`,
+  `setLoop(region?)`, plus read-only `position` and `snapshot`. Seek selects a BEAT of
+  that performed measure — `metricOffset` is where in the written bar to land, clamped
+  to the visit's own `from…until` so a mid-bar segno cannot be seeked outside of.
+  Omitted, it selects the measure's start, which is what every seek did before presses
+  began naming the moment they landed on. An absent ordinal returns false. Natural completion can
   be restarted with Play. The loop API is the seam for item 13, with no practice UI yet.
 - `playback-state-changed` carries `{documentId, ordinal, highlight, playing}`;
-  highlights are `{noteKey, ordinal}` written occurrences. Identical context updates
+  highlights are `{noteKey, ordinal}`. Most are written occurrences — one per visit to
+  a note. RESTS are in the list too and are not: a rest sounds nothing, so it is absent
+  from the compiled performance, and the player intersects the written position it
+  already reports with the document's rests (`model/restSpans.ts`) so the playhead can
+  stand in a silence. A rest's key is the one the layouts stamp on its glyph, so the
+  same paint lights it, in its own voice's colour. Identical context updates
   are suppressed. `seek`, `onset` and `bar` are bubbling, composed events;
   onsets include the transport's scheduled audio time and written occurrence id.
 - `voicePreset`, `partMix` and `soundControl` — the sound every unmixed part plays, the
@@ -149,7 +157,13 @@ player callbacks cannot stamp a replacement document.
 A viewer `note-selected` event maps its key to performed candidates using item 2's
 `chooseOrdinal`. The first click keeps the current candidate or chooses the next;
 repeated clicks cycle, including multiple visits on the same iteration. This seeks
-playback to a bar visit; it never programmatically changes editor selection. The
+playback to the pressed note's own BEAT within that visit, not to the bar's first —
+landing on the barline reads as the scrubber ignoring a press that was already inside
+the bar it is playing. A press that is not on a note seeks the same way through
+`position-selected`, whose `columnKey` names the nearest drawn moment: that is how a
+press on a REST seeks, since a rest is not in the layout's activation index and never
+becomes a `note-selected` at all. Both paths resolve the beat through one helper,
+`elements/scoreSeek.ts`. Neither ever programmatically changes editor selection; the
 editor's own response to a user's click remains independent.
 
 ## Written view and review
