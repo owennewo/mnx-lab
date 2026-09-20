@@ -193,7 +193,11 @@ export const TAB_DIGIT_LAYER: KeymapLayer = {
     // popover is gone, so capital S is the slide that re-picks.
     { code: 'KeyS', shift: true, intent: { type: 'toggleTechnique', kind: 'slide', slideType: 'shift' } as EditorIntent },
     { code: 'KeyV', intent: { type: 'toggleTechnique', kind: 'vibrato' } as EditorIntent },
-    { code: 'KeyX', intent: { type: 'toggleTechnique', kind: 'palmMute' } as EditorIntent },
+    // X is the DEAD note, because `x` is what it draws — on a note it
+    // toggles the flag, on a rest it enters one (session's toggleTechnique).
+    // Palm mute lost the key to it and keeps no other: it is a SPAN rather
+    // than a notehead, and the inspector's pill still types it.
+    { code: 'KeyX', intent: { type: 'toggleTechnique', kind: 'dead' } as EditorIntent },
     { code: 'KeyO', intent: { type: 'toggleTechnique', kind: 'harmonic' } as EditorIntent }
   ]
 };

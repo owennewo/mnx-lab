@@ -132,7 +132,11 @@ export const ELEMENT_KINDS: Record<ElementKind, ElementKindSpec> = {
     // goldens, so `slideIn`/`slideOut` and the non-natural harmonic labels
     // stay unclaimed until a scenario exercises them. A natural harmonic has
     // no class of its own on the TAB staff: it is spelled into the digit
-    // (`<12>`), which `note` already claims as `fret-number`.
+    // (`<12>`), which `note` already claims as `fret-number`. The DEAD note
+    // is that case on both staves at once and so claims nothing anywhere: it
+    // spells `x` into the same digit and swaps the notehead's glyph, both of
+    // them ink `note` already owns. It is still an element and still walked —
+    // a claim is about ink, not about existence.
     classes: [
       'technique-bend', 'technique-bend-prebend', 'technique-bend-hold',
       'technique-bend-release', 'technique-bend-arrow', 'technique-bend-label',
@@ -144,7 +148,7 @@ export const ELEMENT_KINDS: Record<ElementKind, ElementKindSpec> = {
       'technique-palm-mute', 'technique-palm-mute-line',
       'technique-harmonic'
     ],
-    note: 'Playing technique, drawn on BOTH staves since core-guitar-technique.md closed: bends as curves with a labelled arrowhead, slides as the line between two positions, hammer/pull as a letterless slur (one adornment — direction implicit in the pitches), vibrato as a wiggle, palm mute as the span its run reads as, harmonics as `<12>` in the tab digit and a circle over the notation note.',
+    note: 'Playing technique, drawn on BOTH staves since core-guitar-technique.md closed: bends as curves with a labelled arrowhead, slides as the line between two positions, hammer/pull as a letterless slur (one adornment — direction implicit in the pitches), vibrato as a wiggle, palm mute as the span its run reads as, harmonics as `<12>` in the tab digit and a circle over the notation note, a dead note as `x` in place of the digit and an x notehead.',
     construct: ['setTechnique'],
     remove: ['removeTechnique']
   },

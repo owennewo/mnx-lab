@@ -428,7 +428,9 @@ export const KEY_DOCS: KeyDoc[] = [
     keys: 'X',
     strokes: [{ code: 'KeyX' }],
     group: 'adornments',
-    meaning: { note: 'tab: palm mute (toggles)' }
+    meaning: {
+      note: 'tab: dead note — struck, not stopped (toggles); on a rest, enters one on the cursor’s string'
+    }
   },
   {
     keys: 'O',

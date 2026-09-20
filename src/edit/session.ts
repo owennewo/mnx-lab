@@ -880,6 +880,12 @@ export class EditorSession {
       }
       case 'toggleTechnique': {
         const slot = slotAt(this.grid, this.cursorState, this.activeProjection);
+        // X ON A REST ENTERS A DEAD NOTE. A rest is a note without a pitch
+        // (the 2026-09-19 rule `enterFret` already rides), and the dead note
+        // is the one technique with nothing to decorate: you do not fret it,
+        // so no digit precedes it. The pitch MNX requires is the open string
+        // under the cursor — invisible, because `x` replaces the fret.
+        if (!slot && intent.kind === 'dead') return this.enterDeadNote();
         if (!slot) return false;
         // hammerPull is ONE adornment (extension v6, the Soundslice
         // convention): the direction is implicit in the two pitches, so
@@ -1431,6 +1437,24 @@ export class EditorSession {
       duration,
       ...this.entryTarget
     });
+    return true;
+  }
+  /** The rest's half of X: insert an open-string note, already dead, in ONE
+   *  op so one keystroke is one undo. Only on the fingerboard — in notation
+   *  a rest has no string to strike. */
+  private enterDeadNote(): boolean {
+    if (!(this.activeProjection === 'tab' && this.grid.mode === 'string')) return false;
+    this.applyEntry({
+      type: 'insertNote',
+      measureIndex: this.cursorState.measureIndex,
+      onset: [this.cursorState.onset.num, this.cursorState.onset.den],
+      string: this.cursorState.line,
+      fret: 0,
+      dead: true,
+      duration: { base: 'quarter' },
+      ...this.entryTarget
+    });
+    this.standOnEntered();
     return true;
   }
   private enterFret(fret: number): boolean {

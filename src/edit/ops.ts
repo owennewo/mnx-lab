@@ -135,6 +135,10 @@ export type EditOp =
       string: number;
       fret: number;
       duration: { base: MnxNoteValueBase; dots?: number };
+      /** Enter it dead (X on a rest): the same insert, with the technique
+       *  flag set in the SAME op so one keystroke is one undo. `fret` is the
+       *  open string, because nothing is stopped — the `x` hides it anyway. */
+      dead?: true;
     } & EntryTarget)
   | ({
       /** Insert a note BY PITCH at a metric position in the cursor's voice — the
@@ -837,7 +841,12 @@ export type TechniqueChoice =
   | { kind: 'hammerPull' }
   | { kind: 'vibrato' }
   | { kind: 'palmMute' }
-  | { kind: 'harmonic' };
+  | { kind: 'harmonic' }
+  /** The dead (muted, percussive) note — struck, not stopped. A FLAG on a
+   *  note, not an event of its own: the written pitch stays (MNX requires
+   *  one, and a consumer that ignores the flag still has a note), and the
+   *  tab draws `x` where the fret would have been. */
+  | { kind: 'dead' };
 
 /** The part's own declarations. `name`/`strings`/`staffKind` keep their
  *  existing setters (`addPart`, `setTuning`, `setStaffKind`) — rewriting them
@@ -1183,7 +1192,7 @@ export function readTechniques(note: MnxNote | undefined): TechniqueChoice[] {
     const slideType = slide.type === 'shift' ? 'shift' as const : slide.type === 'legato' ? 'legato' as const : undefined;
     out.push({ kind: 'slide', ...(slideType ? { slideType } : {}) });
   }
-  for (const kind of ['hammerPull', 'vibrato', 'palmMute', 'harmonic'] as const) {
+  for (const kind of ['hammerPull', 'vibrato', 'palmMute', 'harmonic', 'dead'] as const) {
     if (technique[kind] !== undefined && technique[kind] !== false) out.push({ kind });
   }
   return out;
@@ -1344,7 +1353,13 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
       if (midi === undefined) return next;
       const note: MnxNote = { pitch: { step: 'C', octave: 4 } };
       setPitchFromMidi(note, midi);
-      note._x = { mnxLab: { string: op.string, fret: op.fret } };
+      note._x = {
+        mnxLab: {
+          string: op.string,
+          fret: op.fret,
+          ...(op.dead ? { tab: { technique: { dead: true } } } : {})
+        }
+      };
 
       const target: Onset = { num: op.onset[0], den: op.onset[1] };
       const found = eventAtOnset(seq, target);
@@ -1825,6 +1840,7 @@ export function applyOp(doc: MnxStructure, op: EditOp): MnxStructure {
           break;
         case 'vibrato':
         case 'palmMute':
+        case 'dead':
           technique[op.technique.kind] = true;
           break;
         case 'harmonic':

@@ -423,7 +423,7 @@ export interface InspectorScope {
 }
 
 const DURATION_WORDS: MnxNoteValueBase[] = ['whole', 'half', 'quarter', 'eighth', '16th', '32nd', '64th'];
-const TECHNIQUE_WORDS: TechniqueChoice['kind'][] = ['bend', 'slide', 'hammerPull', 'vibrato', 'palmMute', 'harmonic'];
+const TECHNIQUE_WORDS: TechniqueChoice['kind'][] = ['bend', 'slide', 'hammerPull', 'vibrato', 'palmMute', 'harmonic', 'dead'];
 
 /** A bar-relative fraction, whole-note units — `0`, `1/4`, `3/8`. */
 function fractionText(onset: { num: number; den: number }): string {
