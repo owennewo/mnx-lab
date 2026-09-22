@@ -45,6 +45,7 @@ proposals that name their campaign.
 
 ### proposed/
 
+- **[lab-architecture-guardrails.md](proposed/lab-architecture-guardrails.md)** — close layer-check coverage gaps and test forbidden dependency graphs.
 
 - **[studio-player-practice.md](proposed/studio-player-practice.md)** — campaign item 13,
   studio's first player feature in `elements/`: loop the selection with the **written-range
