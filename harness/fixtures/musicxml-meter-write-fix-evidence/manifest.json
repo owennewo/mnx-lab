@@ -1,0 +1,22 @@
+{
+  "kind": "numeric meter write-path observations; not scenario verification",
+  "files": {
+    "studio.json": "0429d849fd7c3c0e62de9a2a78bfa42db89554029feb9724e83d1ee1934d4532",
+    "workbench/change.mnx.json": "bcbff746ebcff4a8af32fe0381c7bf0a48763b05e8d26ae12899cc293799688d",
+    "workbench/common.mnx.json": "ba8710878d7ac20e1a537b77f901dffa2e7adf3ef99cab4ea11bef75f8d5c3e5",
+    "workbench/copied.mnx.json": "ccf94cb8395b465ffb4b77d63b205c3d84e552c577eb07f81e822033f87757aa",
+    "workbench/create.mnx.json": "9ec80789212c07689e9adaf65d2bc9fbb4666aa75f22deeb1c68b8d091a075e8",
+    "workbench/cut.mnx.json": "d83eebee6c1534a8d1c2874ffc75d9aa194ef3e9d3ea08dfd90a5658ed49bf58",
+    "workbench/fine.mnx.json": "ba20645c01063d835ac2136a12c17cc76af37945d6607dbe24c6b8354a06cf7e",
+    "workbench/initial.mnx.json": "dc38ac8a81fbc6cfc6a21beef2599cb271977e48192b971fd8db0b9d67fca699",
+    "workbench/rejected-1.png": "3aaea9e151008a39d2024379c5b2a0033f86a44701674f7723429cd252420ec0",
+    "workbench/rejected-2.png": "a821402dcac30aa44137b3f2fb98cfeaff70a4e3c4532a7dac01b251be039e4c",
+    "workbench/rejected-3.png": "2357f7c8a83c5a6ff69f42abe883ecf2fa41cfdcc99ce21e9b5b035a340e6ed1",
+    "workbench/rejected-4.png": "e31b6a547a4719242873419ecaf2e7bad335303cc07dd41236f197e27cede9b8",
+    "workbench/rejected-5.png": "a821402dcac30aa44137b3f2fb98cfeaff70a4e3c4532a7dac01b251be039e4c",
+    "workbench/rejected-6.png": "3aaea9e151008a39d2024379c5b2a0033f86a44701674f7723429cd252420ec0",
+    "workbench/remove.mnx.json": "b76c0fafb6610a9aad2c6263137a715f415215feb4b9d099e52d7b1b689c874c",
+    "workbench/report.json": "48049e98fc6af95f0d0118020f0f11028e00646eaf72eb421c51e1566d7aa3a5",
+    "workbench/wide.mnx.json": "7e23677e4d3552cc6db12427ba6398a4a8596a90c3f1cdb801f40948f6d17204"
+  }
+}

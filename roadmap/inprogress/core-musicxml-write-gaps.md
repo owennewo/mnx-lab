@@ -58,7 +58,7 @@ This does not add additive grouping or single-number display syntax without a ca
 - Direct local score upload is a separately chosen product feature, previously skipped
   by the Studio campaign. This proposal does not add an upload surface.
 - Fractional pitch and staff configurations are representation blockers shared with
-  [render gaps](../inprogress/core-musicxml-render-gaps.md), not merely missing inspector controls.
+  [render gaps](../complete/core-musicxml-render-gaps.md), not merely missing inspector controls.
 - Workbench's JSON copy plus external file save/reopen works in the bounded chord probe;
   a built-in MusicXML download surface is not established by that evidence.
 - Remaining per-feature create/change/remove, selection, discoverability and persistence

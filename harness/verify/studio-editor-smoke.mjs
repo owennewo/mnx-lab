@@ -155,6 +155,8 @@ try {
   }
   // Cancellation cannot alter the document, including while a valid command is typed.
   await typeMeter('time 4/4', false); await key('Escape');
+  if (await c.evaluate(`!!${inspector}`)) await key('Escape');
+  await wait(`!${inspector}`); await c.evaluate(`${viewer}.focus()`);
   assert.deepEqual(await meterRead(), meterInitial);
   console.log('Extended numeric meters: Studio typed 33/4 and 3/128, preserved all musical content and later meter declarations, exact undo/redo and cancellation');
 

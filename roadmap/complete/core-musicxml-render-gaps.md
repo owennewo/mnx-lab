@@ -1,6 +1,6 @@
 # MusicXML rendering gaps — preserve the music before judging its engraving
 
-> **Status: in progress, 2026-09-22.** Campaign item 22. Initial bounded findings from
+> **Status: complete, 2026-09-22.** Campaign item 22. Initial bounded findings from
 > [render assessment item 18](../inprogress/core-musicxml-render-assessment.md), which
 > remains in progress. [Campaign contract](../inprogress/core-campaign-musicxml.md).
 > This is the requested follow-up proposal, not an exhaustive feature backlog.
@@ -154,9 +154,11 @@ staves and explicit unsupported-clef/unpitched warnings. Twelve formerly failing
 regressions cover original sources, inheritance and mid-measure recovery. The capture
 tool also now traverses tall Studio viewers; earlier PNG coverage was incomplete there.
 
-The selected implementations are now covered, including the meter follow-up below.
-The carrier-dependent full-support work remains deferred as specified above. Filing
-closure follows final gates and retirement of the implementation worktree.
+The selected implementations are complete, including the meter follow-up below.
+The carrier-dependent full-support work remains deferred as specified above. The
+implementation worktree was retired after main was pushed at `a1de9ca8`; final gates
+passed (2,632 root tests, 208 converter tests, build and CSP smoke). Both-shell
+source captures and independent-oracle receipts are linked above.
 
 Meter implementation landed in `f15abe6b`: exact rational totals, compatible common/cut
 import/export including display-only changes, and explicit fallback/scope diagnostics.

@@ -109,7 +109,7 @@ full support for those unsupported features is not claimed.
    shared editor operation support.
 
 The requested bounded follow-ups are
-[render gaps](../roadmap/inprogress/core-musicxml-render-gaps.md) and
+[render gaps](../roadmap/complete/core-musicxml-render-gaps.md) and
 [write gaps](../roadmap/inprogress/core-musicxml-write-gaps.md). They specify regression
 fixtures, ownership, acceptance criteria and representation-policy deferrals. Implementation has begun in item 22; see the post-fix report above for the exact scope.
 

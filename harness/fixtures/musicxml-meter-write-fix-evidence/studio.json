@@ -1,0 +1,7 @@
+{
+  "kind": "editable Studio browser smoke receipt, not extended-meter GP storage evidence",
+  "applicationCommit": "e0feec14",
+  "command": "LIBRARY_LOCAL_ORIGIN=http://127.0.0.1:8797 node harness/verify/studio-editor-smoke.mjs",
+  "captureScriptSha256": "ba4349719ce8ba79152d08c8cc6a8df9dac018e17640bad8dcf15c6f04521dc6",
+  "output": "Extended numeric meters: Studio typed 33/4 and 3/128, preserved all musical content and later meter declarations, exact undo/redo and cancellation\nStudio editor smoke passed: e9ffd5149f5480c1 \u2014 a dimmed cursor made live by focus, fret 3 and a two-digit fret 12 entered from the keyboard, Ctrl+Z / Ctrl+Y, one undo history across notes and the Edit piece panel, a text field keeping its own keys, a Keys sheet of what is bound here, the rung inspector opened with Enter and a meter typed into it, lyrics previewed then applied from the text editor, a note copied and pasted, Escape and back, a bar added saved at once (gains), and the notes read back from the stored .gp after a reload.\n"
+}

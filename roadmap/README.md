@@ -141,7 +141,6 @@ back up to `proposed/` the moment it is.
 
 - **[core-musicxml-write-gaps.md](inprogress/core-musicxml-write-gaps.md)** — item 23: resolve missing title metadata for imported Studio versions and expose representable numeric meter ranges.
 
-- **[core-musicxml-render-gaps.md](inprogress/core-musicxml-render-gaps.md)** — item 22: evidenced import/representation/render-containment gaps, including exact meter duration and display losses.
 
 - **[core-musicxml-render-assessment.md](inprogress/core-musicxml-render-assessment.md)** — MusicXML campaign item 18: assess each applicable external fixture’s features through the desktop editor, separate import and representation losses from rendering defects, and produce an evidenced, bounded proposal to fill the gaps.
 
@@ -501,6 +500,8 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+
+- **[core-musicxml-render-gaps.md](complete/core-musicxml-render-gaps.md)** — item 22: evidenced import/representation/render-containment gaps, including exact meter duration and display losses.
 
 - **[core-musicxml-xsd-validation.md](complete/core-musicxml-xsd-validation.md)** —
   MusicXML item 15 built: pinned MusicXML 4.0 schemas and independent local-only XSD

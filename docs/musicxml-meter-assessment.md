@@ -111,7 +111,7 @@ For Studio add `MUSICXML_CAPTURE_SHELL=studio` and use a separate capture direct
 fresh local library state, as described in [the main assessment](musicxml-editor-assessment.md).
 No production state or scenario verification records are changed.
 
-The requested [render gaps](../roadmap/inprogress/core-musicxml-render-gaps.md) and
+The requested [render gaps](../roadmap/complete/core-musicxml-render-gaps.md) and
 [write gaps](../roadmap/inprogress/core-musicxml-write-gaps.md) now include these bounded
 meter findings. Other corpus families, unresolved meter display policy, independent
 reference-engraving comparison where XML is ambiguous, and remaining task/persistence
@@ -145,3 +145,20 @@ The converter suite adds 23 meter regressions; the measured common/cut display r
 moves from lossy to supported (44 supported, 65 lossy, 7 extension, 3 untested).
 Independent note-table verdicts remain unchanged; that oracle does not assess meter
 spelling or grouping.
+
+## Extended numeric-meter authoring — application `e0feec14`
+
+The two representable-meter rejections above are superseded: the shared inspector
+accepts `time 3/128` and `time 33/4`. The Workbench original-file probe retains
+seven edits, exact undo/redo, invalid-input and typed-command cancellation checks,
+and exact final MNX copy/save/reopen evidence in
+`harness/fixtures/musicxml-meter-write-fix-evidence/`. Its original whole note stays
+when changing to 3/128, with a legitimate overfill; separate structural tests prove
+exact padding of a one-128th-note bar with two 128th rests. The inspector documents
+a 1,024-beat editing limit because padding creates per-beat rests.
+
+The extended `studio-editor-smoke.mjs` types both commands in a newly created, editable
+Studio piece and checks unchanged pitched content plus exact history. Inherited bars
+receive the expected rest padding. These commands are undone before the smoke's
+normal GP checkpoint/reload checks; extended-meter GP storage fidelity is not claimed.
+The untitled imported-version reachability issue remains open.
