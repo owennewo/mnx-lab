@@ -142,6 +142,7 @@ deliberately **not** enumerated in advance: item 8 decides them from evidence.
 | 17 | [Dynamics](core-musicxml-dynamics.md) | `<dynamics>` and `<wedge>`, both directions. The enum values map to `value`; the sforzando family to MNX's accent structure, whose parts concatenate to exactly the MusicXML element name (s+f+z = `sfz`), so one table serves both directions; the rest to SMuFL `glyphs`. Hairpins pair by wedge `number`, item 2's shape again. Relative dynamics have no MusicXML element and warn. | accuracy | the corpus's dynamics scenarios + round trip (no W3C comparison carries a dynamic) | **built 2026-09-10** |
 | 18 | [Render assessment](../proposed/core-musicxml-render-assessment.md) | Side quest over item 13’s pinned external corpus: load fixtures through the desktop editor, assess each visible feature, isolate importer/representation/rendering/integration gaps, and produce an evidenced, bounded render-gap proposal. | accuracy | upstream feature descriptions + semantic checks + visual references and editor captures | **proposed 2026-09-22** |
 | 19 | [Write-path assessment](../proposed/core-musicxml-write-assessment.md) | Companion to item 18: assess whether desktop users can create, inspect, change and remove each corpus feature through the editor, with undo/redo and separate persistence evidence; produce a bounded proposal for missing operations and UX surfaces. | accuracy | real UI tasks + structural before/after checks + applicable save/reopen | **proposed 2026-09-22** |
+| 20 | [XSD element ordering](core-musicxml-xsd-ordering.md) | Pitch/tuning alterations before octaves; separate rehearsal and section directions. XSD-valid exports 292 → 336/344, semantic verdicts unchanged. | accuracy | independent XSD + regression tests | **built 2026-09-22** |
 | — | Feature parity | Dynamics, wedges, spanners, ottavas, articulations, SMuFL glyph names, percussion, layout breaks. **Deliberately unenumerated**: item 8 turns these into a ranked queue with evidence, and each becomes its own row when picked up. Note the schema already has `dynamic-*`, `ottava`, `slur` and `wedge-type` as standard objects — but **no pedal def**, so pedal is contract clause 2's first real test. | accuracy | 1 + 2 + 3 | not yet rows |
 
 ### Item 8's derivation rule
@@ -175,6 +176,14 @@ exactly as `verified` already works here. No backend: a generated JSON artifact
 committed to the repo, like `worker/models.json`.
 
 ## Progress + learnings
+
+### 2026-09-22 — item 20: grammar fixes without musical changes
+
+Three small emitter fixes take XSD-valid exports from 292 to 336 of 344 while every
+independent note-table judgment stays unchanged. Regression tests fail on the old output;
+pitch and tuning have the same ordering defect. Rehearsal and section labels now use
+separate typed directions so both grammar and the existing reader preserve them. The
+remaining eight failures group into zero durations, empty parts and rootless harmony.
 
 ### 2026-09-22 — items 14 and 15: independent readers expose what round trips conceal
 

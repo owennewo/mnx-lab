@@ -565,12 +565,12 @@ export function exportMusicXML(
             octaveEl.textContent = `${pitch.octave}`;
 
             staffTuningEl.appendChild(stepEl);
-            staffTuningEl.appendChild(octaveEl);
             if (pitch.alter !== undefined) {
               const alterEl = doc.createElement('tuning-alter');
               alterEl.textContent = `${pitch.alter}`;
               staffTuningEl.appendChild(alterEl);
             }
+            staffTuningEl.appendChild(octaveEl);
             staffDetailsEl.appendChild(staffTuningEl);
           }
         }
@@ -594,25 +594,21 @@ export function exportMusicXML(
 
       // Rehearsal mark and section name. MusicXML has `<rehearsal>` for the
       // index; the formal section name has no element of its own and goes in
-      // BOLD `<words>` of the same direction — the importer reads plain words
+      // BOLD `<words>` in a separate direction — the importer reads plain words
       // as a part direction, so the weight is what brings a section back.
       const rehearsal = globalM.rehearsal;
       const section = globalM.section;
-      if (rehearsal || section) {
+      for (const [tag, label] of [['rehearsal', rehearsal?.label], ['words', section?.label]] as const) {
+        if (label === undefined) continue;
+        // Each mark has its own typed direction at the same measure position.
+        // Mixing rehearsal and words inside one direction-type violates XSD.
         const directionEl = doc.createElement('direction');
         directionEl.setAttribute('placement', 'above');
         const typeEl = doc.createElement('direction-type');
-        if (rehearsal) {
-          const rehearsalEl = doc.createElement('rehearsal');
-          rehearsalEl.textContent = rehearsal.label;
-          typeEl.appendChild(rehearsalEl);
-        }
-        if (section) {
-          const wordsEl = doc.createElement('words');
-          wordsEl.setAttribute('font-weight', 'bold');
-          wordsEl.textContent = section.label;
-          typeEl.appendChild(wordsEl);
-        }
+        const markEl = doc.createElement(tag);
+        if (tag === 'words') markEl.setAttribute('font-weight', 'bold');
+        markEl.textContent = label;
+        typeEl.appendChild(markEl);
         directionEl.appendChild(typeEl);
         measureEl.appendChild(directionEl);
       }
@@ -1104,12 +1100,12 @@ function buildXmlNode(
     octaveEl.textContent = `${writtenPitch.octave}`;
     
     pitchEl.appendChild(stepEl);
-    pitchEl.appendChild(octaveEl);
     if (writtenPitch.alter !== undefined) {
       const alterEl = doc.createElement('alter');
       alterEl.textContent = `${writtenPitch.alter}`;
       pitchEl.appendChild(alterEl);
     }
+    pitchEl.appendChild(octaveEl);
     noteEl.appendChild(pitchEl);
 
     // ID attribute on note (MusicXML 3.0+ support)

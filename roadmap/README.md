@@ -140,6 +140,8 @@ back up to `proposed/` the moment it is.
 
 ### inprogress/
 
+- **[core-musicxml-xsd-ordering.md](inprogress/core-musicxml-xsd-ordering.md)** — item 20 built: pitch/tuning and direction grammar fixes; 336/344 generated exports now XSD-valid, unchanged semantic verdicts.
+
 - **[core-musicxml-differential-oracle.md](inprogress/core-musicxml-differential-oracle.md)** —
   MusicXML item 14 built: independent music21 note tables, exact rational comparison,
   explicit adapter limitations and live/cached evidence across 344 cases.
