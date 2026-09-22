@@ -477,7 +477,8 @@ elements.
 `MNX → .gp → MNX` and `MNX → MusicXML → MNX` are tested against reference
 fixtures and feature scenarios; neither is a corpus-wide losslessness guarantee.
 The committed [Guitar Pro storage round-trip register](../harness/fixtures/roundtrip-register.json)
-measures 138 scenarios: 7 clean, 30 with gains and 101 with differences. Its comparator
+records clean documents, gains and differences across both corpus and reference-fixture
+lanes. Consult its `verdicts` for the current counts. Its comparator
 discounts encoding provenance and known normalization; these are document comparisons,
 not engraving verdicts. Run `npm run update:roundtrip-register` to remeasure.
 The [converter matrix tests](../harness/conformance/converter-matrix.test.ts) exercise
