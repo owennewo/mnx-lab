@@ -2,7 +2,8 @@
 // in production Studio: a fixture LibraryClient, a tab score with a repeat and
 // two endings (bars 0 1 | 0 2 3 as performed), and the scripted YouTube
 // stand-in from youtube-smoke.mjs as the clock — four seconds a visit, so
-// where the video is says which visit the playhead is on.
+// where the video is says which visit the playhead is on. Its seekTo lands
+// 200 ms late, as YouTube's does, so a seek has a moment in flight.
 //
 // Paused, the arrows move the video; → at the first ending loops back and says
 // Pass 2; a bar selection plays from its first event and Play collapses it.
@@ -27,7 +28,7 @@ const fake = `window.__ytInstances=[];window.YT={Player:class{
  setPlaybackRate(rate){this.rate=rate;queueMicrotask(()=>this.events.onPlaybackRateChange({data:rate}));}setVolume(volume){this.volume=volume;}
  mute(){this.muted=true;}unMute(){this.muted=false;}isMuted(){return !!this.muted;}
  cueVideoById({startSeconds}){this.time=startSeconds;this.state=5;this.rate=1;queueMicrotask(()=>{this.events.onPlaybackRateChange({data:1});this.events.onStateChange({data:5});});}
- seekTo(time){this.time=time;this.last=performance.now();}playVideo(){this.last=performance.now();this.state=1;queueMicrotask(()=>this.events.onStateChange({data:1}));}
+ seekTo(time){setTimeout(()=>{this.time=time;this.last=performance.now();},200);}playVideo(){this.last=performance.now();this.state=1;queueMicrotask(()=>this.events.onStateChange({data:1}));}
  pauseVideo(){this.getCurrentTime();this.state=2;queueMicrotask(()=>this.events.onStateChange({data:2}));}destroy(){this.destroyed=true;this.frame.remove();}
 }};window.onYouTubeIframeAPIReady?.();`;
 
@@ -72,21 +73,32 @@ try {
     // Paused: → walks bar 0 into bar 1, and the video follows once the cursor rests.
     while(session.performedOrdinal===0)key('ArrowRight');
     check(session.performedOrdinal===1&&session.cursor.measureIndex===1,'→ did not reach bar 1');
-    await delay(400);
+    await delay(650);
     check(player.scorePosition?.ordinal===1,'The playhead did not follow the cursor');
     near(video(),5,'The video did not follow the cursor');
+
+    // A press seeks at once, and while YouTube is still getting there the tray
+    // keeps a score position — the rail must not blink out ("no score position").
+    const probe=viewer.shadowRoot.querySelector('svg [data-source-id]');
+    if(probe){
+      const box=probe.getBoundingClientRect(),lost=[];
+      probe.dispatchEvent(new PointerEvent('pointerdown',{clientX:box.x+box.width/2,clientY:box.y+box.height/2,button:0,isPrimary:true,bubbles:true,composed:true}));
+      for(let t=0;t<500;t+=20){if(!player.scorePosition)lost.push(t);await delay(20);}
+      check(lost.length===0,'The score position dropped out during a seek at '+lost.join(',')+' ms');
+      editor.handleIntent({type:'goToMeasure',measureIndex:1});await delay(650);
+    }
 
     // → at the first ending loops back to the repeat start, on pass 2, and says so.
     while(session.performedOrdinal===1)key('ArrowRight');
     check(session.performedOrdinal===2&&session.cursor.measureIndex===0,'→ at the first ending did not loop back');
     await until(()=>label()==='Pass 2','the Pass 2 label');
-    await delay(400);near(video(),9,'The video did not follow the loop back');
+    await delay(650);near(video(),9,'The video did not follow the loop back');
 
     // A bar selection plays from its first event, and Play collapses it.
     key('ArrowRight');check(session.cursor.measureIndex===0&&session.cursor.onset.num>0,'→ did not reach the second event');
-    await delay(400);near(video(),9+2,'The video did not follow into the bar');
+    await delay(650);near(video(),9+2,'The video did not follow into the bar');
     editor.handleIntent({type:'goToLevel',level:'measure'});
-    await delay(400);near(video(),9,'A bar selection did not put the video at the bar');
+    await delay(650);near(video(),9,'A bar selection did not put the video at the bar');
     await player.play();
     await until(()=>player.playback?.wantsPlayback&&session.selectionLevel==='note','Play to collapse the selection');
     check(session.cursor.onset.num===0&&session.performedOrdinal===2,'Play did not collapse to the first event');
@@ -117,7 +129,7 @@ try {
     check(session.performedOrdinal===player.scorePosition.ordinal,'The cursor did not park on the playhead');
     near(video(),at,'Pausing moved the video');
     // …and the next move is a seek again.
-    key('ArrowRight');await delay(400);
+    key('ArrowRight');await delay(650);
     check(seeks===base+1,'A move after the pause did not seek');
     return {paused:true,loopLabel:true,playCollapse:true,refused:true,barSeeks:true,park:true};
   })()`);

@@ -67,7 +67,10 @@ export class YouTubePort implements MediaPort {
   get rate() { return this.acceptedRate; }
   get volume() { const value=this.apiReady ? this.api!.getVolume() : NaN; return Number.isFinite(value) ? Math.min(1,Math.max(0,value/100)) : this.gain; }
   get error() { return this.fault; }
-  get clockReliable() { return !this.unstableDuration && (this.hasPlayed || this.clockKnown) && !this.seekingNow; }
+  /** Mid-seek the clock is the seek's TARGET (`sample` only takes YouTube's own time once it arrives near it),
+   *  which is a known place: treating it as unknown dropped the score position for every seek's few hundred ms,
+   *  and the tray flashed "no score position" on each press. */
+  get clockReliable() { return !this.unstableDuration && (this.hasPlayed || this.clockKnown); }
   get clockIssue() { return this.unstableDuration ? 'The video duration is changing. Live or interrupted content cannot be followed reliably.' : undefined; }
   subscribe(listener: (event: MediaEvent) => void) { this.listeners.add(listener); return () => { this.listeners.delete(listener); }; }
   private emit(event: MediaEvent) { if (!this.closed) for (const listener of this.listeners) listener(event); }

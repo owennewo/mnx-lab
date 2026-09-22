@@ -65,6 +65,21 @@ describe('official IFrame API adapter',()=>{
     f.state(3);f.api.time=9;f.port.sample();expect(f.port.currentTime).toBe(4);expect(f.port.clockReliable).toBe(true);
     f.state(1);expect(f.port.currentTime).toBe(9);await f.port.seek(12);expect(f.port.currentTime).toBe(12);expect(f.port.seeking).toBe(false);f.port.dispose();
   });
+  it('keeps a seek\u2019s target as a reliable clock while YouTube is still getting there',async()=>{
+    // A press on the score seeks, and YouTube takes a few hundred ms to report
+    // the new time. The clock is the target meanwhile — a known place — so the
+    // score position must not drop out and the tray must not flash
+    // "no score position" on every press (core-single-cursor.md).
+    const f=fixture();await f.port.prepare();const play=f.port.play();await flush();f.state(1);await play;
+    f.api.time=4;f.port.sample();
+    const lagging=f.api.seekTo;f.api.seekTo=()=>{};
+    const seek=f.port.seek(12);await flush();
+    expect(f.port.seeking).toBe(true);
+    expect(f.port.currentTime).toBe(12);
+    expect(f.port.clockReliable).toBe(true);
+    f.api.seekTo=lagging;f.api.time=12;f.port.sample();await seek;
+    expect(f.port.seeking).toBe(false);expect(f.port.currentTime).toBe(12);f.port.dispose();
+  });
   it('cues again after ending so a reset cannot accidentally start video',async()=>{
     const f=fixture();await f.port.prepare();f.state(1);f.state(0);await f.port.seek(3);
     expect(f.api.cues).toEqual([3]);expect(f.api.plays).toBe(0);expect(f.port.paused).toBe(true);f.port.dispose();
