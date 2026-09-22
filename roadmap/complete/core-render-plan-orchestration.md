@@ -1,6 +1,6 @@
 # Shared render-plan orchestration
 
-Implementation loop. In progress 2026-09-22; requested in the maintenance review.
+Implementation loop. Completed 2026-09-22; requested in the maintenance review.
 
 ## Problem
 
@@ -33,5 +33,8 @@ this extraction does not make a cache reusable across projections.
 
 Development checks: 12 plan contract cases across all projections, 60 zoom/vertical
 density cases, and application TypeScript checking passed. `update:primitives` passed
-its 194 checks and left `git diff -- scenarios/` empty. Final rebased gates and browser
-smokes remain before landing.
+its 194 checks and left `git diff -- scenarios/` empty. Final rebased gates passed: 142 test files, 2,589 tests passed and one skipped;
+`npm run build` passed. The selection and workbench-editor browser smokes passed using
+the gate build. The implementation was fast-forward merged and pushed, then the
+worktree and branch were removed before this completion record. No verification debt
+was created.

@@ -148,7 +148,6 @@ back up to `proposed/` the moment it is.
 
 ### inprogress/
 
-- **[core-render-plan-orchestration.md](inprogress/core-render-plan-orchestration.md)** — share render-plan fitting, scaling, caching and cropping across notation, tab and both without changing engravings.
 
 - **[studio-sync-rederive.md](complete/studio-sync-rederive.md)** — **built 2026-09-17, complete
   2026-09-20** (closed by the owner; the two hands-on checks continue on the live site), [studio authoring campaign](inprogress/studio-campaign-authoring.md)
@@ -491,6 +490,8 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+
+- **[core-render-plan-orchestration.md](complete/core-render-plan-orchestration.md)** — completed 2026-09-22: shared render-plan fitting, scaling, caching and cropping across notation, tab and both without changing engravings.
 
 - **[core-editor-pointer-placement.md](complete/core-editor-pointer-placement.md)** — [studio
   authoring campaign](inprogress/studio-campaign-authoring.md) item 9, **complete 2026-09-20**:
