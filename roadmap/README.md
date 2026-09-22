@@ -45,6 +45,8 @@ proposals that name their campaign.
 
 ### proposed/
 
+- **[lab-current-docs-consistency.md](proposed/lab-current-docs-consistency.md)** — reconcile current capability claims and guard local reference links.
+
 
 - **[studio-player-practice.md](proposed/studio-player-practice.md)** — campaign item 13,
   studio's first player feature in `elements/`: loop the selection with the **written-range
