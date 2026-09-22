@@ -139,7 +139,10 @@ try {
     await typeMeter(`time ${count}/${unit}`);
     await wait(`${page}.editor.document.global.measures[0].time.count === ${count} && ${page}.editor.document.global.measures[0].time.unit === ${unit}`);
     const changed = await meterRead();
-    assert.deepEqual(changed.parts[0].measures.slice(1), beforeMeter.parts[0].measures.slice(1));
+    assert.deepEqual(changed.global.measures.slice(1), beforeMeter.global.measures.slice(1));
+    // These bars inherit the first meter, so their rest padding must change too.
+    const ink = d => d.parts.map(p => p.measures.map(m => ({ ...m, sequences: m.sequences.map(s => ({ ...s, content: s.content.filter(e => !e.rest) })) })));
+    assert.deepEqual(ink(changed), ink(beforeMeter));
     const notes = d => d.parts[0].measures[0].sequences[0].content.filter(e => e.notes);
     assert.deepEqual(notes(changed), notes(beforeMeter));
     await key('Escape'); await c.evaluate(`${viewer}.focus()`);
@@ -154,7 +157,7 @@ try {
   await c.evaluate(`${viewer}.focus()`); await key('Digit5', { shift: true }); await key('Enter');
   await wait(`!!${inspector}`); await key('Escape');
   assert.deepEqual(await meterRead(), meterInitial);
-  console.log('Extended numeric meters: Studio typed 33/4 and 3/128, preserved notes/other bars, exact undo/redo and cancellation');
+  console.log('Extended numeric meters: Studio typed 33/4 and 3/128, preserved all musical content and later meter declarations, exact undo/redo and cancellation');
 
   // The lyric text editor: Shift+L. A clean parse draws live on a scratch copy; nothing is edited until it is applied.
   const lyrics = `${piece}.querySelector('.editor-overlay mnx-editor-surfaces mnx-lyric-text-editor')`;

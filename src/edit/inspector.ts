@@ -7,7 +7,6 @@
 //
 // Stages 3–5: pills at every rung the session can edit, merged over a range.
 import type { MnxNote, MnxNoteValueBase, MnxStructure } from '../model/mnx.ts';
-import { TIME_SIGNATURE_INPUT_HELP } from './setupGrammar.ts';
 import { findNoteAddress } from '../model/noteWalk.ts';
 import { midiOfSpelling } from './staffSpace.ts';
 import { capoOf, defaultStringFor, isTabPart, midiOfPitch, tuningOf } from './tabStrings.ts';
@@ -41,6 +40,7 @@ import {
   parseKeySignature,
   parseLyric,
   parseTimeSignature,
+  TIME_SIGNATURE_INPUT_HELP,
   parseTuning,
   parsePart,
   parsePartDeclaration,

@@ -29,7 +29,7 @@ const LAB_JUMP_TYPES = new Set([
 /** "4/4", "6/8", "12/8" → an MNX time signature. Unit must be a power of two
  *  the notation can express. */
 export const MAX_EDIT_METER_COUNT = 1024;
-export const TIME_SIGNATURE_INPUT_HELP = `Use a count from 1 to ${MAX_EDIT_METER_COUNT} and a denominator of 1, 2, 4, 8, 16, 32, 64 or 128; or common, cut, inherit. Larger counts exceed the editor’s beat-rest padding limit.`;
+export const TIME_SIGNATURE_INPUT_HELP = `For a time signature, use a count from 1 to ${MAX_EDIT_METER_COUNT} and a denominator of 1, 2, 4, 8, 16, 32, 64 or 128; or common, cut, inherit. The editor supports at most ${MAX_EDIT_METER_COUNT} beats per bar.`;
 
 export function parseTimeSignature(
   text: string

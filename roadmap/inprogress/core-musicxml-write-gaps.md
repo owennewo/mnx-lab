@@ -71,3 +71,17 @@ inspector. Padding creates one rest per beat, so larger counts remain an explici
 application limit with an actionable inspector message; this is not an MNX schema limit.
 Add 128th-note rest padding so a newly selected 3/128 meter can be filled exactly.
 Preserve pitched notes when shrinking a bar; existing overfill diagnostics still apply.
+
+## Numeric meter progress — 2026-09-22
+
+The shared grammar now accepts 3/128 and 33/4, through the documented 1024-beat
+limit. Padding includes 128th rests. Structural tests prove exact padding, note
+preservation, unchanged bars after an explicit meter boundary, and exact history.
+The Workbench original-file probe types both commands, rejects invalid/excessive
+values, and reopens the final MNX exactly. The extended Studio editor smoke types
+both commands into an editable piece with exact undo/redo and cancellation. Its
+other bars inherit the meter, so their rest padding changes while musical content
+and later declarations remain intact. Studio storage fidelity for these two meters
+is not claimed by undoing them before the smoke's existing GP-save check.
+
+The untitled-version workflow above remains open.

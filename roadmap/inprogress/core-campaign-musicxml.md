@@ -726,3 +726,14 @@ Both-shell captures are retained in `harness/fixtures/musicxml-meter-fix-evidenc
 visual review and remaining Studio authoring block. Matrix: 44 supported / 65 lossy /
 7 extension / 3 untested. Independent note-table verdicts are unchanged. Lesson:
 correct duration does not imply preserved grouping, local scope, or unmetered layout.
+
+### Shared numeric-meter authoring — 2026-09-22
+
+Item 23 now exposes units through 128 and counts through 1024, with explicit input
+limits and exact 128th-rest padding. Workbench and editable Studio browser probes
+exercise 3/128 and 33/4 through the shared inspector, preserve notes, and exactly
+undo/redo. Workbench additionally copies and reopens the final MNX. Studio's normal
+GP checkpoint smoke passes after restoring its original meter; this does not prove
+GP storage fidelity for the extended meters. Inherited bars legitimately change
+rest padding, so assertions must preserve music rather than forbid that padding.
+Untitled XML version promotion remains the next implementation task.
