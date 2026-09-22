@@ -18,7 +18,7 @@ interface CheckedScore<L> {
 export function projectPieceTags(doc: MnxStructure, heldTags: LibrarySnapshot['tags']): ProjectedTag[] {
   const tags: ProjectedTag[] = derivedLibraryTags(doc);
   for (const held of heldTags)
-    if (held.origin === 'derived' && held.source_ref === 'sidecar' && ['title', 'artist'].includes(held.dimension) && !tags.some(t => t.dimension === held.dimension))
+    if (held.origin === 'derived' && (held.source_ref === 'sidecar' || (held.source_ref === 'library-title' && held.dimension === 'title')) && ['title', 'artist'].includes(held.dimension) && !tags.some(t => t.dimension === held.dimension))
       tags.push({ dimension: held.dimension, value: held.value, kept: true });
   return tags;
 }

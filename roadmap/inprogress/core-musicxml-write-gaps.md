@@ -85,3 +85,14 @@ and later declarations remain intact. Studio storage fidelity for these two mete
 is not claimed by undoing them before the smoke's existing GP-save check.
 
 The untitled-version workflow above remains open.
+
+## Untitled-version title policy
+
+A missing projected title opens a labelled library-title form, prefilled from the
+current library title. Confirming promotes the unchanged rendition and records the
+entered title with `source_ref: library-title`. This is library metadata, not score
+metadata. The original bytes and imported MNX remain untouched. Future checkpoints
+keep that title while the document has none; an explicit document title supersedes
+it. The API rejects a blank title or an override accompanying an existing projected
+title, and retains its owner/revision/canonical-pointer checks. Cancellation performs
+no request. The prompt is tied to the viewed rendition and clears when it changes.

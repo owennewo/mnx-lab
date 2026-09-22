@@ -366,7 +366,7 @@ library.post('/pieces/:id/renditions', async c => {
 // Like a checkpoint it is refused unless the caller knows what is canonical NOW.
 library.put('/pieces/:id/canonical', async c => {
   const b = await body(c);
-  if (Object.keys(b).some(k => !['expected_revision', 'from', 'rendition_id', 'derived_tags'].includes(k))) invalid('Unsupported field');
+  if (Object.keys(b).some(k => !['expected_revision', 'from', 'rendition_id', 'derived_tags', 'library_title'].includes(k))) invalid('Unsupported field');
   if (!Number.isSafeInteger(b.expected_revision) || Number(b.expected_revision) < 0) invalid('Expected the piece revision');
   const lib = reader(c); const owner = c.get('libraryUser').id; const id = c.req.param('id');
   const before = await lib.getPiece(owner, id);
@@ -374,7 +374,11 @@ library.put('/pieces/:id/canonical', async c => {
   const target = before.renditions.find(r => r.id === text(b.rendition_id));
   if (!target || target.role === 'evidence' || target.role === 'derived') invalid('Choose one of this piece\'s own versions');
   if (before.piece.canonical_rendition_id !== text(b.from)) throw new LibraryError('conflict', 'This piece was saved somewhere else; read it again');
-  const derived = keepStored(studioTags(b.derived_tags, `studio-revert@${target.id}`), before.tags);
+  const projected = array(b.derived_tags);
+  const libraryTitle = b.library_title === undefined ? undefined : text(b.library_title).trim();
+  if (libraryTitle !== undefined && projected.some(t => object(t).dimension === 'title')) invalid('The version already has a projected title');
+  const derived = keepStored(studioTags(libraryTitle === undefined ? projected : [...projected, { dimension: 'title', value: libraryTitle }], `studio-revert@${target.id}`), before.tags);
+  if (libraryTitle !== undefined) derived.find(t => t.dimension === 'title')!.source_ref = 'library-title';
   const snapshot = await lib.writePiece(owner, { id, expected_revision: Number(b.expected_revision), canonical: { mode: 'replace', rendition_id: target.id }, tags: [], derived_tags: derived });
   return c.json({ snapshot: { ...snapshot, tags: Library.shown(snapshot.tags, await lib.listAliases(owner)) } });
 });

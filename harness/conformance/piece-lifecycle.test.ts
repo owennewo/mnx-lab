@@ -16,6 +16,7 @@ import { buildNewDocument } from '../../src/edit/newDocument.ts';
 import { applyOp } from '../../src/edit/ops.ts';
 import { parseTuning } from '../../src/edit/setupGrammar.ts';
 import { derivedLibraryTags } from '../../src/model/libraryTags.ts';
+import { projectPieceTags } from '../../src/storage/pieceSaveContext.ts';
 import { checkStorage } from '../../src/importers/storageCheckCore.ts';
 import { documentTitle, type MnxStructure } from '../../src/model/mnx.ts';
 import { importGuitarProCleanRoom } from '../../converters/guitarpro-mnx/src/cleanRoom.ts';
@@ -214,4 +215,31 @@ it('keeps a sidecar\'s title as the sidecar\'s, and lets the document clear what
   const now = (await client().piece(id)).snapshot.piece;
   expect(await status(client().saveCheckpoint(id, checkpoint(applyOp(cleared, { type: 'setWork', work: { subtitle: 'third' } }), now, { derivedTags: [{ dimension: 'title', value: 'Invented', kept: true }] })))).toBe(400);
   expect(await status(client().createPiece(file(blank()), [{ dimension: 'title', value: 'Anji', kept: true }]))).toBe(400);
+}, 30_000);
+
+
+it('names an untitled version in the library without changing its bytes, and keeps that name on save', async () => {
+  const untitled = blank(); delete untitled._x!.mnxLab!.work!.title;
+  const made = (await client().createPiece(file(untitled), [{ dimension: 'title', value: 'Old library title' }])).snapshot;
+  const id = made.piece.canonical_rendition_id!;
+  const original = await client().rendition(id);
+  const request = (title: unknown, revision = made.piece.revision, tags: unknown[] = []) => send(`/pieces/${made.piece.id}/canonical`, {
+    method: 'PUT', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ expected_revision: revision, from: id, rendition_id: id, derived_tags: tags, library_title: title })
+  });
+  expect((await request('   ')).status).toBe(400);
+  expect((await request('New title', made.piece.revision, [{ dimension: 'title', value: 'Source title' }])).status).toBe(400);
+  const response = await request('  New title  ');
+  expect(response.status).toBe(200);
+  expect((await request('Stale title', made.piece.revision)).status).toBe(409);
+  const { snapshot } = await response.json() as { snapshot: Awaited<ReturnType<typeof make>> };
+  expect(snapshot.tags.find(t => t.dimension === 'title')).toMatchObject({ value: 'New title', source_ref: 'library-title' });
+  expect(new Uint8Array(await client().rendition(id))).toEqual(new Uint8Array(original));
+  const tags = projectPieceTags(untitled, snapshot.tags);
+  expect(tags).toContainEqual({ dimension: 'title', value: 'New title', kept: true });
+  const saved = await client().saveCheckpoint(made.piece.id, checkpoint(untitled, snapshot.piece, { derivedTags: tags }));
+  expect(saved.snapshot.tags.find(t => t.dimension === 'title')).toMatchObject({ value: 'New title', source_ref: 'library-title' });
+  expect(titleOf(await client().rendition(saved.snapshot.piece.canonical_rendition_id!))).toBeNull();
+  expect(projectPieceTags(retitled(untitled, 'Score title'), saved.snapshot.tags).filter(t => t.dimension === 'title'))
+    .toEqual([{ dimension: 'title', value: 'Score title' }]);
 }, 30_000);

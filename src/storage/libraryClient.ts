@@ -95,8 +95,8 @@ export class LibraryClient {
     return r.arrayBuffer();
   }
   /** Go back to a version: the pointer moves, nothing is written over. `from` is what the caller believes is canonical now. */
-  revertTo(piece: string, revision: number, from: string, renditionId: string, derivedTags: ProjectedTag[]) {
-    return this.recordingRequest<{ snapshot: LibrarySnapshot }>(`/pieces/${encodeURIComponent(piece)}/canonical`, 'PUT', { expected_revision: revision, from, rendition_id: renditionId, derived_tags: derivedTags });
+  revertTo(piece: string, revision: number, from: string, renditionId: string, derivedTags: ProjectedTag[], libraryTitle?: string) {
+    return this.recordingRequest<{ snapshot: LibrarySnapshot }>(`/pieces/${encodeURIComponent(piece)}/canonical`, 'PUT', { expected_revision: revision, from, rendition_id: renditionId, derived_tags: derivedTags, ...(libraryTitle !== undefined ? { library_title: libraryTitle } : {}) });
   }
   /** Soft: the piece leaves every list and can be restored. */
   deletePiece(piece: string, revision: number) { return this.send<void>('DELETE', `/pieces/${encodeURIComponent(piece)}`, { expected_revision: revision }); }

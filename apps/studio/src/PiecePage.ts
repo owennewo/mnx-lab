@@ -117,6 +117,8 @@ export class PiecePage extends LitElement {
   /** The score as a recording sees it — each performed bar's length (src/audio/scoreShape.ts). */
   @state() private scoreShape = '';
   /** An older version on screen instead of the current document. Looking changes nothing. */
+  @state() private versionTitle: { id: string; title: string } | null = null;
+  @state() private versionBusy = false;
   @state() private viewing: { id: string; label: string; document: MnxStructure } | null = null;
   /** Another tab holds this piece's edit lock. */
   @state() private readOnly = false;
@@ -350,6 +352,7 @@ export class PiecePage extends LitElement {
 
   private async load() {
     this.endSession();
+    this.versionTitle = null;
     void this.flushSync();
     void this.flushPrefs();
     const generation = ++this.generation;
@@ -564,6 +567,7 @@ export class PiecePage extends LitElement {
       this.player?.pause();
       const opened = await openLocalFile(new File([await this.client.rendition(id)], `${id}.${version.format}`));
       if (generation !== this.generation) return;
+      this.versionTitle = null;
       this.viewing = { id, label: `${version.label} · ${savedAge(Date.parse(version.createdAt), Date.now())}`, document: opened.document };
       this.doc = { ...doc, name: documentTitle(opened.document) ?? doc.name, lastUpdated: Date.now(), mnxJson: opened.document };
     } catch (error) {
@@ -573,20 +577,30 @@ export class PiecePage extends LitElement {
   private closeVersion() {
     const current = this.session?.document;
     if (!this.viewing || !this.doc || !current) return;
-    this.viewing = null;
+    this.viewing = null; this.versionTitle = null;
     this.doc = { ...this.doc, name: documentTitle(current) ?? this.doc.name, lastUpdated: Date.now(), mnxJson: current };
   }
-  private async makeVersionCurrent(id: string) {
+  private async makeVersionCurrent(id: string, libraryTitle?: string) {
     const viewing = this.viewing, session = this.session, snapshot = this.snapshot;
-    if (!viewing || viewing.id !== id || !session || !snapshot || this.readOnly || session.dirty || !session.baseRenditionId) return;
+    if (!viewing || viewing.id !== id || !session || !snapshot || this.readOnly || session.dirty || !session.baseRenditionId || this.versionBusy) return;
     const derivedTags = this.projection(viewing.document);
+    if (!derivedTags.some(t => t.dimension === 'title') && libraryTitle === undefined) {
+      this.versionTitle = { id, title: this.tag('title') ?? '' };
+      this.saveOpen = false;
+      await this.updateComplete;
+      this.shadowRoot?.querySelector<HTMLInputElement>('.version-title input')?.focus();
+      return;
+    }
+    if (libraryTitle !== undefined && !libraryTitle.trim()) return;
+    this.versionBusy = true;
+    this.error = '';
     try {
-      await this.enqueue(() => this.client.revertTo(snapshot.piece.id, (this.snapshot ?? snapshot).piece.revision, session.baseRenditionId!, id, derivedTags));
+      await this.enqueue(() => this.client.revertTo(snapshot.piece.id, (this.snapshot ?? snapshot).piece.revision, session.baseRenditionId!, id, derivedTags, libraryTitle));
       this.session = null; session.dispose();
       await this.load();
     } catch (error) {
       this.error = `That version was not made current: ${error instanceof LibraryRequestError && error.status === 409 ? 'this piece was saved somewhere else — reopen it.' : error instanceof Error && error.message ? error.message : 'the library is unavailable.'}`;
-    }
+    } finally { this.versionBusy = false; }
   }
 
   /** Delete the piece: save what is unsaved first (a restore brings back what was SAVED), then leave for the library, which offers the undo. */
@@ -903,7 +917,7 @@ export class PiecePage extends LitElement {
     // Edited here, the heading reads the document; the library's tags catch up at the next save.
     // An older version on screen is read the same way: its own document, then what only the sidecar knows.
     const fromDocument = this.touched || !!this.viewing;
-    const sidecar = (dimension: string) => this.snapshot?.tags.find(t => t.dimension === dimension && t.origin === 'derived' && t.source_ref === 'sidecar')?.shown ?? null;
+    const sidecar = (dimension: string) => this.snapshot?.tags.find(t => t.dimension === dimension && t.origin === 'derived' && (t.source_ref === 'sidecar' || (dimension === 'title' && t.source_ref === 'library-title')))?.shown ?? null;
     const title = this.doc ? (fromDocument ? documentTitle(this.doc.mnxJson) ?? sidecar('title') : this.tag('title')) ?? this.doc.name : '';
     const artist = this.doc ? (fromDocument ? documentArtist(this.doc.mnxJson) ?? sidecar('artist') : this.tag('artist') ?? documentArtist(this.doc.mnxJson)) ?? '' : '';
     const chip = this.save ? saveChip(this.save, this.now) : null;
@@ -973,8 +987,17 @@ export class PiecePage extends LitElement {
           : nothing}
         ${this.doc && this.error ? html`<p class="notice" role="alert">${this.error}</p>` : nothing}
         ${this.viewing ? html`<p class="viewing" role="status"><span>Looking at an older version: <b>${this.viewing.label}</b>. Nothing has changed.</span>
-          <button type="button" @click=${() => this.closeVersion()}>Back to current</button>
-          <button type="button" ?disabled=${this.readOnly} @click=${() => void this.makeVersionCurrent(this.viewing!.id)}>Make this the current version</button></p>` : nothing}
+          <button type="button" ?disabled=${this.versionBusy} @click=${() => this.closeVersion()}>Back to current</button>
+          <button type="button" ?disabled=${this.readOnly || this.versionBusy} @click=${() => void this.makeVersionCurrent(this.viewing!.id)}>Make this the current version</button></p>` : nothing}
+        ${this.versionTitle && this.viewing?.id === this.versionTitle.id ? html`
+          <form class="version-title viewing" @submit=${(e: SubmitEvent) => { e.preventDefault(); if (this.versionTitle) void this.makeVersionCurrent(this.versionTitle.id, this.versionTitle.title.trim()); }}>
+            <label>Library title <input required .value=${this.versionTitle.title} ?disabled=${this.versionBusy}
+              @input=${(e: Event) => { if (this.versionTitle) this.versionTitle = { ...this.versionTitle, title: (e.target as HTMLInputElement).value }; }}></label>
+            <span>This version has no title. This names the library piece; the original score is unchanged. You can add a score title in Edit piece afterward.</span>
+            ${!this.versionTitle.title.trim() ? html`<span role="alert">Enter a library title.</span>` : nothing}
+            <button type="submit" ?disabled=${this.versionBusy || !this.versionTitle.title.trim()}>Make current</button>
+            <button type="button" ?disabled=${this.versionBusy} @click=${() => { this.versionTitle = null; }}>Cancel</button>
+          </form>` : nothing}
         ${this.clipboardNotice ? html`<p class="clip-notice" role="status">${this.clipboardNotice}</p>` : nothing}
         <div class="editor-overlay"></div>
         <mnx-document-viewer
