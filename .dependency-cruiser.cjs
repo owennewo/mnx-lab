@@ -22,7 +22,7 @@ function layerRule(name, from, allowed) {
     severity: 'error',
     from: { path: `^${from}/` },
     to: {
-      path: '^(src|worker)/',
+      path: '^(src|worker|apps|harness|converters|experiments)/',
       // worker/generated/ is not worker logic — it is schema DATA precompiled
       // from spec/ (Workers disallow runtime codegen), importable from any
       // layer (model/pinnedErrors lazy-loads the validator in the browser).
@@ -33,6 +33,12 @@ function layerRule(name, from, allowed) {
 
 module.exports = {
   forbidden: [
+    {
+      name: 'viewer-and-player-do-not-reach-editor', severity: 'error',
+      comment: 'Viewing and playback must not acquire editor dependencies through shared helpers.',
+      from: { path: '^src/elements/(DocumentViewer|Player|playbackHost)\\.ts$' },
+      to: { path: '^src/edit/', reachable: true }
+    },
     {
       name: 'production-does-not-import-experiments', severity: 'error',
       from: { path: '^(src|worker|apps|converters)/' }, to: { path: '^experiments/' }
@@ -54,12 +60,12 @@ module.exports = {
     layerRule('edit-over-model', 'src/edit', ['src/model']),
     layerRule('corpus-over-model', 'src/corpus', ['src/model']),
     layerRule('storage-over-model', 'src/storage', ['src/model']),
-    layerRule('importers-over-model', 'src/importers', ['src/model']),
+    layerRule('importers-over-model', 'src/importers', ['src/model', 'converters']),
     layerRule('assist-carries-ops', 'src/assist', ['src/model', 'src/edit']),
     // `src/edit` since 2026-09-17 (roadmap: core-editor-element-promotion): the
     // editor's MOUNT lives in elements/ so both shells share one. The viewer and
-    // the player still import none of it — only editorHost.ts and
-    // editorSelection.ts do — so an embed that views pays nothing for the editor.
+    // the player cannot reach edit/ — editorHost.ts and its editor surfaces can —
+    // so an embed that views pays nothing for the editor.
     layerRule('elements-embeddable-surface', 'src/elements', [
       'src/model',
       'src/engine',
@@ -89,8 +95,8 @@ module.exports = {
       severity: 'error',
       from: { path: '^apps/studio/' },
       to: {
-        path: '^(src|worker)/',
-        pathNot: '^src/(model|engine|audio|edit|elements|storage|importers)/|^worker/generated/'
+        path: '^(src|worker|apps|harness|converters|experiments)/',
+        pathNot: '^apps/studio/|^src/(model|engine|audio|edit|elements|storage|importers)/|^worker/generated/'
       }
     },
     {
@@ -99,7 +105,7 @@ module.exports = {
         'workbench/, entries/ and apps/studio/ are leaves: anything two consumers want ' +
         'must first be promoted down into elements/ or below — a deliberate, reviewed move.',
       severity: 'error',
-      from: { path: '^(src|worker|harness|apps)/', pathNot: '^src/(workbench|entries)/|^apps/studio/' },
+      from: { path: '^(src|worker|harness|apps|converters|experiments)/', pathNot: '^src/(workbench|entries)/|^apps/studio/' },
       to: { path: '^src/(workbench|entries)/|^apps/studio/' }
     },
     {
@@ -117,11 +123,13 @@ module.exports = {
         'harness loads may import it — the workbench reads Guitar Pro through the ' +
         'clean-room importer.',
       severity: 'error',
-      from: { path: '^(src|worker|harness)/' },
+      from: { path: '^(src|worker|harness|apps|experiments)/' },
       to: { path: 'alphatab' }
     }
   ],
   options: {
+    // Experiment output can contain generated bundles; dependencies are never entry points.
+    exclude: { path: '^experiments/[^/]+/(output|dist)(/|$)' },
     doNotFollow: { path: 'node_modules' },
     tsPreCompilationDeps: true,
     tsConfig: { fileName: 'tsconfig.json' }
