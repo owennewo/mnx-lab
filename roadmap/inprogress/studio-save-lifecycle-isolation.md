@@ -34,3 +34,8 @@ and the save-pipeline and play-only browser smokes.
 
 An undo back to the original document during an in-flight save also drains its final
 checkpoint. Failed/conflicted flushes terminate and retain local recovery.
+
+Final rebased validation (2026-09-22): primitives regenerated with a clean
+`scenarios/` diff; root suites 2599 passed, 1 skipped; build passed. Built
+save-pipeline (including delayed navigation), play-only and piece-lifecycle browser
+smokes passed against isolated local D1/R2 on port 8793.

@@ -140,6 +140,7 @@ try {
   // lock and metadata until it lands, and cannot repaint the new piece's state.
   await c.evaluate(`${editPiece}.click()`);
   await wait(`!!${details}?.querySelector('input')`);
+  await field('Title', `${title} (departing)`);
   await field('Subtitle', 'saved while leaving');
   await c.evaluate(`{
     const WorkerBefore = window.Worker;
@@ -166,7 +167,7 @@ try {
   }
   const departed = await snapshot(copyId);
   assert.ok(departed.tags.some(t => t.dimension === 'subtitle' && t.value === 'saved while leaving'));
-  assert.ok(departed.tags.some(t => t.dimension === 'title' && t.value.includes('(copy)')));
+  assert.ok(departed.tags.some(t => t.dimension === 'title' && t.value === `${title} (departing)`));
   await wait(`navigator.locks.query().then(q => !q.held.some(l => l.name === 'mnx-studio.piece.${copyId}'))`);
   assert.match(await c.evaluate(heading), /the tablet's/, 'old save changed the new piece heading');
   assert.equal(await c.evaluate(`${chip}.dataset.save`), 'clean', 'old save changed the new piece save state');
