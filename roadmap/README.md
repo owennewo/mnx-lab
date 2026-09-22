@@ -45,6 +45,7 @@ proposals that name their campaign.
 
 ### proposed/
 
+- **[lab-retire-document-repository.md](proposed/lab-retire-document-repository.md)** — remove the unused document-sync client and interface; preserve the reserved HTTP routes and document Studio’s actual library persistence.
 
 - **[studio-player-practice.md](proposed/studio-player-practice.md)** — campaign item 13,
   studio's first player feature in `elements/`: loop the selection with the **written-range
