@@ -1,7 +1,7 @@
 # MusicXML write-path assessment — can a person author the data?
 
 > **Status: proposed.** Side quest, item 19 of
-> [core-campaign-musicxml.md](core-campaign-musicxml.md). Serves the implementation loop.
+> [core-campaign-musicxml.md](../inprogress/core-campaign-musicxml.md). Serves the implementation loop.
 > Requested 2026-09-22 as a companion to the
 > [render assessment](core-musicxml-render-assessment.md): for each corpus feature,
 > does the desktop editor offer the means and UX surface to create, change and remove

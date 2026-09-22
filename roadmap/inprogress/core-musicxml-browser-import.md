@@ -1,7 +1,7 @@
 # Browser import surface — MusicXML opens in the workbench
 
 > **Status: BUILT 2026-09-11.** Item 16 of
-> [core-campaign-musicxml.md](../proposed/core-campaign-musicxml.md). **Open…** now takes
+> [core-campaign-musicxml.md](core-campaign-musicxml.md). **Open…** now takes
 > `.musicxml`, `.mxl` and `.xml` beside MNX JSON and Guitar Pro, converted off the main
 > thread by `converters/musicxml-mnx` in its own lazy worker.
 

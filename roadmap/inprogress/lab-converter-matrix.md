@@ -1,7 +1,7 @@
 # The converter support matrix — derived, never declared
 
 > **Status: BUILT 2026-09-04.** Item 8 of
-> [core-campaign-musicxml.md](../proposed/core-campaign-musicxml.md), and the only `lab-`
+> [core-campaign-musicxml.md](core-campaign-musicxml.md), and the only `lab-`
 > item in it: this is corpus machinery, not converter work. Answers the original
 > question — *which converters support what, and which gaps are ours versus the spec's.*
 

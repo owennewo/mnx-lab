@@ -1,7 +1,7 @@
 # `.mxl` — the container most MusicXML actually arrives in
 
 > **Status: BUILT 2026-09-04.** Item 11 of
-> [core-campaign-musicxml.md](../proposed/core-campaign-musicxml.md), completing the
+> [core-campaign-musicxml.md](core-campaign-musicxml.md), completing the
 > zero-dependency objective for this converter. **Still no runtime dependency**, in Node
 > or in the browser.
 

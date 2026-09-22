@@ -1,7 +1,7 @@
 # A part with no id — the first thing the matrix found
 
 > **Status: BUILT 2026-09-04.** Item 9 of
-> [core-campaign-musicxml.md](../proposed/core-campaign-musicxml.md), and the shortest
+> [core-campaign-musicxml.md](core-campaign-musicxml.md), and the shortest
 > item in it. **Matrix supported 24 → 36.**
 
 ## The bug

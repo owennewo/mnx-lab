@@ -1,7 +1,7 @@
 # Repeat barlines — and the final-barline default, which is upstream's question
 
 > **Status: BUILT 2026-09-04** (the repeat half). Item 4 of
-> [core-campaign-musicxml.md](../proposed/core-campaign-musicxml.md). **Oracle 16 → 18 of
+> [core-campaign-musicxml.md](core-campaign-musicxml.md). **Oracle 16 → 18 of
 > 27.** The other half — what an absent final barline means — is **deliberately not
 > built**, and the evidence for why is below.
 

@@ -1,7 +1,7 @@
 # Multi-staff parts — and a limit of the matrix
 
 > **Status: BUILT 2026-09-04.** Item 12 of
-> [core-campaign-musicxml.md](../proposed/core-campaign-musicxml.md). Grand staff round
+> [core-campaign-musicxml.md](core-campaign-musicxml.md). Grand staff round
 > trips; **the matrix score did not move, and the reason is worth more than the feature.**
 
 ## What was missing

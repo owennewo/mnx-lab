@@ -1,7 +1,7 @@
 # Ties and slurs — the first features the oracle asked for
 
 > **Status: BUILT 2026-09-04.** Item 2 of
-> [core-campaign-musicxml.md](../proposed/core-campaign-musicxml.md), chosen by the
+> [core-campaign-musicxml.md](core-campaign-musicxml.md), chosen by the
 > oracle rather than by intuition. **Takes the oracle from 7 match to 11 of 27**, both
 > directions, round trip held.
 

@@ -1,7 +1,7 @@
 # Ottavas, tuplet units, and a note id that was not unique
 
 > **Status: BUILT 2026-09-04.** Item 7 of
-> [core-campaign-musicxml.md](../proposed/core-campaign-musicxml.md).
+> [core-campaign-musicxml.md](core-campaign-musicxml.md).
 > **Oracle 21 → 24 of 27, and `spacing` reaches zero.** The three that remain are the
 > deferred final-barline default, which is
 > [upstream's question](core-musicxml-repeat-barlines.md).

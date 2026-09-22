@@ -1,7 +1,7 @@
 # The W3C comparison oracle — 27 pairs the spec wrote for us
 
 > **Status: BUILT 2026-09-04**, corrected twice the same day (below). Item 1 of
-> [core-campaign-musicxml.md](../proposed/core-campaign-musicxml.md), and the item that
+> [core-campaign-musicxml.md](core-campaign-musicxml.md), and the item that
 > reports the campaign's baseline. **The baseline is 0 match / 1 spacing / 26 content**,
 > and the 26 collapse into roughly eight causes, two of which account for eleven
 > scenarios. Kept in `inprogress/` while the campaign's early items consume it.

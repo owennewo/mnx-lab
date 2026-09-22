@@ -1,7 +1,7 @@
 # Zero dependencies — a clean-room XML layer
 
 > **Status: BUILT 2026-09-04.** Item 10 of
-> [core-campaign-musicxml.md](../proposed/core-campaign-musicxml.md), and the first item
+> [core-campaign-musicxml.md](core-campaign-musicxml.md), and the first item
 > serving the campaign's *other* objective. **`converters/musicxml-mnx` now has no runtime
 > dependency at all** — and the oracle and the matrix did not move by a single cell.
 

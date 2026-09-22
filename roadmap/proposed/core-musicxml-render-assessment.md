@@ -1,7 +1,7 @@
 # MusicXML render assessment — from external fixtures to an evidenced gap proposal
 
 > **Status: proposed.** Side quest, item 18 of
-> [core-campaign-musicxml.md](core-campaign-musicxml.md). Serves the implementation loop.
+> [core-campaign-musicxml.md](../inprogress/core-campaign-musicxml.md). Serves the implementation loop.
 > Requested 2026-09-22: if each external MusicXML fixture were loaded into our editor,
 > would each feature render correctly? The deliverable is an assessment and a new,
 > bounded proposal to fill the gaps it discovers.

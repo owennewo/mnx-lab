@@ -54,20 +54,7 @@ proposals that name their campaign.
 - **[studio-player-practice.md](proposed/studio-player-practice.md)** — campaign item 13,
   studio's first player feature in `elements/`: loop the selection with the **written-range
   → performed-occurrences policy stated**, speed trainer, count-in, metronome, mute/solo.
-- **[core-campaign-musicxml.md](proposed/core-campaign-musicxml.md)** — **campaign**: MusicXML
-  with zero runtime dependencies and provable accuracy. Opens on the discovery that
-  `vendor/mnx/doctools/data.json` already holds **27 MusicXML 3.1 comparisons** whose slugs
-  all exist as mirrored `scenarios/spec/` scenarios (18 of them `verified`) — an unused
-  canonical oracle. The assertion is the campaign's founding correction: **compare through
-  the layout engine**, not by deep-equality on the MNX, because the mapping is not a
-  bijection and the primitives goldens carry no ids. Nine items, ordered oracle → matrix →
-  corpus → generalization → zero-dep; feature parity is deliberately unenumerated because
-  item 2 ranks it from evidence. Records why a LilyPond converter is **rejected as an
-  accuracy measure** (an oracle must be independent; its *corpus* is wanted) and why
-  round-trip invariance ranks below a third-party oracle (symmetric bugs survive it).
-  Contract clause 2 makes every item declare standard-object-vs-`_x.mnxLab` before code, so
-  the "implemented as extension" cell feeds `spec/proposals/` instead of accumulating
-  silently.
+
 
 
 
@@ -152,6 +139,15 @@ back up to `proposed/` the moment it is.
   the best precedent.
 
 ### inprogress/
+
+- **[core-campaign-musicxml.md](inprogress/core-campaign-musicxml.md)** — active campaign:
+  zero-dependency MusicXML import/export; 183 pinned external fixtures now join the
+  27-pair W3C layout oracle. Independent semantic and XSD checks remain, followed by
+  render and write-path assessments that produce evidenced gap proposals.
+- **[core-musicxml-external-corpus.md](inprogress/core-musicxml-external-corpus.md)** —
+  item 13 built: complete licensed corpus, stable inventory and an honest import/export
+  baseline; 13 of 177 feature inputs produce schema-invalid MNX despite completing
+  the pipeline. No converter fixes or visual/authoring verdicts claimed.
 
 
 
@@ -297,7 +293,7 @@ back up to `proposed/` the moment it is.
 
 
 - **[core-musicxml-browser-import.md](inprogress/core-musicxml-browser-import.md)** —
-  [MusicXML campaign](proposed/core-campaign-musicxml.md) item 16, **built 2026-09-11**:
+  [MusicXML campaign](inprogress/core-campaign-musicxml.md) item 16, **built 2026-09-11**:
   **Open…** takes `.musicxml`/`.mxl`/`.xml`, converted in a lazy worker of its own beside
   Guitar Pro's (protocol now format-neutral). The worker imports the converter's core
   modules directly because the package index re-exports Node-only `fs`; entering the app's
@@ -305,14 +301,14 @@ back up to `proposed/` the moment it is.
   now opens a `.musicxml`, a deflated `.mxl` and a `.gpx` through the real input under the
   deployed CSP — neither worker had been loaded under it by any test before.
 - **[core-musicxml-dynamics.md](inprogress/core-musicxml-dynamics.md)** —
-  [MusicXML campaign](proposed/core-campaign-musicxml.md) item 17, **built 2026-09-10**:
+  [MusicXML campaign](inprogress/core-campaign-musicxml.md) item 17, **built 2026-09-10**:
   `<dynamics>` and `<wedge>` both directions — the converter held the word `dynamic` only
   in comments, and no converter fixture contains one. Enum values → `value`, the sforzando
   family → MNX's accent structure (whose parts concatenate to the MusicXML element name, so
   one table serves both directions), the rest → SMuFL `glyphs`; hairpins pair by wedge
   number. **Matrix supported 36 → 42.** Relative dynamics have no MusicXML element and warn.
 - **[core-musicxml-staves.md](inprogress/core-musicxml-staves.md)** —
-  [MusicXML campaign](proposed/core-campaign-musicxml.md) item 12, **built 2026-09-04**:
+  [MusicXML campaign](inprogress/core-campaign-musicxml.md) item 12, **built 2026-09-04**:
   multi-staff parts — `<staves>`, a `<clef number>` per staff tracked independently, and
   `<staff>` per note, both directions. Grand staff round trips. **The matrix score did not
   move, and that is the finding**: `staff` is used both by sequences/clefs (now supported)
@@ -323,7 +319,7 @@ back up to `proposed/` the moment it is.
   sequences apart by staff alone, MusicXML only by voice), the conversion has to
   manufacture the carrier.
 - **[core-musicxml-mxl.md](inprogress/core-musicxml-mxl.md)** —
-  [MusicXML campaign](proposed/core-campaign-musicxml.md) item 11, **built 2026-09-04**:
+  [MusicXML campaign](inprogress/core-campaign-musicxml.md) item 11, **built 2026-09-04**:
   `.mxl`, the container MuseScore/Sibelius/Dorico/Finale export by default — **still zero
   runtime dependencies**. The campaign's own plan said to reuse the Guitar Pro zip reader
   and that was **wrong**: it is `node:zlib`, synchronous, Node-only, and reusing it would
@@ -333,7 +329,7 @@ back up to `proposed/` the moment it is.
   Validated across an implementation boundary in both directions with Python's `zipfile`,
   including its per-member `testzip()` CRC check.
 - **[core-musicxml-zero-dep.md](inprogress/core-musicxml-zero-dep.md)** —
-  [MusicXML campaign](proposed/core-campaign-musicxml.md) item 10, **built 2026-09-04**,
+  [MusicXML campaign](inprogress/core-campaign-musicxml.md) item 10, **built 2026-09-04**,
   and the first serving the campaign's *other* objective: **`converters/musicxml-mnx` now
   has no runtime dependency at all**, and the oracle (24/27) and matrix (36 supported) did
   not move by a cell. The inherited plan — an isomorphic `DOMParser` adapter — was wrong
@@ -343,7 +339,7 @@ back up to `proposed/` the moment it is.
   are committed derived files; meeting it needed the `<?xml …?>` declaration preserved
   verbatim. Converter suite 86 → 98 tests, runtime 5.4s → 2.7s.
 - **[core-musicxml-export-crash.md](inprogress/core-musicxml-export-crash.md)** —
-  [MusicXML campaign](proposed/core-campaign-musicxml.md) item 9, **built 2026-09-04**:
+  [MusicXML campaign](inprogress/core-campaign-musicxml.md) item 9, **built 2026-09-04**:
   `id` and `name` are **optional** on an MNX part and the exporter assumed neither was —
   it threw outright on two corpus scenarios and would write
   `<part-name>undefined</part-name>` otherwise. Both are now minted positionally, which is
@@ -352,7 +348,7 @@ back up to `proposed/` the moment it is.
   fixtures, where parts always have names). **Matrix supported 24 → 36 on this one fix** —
   a crash is not one red cell, it is every cell that document could have proved.
 - **[lab-converter-matrix.md](inprogress/lab-converter-matrix.md)** —
-  [MusicXML campaign](proposed/core-campaign-musicxml.md) item 8, **built 2026-09-04**, and
+  [MusicXML campaign](inprogress/core-campaign-musicxml.md) item 8, **built 2026-09-04**, and
   the only `lab-` item in it: **feature-by-feature converter support, derived rather than
   declared.** All 125 committed MNX documents go through each converter's round trip and
   what comes back is compared with what went in; hand-editing the result is a red test.
@@ -363,7 +359,7 @@ back up to `proposed/` the moment it is.
   MusicXML — and it found a crash nothing else had, two lab scenarios that cannot be
   exported at all. Rendered at `#/converters`.
 - **[core-musicxml-ottavas-tuplets.md](inprogress/core-musicxml-ottavas-tuplets.md)** —
-  [MusicXML campaign](proposed/core-campaign-musicxml.md) item 7, **built 2026-09-04**:
+  [MusicXML campaign](inprogress/core-campaign-musicxml.md) item 7, **built 2026-09-04**:
   **the oracle 21 → 24 of 27 and `spacing` to zero**, leaving only the deferred barline
   question. Ottavas flip sign (MusicXML names the *written* direction) and end at the
   **onset** of the last shifted note, not past it. Tuplet units come from `<normal-type>`,
@@ -373,7 +369,7 @@ back up to `proposed/` the moment it is.
   being able to see ids*, through the sharing structure of `sourceId`: had that been
   stripped rather than normalised, `parts` would have read as a clean match.
 - **[core-musicxml-jumps.md](inprogress/core-musicxml-jumps.md)** —
-  [MusicXML campaign](proposed/core-campaign-musicxml.md) item 6, **built 2026-09-04**:
+  [MusicXML campaign](inprogress/core-campaign-musicxml.md) item 6, **built 2026-09-04**:
   segno, Fine and D.S. — **the oracle 19 → 21 of 27**. MusicXML states a jump twice, as
   printed `<words>` and as `<sound dalsegno>`; the words are free text in any language, so
   the classifier reads the sound. MNX's `dsalfine` vs `segno` distinction is one MusicXML
@@ -382,7 +378,7 @@ back up to `proposed/` the moment it is.
   sits at the end of its measure, and without it the round trip silently moved every jump
   to the downbeat.
 - **[core-musicxml-support-flags.md](inprogress/core-musicxml-support-flags.md)** —
-  [MusicXML campaign](proposed/core-campaign-musicxml.md) item 5, **built 2026-09-04**:
+  [MusicXML campaign](inprogress/core-campaign-musicxml.md) item 5, **built 2026-09-04**:
   **the oracle 18 → 19 of 27**. Two bugs behind one scenario. `<accidental>` was read
   inside an `if (notationsEl)` guard although it is a child of `<note>` — the campaign's
   **third wrong-parent bug**, after `<beam>` and beamed rests, all of which failed only on
@@ -391,7 +387,7 @@ back up to `proposed/` the moment it is.
   deliberately omits; two documents byte-identical apart from ids rendered differently on
   one absent declaration. Declared only when the source actually stated some.
 - **[core-musicxml-repeat-barlines.md](inprogress/core-musicxml-repeat-barlines.md)** —
-  [MusicXML campaign](proposed/core-campaign-musicxml.md) item 4, **built 2026-09-04**:
+  [MusicXML campaign](inprogress/core-campaign-musicxml.md) item 4, **built 2026-09-04**:
   **the oracle 16 → 18 of 27**. Five scenarios shared one symptom (an extra `rect`) and had
   two causes. The bug: MusicXML draws a repeat with a `<bar-style>` *and* a `<repeat>` on
   one `<barline>`, and we emitted both, drawing a thick bar over the repeat. The non-bug:
@@ -402,7 +398,7 @@ back up to `proposed/` the moment it is.
   not a vocabulary gap** — an ambiguity in MNX's defaults rather than something it cannot
   say.
 - **[core-musicxml-beams.md](inprogress/core-musicxml-beams.md)** —
-  [MusicXML campaign](proposed/core-campaign-musicxml.md) item 3, **built 2026-09-04**:
+  [MusicXML campaign](inprogress/core-campaign-musicxml.md) item 3, **built 2026-09-04**:
   beams, both directions — **the oracle 11 → 16 of 27**. The models are the same
   information at different addresses (MNX nests, MusicXML numbers), so **beam number N is
   nesting depth N** and each direction is one recursive scan; that part was right first
@@ -412,7 +408,7 @@ back up to `proposed/` the moment it is.
   comment), and a **one-event group is a flag, not a beam** — except a hook, which is
   exactly that. Leaves `parts` as the campaign's first genuine *layout* disagreement.
 - **[core-musicxml-spanners.md](inprogress/core-musicxml-spanners.md)** —
-  [MusicXML campaign](proposed/core-campaign-musicxml.md) item 2, **built 2026-09-04**:
+  [MusicXML campaign](inprogress/core-campaign-musicxml.md) item 2, **built 2026-09-04**:
   ties and slurs, both directions — **the oracle 7 → 11 of 27**. They were not
   unimplemented but **absent from the data model** (`tied` appeared zero times in the
   converter; `MnxNote` had no `ties`), which is exactly why 46 round-trip tests passed
@@ -424,7 +420,7 @@ back up to `proposed/` the moment it is.
   deliverable. Also pins that our own legato-slide marker (an unmatched `<slur>`) must
   not read as a musical slur.
 - **[core-musicxml-w3c-oracle.md](inprogress/core-musicxml-w3c-oracle.md)** —
-  [MusicXML campaign](proposed/core-campaign-musicxml.md) item 1, **built 2026-09-04**: the
+  [MusicXML campaign](inprogress/core-campaign-musicxml.md) item 1, **built 2026-09-04**: the
   spec's own 27 MusicXML↔MNX comparisons turned into an oracle, judged **through the layout
   engine** (import → `layoutNotation` → diff the paired `expected.primitives.json`) because
   the mapping is not a bijection and the primitives goldens carry no ids. Committed fixtures

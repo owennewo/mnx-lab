@@ -1,7 +1,7 @@
 # Beams — the same shape of problem, one level up
 
 > **Status: BUILT 2026-09-04.** Item 3 of
-> [core-campaign-musicxml.md](../proposed/core-campaign-musicxml.md), named by the oracle
+> [core-campaign-musicxml.md](core-campaign-musicxml.md), named by the oracle
 > as the largest single remaining cause. **Takes the oracle from 11 match to 16 of 27**,
 > both directions, round trip held.
 

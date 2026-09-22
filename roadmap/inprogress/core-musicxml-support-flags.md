@@ -1,7 +1,7 @@
 # Saying what the source states — `mnx.support`, and a lookup in the wrong parent
 
 > **Status: BUILT 2026-09-04.** Item 5 of
-> [core-campaign-musicxml.md](../proposed/core-campaign-musicxml.md). **Oracle 18 → 19 of
+> [core-campaign-musicxml.md](core-campaign-musicxml.md). **Oracle 18 → 19 of
 > 27.** Two bugs behind one scenario, and the second one is the interesting half.
 
 ## The first bug: `<accidental>` read in the wrong parent

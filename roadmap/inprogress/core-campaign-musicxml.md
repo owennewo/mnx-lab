@@ -14,31 +14,27 @@ Two objectives, and every item serves one of them:
 - **Provable accuracy.** Every claim the converter makes is backed by an oracle that
   is not us — not a round trip against our own assumptions, and not visual inspection.
 
-Neither is where the doc that started this campaign assumed. The two halves fail in
-opposite directions, and the campaign exists because fixing each one changes the other's
-plan.
+**Current state, 2026-09-22.** The converter has zero runtime npm dependencies,
+including compressed `.mxl`, and its browser import path is shared by workbench and
+studio. The 27 paired W3C comparisons score 24 exact layout matches; the three remaining
+final-barline discrepancies are retained explicitly, not papered over. The generated
+converter matrix currently records 43 supported / 66 lossy / 7 extension / 3 untested.
+These are bounded measurements, not a promise of complete MusicXML support.
 
-**What is true today.** The converter is already clean-room: 4,872 lines of internal
-TypeScript across `converters/musicxml-mnx/`, no notation library, one runtime
-dependency (`@xmldom/xmldom`, ~124 KB). It parses uncompressed `score-partwise` and is
-pinned against four guitar fixtures. Its core alignment pass
-(`src/import/aligner.ts`, 1,504 lines) assumes either a single notation part or the
-specific standard+TAB guitar pairing; multi-part ensembles and grand staff are not
-handled, and neither is `.mxl`.
-
-**The objective is no longer academic.** `src/workbench/guitarProImporter.worker.ts`
-already pulls alphaTab *and* a converter into a browser worker chunk, and
-`.dependency-cruiser.cjs` was widened to permit it (`alphatab-only-in-file-codecs`).
-Converters reach the browser now — CLAUDE.md's "Node-only, never in the app build" is
-stale — so a browser MusicXML import path is coming and its bundle weight is real.
+**Resumed implementation.** Item 13 now pins the complete 183-fixture external suite with
+MIT notices, stable IDs and an import/export observation baseline. Items 14 and 15 remain
+open. Render and write-path assessments (18 and 19) consume the same inventory and
+produce separate, evidenced gap proposals; implementing those proposals is subsequent
+work. The historical log below records how the earlier baseline was reached.
 
 ### The oracle we already own, and the assertion that would waste it
 
 `vendor/mnx/doctools/data.json` holds **27 `spectools.exampledocumentcomparison`
 records**, each carrying complete MusicXML 3.1 source, and every one of their slugs
 already exists as a mirrored `scenarios/spec/<slug>/`. All 27 carry an
-`expected.primitives.json`; **18 of the 27 are `status: verified`**. That is a
-canonical, paired, human-signed-off corpus sitting in the tree unused.
+`expected.primitives.json`. At campaign inception, 18 had human verification; that
+historical count is not a claim that all current fixtures are approved. Item 1 now uses
+this paired corpus as a renderer-mediated oracle.
 
 The obvious assertion — `importMusicXML(xml)` deep-equals the reference MNX — **would
 fail on all 27 for cosmetic reasons and must not be written.** MusicXML → MNX is not a
@@ -49,7 +45,7 @@ gets weakened until it means nothing.
 **Compare through the layout engine instead.** Primitives are geometry plus SMuFL glyph
 names. So the comparison is: import the MusicXML, run `layoutNotation` through
 `engine/headless.ts`, diff against the scenario's existing golden. **Identical
-primitives ⇒ musically identical**, immune to id choice and JSON shape. It reuses the
+primitives demonstrate equal output for what this renderer exposes**, immune to id choice and JSON shape. It reuses the
 goldens, the headless entry and the human verdicts that already exist.
 
 The one id primitives *do* carry is `sourceId` (the cross-highlight hook), which is
@@ -127,25 +123,25 @@ deliberately **not** enumerated in advance: item 8 decides them from evidence.
 
 | # | Item | Scope | Objective | Oracle | Status |
 |---|------|-------|-----------|--------|--------|
-| 1 | [Tier-1 W3C oracle](../inprogress/core-musicxml-w3c-oracle.md) | The 27 comparisons mirrored into committed fixtures (`sync:musicxml-comparisons`) and judged **through the layout engine**: import → `layoutNotation` → diff `expected.primitives.json`, graded `match`/`spacing`/`content`. Baseline committed at `harness/reports/musicxml-oracle.json`; moving it either way is a red test. | accuracy | itself | **built 2026-09-04** |
-| 2 | [Ties and slurs](../inprogress/core-musicxml-spanners.md) | The first features the oracle asked for, both directions. MNX states a spanner once as an id reference; MusicXML states both ends and numbers its slurs. Import pairs markers and resolves in a final pass (the `linkTechniqueTargets` idiom); export inverts and allocates numbers by interval colouring. Narrowing to `startNote`/`endNote` only when the source narrows. | accuracy | item 1 + round trip | **built 2026-09-04** |
-| 3 | [Beams](../inprogress/core-musicxml-beams.md) | The same shape as item 2 one level up: MNX nests beams, MusicXML numbers them, so beam number N is nesting depth N and each direction is one recursive scan. Hooks are one-event groups with a direction; a cross-barline group is filed on its first event's measure. | accuracy | item 1 + round trip | **built 2026-09-04** |
-| 4 | [Repeat barlines](../inprogress/core-musicxml-repeat-barlines.md) | A `<bar-style>` on a barline that also carries a `<repeat>` is how the repeat is drawn, not a barline of its own — we drew both. Also **measured and reverted** the final-barline default: it fixed 3 and broke 8, because the spec's own examples resolve the absent-barline case two different ways. A spec question, not a bug. | accuracy | item 1 | **built 2026-09-04** |
-| 5 | [Support flags](../inprogress/core-musicxml-support-flags.md) | `<accidental>` was read inside an `if (notationsEl)` guard though it is a child of `<note>` — the third wrong-parent bug of the campaign. And `mnx.support` was never emitted, so the renderer inferred accidentals and beams and **overruled the source**. Declared when we actually read some. | accuracy | item 1 | **built 2026-09-04** |
-| 6 | [Jumps](../inprogress/core-musicxml-jumps.md) | Segno, Fine and D.S., read from `<sound>` rather than the printed caption. MusicXML writes the same `<sound dalsegno>` whether or not it is *al Fine*; the score settles it — a D.S. is al Fine exactly when there is a Fine. Export needs `<offset>`, since a D.S. sits at the end of its measure. | accuracy | item 1 + round trip | **built 2026-09-04** |
-| 7 | [Ottavas, tuplet units, note ids](../inprogress/core-musicxml-ottavas-tuplets.md) | Ottava sign flip and an end that names the last shifted note's ONSET; tuplet units taken from `<normal-type>` so 6:4 does not print as 3:2; and note ids made document-unique — `parts` was minting 14 ids over 9 values. | accuracy | item 1 + round trip | **built 2026-09-04** |
-| 8 | [Converter support matrix](../inprogress/lab-converter-matrix.md) | Rows = MNX `$def` (193, minus plumbing) + `_x.mnxLab` keys; columns = converter × direction. **Cells derived, never declared** (below). Generated, committed artifact; hand-edit is a red test. Extends `src/corpus/defIndex.ts` and the `#/objects` page rather than building a second thing. | both | the corpus itself | **built 2026-09-04** |
-| 9 | [Export crash on anonymous parts](../inprogress/core-musicxml-export-crash.md) | `id` and `name` are optional on an MNX part and the exporter assumed neither was — it threw on two corpus scenarios and wrote `<part-name>undefined</part-name>` for a third case. Found by the matrix on its first run. **Matrix supported 24 → 36**, because a crash costs every cell that document could have proved. | accuracy | the matrix | **built 2026-09-04** |
-| 10 | [Zero-dep XML layer](../inprogress/core-musicxml-zero-dep.md) | **A hand-written pull parser, not a `DOMParser` shim.** Node has no global `DOMParser` (confirmed on v22), so an adapter yields "optional Node dep", not zero; and the hard part is *serialization* parity on export (self-closing tags, entity escaping, whitespace text nodes), which a shim does not solve. MusicXML's grammar is fixed and shallow — the same clean-room move as the GP5 binary reader. Retires `@xmldom/xmldom`. | zero-dep | the oracle and matrix, required unmoved | **built 2026-09-04** |
-| 11 | [`.mxl` container](../inprogress/core-musicxml-mxl.md) | **Not the copy-paste it looks like.** `converters/guitarpro-mnx/src/gpif/container.ts` is `node:zlib` `inflateRawSync`/`crc32` — synchronous, no browser branch; the browser path is `DecompressionStream`, which is async, so the read API becomes async and that ripples through import. Also needs a shared converter package, which `converters/` does not have yet. Read `META-INF/container.xml`; stored-zip emission on write. | zero-dep | cross-checked against Python's zipfile, both directions | **built 2026-09-04** |
-| 12 | [Multi-staff parts](../inprogress/core-musicxml-staves.md) | `<staves>`, a `<clef number>` per staff tracked independently, `<staff>` per note. Grand staff round trips. The matrix did **not** move, because `staff` is shared with `layouts` — a def used by two features scores as the worse of them. | accuracy | the corpus, via spec/grand-staff | **built 2026-09-04** |
-| 13 | W3C/LilyPond corpus | Vendor a curated subset of `w3c-cg/musicxmlTestSuite` (~100 categorised files, Kainhofer's, originally for LilyPond). Widens what the matrix can score. | accuracy | itself | **not started — license unverified**, and vendoring third-party fixtures without checking is the one thing item 1 says not to do |
+| 1 | [Tier-1 W3C oracle](core-musicxml-w3c-oracle.md) | The 27 comparisons mirrored into committed fixtures (`sync:musicxml-comparisons`) and judged **through the layout engine**: import → `layoutNotation` → diff `expected.primitives.json`, graded `match`/`spacing`/`content`. Baseline committed at `harness/reports/musicxml-oracle.json`; moving it either way is a red test. | accuracy | itself | **built 2026-09-04** |
+| 2 | [Ties and slurs](core-musicxml-spanners.md) | The first features the oracle asked for, both directions. MNX states a spanner once as an id reference; MusicXML states both ends and numbers its slurs. Import pairs markers and resolves in a final pass (the `linkTechniqueTargets` idiom); export inverts and allocates numbers by interval colouring. Narrowing to `startNote`/`endNote` only when the source narrows. | accuracy | item 1 + round trip | **built 2026-09-04** |
+| 3 | [Beams](core-musicxml-beams.md) | The same shape as item 2 one level up: MNX nests beams, MusicXML numbers them, so beam number N is nesting depth N and each direction is one recursive scan. Hooks are one-event groups with a direction; a cross-barline group is filed on its first event's measure. | accuracy | item 1 + round trip | **built 2026-09-04** |
+| 4 | [Repeat barlines](core-musicxml-repeat-barlines.md) | A `<bar-style>` on a barline that also carries a `<repeat>` is how the repeat is drawn, not a barline of its own — we drew both. Also **measured and reverted** the final-barline default: it fixed 3 and broke 8, because the spec's own examples resolve the absent-barline case two different ways. A spec question, not a bug. | accuracy | item 1 | **built 2026-09-04** |
+| 5 | [Support flags](core-musicxml-support-flags.md) | `<accidental>` was read inside an `if (notationsEl)` guard though it is a child of `<note>` — the third wrong-parent bug of the campaign. And `mnx.support` was never emitted, so the renderer inferred accidentals and beams and **overruled the source**. Declared when we actually read some. | accuracy | item 1 | **built 2026-09-04** |
+| 6 | [Jumps](core-musicxml-jumps.md) | Segno, Fine and D.S., read from `<sound>` rather than the printed caption. MusicXML writes the same `<sound dalsegno>` whether or not it is *al Fine*; the score settles it — a D.S. is al Fine exactly when there is a Fine. Export needs `<offset>`, since a D.S. sits at the end of its measure. | accuracy | item 1 + round trip | **built 2026-09-04** |
+| 7 | [Ottavas, tuplet units, note ids](core-musicxml-ottavas-tuplets.md) | Ottava sign flip and an end that names the last shifted note's ONSET; tuplet units taken from `<normal-type>` so 6:4 does not print as 3:2; and note ids made document-unique — `parts` was minting 14 ids over 9 values. | accuracy | item 1 + round trip | **built 2026-09-04** |
+| 8 | [Converter support matrix](lab-converter-matrix.md) | Rows = MNX `$def` (193, minus plumbing) + `_x.mnxLab` keys; columns = converter × direction. **Cells derived, never declared** (below). Generated, committed artifact; hand-edit is a red test. Extends `src/corpus/defIndex.ts` and the `#/objects` page rather than building a second thing. | both | the corpus itself | **built 2026-09-04** |
+| 9 | [Export crash on anonymous parts](core-musicxml-export-crash.md) | `id` and `name` are optional on an MNX part and the exporter assumed neither was — it threw on two corpus scenarios and wrote `<part-name>undefined</part-name>` for a third case. Found by the matrix on its first run. **Matrix supported 24 → 36**, because a crash costs every cell that document could have proved. | accuracy | the matrix | **built 2026-09-04** |
+| 10 | [Zero-dep XML layer](core-musicxml-zero-dep.md) | **A hand-written pull parser, not a `DOMParser` shim.** Node has no global `DOMParser` (confirmed on v22), so an adapter yields "optional Node dep", not zero; and the hard part is *serialization* parity on export (self-closing tags, entity escaping, whitespace text nodes), which a shim does not solve. MusicXML's grammar is fixed and shallow — the same clean-room move as the GP5 binary reader. Retires `@xmldom/xmldom`. | zero-dep | the oracle and matrix, required unmoved | **built 2026-09-04** |
+| 11 | [`.mxl` container](core-musicxml-mxl.md) | **Not the copy-paste it looks like.** `converters/guitarpro-mnx/src/gpif/container.ts` is `node:zlib` `inflateRawSync`/`crc32` — synchronous, no browser branch; the browser path is `DecompressionStream`, which is async, so the read API becomes async and that ripples through import. Also needs a shared converter package, which `converters/` does not have yet. Read `META-INF/container.xml`; stored-zip emission on write. | zero-dep | cross-checked against Python's zipfile, both directions | **built 2026-09-04** |
+| 12 | [Multi-staff parts](core-musicxml-staves.md) | `<staves>`, a `<clef number>` per staff tracked independently, `<staff>` per note. Grand staff round trips. The matrix did **not** move, because `staff` is shared with `layouts` — a def used by two features scores as the worse of them. | accuracy | the corpus, via spec/grand-staff | **built 2026-09-04** |
+| 13 | [W3C/LilyPond corpus](core-musicxml-external-corpus.md) | Complete pinned 183-fixture suite, MIT notices, source inventory and deterministic import/export observation report. Keeps invalid and compatibility inputs explicit; does not turn our imports into independent ground truth. | accuracy | pinned upstream bytes + observation baseline | **built 2026-09-22** |
 | 14 | Differential oracle | music21 as a dev-only subprocess emitting a note table, diffed against the same table from our MNX — the one tier that is genuinely independent of us. | accuracy | itself | **not started — music21 is not installed here**; needs a deliberate dev-environment decision, not a silent `pip install` |
 | 15 | XSD export validation | W3C MusicXML 4.0 XSD over every generated document. | accuracy | itself | **not started — no `xmllint` available**, and it would need a new dev dependency for what this campaign already calls *a floor, not an accuracy tier* |
-| 16 | [Browser import surface](../inprogress/core-musicxml-browser-import.md) | MusicXML file import in the workbench, parallel to the Guitar Pro worker: `.musicxml`/`.mxl`/`.xml` through **Open…**, in a lazy worker of its own that imports the converter's core modules directly (the package index re-exports Node-only `fs`). The worker protocol is now format-neutral. | zero-dep | `smoke:csp`, extended to open a `.musicxml`, a deflated `.mxl` and a `.gpx` through the real file input under the deployed CSP | **built 2026-09-11** |
-| 17 | [Dynamics](../inprogress/core-musicxml-dynamics.md) | `<dynamics>` and `<wedge>`, both directions. The enum values map to `value`; the sforzando family to MNX's accent structure, whose parts concatenate to exactly the MusicXML element name (s+f+z = `sfz`), so one table serves both directions; the rest to SMuFL `glyphs`. Hairpins pair by wedge `number`, item 2's shape again. Relative dynamics have no MusicXML element and warn. | accuracy | the corpus's dynamics scenarios + round trip (no W3C comparison carries a dynamic) | **built 2026-09-10** |
-| 18 | [Render assessment](core-musicxml-render-assessment.md) | Side quest over item 13’s pinned external corpus: load fixtures through the desktop editor, assess each visible feature, isolate importer/representation/rendering/integration gaps, and produce an evidenced, bounded render-gap proposal. | accuracy | upstream feature descriptions + semantic checks + visual references and editor captures | **proposed 2026-09-22** |
-| 19 | [Write-path assessment](core-musicxml-write-assessment.md) | Companion to item 18: assess whether desktop users can create, inspect, change and remove each corpus feature through the editor, with undo/redo and separate persistence evidence; produce a bounded proposal for missing operations and UX surfaces. | accuracy | real UI tasks + structural before/after checks + applicable save/reopen | **proposed 2026-09-22** |
+| 16 | [Browser import surface](core-musicxml-browser-import.md) | MusicXML file import in the workbench, parallel to the Guitar Pro worker: `.musicxml`/`.mxl`/`.xml` through **Open…**, in a lazy worker of its own that imports the converter's core modules directly (the package index re-exports Node-only `fs`). The worker protocol is now format-neutral. | zero-dep | `smoke:csp`, extended to open a `.musicxml`, a deflated `.mxl` and a `.gpx` through the real file input under the deployed CSP | **built 2026-09-11** |
+| 17 | [Dynamics](core-musicxml-dynamics.md) | `<dynamics>` and `<wedge>`, both directions. The enum values map to `value`; the sforzando family to MNX's accent structure, whose parts concatenate to exactly the MusicXML element name (s+f+z = `sfz`), so one table serves both directions; the rest to SMuFL `glyphs`. Hairpins pair by wedge `number`, item 2's shape again. Relative dynamics have no MusicXML element and warn. | accuracy | the corpus's dynamics scenarios + round trip (no W3C comparison carries a dynamic) | **built 2026-09-10** |
+| 18 | [Render assessment](../proposed/core-musicxml-render-assessment.md) | Side quest over item 13’s pinned external corpus: load fixtures through the desktop editor, assess each visible feature, isolate importer/representation/rendering/integration gaps, and produce an evidenced, bounded render-gap proposal. | accuracy | upstream feature descriptions + semantic checks + visual references and editor captures | **proposed 2026-09-22** |
+| 19 | [Write-path assessment](../proposed/core-musicxml-write-assessment.md) | Companion to item 18: assess whether desktop users can create, inspect, change and remove each corpus feature through the editor, with undo/redo and separate persistence evidence; produce a bounded proposal for missing operations and UX surfaces. | accuracy | real UI tasks + structural before/after checks + applicable save/reopen | **proposed 2026-09-22** |
 | — | Feature parity | Dynamics, wedges, spanners, ottavas, articulations, SMuFL glyph names, percussion, layout breaks. **Deliberately unenumerated**: item 8 turns these into a ranked queue with evidence, and each becomes its own row when picked up. Note the schema already has `dynamic-*`, `ottava`, `slur` and `wedge-type` as standard objects — but **no pedal def**, so pedal is contract clause 2's first real test. | accuracy | 1 + 2 + 3 | not yet rows |
 
 ### Item 8's derivation rule
@@ -180,9 +176,26 @@ committed to the repo, like `worker/models.json`.
 
 ## Progress + learnings
 
+### 2026-09-22 — item 13: corpus first, and why no exception is not accuracy
+
+The [external corpus](core-musicxml-external-corpus.md) pins all 183 upstream
+fixtures rather than curating away hard cases. The upstream MIT licence and README are
+retained verbatim. Of 177 feature inputs, all complete import/export/re-import, but 13
+produce MNX that fails published or extension validation. Three negative and three
+compatibility fixtures are scored separately. [Report and reproduction](../../docs/musicxml-suite.md).
+
+- **No exception is a weak success criterion.** The new cases expose invalid clefs,
+  unrecognized published fields and a harmony missing required extension data.
+- **Imported data is not independent truth.** The external report records observed defs
+  and loss, but the old matrix is unchanged: feeding our own imports back as expectations
+  would conceal initial import loss. Independent semantics belong to item 14.
+- **The whole suite is small enough to keep.** Stable IDs and upstream descriptions now
+  let render and write-path assessments share evidence without sharing verdicts.
+
+
 ### 2026-09-22 — write-path assessment side quest scoped
 
-[Item 19](core-musicxml-write-assessment.md) complements rendering coverage with authoring
+[Item 19](../proposed/core-musicxml-write-assessment.md) complements rendering coverage with authoring
 coverage over the same fixture/feature inventory. A feature may import and render without
 any way to create or change it; an internal operation may exist without a reachable UI.
 The assessment separates those failures and also records undo/redo and save/reopen losses.
@@ -191,7 +204,7 @@ and UX surfaces. No assessment has run yet.
 
 ### 2026-09-22 — render assessment side quest scoped
 
-[Item 18](core-musicxml-render-assessment.md) asks whether the external MusicXML fixtures
+[Item 18](../proposed/core-musicxml-render-assessment.md) asks whether the external MusicXML fixtures
 actually display their intended features when opened in our editor. Its output is a
 per-feature assessment and a new gap-filling proposal, not fixes during the audit. Import
 loss must be isolated before attributing missing marks to the renderer; screenshots alone
@@ -235,7 +248,7 @@ is the parallel-work contract doing its job rather than an obstacle.
 ### 2026-09-11 — item 16: the browser surface, and the app's compiler as a new reviewer
 
 MusicXML opens in the workbench
-([core-musicxml-browser-import.md](../inprogress/core-musicxml-browser-import.md)),
+([core-musicxml-browser-import.md](core-musicxml-browser-import.md)),
 prompted by a real Soundslice export being refused.
 
 - **A block is a fact about a moment.** The row said BLOCKED on a live collision; by the
@@ -254,7 +267,7 @@ prompted by a real Soundslice export being refused.
 ### 2026-09-10 — item 17: dynamics, found from outside the campaign
 
 **Matrix supported 36 → 42**, the first *Feature parity* row
-([core-musicxml-dynamics.md](../inprogress/core-musicxml-dynamics.md)).
+([core-musicxml-dynamics.md](core-musicxml-dynamics.md)).
 
 - **The matrix had the finding and nobody was reading it for this.** `dynamic-group` sat at
   7 carried / 0 surviving from the first run; what prompted the work was an audit of the
@@ -275,7 +288,7 @@ prompted by a real Soundslice export being refused.
 
 ### 2026-09-04 — item 12: multi-staff parts, and a limit of the matrix worth more than the feature
 
-Grand staff round trips ([core-musicxml-staves.md](../inprogress/core-musicxml-staves.md)).
+Grand staff round trips ([core-musicxml-staves.md](core-musicxml-staves.md)).
 **The matrix score did not move**, and that is the finding.
 
 - **`staff` is used by two features, so it scores as the worse of them.** It appears on
@@ -296,7 +309,7 @@ Grand staff round trips ([core-musicxml-staves.md](../inprogress/core-musicxml-s
 ### 2026-09-04 — item 11: `.mxl`, and why not reusing code was the right call
 
 **Zero runtime dependencies still**, in Node and the browser
-([core-musicxml-mxl.md](../inprogress/core-musicxml-mxl.md)).
+([core-musicxml-mxl.md](core-musicxml-mxl.md)).
 
 - **The campaign's own plan said "reuse the Guitar Pro zip reader", and that was wrong.**
   That reader is `node:zlib`, synchronous, Node-only — reusing it would have carried the
@@ -318,7 +331,7 @@ Grand staff round trips ([core-musicxml-staves.md](../inprogress/core-musicxml-s
 
 **`converters/musicxml-mnx` has no runtime dependency at all**, and the oracle (24/27) and
 matrix (36 supported) are unchanged to the cell
-([core-musicxml-zero-dep.md](../inprogress/core-musicxml-zero-dep.md)).
+([core-musicxml-zero-dep.md](core-musicxml-zero-dep.md)).
 
 - **The inherited plan was wrong twice, and this is the item that proved it.** An
   isomorphic `DOMParser` adapter keeps xmldom as a Node dependency forever (Node has no
@@ -340,7 +353,7 @@ matrix (36 supported) are unchanged to the cell
 ### 2026-09-04 — item 9: the matrix pays for itself in one run
 
 **Matrix supported 24 → 36**
-([core-musicxml-export-crash.md](../inprogress/core-musicxml-export-crash.md)).
+([core-musicxml-export-crash.md](core-musicxml-export-crash.md)).
 
 - **`id` and `name` are optional on an MNX part, and the exporter assumed neither was.**
   It threw on two corpus scenarios and would have written
@@ -359,7 +372,7 @@ matrix (36 supported) are unchanged to the cell
 ### 2026-09-04 — item 8: the matrix, and the answer to the question that started this
 
 **MusicXML: 24 supported, 82 lossy, 6 extension, 3 untested**, over 125 documents
-([lab-converter-matrix.md](../inprogress/lab-converter-matrix.md)). `#/converters` renders
+([lab-converter-matrix.md](lab-converter-matrix.md)). `#/converters` renders
 it.
 
 - **Derived beats declared, and the campaign had already proved why.** Item 5 showed a
@@ -387,7 +400,7 @@ it.
 ### 2026-09-04 — item 7: the oracle finds a bug it cannot see, and the feature gaps close
 
 **Oracle 21 → 24 of 27, `spacing` to zero**
-([core-musicxml-ottavas-tuplets.md](../inprogress/core-musicxml-ottavas-tuplets.md)).
+([core-musicxml-ottavas-tuplets.md](core-musicxml-ottavas-tuplets.md)).
 Every scenario the 27 can still fault is the deferred barline question.
 
 - **The `sourceId` normalisation earned itself back.** `parts` was `spacing` — identical
@@ -408,7 +421,7 @@ Every scenario the 27 can still fault is the deferred barline question.
 
 ### 2026-09-04 — item 6: jumps, and a format that states the same thing twice
 
-**Oracle 19 → 21 of 27** ([core-musicxml-jumps.md](../inprogress/core-musicxml-jumps.md)).
+**Oracle 19 → 21 of 27** ([core-musicxml-jumps.md](core-musicxml-jumps.md)).
 
 - **When a format says a thing twice, read the machine half.** MusicXML writes a jump as
   printed `<words>` *and* as `<sound dalsegno>`. The words are free text in any language;
@@ -426,7 +439,7 @@ Every scenario the 27 can still fault is the deferred barline question.
 ### 2026-09-04 — item 5: the third wrong-parent bug, and a document that failed to say what it stated
 
 **Oracle 18 → 19 of 27**
-([core-musicxml-support-flags.md](../inprogress/core-musicxml-support-flags.md)).
+([core-musicxml-support-flags.md](core-musicxml-support-flags.md)).
 
 - **Three wrong-parent bugs now, and they all failed silently.** `<beam>` and
   `<accidental>` are children of `<note>`, not `<notations>`; beamed **rests** are built
@@ -448,7 +461,7 @@ Every scenario the 27 can still fault is the deferred barline question.
 ### 2026-09-04 — item 4: one symptom, two causes, and the campaign's first spec finding
 
 **Oracle 16 → 18 of 27**
-([core-musicxml-repeat-barlines.md](../inprogress/core-musicxml-repeat-barlines.md)).
+([core-musicxml-repeat-barlines.md](core-musicxml-repeat-barlines.md)).
 
 - **Five scenarios with an identical symptom had two different causes.** All five differed
   by one extra `rect` and nothing missing. Two were a real bug (a `<bar-style>` beside a
@@ -473,7 +486,7 @@ Every scenario the 27 can still fault is the deferred barline question.
 ### 2026-09-04 — item 3: beams, and three bugs the fixtures found that review did not
 
 **Oracle 11 → 16 of 27 match**, both directions, round trip held
-([core-musicxml-beams.md](../inprogress/core-musicxml-beams.md)).
+([core-musicxml-beams.md](core-musicxml-beams.md)).
 
 - **The model mapped cleanly and the edges did not.** "Beam number N is nesting depth N"
   is the whole conversion, and it was right first time. What was wrong three times was
@@ -494,7 +507,7 @@ Every scenario the 27 can still fault is the deferred barline question.
 ### 2026-09-04 — item 2: ties and slurs, and the argument stops being an argument
 
 **Oracle 7 → 11 of 27 match**, both directions, round trip held
-([core-musicxml-spanners.md](../inprogress/core-musicxml-spanners.md)).
+([core-musicxml-spanners.md](core-musicxml-spanners.md)).
 
 - **The features were absent from the data model, not merely unimported.** `MnxNote` had
   no `ties` field and `MnxEvent` no `slurs`; `tied` appeared zero times in the converter.
@@ -519,7 +532,7 @@ Every scenario the 27 can still fault is the deferred barline question.
 ### 2026-09-04 — item 1 lands, and both of the campaign's arguments are proven on live code
 
 **Baseline: 7 match, 20 content, 0 crashes** over the 27
-([core-musicxml-w3c-oracle.md](../inprogress/core-musicxml-w3c-oracle.md)). No converter
+([core-musicxml-w3c-oracle.md](core-musicxml-w3c-oracle.md)). No converter
 code was touched — a measuring instrument is built before the thing it measures.
 
 That number arrived in three steps, and the first two are the story: the oracle's first

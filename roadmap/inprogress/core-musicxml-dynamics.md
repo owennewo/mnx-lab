@@ -1,7 +1,7 @@
 # Dynamics — the sforzando family as structure, hairpins as spanners
 
 > **Status: BUILT 2026-09-10.** Item 17 of
-> [core-campaign-musicxml.md](../proposed/core-campaign-musicxml.md), the first row the
+> [core-campaign-musicxml.md](core-campaign-musicxml.md), the first row the
 > *Feature parity* line turned into. **Matrix supported 36 → 42**, both directions, round
 > trip held over the corpus's five dynamics scenarios.
 

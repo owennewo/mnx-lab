@@ -1,7 +1,7 @@
 # Jumps — segno, Fine and D.S., read from the sound rather than the words
 
 > **Status: BUILT 2026-09-04.** Item 6 of
-> [core-campaign-musicxml.md](../proposed/core-campaign-musicxml.md).
+> [core-campaign-musicxml.md](core-campaign-musicxml.md).
 > **Oracle 19 → 21 of 27**, both directions, round trip held.
 
 ## Read the `<sound>`, not the caption
