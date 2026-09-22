@@ -1,6 +1,6 @@
 # Architecture guardrails
 
-Status: in progress, 2026-09-22. Implementation loop.
+Status: complete, 2026-09-22. Implementation loop.
 
 ## Problem
 
@@ -37,5 +37,8 @@ and converter-oracle seams. It also verifies generated experiment output and ins
 packages are not scanned as entry points. `doNotFollow` retains package import edges;
 excluding node_modules would hide those edges and is deliberately avoided.
 
-Targeted regression and the expanded repository boundary check pass (628 modules,
-2,850 dependencies). Final root tests and build run in the serialized landing slot.
+Targeted regression and the expanded repository boundary check pass. After rebasing
+over the renderer consolidation, regenerated primitives leave scenarios byte-identical.
+Final gates passed: 143 test files, 2,590 tests passed and one skipped; production build
+passed. Landed in main at `0b37daf6`; worktree and branch removed before this completion
+record. No runtime changes required browser smokes.
