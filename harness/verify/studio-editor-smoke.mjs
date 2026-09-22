@@ -121,6 +121,41 @@ try {
   await key('Escape');
   await wait(`!${inspector} && ${viewer}.selectionInactive === false`);
 
+  // Actual typed meter commands in an editable Studio session, with exact history.
+  const meterRead = () => c.evaluate(`${page}.editor.document`);
+  const meterInitial = await meterRead();
+  const typeMeter = async text => {
+    await c.evaluate(`${viewer}.focus()`);
+    await key('Digit5', { shift: true }); await key('Enter');
+    await wait(`!!${inspector}`);
+    for (const ch of text) {
+      await c.send('Input.dispatchKeyEvent', { type: 'keyDown', key: ch, text: ch });
+      await c.send('Input.dispatchKeyEvent', { type: 'keyUp', key: ch });
+    }
+    await key('Enter');
+  };
+  for (const [count, unit] of [[33,4], [3,128]]) {
+    const beforeMeter = await meterRead();
+    await typeMeter(`time ${count}/${unit}`);
+    await wait(`${page}.editor.document.global.measures[0].time.count === ${count} && ${page}.editor.document.global.measures[0].time.unit === ${unit}`);
+    const changed = await meterRead();
+    assert.deepEqual(changed.parts[0].measures.slice(1), beforeMeter.parts[0].measures.slice(1));
+    const notes = d => d.parts[0].measures[0].sequences[0].content.filter(e => e.notes);
+    assert.deepEqual(notes(changed), notes(beforeMeter));
+    await key('Escape'); await c.evaluate(`${viewer}.focus()`);
+    await key('KeyZ', { ctrl: true });
+    await wait(`JSON.stringify(${page}.editor.document) === ${JSON.stringify(JSON.stringify(beforeMeter))}`);
+    await key('KeyY', { ctrl: true });
+    await wait(`JSON.stringify(${page}.editor.document) === ${JSON.stringify(JSON.stringify(changed))}`);
+    await key('KeyZ', { ctrl: true });
+    await wait(`JSON.stringify(${page}.editor.document) === ${JSON.stringify(JSON.stringify(beforeMeter))}`);
+  }
+  // Cancellation cannot alter the document, including while a valid command is typed.
+  await c.evaluate(`${viewer}.focus()`); await key('Digit5', { shift: true }); await key('Enter');
+  await wait(`!!${inspector}`); await key('Escape');
+  assert.deepEqual(await meterRead(), meterInitial);
+  console.log('Extended numeric meters: Studio typed 33/4 and 3/128, preserved notes/other bars, exact undo/redo and cancellation');
+
   // The lyric text editor: Shift+L. A clean parse draws live on a scratch copy; nothing is edited until it is applied.
   const lyrics = `${piece}.querySelector('.editor-overlay mnx-editor-surfaces mnx-lyric-text-editor')`;
   const sung = doc => `JSON.stringify(${doc}.parts[0].measures[0].sequences[0].content.map(e => Object.values(e.lyrics?.lines ?? {}).map(l => l.text)).flat())`;

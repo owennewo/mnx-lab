@@ -7,6 +7,7 @@
 //
 // Stages 3–5: pills at every rung the session can edit, merged over a range.
 import type { MnxNote, MnxNoteValueBase, MnxStructure } from '../model/mnx.ts';
+import { TIME_SIGNATURE_INPUT_HELP } from './setupGrammar.ts';
 import { findNoteAddress } from '../model/noteWalk.ts';
 import { midiOfSpelling } from './staffSpace.ts';
 import { capoOf, defaultStringFor, isTabPart, midiOfPitch, tuningOf } from './tabStrings.ts';
@@ -388,7 +389,7 @@ function parseBarLine(word: string | null, text: string): InspectorParse {
   const rest = line.slice(head.length).trim();
   if (head === 'time') {
     const time = parseTimeSignature(rest);
-    if (!time) return { error: 'not a time signature — 4/4, 6/8, common, cut' };
+    if (!time) return { error: TIME_SIGNATURE_INPUT_HELP };
     if (time === 'inherit') return { intent: { type: 'removeTimeSignature' } };
     return {
       intent: {

@@ -2743,7 +2743,8 @@ const BASE_BY_UNIT: Record<number, MnxNoteValueBase> = {
   8: 'eighth',
   16: '16th',
   32: '32nd',
-  64: '64th'
+  64: '64th',
+  128: '128th'
 };
 
 const PAD_LADDER: { base: MnxNoteValueBase; span: Onset }[] = (
@@ -2754,7 +2755,8 @@ const PAD_LADDER: { base: MnxNoteValueBase; span: Onset }[] = (
     ['eighth', 1, 8],
     ['16th', 1, 16],
     ['32nd', 1, 32],
-    ['64th', 1, 64]
+    ['64th', 1, 64],
+    ['128th', 1, 128]
   ] as [MnxNoteValueBase, number, number][]
 ).map(([base, num, den]) => ({ base, span: { num, den } }));
 

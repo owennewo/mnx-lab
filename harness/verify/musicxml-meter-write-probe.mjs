@@ -45,21 +45,21 @@ try{
  const close=async()=>{for(let i=0;i<3&&await c.evaluate(`!!(${inspector})`);i++)await key('Escape','Escape',27);await c.evaluate(`${viewer}.focus()`);};
  const command=async text=>{await key('Digit5','%',53,8);await waitFor(c,`${session}.selectionLevel==='measure'`,'bar selection before command');await key('Enter','Enter',13);await waitFor(c,`!!(${inspector})`,'rung inspector');await type(text);await key('Enter','Enter',13);};
  const history=async(before,after)=>{await close();await key('KeyZ','z',90,2);await exact(before);await key('KeyY','y',89,2);await exact(after);};
- const changes=[['remove','time inherit',null],['create','time 5/4',{count:5,unit:4}],['change','time 6/4',{count:6,unit:4}],['common','time common',{count:4,unit:4,display:'common'}],['cut','time cut',{count:2,unit:2,display:'cut'}]];
+ const changes=[['remove','time inherit',null],['create','time 5/4',{count:5,unit:4}],['change','time 6/4',{count:6,unit:4}],['common','time common',{count:4,unit:4,display:'common'}],['cut','time cut',{count:2,unit:2,display:'cut'}],['wide','time 33/4',{count:33,unit:4}],['fine','time 3/128',{count:3,unit:128}]];
  report.tasks=[];
  await snapshot('initial');
  for(const [name,text,value]of changes){const before=await read();const expected=structuredClone(before);if(value)expected.global.measures[0].time=value;else delete expected.global.measures[0].time;
- const content=expected.parts[0].measures[0].sequences[0].content;content.splice(1);if(name==='create')content.push({duration:{base:'quarter'},rest:{}});if(name==='change')content.push({duration:{base:'quarter'},rest:{}},{duration:{base:'quarter'},rest:{}});
+ const content=expected.parts[0].measures[0].sequences[0].content;content.splice(1);if(name==='create')content.push({duration:{base:'quarter'},rest:{}});if(name==='wide')for(let i=0;i<29;i++)content.push({duration:{base:'quarter'},rest:{}});if(name==='change')content.push({duration:{base:'quarter'},rest:{}},{duration:{base:'quarter'},rest:{}});
  await command(text);await exact(expected);const after=await snapshot(name);await history(before,after);report.tasks.push({task:name,command:text,verdict:'supported',expected:value,unrelatedData:'all notes and all other measures exactly preserved; only first-bar meter and expected trailing rest padding change',undoRedo:'exact'});}
  report.rejections=[];
- for(const text of ['time 3+2/8','time 3/128','time 33/4','time 3/4 single-number']){
+ for(const text of ['time 3+2/8','time 0/4','time 3/256','time 1025/4','time 9007199254740993/4','time 3/4 single-number']){
  const before=await read();await command(text);await waitFor(c,`!!(${inspector})?.shadowRoot?.querySelector('.error')?.textContent`,'grammar rejection');await exact(before);
  const error=await c.evaluate(`(${inspector}).shadowRoot.querySelector('.error').textContent`);report.rejections.push({command:text,error,documentUnchanged:true});const shot=await c.send('Page.captureScreenshot');await fs.writeFile(path.join(out,'rejected-'+report.rejections.length+'.png'),Buffer.from(shot.result.data,'base64'));await close();}
  const copySelector=`(()=>{const roots=[document];while(roots.length){const r=roots.shift();const hit=r.querySelector('button[title="copy the document as JSON"]');if(hit)return hit;for(const e of r.querySelectorAll('*'))if(e.shadowRoot)roots.push(e.shadowRoot);}return null;})()`;
  await c.evaluate(`(()=>{const roots=[document];while(roots.length){const r=roots.shift();const b=[...r.querySelectorAll('button')].find(b=>b.textContent.trim().toUpperCase()==='JSON');if(b){b.click();return;}for(const e of r.querySelectorAll('*'))if(e.shadowRoot)roots.push(e.shadowRoot);}})()`);
  await waitFor(c,`!!(${copySelector})`,'JSON copy');await c.evaluate(`(${copySelector}).click()`);const copied=await c.evaluate('navigator.clipboard.readText()');const final=await read();assert.deepEqual(JSON.parse(copied),final);const saved=path.join(out,'copied.mnx.json');await fs.writeFile(saved,copied);
  const inputAgain=await c.send('Runtime.evaluate',{expression:`${app}.shadowRoot.querySelector('#local-file')`});await c.send('DOM.setFileInputFiles',{objectId:inputAgain.result.result.objectId,files:[saved]});await waitFor(c,`${app}.localDocument?.fileName==='copied.mnx.json' && !${app}.openingLocalFile`,'reopened meter document');await exact(final);
- report.persistence={route:'JSON copy → external file save → Open MNX',verdict:'exact final document equality',scope:'final cut-time state; other intermediate states not individually reopened'};
+ report.persistence={route:'JSON copy → external file save → Open MNX',verdict:'exact final document equality',scope:'final 3/128 state (original whole note retained, with an overfill diagnostic); other intermediate states not individually reopened'};
  report.consoleErrors=c.logs;
 }catch(error){report.error=error.message;process.exitCode=1;}finally{await fs.writeFile(path.join(out,'report.json'),JSON.stringify(report,null,2)+'\n');ws?.close();chrome.kill();site.server.close();try{await fs.rm(profile,{recursive:true,force:true,maxRetries:3,retryDelay:100});}catch{}}
 console.log(JSON.stringify(report,null,2));

@@ -109,7 +109,7 @@ artifact locations. Agent findings are labelled as such; no scenario `status` or
 
 ## Output and completion
 
-After the assessment, create `roadmap/proposed/core-musicxml-write-gaps.md`, add its roadmap
+After the assessment, create `roadmap/inprogress/core-musicxml-write-gaps.md`, add its roadmap
 and campaign index entries, and append findings to the campaign log. This follow-up is
 explicitly requested as part of the side quest. Its finite, prioritized work list names
 for every selected gap:

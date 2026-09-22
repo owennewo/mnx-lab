@@ -28,6 +28,9 @@ const LAB_JUMP_TYPES = new Set([
 
 /** "4/4", "6/8", "12/8" → an MNX time signature. Unit must be a power of two
  *  the notation can express. */
+export const MAX_EDIT_METER_COUNT = 1024;
+export const TIME_SIGNATURE_INPUT_HELP = `Use a count from 1 to ${MAX_EDIT_METER_COUNT} and a denominator of 1, 2, 4, 8, 16, 32, 64 or 128; or common, cut, inherit. Larger counts exceed the editor’s beat-rest padding limit.`;
+
 export function parseTimeSignature(
   text: string
 ): { count: number; unit: number; display?: 'common' | 'cut' } | 'inherit' | null {
@@ -46,12 +49,12 @@ export function parseTimeSignature(
     display = glyph[2] as 'common' | 'cut';
     token = glyph[1];
   }
-  const match = /^\s*(\d{1,2})\s*\/\s*(\d{1,3})\s*$/.exec(token);
+  const match = /^\s*(\d+)\s*\/\s*(\d{1,3})\s*$/.exec(token);
   if (!match) return null;
   const count = Number(match[1]);
   const unit = Number(match[2]);
-  if (count < 1 || count > 32) return null;
-  if (![1, 2, 4, 8, 16, 32, 64].includes(unit)) return null;
+  if (!Number.isSafeInteger(count) || count < 1 || count > MAX_EDIT_METER_COUNT) return null;
+  if (![1, 2, 4, 8, 16, 32, 64, 128].includes(unit)) return null;
   return { count, unit, ...(display ? { display } : {}) };
 }
 

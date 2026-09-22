@@ -1,6 +1,6 @@
 # MusicXML authoring gaps — source reachability and meter controls
 
-> **Status: proposed, 2026-09-22.** Campaign item 23. Initial bounded finding from
+> **Status: in progress, 2026-09-22.** Campaign item 23. Initial bounded finding from
 > [write assessment item 19](../inprogress/core-musicxml-write-assessment.md), which
 > remains in progress. [Campaign contract](../inprogress/core-campaign-musicxml.md).
 
@@ -63,3 +63,11 @@ This does not add additive grouping or single-number display syntax without a ca
   a built-in MusicXML download surface is not established by that evidence.
 - Remaining per-feature create/change/remove, selection, discoverability and persistence
   verdicts belong to the ongoing assessment, not an inferred list of missing controls.
+
+## Meter implementation policy
+
+Accept units through 128 and positive safe integer counts through 1024 in the shared
+inspector. Padding creates one rest per beat, so larger counts remain an explicit
+application limit with an actionable inspector message; this is not an MNX schema limit.
+Add 128th-note rest padding so a newly selected 3/128 meter can be filled exactly.
+Preserve pitched notes when shrinking a bar; existing overfill diagnostics still apply.

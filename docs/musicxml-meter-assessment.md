@@ -112,7 +112,7 @@ fresh local library state, as described in [the main assessment](musicxml-editor
 No production state or scenario verification records are changed.
 
 The requested [render gaps](../roadmap/inprogress/core-musicxml-render-gaps.md) and
-[write gaps](../roadmap/proposed/core-musicxml-write-gaps.md) now include these bounded
+[write gaps](../roadmap/inprogress/core-musicxml-write-gaps.md) now include these bounded
 meter findings. Other corpus families, unresolved meter display policy, independent
 reference-engraving comparison where XML is ambiguous, and remaining task/persistence
 combinations still belong to assessment items 18/19. This batch does not close either.

@@ -45,7 +45,6 @@ proposals that name their campaign.
 
 ### proposed/
 
-- **[core-musicxml-write-gaps.md](proposed/core-musicxml-write-gaps.md)** — item 23: resolve missing title metadata for imported Studio versions and expose representable numeric meter ranges.
 
 
 
@@ -139,6 +138,8 @@ back up to `proposed/` the moment it is.
   the best precedent.
 
 ### inprogress/
+
+- **[core-musicxml-write-gaps.md](inprogress/core-musicxml-write-gaps.md)** — item 23: resolve missing title metadata for imported Studio versions and expose representable numeric meter ranges.
 
 - **[core-musicxml-render-gaps.md](inprogress/core-musicxml-render-gaps.md)** — item 22: evidenced import/representation/render-containment gaps, including exact meter duration and display losses.
 
