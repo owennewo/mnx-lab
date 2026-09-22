@@ -68,8 +68,57 @@ oracle parse failure to a match; other verdicts are unchanged. XSD validity rema
 are unchanged. Captures are agent evidence, not human verification; no approval record
 or scenario status was manually changed.
 
-Unsupported-clef crash containment and exact meter import remain next in item 22.
+Unsupported-clef crash containment has now landed as detailed below; exact meter import
+remains next in item 22.
 Hidden/local meter in `11b` is still lost. Full microtonal/staff-configuration support
 requires the representation decisions already specified in that item; the warning fixes
 do not close those deferred capabilities. Studio title reachability, numeric meter UX
 limits, and the remaining corpus-wide feature/task assessment are also still open.
+
+## Unsupported-clef containment follow-up
+
+Application commit `77da16d3` stops unsupported clefs from blanking whole projections.
+The import warns about every unsupported sign and retains it for inspection; such a
+clef is still outside the published MNX schema. No invented standard field or vendor
+carrier makes it falsely valid. The plan marks its active interval internally, the
+renderer draws question marks for unavailable pitch placement, and per-measure badges
+identify the affected part/staff. Valid staves, rests, and subsequent supported-clef
+intervals continue rendering. The projection failure panel no longer asserts that an
+arbitrary failed document validates.
+
+`73a-Percussion` keeps the pitched timpani visible, while cymbal/triangle placement gets
+explicit placeholders. Import reports the two unsupported percussion clefs, six existing
+C4 fallbacks for unpitched notes and the unsupported one-line staff. This is not a claim
+of percussion notation, instrument identity, playback or authoring support. In particular,
+the existing unpitched fallback is now disclosed, not repaired.
+
+The [retained captures](../harness/fixtures/musicxml-clef-evidence/manifest.json) cover
+`12a-Clefs`, `34c-Font-Size`, `41c-StaffGroups` and `73a-Percussion` in both shells at
+1440×1000, scale 1, density 2, with time signatures shown. Every observation has zero
+projection errors; imported document hashes agree between shells. Visual review confirms
+local placeholders and surviving valid music, including the lower orchestral staves.
+These are containment verdicts, not full correctness approvals for font sizes, grouping,
+clef octaves or other source features. Both projection APIs also pass mixed-staff,
+inherited-clef and mid-measure recovery regressions with hidden clefs; all 12 cases
+failed on the previous implementation. Core goldens and the converter matrix/W3C
+layout baseline remain unchanged.
+
+### Capture correction for tall Studio scores
+
+A tall viewer can scroll inside Studio's scrolling score frame. The old capture tool
+scrolled only the outer frame, so it could miss lower staves even though the complete
+SVG was retained. It now selects the overflowing viewer, brings it into view, and bases
+tile overlap on the visible rectangle. Reports record the scroll target, visible/client
+sizes and capture-script SHA-256. `41c-StaffGroups` now has four Studio tiles covering
+its 2,623-pixel inner scroll extent, including the final staves; Workbench has five.
+The other three fixtures need two Studio tiles and one Workbench tile each.
+
+Earlier corpus-wide Studio PNGs are historical observations, not proof that every lower
+staff was reviewed. Future assessment of tall sources must recapture them with this
+corrected tool. The previous small piano/meter proofs remain bounded to their visible
+content; this discovery does not broaden those verdicts. Studio title promotion remains
+blocked for these untitled originals, and its warning state while viewing an older
+version still belongs to the current GP seed.
+
+Reproduce the captures with the existing command, changing the filter to
+`^(12a-|34c-|41c-|73a-)` and choosing separate output directories for each shell.

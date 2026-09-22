@@ -1,0 +1,95 @@
+{
+  "id": "34c-Font-Size",
+  "sourceSha256": "24fb2a729f78bc9b7b87e856c2a1d9b8daa68dd5c317f420715bb8fbba83c8af",
+  "testClass": "feature",
+  "description": "Font sizes. The elements in the first bar have the ‘font-size’ attribute set to a larger value for <note>, <notehead>, <trill-mark>, <dot>, and <accidental>, respectively. The elements in the second bar have the ‘font-size’ attribute set to a larger value for <down-bow>, <accidental-mark>, <accent>, and <note> again (for the rest), respectively, followed by a larger percussion clef and a larger unpitched note. The third and fourth bar consists of an oversized two-bar rest. The fifth bar has an oversized rehearsal mark on its starting bar line. The first note has three fingerings, with the middle one oversized; also attached is an oversized ‘ff’ sign. The second note has three plucks, with the first one oversized. An oversized ‘Adagio’ tempo indication is on top of the third and fourth beats, which consist of a quadruplet with an oversized number. The fifth beat demonstrates oversized lyrics. The sixth bar holds an oversized pedal marker with an oversized octave shift, an oversized trill with a wavy line, and an oversized ‘cresc.’ with dashes. The seventh measure demonstrates an oversized, non-traditional key change, followed by an oversized 6/8 time signature, an oversized breath mark, an oversized bass clef, and an oversized, traditional key change.",
+  "views": [
+    {
+      "scrollTarget": "frame",
+      "visibleWidth": 1440,
+      "visibleHeight": 870,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        [
+          5,
+          6
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [
+        "renderer — part P1, staff 1: unsupported clef percussion; affected pitches shown as placeholders (outside published MNX clef signs).",
+        "renderer — part P1, staff 1: unsupported clef percussion; affected pitches shown as placeholders (outside published MNX clef signs).",
+        "renderer — part P1, staff 1: unsupported clef percussion; affected pitches shown as placeholders (outside published MNX clef signs).",
+        "renderer — part P1, staff 1: unsupported clef percussion; affected pitches shown as placeholders (outside published MNX clef signs).",
+        "renderer — part P1, staff 1: unsupported clef percussion; affected pitches shown as placeholders (outside published MNX clef signs).",
+        "renderer — part P1, staff 1: unsupported clef percussion; affected pitches shown as placeholders (outside published MNX clef signs)."
+      ],
+      "scrollWidth": 1425,
+      "scrollHeight": 1135,
+      "clientWidth": 1425,
+      "clientHeight": 870,
+      "screenshots": [
+        "notation-0-0.png",
+        "notation-0-265.png"
+      ]
+    }
+  ],
+  "makeCurrentError": "That version was not made current: A piece needs a title",
+  "entryPath": "Local operator ingest: GP seed + unmodified XML original; Save → Versions → View XML → Make current",
+  "importError": null,
+  "viewingOriginal": true,
+  "editingSuspended": true,
+  "warnings": [
+    "note 0: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 1: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 2: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 3: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 4: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 5: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 6: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 7: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 8: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 9: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 10: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 11: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 12: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 13: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 14: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 15: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 16: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 17: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 18: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 19: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 20: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 21: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 22: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 23: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 24: ConcertPitch disagrees with sounding pitch; spelling was reconstructed."
+  ],
+  "importedDocumentSha256": "590d6ad7e969644c336357e47815297301da226f5d17be3b9e6bc6e1fe0000b7",
+  "displayOptions": {
+    "lyrics": "current",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide",
+    "selectedVerse": "1"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

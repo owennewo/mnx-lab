@@ -24,7 +24,7 @@ const site = shell === 'workbench' ? await serveStatic(path.join(root, 'dist/cli
 const profile = await fs.mkdtemp('/tmp/mnx-musicxml-browser-');
 const chrome = spawn(process.env.CHROME_BIN ?? 'google-chrome', ['--headless=new', '--no-sandbox', '--disable-dev-shm-usage', '--remote-debugging-port=0', `--user-data-dir=${profile}`, 'about:blank'], { stdio: 'ignore' });
 let ws;
-const report = { kind: 'browser observations; not feature correctness or human verification', shell, applicationCommit: execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim(), corpusRevision: manifest.revision, viewport: { width: 1440, height: 1000, deviceScaleFactor: 1 }, fixtures: [] };
+const report = { kind: 'browser observations; not feature correctness or human verification', captureScriptSha256: hash(await fs.readFile(fileURLToPath(import.meta.url))), shell, applicationCommit: execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim(), corpusRevision: manifest.revision, viewport: { width: 1440, height: 1000, deviceScaleFactor: 1 }, fixtures: [] };
 try {
   ws = new WebSocket(await connect(await devtoolsPort(profile))); await once(ws, 'open');
   const c = client(ws);
@@ -36,7 +36,10 @@ try {
   const page = shell === 'workbench' ? `${app}?.shadowRoot?.querySelector('mnx-scenario-page')` : "document.querySelector('mnx-studio')?.shadowRoot?.querySelector('mnx-studio-piece')";
   if(session) { await c.send('Network.enable'); await c.send('Network.setCookie',{name:'CF_Authorization',value:session.browser,url:origin,httpOnly:true,sameSite:'Lax'}); }
   const finder = `(() => { const roots = [document]; while (roots.length) { const r = roots.shift(); const v = r.querySelector('mnx-document-viewer'); if (v) return v; for (const e of r.querySelectorAll('*')) if(e.shadowRoot) roots.push(e.shadowRoot); } return null; })()`;
-  const scroller = shell === 'studio' ? `${page}.shadowRoot.querySelector('mnx-score-frame').shadowRoot.querySelector('.score')` : finder;
+  const outerScroller = shell === 'studio' ? `${page}.shadowRoot.querySelector('mnx-score-frame').shadowRoot.querySelector('.score')` : finder;
+  // Studio can constrain a tall viewer inside its own scrolling score frame.
+  // Scroll the viewer when it overflows; scrolling only the frame misses lower staves.
+  const scroller = `(()=>{const v=${finder};return v.scrollHeight>v.clientHeight+1 || v.scrollWidth>v.clientWidth+1 ? v : (${outerScroller});})()`;
   const settle = async () => {
     await c.evaluate('(async()=>{await document.fonts.ready; await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));})()');
     let previous = null, stable = 0;
@@ -140,12 +143,14 @@ try {
         }
         await waitFor(c, `(${finder}).resolvedView() === ${JSON.stringify(view)}`, view);
         await settle();
-        const observed = await c.evaluate(`(() => { const v=${finder};const scroller=${scroller};return {view:v.resolvedView(), staffScale:v.zoom,densityH:v.densityH,renderErrors:v.renderErrors,systemRows:v.systemRows(),svgCount:v.shadowRoot.querySelectorAll('#projection-container svg').length,diagnosticTitles:[...v.shadowRoot.querySelectorAll('.diagnostic-marker title')].map(e=>e.textContent),scrollWidth:scroller.scrollWidth,scrollHeight:scroller.scrollHeight,clientWidth:scroller.clientWidth,clientHeight:scroller.clientHeight};})()`);
+        await c.evaluate(`(()=>{const v=${finder};if((${scroller})===v)v.scrollIntoView({block:'start',inline:'nearest'});})()`);
+        await settle();
+        const observed = await c.evaluate(`(() => { const v=${finder};const scroller=${scroller};const r=scroller.getBoundingClientRect();const outer=(${outerScroller}).getBoundingClientRect();return {scrollTarget:scroller===v?'viewer':'frame',visibleWidth:Math.max(1,Math.min(r.right,outer.right,innerWidth)-Math.max(r.left,outer.left,0)),visibleHeight:Math.max(1,Math.min(r.bottom,outer.bottom,innerHeight)-Math.max(r.top,outer.top,0)),view:v.resolvedView(), staffScale:v.zoom,densityH:v.densityH,renderErrors:v.renderErrors,systemRows:v.systemRows(),svgCount:v.shadowRoot.querySelectorAll('#projection-container svg').length,diagnosticTitles:[...v.shadowRoot.querySelectorAll('.diagnostic-marker title')].map(e=>e.textContent),scrollWidth:scroller.scrollWidth,scrollHeight:scroller.scrollHeight,clientWidth:scroller.clientWidth,clientHeight:scroller.clientHeight};})()`);
         observed.screenshots = []; row.views.push(observed);
         const svgs = await c.evaluate(`[...(${finder}).shadowRoot.querySelectorAll('#projection-container svg')].map(s=>s.outerHTML)`);
         for (let i=0;i<svgs.length;i++) await fs.writeFile(path.join(dir, `${view}-${i}.svg`), svgs[i]);
         // Tiles overlap. Keep viewport geometry fixed; never shrink a score to fit.
-        const stepX = Math.max(1, observed.clientWidth - 80), stepY = Math.max(1, observed.clientHeight - 100);
+        const stepX = Math.max(1, Math.min(observed.clientWidth, observed.visibleWidth) - 80), stepY = Math.max(1, Math.min(observed.clientHeight, observed.visibleHeight) - 100);
         const xs = [], ys = [];
         for(let x=0;;x+=stepX){xs.push(Math.min(x,Math.max(0,observed.scrollWidth-observed.clientWidth)));if(x>=observed.scrollWidth-observed.clientWidth)break;}
         for(let y=0;;y+=stepY){ys.push(Math.min(y,Math.max(0,observed.scrollHeight-observed.clientHeight)));if(y>=observed.scrollHeight-observed.clientHeight)break;}

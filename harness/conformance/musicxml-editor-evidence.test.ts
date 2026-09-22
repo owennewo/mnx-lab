@@ -82,4 +82,30 @@ describe('retained MusicXML editor evidence provenance (not a fidelity gate)', (
     }
   });
 
+  it('retains complete-source clef containment observations in both shells', () => {
+    const base = 'harness/fixtures/musicxml-clef-evidence/';
+    const manifest = read(base + 'manifest.json');
+    for (const [name, expected] of Object.entries(manifest.files)) {
+      expect(hash(fs.readFileSync(path.join(root, base, name))), name).toBe(expected);
+    }
+    const reports = ['workbench', 'studio'].map(shell => read(base + shell + '/index.json'));
+    for (const report of reports) {
+      expect(report.captureScriptSha256).toMatch(/^[a-f0-9]{64}$/);
+      expect(report.corpusRevision).toBe(suite.revision);
+      expect(report.fixtures.map((f: { id: string }) => f.id)).toEqual(['12a-Clefs', '34c-Font-Size', '41c-StaffGroups', '73a-Percussion']);
+      for (const row of report.fixtures) {
+        expect(row.sourceSha256).toBe(suite.fixtures.find((f: { id: string }) => f.id === row.id).sha256);
+        expect(row.captureError).toBeUndefined();
+        expect(hash(JSON.stringify(read(base + report.shell + '/' + row.id + '/document.mnx.json')))).toBe(row.importedDocumentSha256);
+        for (const view of row.views) expect(view.renderErrors).toEqual([]);
+      }
+    }
+    expect(reports[0].fixtures.map((f: { importedDocumentSha256: string }) => f.importedDocumentSha256))
+      .toEqual(reports[1].fixtures.map((f: { importedDocumentSha256: string }) => f.importedDocumentSha256));
+    const tall = reports[1].fixtures.find((f: { id: string }) => f.id === '41c-StaffGroups').views[0];
+    expect(tall.scrollTarget).toBe('viewer');
+    expect(tall.scrollHeight).toBeGreaterThan(tall.clientHeight);
+    expect(tall.screenshots).toContain(`notation-0-${tall.scrollHeight - tall.clientHeight}.png`);
+  });
+
 });

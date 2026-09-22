@@ -180,6 +180,20 @@ committed to the repo, like `worker/models.json`.
 
 ## Progress + learnings
 
+### 2026-09-22 — item 22: unsupported clefs stay local
+
+All four known projection crashes now render with local question-mark placeholders and
+part/staff diagnostics; valid staves and later supported-clef intervals survive. Import
+reports unsupported clefs and existing unpitched pitch fallbacks; it does not claim
+schema-valid percussion. The generic failure panel no longer guesses schema validity.
+Twelve renderer regressions failed before and pass after; core goldens, W3C layout
+baseline and support matrix remain unchanged. [Both-shell evidence](../../docs/musicxml-import-fixes.md#unsupported-clef-containment-follow-up)
+also exposed a capture issue: **a tall Studio viewer scrolls inside the frame**. The
+harness now follows that inner scroll extent and fingerprints itself. Earlier full-corpus
+PNGs require recapture before lower-staff visual verdicts. Item 22 still needs meter import;
+items 18/19 still need their complete feature/task assessments.
+
+
 ### 2026-09-22 — item 22: separate converter correctness from load-time migration
 
 The original piano import retains both notes; `upgradeTabExtension` then erased staff 2

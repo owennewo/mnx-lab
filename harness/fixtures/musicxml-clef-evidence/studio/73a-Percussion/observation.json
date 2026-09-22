@@ -1,0 +1,89 @@
+{
+  "id": "73a-Percussion",
+  "sourceSha256": "755137ada60c85f314e85ece2cd00cbc17102cda73dde0567191f249a7545e88",
+  "testClass": "feature",
+  "description": "Three types of percussion staves: A five-line staff with bass clef for Timpani, a five-line staff with percussion clef, and a one-line percussion staff with only unpitched notes.",
+  "views": [
+    {
+      "scrollTarget": "frame",
+      "visibleWidth": 1440,
+      "visibleHeight": 870,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0,
+          1
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [
+        "renderer — part P2, staff 1: unsupported clef percussion; affected pitches shown as placeholders (outside published MNX clef signs).",
+        "renderer — part P2, staff 1: unsupported clef percussion; affected pitches shown as placeholders (outside published MNX clef signs).",
+        "renderer — part P3, staff 1: unsupported clef percussion; affected pitches shown as placeholders (outside published MNX clef signs).",
+        "renderer — part P3, staff 1: unsupported clef percussion; affected pitches shown as placeholders (outside published MNX clef signs).",
+        "renderer — part P2, staff 1: unsupported clef percussion; affected pitches shown as placeholders (outside published MNX clef signs).",
+        "renderer — part P2, staff 1: unsupported clef percussion; affected pitches shown as placeholders (outside published MNX clef signs).",
+        "renderer — part P3, staff 1: unsupported clef percussion; affected pitches shown as placeholders (outside published MNX clef signs).",
+        "renderer — part P3, staff 1: unsupported clef percussion; affected pitches shown as placeholders (outside published MNX clef signs)."
+      ],
+      "scrollWidth": 1425,
+      "scrollHeight": 1135,
+      "clientWidth": 1425,
+      "clientHeight": 870,
+      "screenshots": [
+        "notation-0-0.png",
+        "notation-0-265.png"
+      ]
+    }
+  ],
+  "makeCurrentError": "That version was not made current: A piece needs a title",
+  "entryPath": "Local operator ingest: GP seed + unmodified XML original; Save → Versions → View XML → Make current",
+  "importError": null,
+  "viewingOriginal": true,
+  "editingSuspended": true,
+  "warnings": [
+    "note 0: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 1: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 2: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 3: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 4: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 5: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 6: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 7: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 8: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 9: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 10: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 11: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 12: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 13: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 14: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 15: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 16: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 17: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 18: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 19: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 20: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 21: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 22: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 23: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 24: ConcertPitch disagrees with sounding pitch; spelling was reconstructed."
+  ],
+  "importedDocumentSha256": "5935810acad4e5562d44778166eac3137c2fed578d9b520ed812bb55cc69c66a",
+  "displayOptions": {
+    "lyrics": "current",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

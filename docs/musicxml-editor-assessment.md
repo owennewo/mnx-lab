@@ -62,6 +62,11 @@ Studio's conversion-notes state belongs to its current source while an older ver
 viewed; recorded warnings there must not be treated as warnings freshly returned by the
 XML version import. Workbench records the actual original-file import warnings.
 
+**Capture correction:** the initial Studio sweep scrolled the outer score frame only.
+Tall scores may have an independently scrolling viewer, so earlier PNG tiles can omit
+lower staves. Complete SVGs were retained, but a full visual verdict needs the corrected
+capture tool described in [the containment follow-up](musicxml-import-fixes.md#capture-correction-for-tall-studio-scores).
+
 The Studio sweep clicks its Settings → Staff control; Workbench uses the staff-view
 buttons. Screenshots tile the actual shell scroll container, without changing viewport
 or shrinking the score. A settled SVG, rather than just a populated document property,
@@ -82,7 +87,8 @@ The [post-fix report](musicxml-import-fixes.md) supersedes the initial piano-los
 the converter retained the staves, but the shared load-time legacy migration discarded
 the second one. That migration and ordinary clef coordinates are now repaired.
 Fractional pitches and unsupported staff-line configurations now produce explicit import
-warnings. Historical captures below remain unchanged evidence of the original failures;
+warnings. Unsupported clefs now get local placeholders and diagnostics instead of
+blanking the projection. Historical captures below remain unchanged evidence of the original failures;
 full support for those unsupported features is not claimed.
 
 ## Initial agent findings

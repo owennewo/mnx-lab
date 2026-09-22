@@ -137,6 +137,11 @@ for fractional pitches and staff configurations. Original-file captures in both 
 retain both piano notes with the bass clef on its correct line, no invented tuning, and
 notation-only availability. Historical assessment files are not rewritten as passes.
 
-Still open in this item: unsupported-clef failure containment and exact meter/display
-import with explicit residual-loss diagnostics. The carrier-dependent full-support
+Unsupported-clef containment is now implemented: all four source crashes have zero
+projection errors in both-shell recaptures, with local placeholders, preserved valid
+staves and explicit unsupported-clef/unpitched warnings. Twelve formerly failing layout
+regressions cover original sources, inheritance and mid-measure recovery. The capture
+tool also now traverses tall Studio viewers; earlier PNG coverage was incomplete there.
+
+Still open in this item: exact meter/display import with explicit residual-loss diagnostics. The carrier-dependent full-support
 work remains deferred as specified above. This item stays in progress.
