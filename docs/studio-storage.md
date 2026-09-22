@@ -310,8 +310,10 @@ CREATE TABLE piece_views (
 ## The owner's setup for a piece — `piece_views.prefs` (2026-09-19)
 
 Beside WHEN a piece was last opened, the same row keeps HOW it was last set up: the source
-that was playing (`synth` or a recording id) and the Instruments sheet's hidden parts and
-mix, the sound of each part included. Server-side for the reason `opened_at` is — a nylon
+that was playing (`synth` or a recording id), where the video divider was left
+(`videoDividerPercent`, a share of the score frame's width, so it fits whatever window
+reopens it) and the Instruments sheet's hidden parts and mix, the sound of each part
+included. Server-side for the reason `opened_at` is — a nylon
 guitar chosen on the laptop is still chosen on the tablet — and per owner, because it is a
 preference, not a property of the piece that everyone sharing it would see. Migration
 `0006_piece_prefs.sql` adds two columns to `piece_views`; a preference on a piece never

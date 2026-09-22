@@ -54,7 +54,10 @@ import { DEFAULT_SPACE_SP, DEFAULT_SPACING_MODE, DEFAULT_STAFF_SP } from './zoom
  * set (studio's remembered choice; the workbench's document focus), and every
  * toggle from the mark leaves as `focus-change` (detail: the new boolean) for
  * the host to remember or ignore. Which pad is up stays the frame's own — a
- * popover is not a preference.
+ * popover is not a preference. The video divider is the same again: its place,
+ * as a percentage of the frame's width, comes in as `videoDividerPercent`, and
+ * every drag (on release) or arrow-key step leaves as `video-divider-change`
+ * (detail: the new percentage).
  *
  * The progress line reads the slotted `<mnx-player>`: its
  * `playback-state-changed` frames bubble through the frame. The player is the
@@ -103,6 +106,9 @@ export class ScoreFrame extends LitElement {
   @property({ attribute: 'focus-shortcut' }) focusShortcut = '';
   /** True while the mark's own focusing holds the browser fullscreen. */
   private ownsFullscreen = false;
+  /** Where the video divider sits, as a percentage of the frame's width —
+   *  the host's to restore. Null keeps the default pane width. */
+  @property({ type: Number, attribute: 'video-divider-percent' }) videoDividerPercent: number | null = null;
   @state() private videoOpen = false;
   @state() private videoWidth = 320;
   private videoObserver: ResizeObserver | null = null;
@@ -125,6 +131,20 @@ export class ScoreFrame extends LitElement {
   }
   private get videoMaximum() { return Math.max(200, this.clientWidth * 0.75); }
   private resizeVideo(width: number) { this.videoWidth = Math.max(200, Math.min(this.videoMaximum, width)); }
+  /** A placed divider is a proportion, so the pane keeps its share of a window
+   *  resized under it; the width follows once the frame has one. */
+  private fitVideo() {
+    const percent = this.videoDividerPercent;
+    if (percent !== null && Number.isFinite(percent) && this.clientWidth > 0) this.resizeVideo(this.clientWidth * percent / 100);
+    else this.resizeVideo(this.videoWidth);
+  }
+  /** The divider was put somewhere: hold it there as a share, and tell the host. */
+  private placeVideo(width: number) {
+    this.resizeVideo(width);
+    if (this.clientWidth <= 0) return;
+    this.videoDividerPercent = Math.round(this.videoWidth / this.clientWidth * 1000) / 10;
+    this.dispatchEvent(new CustomEvent<number>('video-divider-change', { detail: this.videoDividerPercent, bubbles: true, composed: true }));
+  }
   private readonly dragVideo = (event: PointerEvent) => {
     if (event.button !== 0) return;
     event.preventDefault();
@@ -141,6 +161,7 @@ export class ScoreFrame extends LitElement {
       if (video) video.style.pointerEvents = '';
       divider.removeEventListener('pointermove', move);
       divider.removeEventListener('lostpointercapture', end);
+      this.placeVideo(this.videoWidth);
     };
     divider.addEventListener('pointermove', move);
     divider.addEventListener('lostpointercapture', end);
@@ -149,7 +170,7 @@ export class ScoreFrame extends LitElement {
     const width = event.key === 'Home' ? 200 : event.key === 'End' ? this.videoMaximum
       : event.key === 'ArrowLeft' ? this.videoWidth - 20 : event.key === 'ArrowRight' ? this.videoWidth + 20 : null;
     if (width === null) return;
-    event.preventDefault(); this.resizeVideo(width);
+    event.preventDefault(); this.placeVideo(width);
   };
   @state() private pad: Pad = null;
   @state() private progress = 0;
@@ -576,7 +597,7 @@ export class ScoreFrame extends LitElement {
     this.videoOpen = this.player?.youtubeRegionVisible ?? false;
     if (!region) return;
     this.videoOpen = true;
-    this.resizeVideo(this.videoWidth);
+    this.fitVideo();
     region.mount = this.updateComplete.then(() => this.renderRoot.querySelector<HTMLElement>('.video-surface')!);
   };
 
@@ -599,7 +620,7 @@ export class ScoreFrame extends LitElement {
     this.addEventListener('playback-position', this.onPosition);
     this.addEventListener('video-region-changed', this.onVideo);
     this.addEventListener('video-notice-changed', this.onVideoNotice);
-    this.videoObserver = new ResizeObserver(() => { this.resizeVideo(this.videoWidth); this.requestUpdate(); });
+    this.videoObserver = new ResizeObserver(() => { this.fitVideo(); this.requestUpdate(); });
     this.videoObserver.observe(this);
     this.scrollerObserver = new ResizeObserver(entries => this.measureScrollbar(entries.map(entry => entry.target)));
     document.addEventListener('fullscreenchange', this.onFullscreenChange);
@@ -677,6 +698,7 @@ export class ScoreFrame extends LitElement {
   protected willUpdate(changed: PropertyValues<this>) {
     // A pad hangs under the tools row; focusing takes the row and the pad with it.
     if (changed.has('focused') && this.focused) this.pad = null;
+    if (changed.has('videoDividerPercent')) this.fitVideo();
   }
 
   private readonly onKeydown = (event: KeyboardEvent) => {

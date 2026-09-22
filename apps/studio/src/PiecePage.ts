@@ -132,6 +132,8 @@ export class PiecePage extends LitElement {
   /** What is playing — a recording has no parts to mix. */
   @state() private playbackKind: string | undefined;
   @state() private selectedRecordingId: string | null = null;
+  /** Where the video divider was left (percent of the frame's width); null until placed. */
+  @state() private videoDividerPercent: number | null = null;
   @state() private addingRecording = false;
   @state() private recordingWarning: { id: string; message: string } | null = null;
   @state() private theme: ThemeSetting = readTheme();
@@ -364,6 +366,7 @@ export class PiecePage extends LitElement {
     this.error = '';
     this.loading = true;
     this.editOpen = false; this.recordingsOpen = false; this.sourceOpen = false; this.saveOpen = false; this.keysOpen = false; this.selectedRecordingId = null; this.editingRecordingId = null; this.addingRecording = false;
+    this.videoDividerPercent = null;
     ({ hidden: this.hiddenParts, mix: this.partMix } = readParts(this.pieceId));
     try {
       const readPair = () => Promise.all([
@@ -776,6 +779,10 @@ export class PiecePage extends LitElement {
     this.focused = event.detail;
     write(FOCUSED_KEY, String(this.focused));
   }
+  private onVideoDividerChange(event: CustomEvent<number>) {
+    this.videoDividerPercent = event.detail;
+    this.schedulePrefs();
+  }
 
   private onUnrolledChange(event: CustomEvent<boolean>) {
     this.unrolled = event.detail;
@@ -825,9 +832,10 @@ export class PiecePage extends LitElement {
   }
 
   // ── the owner's own setup for this piece ────────────────────────────────
-  // Which source they last played and how they left the Instruments sheet,
-  // kept per owner and piece in the library beside `opened_at` (docs/studio-
-  // storage.md) so it holds across devices and survives a cleared browser.
+  // Which source they last played, where they left the video divider and how
+  // they left the Instruments sheet, kept per owner and piece in the library
+  // beside `opened_at` (docs/studio-storage.md) so it holds across devices and
+  // survives a cleared browser.
   // localStorage stays the cache underneath: it paints the sheet before the
   // snapshot lands, and it is the whole story for a shell with no library.
 
@@ -835,6 +843,7 @@ export class PiecePage extends LitElement {
   private async applyPrefs(snapshot: LibrarySnapshot | null, partCount: number, generation: number) {
     const stored = normalizePiecePrefs(snapshot?.prefs);
     this.savedPrefs = canonicalJson(stored);
+    this.videoDividerPercent = stored.videoDividerPercent ?? null;
     if (stored.parts && stored.parts.count === partCount) {
       this.hiddenParts = stored.parts.hidden;
       this.partMix = stored.parts.mix;
@@ -864,6 +873,7 @@ export class PiecePage extends LitElement {
     const touched = this.hiddenParts.length > 0 || Object.keys(this.partMix).length > 0;
     return {
       ...(this.selectedRecordingId ? { source: this.selectedRecordingId } : {}),
+      ...(this.videoDividerPercent !== null ? { videoDividerPercent: this.videoDividerPercent } : {}),
       // The rendition the mix was left against — provenance for `count`, and
       // meaningless without it.
       ...(touched && this.snapshot?.piece.canonical_rendition_id ? { rendition: this.snapshot.piece.canonical_rendition_id } : {}),
@@ -944,7 +954,9 @@ export class PiecePage extends LitElement {
         .pads=${!!this.doc}
         .staffView=${false}
         .focused=${this.focused}
+        .videoDividerPercent=${this.videoDividerPercent}
         @focus-change=${this.onFocusChange}
+        @video-divider-change=${this.onVideoDividerChange}
         @view-change=${this.onViewChange}
         @display-change=${this.onDisplayChange}
         @unrolled-change=${this.onUnrolledChange}

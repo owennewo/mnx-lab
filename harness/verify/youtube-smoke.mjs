@@ -79,6 +79,7 @@ try{
  await c.evaluate(`[...test.frame.shadowRoot.querySelectorAll('button')].find(b=>b.textContent==='Terms and privacy').click()`);
  await wait(`!!test.frame.shadowRoot.querySelector('.youtube-notice')`);
  await c.evaluate(`[...test.frame.shadowRoot.querySelectorAll('button')].find(b=>b.textContent==='Hide').click()`);
+ await c.evaluate(`window.dividerEvents=[];test.frame.addEventListener('video-divider-change',e=>dividerEvents.push(e.detail))`);
  const layout=await c.evaluate(`(()=>{const root=test.frame.shadowRoot, video=root.querySelector('iframe'), score=root.querySelector('.score');window.originalVideo=video;const divider=root.querySelector('.video-divider');divider.dispatchEvent(new KeyboardEvent('keydown',{key:'Home'}));return video.getBoundingClientRect().right<=score.getBoundingClientRect().left;})()`);
  if(!layout)throw new Error('Video is not left of the score');
  await new Promise(r=>setTimeout(r,100));
@@ -86,6 +87,8 @@ try{
  await c.evaluate(`test.frame.shadowRoot.querySelector('.video-divider').dispatchEvent(new KeyboardEvent('keydown',{key:'End'}))`);
  await new Promise(r=>setTimeout(r,100));
  if(!await c.evaluate(`Math.abs(test.frame.shadowRoot.querySelector('iframe').getBoundingClientRect().width-test.frame.clientWidth*.75)<1 && originalVideo===test.frame.shadowRoot.querySelector('iframe')`))throw new Error('Maximum width or stable iframe failed');
+ // The divider leaves as a share of the frame, for a host to keep.
+ if(!await c.evaluate(`dividerEvents.length===2 && dividerEvents[1]===75 && test.frame.videoDividerPercent===75`))throw new Error('Divider keys did not report the share '+await c.evaluate('JSON.stringify(dividerEvents)'));
  const divider=await c.evaluate(`(()=>{const b=test.frame.shadowRoot.querySelector('.video-divider').getBoundingClientRect();return {x:b.x+b.width/2,y:b.y+100};})()`);
  await c.send('Input.dispatchMouseEvent',{type:'mouseMoved',...divider});
  await c.send('Input.dispatchMouseEvent',{type:'mousePressed',...divider,button:'left',clickCount:1});
@@ -95,6 +98,10 @@ try{
  await c.send('Input.dispatchMouseEvent',{type:'mouseReleased',x:1,y:divider.y,button:'left',clickCount:1});
  await new Promise(r=>setTimeout(r,100));
  if(!await c.evaluate(`test.frame.shadowRoot.querySelector('iframe').getBoundingClientRect().width===200 && originalVideo===test.frame.shadowRoot.querySelector('iframe') && originalVideo.style.pointerEvents==='' `))throw new Error('Pointer resize failed '+await c.evaluate(`JSON.stringify({width:test.frame.shadowRoot.querySelector('iframe').getBoundingClientRect().width,pointer:test.frame.shadowRoot.querySelector('iframe').style.pointerEvents})`));
+ if(!await c.evaluate(`dividerEvents.length===3 && dividerEvents[2]===Math.round(200/test.frame.clientWidth*1000)/10`))throw new Error('Drag release did not report the share '+await c.evaluate('JSON.stringify(dividerEvents)'));
+ // A host's share sizes the pane against the frame's width, not a remembered pixel count.
+ await c.evaluate(`test.frame.videoDividerPercent=50`);await new Promise(r=>setTimeout(r,100));
+ if(!await c.evaluate(`Math.abs(test.frame.shadowRoot.querySelector('.video-pane').getBoundingClientRect().width-test.frame.clientWidth*.5)<1 && dividerEvents.length===3`))throw new Error('Host divider share was not applied');
  if(live){
   await new Promise(r=>setTimeout(r,2000));
   const b=await c.evaluate(`(()=>{const b=test.frame.shadowRoot.querySelector('iframe').getBoundingClientRect();return {x:b.x+b.width/2,y:b.y+b.height/2};})()`);

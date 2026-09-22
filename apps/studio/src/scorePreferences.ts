@@ -110,7 +110,8 @@ export function readParts(pieceId: string): PartsPreference {
   catch { return { hidden: [], mix: {} }; }
 }
 /** What the library keeps for this owner and piece (`piece_views.prefs`): the
- *  source they last played and how they left the Instruments sheet. A plain
+ *  source they last played, where they left the video divider (a percentage of
+ *  the score frame's width) and how they left the Instruments sheet. A plain
  *  object type, not an interface, so it travels as the client's opaque JSON.
  *
  *  `parts.count` is the number of parts the mix was left against. A mix is keyed
@@ -119,6 +120,7 @@ export function readParts(pieceId: string): PartsPreference {
  *  source, which is named by id, survives that. */
 export type PiecePreferences = {
   source?: string;
+  videoDividerPercent?: number;
   rendition?: string;
   parts?: { hidden: readonly number[]; mix: PartMix; count: number };
 };
@@ -126,8 +128,10 @@ export function normalizePiecePrefs(raw: unknown): PiecePreferences {
   const source = (raw && typeof raw === 'object' ? raw : {}) as Record<string, unknown>;
   const parts = source.parts && typeof source.parts === 'object' ? source.parts as { count?: unknown } : null;
   const count = typeof parts?.count === 'number' && Number.isInteger(parts.count) && parts.count >= 0 ? parts.count : null;
+  const divider = source.videoDividerPercent;
   return {
     ...(typeof source.source === 'string' && source.source ? { source: source.source } : {}),
+    ...(typeof divider === 'number' && divider > 0 && divider <= 100 ? { videoDividerPercent: divider } : {}),
     ...(typeof source.rendition === 'string' && source.rendition ? { rendition: source.rendition } : {}),
     ...(parts && count !== null ? { parts: { ...normalizeParts(parts), count } } : {}),
   };

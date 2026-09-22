@@ -32,7 +32,7 @@ try {
    const check=(v,m)=>{if(!v)throw new Error(m);},delay=ms=>new Promise(r=>setTimeout(r,ms));
    document.body.replaceChildren();const page=document.createElement('mnx-studio-piece');page.style.height='800px';
    const score=${JSON.stringify(fixture)};score.global.measures[0].repeatStart={};score.global.measures.at(-1).repeatEnd={};
-   const saved=[];let gate;page.client={canonical:async id=>{if(id==='next')await new Promise(r=>gate=r);return {bytes:new TextEncoder().encode(JSON.stringify(score)),filename:'fixture.mnx.json'};},piece:async id=>({snapshot:{piece:{id,revision:0},tags:[],...(id==='kept'?{prefs:{source:'audio'}}:{}),recordings:[{id:'audio',kind:'audio',name:'Studio take',syncpoints:JSON.stringify([[0,1],[1,6],[2,11]])},{id:'youtube',kind:'youtube',name:'Linked video',external_id:'M7lc1UVf-VE',syncpoints:'[[0,1],[1,6],[2,11]]'}]}}),opened:async()=>{},savePrefs:async(id,prefs)=>{saved.push([id,prefs]);},recordingUrl:()=>${JSON.stringify(`http://127.0.0.1:${audio.address().port}/audio.wav`)}};
+   const saved=[];let gate;page.client={canonical:async id=>{if(id==='next')await new Promise(r=>gate=r);return {bytes:new TextEncoder().encode(JSON.stringify(score)),filename:'fixture.mnx.json'};},piece:async id=>({snapshot:{piece:{id,revision:0},tags:[],...(id==='kept'?{prefs:{source:'audio',videoDividerPercent:60}}:{}),recordings:[{id:'audio',kind:'audio',name:'Studio take',syncpoints:JSON.stringify([[0,1],[1,6],[2,11]])},{id:'youtube',kind:'youtube',name:'Linked video',external_id:'M7lc1UVf-VE',syncpoints:'[[0,1],[1,6],[2,11]]'}]}}),opened:async()=>{},savePrefs:async(id,prefs)=>{saved.push([id,prefs]);},recordingUrl:()=>${JSON.stringify(`http://127.0.0.1:${audio.address().port}/audio.wav`)}};
    page.pieceId='first';document.body.append(page);
    for(let i=0;i<100&&!page.shadowRoot?.querySelector('mnx-player')?.performance;i++)await delay(50);
    const player=page.shadowRoot.querySelector('mnx-player'),viewer=page.shadowRoot.querySelector('mnx-document-viewer');
@@ -43,14 +43,19 @@ try {
    const frame=page.shadowRoot.querySelector('mnx-score-frame');check(frame.shadowRoot.querySelector('.readout').textContent.includes('#'),'Frame did not read media position');
    await player.seekScorePosition({ordinal:1,metricOffset:{num:0n,den:1n}});check(Math.abs(player.playback.mediaTime-6)<.1,'HTTP audio could not seek');
    await delay(900);check(JSON.stringify(saved)===JSON.stringify([['first',{source:'audio'}]]),'Studio did not store the source it was left on: '+JSON.stringify(saved));
+   // The video divider is kept beside the source, as the frame's share.
+   frame.shadowRoot.querySelector('.video-divider').dispatchEvent(new KeyboardEvent('keydown',{key:'End'}));await delay(900);
+   check(JSON.stringify(saved.at(-1))===JSON.stringify(['first',{source:'audio',videoDividerPercent:75}]),'Studio did not store the video divider: '+JSON.stringify(saved));
    page.pieceId='kept';for(let i=0;i<100&&player.sourceId!=='audio';i++)await delay(50);
    check(player.sourceId==='audio','Stored source was not cued on open');
+   for(let i=0;i<100&&frame.videoDividerPercent!==60;i++)await delay(50);check(frame.videoDividerPercent===60,'Stored video divider was not restored on open');
    // Settled, not instantaneous: what the previous piece was playing tails off
    // through the navigation, and the cue must leave this one PAUSED.
    await delay(200);check(!player.playback||!player.playback.wantsPlayback,'Cueing the stored source started playback');
    page.pieceId='next';await page.updateComplete;await delay(60);check(!player.playback||!player.playback.wantsPlayback,'Old piece played during loading');
-   gate();await delay(250);check(player.documentId==='library:next'&&player.sourceId==='synth','New piece retained old source');page.remove();
-   return {studioRows:true,httpSeek:true,frameReadout:true,navigationStops:true,prefsStored:true,prefsCued:true};
+   gate();await delay(250);check(player.documentId==='library:next'&&player.sourceId==='synth','New piece retained old source');
+   check(frame.videoDividerPercent===null,'New piece retained old video divider');page.remove();
+   return {studioRows:true,httpSeek:true,frameReadout:true,navigationStops:true,prefsStored:true,prefsCued:true,dividerStored:true,dividerRestored:true};
  })()`);
  assert.ok(ranges>0,'Browser did not request a byte range');console.log('recording Studio OK',JSON.stringify({...result,ranges}));
  if(c.logs.length)throw new Error(c.logs.join('\n'));
