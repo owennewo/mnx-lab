@@ -25,6 +25,17 @@ describe('unsupported import data is reported at its source location', () => {
     ]));
     expect(warnings.filter(w => w.includes('staff configuration'))).toHaveLength(4);
   });
+  it('identifies unsupported clefs and every unpitched fallback in the percussion source', () => {
+    const warnings: string[] = [];
+    const doc = importMusicXML(source('73a-Percussion'), { onWarning: w => warnings.push(w) });
+    expect(warnings.filter(w => w.includes('unsupported clef percussion'))).toEqual([
+      expect.stringMatching(/part P2, measure 1, staff 1.*outside published MNX/),
+      expect.stringMatching(/part P3, measure 1, staff 1.*outside published MNX/)
+    ]);
+    expect(warnings.filter(w => w.includes('unpitched instrument identity'))).toHaveLength(6);
+    expect(warnings.filter(w => w.includes('unpitched instrument identity')).every(w => w.includes('C4 pitch fallback'))).toBe(true);
+    expect(doc.parts[1].measures[0].clefs?.[0].clef.sign).toBe('percussion');
+  });
   it('does not warn about ordinary piano pitches and five-line staves', () => {
     const warnings: string[] = [];
     importMusicXML(source('43a-PianoStaff'), { onWarning: w => warnings.push(w) });

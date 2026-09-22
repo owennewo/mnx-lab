@@ -1148,6 +1148,8 @@ export function tupletColumns(t: MnxTuplet, accidentalOf: AccidentalResolver, co
 
 export interface ActiveClef {
   sign: 'G' | 'F' | 'C';
+  /** Source sign has no supported pitch basis; use placeholders, never inferred notes. */
+  unsupportedSign?: string;
   octave: number; // MNX clef.octave: -1 = sounds 8vb, +1 = sounds 8va
   /** MNX `clef.staffPosition`: half-spaces from the middle line, up positive
    *  — the line the glyph pinches. Absent = the sign's conventional line
@@ -1852,7 +1854,10 @@ export function planHorizontal(
       const measureClefs: ClefAt[] = (partMeasureOf.clefs ?? [])
         .filter(c => (c.staff ?? 1) === src.staff && c.clef)
         .map(c => {
-          const sign = (c.clef.sign ?? 'G').toUpperCase() as ActiveClef['sign'];
+          const requested = String(c.clef.sign ?? '').toUpperCase();
+          const supported = requested === 'G' || requested === 'F' || requested === 'C';
+          const sign: ActiveClef['sign'] = supported ? requested : 'G';
+          const unsupportedSign = supported ? undefined : String(c.clef.sign ?? '(missing)');
           // If MNX omits octave, preserve the current octave when sign matches
           // (so the guitar 8vb default isn't lost to a declaration of plain G).
           const oct = c.clef.octave ?? (sign === current.sign ? current.octave : 0);
@@ -1862,6 +1867,7 @@ export function planHorizontal(
             t,
             clef: {
               sign,
+              ...(unsupportedSign ? { unsupportedSign } : {}),
               octave: oct,
               ...(c.clef.staffPosition !== undefined ? { staffPosition: c.clef.staffPosition } : {}),
               ...(c.clef.glyph ? { glyph: c.clef.glyph } : {}),
@@ -1881,6 +1887,7 @@ export function planHorizontal(
       if (
         startClef &&
         (startClef.clef.sign !== current.sign ||
+          startClef.clef.unsupportedSign !== current.unsupportedSign ||
           startClef.clef.octave !== current.octave ||
           startClef.clef.staffPosition !== current.staffPosition ||
           startClef.clef.glyph !== current.glyph ||
@@ -1936,6 +1943,12 @@ export function planHorizontal(
     );
 
     const issues: string[] = [];
+    clefTimelines.forEach((timeline, staff) => {
+      for (const sign of new Set(timeline.map(entry => entry.clef.unsupportedSign).filter(Boolean))) {
+        const source = clefSourceOf(planStaves[staff]);
+        issues.push(`part ${source.part.id ?? source.part.name ?? '?'}, staff ${source.staff}: unsupported clef ${sign}; affected pitches shown as placeholders (outside published MNX clef signs).`);
+      }
+    });
     // Measure-level attributes this renderer does not draw yet say so on the
     // bar — the amber badge the rendering contract promises for a gap. Until
     // core-measure-attributes-gaps.md these were recorded only in prose, and

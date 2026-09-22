@@ -1400,6 +1400,9 @@ export class Aligner {
           const staff = Number(clefEl.getAttribute('number') ?? '1') || 1;
           const sign = getChildText(clefEl, 'sign');
           const line = getChildInt(clefEl, 'line');
+          if (sign && !['G', 'F', 'C', 'TAB'].includes(sign)) this.warnings.push(
+            `part ${partId}, measure ${mIdx + 1}, staff ${staff}: unsupported clef ${sign}; retained for inspection but outside published MNX clef signs. Pitch placement is unavailable.`
+          );
           state.clefByStaff.set(staff, { sign, line });
           if (staff === 1) {
             state.clefSign = sign;
@@ -1875,6 +1878,9 @@ export class Aligner {
           // transposePitch yields NaN, which JSON.stringify silently writes as
           // `null` — producing schema-invalid MNX with no error anywhere.
           const pitchEl = findDirectChild(el, 'pitch');
+          if (findDirectChild(el, 'unpitched')) this.warnings.push(
+            `part ${partId}, measure ${measureIdx + 1}, note ${noteOrdinal}: unpitched instrument identity is not represented in MNX; using the existing C4 pitch fallback.`
+          );
           let mnxPitch: MnxPitch | undefined;
           let pitchUnresolved = false;
           let alterRaw: number | null = null;

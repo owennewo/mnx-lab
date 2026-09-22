@@ -2508,7 +2508,10 @@
       "testClass": "feature",
       "import": {
         "sha256": "2cd2e99f3039917529ceda7791a274a5d7a0dbc814b1388240ff47cf7fb654f8",
-        "warnings": [],
+        "warnings": [
+          "part P1, measure 5, staff 1: unsupported clef percussion; retained for inspection but outside published MNX clef signs. Pitch placement is unavailable.",
+          "part P1, measure 16, staff 1: unsupported clef none; retained for inspection but outside published MNX clef signs. Pitch placement is unavailable."
+        ],
         "validity": {
           "standard": false,
           "extensions": true,
@@ -2611,7 +2614,10 @@
       },
       "reimport": {
         "sha256": "2cd2e99f3039917529ceda7791a274a5d7a0dbc814b1388240ff47cf7fb654f8",
-        "warnings": [],
+        "warnings": [
+          "part P1, measure 5, staff 1: unsupported clef percussion; retained for inspection but outside published MNX clef signs. Pitch placement is unavailable.",
+          "part P1, measure 16, staff 1: unsupported clef none; retained for inspection but outside published MNX clef signs. Pitch placement is unavailable."
+        ],
         "validity": {
           "standard": false,
           "extensions": true,
@@ -7617,7 +7623,9 @@
       "import": {
         "sha256": "5f81f0a35e4f7f50c6da9b00a8f183186428de8fbff5a4b92b1011e55efe911d",
         "warnings": [
-          "part P1, measure 11, staff 1: unsupported staff configuration (3 staff lines, line-detail visibility/style); not represented in MNX."
+          "part P1, measure 2, note 5: unpitched instrument identity is not represented in MNX; using the existing C4 pitch fallback.",
+          "part P1, measure 11, staff 1: unsupported staff configuration (3 staff lines, line-detail visibility/style); not represented in MNX.",
+          "part P1, measure 11, note 2: unpitched instrument identity is not represented in MNX; using the existing C4 pitch fallback."
         ],
         "validity": {
           "standard": false,
@@ -7790,7 +7798,10 @@
       "testClass": "feature",
       "import": {
         "sha256": "590d6ad7e969644c336357e47815297301da226f5d17be3b9e6bc6e1fe0000b7",
-        "warnings": [],
+        "warnings": [
+          "part P1, measure 2, staff 1: unsupported clef percussion; retained for inspection but outside published MNX clef signs. Pitch placement is unavailable.",
+          "part P1, measure 2, note 5: unpitched instrument identity is not represented in MNX; using the existing C4 pitch fallback."
+        ],
         "validity": {
           "standard": false,
           "extensions": true,
@@ -7923,7 +7934,9 @@
       },
       "reimport": {
         "sha256": "590d6ad7e969644c336357e47815297301da226f5d17be3b9e6bc6e1fe0000b7",
-        "warnings": [],
+        "warnings": [
+          "part P1, measure 2, staff 1: unsupported clef percussion; retained for inspection but outside published MNX clef signs. Pitch placement is unavailable."
+        ],
         "validity": {
           "standard": false,
           "extensions": true,
@@ -8206,7 +8219,10 @@
       "testClass": "feature",
       "import": {
         "sha256": "9e7005d493b2c0ac9e5657e2a05957a7360f28ac1e95aedfc713ccb13c0c7132",
-        "warnings": [],
+        "warnings": [
+          "part P18, measure 1, staff 1: unsupported clef percussion; retained for inspection but outside published MNX clef signs. Pitch placement is unavailable.",
+          "part P18, measure 1, note 1: unpitched instrument identity is not represented in MNX; using the existing C4 pitch fallback."
+        ],
         "validity": {
           "standard": false,
           "extensions": true,
@@ -8293,7 +8309,9 @@
       },
       "reimport": {
         "sha256": "9e7005d493b2c0ac9e5657e2a05957a7360f28ac1e95aedfc713ccb13c0c7132",
-        "warnings": [],
+        "warnings": [
+          "part P18, measure 1, staff 1: unsupported clef percussion; retained for inspection but outside published MNX clef signs. Pitch placement is unavailable."
+        ],
         "validity": {
           "standard": false,
           "extensions": true,
@@ -14006,7 +14024,15 @@
       "import": {
         "sha256": "5935810acad4e5562d44778166eac3137c2fed578d9b520ed812bb55cc69c66a",
         "warnings": [
-          "part P3, measure 1, staff 1: unsupported staff configuration (1 staff lines); not represented in MNX."
+          "part P2, measure 1, staff 1: unsupported clef percussion; retained for inspection but outside published MNX clef signs. Pitch placement is unavailable.",
+          "part P2, measure 1, note 1: unpitched instrument identity is not represented in MNX; using the existing C4 pitch fallback.",
+          "part P2, measure 1, note 2: unpitched instrument identity is not represented in MNX; using the existing C4 pitch fallback.",
+          "part P2, measure 2, note 1: unpitched instrument identity is not represented in MNX; using the existing C4 pitch fallback.",
+          "part P3, measure 1, staff 1: unsupported clef percussion; retained for inspection but outside published MNX clef signs. Pitch placement is unavailable.",
+          "part P3, measure 1, staff 1: unsupported staff configuration (1 staff lines); not represented in MNX.",
+          "part P3, measure 1, note 1: unpitched instrument identity is not represented in MNX; using the existing C4 pitch fallback.",
+          "part P3, measure 1, note 2: unpitched instrument identity is not represented in MNX; using the existing C4 pitch fallback.",
+          "part P3, measure 2, note 1: unpitched instrument identity is not represented in MNX; using the existing C4 pitch fallback."
         ],
         "validity": {
           "standard": false,
@@ -14112,7 +14138,10 @@
       },
       "reimport": {
         "sha256": "5935810acad4e5562d44778166eac3137c2fed578d9b520ed812bb55cc69c66a",
-        "warnings": [],
+        "warnings": [
+          "part P2, measure 1, staff 1: unsupported clef percussion; retained for inspection but outside published MNX clef signs. Pitch placement is unavailable.",
+          "part P3, measure 1, staff 1: unsupported clef percussion; retained for inspection but outside published MNX clef signs. Pitch placement is unavailable."
+        ],
         "validity": {
           "standard": false,
           "extensions": true,

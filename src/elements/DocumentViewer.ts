@@ -93,7 +93,7 @@ import type { HideableFeature } from '../engine/layout/notation.ts';
  * The paper carries the engraved SVG (the rendering engine is a black box
  * here), or one of two honest state panels:
  *  - invalid-by-design → the spec-gap exhibit (oxide, pinned-error table)
- *  - valid-but-unrendered → the "validates, doesn't render yet" panel
+ *  - failed projection → the render failure panel
  * Paper never inverts with the theme (DIRECTION.md §4).
  */
 @customElement('mnx-document-viewer')
@@ -1177,8 +1177,8 @@ export class DocumentViewer extends LitElement {
       onNoteClick: this.onNoteClick
     };
 
-    // The layout engine throws on documents using features it doesn't support
-    // yet — that's the honest "validates, doesn't render" state, not a crash.
+    // A projection may fail on unsupported or invalid data, or on an engine bug.
+    // Contain the failure without making an unverified schema-validity claim.
     const guarded = (target: HTMLElement, label: string, fn: () => void) => {
       try {
         fn();
@@ -2075,11 +2075,10 @@ export class DocumentViewer extends LitElement {
         ${this.renderErrors.length
           ? html`
               <div class="state-panel">
-                <h3><span class="sp-warn"></span>Validates, doesn’t render yet</h3>
+                <h3><span class="sp-warn"></span>This view could not be rendered</h3>
                 <p>
-                  The document passes both verdicts, but the layout engine doesn’t support a
-                  feature it uses. That’s an honest gap, not an error — the uncovered def sits on
-                  the coverage backlog, and this scenario is its test fixture-in-waiting.
+                  The layout failed while drawing this view. The details below identify the failure;
+                  they do not establish whether the document is valid.
                 </p>
                 ${this.renderErrors.map(
                   f => html`<code class="fail-code">layout (${f.pane}): ${f.message}</code>`

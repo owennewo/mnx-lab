@@ -1673,6 +1673,12 @@ function assembleSegment(
     if (m.showClef) {
       for (let s = 0; s < numStaves; s++) {
         const staffClef = m.clefTimelines[s][0].clef;
+        if (staffClef.unsupportedSign) {
+          primitives.push({ kind: 'text', text: '?', x: m.clefX, y: staffTops[s] + 2,
+            font: 'body', size: 2, baseline: 'central', className: 'unsupported-clef',
+            title: `unsupported clef ${staffClef.unsupportedSign}` });
+          continue;
+        }
         primitives.push({
           kind: 'glyph',
           glyph: clefGlyph(staffClef),
@@ -1724,6 +1730,12 @@ function assembleSegment(
 
     // Mid-measure clef changes, at the column the plan reserved for them.
     for (const cc of m.clefChanges) {
+      if (cc.clef.unsupportedSign) {
+        primitives.push({ kind: 'text', text: '?', x: cc.x, y: (staffTops[cc.staff - 1] ?? staffTop) + 2,
+          font: 'body', size: 1.4, baseline: 'central', className: 'unsupported-clef clef-change',
+          title: `unsupported clef ${cc.clef.unsupportedSign}` });
+        continue;
+      }
       primitives.push({
         kind: 'glyph',
         glyph: clefGlyph(cc.clef),
@@ -1739,6 +1751,7 @@ function assembleSegment(
       // The colour of the key in force — declared on this bar or inherited.
       const keyColor = keyColorAt(mnx, writtenIndex(plan, i));
       for (let s = 0; s < numStaves; s++) {
+        if (m.clefTimelines[s][0].clef.unsupportedSign) continue;
         const clefShift = KEY_SIG_CLEF_OFFSET[m.clefTimelines[s][0].clef.sign];
         keySignatureGlyphs(m.keyFifths, m.cancelledKeyFifths).forEach((g, idx) => {
           primitives.push({
@@ -1858,6 +1871,12 @@ function assembleSegment(
             ? { ...eventClef, octave: eventClef.octave + ottavaShift }
             : eventClef;
           onset += isGrace(event) ? 0 : isTremolo(event) ? tremoloDuration(event) : isTuplet(event) ? tupletDuration(event) : isTimedEvent(event) ? durationValue(event.duration) : 0.25;
+          if (posClef.unsupportedSign && !(isTimedEvent(event) && event.rest)) {
+            primitives.push({ kind: 'text', text: '?', x: slot.x, y: staffTops[s] + 2,
+              font: 'body', size: 1.8, anchor: 'middle', baseline: 'central',
+              className: 'unsupported-clef-event', title: `pitch placement unavailable under unsupported clef ${posClef.unsupportedSign}` });
+            return;
+          }
           try {
             if (isGrace(event)) {
               emitGraceGroup({

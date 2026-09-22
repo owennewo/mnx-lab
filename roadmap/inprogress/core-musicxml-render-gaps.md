@@ -95,6 +95,14 @@ or blank projection. Use the minimal percussion fixture plus a mixed pitched/unp
 probe; verify the reported unsupported scope and both browser shells. This does not
 promise a full percussion editor or supersede the separate percussion-kit proposal.
 
+Containment policy: retain the imported unsupported clef for inspection and explicitly
+warn that it is outside published MNX; do not silently relabel percussion as treble or
+invent an extension. The render plan uses a safe internal coordinate basis marked as
+unsupported, draws question-mark placeholders for affected pitches, and diagnoses the
+staff/measure. Valid staves and intervals after a supported clef keep their music.
+Unpitched notes still lack a carrier and must report the existing C4 fallback. This is
+forgiving display of unsupported input, not schema conformance or percussion support.
+
 ### P1: retain exact meter duration and existing common/cut display
 
 Added from the [12-fixture meter review](../../docs/musicxml-meter-assessment.md),
