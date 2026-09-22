@@ -76,6 +76,15 @@ full-corpus captures hid time signatures via editor preferences: they cannot est
 missing-meter defects. New captures explicitly show them and record effective display
 options. Other feature families must check relevant preferences before assigning verdicts.
 
+## Import/loading fixes following the assessment
+
+The [post-fix report](musicxml-import-fixes.md) supersedes the initial piano-loss cause:
+the converter retained the staves, but the shared load-time legacy migration discarded
+the second one. That migration and ordinary clef coordinates are now repaired.
+Fractional pitches and unsupported staff-line configurations now produce explicit import
+warnings. Historical captures below remain unchanged evidence of the original failures;
+full support for those unsupported features is not claimed.
+
 ## Initial agent findings
 
 1. `43a-PianoStaff`: the source has two pitches on treble/bass staves and no tuning;
@@ -96,8 +105,7 @@ options. Other feature families must check relevant preferences before assigning
 The requested bounded follow-ups are
 [render gaps](../roadmap/inprogress/core-musicxml-render-gaps.md) and
 [write gaps](../roadmap/proposed/core-musicxml-write-gaps.md). They specify regression
-fixtures, ownership, acceptance criteria and representation-policy deferrals. No fixes
-from those proposals have been implemented during this assessment.
+fixtures, ownership, acceptance criteria and representation-policy deferrals. Implementation has begun in item 22; see the post-fix report above for the exact scope.
 
 ## Bounded write-path proof
 

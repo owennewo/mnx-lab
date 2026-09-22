@@ -120,3 +120,15 @@ These are agent-assessed source → document → display findings, with no human
 claim. Cosmetic spacing and unresolved corpus features are not included. The meter section explicitly extends the four initial findings with separately retained
 evidence. Further scope changes require the same source, data and UI evidence. The [write-gap proposal](../proposed/core-musicxml-write-gaps.md) owns editor
 reachability and persistence, and shares the representation blockers above.
+
+## Implementation progress, 2026-09-22
+
+[Post-fix evidence](../../docs/musicxml-import-fixes.md) records the repaired piano
+migration and ordinary clef coordinates, and the completed first-acceptance diagnostics
+for fractional pitches and staff configurations. Original-file captures in both shells
+retain both piano notes with the bass clef on its correct line, no invented tuning, and
+notation-only availability. Historical assessment files are not rewritten as passes.
+
+Still open in this item: unsupported-clef failure containment and exact meter/display
+import with explicit residual-loss diagnostics. The carrier-dependent full-support
+work remains deferred as specified above. This item stays in progress.

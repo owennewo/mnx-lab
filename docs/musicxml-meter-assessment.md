@@ -34,6 +34,10 @@ carry distinct display/semantic information. Published MNX currently has one pos
 integer count, one denominator through 128, and optional common/cut display. It has no
 corresponding additive grouping, alternate meter, single-number display or unmetered field.
 
+The [subsequent loading fix](musicxml-import-fixes.md) restores `11b`'s independent
+piano staff and ordinary bass-clef position. Its hidden/local meter loss remains;
+the meter captures here are the unchanged pre-fix record.
+
 ## Variant verdicts
 
 Measure numbers below are one-based source order. Duplicate source families are named

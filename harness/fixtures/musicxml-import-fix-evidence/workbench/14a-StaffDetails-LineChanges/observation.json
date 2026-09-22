@@ -1,0 +1,53 @@
+{
+  "id": "14a-StaffDetails-LineChanges",
+  "sourceSha256": "16d63b8dee3be38bd134fc93c3d359c07d5c6cdc964ba8e737c6b29e6b6b6954",
+  "testClass": "feature",
+  "description": "Testing staff line configurations and pitched notes. The number of staff lines can be modified by using the <staff-lines> child of the <staff-details> element. This can happen globally (the first staff has one line globally) or during the part at the beginning of a measure and even inside a measure (the second part has five lines initially, four at the beginning of the second measure, and three starting in the middle of the third measure). The fourth measure in the lower staff has five lines again but uses the ‘print-object=\"no\"’ attribute in the <line-detail> element to suppress the second and fourth staff line.",
+  "views": [
+    {
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0,
+          1,
+          2,
+          3
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [],
+      "scrollWidth": 750,
+      "scrollHeight": 691,
+      "clientWidth": 750,
+      "clientHeight": 691,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "importError": null,
+  "warnings": [
+    "part P1, measure 1, staff 1: unsupported staff configuration (1 staff lines); not represented in MNX.",
+    "part P2, measure 2, staff 1: unsupported staff configuration (4 staff lines); not represented in MNX.",
+    "part P2, measure 3, staff 1: unsupported staff configuration (3 staff lines); not represented in MNX.",
+    "part P2, measure 4, staff 1: unsupported staff configuration (line-detail visibility/style); not represented in MNX."
+  ],
+  "importedDocumentSha256": "b47118212aa367d980d773ac3d74c5c72bffaf8b8c7cd2746568e45f985e1bef",
+  "displayOptions": {
+    "lyrics": "current",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

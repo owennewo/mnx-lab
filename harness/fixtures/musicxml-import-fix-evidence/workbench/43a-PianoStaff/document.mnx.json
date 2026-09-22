@@ -1,0 +1,95 @@
+{
+  "mnx": {
+    "version": 1
+  },
+  "global": {
+    "measures": [
+      {
+        "key": {
+          "fifths": 0
+        },
+        "time": {
+          "count": 4,
+          "unit": 4
+        }
+      }
+    ]
+  },
+  "parts": [
+    {
+      "id": "P1",
+      "name": "MusicXML Part",
+      "staves": 2,
+      "measures": [
+        {
+          "clefs": [
+            {
+              "clef": {
+                "sign": "G",
+                "staffPosition": -2
+              },
+              "staff": 1
+            },
+            {
+              "clef": {
+                "sign": "F",
+                "staffPosition": 2
+              },
+              "staff": 2
+            }
+          ],
+          "sequences": [
+            {
+              "voice": "v1",
+              "staff": 1,
+              "content": [
+                {
+                  "duration": {
+                    "base": "whole"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "F",
+                        "octave": 4
+                      },
+                      "id": "n-1-1-v1-0-0"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "voice": "v2",
+              "staff": 2,
+              "content": [
+                {
+                  "duration": {
+                    "base": "whole"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "B",
+                        "octave": 2
+                      },
+                      "id": "n-1-1-v2-0-0"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "_x": {
+    "mnxLab": {
+      "encoding": {
+        "software": "musicxml-mnx",
+        "version": "0.1.0"
+      }
+    }
+  }
+}

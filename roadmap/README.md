@@ -139,6 +139,7 @@ back up to `proposed/` the moment it is.
   the best precedent.
 
 ### inprogress/
+
 - **[core-musicxml-render-gaps.md](inprogress/core-musicxml-render-gaps.md)** — item 22: evidenced import/representation/render-containment gaps, including exact meter duration and display losses.
 
 - **[core-musicxml-render-assessment.md](inprogress/core-musicxml-render-assessment.md)** — MusicXML campaign item 18: assess each applicable external fixture’s features through the desktop editor, separate import and representation losses from rendering defects, and produce an evidenced, bounded proposal to fill the gaps.

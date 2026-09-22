@@ -61,4 +61,25 @@ describe('retained MusicXML editor evidence provenance (not a fidelity gate)', (
     expect(write.tasks.map((t: { task: string }) => t.task)).toEqual(['remove', 'create', 'change', 'common', 'cut']);
   });
 
+  it('binds the post-fix captures to source bytes and both-shell documents', () => {
+    const base = 'harness/fixtures/musicxml-import-fix-evidence/';
+    const manifest = read(base + 'manifest.json');
+    for (const [name, expected] of Object.entries(manifest.files)) {
+      expect(hash(fs.readFileSync(path.join(root, base, name))), name).toBe(expected);
+    }
+    const workbench = read(base + 'workbench/index.json');
+    const studio = read(base + 'studio/index.json');
+    expect(workbench.corpusRevision).toBe(suite.revision);
+    expect(studio.corpusRevision).toBe(suite.revision);
+    expect(studio.fixtures.map((f: { id: string }) => f.id)).toEqual(workbench.fixtures.map((f: { id: string }) => f.id));
+    for (let i = 0; i < workbench.fixtures.length; i++) {
+      const row = workbench.fixtures[i];
+      expect(row.sourceSha256).toBe(suite.fixtures.find((f: { id: string }) => f.id === row.id).sha256);
+      expect(studio.fixtures[i].importedDocumentSha256).toBe(row.importedDocumentSha256);
+      for (const shell of ['workbench', 'studio']) {
+        expect(hash(JSON.stringify(read(base + shell + '/' + row.id + '/document.mnx.json')))).toBe(row.importedDocumentSha256);
+      }
+    }
+  });
+
 });

@@ -1,0 +1,220 @@
+{
+  "kind": "browser observations; not feature correctness or human verification",
+  "shell": "workbench",
+  "applicationCommit": "744f0c841b7f9aa868ed3406bb05108a5b9b09f0",
+  "corpusRevision": "77c19f7e819154c70ca1a1992e80dcda8ff82fea",
+  "viewport": {
+    "width": 1440,
+    "height": 1000,
+    "deviceScaleFactor": 1
+  },
+  "fixtures": [
+    {
+      "id": "01d-Pitches-Microtones",
+      "sourceSha256": "1d19f51757677182996d9bc8c58b78c0a91cd031197b75c0273aa6f77de3e65c",
+      "testClass": "feature",
+      "description": "Some microtones: c flat-and-a-half, d half-flat, e half-sharp, f sharp-and-a-half; once in the lower and once in the upper region of the staff.",
+      "views": [
+        {
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0,
+              1
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [],
+          "scrollWidth": 750,
+          "scrollHeight": 691,
+          "clientWidth": 750,
+          "clientHeight": 691,
+          "screenshots": [
+            "notation-0-0.png"
+          ]
+        }
+      ],
+      "importError": null,
+      "warnings": [
+        "part P1, measure 1, note 1 (C4): fractional pitch alteration -1.5 is not representable in published MNX; using integer alteration -1. Original pitch is lost.",
+        "part P1, measure 1, note 2 (D4): fractional pitch alteration -0.5 is not representable in published MNX; using integer alteration 0. Original pitch is lost.",
+        "part P1, measure 1, note 3 (E4): fractional pitch alteration 0.5 is not representable in published MNX; using integer alteration 0. Original pitch is lost.",
+        "part P1, measure 1, note 4 (F4): fractional pitch alteration 1.5 is not representable in published MNX; using integer alteration 1. Original pitch is lost.",
+        "part P1, measure 2, note 1 (C5): fractional pitch alteration -1.5 is not representable in published MNX; using integer alteration -1. Original pitch is lost.",
+        "part P1, measure 2, note 2 (D5): fractional pitch alteration -0.5 is not representable in published MNX; using integer alteration 0. Original pitch is lost.",
+        "part P1, measure 2, note 3 (E5): fractional pitch alteration 0.5 is not representable in published MNX; using integer alteration 0. Original pitch is lost.",
+        "part P1, measure 2, note 4 (F5): fractional pitch alteration 1.5 is not representable in published MNX; using integer alteration 1. Original pitch is lost."
+      ],
+      "importedDocumentSha256": "5fb4be0ee0c8e884d69fe191a5d43a51ae78cc6a83255cd143b4c9d46d4af3ab",
+      "displayOptions": {
+        "lyrics": "current",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "11b-TimeSignatures-NoTime",
+      "sourceSha256": "6038ef114c04d0e526b9435eb457572bfc1baffbe302d01150773c17a9102fef",
+      "testClass": "feature",
+      "description": "A score without a time signature at the beginning (but with <key> and <clef> elements). The second bar sets a 2/2 time signature with ‘print-object=\"no\"’ for both staves, and the third bar sets a 4/4 time signature with ‘print-object=\"no\"’ only for the lower staff. Whether a time signature is actually displayed at the very beginning (if there is no <time> element) is application-dependent.",
+      "views": [
+        {
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0,
+              1,
+              2
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [],
+          "scrollWidth": 750,
+          "scrollHeight": 691,
+          "clientWidth": 750,
+          "clientHeight": 691,
+          "screenshots": [
+            "notation-0-0.png"
+          ]
+        }
+      ],
+      "importError": null,
+      "warnings": [],
+      "importedDocumentSha256": "d106bba48288b4604f9c7b65a3bbf4e707fd4476939b63b713fc2f490ef6e049",
+      "displayOptions": {
+        "lyrics": "current",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "14a-StaffDetails-LineChanges",
+      "sourceSha256": "16d63b8dee3be38bd134fc93c3d359c07d5c6cdc964ba8e737c6b29e6b6b6954",
+      "testClass": "feature",
+      "description": "Testing staff line configurations and pitched notes. The number of staff lines can be modified by using the <staff-lines> child of the <staff-details> element. This can happen globally (the first staff has one line globally) or during the part at the beginning of a measure and even inside a measure (the second part has five lines initially, four at the beginning of the second measure, and three starting in the middle of the third measure). The fourth measure in the lower staff has five lines again but uses the ‘print-object=\"no\"’ attribute in the <line-detail> element to suppress the second and fourth staff line.",
+      "views": [
+        {
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0,
+              1,
+              2,
+              3
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [],
+          "scrollWidth": 750,
+          "scrollHeight": 691,
+          "clientWidth": 750,
+          "clientHeight": 691,
+          "screenshots": [
+            "notation-0-0.png"
+          ]
+        }
+      ],
+      "importError": null,
+      "warnings": [
+        "part P1, measure 1, staff 1: unsupported staff configuration (1 staff lines); not represented in MNX.",
+        "part P2, measure 2, staff 1: unsupported staff configuration (4 staff lines); not represented in MNX.",
+        "part P2, measure 3, staff 1: unsupported staff configuration (3 staff lines); not represented in MNX.",
+        "part P2, measure 4, staff 1: unsupported staff configuration (line-detail visibility/style); not represented in MNX."
+      ],
+      "importedDocumentSha256": "b47118212aa367d980d773ac3d74c5c72bffaf8b8c7cd2746568e45f985e1bef",
+      "displayOptions": {
+        "lyrics": "current",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "43a-PianoStaff",
+      "sourceSha256": "820450630ce05ea3bbc53c5ac63c0a8ac6597d7db4c232201d54f0ca162d1503",
+      "testClass": "feature",
+      "description": "A simple piano staff, i.e., two voices, each on a separate staff.",
+      "views": [
+        {
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [],
+          "scrollWidth": 750,
+          "scrollHeight": 691,
+          "clientWidth": 750,
+          "clientHeight": 691,
+          "screenshots": [
+            "notation-0-0.png"
+          ]
+        }
+      ],
+      "importError": null,
+      "warnings": [],
+      "importedDocumentSha256": "98aace28d45b786802ebd95fb6f27a3308d7745045605a59497e39f351f7ef6f",
+      "displayOptions": {
+        "lyrics": "current",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    }
+  ],
+  "browser": {
+    "protocolVersion": "1.3",
+    "product": "Chrome/153.0.8010.36",
+    "revision": "@507c6ee3e2f3b2ca0e660547e5b9ea4820c67f4c",
+    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+    "jsVersion": "15.3.76.10"
+  }
+}

@@ -180,6 +180,20 @@ committed to the repo, like `worker/models.json`.
 
 ## Progress + learnings
 
+### 2026-09-22 — item 22: separate converter correctness from load-time migration
+
+The original piano import retains both notes; `upgradeTabExtension` then erased staff 2
+because it treated every second staff as old guitar tab. Restricting migration to actual
+legacy markers **per part** preserves modern piano even beside a legacy guitar part.
+The recovered bass staff exposed a second error: clef line numbers and MNX staff positions
+use different origins/units. Fix both directions, including same-sign line changes;
+never use our own inverse as the only oracle. The independent alto/tenor export now
+matches music21 instead of failing to parse. Fractional pitch and staff-line losses now
+have location-specific diagnostics. [Both-shell evidence](../../docs/musicxml-import-fixes.md)
+is retained. Core goldens, W3C layout baseline and support matrix are unchanged; XSD
+validity remains 340/344. Item 22 remains open for unsupported-clef containment and meters.
+
+
 ### 2026-09-22 — items 18/19: meter variants and real inspector limits
 
 Reviewed all 12 meter sources in both shells with time signatures explicitly shown;

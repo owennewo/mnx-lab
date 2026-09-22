@@ -1,0 +1,45 @@
+{
+  "id": "43a-PianoStaff",
+  "sourceSha256": "820450630ce05ea3bbc53c5ac63c0a8ac6597d7db4c232201d54f0ca162d1503",
+  "testClass": "feature",
+  "description": "A simple piano staff, i.e., two voices, each on a separate staff.",
+  "views": [
+    {
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [],
+      "scrollWidth": 750,
+      "scrollHeight": 691,
+      "clientWidth": 750,
+      "clientHeight": 691,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "importError": null,
+  "warnings": [],
+  "importedDocumentSha256": "98aace28d45b786802ebd95fb6f27a3308d7745045605a59497e39f351f7ef6f",
+  "displayOptions": {
+    "lyrics": "current",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}
