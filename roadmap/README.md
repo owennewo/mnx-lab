@@ -45,6 +45,8 @@ proposals that name their campaign.
 
 ### proposed/
 
+- **[studio-save-lifecycle-isolation.md](proposed/studio-save-lifecycle-isolation.md)** — isolate pending saves, loss evidence and locks from piece navigation.
+
 - **[studio-player-practice.md](proposed/studio-player-practice.md)** — campaign item 13,
   studio's first player feature in `elements/`: loop the selection with the **written-range
   → performed-occurrences policy stated**, speed trainer, count-in, metronome, mute/solo.
