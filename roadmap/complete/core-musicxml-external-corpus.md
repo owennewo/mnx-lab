@@ -1,7 +1,7 @@
 # MusicXML external corpus — pinned inputs and an honest baseline
 
-> **Status: built, 2026-09-22.** Item 13 of
-> [the MusicXML campaign](core-campaign-musicxml.md).
+> **Status: complete, 2026-09-22.** Item 13 of
+> [the MusicXML campaign](../inprogress/core-campaign-musicxml.md).
 > First implementation slice of the resumed campaign; items 14, 15, 18 and 19 follow it.
 
 ## Agreement before implementation
@@ -53,3 +53,7 @@ pipeline; 13 feature imports fail published or extension validation. The existin
 27-pair oracle and converter matrix are unchanged. See
 [the report guide](../../docs/musicxml-suite.md) for findings and reproducible commands.
 Items 14/15 and the two assessments remain open; no converter behavior changed here.
+
+Validation: 2,606 root tests passed (one skipped), 157 converter tests passed, build
+passed, and the vendored tree matched the pinned upstream git blobs. Implementation
+landed in `220d2da0`; its worktree was removed before this document moved to complete.

@@ -144,10 +144,7 @@ back up to `proposed/` the moment it is.
   zero-dependency MusicXML import/export; 183 pinned external fixtures now join the
   27-pair W3C layout oracle. Independent semantic and XSD checks remain, followed by
   render and write-path assessments that produce evidenced gap proposals.
-- **[core-musicxml-external-corpus.md](inprogress/core-musicxml-external-corpus.md)** —
-  item 13 built: complete licensed corpus, stable inventory and an honest import/export
-  baseline; 13 of 177 feature inputs produce schema-invalid MNX despite completing
-  the pipeline. No converter fixes or visual/authoring verdicts claimed.
+
 
 
 
@@ -492,6 +489,11 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+
+- **[core-musicxml-external-corpus.md](complete/core-musicxml-external-corpus.md)** —
+  item 13 complete: complete licensed corpus, stable inventory and an honest import/export
+  baseline; 13 of 177 feature inputs produce schema-invalid MNX despite completing
+  the pipeline. No converter fixes or visual/authoring verdicts claimed.
 
 - **[lab-current-docs-consistency.md](complete/lab-current-docs-consistency.md)** — completed 2026-09-22: reconcile current capability claims and guard local reference links.
 
