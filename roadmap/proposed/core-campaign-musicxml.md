@@ -145,6 +145,7 @@ deliberately **not** enumerated in advance: item 8 decides them from evidence.
 | 16 | [Browser import surface](../inprogress/core-musicxml-browser-import.md) | MusicXML file import in the workbench, parallel to the Guitar Pro worker: `.musicxml`/`.mxl`/`.xml` through **Open…**, in a lazy worker of its own that imports the converter's core modules directly (the package index re-exports Node-only `fs`). The worker protocol is now format-neutral. | zero-dep | `smoke:csp`, extended to open a `.musicxml`, a deflated `.mxl` and a `.gpx` through the real file input under the deployed CSP | **built 2026-09-11** |
 | 17 | [Dynamics](../inprogress/core-musicxml-dynamics.md) | `<dynamics>` and `<wedge>`, both directions. The enum values map to `value`; the sforzando family to MNX's accent structure, whose parts concatenate to exactly the MusicXML element name (s+f+z = `sfz`), so one table serves both directions; the rest to SMuFL `glyphs`. Hairpins pair by wedge `number`, item 2's shape again. Relative dynamics have no MusicXML element and warn. | accuracy | the corpus's dynamics scenarios + round trip (no W3C comparison carries a dynamic) | **built 2026-09-10** |
 | 18 | [Render assessment](core-musicxml-render-assessment.md) | Side quest over item 13’s pinned external corpus: load fixtures through the desktop editor, assess each visible feature, isolate importer/representation/rendering/integration gaps, and produce an evidenced, bounded render-gap proposal. | accuracy | upstream feature descriptions + semantic checks + visual references and editor captures | **proposed 2026-09-22** |
+| 19 | [Write-path assessment](core-musicxml-write-assessment.md) | Companion to item 18: assess whether desktop users can create, inspect, change and remove each corpus feature through the editor, with undo/redo and separate persistence evidence; produce a bounded proposal for missing operations and UX surfaces. | accuracy | real UI tasks + structural before/after checks + applicable save/reopen | **proposed 2026-09-22** |
 | — | Feature parity | Dynamics, wedges, spanners, ottavas, articulations, SMuFL glyph names, percussion, layout breaks. **Deliberately unenumerated**: item 8 turns these into a ranked queue with evidence, and each becomes its own row when picked up. Note the schema already has `dynamic-*`, `ottava`, `slur` and `wedge-type` as standard objects — but **no pedal def**, so pedal is contract clause 2's first real test. | accuracy | 1 + 2 + 3 | not yet rows |
 
 ### Item 8's derivation rule
@@ -178,6 +179,15 @@ exactly as `verified` already works here. No backend: a generated JSON artifact
 committed to the repo, like `worker/models.json`.
 
 ## Progress + learnings
+
+### 2026-09-22 — write-path assessment side quest scoped
+
+[Item 19](core-musicxml-write-assessment.md) complements rendering coverage with authoring
+coverage over the same fixture/feature inventory. A feature may import and render without
+any way to create or change it; an internal operation may exist without a reachable UI.
+The assessment separates those failures and also records undo/redo and save/reopen losses.
+Its deliverable is an evidenced report and a new proposal for missing editing capabilities
+and UX surfaces. No assessment has run yet.
 
 ### 2026-09-22 — render assessment side quest scoped
 

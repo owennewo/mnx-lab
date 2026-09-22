@@ -45,6 +45,8 @@ proposals that name their campaign.
 
 ### proposed/
 
+- **[core-musicxml-write-assessment.md](proposed/core-musicxml-write-assessment.md)** — MusicXML campaign item 19: assess create/change/remove UX for each corpus feature, undo/redo and persistence; distinguish missing edit operations from missing UI surfaces and produce an evidenced gap proposal.
+
 - **[core-musicxml-render-assessment.md](proposed/core-musicxml-render-assessment.md)** — MusicXML campaign item 18: assess each applicable external fixture’s features through the desktop editor, separate import and representation losses from rendering defects, and produce an evidenced, bounded proposal to fill the gaps.
 
 

@@ -31,6 +31,10 @@
 
 ## Corpus and scope
 
+Share the fixture/feature inventory and evidence identifiers with the companion
+[write-path assessment](core-musicxml-write-assessment.md), campaign item 19. Rendering
+and authoring verdicts remain separate; link shared root causes in the resulting proposals.
+
 Depends on item 13 for the licensed, pinned corpus from
 [W3C's LilyPond-derived suite](https://github.com/w3c-cg/musicxmlTestSuite).
 Inventory the entire pinned suite, including files not selected for converter accuracy
