@@ -144,6 +144,7 @@ deliberately **not** enumerated in advance: item 8 decides them from evidence.
 | 15 | XSD export validation | W3C MusicXML 4.0 XSD over every generated document. | accuracy | itself | **not started — no `xmllint` available**, and it would need a new dev dependency for what this campaign already calls *a floor, not an accuracy tier* |
 | 16 | [Browser import surface](../inprogress/core-musicxml-browser-import.md) | MusicXML file import in the workbench, parallel to the Guitar Pro worker: `.musicxml`/`.mxl`/`.xml` through **Open…**, in a lazy worker of its own that imports the converter's core modules directly (the package index re-exports Node-only `fs`). The worker protocol is now format-neutral. | zero-dep | `smoke:csp`, extended to open a `.musicxml`, a deflated `.mxl` and a `.gpx` through the real file input under the deployed CSP | **built 2026-09-11** |
 | 17 | [Dynamics](../inprogress/core-musicxml-dynamics.md) | `<dynamics>` and `<wedge>`, both directions. The enum values map to `value`; the sforzando family to MNX's accent structure, whose parts concatenate to exactly the MusicXML element name (s+f+z = `sfz`), so one table serves both directions; the rest to SMuFL `glyphs`. Hairpins pair by wedge `number`, item 2's shape again. Relative dynamics have no MusicXML element and warn. | accuracy | the corpus's dynamics scenarios + round trip (no W3C comparison carries a dynamic) | **built 2026-09-10** |
+| 18 | [Render assessment](core-musicxml-render-assessment.md) | Side quest over item 13’s pinned external corpus: load fixtures through the desktop editor, assess each visible feature, isolate importer/representation/rendering/integration gaps, and produce an evidenced, bounded render-gap proposal. | accuracy | upstream feature descriptions + semantic checks + visual references and editor captures | **proposed 2026-09-22** |
 | — | Feature parity | Dynamics, wedges, spanners, ottavas, articulations, SMuFL glyph names, percussion, layout breaks. **Deliberately unenumerated**: item 8 turns these into a ranked queue with evidence, and each becomes its own row when picked up. Note the schema already has `dynamic-*`, `ottava`, `slur` and `wedge-type` as standard objects — but **no pedal def**, so pedal is contract clause 2's first real test. | accuracy | 1 + 2 + 3 | not yet rows |
 
 ### Item 8's derivation rule
@@ -177,6 +178,15 @@ exactly as `verified` already works here. No backend: a generated JSON artifact
 committed to the repo, like `worker/models.json`.
 
 ## Progress + learnings
+
+### 2026-09-22 — render assessment side quest scoped
+
+[Item 18](core-musicxml-render-assessment.md) asks whether the external MusicXML fixtures
+actually display their intended features when opened in our editor. Its output is a
+per-feature assessment and a new gap-filling proposal, not fixes during the audit. Import
+loss must be isolated before attributing missing marks to the renderer; screenshots alone
+cannot establish semantic fidelity. The entire pinned suite receives a disposition so a
+curated converter subset cannot conceal rendering gaps. No assessment has run yet.
 
 ### 2026-09-04 — where the campaign stands
 

@@ -45,6 +45,8 @@ proposals that name their campaign.
 
 ### proposed/
 
+- **[core-musicxml-render-assessment.md](proposed/core-musicxml-render-assessment.md)** — MusicXML campaign item 18: assess each applicable external fixture’s features through the desktop editor, separate import and representation losses from rendering defects, and produce an evidenced, bounded proposal to fill the gaps.
+
 
 
 - **[studio-player-practice.md](proposed/studio-player-practice.md)** — campaign item 13,
