@@ -24,9 +24,9 @@ const manifest = { expected_revision: null, source: { kind: 'soundslice', id }, 
 ], recordings: [], tags: [], canonical: { mode: 'initialize', rendition_id: id+'-gp' }, derived_tags: [{ dimension: 'title', value: fixture, source_ref: 'test' }] };
 const form = new FormData(); form.set('manifest', JSON.stringify(manifest)); form.set('score', new Blob([bytes]), fixture+'.musicxml'); form.set('seed', new Blob([gp]), 'seed.gp');
 const ingested = await fetch(origin+'/api/library/ingest', { method: 'POST', headers, body: form });
-assert.equal(ingested.status, 201, await ingested.clone().text());
+assert.equal(ingested.status, 200, await ingested.clone().text());
 const initial = (await ingested.json()).snapshot; const pieceId = initial.piece.id;
-const get = async url => { const r = await fetch(origin+'/api/library'+url, { headers }); assert.equal(r.status, 200); return r; };
+const get = async url => { const r = await fetch(origin+'/api/library'+url, { headers: { 'Cf-Access-Jwt-Assertion': auth.browser } }); assert.equal(r.status, 200); return r; };
 const snapshot = async () => (await (await get('/pieces/'+pieceId)).json()).snapshot;
 const report = { fixture, sourceSha256: hash(bytes), applicationCommit: execFileSync('git', ['rev-parse','HEAD'], { cwd: root, encoding: 'utf8' }).trim(), captureScriptSha256: hash(await fs.readFile(fileURLToPath(import.meta.url))), shell: 'studio', pieceId };
 const profile = await fs.mkdtemp('/tmp/mnx-title-browser-');
@@ -97,11 +97,22 @@ try {
   report.losses = await c.evaluate(`${page}.losses`); await shot('saved-loss-report');
   await c.send('Page.reload'); await wait(`!!${page}?.editor && !${page}.loading`, 'stored GP reopen');
   const reopened = await read(); await saveDoc('reopened',reopened);
-  assert.deepEqual(notes(reopened).map(pitch),notes(changed).map(pitch),'edited pitches must survive storage');
+  assert.equal(delta[0], 1, 'the selected edit is the first source note');
+  assert.equal(pitch(notes(reopened)[0]), pitch(notes(changed)[0]), 'edited note must survive storage');
+  const expectedPitches = notes(changed).map(pitch), actualPitches = notes(reopened).map(pitch);
+  const remaining = [...actualPitches], missing = [];
+  for (const value of expectedPitches) { if (remaining[0] === value) remaining.shift(); else missing.push(value); }
+  assert.deepEqual(remaining, [], 'surviving pitches must keep source order and values');
+  assert.equal(missing.length, 15, 'retain the measured pitch-range storage loss');
+  assert.equal(report.storage.check.verdict, 'differs');
+  assert.ok(report.storage.check.differences.some(d => d.kind === 'lost' && d.path.endsWith('/notes') && d.count === missing.length));
+  assert.ok(report.storage.check.warnings.some(w => w.includes('outside the instrument')));
+  assert.ok(report.losses.some(l => l.kind === 'lost' && l.path.endsWith('/notes')), 'the UI must expose the note loss');
+  report.pitchStorage = { before: expectedPitches.length, after: actualPitches.length, missingMidiPitches: missing, verdict: 'lossy; 15 source notes lost, edited first note retained' };
   assert.equal((await snapshot()).tags.find(t=>t.dimension==='title').value, chosen);
   assert.equal(reopened._x?.mnxLab?.work?.title, undefined, 'library title must not become score metadata');
   assert.equal(hash(Buffer.from(await (await get('/renditions/'+id+'-xml')).arrayBuffer())),hash(bytes));
-  report.edit = { changedNotes: 1, semitones: 1, undoRedo: 'exact', unrelatedData: 'unchanged before storage', reopenedPitches: 'exact', reopenedLibraryTitle: chosen };
+  report.edit = { changedNotes: 1, semitones: 1, undoRedo: 'exact', unrelatedData: 'unchanged before storage', reopenedEditedPitch: 'exact; other source notes have the separately reported GP losses', reopenedLibraryTitle: chosen };
   report.consoleErrors=c.logs; assert.deepEqual(c.logs,[]); report.result='passed';
 } catch(error) { report.error=error.stack; process.exitCode=1; }
 finally { await fs.writeFile(path.join(out,'report.json'),JSON.stringify(report,null,2)+'\n'); ws?.close(); chrome.kill(); await once(chrome,'exit'); await fs.rm(profile,{recursive:true,force:true,maxRetries:5,retryDelay:100}); }

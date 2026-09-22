@@ -96,7 +96,13 @@ try {
         await waitFor(c,`!!${page}.error || ${page}.viewing?.id === '${id}-xml'`,'view original MusicXML');
         if(!await c.evaluate(`${page}.error`)) {
           await c.evaluate(`[...${sheet}.querySelectorAll('[data-version="${id}-xml"] button')].find(b=>b.textContent.trim()==='Make current').click()`);
-          await waitFor(c,`!!${page}.error || (${page}.snapshot?.piece.canonical_rendition_id === '${id}-xml' && !${page}.viewing)`, 'Make XML current');
+          const titleForm = `${page}.shadowRoot.querySelector('.version-title')`;
+          await waitFor(c,`!!${titleForm} || !!${page}.error || (${page}.snapshot?.piece.canonical_rendition_id === '${id}-xml' && !${page}.viewing)`, 'Make XML current or supply title');
+          if (await c.evaluate(`!!${titleForm}`)) {
+            row.suppliedLibraryTitle = await c.evaluate(`${titleForm}.querySelector('input').value`);
+            await c.evaluate(`${titleForm}.requestSubmit()`);
+            await waitFor(c,`!!${page}.error || (${page}.snapshot?.piece.canonical_rendition_id === '${id}-xml' && !${page}.viewing)`, 'Make untitled XML current');
+          }
           row.makeCurrentError=await c.evaluate(`${page}.error || null`);
           await waitFor(c,`!!${page}.editor`, 'Studio editor binding');
           await c.evaluate(`${page}.shadowRoot.querySelector('button.save').click()`);

@@ -260,8 +260,9 @@ export class EditPieceSheet extends LitElement {
           })}
           ${!derived.length ? html`<p>Nothing beyond the header was read from this file.</p>` : nothing}
         </div>
-        ${derived.some(t => t.source_ref && t.source_ref !== 'sidecar')
-          ? html`<span class="muted">Read by ${[...new Set(derived.map(t => t.source_ref).filter(r => r && r !== 'sidecar'))].join(', ')}.</span>`
+        ${derived.some(t => t.source_ref === 'library-title') ? html`<span class="muted">The library title was supplied when this version was made current; the score has no title.</span>` : nothing}
+        ${derived.some(t => t.source_ref && !['sidecar', 'library-title'].includes(t.source_ref))
+          ? html`<span class="muted">Read by ${[...new Set(derived.map(t => t.source_ref).filter(r => r && !['sidecar', 'library-title'].includes(r)))].join(', ')}.</span>`
           : nothing}
       </section>`;
   }

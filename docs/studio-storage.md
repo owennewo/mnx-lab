@@ -110,6 +110,14 @@ and the service carries it over **exactly as stored, source and all**; it must a
 the library's. A tag Studio itself once projected is the document's to keep or drop: clear
 the artist and the tag goes, go back to a version without one and it goes too.
 
+**An untitled version can receive a library title.** Making it current offers a title
+field when its projection has none. The canonical API accepts `library_title` only
+alongside a title-free projection, labels it `source_ref: library-title`, and keeps
+all ownership/revision checks. This names the library piece; neither the original
+rendition nor its imported document is changed. Future checkpoints retain that title
+with the existing `kept` mechanism while score metadata has no title. A document title
+takes precedence and replaces the library fallback. Cancellation sends no mutation.
+
 **A lossy save leaves a defect report: a fifth role, `evidence`.** When the round trip
 through Guitar Pro lost or changed something, the browser offers the document the file was
 exported *from*, and the service keeps it as an `mnx` rendition `derived_from` the `edit` it
