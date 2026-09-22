@@ -1622,7 +1622,9 @@ export class Aligner {
           clefsList.push({
             clef: {
               sign: clef.sign,
-              staffPosition: clef.line ? -clef.line : undefined
+              staffPosition: clef.line !== null
+                ? 2 * clef.line - 6
+                : ({ G: -2, F: 2, C: 0 } as Record<string, number>)[clef.sign]
             },
             // Only stated when there is more than one staff to tell apart —
             // `staff: 1` on a single-staff part is noise the spec omits.

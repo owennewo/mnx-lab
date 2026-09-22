@@ -720,7 +720,7 @@
       "id": "02b-Rests-PitchedRests",
       "testClass": "feature",
       "import": {
-        "sha256": "dea2506045ff5da95d0e81d281e236266a52fcb3f888a57ad115e520c516c3f8",
+        "sha256": "907710db485c51443431233cb3f046d368330bd338736423ef408532c0b9a1fe",
         "warnings": [],
         "validity": {
           "standard": true,
@@ -772,7 +772,7 @@
         "warnings": []
       },
       "reimport": {
-        "sha256": "dea2506045ff5da95d0e81d281e236266a52fcb3f888a57ad115e520c516c3f8",
+        "sha256": "907710db485c51443431233cb3f046d368330bd338736423ef408532c0b9a1fe",
         "warnings": [],
         "validity": {
           "standard": true,
@@ -933,7 +933,7 @@
       "id": "02e-Rests-NoType",
       "testClass": "feature",
       "import": {
-        "sha256": "7521b5312eb50f5e6f355c402c644f0ddb1f427b312bc00f37cfb498af4f932a",
+        "sha256": "7d14059059146c1e6de98c5d515a8d60651afa91ef26c4708b68bf666575d379",
         "warnings": [],
         "validity": {
           "standard": true,
@@ -994,7 +994,7 @@
         "warnings": []
       },
       "reimport": {
-        "sha256": "7521b5312eb50f5e6f355c402c644f0ddb1f427b312bc00f37cfb498af4f932a",
+        "sha256": "7d14059059146c1e6de98c5d515a8d60651afa91ef26c4708b68bf666575d379",
         "warnings": [],
         "validity": {
           "standard": true,
@@ -1010,7 +1010,7 @@
       "id": "02f-Rests-Placement",
       "testClass": "feature",
       "import": {
-        "sha256": "d488c099c9c3747b0ae5675218718ddd6298c359f8c80579a0b46ba3f8eefdd4",
+        "sha256": "92314cdc6f7fa8e0ee021c13d77350ceaf845ec712d06ef0f300f98ae8f7d528",
         "warnings": [],
         "validity": {
           "standard": true,
@@ -1062,7 +1062,7 @@
         "warnings": []
       },
       "reimport": {
-        "sha256": "d488c099c9c3747b0ae5675218718ddd6298c359f8c80579a0b46ba3f8eefdd4",
+        "sha256": "92314cdc6f7fa8e0ee021c13d77350ceaf845ec712d06ef0f300f98ae8f7d528",
         "warnings": [],
         "validity": {
           "standard": true,
@@ -1662,7 +1662,7 @@
       "id": "11b-TimeSignatures-NoTime",
       "testClass": "feature",
       "import": {
-        "sha256": "714a9a94aac0d584e54cf7b428091a98b61beed5273186202ae2969d6f276229",
+        "sha256": "d106bba48288b4604f9c7b65a3bbf4e707fd4476939b63b713fc2f490ef6e049",
         "warnings": [],
         "validity": {
           "standard": true,
@@ -1720,7 +1720,7 @@
         "warnings": []
       },
       "reimport": {
-        "sha256": "714a9a94aac0d584e54cf7b428091a98b61beed5273186202ae2969d6f276229",
+        "sha256": "d106bba48288b4604f9c7b65a3bbf4e707fd4476939b63b713fc2f490ef6e049",
         "warnings": [],
         "validity": {
           "standard": true,
@@ -2507,7 +2507,7 @@
       "id": "12a-Clefs",
       "testClass": "feature",
       "import": {
-        "sha256": "0b8c823f8b862c340a468ed5769e67eccca287de85b0a08ee2bf367df730f8da",
+        "sha256": "2cd2e99f3039917529ceda7791a274a5d7a0dbc814b1388240ff47cf7fb654f8",
         "warnings": [],
         "validity": {
           "standard": false,
@@ -2606,11 +2606,11 @@
         "measures": 17
       },
       "export": {
-        "sha256": "90f10b88a1d4914979e93ae6c25f5b3a92020d2c55b8c04803393ed6135c4474",
+        "sha256": "1a10a0e00ad463d34dc8fe8dd26364fd8f04915175f25ff4e0eb2e94f6573623",
         "warnings": []
       },
       "reimport": {
-        "sha256": "c687ac3bf550f2b9d7cb6c871478820337debd9d644bfcb1e2a5694f50e3d4c9",
+        "sha256": "2cd2e99f3039917529ceda7791a274a5d7a0dbc814b1388240ff47cf7fb654f8",
         "warnings": [],
         "validity": {
           "standard": false,
@@ -4740,7 +4740,7 @@
       "id": "23f-Tuplets-DurationButNoBracket",
       "testClass": "feature",
       "import": {
-        "sha256": "470855e26af3ce9fd23b4eec77359c8b0e204eddf16cfe228f01e9c12bc86d81",
+        "sha256": "b6a74c0b788b8c42b0a8c74d7172be86e841e80530a41f72d9e998550a92268b",
         "warnings": [],
         "validity": {
           "standard": true,
@@ -4805,7 +4805,7 @@
         "warnings": []
       },
       "reimport": {
-        "sha256": "470855e26af3ce9fd23b4eec77359c8b0e204eddf16cfe228f01e9c12bc86d81",
+        "sha256": "b6a74c0b788b8c42b0a8c74d7172be86e841e80530a41f72d9e998550a92268b",
         "warnings": [],
         "validity": {
           "standard": true,
@@ -7043,7 +7043,7 @@
       "id": "33f-Trill-EndingOnGraceNote",
       "testClass": "feature",
       "import": {
-        "sha256": "a96f208cd796331b55fdd381d2390480d1f0de313605aff0f4dc43d79d2fa5c7",
+        "sha256": "d8e287fd1f9dda1b99016e26412179e6d5acfb68b52fd537e802572635df8d40",
         "warnings": [],
         "validity": {
           "standard": true,
@@ -7114,7 +7114,7 @@
         "warnings": []
       },
       "reimport": {
-        "sha256": "a96f208cd796331b55fdd381d2390480d1f0de313605aff0f4dc43d79d2fa5c7",
+        "sha256": "d8e287fd1f9dda1b99016e26412179e6d5acfb68b52fd537e802572635df8d40",
         "warnings": [],
         "validity": {
           "standard": true,
@@ -7615,7 +7615,7 @@
       "id": "34b-Colors",
       "testClass": "feature",
       "import": {
-        "sha256": "52dfc7717beb0cf17f7eb57d098e2e520d7e845cfff5a9b0d8626a3174155c69",
+        "sha256": "5f81f0a35e4f7f50c6da9b00a8f183186428de8fbff5a4b92b1011e55efe911d",
         "warnings": [
           "part P1, measure 11, staff 1: unsupported staff configuration (3 staff lines, line-detail visibility/style); not represented in MNX."
         ],
@@ -7745,7 +7745,7 @@
         "warnings": []
       },
       "reimport": {
-        "sha256": "001c617620aa1333ce904ffd16daea7f3c9fe47a9cae731fa87d5ad359c114b9",
+        "sha256": "6d8aaf55f53dc0eb1218199772a90f445d190cc49b3ae658f753707caa0ec634",
         "warnings": [],
         "validity": {
           "standard": false,
@@ -8205,7 +8205,7 @@
       "id": "41c-StaffGroups",
       "testClass": "feature",
       "import": {
-        "sha256": "8df3661836a7285c765adfaf18f03649a9314e14731e818247f81fb882cffa76",
+        "sha256": "9e7005d493b2c0ac9e5657e2a05957a7360f28ac1e95aedfc713ccb13c0c7132",
         "warnings": [],
         "validity": {
           "standard": false,
@@ -8292,7 +8292,7 @@
         "warnings": []
       },
       "reimport": {
-        "sha256": "8df3661836a7285c765adfaf18f03649a9314e14731e818247f81fb882cffa76",
+        "sha256": "9e7005d493b2c0ac9e5657e2a05957a7360f28ac1e95aedfc713ccb13c0c7132",
         "warnings": [],
         "validity": {
           "standard": false,
@@ -9087,7 +9087,7 @@
       "id": "42b-MultiVoice-MidMeasureClefChange",
       "testClass": "feature",
       "import": {
-        "sha256": "b1d0ab8182d82150c357c6a8660ee89f7f61b81d3654164c1c054e3d6b8d9f19",
+        "sha256": "c27fa005ed74cb12fd8be4258be44263b4c4ab5304c5178cccab69fe98cbd39a",
         "warnings": [],
         "validity": {
           "standard": true,
@@ -9166,7 +9166,7 @@
         "warnings": []
       },
       "reimport": {
-        "sha256": "b1d0ab8182d82150c357c6a8660ee89f7f61b81d3654164c1c054e3d6b8d9f19",
+        "sha256": "c27fa005ed74cb12fd8be4258be44263b4c4ab5304c5178cccab69fe98cbd39a",
         "warnings": [],
         "validity": {
           "standard": true,
@@ -9182,7 +9182,7 @@
       "id": "43a-PianoStaff",
       "testClass": "feature",
       "import": {
-        "sha256": "f056b54e3298d1160c606291ca2115c9dc7ca1ec36ea317f808f8a967abb74a8",
+        "sha256": "98aace28d45b786802ebd95fb6f27a3308d7745045605a59497e39f351f7ef6f",
         "warnings": [],
         "validity": {
           "standard": true,
@@ -9240,7 +9240,7 @@
         "warnings": []
       },
       "reimport": {
-        "sha256": "f056b54e3298d1160c606291ca2115c9dc7ca1ec36ea317f808f8a967abb74a8",
+        "sha256": "98aace28d45b786802ebd95fb6f27a3308d7745045605a59497e39f351f7ef6f",
         "warnings": [],
         "validity": {
           "standard": true,
@@ -9256,7 +9256,7 @@
       "id": "43b-MultiStaff-DifferentKeys",
       "testClass": "feature",
       "import": {
-        "sha256": "f056b54e3298d1160c606291ca2115c9dc7ca1ec36ea317f808f8a967abb74a8",
+        "sha256": "98aace28d45b786802ebd95fb6f27a3308d7745045605a59497e39f351f7ef6f",
         "warnings": [],
         "validity": {
           "standard": true,
@@ -9314,7 +9314,7 @@
         "warnings": []
       },
       "reimport": {
-        "sha256": "f056b54e3298d1160c606291ca2115c9dc7ca1ec36ea317f808f8a967abb74a8",
+        "sha256": "98aace28d45b786802ebd95fb6f27a3308d7745045605a59497e39f351f7ef6f",
         "warnings": [],
         "validity": {
           "standard": true,
@@ -9404,7 +9404,7 @@
       "id": "43d-MultiStaff-StaffChange",
       "testClass": "feature",
       "import": {
-        "sha256": "114aa658e1000c48518be3780ee3095aedca06b133ed7353071baad5974f0f7b",
+        "sha256": "d702cccfec5b108e4c8595e0602f2981cbe956362f952ff1066fd35a792bcacb",
         "warnings": [],
         "validity": {
           "standard": true,
@@ -9469,7 +9469,7 @@
         "warnings": []
       },
       "reimport": {
-        "sha256": "114aa658e1000c48518be3780ee3095aedca06b133ed7353071baad5974f0f7b",
+        "sha256": "d702cccfec5b108e4c8595e0602f2981cbe956362f952ff1066fd35a792bcacb",
         "warnings": [],
         "validity": {
           "standard": true,
@@ -9485,7 +9485,7 @@
       "id": "43e-Multistaff-ClefDynamics",
       "testClass": "feature",
       "import": {
-        "sha256": "59d377fa3019bac904777baddb24b57512e6800fa546fdd6e31ad17c53f908ea",
+        "sha256": "2caa8c003b0e89ad30ad95c6959b58aaf3252442af71426eaa47d498be912aeb",
         "warnings": [],
         "validity": {
           "standard": true,
@@ -9556,7 +9556,7 @@
         "warnings": []
       },
       "reimport": {
-        "sha256": "59d377fa3019bac904777baddb24b57512e6800fa546fdd6e31ad17c53f908ea",
+        "sha256": "2caa8c003b0e89ad30ad95c6959b58aaf3252442af71426eaa47d498be912aeb",
         "warnings": [],
         "validity": {
           "standard": true,
@@ -9659,7 +9659,7 @@
       "id": "43g-MultiStaff-PartSymbol",
       "testClass": "feature",
       "import": {
-        "sha256": "4c64da004ea6c4afae00608d3e5cb2c78d214fa36112b2324bed0dac09545c43",
+        "sha256": "296b5a299458bb2156246a70c8029d0fcb4df4977a0d5677331841f9da27d5d0",
         "warnings": [],
         "validity": {
           "standard": true,
@@ -9715,7 +9715,7 @@
         "warnings": []
       },
       "reimport": {
-        "sha256": "4c64da004ea6c4afae00608d3e5cb2c78d214fa36112b2324bed0dac09545c43",
+        "sha256": "296b5a299458bb2156246a70c8029d0fcb4df4977a0d5677331841f9da27d5d0",
         "warnings": [],
         "validity": {
           "standard": true,
@@ -9731,7 +9731,7 @@
       "id": "43h-MultiStaff-Chords",
       "testClass": "feature",
       "import": {
-        "sha256": "8a9502c219cc96a1fbf50082c7ec52c0ccd368a60e01430eab7d79fc6487389e",
+        "sha256": "91d530c3658d2cb5aab2a212805f772eed75a80bcf3c091f52178407c9dc2c67",
         "warnings": [],
         "validity": {
           "standard": true,
@@ -9793,7 +9793,7 @@
         "warnings": []
       },
       "reimport": {
-        "sha256": "8a9502c219cc96a1fbf50082c7ec52c0ccd368a60e01430eab7d79fc6487389e",
+        "sha256": "91d530c3658d2cb5aab2a212805f772eed75a80bcf3c091f52178407c9dc2c67",
         "warnings": [],
         "validity": {
           "standard": true,
@@ -9809,7 +9809,7 @@
       "id": "43i-MultiStaff-StaffChange-SingleVoice",
       "testClass": "feature",
       "import": {
-        "sha256": "432a6e893710baa41f7df272da248b62ee0f454e034d542536afacf44e7c3b49",
+        "sha256": "a277cab9288e52f027f62adeeadc997f14588509c5420bed1ba2b35be9745476",
         "warnings": [],
         "validity": {
           "standard": true,
@@ -9871,7 +9871,7 @@
         "warnings": []
       },
       "reimport": {
-        "sha256": "432a6e893710baa41f7df272da248b62ee0f454e034d542536afacf44e7c3b49",
+        "sha256": "a277cab9288e52f027f62adeeadc997f14588509c5420bed1ba2b35be9745476",
         "warnings": [],
         "validity": {
           "standard": true,
@@ -12356,7 +12356,7 @@
       "id": "61c-Lyrics-Pianostaff",
       "testClass": "feature",
       "import": {
-        "sha256": "497a89a953e9fb5a9f94060ddf231558942cd1f990f72498f7c79eaa1f340c33",
+        "sha256": "98e9034143bd83865fde1d78f59a9dcb3fa334b740ef549508a58d70ce65d953",
         "warnings": [],
         "validity": {
           "standard": true,
@@ -12424,7 +12424,7 @@
         "warnings": []
       },
       "reimport": {
-        "sha256": "497a89a953e9fb5a9f94060ddf231558942cd1f990f72498f7c79eaa1f340c33",
+        "sha256": "98e9034143bd83865fde1d78f59a9dcb3fa334b740ef549508a58d70ce65d953",
         "warnings": [],
         "validity": {
           "standard": true,
@@ -13337,7 +13337,7 @@
       "id": "71d-ChordsFrets-Multistaff",
       "testClass": "feature",
       "import": {
-        "sha256": "052e963512eb41bbfde70c99c72574bdd32f79bf23e3c56e2f7760fc5f249936",
+        "sha256": "ad7180c40875ea483e8e7822b54ffbd7a58c4005e88112e07595466b2a6e643c",
         "warnings": [],
         "validity": {
           "standard": true,
@@ -13398,7 +13398,7 @@
         "warnings": []
       },
       "reimport": {
-        "sha256": "052e963512eb41bbfde70c99c72574bdd32f79bf23e3c56e2f7760fc5f249936",
+        "sha256": "ad7180c40875ea483e8e7822b54ffbd7a58c4005e88112e07595466b2a6e643c",
         "warnings": [],
         "validity": {
           "standard": true,
@@ -13770,7 +13770,7 @@
       "id": "72b-TransposingInstruments-Full",
       "testClass": "feature",
       "import": {
-        "sha256": "70df077e444164293ed283bf97c500537a27fc036198855b80ec72f70a230be2",
+        "sha256": "b6a15b8b8408375fc85ec0516adb42da9185aedaba67d0dc97d5b0fadc7a3911",
         "warnings": [],
         "validity": {
           "standard": true,
@@ -13832,7 +13832,7 @@
         "warnings": []
       },
       "reimport": {
-        "sha256": "70df077e444164293ed283bf97c500537a27fc036198855b80ec72f70a230be2",
+        "sha256": "b6a15b8b8408375fc85ec0516adb42da9185aedaba67d0dc97d5b0fadc7a3911",
         "warnings": [],
         "validity": {
           "standard": true,
@@ -13926,7 +13926,7 @@
       "id": "72d-TransposingInstruments-scorePitch",
       "testClass": "feature",
       "import": {
-        "sha256": "80ff6c6a0432951a6a2ac57581592c789940d9c9e99d9346f280be607d7332cf",
+        "sha256": "e4773f52170a63d07abbcc4adb72fd3d744db0ba70b2ac89d013b1c6c2eada57",
         "warnings": [],
         "validity": {
           "standard": true,
@@ -13988,7 +13988,7 @@
         "warnings": []
       },
       "reimport": {
-        "sha256": "80ff6c6a0432951a6a2ac57581592c789940d9c9e99d9346f280be607d7332cf",
+        "sha256": "e4773f52170a63d07abbcc4adb72fd3d744db0ba70b2ac89d013b1c6c2eada57",
         "warnings": [],
         "validity": {
           "standard": true,
@@ -14004,7 +14004,7 @@
       "id": "73a-Percussion",
       "testClass": "feature",
       "import": {
-        "sha256": "962b1d8bdbd76d5fe6b35f1615faf96f6f37125f9aa49aac1ef5424f2beae3b9",
+        "sha256": "5935810acad4e5562d44778166eac3137c2fed578d9b520ed812bb55cc69c66a",
         "warnings": [
           "part P3, measure 1, staff 1: unsupported staff configuration (1 staff lines); not represented in MNX."
         ],
@@ -14111,7 +14111,7 @@
         "warnings": []
       },
       "reimport": {
-        "sha256": "962b1d8bdbd76d5fe6b35f1615faf96f6f37125f9aa49aac1ef5424f2beae3b9",
+        "sha256": "5935810acad4e5562d44778166eac3137c2fed578d9b520ed812bb55cc69c66a",
         "warnings": [],
         "validity": {
           "standard": false,

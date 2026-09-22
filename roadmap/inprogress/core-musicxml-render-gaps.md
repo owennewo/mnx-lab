@@ -64,6 +64,22 @@ proposal (topic: staff configuration); no arbitrary new standard fields. A futur
 implementation must preserve changes and visibility, then prove each affected measure
 in a browser capture. Do not classify this as an SVG-only defect.
 
+### P1: preserve ordinary clef coordinates
+
+The piano recapture after migration repair exposes a second cause: MusicXML F on line 4
+becomes MNX position -4, moving the bass clef below the staff. The converter's inverse
+uses absolute value, so its own round trip concealed this error. The independent oracle
+is the coordinate definition: [MusicXML line](https://www.w3.org/2021/06/musicxml40/musicxml-reference/elements/line/)
+counts from the bottom; MNX staff position counts half-spaces up from the middle.
+Thus G2 → -2, F4 → +2, C3 → 0, C4 → +2, G1 → -4.
+
+Acceptance: assert both directions against these explicit examples, conventional default
+lines when absent, and a line change without a sign change. Recapture the piano in both
+shells, regenerate converter matrix/oracles, and independently XSD-check the exports.
+This uses existing standard clef fields with no extension or runtime dependency.
+An MNX space/off-staff clef position has no MusicXML line 1–5 equivalent: explicitly
+warn and export the conventional line for its sign, rather than an invalid fraction.
+
 ### P1: contain unsupported-clef failures without blanking the score
 
 `12a-Clefs`, `34c-Font-Size`, `41c-StaffGroups` and `73a-Percussion` show a

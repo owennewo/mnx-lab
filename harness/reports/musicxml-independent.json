@@ -63,10 +63,10 @@
       "cases": 130,
       "import": {},
       "export": {
-        "match": 82,
+        "match": 83,
         "adapter-limited": 33,
         "different": 13,
-        "oracle-limited": 2
+        "oracle-limited": 1
       },
       "xsdValid": 127
     },
@@ -433,8 +433,20 @@
       "id": "scenario/lab/01-pitches/02-alto-and-tenor-clefs",
       "group": "scenario",
       "export": {
-        "status": "oracle-limited",
-        "reason": "ClefException: line number (second character) must be 1-5; do not use this function for clefs on special staves such as 'C0'"
+        "status": "match",
+        "match": true,
+        "expectedParts": 1,
+        "actualParts": 1,
+        "expectedMeasures": [
+          2
+        ],
+        "actualMeasures": [
+          2
+        ],
+        "missingCount": 0,
+        "extraCount": 0,
+        "missing": [],
+        "extra": []
       },
       "xsd": {
         "valid": true,

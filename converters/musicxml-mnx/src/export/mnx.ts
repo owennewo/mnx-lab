@@ -505,8 +505,10 @@ export function exportMusicXML(
       for (const [index, entry] of (measure.clefs ?? []).entries()) {
         const clef = entry.clef;
         const staff = entry.staff ?? index + 1;
-        if (!clef || clef.sign === activeClefByStaff.get(staff)) continue;
-        activeClefByStaff.set(staff, clef.sign);
+        if (!clef) continue;
+        const clefKey = `${clef.sign}/${clef.staffPosition}`;
+        if (clefKey === activeClefByStaff.get(staff)) continue;
+        activeClefByStaff.set(staff, clefKey);
         if (staff === 1) activeClefSign = clef.sign;
         const clefEl = doc.createElement('clef');
         if ((part.staves ?? 1) > 1) clefEl.setAttribute('number', `${staff}`);
@@ -515,7 +517,14 @@ export function exportMusicXML(
         clefEl.appendChild(signEl);
         if (clef.staffPosition !== undefined) {
           const lineEl = doc.createElement('line');
-          lineEl.textContent = `${Math.abs(clef.staffPosition)}`;
+          const line = (clef.staffPosition + 6) / 2;
+          const representable = Number.isInteger(line) && line >= 1 && line <= 5;
+          const fallback = clef.sign === 'G' ? 2 : clef.sign === 'F' ? 4 : clef.sign === 'TAB' ? 5 : 3;
+          if (!representable) warn(
+            `part ${part.id}, measure ${m + 1}, staff ${staff}: clef staffPosition ${clef.staffPosition} ` +
+            `has no MusicXML line 1–5 equivalent; using conventional line ${fallback}.`
+          );
+          lineEl.textContent = `${representable ? line : fallback}`;
           clefEl.appendChild(lineEl);
         }
         attributesEl.appendChild(clefEl);

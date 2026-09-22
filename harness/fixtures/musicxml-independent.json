@@ -55726,7 +55726,7 @@
     {
       "id": "scenario/lab/00-document/04-twelve-bar-blues",
       "exported": {
-        "sha256": "90a2584fa76f3f115793ff583f1de259453e1c0c7a123794e50f10d39dca8b47",
+        "sha256": "0ca40105e01d92b8445d842ae462ee5d43a0d7bfbd31d6ca2a3ca01ed8e8b488",
         "semantic": {
           "status": "ok",
           "table": {
@@ -57652,13 +57652,122 @@
     {
       "id": "scenario/lab/01-pitches/02-alto-and-tenor-clefs",
       "exported": {
-        "sha256": "45bfba9f2b7ec03ed71d94af48ffd59c62874f320d5c5ac675898ddba81af95a",
+        "sha256": "7f42fd7d28284880c8905c2720fcef98b2605ac8aa375c861e5349ec1dfe1578",
         "semantic": {
-          "status": "error",
-          "error": "ClefException: line number (second character) must be 1-5; do not use this function for clefs on special staves such as 'C0'",
-          "warnings": [
-            "The following exception took place in m. 1 in part Viola."
-          ]
+          "status": "ok",
+          "table": {
+            "parts": 1,
+            "measures": [
+              2
+            ],
+            "rows": [
+              {
+                "part": 0,
+                "staff": 1,
+                "voice": "1",
+                "measure": 0,
+                "onset": "0/1",
+                "duration": "1/1",
+                "pitch": "60/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 0,
+                "staff": 1,
+                "voice": "1",
+                "measure": 0,
+                "onset": "1/1",
+                "duration": "1/1",
+                "pitch": "64/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 0,
+                "staff": 1,
+                "voice": "1",
+                "measure": 0,
+                "onset": "2/1",
+                "duration": "1/1",
+                "pitch": "67/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 0,
+                "staff": 1,
+                "voice": "1",
+                "measure": 0,
+                "onset": "3/1",
+                "duration": "1/1",
+                "pitch": "57/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 0,
+                "staff": 1,
+                "voice": "1",
+                "measure": 1,
+                "onset": "0/1",
+                "duration": "1/1",
+                "pitch": "60/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 0,
+                "staff": 1,
+                "voice": "1",
+                "measure": 1,
+                "onset": "1/1",
+                "duration": "1/1",
+                "pitch": "64/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 0,
+                "staff": 1,
+                "voice": "1",
+                "measure": 1,
+                "onset": "2/1",
+                "duration": "1/1",
+                "pitch": "67/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 0,
+                "staff": 1,
+                "voice": "1",
+                "measure": 1,
+                "onset": "3/1",
+                "duration": "1/1",
+                "pitch": "57/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              }
+            ]
+          },
+          "warnings": []
         },
         "xsd": {
           "valid": true,
@@ -62128,7 +62237,7 @@
     {
       "id": "scenario/lab/24-tab-spec-gaps/01-tab-clef-rejected",
       "exported": {
-        "sha256": "d2db8acfa65df524245f02c4172b40ea41248efe41ec950017b9d21f1031f62d",
+        "sha256": "444eb11593763e69e6c1d835efe273b21b2bfbb760493e6105cbe1de88d11439",
         "semantic": {
           "status": "ok",
           "table": {
@@ -66830,7 +66939,7 @@
     {
       "id": "scenario/lab/31-score-text/07-directions-multi-staff",
       "exported": {
-        "sha256": "806374dcdb57e95f53ad220a4c705de5abc5f59b44fc907664e243e8275878b3",
+        "sha256": "36e4f81afbfb208e8bd2aa8e5603403be10038c671569c50275e397d91d25b01",
         "semantic": {
           "status": "ok",
           "table": {
@@ -69627,7 +69736,7 @@
     {
       "id": "scenario/lab/60-layout/02-coloured-marks-and-clef-forms",
       "exported": {
-        "sha256": "32bddc33769f1ab76c723c93e8ebd99c4f0bea26b6064867f8fe636e0012e585",
+        "sha256": "941319d17b845fccaff93e3d62733247e5a3c2c1a3e5f4b32720e62622eb7fc6",
         "semantic": {
           "status": "ok",
           "table": {
@@ -71221,7 +71330,7 @@
     {
       "id": "scenario/spec/clef-changes",
       "exported": {
-        "sha256": "65fac9f77ea397d59a2b99c9733bbc91e2288db7936d322afd1a87e30fd398de",
+        "sha256": "243675ee054b740c5a1f89f6890cb863bf5b238b38dd59cac058761c5309a79f",
         "semantic": {
           "status": "ok",
           "table": {
@@ -73582,7 +73691,7 @@
     {
       "id": "scenario/spec/multiple-layouts",
       "exported": {
-        "sha256": "ff152b1db5027e82843a655527b8dd78ff289f3cfd521cc341eda6056ed2fb3d",
+        "sha256": "24bd229978b14e76448d6eac817a4a1025c315a071279564eb5ba5578f46e6b3",
         "semantic": {
           "status": "ok",
           "table": {
@@ -93599,7 +93708,7 @@
         }
       },
       "exported": {
-        "sha256": "90f10b88a1d4914979e93ae6c25f5b3a92020d2c55b8c04803393ed6135c4474",
+        "sha256": "1a10a0e00ad463d34dc8fe8dd26364fd8f04915175f25ff4e0eb2e94f6573623",
         "semantic": {
           "status": "ok",
           "table": {
