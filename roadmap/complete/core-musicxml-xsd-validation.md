@@ -1,7 +1,7 @@
 # MusicXML 4.0 export validation
 
-> **Status: built, 2026-09-22.** Item 15 of
-> [the MusicXML campaign](core-campaign-musicxml.md).
+> **Status: complete, 2026-09-22.** Item 15 of
+> [the MusicXML campaign](../inprogress/core-campaign-musicxml.md).
 
 ## Agreement before implementation
 

@@ -1,0 +1,94 @@
+{
+  "status": "in progress; selected findings only, not full feature coverage",
+  "author": "agent assessment",
+  "features": [
+    {
+      "id": "piano-independent-staves",
+      "fixture": "43a-PianoStaff",
+      "view": "notation",
+      "verdict": "incorrect",
+      "cause": [
+        "importer"
+      ],
+      "evidence": "Original has two pitches on treble/bass staves and no strings; imported document has one pitch plus standard guitar tuning. No import warning.",
+      "proposal": "core-musicxml-render-gaps"
+    },
+    {
+      "id": "fractional-pitch",
+      "fixture": "01d-Pitches-Microtones",
+      "view": "notation",
+      "verdict": "incorrect",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "evidence": "Alterations -1.5/-0.5/0.5/1.5 become -1/0/0/1 twice, without warning. Published pitch.alter is integer. Ordinary accidentals in capture.",
+      "proposal": "core-musicxml-render-gaps"
+    },
+    {
+      "id": "staff-line-configurations",
+      "fixture": "14a-StaffDetails-LineChanges",
+      "view": "notation",
+      "verdict": "missing",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "evidence": "Source line counts and per-line visibility are absent from imported data; both parts display five lines. No import warning.",
+      "proposal": "core-musicxml-render-gaps"
+    },
+    {
+      "id": "unsupported-clef-containment",
+      "fixtures": [
+        "12a-Clefs",
+        "34c-Font-Size",
+        "41c-StaffGroups",
+        "73a-Percussion"
+      ],
+      "view": "notation (and Both for staff groups)",
+      "verdict": "blocked",
+      "cause": [
+        "importer",
+        "layout/SVG engine"
+      ],
+      "evidence": "Both shells record a staffPosition property-access failure. Percussion import has unsupported clef shape. Whole projection absent; capability of individual absent features unresolved.",
+      "proposal": "core-musicxml-render-gaps"
+    },
+    {
+      "id": "studio-untitled-version-editability",
+      "fixtures": [
+        "01a-Pitches-Pitches",
+        "02a-Rests-Durations",
+        "61a-Lyrics"
+      ],
+      "shell": "studio",
+      "tasks": {
+        "create": "blocked",
+        "change": "blocked",
+        "remove": "blocked",
+        "undoRedo": "blocked",
+        "persist": "blocked"
+      },
+      "cause": [
+        "shell integration",
+        "persistence/export"
+      ],
+      "evidence": "Versions \u2192 View opens unchanged XML; Make current refuses A piece needs a title. Binding exists but editing is suspended; not evidence of missing shared editing operations.",
+      "proposal": "core-musicxml-write-gaps"
+    },
+    {
+      "id": "chord-selected-note",
+      "fixture": "21a-Chord-Basic",
+      "shell": "workbench",
+      "tasks": {
+        "create": "supported",
+        "change": "supported",
+        "remove": "supported",
+        "undoRedo": "supported",
+        "persist": "partial"
+      },
+      "scope": "One selected note: +1 semitone; delete while preserving the other chord note; create A4 at vacated staff position. Exact undo/redo and unrelated data preserved. All states validate. JSON copy + external file save + MNX Open gives exact equality; native MusicXML download unassessed.",
+      "evidence": "harness/fixtures/musicxml-editor-evidence/write-chord/report.json"
+    }
+  ]
+}

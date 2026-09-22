@@ -1,7 +1,7 @@
 # MusicXML element ordering — defects found by the XSD oracle
 
-> **Status: built, 2026-09-22.** Item 20 of
-> [the MusicXML campaign](core-campaign-musicxml.md).
+> **Status: complete, 2026-09-22.** Item 20 of
+> [the MusicXML campaign](../inprogress/core-campaign-musicxml.md).
 
 ## Agreement before implementation
 

@@ -1,0 +1,67 @@
+{
+  "fixture": "21a-Chord-Basic",
+  "shell": "workbench",
+  "applicationCommit": "b534a73544c046ee25454e713995262f1e5a00a7",
+  "scope": "Selected note of imported two-note chord: semitone change, remove, create; keyboard undo/redo; JSON clipboard/MNX reopen; MusicXML export unassessed",
+  "actions": [
+    {
+      "code": "ArrowUp",
+      "key": "ArrowUp",
+      "modifiers": 1
+    },
+    {
+      "code": "KeyZ",
+      "key": "z",
+      "modifiers": 2
+    },
+    {
+      "code": "KeyY",
+      "key": "y",
+      "modifiers": 2
+    },
+    {
+      "code": "Delete",
+      "key": "Delete",
+      "modifiers": 0
+    },
+    {
+      "code": "KeyZ",
+      "key": "z",
+      "modifiers": 2
+    },
+    {
+      "code": "KeyY",
+      "key": "y",
+      "modifiers": 2
+    },
+    {
+      "code": "KeyN",
+      "key": "n",
+      "modifiers": 0
+    },
+    {
+      "code": "KeyZ",
+      "key": "z",
+      "modifiers": 2
+    },
+    {
+      "code": "KeyY",
+      "key": "y",
+      "modifiers": 2
+    }
+  ],
+  "browser": {
+    "protocolVersion": "1.3",
+    "product": "Chrome/153.0.8010.36",
+    "revision": "@507c6ee3e2f3b2ca0e660547e5b9ea4820c67f4c",
+    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+    "jsVersion": "15.3.76.10"
+  },
+  "persistence": {
+    "route": "JSON panel → Copy document → save clipboard as copied.mnx.json → Open…",
+    "outcome": "exact document equality",
+    "note": "Saving clipboard text to a file is performed by the harness, not a built-in Workbench download command; no MusicXML export claimed."
+  },
+  "outcome": "Selected note: +1 semitone, remove, and create A4 at the vacated staff position; unrelated data preserved; each exactly undoes/redoes; all states schema-valid. Whole-document JSON clipboard and MNX reopen preserve the final state.",
+  "consoleErrors": []
+}

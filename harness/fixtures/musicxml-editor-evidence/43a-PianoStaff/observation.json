@@ -1,0 +1,78 @@
+{
+  "id": "43a-PianoStaff",
+  "sourceSha256": "820450630ce05ea3bbc53c5ac63c0a8ac6597d7db4c232201d54f0ca162d1503",
+  "testClass": "feature",
+  "description": "A simple piano staff, i.e., two voices, each on a separate staff.",
+  "views": [
+    {
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [],
+      "scrollWidth": 750,
+      "scrollHeight": 691,
+      "clientWidth": 750,
+      "clientHeight": 691,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    },
+    {
+      "view": "tab",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [],
+      "scrollWidth": 750,
+      "scrollHeight": 691,
+      "clientWidth": 750,
+      "clientHeight": 691,
+      "screenshots": [
+        "tab-0-0.png"
+      ]
+    },
+    {
+      "view": "both",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [],
+      "scrollWidth": 750,
+      "scrollHeight": 691,
+      "clientWidth": 750,
+      "clientHeight": 691,
+      "screenshots": [
+        "both-0-0.png"
+      ]
+    }
+  ],
+  "importError": null,
+  "warnings": [],
+  "importedDocumentSha256": "dd6de766af0a2883c8c2b2c057476ae15a8bbb6271ac75991ebc3ac24f8ea4d1",
+  "editorBound": true,
+  "availableViews": [
+    "notation",
+    "tab",
+    "both"
+  ],
+  "consoleErrors": []
+}

@@ -1,0 +1,37 @@
+{
+  "id": "01d-Pitches-Microtones",
+  "sourceSha256": "1d19f51757677182996d9bc8c58b78c0a91cd031197b75c0273aa6f77de3e65c",
+  "testClass": "feature",
+  "description": "Some microtones: c flat-and-a-half, d half-flat, e half-sharp, f sharp-and-a-half; once in the lower and once in the upper region of the staff.",
+  "views": [
+    {
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0,
+          1
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [],
+      "scrollWidth": 750,
+      "scrollHeight": 691,
+      "clientWidth": 750,
+      "clientHeight": 691,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "importError": null,
+  "warnings": [],
+  "importedDocumentSha256": "5fb4be0ee0c8e884d69fe191a5d43a51ae78cc6a83255cd143b4c9d46d4af3ab",
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

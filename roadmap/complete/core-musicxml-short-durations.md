@@ -1,7 +1,7 @@
 # MusicXML short durations — divisions must represent every written value
 
-> **Status: built, 2026-09-22.** Campaign item 21.
-> [MusicXML campaign](core-campaign-musicxml.md).
+> **Status: complete, 2026-09-22.** Campaign item 21.
+> [MusicXML campaign](../inprogress/core-campaign-musicxml.md).
 
 ## Agreement before implementation
 

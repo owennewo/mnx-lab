@@ -45,9 +45,10 @@ proposals that name their campaign.
 
 ### proposed/
 
-- **[core-musicxml-write-assessment.md](proposed/core-musicxml-write-assessment.md)** — MusicXML campaign item 19: assess create/change/remove UX for each corpus feature, undo/redo and persistence; distinguish missing edit operations from missing UI surfaces and produce an evidenced gap proposal.
+- **[core-musicxml-render-gaps.md](proposed/core-musicxml-render-gaps.md)** — item 22: four evidenced import/representation/render-containment gaps from the ongoing browser assessment.
+- **[core-musicxml-write-gaps.md](proposed/core-musicxml-write-gaps.md)** — item 23: let a user resolve missing title metadata when making an imported version editable in Studio.
 
-- **[core-musicxml-render-assessment.md](proposed/core-musicxml-render-assessment.md)** — MusicXML campaign item 18: assess each applicable external fixture’s features through the desktop editor, separate import and representation losses from rendering defects, and produce an evidenced, bounded proposal to fill the gaps.
+
 
 
 
@@ -140,21 +141,19 @@ back up to `proposed/` the moment it is.
 
 ### inprogress/
 
-- **[core-musicxml-short-durations.md](inprogress/core-musicxml-short-durations.md)** — item 21 built: exact short-note divisions, 340/344 exports XSD-valid, and three additional independent export matches.
+- **[core-musicxml-render-assessment.md](inprogress/core-musicxml-render-assessment.md)** — MusicXML campaign item 18: assess each applicable external fixture’s features through the desktop editor, separate import and representation losses from rendering defects, and produce an evidenced, bounded proposal to fill the gaps.
 
-- **[core-musicxml-xsd-ordering.md](inprogress/core-musicxml-xsd-ordering.md)** — item 20 built: pitch/tuning and direction grammar fixes; 336/344 generated exports now XSD-valid, unchanged semantic verdicts.
+- **[core-musicxml-write-assessment.md](inprogress/core-musicxml-write-assessment.md)** — MusicXML campaign item 19: assess create/change/remove UX for each corpus feature, undo/redo and persistence; distinguish missing edit operations from missing UI surfaces and produce an evidenced gap proposal.
 
-- **[core-musicxml-differential-oracle.md](inprogress/core-musicxml-differential-oracle.md)** —
-  MusicXML item 14 built: independent music21 note tables, exact rational comparison,
-  explicit adapter limitations and live/cached evidence across 344 cases.
-- **[core-musicxml-xsd-validation.md](inprogress/core-musicxml-xsd-validation.md)** —
-  MusicXML item 15 built: pinned MusicXML 4.0 schemas and independent local-only XSD
-  checks for every generated corpus export; existing failures are explicit findings.
+
+
+
+
 
 - **[core-campaign-musicxml.md](inprogress/core-campaign-musicxml.md)** — active campaign:
   zero-dependency MusicXML import/export; 183 pinned external fixtures now join the
-  27-pair W3C layout oracle. Independent semantic and XSD checks remain, followed by
-  render and write-path assessments that produce evidenced gap proposals.
+  27-pair W3C layout oracle. Independent semantic and XSD checks are built; ongoing
+  render and write-path assessments have complete browser sweeps and initial gap proposals; detailed feature review remains.
 
 
 
@@ -500,6 +499,18 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+
+- **[core-musicxml-xsd-validation.md](complete/core-musicxml-xsd-validation.md)** —
+  MusicXML item 15 built: pinned MusicXML 4.0 schemas and independent local-only XSD
+  checks for every generated corpus export; existing failures are explicit findings.
+
+- **[core-musicxml-differential-oracle.md](complete/core-musicxml-differential-oracle.md)** —
+  MusicXML item 14 built: independent music21 note tables, exact rational comparison,
+  explicit adapter limitations and live/cached evidence across 344 cases.
+
+- **[core-musicxml-xsd-ordering.md](complete/core-musicxml-xsd-ordering.md)** — item 20 built: pitch/tuning and direction grammar fixes; 336/344 generated exports now XSD-valid, unchanged semantic verdicts.
+
+- **[core-musicxml-short-durations.md](complete/core-musicxml-short-durations.md)** — item 21 built: exact short-note divisions, 340/344 exports XSD-valid, and three additional independent export matches.
 
 - **[core-musicxml-external-corpus.md](complete/core-musicxml-external-corpus.md)** —
   item 13 complete: complete licensed corpus, stable inventory and an honest import/export

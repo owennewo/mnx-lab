@@ -1,7 +1,7 @@
 # MusicXML write-path assessment — can a person author the data?
 
-> **Status: proposed.** Side quest, item 19 of
-> [core-campaign-musicxml.md](../inprogress/core-campaign-musicxml.md). Serves the implementation loop.
+> **Status: in progress, 2026-09-22.** Side quest, item 19 of
+> [core-campaign-musicxml.md](core-campaign-musicxml.md). Serves the implementation loop.
 > Requested 2026-09-22 as a companion to the
 > [render assessment](core-musicxml-render-assessment.md): for each corpus feature,
 > does the desktop editor offer the means and UX surface to create, change and remove
@@ -130,3 +130,10 @@ rules for subsequent implementation. Fixes are separate work, not part of this a
 Complete when the inventory has operation-level dispositions, supported claims have real
 UI and data evidence, blockers are explicit, and the gap proposal is linked. If there are
 no actionable gaps, publish the evidence and conclusion rather than inventing a backlog.
+
+## Initial evidence landed, 2026-09-22
+
+See [the assessment report](../../docs/musicxml-editor-assessment.md) for the complete
+both-shell browser sweep, selected findings, retained evidence and reproduction. The
+requested initial gap proposal exists, but detailed feature/task coverage remains open.
+This item is not complete.

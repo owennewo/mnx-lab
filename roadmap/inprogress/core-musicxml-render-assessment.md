@@ -1,6 +1,6 @@
 # MusicXML render assessment — from external fixtures to an evidenced gap proposal
 
-> **Status: proposed.** Side quest, item 18 of
+> **Status: in progress, 2026-09-22.** Side quest, item 18 of
 > [core-campaign-musicxml.md](../inprogress/core-campaign-musicxml.md). Serves the implementation loop.
 > Requested 2026-09-22: if each external MusicXML fixture were loaded into our editor,
 > would each feature render correctly? The deliverable is an assessment and a new,
@@ -48,7 +48,7 @@ on expected rejection or diagnostic behavior. Neither counts as a rendering pass
 Exercise notation for all applicable scores, and tab/both only when the document declares
 known strings and the view is relevant. Never assume guitar tuning to manufacture a view.
 
-Use the actual desktop editor file-open path with the shared importer and editor/viewer
+Use the actual workbench and studio mouse/keyboard browser editor file-open path with the shared importer and editor/viewer
 surface. Record shell, viewport, staff scale, view, browser version and application commit.
 Touch editing is out of scope. Headless batch rendering may accelerate the assessment,
 but cannot substitute for proving that the corresponding fixture loads and displays
@@ -112,3 +112,10 @@ feature verdicts and causes are evidenced; unresolved cases and exclusions are e
 and the new gap proposal is linked from the roadmap and campaign. Append findings to the
 campaign's progress log. This item can finish with known gaps: fixing the selected gaps is
 what the resulting proposal is for.
+
+## Initial evidence landed, 2026-09-22
+
+See [the assessment report](../../docs/musicxml-editor-assessment.md) for the complete
+both-shell browser sweep, selected findings, retained evidence and reproduction. The
+requested initial gap proposal exists, but detailed feature/task coverage remains open.
+This item is not complete.

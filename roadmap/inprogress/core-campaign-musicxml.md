@@ -136,14 +136,16 @@ deliberately **not** enumerated in advance: item 8 decides them from evidence.
 | 11 | [`.mxl` container](core-musicxml-mxl.md) | **Not the copy-paste it looks like.** `converters/guitarpro-mnx/src/gpif/container.ts` is `node:zlib` `inflateRawSync`/`crc32` — synchronous, no browser branch; the browser path is `DecompressionStream`, which is async, so the read API becomes async and that ripples through import. Also needs a shared converter package, which `converters/` does not have yet. Read `META-INF/container.xml`; stored-zip emission on write. | zero-dep | cross-checked against Python's zipfile, both directions | **built 2026-09-04** |
 | 12 | [Multi-staff parts](core-musicxml-staves.md) | `<staves>`, a `<clef number>` per staff tracked independently, `<staff>` per note. Grand staff round trips. The matrix did **not** move, because `staff` is shared with `layouts` — a def used by two features scores as the worse of them. | accuracy | the corpus, via spec/grand-staff | **built 2026-09-04** |
 | 13 | [W3C/LilyPond corpus](../complete/core-musicxml-external-corpus.md) | Complete pinned 183-fixture suite, MIT notices, source inventory and deterministic import/export observation report. Keeps invalid and compatibility inputs explicit; does not turn our imports into independent ground truth. | accuracy | pinned upstream bytes + observation baseline | **built 2026-09-22** |
-| 14 | [Differential oracle](core-musicxml-differential-oracle.md) | Locked dev-only music21 reads original sources and our exports; independent MNX adapter compares rational note tables. 344 cases with explicit mismatch/limitation verdicts and reproducible captures. | accuracy | independent external tools | **built 2026-09-22** |
-| 15 | [XSD export validation](core-musicxml-xsd-validation.md) | Verbatim pinned MusicXML 4.0 XSD; local-only lxml validation of every generated export across external fixtures, W3C comparisons, scenarios and reference scores. Existing failures recorded explicitly. | accuracy | independent external tools | **built 2026-09-22** |
+| 14 | [Differential oracle](../complete/core-musicxml-differential-oracle.md) | Locked dev-only music21 reads original sources and our exports; independent MNX adapter compares rational note tables. 344 cases with explicit mismatch/limitation verdicts and reproducible captures. | accuracy | independent external tools | **built 2026-09-22** |
+| 15 | [XSD export validation](../complete/core-musicxml-xsd-validation.md) | Verbatim pinned MusicXML 4.0 XSD; local-only lxml validation of every generated export across external fixtures, W3C comparisons, scenarios and reference scores. Existing failures recorded explicitly. | accuracy | independent external tools | **built 2026-09-22** |
 | 16 | [Browser import surface](core-musicxml-browser-import.md) | MusicXML file import in the workbench, parallel to the Guitar Pro worker: `.musicxml`/`.mxl`/`.xml` through **Open…**, in a lazy worker of its own that imports the converter's core modules directly (the package index re-exports Node-only `fs`). The worker protocol is now format-neutral. | zero-dep | `smoke:csp`, extended to open a `.musicxml`, a deflated `.mxl` and a `.gpx` through the real file input under the deployed CSP | **built 2026-09-11** |
 | 17 | [Dynamics](core-musicxml-dynamics.md) | `<dynamics>` and `<wedge>`, both directions. The enum values map to `value`; the sforzando family to MNX's accent structure, whose parts concatenate to exactly the MusicXML element name (s+f+z = `sfz`), so one table serves both directions; the rest to SMuFL `glyphs`. Hairpins pair by wedge `number`, item 2's shape again. Relative dynamics have no MusicXML element and warn. | accuracy | the corpus's dynamics scenarios + round trip (no W3C comparison carries a dynamic) | **built 2026-09-10** |
-| 18 | [Render assessment](../proposed/core-musicxml-render-assessment.md) | Side quest over item 13’s pinned external corpus: load fixtures through the desktop editor, assess each visible feature, isolate importer/representation/rendering/integration gaps, and produce an evidenced, bounded render-gap proposal. | accuracy | upstream feature descriptions + semantic checks + visual references and editor captures | **proposed 2026-09-22** |
-| 19 | [Write-path assessment](../proposed/core-musicxml-write-assessment.md) | Companion to item 18: assess whether desktop users can create, inspect, change and remove each corpus feature through the editor, with undo/redo and separate persistence evidence; produce a bounded proposal for missing operations and UX surfaces. | accuracy | real UI tasks + structural before/after checks + applicable save/reopen | **proposed 2026-09-22** |
-| 20 | [XSD element ordering](core-musicxml-xsd-ordering.md) | Pitch/tuning alterations before octaves; separate rehearsal and section directions. XSD-valid exports 292 → 336/344, semantic verdicts unchanged. | accuracy | independent XSD + regression tests | **built 2026-09-22** |
-| 21 | [Exact short durations](core-musicxml-short-durations.md) | Divisions account for written-duration denominators as well as tuplets; no zero-length metric notes in the measured corpus. XSD validity 336 → 340/344; three external export note tables now match. | accuracy | music21 + XSD + regression tests | **built 2026-09-22** |
+| 18 | [Render assessment](core-musicxml-render-assessment.md) | Side quest over item 13’s pinned external corpus: load fixtures through the desktop editor, assess each visible feature, isolate importer/representation/rendering/integration gaps, and produce an evidenced, bounded render-gap proposal. | accuracy | upstream feature descriptions + semantic checks + visual references and editor captures | **in progress 2026-09-22** |
+| 19 | [Write-path assessment](core-musicxml-write-assessment.md) | Companion to item 18: assess whether desktop users can create, inspect, change and remove each corpus feature through the editor, with undo/redo and separate persistence evidence; produce a bounded proposal for missing operations and UX surfaces. | accuracy | real UI tasks + structural before/after checks + applicable save/reopen | **in progress 2026-09-22** |
+| 20 | [XSD element ordering](../complete/core-musicxml-xsd-ordering.md) | Pitch/tuning alterations before octaves; separate rehearsal and section directions. XSD-valid exports 292 → 336/344, semantic verdicts unchanged. | accuracy | independent XSD + regression tests | **built 2026-09-22** |
+| 21 | [Exact short durations](../complete/core-musicxml-short-durations.md) | Divisions account for written-duration denominators as well as tuplets; no zero-length metric notes in the measured corpus. XSD validity 336 → 340/344; three external export note tables now match. | accuracy | music21 + XSD + regression tests | **built 2026-09-22** |
+| 22 | [Render gaps](../proposed/core-musicxml-render-gaps.md) | Preserve piano staves; diagnose microtonal/staff-line losses; contain unsupported-clef projection failures. Four initial evidenced gaps, not an exhaustive backlog. | accuracy | original XML + imported MNX + both-shell captures | **proposed 2026-09-22** |
+| 23 | [Write gaps](../proposed/core-musicxml-write-gaps.md) | Resolve missing title metadata before making an imported Studio version current, without bypassing the shared editor or GP storage policy. | authoring | real Versions controls + refusal + persistence checks | **proposed 2026-09-22** |
 | — | Feature parity | Dynamics, wedges, spanners, ottavas, articulations, SMuFL glyph names, percussion, layout breaks. **Deliberately unenumerated**: item 8 turns these into a ranked queue with evidence, and each becomes its own row when picked up. Note the schema already has `dynamic-*`, `ottava`, `slur` and `wedge-type` as standard objects — but **no pedal def**, so pedal is contract clause 2's first real test. | accuracy | 1 + 2 + 3 | not yet rows |
 
 ### Item 8's derivation rule
@@ -177,6 +179,27 @@ exactly as `verified` already works here. No backend: a generated JSON artifact
 committed to the repo, like `worker/models.json`.
 
 ## Progress + learnings
+
+### 2026-09-22 — items 18/19: both-shell sweeps and first bounded authoring evidence
+
+[Assessment and reproduction](../../docs/musicxml-editor-assessment.md): all 183 sources
+through both shells, 219 view observations each, 245 Workbench and 432 Studio screenshot
+tiles. Imported documents agree across shells. Four fixtures fail entire projections;
+nonempty output elsewhere is not a feature pass. Selected source/document/capture review
+finds piano-note loss plus invented tuning, truncated fractional pitches, and discarded
+staff-line configurations. Items 22/23 contain the requested initial gap proposals.
+
+Studio can view the unmodified XML as an operator-imported original via Versions, but
+177 untitled sources fail Make current and remain uneditable; six succeed. A separate
+normal Studio editor smoke passes GP save/reload. Workbench's imported chord supports
+actual keyboard change/remove/create with exact undo/redo, unrelated-data preservation,
+schema validation and JSON clipboard → MNX reopen. These scopes do not imply arbitrary
+feature support. Both assessments stay in progress pending variant-level review and tasks.
+
+Lessons: wait for paint before reading diagnostics; tile the shell's actual scroll
+container; a bound Studio editor may be suspended on a viewed version; the importer may
+fabricate the strings that make Tab look available. A source-level capability audit must
+not mistake those artifacts for source intent or user-facing editing support.
 
 ### 2026-09-22 — item 21: denominators exist outside tuplets too
 
@@ -231,7 +254,7 @@ compatibility fixtures are scored separately. [Report and reproduction](../../do
 
 ### 2026-09-22 — write-path assessment side quest scoped
 
-[Item 19](../proposed/core-musicxml-write-assessment.md) complements rendering coverage with authoring
+[Item 19](core-musicxml-write-assessment.md) complements rendering coverage with authoring
 coverage over the same fixture/feature inventory. A feature may import and render without
 any way to create or change it; an internal operation may exist without a reachable UI.
 The assessment separates those failures and also records undo/redo and save/reopen losses.
@@ -240,7 +263,7 @@ and UX surfaces. No assessment has run yet.
 
 ### 2026-09-22 — render assessment side quest scoped
 
-[Item 18](../proposed/core-musicxml-render-assessment.md) asks whether the external MusicXML fixtures
+[Item 18](core-musicxml-render-assessment.md) asks whether the external MusicXML fixtures
 actually display their intended features when opened in our editor. Its output is a
 per-feature assessment and a new gap-filling proposal, not fixes during the audit. Import
 loss must be isolated before attributing missing marks to the renderer; screenshots alone

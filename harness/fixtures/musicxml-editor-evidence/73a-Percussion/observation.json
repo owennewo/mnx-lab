@@ -1,0 +1,37 @@
+{
+  "id": "73a-Percussion",
+  "sourceSha256": "755137ada60c85f314e85ece2cd00cbc17102cda73dde0567191f249a7545e88",
+  "testClass": "feature",
+  "description": "Three types of percussion staves: A five-line staff with bass clef for Timpani, a five-line staff with percussion clef, and a one-line percussion staff with only unpitched notes.",
+  "views": [
+    {
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [
+        {
+          "pane": "notation",
+          "message": "Cannot read properties of undefined (reading 'staffPosition')"
+        }
+      ],
+      "systemRows": null,
+      "svgCount": 0,
+      "diagnosticTitles": [],
+      "scrollWidth": 750,
+      "scrollHeight": 691,
+      "clientWidth": 750,
+      "clientHeight": 691,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "importError": null,
+  "warnings": [],
+  "importedDocumentSha256": "962b1d8bdbd76d5fe6b35f1615faf96f6f37125f9aa49aac1ef5424f2beae3b9",
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}
