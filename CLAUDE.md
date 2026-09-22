@@ -152,9 +152,9 @@ worker: model + assist only                (sibling ceiling; DOM-free)
 violation a red build. **`workbench/` and `entries/` are leaves — nothing imports them**;
 anything two shells want is first *promoted* into `elements/` or below, a deliberate,
 reviewed move. `model`/`engine`/`audio` stay importable from Node — no DOM at module top
-level; `engine/headless.ts` is the guarantee and the harness's entry. Lit is load-bearing
-**only in `elements/`** (shadow DOM is the embeddability story); studio's framework is
-deliberately undecided. **The editor's mount is a host binding** — `bindEditor` in
+level; `engine/headless.ts` is the guarantee and the harness's entry. Lit implements `elements/`
+(shadow DOM is the embeddability story) and both shells; the model, engine, audio and
+editing logic remain framework-independent. **The editor's mount is a host binding** — `bindEditor` in
 `src/elements/editorHost.ts`, beside `bindPlayback` — and it is the ONE editor surface: both
 shells sit on it, and what a host keeps (which session is in force, the neighbouring
 document, its own inspector words) plugs in through the binding's options, never a second
@@ -345,8 +345,9 @@ differential-parity oracle for its tests (`src/import/gp.ts`, `src/export/gp.ts`
 live paths are `cleanRoom.ts` and `gpif/fromMnx.ts`), and must never reach `src/` or any
 bundle.** Shared fixtures in
 `converters/fixtures/` — **authored as Guitar Pro** (`.gpx` sources; `.mnx.json` derived
-via `guitarpro-mnx --import`, `.xml` via `musicxml-mnx --export`). Both round trips are
-lossless and tested. Five traps, all of which have bitten:
+via `guitarpro-mnx --import`, `.xml` via `musicxml-mnx --export`). Reference-fixture round trips are tested, with normalization accounted for; this is not a
+corpus-wide losslessness guarantee. The [round-trip register](harness/fixtures/roundtrip-register.json)
+records the measured Guitar Pro storage losses. Six traps, all of which have bitten:
 
 - Note ids are legitimately rewritten by the MusicXML split — compare technique targets
   by **resolution, not string equality**.

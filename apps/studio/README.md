@@ -13,8 +13,9 @@ workbench (`src/workbench/`), which is the lab's internal review instrument. The
 never bleed together; that guard is structural, not vigilance.
 
 Sign in, browse the library and open a piece in the shared score frame. Tags and
-recording attachments can be edited and persisted; score editing is still a later
-item. [Recording management](../../docs/studio-recordings.md) adds YouTube links,
+recording attachments can be edited and persisted. On devices with a fine primary pointer,
+the shared editor edits the score and checkpoints new Guitar Pro renditions; touch devices
+play without binding the editor. [Recording management](../../docs/studio-recordings.md) adds YouTube links,
 audio uploads, selected-recording details, deletion and read-only sync statistics to the piece page.
 
 ## Shape
@@ -56,7 +57,8 @@ the one persistence a shell may own without a backend decision.
 ## The decisions that starting settled
 
 - **Framework: Lit.** The only surfaces studio consumes are Lit custom elements, the
-  decorator configuration already exists, and the editor will arrive as a Lit element.
+  decorator configuration already exists, and the editor mounts through the shared
+  `bindEditor` host binding in `elements/`.
 - **Hosting: the same Worker, a path prefix.** D1 and R2 already bind to the `mnx-lab`
   Worker (storage campaign, contract clause 2); studio's pages sit beside them at
   `/studio/`, and the Worker redirects `/` there. One config, one deploy, one hostname.

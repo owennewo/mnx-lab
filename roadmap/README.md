@@ -45,7 +45,6 @@ proposals that name their campaign.
 
 ### proposed/
 
-- **[lab-current-docs-consistency.md](proposed/lab-current-docs-consistency.md)** — reconcile current capability claims and guard local reference links.
 
 
 - **[studio-player-practice.md](proposed/studio-player-practice.md)** — campaign item 13,
@@ -149,6 +148,8 @@ back up to `proposed/` the moment it is.
   the best precedent.
 
 ### inprogress/
+
+- **[lab-current-docs-consistency.md](inprogress/lab-current-docs-consistency.md)** — reconcile current capability claims and guard local reference links.
 
 
 - **[studio-sync-rederive.md](complete/studio-sync-rederive.md)** — **built 2026-09-17, complete

@@ -9,7 +9,8 @@ workbench is public at [/workbench/](https://mnx-lab.totai.uk/workbench/)).
   committed layout golden and human-verified engraving status.
 - **A rendering engine** (`src/engine/`) — custom SMuFL/SVG, no notation libraries —
   whose output ships as reference engravings on the MNX spec site.
-- **Converters** (`converters/`) — lossless MusicXML ⇄ MNX and Guitar Pro ⇄ MNX.
+- **Converters** (`converters/`) — MusicXML ⇄ MNX and Guitar Pro ⇄ MNX, with
+  [measured round-trip limitations](docs/mnx-extensions.md#what-the-round-trips-do-and-do-not-preserve).
 - **A spec-loop pipeline** (`spec/`) — `sync:spec` mirrors the standard down;
   `push:proposal` packages our proposals (schema diff + scenarios + engravings) back up
   in the spec's native fixture format.
@@ -19,7 +20,7 @@ workbench is public at [/workbench/](https://mnx-lab.totai.uk/workbench/)).
 ```bash
 git submodule update --init vendor/mnx   # spec sources (dev-time only)
 npm install
-npm run dev        # workbench + Worker API at localhost:5173
+npm run dev        # studio + workbench + Worker API at localhost:5173
 npm test           # harness suites over the corpus
 ```
 

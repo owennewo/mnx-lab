@@ -1,7 +1,9 @@
 # Library access operations
 
-Studio (`/studio/`) reads the library through `src/storage/libraryClient.ts`; the workbench
-(`/workbench/`) never touches the service — it is static and public, by rule. The public
+Studio (`/studio/`) reads the library through `src/storage/libraryClient.ts`. The public
+workbench (`/workbench/`) also offers optional library reads through the storage layer
+when an authenticated library session is available; its corpus review remains fully
+functional from static output without the service. The public
 `/api/capabilities` flag advertises availability without exposing user/library data.
 Every `/api/library` route authenticates before storage; reads use the signed email's
 active D1 user id. Browser login never inserts users.

@@ -23,7 +23,7 @@ A live test bench rendering these documents runs at <https://mnx-lab.totai.uk>.
 | `fingering` | no fingering on notes | — | ⚠️ schema only | ❌ |
 | `harmonies` | **no harmony concept anywhere** — no `root`, no `kind`, no chord | [#109](https://github.com/w3c-cg/mnx/issues/109) | ✅ both converters | ✅ |
 | `swing` | nothing; the reference reserves `struct-swing-*` for 1.0 and implements none of it | [notationref](https://github.com/w3c-cg/mnx) `struct-swing-ratio` | ✅ Guitar Pro (⚠️ MusicXML) | ✅ marking + playback |
-| `navigation` | no coda, D.C., double-sign, or explicitly targeted jump objects; `jump-type` is only `segno \| dsalfine` | [core-coda-navigation](../roadmap/proposed/core-coda-navigation.md) | ✅ Guitar Pro (⚠️ MusicXML) | ✅ both staves + playback |
+| `navigation` | no coda, D.C., double-sign, or explicitly targeted jump objects; `jump-type` is only `segno \| dsalfine` | [core-coda-navigation](../roadmap/complete/core-coda-navigation.md) | ✅ Guitar Pro (⚠️ MusicXML) | ✅ both staves + playback |
 | `work` | **no document metadata at all** — no title, composer, rights or performer anywhere in 193 `$defs` | [#267](https://github.com/w3c-cg/mnx/issues/267), [#56](https://github.com/w3c/mnx/issues/56) | ✅ both converters | n/a — never printed |
 | `encoding` | nothing says what wrote the file | [#547](https://github.com/w3c-cg/mnx/issues/547) | ✅ both converters | n/a |
 
@@ -474,8 +474,14 @@ elements.
 
 ### What the round trips do and do not preserve
 
-`MNX → .gp → MNX` and `MNX → MusicXML → MNX` are both lossless across the whole
-corpus and tested as such. Three caveats worth knowing:
+`MNX → .gp → MNX` and `MNX → MusicXML → MNX` are tested against reference
+fixtures and feature scenarios; neither is a corpus-wide losslessness guarantee.
+The committed [Guitar Pro storage round-trip register](../harness/fixtures/roundtrip-register.json)
+measures 138 scenarios: 7 clean, 30 with gains and 101 with differences. Its comparator
+discounts encoding provenance and known normalization; these are document comparisons,
+not engraving verdicts. Run `npm run update:roundtrip-register` to remeasure.
+The [converter matrix tests](../harness/conformance/converter-matrix.test.ts) exercise
+feature-level support for both formats. Four specific caveats:
 
 1. **Note ids are legitimately rewritten** by the MusicXML notation/TAB split,
    so technique targets must be compared by *which note they resolve to*, never
