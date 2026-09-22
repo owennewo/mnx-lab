@@ -47,9 +47,14 @@ Recorded from the conversation that opened this, so the design is not re-argued:
 4. **Play with a bar (or wider) selection collapses to its first event** on the selection's
    own pass, then plays.
 5. **Editing is disabled while playing.** Nothing mutates during playback: the edit keys,
-   undo/redo, paste and the inspector are refused until the player pauses.
+   undo/redo, paste and the inspector are refused until the player pauses, and a refused
+   key says *Pause to edit* near the cursor.
 6. **A pass change is announced.** Whenever a move changes the pass or arrives by a loop or
-   a jump, a brief *Pass 2* shows at the cursor.
+   a jump, a brief *Pass 2* shows near the cursor.
+7. **While playing, the arrows seek a bar at a time, always to a bar's start.** ← goes to the
+   start of the bar playing, and each further ← one bar back; → to the start of the next
+   bar. Presses in quick succession add up before the seek fires, so ← four times goes
+   back three bars in one seek. Anything finer is done paused.
 
 What this reverses:
 
@@ -117,12 +122,29 @@ music stopped.
    and replaying a fragment.
 6. **Editing waits for pause.** While playing, `readOnly()` answers true. That seam already
    exists on `bindEditor` and is asked per key: navigation still works and nothing
-   mutates. What a refused edit key shows (nothing, or a brief *Pause to edit*) is open.
-7. **The pass is announced.** When a move changes the cursor's iteration, or arrives by a
-   loop, an ending or a jump (`PerformedEntry.via`), a label shows at the cursor for about a
-   second: *Pass 2*, *Pass 2 of 3*, *D.S.*, *Coda*. It is not shown on a document without
-   repeat structure (`hasRepeatStructure`), and never while playing, when the tray's pass
-   lanes already say it.
+   mutates. A refused edit key shows *Pause to edit* in the cursor label (rule 8), through
+   the binding's existing `onRefused` seam.
+7. **Arrows while playing seek by bar.** ←/→ step whole performance entries — the same
+   order as rule 1, so a ← at a repeat start on pass 2 goes back to the repeat end on
+   pass 1 — and always land on an entry's start (`from` when the entry is a mid-bar
+   slice). The first ← goes to the start of the bar playing, not the one before it, so
+   "back to the top of this bar" is one press.
+   - **Presses accumulate.** Each press moves a *pending target* one entry from the last
+     pending target, not from the playhead; the seek fires once, about 300 ms after the
+     last press. So ← ×4 is one seek, three bars back, and a playhead crossing a barline
+     mid-sequence cannot shift the count. The drawn cursor jumps to the pending target at
+     once, so the count is visible while it is being made; the music keeps playing until
+     the seek fires.
+   - ↑/↓, Home/End and clicks while playing keep their paused meaning as seeks (a click
+     already seeks today). Only the event-level walk is paused-only.
+8. **One label near the cursor.** A single short-lived label beside the cursor carries every
+   message of this item, for about a second, in the editor's overlay:
+   - ***Pass 2*** when a move the person made changes the cursor's iteration or arrives by a
+     loop, an ending or a jump (`PerformedEntry.via`), paused or playing. Playback crossing
+     a repeat on its own does not flash; the tray's pass lanes already show that. Never on
+     a document without repeat structure (`hasRepeatStructure`).
+   - ***Not played*** when the cursor lands written-only (below).
+   - ***Pause to edit*** when an edit key is refused during playback.
 
 ### The fallbacks the rules need
 
@@ -169,18 +191,17 @@ music stopped.
 
 ## Decisions still open
 
-1. **Arrows while playing.** Editing is off (decision 5), but ←/→ could still act.
-   Recommended: they **seek** by one event, so stepping back a beat while watching the
-   video works, and the drawn cursor is where the music now is. The alternative is that
-   they do nothing until pause.
-2. **What a refused edit key shows while playing** — nothing, or a brief *Pause to edit*.
-   The binding's `onRefused` is the seam either way.
-3. **The flash's words and place.** *Pass 2* versus *Pass 2 of 3*; at the cursor versus
-   on the tray's rail beside its pass lanes. Its duration.
+None of substance. Settled by the owner on 2026-09-22, after filing: arrows seek by bar
+while playing, accumulating presses (decision 7, rule 7); a refused edit says *Pause to
+edit*; the pass reads *Pass 2*, and both labels sit near the cursor (rule 8). The
+accumulation window (~300 ms) and the label's duration (~1 s) are starting values to tune
+by hand, not decisions.
 
 ## Proof (campaign clause 13)
 
-- **Conformance, over the navigation scenarios** (the 14 the pass cursor used): stepping →
+- **Conformance, over the navigation scenarios** (the 14 the pass cursor used): the
+  accumulated bar seek is a pure function (playhead ordinal, presses → target entry) and
+  is tested there; stepping →
   from the first position visits the entries in `PassModel.entries` order at bar grain;
   ← is its inverse; mid-bar slices offer only their own positions; the chooser keeps the
   pass within a repeat and resets outside it, including a D.S. bar with two candidates on
@@ -190,8 +211,9 @@ music stopped.
 - **A real-browser smoke** on studio with the YouTube stand-in
   (`harness/verify/youtube-smoke.mjs`'s): arrows move the video once they settle; → at a
   `:|` loops and shows the flash; Play from a bar selection starts at its first event;
-  edit keys refuse while playing; pause parks the cursor at the playhead, and play resumes
-  at the exact time. `smoke:workbench-editor` gains the chip reading the cursor's pass.
+  edit keys refuse while playing and the label says *Pause to edit*; ← ×4 while playing is
+  one seek to the start of the bar three back, including across a repeat start; pause
+  parks the cursor at the playhead, and play resumes at the exact time. `smoke:workbench-editor` gains the chip reading the cursor's pass.
 - **No golden moves.** Nothing here reaches layout.
 
 ## Not in scope
