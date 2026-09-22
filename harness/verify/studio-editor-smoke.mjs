@@ -124,7 +124,7 @@ try {
   // Actual typed meter commands in an editable Studio session, with exact history.
   const meterRead = () => c.evaluate(`${page}.editor.document`);
   const meterInitial = await meterRead();
-  const typeMeter = async text => {
+  const typeMeter = async (text, submit = true) => {
     await c.evaluate(`${viewer}.focus()`);
     await key('Digit5', { shift: true }); await key('Enter');
     await wait(`!!${inspector}`);
@@ -132,7 +132,7 @@ try {
       await c.send('Input.dispatchKeyEvent', { type: 'keyDown', key: ch, text: ch });
       await c.send('Input.dispatchKeyEvent', { type: 'keyUp', key: ch });
     }
-    await key('Enter');
+    if (submit) await key('Enter');
   };
   for (const [count, unit] of [[33,4], [3,128]]) {
     const beforeMeter = await meterRead();
@@ -154,8 +154,7 @@ try {
     await wait(`JSON.stringify(${page}.editor.document) === ${JSON.stringify(JSON.stringify(beforeMeter))}`);
   }
   // Cancellation cannot alter the document, including while a valid command is typed.
-  await c.evaluate(`${viewer}.focus()`); await key('Digit5', { shift: true }); await key('Enter');
-  await wait(`!!${inspector}`); await key('Escape');
+  await typeMeter('time 4/4', false); await key('Escape');
   assert.deepEqual(await meterRead(), meterInitial);
   console.log('Extended numeric meters: Studio typed 33/4 and 3/128, preserved all musical content and later meter declarations, exact undo/redo and cancellation');
 

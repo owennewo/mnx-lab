@@ -43,7 +43,7 @@ try{
  await waitFor(c,`${session}.selectionLevel==='measure'`,'bar selection');
  const type=async text=>{report.actions.push({type:'text',text});for(const ch of text){await c.send('Input.dispatchKeyEvent',{type:'keyDown',key:ch,text:ch});await c.send('Input.dispatchKeyEvent',{type:'keyUp',key:ch});}};
  const close=async()=>{for(let i=0;i<3&&await c.evaluate(`!!(${inspector})`);i++)await key('Escape','Escape',27);await c.evaluate(`${viewer}.focus()`);};
- const command=async text=>{await key('Digit5','%',53,8);await waitFor(c,`${session}.selectionLevel==='measure'`,'bar selection before command');await key('Enter','Enter',13);await waitFor(c,`!!(${inspector})`,'rung inspector');await type(text);await key('Enter','Enter',13);};
+ const command=async(text,submit=true)=>{await key('Digit5','%',53,8);await waitFor(c,`${session}.selectionLevel==='measure'`,'bar selection before command');await key('Enter','Enter',13);await waitFor(c,`!!(${inspector})`,'rung inspector');await type(text);if(submit)await key('Enter','Enter',13);};
  const history=async(before,after)=>{await close();await key('KeyZ','z',90,2);await exact(before);await key('KeyY','y',89,2);await exact(after);};
  const changes=[['remove','time inherit',null],['create','time 5/4',{count:5,unit:4}],['change','time 6/4',{count:6,unit:4}],['common','time common',{count:4,unit:4,display:'common'}],['cut','time cut',{count:2,unit:2,display:'cut'}],['wide','time 33/4',{count:33,unit:4}],['fine','time 3/128',{count:3,unit:128}]];
  report.tasks=[];
@@ -55,6 +55,7 @@ try{
  for(const text of ['time 3+2/8','time 0/4','time 3/256','time 1025/4','time 9007199254740993/4','time 3/4 single-number']){
  const before=await read();await command(text);await waitFor(c,`!!(${inspector})?.shadowRoot?.querySelector('.error')?.textContent`,'grammar rejection');await exact(before);
  const error=await c.evaluate(`(${inspector}).shadowRoot.querySelector('.error').textContent`);report.rejections.push({command:text,error,documentUnchanged:true});const shot=await c.send('Page.captureScreenshot');await fs.writeFile(path.join(out,'rejected-'+report.rejections.length+'.png'),Buffer.from(shot.result.data,'base64'));await close();}
+ const beforeCancel=await read();await command('time 4/4',false);await close();await exact(beforeCancel);report.cancellation='typed valid command then Escape: document unchanged';
  const copySelector=`(()=>{const roots=[document];while(roots.length){const r=roots.shift();const hit=r.querySelector('button[title="copy the document as JSON"]');if(hit)return hit;for(const e of r.querySelectorAll('*'))if(e.shadowRoot)roots.push(e.shadowRoot);}return null;})()`;
  await c.evaluate(`(()=>{const roots=[document];while(roots.length){const r=roots.shift();const b=[...r.querySelectorAll('button')].find(b=>b.textContent.trim().toUpperCase()==='JSON');if(b){b.click();return;}for(const e of r.querySelectorAll('*'))if(e.shadowRoot)roots.push(e.shadowRoot);}})()`);
  await waitFor(c,`!!(${copySelector})`,'JSON copy');await c.evaluate(`(${copySelector}).click()`);const copied=await c.evaluate('navigator.clipboard.readText()');const final=await read();assert.deepEqual(JSON.parse(copied),final);const saved=path.join(out,'copied.mnx.json');await fs.writeFile(saved,copied);
