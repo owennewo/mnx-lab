@@ -32,7 +32,7 @@ try {
   });
 
   // 3. Use it the way a consumer would: compute layout headlessly, then emit
-  //    SVG with the four DOM calls the emitter needs faked in.
+  //    SVG by capturing the public renderer’s markup at the container boundary.
   const consumer = `
     import { compilePerformance, serializePerformance, parsePerformance, exportMidi, NativeSink, Transport, loadSamplePack, SAMPLE_PRESETS, isSamplePreset, setSampleBase } from 'mnx-lab/audio';
     // The retired guitar-era spellings. They exist for consumers pinned to the
@@ -77,18 +77,7 @@ try {
     const prims = computePrimitives(JSON.parse(score), 80);
     if (!prims.notation.primitives.length) throw new Error('no primitives');
 
-    class El {
-      constructor(name) { this.name = name; this.attrs = []; this.children = []; this.textContent = ''; }
-      setAttribute(k, v) { this.attrs.push([k, String(v)]); }
-      appendChild(c) { this.children.push(c); return c; }
-      addEventListener() {}
-      serialize() {
-        const a = this.attrs.map(([k, v]) => \` \${k}="\${v.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;')}"\`).join('');
-        return \`<\${this.name}\${a}>\${this.textContent}\${this.children.map(c => c.serialize()).join('')}</\${this.name}>\`;
-      }
-    }
-    globalThis.document = { createElementNS: (_ns, name) => new El(name) };
-    const container = new El('div');
+    const container = { innerHTML: '', firstElementChild: {} };
     renderSvg({
       container,
       primitives: prims.notation.primitives,
@@ -96,7 +85,7 @@ try {
       heightSp: prims.notation.heightSp,
       pxPerSp: fitPxPerSp(640, prims.notation.widthSp, 8)
     });
-    const svg = container.children[0].serialize();
+    const svg = container.innerHTML;
     if (!svg.startsWith('<svg') || !svg.includes('<text')) throw new Error('unexpected SVG: ' + svg.slice(0, 80));
     console.log('OK mnx-lab/engine rendered hello-world to SVG in Node (' + svg.length + ' bytes)');
   `;

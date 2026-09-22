@@ -23,9 +23,9 @@ export async function checkRecordings(cdp, base, format) {
       player.seek(second);check(await player.selectSource('take-a'),'Paused synth/audio handoff failed');
       check(player.playback.state==='paused','Paused handoff started audio');check(Math.abs(player.playback.mediaTime-(1+second*2))<.01,'Wrong repeated visit sought');
       await player.updateComplete;
-      const choosePass=async index=>{player.shadowRoot.querySelector('[aria-haspopup="menu"]').click();await player.updateComplete;player.shadowRoot.querySelectorAll('[role="menuitem"]')[index].click();await delay(80);};
-      await choosePass(0);check(player.scorePosition.ordinal===0,'Pass menu missed first recording visit');
-      await choosePass(1);check(player.scorePosition.ordinal===second,'Pass menu missed second recording visit');
+      const choosePass=async index=>{const lane=player.shadowRoot.querySelector('.rail .cell')?.querySelectorAll('button.lane')[index];check(!!lane,'Recording pass lane '+(index+1)+' missing');lane.click();await player.updateComplete;await delay(80);};
+      await choosePass(0);check(player.scorePosition.ordinal===0,'Pass lane missed first recording visit');
+      await choosePass(1);check(player.scorePosition.ordinal===second,'Pass lane missed second recording visit');
       check(!player.snapshot && player.playback.capabilities.loop==='seek' && !player.playback.capabilities.parts,'Audio faked synth capabilities');
       await player.play();await delay(200);check(player.playback.state==='playing','Real audio did not play');
       check(viewer.playbackState.playbackIteration===2 && viewer.playbackState.highlight.length>0,'Recording did not follow second visit');
