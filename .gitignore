@@ -16,3 +16,7 @@ AGENTS.md
 
 # Downloaded Guitar Pro robustness corpus: never commit transcriptions.
 .gp-corpus/
+
+# Dev-only, locked external MusicXML oracle.
+harness/musicxml-oracle/.venv/
+__pycache__/

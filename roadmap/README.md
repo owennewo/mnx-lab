@@ -140,6 +140,13 @@ back up to `proposed/` the moment it is.
 
 ### inprogress/
 
+- **[core-musicxml-differential-oracle.md](inprogress/core-musicxml-differential-oracle.md)** —
+  MusicXML item 14 built: independent music21 note tables, exact rational comparison,
+  explicit adapter limitations and live/cached evidence across 344 cases.
+- **[core-musicxml-xsd-validation.md](inprogress/core-musicxml-xsd-validation.md)** —
+  MusicXML item 15 built: pinned MusicXML 4.0 schemas and independent local-only XSD
+  checks for every generated corpus export; existing failures are explicit findings.
+
 - **[core-campaign-musicxml.md](inprogress/core-campaign-musicxml.md)** — active campaign:
   zero-dependency MusicXML import/export; 183 pinned external fixtures now join the
   27-pair W3C layout oracle. Independent semantic and XSD checks remain, followed by

@@ -72,7 +72,11 @@
     "smoke": "node harness/verify/run-smokes.mjs",
     "sync:musicxml-suite": "python3 harness/tools/sync-musicxml-suite.py",
     "update:musicxml-suite": "UPDATE_MUSICXML_SUITE=1 vitest run harness/conformance/musicxml-suite.test.ts",
-    "check:musicxml-suite": "vitest run harness/conformance/musicxml-suite.test.ts"
+    "check:musicxml-suite": "vitest run harness/conformance/musicxml-suite.test.ts",
+    "setup:musicxml-oracle": "uv sync --project harness/musicxml-oracle --locked",
+    "capture:musicxml-oracle": "CAPTURE_MUSICXML_ORACLE=1 vitest run harness/conformance/musicxml-independent.test.ts",
+    "check:musicxml-oracle-live": "CHECK_MUSICXML_ORACLE=1 vitest run harness/conformance/musicxml-independent.test.ts",
+    "update:musicxml-independent": "UPDATE_MUSICXML_INDEPENDENT=1 vitest run harness/conformance/musicxml-independent.test.ts"
   },
   "dependencies": {
     "@fontsource/archivo": "^5.3.0",

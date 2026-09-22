@@ -22,8 +22,8 @@ converter matrix currently records 43 supported / 66 lossy / 7 extension / 3 unt
 These are bounded measurements, not a promise of complete MusicXML support.
 
 **Resumed implementation.** Item 13 now pins the complete 183-fixture external suite with
-MIT notices, stable IDs and an import/export observation baseline. Items 14 and 15 remain
-open. Render and write-path assessments (18 and 19) consume the same inventory and
+MIT notices, stable IDs and an import/export observation baseline. Items 14 and 15 now provide independent
+semantic and XSD measurements; their mismatch baselines identify further work. Render and write-path assessments (18 and 19) consume the same inventory and
 produce separate, evidenced gap proposals; implementing those proposals is subsequent
 work. The historical log below records how the earlier baseline was reached.
 
@@ -136,8 +136,8 @@ deliberately **not** enumerated in advance: item 8 decides them from evidence.
 | 11 | [`.mxl` container](core-musicxml-mxl.md) | **Not the copy-paste it looks like.** `converters/guitarpro-mnx/src/gpif/container.ts` is `node:zlib` `inflateRawSync`/`crc32` — synchronous, no browser branch; the browser path is `DecompressionStream`, which is async, so the read API becomes async and that ripples through import. Also needs a shared converter package, which `converters/` does not have yet. Read `META-INF/container.xml`; stored-zip emission on write. | zero-dep | cross-checked against Python's zipfile, both directions | **built 2026-09-04** |
 | 12 | [Multi-staff parts](core-musicxml-staves.md) | `<staves>`, a `<clef number>` per staff tracked independently, `<staff>` per note. Grand staff round trips. The matrix did **not** move, because `staff` is shared with `layouts` — a def used by two features scores as the worse of them. | accuracy | the corpus, via spec/grand-staff | **built 2026-09-04** |
 | 13 | [W3C/LilyPond corpus](../complete/core-musicxml-external-corpus.md) | Complete pinned 183-fixture suite, MIT notices, source inventory and deterministic import/export observation report. Keeps invalid and compatibility inputs explicit; does not turn our imports into independent ground truth. | accuracy | pinned upstream bytes + observation baseline | **built 2026-09-22** |
-| 14 | Differential oracle | music21 as a dev-only subprocess emitting a note table, diffed against the same table from our MNX — the one tier that is genuinely independent of us. | accuracy | itself | **not started — music21 is not installed here**; needs a deliberate dev-environment decision, not a silent `pip install` |
-| 15 | XSD export validation | W3C MusicXML 4.0 XSD over every generated document. | accuracy | itself | **not started — no `xmllint` available**, and it would need a new dev dependency for what this campaign already calls *a floor, not an accuracy tier* |
+| 14 | [Differential oracle](core-musicxml-differential-oracle.md) | Locked dev-only music21 reads original sources and our exports; independent MNX adapter compares rational note tables. 344 cases with explicit mismatch/limitation verdicts and reproducible captures. | accuracy | independent external tools | **built 2026-09-22** |
+| 15 | [XSD export validation](core-musicxml-xsd-validation.md) | Verbatim pinned MusicXML 4.0 XSD; local-only lxml validation of every generated export across external fixtures, W3C comparisons, scenarios and reference scores. Existing failures recorded explicitly. | accuracy | independent external tools | **built 2026-09-22** |
 | 16 | [Browser import surface](core-musicxml-browser-import.md) | MusicXML file import in the workbench, parallel to the Guitar Pro worker: `.musicxml`/`.mxl`/`.xml` through **Open…**, in a lazy worker of its own that imports the converter's core modules directly (the package index re-exports Node-only `fs`). The worker protocol is now format-neutral. | zero-dep | `smoke:csp`, extended to open a `.musicxml`, a deflated `.mxl` and a `.gpx` through the real file input under the deployed CSP | **built 2026-09-11** |
 | 17 | [Dynamics](core-musicxml-dynamics.md) | `<dynamics>` and `<wedge>`, both directions. The enum values map to `value`; the sforzando family to MNX's accent structure, whose parts concatenate to exactly the MusicXML element name (s+f+z = `sfz`), so one table serves both directions; the rest to SMuFL `glyphs`. Hairpins pair by wedge `number`, item 2's shape again. Relative dynamics have no MusicXML element and warn. | accuracy | the corpus's dynamics scenarios + round trip (no W3C comparison carries a dynamic) | **built 2026-09-10** |
 | 18 | [Render assessment](../proposed/core-musicxml-render-assessment.md) | Side quest over item 13’s pinned external corpus: load fixtures through the desktop editor, assess each visible feature, isolate importer/representation/rendering/integration gaps, and produce an evidenced, bounded render-gap proposal. | accuracy | upstream feature descriptions + semantic checks + visual references and editor captures | **proposed 2026-09-22** |
@@ -175,6 +175,22 @@ exactly as `verified` already works here. No backend: a generated JSON artifact
 committed to the repo, like `worker/models.json`.
 
 ## Progress + learnings
+
+### 2026-09-22 — items 14 and 15: independent readers expose what round trips conceal
+
+[Semantic and XSD checks](../../docs/musicxml-oracles.md) cover 344 cases. A locked,
+dev-only Python environment replaces the historical missing-tool blockers. Root tests
+bind cached external judgments to exact current XML and tool/schema hashes; a live command
+reruns music21 and libxml2. Initial source-note matches are 132/177 feature cases; 37
+differ and 8 are oracle-limited. These are scoped note-table results, not feature parity.
+
+XSD initially accepts 292/344 generated exports. Alterations after octaves and mixed
+rehearsal/words direction types are clear grammar defects. The source tuplet duration
+quantization is a different kind of finding: the external reader and our importer follow
+different available information. Exact rational timing preserves that disagreement for
+review. Default notation/TAB duplication remains explicitly unassessed where part
+correspondence is not mapped; it is not labelled semantic loss.
+
 
 ### 2026-09-22 — item 13: corpus first, and why no exception is not accuracy
 
