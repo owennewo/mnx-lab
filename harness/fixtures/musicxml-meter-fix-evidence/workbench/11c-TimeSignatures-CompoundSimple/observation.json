@@ -1,0 +1,52 @@
+{
+  "id": "11c-TimeSignatures-CompoundSimple",
+  "sourceSha256": "37b1da3a2fcb08f2d8c5422ae0bf857a8371a4ea74ef896127bff0c547e30458",
+  "testClass": "feature",
+  "description": "Compound time signatures with same denominator: (3+2)/8 and (5+3+1)/4.",
+  "views": [
+    {
+      "scrollTarget": "viewer",
+      "visibleWidth": 750,
+      "visibleHeight": 691.125,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0,
+          1
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [],
+      "scrollWidth": 750,
+      "scrollHeight": 691,
+      "clientWidth": 750,
+      "clientHeight": 691,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "importError": null,
+  "warnings": [
+    "part P1, measure 1: additive/compound time grouping is not represented; retaining equivalent total 5/8.",
+    "part P1, measure 2: additive/compound time grouping is not represented; retaining equivalent total 9/4."
+  ],
+  "importedDocumentSha256": "2690786c721c22c4e9b20f2c8f87e6b66cca7ac3bbd0cac0d7cb6c884652e1fb",
+  "displayOptions": {
+    "lyrics": "current",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

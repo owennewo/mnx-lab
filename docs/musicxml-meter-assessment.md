@@ -116,3 +116,32 @@ The requested [render gaps](../roadmap/inprogress/core-musicxml-render-gaps.md) 
 meter findings. Other corpus families, unresolved meter display policy, independent
 reference-engraving comparison where XML is ambiguous, and remaining task/persistence
 combinations still belong to assessment items 18/19. This batch does not close either.
+
+## Exact-meter follow-up — application `f15abe6b`
+
+The importer now sums every primary beats/beat-type pair using exact rational
+arithmetic. The complex/compound examples retain 5/8, 9/4, 11/8 and 21/8 rather
+than their first component. Grouping is still flattened and explicitly warned.
+Compatible common (4/4) and cut (2/2) displays survive import and export, including
+changes that only alter display. Incompatible source symbols retain numeric duration
+with a warning. Local/hidden, alternate, single-number, unmetered, invalid and
+unrepresentable instructions have source-located diagnostics; no new carrier is claimed.
+
+All twelve originals were reopened in both shells with time signatures shown. Exact
+captures, SVGs, imported documents and observations are retained in
+`harness/fixtures/musicxml-meter-fix-evidence/`, including the nested Studio scroll.
+Both shells imported identical document hashes and reported no render exceptions.
+Selected visual inspection of 11a and 11d in both shells, plus 11c/11e in Workbench,
+confirms the common symbol and corrected numeric totals. This is a bounded check,
+not a visual pass for every feature in those scores. The 11d second bar still has an
+underfill diagnostic (20 eighth-note units against 21/8); retaining the source meter
+does not authorize adding notes to make it fit. Historical captures above remain
+receipts of the earlier implementation.
+
+Studio still rejects making these untitled originals current, leaving their XML
+viewing session suspended for editing. These render captures therefore provide no
+new Studio authoring verdict. The existing write-gap proposal remains applicable.
+The converter suite adds 23 meter regressions; the measured common/cut display row
+moves from lossy to supported (44 supported, 65 lossy, 7 extension, 3 untested).
+Independent note-table verdicts remain unchanged; that oracle does not assess meter
+spelling or grouping.

@@ -156,3 +156,9 @@ tool also now traverses tall Studio viewers; earlier PNG coverage was incomplete
 
 Still open in this item: exact meter/display import with explicit residual-loss diagnostics. The carrier-dependent full-support
 work remains deferred as specified above. This item stays in progress.
+
+Meter implementation landed in `f15abe6b`: exact rational totals, compatible common/cut
+import/export including display-only changes, and explicit fallback/scope diagnostics.
+The 23 converter regressions and twelve-source both-shell captures are documented in
+[the meter assessment](../../docs/musicxml-meter-assessment.md#exact-meter-follow-up--application-f15abe6b).
+Remaining grouped/local/unmetered representations are outside this bounded policy.

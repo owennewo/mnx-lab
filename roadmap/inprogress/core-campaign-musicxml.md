@@ -714,3 +714,15 @@ opposite corrections, and that is the shape of the campaign.
 - **Nothing was enumerated for feature parity on purpose.** The prior plan listed
   features by intuition and phase; the matrix ranks them by evidence. Building the map
   before choosing the route is the whole point of item 2 coming second.
+
+### Exact meter import and symbol preservation — 2026-09-22
+
+Implementation `f15abe6b` sums all primary MusicXML time fractions exactly, preserves
+compatible common/cut displays through export, and diagnoses representation losses
+rather than silently accepting only the first component. Twenty-three regressions
+cover the twelve pinned meter originals and malformed/local/display-only edge cases.
+Both-shell captures are retained in `harness/fixtures/musicxml-meter-fix-evidence/`;
+[the meter assessment](../../docs/musicxml-meter-assessment.md) states the bounded
+visual review and remaining Studio authoring block. Matrix: 44 supported / 65 lossy /
+7 extension / 3 untested. Independent note-table verdicts are unchanged. Lesson:
+correct duration does not imply preserved grouping, local scope, or unmetered layout.
