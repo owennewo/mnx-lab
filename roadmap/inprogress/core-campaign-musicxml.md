@@ -143,6 +143,7 @@ deliberately **not** enumerated in advance: item 8 decides them from evidence.
 | 18 | [Render assessment](../proposed/core-musicxml-render-assessment.md) | Side quest over item 13’s pinned external corpus: load fixtures through the desktop editor, assess each visible feature, isolate importer/representation/rendering/integration gaps, and produce an evidenced, bounded render-gap proposal. | accuracy | upstream feature descriptions + semantic checks + visual references and editor captures | **proposed 2026-09-22** |
 | 19 | [Write-path assessment](../proposed/core-musicxml-write-assessment.md) | Companion to item 18: assess whether desktop users can create, inspect, change and remove each corpus feature through the editor, with undo/redo and separate persistence evidence; produce a bounded proposal for missing operations and UX surfaces. | accuracy | real UI tasks + structural before/after checks + applicable save/reopen | **proposed 2026-09-22** |
 | 20 | [XSD element ordering](core-musicxml-xsd-ordering.md) | Pitch/tuning alterations before octaves; separate rehearsal and section directions. XSD-valid exports 292 → 336/344, semantic verdicts unchanged. | accuracy | independent XSD + regression tests | **built 2026-09-22** |
+| 21 | [Exact short durations](core-musicxml-short-durations.md) | Divisions account for written-duration denominators as well as tuplets; no zero-length metric notes in the measured corpus. XSD validity 336 → 340/344; three external export note tables now match. | accuracy | music21 + XSD + regression tests | **built 2026-09-22** |
 | — | Feature parity | Dynamics, wedges, spanners, ottavas, articulations, SMuFL glyph names, percussion, layout breaks. **Deliberately unenumerated**: item 8 turns these into a ranked queue with evidence, and each becomes its own row when picked up. Note the schema already has `dynamic-*`, `ottava`, `slur` and `wedge-type` as standard objects — but **no pedal def**, so pedal is contract clause 2's first real test. | accuracy | 1 + 2 + 3 | not yet rows |
 
 ### Item 8's derivation rule
@@ -176,6 +177,16 @@ exactly as `verified` already works here. No backend: a generated JSON artifact
 committed to the repo, like `worker/models.json`.
 
 ## Progress + learnings
+
+### 2026-09-22 — item 21: denominators exist outside tuplets too
+
+The exporter chose divisions for tuplet ratios but assumed plain written values already
+fit an eight-tick quarter. Dotted short values and 128ths disproved that assumption.
+Raising the written grid before applying tuplet ratios removes all measured zero-duration
+exports: XSD validity 336 → 340/344, three external export note tables different → match.
+The remaining four XSD failures are empty parts and rootless harmony, which need explicit
+representation policy. Smaller-than-supported tuplet normal units also remain a distinct
+limitation, not quietly folded into the divisions claim.
 
 ### 2026-09-22 — item 20: grammar fixes without musical changes
 

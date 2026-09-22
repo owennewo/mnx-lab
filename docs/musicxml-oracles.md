@@ -96,3 +96,11 @@ harmony kinds. The generated report is the current authority as fixes land.
 The W3C tuplet source is an instructive discrepancy: its durations are quantized (e.g.
 85/128 quarter notes) while the imported MNX expresses 2/3. The layout oracle cannot
 expose that timing disagreement. Do not weaken exact timing to make it disappear.
+
+## First fixes
+
+Items 20 and 21 improve XSD validity **292 → 336 → 340 of 344**. Ordering changes leave
+all note-table judgments unchanged; the divisions fix changes three external export
+comparisons from different to match and reduces the rest-gallery difference. Four XSD
+failures remain: two empty-part layout documents and two rootless harmony cases.
+The existing converter matrix and core primitives goldens are unchanged.

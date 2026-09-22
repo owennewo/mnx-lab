@@ -317,8 +317,8 @@ export function tupletUnits(tuplet: MnxTuplet): {
  *
  * `divisions` counts per quarter note, and a tuplet divides a written value by
  * its ratio: a triplet eighth at the default 8 divisions is 4 × 2/3, which is
- * not an integer, and rounding it is how a bar ends up a division short. Since
- * every plain note value is already exact at `base`, multiplying by the least
+ * not an integer, and rounding it is how a bar ends up a division short. After
+ * raising the base grid to represent every written value, multiplying by the least
  * common multiple of the tuplets' `actual` counts makes the tuplets exact too
  * without disturbing anything else.
  *
@@ -331,9 +331,23 @@ export function divisionsFor(
   base: number
 ): number {
   let scale = 1;
+  let writtenDivisions = base;
   for (const part of parts) {
     for (const measure of part.measures) {
       for (const sequence of measure.sequences ?? []) {
+        // Tuplet ratios are only half the denominator: at eight divisions a
+        // 128th note is a quarter tick and was rounded to zero. Supported
+        // written values (including dots) are dyadic, so raise the grid until
+        // each written duration is integral, then apply the tuplet LCM below.
+        for (const { event } of walkSequenceEvents(sequence.content, 1)) {
+          const quarters = noteValueInQuarters(event.duration.base, event.duration.dots ?? 0);
+          while (!Number.isInteger(quarters * writtenDivisions)) {
+            writtenDivisions *= 2;
+            if (!Number.isSafeInteger(writtenDivisions)) {
+              throw new Error('MusicXML divisions exceed the exact integer range.');
+            }
+          }
+        }
         for (const item of sequence.content) {
           if (!isTuplet(item)) continue;
           const units = tupletUnits(item);
@@ -342,7 +356,9 @@ export function divisionsFor(
       }
     }
   }
-  return base * scale;
+  const result = writtenDivisions * scale;
+  if (!Number.isSafeInteger(result)) throw new Error('MusicXML divisions exceed the exact integer range.');
+  return result;
 }
 
 function lcm(a: number, b: number): number {

@@ -57669,7 +57669,7 @@
     {
       "id": "scenario/lab/10-durations/01-rest-gallery",
       "exported": {
-        "sha256": "a6a209286ece3321f5a8d342fc3d5c2bf9325c6db6e8cec6f6f4bf9b98d37a14",
+        "sha256": "e5f2b9cc93402d6d68678afe8a45238ff06de93011a701bcffac32c8df3a9fed",
         "semantic": {
           "status": "ok",
           "table": {
@@ -58139,7 +58139,7 @@
                 "voice": "1",
                 "measure": 10,
                 "onset": "0/1",
-                "duration": "1/8",
+                "duration": "1/16",
                 "pitch": "rest",
                 "grace": 0,
                 "writtenGrace": null,
@@ -58151,8 +58151,34 @@
                 "staff": 1,
                 "voice": "1",
                 "measure": 10,
+                "onset": "1/16",
+                "duration": "1/16",
+                "pitch": "67/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 0,
+                "staff": 1,
+                "voice": "1",
+                "measure": 10,
                 "onset": "1/8",
-                "duration": "1/8",
+                "duration": "1/16",
+                "pitch": "rest",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 0,
+                "staff": 1,
+                "voice": "1",
+                "measure": 10,
+                "onset": "3/16",
+                "duration": "1/16",
                 "pitch": "67/1",
                 "grace": 0,
                 "writtenGrace": null,
@@ -58165,7 +58191,7 @@
                 "voice": "1",
                 "measure": 10,
                 "onset": "1/4",
-                "duration": "1/8",
+                "duration": "1/16",
                 "pitch": "rest",
                 "grace": 0,
                 "writtenGrace": null,
@@ -58177,8 +58203,34 @@
                 "staff": 1,
                 "voice": "1",
                 "measure": 10,
+                "onset": "5/16",
+                "duration": "1/16",
+                "pitch": "67/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 0,
+                "staff": 1,
+                "voice": "1",
+                "measure": 10,
                 "onset": "3/8",
-                "duration": "1/8",
+                "duration": "1/16",
+                "pitch": "rest",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 0,
+                "staff": 1,
+                "voice": "1",
+                "measure": 10,
+                "onset": "7/16",
+                "duration": "1/16",
                 "pitch": "67/1",
                 "grace": 0,
                 "writtenGrace": null,
@@ -58191,58 +58243,6 @@
                 "voice": "1",
                 "measure": 10,
                 "onset": "1/2",
-                "duration": "1/8",
-                "pitch": "rest",
-                "grace": 0,
-                "writtenGrace": null,
-                "tie": "",
-                "lyrics": []
-              },
-              {
-                "part": 0,
-                "staff": 1,
-                "voice": "1",
-                "measure": 10,
-                "onset": "5/8",
-                "duration": "1/8",
-                "pitch": "67/1",
-                "grace": 0,
-                "writtenGrace": null,
-                "tie": "",
-                "lyrics": []
-              },
-              {
-                "part": 0,
-                "staff": 1,
-                "voice": "1",
-                "measure": 10,
-                "onset": "3/4",
-                "duration": "1/8",
-                "pitch": "rest",
-                "grace": 0,
-                "writtenGrace": null,
-                "tie": "",
-                "lyrics": []
-              },
-              {
-                "part": 0,
-                "staff": 1,
-                "voice": "1",
-                "measure": 10,
-                "onset": "7/8",
-                "duration": "1/8",
-                "pitch": "67/1",
-                "grace": 0,
-                "writtenGrace": null,
-                "tie": "",
-                "lyrics": []
-              },
-              {
-                "part": 0,
-                "staff": 1,
-                "voice": "1",
-                "measure": 10,
-                "onset": "1/1",
                 "duration": "1/2",
                 "pitch": "rest",
                 "grace": 0,
@@ -58255,7 +58255,7 @@
                 "staff": 1,
                 "voice": "1",
                 "measure": 10,
-                "onset": "3/2",
+                "onset": "1/1",
                 "duration": "1/1",
                 "pitch": "rest",
                 "grace": 0,
@@ -58268,7 +58268,7 @@
                 "staff": 1,
                 "voice": "1",
                 "measure": 10,
-                "onset": "5/2",
+                "onset": "2/1",
                 "duration": "2/1",
                 "pitch": "rest",
                 "grace": 0,
@@ -58282,7 +58282,7 @@
                 "voice": "1",
                 "measure": 11,
                 "onset": "0/1",
-                "duration": "0/1",
+                "duration": "1/32",
                 "pitch": "rest",
                 "grace": 0,
                 "writtenGrace": null,
@@ -58294,8 +58294,8 @@
                 "staff": 1,
                 "voice": "1",
                 "measure": 11,
-                "onset": "0/1",
-                "duration": "0/1",
+                "onset": "1/32",
+                "duration": "1/32",
                 "pitch": "67/1",
                 "grace": 0,
                 "writtenGrace": null,
@@ -58307,8 +58307,8 @@
                 "staff": 1,
                 "voice": "1",
                 "measure": 11,
-                "onset": "0/1",
-                "duration": "0/1",
+                "onset": "1/16",
+                "duration": "1/32",
                 "pitch": "rest",
                 "grace": 0,
                 "writtenGrace": null,
@@ -58320,8 +58320,8 @@
                 "staff": 1,
                 "voice": "1",
                 "measure": 11,
-                "onset": "0/1",
-                "duration": "0/1",
+                "onset": "3/32",
+                "duration": "1/32",
                 "pitch": "67/1",
                 "grace": 0,
                 "writtenGrace": null,
@@ -58333,8 +58333,8 @@
                 "staff": 1,
                 "voice": "1",
                 "measure": 11,
-                "onset": "0/1",
-                "duration": "0/1",
+                "onset": "1/8",
+                "duration": "1/32",
                 "pitch": "rest",
                 "grace": 0,
                 "writtenGrace": null,
@@ -58346,8 +58346,8 @@
                 "staff": 1,
                 "voice": "1",
                 "measure": 11,
-                "onset": "0/1",
-                "duration": "0/1",
+                "onset": "5/32",
+                "duration": "1/32",
                 "pitch": "67/1",
                 "grace": 0,
                 "writtenGrace": null,
@@ -58359,8 +58359,8 @@
                 "staff": 1,
                 "voice": "1",
                 "measure": 11,
-                "onset": "0/1",
-                "duration": "0/1",
+                "onset": "3/16",
+                "duration": "1/32",
                 "pitch": "rest",
                 "grace": 0,
                 "writtenGrace": null,
@@ -58372,8 +58372,8 @@
                 "staff": 1,
                 "voice": "1",
                 "measure": 11,
-                "onset": "0/1",
-                "duration": "0/1",
+                "onset": "7/32",
+                "duration": "1/32",
                 "pitch": "67/1",
                 "grace": 0,
                 "writtenGrace": null,
@@ -58385,7 +58385,7 @@
                 "staff": 1,
                 "voice": "1",
                 "measure": 11,
-                "onset": "0/1",
+                "onset": "1/4",
                 "duration": "1/4",
                 "pitch": "rest",
                 "grace": 0,
@@ -58398,7 +58398,7 @@
                 "staff": 1,
                 "voice": "1",
                 "measure": 11,
-                "onset": "1/4",
+                "onset": "1/2",
                 "duration": "1/2",
                 "pitch": "rest",
                 "grace": 0,
@@ -58411,7 +58411,7 @@
                 "staff": 1,
                 "voice": "1",
                 "measure": 11,
-                "onset": "3/4",
+                "onset": "1/1",
                 "duration": "1/1",
                 "pitch": "rest",
                 "grace": 0,
@@ -58424,7 +58424,7 @@
                 "staff": 1,
                 "voice": "1",
                 "measure": 11,
-                "onset": "7/4",
+                "onset": "2/1",
                 "duration": "2/1",
                 "pitch": "rest",
                 "grace": 0,
@@ -58567,49 +58567,8 @@
           "warnings": []
         },
         "xsd": {
-          "valid": false,
-          "errors": [
-            {
-              "line": 1,
-              "path": "/score-partwise/part/measure[12]/note[1]/duration",
-              "message": "Element 'duration': [facet 'minExclusive'] The value '0' must be greater than '0'."
-            },
-            {
-              "line": 1,
-              "path": "/score-partwise/part/measure[12]/note[2]/duration",
-              "message": "Element 'duration': [facet 'minExclusive'] The value '0' must be greater than '0'."
-            },
-            {
-              "line": 1,
-              "path": "/score-partwise/part/measure[12]/note[3]/duration",
-              "message": "Element 'duration': [facet 'minExclusive'] The value '0' must be greater than '0'."
-            },
-            {
-              "line": 1,
-              "path": "/score-partwise/part/measure[12]/note[4]/duration",
-              "message": "Element 'duration': [facet 'minExclusive'] The value '0' must be greater than '0'."
-            },
-            {
-              "line": 1,
-              "path": "/score-partwise/part/measure[12]/note[5]/duration",
-              "message": "Element 'duration': [facet 'minExclusive'] The value '0' must be greater than '0'."
-            },
-            {
-              "line": 1,
-              "path": "/score-partwise/part/measure[12]/note[6]/duration",
-              "message": "Element 'duration': [facet 'minExclusive'] The value '0' must be greater than '0'."
-            },
-            {
-              "line": 1,
-              "path": "/score-partwise/part/measure[12]/note[7]/duration",
-              "message": "Element 'duration': [facet 'minExclusive'] The value '0' must be greater than '0'."
-            },
-            {
-              "line": 1,
-              "path": "/score-partwise/part/measure[12]/note[8]/duration",
-              "message": "Element 'duration': [facet 'minExclusive'] The value '0' must be greater than '0'."
-            }
-          ]
+          "valid": true,
+          "errors": []
         }
       }
     },
@@ -84259,7 +84218,7 @@
         }
       },
       "exported": {
-        "sha256": "4683ca4cfafc7c91580f4d17d42a59b0822b95d5feb9a55804a1e946869a14c1",
+        "sha256": "4e35771ab3c3d4eed7826ae03c2fa41bca23308c8bdfcd3a0113af1a33b475e0",
         "semantic": {
           "status": "ok",
           "table": {
@@ -84378,7 +84337,33 @@
                 "voice": "1",
                 "measure": 3,
                 "onset": "31/8",
-                "duration": "1/8",
+                "duration": "1/16",
+                "pitch": "rest",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 0,
+                "staff": 1,
+                "voice": "1",
+                "measure": 3,
+                "onset": "63/16",
+                "duration": "1/32",
+                "pitch": "rest",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 0,
+                "staff": 1,
+                "voice": "1",
+                "measure": 3,
+                "onset": "127/32",
+                "duration": "1/32",
                 "pitch": "rest",
                 "grace": 0,
                 "writtenGrace": null,
@@ -84391,7 +84376,7 @@
                 "voice": "1",
                 "measure": 3,
                 "onset": "4/1",
-                "duration": "0/1",
+                "duration": "1/32",
                 "pitch": "rest",
                 "grace": 0,
                 "writtenGrace": null,
@@ -84403,8 +84388,8 @@
                 "staff": 1,
                 "voice": "1",
                 "measure": 3,
-                "onset": "4/1",
-                "duration": "0/1",
+                "onset": "129/32",
+                "duration": "1/32",
                 "pitch": "rest",
                 "grace": 0,
                 "writtenGrace": null,
@@ -84416,34 +84401,8 @@
                 "staff": 1,
                 "voice": "1",
                 "measure": 3,
-                "onset": "4/1",
-                "duration": "0/1",
-                "pitch": "rest",
-                "grace": 0,
-                "writtenGrace": null,
-                "tie": "",
-                "lyrics": []
-              },
-              {
-                "part": 0,
-                "staff": 1,
-                "voice": "1",
-                "measure": 3,
-                "onset": "4/1",
-                "duration": "0/1",
-                "pitch": "rest",
-                "grace": 0,
-                "writtenGrace": null,
-                "tie": "",
-                "lyrics": []
-              },
-              {
-                "part": 0,
-                "staff": 1,
-                "voice": "1",
-                "measure": 3,
-                "onset": "4/1",
-                "duration": "0/1",
+                "onset": "65/16",
+                "duration": "1/32",
                 "pitch": "rest",
                 "grace": 0,
                 "writtenGrace": null,
@@ -84508,7 +84467,7 @@
                 "voice": "1",
                 "measure": 4,
                 "onset": "45/8",
-                "duration": "1/4",
+                "duration": "3/16",
                 "pitch": "rest",
                 "grace": 0,
                 "writtenGrace": null,
@@ -84520,8 +84479,8 @@
                 "staff": 1,
                 "voice": "1",
                 "measure": 4,
-                "onset": "47/8",
-                "duration": "1/8",
+                "onset": "93/16",
+                "duration": "3/32",
                 "pitch": "rest",
                 "grace": 0,
                 "writtenGrace": null,
@@ -84533,8 +84492,8 @@
                 "staff": 1,
                 "voice": "1",
                 "measure": 4,
-                "onset": "6/1",
-                "duration": "0/1",
+                "onset": "189/32",
+                "duration": "3/64",
                 "pitch": "rest",
                 "grace": 0,
                 "writtenGrace": null,
@@ -84546,8 +84505,8 @@
                 "staff": 1,
                 "voice": "1",
                 "measure": 4,
-                "onset": "6/1",
-                "duration": "0/1",
+                "onset": "381/64",
+                "duration": "1/32",
                 "pitch": "rest",
                 "grace": 0,
                 "writtenGrace": null,
@@ -84559,8 +84518,8 @@
                 "staff": 1,
                 "voice": "1",
                 "measure": 4,
-                "onset": "6/1",
-                "duration": "0/1",
+                "onset": "383/64",
+                "duration": "1/32",
                 "pitch": "rest",
                 "grace": 0,
                 "writtenGrace": null,
@@ -84572,8 +84531,8 @@
                 "staff": 1,
                 "voice": "1",
                 "measure": 4,
-                "onset": "6/1",
-                "duration": "0/1",
+                "onset": "385/64",
+                "duration": "1/32",
                 "pitch": "rest",
                 "grace": 0,
                 "writtenGrace": null,
@@ -84585,8 +84544,8 @@
                 "staff": 1,
                 "voice": "1",
                 "measure": 4,
-                "onset": "6/1",
-                "duration": "0/1",
+                "onset": "387/64",
+                "duration": "1/32",
                 "pitch": "rest",
                 "grace": 0,
                 "writtenGrace": null,
@@ -84608,62 +84567,14 @@
               }
             ]
           },
-          "warnings": []
+          "warnings": [
+            "Warning: measure 4 in part MusicXML Partis overfull: 4.09375 > 4.0,assuming 4.0 is correct.",
+            "Warning: measure 5 in part MusicXML Partis overfull: 6.078125 > 6.0,assuming 6.0 is correct."
+          ]
         },
         "xsd": {
-          "valid": false,
-          "errors": [
-            {
-              "line": 1,
-              "path": "/score-partwise/part/measure[4]/note[7]/duration",
-              "message": "Element 'duration': [facet 'minExclusive'] The value '0' must be greater than '0'."
-            },
-            {
-              "line": 1,
-              "path": "/score-partwise/part/measure[4]/note[8]/duration",
-              "message": "Element 'duration': [facet 'minExclusive'] The value '0' must be greater than '0'."
-            },
-            {
-              "line": 1,
-              "path": "/score-partwise/part/measure[4]/note[9]/duration",
-              "message": "Element 'duration': [facet 'minExclusive'] The value '0' must be greater than '0'."
-            },
-            {
-              "line": 1,
-              "path": "/score-partwise/part/measure[4]/note[10]/duration",
-              "message": "Element 'duration': [facet 'minExclusive'] The value '0' must be greater than '0'."
-            },
-            {
-              "line": 1,
-              "path": "/score-partwise/part/measure[4]/note[11]/duration",
-              "message": "Element 'duration': [facet 'minExclusive'] The value '0' must be greater than '0'."
-            },
-            {
-              "line": 1,
-              "path": "/score-partwise/part/measure[5]/note[7]/duration",
-              "message": "Element 'duration': [facet 'minExclusive'] The value '0' must be greater than '0'."
-            },
-            {
-              "line": 1,
-              "path": "/score-partwise/part/measure[5]/note[8]/duration",
-              "message": "Element 'duration': [facet 'minExclusive'] The value '0' must be greater than '0'."
-            },
-            {
-              "line": 1,
-              "path": "/score-partwise/part/measure[5]/note[9]/duration",
-              "message": "Element 'duration': [facet 'minExclusive'] The value '0' must be greater than '0'."
-            },
-            {
-              "line": 1,
-              "path": "/score-partwise/part/measure[5]/note[10]/duration",
-              "message": "Element 'duration': [facet 'minExclusive'] The value '0' must be greater than '0'."
-            },
-            {
-              "line": 1,
-              "path": "/score-partwise/part/measure[5]/note[11]/duration",
-              "message": "Element 'duration': [facet 'minExclusive'] The value '0' must be greater than '0'."
-            }
-          ]
+          "valid": true,
+          "errors": []
         }
       }
     },
@@ -86575,7 +86486,7 @@
         }
       },
       "exported": {
-        "sha256": "f959e84812f8fb7f40f98728f72642052306a1a36edd88177e11b42bda91d03e",
+        "sha256": "2e2542e4b8921d8e541dd7331239cb391626745f7b6e7068bb699f924d3f8de0",
         "semantic": {
           "status": "ok",
           "table": {
@@ -86668,7 +86579,33 @@
                 "voice": "1",
                 "measure": 1,
                 "onset": "31/8",
-                "duration": "1/8",
+                "duration": "1/16",
+                "pitch": "rest",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 0,
+                "staff": 1,
+                "voice": "1",
+                "measure": 1,
+                "onset": "63/16",
+                "duration": "1/32",
+                "pitch": "rest",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 0,
+                "staff": 1,
+                "voice": "1",
+                "measure": 1,
+                "onset": "127/32",
+                "duration": "1/32",
                 "pitch": "rest",
                 "grace": 0,
                 "writtenGrace": null,
@@ -86681,7 +86618,7 @@
                 "voice": "1",
                 "measure": 1,
                 "onset": "4/1",
-                "duration": "0/1",
+                "duration": "1/32",
                 "pitch": "rest",
                 "grace": 0,
                 "writtenGrace": null,
@@ -86693,8 +86630,8 @@
                 "staff": 1,
                 "voice": "1",
                 "measure": 1,
-                "onset": "4/1",
-                "duration": "0/1",
+                "onset": "129/32",
+                "duration": "1/32",
                 "pitch": "rest",
                 "grace": 0,
                 "writtenGrace": null,
@@ -86706,34 +86643,8 @@
                 "staff": 1,
                 "voice": "1",
                 "measure": 1,
-                "onset": "4/1",
-                "duration": "0/1",
-                "pitch": "rest",
-                "grace": 0,
-                "writtenGrace": null,
-                "tie": "",
-                "lyrics": []
-              },
-              {
-                "part": 0,
-                "staff": 1,
-                "voice": "1",
-                "measure": 1,
-                "onset": "4/1",
-                "duration": "0/1",
-                "pitch": "rest",
-                "grace": 0,
-                "writtenGrace": null,
-                "tie": "",
-                "lyrics": []
-              },
-              {
-                "part": 0,
-                "staff": 1,
-                "voice": "1",
-                "measure": 1,
-                "onset": "4/1",
-                "duration": "0/1",
+                "onset": "65/16",
+                "duration": "1/32",
                 "pitch": "rest",
                 "grace": 0,
                 "writtenGrace": null,
@@ -86824,7 +86735,33 @@
                 "voice": "1",
                 "measure": 3,
                 "onset": "31/8",
-                "duration": "1/8",
+                "duration": "1/16",
+                "pitch": "rest",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 0,
+                "staff": 1,
+                "voice": "1",
+                "measure": 3,
+                "onset": "63/16",
+                "duration": "1/32",
+                "pitch": "rest",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 0,
+                "staff": 1,
+                "voice": "1",
+                "measure": 3,
+                "onset": "127/32",
+                "duration": "1/32",
                 "pitch": "rest",
                 "grace": 0,
                 "writtenGrace": null,
@@ -86837,7 +86774,7 @@
                 "voice": "1",
                 "measure": 3,
                 "onset": "4/1",
-                "duration": "0/1",
+                "duration": "1/32",
                 "pitch": "rest",
                 "grace": 0,
                 "writtenGrace": null,
@@ -86849,8 +86786,8 @@
                 "staff": 1,
                 "voice": "1",
                 "measure": 3,
-                "onset": "4/1",
-                "duration": "0/1",
+                "onset": "129/32",
+                "duration": "1/32",
                 "pitch": "rest",
                 "grace": 0,
                 "writtenGrace": null,
@@ -86862,34 +86799,8 @@
                 "staff": 1,
                 "voice": "1",
                 "measure": 3,
-                "onset": "4/1",
-                "duration": "0/1",
-                "pitch": "rest",
-                "grace": 0,
-                "writtenGrace": null,
-                "tie": "",
-                "lyrics": []
-              },
-              {
-                "part": 0,
-                "staff": 1,
-                "voice": "1",
-                "measure": 3,
-                "onset": "4/1",
-                "duration": "0/1",
-                "pitch": "rest",
-                "grace": 0,
-                "writtenGrace": null,
-                "tie": "",
-                "lyrics": []
-              },
-              {
-                "part": 0,
-                "staff": 1,
-                "voice": "1",
-                "measure": 3,
-                "onset": "4/1",
-                "duration": "0/1",
+                "onset": "65/16",
+                "duration": "1/32",
                 "pitch": "rest",
                 "grace": 0,
                 "writtenGrace": null,
@@ -86898,62 +86809,14 @@
               }
             ]
           },
-          "warnings": []
+          "warnings": [
+            "Warning: measure 2 in part MusicXML Partis overfull: 4.09375 > 4.0,assuming 4.0 is correct.",
+            "Warning: measure 4 in part MusicXML Partis overfull: 4.09375 > 4.0,assuming 4.0 is correct."
+          ]
         },
         "xsd": {
-          "valid": false,
-          "errors": [
-            {
-              "line": 1,
-              "path": "/score-partwise/part/measure[2]/note[7]/duration",
-              "message": "Element 'duration': [facet 'minExclusive'] The value '0' must be greater than '0'."
-            },
-            {
-              "line": 1,
-              "path": "/score-partwise/part/measure[2]/note[8]/duration",
-              "message": "Element 'duration': [facet 'minExclusive'] The value '0' must be greater than '0'."
-            },
-            {
-              "line": 1,
-              "path": "/score-partwise/part/measure[2]/note[9]/duration",
-              "message": "Element 'duration': [facet 'minExclusive'] The value '0' must be greater than '0'."
-            },
-            {
-              "line": 1,
-              "path": "/score-partwise/part/measure[2]/note[10]/duration",
-              "message": "Element 'duration': [facet 'minExclusive'] The value '0' must be greater than '0'."
-            },
-            {
-              "line": 1,
-              "path": "/score-partwise/part/measure[2]/note[11]/duration",
-              "message": "Element 'duration': [facet 'minExclusive'] The value '0' must be greater than '0'."
-            },
-            {
-              "line": 1,
-              "path": "/score-partwise/part/measure[4]/note[7]/duration",
-              "message": "Element 'duration': [facet 'minExclusive'] The value '0' must be greater than '0'."
-            },
-            {
-              "line": 1,
-              "path": "/score-partwise/part/measure[4]/note[8]/duration",
-              "message": "Element 'duration': [facet 'minExclusive'] The value '0' must be greater than '0'."
-            },
-            {
-              "line": 1,
-              "path": "/score-partwise/part/measure[4]/note[9]/duration",
-              "message": "Element 'duration': [facet 'minExclusive'] The value '0' must be greater than '0'."
-            },
-            {
-              "line": 1,
-              "path": "/score-partwise/part/measure[4]/note[10]/duration",
-              "message": "Element 'duration': [facet 'minExclusive'] The value '0' must be greater than '0'."
-            },
-            {
-              "line": 1,
-              "path": "/score-partwise/part/measure[4]/note[11]/duration",
-              "message": "Element 'duration': [facet 'minExclusive'] The value '0' must be greater than '0'."
-            }
-          ]
+          "valid": true,
+          "errors": []
         }
       }
     },
@@ -87560,7 +87423,7 @@
         }
       },
       "exported": {
-        "sha256": "56856cb880209df6245c1787a2937a1ce9ae64c24682865e99a6e8a87a197598",
+        "sha256": "8f593af1a49d184c8b3edf51540c136d87fbfd1660ad18d4aad88ea64dcbbae4",
         "semantic": {
           "status": "ok",
           "table": {
@@ -87692,7 +87555,33 @@
                 "voice": "1",
                 "measure": 1,
                 "onset": "183/8",
-                "duration": "1/8",
+                "duration": "1/16",
+                "pitch": "72/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 0,
+                "staff": 1,
+                "voice": "1",
+                "measure": 1,
+                "onset": "367/16",
+                "duration": "1/32",
+                "pitch": "72/1",
+                "grace": 0,
+                "writtenGrace": null,
+                "tie": "",
+                "lyrics": []
+              },
+              {
+                "part": 0,
+                "staff": 1,
+                "voice": "1",
+                "measure": 1,
+                "onset": "735/32",
+                "duration": "1/32",
                 "pitch": "72/1",
                 "grace": 0,
                 "writtenGrace": null,
@@ -87705,7 +87594,7 @@
                 "voice": "1",
                 "measure": 1,
                 "onset": "23/1",
-                "duration": "0/1",
+                "duration": "1/32",
                 "pitch": "72/1",
                 "grace": 0,
                 "writtenGrace": null,
@@ -87717,8 +87606,8 @@
                 "staff": 1,
                 "voice": "1",
                 "measure": 1,
-                "onset": "23/1",
-                "duration": "0/1",
+                "onset": "737/32",
+                "duration": "1/32",
                 "pitch": "72/1",
                 "grace": 0,
                 "writtenGrace": null,
@@ -87730,34 +87619,8 @@
                 "staff": 1,
                 "voice": "1",
                 "measure": 1,
-                "onset": "23/1",
-                "duration": "0/1",
-                "pitch": "72/1",
-                "grace": 0,
-                "writtenGrace": null,
-                "tie": "",
-                "lyrics": []
-              },
-              {
-                "part": 0,
-                "staff": 1,
-                "voice": "1",
-                "measure": 1,
-                "onset": "23/1",
-                "duration": "0/1",
-                "pitch": "72/1",
-                "grace": 0,
-                "writtenGrace": null,
-                "tie": "",
-                "lyrics": []
-              },
-              {
-                "part": 0,
-                "staff": 1,
-                "voice": "1",
-                "measure": 1,
-                "onset": "23/1",
-                "duration": "0/1",
+                "onset": "369/16",
+                "duration": "1/32",
                 "pitch": "72/1",
                 "grace": 0,
                 "writtenGrace": null,
@@ -87874,7 +87737,7 @@
                 "voice": "1",
                 "measure": 3,
                 "onset": "213/8",
-                "duration": "1/4",
+                "duration": "3/16",
                 "pitch": "72/1",
                 "grace": 0,
                 "writtenGrace": null,
@@ -87886,8 +87749,8 @@
                 "staff": 1,
                 "voice": "1",
                 "measure": 3,
-                "onset": "215/8",
-                "duration": "1/8",
+                "onset": "429/16",
+                "duration": "3/32",
                 "pitch": "72/1",
                 "grace": 0,
                 "writtenGrace": null,
@@ -87899,8 +87762,8 @@
                 "staff": 1,
                 "voice": "1",
                 "measure": 3,
-                "onset": "27/1",
-                "duration": "0/1",
+                "onset": "861/32",
+                "duration": "3/64",
                 "pitch": "72/1",
                 "grace": 0,
                 "writtenGrace": null,
@@ -87912,8 +87775,8 @@
                 "staff": 1,
                 "voice": "1",
                 "measure": 3,
-                "onset": "27/1",
-                "duration": "0/1",
+                "onset": "1725/64",
+                "duration": "1/32",
                 "pitch": "72/1",
                 "grace": 0,
                 "writtenGrace": null,
@@ -87925,8 +87788,8 @@
                 "staff": 1,
                 "voice": "1",
                 "measure": 3,
-                "onset": "27/1",
-                "duration": "0/1",
+                "onset": "1727/64",
+                "duration": "1/32",
                 "pitch": "72/1",
                 "grace": 0,
                 "writtenGrace": null,
@@ -87938,8 +87801,8 @@
                 "staff": 1,
                 "voice": "1",
                 "measure": 3,
-                "onset": "27/1",
-                "duration": "0/1",
+                "onset": "1729/64",
+                "duration": "1/32",
                 "pitch": "72/1",
                 "grace": 0,
                 "writtenGrace": null,
@@ -87951,8 +87814,8 @@
                 "staff": 1,
                 "voice": "1",
                 "measure": 3,
-                "onset": "27/1",
-                "duration": "0/1",
+                "onset": "1731/64",
+                "duration": "1/32",
                 "pitch": "72/1",
                 "grace": 0,
                 "writtenGrace": null,
@@ -88056,7 +87919,7 @@
                 "voice": "1",
                 "measure": 5,
                 "onset": "225/8",
-                "duration": "1/2",
+                "duration": "7/16",
                 "pitch": "72/1",
                 "grace": 0,
                 "writtenGrace": null,
@@ -88068,8 +87931,8 @@
                 "staff": 1,
                 "voice": "1",
                 "measure": 5,
-                "onset": "229/8",
-                "duration": "1/4",
+                "onset": "457/16",
+                "duration": "7/32",
                 "pitch": "72/1",
                 "grace": 0,
                 "writtenGrace": null,
@@ -88081,8 +87944,8 @@
                 "staff": 1,
                 "voice": "1",
                 "measure": 5,
-                "onset": "231/8",
-                "duration": "1/8",
+                "onset": "921/32",
+                "duration": "7/64",
                 "pitch": "72/1",
                 "grace": 0,
                 "writtenGrace": null,
@@ -88094,8 +87957,8 @@
                 "staff": 1,
                 "voice": "1",
                 "measure": 5,
-                "onset": "29/1",
-                "duration": "0/1",
+                "onset": "1849/64",
+                "duration": "7/128",
                 "pitch": "72/1",
                 "grace": 0,
                 "writtenGrace": null,
@@ -88107,8 +87970,8 @@
                 "staff": 1,
                 "voice": "1",
                 "measure": 5,
-                "onset": "29/1",
-                "duration": "0/1",
+                "onset": "3705/128",
+                "duration": "1/32",
                 "pitch": "72/1",
                 "grace": 0,
                 "writtenGrace": null,
@@ -88120,8 +87983,8 @@
                 "staff": 1,
                 "voice": "1",
                 "measure": 5,
-                "onset": "29/1",
-                "duration": "0/1",
+                "onset": "3709/128",
+                "duration": "1/32",
                 "pitch": "72/1",
                 "grace": 0,
                 "writtenGrace": null,
@@ -88133,8 +87996,8 @@
                 "staff": 1,
                 "voice": "1",
                 "measure": 5,
-                "onset": "29/1",
-                "duration": "0/1",
+                "onset": "3713/128",
+                "duration": "1/32",
                 "pitch": "72/1",
                 "grace": 0,
                 "writtenGrace": null,
@@ -88146,8 +88009,8 @@
                 "staff": 1,
                 "voice": "1",
                 "measure": 5,
-                "onset": "29/1",
-                "duration": "0/1",
+                "onset": "3717/128",
+                "duration": "1/32",
                 "pitch": "72/1",
                 "grace": 0,
                 "writtenGrace": null,
@@ -88159,84 +88022,8 @@
           "warnings": []
         },
         "xsd": {
-          "valid": false,
-          "errors": [
-            {
-              "line": 1,
-              "path": "/score-partwise/part/measure[2]/note[10]/duration",
-              "message": "Element 'duration': [facet 'minExclusive'] The value '0' must be greater than '0'."
-            },
-            {
-              "line": 1,
-              "path": "/score-partwise/part/measure[2]/note[11]/duration",
-              "message": "Element 'duration': [facet 'minExclusive'] The value '0' must be greater than '0'."
-            },
-            {
-              "line": 1,
-              "path": "/score-partwise/part/measure[2]/note[12]/duration",
-              "message": "Element 'duration': [facet 'minExclusive'] The value '0' must be greater than '0'."
-            },
-            {
-              "line": 1,
-              "path": "/score-partwise/part/measure[2]/note[13]/duration",
-              "message": "Element 'duration': [facet 'minExclusive'] The value '0' must be greater than '0'."
-            },
-            {
-              "line": 1,
-              "path": "/score-partwise/part/measure[2]/note[14]/duration",
-              "message": "Element 'duration': [facet 'minExclusive'] The value '0' must be greater than '0'."
-            },
-            {
-              "line": 1,
-              "path": "/score-partwise/part/measure[4]/note[10]/duration",
-              "message": "Element 'duration': [facet 'minExclusive'] The value '0' must be greater than '0'."
-            },
-            {
-              "line": 1,
-              "path": "/score-partwise/part/measure[4]/note[11]/duration",
-              "message": "Element 'duration': [facet 'minExclusive'] The value '0' must be greater than '0'."
-            },
-            {
-              "line": 1,
-              "path": "/score-partwise/part/measure[4]/note[12]/duration",
-              "message": "Element 'duration': [facet 'minExclusive'] The value '0' must be greater than '0'."
-            },
-            {
-              "line": 1,
-              "path": "/score-partwise/part/measure[4]/note[13]/duration",
-              "message": "Element 'duration': [facet 'minExclusive'] The value '0' must be greater than '0'."
-            },
-            {
-              "line": 1,
-              "path": "/score-partwise/part/measure[4]/note[14]/duration",
-              "message": "Element 'duration': [facet 'minExclusive'] The value '0' must be greater than '0'."
-            },
-            {
-              "line": 1,
-              "path": "/score-partwise/part/measure[6]/note[10]/duration",
-              "message": "Element 'duration': [facet 'minExclusive'] The value '0' must be greater than '0'."
-            },
-            {
-              "line": 1,
-              "path": "/score-partwise/part/measure[6]/note[11]/duration",
-              "message": "Element 'duration': [facet 'minExclusive'] The value '0' must be greater than '0'."
-            },
-            {
-              "line": 1,
-              "path": "/score-partwise/part/measure[6]/note[12]/duration",
-              "message": "Element 'duration': [facet 'minExclusive'] The value '0' must be greater than '0'."
-            },
-            {
-              "line": 1,
-              "path": "/score-partwise/part/measure[6]/note[13]/duration",
-              "message": "Element 'duration': [facet 'minExclusive'] The value '0' must be greater than '0'."
-            },
-            {
-              "line": 1,
-              "path": "/score-partwise/part/measure[6]/note[14]/duration",
-              "message": "Element 'duration': [facet 'minExclusive'] The value '0' must be greater than '0'."
-            }
-          ]
+          "valid": true,
+          "errors": []
         }
       }
     },

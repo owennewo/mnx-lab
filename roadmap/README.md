@@ -140,6 +140,8 @@ back up to `proposed/` the moment it is.
 
 ### inprogress/
 
+- **[core-musicxml-short-durations.md](inprogress/core-musicxml-short-durations.md)** — item 21 built: exact short-note divisions, 340/344 exports XSD-valid, and three additional independent export matches.
+
 - **[core-musicxml-xsd-ordering.md](inprogress/core-musicxml-xsd-ordering.md)** — item 20 built: pitch/tuning and direction grammar fixes; 336/344 generated exports now XSD-valid, unchanged semantic verdicts.
 
 - **[core-musicxml-differential-oracle.md](inprogress/core-musicxml-differential-oracle.md)** —
