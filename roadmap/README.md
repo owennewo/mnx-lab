@@ -45,7 +45,6 @@ proposals that name their campaign.
 
 ### proposed/
 
-- **[core-render-plan-orchestration.md](proposed/core-render-plan-orchestration.md)** — share render-plan fitting, scaling, caching and cropping across notation, tab and both without changing engravings.
 
 - **[studio-player-practice.md](proposed/studio-player-practice.md)** — campaign item 13,
   studio's first player feature in `elements/`: loop the selection with the **written-range
@@ -148,6 +147,8 @@ back up to `proposed/` the moment it is.
   the best precedent.
 
 ### inprogress/
+
+- **[core-render-plan-orchestration.md](inprogress/core-render-plan-orchestration.md)** — share render-plan fitting, scaling, caching and cropping across notation, tab and both without changing engravings.
 
 - **[studio-sync-rederive.md](complete/studio-sync-rederive.md)** — **built 2026-09-17, complete
   2026-09-20** (closed by the owner; the two hands-on checks continue on the live site), [studio authoring campaign](inprogress/studio-campaign-authoring.md)

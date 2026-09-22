@@ -1,76 +1,14 @@
-import type { PerformedEntry } from '../../model/passes.ts';
-import { clearanceSpacing } from '../clearance.ts';
-import type { DisplayOptions } from '../displayOptions.ts';
-import { MnxStructure } from '../../model/mnx.ts';
-import { PartTabSetups } from '../tab/guitarPositions.ts';
 import { layoutBothSystem } from '../layout/bothSystem.ts';
-import type { HideableFeature } from '../layout/notation.ts';
-import { computeBoundsSp } from '../render/bounds.ts';
-import { fitPxPerSp } from '../render/svg.ts';
 import { emitPlan, type RenderPlan } from '../render/plan.ts';
-import { squareLayout, type LayoutCache } from '../render/layoutCache.ts';
-import type { SystemBookends } from '../layout/systemBookends.ts';
-import type { RenderedProjection } from '../render/projection.ts';
-import {
-  clampStaffSp,
-  renderOutcome,
-  staffPxPerSp,
-  type RenderOutcome
-} from '../render/scale.ts';
+import { commonLayoutArgs, planLayout, type RenderOptions } from '../render/planLayout.ts';
+import type { RenderOutcome } from '../render/scale.ts';
+import type { PartTabSetups } from '../tab/guitarPositions.ts';
 
-/**
- * Thin entry point for the combined notation+tab view: one composed system
- * (src/engine/layout/bothSystem.ts), one SVG, one coordinate space — the
- * sourceId click bridge spans both staves through the merged index.
- */
-
-const DEFAULT_PX_PER_SP = 10;
-
-
-export interface RenderBothOptions {
-  entries?: PerformedEntry[];
-  container: HTMLElement;
-  mnx: MnxStructure;
-  /** Total viewport width in pixels. */
-  width: number;
-  activeNoteIds?: string[];
-  /** Record fret-mask duration spans for the playback paint (`RectPrim.spanEndX`). */
-  durationSpans?: boolean;
-  selectedNoteIds?: string[];
+export interface RenderBothOptions extends RenderOptions {
   /** Events lit by the selection — how a REST is highlighted. */
   selectedEventIds?: string[];
-  onNoteClick?: (
-    noteId: string,
-    measureIdx: number,
-    noteIdx: number,
-    projection: RenderedProjection
-  ) => void;
-  /** Pixels per staff space (zoom). Default 10. */
-  pxPerSp?: number;
-  /**
-   * Staff in canonical staff spaces — how big the INK is, and nothing else. 1sp is a
-   * square scale and behaves exactly as it always did. See
-   * `notationRenderer.ts` for why this is not folded into `pxPerSp`.
-   */
-  staffSp?: number;
-  /** @deprecated Use `staffSp`. Values are identical: 1 = 1sp. */
-  staffScale?: number;
-  /** Viewer-supplied instrument (strings/capo) — overrides the document's
-   *  declaration for rendering; never written back. */
+  /** Viewer-supplied instrument; never written back to the document. */
   tabSetup?: PartTabSetups;
-  /** Features the host hid (docs/core-viewer-surface.md). */
-  display?: DisplayOptions;
-  hide?: readonly HideableFeature[];
-  /** Horizontal density multiplier (core-render-density-zoom.md). */
-  spacingMode?: 'natural' | 'fill';
-  densityH?: number;
-  /** Vertical/frame density multiplier (core-vertical-density.md). */
-  densityPad?: number;
-  /** A caller-owned memo of the square layout across a zoom gesture
-   *  (`render/layoutCache.ts`). Absent, every paint lays out afresh. */
-  cache?: LayoutCache;
-  /** Optional host-owned regions before/after the first/last system. */
-  systemBookends?: SystemBookends;
 }
 
 /** The DOM-free half — see `render/plan.ts`. */
@@ -81,63 +19,9 @@ export function renderMnxToSvgBoth(opts: RenderBothOptions): RenderOutcome {
 }
 
 export function planBoth(opts: PlanBothOptions): RenderPlan {
-  const basePxPerSp = opts.pxPerSp ?? DEFAULT_PX_PER_SP;
-
-  const layoutArgs = {
-    mnx: opts.mnx,
-    entries: opts.entries,
-    widthSp: opts.width / basePxPerSp,
-    activeNoteIds: opts.activeNoteIds,
-    durationSpans: opts.durationSpans,
-    selectedNoteIds: opts.selectedNoteIds,
+  return planLayout(opts, {
+    ...commonLayoutArgs(opts),
     selectedEventIds: opts.selectedEventIds,
     tabSetup: opts.tabSetup,
-    display: opts.display,
-    hide: opts.hide,
-    spacingMode: opts.spacingMode,
-    densityH: opts.densityH,
-    densityPad: opts.densityPad,
-    systemBookends: opts.systemBookends
-  };
-  const square = squareLayout(opts.cache, layoutArgs, () => layoutBothSystem(layoutArgs));
-
-  const fitted = opts.pxPerSp === undefined;
-  const pxPerSp = fitted && opts.spacingMode !== 'natural' ? fitPxPerSp(opts.width, square.naturalWidthSp ?? square.usedWidthSp, basePxPerSp) : basePxPerSp;
-  // Staff is ABSOLUTE through its affine ink line, not a multiplier on the
-  // horizontal scale — 1.2 means the same size ink whatever the viewport did.
-  // A control that seeds its first step from the last painted scale (the pad
-  // does) needs that: multiplying would re-apply the fit it just read back.
-  // Unset leaves the emitter square, which is every other caller and the
-  // goldens.
-  const staffSp = clampStaffSp(opts.staffSp ?? opts.staffScale);
-  const pxPerSpY = staffSp === null ? pxPerSp : staffPxPerSp(staffSp);
-
-  // Rigid columns are ink (core-ink-priced-columns.md): under a non-square
-  // scale the plan is re-placed at the ink ratio so glyphs keep their columns.
-  // The fit is NOT redone — the square plan defined it — and bars are re-packed
-  // using the actual symbol widths. One ratio for
-  // both staves is what keeps them column-aligned.
-  const inkRatio = pxPerSpY / pxPerSp;
-  const layout =
-    Math.abs(inkRatio - 1) > 1e-9 ? layoutBothSystem({ ...layoutArgs, inkRatio }) : square;
-
-  const widthSp = fitted && opts.spacingMode !== 'natural' ? layout.usedWidthSp : layout.widthSp;
-  // Crop the rows' fixed headroom to the content's real vertical extent.
-  // y only — the x window stays the full plan width (see the other renderers).
-  const bounds = computeBoundsSp(layout.primitives, clearanceSpacing(opts.display?.clearance, opts.densityPad).cropMargin);
-  const viewBoxSp = bounds ? { x: 0, y: bounds.y, w: widthSp, h: bounds.h } : undefined;
-
-  return {
-    primitives: layout.primitives,
-    widthSp,
-    heightSp: layout.heightSp,
-    pxPerSp,
-    pxPerSpY,
-    viewBoxSp,
-    className: 'mnx-both-svg',
-    index: layout.index,
-    projection: 'both',
-    // The ink scale is what a zoom readout means; see notationRenderer.ts.
-    outcome: renderOutcome(pxPerSpY, fitted, layout.packings)
-  };
+  }, layoutBothSystem, 'both');
 }
