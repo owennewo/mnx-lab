@@ -8,9 +8,10 @@
 // that wrote a shape is the one that checks it on the way back in. That check
 // (`normalizePiecePrefs`) and the cueing it feeds belong to studio, which this
 // layer may not import: their proof is harness/verify/recording-studio-smoke.mjs.
-import { beforeEach, afterEach, expect, it } from 'vitest';
+import { beforeEach, expect, it } from 'vitest';
 import { readFile } from 'node:fs/promises';
-import { Miniflare, convertV4MiniflareOptions } from 'miniflare';
+import type { Miniflare } from 'miniflare';
+import { useLibraryRuntime } from '../helpers/libraryRuntime.ts';
 import app from '../../worker/index.ts';
 import type { Env } from '../../worker/env.ts';
 import { testIdentity } from '../helpers/libraryIdentity.ts';
@@ -31,9 +32,10 @@ const client = (token = () => jwt) => new LibraryClient((input, init) => {
 const make = async (document = blank()) => (await client().createPiece(file(document), derivedLibraryTags(document))).snapshot;
 const status = (promise: Promise<unknown>) => promise.then(() => 200, error => (error instanceof LibraryRequestError ? error.status : -1));
 
+const freshRuntime = useLibraryRuntime();
 beforeEach(async () => {
   const identity = await testIdentity(); jwt = await identity.sign();
-  mf = new Miniflare(convertV4MiniflareOptions({ modules: true, script: 'export default {fetch(){return new Response("test")}}', compatibilityDate: '2026-06-01', d1Databases: ['DB'], r2Buckets: ['BUCKET'] }));
+  mf = await freshRuntime();
   env = { LIBRARY_DB: await mf.getD1Database('DB'), LIBRARY_BUCKET: await mf.getR2Bucket('BUCKET'), LIBRARY_WRITE_TOKEN: 'private-test', ...identity.config };
   for (const name of ['0001_library', '0002_users', '0003_piece_views', '0004_recording_management', '0005_piece_lifecycle', '0006_piece_prefs']) {
     const sql = (await readFile(new URL(`../../migrations/${name}.sql`, import.meta.url), 'utf8')).replace(/--[^\n]*/g, '').trim();
@@ -41,7 +43,6 @@ beforeEach(async () => {
   }
   await env.LIBRARY_DB.prepare("INSERT INTO users VALUES ('operator','owner@example.test',1,'now')").run();
 }, 15000);
-afterEach(async () => { await mf?.dispose(); });
 
 it('carries the setup in the snapshot, replaces it wholesale, and never moves the revision', async () => {
   const piece = await make();

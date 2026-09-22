@@ -68,3 +68,27 @@ export function client(ws) {
   return { send, evaluate, logs };
 }
 
+
+/** Wait for observable readiness, not a fixed boot delay. Evaluation errors fail loudly. */
+export async function waitFor(cdp, expression, label, timeoutMs = 15000) {
+  const deadline = Date.now() + timeoutMs;
+  do {
+    if (await cdp.evaluate(expression)) return;
+    await new Promise(resolve => setTimeout(resolve, 100));
+  } while (Date.now() < deadline);
+  throw new Error(`Timed out waiting for ${label}`);
+}
+
+export const SCORE_READY = `(() => {
+  if (document.readyState !== 'complete' || document.fonts.status !== 'loaded') return false;
+  const roots = [document];
+  while (roots.length) {
+    const root = roots.shift();
+    for (const element of root.querySelectorAll('*')) {
+      if (element.localName === 'mnx-document-viewer' &&
+          element.shadowRoot?.querySelector('svg [data-source-id]')) return true;
+      if (element.shadowRoot) roots.push(element.shadowRoot);
+    }
+  }
+  return false;
+})()`;

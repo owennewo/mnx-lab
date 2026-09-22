@@ -8,24 +8,30 @@ making about them — that a box is drawn where the reader is looking, that a
 press lands on the beat it named — are claims about a finished SVG in a laid
 out page. Only a browser can answer those.
 
-They are **not part of the gates**. Run the relevant ones by hand after
-touching a shell or an element — and check the one you are about to rely on is
-green *before* you change anything, so a failure you inherit is not mistaken for
-one you caused.
+They are selected by the behavior a change affects, not run as a blanket gate.
+Run the relevant ones before landing a shell or element change. Check a baseline before
+editing only when existing behavior or harness health is uncertain. For a bug fix,
+prove the new regression assertion fails on old code with the smallest applicable test.
 
-## Running one
+## Running one or several
 
-Every smoke reads `dist/`, so **`npm run build` first** (`npm run build:embed`
-for the embed face). They need `google-chrome` on the PATH, or `CHROME_BIN`.
+`npm run smoke -- selection inspector` builds the site once and runs both smokes.
+Individual commands such as `npm run smoke:selection` still build for you.
+The runner builds each requested face at most once (site, embed, or library), retains
+both ESM and IIFE embed checks, and stops at the first failure. Use
+`npm run smoke -- --help` for names, including smokes without individual npm scripts.
 
-Most have a script that builds for you — `npm run smoke:selection`,
-`smoke:workbench-editor`, `smoke:inspector`, `smoke:player`, and so on; `npm
-run` lists them. **Five have no script** and are run directly after a build:
-`studio-smoke`, `studio-export-smoke`, `recording-studio-smoke`,
-`recording-management-smoke` and `youtube-smoke`. Their file headers say what
-each one wants. Those that need the library want `npm run dev:login` and
-`wrangler dev` on a free port ([library-access.md](library-access.md) → Local
-development).
+After a successful gate build, run `npm run smoke -- --built selection inspector`.
+`--built` skips builds explicitly: the artifacts must match the current sources and
+configuration. Rebuild after relevant edits or rebases. For embed/lib, build those
+faces first or let the runner do it. Direct `node harness/verify/<name>-smoke.mjs`
+invocations also reuse the current build. The audio smoke uses its own Vite server
+and needs no production build.
+
+Browser smokes need `google-chrome` on PATH, or `CHROME_BIN`. Those using the library
+still need `npm run dev:login` and `wrangler dev` on a free port
+([library-access.md](library-access.md) → Local development); the runner does not start
+or seed that service. Their file headers describe additional requirements.
 
 ## The traps
 
@@ -136,9 +142,10 @@ Prefer an invariant over a constant: "these two presses land in two different
 places" survives a re-engraving, an edited fixture and a different window size,
 where "this press lands on beat 3/4" does not.
 
-Make a new assertion **fail on the old code before you trust it** — `git stash
-push -- src/`, rebuild, run, then pop. Several of the assertions here passed for
-the wrong reason until that was done.
+For a bug regression, make the assertion **fail on old code before trusting it**.
+Use the smallest applicable test; only a browser-only regression needs an old-code
+build. Restore the changed sources and rebuild before the final smoke. This is not
+a requirement to run every existing smoke twice for every UI change.
 
 When one fails and the message is not enough, **instrument the smoke itself**
 rather than cloning it into a scratch harness. A richer failure message is worth

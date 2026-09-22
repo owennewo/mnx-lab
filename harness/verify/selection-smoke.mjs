@@ -1,3 +1,4 @@
+import { waitFor, SCORE_READY } from './browserHarness.mjs';
 // The selection overlay, driven in a real browser — the first test this layer
 // has ever had, and the reason it needed one: three separate bugs put the
 // selection box on the wrong beat, each invisible until the one in front of it
@@ -9,7 +10,7 @@
 // script rather than part of `npm test`: the suite must keep running on a
 // machine with no browser.
 //
-// Usage: npm run smoke:selection   (after npm run build)
+// Usage: npm run smoke:selection
 import fs from 'node:fs';
 import http from 'node:http';
 import path from 'node:path';
@@ -203,7 +204,7 @@ try {
   });
   const url = `http://127.0.0.1:${site.port}/workbench/#/scenario/lab/document/twelve-bar-blues`;
   await cdp.send('Page.navigate', { url });
-  await new Promise(r => setTimeout(r, 7000));
+  await waitFor(cdp, SCORE_READY, 'the score and fonts');
 
   const press = async (key, code, keyCode, settleMs = 700) => {
     for (const type of ['keyDown', 'keyUp']) {
@@ -377,7 +378,7 @@ try {
   await cdp.send('Page.navigate', { url: 'about:blank' });
   await new Promise(r => setTimeout(r, 300));
   await cdp.send('Page.navigate', { url });
-  await new Promise(r => setTimeout(r, 7000));
+  await waitFor(cdp, SCORE_READY, 'the score and fonts');
 
   const before = await settle();
   if (!before.overflows) {

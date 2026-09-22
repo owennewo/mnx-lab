@@ -1,7 +1,8 @@
 // Implementation loop: real signatures and local D1/R2 exercise the HTTP authorization boundary.
-import { beforeEach, afterEach, expect, it } from 'vitest';
+import { beforeEach, expect, it } from 'vitest';
 import { readFile } from 'node:fs/promises';
-import { Miniflare, convertV4MiniflareOptions } from 'miniflare';
+import type { Miniflare } from 'miniflare';
+import { useLibraryRuntime } from '../helpers/libraryRuntime.ts';
 import { SignJWT } from 'jose';
 import app from '../../worker/index.ts';
 import { Library } from '../../worker/library/index.ts';
@@ -10,9 +11,10 @@ import { testIdentity } from '../helpers/libraryIdentity.ts';
 import score from '../../scenarios/lab/00-document/01-minimal-single-note/document.mnx.json';
 let mf: Miniflare; let env: Env; let identity: Awaited<ReturnType<typeof testIdentity>>; let jwt: string;
 const request = (path: string, token = jwt, headers = {}) => app.request(`http://localhost/api/library${path}`, { headers: { 'Cf-Access-Jwt-Assertion': token, ...headers } }, env);
+const freshRuntime = useLibraryRuntime();
 beforeEach(async () => {
   identity = await testIdentity(); jwt = await identity.sign();
-  mf = new Miniflare(convertV4MiniflareOptions({ modules: true, script: 'export default {fetch(){return new Response("test")}}', compatibilityDate: '2026-06-01', d1Databases: ['DB'], r2Buckets: ['BUCKET'] }));
+  mf = await freshRuntime();
   env = { LIBRARY_DB: await mf.getD1Database('DB'), LIBRARY_BUCKET: await mf.getR2Bucket('BUCKET'), LIBRARY_WRITE_TOKEN: 'private-test', ...identity.config };
   for (const name of ['0001_library.sql','0002_users.sql', '0003_piece_views.sql', '0005_piece_lifecycle.sql', '0006_piece_prefs.sql']) {
     const sql = await readFile(new URL(`../../migrations/${name}`, import.meta.url), 'utf8');
@@ -20,7 +22,7 @@ beforeEach(async () => {
   }
   await env.LIBRARY_DB.prepare("INSERT INTO users VALUES ('operator','owner@example.test',1,'now')").run();
 }, 15000);
-afterEach(async () => { await mf?.dispose(); });
+
 it('requires signed identities, never email headers or browser bearer tokens', async () => {
   expect((await request('/me','', { 'Cf-Access-Authenticated-User-Email': 'owner@example.test', Authorization: 'Bearer private-test' })).status).toBe(401);
   expect((await request('/me', jwt.slice(0,-8) + 'aaaaaaaa')).status).toBe(401);

@@ -1,3 +1,4 @@
+import { waitFor, SCORE_READY } from './browserHarness.mjs';
 // The rung inspector, driven in a real browser
 // (roadmap/inprogress/workbench-rung-inspector.md). The data layer is joined
 // headlessly in harness/conformance/rung-inspector.test.ts; what only a
@@ -6,7 +7,7 @@
 // crumbs following, bare typing adds a pill, ⌫ reverts a floor pill, Enter on
 // a crumb goes to a sibling, Esc closes and the score has the keys again.
 //
-// Usage: npm run smoke:inspector   (after npm run build)
+// Usage: npm run smoke:inspector
 import fs from 'node:fs';
 import http from 'node:http';
 import path from 'node:path';
@@ -178,7 +179,7 @@ try {
 
   const url = `http://127.0.0.1:${site.port}/workbench/#/scenario/lab/document/twelve-bar-blues`;
   await cdp.send('Page.navigate', { url });
-  await new Promise(r => setTimeout(r, 7000));
+  await waitFor(cdp, SCORE_READY, 'the score and fonts');
 
   const press = async (key, code, keyCode, settleMs = 500, modifiers = 0) => {
     for (const type of ['keyDown', 'keyUp']) {

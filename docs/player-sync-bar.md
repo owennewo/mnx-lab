@@ -136,7 +136,7 @@ stored evidence is never rewritten.
 
 - `harness/conformance/sync-segments.test.ts`, `click-schedule.test.ts`, and the added cases
   in `recording-playback.test.ts` and `recording-management.test.ts`.
-- After `npm run build`, `npm run smoke:sync-bar` (`harness/verify/sync-bar-smoke.mjs`):
+- After `npm run build`, `npm run smoke -- --built sync-bar` (`harness/verify/sync-bar-smoke.mjs`):
   production Studio, a fixture client and real PCM; `SYNC_BAR_SHOT=<file.png>` writes a
   screenshot.
 

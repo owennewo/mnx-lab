@@ -22,7 +22,7 @@ import path from 'node:path';
 import { execFileSync, spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { serveStatic } from './staticServer.mjs';
-import { devtoolsPort, connect, client } from './browserHarness.mjs';
+import { devtoolsPort, connect, client, waitFor, SCORE_READY } from './browserHarness.mjs';
 import { checkPlayer } from './player-embed-check.mjs';
 import { checkRecordings } from './recording-embed-check.mjs';
 const format=process.env.MNX_EMBED_FORMAT??'esm';
@@ -80,7 +80,7 @@ try {
   await cdp.send('Runtime.enable');
   await cdp.send('Page.enable');
   await cdp.send('Page.navigate', { url: pageUrl });
-  await new Promise(r => setTimeout(r, 6000));
+  await waitFor(cdp, SCORE_READY, 'the embedded score and fonts');
 
   // 1. The custom element upgraded — the artifact loaded and registered.
   const upgraded = await cdp.evaluate(

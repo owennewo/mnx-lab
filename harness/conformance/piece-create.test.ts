@@ -6,9 +6,10 @@
 // its library tags off it, and POST it through the real Worker route over local
 // D1/R2 with a signed Access identity. The first write path for score content
 // gets the same treatment the ingest got.
-import { beforeEach, afterEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { readFile } from 'node:fs/promises';
-import { Miniflare, convertV4MiniflareOptions } from 'miniflare';
+import type { Miniflare } from 'miniflare';
+import { useLibraryRuntime } from '../helpers/libraryRuntime.ts';
 import app from '../../worker/index.ts';
 import type { Env } from '../../worker/env.ts';
 import { testIdentity } from '../helpers/libraryIdentity.ts';
@@ -95,9 +96,10 @@ describe('POST /api/library/pieces', () => {
       derived_tags: [{ dimension: 'title', value: 'Anji' }] };
   };
 
+  const freshRuntime = useLibraryRuntime();
   beforeEach(async () => {
     identity = await testIdentity(); jwt = await identity.sign();
-    mf = new Miniflare(convertV4MiniflareOptions({ modules: true, script: 'export default {fetch(){return new Response("test")}}', compatibilityDate: '2026-06-01', d1Databases: ['DB'], r2Buckets: ['BUCKET'] }));
+    mf = await freshRuntime();
     env = { LIBRARY_DB: await mf.getD1Database('DB'), LIBRARY_BUCKET: await mf.getR2Bucket('BUCKET'), LIBRARY_WRITE_TOKEN: 'private-test', ...identity.config };
     for (const name of ['0001_library', '0002_users', '0003_piece_views', '0004_recording_management', '0005_piece_lifecycle', '0006_piece_prefs']) {
       const sql = (await readFile(new URL(`../../migrations/${name}.sql`, import.meta.url), 'utf8')).replace(/--[^\n]*/g, '').trim();
@@ -105,7 +107,6 @@ describe('POST /api/library/pieces', () => {
     }
     await env.LIBRARY_DB.prepare("INSERT INTO users VALUES ('operator','owner@example.test',1,'now')").run();
   }, 15000);
-  afterEach(async () => { await mf?.dispose(); });
 
   it('stores the .gp as the canonical original of a piece the service named, and reads back the same music', async () => {
     const document = buildNewDocument(spec());

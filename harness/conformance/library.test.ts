@@ -1,7 +1,8 @@
 // Implementation loop: real D1/R2 semantics are the oracle, never SQL mocks.
-import { beforeEach, afterEach, expect, it } from 'vitest';
+import { beforeEach, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { Miniflare, convertV4MiniflareOptions } from 'miniflare'; // The local runtime installed by the locked Wrangler dependency.
+import type { Miniflare } from 'miniflare';
+import { useLibraryRuntime } from '../helpers/libraryRuntime.ts';
 import type { D1Database, R2Bucket } from '@cloudflare/workers-types';
 import { Library, type PieceWrite, type RenditionInput } from '../../worker/library/index.ts';
 import { describeBlob } from '../../worker/library/blobs.ts';
@@ -30,15 +31,15 @@ function wrappedBucket(overrides: Partial<R2Bucket>): R2Bucket {
     return typeof value === 'function' ? value.bind(source) : value;
   } });
 }
+const freshRuntime = useLibraryRuntime();
 beforeEach(async () => {
-  mf = new Miniflare(convertV4MiniflareOptions({ modules: true, script: 'export default { fetch() { return new Response("test only") } }', compatibilityDate: '2026-06-01', d1Databases: ['DB'], r2Buckets: ['BUCKET'] }));
+  mf = await freshRuntime();
   db = await mf.getD1Database('DB');
   bucket = await mf.getR2Bucket('BUCKET');
   // Split only between this migration's CREATE statements, preserving the trigger body.
   await db.batch([migration, views, lifecycle, prefs].map(m => m.replace(/--[^\n]*/g, '').trim().split(/;\s*(?=(?:CREATE|ALTER)\b)/).map(sql => db.prepare(sql))).flat());
   library = new Library(db, bucket);
 }, 15000);
-afterEach(async () => { await mf?.dispose(); });
 
 it('keeps the migration equal to the documented five-table schema', async () => {
   const design = readFileSync(new URL('../../docs/studio-storage.md', import.meta.url), 'utf8').split('```sql\n')[1].split('```')[0];

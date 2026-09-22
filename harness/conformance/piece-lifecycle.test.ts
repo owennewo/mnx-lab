@@ -3,9 +3,10 @@
 // deleting that removes nothing, going back to a version by moving the pointer,
 // and the defect report a lossy save leaves for the operator. The tests make dozens
 // of requests each through Miniflare, so they are given room for a loaded full run.
-import { beforeEach, afterEach, expect, it } from 'vitest';
+import { beforeEach, expect, it } from 'vitest';
 import { readFile } from 'node:fs/promises';
-import { Miniflare, convertV4MiniflareOptions } from 'miniflare';
+import type { Miniflare } from 'miniflare';
+import { useLibraryRuntime } from '../helpers/libraryRuntime.ts';
 import app from '../../worker/index.ts';
 import type { Env } from '../../worker/env.ts';
 import { Library, pieceIdFor } from '../../worker/library/index.ts';
@@ -38,9 +39,10 @@ const status = (promise: Promise<unknown>) => promise.then(() => 200, error => (
 const count = async (table: string) => (await env.LIBRARY_DB.prepare(`SELECT count(*) AS n FROM ${table}`).first<{ n: number }>())!.n;
 const titleOf = (bytes: ArrayBuffer) => documentTitle(importGuitarProCleanRoom(new Uint8Array(bytes)) as unknown as MnxStructure);
 
+const freshRuntime = useLibraryRuntime();
 beforeEach(async () => {
   identity = await testIdentity(); jwt = await identity.sign();
-  mf = new Miniflare(convertV4MiniflareOptions({ modules: true, script: 'export default {fetch(){return new Response("test")}}', compatibilityDate: '2026-06-01', d1Databases: ['DB'], r2Buckets: ['BUCKET'] }));
+  mf = await freshRuntime();
   env = { LIBRARY_DB: await mf.getD1Database('DB'), LIBRARY_BUCKET: await mf.getR2Bucket('BUCKET'), LIBRARY_WRITE_TOKEN: 'private-test', ...identity.config };
   for (const name of ['0001_library', '0002_users', '0003_piece_views', '0004_recording_management', '0005_piece_lifecycle', '0006_piece_prefs']) {
     const sql = (await readFile(new URL(`../../migrations/${name}.sql`, import.meta.url), 'utf8')).replace(/--[^\n]*/g, '').trim();
@@ -48,7 +50,6 @@ beforeEach(async () => {
   }
   await env.LIBRARY_DB.prepare("INSERT INTO users VALUES ('operator','owner@example.test',1,'now')").run();
 }, 15000);
-afterEach(async () => { await mf?.dispose(); });
 
 it('deleting hides a piece from every read and removes nothing; restoring brings all of it back', async () => {
   const kept = await make(blank('Kept'));

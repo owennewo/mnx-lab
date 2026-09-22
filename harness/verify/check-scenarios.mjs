@@ -339,6 +339,25 @@ function checkJsonFile(file, label, fail) {
   return parsed;
 }
 
+export function checkManifest(ctx) {
+  const errors = [];
+  // The manifest restates both schema versions for the workbench's facts
+  // panel; a restated number nothing checks is how the corpus shipped
+  // "extensionVersion: 5" for a v6 schema. Assert both against the $ids.
+  if (String(ctx.manifest.mnxSchemaVersion) !== String(ctx.mnxSchemaVersion)) {
+    errors.push(
+      `manifest.json: mnxSchemaVersion is ${ctx.manifest.mnxSchemaVersion} but spec/mnx-schema.json's $id says ${ctx.mnxSchemaVersion}`
+    );
+  }
+  if (String(ctx.manifest.extensionVersion) !== String(ctx.extensionVersion)) {
+    errors.push(
+      `manifest.json: extensionVersion is ${ctx.manifest.extensionVersion} but spec/mnx-lab-extensions.schema.json's $id says ${ctx.extensionVersion}`
+    );
+  }
+
+  return errors;
+}
+
 // ---------- CLI ----------
 function main() {
   const ctx = createContext();
@@ -353,19 +372,7 @@ function main() {
   const statusCounts = {};
   const coveredDefs = new Set();
 
-  // The manifest restates both schema versions for the workbench's facts
-  // panel; a restated number nothing checks is how the corpus shipped
-  // "extensionVersion: 5" for a v6 schema. Assert both against the $ids.
-  if (String(ctx.manifest.mnxSchemaVersion) !== String(ctx.mnxSchemaVersion)) {
-    allErrors.push(
-      `manifest.json: mnxSchemaVersion is ${ctx.manifest.mnxSchemaVersion} but spec/mnx-schema.json's $id says ${ctx.mnxSchemaVersion}`
-    );
-  }
-  if (String(ctx.manifest.extensionVersion) !== String(ctx.extensionVersion)) {
-    allErrors.push(
-      `manifest.json: extensionVersion is ${ctx.manifest.extensionVersion} but spec/mnx-lab-extensions.schema.json's $id says ${ctx.extensionVersion}`
-    );
-  }
+  allErrors.push(...checkManifest(ctx));
 
   for (const scenario of corpus) {
     const { errors, warnings, meta } = checkScenario(scenario, ctx);

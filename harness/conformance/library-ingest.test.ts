@@ -3,7 +3,8 @@ import { beforeEach, afterEach, expect, it } from 'vitest';
 import { mkdtemp, writeFile, rm, readFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { Miniflare, convertV4MiniflareOptions } from 'miniflare';
+import type { Miniflare } from 'miniflare';
+import { useLibraryRuntime } from '../helpers/libraryRuntime.ts';
 import realApp from '../../worker/index.ts';
 import { testIdentity } from '../helpers/libraryIdentity.ts';
 let assertion = '';
@@ -34,6 +35,7 @@ async function form(manifest: object, files: Map<string, Uint8Array>) {
   for (const [key, value] of files) f.set(key, new Blob([value]), key);
   return f;
 }
+const freshRuntime = useLibraryRuntime();
 beforeEach(async () => {
   directory = await mkdtemp(join(tmpdir(), 'mnx-ingest-'));
   await writeFile(join(directory,'Song_ABC.gp'), 'synthetic GP input');
@@ -44,7 +46,7 @@ beforeEach(async () => {
     { id: 2, source: 2, media_file: 'Song_ABC.mp3', name: 'Audio', syncpoints: [[0,0]], cropped_duration: 10, crop_start: 1, crop_end: 11 }
   ] }));
   await writeFile(join(directory,'Song_ABC.lists.json'), JSON.stringify({ id: 'ABC', score_file: 'Song_ABC.gp', lists: [{ id: 'L1', path: 'Folder / List' }] }));
-  mf = new Miniflare(convertV4MiniflareOptions({ modules: true, script: 'export default {fetch(){return new Response("test")}}', compatibilityDate: '2026-06-01', d1Databases: ['DB'], r2Buckets: ['BUCKET'] }));
+  mf = await freshRuntime();
   env = { LIBRARY_DB: await mf.getD1Database('DB'), LIBRARY_BUCKET: await mf.getR2Bucket('BUCKET'), LIBRARY_WRITE_TOKEN: token };
   const identity = await testIdentity(); Object.assign(env, identity.config); assertion = await identity.sign({}, true);
   await env.LIBRARY_DB.exec("CREATE TABLE users(id TEXT PRIMARY KEY,email TEXT,active INTEGER); INSERT INTO users VALUES('operator','owner@example.test',1)");
@@ -53,7 +55,7 @@ beforeEach(async () => {
     await env.LIBRARY_DB.batch(sql.replace(/--[^\n]*/g,'').trim().split(/;\s*(?=(?:CREATE|ALTER)\b)/).map(s => env.LIBRARY_DB.prepare(s)));
   }
 }, 15000);
-afterEach(async () => { await mf?.dispose(); await rm(directory, { recursive: true, force: true }); });
+afterEach(async () => { await rm(directory, { recursive: true, force: true }); });
 
 it('rejects unauthenticated reads, writes and unknown library routes before storage', async () => {
   for (const path of ['/api/library','/api/library/','/api/library/ingest/ABC','/api/library/pieces','/api/library/renditions/private']) {

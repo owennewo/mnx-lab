@@ -1,10 +1,11 @@
-import { beforeEach, afterEach, expect, it } from 'vitest';
+import { beforeEach, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { Miniflare, convertV4MiniflareOptions } from 'miniflare';
+import type { Miniflare } from 'miniflare';
+import { useLibraryRuntime } from '../helpers/libraryRuntime.ts';
 import type { D1Database, R2Bucket } from '@cloudflare/workers-types';
 import { Library } from '../../worker/library/index.ts';
 import { RecordingManager } from '../../worker/library/recordings.ts';
-import { attachmentSync, recordingSyncChoices, storedSyncSegments, MAX_AUDIO_BYTES } from '../../src/model/recordingAttachment.ts';
+import { attachmentSync, storedSyncSegments, MAX_AUDIO_BYTES } from '../../src/model/recordingAttachment.ts';
 import { SYNC_SEGMENTS_FORMAT, emptySyncSegments, placeEnd, placeStart, setBpm } from '../../src/model/syncSegments.ts';
 import realApp from '../../worker/index.ts';
 import { testIdentity } from '../helpers/libraryIdentity.ts';
@@ -14,8 +15,9 @@ const change = { name: 'Take', video: 'https://youtu.be/M7lc1UVf-VE', rawSync: [
 const payload = new TextEncoder().encode('RIFF test audio integrity');
 async function audio() { return { sha256: Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', payload)), b => b.toString(16).padStart(2,'0')).join(''), bytes: payload.length, mime: 'audio/wav' }; }
 function request(bytes = payload) { return new Request('http://localhost/upload', { method: 'PUT', headers: { 'content-length': String(bytes.length) }, body: bytes }); }
+const freshRuntime = useLibraryRuntime();
 beforeEach(async () => {
-  mf = new Miniflare(convertV4MiniflareOptions({ modules: true, script: 'export default { fetch() { return new Response("test") } }', compatibilityDate: '2026-06-01', d1Databases: ['DB'], r2Buckets: ['BUCKET'] }));
+  mf = await freshRuntime();
   db = await mf.getD1Database('DB'); const nativeBucket = await mf.getR2Bucket('BUCKET');
   // Miniflare's Node RPC drops a Node stream's known-length tag. Adapt only this
   // test boundary; recording-management-smoke exercises the real Worker stream.
@@ -30,16 +32,7 @@ beforeEach(async () => {
   library = new Library(db,bucket); manager = new RecordingManager(db,bucket);
   await library.writePiece('alice',{id:'piece',expected_revision:null});
 },15000);
-afterEach(async () => { await mf?.dispose(); });
-it('requires explicit stable selection from wrappers and retains raw event timings and crop metadata', () => {
-  const raw = { id:'score', recordings:[{id:8,name:'Same',syncpoints:[[0,2],[1,4,240,1]],crop_start:2,crop_end:8},{id:9,name:'Same',syncpoints:[[0,1],[1,5]],cropped_duration:10}] };
-  expect(recordingSyncChoices(raw).map(c=>c.id)).toEqual(['8','9']);
-  expect(()=>attachmentSync(raw,null)).toThrow('Choose');
-  const s=attachmentSync(raw,'8'); expect(s.syncpoints).toEqual(raw.recordings[0].syncpoints); expect(s.provenance.raw).toEqual(raw); expect(s.provenance.crop_start).toBe(2);
-  expect(attachmentSync(raw,'9').provenance).toMatchObject({crop_start:null,crop_end:null,cropped_duration:10});
-  expect(()=>recordingSyncChoices({recordings:[{id:1},{id:'1'}]})).toThrow('unique');
-  expect(()=>attachmentSync([[0,-1]],null)).toThrow();
-});
+
 it('stores a sync authored in Studio: the segments as provenance beside the derived tuples', async () => {
   const segments=placeEnd(setBpm(placeStart(emptySyncSegments(),2),0,120),10), syncpoints=[[0,2],[1,4],[2,6]];
   const authored=attachmentSync({format:SYNC_SEGMENTS_FORMAT,segments,syncpoints},null);

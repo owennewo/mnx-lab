@@ -4,9 +4,10 @@
 // A checkpoint is another immutable `.gp` rendition that takes the canonical
 // pointer — so the service keeps every version — and it is refused unless it
 // was edited from what is canonical NOW.
-import { beforeEach, afterEach, expect, it } from 'vitest';
+import { beforeEach, expect, it } from 'vitest';
 import { readFile } from 'node:fs/promises';
-import { Miniflare, convertV4MiniflareOptions } from 'miniflare';
+import type { Miniflare } from 'miniflare';
+import { useLibraryRuntime } from '../helpers/libraryRuntime.ts';
 import app from '../../worker/index.ts';
 import type { Env } from '../../worker/env.ts';
 import { Library, pieceIdFor } from '../../worker/library/index.ts';
@@ -36,9 +37,10 @@ const checkpoint = (document: MnxStructure, from: { revision: number; canonical_
 const rows = (sql: string, ...bind: unknown[]) => env.LIBRARY_DB.prepare(sql).bind(...bind).all<Record<string, unknown>>().then(r => r.results);
 const status = (promise: Promise<unknown>) => promise.then(() => 200, error => (error instanceof LibraryRequestError ? error.status : -1));
 
+const freshRuntime = useLibraryRuntime();
 beforeEach(async () => {
   identity = await testIdentity(); jwt = await identity.sign();
-  mf = new Miniflare(convertV4MiniflareOptions({ modules: true, script: 'export default {fetch(){return new Response("test")}}', compatibilityDate: '2026-06-01', d1Databases: ['DB'], r2Buckets: ['BUCKET'] }));
+  mf = await freshRuntime();
   env = { LIBRARY_DB: await mf.getD1Database('DB'), LIBRARY_BUCKET: await mf.getR2Bucket('BUCKET'), LIBRARY_WRITE_TOKEN: 'private-test', ...identity.config };
   for (const name of ['0001_library', '0002_users', '0003_piece_views', '0004_recording_management', '0005_piece_lifecycle', '0006_piece_prefs']) {
     const sql = (await readFile(new URL(`../../migrations/${name}.sql`, import.meta.url), 'utf8')).replace(/--[^\n]*/g, '').trim();
@@ -46,7 +48,6 @@ beforeEach(async () => {
   }
   await env.LIBRARY_DB.prepare("INSERT INTO users VALUES ('operator','owner@example.test',1,'now')").run();
 }, 15000);
-afterEach(async () => { await mf?.dispose(); });
 
 it('keeps every version: a checkpoint is a new edit rendition that takes the pointer, and the tags follow the document', async () => {
   const first = blank();

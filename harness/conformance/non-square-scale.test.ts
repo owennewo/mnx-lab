@@ -85,7 +85,12 @@ function drawnSpan(p: Primitive, ink: number): { l: number; r: number } | null {
 }
 
 /** Every layout the corpus can produce, so nothing hides in one projection. */
+// These assertions only read layouts. Cache within this file/run, never across builds.
+const layouts = new Map<string, LayoutResult[]>();
 function layoutsOf(dir: string, ink: number): LayoutResult[] {
+  const key = `${dir}:${ink}`;
+  const cached = layouts.get(key);
+  if (cached) return cached;
   const out: LayoutResult[] = [];
   for (const make of [
     () => layoutNotation({ mnx: readDoc(dir), widthSp: WIDTH_SP, inkRatio: ink }),
@@ -98,6 +103,7 @@ function layoutsOf(dir: string, ink: number): LayoutResult[] {
       // A layout that throws is another test's business.
     }
   }
+  layouts.set(key, out);
   return out;
 }
 

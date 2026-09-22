@@ -1,19 +1,21 @@
 // Implementation loop: pre-provisioned users preserve existing library owner identities.
-import { beforeEach, afterEach, expect, it } from 'vitest';
+import { beforeEach, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { Miniflare, convertV4MiniflareOptions } from 'miniflare';
+import type { Miniflare } from 'miniflare';
+import { useLibraryRuntime } from '../helpers/libraryRuntime.ts';
 import type { D1Database } from '@cloudflare/workers-types';
 let mf: Miniflare;
 let db: D1Database;
+const freshRuntime = useLibraryRuntime({ bucket: false });
 beforeEach(async () => {
-  mf = new Miniflare(convertV4MiniflareOptions({ modules: true, script: 'export default {fetch(){return new Response("test")}}', compatibilityDate: '2026-06-01', d1Databases: ['DB'] }));
+  mf = await freshRuntime();
   db = await mf.getD1Database('DB');
   for (const name of ['0001_library.sql', '0002_users.sql', '0005_piece_lifecycle.sql']) {
     const sql = readFileSync(new URL(`../../migrations/${name}`, import.meta.url), 'utf8');
     await db.batch(sql.replace(/--[^\n]*/g, '').trim().split(/;\s*(?=CREATE\b)/).map(s => db.prepare(s)));
   }
 }, 15000);
-afterEach(async () => { await mf?.dispose(); });
+
 it('requires unique normalized email, nonempty stable identity and boolean activity', async () => {
   const add = (id: string, email: string, active = 1) => db.prepare('INSERT INTO users (id,email,active,created_at) VALUES (?,?,?,?)').bind(id,email,active,'2026-09-11').run();
   await add('operator','owner@example.com');

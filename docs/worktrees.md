@@ -28,7 +28,10 @@ directory inside it, so that **nothing in the tree ever has to know they exist**
 not a glob in a harness script. An in-tree worktree would need every one of those to
 learn an exclusion, and each exclusion is a place for a future bug to hide.
 
-Worktrees do **not** share `node_modules`, hence the `npm ci` in the recipe.
+Worktrees do **not** share `node_modules`, hence the initial `npm ci` in the recipe.
+Install once per worktree; repeat only when dependency inputs change or the installation
+is broken. Targeted tests belong in the development loop; full gates belong on the final
+rebased tree (see CLAUDE.md).
 `git worktree add` also does not populate submodules, so `vendor/mnx` starts empty; no
 build requires it (the compare pane degrades with a warning), which is why populating it
 is opt-in for spec-loop work rather than part of setup.

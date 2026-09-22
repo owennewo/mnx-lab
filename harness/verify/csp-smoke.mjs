@@ -1,3 +1,4 @@
+import { waitFor } from './browserHarness.mjs';
 // Does the built workbench actually run under the CSP we deploy?
 //
 // The policy exists because BYOK put an OpenRouter key in this origin's
@@ -23,7 +24,7 @@
 //      violation and no error banner.
 //
 // Not part of `npm test`: it needs Chrome and a build, like smoke:embed.
-// Run it with `npm run smoke:csp` after `npm run build`.
+// Run it with `npm run smoke:csp`, or reuse a build with `npm run smoke -- --built csp`.
 import fs from 'node:fs';
 import http from 'node:http';
 import path from 'node:path';
@@ -223,7 +224,14 @@ try {
   await cdp.send('Page.enable');
   await cdp.send('Page.addScriptToEvaluateOnNewDocument', { source: COLLECTOR });
   await cdp.send('Page.navigate', { url: pageUrl });
-  await new Promise(r => setTimeout(r, 6000));
+  await waitFor(cdp, `(async () => {
+    const app = document.querySelector('mnx-workbench');
+    if (!app?.updateComplete) return false;
+    await app.updateComplete;
+    await document.fonts.ready;
+    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    return document.readyState === 'complete' && !!app.shadowRoot?.textContent?.trim();
+  })()`, 'the workbench under CSP');
 
   // 1. Nothing the app does on boot violates the policy.
   const violations = (await cdp.evaluate('JSON.stringify(window.__cspViolations ?? [])')) ?? '[]';
