@@ -50,6 +50,11 @@ proposals that name their campaign.
 
 
 
+- **[core-single-cursor.md](proposed/core-single-cursor.md)** — studio authoring item 10:
+  **one cursor**. The edit cursor becomes a performed position (pass-model entry + written
+  address): paused arrows walk the performance and seek the player, jumps reset the pass,
+  Play collapses a selection, pause parks the cursor at the playhead, no editing while
+  playing, a brief *Pass 2* on a loop or jump. Reverses the two-cursor decisions.
 - **[studio-player-practice.md](proposed/studio-player-practice.md)** — campaign item 13,
   studio's first player feature in `elements/`: loop the selection with the **written-range
   → performed-occurrences policy stated**, speed trainer, count-in, metronome, mute/solo.
