@@ -161,4 +161,6 @@ The extended `studio-editor-smoke.mjs` types both commands in a newly created, e
 Studio piece and checks unchanged pitched content plus exact history. Inherited bars
 receive the expected rest padding. These commands are undone before the smoke's
 normal GP checkpoint/reload checks; extended-meter GP storage fidelity is not claimed.
-The untitled imported-version reachability issue remains open.
+At that capture the untitled imported-version reachability issue remained open; the
+[later title-workflow assessment](musicxml-editor-assessment.md#untitled-studio-versions--title-workflow-follow-up)
+records its repair on three original examples.

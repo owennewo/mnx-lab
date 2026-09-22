@@ -1,0 +1,232 @@
+{
+  "kind": "browser observations; not feature correctness or human verification",
+  "captureScriptSha256": "d14d8eb04cfa25dc7113cb4158fe602dd9008c7cb6fedfa4160177b26e33fb7f",
+  "shell": "studio",
+  "applicationCommit": "dad1c6688822158d7db044e3d0db5062a8876fb8",
+  "corpusRevision": "77c19f7e819154c70ca1a1992e80dcda8ff82fea",
+  "viewport": {
+    "width": 1440,
+    "height": 1000,
+    "deviceScaleFactor": 1
+  },
+  "fixtures": [
+    {
+      "id": "01a-Pitches-Pitches",
+      "sourceSha256": "ca77d3d279175451411b3c1730a05d375072a92fe2e1d68be7ce77afe1a0bc17",
+      "testClass": "feature",
+      "description": "All pitches from G to c’’’’ in ascending steps. First without accidentals, then with a sharp, and then with a flat accidental. Measures 25 and 26 show explicit natural accidentals; measure 27 displays double alterations, cautionary, and editorial accidentals.",
+      "views": [
+        {
+          "scrollTarget": "viewer",
+          "visibleWidth": 1060,
+          "visibleHeight": 870,
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            [
+              6,
+              7,
+              8,
+              9,
+              10
+            ],
+            [
+              11,
+              12,
+              13,
+              14
+            ],
+            [
+              15,
+              16,
+              17,
+              18
+            ],
+            [
+              19,
+              20,
+              21,
+              22
+            ],
+            [
+              23,
+              24,
+              25,
+              26
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [],
+          "scrollWidth": 1045,
+          "scrollHeight": 1015,
+          "clientWidth": 1045,
+          "clientHeight": 870,
+          "screenshots": [
+            "notation-0-0.png",
+            "notation-0-145.png"
+          ]
+        }
+      ],
+      "suppliedLibraryTitle": "01a-Pitches-Pitches",
+      "makeCurrentError": null,
+      "entryPath": "Local operator ingest: GP seed + unmodified XML original; Save → Versions → View XML → Make current",
+      "importError": null,
+      "viewingOriginal": false,
+      "editingSuspended": false,
+      "warnings": [],
+      "importedDocumentSha256": "4225471cc9f9ec865b7f5fa49ac43789163058033c33b563584b1253252a5c0a",
+      "displayOptions": {
+        "lyrics": "current",
+        "timeSignatures": "hide",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "02a-Rests-Durations",
+      "sourceSha256": "e3ea4e142675886b0b0f231d70e5e2acbd0a00f543f703543fdf140a5bc0151c",
+      "testClass": "feature",
+      "description": "All different rest lengths: A two-bar multi-measure rest, a whole rest, a half rest, etc., until a 1024th-rest, then the same with dotted durations. The last bar is a full-measure rest with the attribute ‘measure=\"no\"’.",
+      "views": [
+        {
+          "scrollTarget": "frame",
+          "visibleWidth": 1060,
+          "visibleHeight": 870,
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0,
+              1,
+              2,
+              3
+            ],
+            [
+              4,
+              5
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [
+            "validation — overfills the 2/2 bar: notes sum to 2.047 of 2 beats",
+            "validation — overfills the 2/2 bar: notes sum to 2.047 of 2 beats",
+            "validation — overfills the 3/2 bar: notes sum to 3.039 of 3 beats",
+            "validation — overfills the 3/2 bar: notes sum to 3.039 of 3 beats"
+          ],
+          "scrollWidth": 1060,
+          "scrollHeight": 870,
+          "clientWidth": 1060,
+          "clientHeight": 870,
+          "screenshots": [
+            "notation-0-0.png"
+          ]
+        }
+      ],
+      "suppliedLibraryTitle": "02a-Rests-Durations",
+      "makeCurrentError": null,
+      "entryPath": "Local operator ingest: GP seed + unmodified XML original; Save → Versions → View XML → Make current",
+      "importError": null,
+      "viewingOriginal": false,
+      "editingSuspended": false,
+      "warnings": [],
+      "importedDocumentSha256": "e4b2434afe96b7a37a709d3f8a75cdb24674517925e946553b37d4350309b50b",
+      "displayOptions": {
+        "lyrics": "current",
+        "timeSignatures": "hide",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "61a-Lyrics",
+      "sourceSha256": "4128f432175b1a9d30e08459c68fc3321b378fba854fcb80668e42233b922d80",
+      "testClass": "feature",
+      "description": "Some notes with simple lyrics. The values of the <syllabic> elements of the four notes in measure 1 are ‘begin’, ‘middle’, ‘end’, and ‘single’, respectively. Measure 2's first note has no lyrics; the lyrics starts on the second note, skips the third note, and ends at the fourth one. A similar situation is present for measure 3: no lyrics at the first note, a single syllable on the second note, and the third note has again no lyrics.",
+      "views": [
+        {
+          "scrollTarget": "frame",
+          "visibleWidth": 1060,
+          "visibleHeight": 870,
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0,
+              1,
+              2
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [],
+          "scrollWidth": 1060,
+          "scrollHeight": 870,
+          "clientWidth": 1060,
+          "clientHeight": 870,
+          "screenshots": [
+            "notation-0-0.png"
+          ]
+        }
+      ],
+      "suppliedLibraryTitle": "61a-Lyrics",
+      "makeCurrentError": null,
+      "entryPath": "Local operator ingest: GP seed + unmodified XML original; Save → Versions → View XML → Make current",
+      "importError": null,
+      "viewingOriginal": false,
+      "editingSuspended": false,
+      "warnings": [],
+      "importedDocumentSha256": "2f536fa895e3ddf0723d5ee093f6a10c28c2a5579c2342de1e92ec5d29b1c35f",
+      "displayOptions": {
+        "lyrics": "current",
+        "timeSignatures": "hide",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide",
+        "selectedVerse": "1"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    }
+  ],
+  "browser": {
+    "protocolVersion": "1.3",
+    "product": "Chrome/153.0.8010.36",
+    "revision": "@507c6ee3e2f3b2ca0e660547e5b9ea4820c67f4c",
+    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+    "jsVersion": "15.3.76.10"
+  }
+}

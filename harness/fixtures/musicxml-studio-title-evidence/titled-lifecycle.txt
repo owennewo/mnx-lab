@@ -1,0 +1,1 @@
+Piece-lifecycle smoke passed: 01be7e87d29ac552 — three versions listed, the first looked at with nothing written, made current by a pointer move (tags following, the next edit derived from it), deleted with the library's undo, deleted again and restored from #/deleted with all four renditions.

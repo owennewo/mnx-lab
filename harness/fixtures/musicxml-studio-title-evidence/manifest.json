@@ -1,0 +1,28 @@
+{
+  "kind": "Studio title workflow and measured GP storage evidence; not feature goldens",
+  "files": {
+    "sources/01a-Pitches-Pitches/document.mnx.json": "98a9808fdffa2bd328c89365f52c2584d7e6c0e56d0b2f03d5c79b3a91b5e3d9",
+    "sources/01a-Pitches-Pitches/notation-0-0.png": "ed4e0548f41a6d08e6466ec3b66c55695efdd4cdd455f2de8903e99d4e4503c6",
+    "sources/01a-Pitches-Pitches/notation-0-145.png": "279f420be45ebefca3791dc626f2888de4f2d3f781e45b727e9332a01cf6b7bc",
+    "sources/01a-Pitches-Pitches/notation-0.svg": "d9fe86a74202e06058963eefdeeeae6921d01ff0f7b65039b517ae6891deab54",
+    "sources/01a-Pitches-Pitches/observation.json": "85daf24f9a203b836d5dde5aa9fb33a47ed1325945dc02ef97ebdb55d75d46f8",
+    "sources/02a-Rests-Durations/document.mnx.json": "2c219b1576e5ae7344608daa30e9f3be7cdab99fa540edb2f2ae807281181216",
+    "sources/02a-Rests-Durations/notation-0-0.png": "e762f14b9f84c2736d2c135e596d9e3b118e3f3fa771850d93a870f0cf8f6ce3",
+    "sources/02a-Rests-Durations/notation-0.svg": "b48d374f0194ca29d4a9ba6dddf96e3f38cd57ba2da91b85443e52755dd21f92",
+    "sources/02a-Rests-Durations/observation.json": "dffa41c1f1eb53e99dfef9d45fefb0af5c88e5e4da99d04898684275146166b0",
+    "sources/61a-Lyrics/document.mnx.json": "85c3bf2a1de01995c949cc09ba927ebd9336ce87626f9da7cb97c307ecfdea6b",
+    "sources/61a-Lyrics/notation-0-0.png": "da04c4a34695a2e53f544f5e3248afb2da9b9aaae3d5c6f102bdcc7501746800",
+    "sources/61a-Lyrics/notation-0.svg": "a99805ca2b2ee77c4d0168ea98698381b91a8cf05a0ebb68f1070777ff801bd3",
+    "sources/61a-Lyrics/observation.json": "643f41a90a60ee01309e93814f774591d0f92b1b54dd24259d179c1eee22da49",
+    "sources/index.json": "3232d100b364bbb85230027b6425399f9c7824c139b58efb6d3ae04ce76f1f1a",
+    "titled-lifecycle.txt": "a409495b7d4f05923791ebcdfb2b939cf51a23f74c5361bac807bf4b05255469",
+    "write/editable-original.png": "5c48a9d477b1caf78570cc52fba41ea532b4d8fb7c64ed5bb511c3c2a45918a2",
+    "write/edited.mnx.json": "159265da8c76610b822a7be57bcb616b6b40696b76d4d47a9128d41093f2277e",
+    "write/imported.mnx.json": "98a9808fdffa2bd328c89365f52c2584d7e6c0e56d0b2f03d5c79b3a91b5e3d9",
+    "write/metadata-editor.png": "bb679415655439314803258c5dfeec31ff1f26836040fc19b00c616255a15eca",
+    "write/reopened.mnx.json": "1a63981d151581b5fc91150ec13f82b8040f9ad5773e18b1dd36d494dbbe5ec9",
+    "write/report.json": "1cb27468708375fb077e040fedfe3fe68fc705eff20cb32f82e7257f42dcb8f2",
+    "write/saved-loss-report.png": "1fc290fad5992638fcfbb1c59a3ada6e71997e6ac755586bbc887f8db0b5303c",
+    "write/title-prompt.png": "9c05ef47d1b3b6ce732c0e900a5ab313b143f8dde8a2a314ef039dec7f197ad9"
+  }
+}

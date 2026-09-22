@@ -173,3 +173,36 @@ file overrides only its explicitly named feature scopes, never whole fixtures by
 
 Items 18 and 19 must not be marked complete merely because these sweeps and initial gap
 proposals exist. They remain the place to finish the detailed assessment.
+
+## Untitled Studio versions — title workflow follow-up
+
+The original missing-title block is repaired by the shared Studio version workflow.
+When a version has no projected title, Make current offers a **Library title** field,
+prefilled from the piece's existing name. The form explicitly distinguishes library
+metadata from the score header. Cancellation leaves the canonical pointer unchanged;
+blank input cannot submit. Confirmation keeps the original XML bytes and imported MNX
+unchanged, promotes the version, and enables the existing note and metadata editors.
+The supplied title has `library-title` provenance, survives checkpoints while the score
+has no title, and yields to a later explicit score title. No new MNX carrier is involved.
+
+The three originally named examples (`01a-Pitches-Pitches`, `02a-Rests-Durations`,
+`61a-Lyrics`) were recaptured in editable Studio sessions. These are reachability
+observations, not new per-feature render or authoring passes for the whole suite.
+Evidence is retained under `harness/fixtures/musicxml-studio-title-evidence/`.
+The dedicated `musicxml-studio-write-probe.mjs` checks the pitch original through
+prompt cancellation, blank rejection, promotion, a one-semitone note edit, exact
+undo/redo, GP checkpoint, reload and access to the score metadata editor. API lifecycle
+regressions also check stale revisions, an already titled projection, unchanged source
+bytes, title retention and explicit score-title precedence. Existing titled-version
+restoration is covered by `piece-lifecycle-smoke.mjs`.
+
+**GP storage remains lossy.** The pitch original has 108 notes before storage and 93
+afterward: 15 high notes exceed the inferred instrument's range and become rests.
+The measured checkpoint records those 15 lost note objects and range warnings; Studio
+shows the losses and keeps MNX evidence. The edited first note survives with its exact
+changed pitch, as does the chosen library title. Surviving pitches retain their values
+and order, but the reopened score is not equal to the working document. Other recorded
+losses include explicit accidentals, the time-display flag, support flags and a barline;
+tuning and transposition are gained. The original MusicXML remains byte-identical.
+This is a storage/export limitation exposed by the assessment, not lossless MusicXML
+editing. Full fixture-by-feature and task-by-task assessment remains unfinished.

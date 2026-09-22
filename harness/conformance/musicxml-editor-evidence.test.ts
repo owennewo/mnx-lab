@@ -132,4 +132,31 @@ describe('retained MusicXML editor evidence provenance (not a fidelity gate)', (
       .toEqual(reports[1].fixtures.map((f: { importedDocumentSha256: string }) => f.importedDocumentSha256));
   });
 
+  it('retains editable untitled-source observations and explicit pitch-range storage losses', () => {
+    const base = 'harness/fixtures/musicxml-studio-title-evidence/';
+    const manifest = read(base + 'manifest.json');
+    for (const [name, expected] of Object.entries(manifest.files))
+      expect(hash(fs.readFileSync(path.join(root, base, name))), name).toBe(expected);
+    const captures = read(base + 'sources/index.json');
+    expect(captures.fixtures.map((f: { id: string }) => f.id)).toEqual(['01a-Pitches-Pitches', '02a-Rests-Durations', '61a-Lyrics']);
+    for (const row of captures.fixtures) {
+      expect(row.sourceSha256).toBe(suite.fixtures.find((f: { id: string }) => f.id === row.id).sha256);
+      expect(row.captureError).toBeUndefined();
+      expect(row.importError).toBeNull();
+      expect(row.makeCurrentError).toBeNull();
+      expect(row.editingSuspended).toBe(false);
+      expect(row.suppliedLibraryTitle).toBe(row.id);
+    }
+    const write = read(base + 'write/report.json');
+    expect(write.result).toBe('passed');
+    expect(write.sourceSha256).toBe(suite.fixtures.find((f: { id: string }) => f.id === write.fixture).sha256);
+    expect(write.title).toMatchObject({ cancelUnchanged: true, blankRefused: true, sourceUnchanged: true, documentUnchanged: true });
+    expect(write.edit.undoRedo).toBe('exact');
+    expect(write.metadataEditorReachable).toBe(true);
+    expect(write.pitchStorage.before - write.pitchStorage.after).toBe(15);
+    expect(write.storage.check.verdict).toBe('differs');
+    expect(write.storage.evidence).toBe('kept');
+    expect(write.consoleErrors).toEqual([]);
+  });
+
 });

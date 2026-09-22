@@ -84,7 +84,8 @@ other bars inherit the meter, so their rest padding changes while musical conten
 and later declarations remain intact. Studio storage fidelity for these two meters
 is not claimed by undoing them before the smoke's existing GP-save check.
 
-The untitled-version workflow above remains open.
+At the numeric-meter landing the untitled-version workflow remained open; its
+subsequent implementation and evidence are recorded below.
 
 ## Untitled-version title policy
 
@@ -96,3 +97,17 @@ keep that title while the document has none; an explicit document title supersed
 it. The API rejects a blank title or an override accompanying an existing projected
 title, and retains its owner/revision/canonical-pointer checks. Cancellation performs
 no request. The prompt is tied to the viewed rendition and clears when it changes.
+
+## Untitled-version implementation progress — 2026-09-22
+
+The title form and canonical API now implement the policy above. Original-file Studio
+captures reopen all three named examples as current, editable versions. The pitch
+fixture probe verifies cancellation, blank rejection, unchanged XML and imported MNX,
+one-note transposition with exact undo/redo, metadata-editor reachability, and retained
+library title plus edited pitch after GP checkpoint/reload. Lifecycle tests cover
+stale revisions and title precedence; the existing titled-version browser smoke passes.
+[Assessment evidence](../../docs/musicxml-editor-assessment.md#untitled-studio-versions--title-workflow-follow-up)
+records the separate GP storage losses: 15 high notes disappear, with explicit measured
+warnings and retained evidence. This does not constitute lossless GP persistence.
+The selected implementations are covered; filing closure follows final verification
+and retirement of this worktree. The broader assessment items remain in progress.

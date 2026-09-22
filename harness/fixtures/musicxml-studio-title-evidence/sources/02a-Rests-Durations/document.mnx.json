@@ -1,0 +1,274 @@
+{
+  "mnx": {
+    "version": 1
+  },
+  "global": {
+    "measures": [
+      {
+        "key": {
+          "fifths": 0
+        },
+        "time": {
+          "count": 2,
+          "unit": 2
+        }
+      },
+      {},
+      {},
+      {},
+      {
+        "time": {
+          "count": 3,
+          "unit": 2
+        }
+      },
+      {
+        "barline": {
+          "type": "final"
+        }
+      }
+    ]
+  },
+  "parts": [
+    {
+      "id": "P1",
+      "name": "MusicXML Part",
+      "measures": [
+        {
+          "clefs": [
+            {
+              "clef": {
+                "sign": "G",
+                "staffPosition": -2
+              }
+            }
+          ],
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "whole"
+                  },
+                  "rest": {}
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "whole"
+                  },
+                  "rest": {}
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "whole"
+                  },
+                  "rest": {}
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "half"
+                  },
+                  "rest": {}
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "rest": {}
+                },
+                {
+                  "duration": {
+                    "base": "eighth"
+                  },
+                  "rest": {}
+                },
+                {
+                  "duration": {
+                    "base": "16th"
+                  },
+                  "rest": {}
+                },
+                {
+                  "duration": {
+                    "base": "32nd"
+                  },
+                  "rest": {}
+                },
+                {
+                  "duration": {
+                    "base": "64th"
+                  },
+                  "rest": {}
+                },
+                {
+                  "duration": {
+                    "base": "128th"
+                  },
+                  "rest": {}
+                },
+                {
+                  "duration": {
+                    "base": "128th"
+                  },
+                  "rest": {}
+                },
+                {
+                  "duration": {
+                    "base": "128th"
+                  },
+                  "rest": {}
+                },
+                {
+                  "duration": {
+                    "base": "128th"
+                  },
+                  "rest": {}
+                },
+                {
+                  "duration": {
+                    "base": "128th"
+                  },
+                  "rest": {}
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "half",
+                    "dots": 1
+                  },
+                  "rest": {}
+                },
+                {
+                  "duration": {
+                    "base": "quarter",
+                    "dots": 1
+                  },
+                  "rest": {}
+                },
+                {
+                  "duration": {
+                    "base": "eighth",
+                    "dots": 1
+                  },
+                  "rest": {}
+                },
+                {
+                  "duration": {
+                    "base": "16th",
+                    "dots": 1
+                  },
+                  "rest": {}
+                },
+                {
+                  "duration": {
+                    "base": "32nd",
+                    "dots": 1
+                  },
+                  "rest": {}
+                },
+                {
+                  "duration": {
+                    "base": "64th",
+                    "dots": 1
+                  },
+                  "rest": {}
+                },
+                {
+                  "duration": {
+                    "base": "128th",
+                    "dots": 1
+                  },
+                  "rest": {}
+                },
+                {
+                  "duration": {
+                    "base": "128th"
+                  },
+                  "rest": {}
+                },
+                {
+                  "duration": {
+                    "base": "128th"
+                  },
+                  "rest": {}
+                },
+                {
+                  "duration": {
+                    "base": "128th"
+                  },
+                  "rest": {}
+                },
+                {
+                  "duration": {
+                    "base": "128th"
+                  },
+                  "rest": {}
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "whole",
+                    "dots": 1
+                  },
+                  "rest": {}
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "_x": {
+    "mnxLab": {
+      "encoding": {
+        "software": "musicxml-mnx",
+        "version": "0.1.0"
+      }
+    }
+  }
+}

@@ -737,3 +737,15 @@ GP checkpoint smoke passes after restoring its original meter; this does not pro
 GP storage fidelity for the extended meters. Inherited bars legitimately change
 rest padding, so assertions must preserve music rather than forbid that padding.
 Untitled XML version promotion remains the next implementation task.
+
+### Untitled Studio version promotion — 2026-09-22
+
+Item 23 now supplies the missing title-entry step: a library-only title preserves the
+original rendition and becomes a retained fallback until the score supplies a title.
+All three original examples become current and editable. The pitch-original probe
+checks exact note-edit history and a real GP checkpoint/reload. It also exposes the
+storage boundary: 15 of 108 source notes are dropped outside the inferred guitar range;
+those losses are measured, shown and retained as evidence, while the edited first note
+and library title survive. Title promotion is not a storage-fidelity guarantee. The
+[assessment](../../docs/musicxml-editor-assessment.md#untitled-studio-versions--title-workflow-follow-up)
+retains this distinction; broader feature/task coverage still belongs to items 18/19.

@@ -1,0 +1,56 @@
+{
+  "id": "61a-Lyrics",
+  "sourceSha256": "4128f432175b1a9d30e08459c68fc3321b378fba854fcb80668e42233b922d80",
+  "testClass": "feature",
+  "description": "Some notes with simple lyrics. The values of the <syllabic> elements of the four notes in measure 1 are ‘begin’, ‘middle’, ‘end’, and ‘single’, respectively. Measure 2's first note has no lyrics; the lyrics starts on the second note, skips the third note, and ends at the fourth one. A similar situation is present for measure 3: no lyrics at the first note, a single syllable on the second note, and the third note has again no lyrics.",
+  "views": [
+    {
+      "scrollTarget": "frame",
+      "visibleWidth": 1060,
+      "visibleHeight": 870,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0,
+          1,
+          2
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [],
+      "scrollWidth": 1060,
+      "scrollHeight": 870,
+      "clientWidth": 1060,
+      "clientHeight": 870,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "suppliedLibraryTitle": "61a-Lyrics",
+  "makeCurrentError": null,
+  "entryPath": "Local operator ingest: GP seed + unmodified XML original; Save → Versions → View XML → Make current",
+  "importError": null,
+  "viewingOriginal": false,
+  "editingSuspended": false,
+  "warnings": [],
+  "importedDocumentSha256": "2f536fa895e3ddf0723d5ee093f6a10c28c2a5579c2342de1e92ec5d29b1c35f",
+  "displayOptions": {
+    "lyrics": "current",
+    "timeSignatures": "hide",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide",
+    "selectedVerse": "1"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}
