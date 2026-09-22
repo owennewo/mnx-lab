@@ -1,6 +1,6 @@
 # MusicXML rendering gaps — preserve the music before judging its engraving
 
-> **Status: proposed, 2026-09-22.** Campaign item 22. Initial bounded findings from
+> **Status: in progress, 2026-09-22.** Campaign item 22. Initial bounded findings from
 > [render assessment item 18](../inprogress/core-musicxml-render-assessment.md), which
 > remains in progress. [Campaign contract](../inprogress/core-campaign-musicxml.md).
 > This is the requested follow-up proposal, not an exhaustive feature backlog.
@@ -26,8 +26,12 @@
 `43a-PianoStaff` has treble and bass clefs, two pitches, and no string tuning. Opening
 it produces one pitch and standard guitar strings with `staffKind: both`, without an
 import warning. Both piano staff identity and music have been lost before rendering.
-The notation/TAB collapse needs a stricter source identity test; inspect staff splitting
-as well as `mergeParts`. Do not fix this by hiding the spurious Tab button.
+Regression isolation: the converter preserves both staves; `upgradeTabExtension` in the
+shared file-loading path treats every second staff as legacy tab. Require actual legacy
+markers per part, and preserve modern parts when another part needs migration. The
+independent XML note table and original fixture establish both pitches/staff assignments.
+No converter-support claim changes from this migration fix. Do not hide the Tab button
+to conceal the corruption; genuine legacy notation/TAB migration must still work.
 
 Acceptance: original fixture retains both notes on their original staves, offers only
 Notation without actual strings, and reports no fabricated tuning. Also cover
@@ -98,5 +102,5 @@ local/hidden and unmetered support requires a separate carrier/spec decision.
 
 These are agent-assessed source → document → display findings, with no human-verification
 claim. Cosmetic spacing and unresolved corpus features are not included. The meter section explicitly extends the four initial findings with separately retained
-evidence. Further scope changes require the same source, data and UI evidence. The [write-gap proposal](core-musicxml-write-gaps.md) owns editor
+evidence. Further scope changes require the same source, data and UI evidence. The [write-gap proposal](../proposed/core-musicxml-write-gaps.md) owns editor
 reachability and persistence, and shares the representation blockers above.

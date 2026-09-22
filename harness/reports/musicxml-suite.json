@@ -256,7 +256,16 @@
       "testClass": "feature",
       "import": {
         "sha256": "5fb4be0ee0c8e884d69fe191a5d43a51ae78cc6a83255cd143b4c9d46d4af3ab",
-        "warnings": [],
+        "warnings": [
+          "part P1, measure 1, note 1 (C4): fractional pitch alteration -1.5 is not representable in published MNX; using integer alteration -1. Original pitch is lost.",
+          "part P1, measure 1, note 2 (D4): fractional pitch alteration -0.5 is not representable in published MNX; using integer alteration 0. Original pitch is lost.",
+          "part P1, measure 1, note 3 (E4): fractional pitch alteration 0.5 is not representable in published MNX; using integer alteration 0. Original pitch is lost.",
+          "part P1, measure 1, note 4 (F4): fractional pitch alteration 1.5 is not representable in published MNX; using integer alteration 1. Original pitch is lost.",
+          "part P1, measure 2, note 1 (C5): fractional pitch alteration -1.5 is not representable in published MNX; using integer alteration -1. Original pitch is lost.",
+          "part P1, measure 2, note 2 (D5): fractional pitch alteration -0.5 is not representable in published MNX; using integer alteration 0. Original pitch is lost.",
+          "part P1, measure 2, note 3 (E5): fractional pitch alteration 0.5 is not representable in published MNX; using integer alteration 0. Original pitch is lost.",
+          "part P1, measure 2, note 4 (F5): fractional pitch alteration 1.5 is not representable in published MNX; using integer alteration 1. Original pitch is lost."
+        ],
         "validity": {
           "standard": true,
           "extensions": true,
@@ -406,7 +415,20 @@
       "testClass": "feature",
       "import": {
         "sha256": "2e9f4016e26c0f99440f6c69700cdf3c22cd42b881c4fb885bfdb82999aae099",
-        "warnings": [],
+        "warnings": [
+          "part P1, measure 1, note 1 (D4): fractional pitch alteration -0.5 is not representable in published MNX; using integer alteration 0. Original pitch is lost.",
+          "part P1, measure 1, note 2 (D4): fractional pitch alteration -0.5 is not representable in published MNX; using integer alteration 0. Original pitch is lost.",
+          "part P1, measure 1, note 3 (D4): fractional pitch alteration -0.5 is not representable in published MNX; using integer alteration 0. Original pitch is lost.",
+          "part P1, measure 1, note 4 (D4): fractional pitch alteration -0.5 is not representable in published MNX; using integer alteration 0. Original pitch is lost.",
+          "part P1, measure 3, note 1 (D4): fractional pitch alteration -1.5 is not representable in published MNX; using integer alteration -1. Original pitch is lost.",
+          "part P1, measure 3, note 2 (D4): fractional pitch alteration -1.5 is not representable in published MNX; using integer alteration -1. Original pitch is lost.",
+          "part P1, measure 3, note 3 (D4): fractional pitch alteration -1.5 is not representable in published MNX; using integer alteration -1. Original pitch is lost.",
+          "part P1, measure 3, note 4 (D4): fractional pitch alteration -1.5 is not representable in published MNX; using integer alteration -1. Original pitch is lost.",
+          "part P1, measure 4, note 1 (C4): fractional pitch alteration 1.5 is not representable in published MNX; using integer alteration 1. Original pitch is lost.",
+          "part P1, measure 4, note 2 (C4): fractional pitch alteration 1.5 is not representable in published MNX; using integer alteration 1. Original pitch is lost.",
+          "part P1, measure 4, note 3 (C4): fractional pitch alteration 1.5 is not representable in published MNX; using integer alteration 1. Original pitch is lost.",
+          "part P1, measure 4, note 4 (C4): fractional pitch alteration 1.5 is not representable in published MNX; using integer alteration 1. Original pitch is lost."
+        ],
         "validity": {
           "standard": true,
           "extensions": true,
@@ -3242,7 +3264,12 @@
       "testClass": "feature",
       "import": {
         "sha256": "b47118212aa367d980d773ac3d74c5c72bffaf8b8c7cd2746568e45f985e1bef",
-        "warnings": [],
+        "warnings": [
+          "part P1, measure 1, staff 1: unsupported staff configuration (1 staff lines); not represented in MNX.",
+          "part P2, measure 2, staff 1: unsupported staff configuration (4 staff lines); not represented in MNX.",
+          "part P2, measure 3, staff 1: unsupported staff configuration (3 staff lines); not represented in MNX.",
+          "part P2, measure 4, staff 1: unsupported staff configuration (line-detail visibility/style); not represented in MNX."
+        ],
         "validity": {
           "standard": true,
           "extensions": true,
@@ -4064,7 +4091,9 @@
       "testClass": "feature",
       "import": {
         "sha256": "552b2e1af5c6023fb721276659ad7b37874b3a554f732471c570ef7a2a831050",
-        "warnings": [],
+        "warnings": [
+          "part P1, measure 5, staff 1: unsupported staff configuration (0 staff lines); not represented in MNX."
+        ],
         "validity": {
           "standard": true,
           "extensions": true,
@@ -7587,7 +7616,9 @@
       "testClass": "feature",
       "import": {
         "sha256": "52dfc7717beb0cf17f7eb57d098e2e520d7e845cfff5a9b0d8626a3174155c69",
-        "warnings": [],
+        "warnings": [
+          "part P1, measure 11, staff 1: unsupported staff configuration (3 staff lines, line-detail visibility/style); not represented in MNX."
+        ],
         "validity": {
           "standard": false,
           "extensions": true,
@@ -13974,7 +14005,9 @@
       "testClass": "feature",
       "import": {
         "sha256": "962b1d8bdbd76d5fe6b35f1615faf96f6f37125f9aa49aac1ef5424f2beae3b9",
-        "warnings": [],
+        "warnings": [
+          "part P3, measure 1, staff 1: unsupported staff configuration (1 staff lines); not represented in MNX."
+        ],
         "validity": {
           "standard": false,
           "extensions": true,

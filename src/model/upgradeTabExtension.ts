@@ -229,9 +229,10 @@ function needsLabelUpgrade(doc: any): boolean {
 }
 
 function upgradeV1(doc: any): void {
-  if (!needsUpgrade(doc)) return;
-
   for (const part of doc.parts ?? []) {
+    // A second staff is also normal piano/organ notation. Only migrate parts
+    // carrying actual v1 markers, even when another part in this score is old.
+    if (!partNeedsV1Upgrade(part)) continue;
     const hadTabClef = (part.measures ?? []).some((m: any) =>
       (m.clefs ?? []).some((c: any) => c?.clef?.sign === 'TAB')
     );
@@ -410,22 +411,18 @@ function needsNamespaceUpgrade(doc: any): boolean {
   return false;
 }
 
-function needsUpgrade(doc: MnxStructure): boolean {
-  for (const part of (doc as any).parts ?? []) {
-    if (part._x?.guitar) return true;
-    for (const measure of part.measures ?? []) {
-      if ((measure.clefs ?? []).some((c: any) => c?.clef?.sign === 'TAB')) return true;
-      if ((measure.sequences ?? []).some((s: any) => s.staff === 2)) return true;
-      for (const seq of measure.sequences ?? []) {
-        for (const event of seq.content ?? []) {
-          for (const note of event.notes ?? []) {
-            if (note._x?.guitar) return true;
-          }
-        }
-      }
-    }
+function partNeedsV1Upgrade(part: any): boolean {
+  if (part._x?.guitar) return true;
+  for (const measure of part.measures ?? []) {
+    if ((measure.clefs ?? []).some((c: any) => c?.clef?.sign === 'TAB')) return true;
   }
-  return false;
+  let oldNote = false;
+  forEachNote(part, (note: any) => { if (note._x?.guitar) oldNote = true; });
+  return oldNote;
+}
+
+function needsUpgrade(doc: MnxStructure): boolean {
+  return (doc.parts ?? []).some(partNeedsV1Upgrade);
 }
 
 function forEachNote(part: any, fn: (note: any) => void): void {

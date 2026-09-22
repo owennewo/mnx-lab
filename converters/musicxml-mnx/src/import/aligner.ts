@@ -1578,7 +1578,31 @@ export class Aligner {
       }
 
       // 2. Parse child elements chronologically to handle backup/forward
-      const sequences = this.parseMeasureEvents(mEl, state, mIdx);
+      // Report every staff-details instruction, including attributes after notes.
+      // The notation model has no carrier for line count/individual visibility.
+      const diagnosticClefs = new Map(state.clefByStaff);
+      for (const attributes of findDirectChildren(mEl, 'attributes')) {
+        for (const clef of findDirectChildren(attributes, 'clef')) {
+          diagnosticClefs.set(Number(clef.getAttribute('number') ?? '1'), {
+            sign: getChildText(clef, 'sign'), line: getChildInt(clef, 'line')
+          });
+        }
+        for (const details of findDirectChildren(attributes, 'staff-details')) {
+          const number = details.getAttribute('number');
+          const staff = number ?? (state.staves === 1 ? '1' : 'all');
+          const lines = getChildInt(details, 'staff-lines');
+          const tab = number !== null || state.staves === 1
+            ? diagnosticClefs.get(Number(number ?? '1'))?.sign === 'TAB'
+            : [...diagnosticClefs.values()].every(c => c.sign === 'TAB') && diagnosticClefs.size === state.staves;
+          const losses: string[] = [];
+          if (lines !== null && lines !== 5 && !tab) losses.push(`${lines} staff lines`);
+          if (findDirectChildren(details, 'line-detail').length) losses.push('line-detail visibility/style');
+          if (losses.length) this.warnings.push(
+            `part ${partId}, measure ${mIdx + 1}, staff ${staff}: unsupported staff configuration (${losses.join(', ')}); not represented in MNX.`
+          );
+        }
+      }
+      const sequences = this.parseMeasureEvents(mEl, state, mIdx, partId);
 
       // TAB "clefs" are not emitted: the MNX schema's clef-sign enum is C|F|G,
       // and in the tab extension tab-ness is a part-level view declaration
@@ -1700,9 +1724,11 @@ export class Aligner {
   private parseMeasureEvents(
     measureEl: Element,
     state: AttributeState,
-    measureIdx: number
+    measureIdx: number,
+    partId: string
   ): MnxSequence[] {
     let currentTime = 0;
+    let noteOrdinal = 0;
     
     // voiceName -> list of { onset: number, event: MnxEvent }
     const voiceEvents = new Map<string, Array<PendingEvent>>();
@@ -1790,6 +1816,7 @@ export class Aligner {
         const dur = getChildInt(el, 'duration') || 0;
         currentTime += dur;
       } else if (el.tagName === 'note') {
+        noteOrdinal++;
         const isChord = findDirectChild(el, 'chord') !== null;
         const isRest = findDirectChild(el, 'rest') !== null;
         const voice = getChildText(el, 'voice') || '1';
@@ -1854,6 +1881,14 @@ export class Aligner {
             const step = (getChildText(pitchEl, 'step') || '').trim().toUpperCase();
             const octave = getChildInt(pitchEl, 'octave');
             alterRaw = getChildInt(pitchEl, 'alter');
+            const sourceAlter = getChildFloatOf(pitchEl, 'alter');
+            if (sourceAlter !== null && Number.isFinite(sourceAlter) && !Number.isInteger(sourceAlter)) {
+              this.warnings.push(
+                `part ${partId}, measure ${measureIdx + 1}, note ${noteOrdinal} (${step}${octave}): ` +
+                `fractional pitch alteration ${sourceAlter} is not representable in published MNX; ` +
+                `using integer alteration ${alterRaw ?? 0}. Original pitch is lost.`
+              );
+            }
 
             if ((STEP_NAMES as readonly string[]).includes(step) && octave !== null) {
               mnxPitch = this.transposePitch(

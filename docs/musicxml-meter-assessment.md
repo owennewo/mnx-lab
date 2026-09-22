@@ -107,7 +107,7 @@ For Studio add `MUSICXML_CAPTURE_SHELL=studio` and use a separate capture direct
 fresh local library state, as described in [the main assessment](musicxml-editor-assessment.md).
 No production state or scenario verification records are changed.
 
-The requested [render gaps](../roadmap/proposed/core-musicxml-render-gaps.md) and
+The requested [render gaps](../roadmap/inprogress/core-musicxml-render-gaps.md) and
 [write gaps](../roadmap/proposed/core-musicxml-write-gaps.md) now include these bounded
 meter findings. Other corpus families, unresolved meter display policy, independent
 reference-engraving comparison where XML is ambiguous, and remaining task/persistence

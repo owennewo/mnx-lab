@@ -94,7 +94,7 @@ options. Other feature families must check relevant preferences before assigning
    shared editor operation support.
 
 The requested bounded follow-ups are
-[render gaps](../roadmap/proposed/core-musicxml-render-gaps.md) and
+[render gaps](../roadmap/inprogress/core-musicxml-render-gaps.md) and
 [write gaps](../roadmap/proposed/core-musicxml-write-gaps.md). They specify regression
 fixtures, ownership, acceptance criteria and representation-policy deferrals. No fixes
 from those proposals have been implemented during this assessment.

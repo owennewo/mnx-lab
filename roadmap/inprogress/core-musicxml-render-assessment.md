@@ -89,7 +89,7 @@ approved goldens remain untouched by the assessment.
 
 ## Output: a proposal to fill the gaps
 
-Create `roadmap/proposed/core-musicxml-render-gaps.md` and its roadmap index entry after
+Create `roadmap/inprogress/core-musicxml-render-gaps.md` and its roadmap index entry after
 collecting evidence. This follow-up is explicitly requested as part of this side quest.
 It links back to this assessment and the campaign, and contains:
 
