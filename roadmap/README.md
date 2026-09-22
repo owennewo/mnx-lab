@@ -148,7 +148,6 @@ back up to `proposed/` the moment it is.
 
 ### inprogress/
 
-- **[studio-save-lifecycle-isolation.md](inprogress/studio-save-lifecycle-isolation.md)** — isolate pending saves, loss evidence and locks from piece navigation.
 
 - **[studio-sync-rederive.md](complete/studio-sync-rederive.md)** — **built 2026-09-17, complete
   2026-09-20** (closed by the owner; the two hands-on checks continue on the live site), [studio authoring campaign](inprogress/studio-campaign-authoring.md)
@@ -491,6 +490,8 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+
+- **[studio-save-lifecycle-isolation.md](complete/studio-save-lifecycle-isolation.md)** — isolate pending saves, loss evidence and locks from piece navigation.
 
 - **[lab-retire-document-repository.md](complete/lab-retire-document-repository.md)** — completed 2026-09-22: removed the unused document-sync client and interface; preserve the reserved HTTP routes and document Studio’s actual library persistence.
 

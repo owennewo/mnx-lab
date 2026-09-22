@@ -1,6 +1,6 @@
 # Isolate Studio saves across navigation
 
-Implementation loop. Status: in progress, 2026-09-22.
+Implementation loop. Status: complete, 2026-09-22.
 
 A checkpoint awaiting its round-trip check can resume after navigation and read
 another piece’s sidecar tags, loss-report state, or lock release callback.
