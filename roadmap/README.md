@@ -45,6 +45,8 @@ proposals that name their campaign.
 
 ### proposed/
 
+- **[core-render-plan-orchestration.md](proposed/core-render-plan-orchestration.md)** — share render-plan fitting, scaling, caching and cropping across notation, tab and both without changing engravings.
+
 - **[studio-player-practice.md](proposed/studio-player-practice.md)** — campaign item 13,
   studio's first player feature in `elements/`: loop the selection with the **written-range
   → performed-occurrences policy stated**, speed trainer, count-in, metronome, mute/solo.
