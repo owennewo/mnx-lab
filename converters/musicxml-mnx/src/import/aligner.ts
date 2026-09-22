@@ -34,6 +34,7 @@ import {
 } from '../common/utils.js';
 import { findDirectChild, findDirectChildren, getChildText, getChildInt } from './musicxml.js';
 import { dynamicFromXml, type DynamicMark } from '../common/dynamics.js';
+import { readTimeSignature, type TimeSignature } from './time.js';
 
 /** `getChildFloat` restricted to a direct child (the shared helper searches deep). */
 function getChildFloatOf(parent: Element, tagName: string): number | null {
@@ -45,8 +46,7 @@ function getChildFloatOf(parent: Element, tagName: string): number | null {
 interface AttributeState {
   divisions: number;
   fifths: number | null;
-  beats: number | null;
-  beatType: number | null;
+  time: TimeSignature | null;
   transposeChromatic: number;
   transposeDiatonic: number;
   clefSign: string | null;
@@ -1349,8 +1349,7 @@ export class Aligner {
     const state: AttributeState = {
       divisions: 1,
       fifths: null,
-      beats: null,
-      beatType: null,
+      time: null,
       transposeChromatic: 0,
       transposeDiatonic: 0,
       clefSign: null,
@@ -1384,11 +1383,6 @@ export class Aligner {
           state.fifths = getChildInt(keyEl, 'fifths');
         }
 
-        const timeEl = findDirectChild(attributesEl, 'time');
-        if (timeEl) {
-          state.beats = getChildInt(timeEl, 'beats');
-          state.beatType = getChildInt(timeEl, 'beat-type');
-        }
 
         const stavesDeclared = getChildInt(attributesEl, 'staves');
         if (stavesDeclared && stavesDeclared > 0) state.staves = stavesDeclared;
@@ -1448,6 +1442,24 @@ export class Aligner {
         }
       }
 
+      // A global MNX meter has no mid-measure or per-staff placement. Inspect
+      // ALL declarations for losses, but use only the first before music starts.
+      let musicStarted = false, selectedTime = false;
+      for (const node of mEl.childNodes) {
+        if (node.nodeType !== 1) continue;
+        const child = node as Element;
+        if (['note', 'backup', 'forward'].includes(child.tagName)) musicStarted = true;
+        if (child.tagName !== 'attributes') continue;
+        for (const time of findDirectChildren(child, 'time')) {
+          const where = `part ${partId}, measure ${mIdx + 1}${time.getAttribute('number') ? `, staff ${time.getAttribute('number')}` : ''}`;
+          const warn = (message: string) => this.warnings.push(`${where}: ${message}`);
+          const value = readTimeSignature(time, warn);
+          if (musicStarted) warn('mid-measure time change is not represented; previous/default meter retained.');
+          else if (selectedTime) warn('additional local time declaration is not represented; first meter retained.');
+          else { selectedTime = true; if (value) state.time = value; }
+        }
+      }
+
       // Update Global Measures details (change-only)
       if (!globalMeasures[mIdx]) {
         globalMeasures[mIdx] = {};
@@ -1460,12 +1472,12 @@ export class Aligner {
         }
         lastEmittedFifths = state.fifths;
       }
-      const timeKey = state.beats !== null && state.beatType !== null
-        ? `${state.beats}/${state.beatType}`
-        : null;
+      const timeKey = state.time ? JSON.stringify(state.time) : null;
       if (timeKey !== null && timeKey !== lastEmittedTime) {
         if (globalM.time === undefined) {
-          globalM.time = { count: state.beats!, unit: state.beatType! };
+          globalM.time = state.time!;
+        } else if (JSON.stringify(globalM.time) !== timeKey) {
+          this.warnings.push(`part ${partId}, measure ${mIdx + 1}: conflicting part-local time is not represented; first global meter retained.`);
         }
         lastEmittedTime = timeKey;
       }

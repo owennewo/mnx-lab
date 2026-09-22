@@ -437,6 +437,7 @@ export function exportMusicXML(
     let activeKeyFifths: number | null = null;
     let activeTimeCount: number | null = null;
     let activeTimeUnit: number | null = null;
+    let activeTimeDisplay: 'common' | 'cut' | undefined;
     let activeClefSign: string | null = null;
     /** Clef in force per staff, so a grand staff's two change independently. */
     const activeClefByStaff = new Map<number, string>();
@@ -477,10 +478,18 @@ export function exportMusicXML(
       }
 
       // Time signature
-      if (globalM.time && (globalM.time.count !== activeTimeCount || globalM.time.unit !== activeTimeUnit)) {
+      if (globalM.time && (globalM.time.count !== activeTimeCount || globalM.time.unit !== activeTimeUnit || globalM.time.display !== activeTimeDisplay)) {
         activeTimeCount = globalM.time.count;
         activeTimeUnit = globalM.time.unit;
+        activeTimeDisplay = globalM.time.display;
         const timeEl = doc.createElement('time');
+        if (activeTimeDisplay) {
+          const compatible = activeTimeDisplay === 'common'
+            ? activeTimeCount === 4 && activeTimeUnit === 4
+            : activeTimeCount === 2 && activeTimeUnit === 2;
+          if (compatible) timeEl.setAttribute('symbol', activeTimeDisplay);
+          else warn(`measure ${m + 1}: incompatible time symbol ${activeTimeDisplay} for ${activeTimeCount}/${activeTimeUnit}; retaining numeric meter.`);
+        }
         const beatsEl = doc.createElement('beats');
         beatsEl.textContent = `${activeTimeCount}`;
         const beatTypeEl = doc.createElement('beat-type');

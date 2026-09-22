@@ -122,6 +122,17 @@ browser captures. An inconsistent symbol/value (`11f`, or `11a` bar 1) needs an 
 policy with a regression, not an arbitrary glyph expectation. Full grouped, alternate,
 local/hidden and unmetered support requires a separate carrier/spec decision.
 
+Meter fallback policy: sum every direct beats/beat-type pair with exact integer rational
+arithmetic, preserving an ordinary numeric spelling when possible. Otherwise reduce to
+an equivalent supported denominator and safe integer count. Warn on grouped spelling
+loss. Compatible common 4/4 and cut 2/2 display survive import/export, including display-only
+changes; inconsistent symbols defer to numeric values with a warning. Every local/hidden,
+alternate, separator or unmetered instruction is diagnosed. The first head-of-measure
+time declaration is the candidate global meter; later local/conflicting declarations
+are diagnosed rather than silently replacing it. Mid-measure changes, malformed or
+unrepresentable numeric meters and unmetered state retain the previous/default meter
+with an explicit warning. No new schema carrier is invented.
+
 ## Boundaries
 
 These are agent-assessed source → document → display findings, with no human-verification

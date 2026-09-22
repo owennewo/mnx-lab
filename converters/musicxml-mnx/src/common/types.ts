@@ -399,6 +399,7 @@ export interface MnxGlobalMeasure {
   time?: {
     count: number;
     unit: number;
+    display?: 'common' | 'cut';
   };
   barline?: {
     type?: 'regular' | 'dotted' | 'dashed' | 'heavy' | 'double' | 'final'
