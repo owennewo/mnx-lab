@@ -136,6 +136,40 @@ try {
   assert.equal(copy.piece.source_kind, 'studio');
   assert.ok(copy.tags.some(t => t.dimension === 'subtitle' && t.value === 'written on the desktop'));
   assert.equal(await record(pieceId), null);
+  // Navigation while the real export worker is delayed: the old save owns its
+  // lock and metadata until it lands, and cannot repaint the new piece's state.
+  await c.evaluate(`${editPiece}.click()`);
+  await wait(`!!${details}?.querySelector('input')`);
+  await field('Subtitle', 'saved while leaving');
+  await c.evaluate(`{
+    const WorkerBefore = window.Worker;
+    window.Worker = class extends WorkerBefore {
+      postMessage(message, ...rest) {
+        if (message?.cmd === 'mnx-lab:check-storage') {
+          window.Worker = WorkerBefore;
+          window.releaseSaveCheck = () => super.postMessage(message, ...rest);
+        } else super.postMessage(message, ...rest);
+      }
+    };
+  }`);
+  await c.evaluate(`${chip}.click()`);
+  await wait(`!!${saving}`);
+  await c.evaluate(`[...${saving}.querySelectorAll('button')].find(b => b.textContent === 'Save now').click()`);
+  await wait(`typeof window.releaseSaveCheck === 'function'`);
+  await c.evaluate(`location.hash = '#/piece/${pieceId}'`);
+  await wait(`${heading}?.includes("the tablet's")`);
+  assert.equal(await c.evaluate(`navigator.locks.query().then(q => q.held.some(l => l.name === 'mnx-studio.piece.${copyId}'))`), true, 'departing save released its lock before the export finished');
+  await c.evaluate(`window.releaseSaveCheck()`);
+  for (let i = 0; i < 100; i++) {
+    if ((await snapshot(copyId)).tags.some(t => t.dimension === 'subtitle' && t.value === 'saved while leaving')) break;
+    await new Promise(r => setTimeout(r, 100));
+  }
+  const departed = await snapshot(copyId);
+  assert.ok(departed.tags.some(t => t.dimension === 'subtitle' && t.value === 'saved while leaving'));
+  assert.ok(departed.tags.some(t => t.dimension === 'title' && t.value.includes('(copy)')));
+  await wait(`navigator.locks.query().then(q => !q.held.some(l => l.name === 'mnx-studio.piece.${copyId}'))`);
+  assert.match(await c.evaluate(heading), /the tablet's/, 'old save changed the new piece heading');
+  assert.equal(await c.evaluate(`${chip}.dataset.save`), 'clean', 'old save changed the new piece save state');
   console.log(`Save-pipeline smoke passed: ${pieceId} edited in the Edit piece panel; the unsaved edit recovered from IndexedDB after a reload; Save now → an edit rendition with a 'clean' check and the tags following; undo back to clean; a named version; and another device's save met as a conflict, kept as copy ${copyId}.`);
   if (c.logs.length) throw new Error('Browser console errors: '+c.logs.join('\n'));
 } finally { ws?.close(); chrome.kill(); await once(chrome,'exit'); await fs.rm(profile,{recursive:true,force:true,maxRetries:10,retryDelay:200}); }

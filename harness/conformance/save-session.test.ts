@@ -268,3 +268,32 @@ describe('a piece\'s versions', async () => {
     expect(versions.map(v => [v.label, v.current, v.unkept])).toEqual([['Saved automatically', false, 0], ['As imported', false, 0]]);
   });
 });
+
+it('a departing flush waits for edits made during the checkpoint already in flight', async () => {
+  const w = world();
+  const original = blank();
+  let finishLast!: () => void;
+  const lastGate = new Promise<void>(resolve => { finishLast = resolve; });
+  const save = w.ports.save;
+  let count = 0;
+  w.ports.save = async checkpoint => { if (++count === 2) await lastGate; return save(checkpoint); };
+  const session = w.session(original);
+  const first = structuredClone(original), last = structuredClone(original);
+  first._x!.mnxLab!.work!.title = 'First';
+  last._x!.mnxLab!.work!.title = 'Last';
+  session.documentChanged(first);
+  w.hold();
+  const saving = session.checkpoint();
+  await settle();
+  session.documentChanged(last);
+  let departed = false;
+  const departing = session.flush().then(() => { departed = true; session.dispose(); });
+  await w.release();
+  await settle();
+  expect(departed).toBe(false);
+  finishLast();
+  await Promise.all([saving, departing]);
+  expect(w.saves.map(save => save.title)).toEqual(['First', 'Last']);
+  expect(session.dirty).toBe(false);
+  expect(await w.store.read('piece')).toBeNull();
+});

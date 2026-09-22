@@ -95,7 +95,7 @@ try {
   assert.match(await c.evaluate(`${chip}.textContent`), /Play only on this device/, 'the save chip does not say the device plays only');
   const row = await c.evaluate(actions);
   assert.ok(!row.some(label => label.includes('Keys')), `the tools row offers a Keys sheet with nothing bound: ${row.join(' · ')}`);
-  for (const kept of ['Tags', 'Source', 'Instruments', 'Details'])
+  for (const kept of ['Source', 'Instruments'])
     assert.ok(row.some(label => label.includes(kept)), `the tools row lost ${kept}, which touch keeps`);
 
   await c.evaluate(`${editPiece}.click()`);

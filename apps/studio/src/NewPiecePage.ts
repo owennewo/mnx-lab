@@ -16,7 +16,7 @@ import { derivedLibraryTags } from '../../../src/model/libraryTags.ts';
 import { buildNewDocument, newDocumentProblem, MAX_NEW_BARS, type NewDocumentSpec } from '../../../src/edit/newDocument.ts';
 import { TUNING_PRESET_NAMES, parseKeySignature, parseTimeSignature, parseTuning } from '../../../src/edit/setupGrammar.ts';
 import { libraryReturnHref, pieceHref, returnToLibrary } from './StudioApp.ts';
-import { pieceFilename } from './pieceFile.ts';
+import { pieceFilename } from '../../../src/storage/pieceSaveContext.ts';
 import { BUILD } from './build.ts';
 
 const CUSTOM = 'custom';

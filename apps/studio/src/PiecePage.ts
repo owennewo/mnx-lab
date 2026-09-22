@@ -36,6 +36,7 @@ import { customElement, property, query, state } from 'lit/decorators.js';
 import { LibraryClient, LibraryRequestError, type LibrarySnapshot, type ProjectedTag } from '../../../src/storage/libraryClient.ts';
 import { documentTitle, documentArtist, type MnxDocument, type MnxStructure } from '../../../src/model/mnx.ts';
 import { derivedLibraryTags } from '../../../src/model/libraryTags.ts';
+import { PieceSaveContext, projectPieceTags, acquirePieceLock } from '../../../src/storage/pieceSaveContext.ts';
 import type { WorkChange } from '../../../src/edit/ops.ts';
 import type { EditorIntent } from '../../../src/edit/intents.ts';
 import { refusalNotice, type RefusalReason } from '../../../src/edit/clipboardFeedback.ts';
@@ -68,7 +69,7 @@ import './InstrumentsSheet.ts';
 import { sourceGlyph } from './SourceSheet.ts';
 import './SaveSheet.ts';
 import { BUILD } from './build.ts';
-import { pieceFilename } from './pieceFile.ts';
+import { pieceFilename } from '../../../src/storage/pieceSaveContext.ts';
 import { JUST_DELETED_KEY, libraryHref, pieceHref } from './StudioApp.ts';
 import type { EditPieceSnapshot } from './EditPieceSheet.ts';
 import type { InstrumentPart } from './InstrumentsSheet.ts';
@@ -169,10 +170,6 @@ export class PiecePage extends LitElement {
   private session: SaveSession<MnxStructure> | null = null;
   /** Once the document has been edited here, the heading reads the document, not the library's tags. */
   private touched = false;
-  private pendingLosses: readonly StorageLoss[] = [];
-  /** The kinds of loss already reported with evidence this session: a defect report is sent once per new kind, not per autosave. */
-  private reportedLosses = new Set<string>();
-  private pendingLossKind: string | null = null;
   private releaseLock: (() => void) | null = null;
   private ticker: ReturnType<typeof setInterval> | undefined;
   /** Every write this page makes to the piece, one at a time: they all move one revision. */
@@ -416,23 +413,22 @@ export class PiecePage extends LitElement {
   /** Start saving for the piece just opened. Returns this device's unsaved edits, if it has any to continue from. */
   private async beginSession(pieceId: string, document: MnxStructure, renditionId: string): Promise<MnxStructure | null> {
     // A play-only device takes no lock: holding it would lock a real editor out from elsewhere.
-    this.readOnly = this.playOnly || !(await this.takeLock(pieceId));
+    const generation = this.generation;
+    const context = new PieceSaveContext(this.snapshot?.tags ?? [], BUILD, checkForStorage);
+    const lock = this.playOnly ? { writable: false, release: () => {} } : await acquirePieceLock(pieceId, navigator.locks);
+    if (generation !== this.generation) { lock.release(); return null; }
+    this.releaseLock = lock.release;
+    this.readOnly = !lock.writable;
     const revisionOf = async () => (this.snapshot?.piece.id === pieceId ? this.snapshot : (await this.client.piece(pieceId)).snapshot).piece.revision;
     const session = new SaveSession<MnxStructure>(pieceId, document, { renditionId }, {
-      prepare: async doc => {
-        const result = await checkForStorage(doc);
-        this.pendingLosses = result.losses;
-        const derivedTags = this.projection(doc);
-        const title = derivedTags.find(t => t.dimension === 'title')?.value ?? 'Untitled';
-        return { file: { filename: pieceFilename(title), bytes: result.bytes, producerVersion: BUILD, producerOptions: result.options }, check: result.check, derivedTags,
-          evidence: this.evidenceFor(doc, result.check) };
-      },
+      prepare: doc => context.prepare(doc),
       save: checkpoint => this.enqueue(async () => {
         try {
           const saved = await this.client.saveCheckpoint(pieceId, { expectedRevision: await revisionOf(), derivedFrom: checkpoint.derivedFrom,
             file: checkpoint.file, derivedTags: checkpoint.derivedTags, check: checkpoint.check, name: checkpoint.name, evidence: checkpoint.evidence });
-          if (checkpoint.evidence && this.pendingLossKind) this.reportedLosses.add(this.pendingLossKind);
-          if (this.pieceId === pieceId && this.session === session) { this.snapshot = saved.snapshot; this.losses = this.pendingLosses; }
+          const losses = context.saved(checkpoint);
+          context.updateTags(saved.snapshot.tags);
+          if (this.pieceId === pieceId && this.session === session) { this.snapshot = saved.snapshot; this.losses = losses; }
           return { renditionId: saved.snapshot.piece.canonical_rendition_id!, unchanged: saved.unchanged };
         } catch (error) {
           if (error instanceof LibraryRequestError && error.status === 409) throw new StaleWriteError();
@@ -441,6 +437,7 @@ export class PiecePage extends LitElement {
       }),
       current: async () => {
         const fresh = (await this.client.piece(pieceId)).snapshot;
+        context.updateTags(fresh.tags);
         if (this.pieceId === pieceId && this.session === session) { this.snapshot = fresh; this.setRecordings(fresh); }
         return { renditionId: fresh.piece.canonical_rendition_id ?? null };
       },
@@ -449,9 +446,10 @@ export class PiecePage extends LitElement {
     }, state => { if (this.session === session) { this.save = state; this.now = Date.now(); } });
     this.session = session;
     this.save = session.snapshot;
-    this.losses = []; this.touched = false; this.viewing = null; this.reportedLosses.clear();
+    this.losses = []; this.touched = false; this.viewing = null;
     let live = document;
     let found = this.readOnly ? null : await session.recoverable().catch(() => null);
+    if (this.session !== session) return null;
     if (found) {
       const record = found.record.document as MnxStructure | undefined;
       if (record && typeof record === 'object' && record.mnx && Array.isArray(record.parts) && record.global) {
@@ -462,6 +460,7 @@ export class PiecePage extends LitElement {
         // Not something this build can open: hand it over as a file rather than guess at it.
         this.download(new Blob([JSON.stringify(unreadable.record.document, null, 2)], { type: 'application/json' }), `${pieceId}.recovered.json`);
         await session.discardRecovery();
+        if (this.session !== session) return null;
         this.error = 'Unsaved edits from this device could not be opened here, so they were downloaded as a file.';
       }
     }
@@ -495,36 +494,8 @@ export class PiecePage extends LitElement {
     return editor.document;
   }
 
-  /**
-   * A defect report for the operator: the document this save was exported from,
-   * sent only when the round trip lost or changed something, and only the first
-   * time this session that this KIND of loss is seen (or the save is a named
-   * version) — an autosave every half minute must not store the score each time.
-   */
-  private evidenceFor(doc: MnxStructure, check: { verdict: string; differences: { path: string; kind: string }[]; warnings: string[] }): string | null {
-    this.pendingLossKind = null;
-    if (check.verdict !== 'differs') return null;
-    const kind = JSON.stringify([check.differences.filter(d => d.kind !== 'gained').map(d => `${d.kind} ${d.path}`).sort(), [...check.warnings].map(w => w.replace(/\d+/g, '#')).sort()]);
-    if (this.reportedLosses.has(kind)) return null;
-    // Marked reported only when the save lands: a failed save retries with its evidence.
-    this.pendingLossKind = kind;
-    const text = JSON.stringify(doc);
-    return text.length <= 1024 * 1024 ? text : null;
-  }
-
-  /**
-   * The library's tags as this document says them. A Soundslice piece keeps its
-   * title and artist in the SIDECAR — its `.gp` may hold neither — so a tag that
-   * came from there and that the document does not contradict is kept, as stored.
-   * A tag Studio itself projected is the document's: clear the artist and the
-   * tag goes; go back to a version without one and it goes too.
-   */
   private projection(doc: MnxStructure): ProjectedTag[] {
-    const tags: ProjectedTag[] = derivedLibraryTags(doc);
-    for (const held of this.snapshot?.tags ?? [])
-      if (held.origin === 'derived' && held.source_ref === 'sidecar' && ['title', 'artist'].includes(held.dimension) && !tags.some(t => t.dimension === held.dimension))
-        tags.push({ dimension: held.dimension, value: held.value, kept: true });
-    return tags;
+    return projectPieceTags(doc, this.snapshot?.tags ?? []);
   }
 
   /** Leaving the piece: save what is unsaved, then let go. The record stays until that save lands. */
@@ -532,20 +503,9 @@ export class PiecePage extends LitElement {
     const session = this.session;
     this.session = null; this.save = null;
     this.editor?.dispose(); this.editor = null;
-    if (session) void session.flush().finally(() => session.dispose());
-    this.releaseLock?.(); this.releaseLock = null;
-  }
-
-  /** One editing tab per piece on this device; a second one reads. No Web Locks, no second-tab protection. */
-  private takeLock(pieceId: string): Promise<boolean> {
-    this.releaseLock?.(); this.releaseLock = null;
-    if (!navigator.locks) return Promise.resolve(true);
-    return new Promise(resolve => {
-      void navigator.locks.request(`mnx-studio.piece.${pieceId}`, { ifAvailable: true }, lock => {
-        resolve(!!lock);
-        return lock ? new Promise<void>(release => (this.releaseLock = release)) : undefined;
-      }).catch(() => resolve(true));
-    });
+    const release = this.releaseLock; this.releaseLock = null;
+    if (session) void session.flush().finally(() => { session.dispose(); release?.(); });
+    else release?.();
   }
 
   private download(blob: Blob, filename: string) {
