@@ -154,8 +154,9 @@ staves and explicit unsupported-clef/unpitched warnings. Twelve formerly failing
 regressions cover original sources, inheritance and mid-measure recovery. The capture
 tool also now traverses tall Studio viewers; earlier PNG coverage was incomplete there.
 
-Still open in this item: exact meter/display import with explicit residual-loss diagnostics. The carrier-dependent full-support
-work remains deferred as specified above. This item stays in progress.
+The selected implementations are now covered, including the meter follow-up below.
+The carrier-dependent full-support work remains deferred as specified above. Filing
+closure follows final gates and retirement of the implementation worktree.
 
 Meter implementation landed in `f15abe6b`: exact rational totals, compatible common/cut
 import/export including display-only changes, and explicit fallback/scope diagnostics.
