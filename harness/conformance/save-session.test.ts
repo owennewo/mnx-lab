@@ -297,3 +297,34 @@ it('a departing flush waits for edits made during the checkpoint already in flig
   expect(session.dirty).toBe(false);
   expect(await w.store.read('piece')).toBeNull();
 });
+
+it('flush persists an undo to the original document while an older edit is saving', async () => {
+  const w = world();
+  const original = blank(), edited = structuredClone(original);
+  edited._x!.mnxLab!.work!.title = 'Edited';
+  const session = w.session(original);
+  session.documentChanged(edited);
+  w.hold();
+  const saving = session.checkpoint();
+  await settle();
+  session.documentChanged(original);
+  const departing = session.flush().then(() => session.dispose());
+  await w.release();
+  await Promise.all([saving, departing]);
+  expect(w.saves.map(save => save.title)).toEqual(['Edited', 'Anji']);
+  expect(session.dirty).toBe(false);
+});
+
+it.each(['failed', 'conflict'] as const)('flush terminates on %s and keeps recovery', async status => {
+  const w = world();
+  const session = w.session(blank());
+  session.documentChanged(structuredClone(session.document));
+  if (status === 'conflict') { w.savedElsewhere('another-rendition'); w.failNext(new StaleWriteError()); }
+  else w.failNext(new Error('Offline'));
+  await session.flush();
+  session.dispose();
+  expect(session.snapshot.status).toBe(status);
+  expect(session.dirty).toBe(true);
+  expect(await w.store.read('piece')).not.toBeNull();
+  expect(w.pending()).toBe(0);
+});

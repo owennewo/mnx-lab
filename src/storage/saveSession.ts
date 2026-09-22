@@ -178,10 +178,10 @@ export class SaveSession<D> {
 
   /** The page is going away or hidden: the record first (it is local and fast), then the checkpoint. */
   async flush(): Promise<void> {
-    if (!this.dirty) { await this.inFlight; return; }
     this.cancelRecoveryWrite?.(); this.cancelRecoveryWrite = null;
     await this.writeRecovery();
-    await this.checkpoint();
+    if (this.dirty) await this.checkpoint();
+    else await this.inFlight;
     // A checkpoint that was already running can queue a newer document. A host
     // disposing after flush must wait for that final write before releasing its lock.
     while (!this.disposed && this.dirty && this.state.status !== 'failed' && this.state.status !== 'conflict')

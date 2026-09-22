@@ -27,7 +27,10 @@ and the save-pipeline and play-only browser smokes.
 - The delayed-check test failed with Piece B’s title against the extracted old
   getter behavior, then passed with captured metadata. The held-second-write test
   failed against the original `SaveSession.flush`, then passed after the fix.
-- Focused suites: 30 tests pass; TypeScript and architecture checks pass.
+- Focused suites: 33 tests pass; TypeScript and architecture checks pass.
 - The save-pipeline browser smoke now delays the real storage worker across
   navigation and checks persisted metadata, old lock lifetime and current UI state.
   Play-only smoke expectations follow the existing consolidated Edit piece panel.
+
+An undo back to the original document during an in-flight save also drains its final
+checkpoint. Failed/conflicted flushes terminate and retain local recovery.
