@@ -14,7 +14,7 @@ the full render/write assessments and the remaining parts of item 22 stay in pro
 - **Clef placement:** the restored bass staff exposed the converter's `-line` mapping.
   MusicXML F on line 4 needs MNX staff position +2, not -4. Import/export now translate
   coordinate origins and units, apply conventional missing-line defaults, and preserve
-  a line change when the sign stays the same. An MNX space/off-staff position produces
+  a line change when the sign stays the same. An MNX clef placed in a space produces
   an export warning and a conventional-line fallback instead of invalid MusicXML.
 - **Fractional pitch:** each unsupported fractional alteration produces a warning naming
   part, measure, note, original alteration and integer fallback. `01d` gives eight
@@ -29,7 +29,10 @@ The coordinate oracle is independent of our converter:
 counts staff lines from the bottom, while the
 [MNX clef](https://w3c.github.io/mnx/docs/mnx-reference/objects/clef/)
 uses staff position. Tests use explicit G2 → -2, F4 → +2, C3 → 0, C4 → +2 and G1 → -4
-examples in each direction. No new extension or runtime dependency was added.
+examples in each direction. The pinned XSD permits integer lines beyond 1–5;
+explicit off-staff line 0 and 6 tests preserve those values, even though music21 cannot
+read all such unusual clefs. Only fractional lines require the warned fallback.
+No new extension or runtime dependency was added.
 
 ## Browser evidence and its limits
 

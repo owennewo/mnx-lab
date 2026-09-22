@@ -77,7 +77,7 @@ Acceptance: assert both directions against these explicit examples, conventional
 lines when absent, and a line change without a sign change. Recapture the piano in both
 shells, regenerate converter matrix/oracles, and independently XSD-check the exports.
 This uses existing standard clef fields with no extension or runtime dependency.
-An MNX space/off-staff clef position has no MusicXML line 1–5 equivalent: explicitly
+An MNX space-positioned clef position has no MusicXML integer line equivalent: explicitly
 warn and export the conventional line for its sign, rather than an invalid fraction.
 
 ### P1: contain unsupported-clef failures without blanking the score

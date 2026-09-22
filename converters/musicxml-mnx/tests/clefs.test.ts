@@ -7,7 +7,7 @@ const xml = (sign: string, line?: number) => `<score-partwise version="4.0"><par
 const score = (sign: string, staffPosition: number): MnxStructure => ({ mnx: { version: 1 }, global: { measures: [{}] }, parts: [{ id: 'P1', measures: [{ clefs: [{ clef: { sign, staffPosition } }], sequences: [{ content: [{ duration: { base: 'whole' }, notes: [{ pitch: { step: 'C', octave: 4 } }] }] }] }] }] });
 // Independent coordinate examples: MusicXML counts lines from the bottom;
 // MNX counts half-spaces from the middle line, positive upwards.
-const clefs = [['G', 2, -2], ['F', 4, 2], ['C', 3, 0], ['C', 4, 2], ['G', 1, -4]] as const;
+const clefs = [['G', 2, -2], ['F', 4, 2], ['C', 3, 0], ['C', 4, 2], ['G', 1, -4], ['G', 6, 6], ['F', 0, -6]] as const;
 describe('clef coordinates', () => {
   it.each(clefs)('imports %s on MusicXML line %i at MNX position %i', (sign, line, position) => {
     expect(importMusicXML(xml(sign, line)).parts[0].measures[0].clefs?.[0].clef).toEqual({ sign, staffPosition: position });
@@ -22,7 +22,7 @@ describe('clef coordinates', () => {
     const warnings: string[] = [];
     const output = exportMusicXML(score('G', 1), { onWarning: w => warnings.push(w) });
     expect(parseXML(output).getElementsByTagName('line')[0].textContent).toBe('2');
-    expect(warnings).toEqual([expect.stringContaining('clef staffPosition 1 has no MusicXML line 1–5 equivalent')]);
+    expect(warnings).toEqual([expect.stringContaining('clef staffPosition 1 has no integer MusicXML line equivalent')]);
   });
   it('exports a line change without a sign change', () => {
     const doc = score('C', 0);

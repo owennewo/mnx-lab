@@ -518,11 +518,11 @@ export function exportMusicXML(
         if (clef.staffPosition !== undefined) {
           const lineEl = doc.createElement('line');
           const line = (clef.staffPosition + 6) / 2;
-          const representable = Number.isInteger(line) && line >= 1 && line <= 5;
+          const representable = Number.isInteger(line);
           const fallback = clef.sign === 'G' ? 2 : clef.sign === 'F' ? 4 : clef.sign === 'TAB' ? 5 : 3;
           if (!representable) warn(
             `part ${part.id}, measure ${m + 1}, staff ${staff}: clef staffPosition ${clef.staffPosition} ` +
-            `has no MusicXML line 1–5 equivalent; using conventional line ${fallback}.`
+            `has no integer MusicXML line equivalent; using conventional line ${fallback}.`
           );
           lineEl.textContent = `${representable ? line : fallback}`;
           clefEl.appendChild(lineEl);
