@@ -149,7 +149,6 @@ back up to `proposed/` the moment it is.
 
 ### inprogress/
 
-- **[lab-current-docs-consistency.md](inprogress/lab-current-docs-consistency.md)** — reconcile current capability claims and guard local reference links.
 
 
 - **[studio-sync-rederive.md](complete/studio-sync-rederive.md)** — **built 2026-09-17, complete
@@ -493,6 +492,8 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+
+- **[lab-current-docs-consistency.md](complete/lab-current-docs-consistency.md)** — completed 2026-09-22: reconcile current capability claims and guard local reference links.
 
 - **[studio-save-lifecycle-isolation.md](complete/studio-save-lifecycle-isolation.md)** — isolate pending saves, loss evidence and locks from piece navigation.
 

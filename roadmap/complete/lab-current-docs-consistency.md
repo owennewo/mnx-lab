@@ -1,6 +1,6 @@
 # Current documentation consistency
 
-Implementation loop. Proposed and started 2026-09-22; requested as maintenance item 4.
+Implementation loop. Complete 2026-09-22; requested as maintenance item 4.
 
 ## Problem and scope
 
@@ -27,4 +27,7 @@ and Lit framework, the moved navigation link, and optional workbench library acc
 Root tests now check current reference destinations, including inline/image links and
 reference definitions, with code examples, remote URLs and heading anchors excluded.
 The checker does not crawl linked roadmap documents or validate heading fragments.
-Three focused tests pass. Final root tests and build run in the serialized landing slot.
+Three focused tests pass. On the final rebased tree, root tests passed (145 files,
+2602 tests passed, 1 skipped) and the full build passed. Primitives regeneration passed
+194 tests with a clean scenarios diff. No runtime or renderer changes; browser smokes
+were unnecessary. Landed through b32af332; worktree retired before this completion.
