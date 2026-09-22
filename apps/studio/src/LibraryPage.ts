@@ -103,7 +103,25 @@ export class LibraryPage extends LitElement {
     .columns { text-align: right; padding-right: 4px; color: var(--ink-dim); font-size: 12px; }
     .columns span { display: inline-block; width: 130px; text-align: left; }
     .error { color: #b91c1c; }
-    @media (max-width: 720px) { .rail { display: none; } }
+    /* A phone: no rail, and each row folds to two lines — title, artist and
+       when over chips and Export — so the title keeps the width. */
+    @media (max-width: 720px) {
+      .rail { display: none; }
+      .main { padding: 52px 16px 24px; gap: 12px; }
+      .tools { flex-wrap: wrap; gap: 8px; }
+      .search { flex-basis: 100%; }
+      .sort { flex: 1; }
+      .sort button { flex: 1; }
+      .columns { display: none; }
+      li { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "star who when" ". tags actions"; column-gap: 10px; row-gap: 8px; align-items: start; padding: 12px 0; }
+      li .star { grid-area: star; padding: 1px 2px; }
+      li .who { grid-area: who; }
+      li .who a { overflow-wrap: anywhere; }
+      li .when { grid-area: when; width: auto; padding-top: 2px; }
+      li .tags { grid-area: tags; justify-content: flex-start; align-self: center; }
+      .actions { grid-area: actions; width: auto; }
+      .actions select { width: auto; padding: 4px 6px; font-size: 13px; }
+    }
   `;
 
   /** The page's scroll container is the shell's <main>. */

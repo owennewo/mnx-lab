@@ -195,6 +195,15 @@ export class StudioApp extends LitElement {
         display: none;
       }
     }
+    /* The glyph alone still says which theme; the title carries the word. */
+    @media (max-width: 480px) {
+      header {
+        gap: 8px;
+      }
+      button.theme span {
+        display: none;
+      }
+    }
   `;
 
   private readonly onHashChange = () => {
