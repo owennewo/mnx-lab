@@ -216,6 +216,7 @@ export class EditPieceSheet extends LitElement {
         <label>Notes
           <textarea rows="3" maxlength="4000" ?readonly=${this.readOnly} .value=${work.notes ?? ''}
             @change=${(e: Event) => this.commit({ notes: value(e) }, work.notes ?? '', value(e))}></textarea></label>
+        ${!work.title && this.snapshot?.tags.some(t => t.dimension === 'title' && t.source_ref === 'library-title') ? html`<p>The library title was supplied when this version was made current; the score has no title.</p>` : nothing}
         ${borrowed ? html`<p>A greyed value is what the library already knows, from wherever this piece came from — the score itself does not say it. Type to make it the score's own.</p>` : nothing}
       </section>`;
   }
@@ -260,7 +261,6 @@ export class EditPieceSheet extends LitElement {
           })}
           ${!derived.length ? html`<p>Nothing beyond the header was read from this file.</p>` : nothing}
         </div>
-        ${derived.some(t => t.source_ref === 'library-title') ? html`<span class="muted">The library title was supplied when this version was made current; the score has no title.</span>` : nothing}
         ${derived.some(t => t.source_ref && !['sidecar', 'library-title'].includes(t.source_ref))
           ? html`<span class="muted">Read by ${[...new Set(derived.map(t => t.source_ref).filter(r => r && !['sidecar', 'library-title'].includes(r)))].join(', ')}.</span>`
           : nothing}

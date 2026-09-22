@@ -113,6 +113,11 @@ try {
   assert.equal(reopened._x?.mnxLab?.work?.title, undefined, 'library title must not become score metadata');
   assert.equal(hash(Buffer.from(await (await get('/renditions/'+id+'-xml')).arrayBuffer())),hash(bytes));
   report.edit = { changedNotes: 1, semitones: 1, undoRedo: 'exact', unrelatedData: 'unchanged before storage', reopenedEditedPitch: 'exact; other source notes have the separately reported GP losses', reopenedLibraryTitle: chosen };
+  await c.evaluate(`${piece}.querySelector('button[slot="title-action"]').click()`);
+  const details = `${piece}.querySelector('mnx-studio-edit-piece')?.shadowRoot`;
+  await wait(`!!${details}?.querySelector('input')`, 'score metadata editor');
+  assert.ok((await c.evaluate(`${details}.textContent`)).includes('library title was supplied'));
+  await shot('metadata-editor'); report.metadataEditorReachable = true;
   report.consoleErrors=c.logs; assert.deepEqual(c.logs,[]); report.result='passed';
 } catch(error) { report.error=error.stack; process.exitCode=1; }
 finally { await fs.writeFile(path.join(out,'report.json'),JSON.stringify(report,null,2)+'\n'); ws?.close(); chrome.kill(); await once(chrome,'exit'); await fs.rm(profile,{recursive:true,force:true,maxRetries:5,retryDelay:100}); }
