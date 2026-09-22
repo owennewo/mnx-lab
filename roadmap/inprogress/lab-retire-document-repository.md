@@ -1,6 +1,6 @@
 # Retire the unused document repository client
 
-**Status:** proposed, 2026-09-22.
+**Status:** in progress, 2026-09-22.
 **Loop:** implementation — repository maintenance; no schema or engraving changes.
 
 ## Problem

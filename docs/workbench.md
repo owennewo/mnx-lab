@@ -72,21 +72,22 @@ attribution and never committed here. The scenario page distinguishes **loading*
 
 **The workbench has no backend — by rule.** It must stay fully functional from static
 build output alone: the corpus is committed JSON, the only browser persistence is
-localStorage UI preferences (document storage is a reserved seam —
-`storage/cloudRepository.ts`), and every
+localStorage UI preferences, and every
 verification write happens through harness scripts editing repo files — git is the
 database and the audit trail. **Live AI edits are no longer the exception they used to
 be** (core-assist-byok.md): with the user's own OpenRouter key, held in this origin's
 localStorage and obtained by PKCE or paste, `src/assist/editLoop.ts` runs the whole
 self-correcting loop *in the browser* and nothing about the edit reaches a server we run.
-The Worker is *not* the backend and now says so — it is the demo for a visitor who has
-connected no key, spending the deployment's, and every done frame it produces is stamped
-`demoMode` (or `mockMode` with no key at all). `workbench/` may reach it only through
-`assist/`. If browser-driven corpus authoring is ever wanted,
+The Worker supplies the assist demo for a visitor who has connected no key, spending
+the deployment's, and every done frame it produces is stamped `demoMode` (or `mockMode`
+with no key at all). `workbench/` may reach the Worker through `assist/` and through
+`storage/` for optional library reads. If browser-driven corpus authoring is ever wanted,
 the pattern is a dev-only Vite middleware writing repo files — never a deployed API.
-The real API layer (documents, auth, sync) belongs to **studio**
-([apps/studio/README.md](../apps/studio/README.md)) on the reserved seams
-(`worker/api/documents|auth` 501 stubs, `storage/cloudRepository.ts`).
+**Studio** ([apps/studio/README.md](../apps/studio/README.md)) persists source renditions
+through `src/storage/libraryClient.ts` and the Worker’s library API;
+`src/storage/saveSession.ts` coordinates checkpoints and local recovery. The
+`worker/api/documents.ts` and `worker/api/auth.ts` routes remain reserved 501 seams,
+separate from that live persistence path.
 
 
 **The score pane is the score frame** (`src/elements/ScoreFrame.ts`,
