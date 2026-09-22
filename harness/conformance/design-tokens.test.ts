@@ -224,7 +224,8 @@ describe('design tokens', () => {
   // The rung inspector is the tray's sibling — same anchor, same frame, same
   // inheritance rule — so it sits under the same three joins.
   describe.each([
-    ['the rung inspector', 'elements/RungInspector.ts']
+    ['the rung inspector', 'elements/RungInspector.ts'],
+    ['the cursor label', 'elements/CursorLabel.ts']
   ])('%s consumes the system', (_name, TRAY) => {
 
     it('carries no colour literals', () => {

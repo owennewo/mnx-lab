@@ -221,7 +221,7 @@ one.
 | 7 | [core-editor-element-promotion](../complete/core-editor-element-promotion.md) | **built 2026-09-17: slices 1–3 for studio, then the workbench's adoption of the binding — one editor surface** | **The editor in studio.** That doc owns the promotion review. The mount is a plain-DOM host binding beside `bindPlayback` — `bindEditor` in `src/elements/editorHost.ts`, its own lazily loaded chunk, absent from the embed bundles. **Slice 1:** navigation and the ladder, fret and pitch entry, durations, ties, delete, undo, Escape/Enter; structural key scope; `setWork` as an intent; a Keys sheet; the structural checkpoint trigger. **Slice 2 turned out to have already happened** — the one-surface campaign retired every setup popover into the rung inspector — so **slices 2–3 are one:** the inspector, its rows and placement, and the lyric text editor moved to `elements/` (the workbench imports them from there), with shared glue (`inspectorMount.ts`) and a token-carrying layer (`<mnx-editor-surfaces>`); the binding mounts them on Enter and Shift+L and binds copy/cut/paste. **Work-list item 5:** the workbench's scenario page deleted its own mount and sits on `bindEditor`; the binding grew the host's seams for it (`session`, `onEscalate`, `claimUnfocused`, `inspector`, `onRefused`, `sessionMoved`), and `smoke:workbench-editor` proves them. |
 | 8 | [studio-editor-touch](../rejected/studio-editor-touch.md) | **built, then REJECTED 2026-09-20** by the owner | **Entry without a keyboard — closed as won't-do.** `<mnx-entry-bar>` was built and removed the same day: a bar over the score is a bar over the score, and the tablet edits in focus mode where the music is meant to be the whole page. The campaign's answer for touch is now **play only** — studio binds no editor where the primary pointer is coarse. Item 9's pointer placement stays; it is a mouse feature a tap also reaches. |
 | 9 | [core-editor-pointer-placement](../complete/core-editor-pointer-placement.md) | **complete 2026-09-20** (`5b97fbb7`) | **A click or a tap places the edit cursor.** Item 8's first missing piece, usable from a mouse now: a `goToPosition` intent the session snaps to its own grid (nearest string or staff position, nearest event column; an empty bar lands on its rest), a `position-selected` event the viewer emits only while an editor is bound, a hover ghost on a mouse, and the click still seeks playback — to the bar when it lands on empty space. The two cursors stay two; this is the first seeding rule between them. |
-| 10 | [core-single-cursor](../proposed/core-single-cursor.md) | **proposed 2026-09-22** by the owner | **One cursor.** Item 9 kept two cursors joined by seeding rules; the owner, living with them against a YouTube recording, found the keys move one and not the other, and chose one. The cursor becomes a *performed* position — a pass-model entry plus the written address — so the paused arrows walk the performance (→ at a `:|` loops back until the last pass), a jump resets the pass unless the current one plays the target, every settled move seeks the player, Play collapses a selection to its first event, pause parks the cursor at the playhead, editing is off while playing (*Pause to edit*), the arrows seek a bar at a time while playing with presses accumulating into one seek, and a brief *Pass 2* near the cursor announces a loop or a jump. Selections stay written. **Reverses** item 9's decision 1 and the player campaign's clause 3, and retires the workbench's unclamped pass walk. |
+| 10 | [core-single-cursor](core-single-cursor.md) | **built 2026-09-22** — awaiting the owner's hands-on check | **One cursor.** Item 9 kept two cursors joined by seeding rules; the owner, living with them against a YouTube recording, found the keys move one and not the other, and chose one. The cursor becomes a *performed* position — a pass-model entry plus the written address — so the paused arrows walk the performance (→ at a `:|` loops back until the last pass), a jump resets the pass unless the current one plays the target, every settled move seeks the player, Play collapses a selection to its first event, pause parks the cursor at the playhead, editing is off while playing (*Pause to edit*), the arrows seek a bar at a time while playing with presses accumulating into one seek, and a brief *Pass 2* near the cursor announces a loop or a jump. Selections stay written. **Reverses** item 9's decision 1 and the player campaign's clause 3, and retires the workbench's unclamped pass walk. |
 
 ### Decisions still open
 
@@ -707,3 +707,26 @@ what kind of machine it is on, which is where a layer below `elements/` should b
 **The campaign's editing goal is met on the desk and closed on touch.** What remains is
 item 4's hands-on checks and migration 0005 before any deploy — neither of them this item.
 
+### 2026-09-22 — entry 15: item 10 built — one cursor
+
+Filed and built the same day. The edit cursor is a performed position now: a visit of the
+pass model plus the written address, and the player follows it — paused, every settled
+move seeks; playing, edits wait (*Pause to edit*), ←/→ count whole bars into one seek, and
+a pause parks the cursor on the note that was sounding. A move that changes the pass says
+*Pass 2* beside the cursor. The doc's *As built* section has the seven things the build
+settled; three worth carrying forward:
+
+1. **Layer the new order over the old walk; do not rewrite the walk.** The written walk
+   (rungs, ink skipping, grace pins, the ghost bar) stayed exactly as it was, and a pure
+   step decides the visit afterwards, redirecting only where the performance leaves the
+   written order. Every existing editor test passed untouched, which is what made the
+   change reviewable.
+2. **"Someone else moved the playhead" is a heuristic, and it bit twice.** An edit resets
+   an idle player to the top, and a playhead that first appears reads as a move; both
+   yanked the cursor until the rule became *a real move, not by this cursor, and never
+   right after an edit — after which the player is put back under the cursor*.
+3. **Two cursors were load-bearing in three smokes.** `player-workbench` asserted separate
+   inspection and an edit key during playback; `unrolled` held the layout across a pause
+   that now parks the cursor; both were rewritten to the new contract, and a stale-node
+   trap (a press re-engraves the combined view) surfaced once the press, not the note
+   event, was what seeked.

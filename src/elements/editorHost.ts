@@ -66,6 +66,30 @@ import './RungInspector.ts';
 import './LyricTextEditor.ts';
 import './EditorSurfaces.ts';
 import type { SelectionContext } from './mnxContext.ts';
+import type { CursorPlayback, PerformedPosition } from './cursorPlayback.ts';
+import { CURSOR_LABEL_MS, type CursorLabel } from './CursorLabel.ts';
+import './CursorLabel.ts';
+import type { PassNotice, PerformedPlace } from '../edit/session.ts';
+import { entryStart } from '../edit/performedCursor.ts';
+import { barSeekTarget } from '../model/playback.ts';
+import { hasRepeatStructure } from '../model/passes.ts';
+import { rational, type Rational } from '../model/time.ts';
+
+/** How long a paused cursor rests before the player follows it: held keys make one seek, not one per repeat. */
+const SEEK_SETTLE_MS = 150;
+/** How long ←/→ while playing wait for another press before the counted bars become one seek. */
+const BAR_SEEK_MS = 300;
+/** After this cursor seeks, how long a playhead report may still be the old place rather than someone else's seek. */
+const OWN_SEEK_GRACE_MS = 800;
+
+const placeKey = (place: PerformedPlace | null) => place ? `${place.ordinal}:${place.onset.num}/${place.onset.den}` : '';
+const headKey = (head: PerformedPosition | null) => head ? `${head.ordinal}:${head.offset.num}/${head.offset.den}` : '';
+const toPosition = (place: PerformedPlace): PerformedPosition =>
+  ({ ordinal: place.ordinal, offset: rational(BigInt(place.onset.num), BigInt(place.onset.den)) });
+/** A playhead offset as a grid onset — floored to 1/3840 of a whole note, which is only ever compared with stops. */
+const onsetOf = (offset: Rational) => ({ num: Number((offset.num * 3840n) / offset.den), den: 3840 });
+const noticeText = (notice: PassNotice) => notice.kind === 'pass' ? `Pass ${notice.pass}` : 'Not played';
+const HORIZONTAL_STEPS: Partial<Record<EditorIntent['type'], 1 | -1>> = { nextPosition: 1, prevPosition: -1, jumpNext: 1, jumpPrev: -1 };
 
 export interface EditorBindingOptions {
   /** Stamped into the session's traces; '' when the document is not a corpus scenario. */
@@ -146,6 +170,17 @@ export interface EditorBindingOptions {
     extend?(view: InspectorView): InspectorView;
     apply?(word: string | null, text: string, key?: string): string | null | undefined;
   };
+  /**
+   * The player this cursor IS (roadmap/proposed/core-single-cursor.md). Paused,
+   * every settled cursor move seeks it, so Play starts at the cursor — or, with
+   * a range or a bar selected, at the selection's first event, which Play
+   * collapses to. Playing, nothing is edited (*Pause to edit* beside the
+   * playhead), ←/→ seek a whole bar at a time with quick presses counted into
+   * one seek, and a pause parks the cursor on the note that was sounding. A
+   * move that changes the pass says so beside the cursor. Without one the
+   * cursor is the editor's alone, as it always was.
+   */
+  playback?: CursorPlayback;
 }
 
 export interface EditorBinding {
@@ -184,7 +219,7 @@ const NO_SELECTION: SelectionContext = { activePartId: null, activeMeasureIndex:
 const NAVIGATION = new Set<EditorIntent['type']>([
   'nextPosition', 'prevPosition', 'nextMeasure', 'prevMeasure', 'lineDown', 'lineUp', 'goToMeasure', 'goToEdge',
   'relaxSelection', 'tightenSelection', 'goToLevel', 'extendSelection', 'closeSelection', 'setProjection', 'cycleSlot',
-  'setPart', 'setStaff', 'jumpNext', 'jumpPrev', 'jumpUp', 'jumpDown', 'goToPointer'
+  'setPart', 'setStaff', 'jumpNext', 'jumpPrev', 'jumpUp', 'jumpDown', 'goToPointer', 'goToPerformed'
 ]);
 
 export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document: MnxStructure, options: EditorBindingOptions): EditorBinding {
@@ -202,13 +237,29 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
   let inspectorError: string | null = null;
   let lyrics: LyricTextEditor | null = null;
   const surfaces = options.overlay ? options.overlay.appendChild(document_.createElement('mnx-editor-surfaces')) : null;
+  // ── the cursor as the playhead (core-single-cursor.md) ──
+  const playback = options.playback ?? null;
+  let playing = playback?.playing ?? false;
+  /** ←/→ while playing: the visit the counted presses have reached, until the seek fires. */
+  let pendingBar: number | null = null;
+  let barTimer: ReturnType<typeof setTimeout> | undefined;
+  let seekTimer: ReturnType<typeof setTimeout> | undefined;
+  /** Where the player was last put (or found, on a pause) — a settle that names the same place seeks nothing. */
+  let lastSought = placeKey(session.playStart);
+  let lastSeekAt = 0;
+  /** The playhead as last reported: a paused playhead that MOVED, and not by this cursor, takes the cursor with it. */
+  let lastHead = headKey(playback?.playhead ?? null);
+  let label: CursorLabel | null = null;
+  let labelTimer: ReturnType<typeof setTimeout> | undefined;
+  /** While playing the playhead is the cursor, so the editor's own is not drawn — except where counted presses are headed. */
+  const playingHides = () => playing && pendingBar === null;
 
   const suspended = () => options.suspended?.() ?? false;
   /** The inspector is ours too; unclaimed focus only for a host that asked for it. */
   const hasKeyboard = () => focusWithin(scope) || (surfaces !== null && focusWithin(surfaces)) || (!!options.claimUnfocused && focusUnclaimed());
   const draw = () => {
     if (disposed) return;
-    viewer.selection = suspended() ? NO_SELECTION : selectionContextFor(session, { cursorHidden, pendingFret, preview });
+    viewer.selection = suspended() ? NO_SELECTION : selectionContextFor(session, { cursorHidden: cursorHidden || playingHides(), pendingFret, preview });
     // A cursor drawn while the keys go elsewhere is a lie about who owns the keyboard.
     viewer.selectionInactive = !hasKeyboard();
     if (inspector) {
@@ -218,10 +269,134 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     }
     options.onState?.();
   };
-  /** After anything that may have moved the session: report a new document, then redraw. */
-  const settle = () => {
-    if (session.doc !== shown) { shown = session.doc; options.onChange(shown); }
+  /** After anything that may have moved the session: report a new document, redraw, and let the player follow. */
+  const settle = (immediate = false) => {
+    if (session.doc !== shown) { shown = session.doc; options.onChange(shown); reunite(); }
     draw();
+    followCursor(immediate);
+  };
+  /**
+   * An edit replaced the player's performance, and an idle player may come out
+   * of that somewhere else (back at the top). Paused, the CURSOR is the truth:
+   * the playhead is put back under it, and what the player reports meanwhile
+   * is not taken for someone else's seek.
+   */
+  function reunite() {
+    if (!playback || playing) return;
+    lastSeekAt = Date.now();
+    clearTimeout(seekTimer);
+    seekTimer = setTimeout(() => {
+      seekTimer = undefined;
+      const head = playback.playhead, target = session.playStart;
+      if (target && head?.ordinal !== target.ordinal) seekNow(target);
+    }, SEEK_SETTLE_MS);
+  }
+  /** Put the player at a performed place now, and remember it was this cursor that did. */
+  const seekNow = (place: PerformedPlace | null = session.playStart) => {
+    clearTimeout(seekTimer); seekTimer = undefined;
+    if (!playback || !place || disposed) return;
+    lastSought = placeKey(place); lastSeekAt = Date.now();
+    playback.seek(toPosition(place));
+  };
+  /** Paused, the player follows the cursor once it rests — at once for a press, which names a moment. */
+  function followCursor(immediate: boolean) {
+    if (!playback || playing || suspended()) return;
+    const target = session.playStart;
+    if (!target || placeKey(target) === lastSought) return;
+    clearTimeout(seekTimer);
+    if (immediate) seekNow(target);
+    else seekTimer = setTimeout(() => seekNow(), SEEK_SETTLE_MS);
+  }
+  /** The overlay's coordinates for a viewport rect. */
+  const inOverlay = (rect: DOMRect | null): OverlayAnchor | null => {
+    const box = options.overlay?.getBoundingClientRect();
+    return rect && box ? { x: rect.left - box.left, y: rect.top - box.top, width: rect.width, height: rect.height } : null;
+  };
+  /** One line beside the cursor — or beside the playhead, which is the cursor while the music plays. */
+  const showLabel = (text: string) => {
+    if (!surfaces || disposed) return;
+    if (!label) { label = document_.createElement('mnx-cursor-label'); surfaces.append(label); }
+    label.flash(text, playingHides() ? inOverlay(viewer.playheadRect()) : anchor);
+    clearTimeout(labelTimer);
+    labelTimer = setTimeout(() => { if (label) label.hidden = true; }, CURSOR_LABEL_MS);
+  };
+  const refusePlaying = (intent: EditorIntent) => {
+    showLabel('Pause to edit');
+    options.onRefused?.(intent, 'playing');
+  };
+  /** Stand the cursor where the playhead is, without seeking — the player is already there, to the exact time. */
+  const park = (head: PerformedPosition) => {
+    const onset = onsetOf(head.offset);
+    session.handleIntent({ type: 'goToPerformed', ordinal: head.ordinal, onset: [onset.num, onset.den] });
+    lastSought = placeKey(session.playStart);
+  };
+  /** ←/→ while playing: whole visits, to a visit's start, counted until the presses stop. */
+  const barStep = (delta: 1 | -1) => {
+    const head = playback?.playhead;
+    const model = session.passModel;
+    if (!playback || !head || model.entries.length === 0) return;
+    const from = model.entries[pendingBar ?? head.ordinal];
+    pendingBar = barSeekTarget(model.entries.length, head.ordinal, pendingBar, delta);
+    const entry = model.entries[pendingBar];
+    const start = entryStart(entry);
+    // The cursor shows where the count has got to; the music plays on until the seek.
+    session.handleIntent({ type: 'goToPerformed', ordinal: pendingBar, onset: [start.num, start.den] });
+    cursorHidden = false;
+    draw();
+    if (from && from.iteration !== entry.iteration && hasRepeatStructure(session.doc)) showLabel(`Pass ${entry.iteration}`);
+    clearTimeout(barTimer);
+    barTimer = setTimeout(() => {
+      barTimer = undefined;
+      const target = pendingBar;
+      pendingBar = null;
+      const visit = target === null ? undefined : session.passModel.entries[target];
+      if (visit) seekNow({ ordinal: visit.ordinal, onset: entryStart(visit) });
+      draw();
+    }, BAR_SEEK_MS);
+  };
+  const onPlayback = () => {
+    if (disposed || !playback) return;
+    const now = playback.playing;
+    const head = playback.playhead;
+    // A playhead appearing where there was none (a performance just installed)
+    // is the player arriving, not the playhead moving.
+    const moved = lastHead !== '' && headKey(head) !== lastHead;
+    lastHead = headKey(head);
+    if (now !== playing) {
+      playing = now;
+      if (now) {
+        tabDigits.flush(); closeInspector(false); closeLyrics(false);
+        // A move made just before Play is where Play meant to start.
+        if (seekTimer !== undefined) seekNow();
+        // Play collapses a range, or a rung wider than the event, to its first event.
+        const selection = session.selection;
+        const extent = selection.extent.kind === 'cursor' ? selection.extent.cursor : null;
+        const point = extent !== null && extent.measureIndex === selection.anchor.measureIndex
+          && extent.onset.num * selection.anchor.onset.den === selection.anchor.onset.num * extent.onset.den;
+        if (!point || (selection.level !== 'note' && selection.level !== 'event')) {
+          const start = session.playStart;
+          if (start) session.handleIntent({ type: 'goToPerformed', ordinal: start.ordinal, onset: [start.onset.num, start.onset.den], level: 'note' });
+          lastSought = placeKey(session.playStart);
+        }
+      } else {
+        clearTimeout(barTimer); barTimer = undefined;
+        const target = pendingBar;
+        pendingBar = null;
+        const visit = target === null ? undefined : session.passModel.entries[target];
+        if (visit) seekNow({ ordinal: visit.ordinal, onset: entryStart(visit) });
+        else if (head) park(head);
+      }
+      draw();
+      return;
+    }
+    // Paused, and the playhead MOVED by something other than this cursor (the
+    // tray's rail, the sync bar, an address in the URL): the cursor goes with
+    // it — there is one. A report that only repeats the old place (a seek the
+    // player refused, a state change) moves nothing.
+    if (!now && moved && head && seekTimer === undefined && pendingBar === null
+      && Date.now() - lastSeekAt > OWN_SEEK_GRACE_MS && head.ordinal !== session.performedOrdinal) {
+      park(head); draw();
+    }
   };
   const readOnly = () => options.readOnly?.() ?? false;
   const dispatch = (intent: EditorIntent): boolean => {
@@ -230,15 +405,29 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     // this function before anything could observe it, which is why typing a
     // fret into a locked piece did nothing and explained nothing.
     if (suspended()) { options.onRefused?.(intent, 'suspended'); return false; }
+    if (playing && playback && !NAVIGATION.has(intent.type)) { refusePlaying(intent); return false; }
     if (readOnly() && !NAVIGATION.has(intent.type)) { options.onRefused?.(intent, 'read-only'); return false; }
+    if (playing && playback && intent.type !== 'goToPerformed') {
+      // Playing, the playhead is the cursor: a move starts from where the music
+      // is, and where it lands is where the music goes.
+      const head = playback.playhead;
+      if (head) park(head);
+      const moved = session.handleIntent(intent);
+      const target = session.playStart;
+      if (moved && target && (!head || target.ordinal !== head.ordinal || intent.type === 'goToPointer')) seekNow(target);
+      if (session.passNotice) showLabel(noticeText(session.passNotice));
+      draw();
+      return moved;
+    }
     const handled = session.handleIntent(intent);
     cursorHidden = false;
+    if (playback && session.passNotice) showLabel(noticeText(session.passNotice));
     // Delete is the one verb whose two presses mean different things, so it says which one this was — including
     // when it declined. Everything else that returns false is a navigation edge, where silence is the right answer.
     const deleted = intent.type === 'delete' ? session.lastDelete : null;
     if (deleted) options.onNotice?.(deleteSelectionNotice(deleted));
     if (!handled) options.onRefused?.(intent, 'unavailable');
-    settle();
+    settle(intent.type === 'goToPointer');
     return handled;
   };
 
@@ -327,6 +516,8 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     anchor = rect && box ? { x: rect.left - box.left, y: rect.top - box.top, width: rect.width, height: rect.height } : null;
     paneWidth = box?.width ?? 0;
     if (inspector) inspector.anchor = anchor;
+    // A label raised by the move that is only now drawn follows the cursor to where it landed.
+    if (label && !label.hidden && !playingHides()) label.anchor = anchor;
   };
   const clipboard = async (verb: 'copySelection' | 'cutSelection' | 'pasteSelection') => {
     const store = options.clipboard;
@@ -376,6 +567,15 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     if (disposed || suspended() || event.defaultPrevented || event.isComposing || isTextEntry(realTarget(event))) return;
     const stroke = strokeOf(event);
     const action = resolveKeyAction(stroke, layers());
+    if (playing && playback) {
+      // Nothing is written while the music plays: a fret, the inspector, the lyric editor, cut and paste all wait.
+      const shellWhilePlaying = resolveShellAction(stroke);
+      if (action?.type === 'tabDigit') { event.preventDefault(); refusePlaying({ type: 'enterFret', fret: action.digit }); return; }
+      if ((shellWhilePlaying === 'commitPending' && surfaces) || (shellWhilePlaying === 'lyricTextEditor' && surfaces)
+        || ((shellWhilePlaying === 'cutSelection' || shellWhilePlaying === 'pasteSelection') && options.clipboard)) {
+        event.preventDefault(); refusePlaying({ type: 'undo' }); return;
+      }
+    }
     if (action?.type === 'tabDigit') {
       event.preventDefault();
       if (session.projection !== 'tab') session.handleIntent({ type: 'setProjection', projection: 'tab' });
@@ -411,6 +611,9 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
       options.onEscalate?.(intent.type === 'lineDown' ? 1 : -1);
       return;
     }
+    // Playing, ←/→ count whole bars toward one seek (core-single-cursor.md rule 7).
+    const bars = playing && playback ? HORIZONTAL_STEPS[intent.type] : undefined;
+    if (bars !== undefined) { barStep(bars); return; }
     const step = systemStep(intent);
     if (step === null) return;
     if (step) intent = step;
@@ -477,7 +680,8 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
       projection: detail.projection,
       fraction: detail.fraction,
       ...(detail.noteKey === undefined ? {} : { noteKey: detail.noteKey }),
-      ...(detail.columnKey === undefined ? {} : { columnKey: detail.columnKey })
+      ...(detail.columnKey === undefined ? {} : { columnKey: detail.columnKey }),
+      ...(detail.ordinal === undefined ? {} : { ordinal: detail.ordinal })
     })) draw();
   };
   const win = document_.defaultView;
@@ -499,6 +703,14 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     win?.addEventListener('keydown', onUnclaimedKey);
     win?.addEventListener('focusin', onFocusChange);
     win?.addEventListener('focusout', onFocusChange);
+  }
+  const unsubscribe = playback?.subscribe(onPlayback);
+  const uncouple = playback?.couple();
+  // Bound onto a player that is already somewhere else (an address that named a
+  // visit): the cursor starts where the playhead is, not the other way round.
+  {
+    const head = playback?.playhead;
+    if (head && !playing && head.ordinal !== session.performedOrdinal) park(head);
   }
   followProjection();
   draw();
@@ -534,6 +746,9 @@ export function bindEditor(scope: HTMLElement, viewer: DocumentViewer, document:
     dispose: () => {
       disposed = true;
       tabDigits.cancel();
+      clearTimeout(seekTimer); clearTimeout(barTimer); clearTimeout(labelTimer);
+      unsubscribe?.(); uncouple?.();
+      label = null;
       scope.removeEventListener('keydown', onKeyDown);
       scope.removeEventListener('focusin', onFocusChange);
       scope.removeEventListener('focusout', onFocusChange);

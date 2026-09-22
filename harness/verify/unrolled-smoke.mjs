@@ -64,10 +64,19 @@ try {
     const svg=viewer.shadowRoot.querySelector('svg');
     const playing=[...svg.querySelectorAll('.playback-ink')];
     check(playing.length && playing.every(n=>n.dataset.sourceId.startsWith('w2:')),'Playback highlighted another occurrence');
-    player.pause();await delay(50);
+    // Playing repaints ink, never the layout. (A pause then parks the edit
+    // cursor on the playhead — core-single-cursor.md — which is a cursor move,
+    // and a cursor move re-renders like any other; so the identity is held
+    // across a stretch of PLAYING, not across the pause.)
+    await delay(150);
     check(viewer.shadowRoot.querySelector('svg')===svg,'Playback caused a relayout');
-    const first=svg.querySelector('[data-source-id="w0:'+CSS.escape(key)+'"]');
-    first.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,composed:true}));await delay(80);
+    player.pause();await delay(50);
+    // Re-queried: the pause parked the edit cursor, which re-renders, so the
+    // node held from before is detached. And pressed where it is drawn — the
+    // press places the cursor on the visit it names, and the cursor seeks.
+    const first=viewer.shadowRoot.querySelector('svg [data-source-id="w0:'+CSS.escape(key)+'"]');
+    const box=first.getBoundingClientRect();
+    first.dispatchEvent(new PointerEvent('pointerdown',{clientX:box.x+box.width/2,clientY:box.y+box.height/2,button:0,isPrimary:true,bubbles:true,composed:true}));await delay(120);
     check(viewer.playbackState.ordinal===0,'Click did not seek exact occurrence');
     viewer.selection={...viewer.selection,selectedNoteIds:[key]};await viewer.updateComplete;await delay(50);
     const selected=[...viewer.shadowRoot.querySelectorAll('.notehead.selected')];

@@ -50,11 +50,6 @@ proposals that name their campaign.
 
 
 
-- **[core-single-cursor.md](proposed/core-single-cursor.md)** — studio authoring item 10:
-  **one cursor**. The edit cursor becomes a performed position (pass-model entry + written
-  address): paused arrows walk the performance and seek the player, jumps reset the pass,
-  Play collapses a selection, pause parks the cursor at the playhead, no editing while
-  playing, a brief *Pass 2* on a loop or jump. Reverses the two-cursor decisions.
 - **[studio-player-practice.md](proposed/studio-player-practice.md)** — campaign item 13,
   studio's first player feature in `elements/`: loop the selection with the **written-range
   → performed-occurrences policy stated**, speed trainer, count-in, metronome, mute/solo.
@@ -144,6 +139,11 @@ back up to `proposed/` the moment it is.
 
 ### inprogress/
 
+- **[core-single-cursor.md](inprogress/core-single-cursor.md)** — studio authoring item 10,
+  **built 2026-09-22**, awaiting the owner's hands-on check: one cursor. The edit cursor is a
+  performed position; paused arrows walk the performance and seek the player, jumps reset the
+  pass, Play collapses a selection, no editing while playing (*Pause to edit*), ←/→ while
+  playing seek whole bars in one counted seek, a pause parks the cursor, *Pass 2* on a loop.
 - **[core-musicxml-write-gaps.md](inprogress/core-musicxml-write-gaps.md)** — item 23: resolve missing title metadata for imported Studio versions and expose representable numeric meter ranges.
 
 

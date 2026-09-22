@@ -46,6 +46,14 @@ export type NavigationIntent =
    */
   | { type: 'goToEdge'; edge: 'first' | 'last' }
   /**
+   * Stand at a PERFORMED place (roadmap/proposed/core-single-cursor.md): a
+   * visit of the pass model and an onset in its bar, as the player addresses
+   * them — where the playhead was when playback paused, or where Play
+   * collapses a selection to. The cursor lands on the stop sounding there,
+   * keeping its line; `level` re-anchors the selection at that rung.
+   */
+  | { type: 'goToPerformed'; ordinal: number; onset: [number, number]; level?: SelectionLevel }
+  /**
    * Where a POINTER landed (core-editor-pointer-placement.md): a click or a
    * tap, resolved against the grid rather than on the viewer's side, because
    * only the grid knows where a cursor may stand.
@@ -71,6 +79,8 @@ export type NavigationIntent =
       /** Where along the bar, 0…1 of its metric span. The estimate of last
        *  resort: it is linear and the engraving is not. */
       fraction: number;
+      /** The visit pressed, where the view draws visits (unrolled) — core-single-cursor.md. */
+      ordinal?: number;
     }
   /** The selection ladder (roadmap/complete/core-selection-ladder.md): relax
    *  widens one rung (note → … → score; past the top the MOUNT deselects),
@@ -303,6 +313,7 @@ const NAVIGATION_TYPES: ReadonlySet<string> = new Set([
   'goToMeasure',
   'goToEdge',
   'goToPointer',
+  'goToPerformed',
   'relaxSelection',
   'tightenSelection',
   'goToLevel',

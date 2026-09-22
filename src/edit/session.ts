@@ -8,6 +8,8 @@ import type { ContainerIndex } from '../model/noteKeys.ts';
 import type { MnxEvent, MnxGlobalMeasure, MnxNote, MnxNoteValueBase, MnxStructure } from '../model/mnx.ts';
 import type { EditorIntent } from './intents.ts';
 import { isNavigationIntent, MAX_ENTRY_FRET } from './intents.ts';
+import { hasRepeatStructure, linearizePasses, type PassModel } from '../model/passes.ts';
+import { choosePerformance, entryContains, entryStart, performancesAt, performedStep, remapPerformance } from './performedCursor.ts';
 import type { EditOp, EntryTarget, EventAddress, OpLogEntry } from './ops.ts';
 import type { PasteLanding } from './selectionPastePlanner.ts';
 import {
@@ -55,6 +57,7 @@ import {
   positionAt,
   slotAt,
   type EditorCursor,
+  type Onset,
   type Position,
   type PositionGrid,
   type Projection
@@ -113,6 +116,23 @@ export type DeleteOutcome =
   | { kind: 'removed'; level: SelectionLevel; members: number }
   | { kind: 'refused'; level: SelectionLevel };
 
+/**
+ * What the last navigation did to the cursor's PASS (core-single-cursor.md) —
+ * the raw material of the label a host shows beside the cursor. `pass` when a
+ * move changed the visit's iteration or went where the written order does not
+ * (a loop back, an ending, a jump); `not-played` when it landed on a bar no
+ * performance reaches.
+ */
+export type PassNotice = { kind: 'pass'; pass: number } | { kind: 'not-played' };
+
+/** Where playing starts, as the player addresses it: a visit and a bar-relative onset. */
+export interface PerformedPlace { ordinal: number; onset: Onset }
+
+/** The steps that walk the performance rather than jump within it. */
+const STEPS: Partial<Record<EditorIntent['type'], 1 | -1>> = {
+  nextPosition: 1, prevPosition: -1, nextMeasure: 1, prevMeasure: -1, jumpNext: 1, jumpPrev: -1
+};
+
 /** RETIRED 2026-08-30 (core-selection-range-grain.md decision 5, by the
  *  user's call): the two-press armed anchor gave way to the model gestures —
  *  a bare press attaches to the NEXT note, a press at a spanner's end
@@ -144,6 +164,14 @@ export class EditorSession {
   /** Which SPACE the cursor's line addresses (selection-ladder map): the
    *  fingerboard on tab documents by default, else the staff. */
   private activeProjection: Projection;
+  /**
+   * The visit the cursor stands in (core-single-cursor.md): an index into the
+   * pass model's entries, or null where no performance reaches the cursor's
+   * bar. The written address is `cursorState`; together they are ONE cursor.
+   */
+  private ordinalState: number | null = null;
+  private passCache: { doc: MnxStructure; model: PassModel } | null = null;
+  private passNoticeState: PassNotice | null = null;
   readonly initial: MnxStructure;
 
   constructor(
@@ -179,6 +207,66 @@ export class EditorSession {
     this.cursorState = initialCursor(this.grid);
     this.selectionState = pointSelection(options.level ?? 'note', this.cursorState);
     this.activeProjection = this.grid.mode === 'string' ? 'tab' : 'notation';
+    this.ordinalState = choosePerformance(this.passModel, this.cursorState.measureIndex, this.cursorState.onset, null);
+  }
+
+  /** The performance of the document as it is now — rebuilt only when the document changes. */
+  get passModel(): PassModel {
+    return this.passModelFor(this.doc);
+  }
+
+  private passModelFor(doc: MnxStructure): PassModel {
+    if (this.passCache?.doc !== doc) this.passCache = { doc, model: linearizePasses(doc) };
+    return this.passCache.model;
+  }
+
+  /**
+   * The visit the cursor stands in, or null (written-only). Checked on the
+   * way out: a host that moved the session other than by intent cannot leave
+   * the two halves of the cursor disagreeing.
+   */
+  get performedOrdinal(): number | null {
+    const entry = this.ordinalState === null ? undefined : this.passModel.entries[this.ordinalState];
+    if (!entry || !entryContains(entry, this.cursorState.measureIndex, this.cursorState.onset))
+      this.ordinalState = choosePerformance(this.passModel, this.cursorState.measureIndex, this.cursorState.onset, this.ordinalState);
+    return this.ordinalState;
+  }
+
+  /** What the last intent did to the pass, for the label beside the cursor; null when nothing worth saying. */
+  get passNotice(): PassNotice | null {
+    return this.passNoticeState;
+  }
+
+  /**
+   * Where Play starts (core-single-cursor.md rule 4): the cursor, or — when a
+   * range or a rung wider than the event is selected — the selection's first
+   * event, on the visit nearest the cursor's pass. A cursor on a bar no
+   * performance reaches starts at the next bar one does. Null when nothing
+   * is left to play.
+   */
+  get playStart(): PerformedPlace | null {
+    const model = this.passModel;
+    const selection = this.selectionState;
+    let start: EditorCursor = this.cursorState;
+    let barStart = false;
+    if (selection.extent.kind === 'cursor') {
+      const other = selection.anchor, extent = selection.extent.cursor;
+      const earlier = other.measureIndex < extent.measureIndex
+        || (other.measureIndex === extent.measureIndex && onsetLess(other.onset, extent.onset));
+      start = earlier ? other : extent;
+    } else start = selection.anchor;
+    if (selection.level === 'document') return model.entries[0] ? { ordinal: 0, onset: entryStart(model.entries[0]) } : null;
+    if (selection.level === 'voiceMeasure' || selection.level === 'partMeasure' || selection.level === 'measure') barStart = true;
+    const ordinal = start === this.cursorState ? this.performedOrdinal
+      : choosePerformance(model, start.measureIndex, start.onset, this.performedOrdinal);
+    if (ordinal === null) {
+      const next = model.entries
+        .filter(entry => entry.measureIndex > start.measureIndex)
+        .sort((a, b) => a.measureIndex - b.measureIndex || a.ordinal - b.ordinal)[0];
+      return next ? { ordinal: next.ordinal, onset: entryStart(next) } : null;
+    }
+    const entry = model.entries[ordinal];
+    return { ordinal, onset: barStart ? entryStart(entry) : start.onset };
   }
 
   get doc(): MnxStructure {
@@ -336,6 +424,192 @@ export class EditorSession {
    * exactly as it happened, no-ops included.
    */
   handleIntent(intent: EditorIntent): boolean {
+    const cursorBefore = this.cursorState;
+    const docBefore = this.doc;
+    const ordinalBefore = this.performedOrdinal;
+    this.passNoticeState = null;
+    const handled = this.handleWritten(intent);
+    return this.followPerformance(intent, handled, cursorBefore, docBefore, ordinalBefore);
+  }
+
+  /**
+   * The performed half of every intent (core-single-cursor.md). The written
+   * walk has run; this decides the visit. A STEP continues through the
+   * performance — and where the performance goes somewhere the written order
+   * does not (a `:|` on a pass that is not the last, a skipped ending, a
+   * jump), the cursor is redirected there. Anything else that moved the
+   * cursor chose a bar, and the visit is chosen for it. An edit or an undo
+   * rebuilt the performance, and the visit is re-found in it.
+   */
+  private followPerformance(
+    intent: EditorIntent,
+    handled: boolean,
+    cursorBefore: EditorCursor,
+    docBefore: MnxStructure,
+    ordinalBefore: number | null
+  ): boolean {
+    const model = this.passModel;
+    const cursor = this.cursorState;
+    if (this.doc !== docBefore) {
+      const previous = ordinalBefore === null ? null : this.passModelFor(docBefore).entries[ordinalBefore] ?? null;
+      this.ordinalState = remapPerformance(previous, model, cursor.measureIndex, cursor.onset);
+      return handled;
+    }
+    if (!isNavigationIntent(intent) || intent.type === 'goToPerformed') return handled;
+    const delta = STEPS[intent.type];
+    const stepping = delta !== undefined && this.selectionState.level !== 'document'
+      && (intent.type !== 'jumpNext' && intent.type !== 'jumpPrev'
+        || this.selectionState.level === 'note' || this.selectionState.level === 'event');
+    let redirected = false;
+    if (stepping && ordinalBefore !== null) {
+      // A step the written walk could not take (the last stop of the score)
+      // may still have somewhere to go in the performance: a closing `:|`.
+      const onward = model.entries[ordinalBefore + delta];
+      const step = handled
+        ? performedStep(model, ordinalBefore, cursor, delta)
+        : onward ? { kind: 'redirect' as const, entry: onward } : { kind: 'end' as const };
+      if (step.kind === 'follow') this.ordinalState = step.ordinal;
+      else if (step.kind === 'redirect') {
+        this.cursorState = this.landIn(step.entry, delta, cursorBefore);
+        this.reanchorSelection();
+        this.ordinalState = step.entry.ordinal;
+        redirected = true;
+        handled = true;
+      } else if (handled) {
+        // Past the performance's last visit: the ghost bar, where the next
+        // bar is written — never a bar the written order happens to reach,
+        // which after a D.C. al Fine is music that has already been played.
+        const ghost = delta === 1 && this.grid.ghostMeasureIndex !== undefined
+          ? this.grid.positions.find(p => p.measureIndex === this.grid.ghostMeasureIndex)
+          : undefined;
+        this.cursorState = ghost ? this.addressAt(ghost, cursorBefore) : cursorBefore;
+        this.reanchorSelection();
+        this.ordinalState = ghost ? null : ordinalBefore;
+        handled = !!ghost;
+      } else this.ordinalState = ordinalBefore;
+    } else if (stepping && ordinalBefore === null) {
+      // Written-only (the ghost bar, a bar nothing plays): walk written order
+      // until a performed bar, then enter it from the side the step came from —
+      // its first visit walking forward, its last walking back from the end.
+      const last = model.entries[model.entries.length - 1];
+      if (delta < 0 && last && cursorBefore.measureIndex === this.grid.ghostMeasureIndex) {
+        // Back from the ghost bar is back into the performance at its END —
+        // after a D.C. al Fine that is the Fine, not the last written bar.
+        this.cursorState = this.landIn(last, -1, cursorBefore);
+        this.reanchorSelection();
+        this.ordinalState = last.ordinal;
+        handled = true;
+      } else {
+        const visits = performancesAt(model, cursor.measureIndex, cursor.onset);
+        this.ordinalState = visits.length === 0 ? null : (delta > 0 ? visits[0] : visits[visits.length - 1]).ordinal;
+      }
+    } else if (
+      intent.type === 'goToPointer' && intent.ordinal !== undefined
+      && model.entries[intent.ordinal] && entryContains(model.entries[intent.ordinal], cursor.measureIndex, cursor.onset)
+    ) {
+      // The view draws visits (unrolled): the press named one, and it is that one.
+      this.ordinalState = intent.ordinal;
+    } else if (
+      intent.type === 'goToPointer' && ordinalBefore !== null
+      && cursor.measureIndex === cursorBefore.measureIndex && onsetsEqual(cursor.onset, cursorBefore.onset)
+      && cursor.line === cursorBefore.line
+    ) {
+      // A press where the cursor already stands names the same moment again:
+      // the next visit of it, so a bar's second pass is a second press away.
+      const visits = performancesAt(model, cursor.measureIndex, cursor.onset);
+      const at = visits.findIndex(entry => entry.ordinal === ordinalBefore);
+      const next = visits.length > 1 ? visits[(at + 1) % visits.length] : undefined;
+      if (next) { this.ordinalState = next.ordinal; handled = true; }
+    } else {
+      const entry = ordinalBefore === null ? undefined : model.entries[ordinalBefore];
+      this.ordinalState = entry && entryContains(entry, cursor.measureIndex, cursor.onset)
+        ? ordinalBefore
+        : choosePerformance(model, cursor.measureIndex, cursor.onset, ordinalBefore);
+    }
+    this.passNoticeState = this.noticeFor(ordinalBefore, redirected);
+    return handled;
+  }
+
+  private noticeFor(ordinalBefore: number | null, redirected: boolean): PassNotice | null {
+    const model = this.passModel;
+    const after = this.ordinalState === null ? undefined : model.entries[this.ordinalState];
+    if (!after) {
+      const ghost = this.grid.ghostMeasureIndex === this.cursorState.measureIndex;
+      return ghost || ordinalBefore === null ? null : { kind: 'not-played' };
+    }
+    if (!hasRepeatStructure(this.doc)) return null;
+    const before = ordinalBefore === null ? undefined : model.entries[ordinalBefore];
+    if (before && before.ordinal === after.ordinal) return null;
+    return redirected || !before || before.iteration !== after.iteration ? { kind: 'pass', pass: after.iteration } : null;
+  }
+
+  /** Arrive in a visit the written walk did not reach: its first stop walking
+   *  forward, its last walking back — by the rung's own walk, so the landing
+   *  is the one an ordinary step into that bar would have made. */
+  /** A grid stop, addressed as `from` addresses things: its line, part, staff and voice carried. */
+  private addressAt(p: PositionGrid['positions'][number], from: EditorCursor, voice = from.voiceIndex ?? 0): EditorCursor {
+    return {
+      measureIndex: p.measureIndex,
+      onset: p.onset,
+      line: from.line,
+      ...(from.partIndex ? { partIndex: from.partIndex } : {}),
+      ...(from.staffIndex && from.staffIndex !== 1 ? { staffIndex: from.staffIndex } : {}),
+      ...(voice ? { voiceIndex: voice } : {})
+    };
+  }
+
+  /**
+   * Stand at a performed place (`goToPerformed`): on the stop SOUNDING at the
+   * onset — the last at or before it — in the cursor's voice where it has one
+   * there, keeping the line. This is where a pause parks the cursor, so it is
+   * the note just heard rather than the next one.
+   */
+  private goToPerformed(ordinal: number, onset: Onset, level?: SelectionLevel): boolean {
+    const entry = this.passModel.entries[ordinal];
+    if (!entry) return false;
+    const inside = this.grid.positions.filter(p => entryContains(entry, p.measureIndex, p.onset));
+    if (inside.length === 0) return false;
+    const wanted = this.cursorState.voiceIndex ?? 0;
+    const sounding = (list: typeof inside) => [...list].reverse().find(p => !onsetLess(onset, p.onset));
+    const voiced = inside.filter(p => p.voices.includes(wanted));
+    const target = sounding(voiced) ?? voiced[0] ?? sounding(inside) ?? inside[0];
+    const voice = target.voices.includes(wanted) ? wanted : target.voices[0] ?? 0;
+    this.cursorState = this.addressAt(target, this.cursorState, voice);
+    this.ordinalState = ordinal;
+    this.reanchorSelection(level);
+    return true;
+  }
+
+  private landIn(entry: PassModel['entries'][number], delta: 1 | -1, from: EditorCursor): EditorCursor {
+    const positions = this.grid.positions;
+    const address = (p: (typeof positions)[number]) => this.addressAt(p, from);
+    if (delta === 1) {
+      // The visit's first stop at or after its start (a mid-bar segno), else
+      // the one still sounding there.
+      const start = entryStart(entry);
+      let landed = moveToMeasure(this.grid, from, entry.measureIndex);
+      for (let guard = 0; guard < positions.length && onsetLess(landed.onset, start); guard++) {
+        const next = this.moveHorizontal(landed, 1);
+        if (next === landed || !entryContains(entry, next.measureIndex, next.onset)) break;
+        landed = next;
+      }
+      return landed;
+    }
+    // Walking back: step back from just past the visit's end, so the rung's
+    // own walk picks the last stop (the voice's last event, a grace's pin).
+    const after = positions.find(p => entry.until
+      ? p.measureIndex === entry.measureIndex && !entryContains(entry, p.measureIndex, p.onset) && !onsetLess(p.onset, entryStart(entry))
+      : p.measureIndex > entry.measureIndex);
+    if (after) {
+      const back = this.moveHorizontal(address(after), -1);
+      if (entryContains(entry, back.measureIndex, back.onset)) return back;
+    }
+    const inside = positions.filter(p => entryContains(entry, p.measureIndex, p.onset));
+    return inside.length ? address(inside[inside.length - 1]) : moveToMeasure(this.grid, from, entry.measureIndex);
+  }
+
+  /** The intent itself, in written terms — `handleIntent` then settles the visit. */
+  private handleWritten(intent: EditorIntent): boolean {
     this.intents.push(intent);
     // Delete's outcome describes ONE keystroke, so anything else discards it.
     // A notice that outlived its keystroke would report the previous press.
@@ -1673,6 +1947,8 @@ export class EditorSession {
       case 'goToMeasure':
         this.cursorState = moveToMeasure(this.grid, before, intent.measureIndex);
         break;
+      case 'goToPerformed':
+        return this.goToPerformed(intent.ordinal, { num: intent.onset[0], den: intent.onset[1] }, intent.level);
       case 'goToPointer': {
         // A pointer can cross the whole address at once — another part, another
         // staff, another projection — which no keyboard move can do. Each of

@@ -492,7 +492,9 @@ export class PiecePage extends LitElement {
       onNotice: notice => this.showNotice(notice.message),
       onState: () => { if (this.keysOpen || this.editOpen) this.requestUpdate(); },
       onRefused: (intent, reason) => this.sayRefused(intent, reason),
-      readOnly: () => this.readOnly, suspended: () => !!this.viewing
+      readOnly: () => this.readOnly, suspended: () => !!this.viewing,
+      // One cursor (core-single-cursor.md): the edit cursor is the playhead.
+      playback: this.binding?.cursor
     });
     this.editor = editor;
     if (found) session.recover({ ...found.record, document: editor.document }, found.stale);

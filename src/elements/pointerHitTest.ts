@@ -78,6 +78,13 @@ export interface PointerPlacement {
    * over a chord puts the cursor on the fourth string at that beat.
    */
   columnKey?: string;
+  /**
+   * The VISIT the pressed ink belongs to, in the unrolled view — where every
+   * drawn bar is one performance of it (core-single-cursor.md). Absent in the
+   * written view, where a drawn bar stands for all its visits and the cursor's
+   * pass decides.
+   */
+  ordinal?: number;
 }
 
 /** The measured page, built once per paint and asked many times. */

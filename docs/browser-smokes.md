@@ -97,11 +97,14 @@ carry over — which is how the staff-scale and view preferences are set.
 
 ### Scrolling re-engraves, and a held node is then detached
 
-The viewer repaints on scroll and on resize. A node captured before
-`scrollIntoView()` is no longer in the tree afterwards: it reports a zero rect
-and **swallows a synthetic press in silence** rather than erroring. Re-query the
-SVG and the element after anything that can repaint, and assert the rect is
-non-zero before aiming at it.
+The viewer repaints on scroll and on resize — and on every edit-cursor move,
+which now includes a press that places the cursor and a pause that parks it on
+the playhead (core-single-cursor.md). A node captured before any of those is no
+longer in the tree afterwards: it reports a zero rect and **swallows a synthetic
+press in silence** rather than erroring (it may still fire `note-selected`,
+which no longer seeks when an editor is bound). Re-query the SVG and the element
+after anything that can repaint, and assert the rect is non-zero before aiming
+at it.
 
 ### The page-side code is inside a template literal
 

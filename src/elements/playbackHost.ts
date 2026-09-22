@@ -17,12 +17,15 @@ import { beatOfKey } from './scoreSeek.ts';
 import type { MnxDocument } from '../model/mnx.ts';
 import type { Player } from './Player.ts';
 import type { DocumentViewer } from './DocumentViewer.ts';
+import type { CursorPlayback } from './cursorPlayback.ts';
 
 export function bindPlayback(host: HTMLElement, viewer: DocumentViewer, player: Player) {
   let state = initialPlaybackState();
   let model: ReturnType<typeof linearizePasses> | undefined;
   let document: MnxDocument | undefined;
   let lastKey = '';
+  /** An editor cursor owns press-to-seek while this is above zero (core-single-cursor.md). */
+  let coupled = 0;
   const provider = new ContextProvider(host, {
     context: playbackStateContext,
     initialValue: state,
@@ -50,7 +53,7 @@ export function bindPlayback(host: HTMLElement, viewer: DocumentViewer, player: 
   const select = (event: Event) => {
     const detail = (event as CustomEvent<{ noteId?: string; ordinal?: number }>).detail,
       key = detail.noteId;
-    if (!key || !player.performance) return;
+    if (!key || !player.performance || coupled > 0) return;
     const candidates = player.performance.written
       .filter((w) => w.noteKey === key)
       .map((w) => w.ordinal);
@@ -81,7 +84,7 @@ export function bindPlayback(host: HTMLElement, viewer: DocumentViewer, player: 
     const detail = (event as CustomEvent<
       { measureIndex?: number; noteKey?: string; columnKey?: string }
     >).detail;
-    if (!model || !detail || detail.noteKey !== undefined || detail.measureIndex === undefined) return;
+    if (!model || !detail || detail.noteKey !== undefined || detail.measureIndex === undefined || coupled > 0) return;
     const { ordinals } = resolveIteration(model, detail.measureIndex, activeIteration(state));
     const candidates = ordinals.length > 0
       ? ordinals
@@ -102,6 +105,23 @@ export function bindPlayback(host: HTMLElement, viewer: DocumentViewer, player: 
   // above. With no player bound the gesture is a no-op, never an error.
   const toggle = () => player.toggle();
   player.addEventListener('playback-state-changed', update);
+  const cursor: CursorPlayback = {
+    get playing() { return player.playback?.wantsPlayback ?? false; },
+    get playhead() {
+      const at = player.scorePosition;
+      return at ? { ordinal: at.ordinal, offset: at.metricOffset } : null;
+    },
+    seek: ({ ordinal, offset }) => { player.seek(ordinal, offset); },
+    subscribe(listener) {
+      player.addEventListener('playback-state-changed', listener);
+      return () => player.removeEventListener('playback-state-changed', listener);
+    },
+    couple() {
+      coupled++;
+      let released = false;
+      return () => { if (!released) { released = true; coupled--; } };
+    },
+  };
   viewer.addEventListener('note-selected', select);
   viewer.addEventListener('position-selected', place);
   viewer.addEventListener('transport-toggle', toggle);
@@ -109,6 +129,8 @@ export function bindPlayback(host: HTMLElement, viewer: DocumentViewer, player: 
     get state() {
       return state;
     },
+    /** The player, as the editor's cursor sees it (`bindEditor`'s `playback`). */
+    cursor,
     setDocument(next: MnxDocument) {
       // An edit — the same document, a new revision — keeps the player's session, its
       // source and its place (core-player-live-edit); only another document stops the

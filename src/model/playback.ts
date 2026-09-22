@@ -48,6 +48,17 @@ export function activeIteration(state: PlaybackPositionState): number {
 export function verseForIteration(orderedVerseIds: readonly string[], state: PlaybackPositionState): string | undefined {
   return orderedVerseIds[activeIteration(state) - 1];
 }
+/**
+ * Where ←/→ WHILE PLAYING are taking the playhead (core-single-cursor.md):
+ * whole visits, always to a visit's start. Presses accumulate — each moves
+ * one visit on from the previous target, not from the playhead, so ← four
+ * times is three visits back however far the music moved meanwhile. The
+ * first ← is the start of the visit playing, not the one before it.
+ */
+export function barSeekTarget(entryCount: number, playhead: number, pending: number | null, delta: 1 | -1): number {
+  const target = pending === null ? (delta < 0 ? playhead : playhead + 1) : pending + delta;
+  return Math.max(0, Math.min(entryCount - 1, target));
+}
 /** Walking to another bar NEVER changes inspection state, even if this bar
  * skips that iteration or belongs to a different strain. Cycling is explicit. */
 export function nextInspectionIteration(model: PassModel, measureIndex: number, current: number): number {

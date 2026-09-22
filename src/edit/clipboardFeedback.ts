@@ -179,8 +179,9 @@ export function deleteSelectionNotice(outcome: DeleteOutcome): ClipboardNotice {
  *    session to edit.
  *  - `unavailable` — the session declined: a rung this document does not
  *    present, an edit this position cannot take.
+ *  - `playing` — nothing is edited while the music plays (core-single-cursor.md).
  */
-export type RefusalReason = 'read-only' | 'suspended' | 'unavailable';
+export type RefusalReason = 'read-only' | 'suspended' | 'unavailable' | 'playing';
 
 /**
  * One sentence for a refusal, or NOTHING where silence is the honest answer.
@@ -198,6 +199,8 @@ export type RefusalReason = 'read-only' | 'suspended' | 'unavailable';
  */
 export function refusalNotice(intent: EditorIntent, reason: RefusalReason): ClipboardNotice | null {
   if (reason === 'unavailable' && isNavigationIntent(intent)) return null;
+  // The binding already says *Pause to edit* beside the cursor; a second sentence elsewhere would be noise.
+  if (reason === 'playing') return null;
   if (reason === 'suspended')
     return { ok: false, message: 'This is an older version — go back to the current one to edit it, or make this one current.' };
   if (reason === 'read-only')

@@ -7,7 +7,7 @@ import { chooseOrdinal } from '../model/playback.ts';
 import { ContextProvider } from '@lit/context';
 import { playbackStateContext, initialPlaybackState, type PlaybackState, type PlaybackUpdate } from '../elements/mnxContext.ts';
 import { linearizePasses, hasRepeatStructure, type PassModel } from '../model/passes.ts';
-import { resolveIteration, activeIteration, inspectIteration, followPlayback, withPlaybackOrdinal, nextInspectionIteration, verseForIteration } from '../model/playback.ts';
+import { resolveIteration, activeIteration, withPlaybackOrdinal, verseForIteration } from '../model/playback.ts';
 import { documentLyricLineIds } from '../engine/layout/lyricRuns.ts';
 import { readDisplayPreferences, writeDisplayPreferences } from './displayPreferences.ts';
 import type { DisplayOptions } from '../engine/displayOptions.ts';
@@ -50,6 +50,7 @@ import {
 } from '../edit/setupGrammar.ts';
 import { buildOpRow } from './opRows.ts';
 import { bindEditor, type EditorBinding } from '../elements/editorHost.ts';
+import type { CursorPlayback } from '../elements/cursorPlayback.ts';
 import {
   OVERLAY_EDGE_GAP,
   OVERLAY_SHAFT_H,
@@ -363,8 +364,50 @@ export class ScenarioPage extends LitElement {
       highlight: state.ordinal === null ? []
       : update.highlight.filter(occurrence => occurrence.ordinal === state.ordinal) });
   };
-  private chooseInspection(iteration: number) {
-    this.setPlayback(inspectIteration(this.playback, iteration));
+  // ── One cursor (roadmap/proposed/core-single-cursor.md) ────────────────────
+  // The editor's cursor IS the playhead: the binding seeks this page's player
+  // when the cursor rests, parks the cursor when it pauses, and owns
+  // press-to-seek — so this page's own click handlers stand down while it is
+  // coupled. The pass the cursor stands on is the page's inspection iteration,
+  // which is what the verses and the pass chip read.
+  private cursorCoupled = 0;
+  private get player(): Player | null { return this.renderRoot?.querySelector<Player>('mnx-player') ?? null; }
+  private readonly cursorPlayback: CursorPlayback = (() => {
+    const page = this;
+    return {
+      get playing() { return page.player?.playback?.wantsPlayback ?? false; },
+      get playhead() {
+        const at = page.player?.scorePosition;
+        return at ? { ordinal: at.ordinal, offset: at.metricOffset } : null;
+      },
+      seek: ({ ordinal, offset }) => { page.player?.seek(ordinal, offset); },
+      subscribe(listener) {
+        page.addEventListener('playback-state-changed', listener);
+        return () => page.removeEventListener('playback-state-changed', listener);
+      },
+      couple() {
+        page.cursorCoupled++;
+        let released = false;
+        return () => { if (!released) { released = true; page.cursorCoupled--; } };
+      },
+    };
+  })();
+  /** The cursor's pass, as the page's inspection iteration — so the verse shown is the pass the cursor is on. */
+  private followCursorPass() {
+    const ordinal = this.session?.performedOrdinal ?? null;
+    const entry = ordinal === null ? undefined : this.passModel?.entries[ordinal];
+    if (entry && entry.iteration !== this.playback.inspectionIteration)
+      this.setPlayback({ ...this.playback, inspectionIteration: entry.iteration });
+  }
+  /** The cursor to another visit of the bar it stands in (the chip, `iteration N`): a move, so the player follows. */
+  private visitPass(pick: (visits: PassModel['entries'], current: number | null) => PassModel['entries'][number] | undefined): boolean {
+    const session = this.session, model = this.passModel;
+    if (!session || !model || !this.editor) return false;
+    const { measureIndex, onset } = session.cursor;
+    const visits = model.entries.filter(entry => entry.measureIndex === measureIndex);
+    const target = pick(visits, session.performedOrdinal);
+    if (!target) return false;
+    return this.editor.handleIntent({ type: 'goToPerformed', ordinal: target.ordinal, onset: [onset.num, onset.den] });
   }
 
   @state() private copied = false;
@@ -775,7 +818,7 @@ export class ScenarioPage extends LitElement {
       /* Near the score's right edge the whole object mirrors: the chip hangs
          off the selection's RIGHT edge and the ▲▼ pair crosses to the left of
          the word, so the pair never leaves the score. */
-      .iteration-chip, .follow-playback, .playback-label {
+      .iteration-chip {
         border: 0;
         border-left: 1px solid var(--line-strong);
         background: transparent;
@@ -785,10 +828,10 @@ export class ScenarioPage extends LitElement {
         padding: 4px 7px;
         white-space: nowrap;
       }
-      .iteration-chip, .follow-playback { cursor: pointer; }
+      .iteration-chip { cursor: pointer; }
+      .iteration-chip:disabled { cursor: default; }
       .iteration-chip.not-performed { color: var(--ink-3); }
-      .follow-playback[aria-pressed="true"] { text-decoration: underline; }
-      .iteration-chip:focus-visible, .follow-playback:focus-visible { outline: 2px solid currentColor; outline-offset: -2px; }
+      .iteration-chip:focus-visible { outline: 2px solid currentColor; outline-offset: -2px; }
       .rung-chip.mirrored {
         flex-direction: row-reverse;
       }
@@ -1869,6 +1912,7 @@ export class ScenarioPage extends LitElement {
       onChange: () => this.syncFromSession(),
       onState: () => this.onEditorState(),
       onNotice: notice => this.showClipboardNotice(notice),
+      playback: this.cursorPlayback,
       // A rung this document does not present, asked for by name: a dead key with no feedback is what teaches
       // people a shortcut cannot be trusted. Every other refusal is a navigation edge, where silence is right.
       onRefused: intent => { if (intent.type === 'goToLevel') this.flashRungRefusal(); },
@@ -1888,6 +1932,7 @@ export class ScenarioPage extends LitElement {
 
   /** The cursor, the history or the keyboard's owner moved: everything here that reads the session redraws. */
   private onEditorState() {
+    this.followCursorPass();
     const traced = this.session?.intentLog.length ?? 0;
     // A copied trace is stale the moment the trace grows.
     if (traced !== this.tracedIntents) { this.tracedIntents = traced; this.copied = false; }
@@ -1930,6 +1975,7 @@ export class ScenarioPage extends LitElement {
     event: CustomEvent<{ measureIndex?: number; noteKey?: string; columnKey?: string }>
   ) => {
     const { measureIndex, noteKey, columnKey } = event.detail ?? {};
+    if (this.cursorCoupled > 0) return; // the cursor seeks for itself
     if (noteKey !== undefined || measureIndex === undefined || !this.passModel) return;
     const { ordinals } = resolveIteration(this.passModel, measureIndex, activeIteration(this.playback));
     const candidates = ordinals.length > 0
@@ -1950,6 +1996,7 @@ export class ScenarioPage extends LitElement {
     event: CustomEvent<{ projection?: 'notation' | 'tab'; noteId?: string; ordinal?: number }>
   ) => {
     const key=event.detail.noteId;
+    if(this.cursorCoupled>0)return; // the cursor seeks for itself
     if(key && this.performance){
       const candidates=this.performance.written.filter(w=>w.noteKey===key).map(w=>w.ordinal);
       const ordinal=event.detail.ordinal ?? chooseOrdinal(candidates,this.playback.ordinal,{explicitSeek:true,cycle:this.clickedPlaybackKey===key});
@@ -2030,7 +2077,7 @@ export class ScenarioPage extends LitElement {
   private withIterationWord(view: InspectorView): InspectorView {
     if (!this.session || !this.passModel || !hasRepeatStructure(this.session.doc)) return view;
     const iterations = [...new Set(this.passModel.availableIterations.flat())];
-    return { ...view, words: [...view.words, { word: 'iteration', hint: 'inspection iteration (does not seek)', values: iterations.map(String) }] };
+    return { ...view, words: [...view.words, { word: 'iteration', hint: 'this bar on that pass (seeks)', values: iterations.map(String) }] };
   }
 
   /** Undefined: not this page's line. Null: taken. Otherwise the sentence that says why not. */
@@ -2043,7 +2090,9 @@ export class ScenarioPage extends LitElement {
         || !this.passModel?.availableIterations.some(available => available.includes(iteration))) {
       return 'Use iteration N with an iteration declared in this document.';
     }
-    this.chooseInspection(iteration);
+    // One cursor: the bar the cursor is in, on that pass — a move, so it seeks.
+    if (!this.visitPass(visits => visits.find(entry => entry.iteration === iteration)))
+      return `This bar is not played on iteration ${iteration}.`;
     return null;
   }
 
@@ -2159,23 +2208,36 @@ export class ScenarioPage extends LitElement {
     </div>`;
   }
 
+  /**
+   * The pass the ONE cursor stands on (core-single-cursor.md) — the playhead's
+   * while the music plays, since then the playhead is the cursor. A click moves
+   * the cursor to the bar's next visit, which is a move like any other: the
+   * player follows it. The old unclamped inspection (standing on a pass that
+   * skips this bar, to watch which bars go grey) went with the second cursor.
+   */
   private iterationChip() {
     if (!this.session || !this.passModel || !hasRepeatStructure(this.session.doc)) return nothing;
-    const measure = this.session.cursor.measureIndex;
-    const iteration = this.playback.inspectionIteration;
-    const available = this.passModel.availableIterations[measure] ?? [1];
-    const { performed } = resolveIteration(this.passModel, measure, iteration);
+    const model = this.passModel;
+    const playing = this.playback.playing && this.playback.ordinal !== null;
+    const ordinal = playing ? this.playback.ordinal : this.session.performedOrdinal;
+    const entry = ordinal === null ? undefined : model.entries[ordinal];
+    const measure = entry?.measureIndex ?? this.session.cursor.measureIndex;
+    const visits = model.entries.filter(e => e.measureIndex === measure);
+    const at = entry ? visits.findIndex(e => e.ordinal === entry.ordinal) : -1;
+    const words = entry
+      ? `pass ${entry.iteration}${visits.length > 1 ? ` · visit ${at + 1} of ${visits.length}` : ''}`
+      : 'not played';
     return html`
-      <button class="iteration-chip ${performed ? '' : 'not-performed'}"
-        aria-label=${`Inspection iteration ${iteration}${performed ? '' : ', not performed'}. Click to cycle.`}
-        title="Inspection iteration; change here or type iteration N in the inspector"
-        @click=${() => this.chooseInspection(nextInspectionIteration(this.passModel!, measure, iteration))}>
-        iteration ${iteration}${available.includes(iteration) ? ` of ${available.length}` : ''}${performed ? '' : ' · not performed'}
-      </button>
-      ${this.playback.ordinal !== null ? html`<span class="playback-label">playback iteration ${this.playback.playbackIteration}</span>` : nothing}
-      <button class="follow-playback" aria-pressed=${this.playback.followPlayback}
-        title="Follow live playback for verse and scrolling; keep inspection iteration"
-        @click=${() => this.setPlayback(followPlayback(this.playback))}>Follow</button>`;
+      <button class="iteration-chip ${entry ? '' : 'not-performed'}"
+        aria-label=${`${playing ? 'Playing' : 'Cursor'} on ${words}.${visits.length > 1 && !playing ? ' Click for the next visit of this bar.' : ''}`}
+        title="The pass the cursor is on; click for this bar's next visit, or type iteration N in the inspector"
+        ?disabled=${playing || visits.length < 2}
+        @click=${() => this.visitPass((all, current) => {
+          const i = all.findIndex(e => e.ordinal === current);
+          return all[(i + 1) % all.length];
+        })}>
+        ${words}
+      </button>`;
   }
 
   /** A HUD row click moves the selection to that row's level by walking

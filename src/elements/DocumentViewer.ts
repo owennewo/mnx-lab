@@ -1093,7 +1093,10 @@ export class DocumentViewer extends LitElement {
     if(changed.has('playbackState')){
       if(this.bookendSignature()!==this.renderedBookends)this.renderProjection();
       else {this.paintPlayback();this.paintBookends();}
-      if(this.playbackState?.followPlayback)this.revealPlayback();
+      // Paused under a bound editor, the playhead IS the cursor
+      // (core-single-cursor.md) and the selection's own reveal decides the
+      // scroll; following the playhead too would fight it.
+      if(this.playbackState?.followPlayback && (this.playbackState.playing || !this.pointerPlacement))this.revealPlayback();
     }
     if (changed.has('noGestures')) this.syncGestures();
     this.toggleAttribute('data-hide-badges', this.hiddenFeatures().includes('badges'));
@@ -1422,8 +1425,13 @@ export class DocumentViewer extends LitElement {
     const page = this.measuredPage();
     if (!page) return;
     const point = this.scorePointOf(event, page.svg);
-    const placement = point && hitTest(page.map, point, this.noteKeyUnder(event));
-    if (!placement) return;
+    const hit = point && hitTest(page.map, point, this.noteKeyUnder(event));
+    if (!hit) return;
+    // Unrolled, the ink names its visit (`w2:…`): the press means THAT visit.
+    const visit = this.unrolled && event.target instanceof Element
+      ? parseOccurrenceKey(event.target.closest('[data-source-id]')?.getAttribute('data-source-id') ?? '')?.ordinal
+      : undefined;
+    const placement: PointerPlacement = visit === undefined ? hit : { ...hit, ordinal: visit };
     drawPointerGhost(page.svg, page.map, null);
     this.hoverSignature = '';
     this.dispatchEvent(
@@ -1909,6 +1917,18 @@ export class DocumentViewer extends LitElement {
   private revealPlayback() {
     const occurrence=this.playbackState?.highlight[0];
     if(occurrence)this.revealOccurrence(occurrence);
+  }
+  /**
+   * Where the playhead is drawn — the first sounding ink — or null when
+   * nothing is lit. While the music plays the playhead IS the cursor
+   * (core-single-cursor.md), so a label meant for the cursor hangs here.
+   */
+  playheadRect(): DOMRect | null {
+    const occurrence=this.playbackState?.highlight[0];
+    if(!occurrence)return null;
+    const ink=[...(this.container?.querySelectorAll<SVGElement>('[data-source-id]')??[])]
+      .find(node=>!node.classList.contains('unperformed') && node.getAttribute('data-source-id')===occurrenceKey(occurrence.noteKey,this.unrolled?occurrence.ordinal:undefined));
+    return ink?.getBoundingClientRect() ?? null;
   }
   /** Public written-occurrence reveal. It never mutates selection or inspection. */
   revealOccurrence(occurrence: PlaybackOccurrence): boolean {

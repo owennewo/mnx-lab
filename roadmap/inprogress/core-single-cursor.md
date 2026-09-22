@@ -1,6 +1,7 @@
 # One cursor — the edit cursor walks the performance, and the playhead is where it stands
 
-> **Status: proposed 2026-09-22.** Serves the **implementation loop**.
+> **Status: built 2026-09-22, awaiting the owner's hands-on check** (then `complete/`).
+> Serves the **implementation loop**.
 > [Studio authoring campaign](../inprogress/studio-campaign-authoring.md) item 10; inherits
 > the campaign contract (clauses 12–14 bite). **Reverses two recorded decisions** — the
 > player campaign's contract clause 3 and pointer placement's decision 1 — deliberately,
@@ -113,7 +114,7 @@ music stopped.
    → at bar 8's `:|` goes to bar 1, Shift+→ goes to bar 9. It is inherent, not a choice.
 4. **Play collapses a selection.** With any rung above the event selected, Play moves the
    cursor to the selection's first event on the anchor's pass, closes the selection, then
-   plays. (A loop over a selection is [studio-player-practice](studio-player-practice.md)'s
+   plays. (A loop over a selection is [studio-player-practice](../proposed/studio-player-practice.md)'s
    job and gets its own control.)
 5. **Pause parks the cursor.** On pause or stop, the cursor moves to the event sounding at
    the playhead (the last onset at or before it) on the cursor's own part, staff and voice,
@@ -221,9 +222,69 @@ by hand, not decisions.
 - **Keeping the reviewer's unclamped walk.** It could return as a workbench-only mode that
   detaches inspection from the cursor. Nobody has asked for it since it shipped; build it
   when someone misses it.
-- **Loop playback of a selection** — [studio-player-practice](studio-player-practice.md).
+- **Loop playback of a selection** — [studio-player-practice](../proposed/studio-player-practice.md).
   Its selection-to-loop policy starts "on the inspection iteration"; after this item that
   reads "on the selection anchor's pass", and whoever picks it up amends it.
 - **Performance-ordered selection ranges.** Rule 3 is why they do not exist.
 - **The unrolled view.** It already draws one bar per performance entry, so this model fits
   it without change. Making it the default for editing is a separate question.
+
+## As built (2026-09-22)
+
+Where it lives, as the design above said: the rules in `src/edit/` (`performedCursor.ts`,
+pure; the session's `followPerformance` step, `performedOrdinal`, `playStart`, `passNotice`
+and the `goToPerformed` intent), the seam in `src/elements/cursorPlayback.ts` (neither
+binding imports the other), the coupling in `bindEditor`'s `playback` option, the label in
+`src/elements/CursorLabel.ts`, and one adapter per shell — `bindPlayback(...).cursor` for
+studio, the scenario page's own for the workbench. The written walk in `cursor.ts` is
+untouched: a step runs as it always did, and the performed layer decides the visit
+afterwards and redirects only where the performance leaves the written order.
+
+What the build settled that the design did not say:
+
+1. **A visit's START is not a bound for the cursor.** A D.S. to a mid-bar segno arrives
+   while a note that began earlier in the bar is still sounding; with the start as a bound
+   the cursor had nowhere to stand in that visit and a walk looped forever
+   (`ds-final-ending`). The cursor may stand on it; the player clamps a seek to the slice.
+2. **Back from the ghost bar enters the performance at its end** — after a D.C. al Fine,
+   the Fine, not the last written bar — and a step out of any written-only bar enters the
+   performed bar from the side it came from (its last visit walking back).
+3. **A second press where the cursor stands is the bar's next visit** — the old
+   click-to-cycle kept, now as a cursor move. In the unrolled view a press on ink names its
+   visit (`PointerPlacement.ordinal`, from the `w2:` prefix) and lands on exactly that one.
+4. **Paused, the cursor is the truth, except when the playhead really moves.** A playhead
+   moved by something else (the tray's rail, the sync bar, a `?at=` address) takes the
+   cursor with it; a playhead first appearing, a seek the player refused, or a report that
+   repeats the old place does not; and after an EDIT (which can reset an idle player to the
+   top) the player is put back under the cursor instead. Bound onto a player already
+   elsewhere, the cursor starts where the playhead is.
+5. **Paused under a bound editor, the viewer no longer scrolls to the playhead** — the
+   playhead is the cursor, and the selection's own reveal rules decide (following both made
+   `smoke:selection` fail on its tall-selection and last-bar cases). The embed, with no
+   editor, still follows the playhead when paused.
+6. **The workbench lost its two-cursor controls.** The *Follow* toggle and the *playback
+   iteration* label are gone; the chip reads the cursor's pass (the playhead's while
+   playing) as `pass 2 · visit 2 of 3`, and a click moves the cursor to the bar's next visit,
+   which seeks. `iteration N` in the inspector does the same for a named pass. The page's
+   `inspectionIteration` follows the cursor, so the verse shown is the cursor's pass.
+7. **Smokes that asserted the old contract now assert this one**:
+   `player-workbench-smoke.mjs` (an ordinal address brings the cursor; an edit KEY is
+   refused while playing, and live edit is proved by an edit applied to the session
+   directly, as an AI edit would land), and `unrolled-smoke.mjs` (the layout is held across
+   a stretch of playing, not across the pause, which parks the cursor and so re-renders
+   like any cursor move).
+
+Proof: `harness/conformance/single-cursor.test.ts` (29 — the walk over every corpus
+scenario with repeat structure, forward and back, and each rule), and
+`npm run smoke -- single-cursor`: production studio with the YouTube stand-in, a tab score
+with two endings, arrows moving the video, the loop-back label, Play collapsing a bar
+selection, a fret refused while playing, → → and ← ×4 each ONE seek to the right bar, and a
+pause that parks without seeking. Passing too: `selection`, `unrolled`, `player`, `focus`,
+`inspector`, `workbench-editor`, `sync-bar`, `sync-rederive`, `embed`, `youtube`, `csp`.
+Not run here: `play-only` and `studio-editor` need the local Worker; `recording-studio`
+fails on HTTP audio on this machine exactly as it does on `main`.
+
+**Known limit.** ←/→ while playing reach the cursor only when the score has the keyboard.
+Space in the score plays and pauses, so the keyboard flow works end to end; a mouse click
+on the tray's Play leaves focus in the tray, and the arrows then need a click back into
+the score (which also seeks there).

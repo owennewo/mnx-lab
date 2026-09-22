@@ -19,12 +19,24 @@ try{
     const check=(v,m)=>{if(!v)throw new Error(m);},delay=ms=>new Promise(r=>setTimeout(r,ms));
     const page=document.querySelector('mnx-workbench').shadowRoot.querySelector('mnx-scenario-page');
     const player=page.shadowRoot.querySelector('mnx-player'),viewer=page.shadowRoot.querySelector('mnx-document-viewer');
-    check(viewer.playbackState.ordinal===2 && viewer.playbackState.inspectionIteration===1,'Ordinal route did not preserve separate inspection');
-    const selection=JSON.stringify(viewer.selection);await player.play();await delay(100);
-    check(player.snapshot.state==='playing','Workbench did not play');check(JSON.stringify(viewer.selection)===selection,'Playback changed editor selection');
+    // ONE cursor (core-single-cursor.md): an address that names a visit puts
+    // the playhead AND the cursor there — the cursor's pass is the page's
+    // inspection iteration. (This used to assert the opposite: the ordinal
+    // route moved playback and left inspection on pass 1, two cursors apart.)
+    for(let i=0;i<40 && page.session?.performedOrdinal!==2;i++)await delay(50);
+    check(viewer.playbackState.ordinal===2 && page.session.performedOrdinal===2,'Ordinal route did not bring the cursor to the visit');
+    check(viewer.playbackState.inspectionIteration===2,'The cursor\u2019s pass is not the inspection iteration');
+    const address=()=>JSON.stringify({m:page.session.cursor.measureIndex,o:page.session.cursor.onset,v:page.session.performedOrdinal});
+    const selection=address();await player.play();await delay(100);
+    check(player.snapshot.state==='playing','Workbench did not play');check(address()===selection,'Playback moved the edit cursor');
     location.hash='#/scenario/spec/repeats-alternate-endings-simple?at=1';await delay(120);
     check(viewer.playbackState.ordinal===1,'Same-score route update did not seek');
-    const beforeEdit=viewer.mnxDoc.mnxJson;await player.play();viewer.focus();viewer.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowUp',code:'ArrowUp',altKey:true,bubbles:true,composed:true}));await delay(100);
+    // Nothing is written while the music plays: the key is refused.
+    const refused=viewer.mnxDoc.mnxJson;await player.play();viewer.focus();viewer.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowUp',code:'ArrowUp',altKey:true,bubbles:true,composed:true}));await delay(100);
+    check(viewer.mnxDoc.mnxJson===refused,'An edit key wrote while playing');
+    // An edit that does not come from the keys (an AI edit landing mid-play) is
+    // still a live edit: straight into the session, past the binding's gate.
+    const beforeEdit=viewer.mnxDoc.mnxJson;page.session.handleIntent({type:'transpose',semitones:1});page.editor.sessionMoved();await delay(100);
     check(viewer.mnxDoc.mnxJson!==beforeEdit,'Edit input did not change the document');
     await delay(200);
     // AN EDIT KEEPS THE SESSION (core-player-live-edit.md, campaign item 22):
@@ -133,10 +145,15 @@ try{
     }
     check(pair,'no two on-screen noteheads share a bar at different beats');
 
-    press(pair.first.el);await delay(400);
+    // Re-queried before each press: a press moves the edit cursor, which in the
+    // combined view can re-engrave, and a node held across that is detached —
+    // it still names its note, but the press never reaches the viewer's
+    // placement, which is what seeks now that the cursor IS the playhead.
+    const live=n=>viewer.renderRoot.querySelector('#projection-container svg .notehead[data-source-id="'+CSS.escape(n.el.getAttribute('data-source-id'))+'"]')??n.el;
+    press(live(pair.first));await delay(400);
     const early=at();
     check(early,'a press on a notehead left the transport nowhere');
-    press(pair.second.el);await delay(400);
+    press(live(pair.second));await delay(400);
     const late=at();
     check(cmp(late,early)>0,
       'two beats of one bar seeked to the same place — the press is still bar-shaped');

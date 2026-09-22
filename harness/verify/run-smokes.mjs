@@ -26,6 +26,7 @@ const SMOKES = {
   'studio': { build: 'build', runs: [{ file: 'harness/verify/studio-smoke.mjs' }] },
   'studio-export': { build: 'build', runs: [{ file: 'harness/verify/studio-export-smoke.mjs' }] },
   'recording-studio': { build: 'build', runs: [{ file: 'harness/verify/recording-studio-smoke.mjs' }] },
+  'single-cursor': { build: 'build', runs: [{ file: 'harness/verify/single-cursor-smoke.mjs' }] },
   'recording-management': { build: 'build', runs: [{ file: 'harness/verify/recording-management-smoke.mjs' }] },
   'youtube': { build: 'build', runs: [{ file: 'harness/verify/youtube-smoke.mjs' }] },
 };
