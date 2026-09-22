@@ -32,4 +32,33 @@ describe('retained MusicXML editor evidence provenance (not a fidelity gate)', (
       }
     }
   });
+  it('binds the meter review to every pinned meter source, shown preferences and retained bytes', () => {
+    const base = 'harness/fixtures/musicxml-meter-evidence/';
+    const manifest = read(base + 'manifest.json');
+    for (const [name, expected] of Object.entries(manifest.files)) {
+      expect(hash(fs.readFileSync(path.join(root, base, name))), name).toBe(expected);
+      if (name.endsWith('/document.mnx.json')) {
+        const observation = read(base + name.replace('document.mnx.json', 'observation.json'));
+        expect(hash(JSON.stringify(read(base + name)))).toBe(observation.importedDocumentSha256);
+      }
+    }
+    const fixtures = suite.fixtures.filter((f: { id: string }) => f.id.startsWith('11'));
+    const review = read('harness/reports/musicxml-meter-assessment.json');
+    expect(review.corpusRevision).toBe(suite.revision);
+    expect(review.fixtures.map((f: { id: string }) => f.id)).toEqual(fixtures.map((f: { id: string }) => f.id));
+    for (const shell of ['workbench', 'studio']) {
+      const report = read(base + shell + '/index.json');
+      expect(report.corpusRevision).toBe(suite.revision);
+      expect(report.fixtures.map((f: { id: string }) => f.id)).toEqual(fixtures.map((f: { id: string }) => f.id));
+      for (let i = 0; i < fixtures.length; i++) {
+        expect(report.fixtures[i].sourceSha256).toBe(fixtures[i].sha256);
+        expect(review.fixtures[i].sourceSha256).toBe(fixtures[i].sha256);
+        expect(report.fixtures[i].displayOptions.timeSignatures).toBe('show');
+      }
+    }
+    const write = read(base + 'write/report.json');
+    expect(write.error).toBeUndefined();
+    expect(write.tasks.map((t: { task: string }) => t.task)).toEqual(['remove', 'create', 'change', 'common', 'cut']);
+  });
+
 });

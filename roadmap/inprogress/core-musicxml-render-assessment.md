@@ -119,3 +119,13 @@ See [the assessment report](../../docs/musicxml-editor-assessment.md) for the co
 both-shell browser sweep, selected findings, retained evidence and reproduction. The
 requested initial gap proposal exists, but detailed feature/task coverage remains open.
 This item is not complete.
+
+## Meter follow-up, 2026-09-22
+
+[All 12 meter sources](../../docs/musicxml-meter-assessment.md) now have explicit
+variant findings and retained visible-meter captures in both shells. Five Workbench
+meter commands have structural/history evidence, four rejected forms have UI traces,
+and the final state has MNX reopen evidence. Initial captures hid time signatures;
+absence there is not a rendering verdict. Gap proposals include exact meter import,
+display losses and representable inspector ranges. Other families and remaining
+meter policy/task/persistence combinations stay open; this item remains in progress.

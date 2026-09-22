@@ -1,0 +1,90 @@
+{
+  "id": "11h-TimeSignatures-SenzaMisura",
+  "sourceSha256": "ffd0d9dede09f0af87ef39034217f541494359d012f9539a81460c2ba82790e3",
+  "testClass": "feature",
+  "description": "<senza-misura> elements, indicating either no display of a time signature or, if the element has a string value, a senza-misura symbol derived from this string. How the string gets interpreted is application-dependent. The first bar starts with an empty <senza-misura> element; it has three eighth notes. The second bar contains a full-measure rest (indicated by setting ‘measure=\"yes\"’ for the <rest> element) with a length of a dotted half note. The third bar starts with a <senza-misura> element containing value ‘X’; it has four eighth notes in two voices. The last bar contains five eighth notes in two voices.",
+  "views": [
+    {
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0,
+          1,
+          2,
+          3
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [
+        "validation — underfills the 4/4 bar: notes sum to 1.5 of 4 beats",
+        "validation — underfills the 4/4 bar: notes sum to 1.5 of 4 beats",
+        "validation — voice 1 underfills the 4/4 bar: notes sum to 2 of 4 beats",
+        "validation — voice 1 underfills the 4/4 bar: notes sum to 2 of 4 beats",
+        "validation — voice 2 underfills the 4/4 bar: notes sum to 2 of 4 beats",
+        "validation — voice 2 underfills the 4/4 bar: notes sum to 2 of 4 beats",
+        "validation — voice 1 underfills the 4/4 bar: notes sum to 2.5 of 4 beats",
+        "validation — voice 1 underfills the 4/4 bar: notes sum to 2.5 of 4 beats",
+        "validation — voice 2 underfills the 4/4 bar: notes sum to 2.5 of 4 beats",
+        "validation — voice 2 underfills the 4/4 bar: notes sum to 2.5 of 4 beats"
+      ],
+      "scrollWidth": 1425,
+      "scrollHeight": 1087,
+      "clientWidth": 1425,
+      "clientHeight": 822,
+      "screenshots": [
+        "notation-0-0.png",
+        "notation-0-265.png"
+      ]
+    }
+  ],
+  "makeCurrentError": "That version was not made current: A piece needs a title",
+  "entryPath": "Local operator ingest: GP seed + unmodified XML original; Save → Versions → View XML → Make current",
+  "importError": null,
+  "viewingOriginal": true,
+  "editingSuspended": true,
+  "warnings": [
+    "note 0: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 1: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 2: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 3: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 4: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 5: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 6: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 7: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 8: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 9: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 10: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 11: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 12: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 13: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 14: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 15: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 16: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 17: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 18: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 19: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 20: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 21: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 22: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 23: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 24: ConcertPitch disagrees with sounding pitch; spelling was reconstructed."
+  ],
+  "importedDocumentSha256": "7b11ccabd516e8644440268c54ef3a937cd3bb7bd1ab2f3dbcebd0694fa3d370",
+  "displayOptions": {
+    "lyrics": "current",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

@@ -16,6 +16,7 @@ const origin = process.env.LIBRARY_LOCAL_ORIGIN ?? 'http://127.0.0.1:8797';
 if (!['localhost','127.0.0.1'].includes(new URL(origin).hostname)) throw new Error('Studio capture is loopback only');
 const session = shell === 'studio' ? JSON.parse(await fs.readFile(path.join(root,'.secrets/local-library-session.json'))) : null;
 const filter = process.env.MUSICXML_CAPTURE_FILTER;
+const showMeters = process.env.MUSICXML_CAPTURE_TIME_SIGNATURES === 'show';
 const manifest = JSON.parse(await fs.readFile(path.join(root, 'converters/fixtures/musicxml-suite/manifest.json')));
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 await fs.mkdir(output, { recursive: true });
@@ -109,6 +110,17 @@ try {
       row.importedDocumentSha256 = hash(JSON.stringify(document));
       await waitFor(c, `!!(${finder})?.mnxDoc`, fixture.id + ' viewer');
       await settle();
+      if(showMeters) {
+        const frame=`${page}.shadowRoot.querySelector('mnx-score-frame').shadowRoot`;
+        await c.evaluate(`[...${frame}.querySelectorAll('button')].find(b=>b.textContent.trim()==='Settings').click()`);
+        const pad=`${frame}.querySelector('mnx-settings-pad').shadowRoot`;
+        await waitFor(c,`!!${pad}?.querySelector('[data-row="timeSignatures"]')`,'Time signatures setting');
+        await c.evaluate(`(()=>{const b=${pad}.querySelector('[data-row="timeSignatures"]');if(b.textContent.trim()==='Hide')b.click();})()`);
+        await waitFor(c,`${pad}.querySelector('[data-row="timeSignatures"]').textContent.trim()==='Show'`,'Show time signatures');
+        await c.evaluate(`[...${frame}.querySelectorAll('button')].find(b=>b.textContent.trim()==='Settings').click()`);
+        await settle();
+      }
+      row.displayOptions=await c.evaluate(`(${finder}).effectiveDisplay()`);
       row.editorBound = await c.evaluate(`!!${page}?.editor`);
       row.availableViews = await c.evaluate(`(${finder}).availableViews()`);
       for (const view of row.availableViews) {

@@ -1,0 +1,554 @@
+{
+  "kind": "agent assessment evidence; no human verification or whole-fixture pass",
+  "scope": "All 12 time-signature sources; notation view in Workbench and Studio with timeSignatures=show. Detailed variant verdicts in docs/musicxml-meter-assessment.md.",
+  "corpusRevision": "77c19f7e819154c70ca1a1992e80dcda8ff82fea",
+  "fixtures": [
+    {
+      "id": "11a-TimeSignatures",
+      "sourceSha256": "2d9dccb46e08e05c36e339a3a5dab61de2ede11b48e20ea5d7f4664fa8b9f80d",
+      "description": "Various time signatures: 2/2 (alla breve), 4/4 (C), 2/2, 3/2, 2/4, 3/4, 4/4, 5/4, 3/8, 6/8, 12/8.",
+      "sourceTimes": [
+        {
+          "part": "P1",
+          "measureOrdinal": 1,
+          "measureNumber": "1",
+          "xml": "<time symbol=\"common\">\n          <beats>2</beats>\n          <beat-type>2</beat-type>\n        </time>"
+        },
+        {
+          "part": "P1",
+          "measureOrdinal": 2,
+          "measureNumber": "2",
+          "xml": "<time symbol=\"common\">\n          <beats>4</beats>\n          <beat-type>4</beat-type>\n        </time>"
+        },
+        {
+          "part": "P1",
+          "measureOrdinal": 3,
+          "measureNumber": "3",
+          "xml": "<time>\n          <beats>2</beats>\n          <beat-type>2</beat-type>\n        </time>"
+        },
+        {
+          "part": "P1",
+          "measureOrdinal": 4,
+          "measureNumber": "4",
+          "xml": "<time>\n          <beats>3</beats>\n          <beat-type>2</beat-type>\n        </time>"
+        },
+        {
+          "part": "P1",
+          "measureOrdinal": 5,
+          "measureNumber": "5",
+          "xml": "<time>\n          <beats>2</beats>\n          <beat-type>4</beat-type>\n        </time>"
+        },
+        {
+          "part": "P1",
+          "measureOrdinal": 6,
+          "measureNumber": "6",
+          "xml": "<time>\n          <beats>3</beats>\n          <beat-type>4</beat-type>\n        </time>"
+        },
+        {
+          "part": "P1",
+          "measureOrdinal": 7,
+          "measureNumber": "7",
+          "xml": "<time>\n          <beats>4</beats>\n          <beat-type>4</beat-type>\n        </time>"
+        },
+        {
+          "part": "P1",
+          "measureOrdinal": 8,
+          "measureNumber": "8",
+          "xml": "<time>\n          <beats>5</beats>\n          <beat-type>4</beat-type>\n        </time>"
+        },
+        {
+          "part": "P1",
+          "measureOrdinal": 9,
+          "measureNumber": "9",
+          "xml": "<time>\n          <beats>3</beats>\n          <beat-type>8</beat-type>\n        </time>"
+        },
+        {
+          "part": "P1",
+          "measureOrdinal": 10,
+          "measureNumber": "10",
+          "xml": "<time>\n          <beats>6</beats>\n          <beat-type>8</beat-type>\n        </time>"
+        },
+        {
+          "part": "P1",
+          "measureOrdinal": 11,
+          "measureNumber": "11",
+          "xml": "<time>\n          <beats>12</beats>\n          <beat-type>8</beat-type>\n        </time>"
+        }
+      ],
+      "importedTimeChanges": [
+        {
+          "measureOrdinal": 1,
+          "time": {
+            "count": 2,
+            "unit": 2
+          }
+        },
+        {
+          "measureOrdinal": 2,
+          "time": {
+            "count": 4,
+            "unit": 4
+          }
+        },
+        {
+          "measureOrdinal": 3,
+          "time": {
+            "count": 2,
+            "unit": 2
+          }
+        },
+        {
+          "measureOrdinal": 4,
+          "time": {
+            "count": 3,
+            "unit": 2
+          }
+        },
+        {
+          "measureOrdinal": 5,
+          "time": {
+            "count": 2,
+            "unit": 4
+          }
+        },
+        {
+          "measureOrdinal": 6,
+          "time": {
+            "count": 3,
+            "unit": 4
+          }
+        },
+        {
+          "measureOrdinal": 7,
+          "time": {
+            "count": 4,
+            "unit": 4
+          }
+        },
+        {
+          "measureOrdinal": 8,
+          "time": {
+            "count": 5,
+            "unit": 4
+          }
+        },
+        {
+          "measureOrdinal": 9,
+          "time": {
+            "count": 3,
+            "unit": 8
+          }
+        },
+        {
+          "measureOrdinal": 10,
+          "time": {
+            "count": 6,
+            "unit": 8
+          }
+        },
+        {
+          "measureOrdinal": 11,
+          "time": {
+            "count": 12,
+            "unit": 8
+          }
+        }
+      ]
+    },
+    {
+      "id": "11b-TimeSignatures-NoTime",
+      "sourceSha256": "6038ef114c04d0e526b9435eb457572bfc1baffbe302d01150773c17a9102fef",
+      "description": "A score without a time signature at the beginning (but with <key> and <clef> elements). The second bar sets a 2/2 time signature with \u2018print-object=\"no\"\u2019 for both staves, and the third bar sets a 4/4 time signature with \u2018print-object=\"no\"\u2019 only for the lower staff. Whether a time signature is actually displayed at the very beginning (if there is no <time> element) is application-dependent.",
+      "sourceTimes": [
+        {
+          "part": "P1",
+          "measureOrdinal": 2,
+          "measureNumber": "2",
+          "xml": "<time print-object=\"no\">\n          <beats>2</beats>\n          <beat-type>2</beat-type>\n        </time>"
+        },
+        {
+          "part": "P1",
+          "measureOrdinal": 3,
+          "measureNumber": "3",
+          "xml": "<time number=\"1\">\n          <beats>4</beats>\n          <beat-type>4</beat-type>\n        </time>"
+        },
+        {
+          "part": "P1",
+          "measureOrdinal": 3,
+          "measureNumber": "3",
+          "xml": "<time number=\"2\" print-object=\"no\">\n          <beats>4</beats>\n          <beat-type>4</beat-type>\n        </time>"
+        }
+      ],
+      "importedTimeChanges": [
+        {
+          "measureOrdinal": 2,
+          "time": {
+            "count": 2,
+            "unit": 2
+          }
+        },
+        {
+          "measureOrdinal": 3,
+          "time": {
+            "count": 4,
+            "unit": 4
+          }
+        }
+      ]
+    },
+    {
+      "id": "11c-TimeSignatures-Complex",
+      "sourceSha256": "91b1664913466d87b1dcce2506c2d5ab1a05c13b6b3493453751bc5ec1cc588c",
+      "description": "Complex time signatures with the same denominator: (3+2)/8 and (5+3+1)/4.",
+      "sourceTimes": [
+        {
+          "part": "P1",
+          "measureOrdinal": 1,
+          "measureNumber": "1",
+          "xml": "<time>\n          <beats>3+2</beats>\n          <beat-type>8</beat-type>\n        </time>"
+        },
+        {
+          "part": "P1",
+          "measureOrdinal": 2,
+          "measureNumber": "2",
+          "xml": "<time>\n          <beats>5+3+1</beats>\n          <beat-type>4</beat-type>\n        </time>"
+        }
+      ],
+      "importedTimeChanges": [
+        {
+          "measureOrdinal": 1,
+          "time": {
+            "count": 3,
+            "unit": 8
+          }
+        },
+        {
+          "measureOrdinal": 2,
+          "time": {
+            "count": 5,
+            "unit": 4
+          }
+        }
+      ]
+    },
+    {
+      "id": "11c-TimeSignatures-CompoundSimple",
+      "sourceSha256": "37b1da3a2fcb08f2d8c5422ae0bf857a8371a4ea74ef896127bff0c547e30458",
+      "description": "Compound time signatures with same denominator: (3+2)/8 and (5+3+1)/4.",
+      "sourceTimes": [
+        {
+          "part": "P1",
+          "measureOrdinal": 1,
+          "measureNumber": "1",
+          "xml": "<time>\n          <beats>3+2</beats>\n          <beat-type>8</beat-type>\n        </time>"
+        },
+        {
+          "part": "P1",
+          "measureOrdinal": 2,
+          "measureNumber": "2",
+          "xml": "<time>\n          <beats>5+3+1</beats>\n          <beat-type>4</beat-type>\n        </time>"
+        }
+      ],
+      "importedTimeChanges": [
+        {
+          "measureOrdinal": 1,
+          "time": {
+            "count": 3,
+            "unit": 8
+          }
+        },
+        {
+          "measureOrdinal": 2,
+          "time": {
+            "count": 5,
+            "unit": 4
+          }
+        }
+      ]
+    },
+    {
+      "id": "11d-TimeSignatures-ComplexMultiple",
+      "sourceSha256": "6ace5ecb41bfb9602cde51443e0cfca8d2f2f414b36282cfda1378fcec795458",
+      "description": "Complex time signatures with separate fractions displayed: 3/8+2/8+3/4 and 5/2+1/8.",
+      "sourceTimes": [
+        {
+          "part": "P1",
+          "measureOrdinal": 1,
+          "measureNumber": "1",
+          "xml": "<time>\n          <beats>3</beats>\n          <beat-type>8</beat-type>\n          <beats>2</beats>\n          <beat-type>8</beat-type>\n          <beats>3</beats>\n          <beat-type>4</beat-type>\n        </time>"
+        },
+        {
+          "part": "P1",
+          "measureOrdinal": 2,
+          "measureNumber": "2",
+          "xml": "<time>\n          <beats>5</beats>\n          <beat-type>2</beat-type>\n          <beats>1</beats>\n          <beat-type>8</beat-type>\n        </time>"
+        }
+      ],
+      "importedTimeChanges": [
+        {
+          "measureOrdinal": 1,
+          "time": {
+            "count": 3,
+            "unit": 8
+          }
+        },
+        {
+          "measureOrdinal": 2,
+          "time": {
+            "count": 5,
+            "unit": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "11d-TimeSignatures-CompoundMultiple",
+      "sourceSha256": "ec80a0ce38e8a63be016716baa94d70701a11c964274b677520d6b9b11597332",
+      "description": "Compound time signatures with separate fractions displayed: 3/8+2/8+3/4 and 5/2+1/8.",
+      "sourceTimes": [
+        {
+          "part": "P1",
+          "measureOrdinal": 1,
+          "measureNumber": "1",
+          "xml": "<time>\n          <beats>3</beats>\n          <beat-type>8</beat-type>\n          <beats>2</beats>\n          <beat-type>8</beat-type>\n          <beats>3</beats>\n          <beat-type>4</beat-type>\n        </time>"
+        },
+        {
+          "part": "P1",
+          "measureOrdinal": 2,
+          "measureNumber": "2",
+          "xml": "<time>\n          <beats>5</beats>\n          <beat-type>2</beat-type>\n          <beats>1</beats>\n          <beat-type>8</beat-type>\n        </time>"
+        }
+      ],
+      "importedTimeChanges": [
+        {
+          "measureOrdinal": 1,
+          "time": {
+            "count": 3,
+            "unit": 8
+          }
+        },
+        {
+          "measureOrdinal": 2,
+          "time": {
+            "count": 5,
+            "unit": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "11e-TimeSignatures-ComplexMixed",
+      "sourceSha256": "ae541bc0bf49d6207c4d61f12bacdfec1ce700d09a461021491924f49f84ed65",
+      "description": "Complex time signatures of mixed type: (3+2)/8+3/4.",
+      "sourceTimes": [
+        {
+          "part": "P1",
+          "measureOrdinal": 1,
+          "measureNumber": "1",
+          "xml": "<time>\n          <beats>3+2</beats>\n          <beat-type>8</beat-type>\n          <beats>3</beats>\n          <beat-type>4</beat-type>\n        </time>"
+        }
+      ],
+      "importedTimeChanges": [
+        {
+          "measureOrdinal": 1,
+          "time": {
+            "count": 3,
+            "unit": 8
+          }
+        }
+      ]
+    },
+    {
+      "id": "11e-TimeSignatures-CompoundMixed",
+      "sourceSha256": "06e7b33923955fdbdfdf21cf581b715f4e36f2b21ef83f3e74dae29eec14d5b3",
+      "description": "Compound time signatures of mixed type: (3+2)/8+3/4.",
+      "sourceTimes": [
+        {
+          "part": "P1",
+          "measureOrdinal": 1,
+          "measureNumber": "1",
+          "xml": "<time>\n          <beats>3+2</beats>\n          <beat-type>8</beat-type>\n          <beats>3</beats>\n          <beat-type>4</beat-type>\n        </time>"
+        }
+      ],
+      "importedTimeChanges": [
+        {
+          "measureOrdinal": 1,
+          "time": {
+            "count": 3,
+            "unit": 8
+          }
+        }
+      ]
+    },
+    {
+      "id": "11f-TimeSignatures-SymbolMeaning",
+      "sourceSha256": "a97bf953b08f017155631f39bb8a687bd9bdd0db1b3e79f026f60f2414bea1bb",
+      "description": "Semantically invalid use cases for the \u2018symbol\u2019 attribute of <time>. The actual display is application-dependent. This test shows a 3/8 time signature with \u2018symbol=\"cut\"\u2019 and a complex 1/8+2/4 time signature with \u2018symbol=\"single-number\"\u2019.",
+      "sourceTimes": [
+        {
+          "part": "P1",
+          "measureOrdinal": 1,
+          "measureNumber": "1",
+          "xml": "<time symbol=\"cut\">\n          <beats>3</beats>\n          <beat-type>8</beat-type>\n        </time>"
+        },
+        {
+          "part": "P1",
+          "measureOrdinal": 2,
+          "measureNumber": "3",
+          "xml": "<time symbol=\"single-number\">\n          <beats>1</beats>\n          <beat-type>8</beat-type>\n          <beats>2</beats>\n          <beat-type>4</beat-type>\n        </time>"
+        }
+      ],
+      "importedTimeChanges": [
+        {
+          "measureOrdinal": 1,
+          "time": {
+            "count": 3,
+            "unit": 8
+          }
+        },
+        {
+          "measureOrdinal": 2,
+          "time": {
+            "count": 1,
+            "unit": 8
+          }
+        }
+      ]
+    },
+    {
+      "id": "11g-TimeSignatures-SingleNumber",
+      "sourceSha256": "bad3e78bc80b57f01b628d724c03d9817fd2229858eed62e9725fdfc4e544028",
+      "description": "Two time signatures (3/8 and 3+2/8) having the attribute \u2018symbol=\"single-number\"\u2019 (which is a misnomer; it actually means to show only the numerator part).",
+      "sourceTimes": [
+        {
+          "part": "P1",
+          "measureOrdinal": 1,
+          "measureNumber": "1",
+          "xml": "<time symbol=\"single-number\">\n          <beats>3</beats>\n          <beat-type>8</beat-type>\n        </time>"
+        },
+        {
+          "part": "P1",
+          "measureOrdinal": 2,
+          "measureNumber": "2",
+          "xml": "<time symbol=\"single-number\">\n          <beats>3+2</beats>\n          <beat-type>8</beat-type>\n        </time>"
+        }
+      ],
+      "importedTimeChanges": [
+        {
+          "measureOrdinal": 1,
+          "time": {
+            "count": 3,
+            "unit": 8
+          }
+        }
+      ]
+    },
+    {
+      "id": "11h-TimeSignatures-SenzaMisura",
+      "sourceSha256": "ffd0d9dede09f0af87ef39034217f541494359d012f9539a81460c2ba82790e3",
+      "description": "<senza-misura> elements, indicating either no display of a time signature or, if the element has a string value, a senza-misura symbol derived from this string. How the string gets interpreted is application-dependent. The first bar starts with an empty <senza-misura> element; it has three eighth notes. The second bar contains a full-measure rest (indicated by setting \u2018measure=\"yes\"\u2019 for the <rest> element) with a length of a dotted half note. The third bar starts with a <senza-misura> element containing value \u2018X\u2019; it has four eighth notes in two voices. The last bar contains five eighth notes in two voices.",
+      "sourceTimes": [
+        {
+          "part": "P1",
+          "measureOrdinal": 1,
+          "measureNumber": "1",
+          "xml": "<time>\n          <senza-misura />\n        </time>"
+        },
+        {
+          "part": "P1",
+          "measureOrdinal": 3,
+          "measureNumber": "3",
+          "xml": "<time>\n          <senza-misura>X</senza-misura>\n        </time>"
+        }
+      ],
+      "importedTimeChanges": []
+    },
+    {
+      "id": "11i-TimeSignatures-Alternate",
+      "sourceSha256": "3b51106f790378b35dfe8b2675517b30839f2842ebd98993703c263fe29c0710",
+      "description": "Time signatures with alternates using <interchangeable>. \u20183/4 (6/8)\u2019, \u20182/2 [4/4]\u2019, \u20184/4 = 7/8+1/8\u2019, \u20183/4 \u2013 6/8\u2019, \u20182/2 / 4/4\u2019, \u20183/4 6/8\u2019.",
+      "sourceTimes": [
+        {
+          "part": "P1",
+          "measureOrdinal": 1,
+          "measureNumber": "1",
+          "xml": "<time>\n          <beats>3</beats>\n          <beat-type>4</beat-type>\n          <interchangeable>\n            <time-relation>parentheses</time-relation>\n            <beats>6</beats>\n            <beat-type>8</beat-type>\n          </interchangeable>\n        </time>"
+        },
+        {
+          "part": "P1",
+          "measureOrdinal": 2,
+          "measureNumber": "2",
+          "xml": "<time>\n          <beats>2</beats>\n          <beat-type>2</beat-type>\n          <interchangeable>\n            <time-relation>bracket</time-relation>\n            <beats>4</beats>\n            <beat-type>4</beat-type>\n          </interchangeable>\n        </time>"
+        },
+        {
+          "part": "P1",
+          "measureOrdinal": 3,
+          "measureNumber": "3",
+          "xml": "<time>\n          <beats>4</beats>\n          <beat-type>4</beat-type>\n          <interchangeable>\n            <time-relation>equals</time-relation>\n            <beats>7</beats>\n            <beat-type>8</beat-type>\n            <beats>1</beats>\n            <beat-type>8</beat-type>\n          </interchangeable>\n        </time>"
+        },
+        {
+          "part": "P1",
+          "measureOrdinal": 4,
+          "measureNumber": "4",
+          "xml": "<time>\n          <beats>3</beats>\n          <beat-type>4</beat-type>\n          <interchangeable>\n            <time-relation>hyphen</time-relation>\n            <beats>6</beats>\n            <beat-type>8</beat-type>\n          </interchangeable>\n        </time>"
+        },
+        {
+          "part": "P1",
+          "measureOrdinal": 5,
+          "measureNumber": "5",
+          "xml": "<time>\n          <beats>2</beats>\n          <beat-type>2</beat-type>\n          <interchangeable>\n            <time-relation>slash</time-relation>\n            <beats>4</beats>\n            <beat-type>4</beat-type>\n          </interchangeable>\n        </time>"
+        },
+        {
+          "part": "P1",
+          "measureOrdinal": 6,
+          "measureNumber": "6",
+          "xml": "<time>\n          <beats>3</beats>\n          <beat-type>4</beat-type>\n          <interchangeable>\n            <time-relation>space</time-relation>\n            <beats>6</beats>\n            <beat-type>8</beat-type>\n          </interchangeable>\n        </time>"
+        }
+      ],
+      "importedTimeChanges": [
+        {
+          "measureOrdinal": 1,
+          "time": {
+            "count": 3,
+            "unit": 4
+          }
+        },
+        {
+          "measureOrdinal": 2,
+          "time": {
+            "count": 2,
+            "unit": 2
+          }
+        },
+        {
+          "measureOrdinal": 3,
+          "time": {
+            "count": 4,
+            "unit": 4
+          }
+        },
+        {
+          "measureOrdinal": 4,
+          "time": {
+            "count": 3,
+            "unit": 4
+          }
+        },
+        {
+          "measureOrdinal": 5,
+          "time": {
+            "count": 2,
+            "unit": 2
+          }
+        },
+        {
+          "measureOrdinal": 6,
+          "time": {
+            "count": 3,
+            "unit": 4
+          }
+        }
+      ]
+    }
+  ]
+}

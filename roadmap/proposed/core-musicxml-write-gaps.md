@@ -1,4 +1,4 @@
-# MusicXML authoring gaps — make an untitled source editable in Studio
+# MusicXML authoring gaps — source reachability and meter controls
 
 > **Status: proposed, 2026-09-22.** Campaign item 23. Initial bounded finding from
 > [write assessment item 19](../inprogress/core-musicxml-write-assessment.md), which
@@ -37,6 +37,21 @@ The next Studio checkpoint still uses its declared GP storage path and exposes m
 losses. Reload must preserve the intended title and edited notes. Test cancellation,
 blank title, an already titled source, and a stale revision. Extend the Studio editor
 smoke; assert the stored/reopened document rather than only the save chip.
+
+## P2: expose representable numeric meters through the shared inspector
+
+The [meter write probe](../../docs/musicxml-meter-assessment.md) creates/changes/removes
+ordinary meters and sets common/cut display, with exact undo/redo. It also proves that
+`time 3/128` and `time 33/4` are rejected without mutation. Published MNX permits these;
+`setupGrammar.ts` restricts denominators to 64 and counts to 32.
+
+Acceptance: permit representable, safely handled count/unit values in the existing bar
+inspector, or explicitly document a justified application limit with an actionable
+message instead of the generic “not a time signature”. Check rest padding, notes and
+other measures, exact undo/redo, and MNX reopen. Prove the real shared inspector in
+Workbench and in an editable Studio piece; do not count suspended imported versions as
+editing passes. Test invalid denominators, nonpositive/unsafe counts and cancellation.
+This does not add additive grouping or single-number display syntax without a carrier.
 
 ## Explicit deferrals
 

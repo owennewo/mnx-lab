@@ -45,8 +45,8 @@ proposals that name their campaign.
 
 ### proposed/
 
-- **[core-musicxml-render-gaps.md](proposed/core-musicxml-render-gaps.md)** — item 22: four evidenced import/representation/render-containment gaps from the ongoing browser assessment.
-- **[core-musicxml-write-gaps.md](proposed/core-musicxml-write-gaps.md)** — item 23: let a user resolve missing title metadata when making an imported version editable in Studio.
+- **[core-musicxml-render-gaps.md](proposed/core-musicxml-render-gaps.md)** — item 22: evidenced import/representation/render-containment gaps, including exact meter duration and display losses.
+- **[core-musicxml-write-gaps.md](proposed/core-musicxml-write-gaps.md)** — item 23: resolve missing title metadata for imported Studio versions and expose representable numeric meter ranges.
 
 
 

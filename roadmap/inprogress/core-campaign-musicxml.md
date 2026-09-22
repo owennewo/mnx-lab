@@ -144,8 +144,8 @@ deliberately **not** enumerated in advance: item 8 decides them from evidence.
 | 19 | [Write-path assessment](core-musicxml-write-assessment.md) | Companion to item 18: assess whether desktop users can create, inspect, change and remove each corpus feature through the editor, with undo/redo and separate persistence evidence; produce a bounded proposal for missing operations and UX surfaces. | accuracy | real UI tasks + structural before/after checks + applicable save/reopen | **in progress 2026-09-22** |
 | 20 | [XSD element ordering](../complete/core-musicxml-xsd-ordering.md) | Pitch/tuning alterations before octaves; separate rehearsal and section directions. XSD-valid exports 292 → 336/344, semantic verdicts unchanged. | accuracy | independent XSD + regression tests | **built 2026-09-22** |
 | 21 | [Exact short durations](../complete/core-musicxml-short-durations.md) | Divisions account for written-duration denominators as well as tuplets; no zero-length metric notes in the measured corpus. XSD validity 336 → 340/344; three external export note tables now match. | accuracy | music21 + XSD + regression tests | **built 2026-09-22** |
-| 22 | [Render gaps](../proposed/core-musicxml-render-gaps.md) | Preserve piano staves; diagnose microtonal/staff-line losses; contain unsupported-clef projection failures. Four initial evidenced gaps, not an exhaustive backlog. | accuracy | original XML + imported MNX + both-shell captures | **proposed 2026-09-22** |
-| 23 | [Write gaps](../proposed/core-musicxml-write-gaps.md) | Resolve missing title metadata before making an imported Studio version current, without bypassing the shared editor or GP storage policy. | authoring | real Versions controls + refusal + persistence checks | **proposed 2026-09-22** |
+| 22 | [Render gaps](../proposed/core-musicxml-render-gaps.md) | Preserve piano staves; diagnose microtonal/staff-line losses; contain unsupported-clef projection failures. Meter follow-up adds exact duration and display losses; not an exhaustive backlog. | accuracy | original XML + imported MNX + both-shell captures | **proposed 2026-09-22** |
+| 23 | [Write gaps](../proposed/core-musicxml-write-gaps.md) | Resolve missing title metadata before making an imported Studio version current, without bypassing the shared editor or GP storage policy; expose representable numeric meter ranges. | authoring | real Versions controls + refusal + persistence checks | **proposed 2026-09-22** |
 | — | Feature parity | Dynamics, wedges, spanners, ottavas, articulations, SMuFL glyph names, percussion, layout breaks. **Deliberately unenumerated**: item 8 turns these into a ranked queue with evidence, and each becomes its own row when picked up. Note the schema already has `dynamic-*`, `ottava`, `slur` and `wedge-type` as standard objects — but **no pedal def**, so pedal is contract clause 2's first real test. | accuracy | 1 + 2 + 3 | not yet rows |
 
 ### Item 8's derivation rule
@@ -179,6 +179,19 @@ exactly as `verified` already works here. No backend: a generated JSON artifact
 committed to the repo, like `worker/models.json`.
 
 ## Progress + learnings
+
+### 2026-09-22 — items 18/19: meter variants and real inspector limits
+
+Reviewed all 12 meter sources in both shells with time signatures explicitly shown;
+[retained evidence and variant/task dispositions](../../docs/musicxml-meter-assessment.md).
+The initial sweep hid meters: **check effective display preferences before calling a
+missing glyph a defect**. Additive numerators and later fractions disappear on import;
+common display is lost despite an existing carrier. Five actual Workbench inspector
+commands pass exact history/preservation checks; count 33 and denominator 128 reject
+although standard MNX permits them. Rest padding changes are intentional related data,
+not unrelated mutation. Items 22/23 now contain the bounded follow-ups. Both assessments
+remain open, including ambiguous symbols and persistence beyond the tested MNX route.
+
 
 ### 2026-09-22 — items 18/19: both-shell sweeps and first bounded authoring evidence
 

@@ -68,6 +68,14 @@ or shrinking the score. A settled SVG, rather than just a populated document pro
 is required before reading diagnostics. This matters: a preliminary capture read an
 empty diagnostic list just before the first real paint.
 
+## Meter follow-up
+
+The [meter assessment](musicxml-meter-assessment.md) reviews all 12 time-signature
+fixtures in both shells and exercises five Workbench meter commands. The original
+full-corpus captures hid time signatures via editor preferences: they cannot establish
+missing-meter defects. New captures explicitly show them and record effective display
+options. Other feature families must check relevant preferences before assigning verdicts.
+
 ## Initial agent findings
 
 1. `43a-PianoStaff`: the source has two pitches on treble/bass staves and no tuning;
@@ -119,6 +127,7 @@ node harness/verify/musicxml-write-probe.mjs
 
 Optional `MUSICXML_CAPTURE_FILTER` is a source-ID regular expression for a pilot run;
 leave it unset for the full 183. `MUSICXML_CAPTURE_DIR` selects an artifact directory.
+`MUSICXML_CAPTURE_TIME_SIGNATURES=show` drives the real display control before capture.
 The scripts never write scenario statuses. Each shell needs its own capture directory.
 
 For Studio, follow [local library setup](library-access.md), then in separate terminals:

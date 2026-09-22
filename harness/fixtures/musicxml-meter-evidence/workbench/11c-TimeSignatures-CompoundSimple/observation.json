@@ -1,0 +1,51 @@
+{
+  "id": "11c-TimeSignatures-CompoundSimple",
+  "sourceSha256": "37b1da3a2fcb08f2d8c5422ae0bf857a8371a4ea74ef896127bff0c547e30458",
+  "testClass": "feature",
+  "description": "Compound time signatures with same denominator: (3+2)/8 and (5+3+1)/4.",
+  "views": [
+    {
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0,
+          1
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [
+        "validation — overfills the 3/8 bar: notes sum to 5 of 3 beats",
+        "validation — overfills the 3/8 bar: notes sum to 5 of 3 beats",
+        "validation — overfills the 5/4 bar: notes sum to 9 of 5 beats",
+        "validation — overfills the 5/4 bar: notes sum to 9 of 5 beats"
+      ],
+      "scrollWidth": 750,
+      "scrollHeight": 691,
+      "clientWidth": 750,
+      "clientHeight": 691,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "importError": null,
+  "warnings": [],
+  "importedDocumentSha256": "8591583b272d6bd254894180a1ad6c778f7ef40690b109d7e616c0b227b27475",
+  "displayOptions": {
+    "lyrics": "current",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

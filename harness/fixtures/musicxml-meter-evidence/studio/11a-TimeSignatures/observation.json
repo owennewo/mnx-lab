@@ -1,0 +1,86 @@
+{
+  "id": "11a-TimeSignatures",
+  "sourceSha256": "2d9dccb46e08e05c36e339a3a5dab61de2ede11b48e20ea5d7f4664fa8b9f80d",
+  "testClass": "feature",
+  "description": "Various time signatures: 2/2 (alla breve), 4/4 (C), 2/2, 3/2, 2/4, 3/4, 4/4, 5/4, 3/8, 6/8, 12/8.",
+  "views": [
+    {
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [],
+      "scrollWidth": 1425,
+      "scrollHeight": 1135,
+      "clientWidth": 1425,
+      "clientHeight": 870,
+      "screenshots": [
+        "notation-0-0.png",
+        "notation-0-265.png"
+      ]
+    }
+  ],
+  "makeCurrentError": "That version was not made current: A piece needs a title",
+  "entryPath": "Local operator ingest: GP seed + unmodified XML original; Save → Versions → View XML → Make current",
+  "importError": null,
+  "viewingOriginal": true,
+  "editingSuspended": true,
+  "warnings": [
+    "note 0: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 1: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 2: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 3: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 4: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 5: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 6: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 7: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 8: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 9: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 10: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 11: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 12: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 13: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 14: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 15: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 16: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 17: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 18: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 19: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 20: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 21: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 22: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 23: ConcertPitch disagrees with sounding pitch; spelling was reconstructed.",
+    "note 24: ConcertPitch disagrees with sounding pitch; spelling was reconstructed."
+  ],
+  "importedDocumentSha256": "033dd76a2bda8544106f7a8d5fe8ad1144700271497f3bdc80ff5b261b81be5c",
+  "displayOptions": {
+    "lyrics": "current",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

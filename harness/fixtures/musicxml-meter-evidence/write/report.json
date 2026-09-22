@@ -1,0 +1,370 @@
+{
+  "fixture": "11a-TimeSignatures",
+  "shell": "workbench",
+  "applicationCommit": "6f0b09b0a40a1e7b5eac4107a4a48ed1a63001af",
+  "scope": "First-bar meter: remove, create, change, common/cut display data, grammar rejection, exact undo/redo, JSON clipboard/MNX reopen",
+  "actions": [
+    {
+      "code": "Digit5",
+      "key": "%",
+      "modifiers": 8
+    },
+    {
+      "code": "Digit5",
+      "key": "%",
+      "modifiers": 8
+    },
+    {
+      "code": "Enter",
+      "key": "Enter",
+      "modifiers": 0
+    },
+    {
+      "type": "text",
+      "text": "time inherit"
+    },
+    {
+      "code": "Enter",
+      "key": "Enter",
+      "modifiers": 0
+    },
+    {
+      "code": "Escape",
+      "key": "Escape",
+      "modifiers": 0
+    },
+    {
+      "code": "KeyZ",
+      "key": "z",
+      "modifiers": 2
+    },
+    {
+      "code": "KeyY",
+      "key": "y",
+      "modifiers": 2
+    },
+    {
+      "code": "Digit5",
+      "key": "%",
+      "modifiers": 8
+    },
+    {
+      "code": "Enter",
+      "key": "Enter",
+      "modifiers": 0
+    },
+    {
+      "type": "text",
+      "text": "time 5/4"
+    },
+    {
+      "code": "Enter",
+      "key": "Enter",
+      "modifiers": 0
+    },
+    {
+      "code": "Escape",
+      "key": "Escape",
+      "modifiers": 0
+    },
+    {
+      "code": "KeyZ",
+      "key": "z",
+      "modifiers": 2
+    },
+    {
+      "code": "KeyY",
+      "key": "y",
+      "modifiers": 2
+    },
+    {
+      "code": "Digit5",
+      "key": "%",
+      "modifiers": 8
+    },
+    {
+      "code": "Enter",
+      "key": "Enter",
+      "modifiers": 0
+    },
+    {
+      "type": "text",
+      "text": "time 6/4"
+    },
+    {
+      "code": "Enter",
+      "key": "Enter",
+      "modifiers": 0
+    },
+    {
+      "code": "Escape",
+      "key": "Escape",
+      "modifiers": 0
+    },
+    {
+      "code": "KeyZ",
+      "key": "z",
+      "modifiers": 2
+    },
+    {
+      "code": "KeyY",
+      "key": "y",
+      "modifiers": 2
+    },
+    {
+      "code": "Digit5",
+      "key": "%",
+      "modifiers": 8
+    },
+    {
+      "code": "Enter",
+      "key": "Enter",
+      "modifiers": 0
+    },
+    {
+      "type": "text",
+      "text": "time common"
+    },
+    {
+      "code": "Enter",
+      "key": "Enter",
+      "modifiers": 0
+    },
+    {
+      "code": "Escape",
+      "key": "Escape",
+      "modifiers": 0
+    },
+    {
+      "code": "KeyZ",
+      "key": "z",
+      "modifiers": 2
+    },
+    {
+      "code": "KeyY",
+      "key": "y",
+      "modifiers": 2
+    },
+    {
+      "code": "Digit5",
+      "key": "%",
+      "modifiers": 8
+    },
+    {
+      "code": "Enter",
+      "key": "Enter",
+      "modifiers": 0
+    },
+    {
+      "type": "text",
+      "text": "time cut"
+    },
+    {
+      "code": "Enter",
+      "key": "Enter",
+      "modifiers": 0
+    },
+    {
+      "code": "Escape",
+      "key": "Escape",
+      "modifiers": 0
+    },
+    {
+      "code": "KeyZ",
+      "key": "z",
+      "modifiers": 2
+    },
+    {
+      "code": "KeyY",
+      "key": "y",
+      "modifiers": 2
+    },
+    {
+      "code": "Digit5",
+      "key": "%",
+      "modifiers": 8
+    },
+    {
+      "code": "Enter",
+      "key": "Enter",
+      "modifiers": 0
+    },
+    {
+      "type": "text",
+      "text": "time 3+2/8"
+    },
+    {
+      "code": "Enter",
+      "key": "Enter",
+      "modifiers": 0
+    },
+    {
+      "code": "Escape",
+      "key": "Escape",
+      "modifiers": 0
+    },
+    {
+      "code": "Digit5",
+      "key": "%",
+      "modifiers": 8
+    },
+    {
+      "code": "Enter",
+      "key": "Enter",
+      "modifiers": 0
+    },
+    {
+      "type": "text",
+      "text": "time 3/128"
+    },
+    {
+      "code": "Enter",
+      "key": "Enter",
+      "modifiers": 0
+    },
+    {
+      "code": "Escape",
+      "key": "Escape",
+      "modifiers": 0
+    },
+    {
+      "code": "Digit5",
+      "key": "%",
+      "modifiers": 8
+    },
+    {
+      "code": "Enter",
+      "key": "Enter",
+      "modifiers": 0
+    },
+    {
+      "type": "text",
+      "text": "time 33/4"
+    },
+    {
+      "code": "Enter",
+      "key": "Enter",
+      "modifiers": 0
+    },
+    {
+      "code": "Escape",
+      "key": "Escape",
+      "modifiers": 0
+    },
+    {
+      "code": "Digit5",
+      "key": "%",
+      "modifiers": 8
+    },
+    {
+      "code": "Enter",
+      "key": "Enter",
+      "modifiers": 0
+    },
+    {
+      "type": "text",
+      "text": "time 3/4 single-number"
+    },
+    {
+      "code": "Enter",
+      "key": "Enter",
+      "modifiers": 0
+    },
+    {
+      "code": "Escape",
+      "key": "Escape",
+      "modifiers": 0
+    }
+  ],
+  "browser": {
+    "protocolVersion": "1.3",
+    "product": "Chrome/153.0.8010.36",
+    "revision": "@507c6ee3e2f3b2ca0e660547e5b9ea4820c67f4c",
+    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+    "jsVersion": "15.3.76.10"
+  },
+  "tasks": [
+    {
+      "task": "remove",
+      "command": "time inherit",
+      "verdict": "supported",
+      "expected": null,
+      "unrelatedData": "all notes and all other measures exactly preserved; only first-bar meter and expected trailing rest padding change",
+      "undoRedo": "exact"
+    },
+    {
+      "task": "create",
+      "command": "time 5/4",
+      "verdict": "supported",
+      "expected": {
+        "count": 5,
+        "unit": 4
+      },
+      "unrelatedData": "all notes and all other measures exactly preserved; only first-bar meter and expected trailing rest padding change",
+      "undoRedo": "exact"
+    },
+    {
+      "task": "change",
+      "command": "time 6/4",
+      "verdict": "supported",
+      "expected": {
+        "count": 6,
+        "unit": 4
+      },
+      "unrelatedData": "all notes and all other measures exactly preserved; only first-bar meter and expected trailing rest padding change",
+      "undoRedo": "exact"
+    },
+    {
+      "task": "common",
+      "command": "time common",
+      "verdict": "supported",
+      "expected": {
+        "count": 4,
+        "unit": 4,
+        "display": "common"
+      },
+      "unrelatedData": "all notes and all other measures exactly preserved; only first-bar meter and expected trailing rest padding change",
+      "undoRedo": "exact"
+    },
+    {
+      "task": "cut",
+      "command": "time cut",
+      "verdict": "supported",
+      "expected": {
+        "count": 2,
+        "unit": 2,
+        "display": "cut"
+      },
+      "unrelatedData": "all notes and all other measures exactly preserved; only first-bar meter and expected trailing rest padding change",
+      "undoRedo": "exact"
+    }
+  ],
+  "rejections": [
+    {
+      "command": "time 3+2/8",
+      "error": "not a time signature — 4/4, 6/8, common, cut",
+      "documentUnchanged": true
+    },
+    {
+      "command": "time 3/128",
+      "error": "not a time signature — 4/4, 6/8, common, cut",
+      "documentUnchanged": true
+    },
+    {
+      "command": "time 33/4",
+      "error": "not a time signature — 4/4, 6/8, common, cut",
+      "documentUnchanged": true
+    },
+    {
+      "command": "time 3/4 single-number",
+      "error": "not a time signature — 4/4, 6/8, common, cut",
+      "documentUnchanged": true
+    }
+  ],
+  "persistence": {
+    "route": "JSON copy → external file save → Open MNX",
+    "verdict": "exact final document equality",
+    "scope": "final cut-time state; other intermediate states not individually reopened"
+  },
+  "consoleErrors": []
+}

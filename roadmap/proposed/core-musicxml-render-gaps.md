@@ -75,10 +75,28 @@ or blank projection. Use the minimal percussion fixture plus a mixed pitched/unp
 probe; verify the reported unsupported scope and both browser shells. This does not
 promise a full percussion editor or supersede the separate percussion-kit proposal.
 
+### P1: retain exact meter duration and existing common/cut display
+
+Added from the [12-fixture meter review](../../docs/musicxml-meter-assessment.md),
+with new both-shell captures explicitly showing time signatures. `11c` additive beats
+are truncated; `11d`/`11e` retain only the first fraction. For example (3+2)/8 becomes
+3/8 and 3/8+2/8+3/4 becomes 3/8 instead of 11/8, silently. `11a` bar 2 loses
+common display even though published MNX supports it.
+
+Acceptance: compute exact rational duration across every beats/beat-type pair, retaining
+an equivalent valid MNX count/unit where possible; preserve compatible common/cut
+symbols. Never silently discard grouping, alternate meters, single-number display,
+local visibility or unmetered state. Diagnose each unsupported feature at its source
+location, and agree on fallback semantics before implementation. Do not invent a
+standard field or claim equivalent duration preserves additive engraving. Exercise all
+12 meter originals and repeat the independent semantic/XSD checks and visible-meter
+browser captures. An inconsistent symbol/value (`11f`, or `11a` bar 1) needs an explicit
+policy with a regression, not an arbitrary glyph expectation. Full grouped, alternate,
+local/hidden and unmetered support requires a separate carrier/spec decision.
+
 ## Boundaries
 
 These are agent-assessed source → document → display findings, with no human-verification
-claim. Cosmetic spacing and unresolved corpus features are not included. The assessment
-will add new proposals only for separately evidenced work; it must not silently enlarge
-these four fixes. The [write-gap proposal](core-musicxml-write-gaps.md) owns editor
+claim. Cosmetic spacing and unresolved corpus features are not included. The meter section explicitly extends the four initial findings with separately retained
+evidence. Further scope changes require the same source, data and UI evidence. The [write-gap proposal](core-musicxml-write-gaps.md) owns editor
 reachability and persistence, and shares the representation blockers above.
