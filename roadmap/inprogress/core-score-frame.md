@@ -34,9 +34,13 @@ line along the bottom edge. Nothing on the page listens for a tap to show chrome
   on the grey ground, then on the right the **staff view as the library's sort control**
   (Notation · Tab · Both), **Zoom** and **Settings** — which open the shared pads under
   their buttons — a `…` menu and the collapse chevron. The bottom grip becomes the
-  player's tray in the same buttons. Below ~1000px of pane the tools row and the tray
-  each wrap to a stacked form (three lines); the phone and the workbench's pane beside
-  its rail and side panel both hit that breakpoint.
+  player's tray in the same buttons. *Retuned 2026-09-23:* the tools row is one line down
+  to 820px of pane (the title ellipsizes rather than pushing the tools down), then two —
+  the way back beside the tools, the title under them; at 360px the way back is its arrow
+  and the sub-line goes. The tray is one line down to 600px of player (780px when it
+  also carries a Source or Sound select or the bar toggle), then two — the rail as a
+  full-width line on top, the transport and settings under it. Both used to stack three
+  lines deep at 1000px, while one still fitted.
 - **One element, two hosts.** Studio mounts it on the piece page; the workbench mounts it
   on the scenario page's score pane, between the rail and the side panel, where the top
   strip carries the scenario id and provenance and an extra **Focus** button. In document

@@ -279,6 +279,13 @@ export class PiecePage extends LitElement {
       width: 15px;
       height: 15px;
     }
+    /* The frame's narrowest header: the way back is its arrow alone, beside
+       the tools; aria-label keeps its name when the word is hidden. */
+    @container (max-width: 360px) {
+      a[slot='back'] span {
+        display: none;
+      }
+    }
     /* Where the editor's surfaces hang: over the whole score pane, passing every pointer through. */
     .editor-overlay {
       position: absolute;
@@ -1006,7 +1013,7 @@ export class PiecePage extends LitElement {
         @zoom-change=${this.onZoomChange}
         @spacing-mode-change=${this.onSpacingModeChange}
       >
-        <a slot="back" href=${libraryReturnHref()} @click=${returnToLibrary}>${back}<span>Library</span></a>
+        <a slot="back" aria-label="Library" href=${libraryReturnHref()} @click=${returnToLibrary}>${back}<span>Library</span></a>
         ${this.doc
           ? html`<button slot="title-action" class="edit-piece" type="button" aria-label="Edit piece"
               aria-expanded=${this.editOpen} @click=${() => this.openPanel(this.editOpen ? null : 'edit')}>${pencilGlyph}</button>

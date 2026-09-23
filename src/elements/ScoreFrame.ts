@@ -340,9 +340,20 @@ export class ScoreFrame extends LitElement {
         align-items: flex-start;
       }
 
-      /* Wide: the two groups are transparent and everything sits in one row.
-         Narrow: each group is its own row — the way back and the menu on the
-         first, the head on the second, the tools on the third. */
+      /* Wide: the two groups are transparent and everything sits in one row;
+         the row does not wrap, so a title that runs out of room ellipsizes
+         instead of pushing the tools onto a line of their own. Narrow: two
+         rows — the way back, the tools and the menu share the first, the head
+         has the second to itself. A host whose tools will not fit beside its
+         way back gets them on a line of their own (the tools row wraps as one
+         item), so nothing is ever clipped off the pane. The breakpoint is
+         where a studio title and artist of ordinary length still fit whole
+         beside five tools; lower, the one row squeezes a title it could have
+         shown. It was 1000px, which stacked three rows while one still fitted. */
+      .strip.top {
+        flex-wrap: nowrap;
+      }
+
       .head-row,
       .tools-row {
         display: contents;
@@ -366,6 +377,9 @@ export class ScoreFrame extends LitElement {
       }
 
       .head .sub {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
         color: var(--ink-3);
         font-size: 13px;
         white-space: nowrap;
@@ -414,7 +428,11 @@ export class ScoreFrame extends LitElement {
         gap: 8px;
       }
 
-      @container (max-width: 1000px) {
+      @container (max-width: 820px) {
+        .strip.top {
+          flex-wrap: wrap;
+        }
+
         .head-row {
           display: flex;
           align-items: baseline;
@@ -429,8 +447,8 @@ export class ScoreFrame extends LitElement {
           display: flex;
           align-items: center;
           gap: 8px;
-          flex-basis: 100%;
-          order: 3;
+          flex: 1 1 auto;
+          order: 1;
           /* A host's actions are its own business and may outnumber the width:
              wrap them rather than clip the last one off the pane. */
           flex-wrap: wrap;
@@ -444,9 +462,30 @@ export class ScoreFrame extends LitElement {
           display: block;
         }
 
+        /* The menu joins the first row after the tools. The group dissolves so
+           an empty menu is no item at all: an empty box and its gap would
+           spill onto a line of their own on a phone. */
         .end {
-          margin-left: auto;
+          display: contents;
+        }
+
+        ::slotted([slot='menu']) {
           order: 1;
+        }
+      }
+
+      /* A phone: the title steps down a size, then the subheading goes and the
+         title keeps the line. A host's way back can drop its word at the same
+         width — the frame is the container its slotted link queries. */
+      @container (max-width: 480px) {
+        .head h1 {
+          font-size: 1.2rem;
+        }
+      }
+
+      @container (max-width: 360px) {
+        .head .sub {
+          display: none;
         }
       }
 

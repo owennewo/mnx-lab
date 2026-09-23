@@ -1,4 +1,4 @@
-import { LitElement, html, css, svg, nothing } from 'lit';
+import { LitElement, html, css, svg, nothing, unsafeCSS } from 'lit';
 import { designTokens } from './tokens.ts';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { Performance, PerformanceMeasure } from '../audio/performanceTypes.ts';
@@ -34,6 +34,32 @@ import './SyncBar.ts';
 
 /** What a host persists when the sync bar commits an edit. */
 export interface SyncEdit { sourceId: string; segments: SyncSegments; syncpoints: SoundsliceSyncpoint[] | null }
+
+/** The tray's stacked form, for the control line `scope` names — written once,
+ *  applied at two widths (see the styles). */
+function stacked(scope: string) {
+  const s = unsafeCSS(scope);
+  return css`
+    ${s} .rail,
+    ${s} mnx-sync-bar {
+      flex: 1 1 100%;
+      order: -1;
+      padding: 4px 0;
+    }
+    ${s} .rail .lab {
+      display: none;
+    }
+    ${s} .rail .cell {
+      grid-row: 1;
+      height: max(18px, var(--rail-cell, 14px));
+    }
+    ${s} .settings {
+      display: flex;
+      margin-left: auto;
+      gap: 10px;
+    }
+  `;
+}
 
 @customElement('mnx-player')
 export class Player extends LitElement {
@@ -116,34 +142,21 @@ export class Player extends LitElement {
       --player-ground: light-dark(oklch(0.9 0.004 60), oklch(0.26 0.006 60));
     }
     /* Sound, rate and volume travel together: inline in the one-row tray,
-       a right-aligned line of their own in the stacked form. */
+       pushed to the end of the control line in the stacked form. */
     .settings {
       display: contents;
     }
-    /* The stacked form, below the score frame's breakpoint: transport and
-       readout, then the rail on a line of its own without its labels, then
-       the settings. */
-    @container (max-width: 1000px) {
-      .rail,
-      mnx-sync-bar {
-        flex: 1 1 100%;
-        order: 1;
-        padding: 4px 0;
-      }
-      .rail .lab {
-        display: none;
-      }
-      .rail .cell {
-        grid-row: 1;
-        height: max(18px, var(--rail-cell, 14px));
-      }
-      .settings {
-        display: flex;
-        flex: 1 1 100%;
-        order: 2;
-        justify-content: flex-end;
-        gap: 10px;
-      }
+    /* The stacked form: the rail (or the sync bar) becomes a full-width line
+       on top, without its labels, and the transport, readout and settings
+       share the line under it. The tray stays one row while the rail keeps
+       about 240px beside them — sooner when it also carries a Source or Sound
+       select or the bar toggle (.busy). It stacked at 1000px once, three lines
+       deep, while the one still fitted. */
+    @container (max-width: 780px) {
+      ${stacked('.controls.busy')}
+    }
+    @container (max-width: 600px) {
+      ${stacked('.controls')}
     }
     .youtube-panel { margin-top: 12px; }
     .youtube-surface { width: min(100%, 480px); min-width: 200px; height: clamp(200px, 56.25vw, 270px); position: relative; z-index: 10; }
@@ -492,6 +505,26 @@ export class Player extends LitElement {
     p {
       margin: 8px 0 0;
       color: var(--ink-2);
+    }
+    /* A phone's narrowest tray: the rate is its value alone, the play button
+       drops to the tray's own 40px and the values close in, so the control
+       line still holds at 320px. Last in the sheet, so it wins over the rules
+       it narrows. */
+    @container (max-width: 340px) {
+      .controls,
+      .controls .settings {
+        gap: 6px;
+      }
+      button.primary {
+        width: 40px;
+        height: 40px;
+      }
+      button.value {
+        padding: 0 8px;
+      }
+      button.value.rate svg {
+        display: none;
+      }
     }
   `
   ];
@@ -1198,7 +1231,7 @@ export class Player extends LitElement {
       </div>
       <button
         type="button"
-        class=${open ? 'value on' : 'value'}
+        class=${open ? 'value rate on' : 'value rate'}
         aria-haspopup="dialog"
         aria-expanded=${open}
         aria-label=${`Change playback rate, ${this.rate.toFixed(2)}×`}
@@ -1272,7 +1305,10 @@ export class Player extends LitElement {
 
   render() {
     const playing = this.status?.wantsPlayback ?? false;
-    return html` <div class="controls">
+    const busy = this.syncEditable && this.sourceId !== 'synth'
+      || this.sourceControl && (this.recordings.length > 0 || this.canAddRecording)
+      || this.soundControl && this.sourceId === 'synth';
+    return html` <div class=${busy ? 'controls busy' : 'controls'}>
         <button
           class="primary"
           ?disabled=${!this.performance || (this.status?.needsStart && !this.status.alignmentIssue)}

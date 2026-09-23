@@ -30,8 +30,10 @@ section's first bar.
 The lane column's height follows the piece's deepest stack of visits — 6px per lane plus
 2px gaps, from 14px for a piece without repeats up to a 38px cap (five passes) — so the
 tray thickens only when the piece demands it; past the cap the lanes share the height and
-the hover card carries the count. Below the score frame's ~1000px breakpoint the tray stacks: transport
-and readout, the rail on a line of its own without labels, then the settings.
+the hover card carries the count. Below 600px of player (780px when the tray also
+carries a Source or Sound select or the bar toggle) the tray stacks to two lines: the rail on
+top, full width and without labels, then the transport, readout and settings on one line;
+at 340px the rate drops its glyph and the play button its extra size so that line holds at 320.
 
 Rate and volume are value buttons — a glyph and the current value — and each
 control opens in an overlay above the tray: rate has preset chips (`0.25×` … `2×`, or the
