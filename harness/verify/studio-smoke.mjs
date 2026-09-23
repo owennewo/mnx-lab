@@ -83,13 +83,21 @@ try {
   await wait(`!!${pad}.querySelector('.menu')`);
   await c.evaluate(`[...${pad}.querySelectorAll('.menu .item')].find(i => i.textContent.trim() === 'Tab').click()`);
   await wait(`${pad}.querySelector('button[data-row=view] .word')?.textContent === 'Tab' && localStorage.getItem('mnx-studio.view') === 'tab'`);
-  // The theme toggle at the row's end walks auto → light → dark, pinning the
-  // scheme on the document root so every light-dark() pair follows.
-  await c.evaluate(`${piece}.querySelector('button[slot=menu]').click()`);
+  // The theme is the settings card's last row now, not a button at the row's
+  // end (2026-09-23). It names the value it wants rather than walking a cycle,
+  // and pins the scheme on the document root so every light-dark() pair
+  // follows. The card is still open from the STAFF row above.
+  assert.equal(await c.evaluate(`!!${piece}.querySelector('button[slot=menu]')`), false);
+  const pickTheme = async word => {
+    await c.evaluate(`${pad}.querySelector('button[data-row=theme]').click()`);
+    await wait(`!!${pad}.querySelector('.menu')`);
+    await c.evaluate(`[...${pad}.querySelectorAll('.menu .item')].find(i => i.textContent.trim() === '${word}').click()`);
+  };
+  await pickTheme('Light');
   await wait(`document.documentElement.style.colorScheme === 'light' && localStorage.getItem('mnx-studio.theme') === 'light'`);
-  await c.evaluate(`${piece}.querySelector('button[slot=menu]').click()`);
-  await wait(`document.documentElement.style.colorScheme === 'dark' && ${piece}.querySelector('button[slot=menu]').textContent.trim() === 'dark'`);
-  await c.evaluate(`${piece}.querySelector('button[slot=menu]').click()`);
+  await pickTheme('Dark');
+  await wait(`document.documentElement.style.colorScheme === 'dark' && ${pad}.querySelector('button[data-row=theme] .word')?.textContent === 'Dark'`);
+  await pickTheme('Auto');
   await wait(`document.documentElement.style.colorScheme === '' && localStorage.getItem('mnx-studio.theme') === null`);
   // The focus mark on the pane's corner hides both strips, remembers it, and
   // brings them back; the player is parked, not torn down, while focused.

@@ -52,7 +52,8 @@ import { DEFAULT_SPACE_SP, DEFAULT_SPACING_MODE, DEFAULT_STAFF_SP } from './zoom
  * `display-change`, `unrolled-change`, `zoom-change`, `spacing-mode-change`),
  * which bubble composed through the frame for the host to store — the pads
  * are chrome, not surface, and so
- * is this. Focus follows the same rule: `focused` is a property the host may
+ * is this — `theme-change` included, on the one row of the card that is about
+ * the shell rather than the document. Focus follows the same rule: `focused` is a property the host may
  * set (studio's remembered choice; the workbench's document focus), and every
  * toggle from the mark leaves as `focus-change` (detail: the new boolean) for
  * the host to remember or ignore. Which pad is up stays the frame's own — a
@@ -90,6 +91,10 @@ export class ScoreFrame extends LitElement {
   /** The settings card's inputs. */
   @property({ attribute: false }) display: DisplayOptions = {};
   @property({ type: Boolean }) unrolled = false;
+  /** The shell's light/dark setting, when the host wants the settings card to
+   *  carry it. Null leaves the row out — see `SettingsPad.theme`. The frame
+   *  only ferries it: the choice leaves as `theme-change` like every other. */
+  @property() theme: 'auto' | 'light' | 'dark' | null = null;
 
   /** The zoom pad's inputs — see ZoomPad for each. */
   @property({ type: Number }) staffSp: number | null = DEFAULT_STAFF_SP;
@@ -882,6 +887,7 @@ export class ScoreFrame extends LitElement {
                         .views=${this.views}
                         .unrolled=${this.unrolled}
                         .spacingMode=${this.spacingMode}
+                        .theme=${this.theme}
                       ></mnx-settings-pad>
                     </div>`
                   : nothing}

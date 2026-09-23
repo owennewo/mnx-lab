@@ -90,6 +90,21 @@ export class SettingsPad extends LitElement {
   @property({ attribute: false }) display: DisplayOptions = {};
 
   /**
+   * The shell's own light/dark setting, when the host chooses to carry it
+   * here. Null — the default — leaves the row out of the card entirely: the
+   * workbench keeps this control in its header and its command palette, and a
+   * card that grew a THEME row everywhere would hand that shell a third door
+   * to one setting without anyone asking for it.
+   *
+   * It is the only row that is not about the document, and it is here because
+   * this is the card you open to change how the page READS. It stays out of
+   * `offDefault` for exactly the reason the view does: the page in front of
+   * you already says which theme is on, so lighting the gear for it would mark
+   * a fresh visit as modified.
+   */
+  @property() theme: 'auto' | 'light' | 'dark' | null = null;
+
+  /**
    * Something more urgent is over the score (the selection tray). Forces the
    * quiet pose even under the pointer — the zoom pad's rule, mirrored so the
    * two neighbouring marks cannot disagree about who yields. No host sets it
@@ -172,6 +187,14 @@ export class SettingsPad extends LitElement {
     }));
   }
 
+  private emitTheme(value: string) {
+    this.dispatchEvent(new CustomEvent<'auto' | 'light' | 'dark'>('theme-change', {
+      detail: value as 'auto' | 'light' | 'dark',
+      bubbles: true,
+      composed: true
+    }));
+  }
+
   private emitSpacingMode(value: string) {
     this.dispatchEvent(new CustomEvent<'natural' | 'fill'>('spacing-mode-change', {
       detail: value as 'natural' | 'fill',
@@ -229,6 +252,10 @@ export class SettingsPad extends LitElement {
     const lyricNote = svg`${S.head(9.5, 7.8, 2.7, 1.9)}${S.stroke('M12 7.2V1.5', 1.5)}`;
     const twoSystems = svg`${S.stroke('M9 4v5M9 15v5', 1.6)}${S.staffLines([4, 6.5, 9], 10, 22, 1)}${S.staffLines([15, 17.5, 20], 10, 22, 1)}`;
     const barGround = S.staffLines([11, 14.5, 18], 2, 22);
+    // The one glyph that draws the SHELL's ground rather than the document's:
+    // a ring that fills as the page darkens.
+    const themeRing = svg`<circle cx="12" cy="12" r="7" fill="none"
+      stroke="currentColor" stroke-width="1.6"></circle>`;
 
     const drawings: Record<string, TemplateResult> = {
       // STAFF — what kind of staff the page draws. The tab glyph's knock-out is
@@ -276,7 +303,13 @@ export class SettingsPad extends LitElement {
       'beams.slanted': svg`${S.stroke('M9.2 19V8.5M18.2 19V5.5', 1.6)}
         ${S.stroke('M9.2 8.5 18.2 5.5', 3)}${beamHeads}`,
       'beams.flat': svg`${S.stroke('M9.2 19V7M18.2 19V7', 1.6)}
-        ${S.stroke('M9.2 7h9', 3)}${beamHeads}`
+        ${S.stroke('M9.2 7h9', 3)}${beamHeads}`,
+      // THEME — the page itself. Auto takes half the ring rather than some
+      // third mark, because "follow the machine" is one of these two answers
+      // at any moment, not a state of its own.
+      'theme.auto': svg`${themeRing}<path d="M12 5a7 7 0 0 0 0 14z" fill="currentColor"></path>`,
+      'theme.light': svg`${themeRing}`,
+      'theme.dark': svg`${themeRing}<circle cx="12" cy="12" r="7" fill="currentColor"></circle>`
     };
 
     return html`<svg width=${px} height=${px} viewBox="0 0 24 24" aria-hidden="true"
@@ -486,6 +519,17 @@ export class SettingsPad extends LitElement {
       value => this.emitUnrolled(value === 'unrolled'),
       this.unrolled
     );
+  }
+
+  /** Absent unless the host passes a theme — see the property. */
+  private themeRow() {
+    if (!this.theme) return nothing;
+    const choices: Choice[] = [
+      { value: 'auto', word: 'Auto' },
+      { value: 'light', word: 'Light' },
+      { value: 'dark', word: 'Dark' }
+    ];
+    return this.row('theme', 'Theme', choices, this.theme, value => this.emitTheme(value));
   }
 
   private systemAlignmentRow() {
@@ -919,6 +963,7 @@ export class SettingsPad extends LitElement {
                     ${this.displayRow('barNumbers', 'Bar numbers', ['Every bar', 'Every system', 'Hide'])}
                     ${this.displayRow('instrumentNames', 'Instrument names', ['Every system', 'First system', 'Hide'])}
                     ${this.displayRow('beams', 'Beams', ['Slanted', 'Flat'])}
+                    ${this.themeRow()}
                   </div>
                   <p class="help">Current verse uses the first used verse in the document’s verse order until playback supplies a selected verse.</p>
                   <p class="help">A system is one horizontal row of music, including notation and tab together in Both.</p>

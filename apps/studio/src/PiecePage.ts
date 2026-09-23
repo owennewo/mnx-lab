@@ -13,10 +13,13 @@
 // and shown together by the focus mark on the pane's corner (one toggle since
 // 2026-09-15; the edge grips went). This page supplies what the frame prints
 // and stores what it changes. Trimmed 2026-09-13: the tools row carries the way
-// back, the title, Zoom, Settings, Tags and the theme toggle — the tag chips
+// back, the title, Zoom, Settings and Tags — the tag chips
 // went (the Tags sheet shows them), the staff view lives in Settings alone,
 // and the account menu is the library page's (a piece is not where you sign
-// out). 2026-09-14: what plays left the tray for the tools row — a Source
+// out). 2026-09-23: the theme toggle left the row for the settings card's
+// THEME row, so light/dark is asked for where the rest of "how this page
+// reads" is asked for; the library page keeps its own toggle in the header,
+// having no card to put one in. 2026-09-14: what plays left the tray for the tools row — a Source
 // button that names it, opening the Source sheet (choose, edit, add) in the
 // frame's side slot beside Instruments; the recording editor opens there too.
 // 2026-09-17: the tray's sync bar makes a recording's sync here; this page is
@@ -61,7 +64,7 @@ import { performedShape } from '../../../src/audio/scoreShape.ts';
 import { SYNC_SEGMENTS_FORMAT, type StudioSyncPayload } from '../../../src/model/syncSegments.ts';
 import type { ZoomPadChange } from '../../../src/elements/ZoomPad.ts';
 import { libraryReturnHref, returnToLibrary } from './StudioApp.ts';
-import { nextTheme, readTheme, resolvedTheme, setTheme, themeGlyph, type ThemeSetting } from './theme.ts';
+import { readTheme, setTheme, type ThemeSetting } from './theme.ts';
 import { isKitPart, type PartMix } from '../../../src/audio/partMix.ts';
 import './EditPieceSheet.ts';
 import './RecordingsSheet.ts';
@@ -220,9 +223,6 @@ export class PiecePage extends LitElement {
     .notice a {
       color: inherit;
     }
-    /* The theme toggle: a word and a mark, at the end of the tools row. The
-       word is part of the control — three settings cannot be read off an
-       icon, and auto has to say which way it currently resolves. */
     /* The save chip sits beside the title — the frame's chips slot — so it is on
        screen at any width; the tools row is where things go to be clipped. */
     button.save {
@@ -307,13 +307,10 @@ export class PiecePage extends LitElement {
     button.save.warn {
       color: light-dark(#a12121, #ffb4ab);
     }
-    .theme span {
-      text-transform: capitalize;
-    }
   `;
 
-  private cycleTheme() {
-    this.theme = nextTheme(this.theme);
+  private onThemeChange(event: CustomEvent<ThemeSetting>) {
+    this.theme = event.detail;
     setTheme(this.theme);
   }
 
@@ -953,8 +950,6 @@ export class PiecePage extends LitElement {
     const sourceLabel = `Source · ${activeRecording?.name ?? (this.snapshot && !this.recordings.length ? 'Synth · add a recording' : 'Synth')}`;
     const instrumentsLabel = `Instruments · ${this.doc?.mnxJson.parts.length ?? 0}`;
     const playable = this.snapshot?.recordings.filter(r => this.recordings.some(s => s.id === r.id)) ?? [];
-    const themeNext = nextTheme(this.theme);
-    const themeSentence = `Theme: ${this.theme}${this.theme === 'auto' ? ` (now ${resolvedTheme(this.theme)})` : ''} — click for ${themeNext}`;
     // The viewer is queried, not stored: before the first render there is none.
     const viewer = this.viewer as DocumentViewer | null;
     return html`
@@ -965,6 +960,7 @@ export class PiecePage extends LitElement {
         .views=${viewer?.availableViews() ?? ['notation']}
         .display=${this.display}
         .unrolled=${this.unrolled}
+        .theme=${this.theme}
         .staffSp=${this.staffSp}
         .densityH=${this.densityH}
         .spacingMode=${this.spacingMode}
@@ -979,6 +975,7 @@ export class PiecePage extends LitElement {
         @view-change=${this.onViewChange}
         @display-change=${this.onDisplayChange}
         @unrolled-change=${this.onUnrolledChange}
+        @theme-change=${this.onThemeChange}
         @zoom-change=${this.onZoomChange}
         @spacing-mode-change=${this.onSpacingModeChange}
       >
@@ -1005,10 +1002,6 @@ export class PiecePage extends LitElement {
                 </span>`
               : nothing}`
           : nothing}
-        <button slot="menu" class="theme" type="button" title=${themeSentence} aria-label=${themeSentence} @click=${this.cycleTheme}>
-          ${themeGlyph(this.theme)}<span>${this.theme}</span>
-        </button>
-
         ${this.loading ? html`<p class="notice" role="status">Loading…</p>` : nothing}
         ${!this.loading && !this.doc
           ? html`<div class="notice">
