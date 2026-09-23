@@ -195,7 +195,11 @@ function commit(): string {
 }
 
 export default defineConfig(async ({ command }) => {
-  if (command === 'serve') await prepareLocalLibrary();
+  const { devPort, isWorktree } = await import('./tools/dev-port.mjs');
+  if (command === 'serve') {
+    console.log(`dev: serving ${isWorktree() ? `worktree ${path.basename(ROOT)}` : 'the primary checkout'} on port ${devPort()}`);
+    await prepareLocalLibrary();
+  }
   return {
     define: { __MNX_COMMIT__: JSON.stringify(commit()) },
     plugins: [
@@ -227,7 +231,9 @@ export default defineConfig(async ({ command }) => {
       }
     },
     server: {
-      port: 5173,
+      // Per checkout (tools/dev-port.mjs); strict, so a busy port fails loudly.
+      port: devPort(),
+      strictPort: true,
       host: true
     }
   };

@@ -24,7 +24,10 @@ The repo runs **two development loops**, and every artifact declares which it se
 
 ```bash
 git submodule update --init vendor/mnx   # the MNX spec sources (dev-time only)
-npm run dev                # Vite dev server + Worker API (via @cloudflare/vite-plugin)
+npm run dev                # Vite dev server + Worker API (via @cloudflare/vite-plugin); no setup —
+                           # prepares the local library, signs studio in, on this checkout's port
+npm run -s dev:port        # that port: 5173 in the primary checkout, a fixed one per worktree
+npm run smoke -- <names>   # browser smokes (--help lists them); each brings its own library
 npm test                   # harness suites over the corpus (root vitest)
 npm run check:scenarios    # corpus police
 npm run verify:scenarios   # attention queue / approval writer — drive via /verify
@@ -61,6 +64,18 @@ tree ever has to know they exist. **If `add` refuses, another agent already owns
 task** — pick up something else rather than working around it. `git worktree add` does not
 populate `vendor/mnx`; leave it empty unless the task is in the spec loop, and run
 `git submodule update --init vendor/mnx` inside the worktree if it is.
+
+**Running things in a worktree needs no setup.** `npm run dev` prepares the local library
+and signs studio in by itself, on the worktree's own port (`npm run -s dev:port`); a busy
+port fails instead of drifting to the next, so a browser never shows you another
+checkout. Library smokes start a private server of their own — never start `wrangler dev`
+for one. **Stop whatever you start before you finish**: `workerd` ignores SIGTERM and
+takes SIGKILL, and `worktree:retire` (below) sweeps anything left behind.
+
+**Never `git stash`.** The stash stack is shared by every worktree: on 2026-09-23 two
+agents stashed at once and each popped the other's work. To run old code, commit yours
+(a WIP commit you amend later), then `git checkout --detach <old>` in your own worktree,
+build, test, and `git checkout <task>` back.
 
 ### Landing the work
 
@@ -192,7 +207,8 @@ consumer needing independent versioning — a check, not a debate.
 - Build once for the selected browser smokes: `npm run smoke -- selection inspector`.
   After the gate build, use `npm run smoke -- --built selection inspector` instead.
   `--built` requires current artifacts for every selected face; rebuild after changes.
-- For a bug fix, demonstrate the regression on old code with the smallest useful test.
+- For a bug fix, demonstrate the regression on old code with the smallest useful test
+  (commit, then check the old commit out detached — never stash; see above).
   A baseline smoke is otherwise needed only when existing behavior or harness health
   is uncertain. Do not rebuild the whole application to prove a pure unit regression.
 - Install dependencies once per worktree. Repeat `npm ci` only when dependency inputs
