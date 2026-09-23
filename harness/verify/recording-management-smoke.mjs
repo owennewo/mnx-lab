@@ -87,6 +87,7 @@ try {
     check(sheet().recordingId===audioId,'Uploaded recording not selected');
     check(!sheet().shadowRoot.textContent.includes('YouTube take'),'Panel lists other recordings');
     await player.play();await delay(150);check(player.playback.state==='playing','Uploaded audio did not play');player.pause();
+    await select('synth');check(!src()&&player.sourceId==='synth','Choosing a source left the sheet open');
     // Out-of-range sync is a panel warning, never a playback-blocking alert.
     await page.client.saveRecording('piece',audioId,page.snapshot.piece.revision,{name:'Uploaded take',rawSync:[[0,1],[1,6],[2,11],[999,12],[1000,13]]});
     await page.refreshSnapshot();await select(youtubeId);await select(audioId);

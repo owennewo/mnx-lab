@@ -150,6 +150,7 @@ export class PiecePage extends LitElement {
   @query('mnx-player') private player!: Player;
   private binding: ReturnType<typeof bindPlayback> | null = null;
   private generation = 0;
+  private sourceChoice = 0;
   /** The sync bar's latest unsaved edit; saves are debounced and serial. */
   private pendingSync: (SyncEdit & { piece: string }) | null = null;
   private syncTimer: ReturnType<typeof setTimeout> | undefined;
@@ -815,6 +816,19 @@ export class PiecePage extends LitElement {
     this.instrumentsOpen = which === 'instruments';
     this.recordingsOpen = which === 'recording';
   }
+  /**
+   * A pick from the source sheet closes it once the source has loaded — unless
+   * the pick is a recording with a sync warning, which studio shows only on that
+   * recording's row. Synth's row has no warning to show, so Synth always closes.
+   */
+  private async chooseSource(id: string, warning: boolean) {
+    const choice = ++this.sourceChoice;
+    await this.player?.selectSource(id);
+    await this.updateComplete;
+    if (choice !== this.sourceChoice || !this.sourceOpen) return;
+    if (id !== 'synth' && (warning || this.recordingWarning?.id === id)) return;
+    this.openPanel(null);
+  }
   /** The editor on one recording, read fresh so its revision is current. */
   private async editRecording(id: string) {
     const generation = this.generation;
@@ -1053,7 +1067,7 @@ export class PiecePage extends LitElement {
               .syncWarning=${this.recordingWarning?.id === activeId ? this.recordingWarning.message : ''}
               .canAdd=${!!this.snapshot}
               .scoreShape=${this.scoreShape}
-              @source-choose=${(e: CustomEvent<{ id: string }>) => void this.player?.selectSource(e.detail.id)}
+              @source-choose=${(e: CustomEvent<{ id: string; warning: boolean }>) => void this.chooseSource(e.detail.id, e.detail.warning)}
               @recording-edit=${(e: CustomEvent<{ id: string }>) => void this.editRecording(e.detail.id)}
               @recording-add=${() => this.addRecording()}
               @close=${() => (this.sourceOpen = false)}></mnx-studio-source>`

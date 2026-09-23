@@ -106,7 +106,7 @@ export class SourceSheet extends LitElement {
     const first = summary.points[0], last = summary.points.at(-1);
     return html`<div class="source">
       <div class="top">
-        <button class="pick" type="button" role="radio" aria-checked=${active} data-source=${row.id} @click=${() => this.emit('source-choose', { id: row.id })}>
+        <button class="pick" type="button" role="radio" aria-checked=${active} data-source=${row.id} @click=${() => this.emit('source-choose', { id: row.id, warning: !!(summary.warning || summary.dropped) })}>
           <span class="dot"></span>
           <span class="text"><b>${name}</b><span class=${follows === 'sync warning' || follows === 'may be out of date' ? 'sub warn' : 'sub'}>${sourceGlyph(kind, 14)}${kind === 'youtube' ? 'Video' : 'Audio'} · ${follows}</span></span>
         </button>
