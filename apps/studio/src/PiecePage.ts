@@ -1023,8 +1023,12 @@ export class PiecePage extends LitElement {
                   ${keysGlyph}
                 </button>`}
                 <span slot="chips">
-                  <button type="button" class=${`save ${chip!.tone}`} data-save=${this.save.status} aria-pressed=${this.saveOpen} @click=${() => this.openPanel(this.saveOpen ? null : 'save')}>
-                    ${saveGlyph}<span>${this.playOnly ? 'Play only on this device' : this.readOnly ? 'Open in another tab · read only' : chip!.text}</span>
+                  <!-- Play only is the glyph alone, its words in the tooltip: on a
+                       phone the title is what the head row has room for. -->
+                  <button type="button" class=${`save ${chip!.tone}`} data-save=${this.save.status} aria-pressed=${this.saveOpen}
+                    aria-label=${this.playOnly ? 'Play only on this device' : nothing} title=${this.playOnly ? 'Play only on this device' : nothing}
+                    @click=${() => this.openPanel(this.saveOpen ? null : 'save')}>
+                    ${saveGlyph}${this.playOnly ? nothing : html`<span>${this.readOnly ? 'Open in another tab · read only' : chip!.text}</span>`}
                   </button>
                 </span>`
               : nothing}`

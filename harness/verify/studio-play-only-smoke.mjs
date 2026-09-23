@@ -90,7 +90,7 @@ try {
   assert.equal(await c.evaluate(`${viewer}.selection?.cursor ?? null`), null, 'a tap placed an edit cursor on a touch device');
 
   // ── it says so, rather than going quiet ───────────────────────────────────
-  assert.match(await c.evaluate(`${chip}.textContent`), /Play only on this device/, 'the save chip does not say the device plays only');
+  assert.match(await c.evaluate(`${chip}.getAttribute('aria-label')`), /Play only on this device/, 'the save chip does not say the device plays only');
   const row = await c.evaluate(actions);
   assert.ok(!row.some(label => label.includes('Keys')), `the tools row offers a Keys sheet with nothing bound: ${row.join(' · ')}`);
   for (const kept of ['Source', 'Instruments'])
