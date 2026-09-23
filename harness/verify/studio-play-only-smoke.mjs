@@ -56,8 +56,8 @@ try {
   // The pencil beside the title: one Edit piece panel in place of Details + Tags.
   const editPiece = `${piece}.querySelector('button[slot=title-action]')`;
   const chip = `${piece}?.querySelector('button.save')`;
-  const actions = `[...${piece}.querySelectorAll('button[slot=actions]')].map(b => b.textContent.trim())`;
-  const action = text => `[...${piece}.querySelectorAll('button[slot=actions]')].find(b => b.textContent.includes(${JSON.stringify(text)}))`;
+  const actions = `[...${piece}.querySelectorAll('button[slot=actions]')].map(b => b.getAttribute('aria-label') ?? b.textContent.trim())`;
+  const action = text => `[...${piece}.querySelectorAll('button[slot=actions]')].find(b => (b.getAttribute('aria-label') ?? b.textContent).includes(${JSON.stringify(text)}))`;
 
   await c.send('Network.setCookie',{name:'CF_Authorization',value:session.browser,url:origin,httpOnly:true,sameSite:'Lax'});
   // Making a piece is a FORM, so it still works here — it is the music that waits for a keyboard.

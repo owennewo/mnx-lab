@@ -34,7 +34,7 @@ try {
   // score's header, what was read from the notes, and your own values.
   const editPiece = `${piece}.querySelector('button[slot=title-action]')`;
   const saving = `${piece}?.querySelector('mnx-studio-save[slot=side]')?.shadowRoot`;
-  const action = text => `[...${piece}.querySelectorAll('button[slot=actions]')].find(b => b.textContent.includes(${JSON.stringify(text)}))`;
+  const action = text => `[...${piece}.querySelectorAll('button[slot=actions]')].find(b => (b.getAttribute('aria-label') ?? b.textContent).includes(${JSON.stringify(text)}))`;
   const chip = `${piece}?.querySelector('button.save')`;
   const heading = `${frame}?.querySelector('.strip.top .head h1')?.textContent`;
   const field = (label, value) => c.evaluate(`{ const i = [...${details}.querySelectorAll('label')].find(l => l.textContent.trim().startsWith(${JSON.stringify(label)})).querySelector('input, textarea'); i.value = ${JSON.stringify(value)}; i.dispatchEvent(new Event('change')); }`);

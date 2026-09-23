@@ -72,10 +72,10 @@ try {
   // buttons. Studio leaves the staff view to the settings card's STAFF row —
   // no segmented control in the strip.
   assert.equal(await c.evaluate(`!!${frame}.querySelector('.seg')`), false);
-  await c.evaluate(`[...${frame}.querySelectorAll('.strip.top .btn')].find(b => b.textContent.includes('Zoom')).click()`);
+  await c.evaluate(`[...${frame}.querySelectorAll('.strip.top .btn')].find(b => b.getAttribute('aria-label') === 'Zoom').click()`);
   await wait(`!!${frame}.querySelector('mnx-zoom-pad[pinned]')`);
   assert.equal(await c.evaluate(`!!${frame}.querySelector('mnx-zoom-pad').shadowRoot.querySelector('.focus-toggle, .spacing-toggle')`), false);
-  await c.evaluate(`[...${frame}.querySelectorAll('.strip.top .btn')].find(b => b.textContent.includes('Settings')).click()`);
+  await c.evaluate(`[...${frame}.querySelectorAll('.strip.top .btn')].find(b => b.getAttribute('aria-label') === 'Settings').click()`);
   await wait(`!${frame}.querySelector('mnx-zoom-pad') && !!${frame}.querySelector('mnx-settings-pad[pinned]')?.shadowRoot?.querySelector('.card')`);
   const pad = `${frame}.querySelector('mnx-settings-pad[pinned]').shadowRoot`;
   await wait(`${pad}.querySelector('button[data-row=systemAlignment] .word')?.textContent === 'Fill width'`);
@@ -135,7 +135,7 @@ try {
   // carries no Sound selector here — the sheet chooses each part's sound.
   const player = `${piece}.querySelector('mnx-player')`;
   assert.equal(await c.evaluate(`!!${player}.shadowRoot.querySelector('select[aria-label="Playback sound"]')`), false);
-  await c.evaluate(`[...${piece}.querySelectorAll('button[slot=actions]')].find(b => b.textContent.includes('Instruments · 1')).click()`);
+  await c.evaluate(`[...${piece}.querySelectorAll('button[slot=actions]')].find(b => b.getAttribute('aria-label') === 'Instruments · 1').click()`);
   const instruments = `${piece}.querySelector('mnx-studio-instruments[slot=side]')?.shadowRoot`;
   await wait(`${instruments}?.querySelectorAll('.part').length === 1`);
   // A lone part cannot leave the score; a mute and a sound reach the player's
@@ -155,8 +155,8 @@ try {
   // The Source sheet: the tools row names what plays, the tray has no source
   // control, and the sheet lists Synth (checked) with Add recording.
   assert.equal(await c.evaluate(`!!${player}.shadowRoot.querySelector('select[aria-label="Playback source"]')`), false);
-  const sourceButton = `[...${piece}.querySelectorAll('button[slot=actions]')].find(b => b.textContent.includes('Source'))`;
-  await wait(`${sourceButton}?.textContent.includes('Source · Synth')`);
+  const sourceButton = `[...${piece}.querySelectorAll('button[slot=actions]')].find(b => b.getAttribute('aria-label')?.includes('Source'))`;
+  await wait(`${sourceButton}?.getAttribute('aria-label')?.includes('Source · Synth')`);
   await c.evaluate(`${sourceButton}.click()`);
   const source = `${piece}.querySelector('mnx-studio-source[slot=side]')?.shadowRoot`;
   await wait(`${source}?.querySelector('[data-source="synth"]')?.getAttribute('aria-checked') === 'true' && !!${source}.querySelector('[aria-label="Add recording"]')`);

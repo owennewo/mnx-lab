@@ -464,7 +464,10 @@ export class ScoreFrame extends LitElement {
         white-space: nowrap;
       }
 
-      .btn.icon {
+      /* The tools row is icons alone; the tooltip carries the word. A host's
+         actions opt in with class="icon". */
+      .btn.icon,
+      ::slotted(.icon) {
         width: 40px;
         padding: 0;
       }
@@ -816,8 +819,8 @@ export class ScoreFrame extends LitElement {
         ${this.pads
           ? html`
               <div class="anchor">
-                <button class="btn ${this.pad === 'zoom' ? 'on' : ''}" type="button" aria-expanded=${this.pad === 'zoom'} @click=${() => this.togglePad('zoom')}>
-                  ${ScoreFrame.crosshair}<span>Zoom</span>
+                <button class="btn icon ${this.pad === 'zoom' ? 'on' : ''}" type="button" aria-label="Zoom" title="Zoom" aria-expanded=${this.pad === 'zoom'} @click=${() => this.togglePad('zoom')}>
+                  ${ScoreFrame.crosshair}
                 </button>
                 ${this.pad === 'zoom'
                   ? html`<div class="popover">
@@ -833,8 +836,8 @@ export class ScoreFrame extends LitElement {
                   : nothing}
               </div>
               <div class="anchor">
-                <button class="btn ${this.pad === 'settings' ? 'on' : ''}" type="button" aria-expanded=${this.pad === 'settings'} @click=${() => this.togglePad('settings')}>
-                  ${ScoreFrame.gear}<span>Settings</span>
+                <button class="btn icon ${this.pad === 'settings' ? 'on' : ''}" type="button" aria-label="Settings" title="Settings" aria-expanded=${this.pad === 'settings'} @click=${() => this.togglePad('settings')}>
+                  ${ScoreFrame.gear}
                 </button>
                 ${this.pad === 'settings'
                   ? html`<div class="popover">

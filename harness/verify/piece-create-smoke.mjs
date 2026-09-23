@@ -59,8 +59,8 @@ try {
   const read = await c.evaluate(`JSON.stringify((d => ({ bars: d.global.measures.length, time: d.global.measures[0].time, key: d.global.measures[0].key, capo: d.parts[0]._x.mnxLab.capo, low: d.parts[0]._x.mnxLab.strings.find(s => s.string === 6).pitch, high: d.parts[0]._x.mnxLab.strings.find(s => s.string === 1).pitch }))(${piece}.querySelector('mnx-player').document))`);
   assert.deepEqual(JSON.parse(read), { bars: 9, time: { count: 6, unit: 8 }, key: { fifths: 2 }, capo: 2, low: { step: 'D', octave: 2 }, high: { step: 'D', octave: 4 } });
   // Nothing to sync against yet, and the tools row says what to do about it.
-  const sourceButton = `[...${piece}.querySelectorAll('button[slot=actions]')].find(b => b.textContent.includes('Source'))`;
-  await wait(`${sourceButton}?.textContent.includes('add a recording')`);
+  const sourceButton = `[...${piece}.querySelectorAll('button[slot=actions]')].find(b => b.getAttribute('aria-label')?.includes('Source'))`;
+  await wait(`${sourceButton}?.getAttribute('aria-label')?.includes('add a recording')`);
   await c.evaluate(`${sourceButton}.click()`);
   const source = `${piece}.querySelector('mnx-studio-source[slot=side]')?.shadowRoot`;
   await wait(`!!${source}?.querySelector('[aria-label="Add recording"]') && !${source}.querySelector('[aria-label="Add recording"]').disabled`);

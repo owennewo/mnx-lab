@@ -60,7 +60,7 @@ try {
     const sheet=()=>page.shadowRoot.querySelector('mnx-studio-recordings');
     // What plays is chosen in the Source sheet (the tools row's Source button), not the tray.
     const src=()=>page.shadowRoot.querySelector('mnx-studio-source');
-    const sourceButton=()=>[...page.shadowRoot.querySelectorAll('button[slot=actions]')].find(b=>b.textContent.includes('Source'));
+    const sourceButton=()=>[...page.shadowRoot.querySelectorAll('button[slot=actions]')].find(b=>b.getAttribute('aria-label')?.includes('Source'));
     const openSource=async()=>{if(!src()){sourceButton().click();await page.updateComplete;await src()?.updateComplete;}};
     const select=async id=>{await openSource();src().shadowRoot.querySelector(id==='add-recording'?'[aria-label="Add recording"]':'[data-source="'+id+'"]').click();await delay(150);await page.updateComplete;await sheet()?.updateComplete;for(let i=0;i<100&&player.playback.loading;i++)await delay(50);};
     const edit=async id=>{await openSource();src().shadowRoot.querySelector('[data-edit="'+id+'"]').click();await delay(250);await page.updateComplete;await sheet()?.updateComplete;};
@@ -68,7 +68,7 @@ try {
     const button=text=>[...sheet().shadowRoot.querySelectorAll('button')].find(b=>b.textContent.trim()===text);
     const saved=async n=>{for(let i=0;i<120;i++){await delay(50);if(page.snapshot.recordings.length===n&&!sheet()?.busy&&!player.playback.loading)break;}check(page.snapshot.recordings.length===n&&!sheet()?.error,sheet()?.error||'Recording did not save');};
     check(!player.shadowRoot.querySelector('[aria-label="Playback source"]')&&!page.shadowRoot.querySelector('[slot=source-tools]'),'Source is still in the playback tray');
-    check(sourceButton().textContent.includes('Source · Synth'),'Source button does not name Synth');
+    check(sourceButton().getAttribute('aria-label').includes('Source · Synth'),'Source button does not name Synth');
     await select('add-recording');check(!!sheet(),'Empty library cannot add');
     check(player.sourceId==='synth','Add action changed playback source');
     check(!sheet().shadowRoot.querySelector('textarea, [aria-label="Import sync JSON"]'),'Sync editor remains');
@@ -91,7 +91,7 @@ try {
     // Out-of-range sync is a panel warning, never a playback-blocking alert.
     await page.client.saveRecording('piece',audioId,page.snapshot.piece.revision,{name:'Uploaded take',rawSync:[[0,1],[1,6],[2,11],[999,12],[1000,13]]});
     await page.refreshSnapshot();await select(youtubeId);await select(audioId);
-    check(sourceButton().textContent.includes('Uploaded take'),'Source button does not name the recording');
+    check(sourceButton().getAttribute('aria-label').includes('Uploaded take'),'Source button does not name the recording');
     check(src().shadowRoot.textContent.includes('Sync warning:'),'Source sheet hides the sync warning');
     await edit(audioId);
     check(sheet().shadowRoot.textContent.includes('Sync warning:')&&sheet().shadowRoot.textContent.includes('2 out-of-range sync points dropped'),'Missing panel sync warning');
@@ -124,7 +124,7 @@ try {
   const reloaded=await c.evaluate(`(async()=>{for(let i=0;i<100;i++){const page=document.querySelector('mnx-studio')?.shadowRoot?.querySelector('mnx-studio-piece'),p=page?.shadowRoot?.querySelector('mnx-player');if(p?.performance&&p.recordings.length===1)return p.recordings;await new Promise(r=>setTimeout(r,50));}return [];})()`);
   assert.equal(reloaded[0]?.id,result.audioId);assert.equal(reloaded[0]?.name,'Renamed take');assert.equal(reloaded[0]?.syncpoints.length,3);assert.equal(uploads,1);assert.ok(canonicalReads>=3);
   await c.send('Emulation.setDeviceMetricsOverride',{width:360,height:800,deviceScaleFactor:1,mobile:true});
-  await c.evaluate(`(async()=>{const page=document.querySelector('mnx-studio').shadowRoot.querySelector('mnx-studio-piece'),player=page.shadowRoot.querySelector('mnx-player');await player.selectSource(player.recordings[0].id);await page.updateComplete;[...page.shadowRoot.querySelectorAll('button[slot=actions]')].find(b=>b.textContent.includes('Source')).click();await page.updateComplete;const source=page.shadowRoot.querySelector('mnx-studio-source');await source.updateComplete;if(source.getBoundingClientRect().width>360)throw Error('Source panel overflows mobile');source.shadowRoot.querySelector('[data-edit]').click();await new Promise(r=>setTimeout(r,400));const sheet=page.shadowRoot.querySelector('mnx-studio-recordings');if(sheet.getBoundingClientRect().width>360)throw Error('Panel overflows mobile');})()`);
+  await c.evaluate(`(async()=>{const page=document.querySelector('mnx-studio').shadowRoot.querySelector('mnx-studio-piece'),player=page.shadowRoot.querySelector('mnx-player');await player.selectSource(player.recordings[0].id);await page.updateComplete;[...page.shadowRoot.querySelectorAll('button[slot=actions]')].find(b=>b.getAttribute('aria-label')?.includes('Source')).click();await page.updateComplete;const source=page.shadowRoot.querySelector('mnx-studio-source');await source.updateComplete;if(source.getBoundingClientRect().width>360)throw Error('Source panel overflows mobile');source.shadowRoot.querySelector('[data-edit]').click();await new Promise(r=>setTimeout(r,400));const sheet=page.shadowRoot.querySelector('mnx-studio-recordings');if(sheet.getBoundingClientRect().width>360)throw Error('Panel overflows mobile');})()`);
   const shot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync('/tmp/recording-management-mobile.png',Buffer.from(shot.result.data,'base64'));
   assert.deepEqual(c.logs,[]);console.log('Recording management smoke OK',JSON.stringify({uploads,...result,reloaded:reloaded.length}));
 } catch(e) {if(c){const shot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync('/tmp/recording-management-failure.png',Buffer.from(shot.result.data,'base64'));}throw e;}

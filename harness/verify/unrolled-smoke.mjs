@@ -90,7 +90,7 @@ try {
     const frame=page.shadowRoot.querySelector('mnx-score-frame');
     check(frame,'The scenario page has no score frame');
     const gear=[...frame.shadowRoot.querySelectorAll('.tools-row .btn')]
-      .find(b=>(b.textContent||'').includes('Settings'));
+      .find(b=>b.getAttribute('aria-label')==='Settings');
     check(gear,'The score frame offers no Settings button');
     gear.click();await frame.updateComplete;await delay(50);
     const settings=frame.shadowRoot.querySelector('mnx-settings-pad');

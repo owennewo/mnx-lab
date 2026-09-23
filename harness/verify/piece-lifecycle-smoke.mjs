@@ -35,7 +35,7 @@ try {
   // The pencil beside the title: one Edit piece panel in place of Details + Tags.
   const editPiece = `${piece}.querySelector('button[slot=title-action]')`;
   const saving = `${piece}?.querySelector('mnx-studio-save[slot=side]')?.shadowRoot`;
-  const action = text => `[...${piece}.querySelectorAll('button[slot=actions]')].find(b => b.textContent.includes(${JSON.stringify(text)}))`;
+  const action = text => `[...${piece}.querySelectorAll('button[slot=actions]')].find(b => (b.getAttribute('aria-label') ?? b.textContent).includes(${JSON.stringify(text)}))`;
   const chip = `${piece}?.querySelector('button.save')`;
   const heading = `${frame}?.querySelector('.strip.top .head h1')?.textContent`;
   const press = (scope, label) => c.evaluate(`[...${scope}.querySelectorAll('button')].find(b => b.textContent.trim() === ${JSON.stringify(label)}).click()`);

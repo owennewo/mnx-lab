@@ -261,7 +261,7 @@ try {
   const openZoom = async () => {
     await cdp.evaluate(
       `[...${FRAME}.querySelector('mnx-score-frame').shadowRoot.querySelectorAll('.strip.top .btn')]` +
-        ".find(b => b.textContent.includes('Zoom')).click()"
+        ".find(b => b.getAttribute('aria-label') === 'Zoom').click()"
     );
     await new Promise(resolve => setTimeout(resolve, 300));
   };

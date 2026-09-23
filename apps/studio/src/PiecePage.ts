@@ -949,6 +949,9 @@ export class PiecePage extends LitElement {
     const chip = this.save ? saveChip(this.save, this.now) : null;
     const activeId = this.selectedRecordingId ?? 'synth';
     const activeRecording = this.snapshot?.recordings.find(r => r.id === this.selectedRecordingId);
+    // The tools row is icons alone; these are the words its tooltips carry.
+    const sourceLabel = `Source · ${activeRecording?.name ?? (this.snapshot && !this.recordings.length ? 'Synth · add a recording' : 'Synth')}`;
+    const instrumentsLabel = `Instruments · ${this.doc?.mnxJson.parts.length ?? 0}`;
     const playable = this.snapshot?.recordings.filter(r => this.recordings.some(s => s.id === r.id)) ?? [];
     const themeNext = nextTheme(this.theme);
     const themeSentence = `Theme: ${this.theme}${this.theme === 'auto' ? ` (now ${resolvedTheme(this.theme)})` : ''} — click for ${themeNext}`;
@@ -983,16 +986,17 @@ export class PiecePage extends LitElement {
         ${this.doc
           ? html`<button slot="title-action" class="edit-piece" type="button" aria-label="Edit piece"
               aria-expanded=${this.editOpen} @click=${() => this.openPanel(this.editOpen ? null : 'edit')}>${pencilGlyph}</button>
-            <button slot="actions" type="button" aria-pressed=${this.sourceOpen || this.recordingsOpen}
-              aria-label=${`Source: ${activeRecording?.name ?? 'Synth'}`} @click=${() => this.openPanel(this.sourceOpen ? null : 'source')}>
-              ${sourceGlyph(activeRecording ? (activeRecording.kind === 'youtube' ? 'youtube' : 'audio') : 'synth')}<span>Source · ${activeRecording?.name ?? (this.snapshot && !this.recordings.length ? 'Synth · add a recording' : 'Synth')}</span>
+            <button slot="actions" class="icon" type="button" aria-pressed=${this.sourceOpen || this.recordingsOpen}
+              aria-label=${sourceLabel} title=${sourceLabel} @click=${() => this.openPanel(this.sourceOpen ? null : 'source')}>
+              ${sourceGlyph(activeRecording ? (activeRecording.kind === 'youtube' ? 'youtube' : 'audio') : 'synth')}
             </button>
-            <button slot="actions" type="button" aria-pressed=${this.instrumentsOpen} @click=${() => this.openPanel(this.instrumentsOpen ? null : 'instruments')}>
-              ${mixerGlyph}<span>Instruments · ${this.doc.mnxJson.parts.length}</span>
+            <button slot="actions" class="icon" type="button" aria-pressed=${this.instrumentsOpen}
+              aria-label=${instrumentsLabel} title=${instrumentsLabel} @click=${() => this.openPanel(this.instrumentsOpen ? null : 'instruments')}>
+              ${mixerGlyph}
             </button>
             ${this.save
-              ? html`${this.playOnly ? nothing : html`<button slot="actions" type="button" aria-pressed=${this.keysOpen} @click=${() => this.openPanel(this.keysOpen ? null : 'keys')}>
-                  ${keysGlyph}<span>Keys</span>
+              ? html`${this.playOnly ? nothing : html`<button slot="actions" class="icon" type="button" aria-label="Keys" title="Keys" aria-pressed=${this.keysOpen} @click=${() => this.openPanel(this.keysOpen ? null : 'keys')}>
+                  ${keysGlyph}
                 </button>`}
                 <span slot="chips">
                   <button type="button" class=${`save ${chip!.tone}`} data-save=${this.save.status} aria-pressed=${this.saveOpen} @click=${() => this.openPanel(this.saveOpen ? null : 'save')}>

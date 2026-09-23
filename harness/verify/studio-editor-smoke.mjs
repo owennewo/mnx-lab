@@ -42,7 +42,7 @@ try {
   const saving = `${piece}?.querySelector('mnx-studio-save[slot=side]')?.shadowRoot`;
   const keys = `${piece}?.querySelector('mnx-studio-keys[slot=side]')?.shadowRoot`;
   const chip = `${piece}?.querySelector('button.save')`;
-  const action = text => `[...${piece}.querySelectorAll('button[slot=actions]')].find(b => b.textContent.includes(${JSON.stringify(text)}))`;
+  const action = text => `[...${piece}.querySelectorAll('button[slot=actions]')].find(b => (b.getAttribute('aria-label') ?? b.textContent).includes(${JSON.stringify(text)}))`;
   // Every fretted note in the live document, as "bar:string:fret".
   const frets = `JSON.stringify(${piece}.querySelector('mnx-player').document.parts[0].measures.flatMap((m, bar) => m.sequences.flatMap(s => s.content.flatMap(e => (e.notes ?? []).map(n => bar + ':' + n._x?.mnxLab?.string + ':' + n._x?.mnxLab?.fret)))))`;
   const fretsNow = async () => JSON.parse(await c.evaluate(frets));

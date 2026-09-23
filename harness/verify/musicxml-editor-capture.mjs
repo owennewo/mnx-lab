@@ -121,12 +121,12 @@ try {
       await settle();
       if(showMeters) {
         const frame=`${page}.shadowRoot.querySelector('mnx-score-frame').shadowRoot`;
-        await c.evaluate(`[...${frame}.querySelectorAll('button')].find(b=>b.textContent.trim()==='Settings').click()`);
+        await c.evaluate(`[...${frame}.querySelectorAll('button')].find(b=>b.getAttribute('aria-label')==='Settings').click()`);
         const pad=`${frame}.querySelector('mnx-settings-pad').shadowRoot`;
         await waitFor(c,`!!${pad}?.querySelector('[data-row="timeSignatures"]')`,'Time signatures setting');
         await c.evaluate(`(()=>{const b=${pad}.querySelector('[data-row="timeSignatures"]');if(b.textContent.trim()==='Hide')b.click();})()`);
         await waitFor(c,`${pad}.querySelector('[data-row="timeSignatures"]').textContent.trim()==='Show'`,'Show time signatures');
-        await c.evaluate(`[...${frame}.querySelectorAll('button')].find(b=>b.textContent.trim()==='Settings').click()`);
+        await c.evaluate(`[...${frame}.querySelectorAll('button')].find(b=>b.getAttribute('aria-label')==='Settings').click()`);
         await settle();
       }
       row.displayOptions=await c.evaluate(`(${finder}).effectiveDisplay()`);
@@ -135,14 +135,14 @@ try {
       for (const view of row.availableViews) {
         if(shell === 'studio') {
           const frame=`${page}.shadowRoot.querySelector('mnx-score-frame').shadowRoot`;
-          await c.evaluate(`[...${frame}.querySelectorAll('button')].find(b=>b.textContent.trim()==='Settings').click()`);
+          await c.evaluate(`[...${frame}.querySelectorAll('button')].find(b=>b.getAttribute('aria-label')==='Settings').click()`);
           const pad=`${frame}.querySelector('mnx-settings-pad').shadowRoot`;
           await waitFor(c,`!!${pad}?.querySelector('[data-row="view"]')`,'Staff setting');
           await c.evaluate(`${pad}.querySelector('[data-row="view"]').click()`);
           await waitFor(c,`!!${pad}.querySelector('[role="menu"]')`,'Staff menu');
           const switched=await c.evaluate(`(()=>{const b=[...${pad}.querySelectorAll('[role="menuitemradio"]')].find(b=>b.textContent.trim().toLowerCase()===${JSON.stringify(view)});if(!b)return false;b.click();return true;})()`);
           if(!switched)throw new Error('No reachable '+view+' staff menu item');
-          await c.evaluate(`[...${frame}.querySelectorAll('button')].find(b=>b.textContent.trim()==='Settings').click()`);
+          await c.evaluate(`[...${frame}.querySelectorAll('button')].find(b=>b.getAttribute('aria-label')==='Settings').click()`);
         } else {
           const switched = await c.evaluate(`(() => { const p = ${page}; const f=p.shadowRoot.querySelector('mnx-score-frame'); const b=[...f.shadowRoot.querySelectorAll('[aria-label="Staff view"] button')].find(b=>b.textContent.trim().toLowerCase()===${JSON.stringify(view)}); if(!b||b.disabled)return false; b.click();return true; })()`);
           if (!switched) throw new Error('No reachable ' + view + ' staff-view button');

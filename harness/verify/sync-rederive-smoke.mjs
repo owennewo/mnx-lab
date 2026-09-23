@@ -75,7 +75,7 @@ try {
    check(saves.length===2,'the echo of the write-back caused another write: '+saves.length);
    check(player.sourceId===rows[0].id,'the echo re-cued the source');
    // The Source sheet says which imported sync to distrust.
-   [...page.shadowRoot.querySelectorAll('button[slot=actions]')].find(b=>b.textContent.includes('Source')).click();
+   [...page.shadowRoot.querySelectorAll('button[slot=actions]')].find(b=>b.getAttribute('aria-label')?.includes('Source')).click();
    await until(()=>page.shadowRoot.querySelector('mnx-studio-source')?.shadowRoot?.querySelectorAll('.source').length===4,'no Source sheet');
    const sheet=page.shadowRoot.querySelector('mnx-studio-source').shadowRoot;
    const sub=name=>[...sheet.querySelectorAll('.source')].find(s=>s.textContent.includes(name)).querySelector('.sub').textContent;
