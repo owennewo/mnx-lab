@@ -62,24 +62,30 @@ explicitly before that date.
 
 ## Local development
 
-`npm run dev:login` sets a fresh clone up in one go: it creates the local signing key
-under ignored `.secrets/` (once — the key is reused from then on), writes its public half
-into ignored `.dev.vars` as `LIBRARY_LOCAL_JWKS` with the local issuer and audiences,
-signs eight-hour browser and machine sessions into `.secrets/local-library-session.json`,
-applies the D1 migrations **--local** and inserts the local user (`operator`,
-`local@example.test`). Restart `npm run dev` the first time, because the Worker reads
-`.dev.vars` at start; after that a renewal never changes `.dev.vars`, so it never needs a
-restart. `node tools/library-local-auth.mjs` alone renews the sessions without touching D1.
+**`npm run dev` needs nothing first.** Before its Worker starts (`prepareLocalLibrary`,
+`vite.config.ts` → `tools/library-local-auth.mjs`) it creates the local signing key under
+ignored `.secrets/` if there is none (reused from then on), writes its public half into
+ignored `.dev.vars` as `LIBRARY_LOCAL_JWKS` with the local issuer and audiences, signs
+eight-hour browser and machine sessions into `.secrets/local-library-session.json` when
+they have under an hour left, and brings the local D1 to the latest migration with the
+local user (`operator`, `local@example.test`) in it. The migrations run in-process and are
+recorded in wrangler's own `d1_migrations` table, so `wrangler d1 migrations apply
+--local` agrees; a start with nothing to apply costs about half a second. Because
+`.dev.vars` exists before the Worker reads it, no restart is ever asked for.
 
-Signing the browser in is a URL: while `npm run dev` runs, open
-`http://localhost:5173/__local-login`. The dev server (a Vite-only middleware in
-`vite.config.ts`, absent from every build) renews the session file when it is missing or
-within fifteen minutes of expiry, sets the loopback `CF_Authorization` cookie from its
-`browser` field, and bounces to `?next=` (a same-origin path; default `/studio/`).
-`/__local-logout` clears the cookie. Studio's own *Sign in* button goes there in dev, so a
-`401` after the eight hours is one click to clear. The route answers only a loopback
-client asking for a loopback host — the two conditions under which the Worker honours the
-local issuer — and trusts no header: it hands out the same cookie the file already holds.
+**Studio signs itself in.** A studio page asked for with no live session is given the
+loopback `CF_Authorization` cookie from the session file's `browser` field and sent back
+to itself. `/__local-logout` clears the cookie and switches that off, to see the
+signed-out page; `/__local-login` (where studio's own *Sign in* button goes in dev)
+switches it back on and bounces to `?next=` (a same-origin path; default `/studio/`). All
+of it is a Vite-only middleware in `vite.config.ts`, absent from every build, that answers
+only a loopback client asking for a loopback host — the two conditions under which the
+Worker honours the local issuer — so a tablet on the LAN gets the signed-out page. It
+trusts no header: it hands out the same cookie the file already holds.
+
+`npm run dev:login` remains for a CLI such as the ingest tool: it renews the sessions
+(and with `--seed`, which the script passes, brings the local D1 up to date) without
+starting a server.
 
 The browser smokes do not use any of this: each starts a private library of its own
 ([browser-smokes.md](browser-smokes.md)). Should you serve the built site by hand, pass

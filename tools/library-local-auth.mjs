@@ -8,13 +8,15 @@
 //   · SESSIONS — eight-hour browser and machine tokens in
 //     .secrets/local-library-session.json, re-signed on every run.
 //
-// Run directly to renew (`node tools/library-local-auth.mjs`); the Vite dev
-// server imports `renewLocalSessions` to do the same behind /__local-login.
-// `--seed` also applies the D1 migrations locally and inserts the local user,
-// so a fresh clone reaches a signed-in studio in one command (`npm run dev:login`).
+// `npm run dev` does all of this itself on start (`prepareLocalLibrary`) and
+// signs a studio page in without being asked, so a fresh worktree reaches a
+// signed-in studio with no step of its own. Run directly (`npm run dev:login`)
+// only to renew the sessions for a CLI such as the ingest tool; `--seed` also
+// brings the local D1 up to date.
 import { generateKeyPair, exportJWK, importJWK, SignJWT } from 'jose';
 import { mkdir, readFile, writeFile, chmod } from 'node:fs/promises';
-import { spawnSync } from 'node:child_process';
+import fs from 'node:fs';
+import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 export const LOCAL_EMAIL = 'local@example.test';
@@ -109,15 +111,48 @@ export async function renewLocalSessions(root = new URL('../', import.meta.url))
   return { session, keyCreated: created, varsChanged };
 }
 
-/** Local D1 only: apply the migrations and insert the local user. */
-export function seedLocalUser(root = new URL('../', import.meta.url)) {
-  const cwd = fileURLToPath(root);
-  const run = (args) => {
-    const result = spawnSync('npx', ['wrangler', ...args], { cwd, stdio: 'inherit' });
-    if (result.status !== 0) throw new Error(`wrangler ${args.slice(0, 3).join(' ')} failed`);
-  };
-  run(['d1', 'migrations', 'apply', 'LIBRARY_DB', '--local']);
-  run(['d1', 'execute', 'LIBRARY_DB', '--local', '--command', localUserInsert()]);
+/**
+ * Local D1 only: apply the migrations not yet applied and make the local user
+ * exist. In-process through wrangler's own platform proxy (well under a second,
+ * where two `wrangler d1` runs took ~6.5s), recording each migration in
+ * wrangler's `d1_migrations` table exactly as `wrangler d1 migrations apply
+ * --local` would, so the two always agree. `persistPath` defaults to the
+ * checkout's `.wrangler/state/v3`, the state `npm run dev` serves.
+ */
+export async function seedLocalLibrary(root = new URL('../', import.meta.url), { persistPath } = {}) {
+  const { getPlatformProxy, unstable_splitSqlQuery } = await import('wrangler');
+  const dir = fileURLToPath(root);
+  const proxy = await getPlatformProxy({
+    configPath: path.join(dir, 'wrangler.jsonc'),
+    persist: { path: persistPath ?? path.join(dir, '.wrangler/state/v3') },
+    envFiles: [],
+  });
+  try {
+    const db = proxy.env.LIBRARY_DB;
+    await db.prepare(`CREATE TABLE IF NOT EXISTS "d1_migrations"(
+      id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT UNIQUE, applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL)`).run();
+    const applied = new Set((await db.prepare('SELECT name FROM "d1_migrations"').all()).results.map(r => r.name));
+    const pending = fs.readdirSync(path.join(dir, 'migrations')).filter(n => n.endsWith('.sql') && !applied.has(n)).sort();
+    for (const name of pending) {
+      const sql = unstable_splitSqlQuery(fs.readFileSync(path.join(dir, 'migrations', name), 'utf8'));
+      await db.batch([...sql.map(q => db.prepare(q)), db.prepare('INSERT INTO "d1_migrations" (name) VALUES (?)').bind(name)]);
+    }
+    await db.prepare(localUserInsert()).run();
+    return { applied: pending };
+  } finally {
+    await proxy.dispose();
+  }
+}
+
+/** Everything `npm run dev` needs before its Worker starts: the trust in
+ *  `.dev.vars` (so no restart is ever asked for), live sessions, and a local
+ *  D1 at the latest migration with the local user in it. */
+export async function prepareLocalLibrary(root = new URL('../', import.meta.url)) {
+  const expiry = await localSessionExpiry(root);
+  // Re-sign only when it matters: the sessions file is what /__local-login reads.
+  if (!expiry || expiry - Date.now() < 60 * 60 * 1000) await renewLocalSessions(root);
+  else await ensureDevVars(root, (await signingKey(root)).publicJwk);
+  return seedLocalLibrary(root);
 }
 
 /** The statement that makes the local user exist. */
@@ -128,10 +163,12 @@ export function localUserInsert() {
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   const root = new URL('../', import.meta.url);
   const { keyCreated, varsChanged } = await renewLocalSessions(root);
-  if (process.argv.includes('--seed')) seedLocalUser(root);
+  if (process.argv.includes('--seed')) {
+    const { applied } = await seedLocalLibrary(root);
+    console.log(`Local D1: ${applied.length ? `applied ${applied.join(', ')}` : 'up to date'}; ${LOCAL_EMAIL} present.`);
+  }
   console.log(`Local test sessions (${SESSION_HOURS}h) saved under ${fileURLToPath(new URL('.secrets/', root))}.`);
   if (keyCreated) console.log('Created the local signing key (.secrets/local-library-signing-key.json).');
-  console.log(varsChanged ? 'Updated .dev.vars — restart `npm run dev` so the Worker trusts the key.' : '.dev.vars unchanged — no restart needed.');
-  if (!process.argv.includes('--seed')) console.log(`The local user must exist in LOCAL D1 (\`npm run dev:login\` seeds ${LOCAL_EMAIL}).`);
-  console.log('Sign the browser in at http://localhost:5173/__local-login while `npm run dev` runs.');
+  if (varsChanged) console.log('Updated .dev.vars — restart a running `npm run dev` so the Worker trusts the key.');
+  console.log('`npm run dev` does this on start and signs studio in by itself; this is only needed for a CLI.');
 }

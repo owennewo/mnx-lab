@@ -9,8 +9,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { generateKeyPair, exportJWK } from 'jose';
-import { unstable_dev, getPlatformProxy, unstable_splitSqlQuery } from 'wrangler';
-import { VARS, LOCAL_WRITE_TOKEN, signLocalSessions, localUserInsert } from '../../tools/library-local-auth.mjs';
+import { unstable_dev } from 'wrangler';
+import { VARS, LOCAL_WRITE_TOKEN, signLocalSessions, seedLocalLibrary } from '../../tools/library-local-auth.mjs';
 import { startReaper } from './reaper.mjs';
 
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
@@ -34,16 +34,7 @@ export async function startLocalLibrary() {
     const jwk = { ...(await exportJWK(publicKey)), kid: 'local', alg: 'RS256', use: 'sig' };
     const config = path.join(ROOT, 'wrangler.jsonc');
     // Seed through the same persistence the server then opens.
-    const proxy = await getPlatformProxy({ configPath: config, persist: { path: path.join(state, 'v3') }, envFiles: [] });
-    try {
-      const db = proxy.env.LIBRARY_DB;
-      for (const name of fs.readdirSync(path.join(ROOT, 'migrations')).filter(n => n.endsWith('.sql')).sort()) {
-        await db.batch(unstable_splitSqlQuery(fs.readFileSync(path.join(ROOT, 'migrations', name), 'utf8')).map(sql => db.prepare(sql)));
-      }
-      await db.prepare(localUserInsert()).run();
-    } finally {
-      await proxy.dispose();
-    }
+    await seedLocalLibrary(new URL('../../', import.meta.url), { persistPath: path.join(state, 'v3') });
     const worker = await unstable_dev(path.join(ROOT, 'worker/index.ts'), {
       config,
       assets: path.join(ROOT, 'dist/client'),
