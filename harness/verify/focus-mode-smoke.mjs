@@ -454,11 +454,18 @@ try {
   // ── a pad stays inside the frame at phone width ──
   // A pad hangs from its button's right edge and opens leftward, and in the
   // stacked tools row the spacer puts that edge wherever the host's actions
-  // leave it — on a phone, ~245px in, under a settings card that wants ~300.
-  // The difference used to hang off the LEFT EDGE of the screen, label column
-  // first, because the card's own ceiling measured the viewport instead of the
-  // room it actually had. Nothing but a real browser at a real width can see
-  // this: it is geometry, and the pose that fixes it is a container query.
+  // leave it — in studio, on a phone, ~245px in, under a settings card that
+  // wants ~300. The difference hung off the LEFT EDGE of the screen, label
+  // column first, because the card's own ceiling measured the viewport instead
+  // of the room it actually had.
+  //
+  // The WORKBENCH's row cannot reproduce that symptom: its actions are one
+  // icon, so its Settings button keeps enough room, and a wide action slotted
+  // in to imitate studio's only wraps to the next line. So the check that
+  // discriminates here is the POSE — below 560 a pad hangs from the strip and
+  // lands on the frame's gutter, which is what makes the symptom unreachable
+  // for any host. The two checks either side of it are the invariant itself,
+  // slack in this host and exact in studio's.
   //
   // The workbench is not a phone shell, so the rail and the panel go first:
   // left up they take the width and the frame measures zero, which would let
@@ -481,7 +488,7 @@ try {
   check(state.frameRect && state.frameRect.width >= 380, `the frame really is phone-wide ${JSON.stringify(state.frameRect)}`);
   await cdp.evaluate(
     `[...${FRAME}.querySelector('mnx-score-frame').shadowRoot.querySelectorAll('.strip.top .btn')]` +
-      ".find(b => b.textContent.includes('Settings')).click()"
+      ".find(b => b.getAttribute('aria-label') === 'Settings').click()"
   );
   await new Promise(resolve => setTimeout(resolve, 400));
   state = await dump();
@@ -497,6 +504,16 @@ try {
   check(
     state.padRect && state.padRect.width >= 240,
     `the card keeps its two-column width on a phone ${JSON.stringify(state.padRect)}`
+  );
+  // The mechanism, not just the symptom: below 560 the pad hangs from the
+  // STRIP, so its right edge lands on the frame's gutter rather than on
+  // whichever button it was docked under. This is the part no host can undo by
+  // putting something wide beside it.
+  check(
+    state.padRect &&
+      state.frameRect &&
+      near(state.padRect.x + state.padRect.width, state.frameRect.x + state.frameRect.width - 8, 2),
+    `the pad hangs from the strip, at the frame's gutter ${JSON.stringify(state.padRect)}`
   );
 
   ws.close();
