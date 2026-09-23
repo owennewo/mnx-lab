@@ -110,6 +110,21 @@ describe('source handoff ownership', () => {
     expect(second.snapshot.needsStart).toBe(true); expect(second.snapshot.alignmentIssue).toBeTruthy(); await second.play(); expect(c.media.plays).toBe(0);
     await second.start(); expect(second.snapshot.alignmentIssue).toBeUndefined(); expect(c.media.plays).toBe(1); second.dispose();
   });
+  it('starts the next source at its own beginning from a synth paused at the start (core-single-cursor)', async () => {
+    // The single cursor parks a fresh piece's synth PAUSED at the first beat; that is the stopped synth's handoff.
+    class Synth extends RecordingBackend { override get snapshot() { return { ...super.snapshot, kind: 'synth' as const }; } }
+    const parked = async (at = pos(0)) => { const s = new Synth('synth', new Media(), performance, map([[0,0],[1,4],[2,8]])); await s.prepare(); await s.seek(at); s.pause(); expect(s.snapshot.state).toBe('paused'); return s; };
+    const b=backend('b'), session=new PlaybackSession(await parked(),()=>b.backend,()=>{});
+    expect(await session.select('b')).toBe(true); expect(b.media.currentTime).toBe(0); expect(b.backend.snapshot.mediaPhase).toBe('pre-roll');
+    session.dispose();
+    const raw=new RecordingBackend('raw',new Media(),performance,null), unsynced=new PlaybackSession(await parked(),()=>raw,()=>{});
+    expect(await unsynced.select('raw')).toBe(true); expect(unsynced.snapshot.needsStart).toBe(false); expect(unsynced.snapshot.alignmentIssue).toBeUndefined();
+    unsynced.dispose();
+    // Anywhere else, the cursor's position is what a paused switch keeps.
+    const later=new RecordingBackend('raw',new Media(),performance,null), moved=new PlaybackSession(await parked(pos(1)),()=>later,()=>{});
+    expect(await moved.select('raw')).toBe(false); expect(moved.snapshot.needsStart).toBe(true);
+    moved.dispose();
+  });
   it('keeps media preparation failures separate from alignment warnings', async () => {
     const a=backend(), b=backend('b');
     b.media.prepare = async () => { throw new Error('Media could not load'); };

@@ -1,4 +1,5 @@
 /** Owns exactly one audible backend, independent of DOM and any media API. */
+import { ZERO, compare } from './time.ts';
 import { boundedRate, type BackendSnapshot, type PlaybackBackend, type PlaybackCapabilities, type ScoreLoop, type ScorePosition } from './playbackBackend.ts';
 class AlignmentUnavailable extends Error {}
 export interface PlaybackSnapshot extends BackendSnapshot {
@@ -52,9 +53,13 @@ export class PlaybackSession {
     catch (error) { this.pause(); this.alignmentIssue = undefined; this.issue = error instanceof Error ? error.message : String(error); this.notify(); return false; }
     if (!this.selecting && !(replace && this.needsStart)) {
       // A stopped synth and a recording still in pre-roll select the new
-      // source at its own beginning. Other live/paused handoffs preserve a
-      // musical position; an actually unmapped recording remains explicit.
-      this.target = (before.state === 'stopped' && before.kind === 'synth') || before.mediaPhase === 'pre-roll'
+      // source at its own beginning — and so does a synth paused on the first
+      // beat, which is where the single cursor parks a piece nobody has played.
+      // Other live/paused handoffs preserve a musical position; an actually
+      // unmapped recording remains explicit.
+      const synthAtStart = before.kind === 'synth' && (before.state === 'stopped'
+        || (before.state === 'paused' && before.scorePosition?.ordinal === 0 && compare(before.scorePosition.metricOffset, ZERO) === 0));
+      this.target = synthAtStart || before.mediaPhase === 'pre-roll'
         ? { position: null, reset: true }
         : { position: before.scorePosition, problem: before.syncIssue };
       this.handoffRate = before.rate; this.handoffVolume = before.volume;

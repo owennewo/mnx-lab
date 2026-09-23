@@ -731,7 +731,8 @@ export class Player extends LitElement {
       // again when it is, because an open last segment runs to the media's end.
       const playing = playingSyncpoints(source, segments => this.barBeats(segments));
       if (playing.segments) { this.appliedSync.set(id, JSON.stringify(playing.syncpoints)); this.derivedFor.delete(id); }
-      const sync = this.document && this.writtenBarDurations
+      // No sync points is a recording without score following, not a sync issue.
+      const sync = playing.syncpoints && this.document && this.writtenBarDurations
         ? createRecordingSync(playing.syncpoints, { performance, writtenBarDurations: this.writtenBarDurations }, linearizePasses(this.document)) : null;
       const media = source.kind === 'audio' ? new HtmlAudioPort(source.media) : new NativeYouTubePort(youtubeVideoId(source.video), async () => {
         // A surrounding score frame supplies a stable mount before iframe creation.
@@ -748,7 +749,7 @@ export class Player extends LitElement {
         return container;
       });
       return new RecordingBackend(id, media, performance, sync?.ok ? sync.value : null,
-        sync && !sync.ok ? sync.diagnostic.message : !sync ? 'Score timing information is unavailable for this recording.' : undefined);
+        sync && !sync.ok ? sync.diagnostic.message : !sync && playing.syncpoints ? 'Score timing information is unavailable for this recording.' : undefined);
     };
     this.session = new PlaybackSession(factory('synth'), factory, () => {
       if (revision !== this.revision || !this.session) return;
