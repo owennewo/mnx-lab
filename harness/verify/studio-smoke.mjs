@@ -182,7 +182,14 @@ try {
   await wait(`${library}?.textContent.includes('Artist:') && ${library}.textContent.includes('Genre:')`);
   await wait(`${library}.querySelector('li .who a')?.textContent.includes('Studio smoke piece') && ${library}.querySelector('li .when').textContent !== ''`);
   await wait(`${library}.querySelector('li .who .artist')?.textContent === 'Synthetic fixture'`);
-  await c.evaluate(`[...${library}.querySelectorAll('.line')].find(l => l.textContent.includes('List:')).click()`);
+  // The way back keeps the library's view (it lives in the URL): the list
+  // filter set before the piece opened is still on. Clear it, then choose it
+  // again from the rail.
+  const listLine = `[...${library}.querySelectorAll('.line')].find(l => l.textContent.includes('List:'))`;
+  await wait(`${listLine}?.textContent.includes('Studio collection')`);
+  await c.evaluate(`${listLine}.click()`);
+  await wait(`${listLine}?.textContent.includes('All')`);
+  await c.evaluate(`${listLine}.click()`);
   await wait(`!!${library}.querySelector('.group')`);
   await c.evaluate(`[...${library}.querySelectorAll('.option')].find(o => o.textContent.includes('Studio collection')).click()`);
   await wait(`[...${library}.querySelectorAll('.line')].some(l => l.textContent.includes('List:') && l.textContent.includes('Studio collection')) && ${library}.querySelector('.chip')?.textContent.includes('Studio collection')`);
@@ -194,7 +201,7 @@ try {
   await c.evaluate(`[...${library}.querySelectorAll('.sort button')].find(b => b.textContent === 'Title').click()`);
   await wait(`${library}.querySelector('.sort button.on').textContent === 'Title' && ${library}.querySelectorAll('li').length === 1`);
   // The alias page lists what the panel set — the reading it corrected.
-  await c.evaluate(`${library}.querySelector('a.foot').click()`);
+  await c.evaluate(`${library}.querySelector('a.foot[href*="aliases"]').click()`);
   await wait(`!!${app}.querySelector('mnx-studio-aliases')?.shadowRoot?.textContent.includes('A synthetic reading')`);
   const aliases = `${app}.querySelector('mnx-studio-aliases').shadowRoot`;
   await c.evaluate(`${aliases}.querySelector('button[aria-label="Remove alias"]').click()`);

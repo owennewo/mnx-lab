@@ -28,7 +28,7 @@ const SMOKES = {
   'recording-studio': { build: 'build', runs: [{ file: 'harness/verify/recording-studio-smoke.mjs' }] },
   'single-cursor': { build: 'build', runs: [{ file: 'harness/verify/single-cursor-smoke.mjs' }] },
   'recording-management': { build: 'build', runs: [{ file: 'harness/verify/recording-management-smoke.mjs' }] },
-  'youtube': { build: 'build', runs: [{ file: 'harness/verify/youtube-smoke.mjs' }] },
+  'youtube': { build: 'build:embed', runs: [{ file: 'harness/verify/youtube-smoke.mjs' }] },
 };
 const ARTIFACTS = {
   build: 'dist/client/workbench/index.html',

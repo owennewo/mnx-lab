@@ -162,13 +162,17 @@ try {
   // The lyric text editor: Shift+L. A clean parse draws live on a scratch copy; nothing is edited until it is applied.
   const lyrics = `${piece}.querySelector('.editor-overlay mnx-editor-surfaces mnx-lyric-text-editor')`;
   const sung = doc => `JSON.stringify(${doc}.parts[0].measures[0].sequences[0].content.map(e => Object.values(e.lyrics?.lines ?? {}).map(l => l.text)).flat())`;
+  // Let the meter section's save land first: the claim below is that the
+  // preview leaves a settled chip alone, and a save still in flight is not settled.
+  await wait(`${chip}.dataset.save === 'clean'`);
   await c.evaluate(`${page}.editor.handleIntent({ type: 'goToLevel', level: 'note' })`);
   await key('KeyL', { shift: true });
   await wait(`!!${lyrics}?.shadowRoot?.querySelector('textarea')`);
   await c.evaluate(`{ const t = ${lyrics}.shadowRoot.querySelector('textarea'); t.value = 'sing song'; t.dispatchEvent(new Event('input')); }`);
   await wait(`${sung(`${piece}.querySelector('mnx-player').document`)} === '["sing","song"]'`);
   assert.equal(await c.evaluate(sung(`${page}.editor.document`)), '[]', 'the preview edited the document');
-  assert.equal(await c.evaluate(`${chip}.dataset.save`), 'clean', 'the preview was told to the save session');
+  const previewSave = await c.evaluate(`${chip}.dataset.save + ' / ' + ${chip}.textContent.trim()`);
+  assert.ok(previewSave.startsWith('clean /'), `the preview was told to the save session: ${previewSave}`);
   await c.evaluate(`${lyrics}.shadowRoot.querySelector('button.apply').click()`);
   await wait(`!${lyrics} && ${sung(`${page}.editor.document`)} === '["sing","song"]'`);
   // One edit, however many syllables: the chip counts history steps (and by now it knows when it last saved).
