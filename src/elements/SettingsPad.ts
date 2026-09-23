@@ -547,6 +547,18 @@ export class SettingsPad extends LitElement {
 
       :host([pinned]) .card {
         position: static;
+        /* The corner pose's viewport clamp is wrong here. There the card hangs
+           off the score pane's top-right corner, where the viewport really is
+           the space to its left; docked under a host's button it is not, and
+           on a phone the difference ran the label column off the screen. The
+           host owns the measurement in this pose and passes it down. */
+        max-width: var(--pad-max-width, none);
+        /* Right-aligned when the host gives the card more room than it needs,
+           so it still lands under the button's edge — the zoom pad's own
+           margin-left: auto, which this pose had no equivalent of. A no-op
+           where the host's box shrink-wraps the card, which is every pose but
+           the narrow one. */
+        margin-left: auto;
       }
 
       :host([pinned]) button.gear {
@@ -624,6 +636,7 @@ export class SettingsPad extends LitElement {
         z-index: 4;
         box-sizing: border-box;
         width: max-content;
+        /* The CORNER pose's ceiling only — see the pinned override below. */
         max-width: calc(100vw - 110px);
         background: var(--surface);
         border: var(--rule-w) solid var(--ink);

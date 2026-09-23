@@ -42,7 +42,9 @@ import { DEFAULT_SPACE_SP, DEFAULT_SPACING_MODE, DEFAULT_STAFF_SP } from './zoom
  * 2026-09-15 for the one mark: the strips no longer have a reduced form.
  *
  * Below ~1000px of pane the tools row wraps to its stacked form; a phone and
- * the workbench's pane beside its rail and side panel both hit it.
+ * the workbench's pane beside its rail and side panel both hit it. Below 560px
+ * an open pad stops hanging from its button and spans the strip instead — see
+ * the narrow pose beside `.popover`.
  *
  * ONE ELEMENT, TWO HOSTS. Studio mounts it on the piece page; the workbench on
  * the scenario page's score pane. Every value the frame shows comes in as a
@@ -561,6 +563,38 @@ export class ScoreFrame extends LitElement {
         top: calc(100% + 8px);
         right: 0;
         z-index: 5;
+        /* The ceiling a pad sizes itself under. The pads are max-content and
+           know nothing about the strip they were docked into, so the frame —
+           the element that IS the container — says how much room there is. */
+        --pad-max-width: calc(100cqw - 16px);
+      }
+
+      /* ── the pad's narrow pose ──
+         A pad hangs from its button's right edge and opens leftward. In the
+         stacked tools row the spacer pushes the buttons right, so how much
+         room a pad has is set by the host's actions beside it, not by the
+         frame: on a phone the settings card wants ~300px and gets ~245px, and
+         the difference walked off the LEFT EDGE of the screen, taking the
+         first column of every row label with it. (The card's own clamp could
+         not catch it: 100vw is the right measurement in the corner pose it
+         was cut for, where the card hangs off the pane's corner, and the wrong
+         one under a button mid-strip.)
+         Below the width where that can happen, the pad stops hanging from its
+         button and hangs from the STRIP: the anchor gives up being the
+         containing block, and the popover spans the strip between the gutters.
+         "top" still resolves to just under the row, the score below stays
+         visible — which is the whole point of a card you watch the score
+         through — and the click-away path is untouched, because the popover is
+         still the anchor's child in the DOM. */
+      @container (max-width: 560px) {
+        .anchor {
+          position: static;
+        }
+
+        .popover {
+          left: 8px;
+          right: 8px;
+        }
       }
 
       /* A host's side panel (studio's Instruments sheet): in flow beside the

@@ -1,4 +1,7 @@
-// Document focus mode in a real browser.
+// Document focus mode in a real browser, and the frame chrome's geometry with
+// it — the pads' narrow pose rides along at the end, because it is the same
+// kind of claim (a box lands where it should) and the same fixture already
+// has a frame with its buttons in it.
 //
 // This is intentionally a smoke test rather than a DOM-shim unit: the contract
 // is geometric (one main surface owns the viewport), the viewer repacks through
@@ -172,6 +175,10 @@ const DUMP = `(() => {
     playDisabled: playButton?.disabled ?? null,
     zoom: !!zoomPad,
     zoomPinned: zoomPad?.hasAttribute('pinned') ?? false,
+    // The open pad's CARD, not the popover that holds it: in the narrow pose
+    // the popover is the strip's width by design, so measuring it would prove
+    // nothing about the card that overflowed.
+    padRect: rect(frameRoot?.querySelector('.popover > *')?.shadowRoot?.querySelector('.card, .pad')),
     zoomFocus: !!zoomFocus,
     zoomValue: viewer?.zoom ?? null,
     spaceValue: viewer?.densityH ?? null,
@@ -443,6 +450,54 @@ try {
   await new Promise(resolve => setTimeout(resolve, 700));
   state = await dump();
   check(!state.appFocus && state.header && state.nav, 'leaving scenario routes exits document focus');
+
+  // ── a pad stays inside the frame at phone width ──
+  // A pad hangs from its button's right edge and opens leftward, and in the
+  // stacked tools row the spacer puts that edge wherever the host's actions
+  // leave it — on a phone, ~245px in, under a settings card that wants ~300.
+  // The difference used to hang off the LEFT EDGE of the screen, label column
+  // first, because the card's own ceiling measured the viewport instead of the
+  // room it actually had. Nothing but a real browser at a real width can see
+  // this: it is geometry, and the pose that fixes it is a container query.
+  //
+  // The workbench is not a phone shell, so the rail and the panel go first:
+  // left up they take the width and the frame measures zero, which would let
+  // the check below pass on nothing at all. The assertion on the frame's own
+  // width is there to make that impossible.
+  await cdp.evaluate("location.hash='#/scenario/lab/document/navigation-playground'");
+  await new Promise(resolve => setTimeout(resolve, 900));
+  await cdp.send('Emulation.setDeviceMetricsOverride', {
+    width: 412,
+    height: 915,
+    deviceScaleFactor: 1,
+    mobile: false
+  });
+  await new Promise(resolve => setTimeout(resolve, 900));
+  state = await dump();
+  if (state.railPreference !== '1') await press('b', 'KeyB', 66, 2);
+  if (state.panelPreference !== '1') await press('b', 'KeyB', 66, 3);
+  await new Promise(resolve => setTimeout(resolve, 600));
+  state = await dump();
+  check(state.frameRect && state.frameRect.width >= 380, `the frame really is phone-wide ${JSON.stringify(state.frameRect)}`);
+  await cdp.evaluate(
+    `[...${FRAME}.querySelector('mnx-score-frame').shadowRoot.querySelectorAll('.strip.top .btn')]` +
+      ".find(b => b.textContent.includes('Settings')).click()"
+  );
+  await new Promise(resolve => setTimeout(resolve, 400));
+  state = await dump();
+  check(
+    state.padRect &&
+      state.frameRect &&
+      state.padRect.x >= state.frameRect.x &&
+      state.padRect.x + state.padRect.width <= state.frameRect.x + state.frameRect.width,
+    `the open settings card stays inside the frame at phone width ${JSON.stringify({ pad: state.padRect, frame: state.frameRect })}`
+  );
+  // And it is still the card, not a column of it: a fix that squeezed the
+  // two-column grid until it fitted would pass the check above.
+  check(
+    state.padRect && state.padRect.width >= 240,
+    `the card keeps its two-column width on a phone ${JSON.stringify(state.padRect)}`
+  );
 
   ws.close();
   if (failures) process.exitCode = 1;
