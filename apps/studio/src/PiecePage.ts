@@ -150,6 +150,34 @@ export class PiecePage extends LitElement {
   /** Whether the reader left the score focused (the frame's strips hidden) — a per-browser preference. */
   @state() private focused = readFocused();
   @query('mnx-document-viewer') private viewer!: DocumentViewer;
+
+  /**
+   * What the frame prints for STAFF, and which of the three it may offer.
+   *
+   * These are the VIEWER's answers about the viewer's own state, so they are
+   * read back after it has updated and never during this page's render. A
+   * render that asks mid-flight asks the version being replaced: choosing Tab
+   * in the settings card redrew the score as tab, stored the preference and
+   * left the card's STAFF row saying "Both" until something else happened to
+   * re-render this page. The score was right and only the label lied, which is
+   * why it survived so long.
+   *
+   * The workbench never had this — it resolves the view from its own state
+   * (`ScenarioPage.activeView`). Studio asks the element instead, which is one
+   * source of truth rather than a third copy of `tabCapable`, at the price of
+   * having to ask at a moment when the element is telling the truth.
+   */
+  @state() private resolvedView: ViewMode = 'notation';
+  @state() private offeredViews: ViewMode[] = ['notation'];
+
+  private syncViewerViews() {
+    const resolved = this.viewer?.resolvedView() ?? 'notation';
+    const offered = this.viewer?.availableViews() ?? ['notation'];
+    if (resolved !== this.resolvedView) this.resolvedView = resolved;
+    // By content, not identity: availableViews() builds a fresh array every
+    // call, so an identity check would set state on every update forever.
+    if (offered.join() !== this.offeredViews.join()) this.offeredViews = offered;
+  }
   @query('mnx-player') private player!: Player;
   private binding: ReturnType<typeof bindPlayback> | null = null;
   private generation = 0;
@@ -348,6 +376,7 @@ export class PiecePage extends LitElement {
     // The pane, the lock or an older version on screen changed what the keys may do and where the cursor may show.
     if (this.editor && (changed.has('view') || changed.has('viewing') || changed.has('readOnly')))
       void this.viewer?.updateComplete.then(() => this.editor?.refresh());
+    this.syncViewerViews();
   }
 
   private async load() {
@@ -950,14 +979,12 @@ export class PiecePage extends LitElement {
     const sourceLabel = `Source · ${activeRecording?.name ?? (this.snapshot && !this.recordings.length ? 'Synth · add a recording' : 'Synth')}`;
     const instrumentsLabel = `Instruments · ${this.doc?.mnxJson.parts.length ?? 0}`;
     const playable = this.snapshot?.recordings.filter(r => this.recordings.some(s => s.id === r.id)) ?? [];
-    // The viewer is queried, not stored: before the first render there is none.
-    const viewer = this.viewer as DocumentViewer | null;
     return html`
       <mnx-score-frame
         .heading=${title}
         .subheading=${artist}
-        .view=${viewer?.resolvedView() ?? 'notation'}
-        .views=${viewer?.availableViews() ?? ['notation']}
+        .view=${this.resolvedView}
+        .views=${this.offeredViews}
         .display=${this.display}
         .unrolled=${this.unrolled}
         .theme=${this.theme}
