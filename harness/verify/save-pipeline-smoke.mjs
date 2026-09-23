@@ -1,7 +1,6 @@
 // Editing and saving in a real browser against the local Worker/D1/R2
-// (roadmap/complete/studio-save-pipeline.md). Same preconditions as
-// studio-smoke.mjs: local auth (docs/library-access.md → Local development) and
-// wrangler dev serving dist/client on LIBRARY_LOCAL_ORIGIN.
+// (roadmap/complete/studio-save-pipeline.md). Its own private
+// library, like studio-smoke.mjs; it needs only `npm run build`.
 //
 // What only a browser can show: the Details sheet editing the document, the
 // chip, the IndexedDB recovery record surviving a reload ("the crash"), the
@@ -12,10 +11,9 @@ import { spawn } from 'node:child_process';
 import { once } from 'node:events';
 import assert from 'node:assert/strict';
 import { devtoolsPort, connect, client } from './browserHarness.mjs';
-const root = new URL('../../', import.meta.url);
-const origin = process.env.LIBRARY_LOCAL_ORIGIN ?? 'http://127.0.0.1:8791';
-if (!['localhost','127.0.0.1'].includes(new URL(origin).hostname)) throw new Error('Smoke must target loopback only');
-const session = JSON.parse(await fs.readFile(new URL('.secrets/local-library-session.json',root)));
+import { startLocalLibrary } from './localLibrary.mjs';
+const library = await startLocalLibrary();
+const { origin, session } = library;
 const api = async (path, init = {}) => fetch(`${origin}/api/library${path}`, { ...init, headers: { 'Cf-Access-Jwt-Assertion': session.browser, ...(init.headers ?? {}) } });
 const stamp = Date.now(); const title = `Save smoke ${stamp}`;
 const profile = await fs.mkdtemp('/tmp/mnx-save-pipeline-browser-');
@@ -173,4 +171,4 @@ try {
   assert.equal(await c.evaluate(`${chip}.dataset.save`), 'clean', 'old save changed the new piece save state');
   console.log(`Save-pipeline smoke passed: ${pieceId} edited in the Edit piece panel; the unsaved edit recovered from IndexedDB after a reload; Save now → an edit rendition with a 'clean' check and the tags following; undo back to clean; a named version; and another device's save met as a conflict, kept as copy ${copyId}.`);
   if (c.logs.length) throw new Error('Browser console errors: '+c.logs.join('\n'));
-} finally { ws?.close(); chrome.kill(); await once(chrome,'exit'); await fs.rm(profile,{recursive:true,force:true,maxRetries:10,retryDelay:200}); }
+} finally { ws?.close(); chrome.kill(); await once(chrome,'exit'); await fs.rm(profile,{recursive:true,force:true,maxRetries:10,retryDelay:200}); await library.close(); }

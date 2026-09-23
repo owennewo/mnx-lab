@@ -7,14 +7,15 @@ import { spawn, execFileSync } from 'node:child_process';
 import { once } from 'node:events';
 import { createHash } from 'node:crypto';
 import { devtoolsPort, connect, client, waitFor } from './browserHarness.mjs';
+import { startLocalLibrary } from './localLibrary.mjs';
 import { serveStatic } from './staticServer.mjs';
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const output = path.resolve(process.env.MUSICXML_CAPTURE_DIR ?? '/tmp/mnx-musicxml-editor-captures');
 const shell = process.env.MUSICXML_CAPTURE_SHELL ?? 'workbench';
 if (!['workbench', 'studio'].includes(shell)) throw new Error('Unknown shell');
-const origin = process.env.LIBRARY_LOCAL_ORIGIN ?? 'http://127.0.0.1:8797';
-if (!['localhost','127.0.0.1'].includes(new URL(origin).hostname)) throw new Error('Studio capture is loopback only');
-const session = shell === 'studio' ? JSON.parse(await fs.readFile(path.join(root,'.secrets/local-library-session.json'))) : null;
+const library = shell === 'studio' ? await startLocalLibrary() : null;
+const origin = library?.origin;
+const session = library?.session ?? null;
 const filter = process.env.MUSICXML_CAPTURE_FILTER;
 const showMeters = process.env.MUSICXML_CAPTURE_TIME_SIGNATURES === 'show';
 const manifest = JSON.parse(await fs.readFile(path.join(root, 'converters/fixtures/musicxml-suite/manifest.json')));
@@ -70,7 +71,7 @@ try {
         document = await c.evaluate(`${app}.localDocument.document`);
       } else {
         const id = 'MusicXmlAssessment-' + fixture.sha256.slice(0,16);
-        const headers = {Authorization:'Bearer local-development-only','Cf-Access-Jwt-Assertion':session.machine};
+        const headers = {Authorization:`Bearer ${library.writeToken}`,'Cf-Access-Jwt-Assertion':session.machine};
         const before = await fetch(origin+'/api/library/ingest/'+encodeURIComponent(id),{headers});
         if(!before.ok)throw new Error('Local ingest lookup HTTP '+before.status);
         const {snapshot}=await before.json();
@@ -177,7 +178,7 @@ try {
     }
   }
 } finally {
-  ws?.close(); chrome.kill(); site?.server.close();
+  ws?.close(); chrome.kill(); site?.server.close(); await library?.close();
   // Chrome may still flush the profile; cleanup must not mask a capture error.
   try { await fs.rm(profile,{recursive:true,force:true,maxRetries:3,retryDelay:100}); } catch {}
 }

@@ -81,15 +81,18 @@ within fifteen minutes of expiry, sets the loopback `CF_Authorization` cookie fr
 client asking for a loopback host — the two conditions under which the Worker honours the
 local issuer — and trusts no header: it hands out the same cookie the file already holds.
 
-For the built browser smoke start `npx wrangler dev --config wrangler.jsonc --assets dist/client --port 8791 --local-upstream localhost`. Wrangler otherwise rewrites the request hostname to the production route, which correctly rejects local identities. A browser test sets its loopback-only
+The browser smokes do not use any of this: each starts a private library of its own
+([browser-smokes.md](browser-smokes.md)). Should you serve the built site by hand, pass
+`--local-upstream localhost` — wrangler otherwise rewrites the request hostname to the
+production route, which correctly rejects local identities. A browser sets its loopback-only
 `CF_Authorization` cookie from the file's `browser` field; a local ingest request sends
 its `machine` field as `Cf-Access-Jwt-Assertion` alongside the local write token (the ingest CLI supports `--local-session-file .secrets/local-library-session.json --endpoint http://localhost:8791`). Local
 trust requires both the special configured issuer and a loopback URL; it cannot be used
 against deployed hostnames. No development identity header is trusted.
 
 Local logout is `/__local-logout`; production logout is handled by Access.
-`node harness/verify/studio-smoke.mjs` drives the built studio face against the same local
-setup (root redirect, signed-out page, library list and filter, piece view with player,
+`node harness/verify/studio-smoke.mjs` drives the built studio face against its own
+private library (root redirect, signed-out page, library list and filter, piece view with player,
 missing piece), the studio counterpart of `library-smoke.mjs`.
 Never deploy `.dev.vars`, `LIBRARY_LOCAL_JWKS` or anything under `.secrets/`. Do not copy private scores into public
 assets for testing. The harness uses synthetic scores with local D1/R2 and signed keys.

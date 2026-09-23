@@ -7,12 +7,13 @@ import { once } from 'node:events';
 import { createHash } from 'node:crypto';
 import assert from 'node:assert/strict';
 import { devtoolsPort, connect, client, waitFor } from './browserHarness.mjs';
+import { startLocalLibrary } from './localLibrary.mjs';
 const root = fileURLToPath(new URL('../../', import.meta.url));
-const origin = process.env.LIBRARY_LOCAL_ORIGIN ?? 'http://127.0.0.1:8797';
-if (!['localhost', '127.0.0.1'].includes(new URL(origin).hostname)) throw new Error('Local-only probe');
+const library = await startLocalLibrary();
+const { origin } = library;
 const out = process.env.MUSICXML_WRITE_DIR ?? '/tmp/mnx-musicxml-studio-write'; await fs.mkdir(out, { recursive: true });
-const auth = JSON.parse(await fs.readFile(path.join(root, '.secrets/local-library-session.json')));
-const headers = { Authorization: 'Bearer local-development-only', 'Cf-Access-Jwt-Assertion': auth.machine };
+const auth = library.session;
+const headers = { Authorization: `Bearer ${library.writeToken}`, 'Cf-Access-Jwt-Assertion': auth.machine };
 const hash = b => createHash('sha256').update(b).digest('hex');
 const fixture = '01a-Pitches-Pitches';
 const bytes = await fs.readFile(path.join(root, `converters/fixtures/musicxml-suite/xmlFiles/${fixture}.musicxml`));
@@ -120,5 +121,5 @@ try {
   await shot('metadata-editor'); report.metadataEditorReachable = true;
   report.consoleErrors=c.logs; assert.deepEqual(c.logs,[]); report.result='passed';
 } catch(error) { report.error=error.stack; process.exitCode=1; }
-finally { await fs.writeFile(path.join(out,'report.json'),JSON.stringify(report,null,2)+'\n'); ws?.close(); chrome.kill(); await once(chrome,'exit'); await fs.rm(profile,{recursive:true,force:true,maxRetries:5,retryDelay:100}); }
+finally { await fs.writeFile(path.join(out,'report.json'),JSON.stringify(report,null,2)+'\n'); ws?.close(); chrome.kill(); await once(chrome,'exit'); await fs.rm(profile,{recursive:true,force:true,maxRetries:5,retryDelay:100}); await library.close(); }
 console.log(JSON.stringify(report,null,2));

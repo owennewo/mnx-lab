@@ -1,7 +1,6 @@
 // A piece's life in a real browser against the local Worker/D1/R2
-// (roadmap/complete/studio-piece-lifecycle.md). Same preconditions as
-// studio-smoke.mjs: local auth (docs/library-access.md → Local development) and
-// wrangler dev serving dist/client on LIBRARY_LOCAL_ORIGIN, migrations applied.
+// (roadmap/complete/studio-piece-lifecycle.md). Its own private
+// library, like studio-smoke.mjs; it needs only `npm run build`.
 //
 // Versions listed from the saves the service kept; an older one looked at
 // without anything changing; made current by a pointer move; the piece deleted,
@@ -11,10 +10,9 @@ import { spawn } from 'node:child_process';
 import { once } from 'node:events';
 import assert from 'node:assert/strict';
 import { devtoolsPort, connect, client } from './browserHarness.mjs';
-const root = new URL('../../', import.meta.url);
-const origin = process.env.LIBRARY_LOCAL_ORIGIN ?? 'http://127.0.0.1:8791';
-if (!['localhost','127.0.0.1'].includes(new URL(origin).hostname)) throw new Error('Smoke must target loopback only');
-const session = JSON.parse(await fs.readFile(new URL('.secrets/local-library-session.json',root)));
+import { startLocalLibrary } from './localLibrary.mjs';
+const library = await startLocalLibrary();
+const { origin, session } = library;
 const api = async (path, init = {}) => fetch(`${origin}/api/library${path}`, { ...init, headers: { 'Cf-Access-Jwt-Assertion': session.browser, ...(init.headers ?? {}) } });
 const title = `Life smoke ${Date.now()}`;
 const profile = await fs.mkdtemp('/tmp/mnx-piece-lifecycle-browser-');
@@ -122,4 +120,4 @@ try {
   assert.equal((await snapshot(pieceId)).renditions.length, 4);
   console.log(`Piece-lifecycle smoke passed: ${pieceId} — three versions listed, the first looked at with nothing written, made current by a pointer move (tags following, the next edit derived from it), deleted with the library's undo, deleted again and restored from #/deleted with all four renditions.`);
   if (c.logs.length) throw new Error('Browser console errors: '+c.logs.join('\n'));
-} finally { ws?.close(); chrome.kill(); await once(chrome,'exit'); await fs.rm(profile,{recursive:true,force:true,maxRetries:10,retryDelay:200}); }
+} finally { ws?.close(); chrome.kill(); await once(chrome,'exit'); await fs.rm(profile,{recursive:true,force:true,maxRetries:10,retryDelay:200}); await library.close(); }

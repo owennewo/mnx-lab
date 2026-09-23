@@ -1,6 +1,6 @@
 // Writing notes in Studio, in a real browser against the local Worker/D1/R2
 // (roadmap/complete/core-editor-element-promotion.md, slice 1 — keyboard only).
-// Same preconditions as studio-smoke.mjs. Real key events through the DevTools
+// Its own private library, like studio-smoke.mjs. Real key events through the DevTools
 // protocol, because the point is who hears them: the editor's listener is on the
 // viewer, so keys typed into a text field must not reach it.
 import fs from 'node:fs/promises';
@@ -8,10 +8,9 @@ import { spawn } from 'node:child_process';
 import { once } from 'node:events';
 import assert from 'node:assert/strict';
 import { devtoolsPort, connect, client } from './browserHarness.mjs';
-const root = new URL('../../', import.meta.url);
-const origin = process.env.LIBRARY_LOCAL_ORIGIN ?? 'http://127.0.0.1:8791';
-if (!['localhost','127.0.0.1'].includes(new URL(origin).hostname)) throw new Error('Smoke must target loopback only');
-const session = JSON.parse(await fs.readFile(new URL('.secrets/local-library-session.json',root)));
+import { startLocalLibrary } from './localLibrary.mjs';
+const library = await startLocalLibrary();
+const { origin, session } = library;
 const api = async path => fetch(`${origin}/api/library${path}`, { headers: { 'Cf-Access-Jwt-Assertion': session.browser } });
 const title = `Editor smoke ${Date.now()}`;
 const profile = await fs.mkdtemp('/tmp/mnx-studio-editor-browser-');
@@ -209,4 +208,4 @@ try {
   assert.equal(await c.evaluate(sung(`${piece}.querySelector('mnx-player').document`)), '["sing","song"]', 'the lyrics did not survive the stored .gp');
   console.log(`Studio editor smoke passed: ${pieceId} — a dimmed cursor made live by focus, fret 3 and a two-digit fret 12 entered from the keyboard, Ctrl+Z / Ctrl+Y, one undo history across notes and the Edit piece panel, a text field keeping its own keys, a Keys sheet of what is bound here, the rung inspector opened with Enter and a meter typed into it, lyrics previewed then applied from the text editor, a note copied and pasted, Escape and back, a bar added saved at once (${saved.check.verdict}), and the notes read back from the stored .gp after a reload.`);
   if (c.logs.length) throw new Error('Browser console errors: '+c.logs.join('\n'));
-} finally { ws?.close(); chrome.kill(); await once(chrome,'exit'); await fs.rm(profile,{recursive:true,force:true,maxRetries:10,retryDelay:200}); }
+} finally { ws?.close(); chrome.kill(); await once(chrome,'exit'); await fs.rm(profile,{recursive:true,force:true,maxRetries:10,retryDelay:200}); await library.close(); }

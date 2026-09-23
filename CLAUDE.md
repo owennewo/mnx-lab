@@ -95,12 +95,13 @@ agent their next rebase.
 it is abandoned, superseded, or turns out to be a no-op, whichever comes first.
 
 ```bash
-git -C ~/dev/mnx-lab worktree remove ~/dev/mnx-labs-worktrees/<task>
-git -C ~/dev/mnx-lab branch -d <task>       # -d, not -D — it must already be merged
-git -C ~/dev/mnx-lab worktree prune
+cd ~/dev/mnx-lab && npm run worktree:retire -- <task>
 ```
 
-A refusal is information: a dirty tree means go look at what is uncommitted before
+It first stops everything still running from the worktree (a dev server, a smoke's
+workerd — which ignores SIGTERM and would otherwise hold its port long after the tree is
+gone), then runs `git worktree remove`, `branch -d` (not `-D` — it must already be
+merged) and `worktree prune`, and stops at git's first refusal. A refusal is information: a dirty tree means go look at what is uncommitted before
 reaching for `--force`; `branch -d` refusing means the work is not on `main` yet.
 **Removal comes *before* the roadmap doc moves to `complete/`** — an item is not complete
 while its worktree is still on disk.
@@ -387,9 +388,8 @@ output names refuse to overwrite).
   than facts about the code, and every one has cost a debugging session: a glyph's box is
   its whole em square, navigating to the same `#fragment` does not reload, scrolling
   detaches a held node, and a throw from `finally` replaces the failure being reported —
-  [docs/browser-smokes.md](docs/browser-smokes.md). Those that need the library want
-  `npm run dev:login` and `wrangler dev` on a free port
-  ([docs/library-access.md](docs/library-access.md) → Local development).
+  [docs/browser-smokes.md](docs/browser-smokes.md). Those that need the library bring
+  their own (`harness/verify/localLibrary.mjs`): **never start `wrangler dev` for a smoke.**
 - `dist/` is gitignored build output. The scratch site for proposal verification comes
   from `makesite` in the worktree, not from this repo.
 - **Git**: one worktree per agent, rebase, `--ff-only` self-merge to `main`, worktree

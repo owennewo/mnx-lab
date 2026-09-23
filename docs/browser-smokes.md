@@ -28,10 +28,19 @@ faces first or let the runner do it. Direct `node harness/verify/<name>-smoke.mj
 invocations also reuse the current build. The audio smoke uses its own Vite server
 and needs no production build.
 
-Browser smokes need `google-chrome` on PATH, or `CHROME_BIN`. Those using the library
-still need `npm run dev:login` and `wrangler dev` on a free port
-([library-access.md](library-access.md) → Local development); the runner does not start
-or seed that service. Their file headers describe additional requirements.
+Browser smokes need `google-chrome` on PATH, or `CHROME_BIN`. Their file headers
+describe additional requirements.
+
+Those using the library start their own with `startLocalLibrary()`
+(`harness/verify/localLibrary.mjs`): wrangler's dev server run **in-process** — the same
+`wrangler.jsonc`, `dist/client` assets, `_headers` and Worker as `wrangler dev` — on a
+free port, over a throwaway D1/R2 seeded with the migrations and the local user, trusting
+a key made for that run. It is up in about a second and needs no `dev:login`, no
+`.secrets/`, and no server started by hand; no fixed port can collide and no worktree's
+database is written. `close()` belongs in the smoke's `finally`. A smoke killed before it
+gets there (SIGKILL, a tool timeout) is covered by `harness/verify/reaper.mjs`, a
+detached watcher that SIGKILLs the dead smoke's Chrome and workerd; the next start sweeps
+its temp state.
 
 ## The traps
 

@@ -23,6 +23,7 @@
   "scripts": {
     "dev": "NODE_OPTIONS=--disable-warning=DEP0040 vite",
     "dev:login": "node tools/library-local-auth.mjs --seed",
+    "worktree:retire": "node tools/worktree-retire.mjs",
     "build": "npm run compile-validator && npm run check:boundaries && tsc && tsc -p worker && vite build",
     "build:lib": "vite build -c vite.lib.config.ts",
     "build:embed": "vite build -c vite.embed.config.ts",

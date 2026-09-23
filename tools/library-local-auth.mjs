@@ -20,7 +20,9 @@ import { fileURLToPath } from 'node:url';
 export const LOCAL_EMAIL = 'local@example.test';
 export const LOCAL_USER_ID = 'operator';
 export const SESSION_HOURS = 8;
-const VARS = {
+/** The ingest bearer token `.dev.vars` starts with; local only. */
+export const LOCAL_WRITE_TOKEN = 'local-development-only';
+export const VARS = {
   LIBRARY_ACCESS_ISSUER: 'urn:mnx-library-local',
   LIBRARY_ACCESS_AUD: 'local-browser',
   LIBRARY_INGEST_AUD: 'local-machine',
@@ -52,7 +54,7 @@ async function signingKey(root) {
 async function ensureDevVars(root, publicJwk) {
   const file = new URL('.dev.vars', root);
   const vars = { ...VARS, LIBRARY_LOCAL_JWKS: JSON.stringify({ keys: [publicJwk] }) };
-  const before = await readFile(file, 'utf8').catch(() => 'LIBRARY_WRITE_TOKEN=local-development-only\n');
+  const before = await readFile(file, 'utf8').catch(() => `LIBRARY_WRITE_TOKEN=${LOCAL_WRITE_TOKEN}\n`);
   const valueOf = (key) => {
     const line = before.match(new RegExp(`^${key}=(.*)$`, 'm'))?.[1];
     return line === undefined ? undefined : line.replace(/^'(.*)'$/, '$1');
@@ -78,11 +80,9 @@ export async function localSessionExpiry(root = new URL('../', import.meta.url))
   }
 }
 
-/** Sign fresh local sessions; says whether .dev.vars changed (a new key —
- *  the running dev server must restart to trust it). */
-export async function renewLocalSessions(root = new URL('../', import.meta.url)) {
-  const { privateKey, publicJwk, created } = await signingKey(root);
-  const varsChanged = await ensureDevVars(root, publicJwk);
+/** A browser and a machine token for the local user, signed with `privateKey`
+ *  (kid `local`). The smokes' private library signs with a key of its own. */
+export async function signLocalSessions(privateKey) {
   const sign = (machine) =>
     new SignJWT({ type: 'app', ...(machine ? { common_name: VARS.LIBRARY_INGEST_CLIENT_ID } : { email: LOCAL_EMAIL }) })
       .setProtectedHeader({ alg: 'RS256', kid: 'local' })
@@ -92,7 +92,15 @@ export async function renewLocalSessions(root = new URL('../', import.meta.url))
       .setIssuedAt()
       .setExpirationTime(`${SESSION_HOURS}h`)
       .sign(privateKey);
-  const session = { browser: await sign(false), machine: await sign(true) };
+  return { browser: await sign(false), machine: await sign(true) };
+}
+
+/** Sign fresh local sessions; says whether .dev.vars changed (a new key —
+ *  the running dev server must restart to trust it). */
+export async function renewLocalSessions(root = new URL('../', import.meta.url)) {
+  const { privateKey, publicJwk, created } = await signingKey(root);
+  const varsChanged = await ensureDevVars(root, publicJwk);
+  const session = await signLocalSessions(privateKey);
   await mkdir(new URL('.secrets/', root), { mode: 0o700, recursive: true });
   const file = new URL('.secrets/local-library-session.json', root);
   await writeFile(file, JSON.stringify(session), { mode: 0o600 });
@@ -109,8 +117,12 @@ export function seedLocalUser(root = new URL('../', import.meta.url)) {
     if (result.status !== 0) throw new Error(`wrangler ${args.slice(0, 3).join(' ')} failed`);
   };
   run(['d1', 'migrations', 'apply', 'LIBRARY_DB', '--local']);
-  const insert = `INSERT OR IGNORE INTO users (id, email, active, created_at) VALUES ('${LOCAL_USER_ID}', '${LOCAL_EMAIL}', 1, '${new Date().toISOString()}')`;
-  run(['d1', 'execute', 'LIBRARY_DB', '--local', '--command', insert]);
+  run(['d1', 'execute', 'LIBRARY_DB', '--local', '--command', localUserInsert()]);
+}
+
+/** The statement that makes the local user exist. */
+export function localUserInsert() {
+  return `INSERT OR IGNORE INTO users (id, email, active, created_at) VALUES ('${LOCAL_USER_ID}', '${LOCAL_EMAIL}', 1, '${new Date().toISOString()}')`;
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {

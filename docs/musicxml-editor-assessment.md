@@ -144,22 +144,17 @@ leave it unset for the full 183. `MUSICXML_CAPTURE_DIR` selects an artifact dire
 `MUSICXML_CAPTURE_TIME_SIGNATURES=show` drives the real display control before capture.
 The scripts never write scenario statuses. Each shell needs its own capture directory.
 
-For Studio, follow [local library setup](library-access.md), then in separate terminals:
+For Studio, after `npm run build` (each script starts its own private library —
+[browser-smokes.md](browser-smokes.md)):
 
 ```sh
-npm run dev:login
-npx wrangler dev --config wrangler.jsonc --assets dist/client --port 8797 --local --local-upstream localhost
+MUSICXML_CAPTURE_SHELL=studio MUSICXML_CAPTURE_DIR=/tmp/mnx-musicxml-studio-captures node harness/verify/musicxml-editor-capture.mjs
+node harness/verify/studio-editor-smoke.mjs
 ```
 
-```sh
-LIBRARY_LOCAL_ORIGIN=http://127.0.0.1:8797 MUSICXML_CAPTURE_SHELL=studio MUSICXML_CAPTURE_DIR=/tmp/mnx-musicxml-studio-captures node harness/verify/musicxml-editor-capture.mjs
-LIBRARY_LOCAL_ORIGIN=http://127.0.0.1:8797 node harness/verify/studio-editor-smoke.mjs
-```
-
-Studio captures enforce loopback and use ignored local credentials/database files. Use a
-fresh task-local library state for an identical starting point. This creates synthetic
-local pieces; no production data is touched. The worktree can be retired after landing:
-committed evidence and `/tmp` captures remain, while local service state is disposable.
+Every run starts from an empty library, so starting points are identical; its synthetic
+pieces vanish with the run and no production data is touched. Committed evidence and
+`/tmp` captures remain.
 
 ## Remaining assessment work
 

@@ -1,21 +1,21 @@
 // Studio in a real browser against the local Worker/D1/R2 — the studio-shell
-// counterpart of library-smoke.mjs, with the same preconditions: local auth
-// set up (docs/library-access.md → Local development) and wrangler dev on
-// 8791 serving dist/client. In dev there is no Access gate, so the signed-out
-// page is what an unauthenticated visit reaches; behind the gate it cannot.
+// counterpart of library-smoke.mjs. It brings its own private library
+// (localLibrary.mjs); it needs only `npm run build`. In dev there is no Access
+// gate, so the signed-out page is what an unauthenticated visit reaches;
+// behind the gate it cannot.
 import fs from 'node:fs/promises';
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
 import assert from 'node:assert/strict';
 import { devtoolsPort, connect, client } from './browserHarness.mjs';
+import { startLocalLibrary } from './localLibrary.mjs';
 const root = new URL('../../', import.meta.url);
-const origin = process.env.LIBRARY_LOCAL_ORIGIN ?? 'http://127.0.0.1:8791';
-if (!['localhost','127.0.0.1'].includes(new URL(origin).hostname)) throw new Error('Smoke must target loopback only');
-const session = JSON.parse(await fs.readFile(new URL('.secrets/local-library-session.json',root)));
+const library = await startLocalLibrary();
+const { origin, session } = library;
 // The service stores the SOURCE — a real .gp — and the browser converts it.
 const bytes = new Uint8Array(await fs.readFile(new URL('converters/fixtures/Sun-did-glide.gp', root)));
 const sha256 = Buffer.from(await crypto.subtle.digest('SHA-256', bytes)).toString('hex');
-const headers = { Authorization: 'Bearer local-development-only', 'Cf-Access-Jwt-Assertion': session.machine };
+const headers = { Authorization: `Bearer ${library.writeToken}`, 'Cf-Access-Jwt-Assertion': session.machine };
 const before = await fetch(origin + '/api/library/ingest/StudioSmoke', { headers }); assert.equal(before.status,200);
 const { snapshot } = await before.json();
 const manifest = { expected_revision: snapshot?.piece.revision ?? null,
@@ -205,4 +205,4 @@ try {
   assert.equal(await c.evaluate(`Object.values(localStorage).some(v=>v.includes('Studio smoke piece') || v.includes('local@example.test'))`),false);
   console.log('Studio smoke passed: root redirect, signed-out page, library list + filter, canonical .gp converted into the score frame + player, the tools row and tray (Zoom, Settings, the focus mark), Tags sheet add + alias, rail facets + favourite + sort, alias page, missing piece, no private localStorage.');
   if (c.logs.length) throw new Error('Browser console errors: '+c.logs.join('\n'));
-} finally { ws?.close(); chrome.kill(); await once(chrome,'exit'); await fs.rm(profile,{recursive:true,force:true}); }
+} finally { ws?.close(); chrome.kill(); await once(chrome,'exit'); await fs.rm(profile,{recursive:true,force:true,maxRetries:10,retryDelay:200}); await library.close(); }

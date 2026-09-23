@@ -11,17 +11,15 @@
 //   score leaves no edit cursor · the tools row offers no Keys sheet · and the
 //   chip and the Details sheet SAY why rather than going quiet.
 //
-// Same preconditions as studio-smoke.mjs (a local Worker over D1/R2 and a
-// signed local session). Usage: npm run smoke:play-only
+// Its own private library, like studio-smoke.mjs. Usage: npm run smoke:play-only
 import fs from 'node:fs/promises';
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
 import assert from 'node:assert/strict';
 import { devtoolsPort, connect, client } from './browserHarness.mjs';
-const root = new URL('../../', import.meta.url);
-const origin = process.env.LIBRARY_LOCAL_ORIGIN ?? 'http://127.0.0.1:8791';
-if (!['localhost','127.0.0.1'].includes(new URL(origin).hostname)) throw new Error('Smoke must target loopback only');
-const session = JSON.parse(await fs.readFile(new URL('.secrets/local-library-session.json',root)));
+import { startLocalLibrary } from './localLibrary.mjs';
+const library = await startLocalLibrary();
+const { origin, session } = library;
 const title = `Play-only smoke ${Date.now()}`;
 const profile = await fs.mkdtemp('/tmp/mnx-studio-play-only-browser-');
 const chrome = spawn(process.env.CHROME_BIN ?? 'google-chrome',['--headless=new','--no-sandbox','--disable-dev-shm-usage','--window-size=900,1200','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],{stdio:'ignore'});
@@ -106,4 +104,4 @@ try {
   const shot = await c.send('Page.captureScreenshot'); await fs.writeFile('/tmp/mnx-studio-play-only.png',Buffer.from(shot.result.data,'base64'));
   console.log(`Studio play-only smoke passed: ${pieceId} — a coarse pointer, a piece made from the form, score and player rendered, no editor bound and its chunk never fetched, a tap leaving no cursor, no Keys sheet, and the chip and the Details sheet saying why.`);
   if (c.logs.length) throw new Error('Browser console errors: '+c.logs.join('\n'));
-} finally { ws?.close(); chrome.kill(); await once(chrome,'exit'); await fs.rm(profile,{recursive:true,force:true,maxRetries:10,retryDelay:200}); }
+} finally { ws?.close(); chrome.kill(); await once(chrome,'exit'); await fs.rm(profile,{recursive:true,force:true,maxRetries:10,retryDelay:200}); await library.close(); }
