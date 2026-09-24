@@ -141,7 +141,9 @@ try {
   await cdp.send('Page.navigate', {
     url: `http://127.0.0.1:${review.port}/unrolled.html#lab/navigation/ds-final-ending`,
   });
-  await new Promise((resolve) => setTimeout(resolve, 300));
+  // One large static page of inline SVG: under load it is still parsing when a
+  // guessed pause ends, and the count comes up short.
+  await waitFor(cdp, "document.readyState === 'complete'", 'the review page');
   console.log(
     'Unrolled review',
     await cdp.evaluate(
