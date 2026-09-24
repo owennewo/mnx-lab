@@ -8,7 +8,7 @@ import fs from 'node:fs/promises';
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
 import assert from 'node:assert/strict';
-import { devtoolsPort, connect, client } from './browserHarness.mjs';
+import { devtoolsPort, connect, client, until, STUDIO_STATE } from './browserHarness.mjs';
 import { startLocalLibrary } from './localLibrary.mjs';
 const library = await startLocalLibrary();
 const { origin, session } = library;
@@ -23,7 +23,7 @@ try {
   await c.send('Emulation.setDeviceMetricsOverride',{width:1280,height:900,deviceScaleFactor:1,mobile:false});
   // A headless page is not the focused window, and an unfocused page fires no focus events: emulate one, as a person's would be.
   await c.send('Emulation.setFocusEmulationEnabled',{enabled:true});
-  const wait = async expression => { for (let i=0;i<200;i++) { if (await c.evaluate(expression)) return; await new Promise(r=>setTimeout(r,100)); } throw new Error('Browser assertion timed out: '+expression); };
+  const wait = expression => until(c, expression, { timeoutMs: 20000, describe: STUDIO_STATE });
   const VK = { ArrowRight: 39, ArrowLeft: 37, Escape: 27, Enter: 13, Delete: 46, KeyZ: 90, KeyY: 89, KeyL: 76, KeyC: 67, KeyV: 86, Digit1: 49, Digit2: 50, Digit3: 51, Digit5: 53 };
   const key = async (code, { ctrl = false, shift = false, text } = {}) => {
     const base = { code, key: text ?? code, windowsVirtualKeyCode: VK[code], modifiers: (ctrl ? 2 : 0) | (shift ? 8 : 0) };

@@ -10,7 +10,7 @@ import fs from 'node:fs/promises';
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
 import assert from 'node:assert/strict';
-import { devtoolsPort, connect, client } from './browserHarness.mjs';
+import { devtoolsPort, connect, client, until, STUDIO_STATE } from './browserHarness.mjs';
 import { startLocalLibrary } from './localLibrary.mjs';
 const library = await startLocalLibrary();
 const { origin, session } = library;
@@ -23,7 +23,7 @@ try {
   ws = new WebSocket(await connect(await devtoolsPort(profile))); await once(ws,'open');
   const c = client(ws); await c.send('Runtime.enable'); await c.send('Page.enable'); await c.send('Network.enable');
   await c.send('Emulation.setDeviceMetricsOverride',{width:1280,height:900,deviceScaleFactor:1,mobile:false});
-  const wait = async expression => { for (let i=0;i<200;i++) { if (await c.evaluate(expression)) return; await new Promise(r=>setTimeout(r,100)); } throw new Error('Browser assertion timed out: '+expression); };
+  const wait = expression => until(c, expression, { timeoutMs: 20000, describe: STUDIO_STATE });
   const app = "document.querySelector('mnx-studio')?.shadowRoot";
   const form = `${app}?.querySelector('mnx-studio-new-piece')?.shadowRoot`;
   const piece = `${app}?.querySelector('mnx-studio-piece')?.shadowRoot`;

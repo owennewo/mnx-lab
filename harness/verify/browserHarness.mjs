@@ -79,6 +79,46 @@ export async function waitFor(cdp, expression, label, timeoutMs = 15000) {
   throw new Error(`Timed out waiting for ${label}`);
 }
 
+/** Poll a page expression until it is truthy. Right after a navigation a
+ *  chain can reach a shell that has not mounted yet — under load it does — so
+ *  a throw means "not yet" until the deadline. A timeout says what it waited
+ *  for, the last throw, the page's console errors, and — given `describe`, a
+ *  page expression — what the state actually was, which is the part a
+ *  "timed out" alone never told anyone. */
+export async function until(cdp, expression, { timeoutMs = 20000, describe } = {}) {
+  const deadline = Date.now() + timeoutMs;
+  let last = null;
+  do {
+    try {
+      if (await cdp.evaluate(expression)) return;
+      last = null;
+    } catch (error) {
+      last = error;
+    }
+    await new Promise(resolve => setTimeout(resolve, 100));
+  } while (Date.now() < deadline);
+  let state = '';
+  if (describe) {
+    try { state = String(await cdp.evaluate(describe)); } catch (error) { state = `(describe threw: ${error.message})`; }
+  }
+  throw new Error([
+    `Timed out after ${timeoutMs / 1000} s waiting for: ${expression}`,
+    last && `last error: ${last.message}`,
+    state && `state: ${state}`,
+    cdp.logs?.length && `console: ${cdp.logs.join('; ')}`,
+  ].filter(Boolean).join('\n  '));
+}
+
+/** Studio's state for a timed-out wait: the route, the piece page, the save chip. */
+export const STUDIO_STATE = `(() => {
+  const piece = document.querySelector('mnx-studio')?.shadowRoot?.querySelector('mnx-studio-piece')?.shadowRoot;
+  const chip = piece?.querySelector('button.save');
+  return JSON.stringify({
+    route: location.hash, piece: !!piece, save: chip?.dataset.save ?? null,
+    chip: chip?.textContent.trim().replace(/\\s+/g, ' ') ?? null,
+  });
+})()`;
+
 export const SCORE_READY = `(() => {
   if (document.readyState !== 'complete' || document.fonts.status !== 'loaded') return false;
   const roots = [document];

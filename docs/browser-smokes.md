@@ -153,9 +153,18 @@ too. A readiness check that only held because the page was quick then races. Wai
 the thing the next assertion reads, not a neighbour of it: `unrolled-smoke` waited for
 the player's performance and then looked for the painted score, which under load was
 not painted yet (it now waits for `SCORE_READY` and `settle`). A chain evaluated right
-after `Page.navigate` can reach a shell that has not mounted: a wait loop should treat
-that throw as "not yet" until its deadline and report the last error if it never
-clears, as `studio-smoke`'s `wait` does.
+after `Page.navigate` can reach a shell that has not mounted: `until(cdp, expression,
+{ describe })` in `browserHarness.mjs` treats that throw as "not yet" until its
+deadline, and a timeout reports the last error, the console, and `describe`'s account
+of the state (`STUDIO_STATE`: route, piece page, save chip). The six studio smokes
+wait through it.
+
+And a flake under load can be the app's. `studio-editor` failed 2 runs in 12 under CPU
+pressure with the chip reading "1 edit unsaved · last saved just now": a meter undone
+back to the saved document while a save was in flight read clean when studio decided
+whether to save at once, and dirty once that save landed — so it waited for the 30 s
+idle checkpoint. Studio now asks regardless and the session saves only if still dirty
+(`save-session.test.ts` pins it); 24 of 24 passed under the same pressure after.
 
 ### The default headless window is 800×600
 

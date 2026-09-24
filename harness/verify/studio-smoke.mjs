@@ -8,7 +8,7 @@ import fs from 'node:fs/promises';
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
 import assert from 'node:assert/strict';
-import { devtoolsPort, connect, client } from './browserHarness.mjs';
+import { devtoolsPort, connect, client, until, STUDIO_STATE } from './browserHarness.mjs';
 import { startLocalLibrary } from './localLibrary.mjs';
 const root = new URL('../../', import.meta.url);
 const library = await startLocalLibrary();
@@ -36,10 +36,7 @@ let ws;
 try {
   ws = new WebSocket(await connect(await devtoolsPort(profile))); await once(ws,'open');
   const c = client(ws); await c.send('Runtime.enable'); await c.send('Page.enable'); await c.send('Network.enable');
-  // Right after a navigation the chain may reach a shell that has not mounted
-  // yet — under load it does — so a throw means "not yet" until the deadline,
-  // and the last one is reported if it never clears.
-  const wait = async expression => { let last = null; for (let i=0;i<100;i++) { try { if (await c.evaluate(expression)) return; last = null; } catch (error) { last = error; } await new Promise(r=>setTimeout(r,100)); } throw new Error('Browser assertion timed out: '+expression+'; '+(last ? last.message+'; ' : '')+c.logs.join('; ')); };
+  const wait = expression => until(c, expression, { timeoutMs: 10000, describe: STUDIO_STATE });
   const app = "document.querySelector('mnx-studio').shadowRoot";
   const library = `${app}.querySelector('mnx-studio-library').shadowRoot`;
   const piece = `${app}.querySelector('mnx-studio-piece').shadowRoot`;
