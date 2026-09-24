@@ -9,7 +9,7 @@ import fs from 'node:fs/promises';
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
 import assert from 'node:assert/strict';
-import { devtoolsPort, connect, client, until, STUDIO_STATE } from './browserHarness.mjs';
+import { devtoolsPort, connect, client, until, STUDIO_STATE, stopChrome } from './browserHarness.mjs';
 import { startLocalLibrary } from './localLibrary.mjs';
 const library = await startLocalLibrary();
 const { origin, session } = library;
@@ -74,4 +74,4 @@ try {
   for (const tag of [`title:${title}`, 'artist:A synthetic author', 'capo:2', 'tuning-name:DADGAD', 'part:Guitar']) assert.ok(tags.includes(tag), `${tag} in ${tags}`);
   console.log(`Piece-create smoke passed: the New piece form (a bad tuning refused in a sentence), ${title} made as ${pieceId}, its stored .gp read back as 9 bars of 6/8 in D on DADGAD capo 2, the Source row asking for a recording, and the library listing it.`);
   if (c.logs.length) throw new Error('Browser console errors: '+c.logs.join('\n'));
-} finally { ws?.close(); chrome.kill(); await once(chrome,'exit'); await fs.rm(profile,{recursive:true,force:true,maxRetries:10,retryDelay:200}); await library.close(); }
+} finally { ws?.close(); await stopChrome(chrome); await fs.rm(profile,{recursive:true,force:true,maxRetries:10,retryDelay:200}); await library.close(); }

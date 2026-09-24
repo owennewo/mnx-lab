@@ -77,6 +77,20 @@ killed run's directory next time (`harness/verify/tempDirs.mjs`). A smoke makes 
 profile with ``mkdtemp(`${os.tmpdir()}/…`)`` — never a literal `/tmp` — so it lands
 inside. A smoke run directly with `node` has no scope and still litters `/tmp`.
 
+### Never await an exit that already happened
+
+`chrome.kill(); await once(chrome, 'exit')` hangs forever when Chrome is already
+gone — it failed to start, or crashed — because `'exit'` fired long before anyone
+listened. The teardown then never finishes and the error it was about to report never
+prints: eight smokes hung that way when a TMPDIR too long for Chrome's socket stopped it
+starting. Stop Chrome with `stopChrome(chrome)` (`browserHarness.mjs`), which returns at
+once for a Chrome that is gone and SIGKILLs one that ignores SIGTERM.
+
+The runner is the backstop for any other hang: each command leads its own process
+group, and a job still running after 300 s (`--timeout S`) is killed with everything it
+started. Ctrl+C reaches the runner only, which kills the groups it started and removes
+their temp directories.
+
 ### Shadow roots move
 
 An element the smoke reaches by `page.shadowRoot.querySelector(...)` may have

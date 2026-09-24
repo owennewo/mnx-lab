@@ -8,7 +8,7 @@ import fs from 'node:fs/promises';
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
 import assert from 'node:assert/strict';
-import { devtoolsPort, connect, client, until, STUDIO_STATE } from './browserHarness.mjs';
+import { devtoolsPort, connect, client, until, STUDIO_STATE, stopChrome } from './browserHarness.mjs';
 import { startLocalLibrary } from './localLibrary.mjs';
 const root = new URL('../../', import.meta.url);
 const library = await startLocalLibrary();
@@ -213,4 +213,4 @@ try {
   assert.equal(await c.evaluate(`Object.values(localStorage).some(v=>v.includes('Studio smoke piece') || v.includes('local@example.test'))`),false);
   console.log('Studio smoke passed: root redirect, signed-out page, library list + filter, canonical .gp converted into the score frame + player, the tools row and tray (Zoom, Settings, the focus mark), Tags sheet add + alias, rail facets + favourite + sort, alias page, missing piece, no private localStorage.');
   if (c.logs.length) throw new Error('Browser console errors: '+c.logs.join('\n'));
-} finally { ws?.close(); chrome.kill(); await once(chrome,'exit'); await fs.rm(profile,{recursive:true,force:true,maxRetries:10,retryDelay:200}); await library.close(); }
+} finally { ws?.close(); await stopChrome(chrome); await fs.rm(profile,{recursive:true,force:true,maxRetries:10,retryDelay:200}); await library.close(); }

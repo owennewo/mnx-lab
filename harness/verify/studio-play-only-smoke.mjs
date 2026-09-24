@@ -17,7 +17,7 @@ import fs from 'node:fs/promises';
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
 import assert from 'node:assert/strict';
-import { devtoolsPort, connect, client, until, STUDIO_STATE } from './browserHarness.mjs';
+import { devtoolsPort, connect, client, until, STUDIO_STATE, stopChrome } from './browserHarness.mjs';
 import { startLocalLibrary } from './localLibrary.mjs';
 const library = await startLocalLibrary();
 const { origin, session } = library;
@@ -105,4 +105,4 @@ try {
   const shot = await c.send('Page.captureScreenshot'); await fs.writeFile('/tmp/mnx-studio-play-only.png',Buffer.from(shot.result.data,'base64'));
   console.log(`Studio play-only smoke passed: ${pieceId} — a coarse pointer, a piece made from the form, score and player rendered, no editor bound and its chunk never fetched, a tap leaving no cursor, no Keys sheet, and the chip and the Details sheet saying why.`);
   if (c.logs.length) throw new Error('Browser console errors: '+c.logs.join('\n'));
-} finally { ws?.close(); chrome.kill(); await once(chrome,'exit'); await fs.rm(profile,{recursive:true,force:true,maxRetries:10,retryDelay:200}); await library.close(); }
+} finally { ws?.close(); await stopChrome(chrome); await fs.rm(profile,{recursive:true,force:true,maxRetries:10,retryDelay:200}); await library.close(); }

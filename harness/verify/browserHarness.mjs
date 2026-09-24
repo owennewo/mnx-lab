@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 // ── CDP plumbing (no puppeteer: Node's global WebSocket is enough) ──────────
 /** Chrome writes the port it actually bound to into the profile directory —
@@ -12,7 +13,25 @@ export async function devtoolsPort(profileDir) {
     }
     await new Promise(r => setTimeout(r, 250));
   }
-  throw new Error('Chrome never reported a DevTools port (is CHROME_BIN correct?)');
+  // Chrome makes a Unix socket under TMPDIR, and a socket path must fit in 108
+  // bytes: a long TMPDIR stops it starting at all, which looks like this.
+  const tmp = os.tmpdir();
+  throw new Error('Chrome never reported a DevTools port (is CHROME_BIN correct?' +
+    (tmp.length > 60 ? ` Or TMPDIR is too long for its socket: ${tmp.length} chars, ${tmp})` : ')'));
+}
+
+/** Stop a Chrome the smoke started and resolve once it is gone. One that has
+ *  ALREADY exited — it failed to start, or crashed — emitted 'exit' long ago,
+ *  so awaiting that event hangs the teardown forever and the failure being
+ *  reported never prints. SIGKILL if SIGTERM has not done it in `graceMs`. */
+export async function stopChrome(chrome, graceMs = 5000) {
+  if (!chrome || chrome.exitCode !== null || chrome.signalCode !== null) return;
+  const exited = new Promise(resolve => chrome.once('exit', resolve));
+  chrome.kill();
+  const timer = new Promise(resolve => setTimeout(() => resolve('late'), graceMs));
+  if ((await Promise.race([exited, timer])) !== 'late') return;
+  chrome.kill('SIGKILL');
+  await exited;
 }
 
 export async function connect(port) {

@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import { fileURLToPath } from 'node:url';
 import { spawn, execFileSync } from 'node:child_process';
 import { serveStatic } from './staticServer.mjs';
-import { devtoolsPort, connect, client } from './browserHarness.mjs';
+import { devtoolsPort, connect, client, stopChrome } from './browserHarness.mjs';
 const root=fileURLToPath(new URL('../../', import.meta.url)).replace(/\/$/, '');
 const server=await serveStatic(root+'/dist/client');
 const profile=fs.mkdtempSync(`${os.tmpdir()}/studio-export-chrome-`);
@@ -98,7 +98,7 @@ try {
  await p.send('Page.close'); pw.close();
  }
  }
-}finally{ws?.close();chrome.kill();await new Promise(r=>chrome.once('exit',r));server.server.close();
+}finally{ws?.close();await stopChrome(chrome);server.server.close();
   // Litter, not a failure: a throw here from `finally` would replace whatever
   // the smoke was reporting (docs/browser-smokes.md).
   try{fs.rmSync(profile,{recursive:true,force:true,maxRetries:5,retryDelay:100});}catch{}

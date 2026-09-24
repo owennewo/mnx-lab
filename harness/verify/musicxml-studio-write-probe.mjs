@@ -7,7 +7,7 @@ import { spawn, execFileSync } from 'node:child_process';
 import { once } from 'node:events';
 import { createHash } from 'node:crypto';
 import assert from 'node:assert/strict';
-import { devtoolsPort, connect, client, waitFor } from './browserHarness.mjs';
+import { devtoolsPort, connect, client, waitFor, stopChrome } from './browserHarness.mjs';
 import { startLocalLibrary } from './localLibrary.mjs';
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const library = await startLocalLibrary();
@@ -122,5 +122,5 @@ try {
   await shot('metadata-editor'); report.metadataEditorReachable = true;
   report.consoleErrors=c.logs; assert.deepEqual(c.logs,[]); report.result='passed';
 } catch(error) { report.error=error.stack; process.exitCode=1; }
-finally { await fs.writeFile(path.join(out,'report.json'),JSON.stringify(report,null,2)+'\n'); ws?.close(); chrome.kill(); await once(chrome,'exit'); await fs.rm(profile,{recursive:true,force:true,maxRetries:5,retryDelay:100}); await library.close(); }
+finally { await fs.writeFile(path.join(out,'report.json'),JSON.stringify(report,null,2)+'\n'); ws?.close(); await stopChrome(chrome); await fs.rm(profile,{recursive:true,force:true,maxRetries:5,retryDelay:100}); await library.close(); }
 console.log(JSON.stringify(report,null,2));
