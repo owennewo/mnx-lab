@@ -1,6 +1,6 @@
 # MusicXML authoring gaps — source reachability and meter controls
 
-> **Status: in progress, 2026-09-22.** Campaign item 23. Initial bounded finding from
+> **Status: complete, 2026-09-24.** Campaign item 23. Initial bounded finding from
 > [write assessment item 19](../inprogress/core-musicxml-write-assessment.md), which
 > remains in progress. [Campaign contract](../inprogress/core-campaign-musicxml.md).
 
@@ -109,5 +109,7 @@ stale revisions and title precedence; the existing titled-version browser smoke 
 [Assessment evidence](../../docs/musicxml-editor-assessment.md#untitled-studio-versions--title-workflow-follow-up)
 records the separate GP storage losses: 15 high notes disappear, with explicit measured
 warnings and retained evidence. This does not constitute lossless GP persistence.
-The selected implementations are covered; filing closure follows final verification
-and retirement of this worktree. The broader assessment items remain in progress.
+The selected implementations were verified and landed at `1ac3e71d`; the implementation
+worktree was retired. The broader assessment items remain in progress. The 15-note
+Guitar Pro storage loss is recorded in the write-path assessment rather than treated
+as a title-workflow pass.

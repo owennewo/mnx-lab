@@ -89,9 +89,11 @@ approved goldens remain untouched by the assessment.
 
 ## Output: a proposal to fill the gaps
 
-Create `roadmap/proposed/core-musicxml-render-gaps.md` and its roadmap index entry after
-collecting evidence. This follow-up is explicitly requested as part of this side quest.
-It links back to this assessment and the campaign, and contains:
+The first bounded proposal became [item 22](../complete/core-musicxml-render-gaps.md)
+and its selected fixes landed. The corpus-wide assessment is still open. When
+remaining evidence reveals additional actionable gaps, file a new, deduplicated
+proposal under `roadmap/proposed/` and link it from the index and campaign.
+The requested follow-up contains:
 
 - A finite, deduplicated list of observed gaps, with fixture/feature evidence and ownership.
 - Priorities based on missing or misleading musical content, affected cases and dependency
@@ -109,9 +111,9 @@ inventing work; document importer/spec blockers and unresolved coverage honestly
 
 The pinned suite is fully inventoried; applicable cases have been exercised in the editor;
 feature verdicts and causes are evidenced; unresolved cases and exclusions are explicit;
-and the new gap proposal is linked from the roadmap and campaign. Append findings to the
-campaign's progress log. This item can finish with known gaps: fixing the selected gaps is
-what the resulting proposal is for.
+and any further gap proposal is linked from the roadmap and campaign when warranted.
+Append findings to the campaign's progress log. This item can finish with
+known gaps: fixing selected gaps is what the resulting proposal is for.
 
 ## Initial evidence landed, 2026-09-22
 
@@ -129,3 +131,12 @@ and the final state has MNX reopen evidence. Initial captures hid time signature
 absence there is not a rendering verdict. Gap proposals include exact meter import,
 display losses and representable inspector ranges. Other families and remaining
 meter policy/task/persistence combinations stay open; this item remains in progress.
+
+## Handoff, 2026-09-24
+
+The 183-source sweep is a historical load/display baseline, not a current
+fixture-feature verdict sheet. Item 22 fixed selected import and render failures.
+Start the next evidence batch with `01a`–`01h` pitches/accidentals: derive
+feature variants from source and manifest descriptions, inspect imported MNX,
+recapture relevant notation in both shells on the current app, and record
+explicit feature × view verdicts and causes. Carry the same IDs into item 19.

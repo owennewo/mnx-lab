@@ -144,7 +144,6 @@ back up to `proposed/` the moment it is.
   performed position; paused arrows walk the performance and seek the player, jumps reset the
   pass, Play collapses a selection, no editing while playing (*Pause to edit*), ←/→ while
   playing seek whole bars in one counted seek, a pause parks the cursor, *Pass 2* on a loop.
-- **[core-musicxml-write-gaps.md](inprogress/core-musicxml-write-gaps.md)** — item 23: resolve missing title metadata for imported Studio versions and expose representable numeric meter ranges.
 
 
 - **[core-musicxml-render-assessment.md](inprogress/core-musicxml-render-assessment.md)** — MusicXML campaign item 18: assess each applicable external fixture’s features through the desktop editor, separate import and representation losses from rendering defects, and produce an evidenced, bounded proposal to fill the gaps.
@@ -505,6 +504,8 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+
+- **[core-musicxml-write-gaps.md](complete/core-musicxml-write-gaps.md)** — item 23: resolve missing title metadata for imported Studio versions and expose representable numeric meter ranges.
 
 - **[core-musicxml-render-gaps.md](complete/core-musicxml-render-gaps.md)** — item 22: evidenced import/representation/render-containment gaps, including exact meter duration and display losses.
 

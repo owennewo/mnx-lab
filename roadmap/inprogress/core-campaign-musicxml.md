@@ -14,7 +14,7 @@ Two objectives, and every item serves one of them:
 - **Provable accuracy.** Every claim the converter makes is backed by an oracle that
   is not us — not a round trip against our own assumptions, and not visual inspection.
 
-**Current state, 2026-09-22.** The converter has zero runtime npm dependencies,
+**Converter baseline, 2026-09-22.** The converter has zero runtime npm dependencies,
 including compressed `.mxl`, and its browser import path is shared by workbench and
 studio. The 27 paired W3C comparisons score 24 exact layout matches; the three remaining
 final-barline discrepancies are retained explicitly, not papered over. The generated
@@ -26,6 +26,17 @@ MIT notices, stable IDs and an import/export observation baseline. Items 14 and 
 semantic and XSD measurements; their mismatch baselines identify further work. Render and write-path assessments (18 and 19) consume the same inventory and
 produce separate, evidenced gap proposals; implementing those proposals is subsequent
 work. The historical log below records how the earlier baseline was reached.
+
+**Assessment handoff, 2026-09-24.** Items 1–17 and 20–23 have landed; items
+18 (render) and 19 (write path) remain in progress. The first both-shell sweep
+loaded all 183 sources, but its historical captures are not per-feature verdicts;
+later import, display and title fixes also changed the application. The 12 meter
+sources have a bounded variant review, and three untitled Studio originals have
+title-workflow evidence. The pitch original loses 15 of 108 notes when saved
+through GP storage. [The assessment](../../docs/musicxml-editor-assessment.md)
+separates these findings from the unreviewed corpus. Continue from the shared
+fixture/feature inventory, then assess the `01a`–`01h` pitch and accidental
+family on the current app before expanding to the remaining families.
 
 ### The oracle we already own, and the assertion that would waste it
 
@@ -145,7 +156,7 @@ deliberately **not** enumerated in advance: item 8 decides them from evidence.
 | 20 | [XSD element ordering](../complete/core-musicxml-xsd-ordering.md) | Pitch/tuning alterations before octaves; separate rehearsal and section directions. XSD-valid exports 292 → 336/344, semantic verdicts unchanged. | accuracy | independent XSD + regression tests | **built 2026-09-22** |
 | 21 | [Exact short durations](../complete/core-musicxml-short-durations.md) | Divisions account for written-duration denominators as well as tuplets; no zero-length metric notes in the measured corpus. XSD validity 336 → 340/344; three external export note tables now match. | accuracy | music21 + XSD + regression tests | **built 2026-09-22** |
 | 22 | [Render gaps](../complete/core-musicxml-render-gaps.md) | Preserve piano staves; diagnose microtonal/staff-line losses; contain unsupported-clef projection failures. Meter follow-up adds exact duration and display losses; not an exhaustive backlog. | accuracy | original XML + imported MNX + both-shell captures | **complete 2026-09-22** |
-| 23 | [Write gaps](../inprogress/core-musicxml-write-gaps.md) | Resolve missing title metadata before making an imported Studio version current, without bypassing the shared editor or GP storage policy; expose representable numeric meter ranges. | authoring | real Versions controls + refusal + persistence checks | **in progress 2026-09-22** |
+| 23 | [Write gaps](../complete/core-musicxml-write-gaps.md) | Resolve missing title metadata before making an imported Studio version current, without bypassing the shared editor or GP storage policy; expose representable numeric meter ranges. | authoring | real Versions controls + refusal + persistence checks | **complete 2026-09-24** |
 | — | Feature parity | Dynamics, wedges, spanners, ottavas, articulations, SMuFL glyph names, percussion, layout breaks. **Deliberately unenumerated**: item 8 turns these into a ranked queue with evidence, and each becomes its own row when picked up. Note the schema already has `dynamic-*`, `ottava`, `slur` and `wedge-type` as standard objects — but **no pedal def**, so pedal is contract clause 2's first real test. | accuracy | 1 + 2 + 3 | not yet rows |
 
 ### Item 8's derivation rule
@@ -179,6 +190,33 @@ exactly as `verified` already works here. No backend: a generated JSON artifact
 committed to the repo, like `worker/models.json`.
 
 ## Progress + learnings
+
+### 2026-09-24 — handoff: selected gaps closed, assessments remain open
+
+Item 23 is implemented and its implementation worktree retired: a library-only
+title now lets an untitled MusicXML rendition become current without changing
+the original XML, and the shared inspector accepts representable numeric meters
+through the documented application limit. Item 22 already landed the bounded
+render/import fixes. These completed gap items do **not** close items 18/19.
+The earlier 183-file sweep records import and view observations at `b534a735`;
+its four layout exceptions and missing-title refusals describe that historical
+build, not an unqualified current verdict. Selected later captures repair or
+bound some failures, but the full suite still needs source-feature inventory,
+current-app visual review and operation-level authoring evidence.
+
+Next: split each manifest description into identifiable features and variants
+(including negative, compatibility and descriptionless cases), keeping stable
+IDs shared by [render](core-musicxml-render-assessment.md) and
+[write](core-musicxml-write-assessment.md) reports. Start with `01a`–`01h`: check
+source semantics, imported MNX and applicable Workbench/Studio views on the
+current app; record fixture × feature × view verdicts with retained evidence.
+For the same variants, define create/change/remove/inspect tasks, test the real
+shared editor through both shells where applicable, and record undo/redo and
+persistence separately. Studio GP save is a measured lossy route for `01a`,
+not a blanket pass. Repeat across the suite; attribute and deduplicate newly
+observed gaps against completed items 22/23, then file any further requested
+gap proposal with evidence. Close items 18/19 only after their full coverage
+and explicit unresolved dispositions are delivered.
 
 ### 2026-09-22 — item 22: unsupported clefs stay local
 

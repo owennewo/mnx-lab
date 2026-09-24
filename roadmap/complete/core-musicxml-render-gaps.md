@@ -137,7 +137,7 @@ with an explicit warning. No new schema carrier is invented.
 
 These are agent-assessed source → document → display findings, with no human-verification
 claim. Cosmetic spacing and unresolved corpus features are not included. The meter section explicitly extends the four initial findings with separately retained
-evidence. Further scope changes require the same source, data and UI evidence. The [write-gap proposal](../inprogress/core-musicxml-write-gaps.md) owns editor
+evidence. Further scope changes require the same source, data and UI evidence. The [write-gap proposal](../complete/core-musicxml-write-gaps.md) owns editor
 reachability and persistence, and shares the representation blockers above.
 
 ## Implementation progress, 2026-09-22

@@ -109,10 +109,12 @@ artifact locations. Agent findings are labelled as such; no scenario `status` or
 
 ## Output and completion
 
-After the assessment, create `roadmap/inprogress/core-musicxml-write-gaps.md`, add its roadmap
-and campaign index entries, and append findings to the campaign log. This follow-up is
-explicitly requested as part of the side quest. Its finite, prioritized work list names
-for every selected gap:
+The first bounded proposal became [item 23](../complete/core-musicxml-write-gaps.md)
+and its selected fixes landed. The corpus-wide assessment is still open. When
+remaining evidence reveals additional actionable gaps, file a new, deduplicated
+proposal under `roadmap/proposed/`, add its roadmap/campaign links, and append
+findings to the campaign log. The requested follow-up names for every selected
+gap:
 
 - Evidence, affected features/shells and an independently reproducible authoring task.
 - The missing model/operation/binding/UI/persistence capability and dependencies.
@@ -147,3 +149,13 @@ and the final state has MNX reopen evidence. Initial captures hid time signature
 absence there is not a rendering verdict. Gap proposals include exact meter import,
 display losses and representable inspector ranges. Other families and remaining
 meter policy/task/persistence combinations stay open; this item remains in progress.
+
+## Handoff, 2026-09-24
+
+Item 23 resolved the initial Studio title block and numeric-meter inspector
+range; those bounded probes are not corpus-wide authoring passes. On `01a`,
+Studio GP storage loses 15 of 108 source notes, although the selected edit and
+library title survive. Start with the shared `01a`–`01h` feature IDs: define
+create/inspect/change/remove tasks, exercise real desktop Workbench and editable
+Studio paths, check structural changes and undo/redo, and mark each applicable
+save/reopen route separately. Record blocked and unresolved tasks explicitly.
