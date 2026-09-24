@@ -1,37 +1,49 @@
-// Explicit batch orchestration: build each selected face once, then fail fast.
-import { spawnSync } from 'node:child_process';
+// Explicit batch orchestration: build each selected face once, then run the
+// smokes side by side — each owns its ports, profile and library, so they do
+// not share state — and start nothing new after the first failure.
+import { spawn, spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
+// Measured on a 6-core machine (2026-09-24): 4 at once takes the full set from
+// ~205 s to ~60 s with every smoke green; 8 is faster still, but inflates each
+// smoke by up to 2× under contention, which is where timing flakes live.
+const DEFAULT_JOBS = 4;
+const verify = name => `harness/verify/${name}`;
+/** A job is a chain run in order; a smoke's jobs are independent of each other. */
+const one = (file, extra = {}) => ({ build: 'build:site', jobs: [[{ file: verify(file) }]], ...extra });
 const SMOKES = {
-  'lib': { build: 'build:lib', runs: [{ file: 'harness/verify/lib-smoke.mjs' }] },
-  'embed': { build: 'build:embed', runs: [{ file: 'harness/verify/embed-smoke.mjs' }, { file: 'harness/verify/embed-smoke.mjs', env: { MNX_EMBED_FORMAT: 'iife' } }] },
-  'csp': { build: 'build', runs: [{ file: 'harness/verify/csp-smoke.mjs' }] },
-  'selection': { build: 'build', runs: [{ file: 'harness/verify/selection-smoke.mjs' }] },
-  'inspector': { build: 'build', runs: [{ file: 'harness/verify/inspector-smoke.mjs' }] },
-  'focus': { build: 'build', runs: [{ file: 'harness/verify/focus-mode-smoke.mjs' }] },
-  'sync-bar': { build: 'build', runs: [{ file: 'harness/verify/sync-bar-smoke.mjs' }] },
-  'sync-rederive': { build: 'build', runs: [{ file: 'harness/verify/sync-rederive-smoke.mjs' }] },
-  'piece-create': { build: 'build', runs: [{ file: 'harness/verify/piece-create-smoke.mjs' }] },
-  'save-pipeline': { build: 'build', runs: [{ file: 'harness/verify/save-pipeline-smoke.mjs' }] },
-  'piece-lifecycle': { build: 'build', runs: [{ file: 'harness/verify/piece-lifecycle-smoke.mjs' }] },
-  'studio-editor': { build: 'build', runs: [{ file: 'harness/verify/studio-editor-smoke.mjs' }] },
-  'play-only': { build: 'build', runs: [{ file: 'harness/verify/studio-play-only-smoke.mjs' }] },
-  'workbench-editor': { build: 'build', runs: [{ file: 'harness/verify/workbench-editor-smoke.mjs' }] },
-  'audio': { build: null, runs: [{ file: 'harness/verify/audio-smoke.mjs' }] },
-  'player': { build: 'build', runs: [{ file: 'harness/verify/performance-review.mjs' }, { file: 'harness/verify/player-workbench-smoke.mjs' }] },
-  'unrolled': { build: 'build', runs: [{ file: 'harness/verify/unrolled-review.mjs' }, { file: 'harness/verify/unrolled-smoke.mjs' }] },
-  'studio': { build: 'build', runs: [{ file: 'harness/verify/studio-smoke.mjs' }] },
-  'studio-export': { build: 'build', runs: [{ file: 'harness/verify/studio-export-smoke.mjs' }] },
-  'recording-studio': { build: 'build', runs: [{ file: 'harness/verify/recording-studio-smoke.mjs' }] },
-  'single-cursor': { build: 'build', runs: [{ file: 'harness/verify/single-cursor-smoke.mjs' }] },
-  'recording-management': { build: 'build', runs: [{ file: 'harness/verify/recording-management-smoke.mjs' }] },
-  'youtube': { build: 'build:embed', runs: [{ file: 'harness/verify/youtube-smoke.mjs' }] },
+  'lib': one('lib-smoke.mjs', { build: 'build:lib' }),
+  'embed': { build: 'build:embed', jobs: [[{ file: verify('embed-smoke.mjs') }], [{ file: verify('embed-smoke.mjs'), env: { MNX_EMBED_FORMAT: 'iife' } }]] },
+  'csp': one('csp-smoke.mjs'),
+  'selection': one('selection-smoke.mjs'),
+  'inspector': one('inspector-smoke.mjs'),
+  'focus': one('focus-mode-smoke.mjs'),
+  'sync-bar': one('sync-bar-smoke.mjs'),
+  'sync-rederive': one('sync-rederive-smoke.mjs'),
+  'piece-create': one('piece-create-smoke.mjs'),
+  'save-pipeline': one('save-pipeline-smoke.mjs'),
+  'piece-lifecycle': one('piece-lifecycle-smoke.mjs'),
+  'studio-editor': one('studio-editor-smoke.mjs'),
+  'play-only': one('studio-play-only-smoke.mjs'),
+  'workbench-editor': one('workbench-editor-smoke.mjs'),
+  'audio': one('audio-smoke.mjs', { build: null }),
+  // The review page is the smoke's input, so it is built first in the same job.
+  'player': { build: 'build:site', jobs: [[{ file: verify('performance-review.mjs') }, { file: verify('player-workbench-smoke.mjs') }]] },
+  'unrolled': { build: 'build:site', jobs: [[{ file: verify('unrolled-review.mjs') }, { file: verify('unrolled-smoke.mjs') }]] },
+  'studio': one('studio-smoke.mjs'),
+  'studio-export': one('studio-export-smoke.mjs'),
+  'recording-studio': one('recording-studio-smoke.mjs'),
+  'single-cursor': one('single-cursor-smoke.mjs'),
+  'recording-management': one('recording-management-smoke.mjs'),
+  'youtube': one('youtube-smoke.mjs', { build: 'build:embed' }),
 };
+// What a smoke needs built is the bundle alone: the gate build's validators,
+// boundaries and type checks add ~20 s and nothing a browser can see.
 const ARTIFACTS = {
-  build: 'dist/client/workbench/index.html',
+  'build:site': 'dist/client/workbench/index.html',
   'build:embed': 'dist/embed/mnx-lab.js',
   'build:lib': 'dist/lib/index.js',
 };
@@ -41,45 +53,99 @@ export function planSmokes(names, { built = false } = {}) {
   for (const name of names) {
     if (!Object.hasOwn(SMOKES, name)) throw new Error(`Unknown smoke: ${name}. Use --help for names.`);
   }
-  const selected = [...new Set(names)].map(name => SMOKES[name]);
-  const builds = [...new Set(selected.map(smoke => smoke.build).filter(Boolean))];
+  const unique = [...new Set(names)];
+  const builds = [...new Set(unique.map(name => SMOKES[name].build).filter(Boolean))];
   return {
     artifacts: builds.map(build => ARTIFACTS[build]),
-    commands: [
-      ...(built ? [] : builds.map(build => ({ command: 'npm', args: ['run', build] }))),
-      ...selected.flatMap(smoke => smoke.runs.map(({ file, env }) => ({
-        command: process.execPath, args: [file], ...(env ? { env } : {}),
-      }))),
-    ],
+    builds: built ? [] : builds.map(build => ({ command: 'npm', args: ['run', build] })),
+    jobs: unique.flatMap(name => SMOKES[name].jobs.map(chain => ({
+      label: name + (chain[0].env?.MNX_EMBED_FORMAT ? ` (${chain[0].env.MNX_EMBED_FORMAT})` : ''),
+      commands: chain.map(({ file, env }) => ({ command: process.execPath, args: [file], ...(env ? { env } : {}) })),
+    }))),
   };
 }
 
-function main() {
+/** Run one command with its output held back, so parallel smokes print whole. */
+function runBuffered({ command, args, env }, output) {
+  return new Promise(resolve => {
+    output.push(`> ${path.basename(command)} ${args.join(' ')}\n`);
+    const child = spawn(command, args, { cwd: ROOT, stdio: ['ignore', 'pipe', 'pipe'], env: { ...process.env, ...env } });
+    child.stdout.on('data', chunk => output.push(chunk));
+    child.stderr.on('data', chunk => output.push(chunk));
+    child.on('error', error => { output.push(`${error.stack}\n`); resolve(1); });
+    child.on('close', (code, signal) => resolve(code ?? (signal ? 1 : 0)));
+  });
+}
+
+async function runJobs(jobs, concurrency) {
+  const queue = [...jobs];
+  const results = [];
+  let stopped = false;
+  const worker = async () => {
+    while (queue.length && !stopped) {
+      const job = queue.shift();
+      const started = performance.now();
+      const output = [];
+      let status = 0;
+      for (const command of job.commands) {
+        status = await runBuffered(command, output);
+        if (status !== 0) break;
+      }
+      const seconds = (performance.now() - started) / 1000;
+      if (status !== 0) stopped = true;
+      results.push({ label: job.label, status, seconds });
+      process.stdout.write(`\n━━ ${job.label} ${status === 0 ? 'passed' : 'FAILED'} in ${seconds.toFixed(1)}s\n`);
+      process.stdout.write(Buffer.concat(output.map(part => (typeof part === 'string' ? Buffer.from(part) : part))));
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(concurrency, jobs.length) }, worker));
+  return { results, skipped: queue.map(job => job.label) };
+}
+
+function parseJobs(args) {
+  const at = args.findIndex(arg => arg === '--jobs' || arg === '-j');
+  if (at < 0) return { jobs: DEFAULT_JOBS, rest: args };
+  const jobs = Number(args[at + 1]);
+  if (!Number.isInteger(jobs) || jobs < 1) throw new Error('--jobs takes a whole number of at least 1.');
+  return { jobs, rest: args.filter((_, i) => i !== at && i !== at + 1) };
+}
+
+async function main() {
   const args = process.argv.slice(2);
   if (args.includes('--help')) {
-    console.log('Usage: npm run smoke -- [--built] <name> [<name> ...]');
+    console.log('Usage: npm run smoke -- [--built] [--jobs N] <name> [<name> ...]');
     console.log('Names: ' + Object.keys(SMOKES).join(', '));
     console.log('--built: reuse current artifacts; rebuild first if sources/configuration changed.');
+    console.log(`--jobs N: smokes run at once (default ${DEFAULT_JOBS}); 1 runs them in turn.`);
     return;
   }
-  const built = args.includes('--built');
-  const plan = planSmokes(args.filter(arg => arg !== '--built'), { built });
+  const { jobs: concurrency, rest } = parseJobs(args);
+  const built = rest.includes('--built');
+  const plan = planSmokes(rest.filter(arg => arg !== '--built'), { built });
   if (built) {
     for (const artifact of plan.artifacts) {
       if (!fs.existsSync(path.join(ROOT, artifact))) throw new Error(`Missing ${artifact}; run without --built first.`);
     }
   }
-  for (const { command, args, env } of plan.commands) {
-    console.log(`\n> ${path.basename(command)} ${args.join(' ')}`);
-    const child = spawnSync(command, args, { cwd: ROOT, stdio: 'inherit', env: { ...process.env, ...env } });
+  for (const { command, args: buildArgs } of plan.builds) {
+    console.log(`\n> ${path.basename(command)} ${buildArgs.join(' ')}`);
+    const child = spawnSync(command, buildArgs, { cwd: ROOT, stdio: 'inherit' });
     if (child.error) throw child.error;
     if (child.status !== 0) {
       process.exitCode = child.status ?? 1;
       return;
     }
   }
+  const started = performance.now();
+  const { results, skipped } = await runJobs(plan.jobs, concurrency);
+  const failed = results.filter(result => result.status !== 0);
+  console.log(`\n${results.length - failed.length} passed, ${failed.length} failed` +
+    `${skipped.length ? `, ${skipped.length} not started` : ''} in ${((performance.now() - started) / 1000).toFixed(1)}s (${concurrency} at once)`);
+  for (const { label } of failed) console.log(`  FAILED ${label}`);
+  if (skipped.length) console.log(`  not started after the failure: ${skipped.join(', ')}`);
+  if (failed.length) process.exitCode = 1;
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  try { main(); } catch (error) { console.error(error.message); process.exitCode = 1; }
+  main().catch(error => { console.error(error.message); process.exitCode = 1; });
 }

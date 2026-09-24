@@ -1,4 +1,4 @@
-import { waitFor, SCORE_READY } from './browserHarness.mjs';
+import { waitFor, settle, SCORE_READY } from './browserHarness.mjs';
 // The rung inspector, driven in a real browser
 // (roadmap/inprogress/workbench-rung-inspector.md). The data layer is joined
 // headlessly in harness/conformance/rung-inspector.test.ts; what only a
@@ -181,25 +181,25 @@ try {
   await cdp.send('Page.navigate', { url });
   await waitFor(cdp, SCORE_READY, 'the score and fonts');
 
-  const press = async (key, code, keyCode, settleMs = 500, modifiers = 0) => {
+  const press = async (key, code, keyCode, modifiers = 0) => {
     for (const type of ['keyDown', 'keyUp']) {
       await cdp.send('Input.dispatchKeyEvent', { type, key, code, windowsVirtualKeyCode: keyCode, modifiers });
     }
-    await new Promise(r => setTimeout(r, settleMs));
+    await settle(cdp);
   };
   const type = async text => {
     for (const ch of text) {
       await cdp.send('Input.dispatchKeyEvent', { type: 'keyDown', key: ch, text: ch });
       await cdp.send('Input.dispatchKeyEvent', { type: 'keyUp', key: ch });
     }
-    await new Promise(r => setTimeout(r, 400));
+    await settle(cdp);
   };
   const state = async () => JSON.parse(await cdp.evaluate(INSPECTOR));
 
   // ── Enter opens it over the selection ───────────────────────────────────
   console.log('Enter with nothing pending opens the inspector');
   await press('ArrowRight', 'ArrowRight', 39);
-  await press('Enter', 'Enter', 13, 1000);
+  await press('Enter', 'Enter', 13);
   let s = await state();
   if (!s.open) fail('no inspector after Enter');
   else {
@@ -241,7 +241,7 @@ try {
   s = await state();
   if (s.state !== 'add') fail(`typing did not open the slot (state ${s.state}, input ${s.input})`);
   else pass(`slot open with “${s.input}”, ${s.menu.length} candidate(s)`);
-  await press('Enter', 'Enter', 13, 900);
+  await press('Enter', 'Enter', 13);
   s = await state();
   const barline = s.pills.find(p => p.text.startsWith('barline:'));
   if (barline?.text !== 'barline: double') fail(`barline pill reads “${barline?.text}” (error: ${s.error})`);
@@ -256,9 +256,9 @@ try {
     s = await state();
     const i = s.pills.findIndex(p => p.cls.includes('cursor'));
     if (i >= 0 && s.pills[i].text.startsWith('barline:')) break;
-    await press('Tab', 'Tab', 9, 200);
+    await press('Tab', 'Tab', 9);
   }
-  await press('Backspace', 'Backspace', 8, 900);
+  await press('Backspace', 'Backspace', 8);
   s = await state();
   const reverted = s.pills.find(p => p.text.startsWith('barline:'));
   if (reverted?.text !== 'barline: regular') fail(`barline reads “${reverted?.text}” after ⌫`);
@@ -268,12 +268,12 @@ try {
   console.log('\n→ steps to the next bar; ← back');
   s = await state();
   const here = s.crumbs.find(c => c.active)?.label;
-  await press('ArrowRight', 'ArrowRight', 39, 600);
+  await press('ArrowRight', 'ArrowRight', 39);
   s = await state();
   const stepped = s.crumbs.find(c => c.active)?.label;
   if (stepped === here) fail(`→ did not step: still “${here}”`);
   else pass(`“${here}” → “${stepped}”`);
-  await press('ArrowLeft', 'ArrowLeft', 37, 600);
+  await press('ArrowLeft', 'ArrowLeft', 37);
   s = await state();
   if (s.crumbs.find(c => c.active)?.label !== here) fail('← did not step back');
   else pass('← back');
@@ -284,15 +284,15 @@ try {
   while (guard++ < 12) {
     s = await state();
     if (s.crumbs.find(c => c.cursor)?.label.startsWith('bar ')) break;
-    await press('Tab', 'Tab', 9, 200, 8);
+    await press('Tab', 'Tab', 9, 8);
   }
   const before = s.crumbs.find(c => c.active)?.label;
-  await press('Enter', 'Enter', 13, 600);
+  await press('Enter', 'Enter', 13);
   s = await state();
   if (s.state !== 'go to' || s.menu.length === 0) fail(`crumb did not open (state ${s.state}, ${s.menu.length} rows)`);
   else pass(`go to: ${s.menu.length} bars, current “${s.menu.find(m => m.cur)?.label}”`);
-  await press('ArrowDown', 'ArrowDown', 40, 300);
-  await press('Enter', 'Enter', 13, 900);
+  await press('ArrowDown', 'ArrowDown', 40);
+  await press('Enter', 'Enter', 13);
   s = await state();
   const after = s.crumbs.find(c => c.active)?.label;
   if (!s.open) fail('the inspector closed on go-to; it should stay open');
@@ -305,7 +305,7 @@ try {
   while (guard++ < 8) {
     s = await state();
     if (s.crumbs.find(c => c.active)?.label.startsWith('event')) break;
-    await press('ArrowDown', 'ArrowDown', 40, 400);
+    await press('ArrowDown', 'ArrowDown', 40);
   }
   s = await state();
   const eventCrumb = s.crumbs.find(c => c.active)?.label;
@@ -314,7 +314,7 @@ try {
     pass(`at “${eventCrumb}” · pills: ${s.pills.map(p => p.text).join(' · ') || '(none)'}`);
     if (!s.pills.some(p => p.text.startsWith('duration:'))) fail('no duration pill at the event rung');
     await type('staccato');
-    await press('Enter', 'Enter', 13, 900);
+    await press('Enter', 'Enter', 13);
     s = await state();
     if (!s.pills.some(p => p.text.startsWith('staccato'))) fail(`no staccato pill after applying (error: ${s.error}; pills ${JSON.stringify(s.pills.map(p => p.text))})`);
     else pass('staccato pill added');
@@ -338,7 +338,7 @@ try {
       const pill = [...(sr?.querySelectorAll('.pills .pill') ?? [])].find(p => p.textContent.includes('staccato'));
       pill?.querySelector('.x')?.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }));
     })()`);
-    await new Promise(r => setTimeout(r, 600));
+    await settle(cdp);
     s = await state();
     if (s.pills.some(p => p.text.startsWith('staccato'))) fail(`the × did not remove the pill (state ${s.state}; error: ${s.error})`);
     else if (s.state !== 'walking') fail(`the × opened the pill instead of removing — state reads ${s.state}`);
@@ -346,14 +346,14 @@ try {
     else pass('× removed the pill; still walking, no error');
     // Put it back so the note-rung step below still reads the marking.
     await type('staccato');
-    await press('Enter', 'Enter', 13, 900);
+    await press('Enter', 'Enter', 13);
     s = await state();
     if (!s.pills.some(p => p.text.startsWith('staccato'))) fail('could not re-add staccato after the × test');
   }
 
   // ── the note rung reads the string ──────────────────────────────────────
   console.log('\n↓ to the note rung');
-  await press('ArrowDown', 'ArrowDown', 40, 500);
+  await press('ArrowDown', 'ArrowDown', 40);
   s = await state();
   if (!s.crumbs.find(c => c.active)?.label.startsWith('note')) fail(`not at the note rung: ${s.crumbs.find(c => c.active)?.label}`);
   // This document's strings are DERIVED (no `_x.mnxLab.string`), so there is
@@ -363,8 +363,8 @@ try {
 
   // ── a range: the marking on one of two notes reads half-tone ────────────
   console.log('\nShift+→ twice: the first re-levels note→event (the floor axis), the second extends — staccato is on one of two, so it reads half-tone');
-  await press('ArrowRight', 'ArrowRight', 39, 500, 8);
-  await press('ArrowRight', 'ArrowRight', 39, 500, 8);
+  await press('ArrowRight', 'ArrowRight', 39, 8);
+  await press('ArrowRight', 'ArrowRight', 39, 8);
   s = await state();
   const half = s.pills.find(p => p.text.startsWith('staccato'));
 
@@ -375,11 +375,11 @@ try {
 
   // ── Esc closes; the score has the keys again ────────────────────────────
   console.log('\nEsc closes it');
-  await press('Escape', 'Escape', 27, 700);
+  await press('Escape', 'Escape', 27);
   s = await state();
   if (s.open) fail('still open after Escape');
   else pass('closed');
-  await press('ArrowRight', 'ArrowRight', 39, 600);
+  await press('ArrowRight', 'ArrowRight', 39);
   const hudAfter = JSON.parse(await cdp.evaluate(SELECTION));
   pass(`the score took the next key (bar row: ${hudAfter.rows.find(r => r.key === 'bar')?.value})`);
 
@@ -419,7 +419,7 @@ try {
     };
     find(document, 'mnx-lyric-text-editor', 0)?.shadowRoot.querySelector('button.apply')?.click();
   })()`;
-  await press('L', 'KeyL', 76, 900, 8);
+  await press('L', 'KeyL', 76, 8);
   let ly = JSON.parse(await cdp.evaluate(LYRIC));
   if (!ly.open) fail('no lyric editor after Shift+L');
   else {
@@ -431,18 +431,18 @@ try {
     else if (ly.applyDisabled) fail('apply is disabled with a clean, changed buffer');
     else pass('typed a verse, no diagnostics, apply armed');
     await cdp.evaluate(clickApply);
-    await new Promise(r => setTimeout(r, 900));
+    await settle(cdp);
     ly = JSON.parse(await cdp.evaluate(LYRIC));
     if (ly.open) fail('the editor did not close on apply');
     else pass('applied and closed');
-    await press('L', 'KeyL', 76, 900, 8);
+    await press('L', 'KeyL', 76, 8);
     ly = JSON.parse(await cdp.evaluate(LYRIC));
     // The canonical form may add bar checks the typed text lacked; the honest
     // assertions are that the verse landed and the buffer diffs to nothing.
     if (!ly.text?.startsWith('Hush')) fail(`reopening reads “${ly.text}” — the verse did not land in the document`);
     else if (ly.applyDisabled !== true) fail('the reopened buffer diffs against its own document — the round trip is broken');
     else pass(`reopened on the document’s own serialization (“${ly.text}”) — the round trip holds`);
-    await press('Escape', 'Escape', 27, 700);
+    await press('Escape', 'Escape', 27);
     ly = JSON.parse(await cdp.evaluate(LYRIC));
     if (ly.open) fail('still open after Escape');
     else pass('Esc closes the editor');

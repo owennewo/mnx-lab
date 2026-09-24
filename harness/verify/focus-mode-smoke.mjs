@@ -13,6 +13,7 @@ import http from 'node:http';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { waitFor, settle, SCORE_READY } from './browserHarness.mjs';
 
 const ROOT = path.dirname(path.dirname(path.dirname(fileURLToPath(import.meta.url))));
 const DIST = path.join(ROOT, 'dist/client');
@@ -238,10 +239,11 @@ try {
   const url =
     `http://127.0.0.1:${site.port}/workbench/#/scenario/lab/document/twelve-bar-blues`;
   await cdp.send('Page.navigate', { url });
-  await new Promise(resolve => setTimeout(resolve, 6500));
+  await waitFor(cdp, SCORE_READY, 'the score and fonts');
+  await settle(cdp);
 
   const dump = async () => JSON.parse(await cdp.evaluate(DUMP));
-  const press = async (key, code, keyCode, modifiers = 0, settleMs = 500) => {
+  const press = async (key, code, keyCode, modifiers = 0) => {
     for (const type of ['keyDown', 'keyUp']) {
       await cdp.send('Input.dispatchKeyEvent', {
         type,
@@ -251,7 +253,7 @@ try {
         modifiers
       });
     }
-    await new Promise(resolve => setTimeout(resolve, settleMs));
+    await settle(cdp);
   };
   const focusKey = () => press('f', 'KeyF', 70, 3);
   const FRAME =
@@ -259,18 +261,18 @@ try {
     ".querySelector('mnx-scenario-page').shadowRoot";
   const clickFrameFocus = async () => {
     await cdp.evaluate(`${FRAME}.querySelector('mnx-score-frame').shadowRoot.querySelector('.focus-mark').click()`);
-    await new Promise(resolve => setTimeout(resolve, 400));
+    await settle(cdp);
   };
   const clickFocusPlay = async () => {
     await cdp.evaluate(`${FRAME}.querySelector('mnx-score-frame').shadowRoot.querySelector('.focus-play').click()`);
-    await new Promise(resolve => setTimeout(resolve, 400));
+    await settle(cdp);
   };
   const openZoom = async () => {
     await cdp.evaluate(
       `[...${FRAME}.querySelector('mnx-score-frame').shadowRoot.querySelectorAll('.strip.top .btn')]` +
         ".find(b => b.getAttribute('aria-label') === 'Zoom').click()"
     );
-    await new Promise(resolve => setTimeout(resolve, 300));
+    await settle(cdp);
   };
 
   let state = await dump();
@@ -390,7 +392,7 @@ try {
     deviceScaleFactor: 1,
     mobile: false
   });
-  await new Promise(resolve => setTimeout(resolve, 1300));
+  await settle(cdp);
   state = await dump();
   check(
     near(state.viewerRect.width, 820) && near(state.scoreRect.width, 820) && near(state.scoreRect.height, 520),
@@ -442,12 +444,12 @@ try {
   await cdp.evaluate(
     "location.hash='#/scenario/lab/document/navigation-playground'"
   );
-  await new Promise(resolve => setTimeout(resolve, 1200));
+  await settle(cdp);
   state = await dump();
   check(state.appFocus && state.pageFocus, 'scenario-to-scenario navigation preserves document focus');
 
   await cdp.evaluate("location.hash='#/'");
-  await new Promise(resolve => setTimeout(resolve, 700));
+  await settle(cdp);
   state = await dump();
   check(!state.appFocus && state.header && state.nav, 'leaving scenario routes exits document focus');
 
@@ -472,25 +474,25 @@ try {
   // the check below pass on nothing at all. The assertion on the frame's own
   // width is there to make that impossible.
   await cdp.evaluate("location.hash='#/scenario/lab/document/navigation-playground'");
-  await new Promise(resolve => setTimeout(resolve, 900));
+  await settle(cdp);
   await cdp.send('Emulation.setDeviceMetricsOverride', {
     width: 412,
     height: 915,
     deviceScaleFactor: 1,
     mobile: false
   });
-  await new Promise(resolve => setTimeout(resolve, 900));
+  await settle(cdp);
   state = await dump();
   if (state.railPreference !== '1') await press('b', 'KeyB', 66, 2);
   if (state.panelPreference !== '1') await press('b', 'KeyB', 66, 3);
-  await new Promise(resolve => setTimeout(resolve, 600));
+  await settle(cdp);
   state = await dump();
   check(state.frameRect && state.frameRect.width >= 380, `the frame really is phone-wide ${JSON.stringify(state.frameRect)}`);
   await cdp.evaluate(
     `[...${FRAME}.querySelector('mnx-score-frame').shadowRoot.querySelectorAll('.strip.top .btn')]` +
       ".find(b => b.getAttribute('aria-label') === 'Settings').click()"
   );
-  await new Promise(resolve => setTimeout(resolve, 400));
+  await settle(cdp);
   state = await dump();
   check(
     state.padRect &&

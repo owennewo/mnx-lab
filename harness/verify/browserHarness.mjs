@@ -92,3 +92,68 @@ export const SCORE_READY = `(() => {
   }
   return false;
 })()`;
+
+/** True once the page has gone quiet after an input: for three frames running,
+ *  no DOM mutation anywhere (shadow roots included — a script-driven tween
+ *  writes attributes every frame until it removes itself), no Lit update
+ *  pending (one that threw counts as finished), no CSS transition running,
+ *  and no scroll position moving — which covers the smooth scroll a moved
+ *  selection starts from its own frame callback. False if it never does
+ *  within 10 s. */
+export const SETTLED = `(async () => {
+  const frame = () => new Promise(resolve => requestAnimationFrame(() => resolve()));
+  let mutated = false;
+  const observer = new MutationObserver(() => { mutated = true; });
+  const observed = new Set();
+  const walk = () => {
+    const elements = [];
+    const roots = [document];
+    for (let i = 0; i < roots.length; i++) {
+      if (!observed.has(roots[i])) {
+        observed.add(roots[i]);
+        observer.observe(roots[i], { subtree: true, childList: true, attributes: true, characterData: true });
+      }
+      for (const element of roots[i].querySelectorAll('*')) {
+        elements.push(element);
+        if (element.shadowRoot) roots.push(element.shadowRoot);
+      }
+    }
+    return { elements, roots };
+  };
+  const scrolls = elements => String(window.scrollX) + ',' + String(window.scrollY) + ';' + elements
+    .filter(element => element.scrollTop || element.scrollLeft)
+    .map(element => element.localName + ':' + element.scrollTop + ',' + element.scrollLeft)
+    .join(';');
+  // A CSS transition is a state change still arriving — a width a geometry
+  // check would read mid-flight. A keyframed animation is decoration (the
+  // focus hint fades for 2.2 s) and never holds the page up.
+  const animating = roots => roots.some(root => root.getAnimations().some(animation =>
+    animation instanceof CSSTransition && animation.playState === 'running'));
+  const deadline = performance.now() + 10000;
+  let last = null;
+  let quiet = 0;
+  try {
+    while (performance.now() < deadline) {
+      // Waiting, not judging: an update that throws still ends, and whether a
+      // throw is a failure is the smoke's assertion to make, not the wait's.
+      await Promise.all(walk().elements.map(element => element.updateComplete?.catch(() => {})));
+      mutated = false;
+      await frame();
+      const { elements, roots } = walk();
+      if (observer.takeRecords().length) mutated = true;
+      const now = scrolls(elements);
+      const busy = mutated || elements.some(element => element.isUpdatePending) || animating(roots);
+      quiet = !busy && now === last ? quiet + 1 : 0;
+      last = now;
+      if (quiet >= 3) return true;
+    }
+    return false;
+  } finally {
+    observer.disconnect();
+  }
+})()`;
+
+/** Wait for the page to settle after an input — instead of a guessed sleep. */
+export async function settle(cdp) {
+  if (!(await cdp.evaluate(SETTLED))) throw new Error('the page never settled (the DOM, an update, an animation or a scroll still moving after 10 s)');
+}

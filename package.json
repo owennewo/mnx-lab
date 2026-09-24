@@ -26,6 +26,7 @@
     "dev:port": "node tools/dev-port.mjs",
     "worktree:retire": "node tools/worktree-retire.mjs",
     "build": "npm run compile-validator && npm run check:boundaries && tsc && tsc -p worker && vite build",
+    "build:site": "vite build",
     "build:lib": "vite build -c vite.lib.config.ts",
     "build:embed": "vite build -c vite.embed.config.ts",
     "smoke:lib": "node harness/verify/run-smokes.mjs lib",

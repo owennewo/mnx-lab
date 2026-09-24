@@ -1,4 +1,4 @@
-import { waitFor, SCORE_READY } from './browserHarness.mjs';
+import { waitFor, settle, SCORE_READY } from './browserHarness.mjs';
 // The selection overlay, driven in a real browser — the first test this layer
 // has ever had, and the reason it needed one: three separate bugs put the
 // selection box on the wrong beat, each invisible until the one in front of it
@@ -206,11 +206,11 @@ try {
   await cdp.send('Page.navigate', { url });
   await waitFor(cdp, SCORE_READY, 'the score and fonts');
 
-  const press = async (key, code, keyCode, settleMs = 700) => {
+  const press = async (key, code, keyCode, wait = true) => {
     for (const type of ['keyDown', 'keyUp']) {
       await cdp.send('Input.dispatchKeyEvent', { type, key, code, windowsVirtualKeyCode: keyCode });
     }
-    await new Promise(r => setTimeout(r, settleMs));
+    if (wait) await settle(cdp);
   };
 
   console.log('insert a note, then delete it — the cursor lands on a rest mid-bar');
@@ -248,7 +248,7 @@ try {
   // fret will land in for the whole window, so only the ink changes at the
   // commit. Judged in a browser because it is a fact about the drawn overlay.
   console.log('\ntype a fret over that rest — the box must not move when it commits');
-  await press('1', 'Digit1', 49, 200); // inside the 500 ms window
+  await press('1', 'Digit1', 49); // inside the 500 ms window
   const typing = JSON.parse(await cdp.evaluate(DUMP));
   if (typing.pendingFret !== '1') {
     fail(`no pending fret is painted (got ${JSON.stringify(typing.pendingFret)})`);
@@ -265,7 +265,8 @@ try {
       pass('the rest has stopped claiming the beat');
     }
   }
-  await new Promise(r => setTimeout(r, 700)); // past the window: the fret lands
+  await waitFor(cdp, `JSON.parse(${DUMP}).pendingFret === null`, 'the fret to land past its window');
+  await settle(cdp);
   const landed = JSON.parse(await cdp.evaluate(DUMP));
   if (landed.pendingFret !== null) fail('the fret never committed — still pending');
   else if (landed.encKinds.length && !landed.encKinds.includes('enc-cell')) {
@@ -280,8 +281,8 @@ try {
   console.log('\nwalk off the end of the score onto the ghost bar');
   await press('End', 'End', 35);
   const beforeGhost = JSON.parse(await cdp.evaluate(DUMP));
-  for (let i = 0; i < 40; i++) await press('ArrowRight', 'ArrowRight', 39, 60);
-  await new Promise(r => setTimeout(r, 700));
+  for (let i = 0; i < 40; i++) await press('ArrowRight', 'ArrowRight', 39, false);
+  await settle(cdp);
 
   const past = JSON.parse(await cdp.evaluate(DUMP));
   const panel = past.ghostPanels.find(rect => rect.scope === 'past-end');
@@ -326,9 +327,9 @@ try {
   // directions: the arithmetic reveals a selection below the fold and one
   // above it through different branches.
   console.log('the selection stays in view while moving about the score');
-  const settle = async () => {
+  const arrive = async () => {
     // The scroll is smooth; let it arrive before measuring.
-    await new Promise(r => setTimeout(r, 900));
+    await settle(cdp);
     const state = JSON.parse(await cdp.evaluate(IN_VIEW));
     if (state.error) throw new Error(state.error);
     return state;
@@ -380,12 +381,12 @@ try {
   await cdp.send('Page.navigate', { url });
   await waitFor(cdp, SCORE_READY, 'the score and fonts');
 
-  const before = await settle();
+  const before = await arrive();
   if (!before.overflows) {
     fail('the score fits the viewport — this case asserts nothing about scrolling');
   } else {
     await press('End', 'End', 35);
-    const atEnd = await settle();
+    const atEnd = await arrive();
     if (atEnd.scrollTop <= before.scrollTop) {
       fail(`End reached the last bar but the viewer never scrolled (${atEnd.scrollTop})`);
     } else {
@@ -394,7 +395,7 @@ try {
     inView(atEnd, 'at the last bar');
 
     await press('Home', 'Home', 36);
-    const atStart = await settle();
+    const atStart = await arrive();
     if (atStart.scrollTop >= atEnd.scrollTop) {
       fail('Home reached the first bar but the viewer never scrolled back');
     } else {

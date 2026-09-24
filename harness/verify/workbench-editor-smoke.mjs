@@ -19,7 +19,7 @@ import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { serveStatic } from './staticServer.mjs';
-import { devtoolsPort, connect, client } from './browserHarness.mjs';
+import { devtoolsPort, connect, client, settle } from './browserHarness.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const delay = ms => new Promise(r => setTimeout(r, ms));
@@ -63,16 +63,16 @@ try {
   const press = async (key, code, keyCode, modifiers = 0, text) => {
     await c.send('Input.dispatchKeyEvent', { type: 'keyDown', key, code, windowsVirtualKeyCode: keyCode, modifiers, ...(text ? { text } : {}) });
     await c.send('Input.dispatchKeyEvent', { type: 'keyUp', key, code, windowsVirtualKeyCode: keyCode, modifiers });
-    await delay(250);
+    await settle(c);
   };
   const clickAt = async (x, y) => {
     for (const type of ['mousePressed', 'mouseReleased']) await c.send('Input.dispatchMouseEvent', { type, x, y, button: 'left', clickCount: 1 });
-    await delay(300);
+    await settle(c);
   };
   const open = async id => {
     await c.send('Page.navigate', { url: `http://127.0.0.1:${server.port}/workbench/#/scenario/${id}` });
     await until(`page()?.editor && viewer()?.selection?.activeMeasureIndex != null`, `no bound editor on ${id}`);
-    await delay(800);
+    await settle(c);
   };
 
   // ── nothing focused: the keys are still the score's ────────────────────────
@@ -85,17 +85,17 @@ try {
 
   // ── an edit reaches the page; the ops panel walks the session under the binding ──
   await press('5', 'Digit5', 53, 0, '5');
-  await delay(700); // the fret window
+  await until(`page().editor.session.appliedOps.length > 0`, 'the fret window never closed');
   assert.equal(await run(`return page().editor.session.appliedOps.length;`), 1, 'fret 5 did not become one op');
   assert.equal(await run(`return page().doc.mnxJson === page().editor.session.doc;`), true, 'the page is not showing the session’s document');
   await run(`[...page().shadowRoot.querySelectorAll('.panel-tabs button')].find(b => b.textContent.trim().startsWith('ops')).click();`);
-  await delay(300);
+  await settle(c);
   assert.equal(await run(`return page().shadowRoot.querySelectorAll('ol.ops li').length;`), 2, 'the ops panel does not list the op');
   await run(`page().shadowRoot.querySelector('ol.ops li.baseline').click();`);
-  await delay(300);
+  await settle(c);
   assert.deepEqual(await run(`const s = page().editor.session; return [s.appliedOps.length, s.canRedo, page().doc.mnxJson === s.doc];`), [0, true, true], 'jumping to the start did not undo through the binding');
   await run(`page().shadowRoot.querySelector('ol.ops li.row-past').click();`);
-  await delay(300);
+  await settle(c);
   assert.equal(await run(`return page().editor.session.appliedOps.length;`), 1, 'redo from the ops panel');
 
   // ── revert REPLACES the session: the binding follows it ────────────────────
@@ -119,7 +119,7 @@ try {
     if (await run(`return page().editor.session.selectionLevel;`) === level) continue;
     refusals++;
     assert.equal(await run(`return !!page().shadowRoot.querySelector('.rung-chip.refused');`), true, `Shift+${index + 1} (${level}) was refused without a flash`);
-    await delay(900);
+    await until(`!page().shadowRoot.querySelector('.rung-chip.refused')`, 'the refusal flash never cleared');
   }
 
   // ── a pointer outside the inspector closes it ──────────────────────────────
@@ -157,7 +157,7 @@ try {
   // ── construct replay builds a session elsewhere and hands it over; the sweep drives it directly ──
   await open('lab/tab-derivation/bare-melody');
   await run(`[...page().shadowRoot.querySelectorAll('.panel-tabs button')].find(b => b.textContent.trim().startsWith('ops')).click();`);
-  await delay(300);
+  await settle(c);
   await run(`window.__session = page().editor.session; button('replay construct trace').click();`);
   await until(`page().editor && page().editor.session !== window.__session`, 'replay did not rebind the editor');
   const built = await run(`const s = page().editor.session; return [s.appliedOps.length > 0, page().doc.mnxJson === s.doc, viewer().selection.activeMeasureIndex != null];`);
@@ -168,9 +168,9 @@ try {
   await c.send('Page.navigate', { url: 'about:blank' }); // the same hash again would not reload the page
   await open('lab/tab-derivation/bare-melody');
   await run(`[...page().shadowRoot.querySelectorAll('.panel-tabs button')].find(b => b.textContent.trim().startsWith('ops')).click();`);
-  await delay(300);
+  await settle(c);
   await run(`button('run destruct sweep').click();`);
-  await delay(500);
+  await settle(c);
   // The sweep dissolves the score to `{}`, which the page must survive showing (it compiles every revision).
   assert.deepEqual(await run(`const s = page().editor.session; return [s.appliedOps.length > 0, page().doc.mnxJson === s.doc];`), [true, true], 'the sweep’s ops did not reach the page');
   await press('z', 'KeyZ', 90, 2);
@@ -331,14 +331,14 @@ try {
   // The hover ghost: a mouse over the paper proposes a landing, and leaving
   // takes it away. Touch never sees it, which is why the snap has to be enough.
   await c.send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: gap.x + 30, y: gap.y, button: 'none' });
-  await delay(300);
+  await settle(c);
   assert.equal(
     await run(`const svg = viewer().renderRoot.querySelector('#projection-container svg'); return !!svg.querySelector(':scope > g.pointer-ghost');`),
     true,
     'a mouse over the score drew no hover ghost'
   );
   await run(`viewer().container.dispatchEvent(new PointerEvent('pointerleave'));`);
-  await delay(150);
+  await settle(c);
   assert.equal(
     await run(`const svg = viewer().renderRoot.querySelector('#projection-container svg'); return !!svg.querySelector(':scope > g.pointer-ghost');`),
     false,

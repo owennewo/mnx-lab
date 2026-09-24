@@ -17,9 +17,20 @@ prove the new regression assertion fails on old code with the smallest applicabl
 
 `npm run smoke -- selection inspector` builds the site once and runs both smokes.
 Individual commands such as `npm run smoke:selection` still build for you.
-The runner builds each requested face at most once (site, embed, or library), retains
-both ESM and IIFE embed checks, and stops at the first failure. Use
-`npm run smoke -- --help` for names, including smokes without individual npm scripts.
+The runner builds each requested face at most once (site, embed, or library) — the
+bundle only (`build:site` is `vite build`, a few seconds): the gate build's validators,
+boundaries and type checks are the gate's business, not the browser's. Then it runs the
+smokes **four at a time** (`--jobs N` to change it, `--jobs 1` for one after another):
+each owns its ports, Chrome profile and library, so nothing is shared. Output is held
+per smoke and printed whole as each finishes; after the first failure nothing new
+starts, and the summary names what failed and what never ran. The ESM and IIFE embed
+checks are two independent jobs; a review page and the smoke that reads it
+(`player`, `unrolled`) stay one ordered job. Use `npm run smoke -- --help` for names,
+including smokes without individual npm scripts.
+
+On 2026-09-24 the full set took ~205 s one at a time and ~67 s four at once, all green,
+before any smoke was sped up; eight at once was faster still but slowed each smoke by
+up to 2× on a 6-core machine, which is where timing flakes live.
 
 After a successful gate build, run `npm run smoke -- --built selection inspector`.
 `--built` skips builds explicitly: the artifacts must match the current sources and
@@ -149,6 +160,22 @@ el.dispatchEvent(new PointerEvent('pointerdown', {
 Rationals crossing `Runtime.evaluate` are BigInt and **`JSON.stringify` throws
 on them** — send `String(r.num) + '/' + String(r.den)`, or compare in the page
 (`a.num * b.den - b.num * a.den`).
+
+**Wait for a condition, never a guessed time.** After an input, `await settle(cdp)`
+(`browserHarness.mjs`): it returns once, for three frames running, nothing in the DOM or
+any shadow root has changed, no Lit update is pending, no CSS transition is running and
+no scroll has moved. That is what a fixed sleep was guessing at, and the guesses were
+most of the suite's time — `inspector` spent 21 of its 25 s asleep. What `settle` cannot
+see is a timer that fires *later* in quiet: the fret window, a refusal flash. Wait for
+that timer's result by name with `waitFor` / the smoke's `until`, as
+`selection-smoke` does for `pendingFret === null`. Keyframed animations (the focus
+hint's 2.2 s fade) do not hold `settle` up; transitions do, because a geometry check can
+read one mid-flight.
+
+`settle` found two things the sleeps hid: a 180 ms enclosure tween still on the page
+(the old sleep outlasted it by luck), and after the destruct sweep the scenario page's
+render throws (`reading 'lyrics'` on the `{}` document). A throwing update counts as
+finished — judging it is an assertion's job, not the wait's.
 
 Prefer an invariant over a constant: "these two presses land in two different
 places" survives a re-engraving, an edited fixture and a different window size,
