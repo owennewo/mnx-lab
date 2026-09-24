@@ -1,0 +1,53 @@
+{
+  "id": "11g-TimeSignatures-SingleNumber",
+  "sourceSha256": "bad3e78bc80b57f01b628d724c03d9817fd2229858eed62e9725fdfc4e544028",
+  "testClass": "feature",
+  "description": "Two time signatures (3/8 and 3+2/8) having the attribute ‘symbol=\"single-number\"’ (which is a misnomer; it actually means to show only the numerator part).",
+  "views": [
+    {
+      "scrollTarget": "viewer",
+      "visibleWidth": 750,
+      "visibleHeight": 753.125,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0,
+          1
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [],
+      "scrollWidth": 750,
+      "scrollHeight": 753,
+      "clientWidth": 750,
+      "clientHeight": 753,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "importError": null,
+  "warnings": [
+    "part P1, measure 1: time symbol single-number is not represented; using a numeric meter.",
+    "part P1, measure 2: time symbol single-number is not represented; using a numeric meter.",
+    "part P1, measure 2: additive/compound time grouping is not represented; retaining equivalent total 5/8."
+  ],
+  "importedDocumentSha256": "e266d92aa06be9d2a81d9e263691d13482edf65ea6f3956d95a46f13fdee8531",
+  "displayOptions": {
+    "lyrics": "current",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

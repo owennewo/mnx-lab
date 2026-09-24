@@ -1,0 +1,60 @@
+{
+  "id": "11d-TimeSignatures-ComplexMultiple",
+  "sourceSha256": "6ace5ecb41bfb9602cde51443e0cfca8d2f2f414b36282cfda1378fcec795458",
+  "testClass": "feature",
+  "description": "Complex time signatures with separate fractions displayed: 3/8+2/8+3/4 and 5/2+1/8.",
+  "views": [
+    {
+      "scrollTarget": "frame",
+      "visibleWidth": 1060,
+      "visibleHeight": 870,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0,
+          1
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [
+        "validation — underfills the 21/8 bar: notes sum to 20 of 21 beats",
+        "validation — underfills the 21/8 bar: notes sum to 20 of 21 beats"
+      ],
+      "scrollWidth": 1060,
+      "scrollHeight": 870,
+      "clientWidth": 1060,
+      "clientHeight": 870,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "suppliedLibraryTitle": "11d-TimeSignatures-ComplexMultiple",
+  "makeCurrentError": null,
+  "entryPath": "Local operator ingest: GP seed + unmodified XML original; Save → Versions → View XML → Make current",
+  "importError": null,
+  "viewingOriginal": false,
+  "editingSuspended": false,
+  "warnings": [
+    "part P1, measure 1: additive/compound time grouping is not represented; retaining equivalent total 11/8.",
+    "part P1, measure 2: additive/compound time grouping is not represented; retaining equivalent total 21/8."
+  ],
+  "importedDocumentSha256": "5ff2df54697a64a82311ea6977065f352081cea1f459a45e309bc07d266e7c56",
+  "displayOptions": {
+    "lyrics": "current",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

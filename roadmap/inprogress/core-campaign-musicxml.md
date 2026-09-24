@@ -250,6 +250,31 @@ committed to the repo, like `worker/models.json`.
 
 ## Progress + learnings
 
+### 2026-09-24 — item 18: current 11-series meter rendering slice
+
+[The twelve-source current review](../../docs/musicxml-meter-current-assessment.md)
+adds 34 stable feature IDs, 40 source contexts and 68 both-shell Notation
+rows. Original XML, current imported MNX, Show meter preference, one complete
+viewport tile per score and source-located warnings are retained. Every
+Studio imported version is now editable after item 23's title repair. No
+source declares known strings; Tab/Both are inapplicable.
+
+All numeric totals now survive, including 5/8, 9/4, 11/8 and 21/8 from
+additive or separate fractions. Compatible common 4/4 displays as C; the
+independent piano staves in `11b` remain intact. These are item 22's landed
+fixes. Group spelling, hidden and staff-local meters, single-number display,
+unmetered state, X and alternate meters still disappear at import with
+warnings. `11h`'s default metric interpretation produces underfill badges.
+The conflicting `11a` and `11f` glyph requests, plus `11h` rest/voice
+context, have explicit unresolved dispositions. This current slice
+supersedes the old meter captures as a feature verdict sheet but preserves
+them as historical evidence.
+
+No new proposal duplicates item 22's documented carrier/display deferrals
+or item 23's title/range work. Item 19 receives the same feature IDs but
+no new create/inspect/change/remove, undo/redo or route-specific persistence
+passes. Render item 18 remains open for the rest of the 183-source suite.
+
 ### 2026-09-24 — item 18: 13-series key-signature rendering slice
 
 [The seven-source current review](../../docs/musicxml-key-assessment.md)

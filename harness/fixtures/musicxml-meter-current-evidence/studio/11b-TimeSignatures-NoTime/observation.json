@@ -1,0 +1,61 @@
+{
+  "id": "11b-TimeSignatures-NoTime",
+  "sourceSha256": "6038ef114c04d0e526b9435eb457572bfc1baffbe302d01150773c17a9102fef",
+  "testClass": "feature",
+  "description": "A score without a time signature at the beginning (but with <key> and <clef> elements). The second bar sets a 2/2 time signature with ‘print-object=\"no\"’ for both staves, and the third bar sets a 4/4 time signature with ‘print-object=\"no\"’ only for the lower staff. Whether a time signature is actually displayed at the very beginning (if there is no <time> element) is application-dependent.",
+  "views": [
+    {
+      "scrollTarget": "frame",
+      "visibleWidth": 1060,
+      "visibleHeight": 870,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0,
+          1,
+          2
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [],
+      "scrollWidth": 1060,
+      "scrollHeight": 870,
+      "clientWidth": 1060,
+      "clientHeight": 870,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "suppliedLibraryTitle": "11b-TimeSignatures-NoTime",
+  "makeCurrentError": null,
+  "entryPath": "Local operator ingest: GP seed + unmodified XML original; Save → Versions → View XML → Make current",
+  "importError": null,
+  "viewingOriginal": false,
+  "editingSuspended": false,
+  "warnings": [
+    "part P1, measure 2: time print-object=\"no\" is not represented; the meter remains visible when time signatures are shown.",
+    "part P1, measure 3, staff 1: staff-local time scope is not represented; the selected meter is applied globally.",
+    "part P1, measure 3, staff 2: staff-local time scope is not represented; the selected meter is applied globally.",
+    "part P1, measure 3, staff 2: time print-object=\"no\" is not represented; the meter remains visible when time signatures are shown.",
+    "part P1, measure 3, staff 2: additional local time declaration is not represented; first meter retained."
+  ],
+  "importedDocumentSha256": "d106bba48288b4604f9c7b65a3bbf4e707fd4476939b63b713fc2f490ef6e049",
+  "displayOptions": {
+    "lyrics": "current",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

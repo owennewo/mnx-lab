@@ -1,0 +1,399 @@
+{
+  "kind": "retained original-file browser captures; not feature verdicts",
+  "applicationCommit": "183ac0885ef19df26b3278c6e5f413a90e07dc76",
+  "corpusRevision": "77c19f7e819154c70ca1a1992e80dcda8ff82fea",
+  "files": [
+    {
+      "path": "workbench/11a-TimeSignatures/document.mnx.json",
+      "sha256": "dc38ac8a81fbc6cfc6a21beef2599cb271977e48192b971fd8db0b9d67fca699"
+    },
+    {
+      "path": "workbench/11a-TimeSignatures/notation-0-0.png",
+      "sha256": "dc48c8546a85441c4a7ab348dba5344b2d5c64dda171e3cd4ddbab62bfe45b85"
+    },
+    {
+      "path": "workbench/11a-TimeSignatures/notation-0.svg",
+      "sha256": "aee24c84300e47473a0fa3272e36f6a001a67d5f3461c344c48c3da859611816"
+    },
+    {
+      "path": "workbench/11a-TimeSignatures/observation.json",
+      "sha256": "a89c22a5f7d77e5fdb964661da14d1b42511b10984db4e2326fbc612082b3d58"
+    },
+    {
+      "path": "workbench/11b-TimeSignatures-NoTime/document.mnx.json",
+      "sha256": "cef3bb198da83d397999304da0852fb9b6069d47ab5985d9a6ac7e95b43dff5b"
+    },
+    {
+      "path": "workbench/11b-TimeSignatures-NoTime/notation-0-0.png",
+      "sha256": "76f984d4a029eeff2c1dcf0b64292d1e00d8827770f319bddb0eed7b00d5e991"
+    },
+    {
+      "path": "workbench/11b-TimeSignatures-NoTime/notation-0.svg",
+      "sha256": "c8b3c7d475af45c71cf02bfd6a87ccf4e2ce5f6cddcfba98938e15635cbd94c1"
+    },
+    {
+      "path": "workbench/11b-TimeSignatures-NoTime/observation.json",
+      "sha256": "1b89f00d16a6c6c33161c8e7f666259d25981ea0c4d204518f6f547b01c42328"
+    },
+    {
+      "path": "workbench/11c-TimeSignatures-Complex/document.mnx.json",
+      "sha256": "631a032c628a9368008525db9b70211a1081a16082e7594fb60ef1924aa18aac"
+    },
+    {
+      "path": "workbench/11c-TimeSignatures-Complex/notation-0-0.png",
+      "sha256": "8a614303913f7d08cacd57c6eb4ec5831947072635b8b965d738cb2b321d3555"
+    },
+    {
+      "path": "workbench/11c-TimeSignatures-Complex/notation-0.svg",
+      "sha256": "933816bb6830f445a71910bd17560274c6c8f81aaa298af68948d799710ebc3e"
+    },
+    {
+      "path": "workbench/11c-TimeSignatures-Complex/observation.json",
+      "sha256": "0fb4744a1b55c52a520acf04bb06c06f5ef27abfd5c586bd284ef55e02a7dcf5"
+    },
+    {
+      "path": "workbench/11c-TimeSignatures-CompoundSimple/document.mnx.json",
+      "sha256": "631a032c628a9368008525db9b70211a1081a16082e7594fb60ef1924aa18aac"
+    },
+    {
+      "path": "workbench/11c-TimeSignatures-CompoundSimple/notation-0-0.png",
+      "sha256": "112e4a1b95cd250d374bf9b81a3fa5c9864b7a7498957d50c504bfc4358425bb"
+    },
+    {
+      "path": "workbench/11c-TimeSignatures-CompoundSimple/notation-0.svg",
+      "sha256": "933816bb6830f445a71910bd17560274c6c8f81aaa298af68948d799710ebc3e"
+    },
+    {
+      "path": "workbench/11c-TimeSignatures-CompoundSimple/observation.json",
+      "sha256": "e1464378bb86ffadf9e19d5abcb0993c2229c6a62c021b0aa93687b3c750b9ec"
+    },
+    {
+      "path": "workbench/11d-TimeSignatures-ComplexMultiple/document.mnx.json",
+      "sha256": "055fbff22ec2293fdaf1739cc97b4c0d70a1bd6d27996b861ce1131a35aabec9"
+    },
+    {
+      "path": "workbench/11d-TimeSignatures-ComplexMultiple/notation-0-0.png",
+      "sha256": "aff78f36ad9df31917b991abceb5e2a9e5fd914f926f973cecc19f41f00fae70"
+    },
+    {
+      "path": "workbench/11d-TimeSignatures-ComplexMultiple/notation-0.svg",
+      "sha256": "2f4e5dd001a3ce4720a18cc16c68e989189e9ad972fdf7ca084cd2b6eb9b53b6"
+    },
+    {
+      "path": "workbench/11d-TimeSignatures-ComplexMultiple/observation.json",
+      "sha256": "ede1c912d9ec64c905dfda7eb9375fb9b1379da8300e26480c0e5613c814a96f"
+    },
+    {
+      "path": "workbench/11d-TimeSignatures-CompoundMultiple/document.mnx.json",
+      "sha256": "055fbff22ec2293fdaf1739cc97b4c0d70a1bd6d27996b861ce1131a35aabec9"
+    },
+    {
+      "path": "workbench/11d-TimeSignatures-CompoundMultiple/notation-0-0.png",
+      "sha256": "59fcaedd7cf4bae287925c7f6225291022bc7ca123786a900c6d31f334ba06a0"
+    },
+    {
+      "path": "workbench/11d-TimeSignatures-CompoundMultiple/notation-0.svg",
+      "sha256": "2f4e5dd001a3ce4720a18cc16c68e989189e9ad972fdf7ca084cd2b6eb9b53b6"
+    },
+    {
+      "path": "workbench/11d-TimeSignatures-CompoundMultiple/observation.json",
+      "sha256": "0e97ccc53cc4cd6fb0c061ee3924414a8509e0c73b0753748cd32ac6f721969b"
+    },
+    {
+      "path": "workbench/11e-TimeSignatures-ComplexMixed/document.mnx.json",
+      "sha256": "37711e6377b3ee01b775101ebeb51fe88273aa0a0be93cf12ebef729d1a25cc3"
+    },
+    {
+      "path": "workbench/11e-TimeSignatures-ComplexMixed/notation-0-0.png",
+      "sha256": "4111e6e31f48ed45aa3ed7a9dc641452c35dafbbece44171c2be934635af71df"
+    },
+    {
+      "path": "workbench/11e-TimeSignatures-ComplexMixed/notation-0.svg",
+      "sha256": "2e6088f5ac788c81cab990cc5bd90574cfa643e991f6f567cdb44c6b6233d007"
+    },
+    {
+      "path": "workbench/11e-TimeSignatures-ComplexMixed/observation.json",
+      "sha256": "be0eca2e25b434f830ec85a278e99bb5c229916bb30b819212874e3a7254f4de"
+    },
+    {
+      "path": "workbench/11e-TimeSignatures-CompoundMixed/document.mnx.json",
+      "sha256": "37711e6377b3ee01b775101ebeb51fe88273aa0a0be93cf12ebef729d1a25cc3"
+    },
+    {
+      "path": "workbench/11e-TimeSignatures-CompoundMixed/notation-0-0.png",
+      "sha256": "4d64312398132a35c19123e20bc3b7852c6c82ec39c393f7f3cdb9fa48a9bdd0"
+    },
+    {
+      "path": "workbench/11e-TimeSignatures-CompoundMixed/notation-0.svg",
+      "sha256": "2e6088f5ac788c81cab990cc5bd90574cfa643e991f6f567cdb44c6b6233d007"
+    },
+    {
+      "path": "workbench/11e-TimeSignatures-CompoundMixed/observation.json",
+      "sha256": "1d8e4a875db6cdf2766d2a2b672859ad448115a7f78a07541c94ff0d4084f3ca"
+    },
+    {
+      "path": "workbench/11f-TimeSignatures-SymbolMeaning/document.mnx.json",
+      "sha256": "0c442716e13f4fbf6af18a81eff6fb8716cf8c81596d2b6f18b369f4be96cb49"
+    },
+    {
+      "path": "workbench/11f-TimeSignatures-SymbolMeaning/notation-0-0.png",
+      "sha256": "5a86910e5fb73aef3f27b5bc4e9cd063904661d532ecc45d7659965277f051d4"
+    },
+    {
+      "path": "workbench/11f-TimeSignatures-SymbolMeaning/notation-0.svg",
+      "sha256": "24fb2d003fb12bd87ed5ed4652196b24f2868d2d90834accfef6fe039f7f196f"
+    },
+    {
+      "path": "workbench/11f-TimeSignatures-SymbolMeaning/observation.json",
+      "sha256": "d2e64d04bea8e72b4d332cbc421aff14b80644cbb3e6ad66605f39bbaee962cc"
+    },
+    {
+      "path": "workbench/11g-TimeSignatures-SingleNumber/document.mnx.json",
+      "sha256": "c0cd98de16bb5c569702c4775c3f39717b6dbec09f3632670835c804b7ce8624"
+    },
+    {
+      "path": "workbench/11g-TimeSignatures-SingleNumber/notation-0-0.png",
+      "sha256": "07ab9eaba47e56c8364ea4249b014e173adeb71ee67a87722a89dbf6971d23b2"
+    },
+    {
+      "path": "workbench/11g-TimeSignatures-SingleNumber/notation-0.svg",
+      "sha256": "ba7c29e8f9331cef36d0e3d271e887e4fc1277361813e06eb81309dfb8f48244"
+    },
+    {
+      "path": "workbench/11g-TimeSignatures-SingleNumber/observation.json",
+      "sha256": "b9aab01785f9118c5745456fe3e20fb54319722baa561b71760332f61a3a80a1"
+    },
+    {
+      "path": "workbench/11h-TimeSignatures-SenzaMisura/document.mnx.json",
+      "sha256": "ae1c358cf15d72b7f885c1df25c19c3ed4299053057eddcf2b35e48928c7fae1"
+    },
+    {
+      "path": "workbench/11h-TimeSignatures-SenzaMisura/notation-0-0.png",
+      "sha256": "2d76be58c9f35b4b7a76cbb7e3498f1ebe1cc85843bd71111710606fb0501a9a"
+    },
+    {
+      "path": "workbench/11h-TimeSignatures-SenzaMisura/notation-0.svg",
+      "sha256": "694a3fd866e3ac00aad79b7e4118c3cd4a2b1f9018f4b3bfcdb85f286dbf1750"
+    },
+    {
+      "path": "workbench/11h-TimeSignatures-SenzaMisura/observation.json",
+      "sha256": "20110c7e5cdd6b8e9ff8a1234d1cb0418d485a17afb37c74a1627c91a25f915d"
+    },
+    {
+      "path": "workbench/11i-TimeSignatures-Alternate/document.mnx.json",
+      "sha256": "053ca04e8406167bca9e817a11a3051a098c3efc6ea140d9bbe274382d0e490c"
+    },
+    {
+      "path": "workbench/11i-TimeSignatures-Alternate/notation-0-0.png",
+      "sha256": "162a073ffde35504cf897c2ba576377c931632b4b823f147f87829cd0d66df8d"
+    },
+    {
+      "path": "workbench/11i-TimeSignatures-Alternate/notation-0.svg",
+      "sha256": "22e71cff95336dc4c305aadf569de69e6a126122ab5829bfd85ced5331e449dd"
+    },
+    {
+      "path": "workbench/11i-TimeSignatures-Alternate/observation.json",
+      "sha256": "05722efdc599170acbbae92d3a7166b5de49b2a654a164e2883a0b03ce85557f"
+    },
+    {
+      "path": "workbench/index.json",
+      "sha256": "486aa55ac5ab302b839620448e89b140251fbd9d8dcb22d3c3f571fca6bfbf4a"
+    },
+    {
+      "path": "studio/11a-TimeSignatures/document.mnx.json",
+      "sha256": "dc38ac8a81fbc6cfc6a21beef2599cb271977e48192b971fd8db0b9d67fca699"
+    },
+    {
+      "path": "studio/11a-TimeSignatures/notation-0-0.png",
+      "sha256": "26670291140d9f41bc8781ccfa027d5db65719327dc85c49d26eacd7d679d871"
+    },
+    {
+      "path": "studio/11a-TimeSignatures/notation-0.svg",
+      "sha256": "0da807bbbf0b8f2db684c71e49ab955b2ae29442b5df602a43a945c710cb11ba"
+    },
+    {
+      "path": "studio/11a-TimeSignatures/observation.json",
+      "sha256": "2611b82987b72432399c621ca3abfd50b181214d9115e7d6de9486af704e5ae1"
+    },
+    {
+      "path": "studio/11b-TimeSignatures-NoTime/document.mnx.json",
+      "sha256": "cef3bb198da83d397999304da0852fb9b6069d47ab5985d9a6ac7e95b43dff5b"
+    },
+    {
+      "path": "studio/11b-TimeSignatures-NoTime/notation-0-0.png",
+      "sha256": "6e388ce7cabe933d73cc1439d44124e835fb5240db93ae3733b044c2261148d9"
+    },
+    {
+      "path": "studio/11b-TimeSignatures-NoTime/notation-0.svg",
+      "sha256": "4e882922e92fe513f3034b8a07aebd975eb624c0b02cbbbc53ee153e5ee1726d"
+    },
+    {
+      "path": "studio/11b-TimeSignatures-NoTime/observation.json",
+      "sha256": "82d1ce68716ba8419cbf1b7d4a744635acf38e27c99c99a954ae012ba97e47cb"
+    },
+    {
+      "path": "studio/11c-TimeSignatures-Complex/document.mnx.json",
+      "sha256": "631a032c628a9368008525db9b70211a1081a16082e7594fb60ef1924aa18aac"
+    },
+    {
+      "path": "studio/11c-TimeSignatures-Complex/notation-0-0.png",
+      "sha256": "b5ea0bff9459d529afaa3b517a1d7b233108e30e108d9f418a6735457eb5b555"
+    },
+    {
+      "path": "studio/11c-TimeSignatures-Complex/notation-0.svg",
+      "sha256": "d51cd521fe8377adeaeab2fe5c229c0401ffb6f5747cdc55c0103ccab4472b01"
+    },
+    {
+      "path": "studio/11c-TimeSignatures-Complex/observation.json",
+      "sha256": "7920ce67a84885a8e9f6b0df33adb4c58df1c23acbc93cd4da26ac21507b4ed0"
+    },
+    {
+      "path": "studio/11c-TimeSignatures-CompoundSimple/document.mnx.json",
+      "sha256": "631a032c628a9368008525db9b70211a1081a16082e7594fb60ef1924aa18aac"
+    },
+    {
+      "path": "studio/11c-TimeSignatures-CompoundSimple/notation-0-0.png",
+      "sha256": "94a7ccc65627abd518f4964b44fa1001dac1fa70bffddaa1c3b0b796e028f7dd"
+    },
+    {
+      "path": "studio/11c-TimeSignatures-CompoundSimple/notation-0.svg",
+      "sha256": "d51cd521fe8377adeaeab2fe5c229c0401ffb6f5747cdc55c0103ccab4472b01"
+    },
+    {
+      "path": "studio/11c-TimeSignatures-CompoundSimple/observation.json",
+      "sha256": "a90f0cfdcd66511371b26058ff9b960c4ea9ff6da5251ad8f01c1cd6744ad85e"
+    },
+    {
+      "path": "studio/11d-TimeSignatures-ComplexMultiple/document.mnx.json",
+      "sha256": "055fbff22ec2293fdaf1739cc97b4c0d70a1bd6d27996b861ce1131a35aabec9"
+    },
+    {
+      "path": "studio/11d-TimeSignatures-ComplexMultiple/notation-0-0.png",
+      "sha256": "17b6a4779b0c9222763a41140ebe641e91b388389c5b0970a39f6b642101186c"
+    },
+    {
+      "path": "studio/11d-TimeSignatures-ComplexMultiple/notation-0.svg",
+      "sha256": "75af726b5cde3ff2451d357965637f7dbad6928e5505bd751ff71d39cb38913f"
+    },
+    {
+      "path": "studio/11d-TimeSignatures-ComplexMultiple/observation.json",
+      "sha256": "e288ced1b881e44d95150b433dc1ac344c08ce712e2cf71b279e231b914d7a57"
+    },
+    {
+      "path": "studio/11d-TimeSignatures-CompoundMultiple/document.mnx.json",
+      "sha256": "055fbff22ec2293fdaf1739cc97b4c0d70a1bd6d27996b861ce1131a35aabec9"
+    },
+    {
+      "path": "studio/11d-TimeSignatures-CompoundMultiple/notation-0-0.png",
+      "sha256": "edd1602478c07465180674d8d7310815c83ceea1d7414fd7bd648b8da91e2737"
+    },
+    {
+      "path": "studio/11d-TimeSignatures-CompoundMultiple/notation-0.svg",
+      "sha256": "75af726b5cde3ff2451d357965637f7dbad6928e5505bd751ff71d39cb38913f"
+    },
+    {
+      "path": "studio/11d-TimeSignatures-CompoundMultiple/observation.json",
+      "sha256": "80ae99f6087ffd294a9042ce892de6f0670db474be70a506b707deaa5ce9c2ac"
+    },
+    {
+      "path": "studio/11e-TimeSignatures-ComplexMixed/document.mnx.json",
+      "sha256": "37711e6377b3ee01b775101ebeb51fe88273aa0a0be93cf12ebef729d1a25cc3"
+    },
+    {
+      "path": "studio/11e-TimeSignatures-ComplexMixed/notation-0-0.png",
+      "sha256": "50d7b20c8c6b97fae8ff35155cb68b054f1ae63a111e35bdea809978908de1fe"
+    },
+    {
+      "path": "studio/11e-TimeSignatures-ComplexMixed/notation-0.svg",
+      "sha256": "35192cb57fbcfa68c1ccda79cd82760f0cf63da84979bd9392f164beb4e51be3"
+    },
+    {
+      "path": "studio/11e-TimeSignatures-ComplexMixed/observation.json",
+      "sha256": "7e949ecc7b978fa448d9a486984592df4a8e2ce541356ee73f7b610de58c776f"
+    },
+    {
+      "path": "studio/11e-TimeSignatures-CompoundMixed/document.mnx.json",
+      "sha256": "37711e6377b3ee01b775101ebeb51fe88273aa0a0be93cf12ebef729d1a25cc3"
+    },
+    {
+      "path": "studio/11e-TimeSignatures-CompoundMixed/notation-0-0.png",
+      "sha256": "d99a514dbb8509518a871f4f95a5f60968f30162fd211fa5c6a6d0309843f6a0"
+    },
+    {
+      "path": "studio/11e-TimeSignatures-CompoundMixed/notation-0.svg",
+      "sha256": "35192cb57fbcfa68c1ccda79cd82760f0cf63da84979bd9392f164beb4e51be3"
+    },
+    {
+      "path": "studio/11e-TimeSignatures-CompoundMixed/observation.json",
+      "sha256": "e90771ce84354fa17095b9ad1558a18ff58742370b25ae85a144659cfda2f089"
+    },
+    {
+      "path": "studio/11f-TimeSignatures-SymbolMeaning/document.mnx.json",
+      "sha256": "0c442716e13f4fbf6af18a81eff6fb8716cf8c81596d2b6f18b369f4be96cb49"
+    },
+    {
+      "path": "studio/11f-TimeSignatures-SymbolMeaning/notation-0-0.png",
+      "sha256": "8fec3a2bda8776a622d4daae7d61aad75d80b43d312f95b48305994a67f610b7"
+    },
+    {
+      "path": "studio/11f-TimeSignatures-SymbolMeaning/notation-0.svg",
+      "sha256": "24fb2d003fb12bd87ed5ed4652196b24f2868d2d90834accfef6fe039f7f196f"
+    },
+    {
+      "path": "studio/11f-TimeSignatures-SymbolMeaning/observation.json",
+      "sha256": "c196c8b4cdb1465e343914d7f5aeee60c7aa11435b3b6bdd6417b44ff6073388"
+    },
+    {
+      "path": "studio/11g-TimeSignatures-SingleNumber/document.mnx.json",
+      "sha256": "c0cd98de16bb5c569702c4775c3f39717b6dbec09f3632670835c804b7ce8624"
+    },
+    {
+      "path": "studio/11g-TimeSignatures-SingleNumber/notation-0-0.png",
+      "sha256": "c9b95f159f6c284cef48ff1e38c8ab8c2c598e64ec225583ba3533453f70109c"
+    },
+    {
+      "path": "studio/11g-TimeSignatures-SingleNumber/notation-0.svg",
+      "sha256": "f3c97568659ba8a9723776cac9b205bb888271636d8726e39761249cbd39cc64"
+    },
+    {
+      "path": "studio/11g-TimeSignatures-SingleNumber/observation.json",
+      "sha256": "76213fa167956f907b5d5bd81f3ed17e4c7df267714b7838c2411a37e8afc1b6"
+    },
+    {
+      "path": "studio/11h-TimeSignatures-SenzaMisura/document.mnx.json",
+      "sha256": "ae1c358cf15d72b7f885c1df25c19c3ed4299053057eddcf2b35e48928c7fae1"
+    },
+    {
+      "path": "studio/11h-TimeSignatures-SenzaMisura/notation-0-0.png",
+      "sha256": "f0192afcbc5c7dc1d3d364b1f62d34544fa027405231bbd10b0b2d4816f8e39d"
+    },
+    {
+      "path": "studio/11h-TimeSignatures-SenzaMisura/notation-0.svg",
+      "sha256": "9d4b3c8a57f2cff8e032c01c2cbbed750637730048b6d386a396a3af80788aa9"
+    },
+    {
+      "path": "studio/11h-TimeSignatures-SenzaMisura/observation.json",
+      "sha256": "2c91a62064c0b4351daf7a36bbe7334c902616e210f507b684893ee52cbb4736"
+    },
+    {
+      "path": "studio/11i-TimeSignatures-Alternate/document.mnx.json",
+      "sha256": "053ca04e8406167bca9e817a11a3051a098c3efc6ea140d9bbe274382d0e490c"
+    },
+    {
+      "path": "studio/11i-TimeSignatures-Alternate/notation-0-0.png",
+      "sha256": "88babfe8a81941d45035613569e104e31a6d9fcd15a145c2437eca927b01e23c"
+    },
+    {
+      "path": "studio/11i-TimeSignatures-Alternate/notation-0.svg",
+      "sha256": "db4b7f28d8ffc6fc7b92eed59f48a3a436355d88088ea0a5fe4edec67611f193"
+    },
+    {
+      "path": "studio/11i-TimeSignatures-Alternate/observation.json",
+      "sha256": "1ecffa466b72464d6f23f7a597e171e89519888bc64309d0fda107fcde3179d7"
+    },
+    {
+      "path": "studio/index.json",
+      "sha256": "9f60862ad3d40b225e95a372a21f4030961b4eea179a226a6ccd1b828b362aea"
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "id": "11g-TimeSignatures-SingleNumber",
+  "sourceSha256": "bad3e78bc80b57f01b628d724c03d9817fd2229858eed62e9725fdfc4e544028",
+  "testClass": "feature",
+  "description": "Two time signatures (3/8 and 3+2/8) having the attribute ‘symbol=\"single-number\"’ (which is a misnomer; it actually means to show only the numerator part).",
+  "views": [
+    {
+      "scrollTarget": "frame",
+      "visibleWidth": 1060,
+      "visibleHeight": 870,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0,
+          1
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [],
+      "scrollWidth": 1060,
+      "scrollHeight": 870,
+      "clientWidth": 1060,
+      "clientHeight": 870,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "suppliedLibraryTitle": "11g-TimeSignatures-SingleNumber",
+  "makeCurrentError": null,
+  "entryPath": "Local operator ingest: GP seed + unmodified XML original; Save → Versions → View XML → Make current",
+  "importError": null,
+  "viewingOriginal": false,
+  "editingSuspended": false,
+  "warnings": [
+    "part P1, measure 1: time symbol single-number is not represented; using a numeric meter.",
+    "part P1, measure 2: time symbol single-number is not represented; using a numeric meter.",
+    "part P1, measure 2: additive/compound time grouping is not represented; retaining equivalent total 5/8."
+  ],
+  "importedDocumentSha256": "e266d92aa06be9d2a81d9e263691d13482edf65ea6f3956d95a46f13fdee8531",
+  "displayOptions": {
+    "lyrics": "current",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

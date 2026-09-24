@@ -203,3 +203,18 @@ nonvisual dispositions and remains an import/authoring concern. [Proposed
 item 28](../proposed/core-musicxml-key-fidelity.md) names the bounded
 follow-up. No strings are declared, so Tab/Both are inapplicable. Item
 18 remains open for the rest of the suite.
+
+## Current meter rendering batch, 2026-09-24
+
+[The twelve 11-series originals](../../docs/musicxml-meter-current-assessment.md)
+now have 34 stable feature IDs, 40 source contexts and 68 current Notation
+feature × shell × view rows. Original-file browser imports, imported MNX,
+full SVG/PNG score captures and meter preference are retained in both
+shells. No source declares strings; Tab/Both are inapplicable. Every score
+fits one tile. Exact totals, compatible common display and independent
+piano staves confirm item 22's selected repairs. Grouping, hidden/local,
+single-number, unmetered and alternate information remains absent on import;
+source-located warnings and unresolved source policies are explicit. These
+are item 22's documented deferrals, so this repeat evidence does not file
+a duplicate proposal. Item 18 remains open for the remaining sources;
+item 19 gets no authoring or persistence pass from these captures.

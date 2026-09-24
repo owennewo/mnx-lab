@@ -1,0 +1,688 @@
+{
+  "kind": "browser observations; not feature correctness or human verification",
+  "captureScriptSha256": "f98c69412562c6a5eb8dc47fd81d173e7fb6daf6ff27019682b30adad8eb322a",
+  "shell": "workbench",
+  "applicationCommit": "183ac0885ef19df26b3278c6e5f413a90e07dc76",
+  "corpusRevision": "77c19f7e819154c70ca1a1992e80dcda8ff82fea",
+  "viewport": {
+    "width": 1440,
+    "height": 1000,
+    "deviceScaleFactor": 1
+  },
+  "fixtures": [
+    {
+      "id": "11a-TimeSignatures",
+      "sourceSha256": "2d9dccb46e08e05c36e339a3a5dab61de2ede11b48e20ea5d7f4664fa8b9f80d",
+      "testClass": "feature",
+      "description": "Various time signatures: 2/2 (alla breve), 4/4 (C), 2/2, 3/2, 2/4, 3/4, 4/4, 5/4, 3/8, 6/8, 12/8.",
+      "views": [
+        {
+          "scrollTarget": "viewer",
+          "visibleWidth": 750,
+          "visibleHeight": 753.125,
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0,
+              1,
+              2,
+              3,
+              4
+            ],
+            [
+              5,
+              6,
+              7,
+              8,
+              9
+            ],
+            [
+              10
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [],
+          "scrollWidth": 750,
+          "scrollHeight": 753,
+          "clientWidth": 750,
+          "clientHeight": 753,
+          "screenshots": [
+            "notation-0-0.png"
+          ]
+        }
+      ],
+      "importError": null,
+      "warnings": [
+        "part P1, measure 1: incompatible time symbol common for 2/2; retaining numeric meter."
+      ],
+      "importedDocumentSha256": "c1ad7fd93bf14d01cc4a6cdb274bdf39ce9e4b6549a6444cb6a5f93228d5b71f",
+      "displayOptions": {
+        "lyrics": "current",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "11b-TimeSignatures-NoTime",
+      "sourceSha256": "6038ef114c04d0e526b9435eb457572bfc1baffbe302d01150773c17a9102fef",
+      "testClass": "feature",
+      "description": "A score without a time signature at the beginning (but with <key> and <clef> elements). The second bar sets a 2/2 time signature with ‘print-object=\"no\"’ for both staves, and the third bar sets a 4/4 time signature with ‘print-object=\"no\"’ only for the lower staff. Whether a time signature is actually displayed at the very beginning (if there is no <time> element) is application-dependent.",
+      "views": [
+        {
+          "scrollTarget": "viewer",
+          "visibleWidth": 750,
+          "visibleHeight": 753.125,
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0,
+              1,
+              2
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [],
+          "scrollWidth": 750,
+          "scrollHeight": 753,
+          "clientWidth": 750,
+          "clientHeight": 753,
+          "screenshots": [
+            "notation-0-0.png"
+          ]
+        }
+      ],
+      "importError": null,
+      "warnings": [
+        "part P1, measure 2: time print-object=\"no\" is not represented; the meter remains visible when time signatures are shown.",
+        "part P1, measure 3, staff 1: staff-local time scope is not represented; the selected meter is applied globally.",
+        "part P1, measure 3, staff 2: staff-local time scope is not represented; the selected meter is applied globally.",
+        "part P1, measure 3, staff 2: time print-object=\"no\" is not represented; the meter remains visible when time signatures are shown.",
+        "part P1, measure 3, staff 2: additional local time declaration is not represented; first meter retained."
+      ],
+      "importedDocumentSha256": "d106bba48288b4604f9c7b65a3bbf4e707fd4476939b63b713fc2f490ef6e049",
+      "displayOptions": {
+        "lyrics": "current",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "11c-TimeSignatures-Complex",
+      "sourceSha256": "91b1664913466d87b1dcce2506c2d5ab1a05c13b6b3493453751bc5ec1cc588c",
+      "testClass": "feature",
+      "description": "Complex time signatures with the same denominator: (3+2)/8 and (5+3+1)/4.",
+      "views": [
+        {
+          "scrollTarget": "viewer",
+          "visibleWidth": 750,
+          "visibleHeight": 753.125,
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0,
+              1
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [],
+          "scrollWidth": 750,
+          "scrollHeight": 753,
+          "clientWidth": 750,
+          "clientHeight": 753,
+          "screenshots": [
+            "notation-0-0.png"
+          ]
+        }
+      ],
+      "importError": null,
+      "warnings": [
+        "part P1, measure 1: additive/compound time grouping is not represented; retaining equivalent total 5/8.",
+        "part P1, measure 2: additive/compound time grouping is not represented; retaining equivalent total 9/4."
+      ],
+      "importedDocumentSha256": "2690786c721c22c4e9b20f2c8f87e6b66cca7ac3bbd0cac0d7cb6c884652e1fb",
+      "displayOptions": {
+        "lyrics": "current",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "11c-TimeSignatures-CompoundSimple",
+      "sourceSha256": "37b1da3a2fcb08f2d8c5422ae0bf857a8371a4ea74ef896127bff0c547e30458",
+      "testClass": "feature",
+      "description": "Compound time signatures with same denominator: (3+2)/8 and (5+3+1)/4.",
+      "views": [
+        {
+          "scrollTarget": "viewer",
+          "visibleWidth": 750,
+          "visibleHeight": 753.125,
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0,
+              1
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [],
+          "scrollWidth": 750,
+          "scrollHeight": 753,
+          "clientWidth": 750,
+          "clientHeight": 753,
+          "screenshots": [
+            "notation-0-0.png"
+          ]
+        }
+      ],
+      "importError": null,
+      "warnings": [
+        "part P1, measure 1: additive/compound time grouping is not represented; retaining equivalent total 5/8.",
+        "part P1, measure 2: additive/compound time grouping is not represented; retaining equivalent total 9/4."
+      ],
+      "importedDocumentSha256": "2690786c721c22c4e9b20f2c8f87e6b66cca7ac3bbd0cac0d7cb6c884652e1fb",
+      "displayOptions": {
+        "lyrics": "current",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "11d-TimeSignatures-ComplexMultiple",
+      "sourceSha256": "6ace5ecb41bfb9602cde51443e0cfca8d2f2f414b36282cfda1378fcec795458",
+      "testClass": "feature",
+      "description": "Complex time signatures with separate fractions displayed: 3/8+2/8+3/4 and 5/2+1/8.",
+      "views": [
+        {
+          "scrollTarget": "viewer",
+          "visibleWidth": 750,
+          "visibleHeight": 753.125,
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0,
+              1
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [
+            "validation — underfills the 21/8 bar: notes sum to 20 of 21 beats",
+            "validation — underfills the 21/8 bar: notes sum to 20 of 21 beats"
+          ],
+          "scrollWidth": 750,
+          "scrollHeight": 753,
+          "clientWidth": 750,
+          "clientHeight": 753,
+          "screenshots": [
+            "notation-0-0.png"
+          ]
+        }
+      ],
+      "importError": null,
+      "warnings": [
+        "part P1, measure 1: additive/compound time grouping is not represented; retaining equivalent total 11/8.",
+        "part P1, measure 2: additive/compound time grouping is not represented; retaining equivalent total 21/8."
+      ],
+      "importedDocumentSha256": "5ff2df54697a64a82311ea6977065f352081cea1f459a45e309bc07d266e7c56",
+      "displayOptions": {
+        "lyrics": "current",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "11d-TimeSignatures-CompoundMultiple",
+      "sourceSha256": "ec80a0ce38e8a63be016716baa94d70701a11c964274b677520d6b9b11597332",
+      "testClass": "feature",
+      "description": "Compound time signatures with separate fractions displayed: 3/8+2/8+3/4 and 5/2+1/8.",
+      "views": [
+        {
+          "scrollTarget": "viewer",
+          "visibleWidth": 750,
+          "visibleHeight": 753.125,
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0,
+              1
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [
+            "validation — underfills the 21/8 bar: notes sum to 20 of 21 beats",
+            "validation — underfills the 21/8 bar: notes sum to 20 of 21 beats"
+          ],
+          "scrollWidth": 750,
+          "scrollHeight": 753,
+          "clientWidth": 750,
+          "clientHeight": 753,
+          "screenshots": [
+            "notation-0-0.png"
+          ]
+        }
+      ],
+      "importError": null,
+      "warnings": [
+        "part P1, measure 1: additive/compound time grouping is not represented; retaining equivalent total 11/8.",
+        "part P1, measure 2: additive/compound time grouping is not represented; retaining equivalent total 21/8."
+      ],
+      "importedDocumentSha256": "5ff2df54697a64a82311ea6977065f352081cea1f459a45e309bc07d266e7c56",
+      "displayOptions": {
+        "lyrics": "current",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "11e-TimeSignatures-ComplexMixed",
+      "sourceSha256": "ae541bc0bf49d6207c4d61f12bacdfec1ce700d09a461021491924f49f84ed65",
+      "testClass": "feature",
+      "description": "Complex time signatures of mixed type: (3+2)/8+3/4.",
+      "views": [
+        {
+          "scrollTarget": "viewer",
+          "visibleWidth": 750,
+          "visibleHeight": 789.125,
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [],
+          "scrollWidth": 750,
+          "scrollHeight": 789,
+          "clientWidth": 750,
+          "clientHeight": 789,
+          "screenshots": [
+            "notation-0-0.png"
+          ]
+        }
+      ],
+      "importError": null,
+      "warnings": [
+        "part P1, measure 1: additive/compound time grouping is not represented; retaining equivalent total 11/8."
+      ],
+      "importedDocumentSha256": "910efa7482b5d3dac3f0e8e6c86b4ca1ca38467327d3bd37edab085d47fae903",
+      "displayOptions": {
+        "lyrics": "current",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "11e-TimeSignatures-CompoundMixed",
+      "sourceSha256": "06e7b33923955fdbdfdf21cf581b715f4e36f2b21ef83f3e74dae29eec14d5b3",
+      "testClass": "feature",
+      "description": "Compound time signatures of mixed type: (3+2)/8+3/4.",
+      "views": [
+        {
+          "scrollTarget": "viewer",
+          "visibleWidth": 750,
+          "visibleHeight": 789.125,
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [],
+          "scrollWidth": 750,
+          "scrollHeight": 789,
+          "clientWidth": 750,
+          "clientHeight": 789,
+          "screenshots": [
+            "notation-0-0.png"
+          ]
+        }
+      ],
+      "importError": null,
+      "warnings": [
+        "part P1, measure 1: additive/compound time grouping is not represented; retaining equivalent total 11/8."
+      ],
+      "importedDocumentSha256": "910efa7482b5d3dac3f0e8e6c86b4ca1ca38467327d3bd37edab085d47fae903",
+      "displayOptions": {
+        "lyrics": "current",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "11f-TimeSignatures-SymbolMeaning",
+      "sourceSha256": "a97bf953b08f017155631f39bb8a687bd9bdd0db1b3e79f026f60f2414bea1bb",
+      "testClass": "feature",
+      "description": "Semantically invalid use cases for the ‘symbol’ attribute of <time>. The actual display is application-dependent. This test shows a 3/8 time signature with ‘symbol=\"cut\"’ and a complex 1/8+2/4 time signature with ‘symbol=\"single-number\"’.",
+      "views": [
+        {
+          "scrollTarget": "viewer",
+          "visibleWidth": 750,
+          "visibleHeight": 753.125,
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0,
+              1
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [],
+          "scrollWidth": 750,
+          "scrollHeight": 753,
+          "clientWidth": 750,
+          "clientHeight": 753,
+          "screenshots": [
+            "notation-0-0.png"
+          ]
+        }
+      ],
+      "importError": null,
+      "warnings": [
+        "part P1, measure 1: incompatible time symbol cut for 3/8; retaining numeric meter.",
+        "part P1, measure 2: time symbol single-number is not represented; using a numeric meter.",
+        "part P1, measure 2: additive/compound time grouping is not represented; retaining equivalent total 5/8."
+      ],
+      "importedDocumentSha256": "7d93d93f8ca2cf64a2c1a1a7635bf198c9d8f9bd8da3eb4d357386f721e39ddf",
+      "displayOptions": {
+        "lyrics": "current",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "11g-TimeSignatures-SingleNumber",
+      "sourceSha256": "bad3e78bc80b57f01b628d724c03d9817fd2229858eed62e9725fdfc4e544028",
+      "testClass": "feature",
+      "description": "Two time signatures (3/8 and 3+2/8) having the attribute ‘symbol=\"single-number\"’ (which is a misnomer; it actually means to show only the numerator part).",
+      "views": [
+        {
+          "scrollTarget": "viewer",
+          "visibleWidth": 750,
+          "visibleHeight": 753.125,
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0,
+              1
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [],
+          "scrollWidth": 750,
+          "scrollHeight": 753,
+          "clientWidth": 750,
+          "clientHeight": 753,
+          "screenshots": [
+            "notation-0-0.png"
+          ]
+        }
+      ],
+      "importError": null,
+      "warnings": [
+        "part P1, measure 1: time symbol single-number is not represented; using a numeric meter.",
+        "part P1, measure 2: time symbol single-number is not represented; using a numeric meter.",
+        "part P1, measure 2: additive/compound time grouping is not represented; retaining equivalent total 5/8."
+      ],
+      "importedDocumentSha256": "e266d92aa06be9d2a81d9e263691d13482edf65ea6f3956d95a46f13fdee8531",
+      "displayOptions": {
+        "lyrics": "current",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "11h-TimeSignatures-SenzaMisura",
+      "sourceSha256": "ffd0d9dede09f0af87ef39034217f541494359d012f9539a81460c2ba82790e3",
+      "testClass": "feature",
+      "description": "<senza-misura> elements, indicating either no display of a time signature or, if the element has a string value, a senza-misura symbol derived from this string. How the string gets interpreted is application-dependent. The first bar starts with an empty <senza-misura> element; it has three eighth notes. The second bar contains a full-measure rest (indicated by setting ‘measure=\"yes\"’ for the <rest> element) with a length of a dotted half note. The third bar starts with a <senza-misura> element containing value ‘X’; it has four eighth notes in two voices. The last bar contains five eighth notes in two voices.",
+      "views": [
+        {
+          "scrollTarget": "viewer",
+          "visibleWidth": 750,
+          "visibleHeight": 753.125,
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0,
+              1,
+              2,
+              3
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [
+            "validation — underfills the 4/4 bar: notes sum to 1.5 of 4 beats",
+            "validation — underfills the 4/4 bar: notes sum to 1.5 of 4 beats",
+            "validation — voice 1 underfills the 4/4 bar: notes sum to 2 of 4 beats",
+            "validation — voice 1 underfills the 4/4 bar: notes sum to 2 of 4 beats",
+            "validation — voice 2 underfills the 4/4 bar: notes sum to 2 of 4 beats",
+            "validation — voice 2 underfills the 4/4 bar: notes sum to 2 of 4 beats",
+            "validation — voice 1 underfills the 4/4 bar: notes sum to 2.5 of 4 beats",
+            "validation — voice 1 underfills the 4/4 bar: notes sum to 2.5 of 4 beats",
+            "validation — voice 2 underfills the 4/4 bar: notes sum to 2.5 of 4 beats",
+            "validation — voice 2 underfills the 4/4 bar: notes sum to 2.5 of 4 beats"
+          ],
+          "scrollWidth": 750,
+          "scrollHeight": 753,
+          "clientWidth": 750,
+          "clientHeight": 753,
+          "screenshots": [
+            "notation-0-0.png"
+          ]
+        }
+      ],
+      "importError": null,
+      "warnings": [
+        "part P1, measure 1: unmetered time (senza-misura \"\") is not represented; previous/default meter retained.",
+        "part P1, measure 3: unmetered time (senza-misura \"X\") is not represented; previous/default meter retained."
+      ],
+      "importedDocumentSha256": "7b11ccabd516e8644440268c54ef3a937cd3bb7bd1ab2f3dbcebd0694fa3d370",
+      "displayOptions": {
+        "lyrics": "current",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "11i-TimeSignatures-Alternate",
+      "sourceSha256": "3b51106f790378b35dfe8b2675517b30839f2842ebd98993703c263fe29c0710",
+      "testClass": "feature",
+      "description": "Time signatures with alternates using <interchangeable>. ‘3/4 (6/8)’, ‘2/2 [4/4]’, ‘4/4 = 7/8+1/8’, ‘3/4 – 6/8’, ‘2/2 / 4/4’, ‘3/4 6/8’.",
+      "views": [
+        {
+          "scrollTarget": "viewer",
+          "visibleWidth": 750,
+          "visibleHeight": 753.125,
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0,
+              1,
+              2,
+              3,
+              4
+            ],
+            [
+              5
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [],
+          "scrollWidth": 750,
+          "scrollHeight": 753,
+          "clientWidth": 750,
+          "clientHeight": 753,
+          "screenshots": [
+            "notation-0-0.png"
+          ]
+        }
+      ],
+      "importError": null,
+      "warnings": [
+        "part P1, measure 1: interchangeable meter and its relation/enclosure are not represented; retaining the primary meter.",
+        "part P1, measure 2: interchangeable meter and its relation/enclosure are not represented; retaining the primary meter.",
+        "part P1, measure 3: interchangeable meter and its relation/enclosure are not represented; retaining the primary meter.",
+        "part P1, measure 4: interchangeable meter and its relation/enclosure are not represented; retaining the primary meter.",
+        "part P1, measure 5: interchangeable meter and its relation/enclosure are not represented; retaining the primary meter.",
+        "part P1, measure 6: interchangeable meter and its relation/enclosure are not represented; retaining the primary meter."
+      ],
+      "importedDocumentSha256": "544f11f718e304a7bae50c311c13fe33edc6244cc46dbda01088ac558c6ecf1b",
+      "displayOptions": {
+        "lyrics": "current",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    }
+  ],
+  "browser": {
+    "protocolVersion": "1.3",
+    "product": "Chrome/153.0.8010.36",
+    "revision": "@507c6ee3e2f3b2ca0e660547e5b9ea4820c67f4c",
+    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+    "jsVersion": "15.3.76.10"
+  }
+}

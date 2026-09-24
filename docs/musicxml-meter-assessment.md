@@ -1,5 +1,7 @@
 # MusicXML meter assessment, 2026-09-22
 
+**Current feature verdicts:** [2026-09-24 meter rendering assessment](musicxml-meter-current-assessment.md). This page preserves the earlier bounded review and pre-fix evidence.
+
 All **12** time-signature fixtures have been reviewed against their original XML and
 notation captures in Workbench and Studio. These are agent findings, not human scenario
 verification. The broader render/write assessments remain in progress. This review is
