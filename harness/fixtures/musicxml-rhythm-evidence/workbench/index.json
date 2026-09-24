@@ -1,0 +1,420 @@
+{
+  "kind": "browser observations; not feature correctness or human verification",
+  "captureScriptSha256": "f98c69412562c6a5eb8dc47fd81d173e7fb6daf6ff27019682b30adad8eb322a",
+  "shell": "workbench",
+  "applicationCommit": "4817af904bd848d7ad20ea5aa98584907a152139",
+  "corpusRevision": "77c19f7e819154c70ca1a1992e80dcda8ff82fea",
+  "viewport": {
+    "width": 1440,
+    "height": 1000,
+    "deviceScaleFactor": 1
+  },
+  "fixtures": [
+    {
+      "id": "03a-Rhythm-Durations",
+      "sourceSha256": "2ffa3b72ee544da943215c6e04a7f8d7970801dfb5765ce7515468373839122b",
+      "testClass": "feature",
+      "description": "All note durations, from maxima, long, brevis, whole, etc., until 1024th. First with their plain values, then dotted, and finally double-dotted.",
+      "views": [
+        {
+          "scrollTarget": "viewer",
+          "visibleWidth": 750,
+          "visibleHeight": 753.125,
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0
+            ],
+            [
+              1
+            ],
+            [
+              2
+            ],
+            [
+              3
+            ],
+            [
+              4
+            ],
+            [
+              5
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [
+            "validation — underfills the 16/2 bar: notes sum to 3.75 of 16 beats",
+            "validation — underfills the 16/2 bar: notes sum to 3.75 of 16 beats",
+            "validation — underfills the 16/2 bar: notes sum to 11.547 of 16 beats",
+            "validation — underfills the 16/2 bar: notes sum to 11.547 of 16 beats",
+            "validation — underfills the 24/2 bar: notes sum to 3.75 of 24 beats",
+            "validation — underfills the 24/2 bar: notes sum to 3.75 of 24 beats",
+            "validation — underfills the 24/2 bar: notes sum to 13.539 of 24 beats",
+            "validation — underfills the 24/2 bar: notes sum to 13.539 of 24 beats",
+            "validation — underfills the 28/2 bar: notes sum to 3.75 of 28 beats",
+            "validation — underfills the 28/2 bar: notes sum to 3.75 of 28 beats",
+            "validation — underfills the 28/2 bar: notes sum to 14.535 of 28 beats",
+            "validation — underfills the 28/2 bar: notes sum to 14.535 of 28 beats"
+          ],
+          "scrollWidth": 750,
+          "scrollHeight": 753,
+          "clientWidth": 750,
+          "clientHeight": 753,
+          "screenshots": [
+            "notation-0-0.png"
+          ]
+        }
+      ],
+      "importError": null,
+      "warnings": [],
+      "importedDocumentSha256": "aa472b008dee8f343d407d284a5be26956adc94097b04bded621f332cb458c25",
+      "displayOptions": {
+        "lyrics": "current",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "03b-Rhythm-Backup",
+      "sourceSha256": "6a03c9a2f22997145f45695dc03bb2a6ef790dded508d9f8e133e02b9af58bda",
+      "testClass": "feature",
+      "description": "Two voices with a <backup> element that does not jump to the beginning of the measure for voice 2 but to the second beat. Voice 1 covers beats 1 and 2, and voice 2 covers beats 2 and 3. There is no rest or note for uncovered beats.",
+      "views": [
+        {
+          "scrollTarget": "viewer",
+          "visibleWidth": 750,
+          "visibleHeight": 789.125,
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [
+            "validation — voice 1 underfills the 4/4 bar: notes sum to 2 of 4 beats",
+            "validation — voice 1 underfills the 4/4 bar: notes sum to 2 of 4 beats",
+            "validation — voice 2 underfills the 4/4 bar: notes sum to 3 of 4 beats",
+            "validation — voice 2 underfills the 4/4 bar: notes sum to 3 of 4 beats"
+          ],
+          "scrollWidth": 750,
+          "scrollHeight": 789,
+          "clientWidth": 750,
+          "clientHeight": 789,
+          "screenshots": [
+            "notation-0-0.png"
+          ]
+        }
+      ],
+      "importError": null,
+      "warnings": [],
+      "importedDocumentSha256": "154cae70f13fcf4083eca3b5fd98e1826f66f20ae41f71fcc3fa4b3afdd91683",
+      "displayOptions": {
+        "lyrics": "current",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "03c-Rhythm-DivisionChange",
+      "sourceSha256": "9795a6ffef846fc5d38947f3123d9b635d098763600a7bf72e5f10f0ab2fed8d",
+      "testClass": "feature",
+      "description": "Although uncommon, the divisions of a quarter note can change somewhere in the middle of a MusicXML file. Here, the first half measure uses a division of 1, which then changes to 8 in the middle of the first measure and to 38 in the middle of the second measure.",
+      "views": [
+        {
+          "scrollTarget": "viewer",
+          "visibleWidth": 750,
+          "visibleHeight": 753.125,
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0,
+              1
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [],
+          "scrollWidth": 750,
+          "scrollHeight": 753,
+          "clientWidth": 750,
+          "clientHeight": 753,
+          "screenshots": [
+            "notation-0-0.png"
+          ]
+        }
+      ],
+      "importError": null,
+      "warnings": [],
+      "importedDocumentSha256": "350e6c3b987227e01ff73acc245eb284366ef2e806c8c4519ca403cd08bc2771",
+      "displayOptions": {
+        "lyrics": "current",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "03d-Rhythm-DottedDurations-Factors",
+      "sourceSha256": "1a84fcdae4bb6ee04ba19ec6a506ef40d2a85e6ad2f1996bbae398067d91ce34",
+      "testClass": "feature",
+      "description": "Several durations can be written with dots. For multi-measure rests it is also possible to have durations that cannot be expressed with dotted notes (like 5/8). In bar 15 there is only a 16th note and no rest for the remaining part of the bar.",
+      "views": [
+        {
+          "scrollTarget": "viewer",
+          "visibleWidth": 750,
+          "visibleHeight": 753.125,
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            [
+              6,
+              7,
+              8,
+              9,
+              10,
+              11
+            ],
+            [
+              12,
+              13,
+              14,
+              15,
+              16
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [
+            "validation — underfills the 31/8 bar: notes sum to 0.5 of 31 beats",
+            "validation — underfills the 31/8 bar: notes sum to 0.5 of 31 beats"
+          ],
+          "scrollWidth": 750,
+          "scrollHeight": 753,
+          "clientWidth": 750,
+          "clientHeight": 753,
+          "screenshots": [
+            "notation-0-0.png"
+          ]
+        }
+      ],
+      "importError": null,
+      "warnings": [],
+      "importedDocumentSha256": "697faad9210910de0f88bbb58b67a93ea2d372f6c09978eb66425614f77386fe",
+      "displayOptions": {
+        "lyrics": "current",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "03e-Rhythm-No-Divisions",
+      "sourceSha256": "d993c4af8d773d7570ece7f31c17179f58181a301c366358243c27e9aa327bf4",
+      "testClass": "feature",
+      "description": "No <divisions> element. The generally agreed default value is 1, and MusicXML version 4.1 will mention this explicitly. This test holds a single whole note.",
+      "views": [
+        {
+          "scrollTarget": "viewer",
+          "visibleWidth": 750,
+          "visibleHeight": 789.125,
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [],
+          "scrollWidth": 750,
+          "scrollHeight": 789,
+          "clientWidth": 750,
+          "clientHeight": 789,
+          "screenshots": [
+            "notation-0-0.png"
+          ]
+        }
+      ],
+      "importError": null,
+      "warnings": [],
+      "importedDocumentSha256": "b22f2a921a04ad87e4b4c40129a5d5b6055c72633e5451ac914feb84fb5d22ba",
+      "displayOptions": {
+        "lyrics": "current",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "03e-Rhythm-SecondaryBeamBreaks",
+      "sourceSha256": "7adc2a23112668c7d73835d9b45cf76a11dfae3a6b36d28a2228839ab1932b3a",
+      "testClass": "feature",
+      "description": "A piece with four beamed scales, showing different secondary beam breaks.",
+      "views": [
+        {
+          "scrollTarget": "viewer",
+          "visibleWidth": 750,
+          "visibleHeight": 789.125,
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [],
+          "scrollWidth": 750,
+          "scrollHeight": 789,
+          "clientWidth": 750,
+          "clientHeight": 789,
+          "screenshots": [
+            "notation-0-0.png"
+          ]
+        }
+      ],
+      "importError": null,
+      "warnings": [],
+      "importedDocumentSha256": "9976708d9a05367a0a6d408af53c196f4f581557cb46342203f38b6dba36d696",
+      "displayOptions": {
+        "lyrics": "current",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "03f-Rhythm-Forward",
+      "sourceSha256": "22d6f261c21208b3690241a1f37fe3790ef2c66f42be242213279077536006c1",
+      "testClass": "feature",
+      "description": "A voice with three <forward> elements in the first measure, putting a quarter note on the second beat, a 16th note on the fourth beat, then filling up the measure to have the correct length. There are no visible rests.",
+      "views": [
+        {
+          "scrollTarget": "viewer",
+          "visibleWidth": 750,
+          "visibleHeight": 753.125,
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0,
+              1
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [
+            "validation — underfills the 4/4 bar: notes sum to 3.25 of 4 beats",
+            "validation — underfills the 4/4 bar: notes sum to 3.25 of 4 beats",
+            "validation — underfills the 4/4 bar: notes sum to 1 of 4 beats",
+            "validation — underfills the 4/4 bar: notes sum to 1 of 4 beats"
+          ],
+          "scrollWidth": 750,
+          "scrollHeight": 753,
+          "clientWidth": 750,
+          "clientHeight": 753,
+          "screenshots": [
+            "notation-0-0.png"
+          ]
+        }
+      ],
+      "importError": null,
+      "warnings": [],
+      "importedDocumentSha256": "7fe1af7c168423c625ef189cdd7a910de8eda397be7d65c87c585867427eda4a",
+      "displayOptions": {
+        "lyrics": "current",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    }
+  ],
+  "browser": {
+    "protocolVersion": "1.3",
+    "product": "Chrome/153.0.8010.36",
+    "revision": "@507c6ee3e2f3b2ca0e660547e5b9ea4820c67f4c",
+    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+    "jsVersion": "15.3.76.10"
+  }
+}

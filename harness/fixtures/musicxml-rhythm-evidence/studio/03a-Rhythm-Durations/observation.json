@@ -1,0 +1,75 @@
+{
+  "id": "03a-Rhythm-Durations",
+  "sourceSha256": "2ffa3b72ee544da943215c6e04a7f8d7970801dfb5765ce7515468373839122b",
+  "testClass": "feature",
+  "description": "All note durations, from maxima, long, brevis, whole, etc., until 1024th. First with their plain values, then dotted, and finally double-dotted.",
+  "views": [
+    {
+      "scrollTarget": "frame",
+      "visibleWidth": 1060,
+      "visibleHeight": 870,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0,
+          1,
+          2
+        ],
+        [
+          3,
+          4
+        ],
+        [
+          5
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [
+        "validation — underfills the 16/2 bar: notes sum to 3.75 of 16 beats",
+        "validation — underfills the 16/2 bar: notes sum to 3.75 of 16 beats",
+        "validation — underfills the 16/2 bar: notes sum to 11.547 of 16 beats",
+        "validation — underfills the 16/2 bar: notes sum to 11.547 of 16 beats",
+        "validation — underfills the 24/2 bar: notes sum to 3.75 of 24 beats",
+        "validation — underfills the 24/2 bar: notes sum to 3.75 of 24 beats",
+        "validation — underfills the 24/2 bar: notes sum to 13.539 of 24 beats",
+        "validation — underfills the 24/2 bar: notes sum to 13.539 of 24 beats",
+        "validation — underfills the 28/2 bar: notes sum to 3.75 of 28 beats",
+        "validation — underfills the 28/2 bar: notes sum to 3.75 of 28 beats",
+        "validation — underfills the 28/2 bar: notes sum to 14.535 of 28 beats",
+        "validation — underfills the 28/2 bar: notes sum to 14.535 of 28 beats"
+      ],
+      "scrollWidth": 1060,
+      "scrollHeight": 870,
+      "clientWidth": 1060,
+      "clientHeight": 870,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "suppliedLibraryTitle": "03a-Rhythm-Durations",
+  "makeCurrentError": null,
+  "entryPath": "Local operator ingest: GP seed + unmodified XML original; Save → Versions → View XML → Make current",
+  "importError": null,
+  "viewingOriginal": false,
+  "editingSuspended": false,
+  "warnings": [],
+  "importedDocumentSha256": "aa472b008dee8f343d407d284a5be26956adc94097b04bded621f332cb458c25",
+  "displayOptions": {
+    "lyrics": "current",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

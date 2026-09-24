@@ -1,0 +1,54 @@
+{
+  "id": "03f-Rhythm-Forward",
+  "sourceSha256": "22d6f261c21208b3690241a1f37fe3790ef2c66f42be242213279077536006c1",
+  "testClass": "feature",
+  "description": "A voice with three <forward> elements in the first measure, putting a quarter note on the second beat, a 16th note on the fourth beat, then filling up the measure to have the correct length. There are no visible rests.",
+  "views": [
+    {
+      "scrollTarget": "viewer",
+      "visibleWidth": 750,
+      "visibleHeight": 753.125,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0,
+          1
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [
+        "validation — underfills the 4/4 bar: notes sum to 3.25 of 4 beats",
+        "validation — underfills the 4/4 bar: notes sum to 3.25 of 4 beats",
+        "validation — underfills the 4/4 bar: notes sum to 1 of 4 beats",
+        "validation — underfills the 4/4 bar: notes sum to 1 of 4 beats"
+      ],
+      "scrollWidth": 750,
+      "scrollHeight": 753,
+      "clientWidth": 750,
+      "clientHeight": 753,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "importError": null,
+  "warnings": [],
+  "importedDocumentSha256": "7fe1af7c168423c625ef189cdd7a910de8eda397be7d65c87c585867427eda4a",
+  "displayOptions": {
+    "lyrics": "current",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

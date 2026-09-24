@@ -165,3 +165,17 @@ apply. Missing multimeasure groups, explicit rest positions and 256th–1024th
 values support [proposed item 25](../proposed/core-musicxml-rest-fidelity.md).
 This is a render-only slice; item 19's tasks and persistence for these IDs
 remain open. Item 18 remains in progress for the rest of the suite.
+
+## Rhythm rendering batch, 2026-09-24
+
+[The seven 03-series originals](../../docs/musicxml-rhythm-assessment.md)
+now have 14 stable feature IDs, 110 source-note and 41 source-control
+variants, and 28 current Notation feature × shell × view verdicts. Both-shell
+original-file imports, complete visible captures and an independent-MNX
+engine probe are retained. Note-value and unwritten-gap losses support
+[proposed item 26](../proposed/core-musicxml-rhythm-fidelity.md); `03d`'s
+one-bar rest cases extend [proposed item 25](../proposed/core-musicxml-rest-fidelity.md).
+The `03e` no-divisions music21 metric disagreement stays explicitly
+unresolved despite the correct visible whole note. No authoring or
+persistence result is inferred; item 18 remains open for the rest of the
+suite.

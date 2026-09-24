@@ -1,0 +1,53 @@
+{
+  "id": "03b-Rhythm-Backup",
+  "sourceSha256": "6a03c9a2f22997145f45695dc03bb2a6ef790dded508d9f8e133e02b9af58bda",
+  "testClass": "feature",
+  "description": "Two voices with a <backup> element that does not jump to the beginning of the measure for voice 2 but to the second beat. Voice 1 covers beats 1 and 2, and voice 2 covers beats 2 and 3. There is no rest or note for uncovered beats.",
+  "views": [
+    {
+      "scrollTarget": "viewer",
+      "visibleWidth": 750,
+      "visibleHeight": 789.125,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [
+        "validation — voice 1 underfills the 4/4 bar: notes sum to 2 of 4 beats",
+        "validation — voice 1 underfills the 4/4 bar: notes sum to 2 of 4 beats",
+        "validation — voice 2 underfills the 4/4 bar: notes sum to 3 of 4 beats",
+        "validation — voice 2 underfills the 4/4 bar: notes sum to 3 of 4 beats"
+      ],
+      "scrollWidth": 750,
+      "scrollHeight": 789,
+      "clientWidth": 750,
+      "clientHeight": 789,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "importError": null,
+  "warnings": [],
+  "importedDocumentSha256": "154cae70f13fcf4083eca3b5fd98e1826f66f20ae41f71fcc3fa4b3afdd91683",
+  "displayOptions": {
+    "lyrics": "current",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

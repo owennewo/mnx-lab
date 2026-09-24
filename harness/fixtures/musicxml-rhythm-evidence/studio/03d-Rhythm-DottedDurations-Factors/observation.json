@@ -1,0 +1,74 @@
+{
+  "id": "03d-Rhythm-DottedDurations-Factors",
+  "sourceSha256": "1a84fcdae4bb6ee04ba19ec6a506ef40d2a85e6ad2f1996bbae398067d91ce34",
+  "testClass": "feature",
+  "description": "Several durations can be written with dots. For multi-measure rests it is also possible to have durations that cannot be expressed with dotted notes (like 5/8). In bar 15 there is only a 16th note and no rest for the remaining part of the bar.",
+  "views": [
+    {
+      "scrollTarget": "frame",
+      "visibleWidth": 1060,
+      "visibleHeight": 870,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        [
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [
+        "validation — underfills the 31/8 bar: notes sum to 0.5 of 31 beats",
+        "validation — underfills the 31/8 bar: notes sum to 0.5 of 31 beats"
+      ],
+      "scrollWidth": 1060,
+      "scrollHeight": 870,
+      "clientWidth": 1060,
+      "clientHeight": 870,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "suppliedLibraryTitle": "03d-Rhythm-DottedDurations-Factors",
+  "makeCurrentError": null,
+  "entryPath": "Local operator ingest: GP seed + unmodified XML original; Save → Versions → View XML → Make current",
+  "importError": null,
+  "viewingOriginal": false,
+  "editingSuspended": false,
+  "warnings": [],
+  "importedDocumentSha256": "697faad9210910de0f88bbb58b67a93ea2d372f6c09978eb66425614f77386fe",
+  "displayOptions": {
+    "lyrics": "current",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

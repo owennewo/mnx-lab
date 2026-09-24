@@ -58,6 +58,18 @@ items 22 and 23 behave as expected. [Proposed item 25](../proposed/core-musicxml
 owns only the new rest gaps. Render item 18 remains open for the other families;
 this pass makes no write-path claim for item 19.
 
+**Rhythm render slice, 2026-09-24.** The seven `03`-series originals now have
+[current source/import/both-shell Notation verdicts](../../docs/musicxml-rhythm-assessment.md):
+14 feature IDs, 110 source-note and 41 source-control variants, and 28
+feature × shell × view rows. `03a` loses 21 written note durations and shifts
+39 note onsets; an isolated MNX probe also finds black noteheads for long
+values. `03b`/`03f` print unwritten cursor gaps as rests. `03d` adds three
+wrong one-bar full-rest durations to proposed item 25. [Proposed item
+26](../proposed/core-musicxml-rhythm-fidelity.md) owns the new note-value and
+invisible-gap failures. The `03e` absent-divisions visual result is correct,
+but its independent music21 metric disagreement remains explicit. Item 18
+remains open for the rest of the suite; no write-path tasks are claimed.
+
 ### The oracle we already own, and the assertion that would waste it
 
 `vendor/mnx/doctools/data.json` holds **27 `spectools.exampledocumentcomparison`
@@ -178,7 +190,8 @@ deliberately **not** enumerated in advance: item 8 decides them from evidence.
 | 22 | [Render gaps](../complete/core-musicxml-render-gaps.md) | Preserve piano staves; diagnose microtonal/staff-line losses; contain unsupported-clef projection failures. Meter follow-up adds exact duration and display losses; not an exhaustive backlog. | accuracy | original XML + imported MNX + both-shell captures | **complete 2026-09-22** |
 | 23 | [Write gaps](../complete/core-musicxml-write-gaps.md) | Resolve missing title metadata before making an imported Studio version current, without bypassing the shared editor or GP storage policy; expose representable numeric meter ranges. | authoring | real Versions controls + refusal + persistence checks | **complete 2026-09-24** |
 | 24 | [Accidental fidelity](../proposed/core-musicxml-accidental-fidelity.md) | Preserve and draw explicit enclosures; diagnose named accidental glyph loss; expose the missing note-inspector choices and resolve the measured Studio GP persistence loss. Deduplicates item 22's fractional-pitch work and item 23's title workflow. | accuracy + authoring | 01a–01h source/import/browser/editor/save-route evidence | **proposed 2026-09-24** |
-| 25 | [Rest fidelity](../proposed/core-musicxml-rest-fidelity.md) | Import multimeasure rest ranges, explicit rest heights and 256th–1024th written values; diagnose `use-symbols` until a carrier is agreed. Keeps meter/title fixes in items 22/23. | accuracy | 02a–02f source/import/both-shell notation evidence | **proposed 2026-09-24** |
+| 25 | [Rest fidelity](../proposed/core-musicxml-rest-fidelity.md) | Import multimeasure rest ranges, explicit rest heights and 256th–1024th written values; preserve noncanonical one-bar full-rest spans and diagnose `use-symbols` until a carrier is agreed. | accuracy | 02a–02f plus 03d source/import/both-shell notation evidence | **proposed 2026-09-24** |
+| 26 | [Rhythm fidelity](../proposed/core-musicxml-rhythm-fidelity.md) | Keep maxima/longa/breve and 256th–1024th note values, draw long-value heads, and retain backup/forward gaps as invisible MNX spaces. Deduplicates item 21's export work and item 25's rest work. | accuracy | 03-series source/import/browser/headless evidence | **proposed 2026-09-24** |
 | — | Feature parity | Dynamics, wedges, spanners, ottavas, articulations, SMuFL glyph names, percussion, layout breaks. **Deliberately unenumerated**: item 8 turns these into a ranked queue with evidence, and each becomes its own row when picked up. Note the schema already has `dynamic-*`, `ottava`, `slur` and `wedge-type` as standard objects — but **no pedal def**, so pedal is contract clause 2's first real test. | accuracy | 1 + 2 + 3 | not yet rows |
 
 ### Item 8's derivation rule
@@ -212,6 +225,32 @@ exactly as `verified` already works here. No backend: a generated JSON artifact
 committed to the repo, like `worker/models.json`.
 
 ## Progress + learnings
+
+### 2026-09-24 — item 18: 03-series rhythm rendering slice
+
+[The current seven-source review](../../docs/musicxml-rhythm-assessment.md)
+adds 14 feature IDs, 110 source notes, 41 cursor/meter/beam controls and 28
+both-shell Notation verdicts. Both original-file entry paths, imported MNX,
+complete visible score tiles, Show time-signature preference and a separate
+headless layout probe are retained. No source declares strings; Tab/Both are
+inapplicable.
+
+`03a` changes all nine maxima/longa/breve and twelve 256th–1024th written
+values, moving 39 later onsets. Independently authored long MNX values still
+draw black heads; short flags are already available. `03b` and `03f` keep
+their source note onsets but turn unwritten cursor gaps into visible rests,
+and `03f` drops its final forward span. `03d`'s changing meters and dotted
+pitched notes look right, but three one-bar full rests have wrong duration.
+Secondary beams and mid-measure divisions match the source. The no-divisions
+fixture visibly shows its whole note; a conflicting independent music21
+duration remains an explicit unresolved semantic/tool case.
+
+[Proposed item 25](../proposed/core-musicxml-rest-fidelity.md) now includes
+`03d`'s one-bar rest variants. [Proposed item
+26](../proposed/core-musicxml-rhythm-fidelity.md) covers new note and
+unwritten-gap losses, without reopening item 21's export fix or item 22's
+meter fix. Item 18 remains open for the rest of the pinned suite; item 19
+receives shared IDs but no task or persistence passes from these captures.
 
 ### 2026-09-24 — item 18: 02a–02f rest rendering slice
 

@@ -1,0 +1,297 @@
+{
+  "kind": "implementation-loop retained 03-series agent render artifacts; not pixel goldens",
+  "applicationCommit": "4817af904bd848d7ad20ea5aa98584907a152139",
+  "corpusRevision": "77c19f7e819154c70ca1a1992e80dcda8ff82fea",
+  "files": [
+    {
+      "path": "studio/03a-Rhythm-Durations/document.mnx.json",
+      "bytes": 20298,
+      "sha256": "c420af89ebff363ab8392cc04164352abac979d217aae9ddb429bfdbf1962653"
+    },
+    {
+      "path": "studio/03a-Rhythm-Durations/notation-0-0.png",
+      "bytes": 98079,
+      "sha256": "006e7262f8f169f880c47d906f4b8fb504a9a3751a0e0cf0b53c54ca0a69d5ff"
+    },
+    {
+      "path": "studio/03a-Rhythm-Durations/notation-0.svg",
+      "bytes": 22490,
+      "sha256": "b0fc06ea4b888c04960aae5720b07b651d79c3371720525ec69e1f80525d03a6"
+    },
+    {
+      "path": "studio/03a-Rhythm-Durations/observation.json",
+      "bytes": 2596,
+      "sha256": "0664d3d2f6b9adc9518533765edbc5ffc571257ff806848db3152cdacc025260"
+    },
+    {
+      "path": "studio/03b-Rhythm-Backup/document.mnx.json",
+      "bytes": 2638,
+      "sha256": "43d539c21f2e8a84f07be36e9d2aa26834e02b44c5871cc5478c6e1ee4de7c1e"
+    },
+    {
+      "path": "studio/03b-Rhythm-Backup/notation-0-0.png",
+      "bytes": 64532,
+      "sha256": "970a92507d386ad53dad3e997c87920519b503d421934816c9ec02d59e68de0a"
+    },
+    {
+      "path": "studio/03b-Rhythm-Backup/notation-0.svg",
+      "bytes": 4014,
+      "sha256": "8daf680f8f7a5e4359c6e9ca13bc198a1e4bed72bd9658c61b04e8cb997267b2"
+    },
+    {
+      "path": "studio/03b-Rhythm-Backup/observation.json",
+      "bytes": 1924,
+      "sha256": "41506f72fb7799aef8d15f1308f7035cc59c917470fda2b5f47a1955fc3876cb"
+    },
+    {
+      "path": "studio/03c-Rhythm-DivisionChange/document.mnx.json",
+      "bytes": 3399,
+      "sha256": "dca507d65af27c585aa07ca6f9adb3bf752ea5fc7cfe37f147ab2ed67cd3376d"
+    },
+    {
+      "path": "studio/03c-Rhythm-DivisionChange/notation-0-0.png",
+      "bytes": 65950,
+      "sha256": "79bd966170dbf8072407a52310096baad59294ec87d7a7213a8dfeeab9ccbf02"
+    },
+    {
+      "path": "studio/03c-Rhythm-DivisionChange/notation-0.svg",
+      "bytes": 3116,
+      "sha256": "725f371d4768682fe96556592daa71beeccea42059563d9df3072477f6c2257b"
+    },
+    {
+      "path": "studio/03c-Rhythm-DivisionChange/observation.json",
+      "bytes": 1642,
+      "sha256": "be6c4f40f51545ee7c5be642fb91af0d0059bb1237ef08b23d5977158d7817d7"
+    },
+    {
+      "path": "studio/03d-Rhythm-DottedDurations-Factors/document.mnx.json",
+      "bytes": 9574,
+      "sha256": "a80bd7d80265c46ac5cabd610540200653ba94b3e9a465b3d5380f7fbd161ead"
+    },
+    {
+      "path": "studio/03d-Rhythm-DottedDurations-Factors/notation-0-0.png",
+      "bytes": 89347,
+      "sha256": "2a1ca605cfd7b04d91c9ce42f0002cf238007c6020057fef221b842bcfff3dd2"
+    },
+    {
+      "path": "studio/03d-Rhythm-DottedDurations-Factors/notation-0.svg",
+      "bytes": 17148,
+      "sha256": "c06ff8c68065a9a89ec981660421483422deed1d7977e65a15689681ff9a5ccc"
+    },
+    {
+      "path": "studio/03d-Rhythm-DottedDurations-Factors/observation.json",
+      "bytes": 2029,
+      "sha256": "fe799792581112df4f1d24dffd854d8456e5e17620ce6c28388599edf5f007c0"
+    },
+    {
+      "path": "studio/03e-Rhythm-No-Divisions/document.mnx.json",
+      "bytes": 1166,
+      "sha256": "daab3afd02f4e0de4d1c2774193194158928bd298969a26ee4d7223fe499c68e"
+    },
+    {
+      "path": "studio/03e-Rhythm-No-Divisions/notation-0-0.png",
+      "bytes": 63162,
+      "sha256": "b83628eadb8f91f56e49a524c1135ad0fd5f620de273323a357c3eb0a85e7389"
+    },
+    {
+      "path": "studio/03e-Rhythm-No-Divisions/notation-0.svg",
+      "bytes": 1783,
+      "sha256": "ce53f4c0fb8e8b998a249e53768185f56a4f431892bee5c6c77ba00dde2cde43"
+    },
+    {
+      "path": "studio/03e-Rhythm-No-Divisions/observation.json",
+      "bytes": 1519,
+      "sha256": "69a318bd6ddfbb48aaac45bba4c9218d884dec836b7da8a06c22157b9b4ad5d6"
+    },
+    {
+      "path": "studio/03e-Rhythm-SecondaryBeamBreaks/document.mnx.json",
+      "bytes": 20855,
+      "sha256": "152e477553a20f1225ac292d512c0013925fbcfa8b7b50595713be73569ec079"
+    },
+    {
+      "path": "studio/03e-Rhythm-SecondaryBeamBreaks/notation-0-0.png",
+      "bytes": 79956,
+      "sha256": "99db6293201a65851529eb88cee515632300187eda0826fb4a3bdc4d1179cd17"
+    },
+    {
+      "path": "studio/03e-Rhythm-SecondaryBeamBreaks/notation-0.svg",
+      "bytes": 10759,
+      "sha256": "42cc65b57c4dabc1718f829265e4b9b42bec61163f5ec0b8c4e682ca5d74934c"
+    },
+    {
+      "path": "studio/03e-Rhythm-SecondaryBeamBreaks/observation.json",
+      "bytes": 1450,
+      "sha256": "6179b566b0ef84dc12677462c51b4a96283d4d1f1ab6ef0e00d515afa0f8ceca"
+    },
+    {
+      "path": "studio/03f-Rhythm-Forward/document.mnx.json",
+      "bytes": 2464,
+      "sha256": "ee4b69b9469850cc50f6c1108e20ef4af103527583d0e1f5f7c2293f6efc8913"
+    },
+    {
+      "path": "studio/03f-Rhythm-Forward/notation-0-0.png",
+      "bytes": 65194,
+      "sha256": "c9f5340e158f38f0f7802f4c6cc387974e6948a925a2c28727d1580832304437"
+    },
+    {
+      "path": "studio/03f-Rhythm-Forward/notation-0.svg",
+      "bytes": 4105,
+      "sha256": "f8cc04ec82c97c1a37117f17cb93bb6ed0716bf1388c76adec614c109bc72fec"
+    },
+    {
+      "path": "studio/03f-Rhythm-Forward/observation.json",
+      "bytes": 1900,
+      "sha256": "0310a0b6d52780b8a7c4afccdf51e4a881ed2df532e6533933a7ef6ce416df3c"
+    },
+    {
+      "path": "studio/index.json",
+      "bytes": 15517,
+      "sha256": "f7fcf73a795df84a38be3ca2314f66e1cd6a93d1e159b6ab7c10702f16937fa5"
+    },
+    {
+      "path": "workbench/03a-Rhythm-Durations/document.mnx.json",
+      "bytes": 20298,
+      "sha256": "c420af89ebff363ab8392cc04164352abac979d217aae9ddb429bfdbf1962653"
+    },
+    {
+      "path": "workbench/03a-Rhythm-Durations/notation-0-0.png",
+      "bytes": 297378,
+      "sha256": "75e8a0c18b6d7c0d32075ccaa7781a60796a3e2a905671bca16655d41317cf4f"
+    },
+    {
+      "path": "workbench/03a-Rhythm-Durations/notation-0.svg",
+      "bytes": 23340,
+      "sha256": "e7d7a914276df3a2852c06c588563beef4046e01d830b6a6633121a6829cf8ac"
+    },
+    {
+      "path": "workbench/03a-Rhythm-Durations/observation.json",
+      "bytes": 2399,
+      "sha256": "75e3cbdbe55e2257cb75a3a86ccf4b6392c336b8229b129038e180f331593f67"
+    },
+    {
+      "path": "workbench/03b-Rhythm-Backup/document.mnx.json",
+      "bytes": 2638,
+      "sha256": "43d539c21f2e8a84f07be36e9d2aa26834e02b44c5871cc5478c6e1ee4de7c1e"
+    },
+    {
+      "path": "workbench/03b-Rhythm-Backup/notation-0-0.png",
+      "bytes": 248637,
+      "sha256": "fd6fed67b7cb00106818ad5ad829552d599034ff2901e755ae488336cdb04846"
+    },
+    {
+      "path": "workbench/03b-Rhythm-Backup/notation-0.svg",
+      "bytes": 4014,
+      "sha256": "8daf680f8f7a5e4359c6e9ca13bc198a1e4bed72bd9658c61b04e8cb997267b2"
+    },
+    {
+      "path": "workbench/03b-Rhythm-Backup/observation.json",
+      "bytes": 1670,
+      "sha256": "049172edbafbb9caf54c4b4797f3e20620623b7c214343fcd01327f0ebeeead5"
+    },
+    {
+      "path": "workbench/03c-Rhythm-DivisionChange/document.mnx.json",
+      "bytes": 3399,
+      "sha256": "dca507d65af27c585aa07ca6f9adb3bf752ea5fc7cfe37f147ab2ed67cd3376d"
+    },
+    {
+      "path": "workbench/03c-Rhythm-DivisionChange/notation-0-0.png",
+      "bytes": 249459,
+      "sha256": "ae05c92844a445d1773ae7c04ec962732ff745a51a53cec950b591c0f6b0e5cc"
+    },
+    {
+      "path": "workbench/03c-Rhythm-DivisionChange/notation-0.svg",
+      "bytes": 3175,
+      "sha256": "443b61ea3cf0265d3546fc027db642dfc28c258843e116fa7f9de60519b53995"
+    },
+    {
+      "path": "workbench/03c-Rhythm-DivisionChange/observation.json",
+      "bytes": 1380,
+      "sha256": "7b162d958f9a6d5ad52dd47f29a00797a82afaa8931ffa5b89b7839588b58e30"
+    },
+    {
+      "path": "workbench/03d-Rhythm-DottedDurations-Factors/document.mnx.json",
+      "bytes": 9574,
+      "sha256": "a80bd7d80265c46ac5cabd610540200653ba94b3e9a465b3d5380f7fbd161ead"
+    },
+    {
+      "path": "workbench/03d-Rhythm-DottedDurations-Factors/notation-0-0.png",
+      "bytes": 274018,
+      "sha256": "04fb59185d00cd2ba6b3516f26ebbd0eeb010542b7c82d9de69d06bb0f8e1a32"
+    },
+    {
+      "path": "workbench/03d-Rhythm-DottedDurations-Factors/notation-0.svg",
+      "bytes": 17521,
+      "sha256": "befcbb7cef4ce9a9802ced2502cc8fa58a8517f8127c7af4ddd0111398843d4a"
+    },
+    {
+      "path": "workbench/03d-Rhythm-DottedDurations-Factors/observation.json",
+      "bytes": 1778,
+      "sha256": "91a56de88c0b41fc50dedd306ba43e6a113152b9202fbeb08ce7b3052af0d71b"
+    },
+    {
+      "path": "workbench/03e-Rhythm-No-Divisions/document.mnx.json",
+      "bytes": 1166,
+      "sha256": "daab3afd02f4e0de4d1c2774193194158928bd298969a26ee4d7223fe499c68e"
+    },
+    {
+      "path": "workbench/03e-Rhythm-No-Divisions/notation-0-0.png",
+      "bytes": 247318,
+      "sha256": "42c9a7a125df99328dd23c1d7bd0b471d1c1e14d4f25c30113b6562225a41152"
+    },
+    {
+      "path": "workbench/03e-Rhythm-No-Divisions/notation-0.svg",
+      "bytes": 1783,
+      "sha256": "ce53f4c0fb8e8b998a249e53768185f56a4f431892bee5c6c77ba00dde2cde43"
+    },
+    {
+      "path": "workbench/03e-Rhythm-No-Divisions/observation.json",
+      "bytes": 1259,
+      "sha256": "4306361b1e8c5aa9492ac837dfef4a69b3f6dba690aaf020386d5d38357e1059"
+    },
+    {
+      "path": "workbench/03e-Rhythm-SecondaryBeamBreaks/document.mnx.json",
+      "bytes": 20855,
+      "sha256": "152e477553a20f1225ac292d512c0013925fbcfa8b7b50595713be73569ec079"
+    },
+    {
+      "path": "workbench/03e-Rhythm-SecondaryBeamBreaks/notation-0-0.png",
+      "bytes": 262669,
+      "sha256": "efe6e17a2fa284c0428e5a680971f9491faa8273d6a36a2dd290881fbad48b96"
+    },
+    {
+      "path": "workbench/03e-Rhythm-SecondaryBeamBreaks/notation-0.svg",
+      "bytes": 10765,
+      "sha256": "1cd6d2b191db3a84d2311f3cf2fe91715b36a3dcb58b60c87b74bbaa672a8230"
+    },
+    {
+      "path": "workbench/03e-Rhythm-SecondaryBeamBreaks/observation.json",
+      "bytes": 1183,
+      "sha256": "5a34954bef7094bea3103051dad89f31072bf19fa4038ade2a2e652648e7d3e7"
+    },
+    {
+      "path": "workbench/03f-Rhythm-Forward/document.mnx.json",
+      "bytes": 2464,
+      "sha256": "ee4b69b9469850cc50f6c1108e20ef4af103527583d0e1f5f7c2293f6efc8913"
+    },
+    {
+      "path": "workbench/03f-Rhythm-Forward/notation-0-0.png",
+      "bytes": 250276,
+      "sha256": "5dc32786780f7a83c70db55e8fba569431c692e50880f0cc1f96070b8a6de383"
+    },
+    {
+      "path": "workbench/03f-Rhythm-Forward/notation-0.svg",
+      "bytes": 4099,
+      "sha256": "5ed1e2bada35a26fbb495b5383d11d02974ee758691e4e06223e50f19bc32d15"
+    },
+    {
+      "path": "workbench/03f-Rhythm-Forward/observation.json",
+      "bytes": 1645,
+      "sha256": "8859acfa169ea34583e2461a80b7a2b959bb43e47176e3cfc68553af1d949f52"
+    },
+    {
+      "path": "workbench/index.json",
+      "bytes": 13666,
+      "sha256": "e0fa300040559007561825f695f85297f3966a92d2a97758a4dfec6b6a42bd2d"
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "kind": "headless MNX layout isolation, separate from original-file browser verdicts",
+  "applicationCommit": "4817af904bd848d7ad20ea5aa98584907a152139",
+  "noteValues": [
+    {
+      "value": "maxima",
+      "noteheadGlyphs": [
+        "noteheadBlack"
+      ],
+      "flagGlyphs": []
+    },
+    {
+      "value": "longa",
+      "noteheadGlyphs": [
+        "noteheadBlack"
+      ],
+      "flagGlyphs": []
+    },
+    {
+      "value": "breve",
+      "noteheadGlyphs": [
+        "noteheadBlack"
+      ],
+      "flagGlyphs": []
+    },
+    {
+      "value": "whole",
+      "noteheadGlyphs": [
+        "noteheadWhole"
+      ],
+      "flagGlyphs": []
+    },
+    {
+      "value": "256th",
+      "noteheadGlyphs": [
+        "noteheadBlack"
+      ],
+      "flagGlyphs": [
+        "flag256thUp"
+      ]
+    },
+    {
+      "value": "512th",
+      "noteheadGlyphs": [
+        "noteheadBlack"
+      ],
+      "flagGlyphs": [
+        "flag512thUp"
+      ]
+    },
+    {
+      "value": "1024th",
+      "noteheadGlyphs": [
+        "noteheadBlack"
+      ],
+      "flagGlyphs": [
+        "flag1024thUp"
+      ]
+    }
+  ],
+  "forwardSpaceProbe": {
+    "importedFirstBarRestGlyphs": [
+      "restQuarter",
+      "restQuarter"
+    ],
+    "spacedFirstBarRestGlyphs": [],
+    "importedNoteheadCount": 3,
+    "spacedNoteheadCount": 3,
+    "spacedDiagnostics": [
+      "underfills the 4/4 bar: notes sum to 1 of 4 beats"
+    ]
+  }
+}

@@ -2,7 +2,8 @@
 
 > **Status: proposed, 2026-09-24.** MusicXML campaign item 25.
 > Bounded gaps from [render assessment item 18](../inprogress/core-musicxml-render-assessment.md),
-> evidenced in the [02a–02f rest review](../../docs/musicxml-rest-assessment.md).
+> evidenced in the [02a–02f rest review](../../docs/musicxml-rest-assessment.md)
+> and [03-series rhythm review](../../docs/musicxml-rhythm-assessment.md).
 > This proposal does not close the assessment or implement the fixes. Serves the
 > implementation loop. [Campaign contract](../inprogress/core-campaign-musicxml.md).
 
@@ -46,6 +47,19 @@ Acceptance: structural range equality for `02a`, `02c`, `02d`, and both-shell
 captures with the requested bar counts, original-note order and unchanged
 meter display. A minimal MNX probe confirms the renderer draws ranges
 independently of MusicXML import.
+
+The later `03d` source adds eight **one-bar** `<multiple-rest>1` cases under
+changing meters. All markers disappear; 5/16, 9/8 and 31/8 full-bar rest
+durations are approximated as quarter, whole and triple-dotted whole because
+there is no matching single note value. This is the one-bar case above, with
+an additional exact-duration requirement, rather than a separate proposal.
+Choose a valid published-MNX representation for the complete bar (for
+example, a score-level one-bar range plus a metric `space` fraction, if
+layout and editing uphold that meaning). Acceptance also covers `03d`'s
+eight source rest IDs: exact bar spans and one full-bar rest symbol in both
+shells, including 5/16, 9/8 and 31/8, with no silent closest-value rounding.
+Prove the representation in an authored-MNX probe before treating the
+importer change as sufficient.
 
 ## P1: preserve explicit rest height across clefs
 
@@ -98,9 +112,11 @@ do not equate a numbered H-bar with the requested symbol style.
 Completed [item 22](../complete/core-musicxml-render-gaps.md) owns exact meter
 totals and compatible common/cut display; `02d` confirms those are visible.
 Completed [item 23](../complete/core-musicxml-write-gaps.md) owns untitled
-Studio version promotion; all six sources are now reachable. [Item
+Studio version promotion; the reviewed sources are now reachable. [Item
 24](core-musicxml-accidental-fidelity.md) owns accidental glyphs and its
-measured GP-storage losses. This item owns only the new rest-family render
-findings. Direct rest authoring, undo/redo and save/reopen remain [write
+measured GP-storage losses. [Item 26](core-musicxml-rhythm-fidelity.md)
+owns short and long **note** values and invisible cursor gaps. This item
+owns only the rest-family render findings. Direct rest authoring, undo/redo
+and save/reopen remain [write
 assessment item 19](../inprogress/core-musicxml-write-assessment.md) work;
 none is inferred from this rendering review.
