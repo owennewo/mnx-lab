@@ -1,0 +1,137 @@
+{
+  "mnx": {
+    "version": 1
+  },
+  "global": {
+    "measures": [
+      {
+        "key": {
+          "fifths": 0
+        },
+        "time": {
+          "count": 4,
+          "unit": 4,
+          "display": "common"
+        },
+        "section": {
+          "label": "Lento"
+        },
+        "tempos": [
+          {
+            "bpm": 56,
+            "value": {
+              "base": "quarter"
+            }
+          }
+        ]
+      },
+      {
+        "barline": {
+          "type": "final"
+        },
+        "id": "m2"
+      }
+    ]
+  },
+  "parts": [
+    {
+      "id": "P1",
+      "name": "MusicXML Part",
+      "measures": [
+        {
+          "clefs": [
+            {
+              "clef": {
+                "sign": "G",
+                "staffPosition": -2
+              }
+            }
+          ],
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "whole"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 4
+                      },
+                      "id": "n-1-1-v1-0-0"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "whole"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 4
+                      },
+                      "id": "n-1-2-v1-0-0"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "dynamics": [
+            {
+              "position": {
+                "fraction": [
+                  0,
+                  1
+                ]
+              },
+              "type": "immediate",
+              "value": "f"
+            },
+            {
+              "position": {
+                "fraction": [
+                  1,
+                  4
+                ]
+              },
+              "type": "gradual",
+              "wedgeType": "decreasing",
+              "end": {
+                "measure": "m2",
+                "position": {
+                  "fraction": [
+                    1,
+                    1
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "_x": {
+    "mnxLab": {
+      "encoding": {
+        "software": "musicxml-mnx",
+        "version": "0.1.0"
+      }
+    }
+  }
+}

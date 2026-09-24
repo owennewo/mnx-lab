@@ -1,0 +1,61 @@
+{
+  "id": "31d-Directions-Compounds",
+  "sourceSha256": "7b9a6952ed0fb4ed64f28eac334256686a341089228ab1124251235f68011504",
+  "testClass": "feature",
+  "description": "This tests various combinations of <direction> children. The lyrics for each note describe the compound elements assigned to that note. The first ‘molto f’ uses <words>molto <words>, i.e., it omits the ‘xml:space’ attribute. This makes the rendering of the space between ‘molto’ and ‘f’ implementation-dependent (and might be thus not rendered). The second ‘molto f’, together with ‘meno f’, uses ‘xml:space=\"preserve\"’. For demonstration purposes, there is no space between the words ‘bold’ and ‘italic’. A trailing up-arrow indicates a ‘placement=\"above\"’ attribute, a down-arrow means ‘placement=\"below\"’.",
+  "views": [
+    {
+      "scrollTarget": "frame",
+      "visibleWidth": 1060,
+      "visibleHeight": 870,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0,
+          1,
+          2,
+          3
+        ],
+        [
+          4,
+          5
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [],
+      "scrollWidth": 1060,
+      "scrollHeight": 870,
+      "clientWidth": 1060,
+      "clientHeight": 870,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "suppliedLibraryTitle": "31d-Directions-Compounds",
+  "makeCurrentError": null,
+  "entryPath": "Local operator ingest: GP seed + unmodified XML original; Save → Versions → View XML → Make current",
+  "importError": null,
+  "viewingOriginal": false,
+  "editingSuspended": false,
+  "warnings": [],
+  "importedDocumentSha256": "df6c993567696d0e62cc5d6da594ffc99a4811dee7a9a5b7f90e40bf065c0d5d",
+  "displayOptions": {
+    "lyrics": "all",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide",
+    "selectedVerse": "1"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

@@ -54,6 +54,7 @@ proposals that name their campaign.
 - **[core-musicxml-notehead-fidelity.md](proposed/core-musicxml-notehead-fidelity.md)** — MusicXML campaign item 30: diagnose and eventually preserve per-note head shapes/fill/parentheses, slash-style spans, hidden note ink and numbered chord-member labels.
 - **[core-musicxml-tuplet-fidelity.md](proposed/core-musicxml-tuplet-fidelity.md)** — MusicXML campaign item 31: preserve nested tuplet timing and explicit display choices, and import positive single-note tremolo and staccato marks from the six 23-series originals.
 - **[core-musicxml-grace-fidelity.md](proposed/core-musicxml-grace-fidelity.md)** — MusicXML campaign item 32: draw grace-origin links and cross-staff graces, and resolve zero-time dynamic attachment from the eight 24-series originals.
+- **[core-musicxml-direction-fidelity.md](proposed/core-musicxml-direction-fidelity.md)** — MusicXML campaign item 33: preserve timed, multiple and compound direction marks, metric relations, above dynamics and source signs from the five 31-series originals.
 
 
 

@@ -299,3 +299,23 @@ attachment. `24d`'s two 20-percent playback attributes remain nonvisual and
 unassessed for playback; `24f`'s omitted slash is an allowed application
 choice. This raises detailed current render coverage to 70/183 originals;
 item 18 and item 19 remain open.
+
+## Direction rendering batch, 2026-09-24
+
+[The five 31a/31b/31c/31d/31f originals](../../docs/musicxml-directions-assessment.md)
+now have 86 source-derived feature IDs, 357 note/direction/lyric variants and
+172 current Notation feature × shell rows. Original-file Workbench and editable
+Studio imports, identical MNX, complete SVG/PNG captures, Show clefs/meters,
+All verses and tiled `31a` scroll coverage are retained. No known strings
+permit Tab/Both. Ordinary dynamic glyphs, the `31a` hairpin/8vb, segno
+and two dotted metronome marks survive. Other directions show distinct
+failures: `31a` drops most specialist signs and three of four first-bar
+rehearsals; `31b` loses tempo offset/parentheses and omits an imported
+end-of-bar hairpin; `31c` drops metric relations; `31d` splits or
+overprints compound text/dynamics; `31f` collapses a retained three-line
+text into one unboxed line and draws an above dynamic below. [Proposed item
+33](../proposed/core-musicxml-direction-fidelity.md) owns these new gaps.
+The referenced `nestedboxes.png` is absent from the pinned suite and
+its image ink is blocked; the first `molto` space is source-ambiguous.
+Detailed current render coverage is 75/183 originals; item 18 and item 19
+remain open.

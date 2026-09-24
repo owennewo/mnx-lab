@@ -220,6 +220,7 @@ deliberately **not** enumerated in advance: item 8 decides them from evidence.
 | 30 | [Notehead fidelity](../proposed/core-musicxml-notehead-fidelity.md) | Diagnose and preserve per-note head shape/fill/enclosure, slash spans, hidden note ink and chord-member labels. Deduplicates item 22's zero-line warning and item 25's rest-height work. | accuracy | 22a–22d source/import/current both-shell notation evidence | **proposed 2026-09-24** |
 | 31 | [Tuplet fidelity](../proposed/core-musicxml-tuplet-fidelity.md) | Restore performed duration and nested groups, carry explicit tuplet display, and import simple staccato/single-note tremolo marks. Keep 23b's manifest/XML conflict and 23f's marker-free grouping qualified. | accuracy | 23a–23f source/import/current both-shell notation evidence | **proposed 2026-09-24** |
 | 32 | [Grace fidelity](../proposed/core-musicxml-grace-fidelity.md) | Draw grace-origin slurs/ties and staff-2 grace notes from retained MNX fields; resolve grace-local dynamic/wedge attachment where metric fractions coincide. Keep playback stealing and absent slash defaults separately qualified. | accuracy | 24a–24h source/import/current both-shell notation evidence | **proposed 2026-09-24** |
+| 33 | [Direction fidelity](../proposed/core-musicxml-direction-fidelity.md) | Preserve timed offsets, multiple/compound direction marks and metric relations; draw above dynamics and source glyph/spanner signs, diagnosing unsupported specialist controls and missing image resources. | accuracy | 31a/31b/31c/31d/31f source/import/current both-shell notation evidence | **proposed 2026-09-24** |
 | — | Feature parity | Dynamics, wedges, spanners, ottavas, articulations, SMuFL glyph names, percussion, layout breaks. **Deliberately unenumerated**: item 8 turns these into a ranked queue with evidence, and each becomes its own row when picked up. Note the schema already has `dynamic-*`, `ottava`, `slur` and `wedge-type` as standard objects — but **no pedal def**, so pedal is contract clause 2's first real test. | accuracy | 1 + 2 + 3 | not yet rows |
 
 ### Item 8's derivation rule
@@ -253,6 +254,26 @@ exactly as `verified` already works here. No backend: a generated JSON artifact
 committed to the repo, like `worker/models.json`.
 
 ## Progress + learnings
+
+### 2026-09-24 — item 18: 31-series direction rendering slice
+
+[The five-source original-file review](../../docs/musicxml-directions-assessment.md)
+adds 86 stable feature IDs, 84 notes, 79 directions, 93 direction children,
+101 lyric reference labels and 357 source variants. All five originals opened
+in current Workbench and editable Studio with Show clefs/meters and All verses;
+`31a` required three Workbench and two Studio scroll tiles. The 172
+Notation feature × shell rows are 76 correct, 22 incorrect, 64 missing, 8
+partial and 2 blocked. Existing ordinary dynamics, hairpins, segno, 8vb and
+the two surviving dotted tempo marks earn passes. Missing signs, multiple
+rehearsals, metric modulations and compound fragments are separated from
+renderer failures: above dynamics draw below despite retained `orient`,
+and `31b`'s imported end-of-bar wedge has no ink. The original
+`31f` multiline text survives in MNX but paints on one unboxed line.
+[Proposed item 33](../proposed/core-musicxml-direction-fidelity.md) owns the
+new gaps, deduplicated from completed items 17, 22, 23 and proposed item 32.
+The unavailable `nestedboxes.png` image and `31d`'s unspecified first
+`molto` space remain qualified. Detailed current render coverage is
+75/183 originals; item 18 and item 19 remain open.
 
 ### 2026-09-24 — item 18: 24-series grace rendering slice
 

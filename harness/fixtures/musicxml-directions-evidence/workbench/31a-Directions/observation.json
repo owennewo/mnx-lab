@@ -1,0 +1,83 @@
+{
+  "id": "31a-Directions",
+  "sourceSha256": "830db690e37a793b091f4361ea0467129abda4205e34ce9512900bd800574818",
+  "testClass": "feature",
+  "description": "All <direction> elements defined in MusicXML. The lyrics for each note describes the direction element assigned to that note. Not marked with lyrics is a <scordatura> element at the very beginning. A trailing up-arrow indicates a ‘placement=\"above\"’ attribute, a down-arrow means ‘placement=\"below\"’.",
+  "views": [
+    {
+      "scrollTarget": "viewer",
+      "visibleWidth": 750,
+      "visibleHeight": 753.125,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          3
+        ],
+        [
+          4
+        ],
+        [
+          5,
+          6
+        ],
+        [
+          7,
+          8
+        ],
+        [
+          9,
+          10
+        ],
+        [
+          11,
+          12
+        ],
+        [
+          13,
+          14
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [],
+      "scrollWidth": 740,
+      "scrollHeight": 1446,
+      "clientWidth": 740,
+      "clientHeight": 753,
+      "screenshots": [
+        "notation-0-0.png",
+        "notation-0-653.png",
+        "notation-0-693.png"
+      ]
+    }
+  ],
+  "importError": null,
+  "warnings": [
+    "measure 8: dynamic \"ffz\" has no MNX equivalent and was not imported."
+  ],
+  "importedDocumentSha256": "7501426f3292b2507d69ecf23f62a76c42edf6b987ca70d64e02b3ef855bd5d1",
+  "displayOptions": {
+    "lyrics": "all",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide",
+    "selectedVerse": "1"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

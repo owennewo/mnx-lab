@@ -1,0 +1,49 @@
+{
+  "id": "31b-Directions-Order",
+  "sourceSha256": "4330dc0ef3a0b2b9e9b89a02d05f6dee07bce5bcea629cba02e408bd91990e89",
+  "testClass": "feature",
+  "description": "Using <offset> it is possible to make successive <direction> elements look like being concatenated. However, it is a bad idea in general to do that because it makes the rendering dependent on a program's score formatting. In the first bar, the first <direction> element contains a tempo mark and is directly followed by another <direction> element containing a metronome mark that is moved to the right by a positive <offset> element. In the second bar, the first <direction> element holds the start of a diminuendo wedge; it is directly followed by another <direction> element containing a dynamics mark. Since the wedge has an <offset> element with a positive value while the dynamics has no such element at all, the dynamics precedes the wedge. The wedge ends at or right before the final bar line (i.e., the <direction> element ending the wedge comes after the last <note> element).",
+  "views": [
+    {
+      "scrollTarget": "viewer",
+      "visibleWidth": 750,
+      "visibleHeight": 753.125,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0,
+          1
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [],
+      "scrollWidth": 750,
+      "scrollHeight": 753,
+      "clientWidth": 750,
+      "clientHeight": 753,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "importError": null,
+  "warnings": [],
+  "importedDocumentSha256": "7708cb8d07371e1501e64e363231d07dae7bb94d02b07d8401536e00b32cf6a5",
+  "displayOptions": {
+    "lyrics": "all",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

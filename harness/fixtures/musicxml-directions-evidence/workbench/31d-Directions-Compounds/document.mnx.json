@@ -1,0 +1,601 @@
+{
+  "mnx": {
+    "version": 1
+  },
+  "global": {
+    "measures": [
+      {
+        "key": {
+          "fifths": 0
+        },
+        "time": {
+          "count": 4,
+          "unit": 4,
+          "display": "common"
+        }
+      },
+      {},
+      {
+        "id": "m3"
+      },
+      {},
+      {
+        "rehearsal": {
+          "label": "12"
+        }
+      },
+      {
+        "barline": {
+          "type": "final"
+        },
+        "segno": {
+          "location": {
+            "fraction": [
+              0,
+              1
+            ]
+          }
+        }
+      }
+    ],
+    "lyrics": {
+      "lineOrder": [
+        "1",
+        "2"
+      ]
+    }
+  },
+  "parts": [
+    {
+      "id": "P1",
+      "name": "MusicXML Part",
+      "measures": [
+        {
+          "clefs": [
+            {
+              "clef": {
+                "sign": "G",
+                "staffPosition": -2
+              }
+            }
+          ],
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "half"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "Adagio",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "long=100",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 4
+                      },
+                      "id": "n-1-1-v1-0-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "half"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "molto↓",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "f",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 4
+                      },
+                      "id": "n-1-1-v1-1-0"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "dynamics": [
+            {
+              "position": {
+                "fraction": [
+                  1,
+                  2
+                ]
+              },
+              "type": "immediate",
+              "value": "f"
+            }
+          ],
+          "directions": [
+            {
+              "position": {
+                "fraction": [
+                  1,
+                  2
+                ]
+              },
+              "text": "molto ",
+              "orient": "below"
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "half"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "p↓",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "subito",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 4
+                      },
+                      "id": "n-1-2-v1-0-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "half"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "molto f↑",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "(rectangle)",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 4
+                      },
+                      "id": "n-1-2-v1-1-0"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "dynamics": [
+            {
+              "position": {
+                "fraction": [
+                  0,
+                  1
+                ]
+              },
+              "type": "immediate",
+              "value": "p"
+            },
+            {
+              "position": {
+                "fraction": [
+                  1,
+                  2
+                ]
+              },
+              "type": "immediate",
+              "value": "f",
+              "orient": "above"
+            }
+          ],
+          "directions": [
+            {
+              "position": {
+                "fraction": [
+                  0,
+                  1
+                ]
+              },
+              "text": " subito",
+              "orient": "below"
+            },
+            {
+              "position": {
+                "fraction": [
+                  1,
+                  2
+                ]
+              },
+              "text": "molto ",
+              "orient": "above"
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "half"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "ppp↓",
+                        "type": "start"
+                      },
+                      "2": {
+                        "text": "cresc.",
+                        "type": "start"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 4
+                      },
+                      "id": "n-1-3-v1-0-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "half"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "to",
+                        "type": "end"
+                      },
+                      "2": {
+                        "text": "fff↓",
+                        "type": "end"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 4
+                      },
+                      "id": "n-1-3-v1-1-0"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "dynamics": [
+            {
+              "position": {
+                "fraction": [
+                  0,
+                  1
+                ]
+              },
+              "type": "immediate",
+              "value": "ppp"
+            },
+            {
+              "position": {
+                "fraction": [
+                  0,
+                  1
+                ]
+              },
+              "type": "gradual",
+              "wedgeType": "increasing",
+              "end": {
+                "measure": "m3",
+                "position": {
+                  "fraction": [
+                    1,
+                    2
+                  ]
+                }
+              }
+            },
+            {
+              "position": {
+                "fraction": [
+                  1,
+                  2
+                ]
+              },
+              "type": "immediate",
+              "value": "fff"
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "half"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "cresc.↑",
+                        "type": "start"
+                      },
+                      "2": {
+                        "text": "dashes",
+                        "type": "start"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 4
+                      },
+                      "id": "n-1-4-v1-0-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "half"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "to",
+                        "type": "end"
+                      },
+                      "2": {
+                        "text": "meno f↑",
+                        "type": "end"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 4
+                      },
+                      "id": "n-1-4-v1-1-0"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "dynamics": [
+            {
+              "position": {
+                "fraction": [
+                  1,
+                  2
+                ]
+              },
+              "type": "immediate",
+              "value": "f",
+              "orient": "above"
+            }
+          ],
+          "directions": [
+            {
+              "position": {
+                "fraction": [
+                  0,
+                  1
+                ]
+              },
+              "text": "cresc.",
+              "orient": "above"
+            },
+            {
+              "position": {
+                "fraction": [
+                  1,
+                  2
+                ]
+              },
+              "text": "meno ",
+              "orient": "above"
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "half"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "reh. 12+bis",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "(square)",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 4
+                      },
+                      "id": "n-1-5-v1-0-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "half"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "bold+",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "italic",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 4
+                      },
+                      "id": "n-1-5-v1-1-0"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "directions": [
+            {
+              "position": {
+                "fraction": [
+                  1,
+                  2
+                ]
+              },
+              "text": "bold",
+              "orient": "below"
+            },
+            {
+              "position": {
+                "fraction": [
+                  1,
+                  2
+                ]
+              },
+              "text": "italic",
+              "orient": "below"
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "half"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "segno",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 4
+                      },
+                      "id": "n-1-6-v1-0-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "half"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "coda",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "×2",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 4
+                      },
+                      "id": "n-1-6-v1-1-0"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "_x": {
+    "mnxLab": {
+      "encoding": {
+        "software": "musicxml-mnx",
+        "version": "0.1.0"
+      }
+    }
+  }
+}

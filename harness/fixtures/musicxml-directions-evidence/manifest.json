@@ -1,0 +1,203 @@
+{
+  "kind": "retained original-file desktop browser render evidence",
+  "applicationCommit": "ae12b7a162422fcec663698e4ac7d89b4bd87e73",
+  "corpusRevision": "77c19f7e819154c70ca1a1992e80dcda8ff82fea",
+  "files": [
+    {
+      "path": "studio/31a-Directions/document.mnx.json",
+      "sha256": "cbed471ad15b5971f3f06b633402e538fb9544a621c9c4b75de7bfaf9ebcfe5c"
+    },
+    {
+      "path": "studio/31a-Directions/notation-0-0.png",
+      "sha256": "4ae8716b789fabd3304a3cee15a6ed41f2ba71ecdae421dc5d4a1497ec39308e"
+    },
+    {
+      "path": "studio/31a-Directions/notation-0-80.png",
+      "sha256": "017690d9a6c0cade5805292f87f7c8e2eb2590aab40a371bfabbf26fd719098c"
+    },
+    {
+      "path": "studio/31a-Directions/notation-0.svg",
+      "sha256": "2a59926a517a0767cd4019cc756efec4dc930dbe4ffa4e20f9ec9bc33965e56d"
+    },
+    {
+      "path": "studio/31a-Directions/observation.json",
+      "sha256": "ea724cf36b11e2fb6338e7e90ca03987dc610495ca320c13c8a99e4f19fa89e9"
+    },
+    {
+      "path": "studio/31b-Directions-Order/document.mnx.json",
+      "sha256": "cb0aa54dc903cb88d2251ef33421084c246116445d4d4bfeac2d2648f8ecf869"
+    },
+    {
+      "path": "studio/31b-Directions-Order/notation-0-0.png",
+      "sha256": "0eba284b3dc8aab49124845d85001673901caa76a58a44d4e8b438d0f75ed65f"
+    },
+    {
+      "path": "studio/31b-Directions-Order/notation-0.svg",
+      "sha256": "17a9408cfce44dfe8edebef78c01832bc6799466952d8a907907718d60970788"
+    },
+    {
+      "path": "studio/31b-Directions-Order/observation.json",
+      "sha256": "fc36fb31a1d6355a75825e178981aca74fd6f566b33d8bb33ad74bfb748bf9ff"
+    },
+    {
+      "path": "studio/31c-MetronomeMarks/document.mnx.json",
+      "sha256": "f8e8358e7a808e1724f02cb5e04e221259d84aa7eb71cd357260b960a1b73284"
+    },
+    {
+      "path": "studio/31c-MetronomeMarks/notation-0-0.png",
+      "sha256": "54004c7a2fc06bfdbbde64fe425d8ddbf558d1e84c76f83a4830660c9d150152"
+    },
+    {
+      "path": "studio/31c-MetronomeMarks/notation-0.svg",
+      "sha256": "9e4be01abec07f150cdd2645329831044945185a9ed3185b3fb280c0e81d4405"
+    },
+    {
+      "path": "studio/31c-MetronomeMarks/observation.json",
+      "sha256": "2b363066557acb2874e58691f9834bb348093ab169675990695ae0e78d4e9be6"
+    },
+    {
+      "path": "studio/31d-Directions-Compounds/document.mnx.json",
+      "sha256": "786e44e959255a2dd908fecf28142a0b9746708a452be51f41893d187438a46e"
+    },
+    {
+      "path": "studio/31d-Directions-Compounds/notation-0-0.png",
+      "sha256": "43e713920b256cecc5009676236f2682cee75461969d8362b1037aa2649f64a7"
+    },
+    {
+      "path": "studio/31d-Directions-Compounds/notation-0.svg",
+      "sha256": "d5cf1ce40e49d9b9b4e1077b44326a6b68a3b31b052973f3c239fe0bb3ca5a6e"
+    },
+    {
+      "path": "studio/31d-Directions-Compounds/observation.json",
+      "sha256": "5eb7c3cd08cc8976e803c31afc4fadcd4d3cbfbb40c21738f196655cd7fafd6e"
+    },
+    {
+      "path": "studio/31f-Direction-Multiline-Compounds/document.mnx.json",
+      "sha256": "7fbc4394829c1275208b73bed08e61d4edbd0b1d25da8af5d5d37b22620de16d"
+    },
+    {
+      "path": "studio/31f-Direction-Multiline-Compounds/notation-0-0.png",
+      "sha256": "617379b59a3851cf384f84a91b86331490ca8b0f5fc23fce894d18e80c81175e"
+    },
+    {
+      "path": "studio/31f-Direction-Multiline-Compounds/notation-0.svg",
+      "sha256": "44e971808c2d10cd712289a92a384b3b37fd3d7288b1316a9b6e2885d0273f31"
+    },
+    {
+      "path": "studio/31f-Direction-Multiline-Compounds/observation.json",
+      "sha256": "536d2150cdb432b2fd8dc0d26023ee1766c6a975dbac86fb8e31b83e68c0dd0f"
+    },
+    {
+      "path": "studio/capture-index-31a-d.json",
+      "sha256": "7577d57b2ec9dcfd423fe3e107c6b9c1fc6834ab8575f3809d4c4ab8df9a8366"
+    },
+    {
+      "path": "studio/capture-index-31f.json",
+      "sha256": "5d944e68f2ce8d61cbded8745b13b0c82cf0521349cb372b71e877c8f51b285d"
+    },
+    {
+      "path": "studio/index.json",
+      "sha256": "91f918e8a1fb7c3255592626bb7cc70ad0d19ee5ef1ba3f25c94fb6eebe22903"
+    },
+    {
+      "path": "workbench/31a-Directions/document.mnx.json",
+      "sha256": "cbed471ad15b5971f3f06b633402e538fb9544a621c9c4b75de7bfaf9ebcfe5c"
+    },
+    {
+      "path": "workbench/31a-Directions/notation-0-0.png",
+      "sha256": "9ff48f08ea4c28aa70cf360776fe3f3a246277b699f4514c1b067ab50b633e2d"
+    },
+    {
+      "path": "workbench/31a-Directions/notation-0-653.png",
+      "sha256": "7f2ef24dd885dd7c52ce46cc361f740a6652355a155b20718d77c74db74f5f7e"
+    },
+    {
+      "path": "workbench/31a-Directions/notation-0-693.png",
+      "sha256": "1b45637f9b7374bcdc4063896593b1d217b84186110c7b3d571417358e78ec64"
+    },
+    {
+      "path": "workbench/31a-Directions/notation-0.svg",
+      "sha256": "1b67226d8ed6bd018309032d0897b10616a80069754c5f07021a7b6a14246ea8"
+    },
+    {
+      "path": "workbench/31a-Directions/observation.json",
+      "sha256": "19f12ac016b343bfe866d3273b3f0a7f9f17d04c47a7ed5e3ae24dd2c069466b"
+    },
+    {
+      "path": "workbench/31b-Directions-Order/document.mnx.json",
+      "sha256": "cb0aa54dc903cb88d2251ef33421084c246116445d4d4bfeac2d2648f8ecf869"
+    },
+    {
+      "path": "workbench/31b-Directions-Order/notation-0-0.png",
+      "sha256": "894285ec1543afa272c1021b20519bcdbf5569e1aa2fe2e2a5850b1d87b96650"
+    },
+    {
+      "path": "workbench/31b-Directions-Order/notation-0.svg",
+      "sha256": "7d48a21f6ae6c4e88ffde3812c9ddb8bcd34efa0e79af9bd1dd84909a52c8f73"
+    },
+    {
+      "path": "workbench/31b-Directions-Order/observation.json",
+      "sha256": "62c80f6743bf690823d69e5a8d4ea5db3115ef5bf259f5ea390fc629c412020f"
+    },
+    {
+      "path": "workbench/31c-MetronomeMarks/document.mnx.json",
+      "sha256": "f8e8358e7a808e1724f02cb5e04e221259d84aa7eb71cd357260b960a1b73284"
+    },
+    {
+      "path": "workbench/31c-MetronomeMarks/notation-0-0.png",
+      "sha256": "31ab18d5ad7dbdb49eb19afaf9ec63a04c19181e130a0607b8023d2e08c69065"
+    },
+    {
+      "path": "workbench/31c-MetronomeMarks/notation-0.svg",
+      "sha256": "d9820722ed6c34a8029e211fdc6a31301f20db33a06a4ac04d83835e535b2ea4"
+    },
+    {
+      "path": "workbench/31c-MetronomeMarks/observation.json",
+      "sha256": "25f2a2837d89424b408feccd3fd2ee78704641c8a2710a27363387c59ffe1da7"
+    },
+    {
+      "path": "workbench/31d-Directions-Compounds/document.mnx.json",
+      "sha256": "786e44e959255a2dd908fecf28142a0b9746708a452be51f41893d187438a46e"
+    },
+    {
+      "path": "workbench/31d-Directions-Compounds/notation-0-0.png",
+      "sha256": "11799061c87a9c446451b72551e450ae954a14c251f61b4e5ec4ee4ef52ad817"
+    },
+    {
+      "path": "workbench/31d-Directions-Compounds/notation-0.svg",
+      "sha256": "420c5b874168bd1d5b25f0964888bc9e20492355915035b871e05c4ef44758ff"
+    },
+    {
+      "path": "workbench/31d-Directions-Compounds/observation.json",
+      "sha256": "eb7bd82a7f4b7f4b6f77b1a9c0adffb6cd0bcd72b6689fd6367f96286f8cb76a"
+    },
+    {
+      "path": "workbench/31f-Direction-Multiline-Compounds/document.mnx.json",
+      "sha256": "7fbc4394829c1275208b73bed08e61d4edbd0b1d25da8af5d5d37b22620de16d"
+    },
+    {
+      "path": "workbench/31f-Direction-Multiline-Compounds/notation-0-0.png",
+      "sha256": "9cfc56a281a056cd7a36fa00d0b9e9baf7c25f7781460efbefdb5cf85bd7a119"
+    },
+    {
+      "path": "workbench/31f-Direction-Multiline-Compounds/notation-0.svg",
+      "sha256": "44e971808c2d10cd712289a92a384b3b37fd3d7288b1316a9b6e2885d0273f31"
+    },
+    {
+      "path": "workbench/31f-Direction-Multiline-Compounds/observation.json",
+      "sha256": "3ad250a7f376d7711b60339b741d885cc8011ded765fa0e596660f3e7a88ce35"
+    },
+    {
+      "path": "workbench/capture-index-31a-d.json",
+      "sha256": "e23fb9019481c81970d00e2b808cec6d78552d8d9735535b2d4561ee04bbf8c0"
+    },
+    {
+      "path": "workbench/capture-index-31f.json",
+      "sha256": "e0a83ac6e59c8994153bfdd79464502109e7345d89db9493586615e0bea20532"
+    },
+    {
+      "path": "workbench/index.json",
+      "sha256": "4e4a61cc6fd53a2f141b0af85c4db251864dbc15e0ac3a94d0a2053a01e687ef"
+    }
+  ]
+}

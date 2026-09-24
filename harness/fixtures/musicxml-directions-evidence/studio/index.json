@@ -1,0 +1,329 @@
+{
+  "kind": "browser observations; not feature correctness or human verification",
+  "captureScriptSha256": "3de2f09e6d288ee54757a40cbeed8eafcf70dff5c03b0c0fac2eaf481ac0e951",
+  "shell": "studio",
+  "applicationCommit": "ae12b7a162422fcec663698e4ac7d89b4bd87e73",
+  "corpusRevision": "77c19f7e819154c70ca1a1992e80dcda8ff82fea",
+  "viewport": {
+    "width": 1440,
+    "height": 1000,
+    "deviceScaleFactor": 1
+  },
+  "fixtures": [
+    {
+      "id": "31a-Directions",
+      "sourceSha256": "830db690e37a793b091f4361ea0467129abda4205e34ce9512900bd800574818",
+      "testClass": "feature",
+      "description": "All <direction> elements defined in MusicXML. The lyrics for each note describes the direction element assigned to that note. Not marked with lyrics is a <scordatura> element at the very beginning. A trailing up-arrow indicates a \u2018placement=\"above\"\u2019 attribute, a down-arrow means \u2018placement=\"below\"\u2019.",
+      "views": [
+        {
+          "scrollTarget": "viewer",
+          "visibleWidth": 1060,
+          "visibleHeight": 870,
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0,
+              1
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              4,
+              5,
+              6
+            ],
+            [
+              7,
+              8,
+              9
+            ],
+            [
+              10,
+              11,
+              12
+            ],
+            [
+              13,
+              14
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [],
+          "scrollWidth": 1045,
+          "scrollHeight": 950,
+          "clientWidth": 1045,
+          "clientHeight": 870,
+          "screenshots": [
+            "notation-0-0.png",
+            "notation-0-80.png"
+          ]
+        }
+      ],
+      "suppliedLibraryTitle": "31a-Directions",
+      "makeCurrentError": null,
+      "entryPath": "Local operator ingest: GP seed + unmodified XML original; Save \u2192 Versions \u2192 View XML \u2192 Make current",
+      "importError": null,
+      "viewingOriginal": false,
+      "editingSuspended": false,
+      "warnings": [
+        "measure 8: dynamic \"ffz\" has no MNX equivalent and was not imported."
+      ],
+      "importedDocumentSha256": "7501426f3292b2507d69ecf23f62a76c42edf6b987ca70d64e02b3ef855bd5d1",
+      "displayOptions": {
+        "lyrics": "all",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide",
+        "selectedVerse": "1"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "31b-Directions-Order",
+      "sourceSha256": "4330dc0ef3a0b2b9e9b89a02d05f6dee07bce5bcea629cba02e408bd91990e89",
+      "testClass": "feature",
+      "description": "Using <offset> it is possible to make successive <direction> elements look like being concatenated. However, it is a bad idea in general to do that because it makes the rendering dependent on a program's score formatting. In the first bar, the first <direction> element contains a tempo mark and is directly followed by another <direction> element containing a metronome mark that is moved to the right by a positive <offset> element. In the second bar, the first <direction> element holds the start of a diminuendo wedge; it is directly followed by another <direction> element containing a dynamics mark. Since the wedge has an <offset> element with a positive value while the dynamics has no such element at all, the dynamics precedes the wedge. The wedge ends at or right before the final bar line (i.e., the <direction> element ending the wedge comes after the last <note> element).",
+      "views": [
+        {
+          "scrollTarget": "frame",
+          "visibleWidth": 1060,
+          "visibleHeight": 870,
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0,
+              1
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [],
+          "scrollWidth": 1060,
+          "scrollHeight": 870,
+          "clientWidth": 1060,
+          "clientHeight": 870,
+          "screenshots": [
+            "notation-0-0.png"
+          ]
+        }
+      ],
+      "suppliedLibraryTitle": "31b-Directions-Order",
+      "makeCurrentError": null,
+      "entryPath": "Local operator ingest: GP seed + unmodified XML original; Save \u2192 Versions \u2192 View XML \u2192 Make current",
+      "importError": null,
+      "viewingOriginal": false,
+      "editingSuspended": false,
+      "warnings": [],
+      "importedDocumentSha256": "7708cb8d07371e1501e64e363231d07dae7bb94d02b07d8401536e00b32cf6a5",
+      "displayOptions": {
+        "lyrics": "all",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "31c-MetronomeMarks",
+      "sourceSha256": "e58b8b4b4dc80fd032b5f84aab36671a45948ab5f8993d6892f90825974f5cba",
+      "testClass": "feature",
+      "description": "Tempo markings (every third quarter): \u2018quarter.=100\u2019, \u2018quarter..=half.\u2019, \u2018(quarter.=half..)\u2019, \u2018(quarter.=77)\u2019.",
+      "views": [
+        {
+          "scrollTarget": "frame",
+          "visibleWidth": 1060,
+          "visibleHeight": 870,
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0,
+              1,
+              2
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [],
+          "scrollWidth": 1060,
+          "scrollHeight": 870,
+          "clientWidth": 1060,
+          "clientHeight": 870,
+          "screenshots": [
+            "notation-0-0.png"
+          ]
+        }
+      ],
+      "suppliedLibraryTitle": "31c-MetronomeMarks",
+      "makeCurrentError": null,
+      "entryPath": "Local operator ingest: GP seed + unmodified XML original; Save \u2192 Versions \u2192 View XML \u2192 Make current",
+      "importError": null,
+      "viewingOriginal": false,
+      "editingSuspended": false,
+      "warnings": [],
+      "importedDocumentSha256": "82bc19845272145162c53ff3d8a543c0eb05212fdfb1bc886b29f94d9dd41513",
+      "displayOptions": {
+        "lyrics": "all",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "31d-Directions-Compounds",
+      "sourceSha256": "7b9a6952ed0fb4ed64f28eac334256686a341089228ab1124251235f68011504",
+      "testClass": "feature",
+      "description": "This tests various combinations of <direction> children. The lyrics for each note describe the compound elements assigned to that note. The first \u2018molto f\u2019 uses <words>molto <words>, i.e., it omits the \u2018xml:space\u2019 attribute. This makes the rendering of the space between \u2018molto\u2019 and \u2018f\u2019 implementation-dependent (and might be thus not rendered). The second \u2018molto f\u2019, together with \u2018meno f\u2019, uses \u2018xml:space=\"preserve\"\u2019. For demonstration purposes, there is no space between the words \u2018bold\u2019 and \u2018italic\u2019. A trailing up-arrow indicates a \u2018placement=\"above\"\u2019 attribute, a down-arrow means \u2018placement=\"below\"\u2019.",
+      "views": [
+        {
+          "scrollTarget": "frame",
+          "visibleWidth": 1060,
+          "visibleHeight": 870,
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0,
+              1,
+              2,
+              3
+            ],
+            [
+              4,
+              5
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [],
+          "scrollWidth": 1060,
+          "scrollHeight": 870,
+          "clientWidth": 1060,
+          "clientHeight": 870,
+          "screenshots": [
+            "notation-0-0.png"
+          ]
+        }
+      ],
+      "suppliedLibraryTitle": "31d-Directions-Compounds",
+      "makeCurrentError": null,
+      "entryPath": "Local operator ingest: GP seed + unmodified XML original; Save \u2192 Versions \u2192 View XML \u2192 Make current",
+      "importError": null,
+      "viewingOriginal": false,
+      "editingSuspended": false,
+      "warnings": [],
+      "importedDocumentSha256": "df6c993567696d0e62cc5d6da594ffc99a4811dee7a9a5b7f90e40bf065c0d5d",
+      "displayOptions": {
+        "lyrics": "all",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide",
+        "selectedVerse": "1"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "31f-Direction-Multiline-Compounds",
+      "sourceSha256": "5dce5e6ef91a4c8466b9f74a0def68f293ef70b7bb8a39efc20aad308b5e7210",
+      "testClass": "feature",
+      "description": "A test that checks how newlines in <words> elements are supported. Within a single <direction> element to be placed above the staff, the \u2018p\u2019 dynamic symbol gets followed by a single space, which in turn is followed by some boxed text that spreads over three lines and has the attribute \u2018valign=\"center\"\u2019. The latter two also set the attribute \u2018xml:space=\"preserve\"\u2019.",
+      "views": [
+        {
+          "scrollTarget": "frame",
+          "visibleWidth": 1060,
+          "visibleHeight": 870,
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [],
+          "scrollWidth": 1060,
+          "scrollHeight": 870,
+          "clientWidth": 1060,
+          "clientHeight": 870,
+          "screenshots": [
+            "notation-0-0.png"
+          ]
+        }
+      ],
+      "suppliedLibraryTitle": "31f-Direction-Multiline-Compounds",
+      "makeCurrentError": null,
+      "entryPath": "Local operator ingest: GP seed + unmodified XML original; Save \u2192 Versions \u2192 View XML \u2192 Make current",
+      "importError": null,
+      "viewingOriginal": false,
+      "editingSuspended": false,
+      "warnings": [],
+      "importedDocumentSha256": "3699829fb9ac50bf4101ffc2a4a4050b690325588399531e77d85b71718f8a78",
+      "displayOptions": {
+        "lyrics": "all",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    }
+  ],
+  "browser": {
+    "protocolVersion": "1.3",
+    "product": "Chrome/153.0.8010.36",
+    "revision": "@507c6ee3e2f3b2ca0e660547e5b9ea4820c67f4c",
+    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+    "jsVersion": "15.3.76.10"
+  },
+  "captureRuns": [
+    "capture-index-31a-d.json",
+    "capture-index-31f.json"
+  ]
+}
