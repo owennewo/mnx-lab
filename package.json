@@ -25,6 +25,7 @@
     "dev:login": "node tools/library-local-auth.mjs --seed",
     "dev:port": "node tools/dev-port.mjs",
     "worktree:retire": "node tools/worktree-retire.mjs",
+    "gate": "node tools/gate.mjs",
     "build": "npm run compile-validator && npm run check:boundaries && tsc && tsc -p worker && vite build",
     "build:site": "vite build",
     "build:lib": "vite build -c vite.lib.config.ts",

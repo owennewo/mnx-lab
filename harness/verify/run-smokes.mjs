@@ -12,34 +12,46 @@ const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 // smoke by up to 2× under contention, which is where timing flakes live.
 const DEFAULT_JOBS = 4;
 const verify = name => `harness/verify/${name}`;
-/** A job is a chain run in order; a smoke's jobs are independent of each other. */
-const one = (file, extra = {}) => ({ build: 'build:site', jobs: [[{ file: verify(file) }]], ...extra });
+/** A job is a chain run in order; a smoke's jobs are independent of each other.
+ *  `covers` names the areas a change must touch for the smoke to be worth
+ *  running (tools/gate.mjs): the shell it drives, `library` when it runs the
+ *  Worker, or the build face it loads. */
+const one = (file, covers, extra = {}) => ({ build: 'build:site', covers, jobs: [[{ file: verify(file) }]], ...extra });
+const WORKBENCH = ['workbench'];
+const STUDIO = ['studio'];
+const STUDIO_LIBRARY = ['studio', 'library'];
 const SMOKES = {
-  'lib': one('lib-smoke.mjs', { build: 'build:lib' }),
-  'embed': { build: 'build:embed', jobs: [[{ file: verify('embed-smoke.mjs') }], [{ file: verify('embed-smoke.mjs'), env: { MNX_EMBED_FORMAT: 'iife' } }]] },
-  'csp': one('csp-smoke.mjs'),
-  'selection': one('selection-smoke.mjs'),
-  'inspector': one('inspector-smoke.mjs'),
-  'focus': one('focus-mode-smoke.mjs'),
-  'sync-bar': one('sync-bar-smoke.mjs'),
-  'sync-rederive': one('sync-rederive-smoke.mjs'),
-  'piece-create': one('piece-create-smoke.mjs'),
-  'save-pipeline': one('save-pipeline-smoke.mjs'),
-  'piece-lifecycle': one('piece-lifecycle-smoke.mjs'),
-  'studio-editor': one('studio-editor-smoke.mjs'),
-  'play-only': one('studio-play-only-smoke.mjs'),
-  'workbench-editor': one('workbench-editor-smoke.mjs'),
-  'audio': one('audio-smoke.mjs', { build: null }),
+  'lib': one('lib-smoke.mjs', ['lib'], { build: 'build:lib' }),
+  'embed': { build: 'build:embed', covers: ['embed'], jobs: [[{ file: verify('embed-smoke.mjs') }], [{ file: verify('embed-smoke.mjs'), env: { MNX_EMBED_FORMAT: 'iife' } }]] },
+  'csp': one('csp-smoke.mjs', WORKBENCH),
+  'selection': one('selection-smoke.mjs', WORKBENCH),
+  'inspector': one('inspector-smoke.mjs', WORKBENCH),
+  'focus': one('focus-mode-smoke.mjs', WORKBENCH),
+  'sync-bar': one('sync-bar-smoke.mjs', STUDIO),
+  'sync-rederive': one('sync-rederive-smoke.mjs', STUDIO),
+  'piece-create': one('piece-create-smoke.mjs', STUDIO_LIBRARY),
+  'save-pipeline': one('save-pipeline-smoke.mjs', STUDIO_LIBRARY),
+  'piece-lifecycle': one('piece-lifecycle-smoke.mjs', STUDIO_LIBRARY),
+  'studio-editor': one('studio-editor-smoke.mjs', STUDIO_LIBRARY),
+  'play-only': one('studio-play-only-smoke.mjs', STUDIO_LIBRARY),
+  'workbench-editor': one('workbench-editor-smoke.mjs', WORKBENCH),
+  'audio': one('audio-smoke.mjs', ['audio'], { build: null }),
   // The review page is the smoke's input, so it is built first in the same job.
-  'player': { build: 'build:site', jobs: [[{ file: verify('performance-review.mjs') }, { file: verify('player-workbench-smoke.mjs') }]] },
-  'unrolled': { build: 'build:site', jobs: [[{ file: verify('unrolled-review.mjs') }, { file: verify('unrolled-smoke.mjs') }]] },
-  'studio': one('studio-smoke.mjs'),
-  'studio-export': one('studio-export-smoke.mjs'),
-  'recording-studio': one('recording-studio-smoke.mjs'),
-  'single-cursor': one('single-cursor-smoke.mjs'),
-  'recording-management': one('recording-management-smoke.mjs'),
-  'youtube': one('youtube-smoke.mjs', { build: 'build:embed' }),
+  'player': { build: 'build:site', covers: WORKBENCH, jobs: [[{ file: verify('performance-review.mjs') }, { file: verify('player-workbench-smoke.mjs') }]] },
+  'unrolled': { build: 'build:site', covers: WORKBENCH, jobs: [[{ file: verify('unrolled-review.mjs') }, { file: verify('unrolled-smoke.mjs') }]] },
+  'studio': one('studio-smoke.mjs', STUDIO_LIBRARY),
+  'studio-export': one('studio-export-smoke.mjs', STUDIO),
+  'recording-studio': one('recording-studio-smoke.mjs', STUDIO),
+  'single-cursor': one('single-cursor-smoke.mjs', STUDIO),
+  'recording-management': one('recording-management-smoke.mjs', STUDIO_LIBRARY),
+  'youtube': one('youtube-smoke.mjs', ['embed'], { build: 'build:embed' }),
 };
+
+/** Every smoke with the areas it covers and the files that are its own. */
+export const smokeCoverage = () => Object.entries(SMOKES).map(([name, smoke]) => ({
+  name, build: smoke.build, covers: smoke.covers,
+  files: [...new Set(smoke.jobs.flat().map(run => run.file))],
+}));
 // What a smoke needs built is the bundle alone: the gate build's validators,
 // boundaries and type checks add ~20 s and nothing a browser can see.
 const ARTIFACTS = {

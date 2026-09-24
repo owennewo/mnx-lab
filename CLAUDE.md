@@ -27,6 +27,8 @@ git submodule update --init vendor/mnx   # the MNX spec sources (dev-time only)
 npm run dev                # Vite dev server + Worker API (via @cloudflare/vite-plugin); no setup —
                            # prepares the local library, signs studio in, on this checkout's port
 npm run -s dev:port        # that port: 5173 in the primary checkout, a fixed one per worktree
+npm run gate               # the landing gate: tests, build, smokes this branch's diff reaches
+npm run gate -- --plan     # what it would run and why, without running it
 npm run smoke -- <names>   # browser smokes (--help lists them); each brings its own library
 npm test                   # harness suites over the corpus (root vitest)
 npm run check:scenarios    # corpus police
@@ -91,11 +93,16 @@ when concurrent work collides, so it runs to a fixed order:
 4. **Never hand-edit a `verification:` block or a `status:` field to resolve a conflict.**
    Keep `main`'s record; if your change really moved the output, `update:primitives`
    demotes it and the queue asks a human — the correct outcome.
-5. Gates, once on the final rebased tree in the worktree: `npm test` and
-   `npm run build`. Root tests include the complete scenario checks;
-   `npm run check:scenarios` is the standalone diagnostic, not an additional gate.
-   Also run affected converter-package suites and relevant browser smokes. Reuse the
-   gate build for site smokes (`npm run smoke -- --built <names>`).
+5. Gates, once on the final rebased tree in the worktree: **`npm run gate`**. It reads
+   what the branch changed against `origin/main` and runs what that reaches — the whole
+   suite when data read from disk changed (scenarios, goldens, `public/`, migrations,
+   fixtures, configs), the tests that import changed code otherwise, the converter
+   suites the model or a converter reaches, `npm run build` for anything compiled, and
+   the smokes whose shell, Worker or face the diff touches; prose alone runs the link
+   check and nothing else. A path it does not recognise runs everything. Root tests
+   include the complete scenario checks; `npm run check:scenarios` is the standalone
+   diagnostic, not an additional gate. The rule, its evidence and how to extend it:
+   [docs/gates.md](docs/gates.md).
 6. `git -C ~/dev/mnx-lab merge --ff-only <task>`. **Fast-forward only** — a refusal means
    `main` moved while you were testing, so return to step 2 and run the whole sequence
    again. Never `--no-ff`, never force-push `main`, never rewrite a commit already on `main`.
@@ -201,9 +208,10 @@ consumer needing independent versioning — a check, not a debate.
   `npm test -- harness/conformance/edit-ops.test.ts` or add `-t "case name"`.
   Broaden checks when shared behavior changes, failures reveal wider impact, or
   coverage is uncertain. Do not routinely run full gates before and after each edit.
-- Run the full gates once on the final rebased tree, immediately before landing.
-  Repeat successful checks only when their inputs change or a failure needs diagnosis;
-  a moved `main` still requires the landing sequence again.
+- Run `npm run gate` once on the final rebased tree, immediately before landing
+  (`--full` when you have reason to distrust the targeting). Repeat successful checks
+  only when their inputs change or a failure needs diagnosis; a moved `main` still
+  requires the landing sequence again.
 - Build once for the selected browser smokes: `npm run smoke -- selection inspector`.
   After the gate build, use `npm run smoke -- --built selection inspector` instead.
   `--built` requires current artifacts for every selected face; rebuild after changes.
@@ -214,7 +222,7 @@ consumer needing independent versioning — a check, not a debate.
 - Install dependencies once per worktree. Repeat `npm ci` only when dependency inputs
   change or the installation is broken. Never share a mutable `node_modules` tree.
 - Root tests exclude converter-package suites: run `npm -w @mnx-editor/<name> test`
-  when that converter or its shared model contracts change. Preserve the golden
+  when that converter or its shared model contracts change (the gate does). Preserve the golden
   regeneration and human-verification rules below.
 - Prefer assertions about behavior and invariants. Avoid source-text checks that only
   pin imports or spellings, and do not add tests solely to mirror implementation.
@@ -399,8 +407,9 @@ output names refuse to overwrite).
   `harness/conformance/` over Miniflare's local D1/R2 with signed identities
   (`library*.test.ts`, `piece-*.test.ts`, `recording-management.test.ts`); the assist demo
   and the UI have no unit tests. The UI's proof is the real-browser smokes in
-  `harness/verify/*-smoke.mjs` (`npm run smoke -- <names>` or `npm run smoke:<name>`) — **not part of the gates**, so run the relevant ones by
-  hand after touching a shell or an element. Their traps are all harness facts rather
+  `harness/verify/*-smoke.mjs` (`npm run smoke -- <names>` or `npm run smoke:<name>`);
+  `npm run gate` picks the ones a diff reaches by the areas each declares in
+  `run-smokes.mjs`, so a new smoke declares its `covers`. Their traps are all harness facts rather
   than facts about the code, and every one has cost a debugging session: a glyph's box is
   its whole em square, navigating to the same `#fragment` does not reload, scrolling
   detaches a held node, and a throw from `finally` replaces the failure being reported —
