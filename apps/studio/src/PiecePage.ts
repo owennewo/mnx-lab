@@ -697,7 +697,10 @@ export class PiecePage extends LitElement {
     this.scoreShape = performance && writtenBarDurations ? performedShape(performance, writtenBarDurations) : '';
     // A bar added or removed, a repeat, a meter: the edits a sync and a reader feel most. Save them at once
     // rather than after the pause (studio authoring campaign, clause 6 — owed since the save pipeline).
-    if (shapeBefore && this.scoreShape !== shapeBefore && this.touched && !this.viewing && this.session?.dirty) void this.session.checkpoint();
+    // Not guarded on `dirty`: an undo back to the saved document while a save is in flight
+    // reads clean NOW and dirty once that save lands. checkpoint() is a no-op when clean
+    // and idle, and while a save is in flight it queues one that runs only if still dirty.
+    if (shapeBefore && this.scoreShape !== shapeBefore && this.touched && !this.viewing) void this.session?.checkpoint();
     void this.stampImportedSyncs();
     this.requestUpdate();
   }

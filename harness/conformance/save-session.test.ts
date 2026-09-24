@@ -112,6 +112,23 @@ describe('recovery: the record is the live document', () => {
     expect(session.snapshot).toMatchObject({ status: 'clean', edits: 0 });
   });
 
+  it('asked to save at once mid-save, it saves when that save lands — even an undo that read clean when asked', async () => {
+    // Studio saves a change of score shape at once (PiecePage.present). An undo back
+    // to the saved document while a save is in flight reads clean at that moment and
+    // dirty once the save lands; asking anyway must not leave it to the idle pause.
+    const w = world(); const history = new EditHistory(blank()); const session = w.session(history.current);
+    session.documentChanged(retitle(history, 'Angie'));
+    w.hold();
+    const saving = session.checkpoint();
+    await settle();
+    session.documentChanged(history.undo());
+    expect(session.dirty).toBe(false);
+    void session.checkpoint();
+    await w.release(); await saving; await settle();
+    expect(w.saves.map(s => s.title)).toEqual(['Angie', 'Anji']);
+    expect(session.snapshot).toMatchObject({ status: 'clean', edits: 0 });
+  });
+
   it('undo back to the checkpointed state reads clean, and nothing is kept', async () => {
     const w = world(); const history = new EditHistory(blank()); const session = w.session(history.current);
     session.documentChanged(retitle(history, 'Angie'));
