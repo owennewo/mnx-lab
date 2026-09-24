@@ -1,0 +1,63 @@
+{
+  "id": "23b-Tuplets-Styles",
+  "sourceSha256": "5633f6f032a05fb83797722043fb5f420bde8016fdc91c547b46729debc7cdeb",
+  "testClass": "feature",
+  "description": "Different tuplet styles: default, none, x:y, x:y-note, and x-note:y-note; each with bracket, slur, and without bracket. Finally, non-standard 4:3 and 17:2 tuplets are given in the last measure.",
+  "views": [
+    {
+      "scrollTarget": "frame",
+      "visibleWidth": 1060,
+      "visibleHeight": 870,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0,
+          1
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [
+        "validation — underfills the 5/4 bar: notes sum to 4 of 5 beats",
+        "validation — underfills the 5/4 bar: notes sum to 4 of 5 beats"
+      ],
+      "scrollWidth": 1060,
+      "scrollHeight": 870,
+      "clientWidth": 1060,
+      "clientHeight": 870,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "suppliedLibraryTitle": "23b-Tuplets-Styles",
+  "makeCurrentError": null,
+  "entryPath": "Local operator ingest: GP seed + unmodified XML original; Save → Versions → View XML → Make current",
+  "importError": null,
+  "viewingOriginal": false,
+  "editingSuspended": false,
+  "warnings": [
+    "part P1, measure 1: incompatible time symbol common for 5/4; retaining numeric meter."
+  ],
+  "importedDocumentSha256": "3de99a262bec4b9e74a4bbec47fa16a5f98a3d2f8d3eb1cc24901bd947b6ded3",
+  "displayOptions": {
+    "lyrics": "current",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

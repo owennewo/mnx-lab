@@ -1,0 +1,66 @@
+{
+  "id": "23c-Tuplet-Display-NonStandard",
+  "sourceSha256": "1ba540d975814fd19624482ea599a3eccf9ffd17b2fd5a939ad93a1f5d701ebd",
+  "testClass": "feature",
+  "description": "Displaying tuplet note types that might not coincide with the displayed note. The tuplets in measure 1 derive the type from the note, the tuplets in measure 2 use the <normal-type> and <normal-dot> children of the <time-modification> element, and the remaining tuplets use the <tuplet-type> and <tuplet-dot> children of the <tuplet> element. The tuplets in measure 3 specify both a number of notes and a type inside the <tuplet-actual> and <tuplet-normal> elements, the ones in measure 4 specify only a note type (but no number), and the ones in measure 5 specify only a number of tuplet notes (but no type, which is deduced from the note's type). The first tuplets of measures 3 to 5 use the attribute ‘display-type=\"actual\"’, the second ones ‘display-type=\"both\"’. FIXME: The tuplet-normal should coincide with the real notes!",
+  "views": [
+    {
+      "scrollTarget": "frame",
+      "visibleWidth": 1060,
+      "visibleHeight": 870,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0,
+          1,
+          2,
+          3
+        ],
+        [
+          4
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [
+        "validation — overfills the 4/4 bar: notes sum to 18 of 4 beats",
+        "validation — overfills the 4/4 bar: notes sum to 18 of 4 beats",
+        "validation — overfills the 4/4 bar: notes sum to 18 of 4 beats",
+        "validation — overfills the 4/4 bar: notes sum to 18 of 4 beats",
+        "validation — overfills the 4/4 bar: notes sum to 18 of 4 beats",
+        "validation — overfills the 4/4 bar: notes sum to 18 of 4 beats"
+      ],
+      "scrollWidth": 1060,
+      "scrollHeight": 870,
+      "clientWidth": 1060,
+      "clientHeight": 870,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "suppliedLibraryTitle": "23c-Tuplet-Display-NonStandard",
+  "makeCurrentError": null,
+  "entryPath": "Local operator ingest: GP seed + unmodified XML original; Save → Versions → View XML → Make current",
+  "importError": null,
+  "viewingOriginal": false,
+  "editingSuspended": false,
+  "warnings": [],
+  "importedDocumentSha256": "12b24429ca7e31b4290f2c1cc1e2fa5868ad10abcc9be921474f19dc844139c2",
+  "displayOptions": {
+    "lyrics": "current",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

@@ -52,6 +52,7 @@ proposals that name their campaign.
 - **[core-musicxml-key-fidelity.md](proposed/core-musicxml-key-fidelity.md)** — MusicXML campaign item 28: complete ±8…±11 traditional signatures and diagnose rich key, cancellation, timing and hidden-key losses pending a carrier decision.
 - **[core-musicxml-chord-fidelity.md](proposed/core-musicxml-chord-fidelity.md)** — MusicXML campaign item 29: retain forced tie placement and ornaments, diagnose chord-member tremolo/pickup losses, and prevent silent cross-voice onset shifts.
 - **[core-musicxml-notehead-fidelity.md](proposed/core-musicxml-notehead-fidelity.md)** — MusicXML campaign item 30: diagnose and eventually preserve per-note head shapes/fill/parentheses, slash-style spans, hidden note ink and numbered chord-member labels.
+- **[core-musicxml-tuplet-fidelity.md](proposed/core-musicxml-tuplet-fidelity.md)** — MusicXML campaign item 31: preserve nested tuplet timing and explicit display choices, and import positive single-note tremolo and staccato marks from the six 23-series originals.
 
 
 

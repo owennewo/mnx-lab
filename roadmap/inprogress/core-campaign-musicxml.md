@@ -218,6 +218,7 @@ deliberately **not** enumerated in advance: item 8 decides them from evidence.
 | 28 | [Key fidelity](../proposed/core-musicxml-key-fidelity.md) | Draw full traditional ±8…±11 fifths and diagnose nontraditional, cancellation, midmeasure and hidden-key losses pending a carrier decision. Deduplicates item 22 note-pitch work and item 23 title work. | accuracy | 13a–13f source/import/current both-shell notation evidence | **proposed 2026-09-24** |
 | 29 | [Chord fidelity](../proposed/core-musicxml-chord-fidelity.md) | Keep forced tie sides and first-bar ornaments, diagnose member-specific tremolo and implicit pickup losses pending carriers, and prevent silent cross-voice onset shifts. Deduplicates item 24's accidental-policy work. | accuracy | 21a–21i source/import/current both-shell notation evidence | **proposed 2026-09-24** |
 | 30 | [Notehead fidelity](../proposed/core-musicxml-notehead-fidelity.md) | Diagnose and preserve per-note head shape/fill/enclosure, slash spans, hidden note ink and chord-member labels. Deduplicates item 22's zero-line warning and item 25's rest-height work. | accuracy | 22a–22d source/import/current both-shell notation evidence | **proposed 2026-09-24** |
+| 31 | [Tuplet fidelity](../proposed/core-musicxml-tuplet-fidelity.md) | Restore performed duration and nested groups, carry explicit tuplet display, and import simple staccato/single-note tremolo marks. Keep 23b's manifest/XML conflict and 23f's marker-free grouping qualified. | accuracy | 23a–23f source/import/current both-shell notation evidence | **proposed 2026-09-24** |
 | — | Feature parity | Dynamics, wedges, spanners, ottavas, articulations, SMuFL glyph names, percussion, layout breaks. **Deliberately unenumerated**: item 8 turns these into a ranked queue with evidence, and each becomes its own row when picked up. Note the schema already has `dynamic-*`, `ottava`, `slur` and `wedge-type` as standard objects — but **no pedal def**, so pedal is contract clause 2's first real test. | accuracy | 1 + 2 + 3 | not yet rows |
 
 ### Item 8's derivation rule
@@ -251,6 +252,24 @@ exactly as `verified` already works here. No backend: a generated JSON artifact
 committed to the repo, like `worker/models.json`.
 
 ## Progress + learnings
+
+### 2026-09-24 — item 18: 23-series tuplet rendering slice
+
+[The six-source original-file review](../../docs/musicxml-tuplet-assessment.md)
+adds 65 stable features, 268 source variants and 130 current Notation
+feature × shell × view rows. All six originals opened in both desktop
+shells with Show display settings and complete captures. `23a`'s seven
+ratios survive. `23c`'s normal-type/boundary handling turns four-quarter
+bars into 18-quarter imports, and `23d` loses seven nested groups despite
+eight warnings, leaving all three 2/4 bars overfull. `23b`/`23c` lose
+declared tuplet display, while `23e` retains tuplet timing but drops nine
+staccato and eight positive single-note tremolo controls. `23f` acquires
+an unwanted bracket and splits its manifest-described sextuplet. [Proposed
+item 31](../proposed/core-musicxml-tuplet-fidelity.md) owns the new gaps,
+deduplicated from items 7, 22, 23 and proposed item 29. The `23b`
+17:2/17:3 manifest/XML mismatch and `23f` marker-free grouping remain
+explicitly qualified. Detailed current render coverage is 62/183
+originals; item 18 and item 19 remain open.
 
 ### 2026-09-24 — item 18: 22-series notehead rendering slice
 

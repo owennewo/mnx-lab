@@ -1,0 +1,71 @@
+{
+  "id": "23d-Tuplets-Nested",
+  "sourceSha256": "fdf7a2bebd1808090b4ace160e8349f424a1a0a0ad06d36939be80f0bf4e64fd",
+  "testClass": "feature",
+  "description": "Tuplets can be nested. The first bar contains a 5:2 tuplet (with 16th notes) in the middle of a 3:2 tuple (with eighth notes). The second bar has a 5:2 tuplet at the beginning and at the end (with the tuplet number forced below) of a 3:2 tuple (with the bracket forced above). The third bar changes the <divisions> value and contains a triplet with eighths on the last beat of another triplet with quarter notes.",
+  "views": [
+    {
+      "scrollTarget": "frame",
+      "visibleWidth": 1060,
+      "visibleHeight": 870,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0,
+          1,
+          2
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [
+        "validation — overfills the 2/4 bar: notes sum to 3.25 of 2 beats",
+        "validation — overfills the 2/4 bar: notes sum to 3.25 of 2 beats",
+        "validation — overfills the 2/4 bar: notes sum to 3.5 of 2 beats",
+        "validation — overfills the 2/4 bar: notes sum to 3.5 of 2 beats",
+        "validation — overfills the 2/4 bar: notes sum to 3.5 of 2 beats",
+        "validation — overfills the 2/4 bar: notes sum to 3.5 of 2 beats"
+      ],
+      "scrollWidth": 1060,
+      "scrollHeight": 870,
+      "clientWidth": 1060,
+      "clientHeight": 870,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "suppliedLibraryTitle": "23d-Tuplets-Nested",
+  "makeCurrentError": null,
+  "entryPath": "Local operator ingest: GP seed + unmodified XML original; Save → Versions → View XML → Make current",
+  "importError": null,
+  "viewingOriginal": false,
+  "editingSuspended": false,
+  "warnings": [
+    "measure 1: a 3:2 tuplet could not be stated as a whole number of note values; its notes were written without it.",
+    "measure 1: a 15:4 tuplet could not be stated as a whole number of note values; its notes were written without it.",
+    "measure 1: a 3:2 tuplet could not be stated as a whole number of note values; its notes were written without it.",
+    "measure 2: a 15:4 tuplet could not be stated as a whole number of note values; its notes were written without it.",
+    "measure 2: a 3:2 tuplet could not be stated as a whole number of note values; its notes were written without it.",
+    "measure 2: a 15:4 tuplet could not be stated as a whole number of note values; its notes were written without it.",
+    "measure 3: a 3:2 tuplet could not be stated as a whole number of note values; its notes were written without it.",
+    "measure 3: a 9:4 tuplet could not be stated as a whole number of note values; its notes were written without it."
+  ],
+  "importedDocumentSha256": "62ef23e0c1e4c0792a39b4a12e67b26b5611dadf01a1b40bc083d95e2880dced",
+  "displayOptions": {
+    "lyrics": "current",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

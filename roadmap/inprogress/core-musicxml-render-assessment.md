@@ -263,3 +263,21 @@ chord-member labels even when all verses are shown. [Proposed item
 Item 22 already owns the `22b` zero-line warning and full-geometry
 deferral; item 25 already owns the `22d` positioned rest. Item 18
 remains open, and no item 19 authoring or persistence pass follows.
+
+## Tuplet rendering batch, 2026-09-24
+
+[The six 23a–23f originals](../../docs/musicxml-tuplet-assessment.md)
+now have 65 source-derived feature IDs, 268 note/group/control variants and 130
+current Notation feature × shell × view rows. Original-file Workbench and
+editable Studio imports, identical imported MNX, complete SVG/PNG captures,
+Show settings and no-score-scroll observations are retained. No strings
+permit Tab/Both. `23a` keeps all seven ratios; `23b`/`23c` lose explicit
+display requests; `23c` turns three four-quarter bars into 18-quarter
+imports; `23d` drops all seven nested groups and overfills all three
+bars with source-located warnings. `23e` retains tuplet timing while losing
+staccato and single-note tremolo ink. `23f` adds a bracket to an unmarked
+group and splits the manifest's sextuplet into two triplets. [Proposed
+item 31](../proposed/core-musicxml-tuplet-fidelity.md) owns the new gaps.
+The `23b` 17:2/17:3 source-description conflict and `23f` grouping
+ambiguity remain explicit. This raises detailed current render coverage to
+62/183 originals; item 18 and item 19 remain open.

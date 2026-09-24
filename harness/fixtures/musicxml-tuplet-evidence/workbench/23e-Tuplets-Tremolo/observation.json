@@ -1,0 +1,52 @@
+{
+  "id": "23e-Tuplets-Tremolo",
+  "sourceSha256": "93b448376a600c5ef1e9457e85a2c9f91cc98ef272639014792fdcf56fae5e02",
+  "testClass": "feature",
+  "description": "Tremolo tuplets. The first bar contains normal eighth triplets with staccato points, the second bar holds three tremolo tuplets, the third bar holds a sextuple followed by a triplet, the fourth bar contains a sextuple (starting on the second beat) with a ‘fp’ sign, and the fifth bar is identical to the third bar.",
+  "views": [
+    {
+      "scrollTarget": "viewer",
+      "visibleWidth": 750,
+      "visibleHeight": 753.125,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0,
+          1,
+          2,
+          3,
+          4
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [],
+      "scrollWidth": 750,
+      "scrollHeight": 753,
+      "clientWidth": 750,
+      "clientHeight": 753,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "importError": null,
+  "warnings": [],
+  "importedDocumentSha256": "c05d68538062c36ca1c5185db58a2d43c8763fe763907bfd5b3059b188d7af23",
+  "displayOptions": {
+    "lyrics": "current",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}
