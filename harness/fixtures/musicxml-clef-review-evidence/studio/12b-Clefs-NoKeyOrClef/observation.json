@@ -1,0 +1,54 @@
+{
+  "id": "12b-Clefs-NoKeyOrClef",
+  "sourceSha256": "f1bf7e18f9207472686d57bc0dca79968f803c635c1551f5c1da110d1200cd17",
+  "testClass": "feature",
+  "description": "A score without a <key> or <clef> element (but with <time>). The default (4/4 in treble clef) should be used.",
+  "views": [
+    {
+      "scrollTarget": "frame",
+      "visibleWidth": 1060,
+      "visibleHeight": 870,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0,
+          1
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [],
+      "scrollWidth": 1060,
+      "scrollHeight": 870,
+      "clientWidth": 1060,
+      "clientHeight": 870,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "suppliedLibraryTitle": "12b-Clefs-NoKeyOrClef",
+  "makeCurrentError": null,
+  "entryPath": "Local operator ingest: GP seed + unmodified XML original; Save → Versions → View XML → Make current",
+  "importError": null,
+  "viewingOriginal": false,
+  "editingSuspended": false,
+  "warnings": [],
+  "importedDocumentSha256": "175b2ba43eb79343c630cc3ec91091664b0551ec74b3910fb2815babbaf77a8d",
+  "displayOptions": {
+    "lyrics": "current",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

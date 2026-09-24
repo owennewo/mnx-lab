@@ -179,3 +179,14 @@ The `03e` no-divisions music21 metric disagreement stays explicitly
 unresolved despite the correct visible whole note. No authoring or
 persistence result is inferred; item 18 remains open for the rest of the
 suite.
+
+## Clef rendering batch, 2026-09-24
+
+[The 12a–12b report](../../docs/musicxml-clef-assessment.md) adds two
+originals, 7 stable feature IDs, 19 source contexts and 14 current Notation
+feature × shell × view verdicts. Source/import comparisons and both-shell
+complete captures are retained. Four octave changes vanish on import, and
+the `12a` TAB sign is silently dropped; [proposed item 27](../proposed/core-musicxml-clef-fidelity.md)
+owns those bounded follow-ups. Item 22's ordinary clef coordinates and
+unsupported-sign containment hold. No strings are declared, so Tab/Both
+are inapplicable. Item 18 remains open for the rest of the suite.

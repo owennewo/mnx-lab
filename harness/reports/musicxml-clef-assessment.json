@@ -1,0 +1,1074 @@
+{
+  "kind": "implementation-loop agent render assessment; not human verification",
+  "applicationCommit": "090c441ec2466cb552849665e849403e8fad6b55",
+  "corpusRevision": "77c19f7e819154c70ca1a1992e80dcda8ff82fea",
+  "scope": "Two 12-series clef originals, source to browser-imported MNX to complete Notation in both shells",
+  "fixtureCount": 2,
+  "featureCount": 7,
+  "sourceVariantCount": 19,
+  "browser": "Chrome/153.0.8010.36",
+  "viewport": {
+    "width": 1440,
+    "height": 1000,
+    "deviceScaleFactor": 1
+  },
+  "viewPolicy": "No source strings; Notation only. Clefs and time signatures explicitly Show. Complete score tiles reviewed.",
+  "fixtures": [
+    {
+      "id": "12a-Clefs",
+      "sourcePath": "xmlFiles/12a-Clefs.musicxml",
+      "sourceSha256": "ef439e5debbf5f9abeb5aaf03c53426dd61f94a98698d89872dc32af366b65e3",
+      "description": "Various clefs: G, C, F, percussion, TAB, and ‘none’ (in measure 16). Some clefs are also shown with transposition and on other staff lines than their default; the displayed note is always C4. Each measure shows a different clef; only measure 17 has the same treble clef as the first measure.",
+      "testClass": "feature",
+      "sourceMeasures": 17,
+      "sourceDeclaresStrings": false,
+      "variants": [
+        {
+          "id": "12a-Clefs/m01/clef-context",
+          "featureIds": [
+            "12a.ordinary-clef-lines"
+          ],
+          "source": {
+            "measureNumber": "1",
+            "clef": {
+              "sign": "G",
+              "line": 2,
+              "octaveChange": null
+            },
+            "note": "C4 whole",
+            "keyPresent": true,
+            "time": [
+              "4",
+              "4"
+            ]
+          },
+          "imported": {
+            "clef": {
+              "sign": "G",
+              "staffPosition": -2
+            },
+            "note": {
+              "step": "C",
+              "octave": 4
+            },
+            "global": {
+              "key": {
+                "fifths": 0
+              },
+              "time": {
+                "count": 4,
+                "unit": 4,
+                "display": "common"
+              }
+            }
+          }
+        },
+        {
+          "id": "12a-Clefs/m02/clef-context",
+          "featureIds": [
+            "12a.ordinary-clef-lines"
+          ],
+          "source": {
+            "measureNumber": "2",
+            "clef": {
+              "sign": "C",
+              "line": 3,
+              "octaveChange": null
+            },
+            "note": "C4 whole",
+            "keyPresent": false,
+            "time": null
+          },
+          "imported": {
+            "clef": {
+              "sign": "C",
+              "staffPosition": 0
+            },
+            "note": {
+              "step": "C",
+              "octave": 4
+            },
+            "global": {}
+          }
+        },
+        {
+          "id": "12a-Clefs/m03/clef-context",
+          "featureIds": [
+            "12a.ordinary-clef-lines"
+          ],
+          "source": {
+            "measureNumber": "3",
+            "clef": {
+              "sign": "C",
+              "line": 4,
+              "octaveChange": null
+            },
+            "note": "C4 whole",
+            "keyPresent": false,
+            "time": null
+          },
+          "imported": {
+            "clef": {
+              "sign": "C",
+              "staffPosition": 2
+            },
+            "note": {
+              "step": "C",
+              "octave": 4
+            },
+            "global": {}
+          }
+        },
+        {
+          "id": "12a-Clefs/m04/clef-context",
+          "featureIds": [
+            "12a.ordinary-clef-lines"
+          ],
+          "source": {
+            "measureNumber": "4",
+            "clef": {
+              "sign": "F",
+              "line": 4,
+              "octaveChange": null
+            },
+            "note": "C4 whole",
+            "keyPresent": false,
+            "time": null
+          },
+          "imported": {
+            "clef": {
+              "sign": "F",
+              "staffPosition": 2
+            },
+            "note": {
+              "step": "C",
+              "octave": 4
+            },
+            "global": {}
+          }
+        },
+        {
+          "id": "12a-Clefs/m05/clef-context",
+          "featureIds": [
+            "12a.percussion-clef"
+          ],
+          "source": {
+            "measureNumber": "5",
+            "clef": {
+              "sign": "percussion",
+              "line": null,
+              "octaveChange": null
+            },
+            "note": "C4 whole",
+            "keyPresent": false,
+            "time": null
+          },
+          "imported": {
+            "clef": {
+              "sign": "percussion"
+            },
+            "note": {
+              "step": "C",
+              "octave": 4
+            },
+            "global": {}
+          }
+        },
+        {
+          "id": "12a-Clefs/m06/clef-context",
+          "featureIds": [
+            "12a.octave-clefs"
+          ],
+          "source": {
+            "measureNumber": "6",
+            "clef": {
+              "sign": "G",
+              "line": 2,
+              "octaveChange": -1
+            },
+            "note": "C4 whole",
+            "keyPresent": false,
+            "time": null
+          },
+          "imported": {
+            "clef": {
+              "sign": "G",
+              "staffPosition": -2
+            },
+            "note": {
+              "step": "C",
+              "octave": 4
+            },
+            "global": {}
+          }
+        },
+        {
+          "id": "12a-Clefs/m07/clef-context",
+          "featureIds": [
+            "12a.octave-clefs"
+          ],
+          "source": {
+            "measureNumber": "7",
+            "clef": {
+              "sign": "F",
+              "line": 4,
+              "octaveChange": -1
+            },
+            "note": "C4 whole",
+            "keyPresent": false,
+            "time": null
+          },
+          "imported": {
+            "clef": {
+              "sign": "F",
+              "staffPosition": 2
+            },
+            "note": {
+              "step": "C",
+              "octave": 4
+            },
+            "global": {}
+          }
+        },
+        {
+          "id": "12a-Clefs/m08/clef-context",
+          "featureIds": [
+            "12a.ordinary-clef-lines"
+          ],
+          "source": {
+            "measureNumber": "8",
+            "clef": {
+              "sign": "F",
+              "line": 3,
+              "octaveChange": null
+            },
+            "note": "C4 whole",
+            "keyPresent": false,
+            "time": null
+          },
+          "imported": {
+            "clef": {
+              "sign": "F",
+              "staffPosition": 0
+            },
+            "note": {
+              "step": "C",
+              "octave": 4
+            },
+            "global": {}
+          }
+        },
+        {
+          "id": "12a-Clefs/m09/clef-context",
+          "featureIds": [
+            "12a.ordinary-clef-lines"
+          ],
+          "source": {
+            "measureNumber": "9",
+            "clef": {
+              "sign": "G",
+              "line": 1,
+              "octaveChange": null
+            },
+            "note": "C4 whole",
+            "keyPresent": false,
+            "time": null
+          },
+          "imported": {
+            "clef": {
+              "sign": "G",
+              "staffPosition": -4
+            },
+            "note": {
+              "step": "C",
+              "octave": 4
+            },
+            "global": {}
+          }
+        },
+        {
+          "id": "12a-Clefs/m10/clef-context",
+          "featureIds": [
+            "12a.ordinary-clef-lines"
+          ],
+          "source": {
+            "measureNumber": "10",
+            "clef": {
+              "sign": "C",
+              "line": 5,
+              "octaveChange": null
+            },
+            "note": "C4 whole",
+            "keyPresent": false,
+            "time": null
+          },
+          "imported": {
+            "clef": {
+              "sign": "C",
+              "staffPosition": 4
+            },
+            "note": {
+              "step": "C",
+              "octave": 4
+            },
+            "global": {}
+          }
+        },
+        {
+          "id": "12a-Clefs/m11/clef-context",
+          "featureIds": [
+            "12a.ordinary-clef-lines"
+          ],
+          "source": {
+            "measureNumber": "11",
+            "clef": {
+              "sign": "C",
+              "line": 2,
+              "octaveChange": null
+            },
+            "note": "C4 whole",
+            "keyPresent": false,
+            "time": null
+          },
+          "imported": {
+            "clef": {
+              "sign": "C",
+              "staffPosition": -2
+            },
+            "note": {
+              "step": "C",
+              "octave": 4
+            },
+            "global": {}
+          }
+        },
+        {
+          "id": "12a-Clefs/m12/clef-context",
+          "featureIds": [
+            "12a.ordinary-clef-lines"
+          ],
+          "source": {
+            "measureNumber": "12",
+            "clef": {
+              "sign": "C",
+              "line": 1,
+              "octaveChange": null
+            },
+            "note": "C4 whole",
+            "keyPresent": false,
+            "time": null
+          },
+          "imported": {
+            "clef": {
+              "sign": "C",
+              "staffPosition": -4
+            },
+            "note": {
+              "step": "C",
+              "octave": 4
+            },
+            "global": {}
+          }
+        },
+        {
+          "id": "12a-Clefs/m13/clef-context",
+          "featureIds": [
+            "12a.octave-clefs"
+          ],
+          "source": {
+            "measureNumber": "13",
+            "clef": {
+              "sign": "G",
+              "line": 2,
+              "octaveChange": 1
+            },
+            "note": "C4 whole",
+            "keyPresent": false,
+            "time": null
+          },
+          "imported": {
+            "clef": {
+              "sign": "G",
+              "staffPosition": -2
+            },
+            "note": {
+              "step": "C",
+              "octave": 4
+            },
+            "global": {}
+          }
+        },
+        {
+          "id": "12a-Clefs/m14/clef-context",
+          "featureIds": [
+            "12a.octave-clefs"
+          ],
+          "source": {
+            "measureNumber": "14",
+            "clef": {
+              "sign": "F",
+              "line": 4,
+              "octaveChange": 1
+            },
+            "note": "C4 whole",
+            "keyPresent": false,
+            "time": null
+          },
+          "imported": {
+            "clef": {
+              "sign": "F",
+              "staffPosition": 2
+            },
+            "note": {
+              "step": "C",
+              "octave": 4
+            },
+            "global": {}
+          }
+        },
+        {
+          "id": "12a-Clefs/m15/clef-context",
+          "featureIds": [
+            "12a.tab-clef-without-strings"
+          ],
+          "source": {
+            "measureNumber": "15",
+            "clef": {
+              "sign": "TAB",
+              "line": 5,
+              "octaveChange": null
+            },
+            "note": "C4 whole",
+            "keyPresent": false,
+            "time": null
+          },
+          "imported": {
+            "clef": null,
+            "note": {
+              "step": "C",
+              "octave": 4
+            },
+            "global": {}
+          }
+        },
+        {
+          "id": "12a-Clefs/m16/clef-context",
+          "featureIds": [
+            "12a.none-clef"
+          ],
+          "source": {
+            "measureNumber": "16",
+            "clef": {
+              "sign": "none",
+              "line": null,
+              "octaveChange": null
+            },
+            "note": "C4 whole",
+            "keyPresent": false,
+            "time": null
+          },
+          "imported": {
+            "clef": {
+              "sign": "none"
+            },
+            "note": {
+              "step": "C",
+              "octave": 4
+            },
+            "global": {}
+          }
+        },
+        {
+          "id": "12a-Clefs/m17/clef-context",
+          "featureIds": [
+            "12a.ordinary-clef-lines"
+          ],
+          "source": {
+            "measureNumber": "17",
+            "clef": {
+              "sign": "G",
+              "line": 2,
+              "octaveChange": null
+            },
+            "note": "C4 whole",
+            "keyPresent": false,
+            "time": null
+          },
+          "imported": {
+            "clef": {
+              "sign": "G",
+              "staffPosition": -2
+            },
+            "note": {
+              "step": "C",
+              "octave": 4
+            },
+            "global": {
+              "barline": {
+                "type": "final"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "12b-Clefs-NoKeyOrClef",
+      "sourcePath": "xmlFiles/12b-Clefs-NoKeyOrClef.musicxml",
+      "sourceSha256": "f1bf7e18f9207472686d57bc0dca79968f803c635c1551f5c1da110d1200cd17",
+      "description": "A score without a <key> or <clef> element (but with <time>). The default (4/4 in treble clef) should be used.",
+      "testClass": "feature",
+      "sourceMeasures": 2,
+      "sourceDeclaresStrings": false,
+      "variants": [
+        {
+          "id": "12b-Clefs-NoKeyOrClef/m01/clef-context",
+          "featureIds": [
+            "12b.implicit-treble-and-key",
+            "12b.explicit-four-four"
+          ],
+          "source": {
+            "measureNumber": "1",
+            "clef": null,
+            "note": "C4 whole",
+            "keyPresent": false,
+            "time": [
+              "4",
+              "4"
+            ]
+          },
+          "imported": {
+            "clef": null,
+            "note": {
+              "step": "C",
+              "octave": 4
+            },
+            "global": {
+              "time": {
+                "count": 4,
+                "unit": 4
+              }
+            }
+          }
+        },
+        {
+          "id": "12b-Clefs-NoKeyOrClef/m02/clef-context",
+          "featureIds": [
+            "12b.implicit-treble-and-key"
+          ],
+          "source": {
+            "measureNumber": "2",
+            "clef": null,
+            "note": "C4 whole",
+            "keyPresent": false,
+            "time": null
+          },
+          "imported": {
+            "clef": null,
+            "note": {
+              "step": "C",
+              "octave": 4
+            },
+            "global": {}
+          }
+        }
+      ]
+    }
+  ],
+  "features": [
+    {
+      "id": "12a.ordinary-clef-lines",
+      "fixture": "12a-Clefs",
+      "sourceDescription": "Various clefs: G, C, F, percussion, TAB, and ‘none’ (in measure 16). Some clefs are also shown with transposition and on other staff lines than their default; the displayed note is always C4. Each measure shows a different clef; only measure 17 has the same treble clef as the first measure.",
+      "expected": "G, C and F clefs use the stated staff line; C4 appears at the corresponding height.",
+      "variantIds": [
+        "12a-Clefs/m01/clef-context",
+        "12a-Clefs/m02/clef-context",
+        "12a-Clefs/m03/clef-context",
+        "12a-Clefs/m04/clef-context",
+        "12a-Clefs/m08/clef-context",
+        "12a-Clefs/m09/clef-context",
+        "12a-Clefs/m10/clef-context",
+        "12a-Clefs/m11/clef-context",
+        "12a-Clefs/m12/clef-context",
+        "12a-Clefs/m17/clef-context"
+      ],
+      "variantCount": 10
+    },
+    {
+      "id": "12a.octave-clefs",
+      "fixture": "12a-Clefs",
+      "sourceDescription": "Various clefs: G, C, F, percussion, TAB, and ‘none’ (in measure 16). Some clefs are also shown with transposition and on other staff lines than their default; the displayed note is always C4. Each measure shows a different clef; only measure 17 has the same treble clef as the first measure.",
+      "expected": "G2/F4 clefs carry -1 or +1 octave figures and place sounding C4 at the shifted written height.",
+      "variantIds": [
+        "12a-Clefs/m06/clef-context",
+        "12a-Clefs/m07/clef-context",
+        "12a-Clefs/m13/clef-context",
+        "12a-Clefs/m14/clef-context"
+      ],
+      "variantCount": 4
+    },
+    {
+      "id": "12a.percussion-clef",
+      "fixture": "12a-Clefs",
+      "sourceDescription": "Various clefs: G, C, F, percussion, TAB, and ‘none’ (in measure 16). Some clefs are also shown with transposition and on other staff lines than their default; the displayed note is always C4. Each measure shows a different clef; only measure 17 has the same treble clef as the first measure.",
+      "expected": "Show the percussion sign while keeping its pitched C4 event local and diagnosing any unsupported placement.",
+      "variantIds": [
+        "12a-Clefs/m05/clef-context"
+      ],
+      "variantCount": 1
+    },
+    {
+      "id": "12a.tab-clef-without-strings",
+      "fixture": "12a-Clefs",
+      "sourceDescription": "Various clefs: G, C, F, percussion, TAB, and ‘none’ (in measure 16). Some clefs are also shown with transposition and on other staff lines than their default; the displayed note is always C4. Each measure shows a different clef; only measure 17 has the same treble clef as the first measure.",
+      "expected": "Represent or explicitly diagnose the source TAB sign. No strings are declared, so a tablature note position is not inferred.",
+      "variantIds": [
+        "12a-Clefs/m15/clef-context"
+      ],
+      "variantCount": 1
+    },
+    {
+      "id": "12a.none-clef",
+      "fixture": "12a-Clefs",
+      "sourceDescription": "Various clefs: G, C, F, percussion, TAB, and ‘none’ (in measure 16). Some clefs are also shown with transposition and on other staff lines than their default; the displayed note is always C4. Each measure shows a different clef; only measure 17 has the same treble clef as the first measure.",
+      "expected": "The deprecated none sign draws no clef; MusicXML specifies treble placement for its notes.",
+      "variantIds": [
+        "12a-Clefs/m16/clef-context"
+      ],
+      "variantCount": 1
+    },
+    {
+      "id": "12b.implicit-treble-and-key",
+      "fixture": "12b-Clefs-NoKeyOrClef",
+      "sourceDescription": "A score without a <key> or <clef> element (but with <time>). The default (4/4 in treble clef) should be used.",
+      "expected": "With no key or clef element, display the two C4 whole notes using the default treble clef and no key signature.",
+      "variantIds": [
+        "12b-Clefs-NoKeyOrClef/m01/clef-context",
+        "12b-Clefs-NoKeyOrClef/m02/clef-context"
+      ],
+      "variantCount": 2
+    },
+    {
+      "id": "12b.explicit-four-four",
+      "fixture": "12b-Clefs-NoKeyOrClef",
+      "sourceDescription": "A score without a <key> or <clef> element (but with <time>). The default (4/4 in treble clef) should be used.",
+      "expected": "The stated 4/4 meter appears at the first bar when Time signatures is Show.",
+      "variantIds": [
+        "12b-Clefs-NoKeyOrClef/m01/clef-context"
+      ],
+      "variantCount": 1
+    }
+  ],
+  "render": [
+    {
+      "featureId": "12a.ordinary-clef-lines",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "All ten ordinary line variants retain their sign and exact MNX staffPosition, and the complete captured scores show the corresponding clefs and C4 noteheads.",
+      "captureEvidence": "harness/fixtures/musicxml-clef-review-evidence/workbench/12a-Clefs/observation.json",
+      "sourceImportEvidence": "harness/reports/musicxml-clef-assessment.json"
+    },
+    {
+      "featureId": "12a.ordinary-clef-lines",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "All ten ordinary line variants retain their sign and exact MNX staffPosition, and the complete captured scores show the corresponding clefs and C4 noteheads.",
+      "captureEvidence": "harness/fixtures/musicxml-clef-review-evidence/studio/12a-Clefs/observation.json",
+      "sourceImportEvidence": "harness/reports/musicxml-clef-assessment.json"
+    },
+    {
+      "featureId": "12a.octave-clefs",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "incorrect",
+      "cause": [
+        "importer"
+      ],
+      "reason": "All four octave changes vanish before MNX; ordinary clef glyphs and unshifted C4 heights are visible. Published MNX clef.octave and the existing renderer support octave clefs.",
+      "captureEvidence": "harness/fixtures/musicxml-clef-review-evidence/workbench/12a-Clefs/observation.json",
+      "sourceImportEvidence": "harness/reports/musicxml-clef-assessment.json"
+    },
+    {
+      "featureId": "12a.octave-clefs",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "incorrect",
+      "cause": [
+        "importer"
+      ],
+      "reason": "All four octave changes vanish before MNX; ordinary clef glyphs and unshifted C4 heights are visible. Published MNX clef.octave and the existing renderer support octave clefs.",
+      "captureEvidence": "harness/fixtures/musicxml-clef-review-evidence/studio/12a-Clefs/observation.json",
+      "sourceImportEvidence": "harness/reports/musicxml-clef-assessment.json"
+    },
+    {
+      "featureId": "12a.percussion-clef",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "partial",
+      "cause": [
+        "MNX representation",
+        "layout/SVG engine"
+      ],
+      "reason": "The unsupported sign is retained with a source-located warning. A question-mark clef and note placeholder replace the percussion glyph and pitched placement; the rest of the score remains visible.",
+      "captureEvidence": "harness/fixtures/musicxml-clef-review-evidence/workbench/12a-Clefs/observation.json",
+      "sourceImportEvidence": "harness/reports/musicxml-clef-assessment.json"
+    },
+    {
+      "featureId": "12a.percussion-clef",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "partial",
+      "cause": [
+        "MNX representation",
+        "layout/SVG engine"
+      ],
+      "reason": "The unsupported sign is retained with a source-located warning. A question-mark clef and note placeholder replace the percussion glyph and pitched placement; the rest of the score remains visible.",
+      "captureEvidence": "harness/fixtures/musicxml-clef-review-evidence/studio/12a-Clefs/observation.json",
+      "sourceImportEvidence": "harness/reports/musicxml-clef-assessment.json"
+    },
+    {
+      "featureId": "12a.tab-clef-without-strings",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "incorrect",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "The importer silently omits TAB, the prior F clef persists visually and C4 is seated under it. Neither shell offers Tab/Both because source strings are unknown.",
+      "captureEvidence": "harness/fixtures/musicxml-clef-review-evidence/workbench/12a-Clefs/observation.json",
+      "sourceImportEvidence": "harness/reports/musicxml-clef-assessment.json"
+    },
+    {
+      "featureId": "12a.tab-clef-without-strings",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "incorrect",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "The importer silently omits TAB, the prior F clef persists visually and C4 is seated under it. Neither shell offers Tab/Both because source strings are unknown.",
+      "captureEvidence": "harness/fixtures/musicxml-clef-review-evidence/studio/12a-Clefs/observation.json",
+      "sourceImportEvidence": "harness/reports/musicxml-clef-assessment.json"
+    },
+    {
+      "featureId": "12a.none-clef",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "incorrect",
+      "cause": [
+        "MNX representation",
+        "layout/SVG engine"
+      ],
+      "reason": "The importer warns and retains none, but both shells show question marks for clef and C4 instead of a blank clef position and treble-height C4.",
+      "captureEvidence": "harness/fixtures/musicxml-clef-review-evidence/workbench/12a-Clefs/observation.json",
+      "sourceImportEvidence": "harness/reports/musicxml-clef-assessment.json"
+    },
+    {
+      "featureId": "12a.none-clef",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "incorrect",
+      "cause": [
+        "MNX representation",
+        "layout/SVG engine"
+      ],
+      "reason": "The importer warns and retains none, but both shells show question marks for clef and C4 instead of a blank clef position and treble-height C4.",
+      "captureEvidence": "harness/fixtures/musicxml-clef-review-evidence/studio/12a-Clefs/observation.json",
+      "sourceImportEvidence": "harness/reports/musicxml-clef-assessment.json"
+    },
+    {
+      "featureId": "12b.implicit-treble-and-key",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Source and MNX both omit key and clef declarations. Both shells show a first-system treble clef, two C4 whole notes and no key-signature accidentals.",
+      "captureEvidence": "harness/fixtures/musicxml-clef-review-evidence/workbench/12b-Clefs-NoKeyOrClef/observation.json",
+      "sourceImportEvidence": "harness/reports/musicxml-clef-assessment.json"
+    },
+    {
+      "featureId": "12b.implicit-treble-and-key",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Source and MNX both omit key and clef declarations. Both shells show a first-system treble clef, two C4 whole notes and no key-signature accidentals.",
+      "captureEvidence": "harness/fixtures/musicxml-clef-review-evidence/studio/12b-Clefs-NoKeyOrClef/observation.json",
+      "sourceImportEvidence": "harness/reports/musicxml-clef-assessment.json"
+    },
+    {
+      "featureId": "12b.explicit-four-four",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "The imported global meter is 4/4 and the first-system 4/4 mark is visible in both shells.",
+      "captureEvidence": "harness/fixtures/musicxml-clef-review-evidence/workbench/12b-Clefs-NoKeyOrClef/observation.json",
+      "sourceImportEvidence": "harness/reports/musicxml-clef-assessment.json"
+    },
+    {
+      "featureId": "12b.explicit-four-four",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "The imported global meter is 4/4 and the first-system 4/4 mark is visible in both shells.",
+      "captureEvidence": "harness/fixtures/musicxml-clef-review-evidence/studio/12b-Clefs-NoKeyOrClef/observation.json",
+      "sourceImportEvidence": "harness/reports/musicxml-clef-assessment.json"
+    }
+  ],
+  "renderVariantDispositions": [
+    {
+      "featureId": "12a.ordinary-clef-lines",
+      "variantId": "12a-Clefs/m01/clef-context",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All ten ordinary line variants retain their sign and exact MNX staffPosition, and the complete captured scores show the corresponding clefs and C4 noteheads."
+    },
+    {
+      "featureId": "12a.ordinary-clef-lines",
+      "variantId": "12a-Clefs/m02/clef-context",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All ten ordinary line variants retain their sign and exact MNX staffPosition, and the complete captured scores show the corresponding clefs and C4 noteheads."
+    },
+    {
+      "featureId": "12a.ordinary-clef-lines",
+      "variantId": "12a-Clefs/m03/clef-context",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All ten ordinary line variants retain their sign and exact MNX staffPosition, and the complete captured scores show the corresponding clefs and C4 noteheads."
+    },
+    {
+      "featureId": "12a.ordinary-clef-lines",
+      "variantId": "12a-Clefs/m04/clef-context",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All ten ordinary line variants retain their sign and exact MNX staffPosition, and the complete captured scores show the corresponding clefs and C4 noteheads."
+    },
+    {
+      "featureId": "12a.ordinary-clef-lines",
+      "variantId": "12a-Clefs/m08/clef-context",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All ten ordinary line variants retain their sign and exact MNX staffPosition, and the complete captured scores show the corresponding clefs and C4 noteheads."
+    },
+    {
+      "featureId": "12a.ordinary-clef-lines",
+      "variantId": "12a-Clefs/m09/clef-context",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All ten ordinary line variants retain their sign and exact MNX staffPosition, and the complete captured scores show the corresponding clefs and C4 noteheads."
+    },
+    {
+      "featureId": "12a.ordinary-clef-lines",
+      "variantId": "12a-Clefs/m10/clef-context",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All ten ordinary line variants retain their sign and exact MNX staffPosition, and the complete captured scores show the corresponding clefs and C4 noteheads."
+    },
+    {
+      "featureId": "12a.ordinary-clef-lines",
+      "variantId": "12a-Clefs/m11/clef-context",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All ten ordinary line variants retain their sign and exact MNX staffPosition, and the complete captured scores show the corresponding clefs and C4 noteheads."
+    },
+    {
+      "featureId": "12a.ordinary-clef-lines",
+      "variantId": "12a-Clefs/m12/clef-context",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All ten ordinary line variants retain their sign and exact MNX staffPosition, and the complete captured scores show the corresponding clefs and C4 noteheads."
+    },
+    {
+      "featureId": "12a.ordinary-clef-lines",
+      "variantId": "12a-Clefs/m17/clef-context",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All ten ordinary line variants retain their sign and exact MNX staffPosition, and the complete captured scores show the corresponding clefs and C4 noteheads."
+    },
+    {
+      "featureId": "12a.octave-clefs",
+      "variantId": "12a-Clefs/m06/clef-context",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "All four octave changes vanish before MNX; ordinary clef glyphs and unshifted C4 heights are visible. Published MNX clef.octave and the existing renderer support octave clefs."
+    },
+    {
+      "featureId": "12a.octave-clefs",
+      "variantId": "12a-Clefs/m07/clef-context",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "All four octave changes vanish before MNX; ordinary clef glyphs and unshifted C4 heights are visible. Published MNX clef.octave and the existing renderer support octave clefs."
+    },
+    {
+      "featureId": "12a.octave-clefs",
+      "variantId": "12a-Clefs/m13/clef-context",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "All four octave changes vanish before MNX; ordinary clef glyphs and unshifted C4 heights are visible. Published MNX clef.octave and the existing renderer support octave clefs."
+    },
+    {
+      "featureId": "12a.octave-clefs",
+      "variantId": "12a-Clefs/m14/clef-context",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "All four octave changes vanish before MNX; ordinary clef glyphs and unshifted C4 heights are visible. Published MNX clef.octave and the existing renderer support octave clefs."
+    },
+    {
+      "featureId": "12a.percussion-clef",
+      "variantId": "12a-Clefs/m05/clef-context",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "partial",
+      "reason": "The unsupported sign is retained with a source-located warning. A question-mark clef and note placeholder replace the percussion glyph and pitched placement; the rest of the score remains visible."
+    },
+    {
+      "featureId": "12a.tab-clef-without-strings",
+      "variantId": "12a-Clefs/m15/clef-context",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "The importer silently omits TAB, the prior F clef persists visually and C4 is seated under it. Neither shell offers Tab/Both because source strings are unknown."
+    },
+    {
+      "featureId": "12a.none-clef",
+      "variantId": "12a-Clefs/m16/clef-context",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "The importer warns and retains none, but both shells show question marks for clef and C4 instead of a blank clef position and treble-height C4."
+    },
+    {
+      "featureId": "12b.implicit-treble-and-key",
+      "variantId": "12b-Clefs-NoKeyOrClef/m01/clef-context",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "Source and MNX both omit key and clef declarations. Both shells show a first-system treble clef, two C4 whole notes and no key-signature accidentals."
+    },
+    {
+      "featureId": "12b.implicit-treble-and-key",
+      "variantId": "12b-Clefs-NoKeyOrClef/m02/clef-context",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "Source and MNX both omit key and clef declarations. Both shells show a first-system treble clef, two C4 whole notes and no key-signature accidentals."
+    },
+    {
+      "featureId": "12b.explicit-four-four",
+      "variantId": "12b-Clefs-NoKeyOrClef/m01/clef-context",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "The imported global meter is 4/4 and the first-system 4/4 mark is visible in both shells."
+    }
+  ],
+  "unresolvedCases": [
+    {
+      "id": "12a-Clefs/m05/percussion-pitch-placement",
+      "featureId": "12a.percussion-clef",
+      "reason": "The source gives pitched C4 under a percussion clef without a kit or display-step. The missing sign is clear; a unique note height is not established."
+    },
+    {
+      "id": "12a-Clefs/m15/tab-pitch-placement",
+      "featureId": "12a.tab-clef-without-strings",
+      "reason": "The source gives a TAB sign and C4 but no string declarations. The silently omitted sign is clear; an intended fret/string position is not."
+    }
+  ],
+  "counts": {
+    "verdicts": {
+      "correct": 6,
+      "partial": 2,
+      "incorrect": 6
+    },
+    "renderRows": 14
+  },
+  "deduplication": {
+    "completed22": "Ordinary clef coordinates and local unsupported-clef containment already landed; the percussion/none placeholders are known containment, not a new claim of complete glyph support.",
+    "completed23": "Untitled Studio XML promotion works; no title or save-route conclusion follows from this render-only review.",
+    "proposed27": "Four lost octave clefs and the silent TAB omission are newly isolated import/representation gaps; retain the none/percussion residuals as known item-22 scope."
+  }
+}

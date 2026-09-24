@@ -70,6 +70,17 @@ invisible-gap failures. The `03e` absent-divisions visual result is correct,
 but its independent music21 metric disagreement remains explicit. Item 18
 remains open for the rest of the suite; no write-path tasks are claimed.
 
+**Clef render slice, 2026-09-24.** The two `12a–12b` originals now have
+[current source/import/both-shell Notation verdicts](../../docs/musicxml-clef-assessment.md):
+7 feature IDs, 19 measure-context variants and 14 feature × shell × view rows.
+Ordinary G/C/F line positions and `12b` default treble work. Four octave
+clefs lose their octave changes and written note heights; the ungrounded TAB
+sign is silently omitted. Percussion/`none` signs remain locally diagnosed
+placeholders under item 22's completed containment. [Proposed item
+27](../proposed/core-musicxml-clef-fidelity.md) owns the new octave and
+TAB-diagnostic gaps. Item 18 remains open for the suite; no authoring task
+is inferred for item 19.
+
 ### The oracle we already own, and the assertion that would waste it
 
 `vendor/mnx/doctools/data.json` holds **27 `spectools.exampledocumentcomparison`
@@ -192,6 +203,7 @@ deliberately **not** enumerated in advance: item 8 decides them from evidence.
 | 24 | [Accidental fidelity](../proposed/core-musicxml-accidental-fidelity.md) | Preserve and draw explicit enclosures; diagnose named accidental glyph loss; expose the missing note-inspector choices and resolve the measured Studio GP persistence loss. Deduplicates item 22's fractional-pitch work and item 23's title workflow. | accuracy + authoring | 01a–01h source/import/browser/editor/save-route evidence | **proposed 2026-09-24** |
 | 25 | [Rest fidelity](../proposed/core-musicxml-rest-fidelity.md) | Import multimeasure rest ranges, explicit rest heights and 256th–1024th written values; preserve noncanonical one-bar full-rest spans and diagnose `use-symbols` until a carrier is agreed. | accuracy | 02a–02f plus 03d source/import/both-shell notation evidence | **proposed 2026-09-24** |
 | 26 | [Rhythm fidelity](../proposed/core-musicxml-rhythm-fidelity.md) | Keep maxima/longa/breve and 256th–1024th note values, draw long-value heads, and retain backup/forward gaps as invisible MNX spaces. Deduplicates item 21's export work and item 25's rest work. | accuracy | 03-series source/import/browser/headless evidence | **proposed 2026-09-24** |
+| 27 | [Clef fidelity](../proposed/core-musicxml-clef-fidelity.md) | Import octave-transposing G/F clefs and diagnose TAB signs without known strings; ordinary clef coordinates and unsupported-sign containment remain completed item 22 work. | accuracy | 12a–12b source/import/current both-shell notation evidence | **proposed 2026-09-24** |
 | — | Feature parity | Dynamics, wedges, spanners, ottavas, articulations, SMuFL glyph names, percussion, layout breaks. **Deliberately unenumerated**: item 8 turns these into a ranked queue with evidence, and each becomes its own row when picked up. Note the schema already has `dynamic-*`, `ottava`, `slur` and `wedge-type` as standard objects — but **no pedal def**, so pedal is contract clause 2's first real test. | accuracy | 1 + 2 + 3 | not yet rows |
 
 ### Item 8's derivation rule
@@ -225,6 +237,29 @@ exactly as `verified` already works here. No backend: a generated JSON artifact
 committed to the repo, like `worker/models.json`.
 
 ## Progress + learnings
+
+### 2026-09-24 — item 18: 12-series clef rendering slice
+
+[The two-source current review](../../docs/musicxml-clef-assessment.md)
+adds 7 shared feature IDs, 19 source measure-context variants and 14
+both-shell Notation verdicts. Original XML, imported MNX, Show clef/meter
+preferences and complete score captures are retained. No source declares
+strings, so Tab/Both are inapplicable.
+
+All ten ordinary G/C/F line variants and `12b`'s implicit treble/key and
+explicit 4/4 render correctly. `12a`'s four octave-clef values disappear
+before MNX, producing ordinary signs and wrong written C4 heights. The
+percussion and deprecated `none` cases now receive local warnings and
+question-mark placeholders rather than blanking the score; this is the
+containment item 22 delivered, not full clef support. The TAB sign in bar
+15 is silently omitted, leaving the preceding F clef to misstate the
+note's context. Percussion pitch placement and TAB fret placement remain
+explicitly unresolved from this source.
+
+[Proposed item 27](../proposed/core-musicxml-clef-fidelity.md) isolates the
+new octave and TAB-diagnostic gaps, without reopening item 22's ordinary
+coordinates or item 23's title workflow. Render item 18 remains open
+for the rest of the suite; item 19 has no new task or persistence passes.
 
 ### 2026-09-24 — item 18: 03-series rhythm rendering slice
 

@@ -48,6 +48,7 @@ proposals that name their campaign.
 - **[core-musicxml-accidental-fidelity.md](proposed/core-musicxml-accidental-fidelity.md)** — MusicXML campaign item 24: explicit accidental enclosure import/render, named-glyph diagnostics, direct qualifier editing and the measured Studio GP save losses from `01a`/`01e`.
 - **[core-musicxml-rest-fidelity.md](proposed/core-musicxml-rest-fidelity.md)** — MusicXML campaign item 25: preserve multimeasure rest groups, explicit rest placement, 256th–1024th values and `03d`'s noncanonical one-bar full rests; diagnose unsupported symbol-style requests.
 - **[core-musicxml-rhythm-fidelity.md](proposed/core-musicxml-rhythm-fidelity.md)** — MusicXML campaign item 26: preserve the full `03a` written-note ladder, draw long noteheads, and keep `03b`/`03f` cursor gaps invisible.
+- **[core-musicxml-clef-fidelity.md](proposed/core-musicxml-clef-fidelity.md)** — MusicXML campaign item 27: preserve the four `12a` octave clefs and diagnose the ungrounded TAB sign without assuming string tuning.
 
 
 
