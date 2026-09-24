@@ -11,7 +11,17 @@ try{
   chrome=spawn(process.env.CHROME_BIN??'google-chrome',['--headless=new','--remote-debugging-port=0','--no-sandbox','--disable-gpu',`--user-data-dir=${profile}`,'about:blank'],{stdio:'ignore'});
   ws=new WebSocket(await connect(await devtoolsPort(profile)));await new Promise(r=>ws.addEventListener('open',r,{once:true}));const cdp=client(ws);
   await cdp.send('Runtime.enable');await cdp.send('Page.enable');
-  await cdp.send('Page.addScriptToEvaluateOnNewDocument',{source:"localStorage.setItem('mnx-lab.view','notation');"});
+  // A recording stand-in for navigator.wakeLock. Headless Chrome's own is not
+  // dependable (no display, and it refuses outright when the page is not
+  // visible), and what is being tested is OUR bookkeeping, not the browser's.
+  // It has to be in place before any page script runs, hence this hook.
+  const wakeLockStub=`(()=>{const log={requests:0,releases:0,held:0};window.__wakeLock=log;
+    Object.defineProperty(navigator,'wakeLock',{configurable:true,value:{request:async()=>{log.requests++;log.held++;
+      let onRelease=null;const sentinel={type:'screen',released:false,
+        release:async()=>{if(sentinel.released)return;sentinel.released=true;log.releases++;log.held--;onRelease&&onRelease();},
+        addEventListener:(name,fn)=>{if(name==='release')onRelease=fn;},removeEventListener:()=>{}};
+      return sentinel;}}});})();`;
+  await cdp.send('Page.addScriptToEvaluateOnNewDocument',{source:"localStorage.setItem('mnx-lab.view','notation');"+wakeLockStub});
   await cdp.send('Page.navigate',{url:`http://127.0.0.1:${server.port}/workbench/#/scenario/spec/repeats-alternate-endings-simple?at=2`});
   let ready=false;for(let i=0;i<100;i++){ready=await cdp.evaluate(`!!document.querySelector('mnx-workbench')?.shadowRoot?.querySelector('mnx-scenario-page')?.shadowRoot?.querySelector('mnx-player')?.performance`);if(ready)break;await new Promise(r=>setTimeout(r,100));}
   if(!ready)throw new Error('Workbench player did not load');
@@ -99,6 +109,33 @@ try{
     check(!viewer.shadowRoot.querySelector('.tab-rest-pill.playback-ink'),'The rest pill outlived the playhead');
     check(!viewer.shadowRoot.querySelector('.rest.playback-ink'),'The lit rest outlived the playhead');
     return {notationRest:true,tabPill:true,cleared:true};
+  })()`));
+  // THE SCREEN IS HELD WHILE, AND ONLY WHILE, SOMETHING PLAYS.
+  //
+  // A tablet on a music stand goes untouched for the length of a song, so
+  // without this it dims and locks mid-piece. The lock follows the transport's
+  // own `wantsPlayback` out of Player.publish(), NOT the Play button — so a
+  // track that simply ends, or a source swap, gives the screen back too. That
+  // is what the stop-without-pressing-pause leg below is for.
+  console.log('the screen is held while playing',await cdp.evaluate(`(async()=>{
+    const check=(v,m)=>{if(!v)throw new Error(m);},delay=ms=>new Promise(r=>setTimeout(r,ms));
+    const page=document.querySelector('mnx-workbench').shadowRoot.querySelector('mnx-scenario-page');
+    const player=page.shadowRoot.querySelector('mnx-player');
+    const log=window.__wakeLock;
+    check(log,'The wake lock stub never installed');
+    check(log.held===0,'Something was holding the screen before playback started');
+    const before=log.requests;
+    await player.play();await delay(200);
+    check(player.snapshot.state==='playing','Player did not start for the wake lock check');
+    check(log.requests===before+1,'Playing did not ask for the screen exactly once');
+    check(log.held===1,'Playing is not holding the screen');
+    // Idle churn must not re-ask: publish() fires on every status change.
+    await delay(400);
+    check(log.requests===before+1,'A second lock was taken while already holding one');
+    player.stop();await delay(200);
+    check(log.held===0,'Stopping left the screen held');
+    check(log.releases>=1,'Stopping never released the lock');
+    return {requests:log.requests-before,releases:log.releases};
   })()`));
   // A PRESS ON THE SCORE MOVES THE SCRUBBER TO THE BEAT IT NAMED.
   //

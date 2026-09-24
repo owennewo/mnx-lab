@@ -1,0 +1,26 @@
+{
+  "id": "/studio/",
+  "name": "MNX Studio",
+  "short_name": "MNX",
+  "description": "Your library of scores, on the stand: browse, open and play guitar tab and notation.",
+  "start_url": "/studio/",
+  "scope": "/studio/",
+  "display": "standalone",
+  "launch_handler": { "client_mode": "navigate-existing" },
+  "background_color": "#f3f2f1",
+  "theme_color": "#f3f2f1",
+  "icons": [
+    {
+      "src": "/app-icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/app-icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

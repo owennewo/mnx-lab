@@ -27,6 +27,7 @@ import type { MnxStructure } from '../model/mnx.ts';
 import type { PlaybackOccurrence, PlaybackUpdate } from './mnxContext.ts';
 import { ClickTrack } from '../audio/native/click.ts';
 import { beatTimes, decodeSyncSegments, defaultBeatUnit, emptySyncSegments, playingSyncpoints, syncpointsFromSegments, type SyncSegments } from '../model/syncSegments.ts';
+import { screenWakeLock } from './screenWakeLock.ts';
 import type { SoundsliceSyncpoint } from '../model/recordingSync.ts';
 import type { SyncChange } from './SyncBar.ts';
 import { isTextEntry, realTarget } from './keyScope.ts';
@@ -574,6 +575,7 @@ export class Player extends LitElement {
     this.removeEventListener('keydown', this.onKeydown);
     this.removeEventListener('keyup', this.onKeyup);
     this.teardown();
+    this.wakeLock.dispose();
     super.disconnectedCallback();
   }
   /** The widest readout label, refreshed only when the performance changes:
@@ -691,6 +693,7 @@ export class Player extends LitElement {
     const detail: PlaybackUpdate = { documentId: this.documentId, ordinal,
       highlight: [...(status?.highlight ?? []), ...this.restsUnderPlayhead(visible ? status?.scorePosition ?? null : null)],
       playing: status?.wantsPlayback ?? false, recordingBookends, mediaPhase: status?.mediaPhase ?? null };
+    this.wakeLock.want(status?.wantsPlayback ?? false);
     this.dispatchEvent(new CustomEvent('playback-position', { detail: {
       documentId: this.documentId, sourceId: status?.sourceId, kind: status?.kind,
       syncWarning: status?.alignmentIssue || status?.syncIssue,
@@ -722,6 +725,9 @@ export class Player extends LitElement {
   private requiredSamples(): SamplePreset[] {
     return this.performance ? requiredPresets(this.performance, this.partMix, this.voicePreset) : [];
   }
+  /** Held while the transport wants playback — a stand's screen must not
+   *  sleep mid-song. Driven from publish(), the one place that knows. */
+  private readonly wakeLock = screenWakeLock();
   /** What every voice plays, so a mix change that moves only a level never
    *  pauses to swap sounds. */
   private lastSounds = '';

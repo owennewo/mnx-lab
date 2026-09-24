@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-labelledby="icon-title">
+  <title id="icon-title">MNX Studio</title>
+  <!--
+    Fret 0 on the middle string: the open string, which is what studio opens.
+
+    Two things about these numbers, both of which have already bitten:
+
+    1. The strings have ROUND caps, so a line reaches stroke-width/2 BEYOND its
+       endpoint. Every clearance below is measured on the visual extent, not on
+       the endpoints — the visual frame is x 106.5→405.5, y 125.5→386.5.
+    2. That frame clears the maskable safe circle (radius 205, the 80% circle)
+       by 6.6px at its worst corner. The composition is the one chosen on the
+       design canvas, scaled by 0.92 about the centre to make it fit: at full
+       size the string ends fell 11px OUTSIDE the circle and a round launcher
+       mask would have clipped them.
+
+    Lengthening or thickening a string spends that margin.
+    harness/conformance/app-icons.test.ts is what refuses to let it go.
+  -->
+  <rect width="512" height="512" fill="#141211"/>
+  <g stroke="#F3F2F1" stroke-width="35" stroke-linecap="round">
+    <line x1="124" y1="143" x2="388" y2="143"/>
+    <line x1="124" y1="256" x2="151" y2="256"/>
+    <line x1="361" y1="256" x2="388" y2="256"/>
+    <line x1="124" y1="369" x2="388" y2="369"/>
+  </g>
+  <ellipse cx="256" cy="256" rx="39" ry="52" fill="none" stroke="#E0913F" stroke-width="29"/>
+</svg>

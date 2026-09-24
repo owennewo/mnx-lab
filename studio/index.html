@@ -4,6 +4,18 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MNX Studio</title>
+    <!-- `use-credentials` is load-bearing: /studio is behind Cloudflare Access,
+         and an anonymous manifest fetch gets the OTP page instead, which Chrome
+         fails to parse and silently falls back to a generated letter tile from. -->
+    <link rel="manifest" href="/studio/manifest.webmanifest" crossorigin="use-credentials" />
+    <!-- The icons live OUTSIDE /studio on purpose: Chrome hands their URLs to
+         Google's WebAPK minting service, which fetches them server-side with no
+         Access cookie. docs/studio-installable.md; the conformance test enforces it. -->
+    <link rel="icon" href="/app-icons/icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/app-icons/apple-touch-icon-180.png" />
+    <!-- One value, rewritten by applyTheme() — the theme is tri-state and a
+         pinned choice must beat the OS, which a prefers-color-scheme pair cannot. -->
+    <meta name="theme-color" content="#f3f2f1" />
   </head>
   <body>
     <mnx-studio></mnx-studio>

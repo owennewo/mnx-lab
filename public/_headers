@@ -24,3 +24,17 @@
   Content-Security-Policy: default-src 'self'; script-src 'self' https://www.youtube.com/iframe_api https://www.youtube.com/s/player/ https://s.ytimg.com/yts/jsbin/; frame-src https://www.youtube.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; media-src 'self' blob:; connect-src 'self' https://openrouter.ai; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
   Referrer-Policy: strict-origin-when-cross-origin
   X-Content-Type-Options: nosniff
+
+# The manifest is served from under /studio, so it is behind Access like the
+# page — studio/index.html asks for it with `crossorigin="use-credentials"`.
+# Chrome does not enforce the media type, but a wrong one is the kind of thing
+# a future audit tool will flag, and Workers Assets infers this one from an
+# extension it may not know.
+/studio/manifest.webmanifest
+  Content-Type: application/manifest+json
+
+# The icons deliberately are NOT under /studio: Chrome hands their URLs to
+# Google's WebAPK minting service, which fetches them server-side with no
+# Access cookie. An icon behind Access mints as a generated letter tile.
+/app-icons/*
+  Cache-Control: public, max-age=604800
