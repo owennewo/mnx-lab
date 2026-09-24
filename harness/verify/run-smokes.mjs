@@ -26,31 +26,35 @@ const one = (file, covers, extra = {}) => ({ build: 'build:site', covers, jobs: 
 const WORKBENCH = ['workbench'];
 const STUDIO = ['studio'];
 const STUDIO_LIBRARY = ['studio', 'library'];
+// Listed LONGEST FIRST, and the runner starts them in this order whatever order
+// they were asked for: four slots finish together instead of one long smoke
+// starting last (paired runs 2026-09-24: 61.5–63.0 s → 58.1–59.5 s). Only the
+// ranking matters; seconds from a green gate run at the time are in the comments.
 const SMOKES = {
-  'lib': one('lib-smoke.mjs', ['lib'], { build: 'build:lib' }),
-  'embed': { build: 'build:embed', covers: ['embed'], jobs: [[{ file: verify('embed-smoke.mjs') }], [{ file: verify('embed-smoke.mjs'), env: { MNX_EMBED_FORMAT: 'iife' } }]] },
-  'csp': one('csp-smoke.mjs', WORKBENCH),
-  'selection': one('selection-smoke.mjs', WORKBENCH),
-  'inspector': one('inspector-smoke.mjs', WORKBENCH),
-  'focus': one('focus-mode-smoke.mjs', WORKBENCH),
-  'sync-bar': one('sync-bar-smoke.mjs', STUDIO),
-  'sync-rederive': one('sync-rederive-smoke.mjs', STUDIO),
-  'piece-create': one('piece-create-smoke.mjs', STUDIO_LIBRARY),
-  'save-pipeline': one('save-pipeline-smoke.mjs', STUDIO_LIBRARY),
-  'piece-lifecycle': one('piece-lifecycle-smoke.mjs', STUDIO_LIBRARY),
-  'studio-editor': one('studio-editor-smoke.mjs', STUDIO_LIBRARY),
-  'play-only': one('studio-play-only-smoke.mjs', STUDIO_LIBRARY),
-  'workbench-editor': one('workbench-editor-smoke.mjs', WORKBENCH),
-  'audio': one('audio-smoke.mjs', ['audio'], { build: null }),
+  'inspector': one('inspector-smoke.mjs', WORKBENCH), // 15
+  'workbench-editor': one('workbench-editor-smoke.mjs', WORKBENCH), // 15
+  'save-pipeline': one('save-pipeline-smoke.mjs', STUDIO_LIBRARY), // 15
+  'studio': one('studio-smoke.mjs', STUDIO_LIBRARY), // 14
+  'studio-editor': one('studio-editor-smoke.mjs', STUDIO_LIBRARY), // 14
   // The review page is the smoke's input, so it is built first in the same job.
-  'player': { build: 'build:site', covers: WORKBENCH, jobs: [[{ file: verify('performance-review.mjs') }, { file: verify('player-workbench-smoke.mjs') }]] },
-  'unrolled': { build: 'build:site', covers: WORKBENCH, jobs: [[{ file: verify('unrolled-review.mjs') }, { file: verify('unrolled-smoke.mjs') }]] },
-  'studio': one('studio-smoke.mjs', STUDIO_LIBRARY),
-  'studio-export': one('studio-export-smoke.mjs', STUDIO),
-  'recording-studio': one('recording-studio-smoke.mjs', STUDIO),
-  'single-cursor': one('single-cursor-smoke.mjs', STUDIO),
-  'recording-management': one('recording-management-smoke.mjs', STUDIO_LIBRARY),
-  'youtube': one('youtube-smoke.mjs', ['embed'], { build: 'build:embed' }),
+  'player': { build: 'build:site', covers: WORKBENCH, jobs: [[{ file: verify('performance-review.mjs') }, { file: verify('player-workbench-smoke.mjs') }]] }, // 13
+  'piece-lifecycle': one('piece-lifecycle-smoke.mjs', STUDIO_LIBRARY), // 13
+  'play-only': one('studio-play-only-smoke.mjs', STUDIO_LIBRARY), // 11
+  'studio-export': one('studio-export-smoke.mjs', STUDIO), // 11
+  'recording-management': one('recording-management-smoke.mjs', STUDIO_LIBRARY), // 11
+  'piece-create': one('piece-create-smoke.mjs', STUDIO_LIBRARY), // 11
+  'embed': { build: 'build:embed', covers: ['embed'], jobs: [[{ file: verify('embed-smoke.mjs') }], [{ file: verify('embed-smoke.mjs'), env: { MNX_EMBED_FORMAT: 'iife' } }]] }, // 10 each
+  'selection': one('selection-smoke.mjs', WORKBENCH), // 10
+  'single-cursor': one('single-cursor-smoke.mjs', STUDIO), // 7
+  'focus': one('focus-mode-smoke.mjs', WORKBENCH), // 6
+  'youtube': one('youtube-smoke.mjs', ['embed'], { build: 'build:embed' }), // 6
+  'sync-bar': one('sync-bar-smoke.mjs', STUDIO), // 6
+  'unrolled': { build: 'build:site', covers: WORKBENCH, jobs: [[{ file: verify('unrolled-review.mjs') }, { file: verify('unrolled-smoke.mjs') }]] }, // 5
+  'recording-studio': one('recording-studio-smoke.mjs', STUDIO), // 5
+  'lib': one('lib-smoke.mjs', ['lib'], { build: 'build:lib' }), // 4
+  'csp': one('csp-smoke.mjs', WORKBENCH), // 4
+  'sync-rederive': one('sync-rederive-smoke.mjs', STUDIO), // 3
+  'audio': one('audio-smoke.mjs', ['audio'], { build: null }), // 3
 };
 
 /** Every smoke with the areas it covers and the files that are its own. */
@@ -71,7 +75,8 @@ export function planSmokes(names, { built = false } = {}) {
   for (const name of names) {
     if (!Object.hasOwn(SMOKES, name)) throw new Error(`Unknown smoke: ${name}. Use --help for names.`);
   }
-  const unique = [...new Set(names)];
+  // Table order, not request order: the table is the schedule.
+  const unique = Object.keys(SMOKES).filter(name => names.includes(name));
   const builds = [...new Set(unique.map(name => SMOKES[name].build).filter(Boolean))];
   return {
     artifacts: builds.map(build => ARTIFACTS[build]),

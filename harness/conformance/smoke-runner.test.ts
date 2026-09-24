@@ -11,6 +11,10 @@ it('builds each selected face once, bundle only, and removes duplicate requests'
   expect(builds.map((c: Command) => c.args)).toEqual([['run', 'build:site'], ['run', 'build:embed'], ['run', 'build:lib']]);
   expect(jobs.filter((j: Job) => files(j).includes('selection-smoke.mjs'))).toHaveLength(1);
 });
+it('starts the longest smokes first, whatever order they were asked for', () => {
+  const labels = (planSmokes(['audio', 'selection', 'inspector']).jobs as Job[]).map(j => j.label);
+  expect(labels).toEqual(['inspector', 'selection', 'audio']);
+});
 it('runs the two embed formats as independent jobs', () => {
   const embeds = planSmokes(['embed']).jobs as Job[];
   expect(embeds.map(j => j.label)).toEqual(['embed', 'embed (iife)']);

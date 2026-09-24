@@ -32,6 +32,12 @@ On 2026-09-24 the full set took ~205 s one at a time and ~67 s four at once, all
 before any smoke was sped up; eight at once was faster still but slowed each smoke by
 up to 2× on a 6-core machine, which is where timing flakes live.
 
+The table in `run-smokes.mjs` is listed **longest first**, and the runner starts smokes
+in table order whatever order they were asked for, so the four slots finish together
+instead of waiting on one long smoke that started last (paired runs: 61.5–63.0 s →
+58.1–59.5 s). A new smoke goes where its duration puts it; a misplaced one costs a few
+seconds, never a result.
+
 After a successful gate build, run `npm run smoke -- --built selection inspector`.
 `--built` skips builds explicitly: the artifacts must match the current sources and
 configuration. Rebuild after relevant edits or rebases. For embed/lib, build those
