@@ -15,7 +15,8 @@ const output = path.resolve(outAt < 0 ? 'dist/review/unrolled.html' : args.splic
 const server = await createServer({
   configFile: false,
   optimizeDeps: { noDiscovery: true, include: [] },
-  server: { middlewareMode: true },
+  // Modules only: no live-reload socket, whose fixed port two reviews run at once would share.
+  server: { middlewareMode: true, ws: false },
   appType: 'custom',
 });
 try {

@@ -32,7 +32,8 @@ const wanted = args.length
 const server = await createServer({
   configFile: false,
   optimizeDeps: { noDiscovery: true, include: [] },
-  server: { middlewareMode: true },
+  // Modules only: no live-reload socket, whose fixed port two reviews run at once would share.
+  server: { middlewareMode: true, ws: false },
   appType: 'custom',
 });
 try {
