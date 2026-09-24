@@ -16,6 +16,7 @@
 // demotions. Structural assertions only.
 //
 // Run: npm run smoke:embed  (builds the artifact first)
+import os from 'node:os';
 import fs from 'node:fs';
 import http from 'node:http';
 import path from 'node:path';
@@ -59,7 +60,7 @@ try {
   const pageUrl = `http://127.0.0.1:${host.port}/index.html?base=${encodeURIComponent(artifactBase)}&format=${format}`;
   console.log(`artifact origin ${artifactBase} · host origin http://127.0.0.1:${host.port}`);
 
-  const profile = fs.mkdtempSync('/tmp/mnx-embed-smoke-');
+  const profile = fs.mkdtempSync(`${os.tmpdir()}/mnx-embed-smoke-`);
   chrome = spawn(
     chromeBin,
     [

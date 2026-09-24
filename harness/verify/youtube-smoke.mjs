@@ -1,6 +1,7 @@
 // npm run build:embed, then node harness/verify/youtube-smoke.mjs [--live]
 // Default: deterministic official-API stand-in. --live: actual YouTube, never
 // substitutes network responses. Both use the production CSP and referrer policy.
+import os from 'node:os';
 import fs from 'node:fs';
 import path from 'node:path';
 import http from 'node:http';
@@ -28,7 +29,7 @@ const server=http.createServer((req,res)=>{
   res.setHeader('Content-Type',file.endsWith('.js')?'text/javascript':file.endsWith('.json')?'application/json':file.endsWith('.woff2')?'font/woff2':'application/octet-stream');fs.createReadStream(file).pipe(res);
 });
 await new Promise(r=>server.listen(0,'127.0.0.1',r));
-const profile=fs.mkdtempSync('/tmp/youtube-smoke-'),chrome=spawn('google-chrome',['--headless=new','--no-sandbox','--disable-gpu','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],{stdio:'ignore'});
+const profile=fs.mkdtempSync(`${os.tmpdir()}/youtube-smoke-`),chrome=spawn('google-chrome',['--headless=new','--no-sandbox','--disable-gpu','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],{stdio:'ignore'});
 let ws,c;
 const fake=`window.__ytInstances=[];window.YT={Player:class{
  constructor(frame,{events}){this.frame=frame;this.events=events;this.time=0;this.state=5;this.rate=1;this.volume=70;this.plays=0;this.last=performance.now();__ytInstances.push(this);queueMicrotask(()=>events.onReady());}

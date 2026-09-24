@@ -1,4 +1,5 @@
 // Run after npm run build: node harness/verify/studio-export-smoke.mjs
+import os from 'node:os';
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
 import { fileURLToPath } from 'node:url';
@@ -7,7 +8,7 @@ import { serveStatic } from './staticServer.mjs';
 import { devtoolsPort, connect, client } from './browserHarness.mjs';
 const root=fileURLToPath(new URL('../../', import.meta.url)).replace(/\/$/, '');
 const server=await serveStatic(root+'/dist/client');
-const profile=fs.mkdtempSync('/tmp/studio-export-chrome-');
+const profile=fs.mkdtempSync(`${os.tmpdir()}/studio-export-chrome-`);
 const chrome=spawn('google-chrome',['--headless=new','--no-sandbox','--disable-gpu','--disable-popup-blocking','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],{stdio:'ignore'});
 let ws;
 try {

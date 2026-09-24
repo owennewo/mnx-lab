@@ -1,4 +1,5 @@
 // Bounded real desktop editor probe. It never calls an edit operation directly.
+import os from 'node:os';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -24,7 +25,7 @@ const sourceBytes = await fs.readFile(source);
 const hash = value => createHash('sha256').update(value).digest('hex');
 const library = shell === 'studio' ? await startLocalLibrary() : null;
 const site = shell === 'workbench' ? await serveStatic(path.join(root, 'dist/client')) : null;
-const profile = await fs.mkdtemp('/tmp/mnx-pitch-write-browser-');
+const profile = await fs.mkdtemp(`${os.tmpdir()}/mnx-pitch-write-browser-`);
 const chrome = spawn(process.env.CHROME_BIN ?? 'google-chrome', [
   '--headless=new', '--no-sandbox', '--disable-dev-shm-usage', '--remote-debugging-port=0',
   `--user-data-dir=${profile}`, 'about:blank'

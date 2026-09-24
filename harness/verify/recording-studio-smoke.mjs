@@ -1,5 +1,6 @@
 // Run after npm run build. Production Studio with a fixture LibraryClient and
 // seekable HTTP PCM; authorization and R2 behavior are covered by library-access.
+import os from 'node:os';
 import fs from 'node:fs';
 import http from 'node:http';
 import assert from 'node:assert/strict';
@@ -19,7 +20,7 @@ const audio=http.createServer((req,res)=>{
  res.writeHead(match?206:200,{'Content-Type':'audio/wav','Accept-Ranges':'bytes','Content-Length':end-start+1,...(match?{'Content-Range':`bytes ${start}-${end}/${pcm.length}`}:{})});res.end(pcm.subarray(start,end+1));
 });
 await new Promise(r=>audio.listen(0,'127.0.0.1',r));
-const server=await serveStatic(root+'dist/client'),profile=fs.mkdtempSync('/tmp/recording-studio-');
+const server=await serveStatic(root+'dist/client'),profile=fs.mkdtempSync(`${os.tmpdir()}/recording-studio-`);
 const chrome=spawn('google-chrome',['--headless=new','--no-sandbox','--disable-gpu','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],{stdio:'ignore'});
 let ws;
 try {

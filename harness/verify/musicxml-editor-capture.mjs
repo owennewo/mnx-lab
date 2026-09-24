@@ -1,5 +1,6 @@
 // Observations, NOT rendering verdicts. Original files enter the real workbench
 // file input; screenshots tile the scroll host without changing score layout.
+import os from 'node:os';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -23,7 +24,7 @@ const manifest = JSON.parse(await fs.readFile(path.join(root, 'converters/fixtur
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 await fs.mkdir(output, { recursive: true });
 const site = shell === 'workbench' ? await serveStatic(path.join(root, 'dist/client')) : null;
-const profile = await fs.mkdtemp('/tmp/mnx-musicxml-browser-');
+const profile = await fs.mkdtemp(`${os.tmpdir()}/mnx-musicxml-browser-`);
 const chrome = spawn(process.env.CHROME_BIN ?? 'google-chrome', ['--headless=new', '--no-sandbox', '--disable-dev-shm-usage', '--remote-debugging-port=0', `--user-data-dir=${profile}`, 'about:blank'], { stdio: 'ignore' });
 let ws;
 const report = { kind: 'browser observations; not feature correctness or human verification', captureScriptSha256: hash(await fs.readFile(fileURLToPath(import.meta.url))), shell, applicationCommit: execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim(), corpusRevision: manifest.revision, viewport: { width: 1440, height: 1000, deviceScaleFactor: 1 }, fixtures: [] };

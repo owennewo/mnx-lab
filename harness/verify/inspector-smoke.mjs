@@ -1,3 +1,4 @@
+import os from 'node:os';
 import { waitFor, settle, SCORE_READY } from './browserHarness.mjs';
 // The rung inspector, driven in a real browser
 // (roadmap/inprogress/workbench-rung-inspector.md). The data layer is joined
@@ -161,7 +162,7 @@ try {
     throw new Error('dist/client/workbench/index.html missing — run `npm run build` first');
   }
   site = await serve(DIST);
-  const profile = fs.mkdtempSync('/tmp/mnx-inspector-smoke-');
+  const profile = fs.mkdtempSync(`${os.tmpdir()}/mnx-inspector-smoke-`);
   chrome = spawn(
     process.env.CHROME_BIN ?? 'google-chrome',
     ['--headless=new', '--remote-debugging-port=0', '--disable-gpu', '--no-sandbox',

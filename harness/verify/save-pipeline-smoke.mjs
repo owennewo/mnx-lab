@@ -6,6 +6,7 @@
 // chip, the IndexedDB recovery record surviving a reload ("the crash"), the
 // storage check running in its worker, the edit lock, and a conflict with
 // another device settled by keeping a copy.
+import os from 'node:os';
 import fs from 'node:fs/promises';
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
@@ -16,7 +17,7 @@ const library = await startLocalLibrary();
 const { origin, session } = library;
 const api = async (path, init = {}) => fetch(`${origin}/api/library${path}`, { ...init, headers: { 'Cf-Access-Jwt-Assertion': session.browser, ...(init.headers ?? {}) } });
 const stamp = Date.now(); const title = `Save smoke ${stamp}`;
-const profile = await fs.mkdtemp('/tmp/mnx-save-pipeline-browser-');
+const profile = await fs.mkdtemp(`${os.tmpdir()}/mnx-save-pipeline-browser-`);
 const chrome = spawn(process.env.CHROME_BIN ?? 'google-chrome',['--headless=new','--no-sandbox','--disable-dev-shm-usage','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],{stdio:'ignore'});
 let ws;
 try {

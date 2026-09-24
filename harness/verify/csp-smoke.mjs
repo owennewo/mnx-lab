@@ -1,3 +1,4 @@
+import os from 'node:os';
 import { waitFor } from './browserHarness.mjs';
 // Does the built workbench actually run under the CSP we deploy?
 //
@@ -210,7 +211,7 @@ try {
   const pageUrl = `http://127.0.0.1:${site.port}/workbench/`;
   console.log(`serving dist/client at ${pageUrl}`);
 
-  const profile = fs.mkdtempSync('/tmp/mnx-csp-smoke-');
+  const profile = fs.mkdtempSync(`${os.tmpdir()}/mnx-csp-smoke-`);
   chrome = spawn(
     process.env.CHROME_BIN ?? 'google-chrome',
     ['--headless=new', '--remote-debugging-port=0', '--disable-gpu', '--no-sandbox', `--user-data-dir=${profile}`, 'about:blank'],
@@ -277,7 +278,7 @@ try {
 
   // 4. Every import worker loads under the policy and produces a document.
   await cdp.send('DOM.enable');
-  for (const { file, format } of localFiles(fs.mkdtempSync('/tmp/mnx-csp-smoke-files-'))) {
+  for (const { file, format } of localFiles(fs.mkdtempSync(`${os.tmpdir()}/mnx-csp-smoke-files-`))) {
     const name = path.basename(file);
     const before = await cdp.evaluate('window.__cspViolations.length');
     const input = await cdp.send('Runtime.evaluate', {

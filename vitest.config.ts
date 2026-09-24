@@ -5,6 +5,8 @@ import { defineConfig } from 'vitest/config';
 // Converter sub-packages run their own vitest suites (npm -w <pkg> test).
 export default defineConfig({
   test: {
-    include: ['harness/**/*.test.ts']
+    include: ['harness/**/*.test.ts'],
+    // One temp directory per run, gone at teardown (harness/helpers/tempScope.ts).
+    globalSetup: ['harness/helpers/tempScope.ts']
   }
 });

@@ -4,6 +4,7 @@
 //
 // The form → ops → .gp → POST /api/library/pieces → the piece page reading that
 // .gp back: the whole priority flow up to the moment a recording is added.
+import os from 'node:os';
 import fs from 'node:fs/promises';
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
@@ -13,7 +14,7 @@ import { startLocalLibrary } from './localLibrary.mjs';
 const library = await startLocalLibrary();
 const { origin, session } = library;
 const title = `Smoke piece ${Date.now()}`;
-const profile = await fs.mkdtemp('/tmp/mnx-piece-create-browser-');
+const profile = await fs.mkdtemp(`${os.tmpdir()}/mnx-piece-create-browser-`);
 const chrome = spawn(process.env.CHROME_BIN ?? 'google-chrome',['--headless=new','--no-sandbox','--disable-dev-shm-usage','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],{stdio:'ignore'});
 let ws;
 try {

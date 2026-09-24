@@ -10,6 +10,7 @@
 // Playing, a fret is refused with Pause to edit, and ←/→ presses are counted
 // into ONE seek of whole bars. A pause parks the cursor on the playhead without
 // seeking, and the next move seeks again.
+import os from 'node:os';
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
@@ -32,7 +33,7 @@ const fake = `window.__ytInstances=[];window.YT={Player:class{
  pauseVideo(){this.getCurrentTime();this.state=2;queueMicrotask(()=>this.events.onStateChange({data:2}));}destroy(){this.destroyed=true;this.frame.remove();}
 }};window.onYouTubeIframeAPIReady?.();`;
 
-const server = await serveStatic(root + 'dist/client'), profile = fs.mkdtempSync('/tmp/single-cursor-');
+const server = await serveStatic(root + 'dist/client'), profile = fs.mkdtempSync(`${os.tmpdir()}/single-cursor-`);
 const chrome = spawn('google-chrome', ['--headless=new', '--no-sandbox', '--disable-gpu', '--remote-debugging-port=0', `--user-data-dir=${profile}`, 'about:blank'], { stdio: 'ignore' });
 let ws;
 try {

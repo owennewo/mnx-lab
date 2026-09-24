@@ -66,6 +66,17 @@ specific offender is the profile directory: Chrome goes on flushing its cache
 after it reports exit, so `fs.rmSync(profile)` races and sometimes loses with
 `ENOTEMPTY`. A temp directory left behind is litter, not a failure — wrap it.
 
+The litter itself is the runner's job, not the smoke's. Most smokes never removed
+their profile and the rest lost that race, Chrome leaves `com.google.Chrome.*` and
+`scoped_dir*` behind, and Miniflare its storage: on 2026-09-24 `/tmp` (a tmpfs with a
+per-user quota) held 6.3 GB of it and SQLite writes in the library tests failed with
+`EDQUOT`. So `run-smokes.mjs` gives every job `TMPDIR=<a directory of its own>` and,
+when the job ends, SIGKILLs whatever still names that directory and removes it;
+`npm test` does the same per run (`harness/helpers/tempScope.ts`), and either sweeps a
+killed run's directory next time (`harness/verify/tempDirs.mjs`). A smoke makes its
+profile with ``mkdtemp(`${os.tmpdir()}/…`)`` — never a literal `/tmp` — so it lands
+inside. A smoke run directly with `node` has no scope and still litters `/tmp`.
+
 ### Shadow roots move
 
 An element the smoke reaches by `page.shadowRoot.querySelector(...)` may have

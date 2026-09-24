@@ -3,6 +3,7 @@
 // without the source being re-cued, and the save carries segments plus one
 // point per bar (roadmap/complete/studio-sync-bar.md).
 // SYNC_BAR_SHOT=<path.png> also writes a screenshot of the zoomed bar.
+import os from 'node:os';
 import fs from 'node:fs';
 import http from 'node:http';
 import assert from 'node:assert/strict';
@@ -23,7 +24,7 @@ const audio=http.createServer((req,res)=>{
  res.writeHead(match?206:200,{'Content-Type':'audio/wav','Accept-Ranges':'bytes','Content-Length':end-start+1,...(match?{'Content-Range':`bytes ${start}-${end}/${pcm.length}`}:{})});res.end(pcm.subarray(start,end+1));
 });
 await new Promise(r=>audio.listen(0,'127.0.0.1',r));
-const server=await serveStatic(root+'dist/client'),profile=fs.mkdtempSync('/tmp/sync-bar-');
+const server=await serveStatic(root+'dist/client'),profile=fs.mkdtempSync(`${os.tmpdir()}/sync-bar-`);
 const chrome=spawn('google-chrome',['--headless=new','--no-sandbox','--disable-gpu','--autoplay-policy=no-user-gesture-required','--window-size=1280,800','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],{stdio:'ignore'});
 let ws;
 try {

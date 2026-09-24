@@ -1,4 +1,5 @@
 // Original MusicXML → title prompt → editable Studio → measured GP checkpoint.
+import os from 'node:os';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -30,7 +31,7 @@ const initial = (await ingested.json()).snapshot; const pieceId = initial.piece.
 const get = async url => { const r = await fetch(origin+'/api/library'+url, { headers: { 'Cf-Access-Jwt-Assertion': auth.browser } }); assert.equal(r.status, 200); return r; };
 const snapshot = async () => (await (await get('/pieces/'+pieceId)).json()).snapshot;
 const report = { fixture, sourceSha256: hash(bytes), applicationCommit: execFileSync('git', ['rev-parse','HEAD'], { cwd: root, encoding: 'utf8' }).trim(), captureScriptSha256: hash(await fs.readFile(fileURLToPath(import.meta.url))), shell: 'studio', pieceId };
-const profile = await fs.mkdtemp('/tmp/mnx-title-browser-');
+const profile = await fs.mkdtemp(`${os.tmpdir()}/mnx-title-browser-`);
 const chrome = spawn(process.env.CHROME_BIN ?? 'google-chrome', ['--headless=new','--no-sandbox','--disable-dev-shm-usage','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'], { stdio: 'ignore' });
 let ws;
 try {

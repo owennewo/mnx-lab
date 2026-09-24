@@ -5,6 +5,7 @@ import { spawn, spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { removeTree, scopedTempRoot, sweepScopedRoots } from './tempDirs.mjs';
 
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 // Measured on a 6-core machine (2026-09-24): 4 at once takes the full set from
@@ -89,20 +90,26 @@ function runBuffered({ command, args, env }, output) {
   });
 }
 
-async function runJobs(jobs, concurrency) {
+/** Each job works in a temp directory of its own (TMPDIR), removed when the
+ *  job ends — with whatever it left running in it (harness/verify/tempDirs.mjs). */
+async function runJobs(jobs, concurrency, scope) {
   const queue = [...jobs];
   const results = [];
   let stopped = false;
+  let next = 0;
   const worker = async () => {
     while (queue.length && !stopped) {
       const job = queue.shift();
       const started = performance.now();
       const output = [];
+      const tmp = path.join(scope, String(next++));
+      fs.mkdirSync(tmp);
       let status = 0;
       for (const command of job.commands) {
-        status = await runBuffered(command, output);
+        status = await runBuffered({ ...command, env: { ...command.env, TMPDIR: tmp } }, output);
         if (status !== 0) break;
       }
+      if (!removeTree(tmp)) output.push(`(could not remove ${tmp})\n`);
       const seconds = (performance.now() - started) / 1000;
       if (status !== 0) stopped = true;
       results.push({ label: job.label, status, seconds });
@@ -148,8 +155,10 @@ async function main() {
       return;
     }
   }
+  sweepScopedRoots();
+  const scope = scopedTempRoot('smokes');
   const started = performance.now();
-  const { results, skipped } = await runJobs(plan.jobs, concurrency);
+  const { results, skipped } = await runJobs(plan.jobs, concurrency, scope).finally(() => removeTree(scope));
   const failed = results.filter(result => result.status !== 0);
   console.log(`\n${results.length - failed.length} passed, ${failed.length} failed` +
     `${skipped.length ? `, ${skipped.length} not started` : ''} in ${((performance.now() - started) / 1000).toFixed(1)}s (${concurrency} at once)`);

@@ -12,6 +12,7 @@
 //   chip and the Details sheet SAY why rather than going quiet.
 //
 // Its own private library, like studio-smoke.mjs. Usage: npm run smoke:play-only
+import os from 'node:os';
 import fs from 'node:fs/promises';
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
@@ -21,7 +22,7 @@ import { startLocalLibrary } from './localLibrary.mjs';
 const library = await startLocalLibrary();
 const { origin, session } = library;
 const title = `Play-only smoke ${Date.now()}`;
-const profile = await fs.mkdtemp('/tmp/mnx-studio-play-only-browser-');
+const profile = await fs.mkdtemp(`${os.tmpdir()}/mnx-studio-play-only-browser-`);
 const chrome = spawn(process.env.CHROME_BIN ?? 'google-chrome',['--headless=new','--no-sandbox','--disable-dev-shm-usage','--window-size=900,1200','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],{stdio:'ignore'});
 let ws;
 try {

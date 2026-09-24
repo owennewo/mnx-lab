@@ -3,6 +3,7 @@
 // Its own private library, like studio-smoke.mjs. Real key events through the DevTools
 // protocol, because the point is who hears them: the editor's listener is on the
 // viewer, so keys typed into a text field must not reach it.
+import os from 'node:os';
 import fs from 'node:fs/promises';
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
@@ -13,7 +14,7 @@ const library = await startLocalLibrary();
 const { origin, session } = library;
 const api = async path => fetch(`${origin}/api/library${path}`, { headers: { 'Cf-Access-Jwt-Assertion': session.browser } });
 const title = `Editor smoke ${Date.now()}`;
-const profile = await fs.mkdtemp('/tmp/mnx-studio-editor-browser-');
+const profile = await fs.mkdtemp(`${os.tmpdir()}/mnx-studio-editor-browser-`);
 const chrome = spawn(process.env.CHROME_BIN ?? 'google-chrome',['--headless=new','--no-sandbox','--disable-dev-shm-usage','--window-size=1280,900','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],{stdio:'ignore'});
 let ws;
 try {

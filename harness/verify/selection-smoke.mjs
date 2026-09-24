@@ -1,3 +1,4 @@
+import os from 'node:os';
 import { waitFor, settle, SCORE_READY } from './browserHarness.mjs';
 // The selection overlay, driven in a real browser — the first test this layer
 // has ever had, and the reason it needed one: three separate bugs put the
@@ -183,7 +184,7 @@ try {
     throw new Error('dist/client/workbench/index.html missing — run `npm run build` first');
   }
   site = await serve(DIST);
-  const profile = fs.mkdtempSync('/tmp/mnx-selection-smoke-');
+  const profile = fs.mkdtempSync(`${os.tmpdir()}/mnx-selection-smoke-`);
   chrome = spawn(
     process.env.CHROME_BIN ?? 'google-chrome',
     ['--headless=new', '--remote-debugging-port=0', '--disable-gpu', '--no-sandbox',
