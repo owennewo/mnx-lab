@@ -1,0 +1,55 @@
+{
+  "id": "01g-Pitches-AllArrowAccidentals",
+  "sourceSha256": "a1144e8aec23ed46bf0750a07b13845a770ec40a040f8514c2394fc100e5622f",
+  "testClass": "feature",
+  "description": "Complete range of quartertone accidentals with arrows from MusicXML 3.1: sharp-down, sharp-up, natural-down, natural-up, flat-down, flat-up, double-sharp-down, double-sharp-up, flat-flat-down, flat-flat-up, arrow-down, arrow-up.",
+  "views": [
+    {
+      "scrollTarget": "viewer",
+      "visibleWidth": 750,
+      "visibleHeight": 753.125,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        [
+          5
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [],
+      "scrollWidth": 750,
+      "scrollHeight": 753,
+      "clientWidth": 750,
+      "clientHeight": 753,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "importError": null,
+  "warnings": [],
+  "importedDocumentSha256": "46fbecfc3b8070a2dc92630557e6f982e436ee4f200725cf7dd80f006dcc32ae",
+  "displayOptions": {
+    "lyrics": "current",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

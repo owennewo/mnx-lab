@@ -1,0 +1,110 @@
+{
+  "kind": "implementation-loop agent assessment; real desktop controls, not human verification",
+  "fixture": "01a-Pitches-Pitches",
+  "shell": "workbench",
+  "sourceSha256": "ca77d3d279175451411b3c1730a05d375072a92fe2e1d68be7ce77afe1a0bc17",
+  "applicationCommit": "a88340607012436d79032cf907a536852307c559",
+  "captureScriptSha256": "fefa215ed7d0ea5320b1fa56dd98691f6c20a2c5c9ce0116d5735984971448d0",
+  "viewport": {
+    "width": 1440,
+    "height": 1000,
+    "deviceScaleFactor": 1
+  },
+  "actions": [
+    {
+      "key": "Enter",
+      "code": "Enter",
+      "modifiers": 0
+    },
+    {
+      "key": "Escape",
+      "code": "Escape",
+      "modifiers": 0
+    },
+    {
+      "key": "ArrowUp",
+      "code": "ArrowUp",
+      "modifiers": 1
+    },
+    {
+      "key": "z",
+      "code": "KeyZ",
+      "modifiers": 2
+    },
+    {
+      "key": "y",
+      "code": "KeyY",
+      "modifiers": 2
+    },
+    {
+      "key": "Delete",
+      "code": "Delete",
+      "modifiers": 0
+    },
+    {
+      "key": "z",
+      "code": "KeyZ",
+      "modifiers": 2
+    },
+    {
+      "key": "y",
+      "code": "KeyY",
+      "modifiers": 2
+    },
+    {
+      "key": "n",
+      "code": "KeyN",
+      "modifiers": 0
+    },
+    {
+      "key": "z",
+      "code": "KeyZ",
+      "modifiers": 2
+    },
+    {
+      "key": "y",
+      "code": "KeyY",
+      "modifiers": 2
+    }
+  ],
+  "tasks": [
+    {
+      "id": "change-pitch",
+      "verdict": "supported",
+      "structuralChange": true,
+      "unrelatedData": "exactly preserved outside the named field/event",
+      "undoRedo": "exact"
+    },
+    {
+      "id": "remove-note",
+      "verdict": "supported",
+      "structuralChange": true,
+      "unrelatedData": "exactly preserved outside the named field/event",
+      "undoRedo": "exact"
+    },
+    {
+      "id": "create-note",
+      "verdict": "supported",
+      "structuralChange": true,
+      "unrelatedData": "exactly preserved outside the named field/event",
+      "undoRedo": "exact"
+    }
+  ],
+  "browser": {
+    "protocolVersion": "1.3",
+    "product": "Chrome/153.0.8010.36",
+    "revision": "@507c6ee3e2f3b2ca0e660547e5b9ea4820c67f4c",
+    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+    "jsVersion": "15.3.76.10"
+  },
+  "entryPath": "Open… → original MusicXML",
+  "initialNotes": 108,
+  "initialInspector": "\n      \n      \n        \n          \n        event1\n      \n          note\n          1\n        —\n          \n            \n              add…\n          walking\n          \n          ?\n            \n            \n              pitch:G2at:0 → 1/4\n            \n            \n          \n          \n          \n          \n        \n        \n        \n        \n      \n    ",
+  "persistence": {
+    "route": "JSON panel → Copy document → harness file save → Open MNX",
+    "verdict": "exact",
+    "scope": "final edited state"
+  },
+  "consoleErrors": [],
+  "result": "passed"
+}

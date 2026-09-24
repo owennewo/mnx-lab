@@ -38,6 +38,16 @@ separates these findings from the unreviewed corpus. Continue from the shared
 fixture/feature inventory, then assess the `01a`–`01h` pitch and accidental
 family on the current app before expanding to the remaining families.
 
+**Pitch/accidental slice, 2026-09-24.** The eight `01a`–`01h` originals now have
+stable source-note variant IDs, [current feature/view and authoring
+dispositions](../../docs/musicxml-pitch-assessment.md), and retained both-shell
+evidence. Of 257 source pitches, 237 import exactly; 20 fractional alterations
+are diagnosed losses. Named glyphs and explicit enclosures reveal new gaps,
+captured in proposed item 24. Workbench MNX copy/reopen preserves the selected
+edits, while Studio GP storage loses 15 `01a` notes and all 16 `01e`
+accidental-display values; subsequent Library exports inherit those losses.
+Items 18/19 remain open for the rest of the suite and explicit unresolved tasks.
+
 ### The oracle we already own, and the assertion that would waste it
 
 `vendor/mnx/doctools/data.json` holds **27 `spectools.exampledocumentcomparison`
@@ -157,6 +167,7 @@ deliberately **not** enumerated in advance: item 8 decides them from evidence.
 | 21 | [Exact short durations](../complete/core-musicxml-short-durations.md) | Divisions account for written-duration denominators as well as tuplets; no zero-length metric notes in the measured corpus. XSD validity 336 → 340/344; three external export note tables now match. | accuracy | music21 + XSD + regression tests | **built 2026-09-22** |
 | 22 | [Render gaps](../complete/core-musicxml-render-gaps.md) | Preserve piano staves; diagnose microtonal/staff-line losses; contain unsupported-clef projection failures. Meter follow-up adds exact duration and display losses; not an exhaustive backlog. | accuracy | original XML + imported MNX + both-shell captures | **complete 2026-09-22** |
 | 23 | [Write gaps](../complete/core-musicxml-write-gaps.md) | Resolve missing title metadata before making an imported Studio version current, without bypassing the shared editor or GP storage policy; expose representable numeric meter ranges. | authoring | real Versions controls + refusal + persistence checks | **complete 2026-09-24** |
+| 24 | [Accidental fidelity](../proposed/core-musicxml-accidental-fidelity.md) | Preserve and draw explicit enclosures; diagnose named accidental glyph loss; expose the missing note-inspector choices and resolve the measured Studio GP persistence loss. Deduplicates item 22's fractional-pitch work and item 23's title workflow. | accuracy + authoring | 01a–01h source/import/browser/editor/save-route evidence | **proposed 2026-09-24** |
 | — | Feature parity | Dynamics, wedges, spanners, ottavas, articulations, SMuFL glyph names, percussion, layout breaks. **Deliberately unenumerated**: item 8 turns these into a ranked queue with evidence, and each becomes its own row when picked up. Note the schema already has `dynamic-*`, `ottava`, `slur` and `wedge-type` as standard objects — but **no pedal def**, so pedal is contract clause 2's first real test. | accuracy | 1 + 2 + 3 | not yet rows |
 
 ### Item 8's derivation rule
@@ -190,6 +201,36 @@ exactly as `verified` already works here. No backend: a generated JSON artifact
 committed to the repo, like `worker/models.json`.
 
 ## Progress + learnings
+
+### 2026-09-24 — items 18/19: 01a–01h pitch and accidental slice
+
+[The source-to-MNX and current both-shell assessment](../../docs/musicxml-pitch-assessment.md)
+records 11 feature IDs over all eight originals, with 22 Notation feature/view
+rows, 88 create/inspect/change/remove rows and 55 separately classified
+persistence rows. Every source note has a stable variant ID. The 183-file
+historical sweep was not upgraded to a feature verdict. The eight originals
+declare no strings, so Tab/Both were correctly excluded. Display preferences
+and actual scroll hosts were checked before judging absent content.
+
+Ordinary pitches, intervals, accidentals and the lyric on an omitted-voice
+note display as expected in this bounded review. Twenty fractional pitches
+remain lossy with explicit warnings under item 22. `01e` drops explicit
+enclosures on import, and the real inspector can write a parenthesis that the
+engine still does not draw. All 26 named arrow/Turkish/Persian glyphs in
+`01g`/`01h` collapse to ordinary natural signs without a warning. Source
+default styling makes eight `01e` and three `01f` variant glyph outcomes
+unresolved, even though their qualification flags are known to be lost.
+
+Workbench and editable Studio both passed exact structural/history probes
+for a first-note pitch change/delete/create and a parenthesis show/remove/
+change sequence. Studio's GP checkpoint still loses 15 of 108 `01a` notes;
+on `01e` it keeps 16 notes but loses all 16 accidental-display objects.
+Library MNX, MusicXML and GP7 downloads reopen from that canonical GP and
+inherit its losses. This is a persistence finding, not a title-workflow
+regression. [Proposed item 24](../proposed/core-musicxml-accidental-fidelity.md)
+contains only the new or still unfixed bounded gaps and names item 22/23
+overlap. Neither assessment is complete; unresolved authoring variants and
+the other fixture families remain explicit work.
 
 ### 2026-09-24 — handoff: selected gaps closed, assessments remain open
 

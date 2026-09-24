@@ -159,3 +159,17 @@ library title survive. Start with the shared `01a`–`01h` feature IDs: define
 create/inspect/change/remove tasks, exercise real desktop Workbench and editable
 Studio paths, check structural changes and undo/redo, and mark each applicable
 save/reopen route separately. Record blocked and unresolved tasks explicitly.
+
+## Pitch/accidental batch, 2026-09-24
+
+[The 01a–01h report](../../docs/musicxml-pitch-assessment.md) defines 88
+feature × shell × create/inspect/change/remove task rows and 55 save-route
+rows with supported subsets, blockers and unresolved cases explicit. Real
+desktop probes in both shells cover selected `01a` note operations and `01e`
+accidental show/parentheses/remove with exact structural checks and undo/redo.
+Workbench MNX copy/reopen is exact for those final edits. Studio's editable
+version workflow works, but GP reload loses 15 `01a` notes and all 16 `01e`
+accidental-display objects; Library MNX, MusicXML and GP7 downloads inherit
+the saved GP state. [Proposed item 24](../proposed/core-musicxml-accidental-fidelity.md)
+owns the new qualifier and persistence gaps. Untested source variants remain
+unresolved, and this item is still in progress.

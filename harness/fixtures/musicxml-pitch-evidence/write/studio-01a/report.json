@@ -1,0 +1,402 @@
+{
+  "kind": "implementation-loop agent assessment; real desktop controls, not human verification",
+  "fixture": "01a-Pitches-Pitches",
+  "shell": "studio",
+  "sourceSha256": "ca77d3d279175451411b3c1730a05d375072a92fe2e1d68be7ce77afe1a0bc17",
+  "applicationCommit": "a88340607012436d79032cf907a536852307c559",
+  "captureScriptSha256": "fefa215ed7d0ea5320b1fa56dd98691f6c20a2c5c9ce0116d5735984971448d0",
+  "viewport": {
+    "width": 1440,
+    "height": 1000,
+    "deviceScaleFactor": 1
+  },
+  "actions": [
+    {
+      "key": "Enter",
+      "code": "Enter",
+      "modifiers": 0
+    },
+    {
+      "key": "Escape",
+      "code": "Escape",
+      "modifiers": 0
+    },
+    {
+      "key": "ArrowUp",
+      "code": "ArrowUp",
+      "modifiers": 1
+    },
+    {
+      "key": "z",
+      "code": "KeyZ",
+      "modifiers": 2
+    },
+    {
+      "key": "y",
+      "code": "KeyY",
+      "modifiers": 2
+    },
+    {
+      "key": "Delete",
+      "code": "Delete",
+      "modifiers": 0
+    },
+    {
+      "key": "z",
+      "code": "KeyZ",
+      "modifiers": 2
+    },
+    {
+      "key": "y",
+      "code": "KeyY",
+      "modifiers": 2
+    },
+    {
+      "key": "n",
+      "code": "KeyN",
+      "modifiers": 0
+    },
+    {
+      "key": "z",
+      "code": "KeyZ",
+      "modifiers": 2
+    },
+    {
+      "key": "y",
+      "code": "KeyY",
+      "modifiers": 2
+    }
+  ],
+  "tasks": [
+    {
+      "id": "change-pitch",
+      "verdict": "supported",
+      "structuralChange": true,
+      "unrelatedData": "exactly preserved outside the named field/event",
+      "undoRedo": "exact"
+    },
+    {
+      "id": "remove-note",
+      "verdict": "supported",
+      "structuralChange": true,
+      "unrelatedData": "exactly preserved outside the named field/event",
+      "undoRedo": "exact"
+    },
+    {
+      "id": "create-note",
+      "verdict": "supported",
+      "structuralChange": true,
+      "unrelatedData": "exactly preserved outside the named field/event",
+      "undoRedo": "exact"
+    }
+  ],
+  "browser": {
+    "protocolVersion": "1.3",
+    "product": "Chrome/153.0.8010.36",
+    "revision": "@507c6ee3e2f3b2ca0e660547e5b9ea4820c67f4c",
+    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+    "jsVersion": "15.3.76.10"
+  },
+  "entryPath": "private operator ingest → Saved → Versions → View XML → Make current → Library title",
+  "originalSha256AfterPromotion": "ca77d3d279175451411b3c1730a05d375072a92fe2e1d68be7ce77afe1a0bc17",
+  "initialNotes": 108,
+  "initialInspector": "\n      \n      \n        \n          \n        event1\n      \n          note\n          1\n        —\n          \n            \n              add…\n          walking\n          \n          ?\n            \n            \n              pitch:G2at:0 → 1/4\n            \n            \n          \n          \n          \n          \n        \n        \n        \n        \n      \n    ",
+  "storageLosses": [
+    {
+      "path": "mnx/support",
+      "kind": "lost",
+      "was": "{\"useAccidentalDisplay\":true}"
+    },
+    {
+      "path": "global/measures/0/time/display",
+      "kind": "lost",
+      "was": "\"common\""
+    },
+    {
+      "path": "global/measures/26/barline",
+      "kind": "lost",
+      "was": "{\"type\":\"final\"}"
+    },
+    {
+      "path": "parts/0/measures/6/sequences/0/content/3/notes",
+      "kind": "lost",
+      "was": "[{\"pitch\":{\"step\":\"F\",\"octave\":6}}]"
+    },
+    {
+      "path": "parts/0/measures/7/sequences/0/content/0/notes",
+      "kind": "lost",
+      "was": "[{\"pitch\":{\"step\":\"G\",\"octave\":6}}]"
+    },
+    {
+      "path": "parts/0/measures/7/sequences/0/content/1/notes",
+      "kind": "lost",
+      "was": "[{\"pitch\":{\"step\":\"A\",\"octave\":6}}]"
+    },
+    {
+      "path": "parts/0/measures/7/sequences/0/content/2/notes",
+      "kind": "lost",
+      "was": "[{\"pitch\":{\"step\":\"B\",\"octave\":6}}]"
+    },
+    {
+      "path": "parts/0/measures/7/sequences/0/content/3/notes",
+      "kind": "lost",
+      "was": "[{\"pitch\":{\"step\":\"C\",\"octave\":7}}]"
+    },
+    {
+      "path": "parts/0/measures/8/sequences/0/content/0/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    },
+    {
+      "path": "parts/0/measures/8/sequences/0/content/1/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    },
+    {
+      "path": "parts/0/measures/8/sequences/0/content/2/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    },
+    {
+      "path": "parts/0/measures/8/sequences/0/content/3/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    },
+    {
+      "path": "parts/0/measures/9/sequences/0/content/0/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    },
+    {
+      "path": "parts/0/measures/9/sequences/0/content/1/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    },
+    {
+      "path": "parts/0/measures/9/sequences/0/content/2/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    },
+    {
+      "path": "parts/0/measures/9/sequences/0/content/3/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    },
+    {
+      "path": "parts/0/measures/10/sequences/0/content/0/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    },
+    {
+      "path": "parts/0/measures/10/sequences/0/content/1/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    },
+    {
+      "path": "parts/0/measures/10/sequences/0/content/2/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    },
+    {
+      "path": "parts/0/measures/10/sequences/0/content/3/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    },
+    {
+      "path": "parts/0/measures/11/sequences/0/content/0/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    },
+    {
+      "path": "parts/0/measures/11/sequences/0/content/1/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    },
+    {
+      "path": "parts/0/measures/11/sequences/0/content/2/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    },
+    {
+      "path": "parts/0/measures/11/sequences/0/content/3/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    },
+    {
+      "path": "parts/0/measures/12/sequences/0/content/0/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    },
+    {
+      "path": "parts/0/measures/12/sequences/0/content/1/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    },
+    {
+      "path": "parts/0/measures/12/sequences/0/content/2/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    },
+    {
+      "path": "parts/0/measures/12/sequences/0/content/3/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    },
+    {
+      "path": "parts/0/measures/13/sequences/0/content/0/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    },
+    {
+      "path": "parts/0/measures/13/sequences/0/content/1/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    },
+    {
+      "path": "parts/0/measures/13/sequences/0/content/2/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    },
+    {
+      "path": "parts/0/measures/13/sequences/0/content/3/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    },
+    {
+      "path": "parts/0/measures/14/sequences/0/content/0/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    },
+    {
+      "path": "parts/0/measures/14/sequences/0/content/1/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    },
+    {
+      "path": "parts/0/measures/14/sequences/0/content/2/notes",
+      "kind": "lost",
+      "was": "[{\"pitch\":{\"step\":\"E\",\"octave\":6,\"alter\":1},\"accidentalDisplay\":{\"show\":true}}]"
+    },
+    {
+      "path": "parts/0/measures/14/sequences/0/content/3/notes",
+      "kind": "lost",
+      "was": "[{\"pitch\":{\"step\":\"F\",\"octave\":6,\"alter\":1},\"accidentalDisplay\":{\"show\":true}}]"
+    },
+    {
+      "path": "parts/0/measures/15/sequences/0/content/0/notes",
+      "kind": "lost",
+      "was": "[{\"pitch\":{\"step\":\"G\",\"octave\":6,\"alter\":1},\"accidentalDisplay\":{\"show\":true}}]"
+    },
+    {
+      "path": "parts/0/measures/15/sequences/0/content/1/notes",
+      "kind": "lost",
+      "was": "[{\"pitch\":{\"step\":\"A\",\"octave\":6,\"alter\":1},\"accidentalDisplay\":{\"show\":true}}]"
+    },
+    {
+      "path": "parts/0/measures/15/sequences/0/content/2/notes",
+      "kind": "lost",
+      "was": "[{\"pitch\":{\"step\":\"B\",\"octave\":6,\"alter\":1},\"accidentalDisplay\":{\"show\":true}}]"
+    },
+    {
+      "path": "parts/0/measures/15/sequences/0/content/3/notes",
+      "kind": "lost",
+      "was": "[{\"pitch\":{\"step\":\"C\",\"octave\":7,\"alter\":1},\"accidentalDisplay\":{\"show\":true}}]"
+    },
+    {
+      "path": "parts/0/measures/16/sequences/0/content/0/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    },
+    {
+      "path": "parts/0/measures/16/sequences/0/content/1/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    },
+    {
+      "path": "parts/0/measures/16/sequences/0/content/2/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    },
+    {
+      "path": "parts/0/measures/16/sequences/0/content/3/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    },
+    {
+      "path": "parts/0/measures/17/sequences/0/content/0/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    },
+    {
+      "path": "parts/0/measures/17/sequences/0/content/1/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    },
+    {
+      "path": "parts/0/measures/17/sequences/0/content/2/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    },
+    {
+      "path": "parts/0/measures/17/sequences/0/content/3/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    },
+    {
+      "path": "parts/0/measures/18/sequences/0/content/0/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    },
+    {
+      "path": "parts/0/measures/18/sequences/0/content/1/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    }
+  ],
+  "persistence": {
+    "route": "Save now → GP storage → page reload",
+    "verdict": "lossy",
+    "beforeNotes": 108,
+    "afterNotes": 93,
+    "beforeFirstAccidental": null,
+    "afterFirstAccidental": null
+  },
+  "originalSha256AfterCheckpoint": "ca77d3d279175451411b3c1730a05d375072a92fe2e1d68be7ce77afe1a0bc17",
+  "libraryExports": [
+    {
+      "format": "mnx",
+      "control": "Library → Export… → MNX",
+      "filename": "01a-Pitches-Pitches.mnx.json",
+      "sha256": "865556562b16b4e6d4296064411d75e3bc59602615d4048b33f2f31ae44d35c7",
+      "bytes": 64566,
+      "notice": "Export ready.",
+      "reopenError": null,
+      "reopenedNotes": 93,
+      "reopenedFirstAccidental": null
+    },
+    {
+      "format": "musicxml",
+      "control": "Library → Export… → MusicXML",
+      "filename": "01a-Pitches-Pitches.musicxml",
+      "sha256": "85ae22eae663bc98ae9443d5fd9eb2aa1305d85a36d4f3318348520d8a7c16aa",
+      "bytes": 38993,
+      "notice": "Export ready.",
+      "reopenError": null,
+      "reopenedNotes": 93,
+      "reopenedFirstAccidental": null
+    },
+    {
+      "format": "gp7",
+      "control": "Library → Export… → Guitar Pro 7",
+      "filename": "01a-Pitches-Pitches.gp",
+      "sha256": "b16891b8b55142d5af88dffcd592f302396ebb11bfd4decbd934947f7bfbedd1",
+      "bytes": 73596,
+      "notice": "Export ready.",
+      "reopenError": null,
+      "reopenedNotes": 93,
+      "reopenedFirstAccidental": null
+    }
+  ],
+  "consoleErrors": [],
+  "result": "passed"
+}

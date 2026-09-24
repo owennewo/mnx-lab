@@ -1,0 +1,321 @@
+{
+  "kind": "implementation-loop agent assessment; real desktop controls, not human verification",
+  "fixture": "01e-Pitches-ParenthesizedAccidentals",
+  "shell": "studio",
+  "sourceSha256": "76c4977cab6cf9f68c53cc6785dfa830675462e291f990224880ae2ccf535de5",
+  "applicationCommit": "a88340607012436d79032cf907a536852307c559",
+  "captureScriptSha256": "fefa215ed7d0ea5320b1fa56dd98691f6c20a2c5c9ce0116d5735984971448d0",
+  "viewport": {
+    "width": 1440,
+    "height": 1000,
+    "deviceScaleFactor": 1
+  },
+  "actions": [
+    {
+      "key": "Enter",
+      "code": "Enter",
+      "modifiers": 0
+    },
+    {
+      "key": "Escape",
+      "code": "Escape",
+      "modifiers": 0
+    },
+    {
+      "key": "Enter",
+      "code": "Enter",
+      "modifiers": 0
+    },
+    {
+      "typed": "no accidental"
+    },
+    {
+      "key": "Enter",
+      "code": "Enter",
+      "modifiers": 0
+    },
+    {
+      "key": "Escape",
+      "code": "Escape",
+      "modifiers": 0
+    },
+    {
+      "key": "z",
+      "code": "KeyZ",
+      "modifiers": 2
+    },
+    {
+      "key": "y",
+      "code": "KeyY",
+      "modifiers": 2
+    },
+    {
+      "key": "Enter",
+      "code": "Enter",
+      "modifiers": 0
+    },
+    {
+      "typed": "accidental parens"
+    },
+    {
+      "key": "Enter",
+      "code": "Enter",
+      "modifiers": 0
+    },
+    {
+      "key": "Escape",
+      "code": "Escape",
+      "modifiers": 0
+    },
+    {
+      "key": "z",
+      "code": "KeyZ",
+      "modifiers": 2
+    },
+    {
+      "key": "y",
+      "code": "KeyY",
+      "modifiers": 2
+    },
+    {
+      "key": "Enter",
+      "code": "Enter",
+      "modifiers": 0
+    },
+    {
+      "typed": "accidental show"
+    },
+    {
+      "key": "Enter",
+      "code": "Enter",
+      "modifiers": 0
+    },
+    {
+      "key": "Escape",
+      "code": "Escape",
+      "modifiers": 0
+    },
+    {
+      "key": "z",
+      "code": "KeyZ",
+      "modifiers": 2
+    },
+    {
+      "key": "y",
+      "code": "KeyY",
+      "modifiers": 2
+    },
+    {
+      "key": "Enter",
+      "code": "Enter",
+      "modifiers": 0
+    },
+    {
+      "typed": "accidental parens"
+    },
+    {
+      "key": "Enter",
+      "code": "Enter",
+      "modifiers": 0
+    },
+    {
+      "key": "Escape",
+      "code": "Escape",
+      "modifiers": 0
+    },
+    {
+      "key": "z",
+      "code": "KeyZ",
+      "modifiers": 2
+    },
+    {
+      "key": "y",
+      "code": "KeyY",
+      "modifiers": 2
+    }
+  ],
+  "tasks": [
+    {
+      "id": "remove-explicit-accidental",
+      "verdict": "supported",
+      "structuralChange": true,
+      "unrelatedData": "exactly preserved outside the named field/event",
+      "undoRedo": "exact"
+    },
+    {
+      "id": "create-parenthesized-accidental",
+      "verdict": "supported",
+      "structuralChange": true,
+      "unrelatedData": "exactly preserved outside the named field/event",
+      "undoRedo": "exact"
+    },
+    {
+      "id": "change-to-plain-accidental",
+      "verdict": "supported",
+      "structuralChange": true,
+      "unrelatedData": "exactly preserved outside the named field/event",
+      "undoRedo": "exact"
+    },
+    {
+      "id": "change-back-to-parentheses",
+      "verdict": "supported",
+      "structuralChange": true,
+      "unrelatedData": "exactly preserved outside the named field/event",
+      "undoRedo": "exact"
+    }
+  ],
+  "browser": {
+    "protocolVersion": "1.3",
+    "product": "Chrome/153.0.8010.36",
+    "revision": "@507c6ee3e2f3b2ca0e660547e5b9ea4820c67f4c",
+    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+    "jsVersion": "15.3.76.10"
+  },
+  "entryPath": "private operator ingest → Saved → Versions → View XML → Make current → Library title",
+  "originalSha256AfterPromotion": "76c4977cab6cf9f68c53cc6785dfa830675462e291f990224880ae2ccf535de5",
+  "initialNotes": 16,
+  "initialInspector": "\n      \n      \n        \n          \n        event1\n      \n          note\n          1\n        —\n          \n            \n              add…\n          walking\n          \n          ?\n            \n            \n              pitch:Db4accidental:showat:0 → 1/4\n            \n            \n          \n          \n          \n          \n        \n        \n        \n        \n      \n    ",
+  "storageLosses": [
+    {
+      "path": "mnx/support",
+      "kind": "lost",
+      "was": "{\"useAccidentalDisplay\":true}"
+    },
+    {
+      "path": "global/measures/0/time/display",
+      "kind": "lost",
+      "was": "\"common\""
+    },
+    {
+      "path": "parts/0/measures/0/sequences/0/content/0/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true,\"enclosure\":{\"symbol\":\"parentheses\"}}"
+    },
+    {
+      "path": "parts/0/measures/0/sequences/0/content/1/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    },
+    {
+      "path": "parts/0/measures/0/sequences/0/content/2/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    },
+    {
+      "path": "parts/0/measures/0/sequences/0/content/3/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    },
+    {
+      "path": "parts/0/measures/1/sequences/0/content/0/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    },
+    {
+      "path": "parts/0/measures/1/sequences/0/content/1/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    },
+    {
+      "path": "parts/0/measures/1/sequences/0/content/2/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    },
+    {
+      "path": "parts/0/measures/1/sequences/0/content/3/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    },
+    {
+      "path": "parts/0/measures/2/sequences/0/content/0/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    },
+    {
+      "path": "parts/0/measures/2/sequences/0/content/1/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    },
+    {
+      "path": "parts/0/measures/2/sequences/0/content/2/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    },
+    {
+      "path": "parts/0/measures/2/sequences/0/content/3/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    },
+    {
+      "path": "parts/0/measures/3/sequences/0/content/0/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    },
+    {
+      "path": "parts/0/measures/3/sequences/0/content/1/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    },
+    {
+      "path": "parts/0/measures/3/sequences/0/content/2/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    },
+    {
+      "path": "parts/0/measures/3/sequences/0/content/3/notes/0/accidentalDisplay",
+      "kind": "lost",
+      "was": "{\"show\":true}"
+    }
+  ],
+  "persistence": {
+    "route": "Save now → GP storage → page reload",
+    "verdict": "lossy",
+    "beforeNotes": 16,
+    "afterNotes": 16,
+    "beforeFirstAccidental": {
+      "show": true,
+      "enclosure": {
+        "symbol": "parentheses"
+      }
+    },
+    "afterFirstAccidental": null
+  },
+  "originalSha256AfterCheckpoint": "76c4977cab6cf9f68c53cc6785dfa830675462e291f990224880ae2ccf535de5",
+  "libraryExports": [
+    {
+      "format": "mnx",
+      "control": "Library → Export… → MNX",
+      "filename": "01e-Pitches-ParenthesizedAccidentals.mnx.json",
+      "sha256": "fe5b3772dd906c6dde32559c86c019c67481d021284b7fc8d3f8fd69b2a7d0ad",
+      "bytes": 12302,
+      "notice": "Export ready.",
+      "reopenError": null,
+      "reopenedNotes": 16,
+      "reopenedFirstAccidental": null
+    },
+    {
+      "format": "musicxml",
+      "control": "Library → Export… → MusicXML",
+      "filename": "01e-Pitches-ParenthesizedAccidentals.musicxml",
+      "sha256": "814d123f498a4dcb34aba2f434f0c5850a2db41c9122d7ae4f6ec7ee28447673",
+      "bytes": 7642,
+      "notice": "Export ready.",
+      "reopenError": null,
+      "reopenedNotes": 16,
+      "reopenedFirstAccidental": null
+    },
+    {
+      "format": "gp7",
+      "control": "Library → Export… → Guitar Pro 7",
+      "filename": "01e-Pitches-ParenthesizedAccidentals.gp",
+      "sha256": "8f0f6f2ce615e7453b971c7aed25b7e8c20db7155a345fd745816f3463f766f1",
+      "bytes": 14752,
+      "notice": "Export ready.",
+      "reopenError": null,
+      "reopenedNotes": 16,
+      "reopenedFirstAccidental": null
+    }
+  ],
+  "consoleErrors": [],
+  "result": "passed"
+}

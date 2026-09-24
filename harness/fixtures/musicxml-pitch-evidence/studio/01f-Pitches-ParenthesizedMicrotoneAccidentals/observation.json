@@ -1,0 +1,69 @@
+{
+  "id": "01f-Pitches-ParenthesizedMicrotoneAccidentals",
+  "sourceSha256": "ba8ab15092f24a686de784270b73d9fc548c80ef18765eb6e4bfe81aba5e2ea9",
+  "testClass": "feature",
+  "description": "Microtone accidentals can be cautionary or editorial. Each measure has a normal accidental, an editorial, a cautionary, and an editiorial and cautionary accidental.",
+  "views": [
+    {
+      "scrollTarget": "frame",
+      "visibleWidth": 1060,
+      "visibleHeight": 870,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0,
+          1,
+          2,
+          3
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [],
+      "scrollWidth": 1060,
+      "scrollHeight": 870,
+      "clientWidth": 1060,
+      "clientHeight": 870,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "suppliedLibraryTitle": "01f-Pitches-ParenthesizedMicrotoneAccidentals",
+  "makeCurrentError": null,
+  "entryPath": "Local operator ingest: GP seed + unmodified XML original; Save → Versions → View XML → Make current",
+  "importError": null,
+  "viewingOriginal": false,
+  "editingSuspended": false,
+  "warnings": [
+    "part P1, measure 1, note 1 (D4): fractional pitch alteration -0.5 is not representable in published MNX; using integer alteration 0. Original pitch is lost.",
+    "part P1, measure 1, note 2 (D4): fractional pitch alteration -0.5 is not representable in published MNX; using integer alteration 0. Original pitch is lost.",
+    "part P1, measure 1, note 3 (D4): fractional pitch alteration -0.5 is not representable in published MNX; using integer alteration 0. Original pitch is lost.",
+    "part P1, measure 1, note 4 (D4): fractional pitch alteration -0.5 is not representable in published MNX; using integer alteration 0. Original pitch is lost.",
+    "part P1, measure 3, note 1 (D4): fractional pitch alteration -1.5 is not representable in published MNX; using integer alteration -1. Original pitch is lost.",
+    "part P1, measure 3, note 2 (D4): fractional pitch alteration -1.5 is not representable in published MNX; using integer alteration -1. Original pitch is lost.",
+    "part P1, measure 3, note 3 (D4): fractional pitch alteration -1.5 is not representable in published MNX; using integer alteration -1. Original pitch is lost.",
+    "part P1, measure 3, note 4 (D4): fractional pitch alteration -1.5 is not representable in published MNX; using integer alteration -1. Original pitch is lost.",
+    "part P1, measure 4, note 1 (C4): fractional pitch alteration 1.5 is not representable in published MNX; using integer alteration 1. Original pitch is lost.",
+    "part P1, measure 4, note 2 (C4): fractional pitch alteration 1.5 is not representable in published MNX; using integer alteration 1. Original pitch is lost.",
+    "part P1, measure 4, note 3 (C4): fractional pitch alteration 1.5 is not representable in published MNX; using integer alteration 1. Original pitch is lost.",
+    "part P1, measure 4, note 4 (C4): fractional pitch alteration 1.5 is not representable in published MNX; using integer alteration 1. Original pitch is lost."
+  ],
+  "importedDocumentSha256": "d045b5f20e041f312c1d1710a400f1a2ef0310f6cd1b7a47d4904a5052768c57",
+  "displayOptions": {
+    "lyrics": "current",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

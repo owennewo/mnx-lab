@@ -1,0 +1,3011 @@
+{
+  "kind": "implementation-loop agent assessment; feature and task verdicts are not human scenario verification",
+  "corpusRevision": "77c19f7e819154c70ca1a1992e80dcda8ff82fea",
+  "applicationCommit": "a88340607012436d79032cf907a536852307c559",
+  "scope": "Eight 01a–01h originals. Source → browser-imported MNX → all applicable notation views. Direct desktop task probes use 01a and 01e; other task variants have explicit unresolved/blocked dispositions.",
+  "fixtureCount": 8,
+  "featureCount": 11,
+  "sourceNoteVariantCount": 257,
+  "sourcePitchMatchCount": 237,
+  "browser": "Chrome/153.0.8010.36",
+  "viewport": {
+    "width": 1440,
+    "height": 1000,
+    "deviceScaleFactor": 1
+  },
+  "viewPolicy": "Originals declare no strings; notation only. Time signatures were explicitly set to Show; effective display options and actual scroller tiles are in each observation.",
+  "features": [
+    {
+      "id": "01a.pitch-sequence",
+      "fixture": "01a-Pitches-Pitches",
+      "expected": "All 108 source notes ascend G2–C7 in unaltered, sharp and flat runs; pitch spelling and placement remain readable across 27 bars.",
+      "variantIds": [
+        "01a-Pitches-Pitches/m01/n01",
+        "01a-Pitches-Pitches/m01/n02",
+        "01a-Pitches-Pitches/m01/n03",
+        "01a-Pitches-Pitches/m01/n04",
+        "01a-Pitches-Pitches/m02/n01",
+        "01a-Pitches-Pitches/m02/n02",
+        "01a-Pitches-Pitches/m02/n03",
+        "01a-Pitches-Pitches/m02/n04",
+        "01a-Pitches-Pitches/m03/n01",
+        "01a-Pitches-Pitches/m03/n02",
+        "01a-Pitches-Pitches/m03/n03",
+        "01a-Pitches-Pitches/m03/n04",
+        "01a-Pitches-Pitches/m04/n01",
+        "01a-Pitches-Pitches/m04/n02",
+        "01a-Pitches-Pitches/m04/n03",
+        "01a-Pitches-Pitches/m04/n04",
+        "01a-Pitches-Pitches/m05/n01",
+        "01a-Pitches-Pitches/m05/n02",
+        "01a-Pitches-Pitches/m05/n03",
+        "01a-Pitches-Pitches/m05/n04",
+        "01a-Pitches-Pitches/m06/n01",
+        "01a-Pitches-Pitches/m06/n02",
+        "01a-Pitches-Pitches/m06/n03",
+        "01a-Pitches-Pitches/m06/n04",
+        "01a-Pitches-Pitches/m07/n01",
+        "01a-Pitches-Pitches/m07/n02",
+        "01a-Pitches-Pitches/m07/n03",
+        "01a-Pitches-Pitches/m07/n04",
+        "01a-Pitches-Pitches/m08/n01",
+        "01a-Pitches-Pitches/m08/n02",
+        "01a-Pitches-Pitches/m08/n03",
+        "01a-Pitches-Pitches/m08/n04",
+        "01a-Pitches-Pitches/m09/n01",
+        "01a-Pitches-Pitches/m09/n02",
+        "01a-Pitches-Pitches/m09/n03",
+        "01a-Pitches-Pitches/m09/n04",
+        "01a-Pitches-Pitches/m10/n01",
+        "01a-Pitches-Pitches/m10/n02",
+        "01a-Pitches-Pitches/m10/n03",
+        "01a-Pitches-Pitches/m10/n04",
+        "01a-Pitches-Pitches/m11/n01",
+        "01a-Pitches-Pitches/m11/n02",
+        "01a-Pitches-Pitches/m11/n03",
+        "01a-Pitches-Pitches/m11/n04",
+        "01a-Pitches-Pitches/m12/n01",
+        "01a-Pitches-Pitches/m12/n02",
+        "01a-Pitches-Pitches/m12/n03",
+        "01a-Pitches-Pitches/m12/n04",
+        "01a-Pitches-Pitches/m13/n01",
+        "01a-Pitches-Pitches/m13/n02",
+        "01a-Pitches-Pitches/m13/n03",
+        "01a-Pitches-Pitches/m13/n04",
+        "01a-Pitches-Pitches/m14/n01",
+        "01a-Pitches-Pitches/m14/n02",
+        "01a-Pitches-Pitches/m14/n03",
+        "01a-Pitches-Pitches/m14/n04",
+        "01a-Pitches-Pitches/m15/n01",
+        "01a-Pitches-Pitches/m15/n02",
+        "01a-Pitches-Pitches/m15/n03",
+        "01a-Pitches-Pitches/m15/n04",
+        "01a-Pitches-Pitches/m16/n01",
+        "01a-Pitches-Pitches/m16/n02",
+        "01a-Pitches-Pitches/m16/n03",
+        "01a-Pitches-Pitches/m16/n04",
+        "01a-Pitches-Pitches/m17/n01",
+        "01a-Pitches-Pitches/m17/n02",
+        "01a-Pitches-Pitches/m17/n03",
+        "01a-Pitches-Pitches/m17/n04",
+        "01a-Pitches-Pitches/m18/n01",
+        "01a-Pitches-Pitches/m18/n02",
+        "01a-Pitches-Pitches/m18/n03",
+        "01a-Pitches-Pitches/m18/n04",
+        "01a-Pitches-Pitches/m19/n01",
+        "01a-Pitches-Pitches/m19/n02",
+        "01a-Pitches-Pitches/m19/n03",
+        "01a-Pitches-Pitches/m19/n04",
+        "01a-Pitches-Pitches/m20/n01",
+        "01a-Pitches-Pitches/m20/n02",
+        "01a-Pitches-Pitches/m20/n03",
+        "01a-Pitches-Pitches/m20/n04",
+        "01a-Pitches-Pitches/m21/n01",
+        "01a-Pitches-Pitches/m21/n02",
+        "01a-Pitches-Pitches/m21/n03",
+        "01a-Pitches-Pitches/m21/n04",
+        "01a-Pitches-Pitches/m22/n01",
+        "01a-Pitches-Pitches/m22/n02",
+        "01a-Pitches-Pitches/m22/n03",
+        "01a-Pitches-Pitches/m22/n04",
+        "01a-Pitches-Pitches/m23/n01",
+        "01a-Pitches-Pitches/m23/n02",
+        "01a-Pitches-Pitches/m23/n03",
+        "01a-Pitches-Pitches/m23/n04",
+        "01a-Pitches-Pitches/m24/n01",
+        "01a-Pitches-Pitches/m24/n02",
+        "01a-Pitches-Pitches/m24/n03",
+        "01a-Pitches-Pitches/m24/n04",
+        "01a-Pitches-Pitches/m25/n01",
+        "01a-Pitches-Pitches/m25/n02",
+        "01a-Pitches-Pitches/m25/n03",
+        "01a-Pitches-Pitches/m25/n04",
+        "01a-Pitches-Pitches/m26/n01",
+        "01a-Pitches-Pitches/m26/n02",
+        "01a-Pitches-Pitches/m26/n03",
+        "01a-Pitches-Pitches/m26/n04",
+        "01a-Pitches-Pitches/m27/n01",
+        "01a-Pitches-Pitches/m27/n02",
+        "01a-Pitches-Pitches/m27/n03",
+        "01a-Pitches-Pitches/m27/n04"
+      ],
+      "variantCount": 108,
+      "sourceDescription": "All pitches from G to c’’’’ in ascending steps. First without accidentals, then with a sharp, and then with a flat accidental. Measures 25 and 26 show explicit natural accidentals; measure 27 displays double alterations, cautionary, and editorial accidentals."
+    },
+    {
+      "id": "01a.explicit-accidentals",
+      "fixture": "01a-Pitches-Pitches",
+      "expected": "Sharp and flat runs, explicit naturals in bars 25–26, and double sharp / double flat in bar 27 retain their ordinary symbol and note pitch.",
+      "variantIds": [
+        "01a-Pitches-Pitches/m09/n01",
+        "01a-Pitches-Pitches/m09/n02",
+        "01a-Pitches-Pitches/m09/n03",
+        "01a-Pitches-Pitches/m09/n04",
+        "01a-Pitches-Pitches/m10/n01",
+        "01a-Pitches-Pitches/m10/n02",
+        "01a-Pitches-Pitches/m10/n03",
+        "01a-Pitches-Pitches/m10/n04",
+        "01a-Pitches-Pitches/m11/n01",
+        "01a-Pitches-Pitches/m11/n02",
+        "01a-Pitches-Pitches/m11/n03",
+        "01a-Pitches-Pitches/m11/n04",
+        "01a-Pitches-Pitches/m12/n01",
+        "01a-Pitches-Pitches/m12/n02",
+        "01a-Pitches-Pitches/m12/n03",
+        "01a-Pitches-Pitches/m12/n04",
+        "01a-Pitches-Pitches/m13/n01",
+        "01a-Pitches-Pitches/m13/n02",
+        "01a-Pitches-Pitches/m13/n03",
+        "01a-Pitches-Pitches/m13/n04",
+        "01a-Pitches-Pitches/m14/n01",
+        "01a-Pitches-Pitches/m14/n02",
+        "01a-Pitches-Pitches/m14/n03",
+        "01a-Pitches-Pitches/m14/n04",
+        "01a-Pitches-Pitches/m15/n01",
+        "01a-Pitches-Pitches/m15/n02",
+        "01a-Pitches-Pitches/m15/n03",
+        "01a-Pitches-Pitches/m15/n04",
+        "01a-Pitches-Pitches/m16/n01",
+        "01a-Pitches-Pitches/m16/n02",
+        "01a-Pitches-Pitches/m16/n03",
+        "01a-Pitches-Pitches/m16/n04",
+        "01a-Pitches-Pitches/m17/n01",
+        "01a-Pitches-Pitches/m17/n02",
+        "01a-Pitches-Pitches/m17/n03",
+        "01a-Pitches-Pitches/m17/n04",
+        "01a-Pitches-Pitches/m18/n01",
+        "01a-Pitches-Pitches/m18/n02",
+        "01a-Pitches-Pitches/m18/n03",
+        "01a-Pitches-Pitches/m18/n04",
+        "01a-Pitches-Pitches/m19/n01",
+        "01a-Pitches-Pitches/m19/n02",
+        "01a-Pitches-Pitches/m19/n03",
+        "01a-Pitches-Pitches/m19/n04",
+        "01a-Pitches-Pitches/m20/n01",
+        "01a-Pitches-Pitches/m20/n02",
+        "01a-Pitches-Pitches/m20/n03",
+        "01a-Pitches-Pitches/m20/n04",
+        "01a-Pitches-Pitches/m21/n01",
+        "01a-Pitches-Pitches/m21/n02",
+        "01a-Pitches-Pitches/m21/n03",
+        "01a-Pitches-Pitches/m21/n04",
+        "01a-Pitches-Pitches/m22/n01",
+        "01a-Pitches-Pitches/m22/n02",
+        "01a-Pitches-Pitches/m22/n03",
+        "01a-Pitches-Pitches/m22/n04",
+        "01a-Pitches-Pitches/m23/n01",
+        "01a-Pitches-Pitches/m23/n02",
+        "01a-Pitches-Pitches/m23/n03",
+        "01a-Pitches-Pitches/m23/n04",
+        "01a-Pitches-Pitches/m24/n01",
+        "01a-Pitches-Pitches/m24/n02",
+        "01a-Pitches-Pitches/m24/n03",
+        "01a-Pitches-Pitches/m24/n04",
+        "01a-Pitches-Pitches/m25/n01",
+        "01a-Pitches-Pitches/m25/n02",
+        "01a-Pitches-Pitches/m25/n03",
+        "01a-Pitches-Pitches/m25/n04",
+        "01a-Pitches-Pitches/m26/n01",
+        "01a-Pitches-Pitches/m26/n02",
+        "01a-Pitches-Pitches/m26/n03",
+        "01a-Pitches-Pitches/m26/n04",
+        "01a-Pitches-Pitches/m27/n01",
+        "01a-Pitches-Pitches/m27/n02",
+        "01a-Pitches-Pitches/m27/n03",
+        "01a-Pitches-Pitches/m27/n04"
+      ],
+      "variantCount": 76,
+      "sourceDescription": "All pitches from G to c’’’’ in ascending steps. First without accidentals, then with a sharp, and then with a flat accidental. Measures 25 and 26 show explicit natural accidentals; measure 27 displays double alterations, cautionary, and editorial accidentals."
+    },
+    {
+      "id": "01a.accidental-qualifiers",
+      "fixture": "01a-Pitches-Pitches",
+      "expected": "Bar 27 note 3 is cautionary and note 4 editorial, with identical sharp pitch but distinct source intent.",
+      "variantIds": [
+        "01a-Pitches-Pitches/m27/n03",
+        "01a-Pitches-Pitches/m27/n04"
+      ],
+      "variantCount": 2,
+      "sourceDescription": "All pitches from G to c’’’’ in ascending steps. First without accidentals, then with a sharp, and then with a flat accidental. Measures 25 and 26 show explicit natural accidentals; measure 27 displays double alterations, cautionary, and editorial accidentals."
+    },
+    {
+      "id": "01b.interval-ladder",
+      "fixture": "01b-Pitches-Intervals",
+      "expected": "Each of 41 bars pairs two notes in the source's ascending interval-jump sequence, including enharmonic sharp/flat spellings and distant ledger notes.",
+      "variantIds": [
+        "01b-Pitches-Intervals/m01/n01",
+        "01b-Pitches-Intervals/m01/n02",
+        "01b-Pitches-Intervals/m02/n01",
+        "01b-Pitches-Intervals/m02/n02",
+        "01b-Pitches-Intervals/m03/n01",
+        "01b-Pitches-Intervals/m03/n02",
+        "01b-Pitches-Intervals/m04/n01",
+        "01b-Pitches-Intervals/m04/n02",
+        "01b-Pitches-Intervals/m05/n01",
+        "01b-Pitches-Intervals/m05/n02",
+        "01b-Pitches-Intervals/m06/n01",
+        "01b-Pitches-Intervals/m06/n02",
+        "01b-Pitches-Intervals/m07/n01",
+        "01b-Pitches-Intervals/m07/n02",
+        "01b-Pitches-Intervals/m08/n01",
+        "01b-Pitches-Intervals/m08/n02",
+        "01b-Pitches-Intervals/m09/n01",
+        "01b-Pitches-Intervals/m09/n02",
+        "01b-Pitches-Intervals/m10/n01",
+        "01b-Pitches-Intervals/m10/n02",
+        "01b-Pitches-Intervals/m11/n01",
+        "01b-Pitches-Intervals/m11/n02",
+        "01b-Pitches-Intervals/m12/n01",
+        "01b-Pitches-Intervals/m12/n02",
+        "01b-Pitches-Intervals/m13/n01",
+        "01b-Pitches-Intervals/m13/n02",
+        "01b-Pitches-Intervals/m14/n01",
+        "01b-Pitches-Intervals/m14/n02",
+        "01b-Pitches-Intervals/m15/n01",
+        "01b-Pitches-Intervals/m15/n02",
+        "01b-Pitches-Intervals/m16/n01",
+        "01b-Pitches-Intervals/m16/n02",
+        "01b-Pitches-Intervals/m17/n01",
+        "01b-Pitches-Intervals/m17/n02",
+        "01b-Pitches-Intervals/m18/n01",
+        "01b-Pitches-Intervals/m18/n02",
+        "01b-Pitches-Intervals/m19/n01",
+        "01b-Pitches-Intervals/m19/n02",
+        "01b-Pitches-Intervals/m20/n01",
+        "01b-Pitches-Intervals/m20/n02",
+        "01b-Pitches-Intervals/m21/n01",
+        "01b-Pitches-Intervals/m21/n02",
+        "01b-Pitches-Intervals/m22/n01",
+        "01b-Pitches-Intervals/m22/n02",
+        "01b-Pitches-Intervals/m23/n01",
+        "01b-Pitches-Intervals/m23/n02",
+        "01b-Pitches-Intervals/m24/n01",
+        "01b-Pitches-Intervals/m24/n02",
+        "01b-Pitches-Intervals/m25/n01",
+        "01b-Pitches-Intervals/m25/n02",
+        "01b-Pitches-Intervals/m26/n01",
+        "01b-Pitches-Intervals/m26/n02",
+        "01b-Pitches-Intervals/m27/n01",
+        "01b-Pitches-Intervals/m27/n02",
+        "01b-Pitches-Intervals/m28/n01",
+        "01b-Pitches-Intervals/m28/n02",
+        "01b-Pitches-Intervals/m29/n01",
+        "01b-Pitches-Intervals/m29/n02",
+        "01b-Pitches-Intervals/m30/n01",
+        "01b-Pitches-Intervals/m30/n02",
+        "01b-Pitches-Intervals/m31/n01",
+        "01b-Pitches-Intervals/m31/n02",
+        "01b-Pitches-Intervals/m32/n01",
+        "01b-Pitches-Intervals/m32/n02",
+        "01b-Pitches-Intervals/m33/n01",
+        "01b-Pitches-Intervals/m33/n02",
+        "01b-Pitches-Intervals/m34/n01",
+        "01b-Pitches-Intervals/m34/n02",
+        "01b-Pitches-Intervals/m35/n01",
+        "01b-Pitches-Intervals/m35/n02",
+        "01b-Pitches-Intervals/m36/n01",
+        "01b-Pitches-Intervals/m36/n02",
+        "01b-Pitches-Intervals/m37/n01",
+        "01b-Pitches-Intervals/m37/n02",
+        "01b-Pitches-Intervals/m38/n01",
+        "01b-Pitches-Intervals/m38/n02",
+        "01b-Pitches-Intervals/m39/n01",
+        "01b-Pitches-Intervals/m39/n02",
+        "01b-Pitches-Intervals/m40/n01",
+        "01b-Pitches-Intervals/m40/n02",
+        "01b-Pitches-Intervals/m41/n01",
+        "01b-Pitches-Intervals/m41/n02"
+      ],
+      "variantCount": 82,
+      "sourceDescription": "All pitch intervals in ascending jump size."
+    },
+    {
+      "id": "01c.omitted-voice",
+      "fixture": "01c-Pitches-NoVoiceElement",
+      "expected": "The sole source note omits the optional MusicXML voice element.",
+      "variantIds": [
+        "01c-Pitches-NoVoiceElement/m01/n01"
+      ],
+      "variantCount": 1,
+      "sourceDescription": "The <voice> element of notes is optional in MusicXML. Here, there is one note with lyrics, but without a voice assigned."
+    },
+    {
+      "id": "01c.lyric-anchor",
+      "fixture": "01c-Pitches-NoVoiceElement",
+      "expected": "The unvoiced G4 whole note carries lyric A under the note.",
+      "variantIds": [
+        "01c-Pitches-NoVoiceElement/m01/n01"
+      ],
+      "variantCount": 1,
+      "sourceDescription": "The <voice> element of notes is optional in MusicXML. Here, there is one note with lyrics, but without a voice assigned."
+    },
+    {
+      "id": "01d.fractional-pitches",
+      "fixture": "01d-Pitches-Microtones",
+      "expected": "Four quarter-tone alterations −1.5, −0.5, +0.5, +1.5 occur once in each of two staff registers.",
+      "variantIds": [
+        "01d-Pitches-Microtones/m01/n01",
+        "01d-Pitches-Microtones/m01/n02",
+        "01d-Pitches-Microtones/m01/n03",
+        "01d-Pitches-Microtones/m01/n04",
+        "01d-Pitches-Microtones/m02/n01",
+        "01d-Pitches-Microtones/m02/n02",
+        "01d-Pitches-Microtones/m02/n03",
+        "01d-Pitches-Microtones/m02/n04"
+      ],
+      "variantCount": 8,
+      "sourceDescription": "Some microtones: c flat-and-a-half, d half-flat, e half-sharp, f sharp-and-a-half; once in the lower and once in the upper region of the staff."
+    },
+    {
+      "id": "01e.accidental-qualifiers",
+      "fixture": "01e-Pitches-ParenthesizedAccidentals",
+      "expected": "Cautionary/editorial combinations, explicit parentheses off, brackets, parentheses, and bracket-plus-parentheses are distinct around ordinary single/double accidentals.",
+      "variantIds": [
+        "01e-Pitches-ParenthesizedAccidentals/m01/n01",
+        "01e-Pitches-ParenthesizedAccidentals/m01/n02",
+        "01e-Pitches-ParenthesizedAccidentals/m01/n03",
+        "01e-Pitches-ParenthesizedAccidentals/m01/n04",
+        "01e-Pitches-ParenthesizedAccidentals/m02/n01",
+        "01e-Pitches-ParenthesizedAccidentals/m02/n02",
+        "01e-Pitches-ParenthesizedAccidentals/m02/n03",
+        "01e-Pitches-ParenthesizedAccidentals/m02/n04",
+        "01e-Pitches-ParenthesizedAccidentals/m03/n01",
+        "01e-Pitches-ParenthesizedAccidentals/m03/n02",
+        "01e-Pitches-ParenthesizedAccidentals/m03/n03",
+        "01e-Pitches-ParenthesizedAccidentals/m03/n04",
+        "01e-Pitches-ParenthesizedAccidentals/m04/n01",
+        "01e-Pitches-ParenthesizedAccidentals/m04/n02",
+        "01e-Pitches-ParenthesizedAccidentals/m04/n03",
+        "01e-Pitches-ParenthesizedAccidentals/m04/n04"
+      ],
+      "variantCount": 16,
+      "sourceDescription": "Accidentals have the attributes ‘cautionary’, ‘editorial’, ‘parenthesized’, and ‘bracketed’. The first two measures each have a cautionary accidental, an editorial, a cautionary with parentheses off, and an editorial and cautionary accidental. The next two measures each have a normal accidental, a bracketed, a parenthesized, and a bracketed and parenthesized accidental."
+    },
+    {
+      "id": "01f.microtonal-accidental-qualifiers",
+      "fixture": "01f-Pitches-ParenthesizedMicrotoneAccidentals",
+      "expected": "Quarter-flat, sharp, three-quarters-flat and three-quarters-sharp each occur plain, editorial, cautionary, and combined.",
+      "variantIds": [
+        "01f-Pitches-ParenthesizedMicrotoneAccidentals/m01/n01",
+        "01f-Pitches-ParenthesizedMicrotoneAccidentals/m01/n02",
+        "01f-Pitches-ParenthesizedMicrotoneAccidentals/m01/n03",
+        "01f-Pitches-ParenthesizedMicrotoneAccidentals/m01/n04",
+        "01f-Pitches-ParenthesizedMicrotoneAccidentals/m02/n01",
+        "01f-Pitches-ParenthesizedMicrotoneAccidentals/m02/n02",
+        "01f-Pitches-ParenthesizedMicrotoneAccidentals/m02/n03",
+        "01f-Pitches-ParenthesizedMicrotoneAccidentals/m02/n04",
+        "01f-Pitches-ParenthesizedMicrotoneAccidentals/m03/n01",
+        "01f-Pitches-ParenthesizedMicrotoneAccidentals/m03/n02",
+        "01f-Pitches-ParenthesizedMicrotoneAccidentals/m03/n03",
+        "01f-Pitches-ParenthesizedMicrotoneAccidentals/m03/n04",
+        "01f-Pitches-ParenthesizedMicrotoneAccidentals/m04/n01",
+        "01f-Pitches-ParenthesizedMicrotoneAccidentals/m04/n02",
+        "01f-Pitches-ParenthesizedMicrotoneAccidentals/m04/n03",
+        "01f-Pitches-ParenthesizedMicrotoneAccidentals/m04/n04"
+      ],
+      "variantCount": 16,
+      "sourceDescription": "Microtone accidentals can be cautionary or editorial. Each measure has a normal accidental, an editorial, a cautionary, and an editiorial and cautionary accidental."
+    },
+    {
+      "id": "01g.arrow-accidental-glyphs",
+      "fixture": "01g-Pitches-AllArrowAccidentals",
+      "expected": "Twelve distinct MusicXML 3.1 up/down arrow accidental names are printed on G4, even though the pitch elements have no alter.",
+      "variantIds": [
+        "01g-Pitches-AllArrowAccidentals/m01/n01",
+        "01g-Pitches-AllArrowAccidentals/m01/n02",
+        "01g-Pitches-AllArrowAccidentals/m02/n01",
+        "01g-Pitches-AllArrowAccidentals/m02/n02",
+        "01g-Pitches-AllArrowAccidentals/m03/n01",
+        "01g-Pitches-AllArrowAccidentals/m03/n02",
+        "01g-Pitches-AllArrowAccidentals/m04/n01",
+        "01g-Pitches-AllArrowAccidentals/m04/n02",
+        "01g-Pitches-AllArrowAccidentals/m05/n01",
+        "01g-Pitches-AllArrowAccidentals/m05/n02",
+        "01g-Pitches-AllArrowAccidentals/m06/n01",
+        "01g-Pitches-AllArrowAccidentals/m06/n02"
+      ],
+      "variantCount": 12,
+      "sourceDescription": "Complete range of quartertone accidentals with arrows from MusicXML 3.1: sharp-down, sharp-up, natural-down, natural-up, flat-down, flat-up, double-sharp-down, double-sharp-up, flat-flat-down, flat-flat-up, arrow-down, arrow-up."
+    },
+    {
+      "id": "01h.turkish-persian-accidental-glyphs",
+      "fixture": "01h-Pitches-TurkishPersian",
+      "expected": "Fourteen distinct slash, numbered, sori and koron accidental names are printed on G4.",
+      "variantIds": [
+        "01h-Pitches-TurkishPersian/m01/n01",
+        "01h-Pitches-TurkishPersian/m01/n02",
+        "01h-Pitches-TurkishPersian/m02/n01",
+        "01h-Pitches-TurkishPersian/m02/n02",
+        "01h-Pitches-TurkishPersian/m03/n01",
+        "01h-Pitches-TurkishPersian/m03/n02",
+        "01h-Pitches-TurkishPersian/m04/n01",
+        "01h-Pitches-TurkishPersian/m04/n02",
+        "01h-Pitches-TurkishPersian/m05/n01",
+        "01h-Pitches-TurkishPersian/m05/n02",
+        "01h-Pitches-TurkishPersian/m06/n01",
+        "01h-Pitches-TurkishPersian/m06/n02",
+        "01h-Pitches-TurkishPersian/m07/n01",
+        "01h-Pitches-TurkishPersian/m07/n02"
+      ],
+      "variantCount": 14,
+      "sourceDescription": "Complete range of Turkish and Persian accidentals from MusicXML 3.1: slash-quarter-sharp, slash-sharp, slash-flat, double-slash-flat, sharp-1, sharp-2, sharp-3, sharp-5, flat-1, flat-2, flat-3, flat-4, sori, and koron."
+    }
+  ],
+  "render": [
+    {
+      "featureId": "01a.pitch-sequence",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "All 108 step/octave/alter triples match imported MNX; full notation tiles in both shells show the low and high ledger positions. Accidental qualifications in bar 27 are judged separately.",
+      "sourceImportEvidence": "harness/reports/musicxml-pitch-source-import.json",
+      "captureEvidence": "harness/fixtures/musicxml-pitch-evidence/workbench/01a-Pitches-Pitches/observation.json"
+    },
+    {
+      "featureId": "01a.pitch-sequence",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "All 108 step/octave/alter triples match imported MNX; full notation tiles in both shells show the low and high ledger positions. Accidental qualifications in bar 27 are judged separately.",
+      "sourceImportEvidence": "harness/reports/musicxml-pitch-source-import.json",
+      "captureEvidence": "harness/fixtures/musicxml-pitch-evidence/studio/01a-Pitches-Pitches/observation.json"
+    },
+    {
+      "featureId": "01a.explicit-accidentals",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "All 76 explicit accidental displays and pitch alterations are present; both shells show the ordinary glyphs including the bottom bar. Cautionary/editorial meaning is separate.",
+      "sourceImportEvidence": "harness/reports/musicxml-pitch-source-import.json",
+      "captureEvidence": "harness/fixtures/musicxml-pitch-evidence/workbench/01a-Pitches-Pitches/observation.json"
+    },
+    {
+      "featureId": "01a.explicit-accidentals",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "All 76 explicit accidental displays and pitch alterations are present; both shells show the ordinary glyphs including the bottom bar. Cautionary/editorial meaning is separate.",
+      "sourceImportEvidence": "harness/reports/musicxml-pitch-source-import.json",
+      "captureEvidence": "harness/fixtures/musicxml-pitch-evidence/studio/01a-Pitches-Pitches/observation.json"
+    },
+    {
+      "featureId": "01a.accidental-qualifiers",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "unresolved",
+      "cause": [
+        "importer",
+        "source/reference ambiguity"
+      ],
+      "reason": "Both flags disappear on import, leaving indistinguishable show:true fields. MusicXML leaves the default enclosure for such attributes to applications; the required visible distinction needs a reference policy. The semantic loss is certain.",
+      "sourceImportEvidence": "harness/reports/musicxml-pitch-source-import.json",
+      "captureEvidence": "harness/fixtures/musicxml-pitch-evidence/workbench/01a-Pitches-Pitches/observation.json"
+    },
+    {
+      "featureId": "01a.accidental-qualifiers",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "unresolved",
+      "cause": [
+        "importer",
+        "source/reference ambiguity"
+      ],
+      "reason": "Both flags disappear on import, leaving indistinguishable show:true fields. MusicXML leaves the default enclosure for such attributes to applications; the required visible distinction needs a reference policy. The semantic loss is certain.",
+      "sourceImportEvidence": "harness/reports/musicxml-pitch-source-import.json",
+      "captureEvidence": "harness/fixtures/musicxml-pitch-evidence/studio/01a-Pitches-Pitches/observation.json"
+    },
+    {
+      "featureId": "01b.interval-ladder",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "All 82 pitches match, each pair appears in measure order in both shells, and the complete score was inspected through the actual scroll area. The unrelated incompatible 2/4 common-symbol warning is retained.",
+      "sourceImportEvidence": "harness/reports/musicxml-pitch-source-import.json",
+      "captureEvidence": "harness/fixtures/musicxml-pitch-evidence/workbench/01b-Pitches-Intervals/observation.json"
+    },
+    {
+      "featureId": "01b.interval-ladder",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "All 82 pitches match, each pair appears in measure order in both shells, and the complete score was inspected through the actual scroll area. The unrelated incompatible 2/4 common-symbol warning is retained.",
+      "sourceImportEvidence": "harness/reports/musicxml-pitch-source-import.json",
+      "captureEvidence": "harness/fixtures/musicxml-pitch-evidence/studio/01b-Pitches-Intervals/observation.json"
+    },
+    {
+      "featureId": "01c.omitted-voice",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "not applicable",
+      "cause": [],
+      "reason": "Voice omission is format syntax with no separate mark to engrave; import assigns an internal v1 voice and retains the note. Its visible lyric anchor is judged separately.",
+      "sourceImportEvidence": "harness/reports/musicxml-pitch-source-import.json",
+      "captureEvidence": "harness/fixtures/musicxml-pitch-evidence/workbench/01c-Pitches-NoVoiceElement/observation.json"
+    },
+    {
+      "featureId": "01c.omitted-voice",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "not applicable",
+      "cause": [],
+      "reason": "Voice omission is format syntax with no separate mark to engrave; import assigns an internal v1 voice and retains the note. Its visible lyric anchor is judged separately.",
+      "sourceImportEvidence": "harness/reports/musicxml-pitch-source-import.json",
+      "captureEvidence": "harness/fixtures/musicxml-pitch-evidence/studio/01c-Pitches-NoVoiceElement/observation.json"
+    },
+    {
+      "featureId": "01c.lyric-anchor",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "The imported event has lyric line 1 text A; both shell captures show A under the whole note.",
+      "sourceImportEvidence": "harness/reports/musicxml-pitch-source-import.json",
+      "captureEvidence": "harness/fixtures/musicxml-pitch-evidence/workbench/01c-Pitches-NoVoiceElement/observation.json"
+    },
+    {
+      "featureId": "01c.lyric-anchor",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "The imported event has lyric line 1 text A; both shell captures show A under the whole note.",
+      "sourceImportEvidence": "harness/reports/musicxml-pitch-source-import.json",
+      "captureEvidence": "harness/fixtures/musicxml-pitch-evidence/studio/01c-Pitches-NoVoiceElement/observation.json"
+    },
+    {
+      "featureId": "01d.fractional-pitches",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "incorrect",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "All eight source pitches become integer alterations and ordinary engraving; all eight locations now have explicit import-loss warnings. Published pitch.alter is integer. Item 22 already owns the diagnostic and representation deferral.",
+      "sourceImportEvidence": "harness/reports/musicxml-pitch-source-import.json",
+      "captureEvidence": "harness/fixtures/musicxml-pitch-evidence/workbench/01d-Pitches-Microtones/observation.json"
+    },
+    {
+      "featureId": "01d.fractional-pitches",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "incorrect",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "All eight source pitches become integer alterations and ordinary engraving; all eight locations now have explicit import-loss warnings. Published pitch.alter is integer. Item 22 already owns the diagnostic and representation deferral.",
+      "sourceImportEvidence": "harness/reports/musicxml-pitch-source-import.json",
+      "captureEvidence": "harness/fixtures/musicxml-pitch-evidence/studio/01d-Pitches-Microtones/observation.json"
+    },
+    {
+      "featureId": "01e.accidental-qualifiers",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "partial",
+      "cause": [
+        "importer",
+        "layout/SVG engine",
+        "source/reference ambiguity"
+      ],
+      "reason": "Two plain baseline notes render correctly; explicit bracket/parenthesis choices are dropped on import. A real inspector edit proves MNX can hold parentheses, but the rendered first note remains unenclosed. Default styling for bare cautionary/editorial flags is not fixed by the source.",
+      "sourceImportEvidence": "harness/reports/musicxml-pitch-source-import.json",
+      "captureEvidence": "harness/fixtures/musicxml-pitch-evidence/workbench/01e-Pitches-ParenthesizedAccidentals/observation.json"
+    },
+    {
+      "featureId": "01e.accidental-qualifiers",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "partial",
+      "cause": [
+        "importer",
+        "layout/SVG engine",
+        "source/reference ambiguity"
+      ],
+      "reason": "Two plain baseline notes render correctly; explicit bracket/parenthesis choices are dropped on import. A real inspector edit proves MNX can hold parentheses, but the rendered first note remains unenclosed. Default styling for bare cautionary/editorial flags is not fixed by the source.",
+      "sourceImportEvidence": "harness/reports/musicxml-pitch-source-import.json",
+      "captureEvidence": "harness/fixtures/musicxml-pitch-evidence/studio/01e-Pitches-ParenthesizedAccidentals/observation.json"
+    },
+    {
+      "featureId": "01f.microtonal-accidental-qualifiers",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "incorrect",
+      "cause": [
+        "importer",
+        "MNX representation",
+        "source/reference ambiguity"
+      ],
+      "reason": "Twelve of 16 pitches are rounded to integers with warnings; all special accidental names and qualification flags collapse to show:true without warning. The one plain sharp is an ordinary-symbol baseline, not a pass for the feature.",
+      "sourceImportEvidence": "harness/reports/musicxml-pitch-source-import.json",
+      "captureEvidence": "harness/fixtures/musicxml-pitch-evidence/workbench/01f-Pitches-ParenthesizedMicrotoneAccidentals/observation.json"
+    },
+    {
+      "featureId": "01f.microtonal-accidental-qualifiers",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "incorrect",
+      "cause": [
+        "importer",
+        "MNX representation",
+        "source/reference ambiguity"
+      ],
+      "reason": "Twelve of 16 pitches are rounded to integers with warnings; all special accidental names and qualification flags collapse to show:true without warning. The one plain sharp is an ordinary-symbol baseline, not a pass for the feature.",
+      "sourceImportEvidence": "harness/reports/musicxml-pitch-source-import.json",
+      "captureEvidence": "harness/fixtures/musicxml-pitch-evidence/studio/01f-Pitches-ParenthesizedMicrotoneAccidentals/observation.json"
+    },
+    {
+      "featureId": "01g.arrow-accidental-glyphs",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "incorrect",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "All twelve source glyph names collapse to identical show:true on unaltered G4; both shells print ordinary natural signs. No import warning identifies the lost glyph names.",
+      "sourceImportEvidence": "harness/reports/musicxml-pitch-source-import.json",
+      "captureEvidence": "harness/fixtures/musicxml-pitch-evidence/workbench/01g-Pitches-AllArrowAccidentals/observation.json"
+    },
+    {
+      "featureId": "01g.arrow-accidental-glyphs",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "incorrect",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "All twelve source glyph names collapse to identical show:true on unaltered G4; both shells print ordinary natural signs. No import warning identifies the lost glyph names.",
+      "sourceImportEvidence": "harness/reports/musicxml-pitch-source-import.json",
+      "captureEvidence": "harness/fixtures/musicxml-pitch-evidence/studio/01g-Pitches-AllArrowAccidentals/observation.json"
+    },
+    {
+      "featureId": "01h.turkish-persian-accidental-glyphs",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "incorrect",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "All fourteen source glyph names collapse to identical show:true on unaltered G4; both shells print ordinary natural signs. No import warning identifies the lost glyph names.",
+      "sourceImportEvidence": "harness/reports/musicxml-pitch-source-import.json",
+      "captureEvidence": "harness/fixtures/musicxml-pitch-evidence/workbench/01h-Pitches-TurkishPersian/observation.json"
+    },
+    {
+      "featureId": "01h.turkish-persian-accidental-glyphs",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "incorrect",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "All fourteen source glyph names collapse to identical show:true on unaltered G4; both shells print ordinary natural signs. No import warning identifies the lost glyph names.",
+      "sourceImportEvidence": "harness/reports/musicxml-pitch-source-import.json",
+      "captureEvidence": "harness/fixtures/musicxml-pitch-evidence/studio/01h-Pitches-TurkishPersian/observation.json"
+    }
+  ],
+  "renderVariantDispositions": [
+    {
+      "featureId": "01e.accidental-qualifiers",
+      "variantId": "01e-Pitches-ParenthesizedAccidentals/m01/n01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "unresolved",
+      "reason": "Default styling not specified; semantic flags lost"
+    },
+    {
+      "featureId": "01e.accidental-qualifiers",
+      "variantId": "01e-Pitches-ParenthesizedAccidentals/m01/n02",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "unresolved",
+      "reason": "Default styling not specified; semantic flags lost"
+    },
+    {
+      "featureId": "01e.accidental-qualifiers",
+      "variantId": "01e-Pitches-ParenthesizedAccidentals/m01/n03",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "unresolved",
+      "reason": "Default styling not specified; semantic flags lost"
+    },
+    {
+      "featureId": "01e.accidental-qualifiers",
+      "variantId": "01e-Pitches-ParenthesizedAccidentals/m01/n04",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "unresolved",
+      "reason": "Default styling not specified; semantic flags lost"
+    },
+    {
+      "featureId": "01e.accidental-qualifiers",
+      "variantId": "01e-Pitches-ParenthesizedAccidentals/m02/n01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "unresolved",
+      "reason": "Default styling not specified; semantic flags lost"
+    },
+    {
+      "featureId": "01e.accidental-qualifiers",
+      "variantId": "01e-Pitches-ParenthesizedAccidentals/m02/n02",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "unresolved",
+      "reason": "Default styling not specified; semantic flags lost"
+    },
+    {
+      "featureId": "01e.accidental-qualifiers",
+      "variantId": "01e-Pitches-ParenthesizedAccidentals/m02/n03",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "unresolved",
+      "reason": "Default styling not specified; semantic flags lost"
+    },
+    {
+      "featureId": "01e.accidental-qualifiers",
+      "variantId": "01e-Pitches-ParenthesizedAccidentals/m02/n04",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "unresolved",
+      "reason": "Default styling not specified; semantic flags lost"
+    },
+    {
+      "featureId": "01e.accidental-qualifiers",
+      "variantId": "01e-Pitches-ParenthesizedAccidentals/m03/n01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "Plain baseline"
+    },
+    {
+      "featureId": "01e.accidental-qualifiers",
+      "variantId": "01e-Pitches-ParenthesizedAccidentals/m03/n02",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "Explicit enclosure missing"
+    },
+    {
+      "featureId": "01e.accidental-qualifiers",
+      "variantId": "01e-Pitches-ParenthesizedAccidentals/m03/n03",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "Explicit enclosure missing"
+    },
+    {
+      "featureId": "01e.accidental-qualifiers",
+      "variantId": "01e-Pitches-ParenthesizedAccidentals/m03/n04",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "Explicit enclosure missing"
+    },
+    {
+      "featureId": "01e.accidental-qualifiers",
+      "variantId": "01e-Pitches-ParenthesizedAccidentals/m04/n01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "Plain baseline"
+    },
+    {
+      "featureId": "01e.accidental-qualifiers",
+      "variantId": "01e-Pitches-ParenthesizedAccidentals/m04/n02",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "Explicit enclosure missing"
+    },
+    {
+      "featureId": "01e.accidental-qualifiers",
+      "variantId": "01e-Pitches-ParenthesizedAccidentals/m04/n03",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "Explicit enclosure missing"
+    },
+    {
+      "featureId": "01e.accidental-qualifiers",
+      "variantId": "01e-Pitches-ParenthesizedAccidentals/m04/n04",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "Explicit enclosure missing"
+    },
+    {
+      "featureId": "01f.microtonal-accidental-qualifiers",
+      "variantId": "01f-Pitches-ParenthesizedMicrotoneAccidentals/m01/n01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "Fractional source pitch lost"
+    },
+    {
+      "featureId": "01f.microtonal-accidental-qualifiers",
+      "variantId": "01f-Pitches-ParenthesizedMicrotoneAccidentals/m01/n02",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "Fractional source pitch lost"
+    },
+    {
+      "featureId": "01f.microtonal-accidental-qualifiers",
+      "variantId": "01f-Pitches-ParenthesizedMicrotoneAccidentals/m01/n03",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "Fractional source pitch lost"
+    },
+    {
+      "featureId": "01f.microtonal-accidental-qualifiers",
+      "variantId": "01f-Pitches-ParenthesizedMicrotoneAccidentals/m01/n04",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "Fractional source pitch lost"
+    },
+    {
+      "featureId": "01f.microtonal-accidental-qualifiers",
+      "variantId": "01f-Pitches-ParenthesizedMicrotoneAccidentals/m02/n01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "Plain sharp baseline"
+    },
+    {
+      "featureId": "01f.microtonal-accidental-qualifiers",
+      "variantId": "01f-Pitches-ParenthesizedMicrotoneAccidentals/m02/n02",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "unresolved",
+      "reason": "Default cautionary/editorial styling unresolved; flags lost"
+    },
+    {
+      "featureId": "01f.microtonal-accidental-qualifiers",
+      "variantId": "01f-Pitches-ParenthesizedMicrotoneAccidentals/m02/n03",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "unresolved",
+      "reason": "Default cautionary/editorial styling unresolved; flags lost"
+    },
+    {
+      "featureId": "01f.microtonal-accidental-qualifiers",
+      "variantId": "01f-Pitches-ParenthesizedMicrotoneAccidentals/m02/n04",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "unresolved",
+      "reason": "Default cautionary/editorial styling unresolved; flags lost"
+    },
+    {
+      "featureId": "01f.microtonal-accidental-qualifiers",
+      "variantId": "01f-Pitches-ParenthesizedMicrotoneAccidentals/m03/n01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "Fractional source pitch lost"
+    },
+    {
+      "featureId": "01f.microtonal-accidental-qualifiers",
+      "variantId": "01f-Pitches-ParenthesizedMicrotoneAccidentals/m03/n02",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "Fractional source pitch lost"
+    },
+    {
+      "featureId": "01f.microtonal-accidental-qualifiers",
+      "variantId": "01f-Pitches-ParenthesizedMicrotoneAccidentals/m03/n03",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "Fractional source pitch lost"
+    },
+    {
+      "featureId": "01f.microtonal-accidental-qualifiers",
+      "variantId": "01f-Pitches-ParenthesizedMicrotoneAccidentals/m03/n04",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "Fractional source pitch lost"
+    },
+    {
+      "featureId": "01f.microtonal-accidental-qualifiers",
+      "variantId": "01f-Pitches-ParenthesizedMicrotoneAccidentals/m04/n01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "Fractional source pitch lost"
+    },
+    {
+      "featureId": "01f.microtonal-accidental-qualifiers",
+      "variantId": "01f-Pitches-ParenthesizedMicrotoneAccidentals/m04/n02",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "Fractional source pitch lost"
+    },
+    {
+      "featureId": "01f.microtonal-accidental-qualifiers",
+      "variantId": "01f-Pitches-ParenthesizedMicrotoneAccidentals/m04/n03",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "Fractional source pitch lost"
+    },
+    {
+      "featureId": "01f.microtonal-accidental-qualifiers",
+      "variantId": "01f-Pitches-ParenthesizedMicrotoneAccidentals/m04/n04",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "Fractional source pitch lost"
+    }
+  ],
+  "authoringTasks": [
+    {
+      "featureId": "01a.pitch-sequence",
+      "shell": "workbench",
+      "operation": "create",
+      "task": "At an empty first-beat G2 staff position, enter a pitched note without changing the other 107 notes.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "partial",
+      "cause": [],
+      "reason": "First G2 variant passed via real controls with exact structural preservation; remaining register and accidental variants were not individually authored.",
+      "undoRedo": "exact for tested mutation",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/write/workbench-01a/report.json",
+      "testedVariantIds": [
+        "01a-Pitches-Pitches/m01/n01"
+      ],
+      "uiPath": "N on the selected empty first-beat G2 cell"
+    },
+    {
+      "featureId": "01a.pitch-sequence",
+      "shell": "workbench",
+      "operation": "inspect",
+      "task": "Select a note and read its written pitch and octave in the note inspector.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "partial",
+      "cause": [],
+      "reason": "First G2 variant passed via real controls with exact structural preservation; remaining register and accidental variants were not individually authored.",
+      "undoRedo": "not applicable",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/write/workbench-01a/report.json",
+      "testedVariantIds": [
+        "01a-Pitches-Pitches/m01/n01"
+      ],
+      "uiPath": "Enter on first G2 note → pitch:G2 pill"
+    },
+    {
+      "featureId": "01a.pitch-sequence",
+      "shell": "workbench",
+      "operation": "change",
+      "task": "Transpose one G2 to G♯2 while retaining its event and all other notes.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "partial",
+      "cause": [],
+      "reason": "First G2 variant passed via real controls with exact structural preservation; remaining register and accidental variants were not individually authored.",
+      "undoRedo": "exact for tested mutation",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/write/workbench-01a/report.json",
+      "testedVariantIds": [
+        "01a-Pitches-Pitches/m01/n01"
+      ],
+      "uiPath": "Alt+↑ on selected first G2 note"
+    },
+    {
+      "featureId": "01a.pitch-sequence",
+      "shell": "workbench",
+      "operation": "remove",
+      "task": "Delete the selected G2 note, leaving its rhythmic cell as a rest.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "partial",
+      "cause": [],
+      "reason": "First G2 variant passed via real controls with exact structural preservation; remaining register and accidental variants were not individually authored.",
+      "undoRedo": "exact for tested mutation",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/write/workbench-01a/report.json",
+      "testedVariantIds": [
+        "01a-Pitches-Pitches/m01/n01"
+      ],
+      "uiPath": "Delete on the selected first note"
+    },
+    {
+      "featureId": "01a.pitch-sequence",
+      "shell": "studio",
+      "operation": "create",
+      "task": "At an empty first-beat G2 staff position, enter a pitched note without changing the other 107 notes.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "partial",
+      "cause": [],
+      "reason": "First G2 variant passed via real controls with exact structural preservation; remaining register and accidental variants were not individually authored.",
+      "undoRedo": "exact for tested mutation",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/write/studio-01a/report.json",
+      "testedVariantIds": [
+        "01a-Pitches-Pitches/m01/n01"
+      ],
+      "uiPath": "N on the selected empty first-beat G2 cell"
+    },
+    {
+      "featureId": "01a.pitch-sequence",
+      "shell": "studio",
+      "operation": "inspect",
+      "task": "Select a note and read its written pitch and octave in the note inspector.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "partial",
+      "cause": [],
+      "reason": "First G2 variant passed via real controls with exact structural preservation; remaining register and accidental variants were not individually authored.",
+      "undoRedo": "not applicable",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/write/studio-01a/report.json",
+      "testedVariantIds": [
+        "01a-Pitches-Pitches/m01/n01"
+      ],
+      "uiPath": "Enter on first G2 note → pitch:G2 pill"
+    },
+    {
+      "featureId": "01a.pitch-sequence",
+      "shell": "studio",
+      "operation": "change",
+      "task": "Transpose one G2 to G♯2 while retaining its event and all other notes.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "partial",
+      "cause": [],
+      "reason": "First G2 variant passed via real controls with exact structural preservation; remaining register and accidental variants were not individually authored.",
+      "undoRedo": "exact for tested mutation",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/write/studio-01a/report.json",
+      "testedVariantIds": [
+        "01a-Pitches-Pitches/m01/n01"
+      ],
+      "uiPath": "Alt+↑ on selected first G2 note"
+    },
+    {
+      "featureId": "01a.pitch-sequence",
+      "shell": "studio",
+      "operation": "remove",
+      "task": "Delete the selected G2 note, leaving its rhythmic cell as a rest.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "partial",
+      "cause": [],
+      "reason": "First G2 variant passed via real controls with exact structural preservation; remaining register and accidental variants were not individually authored.",
+      "undoRedo": "exact for tested mutation",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/write/studio-01a/report.json",
+      "testedVariantIds": [
+        "01a-Pitches-Pitches/m01/n01"
+      ],
+      "uiPath": "Delete on the selected first note"
+    },
+    {
+      "featureId": "01a.explicit-accidentals",
+      "shell": "workbench",
+      "operation": "create",
+      "task": "Add an explicit sharp, flat, natural or double accidental on the matching selected pitch.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "unresolved",
+      "cause": [
+        "not yet isolated"
+      ],
+      "reason": "The first-note/parentheses probes do not prove the source's later natural, double, cautionary or editorial forms in this fixture.",
+      "undoRedo": "unresolved",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/workbench/01a-Pitches-Pitches/observation.json"
+    },
+    {
+      "featureId": "01a.explicit-accidentals",
+      "shell": "workbench",
+      "operation": "inspect",
+      "task": "Read the selected note's exact spelling and whether its accidental display is explicit.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "unresolved",
+      "cause": [
+        "not yet isolated"
+      ],
+      "reason": "The first-note/parentheses probes do not prove the source's later natural, double, cautionary or editorial forms in this fixture.",
+      "undoRedo": "unresolved",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/workbench/01a-Pitches-Pitches/observation.json"
+    },
+    {
+      "featureId": "01a.explicit-accidentals",
+      "shell": "workbench",
+      "operation": "change",
+      "task": "Change an explicit accidental and its corresponding pitch spelling without moving the note.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "unresolved",
+      "cause": [
+        "not yet isolated"
+      ],
+      "reason": "The first-note/parentheses probes do not prove the source's later natural, double, cautionary or editorial forms in this fixture.",
+      "undoRedo": "unresolved",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/workbench/01a-Pitches-Pitches/observation.json"
+    },
+    {
+      "featureId": "01a.explicit-accidentals",
+      "shell": "workbench",
+      "operation": "remove",
+      "task": "Remove the explicit display while retaining the intended pitch.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "unresolved",
+      "cause": [
+        "not yet isolated"
+      ],
+      "reason": "The first-note/parentheses probes do not prove the source's later natural, double, cautionary or editorial forms in this fixture.",
+      "undoRedo": "unresolved",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/workbench/01a-Pitches-Pitches/observation.json"
+    },
+    {
+      "featureId": "01a.explicit-accidentals",
+      "shell": "studio",
+      "operation": "create",
+      "task": "Add an explicit sharp, flat, natural or double accidental on the matching selected pitch.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "unresolved",
+      "cause": [
+        "not yet isolated"
+      ],
+      "reason": "The first-note/parentheses probes do not prove the source's later natural, double, cautionary or editorial forms in this fixture.",
+      "undoRedo": "unresolved",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/studio/01a-Pitches-Pitches/observation.json"
+    },
+    {
+      "featureId": "01a.explicit-accidentals",
+      "shell": "studio",
+      "operation": "inspect",
+      "task": "Read the selected note's exact spelling and whether its accidental display is explicit.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "unresolved",
+      "cause": [
+        "not yet isolated"
+      ],
+      "reason": "The first-note/parentheses probes do not prove the source's later natural, double, cautionary or editorial forms in this fixture.",
+      "undoRedo": "unresolved",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/studio/01a-Pitches-Pitches/observation.json"
+    },
+    {
+      "featureId": "01a.explicit-accidentals",
+      "shell": "studio",
+      "operation": "change",
+      "task": "Change an explicit accidental and its corresponding pitch spelling without moving the note.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "unresolved",
+      "cause": [
+        "not yet isolated"
+      ],
+      "reason": "The first-note/parentheses probes do not prove the source's later natural, double, cautionary or editorial forms in this fixture.",
+      "undoRedo": "unresolved",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/studio/01a-Pitches-Pitches/observation.json"
+    },
+    {
+      "featureId": "01a.explicit-accidentals",
+      "shell": "studio",
+      "operation": "remove",
+      "task": "Remove the explicit display while retaining the intended pitch.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "unresolved",
+      "cause": [
+        "not yet isolated"
+      ],
+      "reason": "The first-note/parentheses probes do not prove the source's later natural, double, cautionary or editorial forms in this fixture.",
+      "undoRedo": "unresolved",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/studio/01a-Pitches-Pitches/observation.json"
+    },
+    {
+      "featureId": "01a.accidental-qualifiers",
+      "shell": "workbench",
+      "operation": "create",
+      "task": "Add the bar-27 cautionary or editorial distinction to a sharp note.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "unresolved",
+      "cause": [
+        "not yet isolated"
+      ],
+      "reason": "The first-note/parentheses probes do not prove the source's later natural, double, cautionary or editorial forms in this fixture.",
+      "undoRedo": "unresolved",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/workbench/01a-Pitches-Pitches/observation.json"
+    },
+    {
+      "featureId": "01a.accidental-qualifiers",
+      "shell": "workbench",
+      "operation": "inspect",
+      "task": "Distinguish cautionary from editorial on the two imported bar-27 notes.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "unresolved",
+      "cause": [
+        "not yet isolated"
+      ],
+      "reason": "The first-note/parentheses probes do not prove the source's later natural, double, cautionary or editorial forms in this fixture.",
+      "undoRedo": "unresolved",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/workbench/01a-Pitches-Pitches/observation.json"
+    },
+    {
+      "featureId": "01a.accidental-qualifiers",
+      "shell": "workbench",
+      "operation": "change",
+      "task": "Switch the intended qualification while preserving C♯5.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "unresolved",
+      "cause": [
+        "not yet isolated"
+      ],
+      "reason": "The first-note/parentheses probes do not prove the source's later natural, double, cautionary or editorial forms in this fixture.",
+      "undoRedo": "unresolved",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/workbench/01a-Pitches-Pitches/observation.json"
+    },
+    {
+      "featureId": "01a.accidental-qualifiers",
+      "shell": "workbench",
+      "operation": "remove",
+      "task": "Remove only the qualification, retaining pitch and ordinary accidental display.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "unresolved",
+      "cause": [
+        "not yet isolated"
+      ],
+      "reason": "The first-note/parentheses probes do not prove the source's later natural, double, cautionary or editorial forms in this fixture.",
+      "undoRedo": "unresolved",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/workbench/01a-Pitches-Pitches/observation.json"
+    },
+    {
+      "featureId": "01a.accidental-qualifiers",
+      "shell": "studio",
+      "operation": "create",
+      "task": "Add the bar-27 cautionary or editorial distinction to a sharp note.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "unresolved",
+      "cause": [
+        "not yet isolated"
+      ],
+      "reason": "The first-note/parentheses probes do not prove the source's later natural, double, cautionary or editorial forms in this fixture.",
+      "undoRedo": "unresolved",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/studio/01a-Pitches-Pitches/observation.json"
+    },
+    {
+      "featureId": "01a.accidental-qualifiers",
+      "shell": "studio",
+      "operation": "inspect",
+      "task": "Distinguish cautionary from editorial on the two imported bar-27 notes.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "unresolved",
+      "cause": [
+        "not yet isolated"
+      ],
+      "reason": "The first-note/parentheses probes do not prove the source's later natural, double, cautionary or editorial forms in this fixture.",
+      "undoRedo": "unresolved",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/studio/01a-Pitches-Pitches/observation.json"
+    },
+    {
+      "featureId": "01a.accidental-qualifiers",
+      "shell": "studio",
+      "operation": "change",
+      "task": "Switch the intended qualification while preserving C♯5.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "unresolved",
+      "cause": [
+        "not yet isolated"
+      ],
+      "reason": "The first-note/parentheses probes do not prove the source's later natural, double, cautionary or editorial forms in this fixture.",
+      "undoRedo": "unresolved",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/studio/01a-Pitches-Pitches/observation.json"
+    },
+    {
+      "featureId": "01a.accidental-qualifiers",
+      "shell": "studio",
+      "operation": "remove",
+      "task": "Remove only the qualification, retaining pitch and ordinary accidental display.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "unresolved",
+      "cause": [
+        "not yet isolated"
+      ],
+      "reason": "The first-note/parentheses probes do not prove the source's later natural, double, cautionary or editorial forms in this fixture.",
+      "undoRedo": "unresolved",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/studio/01a-Pitches-Pitches/observation.json"
+    },
+    {
+      "featureId": "01b.interval-ladder",
+      "shell": "workbench",
+      "operation": "create",
+      "task": "Add a two-note bar with a chosen interval and source-style enharmonic spelling.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "unresolved",
+      "cause": [
+        "not yet isolated"
+      ],
+      "reason": "No source-specific real-editor action was exercised for this variant family; the displayed import is not authoring proof.",
+      "undoRedo": "unresolved",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/workbench/01b-Pitches-Intervals/observation.json"
+    },
+    {
+      "featureId": "01b.interval-ladder",
+      "shell": "workbench",
+      "operation": "inspect",
+      "task": "Select each member of a pair and determine its pitches and interval.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "partial",
+      "cause": [],
+      "reason": "Both displayed endpoint pitches can be selected; no dedicated numerical interval readout or all-41-pair authoring probe was checked.",
+      "undoRedo": "unresolved",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/workbench/01b-Pitches-Intervals/observation.json"
+    },
+    {
+      "featureId": "01b.interval-ladder",
+      "shell": "workbench",
+      "operation": "change",
+      "task": "Change one interval endpoint without changing the other note or bar rhythm.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "unresolved",
+      "cause": [
+        "not yet isolated"
+      ],
+      "reason": "No source-specific real-editor action was exercised for this variant family; the displayed import is not authoring proof.",
+      "undoRedo": "unresolved",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/workbench/01b-Pitches-Intervals/observation.json"
+    },
+    {
+      "featureId": "01b.interval-ladder",
+      "shell": "workbench",
+      "operation": "remove",
+      "task": "Remove one interval member while preserving its partner.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "unresolved",
+      "cause": [
+        "not yet isolated"
+      ],
+      "reason": "No source-specific real-editor action was exercised for this variant family; the displayed import is not authoring proof.",
+      "undoRedo": "unresolved",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/workbench/01b-Pitches-Intervals/observation.json"
+    },
+    {
+      "featureId": "01b.interval-ladder",
+      "shell": "studio",
+      "operation": "create",
+      "task": "Add a two-note bar with a chosen interval and source-style enharmonic spelling.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "unresolved",
+      "cause": [
+        "not yet isolated"
+      ],
+      "reason": "No source-specific real-editor action was exercised for this variant family; the displayed import is not authoring proof.",
+      "undoRedo": "unresolved",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/studio/01b-Pitches-Intervals/observation.json"
+    },
+    {
+      "featureId": "01b.interval-ladder",
+      "shell": "studio",
+      "operation": "inspect",
+      "task": "Select each member of a pair and determine its pitches and interval.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "partial",
+      "cause": [],
+      "reason": "Both displayed endpoint pitches can be selected; no dedicated numerical interval readout or all-41-pair authoring probe was checked.",
+      "undoRedo": "unresolved",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/studio/01b-Pitches-Intervals/observation.json"
+    },
+    {
+      "featureId": "01b.interval-ladder",
+      "shell": "studio",
+      "operation": "change",
+      "task": "Change one interval endpoint without changing the other note or bar rhythm.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "unresolved",
+      "cause": [
+        "not yet isolated"
+      ],
+      "reason": "No source-specific real-editor action was exercised for this variant family; the displayed import is not authoring proof.",
+      "undoRedo": "unresolved",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/studio/01b-Pitches-Intervals/observation.json"
+    },
+    {
+      "featureId": "01b.interval-ladder",
+      "shell": "studio",
+      "operation": "remove",
+      "task": "Remove one interval member while preserving its partner.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "unresolved",
+      "cause": [
+        "not yet isolated"
+      ],
+      "reason": "No source-specific real-editor action was exercised for this variant family; the displayed import is not authoring proof.",
+      "undoRedo": "unresolved",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/studio/01b-Pitches-Intervals/observation.json"
+    },
+    {
+      "featureId": "01c.omitted-voice",
+      "shell": "workbench",
+      "operation": "create",
+      "task": "Omit the MusicXML voice tag for a single-voice note on export.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "not applicable",
+      "cause": [],
+      "reason": "Optional MusicXML voice-tag spelling is a serialization choice; MNX assigns one internal voice and exposes no separate musical operation for tag omission.",
+      "undoRedo": "not applicable",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/workbench/01c-Pitches-NoVoiceElement/observation.json"
+    },
+    {
+      "featureId": "01c.omitted-voice",
+      "shell": "workbench",
+      "operation": "inspect",
+      "task": "Read whether the original file omitted the optional voice tag.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "not applicable",
+      "cause": [],
+      "reason": "Optional MusicXML voice-tag spelling is a serialization choice; MNX assigns one internal voice and exposes no separate musical operation for tag omission.",
+      "undoRedo": "not applicable",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/workbench/01c-Pitches-NoVoiceElement/observation.json"
+    },
+    {
+      "featureId": "01c.omitted-voice",
+      "shell": "workbench",
+      "operation": "change",
+      "task": "Switch tag omission without changing musical voice membership.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "not applicable",
+      "cause": [],
+      "reason": "Optional MusicXML voice-tag spelling is a serialization choice; MNX assigns one internal voice and exposes no separate musical operation for tag omission.",
+      "undoRedo": "not applicable",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/workbench/01c-Pitches-NoVoiceElement/observation.json"
+    },
+    {
+      "featureId": "01c.omitted-voice",
+      "shell": "workbench",
+      "operation": "remove",
+      "task": "Remove the optional source tag without deleting the note.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "not applicable",
+      "cause": [],
+      "reason": "Optional MusicXML voice-tag spelling is a serialization choice; MNX assigns one internal voice and exposes no separate musical operation for tag omission.",
+      "undoRedo": "not applicable",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/workbench/01c-Pitches-NoVoiceElement/observation.json"
+    },
+    {
+      "featureId": "01c.omitted-voice",
+      "shell": "studio",
+      "operation": "create",
+      "task": "Omit the MusicXML voice tag for a single-voice note on export.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "not applicable",
+      "cause": [],
+      "reason": "Optional MusicXML voice-tag spelling is a serialization choice; MNX assigns one internal voice and exposes no separate musical operation for tag omission.",
+      "undoRedo": "not applicable",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/studio/01c-Pitches-NoVoiceElement/observation.json"
+    },
+    {
+      "featureId": "01c.omitted-voice",
+      "shell": "studio",
+      "operation": "inspect",
+      "task": "Read whether the original file omitted the optional voice tag.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "not applicable",
+      "cause": [],
+      "reason": "Optional MusicXML voice-tag spelling is a serialization choice; MNX assigns one internal voice and exposes no separate musical operation for tag omission.",
+      "undoRedo": "not applicable",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/studio/01c-Pitches-NoVoiceElement/observation.json"
+    },
+    {
+      "featureId": "01c.omitted-voice",
+      "shell": "studio",
+      "operation": "change",
+      "task": "Switch tag omission without changing musical voice membership.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "not applicable",
+      "cause": [],
+      "reason": "Optional MusicXML voice-tag spelling is a serialization choice; MNX assigns one internal voice and exposes no separate musical operation for tag omission.",
+      "undoRedo": "not applicable",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/studio/01c-Pitches-NoVoiceElement/observation.json"
+    },
+    {
+      "featureId": "01c.omitted-voice",
+      "shell": "studio",
+      "operation": "remove",
+      "task": "Remove the optional source tag without deleting the note.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "not applicable",
+      "cause": [],
+      "reason": "Optional MusicXML voice-tag spelling is a serialization choice; MNX assigns one internal voice and exposes no separate musical operation for tag omission.",
+      "undoRedo": "not applicable",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/studio/01c-Pitches-NoVoiceElement/observation.json"
+    },
+    {
+      "featureId": "01c.lyric-anchor",
+      "shell": "workbench",
+      "operation": "create",
+      "task": "Attach lyric A to the G4 whole-note event.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "unresolved",
+      "cause": [
+        "not yet isolated"
+      ],
+      "reason": "No source-specific real-editor action was exercised for this variant family; the displayed import is not authoring proof.",
+      "undoRedo": "unresolved",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/workbench/01c-Pitches-NoVoiceElement/observation.json"
+    },
+    {
+      "featureId": "01c.lyric-anchor",
+      "shell": "workbench",
+      "operation": "inspect",
+      "task": "Select the G4 event and read its lyric text and line.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "partial",
+      "cause": [],
+      "reason": "Lyric A is visible and retained in imported event data; its selected inspector state was not captured.",
+      "undoRedo": "unresolved",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/workbench/01c-Pitches-NoVoiceElement/observation.json"
+    },
+    {
+      "featureId": "01c.lyric-anchor",
+      "shell": "workbench",
+      "operation": "change",
+      "task": "Replace A with another lyric syllable without altering pitch or duration.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "unresolved",
+      "cause": [
+        "not yet isolated"
+      ],
+      "reason": "No source-specific real-editor action was exercised for this variant family; the displayed import is not authoring proof.",
+      "undoRedo": "unresolved",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/workbench/01c-Pitches-NoVoiceElement/observation.json"
+    },
+    {
+      "featureId": "01c.lyric-anchor",
+      "shell": "workbench",
+      "operation": "remove",
+      "task": "Remove the syllable while preserving the G4 whole note.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "unresolved",
+      "cause": [
+        "not yet isolated"
+      ],
+      "reason": "No source-specific real-editor action was exercised for this variant family; the displayed import is not authoring proof.",
+      "undoRedo": "unresolved",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/workbench/01c-Pitches-NoVoiceElement/observation.json"
+    },
+    {
+      "featureId": "01c.lyric-anchor",
+      "shell": "studio",
+      "operation": "create",
+      "task": "Attach lyric A to the G4 whole-note event.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "unresolved",
+      "cause": [
+        "not yet isolated"
+      ],
+      "reason": "No source-specific real-editor action was exercised for this variant family; the displayed import is not authoring proof.",
+      "undoRedo": "unresolved",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/studio/01c-Pitches-NoVoiceElement/observation.json"
+    },
+    {
+      "featureId": "01c.lyric-anchor",
+      "shell": "studio",
+      "operation": "inspect",
+      "task": "Select the G4 event and read its lyric text and line.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "partial",
+      "cause": [],
+      "reason": "Lyric A is visible and retained in imported event data; its selected inspector state was not captured.",
+      "undoRedo": "unresolved",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/studio/01c-Pitches-NoVoiceElement/observation.json"
+    },
+    {
+      "featureId": "01c.lyric-anchor",
+      "shell": "studio",
+      "operation": "change",
+      "task": "Replace A with another lyric syllable without altering pitch or duration.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "unresolved",
+      "cause": [
+        "not yet isolated"
+      ],
+      "reason": "No source-specific real-editor action was exercised for this variant family; the displayed import is not authoring proof.",
+      "undoRedo": "unresolved",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/studio/01c-Pitches-NoVoiceElement/observation.json"
+    },
+    {
+      "featureId": "01c.lyric-anchor",
+      "shell": "studio",
+      "operation": "remove",
+      "task": "Remove the syllable while preserving the G4 whole note.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "unresolved",
+      "cause": [
+        "not yet isolated"
+      ],
+      "reason": "No source-specific real-editor action was exercised for this variant family; the displayed import is not authoring proof.",
+      "undoRedo": "unresolved",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/studio/01c-Pitches-NoVoiceElement/observation.json"
+    },
+    {
+      "featureId": "01d.fractional-pitches",
+      "shell": "workbench",
+      "operation": "create",
+      "task": "Enter each of −1.5, −0.5, +0.5 and +1.5 semitone alterations at two octaves.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "blocked",
+      "cause": [
+        "MNX representation",
+        "importer"
+      ],
+      "reason": "The exact source pitch or named glyph is absent from the imported document; no direct control can preserve the requested value. A model/carrier decision precedes a meaningful editing task.",
+      "undoRedo": "blocked",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/workbench/01d-Pitches-Microtones/observation.json"
+    },
+    {
+      "featureId": "01d.fractional-pitches",
+      "shell": "workbench",
+      "operation": "inspect",
+      "task": "Read the exact fractional alteration of each source note.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "blocked",
+      "cause": [
+        "MNX representation",
+        "importer"
+      ],
+      "reason": "The exact source pitch or named glyph is absent from the imported document; no direct control can preserve the requested value. A model/carrier decision precedes a meaningful editing task.",
+      "undoRedo": "blocked",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/workbench/01d-Pitches-Microtones/observation.json"
+    },
+    {
+      "featureId": "01d.fractional-pitches",
+      "shell": "workbench",
+      "operation": "change",
+      "task": "Change one fractional alteration without rounding or affecting other notes.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "blocked",
+      "cause": [
+        "MNX representation",
+        "importer"
+      ],
+      "reason": "The exact source pitch or named glyph is absent from the imported document; no direct control can preserve the requested value. A model/carrier decision precedes a meaningful editing task.",
+      "undoRedo": "blocked",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/workbench/01d-Pitches-Microtones/observation.json"
+    },
+    {
+      "featureId": "01d.fractional-pitches",
+      "shell": "workbench",
+      "operation": "remove",
+      "task": "Remove a fractional alteration while retaining its base step and octave.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "blocked",
+      "cause": [
+        "MNX representation",
+        "importer"
+      ],
+      "reason": "The exact source pitch or named glyph is absent from the imported document; no direct control can preserve the requested value. A model/carrier decision precedes a meaningful editing task.",
+      "undoRedo": "blocked",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/workbench/01d-Pitches-Microtones/observation.json"
+    },
+    {
+      "featureId": "01d.fractional-pitches",
+      "shell": "studio",
+      "operation": "create",
+      "task": "Enter each of −1.5, −0.5, +0.5 and +1.5 semitone alterations at two octaves.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "blocked",
+      "cause": [
+        "MNX representation",
+        "importer"
+      ],
+      "reason": "The exact source pitch or named glyph is absent from the imported document; no direct control can preserve the requested value. A model/carrier decision precedes a meaningful editing task.",
+      "undoRedo": "blocked",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/studio/01d-Pitches-Microtones/observation.json"
+    },
+    {
+      "featureId": "01d.fractional-pitches",
+      "shell": "studio",
+      "operation": "inspect",
+      "task": "Read the exact fractional alteration of each source note.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "blocked",
+      "cause": [
+        "MNX representation",
+        "importer"
+      ],
+      "reason": "The exact source pitch or named glyph is absent from the imported document; no direct control can preserve the requested value. A model/carrier decision precedes a meaningful editing task.",
+      "undoRedo": "blocked",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/studio/01d-Pitches-Microtones/observation.json"
+    },
+    {
+      "featureId": "01d.fractional-pitches",
+      "shell": "studio",
+      "operation": "change",
+      "task": "Change one fractional alteration without rounding or affecting other notes.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "blocked",
+      "cause": [
+        "MNX representation",
+        "importer"
+      ],
+      "reason": "The exact source pitch or named glyph is absent from the imported document; no direct control can preserve the requested value. A model/carrier decision precedes a meaningful editing task.",
+      "undoRedo": "blocked",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/studio/01d-Pitches-Microtones/observation.json"
+    },
+    {
+      "featureId": "01d.fractional-pitches",
+      "shell": "studio",
+      "operation": "remove",
+      "task": "Remove a fractional alteration while retaining its base step and octave.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "blocked",
+      "cause": [
+        "MNX representation",
+        "importer"
+      ],
+      "reason": "The exact source pitch or named glyph is absent from the imported document; no direct control can preserve the requested value. A model/carrier decision precedes a meaningful editing task.",
+      "undoRedo": "blocked",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/studio/01d-Pitches-Microtones/observation.json"
+    },
+    {
+      "featureId": "01e.accidental-qualifiers",
+      "shell": "workbench",
+      "operation": "create",
+      "task": "Add a parenthesized or bracketed accidental, or a cautionary/editorial qualification, to a selected note.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "partial",
+      "cause": [
+        "command/binding",
+        "renderer feedback"
+      ],
+      "reason": "Parentheses and ordinary show/remove pass exact history on one selected note; bracket, editorial and combined qualifications have no proved direct control, and parentheses are not drawn.",
+      "undoRedo": "exact for tested mutation",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/write/workbench-01e/report.json",
+      "testedVariantIds": [
+        "01e-Pitches-ParenthesizedAccidentals/m01/n01"
+      ],
+      "uiPath": "Enter note inspector → accidental parens"
+    },
+    {
+      "featureId": "01e.accidental-qualifiers",
+      "shell": "workbench",
+      "operation": "inspect",
+      "task": "Read which of the four source qualifications applies to each note.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "partial",
+      "cause": [
+        "command/binding",
+        "renderer feedback"
+      ],
+      "reason": "Parentheses and ordinary show/remove pass exact history on one selected note; bracket, editorial and combined qualifications have no proved direct control, and parentheses are not drawn.",
+      "undoRedo": "not applicable",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/write/workbench-01e/report.json",
+      "testedVariantIds": [
+        "01e-Pitches-ParenthesizedAccidentals/m01/n01"
+      ],
+      "uiPath": "Enter note inspector → accidental show/parens pill"
+    },
+    {
+      "featureId": "01e.accidental-qualifiers",
+      "shell": "workbench",
+      "operation": "change",
+      "task": "Switch enclosure or qualification while retaining the sounding pitch.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "partial",
+      "cause": [
+        "command/binding",
+        "renderer feedback"
+      ],
+      "reason": "Parentheses and ordinary show/remove pass exact history on one selected note; bracket, editorial and combined qualifications have no proved direct control, and parentheses are not drawn.",
+      "undoRedo": "exact for tested mutation",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/write/workbench-01e/report.json",
+      "testedVariantIds": [
+        "01e-Pitches-ParenthesizedAccidentals/m01/n01"
+      ],
+      "uiPath": "Enter note inspector → accidental show, then accidental parens"
+    },
+    {
+      "featureId": "01e.accidental-qualifiers",
+      "shell": "workbench",
+      "operation": "remove",
+      "task": "Remove the selected accidental qualification without deleting its pitch.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "partial",
+      "cause": [
+        "command/binding",
+        "renderer feedback"
+      ],
+      "reason": "Parentheses and ordinary show/remove pass exact history on one selected note; bracket, editorial and combined qualifications have no proved direct control, and parentheses are not drawn.",
+      "undoRedo": "exact for tested mutation",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/write/workbench-01e/report.json",
+      "testedVariantIds": [
+        "01e-Pitches-ParenthesizedAccidentals/m01/n01"
+      ],
+      "uiPath": "Enter note inspector → no accidental"
+    },
+    {
+      "featureId": "01e.accidental-qualifiers",
+      "shell": "studio",
+      "operation": "create",
+      "task": "Add a parenthesized or bracketed accidental, or a cautionary/editorial qualification, to a selected note.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "partial",
+      "cause": [
+        "command/binding",
+        "renderer feedback"
+      ],
+      "reason": "Parentheses and ordinary show/remove pass exact history on one selected note; bracket, editorial and combined qualifications have no proved direct control, and parentheses are not drawn.",
+      "undoRedo": "exact for tested mutation",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/write/studio-01e/report.json",
+      "testedVariantIds": [
+        "01e-Pitches-ParenthesizedAccidentals/m01/n01"
+      ],
+      "uiPath": "Enter note inspector → accidental parens"
+    },
+    {
+      "featureId": "01e.accidental-qualifiers",
+      "shell": "studio",
+      "operation": "inspect",
+      "task": "Read which of the four source qualifications applies to each note.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "partial",
+      "cause": [
+        "command/binding",
+        "renderer feedback"
+      ],
+      "reason": "Parentheses and ordinary show/remove pass exact history on one selected note; bracket, editorial and combined qualifications have no proved direct control, and parentheses are not drawn.",
+      "undoRedo": "not applicable",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/write/studio-01e/report.json",
+      "testedVariantIds": [
+        "01e-Pitches-ParenthesizedAccidentals/m01/n01"
+      ],
+      "uiPath": "Enter note inspector → accidental show/parens pill"
+    },
+    {
+      "featureId": "01e.accidental-qualifiers",
+      "shell": "studio",
+      "operation": "change",
+      "task": "Switch enclosure or qualification while retaining the sounding pitch.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "partial",
+      "cause": [
+        "command/binding",
+        "renderer feedback"
+      ],
+      "reason": "Parentheses and ordinary show/remove pass exact history on one selected note; bracket, editorial and combined qualifications have no proved direct control, and parentheses are not drawn.",
+      "undoRedo": "exact for tested mutation",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/write/studio-01e/report.json",
+      "testedVariantIds": [
+        "01e-Pitches-ParenthesizedAccidentals/m01/n01"
+      ],
+      "uiPath": "Enter note inspector → accidental show, then accidental parens"
+    },
+    {
+      "featureId": "01e.accidental-qualifiers",
+      "shell": "studio",
+      "operation": "remove",
+      "task": "Remove the selected accidental qualification without deleting its pitch.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "partial",
+      "cause": [
+        "command/binding",
+        "renderer feedback"
+      ],
+      "reason": "Parentheses and ordinary show/remove pass exact history on one selected note; bracket, editorial and combined qualifications have no proved direct control, and parentheses are not drawn.",
+      "undoRedo": "exact for tested mutation",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/write/studio-01e/report.json",
+      "testedVariantIds": [
+        "01e-Pitches-ParenthesizedAccidentals/m01/n01"
+      ],
+      "uiPath": "Enter note inspector → no accidental"
+    },
+    {
+      "featureId": "01f.microtonal-accidental-qualifiers",
+      "shell": "workbench",
+      "operation": "create",
+      "task": "Enter the exact quarter/three-quarter glyph and its plain, cautionary or editorial form.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "blocked",
+      "cause": [
+        "MNX representation",
+        "importer"
+      ],
+      "reason": "The exact source pitch or named glyph is absent from the imported document; no direct control can preserve the requested value. A model/carrier decision precedes a meaningful editing task.",
+      "undoRedo": "blocked",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/workbench/01f-Pitches-ParenthesizedMicrotoneAccidentals/observation.json"
+    },
+    {
+      "featureId": "01f.microtonal-accidental-qualifiers",
+      "shell": "workbench",
+      "operation": "inspect",
+      "task": "Read both the fractional pitch and the accidental qualification.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "blocked",
+      "cause": [
+        "MNX representation",
+        "importer"
+      ],
+      "reason": "The exact source pitch or named glyph is absent from the imported document; no direct control can preserve the requested value. A model/carrier decision precedes a meaningful editing task.",
+      "undoRedo": "blocked",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/workbench/01f-Pitches-ParenthesizedMicrotoneAccidentals/observation.json"
+    },
+    {
+      "featureId": "01f.microtonal-accidental-qualifiers",
+      "shell": "workbench",
+      "operation": "change",
+      "task": "Switch either exact microtonal glyph or qualification without rounding pitch.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "blocked",
+      "cause": [
+        "MNX representation",
+        "importer"
+      ],
+      "reason": "The exact source pitch or named glyph is absent from the imported document; no direct control can preserve the requested value. A model/carrier decision precedes a meaningful editing task.",
+      "undoRedo": "blocked",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/workbench/01f-Pitches-ParenthesizedMicrotoneAccidentals/observation.json"
+    },
+    {
+      "featureId": "01f.microtonal-accidental-qualifiers",
+      "shell": "workbench",
+      "operation": "remove",
+      "task": "Remove qualification or glyph choice without silently changing pitch.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "blocked",
+      "cause": [
+        "MNX representation",
+        "importer"
+      ],
+      "reason": "The exact source pitch or named glyph is absent from the imported document; no direct control can preserve the requested value. A model/carrier decision precedes a meaningful editing task.",
+      "undoRedo": "blocked",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/workbench/01f-Pitches-ParenthesizedMicrotoneAccidentals/observation.json"
+    },
+    {
+      "featureId": "01f.microtonal-accidental-qualifiers",
+      "shell": "studio",
+      "operation": "create",
+      "task": "Enter the exact quarter/three-quarter glyph and its plain, cautionary or editorial form.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "blocked",
+      "cause": [
+        "MNX representation",
+        "importer"
+      ],
+      "reason": "The exact source pitch or named glyph is absent from the imported document; no direct control can preserve the requested value. A model/carrier decision precedes a meaningful editing task.",
+      "undoRedo": "blocked",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/studio/01f-Pitches-ParenthesizedMicrotoneAccidentals/observation.json"
+    },
+    {
+      "featureId": "01f.microtonal-accidental-qualifiers",
+      "shell": "studio",
+      "operation": "inspect",
+      "task": "Read both the fractional pitch and the accidental qualification.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "blocked",
+      "cause": [
+        "MNX representation",
+        "importer"
+      ],
+      "reason": "The exact source pitch or named glyph is absent from the imported document; no direct control can preserve the requested value. A model/carrier decision precedes a meaningful editing task.",
+      "undoRedo": "blocked",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/studio/01f-Pitches-ParenthesizedMicrotoneAccidentals/observation.json"
+    },
+    {
+      "featureId": "01f.microtonal-accidental-qualifiers",
+      "shell": "studio",
+      "operation": "change",
+      "task": "Switch either exact microtonal glyph or qualification without rounding pitch.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "blocked",
+      "cause": [
+        "MNX representation",
+        "importer"
+      ],
+      "reason": "The exact source pitch or named glyph is absent from the imported document; no direct control can preserve the requested value. A model/carrier decision precedes a meaningful editing task.",
+      "undoRedo": "blocked",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/studio/01f-Pitches-ParenthesizedMicrotoneAccidentals/observation.json"
+    },
+    {
+      "featureId": "01f.microtonal-accidental-qualifiers",
+      "shell": "studio",
+      "operation": "remove",
+      "task": "Remove qualification or glyph choice without silently changing pitch.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "blocked",
+      "cause": [
+        "MNX representation",
+        "importer"
+      ],
+      "reason": "The exact source pitch or named glyph is absent from the imported document; no direct control can preserve the requested value. A model/carrier decision precedes a meaningful editing task.",
+      "undoRedo": "blocked",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/studio/01f-Pitches-ParenthesizedMicrotoneAccidentals/observation.json"
+    },
+    {
+      "featureId": "01g.arrow-accidental-glyphs",
+      "shell": "workbench",
+      "operation": "create",
+      "task": "Place one of the twelve distinct up/down arrow accidental glyphs on a G4 note.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "blocked",
+      "cause": [
+        "MNX representation",
+        "importer"
+      ],
+      "reason": "The exact source pitch or named glyph is absent from the imported document; no direct control can preserve the requested value. A model/carrier decision precedes a meaningful editing task.",
+      "undoRedo": "blocked",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/workbench/01g-Pitches-AllArrowAccidentals/observation.json"
+    },
+    {
+      "featureId": "01g.arrow-accidental-glyphs",
+      "shell": "workbench",
+      "operation": "inspect",
+      "task": "Read which named arrow accidental the selected source note uses.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "blocked",
+      "cause": [
+        "MNX representation",
+        "importer"
+      ],
+      "reason": "The exact source pitch or named glyph is absent from the imported document; no direct control can preserve the requested value. A model/carrier decision precedes a meaningful editing task.",
+      "undoRedo": "blocked",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/workbench/01g-Pitches-AllArrowAccidentals/observation.json"
+    },
+    {
+      "featureId": "01g.arrow-accidental-glyphs",
+      "shell": "workbench",
+      "operation": "change",
+      "task": "Switch between two named arrow glyphs while preserving G4.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "blocked",
+      "cause": [
+        "MNX representation",
+        "importer"
+      ],
+      "reason": "The exact source pitch or named glyph is absent from the imported document; no direct control can preserve the requested value. A model/carrier decision precedes a meaningful editing task.",
+      "undoRedo": "blocked",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/workbench/01g-Pitches-AllArrowAccidentals/observation.json"
+    },
+    {
+      "featureId": "01g.arrow-accidental-glyphs",
+      "shell": "workbench",
+      "operation": "remove",
+      "task": "Remove the arrow glyph choice while preserving the note.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "blocked",
+      "cause": [
+        "MNX representation",
+        "importer"
+      ],
+      "reason": "The exact source pitch or named glyph is absent from the imported document; no direct control can preserve the requested value. A model/carrier decision precedes a meaningful editing task.",
+      "undoRedo": "blocked",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/workbench/01g-Pitches-AllArrowAccidentals/observation.json"
+    },
+    {
+      "featureId": "01g.arrow-accidental-glyphs",
+      "shell": "studio",
+      "operation": "create",
+      "task": "Place one of the twelve distinct up/down arrow accidental glyphs on a G4 note.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "blocked",
+      "cause": [
+        "MNX representation",
+        "importer"
+      ],
+      "reason": "The exact source pitch or named glyph is absent from the imported document; no direct control can preserve the requested value. A model/carrier decision precedes a meaningful editing task.",
+      "undoRedo": "blocked",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/studio/01g-Pitches-AllArrowAccidentals/observation.json"
+    },
+    {
+      "featureId": "01g.arrow-accidental-glyphs",
+      "shell": "studio",
+      "operation": "inspect",
+      "task": "Read which named arrow accidental the selected source note uses.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "blocked",
+      "cause": [
+        "MNX representation",
+        "importer"
+      ],
+      "reason": "The exact source pitch or named glyph is absent from the imported document; no direct control can preserve the requested value. A model/carrier decision precedes a meaningful editing task.",
+      "undoRedo": "blocked",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/studio/01g-Pitches-AllArrowAccidentals/observation.json"
+    },
+    {
+      "featureId": "01g.arrow-accidental-glyphs",
+      "shell": "studio",
+      "operation": "change",
+      "task": "Switch between two named arrow glyphs while preserving G4.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "blocked",
+      "cause": [
+        "MNX representation",
+        "importer"
+      ],
+      "reason": "The exact source pitch or named glyph is absent from the imported document; no direct control can preserve the requested value. A model/carrier decision precedes a meaningful editing task.",
+      "undoRedo": "blocked",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/studio/01g-Pitches-AllArrowAccidentals/observation.json"
+    },
+    {
+      "featureId": "01g.arrow-accidental-glyphs",
+      "shell": "studio",
+      "operation": "remove",
+      "task": "Remove the arrow glyph choice while preserving the note.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "blocked",
+      "cause": [
+        "MNX representation",
+        "importer"
+      ],
+      "reason": "The exact source pitch or named glyph is absent from the imported document; no direct control can preserve the requested value. A model/carrier decision precedes a meaningful editing task.",
+      "undoRedo": "blocked",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/studio/01g-Pitches-AllArrowAccidentals/observation.json"
+    },
+    {
+      "featureId": "01h.turkish-persian-accidental-glyphs",
+      "shell": "workbench",
+      "operation": "create",
+      "task": "Place one of the fourteen slash, numbered, sori or koron glyphs on G4.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "blocked",
+      "cause": [
+        "MNX representation",
+        "importer"
+      ],
+      "reason": "The exact source pitch or named glyph is absent from the imported document; no direct control can preserve the requested value. A model/carrier decision precedes a meaningful editing task.",
+      "undoRedo": "blocked",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/workbench/01h-Pitches-TurkishPersian/observation.json"
+    },
+    {
+      "featureId": "01h.turkish-persian-accidental-glyphs",
+      "shell": "workbench",
+      "operation": "inspect",
+      "task": "Read the selected glyph's exact MusicXML accidental name.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "blocked",
+      "cause": [
+        "MNX representation",
+        "importer"
+      ],
+      "reason": "The exact source pitch or named glyph is absent from the imported document; no direct control can preserve the requested value. A model/carrier decision precedes a meaningful editing task.",
+      "undoRedo": "blocked",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/workbench/01h-Pitches-TurkishPersian/observation.json"
+    },
+    {
+      "featureId": "01h.turkish-persian-accidental-glyphs",
+      "shell": "workbench",
+      "operation": "change",
+      "task": "Switch between two named Turkish/Persian glyphs while preserving G4.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "blocked",
+      "cause": [
+        "MNX representation",
+        "importer"
+      ],
+      "reason": "The exact source pitch or named glyph is absent from the imported document; no direct control can preserve the requested value. A model/carrier decision precedes a meaningful editing task.",
+      "undoRedo": "blocked",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/workbench/01h-Pitches-TurkishPersian/observation.json"
+    },
+    {
+      "featureId": "01h.turkish-persian-accidental-glyphs",
+      "shell": "workbench",
+      "operation": "remove",
+      "task": "Remove the named glyph choice while preserving the note.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "blocked",
+      "cause": [
+        "MNX representation",
+        "importer"
+      ],
+      "reason": "The exact source pitch or named glyph is absent from the imported document; no direct control can preserve the requested value. A model/carrier decision precedes a meaningful editing task.",
+      "undoRedo": "blocked",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/workbench/01h-Pitches-TurkishPersian/observation.json"
+    },
+    {
+      "featureId": "01h.turkish-persian-accidental-glyphs",
+      "shell": "studio",
+      "operation": "create",
+      "task": "Place one of the fourteen slash, numbered, sori or koron glyphs on G4.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "blocked",
+      "cause": [
+        "MNX representation",
+        "importer"
+      ],
+      "reason": "The exact source pitch or named glyph is absent from the imported document; no direct control can preserve the requested value. A model/carrier decision precedes a meaningful editing task.",
+      "undoRedo": "blocked",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/studio/01h-Pitches-TurkishPersian/observation.json"
+    },
+    {
+      "featureId": "01h.turkish-persian-accidental-glyphs",
+      "shell": "studio",
+      "operation": "inspect",
+      "task": "Read the selected glyph's exact MusicXML accidental name.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "blocked",
+      "cause": [
+        "MNX representation",
+        "importer"
+      ],
+      "reason": "The exact source pitch or named glyph is absent from the imported document; no direct control can preserve the requested value. A model/carrier decision precedes a meaningful editing task.",
+      "undoRedo": "blocked",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/studio/01h-Pitches-TurkishPersian/observation.json"
+    },
+    {
+      "featureId": "01h.turkish-persian-accidental-glyphs",
+      "shell": "studio",
+      "operation": "change",
+      "task": "Switch between two named Turkish/Persian glyphs while preserving G4.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "blocked",
+      "cause": [
+        "MNX representation",
+        "importer"
+      ],
+      "reason": "The exact source pitch or named glyph is absent from the imported document; no direct control can preserve the requested value. A model/carrier decision precedes a meaningful editing task.",
+      "undoRedo": "blocked",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/studio/01h-Pitches-TurkishPersian/observation.json"
+    },
+    {
+      "featureId": "01h.turkish-persian-accidental-glyphs",
+      "shell": "studio",
+      "operation": "remove",
+      "task": "Remove the named glyph choice while preserving the note.",
+      "expectedStructuralChange": "See task; preserve unrelated notes, events and metadata",
+      "verdict": "blocked",
+      "cause": [
+        "MNX representation",
+        "importer"
+      ],
+      "reason": "The exact source pitch or named glyph is absent from the imported document; no direct control can preserve the requested value. A model/carrier decision precedes a meaningful editing task.",
+      "undoRedo": "blocked",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/studio/01h-Pitches-TurkishPersian/observation.json"
+    }
+  ],
+  "persistence": [
+    {
+      "featureId": "01a.pitch-sequence",
+      "shell": "workbench",
+      "route": "JSON Copy → file → Open MNX",
+      "verdict": "partial",
+      "cause": [],
+      "reason": "Final first-note create state reopens exactly; only this selected edit was exercised.",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/write/workbench-01a/report.json"
+    },
+    {
+      "featureId": "01a.pitch-sequence",
+      "shell": "studio",
+      "route": "Save now → GP checkpoint → reload",
+      "verdict": "incorrect",
+      "cause": [
+        "persistence/export"
+      ],
+      "reason": "GP checkpoint has 93 of 108 notes; each Library download reopens from that saved canonical source with 93 notes. The original XML rendition stays unchanged.",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/write/studio-01a/report.json"
+    },
+    {
+      "featureId": "01a.pitch-sequence",
+      "shell": "studio",
+      "route": "Library Export MNX → Open",
+      "verdict": "incorrect",
+      "cause": [
+        "persistence/export"
+      ],
+      "reason": "GP checkpoint has 93 of 108 notes; each Library download reopens from that saved canonical source with 93 notes. The original XML rendition stays unchanged.",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/write/studio-01a/report.json"
+    },
+    {
+      "featureId": "01a.pitch-sequence",
+      "shell": "studio",
+      "route": "Library Export MusicXML → Open",
+      "verdict": "incorrect",
+      "cause": [
+        "persistence/export"
+      ],
+      "reason": "GP checkpoint has 93 of 108 notes; each Library download reopens from that saved canonical source with 93 notes. The original XML rendition stays unchanged.",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/write/studio-01a/report.json"
+    },
+    {
+      "featureId": "01a.pitch-sequence",
+      "shell": "studio",
+      "route": "Library Export Guitar Pro 7 → Open",
+      "verdict": "incorrect",
+      "cause": [
+        "persistence/export"
+      ],
+      "reason": "GP checkpoint has 93 of 108 notes; each Library download reopens from that saved canonical source with 93 notes. The original XML rendition stays unchanged.",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/write/studio-01a/report.json"
+    },
+    {
+      "featureId": "01a.explicit-accidentals",
+      "shell": "workbench",
+      "route": "JSON Copy → file → Open MNX",
+      "verdict": "unresolved",
+      "cause": [
+        "not yet isolated"
+      ],
+      "reason": "No edited source-specific state was reopened through this route.",
+      "evidence": null
+    },
+    {
+      "featureId": "01a.explicit-accidentals",
+      "shell": "studio",
+      "route": "Save now → GP checkpoint → reload",
+      "verdict": "incorrect",
+      "cause": [
+        "persistence/export"
+      ],
+      "reason": "The 01a GP checkpoint loses explicit accidental-display fields, independently of its 15 lost notes; downstream Library exports inherit the saved canonical state.",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/write/studio-01a/report.json"
+    },
+    {
+      "featureId": "01a.explicit-accidentals",
+      "shell": "studio",
+      "route": "Library Export MNX → Open",
+      "verdict": "incorrect",
+      "cause": [
+        "persistence/export"
+      ],
+      "reason": "The 01a GP checkpoint loses explicit accidental-display fields, independently of its 15 lost notes; downstream Library exports inherit the saved canonical state.",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/write/studio-01a/report.json"
+    },
+    {
+      "featureId": "01a.explicit-accidentals",
+      "shell": "studio",
+      "route": "Library Export MusicXML → Open",
+      "verdict": "incorrect",
+      "cause": [
+        "persistence/export"
+      ],
+      "reason": "The 01a GP checkpoint loses explicit accidental-display fields, independently of its 15 lost notes; downstream Library exports inherit the saved canonical state.",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/write/studio-01a/report.json"
+    },
+    {
+      "featureId": "01a.explicit-accidentals",
+      "shell": "studio",
+      "route": "Library Export Guitar Pro 7 → Open",
+      "verdict": "incorrect",
+      "cause": [
+        "persistence/export"
+      ],
+      "reason": "The 01a GP checkpoint loses explicit accidental-display fields, independently of its 15 lost notes; downstream Library exports inherit the saved canonical state.",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/write/studio-01a/report.json"
+    },
+    {
+      "featureId": "01a.accidental-qualifiers",
+      "shell": "workbench",
+      "route": "JSON Copy → file → Open MNX",
+      "verdict": "unresolved",
+      "cause": [
+        "not yet isolated"
+      ],
+      "reason": "No edited source-specific state was reopened through this route.",
+      "evidence": null
+    },
+    {
+      "featureId": "01a.accidental-qualifiers",
+      "shell": "studio",
+      "route": "Save now → GP checkpoint → reload",
+      "verdict": "unresolved",
+      "cause": [
+        "not yet isolated"
+      ],
+      "reason": "No edited source-specific state was reopened through this route.",
+      "evidence": null
+    },
+    {
+      "featureId": "01a.accidental-qualifiers",
+      "shell": "studio",
+      "route": "Library Export MNX → Open",
+      "verdict": "unresolved",
+      "cause": [
+        "not yet isolated"
+      ],
+      "reason": "No edited source-specific state was reopened through this route.",
+      "evidence": null
+    },
+    {
+      "featureId": "01a.accidental-qualifiers",
+      "shell": "studio",
+      "route": "Library Export MusicXML → Open",
+      "verdict": "unresolved",
+      "cause": [
+        "not yet isolated"
+      ],
+      "reason": "No edited source-specific state was reopened through this route.",
+      "evidence": null
+    },
+    {
+      "featureId": "01a.accidental-qualifiers",
+      "shell": "studio",
+      "route": "Library Export Guitar Pro 7 → Open",
+      "verdict": "unresolved",
+      "cause": [
+        "not yet isolated"
+      ],
+      "reason": "No edited source-specific state was reopened through this route.",
+      "evidence": null
+    },
+    {
+      "featureId": "01b.interval-ladder",
+      "shell": "workbench",
+      "route": "JSON Copy → file → Open MNX",
+      "verdict": "unresolved",
+      "cause": [
+        "not yet isolated"
+      ],
+      "reason": "No edited source-specific state was reopened through this route.",
+      "evidence": null
+    },
+    {
+      "featureId": "01b.interval-ladder",
+      "shell": "studio",
+      "route": "Save now → GP checkpoint → reload",
+      "verdict": "unresolved",
+      "cause": [
+        "not yet isolated"
+      ],
+      "reason": "No edited source-specific state was reopened through this route.",
+      "evidence": null
+    },
+    {
+      "featureId": "01b.interval-ladder",
+      "shell": "studio",
+      "route": "Library Export MNX → Open",
+      "verdict": "unresolved",
+      "cause": [
+        "not yet isolated"
+      ],
+      "reason": "No edited source-specific state was reopened through this route.",
+      "evidence": null
+    },
+    {
+      "featureId": "01b.interval-ladder",
+      "shell": "studio",
+      "route": "Library Export MusicXML → Open",
+      "verdict": "unresolved",
+      "cause": [
+        "not yet isolated"
+      ],
+      "reason": "No edited source-specific state was reopened through this route.",
+      "evidence": null
+    },
+    {
+      "featureId": "01b.interval-ladder",
+      "shell": "studio",
+      "route": "Library Export Guitar Pro 7 → Open",
+      "verdict": "unresolved",
+      "cause": [
+        "not yet isolated"
+      ],
+      "reason": "No edited source-specific state was reopened through this route.",
+      "evidence": null
+    },
+    {
+      "featureId": "01c.omitted-voice",
+      "shell": "workbench",
+      "route": "JSON Copy → file → Open MNX",
+      "verdict": "not applicable",
+      "cause": [],
+      "reason": "Omission of an optional XML voice tag is not a direct editor state.",
+      "evidence": null
+    },
+    {
+      "featureId": "01c.omitted-voice",
+      "shell": "studio",
+      "route": "Save now → GP checkpoint → reload",
+      "verdict": "not applicable",
+      "cause": [],
+      "reason": "Omission of an optional XML voice tag is not a direct editor state.",
+      "evidence": null
+    },
+    {
+      "featureId": "01c.omitted-voice",
+      "shell": "studio",
+      "route": "Library Export MNX → Open",
+      "verdict": "not applicable",
+      "cause": [],
+      "reason": "Omission of an optional XML voice tag is not a direct editor state.",
+      "evidence": null
+    },
+    {
+      "featureId": "01c.omitted-voice",
+      "shell": "studio",
+      "route": "Library Export MusicXML → Open",
+      "verdict": "not applicable",
+      "cause": [],
+      "reason": "Omission of an optional XML voice tag is not a direct editor state.",
+      "evidence": null
+    },
+    {
+      "featureId": "01c.omitted-voice",
+      "shell": "studio",
+      "route": "Library Export Guitar Pro 7 → Open",
+      "verdict": "not applicable",
+      "cause": [],
+      "reason": "Omission of an optional XML voice tag is not a direct editor state.",
+      "evidence": null
+    },
+    {
+      "featureId": "01c.lyric-anchor",
+      "shell": "workbench",
+      "route": "JSON Copy → file → Open MNX",
+      "verdict": "unresolved",
+      "cause": [
+        "not yet isolated"
+      ],
+      "reason": "No edited source-specific state was reopened through this route.",
+      "evidence": null
+    },
+    {
+      "featureId": "01c.lyric-anchor",
+      "shell": "studio",
+      "route": "Save now → GP checkpoint → reload",
+      "verdict": "unresolved",
+      "cause": [
+        "not yet isolated"
+      ],
+      "reason": "No edited source-specific state was reopened through this route.",
+      "evidence": null
+    },
+    {
+      "featureId": "01c.lyric-anchor",
+      "shell": "studio",
+      "route": "Library Export MNX → Open",
+      "verdict": "unresolved",
+      "cause": [
+        "not yet isolated"
+      ],
+      "reason": "No edited source-specific state was reopened through this route.",
+      "evidence": null
+    },
+    {
+      "featureId": "01c.lyric-anchor",
+      "shell": "studio",
+      "route": "Library Export MusicXML → Open",
+      "verdict": "unresolved",
+      "cause": [
+        "not yet isolated"
+      ],
+      "reason": "No edited source-specific state was reopened through this route.",
+      "evidence": null
+    },
+    {
+      "featureId": "01c.lyric-anchor",
+      "shell": "studio",
+      "route": "Library Export Guitar Pro 7 → Open",
+      "verdict": "unresolved",
+      "cause": [
+        "not yet isolated"
+      ],
+      "reason": "No edited source-specific state was reopened through this route.",
+      "evidence": null
+    },
+    {
+      "featureId": "01d.fractional-pitches",
+      "shell": "workbench",
+      "route": "JSON Copy → file → Open MNX",
+      "verdict": "blocked",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "The exact source feature was lost before an editable state or save route existed.",
+      "evidence": null
+    },
+    {
+      "featureId": "01d.fractional-pitches",
+      "shell": "studio",
+      "route": "Save now → GP checkpoint → reload",
+      "verdict": "blocked",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "The exact source feature was lost before an editable state or save route existed.",
+      "evidence": null
+    },
+    {
+      "featureId": "01d.fractional-pitches",
+      "shell": "studio",
+      "route": "Library Export MNX → Open",
+      "verdict": "blocked",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "The exact source feature was lost before an editable state or save route existed.",
+      "evidence": null
+    },
+    {
+      "featureId": "01d.fractional-pitches",
+      "shell": "studio",
+      "route": "Library Export MusicXML → Open",
+      "verdict": "blocked",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "The exact source feature was lost before an editable state or save route existed.",
+      "evidence": null
+    },
+    {
+      "featureId": "01d.fractional-pitches",
+      "shell": "studio",
+      "route": "Library Export Guitar Pro 7 → Open",
+      "verdict": "blocked",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "The exact source feature was lost before an editable state or save route existed.",
+      "evidence": null
+    },
+    {
+      "featureId": "01e.accidental-qualifiers",
+      "shell": "workbench",
+      "route": "JSON Copy → file → Open MNX",
+      "verdict": "partial",
+      "cause": [],
+      "reason": "Final first-note parenthesis carrier reopens exactly as MNX; other qualifier variants were not authored.",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/write/workbench-01e/report.json"
+    },
+    {
+      "featureId": "01e.accidental-qualifiers",
+      "shell": "studio",
+      "route": "Save now → GP checkpoint → reload",
+      "verdict": "incorrect",
+      "cause": [
+        "persistence/export"
+      ],
+      "reason": "GP storage retains 16 notes but drops every accidentalDisplay, including the new parentheses; all three Library downloads reopen without it.",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/write/studio-01e/report.json"
+    },
+    {
+      "featureId": "01e.accidental-qualifiers",
+      "shell": "studio",
+      "route": "Library Export MNX → Open",
+      "verdict": "incorrect",
+      "cause": [
+        "persistence/export"
+      ],
+      "reason": "GP storage retains 16 notes but drops every accidentalDisplay, including the new parentheses; all three Library downloads reopen without it.",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/write/studio-01e/report.json"
+    },
+    {
+      "featureId": "01e.accidental-qualifiers",
+      "shell": "studio",
+      "route": "Library Export MusicXML → Open",
+      "verdict": "incorrect",
+      "cause": [
+        "persistence/export"
+      ],
+      "reason": "GP storage retains 16 notes but drops every accidentalDisplay, including the new parentheses; all three Library downloads reopen without it.",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/write/studio-01e/report.json"
+    },
+    {
+      "featureId": "01e.accidental-qualifiers",
+      "shell": "studio",
+      "route": "Library Export Guitar Pro 7 → Open",
+      "verdict": "incorrect",
+      "cause": [
+        "persistence/export"
+      ],
+      "reason": "GP storage retains 16 notes but drops every accidentalDisplay, including the new parentheses; all three Library downloads reopen without it.",
+      "evidence": "harness/fixtures/musicxml-pitch-evidence/write/studio-01e/report.json"
+    },
+    {
+      "featureId": "01f.microtonal-accidental-qualifiers",
+      "shell": "workbench",
+      "route": "JSON Copy → file → Open MNX",
+      "verdict": "blocked",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "The exact source feature was lost before an editable state or save route existed.",
+      "evidence": null
+    },
+    {
+      "featureId": "01f.microtonal-accidental-qualifiers",
+      "shell": "studio",
+      "route": "Save now → GP checkpoint → reload",
+      "verdict": "blocked",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "The exact source feature was lost before an editable state or save route existed.",
+      "evidence": null
+    },
+    {
+      "featureId": "01f.microtonal-accidental-qualifiers",
+      "shell": "studio",
+      "route": "Library Export MNX → Open",
+      "verdict": "blocked",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "The exact source feature was lost before an editable state or save route existed.",
+      "evidence": null
+    },
+    {
+      "featureId": "01f.microtonal-accidental-qualifiers",
+      "shell": "studio",
+      "route": "Library Export MusicXML → Open",
+      "verdict": "blocked",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "The exact source feature was lost before an editable state or save route existed.",
+      "evidence": null
+    },
+    {
+      "featureId": "01f.microtonal-accidental-qualifiers",
+      "shell": "studio",
+      "route": "Library Export Guitar Pro 7 → Open",
+      "verdict": "blocked",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "The exact source feature was lost before an editable state or save route existed.",
+      "evidence": null
+    },
+    {
+      "featureId": "01g.arrow-accidental-glyphs",
+      "shell": "workbench",
+      "route": "JSON Copy → file → Open MNX",
+      "verdict": "blocked",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "The exact source feature was lost before an editable state or save route existed.",
+      "evidence": null
+    },
+    {
+      "featureId": "01g.arrow-accidental-glyphs",
+      "shell": "studio",
+      "route": "Save now → GP checkpoint → reload",
+      "verdict": "blocked",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "The exact source feature was lost before an editable state or save route existed.",
+      "evidence": null
+    },
+    {
+      "featureId": "01g.arrow-accidental-glyphs",
+      "shell": "studio",
+      "route": "Library Export MNX → Open",
+      "verdict": "blocked",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "The exact source feature was lost before an editable state or save route existed.",
+      "evidence": null
+    },
+    {
+      "featureId": "01g.arrow-accidental-glyphs",
+      "shell": "studio",
+      "route": "Library Export MusicXML → Open",
+      "verdict": "blocked",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "The exact source feature was lost before an editable state or save route existed.",
+      "evidence": null
+    },
+    {
+      "featureId": "01g.arrow-accidental-glyphs",
+      "shell": "studio",
+      "route": "Library Export Guitar Pro 7 → Open",
+      "verdict": "blocked",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "The exact source feature was lost before an editable state or save route existed.",
+      "evidence": null
+    },
+    {
+      "featureId": "01h.turkish-persian-accidental-glyphs",
+      "shell": "workbench",
+      "route": "JSON Copy → file → Open MNX",
+      "verdict": "blocked",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "The exact source feature was lost before an editable state or save route existed.",
+      "evidence": null
+    },
+    {
+      "featureId": "01h.turkish-persian-accidental-glyphs",
+      "shell": "studio",
+      "route": "Save now → GP checkpoint → reload",
+      "verdict": "blocked",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "The exact source feature was lost before an editable state or save route existed.",
+      "evidence": null
+    },
+    {
+      "featureId": "01h.turkish-persian-accidental-glyphs",
+      "shell": "studio",
+      "route": "Library Export MNX → Open",
+      "verdict": "blocked",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "The exact source feature was lost before an editable state or save route existed.",
+      "evidence": null
+    },
+    {
+      "featureId": "01h.turkish-persian-accidental-glyphs",
+      "shell": "studio",
+      "route": "Library Export MusicXML → Open",
+      "verdict": "blocked",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "The exact source feature was lost before an editable state or save route existed.",
+      "evidence": null
+    },
+    {
+      "featureId": "01h.turkish-persian-accidental-glyphs",
+      "shell": "studio",
+      "route": "Library Export Guitar Pro 7 → Open",
+      "verdict": "blocked",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "The exact source feature was lost before an editable state or save route existed.",
+      "evidence": null
+    }
+  ],
+  "counts": {
+    "renderRows": 22,
+    "renderVerdicts": {
+      "correct": 8,
+      "unresolved": 2,
+      "not applicable": 2,
+      "incorrect": 8,
+      "partial": 2
+    },
+    "authoringTaskRows": 88,
+    "authoringVerdicts": {
+      "partial": 20,
+      "unresolved": 28,
+      "not applicable": 8,
+      "blocked": 32
+    },
+    "persistenceRows": 55,
+    "persistenceVerdicts": {
+      "partial": 2,
+      "incorrect": 12,
+      "unresolved": 16,
+      "not applicable": 5,
+      "blocked": 20
+    }
+  },
+  "deduplication": {
+    "item22": "01d's eight fractional pitch warnings and carrier deferral already belong to completed item 22. The 01f fractional cases share that blocker; they are not a new fractional-pitch implementation request.",
+    "item23": "Item 23 enables untitled Studio originals to become editable; the current eight do. It records 01a's 15-note GP storage loss but does not repair it.",
+    "newProposal": "core-musicxml-accidental-fidelity: explicit enclosure import/render, named accidental diagnostics and carrier decision, direct bracket/editorial authoring, and GP storage policy."
+  }
+}

@@ -140,3 +140,16 @@ Start the next evidence batch with `01a`–`01h` pitches/accidentals: derive
 feature variants from source and manifest descriptions, inspect imported MNX,
 recapture relevant notation in both shells on the current app, and record
 explicit feature × view verdicts and causes. Carry the same IDs into item 19.
+
+## Pitch/accidental batch, 2026-09-24
+
+[The 01a–01h report](../../docs/musicxml-pitch-assessment.md) now records 11
+shared feature IDs, stable source-note variants and 22 current Notation
+feature × shell × view verdicts. Both-shell captures, imported MNX and
+source-to-import comparisons are retained. No source declares strings; Tab/Both
+are inapplicable. Explicit enclosure and named-glyph losses support
+[proposed item 24](../proposed/core-musicxml-accidental-fidelity.md); `01d`
+fractional-pitch diagnostics remain item 22's completed scope. Default
+cautionary/editorial styling is unresolved where the original does not
+specify an enclosure. This is one eight-fixture slice, not completion of the
+183-fixture assessment.

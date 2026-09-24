@@ -1,0 +1,56 @@
+{
+  "id": "01e-Pitches-ParenthesizedAccidentals",
+  "sourceSha256": "76c4977cab6cf9f68c53cc6785dfa830675462e291f990224880ae2ccf535de5",
+  "testClass": "feature",
+  "description": "Accidentals have the attributes ‘cautionary’, ‘editorial’, ‘parenthesized’, and ‘bracketed’. The first two measures each have a cautionary accidental, an editorial, a cautionary with parentheses off, and an editorial and cautionary accidental. The next two measures each have a normal accidental, a bracketed, a parenthesized, and a bracketed and parenthesized accidental.",
+  "views": [
+    {
+      "scrollTarget": "frame",
+      "visibleWidth": 1060,
+      "visibleHeight": 870,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0,
+          1,
+          2,
+          3
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [],
+      "scrollWidth": 1060,
+      "scrollHeight": 870,
+      "clientWidth": 1060,
+      "clientHeight": 870,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "suppliedLibraryTitle": "01e-Pitches-ParenthesizedAccidentals",
+  "makeCurrentError": null,
+  "entryPath": "Local operator ingest: GP seed + unmodified XML original; Save → Versions → View XML → Make current",
+  "importError": null,
+  "viewingOriginal": false,
+  "editingSuspended": false,
+  "warnings": [],
+  "importedDocumentSha256": "78fed76f0707d3ca6359edeffd02a5fe9d56932b194d17b24a0c4e7a7e743516",
+  "displayOptions": {
+    "lyrics": "current",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

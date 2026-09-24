@@ -201,3 +201,12 @@ losses include explicit accidentals, the time-display flag, support flags and a 
 tuning and transposition are gained. The original MusicXML remains byte-identical.
 This is a storage/export limitation exposed by the assessment, not lossless MusicXML
 editing. Full fixture-by-feature and task-by-task assessment remains unfinished.
+
+## Current pitch/accidental slice
+
+The [01a–01h assessment](musicxml-pitch-assessment.md) supersedes the historical
+load/display observations for those eight originals with current feature/view
+and task dispositions. It includes original-file captures in both shells,
+source-note variant IDs, exact UI history probes and separate Studio storage
+and Library export/reopen measurements. The rest of the 183-source sweep
+remains a historical baseline. Neither assessment item is complete.
