@@ -1,0 +1,3971 @@
+{
+  "kind": "implementation-loop agent render assessment; not human verification",
+  "applicationCommit": "2a2481d9dd12d9e17ded020d00e967bdcee0b67d",
+  "corpusRevision": "77c19f7e819154c70ca1a1992e80dcda8ff82fea",
+  "scope": "Six 02a–02f original rest fixtures, source → browser-imported MNX → complete notation in both shells",
+  "fixtureCount": 6,
+  "featureCount": 13,
+  "sourceVariantCount": 113,
+  "browser": "Chrome/153.0.8010.36",
+  "viewport": {
+    "width": 1440,
+    "height": 1000,
+    "deviceScaleFactor": 1
+  },
+  "viewPolicy": "No source strings: Notation only in both shells; Tab/Both inapplicable. Time signatures explicitly Show. Full scroll tiled.",
+  "fixtures": [
+    {
+      "id": "02a-Rests-Durations",
+      "description": "All different rest lengths: A two-bar multi-measure rest, a whole rest, a half rest, etc., until a 1024th-rest, then the same with dotted durations. The last bar is a full-measure rest with the attribute ‘measure=\"no\"’.",
+      "testClass": "feature",
+      "sourcePath": "xmlFiles/02a-Rests-Durations.musicxml",
+      "sourceSha256": "e3ea4e142675886b0b0f231d70e5e2acbd0a00f543f703543fdf140a5bc0151c",
+      "sourceMeasures": 6,
+      "sourceDeclaresStrings": false,
+      "variants": [
+        {
+          "id": "02a-Rests-Durations/m01/n01",
+          "featureIds": [
+            "02a.multimeasure-rest"
+          ],
+          "source": {
+            "measureNumber": "1",
+            "kind": "rest",
+            "duration": "2048",
+            "type": "whole",
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "whole"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02a-Rests-Durations/m02/n01",
+          "featureIds": [],
+          "source": {
+            "measureNumber": "2",
+            "kind": "rest",
+            "duration": "2048",
+            "type": "whole",
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "whole"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02a-Rests-Durations/m03/n01",
+          "featureIds": [],
+          "source": {
+            "measureNumber": "3",
+            "kind": "rest",
+            "duration": "2048",
+            "type": "whole",
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "whole"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02a-Rests-Durations/m04/n01",
+          "featureIds": [
+            "02a.short-rest-durations"
+          ],
+          "source": {
+            "measureNumber": "4",
+            "kind": "rest",
+            "duration": "1024",
+            "type": "half",
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "half"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02a-Rests-Durations/m04/n02",
+          "featureIds": [
+            "02a.short-rest-durations"
+          ],
+          "source": {
+            "measureNumber": "4",
+            "kind": "rest",
+            "duration": "512",
+            "type": "quarter",
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "quarter"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02a-Rests-Durations/m04/n03",
+          "featureIds": [
+            "02a.short-rest-durations"
+          ],
+          "source": {
+            "measureNumber": "4",
+            "kind": "rest",
+            "duration": "256",
+            "type": "eighth",
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "eighth"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02a-Rests-Durations/m04/n04",
+          "featureIds": [
+            "02a.short-rest-durations"
+          ],
+          "source": {
+            "measureNumber": "4",
+            "kind": "rest",
+            "duration": "128",
+            "type": "16th",
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "16th"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02a-Rests-Durations/m04/n05",
+          "featureIds": [
+            "02a.short-rest-durations"
+          ],
+          "source": {
+            "measureNumber": "4",
+            "kind": "rest",
+            "duration": "64",
+            "type": "32nd",
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "32nd"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02a-Rests-Durations/m04/n06",
+          "featureIds": [
+            "02a.short-rest-durations"
+          ],
+          "source": {
+            "measureNumber": "4",
+            "kind": "rest",
+            "duration": "32",
+            "type": "64th",
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "64th"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02a-Rests-Durations/m04/n07",
+          "featureIds": [
+            "02a.short-rest-durations"
+          ],
+          "source": {
+            "measureNumber": "4",
+            "kind": "rest",
+            "duration": "16",
+            "type": "128th",
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "128th"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02a-Rests-Durations/m04/n08",
+          "featureIds": [
+            "02a.short-rest-durations"
+          ],
+          "source": {
+            "measureNumber": "4",
+            "kind": "rest",
+            "duration": "8",
+            "type": "256th",
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "128th"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02a-Rests-Durations/m04/n09",
+          "featureIds": [
+            "02a.short-rest-durations"
+          ],
+          "source": {
+            "measureNumber": "4",
+            "kind": "rest",
+            "duration": "4",
+            "type": "512th",
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "128th"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02a-Rests-Durations/m04/n10",
+          "featureIds": [
+            "02a.short-rest-durations"
+          ],
+          "source": {
+            "measureNumber": "4",
+            "kind": "rest",
+            "duration": "2",
+            "type": "1024th",
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "128th"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02a-Rests-Durations/m04/n11",
+          "featureIds": [
+            "02a.short-rest-durations"
+          ],
+          "source": {
+            "measureNumber": "4",
+            "kind": "rest",
+            "duration": "2",
+            "type": "1024th",
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "128th"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02a-Rests-Durations/m05/n01",
+          "featureIds": [
+            "02a.short-rest-durations"
+          ],
+          "source": {
+            "measureNumber": "5",
+            "kind": "rest",
+            "duration": "1536",
+            "type": "half",
+            "dots": 1,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "half",
+              "dots": 1
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02a-Rests-Durations/m05/n02",
+          "featureIds": [
+            "02a.short-rest-durations"
+          ],
+          "source": {
+            "measureNumber": "5",
+            "kind": "rest",
+            "duration": "768",
+            "type": "quarter",
+            "dots": 1,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "quarter",
+              "dots": 1
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02a-Rests-Durations/m05/n03",
+          "featureIds": [
+            "02a.short-rest-durations"
+          ],
+          "source": {
+            "measureNumber": "5",
+            "kind": "rest",
+            "duration": "384",
+            "type": "eighth",
+            "dots": 1,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "eighth",
+              "dots": 1
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02a-Rests-Durations/m05/n04",
+          "featureIds": [
+            "02a.short-rest-durations"
+          ],
+          "source": {
+            "measureNumber": "5",
+            "kind": "rest",
+            "duration": "192",
+            "type": "16th",
+            "dots": 1,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "16th",
+              "dots": 1
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02a-Rests-Durations/m05/n05",
+          "featureIds": [
+            "02a.short-rest-durations"
+          ],
+          "source": {
+            "measureNumber": "5",
+            "kind": "rest",
+            "duration": "96",
+            "type": "32nd",
+            "dots": 1,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "32nd",
+              "dots": 1
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02a-Rests-Durations/m05/n06",
+          "featureIds": [
+            "02a.short-rest-durations"
+          ],
+          "source": {
+            "measureNumber": "5",
+            "kind": "rest",
+            "duration": "48",
+            "type": "64th",
+            "dots": 1,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "64th",
+              "dots": 1
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02a-Rests-Durations/m05/n07",
+          "featureIds": [
+            "02a.short-rest-durations"
+          ],
+          "source": {
+            "measureNumber": "5",
+            "kind": "rest",
+            "duration": "24",
+            "type": "128th",
+            "dots": 1,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "128th",
+              "dots": 1
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02a-Rests-Durations/m05/n08",
+          "featureIds": [
+            "02a.short-rest-durations"
+          ],
+          "source": {
+            "measureNumber": "5",
+            "kind": "rest",
+            "duration": "12",
+            "type": "256th",
+            "dots": 1,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "128th"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02a-Rests-Durations/m05/n09",
+          "featureIds": [
+            "02a.short-rest-durations"
+          ],
+          "source": {
+            "measureNumber": "5",
+            "kind": "rest",
+            "duration": "6",
+            "type": "512th",
+            "dots": 1,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "128th"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02a-Rests-Durations/m05/n10",
+          "featureIds": [
+            "02a.short-rest-durations"
+          ],
+          "source": {
+            "measureNumber": "5",
+            "kind": "rest",
+            "duration": "3",
+            "type": "1024th",
+            "dots": 1,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "128th"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02a-Rests-Durations/m05/n11",
+          "featureIds": [
+            "02a.short-rest-durations"
+          ],
+          "source": {
+            "measureNumber": "5",
+            "kind": "rest",
+            "duration": "3",
+            "type": "1024th",
+            "dots": 1,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "128th"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02a-Rests-Durations/m06/n01",
+          "featureIds": [
+            "02a.timed-full-bar-rest"
+          ],
+          "source": {
+            "measureNumber": "6",
+            "kind": "rest",
+            "duration": "3072",
+            "type": "whole",
+            "dots": 1,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {
+              "measure": "no"
+            },
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "whole",
+              "dots": 1
+            },
+            "rest": {},
+            "staff": null
+          }
+        }
+      ],
+      "multiRestRanges": [
+        {
+          "id": "02a-Rests-Durations/m01/multi",
+          "startMeasure": 1,
+          "count": 2,
+          "useSymbols": null
+        }
+      ],
+      "importedScoreMultiRestRanges": [],
+      "warnings": [],
+      "workbenchDocumentSha256": "e4b2434afe96b7a37a709d3f8a75cdb24674517925e946553b37d4350309b50b",
+      "studioDocumentSha256": "e4b2434afe96b7a37a709d3f8a75cdb24674517925e946553b37d4350309b50b"
+    },
+    {
+      "id": "02b-Rests-PitchedRests",
+      "description": "Rests can have explicit pitches to position them vertically. In the first bar, the first rest has no explicit pitch and should use the default position, while the remaining rests are explicitly positioned at pitches E4, F5, A3, and C6. The second bar holds a full-measure rest at pitch G4 (within an alto clef).",
+      "testClass": "feature",
+      "sourcePath": "xmlFiles/02b-Rests-PitchedRests.musicxml",
+      "sourceSha256": "e588e009cc4620f56f2223360846af1b5bc6c007f48fa180bfd5ecc6894ccc9b",
+      "sourceMeasures": 2,
+      "sourceDeclaresStrings": false,
+      "variants": [
+        {
+          "id": "02b-Rests-PitchedRests/m01/n01",
+          "featureIds": [
+            "02b.default-rest-position"
+          ],
+          "source": {
+            "measureNumber": "1",
+            "kind": "rest",
+            "duration": "96",
+            "type": "quarter",
+            "dots": 0,
+            "staff": "1",
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "quarter"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02b-Rests-PitchedRests/m01/n02",
+          "featureIds": [
+            "02b.explicit-rest-position"
+          ],
+          "source": {
+            "measureNumber": "1",
+            "kind": "rest",
+            "duration": "96",
+            "type": "quarter",
+            "dots": 0,
+            "staff": "1",
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": "E",
+            "displayOctave": "4"
+          },
+          "imported": {
+            "duration": {
+              "base": "quarter"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02b-Rests-PitchedRests/m01/n03",
+          "featureIds": [
+            "02b.explicit-rest-position"
+          ],
+          "source": {
+            "measureNumber": "1",
+            "kind": "rest",
+            "duration": "96",
+            "type": "quarter",
+            "dots": 0,
+            "staff": "1",
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": "F",
+            "displayOctave": "5"
+          },
+          "imported": {
+            "duration": {
+              "base": "quarter"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02b-Rests-PitchedRests/m01/n04",
+          "featureIds": [
+            "02b.explicit-rest-position"
+          ],
+          "source": {
+            "measureNumber": "1",
+            "kind": "rest",
+            "duration": "96",
+            "type": "quarter",
+            "dots": 0,
+            "staff": "1",
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": "A",
+            "displayOctave": "3"
+          },
+          "imported": {
+            "duration": {
+              "base": "quarter"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02b-Rests-PitchedRests/m01/n05",
+          "featureIds": [
+            "02b.explicit-rest-position"
+          ],
+          "source": {
+            "measureNumber": "1",
+            "kind": "rest",
+            "duration": "96",
+            "type": "quarter",
+            "dots": 0,
+            "staff": "1",
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": "C",
+            "displayOctave": "6"
+          },
+          "imported": {
+            "duration": {
+              "base": "quarter"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02b-Rests-PitchedRests/m02/n01",
+          "featureIds": [
+            "02b.explicit-rest-position"
+          ],
+          "source": {
+            "measureNumber": "2",
+            "kind": "rest",
+            "duration": "480",
+            "type": null,
+            "dots": 0,
+            "staff": "1",
+            "voice": "1",
+            "restAttributes": {
+              "measure": "yes"
+            },
+            "displayStep": "G",
+            "displayOctave": "4"
+          },
+          "imported": {
+            "duration": {
+              "base": "whole"
+            },
+            "rest": {},
+            "staff": null
+          }
+        }
+      ],
+      "multiRestRanges": [],
+      "importedScoreMultiRestRanges": [],
+      "warnings": [],
+      "workbenchDocumentSha256": "907710db485c51443431233cb3f046d368330bd338736423ef408532c0b9a1fe",
+      "studioDocumentSha256": "907710db485c51443431233cb3f046d368330bd338736423ef408532c0b9a1fe"
+    },
+    {
+      "id": "02c-Rests-MultiMeasureRests",
+      "description": "Five multi-measure rests: 3 measures, 15 measures, 1 measure, 12 measures, and finally 3 measures with the ‘use-symbols’ attribute set.",
+      "testClass": "feature",
+      "sourcePath": "xmlFiles/02c-Rests-MultiMeasureRests.musicxml",
+      "sourceSha256": "44bd4ccd8db51dd5887c91d6b06855497a9c029b24a2328759983f61bb8921b6",
+      "sourceMeasures": 34,
+      "sourceDeclaresStrings": false,
+      "variants": [
+        {
+          "id": "02c-Rests-MultiMeasureRests/m01/n01",
+          "featureIds": [
+            "02c.multimeasure-ranges"
+          ],
+          "source": {
+            "measureNumber": "1",
+            "kind": "rest",
+            "duration": "4",
+            "type": null,
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "whole"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02c-Rests-MultiMeasureRests/m02/n01",
+          "featureIds": [
+            "02c.multimeasure-ranges"
+          ],
+          "source": {
+            "measureNumber": "2",
+            "kind": "rest",
+            "duration": "4",
+            "type": null,
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "whole"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02c-Rests-MultiMeasureRests/m03/n01",
+          "featureIds": [
+            "02c.multimeasure-ranges"
+          ],
+          "source": {
+            "measureNumber": "3",
+            "kind": "rest",
+            "duration": "4",
+            "type": null,
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "whole"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02c-Rests-MultiMeasureRests/m04/n01",
+          "featureIds": [
+            "02c.multimeasure-ranges"
+          ],
+          "source": {
+            "measureNumber": "4",
+            "kind": "rest",
+            "duration": "4",
+            "type": null,
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "whole"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02c-Rests-MultiMeasureRests/m05/n01",
+          "featureIds": [
+            "02c.multimeasure-ranges"
+          ],
+          "source": {
+            "measureNumber": "5",
+            "kind": "rest",
+            "duration": "4",
+            "type": null,
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "whole"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02c-Rests-MultiMeasureRests/m06/n01",
+          "featureIds": [
+            "02c.multimeasure-ranges"
+          ],
+          "source": {
+            "measureNumber": "6",
+            "kind": "rest",
+            "duration": "4",
+            "type": null,
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "whole"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02c-Rests-MultiMeasureRests/m07/n01",
+          "featureIds": [
+            "02c.multimeasure-ranges"
+          ],
+          "source": {
+            "measureNumber": "7",
+            "kind": "rest",
+            "duration": "4",
+            "type": null,
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "whole"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02c-Rests-MultiMeasureRests/m08/n01",
+          "featureIds": [
+            "02c.multimeasure-ranges"
+          ],
+          "source": {
+            "measureNumber": "8",
+            "kind": "rest",
+            "duration": "4",
+            "type": null,
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "whole"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02c-Rests-MultiMeasureRests/m09/n01",
+          "featureIds": [
+            "02c.multimeasure-ranges"
+          ],
+          "source": {
+            "measureNumber": "9",
+            "kind": "rest",
+            "duration": "4",
+            "type": null,
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "whole"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02c-Rests-MultiMeasureRests/m10/n01",
+          "featureIds": [
+            "02c.multimeasure-ranges"
+          ],
+          "source": {
+            "measureNumber": "10",
+            "kind": "rest",
+            "duration": "4",
+            "type": null,
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "whole"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02c-Rests-MultiMeasureRests/m11/n01",
+          "featureIds": [
+            "02c.multimeasure-ranges"
+          ],
+          "source": {
+            "measureNumber": "11",
+            "kind": "rest",
+            "duration": "4",
+            "type": null,
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "whole"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02c-Rests-MultiMeasureRests/m12/n01",
+          "featureIds": [
+            "02c.multimeasure-ranges"
+          ],
+          "source": {
+            "measureNumber": "12",
+            "kind": "rest",
+            "duration": "4",
+            "type": null,
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "whole"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02c-Rests-MultiMeasureRests/m13/n01",
+          "featureIds": [
+            "02c.multimeasure-ranges"
+          ],
+          "source": {
+            "measureNumber": "13",
+            "kind": "rest",
+            "duration": "4",
+            "type": null,
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "whole"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02c-Rests-MultiMeasureRests/m14/n01",
+          "featureIds": [
+            "02c.multimeasure-ranges"
+          ],
+          "source": {
+            "measureNumber": "14",
+            "kind": "rest",
+            "duration": "4",
+            "type": null,
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "whole"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02c-Rests-MultiMeasureRests/m15/n01",
+          "featureIds": [
+            "02c.multimeasure-ranges"
+          ],
+          "source": {
+            "measureNumber": "15",
+            "kind": "rest",
+            "duration": "4",
+            "type": null,
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "whole"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02c-Rests-MultiMeasureRests/m16/n01",
+          "featureIds": [
+            "02c.multimeasure-ranges"
+          ],
+          "source": {
+            "measureNumber": "16",
+            "kind": "rest",
+            "duration": "4",
+            "type": null,
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "whole"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02c-Rests-MultiMeasureRests/m17/n01",
+          "featureIds": [
+            "02c.multimeasure-ranges"
+          ],
+          "source": {
+            "measureNumber": "17",
+            "kind": "rest",
+            "duration": "4",
+            "type": null,
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "whole"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02c-Rests-MultiMeasureRests/m18/n01",
+          "featureIds": [
+            "02c.multimeasure-ranges"
+          ],
+          "source": {
+            "measureNumber": "18",
+            "kind": "rest",
+            "duration": "4",
+            "type": null,
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "whole"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02c-Rests-MultiMeasureRests/m19/n01",
+          "featureIds": [
+            "02c.multimeasure-ranges"
+          ],
+          "source": {
+            "measureNumber": "19",
+            "kind": "rest",
+            "duration": "4",
+            "type": null,
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "whole"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02c-Rests-MultiMeasureRests/m20/n01",
+          "featureIds": [
+            "02c.multimeasure-ranges"
+          ],
+          "source": {
+            "measureNumber": "20",
+            "kind": "rest",
+            "duration": "4",
+            "type": null,
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "whole"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02c-Rests-MultiMeasureRests/m21/n01",
+          "featureIds": [
+            "02c.multimeasure-ranges"
+          ],
+          "source": {
+            "measureNumber": "21",
+            "kind": "rest",
+            "duration": "4",
+            "type": null,
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "whole"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02c-Rests-MultiMeasureRests/m22/n01",
+          "featureIds": [
+            "02c.multimeasure-ranges"
+          ],
+          "source": {
+            "measureNumber": "22",
+            "kind": "rest",
+            "duration": "4",
+            "type": null,
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "whole"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02c-Rests-MultiMeasureRests/m23/n01",
+          "featureIds": [
+            "02c.multimeasure-ranges"
+          ],
+          "source": {
+            "measureNumber": "23",
+            "kind": "rest",
+            "duration": "4",
+            "type": null,
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "whole"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02c-Rests-MultiMeasureRests/m24/n01",
+          "featureIds": [
+            "02c.multimeasure-ranges"
+          ],
+          "source": {
+            "measureNumber": "24",
+            "kind": "rest",
+            "duration": "4",
+            "type": null,
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "whole"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02c-Rests-MultiMeasureRests/m25/n01",
+          "featureIds": [
+            "02c.multimeasure-ranges"
+          ],
+          "source": {
+            "measureNumber": "25",
+            "kind": "rest",
+            "duration": "4",
+            "type": null,
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "whole"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02c-Rests-MultiMeasureRests/m26/n01",
+          "featureIds": [
+            "02c.multimeasure-ranges"
+          ],
+          "source": {
+            "measureNumber": "26",
+            "kind": "rest",
+            "duration": "4",
+            "type": null,
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "whole"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02c-Rests-MultiMeasureRests/m27/n01",
+          "featureIds": [
+            "02c.multimeasure-ranges"
+          ],
+          "source": {
+            "measureNumber": "27",
+            "kind": "rest",
+            "duration": "4",
+            "type": null,
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "whole"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02c-Rests-MultiMeasureRests/m28/n01",
+          "featureIds": [
+            "02c.multimeasure-ranges"
+          ],
+          "source": {
+            "measureNumber": "28",
+            "kind": "rest",
+            "duration": "4",
+            "type": null,
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "whole"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02c-Rests-MultiMeasureRests/m29/n01",
+          "featureIds": [
+            "02c.multimeasure-ranges"
+          ],
+          "source": {
+            "measureNumber": "29",
+            "kind": "rest",
+            "duration": "4",
+            "type": null,
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "whole"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02c-Rests-MultiMeasureRests/m30/n01",
+          "featureIds": [
+            "02c.multimeasure-ranges"
+          ],
+          "source": {
+            "measureNumber": "30",
+            "kind": "rest",
+            "duration": "4",
+            "type": null,
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "whole"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02c-Rests-MultiMeasureRests/m31/n01",
+          "featureIds": [
+            "02c.multimeasure-ranges"
+          ],
+          "source": {
+            "measureNumber": "31",
+            "kind": "rest",
+            "duration": "4",
+            "type": null,
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "whole"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02c-Rests-MultiMeasureRests/m32/n01",
+          "featureIds": [
+            "02c.multimeasure-ranges",
+            "02c.use-symbols"
+          ],
+          "source": {
+            "measureNumber": "32",
+            "kind": "rest",
+            "duration": "4",
+            "type": null,
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "whole"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02c-Rests-MultiMeasureRests/m33/n01",
+          "featureIds": [
+            "02c.multimeasure-ranges",
+            "02c.use-symbols"
+          ],
+          "source": {
+            "measureNumber": "33",
+            "kind": "rest",
+            "duration": "4",
+            "type": null,
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "whole"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02c-Rests-MultiMeasureRests/m34/n01",
+          "featureIds": [
+            "02c.multimeasure-ranges",
+            "02c.use-symbols"
+          ],
+          "source": {
+            "measureNumber": "34",
+            "kind": "rest",
+            "duration": "4",
+            "type": null,
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "whole"
+            },
+            "rest": {},
+            "staff": null
+          }
+        }
+      ],
+      "multiRestRanges": [
+        {
+          "id": "02c-Rests-MultiMeasureRests/m01/multi",
+          "startMeasure": 1,
+          "count": 3,
+          "useSymbols": null
+        },
+        {
+          "id": "02c-Rests-MultiMeasureRests/m04/multi",
+          "startMeasure": 4,
+          "count": 15,
+          "useSymbols": null
+        },
+        {
+          "id": "02c-Rests-MultiMeasureRests/m20/multi",
+          "startMeasure": 20,
+          "count": 12,
+          "useSymbols": null
+        },
+        {
+          "id": "02c-Rests-MultiMeasureRests/m32/multi",
+          "startMeasure": 32,
+          "count": 3,
+          "useSymbols": "yes"
+        }
+      ],
+      "importedScoreMultiRestRanges": [],
+      "warnings": [],
+      "workbenchDocumentSha256": "15128c355f081b63804e631282b25b0595e7adecbf07c0ecb1a740f916ca63e5",
+      "studioDocumentSha256": "15128c355f081b63804e631282b25b0595e7adecbf07c0ecb1a740f916ca63e5"
+    },
+    {
+      "id": "02d-Rests-Multimeasure-TimeSignatures",
+      "description": "Multi-measure rests should always be converted into durations that are multiples of the time signature.",
+      "testClass": "feature",
+      "sourcePath": "xmlFiles/02d-Rests-Multimeasure-TimeSignatures.musicxml",
+      "sourceSha256": "4685e5a403982c9f60aa03ef081d6d80935aa2e336ebf493c27549cf77914aed",
+      "sourceMeasures": 10,
+      "sourceDeclaresStrings": false,
+      "variants": [
+        {
+          "id": "02d-Rests-Multimeasure-TimeSignatures/m01/n01",
+          "featureIds": [
+            "02d.meter-scaled-multimeasure-rests"
+          ],
+          "source": {
+            "measureNumber": "1",
+            "kind": "rest",
+            "duration": "4",
+            "type": null,
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "whole"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02d-Rests-Multimeasure-TimeSignatures/m02/n01",
+          "featureIds": [
+            "02d.meter-scaled-multimeasure-rests"
+          ],
+          "source": {
+            "measureNumber": "2",
+            "kind": "rest",
+            "duration": "4",
+            "type": null,
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "whole"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02d-Rests-Multimeasure-TimeSignatures/m03/n01",
+          "featureIds": [
+            "02d.meter-scaled-multimeasure-rests"
+          ],
+          "source": {
+            "measureNumber": "3",
+            "kind": "rest",
+            "duration": "3",
+            "type": null,
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "half",
+              "dots": 1
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02d-Rests-Multimeasure-TimeSignatures/m04/n01",
+          "featureIds": [
+            "02d.meter-scaled-multimeasure-rests"
+          ],
+          "source": {
+            "measureNumber": "4",
+            "kind": "rest",
+            "duration": "3",
+            "type": null,
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "half",
+              "dots": 1
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02d-Rests-Multimeasure-TimeSignatures/m05/n01",
+          "featureIds": [
+            "02d.meter-scaled-multimeasure-rests"
+          ],
+          "source": {
+            "measureNumber": "5",
+            "kind": "rest",
+            "duration": "3",
+            "type": null,
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "half",
+              "dots": 1
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02d-Rests-Multimeasure-TimeSignatures/m06/n01",
+          "featureIds": [
+            "02d.meter-scaled-multimeasure-rests"
+          ],
+          "source": {
+            "measureNumber": "6",
+            "kind": "rest",
+            "duration": "2",
+            "type": null,
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "half"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02d-Rests-Multimeasure-TimeSignatures/m07/n01",
+          "featureIds": [
+            "02d.meter-scaled-multimeasure-rests"
+          ],
+          "source": {
+            "measureNumber": "7",
+            "kind": "rest",
+            "duration": "2",
+            "type": null,
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "half"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02d-Rests-Multimeasure-TimeSignatures/m08/n01",
+          "featureIds": [
+            "02d.meter-scaled-multimeasure-rests"
+          ],
+          "source": {
+            "measureNumber": "8",
+            "kind": "rest",
+            "duration": "4",
+            "type": null,
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "whole"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02d-Rests-Multimeasure-TimeSignatures/m09/n01",
+          "featureIds": [
+            "02d.meter-scaled-multimeasure-rests"
+          ],
+          "source": {
+            "measureNumber": "9",
+            "kind": "rest",
+            "duration": "4",
+            "type": null,
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "whole"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02d-Rests-Multimeasure-TimeSignatures/m10/n01",
+          "featureIds": [],
+          "source": {
+            "measureNumber": "10",
+            "kind": "note",
+            "duration": "4",
+            "type": "whole",
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": null,
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "whole"
+            },
+            "rest": null,
+            "staff": null
+          }
+        }
+      ],
+      "multiRestRanges": [
+        {
+          "id": "02d-Rests-Multimeasure-TimeSignatures/m01/multi",
+          "startMeasure": 1,
+          "count": 2,
+          "useSymbols": null
+        },
+        {
+          "id": "02d-Rests-Multimeasure-TimeSignatures/m03/multi",
+          "startMeasure": 3,
+          "count": 3,
+          "useSymbols": null
+        },
+        {
+          "id": "02d-Rests-Multimeasure-TimeSignatures/m06/multi",
+          "startMeasure": 6,
+          "count": 2,
+          "useSymbols": null
+        },
+        {
+          "id": "02d-Rests-Multimeasure-TimeSignatures/m08/multi",
+          "startMeasure": 8,
+          "count": 2,
+          "useSymbols": null
+        }
+      ],
+      "importedScoreMultiRestRanges": [],
+      "warnings": [],
+      "workbenchDocumentSha256": "af941bec82012b06c0f8affff675ba0fed6c40c4fb5fb8fca938759d235ea6d6",
+      "studioDocumentSha256": "af941bec82012b06c0f8affff675ba0fed6c40c4fb5fb8fca938759d235ea6d6"
+    },
+    {
+      "id": "02e-Rests-NoType",
+      "description": "In some cases, a <rest> element misses the <type> child (this happens, for example, with voices in Finale, where you don't manually insert a rest). The second note in voice 2 misses a <staff> element; it is thus positioned in the upper staff.",
+      "testClass": "feature",
+      "sourcePath": "xmlFiles/02e-Rests-NoType.musicxml",
+      "sourceSha256": "1a4c740d7b6b026158f2594f00633c31c71c1070ea11f005bdbea9074d9685fe",
+      "sourceMeasures": 2,
+      "sourceDeclaresStrings": false,
+      "variants": [
+        {
+          "id": "02e-Rests-NoType/m01/n01",
+          "featureIds": [],
+          "source": {
+            "measureNumber": "0",
+            "kind": "note",
+            "duration": "1",
+            "type": "quarter",
+            "dots": 0,
+            "staff": "1",
+            "voice": "1",
+            "restAttributes": null,
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "quarter"
+            },
+            "rest": null,
+            "staff": 1
+          }
+        },
+        {
+          "id": "02e-Rests-NoType/m01/n02",
+          "featureIds": [
+            "02e.untyped-rest"
+          ],
+          "source": {
+            "measureNumber": "0",
+            "kind": "rest",
+            "duration": "1",
+            "type": null,
+            "dots": 0,
+            "staff": "2",
+            "voice": "2",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "quarter"
+            },
+            "rest": {},
+            "staff": 2
+          }
+        },
+        {
+          "id": "02e-Rests-NoType/m02/n01",
+          "featureIds": [],
+          "source": {
+            "measureNumber": "1",
+            "kind": "note",
+            "duration": "4",
+            "type": "whole",
+            "dots": 0,
+            "staff": "1",
+            "voice": "1",
+            "restAttributes": null,
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "whole"
+            },
+            "rest": null,
+            "staff": 1
+          }
+        },
+        {
+          "id": "02e-Rests-NoType/m02/n02",
+          "featureIds": [
+            "02e.unstaffed-voice-note"
+          ],
+          "source": {
+            "measureNumber": "1",
+            "kind": "note",
+            "duration": "4",
+            "type": "whole",
+            "dots": 0,
+            "staff": null,
+            "voice": "2",
+            "restAttributes": null,
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "whole"
+            },
+            "rest": null,
+            "staff": null
+          }
+        }
+      ],
+      "multiRestRanges": [],
+      "importedScoreMultiRestRanges": [],
+      "warnings": [],
+      "workbenchDocumentSha256": "a52649c01fd8b4f3557589da325c71247850b0994d003e01c85cb29df9902efe",
+      "studioDocumentSha256": "a52649c01fd8b4f3557589da325c71247850b0994d003e01c85cb29df9902efe"
+    },
+    {
+      "id": "02f-Rests-Placement",
+      "description": "All different rest lengths with different clefs and explicit display-step placements, including ambiguous placements within staff spaces instead of lines.",
+      "testClass": "feature",
+      "sourcePath": "xmlFiles/02f-Rests-Placement.musicxml",
+      "sourceSha256": "e19e67af60f686d56936c59ef12cdbd1feeaa761710f23bd0d1f704d46552d69",
+      "sourceMeasures": 4,
+      "sourceDeclaresStrings": false,
+      "variants": [
+        {
+          "id": "02f-Rests-Placement/m01/n01",
+          "featureIds": [
+            "02f.clef-context"
+          ],
+          "source": {
+            "measureNumber": "1",
+            "kind": "rest",
+            "duration": "2048",
+            "type": "whole",
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "whole"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02f-Rests-Placement/m02/n01",
+          "featureIds": [
+            "02f.short-rest-durations",
+            "02f.clef-context"
+          ],
+          "source": {
+            "measureNumber": "2",
+            "kind": "rest",
+            "duration": "1024",
+            "type": "half",
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "half"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02f-Rests-Placement/m02/n02",
+          "featureIds": [
+            "02f.short-rest-durations",
+            "02f.clef-context"
+          ],
+          "source": {
+            "measureNumber": "2",
+            "kind": "rest",
+            "duration": "512",
+            "type": "quarter",
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "quarter"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02f-Rests-Placement/m02/n03",
+          "featureIds": [
+            "02f.short-rest-durations",
+            "02f.clef-context"
+          ],
+          "source": {
+            "measureNumber": "2",
+            "kind": "rest",
+            "duration": "256",
+            "type": "eighth",
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "eighth"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02f-Rests-Placement/m02/n04",
+          "featureIds": [
+            "02f.short-rest-durations",
+            "02f.clef-context"
+          ],
+          "source": {
+            "measureNumber": "2",
+            "kind": "rest",
+            "duration": "128",
+            "type": "16th",
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "16th"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02f-Rests-Placement/m02/n05",
+          "featureIds": [
+            "02f.short-rest-durations",
+            "02f.clef-context"
+          ],
+          "source": {
+            "measureNumber": "2",
+            "kind": "rest",
+            "duration": "64",
+            "type": "32nd",
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "32nd"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02f-Rests-Placement/m02/n06",
+          "featureIds": [
+            "02f.short-rest-durations",
+            "02f.clef-context"
+          ],
+          "source": {
+            "measureNumber": "2",
+            "kind": "rest",
+            "duration": "32",
+            "type": "64th",
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "64th"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02f-Rests-Placement/m02/n07",
+          "featureIds": [
+            "02f.short-rest-durations",
+            "02f.clef-context"
+          ],
+          "source": {
+            "measureNumber": "2",
+            "kind": "rest",
+            "duration": "16",
+            "type": "128th",
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "128th"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02f-Rests-Placement/m02/n08",
+          "featureIds": [
+            "02f.short-rest-durations",
+            "02f.clef-context"
+          ],
+          "source": {
+            "measureNumber": "2",
+            "kind": "rest",
+            "duration": "8",
+            "type": "256th",
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "128th"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02f-Rests-Placement/m02/n09",
+          "featureIds": [
+            "02f.short-rest-durations",
+            "02f.clef-context"
+          ],
+          "source": {
+            "measureNumber": "2",
+            "kind": "rest",
+            "duration": "4",
+            "type": "512th",
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "128th"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02f-Rests-Placement/m02/n10",
+          "featureIds": [
+            "02f.short-rest-durations",
+            "02f.clef-context"
+          ],
+          "source": {
+            "measureNumber": "2",
+            "kind": "rest",
+            "duration": "2",
+            "type": "1024th",
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "128th"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02f-Rests-Placement/m02/n11",
+          "featureIds": [
+            "02f.short-rest-durations",
+            "02f.clef-context"
+          ],
+          "source": {
+            "measureNumber": "2",
+            "kind": "rest",
+            "duration": "2",
+            "type": "1024th",
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": null,
+            "displayOctave": null
+          },
+          "imported": {
+            "duration": {
+              "base": "128th"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02f-Rests-Placement/m03/n01",
+          "featureIds": [
+            "02f.explicit-rest-position",
+            "02f.clef-context"
+          ],
+          "source": {
+            "measureNumber": "3",
+            "kind": "rest",
+            "duration": "2048",
+            "type": "whole",
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": "G",
+            "displayOctave": "4"
+          },
+          "imported": {
+            "duration": {
+              "base": "whole"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02f-Rests-Placement/m04/n01",
+          "featureIds": [
+            "02f.short-rest-durations",
+            "02f.explicit-rest-position",
+            "02f.clef-context"
+          ],
+          "source": {
+            "measureNumber": "4",
+            "kind": "rest",
+            "duration": "1024",
+            "type": "half",
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": "G",
+            "displayOctave": "4"
+          },
+          "imported": {
+            "duration": {
+              "base": "half"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02f-Rests-Placement/m04/n02",
+          "featureIds": [
+            "02f.short-rest-durations",
+            "02f.explicit-rest-position",
+            "02f.clef-context"
+          ],
+          "source": {
+            "measureNumber": "4",
+            "kind": "rest",
+            "duration": "512",
+            "type": "quarter",
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": "F",
+            "displayOctave": "5"
+          },
+          "imported": {
+            "duration": {
+              "base": "quarter"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02f-Rests-Placement/m04/n03",
+          "featureIds": [
+            "02f.short-rest-durations",
+            "02f.explicit-rest-position",
+            "02f.clef-context"
+          ],
+          "source": {
+            "measureNumber": "4",
+            "kind": "rest",
+            "duration": "256",
+            "type": "eighth",
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": "E",
+            "displayOctave": "5"
+          },
+          "imported": {
+            "duration": {
+              "base": "eighth"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02f-Rests-Placement/m04/n04",
+          "featureIds": [
+            "02f.short-rest-durations",
+            "02f.explicit-rest-position",
+            "02f.clef-context"
+          ],
+          "source": {
+            "measureNumber": "4",
+            "kind": "rest",
+            "duration": "128",
+            "type": "16th",
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": "D",
+            "displayOctave": "5"
+          },
+          "imported": {
+            "duration": {
+              "base": "16th"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02f-Rests-Placement/m04/n05",
+          "featureIds": [
+            "02f.short-rest-durations",
+            "02f.explicit-rest-position",
+            "02f.clef-context"
+          ],
+          "source": {
+            "measureNumber": "4",
+            "kind": "rest",
+            "duration": "64",
+            "type": "32nd",
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": "C",
+            "displayOctave": "5"
+          },
+          "imported": {
+            "duration": {
+              "base": "32nd"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02f-Rests-Placement/m04/n06",
+          "featureIds": [
+            "02f.short-rest-durations",
+            "02f.explicit-rest-position",
+            "02f.clef-context"
+          ],
+          "source": {
+            "measureNumber": "4",
+            "kind": "rest",
+            "duration": "32",
+            "type": "64th",
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": "B",
+            "displayOctave": "4"
+          },
+          "imported": {
+            "duration": {
+              "base": "64th"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02f-Rests-Placement/m04/n07",
+          "featureIds": [
+            "02f.short-rest-durations",
+            "02f.explicit-rest-position",
+            "02f.clef-context"
+          ],
+          "source": {
+            "measureNumber": "4",
+            "kind": "rest",
+            "duration": "16",
+            "type": "128th",
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": "A",
+            "displayOctave": "4"
+          },
+          "imported": {
+            "duration": {
+              "base": "128th"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02f-Rests-Placement/m04/n08",
+          "featureIds": [
+            "02f.short-rest-durations",
+            "02f.explicit-rest-position",
+            "02f.clef-context"
+          ],
+          "source": {
+            "measureNumber": "4",
+            "kind": "rest",
+            "duration": "8",
+            "type": "256th",
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": "G",
+            "displayOctave": "4"
+          },
+          "imported": {
+            "duration": {
+              "base": "128th"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02f-Rests-Placement/m04/n09",
+          "featureIds": [
+            "02f.short-rest-durations",
+            "02f.explicit-rest-position",
+            "02f.clef-context"
+          ],
+          "source": {
+            "measureNumber": "4",
+            "kind": "rest",
+            "duration": "4",
+            "type": "512th",
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": "F",
+            "displayOctave": "4"
+          },
+          "imported": {
+            "duration": {
+              "base": "128th"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02f-Rests-Placement/m04/n10",
+          "featureIds": [
+            "02f.short-rest-durations",
+            "02f.explicit-rest-position",
+            "02f.clef-context"
+          ],
+          "source": {
+            "measureNumber": "4",
+            "kind": "rest",
+            "duration": "2",
+            "type": "1024th",
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": "E",
+            "displayOctave": "4"
+          },
+          "imported": {
+            "duration": {
+              "base": "128th"
+            },
+            "rest": {},
+            "staff": null
+          }
+        },
+        {
+          "id": "02f-Rests-Placement/m04/n11",
+          "featureIds": [
+            "02f.short-rest-durations",
+            "02f.explicit-rest-position",
+            "02f.clef-context"
+          ],
+          "source": {
+            "measureNumber": "4",
+            "kind": "rest",
+            "duration": "2",
+            "type": "1024th",
+            "dots": 0,
+            "staff": null,
+            "voice": "1",
+            "restAttributes": {},
+            "displayStep": "D",
+            "displayOctave": "4"
+          },
+          "imported": {
+            "duration": {
+              "base": "128th"
+            },
+            "rest": {},
+            "staff": null
+          }
+        }
+      ],
+      "multiRestRanges": [],
+      "importedScoreMultiRestRanges": [],
+      "warnings": [],
+      "workbenchDocumentSha256": "92314cdc6f7fa8e0ee021c13d77350ceaf845ec712d06ef0f300f98ae8f7d528",
+      "studioDocumentSha256": "92314cdc6f7fa8e0ee021c13d77350ceaf845ec712d06ef0f300f98ae8f7d528"
+    }
+  ],
+  "features": [
+    {
+      "id": "02a.multimeasure-rest",
+      "fixture": "02a-Rests-Durations",
+      "expected": "The first two bars collapse to a numbered 2-bar rest; the third is an ordinary whole-bar rest.",
+      "variantIds": [
+        "02a-Rests-Durations/m01/n01",
+        "02a-Rests-Durations/m01/multi"
+      ],
+      "variantCount": 2,
+      "sourceDescription": "All different rest lengths: A two-bar multi-measure rest, a whole rest, a half rest, etc., until a 1024th-rest, then the same with dotted durations. The last bar is a full-measure rest with the attribute ‘measure=\"no\"’."
+    },
+    {
+      "id": "02a.short-rest-durations",
+      "fixture": "02a-Rests-Durations",
+      "expected": "The plain and dotted ladders distinguish half through 1024th rests, including dotted 256th, 512th and 1024th symbols.",
+      "variantIds": [
+        "02a-Rests-Durations/m04/n01",
+        "02a-Rests-Durations/m04/n02",
+        "02a-Rests-Durations/m04/n03",
+        "02a-Rests-Durations/m04/n04",
+        "02a-Rests-Durations/m04/n05",
+        "02a-Rests-Durations/m04/n06",
+        "02a-Rests-Durations/m04/n07",
+        "02a-Rests-Durations/m04/n08",
+        "02a-Rests-Durations/m04/n09",
+        "02a-Rests-Durations/m04/n10",
+        "02a-Rests-Durations/m04/n11",
+        "02a-Rests-Durations/m05/n01",
+        "02a-Rests-Durations/m05/n02",
+        "02a-Rests-Durations/m05/n03",
+        "02a-Rests-Durations/m05/n04",
+        "02a-Rests-Durations/m05/n05",
+        "02a-Rests-Durations/m05/n06",
+        "02a-Rests-Durations/m05/n07",
+        "02a-Rests-Durations/m05/n08",
+        "02a-Rests-Durations/m05/n09",
+        "02a-Rests-Durations/m05/n10",
+        "02a-Rests-Durations/m05/n11"
+      ],
+      "variantCount": 22,
+      "sourceDescription": "All different rest lengths: A two-bar multi-measure rest, a whole rest, a half rest, etc., until a 1024th-rest, then the same with dotted durations. The last bar is a full-measure rest with the attribute ‘measure=\"no\"’."
+    },
+    {
+      "id": "02a.timed-full-bar-rest",
+      "fixture": "02a-Rests-Durations",
+      "expected": "The final 3/2 bar has a dotted whole rest with measure=no, as a timed rest rather than a generic full-bar glyph.",
+      "variantIds": [
+        "02a-Rests-Durations/m06/n01"
+      ],
+      "variantCount": 1,
+      "sourceDescription": "All different rest lengths: A two-bar multi-measure rest, a whole rest, a half rest, etc., until a 1024th-rest, then the same with dotted durations. The last bar is a full-measure rest with the attribute ‘measure=\"no\"’."
+    },
+    {
+      "id": "02b.default-rest-position",
+      "fixture": "02b-Rests-PitchedRests",
+      "expected": "The first quarter rest uses the default staff position.",
+      "variantIds": [
+        "02b-Rests-PitchedRests/m01/n01"
+      ],
+      "variantCount": 1,
+      "sourceDescription": "Rests can have explicit pitches to position them vertically. In the first bar, the first rest has no explicit pitch and should use the default position, while the remaining rests are explicitly positioned at pitches E4, F5, A3, and C6. The second bar holds a full-measure rest at pitch G4 (within an alto clef)."
+    },
+    {
+      "id": "02b.explicit-rest-position",
+      "fixture": "02b-Rests-PitchedRests",
+      "expected": "Four quarter rests occupy E4, F5, A3 and C6 staff positions; the final full-measure rest is positioned at G4 in its C clef.",
+      "variantIds": [
+        "02b-Rests-PitchedRests/m01/n02",
+        "02b-Rests-PitchedRests/m01/n03",
+        "02b-Rests-PitchedRests/m01/n04",
+        "02b-Rests-PitchedRests/m01/n05",
+        "02b-Rests-PitchedRests/m02/n01"
+      ],
+      "variantCount": 5,
+      "sourceDescription": "Rests can have explicit pitches to position them vertically. In the first bar, the first rest has no explicit pitch and should use the default position, while the remaining rests are explicitly positioned at pitches E4, F5, A3, and C6. The second bar holds a full-measure rest at pitch G4 (within an alto clef)."
+    },
+    {
+      "id": "02c.multimeasure-ranges",
+      "fixture": "02c-Rests-MultiMeasureRests",
+      "expected": "The 34 measures display five rest groups of 3, 15, 1, 12 and 3 bars, with appropriate counts.",
+      "variantIds": [
+        "02c-Rests-MultiMeasureRests/m01/n01",
+        "02c-Rests-MultiMeasureRests/m02/n01",
+        "02c-Rests-MultiMeasureRests/m03/n01",
+        "02c-Rests-MultiMeasureRests/m04/n01",
+        "02c-Rests-MultiMeasureRests/m05/n01",
+        "02c-Rests-MultiMeasureRests/m06/n01",
+        "02c-Rests-MultiMeasureRests/m07/n01",
+        "02c-Rests-MultiMeasureRests/m08/n01",
+        "02c-Rests-MultiMeasureRests/m09/n01",
+        "02c-Rests-MultiMeasureRests/m10/n01",
+        "02c-Rests-MultiMeasureRests/m11/n01",
+        "02c-Rests-MultiMeasureRests/m12/n01",
+        "02c-Rests-MultiMeasureRests/m13/n01",
+        "02c-Rests-MultiMeasureRests/m14/n01",
+        "02c-Rests-MultiMeasureRests/m15/n01",
+        "02c-Rests-MultiMeasureRests/m16/n01",
+        "02c-Rests-MultiMeasureRests/m17/n01",
+        "02c-Rests-MultiMeasureRests/m18/n01",
+        "02c-Rests-MultiMeasureRests/m19/n01",
+        "02c-Rests-MultiMeasureRests/m20/n01",
+        "02c-Rests-MultiMeasureRests/m21/n01",
+        "02c-Rests-MultiMeasureRests/m22/n01",
+        "02c-Rests-MultiMeasureRests/m23/n01",
+        "02c-Rests-MultiMeasureRests/m24/n01",
+        "02c-Rests-MultiMeasureRests/m25/n01",
+        "02c-Rests-MultiMeasureRests/m26/n01",
+        "02c-Rests-MultiMeasureRests/m27/n01",
+        "02c-Rests-MultiMeasureRests/m28/n01",
+        "02c-Rests-MultiMeasureRests/m29/n01",
+        "02c-Rests-MultiMeasureRests/m30/n01",
+        "02c-Rests-MultiMeasureRests/m31/n01",
+        "02c-Rests-MultiMeasureRests/m32/n01",
+        "02c-Rests-MultiMeasureRests/m33/n01",
+        "02c-Rests-MultiMeasureRests/m34/n01",
+        "02c-Rests-MultiMeasureRests/m01/multi",
+        "02c-Rests-MultiMeasureRests/m04/multi",
+        "02c-Rests-MultiMeasureRests/m20/multi",
+        "02c-Rests-MultiMeasureRests/m32/multi"
+      ],
+      "variantCount": 38,
+      "sourceDescription": "Five multi-measure rests: 3 measures, 15 measures, 1 measure, 12 measures, and finally 3 measures with the ‘use-symbols’ attribute set."
+    },
+    {
+      "id": "02c.use-symbols",
+      "fixture": "02c-Rests-MultiMeasureRests",
+      "expected": "The final 3-bar range uses the requested 1/2/4-bar rest-symbol style instead of a single H-bar.",
+      "variantIds": [
+        "02c-Rests-MultiMeasureRests/m32/n01",
+        "02c-Rests-MultiMeasureRests/m33/n01",
+        "02c-Rests-MultiMeasureRests/m34/n01",
+        "02c-Rests-MultiMeasureRests/m32/multi"
+      ],
+      "variantCount": 4,
+      "sourceDescription": "Five multi-measure rests: 3 measures, 15 measures, 1 measure, 12 measures, and finally 3 measures with the ‘use-symbols’ attribute set."
+    },
+    {
+      "id": "02d.meter-scaled-multimeasure-rests",
+      "fixture": "02d-Rests-Multimeasure-TimeSignatures",
+      "expected": "Ranges of 2, 3, 2 and 2 bars collapse while 4/4, 3/4, 2/4 and 4/4 rest durations match their meters.",
+      "variantIds": [
+        "02d-Rests-Multimeasure-TimeSignatures/m01/n01",
+        "02d-Rests-Multimeasure-TimeSignatures/m02/n01",
+        "02d-Rests-Multimeasure-TimeSignatures/m03/n01",
+        "02d-Rests-Multimeasure-TimeSignatures/m04/n01",
+        "02d-Rests-Multimeasure-TimeSignatures/m05/n01",
+        "02d-Rests-Multimeasure-TimeSignatures/m06/n01",
+        "02d-Rests-Multimeasure-TimeSignatures/m07/n01",
+        "02d-Rests-Multimeasure-TimeSignatures/m08/n01",
+        "02d-Rests-Multimeasure-TimeSignatures/m09/n01",
+        "02d-Rests-Multimeasure-TimeSignatures/m01/multi",
+        "02d-Rests-Multimeasure-TimeSignatures/m03/multi",
+        "02d-Rests-Multimeasure-TimeSignatures/m06/multi",
+        "02d-Rests-Multimeasure-TimeSignatures/m08/multi"
+      ],
+      "variantCount": 13,
+      "sourceDescription": "Multi-measure rests should always be converted into durations that are multiples of the time signature."
+    },
+    {
+      "id": "02e.untyped-rest",
+      "fixture": "02e-Rests-NoType",
+      "expected": "The voice-2 quarter rest without <type> occupies one beat on the lower staff.",
+      "variantIds": [
+        "02e-Rests-NoType/m01/n02"
+      ],
+      "variantCount": 1,
+      "sourceDescription": "In some cases, a <rest> element misses the <type> child (this happens, for example, with voices in Finale, where you don't manually insert a rest). The second note in voice 2 misses a <staff> element; it is thus positioned in the upper staff."
+    },
+    {
+      "id": "02e.unstaffed-voice-note",
+      "fixture": "02e-Rests-NoType",
+      "expected": "The voice-2 E3 whole note with no <staff> appears on the upper staff despite its low ledger position.",
+      "variantIds": [
+        "02e-Rests-NoType/m02/n02"
+      ],
+      "variantCount": 1,
+      "sourceDescription": "In some cases, a <rest> element misses the <type> child (this happens, for example, with voices in Finale, where you don't manually insert a rest). The second note in voice 2 misses a <staff> element; it is thus positioned in the upper staff."
+    },
+    {
+      "id": "02f.short-rest-durations",
+      "fixture": "02f-Rests-Placement",
+      "expected": "Both clef contexts distinguish the plain half-to-1024th rest ladder.",
+      "variantIds": [
+        "02f-Rests-Placement/m02/n01",
+        "02f-Rests-Placement/m02/n02",
+        "02f-Rests-Placement/m02/n03",
+        "02f-Rests-Placement/m02/n04",
+        "02f-Rests-Placement/m02/n05",
+        "02f-Rests-Placement/m02/n06",
+        "02f-Rests-Placement/m02/n07",
+        "02f-Rests-Placement/m02/n08",
+        "02f-Rests-Placement/m02/n09",
+        "02f-Rests-Placement/m02/n10",
+        "02f-Rests-Placement/m02/n11",
+        "02f-Rests-Placement/m04/n01",
+        "02f-Rests-Placement/m04/n02",
+        "02f-Rests-Placement/m04/n03",
+        "02f-Rests-Placement/m04/n04",
+        "02f-Rests-Placement/m04/n05",
+        "02f-Rests-Placement/m04/n06",
+        "02f-Rests-Placement/m04/n07",
+        "02f-Rests-Placement/m04/n08",
+        "02f-Rests-Placement/m04/n09",
+        "02f-Rests-Placement/m04/n10",
+        "02f-Rests-Placement/m04/n11"
+      ],
+      "variantCount": 22,
+      "sourceDescription": "All different rest lengths with different clefs and explicit display-step placements, including ambiguous placements within staff spaces instead of lines."
+    },
+    {
+      "id": "02f.explicit-rest-position",
+      "fixture": "02f-Rests-Placement",
+      "expected": "The treble-clef bar places the whole rest at G4 and its ladder from G4 through D4, including positions in spaces.",
+      "variantIds": [
+        "02f-Rests-Placement/m03/n01",
+        "02f-Rests-Placement/m04/n01",
+        "02f-Rests-Placement/m04/n02",
+        "02f-Rests-Placement/m04/n03",
+        "02f-Rests-Placement/m04/n04",
+        "02f-Rests-Placement/m04/n05",
+        "02f-Rests-Placement/m04/n06",
+        "02f-Rests-Placement/m04/n07",
+        "02f-Rests-Placement/m04/n08",
+        "02f-Rests-Placement/m04/n09",
+        "02f-Rests-Placement/m04/n10",
+        "02f-Rests-Placement/m04/n11"
+      ],
+      "variantCount": 12,
+      "sourceDescription": "All different rest lengths with different clefs and explicit display-step placements, including ambiguous placements within staff spaces instead of lines."
+    },
+    {
+      "id": "02f.clef-context",
+      "fixture": "02f-Rests-Placement",
+      "expected": "The first ladder is under F clef and the positioned ladder under G clef.",
+      "variantIds": [
+        "02f-Rests-Placement/m01/n01",
+        "02f-Rests-Placement/m02/n01",
+        "02f-Rests-Placement/m02/n02",
+        "02f-Rests-Placement/m02/n03",
+        "02f-Rests-Placement/m02/n04",
+        "02f-Rests-Placement/m02/n05",
+        "02f-Rests-Placement/m02/n06",
+        "02f-Rests-Placement/m02/n07",
+        "02f-Rests-Placement/m02/n08",
+        "02f-Rests-Placement/m02/n09",
+        "02f-Rests-Placement/m02/n10",
+        "02f-Rests-Placement/m02/n11",
+        "02f-Rests-Placement/m03/n01",
+        "02f-Rests-Placement/m04/n01",
+        "02f-Rests-Placement/m04/n02",
+        "02f-Rests-Placement/m04/n03",
+        "02f-Rests-Placement/m04/n04",
+        "02f-Rests-Placement/m04/n05",
+        "02f-Rests-Placement/m04/n06",
+        "02f-Rests-Placement/m04/n07",
+        "02f-Rests-Placement/m04/n08",
+        "02f-Rests-Placement/m04/n09",
+        "02f-Rests-Placement/m04/n10",
+        "02f-Rests-Placement/m04/n11"
+      ],
+      "variantCount": 24,
+      "sourceDescription": "All different rest lengths with different clefs and explicit display-step placements, including ambiguous placements within staff spaces instead of lines."
+    }
+  ],
+  "render": [
+    {
+      "featureId": "02a.multimeasure-rest",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "incorrect",
+      "cause": [
+        "importer"
+      ],
+      "reason": "The score has three separate whole-rest bars; source <multiple-rest> 2 is absent from imported scores[].multimeasureRests. Published MNX and notation layout support collapsed ranges.",
+      "importEvidence": "harness/reports/musicxml-rest-assessment.json",
+      "captureEvidence": "harness/fixtures/musicxml-rest-evidence/workbench/02a-Rests-Durations/observation.json",
+      "diagnosticTitles": [
+        "validation — overfills the 2/2 bar: notes sum to 2.047 of 2 beats",
+        "validation — overfills the 2/2 bar: notes sum to 2.047 of 2 beats",
+        "validation — overfills the 3/2 bar: notes sum to 3.039 of 3 beats",
+        "validation — overfills the 3/2 bar: notes sum to 3.039 of 3 beats"
+      ]
+    },
+    {
+      "featureId": "02a.multimeasure-rest",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "incorrect",
+      "cause": [
+        "importer"
+      ],
+      "reason": "The score has three separate whole-rest bars; source <multiple-rest> 2 is absent from imported scores[].multimeasureRests. Published MNX and notation layout support collapsed ranges.",
+      "importEvidence": "harness/reports/musicxml-rest-assessment.json",
+      "captureEvidence": "harness/fixtures/musicxml-rest-evidence/studio/02a-Rests-Durations/observation.json",
+      "diagnosticTitles": [
+        "validation — overfills the 2/2 bar: notes sum to 2.047 of 2 beats",
+        "validation — overfills the 2/2 bar: notes sum to 2.047 of 2 beats",
+        "validation — overfills the 3/2 bar: notes sum to 3.039 of 3 beats",
+        "validation — overfills the 3/2 bar: notes sum to 3.039 of 3 beats"
+      ]
+    },
+    {
+      "featureId": "02a.short-rest-durations",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "partial",
+      "cause": [
+        "importer"
+      ],
+      "reason": "Through 128th, written values and dots survive; all 256th/512th/1024th values become 128th, and their dots disappear. Both shells repeat 128th glyphs and show spurious bar-overfill badges. Published MNX and the engine name the original values.",
+      "importEvidence": "harness/reports/musicxml-rest-assessment.json",
+      "captureEvidence": "harness/fixtures/musicxml-rest-evidence/workbench/02a-Rests-Durations/observation.json",
+      "diagnosticTitles": [
+        "validation — overfills the 2/2 bar: notes sum to 2.047 of 2 beats",
+        "validation — overfills the 2/2 bar: notes sum to 2.047 of 2 beats",
+        "validation — overfills the 3/2 bar: notes sum to 3.039 of 3 beats",
+        "validation — overfills the 3/2 bar: notes sum to 3.039 of 3 beats"
+      ]
+    },
+    {
+      "featureId": "02a.short-rest-durations",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "partial",
+      "cause": [
+        "importer"
+      ],
+      "reason": "Through 128th, written values and dots survive; all 256th/512th/1024th values become 128th, and their dots disappear. Both shells repeat 128th glyphs and show spurious bar-overfill badges. Published MNX and the engine name the original values.",
+      "importEvidence": "harness/reports/musicxml-rest-assessment.json",
+      "captureEvidence": "harness/fixtures/musicxml-rest-evidence/studio/02a-Rests-Durations/observation.json",
+      "diagnosticTitles": [
+        "validation — overfills the 2/2 bar: notes sum to 2.047 of 2 beats",
+        "validation — overfills the 2/2 bar: notes sum to 2.047 of 2 beats",
+        "validation — overfills the 3/2 bar: notes sum to 3.039 of 3 beats",
+        "validation — overfills the 3/2 bar: notes sum to 3.039 of 3 beats"
+      ]
+    },
+    {
+      "featureId": "02a.timed-full-bar-rest",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Imported whole+dots:1 survives; the last bar shows a dotted whole rest. MNX does not retain the measure=no source flag, but no separate visible distinction is requested beyond the dot.",
+      "importEvidence": "harness/reports/musicxml-rest-assessment.json",
+      "captureEvidence": "harness/fixtures/musicxml-rest-evidence/workbench/02a-Rests-Durations/observation.json",
+      "diagnosticTitles": [
+        "validation — overfills the 2/2 bar: notes sum to 2.047 of 2 beats",
+        "validation — overfills the 2/2 bar: notes sum to 2.047 of 2 beats",
+        "validation — overfills the 3/2 bar: notes sum to 3.039 of 3 beats",
+        "validation — overfills the 3/2 bar: notes sum to 3.039 of 3 beats"
+      ]
+    },
+    {
+      "featureId": "02a.timed-full-bar-rest",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Imported whole+dots:1 survives; the last bar shows a dotted whole rest. MNX does not retain the measure=no source flag, but no separate visible distinction is requested beyond the dot.",
+      "importEvidence": "harness/reports/musicxml-rest-assessment.json",
+      "captureEvidence": "harness/fixtures/musicxml-rest-evidence/studio/02a-Rests-Durations/observation.json",
+      "diagnosticTitles": [
+        "validation — overfills the 2/2 bar: notes sum to 2.047 of 2 beats",
+        "validation — overfills the 2/2 bar: notes sum to 2.047 of 2 beats",
+        "validation — overfills the 3/2 bar: notes sum to 3.039 of 3 beats",
+        "validation — overfills the 3/2 bar: notes sum to 3.039 of 3 beats"
+      ]
+    },
+    {
+      "featureId": "02b.default-rest-position",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "The unpositioned source rest imports as rest:{} and appears at the default middle-staff position in both shells.",
+      "importEvidence": "harness/reports/musicxml-rest-assessment.json",
+      "captureEvidence": "harness/fixtures/musicxml-rest-evidence/workbench/02b-Rests-PitchedRests/observation.json",
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "02b.default-rest-position",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "The unpositioned source rest imports as rest:{} and appears at the default middle-staff position in both shells.",
+      "importEvidence": "harness/reports/musicxml-rest-assessment.json",
+      "captureEvidence": "harness/fixtures/musicxml-rest-evidence/studio/02b-Rests-PitchedRests/observation.json",
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "02b.explicit-rest-position",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "incorrect",
+      "cause": [
+        "importer"
+      ],
+      "reason": "Every imported rest is {}, without staffPosition. Five quarter glyphs sit on one line and the final rest uses the default full-bar position. The MusicXML display step/octave never reaches MNX although published rest.staffPosition and layout support it.",
+      "importEvidence": "harness/reports/musicxml-rest-assessment.json",
+      "captureEvidence": "harness/fixtures/musicxml-rest-evidence/workbench/02b-Rests-PitchedRests/observation.json",
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "02b.explicit-rest-position",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "incorrect",
+      "cause": [
+        "importer"
+      ],
+      "reason": "Every imported rest is {}, without staffPosition. Five quarter glyphs sit on one line and the final rest uses the default full-bar position. The MusicXML display step/octave never reaches MNX although published rest.staffPosition and layout support it.",
+      "importEvidence": "harness/reports/musicxml-rest-assessment.json",
+      "captureEvidence": "harness/fixtures/musicxml-rest-evidence/studio/02b-Rests-PitchedRests/observation.json",
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "02c.multimeasure-ranges",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "incorrect",
+      "cause": [
+        "importer"
+      ],
+      "reason": "All 34 bars remain separate whole-rest bars, without numbered H-bars; no multimeasureRests ranges enter the score. The one-bar group is visually ordinary, but the four longer groups are lost.",
+      "importEvidence": "harness/reports/musicxml-rest-assessment.json",
+      "captureEvidence": "harness/fixtures/musicxml-rest-evidence/workbench/02c-Rests-MultiMeasureRests/observation.json",
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "02c.multimeasure-ranges",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "incorrect",
+      "cause": [
+        "importer"
+      ],
+      "reason": "All 34 bars remain separate whole-rest bars, without numbered H-bars; no multimeasureRests ranges enter the score. The one-bar group is visually ordinary, but the four longer groups are lost.",
+      "importEvidence": "harness/reports/musicxml-rest-assessment.json",
+      "captureEvidence": "harness/fixtures/musicxml-rest-evidence/studio/02c-Rests-MultiMeasureRests/observation.json",
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "02c.use-symbols",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "incorrect",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "The final three bars are ordinary separate whole rests. No range or use-symbols choice is imported; published multimeasureRests has duration/start/label but no style field.",
+      "importEvidence": "harness/reports/musicxml-rest-assessment.json",
+      "captureEvidence": "harness/fixtures/musicxml-rest-evidence/workbench/02c-Rests-MultiMeasureRests/observation.json",
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "02c.use-symbols",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "incorrect",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "The final three bars are ordinary separate whole rests. No range or use-symbols choice is imported; published multimeasureRests has duration/start/label but no style field.",
+      "importEvidence": "harness/reports/musicxml-rest-assessment.json",
+      "captureEvidence": "harness/fixtures/musicxml-rest-evidence/studio/02c-Rests-MultiMeasureRests/observation.json",
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "02d.meter-scaled-multimeasure-rests",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "partial",
+      "cause": [
+        "importer"
+      ],
+      "reason": "Imported whole, dotted-half and half durations match the changing meters, and both shells show the meters after the Show preference. All four requested collapses and counts are lost.",
+      "importEvidence": "harness/reports/musicxml-rest-assessment.json",
+      "captureEvidence": "harness/fixtures/musicxml-rest-evidence/workbench/02d-Rests-Multimeasure-TimeSignatures/observation.json",
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "02d.meter-scaled-multimeasure-rests",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "partial",
+      "cause": [
+        "importer"
+      ],
+      "reason": "Imported whole, dotted-half and half durations match the changing meters, and both shells show the meters after the Show preference. All four requested collapses and counts are lost.",
+      "importEvidence": "harness/reports/musicxml-rest-assessment.json",
+      "captureEvidence": "harness/fixtures/musicxml-rest-evidence/studio/02d-Rests-Multimeasure-TimeSignatures/observation.json",
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "02e.untyped-rest",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "The importer derives quarter from duration/divisions, assigns staff 2, and both shells display it on the bass staff. The underfill badge flags the deliberately incomplete pickup rather than a missing rest.",
+      "importEvidence": "harness/reports/musicxml-rest-assessment.json",
+      "captureEvidence": "harness/fixtures/musicxml-rest-evidence/workbench/02e-Rests-NoType/observation.json",
+      "diagnosticTitles": [
+        "validation — voice 1 underfills the 4/4 bar: notes sum to 1 of 4 beats",
+        "validation — voice 1 underfills the 4/4 bar: notes sum to 1 of 4 beats"
+      ]
+    },
+    {
+      "featureId": "02e.untyped-rest",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "The importer derives quarter from duration/divisions, assigns staff 2, and both shells display it on the bass staff. The underfill badge flags the deliberately incomplete pickup rather than a missing rest.",
+      "importEvidence": "harness/reports/musicxml-rest-assessment.json",
+      "captureEvidence": "harness/fixtures/musicxml-rest-evidence/studio/02e-Rests-NoType/observation.json",
+      "diagnosticTitles": [
+        "validation — voice 1 underfills the 4/4 bar: notes sum to 1 of 4 beats",
+        "validation — voice 1 underfills the 4/4 bar: notes sum to 1 of 4 beats"
+      ]
+    },
+    {
+      "featureId": "02e.unstaffed-voice-note",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "The imported voice-2 sequence has no staff assignment; both shells draw E3 below the upper treble staff, exactly the source's stated default placement. This is judged separately from the untyped rest.",
+      "importEvidence": "harness/reports/musicxml-rest-assessment.json",
+      "captureEvidence": "harness/fixtures/musicxml-rest-evidence/workbench/02e-Rests-NoType/observation.json",
+      "diagnosticTitles": [
+        "validation — voice 1 underfills the 4/4 bar: notes sum to 1 of 4 beats",
+        "validation — voice 1 underfills the 4/4 bar: notes sum to 1 of 4 beats"
+      ]
+    },
+    {
+      "featureId": "02e.unstaffed-voice-note",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "The imported voice-2 sequence has no staff assignment; both shells draw E3 below the upper treble staff, exactly the source's stated default placement. This is judged separately from the untyped rest.",
+      "importEvidence": "harness/reports/musicxml-rest-assessment.json",
+      "captureEvidence": "harness/fixtures/musicxml-rest-evidence/studio/02e-Rests-NoType/observation.json",
+      "diagnosticTitles": [
+        "validation — voice 1 underfills the 4/4 bar: notes sum to 1 of 4 beats",
+        "validation — voice 1 underfills the 4/4 bar: notes sum to 1 of 4 beats"
+      ]
+    },
+    {
+      "featureId": "02f.short-rest-durations",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "partial",
+      "cause": [
+        "importer"
+      ],
+      "reason": "The source's 256th, 512th and 1024th types become 128th in bars 2 and 4, with repeated glyphs and spurious overfill badges. The shorter types and both clefs survive.",
+      "importEvidence": "harness/reports/musicxml-rest-assessment.json",
+      "captureEvidence": "harness/fixtures/musicxml-rest-evidence/workbench/02f-Rests-Placement/observation.json",
+      "diagnosticTitles": [
+        "validation — overfills the 2/2 bar: notes sum to 2.047 of 2 beats",
+        "validation — overfills the 2/2 bar: notes sum to 2.047 of 2 beats",
+        "validation — overfills the 2/2 bar: notes sum to 2.047 of 2 beats",
+        "validation — overfills the 2/2 bar: notes sum to 2.047 of 2 beats"
+      ]
+    },
+    {
+      "featureId": "02f.short-rest-durations",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "partial",
+      "cause": [
+        "importer"
+      ],
+      "reason": "The source's 256th, 512th and 1024th types become 128th in bars 2 and 4, with repeated glyphs and spurious overfill badges. The shorter types and both clefs survive.",
+      "importEvidence": "harness/reports/musicxml-rest-assessment.json",
+      "captureEvidence": "harness/fixtures/musicxml-rest-evidence/studio/02f-Rests-Placement/observation.json",
+      "diagnosticTitles": [
+        "validation — overfills the 2/2 bar: notes sum to 2.047 of 2 beats",
+        "validation — overfills the 2/2 bar: notes sum to 2.047 of 2 beats",
+        "validation — overfills the 2/2 bar: notes sum to 2.047 of 2 beats",
+        "validation — overfills the 2/2 bar: notes sum to 2.047 of 2 beats"
+      ]
+    },
+    {
+      "featureId": "02f.explicit-rest-position",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "incorrect",
+      "cause": [
+        "importer"
+      ],
+      "reason": "All 12 explicit display-step/octave positions import as rest:{}; both shells put the ladder glyphs at their duration defaults. Staff-space choices never reach the renderer.",
+      "importEvidence": "harness/reports/musicxml-rest-assessment.json",
+      "captureEvidence": "harness/fixtures/musicxml-rest-evidence/workbench/02f-Rests-Placement/observation.json",
+      "diagnosticTitles": [
+        "validation — overfills the 2/2 bar: notes sum to 2.047 of 2 beats",
+        "validation — overfills the 2/2 bar: notes sum to 2.047 of 2 beats",
+        "validation — overfills the 2/2 bar: notes sum to 2.047 of 2 beats",
+        "validation — overfills the 2/2 bar: notes sum to 2.047 of 2 beats"
+      ]
+    },
+    {
+      "featureId": "02f.explicit-rest-position",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "incorrect",
+      "cause": [
+        "importer"
+      ],
+      "reason": "All 12 explicit display-step/octave positions import as rest:{}; both shells put the ladder glyphs at their duration defaults. Staff-space choices never reach the renderer.",
+      "importEvidence": "harness/reports/musicxml-rest-assessment.json",
+      "captureEvidence": "harness/fixtures/musicxml-rest-evidence/studio/02f-Rests-Placement/observation.json",
+      "diagnosticTitles": [
+        "validation — overfills the 2/2 bar: notes sum to 2.047 of 2 beats",
+        "validation — overfills the 2/2 bar: notes sum to 2.047 of 2 beats",
+        "validation — overfills the 2/2 bar: notes sum to 2.047 of 2 beats",
+        "validation — overfills the 2/2 bar: notes sum to 2.047 of 2 beats"
+      ]
+    },
+    {
+      "featureId": "02f.clef-context",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Imported F clef on line 4 then G clef on line 2 and the two visible clefs match the source. Rest-position loss is judged separately.",
+      "importEvidence": "harness/reports/musicxml-rest-assessment.json",
+      "captureEvidence": "harness/fixtures/musicxml-rest-evidence/workbench/02f-Rests-Placement/observation.json",
+      "diagnosticTitles": [
+        "validation — overfills the 2/2 bar: notes sum to 2.047 of 2 beats",
+        "validation — overfills the 2/2 bar: notes sum to 2.047 of 2 beats",
+        "validation — overfills the 2/2 bar: notes sum to 2.047 of 2 beats",
+        "validation — overfills the 2/2 bar: notes sum to 2.047 of 2 beats"
+      ]
+    },
+    {
+      "featureId": "02f.clef-context",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Imported F clef on line 4 then G clef on line 2 and the two visible clefs match the source. Rest-position loss is judged separately.",
+      "importEvidence": "harness/reports/musicxml-rest-assessment.json",
+      "captureEvidence": "harness/fixtures/musicxml-rest-evidence/studio/02f-Rests-Placement/observation.json",
+      "diagnosticTitles": [
+        "validation — overfills the 2/2 bar: notes sum to 2.047 of 2 beats",
+        "validation — overfills the 2/2 bar: notes sum to 2.047 of 2 beats",
+        "validation — overfills the 2/2 bar: notes sum to 2.047 of 2 beats",
+        "validation — overfills the 2/2 bar: notes sum to 2.047 of 2 beats"
+      ]
+    }
+  ],
+  "renderVariantDispositions": [
+    {
+      "featureId": "02a.short-rest-durations",
+      "variantId": "02a-Rests-Durations/m04/n01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "Written value and dot match the source"
+    },
+    {
+      "featureId": "02a.short-rest-durations",
+      "variantId": "02a-Rests-Durations/m04/n02",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "Written value and dot match the source"
+    },
+    {
+      "featureId": "02a.short-rest-durations",
+      "variantId": "02a-Rests-Durations/m04/n03",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "Written value and dot match the source"
+    },
+    {
+      "featureId": "02a.short-rest-durations",
+      "variantId": "02a-Rests-Durations/m04/n04",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "Written value and dot match the source"
+    },
+    {
+      "featureId": "02a.short-rest-durations",
+      "variantId": "02a-Rests-Durations/m04/n05",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "Written value and dot match the source"
+    },
+    {
+      "featureId": "02a.short-rest-durations",
+      "variantId": "02a-Rests-Durations/m04/n06",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "Written value and dot match the source"
+    },
+    {
+      "featureId": "02a.short-rest-durations",
+      "variantId": "02a-Rests-Durations/m04/n07",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "Written value and dot match the source"
+    },
+    {
+      "featureId": "02a.short-rest-durations",
+      "variantId": "02a-Rests-Durations/m04/n08",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "Imported as undotted 128th with repeated glyph and false overfill"
+    },
+    {
+      "featureId": "02a.short-rest-durations",
+      "variantId": "02a-Rests-Durations/m04/n09",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "Imported as undotted 128th with repeated glyph and false overfill"
+    },
+    {
+      "featureId": "02a.short-rest-durations",
+      "variantId": "02a-Rests-Durations/m04/n10",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "Imported as undotted 128th with repeated glyph and false overfill"
+    },
+    {
+      "featureId": "02a.short-rest-durations",
+      "variantId": "02a-Rests-Durations/m04/n11",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "Imported as undotted 128th with repeated glyph and false overfill"
+    },
+    {
+      "featureId": "02a.short-rest-durations",
+      "variantId": "02a-Rests-Durations/m05/n01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "Written value and dot match the source"
+    },
+    {
+      "featureId": "02a.short-rest-durations",
+      "variantId": "02a-Rests-Durations/m05/n02",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "Written value and dot match the source"
+    },
+    {
+      "featureId": "02a.short-rest-durations",
+      "variantId": "02a-Rests-Durations/m05/n03",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "Written value and dot match the source"
+    },
+    {
+      "featureId": "02a.short-rest-durations",
+      "variantId": "02a-Rests-Durations/m05/n04",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "Written value and dot match the source"
+    },
+    {
+      "featureId": "02a.short-rest-durations",
+      "variantId": "02a-Rests-Durations/m05/n05",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "Written value and dot match the source"
+    },
+    {
+      "featureId": "02a.short-rest-durations",
+      "variantId": "02a-Rests-Durations/m05/n06",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "Written value and dot match the source"
+    },
+    {
+      "featureId": "02a.short-rest-durations",
+      "variantId": "02a-Rests-Durations/m05/n07",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "Written value and dot match the source"
+    },
+    {
+      "featureId": "02a.short-rest-durations",
+      "variantId": "02a-Rests-Durations/m05/n08",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "Imported as undotted 128th with repeated glyph and false overfill"
+    },
+    {
+      "featureId": "02a.short-rest-durations",
+      "variantId": "02a-Rests-Durations/m05/n09",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "Imported as undotted 128th with repeated glyph and false overfill"
+    },
+    {
+      "featureId": "02a.short-rest-durations",
+      "variantId": "02a-Rests-Durations/m05/n10",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "Imported as undotted 128th with repeated glyph and false overfill"
+    },
+    {
+      "featureId": "02a.short-rest-durations",
+      "variantId": "02a-Rests-Durations/m05/n11",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "Imported as undotted 128th with repeated glyph and false overfill"
+    },
+    {
+      "featureId": "02f.short-rest-durations",
+      "variantId": "02f-Rests-Placement/m02/n01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "Written value and dot match the source"
+    },
+    {
+      "featureId": "02f.short-rest-durations",
+      "variantId": "02f-Rests-Placement/m02/n02",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "Written value and dot match the source"
+    },
+    {
+      "featureId": "02f.short-rest-durations",
+      "variantId": "02f-Rests-Placement/m02/n03",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "Written value and dot match the source"
+    },
+    {
+      "featureId": "02f.short-rest-durations",
+      "variantId": "02f-Rests-Placement/m02/n04",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "Written value and dot match the source"
+    },
+    {
+      "featureId": "02f.short-rest-durations",
+      "variantId": "02f-Rests-Placement/m02/n05",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "Written value and dot match the source"
+    },
+    {
+      "featureId": "02f.short-rest-durations",
+      "variantId": "02f-Rests-Placement/m02/n06",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "Written value and dot match the source"
+    },
+    {
+      "featureId": "02f.short-rest-durations",
+      "variantId": "02f-Rests-Placement/m02/n07",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "Written value and dot match the source"
+    },
+    {
+      "featureId": "02f.short-rest-durations",
+      "variantId": "02f-Rests-Placement/m02/n08",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "Imported as undotted 128th with repeated glyph and false overfill"
+    },
+    {
+      "featureId": "02f.short-rest-durations",
+      "variantId": "02f-Rests-Placement/m02/n09",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "Imported as undotted 128th with repeated glyph and false overfill"
+    },
+    {
+      "featureId": "02f.short-rest-durations",
+      "variantId": "02f-Rests-Placement/m02/n10",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "Imported as undotted 128th with repeated glyph and false overfill"
+    },
+    {
+      "featureId": "02f.short-rest-durations",
+      "variantId": "02f-Rests-Placement/m02/n11",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "Imported as undotted 128th with repeated glyph and false overfill"
+    },
+    {
+      "featureId": "02f.short-rest-durations",
+      "variantId": "02f-Rests-Placement/m04/n01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "Written value and dot match the source"
+    },
+    {
+      "featureId": "02f.short-rest-durations",
+      "variantId": "02f-Rests-Placement/m04/n02",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "Written value and dot match the source"
+    },
+    {
+      "featureId": "02f.short-rest-durations",
+      "variantId": "02f-Rests-Placement/m04/n03",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "Written value and dot match the source"
+    },
+    {
+      "featureId": "02f.short-rest-durations",
+      "variantId": "02f-Rests-Placement/m04/n04",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "Written value and dot match the source"
+    },
+    {
+      "featureId": "02f.short-rest-durations",
+      "variantId": "02f-Rests-Placement/m04/n05",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "Written value and dot match the source"
+    },
+    {
+      "featureId": "02f.short-rest-durations",
+      "variantId": "02f-Rests-Placement/m04/n06",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "Written value and dot match the source"
+    },
+    {
+      "featureId": "02f.short-rest-durations",
+      "variantId": "02f-Rests-Placement/m04/n07",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "Written value and dot match the source"
+    },
+    {
+      "featureId": "02f.short-rest-durations",
+      "variantId": "02f-Rests-Placement/m04/n08",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "Imported as undotted 128th with repeated glyph and false overfill"
+    },
+    {
+      "featureId": "02f.short-rest-durations",
+      "variantId": "02f-Rests-Placement/m04/n09",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "Imported as undotted 128th with repeated glyph and false overfill"
+    },
+    {
+      "featureId": "02f.short-rest-durations",
+      "variantId": "02f-Rests-Placement/m04/n10",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "Imported as undotted 128th with repeated glyph and false overfill"
+    },
+    {
+      "featureId": "02f.short-rest-durations",
+      "variantId": "02f-Rests-Placement/m04/n11",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "Imported as undotted 128th with repeated glyph and false overfill"
+    }
+  ],
+  "counts": {
+    "renderRows": 26,
+    "renderVerdicts": {
+      "incorrect": 10,
+      "partial": 6,
+      "correct": 10
+    }
+  },
+  "deduplication": {
+    "22": "Meter import/display fixes already landed; these sources retain exact 4/4, 3/4 and 2/4 meters. No duplicate meter proposal.",
+    "23": "Studio title promotion already landed; all six XML versions were made current with bound desktop editors.",
+    "24": "Accidental fidelity and GP losses are separate. This slice proposes only rest-family import/render fidelity."
+  }
+}

@@ -1,0 +1,233 @@
+{
+  "mnx": {
+    "version": 1
+  },
+  "global": {
+    "measures": [
+      {
+        "key": {
+          "fifths": 0
+        },
+        "time": {
+          "count": 4,
+          "unit": 4,
+          "display": "common"
+        }
+      },
+      {},
+      {
+        "time": {
+          "count": 3,
+          "unit": 4
+        }
+      },
+      {},
+      {},
+      {
+        "time": {
+          "count": 2,
+          "unit": 4
+        }
+      },
+      {},
+      {
+        "time": {
+          "count": 4,
+          "unit": 4,
+          "display": "common"
+        }
+      },
+      {},
+      {
+        "barline": {
+          "type": "final"
+        }
+      }
+    ]
+  },
+  "parts": [
+    {
+      "id": "P1",
+      "name": "MusicXML Part",
+      "measures": [
+        {
+          "clefs": [
+            {
+              "clef": {
+                "sign": "G",
+                "staffPosition": -2
+              }
+            }
+          ],
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "whole"
+                  },
+                  "rest": {}
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "whole"
+                  },
+                  "rest": {}
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "half",
+                    "dots": 1
+                  },
+                  "rest": {}
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "half",
+                    "dots": 1
+                  },
+                  "rest": {}
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "half",
+                    "dots": 1
+                  },
+                  "rest": {}
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "half"
+                  },
+                  "rest": {}
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "half"
+                  },
+                  "rest": {}
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "whole"
+                  },
+                  "rest": {}
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "whole"
+                  },
+                  "rest": {}
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "whole"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-10-v1-0-0"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "_x": {
+    "mnxLab": {
+      "encoding": {
+        "software": "musicxml-mnx",
+        "version": "0.1.0"
+      }
+    }
+  }
+}

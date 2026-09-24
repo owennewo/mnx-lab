@@ -1,0 +1,49 @@
+{
+  "id": "02b-Rests-PitchedRests",
+  "sourceSha256": "e588e009cc4620f56f2223360846af1b5bc6c007f48fa180bfd5ecc6894ccc9b",
+  "testClass": "feature",
+  "description": "Rests can have explicit pitches to position them vertically. In the first bar, the first rest has no explicit pitch and should use the default position, while the remaining rests are explicitly positioned at pitches E4, F5, A3, and C6. The second bar holds a full-measure rest at pitch G4 (within an alto clef).",
+  "views": [
+    {
+      "scrollTarget": "viewer",
+      "visibleWidth": 750,
+      "visibleHeight": 753.125,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0,
+          1
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [],
+      "scrollWidth": 750,
+      "scrollHeight": 753,
+      "clientWidth": 750,
+      "clientHeight": 753,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "importError": null,
+  "warnings": [],
+  "importedDocumentSha256": "907710db485c51443431233cb3f046d368330bd338736423ef408532c0b9a1fe",
+  "displayOptions": {
+    "lyrics": "current",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

@@ -46,6 +46,7 @@ proposals that name their campaign.
 ### proposed/
 
 - **[core-musicxml-accidental-fidelity.md](proposed/core-musicxml-accidental-fidelity.md)** — MusicXML campaign item 24: explicit accidental enclosure import/render, named-glyph diagnostics, direct qualifier editing and the measured Studio GP save losses from `01a`/`01e`.
+- **[core-musicxml-rest-fidelity.md](proposed/core-musicxml-rest-fidelity.md)** — MusicXML campaign item 25: preserve multimeasure rest groups, explicit rest placement and 256th–1024th values; diagnose unsupported symbol-style requests from `02a`–`02f`.
 
 
 

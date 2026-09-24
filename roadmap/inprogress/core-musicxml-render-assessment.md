@@ -153,3 +153,15 @@ fractional-pitch diagnostics remain item 22's completed scope. Default
 cautionary/editorial styling is unresolved where the original does not
 specify an enclosure. This is one eight-fixture slice, not completion of the
 183-fixture assessment.
+
+## Rest rendering batch, 2026-09-24
+
+[The 02a–02f report](../../docs/musicxml-rest-assessment.md) adds six original
+rest fixtures, 13 shared feature IDs, 113 source note/range variants and 26
+current Notation feature × shell × view verdicts. Original-file browser
+imports, MNX, complete SVG/PNG captures, display settings and diagnostics
+are retained for both shells. No strings are declared, so Tab/Both do not
+apply. Missing multimeasure groups, explicit rest positions and 256th–1024th
+values support [proposed item 25](../proposed/core-musicxml-rest-fidelity.md).
+This is a render-only slice; item 19's tasks and persistence for these IDs
+remain open. Item 18 remains in progress for the rest of the suite.

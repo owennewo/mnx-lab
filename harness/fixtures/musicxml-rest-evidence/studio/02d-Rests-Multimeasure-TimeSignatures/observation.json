@@ -1,0 +1,64 @@
+{
+  "id": "02d-Rests-Multimeasure-TimeSignatures",
+  "sourceSha256": "4685e5a403982c9f60aa03ef081d6d80935aa2e336ebf493c27549cf77914aed",
+  "testClass": "feature",
+  "description": "Multi-measure rests should always be converted into durations that are multiples of the time signature.",
+  "views": [
+    {
+      "scrollTarget": "frame",
+      "visibleWidth": 1060,
+      "visibleHeight": 870,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        [
+          9
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [],
+      "scrollWidth": 1060,
+      "scrollHeight": 870,
+      "clientWidth": 1060,
+      "clientHeight": 870,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "suppliedLibraryTitle": "02d-Rests-Multimeasure-TimeSignatures",
+  "makeCurrentError": null,
+  "entryPath": "Local operator ingest: GP seed + unmodified XML original; Save → Versions → View XML → Make current",
+  "importError": null,
+  "viewingOriginal": false,
+  "editingSuspended": false,
+  "warnings": [],
+  "importedDocumentSha256": "af941bec82012b06c0f8affff675ba0fed6c40c4fb5fb8fca938759d235ea6d6",
+  "displayOptions": {
+    "lyrics": "current",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

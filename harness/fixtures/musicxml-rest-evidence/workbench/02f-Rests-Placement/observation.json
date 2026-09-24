@@ -1,0 +1,58 @@
+{
+  "id": "02f-Rests-Placement",
+  "sourceSha256": "e19e67af60f686d56936c59ef12cdbd1feeaa761710f23bd0d1f704d46552d69",
+  "testClass": "feature",
+  "description": "All different rest lengths with different clefs and explicit display-step placements, including ambiguous placements within staff spaces instead of lines.",
+  "views": [
+    {
+      "scrollTarget": "viewer",
+      "visibleWidth": 750,
+      "visibleHeight": 753.125,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0,
+          1,
+          2
+        ],
+        [
+          3
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [
+        "validation — overfills the 2/2 bar: notes sum to 2.047 of 2 beats",
+        "validation — overfills the 2/2 bar: notes sum to 2.047 of 2 beats",
+        "validation — overfills the 2/2 bar: notes sum to 2.047 of 2 beats",
+        "validation — overfills the 2/2 bar: notes sum to 2.047 of 2 beats"
+      ],
+      "scrollWidth": 750,
+      "scrollHeight": 753,
+      "clientWidth": 750,
+      "clientHeight": 753,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "importError": null,
+  "warnings": [],
+  "importedDocumentSha256": "92314cdc6f7fa8e0ee021c13d77350ceaf845ec712d06ef0f300f98ae8f7d528",
+  "displayOptions": {
+    "lyrics": "current",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

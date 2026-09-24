@@ -48,6 +48,16 @@ edits, while Studio GP storage loses 15 `01a` notes and all 16 `01e`
 accidental-display values; subsequent Library exports inherit those losses.
 Items 18/19 remain open for the rest of the suite and explicit unresolved tasks.
 
+**Rest render slice, 2026-09-24.** The six `02a`–`02f` originals now have
+[source/import and current both-shell Notation verdicts](../../docs/musicxml-rest-assessment.md):
+13 feature IDs, 113 source note/range variant IDs and 26 feature × shell ×
+view rows. Their 256th–1024th rests collapse to 128ths; explicit rest heights
+and multimeasure group counts disappear, all without import warnings.
+The changing meters and untitled Studio version workflow already fixed by
+items 22 and 23 behave as expected. [Proposed item 25](../proposed/core-musicxml-rest-fidelity.md)
+owns only the new rest gaps. Render item 18 remains open for the other families;
+this pass makes no write-path claim for item 19.
+
 ### The oracle we already own, and the assertion that would waste it
 
 `vendor/mnx/doctools/data.json` holds **27 `spectools.exampledocumentcomparison`
@@ -168,6 +178,7 @@ deliberately **not** enumerated in advance: item 8 decides them from evidence.
 | 22 | [Render gaps](../complete/core-musicxml-render-gaps.md) | Preserve piano staves; diagnose microtonal/staff-line losses; contain unsupported-clef projection failures. Meter follow-up adds exact duration and display losses; not an exhaustive backlog. | accuracy | original XML + imported MNX + both-shell captures | **complete 2026-09-22** |
 | 23 | [Write gaps](../complete/core-musicxml-write-gaps.md) | Resolve missing title metadata before making an imported Studio version current, without bypassing the shared editor or GP storage policy; expose representable numeric meter ranges. | authoring | real Versions controls + refusal + persistence checks | **complete 2026-09-24** |
 | 24 | [Accidental fidelity](../proposed/core-musicxml-accidental-fidelity.md) | Preserve and draw explicit enclosures; diagnose named accidental glyph loss; expose the missing note-inspector choices and resolve the measured Studio GP persistence loss. Deduplicates item 22's fractional-pitch work and item 23's title workflow. | accuracy + authoring | 01a–01h source/import/browser/editor/save-route evidence | **proposed 2026-09-24** |
+| 25 | [Rest fidelity](../proposed/core-musicxml-rest-fidelity.md) | Import multimeasure rest ranges, explicit rest heights and 256th–1024th written values; diagnose `use-symbols` until a carrier is agreed. Keeps meter/title fixes in items 22/23. | accuracy | 02a–02f source/import/both-shell notation evidence | **proposed 2026-09-24** |
 | — | Feature parity | Dynamics, wedges, spanners, ottavas, articulations, SMuFL glyph names, percussion, layout breaks. **Deliberately unenumerated**: item 8 turns these into a ranked queue with evidence, and each becomes its own row when picked up. Note the schema already has `dynamic-*`, `ottava`, `slur` and `wedge-type` as standard objects — but **no pedal def**, so pedal is contract clause 2's first real test. | accuracy | 1 + 2 + 3 | not yet rows |
 
 ### Item 8's derivation rule
@@ -201,6 +212,26 @@ exactly as `verified` already works here. No backend: a generated JSON artifact
 committed to the repo, like `worker/models.json`.
 
 ## Progress + learnings
+
+### 2026-09-24 — item 18: 02a–02f rest rendering slice
+
+[The current source-to-MNX and both-shell review](../../docs/musicxml-rest-assessment.md)
+adds 13 feature IDs, 113 stable source note/range variants and 26 Notation
+feature/view verdicts across six unchanged originals. The capture checked
+Time signatures = Show and the actual scroll host; no source declares strings.
+All six XML versions became current and had bound Studio desktop editors.
+
+The short-rest ladders retain half through 128th but silently turn all sixteen
+256th/512th/1024th variants into 128ths, creating false overfill badges.
+Explicit rest positions disappear before layout, including space positions
+and a C-clef example. The requested 2-, 3-, 15- and 12-bar rest spans are
+shown as individual bars; `02d`'s underlying changing-meter durations do
+survive. Published MNX already represents ordinary ranges, rest positions
+and short values, while `use-symbols=yes` needs a carrier decision. A
+deduplicated [proposed item 25](../proposed/core-musicxml-rest-fidelity.md)
+records the new gaps; item 22's meter and item 23's title work are not
+reopened. Rendering item 18 remains open across the rest of the suite, and
+no authoring task or save-route verdict is inferred from this slice.
 
 ### 2026-09-24 — items 18/19: 01a–01h pitch and accidental slice
 

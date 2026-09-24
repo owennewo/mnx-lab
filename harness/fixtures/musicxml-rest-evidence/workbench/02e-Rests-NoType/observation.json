@@ -1,0 +1,52 @@
+{
+  "id": "02e-Rests-NoType",
+  "sourceSha256": "1a4c740d7b6b026158f2594f00633c31c71c1070ea11f005bdbea9074d9685fe",
+  "testClass": "feature",
+  "description": "In some cases, a <rest> element misses the <type> child (this happens, for example, with voices in Finale, where you don't manually insert a rest). The second note in voice 2 misses a <staff> element; it is thus positioned in the upper staff.",
+  "views": [
+    {
+      "scrollTarget": "viewer",
+      "visibleWidth": 750,
+      "visibleHeight": 753.125,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0,
+          1
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [
+        "validation — voice 1 underfills the 4/4 bar: notes sum to 1 of 4 beats",
+        "validation — voice 1 underfills the 4/4 bar: notes sum to 1 of 4 beats"
+      ],
+      "scrollWidth": 750,
+      "scrollHeight": 753,
+      "clientWidth": 750,
+      "clientHeight": 753,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "importError": null,
+  "warnings": [],
+  "importedDocumentSha256": "a52649c01fd8b4f3557589da325c71247850b0994d003e01c85cb29df9902efe",
+  "displayOptions": {
+    "lyrics": "current",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

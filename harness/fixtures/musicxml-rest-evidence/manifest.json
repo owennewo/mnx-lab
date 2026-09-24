@@ -1,0 +1,257 @@
+{
+  "kind": "implementation-loop retained 02a\u201302f agent render artifacts; not pixel goldens",
+  "applicationCommit": "2a2481d9dd12d9e17ded020d00e967bdcee0b67d",
+  "corpusRevision": "77c19f7e819154c70ca1a1992e80dcda8ff82fea",
+  "files": [
+    {
+      "path": "studio/02a-Rests-Durations/document.mnx.json",
+      "bytes": 6025,
+      "sha256": "2c219b1576e5ae7344608daa30e9f3be7cdab99fa540edb2f2ae807281181216"
+    },
+    {
+      "path": "studio/02a-Rests-Durations/notation-0-0.png",
+      "bytes": 86149,
+      "sha256": "0fc6ea04a641462e3ec95d3bdb6b3596bed79214e90ba19e07c56393c6c74505"
+    },
+    {
+      "path": "studio/02a-Rests-Durations/notation-0.svg",
+      "bytes": 9263,
+      "sha256": "2f77062c79df8a4ff90dac9cd608d663d8f4207403cc6c2d255540ba2adadef0"
+    },
+    {
+      "path": "studio/02a-Rests-Durations/observation.json",
+      "bytes": 1987,
+      "sha256": "996a5c5659ca1a82b4eb76094a03cb741d2ba8acccd4ba9f738f73cdf17d75ff"
+    },
+    {
+      "path": "studio/02b-Rests-PitchedRests/document.mnx.json",
+      "bytes": 2046,
+      "sha256": "bfcda1458fa4184c4a8d4a9feb52af08e4057007e378cd46a5a5a61dc2eaaf66"
+    },
+    {
+      "path": "studio/02b-Rests-PitchedRests/notation-0-0.png",
+      "bytes": 67155,
+      "sha256": "e060c4ce62c34f70594faad0e3c294c1242ab92193cd0909b06b1356f29cc05a"
+    },
+    {
+      "path": "studio/02b-Rests-PitchedRests/notation-0.svg",
+      "bytes": 2744,
+      "sha256": "8eb5aba53bdc1f8270409f8c255e29167d6c2d7ed51cfe41723241dcb1441078"
+    },
+    {
+      "path": "studio/02b-Rests-PitchedRests/observation.json",
+      "bytes": 1685,
+      "sha256": "72b1301e37c2839c625dcc12907dbdefc102a98736bebbcdc95d93bd3cd83d25"
+    },
+    {
+      "path": "studio/02c-Rests-MultiMeasureRests/document.mnx.json",
+      "bytes": 11649,
+      "sha256": "3941357283cbdcba104032144cec0e4d375218e402b3438636a711c461dacaf9"
+    },
+    {
+      "path": "studio/02c-Rests-MultiMeasureRests/notation-0-0.png",
+      "bytes": 79492,
+      "sha256": "036711b466713b708735fe3ecaee1b153eb9efc7ac366a3fcd9b52406c9d2224"
+    },
+    {
+      "path": "studio/02c-Rests-MultiMeasureRests/notation-0.svg",
+      "bytes": 25748,
+      "sha256": "1e207eddfc8d3c8bf719f0fb8ccad34bd747b698712acf8001a454e814b79597"
+    },
+    {
+      "path": "studio/02c-Rests-MultiMeasureRests/observation.json",
+      "bytes": 2023,
+      "sha256": "04ca9ef53f99b66d96722d9252a3c5de38d3353374a6a9227787f86bf4c0d3f5"
+    },
+    {
+      "path": "studio/02d-Rests-Multimeasure-TimeSignatures/document.mnx.json",
+      "bytes": 4510,
+      "sha256": "118ce96064319028d9de21b28a0dd12cc75c58ee469e5f5f3213ff50e555318a"
+    },
+    {
+      "path": "studio/02d-Rests-Multimeasure-TimeSignatures/notation-0-0.png",
+      "bytes": 72691,
+      "sha256": "e24cb30680ce3d35b2af747bd817049ceac42fa89b91f267c04e1afc7d4380e3"
+    },
+    {
+      "path": "studio/02d-Rests-Multimeasure-TimeSignatures/notation-0.svg",
+      "bytes": 8500,
+      "sha256": "dacc88dd60a31cb2bf7ea5d3b0f8f4d0f2416a6bb8420fba9ed10a5fb1493b70"
+    },
+    {
+      "path": "studio/02d-Rests-Multimeasure-TimeSignatures/observation.json",
+      "bytes": 1631,
+      "sha256": "61731fb1db65a66953ade73beda71a7fc2712603d6bdf66f7de9a3bcca8c4ab0"
+    },
+    {
+      "path": "studio/02e-Rests-NoType/document.mnx.json",
+      "bytes": 2855,
+      "sha256": "e1690fe47835980b1ca3d437136f323197f557741a423b3d3651ea741e2acb79"
+    },
+    {
+      "path": "studio/02e-Rests-NoType/notation-0-0.png",
+      "bytes": 69423,
+      "sha256": "c058cb75f4b535e8d7c11fb12d659726e38420adaa000f3ee0518e1c00c0bb34"
+    },
+    {
+      "path": "studio/02e-Rests-NoType/notation-0.svg",
+      "bytes": 4742,
+      "sha256": "0ebe2d3eb5b2134b261175a831cf8ad22a84920c3c8ccc4cfc9e64f2f07102ef"
+    },
+    {
+      "path": "studio/02e-Rests-NoType/observation.json",
+      "bytes": 1778,
+      "sha256": "3cadb4884e1700c61949d1ece7c87a20af690ae95478179c3fc08a1669d11378"
+    },
+    {
+      "path": "studio/02f-Rests-Placement/document.mnx.json",
+      "bytes": 5158,
+      "sha256": "59cd27a3a3ad61b0ad3f46d4b5319a7ead81f44f41c30d6cc743d8e806b3aa33"
+    },
+    {
+      "path": "studio/02f-Rests-Placement/notation-0-0.png",
+      "bytes": 74115,
+      "sha256": "fb22204f63112b142a0acee5c75fda229ef166447f8674b3b03779a285e753d8"
+    },
+    {
+      "path": "studio/02f-Rests-Placement/notation-0.svg",
+      "bytes": 6979,
+      "sha256": "2adfaaa4a1e1ef8f19c2478f91ba2c561acf56a949ae4d059c57d75ec795004d"
+    },
+    {
+      "path": "studio/02f-Rests-Placement/observation.json",
+      "bytes": 1870,
+      "sha256": "2f91cb52c76190dbd1b83d63975de51af8777e94960401ff447b5cc579450fd9"
+    },
+    {
+      "path": "studio/index.json",
+      "bytes": 13298,
+      "sha256": "d1b885187a29fdfe69d29c6bfc2317c4ec990b510695a076efedbfef5f742e94"
+    },
+    {
+      "path": "workbench/02a-Rests-Durations/document.mnx.json",
+      "bytes": 6025,
+      "sha256": "2c219b1576e5ae7344608daa30e9f3be7cdab99fa540edb2f2ae807281181216"
+    },
+    {
+      "path": "workbench/02a-Rests-Durations/notation-0-0.png",
+      "bytes": 269948,
+      "sha256": "d43b5eb5e8b759604f35be1efec4ae1e0a4af839633fa3086fa671dcf15978aa"
+    },
+    {
+      "path": "workbench/02a-Rests-Durations/notation-0.svg",
+      "bytes": 9296,
+      "sha256": "881e8e3d712b1df886b9cc0a150c1097f205a9bb0ad9e8cf05aaa3714864c719"
+    },
+    {
+      "path": "workbench/02a-Rests-Durations/observation.json",
+      "bytes": 1731,
+      "sha256": "3de15839493ac0fd0589ed889400b37ab149e7ca6d5b39c75c8dc8b3614d2461"
+    },
+    {
+      "path": "workbench/02b-Rests-PitchedRests/document.mnx.json",
+      "bytes": 2046,
+      "sha256": "bfcda1458fa4184c4a8d4a9feb52af08e4057007e378cd46a5a5a61dc2eaaf66"
+    },
+    {
+      "path": "workbench/02b-Rests-PitchedRests/notation-0-0.png",
+      "bytes": 252115,
+      "sha256": "1315c87dc79e73933f289f1c35d326c9e4476834b27b65802127858d1b750399"
+    },
+    {
+      "path": "workbench/02b-Rests-PitchedRests/notation-0.svg",
+      "bytes": 2747,
+      "sha256": "7f62cc14242a29313c5ecd26f05c80fbb8a1be9a0fd037062676fba8b481f9b9"
+    },
+    {
+      "path": "workbench/02b-Rests-PitchedRests/observation.json",
+      "bytes": 1426,
+      "sha256": "21963892a4117278e9e02d5ef72f570f2093e3ecbcdedc5e40f8935e8d10e138"
+    },
+    {
+      "path": "workbench/02c-Rests-MultiMeasureRests/document.mnx.json",
+      "bytes": 11649,
+      "sha256": "3941357283cbdcba104032144cec0e4d375218e402b3438636a711c461dacaf9"
+    },
+    {
+      "path": "workbench/02c-Rests-MultiMeasureRests/notation-0-0.png",
+      "bytes": 271474,
+      "sha256": "5385cba1cc42c5ef1eadcdace4b94d48dd8ad37836425651651857378295c6c8"
+    },
+    {
+      "path": "workbench/02c-Rests-MultiMeasureRests/notation-0.svg",
+      "bytes": 26226,
+      "sha256": "d0e95f2ff5876d8bd373e8b861ebd44735115860fb347912c795ddc49896ad7d"
+    },
+    {
+      "path": "workbench/02c-Rests-MultiMeasureRests/observation.json",
+      "bytes": 1799,
+      "sha256": "31c74af5b8e04874631c6d574b0b029e93b90bc9b43b0d9b97f9296dc823dd8e"
+    },
+    {
+      "path": "workbench/02d-Rests-Multimeasure-TimeSignatures/document.mnx.json",
+      "bytes": 4510,
+      "sha256": "118ce96064319028d9de21b28a0dd12cc75c58ee469e5f5f3213ff50e555318a"
+    },
+    {
+      "path": "workbench/02d-Rests-Multimeasure-TimeSignatures/notation-0-0.png",
+      "bytes": 256470,
+      "sha256": "b668aff44b5d4ef0b10c4342a05a94ac2321e14f2014cfd69b9a5a2cb4841db2"
+    },
+    {
+      "path": "workbench/02d-Rests-Multimeasure-TimeSignatures/notation-0.svg",
+      "bytes": 8673,
+      "sha256": "651d9b06f95a72316de9f4a23d7bbe9f75c291f909e2b1c94e3c97d893221c18"
+    },
+    {
+      "path": "workbench/02d-Rests-Multimeasure-TimeSignatures/observation.json",
+      "bytes": 1357,
+      "sha256": "0347813a9a510124804509a0114855831d7852466b4fbc2398ae5bbf8ecf4e31"
+    },
+    {
+      "path": "workbench/02e-Rests-NoType/document.mnx.json",
+      "bytes": 2855,
+      "sha256": "e1690fe47835980b1ca3d437136f323197f557741a423b3d3651ea741e2acb79"
+    },
+    {
+      "path": "workbench/02e-Rests-NoType/notation-0-0.png",
+      "bytes": 253749,
+      "sha256": "c51153e6b4bdddcb6c025f136b3c448b14424348873323fca44ec86eb4e472ac"
+    },
+    {
+      "path": "workbench/02e-Rests-NoType/notation-0.svg",
+      "bytes": 4742,
+      "sha256": "0ebe2d3eb5b2134b261175a831cf8ad22a84920c3c8ccc4cfc9e64f2f07102ef"
+    },
+    {
+      "path": "workbench/02e-Rests-NoType/observation.json",
+      "bytes": 1525,
+      "sha256": "d72ea139fe2a14a468f3f5d14b60b5f32d7a1c91878e6d6344cf067afe25670c"
+    },
+    {
+      "path": "workbench/02f-Rests-Placement/document.mnx.json",
+      "bytes": 5158,
+      "sha256": "59cd27a3a3ad61b0ad3f46d4b5319a7ead81f44f41c30d6cc743d8e806b3aa33"
+    },
+    {
+      "path": "workbench/02f-Rests-Placement/notation-0-0.png",
+      "bytes": 265269,
+      "sha256": "3297858acfad5c8ff69875b5a4a99080b875fb9f680b215834bb1040894615dc"
+    },
+    {
+      "path": "workbench/02f-Rests-Placement/notation-0.svg",
+      "bytes": 7233,
+      "sha256": "7df797f554b528ec032f4f85d1a12894c073050996c6da52babb221f1effd7cd"
+    },
+    {
+      "path": "workbench/02f-Rests-Placement/observation.json",
+      "bytes": 1634,
+      "sha256": "b736daeb9ac9659f4ea862f3f162575facd798b339bce7c4b74a65e94b0a7a99"
+    },
+    {
+      "path": "workbench/index.json",
+      "bytes": 11703,
+      "sha256": "6ff6e1fae73662e3e275febc68d1d450a455dfbc1780111e5f4705d48e0957cc"
+    }
+  ]
+}
