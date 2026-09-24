@@ -1,0 +1,48 @@
+{
+  "id": "24f-GraceNote-Slur",
+  "sourceSha256": "cc36ca009a06ed474b7ade56931ce62495680d3af9eeba2e9afb0376ba0e9fbd",
+  "testClass": "feature",
+  "description": "A grace note with a slur to the actual note. The <grace> element has no ‘slash’ attribute; since MusicXML does not provide a default value it is up to the application to interpret the grace note as an acciaccatura (with slash) or an appoggiatura (without slash).",
+  "views": [
+    {
+      "scrollTarget": "viewer",
+      "visibleWidth": 750,
+      "visibleHeight": 789.125,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [],
+      "scrollWidth": 750,
+      "scrollHeight": 789,
+      "clientWidth": 750,
+      "clientHeight": 789,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "importError": null,
+  "warnings": [],
+  "importedDocumentSha256": "5d83bed0bec997a6ff546bb5a76287d3ece146cad5013a03cf4d618af2f30ae6",
+  "displayOptions": {
+    "lyrics": "current",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

@@ -1,0 +1,5530 @@
+{
+  "kind": "implementation-loop agent render assessment; not human verification",
+  "applicationCommit": "72b21d716d001fa80a0214c60856dccc6a3998df",
+  "corpusRevision": "77c19f7e819154c70ca1a1992e80dcda8ff82fea",
+  "scope": "Eight original 24a–24h MusicXML files through current Workbench and editable Studio, source to imported MNX to complete Notation",
+  "fixtureCount": 8,
+  "featureCount": 40,
+  "sourceNoteCount": 75,
+  "sourcePitchedNoteCount": 72,
+  "sourceRestCount": 3,
+  "sourceGraceGroupCount": 24,
+  "sourceControlCount": 58,
+  "sourceVariantCount": 157,
+  "renderRowCount": 80,
+  "verdictCounts": {
+    "correct": 62,
+    "incorrect": 8,
+    "missing": 8,
+    "not applicable": 2
+  },
+  "browser": "Chrome/153.0.8010.36",
+  "viewport": {
+    "width": 1440,
+    "height": 1000,
+    "deviceScaleFactor": 1
+  },
+  "viewPolicy": "No original declares known strings: Notation only. Clefs and time signatures Show. No tested lyric is present. Every complete score fits one viewport in both shells.",
+  "fixtures": [
+    {
+      "id": "24a-GraceNotes",
+      "sourcePath": "xmlFiles/24a-GraceNotes.musicxml",
+      "sourceSha256": "872293a5844f5983351cf1836e227b94e0f68bcf9e7228591ff250537fde760e",
+      "testClass": "feature",
+      "description": "Different kinds of grace notes. First measure: single 1/16 grace note, two beamed 1/16 grace notes, 1/16 appoggiatura, 1/8 appoggiatura. Second measure: slashed single 1/16 grace note, two beamed 1/16 grace notes (with both notes marked as slashed), 1/16 acciaccatura, 1/16 grace note (without slash) right before the bar line. Third measure: no grace note before chord, 1/4 grace note with sharp, two 1/4 grace notes with flats, 1/16 slashed grace note with natural before a quarter rest.",
+      "sourceDeclaresStrings": false,
+      "sourceNotes": [
+        {
+          "id": "24a-GraceNotes/p01/m01/n01",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 1,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "pitch": {
+            "step": "D",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "16th",
+          "dots": 0,
+          "durationQuarter": [
+            0,
+            1
+          ],
+          "grace": {
+            "slash": "no"
+          },
+          "beams": []
+        },
+        {
+          "id": "24a-GraceNotes/p01/m01/n02",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 2,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "pitch": {
+            "step": "C",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "quarter",
+          "dots": 0,
+          "durationQuarter": [
+            1,
+            1
+          ],
+          "grace": null,
+          "beams": []
+        },
+        {
+          "id": "24a-GraceNotes/p01/m01/n03",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 3,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            1,
+            1
+          ],
+          "pitch": {
+            "step": "E",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "16th",
+          "dots": 0,
+          "durationQuarter": [
+            0,
+            1
+          ],
+          "grace": {
+            "slash": "no"
+          },
+          "beams": [
+            {
+              "number": "1",
+              "value": "begin"
+            },
+            {
+              "number": "2",
+              "value": "begin"
+            }
+          ]
+        },
+        {
+          "id": "24a-GraceNotes/p01/m01/n04",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 4,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            1,
+            1
+          ],
+          "pitch": {
+            "step": "D",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "16th",
+          "dots": 0,
+          "durationQuarter": [
+            0,
+            1
+          ],
+          "grace": {
+            "slash": "no"
+          },
+          "beams": [
+            {
+              "number": "1",
+              "value": "end"
+            },
+            {
+              "number": "2",
+              "value": "end"
+            }
+          ]
+        },
+        {
+          "id": "24a-GraceNotes/p01/m01/n05",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 5,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            1,
+            1
+          ],
+          "pitch": {
+            "step": "C",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "quarter",
+          "dots": 0,
+          "durationQuarter": [
+            1,
+            1
+          ],
+          "grace": null,
+          "beams": []
+        },
+        {
+          "id": "24a-GraceNotes/p01/m01/n06",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 6,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            2,
+            1
+          ],
+          "pitch": {
+            "step": "D",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "16th",
+          "dots": 0,
+          "durationQuarter": [
+            0,
+            1
+          ],
+          "grace": {
+            "slash": "no"
+          },
+          "beams": []
+        },
+        {
+          "id": "24a-GraceNotes/p01/m01/n07",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 7,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            2,
+            1
+          ],
+          "pitch": {
+            "step": "C",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "quarter",
+          "dots": 0,
+          "durationQuarter": [
+            1,
+            1
+          ],
+          "grace": null,
+          "beams": []
+        },
+        {
+          "id": "24a-GraceNotes/p01/m01/n08",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 8,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            3,
+            1
+          ],
+          "pitch": {
+            "step": "D",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "eighth",
+          "dots": 0,
+          "durationQuarter": [
+            0,
+            1
+          ],
+          "grace": {
+            "slash": "no"
+          },
+          "beams": []
+        },
+        {
+          "id": "24a-GraceNotes/p01/m01/n09",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 9,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            3,
+            1
+          ],
+          "pitch": {
+            "step": "C",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "quarter",
+          "dots": 0,
+          "durationQuarter": [
+            1,
+            1
+          ],
+          "grace": null,
+          "beams": []
+        },
+        {
+          "id": "24a-GraceNotes/p01/m02/n01",
+          "part": 1,
+          "measure": 2,
+          "ordinal": 1,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "pitch": {
+            "step": "D",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "16th",
+          "dots": 0,
+          "durationQuarter": [
+            0,
+            1
+          ],
+          "grace": {
+            "slash": "yes"
+          },
+          "beams": []
+        },
+        {
+          "id": "24a-GraceNotes/p01/m02/n02",
+          "part": 1,
+          "measure": 2,
+          "ordinal": 2,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "pitch": {
+            "step": "C",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "quarter",
+          "dots": 0,
+          "durationQuarter": [
+            1,
+            1
+          ],
+          "grace": null,
+          "beams": []
+        },
+        {
+          "id": "24a-GraceNotes/p01/m02/n03",
+          "part": 1,
+          "measure": 2,
+          "ordinal": 3,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            1,
+            1
+          ],
+          "pitch": {
+            "step": "E",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "16th",
+          "dots": 0,
+          "durationQuarter": [
+            0,
+            1
+          ],
+          "grace": {
+            "slash": "yes"
+          },
+          "beams": [
+            {
+              "number": "1",
+              "value": "begin"
+            },
+            {
+              "number": "2",
+              "value": "begin"
+            }
+          ]
+        },
+        {
+          "id": "24a-GraceNotes/p01/m02/n04",
+          "part": 1,
+          "measure": 2,
+          "ordinal": 4,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            1,
+            1
+          ],
+          "pitch": {
+            "step": "D",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "16th",
+          "dots": 0,
+          "durationQuarter": [
+            0,
+            1
+          ],
+          "grace": {
+            "slash": "yes"
+          },
+          "beams": [
+            {
+              "number": "1",
+              "value": "end"
+            },
+            {
+              "number": "2",
+              "value": "end"
+            }
+          ]
+        },
+        {
+          "id": "24a-GraceNotes/p01/m02/n05",
+          "part": 1,
+          "measure": 2,
+          "ordinal": 5,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            1,
+            1
+          ],
+          "pitch": {
+            "step": "C",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "quarter",
+          "dots": 0,
+          "durationQuarter": [
+            1,
+            1
+          ],
+          "grace": null,
+          "beams": []
+        },
+        {
+          "id": "24a-GraceNotes/p01/m02/n06",
+          "part": 1,
+          "measure": 2,
+          "ordinal": 6,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            2,
+            1
+          ],
+          "pitch": {
+            "step": "D",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "16th",
+          "dots": 0,
+          "durationQuarter": [
+            0,
+            1
+          ],
+          "grace": {
+            "slash": "yes"
+          },
+          "beams": []
+        },
+        {
+          "id": "24a-GraceNotes/p01/m02/n07",
+          "part": 1,
+          "measure": 2,
+          "ordinal": 7,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            2,
+            1
+          ],
+          "pitch": {
+            "step": "C",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "quarter",
+          "dots": 0,
+          "durationQuarter": [
+            1,
+            1
+          ],
+          "grace": null,
+          "beams": []
+        },
+        {
+          "id": "24a-GraceNotes/p01/m02/n08",
+          "part": 1,
+          "measure": 2,
+          "ordinal": 8,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            3,
+            1
+          ],
+          "pitch": {
+            "step": "C",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "quarter",
+          "dots": 0,
+          "durationQuarter": [
+            1,
+            1
+          ],
+          "grace": null,
+          "beams": []
+        },
+        {
+          "id": "24a-GraceNotes/p01/m02/n09",
+          "part": 1,
+          "measure": 2,
+          "ordinal": 9,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            4,
+            1
+          ],
+          "pitch": {
+            "step": "E",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "16th",
+          "dots": 0,
+          "durationQuarter": [
+            0,
+            1
+          ],
+          "grace": {
+            "slash": "no"
+          },
+          "beams": []
+        },
+        {
+          "id": "24a-GraceNotes/p01/m03/n01",
+          "part": 1,
+          "measure": 3,
+          "ordinal": 1,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "pitch": {
+            "step": "F",
+            "octave": 4
+          },
+          "rest": false,
+          "chord": false,
+          "type": "quarter",
+          "dots": 0,
+          "durationQuarter": [
+            1,
+            1
+          ],
+          "grace": null,
+          "beams": []
+        },
+        {
+          "id": "24a-GraceNotes/p01/m03/n02",
+          "part": 1,
+          "measure": 3,
+          "ordinal": 2,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            1,
+            1
+          ],
+          "pitch": {
+            "step": "C",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": true,
+          "type": "quarter",
+          "dots": 0,
+          "durationQuarter": [
+            1,
+            1
+          ],
+          "grace": null,
+          "beams": []
+        },
+        {
+          "id": "24a-GraceNotes/p01/m03/n03",
+          "part": 1,
+          "measure": 3,
+          "ordinal": 3,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            1,
+            1
+          ],
+          "pitch": {
+            "step": "D",
+            "octave": 5,
+            "alter": 1
+          },
+          "rest": false,
+          "chord": false,
+          "type": "quarter",
+          "dots": 0,
+          "durationQuarter": [
+            0,
+            1
+          ],
+          "grace": {},
+          "beams": []
+        },
+        {
+          "id": "24a-GraceNotes/p01/m03/n04",
+          "part": 1,
+          "measure": 3,
+          "ordinal": 4,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            1,
+            1
+          ],
+          "pitch": {
+            "step": "C",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "quarter",
+          "dots": 0,
+          "durationQuarter": [
+            1,
+            1
+          ],
+          "grace": null,
+          "beams": []
+        },
+        {
+          "id": "24a-GraceNotes/p01/m03/n05",
+          "part": 1,
+          "measure": 3,
+          "ordinal": 5,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            2,
+            1
+          ],
+          "pitch": {
+            "step": "D",
+            "octave": 5,
+            "alter": -1
+          },
+          "rest": false,
+          "chord": false,
+          "type": "quarter",
+          "dots": 0,
+          "durationQuarter": [
+            0,
+            1
+          ],
+          "grace": {},
+          "beams": []
+        },
+        {
+          "id": "24a-GraceNotes/p01/m03/n06",
+          "part": 1,
+          "measure": 3,
+          "ordinal": 6,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            2,
+            1
+          ],
+          "pitch": {
+            "step": "A",
+            "octave": 4,
+            "alter": -1
+          },
+          "rest": false,
+          "chord": false,
+          "type": "quarter",
+          "dots": 0,
+          "durationQuarter": [
+            0,
+            1
+          ],
+          "grace": {},
+          "beams": []
+        },
+        {
+          "id": "24a-GraceNotes/p01/m03/n07",
+          "part": 1,
+          "measure": 3,
+          "ordinal": 7,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            2,
+            1
+          ],
+          "pitch": {
+            "step": "C",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "quarter",
+          "dots": 0,
+          "durationQuarter": [
+            1,
+            1
+          ],
+          "grace": null,
+          "beams": []
+        },
+        {
+          "id": "24a-GraceNotes/p01/m03/n08",
+          "part": 1,
+          "measure": 3,
+          "ordinal": 8,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            3,
+            1
+          ],
+          "pitch": {
+            "step": "D",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "16th",
+          "dots": 0,
+          "durationQuarter": [
+            0,
+            1
+          ],
+          "grace": {
+            "slash": "yes"
+          },
+          "beams": []
+        },
+        {
+          "id": "24a-GraceNotes/p01/m03/n09",
+          "part": 1,
+          "measure": 3,
+          "ordinal": 9,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            3,
+            1
+          ],
+          "pitch": null,
+          "rest": true,
+          "chord": false,
+          "type": "quarter",
+          "dots": 0,
+          "durationQuarter": [
+            1,
+            1
+          ],
+          "grace": null,
+          "beams": []
+        }
+      ],
+      "sourceGraceGroups": [
+        {
+          "id": "24a-GraceNotes/p01/m01/g01",
+          "part": 1,
+          "measure": 1,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "noteIds": [
+            "24a-GraceNotes/p01/m01/n01"
+          ],
+          "eventCount": 1,
+          "graceAttributes": [
+            {
+              "slash": "no"
+            }
+          ]
+        },
+        {
+          "id": "24a-GraceNotes/p01/m01/g02",
+          "part": 1,
+          "measure": 1,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            1,
+            1
+          ],
+          "noteIds": [
+            "24a-GraceNotes/p01/m01/n03",
+            "24a-GraceNotes/p01/m01/n04"
+          ],
+          "eventCount": 2,
+          "graceAttributes": [
+            {
+              "slash": "no"
+            },
+            {
+              "slash": "no"
+            }
+          ]
+        },
+        {
+          "id": "24a-GraceNotes/p01/m01/g03",
+          "part": 1,
+          "measure": 1,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            2,
+            1
+          ],
+          "noteIds": [
+            "24a-GraceNotes/p01/m01/n06"
+          ],
+          "eventCount": 1,
+          "graceAttributes": [
+            {
+              "slash": "no"
+            }
+          ]
+        },
+        {
+          "id": "24a-GraceNotes/p01/m01/g04",
+          "part": 1,
+          "measure": 1,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            3,
+            1
+          ],
+          "noteIds": [
+            "24a-GraceNotes/p01/m01/n08"
+          ],
+          "eventCount": 1,
+          "graceAttributes": [
+            {
+              "slash": "no"
+            }
+          ]
+        },
+        {
+          "id": "24a-GraceNotes/p01/m02/g01",
+          "part": 1,
+          "measure": 2,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "noteIds": [
+            "24a-GraceNotes/p01/m02/n01"
+          ],
+          "eventCount": 1,
+          "graceAttributes": [
+            {
+              "slash": "yes"
+            }
+          ]
+        },
+        {
+          "id": "24a-GraceNotes/p01/m02/g02",
+          "part": 1,
+          "measure": 2,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            1,
+            1
+          ],
+          "noteIds": [
+            "24a-GraceNotes/p01/m02/n03",
+            "24a-GraceNotes/p01/m02/n04"
+          ],
+          "eventCount": 2,
+          "graceAttributes": [
+            {
+              "slash": "yes"
+            },
+            {
+              "slash": "yes"
+            }
+          ]
+        },
+        {
+          "id": "24a-GraceNotes/p01/m02/g03",
+          "part": 1,
+          "measure": 2,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            2,
+            1
+          ],
+          "noteIds": [
+            "24a-GraceNotes/p01/m02/n06"
+          ],
+          "eventCount": 1,
+          "graceAttributes": [
+            {
+              "slash": "yes"
+            }
+          ]
+        },
+        {
+          "id": "24a-GraceNotes/p01/m02/g04",
+          "part": 1,
+          "measure": 2,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            4,
+            1
+          ],
+          "noteIds": [
+            "24a-GraceNotes/p01/m02/n09"
+          ],
+          "eventCount": 1,
+          "graceAttributes": [
+            {
+              "slash": "no"
+            }
+          ]
+        },
+        {
+          "id": "24a-GraceNotes/p01/m03/g01",
+          "part": 1,
+          "measure": 3,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            1,
+            1
+          ],
+          "noteIds": [
+            "24a-GraceNotes/p01/m03/n03"
+          ],
+          "eventCount": 1,
+          "graceAttributes": [
+            {}
+          ]
+        },
+        {
+          "id": "24a-GraceNotes/p01/m03/g02",
+          "part": 1,
+          "measure": 3,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            2,
+            1
+          ],
+          "noteIds": [
+            "24a-GraceNotes/p01/m03/n05",
+            "24a-GraceNotes/p01/m03/n06"
+          ],
+          "eventCount": 2,
+          "graceAttributes": [
+            {},
+            {}
+          ]
+        },
+        {
+          "id": "24a-GraceNotes/p01/m03/g03",
+          "part": 1,
+          "measure": 3,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            3,
+            1
+          ],
+          "noteIds": [
+            "24a-GraceNotes/p01/m03/n08"
+          ],
+          "eventCount": 1,
+          "graceAttributes": [
+            {
+              "slash": "yes"
+            }
+          ]
+        }
+      ],
+      "sourceControls": [
+        {
+          "id": "24a-GraceNotes/p01/m01/n01/grace",
+          "kind": "grace",
+          "noteId": "24a-GraceNotes/p01/m01/n01",
+          "attributes": {
+            "slash": "no"
+          }
+        },
+        {
+          "id": "24a-GraceNotes/p01/m01/n03/grace",
+          "kind": "grace",
+          "noteId": "24a-GraceNotes/p01/m01/n03",
+          "attributes": {
+            "slash": "no"
+          }
+        },
+        {
+          "id": "24a-GraceNotes/p01/m01/n04/grace",
+          "kind": "grace",
+          "noteId": "24a-GraceNotes/p01/m01/n04",
+          "attributes": {
+            "slash": "no"
+          }
+        },
+        {
+          "id": "24a-GraceNotes/p01/m01/n06/grace",
+          "kind": "grace",
+          "noteId": "24a-GraceNotes/p01/m01/n06",
+          "attributes": {
+            "slash": "no"
+          }
+        },
+        {
+          "id": "24a-GraceNotes/p01/m01/n06/slur01",
+          "kind": "slur",
+          "noteId": "24a-GraceNotes/p01/m01/n06",
+          "type": "start",
+          "number": "1"
+        },
+        {
+          "id": "24a-GraceNotes/p01/m01/n07/slur01",
+          "kind": "slur",
+          "noteId": "24a-GraceNotes/p01/m01/n07",
+          "type": "stop",
+          "number": "1"
+        },
+        {
+          "id": "24a-GraceNotes/p01/m01/n08/grace",
+          "kind": "grace",
+          "noteId": "24a-GraceNotes/p01/m01/n08",
+          "attributes": {
+            "slash": "no"
+          }
+        },
+        {
+          "id": "24a-GraceNotes/p01/m01/n08/slur01",
+          "kind": "slur",
+          "noteId": "24a-GraceNotes/p01/m01/n08",
+          "type": "start",
+          "number": "1"
+        },
+        {
+          "id": "24a-GraceNotes/p01/m01/n09/slur01",
+          "kind": "slur",
+          "noteId": "24a-GraceNotes/p01/m01/n09",
+          "type": "stop",
+          "number": "1"
+        },
+        {
+          "id": "24a-GraceNotes/p01/m02/n01/grace",
+          "kind": "grace",
+          "noteId": "24a-GraceNotes/p01/m02/n01",
+          "attributes": {
+            "slash": "yes"
+          }
+        },
+        {
+          "id": "24a-GraceNotes/p01/m02/n03/grace",
+          "kind": "grace",
+          "noteId": "24a-GraceNotes/p01/m02/n03",
+          "attributes": {
+            "slash": "yes"
+          }
+        },
+        {
+          "id": "24a-GraceNotes/p01/m02/n04/grace",
+          "kind": "grace",
+          "noteId": "24a-GraceNotes/p01/m02/n04",
+          "attributes": {
+            "slash": "yes"
+          }
+        },
+        {
+          "id": "24a-GraceNotes/p01/m02/n06/grace",
+          "kind": "grace",
+          "noteId": "24a-GraceNotes/p01/m02/n06",
+          "attributes": {
+            "slash": "yes"
+          }
+        },
+        {
+          "id": "24a-GraceNotes/p01/m02/n06/slur01",
+          "kind": "slur",
+          "noteId": "24a-GraceNotes/p01/m02/n06",
+          "type": "start",
+          "number": "1"
+        },
+        {
+          "id": "24a-GraceNotes/p01/m02/n07/slur01",
+          "kind": "slur",
+          "noteId": "24a-GraceNotes/p01/m02/n07",
+          "type": "stop",
+          "number": "1"
+        },
+        {
+          "id": "24a-GraceNotes/p01/m02/n09/grace",
+          "kind": "grace",
+          "noteId": "24a-GraceNotes/p01/m02/n09",
+          "attributes": {
+            "slash": "no"
+          }
+        },
+        {
+          "id": "24a-GraceNotes/p01/m03/n03/grace",
+          "kind": "grace",
+          "noteId": "24a-GraceNotes/p01/m03/n03",
+          "attributes": {}
+        },
+        {
+          "id": "24a-GraceNotes/p01/m03/n05/grace",
+          "kind": "grace",
+          "noteId": "24a-GraceNotes/p01/m03/n05",
+          "attributes": {}
+        },
+        {
+          "id": "24a-GraceNotes/p01/m03/n06/grace",
+          "kind": "grace",
+          "noteId": "24a-GraceNotes/p01/m03/n06",
+          "attributes": {}
+        },
+        {
+          "id": "24a-GraceNotes/p01/m03/n08/grace",
+          "kind": "grace",
+          "noteId": "24a-GraceNotes/p01/m03/n08",
+          "attributes": {
+            "slash": "yes"
+          }
+        }
+      ],
+      "sourceMeasures": [
+        {
+          "part": 1,
+          "ordinal": 1,
+          "sourceNumber": "1",
+          "sourceSpanQuarter": [
+            4,
+            1
+          ],
+          "sourceNoteCount": 9,
+          "importedGraceGroups": [
+            {
+              "graceType": "stealFollowing",
+              "slash": false,
+              "staffs": [
+                1
+              ],
+              "eventCount": 1
+            },
+            {
+              "graceType": "stealFollowing",
+              "slash": false,
+              "staffs": [
+                1,
+                1
+              ],
+              "eventCount": 2
+            },
+            {
+              "graceType": "stealFollowing",
+              "slash": false,
+              "staffs": [
+                1
+              ],
+              "eventCount": 1
+            },
+            {
+              "graceType": "stealFollowing",
+              "slash": false,
+              "staffs": [
+                1
+              ],
+              "eventCount": 1
+            }
+          ],
+          "importedSequenceCount": 1
+        },
+        {
+          "part": 1,
+          "ordinal": 2,
+          "sourceNumber": "2",
+          "sourceSpanQuarter": [
+            4,
+            1
+          ],
+          "sourceNoteCount": 9,
+          "importedGraceGroups": [
+            {
+              "graceType": "stealPrevious",
+              "slash": "default-yes",
+              "staffs": [
+                1
+              ],
+              "eventCount": 1
+            },
+            {
+              "graceType": "stealPrevious",
+              "slash": "default-yes",
+              "staffs": [
+                1,
+                1
+              ],
+              "eventCount": 2
+            },
+            {
+              "graceType": "stealPrevious",
+              "slash": "default-yes",
+              "staffs": [
+                1
+              ],
+              "eventCount": 1
+            },
+            {
+              "graceType": "stealFollowing",
+              "slash": false,
+              "staffs": [
+                1
+              ],
+              "eventCount": 1
+            }
+          ],
+          "importedSequenceCount": 1
+        },
+        {
+          "part": 1,
+          "ordinal": 3,
+          "sourceNumber": "3",
+          "sourceSpanQuarter": [
+            4,
+            1
+          ],
+          "sourceNoteCount": 9,
+          "importedGraceGroups": [
+            {
+              "graceType": "stealPrevious",
+              "slash": "default-yes",
+              "staffs": [
+                1
+              ],
+              "eventCount": 1
+            },
+            {
+              "graceType": "stealPrevious",
+              "slash": "default-yes",
+              "staffs": [
+                1,
+                1
+              ],
+              "eventCount": 2
+            },
+            {
+              "graceType": "stealPrevious",
+              "slash": "default-yes",
+              "staffs": [
+                1
+              ],
+              "eventCount": 1
+            }
+          ],
+          "importedSequenceCount": 1
+        }
+      ]
+    },
+    {
+      "id": "24b-ChordAsGraceNote",
+      "sourcePath": "xmlFiles/24b-ChordAsGraceNote.musicxml",
+      "sourceSha256": "8b182b7f484fb18008602f603f3f3448471e282d7bd2e4ca21b657c11baef454",
+      "testClass": "feature",
+      "description": "Chords as grace notes. The last (unslashed and beamed) grace group consists of two chords with one tie between the two grace chords and another tie between the last grace chord and the main chord.",
+      "sourceDeclaresStrings": false,
+      "sourceNotes": [
+        {
+          "id": "24b-ChordAsGraceNote/p01/m01/n01",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 1,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "pitch": {
+            "step": "C",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "quarter",
+          "dots": 0,
+          "durationQuarter": [
+            1,
+            1
+          ],
+          "grace": null,
+          "beams": []
+        },
+        {
+          "id": "24b-ChordAsGraceNote/p01/m01/n02",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 2,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            1,
+            1
+          ],
+          "pitch": {
+            "step": "D",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "eighth",
+          "dots": 0,
+          "durationQuarter": [
+            0,
+            1
+          ],
+          "grace": {
+            "slash": "yes"
+          },
+          "beams": []
+        },
+        {
+          "id": "24b-ChordAsGraceNote/p01/m01/n03",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 3,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            1,
+            1
+          ],
+          "pitch": {
+            "step": "F",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": true,
+          "type": "eighth",
+          "dots": 0,
+          "durationQuarter": [
+            0,
+            1
+          ],
+          "grace": {
+            "slash": "yes"
+          },
+          "beams": []
+        },
+        {
+          "id": "24b-ChordAsGraceNote/p01/m01/n04",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 4,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            1,
+            1
+          ],
+          "pitch": {
+            "step": "C",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "quarter",
+          "dots": 0,
+          "durationQuarter": [
+            1,
+            1
+          ],
+          "grace": null,
+          "beams": []
+        },
+        {
+          "id": "24b-ChordAsGraceNote/p01/m01/n05",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 5,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            2,
+            1
+          ],
+          "pitch": {
+            "step": "B",
+            "octave": 4
+          },
+          "rest": false,
+          "chord": false,
+          "type": "eighth",
+          "dots": 0,
+          "durationQuarter": [
+            0,
+            1
+          ],
+          "grace": {
+            "slash": "yes"
+          },
+          "beams": []
+        },
+        {
+          "id": "24b-ChordAsGraceNote/p01/m01/n06",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 6,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            2,
+            1
+          ],
+          "pitch": {
+            "step": "D",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": true,
+          "type": "eighth",
+          "dots": 0,
+          "durationQuarter": [
+            0,
+            1
+          ],
+          "grace": {
+            "slash": "yes"
+          },
+          "beams": []
+        },
+        {
+          "id": "24b-ChordAsGraceNote/p01/m01/n07",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 7,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            2,
+            1
+          ],
+          "pitch": {
+            "step": "A",
+            "octave": 4
+          },
+          "rest": false,
+          "chord": false,
+          "type": "quarter",
+          "dots": 0,
+          "durationQuarter": [
+            1,
+            1
+          ],
+          "grace": null,
+          "beams": []
+        },
+        {
+          "id": "24b-ChordAsGraceNote/p01/m01/n08",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 8,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            3,
+            1
+          ],
+          "pitch": {
+            "step": "C",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": true,
+          "type": "quarter",
+          "dots": 0,
+          "durationQuarter": [
+            1,
+            1
+          ],
+          "grace": null,
+          "beams": []
+        },
+        {
+          "id": "24b-ChordAsGraceNote/p01/m01/n09",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 9,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            3,
+            1
+          ],
+          "pitch": {
+            "step": "B",
+            "octave": 4
+          },
+          "rest": false,
+          "chord": false,
+          "type": "16th",
+          "dots": 0,
+          "durationQuarter": [
+            0,
+            1
+          ],
+          "grace": {
+            "slash": "no"
+          },
+          "beams": [
+            {
+              "number": "1",
+              "value": "begin"
+            },
+            {
+              "number": "2",
+              "value": "begin"
+            }
+          ]
+        },
+        {
+          "id": "24b-ChordAsGraceNote/p01/m01/n10",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 10,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            3,
+            1
+          ],
+          "pitch": {
+            "step": "D",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": true,
+          "type": "16th",
+          "dots": 0,
+          "durationQuarter": [
+            0,
+            1
+          ],
+          "grace": {},
+          "beams": []
+        },
+        {
+          "id": "24b-ChordAsGraceNote/p01/m01/n11",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 11,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            3,
+            1
+          ],
+          "pitch": {
+            "step": "G",
+            "octave": 4
+          },
+          "rest": false,
+          "chord": false,
+          "type": "16th",
+          "dots": 0,
+          "durationQuarter": [
+            0,
+            1
+          ],
+          "grace": {
+            "slash": "no"
+          },
+          "beams": [
+            {
+              "number": "1",
+              "value": "end"
+            },
+            {
+              "number": "2",
+              "value": "end"
+            }
+          ]
+        },
+        {
+          "id": "24b-ChordAsGraceNote/p01/m01/n12",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 12,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            3,
+            1
+          ],
+          "pitch": {
+            "step": "D",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": true,
+          "type": "16th",
+          "dots": 0,
+          "durationQuarter": [
+            0,
+            1
+          ],
+          "grace": {},
+          "beams": []
+        },
+        {
+          "id": "24b-ChordAsGraceNote/p01/m01/n13",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 13,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            3,
+            1
+          ],
+          "pitch": {
+            "step": "G",
+            "octave": 4
+          },
+          "rest": false,
+          "chord": false,
+          "type": "quarter",
+          "dots": 0,
+          "durationQuarter": [
+            1,
+            1
+          ],
+          "grace": null,
+          "beams": []
+        },
+        {
+          "id": "24b-ChordAsGraceNote/p01/m01/n14",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 14,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            4,
+            1
+          ],
+          "pitch": {
+            "step": "C",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": true,
+          "type": "quarter",
+          "dots": 0,
+          "durationQuarter": [
+            1,
+            1
+          ],
+          "grace": null,
+          "beams": []
+        }
+      ],
+      "sourceGraceGroups": [
+        {
+          "id": "24b-ChordAsGraceNote/p01/m01/g01",
+          "part": 1,
+          "measure": 1,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            1,
+            1
+          ],
+          "noteIds": [
+            "24b-ChordAsGraceNote/p01/m01/n02",
+            "24b-ChordAsGraceNote/p01/m01/n03"
+          ],
+          "eventCount": 1,
+          "graceAttributes": [
+            {
+              "slash": "yes"
+            },
+            {
+              "slash": "yes"
+            }
+          ]
+        },
+        {
+          "id": "24b-ChordAsGraceNote/p01/m01/g02",
+          "part": 1,
+          "measure": 1,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            2,
+            1
+          ],
+          "noteIds": [
+            "24b-ChordAsGraceNote/p01/m01/n05",
+            "24b-ChordAsGraceNote/p01/m01/n06"
+          ],
+          "eventCount": 1,
+          "graceAttributes": [
+            {
+              "slash": "yes"
+            },
+            {
+              "slash": "yes"
+            }
+          ]
+        },
+        {
+          "id": "24b-ChordAsGraceNote/p01/m01/g03",
+          "part": 1,
+          "measure": 1,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            3,
+            1
+          ],
+          "noteIds": [
+            "24b-ChordAsGraceNote/p01/m01/n09",
+            "24b-ChordAsGraceNote/p01/m01/n10",
+            "24b-ChordAsGraceNote/p01/m01/n11",
+            "24b-ChordAsGraceNote/p01/m01/n12"
+          ],
+          "eventCount": 2,
+          "graceAttributes": [
+            {
+              "slash": "no"
+            },
+            {},
+            {
+              "slash": "no"
+            },
+            {}
+          ]
+        }
+      ],
+      "sourceControls": [
+        {
+          "id": "24b-ChordAsGraceNote/p01/m01/n02/grace",
+          "kind": "grace",
+          "noteId": "24b-ChordAsGraceNote/p01/m01/n02",
+          "attributes": {
+            "slash": "yes"
+          }
+        },
+        {
+          "id": "24b-ChordAsGraceNote/p01/m01/n03/grace",
+          "kind": "grace",
+          "noteId": "24b-ChordAsGraceNote/p01/m01/n03",
+          "attributes": {
+            "slash": "yes"
+          }
+        },
+        {
+          "id": "24b-ChordAsGraceNote/p01/m01/n05/grace",
+          "kind": "grace",
+          "noteId": "24b-ChordAsGraceNote/p01/m01/n05",
+          "attributes": {
+            "slash": "yes"
+          }
+        },
+        {
+          "id": "24b-ChordAsGraceNote/p01/m01/n06/grace",
+          "kind": "grace",
+          "noteId": "24b-ChordAsGraceNote/p01/m01/n06",
+          "attributes": {
+            "slash": "yes"
+          }
+        },
+        {
+          "id": "24b-ChordAsGraceNote/p01/m01/n09/grace",
+          "kind": "grace",
+          "noteId": "24b-ChordAsGraceNote/p01/m01/n09",
+          "attributes": {
+            "slash": "no"
+          }
+        },
+        {
+          "id": "24b-ChordAsGraceNote/p01/m01/n10/grace",
+          "kind": "grace",
+          "noteId": "24b-ChordAsGraceNote/p01/m01/n10",
+          "attributes": {}
+        },
+        {
+          "id": "24b-ChordAsGraceNote/p01/m01/n10/tied01",
+          "kind": "tied",
+          "noteId": "24b-ChordAsGraceNote/p01/m01/n10",
+          "type": "start",
+          "number": null
+        },
+        {
+          "id": "24b-ChordAsGraceNote/p01/m01/n11/grace",
+          "kind": "grace",
+          "noteId": "24b-ChordAsGraceNote/p01/m01/n11",
+          "attributes": {
+            "slash": "no"
+          }
+        },
+        {
+          "id": "24b-ChordAsGraceNote/p01/m01/n11/tied01",
+          "kind": "tied",
+          "noteId": "24b-ChordAsGraceNote/p01/m01/n11",
+          "type": "start",
+          "number": null
+        },
+        {
+          "id": "24b-ChordAsGraceNote/p01/m01/n12/grace",
+          "kind": "grace",
+          "noteId": "24b-ChordAsGraceNote/p01/m01/n12",
+          "attributes": {}
+        },
+        {
+          "id": "24b-ChordAsGraceNote/p01/m01/n12/tied01",
+          "kind": "tied",
+          "noteId": "24b-ChordAsGraceNote/p01/m01/n12",
+          "type": "stop",
+          "number": null
+        },
+        {
+          "id": "24b-ChordAsGraceNote/p01/m01/n13/tied01",
+          "kind": "tied",
+          "noteId": "24b-ChordAsGraceNote/p01/m01/n13",
+          "type": "stop",
+          "number": null
+        }
+      ],
+      "sourceMeasures": [
+        {
+          "part": 1,
+          "ordinal": 1,
+          "sourceNumber": "1",
+          "sourceSpanQuarter": [
+            4,
+            1
+          ],
+          "sourceNoteCount": 14,
+          "importedGraceGroups": [
+            {
+              "graceType": "stealPrevious",
+              "slash": "default-yes",
+              "staffs": [
+                1
+              ],
+              "eventCount": 1
+            },
+            {
+              "graceType": "stealPrevious",
+              "slash": "default-yes",
+              "staffs": [
+                1
+              ],
+              "eventCount": 1
+            },
+            {
+              "graceType": "stealFollowing",
+              "slash": false,
+              "staffs": [
+                1,
+                1
+              ],
+              "eventCount": 2
+            }
+          ],
+          "importedSequenceCount": 1
+        }
+      ]
+    },
+    {
+      "id": "24c-GraceNote-MeasureEnd",
+      "sourcePath": "xmlFiles/24c-GraceNote-MeasureEnd.musicxml",
+      "sourceSha256": "d7aa3dec93a1601ca51b094780dd39e5b5b0a78653222379fe9516169064669d",
+      "testClass": "feature",
+      "description": "A grace note that appears at the measure end (without any ‘steal-from-*’ attribute set). Some applications need to convert this into an after-grace.",
+      "sourceDeclaresStrings": false,
+      "sourceNotes": [
+        {
+          "id": "24c-GraceNote-MeasureEnd/p01/m01/n01",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 1,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "pitch": {
+            "step": "E",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "half",
+          "dots": 0,
+          "durationQuarter": [
+            2,
+            1
+          ],
+          "grace": null,
+          "beams": []
+        },
+        {
+          "id": "24c-GraceNote-MeasureEnd/p01/m01/n02",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 2,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            2,
+            1
+          ],
+          "pitch": {
+            "step": "E",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "half",
+          "dots": 0,
+          "durationQuarter": [
+            2,
+            1
+          ],
+          "grace": null,
+          "beams": []
+        },
+        {
+          "id": "24c-GraceNote-MeasureEnd/p01/m01/n03",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 3,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            4,
+            1
+          ],
+          "pitch": {
+            "step": "G",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "16th",
+          "dots": 0,
+          "durationQuarter": [
+            0,
+            1
+          ],
+          "grace": {
+            "slash": "no"
+          },
+          "beams": [
+            {
+              "number": "1",
+              "value": "begin"
+            },
+            {
+              "number": "2",
+              "value": "begin"
+            }
+          ]
+        },
+        {
+          "id": "24c-GraceNote-MeasureEnd/p01/m01/n04",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 4,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            4,
+            1
+          ],
+          "pitch": {
+            "step": "A",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "16th",
+          "dots": 0,
+          "durationQuarter": [
+            0,
+            1
+          ],
+          "grace": {
+            "slash": "no"
+          },
+          "beams": [
+            {
+              "number": "1",
+              "value": "end"
+            },
+            {
+              "number": "2",
+              "value": "end"
+            }
+          ]
+        }
+      ],
+      "sourceGraceGroups": [
+        {
+          "id": "24c-GraceNote-MeasureEnd/p01/m01/g01",
+          "part": 1,
+          "measure": 1,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            4,
+            1
+          ],
+          "noteIds": [
+            "24c-GraceNote-MeasureEnd/p01/m01/n03",
+            "24c-GraceNote-MeasureEnd/p01/m01/n04"
+          ],
+          "eventCount": 2,
+          "graceAttributes": [
+            {
+              "slash": "no"
+            },
+            {
+              "slash": "no"
+            }
+          ]
+        }
+      ],
+      "sourceControls": [
+        {
+          "id": "24c-GraceNote-MeasureEnd/p01/m01/n03/grace",
+          "kind": "grace",
+          "noteId": "24c-GraceNote-MeasureEnd/p01/m01/n03",
+          "attributes": {
+            "slash": "no"
+          }
+        },
+        {
+          "id": "24c-GraceNote-MeasureEnd/p01/m01/n04/grace",
+          "kind": "grace",
+          "noteId": "24c-GraceNote-MeasureEnd/p01/m01/n04",
+          "attributes": {
+            "slash": "no"
+          }
+        }
+      ],
+      "sourceMeasures": [
+        {
+          "part": 1,
+          "ordinal": 1,
+          "sourceNumber": "1",
+          "sourceSpanQuarter": [
+            4,
+            1
+          ],
+          "sourceNoteCount": 4,
+          "importedGraceGroups": [
+            {
+              "graceType": "stealFollowing",
+              "slash": false,
+              "staffs": [
+                1,
+                1
+              ],
+              "eventCount": 2
+            }
+          ],
+          "importedSequenceCount": 1
+        }
+      ]
+    },
+    {
+      "id": "24d-AfterGrace",
+      "sourcePath": "xmlFiles/24d-AfterGrace.musicxml",
+      "sourceSha256": "bd385f38d91b45425bb7bb3d6b0d13f8b349dc4caf1750f3e7b62c831bfbaf1f",
+      "testClass": "feature",
+      "description": "Some grace notes and after-graces indicated by ‘steal-time-previous’ (for the first grace note) and ‘steal-time-following’ (for the second one). The remaining grace notes have no such attribute.",
+      "sourceDeclaresStrings": false,
+      "sourceNotes": [
+        {
+          "id": "24d-AfterGrace/p01/m01/n01",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 1,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "pitch": {
+            "step": "E",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "half",
+          "dots": 0,
+          "durationQuarter": [
+            2,
+            1
+          ],
+          "grace": null,
+          "beams": []
+        },
+        {
+          "id": "24d-AfterGrace/p01/m01/n02",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 2,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            2,
+            1
+          ],
+          "pitch": {
+            "step": "G",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "16th",
+          "dots": 0,
+          "durationQuarter": [
+            0,
+            1
+          ],
+          "grace": {
+            "slash": "no",
+            "steal-time-previous": "20"
+          },
+          "beams": []
+        },
+        {
+          "id": "24d-AfterGrace/p01/m01/n03",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 3,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            2,
+            1
+          ],
+          "pitch": {
+            "step": "A",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "16th",
+          "dots": 0,
+          "durationQuarter": [
+            0,
+            1
+          ],
+          "grace": {
+            "slash": "no",
+            "steal-time-following": "20"
+          },
+          "beams": []
+        },
+        {
+          "id": "24d-AfterGrace/p01/m01/n04",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 4,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            2,
+            1
+          ],
+          "pitch": {
+            "step": "A",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "16th",
+          "dots": 0,
+          "durationQuarter": [
+            0,
+            1
+          ],
+          "grace": {
+            "slash": "no"
+          },
+          "beams": []
+        },
+        {
+          "id": "24d-AfterGrace/p01/m01/n05",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 5,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            2,
+            1
+          ],
+          "pitch": {
+            "step": "E",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "half",
+          "dots": 0,
+          "durationQuarter": [
+            2,
+            1
+          ],
+          "grace": null,
+          "beams": []
+        },
+        {
+          "id": "24d-AfterGrace/p01/m01/n06",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 6,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            4,
+            1
+          ],
+          "pitch": {
+            "step": "G",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "16th",
+          "dots": 0,
+          "durationQuarter": [
+            0,
+            1
+          ],
+          "grace": {
+            "slash": "no"
+          },
+          "beams": [
+            {
+              "number": "1",
+              "value": "begin"
+            },
+            {
+              "number": "2",
+              "value": "begin"
+            }
+          ]
+        },
+        {
+          "id": "24d-AfterGrace/p01/m01/n07",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 7,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            4,
+            1
+          ],
+          "pitch": {
+            "step": "A",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "16th",
+          "dots": 0,
+          "durationQuarter": [
+            0,
+            1
+          ],
+          "grace": {
+            "slash": "no"
+          },
+          "beams": [
+            {
+              "number": "1",
+              "value": "end"
+            },
+            {
+              "number": "2",
+              "value": "end"
+            }
+          ]
+        }
+      ],
+      "sourceGraceGroups": [
+        {
+          "id": "24d-AfterGrace/p01/m01/g01",
+          "part": 1,
+          "measure": 1,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            2,
+            1
+          ],
+          "noteIds": [
+            "24d-AfterGrace/p01/m01/n02",
+            "24d-AfterGrace/p01/m01/n03",
+            "24d-AfterGrace/p01/m01/n04"
+          ],
+          "eventCount": 3,
+          "graceAttributes": [
+            {
+              "slash": "no",
+              "steal-time-previous": "20"
+            },
+            {
+              "slash": "no",
+              "steal-time-following": "20"
+            },
+            {
+              "slash": "no"
+            }
+          ]
+        },
+        {
+          "id": "24d-AfterGrace/p01/m01/g02",
+          "part": 1,
+          "measure": 1,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            4,
+            1
+          ],
+          "noteIds": [
+            "24d-AfterGrace/p01/m01/n06",
+            "24d-AfterGrace/p01/m01/n07"
+          ],
+          "eventCount": 2,
+          "graceAttributes": [
+            {
+              "slash": "no"
+            },
+            {
+              "slash": "no"
+            }
+          ]
+        }
+      ],
+      "sourceControls": [
+        {
+          "id": "24d-AfterGrace/p01/m01/n02/grace",
+          "kind": "grace",
+          "noteId": "24d-AfterGrace/p01/m01/n02",
+          "attributes": {
+            "slash": "no",
+            "steal-time-previous": "20"
+          }
+        },
+        {
+          "id": "24d-AfterGrace/p01/m01/n03/grace",
+          "kind": "grace",
+          "noteId": "24d-AfterGrace/p01/m01/n03",
+          "attributes": {
+            "slash": "no",
+            "steal-time-following": "20"
+          }
+        },
+        {
+          "id": "24d-AfterGrace/p01/m01/n04/grace",
+          "kind": "grace",
+          "noteId": "24d-AfterGrace/p01/m01/n04",
+          "attributes": {
+            "slash": "no"
+          }
+        },
+        {
+          "id": "24d-AfterGrace/p01/m01/n06/grace",
+          "kind": "grace",
+          "noteId": "24d-AfterGrace/p01/m01/n06",
+          "attributes": {
+            "slash": "no"
+          }
+        },
+        {
+          "id": "24d-AfterGrace/p01/m01/n07/grace",
+          "kind": "grace",
+          "noteId": "24d-AfterGrace/p01/m01/n07",
+          "attributes": {
+            "slash": "no"
+          }
+        }
+      ],
+      "sourceMeasures": [
+        {
+          "part": 1,
+          "ordinal": 1,
+          "sourceNumber": "1",
+          "sourceSpanQuarter": [
+            4,
+            1
+          ],
+          "sourceNoteCount": 7,
+          "importedGraceGroups": [
+            {
+              "graceType": "stealPrevious",
+              "slash": false,
+              "staffs": [
+                1,
+                1,
+                1
+              ],
+              "eventCount": 3
+            },
+            {
+              "graceType": "stealFollowing",
+              "slash": false,
+              "staffs": [
+                1,
+                1
+              ],
+              "eventCount": 2
+            }
+          ],
+          "importedSequenceCount": 1
+        }
+      ]
+    },
+    {
+      "id": "24e-GraceNote-StaffChange",
+      "sourcePath": "xmlFiles/24e-GraceNote-StaffChange.musicxml",
+      "sourceSha256": "e67053812338df5d090c6cefddd18a45c7da55c5574bbf42303b630002f8e295",
+      "testClass": "feature",
+      "description": "Grace notes on a different staff than the actual notes.",
+      "sourceDeclaresStrings": false,
+      "sourceNotes": [
+        {
+          "id": "24e-GraceNote-StaffChange/p01/m01/n01",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 1,
+          "voice": "1",
+          "staff": 2,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "pitch": {
+            "step": "G",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "16th",
+          "dots": 0,
+          "durationQuarter": [
+            0,
+            1
+          ],
+          "grace": {
+            "slash": "no"
+          },
+          "beams": []
+        },
+        {
+          "id": "24e-GraceNote-StaffChange/p01/m01/n02",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 2,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "pitch": {
+            "step": "E",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "half",
+          "dots": 0,
+          "durationQuarter": [
+            2,
+            1
+          ],
+          "grace": null,
+          "beams": []
+        },
+        {
+          "id": "24e-GraceNote-StaffChange/p01/m01/n03",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 3,
+          "voice": "1",
+          "staff": 2,
+          "onsetQuarter": [
+            2,
+            1
+          ],
+          "pitch": {
+            "step": "G",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "16th",
+          "dots": 0,
+          "durationQuarter": [
+            0,
+            1
+          ],
+          "grace": {
+            "slash": "no"
+          },
+          "beams": [
+            {
+              "number": "1",
+              "value": "begin"
+            },
+            {
+              "number": "2",
+              "value": "begin"
+            }
+          ]
+        },
+        {
+          "id": "24e-GraceNote-StaffChange/p01/m01/n04",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 4,
+          "voice": "1",
+          "staff": 2,
+          "onsetQuarter": [
+            2,
+            1
+          ],
+          "pitch": {
+            "step": "A",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "16th",
+          "dots": 0,
+          "durationQuarter": [
+            0,
+            1
+          ],
+          "grace": {
+            "slash": "no"
+          },
+          "beams": [
+            {
+              "number": "1",
+              "value": "end"
+            },
+            {
+              "number": "2",
+              "value": "end"
+            }
+          ]
+        },
+        {
+          "id": "24e-GraceNote-StaffChange/p01/m01/n05",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 5,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            2,
+            1
+          ],
+          "pitch": {
+            "step": "E",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "half",
+          "dots": 0,
+          "durationQuarter": [
+            2,
+            1
+          ],
+          "grace": null,
+          "beams": []
+        },
+        {
+          "id": "24e-GraceNote-StaffChange/p01/m01/n06",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 6,
+          "voice": "2",
+          "staff": 2,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "pitch": null,
+          "rest": true,
+          "chord": false,
+          "type": null,
+          "dots": 0,
+          "durationQuarter": [
+            4,
+            1
+          ],
+          "grace": null,
+          "beams": []
+        }
+      ],
+      "sourceGraceGroups": [
+        {
+          "id": "24e-GraceNote-StaffChange/p01/m01/g01",
+          "part": 1,
+          "measure": 1,
+          "voice": "1",
+          "staff": 2,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "noteIds": [
+            "24e-GraceNote-StaffChange/p01/m01/n01"
+          ],
+          "eventCount": 1,
+          "graceAttributes": [
+            {
+              "slash": "no"
+            }
+          ]
+        },
+        {
+          "id": "24e-GraceNote-StaffChange/p01/m01/g02",
+          "part": 1,
+          "measure": 1,
+          "voice": "1",
+          "staff": 2,
+          "onsetQuarter": [
+            2,
+            1
+          ],
+          "noteIds": [
+            "24e-GraceNote-StaffChange/p01/m01/n03",
+            "24e-GraceNote-StaffChange/p01/m01/n04"
+          ],
+          "eventCount": 2,
+          "graceAttributes": [
+            {
+              "slash": "no"
+            },
+            {
+              "slash": "no"
+            }
+          ]
+        }
+      ],
+      "sourceControls": [
+        {
+          "id": "24e-GraceNote-StaffChange/p01/m01/n01/grace",
+          "kind": "grace",
+          "noteId": "24e-GraceNote-StaffChange/p01/m01/n01",
+          "attributes": {
+            "slash": "no"
+          }
+        },
+        {
+          "id": "24e-GraceNote-StaffChange/p01/m01/n03/grace",
+          "kind": "grace",
+          "noteId": "24e-GraceNote-StaffChange/p01/m01/n03",
+          "attributes": {
+            "slash": "no"
+          }
+        },
+        {
+          "id": "24e-GraceNote-StaffChange/p01/m01/n04/grace",
+          "kind": "grace",
+          "noteId": "24e-GraceNote-StaffChange/p01/m01/n04",
+          "attributes": {
+            "slash": "no"
+          }
+        }
+      ],
+      "sourceMeasures": [
+        {
+          "part": 1,
+          "ordinal": 1,
+          "sourceNumber": "1",
+          "sourceSpanQuarter": [
+            4,
+            1
+          ],
+          "sourceNoteCount": 6,
+          "importedGraceGroups": [
+            {
+              "graceType": "stealFollowing",
+              "slash": false,
+              "staffs": [
+                2
+              ],
+              "eventCount": 1
+            },
+            {
+              "graceType": "stealFollowing",
+              "slash": false,
+              "staffs": [
+                2,
+                2
+              ],
+              "eventCount": 2
+            }
+          ],
+          "importedSequenceCount": 2
+        }
+      ]
+    },
+    {
+      "id": "24f-GraceNote-Slur",
+      "sourcePath": "xmlFiles/24f-GraceNote-Slur.musicxml",
+      "sourceSha256": "cc36ca009a06ed474b7ade56931ce62495680d3af9eeba2e9afb0376ba0e9fbd",
+      "testClass": "feature",
+      "description": "A grace note with a slur to the actual note. The <grace> element has no ‘slash’ attribute; since MusicXML does not provide a default value it is up to the application to interpret the grace note as an acciaccatura (with slash) or an appoggiatura (without slash).",
+      "sourceDeclaresStrings": false,
+      "sourceNotes": [
+        {
+          "id": "24f-GraceNote-Slur/p01/m01/n01",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 1,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "pitch": {
+            "step": "E",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "half",
+          "dots": 0,
+          "durationQuarter": [
+            2,
+            1
+          ],
+          "grace": null,
+          "beams": []
+        },
+        {
+          "id": "24f-GraceNote-Slur/p01/m01/n02",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 2,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            2,
+            1
+          ],
+          "pitch": {
+            "step": "G",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "16th",
+          "dots": 0,
+          "durationQuarter": [
+            0,
+            1
+          ],
+          "grace": {},
+          "beams": []
+        },
+        {
+          "id": "24f-GraceNote-Slur/p01/m01/n03",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 3,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            2,
+            1
+          ],
+          "pitch": {
+            "step": "E",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "half",
+          "dots": 0,
+          "durationQuarter": [
+            2,
+            1
+          ],
+          "grace": null,
+          "beams": []
+        }
+      ],
+      "sourceGraceGroups": [
+        {
+          "id": "24f-GraceNote-Slur/p01/m01/g01",
+          "part": 1,
+          "measure": 1,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            2,
+            1
+          ],
+          "noteIds": [
+            "24f-GraceNote-Slur/p01/m01/n02"
+          ],
+          "eventCount": 1,
+          "graceAttributes": [
+            {}
+          ]
+        }
+      ],
+      "sourceControls": [
+        {
+          "id": "24f-GraceNote-Slur/p01/m01/n02/grace",
+          "kind": "grace",
+          "noteId": "24f-GraceNote-Slur/p01/m01/n02",
+          "attributes": {}
+        },
+        {
+          "id": "24f-GraceNote-Slur/p01/m01/n02/slur01",
+          "kind": "slur",
+          "noteId": "24f-GraceNote-Slur/p01/m01/n02",
+          "type": "start",
+          "number": "1"
+        },
+        {
+          "id": "24f-GraceNote-Slur/p01/m01/n03/slur01",
+          "kind": "slur",
+          "noteId": "24f-GraceNote-Slur/p01/m01/n03",
+          "type": "stop",
+          "number": "1"
+        }
+      ],
+      "sourceMeasures": [
+        {
+          "part": 1,
+          "ordinal": 1,
+          "sourceNumber": "25",
+          "sourceSpanQuarter": [
+            4,
+            1
+          ],
+          "sourceNoteCount": 3,
+          "importedGraceGroups": [
+            {
+              "graceType": "stealPrevious",
+              "slash": "default-yes",
+              "staffs": [
+                1
+              ],
+              "eventCount": 1
+            }
+          ],
+          "importedSequenceCount": 1
+        }
+      ]
+    },
+    {
+      "id": "24g-GraceNote-Dynamics",
+      "sourcePath": "xmlFiles/24g-GraceNote-Dynamics.musicxml",
+      "sourceSha256": "20d93574d3ff7081874f847e6034fb0f15c0de22e23a8a7423429841a1d8502f",
+      "testClass": "feature",
+      "description": "Grace notes in combination with dynamics. The ‘f’ sign is located on the first grace note (using a <direction> element), followed by a diminuendo wedge, and the ‘p’ sign is on the main beat (again using <direction>).",
+      "sourceDeclaresStrings": false,
+      "sourceNotes": [
+        {
+          "id": "24g-GraceNote-Dynamics/p01/m01/n01",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 1,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "pitch": {
+            "step": "G",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "16th",
+          "dots": 0,
+          "durationQuarter": [
+            0,
+            1
+          ],
+          "grace": {
+            "slash": "no"
+          },
+          "beams": [
+            {
+              "number": "1",
+              "value": "begin"
+            },
+            {
+              "number": "2",
+              "value": "begin"
+            }
+          ]
+        },
+        {
+          "id": "24g-GraceNote-Dynamics/p01/m01/n02",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 2,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "pitch": {
+            "step": "F",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "16th",
+          "dots": 0,
+          "durationQuarter": [
+            0,
+            1
+          ],
+          "grace": {
+            "slash": "no"
+          },
+          "beams": [
+            {
+              "number": "1",
+              "value": "continue"
+            },
+            {
+              "number": "2",
+              "value": "continue"
+            }
+          ]
+        },
+        {
+          "id": "24g-GraceNote-Dynamics/p01/m01/n03",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 3,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "pitch": {
+            "step": "E",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "16th",
+          "dots": 0,
+          "durationQuarter": [
+            0,
+            1
+          ],
+          "grace": {
+            "slash": "no"
+          },
+          "beams": [
+            {
+              "number": "1",
+              "value": "continue"
+            },
+            {
+              "number": "2",
+              "value": "continue"
+            }
+          ]
+        },
+        {
+          "id": "24g-GraceNote-Dynamics/p01/m01/n04",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 4,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "pitch": {
+            "step": "D",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "16th",
+          "dots": 0,
+          "durationQuarter": [
+            0,
+            1
+          ],
+          "grace": {
+            "slash": "no"
+          },
+          "beams": [
+            {
+              "number": "1",
+              "value": "end"
+            },
+            {
+              "number": "2",
+              "value": "end"
+            }
+          ]
+        },
+        {
+          "id": "24g-GraceNote-Dynamics/p01/m01/n05",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 5,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "pitch": {
+            "step": "C",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "quarter",
+          "dots": 0,
+          "durationQuarter": [
+            1,
+            1
+          ],
+          "grace": null,
+          "beams": []
+        }
+      ],
+      "sourceGraceGroups": [
+        {
+          "id": "24g-GraceNote-Dynamics/p01/m01/g01",
+          "part": 1,
+          "measure": 1,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "noteIds": [
+            "24g-GraceNote-Dynamics/p01/m01/n01",
+            "24g-GraceNote-Dynamics/p01/m01/n02",
+            "24g-GraceNote-Dynamics/p01/m01/n03",
+            "24g-GraceNote-Dynamics/p01/m01/n04"
+          ],
+          "eventCount": 4,
+          "graceAttributes": [
+            {
+              "slash": "no"
+            },
+            {
+              "slash": "no"
+            },
+            {
+              "slash": "no"
+            },
+            {
+              "slash": "no"
+            }
+          ]
+        }
+      ],
+      "sourceControls": [
+        {
+          "id": "24g-GraceNote-Dynamics/p01/m01/d01",
+          "kind": "direction",
+          "part": 1,
+          "measure": 1,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "types": [
+            "dynamics"
+          ],
+          "dynamics": [
+            "f"
+          ],
+          "wedge": [],
+          "placement": "below"
+        },
+        {
+          "id": "24g-GraceNote-Dynamics/p01/m01/d02",
+          "kind": "direction",
+          "part": 1,
+          "measure": 1,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "types": [
+            "wedge"
+          ],
+          "dynamics": [],
+          "wedge": [
+            "diminuendo"
+          ],
+          "placement": "below"
+        },
+        {
+          "id": "24g-GraceNote-Dynamics/p01/m01/n01/grace",
+          "kind": "grace",
+          "noteId": "24g-GraceNote-Dynamics/p01/m01/n01",
+          "attributes": {
+            "slash": "no"
+          }
+        },
+        {
+          "id": "24g-GraceNote-Dynamics/p01/m01/n02/grace",
+          "kind": "grace",
+          "noteId": "24g-GraceNote-Dynamics/p01/m01/n02",
+          "attributes": {
+            "slash": "no"
+          }
+        },
+        {
+          "id": "24g-GraceNote-Dynamics/p01/m01/n03/grace",
+          "kind": "grace",
+          "noteId": "24g-GraceNote-Dynamics/p01/m01/n03",
+          "attributes": {
+            "slash": "no"
+          }
+        },
+        {
+          "id": "24g-GraceNote-Dynamics/p01/m01/n04/grace",
+          "kind": "grace",
+          "noteId": "24g-GraceNote-Dynamics/p01/m01/n04",
+          "attributes": {
+            "slash": "no"
+          }
+        },
+        {
+          "id": "24g-GraceNote-Dynamics/p01/m01/d03",
+          "kind": "direction",
+          "part": 1,
+          "measure": 1,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "types": [
+            "wedge"
+          ],
+          "dynamics": [],
+          "wedge": [
+            "stop"
+          ],
+          "placement": null
+        },
+        {
+          "id": "24g-GraceNote-Dynamics/p01/m01/d04",
+          "kind": "direction",
+          "part": 1,
+          "measure": 1,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "types": [
+            "dynamics"
+          ],
+          "dynamics": [
+            "p"
+          ],
+          "wedge": [],
+          "placement": "below"
+        }
+      ],
+      "sourceMeasures": [
+        {
+          "part": 1,
+          "ordinal": 1,
+          "sourceNumber": "1",
+          "sourceSpanQuarter": [
+            1,
+            1
+          ],
+          "sourceNoteCount": 5,
+          "importedGraceGroups": [
+            {
+              "graceType": "stealFollowing",
+              "slash": false,
+              "staffs": [
+                1,
+                1,
+                1,
+                1
+              ],
+              "eventCount": 4
+            }
+          ],
+          "importedSequenceCount": 1
+        }
+      ]
+    },
+    {
+      "id": "24h-GraceNote-Simultaneous",
+      "sourcePath": "xmlFiles/24h-GraceNote-Simultaneous.musicxml",
+      "sourceSha256": "0f0e102375b689883769d633c1e44f195f18ffeb754f6b212f2e5aaf427153ff",
+      "testClass": "feature",
+      "description": "Simultaneous grace notes and grace note groups of different length starting a part or a voice. The topmost three staves are voices 1 to 3 of part ‘P1’, with no grace notes in the third staff and music starting on the second beat. There is also an ‘fp’ on the main note of the first staff. The bottommost two staves are voices 1 and 2 of part ‘P2’, with no grace notes in the lowest staff.",
+      "sourceDeclaresStrings": false,
+      "sourceNotes": [
+        {
+          "id": "24h-GraceNote-Simultaneous/p01/m01/n01",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 1,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "pitch": {
+            "step": "G",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "16th",
+          "dots": 0,
+          "durationQuarter": [
+            0,
+            1
+          ],
+          "grace": {
+            "slash": "no"
+          },
+          "beams": []
+        },
+        {
+          "id": "24h-GraceNote-Simultaneous/p01/m01/n02",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 2,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "pitch": {
+            "step": "E",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "half",
+          "dots": 0,
+          "durationQuarter": [
+            2,
+            1
+          ],
+          "grace": null,
+          "beams": []
+        },
+        {
+          "id": "24h-GraceNote-Simultaneous/p01/m01/n03",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 3,
+          "voice": "2",
+          "staff": 2,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "pitch": {
+            "step": "G",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "16th",
+          "dots": 0,
+          "durationQuarter": [
+            0,
+            1
+          ],
+          "grace": {
+            "slash": "no"
+          },
+          "beams": [
+            {
+              "number": "1",
+              "value": "begin"
+            },
+            {
+              "number": "2",
+              "value": "begin"
+            }
+          ]
+        },
+        {
+          "id": "24h-GraceNote-Simultaneous/p01/m01/n04",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 4,
+          "voice": "2",
+          "staff": 2,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "pitch": {
+            "step": "A",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "16th",
+          "dots": 0,
+          "durationQuarter": [
+            0,
+            1
+          ],
+          "grace": {
+            "slash": "no"
+          },
+          "beams": [
+            {
+              "number": "1",
+              "value": "end"
+            },
+            {
+              "number": "2",
+              "value": "end"
+            }
+          ]
+        },
+        {
+          "id": "24h-GraceNote-Simultaneous/p01/m01/n05",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 5,
+          "voice": "2",
+          "staff": 2,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "pitch": {
+            "step": "E",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "half",
+          "dots": 0,
+          "durationQuarter": [
+            2,
+            1
+          ],
+          "grace": null,
+          "beams": []
+        },
+        {
+          "id": "24h-GraceNote-Simultaneous/p01/m01/n06",
+          "part": 1,
+          "measure": 1,
+          "ordinal": 6,
+          "voice": "3",
+          "staff": 3,
+          "onsetQuarter": [
+            1,
+            1
+          ],
+          "pitch": {
+            "step": "E",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "quarter",
+          "dots": 0,
+          "durationQuarter": [
+            1,
+            1
+          ],
+          "grace": null,
+          "beams": []
+        },
+        {
+          "id": "24h-GraceNote-Simultaneous/p02/m01/n01",
+          "part": 2,
+          "measure": 1,
+          "ordinal": 1,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "pitch": {
+            "step": "G",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "quarter",
+          "dots": 0,
+          "durationQuarter": [
+            0,
+            1
+          ],
+          "grace": {
+            "slash": "no"
+          },
+          "beams": []
+        },
+        {
+          "id": "24h-GraceNote-Simultaneous/p02/m01/n02",
+          "part": 2,
+          "measure": 1,
+          "ordinal": 2,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "pitch": {
+            "step": "E",
+            "octave": 5
+          },
+          "rest": false,
+          "chord": false,
+          "type": "half",
+          "dots": 0,
+          "durationQuarter": [
+            2,
+            1
+          ],
+          "grace": null,
+          "beams": []
+        },
+        {
+          "id": "24h-GraceNote-Simultaneous/p02/m01/n03",
+          "part": 2,
+          "measure": 1,
+          "ordinal": 3,
+          "voice": "2",
+          "staff": 2,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "pitch": null,
+          "rest": true,
+          "chord": false,
+          "type": "half",
+          "dots": 0,
+          "durationQuarter": [
+            2,
+            1
+          ],
+          "grace": null,
+          "beams": []
+        }
+      ],
+      "sourceGraceGroups": [
+        {
+          "id": "24h-GraceNote-Simultaneous/p01/m01/g01",
+          "part": 1,
+          "measure": 1,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "noteIds": [
+            "24h-GraceNote-Simultaneous/p01/m01/n01"
+          ],
+          "eventCount": 1,
+          "graceAttributes": [
+            {
+              "slash": "no"
+            }
+          ]
+        },
+        {
+          "id": "24h-GraceNote-Simultaneous/p01/m01/g02",
+          "part": 1,
+          "measure": 1,
+          "voice": "2",
+          "staff": 2,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "noteIds": [
+            "24h-GraceNote-Simultaneous/p01/m01/n03",
+            "24h-GraceNote-Simultaneous/p01/m01/n04"
+          ],
+          "eventCount": 2,
+          "graceAttributes": [
+            {
+              "slash": "no"
+            },
+            {
+              "slash": "no"
+            }
+          ]
+        },
+        {
+          "id": "24h-GraceNote-Simultaneous/p02/m01/g01",
+          "part": 2,
+          "measure": 1,
+          "voice": "1",
+          "staff": 1,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "noteIds": [
+            "24h-GraceNote-Simultaneous/p02/m01/n01"
+          ],
+          "eventCount": 1,
+          "graceAttributes": [
+            {
+              "slash": "no"
+            }
+          ]
+        }
+      ],
+      "sourceControls": [
+        {
+          "id": "24h-GraceNote-Simultaneous/p01/m01/n01/grace",
+          "kind": "grace",
+          "noteId": "24h-GraceNote-Simultaneous/p01/m01/n01",
+          "attributes": {
+            "slash": "no"
+          }
+        },
+        {
+          "id": "24h-GraceNote-Simultaneous/p01/m01/d01",
+          "kind": "direction",
+          "part": 1,
+          "measure": 1,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "types": [
+            "dynamics"
+          ],
+          "dynamics": [
+            "fp"
+          ],
+          "wedge": [],
+          "placement": "below"
+        },
+        {
+          "id": "24h-GraceNote-Simultaneous/p01/m01/n03/grace",
+          "kind": "grace",
+          "noteId": "24h-GraceNote-Simultaneous/p01/m01/n03",
+          "attributes": {
+            "slash": "no"
+          }
+        },
+        {
+          "id": "24h-GraceNote-Simultaneous/p01/m01/n04/grace",
+          "kind": "grace",
+          "noteId": "24h-GraceNote-Simultaneous/p01/m01/n04",
+          "attributes": {
+            "slash": "no"
+          }
+        },
+        {
+          "id": "24h-GraceNote-Simultaneous/p02/m01/n01/grace",
+          "kind": "grace",
+          "noteId": "24h-GraceNote-Simultaneous/p02/m01/n01",
+          "attributes": {
+            "slash": "no"
+          }
+        }
+      ],
+      "sourceMeasures": [
+        {
+          "part": 1,
+          "ordinal": 1,
+          "sourceNumber": "1",
+          "sourceSpanQuarter": [
+            2,
+            1
+          ],
+          "sourceNoteCount": 6,
+          "importedGraceGroups": [
+            {
+              "graceType": "stealFollowing",
+              "slash": false,
+              "staffs": [
+                1
+              ],
+              "eventCount": 1
+            },
+            {
+              "graceType": "stealFollowing",
+              "slash": false,
+              "staffs": [
+                2,
+                2
+              ],
+              "eventCount": 2
+            }
+          ],
+          "importedSequenceCount": 3
+        },
+        {
+          "part": 2,
+          "ordinal": 1,
+          "sourceNumber": "1",
+          "sourceSpanQuarter": [
+            2,
+            1
+          ],
+          "sourceNoteCount": 3,
+          "importedGraceGroups": [
+            {
+              "graceType": "stealFollowing",
+              "slash": false,
+              "staffs": [
+                1
+              ],
+              "eventCount": 1
+            }
+          ],
+          "importedSequenceCount": 2
+        }
+      ]
+    }
+  ],
+  "features": [
+    {
+      "id": "24a.pitch-written-values",
+      "fixture": "24a-GraceNotes",
+      "variantIds": [
+        "24a-GraceNotes/p01/m01/n01",
+        "24a-GraceNotes/p01/m01/n02",
+        "24a-GraceNotes/p01/m01/n03",
+        "24a-GraceNotes/p01/m01/n04",
+        "24a-GraceNotes/p01/m01/n05",
+        "24a-GraceNotes/p01/m01/n06",
+        "24a-GraceNotes/p01/m01/n07",
+        "24a-GraceNotes/p01/m01/n08",
+        "24a-GraceNotes/p01/m01/n09",
+        "24a-GraceNotes/p01/m02/n01",
+        "24a-GraceNotes/p01/m02/n02",
+        "24a-GraceNotes/p01/m02/n03",
+        "24a-GraceNotes/p01/m02/n04",
+        "24a-GraceNotes/p01/m02/n05",
+        "24a-GraceNotes/p01/m02/n06",
+        "24a-GraceNotes/p01/m02/n07",
+        "24a-GraceNotes/p01/m02/n08",
+        "24a-GraceNotes/p01/m02/n09",
+        "24a-GraceNotes/p01/m03/n01",
+        "24a-GraceNotes/p01/m03/n02",
+        "24a-GraceNotes/p01/m03/n03",
+        "24a-GraceNotes/p01/m03/n04",
+        "24a-GraceNotes/p01/m03/n05",
+        "24a-GraceNotes/p01/m03/n06",
+        "24a-GraceNotes/p01/m03/n07",
+        "24a-GraceNotes/p01/m03/n08",
+        "24a-GraceNotes/p01/m03/n09"
+      ],
+      "sourceDescription": "Different kinds of grace notes. First measure: single 1/16 grace note, two beamed 1/16 grace notes, 1/16 appoggiatura, 1/8 appoggiatura. Second measure: slashed single 1/16 grace note, two beamed 1/16 grace notes (with both notes marked as slashed), 1/16 acciaccatura, 1/16 grace note (without slash) right before the bar line. Third measure: no grace note before chord, 1/4 grace note with sharp, two 1/4 grace notes with flats, 1/16 slashed grace note with natural before a quarter rest.",
+      "expected": "All source pitches, written values and grace note counts survive in part/voice order; grace notes consume no metric duration."
+    },
+    {
+      "id": "24a.p01.m01.g01",
+      "fixture": "24a-GraceNotes",
+      "variantIds": [
+        "24a-GraceNotes/p01/m01/g01",
+        "24a-GraceNotes/p01/m01/n01",
+        "24a-GraceNotes/p01/m01/n01/grace"
+      ],
+      "sourceDescription": "Different kinds of grace notes. First measure: single 1/16 grace note, two beamed 1/16 grace notes, 1/16 appoggiatura, 1/8 appoggiatura. Second measure: slashed single 1/16 grace note, two beamed 1/16 grace notes (with both notes marked as slashed), 1/16 acciaccatura, 1/16 grace note (without slash) right before the bar line. Third measure: no grace note before chord, 1/4 grace note with sharp, two 1/4 grace notes with flats, 1/16 slashed grace note with natural before a quarter rest.",
+      "expected": "Grace group 24a-GraceNotes/p01/m01/g01 has 1 zero-duration events, 1 notes on source staff 1, with source <grace> attributes [{'slash': 'no'}]."
+    },
+    {
+      "id": "24a.p01.m01.g02",
+      "fixture": "24a-GraceNotes",
+      "variantIds": [
+        "24a-GraceNotes/p01/m01/g02",
+        "24a-GraceNotes/p01/m01/n03",
+        "24a-GraceNotes/p01/m01/n03/grace",
+        "24a-GraceNotes/p01/m01/n04",
+        "24a-GraceNotes/p01/m01/n04/grace"
+      ],
+      "sourceDescription": "Different kinds of grace notes. First measure: single 1/16 grace note, two beamed 1/16 grace notes, 1/16 appoggiatura, 1/8 appoggiatura. Second measure: slashed single 1/16 grace note, two beamed 1/16 grace notes (with both notes marked as slashed), 1/16 acciaccatura, 1/16 grace note (without slash) right before the bar line. Third measure: no grace note before chord, 1/4 grace note with sharp, two 1/4 grace notes with flats, 1/16 slashed grace note with natural before a quarter rest.",
+      "expected": "Grace group 24a-GraceNotes/p01/m01/g02 has 2 zero-duration events, 2 notes on source staff 1, with source <grace> attributes [{'slash': 'no'}, {'slash': 'no'}]."
+    },
+    {
+      "id": "24a.p01.m01.g03",
+      "fixture": "24a-GraceNotes",
+      "variantIds": [
+        "24a-GraceNotes/p01/m01/g03",
+        "24a-GraceNotes/p01/m01/n06",
+        "24a-GraceNotes/p01/m01/n06/grace"
+      ],
+      "sourceDescription": "Different kinds of grace notes. First measure: single 1/16 grace note, two beamed 1/16 grace notes, 1/16 appoggiatura, 1/8 appoggiatura. Second measure: slashed single 1/16 grace note, two beamed 1/16 grace notes (with both notes marked as slashed), 1/16 acciaccatura, 1/16 grace note (without slash) right before the bar line. Third measure: no grace note before chord, 1/4 grace note with sharp, two 1/4 grace notes with flats, 1/16 slashed grace note with natural before a quarter rest.",
+      "expected": "Grace group 24a-GraceNotes/p01/m01/g03 has 1 zero-duration events, 1 notes on source staff 1, with source <grace> attributes [{'slash': 'no'}]."
+    },
+    {
+      "id": "24a.p01.m01.g04",
+      "fixture": "24a-GraceNotes",
+      "variantIds": [
+        "24a-GraceNotes/p01/m01/g04",
+        "24a-GraceNotes/p01/m01/n08",
+        "24a-GraceNotes/p01/m01/n08/grace"
+      ],
+      "sourceDescription": "Different kinds of grace notes. First measure: single 1/16 grace note, two beamed 1/16 grace notes, 1/16 appoggiatura, 1/8 appoggiatura. Second measure: slashed single 1/16 grace note, two beamed 1/16 grace notes (with both notes marked as slashed), 1/16 acciaccatura, 1/16 grace note (without slash) right before the bar line. Third measure: no grace note before chord, 1/4 grace note with sharp, two 1/4 grace notes with flats, 1/16 slashed grace note with natural before a quarter rest.",
+      "expected": "Grace group 24a-GraceNotes/p01/m01/g04 has 1 zero-duration events, 1 notes on source staff 1, with source <grace> attributes [{'slash': 'no'}]."
+    },
+    {
+      "id": "24a.p01.m02.g01",
+      "fixture": "24a-GraceNotes",
+      "variantIds": [
+        "24a-GraceNotes/p01/m02/g01",
+        "24a-GraceNotes/p01/m02/n01",
+        "24a-GraceNotes/p01/m02/n01/grace"
+      ],
+      "sourceDescription": "Different kinds of grace notes. First measure: single 1/16 grace note, two beamed 1/16 grace notes, 1/16 appoggiatura, 1/8 appoggiatura. Second measure: slashed single 1/16 grace note, two beamed 1/16 grace notes (with both notes marked as slashed), 1/16 acciaccatura, 1/16 grace note (without slash) right before the bar line. Third measure: no grace note before chord, 1/4 grace note with sharp, two 1/4 grace notes with flats, 1/16 slashed grace note with natural before a quarter rest.",
+      "expected": "Grace group 24a-GraceNotes/p01/m02/g01 has 1 zero-duration events, 1 notes on source staff 1, with source <grace> attributes [{'slash': 'yes'}]."
+    },
+    {
+      "id": "24a.p01.m02.g02",
+      "fixture": "24a-GraceNotes",
+      "variantIds": [
+        "24a-GraceNotes/p01/m02/g02",
+        "24a-GraceNotes/p01/m02/n03",
+        "24a-GraceNotes/p01/m02/n03/grace",
+        "24a-GraceNotes/p01/m02/n04",
+        "24a-GraceNotes/p01/m02/n04/grace"
+      ],
+      "sourceDescription": "Different kinds of grace notes. First measure: single 1/16 grace note, two beamed 1/16 grace notes, 1/16 appoggiatura, 1/8 appoggiatura. Second measure: slashed single 1/16 grace note, two beamed 1/16 grace notes (with both notes marked as slashed), 1/16 acciaccatura, 1/16 grace note (without slash) right before the bar line. Third measure: no grace note before chord, 1/4 grace note with sharp, two 1/4 grace notes with flats, 1/16 slashed grace note with natural before a quarter rest.",
+      "expected": "Grace group 24a-GraceNotes/p01/m02/g02 has 2 zero-duration events, 2 notes on source staff 1, with source <grace> attributes [{'slash': 'yes'}, {'slash': 'yes'}]."
+    },
+    {
+      "id": "24a.p01.m02.g03",
+      "fixture": "24a-GraceNotes",
+      "variantIds": [
+        "24a-GraceNotes/p01/m02/g03",
+        "24a-GraceNotes/p01/m02/n06",
+        "24a-GraceNotes/p01/m02/n06/grace"
+      ],
+      "sourceDescription": "Different kinds of grace notes. First measure: single 1/16 grace note, two beamed 1/16 grace notes, 1/16 appoggiatura, 1/8 appoggiatura. Second measure: slashed single 1/16 grace note, two beamed 1/16 grace notes (with both notes marked as slashed), 1/16 acciaccatura, 1/16 grace note (without slash) right before the bar line. Third measure: no grace note before chord, 1/4 grace note with sharp, two 1/4 grace notes with flats, 1/16 slashed grace note with natural before a quarter rest.",
+      "expected": "Grace group 24a-GraceNotes/p01/m02/g03 has 1 zero-duration events, 1 notes on source staff 1, with source <grace> attributes [{'slash': 'yes'}]."
+    },
+    {
+      "id": "24a.p01.m02.g04",
+      "fixture": "24a-GraceNotes",
+      "variantIds": [
+        "24a-GraceNotes/p01/m02/g04",
+        "24a-GraceNotes/p01/m02/n09",
+        "24a-GraceNotes/p01/m02/n09/grace"
+      ],
+      "sourceDescription": "Different kinds of grace notes. First measure: single 1/16 grace note, two beamed 1/16 grace notes, 1/16 appoggiatura, 1/8 appoggiatura. Second measure: slashed single 1/16 grace note, two beamed 1/16 grace notes (with both notes marked as slashed), 1/16 acciaccatura, 1/16 grace note (without slash) right before the bar line. Third measure: no grace note before chord, 1/4 grace note with sharp, two 1/4 grace notes with flats, 1/16 slashed grace note with natural before a quarter rest.",
+      "expected": "Grace group 24a-GraceNotes/p01/m02/g04 has 1 zero-duration events, 1 notes on source staff 1, with source <grace> attributes [{'slash': 'no'}]."
+    },
+    {
+      "id": "24a.p01.m03.g01",
+      "fixture": "24a-GraceNotes",
+      "variantIds": [
+        "24a-GraceNotes/p01/m03/g01",
+        "24a-GraceNotes/p01/m03/n03",
+        "24a-GraceNotes/p01/m03/n03/grace"
+      ],
+      "sourceDescription": "Different kinds of grace notes. First measure: single 1/16 grace note, two beamed 1/16 grace notes, 1/16 appoggiatura, 1/8 appoggiatura. Second measure: slashed single 1/16 grace note, two beamed 1/16 grace notes (with both notes marked as slashed), 1/16 acciaccatura, 1/16 grace note (without slash) right before the bar line. Third measure: no grace note before chord, 1/4 grace note with sharp, two 1/4 grace notes with flats, 1/16 slashed grace note with natural before a quarter rest.",
+      "expected": "Grace group 24a-GraceNotes/p01/m03/g01 has 1 zero-duration events, 1 notes on source staff 1, with source <grace> attributes [{}]."
+    },
+    {
+      "id": "24a.p01.m03.g02",
+      "fixture": "24a-GraceNotes",
+      "variantIds": [
+        "24a-GraceNotes/p01/m03/g02",
+        "24a-GraceNotes/p01/m03/n05",
+        "24a-GraceNotes/p01/m03/n05/grace",
+        "24a-GraceNotes/p01/m03/n06",
+        "24a-GraceNotes/p01/m03/n06/grace"
+      ],
+      "sourceDescription": "Different kinds of grace notes. First measure: single 1/16 grace note, two beamed 1/16 grace notes, 1/16 appoggiatura, 1/8 appoggiatura. Second measure: slashed single 1/16 grace note, two beamed 1/16 grace notes (with both notes marked as slashed), 1/16 acciaccatura, 1/16 grace note (without slash) right before the bar line. Third measure: no grace note before chord, 1/4 grace note with sharp, two 1/4 grace notes with flats, 1/16 slashed grace note with natural before a quarter rest.",
+      "expected": "Grace group 24a-GraceNotes/p01/m03/g02 has 2 zero-duration events, 2 notes on source staff 1, with source <grace> attributes [{}, {}]."
+    },
+    {
+      "id": "24a.p01.m03.g03",
+      "fixture": "24a-GraceNotes",
+      "variantIds": [
+        "24a-GraceNotes/p01/m03/g03",
+        "24a-GraceNotes/p01/m03/n08",
+        "24a-GraceNotes/p01/m03/n08/grace"
+      ],
+      "sourceDescription": "Different kinds of grace notes. First measure: single 1/16 grace note, two beamed 1/16 grace notes, 1/16 appoggiatura, 1/8 appoggiatura. Second measure: slashed single 1/16 grace note, two beamed 1/16 grace notes (with both notes marked as slashed), 1/16 acciaccatura, 1/16 grace note (without slash) right before the bar line. Third measure: no grace note before chord, 1/4 grace note with sharp, two 1/4 grace notes with flats, 1/16 slashed grace note with natural before a quarter rest.",
+      "expected": "Grace group 24a-GraceNotes/p01/m03/g03 has 1 zero-duration events, 1 notes on source staff 1, with source <grace> attributes [{'slash': 'yes'}]."
+    },
+    {
+      "id": "24b.pitch-written-values",
+      "fixture": "24b-ChordAsGraceNote",
+      "variantIds": [
+        "24b-ChordAsGraceNote/p01/m01/n01",
+        "24b-ChordAsGraceNote/p01/m01/n02",
+        "24b-ChordAsGraceNote/p01/m01/n03",
+        "24b-ChordAsGraceNote/p01/m01/n04",
+        "24b-ChordAsGraceNote/p01/m01/n05",
+        "24b-ChordAsGraceNote/p01/m01/n06",
+        "24b-ChordAsGraceNote/p01/m01/n07",
+        "24b-ChordAsGraceNote/p01/m01/n08",
+        "24b-ChordAsGraceNote/p01/m01/n09",
+        "24b-ChordAsGraceNote/p01/m01/n10",
+        "24b-ChordAsGraceNote/p01/m01/n11",
+        "24b-ChordAsGraceNote/p01/m01/n12",
+        "24b-ChordAsGraceNote/p01/m01/n13",
+        "24b-ChordAsGraceNote/p01/m01/n14"
+      ],
+      "sourceDescription": "Chords as grace notes. The last (unslashed and beamed) grace group consists of two chords with one tie between the two grace chords and another tie between the last grace chord and the main chord.",
+      "expected": "All source pitches, written values and grace note counts survive in part/voice order; grace notes consume no metric duration."
+    },
+    {
+      "id": "24b.p01.m01.g01",
+      "fixture": "24b-ChordAsGraceNote",
+      "variantIds": [
+        "24b-ChordAsGraceNote/p01/m01/g01",
+        "24b-ChordAsGraceNote/p01/m01/n02",
+        "24b-ChordAsGraceNote/p01/m01/n02/grace",
+        "24b-ChordAsGraceNote/p01/m01/n03",
+        "24b-ChordAsGraceNote/p01/m01/n03/grace"
+      ],
+      "sourceDescription": "Chords as grace notes. The last (unslashed and beamed) grace group consists of two chords with one tie between the two grace chords and another tie between the last grace chord and the main chord.",
+      "expected": "Grace group 24b-ChordAsGraceNote/p01/m01/g01 has 1 zero-duration events, 2 notes on source staff 1, with source <grace> attributes [{'slash': 'yes'}, {'slash': 'yes'}]."
+    },
+    {
+      "id": "24b.p01.m01.g02",
+      "fixture": "24b-ChordAsGraceNote",
+      "variantIds": [
+        "24b-ChordAsGraceNote/p01/m01/g02",
+        "24b-ChordAsGraceNote/p01/m01/n05",
+        "24b-ChordAsGraceNote/p01/m01/n05/grace",
+        "24b-ChordAsGraceNote/p01/m01/n06",
+        "24b-ChordAsGraceNote/p01/m01/n06/grace"
+      ],
+      "sourceDescription": "Chords as grace notes. The last (unslashed and beamed) grace group consists of two chords with one tie between the two grace chords and another tie between the last grace chord and the main chord.",
+      "expected": "Grace group 24b-ChordAsGraceNote/p01/m01/g02 has 1 zero-duration events, 2 notes on source staff 1, with source <grace> attributes [{'slash': 'yes'}, {'slash': 'yes'}]."
+    },
+    {
+      "id": "24b.p01.m01.g03",
+      "fixture": "24b-ChordAsGraceNote",
+      "variantIds": [
+        "24b-ChordAsGraceNote/p01/m01/g03",
+        "24b-ChordAsGraceNote/p01/m01/n09",
+        "24b-ChordAsGraceNote/p01/m01/n09/grace",
+        "24b-ChordAsGraceNote/p01/m01/n10",
+        "24b-ChordAsGraceNote/p01/m01/n10/grace",
+        "24b-ChordAsGraceNote/p01/m01/n11",
+        "24b-ChordAsGraceNote/p01/m01/n11/grace",
+        "24b-ChordAsGraceNote/p01/m01/n12",
+        "24b-ChordAsGraceNote/p01/m01/n12/grace"
+      ],
+      "sourceDescription": "Chords as grace notes. The last (unslashed and beamed) grace group consists of two chords with one tie between the two grace chords and another tie between the last grace chord and the main chord.",
+      "expected": "Grace group 24b-ChordAsGraceNote/p01/m01/g03 has 2 zero-duration events, 4 notes on source staff 1, with source <grace> attributes [{'slash': 'no'}, {}, {'slash': 'no'}, {}]."
+    },
+    {
+      "id": "24c.pitch-written-values",
+      "fixture": "24c-GraceNote-MeasureEnd",
+      "variantIds": [
+        "24c-GraceNote-MeasureEnd/p01/m01/n01",
+        "24c-GraceNote-MeasureEnd/p01/m01/n02",
+        "24c-GraceNote-MeasureEnd/p01/m01/n03",
+        "24c-GraceNote-MeasureEnd/p01/m01/n04"
+      ],
+      "sourceDescription": "A grace note that appears at the measure end (without any ‘steal-from-*’ attribute set). Some applications need to convert this into an after-grace.",
+      "expected": "All source pitches, written values and grace note counts survive in part/voice order; grace notes consume no metric duration."
+    },
+    {
+      "id": "24c.p01.m01.g01",
+      "fixture": "24c-GraceNote-MeasureEnd",
+      "variantIds": [
+        "24c-GraceNote-MeasureEnd/p01/m01/g01",
+        "24c-GraceNote-MeasureEnd/p01/m01/n03",
+        "24c-GraceNote-MeasureEnd/p01/m01/n03/grace",
+        "24c-GraceNote-MeasureEnd/p01/m01/n04",
+        "24c-GraceNote-MeasureEnd/p01/m01/n04/grace"
+      ],
+      "sourceDescription": "A grace note that appears at the measure end (without any ‘steal-from-*’ attribute set). Some applications need to convert this into an after-grace.",
+      "expected": "Grace group 24c-GraceNote-MeasureEnd/p01/m01/g01 has 2 zero-duration events, 2 notes on source staff 1, with source <grace> attributes [{'slash': 'no'}, {'slash': 'no'}]."
+    },
+    {
+      "id": "24d.pitch-written-values",
+      "fixture": "24d-AfterGrace",
+      "variantIds": [
+        "24d-AfterGrace/p01/m01/n01",
+        "24d-AfterGrace/p01/m01/n02",
+        "24d-AfterGrace/p01/m01/n03",
+        "24d-AfterGrace/p01/m01/n04",
+        "24d-AfterGrace/p01/m01/n05",
+        "24d-AfterGrace/p01/m01/n06",
+        "24d-AfterGrace/p01/m01/n07"
+      ],
+      "sourceDescription": "Some grace notes and after-graces indicated by ‘steal-time-previous’ (for the first grace note) and ‘steal-time-following’ (for the second one). The remaining grace notes have no such attribute.",
+      "expected": "All source pitches, written values and grace note counts survive in part/voice order; grace notes consume no metric duration."
+    },
+    {
+      "id": "24d.p01.m01.g01",
+      "fixture": "24d-AfterGrace",
+      "variantIds": [
+        "24d-AfterGrace/p01/m01/g01",
+        "24d-AfterGrace/p01/m01/n02",
+        "24d-AfterGrace/p01/m01/n02/grace",
+        "24d-AfterGrace/p01/m01/n03",
+        "24d-AfterGrace/p01/m01/n03/grace",
+        "24d-AfterGrace/p01/m01/n04",
+        "24d-AfterGrace/p01/m01/n04/grace"
+      ],
+      "sourceDescription": "Some grace notes and after-graces indicated by ‘steal-time-previous’ (for the first grace note) and ‘steal-time-following’ (for the second one). The remaining grace notes have no such attribute.",
+      "expected": "Grace group 24d-AfterGrace/p01/m01/g01 has 3 zero-duration events, 3 notes on source staff 1, with source <grace> attributes [{'slash': 'no', 'steal-time-previous': '20'}, {'slash': 'no', 'steal-time-following': '20'}, {'slash': 'no'}]."
+    },
+    {
+      "id": "24d.p01.m01.g02",
+      "fixture": "24d-AfterGrace",
+      "variantIds": [
+        "24d-AfterGrace/p01/m01/g02",
+        "24d-AfterGrace/p01/m01/n06",
+        "24d-AfterGrace/p01/m01/n06/grace",
+        "24d-AfterGrace/p01/m01/n07",
+        "24d-AfterGrace/p01/m01/n07/grace"
+      ],
+      "sourceDescription": "Some grace notes and after-graces indicated by ‘steal-time-previous’ (for the first grace note) and ‘steal-time-following’ (for the second one). The remaining grace notes have no such attribute.",
+      "expected": "Grace group 24d-AfterGrace/p01/m01/g02 has 2 zero-duration events, 2 notes on source staff 1, with source <grace> attributes [{'slash': 'no'}, {'slash': 'no'}]."
+    },
+    {
+      "id": "24e.pitch-written-values",
+      "fixture": "24e-GraceNote-StaffChange",
+      "variantIds": [
+        "24e-GraceNote-StaffChange/p01/m01/n01",
+        "24e-GraceNote-StaffChange/p01/m01/n02",
+        "24e-GraceNote-StaffChange/p01/m01/n03",
+        "24e-GraceNote-StaffChange/p01/m01/n04",
+        "24e-GraceNote-StaffChange/p01/m01/n05",
+        "24e-GraceNote-StaffChange/p01/m01/n06"
+      ],
+      "sourceDescription": "Grace notes on a different staff than the actual notes.",
+      "expected": "All source pitches, written values and grace note counts survive in part/voice order; grace notes consume no metric duration."
+    },
+    {
+      "id": "24e.p01.m01.g01",
+      "fixture": "24e-GraceNote-StaffChange",
+      "variantIds": [
+        "24e-GraceNote-StaffChange/p01/m01/g01",
+        "24e-GraceNote-StaffChange/p01/m01/n01",
+        "24e-GraceNote-StaffChange/p01/m01/n01/grace"
+      ],
+      "sourceDescription": "Grace notes on a different staff than the actual notes.",
+      "expected": "Grace group 24e-GraceNote-StaffChange/p01/m01/g01 has 1 zero-duration events, 1 notes on source staff 2, with source <grace> attributes [{'slash': 'no'}]."
+    },
+    {
+      "id": "24e.p01.m01.g02",
+      "fixture": "24e-GraceNote-StaffChange",
+      "variantIds": [
+        "24e-GraceNote-StaffChange/p01/m01/g02",
+        "24e-GraceNote-StaffChange/p01/m01/n03",
+        "24e-GraceNote-StaffChange/p01/m01/n03/grace",
+        "24e-GraceNote-StaffChange/p01/m01/n04",
+        "24e-GraceNote-StaffChange/p01/m01/n04/grace"
+      ],
+      "sourceDescription": "Grace notes on a different staff than the actual notes.",
+      "expected": "Grace group 24e-GraceNote-StaffChange/p01/m01/g02 has 2 zero-duration events, 2 notes on source staff 2, with source <grace> attributes [{'slash': 'no'}, {'slash': 'no'}]."
+    },
+    {
+      "id": "24f.pitch-written-values",
+      "fixture": "24f-GraceNote-Slur",
+      "variantIds": [
+        "24f-GraceNote-Slur/p01/m01/n01",
+        "24f-GraceNote-Slur/p01/m01/n02",
+        "24f-GraceNote-Slur/p01/m01/n03"
+      ],
+      "sourceDescription": "A grace note with a slur to the actual note. The <grace> element has no ‘slash’ attribute; since MusicXML does not provide a default value it is up to the application to interpret the grace note as an acciaccatura (with slash) or an appoggiatura (without slash).",
+      "expected": "All source pitches, written values and grace note counts survive in part/voice order; grace notes consume no metric duration."
+    },
+    {
+      "id": "24f.p01.m01.g01",
+      "fixture": "24f-GraceNote-Slur",
+      "variantIds": [
+        "24f-GraceNote-Slur/p01/m01/g01",
+        "24f-GraceNote-Slur/p01/m01/n02",
+        "24f-GraceNote-Slur/p01/m01/n02/grace"
+      ],
+      "sourceDescription": "A grace note with a slur to the actual note. The <grace> element has no ‘slash’ attribute; since MusicXML does not provide a default value it is up to the application to interpret the grace note as an acciaccatura (with slash) or an appoggiatura (without slash).",
+      "expected": "Grace group 24f-GraceNote-Slur/p01/m01/g01 has 1 zero-duration events, 1 notes on source staff 1, with source <grace> attributes [{}]."
+    },
+    {
+      "id": "24g.pitch-written-values",
+      "fixture": "24g-GraceNote-Dynamics",
+      "variantIds": [
+        "24g-GraceNote-Dynamics/p01/m01/n01",
+        "24g-GraceNote-Dynamics/p01/m01/n02",
+        "24g-GraceNote-Dynamics/p01/m01/n03",
+        "24g-GraceNote-Dynamics/p01/m01/n04",
+        "24g-GraceNote-Dynamics/p01/m01/n05"
+      ],
+      "sourceDescription": "Grace notes in combination with dynamics. The ‘f’ sign is located on the first grace note (using a <direction> element), followed by a diminuendo wedge, and the ‘p’ sign is on the main beat (again using <direction>).",
+      "expected": "All source pitches, written values and grace note counts survive in part/voice order; grace notes consume no metric duration."
+    },
+    {
+      "id": "24g.p01.m01.g01",
+      "fixture": "24g-GraceNote-Dynamics",
+      "variantIds": [
+        "24g-GraceNote-Dynamics/p01/m01/g01",
+        "24g-GraceNote-Dynamics/p01/m01/n01",
+        "24g-GraceNote-Dynamics/p01/m01/n01/grace",
+        "24g-GraceNote-Dynamics/p01/m01/n02",
+        "24g-GraceNote-Dynamics/p01/m01/n02/grace",
+        "24g-GraceNote-Dynamics/p01/m01/n03",
+        "24g-GraceNote-Dynamics/p01/m01/n03/grace",
+        "24g-GraceNote-Dynamics/p01/m01/n04",
+        "24g-GraceNote-Dynamics/p01/m01/n04/grace"
+      ],
+      "sourceDescription": "Grace notes in combination with dynamics. The ‘f’ sign is located on the first grace note (using a <direction> element), followed by a diminuendo wedge, and the ‘p’ sign is on the main beat (again using <direction>).",
+      "expected": "Grace group 24g-GraceNote-Dynamics/p01/m01/g01 has 4 zero-duration events, 4 notes on source staff 1, with source <grace> attributes [{'slash': 'no'}, {'slash': 'no'}, {'slash': 'no'}, {'slash': 'no'}]."
+    },
+    {
+      "id": "24h.pitch-written-values",
+      "fixture": "24h-GraceNote-Simultaneous",
+      "variantIds": [
+        "24h-GraceNote-Simultaneous/p01/m01/n01",
+        "24h-GraceNote-Simultaneous/p01/m01/n02",
+        "24h-GraceNote-Simultaneous/p01/m01/n03",
+        "24h-GraceNote-Simultaneous/p01/m01/n04",
+        "24h-GraceNote-Simultaneous/p01/m01/n05",
+        "24h-GraceNote-Simultaneous/p01/m01/n06",
+        "24h-GraceNote-Simultaneous/p02/m01/n01",
+        "24h-GraceNote-Simultaneous/p02/m01/n02",
+        "24h-GraceNote-Simultaneous/p02/m01/n03"
+      ],
+      "sourceDescription": "Simultaneous grace notes and grace note groups of different length starting a part or a voice. The topmost three staves are voices 1 to 3 of part ‘P1’, with no grace notes in the third staff and music starting on the second beat. There is also an ‘fp’ on the main note of the first staff. The bottommost two staves are voices 1 and 2 of part ‘P2’, with no grace notes in the lowest staff.",
+      "expected": "All source pitches, written values and grace note counts survive in part/voice order; grace notes consume no metric duration."
+    },
+    {
+      "id": "24h.p01.m01.g01",
+      "fixture": "24h-GraceNote-Simultaneous",
+      "variantIds": [
+        "24h-GraceNote-Simultaneous/p01/m01/g01",
+        "24h-GraceNote-Simultaneous/p01/m01/n01",
+        "24h-GraceNote-Simultaneous/p01/m01/n01/grace"
+      ],
+      "sourceDescription": "Simultaneous grace notes and grace note groups of different length starting a part or a voice. The topmost three staves are voices 1 to 3 of part ‘P1’, with no grace notes in the third staff and music starting on the second beat. There is also an ‘fp’ on the main note of the first staff. The bottommost two staves are voices 1 and 2 of part ‘P2’, with no grace notes in the lowest staff.",
+      "expected": "Grace group 24h-GraceNote-Simultaneous/p01/m01/g01 has 1 zero-duration events, 1 notes on source staff 1, with source <grace> attributes [{'slash': 'no'}]."
+    },
+    {
+      "id": "24h.p01.m01.g02",
+      "fixture": "24h-GraceNote-Simultaneous",
+      "variantIds": [
+        "24h-GraceNote-Simultaneous/p01/m01/g02",
+        "24h-GraceNote-Simultaneous/p01/m01/n03",
+        "24h-GraceNote-Simultaneous/p01/m01/n03/grace",
+        "24h-GraceNote-Simultaneous/p01/m01/n04",
+        "24h-GraceNote-Simultaneous/p01/m01/n04/grace"
+      ],
+      "sourceDescription": "Simultaneous grace notes and grace note groups of different length starting a part or a voice. The topmost three staves are voices 1 to 3 of part ‘P1’, with no grace notes in the third staff and music starting on the second beat. There is also an ‘fp’ on the main note of the first staff. The bottommost two staves are voices 1 and 2 of part ‘P2’, with no grace notes in the lowest staff.",
+      "expected": "Grace group 24h-GraceNote-Simultaneous/p01/m01/g02 has 2 zero-duration events, 2 notes on source staff 2, with source <grace> attributes [{'slash': 'no'}, {'slash': 'no'}]."
+    },
+    {
+      "id": "24h.p02.m01.g01",
+      "fixture": "24h-GraceNote-Simultaneous",
+      "variantIds": [
+        "24h-GraceNote-Simultaneous/p02/m01/g01",
+        "24h-GraceNote-Simultaneous/p02/m01/n01",
+        "24h-GraceNote-Simultaneous/p02/m01/n01/grace"
+      ],
+      "sourceDescription": "Simultaneous grace notes and grace note groups of different length starting a part or a voice. The topmost three staves are voices 1 to 3 of part ‘P1’, with no grace notes in the third staff and music starting on the second beat. There is also an ‘fp’ on the main note of the first staff. The bottommost two staves are voices 1 and 2 of part ‘P2’, with no grace notes in the lowest staff.",
+      "expected": "Grace group 24h-GraceNote-Simultaneous/p02/m01/g01 has 1 zero-duration events, 1 notes on source staff 1, with source <grace> attributes [{'slash': 'no'}]."
+    },
+    {
+      "id": "24a.grace-to-main-slurs",
+      "fixture": "24a-GraceNotes",
+      "variantIds": [
+        "24a-GraceNotes/p01/m01/n06/slur01",
+        "24a-GraceNotes/p01/m01/n07/slur01",
+        "24a-GraceNotes/p01/m01/n08/slur01",
+        "24a-GraceNotes/p01/m01/n09/slur01",
+        "24a-GraceNotes/p01/m02/n06/slur01",
+        "24a-GraceNotes/p01/m02/n07/slur01"
+      ],
+      "sourceDescription": "Different kinds of grace notes. First measure: single 1/16 grace note, two beamed 1/16 grace notes, 1/16 appoggiatura, 1/8 appoggiatura. Second measure: slashed single 1/16 grace note, two beamed 1/16 grace notes (with both notes marked as slashed), 1/16 acciaccatura, 1/16 grace note (without slash) right before the bar line. Third measure: no grace note before chord, 1/4 grace note with sharp, two 1/4 grace notes with flats, 1/16 slashed grace note with natural before a quarter rest.",
+      "expected": "Three grace-to-principal slurs connect the two appoggiaturas in bar 1 and the acciaccatura in bar 2."
+    },
+    {
+      "id": "24b.grace-chord-ties",
+      "fixture": "24b-ChordAsGraceNote",
+      "variantIds": [
+        "24b-ChordAsGraceNote/p01/m01/n10/tied01",
+        "24b-ChordAsGraceNote/p01/m01/n11/tied01",
+        "24b-ChordAsGraceNote/p01/m01/n12/tied01",
+        "24b-ChordAsGraceNote/p01/m01/n13/tied01"
+      ],
+      "sourceDescription": "Chords as grace notes. The last (unslashed and beamed) grace group consists of two chords with one tie between the two grace chords and another tie between the last grace chord and the main chord.",
+      "expected": "The D5 tie joins two grace chords and the G4 tie joins the last grace chord to the principal chord."
+    },
+    {
+      "id": "24d.steal-time-percentages",
+      "fixture": "24d-AfterGrace",
+      "variantIds": [
+        "24d-AfterGrace/p01/m01/n02/grace",
+        "24d-AfterGrace/p01/m01/n03/grace"
+      ],
+      "sourceDescription": "Some grace notes and after-graces indicated by ‘steal-time-previous’ (for the first grace note) and ‘steal-time-following’ (for the second one). The remaining grace notes have no such attribute.",
+      "expected": "Two source grace notes specify 20 percent stolen from previous and following notes, respectively."
+    },
+    {
+      "id": "24f.grace-to-main-slur",
+      "fixture": "24f-GraceNote-Slur",
+      "variantIds": [
+        "24f-GraceNote-Slur/p01/m01/n02/slur01",
+        "24f-GraceNote-Slur/p01/m01/n03/slur01"
+      ],
+      "sourceDescription": "A grace note with a slur to the actual note. The <grace> element has no ‘slash’ attribute; since MusicXML does not provide a default value it is up to the application to interpret the grace note as an acciaccatura (with slash) or an appoggiatura (without slash).",
+      "expected": "The grace G5 slurs to the following main E5."
+    },
+    {
+      "id": "24g.grace-and-main-dynamics",
+      "fixture": "24g-GraceNote-Dynamics",
+      "variantIds": [
+        "24g-GraceNote-Dynamics/p01/m01/d01",
+        "24g-GraceNote-Dynamics/p01/m01/d04"
+      ],
+      "sourceDescription": "Grace notes in combination with dynamics. The ‘f’ sign is located on the first grace note (using a <direction> element), followed by a diminuendo wedge, and the ‘p’ sign is on the main beat (again using <direction>).",
+      "expected": "A forte is under the first grace note; a piano is under the following principal note."
+    },
+    {
+      "id": "24g.diminuendo",
+      "fixture": "24g-GraceNote-Dynamics",
+      "variantIds": [
+        "24g-GraceNote-Dynamics/p01/m01/d02",
+        "24g-GraceNote-Dynamics/p01/m01/d03"
+      ],
+      "sourceDescription": "Grace notes in combination with dynamics. The ‘f’ sign is located on the first grace note (using a <direction> element), followed by a diminuendo wedge, and the ‘p’ sign is on the main beat (again using <direction>).",
+      "expected": "A diminuendo wedge spans the grace run and ends before the principal-note piano."
+    },
+    {
+      "id": "24h.fp-on-main",
+      "fixture": "24h-GraceNote-Simultaneous",
+      "variantIds": [
+        "24h-GraceNote-Simultaneous/p01/m01/d01"
+      ],
+      "sourceDescription": "Simultaneous grace notes and grace note groups of different length starting a part or a voice. The topmost three staves are voices 1 to 3 of part ‘P1’, with no grace notes in the third staff and music starting on the second beat. There is also an ‘fp’ on the main note of the first staff. The bottommost two staves are voices 1 and 2 of part ‘P2’, with no grace notes in the lowest staff.",
+      "expected": "The fp dynamic sits under the first main note on P1's top staff."
+    },
+    {
+      "id": "24h.voices-without-grace",
+      "fixture": "24h-GraceNote-Simultaneous",
+      "variantIds": [
+        "24h-GraceNote-Simultaneous/p01/m01/n06",
+        "24h-GraceNote-Simultaneous/p02/m01/n03"
+      ],
+      "sourceDescription": "Simultaneous grace notes and grace note groups of different length starting a part or a voice. The topmost three staves are voices 1 to 3 of part ‘P1’, with no grace notes in the third staff and music starting on the second beat. There is also an ‘fp’ on the main note of the first staff. The bottommost two staves are voices 1 and 2 of part ‘P2’, with no grace notes in the lowest staff.",
+      "expected": "P1 voice 3 begins on beat 2 without graces; P2 voice 2 remains a rest without graces."
+    }
+  ],
+  "render": [
+    {
+      "featureId": "24a.pitch-written-values",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Source pitched-note order, pitch, value and grace-note count match browser-imported MNX. The complete views show the retained pitches; attachment, staff placement and spanners are separate features.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24a.pitch-written-values",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Source pitched-note order, pitch, value and grace-note count match browser-imported MNX. The complete views show the retained pitches; attachment, staff placement and spanners are separate features.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24a.p01.m01.g01",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Pitches, small noteheads, value, chord membership where present, order and visible placement match this source group. Explicit slash=yes/no is respected; absent slash remains an application choice.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24a.p01.m01.g01",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Pitches, small noteheads, value, chord membership where present, order and visible placement match this source group. Explicit slash=yes/no is respected; absent slash remains an application choice.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24a.p01.m01.g02",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Pitches, small noteheads, value, chord membership where present, order and visible placement match this source group. Explicit slash=yes/no is respected; absent slash remains an application choice.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24a.p01.m01.g02",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Pitches, small noteheads, value, chord membership where present, order and visible placement match this source group. Explicit slash=yes/no is respected; absent slash remains an application choice.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24a.p01.m01.g03",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Pitches, small noteheads, value, chord membership where present, order and visible placement match this source group. Explicit slash=yes/no is respected; absent slash remains an application choice.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24a.p01.m01.g03",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Pitches, small noteheads, value, chord membership where present, order and visible placement match this source group. Explicit slash=yes/no is respected; absent slash remains an application choice.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24a.p01.m01.g04",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Pitches, small noteheads, value, chord membership where present, order and visible placement match this source group. Explicit slash=yes/no is respected; absent slash remains an application choice.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24a.p01.m01.g04",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Pitches, small noteheads, value, chord membership where present, order and visible placement match this source group. Explicit slash=yes/no is respected; absent slash remains an application choice.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24a.p01.m02.g01",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Pitches, small noteheads, value, chord membership where present, order and visible placement match this source group. Explicit slash=yes/no is respected; absent slash remains an application choice.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24a.p01.m02.g01",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Pitches, small noteheads, value, chord membership where present, order and visible placement match this source group. Explicit slash=yes/no is respected; absent slash remains an application choice.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24a.p01.m02.g02",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Pitches, small noteheads, value, chord membership where present, order and visible placement match this source group. Explicit slash=yes/no is respected; absent slash remains an application choice.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24a.p01.m02.g02",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Pitches, small noteheads, value, chord membership where present, order and visible placement match this source group. Explicit slash=yes/no is respected; absent slash remains an application choice.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24a.p01.m02.g03",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Pitches, small noteheads, value, chord membership where present, order and visible placement match this source group. Explicit slash=yes/no is respected; absent slash remains an application choice.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24a.p01.m02.g03",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Pitches, small noteheads, value, chord membership where present, order and visible placement match this source group. Explicit slash=yes/no is respected; absent slash remains an application choice.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24a.p01.m02.g04",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Pitches, small noteheads, value, chord membership where present, order and visible placement match this source group. Explicit slash=yes/no is respected; absent slash remains an application choice.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24a.p01.m02.g04",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Pitches, small noteheads, value, chord membership where present, order and visible placement match this source group. Explicit slash=yes/no is respected; absent slash remains an application choice.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24a.p01.m03.g01",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Pitches, small noteheads, value, chord membership where present, order and visible placement match this source group. Explicit slash=yes/no is respected; absent slash remains an application choice.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24a.p01.m03.g01",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Pitches, small noteheads, value, chord membership where present, order and visible placement match this source group. Explicit slash=yes/no is respected; absent slash remains an application choice.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24a.p01.m03.g02",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Pitches, small noteheads, value, chord membership where present, order and visible placement match this source group. Explicit slash=yes/no is respected; absent slash remains an application choice.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24a.p01.m03.g02",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Pitches, small noteheads, value, chord membership where present, order and visible placement match this source group. Explicit slash=yes/no is respected; absent slash remains an application choice.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24a.p01.m03.g03",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Pitches, small noteheads, value, chord membership where present, order and visible placement match this source group. Explicit slash=yes/no is respected; absent slash remains an application choice.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24a.p01.m03.g03",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Pitches, small noteheads, value, chord membership where present, order and visible placement match this source group. Explicit slash=yes/no is respected; absent slash remains an application choice.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24b.pitch-written-values",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Source pitched-note order, pitch, value and grace-note count match browser-imported MNX. The complete views show the retained pitches; attachment, staff placement and spanners are separate features.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24b-ChordAsGraceNote/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24b-ChordAsGraceNote/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24b-ChordAsGraceNote/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/workbench/24b-ChordAsGraceNote/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24b.pitch-written-values",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Source pitched-note order, pitch, value and grace-note count match browser-imported MNX. The complete views show the retained pitches; attachment, staff placement and spanners are separate features.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24b-ChordAsGraceNote/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24b-ChordAsGraceNote/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24b-ChordAsGraceNote/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/studio/24b-ChordAsGraceNote/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24b.p01.m01.g01",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Pitches, small noteheads, value, chord membership where present, order and visible placement match this source group. Explicit slash=yes/no is respected; absent slash remains an application choice.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24b-ChordAsGraceNote/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24b-ChordAsGraceNote/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24b-ChordAsGraceNote/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/workbench/24b-ChordAsGraceNote/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24b.p01.m01.g01",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Pitches, small noteheads, value, chord membership where present, order and visible placement match this source group. Explicit slash=yes/no is respected; absent slash remains an application choice.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24b-ChordAsGraceNote/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24b-ChordAsGraceNote/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24b-ChordAsGraceNote/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/studio/24b-ChordAsGraceNote/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24b.p01.m01.g02",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Pitches, small noteheads, value, chord membership where present, order and visible placement match this source group. Explicit slash=yes/no is respected; absent slash remains an application choice.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24b-ChordAsGraceNote/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24b-ChordAsGraceNote/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24b-ChordAsGraceNote/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/workbench/24b-ChordAsGraceNote/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24b.p01.m01.g02",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Pitches, small noteheads, value, chord membership where present, order and visible placement match this source group. Explicit slash=yes/no is respected; absent slash remains an application choice.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24b-ChordAsGraceNote/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24b-ChordAsGraceNote/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24b-ChordAsGraceNote/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/studio/24b-ChordAsGraceNote/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24b.p01.m01.g03",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Pitches, small noteheads, value, chord membership where present, order and visible placement match this source group. Explicit slash=yes/no is respected; absent slash remains an application choice.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24b-ChordAsGraceNote/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24b-ChordAsGraceNote/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24b-ChordAsGraceNote/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/workbench/24b-ChordAsGraceNote/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24b.p01.m01.g03",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Pitches, small noteheads, value, chord membership where present, order and visible placement match this source group. Explicit slash=yes/no is respected; absent slash remains an application choice.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24b-ChordAsGraceNote/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24b-ChordAsGraceNote/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24b-ChordAsGraceNote/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/studio/24b-ChordAsGraceNote/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24c.pitch-written-values",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Source pitched-note order, pitch, value and grace-note count match browser-imported MNX. The complete views show the retained pitches; attachment, staff placement and spanners are separate features.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24c-GraceNote-MeasureEnd/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24c-GraceNote-MeasureEnd/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24c-GraceNote-MeasureEnd/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/workbench/24c-GraceNote-MeasureEnd/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24c.pitch-written-values",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Source pitched-note order, pitch, value and grace-note count match browser-imported MNX. The complete views show the retained pitches; attachment, staff placement and spanners are separate features.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24c-GraceNote-MeasureEnd/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24c-GraceNote-MeasureEnd/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24c-GraceNote-MeasureEnd/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/studio/24c-GraceNote-MeasureEnd/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24c.p01.m01.g01",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "The two small beamed notes appear after the two half notes and before the barline. The source gives no steal-time percentage.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24c-GraceNote-MeasureEnd/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24c-GraceNote-MeasureEnd/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24c-GraceNote-MeasureEnd/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/workbench/24c-GraceNote-MeasureEnd/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24c.p01.m01.g01",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "The two small beamed notes appear after the two half notes and before the barline. The source gives no steal-time percentage.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24c-GraceNote-MeasureEnd/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24c-GraceNote-MeasureEnd/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24c-GraceNote-MeasureEnd/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/studio/24c-GraceNote-MeasureEnd/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24d.pitch-written-values",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Source pitched-note order, pitch, value and grace-note count match browser-imported MNX. The complete views show the retained pitches; attachment, staff placement and spanners are separate features.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24d-AfterGrace/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24d-AfterGrace/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24d-AfterGrace/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/workbench/24d-AfterGrace/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24d.pitch-written-values",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Source pitched-note order, pitch, value and grace-note count match browser-imported MNX. The complete views show the retained pitches; attachment, staff placement and spanners are separate features.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24d-AfterGrace/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24d-AfterGrace/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24d-AfterGrace/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/studio/24d-AfterGrace/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24d.p01.m01.g01",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "The small notes remain visibly between/after the two principal half notes in source order. Explicit steal-time percentages are nonvisual and assessed separately.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24d-AfterGrace/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24d-AfterGrace/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24d-AfterGrace/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/workbench/24d-AfterGrace/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24d.p01.m01.g01",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "The small notes remain visibly between/after the two principal half notes in source order. Explicit steal-time percentages are nonvisual and assessed separately.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24d-AfterGrace/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24d-AfterGrace/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24d-AfterGrace/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/studio/24d-AfterGrace/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24d.p01.m01.g02",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "The small notes remain visibly between/after the two principal half notes in source order. Explicit steal-time percentages are nonvisual and assessed separately.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24d-AfterGrace/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24d-AfterGrace/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24d-AfterGrace/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/workbench/24d-AfterGrace/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24d.p01.m01.g02",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "The small notes remain visibly between/after the two principal half notes in source order. Explicit steal-time percentages are nonvisual and assessed separately.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24d-AfterGrace/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24d-AfterGrace/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24d-AfterGrace/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/studio/24d-AfterGrace/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24e.pitch-written-values",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Source pitched-note order, pitch, value and grace-note count match browser-imported MNX. The complete views show the retained pitches; attachment, staff placement and spanners are separate features.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24e-GraceNote-StaffChange/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24e-GraceNote-StaffChange/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24e-GraceNote-StaffChange/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/workbench/24e-GraceNote-StaffChange/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24e.pitch-written-values",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Source pitched-note order, pitch, value and grace-note count match browser-imported MNX. The complete views show the retained pitches; attachment, staff placement and spanners are separate features.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24e-GraceNote-StaffChange/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24e-GraceNote-StaffChange/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24e-GraceNote-StaffChange/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/studio/24e-GraceNote-StaffChange/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24e.p01.m01.g01",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "incorrect",
+      "cause": [
+        "layout/SVG engine"
+      ],
+      "reason": "The importer preserves staff=2 on every grace event, but both shells draw the small grace heads on staff 1 above the principal notes.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24e-GraceNote-StaffChange/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24e-GraceNote-StaffChange/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24e-GraceNote-StaffChange/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/workbench/24e-GraceNote-StaffChange/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24e.p01.m01.g01",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "incorrect",
+      "cause": [
+        "layout/SVG engine"
+      ],
+      "reason": "The importer preserves staff=2 on every grace event, but both shells draw the small grace heads on staff 1 above the principal notes.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24e-GraceNote-StaffChange/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24e-GraceNote-StaffChange/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24e-GraceNote-StaffChange/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/studio/24e-GraceNote-StaffChange/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24e.p01.m01.g02",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "incorrect",
+      "cause": [
+        "layout/SVG engine"
+      ],
+      "reason": "The importer preserves staff=2 on every grace event, but both shells draw the small grace heads on staff 1 above the principal notes.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24e-GraceNote-StaffChange/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24e-GraceNote-StaffChange/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24e-GraceNote-StaffChange/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/workbench/24e-GraceNote-StaffChange/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24e.p01.m01.g02",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "incorrect",
+      "cause": [
+        "layout/SVG engine"
+      ],
+      "reason": "The importer preserves staff=2 on every grace event, but both shells draw the small grace heads on staff 1 above the principal notes.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24e-GraceNote-StaffChange/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24e-GraceNote-StaffChange/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24e-GraceNote-StaffChange/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/studio/24e-GraceNote-StaffChange/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24f.pitch-written-values",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Source pitched-note order, pitch, value and grace-note count match browser-imported MNX. The complete views show the retained pitches; attachment, staff placement and spanners are separate features.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24f-GraceNote-Slur/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24f-GraceNote-Slur/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24f-GraceNote-Slur/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/workbench/24f-GraceNote-Slur/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24f.pitch-written-values",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Source pitched-note order, pitch, value and grace-note count match browser-imported MNX. The complete views show the retained pitches; attachment, staff placement and spanners are separate features.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24f-GraceNote-Slur/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24f-GraceNote-Slur/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24f-GraceNote-Slur/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/studio/24f-GraceNote-Slur/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24f.p01.m01.g01",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Pitches, small noteheads, value, chord membership where present, order and visible placement match this source group. Explicit slash=yes/no is respected; absent slash remains an application choice.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24f-GraceNote-Slur/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24f-GraceNote-Slur/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24f-GraceNote-Slur/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/workbench/24f-GraceNote-Slur/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24f.p01.m01.g01",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Pitches, small noteheads, value, chord membership where present, order and visible placement match this source group. Explicit slash=yes/no is respected; absent slash remains an application choice.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24f-GraceNote-Slur/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24f-GraceNote-Slur/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24f-GraceNote-Slur/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/studio/24f-GraceNote-Slur/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24g.pitch-written-values",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Source pitched-note order, pitch, value and grace-note count match browser-imported MNX. The complete views show the retained pitches; attachment, staff placement and spanners are separate features.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24g-GraceNote-Dynamics/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24g-GraceNote-Dynamics/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24g-GraceNote-Dynamics/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/workbench/24g-GraceNote-Dynamics/notation-0-0.png"
+      ],
+      "diagnosticTitles": [
+        "validation — underfills the 4/4 bar: notes sum to 1 of 4 beats",
+        "validation — underfills the 4/4 bar: notes sum to 1 of 4 beats"
+      ]
+    },
+    {
+      "featureId": "24g.pitch-written-values",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Source pitched-note order, pitch, value and grace-note count match browser-imported MNX. The complete views show the retained pitches; attachment, staff placement and spanners are separate features.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24g-GraceNote-Dynamics/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24g-GraceNote-Dynamics/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24g-GraceNote-Dynamics/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/studio/24g-GraceNote-Dynamics/notation-0-0.png"
+      ],
+      "diagnosticTitles": [
+        "validation — underfills the 4/4 bar: notes sum to 1 of 4 beats",
+        "validation — underfills the 4/4 bar: notes sum to 1 of 4 beats"
+      ]
+    },
+    {
+      "featureId": "24g.p01.m01.g01",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Pitches, small noteheads, value, chord membership where present, order and visible placement match this source group. Explicit slash=yes/no is respected; absent slash remains an application choice.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24g-GraceNote-Dynamics/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24g-GraceNote-Dynamics/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24g-GraceNote-Dynamics/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/workbench/24g-GraceNote-Dynamics/notation-0-0.png"
+      ],
+      "diagnosticTitles": [
+        "validation — underfills the 4/4 bar: notes sum to 1 of 4 beats",
+        "validation — underfills the 4/4 bar: notes sum to 1 of 4 beats"
+      ]
+    },
+    {
+      "featureId": "24g.p01.m01.g01",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Pitches, small noteheads, value, chord membership where present, order and visible placement match this source group. Explicit slash=yes/no is respected; absent slash remains an application choice.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24g-GraceNote-Dynamics/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24g-GraceNote-Dynamics/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24g-GraceNote-Dynamics/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/studio/24g-GraceNote-Dynamics/notation-0-0.png"
+      ],
+      "diagnosticTitles": [
+        "validation — underfills the 4/4 bar: notes sum to 1 of 4 beats",
+        "validation — underfills the 4/4 bar: notes sum to 1 of 4 beats"
+      ]
+    },
+    {
+      "featureId": "24h.pitch-written-values",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Source pitched-note order, pitch, value and grace-note count match browser-imported MNX. The complete views show the retained pitches; attachment, staff placement and spanners are separate features.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24h-GraceNote-Simultaneous/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24h-GraceNote-Simultaneous/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24h-GraceNote-Simultaneous/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/workbench/24h-GraceNote-Simultaneous/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24h.pitch-written-values",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Source pitched-note order, pitch, value and grace-note count match browser-imported MNX. The complete views show the retained pitches; attachment, staff placement and spanners are separate features.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24h-GraceNote-Simultaneous/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24h-GraceNote-Simultaneous/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24h-GraceNote-Simultaneous/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/studio/24h-GraceNote-Simultaneous/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24h.p01.m01.g01",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "The small source group appears on its own declared part/staff, aligned with the other voices' opening beat without inventing grace notes on the empty voices.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24h-GraceNote-Simultaneous/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24h-GraceNote-Simultaneous/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24h-GraceNote-Simultaneous/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/workbench/24h-GraceNote-Simultaneous/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24h.p01.m01.g01",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "The small source group appears on its own declared part/staff, aligned with the other voices' opening beat without inventing grace notes on the empty voices.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24h-GraceNote-Simultaneous/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24h-GraceNote-Simultaneous/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24h-GraceNote-Simultaneous/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/studio/24h-GraceNote-Simultaneous/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24h.p01.m01.g02",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "The small source group appears on its own declared part/staff, aligned with the other voices' opening beat without inventing grace notes on the empty voices.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24h-GraceNote-Simultaneous/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24h-GraceNote-Simultaneous/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24h-GraceNote-Simultaneous/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/workbench/24h-GraceNote-Simultaneous/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24h.p01.m01.g02",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "The small source group appears on its own declared part/staff, aligned with the other voices' opening beat without inventing grace notes on the empty voices.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24h-GraceNote-Simultaneous/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24h-GraceNote-Simultaneous/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24h-GraceNote-Simultaneous/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/studio/24h-GraceNote-Simultaneous/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24h.p02.m01.g01",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "The small source group appears on its own declared part/staff, aligned with the other voices' opening beat without inventing grace notes on the empty voices.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24h-GraceNote-Simultaneous/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24h-GraceNote-Simultaneous/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24h-GraceNote-Simultaneous/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/workbench/24h-GraceNote-Simultaneous/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24h.p02.m01.g01",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "The small source group appears on its own declared part/staff, aligned with the other voices' opening beat without inventing grace notes on the empty voices.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24h-GraceNote-Simultaneous/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24h-GraceNote-Simultaneous/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24h-GraceNote-Simultaneous/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/studio/24h-GraceNote-Simultaneous/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24a.grace-to-main-slurs",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "missing",
+      "cause": [
+        "layout/SVG engine"
+      ],
+      "reason": "The importer resolves all three slur targets in MNX, but neither shell draws any slur curve from a grace container.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/workbench/24a-GraceNotes/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24a.grace-to-main-slurs",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "missing",
+      "cause": [
+        "layout/SVG engine"
+      ],
+      "reason": "The importer resolves all three slur targets in MNX, but neither shell draws any slur curve from a grace container.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/studio/24a-GraceNotes/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24b.grace-chord-ties",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "missing",
+      "cause": [
+        "layout/SVG engine"
+      ],
+      "reason": "Both note-level target links survive in MNX. Neither shell draws the two tie curves from grace chord members.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24b-ChordAsGraceNote/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24b-ChordAsGraceNote/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24b-ChordAsGraceNote/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/workbench/24b-ChordAsGraceNote/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24b.grace-chord-ties",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "missing",
+      "cause": [
+        "layout/SVG engine"
+      ],
+      "reason": "Both note-level target links survive in MNX. Neither shell draws the two tie curves from grace chord members.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24b-ChordAsGraceNote/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24b-ChordAsGraceNote/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24b-ChordAsGraceNote/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/studio/24b-ChordAsGraceNote/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24d.steal-time-percentages",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "not applicable",
+      "cause": [
+        "importer"
+      ],
+      "reason": "Playback percentages are nonvisual. The importer collapses the three-note run under stealPrevious and does not retain either numeric percentage; this is not a render pass.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24d-AfterGrace/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24d-AfterGrace/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24d-AfterGrace/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/workbench/24d-AfterGrace/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24d.steal-time-percentages",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "not applicable",
+      "cause": [
+        "importer"
+      ],
+      "reason": "Playback percentages are nonvisual. The importer collapses the three-note run under stealPrevious and does not retain either numeric percentage; this is not a render pass.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24d-AfterGrace/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24d-AfterGrace/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24d-AfterGrace/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/studio/24d-AfterGrace/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24f.grace-to-main-slur",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "missing",
+      "cause": [
+        "layout/SVG engine"
+      ],
+      "reason": "The MNX grace event retains a slur target, but both shells draw the notes without the connecting curve. An absent slash attribute is an application policy, not a failed mark.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24f-GraceNote-Slur/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24f-GraceNote-Slur/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24f-GraceNote-Slur/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/workbench/24f-GraceNote-Slur/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24f.grace-to-main-slur",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "missing",
+      "cause": [
+        "layout/SVG engine"
+      ],
+      "reason": "The MNX grace event retains a slur target, but both shells draw the notes without the connecting curve. An absent slash attribute is an application policy, not a failed mark.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24f-GraceNote-Slur/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24f-GraceNote-Slur/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24f-GraceNote-Slur/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/studio/24f-GraceNote-Slur/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24g.grace-and-main-dynamics",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "incorrect",
+      "cause": [
+        "importer",
+        "MNX representation",
+        "layout/SVG engine"
+      ],
+      "reason": "Both marks import at fraction 0 and both SVG glyphs occupy exactly the same x/y, so the two separate source placements overprint. Zero-time grace attachment is not represented by the current measure-fraction carrier.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24g-GraceNote-Dynamics/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24g-GraceNote-Dynamics/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24g-GraceNote-Dynamics/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/workbench/24g-GraceNote-Dynamics/notation-0-0.png"
+      ],
+      "diagnosticTitles": [
+        "validation — underfills the 4/4 bar: notes sum to 1 of 4 beats",
+        "validation — underfills the 4/4 bar: notes sum to 1 of 4 beats"
+      ]
+    },
+    {
+      "featureId": "24g.grace-and-main-dynamics",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "incorrect",
+      "cause": [
+        "importer",
+        "MNX representation",
+        "layout/SVG engine"
+      ],
+      "reason": "Both marks import at fraction 0 and both SVG glyphs occupy exactly the same x/y, so the two separate source placements overprint. Zero-time grace attachment is not represented by the current measure-fraction carrier.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24g-GraceNote-Dynamics/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24g-GraceNote-Dynamics/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24g-GraceNote-Dynamics/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/studio/24g-GraceNote-Dynamics/notation-0-0.png"
+      ],
+      "diagnosticTitles": [
+        "validation — underfills the 4/4 bar: notes sum to 1 of 4 beats",
+        "validation — underfills the 4/4 bar: notes sum to 1 of 4 beats"
+      ]
+    },
+    {
+      "featureId": "24g.diminuendo",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "missing",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "The imported gradual dynamic begins and ends at fraction 0; both shell SVGs omit a hairpin. The source start/stop order is distinct despite their equal metric positions.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24g-GraceNote-Dynamics/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24g-GraceNote-Dynamics/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24g-GraceNote-Dynamics/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/workbench/24g-GraceNote-Dynamics/notation-0-0.png"
+      ],
+      "diagnosticTitles": [
+        "validation — underfills the 4/4 bar: notes sum to 1 of 4 beats",
+        "validation — underfills the 4/4 bar: notes sum to 1 of 4 beats"
+      ]
+    },
+    {
+      "featureId": "24g.diminuendo",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "missing",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "The imported gradual dynamic begins and ends at fraction 0; both shell SVGs omit a hairpin. The source start/stop order is distinct despite their equal metric positions.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24g-GraceNote-Dynamics/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24g-GraceNote-Dynamics/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24g-GraceNote-Dynamics/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/studio/24g-GraceNote-Dynamics/notation-0-0.png"
+      ],
+      "diagnosticTitles": [
+        "validation — underfills the 4/4 bar: notes sum to 1 of 4 beats",
+        "validation — underfills the 4/4 bar: notes sum to 1 of 4 beats"
+      ]
+    },
+    {
+      "featureId": "24h.fp-on-main",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "incorrect",
+      "cause": [
+        "importer",
+        "MNX representation",
+        "layout/SVG engine"
+      ],
+      "reason": "The fp survives, but its measure-fraction 0 position draws directly under the grace head (about 4 units away), over 25 units left of the main head named by the manifest. Zero-time grace and principal share a metric position.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24h-GraceNote-Simultaneous/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24h-GraceNote-Simultaneous/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24h-GraceNote-Simultaneous/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/workbench/24h-GraceNote-Simultaneous/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24h.fp-on-main",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "incorrect",
+      "cause": [
+        "importer",
+        "MNX representation",
+        "layout/SVG engine"
+      ],
+      "reason": "The fp survives, but its measure-fraction 0 position draws directly under the grace head (about 4 units away), over 25 units left of the main head named by the manifest. Zero-time grace and principal share a metric position.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24h-GraceNote-Simultaneous/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24h-GraceNote-Simultaneous/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24h-GraceNote-Simultaneous/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/studio/24h-GraceNote-Simultaneous/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24h.voices-without-grace",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Both shells keep the opening rest/offset on P1's third staff and the lower P2 rest, without inventing grace notes on either voice.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24h-GraceNote-Simultaneous/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24h-GraceNote-Simultaneous/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/workbench/24h-GraceNote-Simultaneous/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/workbench/24h-GraceNote-Simultaneous/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "24h.voices-without-grace",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Both shells keep the opening rest/offset on P1's third staff and the lower P2 rest, without inventing grace notes on either voice.",
+      "observationEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24h-GraceNote-Simultaneous/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24h-GraceNote-Simultaneous/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-grace-evidence/studio/24h-GraceNote-Simultaneous/notation-0.svg",
+      "screenshotEvidence": [
+        "harness/fixtures/musicxml-grace-evidence/studio/24h-GraceNote-Simultaneous/notation-0-0.png"
+      ],
+      "diagnosticTitles": []
+    }
+  ],
+  "unresolvedCases": [
+    {
+      "featureId": "24f.p01.m01.g01",
+      "reason": "The original omits <grace slash>; its manifest explicitly leaves slash interpretation to applications. The drawn slash is not judged incorrect."
+    },
+    {
+      "fixture": "24a-GraceNotes",
+      "reason": "Three bar-3 grace elements omit slash; the pinned source/description does not select a default. Their pitch/value/size are judged, the slash choice is left open."
+    },
+    {
+      "featureId": "24d.steal-time-percentages",
+      "reason": "The 20-percent playback directives are nonvisual and lost structurally; this render pass does not measure playback or authoring."
+    }
+  ],
+  "deduplication": {
+    "completed22": "Ordinary clefs, 4/4 and common symbols are already covered by item 22. The source 24g bar contains one principal quarter and intentionally underfills 4/4; this validation diagnostic is not a grace render failure.",
+    "completed23": "Every Studio XML version is current/editable after the version-title workflow. No grace authoring or GP storage route is credited by these captures.",
+    "proposed31": "Tuplet item 31's single-note staccato/tremolo import is distinct from these grace spanner, staff and zero-time dynamic issues.",
+    "proposed32": "Source-grounded grace spanner drawing, cross-staff placement and dynamic anchoring warrant one bounded follow-up."
+  }
+}

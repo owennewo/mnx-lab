@@ -1,0 +1,55 @@
+{
+  "id": "24a-GraceNotes",
+  "sourceSha256": "872293a5844f5983351cf1836e227b94e0f68bcf9e7228591ff250537fde760e",
+  "testClass": "feature",
+  "description": "Different kinds of grace notes. First measure: single 1/16 grace note, two beamed 1/16 grace notes, 1/16 appoggiatura, 1/8 appoggiatura. Second measure: slashed single 1/16 grace note, two beamed 1/16 grace notes (with both notes marked as slashed), 1/16 acciaccatura, 1/16 grace note (without slash) right before the bar line. Third measure: no grace note before chord, 1/4 grace note with sharp, two 1/4 grace notes with flats, 1/16 slashed grace note with natural before a quarter rest.",
+  "views": [
+    {
+      "scrollTarget": "frame",
+      "visibleWidth": 1060,
+      "visibleHeight": 870,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0,
+          1,
+          2
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [],
+      "scrollWidth": 1060,
+      "scrollHeight": 870,
+      "clientWidth": 1060,
+      "clientHeight": 870,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "suppliedLibraryTitle": "24a-GraceNotes",
+  "makeCurrentError": null,
+  "entryPath": "Local operator ingest: GP seed + unmodified XML original; Save → Versions → View XML → Make current",
+  "importError": null,
+  "viewingOriginal": false,
+  "editingSuspended": false,
+  "warnings": [],
+  "importedDocumentSha256": "694a90779e0c15abbd1ba3dd4246eda0d142ed9495435db495ef814d5ee1fdce",
+  "displayOptions": {
+    "lyrics": "current",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

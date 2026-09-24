@@ -1,0 +1,271 @@
+{
+  "kind": "retained original-file desktop browser render evidence",
+  "applicationCommit": "72b21d716d001fa80a0214c60856dccc6a3998df",
+  "corpusRevision": "77c19f7e819154c70ca1a1992e80dcda8ff82fea",
+  "files": [
+    {
+      "path": "studio/24a-GraceNotes/document.mnx.json",
+      "sha256": "14c02376284e865e97fdc10165d730f4206e89582f5bedcb248d1b20e493d1c5"
+    },
+    {
+      "path": "studio/24a-GraceNotes/notation-0-0.png",
+      "sha256": "92280be7d346eaf95650e2414c474adda59d4da3e6f61a2787b4d36ca9331c0a"
+    },
+    {
+      "path": "studio/24a-GraceNotes/notation-0.svg",
+      "sha256": "f838955a5309e9bb2a6f02717037ab65003e28ef2d2b127d8906aecda50bf29c"
+    },
+    {
+      "path": "studio/24a-GraceNotes/observation.json",
+      "sha256": "b23b15cf72eb9f43aafd1894b225628ad16b36ac0ea0f10550fc4d0eaf96f4a9"
+    },
+    {
+      "path": "studio/24b-ChordAsGraceNote/document.mnx.json",
+      "sha256": "f90aa68e6782db19b39057f3bafa6819b020e6af2b4b767cd4d50caa9132ccc2"
+    },
+    {
+      "path": "studio/24b-ChordAsGraceNote/notation-0-0.png",
+      "sha256": "275576a636a4cca372ee45d0eb96ffb17098d5fdb2f0f00060f1d1d5b8064a67"
+    },
+    {
+      "path": "studio/24b-ChordAsGraceNote/notation-0.svg",
+      "sha256": "e8890f90c09af4cf3c23922a5b6227adb6875e62efb2b8a8f40490c4831f1039"
+    },
+    {
+      "path": "studio/24b-ChordAsGraceNote/observation.json",
+      "sha256": "bbbe5f467ccd8e2a1e54b96a7b14fb11fa58493af1ec7e7051631e044d7d6ef1"
+    },
+    {
+      "path": "studio/24c-GraceNote-MeasureEnd/document.mnx.json",
+      "sha256": "7719a2645fd060851ebaac05791b0e3131083a3df4af3992c477247b7bfb2197"
+    },
+    {
+      "path": "studio/24c-GraceNote-MeasureEnd/notation-0-0.png",
+      "sha256": "2ee504683584d872a82107031bb92bbb0286223e53b99518de38346785d84dd5"
+    },
+    {
+      "path": "studio/24c-GraceNote-MeasureEnd/notation-0.svg",
+      "sha256": "606c28e45e363aee3ef511c87ecae6badb4044f790818db7915afa2b047b4706"
+    },
+    {
+      "path": "studio/24c-GraceNote-MeasureEnd/observation.json",
+      "sha256": "94be87c69b4e01376739f295a6edf1feea5fcf59bb798fe998dd57f112acd94b"
+    },
+    {
+      "path": "studio/24d-AfterGrace/document.mnx.json",
+      "sha256": "490a9a83537f89d049d9f7e822a7b2556bac1a6e62a620e0d96d8d6438cc7477"
+    },
+    {
+      "path": "studio/24d-AfterGrace/notation-0-0.png",
+      "sha256": "31d3d29968eccfca1c50c65db280d7d0e33a5599e308465aab2e6606baa9bb2b"
+    },
+    {
+      "path": "studio/24d-AfterGrace/notation-0.svg",
+      "sha256": "6f395434ab717f7fba88359250916f6c7b150d8c9b13b1554a239615528994fa"
+    },
+    {
+      "path": "studio/24d-AfterGrace/observation.json",
+      "sha256": "126ee837a528c10e9741128f8ff9cdad63853c79b54381ce382b490763da007a"
+    },
+    {
+      "path": "studio/24e-GraceNote-StaffChange/document.mnx.json",
+      "sha256": "fb1f5f37d72149f1b3111fa04e28712be52cd26225f0386ecdb82a6c8ba9acc9"
+    },
+    {
+      "path": "studio/24e-GraceNote-StaffChange/notation-0-0.png",
+      "sha256": "969adc102e711567b7c875b44f6acfde6c364daac637c34d00331b8889c5e44f"
+    },
+    {
+      "path": "studio/24e-GraceNote-StaffChange/notation-0.svg",
+      "sha256": "c79ea0e33ff46f38ef329f0868635171c197bf164dd4ea860570feb793d50c93"
+    },
+    {
+      "path": "studio/24e-GraceNote-StaffChange/observation.json",
+      "sha256": "fce6247d437b01cc0a0b10bfa4d573b6e28fb56c98932453e680d187bb2c4033"
+    },
+    {
+      "path": "studio/24f-GraceNote-Slur/document.mnx.json",
+      "sha256": "978c453f505fe43cd8c38ac11360fda1b133f57589917134c92e0f155ae12c7f"
+    },
+    {
+      "path": "studio/24f-GraceNote-Slur/notation-0-0.png",
+      "sha256": "0a00424cde9e91001bade79adfb9f21dc0dff872218fa8493b76bd6a368aff3b"
+    },
+    {
+      "path": "studio/24f-GraceNote-Slur/notation-0.svg",
+      "sha256": "455295515fa170db100308d3231af310a8076e8a7b9cd10ca9e600964ad331b5"
+    },
+    {
+      "path": "studio/24f-GraceNote-Slur/observation.json",
+      "sha256": "db18b1919a30dfc4dc1858bcb5e1882525451a792976cd91ee62733673078a84"
+    },
+    {
+      "path": "studio/24g-GraceNote-Dynamics/document.mnx.json",
+      "sha256": "e0ee3abc7a333a7f81297d9c5674dfdf96a938625e8089ba778bb5eb40997684"
+    },
+    {
+      "path": "studio/24g-GraceNote-Dynamics/notation-0-0.png",
+      "sha256": "374b747394704b1a7c066f2163774a7f1f10c297ad8ba273300e8cae298897bf"
+    },
+    {
+      "path": "studio/24g-GraceNote-Dynamics/notation-0.svg",
+      "sha256": "615736709c611101bc81582a798d71bd3f8f5a1cae7ec0043f3edddaf891265f"
+    },
+    {
+      "path": "studio/24g-GraceNote-Dynamics/observation.json",
+      "sha256": "3cf5ad7474b0114af2bfd6c9e9c27f5477b7908f4ab281cc907dcfbffa71b35b"
+    },
+    {
+      "path": "studio/24h-GraceNote-Simultaneous/document.mnx.json",
+      "sha256": "e7b8e5e9fd2dc75357fcccad804cedf7730f47153bbcd55692e24bd9d2218034"
+    },
+    {
+      "path": "studio/24h-GraceNote-Simultaneous/notation-0-0.png",
+      "sha256": "85147b2846d0afa2e70955aafb111d03c29caddf35e851a2ec43b7114d9b79d4"
+    },
+    {
+      "path": "studio/24h-GraceNote-Simultaneous/notation-0.svg",
+      "sha256": "339a3c9c0ea0788f4430f9d84011271126d46ca0df0874c0fa567fee9c7f3336"
+    },
+    {
+      "path": "studio/24h-GraceNote-Simultaneous/observation.json",
+      "sha256": "795329364654018f77323ad51e28148d206fe9a09dbe1e70fe3f299eec0dea3c"
+    },
+    {
+      "path": "studio/index.json",
+      "sha256": "57b18c06ea9ff055da04274cb453a6155f09b234aa5f6ef672bdd5708c853475"
+    },
+    {
+      "path": "workbench/24a-GraceNotes/document.mnx.json",
+      "sha256": "14c02376284e865e97fdc10165d730f4206e89582f5bedcb248d1b20e493d1c5"
+    },
+    {
+      "path": "workbench/24a-GraceNotes/notation-0-0.png",
+      "sha256": "efd568aff538818d77f0844e0f589e5178000fdacc5ca6d8cd5ad0afed24c704"
+    },
+    {
+      "path": "workbench/24a-GraceNotes/notation-0.svg",
+      "sha256": "52b37d1cde1dc36a6bb7f191993ef713c3606e02b55355cc1cce7ebed2803568"
+    },
+    {
+      "path": "workbench/24a-GraceNotes/observation.json",
+      "sha256": "a50ce32c60b75ce6eec3e95a6e793bfb4be6c2c1d4574d3ee5b092c0d7d46927"
+    },
+    {
+      "path": "workbench/24b-ChordAsGraceNote/document.mnx.json",
+      "sha256": "f90aa68e6782db19b39057f3bafa6819b020e6af2b4b767cd4d50caa9132ccc2"
+    },
+    {
+      "path": "workbench/24b-ChordAsGraceNote/notation-0-0.png",
+      "sha256": "1548302e1feb4b6bb4943cddccbb28fe59850a77f9d840494e6f725b656f5152"
+    },
+    {
+      "path": "workbench/24b-ChordAsGraceNote/notation-0.svg",
+      "sha256": "91348de0a1783077b68c969a5800335cd7f28718dfa623b4d8db8c7a2560edff"
+    },
+    {
+      "path": "workbench/24b-ChordAsGraceNote/observation.json",
+      "sha256": "374fb8f95f9223c03d8d3907f4bd956766e8ca222b9b1daa55e522adfbfd86bf"
+    },
+    {
+      "path": "workbench/24c-GraceNote-MeasureEnd/document.mnx.json",
+      "sha256": "7719a2645fd060851ebaac05791b0e3131083a3df4af3992c477247b7bfb2197"
+    },
+    {
+      "path": "workbench/24c-GraceNote-MeasureEnd/notation-0-0.png",
+      "sha256": "67707cd733f22b83ad0609e57ddd1aca1d4752fe6c4dea9eb5d8189337faf15b"
+    },
+    {
+      "path": "workbench/24c-GraceNote-MeasureEnd/notation-0.svg",
+      "sha256": "606c28e45e363aee3ef511c87ecae6badb4044f790818db7915afa2b047b4706"
+    },
+    {
+      "path": "workbench/24c-GraceNote-MeasureEnd/observation.json",
+      "sha256": "6dfd3fe975d55ee75df0ba15ce3ac677603707531a7af55c5c077cc96f13e52d"
+    },
+    {
+      "path": "workbench/24d-AfterGrace/document.mnx.json",
+      "sha256": "490a9a83537f89d049d9f7e822a7b2556bac1a6e62a620e0d96d8d6438cc7477"
+    },
+    {
+      "path": "workbench/24d-AfterGrace/notation-0-0.png",
+      "sha256": "e607291c8193426e2d3e307a4eeef587b31cda19fa318e6b194ca432350e8fe0"
+    },
+    {
+      "path": "workbench/24d-AfterGrace/notation-0.svg",
+      "sha256": "c85ea5cdea880ddd943c91bf14ae37c4447749f3b88a4e2fa7e5905b5dbd092b"
+    },
+    {
+      "path": "workbench/24d-AfterGrace/observation.json",
+      "sha256": "6a15cf6a2f209a3ac8c816d660e41e1fa12b9947ad4d4c17a82a9cd46d117811"
+    },
+    {
+      "path": "workbench/24e-GraceNote-StaffChange/document.mnx.json",
+      "sha256": "fb1f5f37d72149f1b3111fa04e28712be52cd26225f0386ecdb82a6c8ba9acc9"
+    },
+    {
+      "path": "workbench/24e-GraceNote-StaffChange/notation-0-0.png",
+      "sha256": "b4844340bed5082a3657ba4ec43e4b60173ba8a64b976a8b0b38c3ab3c363952"
+    },
+    {
+      "path": "workbench/24e-GraceNote-StaffChange/notation-0.svg",
+      "sha256": "250d676f8787e7e71033200db7f75ba1545a564874df116db7f9e26caee9bd04"
+    },
+    {
+      "path": "workbench/24e-GraceNote-StaffChange/observation.json",
+      "sha256": "2cb58d2205d2ec45a90314555813278f87e5a59adecfdff091a0c2df9f5c0c79"
+    },
+    {
+      "path": "workbench/24f-GraceNote-Slur/document.mnx.json",
+      "sha256": "978c453f505fe43cd8c38ac11360fda1b133f57589917134c92e0f155ae12c7f"
+    },
+    {
+      "path": "workbench/24f-GraceNote-Slur/notation-0-0.png",
+      "sha256": "3af66aa2ae962efdea7cf502e8eff1ba9c2345bdef194fe239298ac7c4779bc4"
+    },
+    {
+      "path": "workbench/24f-GraceNote-Slur/notation-0.svg",
+      "sha256": "455295515fa170db100308d3231af310a8076e8a7b9cd10ca9e600964ad331b5"
+    },
+    {
+      "path": "workbench/24f-GraceNote-Slur/observation.json",
+      "sha256": "d2fa82f25689b82673d231038549a2e6ac3650656071cae93d906e414e78b0dd"
+    },
+    {
+      "path": "workbench/24g-GraceNote-Dynamics/document.mnx.json",
+      "sha256": "e0ee3abc7a333a7f81297d9c5674dfdf96a938625e8089ba778bb5eb40997684"
+    },
+    {
+      "path": "workbench/24g-GraceNote-Dynamics/notation-0-0.png",
+      "sha256": "7987d34a154d89ccd11b37c50d07d8943faa52009de0bb54d0a1cd9667e532b6"
+    },
+    {
+      "path": "workbench/24g-GraceNote-Dynamics/notation-0.svg",
+      "sha256": "615736709c611101bc81582a798d71bd3f8f5a1cae7ec0043f3edddaf891265f"
+    },
+    {
+      "path": "workbench/24g-GraceNote-Dynamics/observation.json",
+      "sha256": "414d8d61630ca182c4bc3104ff9009df14c53175ef93ec4bbcb3573723d3b6eb"
+    },
+    {
+      "path": "workbench/24h-GraceNote-Simultaneous/document.mnx.json",
+      "sha256": "e7b8e5e9fd2dc75357fcccad804cedf7730f47153bbcd55692e24bd9d2218034"
+    },
+    {
+      "path": "workbench/24h-GraceNote-Simultaneous/notation-0-0.png",
+      "sha256": "751bb62b76dbe96cc92d7f6d91522da212ca99e3821ca91d446cd5d44370fb96"
+    },
+    {
+      "path": "workbench/24h-GraceNote-Simultaneous/notation-0.svg",
+      "sha256": "339a3c9c0ea0788f4430f9d84011271126d46ca0df0874c0fa567fee9c7f3336"
+    },
+    {
+      "path": "workbench/24h-GraceNote-Simultaneous/observation.json",
+      "sha256": "1d7415b980bcff109b8103b3c091677535b0a71f14a871c5cb4289755c412865"
+    },
+    {
+      "path": "workbench/index.json",
+      "sha256": "1cea084f57bb00988cecfa40e6dbf417fab8841b95edadfd977a0d272b7464a7"
+    }
+  ]
+}

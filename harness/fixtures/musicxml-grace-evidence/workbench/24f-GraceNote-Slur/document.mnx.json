@@ -1,0 +1,107 @@
+{
+  "mnx": {
+    "version": 1
+  },
+  "global": {
+    "measures": [
+      {
+        "key": {
+          "fifths": 0
+        },
+        "time": {
+          "count": 4,
+          "unit": 4,
+          "display": "common"
+        }
+      }
+    ]
+  },
+  "parts": [
+    {
+      "id": "P1",
+      "name": "MusicXML Part",
+      "measures": [
+        {
+          "clefs": [
+            {
+              "clef": {
+                "sign": "G",
+                "staffPosition": -2
+              }
+            }
+          ],
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "half"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "E",
+                        "octave": 5
+                      },
+                      "id": "n-1-1-v1-0-0"
+                    }
+                  ]
+                },
+                {
+                  "type": "grace",
+                  "content": [
+                    {
+                      "duration": {
+                        "base": "16th"
+                      },
+                      "notes": [
+                        {
+                          "pitch": {
+                            "step": "G",
+                            "octave": 5
+                          },
+                          "id": "n-1-1-v1-1-0"
+                        }
+                      ],
+                      "id": "e-1-v1-1",
+                      "slurs": [
+                        {
+                          "target": "e-1-v1-2"
+                        }
+                      ]
+                    }
+                  ],
+                  "graceType": "stealPrevious"
+                },
+                {
+                  "duration": {
+                    "base": "half"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "E",
+                        "octave": 5
+                      },
+                      "id": "n-1-1-v1-2-0"
+                    }
+                  ],
+                  "id": "e-1-v1-2"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "_x": {
+    "mnxLab": {
+      "encoding": {
+        "software": "musicxml-mnx",
+        "version": "0.1.0"
+      }
+    }
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "id": "24h-GraceNote-Simultaneous",
+  "sourceSha256": "0f0e102375b689883769d633c1e44f195f18ffeb754f6b212f2e5aaf427153ff",
+  "testClass": "feature",
+  "description": "Simultaneous grace notes and grace note groups of different length starting a part or a voice. The topmost three staves are voices 1 to 3 of part ‘P1’, with no grace notes in the third staff and music starting on the second beat. There is also an ‘fp’ on the main note of the first staff. The bottommost two staves are voices 1 and 2 of part ‘P2’, with no grace notes in the lowest staff.",
+  "views": [
+    {
+      "scrollTarget": "viewer",
+      "visibleWidth": 750,
+      "visibleHeight": 789.125,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [],
+      "scrollWidth": 750,
+      "scrollHeight": 789,
+      "clientWidth": 750,
+      "clientHeight": 789,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "importError": null,
+  "warnings": [],
+  "importedDocumentSha256": "c574e47c6899157afa0fe0ca18c94aca39407dfb28f9f2cd06f9e9c0863114d3",
+  "displayOptions": {
+    "lyrics": "current",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

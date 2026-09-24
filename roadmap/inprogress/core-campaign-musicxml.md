@@ -219,6 +219,7 @@ deliberately **not** enumerated in advance: item 8 decides them from evidence.
 | 29 | [Chord fidelity](../proposed/core-musicxml-chord-fidelity.md) | Keep forced tie sides and first-bar ornaments, diagnose member-specific tremolo and implicit pickup losses pending carriers, and prevent silent cross-voice onset shifts. Deduplicates item 24's accidental-policy work. | accuracy | 21a–21i source/import/current both-shell notation evidence | **proposed 2026-09-24** |
 | 30 | [Notehead fidelity](../proposed/core-musicxml-notehead-fidelity.md) | Diagnose and preserve per-note head shape/fill/enclosure, slash spans, hidden note ink and chord-member labels. Deduplicates item 22's zero-line warning and item 25's rest-height work. | accuracy | 22a–22d source/import/current both-shell notation evidence | **proposed 2026-09-24** |
 | 31 | [Tuplet fidelity](../proposed/core-musicxml-tuplet-fidelity.md) | Restore performed duration and nested groups, carry explicit tuplet display, and import simple staccato/single-note tremolo marks. Keep 23b's manifest/XML conflict and 23f's marker-free grouping qualified. | accuracy | 23a–23f source/import/current both-shell notation evidence | **proposed 2026-09-24** |
+| 32 | [Grace fidelity](../proposed/core-musicxml-grace-fidelity.md) | Draw grace-origin slurs/ties and staff-2 grace notes from retained MNX fields; resolve grace-local dynamic/wedge attachment where metric fractions coincide. Keep playback stealing and absent slash defaults separately qualified. | accuracy | 24a–24h source/import/current both-shell notation evidence | **proposed 2026-09-24** |
 | — | Feature parity | Dynamics, wedges, spanners, ottavas, articulations, SMuFL glyph names, percussion, layout breaks. **Deliberately unenumerated**: item 8 turns these into a ranked queue with evidence, and each becomes its own row when picked up. Note the schema already has `dynamic-*`, `ottava`, `slur` and `wedge-type` as standard objects — but **no pedal def**, so pedal is contract clause 2's first real test. | accuracy | 1 + 2 + 3 | not yet rows |
 
 ### Item 8's derivation rule
@@ -252,6 +253,23 @@ exactly as `verified` already works here. No backend: a generated JSON artifact
 committed to the repo, like `worker/models.json`.
 
 ## Progress + learnings
+
+### 2026-09-24 — item 18: 24-series grace rendering slice
+
+[The eight-source original-file review](../../docs/musicxml-grace-assessment.md)
+adds 40 stable features, 75 notes, 24 grace groups, 58 controls and 157
+source variants. Current Workbench and editable Studio gave 80 Notation
+feature × shell rows: 62 correct, 8 incorrect, 8 missing and 2 nonvisual.
+Both shells imported the same pitches, written values and grace counts. The
+missing curves in `24a`/`24b`/`24f` have surviving MNX slur/tie targets;
+`24e` retains staff 2 in MNX but draws the graces on staff 1. In `24g`,
+grace and principal dynamics overlap at fraction zero and the wedge has no
+ink; `24h`'s `fp` is displaced to its preceding grace. [Proposed item
+32](../proposed/core-musicxml-grace-fidelity.md) owns those new gaps. The
+`24d` steal-time percentages are nonvisual and lost structurally; an absent
+slash in `24f` or `24a` bar 3 does not prescribe a display choice. Detailed
+current render coverage is now 70/183 originals; item 18 and item 19 remain
+open.
 
 ### 2026-09-24 — item 18: 23-series tuplet rendering slice
 

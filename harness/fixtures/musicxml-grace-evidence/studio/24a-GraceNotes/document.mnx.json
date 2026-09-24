@@ -1,0 +1,583 @@
+{
+  "mnx": {
+    "version": 1,
+    "support": {
+      "useBeams": true,
+      "useAccidentalDisplay": true
+    }
+  },
+  "global": {
+    "measures": [
+      {
+        "key": {
+          "fifths": 0
+        },
+        "time": {
+          "count": 4,
+          "unit": 4,
+          "display": "common"
+        }
+      },
+      {},
+      {
+        "barline": {
+          "type": "final"
+        }
+      }
+    ]
+  },
+  "parts": [
+    {
+      "id": "P1",
+      "name": "MusicXML Part",
+      "measures": [
+        {
+          "clefs": [
+            {
+              "clef": {
+                "sign": "G",
+                "staffPosition": -2
+              }
+            }
+          ],
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "type": "grace",
+                  "content": [
+                    {
+                      "duration": {
+                        "base": "16th"
+                      },
+                      "notes": [
+                        {
+                          "pitch": {
+                            "step": "D",
+                            "octave": 5
+                          },
+                          "id": "n-1-1-v1-0-0"
+                        }
+                      ]
+                    }
+                  ],
+                  "graceType": "stealFollowing",
+                  "slash": false
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-1-v1-1-0"
+                    }
+                  ]
+                },
+                {
+                  "type": "grace",
+                  "content": [
+                    {
+                      "duration": {
+                        "base": "16th"
+                      },
+                      "notes": [
+                        {
+                          "pitch": {
+                            "step": "E",
+                            "octave": 5
+                          },
+                          "id": "n-1-1-v1-2-0"
+                        }
+                      ],
+                      "id": "e-beam-1"
+                    },
+                    {
+                      "duration": {
+                        "base": "16th"
+                      },
+                      "notes": [
+                        {
+                          "pitch": {
+                            "step": "D",
+                            "octave": 5
+                          },
+                          "id": "n-1-1-v1-3-0"
+                        }
+                      ],
+                      "id": "e-beam-2"
+                    }
+                  ],
+                  "graceType": "stealFollowing",
+                  "slash": false
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-1-v1-4-0"
+                    }
+                  ]
+                },
+                {
+                  "type": "grace",
+                  "content": [
+                    {
+                      "duration": {
+                        "base": "16th"
+                      },
+                      "notes": [
+                        {
+                          "pitch": {
+                            "step": "D",
+                            "octave": 5
+                          },
+                          "id": "n-1-1-v1-5-0"
+                        }
+                      ],
+                      "id": "e-1-v1-5",
+                      "slurs": [
+                        {
+                          "target": "e-1-v1-6"
+                        }
+                      ]
+                    }
+                  ],
+                  "graceType": "stealFollowing",
+                  "slash": false
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-1-v1-6-0"
+                    }
+                  ],
+                  "id": "e-1-v1-6"
+                },
+                {
+                  "type": "grace",
+                  "content": [
+                    {
+                      "duration": {
+                        "base": "eighth"
+                      },
+                      "notes": [
+                        {
+                          "pitch": {
+                            "step": "D",
+                            "octave": 5
+                          },
+                          "id": "n-1-1-v1-7-0"
+                        }
+                      ],
+                      "id": "e-1-v1-7",
+                      "slurs": [
+                        {
+                          "target": "e-1-v1-8"
+                        }
+                      ]
+                    }
+                  ],
+                  "graceType": "stealFollowing",
+                  "slash": false
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-1-v1-8-0"
+                    }
+                  ],
+                  "id": "e-1-v1-8"
+                }
+              ]
+            }
+          ],
+          "beams": [
+            {
+              "events": [
+                "e-beam-1",
+                "e-beam-2"
+              ],
+              "beams": [
+                {
+                  "events": [
+                    "e-beam-1",
+                    "e-beam-2"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "type": "grace",
+                  "content": [
+                    {
+                      "duration": {
+                        "base": "16th"
+                      },
+                      "notes": [
+                        {
+                          "pitch": {
+                            "step": "D",
+                            "octave": 5
+                          },
+                          "id": "n-1-2-v1-0-0"
+                        }
+                      ]
+                    }
+                  ],
+                  "graceType": "stealPrevious"
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-2-v1-1-0"
+                    }
+                  ]
+                },
+                {
+                  "type": "grace",
+                  "content": [
+                    {
+                      "duration": {
+                        "base": "16th"
+                      },
+                      "notes": [
+                        {
+                          "pitch": {
+                            "step": "E",
+                            "octave": 5
+                          },
+                          "id": "n-1-2-v1-2-0"
+                        }
+                      ],
+                      "id": "e-beam-3"
+                    },
+                    {
+                      "duration": {
+                        "base": "16th"
+                      },
+                      "notes": [
+                        {
+                          "pitch": {
+                            "step": "D",
+                            "octave": 5
+                          },
+                          "id": "n-1-2-v1-3-0"
+                        }
+                      ],
+                      "id": "e-beam-4"
+                    }
+                  ],
+                  "graceType": "stealPrevious"
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-2-v1-4-0"
+                    }
+                  ]
+                },
+                {
+                  "type": "grace",
+                  "content": [
+                    {
+                      "duration": {
+                        "base": "16th"
+                      },
+                      "notes": [
+                        {
+                          "pitch": {
+                            "step": "D",
+                            "octave": 5
+                          },
+                          "id": "n-1-2-v1-5-0"
+                        }
+                      ],
+                      "id": "e-2-v1-5",
+                      "slurs": [
+                        {
+                          "target": "e-2-v1-6"
+                        }
+                      ]
+                    }
+                  ],
+                  "graceType": "stealPrevious"
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-2-v1-6-0"
+                    }
+                  ],
+                  "id": "e-2-v1-6"
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-2-v1-7-0"
+                    }
+                  ]
+                },
+                {
+                  "type": "grace",
+                  "content": [
+                    {
+                      "duration": {
+                        "base": "16th"
+                      },
+                      "notes": [
+                        {
+                          "pitch": {
+                            "step": "E",
+                            "octave": 5
+                          },
+                          "id": "n-1-2-v1-8-0"
+                        }
+                      ]
+                    }
+                  ],
+                  "graceType": "stealFollowing",
+                  "slash": false
+                }
+              ]
+            }
+          ],
+          "beams": [
+            {
+              "events": [
+                "e-beam-3",
+                "e-beam-4"
+              ],
+              "beams": [
+                {
+                  "events": [
+                    "e-beam-3",
+                    "e-beam-4"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "F",
+                        "octave": 4
+                      },
+                      "id": "n-1-3-v1-0-0"
+                    },
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-3-v1-0-1"
+                    }
+                  ]
+                },
+                {
+                  "type": "grace",
+                  "content": [
+                    {
+                      "duration": {
+                        "base": "quarter"
+                      },
+                      "notes": [
+                        {
+                          "pitch": {
+                            "step": "D",
+                            "octave": 5,
+                            "alter": 1
+                          },
+                          "accidentalDisplay": {
+                            "show": true
+                          },
+                          "id": "n-1-3-v1-1-0"
+                        }
+                      ]
+                    }
+                  ],
+                  "graceType": "stealPrevious"
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-3-v1-2-0"
+                    }
+                  ]
+                },
+                {
+                  "type": "grace",
+                  "content": [
+                    {
+                      "duration": {
+                        "base": "quarter"
+                      },
+                      "notes": [
+                        {
+                          "pitch": {
+                            "step": "D",
+                            "octave": 5,
+                            "alter": -1
+                          },
+                          "accidentalDisplay": {
+                            "show": true
+                          },
+                          "id": "n-1-3-v1-3-0"
+                        }
+                      ]
+                    },
+                    {
+                      "duration": {
+                        "base": "quarter"
+                      },
+                      "notes": [
+                        {
+                          "pitch": {
+                            "step": "A",
+                            "octave": 4,
+                            "alter": -1
+                          },
+                          "accidentalDisplay": {
+                            "show": true
+                          },
+                          "id": "n-1-3-v1-4-0"
+                        }
+                      ]
+                    }
+                  ],
+                  "graceType": "stealPrevious"
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-3-v1-5-0"
+                    }
+                  ]
+                },
+                {
+                  "type": "grace",
+                  "content": [
+                    {
+                      "duration": {
+                        "base": "16th"
+                      },
+                      "notes": [
+                        {
+                          "pitch": {
+                            "step": "D",
+                            "octave": 5
+                          },
+                          "id": "n-1-3-v1-6-0"
+                        }
+                      ]
+                    }
+                  ],
+                  "graceType": "stealPrevious"
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "rest": {}
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "_x": {
+    "mnxLab": {
+      "encoding": {
+        "software": "musicxml-mnx",
+        "version": "0.1.0"
+      }
+    }
+  }
+}

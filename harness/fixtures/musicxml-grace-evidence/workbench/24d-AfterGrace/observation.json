@@ -1,0 +1,48 @@
+{
+  "id": "24d-AfterGrace",
+  "sourceSha256": "bd385f38d91b45425bb7bb3d6b0d13f8b349dc4caf1750f3e7b62c831bfbaf1f",
+  "testClass": "feature",
+  "description": "Some grace notes and after-graces indicated by ‘steal-time-previous’ (for the first grace note) and ‘steal-time-following’ (for the second one). The remaining grace notes have no such attribute.",
+  "views": [
+    {
+      "scrollTarget": "viewer",
+      "visibleWidth": 750,
+      "visibleHeight": 789.125,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [],
+      "scrollWidth": 750,
+      "scrollHeight": 789,
+      "clientWidth": 750,
+      "clientHeight": 789,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "importError": null,
+  "warnings": [],
+  "importedDocumentSha256": "49f6b9c3d528e696011850bf7a9515ba143231d10a8d3aae88e99272b07cf86b",
+  "displayOptions": {
+    "lyrics": "current",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

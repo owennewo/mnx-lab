@@ -1,0 +1,56 @@
+{
+  "id": "24g-GraceNote-Dynamics",
+  "sourceSha256": "20d93574d3ff7081874f847e6034fb0f15c0de22e23a8a7423429841a1d8502f",
+  "testClass": "feature",
+  "description": "Grace notes in combination with dynamics. The ‘f’ sign is located on the first grace note (using a <direction> element), followed by a diminuendo wedge, and the ‘p’ sign is on the main beat (again using <direction>).",
+  "views": [
+    {
+      "scrollTarget": "frame",
+      "visibleWidth": 1060,
+      "visibleHeight": 870,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [
+        "validation — underfills the 4/4 bar: notes sum to 1 of 4 beats",
+        "validation — underfills the 4/4 bar: notes sum to 1 of 4 beats"
+      ],
+      "scrollWidth": 1060,
+      "scrollHeight": 870,
+      "clientWidth": 1060,
+      "clientHeight": 870,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "suppliedLibraryTitle": "24g-GraceNote-Dynamics",
+  "makeCurrentError": null,
+  "entryPath": "Local operator ingest: GP seed + unmodified XML original; Save → Versions → View XML → Make current",
+  "importError": null,
+  "viewingOriginal": false,
+  "editingSuspended": false,
+  "warnings": [],
+  "importedDocumentSha256": "d7cdf5e180fc2805213c394170951626212e2d78d7e81beff85d1847e54e8fa6",
+  "displayOptions": {
+    "lyrics": "current",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

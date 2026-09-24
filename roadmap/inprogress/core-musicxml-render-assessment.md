@@ -281,3 +281,21 @@ item 31](../proposed/core-musicxml-tuplet-fidelity.md) owns the new gaps.
 The `23b` 17:2/17:3 source-description conflict and `23f` grouping
 ambiguity remain explicit. This raises detailed current render coverage to
 62/183 originals; item 18 and item 19 remain open.
+
+## Grace rendering batch, 2026-09-24
+
+[The eight 24a–24h originals](../../docs/musicxml-grace-assessment.md)
+now have 40 source-derived feature IDs, 157 note/group/control variants and
+80 current Notation feature × shell rows. Original-file Workbench and editable
+Studio imports, identical MNX, complete SVG/PNG captures, Show settings and
+no-scroll observations are retained. No known strings permit Tab/Both. All
+72 pitches and three rests survive. `24a`, `24b` and `24f` retain
+grace-origin slur/tie targets in MNX but draw no curves. `24e` retains staff 2
+on three grace events but draws them on staff 1. `24g` overprints distinct
+grace/main dynamics at fraction zero and omits the wedge; `24h` places its
+main-note `fp` under a preceding grace. [Proposed item 32](../proposed/core-musicxml-grace-fidelity.md)
+owns these new gaps, with a named carrier decision for zero-time direction
+attachment. `24d`'s two 20-percent playback attributes remain nonvisual and
+unassessed for playback; `24f`'s omitted slash is an allowed application
+choice. This raises detailed current render coverage to 70/183 originals;
+item 18 and item 19 remain open.
