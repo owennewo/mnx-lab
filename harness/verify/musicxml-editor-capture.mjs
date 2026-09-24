@@ -18,6 +18,7 @@ const origin = library?.origin;
 const session = library?.session ?? null;
 const filter = process.env.MUSICXML_CAPTURE_FILTER;
 const showMeters = process.env.MUSICXML_CAPTURE_TIME_SIGNATURES === 'show';
+const showAllLyrics = process.env.MUSICXML_CAPTURE_LYRICS === 'all';
 const manifest = JSON.parse(await fs.readFile(path.join(root, 'converters/fixtures/musicxml-suite/manifest.json')));
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 await fs.mkdir(output, { recursive: true });
@@ -127,6 +128,18 @@ try {
         await waitFor(c,`!!${pad}?.querySelector('[data-row="timeSignatures"]')`,'Time signatures setting');
         await c.evaluate(`(()=>{const b=${pad}.querySelector('[data-row="timeSignatures"]');if(b.textContent.trim()==='Hide')b.click();})()`);
         await waitFor(c,`${pad}.querySelector('[data-row="timeSignatures"]').textContent.trim()==='Show'`,'Show time signatures');
+        await c.evaluate(`[...${frame}.querySelectorAll('button')].find(b=>b.getAttribute('aria-label')==='Settings').click()`);
+        await settle();
+      }
+      if(showAllLyrics) {
+        const frame=`${page}.shadowRoot.querySelector('mnx-score-frame').shadowRoot`;
+        await c.evaluate(`[...${frame}.querySelectorAll('button')].find(b=>b.getAttribute('aria-label')==='Settings').click()`);
+        const pad=`${frame}.querySelector('mnx-settings-pad').shadowRoot`;
+        await waitFor(c,`!!${pad}?.querySelector('[data-row="lyrics"]')`,'Lyrics setting');
+        await c.evaluate(`${pad}.querySelector('[data-row="lyrics"]').click()`);
+        await waitFor(c,`!!${pad}.querySelector('[role="menu"]')`,'Lyrics menu');
+        await c.evaluate(`[...${pad}.querySelectorAll('[role="menuitemradio"]')].find(b=>b.textContent.trim()==='All verses').click()`);
+        await waitFor(c,`${pad}.querySelector('[data-row="lyrics"]').textContent.trim()==='All verses'`,'All verses setting');
         await c.evaluate(`[...${frame}.querySelectorAll('button')].find(b=>b.getAttribute('aria-label')==='Settings').click()`);
         await settle();
       }

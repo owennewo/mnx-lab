@@ -1,0 +1,102 @@
+{
+  "id": "22a-Noteheads",
+  "sourceSha256": "6cd9846cc8e03e7f4ad23e0cdbb51274d0e77f8ec56b5177e2c174b216dc9abe",
+  "testClass": "feature",
+  "description": "Different note styles, using the <notehead> element. First, each note head style is printed with four quarter notes, two with filled heads, two with unfilled heads, where first the stem is up and then the stem is down. After that, starting with measure 16, each note head style is printed with a half note (should have an unfilled head by default). Finally, starting with measure 23, Aiken note head styles are tested, once with stem up and once with stem down.",
+  "views": [
+    {
+      "scrollTarget": "viewer",
+      "visibleWidth": 750,
+      "visibleHeight": 753.125,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0,
+          1,
+          2
+        ],
+        [
+          3,
+          4,
+          5
+        ],
+        [
+          6,
+          7,
+          8
+        ],
+        [
+          9,
+          10,
+          11
+        ],
+        [
+          12,
+          13,
+          14
+        ],
+        [
+          15,
+          16,
+          17
+        ],
+        [
+          18,
+          19,
+          20
+        ],
+        [
+          21,
+          22,
+          23
+        ],
+        [
+          24,
+          25,
+          26
+        ],
+        [
+          27,
+          28,
+          29
+        ],
+        [
+          30,
+          31
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [],
+      "scrollWidth": 740,
+      "scrollHeight": 1426,
+      "clientWidth": 740,
+      "clientHeight": 753,
+      "screenshots": [
+        "notation-0-0.png",
+        "notation-0-653.png",
+        "notation-0-673.png"
+      ]
+    }
+  ],
+  "importError": null,
+  "warnings": [],
+  "importedDocumentSha256": "5fd49192a4b172835bb8d0dd5652273c840632f9639ad11220d1b2126a548a82",
+  "displayOptions": {
+    "lyrics": "all",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide",
+    "selectedVerse": "1"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

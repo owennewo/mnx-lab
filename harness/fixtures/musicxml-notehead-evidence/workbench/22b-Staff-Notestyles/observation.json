@@ -1,0 +1,60 @@
+{
+  "id": "22b-Staff-Notestyles",
+  "sourceSha256": "35b86b131a2005668e70f102284480ec26c599cd726443797993284ad85db798",
+  "testClass": "feature",
+  "description": "Staff-connected note styles: slash notation, hidden notes (with and without hidden staff lines). The lyrics (used as descriptive text) in bars 4 and 5 are visible due to the ‘print-lyric=\"yes\"’ attribute of <note>.",
+  "views": [
+    {
+      "scrollTarget": "viewer",
+      "visibleWidth": 750,
+      "visibleHeight": 753.125,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0,
+          1
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          4,
+          5
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [],
+      "scrollWidth": 750,
+      "scrollHeight": 753,
+      "clientWidth": 750,
+      "clientHeight": 753,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "importError": null,
+  "warnings": [
+    "part P1, measure 5, staff 1: unsupported staff configuration (0 staff lines); not represented in MNX."
+  ],
+  "importedDocumentSha256": "fb7f70b65ad8575fa63dda06c48fdd7f52d70becda9280300318cb53745abf0f",
+  "displayOptions": {
+    "lyrics": "all",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide",
+    "selectedVerse": "1"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

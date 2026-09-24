@@ -120,3 +120,10 @@ owns only the rest-family render findings. Direct rest authoring, undo/redo
 and save/reopen remain [write
 assessment item 19](../inprogress/core-musicxml-write-assessment.md) work;
 none is inferred from this rendering review.
+
+The later [22d notehead assessment](../../docs/musicxml-notehead-assessment.md)
+adds an E4-positioned quarter rest that imports as an unpositioned `rest: {}`
+and prints at the same height as the preceding unpositioned quarter rest.
+This is another source witness for the existing `rest.staffPosition`
+acceptance case, not a separate notehead-height task. Its parentheses
+belong to [item 30](core-musicxml-notehead-fidelity.md).

@@ -1,0 +1,293 @@
+{
+  "kind": "browser observations; not feature correctness or human verification",
+  "captureScriptSha256": "3de2f09e6d288ee54757a40cbeed8eafcf70dff5c03b0c0fac2eaf481ac0e951",
+  "shell": "workbench",
+  "applicationCommit": "dae3904660ffc32f4a39bf25a4fe1301db6a5228",
+  "corpusRevision": "77c19f7e819154c70ca1a1992e80dcda8ff82fea",
+  "viewport": {
+    "width": 1440,
+    "height": 1000,
+    "deviceScaleFactor": 1
+  },
+  "fixtures": [
+    {
+      "id": "22a-Noteheads",
+      "sourceSha256": "6cd9846cc8e03e7f4ad23e0cdbb51274d0e77f8ec56b5177e2c174b216dc9abe",
+      "testClass": "feature",
+      "description": "Different note styles, using the <notehead> element. First, each note head style is printed with four quarter notes, two with filled heads, two with unfilled heads, where first the stem is up and then the stem is down. After that, starting with measure 16, each note head style is printed with a half note (should have an unfilled head by default). Finally, starting with measure 23, Aiken note head styles are tested, once with stem up and once with stem down.",
+      "views": [
+        {
+          "scrollTarget": "viewer",
+          "visibleWidth": 750,
+          "visibleHeight": 753.125,
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0,
+              1,
+              2
+            ],
+            [
+              3,
+              4,
+              5
+            ],
+            [
+              6,
+              7,
+              8
+            ],
+            [
+              9,
+              10,
+              11
+            ],
+            [
+              12,
+              13,
+              14
+            ],
+            [
+              15,
+              16,
+              17
+            ],
+            [
+              18,
+              19,
+              20
+            ],
+            [
+              21,
+              22,
+              23
+            ],
+            [
+              24,
+              25,
+              26
+            ],
+            [
+              27,
+              28,
+              29
+            ],
+            [
+              30,
+              31
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [],
+          "scrollWidth": 740,
+          "scrollHeight": 1426,
+          "clientWidth": 740,
+          "clientHeight": 753,
+          "screenshots": [
+            "notation-0-0.png",
+            "notation-0-653.png",
+            "notation-0-673.png"
+          ]
+        }
+      ],
+      "importError": null,
+      "warnings": [],
+      "importedDocumentSha256": "5fd49192a4b172835bb8d0dd5652273c840632f9639ad11220d1b2126a548a82",
+      "displayOptions": {
+        "lyrics": "all",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide",
+        "selectedVerse": "1"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "22b-Staff-Notestyles",
+      "sourceSha256": "35b86b131a2005668e70f102284480ec26c599cd726443797993284ad85db798",
+      "testClass": "feature",
+      "description": "Staff-connected note styles: slash notation, hidden notes (with and without hidden staff lines). The lyrics (used as descriptive text) in bars 4 and 5 are visible due to the ‘print-lyric=\"yes\"’ attribute of <note>.",
+      "views": [
+        {
+          "scrollTarget": "viewer",
+          "visibleWidth": 750,
+          "visibleHeight": 753.125,
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0,
+              1
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              4,
+              5
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [],
+          "scrollWidth": 750,
+          "scrollHeight": 753,
+          "clientWidth": 750,
+          "clientHeight": 753,
+          "screenshots": [
+            "notation-0-0.png"
+          ]
+        }
+      ],
+      "importError": null,
+      "warnings": [
+        "part P1, measure 5, staff 1: unsupported staff configuration (0 staff lines); not represented in MNX."
+      ],
+      "importedDocumentSha256": "fb7f70b65ad8575fa63dda06c48fdd7f52d70becda9280300318cb53745abf0f",
+      "displayOptions": {
+        "lyrics": "all",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide",
+        "selectedVerse": "1"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "22c-Noteheads-Chords",
+      "sourceSha256": "e6e45947b2028bf8f60e80912da48939694264c6ec6870d5199be0ad996221ea",
+      "testClass": "feature",
+      "description": "Different note styles for individual notes inside a chord, using the <notehead> element.",
+      "views": [
+        {
+          "scrollTarget": "viewer",
+          "visibleWidth": 750,
+          "visibleHeight": 753.125,
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0,
+              1,
+              2,
+              3
+            ],
+            [
+              4,
+              5,
+              6
+            ],
+            [
+              7
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [],
+          "scrollWidth": 750,
+          "scrollHeight": 753,
+          "clientWidth": 750,
+          "clientHeight": 753,
+          "screenshots": [
+            "notation-0-0.png"
+          ]
+        }
+      ],
+      "importError": null,
+      "warnings": [],
+      "importedDocumentSha256": "2f326c307eac85b0131ddddd6ac876b14786ef20f46aff37263d447f4939d4be",
+      "displayOptions": {
+        "lyrics": "all",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide",
+        "selectedVerse": "1"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "22d-Parenthesized-Noteheads",
+      "sourceSha256": "d80aaeb960c5d55da1ea6f492ddd4394f62c332321f63b682522805691616b44",
+      "testClass": "feature",
+      "description": "Parenthesized note heads. A normal parenthesized note, a parenthesized note with an ‘x’ note head, a three-note chord with the middle note parenthesized, a three-note chord with all notes parenthesized, a normal quarter rest in parentheses, and a pitched quarter rest in parentheses.",
+      "views": [
+        {
+          "scrollTarget": "viewer",
+          "visibleWidth": 750,
+          "visibleHeight": 789.125,
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [],
+          "scrollWidth": 750,
+          "scrollHeight": 789,
+          "clientWidth": 750,
+          "clientHeight": 789,
+          "screenshots": [
+            "notation-0-0.png"
+          ]
+        }
+      ],
+      "importError": null,
+      "warnings": [
+        "part P1, measure 1: incompatible time symbol common for 6/4; retaining numeric meter."
+      ],
+      "importedDocumentSha256": "0975769cad4a4b86f2dee386db61d631cfd75e9cdd29088fc1a499b407c4927e",
+      "displayOptions": {
+        "lyrics": "all",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    }
+  ],
+  "browser": {
+    "protocolVersion": "1.3",
+    "product": "Chrome/153.0.8010.36",
+    "revision": "@507c6ee3e2f3b2ca0e660547e5b9ea4820c67f4c",
+    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+    "jsVersion": "15.3.76.10"
+  }
+}

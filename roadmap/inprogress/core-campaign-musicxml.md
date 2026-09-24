@@ -217,6 +217,7 @@ deliberately **not** enumerated in advance: item 8 decides them from evidence.
 | 27 | [Clef fidelity](../proposed/core-musicxml-clef-fidelity.md) | Import octave-transposing G/F clefs and diagnose TAB signs without known strings; ordinary clef coordinates and unsupported-sign containment remain completed item 22 work. | accuracy | 12a–12b source/import/current both-shell notation evidence | **proposed 2026-09-24** |
 | 28 | [Key fidelity](../proposed/core-musicxml-key-fidelity.md) | Draw full traditional ±8…±11 fifths and diagnose nontraditional, cancellation, midmeasure and hidden-key losses pending a carrier decision. Deduplicates item 22 note-pitch work and item 23 title work. | accuracy | 13a–13f source/import/current both-shell notation evidence | **proposed 2026-09-24** |
 | 29 | [Chord fidelity](../proposed/core-musicxml-chord-fidelity.md) | Keep forced tie sides and first-bar ornaments, diagnose member-specific tremolo and implicit pickup losses pending carriers, and prevent silent cross-voice onset shifts. Deduplicates item 24's accidental-policy work. | accuracy | 21a–21i source/import/current both-shell notation evidence | **proposed 2026-09-24** |
+| 30 | [Notehead fidelity](../proposed/core-musicxml-notehead-fidelity.md) | Diagnose and preserve per-note head shape/fill/enclosure, slash spans, hidden note ink and chord-member labels. Deduplicates item 22's zero-line warning and item 25's rest-height work. | accuracy | 22a–22d source/import/current both-shell notation evidence | **proposed 2026-09-24** |
 | — | Feature parity | Dynamics, wedges, spanners, ottavas, articulations, SMuFL glyph names, percussion, layout breaks. **Deliberately unenumerated**: item 8 turns these into a ranked queue with evidence, and each becomes its own row when picked up. Note the schema already has `dynamic-*`, `ottava`, `slur` and `wedge-type` as standard objects — but **no pedal def**, so pedal is contract clause 2's first real test. | accuracy | 1 + 2 + 3 | not yet rows |
 
 ### Item 8's derivation rule
@@ -250,6 +251,27 @@ exactly as `verified` already works here. No backend: a generated JSON artifact
 committed to the repo, like `worker/models.json`.
 
 ## Progress + learnings
+
+### 2026-09-24 — item 18: 22-series notehead rendering slice
+
+[The four-source original-file review](../../docs/musicxml-notehead-assessment.md)
+adds 62 stable feature IDs, 176 notes, 164 events, 150 controls, 490 source
+variants and 124 both-shell Notation rows. All-verses, visible-meter captures
+were inspected in both shells; `22a` needed three Workbench and two Studio
+scroll tiles. No source strings permit Tab/Both. The 114 `22a` head
+declarations, eleven `22c` chord-member shapes and eight `22d` parentheses
+are absent from imported MNX. `22b` loses two slash-style spans and eight
+hidden-note flags; its first hidden-note lyric lines do appear with All
+verses, but the notes remain visible. `22c` loses eight of twelve numbered
+member labels even with All verses selected. Pitches, written values and
+chord grouping survive.
+
+[Proposed item 30](../proposed/core-musicxml-notehead-fidelity.md) owns the
+new head, slash, visibility and lyric-import gaps. Item 22's source-located
+zero-line warning still works, and [item 25](../proposed/core-musicxml-rest-fidelity.md)
+already owns `22d`'s E4 rest-height loss. This is render evidence only:
+item 19 gets no editor or persistence pass. Item 18 remains open for the
+other originals and carrier decisions.
 
 ### 2026-09-24 — item 18: 21-series chord rendering slice
 

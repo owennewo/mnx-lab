@@ -245,3 +245,21 @@ cautionary/editorial question extends existing proposed item 24; [proposed
 item 29](../proposed/core-musicxml-chord-fidelity.md) owns the other new
 gaps. Item 18 remains open for the rest of the suite, and no item 19
 authoring or persistence pass is inferred.
+
+## Notehead rendering batch, 2026-09-24
+
+[The four 22a–22d originals](../../docs/musicxml-notehead-assessment.md)
+now have 62 stable feature IDs, 490 source variants and 124 current
+Notation feature × shell × view verdicts. Complete original-file captures
+show clefs and meter and explicitly set Lyrics to All verses; `22a` needs
+overlapping scroll tiles in both shells. No source declares strings.
+
+All source pitches and event groups survive, but 114 explicit `22a`
+noteheads, eleven per-chord `22c` heads and eight `22d` parentheses
+disappear before MNX. `22b` loses two slash spans and eight hidden-note
+flags, while keeping its lyric texts. `22c` loses eight numbered
+chord-member labels even when all verses are shown. [Proposed item
+30](../proposed/core-musicxml-notehead-fidelity.md) owns the new gaps.
+Item 22 already owns the `22b` zero-line warning and full-geometry
+deferral; item 25 already owns the `22d` positioned rest. Item 18
+remains open, and no item 19 authoring or persistence pass follows.

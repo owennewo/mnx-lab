@@ -1,0 +1,155 @@
+{
+  "kind": "retained original-file browser captures with All verses; not feature verdicts",
+  "applicationCommit": "dae3904660ffc32f4a39bf25a4fe1301db6a5228",
+  "corpusRevision": "77c19f7e819154c70ca1a1992e80dcda8ff82fea",
+  "files": [
+    {
+      "path": "studio/22a-Noteheads/document.mnx.json",
+      "sha256": "961896c4ab1dd8bf4218f43280ccea3740b6b39ed1b7b2dff40b0edc39dac10a"
+    },
+    {
+      "path": "studio/22a-Noteheads/notation-0-0.png",
+      "sha256": "cf3e91f0e7a72c83bc2b492d7b2aaf22ae712f37ec205c8d7147c40c38339bd6"
+    },
+    {
+      "path": "studio/22a-Noteheads/notation-0-88.png",
+      "sha256": "3d6d11768e201c58216a5a233b187355fa9d67e280621a8df0d7f32a9712008f"
+    },
+    {
+      "path": "studio/22a-Noteheads/notation-0.svg",
+      "sha256": "05355b8e87996c8ebe88394b9bb9370907805cfaf0f9985cb3d5fe98dddd3633"
+    },
+    {
+      "path": "studio/22a-Noteheads/observation.json",
+      "sha256": "ff5979a9163677beb1865d14b61e3a73c3b7eb63a3a9bea8c7960293a8d32d12"
+    },
+    {
+      "path": "studio/22b-Staff-Notestyles/document.mnx.json",
+      "sha256": "271f5a24204799fd8f0664b8c2a4c2a2242585b9d3a1d84ef60dc45cdda46f39"
+    },
+    {
+      "path": "studio/22b-Staff-Notestyles/notation-0-0.png",
+      "sha256": "af7b0012bda6132c64a994efce62010605a25ee674ae94ae1fdd453a9fd49666"
+    },
+    {
+      "path": "studio/22b-Staff-Notestyles/notation-0.svg",
+      "sha256": "ac2b8a52ba0d2cf4bbf61d014e2cb69687c5542c8df294e6ef799232d36da309"
+    },
+    {
+      "path": "studio/22b-Staff-Notestyles/observation.json",
+      "sha256": "12b6a09eda01cb61a05661702d2512d2afe394e70571af98dab4e9ca4a23128b"
+    },
+    {
+      "path": "studio/22c-Noteheads-Chords/document.mnx.json",
+      "sha256": "1fa543d778587b13c75f007bf8db7d8fc514d32b03d34cba605eacbf98f1fe67"
+    },
+    {
+      "path": "studio/22c-Noteheads-Chords/notation-0-0.png",
+      "sha256": "8bebf0624d4a71b4542083c4e3722bd2654b00b99ef8fd0031d2e45428bc07c6"
+    },
+    {
+      "path": "studio/22c-Noteheads-Chords/notation-0.svg",
+      "sha256": "157a45801a60052c184f000e43ce7769724d62d3911108080a36a84102a9f8a7"
+    },
+    {
+      "path": "studio/22c-Noteheads-Chords/observation.json",
+      "sha256": "2578c4cc98ff1e08c0ed4f6fb0580d2a9d4aaf165c328c273829a6ab51bc8fc4"
+    },
+    {
+      "path": "studio/22d-Parenthesized-Noteheads/document.mnx.json",
+      "sha256": "36f2532a358cd19955986c75dfa94a4cf8ec7bd40ebd6c7d10f40210b8760c9e"
+    },
+    {
+      "path": "studio/22d-Parenthesized-Noteheads/notation-0-0.png",
+      "sha256": "52a48e4c9de3e15733cf6b84592a4eb3ee00f6ceb22bf316c04414d45e91a1f4"
+    },
+    {
+      "path": "studio/22d-Parenthesized-Noteheads/notation-0.svg",
+      "sha256": "a1820e9226a2d34f51992d004f90403e03640c2652eb44ebf3a50ecc4a6151b3"
+    },
+    {
+      "path": "studio/22d-Parenthesized-Noteheads/observation.json",
+      "sha256": "2be1cf01a92a261af256644b0adcfa2f8682ff168c692adde2c66fc3ded45e52"
+    },
+    {
+      "path": "studio/index.json",
+      "sha256": "86469386489398ccc009d90b6328bba2032ef1a43a2a09c957ce32958a6cb396"
+    },
+    {
+      "path": "workbench/22a-Noteheads/document.mnx.json",
+      "sha256": "961896c4ab1dd8bf4218f43280ccea3740b6b39ed1b7b2dff40b0edc39dac10a"
+    },
+    {
+      "path": "workbench/22a-Noteheads/notation-0-0.png",
+      "sha256": "99b09a46e142a1f3dc7a637e4245352a388d0af5a880eb8691e671b6c14f734f"
+    },
+    {
+      "path": "workbench/22a-Noteheads/notation-0-653.png",
+      "sha256": "d89289ab8c2bba7b6686de7b6507332937ef5b1f37a68c4130a5b773b7a043af"
+    },
+    {
+      "path": "workbench/22a-Noteheads/notation-0-673.png",
+      "sha256": "1e284ee5cfdc944932326ca4221b48fd688d7b2eaed6ab0e673dbec9c009812d"
+    },
+    {
+      "path": "workbench/22a-Noteheads/notation-0.svg",
+      "sha256": "492caf83f15998901f210366d8e41b6ca61bb44e408501103ac0f6d6e44b20b7"
+    },
+    {
+      "path": "workbench/22a-Noteheads/observation.json",
+      "sha256": "f75f140249ad228241533153f93589f80c291d532dd002a55ce84230af17106d"
+    },
+    {
+      "path": "workbench/22b-Staff-Notestyles/document.mnx.json",
+      "sha256": "271f5a24204799fd8f0664b8c2a4c2a2242585b9d3a1d84ef60dc45cdda46f39"
+    },
+    {
+      "path": "workbench/22b-Staff-Notestyles/notation-0-0.png",
+      "sha256": "182f1fbb7929dd0072ee9dd11c8a91f80599727a48380274ec9a4feee57c336f"
+    },
+    {
+      "path": "workbench/22b-Staff-Notestyles/notation-0.svg",
+      "sha256": "01b1851c6619868a1b83180d01958148a2b11c384a2f484254932686079ac590"
+    },
+    {
+      "path": "workbench/22b-Staff-Notestyles/observation.json",
+      "sha256": "4ff766661d45e42e79142aee9d9920696f46131dc6e981e75cdd5ba520649361"
+    },
+    {
+      "path": "workbench/22c-Noteheads-Chords/document.mnx.json",
+      "sha256": "1fa543d778587b13c75f007bf8db7d8fc514d32b03d34cba605eacbf98f1fe67"
+    },
+    {
+      "path": "workbench/22c-Noteheads-Chords/notation-0-0.png",
+      "sha256": "8bd26a70480bb3e887b2271d53b4168eb71f21f5275f064f443f7aab09413189"
+    },
+    {
+      "path": "workbench/22c-Noteheads-Chords/notation-0.svg",
+      "sha256": "967d851409262f10417721fed1a6e23e040a4acf880e2bb7e189afe2baa6bf8b"
+    },
+    {
+      "path": "workbench/22c-Noteheads-Chords/observation.json",
+      "sha256": "26c0222b369d2755a281a53c8e43e12ef4904f85a199c6dcb2ecd203cb44394c"
+    },
+    {
+      "path": "workbench/22d-Parenthesized-Noteheads/document.mnx.json",
+      "sha256": "36f2532a358cd19955986c75dfa94a4cf8ec7bd40ebd6c7d10f40210b8760c9e"
+    },
+    {
+      "path": "workbench/22d-Parenthesized-Noteheads/notation-0-0.png",
+      "sha256": "9cc9c9dcf5c36c0d84e4f86bb73a508c87ed89518c1a7d52c4b51d854f318604"
+    },
+    {
+      "path": "workbench/22d-Parenthesized-Noteheads/notation-0.svg",
+      "sha256": "7423f77ea17cd19531e9667afe0a26849bbd95a9a05baf68737f500801ebbed9"
+    },
+    {
+      "path": "workbench/22d-Parenthesized-Noteheads/observation.json",
+      "sha256": "eb9d326546589a13da3788e8c4ef5416926202dea4aff17e835574eef5e99b57"
+    },
+    {
+      "path": "workbench/index.json",
+      "sha256": "160d86723e0b19031e34c1cd61d0a59828b13891265434fdfaf09e5dffad445c"
+    }
+  ]
+}
