@@ -1,0 +1,1020 @@
+{
+  "kind": "implementation-loop agent render assessment; not human verification",
+  "applicationCommit": "8994daccccd2697f52047fb0209965f5cef2d18f",
+  "corpusRevision": "77c19f7e819154c70ca1a1992e80dcda8ff82fea",
+  "scope": "14a original staff configuration, source to current browser-imported MNX to complete Notation in both desktop shells",
+  "fixtureCount": 1,
+  "featureCount": 8,
+  "sourceStaffDetailCount": 5,
+  "sourceLineDetailCount": 2,
+  "sourceNoteCount": 10,
+  "sourceVariantCount": 17,
+  "renderRowCount": 16,
+  "browser": "Chrome/153.0.8010.36",
+  "viewport": {
+    "width": 1440,
+    "height": 1000,
+    "deviceScaleFactor": 1
+  },
+  "viewPolicy": "No declared source strings; Notation only. Clefs and time signatures Show. The complete score fits one viewport tile per shell.",
+  "fixture": {
+    "id": "14a-StaffDetails-LineChanges",
+    "sourcePath": "xmlFiles/14a-StaffDetails-LineChanges.musicxml",
+    "sourceSha256": "16d63b8dee3be38bd134fc93c3d359c07d5c6cdc964ba8e737c6b29e6b6b6954",
+    "testClass": "feature",
+    "description": "Testing staff line configurations and pitched notes. The number of staff lines can be modified by using the <staff-lines> child of the <staff-details> element. This can happen globally (the first staff has one line globally) or during the part at the beginning of a measure and even inside a measure (the second part has five lines initially, four at the beginning of the second measure, and three starting in the middle of the third measure). The fourth measure in the lower staff has five lines again but uses the ‘print-object=\"no\"’ attribute in the <line-detail> element to suppress the second and fourth staff line.",
+    "sourceDeclaresStrings": false,
+    "staffDetails": [
+      {
+        "id": "14a-StaffDetails-LineChanges/p01/m01/sd01",
+        "part": 1,
+        "measure": 1,
+        "onsetQuarter": [
+          0,
+          1
+        ],
+        "staffLines": 1,
+        "staffNumber": "1",
+        "lineDetails": [],
+        "importedStaffConfiguration": null
+      },
+      {
+        "id": "14a-StaffDetails-LineChanges/p02/m01/sd01",
+        "part": 2,
+        "measure": 1,
+        "onsetQuarter": [
+          0,
+          1
+        ],
+        "staffLines": 5,
+        "staffNumber": "1",
+        "lineDetails": [],
+        "importedStaffConfiguration": null
+      },
+      {
+        "id": "14a-StaffDetails-LineChanges/p02/m02/sd01",
+        "part": 2,
+        "measure": 2,
+        "onsetQuarter": [
+          0,
+          1
+        ],
+        "staffLines": 4,
+        "staffNumber": "1",
+        "lineDetails": [],
+        "importedStaffConfiguration": null
+      },
+      {
+        "id": "14a-StaffDetails-LineChanges/p02/m03/sd01",
+        "part": 2,
+        "measure": 3,
+        "onsetQuarter": [
+          2,
+          1
+        ],
+        "staffLines": 3,
+        "staffNumber": "1",
+        "lineDetails": [],
+        "importedStaffConfiguration": null
+      },
+      {
+        "id": "14a-StaffDetails-LineChanges/p02/m04/sd01",
+        "part": 2,
+        "measure": 4,
+        "onsetQuarter": [
+          0,
+          1
+        ],
+        "staffLines": 5,
+        "staffNumber": "1",
+        "lineDetails": [
+          {
+            "id": "14a-StaffDetails-LineChanges/p02/m04/sd01/ld01",
+            "line": 2,
+            "printObject": "no",
+            "lineType": null
+          },
+          {
+            "id": "14a-StaffDetails-LineChanges/p02/m04/sd01/ld02",
+            "line": 4,
+            "printObject": "no",
+            "lineType": null
+          }
+        ],
+        "importedStaffConfiguration": null
+      }
+    ],
+    "notes": [
+      {
+        "id": "14a-StaffDetails-LineChanges/p01/m01/n01",
+        "part": 1,
+        "measure": 1,
+        "onsetQuarter": [
+          0,
+          1
+        ],
+        "pitch": {
+          "step": "G",
+          "octave": 4
+        },
+        "type": "whole",
+        "durationQuarter": [
+          4,
+          1
+        ],
+        "importedPitch": {
+          "step": "G",
+          "octave": 4
+        },
+        "importedDuration": {
+          "base": "whole"
+        }
+      },
+      {
+        "id": "14a-StaffDetails-LineChanges/p01/m02/n01",
+        "part": 1,
+        "measure": 2,
+        "onsetQuarter": [
+          0,
+          1
+        ],
+        "pitch": {
+          "step": "G",
+          "octave": 4
+        },
+        "type": "whole",
+        "durationQuarter": [
+          4,
+          1
+        ],
+        "importedPitch": {
+          "step": "G",
+          "octave": 4
+        },
+        "importedDuration": {
+          "base": "whole"
+        }
+      },
+      {
+        "id": "14a-StaffDetails-LineChanges/p01/m03/n01",
+        "part": 1,
+        "measure": 3,
+        "onsetQuarter": [
+          0,
+          1
+        ],
+        "pitch": {
+          "step": "G",
+          "octave": 4
+        },
+        "type": "whole",
+        "durationQuarter": [
+          4,
+          1
+        ],
+        "importedPitch": {
+          "step": "G",
+          "octave": 4
+        },
+        "importedDuration": {
+          "base": "whole"
+        }
+      },
+      {
+        "id": "14a-StaffDetails-LineChanges/p01/m04/n01",
+        "part": 1,
+        "measure": 4,
+        "onsetQuarter": [
+          0,
+          1
+        ],
+        "pitch": {
+          "step": "G",
+          "octave": 4
+        },
+        "type": "whole",
+        "durationQuarter": [
+          4,
+          1
+        ],
+        "importedPitch": {
+          "step": "G",
+          "octave": 4
+        },
+        "importedDuration": {
+          "base": "whole"
+        }
+      },
+      {
+        "id": "14a-StaffDetails-LineChanges/p02/m01/n01",
+        "part": 2,
+        "measure": 1,
+        "onsetQuarter": [
+          0,
+          1
+        ],
+        "pitch": {
+          "step": "G",
+          "octave": 4
+        },
+        "type": "whole",
+        "durationQuarter": [
+          4,
+          1
+        ],
+        "importedPitch": {
+          "step": "G",
+          "octave": 4
+        },
+        "importedDuration": {
+          "base": "whole"
+        }
+      },
+      {
+        "id": "14a-StaffDetails-LineChanges/p02/m02/n01",
+        "part": 2,
+        "measure": 2,
+        "onsetQuarter": [
+          0,
+          1
+        ],
+        "pitch": {
+          "step": "G",
+          "octave": 4
+        },
+        "type": "half",
+        "durationQuarter": [
+          2,
+          1
+        ],
+        "importedPitch": {
+          "step": "G",
+          "octave": 4
+        },
+        "importedDuration": {
+          "base": "half"
+        }
+      },
+      {
+        "id": "14a-StaffDetails-LineChanges/p02/m02/n02",
+        "part": 2,
+        "measure": 2,
+        "onsetQuarter": [
+          2,
+          1
+        ],
+        "pitch": {
+          "step": "G",
+          "octave": 4
+        },
+        "type": "half",
+        "durationQuarter": [
+          2,
+          1
+        ],
+        "importedPitch": {
+          "step": "G",
+          "octave": 4
+        },
+        "importedDuration": {
+          "base": "half"
+        }
+      },
+      {
+        "id": "14a-StaffDetails-LineChanges/p02/m03/n01",
+        "part": 2,
+        "measure": 3,
+        "onsetQuarter": [
+          0,
+          1
+        ],
+        "pitch": {
+          "step": "G",
+          "octave": 4
+        },
+        "type": "half",
+        "durationQuarter": [
+          2,
+          1
+        ],
+        "importedPitch": {
+          "step": "G",
+          "octave": 4
+        },
+        "importedDuration": {
+          "base": "half"
+        }
+      },
+      {
+        "id": "14a-StaffDetails-LineChanges/p02/m03/n02",
+        "part": 2,
+        "measure": 3,
+        "onsetQuarter": [
+          2,
+          1
+        ],
+        "pitch": {
+          "step": "G",
+          "octave": 4
+        },
+        "type": "half",
+        "durationQuarter": [
+          2,
+          1
+        ],
+        "importedPitch": {
+          "step": "G",
+          "octave": 4
+        },
+        "importedDuration": {
+          "base": "half"
+        }
+      },
+      {
+        "id": "14a-StaffDetails-LineChanges/p02/m04/n01",
+        "part": 2,
+        "measure": 4,
+        "onsetQuarter": [
+          0,
+          1
+        ],
+        "pitch": {
+          "step": "G",
+          "octave": 4
+        },
+        "type": "whole",
+        "durationQuarter": [
+          4,
+          1
+        ],
+        "importedPitch": {
+          "step": "G",
+          "octave": 4
+        },
+        "importedDuration": {
+          "base": "whole"
+        }
+      }
+    ]
+  },
+  "features": [
+    {
+      "id": "14a.upper-one-line-staff",
+      "fixture": "14a-StaffDetails-LineChanges",
+      "variantIds": [
+        "14a-StaffDetails-LineChanges/p01/m01/sd01"
+      ],
+      "expected": "Part 1 uses a single line throughout four measures."
+    },
+    {
+      "id": "14a.lower-initial-five-lines",
+      "fixture": "14a-StaffDetails-LineChanges",
+      "variantIds": [
+        "14a-StaffDetails-LineChanges/p02/m01/sd01"
+      ],
+      "expected": "Part 2 begins with five ordinary visible lines."
+    },
+    {
+      "id": "14a.lower-four-line-change",
+      "fixture": "14a-StaffDetails-LineChanges",
+      "variantIds": [
+        "14a-StaffDetails-LineChanges/p02/m02/sd01",
+        "14a-StaffDetails-LineChanges/p02/m02/n01",
+        "14a-StaffDetails-LineChanges/p02/m02/n02",
+        "14a-StaffDetails-LineChanges/p02/m03/n01"
+      ],
+      "expected": "Part 2 has four lines from the start of bar 2 through the first half of bar 3."
+    },
+    {
+      "id": "14a.lower-midmeasure-three-lines",
+      "fixture": "14a-StaffDetails-LineChanges",
+      "variantIds": [
+        "14a-StaffDetails-LineChanges/p02/m03/sd01",
+        "14a-StaffDetails-LineChanges/p02/m03/n02"
+      ],
+      "expected": "Part 2 changes to three lines after the first half note in bar 3."
+    },
+    {
+      "id": "14a.lower-five-line-reset",
+      "fixture": "14a-StaffDetails-LineChanges",
+      "variantIds": [
+        "14a-StaffDetails-LineChanges/p02/m04/sd01"
+      ],
+      "expected": "Part 2 returns to a five-line geometry in bar 4."
+    },
+    {
+      "id": "14a.lower-hidden-inner-lines",
+      "fixture": "14a-StaffDetails-LineChanges",
+      "variantIds": [
+        "14a-StaffDetails-LineChanges/p02/m04/sd01/ld01",
+        "14a-StaffDetails-LineChanges/p02/m04/sd01/ld02"
+      ],
+      "expected": "Lines 2 and 4 are hidden while the five-line positions remain."
+    },
+    {
+      "id": "14a.pitched-note-data",
+      "fixture": "14a-StaffDetails-LineChanges",
+      "variantIds": [
+        "14a-StaffDetails-LineChanges/p01/m01/n01",
+        "14a-StaffDetails-LineChanges/p01/m02/n01",
+        "14a-StaffDetails-LineChanges/p01/m03/n01",
+        "14a-StaffDetails-LineChanges/p01/m04/n01",
+        "14a-StaffDetails-LineChanges/p02/m01/n01",
+        "14a-StaffDetails-LineChanges/p02/m02/n01",
+        "14a-StaffDetails-LineChanges/p02/m02/n02",
+        "14a-StaffDetails-LineChanges/p02/m03/n01",
+        "14a-StaffDetails-LineChanges/p02/m03/n02",
+        "14a-StaffDetails-LineChanges/p02/m04/n01"
+      ],
+      "expected": "Ten G4 pitches and their whole/half durations survive, with two parts and four measures."
+    },
+    {
+      "id": "14a.staff-relative-note-placement",
+      "fixture": "14a-StaffDetails-LineChanges",
+      "variantIds": [
+        "14a-StaffDetails-LineChanges/p01/m01/n01",
+        "14a-StaffDetails-LineChanges/p01/m02/n01",
+        "14a-StaffDetails-LineChanges/p01/m03/n01",
+        "14a-StaffDetails-LineChanges/p01/m04/n01",
+        "14a-StaffDetails-LineChanges/p02/m02/n01",
+        "14a-StaffDetails-LineChanges/p02/m02/n02",
+        "14a-StaffDetails-LineChanges/p02/m03/n01",
+        "14a-StaffDetails-LineChanges/p02/m03/n02",
+        "14a-StaffDetails-LineChanges/p02/m04/n01"
+      ],
+      "expected": "G4 note positions should be judged against the nondefault or hidden-line source configurations."
+    }
+  ],
+  "render": [
+    {
+      "featureId": "14a.upper-one-line-staff",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "incorrect",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "The one-line declaration is warned and discarded; both shells draw five lines in all four bars.",
+      "observationEvidence": "harness/fixtures/musicxml-staff-lines-evidence/workbench/14a-StaffDetails-LineChanges/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-staff-lines-evidence/workbench/14a-StaffDetails-LineChanges/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-staff-lines-evidence/workbench/14a-StaffDetails-LineChanges/notation-0.svg",
+      "screenshotEvidence": "harness/fixtures/musicxml-staff-lines-evidence/workbench/14a-StaffDetails-LineChanges/notation-0-0.png"
+    },
+    {
+      "featureId": "14a.upper-one-line-staff",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "incorrect",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "The one-line declaration is warned and discarded; both shells draw five lines in all four bars.",
+      "observationEvidence": "harness/fixtures/musicxml-staff-lines-evidence/studio/14a-StaffDetails-LineChanges/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-staff-lines-evidence/studio/14a-StaffDetails-LineChanges/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-staff-lines-evidence/studio/14a-StaffDetails-LineChanges/notation-0.svg",
+      "screenshotEvidence": "harness/fixtures/musicxml-staff-lines-evidence/studio/14a-StaffDetails-LineChanges/notation-0-0.png"
+    },
+    {
+      "featureId": "14a.lower-initial-five-lines",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Five lines are the source default and remain visible in the first bar.",
+      "observationEvidence": "harness/fixtures/musicxml-staff-lines-evidence/workbench/14a-StaffDetails-LineChanges/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-staff-lines-evidence/workbench/14a-StaffDetails-LineChanges/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-staff-lines-evidence/workbench/14a-StaffDetails-LineChanges/notation-0.svg",
+      "screenshotEvidence": "harness/fixtures/musicxml-staff-lines-evidence/workbench/14a-StaffDetails-LineChanges/notation-0-0.png"
+    },
+    {
+      "featureId": "14a.lower-initial-five-lines",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "Five lines are the source default and remain visible in the first bar.",
+      "observationEvidence": "harness/fixtures/musicxml-staff-lines-evidence/studio/14a-StaffDetails-LineChanges/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-staff-lines-evidence/studio/14a-StaffDetails-LineChanges/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-staff-lines-evidence/studio/14a-StaffDetails-LineChanges/notation-0.svg",
+      "screenshotEvidence": "harness/fixtures/musicxml-staff-lines-evidence/studio/14a-StaffDetails-LineChanges/notation-0-0.png"
+    },
+    {
+      "featureId": "14a.lower-four-line-change",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "incorrect",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "The four-line declaration disappears; five lines remain through this span.",
+      "observationEvidence": "harness/fixtures/musicxml-staff-lines-evidence/workbench/14a-StaffDetails-LineChanges/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-staff-lines-evidence/workbench/14a-StaffDetails-LineChanges/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-staff-lines-evidence/workbench/14a-StaffDetails-LineChanges/notation-0.svg",
+      "screenshotEvidence": "harness/fixtures/musicxml-staff-lines-evidence/workbench/14a-StaffDetails-LineChanges/notation-0-0.png"
+    },
+    {
+      "featureId": "14a.lower-four-line-change",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "incorrect",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "The four-line declaration disappears; five lines remain through this span.",
+      "observationEvidence": "harness/fixtures/musicxml-staff-lines-evidence/studio/14a-StaffDetails-LineChanges/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-staff-lines-evidence/studio/14a-StaffDetails-LineChanges/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-staff-lines-evidence/studio/14a-StaffDetails-LineChanges/notation-0.svg",
+      "screenshotEvidence": "harness/fixtures/musicxml-staff-lines-evidence/studio/14a-StaffDetails-LineChanges/notation-0-0.png"
+    },
+    {
+      "featureId": "14a.lower-midmeasure-three-lines",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "incorrect",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "The half-bar change disappears; both halves of the bar show five lines.",
+      "observationEvidence": "harness/fixtures/musicxml-staff-lines-evidence/workbench/14a-StaffDetails-LineChanges/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-staff-lines-evidence/workbench/14a-StaffDetails-LineChanges/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-staff-lines-evidence/workbench/14a-StaffDetails-LineChanges/notation-0.svg",
+      "screenshotEvidence": "harness/fixtures/musicxml-staff-lines-evidence/workbench/14a-StaffDetails-LineChanges/notation-0-0.png"
+    },
+    {
+      "featureId": "14a.lower-midmeasure-three-lines",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "incorrect",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "The half-bar change disappears; both halves of the bar show five lines.",
+      "observationEvidence": "harness/fixtures/musicxml-staff-lines-evidence/studio/14a-StaffDetails-LineChanges/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-staff-lines-evidence/studio/14a-StaffDetails-LineChanges/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-staff-lines-evidence/studio/14a-StaffDetails-LineChanges/notation-0.svg",
+      "screenshotEvidence": "harness/fixtures/musicxml-staff-lines-evidence/studio/14a-StaffDetails-LineChanges/notation-0-0.png"
+    },
+    {
+      "featureId": "14a.lower-five-line-reset",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "The fallback five-line staff matches the source line count in this bar alone.",
+      "observationEvidence": "harness/fixtures/musicxml-staff-lines-evidence/workbench/14a-StaffDetails-LineChanges/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-staff-lines-evidence/workbench/14a-StaffDetails-LineChanges/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-staff-lines-evidence/workbench/14a-StaffDetails-LineChanges/notation-0.svg",
+      "screenshotEvidence": "harness/fixtures/musicxml-staff-lines-evidence/workbench/14a-StaffDetails-LineChanges/notation-0-0.png"
+    },
+    {
+      "featureId": "14a.lower-five-line-reset",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "The fallback five-line staff matches the source line count in this bar alone.",
+      "observationEvidence": "harness/fixtures/musicxml-staff-lines-evidence/studio/14a-StaffDetails-LineChanges/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-staff-lines-evidence/studio/14a-StaffDetails-LineChanges/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-staff-lines-evidence/studio/14a-StaffDetails-LineChanges/notation-0.svg",
+      "screenshotEvidence": "harness/fixtures/musicxml-staff-lines-evidence/studio/14a-StaffDetails-LineChanges/notation-0-0.png"
+    },
+    {
+      "featureId": "14a.lower-hidden-inner-lines",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "incorrect",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "Both print-object=no controls disappear; all five lines are visible.",
+      "observationEvidence": "harness/fixtures/musicxml-staff-lines-evidence/workbench/14a-StaffDetails-LineChanges/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-staff-lines-evidence/workbench/14a-StaffDetails-LineChanges/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-staff-lines-evidence/workbench/14a-StaffDetails-LineChanges/notation-0.svg",
+      "screenshotEvidence": "harness/fixtures/musicxml-staff-lines-evidence/workbench/14a-StaffDetails-LineChanges/notation-0-0.png"
+    },
+    {
+      "featureId": "14a.lower-hidden-inner-lines",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "incorrect",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "Both print-object=no controls disappear; all five lines are visible.",
+      "observationEvidence": "harness/fixtures/musicxml-staff-lines-evidence/studio/14a-StaffDetails-LineChanges/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-staff-lines-evidence/studio/14a-StaffDetails-LineChanges/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-staff-lines-evidence/studio/14a-StaffDetails-LineChanges/notation-0.svg",
+      "screenshotEvidence": "harness/fixtures/musicxml-staff-lines-evidence/studio/14a-StaffDetails-LineChanges/notation-0-0.png"
+    },
+    {
+      "featureId": "14a.pitched-note-data",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "All ten source pitches and durations match imported MNX, and all notes are visible.",
+      "observationEvidence": "harness/fixtures/musicxml-staff-lines-evidence/workbench/14a-StaffDetails-LineChanges/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-staff-lines-evidence/workbench/14a-StaffDetails-LineChanges/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-staff-lines-evidence/workbench/14a-StaffDetails-LineChanges/notation-0.svg",
+      "screenshotEvidence": "harness/fixtures/musicxml-staff-lines-evidence/workbench/14a-StaffDetails-LineChanges/notation-0-0.png"
+    },
+    {
+      "featureId": "14a.pitched-note-data",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "All ten source pitches and durations match imported MNX, and all notes are visible.",
+      "observationEvidence": "harness/fixtures/musicxml-staff-lines-evidence/studio/14a-StaffDetails-LineChanges/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-staff-lines-evidence/studio/14a-StaffDetails-LineChanges/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-staff-lines-evidence/studio/14a-StaffDetails-LineChanges/notation-0.svg",
+      "screenshotEvidence": "harness/fixtures/musicxml-staff-lines-evidence/studio/14a-StaffDetails-LineChanges/notation-0-0.png"
+    },
+    {
+      "featureId": "14a.staff-relative-note-placement",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "blocked",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "The target one-, four-, three- and selectively hidden-line geometry is absent from MNX; visible note positions on the five-line fallback cannot establish source-relative placement.",
+      "observationEvidence": "harness/fixtures/musicxml-staff-lines-evidence/workbench/14a-StaffDetails-LineChanges/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-staff-lines-evidence/workbench/14a-StaffDetails-LineChanges/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-staff-lines-evidence/workbench/14a-StaffDetails-LineChanges/notation-0.svg",
+      "screenshotEvidence": "harness/fixtures/musicxml-staff-lines-evidence/workbench/14a-StaffDetails-LineChanges/notation-0-0.png"
+    },
+    {
+      "featureId": "14a.staff-relative-note-placement",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "blocked",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "The target one-, four-, three- and selectively hidden-line geometry is absent from MNX; visible note positions on the five-line fallback cannot establish source-relative placement.",
+      "observationEvidence": "harness/fixtures/musicxml-staff-lines-evidence/studio/14a-StaffDetails-LineChanges/observation.json",
+      "documentEvidence": "harness/fixtures/musicxml-staff-lines-evidence/studio/14a-StaffDetails-LineChanges/document.mnx.json",
+      "svgEvidence": "harness/fixtures/musicxml-staff-lines-evidence/studio/14a-StaffDetails-LineChanges/notation-0.svg",
+      "screenshotEvidence": "harness/fixtures/musicxml-staff-lines-evidence/studio/14a-StaffDetails-LineChanges/notation-0-0.png"
+    }
+  ],
+  "renderVariantDispositions": [
+    {
+      "featureId": "14a.upper-one-line-staff",
+      "variantId": "14a-StaffDetails-LineChanges/p01/m01/sd01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "The one-line declaration is warned and discarded; both shells draw five lines in all four bars."
+    },
+    {
+      "featureId": "14a.lower-initial-five-lines",
+      "variantId": "14a-StaffDetails-LineChanges/p02/m01/sd01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "Five lines are the source default and remain visible in the first bar."
+    },
+    {
+      "featureId": "14a.lower-four-line-change",
+      "variantId": "14a-StaffDetails-LineChanges/p02/m02/sd01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "The four-line declaration disappears; five lines remain through this span."
+    },
+    {
+      "featureId": "14a.lower-four-line-change",
+      "variantId": "14a-StaffDetails-LineChanges/p02/m02/n01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "The four-line declaration disappears; five lines remain through this span."
+    },
+    {
+      "featureId": "14a.lower-four-line-change",
+      "variantId": "14a-StaffDetails-LineChanges/p02/m02/n02",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "The four-line declaration disappears; five lines remain through this span."
+    },
+    {
+      "featureId": "14a.lower-four-line-change",
+      "variantId": "14a-StaffDetails-LineChanges/p02/m03/n01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "The four-line declaration disappears; five lines remain through this span."
+    },
+    {
+      "featureId": "14a.lower-midmeasure-three-lines",
+      "variantId": "14a-StaffDetails-LineChanges/p02/m03/sd01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "The half-bar change disappears; both halves of the bar show five lines."
+    },
+    {
+      "featureId": "14a.lower-midmeasure-three-lines",
+      "variantId": "14a-StaffDetails-LineChanges/p02/m03/n02",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "The half-bar change disappears; both halves of the bar show five lines."
+    },
+    {
+      "featureId": "14a.lower-five-line-reset",
+      "variantId": "14a-StaffDetails-LineChanges/p02/m04/sd01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "The fallback five-line staff matches the source line count in this bar alone."
+    },
+    {
+      "featureId": "14a.lower-hidden-inner-lines",
+      "variantId": "14a-StaffDetails-LineChanges/p02/m04/sd01/ld01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "Both print-object=no controls disappear; all five lines are visible."
+    },
+    {
+      "featureId": "14a.lower-hidden-inner-lines",
+      "variantId": "14a-StaffDetails-LineChanges/p02/m04/sd01/ld02",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "Both print-object=no controls disappear; all five lines are visible."
+    },
+    {
+      "featureId": "14a.pitched-note-data",
+      "variantId": "14a-StaffDetails-LineChanges/p01/m01/n01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All ten source pitches and durations match imported MNX, and all notes are visible."
+    },
+    {
+      "featureId": "14a.pitched-note-data",
+      "variantId": "14a-StaffDetails-LineChanges/p01/m02/n01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All ten source pitches and durations match imported MNX, and all notes are visible."
+    },
+    {
+      "featureId": "14a.pitched-note-data",
+      "variantId": "14a-StaffDetails-LineChanges/p01/m03/n01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All ten source pitches and durations match imported MNX, and all notes are visible."
+    },
+    {
+      "featureId": "14a.pitched-note-data",
+      "variantId": "14a-StaffDetails-LineChanges/p01/m04/n01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All ten source pitches and durations match imported MNX, and all notes are visible."
+    },
+    {
+      "featureId": "14a.pitched-note-data",
+      "variantId": "14a-StaffDetails-LineChanges/p02/m01/n01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All ten source pitches and durations match imported MNX, and all notes are visible."
+    },
+    {
+      "featureId": "14a.pitched-note-data",
+      "variantId": "14a-StaffDetails-LineChanges/p02/m02/n01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All ten source pitches and durations match imported MNX, and all notes are visible."
+    },
+    {
+      "featureId": "14a.pitched-note-data",
+      "variantId": "14a-StaffDetails-LineChanges/p02/m02/n02",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All ten source pitches and durations match imported MNX, and all notes are visible."
+    },
+    {
+      "featureId": "14a.pitched-note-data",
+      "variantId": "14a-StaffDetails-LineChanges/p02/m03/n01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All ten source pitches and durations match imported MNX, and all notes are visible."
+    },
+    {
+      "featureId": "14a.pitched-note-data",
+      "variantId": "14a-StaffDetails-LineChanges/p02/m03/n02",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All ten source pitches and durations match imported MNX, and all notes are visible."
+    },
+    {
+      "featureId": "14a.pitched-note-data",
+      "variantId": "14a-StaffDetails-LineChanges/p02/m04/n01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All ten source pitches and durations match imported MNX, and all notes are visible."
+    },
+    {
+      "featureId": "14a.staff-relative-note-placement",
+      "variantId": "14a-StaffDetails-LineChanges/p01/m01/n01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "blocked",
+      "reason": "The target one-, four-, three- and selectively hidden-line geometry is absent from MNX; visible note positions on the five-line fallback cannot establish source-relative placement."
+    },
+    {
+      "featureId": "14a.staff-relative-note-placement",
+      "variantId": "14a-StaffDetails-LineChanges/p01/m02/n01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "blocked",
+      "reason": "The target one-, four-, three- and selectively hidden-line geometry is absent from MNX; visible note positions on the five-line fallback cannot establish source-relative placement."
+    },
+    {
+      "featureId": "14a.staff-relative-note-placement",
+      "variantId": "14a-StaffDetails-LineChanges/p01/m03/n01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "blocked",
+      "reason": "The target one-, four-, three- and selectively hidden-line geometry is absent from MNX; visible note positions on the five-line fallback cannot establish source-relative placement."
+    },
+    {
+      "featureId": "14a.staff-relative-note-placement",
+      "variantId": "14a-StaffDetails-LineChanges/p01/m04/n01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "blocked",
+      "reason": "The target one-, four-, three- and selectively hidden-line geometry is absent from MNX; visible note positions on the five-line fallback cannot establish source-relative placement."
+    },
+    {
+      "featureId": "14a.staff-relative-note-placement",
+      "variantId": "14a-StaffDetails-LineChanges/p02/m02/n01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "blocked",
+      "reason": "The target one-, four-, three- and selectively hidden-line geometry is absent from MNX; visible note positions on the five-line fallback cannot establish source-relative placement."
+    },
+    {
+      "featureId": "14a.staff-relative-note-placement",
+      "variantId": "14a-StaffDetails-LineChanges/p02/m02/n02",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "blocked",
+      "reason": "The target one-, four-, three- and selectively hidden-line geometry is absent from MNX; visible note positions on the five-line fallback cannot establish source-relative placement."
+    },
+    {
+      "featureId": "14a.staff-relative-note-placement",
+      "variantId": "14a-StaffDetails-LineChanges/p02/m03/n01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "blocked",
+      "reason": "The target one-, four-, three- and selectively hidden-line geometry is absent from MNX; visible note positions on the five-line fallback cannot establish source-relative placement."
+    },
+    {
+      "featureId": "14a.staff-relative-note-placement",
+      "variantId": "14a-StaffDetails-LineChanges/p02/m03/n02",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "blocked",
+      "reason": "The target one-, four-, three- and selectively hidden-line geometry is absent from MNX; visible note positions on the five-line fallback cannot establish source-relative placement."
+    },
+    {
+      "featureId": "14a.staff-relative-note-placement",
+      "variantId": "14a-StaffDetails-LineChanges/p02/m04/n01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "blocked",
+      "reason": "The target one-, four-, three- and selectively hidden-line geometry is absent from MNX; visible note positions on the five-line fallback cannot establish source-relative placement."
+    }
+  ],
+  "verdictCounts": {
+    "correct": 6,
+    "incorrect": 8,
+    "blocked": 2
+  },
+  "unresolvedCases": [
+    {
+      "featureId": "14a.staff-relative-note-placement",
+      "reason": "The intended variable-line coordinate system is missing on import; exact original-relative note placement is blocked by that prerequisite."
+    }
+  ],
+  "deduplication": {
+    "completed22": "Source-located warnings for the four unsupported configurations are the completed item 22 containment. Full variable/hidden staff-line carrier and engraving were explicitly deferred there.",
+    "completed23": "The untitled Studio XML version is now editable after the title repair; no authoring or GP persistence pass is inferred.",
+    "newProposal": "None: the observed line geometry loss and carrier dependency repeat item 22's documented deferral."
+  }
+}

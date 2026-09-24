@@ -90,7 +90,7 @@ Fractional pitches and unsupported staff-line configurations now produce explici
 warnings. Unsupported clefs now get local placeholders and diagnostics instead of
 blanking the projection. Historical captures below remain unchanged evidence of the original failures;
 full support for those unsupported features is not claimed.
-
+The [current 14a feature review](musicxml-staff-lines-assessment.md) records the\nstaff-line results after those warning fixes.\n
 ## Initial agent findings
 
 1. `43a-PianoStaff`: the source has two pitches on treble/bass staves and no tuning;

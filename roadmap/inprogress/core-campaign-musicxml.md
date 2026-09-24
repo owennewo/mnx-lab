@@ -250,6 +250,24 @@ committed to the repo, like `worker/models.json`.
 
 ## Progress + learnings
 
+### 2026-09-24 — item 18: 14a staff-line rendering slice
+
+[The current original-file review](../../docs/musicxml-staff-lines-assessment.md)
+adds eight feature IDs, five staff-detail declarations, two hidden-line
+controls, ten note variants and 16 both-shell Notation rows. The complete
+four-bar, two-part score fits one tile per shell; no source strings permit
+Tab/Both. All ten G4 notes and their values survive, but the one-, four-
+and three-line phases and the two hidden fourth-bar lines all display as
+ordinary five-line staves. Source-relative note placement is explicitly
+blocked by the missing staff geometry.
+
+Item 22's four source-located unsupported-configuration warnings now
+appear in both shells, so the diagnostic containment landed; full
+variable/hidden staff-line support remains its documented carrier
+deferral. No duplicate proposal or item 19 authoring/persistence pass
+follows from this render capture. Item 18 remains open for the other
+sources.
+
 ### 2026-09-24 — item 18: current 11-series meter rendering slice
 
 [The twelve-source current review](../../docs/musicxml-meter-current-assessment.md)

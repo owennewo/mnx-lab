@@ -1,0 +1,47 @@
+{
+  "kind": "retained original-file browser captures; not feature verdicts",
+  "applicationCommit": "8994daccccd2697f52047fb0209965f5cef2d18f",
+  "corpusRevision": "77c19f7e819154c70ca1a1992e80dcda8ff82fea",
+  "files": [
+    {
+      "path": "workbench/14a-StaffDetails-LineChanges/document.mnx.json",
+      "sha256": "d257a6b990364c16e24cf680d837e2938fe8d5869b3f01d2278bcaf43019fde8"
+    },
+    {
+      "path": "workbench/14a-StaffDetails-LineChanges/notation-0-0.png",
+      "sha256": "f50a0ec40eaabba4d84174deb7f5b9e3e5a42b9ec440b9cc88268f7d2bed342b"
+    },
+    {
+      "path": "workbench/14a-StaffDetails-LineChanges/notation-0.svg",
+      "sha256": "18318a0a9533e6362aafd72e3420cbbbf7a5c6b4a9c667f3dccfda996ce1aa9c"
+    },
+    {
+      "path": "workbench/14a-StaffDetails-LineChanges/observation.json",
+      "sha256": "e8780c6da70c7611ec971bf45662ee98549e70f10f3ceeea540af7af824b6db4"
+    },
+    {
+      "path": "workbench/index.json",
+      "sha256": "3dadaf6e4731833c4494bf4bb74ffb7f18a997c0ea6c50889d787b887029cf0e"
+    },
+    {
+      "path": "studio/14a-StaffDetails-LineChanges/document.mnx.json",
+      "sha256": "d257a6b990364c16e24cf680d837e2938fe8d5869b3f01d2278bcaf43019fde8"
+    },
+    {
+      "path": "studio/14a-StaffDetails-LineChanges/notation-0-0.png",
+      "sha256": "c7d947d52744d9c61bcb0de68e07a9eccee84fbe429e7f765d4ed8c8a1b58415"
+    },
+    {
+      "path": "studio/14a-StaffDetails-LineChanges/notation-0.svg",
+      "sha256": "7b1c43eb76c54f43191355a736c6cda909143f5a50b7243236ec6a80d64c0465"
+    },
+    {
+      "path": "studio/14a-StaffDetails-LineChanges/observation.json",
+      "sha256": "dcea5cd4143bddb3b7c066b3f1ecc38f4d1385a8be941eb63c51571eeeeca0b2"
+    },
+    {
+      "path": "studio/index.json",
+      "sha256": "3511cd85bd25b3af2a3ffd6d945e51a3a51f0e97e1f6f5218b5d24077c5d075c"
+    }
+  ]
+}

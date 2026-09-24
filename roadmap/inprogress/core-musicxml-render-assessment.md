@@ -218,3 +218,15 @@ source-located warnings and unresolved source policies are explicit. These
 are item 22's documented deferrals, so this repeat evidence does not file
 a duplicate proposal. Item 18 remains open for the remaining sources;
 item 19 gets no authoring or persistence pass from these captures.
+
+## Staff-line rendering batch, 2026-09-24
+
+[The current 14a original](../../docs/musicxml-staff-lines-assessment.md)
+has eight stable feature IDs, 17 source-control/note variants and 16
+Notation feature × shell × view rows. Both-shell original-file imports,
+MNX, complete SVG/PNG and Show display settings are retained. Ten pitches
+and values survive, while all nondefault or hidden staff-line geometry is
+lost before MNX. The four source-located warnings confirm item 22's
+containment; full geometry and staff-relative note placement remain its
+documented carrier/engraving deferral. No new duplicate proposal or
+authoring claim is filed. Item 18 remains open for the rest of the suite.
