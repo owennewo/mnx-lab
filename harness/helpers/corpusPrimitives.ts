@@ -21,8 +21,14 @@ export type { ScenarioPrimitives, RenderedSystem } from '../../src/engine/headle
 
 export const WIDTH_SP = 80; // fixed viewport so snapshots are deterministic
 
-/** Loads SMuFL metadata from public/smufl/ once per process. */
+let smuflLoaded = false;
+
+/** Loads SMuFL metadata from public/smufl/ once per process. `ensureSmufl`
+ *  keeps only the first load, so reading and parsing the ~1 MB of JSON again
+ *  on every call was pure cost — 24 of the destruct sweep's 36 s. */
 export function initSmufl(): void {
+  if (smuflLoaded) return;
+  smuflLoaded = true;
   ensureSmufl(
     JSON.parse(fs.readFileSync(path.join(ROOT, 'public/smufl/glyphnames.json'), 'utf8')),
     JSON.parse(fs.readFileSync(path.join(ROOT, 'public/smufl/bravura_metadata.json'), 'utf8'))
