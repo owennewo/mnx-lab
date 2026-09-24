@@ -1,0 +1,2943 @@
+{
+  "mnx": {
+    "version": 1
+  },
+  "global": {
+    "measures": [
+      {
+        "key": {
+          "fifths": 0
+        }
+      },
+      {
+        "barline": {
+          "type": "double"
+        }
+      },
+      {},
+      {},
+      {},
+      {
+        "barline": {
+          "type": "double"
+        }
+      },
+      {},
+      {},
+      {},
+      {},
+      {
+        "barline": {
+          "type": "double"
+        }
+      },
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {
+        "barline": {
+          "type": "double"
+        }
+      },
+      {},
+      {},
+      {
+        "barline": {
+          "type": "final"
+        }
+      }
+    ],
+    "lyrics": {
+      "lineOrder": [
+        "1",
+        "2",
+        "3"
+      ]
+    }
+  },
+  "parts": [
+    {
+      "id": "P1",
+      "name": "Instrument",
+      "measures": [
+        {
+          "clefs": [
+            {
+              "clef": {
+                "sign": "G",
+                "staffPosition": -2
+              }
+            }
+          ],
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "fermata",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "upright",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-1-v1-0-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "fermata",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "inverted",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-1-v1-1-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "normal",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "fermata",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-1-v1-2-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "angled",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "fermata",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-1-v1-3-0"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "square",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "fermata",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-2-v1-0-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "arpeggio",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-2-v1-1-0"
+                    },
+                    {
+                      "pitch": {
+                        "step": "E",
+                        "octave": 5
+                      },
+                      "id": "n-1-2-v1-1-1"
+                    },
+                    {
+                      "pitch": {
+                        "step": "G",
+                        "octave": 5
+                      },
+                      "id": "n-1-2-v1-1-2"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "non-",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "arpeggio",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-2-v1-2-0"
+                    },
+                    {
+                      "pitch": {
+                        "step": "E",
+                        "octave": 5
+                      },
+                      "id": "n-1-2-v1-2-1"
+                    },
+                    {
+                      "pitch": {
+                        "step": "G",
+                        "octave": 5
+                      },
+                      "id": "n-1-2-v1-2-2"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "accidental",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "mark ↑",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-2-v1-3-0"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "accent",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-3-v1-0-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "strong",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "accent",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-3-v1-1-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "staccato",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-3-v1-2-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "tenuto",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-3-v1-3-0"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "detached",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "legato",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-4-v1-0-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "stacca-",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "tissimo",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-4-v1-1-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "spiccato",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-4-v1-2-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "scoop",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-4-v1-3-0"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "plop",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-5-v1-0-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "doit",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-5-v1-1-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "falloff",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-5-v1-2-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "breath",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "mark",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-5-v1-3-0"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "caesura",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-6-v1-0-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "stress",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-6-v1-1-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "un-",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "stress",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-6-v1-2-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "soft",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "accent",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-6-v1-3-0"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "trill",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "mark",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-7-v1-0-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "turn",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-7-v1-1-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "delayed",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "turn",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-7-v1-2-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "inverted",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "turn",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-7-v1-3-0"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "delayed",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "inverted",
+                        "type": "whole"
+                      },
+                      "3": {
+                        "text": "turn",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-8-v1-0-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "vertical",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "turn",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-8-v1-1-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "inverted",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "vertical",
+                        "type": "whole"
+                      },
+                      "3": {
+                        "text": "turn",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-8-v1-2-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "shake",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-8-v1-3-0"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "wa",
+                        "type": "start"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-9-v1-0-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "vy",
+                        "type": "middle"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-9-v1-1-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "line",
+                        "type": "end"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-9-v1-2-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "mordent",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-9-v1-3-0"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "inverted",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "mordent",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-10-v1-0-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "schleifer",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-10-v1-1-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "tremolo",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-10-v1-2-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "haydn",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-10-v1-3-0"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "turn + acc.",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "mark ↓",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-11-v1-0-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "turn + acc.",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "marks ↑↓",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-11-v1-1-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "turn + acc.",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "marks ↑[↑]",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-11-v1-2-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "trill + acc.",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "mark ↑",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-11-v1-3-0"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "up-",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "bow",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-12-v1-0-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "down-",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "bow",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-12-v1-1-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "harmonic",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "G",
+                        "octave": 5
+                      },
+                      "_x": {
+                        "mnxLab": {
+                          "tab": {
+                            "technique": {
+                              "harmonic": {
+                                "type": "natural"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "id": "n-1-12-v1-2-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "natural",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "harmonic",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "G",
+                        "octave": 5
+                      },
+                      "_x": {
+                        "mnxLab": {
+                          "tab": {
+                            "technique": {
+                              "harmonic": {
+                                "type": "natural"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "id": "n-1-12-v1-3-0"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "artificial",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "harmonic",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "A",
+                        "octave": 5
+                      },
+                      "_x": {
+                        "mnxLab": {
+                          "tab": {
+                            "technique": {
+                              "harmonic": {
+                                "type": "artificial"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "id": "n-1-13-v1-0-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "natural",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "harmonic",
+                        "type": "whole"
+                      },
+                      "3": {
+                        "text": "(base+touch)",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "G",
+                        "octave": 3
+                      },
+                      "_x": {
+                        "mnxLab": {
+                          "tab": {
+                            "technique": {
+                              "harmonic": {
+                                "type": "natural"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "id": "n-1-13-v1-1-0"
+                    },
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 4
+                      },
+                      "_x": {
+                        "mnxLab": {
+                          "tab": {
+                            "technique": {
+                              "harmonic": {
+                                "type": "natural"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "id": "n-1-13-v1-1-1"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "natural",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "harmonic",
+                        "type": "whole"
+                      },
+                      "3": {
+                        "text": "(touch)",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 4
+                      },
+                      "_x": {
+                        "mnxLab": {
+                          "tab": {
+                            "technique": {
+                              "harmonic": {
+                                "type": "natural"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "id": "n-1-13-v1-2-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "natural",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "harmonic",
+                        "type": "whole"
+                      },
+                      "3": {
+                        "text": "(touch+sound)",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 4
+                      },
+                      "_x": {
+                        "mnxLab": {
+                          "tab": {
+                            "technique": {
+                              "harmonic": {
+                                "type": "natural"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "id": "n-1-13-v1-3-0"
+                    },
+                    {
+                      "pitch": {
+                        "step": "G",
+                        "octave": 5
+                      },
+                      "_x": {
+                        "mnxLab": {
+                          "tab": {
+                            "technique": {
+                              "harmonic": {
+                                "type": "natural"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "id": "n-1-13-v1-3-1"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "nat. harm.",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "(base+touch",
+                        "type": "whole"
+                      },
+                      "3": {
+                        "text": "+sound)",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "G",
+                        "octave": 3
+                      },
+                      "_x": {
+                        "mnxLab": {
+                          "tab": {
+                            "technique": {
+                              "harmonic": {
+                                "type": "natural"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "id": "n-1-14-v1-0-0"
+                    },
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 4
+                      },
+                      "_x": {
+                        "mnxLab": {
+                          "tab": {
+                            "technique": {
+                              "harmonic": {
+                                "type": "natural"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "id": "n-1-14-v1-0-1"
+                    },
+                    {
+                      "pitch": {
+                        "step": "G",
+                        "octave": 5
+                      },
+                      "_x": {
+                        "mnxLab": {
+                          "tab": {
+                            "technique": {
+                              "harmonic": {
+                                "type": "natural"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "id": "n-1-14-v1-0-2"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "artificial",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "harmonic",
+                        "type": "whole"
+                      },
+                      "3": {
+                        "text": "(base+touch)",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "A",
+                        "octave": 3
+                      },
+                      "_x": {
+                        "mnxLab": {
+                          "tab": {
+                            "technique": {
+                              "harmonic": {
+                                "type": "artificial"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "id": "n-1-14-v1-1-0"
+                    },
+                    {
+                      "pitch": {
+                        "step": "D",
+                        "octave": 4
+                      },
+                      "_x": {
+                        "mnxLab": {
+                          "tab": {
+                            "technique": {
+                              "harmonic": {
+                                "type": "artificial"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "id": "n-1-14-v1-1-1"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "art. harm.",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "(base+touch",
+                        "type": "whole"
+                      },
+                      "3": {
+                        "text": "+sound)",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "A",
+                        "octave": 3
+                      },
+                      "_x": {
+                        "mnxLab": {
+                          "tab": {
+                            "technique": {
+                              "harmonic": {
+                                "type": "artificial"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "id": "n-1-14-v1-2-0"
+                    },
+                    {
+                      "pitch": {
+                        "step": "D",
+                        "octave": 4
+                      },
+                      "_x": {
+                        "mnxLab": {
+                          "tab": {
+                            "technique": {
+                              "harmonic": {
+                                "type": "artificial"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "id": "n-1-14-v1-2-1"
+                    },
+                    {
+                      "pitch": {
+                        "step": "A",
+                        "octave": 5
+                      },
+                      "_x": {
+                        "mnxLab": {
+                          "tab": {
+                            "technique": {
+                              "harmonic": {
+                                "type": "artificial"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "id": "n-1-14-v1-2-2"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "open",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "string",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-14-v1-3-0"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "thumb-",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "position",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-15-v1-0-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "fingering",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "1",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-15-v1-1-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "fingering",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "2,3,4,5",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-15-v1-2-0"
+                    },
+                    {
+                      "pitch": {
+                        "step": "D",
+                        "octave": 5
+                      },
+                      "id": "n-1-15-v1-2-1"
+                    },
+                    {
+                      "pitch": {
+                        "step": "E",
+                        "octave": 5
+                      },
+                      "id": "n-1-15-v1-2-2"
+                    },
+                    {
+                      "pitch": {
+                        "step": "F",
+                        "octave": 5
+                      },
+                      "id": "n-1-15-v1-2-3"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "fingering",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "0,1,2↑",
+                        "type": "whole"
+                      },
+                      "3": {
+                        "text": "3,4,5↓",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-15-v1-3-0"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "fingering",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "2, subst. 3",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-16-v1-0-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "fingering",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "2, alt. 3",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-16-v1-1-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "pluck",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "a",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-16-v1-2-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "pluck",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "a,m,i↓",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-16-v1-3-0"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "double",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "tongue",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-17-v1-0-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "triple",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "tongue",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-17-v1-1-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "stopped",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-17-v1-2-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "snap-",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "pizz.",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-17-v1-3-0"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "fret",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "0",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-18-v1-0-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "string",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "5",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-18-v1-1-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "hammer",
+                        "type": "start"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "_x": {
+                        "mnxLab": {
+                          "tab": {
+                            "technique": {
+                              "hammerPull": {
+                                "target": "n-1-18-v1-3-0"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "id": "n-1-18-v1-2-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "on",
+                        "type": "end"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-18-v1-3-0"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "pull",
+                        "type": "start"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "_x": {
+                        "mnxLab": {
+                          "tab": {
+                            "technique": {
+                              "hammerPull": {
+                                "target": "n-1-19-v1-1-0"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "id": "n-1-19-v1-0-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "off",
+                        "type": "end"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-19-v1-1-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "bend 4",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "_x": {
+                        "mnxLab": {
+                          "tab": {
+                            "technique": {
+                              "bend": {
+                                "points": [
+                                  {
+                                    "position": 0,
+                                    "alter": 0
+                                  },
+                                  {
+                                    "position": 1,
+                                    "alter": 4
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "id": "n-1-19-v1-2-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "bend 3",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "with bar",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "_x": {
+                        "mnxLab": {
+                          "tab": {
+                            "technique": {
+                              "bend": {
+                                "points": [
+                                  {
+                                    "position": 0,
+                                    "alter": 0
+                                  },
+                                  {
+                                    "position": 1,
+                                    "alter": -3
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "id": "n-1-19-v1-3-0"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "bend -0.5",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "pre-bend",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "_x": {
+                        "mnxLab": {
+                          "tab": {
+                            "technique": {
+                              "bend": {
+                                "points": [
+                                  {
+                                    "position": 0,
+                                    "alter": 0.5
+                                  },
+                                  {
+                                    "position": 1,
+                                    "alter": 0.5
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "id": "n-1-20-v1-0-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "bend 3.5",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "release",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "_x": {
+                        "mnxLab": {
+                          "tab": {
+                            "technique": {
+                              "bend": {
+                                "points": [
+                                  {
+                                    "position": 0,
+                                    "alter": 0
+                                  },
+                                  {
+                                    "position": 1,
+                                    "alter": -3.5
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "id": "n-1-20-v1-1-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "tap",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-20-v1-2-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "tap",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "T",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-20-v1-3-0"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "heel",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-21-v1-0-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "toe",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-21-v1-1-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "heel-toe",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "subst.",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-21-v1-2-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "finger-",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "nails",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-21-v1-3-0"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "whole"
+                  },
+                  "rest": {}
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "f",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-23-v1-0-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "sfp",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-23-v1-1-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "half"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "other",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "dynamics",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-23-v1-2-0"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "dynamics": [
+            {
+              "position": {
+                "fraction": [
+                  0,
+                  1
+                ]
+              },
+              "type": "immediate",
+              "value": "f"
+            },
+            {
+              "position": {
+                "fraction": [
+                  1,
+                  4
+                ]
+              },
+              "type": "accent",
+              "accentPrefix": "s",
+              "value": "f",
+              "accentSuffix": "",
+              "residualValue": "p"
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "strong ↑",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "stacc. ↑",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "G",
+                        "octave": 4
+                      },
+                      "id": "n-1-24-v1-0-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "acc. ↓",
+                        "type": "whole"
+                      },
+                      "2": {
+                        "text": "ten. ↓",
+                        "type": "whole"
+                      },
+                      "3": {
+                        "text": "stacc. ↑",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "G",
+                        "octave": 4
+                      },
+                      "id": "n-1-24-v1-1-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "half"
+                  },
+                  "rest": {}
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "_x": {
+    "mnxLab": {
+      "encoding": {
+        "software": "musicxml-mnx",
+        "version": "0.1.0"
+      }
+    }
+  }
+}

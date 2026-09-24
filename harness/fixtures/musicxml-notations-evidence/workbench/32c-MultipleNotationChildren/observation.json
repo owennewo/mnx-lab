@@ -1,0 +1,48 @@
+{
+  "id": "32c-MultipleNotationChildren",
+  "sourceSha256": "7ebeb0dcb2b244fffa9061fda33c04a0e33d7ad69ad2f016bc3324a77175e5f7",
+  "testClass": "feature",
+  "description": "It should not make any difference whether two articulations are given inside two different <notations> elements, inside two different <articulations> children of the same <notations> element, or inside the same <articulations> element. Thus, all three notes should have a staccato and an accent.",
+  "views": [
+    {
+      "scrollTarget": "viewer",
+      "visibleWidth": 750,
+      "visibleHeight": 789.125,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [],
+      "scrollWidth": 750,
+      "scrollHeight": 789,
+      "clientWidth": 750,
+      "clientHeight": 789,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "importError": null,
+  "warnings": [],
+  "importedDocumentSha256": "2fb46a47ed2bcc5b9ccd8eca6790ee53dda4eb6a3f385c90f1f8beaa816af999",
+  "displayOptions": {
+    "lyrics": "all",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

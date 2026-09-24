@@ -1,0 +1,228 @@
+{
+  "kind": "retained original-file browser evidence",
+  "suiteRevision": "77c19f7e819154c70ca1a1992e80dcda8ff82fea",
+  "applicationCommit": "65a7212cf93e960938e0ceb1ebd13728a5f0ced7",
+  "captureScriptSha256": "3380b20e5b203676d93d6b4742916e8f5ecff4322d5a56eac66e158a3c6a6d9f",
+  "files": [
+    {
+      "path": "studio/32a-Notations/document.mnx.json",
+      "sha256": "47168432a073ff8bb93862a9e41856af65321cb0d2f55688d1e4e24da66a75ab"
+    },
+    {
+      "path": "studio/32a-Notations/notation-0-0.png",
+      "sha256": "ee358367cc548052975956520065460bebca58abf90022b4ab4d95e844eaaa08"
+    },
+    {
+      "path": "studio/32a-Notations/notation-0-770.png",
+      "sha256": "97fdb221b86ef7779cd606695698d3e43b83ac344fbd2c11f259648649a386d3"
+    },
+    {
+      "path": "studio/32a-Notations/notation-0-796.png",
+      "sha256": "8ac8d78882183f05a63ca369e3d8973f2359ce2480fc51eff300e42229c709e1"
+    },
+    {
+      "path": "studio/32a-Notations/notation-0.svg",
+      "sha256": "db7f9fca6349805b0369d537608b6ba845dcd27c46e4e6639669986647c3b02d"
+    },
+    {
+      "path": "studio/32a-Notations/observation.json",
+      "sha256": "244791228ae3dd12216e7d189f4ecf2bda6dbec34c016376f29680facc00d30f"
+    },
+    {
+      "path": "studio/32b-Articulations-Texts/document.mnx.json",
+      "sha256": "296b0e49ae83f6b6b5645fd155d008418a48b9fe1698119f39e847fef7f2334e"
+    },
+    {
+      "path": "studio/32b-Articulations-Texts/notation-0-0.png",
+      "sha256": "e775636032e7c8fe95275da3c3818d3c215818f5cfe0caefc3e9c9c31715584a"
+    },
+    {
+      "path": "studio/32b-Articulations-Texts/notation-0.svg",
+      "sha256": "f79f081fc06d04e997eabd31b2e3a5f49a74ca9761709e307fb79c1a14ae3279"
+    },
+    {
+      "path": "studio/32b-Articulations-Texts/observation.json",
+      "sha256": "999a6963d3d43e39d38a3eb2bf79bc3b23c6edab14f9022a1ef13e84425a19b8"
+    },
+    {
+      "path": "studio/32c-MultipleNotationChildren/document.mnx.json",
+      "sha256": "428708e3c4497d3b780608d6b565234b7ce1b9e6f8973b7b29f6a46e263a9a48"
+    },
+    {
+      "path": "studio/32c-MultipleNotationChildren/notation-0-0.png",
+      "sha256": "9fe2e2af04ddb245f1f35fd993a0dafaa307a30be702961896a985546d598ee7"
+    },
+    {
+      "path": "studio/32c-MultipleNotationChildren/notation-0.svg",
+      "sha256": "887f872ddc10843df8e9d1e6b61e96152471651a2c1281ed4aae61cbb57e112f"
+    },
+    {
+      "path": "studio/32c-MultipleNotationChildren/observation.json",
+      "sha256": "39695048096383078968cd203ddf6279721db8ed506ee433c8b041b7c9f0487a"
+    },
+    {
+      "path": "studio/32d-Arpeggio/document.mnx.json",
+      "sha256": "43fa50f1abdbe797f9d7424c8a4b770acd2f381e4e98eae6e4dc6057504299b0"
+    },
+    {
+      "path": "studio/32d-Arpeggio/notation-0-0.png",
+      "sha256": "8bf78c7882fb7236d3cc778df21d554409e81af34aacd1263fc2d8afc8b96f26"
+    },
+    {
+      "path": "studio/32d-Arpeggio/notation-0.svg",
+      "sha256": "74a3cd49faf182462b010f08a31db715525aa5506dad2f6247d98a592e82377c"
+    },
+    {
+      "path": "studio/32d-Arpeggio/observation.json",
+      "sha256": "65ee0daa4ccde36764dcb9dad3a3a528a74325c1bbc09e38af47c581fb24806c"
+    },
+    {
+      "path": "studio/32e-Arpeggios-Cross/document.mnx.json",
+      "sha256": "3d871d3993bceaced951828f8b1930c64d1c21a9d23c883afd40cfed07750b29"
+    },
+    {
+      "path": "studio/32e-Arpeggios-Cross/notation-0-0.png",
+      "sha256": "d78311514d17d78d1f7de2cfa9e82b0e367afc8d0cb2c5744a0bf289ff6adb07"
+    },
+    {
+      "path": "studio/32e-Arpeggios-Cross/notation-0.svg",
+      "sha256": "cd6aef29d2c9598ed1d040acfb0512087efaaed84bbf7e9029836461fd3d2301"
+    },
+    {
+      "path": "studio/32e-Arpeggios-Cross/observation.json",
+      "sha256": "46991f59fee68652e9d1188fdd581ea91664f19410b0f0154d3e27222f8e3b73"
+    },
+    {
+      "path": "studio/32e-Fermatas/document.mnx.json",
+      "sha256": "5048e48dc2cd6fa16c03ebafe45d45ec5519452b5298ccf0ccf1829b5c490a76"
+    },
+    {
+      "path": "studio/32e-Fermatas/notation-0-0.png",
+      "sha256": "9ff6922725a1bac4100b27cb8baad017111274b413c5eea3e6f091b6e80fb666"
+    },
+    {
+      "path": "studio/32e-Fermatas/notation-0.svg",
+      "sha256": "3e0e7dc43a2617fd2a2e375f1eefebf3e6f430c7556758d55222a33062d3b0b8"
+    },
+    {
+      "path": "studio/32e-Fermatas/observation.json",
+      "sha256": "13eeed3cb2b32d764f6f30c0776546a0aea789197d510271e2fa1a14bb61502f"
+    },
+    {
+      "path": "studio/index.json",
+      "sha256": "e070bd3c5adb7fa6028d265e9fb80ea9ae7eae53570b9178dcad5096684c7851"
+    },
+    {
+      "path": "workbench/32a-Notations/document.mnx.json",
+      "sha256": "47168432a073ff8bb93862a9e41856af65321cb0d2f55688d1e4e24da66a75ab"
+    },
+    {
+      "path": "workbench/32a-Notations/notation-0-0.png",
+      "sha256": "00e71a123394dfe7f1aa544a2711befaa0a3d5c6eb49ffb87a661cca318e3a5b"
+    },
+    {
+      "path": "workbench/32a-Notations/notation-0-1306.png",
+      "sha256": "92c68bce7dc39744de4be7d20a8a1c0b29bdc13c3bf77f9096ab24ac422dcba6"
+    },
+    {
+      "path": "workbench/32a-Notations/notation-0-1897.png",
+      "sha256": "057e6a55cabb33b17ff34b084e5822ae91f02cbbd667143494d318ebccfc236a"
+    },
+    {
+      "path": "workbench/32a-Notations/notation-0-653.png",
+      "sha256": "d2400c6483921b345a5f420fc77f399f543eda8d217e031680b676dec974f6e7"
+    },
+    {
+      "path": "workbench/32a-Notations/notation-0.svg",
+      "sha256": "4ae938273a3baa8b0c2415ed924a0c85f7dd96a745f2e334c837cb165c8f56f1"
+    },
+    {
+      "path": "workbench/32a-Notations/observation.json",
+      "sha256": "b93ec1ade609040e4a21954726c592d4397102f45f35fc4c6f6bee7f097753e2"
+    },
+    {
+      "path": "workbench/32b-Articulations-Texts/document.mnx.json",
+      "sha256": "296b0e49ae83f6b6b5645fd155d008418a48b9fe1698119f39e847fef7f2334e"
+    },
+    {
+      "path": "workbench/32b-Articulations-Texts/notation-0-0.png",
+      "sha256": "899d80a5c99baa608a3165a4031647a3f083888384b51fcb72264658c9c6bc71"
+    },
+    {
+      "path": "workbench/32b-Articulations-Texts/notation-0.svg",
+      "sha256": "bb9f57196967ba780c9a80c923bd437160121d26f3cb9778c6fef17bc77662ca"
+    },
+    {
+      "path": "workbench/32b-Articulations-Texts/observation.json",
+      "sha256": "6e17ee887df629169f6c6aa1b4439f6873de11ba9aab5d01f817bd81ebc80b3b"
+    },
+    {
+      "path": "workbench/32c-MultipleNotationChildren/document.mnx.json",
+      "sha256": "428708e3c4497d3b780608d6b565234b7ce1b9e6f8973b7b29f6a46e263a9a48"
+    },
+    {
+      "path": "workbench/32c-MultipleNotationChildren/notation-0-0.png",
+      "sha256": "425257bf2bd1dcccfb7d10355179fe04725536d1c1cb0030e7c06b9e6584f758"
+    },
+    {
+      "path": "workbench/32c-MultipleNotationChildren/notation-0.svg",
+      "sha256": "8e5fae8166b9982d49ddbb724d66edcd3ba78c3a5c4774cc8e33ea27f263ab92"
+    },
+    {
+      "path": "workbench/32c-MultipleNotationChildren/observation.json",
+      "sha256": "f0d5cbf96e57edf2c1c1ddf0288f30eea305df49d8c9cfe2895e8c11a428673b"
+    },
+    {
+      "path": "workbench/32d-Arpeggio/document.mnx.json",
+      "sha256": "43fa50f1abdbe797f9d7424c8a4b770acd2f381e4e98eae6e4dc6057504299b0"
+    },
+    {
+      "path": "workbench/32d-Arpeggio/notation-0-0.png",
+      "sha256": "2bd605e13a367042c356d7a1482a0c82c33c60e241c95e2ab9cc95673c30c438"
+    },
+    {
+      "path": "workbench/32d-Arpeggio/notation-0.svg",
+      "sha256": "f0217fe4a6bac9def2201a1243b5b44988ac4879f74ef9fd5ceb29a44f41e3a5"
+    },
+    {
+      "path": "workbench/32d-Arpeggio/observation.json",
+      "sha256": "1fcb838dc74b747d73ce26b5f4d6b0bbb14de11cabd351bc35c3d54f875b88a5"
+    },
+    {
+      "path": "workbench/32e-Arpeggios-Cross/document.mnx.json",
+      "sha256": "3d871d3993bceaced951828f8b1930c64d1c21a9d23c883afd40cfed07750b29"
+    },
+    {
+      "path": "workbench/32e-Arpeggios-Cross/notation-0-0.png",
+      "sha256": "e30e2bd341136cf9a7670948bd726da9750c61b0e537468dea48e10e170d79ef"
+    },
+    {
+      "path": "workbench/32e-Arpeggios-Cross/notation-0.svg",
+      "sha256": "7c986ebdf6f0f8fbe857b69e59e73ea757fff36cd9f3f095faef13539b97c256"
+    },
+    {
+      "path": "workbench/32e-Arpeggios-Cross/observation.json",
+      "sha256": "33d5415b02ef50931de8164050ddffd2b1bd9fca1e6298c46ae143f449d73fe3"
+    },
+    {
+      "path": "workbench/32e-Fermatas/document.mnx.json",
+      "sha256": "5048e48dc2cd6fa16c03ebafe45d45ec5519452b5298ccf0ccf1829b5c490a76"
+    },
+    {
+      "path": "workbench/32e-Fermatas/notation-0-0.png",
+      "sha256": "cb5aba3a1609482a0242d3f436ef03f12c8e353cc67118736b03ef4a975e6f00"
+    },
+    {
+      "path": "workbench/32e-Fermatas/notation-0.svg",
+      "sha256": "7dde602e2c5155f9701793bb0ce06a3776b07ed5fbe32fac3b951ad19d2186ac"
+    },
+    {
+      "path": "workbench/32e-Fermatas/observation.json",
+      "sha256": "22ccf67e85f781b00f8abef380191d1791fca23d47b611104afb680cbdc43e2d"
+    },
+    {
+      "path": "workbench/index.json",
+      "sha256": "64346294721cc6be9d3f8ba66d57f525c0131184aa83165c78abce86e19c6a78"
+    }
+  ]
+}

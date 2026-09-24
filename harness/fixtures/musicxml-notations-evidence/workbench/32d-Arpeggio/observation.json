@@ -1,0 +1,53 @@
+{
+  "id": "32d-Arpeggio",
+  "sourceSha256": "acf452bc172e562cea3bf8f03438f9333b04bac359e041a12129c1ad835fdef6",
+  "testClass": "feature",
+  "description": "Different arpeggio kinds and directions.",
+  "views": [
+    {
+      "scrollTarget": "viewer",
+      "visibleWidth": 750,
+      "visibleHeight": 753.125,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0,
+          1
+        ],
+        [
+          2
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [],
+      "scrollWidth": 750,
+      "scrollHeight": 753,
+      "clientWidth": 750,
+      "clientHeight": 753,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "importError": null,
+  "warnings": [],
+  "importedDocumentSha256": "b971ca5a988d1cf87fb14f61f74e6dce66b724999b4a96e799a770f8e6b52e0e",
+  "displayOptions": {
+    "lyrics": "all",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide",
+    "selectedVerse": "1"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

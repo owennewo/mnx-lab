@@ -319,3 +319,22 @@ The referenced `nestedboxes.png` is absent from the pinned suite and
 its image ink is blocked; the first `molto` space is source-ambiguous.
 Detailed current render coverage is 75/183 originals; item 18 and item 19
 remain open.
+
+## Notation rendering batch, 2026-09-24
+
+[The six 32-series originals](../../docs/musicxml-notations-assessment.md)
+now have 71 source-derived feature IDs, 187 source controls, 193 variants,
+142 feature × shell and 386 variant × shell Notation rows. Both-shell original-file
+imports, identical MNX, complete SVG/PNG captures, Show clefs/meters,
+All verses and tiled `32a` scroll coverage are retained. No tuned strings
+permit Tab/Both. All 175 note/rest entries and 166 lyric captions survive,
+but all fifty arpeggio/non-arpeggio controls, thirteen fermatas and six
+`32c` accent/staccato controls vanish before rendering. `32a` keeps simple
+harmonics, H/P curves and a positive bend, but loses harmonic pitch roles,
+two release curves and the sign of a negative pre-bend; many other source
+marks lack diagnostics. `32b` loses word positions/typography/color and
+clips two labels. [Proposed item 34](../proposed/core-musicxml-notation-fidelity.md)
+owns new note-mark gaps; item 33 owns the `32b` direction extension.
+Detailed current render coverage is **81/183 originals; 102 remain**.
+Item 18 remains in progress, and item 19 receives no authoring or GP
+persistence claim from this slice.

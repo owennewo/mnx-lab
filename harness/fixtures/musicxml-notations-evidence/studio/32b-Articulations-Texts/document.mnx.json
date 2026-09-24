@@ -1,0 +1,181 @@
+{
+  "mnx": {
+    "version": 1
+  },
+  "global": {
+    "measures": [
+      {
+        "key": {
+          "fifths": 0
+        },
+        "time": {
+          "count": 4,
+          "unit": 4
+        }
+      },
+      {},
+      {}
+    ]
+  },
+  "parts": [
+    {
+      "id": "P1",
+      "name": "Instrument",
+      "measures": [
+        {
+          "clefs": [
+            {
+              "clef": {
+                "sign": "G",
+                "staffPosition": -2
+              }
+            }
+          ],
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "whole"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "F",
+                        "octave": 4
+                      },
+                      "id": "n-1-1-v1-0-0"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "directions": [
+            {
+              "position": {
+                "fraction": [
+                  0,
+                  1
+                ]
+              },
+              "text": "(0,15) normal, medium ↑",
+              "orient": "above"
+            },
+            {
+              "position": {
+                "fraction": [
+                  1,
+                  1
+                ]
+              },
+              "text": "(-50,-100) bold, medium ↓",
+              "orient": "below"
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "whole"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "G",
+                        "octave": 4
+                      },
+                      "id": "n-1-2-v1-0-0"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "directions": [
+            {
+              "position": {
+                "fraction": [
+                  0,
+                  1
+                ]
+              },
+              "text": "(50,35) normal, large ↑",
+              "orient": "above"
+            },
+            {
+              "position": {
+                "fraction": [
+                  1,
+                  1
+                ]
+              },
+              "text": "(0,-120) bold, large ↓",
+              "orient": "below"
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "whole"
+                  },
+                  "rest": {}
+                }
+              ]
+            }
+          ],
+          "directions": [
+            {
+              "position": {
+                "fraction": [
+                  0,
+                  1
+                ]
+              },
+              "text": "(0,55) normal, small ↑",
+              "orient": "above"
+            },
+            {
+              "position": {
+                "fraction": [
+                  1,
+                  1
+                ]
+              },
+              "text": "(50,-140) bold, small ↓",
+              "orient": "below"
+            },
+            {
+              "position": {
+                "fraction": [
+                  1,
+                  1
+                ]
+              },
+              "text": "(100,-160) normal, small, red ↓",
+              "orient": "below"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "_x": {
+    "mnxLab": {
+      "encoding": {
+        "software": "musicxml-mnx",
+        "version": "0.1.0"
+      }
+    }
+  }
+}

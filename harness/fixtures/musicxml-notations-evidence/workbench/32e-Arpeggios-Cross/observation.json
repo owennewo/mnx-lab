@@ -1,0 +1,50 @@
+{
+  "id": "32e-Arpeggios-Cross",
+  "sourceSha256": "fd0e3f4a16552b2eefbc1616014a5f4b2369b9c6147d10f58f6ec37451d3c2c8",
+  "testClass": "feature",
+  "description": "Cross-voice and cross-staff arpeggios. In the first bar, the <arpeggiate> elements all have the same ‘number’ attribute value, causing cross-staff arpeggios. In the second bar, the elements in the two staves have different ‘number’ attribute values, causing the arpeggios to be connected staff-wise. In the third bar there are different ‘number’ attribute values for each voice, causing arpeggios to be connected voice-wise.",
+  "views": [
+    {
+      "scrollTarget": "viewer",
+      "visibleWidth": 750,
+      "visibleHeight": 753.125,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0,
+          1,
+          2
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [],
+      "scrollWidth": 750,
+      "scrollHeight": 753,
+      "clientWidth": 750,
+      "clientHeight": 753,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "importError": null,
+  "warnings": [],
+  "importedDocumentSha256": "2d9bd570ea69cd50b95f2033f3a126c5ffbd8c65c07d70a6d567bc9b514b48c6",
+  "displayOptions": {
+    "lyrics": "all",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}
