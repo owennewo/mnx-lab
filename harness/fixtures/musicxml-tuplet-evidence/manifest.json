@@ -1,6 +1,6 @@
 {
   "kind": "retained original-file desktop browser render evidence",
-  "applicationCommit": "666ea4eed1e5541bab5db275170ac6de81562fea",
+  "applicationCommit": "8e14eb0b519c8fe94956024fd7d66056ec651324",
   "corpusRevision": "77c19f7e819154c70ca1a1992e80dcda8ff82fea",
   "files": [
     {
@@ -25,7 +25,7 @@
     },
     {
       "path": "studio/23b-Tuplets-Styles/notation-0-0.png",
-      "sha256": "885cfe4a0b7758c0506645f95accdd431e35c106173ace709827553d4942dd46"
+      "sha256": "9f99a2793a9e0f0eb706e264ad836e4be6c88c6bc26021942879c2717ef28688"
     },
     {
       "path": "studio/23b-Tuplets-Styles/notation-0.svg",
@@ -57,7 +57,7 @@
     },
     {
       "path": "studio/23d-Tuplets-Nested/notation-0-0.png",
-      "sha256": "1fbf7b3ec847d2ae086aab749b832ccbea4df7fe23fe6e568e25aba150d2718d"
+      "sha256": "e8d0eb0f28b8c07b1490407f58f571ef84ac164ae64b5e4f9b5b5b02d18821f0"
     },
     {
       "path": "studio/23d-Tuplets-Nested/notation-0.svg",
@@ -73,7 +73,7 @@
     },
     {
       "path": "studio/23e-Tuplets-Tremolo/notation-0-0.png",
-      "sha256": "995b55fceb8ab509886e0802f0bf11d06b65eec49ba21315d18511830cc8805d"
+      "sha256": "751e9baffc13b9229611e7bc030db4795cc6ecbd55999425411b820947bdb997"
     },
     {
       "path": "studio/23e-Tuplets-Tremolo/notation-0.svg",
@@ -101,7 +101,7 @@
     },
     {
       "path": "studio/index.json",
-      "sha256": "a734795766e13934cb598094c3c27db5744285f76d6f911373c46a45c286edd2"
+      "sha256": "b11070e321f5b4598dae15bff64d4e1cbaa5663fce27418779080e7460e99707"
     },
     {
       "path": "workbench/23a-Tuplets/document.mnx.json",
@@ -109,7 +109,7 @@
     },
     {
       "path": "workbench/23a-Tuplets/notation-0-0.png",
-      "sha256": "ef48aa85318c1930048241166fc2e2e3ae913cb17cc25490f20aa5de70ab916a"
+      "sha256": "4777f2b54b24ccabfba537e7fe294795fbbfa3131c1c4651c234307d5df9fcb5"
     },
     {
       "path": "workbench/23a-Tuplets/notation-0.svg",
@@ -125,7 +125,7 @@
     },
     {
       "path": "workbench/23b-Tuplets-Styles/notation-0-0.png",
-      "sha256": "de804f171ae59788918ba75709f7520e5dee296b29e8ae10604259d4a998aaa1"
+      "sha256": "d8432cacf8c602f2fa32e41a763514fbe3c24ee2b5d0a04784af7b68ee836e33"
     },
     {
       "path": "workbench/23b-Tuplets-Styles/notation-0.svg",
@@ -141,7 +141,7 @@
     },
     {
       "path": "workbench/23c-Tuplet-Display-NonStandard/notation-0-0.png",
-      "sha256": "8752d61cf6ba9ac9e085c5e466eea0db2af5a9063c3f8948c43d1c8c82096f29"
+      "sha256": "412e4aca46f2434ca79c551813f608efd7e56c241ec8456b3f41feb312f02542"
     },
     {
       "path": "workbench/23c-Tuplet-Display-NonStandard/notation-0.svg",
@@ -157,7 +157,7 @@
     },
     {
       "path": "workbench/23d-Tuplets-Nested/notation-0-0.png",
-      "sha256": "5b3ba39a142499afb03c1a60223d944a1273528d1e7a1345a9fa767c3f139436"
+      "sha256": "f6fdbb2fa1f26b9e3c7fe7632a9d226b27c9789f9d3f2b1b8d8d61792249a291"
     },
     {
       "path": "workbench/23d-Tuplets-Nested/notation-0.svg",
@@ -173,7 +173,7 @@
     },
     {
       "path": "workbench/23e-Tuplets-Tremolo/notation-0-0.png",
-      "sha256": "b470a41c4ca86832c2d1d50f53a30557b557dd057ba37c123f046468d813d72d"
+      "sha256": "e290fa2a5dedc2d26e98f1fc5fb64c1113db33e0da299798709e96821a410a9e"
     },
     {
       "path": "workbench/23e-Tuplets-Tremolo/notation-0.svg",
@@ -189,7 +189,7 @@
     },
     {
       "path": "workbench/23f-Tuplets-DurationButNoBracket/notation-0-0.png",
-      "sha256": "e0de1e96492810f816b799b2822a97ae855de15ddee80ec7fc6243451ea30bbd"
+      "sha256": "ef5b7f4db2e548a229f349be914dadff43a7fc759722a5d88487c59cf0c5383c"
     },
     {
       "path": "workbench/23f-Tuplets-DurationButNoBracket/notation-0.svg",
@@ -201,7 +201,7 @@
     },
     {
       "path": "workbench/index.json",
-      "sha256": "2ea2668b79dfe811ee6d7ed1b9b1ee25b38fac0af63c4401557ca4c5ee3e1cdc"
+      "sha256": "e8c9e997177b15b5725b418aae47bd6665a123225bd3bbdd886cd6fbc057a1f9"
     }
   ]
 }

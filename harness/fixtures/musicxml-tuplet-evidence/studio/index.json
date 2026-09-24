@@ -2,7 +2,7 @@
   "kind": "browser observations; not feature correctness or human verification",
   "captureScriptSha256": "3de2f09e6d288ee54757a40cbeed8eafcf70dff5c03b0c0fac2eaf481ac0e951",
   "shell": "studio",
-  "applicationCommit": "666ea4eed1e5541bab5db275170ac6de81562fea",
+  "applicationCommit": "8e14eb0b519c8fe94956024fd7d66056ec651324",
   "corpusRevision": "77c19f7e819154c70ca1a1992e80dcda8ff82fea",
   "viewport": {
     "width": 1440,
