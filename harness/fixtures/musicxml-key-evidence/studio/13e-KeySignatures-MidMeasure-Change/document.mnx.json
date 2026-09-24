@@ -1,0 +1,145 @@
+{
+  "mnx": {
+    "version": 1
+  },
+  "global": {
+    "measures": [
+      {
+        "key": {
+          "fifths": 2
+        },
+        "time": {
+          "count": 4,
+          "unit": 4,
+          "display": "common"
+        }
+      }
+    ],
+    "lyrics": {
+      "lineOrder": [
+        "1"
+      ]
+    }
+  },
+  "parts": [
+    {
+      "id": "P1",
+      "name": "MusicXML Part",
+      "measures": [
+        {
+          "clefs": [
+            {
+              "clef": {
+                "sign": "G",
+                "staffPosition": -2
+              }
+            }
+          ],
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "2s",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "G",
+                        "octave": 4
+                      },
+                      "id": "n-1-1-v1-0-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "2f",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "G",
+                        "octave": 4
+                      },
+                      "id": "n-1-1-v1-1-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "0",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "G",
+                        "octave": 4
+                      },
+                      "id": "n-1-1-v1-2-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "7s",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "G",
+                        "octave": 4
+                      },
+                      "id": "n-1-1-v1-3-0"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "_x": {
+    "mnxLab": {
+      "encoding": {
+        "software": "musicxml-mnx",
+        "version": "0.1.0"
+      }
+    }
+  }
+}

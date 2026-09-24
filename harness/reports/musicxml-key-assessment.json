@@ -1,0 +1,5676 @@
+{
+  "kind": "implementation-loop agent render assessment; not human verification",
+  "applicationCommit": "af7f3401c6c9e5928f886a8b9e05626c01b3a2a8",
+  "corpusRevision": "77c19f7e819154c70ca1a1992e80dcda8ff82fea",
+  "scope": "Seven 13-series key-signature originals, source to current browser-imported MNX to complete Notation in both shells",
+  "fixtureCount": 7,
+  "featureCount": 15,
+  "sourceKeyCount": 70,
+  "sourceNoteCount": 73,
+  "sourceVariantCount": 167,
+  "browser": "Chrome/153.0.8010.36",
+  "viewport": {
+    "width": 1440,
+    "height": 1000,
+    "deviceScaleFactor": 1
+  },
+  "viewPolicy": "No source strings; Notation only. Clefs and time signatures Show. Workbench 13a has two overlapping scroll tiles; all other scores fit one tile.",
+  "fixtures": [
+    {
+      "id": "13a-KeySignatures",
+      "sourcePath": "xmlFiles/13a-KeySignatures.musicxml",
+      "sourceSha256": "7e7abc0c164ac5d8835f92989f2dfc896a6fff1b43c32478d5d5823e56baba81",
+      "testClass": "feature",
+      "description": "Various key signatures: from 11 flats to 11 sharps. Each signature is shown twice, with one measure in major and the other measure in minor.",
+      "sourceMeasures": 46,
+      "sourceDeclaresStrings": false,
+      "keys": [
+        {
+          "id": "13a-KeySignatures/m01/k01",
+          "measure": 1,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": -11,
+            "mode": "major",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": {
+            "fifths": -11
+          }
+        },
+        {
+          "id": "13a-KeySignatures/m02/k01",
+          "measure": 2,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": -11,
+            "mode": "minor",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": null
+        },
+        {
+          "id": "13a-KeySignatures/m03/k01",
+          "measure": 3,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": -10,
+            "mode": "major",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": {
+            "fifths": -10
+          }
+        },
+        {
+          "id": "13a-KeySignatures/m04/k01",
+          "measure": 4,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": -10,
+            "mode": "minor",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": null
+        },
+        {
+          "id": "13a-KeySignatures/m05/k01",
+          "measure": 5,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": -9,
+            "mode": "major",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": {
+            "fifths": -9
+          }
+        },
+        {
+          "id": "13a-KeySignatures/m06/k01",
+          "measure": 6,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": -9,
+            "mode": "minor",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": null
+        },
+        {
+          "id": "13a-KeySignatures/m07/k01",
+          "measure": 7,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": -8,
+            "mode": "major",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": {
+            "fifths": -8
+          }
+        },
+        {
+          "id": "13a-KeySignatures/m08/k01",
+          "measure": 8,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": -8,
+            "mode": "minor",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": null
+        },
+        {
+          "id": "13a-KeySignatures/m09/k01",
+          "measure": 9,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": -7,
+            "mode": "major",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": {
+            "fifths": -7
+          }
+        },
+        {
+          "id": "13a-KeySignatures/m10/k01",
+          "measure": 10,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": -7,
+            "mode": "minor",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": null
+        },
+        {
+          "id": "13a-KeySignatures/m11/k01",
+          "measure": 11,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": -6,
+            "mode": "major",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": {
+            "fifths": -6
+          }
+        },
+        {
+          "id": "13a-KeySignatures/m12/k01",
+          "measure": 12,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": -6,
+            "mode": "minor",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": null
+        },
+        {
+          "id": "13a-KeySignatures/m13/k01",
+          "measure": 13,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": -5,
+            "mode": "major",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": {
+            "fifths": -5
+          }
+        },
+        {
+          "id": "13a-KeySignatures/m14/k01",
+          "measure": 14,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": -5,
+            "mode": "minor",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": null
+        },
+        {
+          "id": "13a-KeySignatures/m15/k01",
+          "measure": 15,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": -4,
+            "mode": "major",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": {
+            "fifths": -4
+          }
+        },
+        {
+          "id": "13a-KeySignatures/m16/k01",
+          "measure": 16,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": -4,
+            "mode": "minor",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": null
+        },
+        {
+          "id": "13a-KeySignatures/m17/k01",
+          "measure": 17,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": -3,
+            "mode": "major",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": {
+            "fifths": -3
+          }
+        },
+        {
+          "id": "13a-KeySignatures/m18/k01",
+          "measure": 18,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": -3,
+            "mode": "minor",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": null
+        },
+        {
+          "id": "13a-KeySignatures/m19/k01",
+          "measure": 19,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": -2,
+            "mode": "major",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": {
+            "fifths": -2
+          }
+        },
+        {
+          "id": "13a-KeySignatures/m20/k01",
+          "measure": 20,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": -2,
+            "mode": "minor",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": null
+        },
+        {
+          "id": "13a-KeySignatures/m21/k01",
+          "measure": 21,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": -1,
+            "mode": "major",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": {
+            "fifths": -1
+          }
+        },
+        {
+          "id": "13a-KeySignatures/m22/k01",
+          "measure": 22,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": -1,
+            "mode": "minor",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": null
+        },
+        {
+          "id": "13a-KeySignatures/m23/k01",
+          "measure": 23,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": 0,
+            "mode": "major",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": {
+            "fifths": 0
+          }
+        },
+        {
+          "id": "13a-KeySignatures/m24/k01",
+          "measure": 24,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": 0,
+            "mode": "minor",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": null
+        },
+        {
+          "id": "13a-KeySignatures/m25/k01",
+          "measure": 25,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": 1,
+            "mode": "major",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": {
+            "fifths": 1
+          }
+        },
+        {
+          "id": "13a-KeySignatures/m26/k01",
+          "measure": 26,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": 1,
+            "mode": "minor",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": null
+        },
+        {
+          "id": "13a-KeySignatures/m27/k01",
+          "measure": 27,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": 2,
+            "mode": "major",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": {
+            "fifths": 2
+          }
+        },
+        {
+          "id": "13a-KeySignatures/m28/k01",
+          "measure": 28,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": 2,
+            "mode": "minor",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": null
+        },
+        {
+          "id": "13a-KeySignatures/m29/k01",
+          "measure": 29,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": 3,
+            "mode": "major",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": {
+            "fifths": 3
+          }
+        },
+        {
+          "id": "13a-KeySignatures/m30/k01",
+          "measure": 30,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": 3,
+            "mode": "minor",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": null
+        },
+        {
+          "id": "13a-KeySignatures/m31/k01",
+          "measure": 31,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": 4,
+            "mode": "major",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": {
+            "fifths": 4
+          }
+        },
+        {
+          "id": "13a-KeySignatures/m32/k01",
+          "measure": 32,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": 4,
+            "mode": "minor",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": null
+        },
+        {
+          "id": "13a-KeySignatures/m33/k01",
+          "measure": 33,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": 5,
+            "mode": "major",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": {
+            "fifths": 5
+          }
+        },
+        {
+          "id": "13a-KeySignatures/m34/k01",
+          "measure": 34,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": 5,
+            "mode": "minor",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": null
+        },
+        {
+          "id": "13a-KeySignatures/m35/k01",
+          "measure": 35,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": 6,
+            "mode": "major",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": {
+            "fifths": 6
+          }
+        },
+        {
+          "id": "13a-KeySignatures/m36/k01",
+          "measure": 36,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": 6,
+            "mode": "minor",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": null
+        },
+        {
+          "id": "13a-KeySignatures/m37/k01",
+          "measure": 37,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": 7,
+            "mode": "major",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": {
+            "fifths": 7
+          }
+        },
+        {
+          "id": "13a-KeySignatures/m38/k01",
+          "measure": 38,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": 7,
+            "mode": "minor",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": null
+        },
+        {
+          "id": "13a-KeySignatures/m39/k01",
+          "measure": 39,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": 8,
+            "mode": "major",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": {
+            "fifths": 8
+          }
+        },
+        {
+          "id": "13a-KeySignatures/m40/k01",
+          "measure": 40,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": 8,
+            "mode": "minor",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": null
+        },
+        {
+          "id": "13a-KeySignatures/m41/k01",
+          "measure": 41,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": 9,
+            "mode": "major",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": {
+            "fifths": 9
+          }
+        },
+        {
+          "id": "13a-KeySignatures/m42/k01",
+          "measure": 42,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": 9,
+            "mode": "minor",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": null
+        },
+        {
+          "id": "13a-KeySignatures/m43/k01",
+          "measure": 43,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": 10,
+            "mode": "major",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": {
+            "fifths": 10
+          }
+        },
+        {
+          "id": "13a-KeySignatures/m44/k01",
+          "measure": 44,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": 10,
+            "mode": "minor",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": null
+        },
+        {
+          "id": "13a-KeySignatures/m45/k01",
+          "measure": 45,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": 11,
+            "mode": "major",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": {
+            "fifths": 11
+          }
+        },
+        {
+          "id": "13a-KeySignatures/m46/k01",
+          "measure": 46,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": 11,
+            "mode": "minor",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": null
+        }
+      ],
+      "notes": [
+        {
+          "id": "13a-KeySignatures/m01/n01",
+          "measure": 1,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13a-KeySignatures/m02/n01",
+          "measure": 2,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13a-KeySignatures/m03/n01",
+          "measure": 3,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13a-KeySignatures/m04/n01",
+          "measure": 4,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13a-KeySignatures/m05/n01",
+          "measure": 5,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13a-KeySignatures/m06/n01",
+          "measure": 6,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13a-KeySignatures/m07/n01",
+          "measure": 7,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13a-KeySignatures/m08/n01",
+          "measure": 8,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13a-KeySignatures/m09/n01",
+          "measure": 9,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13a-KeySignatures/m10/n01",
+          "measure": 10,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13a-KeySignatures/m11/n01",
+          "measure": 11,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13a-KeySignatures/m12/n01",
+          "measure": 12,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13a-KeySignatures/m13/n01",
+          "measure": 13,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13a-KeySignatures/m14/n01",
+          "measure": 14,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13a-KeySignatures/m15/n01",
+          "measure": 15,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13a-KeySignatures/m16/n01",
+          "measure": 16,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13a-KeySignatures/m17/n01",
+          "measure": 17,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13a-KeySignatures/m18/n01",
+          "measure": 18,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13a-KeySignatures/m19/n01",
+          "measure": 19,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13a-KeySignatures/m20/n01",
+          "measure": 20,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13a-KeySignatures/m21/n01",
+          "measure": 21,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13a-KeySignatures/m22/n01",
+          "measure": 22,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13a-KeySignatures/m23/n01",
+          "measure": 23,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13a-KeySignatures/m24/n01",
+          "measure": 24,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13a-KeySignatures/m25/n01",
+          "measure": 25,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13a-KeySignatures/m26/n01",
+          "measure": 26,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13a-KeySignatures/m27/n01",
+          "measure": 27,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13a-KeySignatures/m28/n01",
+          "measure": 28,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13a-KeySignatures/m29/n01",
+          "measure": 29,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13a-KeySignatures/m30/n01",
+          "measure": 30,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13a-KeySignatures/m31/n01",
+          "measure": 31,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13a-KeySignatures/m32/n01",
+          "measure": 32,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13a-KeySignatures/m33/n01",
+          "measure": 33,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13a-KeySignatures/m34/n01",
+          "measure": 34,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13a-KeySignatures/m35/n01",
+          "measure": 35,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13a-KeySignatures/m36/n01",
+          "measure": 36,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13a-KeySignatures/m37/n01",
+          "measure": 37,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13a-KeySignatures/m38/n01",
+          "measure": 38,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13a-KeySignatures/m39/n01",
+          "measure": 39,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13a-KeySignatures/m40/n01",
+          "measure": 40,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13a-KeySignatures/m41/n01",
+          "measure": 41,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13a-KeySignatures/m42/n01",
+          "measure": 42,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13a-KeySignatures/m43/n01",
+          "measure": 43,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13a-KeySignatures/m44/n01",
+          "measure": 44,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13a-KeySignatures/m45/n01",
+          "measure": 45,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13a-KeySignatures/m46/n01",
+          "measure": 46,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        }
+      ]
+    },
+    {
+      "id": "13b-KeySignatures-ChurchModes",
+      "sourcePath": "xmlFiles/13b-KeySignatures-ChurchModes.musicxml",
+      "sourceSha256": "0833c300cd1a03633115ceac8b7820c24af9495658c14bf85eefece2c5e6f6f9",
+      "testClass": "feature",
+      "description": "All different modes: ‘major’, ‘minor’, ‘ionian’, ‘dorian’, ‘phrygian’, ‘lydian’, ‘mixolydian’, ‘aeolian’, ‘locrian’, and ‘none’. All modes are given with two sharps.",
+      "sourceMeasures": 3,
+      "sourceDeclaresStrings": false,
+      "keys": [
+        {
+          "id": "13b-KeySignatures-ChurchModes/m01/k01",
+          "measure": 1,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": 2,
+            "mode": "major",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": {
+            "fifths": 2
+          }
+        },
+        {
+          "id": "13b-KeySignatures-ChurchModes/m01/k02",
+          "measure": 1,
+          "onsetQuarter": [
+            1,
+            1
+          ],
+          "source": {
+            "fifths": 2,
+            "mode": "minor",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": {
+            "fifths": 2
+          }
+        },
+        {
+          "id": "13b-KeySignatures-ChurchModes/m01/k03",
+          "measure": 1,
+          "onsetQuarter": [
+            2,
+            1
+          ],
+          "source": {
+            "fifths": 2,
+            "mode": "ionian",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": {
+            "fifths": 2
+          }
+        },
+        {
+          "id": "13b-KeySignatures-ChurchModes/m01/k04",
+          "measure": 1,
+          "onsetQuarter": [
+            3,
+            1
+          ],
+          "source": {
+            "fifths": 2,
+            "mode": "dorian",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": {
+            "fifths": 2
+          }
+        },
+        {
+          "id": "13b-KeySignatures-ChurchModes/m02/k01",
+          "measure": 2,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": 2,
+            "mode": "phrygian",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": null
+        },
+        {
+          "id": "13b-KeySignatures-ChurchModes/m02/k02",
+          "measure": 2,
+          "onsetQuarter": [
+            1,
+            1
+          ],
+          "source": {
+            "fifths": 2,
+            "mode": "lydian",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": null
+        },
+        {
+          "id": "13b-KeySignatures-ChurchModes/m02/k03",
+          "measure": 2,
+          "onsetQuarter": [
+            2,
+            1
+          ],
+          "source": {
+            "fifths": 2,
+            "mode": "mixolydian",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": null
+        },
+        {
+          "id": "13b-KeySignatures-ChurchModes/m02/k04",
+          "measure": 2,
+          "onsetQuarter": [
+            3,
+            1
+          ],
+          "source": {
+            "fifths": 2,
+            "mode": "aeolian",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": null
+        },
+        {
+          "id": "13b-KeySignatures-ChurchModes/m03/k01",
+          "measure": 3,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": 2,
+            "mode": "locrian",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": null
+        },
+        {
+          "id": "13b-KeySignatures-ChurchModes/m03/k02",
+          "measure": 3,
+          "onsetQuarter": [
+            1,
+            1
+          ],
+          "source": {
+            "fifths": 2,
+            "mode": "none",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": null
+        }
+      ],
+      "notes": [
+        {
+          "id": "13b-KeySignatures-ChurchModes/m01/n01",
+          "measure": 1,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "G",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "G",
+            "octave": 4
+          },
+          "type": "quarter",
+          "lyric": "major"
+        },
+        {
+          "id": "13b-KeySignatures-ChurchModes/m01/n02",
+          "measure": 1,
+          "onsetQuarter": [
+            1,
+            1
+          ],
+          "sourcePitch": {
+            "step": "G",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "G",
+            "octave": 4
+          },
+          "type": "quarter",
+          "lyric": "minor"
+        },
+        {
+          "id": "13b-KeySignatures-ChurchModes/m01/n03",
+          "measure": 1,
+          "onsetQuarter": [
+            2,
+            1
+          ],
+          "sourcePitch": {
+            "step": "G",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "G",
+            "octave": 4
+          },
+          "type": "quarter",
+          "lyric": "ionian"
+        },
+        {
+          "id": "13b-KeySignatures-ChurchModes/m01/n04",
+          "measure": 1,
+          "onsetQuarter": [
+            3,
+            1
+          ],
+          "sourcePitch": {
+            "step": "G",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "G",
+            "octave": 4
+          },
+          "type": "quarter",
+          "lyric": "dorian"
+        },
+        {
+          "id": "13b-KeySignatures-ChurchModes/m02/n01",
+          "measure": 2,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "G",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "G",
+            "octave": 4
+          },
+          "type": "quarter",
+          "lyric": "phrygian"
+        },
+        {
+          "id": "13b-KeySignatures-ChurchModes/m02/n02",
+          "measure": 2,
+          "onsetQuarter": [
+            1,
+            1
+          ],
+          "sourcePitch": {
+            "step": "G",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "G",
+            "octave": 4
+          },
+          "type": "quarter",
+          "lyric": "lydian"
+        },
+        {
+          "id": "13b-KeySignatures-ChurchModes/m02/n03",
+          "measure": 2,
+          "onsetQuarter": [
+            2,
+            1
+          ],
+          "sourcePitch": {
+            "step": "G",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "G",
+            "octave": 4
+          },
+          "type": "quarter",
+          "lyric": "mixolydian"
+        },
+        {
+          "id": "13b-KeySignatures-ChurchModes/m02/n04",
+          "measure": 2,
+          "onsetQuarter": [
+            3,
+            1
+          ],
+          "sourcePitch": {
+            "step": "G",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "G",
+            "octave": 4
+          },
+          "type": "quarter",
+          "lyric": "aeolian"
+        },
+        {
+          "id": "13b-KeySignatures-ChurchModes/m03/n01",
+          "measure": 3,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "G",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "G",
+            "octave": 4
+          },
+          "type": "quarter",
+          "lyric": "locrian"
+        },
+        {
+          "id": "13b-KeySignatures-ChurchModes/m03/n02",
+          "measure": 3,
+          "onsetQuarter": [
+            1,
+            1
+          ],
+          "sourcePitch": {
+            "step": "G",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "G",
+            "octave": 4
+          },
+          "type": "quarter",
+          "lyric": "none"
+        }
+      ]
+    },
+    {
+      "id": "13c-KeySignatures-NonTraditional",
+      "sourcePath": "xmlFiles/13c-KeySignatures-NonTraditional.musicxml",
+      "sourceSha256": "55d06fc5a7dcbb7f8554a96166ab8edddab6e785b5fbd067a041c29bb08cc061",
+      "testClass": "feature",
+      "description": "Non-traditional key signatures, where each alteration is separately given. The first signature is [f sharp, a flat, b flat]. The second one is [c flat-flat, g sharp-sharp, d flat, b sharp, f natural], with explicitly selected octaves for each alteration.",
+      "sourceMeasures": 2,
+      "sourceDeclaresStrings": false,
+      "keys": [
+        {
+          "id": "13c-KeySignatures-NonTraditional/m01/k01",
+          "measure": 1,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": null,
+            "mode": null,
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [
+              {
+                "index": 1,
+                "step": "F",
+                "alter": "1",
+                "accidental": null
+              },
+              {
+                "index": 2,
+                "step": "A",
+                "alter": "-1",
+                "accidental": null
+              },
+              {
+                "index": 3,
+                "step": "B",
+                "alter": "-1",
+                "accidental": null
+              }
+            ],
+            "octaves": []
+          },
+          "alterationVariants": [
+            {
+              "id": "13c-KeySignatures-NonTraditional/m01/k01/a01",
+              "index": 1,
+              "step": "F",
+              "alter": "1",
+              "accidental": null
+            },
+            {
+              "id": "13c-KeySignatures-NonTraditional/m01/k01/a02",
+              "index": 2,
+              "step": "A",
+              "alter": "-1",
+              "accidental": null
+            },
+            {
+              "id": "13c-KeySignatures-NonTraditional/m01/k01/a03",
+              "index": 3,
+              "step": "B",
+              "alter": "-1",
+              "accidental": null
+            }
+          ],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": null
+        },
+        {
+          "id": "13c-KeySignatures-NonTraditional/m02/k01",
+          "measure": 2,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": null,
+            "mode": null,
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [
+              {
+                "index": 1,
+                "step": "C",
+                "alter": "-2",
+                "accidental": null
+              },
+              {
+                "index": 2,
+                "step": "G",
+                "alter": "2",
+                "accidental": null
+              },
+              {
+                "index": 3,
+                "step": "D",
+                "alter": "-1",
+                "accidental": null
+              },
+              {
+                "index": 4,
+                "step": "B",
+                "alter": "1",
+                "accidental": null
+              },
+              {
+                "index": 5,
+                "step": "F",
+                "alter": "0",
+                "accidental": null
+              }
+            ],
+            "octaves": [
+              {
+                "number": 1,
+                "octave": 2
+              },
+              {
+                "number": 2,
+                "octave": 3
+              },
+              {
+                "number": 3,
+                "octave": 4
+              },
+              {
+                "number": 4,
+                "octave": 5
+              },
+              {
+                "number": 5,
+                "octave": 6
+              }
+            ]
+          },
+          "alterationVariants": [
+            {
+              "id": "13c-KeySignatures-NonTraditional/m02/k01/a01",
+              "index": 1,
+              "step": "C",
+              "alter": "-2",
+              "accidental": null
+            },
+            {
+              "id": "13c-KeySignatures-NonTraditional/m02/k01/a02",
+              "index": 2,
+              "step": "G",
+              "alter": "2",
+              "accidental": null
+            },
+            {
+              "id": "13c-KeySignatures-NonTraditional/m02/k01/a03",
+              "index": 3,
+              "step": "D",
+              "alter": "-1",
+              "accidental": null
+            },
+            {
+              "id": "13c-KeySignatures-NonTraditional/m02/k01/a04",
+              "index": 4,
+              "step": "B",
+              "alter": "1",
+              "accidental": null
+            },
+            {
+              "id": "13c-KeySignatures-NonTraditional/m02/k01/a05",
+              "index": 5,
+              "step": "F",
+              "alter": "0",
+              "accidental": null
+            }
+          ],
+          "octaveVariants": [
+            {
+              "id": "13c-KeySignatures-NonTraditional/m02/k01/o01",
+              "number": 1,
+              "octave": 2
+            },
+            {
+              "id": "13c-KeySignatures-NonTraditional/m02/k01/o02",
+              "number": 2,
+              "octave": 3
+            },
+            {
+              "id": "13c-KeySignatures-NonTraditional/m02/k01/o03",
+              "number": 3,
+              "octave": 4
+            },
+            {
+              "id": "13c-KeySignatures-NonTraditional/m02/k01/o04",
+              "number": 4,
+              "octave": 5
+            },
+            {
+              "id": "13c-KeySignatures-NonTraditional/m02/k01/o05",
+              "number": 5,
+              "octave": 6
+            }
+          ],
+          "cancelVariant": null,
+          "importedGlobalKey": null
+        }
+      ],
+      "notes": [
+        {
+          "id": "13c-KeySignatures-NonTraditional/m01/n01",
+          "measure": 1,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13c-KeySignatures-NonTraditional/m02/n01",
+          "measure": 2,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        }
+      ]
+    },
+    {
+      "id": "13d-KeySignatures-Microtones",
+      "sourcePath": "xmlFiles/13d-KeySignatures-Microtones.musicxml",
+      "sourceSha256": "4a1e57b89ad4e745ca8bf1ddb09abe38fa0706dad3298de944c253075affa7e4",
+      "testClass": "feature",
+      "description": "Non-traditional key signatures with microtone alterations: [g flat-and-a-half, a flat, b half-flat, c natural, d half-sharp, e sharp, f sharp-and-a-half].",
+      "sourceMeasures": 1,
+      "sourceDeclaresStrings": false,
+      "keys": [
+        {
+          "id": "13d-KeySignatures-Microtones/m01/k01",
+          "measure": 1,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": null,
+            "mode": null,
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [
+              {
+                "index": 1,
+                "step": "G",
+                "alter": "-1.5",
+                "accidental": null
+              },
+              {
+                "index": 2,
+                "step": "A",
+                "alter": "-1",
+                "accidental": null
+              },
+              {
+                "index": 3,
+                "step": "B",
+                "alter": "-0.5",
+                "accidental": null
+              },
+              {
+                "index": 4,
+                "step": "C",
+                "alter": "0",
+                "accidental": null
+              },
+              {
+                "index": 5,
+                "step": "D",
+                "alter": "0.5",
+                "accidental": null
+              },
+              {
+                "index": 6,
+                "step": "E",
+                "alter": "1",
+                "accidental": null
+              },
+              {
+                "index": 7,
+                "step": "F",
+                "alter": "1.5",
+                "accidental": null
+              }
+            ],
+            "octaves": []
+          },
+          "alterationVariants": [
+            {
+              "id": "13d-KeySignatures-Microtones/m01/k01/a01",
+              "index": 1,
+              "step": "G",
+              "alter": "-1.5",
+              "accidental": null
+            },
+            {
+              "id": "13d-KeySignatures-Microtones/m01/k01/a02",
+              "index": 2,
+              "step": "A",
+              "alter": "-1",
+              "accidental": null
+            },
+            {
+              "id": "13d-KeySignatures-Microtones/m01/k01/a03",
+              "index": 3,
+              "step": "B",
+              "alter": "-0.5",
+              "accidental": null
+            },
+            {
+              "id": "13d-KeySignatures-Microtones/m01/k01/a04",
+              "index": 4,
+              "step": "C",
+              "alter": "0",
+              "accidental": null
+            },
+            {
+              "id": "13d-KeySignatures-Microtones/m01/k01/a05",
+              "index": 5,
+              "step": "D",
+              "alter": "0.5",
+              "accidental": null
+            },
+            {
+              "id": "13d-KeySignatures-Microtones/m01/k01/a06",
+              "index": 6,
+              "step": "E",
+              "alter": "1",
+              "accidental": null
+            },
+            {
+              "id": "13d-KeySignatures-Microtones/m01/k01/a07",
+              "index": 7,
+              "step": "F",
+              "alter": "1.5",
+              "accidental": null
+            }
+          ],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": null
+        }
+      ],
+      "notes": [
+        {
+          "id": "13d-KeySignatures-Microtones/m01/n01",
+          "measure": 1,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        }
+      ]
+    },
+    {
+      "id": "13e-KeySignatures-Cancel",
+      "sourcePath": "xmlFiles/13e-KeySignatures-Cancel.musicxml",
+      "sourceSha256": "90b4e555eb7149a94679605e2ba73b5c48f81a76b3e74b8d680b363e4f1112a7",
+      "testClass": "feature",
+      "description": "Tests of key signature cancellation: in measure 2 it is positioned at the default location (which usually means that the cancellation comes immediately after the bar line), in measure 3 it uses the attribute ‘location=\"right\"’ (i.e., the cancellation comes after the new key signature), in measure 4 it uses ‘location=\"before-barline\"’, and in measure 5 it uses the attribute ‘location=\"left\"’ (the cancellation comes before the new key signature). The <cancel> element's value (4) in the last measure intentionally doesn't correspond to the value of the previous <fifths> value (2) for testing purposes.",
+      "sourceMeasures": 5,
+      "sourceDeclaresStrings": false,
+      "keys": [
+        {
+          "id": "13e-KeySignatures-Cancel/m01/k01",
+          "measure": 1,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": 3,
+            "mode": "major",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": {
+            "fifths": 3
+          }
+        },
+        {
+          "id": "13e-KeySignatures-Cancel/m02/k01",
+          "measure": 2,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": -5,
+            "mode": "major",
+            "printObject": "yes",
+            "cancel": {
+              "value": 3,
+              "location": "left"
+            },
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": {
+            "id": "13e-KeySignatures-Cancel/m02/k01/cancel",
+            "value": 3,
+            "location": "left"
+          },
+          "importedGlobalKey": {
+            "fifths": -5
+          }
+        },
+        {
+          "id": "13e-KeySignatures-Cancel/m03/k01",
+          "measure": 3,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": -3,
+            "mode": "major",
+            "printObject": "yes",
+            "cancel": {
+              "value": -5,
+              "location": "right"
+            },
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": {
+            "id": "13e-KeySignatures-Cancel/m03/k01/cancel",
+            "value": -5,
+            "location": "right"
+          },
+          "importedGlobalKey": {
+            "fifths": -3
+          }
+        },
+        {
+          "id": "13e-KeySignatures-Cancel/m04/k01",
+          "measure": 4,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": 2,
+            "mode": "major",
+            "printObject": "yes",
+            "cancel": {
+              "value": -3,
+              "location": "before-barline"
+            },
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": {
+            "id": "13e-KeySignatures-Cancel/m04/k01/cancel",
+            "value": -3,
+            "location": "before-barline"
+          },
+          "importedGlobalKey": {
+            "fifths": 2
+          }
+        },
+        {
+          "id": "13e-KeySignatures-Cancel/m05/k01",
+          "measure": 5,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": -2,
+            "mode": "major",
+            "printObject": "yes",
+            "cancel": {
+              "value": 4,
+              "location": "left"
+            },
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": {
+            "id": "13e-KeySignatures-Cancel/m05/k01/cancel",
+            "value": 4,
+            "location": "left"
+          },
+          "importedGlobalKey": {
+            "fifths": -2
+          }
+        }
+      ],
+      "notes": [
+        {
+          "id": "13e-KeySignatures-Cancel/m01/n01",
+          "measure": 1,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13e-KeySignatures-Cancel/m02/n01",
+          "measure": 2,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13e-KeySignatures-Cancel/m03/n01",
+          "measure": 3,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13e-KeySignatures-Cancel/m04/n01",
+          "measure": 4,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        },
+        {
+          "id": "13e-KeySignatures-Cancel/m05/n01",
+          "measure": 5,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "C",
+            "octave": 4
+          },
+          "type": "half",
+          "lyric": null
+        }
+      ]
+    },
+    {
+      "id": "13e-KeySignatures-MidMeasure-Change",
+      "sourcePath": "xmlFiles/13e-KeySignatures-MidMeasure-Change.musicxml",
+      "sourceSha256": "1606f21465d79c5ac44456f712fac03d619ceece8bef18c78e8f7de1b15d8e99",
+      "testClass": "feature",
+      "description": "Mid-Measure Key-Change: 2 sharps, 2 flats, 0 sharps/flats, 7 sharps, no mode.",
+      "sourceMeasures": 1,
+      "sourceDeclaresStrings": false,
+      "keys": [
+        {
+          "id": "13e-KeySignatures-MidMeasure-Change/m01/k01",
+          "measure": 1,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": 2,
+            "mode": null,
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": {
+            "fifths": 2
+          }
+        },
+        {
+          "id": "13e-KeySignatures-MidMeasure-Change/m01/k02",
+          "measure": 1,
+          "onsetQuarter": [
+            1,
+            1
+          ],
+          "source": {
+            "fifths": -2,
+            "mode": null,
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": {
+            "fifths": 2
+          }
+        },
+        {
+          "id": "13e-KeySignatures-MidMeasure-Change/m01/k03",
+          "measure": 1,
+          "onsetQuarter": [
+            2,
+            1
+          ],
+          "source": {
+            "fifths": 0,
+            "mode": null,
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": {
+            "fifths": 2
+          }
+        },
+        {
+          "id": "13e-KeySignatures-MidMeasure-Change/m01/k04",
+          "measure": 1,
+          "onsetQuarter": [
+            3,
+            1
+          ],
+          "source": {
+            "fifths": 7,
+            "mode": null,
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": {
+            "fifths": 2
+          }
+        }
+      ],
+      "notes": [
+        {
+          "id": "13e-KeySignatures-MidMeasure-Change/m01/n01",
+          "measure": 1,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "G",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "G",
+            "octave": 4
+          },
+          "type": "quarter",
+          "lyric": "2s"
+        },
+        {
+          "id": "13e-KeySignatures-MidMeasure-Change/m01/n02",
+          "measure": 1,
+          "onsetQuarter": [
+            1,
+            1
+          ],
+          "sourcePitch": {
+            "step": "G",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "G",
+            "octave": 4
+          },
+          "type": "quarter",
+          "lyric": "2f"
+        },
+        {
+          "id": "13e-KeySignatures-MidMeasure-Change/m01/n03",
+          "measure": 1,
+          "onsetQuarter": [
+            2,
+            1
+          ],
+          "sourcePitch": {
+            "step": "G",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "G",
+            "octave": 4
+          },
+          "type": "quarter",
+          "lyric": "0"
+        },
+        {
+          "id": "13e-KeySignatures-MidMeasure-Change/m01/n04",
+          "measure": 1,
+          "onsetQuarter": [
+            3,
+            1
+          ],
+          "sourcePitch": {
+            "step": "G",
+            "octave": 4
+          },
+          "importedPitch": {
+            "step": "G",
+            "octave": 4
+          },
+          "type": "quarter",
+          "lyric": "7s"
+        }
+      ]
+    },
+    {
+      "id": "13f-KeySignatures-Visible",
+      "sourcePath": "xmlFiles/13f-KeySignatures-Visible.musicxml",
+      "sourceSha256": "e669b4a0d7f5cddf69b6e6d5648383595ab4a32755425dbc65187466aaa6373c",
+      "testClass": "feature",
+      "description": "Test the ‘print-object’ attribute of key signatures. The signature at the beginning of the second bar is a flat major and should be invisible; the following notes d flat, e flat, a flat, and b flat shouldn't have a flat accidental.",
+      "sourceMeasures": 2,
+      "sourceDeclaresStrings": false,
+      "keys": [
+        {
+          "id": "13f-KeySignatures-Visible/m01/k01",
+          "measure": 1,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": 4,
+            "mode": "major",
+            "printObject": "yes",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": {
+            "fifths": 4
+          }
+        },
+        {
+          "id": "13f-KeySignatures-Visible/m02/k01",
+          "measure": 2,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "source": {
+            "fifths": -4,
+            "mode": "major",
+            "printObject": "no",
+            "cancel": null,
+            "alterations": [],
+            "octaves": []
+          },
+          "alterationVariants": [],
+          "octaveVariants": [],
+          "cancelVariant": null,
+          "importedGlobalKey": {
+            "fifths": -4
+          }
+        }
+      ],
+      "notes": [
+        {
+          "id": "13f-KeySignatures-Visible/m01/n01",
+          "measure": 1,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "D",
+            "octave": 4,
+            "alter": 1
+          },
+          "importedPitch": {
+            "step": "D",
+            "octave": 4,
+            "alter": 1
+          },
+          "type": "whole",
+          "lyric": null
+        },
+        {
+          "id": "13f-KeySignatures-Visible/m02/n01",
+          "measure": 2,
+          "onsetQuarter": [
+            0,
+            1
+          ],
+          "sourcePitch": {
+            "step": "D",
+            "octave": 4,
+            "alter": -1
+          },
+          "importedPitch": {
+            "step": "D",
+            "octave": 4,
+            "alter": -1
+          },
+          "type": "quarter",
+          "lyric": null
+        },
+        {
+          "id": "13f-KeySignatures-Visible/m02/n02",
+          "measure": 2,
+          "onsetQuarter": [
+            1,
+            1
+          ],
+          "sourcePitch": {
+            "step": "E",
+            "octave": 4,
+            "alter": -1
+          },
+          "importedPitch": {
+            "step": "E",
+            "octave": 4,
+            "alter": -1
+          },
+          "type": "quarter",
+          "lyric": null
+        },
+        {
+          "id": "13f-KeySignatures-Visible/m02/n03",
+          "measure": 2,
+          "onsetQuarter": [
+            2,
+            1
+          ],
+          "sourcePitch": {
+            "step": "A",
+            "octave": 4,
+            "alter": -1
+          },
+          "importedPitch": {
+            "step": "A",
+            "octave": 4,
+            "alter": -1
+          },
+          "type": "quarter",
+          "lyric": null
+        },
+        {
+          "id": "13f-KeySignatures-Visible/m02/n04",
+          "measure": 2,
+          "onsetQuarter": [
+            3,
+            1
+          ],
+          "sourcePitch": {
+            "step": "B",
+            "octave": 4,
+            "alter": -1
+          },
+          "importedPitch": {
+            "step": "B",
+            "octave": 4,
+            "alter": -1
+          },
+          "type": "quarter",
+          "lyric": null
+        }
+      ]
+    }
+  ],
+  "features": [
+    {
+      "id": "13a.conventional-fifths",
+      "fixture": "13a-KeySignatures",
+      "variantIds": [
+        "13a-KeySignatures/m09/k01",
+        "13a-KeySignatures/m10/k01",
+        "13a-KeySignatures/m11/k01",
+        "13a-KeySignatures/m12/k01",
+        "13a-KeySignatures/m13/k01",
+        "13a-KeySignatures/m14/k01",
+        "13a-KeySignatures/m15/k01",
+        "13a-KeySignatures/m16/k01",
+        "13a-KeySignatures/m17/k01",
+        "13a-KeySignatures/m18/k01",
+        "13a-KeySignatures/m19/k01",
+        "13a-KeySignatures/m20/k01",
+        "13a-KeySignatures/m21/k01",
+        "13a-KeySignatures/m22/k01",
+        "13a-KeySignatures/m23/k01",
+        "13a-KeySignatures/m24/k01",
+        "13a-KeySignatures/m25/k01",
+        "13a-KeySignatures/m26/k01",
+        "13a-KeySignatures/m27/k01",
+        "13a-KeySignatures/m28/k01",
+        "13a-KeySignatures/m29/k01",
+        "13a-KeySignatures/m30/k01",
+        "13a-KeySignatures/m31/k01",
+        "13a-KeySignatures/m32/k01",
+        "13a-KeySignatures/m33/k01",
+        "13a-KeySignatures/m34/k01",
+        "13a-KeySignatures/m35/k01",
+        "13a-KeySignatures/m36/k01",
+        "13a-KeySignatures/m37/k01",
+        "13a-KeySignatures/m38/k01"
+      ],
+      "variantCount": 30,
+      "sourceDescription": "Various key signatures: from 11 flats to 11 sharps. Each signature is shown twice, with one measure in major and the other measure in minor.",
+      "expected": "All -7 through +7 traditional fifth counts show their complete key-signature ink in both major and minor bars."
+    },
+    {
+      "id": "13a.extreme-fifths",
+      "fixture": "13a-KeySignatures",
+      "variantIds": [
+        "13a-KeySignatures/m01/k01",
+        "13a-KeySignatures/m02/k01",
+        "13a-KeySignatures/m03/k01",
+        "13a-KeySignatures/m04/k01",
+        "13a-KeySignatures/m05/k01",
+        "13a-KeySignatures/m06/k01",
+        "13a-KeySignatures/m07/k01",
+        "13a-KeySignatures/m08/k01",
+        "13a-KeySignatures/m39/k01",
+        "13a-KeySignatures/m40/k01",
+        "13a-KeySignatures/m41/k01",
+        "13a-KeySignatures/m42/k01",
+        "13a-KeySignatures/m43/k01",
+        "13a-KeySignatures/m44/k01",
+        "13a-KeySignatures/m45/k01",
+        "13a-KeySignatures/m46/k01"
+      ],
+      "variantCount": 16,
+      "sourceDescription": "Various key signatures: from 11 flats to 11 sharps. Each signature is shown twice, with one measure in major and the other measure in minor.",
+      "expected": "All -11 through -8 and +8 through +11 fifth counts remain visibly distinct and complete."
+    },
+    {
+      "id": "13a.major-minor-values",
+      "fixture": "13a-KeySignatures",
+      "variantIds": [
+        "13a-KeySignatures/m01/k01",
+        "13a-KeySignatures/m02/k01",
+        "13a-KeySignatures/m03/k01",
+        "13a-KeySignatures/m04/k01",
+        "13a-KeySignatures/m05/k01",
+        "13a-KeySignatures/m06/k01",
+        "13a-KeySignatures/m07/k01",
+        "13a-KeySignatures/m08/k01",
+        "13a-KeySignatures/m09/k01",
+        "13a-KeySignatures/m10/k01",
+        "13a-KeySignatures/m11/k01",
+        "13a-KeySignatures/m12/k01",
+        "13a-KeySignatures/m13/k01",
+        "13a-KeySignatures/m14/k01",
+        "13a-KeySignatures/m15/k01",
+        "13a-KeySignatures/m16/k01",
+        "13a-KeySignatures/m17/k01",
+        "13a-KeySignatures/m18/k01",
+        "13a-KeySignatures/m19/k01",
+        "13a-KeySignatures/m20/k01",
+        "13a-KeySignatures/m21/k01",
+        "13a-KeySignatures/m22/k01",
+        "13a-KeySignatures/m23/k01",
+        "13a-KeySignatures/m24/k01",
+        "13a-KeySignatures/m25/k01",
+        "13a-KeySignatures/m26/k01",
+        "13a-KeySignatures/m27/k01",
+        "13a-KeySignatures/m28/k01",
+        "13a-KeySignatures/m29/k01",
+        "13a-KeySignatures/m30/k01",
+        "13a-KeySignatures/m31/k01",
+        "13a-KeySignatures/m32/k01",
+        "13a-KeySignatures/m33/k01",
+        "13a-KeySignatures/m34/k01",
+        "13a-KeySignatures/m35/k01",
+        "13a-KeySignatures/m36/k01",
+        "13a-KeySignatures/m37/k01",
+        "13a-KeySignatures/m38/k01",
+        "13a-KeySignatures/m39/k01",
+        "13a-KeySignatures/m40/k01",
+        "13a-KeySignatures/m41/k01",
+        "13a-KeySignatures/m42/k01",
+        "13a-KeySignatures/m43/k01",
+        "13a-KeySignatures/m44/k01",
+        "13a-KeySignatures/m45/k01",
+        "13a-KeySignatures/m46/k01"
+      ],
+      "variantCount": 46,
+      "sourceDescription": "Various key signatures: from 11 flats to 11 sharps. Each signature is shown twice, with one measure in major and the other measure in minor.",
+      "expected": "Major/minor mode metadata is retained for later semantic and authoring use; the mode itself has no separate key-signature glyph."
+    },
+    {
+      "id": "13b.two-sharp-ink",
+      "fixture": "13b-KeySignatures-ChurchModes",
+      "variantIds": [
+        "13b-KeySignatures-ChurchModes/m01/k01",
+        "13b-KeySignatures-ChurchModes/m01/k02",
+        "13b-KeySignatures-ChurchModes/m01/k03",
+        "13b-KeySignatures-ChurchModes/m01/k04",
+        "13b-KeySignatures-ChurchModes/m02/k01",
+        "13b-KeySignatures-ChurchModes/m02/k02",
+        "13b-KeySignatures-ChurchModes/m02/k03",
+        "13b-KeySignatures-ChurchModes/m02/k04",
+        "13b-KeySignatures-ChurchModes/m03/k01",
+        "13b-KeySignatures-ChurchModes/m03/k02"
+      ],
+      "variantCount": 10,
+      "sourceDescription": "All different modes: ‘major’, ‘minor’, ‘ionian’, ‘dorian’, ‘phrygian’, ‘lydian’, ‘mixolydian’, ‘aeolian’, ‘locrian’, and ‘none’. All modes are given with two sharps.",
+      "expected": "All ten mode changes share the same two-sharp visible signature."
+    },
+    {
+      "id": "13b.mode-values",
+      "fixture": "13b-KeySignatures-ChurchModes",
+      "variantIds": [
+        "13b-KeySignatures-ChurchModes/m01/k01",
+        "13b-KeySignatures-ChurchModes/m01/k02",
+        "13b-KeySignatures-ChurchModes/m01/k03",
+        "13b-KeySignatures-ChurchModes/m01/k04",
+        "13b-KeySignatures-ChurchModes/m02/k01",
+        "13b-KeySignatures-ChurchModes/m02/k02",
+        "13b-KeySignatures-ChurchModes/m02/k03",
+        "13b-KeySignatures-ChurchModes/m02/k04",
+        "13b-KeySignatures-ChurchModes/m03/k01",
+        "13b-KeySignatures-ChurchModes/m03/k02"
+      ],
+      "variantCount": 10,
+      "sourceDescription": "All different modes: ‘major’, ‘minor’, ‘ionian’, ‘dorian’, ‘phrygian’, ‘lydian’, ‘mixolydian’, ‘aeolian’, ‘locrian’, and ‘none’. All modes are given with two sharps.",
+      "expected": "All ten named modes remain semantically identifiable, with no distinct mode glyph."
+    },
+    {
+      "id": "13b.mode-labels",
+      "fixture": "13b-KeySignatures-ChurchModes",
+      "variantIds": [
+        "13b-KeySignatures-ChurchModes/m01/n01",
+        "13b-KeySignatures-ChurchModes/m01/n02",
+        "13b-KeySignatures-ChurchModes/m01/n03",
+        "13b-KeySignatures-ChurchModes/m01/n04",
+        "13b-KeySignatures-ChurchModes/m02/n01",
+        "13b-KeySignatures-ChurchModes/m02/n02",
+        "13b-KeySignatures-ChurchModes/m02/n03",
+        "13b-KeySignatures-ChurchModes/m02/n04",
+        "13b-KeySignatures-ChurchModes/m03/n01",
+        "13b-KeySignatures-ChurchModes/m03/n02"
+      ],
+      "variantCount": 10,
+      "sourceDescription": "All different modes: ‘major’, ‘minor’, ‘ionian’, ‘dorian’, ‘phrygian’, ‘lydian’, ‘mixolydian’, ‘aeolian’, ‘locrian’, and ‘none’. All modes are given with two sharps.",
+      "expected": "The source lyric under each note names its mode."
+    },
+    {
+      "id": "13c.nontraditional-alterations",
+      "fixture": "13c-KeySignatures-NonTraditional",
+      "variantIds": [
+        "13c-KeySignatures-NonTraditional/m01/k01",
+        "13c-KeySignatures-NonTraditional/m02/k01",
+        "13c-KeySignatures-NonTraditional/m01/k01/a01",
+        "13c-KeySignatures-NonTraditional/m01/k01/a02",
+        "13c-KeySignatures-NonTraditional/m01/k01/a03",
+        "13c-KeySignatures-NonTraditional/m02/k01/a01",
+        "13c-KeySignatures-NonTraditional/m02/k01/a02",
+        "13c-KeySignatures-NonTraditional/m02/k01/a03",
+        "13c-KeySignatures-NonTraditional/m02/k01/a04",
+        "13c-KeySignatures-NonTraditional/m02/k01/a05"
+      ],
+      "variantCount": 10,
+      "sourceDescription": "Non-traditional key signatures, where each alteration is separately given. The first signature is [f sharp, a flat, b flat]. The second one is [c flat-flat, g sharp-sharp, d flat, b sharp, f natural], with explicitly selected octaves for each alteration.",
+      "expected": "The three-component and five-component signatures show their ordered named alterations."
+    },
+    {
+      "id": "13c.explicit-key-octaves",
+      "fixture": "13c-KeySignatures-NonTraditional",
+      "variantIds": [
+        "13c-KeySignatures-NonTraditional/m02/k01/o01",
+        "13c-KeySignatures-NonTraditional/m02/k01/o02",
+        "13c-KeySignatures-NonTraditional/m02/k01/o03",
+        "13c-KeySignatures-NonTraditional/m02/k01/o04",
+        "13c-KeySignatures-NonTraditional/m02/k01/o05"
+      ],
+      "variantCount": 5,
+      "sourceDescription": "Non-traditional key signatures, where each alteration is separately given. The first signature is [f sharp, a flat, b flat]. The second one is [c flat-flat, g sharp-sharp, d flat, b sharp, f natural], with explicitly selected octaves for each alteration.",
+      "expected": "The second key locates its five alterations in explicitly numbered octaves 2 through 6."
+    },
+    {
+      "id": "13d.microtonal-alterations",
+      "fixture": "13d-KeySignatures-Microtones",
+      "variantIds": [
+        "13d-KeySignatures-Microtones/m01/k01",
+        "13d-KeySignatures-Microtones/m01/k01/a01",
+        "13d-KeySignatures-Microtones/m01/k01/a02",
+        "13d-KeySignatures-Microtones/m01/k01/a03",
+        "13d-KeySignatures-Microtones/m01/k01/a04",
+        "13d-KeySignatures-Microtones/m01/k01/a05",
+        "13d-KeySignatures-Microtones/m01/k01/a06",
+        "13d-KeySignatures-Microtones/m01/k01/a07"
+      ],
+      "variantCount": 8,
+      "sourceDescription": "Non-traditional key signatures with microtone alterations: [g flat-and-a-half, a flat, b half-flat, c natural, d half-sharp, e sharp, f sharp-and-a-half].",
+      "expected": "All seven fractional and integer key alterations are visible, or unsupported ones are explicitly diagnosed."
+    },
+    {
+      "id": "13e.cancel.new-fifths",
+      "fixture": "13e-KeySignatures-Cancel",
+      "variantIds": [
+        "13e-KeySignatures-Cancel/m01/k01",
+        "13e-KeySignatures-Cancel/m02/k01",
+        "13e-KeySignatures-Cancel/m03/k01",
+        "13e-KeySignatures-Cancel/m04/k01",
+        "13e-KeySignatures-Cancel/m05/k01"
+      ],
+      "variantCount": 5,
+      "sourceDescription": "Tests of key signature cancellation: in measure 2 it is positioned at the default location (which usually means that the cancellation comes immediately after the bar line), in measure 3 it uses the attribute ‘location=\"right\"’ (i.e., the cancellation comes after the new key signature), in measure 4 it uses ‘location=\"before-barline\"’, and in measure 5 it uses the attribute ‘location=\"left\"’ (the cancellation comes before the new key signature). The <cancel> element's value (4) in the last measure intentionally doesn't correspond to the value of the previous <fifths> value (2) for testing purposes.",
+      "expected": "The five new traditional fifth counts are shown at their bars."
+    },
+    {
+      "id": "13e.cancel.explicit-natural-placement",
+      "fixture": "13e-KeySignatures-Cancel",
+      "variantIds": [
+        "13e-KeySignatures-Cancel/m02/k01/cancel",
+        "13e-KeySignatures-Cancel/m03/k01/cancel",
+        "13e-KeySignatures-Cancel/m04/k01/cancel",
+        "13e-KeySignatures-Cancel/m05/k01/cancel"
+      ],
+      "variantCount": 4,
+      "sourceDescription": "Tests of key signature cancellation: in measure 2 it is positioned at the default location (which usually means that the cancellation comes immediately after the bar line), in measure 3 it uses the attribute ‘location=\"right\"’ (i.e., the cancellation comes after the new key signature), in measure 4 it uses ‘location=\"before-barline\"’, and in measure 5 it uses the attribute ‘location=\"left\"’ (the cancellation comes before the new key signature). The <cancel> element's value (4) in the last measure intentionally doesn't correspond to the value of the previous <fifths> value (2) for testing purposes.",
+      "expected": "Four cancellation values show naturals left, right or before the barline as stated, including the deliberately mismatched final value 4."
+    },
+    {
+      "id": "13e.midmeasure.initial-key",
+      "fixture": "13e-KeySignatures-MidMeasure-Change",
+      "variantIds": [
+        "13e-KeySignatures-MidMeasure-Change/m01/k01"
+      ],
+      "variantCount": 1,
+      "sourceDescription": "Mid-Measure Key-Change: 2 sharps, 2 flats, 0 sharps/flats, 7 sharps, no mode.",
+      "expected": "The opening two-sharp signature appears before the first note."
+    },
+    {
+      "id": "13e.midmeasure.later-keys",
+      "fixture": "13e-KeySignatures-MidMeasure-Change",
+      "variantIds": [
+        "13e-KeySignatures-MidMeasure-Change/m01/k02",
+        "13e-KeySignatures-MidMeasure-Change/m01/k03",
+        "13e-KeySignatures-MidMeasure-Change/m01/k04"
+      ],
+      "variantCount": 3,
+      "sourceDescription": "Mid-Measure Key-Change: 2 sharps, 2 flats, 0 sharps/flats, 7 sharps, no mode.",
+      "expected": "Two flats, zero, then seven sharps appear at quarters 2, 3 and 4 of the same bar."
+    },
+    {
+      "id": "13f.hidden-key-ink",
+      "fixture": "13f-KeySignatures-Visible",
+      "variantIds": [
+        "13f-KeySignatures-Visible/m02/k01"
+      ],
+      "variantCount": 1,
+      "sourceDescription": "Test the ‘print-object’ attribute of key signatures. The signature at the beginning of the second bar is a flat major and should be invisible; the following notes d flat, e flat, a flat, and b flat shouldn't have a flat accidental.",
+      "expected": "The second bar's four-flat key takes effect but produces no printed key symbols."
+    },
+    {
+      "id": "13f.hidden-key-note-context",
+      "fixture": "13f-KeySignatures-Visible",
+      "variantIds": [
+        "13f-KeySignatures-Visible/m02/n01",
+        "13f-KeySignatures-Visible/m02/n02",
+        "13f-KeySignatures-Visible/m02/n03",
+        "13f-KeySignatures-Visible/m02/n04"
+      ],
+      "variantCount": 4,
+      "sourceDescription": "Test the ‘print-object’ attribute of key signatures. The signature at the beginning of the second bar is a flat major and should be invisible; the following notes d flat, e flat, a flat, and b flat shouldn't have a flat accidental.",
+      "expected": "D-flat, E-flat, A-flat and B-flat retain their pitches and need no individual flat signs under the effective hidden key."
+    }
+  ],
+  "render": [
+    {
+      "featureId": "13a.conventional-fifths",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "All 30 conventional source values survive as MNX fifths and their complete flat/sharp or zero-key display is visible.",
+      "captureEvidence": "harness/fixtures/musicxml-key-evidence/workbench/13a-KeySignatures/observation.json",
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "13a.conventional-fifths",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "All 30 conventional source values survive as MNX fifths and their complete flat/sharp or zero-key display is visible.",
+      "captureEvidence": "harness/fixtures/musicxml-key-evidence/studio/13a-KeySignatures/observation.json",
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "13a.extreme-fifths",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "incorrect",
+      "cause": [
+        "layout/SVG engine"
+      ],
+      "reason": "All 16 source values survive in MNX but layout draws no more than seven key symbols. Each extreme pair is visually reduced to its seven-sign counterpart.",
+      "captureEvidence": "harness/fixtures/musicxml-key-evidence/workbench/13a-KeySignatures/observation.json",
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "13a.extreme-fifths",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "incorrect",
+      "cause": [
+        "layout/SVG engine"
+      ],
+      "reason": "All 16 source values survive in MNX but layout draws no more than seven key symbols. Each extreme pair is visually reduced to its seven-sign counterpart.",
+      "captureEvidence": "harness/fixtures/musicxml-key-evidence/studio/13a-KeySignatures/observation.json",
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "13a.major-minor-values",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "not applicable",
+      "cause": [
+        "importer"
+      ],
+      "reason": "Both source modes use the same visible fifths. MNX discards mode, which is a semantic import loss, not an additional visible rendering pass.",
+      "captureEvidence": "harness/fixtures/musicxml-key-evidence/workbench/13a-KeySignatures/observation.json",
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "13a.major-minor-values",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "not applicable",
+      "cause": [
+        "importer"
+      ],
+      "reason": "Both source modes use the same visible fifths. MNX discards mode, which is a semantic import loss, not an additional visible rendering pass.",
+      "captureEvidence": "harness/fixtures/musicxml-key-evidence/studio/13a-KeySignatures/observation.json",
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "13b.two-sharp-ink",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "The two-sharp signature and ten G4 notes remain visible; a mode-only change does not request different accidental ink.",
+      "captureEvidence": "harness/fixtures/musicxml-key-evidence/workbench/13b-KeySignatures-ChurchModes/observation.json",
+      "diagnosticTitles": [
+        "validation — underfills the 4/4 bar: notes sum to 2 of 4 beats",
+        "validation — underfills the 4/4 bar: notes sum to 2 of 4 beats"
+      ]
+    },
+    {
+      "featureId": "13b.two-sharp-ink",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "The two-sharp signature and ten G4 notes remain visible; a mode-only change does not request different accidental ink.",
+      "captureEvidence": "harness/fixtures/musicxml-key-evidence/studio/13b-KeySignatures-ChurchModes/observation.json",
+      "diagnosticTitles": [
+        "validation — underfills the 4/4 bar: notes sum to 2 of 4 beats",
+        "validation — underfills the 4/4 bar: notes sum to 2 of 4 beats"
+      ]
+    },
+    {
+      "featureId": "13b.mode-values",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "not applicable",
+      "cause": [
+        "importer"
+      ],
+      "reason": "MNX retains only the first two-sharp value and drops all mode values. Mode is nonvisual here; the lyrics provide visible labels separately.",
+      "captureEvidence": "harness/fixtures/musicxml-key-evidence/workbench/13b-KeySignatures-ChurchModes/observation.json",
+      "diagnosticTitles": [
+        "validation — underfills the 4/4 bar: notes sum to 2 of 4 beats",
+        "validation — underfills the 4/4 bar: notes sum to 2 of 4 beats"
+      ]
+    },
+    {
+      "featureId": "13b.mode-values",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "not applicable",
+      "cause": [
+        "importer"
+      ],
+      "reason": "MNX retains only the first two-sharp value and drops all mode values. Mode is nonvisual here; the lyrics provide visible labels separately.",
+      "captureEvidence": "harness/fixtures/musicxml-key-evidence/studio/13b-KeySignatures-ChurchModes/observation.json",
+      "diagnosticTitles": [
+        "validation — underfills the 4/4 bar: notes sum to 2 of 4 beats",
+        "validation — underfills the 4/4 bar: notes sum to 2 of 4 beats"
+      ]
+    },
+    {
+      "featureId": "13b.mode-labels",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "All ten mode-name lyrics are visible beneath their respective G4 notes in both shells.",
+      "captureEvidence": "harness/fixtures/musicxml-key-evidence/workbench/13b-KeySignatures-ChurchModes/observation.json",
+      "diagnosticTitles": [
+        "validation — underfills the 4/4 bar: notes sum to 2 of 4 beats",
+        "validation — underfills the 4/4 bar: notes sum to 2 of 4 beats"
+      ]
+    },
+    {
+      "featureId": "13b.mode-labels",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "All ten mode-name lyrics are visible beneath their respective G4 notes in both shells.",
+      "captureEvidence": "harness/fixtures/musicxml-key-evidence/studio/13b-KeySignatures-ChurchModes/observation.json",
+      "diagnosticTitles": [
+        "validation — underfills the 4/4 bar: notes sum to 2 of 4 beats",
+        "validation — underfills the 4/4 bar: notes sum to 2 of 4 beats"
+      ]
+    },
+    {
+      "featureId": "13c.nontraditional-alterations",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "missing",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "Neither source key is represented in MNX; both shells draw no key symbols and issue no warning.",
+      "captureEvidence": "harness/fixtures/musicxml-key-evidence/workbench/13c-KeySignatures-NonTraditional/observation.json",
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "13c.nontraditional-alterations",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "missing",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "Neither source key is represented in MNX; both shells draw no key symbols and issue no warning.",
+      "captureEvidence": "harness/fixtures/musicxml-key-evidence/studio/13c-KeySignatures-NonTraditional/observation.json",
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "13c.explicit-key-octaves",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "missing",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "All five key-octave controls disappear with the nontraditional key; the corresponding visual heights cannot be recovered.",
+      "captureEvidence": "harness/fixtures/musicxml-key-evidence/workbench/13c-KeySignatures-NonTraditional/observation.json",
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "13c.explicit-key-octaves",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "missing",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "All five key-octave controls disappear with the nontraditional key; the corresponding visual heights cannot be recovered.",
+      "captureEvidence": "harness/fixtures/musicxml-key-evidence/studio/13c-KeySignatures-NonTraditional/observation.json",
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "13d.microtonal-alterations",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "missing",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "The seven-component signature disappears entirely, including four fractional values, with no import warning.",
+      "captureEvidence": "harness/fixtures/musicxml-key-evidence/workbench/13d-KeySignatures-Microtones/observation.json",
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "13d.microtonal-alterations",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "missing",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "The seven-component signature disappears entirely, including four fractional values, with no import warning.",
+      "captureEvidence": "harness/fixtures/musicxml-key-evidence/studio/13d-KeySignatures-Microtones/observation.json",
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "13e.cancel.new-fifths",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "All five fifth counts survive in MNX and their new flat/sharp signatures appear in both shells.",
+      "captureEvidence": "harness/fixtures/musicxml-key-evidence/workbench/13e-KeySignatures-Cancel/observation.json",
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "13e.cancel.new-fifths",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "All five fifth counts survive in MNX and their new flat/sharp signatures appear in both shells.",
+      "captureEvidence": "harness/fixtures/musicxml-key-evidence/studio/13e-KeySignatures-Cancel/observation.json",
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "13e.cancel.explicit-natural-placement",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "incorrect",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "The importer drops every cancel value/location. The new signatures appear without the source-requested natural runs.",
+      "captureEvidence": "harness/fixtures/musicxml-key-evidence/workbench/13e-KeySignatures-Cancel/observation.json",
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "13e.cancel.explicit-natural-placement",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "incorrect",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "The importer drops every cancel value/location. The new signatures appear without the source-requested natural runs.",
+      "captureEvidence": "harness/fixtures/musicxml-key-evidence/studio/13e-KeySignatures-Cancel/observation.json",
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "13e.midmeasure.initial-key",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "The first key survives in MNX and is shown in both shells.",
+      "captureEvidence": "harness/fixtures/musicxml-key-evidence/workbench/13e-KeySignatures-MidMeasure-Change/observation.json",
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "13e.midmeasure.initial-key",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "The first key survives in MNX and is shown in both shells.",
+      "captureEvidence": "harness/fixtures/musicxml-key-evidence/studio/13e-KeySignatures-MidMeasure-Change/observation.json",
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "13e.midmeasure.later-keys",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "missing",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "The three later source key declarations disappear; the opening two sharps remain throughout, despite visible lyric labels naming the intended changes.",
+      "captureEvidence": "harness/fixtures/musicxml-key-evidence/workbench/13e-KeySignatures-MidMeasure-Change/observation.json",
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "13e.midmeasure.later-keys",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "missing",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "The three later source key declarations disappear; the opening two sharps remain throughout, despite visible lyric labels naming the intended changes.",
+      "captureEvidence": "harness/fixtures/musicxml-key-evidence/studio/13e-KeySignatures-MidMeasure-Change/observation.json",
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "13f.hidden-key-ink",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "incorrect",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "The hidden flag is dropped; both shells visibly print four flats at bar 2.",
+      "captureEvidence": "harness/fixtures/musicxml-key-evidence/workbench/13f-KeySignatures-Visible/observation.json",
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "13f.hidden-key-ink",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "incorrect",
+      "cause": [
+        "importer",
+        "MNX representation"
+      ],
+      "reason": "The hidden flag is dropped; both shells visibly print four flats at bar 2.",
+      "captureEvidence": "harness/fixtures/musicxml-key-evidence/studio/13f-KeySignatures-Visible/observation.json",
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "13f.hidden-key-note-context",
+      "shell": "workbench",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "All four altered pitches survive in MNX and no redundant note accidentals appear; this does not excuse the visible hidden key.",
+      "captureEvidence": "harness/fixtures/musicxml-key-evidence/workbench/13f-KeySignatures-Visible/observation.json",
+      "diagnosticTitles": []
+    },
+    {
+      "featureId": "13f.hidden-key-note-context",
+      "shell": "studio",
+      "view": "notation",
+      "verdict": "correct",
+      "cause": [],
+      "reason": "All four altered pitches survive in MNX and no redundant note accidentals appear; this does not excuse the visible hidden key.",
+      "captureEvidence": "harness/fixtures/musicxml-key-evidence/studio/13f-KeySignatures-Visible/observation.json",
+      "diagnosticTitles": []
+    }
+  ],
+  "renderVariantDispositions": [
+    {
+      "featureId": "13a.conventional-fifths",
+      "variantId": "13a-KeySignatures/m09/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All 30 conventional source values survive as MNX fifths and their complete flat/sharp or zero-key display is visible."
+    },
+    {
+      "featureId": "13a.conventional-fifths",
+      "variantId": "13a-KeySignatures/m10/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All 30 conventional source values survive as MNX fifths and their complete flat/sharp or zero-key display is visible."
+    },
+    {
+      "featureId": "13a.conventional-fifths",
+      "variantId": "13a-KeySignatures/m11/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All 30 conventional source values survive as MNX fifths and their complete flat/sharp or zero-key display is visible."
+    },
+    {
+      "featureId": "13a.conventional-fifths",
+      "variantId": "13a-KeySignatures/m12/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All 30 conventional source values survive as MNX fifths and their complete flat/sharp or zero-key display is visible."
+    },
+    {
+      "featureId": "13a.conventional-fifths",
+      "variantId": "13a-KeySignatures/m13/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All 30 conventional source values survive as MNX fifths and their complete flat/sharp or zero-key display is visible."
+    },
+    {
+      "featureId": "13a.conventional-fifths",
+      "variantId": "13a-KeySignatures/m14/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All 30 conventional source values survive as MNX fifths and their complete flat/sharp or zero-key display is visible."
+    },
+    {
+      "featureId": "13a.conventional-fifths",
+      "variantId": "13a-KeySignatures/m15/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All 30 conventional source values survive as MNX fifths and their complete flat/sharp or zero-key display is visible."
+    },
+    {
+      "featureId": "13a.conventional-fifths",
+      "variantId": "13a-KeySignatures/m16/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All 30 conventional source values survive as MNX fifths and their complete flat/sharp or zero-key display is visible."
+    },
+    {
+      "featureId": "13a.conventional-fifths",
+      "variantId": "13a-KeySignatures/m17/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All 30 conventional source values survive as MNX fifths and their complete flat/sharp or zero-key display is visible."
+    },
+    {
+      "featureId": "13a.conventional-fifths",
+      "variantId": "13a-KeySignatures/m18/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All 30 conventional source values survive as MNX fifths and their complete flat/sharp or zero-key display is visible."
+    },
+    {
+      "featureId": "13a.conventional-fifths",
+      "variantId": "13a-KeySignatures/m19/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All 30 conventional source values survive as MNX fifths and their complete flat/sharp or zero-key display is visible."
+    },
+    {
+      "featureId": "13a.conventional-fifths",
+      "variantId": "13a-KeySignatures/m20/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All 30 conventional source values survive as MNX fifths and their complete flat/sharp or zero-key display is visible."
+    },
+    {
+      "featureId": "13a.conventional-fifths",
+      "variantId": "13a-KeySignatures/m21/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All 30 conventional source values survive as MNX fifths and their complete flat/sharp or zero-key display is visible."
+    },
+    {
+      "featureId": "13a.conventional-fifths",
+      "variantId": "13a-KeySignatures/m22/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All 30 conventional source values survive as MNX fifths and their complete flat/sharp or zero-key display is visible."
+    },
+    {
+      "featureId": "13a.conventional-fifths",
+      "variantId": "13a-KeySignatures/m23/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All 30 conventional source values survive as MNX fifths and their complete flat/sharp or zero-key display is visible."
+    },
+    {
+      "featureId": "13a.conventional-fifths",
+      "variantId": "13a-KeySignatures/m24/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All 30 conventional source values survive as MNX fifths and their complete flat/sharp or zero-key display is visible."
+    },
+    {
+      "featureId": "13a.conventional-fifths",
+      "variantId": "13a-KeySignatures/m25/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All 30 conventional source values survive as MNX fifths and their complete flat/sharp or zero-key display is visible."
+    },
+    {
+      "featureId": "13a.conventional-fifths",
+      "variantId": "13a-KeySignatures/m26/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All 30 conventional source values survive as MNX fifths and their complete flat/sharp or zero-key display is visible."
+    },
+    {
+      "featureId": "13a.conventional-fifths",
+      "variantId": "13a-KeySignatures/m27/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All 30 conventional source values survive as MNX fifths and their complete flat/sharp or zero-key display is visible."
+    },
+    {
+      "featureId": "13a.conventional-fifths",
+      "variantId": "13a-KeySignatures/m28/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All 30 conventional source values survive as MNX fifths and their complete flat/sharp or zero-key display is visible."
+    },
+    {
+      "featureId": "13a.conventional-fifths",
+      "variantId": "13a-KeySignatures/m29/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All 30 conventional source values survive as MNX fifths and their complete flat/sharp or zero-key display is visible."
+    },
+    {
+      "featureId": "13a.conventional-fifths",
+      "variantId": "13a-KeySignatures/m30/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All 30 conventional source values survive as MNX fifths and their complete flat/sharp or zero-key display is visible."
+    },
+    {
+      "featureId": "13a.conventional-fifths",
+      "variantId": "13a-KeySignatures/m31/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All 30 conventional source values survive as MNX fifths and their complete flat/sharp or zero-key display is visible."
+    },
+    {
+      "featureId": "13a.conventional-fifths",
+      "variantId": "13a-KeySignatures/m32/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All 30 conventional source values survive as MNX fifths and their complete flat/sharp or zero-key display is visible."
+    },
+    {
+      "featureId": "13a.conventional-fifths",
+      "variantId": "13a-KeySignatures/m33/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All 30 conventional source values survive as MNX fifths and their complete flat/sharp or zero-key display is visible."
+    },
+    {
+      "featureId": "13a.conventional-fifths",
+      "variantId": "13a-KeySignatures/m34/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All 30 conventional source values survive as MNX fifths and their complete flat/sharp or zero-key display is visible."
+    },
+    {
+      "featureId": "13a.conventional-fifths",
+      "variantId": "13a-KeySignatures/m35/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All 30 conventional source values survive as MNX fifths and their complete flat/sharp or zero-key display is visible."
+    },
+    {
+      "featureId": "13a.conventional-fifths",
+      "variantId": "13a-KeySignatures/m36/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All 30 conventional source values survive as MNX fifths and their complete flat/sharp or zero-key display is visible."
+    },
+    {
+      "featureId": "13a.conventional-fifths",
+      "variantId": "13a-KeySignatures/m37/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All 30 conventional source values survive as MNX fifths and their complete flat/sharp or zero-key display is visible."
+    },
+    {
+      "featureId": "13a.conventional-fifths",
+      "variantId": "13a-KeySignatures/m38/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All 30 conventional source values survive as MNX fifths and their complete flat/sharp or zero-key display is visible."
+    },
+    {
+      "featureId": "13a.extreme-fifths",
+      "variantId": "13a-KeySignatures/m01/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "All 16 source values survive in MNX but layout draws no more than seven key symbols. Each extreme pair is visually reduced to its seven-sign counterpart."
+    },
+    {
+      "featureId": "13a.extreme-fifths",
+      "variantId": "13a-KeySignatures/m02/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "All 16 source values survive in MNX but layout draws no more than seven key symbols. Each extreme pair is visually reduced to its seven-sign counterpart."
+    },
+    {
+      "featureId": "13a.extreme-fifths",
+      "variantId": "13a-KeySignatures/m03/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "All 16 source values survive in MNX but layout draws no more than seven key symbols. Each extreme pair is visually reduced to its seven-sign counterpart."
+    },
+    {
+      "featureId": "13a.extreme-fifths",
+      "variantId": "13a-KeySignatures/m04/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "All 16 source values survive in MNX but layout draws no more than seven key symbols. Each extreme pair is visually reduced to its seven-sign counterpart."
+    },
+    {
+      "featureId": "13a.extreme-fifths",
+      "variantId": "13a-KeySignatures/m05/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "All 16 source values survive in MNX but layout draws no more than seven key symbols. Each extreme pair is visually reduced to its seven-sign counterpart."
+    },
+    {
+      "featureId": "13a.extreme-fifths",
+      "variantId": "13a-KeySignatures/m06/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "All 16 source values survive in MNX but layout draws no more than seven key symbols. Each extreme pair is visually reduced to its seven-sign counterpart."
+    },
+    {
+      "featureId": "13a.extreme-fifths",
+      "variantId": "13a-KeySignatures/m07/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "All 16 source values survive in MNX but layout draws no more than seven key symbols. Each extreme pair is visually reduced to its seven-sign counterpart."
+    },
+    {
+      "featureId": "13a.extreme-fifths",
+      "variantId": "13a-KeySignatures/m08/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "All 16 source values survive in MNX but layout draws no more than seven key symbols. Each extreme pair is visually reduced to its seven-sign counterpart."
+    },
+    {
+      "featureId": "13a.extreme-fifths",
+      "variantId": "13a-KeySignatures/m39/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "All 16 source values survive in MNX but layout draws no more than seven key symbols. Each extreme pair is visually reduced to its seven-sign counterpart."
+    },
+    {
+      "featureId": "13a.extreme-fifths",
+      "variantId": "13a-KeySignatures/m40/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "All 16 source values survive in MNX but layout draws no more than seven key symbols. Each extreme pair is visually reduced to its seven-sign counterpart."
+    },
+    {
+      "featureId": "13a.extreme-fifths",
+      "variantId": "13a-KeySignatures/m41/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "All 16 source values survive in MNX but layout draws no more than seven key symbols. Each extreme pair is visually reduced to its seven-sign counterpart."
+    },
+    {
+      "featureId": "13a.extreme-fifths",
+      "variantId": "13a-KeySignatures/m42/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "All 16 source values survive in MNX but layout draws no more than seven key symbols. Each extreme pair is visually reduced to its seven-sign counterpart."
+    },
+    {
+      "featureId": "13a.extreme-fifths",
+      "variantId": "13a-KeySignatures/m43/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "All 16 source values survive in MNX but layout draws no more than seven key symbols. Each extreme pair is visually reduced to its seven-sign counterpart."
+    },
+    {
+      "featureId": "13a.extreme-fifths",
+      "variantId": "13a-KeySignatures/m44/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "All 16 source values survive in MNX but layout draws no more than seven key symbols. Each extreme pair is visually reduced to its seven-sign counterpart."
+    },
+    {
+      "featureId": "13a.extreme-fifths",
+      "variantId": "13a-KeySignatures/m45/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "All 16 source values survive in MNX but layout draws no more than seven key symbols. Each extreme pair is visually reduced to its seven-sign counterpart."
+    },
+    {
+      "featureId": "13a.extreme-fifths",
+      "variantId": "13a-KeySignatures/m46/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "All 16 source values survive in MNX but layout draws no more than seven key symbols. Each extreme pair is visually reduced to its seven-sign counterpart."
+    },
+    {
+      "featureId": "13a.major-minor-values",
+      "variantId": "13a-KeySignatures/m01/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "Both source modes use the same visible fifths. MNX discards mode, which is a semantic import loss, not an additional visible rendering pass."
+    },
+    {
+      "featureId": "13a.major-minor-values",
+      "variantId": "13a-KeySignatures/m02/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "Both source modes use the same visible fifths. MNX discards mode, which is a semantic import loss, not an additional visible rendering pass."
+    },
+    {
+      "featureId": "13a.major-minor-values",
+      "variantId": "13a-KeySignatures/m03/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "Both source modes use the same visible fifths. MNX discards mode, which is a semantic import loss, not an additional visible rendering pass."
+    },
+    {
+      "featureId": "13a.major-minor-values",
+      "variantId": "13a-KeySignatures/m04/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "Both source modes use the same visible fifths. MNX discards mode, which is a semantic import loss, not an additional visible rendering pass."
+    },
+    {
+      "featureId": "13a.major-minor-values",
+      "variantId": "13a-KeySignatures/m05/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "Both source modes use the same visible fifths. MNX discards mode, which is a semantic import loss, not an additional visible rendering pass."
+    },
+    {
+      "featureId": "13a.major-minor-values",
+      "variantId": "13a-KeySignatures/m06/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "Both source modes use the same visible fifths. MNX discards mode, which is a semantic import loss, not an additional visible rendering pass."
+    },
+    {
+      "featureId": "13a.major-minor-values",
+      "variantId": "13a-KeySignatures/m07/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "Both source modes use the same visible fifths. MNX discards mode, which is a semantic import loss, not an additional visible rendering pass."
+    },
+    {
+      "featureId": "13a.major-minor-values",
+      "variantId": "13a-KeySignatures/m08/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "Both source modes use the same visible fifths. MNX discards mode, which is a semantic import loss, not an additional visible rendering pass."
+    },
+    {
+      "featureId": "13a.major-minor-values",
+      "variantId": "13a-KeySignatures/m09/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "Both source modes use the same visible fifths. MNX discards mode, which is a semantic import loss, not an additional visible rendering pass."
+    },
+    {
+      "featureId": "13a.major-minor-values",
+      "variantId": "13a-KeySignatures/m10/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "Both source modes use the same visible fifths. MNX discards mode, which is a semantic import loss, not an additional visible rendering pass."
+    },
+    {
+      "featureId": "13a.major-minor-values",
+      "variantId": "13a-KeySignatures/m11/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "Both source modes use the same visible fifths. MNX discards mode, which is a semantic import loss, not an additional visible rendering pass."
+    },
+    {
+      "featureId": "13a.major-minor-values",
+      "variantId": "13a-KeySignatures/m12/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "Both source modes use the same visible fifths. MNX discards mode, which is a semantic import loss, not an additional visible rendering pass."
+    },
+    {
+      "featureId": "13a.major-minor-values",
+      "variantId": "13a-KeySignatures/m13/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "Both source modes use the same visible fifths. MNX discards mode, which is a semantic import loss, not an additional visible rendering pass."
+    },
+    {
+      "featureId": "13a.major-minor-values",
+      "variantId": "13a-KeySignatures/m14/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "Both source modes use the same visible fifths. MNX discards mode, which is a semantic import loss, not an additional visible rendering pass."
+    },
+    {
+      "featureId": "13a.major-minor-values",
+      "variantId": "13a-KeySignatures/m15/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "Both source modes use the same visible fifths. MNX discards mode, which is a semantic import loss, not an additional visible rendering pass."
+    },
+    {
+      "featureId": "13a.major-minor-values",
+      "variantId": "13a-KeySignatures/m16/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "Both source modes use the same visible fifths. MNX discards mode, which is a semantic import loss, not an additional visible rendering pass."
+    },
+    {
+      "featureId": "13a.major-minor-values",
+      "variantId": "13a-KeySignatures/m17/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "Both source modes use the same visible fifths. MNX discards mode, which is a semantic import loss, not an additional visible rendering pass."
+    },
+    {
+      "featureId": "13a.major-minor-values",
+      "variantId": "13a-KeySignatures/m18/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "Both source modes use the same visible fifths. MNX discards mode, which is a semantic import loss, not an additional visible rendering pass."
+    },
+    {
+      "featureId": "13a.major-minor-values",
+      "variantId": "13a-KeySignatures/m19/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "Both source modes use the same visible fifths. MNX discards mode, which is a semantic import loss, not an additional visible rendering pass."
+    },
+    {
+      "featureId": "13a.major-minor-values",
+      "variantId": "13a-KeySignatures/m20/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "Both source modes use the same visible fifths. MNX discards mode, which is a semantic import loss, not an additional visible rendering pass."
+    },
+    {
+      "featureId": "13a.major-minor-values",
+      "variantId": "13a-KeySignatures/m21/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "Both source modes use the same visible fifths. MNX discards mode, which is a semantic import loss, not an additional visible rendering pass."
+    },
+    {
+      "featureId": "13a.major-minor-values",
+      "variantId": "13a-KeySignatures/m22/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "Both source modes use the same visible fifths. MNX discards mode, which is a semantic import loss, not an additional visible rendering pass."
+    },
+    {
+      "featureId": "13a.major-minor-values",
+      "variantId": "13a-KeySignatures/m23/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "Both source modes use the same visible fifths. MNX discards mode, which is a semantic import loss, not an additional visible rendering pass."
+    },
+    {
+      "featureId": "13a.major-minor-values",
+      "variantId": "13a-KeySignatures/m24/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "Both source modes use the same visible fifths. MNX discards mode, which is a semantic import loss, not an additional visible rendering pass."
+    },
+    {
+      "featureId": "13a.major-minor-values",
+      "variantId": "13a-KeySignatures/m25/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "Both source modes use the same visible fifths. MNX discards mode, which is a semantic import loss, not an additional visible rendering pass."
+    },
+    {
+      "featureId": "13a.major-minor-values",
+      "variantId": "13a-KeySignatures/m26/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "Both source modes use the same visible fifths. MNX discards mode, which is a semantic import loss, not an additional visible rendering pass."
+    },
+    {
+      "featureId": "13a.major-minor-values",
+      "variantId": "13a-KeySignatures/m27/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "Both source modes use the same visible fifths. MNX discards mode, which is a semantic import loss, not an additional visible rendering pass."
+    },
+    {
+      "featureId": "13a.major-minor-values",
+      "variantId": "13a-KeySignatures/m28/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "Both source modes use the same visible fifths. MNX discards mode, which is a semantic import loss, not an additional visible rendering pass."
+    },
+    {
+      "featureId": "13a.major-minor-values",
+      "variantId": "13a-KeySignatures/m29/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "Both source modes use the same visible fifths. MNX discards mode, which is a semantic import loss, not an additional visible rendering pass."
+    },
+    {
+      "featureId": "13a.major-minor-values",
+      "variantId": "13a-KeySignatures/m30/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "Both source modes use the same visible fifths. MNX discards mode, which is a semantic import loss, not an additional visible rendering pass."
+    },
+    {
+      "featureId": "13a.major-minor-values",
+      "variantId": "13a-KeySignatures/m31/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "Both source modes use the same visible fifths. MNX discards mode, which is a semantic import loss, not an additional visible rendering pass."
+    },
+    {
+      "featureId": "13a.major-minor-values",
+      "variantId": "13a-KeySignatures/m32/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "Both source modes use the same visible fifths. MNX discards mode, which is a semantic import loss, not an additional visible rendering pass."
+    },
+    {
+      "featureId": "13a.major-minor-values",
+      "variantId": "13a-KeySignatures/m33/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "Both source modes use the same visible fifths. MNX discards mode, which is a semantic import loss, not an additional visible rendering pass."
+    },
+    {
+      "featureId": "13a.major-minor-values",
+      "variantId": "13a-KeySignatures/m34/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "Both source modes use the same visible fifths. MNX discards mode, which is a semantic import loss, not an additional visible rendering pass."
+    },
+    {
+      "featureId": "13a.major-minor-values",
+      "variantId": "13a-KeySignatures/m35/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "Both source modes use the same visible fifths. MNX discards mode, which is a semantic import loss, not an additional visible rendering pass."
+    },
+    {
+      "featureId": "13a.major-minor-values",
+      "variantId": "13a-KeySignatures/m36/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "Both source modes use the same visible fifths. MNX discards mode, which is a semantic import loss, not an additional visible rendering pass."
+    },
+    {
+      "featureId": "13a.major-minor-values",
+      "variantId": "13a-KeySignatures/m37/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "Both source modes use the same visible fifths. MNX discards mode, which is a semantic import loss, not an additional visible rendering pass."
+    },
+    {
+      "featureId": "13a.major-minor-values",
+      "variantId": "13a-KeySignatures/m38/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "Both source modes use the same visible fifths. MNX discards mode, which is a semantic import loss, not an additional visible rendering pass."
+    },
+    {
+      "featureId": "13a.major-minor-values",
+      "variantId": "13a-KeySignatures/m39/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "Both source modes use the same visible fifths. MNX discards mode, which is a semantic import loss, not an additional visible rendering pass."
+    },
+    {
+      "featureId": "13a.major-minor-values",
+      "variantId": "13a-KeySignatures/m40/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "Both source modes use the same visible fifths. MNX discards mode, which is a semantic import loss, not an additional visible rendering pass."
+    },
+    {
+      "featureId": "13a.major-minor-values",
+      "variantId": "13a-KeySignatures/m41/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "Both source modes use the same visible fifths. MNX discards mode, which is a semantic import loss, not an additional visible rendering pass."
+    },
+    {
+      "featureId": "13a.major-minor-values",
+      "variantId": "13a-KeySignatures/m42/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "Both source modes use the same visible fifths. MNX discards mode, which is a semantic import loss, not an additional visible rendering pass."
+    },
+    {
+      "featureId": "13a.major-minor-values",
+      "variantId": "13a-KeySignatures/m43/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "Both source modes use the same visible fifths. MNX discards mode, which is a semantic import loss, not an additional visible rendering pass."
+    },
+    {
+      "featureId": "13a.major-minor-values",
+      "variantId": "13a-KeySignatures/m44/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "Both source modes use the same visible fifths. MNX discards mode, which is a semantic import loss, not an additional visible rendering pass."
+    },
+    {
+      "featureId": "13a.major-minor-values",
+      "variantId": "13a-KeySignatures/m45/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "Both source modes use the same visible fifths. MNX discards mode, which is a semantic import loss, not an additional visible rendering pass."
+    },
+    {
+      "featureId": "13a.major-minor-values",
+      "variantId": "13a-KeySignatures/m46/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "Both source modes use the same visible fifths. MNX discards mode, which is a semantic import loss, not an additional visible rendering pass."
+    },
+    {
+      "featureId": "13b.two-sharp-ink",
+      "variantId": "13b-KeySignatures-ChurchModes/m01/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "The two-sharp signature and ten G4 notes remain visible; a mode-only change does not request different accidental ink."
+    },
+    {
+      "featureId": "13b.two-sharp-ink",
+      "variantId": "13b-KeySignatures-ChurchModes/m01/k02",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "The two-sharp signature and ten G4 notes remain visible; a mode-only change does not request different accidental ink."
+    },
+    {
+      "featureId": "13b.two-sharp-ink",
+      "variantId": "13b-KeySignatures-ChurchModes/m01/k03",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "The two-sharp signature and ten G4 notes remain visible; a mode-only change does not request different accidental ink."
+    },
+    {
+      "featureId": "13b.two-sharp-ink",
+      "variantId": "13b-KeySignatures-ChurchModes/m01/k04",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "The two-sharp signature and ten G4 notes remain visible; a mode-only change does not request different accidental ink."
+    },
+    {
+      "featureId": "13b.two-sharp-ink",
+      "variantId": "13b-KeySignatures-ChurchModes/m02/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "The two-sharp signature and ten G4 notes remain visible; a mode-only change does not request different accidental ink."
+    },
+    {
+      "featureId": "13b.two-sharp-ink",
+      "variantId": "13b-KeySignatures-ChurchModes/m02/k02",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "The two-sharp signature and ten G4 notes remain visible; a mode-only change does not request different accidental ink."
+    },
+    {
+      "featureId": "13b.two-sharp-ink",
+      "variantId": "13b-KeySignatures-ChurchModes/m02/k03",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "The two-sharp signature and ten G4 notes remain visible; a mode-only change does not request different accidental ink."
+    },
+    {
+      "featureId": "13b.two-sharp-ink",
+      "variantId": "13b-KeySignatures-ChurchModes/m02/k04",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "The two-sharp signature and ten G4 notes remain visible; a mode-only change does not request different accidental ink."
+    },
+    {
+      "featureId": "13b.two-sharp-ink",
+      "variantId": "13b-KeySignatures-ChurchModes/m03/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "The two-sharp signature and ten G4 notes remain visible; a mode-only change does not request different accidental ink."
+    },
+    {
+      "featureId": "13b.two-sharp-ink",
+      "variantId": "13b-KeySignatures-ChurchModes/m03/k02",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "The two-sharp signature and ten G4 notes remain visible; a mode-only change does not request different accidental ink."
+    },
+    {
+      "featureId": "13b.mode-values",
+      "variantId": "13b-KeySignatures-ChurchModes/m01/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "MNX retains only the first two-sharp value and drops all mode values. Mode is nonvisual here; the lyrics provide visible labels separately."
+    },
+    {
+      "featureId": "13b.mode-values",
+      "variantId": "13b-KeySignatures-ChurchModes/m01/k02",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "MNX retains only the first two-sharp value and drops all mode values. Mode is nonvisual here; the lyrics provide visible labels separately."
+    },
+    {
+      "featureId": "13b.mode-values",
+      "variantId": "13b-KeySignatures-ChurchModes/m01/k03",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "MNX retains only the first two-sharp value and drops all mode values. Mode is nonvisual here; the lyrics provide visible labels separately."
+    },
+    {
+      "featureId": "13b.mode-values",
+      "variantId": "13b-KeySignatures-ChurchModes/m01/k04",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "MNX retains only the first two-sharp value and drops all mode values. Mode is nonvisual here; the lyrics provide visible labels separately."
+    },
+    {
+      "featureId": "13b.mode-values",
+      "variantId": "13b-KeySignatures-ChurchModes/m02/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "MNX retains only the first two-sharp value and drops all mode values. Mode is nonvisual here; the lyrics provide visible labels separately."
+    },
+    {
+      "featureId": "13b.mode-values",
+      "variantId": "13b-KeySignatures-ChurchModes/m02/k02",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "MNX retains only the first two-sharp value and drops all mode values. Mode is nonvisual here; the lyrics provide visible labels separately."
+    },
+    {
+      "featureId": "13b.mode-values",
+      "variantId": "13b-KeySignatures-ChurchModes/m02/k03",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "MNX retains only the first two-sharp value and drops all mode values. Mode is nonvisual here; the lyrics provide visible labels separately."
+    },
+    {
+      "featureId": "13b.mode-values",
+      "variantId": "13b-KeySignatures-ChurchModes/m02/k04",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "MNX retains only the first two-sharp value and drops all mode values. Mode is nonvisual here; the lyrics provide visible labels separately."
+    },
+    {
+      "featureId": "13b.mode-values",
+      "variantId": "13b-KeySignatures-ChurchModes/m03/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "MNX retains only the first two-sharp value and drops all mode values. Mode is nonvisual here; the lyrics provide visible labels separately."
+    },
+    {
+      "featureId": "13b.mode-values",
+      "variantId": "13b-KeySignatures-ChurchModes/m03/k02",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "not applicable",
+      "reason": "MNX retains only the first two-sharp value and drops all mode values. Mode is nonvisual here; the lyrics provide visible labels separately."
+    },
+    {
+      "featureId": "13b.mode-labels",
+      "variantId": "13b-KeySignatures-ChurchModes/m01/n01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All ten mode-name lyrics are visible beneath their respective G4 notes in both shells."
+    },
+    {
+      "featureId": "13b.mode-labels",
+      "variantId": "13b-KeySignatures-ChurchModes/m01/n02",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All ten mode-name lyrics are visible beneath their respective G4 notes in both shells."
+    },
+    {
+      "featureId": "13b.mode-labels",
+      "variantId": "13b-KeySignatures-ChurchModes/m01/n03",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All ten mode-name lyrics are visible beneath their respective G4 notes in both shells."
+    },
+    {
+      "featureId": "13b.mode-labels",
+      "variantId": "13b-KeySignatures-ChurchModes/m01/n04",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All ten mode-name lyrics are visible beneath their respective G4 notes in both shells."
+    },
+    {
+      "featureId": "13b.mode-labels",
+      "variantId": "13b-KeySignatures-ChurchModes/m02/n01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All ten mode-name lyrics are visible beneath their respective G4 notes in both shells."
+    },
+    {
+      "featureId": "13b.mode-labels",
+      "variantId": "13b-KeySignatures-ChurchModes/m02/n02",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All ten mode-name lyrics are visible beneath their respective G4 notes in both shells."
+    },
+    {
+      "featureId": "13b.mode-labels",
+      "variantId": "13b-KeySignatures-ChurchModes/m02/n03",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All ten mode-name lyrics are visible beneath their respective G4 notes in both shells."
+    },
+    {
+      "featureId": "13b.mode-labels",
+      "variantId": "13b-KeySignatures-ChurchModes/m02/n04",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All ten mode-name lyrics are visible beneath their respective G4 notes in both shells."
+    },
+    {
+      "featureId": "13b.mode-labels",
+      "variantId": "13b-KeySignatures-ChurchModes/m03/n01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All ten mode-name lyrics are visible beneath their respective G4 notes in both shells."
+    },
+    {
+      "featureId": "13b.mode-labels",
+      "variantId": "13b-KeySignatures-ChurchModes/m03/n02",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All ten mode-name lyrics are visible beneath their respective G4 notes in both shells."
+    },
+    {
+      "featureId": "13c.nontraditional-alterations",
+      "variantId": "13c-KeySignatures-NonTraditional/m01/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "missing",
+      "reason": "Neither source key is represented in MNX; both shells draw no key symbols and issue no warning."
+    },
+    {
+      "featureId": "13c.nontraditional-alterations",
+      "variantId": "13c-KeySignatures-NonTraditional/m02/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "missing",
+      "reason": "Neither source key is represented in MNX; both shells draw no key symbols and issue no warning."
+    },
+    {
+      "featureId": "13c.nontraditional-alterations",
+      "variantId": "13c-KeySignatures-NonTraditional/m01/k01/a01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "missing",
+      "reason": "Neither source key is represented in MNX; both shells draw no key symbols and issue no warning."
+    },
+    {
+      "featureId": "13c.nontraditional-alterations",
+      "variantId": "13c-KeySignatures-NonTraditional/m01/k01/a02",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "missing",
+      "reason": "Neither source key is represented in MNX; both shells draw no key symbols and issue no warning."
+    },
+    {
+      "featureId": "13c.nontraditional-alterations",
+      "variantId": "13c-KeySignatures-NonTraditional/m01/k01/a03",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "missing",
+      "reason": "Neither source key is represented in MNX; both shells draw no key symbols and issue no warning."
+    },
+    {
+      "featureId": "13c.nontraditional-alterations",
+      "variantId": "13c-KeySignatures-NonTraditional/m02/k01/a01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "missing",
+      "reason": "Neither source key is represented in MNX; both shells draw no key symbols and issue no warning."
+    },
+    {
+      "featureId": "13c.nontraditional-alterations",
+      "variantId": "13c-KeySignatures-NonTraditional/m02/k01/a02",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "missing",
+      "reason": "Neither source key is represented in MNX; both shells draw no key symbols and issue no warning."
+    },
+    {
+      "featureId": "13c.nontraditional-alterations",
+      "variantId": "13c-KeySignatures-NonTraditional/m02/k01/a03",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "missing",
+      "reason": "Neither source key is represented in MNX; both shells draw no key symbols and issue no warning."
+    },
+    {
+      "featureId": "13c.nontraditional-alterations",
+      "variantId": "13c-KeySignatures-NonTraditional/m02/k01/a04",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "missing",
+      "reason": "Neither source key is represented in MNX; both shells draw no key symbols and issue no warning."
+    },
+    {
+      "featureId": "13c.nontraditional-alterations",
+      "variantId": "13c-KeySignatures-NonTraditional/m02/k01/a05",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "missing",
+      "reason": "Neither source key is represented in MNX; both shells draw no key symbols and issue no warning."
+    },
+    {
+      "featureId": "13c.explicit-key-octaves",
+      "variantId": "13c-KeySignatures-NonTraditional/m02/k01/o01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "missing",
+      "reason": "All five key-octave controls disappear with the nontraditional key; the corresponding visual heights cannot be recovered."
+    },
+    {
+      "featureId": "13c.explicit-key-octaves",
+      "variantId": "13c-KeySignatures-NonTraditional/m02/k01/o02",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "missing",
+      "reason": "All five key-octave controls disappear with the nontraditional key; the corresponding visual heights cannot be recovered."
+    },
+    {
+      "featureId": "13c.explicit-key-octaves",
+      "variantId": "13c-KeySignatures-NonTraditional/m02/k01/o03",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "missing",
+      "reason": "All five key-octave controls disappear with the nontraditional key; the corresponding visual heights cannot be recovered."
+    },
+    {
+      "featureId": "13c.explicit-key-octaves",
+      "variantId": "13c-KeySignatures-NonTraditional/m02/k01/o04",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "missing",
+      "reason": "All five key-octave controls disappear with the nontraditional key; the corresponding visual heights cannot be recovered."
+    },
+    {
+      "featureId": "13c.explicit-key-octaves",
+      "variantId": "13c-KeySignatures-NonTraditional/m02/k01/o05",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "missing",
+      "reason": "All five key-octave controls disappear with the nontraditional key; the corresponding visual heights cannot be recovered."
+    },
+    {
+      "featureId": "13d.microtonal-alterations",
+      "variantId": "13d-KeySignatures-Microtones/m01/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "missing",
+      "reason": "The seven-component signature disappears entirely, including four fractional values, with no import warning."
+    },
+    {
+      "featureId": "13d.microtonal-alterations",
+      "variantId": "13d-KeySignatures-Microtones/m01/k01/a01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "missing",
+      "reason": "The seven-component signature disappears entirely, including four fractional values, with no import warning."
+    },
+    {
+      "featureId": "13d.microtonal-alterations",
+      "variantId": "13d-KeySignatures-Microtones/m01/k01/a02",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "missing",
+      "reason": "The seven-component signature disappears entirely, including four fractional values, with no import warning."
+    },
+    {
+      "featureId": "13d.microtonal-alterations",
+      "variantId": "13d-KeySignatures-Microtones/m01/k01/a03",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "missing",
+      "reason": "The seven-component signature disappears entirely, including four fractional values, with no import warning."
+    },
+    {
+      "featureId": "13d.microtonal-alterations",
+      "variantId": "13d-KeySignatures-Microtones/m01/k01/a04",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "missing",
+      "reason": "The seven-component signature disappears entirely, including four fractional values, with no import warning."
+    },
+    {
+      "featureId": "13d.microtonal-alterations",
+      "variantId": "13d-KeySignatures-Microtones/m01/k01/a05",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "missing",
+      "reason": "The seven-component signature disappears entirely, including four fractional values, with no import warning."
+    },
+    {
+      "featureId": "13d.microtonal-alterations",
+      "variantId": "13d-KeySignatures-Microtones/m01/k01/a06",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "missing",
+      "reason": "The seven-component signature disappears entirely, including four fractional values, with no import warning."
+    },
+    {
+      "featureId": "13d.microtonal-alterations",
+      "variantId": "13d-KeySignatures-Microtones/m01/k01/a07",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "missing",
+      "reason": "The seven-component signature disappears entirely, including four fractional values, with no import warning."
+    },
+    {
+      "featureId": "13e.cancel.new-fifths",
+      "variantId": "13e-KeySignatures-Cancel/m01/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All five fifth counts survive in MNX and their new flat/sharp signatures appear in both shells."
+    },
+    {
+      "featureId": "13e.cancel.new-fifths",
+      "variantId": "13e-KeySignatures-Cancel/m02/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All five fifth counts survive in MNX and their new flat/sharp signatures appear in both shells."
+    },
+    {
+      "featureId": "13e.cancel.new-fifths",
+      "variantId": "13e-KeySignatures-Cancel/m03/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All five fifth counts survive in MNX and their new flat/sharp signatures appear in both shells."
+    },
+    {
+      "featureId": "13e.cancel.new-fifths",
+      "variantId": "13e-KeySignatures-Cancel/m04/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All five fifth counts survive in MNX and their new flat/sharp signatures appear in both shells."
+    },
+    {
+      "featureId": "13e.cancel.new-fifths",
+      "variantId": "13e-KeySignatures-Cancel/m05/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All five fifth counts survive in MNX and their new flat/sharp signatures appear in both shells."
+    },
+    {
+      "featureId": "13e.cancel.explicit-natural-placement",
+      "variantId": "13e-KeySignatures-Cancel/m02/k01/cancel",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "The importer drops every cancel value/location. The new signatures appear without the source-requested natural runs."
+    },
+    {
+      "featureId": "13e.cancel.explicit-natural-placement",
+      "variantId": "13e-KeySignatures-Cancel/m03/k01/cancel",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "The importer drops every cancel value/location. The new signatures appear without the source-requested natural runs."
+    },
+    {
+      "featureId": "13e.cancel.explicit-natural-placement",
+      "variantId": "13e-KeySignatures-Cancel/m04/k01/cancel",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "The importer drops every cancel value/location. The new signatures appear without the source-requested natural runs."
+    },
+    {
+      "featureId": "13e.cancel.explicit-natural-placement",
+      "variantId": "13e-KeySignatures-Cancel/m05/k01/cancel",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "The importer drops every cancel value/location. The new signatures appear without the source-requested natural runs."
+    },
+    {
+      "featureId": "13e.midmeasure.initial-key",
+      "variantId": "13e-KeySignatures-MidMeasure-Change/m01/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "The first key survives in MNX and is shown in both shells."
+    },
+    {
+      "featureId": "13e.midmeasure.later-keys",
+      "variantId": "13e-KeySignatures-MidMeasure-Change/m01/k02",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "missing",
+      "reason": "The three later source key declarations disappear; the opening two sharps remain throughout, despite visible lyric labels naming the intended changes."
+    },
+    {
+      "featureId": "13e.midmeasure.later-keys",
+      "variantId": "13e-KeySignatures-MidMeasure-Change/m01/k03",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "missing",
+      "reason": "The three later source key declarations disappear; the opening two sharps remain throughout, despite visible lyric labels naming the intended changes."
+    },
+    {
+      "featureId": "13e.midmeasure.later-keys",
+      "variantId": "13e-KeySignatures-MidMeasure-Change/m01/k04",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "missing",
+      "reason": "The three later source key declarations disappear; the opening two sharps remain throughout, despite visible lyric labels naming the intended changes."
+    },
+    {
+      "featureId": "13f.hidden-key-ink",
+      "variantId": "13f-KeySignatures-Visible/m02/k01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "incorrect",
+      "reason": "The hidden flag is dropped; both shells visibly print four flats at bar 2."
+    },
+    {
+      "featureId": "13f.hidden-key-note-context",
+      "variantId": "13f-KeySignatures-Visible/m02/n01",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All four altered pitches survive in MNX and no redundant note accidentals appear; this does not excuse the visible hidden key."
+    },
+    {
+      "featureId": "13f.hidden-key-note-context",
+      "variantId": "13f-KeySignatures-Visible/m02/n02",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All four altered pitches survive in MNX and no redundant note accidentals appear; this does not excuse the visible hidden key."
+    },
+    {
+      "featureId": "13f.hidden-key-note-context",
+      "variantId": "13f-KeySignatures-Visible/m02/n03",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All four altered pitches survive in MNX and no redundant note accidentals appear; this does not excuse the visible hidden key."
+    },
+    {
+      "featureId": "13f.hidden-key-note-context",
+      "variantId": "13f-KeySignatures-Visible/m02/n04",
+      "shells": [
+        "workbench",
+        "studio"
+      ],
+      "view": "notation",
+      "verdict": "correct",
+      "reason": "All four altered pitches survive in MNX and no redundant note accidentals appear; this does not excuse the visible hidden key."
+    }
+  ],
+  "unresolvedCases": [
+    {
+      "id": "13a.extreme-fifths/exact-glyph-policy",
+      "scope": "Precise >7 accidental glyph and position design",
+      "reason": "The source specifies fifth counts through +/-11, and truncation to seven is wrong. This review does not choose the exact double-accidental engraving sequence."
+    },
+    {
+      "id": "13d.microtonal-alterations/accidental-glyphs",
+      "scope": "Exact microtonal signature glyph selection",
+      "reason": "The source supplies key-alter fractions but no key-accidental overrides. Missing all seven symbols is a definite loss; exact glyph selection needs a carrier and reference policy."
+    }
+  ],
+  "counts": {
+    "renderRows": 30,
+    "verdicts": {
+      "correct": 12,
+      "incorrect": 6,
+      "missing": 8,
+      "not applicable": 4
+    }
+  },
+  "deduplication": {
+    "completed22": "Its fractional note-pitch diagnostics and ordinary clef/meter repairs do not preserve fractional KEY alterations, extreme fifth engraving or hidden/positioned keys.",
+    "completed23": "Studio title workflow succeeds; no edit or GP persistence claim follows.",
+    "proposed28": "Bounded follow-up owns traditional extreme fifths, explicit cancel/visibility losses, midmeasure diagnostics, and the carrier decision/diagnostic for nontraditional keys."
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "id": "13d-KeySignatures-Microtones",
+  "sourceSha256": "4a1e57b89ad4e745ca8bf1ddb09abe38fa0706dad3298de944c253075affa7e4",
+  "testClass": "feature",
+  "description": "Non-traditional key signatures with microtone alterations: [g flat-and-a-half, a flat, b half-flat, c natural, d half-sharp, e sharp, f sharp-and-a-half].",
+  "views": [
+    {
+      "scrollTarget": "viewer",
+      "visibleWidth": 750,
+      "visibleHeight": 789.125,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [],
+      "scrollWidth": 750,
+      "scrollHeight": 789,
+      "clientWidth": 750,
+      "clientHeight": 789,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "importError": null,
+  "warnings": [],
+  "importedDocumentSha256": "5037ae2f3647d30ad9780b6490f54e3da2691847fc62030d3ae23f17923e4f1f",
+  "displayOptions": {
+    "lyrics": "current",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

@@ -1,0 +1,54 @@
+{
+  "id": "13c-KeySignatures-NonTraditional",
+  "sourceSha256": "55d06fc5a7dcbb7f8554a96166ab8edddab6e785b5fbd067a041c29bb08cc061",
+  "testClass": "feature",
+  "description": "Non-traditional key signatures, where each alteration is separately given. The first signature is [f sharp, a flat, b flat]. The second one is [c flat-flat, g sharp-sharp, d flat, b sharp, f natural], with explicitly selected octaves for each alteration.",
+  "views": [
+    {
+      "scrollTarget": "frame",
+      "visibleWidth": 1060,
+      "visibleHeight": 870,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0,
+          1
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [],
+      "scrollWidth": 1060,
+      "scrollHeight": 870,
+      "clientWidth": 1060,
+      "clientHeight": 870,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "suppliedLibraryTitle": "13c-KeySignatures-NonTraditional",
+  "makeCurrentError": null,
+  "entryPath": "Local operator ingest: GP seed + unmodified XML original; Save → Versions → View XML → Make current",
+  "importError": null,
+  "viewingOriginal": false,
+  "editingSuspended": false,
+  "warnings": [],
+  "importedDocumentSha256": "fe57668e2338077f60b6487955c0d00469f1377d3f2e87ab9e90762b8464b1d3",
+  "displayOptions": {
+    "lyrics": "current",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

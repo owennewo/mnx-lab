@@ -49,6 +49,7 @@ proposals that name their campaign.
 - **[core-musicxml-rest-fidelity.md](proposed/core-musicxml-rest-fidelity.md)** — MusicXML campaign item 25: preserve multimeasure rest groups, explicit rest placement, 256th–1024th values and `03d`'s noncanonical one-bar full rests; diagnose unsupported symbol-style requests.
 - **[core-musicxml-rhythm-fidelity.md](proposed/core-musicxml-rhythm-fidelity.md)** — MusicXML campaign item 26: preserve the full `03a` written-note ladder, draw long noteheads, and keep `03b`/`03f` cursor gaps invisible.
 - **[core-musicxml-clef-fidelity.md](proposed/core-musicxml-clef-fidelity.md)** — MusicXML campaign item 27: preserve the four `12a` octave clefs and diagnose the ungrounded TAB sign without assuming string tuning.
+- **[core-musicxml-key-fidelity.md](proposed/core-musicxml-key-fidelity.md)** — MusicXML campaign item 28: complete ±8…±11 traditional signatures and diagnose rich key, cancellation, timing and hidden-key losses pending a carrier decision.
 
 
 

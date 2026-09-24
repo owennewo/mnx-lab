@@ -190,3 +190,16 @@ the `12a` TAB sign is silently dropped; [proposed item 27](../proposed/core-musi
 owns those bounded follow-ups. Item 22's ordinary clef coordinates and
 unsupported-sign containment hold. No strings are declared, so Tab/Both
 are inapplicable. Item 18 remains open for the rest of the suite.
+
+## Key-signature rendering batch, 2026-09-24
+
+[The seven 13-series originals](../../docs/musicxml-key-assessment.md) now
+have 15 stable feature IDs, 167 source variants and 30 current Notation
+feature × shell × view verdicts. Both-shell original-file captures include
+the full tall `13a` ladder. Traditional ±8…±11 values survive import but
+draw only seven symbols; nontraditional keys, cancellations and later
+midmeasure changes vanish; `13f` prints its hidden key. Mode data has
+nonvisual dispositions and remains an import/authoring concern. [Proposed
+item 28](../proposed/core-musicxml-key-fidelity.md) names the bounded
+follow-up. No strings are declared, so Tab/Both are inapplicable. Item
+18 remains open for the rest of the suite.

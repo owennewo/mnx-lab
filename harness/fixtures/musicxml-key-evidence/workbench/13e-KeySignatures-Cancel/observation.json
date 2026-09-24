@@ -1,0 +1,54 @@
+{
+  "id": "13e-KeySignatures-Cancel",
+  "sourceSha256": "90b4e555eb7149a94679605e2ba73b5c48f81a76b3e74b8d680b363e4f1112a7",
+  "testClass": "feature",
+  "description": "Tests of key signature cancellation: in measure 2 it is positioned at the default location (which usually means that the cancellation comes immediately after the bar line), in measure 3 it uses the attribute ‘location=\"right\"’ (i.e., the cancellation comes after the new key signature), in measure 4 it uses ‘location=\"before-barline\"’, and in measure 5 it uses the attribute ‘location=\"left\"’ (the cancellation comes before the new key signature). The <cancel> element's value (4) in the last measure intentionally doesn't correspond to the value of the previous <fifths> value (2) for testing purposes.",
+  "views": [
+    {
+      "scrollTarget": "viewer",
+      "visibleWidth": 750,
+      "visibleHeight": 753.125,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0,
+          1,
+          2,
+          3
+        ],
+        [
+          4
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [],
+      "scrollWidth": 750,
+      "scrollHeight": 753,
+      "clientWidth": 750,
+      "clientHeight": 753,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "importError": null,
+  "warnings": [],
+  "importedDocumentSha256": "ce8fb681c1f6db1ea6074480f8db4a30e50057bbbb957c678b60d79b1e33c629",
+  "displayOptions": {
+    "lyrics": "current",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

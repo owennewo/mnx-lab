@@ -1,0 +1,54 @@
+{
+  "id": "13f-KeySignatures-Visible",
+  "sourceSha256": "e669b4a0d7f5cddf69b6e6d5648383595ab4a32755425dbc65187466aaa6373c",
+  "testClass": "feature",
+  "description": "Test the ‘print-object’ attribute of key signatures. The signature at the beginning of the second bar is a flat major and should be invisible; the following notes d flat, e flat, a flat, and b flat shouldn't have a flat accidental.",
+  "views": [
+    {
+      "scrollTarget": "frame",
+      "visibleWidth": 1060,
+      "visibleHeight": 870,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0,
+          1
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [],
+      "scrollWidth": 1060,
+      "scrollHeight": 870,
+      "clientWidth": 1060,
+      "clientHeight": 870,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "suppliedLibraryTitle": "13f-KeySignatures-Visible",
+  "makeCurrentError": null,
+  "entryPath": "Local operator ingest: GP seed + unmodified XML original; Save → Versions → View XML → Make current",
+  "importError": null,
+  "viewingOriginal": false,
+  "editingSuspended": false,
+  "warnings": [],
+  "importedDocumentSha256": "1666397d0ca0752098b51fa51c8c4d8dca9308092acc094f10d569a14d83475a",
+  "displayOptions": {
+    "lyrics": "current",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

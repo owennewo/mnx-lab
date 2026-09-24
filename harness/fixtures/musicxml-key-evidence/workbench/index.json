@@ -1,0 +1,442 @@
+{
+  "kind": "browser observations; not feature correctness or human verification",
+  "captureScriptSha256": "f98c69412562c6a5eb8dc47fd81d173e7fb6daf6ff27019682b30adad8eb322a",
+  "shell": "workbench",
+  "applicationCommit": "af7f3401c6c9e5928f886a8b9e05626c01b3a2a8",
+  "corpusRevision": "77c19f7e819154c70ca1a1992e80dcda8ff82fea",
+  "viewport": {
+    "width": 1440,
+    "height": 1000,
+    "deviceScaleFactor": 1
+  },
+  "fixtures": [
+    {
+      "id": "13a-KeySignatures",
+      "sourceSha256": "7e7abc0c164ac5d8835f92989f2dfc896a6fff1b43c32478d5d5823e56baba81",
+      "testClass": "feature",
+      "description": "Various key signatures: from 11 flats to 11 sharps. Each signature is shown twice, with one measure in major and the other measure in minor.",
+      "views": [
+        {
+          "scrollTarget": "viewer",
+          "visibleWidth": 750,
+          "visibleHeight": 753.125,
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0,
+              1,
+              2,
+              3
+            ],
+            [
+              4,
+              5,
+              6,
+              7
+            ],
+            [
+              8,
+              9,
+              10,
+              11
+            ],
+            [
+              12,
+              13,
+              14,
+              15,
+              16
+            ],
+            [
+              17,
+              18,
+              19,
+              20,
+              21
+            ],
+            [
+              22,
+              23,
+              24,
+              25,
+              26,
+              27
+            ],
+            [
+              28,
+              29,
+              30,
+              31,
+              32
+            ],
+            [
+              33,
+              34,
+              35,
+              36
+            ],
+            [
+              37,
+              38,
+              39
+            ],
+            [
+              40,
+              41,
+              42,
+              43
+            ],
+            [
+              44,
+              45
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [],
+          "scrollWidth": 740,
+          "scrollHeight": 1141,
+          "clientWidth": 740,
+          "clientHeight": 753,
+          "screenshots": [
+            "notation-0-0.png",
+            "notation-0-388.png"
+          ]
+        }
+      ],
+      "importError": null,
+      "warnings": [
+        "part P1, measure 1: incompatible time symbol common for 2/4; retaining numeric meter."
+      ],
+      "importedDocumentSha256": "60cfa470a1090a7ce8f6c95c12a24a0b85c2de8a306546a7b3049396a3d6ebb8",
+      "displayOptions": {
+        "lyrics": "current",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "13b-KeySignatures-ChurchModes",
+      "sourceSha256": "0833c300cd1a03633115ceac8b7820c24af9495658c14bf85eefece2c5e6f6f9",
+      "testClass": "feature",
+      "description": "All different modes: ‘major’, ‘minor’, ‘ionian’, ‘dorian’, ‘phrygian’, ‘lydian’, ‘mixolydian’, ‘aeolian’, ‘locrian’, and ‘none’. All modes are given with two sharps.",
+      "views": [
+        {
+          "scrollTarget": "viewer",
+          "visibleWidth": 750,
+          "visibleHeight": 753.125,
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0
+            ],
+            [
+              1,
+              2
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [
+            "validation — underfills the 4/4 bar: notes sum to 2 of 4 beats",
+            "validation — underfills the 4/4 bar: notes sum to 2 of 4 beats"
+          ],
+          "scrollWidth": 750,
+          "scrollHeight": 753,
+          "clientWidth": 750,
+          "clientHeight": 753,
+          "screenshots": [
+            "notation-0-0.png"
+          ]
+        }
+      ],
+      "importError": null,
+      "warnings": [],
+      "importedDocumentSha256": "3b4200167b7e50eae6347402b7e3b82d896d9d5dd875cbf4f4ed232070c65af0",
+      "displayOptions": {
+        "lyrics": "current",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide",
+        "selectedVerse": "1"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "13c-KeySignatures-NonTraditional",
+      "sourceSha256": "55d06fc5a7dcbb7f8554a96166ab8edddab6e785b5fbd067a041c29bb08cc061",
+      "testClass": "feature",
+      "description": "Non-traditional key signatures, where each alteration is separately given. The first signature is [f sharp, a flat, b flat]. The second one is [c flat-flat, g sharp-sharp, d flat, b sharp, f natural], with explicitly selected octaves for each alteration.",
+      "views": [
+        {
+          "scrollTarget": "viewer",
+          "visibleWidth": 750,
+          "visibleHeight": 753.125,
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0,
+              1
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [],
+          "scrollWidth": 750,
+          "scrollHeight": 753,
+          "clientWidth": 750,
+          "clientHeight": 753,
+          "screenshots": [
+            "notation-0-0.png"
+          ]
+        }
+      ],
+      "importError": null,
+      "warnings": [],
+      "importedDocumentSha256": "fe57668e2338077f60b6487955c0d00469f1377d3f2e87ab9e90762b8464b1d3",
+      "displayOptions": {
+        "lyrics": "current",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "13d-KeySignatures-Microtones",
+      "sourceSha256": "4a1e57b89ad4e745ca8bf1ddb09abe38fa0706dad3298de944c253075affa7e4",
+      "testClass": "feature",
+      "description": "Non-traditional key signatures with microtone alterations: [g flat-and-a-half, a flat, b half-flat, c natural, d half-sharp, e sharp, f sharp-and-a-half].",
+      "views": [
+        {
+          "scrollTarget": "viewer",
+          "visibleWidth": 750,
+          "visibleHeight": 789.125,
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [],
+          "scrollWidth": 750,
+          "scrollHeight": 789,
+          "clientWidth": 750,
+          "clientHeight": 789,
+          "screenshots": [
+            "notation-0-0.png"
+          ]
+        }
+      ],
+      "importError": null,
+      "warnings": [],
+      "importedDocumentSha256": "5037ae2f3647d30ad9780b6490f54e3da2691847fc62030d3ae23f17923e4f1f",
+      "displayOptions": {
+        "lyrics": "current",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "13e-KeySignatures-Cancel",
+      "sourceSha256": "90b4e555eb7149a94679605e2ba73b5c48f81a76b3e74b8d680b363e4f1112a7",
+      "testClass": "feature",
+      "description": "Tests of key signature cancellation: in measure 2 it is positioned at the default location (which usually means that the cancellation comes immediately after the bar line), in measure 3 it uses the attribute ‘location=\"right\"’ (i.e., the cancellation comes after the new key signature), in measure 4 it uses ‘location=\"before-barline\"’, and in measure 5 it uses the attribute ‘location=\"left\"’ (the cancellation comes before the new key signature). The <cancel> element's value (4) in the last measure intentionally doesn't correspond to the value of the previous <fifths> value (2) for testing purposes.",
+      "views": [
+        {
+          "scrollTarget": "viewer",
+          "visibleWidth": 750,
+          "visibleHeight": 753.125,
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0,
+              1,
+              2,
+              3
+            ],
+            [
+              4
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [],
+          "scrollWidth": 750,
+          "scrollHeight": 753,
+          "clientWidth": 750,
+          "clientHeight": 753,
+          "screenshots": [
+            "notation-0-0.png"
+          ]
+        }
+      ],
+      "importError": null,
+      "warnings": [],
+      "importedDocumentSha256": "ce8fb681c1f6db1ea6074480f8db4a30e50057bbbb957c678b60d79b1e33c629",
+      "displayOptions": {
+        "lyrics": "current",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "13e-KeySignatures-MidMeasure-Change",
+      "sourceSha256": "1606f21465d79c5ac44456f712fac03d619ceece8bef18c78e8f7de1b15d8e99",
+      "testClass": "feature",
+      "description": "Mid-Measure Key-Change: 2 sharps, 2 flats, 0 sharps/flats, 7 sharps, no mode.",
+      "views": [
+        {
+          "scrollTarget": "viewer",
+          "visibleWidth": 750,
+          "visibleHeight": 789.125,
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [],
+          "scrollWidth": 750,
+          "scrollHeight": 789,
+          "clientWidth": 750,
+          "clientHeight": 789,
+          "screenshots": [
+            "notation-0-0.png"
+          ]
+        }
+      ],
+      "importError": null,
+      "warnings": [],
+      "importedDocumentSha256": "003ab52f42fb4bf37b71c7a3b6aae26b43b16dabbbe2a44d3b1021c335b21084",
+      "displayOptions": {
+        "lyrics": "current",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide",
+        "selectedVerse": "1"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "13f-KeySignatures-Visible",
+      "sourceSha256": "e669b4a0d7f5cddf69b6e6d5648383595ab4a32755425dbc65187466aaa6373c",
+      "testClass": "feature",
+      "description": "Test the ‘print-object’ attribute of key signatures. The signature at the beginning of the second bar is a flat major and should be invisible; the following notes d flat, e flat, a flat, and b flat shouldn't have a flat accidental.",
+      "views": [
+        {
+          "scrollTarget": "viewer",
+          "visibleWidth": 750,
+          "visibleHeight": 753.125,
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0,
+              1
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [],
+          "scrollWidth": 750,
+          "scrollHeight": 753,
+          "clientWidth": 750,
+          "clientHeight": 753,
+          "screenshots": [
+            "notation-0-0.png"
+          ]
+        }
+      ],
+      "importError": null,
+      "warnings": [],
+      "importedDocumentSha256": "1666397d0ca0752098b51fa51c8c4d8dca9308092acc094f10d569a14d83475a",
+      "displayOptions": {
+        "lyrics": "current",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    }
+  ],
+  "browser": {
+    "protocolVersion": "1.3",
+    "product": "Chrome/153.0.8010.36",
+    "revision": "@507c6ee3e2f3b2ca0e660547e5b9ea4820c67f4c",
+    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+    "jsVersion": "15.3.76.10"
+  }
+}

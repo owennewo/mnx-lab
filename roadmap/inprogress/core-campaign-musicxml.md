@@ -81,6 +81,17 @@ placeholders under item 22's completed containment. [Proposed item
 TAB-diagnostic gaps. Item 18 remains open for the suite; no authoring task
 is inferred for item 19.
 
+**Key render slice, 2026-09-24.** Seven `13a–13f` originals now have
+[current source/import/both-shell Notation verdicts](../../docs/musicxml-key-assessment.md):
+15 stable feature IDs, 70 key declarations, 73 notes, 167 variants and 30
+feature × shell × view rows. Traditional -7…+7 signatures and mode-name
+lyrics render; sixteen ±8…±11 bars retain their MNX fifths but draw at most
+seven symbols. Nontraditional/microtonal keys, explicit cancellation and
+later midmeasure changes disappear; `13f` prints a key marked hidden while
+retaining its note pitches. Mode metadata is explicitly nonvisual and lost
+on import. [Proposed item 28](../proposed/core-musicxml-key-fidelity.md)
+owns the new bounded gaps. Items 18/19 remain in progress.
+
 ### The oracle we already own, and the assertion that would waste it
 
 `vendor/mnx/doctools/data.json` holds **27 `spectools.exampledocumentcomparison`
@@ -204,6 +215,7 @@ deliberately **not** enumerated in advance: item 8 decides them from evidence.
 | 25 | [Rest fidelity](../proposed/core-musicxml-rest-fidelity.md) | Import multimeasure rest ranges, explicit rest heights and 256th–1024th written values; preserve noncanonical one-bar full-rest spans and diagnose `use-symbols` until a carrier is agreed. | accuracy | 02a–02f plus 03d source/import/both-shell notation evidence | **proposed 2026-09-24** |
 | 26 | [Rhythm fidelity](../proposed/core-musicxml-rhythm-fidelity.md) | Keep maxima/longa/breve and 256th–1024th note values, draw long-value heads, and retain backup/forward gaps as invisible MNX spaces. Deduplicates item 21's export work and item 25's rest work. | accuracy | 03-series source/import/browser/headless evidence | **proposed 2026-09-24** |
 | 27 | [Clef fidelity](../proposed/core-musicxml-clef-fidelity.md) | Import octave-transposing G/F clefs and diagnose TAB signs without known strings; ordinary clef coordinates and unsupported-sign containment remain completed item 22 work. | accuracy | 12a–12b source/import/current both-shell notation evidence | **proposed 2026-09-24** |
+| 28 | [Key fidelity](../proposed/core-musicxml-key-fidelity.md) | Draw full traditional ±8…±11 fifths and diagnose nontraditional, cancellation, midmeasure and hidden-key losses pending a carrier decision. Deduplicates item 22 note-pitch work and item 23 title work. | accuracy | 13a–13f source/import/current both-shell notation evidence | **proposed 2026-09-24** |
 | — | Feature parity | Dynamics, wedges, spanners, ottavas, articulations, SMuFL glyph names, percussion, layout breaks. **Deliberately unenumerated**: item 8 turns these into a ranked queue with evidence, and each becomes its own row when picked up. Note the schema already has `dynamic-*`, `ottava`, `slur` and `wedge-type` as standard objects — but **no pedal def**, so pedal is contract clause 2's first real test. | accuracy | 1 + 2 + 3 | not yet rows |
 
 ### Item 8's derivation rule
@@ -237,6 +249,33 @@ exactly as `verified` already works here. No backend: a generated JSON artifact
 committed to the repo, like `worker/models.json`.
 
 ## Progress + learnings
+
+### 2026-09-24 — item 18: 13-series key-signature rendering slice
+
+[The seven-source current review](../../docs/musicxml-key-assessment.md)
+adds 15 feature IDs, 70 source key declarations, 73 notes, 167 stable
+source variants and 30 both-shell Notation rows. Full source XML, imported
+MNX and current browser captures are retained. Workbench's tall `13a`
+score was checked with two overlapping scroll tiles; Studio and the six
+other scores fit one tile. No source declares strings, so Tab/Both do not
+apply.
+
+The -7…+7 traditional keys display, and `13b`'s ten mode labels remain
+visible. Mode values themselves have no separate glyph and disappear
+semantically on import, so they receive nonvisual dispositions rather
+than render passes. `13a` retains ±8…±11 in MNX but draws at most seven
+key symbols in all sixteen extreme bars. The `13c`/`13d` nontraditional
+and fractional signatures are absent without warning. Four explicit
+cancellation controls and three in-bar changes in `13e` disappear, while
+the new bar-start fifths survive. `13f`'s hidden four-flat key prints,
+although its four altered note pitches and accidental context survive.
+
+[Proposed item 28](../proposed/core-musicxml-key-fidelity.md) covers the
+representable extreme-fifths rendering gap and diagnostics for key
+details awaiting a spec-loop carrier. It does not reopen item 22's
+fractional note-pitch or item 23's title work. Render item 18 remains
+open for the rest of the suite; no item 19 authoring or persistence pass
+is inferred.
 
 ### 2026-09-24 — item 18: 12-series clef rendering slice
 

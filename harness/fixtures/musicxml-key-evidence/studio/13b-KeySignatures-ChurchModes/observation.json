@@ -1,0 +1,59 @@
+{
+  "id": "13b-KeySignatures-ChurchModes",
+  "sourceSha256": "0833c300cd1a03633115ceac8b7820c24af9495658c14bf85eefece2c5e6f6f9",
+  "testClass": "feature",
+  "description": "All different modes: ‘major’, ‘minor’, ‘ionian’, ‘dorian’, ‘phrygian’, ‘lydian’, ‘mixolydian’, ‘aeolian’, ‘locrian’, and ‘none’. All modes are given with two sharps.",
+  "views": [
+    {
+      "scrollTarget": "frame",
+      "visibleWidth": 1060,
+      "visibleHeight": 870,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0,
+          1,
+          2
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [
+        "validation — underfills the 4/4 bar: notes sum to 2 of 4 beats",
+        "validation — underfills the 4/4 bar: notes sum to 2 of 4 beats"
+      ],
+      "scrollWidth": 1060,
+      "scrollHeight": 870,
+      "clientWidth": 1060,
+      "clientHeight": 870,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "suppliedLibraryTitle": "13b-KeySignatures-ChurchModes",
+  "makeCurrentError": null,
+  "entryPath": "Local operator ingest: GP seed + unmodified XML original; Save → Versions → View XML → Make current",
+  "importError": null,
+  "viewingOriginal": false,
+  "editingSuspended": false,
+  "warnings": [],
+  "importedDocumentSha256": "3b4200167b7e50eae6347402b7e3b82d896d9d5dd875cbf4f4ed232070c65af0",
+  "displayOptions": {
+    "lyrics": "current",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide",
+    "selectedVerse": "1"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}
