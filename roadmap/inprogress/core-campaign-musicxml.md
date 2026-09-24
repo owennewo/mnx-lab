@@ -27,16 +27,19 @@ semantic and XSD measurements; their mismatch baselines identify further work. R
 produce separate, evidenced gap proposals; implementing those proposals is subsequent
 work. The historical log below records how the earlier baseline was reached.
 
-**Assessment handoff, 2026-09-24.** Items 1–17 and 20–23 have landed; items
-18 (render) and 19 (write path) remain in progress. The first both-shell sweep
-loaded all 183 sources, but its historical captures are not per-feature verdicts;
-later import, display and title fixes also changed the application. The 12 meter
-sources have a bounded variant review, and three untitled Studio originals have
-title-workflow evidence. The pitch original loses 15 of 108 notes when saved
-through GP storage. [The assessment](../../docs/musicxml-editor-assessment.md)
-separates these findings from the unreviewed corpus. Continue from the shared
-fixture/feature inventory, then assess the `01a`–`01h` pitch and accidental
-family on the current app before expanding to the remaining families.
+**Assessment checkpoint, 2026-09-24.** Items 1–17 and 20–23 have landed;
+items 18 (render) and 19 (write path) remain in progress. Current, detailed
+render verdicts cover **81/183** pinned originals across `01a`–`01h`, `02a`–`02f`,
+the `03`, `11`, `12`, `13`, `14a`, `21`, `22`, `23`, `24`, `31` and `32` families;
+**102 originals remain**. The historical both-shell sweep of all 183 files is a
+load/display baseline, not feature-level coverage. Item 19 has bounded meter,
+title and `01a`–`01h` authoring evidence, including the Studio GP storage loss
+of 15/108 `01a` notes; it has no corpus-wide task disposition. The next render
+slice is the eleven `33a`–`33k` spanner originals. Both shells have current
+captures, but no source-derived feature/variant verdicts are complete, so they
+are not counted. See the [render assessment](core-musicxml-render-assessment.md),
+[write-path assessment](core-musicxml-write-assessment.md) and
+[initial sweep](../../docs/musicxml-editor-assessment.md) for scope and evidence rules.
 
 **Pitch/accidental slice, 2026-09-24.** The eight `01a`–`01h` originals now have
 stable source-note variant IDs, [current feature/view and authoring
@@ -255,6 +258,27 @@ exactly as `verified` already works here. No backend: a generated JSON artifact
 committed to the repo, like `worker/models.json`.
 
 ## Progress + learnings
+
+### 2026-09-24 — assessment pause before 33-series spanner verdicts
+
+The current assessment boundary is the landed `32`-series render review:
+**81/183** originals have detailed render dispositions, **102 remain**, and
+items 18/19 stay open. A fresh `c30847ce` worktree captured all eleven
+`33a`–`33k` originals in current Workbench and editable Studio. Both shells
+imported them without capture errors and produced one complete Notation tile
+per original with meter shown and all lyric verses enabled; the source files
+declare no known tuning, so Tab/Both do not apply. The `33e` import reports an
+unrelated common-time-symbol warning but no warning about its invalid octave
+sizes. These are preliminary load/display observations, **not** feature or
+variant verdicts. The captures live under `/tmp/mnx-spanners-workbench` and
+`/tmp/mnx-spanners-studio` and must be regenerated if those temporary files
+are unavailable. The next session should derive stable IDs from each original
+and its pinned manifest description, compare source markers with imported
+MNX and complete shell views, retain reviewed evidence, attribute each gap,
+and update machine/readable render reports. It should keep item 19's direct
+editor tasks and save-route verdicts separate; no 33-series authoring pass has
+been claimed. Neither item closes until every fixture has explicit
+feature/task dispositions, including unresolved cases.
 
 ### 2026-09-24 — item 18: 32-series notation rendering slice
 

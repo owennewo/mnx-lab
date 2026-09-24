@@ -338,3 +338,19 @@ owns new note-mark gaps; item 33 owns the `32b` direction extension.
 Detailed current render coverage is **81/183 originals; 102 remain**.
 Item 18 remains in progress, and item 19 receives no authoring or GP
 persistence claim from this slice.
+
+## Pause checkpoint before spanners, 2026-09-24
+
+The `32`-series batch is the last completed detailed render slice: 81/183
+originals are covered and 102 remain. Both current shells loaded and captured
+the eleven `33a`–`33k` originals at application commit `c30847ce`, with one
+complete Notation tile per fixture, meter shown and all lyric verses enabled.
+Their source strings are unknown, so Tab/Both are inapplicable. These captures
+do not yet establish per-feature verdicts; the eleven are excluded from the
+81-source coverage count. The local, disposable captures are in
+`/tmp/mnx-spanners-workbench` and `/tmp/mnx-spanners-studio`. Resume with the
+original MusicXML and manifest descriptions, compare each spanner endpoint
+and display variant with imported MNX and both shell views, and retain the
+reviewed evidence in the machine-readable and readable reports. Treat `33e`'s
+invalid octave sizes separately from valid octave-shift cases. Do not infer
+item 19 editor or persistence support from these render captures.
