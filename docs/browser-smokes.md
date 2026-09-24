@@ -135,6 +135,17 @@ pointing at the opening line rather than at the offending one. `${` is
 interpolated by the smoke rather than the page for the same reason. Write inner
 comments in plain prose, and run `node --check` after editing one.
 
+### Ready alone is not ready under load
+
+The runner puts four smokes on the machine at once, and other agents' gates share it
+too. A readiness check that only held because the page was quick then races. Wait for
+the thing the next assertion reads, not a neighbour of it: `unrolled-smoke` waited for
+the player's performance and then looked for the painted score, which under load was
+not painted yet (it now waits for `SCORE_READY` and `settle`). A chain evaluated right
+after `Page.navigate` can reach a shell that has not mounted: a wait loop should treat
+that throw as "not yet" until its deadline and report the last error if it never
+clears, as `studio-smoke`'s `wait` does.
+
 ### The default headless window is 800×600
 
 Unless the smoke sets `--window-size` or `Emulation.setDeviceMetricsOverride`,

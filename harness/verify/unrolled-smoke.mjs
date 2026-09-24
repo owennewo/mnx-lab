@@ -4,7 +4,7 @@ import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { serveStatic } from './staticServer.mjs';
 import { loadCorpus } from './check-scenarios.mjs';
-import { devtoolsPort, connect, client } from './browserHarness.mjs';
+import { devtoolsPort, connect, client, waitFor, settle, SCORE_READY } from './browserHarness.mjs';
 const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'mnx-unrolled-'));
 let chrome, ws, server, review;
 try {
@@ -49,6 +49,10 @@ try {
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
   if (!ready) throw new Error('Unrolled workbench did not load');
+  // The player's performance can be ready before the viewer has painted the
+  // unrolled score, and under load it is.
+  await waitFor(cdp, SCORE_READY, 'the unrolled score');
+  await settle(cdp);
   console.log(
     'Unrolled interaction',
     await cdp.evaluate(`(async()=>{
