@@ -50,6 +50,7 @@ proposals that name their campaign.
 - **[core-musicxml-rhythm-fidelity.md](proposed/core-musicxml-rhythm-fidelity.md)** — MusicXML campaign item 26: preserve the full `03a` written-note ladder, draw long noteheads, and keep `03b`/`03f` cursor gaps invisible.
 - **[core-musicxml-clef-fidelity.md](proposed/core-musicxml-clef-fidelity.md)** — MusicXML campaign item 27: preserve the four `12a` octave clefs and diagnose the ungrounded TAB sign without assuming string tuning.
 - **[core-musicxml-key-fidelity.md](proposed/core-musicxml-key-fidelity.md)** — MusicXML campaign item 28: complete ±8…±11 traditional signatures and diagnose rich key, cancellation, timing and hidden-key losses pending a carrier decision.
+- **[core-musicxml-chord-fidelity.md](proposed/core-musicxml-chord-fidelity.md)** — MusicXML campaign item 29: retain forced tie placement and ornaments, diagnose chord-member tremolo/pickup losses, and prevent silent cross-voice onset shifts.
 
 
 

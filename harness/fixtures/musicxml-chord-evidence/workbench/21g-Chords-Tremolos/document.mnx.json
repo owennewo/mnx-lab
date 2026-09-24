@@ -1,0 +1,234 @@
+{
+  "mnx": {
+    "version": 1,
+    "support": {
+      "useBeams": true
+    }
+  },
+  "global": {
+    "measures": [
+      {
+        "key": {
+          "fifths": 0
+        }
+      }
+    ]
+  },
+  "parts": [
+    {
+      "id": "P1",
+      "name": "Instrument",
+      "measures": [
+        {
+          "clefs": [
+            {
+              "clef": {
+                "sign": "G",
+                "staffPosition": -2
+              }
+            }
+          ],
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "F",
+                        "octave": 3
+                      },
+                      "id": "n-1-1-v1-0-0"
+                    },
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 4
+                      },
+                      "id": "n-1-1-v1-0-1"
+                    },
+                    {
+                      "pitch": {
+                        "step": "G",
+                        "octave": 4
+                      },
+                      "id": "n-1-1-v1-0-2"
+                    },
+                    {
+                      "pitch": {
+                        "step": "D",
+                        "octave": 5
+                      },
+                      "id": "n-1-1-v1-0-3"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "eighth"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "A",
+                        "octave": 3
+                      },
+                      "id": "n-1-1-v1-1-0"
+                    },
+                    {
+                      "pitch": {
+                        "step": "D",
+                        "octave": 4
+                      },
+                      "id": "n-1-1-v1-1-1"
+                    },
+                    {
+                      "pitch": {
+                        "step": "G",
+                        "octave": 4
+                      },
+                      "id": "n-1-1-v1-1-2"
+                    },
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-1-v1-1-3"
+                    }
+                  ],
+                  "id": "e-beam-1"
+                },
+                {
+                  "duration": {
+                    "base": "eighth"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "B",
+                        "octave": 3
+                      },
+                      "id": "n-1-1-v1-2-0"
+                    },
+                    {
+                      "pitch": {
+                        "step": "D",
+                        "octave": 4
+                      },
+                      "id": "n-1-1-v1-2-1"
+                    },
+                    {
+                      "pitch": {
+                        "step": "F",
+                        "octave": 4
+                      },
+                      "id": "n-1-1-v1-2-2"
+                    },
+                    {
+                      "pitch": {
+                        "step": "A",
+                        "octave": 4
+                      },
+                      "id": "n-1-1-v1-2-3"
+                    }
+                  ],
+                  "id": "e-beam-2"
+                },
+                {
+                  "duration": {
+                    "base": "eighth"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "F",
+                        "octave": 5
+                      },
+                      "id": "n-1-1-v1-3-0"
+                    },
+                    {
+                      "pitch": {
+                        "step": "A",
+                        "octave": 5
+                      },
+                      "id": "n-1-1-v1-3-1"
+                    },
+                    {
+                      "pitch": {
+                        "step": "B",
+                        "octave": 5
+                      },
+                      "id": "n-1-1-v1-3-2"
+                    },
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 6
+                      },
+                      "id": "n-1-1-v1-3-3"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "G",
+                        "octave": 4
+                      },
+                      "id": "n-1-1-v1-4-0"
+                    },
+                    {
+                      "pitch": {
+                        "step": "D",
+                        "octave": 5
+                      },
+                      "id": "n-1-1-v1-4-1"
+                    },
+                    {
+                      "pitch": {
+                        "step": "A",
+                        "octave": 5
+                      },
+                      "id": "n-1-1-v1-4-2"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "eighth"
+                  },
+                  "rest": {}
+                }
+              ]
+            }
+          ],
+          "beams": [
+            {
+              "events": [
+                "e-beam-1",
+                "e-beam-2"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "_x": {
+    "mnxLab": {
+      "encoding": {
+        "software": "musicxml-mnx",
+        "version": "0.1.0"
+      }
+    }
+  }
+}

@@ -230,3 +230,18 @@ lost before MNX. The four source-located warnings confirm item 22's
 containment; full geometry and staff-relative note placement remain its
 documented carrier/engraving deferral. No new duplicate proposal or
 authoring claim is filed. Item 18 remains open for the rest of the suite.
+
+## Chord rendering batch, 2026-09-24
+
+[The nine 21a–21i originals](../../docs/musicxml-chord-assessment.md) now
+have 27 stable feature IDs, 167 source variants and 54 current Notation
+feature × shell × view verdicts. Original-file browser imports, matching
+imported MNX, complete SVG/PNG and Show display settings are retained for
+both shells. No source strings permit Tab/Both. Ordinary chord grouping,
+pitch/rhythm and tie targets survive; forced tie shape, the `21d` accent and
+fermata, five member-specific tremolos and implicit pickup state disappear.
+`21i` moves two cross-voice chord notes one quarter late. `21h`'s
+cautionary/editorial question extends existing proposed item 24; [proposed
+item 29](../proposed/core-musicxml-chord-fidelity.md) owns the other new
+gaps. Item 18 remains open for the rest of the suite, and no item 19
+authoring or persistence pass is inferred.

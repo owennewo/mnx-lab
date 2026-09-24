@@ -130,5 +130,10 @@ rendition byte-identical and the library title workflow intact.
   formerly blocked Studio title promotion. It already exposes the `01a` GP
   loss; this proposal makes preservation an acceptance target.
 - Default cautionary/editorial enclosure style remains unresolved until the
-  policy is chosen. Other pitch-register authoring variants and the remaining
-  175 suite fixtures are still assessment work, not asserted gaps here.
+  policy is chosen. Other pitch-register authoring variants and the other
+  suite fixtures are still assessment work, not asserted gaps here. The later
+  [21h chord render assessment](../../docs/musicxml-chord-assessment.md)
+  confirms the same loss on a three-note chord: ordinary accidental ink and
+  pitches survive, but cautionary/editorial flags vanish from imported MNX
+  with no explicit source enclosure. This adds evidence to the existing
+  policy/carrier task, not a separate chord proposal.

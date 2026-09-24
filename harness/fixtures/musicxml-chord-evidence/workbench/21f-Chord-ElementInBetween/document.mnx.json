@@ -1,0 +1,109 @@
+{
+  "mnx": {
+    "version": 1
+  },
+  "global": {
+    "measures": [
+      {
+        "time": {
+          "count": 4,
+          "unit": 4
+        },
+        "segno": {
+          "location": {
+            "fraction": [
+              1,
+              4
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "parts": [
+    {
+      "id": "P0",
+      "name": "MusicXML Part",
+      "measures": [
+        {
+          "clefs": [
+            {
+              "clef": {
+                "sign": "G",
+                "staffPosition": -2
+              }
+            }
+          ],
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "A",
+                        "octave": 4
+                      },
+                      "id": "n-1-1-v1-0-0"
+                    },
+                    {
+                      "pitch": {
+                        "step": "F",
+                        "octave": 4,
+                        "alter": 1
+                      },
+                      "id": "n-1-1-v1-0-1"
+                    },
+                    {
+                      "pitch": {
+                        "step": "D",
+                        "octave": 4
+                      },
+                      "id": "n-1-1-v1-0-2"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "rest": {}
+                },
+                {
+                  "duration": {
+                    "base": "half"
+                  },
+                  "rest": {}
+                }
+              ]
+            }
+          ],
+          "dynamics": [
+            {
+              "position": {
+                "fraction": [
+                  1,
+                  4
+                ]
+              },
+              "type": "immediate",
+              "value": "p"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "_x": {
+    "mnxLab": {
+      "encoding": {
+        "software": "musicxml-mnx",
+        "version": "0.1.0"
+      }
+    }
+  }
+}

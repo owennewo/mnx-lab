@@ -216,6 +216,7 @@ deliberately **not** enumerated in advance: item 8 decides them from evidence.
 | 26 | [Rhythm fidelity](../proposed/core-musicxml-rhythm-fidelity.md) | Keep maxima/longa/breve and 256th–1024th note values, draw long-value heads, and retain backup/forward gaps as invisible MNX spaces. Deduplicates item 21's export work and item 25's rest work. | accuracy | 03-series source/import/browser/headless evidence | **proposed 2026-09-24** |
 | 27 | [Clef fidelity](../proposed/core-musicxml-clef-fidelity.md) | Import octave-transposing G/F clefs and diagnose TAB signs without known strings; ordinary clef coordinates and unsupported-sign containment remain completed item 22 work. | accuracy | 12a–12b source/import/current both-shell notation evidence | **proposed 2026-09-24** |
 | 28 | [Key fidelity](../proposed/core-musicxml-key-fidelity.md) | Draw full traditional ±8…±11 fifths and diagnose nontraditional, cancellation, midmeasure and hidden-key losses pending a carrier decision. Deduplicates item 22 note-pitch work and item 23 title work. | accuracy | 13a–13f source/import/current both-shell notation evidence | **proposed 2026-09-24** |
+| 29 | [Chord fidelity](../proposed/core-musicxml-chord-fidelity.md) | Keep forced tie sides and first-bar ornaments, diagnose member-specific tremolo and implicit pickup losses pending carriers, and prevent silent cross-voice onset shifts. Deduplicates item 24's accidental-policy work. | accuracy | 21a–21i source/import/current both-shell notation evidence | **proposed 2026-09-24** |
 | — | Feature parity | Dynamics, wedges, spanners, ottavas, articulations, SMuFL glyph names, percussion, layout breaks. **Deliberately unenumerated**: item 8 turns these into a ranked queue with evidence, and each becomes its own row when picked up. Note the schema already has `dynamic-*`, `ottava`, `slur` and `wedge-type` as standard objects — but **no pedal def**, so pedal is contract clause 2's first real test. | accuracy | 1 + 2 + 3 | not yet rows |
 
 ### Item 8's derivation rule
@@ -249,6 +250,25 @@ exactly as `verified` already works here. No backend: a generated JSON artifact
 committed to the repo, like `worker/models.json`.
 
 ## Progress + learnings
+
+### 2026-09-24 — item 18: 21-series chord rendering slice
+
+[The nine-source original-file review](../../docs/musicxml-chord-assessment.md)
+adds 27 stable feature IDs, 95 notes, 40 source events, 32 controls, 167
+source variants and 54 both-shell Notation rows. All complete scores fit one
+tile with clefs and time signatures shown; no source declares strings, so
+Tab/Both do not apply. Chord grouping, ordinary pitch/rhythm, eight tie
+targets and interleaved directions survive. Forced tie placement/orientation,
+the `21d` accent and fermata, five member-specific tremolos and pickup
+implicit state disappear on import; `21i` moves two notes from quarter 0 to
+quarter 1. Cautionary/editorial identity on `21h` confirms item 24's already
+filed default-policy question.
+
+[Proposed item 29](../proposed/core-musicxml-chord-fidelity.md) owns the new
+tie, ornament, tremolo, pickup and cross-voice failures. It does not repeat
+completed items 22/23 or the accidental proposal. This is render evidence;
+item 19 has no new direct editor, history or save-route pass. Item 18 remains
+open for the other originals and unresolved source policies.
 
 ### 2026-09-24 — item 18: 14a staff-line rendering slice
 

@@ -1,0 +1,49 @@
+{
+  "id": "21d-Chords-SchubertStabatMater",
+  "sourceSha256": "07325229b78933c7d2daef46a0de83bf69d38a6f3f33e973f0ed2ac460eb2ce9",
+  "testClass": "feature",
+  "description": "There are chords in the second measure, after several ornaments in the first measure and a ‘p’ at the beginning of the second measure.",
+  "views": [
+    {
+      "scrollTarget": "viewer",
+      "visibleWidth": 750,
+      "visibleHeight": 753.125,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0,
+          1
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [],
+      "scrollWidth": 750,
+      "scrollHeight": 753,
+      "clientWidth": 750,
+      "clientHeight": 753,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "importError": null,
+  "warnings": [],
+  "importedDocumentSha256": "855dffdd6fa81fb15ce443090eff37a8e91dca0da7748c25d9da024014a616e8",
+  "displayOptions": {
+    "lyrics": "current",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

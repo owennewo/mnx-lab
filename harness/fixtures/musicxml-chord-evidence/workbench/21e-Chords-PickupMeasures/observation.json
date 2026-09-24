@@ -1,0 +1,54 @@
+{
+  "id": "21e-Chords-PickupMeasures",
+  "sourceSha256": "c529b4f7c3956604a8d38c5d34212a18dc0ebb96f5ec102de1921a2c3035377e",
+  "testClass": "feature",
+  "description": "A test for proper chord detection after a pickup measure (i.e., the first beat of measure 1 is not aligned with a multiple of the time signature).",
+  "views": [
+    {
+      "scrollTarget": "viewer",
+      "visibleWidth": 750,
+      "visibleHeight": 753.125,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0,
+          1
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [
+        "validation — underfills the 4/4 bar: notes sum to 1 of 4 beats",
+        "validation — underfills the 4/4 bar: notes sum to 1 of 4 beats",
+        "validation — underfills the 4/4 bar: notes sum to 2 of 4 beats",
+        "validation — underfills the 4/4 bar: notes sum to 2 of 4 beats"
+      ],
+      "scrollWidth": 750,
+      "scrollHeight": 753,
+      "clientWidth": 750,
+      "clientHeight": 753,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "importError": null,
+  "warnings": [],
+  "importedDocumentSha256": "2779a1eef1176dff3ed3b420684bf6267cf67b65ba89a9700bc8da974da0d935",
+  "displayOptions": {
+    "lyrics": "current",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

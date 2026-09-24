@@ -1,0 +1,50 @@
+{
+  "id": "21b-Chords-TwoNotes",
+  "sourceSha256": "754bdda665be91eb90c3af09b4999ae9572596e2d31c7516a5ba4a49175b0327",
+  "testClass": "feature",
+  "description": "Some subsequent (identical) two-note chords. In the second bar, the chords are tied (top note, bottom note, both notes). In the third bar, the unnatural directions of the ties are enforced with the ‘placement’ attribute (between chords one and two) and the ‘orientation’ attribute (between chords three and four)",
+  "views": [
+    {
+      "scrollTarget": "viewer",
+      "visibleWidth": 750,
+      "visibleHeight": 753.125,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0,
+          1,
+          2
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [],
+      "scrollWidth": 750,
+      "scrollHeight": 753,
+      "clientWidth": 750,
+      "clientHeight": 753,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "importError": null,
+  "warnings": [],
+  "importedDocumentSha256": "4b008be66b7761af49be5607f996103c90d556de459b93ce8f89f11008dc82d4",
+  "displayOptions": {
+    "lyrics": "current",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

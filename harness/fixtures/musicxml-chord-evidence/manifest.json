@@ -1,0 +1,303 @@
+{
+  "kind": "retained original-file browser captures; not feature verdicts",
+  "applicationCommit": "b970e686cd4d84f16db86d1751dd47aa4594805e",
+  "corpusRevision": "77c19f7e819154c70ca1a1992e80dcda8ff82fea",
+  "files": [
+    {
+      "path": "workbench/21a-Chord-Basic/document.mnx.json",
+      "sha256": "3efdfc76c118b0e8eba7117c108c25c78f27b4c450c470ceb7dff21cebe7edfb"
+    },
+    {
+      "path": "workbench/21a-Chord-Basic/notation-0-0.png",
+      "sha256": "010fe4bbcd5710c3714b9b79b606fac854b06da0e5a549821b12d7da34a07371"
+    },
+    {
+      "path": "workbench/21a-Chord-Basic/notation-0.svg",
+      "sha256": "148bdf7965c20570c3acbe55fdc4e6d52851c4c65a63a52f1b1dda902d75ce70"
+    },
+    {
+      "path": "workbench/21a-Chord-Basic/observation.json",
+      "sha256": "9e3f7b83188b43126a945fd8fd2291e4e7ae8ad356289cc82b4661a478a9afc2"
+    },
+    {
+      "path": "workbench/21b-Chords-TwoNotes/document.mnx.json",
+      "sha256": "61ba23b557bce416d2f50633d13c3db95d4fecbf51e636d1bf1bfd0558edd356"
+    },
+    {
+      "path": "workbench/21b-Chords-TwoNotes/notation-0-0.png",
+      "sha256": "5fa9a2d2ce8dcf38585caf9d67792153824b6c8dd1a9327d515f36b0d0a37f9f"
+    },
+    {
+      "path": "workbench/21b-Chords-TwoNotes/notation-0.svg",
+      "sha256": "a09b6a4e3907b2594cdd3f40356bdfa158c66828f74e37188ffb13327a1cc3d5"
+    },
+    {
+      "path": "workbench/21b-Chords-TwoNotes/observation.json",
+      "sha256": "94d82636f73bcc8d53997a1efd84373e41053a0ca406c58184036ee2810d880b"
+    },
+    {
+      "path": "workbench/21c-Chords-ThreeNotesDuration/document.mnx.json",
+      "sha256": "85c39db84f0c7ae74969d7023c81e4f3522f72c6e4989abc185939a094432be1"
+    },
+    {
+      "path": "workbench/21c-Chords-ThreeNotesDuration/notation-0-0.png",
+      "sha256": "5f54a79291f805704aee4165b91883bfefe7ddd3ccd620a4c4dce097225cb17b"
+    },
+    {
+      "path": "workbench/21c-Chords-ThreeNotesDuration/notation-0.svg",
+      "sha256": "77014f314cc3bd03528471b4bfda3115b57860c8e7981dfa6825f0f279abc309"
+    },
+    {
+      "path": "workbench/21c-Chords-ThreeNotesDuration/observation.json",
+      "sha256": "48f6cd43440e1d9b3733f557b3d18bee1c875313da23c235e34f8fbeb46bdf6a"
+    },
+    {
+      "path": "workbench/21d-Chords-SchubertStabatMater/document.mnx.json",
+      "sha256": "fc8cfc2269f0b1449f72c9743d34b6788cab050c7d42031d49530a8cf1a6da0b"
+    },
+    {
+      "path": "workbench/21d-Chords-SchubertStabatMater/notation-0-0.png",
+      "sha256": "839046755906641ff2d76a6f53bec9235b94c5872b5f7832b720f5296e0c0956"
+    },
+    {
+      "path": "workbench/21d-Chords-SchubertStabatMater/notation-0.svg",
+      "sha256": "93f142a8fc503fe7d6558afdb0c9345d4843bd8b503707bd922b91225dc58f0b"
+    },
+    {
+      "path": "workbench/21d-Chords-SchubertStabatMater/observation.json",
+      "sha256": "a625236755b25b2b8f4e53b19af28825f6b9912ff15e5dbacd483c0d5878d58f"
+    },
+    {
+      "path": "workbench/21e-Chords-PickupMeasures/document.mnx.json",
+      "sha256": "aeca802479506c7f86e56615f4cd38770e124e57d2d4375e8e8fc107dc8845d8"
+    },
+    {
+      "path": "workbench/21e-Chords-PickupMeasures/notation-0-0.png",
+      "sha256": "723e29d83055e943f659f8788d39cb0b0dd4cda19b2925710acbf05b5594a6f6"
+    },
+    {
+      "path": "workbench/21e-Chords-PickupMeasures/notation-0.svg",
+      "sha256": "8af61ea0348911e220806394863c7c241d44472a62220cb16f3919fd4ecae578"
+    },
+    {
+      "path": "workbench/21e-Chords-PickupMeasures/observation.json",
+      "sha256": "08763c90c936b86365a7ab4e48f456c83266b99e83c4e401f27238036c44846f"
+    },
+    {
+      "path": "workbench/21f-Chord-ElementInBetween/document.mnx.json",
+      "sha256": "c2f191a33185451138598ccb7ba08000ff0dd89aa549988f5be1d8976ce982ce"
+    },
+    {
+      "path": "workbench/21f-Chord-ElementInBetween/notation-0-0.png",
+      "sha256": "70c7ff5a7bd2c122816a71e55cfc4b677b1634880cd1efc4e2924679b0bd242a"
+    },
+    {
+      "path": "workbench/21f-Chord-ElementInBetween/notation-0.svg",
+      "sha256": "4a96c8ad38e56abdbdc62f2b63787d270c2091ea09250c50d1563054054e53e6"
+    },
+    {
+      "path": "workbench/21f-Chord-ElementInBetween/observation.json",
+      "sha256": "0e3b1754e0dbc8ccb428f9bd3d22dc1c8d15d079c1d82f7c75da428d16374610"
+    },
+    {
+      "path": "workbench/21g-Chords-Tremolos/document.mnx.json",
+      "sha256": "a3401aa5903a88faf28d58564d837ce744a8aef56f538693ad8bc49890b8b814"
+    },
+    {
+      "path": "workbench/21g-Chords-Tremolos/notation-0-0.png",
+      "sha256": "7dde0d4b497f990beda856077434b33c90b8d62c5927909da00cf917e4ad346f"
+    },
+    {
+      "path": "workbench/21g-Chords-Tremolos/notation-0.svg",
+      "sha256": "8fe437d841b500f9f3369fd67cdc1fe0338c98a3562ad28ab354ae44da2c3b8f"
+    },
+    {
+      "path": "workbench/21g-Chords-Tremolos/observation.json",
+      "sha256": "44b43376ebe0607a1b31f5c3a574a56da1cb7d1a2dcaa3171df5901e4e62dc39"
+    },
+    {
+      "path": "workbench/21h-Chord-Accidentals/document.mnx.json",
+      "sha256": "1a97036e702597e0e8c938ec63fadf75ac4c48e4e0f6d6cd2afa5f17c568a744"
+    },
+    {
+      "path": "workbench/21h-Chord-Accidentals/notation-0-0.png",
+      "sha256": "95f614bb6649b87e3853abfe9798d7a0b0e0facc4effe1c307da67b2ab12bada"
+    },
+    {
+      "path": "workbench/21h-Chord-Accidentals/notation-0.svg",
+      "sha256": "aad8d2645efe0926fb36f5aabba1923f4af53c9230063d80c6319703000be29b"
+    },
+    {
+      "path": "workbench/21h-Chord-Accidentals/observation.json",
+      "sha256": "20b54bd6782fc8344586bd34a514e86a9c88d7a60b1a5b51a13d25d3f0a1c776"
+    },
+    {
+      "path": "workbench/21i-Chord-DifferentVoices/document.mnx.json",
+      "sha256": "2ab96ff4eca14f44d0e1ebfe8d1271efef459060976a35626b0b03d150dd7fd3"
+    },
+    {
+      "path": "workbench/21i-Chord-DifferentVoices/notation-0-0.png",
+      "sha256": "04b33635fb38bf3d1ca083ab3cfe176441deabe1dc82781beee38d6febdd9881"
+    },
+    {
+      "path": "workbench/21i-Chord-DifferentVoices/notation-0.svg",
+      "sha256": "92b521d5ffd7372d736fe2ead7644de0b286922ef79cd2accd8505b7597cc6b5"
+    },
+    {
+      "path": "workbench/21i-Chord-DifferentVoices/observation.json",
+      "sha256": "9a88c5c0abcf78868320a8ee4ccb45b9e3791859b438b70b4be6e240b32a67db"
+    },
+    {
+      "path": "workbench/index.json",
+      "sha256": "9c45de8eed1267895d4c04b711c2ac9c8c47bbcd6888b7b3b05c13adbe188b41"
+    },
+    {
+      "path": "studio/21a-Chord-Basic/document.mnx.json",
+      "sha256": "3efdfc76c118b0e8eba7117c108c25c78f27b4c450c470ceb7dff21cebe7edfb"
+    },
+    {
+      "path": "studio/21a-Chord-Basic/notation-0-0.png",
+      "sha256": "67d2945c6926d60a496e7618ff1e3c502234e7e74094b2431fb8b4cbe29fbace"
+    },
+    {
+      "path": "studio/21a-Chord-Basic/notation-0.svg",
+      "sha256": "148bdf7965c20570c3acbe55fdc4e6d52851c4c65a63a52f1b1dda902d75ce70"
+    },
+    {
+      "path": "studio/21a-Chord-Basic/observation.json",
+      "sha256": "2488781eb5989fcf55a2fcfe48d65d09cd7f369a14dee41c620f6a34322f53d4"
+    },
+    {
+      "path": "studio/21b-Chords-TwoNotes/document.mnx.json",
+      "sha256": "61ba23b557bce416d2f50633d13c3db95d4fecbf51e636d1bf1bfd0558edd356"
+    },
+    {
+      "path": "studio/21b-Chords-TwoNotes/notation-0-0.png",
+      "sha256": "38004b23e8b543eec7abc00db906b2d37595ee7c32633ecf7f63853374e33f7e"
+    },
+    {
+      "path": "studio/21b-Chords-TwoNotes/notation-0.svg",
+      "sha256": "c2529d47e7bd24f05b26cbd85073bd90d6ef5a2b3096a79794f595ceb94f3bfc"
+    },
+    {
+      "path": "studio/21b-Chords-TwoNotes/observation.json",
+      "sha256": "ee5aa0952495965b903f4ce859feacd78a33b78d78c02c089d43f052b2f71e87"
+    },
+    {
+      "path": "studio/21c-Chords-ThreeNotesDuration/document.mnx.json",
+      "sha256": "85c39db84f0c7ae74969d7023c81e4f3522f72c6e4989abc185939a094432be1"
+    },
+    {
+      "path": "studio/21c-Chords-ThreeNotesDuration/notation-0-0.png",
+      "sha256": "9d0d5b38cd8db35ab673ba1b8ed579cdc1a95e78636d8020ea97e5ac2322d7c8"
+    },
+    {
+      "path": "studio/21c-Chords-ThreeNotesDuration/notation-0.svg",
+      "sha256": "2a4eedc4d0849401c4282837d79e65e5b044dff5d11cf9ee55727c563b09b5e7"
+    },
+    {
+      "path": "studio/21c-Chords-ThreeNotesDuration/observation.json",
+      "sha256": "8c757998ec40763ab3ded956f7887f8708f1534a3e0d708f7a22a3d4b9f6bb2f"
+    },
+    {
+      "path": "studio/21d-Chords-SchubertStabatMater/document.mnx.json",
+      "sha256": "fc8cfc2269f0b1449f72c9743d34b6788cab050c7d42031d49530a8cf1a6da0b"
+    },
+    {
+      "path": "studio/21d-Chords-SchubertStabatMater/notation-0-0.png",
+      "sha256": "f466b53097b718cd239be90f6c5019e1896e3a552aabba732a265d509997933d"
+    },
+    {
+      "path": "studio/21d-Chords-SchubertStabatMater/notation-0.svg",
+      "sha256": "8a2507df7a40f7b12df205c068c961d6aecd13da787dd5cfe66976c428ee0919"
+    },
+    {
+      "path": "studio/21d-Chords-SchubertStabatMater/observation.json",
+      "sha256": "7b1de8cfe59557ad1ad67965f7905d95a51f22755dfab31c139da33e5fd6c36b"
+    },
+    {
+      "path": "studio/21e-Chords-PickupMeasures/document.mnx.json",
+      "sha256": "aeca802479506c7f86e56615f4cd38770e124e57d2d4375e8e8fc107dc8845d8"
+    },
+    {
+      "path": "studio/21e-Chords-PickupMeasures/notation-0-0.png",
+      "sha256": "f97583849a113df2279e22bbd3f0a7b19da91404a6d8ed9643666d8d906119b6"
+    },
+    {
+      "path": "studio/21e-Chords-PickupMeasures/notation-0.svg",
+      "sha256": "8af61ea0348911e220806394863c7c241d44472a62220cb16f3919fd4ecae578"
+    },
+    {
+      "path": "studio/21e-Chords-PickupMeasures/observation.json",
+      "sha256": "4c97134c29a7b20e35f946b5fa03e165d4b946eece59744e786a525b818bead9"
+    },
+    {
+      "path": "studio/21f-Chord-ElementInBetween/document.mnx.json",
+      "sha256": "c2f191a33185451138598ccb7ba08000ff0dd89aa549988f5be1d8976ce982ce"
+    },
+    {
+      "path": "studio/21f-Chord-ElementInBetween/notation-0-0.png",
+      "sha256": "6c54d0614d5082ef00e75fc5be5d128d717287b915b54701948cc38ab7117d24"
+    },
+    {
+      "path": "studio/21f-Chord-ElementInBetween/notation-0.svg",
+      "sha256": "4a96c8ad38e56abdbdc62f2b63787d270c2091ea09250c50d1563054054e53e6"
+    },
+    {
+      "path": "studio/21f-Chord-ElementInBetween/observation.json",
+      "sha256": "f08b9fd02877ddc134538d3f1ee17d71400bb642addd51acdca2b6ad23fccc05"
+    },
+    {
+      "path": "studio/21g-Chords-Tremolos/document.mnx.json",
+      "sha256": "a3401aa5903a88faf28d58564d837ce744a8aef56f538693ad8bc49890b8b814"
+    },
+    {
+      "path": "studio/21g-Chords-Tremolos/notation-0-0.png",
+      "sha256": "6e5738b8d4d7f260325805902d07844ed3daf61004ee50cc5e009f992464c427"
+    },
+    {
+      "path": "studio/21g-Chords-Tremolos/notation-0.svg",
+      "sha256": "0880e89f8665471e97e18fc2a2312c55fccd224748248830935ca9f1396a33c2"
+    },
+    {
+      "path": "studio/21g-Chords-Tremolos/observation.json",
+      "sha256": "0ed7a6b45c03d4790d96f1601a36fac6596a8a89135600c6db9fe308521ab81c"
+    },
+    {
+      "path": "studio/21h-Chord-Accidentals/document.mnx.json",
+      "sha256": "1a97036e702597e0e8c938ec63fadf75ac4c48e4e0f6d6cd2afa5f17c568a744"
+    },
+    {
+      "path": "studio/21h-Chord-Accidentals/notation-0-0.png",
+      "sha256": "877987ff9f63c830917698c6845a80370a1ec887622bd7193b56484f10541862"
+    },
+    {
+      "path": "studio/21h-Chord-Accidentals/notation-0.svg",
+      "sha256": "aad8d2645efe0926fb36f5aabba1923f4af53c9230063d80c6319703000be29b"
+    },
+    {
+      "path": "studio/21h-Chord-Accidentals/observation.json",
+      "sha256": "a3db9a410291076f3f5664bb23c0500b3f84077a1825d11ca2645b5b8a8770b9"
+    },
+    {
+      "path": "studio/21i-Chord-DifferentVoices/document.mnx.json",
+      "sha256": "2ab96ff4eca14f44d0e1ebfe8d1271efef459060976a35626b0b03d150dd7fd3"
+    },
+    {
+      "path": "studio/21i-Chord-DifferentVoices/notation-0-0.png",
+      "sha256": "de9ec0d64aeb94b9132577db4e5d86224338be789e5572db139bc817be923228"
+    },
+    {
+      "path": "studio/21i-Chord-DifferentVoices/notation-0.svg",
+      "sha256": "92b521d5ffd7372d736fe2ead7644de0b286922ef79cd2accd8505b7597cc6b5"
+    },
+    {
+      "path": "studio/21i-Chord-DifferentVoices/observation.json",
+      "sha256": "10ab41419d9453dc0172ee98b360cb9c6a9b9ceaaefabdee846192ade385d64c"
+    },
+    {
+      "path": "studio/index.json",
+      "sha256": "9034fd286c27c5d3cbb4aaf42a072ef9a88de23621a4a1e28c609e2ec426d1ba"
+    }
+  ]
+}

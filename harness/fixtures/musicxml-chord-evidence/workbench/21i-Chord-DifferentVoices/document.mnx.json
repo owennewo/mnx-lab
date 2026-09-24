@@ -1,0 +1,101 @@
+{
+  "mnx": {
+    "version": 1
+  },
+  "global": {
+    "measures": [
+      {
+        "time": {
+          "count": 4,
+          "unit": 4
+        }
+      }
+    ]
+  },
+  "parts": [
+    {
+      "id": "P0",
+      "name": "MusicXML Part",
+      "measures": [
+        {
+          "clefs": [
+            {
+              "clef": {
+                "sign": "G",
+                "staffPosition": -2
+              }
+            }
+          ],
+          "sequences": [
+            {
+              "voice": "vX",
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "E",
+                        "octave": 5
+                      },
+                      "id": "n-1-1-vX-0-0"
+                    },
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-1-vX-0-1"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "voice": "vY",
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "rest": {}
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "A",
+                        "octave": 4
+                      },
+                      "id": "n-1-1-vY-1-0"
+                    },
+                    {
+                      "pitch": {
+                        "step": "F",
+                        "octave": 4
+                      },
+                      "id": "n-1-1-vY-1-1"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "_x": {
+    "mnxLab": {
+      "encoding": {
+        "software": "musicxml-mnx",
+        "version": "0.1.0"
+      }
+    }
+  }
+}
