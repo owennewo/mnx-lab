@@ -38,6 +38,9 @@ try {
   const heading = `${frame}?.querySelector('.strip.top .head h1')?.textContent`;
   const field = (label, value) => c.evaluate(`{ const i = [...${details}.querySelectorAll('label')].find(l => l.textContent.trim().startsWith(${JSON.stringify(label)})).querySelector('input, textarea'); i.value = ${JSON.stringify(value)}; i.dispatchEvent(new Event('change')); }`);
   const record = id => c.evaluate(`new Promise(resolve => { const open = indexedDB.open('mnx-studio.recovery', 1); open.onupgradeneeded = () => open.result.createObjectStore('recovery', { keyPath: 'pieceId' }); open.onsuccess = () => { const get = open.result.transaction('recovery').objectStore('recovery').get(${JSON.stringify(id)}); get.onsuccess = () => resolve(get.result ? JSON.stringify({ title: get.result.document._x.mnxLab.work.title, base: get.result.baseRenditionId, edits: get.result.edits, build: get.result.build }) : null); }; })`);
+  // The recovery record is deleted asynchronously (IndexedDB), after whatever settled it: wait for it
+  // to go, with room for a loaded machine — a record that is never deleted still fails, just later.
+  const recordGone = async id => { for (let i = 0; i < 300 && (await record(id)) !== null; i++) await new Promise(r => setTimeout(r, 50)); return record(id); };
   const snapshot = async id => (await (await api(`/pieces/${id}`)).json()).snapshot;
 
   await c.send('Network.setCookie',{name:'CF_Authorization',value:session.browser,url:origin,httpOnly:true,sameSite:'Lax'});
@@ -83,7 +86,7 @@ try {
   assert.deepEqual([JSON.parse(edit.provenance).kind, JSON.parse(edit.provenance).name, JSON.parse(edit.provenance).check.verdict], ['checkpoint', null, 'clean']);
   assert.deepEqual(JSON.parse(edit.producer_options), { collapseTabUnisons: false, compress: true });
   assert.ok(second.tags.some(t => t.dimension === 'title' && t.value === `${title} (edited)`));
-  assert.equal(await record(pieceId), null);
+  assert.equal(await recordGone(pieceId), null);
 
   // Undo back to the saved document is clean again — nothing to save, nothing kept.
   await c.evaluate(`${editPiece}.click()`);
@@ -92,9 +95,8 @@ try {
   await wait(`${chip}.textContent.trim().startsWith('1 edit unsaved')`);
   await c.evaluate(`[...${details}.querySelectorAll('button')].find(b => b.textContent === 'Undo').click()`);
   await wait(`${chip}.textContent.trim().startsWith('Saved ·') && ${chip}.dataset.save === 'clean'`);
-  // Back on the saved document the recovery record is deleted — asynchronously, in IndexedDB.
-  for (let i = 0; i < 100 && (await record(pieceId)) !== null; i++) await new Promise(r => setTimeout(r, 50));
-  assert.equal(await record(pieceId), null);
+  // Back on the saved document the recovery record is deleted.
+  assert.equal(await recordGone(pieceId), null);
   assert.equal((await snapshot(pieceId)).piece.revision, second.piece.revision);
 
   // A named version.
@@ -135,7 +137,7 @@ try {
   const copy = await snapshot(copyId);
   assert.equal(copy.piece.source_kind, 'studio');
   assert.ok(copy.tags.some(t => t.dimension === 'subtitle' && t.value === 'written on the desktop'));
-  assert.equal(await record(pieceId), null);
+  assert.equal(await recordGone(pieceId), null);
   // Navigation while the real export worker is delayed: the old save owns its
   // lock and metadata until it lands, and cannot repaint the new piece's state.
   await c.evaluate(`${editPiece}.click()`);

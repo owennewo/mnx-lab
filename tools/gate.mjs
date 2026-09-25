@@ -195,18 +195,22 @@ async function main() {
   ];
   // The gate build is the site face; embed and lib still build their own.
   const onlySite = plan.smokes.length && planSmokes(plan.smokes).builds.every(build => build.args[1] === 'build:site');
+  // `npm run build` is check:static then the bundle. The smokes need only the
+  // bundle, so the static checks take a lane of their own and the smokes start
+  // ~25 s sooner (2026-09-25: 125/129 s two lanes, 113/113 s three).
+  const statics = plan.build ? [['static checks', 'npm', ['run', 'check:static']]] : [];
   const browser = [
-    ...(plan.build ? [['build', 'npm', ['run', 'build']]] : []),
+    ...(plan.build ? [['bundle', 'npm', ['run', 'build:site']]] : []),
     ...(plan.smokes.length ? [['smokes', process.execPath, ['harness/verify/run-smokes.mjs', ...(plan.build && onlySite ? ['--built'] : []), ...plan.smokes]]] : []),
   ];
   // The lanes run side by side unless asked not to: measured on 2026-09-25, full
   // gates took 145/157 s one after the other and 131-136 s overlapped, green 4 of 4.
   if (args.includes('--sequential')) {
-    for (const [label, command, commandArgs] of [...checks, ...browser]) run(label, command, commandArgs);
+    for (const [label, command, commandArgs] of [...checks, ...statics, ...browser]) run(label, command, commandArgs);
     console.log('\n✓ gate passed');
     return;
   }
-  const failed = (await Promise.all([lane('checks', checks), lane('build and smokes', browser)])).flat();
+  const failed = (await Promise.all([lane('checks', checks), lane('static checks', statics), lane('bundle and smokes', browser)])).flat();
   if (failed.length) {
     console.error(`\n✗ gate failed at: ${failed.join(', ')}`);
     process.exit(1);
@@ -216,6 +220,7 @@ async function main() {
 
 /** A lane's commands in order, output held and printed whole; the failed labels. */
 async function lane(name, commands) {
+  if (!commands.length) return [];
   const output = [];
   const failed = [];
   const started = performance.now();
