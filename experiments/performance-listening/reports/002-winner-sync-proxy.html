@@ -1,0 +1,1241 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>002 · Winner with sync interpolation</title><style>body{margin:0;background:#f3f4ef;color:#21383c;font:16px/1.65 system-ui}main{max-width:1080px;margin:auto;padding:32px}article,details{background:white;border:1px solid #ccd8d1;border-radius:10px;padding:28px;margin:0 0 22px}h1{font-size:2.25rem;line-height:1.2}h2{margin-top:32px}a{color:#14616a}p,li{max-width:90ch}.table-wrap{overflow:auto}table{border-collapse:collapse;width:100%;font-size:.9rem}td,th{border:1px solid #ccd8d1;padding:10px;text-align:left}th{background:#edf3ee}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#f4f6f3;padding:16px;font-size:.8rem}code{overflow-wrap:anywhere;font-size:.86em}.banner{padding:18px;background:#f8edce;border-left:5px solid #ad782e}summary{cursor:pointer;font-weight:650}footer{font-size:.85rem}@media(max-width:650px){main{padding:12px}article,details{padding:18px}h1{font-size:1.8rem}}</style></head><body><main><article><div class="banner">Experiment complete · neither candidate passes · four bars retained</div><p><a href="file:///home/williao/dev/mnx-listening-data/real-evidence-01/002-winner-sync-proxy.html">Open private audio and timing trace</a> · <a href="001-initial-two-scale.html">Experiment 001</a></p><h1 id="summary-002-winner-first-four-bars-with-sync-interpolation">002 — Winner: first four bars with sync interpolation</h1>
+<p><strong>The first real-audio development loop is complete. Neither spectral follower passes.</strong> Both reject silence and the wrong-score probe much better than the clock, but they lose too much of the correct performance. Keep Winner at four bars; do not advance to positive Dust or longer excerpts yet.</p>
+<p>This is implementation research, using the user&#39;s requested <code>sync.json</code> interpolation. Manual beat annotation is not a prerequisite for this development experiment. The wider microphone-following milestone remains unfinished.</p>
+<h2 id="summary-what-we-measured">What we measured</h2>
+<p>The fixed 9.507-second Winner clip contains the four bars the user reviewed as solo guitar. Five existing bar boundaries supply a linearly interpolated position reference. The original sync, score and audio files are unchanged and hash-pinned privately. Both algorithms receive the same score, known start, and nominal 101 BPM (the anchor average 100.978568 rounded once before running), but never the sync anchors or labels. Audio arrives causally at 48 kHz in 10 ms chunks. There are 189 evaluation points per example, spaced 50 ms apart after the 150 ms initial allowance, including the clip end.</p>
+<p>The controls are the same Winner recording with Dust&#39;s score, and exact digital silence with Winner&#39;s score. Dust&#39;s recording has not been advanced to a positive test. The wrong-score probe assumes rejection is warranted after the initial allowance; its precise first distinguishing instant is unverified. Silence has no such ambiguity.</p>
+<p>Position agreement means within ±0.25 quarter notes of the interpolated reference. This measures useful approximate following, not independently verified beat accuracy. Early/late residuals may include performer timing, sync imperfections and tracker error. The earlier 31.25% calculation was a worst-case sensitivity analysis, <strong>not a measured accuracy of sync.json</strong>, and is not an eligibility gate here.</p>
+<h2 id="summary-results">Results</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Measure, Clock @1, Spectral @1, Spectral @2, Target"><table><thead><tr><th scope="col">Measure</th><th scope="col">Clock @1</th><th scope="col">Spectral @1</th><th scope="col">Spectral @2</th><th scope="col">Target</th></tr></thead><tbody><tr><td>Winner position agreement</td><td>88.36% (167/189)</td><td>46.03% (87/189)</td><td>17.99% (34/189)</td><td>≥95%</td></tr>
+<tr><td>Winner position claims</td><td>189/189</td><td>123/189</td><td>42/189</td><td>Report separately</td></tr>
+<tr><td>Winner lost / rejected points</td><td>0/189</td><td>66/189</td><td>147/189</td><td>Never counted as correct following</td></tr>
+<tr><td>Wrong-score rejection</td><td>0%</td><td>95.77% (181/189)</td><td>100% (189/189)</td><td>≥95%</td></tr>
+<tr><td>Silence rejection</td><td>0%</td><td>100%</td><td>100%</td><td>≥95%</td></tr>
+<tr><td>Winner wrong-position exposure</td><td>11.76%</td><td>19.24%</td><td>4.27%</td><td>≤5%</td></tr>
+<tr><td>Winner longest wrong episode</td><td>1.10 s</td><td>0.55 s</td><td>0.20 s</td><td>≤0.50 s</td></tr>
+<tr><td>Winner missed decision deadlines</td><td>11.64%</td><td>53.97%</td><td>82.01%</td><td>≤10%</td></tr>
+<tr><td>Decision emission coverage, every example</td><td>100%</td><td>100%</td><td>100%</td><td>≥98%</td></tr></tbody></table></div>
+<p>Decision emission coverage includes explicit rejection. It is not supported-following coverage. Version 2&#39;s lower wrong exposure mostly comes from declining to follow; that does not rescue its failed positive agreement. All failed positive decisions also miss the 200 ms correctness deadline: these versions never issue corrections. Exposure and longest episodes use the declared 50 ms evaluation grid.</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Timing against sync, on position claims only, Clock @1, Spectral @1, Spectral @2"><table><thead><tr><th scope="col">Timing against sync, on position claims only</th><th scope="col">Clock @1</th><th scope="col">Spectral @1</th><th scope="col">Spectral @2</th></tr></thead><tbody><tr><td>Signed mean: positive ahead, negative behind</td><td>+70 ms</td><td>−70 ms</td><td>−8 ms</td></tr>
+<tr><td>Median absolute residual</td><td>52 ms</td><td>71 ms</td><td>73 ms</td></tr>
+<tr><td>95th percentile absolute residual</td><td>164 ms</td><td>592 ms</td><td>232 ms</td></tr>
+<tr><td>Denominator</td><td>189 claims</td><td>123 claims</td><td>42 claims</td></tr></tbody></table></div>
+<p>A small residual among the surviving claims does not show reliable following. The private listening trace displays rejected intervals as gaps rather than zero error. These are correlated observations from one performance, not 189 independent trials; no population confidence interval or transfer claim is justified.</p>
+<h2 id="summary-hypotheses-and-decision">Hypotheses and decision</h2>
+<p>Version 1 compares short causal pitch-class spectra with score-derived templates and uses a monotone incremental alignment with a tempo prior. It was motivated by the <a href="../research/dixon-2005-online-alignment.md">bounded alignment research</a>, not a claim that a published piano result transfers to guitar. Harmonics and ringing notes were a plausible explanation for its failures.</p>
+<p>The <a href="../research/spectral-revision-2.md">pre-recorded revision</a> preserves pitch register and gives each score note a simple harmonic template. The alignment, rejection threshold and reference stay unchanged. This made rejection more conservative and positive following substantially worse. The predicted improvement was contradicted. The experiment does not isolate whether representation, template decay, alignment or confidence calibration is the main cause; it does rule out accepting either candidate as a useful following improvement on this clip.</p>
+<p>Both versions reduce source-weighted wrong exposure versus the audio-ignoring clock, but both violate positive accuracy, deadline and regression limits. The recorded verdict for each is <strong>proxy-targets-not-met</strong>. Neither is retained; the clock remains the permanent floor, not a successful listener. No reserved or acceptance sets were used. Formal retention and microphone qualification were not assessed.</p>
+<p>The predeclared sub-batch allowed two versions and four candidate/set assessments, including the clock twice. It is now closed. The second run&#39;s generic <code>next</code> field still says “at most one focused revision”; the predeclared cap and this closing record take precedence. The run record is preserved unchanged.</p>
+<h2 id="summary-cost-and-research-budget">Cost and research budget</h2>
+<p>All 72 complete-record prefix checks passed: three cut points, two altered futures, three examples, two algorithms in each of two runs. No measured replay backlog occurred. On this laptop (Intel i7-8750H, Node 22.22.1), the maximum chunk p99 was 1.39 ms for version 1 and 1.67 ms for version 2, below the 10 ms target. Maximum sustained ratios were 5.88% and 6.96% of audio time, below 25%. Maximum initialization times were 101 ms and 96 ms. Replay costs are provisional; microphone-to-feedback latency was not measured.</p>
+<p>The two runs consumed 16.261452 + 18.324054 = <strong>34.585506 CPU seconds</strong>, including prefix checks. Contract 1 now has two of six candidate versions and four of twelve candidate/set assessments used; this narrower two-version sub-batch is exhausted. Web research has used three of six source slots and both bounded questions. No budget was extended to keep trying until a pass.</p>
+<h2 id="summary-where-the-loop-is-now">Where the loop is now</h2>
+<p>Question → fixed evidence → initial candidate → diagnosis → one revision → decision → next question are complete for experiment 002. The next useful question is whether score-template similarity distinguishes correct from incorrect position when alignment is supplied for diagnosis. Use the existing sync proxy as privileged diagnostic input to separate acoustic representation/confidence from tracking errors; do not count such a result as end-to-end following. That is a proposed next bounded experiment, not an unreported third candidate trial. No further annotation is needed to begin it.</p>
+<p>Winner remains first and stays at four bars. Only a candidate that clears its targets should move to Dust; eight and twelve bars follow the agreed progression. Stronger independent evidence is still needed for eventual retention and live-microphone use.</p>
+<h2 id="summary-evidence-and-reproduction">Evidence and reproduction</h2>
+<p>Policy: <a href="../contracts/sync-proxy-development-1.md">user-directed sync development</a>. Set: <code>winner-four-bars-sync-proxy-v1</code>, SHA-256 <code>80c8a6358751f356e164f75389dd50d49a2a0da6ad094f95847bd304eb5c5b8b</code>. Evaluator: <code>sync-proxy-evaluator@1</code>.</p>
+<ul><li><a href="../runs/g002a-spectral1-winner-sync-proxy/summary.json">Run 002a: initial spectral follower</a>, source commit <code>b1a1f103</code>.</li>
+<li><a href="../runs/g002b-spectral2-winner-sync-proxy/summary.json">Run 002b: register/harmonic revision</a>, source commit <code>56434dd9</code>.</li></ul>
+<p>Each aggregate summary pins the implementation, policy, private full records and private evaluations. Full traces, the frozen manifest, audio and scores stay outside git under <code>/home/williao/dev/mnx-listening-data/real-evidence-01/</code>. The private page <code>002-winner-sync-proxy.html</code> embeds the Winner WAV and saved timing traces; it works offline without a server or access to the original media paths.</p>
+<p>To reproduce candidate decisions, use a detached checkout of the recorded source commit in an isolated worktree, and a separate private copy of the frozen set and its hash-identical assets. The runner refuses existing run IDs and enforces the batch budget; never delete history to make room. A fresh private parent directory gets a fresh reproduction history, clearly separate from development selection. Cost timings will vary. The private manifest uses absolute paths; preserve those paths or create a new relocated manifest identity and report that difference.</p>
+<pre><code>npx tsx experiments/performance-listening/bench/src/proxy/run.ts /private/reproduction/proxy-winner-v1 g002r-reproduction 1
+# On the revision&#39;s recorded source commit, use a different fresh reproduction parent:
+npx tsx experiments/performance-listening/bench/src/proxy/run.ts /private/reproduction-v2/proxy-winner-v1 g002s-reproduction 2</code></pre>
+<p>The preparer reads the original sync sidecar directly and refuses to replace an existing frozen set. All commands and report exporters preserve the recorded outcomes.</p></article><details><summary>g002a-spectral1-winner-sync-proxy — complete aggregate evidence</summary><pre>{
+  &quot;id&quot;: &quot;g002a-spectral1-winner-sync-proxy&quot;,
+  &quot;kind&quot;: &quot;approximate-sync-development&quot;,
+  &quot;policy&quot;: &quot;sync-proxy-development-1&quot;,
+  &quot;referencePrecision&quot;: &quot;unmeasured; sync interpolation accepted by the user for development&quot;,
+  &quot;set&quot;: &quot;winner-four-bars-sync-proxy-v1&quot;,
+  &quot;setSha256&quot;: &quot;80c8a6358751f356e164f75389dd50d49a2a0da6ad094f95847bd304eb5c5b8b&quot;,
+  &quot;nominalBpm&quot;: 101,
+  &quot;nominalRaw&quot;: 100.97856838238299,
+  &quot;gitCommit&quot;: &quot;b1a1f1037aa875481feb3101e9a366969bf692df&quot;,
+  &quot;sourceHashes&quot;: {
+    &quot;bench/src/candidates/clockFollower.ts&quot;: &quot;687cbaaed6323594761986370ade1e7c4262fcd02deb4930ba5a0c64c35df5b9&quot;,
+    &quot;bench/src/candidates/spectralFollower1.ts&quot;: &quot;e86ef1b9aaf6d1072a9082fe126e0199d0675991740206179db188f194a2486a&quot;,
+    &quot;bench/src/cli.ts&quot;: &quot;4a0718e6135faa531bfcf0763dbb00cb20a2d03372186d45e28ae17d6a6f0600&quot;,
+    &quot;bench/src/evaluate/index.ts&quot;: &quot;33a85837d638734c01331f1aebb930c764ff7871ab5b9bf45d09c5f6af2cac7d&quot;,
+    &quot;bench/src/evidence/inspect-anchor-precision.ts&quot;: &quot;58a7c6cd3109af1638fc2380f1972b282fee86e3d338e10cdce5201dc71413a3&quot;,
+    &quot;bench/src/evidence/preflight.ts&quot;: &quot;551e36f18054caeba0693a0d967ae30bd269c53f0f7f3de503912d1530e94b87&quot;,
+    &quot;bench/src/evidence/prepare-review.ts&quot;: &quot;868a1f6534ae9b603da941e1b83adee334cecccbb701431ed5ce3b36df1af02e&quot;,
+    &quot;bench/src/generate/set.ts&quot;: &quot;69795c1ad4e60cd31e88f152fc85b3e0bc5938b4f9bd81de972ff944c9489c2e&quot;,
+    &quot;bench/src/generate/sine.ts&quot;: &quot;c7aab46132f2461172d531751b251341ad76d832f03dffda206d5161f7a93f96&quot;,
+    &quot;bench/src/generate/wav.ts&quot;: &quot;a38ae9c13209414f103a2ec75007f2d904919bb2e0a8eaf24d26d9614d94a371&quot;,
+    &quot;bench/src/io.ts&quot;: &quot;62c62365425f2ca12ebca5290ad5164b851125a55bc45a2d1224a346af5c6a7e&quot;,
+    &quot;bench/src/proxy/prepare.ts&quot;: &quot;dc249e05527d02ffd718eb6a72d5199934828bd8b0346def8edc644fdba590f2&quot;,
+    &quot;bench/src/proxy/reference.ts&quot;: &quot;450adc25b1dd24169b20ea3c1dde3c1a9b8479bae309230b94f635512c04c456&quot;,
+    &quot;bench/src/proxy/run.ts&quot;: &quot;da3171b3fe6747f752a33b050192896ac99da2e09b05a0f8b6c391d9bd759109&quot;,
+    &quot;bench/src/report/index.ts&quot;: &quot;f008c0a07feb6b8286d19e1b2da2de022afe300800b78a3c22e198164369285b&quot;,
+    &quot;bench/src/report/oracle.ts&quot;: &quot;d5483693aec119928140b9eb53d71bc988df0843e3440d493b632c9acee10f21&quot;,
+    &quot;bench/src/run/runner.ts&quot;: &quot;c5bd7d90ccaacf1b1382f6663b5ac6f8c1dea930754eecbbf684f27635cb7cf6&quot;,
+    &quot;bench/src/run/set.ts&quot;: &quot;fde9901932e537981425f45f05442c15ee0a7ad70d3a9d70751fb4aff4c8aef4&quot;,
+    &quot;bench/src/types.ts&quot;: &quot;bcb4d528af893a4bcd872360915ff635e9cfc4d26328c4315433293a39fa9744&quot;,
+    &quot;bench/src/v2/anchor-limits.ts&quot;: &quot;b955c00409a5fa03625160eb49aa12813ddf82d4ddbaaa9a649458906730e5d0&quot;,
+    &quot;bench/src/v2/checkpoint.ts&quot;: &quot;c2ecec5401418846faa4d908a2e528219290abd2c6e782141070cb3530e93490&quot;,
+    &quot;bench/src/v2/driver.ts&quot;: &quot;ebfcc84a1b660665ea6f9de9cabb6b997de4292047a8a565806e747b12f7600c&quot;,
+    &quot;bench/src/v2/evaluate.ts&quot;: &quot;88ec56c29bd22194f7f2d530f49663d648b11416794564cc32c0db7fba4d2a42&quot;,
+    &quot;bench/src/v2/partitions.ts&quot;: &quot;3d266e42aa1cdcbf40adc3bbc7d69321fe83f59b993b01ee68496783b71f56d5&quot;,
+    &quot;bench/src/v2/retain.ts&quot;: &quot;0a272adbe0fc0c7721058352f191032651fa2cf511603571668c29e95f558814&quot;,
+    &quot;bench/src/v2/run-pair.ts&quot;: &quot;3b9a02a6e5783f7472330ab9fdd19ef378383b8f287c52a095e86eafb913ff70&quot;,
+    &quot;bench/src/v2/types.ts&quot;: &quot;5b3d48d6ab30f0e1c8bf686f62595d1ecc0c13716d14489555bd383f21f63f32&quot;,
+    &quot;bench/src/v2/validate.ts&quot;: &quot;4eb351d4f38a14462d2b0b6b54a21f5ed8b83dd8226b511d048a07cea23849d0&quot;,
+    &quot;bench/src/validate.ts&quot;: &quot;c22008ca22f8d196d2425858e85a9e7af885acc7a0dd0b5c41495f32b871e628&quot;,
+    &quot;contracts/sync-proxy-development-1.md&quot;: &quot;ed39195f9d22f6d698052cec7230a763bef12c56c3077c92445616103c08ae02&quot;
+  },
+  &quot;machine&quot;: {
+    &quot;hostname&quot;: &quot;williao-G3-3579&quot;,
+    &quot;cpu&quot;: &quot;Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz&quot;,
+    &quot;cores&quot;: 12,
+    &quot;platform&quot;: &quot;linux&quot;,
+    &quot;arch&quot;: &quot;x64&quot;,
+    &quot;node&quot;: &quot;v22.22.1&quot;
+  },
+  &quot;comparator&quot;: {
+    &quot;id&quot;: &quot;clock-follower@1&quot;,
+    &quot;examples&quot;: [
+      {
+        &quot;example&quot;: &quot;winner-positive&quot;,
+        &quot;referenceKind&quot;: &quot;linear-sync-proxy&quot;,
+        &quot;referenceUncertainty&quot;: &quot;unmeasured&quot;,
+        &quot;metrics&quot;: {
+          &quot;points&quot;: 189,
+          &quot;agreement&quot;: 0.883597884,
+          &quot;coverage&quot;: 1,
+          &quot;deadlineMisses&quot;: 0.116402116,
+          &quot;wrongReferenceExposure&quot;: 0.11755957,
+          &quot;longestWrongReferenceSeconds&quot;: 1.1,
+          &quot;residualSeconds&quot;: {
+            &quot;signedMean&quot;: 0.070161185,
+            &quot;absoluteMedian&quot;: 0.051605005,
+            &quot;absoluteP95&quot;: 0.164493974,
+            &quot;absoluteMax&quot;: 0.185647528,
+            &quot;denominator&quot;: 189
+          }
+        },
+        &quot;cost&quot;: {
+          &quot;machine&quot;: {
+            &quot;hostname&quot;: &quot;williao-G3-3579&quot;,
+            &quot;cpu&quot;: &quot;Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz&quot;,
+            &quot;cores&quot;: 12,
+            &quot;platform&quot;: &quot;linux&quot;,
+            &quot;arch&quot;: &quot;x64&quot;,
+            &quot;node&quot;: &quot;v22.22.1&quot;
+          },
+          &quot;sampleRate&quot;: 48000,
+          &quot;chunkSamples&quot;: 480,
+          &quot;chunks&quot;: 951,
+          &quot;audioSeconds&quot;: 9.506958333333333,
+          &quot;initializationMs&quot;: 3.919015,
+          &quot;finishMs&quot;: 0.094682,
+          &quot;meanMs&quot;: 0.004658444,
+          &quot;p95Ms&quot;: 0.008793,
+          &quot;p99Ms&quot;: 0.012612,
+          &quot;sustainedRatio&quot;: 0.000888179,
+          &quot;maxBacklogMs&quot;: 0,
+          &quot;provisional&quot;: true
+        },
+        &quot;causality&quot;: [
+          {
+            &quot;fraction&quot;: 0.25,
+            &quot;kind&quot;: &quot;silence&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.25,
+            &quot;kind&quot;: &quot;alternating&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.5,
+            &quot;kind&quot;: &quot;silence&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.5,
+            &quot;kind&quot;: &quot;alternating&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.75,
+            &quot;kind&quot;: &quot;silence&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.75,
+            &quot;kind&quot;: &quot;alternating&quot;,
+            &quot;pass&quot;: true
+          }
+        ],
+        &quot;targets&quot;: {
+          &quot;agreement&quot;: false,
+          &quot;coverage&quot;: true,
+          &quot;exposure&quot;: false,
+          &quot;longestExposure&quot;: false,
+          &quot;deadline&quot;: false,
+          &quot;causality&quot;: true,
+          &quot;sustained&quot;: true,
+          &quot;chunkP99&quot;: true
+        }
+      },
+      {
+        &quot;example&quot;: &quot;winner-audio-dust-score&quot;,
+        &quot;referenceKind&quot;: &quot;cross-piece-negative-proxy&quot;,
+        &quot;referenceUncertainty&quot;: &quot;unmeasured&quot;,
+        &quot;metrics&quot;: {
+          &quot;points&quot;: 189,
+          &quot;agreement&quot;: 0,
+          &quot;coverage&quot;: 1,
+          &quot;deadlineMisses&quot;: 1,
+          &quot;wrongReferenceExposure&quot;: 1,
+          &quot;longestWrongReferenceSeconds&quot;: 9.356958333,
+          &quot;residualSeconds&quot;: {
+            &quot;signedMean&quot;: null,
+            &quot;absoluteMedian&quot;: null,
+            &quot;absoluteP95&quot;: null,
+            &quot;absoluteMax&quot;: null,
+            &quot;denominator&quot;: 0
+          }
+        },
+        &quot;cost&quot;: {
+          &quot;machine&quot;: {
+            &quot;hostname&quot;: &quot;williao-G3-3579&quot;,
+            &quot;cpu&quot;: &quot;Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz&quot;,
+            &quot;cores&quot;: 12,
+            &quot;platform&quot;: &quot;linux&quot;,
+            &quot;arch&quot;: &quot;x64&quot;,
+            &quot;node&quot;: &quot;v22.22.1&quot;
+          },
+          &quot;sampleRate&quot;: 48000,
+          &quot;chunkSamples&quot;: 480,
+          &quot;chunks&quot;: 951,
+          &quot;audioSeconds&quot;: 9.506958333333333,
+          &quot;initializationMs&quot;: 5.55731,
+          &quot;finishMs&quot;: 0.00123,
+          &quot;meanMs&quot;: 0.001595677,
+          &quot;p95Ms&quot;: 0.001779,
+          &quot;p99Ms&quot;: 0.003273,
+          &quot;sustainedRatio&quot;: 0.0007443,
+          &quot;maxBacklogMs&quot;: 0,
+          &quot;provisional&quot;: true
+        },
+        &quot;causality&quot;: [
+          {
+            &quot;fraction&quot;: 0.25,
+            &quot;kind&quot;: &quot;silence&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.25,
+            &quot;kind&quot;: &quot;alternating&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.5,
+            &quot;kind&quot;: &quot;silence&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.5,
+            &quot;kind&quot;: &quot;alternating&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.75,
+            &quot;kind&quot;: &quot;silence&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.75,
+            &quot;kind&quot;: &quot;alternating&quot;,
+            &quot;pass&quot;: true
+          }
+        ],
+        &quot;targets&quot;: {
+          &quot;agreement&quot;: false,
+          &quot;coverage&quot;: true,
+          &quot;exposure&quot;: false,
+          &quot;longestExposure&quot;: false,
+          &quot;deadline&quot;: false,
+          &quot;causality&quot;: true,
+          &quot;sustained&quot;: true,
+          &quot;chunkP99&quot;: true
+        }
+      },
+      {
+        &quot;example&quot;: &quot;digital-silence&quot;,
+        &quot;referenceKind&quot;: &quot;digital-silence&quot;,
+        &quot;referenceUncertainty&quot;: &quot;exact-silence&quot;,
+        &quot;metrics&quot;: {
+          &quot;points&quot;: 189,
+          &quot;agreement&quot;: 0,
+          &quot;coverage&quot;: 1,
+          &quot;deadlineMisses&quot;: 1,
+          &quot;wrongReferenceExposure&quot;: 1,
+          &quot;longestWrongReferenceSeconds&quot;: 9.356958333,
+          &quot;residualSeconds&quot;: {
+            &quot;signedMean&quot;: null,
+            &quot;absoluteMedian&quot;: null,
+            &quot;absoluteP95&quot;: null,
+            &quot;absoluteMax&quot;: null,
+            &quot;denominator&quot;: 0
+          }
+        },
+        &quot;cost&quot;: {
+          &quot;machine&quot;: {
+            &quot;hostname&quot;: &quot;williao-G3-3579&quot;,
+            &quot;cpu&quot;: &quot;Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz&quot;,
+            &quot;cores&quot;: 12,
+            &quot;platform&quot;: &quot;linux&quot;,
+            &quot;arch&quot;: &quot;x64&quot;,
+            &quot;node&quot;: &quot;v22.22.1&quot;
+          },
+          &quot;sampleRate&quot;: 48000,
+          &quot;chunkSamples&quot;: 480,
+          &quot;chunks&quot;: 951,
+          &quot;audioSeconds&quot;: 9.506958333333333,
+          &quot;initializationMs&quot;: 3.511041,
+          &quot;finishMs&quot;: 0.000072,
+          &quot;meanMs&quot;: 0.001392509,
+          &quot;p95Ms&quot;: 0.001511,
+          &quot;p99Ms&quot;: 0.002324,
+          &quot;sustainedRatio&quot;: 0.000508616,
+          &quot;maxBacklogMs&quot;: 0,
+          &quot;provisional&quot;: true
+        },
+        &quot;causality&quot;: [
+          {
+            &quot;fraction&quot;: 0.25,
+            &quot;kind&quot;: &quot;silence&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.25,
+            &quot;kind&quot;: &quot;alternating&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.5,
+            &quot;kind&quot;: &quot;silence&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.5,
+            &quot;kind&quot;: &quot;alternating&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.75,
+            &quot;kind&quot;: &quot;silence&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.75,
+            &quot;kind&quot;: &quot;alternating&quot;,
+            &quot;pass&quot;: true
+          }
+        ],
+        &quot;targets&quot;: {
+          &quot;agreement&quot;: false,
+          &quot;coverage&quot;: true,
+          &quot;exposure&quot;: false,
+          &quot;longestExposure&quot;: false,
+          &quot;deadline&quot;: false,
+          &quot;causality&quot;: true,
+          &quot;sustained&quot;: true,
+          &quot;chunkP99&quot;: true
+        }
+      }
+    ]
+  },
+  &quot;candidate&quot;: {
+    &quot;id&quot;: &quot;spectral-follower@1&quot;,
+    &quot;examples&quot;: [
+      {
+        &quot;example&quot;: &quot;winner-positive&quot;,
+        &quot;referenceKind&quot;: &quot;linear-sync-proxy&quot;,
+        &quot;referenceUncertainty&quot;: &quot;unmeasured&quot;,
+        &quot;metrics&quot;: {
+          &quot;points&quot;: 189,
+          &quot;agreement&quot;: 0.46031746,
+          &quot;coverage&quot;: 1,
+          &quot;deadlineMisses&quot;: 0.53968254,
+          &quot;wrongReferenceExposure&quot;: 0.192370206,
+          &quot;longestWrongReferenceSeconds&quot;: 0.55,
+          &quot;residualSeconds&quot;: {
+            &quot;signedMean&quot;: -0.07018459,
+            &quot;absoluteMedian&quot;: 0.070667248,
+            &quot;absoluteP95&quot;: 0.591795383,
+            &quot;absoluteMax&quot;: 0.891795383,
+            &quot;denominator&quot;: 123
+          }
+        },
+        &quot;cost&quot;: {
+          &quot;machine&quot;: {
+            &quot;hostname&quot;: &quot;williao-G3-3579&quot;,
+            &quot;cpu&quot;: &quot;Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz&quot;,
+            &quot;cores&quot;: 12,
+            &quot;platform&quot;: &quot;linux&quot;,
+            &quot;arch&quot;: &quot;x64&quot;,
+            &quot;node&quot;: &quot;v22.22.1&quot;
+          },
+          &quot;sampleRate&quot;: 48000,
+          &quot;chunkSamples&quot;: 480,
+          &quot;chunks&quot;: 951,
+          &quot;audioSeconds&quot;: 9.506958333333333,
+          &quot;initializationMs&quot;: 49.537954,
+          &quot;finishMs&quot;: 0.069735,
+          &quot;meanMs&quot;: 0.487754238,
+          &quot;p95Ms&quot;: 1.077146,
+          &quot;p99Ms&quot;: 1.385009,
+          &quot;sustainedRatio&quot;: 0.054009069,
+          &quot;maxBacklogMs&quot;: 0,
+          &quot;provisional&quot;: true
+        },
+        &quot;causality&quot;: [
+          {
+            &quot;fraction&quot;: 0.25,
+            &quot;kind&quot;: &quot;silence&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.25,
+            &quot;kind&quot;: &quot;alternating&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.5,
+            &quot;kind&quot;: &quot;silence&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.5,
+            &quot;kind&quot;: &quot;alternating&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.75,
+            &quot;kind&quot;: &quot;silence&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.75,
+            &quot;kind&quot;: &quot;alternating&quot;,
+            &quot;pass&quot;: true
+          }
+        ],
+        &quot;targets&quot;: {
+          &quot;agreement&quot;: false,
+          &quot;coverage&quot;: true,
+          &quot;exposure&quot;: false,
+          &quot;longestExposure&quot;: false,
+          &quot;deadline&quot;: false,
+          &quot;causality&quot;: true,
+          &quot;sustained&quot;: true,
+          &quot;chunkP99&quot;: true
+        }
+      },
+      {
+        &quot;example&quot;: &quot;winner-audio-dust-score&quot;,
+        &quot;referenceKind&quot;: &quot;cross-piece-negative-proxy&quot;,
+        &quot;referenceUncertainty&quot;: &quot;unmeasured&quot;,
+        &quot;metrics&quot;: {
+          &quot;points&quot;: 189,
+          &quot;agreement&quot;: 0.957671958,
+          &quot;coverage&quot;: 1,
+          &quot;deadlineMisses&quot;: 0.042328042,
+          &quot;wrongReferenceExposure&quot;: 0.042748935,
+          &quot;longestWrongReferenceSeconds&quot;: 0.2,
+          &quot;residualSeconds&quot;: {
+            &quot;signedMean&quot;: null,
+            &quot;absoluteMedian&quot;: null,
+            &quot;absoluteP95&quot;: null,
+            &quot;absoluteMax&quot;: null,
+            &quot;denominator&quot;: 0
+          }
+        },
+        &quot;cost&quot;: {
+          &quot;machine&quot;: {
+            &quot;hostname&quot;: &quot;williao-G3-3579&quot;,
+            &quot;cpu&quot;: &quot;Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz&quot;,
+            &quot;cores&quot;: 12,
+            &quot;platform&quot;: &quot;linux&quot;,
+            &quot;arch&quot;: &quot;x64&quot;,
+            &quot;node&quot;: &quot;v22.22.1&quot;
+          },
+          &quot;sampleRate&quot;: 48000,
+          &quot;chunkSamples&quot;: 480,
+          &quot;chunks&quot;: 951,
+          &quot;audioSeconds&quot;: 9.506958333333333,
+          &quot;initializationMs&quot;: 101.043245,
+          &quot;finishMs&quot;: 0.001689,
+          &quot;meanMs&quot;: 0.481128351,
+          &quot;p95Ms&quot;: 1.09697,
+          &quot;p99Ms&quot;: 1.334708,
+          &quot;sustainedRatio&quot;: 0.058756752,
+          &quot;maxBacklogMs&quot;: 0,
+          &quot;provisional&quot;: true
+        },
+        &quot;causality&quot;: [
+          {
+            &quot;fraction&quot;: 0.25,
+            &quot;kind&quot;: &quot;silence&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.25,
+            &quot;kind&quot;: &quot;alternating&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.5,
+            &quot;kind&quot;: &quot;silence&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.5,
+            &quot;kind&quot;: &quot;alternating&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.75,
+            &quot;kind&quot;: &quot;silence&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.75,
+            &quot;kind&quot;: &quot;alternating&quot;,
+            &quot;pass&quot;: true
+          }
+        ],
+        &quot;targets&quot;: {
+          &quot;agreement&quot;: true,
+          &quot;coverage&quot;: true,
+          &quot;exposure&quot;: true,
+          &quot;longestExposure&quot;: true,
+          &quot;deadline&quot;: true,
+          &quot;causality&quot;: true,
+          &quot;sustained&quot;: true,
+          &quot;chunkP99&quot;: true
+        }
+      },
+      {
+        &quot;example&quot;: &quot;digital-silence&quot;,
+        &quot;referenceKind&quot;: &quot;digital-silence&quot;,
+        &quot;referenceUncertainty&quot;: &quot;exact-silence&quot;,
+        &quot;metrics&quot;: {
+          &quot;points&quot;: 189,
+          &quot;agreement&quot;: 1,
+          &quot;coverage&quot;: 1,
+          &quot;deadlineMisses&quot;: 0,
+          &quot;wrongReferenceExposure&quot;: 0,
+          &quot;longestWrongReferenceSeconds&quot;: 0,
+          &quot;residualSeconds&quot;: {
+            &quot;signedMean&quot;: null,
+            &quot;absoluteMedian&quot;: null,
+            &quot;absoluteP95&quot;: null,
+            &quot;absoluteMax&quot;: null,
+            &quot;denominator&quot;: 0
+          }
+        },
+        &quot;cost&quot;: {
+          &quot;machine&quot;: {
+            &quot;hostname&quot;: &quot;williao-G3-3579&quot;,
+            &quot;cpu&quot;: &quot;Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz&quot;,
+            &quot;cores&quot;: 12,
+            &quot;platform&quot;: &quot;linux&quot;,
+            &quot;arch&quot;: &quot;x64&quot;,
+            &quot;node&quot;: &quot;v22.22.1&quot;
+          },
+          &quot;sampleRate&quot;: 48000,
+          &quot;chunkSamples&quot;: 480,
+          &quot;chunks&quot;: 951,
+          &quot;audioSeconds&quot;: 9.506958333333333,
+          &quot;initializationMs&quot;: 36.500327,
+          &quot;finishMs&quot;: 0.001444,
+          &quot;meanMs&quot;: 0.430947783,
+          &quot;p95Ms&quot;: 0.892368,
+          &quot;p99Ms&quot;: 1.179968,
+          &quot;sustainedRatio&quot;: 0.046948046,
+          &quot;maxBacklogMs&quot;: 0,
+          &quot;provisional&quot;: true
+        },
+        &quot;causality&quot;: [
+          {
+            &quot;fraction&quot;: 0.25,
+            &quot;kind&quot;: &quot;silence&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.25,
+            &quot;kind&quot;: &quot;alternating&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.5,
+            &quot;kind&quot;: &quot;silence&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.5,
+            &quot;kind&quot;: &quot;alternating&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.75,
+            &quot;kind&quot;: &quot;silence&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.75,
+            &quot;kind&quot;: &quot;alternating&quot;,
+            &quot;pass&quot;: true
+          }
+        ],
+        &quot;targets&quot;: {
+          &quot;agreement&quot;: true,
+          &quot;coverage&quot;: true,
+          &quot;exposure&quot;: true,
+          &quot;longestExposure&quot;: true,
+          &quot;deadline&quot;: true,
+          &quot;causality&quot;: true,
+          &quot;sustained&quot;: true,
+          &quot;chunkP99&quot;: true
+        }
+      }
+    ]
+  },
+  &quot;comparison&quot;: {
+    &quot;baseExposure&quot;: 0.7793898925,
+    &quot;candidateExposure&quot;: 0.058779785249999994,
+    &quot;absolute&quot;: 0.72061010725,
+    &quot;relative&quot;: 0.9245823100663317,
+    &quot;regressions&quot;: [
+      {
+        &quot;example&quot;: &quot;winner-positive&quot;,
+        &quot;agreement&quot;: -0.42328042399999993,
+        &quot;deadline&quot;: 0.42328042400000004
+      },
+      {
+        &quot;example&quot;: &quot;winner-audio-dust-score&quot;,
+        &quot;agreement&quot;: 0.957671958,
+        &quot;deadline&quot;: -0.957671958
+      },
+      {
+        &quot;example&quot;: &quot;digital-silence&quot;,
+        &quot;agreement&quot;: 1,
+        &quot;deadline&quot;: -1
+      }
+    ],
+    &quot;allTargets&quot;: false,
+    &quot;gain&quot;: true,
+    &quot;noRegression&quot;: false,
+    &quot;decision&quot;: &quot;proxy-targets-not-met&quot;
+  },
+  &quot;cpuSeconds&quot;: 16.261452,
+  &quot;next&quot;: &quot;Inspect the recorded failures; at most one focused revision remains in this first sub-batch.&quot;,
+  &quot;formalRetention&quot;: &quot;not assessed&quot;,
+  &quot;microphoneQualification&quot;: &quot;not assessed&quot;,
+  &quot;privateRecordsSha256&quot;: &quot;940105aa60f48ac2edc480963affd86084e266af8d2d80841054a5d5430dd954&quot;,
+  &quot;privateEvaluationsSha256&quot;: &quot;a71e72c288f69f96506b6a44234eb226e6b56cf80a88b7ed0890234dcb720b65&quot;
+}
+</pre><p>SHA-256 <code>00c54f9ac66006f154a906af287cbd480be012e4eef30c3511cc1d414acdcc1b</code></p></details><details><summary>g002b-spectral2-winner-sync-proxy — complete aggregate evidence</summary><pre>{
+  &quot;id&quot;: &quot;g002b-spectral2-winner-sync-proxy&quot;,
+  &quot;kind&quot;: &quot;approximate-sync-development&quot;,
+  &quot;policy&quot;: &quot;sync-proxy-development-1&quot;,
+  &quot;referencePrecision&quot;: &quot;unmeasured; sync interpolation accepted by the user for development&quot;,
+  &quot;set&quot;: &quot;winner-four-bars-sync-proxy-v1&quot;,
+  &quot;setSha256&quot;: &quot;80c8a6358751f356e164f75389dd50d49a2a0da6ad094f95847bd304eb5c5b8b&quot;,
+  &quot;nominalBpm&quot;: 101,
+  &quot;nominalRaw&quot;: 100.97856838238299,
+  &quot;gitCommit&quot;: &quot;56434dd9deb4f21ead9074d2abf3e0560df75f09&quot;,
+  &quot;sourceHashes&quot;: {
+    &quot;bench/src/candidates/clockFollower.ts&quot;: &quot;687cbaaed6323594761986370ade1e7c4262fcd02deb4930ba5a0c64c35df5b9&quot;,
+    &quot;bench/src/candidates/spectralFollower1.ts&quot;: &quot;e86ef1b9aaf6d1072a9082fe126e0199d0675991740206179db188f194a2486a&quot;,
+    &quot;bench/src/candidates/spectralFollower2.ts&quot;: &quot;b21fa0dbb735a06561a4004eb8e54368b0c08e35663722257426a1278a812aaa&quot;,
+    &quot;bench/src/cli.ts&quot;: &quot;4a0718e6135faa531bfcf0763dbb00cb20a2d03372186d45e28ae17d6a6f0600&quot;,
+    &quot;bench/src/evaluate/index.ts&quot;: &quot;33a85837d638734c01331f1aebb930c764ff7871ab5b9bf45d09c5f6af2cac7d&quot;,
+    &quot;bench/src/evidence/inspect-anchor-precision.ts&quot;: &quot;58a7c6cd3109af1638fc2380f1972b282fee86e3d338e10cdce5201dc71413a3&quot;,
+    &quot;bench/src/evidence/preflight.ts&quot;: &quot;551e36f18054caeba0693a0d967ae30bd269c53f0f7f3de503912d1530e94b87&quot;,
+    &quot;bench/src/evidence/prepare-review.ts&quot;: &quot;868a1f6534ae9b603da941e1b83adee334cecccbb701431ed5ce3b36df1af02e&quot;,
+    &quot;bench/src/generate/set.ts&quot;: &quot;69795c1ad4e60cd31e88f152fc85b3e0bc5938b4f9bd81de972ff944c9489c2e&quot;,
+    &quot;bench/src/generate/sine.ts&quot;: &quot;c7aab46132f2461172d531751b251341ad76d832f03dffda206d5161f7a93f96&quot;,
+    &quot;bench/src/generate/wav.ts&quot;: &quot;a38ae9c13209414f103a2ec75007f2d904919bb2e0a8eaf24d26d9614d94a371&quot;,
+    &quot;bench/src/io.ts&quot;: &quot;62c62365425f2ca12ebca5290ad5164b851125a55bc45a2d1224a346af5c6a7e&quot;,
+    &quot;bench/src/proxy/prepare.ts&quot;: &quot;dc249e05527d02ffd718eb6a72d5199934828bd8b0346def8edc644fdba590f2&quot;,
+    &quot;bench/src/proxy/reference.ts&quot;: &quot;450adc25b1dd24169b20ea3c1dde3c1a9b8479bae309230b94f635512c04c456&quot;,
+    &quot;bench/src/proxy/run.ts&quot;: &quot;da3171b3fe6747f752a33b050192896ac99da2e09b05a0f8b6c391d9bd759109&quot;,
+    &quot;bench/src/report/index.ts&quot;: &quot;f008c0a07feb6b8286d19e1b2da2de022afe300800b78a3c22e198164369285b&quot;,
+    &quot;bench/src/report/oracle.ts&quot;: &quot;d5483693aec119928140b9eb53d71bc988df0843e3440d493b632c9acee10f21&quot;,
+    &quot;bench/src/run/runner.ts&quot;: &quot;c5bd7d90ccaacf1b1382f6663b5ac6f8c1dea930754eecbbf684f27635cb7cf6&quot;,
+    &quot;bench/src/run/set.ts&quot;: &quot;fde9901932e537981425f45f05442c15ee0a7ad70d3a9d70751fb4aff4c8aef4&quot;,
+    &quot;bench/src/types.ts&quot;: &quot;bcb4d528af893a4bcd872360915ff635e9cfc4d26328c4315433293a39fa9744&quot;,
+    &quot;bench/src/v2/anchor-limits.ts&quot;: &quot;b955c00409a5fa03625160eb49aa12813ddf82d4ddbaaa9a649458906730e5d0&quot;,
+    &quot;bench/src/v2/checkpoint.ts&quot;: &quot;c2ecec5401418846faa4d908a2e528219290abd2c6e782141070cb3530e93490&quot;,
+    &quot;bench/src/v2/driver.ts&quot;: &quot;ebfcc84a1b660665ea6f9de9cabb6b997de4292047a8a565806e747b12f7600c&quot;,
+    &quot;bench/src/v2/evaluate.ts&quot;: &quot;88ec56c29bd22194f7f2d530f49663d648b11416794564cc32c0db7fba4d2a42&quot;,
+    &quot;bench/src/v2/partitions.ts&quot;: &quot;3d266e42aa1cdcbf40adc3bbc7d69321fe83f59b993b01ee68496783b71f56d5&quot;,
+    &quot;bench/src/v2/retain.ts&quot;: &quot;0a272adbe0fc0c7721058352f191032651fa2cf511603571668c29e95f558814&quot;,
+    &quot;bench/src/v2/run-pair.ts&quot;: &quot;3b9a02a6e5783f7472330ab9fdd19ef378383b8f287c52a095e86eafb913ff70&quot;,
+    &quot;bench/src/v2/types.ts&quot;: &quot;5b3d48d6ab30f0e1c8bf686f62595d1ecc0c13716d14489555bd383f21f63f32&quot;,
+    &quot;bench/src/v2/validate.ts&quot;: &quot;4eb351d4f38a14462d2b0b6b54a21f5ed8b83dd8226b511d048a07cea23849d0&quot;,
+    &quot;bench/src/validate.ts&quot;: &quot;c22008ca22f8d196d2425858e85a9e7af885acc7a0dd0b5c41495f32b871e628&quot;,
+    &quot;contracts/sync-proxy-development-1.md&quot;: &quot;ed39195f9d22f6d698052cec7230a763bef12c56c3077c92445616103c08ae02&quot;
+  },
+  &quot;machine&quot;: {
+    &quot;hostname&quot;: &quot;williao-G3-3579&quot;,
+    &quot;cpu&quot;: &quot;Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz&quot;,
+    &quot;cores&quot;: 12,
+    &quot;platform&quot;: &quot;linux&quot;,
+    &quot;arch&quot;: &quot;x64&quot;,
+    &quot;node&quot;: &quot;v22.22.1&quot;
+  },
+  &quot;comparator&quot;: {
+    &quot;id&quot;: &quot;clock-follower@1&quot;,
+    &quot;examples&quot;: [
+      {
+        &quot;example&quot;: &quot;winner-positive&quot;,
+        &quot;referenceKind&quot;: &quot;linear-sync-proxy&quot;,
+        &quot;referenceUncertainty&quot;: &quot;unmeasured&quot;,
+        &quot;metrics&quot;: {
+          &quot;points&quot;: 189,
+          &quot;agreement&quot;: 0.883597884,
+          &quot;coverage&quot;: 1,
+          &quot;deadlineMisses&quot;: 0.116402116,
+          &quot;wrongReferenceExposure&quot;: 0.11755957,
+          &quot;longestWrongReferenceSeconds&quot;: 1.1,
+          &quot;residualSeconds&quot;: {
+            &quot;signedMean&quot;: 0.070161185,
+            &quot;absoluteMedian&quot;: 0.051605005,
+            &quot;absoluteP95&quot;: 0.164493974,
+            &quot;absoluteMax&quot;: 0.185647528,
+            &quot;denominator&quot;: 189
+          }
+        },
+        &quot;cost&quot;: {
+          &quot;machine&quot;: {
+            &quot;hostname&quot;: &quot;williao-G3-3579&quot;,
+            &quot;cpu&quot;: &quot;Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz&quot;,
+            &quot;cores&quot;: 12,
+            &quot;platform&quot;: &quot;linux&quot;,
+            &quot;arch&quot;: &quot;x64&quot;,
+            &quot;node&quot;: &quot;v22.22.1&quot;
+          },
+          &quot;sampleRate&quot;: 48000,
+          &quot;chunkSamples&quot;: 480,
+          &quot;chunks&quot;: 951,
+          &quot;audioSeconds&quot;: 9.506958333333333,
+          &quot;initializationMs&quot;: 4.226258,
+          &quot;finishMs&quot;: 0.056496,
+          &quot;meanMs&quot;: 0.003485792,
+          &quot;p95Ms&quot;: 0.003552,
+          &quot;p99Ms&quot;: 0.010318,
+          &quot;sustainedRatio&quot;: 0.000799177,
+          &quot;maxBacklogMs&quot;: 0,
+          &quot;provisional&quot;: true
+        },
+        &quot;causality&quot;: [
+          {
+            &quot;fraction&quot;: 0.25,
+            &quot;kind&quot;: &quot;silence&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.25,
+            &quot;kind&quot;: &quot;alternating&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.5,
+            &quot;kind&quot;: &quot;silence&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.5,
+            &quot;kind&quot;: &quot;alternating&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.75,
+            &quot;kind&quot;: &quot;silence&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.75,
+            &quot;kind&quot;: &quot;alternating&quot;,
+            &quot;pass&quot;: true
+          }
+        ],
+        &quot;targets&quot;: {
+          &quot;agreement&quot;: false,
+          &quot;coverage&quot;: true,
+          &quot;exposure&quot;: false,
+          &quot;longestExposure&quot;: false,
+          &quot;deadline&quot;: false,
+          &quot;causality&quot;: true,
+          &quot;sustained&quot;: true,
+          &quot;chunkP99&quot;: true
+        }
+      },
+      {
+        &quot;example&quot;: &quot;winner-audio-dust-score&quot;,
+        &quot;referenceKind&quot;: &quot;cross-piece-negative-proxy&quot;,
+        &quot;referenceUncertainty&quot;: &quot;unmeasured&quot;,
+        &quot;metrics&quot;: {
+          &quot;points&quot;: 189,
+          &quot;agreement&quot;: 0,
+          &quot;coverage&quot;: 1,
+          &quot;deadlineMisses&quot;: 1,
+          &quot;wrongReferenceExposure&quot;: 1,
+          &quot;longestWrongReferenceSeconds&quot;: 9.356958333,
+          &quot;residualSeconds&quot;: {
+            &quot;signedMean&quot;: null,
+            &quot;absoluteMedian&quot;: null,
+            &quot;absoluteP95&quot;: null,
+            &quot;absoluteMax&quot;: null,
+            &quot;denominator&quot;: 0
+          }
+        },
+        &quot;cost&quot;: {
+          &quot;machine&quot;: {
+            &quot;hostname&quot;: &quot;williao-G3-3579&quot;,
+            &quot;cpu&quot;: &quot;Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz&quot;,
+            &quot;cores&quot;: 12,
+            &quot;platform&quot;: &quot;linux&quot;,
+            &quot;arch&quot;: &quot;x64&quot;,
+            &quot;node&quot;: &quot;v22.22.1&quot;
+          },
+          &quot;sampleRate&quot;: 48000,
+          &quot;chunkSamples&quot;: 480,
+          &quot;chunks&quot;: 951,
+          &quot;audioSeconds&quot;: 9.506958333333333,
+          &quot;initializationMs&quot;: 5.384139,
+          &quot;finishMs&quot;: 0.000745,
+          &quot;meanMs&quot;: 0.001610131,
+          &quot;p95Ms&quot;: 0.00175,
+          &quot;p99Ms&quot;: 0.001908,
+          &quot;sustainedRatio&quot;: 0.00072748,
+          &quot;maxBacklogMs&quot;: 0,
+          &quot;provisional&quot;: true
+        },
+        &quot;causality&quot;: [
+          {
+            &quot;fraction&quot;: 0.25,
+            &quot;kind&quot;: &quot;silence&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.25,
+            &quot;kind&quot;: &quot;alternating&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.5,
+            &quot;kind&quot;: &quot;silence&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.5,
+            &quot;kind&quot;: &quot;alternating&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.75,
+            &quot;kind&quot;: &quot;silence&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.75,
+            &quot;kind&quot;: &quot;alternating&quot;,
+            &quot;pass&quot;: true
+          }
+        ],
+        &quot;targets&quot;: {
+          &quot;agreement&quot;: false,
+          &quot;coverage&quot;: true,
+          &quot;exposure&quot;: false,
+          &quot;longestExposure&quot;: false,
+          &quot;deadline&quot;: false,
+          &quot;causality&quot;: true,
+          &quot;sustained&quot;: true,
+          &quot;chunkP99&quot;: true
+        }
+      },
+      {
+        &quot;example&quot;: &quot;digital-silence&quot;,
+        &quot;referenceKind&quot;: &quot;digital-silence&quot;,
+        &quot;referenceUncertainty&quot;: &quot;exact-silence&quot;,
+        &quot;metrics&quot;: {
+          &quot;points&quot;: 189,
+          &quot;agreement&quot;: 0,
+          &quot;coverage&quot;: 1,
+          &quot;deadlineMisses&quot;: 1,
+          &quot;wrongReferenceExposure&quot;: 1,
+          &quot;longestWrongReferenceSeconds&quot;: 9.356958333,
+          &quot;residualSeconds&quot;: {
+            &quot;signedMean&quot;: null,
+            &quot;absoluteMedian&quot;: null,
+            &quot;absoluteP95&quot;: null,
+            &quot;absoluteMax&quot;: null,
+            &quot;denominator&quot;: 0
+          }
+        },
+        &quot;cost&quot;: {
+          &quot;machine&quot;: {
+            &quot;hostname&quot;: &quot;williao-G3-3579&quot;,
+            &quot;cpu&quot;: &quot;Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz&quot;,
+            &quot;cores&quot;: 12,
+            &quot;platform&quot;: &quot;linux&quot;,
+            &quot;arch&quot;: &quot;x64&quot;,
+            &quot;node&quot;: &quot;v22.22.1&quot;
+          },
+          &quot;sampleRate&quot;: 48000,
+          &quot;chunkSamples&quot;: 480,
+          &quot;chunks&quot;: 951,
+          &quot;audioSeconds&quot;: 9.506958333333333,
+          &quot;initializationMs&quot;: 3.589545,
+          &quot;finishMs&quot;: 0.000072,
+          &quot;meanMs&quot;: 0.002133494,
+          &quot;p95Ms&quot;: 0.001558,
+          &quot;p99Ms&quot;: 0.003255,
+          &quot;sustainedRatio&quot;: 0.000590996,
+          &quot;maxBacklogMs&quot;: 0,
+          &quot;provisional&quot;: true
+        },
+        &quot;causality&quot;: [
+          {
+            &quot;fraction&quot;: 0.25,
+            &quot;kind&quot;: &quot;silence&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.25,
+            &quot;kind&quot;: &quot;alternating&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.5,
+            &quot;kind&quot;: &quot;silence&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.5,
+            &quot;kind&quot;: &quot;alternating&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.75,
+            &quot;kind&quot;: &quot;silence&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.75,
+            &quot;kind&quot;: &quot;alternating&quot;,
+            &quot;pass&quot;: true
+          }
+        ],
+        &quot;targets&quot;: {
+          &quot;agreement&quot;: false,
+          &quot;coverage&quot;: true,
+          &quot;exposure&quot;: false,
+          &quot;longestExposure&quot;: false,
+          &quot;deadline&quot;: false,
+          &quot;causality&quot;: true,
+          &quot;sustained&quot;: true,
+          &quot;chunkP99&quot;: true
+        }
+      }
+    ]
+  },
+  &quot;candidate&quot;: {
+    &quot;id&quot;: &quot;spectral-follower@2&quot;,
+    &quot;examples&quot;: [
+      {
+        &quot;example&quot;: &quot;winner-positive&quot;,
+        &quot;referenceKind&quot;: &quot;linear-sync-proxy&quot;,
+        &quot;referenceUncertainty&quot;: &quot;unmeasured&quot;,
+        &quot;metrics&quot;: {
+          &quot;points&quot;: 189,
+          &quot;agreement&quot;: 0.17989418,
+          &quot;coverage&quot;: 1,
+          &quot;deadlineMisses&quot;: 0.82010582,
+          &quot;wrongReferenceExposure&quot;: 0.042748935,
+          &quot;longestWrongReferenceSeconds&quot;: 0.2,
+          &quot;residualSeconds&quot;: {
+            &quot;signedMean&quot;: -0.008090846,
+            &quot;absoluteMedian&quot;: 0.072514133,
+            &quot;absoluteP95&quot;: 0.231965372,
+            &quot;absoluteMax&quot;: 0.329860047,
+            &quot;denominator&quot;: 42
+          }
+        },
+        &quot;cost&quot;: {
+          &quot;machine&quot;: {
+            &quot;hostname&quot;: &quot;williao-G3-3579&quot;,
+            &quot;cpu&quot;: &quot;Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz&quot;,
+            &quot;cores&quot;: 12,
+            &quot;platform&quot;: &quot;linux&quot;,
+            &quot;arch&quot;: &quot;x64&quot;,
+            &quot;node&quot;: &quot;v22.22.1&quot;
+          },
+          &quot;sampleRate&quot;: 48000,
+          &quot;chunkSamples&quot;: 480,
+          &quot;chunks&quot;: 951,
+          &quot;audioSeconds&quot;: 9.506958333333333,
+          &quot;initializationMs&quot;: 54.823785,
+          &quot;finishMs&quot;: 0.062841,
+          &quot;meanMs&quot;: 0.610051864,
+          &quot;p95Ms&quot;: 1.388506,
+          &quot;p99Ms&quot;: 1.666084,
+          &quot;sustainedRatio&quot;: 0.066798015,
+          &quot;maxBacklogMs&quot;: 0,
+          &quot;provisional&quot;: true
+        },
+        &quot;causality&quot;: [
+          {
+            &quot;fraction&quot;: 0.25,
+            &quot;kind&quot;: &quot;silence&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.25,
+            &quot;kind&quot;: &quot;alternating&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.5,
+            &quot;kind&quot;: &quot;silence&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.5,
+            &quot;kind&quot;: &quot;alternating&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.75,
+            &quot;kind&quot;: &quot;silence&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.75,
+            &quot;kind&quot;: &quot;alternating&quot;,
+            &quot;pass&quot;: true
+          }
+        ],
+        &quot;targets&quot;: {
+          &quot;agreement&quot;: false,
+          &quot;coverage&quot;: true,
+          &quot;exposure&quot;: true,
+          &quot;longestExposure&quot;: true,
+          &quot;deadline&quot;: false,
+          &quot;causality&quot;: true,
+          &quot;sustained&quot;: true,
+          &quot;chunkP99&quot;: true
+        }
+      },
+      {
+        &quot;example&quot;: &quot;winner-audio-dust-score&quot;,
+        &quot;referenceKind&quot;: &quot;cross-piece-negative-proxy&quot;,
+        &quot;referenceUncertainty&quot;: &quot;unmeasured&quot;,
+        &quot;metrics&quot;: {
+          &quot;points&quot;: 189,
+          &quot;agreement&quot;: 1,
+          &quot;coverage&quot;: 1,
+          &quot;deadlineMisses&quot;: 0,
+          &quot;wrongReferenceExposure&quot;: 0,
+          &quot;longestWrongReferenceSeconds&quot;: 0,
+          &quot;residualSeconds&quot;: {
+            &quot;signedMean&quot;: null,
+            &quot;absoluteMedian&quot;: null,
+            &quot;absoluteP95&quot;: null,
+            &quot;absoluteMax&quot;: null,
+            &quot;denominator&quot;: 0
+          }
+        },
+        &quot;cost&quot;: {
+          &quot;machine&quot;: {
+            &quot;hostname&quot;: &quot;williao-G3-3579&quot;,
+            &quot;cpu&quot;: &quot;Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz&quot;,
+            &quot;cores&quot;: 12,
+            &quot;platform&quot;: &quot;linux&quot;,
+            &quot;arch&quot;: &quot;x64&quot;,
+            &quot;node&quot;: &quot;v22.22.1&quot;
+          },
+          &quot;sampleRate&quot;: 48000,
+          &quot;chunkSamples&quot;: 480,
+          &quot;chunks&quot;: 951,
+          &quot;audioSeconds&quot;: 9.506958333333333,
+          &quot;initializationMs&quot;: 96.265543,
+          &quot;finishMs&quot;: 0.001381,
+          &quot;meanMs&quot;: 0.594799384,
+          &quot;p95Ms&quot;: 1.226894,
+          &quot;p99Ms&quot;: 1.485458,
+          &quot;sustainedRatio&quot;: 0.069624912,
+          &quot;maxBacklogMs&quot;: 0,
+          &quot;provisional&quot;: true
+        },
+        &quot;causality&quot;: [
+          {
+            &quot;fraction&quot;: 0.25,
+            &quot;kind&quot;: &quot;silence&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.25,
+            &quot;kind&quot;: &quot;alternating&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.5,
+            &quot;kind&quot;: &quot;silence&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.5,
+            &quot;kind&quot;: &quot;alternating&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.75,
+            &quot;kind&quot;: &quot;silence&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.75,
+            &quot;kind&quot;: &quot;alternating&quot;,
+            &quot;pass&quot;: true
+          }
+        ],
+        &quot;targets&quot;: {
+          &quot;agreement&quot;: true,
+          &quot;coverage&quot;: true,
+          &quot;exposure&quot;: true,
+          &quot;longestExposure&quot;: true,
+          &quot;deadline&quot;: true,
+          &quot;causality&quot;: true,
+          &quot;sustained&quot;: true,
+          &quot;chunkP99&quot;: true
+        }
+      },
+      {
+        &quot;example&quot;: &quot;digital-silence&quot;,
+        &quot;referenceKind&quot;: &quot;digital-silence&quot;,
+        &quot;referenceUncertainty&quot;: &quot;exact-silence&quot;,
+        &quot;metrics&quot;: {
+          &quot;points&quot;: 189,
+          &quot;agreement&quot;: 1,
+          &quot;coverage&quot;: 1,
+          &quot;deadlineMisses&quot;: 0,
+          &quot;wrongReferenceExposure&quot;: 0,
+          &quot;longestWrongReferenceSeconds&quot;: 0,
+          &quot;residualSeconds&quot;: {
+            &quot;signedMean&quot;: null,
+            &quot;absoluteMedian&quot;: null,
+            &quot;absoluteP95&quot;: null,
+            &quot;absoluteMax&quot;: null,
+            &quot;denominator&quot;: 0
+          }
+        },
+        &quot;cost&quot;: {
+          &quot;machine&quot;: {
+            &quot;hostname&quot;: &quot;williao-G3-3579&quot;,
+            &quot;cpu&quot;: &quot;Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz&quot;,
+            &quot;cores&quot;: 12,
+            &quot;platform&quot;: &quot;linux&quot;,
+            &quot;arch&quot;: &quot;x64&quot;,
+            &quot;node&quot;: &quot;v22.22.1&quot;
+          },
+          &quot;sampleRate&quot;: 48000,
+          &quot;chunkSamples&quot;: 480,
+          &quot;chunks&quot;: 951,
+          &quot;audioSeconds&quot;: 9.506958333333333,
+          &quot;initializationMs&quot;: 37.908335,
+          &quot;finishMs&quot;: 0.001521,
+          &quot;meanMs&quot;: 0.575777803,
+          &quot;p95Ms&quot;: 1.207968,
+          &quot;p99Ms&quot;: 1.412554,
+          &quot;sustainedRatio&quot;: 0.061583792,
+          &quot;maxBacklogMs&quot;: 0,
+          &quot;provisional&quot;: true
+        },
+        &quot;causality&quot;: [
+          {
+            &quot;fraction&quot;: 0.25,
+            &quot;kind&quot;: &quot;silence&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.25,
+            &quot;kind&quot;: &quot;alternating&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.5,
+            &quot;kind&quot;: &quot;silence&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.5,
+            &quot;kind&quot;: &quot;alternating&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.75,
+            &quot;kind&quot;: &quot;silence&quot;,
+            &quot;pass&quot;: true
+          },
+          {
+            &quot;fraction&quot;: 0.75,
+            &quot;kind&quot;: &quot;alternating&quot;,
+            &quot;pass&quot;: true
+          }
+        ],
+        &quot;targets&quot;: {
+          &quot;agreement&quot;: true,
+          &quot;coverage&quot;: true,
+          &quot;exposure&quot;: true,
+          &quot;longestExposure&quot;: true,
+          &quot;deadline&quot;: true,
+          &quot;causality&quot;: true,
+          &quot;sustained&quot;: true,
+          &quot;chunkP99&quot;: true
+        }
+      }
+    ]
+  },
+  &quot;comparison&quot;: {
+    &quot;baseExposure&quot;: 0.7793898925,
+    &quot;candidateExposure&quot;: 0.01068723375,
+    &quot;absolute&quot;: 0.76870265875,
+    &quot;relative&quot;: 0.986287692651852,
+    &quot;regressions&quot;: [
+      {
+        &quot;example&quot;: &quot;winner-positive&quot;,
+        &quot;agreement&quot;: -0.7037037039999999,
+        &quot;deadline&quot;: 0.703703704
+      },
+      {
+        &quot;example&quot;: &quot;winner-audio-dust-score&quot;,
+        &quot;agreement&quot;: 1,
+        &quot;deadline&quot;: -1
+      },
+      {
+        &quot;example&quot;: &quot;digital-silence&quot;,
+        &quot;agreement&quot;: 1,
+        &quot;deadline&quot;: -1
+      }
+    ],
+    &quot;allTargets&quot;: false,
+    &quot;gain&quot;: true,
+    &quot;noRegression&quot;: false,
+    &quot;decision&quot;: &quot;proxy-targets-not-met&quot;
+  },
+  &quot;cpuSeconds&quot;: 18.324054,
+  &quot;next&quot;: &quot;Inspect the recorded failures; at most one focused revision remains in this first sub-batch.&quot;,
+  &quot;formalRetention&quot;: &quot;not assessed&quot;,
+  &quot;microphoneQualification&quot;: &quot;not assessed&quot;,
+  &quot;privateRecordsSha256&quot;: &quot;a6406f9023a0ac5304ba4d97d1375442dcc8237201b084e604b50be20b5f7de1&quot;,
+  &quot;privateEvaluationsSha256&quot;: &quot;3b0cc37b7f101041bf8cd4846fead76b116c467b10523a0b1fa81e8d036bf7e4&quot;
+}
+</pre><p>SHA-256 <code>d7618ad4eb26253cb1683cc4f9c6524322a24662ce72afc2c76e6e970cdb38e1</code></p></details><footer>Summary SHA-256 <code>5c30050174f1e49625898436fd1f3bb8366ebc1df7c762dc4b81f13385f4d7b9</code>. This report does not rerun or alter an experiment.</footer></main></body></html>

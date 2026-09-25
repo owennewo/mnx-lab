@@ -1,3 +1,8 @@
+Current result: [002 — Winner with sync interpolation](002-winner-sync-proxy.html).
+The first two real-audio candidate versions fail the development targets; the loop is
+closed and Winner stays at four bars. Its private companion embeds audio and timing
+traces, with a link from the public report.
+
 # Readable experiment reports
 
 Open [001 — Initial two-scale assessment](001-initial-two-scale.html) in a browser.
@@ -18,11 +23,13 @@ Use `NNN-short-description.html` for readable reports, with a matching Markdown
 summary. Numbers increase within the active performance-listening experiment and
 are not reused; archived work retains its original names. Each summary names the
 exact recorded run ID, candidate, set and evaluator. A presentation-only update keeps
-the report number. A new assessment receives the next number and names its new run.
+the report number. A new bounded experiment receives the next number and names every constituent run;
+002 groups the initial comparison and its one predeclared revision as 002a and 002b.
 
 | Number | Readable report | Recorded run |
 |---|---|---|
 | 001 | [Initial two-scale assessment](001-initial-two-scale.html) | [g001-clock-harness-v1](../runs/g001-clock-harness-v1/report.md) |
+| 002 | [Winner with sync interpolation](002-winner-sync-proxy.html) | [002a](../runs/g002a-spectral1-winner-sync-proxy/summary.json), [002b](../runs/g002b-spectral2-winner-sync-proxy/summary.json) |
 
 The run directory remains the original machine-readable evidence. Do not rename or
 rewrite its decisions, counts, metadata or report when improving the HTML. The
@@ -52,16 +59,31 @@ both sections before using the browser's Print command.
 
 [Four-bar real-evidence preparation](real-evidence-review.html) contains the approval record, exact reviewed
 contract snapshot and the current preparation record, with a link to the private listening
-packet on this machine. It is not a numbered experiment result: report 002 is reserved
-for an actual new assessment. Rebuild it with `node experiments/performance-listening/reports/export-evidence-review.mjs`;
+packet on this machine. It is preparation history, not a numbered experiment result; experiment 002 now
+records the actual comparisons under the subsequent development amendment. Rebuild it with `node experiments/performance-listening/reports/export-evidence-review.mjs`;
 add `--check` to verify that it matches its sources. Export also verifies the approved
 contract snapshot against the SHA-256 in its approval record.
 
 ## Loop readiness checkpoint
 
 [Research loop readiness](loop-readiness.html) records v2 instrument verification,
-the user's source confirmation, the bar-anchor precision limit and the remaining
-independent beat-review step. It is not experiment 002 or a candidate result.
+the user's source confirmation and the historical bar-anchor sensitivity calculation.
+It now points to experiment 002 and explains why manual beat review is optional for
+initial proxy development, while independent precision matters for stronger claims.
 Rebuild with `node experiments/performance-listening/reports/export-loop-readiness.mjs`
 and verify with `--check`. Private embedded playback/beat-review pages are generated
 outside git; the report source lists their commands.
+
+## Rebuild report 002
+
+```sh
+node experiments/performance-listening/reports/export-sync-proxy.mjs
+node experiments/performance-listening/reports/export-sync-proxy.mjs --check
+node experiments/performance-listening/reports/export-private-sync-proxy.mjs /home/williao/dev/mnx-listening-data/real-evidence-01
+node experiments/performance-listening/reports/export-private-sync-proxy.mjs /home/williao/dev/mnx-listening-data/real-evidence-01 --check
+```
+
+The public exporter verifies every pinned implementation/policy hash in both runs.
+The private exporter verifies the saved evaluation hashes and reviewed WAV identity;
+it refuses output inside a git checkout. Both are presentation-only. The private page
+uses native WAV playback and inline SVG/JavaScript, with no server or network requests.

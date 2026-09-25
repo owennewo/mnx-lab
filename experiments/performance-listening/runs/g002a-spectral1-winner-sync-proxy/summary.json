@@ -1,0 +1,598 @@
+{
+  "id": "g002a-spectral1-winner-sync-proxy",
+  "kind": "approximate-sync-development",
+  "policy": "sync-proxy-development-1",
+  "referencePrecision": "unmeasured; sync interpolation accepted by the user for development",
+  "set": "winner-four-bars-sync-proxy-v1",
+  "setSha256": "80c8a6358751f356e164f75389dd50d49a2a0da6ad094f95847bd304eb5c5b8b",
+  "nominalBpm": 101,
+  "nominalRaw": 100.97856838238299,
+  "gitCommit": "b1a1f1037aa875481feb3101e9a366969bf692df",
+  "sourceHashes": {
+    "bench/src/candidates/clockFollower.ts": "687cbaaed6323594761986370ade1e7c4262fcd02deb4930ba5a0c64c35df5b9",
+    "bench/src/candidates/spectralFollower1.ts": "e86ef1b9aaf6d1072a9082fe126e0199d0675991740206179db188f194a2486a",
+    "bench/src/cli.ts": "4a0718e6135faa531bfcf0763dbb00cb20a2d03372186d45e28ae17d6a6f0600",
+    "bench/src/evaluate/index.ts": "33a85837d638734c01331f1aebb930c764ff7871ab5b9bf45d09c5f6af2cac7d",
+    "bench/src/evidence/inspect-anchor-precision.ts": "58a7c6cd3109af1638fc2380f1972b282fee86e3d338e10cdce5201dc71413a3",
+    "bench/src/evidence/preflight.ts": "551e36f18054caeba0693a0d967ae30bd269c53f0f7f3de503912d1530e94b87",
+    "bench/src/evidence/prepare-review.ts": "868a1f6534ae9b603da941e1b83adee334cecccbb701431ed5ce3b36df1af02e",
+    "bench/src/generate/set.ts": "69795c1ad4e60cd31e88f152fc85b3e0bc5938b4f9bd81de972ff944c9489c2e",
+    "bench/src/generate/sine.ts": "c7aab46132f2461172d531751b251341ad76d832f03dffda206d5161f7a93f96",
+    "bench/src/generate/wav.ts": "a38ae9c13209414f103a2ec75007f2d904919bb2e0a8eaf24d26d9614d94a371",
+    "bench/src/io.ts": "62c62365425f2ca12ebca5290ad5164b851125a55bc45a2d1224a346af5c6a7e",
+    "bench/src/proxy/prepare.ts": "dc249e05527d02ffd718eb6a72d5199934828bd8b0346def8edc644fdba590f2",
+    "bench/src/proxy/reference.ts": "450adc25b1dd24169b20ea3c1dde3c1a9b8479bae309230b94f635512c04c456",
+    "bench/src/proxy/run.ts": "da3171b3fe6747f752a33b050192896ac99da2e09b05a0f8b6c391d9bd759109",
+    "bench/src/report/index.ts": "f008c0a07feb6b8286d19e1b2da2de022afe300800b78a3c22e198164369285b",
+    "bench/src/report/oracle.ts": "d5483693aec119928140b9eb53d71bc988df0843e3440d493b632c9acee10f21",
+    "bench/src/run/runner.ts": "c5bd7d90ccaacf1b1382f6663b5ac6f8c1dea930754eecbbf684f27635cb7cf6",
+    "bench/src/run/set.ts": "fde9901932e537981425f45f05442c15ee0a7ad70d3a9d70751fb4aff4c8aef4",
+    "bench/src/types.ts": "bcb4d528af893a4bcd872360915ff635e9cfc4d26328c4315433293a39fa9744",
+    "bench/src/v2/anchor-limits.ts": "b955c00409a5fa03625160eb49aa12813ddf82d4ddbaaa9a649458906730e5d0",
+    "bench/src/v2/checkpoint.ts": "c2ecec5401418846faa4d908a2e528219290abd2c6e782141070cb3530e93490",
+    "bench/src/v2/driver.ts": "ebfcc84a1b660665ea6f9de9cabb6b997de4292047a8a565806e747b12f7600c",
+    "bench/src/v2/evaluate.ts": "88ec56c29bd22194f7f2d530f49663d648b11416794564cc32c0db7fba4d2a42",
+    "bench/src/v2/partitions.ts": "3d266e42aa1cdcbf40adc3bbc7d69321fe83f59b993b01ee68496783b71f56d5",
+    "bench/src/v2/retain.ts": "0a272adbe0fc0c7721058352f191032651fa2cf511603571668c29e95f558814",
+    "bench/src/v2/run-pair.ts": "3b9a02a6e5783f7472330ab9fdd19ef378383b8f287c52a095e86eafb913ff70",
+    "bench/src/v2/types.ts": "5b3d48d6ab30f0e1c8bf686f62595d1ecc0c13716d14489555bd383f21f63f32",
+    "bench/src/v2/validate.ts": "4eb351d4f38a14462d2b0b6b54a21f5ed8b83dd8226b511d048a07cea23849d0",
+    "bench/src/validate.ts": "c22008ca22f8d196d2425858e85a9e7af885acc7a0dd0b5c41495f32b871e628",
+    "contracts/sync-proxy-development-1.md": "ed39195f9d22f6d698052cec7230a763bef12c56c3077c92445616103c08ae02"
+  },
+  "machine": {
+    "hostname": "williao-G3-3579",
+    "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+    "cores": 12,
+    "platform": "linux",
+    "arch": "x64",
+    "node": "v22.22.1"
+  },
+  "comparator": {
+    "id": "clock-follower@1",
+    "examples": [
+      {
+        "example": "winner-positive",
+        "referenceKind": "linear-sync-proxy",
+        "referenceUncertainty": "unmeasured",
+        "metrics": {
+          "points": 189,
+          "agreement": 0.883597884,
+          "coverage": 1,
+          "deadlineMisses": 0.116402116,
+          "wrongReferenceExposure": 0.11755957,
+          "longestWrongReferenceSeconds": 1.1,
+          "residualSeconds": {
+            "signedMean": 0.070161185,
+            "absoluteMedian": 0.051605005,
+            "absoluteP95": 0.164493974,
+            "absoluteMax": 0.185647528,
+            "denominator": 189
+          }
+        },
+        "cost": {
+          "machine": {
+            "hostname": "williao-G3-3579",
+            "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+            "cores": 12,
+            "platform": "linux",
+            "arch": "x64",
+            "node": "v22.22.1"
+          },
+          "sampleRate": 48000,
+          "chunkSamples": 480,
+          "chunks": 951,
+          "audioSeconds": 9.506958333333333,
+          "initializationMs": 3.919015,
+          "finishMs": 0.094682,
+          "meanMs": 0.004658444,
+          "p95Ms": 0.008793,
+          "p99Ms": 0.012612,
+          "sustainedRatio": 0.000888179,
+          "maxBacklogMs": 0,
+          "provisional": true
+        },
+        "causality": [
+          {
+            "fraction": 0.25,
+            "kind": "silence",
+            "pass": true
+          },
+          {
+            "fraction": 0.25,
+            "kind": "alternating",
+            "pass": true
+          },
+          {
+            "fraction": 0.5,
+            "kind": "silence",
+            "pass": true
+          },
+          {
+            "fraction": 0.5,
+            "kind": "alternating",
+            "pass": true
+          },
+          {
+            "fraction": 0.75,
+            "kind": "silence",
+            "pass": true
+          },
+          {
+            "fraction": 0.75,
+            "kind": "alternating",
+            "pass": true
+          }
+        ],
+        "targets": {
+          "agreement": false,
+          "coverage": true,
+          "exposure": false,
+          "longestExposure": false,
+          "deadline": false,
+          "causality": true,
+          "sustained": true,
+          "chunkP99": true
+        }
+      },
+      {
+        "example": "winner-audio-dust-score",
+        "referenceKind": "cross-piece-negative-proxy",
+        "referenceUncertainty": "unmeasured",
+        "metrics": {
+          "points": 189,
+          "agreement": 0,
+          "coverage": 1,
+          "deadlineMisses": 1,
+          "wrongReferenceExposure": 1,
+          "longestWrongReferenceSeconds": 9.356958333,
+          "residualSeconds": {
+            "signedMean": null,
+            "absoluteMedian": null,
+            "absoluteP95": null,
+            "absoluteMax": null,
+            "denominator": 0
+          }
+        },
+        "cost": {
+          "machine": {
+            "hostname": "williao-G3-3579",
+            "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+            "cores": 12,
+            "platform": "linux",
+            "arch": "x64",
+            "node": "v22.22.1"
+          },
+          "sampleRate": 48000,
+          "chunkSamples": 480,
+          "chunks": 951,
+          "audioSeconds": 9.506958333333333,
+          "initializationMs": 5.55731,
+          "finishMs": 0.00123,
+          "meanMs": 0.001595677,
+          "p95Ms": 0.001779,
+          "p99Ms": 0.003273,
+          "sustainedRatio": 0.0007443,
+          "maxBacklogMs": 0,
+          "provisional": true
+        },
+        "causality": [
+          {
+            "fraction": 0.25,
+            "kind": "silence",
+            "pass": true
+          },
+          {
+            "fraction": 0.25,
+            "kind": "alternating",
+            "pass": true
+          },
+          {
+            "fraction": 0.5,
+            "kind": "silence",
+            "pass": true
+          },
+          {
+            "fraction": 0.5,
+            "kind": "alternating",
+            "pass": true
+          },
+          {
+            "fraction": 0.75,
+            "kind": "silence",
+            "pass": true
+          },
+          {
+            "fraction": 0.75,
+            "kind": "alternating",
+            "pass": true
+          }
+        ],
+        "targets": {
+          "agreement": false,
+          "coverage": true,
+          "exposure": false,
+          "longestExposure": false,
+          "deadline": false,
+          "causality": true,
+          "sustained": true,
+          "chunkP99": true
+        }
+      },
+      {
+        "example": "digital-silence",
+        "referenceKind": "digital-silence",
+        "referenceUncertainty": "exact-silence",
+        "metrics": {
+          "points": 189,
+          "agreement": 0,
+          "coverage": 1,
+          "deadlineMisses": 1,
+          "wrongReferenceExposure": 1,
+          "longestWrongReferenceSeconds": 9.356958333,
+          "residualSeconds": {
+            "signedMean": null,
+            "absoluteMedian": null,
+            "absoluteP95": null,
+            "absoluteMax": null,
+            "denominator": 0
+          }
+        },
+        "cost": {
+          "machine": {
+            "hostname": "williao-G3-3579",
+            "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+            "cores": 12,
+            "platform": "linux",
+            "arch": "x64",
+            "node": "v22.22.1"
+          },
+          "sampleRate": 48000,
+          "chunkSamples": 480,
+          "chunks": 951,
+          "audioSeconds": 9.506958333333333,
+          "initializationMs": 3.511041,
+          "finishMs": 0.000072,
+          "meanMs": 0.001392509,
+          "p95Ms": 0.001511,
+          "p99Ms": 0.002324,
+          "sustainedRatio": 0.000508616,
+          "maxBacklogMs": 0,
+          "provisional": true
+        },
+        "causality": [
+          {
+            "fraction": 0.25,
+            "kind": "silence",
+            "pass": true
+          },
+          {
+            "fraction": 0.25,
+            "kind": "alternating",
+            "pass": true
+          },
+          {
+            "fraction": 0.5,
+            "kind": "silence",
+            "pass": true
+          },
+          {
+            "fraction": 0.5,
+            "kind": "alternating",
+            "pass": true
+          },
+          {
+            "fraction": 0.75,
+            "kind": "silence",
+            "pass": true
+          },
+          {
+            "fraction": 0.75,
+            "kind": "alternating",
+            "pass": true
+          }
+        ],
+        "targets": {
+          "agreement": false,
+          "coverage": true,
+          "exposure": false,
+          "longestExposure": false,
+          "deadline": false,
+          "causality": true,
+          "sustained": true,
+          "chunkP99": true
+        }
+      }
+    ]
+  },
+  "candidate": {
+    "id": "spectral-follower@1",
+    "examples": [
+      {
+        "example": "winner-positive",
+        "referenceKind": "linear-sync-proxy",
+        "referenceUncertainty": "unmeasured",
+        "metrics": {
+          "points": 189,
+          "agreement": 0.46031746,
+          "coverage": 1,
+          "deadlineMisses": 0.53968254,
+          "wrongReferenceExposure": 0.192370206,
+          "longestWrongReferenceSeconds": 0.55,
+          "residualSeconds": {
+            "signedMean": -0.07018459,
+            "absoluteMedian": 0.070667248,
+            "absoluteP95": 0.591795383,
+            "absoluteMax": 0.891795383,
+            "denominator": 123
+          }
+        },
+        "cost": {
+          "machine": {
+            "hostname": "williao-G3-3579",
+            "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+            "cores": 12,
+            "platform": "linux",
+            "arch": "x64",
+            "node": "v22.22.1"
+          },
+          "sampleRate": 48000,
+          "chunkSamples": 480,
+          "chunks": 951,
+          "audioSeconds": 9.506958333333333,
+          "initializationMs": 49.537954,
+          "finishMs": 0.069735,
+          "meanMs": 0.487754238,
+          "p95Ms": 1.077146,
+          "p99Ms": 1.385009,
+          "sustainedRatio": 0.054009069,
+          "maxBacklogMs": 0,
+          "provisional": true
+        },
+        "causality": [
+          {
+            "fraction": 0.25,
+            "kind": "silence",
+            "pass": true
+          },
+          {
+            "fraction": 0.25,
+            "kind": "alternating",
+            "pass": true
+          },
+          {
+            "fraction": 0.5,
+            "kind": "silence",
+            "pass": true
+          },
+          {
+            "fraction": 0.5,
+            "kind": "alternating",
+            "pass": true
+          },
+          {
+            "fraction": 0.75,
+            "kind": "silence",
+            "pass": true
+          },
+          {
+            "fraction": 0.75,
+            "kind": "alternating",
+            "pass": true
+          }
+        ],
+        "targets": {
+          "agreement": false,
+          "coverage": true,
+          "exposure": false,
+          "longestExposure": false,
+          "deadline": false,
+          "causality": true,
+          "sustained": true,
+          "chunkP99": true
+        }
+      },
+      {
+        "example": "winner-audio-dust-score",
+        "referenceKind": "cross-piece-negative-proxy",
+        "referenceUncertainty": "unmeasured",
+        "metrics": {
+          "points": 189,
+          "agreement": 0.957671958,
+          "coverage": 1,
+          "deadlineMisses": 0.042328042,
+          "wrongReferenceExposure": 0.042748935,
+          "longestWrongReferenceSeconds": 0.2,
+          "residualSeconds": {
+            "signedMean": null,
+            "absoluteMedian": null,
+            "absoluteP95": null,
+            "absoluteMax": null,
+            "denominator": 0
+          }
+        },
+        "cost": {
+          "machine": {
+            "hostname": "williao-G3-3579",
+            "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+            "cores": 12,
+            "platform": "linux",
+            "arch": "x64",
+            "node": "v22.22.1"
+          },
+          "sampleRate": 48000,
+          "chunkSamples": 480,
+          "chunks": 951,
+          "audioSeconds": 9.506958333333333,
+          "initializationMs": 101.043245,
+          "finishMs": 0.001689,
+          "meanMs": 0.481128351,
+          "p95Ms": 1.09697,
+          "p99Ms": 1.334708,
+          "sustainedRatio": 0.058756752,
+          "maxBacklogMs": 0,
+          "provisional": true
+        },
+        "causality": [
+          {
+            "fraction": 0.25,
+            "kind": "silence",
+            "pass": true
+          },
+          {
+            "fraction": 0.25,
+            "kind": "alternating",
+            "pass": true
+          },
+          {
+            "fraction": 0.5,
+            "kind": "silence",
+            "pass": true
+          },
+          {
+            "fraction": 0.5,
+            "kind": "alternating",
+            "pass": true
+          },
+          {
+            "fraction": 0.75,
+            "kind": "silence",
+            "pass": true
+          },
+          {
+            "fraction": 0.75,
+            "kind": "alternating",
+            "pass": true
+          }
+        ],
+        "targets": {
+          "agreement": true,
+          "coverage": true,
+          "exposure": true,
+          "longestExposure": true,
+          "deadline": true,
+          "causality": true,
+          "sustained": true,
+          "chunkP99": true
+        }
+      },
+      {
+        "example": "digital-silence",
+        "referenceKind": "digital-silence",
+        "referenceUncertainty": "exact-silence",
+        "metrics": {
+          "points": 189,
+          "agreement": 1,
+          "coverage": 1,
+          "deadlineMisses": 0,
+          "wrongReferenceExposure": 0,
+          "longestWrongReferenceSeconds": 0,
+          "residualSeconds": {
+            "signedMean": null,
+            "absoluteMedian": null,
+            "absoluteP95": null,
+            "absoluteMax": null,
+            "denominator": 0
+          }
+        },
+        "cost": {
+          "machine": {
+            "hostname": "williao-G3-3579",
+            "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+            "cores": 12,
+            "platform": "linux",
+            "arch": "x64",
+            "node": "v22.22.1"
+          },
+          "sampleRate": 48000,
+          "chunkSamples": 480,
+          "chunks": 951,
+          "audioSeconds": 9.506958333333333,
+          "initializationMs": 36.500327,
+          "finishMs": 0.001444,
+          "meanMs": 0.430947783,
+          "p95Ms": 0.892368,
+          "p99Ms": 1.179968,
+          "sustainedRatio": 0.046948046,
+          "maxBacklogMs": 0,
+          "provisional": true
+        },
+        "causality": [
+          {
+            "fraction": 0.25,
+            "kind": "silence",
+            "pass": true
+          },
+          {
+            "fraction": 0.25,
+            "kind": "alternating",
+            "pass": true
+          },
+          {
+            "fraction": 0.5,
+            "kind": "silence",
+            "pass": true
+          },
+          {
+            "fraction": 0.5,
+            "kind": "alternating",
+            "pass": true
+          },
+          {
+            "fraction": 0.75,
+            "kind": "silence",
+            "pass": true
+          },
+          {
+            "fraction": 0.75,
+            "kind": "alternating",
+            "pass": true
+          }
+        ],
+        "targets": {
+          "agreement": true,
+          "coverage": true,
+          "exposure": true,
+          "longestExposure": true,
+          "deadline": true,
+          "causality": true,
+          "sustained": true,
+          "chunkP99": true
+        }
+      }
+    ]
+  },
+  "comparison": {
+    "baseExposure": 0.7793898925,
+    "candidateExposure": 0.058779785249999994,
+    "absolute": 0.72061010725,
+    "relative": 0.9245823100663317,
+    "regressions": [
+      {
+        "example": "winner-positive",
+        "agreement": -0.42328042399999993,
+        "deadline": 0.42328042400000004
+      },
+      {
+        "example": "winner-audio-dust-score",
+        "agreement": 0.957671958,
+        "deadline": -0.957671958
+      },
+      {
+        "example": "digital-silence",
+        "agreement": 1,
+        "deadline": -1
+      }
+    ],
+    "allTargets": false,
+    "gain": true,
+    "noRegression": false,
+    "decision": "proxy-targets-not-met"
+  },
+  "cpuSeconds": 16.261452,
+  "next": "Inspect the recorded failures; at most one focused revision remains in this first sub-batch.",
+  "formalRetention": "not assessed",
+  "microphoneQualification": "not assessed",
+  "privateRecordsSha256": "940105aa60f48ac2edc480963affd86084e266af8d2d80841054a5d5430dd954",
+  "privateEvaluationsSha256": "a71e72c288f69f96506b6a44234eb226e6b56cf80a88b7ed0890234dcb720b65"
+}

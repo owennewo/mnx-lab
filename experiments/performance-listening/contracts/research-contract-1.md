@@ -20,14 +20,19 @@ bars of The Winner Takes It All, then Dust in the Wind; expand to eight and twel
 only when the contract's measured gates and review requirements are met. There is
 no change to the frozen v1 instrument or experiment 001.
 
-## What remains before comparison
+## Subsequent user-directed development amendment
 
-Source identity, solo-guitar/score/route correspondence, timing bounds and control
-labels still need independent review. The private review packet and its null review
-fields are not approved labels. Freeze a separately versioned manifest only after
-those checks. Implement and independently check the versioned real-audio evaluator
-with annotation uncertainty before judging these clips.
+The user then instructed us to use `sync.json` and interpolation as “good enough” for
+initial development. [Sync-proxy development 1](sync-proxy-development-1.md) records
+that instruction and its bounded implementation without rewriting the approved draft.
+Manual beat annotation is not a prerequisite for this approximate-development loop.
+[Experiment 002](../reports/002-winner-sync-proxy.html) completed two candidate trials
+on a fixed proxy reference; neither passed.
 
+## What remains for stronger claims
+
+Independent timing bounds and control distinguishability remain necessary for the
+original independently bounded comparisons. The separate v2 instrument implements
+those semantics; approximate proxy runs do not silently count as that evidence.
 Reserved retention and final microphone acceptance groups are still unallocated.
 Contract approval alone is neither candidate retention nor Studio qualification.
-This is an approval event, not a new assessment; experiment 002 is not assigned.

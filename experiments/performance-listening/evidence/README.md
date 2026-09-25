@@ -1,12 +1,16 @@
 # Real evidence — first four bars
 
-Preparation record, 2026-09-25. **No real golden is frozen and no candidate has run.**
+Preparation record and subsequent outcome, 2026-09-25. **Experiment 002 completed
+on a frozen approximate sync-reference set; neither candidate passed.**
+[The report](../reports/002-winner-sync-proxy.html) records the full result. The user
+instructed us to interpolate `sync.json`; [the amendment](../contracts/sync-proxy-development-1.md)
+removes manual beat annotation as a prerequisite for initial development.
 The user selected The Winner Takes It All first, then Dust in the Wind, four performed
 bars each, expanding only after measured success. Both pieces and every later crop
 remain development evidence. This replaces the earlier five-title shortlist for the
 next batch; it does not rewrite the historical R1 inventory.
 
-## Ready to review
+## Reviewed sources
 
 The private packet is `/home/williao/dev/mnx-listening-data/real-evidence-01/index.html`.
 It contains two playable four-bar WAVs, original score links and first-window anchor
@@ -22,8 +26,10 @@ only identities, aggregate diagnostics, crop boundaries and hashes.
 Windows come from cached bar boundaries rounded to the nearest decoded output sample.
 That rounding does not establish annotation precision. Each WAV is mono PCM16; the
 sample count was checked after decoding/resampling and trimming. The encoded sources
-and WAVs have separate SHA-256 identities. Decoder time zero has not yet been independently
-reconciled with video/sync time zero, so these remain review crops rather than bench inputs.
+and WAVs have separate SHA-256 identities. Decoder time zero has not been independently
+reconciled with video/sync time zero. Experiment 002 uses the fixed reviewed crop and
+sidecar origin as an explicitly approximate development reference; it does not
+claim independently calibrated timing.
 
 ## Technical findings
 
@@ -35,7 +41,9 @@ four bars are wrong, nor that any later bar can be admitted without checking it.
 
 The two first-window anchor spans imply approximately 101 and 189 quarter-note BPM,
 respectively. Those are boundary-derived averages, not verified beat-tempo labels.
-Do not use them as an unexamined listener handoff or assume local variation is bounded.
+Experiment 002 explicitly supplies 101 BPM to both listeners and controls, computed
+by rounding Winner's anchor average before either run. Local tempo bounds are not
+independently verified by this average.
 
 Initial audio requests with yt-dlp 2026.07.04 returned HTTP 403. Following the user's
 suggestion, `uv tool upgrade yt-dlp` installed 2026.08.19 and both downloads succeeded.
@@ -44,29 +52,28 @@ for provenance; the review and proposed assessment window are limited to the fir
 four bars. This is private evaluation at the user's request, not a redistribution
 licence or proof of recording conditions.
 
-## Human evidence still needed
+## Human review and subsequent development direction
 
-For each four-bar excerpt, record who checked it, when, and the exact source hashes.
-Confirm that it is solo guitar, that the intended score and performed route match,
-and that the crop begins/ends at the intended bar boundaries. Check every beat or
-other landmark needed for the labelled trajectory; supply independently observed
-bounds rather than simply accepting the cached decimal timestamps. Check the initial
-wrong-score control against the other piece and mark its first distinguishing evidence.
-Unresolved interiors remain unknown. A high-level “sounds right” is not a precision bound.
-
-The user subsequently confirmed solo guitar and four bars for both clips;
+The user confirmed solo guitar and four bars for both clips;
 [source-review-1.json](source-review-1.json) pins that exact statement to the clip
-hashes. It does not assert unmentioned timing or route facts. The original private
-`review.json` keeps its preparation-time review placeholders as null. It does not write approvals.
-Preserve the cached sidecars. Record corrections separately with their evidence and
-source identities; a later accepted label set will be a new version. No pitch/onset
-assessment labels are being inferred from the score.
+hashes. Winner is easier and goes first. The statement does not assert every beat's
+precision. The original private `review.json` retains its preparation-time null
+review placeholders; these are not silently rewritten as approvals.
 
-The user approved [research contract 1](../contracts/research-contract-1.md) on
-2026-09-25, including its numerical gates and progression 4 → 8 → 12 bars. Source
-selection and intended use are confirmed; independent source/label review and set
-freezing remain separate acts. The separate [v2 instrument](../contracts/instrument-v2.md) now implements bounded
-real-audio evaluation without changing v1; it refuses unchecked recording inputs.
+After approving [research contract 1](../contracts/research-contract-1.md), the user
+instructed us to use the existing sync with interpolation as good enough. The
+[development amendment](../contracts/sync-proxy-development-1.md) records that instruction.
+A separate private set pins the crop, score, original sync and approximate reference.
+Manual beat review is not required for that set. Both candidate versions use it
+unchanged; neither receives the sync anchors. No note-level assessment labels are
+inferred from the score.
+
+Independent precision, exact score/crop correspondence and wrong-score distinguishing
+evidence remain relevant to stronger qualification claims. The separate
+[v2 instrument](../contracts/instrument-v2.md) handles bounded labels when supplied;
+it is not the proxy evaluator used in experiment 002. Preserve cached sidecars and
+record any independently justified correction as a new set version, never a way to
+retroactively turn a failed run into a pass.
 
 ## Reproduce the private preparation
 
@@ -93,17 +100,17 @@ change; do not replace frozen experiment evidence with it.
 
 ## Stage status
 
-Contracts, instrument-v1 and the synthetic pipeline remain complete. Contract 1 is
-approved and v2 instrument/decision checks pass. Solo guitar and four bars are confirmed;
-independent beat/route/control labels and a frozen real manifest remain missing.
-[The bar-anchor precision calculation](bar-anchor-precision-1.json) shows why cached
-bar counts cannot supply those labels. No audio-driven comparison has run and
-experiment 002 remains unassigned. See the [loop readiness report](../reports/loop-readiness.html).
+The first real-audio development loop is complete; see
+[002 — Winner with sync interpolation](../reports/002-winner-sync-proxy.html).
+Two spectral versions improve control rejection but regress on positive following.
+The bounded sub-batch is closed, with no retained candidate or positive Dust expansion.
+The [bar-anchor sensitivity calculation](bar-anchor-precision-1.json) remains historical
+analysis of guaranteed precision, not measured sync error and not a proxy eligibility gate.
 
-## Playback and independent beat review
+## Playback and optional independent beat review
 
-The private `listen.html` embeds the review WAVs, avoiding blocked `file://` media
-references. `beat-review.html` adds waveform seeking, playback speed and blank beat
-bounds with a draft JSON export. Both are generated locally, outside git. Commands,
-limitations and the local-only server are in the
-[readiness report source](../reports/loop-readiness.md#private-review-tools).
+The private `002-winner-sync-proxy.html` embeds Winner and recorded timing traces.
+`listen.html` embeds both reviewed WAVs. `beat-review.html` offers waveform seeking,
+playback speed and blank independent beat bounds for later precision work; it is not
+a requirement for current development. Commands and UI-check limitations are in the
+[readiness report](../reports/loop-readiness.md#private-playback-and-optional-precision-review).

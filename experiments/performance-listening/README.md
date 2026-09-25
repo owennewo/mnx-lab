@@ -14,33 +14,31 @@ Two documents govern the work. Read them in this order:
    contracts, components, responsibilities and construction order that implement
    that approach.
 
-The first step (A–G and R1) is complete. Open
-[001 — Initial two-scale assessment](reports/001-initial-two-scale.html) in a browser
-for the summary, full run report and real-source inventory. It works offline with no
-server. [Report names and regeneration](reports/README.md) explain the numbering and
-how the HTML relates to the original run records.
+The first real-audio development loop is complete. Open
+[002 — Winner with sync interpolation](reports/002-winner-sync-proxy.html) for its
+results and a link to private embedded playback with timing traces. Two causal
+spectral followers were compared with the clock on the same four-bar Winner clip,
+wrong-score probe and silence. Neither passes: control rejection improves, but
+positive following regresses. Winner stays at four bars; positive Dust is next only
+after Winner passes. No candidate is retained or microphone-qualified.
 
-The first clock run reproduced every pre-registered prediction: matching scores pass,
-while silence, a wrong tune and a faster performance expose the clock's false claims.
-This checks the measurement pipeline; it does not demonstrate listening capability.
-The v1 instrument and synthetic set are frozen. That run used provisional research
-contract 0; the next milestone now has approved contract 1. No real-source set is ready
-to freeze.
+The user directed us to use `sync.json` with interpolation for this initial development
+work. [That direction and the bounded plan](contracts/sync-proxy-development-1.md)
+are recorded separately from the unchanged approved contract 1. Manual beat marking
+is not a prerequisite for this approximate-development experiment. The next question
+is to diagnose score-template discrimination at a supplied alignment before another
+end-to-end tracking trial; see [the research log](RESEARCH_LOG.md).
 
-Current work: [four-bar evidence and contract review (HTML)](reports/real-evidence-review.html)
-and [real-evidence preparation](evidence/README.md) has private four-bar
-review clips for The Winner Takes It All and Dust in the Wind. The
-[research contract 1](contracts/research-contract-1.md) was approved by the user on
-2026-09-25. The user has confirmed solo guitar and four bars. The separate v2
-instrument, paired runner and decision rule are checked; independent timing/route
-and control labels remain prerequisites for the first real comparison. Open the
-[loop readiness report (HTML)](reports/loop-readiness.html) for the outcome and next
-review step. Bar anchors alone do not meet the approved precision/coverage requirement.
+[001 — Initial two-scale assessment](reports/001-initial-two-scale.html) remains the
+frozen synthetic instrument check and approved R1 inventory. Its matching clock
+predictions establish harness behavior, not listening. The separate uncertainty-aware
+[v2 instrument](contracts/instrument-v2.md) remains available for independently bounded
+labels and formal comparisons.
 
-[FIRST_STEP.md](FIRST_STEP.md) records the work and its learnings.
-[RESEARCH_LOG.md](RESEARCH_LOG.md) holds the current state and next question;
-[ledger.md](ledger.md) records the runs. Audio-driven candidates and retention
-comparisons follow under approved research contract 1 once its prerequisites are met.
+[Report names and regeneration](reports/README.md) explain the numbered HTML reports.
+[The ledger](ledger.md) preserves each run; [evidence preparation](evidence/README.md)
+records private source provenance. [The readiness page](reports/loop-readiness.html)
+now points to the completed development loop and distinguishes later qualification.
 
 Earlier work is retained in [archive/](archive/ARCHIVED.md) for reference when a
 specific question calls for it.

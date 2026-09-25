@@ -1,101 +1,72 @@
-# Research loop: instrument ready, real comparison awaiting timing evidence
+# Research loop: first real-audio experiment complete
 
-Research contract 1 is approved. The user confirmed that both selected clips are solo
-guitar and contain four bars, and reiterated that Winner is easier. Winner remains
-first; Dust follows only after the applicable Winner gates pass.
+[002 — Winner with sync interpolation](002-winner-sync-proxy.html) now records the
+completed development loop: fixed evidence, initial spectral follower, one focused
+revision and a stopping decision. Neither candidate passes. Stay at Winner's first
+four bars; positive Dust and longer excerpts have not been advanced.
 
-The next measuring apparatus and decision procedure are implemented and checked.
-**We have not completed a real-performance research loop or qualified a listener.**
-There is no new audio-driven candidate result, no retained candidate and no experiment
-002 yet. This is an instrument/readiness checkpoint, not a numbered assessment.
+The user directed us to use `sync.json` with interpolation as good enough for initial
+development. [The development amendment](../contracts/sync-proxy-development-1.md)
+records that direction. Manual beat annotation is not a prerequisite for this loop.
+The approved contract 1 and its later formal retention/microphone requirements remain
+preserved; neither retention nor qualification is claimed.
 
-## What is now implemented
+## What the instrument checkpoint established
 
-- A separate v2 real-evidence format with source hashes, independent review provenance,
-  bounded position uncertainty, acoustic alternatives and explicit unknown regions.
-- Conservative correctness, rejection, coverage and deadline bounds, plus continuous
-  wrong/false exposure that a late correction cannot erase.
-- A paired development runner that checks reviewed score/audio/review hashes before
-  candidate creation, measures processing costs and checks both silent and non-silent
-  futures for complete-record prefix invariance.
-- The approved decision rule: provisional development selection, reject or inconclusive;
-  formal retention additionally requires independent reserved evidence and access history.
-- A loop driver that reports the next action and remaining budget without extending it.
+Before experiment 002, a separate v2 instrument was implemented and checked for
+independently bounded real-audio labels. It supports position uncertainty, acoustic
+alternatives, unknown regions, causal paired comparison and conservative selection.
+The [v2 contract](../contracts/instrument-v2.md), [hand-worked oracle](../bench/oracle-v2/README.md)
+and [recorded checkpoint](../bench/oracle-v2/recorded/checkpoint.json) remain unchanged.
+They prove measuring-apparatus behavior, not a listening result.
 
-The [v2 contract](../contracts/instrument-v2.md) states exact semantics and limitations.
-The [oracle](../bench/oracle-v2/README.md) contains hand-worked arithmetic.
-The [recorded checkpoint](../bench/oracle-v2/recorded/checkpoint.json) pins sources and
-records five evaluator cases and three decision-rule cases. Those decision-rule inputs
-stipulate cost and causality; they are not measurements of a listener. Separate tests
-exercise actual paired chunk delivery and reject altered or unreviewed inputs.
-Experiment 001 and every frozen v1 source/contract remain unchanged.
+Experiment 002 instead uses the explicitly declared `sync-proxy-evaluator@1` with
+unmeasured interpolation precision and unchanged numerical development targets.
+It keeps approximation visible rather than pretending it has independently bounded
+beat labels. The frozen v1 instrument and experiment 001 also remain unchanged.
 
-## Why four bars are not yet precise following labels
+## What the 31.25% calculation meant
 
-The [source confirmation](../evidence/source-review-1.json) establishes solo guitar
-and four bars. It does not establish every beat time, exact score/route correspondence,
-or when the other piece becomes audibly distinguishable as a wrong-score control.
+The [anchor sensitivity calculation](../evidence/bar-anchor-precision-1.json) asked
+how much interior precision could be guaranteed if cached endpoints were exact and
+continuous local speed could vary anywhere within 80–120% of nominal tempo. Under
+those assumptions, bar anchors guaranteed the specified uncertainty envelope for
+31.25% of each clip, below the original 80% independently bounded-label requirement.
 
-The [anchor sensitivity calculation](../evidence/bar-anchor-precision-1.json) asks an
-optimistic question: suppose cached bar endpoints were exact and continuous local
-speed were known to stay within 80–120% of the nominal tempo. How much of each clip
-could the bar endpoints alone locate within a ±0.125-quarter uncertainty envelope?
+**That was not a measurement of sync.json accuracy.** It did not show that the real
+anchors or interpolated positions were wrong. Applying it as a blocker to the first
+approximate development loop was unnecessarily restrictive; the user's direction
+resolves that. Keep sync unchanged and investigate early/late differences as evidence,
+without automatically blaming either the musician or the reference.
 
-| Source | Optimistic answerable fraction | Contract requires |
-|---|---|---|
-| Winner, four bars | 31.25% | At least 80% |
-| Dust, four bars | 31.25% | At least 80% |
-
-Neither assumption is independently established, so 31.25% is an assumption result,
-not accepted label coverage. Even that optimistic calculation is insufficient. A
-candidate's own alignment cannot fill the missing truth; doing so would make it judge
-itself. The next action is independent beat/landmark review, starting with Winner.
-
-## Private review tools
+## Private playback and optional precision review
 
 The private directory is `/home/williao/dev/mnx-listening-data/real-evidence-01/`.
-`listen.html` embeds the two WAVs and works without a server. `beat-review.html` embeds
-them alongside waveform seeking, slower playback, separate suggested and observed beat
-times, and a draft JSON export. Observations start blank. Saving a draft does not approve
-labels, change cached anchors or freeze a golden. The original `index.html` and
-`review.json` preserve source/anchor provenance.
+`002-winner-sync-proxy.html` embeds Winner's WAV and the three recorded timing traces.
+`listen.html` embeds both reviewed four-bar clips. `beat-review.html` remains available
+if independent timing bounds become useful for stronger claims; it is optional for
+this development stage. Its blank observation fields do not mean the proxy run is blocked.
 
-Playback over localhost was verified in Chrome at 9.506958 and 5.079896 seconds.
-Both offline exports embed those same clip hashes. Browser automation blocks `file://`
-navigation, so their offline UI was checked structurally and for script syntax, but
-was not interactively verified through that browser tool.
+Playback over localhost was previously verified in Chrome at 9.506958 and 5.079896
+seconds. The offline pages embed those exact WAVs; exporters check identities and
+script syntax is checked separately. Browser automation blocks `file://` navigation,
+so the offline UI has not been interactively verified through that tool.
 
-Rebuild the private offline pages from the repository root:
+Rebuild the private pages from the repository root:
 
 ```sh
+node experiments/performance-listening/reports/export-private-sync-proxy.mjs /home/williao/dev/mnx-listening-data/real-evidence-01
 node experiments/performance-listening/reports/export-private-listening.mjs /home/williao/dev/mnx-listening-data/real-evidence-01
 node experiments/performance-listening/reports/export-beat-review.mjs /home/williao/dev/mnx-listening-data/real-evidence-01
 ```
 
-For an ordinary browser over HTTP, start the local-only review server and open its
-printed URL; stop it with Ctrl+C when finished:
+For an ordinary browser over HTTP, start the local-only server and stop it with Ctrl+C:
 
 ```sh
 node experiments/performance-listening/reports/serve-private-review.mjs /home/williao/dev/mnx-listening-data/real-evidence-01
 ```
 
-No audio, scores or raw private annotations are committed.
-
-## Remaining work and budget
-
-Independent observed beat bounds, interpolation justification, exact score/crop/time
-origin, nominal tempo/envelope and wrong-score distinguishing evidence are still needed.
-After that, freeze the Winner development manifest, record a bounded candidate
-hypothesis and version, and compare it with clock-follower@1. Apply the same frozen
-candidate to reviewed Dust only when Winner passes; extend bar count only under the
-approved progression. The replay adapter currently requires an independently supplied
-integer nominal BPM for the unchanged clock floor; it never silently rounds a handoff.
-
-The candidate batch remains unused: zero new candidate versions, zero candidate/set
-assessments and zero candidate-run CPU time charged. Instrument tests are construction
-checks. Annotation-practice research used two of six sources and one of two bounded
-questions. No reserved or final-acceptance set has been allocated or inspected.
-
-Formal retention and live-microphone qualification cannot be claimed from these two
-development recordings. They still need their separately reviewed disjoint groups,
-interruption/noise evidence and physical microphone latency measurements.
+No audio, scores or per-frame private references are committed. Full results, consumed
+budget and the next diagnostic question are in experiment 002. The first research
+cycle is closed with a failed hypothesis; the useful microphone-following milestone
+is still in development.
