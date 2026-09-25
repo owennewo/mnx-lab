@@ -1,0 +1,55 @@
+{
+  "id": "33c-Spanners-Slurs",
+  "sourceSha256": "103a6a750f7de792d5dd7684a7f724278327ebe78f94a57d58f4d45b5e21fcda",
+  "testClass": "feature",
+  "description": "A note can be the end of one slur and the start of a new slur. Also, in MusicXML, nested slurs are possible like in the second measure where one slur goes over all four notes, and another slur goes from the second to the third note. The third bar demonstrates a cross-voice slur starting at the first beat in the lower voice and ending on the third beat in the upper voice.",
+  "views": [
+    {
+      "scrollTarget": "frame",
+      "visibleWidth": 1060,
+      "visibleHeight": 870,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0,
+          1,
+          2
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [],
+      "scrollWidth": 1060,
+      "scrollHeight": 870,
+      "clientWidth": 1060,
+      "clientHeight": 870,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "suppliedLibraryTitle": "33c-Spanners-Slurs",
+  "makeCurrentError": null,
+  "entryPath": "Local operator ingest: GP seed + unmodified XML original; Save → Versions → View XML → Make current",
+  "importError": null,
+  "viewingOriginal": false,
+  "editingSuspended": false,
+  "warnings": [],
+  "importedDocumentSha256": "01776e534cfc909d183401c06ef587a2d11b0d2b39b9c3e824a335f7773da360",
+  "displayOptions": {
+    "lyrics": "all",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

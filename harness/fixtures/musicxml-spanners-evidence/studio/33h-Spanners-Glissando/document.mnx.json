@@ -1,0 +1,608 @@
+{
+  "mnx": {
+    "version": 1
+  },
+  "global": {
+    "measures": [
+      {
+        "key": {
+          "fifths": 0
+        }
+      },
+      {},
+      {},
+      {},
+      {
+        "barline": {
+          "type": "final"
+        }
+      }
+    ],
+    "lyrics": {
+      "lineOrder": [
+        "1"
+      ]
+    }
+  },
+  "parts": [
+    {
+      "id": "P1",
+      "name": "Instrument",
+      "measures": [
+        {
+          "clefs": [
+            {
+              "clef": {
+                "sign": "G",
+                "staffPosition": -2
+              }
+            }
+          ],
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "default",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "G",
+                        "octave": 4
+                      },
+                      "_x": {
+                        "mnxLab": {
+                          "tab": {
+                            "technique": {
+                              "slide": {
+                                "type": "shift",
+                                "target": "n-1-1-v1-1-0"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "id": "n-1-1-v1-0-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "glissando",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "F",
+                        "octave": 5
+                      },
+                      "id": "n-1-1-v1-1-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "solid",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "G",
+                        "octave": 4
+                      },
+                      "_x": {
+                        "mnxLab": {
+                          "tab": {
+                            "technique": {
+                              "slide": {
+                                "type": "shift",
+                                "target": "n-1-1-v1-3-0"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "id": "n-1-1-v1-2-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "(+text)",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "F",
+                        "octave": 5
+                      },
+                      "id": "n-1-1-v1-3-0"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "dashed",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "G",
+                        "octave": 4
+                      },
+                      "_x": {
+                        "mnxLab": {
+                          "tab": {
+                            "technique": {
+                              "slide": {
+                                "type": "shift",
+                                "target": "n-1-2-v1-1-0"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "id": "n-1-2-v1-0-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "F",
+                        "octave": 5
+                      },
+                      "id": "n-1-2-v1-1-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "dotted",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "G",
+                        "octave": 4
+                      },
+                      "_x": {
+                        "mnxLab": {
+                          "tab": {
+                            "technique": {
+                              "slide": {
+                                "type": "shift",
+                                "target": "n-1-2-v1-3-0"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "id": "n-1-2-v1-2-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "F",
+                        "octave": 5
+                      },
+                      "id": "n-1-2-v1-3-0"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "wavy",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "G",
+                        "octave": 4
+                      },
+                      "_x": {
+                        "mnxLab": {
+                          "tab": {
+                            "technique": {
+                              "slide": {
+                                "type": "shift",
+                                "target": "n-1-3-v1-1-0"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "id": "n-1-3-v1-0-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "F",
+                        "octave": 5
+                      },
+                      "id": "n-1-3-v1-1-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "default",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "G",
+                        "octave": 4
+                      },
+                      "_x": {
+                        "mnxLab": {
+                          "tab": {
+                            "technique": {
+                              "slide": {
+                                "type": "shift",
+                                "target": "n-1-3-v1-3-0"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "id": "n-1-3-v1-2-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "slide",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "F",
+                        "octave": 5
+                      },
+                      "id": "n-1-3-v1-3-0"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "solid",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "G",
+                        "octave": 4
+                      },
+                      "_x": {
+                        "mnxLab": {
+                          "tab": {
+                            "technique": {
+                              "slide": {
+                                "type": "shift",
+                                "target": "n-1-4-v1-1-0"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "id": "n-1-4-v1-0-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "(+text)",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "F",
+                        "octave": 5
+                      },
+                      "id": "n-1-4-v1-1-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "dashed",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "G",
+                        "octave": 4
+                      },
+                      "_x": {
+                        "mnxLab": {
+                          "tab": {
+                            "technique": {
+                              "slide": {
+                                "type": "shift",
+                                "target": "n-1-4-v1-3-0"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "id": "n-1-4-v1-2-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "F",
+                        "octave": 5
+                      },
+                      "id": "n-1-4-v1-3-0"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "dotted",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "G",
+                        "octave": 4
+                      },
+                      "_x": {
+                        "mnxLab": {
+                          "tab": {
+                            "technique": {
+                              "slide": {
+                                "type": "shift",
+                                "target": "n-1-5-v1-1-0"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "id": "n-1-5-v1-0-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "F",
+                        "octave": 5
+                      },
+                      "id": "n-1-5-v1-1-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "lyrics": {
+                    "lines": {
+                      "1": {
+                        "text": "wavy",
+                        "type": "whole"
+                      }
+                    }
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "G",
+                        "octave": 4
+                      },
+                      "_x": {
+                        "mnxLab": {
+                          "tab": {
+                            "technique": {
+                              "slide": {
+                                "type": "shift",
+                                "target": "n-1-5-v1-3-0"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "id": "n-1-5-v1-2-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "F",
+                        "octave": 5
+                      },
+                      "id": "n-1-5-v1-3-0"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "_x": {
+    "mnxLab": {
+      "encoding": {
+        "software": "musicxml-mnx",
+        "version": "0.1.0"
+      }
+    }
+  }
+}

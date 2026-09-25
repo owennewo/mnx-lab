@@ -1,0 +1,53 @@
+{
+  "id": "33k-Tie-Types",
+  "sourceSha256": "67f4d3c8748f2e42c73cf2fcba686fa56485ec2fa2af17f190dfe62abb45c64c",
+  "testClass": "feature",
+  "description": "Varies tie types. In measure 1, there is a cross-voice tie between beat 1 (in voice 1) and beat 2 (in voice 2). On beat 4, there is a enharmonic tie to the first note in measure 2. In measure 2, there are three “arpeggio ties” starting at the sixth, seventh, and eighth eighth note, respectively, tying to a chord on the first beat in measure 3. In measure 4, there is a laissez-vibrer tie on the eighth note.",
+  "views": [
+    {
+      "scrollTarget": "viewer",
+      "visibleWidth": 750,
+      "visibleHeight": 753.125,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0,
+          1,
+          2
+        ],
+        [
+          3
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [],
+      "scrollWidth": 750,
+      "scrollHeight": 753,
+      "clientWidth": 750,
+      "clientHeight": 753,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "importError": null,
+  "warnings": [],
+  "importedDocumentSha256": "f1f72e6e1478cbbc56d37db6a14155e09ca6a4d2dab03c1e3125ce6895badc74",
+  "displayOptions": {
+    "lyrics": "all",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

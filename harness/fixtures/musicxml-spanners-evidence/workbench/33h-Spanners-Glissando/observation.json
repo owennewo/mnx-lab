@@ -1,0 +1,57 @@
+{
+  "id": "33h-Spanners-Glissando",
+  "sourceSha256": "478c3c1e33081506a9c1bdde2556e160565f7dccc9ec604a35daad84f5d2ae11",
+  "testClass": "feature",
+  "description": "All different types of glissando defined in MusicXML. The first two and a half measures contain <glissando> elements with various ‘line-type’ attributes, the rest contains <slide> elements (also with various ‘line-type’ attributes).",
+  "views": [
+    {
+      "scrollTarget": "viewer",
+      "visibleWidth": 750,
+      "visibleHeight": 753.125,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0,
+          1
+        ],
+        [
+          2,
+          3
+        ],
+        [
+          4
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [],
+      "scrollWidth": 750,
+      "scrollHeight": 753,
+      "clientWidth": 750,
+      "clientHeight": 753,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "importError": null,
+  "warnings": [],
+  "importedDocumentSha256": "f227270ca66b2feab0ee0d9c6cbfacfdbb3fa4f5e58d501349a132d739c1af05",
+  "displayOptions": {
+    "lyrics": "all",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide",
+    "selectedVerse": "1"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

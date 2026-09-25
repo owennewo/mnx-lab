@@ -1,0 +1,368 @@
+{
+  "kind": "retained original-file browser evidence",
+  "suiteRevision": "77c19f7e819154c70ca1a1992e80dcda8ff82fea",
+  "applicationCommit": "a63d68d652286045b2c45e1023fe0d7d3e0365a7",
+  "captureScriptSha256": "3380b20e5b203676d93d6b4742916e8f5ecff4322d5a56eac66e158a3c6a6d9f",
+  "files": [
+    {
+      "path": "studio/33a-Spanners/document.mnx.json",
+      "sha256": "51db910233f105d97f89685d93fe707d0c3784b19a0bd8cf60aa1d6f0deb0214"
+    },
+    {
+      "path": "studio/33a-Spanners/notation-0-0.png",
+      "sha256": "471f706d4936c5e07c21597caa9f1801c85e4b0e0ef1fee3e4272a23991fb357"
+    },
+    {
+      "path": "studio/33a-Spanners/notation-0.svg",
+      "sha256": "cc8947903e1260fd63e6fd77af4a02f4a584bf962d67755a39ddda348f0a322d"
+    },
+    {
+      "path": "studio/33a-Spanners/observation.json",
+      "sha256": "093804536b4a469cb21cf349242cbf4cc314ea95331f5426721a8ee66aca9ea2"
+    },
+    {
+      "path": "studio/33b-Spanners-Tie/document.mnx.json",
+      "sha256": "43508fd9e597b58657c240ded5e50587a72cc4a1632055b69587b7319614a2e5"
+    },
+    {
+      "path": "studio/33b-Spanners-Tie/notation-0-0.png",
+      "sha256": "6b225b827ab1db8d57bab904cb97dece7afb4e230ab3c3233f23afa154ef4d33"
+    },
+    {
+      "path": "studio/33b-Spanners-Tie/notation-0.svg",
+      "sha256": "7cb29906a72d2db7246a4dba5417cb80a3b080eb323fa4e1b4ca89911faae041"
+    },
+    {
+      "path": "studio/33b-Spanners-Tie/observation.json",
+      "sha256": "479310b9aa44733230464318648bd971d96069db1698d4c74bc115125c5c39c7"
+    },
+    {
+      "path": "studio/33c-Spanners-Slurs/document.mnx.json",
+      "sha256": "ff6f40da6a49c948ad81da2849dca1544d6d3a80b064de8375a97ed428a9bcef"
+    },
+    {
+      "path": "studio/33c-Spanners-Slurs/notation-0-0.png",
+      "sha256": "a335afb36ca77444119b788d8b961d013f6dba286c9f7b67b41383b716ff7a67"
+    },
+    {
+      "path": "studio/33c-Spanners-Slurs/notation-0.svg",
+      "sha256": "c39928e28be73e0047eeb61a0b2526b3c741ad69ccc1e753cc80cad349a324f9"
+    },
+    {
+      "path": "studio/33c-Spanners-Slurs/observation.json",
+      "sha256": "14fa9b78d9b9e62a8af775ad0668b64e99f663d94dd08b6eafdf923ed4f66537"
+    },
+    {
+      "path": "studio/33d-Spanners-OctaveShifts/document.mnx.json",
+      "sha256": "27b81807eb1d7f46a0f68ea8ff83a453a0c0e14a7a54121dd661c84b90521a5a"
+    },
+    {
+      "path": "studio/33d-Spanners-OctaveShifts/notation-0-0.png",
+      "sha256": "500099bfcfc0912a51e24003819ef89d2af57dd670844daa5a93b339e0de9ab0"
+    },
+    {
+      "path": "studio/33d-Spanners-OctaveShifts/notation-0.svg",
+      "sha256": "b188c4206dbac3565381052b5e5a3567ceb831a9c4b75b20e566df368b49cd4f"
+    },
+    {
+      "path": "studio/33d-Spanners-OctaveShifts/observation.json",
+      "sha256": "1f39e8bc1c5d8a76107389feec870d9d676e7eb0ee7e92efb67f2e5d451c23d0"
+    },
+    {
+      "path": "studio/33e-Spanners-OctaveShifts-InvalidSize/document.mnx.json",
+      "sha256": "7902757478d84f1b336f9726ea4c0ed27a120ae438afc3fcb2fd58f1effa1882"
+    },
+    {
+      "path": "studio/33e-Spanners-OctaveShifts-InvalidSize/notation-0-0.png",
+      "sha256": "3efcbb68a81f6dd77bc48313a19c14481a0e79e2d3f76099918f5f1b51b20c13"
+    },
+    {
+      "path": "studio/33e-Spanners-OctaveShifts-InvalidSize/notation-0.svg",
+      "sha256": "211effba8fb2cdd56b982bdbcef36a1e22a2f5c8e80374a6742df1264bbf67f7"
+    },
+    {
+      "path": "studio/33e-Spanners-OctaveShifts-InvalidSize/observation.json",
+      "sha256": "4900dcc23a5b956b8631172b50079bbb4fb5af7946ee92b315ac80b349e6b356"
+    },
+    {
+      "path": "studio/33f-Trill-EndingOnGraceNote/document.mnx.json",
+      "sha256": "c2dba1afb639d1d5cfa3ae241fd1b7fbaf836d97c85c5921614b0b7419bc16c4"
+    },
+    {
+      "path": "studio/33f-Trill-EndingOnGraceNote/notation-0-0.png",
+      "sha256": "72b40c649a11e0bd2ef135f9271ef010fab06f9fce6968c0e6e0f0d68e5cc455"
+    },
+    {
+      "path": "studio/33f-Trill-EndingOnGraceNote/notation-0.svg",
+      "sha256": "fb0fbf5977f70e8362954a8817e03145cc8dc99eb07f95b1e505e35e09948fc1"
+    },
+    {
+      "path": "studio/33f-Trill-EndingOnGraceNote/observation.json",
+      "sha256": "2b46d013d23c7977195a81cccaad8a19a3364218640790fb2734414e8c81f23e"
+    },
+    {
+      "path": "studio/33g-Slur-ChordedNotes/document.mnx.json",
+      "sha256": "95dd95a9641a8e319d0d0ccccd781e56b9f95941317a7ca0e4f99c77380ea826"
+    },
+    {
+      "path": "studio/33g-Slur-ChordedNotes/notation-0-0.png",
+      "sha256": "0ff2371eee2788e385cde5cb400a39d4c8c6bbd36f67525fb06f16c5aa89b835"
+    },
+    {
+      "path": "studio/33g-Slur-ChordedNotes/notation-0.svg",
+      "sha256": "1bbe28b41547818f791913b69a674c13c0c21ce13162a5ae6ccbb9104ca6975c"
+    },
+    {
+      "path": "studio/33g-Slur-ChordedNotes/observation.json",
+      "sha256": "38cf69dcc9856e351faa9b2c9887a7ad11582ff51fdf72dcbb717c28a0520d09"
+    },
+    {
+      "path": "studio/33h-Spanners-Glissando/document.mnx.json",
+      "sha256": "367cb3c26fe37e08a92dc0e690af529e85109dca1d7d8fced428163eab66f6d8"
+    },
+    {
+      "path": "studio/33h-Spanners-Glissando/notation-0-0.png",
+      "sha256": "ce27f68aab5196f0fdbdd5bee7bec4c888c84f55daaa3a25cff92491e1acf783"
+    },
+    {
+      "path": "studio/33h-Spanners-Glissando/notation-0.svg",
+      "sha256": "b3f8021d6a9285670270f03a4fe70883968edaf598d5fe7a02fb4ddf2f6663bc"
+    },
+    {
+      "path": "studio/33h-Spanners-Glissando/observation.json",
+      "sha256": "f5778dfb935d6164eb0e6d48285fb95ef550b07a6d62ba1d6268a4b369cb377f"
+    },
+    {
+      "path": "studio/33i-Ties-NotEnded/document.mnx.json",
+      "sha256": "ea795e98b0b4632da80362e7ee4cfbc881ec33d7e7b878a264f3c05d73768daf"
+    },
+    {
+      "path": "studio/33i-Ties-NotEnded/notation-0-0.png",
+      "sha256": "e4f8dfad2c734ba5dea782e0308928701df7c0389e76deaaf401bbd26416e798"
+    },
+    {
+      "path": "studio/33i-Ties-NotEnded/notation-0.svg",
+      "sha256": "a96678085ae4a0f91b1ae62d1dcf9a7d0f98c55c06219fb41ac309b6c14abaf3"
+    },
+    {
+      "path": "studio/33i-Ties-NotEnded/observation.json",
+      "sha256": "0ccead49670a0b56971501fb8248d943001337740dc4538ea0c4bff0b2ec0e22"
+    },
+    {
+      "path": "studio/33j-Beams-Tremolos/document.mnx.json",
+      "sha256": "0ffd636dbb41293cd0bf4c2f47b30c084ebdbd40dbf2930c295487947b951450"
+    },
+    {
+      "path": "studio/33j-Beams-Tremolos/notation-0-0.png",
+      "sha256": "46f3e1601102a6c80905f1df4470697f9a89662e9b77705979da8792f6420cef"
+    },
+    {
+      "path": "studio/33j-Beams-Tremolos/notation-0.svg",
+      "sha256": "075e3691621fb77eab829ad98ebb0f25726b5eb807814e38bfd6458777f0934a"
+    },
+    {
+      "path": "studio/33j-Beams-Tremolos/observation.json",
+      "sha256": "27562dbda4bce4467f78ee03b581190406049dfa6c723b70ca88ae3c51ebb786"
+    },
+    {
+      "path": "studio/33k-Tie-Types/document.mnx.json",
+      "sha256": "1c41a6b2fd956d377e671f4236f7d9997432e38e6bab709da2ddc915c3d300af"
+    },
+    {
+      "path": "studio/33k-Tie-Types/notation-0-0.png",
+      "sha256": "71b23922165bebb8a0eae1d20136f0d66455c5bcf64aad24b157d093f69f7478"
+    },
+    {
+      "path": "studio/33k-Tie-Types/notation-0.svg",
+      "sha256": "60ab11c36900198c129647c9763a2df9f65f0edd9b91d63753208581d2a09a36"
+    },
+    {
+      "path": "studio/33k-Tie-Types/observation.json",
+      "sha256": "883ac574f04a0db34f51f6b50f4ae7fa2b338564e9ff54de59c462c1b1e0321e"
+    },
+    {
+      "path": "studio/index.json",
+      "sha256": "c6622f62290dd064fcc4ee787faea87060fc2b80508f7e7beb248d3ceca8cde0"
+    },
+    {
+      "path": "workbench/33a-Spanners/document.mnx.json",
+      "sha256": "51db910233f105d97f89685d93fe707d0c3784b19a0bd8cf60aa1d6f0deb0214"
+    },
+    {
+      "path": "workbench/33a-Spanners/notation-0-0.png",
+      "sha256": "061f468b9c158ec21a8293c12b986559be142368af9677a1775f3d69919212c9"
+    },
+    {
+      "path": "workbench/33a-Spanners/notation-0.svg",
+      "sha256": "722d04222cf92cc746c7ef2c23ceb05ad03f3656f0f84c053cb281d9e9b16624"
+    },
+    {
+      "path": "workbench/33a-Spanners/observation.json",
+      "sha256": "5bed0e05154860e967894792e926073d295e1f2c322ef30cc4ea6b82630db740"
+    },
+    {
+      "path": "workbench/33b-Spanners-Tie/document.mnx.json",
+      "sha256": "43508fd9e597b58657c240ded5e50587a72cc4a1632055b69587b7319614a2e5"
+    },
+    {
+      "path": "workbench/33b-Spanners-Tie/notation-0-0.png",
+      "sha256": "9c1f0db8170bab2cfc03da183faa28d7845b6b7666508c71daca2d670d7181f5"
+    },
+    {
+      "path": "workbench/33b-Spanners-Tie/notation-0.svg",
+      "sha256": "ec4528785d0ea00b3c45c576fd78ce0499262d6fda7963856ec6b74bb5cc116f"
+    },
+    {
+      "path": "workbench/33b-Spanners-Tie/observation.json",
+      "sha256": "bb3a533255a880f6b05c1d995fcb142c1a59a2abb38c6eb0d5da60d5e2a549a6"
+    },
+    {
+      "path": "workbench/33c-Spanners-Slurs/document.mnx.json",
+      "sha256": "ff6f40da6a49c948ad81da2849dca1544d6d3a80b064de8375a97ed428a9bcef"
+    },
+    {
+      "path": "workbench/33c-Spanners-Slurs/notation-0-0.png",
+      "sha256": "66033a3c3e6eaba239b4a1a3734c681ddcc915d2ca88579f14de58d867ca065f"
+    },
+    {
+      "path": "workbench/33c-Spanners-Slurs/notation-0.svg",
+      "sha256": "2c07b7c26797e87f95a2f64f4d33bb6c82de983e99cad26c6807598a86c3ad86"
+    },
+    {
+      "path": "workbench/33c-Spanners-Slurs/observation.json",
+      "sha256": "864616a128679b308c73cb6ce533ecae25b7814209ec1c313ff4ecb4955778f7"
+    },
+    {
+      "path": "workbench/33d-Spanners-OctaveShifts/document.mnx.json",
+      "sha256": "27b81807eb1d7f46a0f68ea8ff83a453a0c0e14a7a54121dd661c84b90521a5a"
+    },
+    {
+      "path": "workbench/33d-Spanners-OctaveShifts/notation-0-0.png",
+      "sha256": "9ca5a9ce2161d27d5a11f5d1d61d8401fc9e6fef82bdc86deb63551d6d9a6acd"
+    },
+    {
+      "path": "workbench/33d-Spanners-OctaveShifts/notation-0.svg",
+      "sha256": "554c970c1af7d75f91342e08ee510dbf474609cae1a0d0ca7f014af0d1af2721"
+    },
+    {
+      "path": "workbench/33d-Spanners-OctaveShifts/observation.json",
+      "sha256": "03c9700c6ae9f15483e248061d33756d732464adbc7548a3a436d80a6d6d84a0"
+    },
+    {
+      "path": "workbench/33e-Spanners-OctaveShifts-InvalidSize/document.mnx.json",
+      "sha256": "7902757478d84f1b336f9726ea4c0ed27a120ae438afc3fcb2fd58f1effa1882"
+    },
+    {
+      "path": "workbench/33e-Spanners-OctaveShifts-InvalidSize/notation-0-0.png",
+      "sha256": "6e2c5c5d5edfd103e2c9cf4e691db31a7b15e21b42b470ced7d13db82f8d2d0f"
+    },
+    {
+      "path": "workbench/33e-Spanners-OctaveShifts-InvalidSize/notation-0.svg",
+      "sha256": "21aafa3abc4e7dfab7fe338751ba54319db90a9405f07df572f8f8f7fad5fa1a"
+    },
+    {
+      "path": "workbench/33e-Spanners-OctaveShifts-InvalidSize/observation.json",
+      "sha256": "7b79760a1402d10a28622b10936ed261057579bc592b0e43a11b6dce743b9d88"
+    },
+    {
+      "path": "workbench/33f-Trill-EndingOnGraceNote/document.mnx.json",
+      "sha256": "c2dba1afb639d1d5cfa3ae241fd1b7fbaf836d97c85c5921614b0b7419bc16c4"
+    },
+    {
+      "path": "workbench/33f-Trill-EndingOnGraceNote/notation-0-0.png",
+      "sha256": "e21a766cff7b7f797c45644a81c921d0c82d86c8a8c4c188ca23543c595d5af1"
+    },
+    {
+      "path": "workbench/33f-Trill-EndingOnGraceNote/notation-0.svg",
+      "sha256": "65e60826183d0555dad760445fee54f868fc2607d9807fc7196fbf4996e95471"
+    },
+    {
+      "path": "workbench/33f-Trill-EndingOnGraceNote/observation.json",
+      "sha256": "645bbd49a61b5d2a9a9fb16cde8bb3f30ed7a90a7beeb966c94f688758b1d567"
+    },
+    {
+      "path": "workbench/33g-Slur-ChordedNotes/document.mnx.json",
+      "sha256": "95dd95a9641a8e319d0d0ccccd781e56b9f95941317a7ca0e4f99c77380ea826"
+    },
+    {
+      "path": "workbench/33g-Slur-ChordedNotes/notation-0-0.png",
+      "sha256": "05204dbc42381926affd72483b10862cf18036135add2e4f65e1c9384b3fcecd"
+    },
+    {
+      "path": "workbench/33g-Slur-ChordedNotes/notation-0.svg",
+      "sha256": "cd9ffd1a8498a8ca46431e8e246a878e0e7c6c8e612db52d847502fc8ae69738"
+    },
+    {
+      "path": "workbench/33g-Slur-ChordedNotes/observation.json",
+      "sha256": "1946d563fd1c169c5f199f2f8ddd86b28ecf17b86fb374250e55c115e9a5fb09"
+    },
+    {
+      "path": "workbench/33h-Spanners-Glissando/document.mnx.json",
+      "sha256": "367cb3c26fe37e08a92dc0e690af529e85109dca1d7d8fced428163eab66f6d8"
+    },
+    {
+      "path": "workbench/33h-Spanners-Glissando/notation-0-0.png",
+      "sha256": "941219bdb5588cd4bdca0359f6c78a9bcd020fcc9dec84102fc528491c06bf32"
+    },
+    {
+      "path": "workbench/33h-Spanners-Glissando/notation-0.svg",
+      "sha256": "db942b117aa87a3dac07ea8762364d883a1285a133b8f70cf2357ab69fa598e5"
+    },
+    {
+      "path": "workbench/33h-Spanners-Glissando/observation.json",
+      "sha256": "870765847d691ca89af7908399d69fb99a09403be50312292185376b921969c4"
+    },
+    {
+      "path": "workbench/33i-Ties-NotEnded/document.mnx.json",
+      "sha256": "ea795e98b0b4632da80362e7ee4cfbc881ec33d7e7b878a264f3c05d73768daf"
+    },
+    {
+      "path": "workbench/33i-Ties-NotEnded/notation-0-0.png",
+      "sha256": "5cbebe029a430eac7e86dda6439030287d178a23eb6208c3e7524b210c2b098e"
+    },
+    {
+      "path": "workbench/33i-Ties-NotEnded/notation-0.svg",
+      "sha256": "f8e41f78d2391e830b162a8ef2255d0adecf228d66a700f434f3c853597501aa"
+    },
+    {
+      "path": "workbench/33i-Ties-NotEnded/observation.json",
+      "sha256": "902f36b805ebab76cf0e782344a3e78d1bfc604ff5ed346573df71fb41071083"
+    },
+    {
+      "path": "workbench/33j-Beams-Tremolos/document.mnx.json",
+      "sha256": "0ffd636dbb41293cd0bf4c2f47b30c084ebdbd40dbf2930c295487947b951450"
+    },
+    {
+      "path": "workbench/33j-Beams-Tremolos/notation-0-0.png",
+      "sha256": "5146799f6130b970c595a74d51d59d80390197c6744b900aeaa0d634c76f23b6"
+    },
+    {
+      "path": "workbench/33j-Beams-Tremolos/notation-0.svg",
+      "sha256": "a3599132095818fb1c1c8b91acac54d887b91aa595806a4e5ec1cefb7b5b44c3"
+    },
+    {
+      "path": "workbench/33j-Beams-Tremolos/observation.json",
+      "sha256": "664968a3f923e8b15238c37eeb15c70487e92e2e19900bc146d34def06665e26"
+    },
+    {
+      "path": "workbench/33k-Tie-Types/document.mnx.json",
+      "sha256": "1c41a6b2fd956d377e671f4236f7d9997432e38e6bab709da2ddc915c3d300af"
+    },
+    {
+      "path": "workbench/33k-Tie-Types/notation-0-0.png",
+      "sha256": "c311f8405229373d8bc5d0548832d0237dd0f8f3a2b80b0b16b183d95a50dfbc"
+    },
+    {
+      "path": "workbench/33k-Tie-Types/notation-0.svg",
+      "sha256": "1b73a8c6d08d815d5a5a0d5f0bd25d32b9359d351b4700640e30ef4f54bfab40"
+    },
+    {
+      "path": "workbench/33k-Tie-Types/observation.json",
+      "sha256": "830cc780489f53fc93446dbbcb4a3ab6b004122b6c9a98ef781dcdc47c00f4c6"
+    },
+    {
+      "path": "workbench/index.json",
+      "sha256": "25b7f1311e8cdffb142af6c5d15c7037d4aab5e7565e614c3a80955dae559d77"
+    }
+  ]
+}

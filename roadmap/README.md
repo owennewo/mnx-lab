@@ -56,6 +56,7 @@ proposals that name their campaign.
 - **[core-musicxml-grace-fidelity.md](proposed/core-musicxml-grace-fidelity.md)** — MusicXML campaign item 32: draw grace-origin links and cross-staff graces, and resolve zero-time dynamic attachment from the eight 24-series originals.
 - **[core-musicxml-direction-fidelity.md](proposed/core-musicxml-direction-fidelity.md)** — MusicXML campaign item 33: preserve timed, multiple and compound direction marks, metric relations, above dynamics and source signs from the five 31-series originals.
 - **[core-musicxml-notation-fidelity.md](proposed/core-musicxml-notation-fidelity.md)** — MusicXML campaign item 34: restore numbered arpeggios, non-arpeggio brackets, fermata shapes and representable event marks; diagnose the 32-series harmonic, bend and specialist-notation losses.
+- **[core-musicxml-spanner-fidelity.md](proposed/core-musicxml-spanner-fidelity.md)** — MusicXML campaign item 35: valid/invalid ottava ranges, cross-voice and enharmonic ties/slurs, gliss and slide styles, and double-note tremolo from 33a–33k.
 
 
 

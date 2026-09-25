@@ -1,0 +1,159 @@
+{
+  "mnx": {
+    "version": 1
+  },
+  "global": {
+    "measures": [
+      {
+        "key": {
+          "fifths": 0
+        },
+        "time": {
+          "count": 4,
+          "unit": 4,
+          "display": "common"
+        },
+        "barline": {
+          "type": "final"
+        }
+      }
+    ]
+  },
+  "parts": [
+    {
+      "id": "P1",
+      "name": "MusicXML Part",
+      "measures": [
+        {
+          "clefs": [
+            {
+              "clef": {
+                "sign": "G",
+                "staffPosition": -2
+              }
+            }
+          ],
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "G",
+                        "octave": 4
+                      },
+                      "id": "n-1-1-v1-0-0"
+                    },
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-1-v1-0-1"
+                    },
+                    {
+                      "pitch": {
+                        "step": "G",
+                        "octave": 5
+                      },
+                      "id": "n-1-1-v1-0-2"
+                    }
+                  ],
+                  "id": "e-1-v1-0",
+                  "slurs": [
+                    {
+                      "side": "up",
+                      "target": "e-1-v1-2",
+                      "startNote": "n-1-1-v1-0-1",
+                      "endNote": "n-1-1-v1-2-1"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "A",
+                        "octave": 4
+                      },
+                      "id": "n-1-1-v1-1-0"
+                    },
+                    {
+                      "pitch": {
+                        "step": "D",
+                        "octave": 5
+                      },
+                      "id": "n-1-1-v1-1-1"
+                    }
+                  ],
+                  "id": "e-1-v1-1",
+                  "slurs": [
+                    {
+                      "side": "down",
+                      "target": "e-1-v1-3",
+                      "startNote": "n-1-1-v1-1-1",
+                      "endNote": "n-1-1-v1-3-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "G",
+                        "octave": 4
+                      },
+                      "id": "n-1-1-v1-2-0"
+                    },
+                    {
+                      "pitch": {
+                        "step": "D",
+                        "octave": 5
+                      },
+                      "id": "n-1-1-v1-2-1"
+                    }
+                  ],
+                  "id": "e-1-v1-2"
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-1-v1-3-0"
+                    }
+                  ],
+                  "id": "e-1-v1-3"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "_x": {
+    "mnxLab": {
+      "encoding": {
+        "software": "musicxml-mnx",
+        "version": "0.1.0"
+      }
+    }
+  }
+}

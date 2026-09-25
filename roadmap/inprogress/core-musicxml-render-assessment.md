@@ -354,3 +354,23 @@ and display variant with imported MNX and both shell views, and retain the
 reviewed evidence in the machine-readable and readable reports. Treat `33e`'s
 invalid octave sizes separately from valid octave-shift cases. Do not infer
 item 19 editor or persistence support from these render captures.
+
+
+## Spanner rendering batch, 2026-09-25
+
+[The eleven 33a–33k originals](../../docs/musicxml-spanners-assessment.md)
+now have 63 source-derived feature IDs, 149 source-marker variants, 126
+feature × shell and 298 marker × shell Notation rows. Fresh original-file
+Workbench and editable Studio imports at a63d68d6 produced identical MNX,
+complete unscrolled SVG/PNG captures, Show clefs/meters and All verses.
+No known strings permit Tab/Both. All 164 pitches survive. Ordinary ties,
+nested/chained/chord-member slurs and wedges draw, but valid ottava stop
+offsets shorten in 33d and retained 33a ottavas paint in wrong bars.
+33e's invalid sizes silently become 8va/8vb. Cross-voice and enharmonic
+links, let-ring, gliss/slide styles and double-note tremolo expose separate
+gaps; the unended 33i tie retains an unresolved visual endpoint.
+[Proposed item 35](../proposed/core-musicxml-spanner-fidelity.md) owns the
+new gaps after deduplication with existing items 22/23 and proposed 29/31/33/34.
+Detailed current render coverage is **92/183 originals; 91 remain**. Item
+18 stays open for the suite, and item 19 receives no direct editing,
+undo/redo or persistence claim.

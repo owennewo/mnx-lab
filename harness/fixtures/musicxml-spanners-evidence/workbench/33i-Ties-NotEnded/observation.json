@@ -1,0 +1,53 @@
+{
+  "id": "33i-Ties-NotEnded",
+  "sourceSha256": "7ca5ff5968e6f9273f971f3e702d06595a13b40b851231f38bb53f0e2e32c0f7",
+  "testClass": "feature",
+  "description": "Several ties that have their end tag missing. The end position of the tie starting at position A is at position C. The tie starting at position C has no end tag at all. The tie starting at position D is ended at position E.",
+  "views": [
+    {
+      "scrollTarget": "viewer",
+      "visibleWidth": 750,
+      "visibleHeight": 753.125,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0,
+          1,
+          2,
+          3,
+          4
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [],
+      "scrollWidth": 750,
+      "scrollHeight": 753,
+      "clientWidth": 750,
+      "clientHeight": 753,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "importError": null,
+  "warnings": [],
+  "importedDocumentSha256": "f05abe13ea5848d7e245e54aa89783585db2e2e9ea4e2493f86d41eb5e6208f8",
+  "displayOptions": {
+    "lyrics": "all",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide",
+    "selectedVerse": "1"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

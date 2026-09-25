@@ -1,0 +1,54 @@
+{
+  "id": "33j-Beams-Tremolos",
+  "sourceSha256": "68aa7b6c7681d293b15481908bf6d4fdc9bc0e7dfe3a5d62af3f5202b09d9822",
+  "testClass": "feature",
+  "description": "Tests for double-note tremolo beams. The first bar shows a half-note tremolo (one beam, two strokes) followed by a dotted quarter-note tremolo with chords (three strokes). The second bar shows a half-note triplet with three tremolos (no beams, three strokes) followed by three beamed eighths-note chords with a tremolo (two strokes) between the second and third chord.",
+  "views": [
+    {
+      "scrollTarget": "frame",
+      "visibleWidth": 1060,
+      "visibleHeight": 870,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0,
+          1
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [],
+      "scrollWidth": 1060,
+      "scrollHeight": 870,
+      "clientWidth": 1060,
+      "clientHeight": 870,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "suppliedLibraryTitle": "33j-Beams-Tremolos",
+  "makeCurrentError": null,
+  "entryPath": "Local operator ingest: GP seed + unmodified XML original; Save → Versions → View XML → Make current",
+  "importError": null,
+  "viewingOriginal": false,
+  "editingSuspended": false,
+  "warnings": [],
+  "importedDocumentSha256": "138bb6bf08a5310974bf3e6f144cc043a7d1a434b9d82298bbc61287a6f10ce1",
+  "displayOptions": {
+    "lyrics": "all",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

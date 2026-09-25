@@ -1,0 +1,299 @@
+{
+  "mnx": {
+    "version": 1,
+    "support": {
+      "useBeams": true
+    }
+  },
+  "global": {
+    "measures": [
+      {
+        "key": {
+          "fifths": 0
+        },
+        "time": {
+          "count": 4,
+          "unit": 4,
+          "display": "common"
+        },
+        "barline": {
+          "type": "final"
+        },
+        "id": "m1"
+      }
+    ]
+  },
+  "parts": [
+    {
+      "id": "P1",
+      "name": "MusicXML Part",
+      "measures": [
+        {
+          "clefs": [
+            {
+              "clef": {
+                "sign": "G",
+                "staffPosition": -2
+              }
+            }
+          ],
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "eighth"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "A",
+                        "octave": 4
+                      },
+                      "id": "n-1-1-v1-0-0"
+                    }
+                  ],
+                  "id": "e-beam-1"
+                },
+                {
+                  "duration": {
+                    "base": "eighth"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 5
+                      },
+                      "id": "n-1-1-v1-1-0"
+                    }
+                  ],
+                  "id": "e-beam-2"
+                },
+                {
+                  "duration": {
+                    "base": "eighth"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "A",
+                        "octave": 6
+                      },
+                      "id": "n-1-1-v1-2-0"
+                    }
+                  ],
+                  "id": "e-beam-3"
+                },
+                {
+                  "duration": {
+                    "base": "eighth"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 3
+                      },
+                      "id": "n-1-1-v1-3-0"
+                    }
+                  ],
+                  "id": "e-beam-4"
+                },
+                {
+                  "duration": {
+                    "base": "eighth"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "B",
+                        "octave": 2
+                      },
+                      "id": "n-1-1-v1-4-0"
+                    }
+                  ],
+                  "id": "e-beam-5"
+                },
+                {
+                  "duration": {
+                    "base": "eighth"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "A",
+                        "octave": 5
+                      },
+                      "id": "n-1-1-v1-5-0"
+                    }
+                  ],
+                  "id": "e-beam-6"
+                },
+                {
+                  "duration": {
+                    "base": "eighth"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "A",
+                        "octave": 5
+                      },
+                      "id": "n-1-1-v1-6-0"
+                    }
+                  ],
+                  "id": "e-beam-9"
+                },
+                {
+                  "duration": {
+                    "base": "16th"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "B",
+                        "octave": 3
+                      },
+                      "id": "n-1-1-v1-7-0"
+                    }
+                  ],
+                  "id": "e-beam-7"
+                },
+                {
+                  "duration": {
+                    "base": "16th"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 4
+                      },
+                      "id": "n-1-1-v1-8-0"
+                    }
+                  ],
+                  "id": "e-beam-8"
+                }
+              ]
+            }
+          ],
+          "ottavas": [
+            {
+              "value": 2,
+              "position": {
+                "fraction": [
+                  1,
+                  8
+                ]
+              },
+              "end": {
+                "measure": "m1",
+                "position": {
+                  "fraction": [
+                    1,
+                    8
+                  ]
+                }
+              }
+            },
+            {
+              "value": -2,
+              "position": {
+                "fraction": [
+                  3,
+                  8
+                ]
+              },
+              "end": {
+                "measure": "m1",
+                "position": {
+                  "fraction": [
+                    3,
+                    8
+                  ]
+                }
+              }
+            },
+            {
+              "value": 1,
+              "position": {
+                "fraction": [
+                  5,
+                  8
+                ]
+              },
+              "end": {
+                "measure": "m1",
+                "position": {
+                  "fraction": [
+                    21,
+                    32
+                  ]
+                }
+              }
+            },
+            {
+              "value": -1,
+              "position": {
+                "fraction": [
+                  7,
+                  8
+                ]
+              },
+              "end": {
+                "measure": "m1",
+                "position": {
+                  "fraction": [
+                    7,
+                    8
+                  ]
+                }
+              }
+            }
+          ],
+          "beams": [
+            {
+              "events": [
+                "e-beam-1",
+                "e-beam-2",
+                "e-beam-3",
+                "e-beam-4"
+              ]
+            },
+            {
+              "events": [
+                "e-beam-5",
+                "e-beam-6"
+              ]
+            },
+            {
+              "events": [
+                "e-beam-9",
+                "e-beam-7",
+                "e-beam-8"
+              ],
+              "beams": [
+                {
+                  "events": [
+                    "e-beam-7",
+                    "e-beam-8"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "_x": {
+    "mnxLab": {
+      "encoding": {
+        "software": "musicxml-mnx",
+        "version": "0.1.0"
+      }
+    }
+  }
+}

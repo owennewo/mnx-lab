@@ -1,0 +1,135 @@
+{
+  "mnx": {
+    "version": 1
+  },
+  "global": {
+    "measures": [
+      {
+        "key": {
+          "fifths": 0
+        },
+        "time": {
+          "count": 3,
+          "unit": 4
+        },
+        "barline": {
+          "type": "final"
+        },
+        "id": "m1"
+      }
+    ]
+  },
+  "parts": [
+    {
+      "id": "P1",
+      "name": "MusicXML Part",
+      "measures": [
+        {
+          "clefs": [
+            {
+              "clef": {
+                "sign": "G",
+                "staffPosition": -2
+              }
+            }
+          ],
+          "sequences": [
+            {
+              "voice": "v1",
+              "content": [
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "A",
+                        "octave": 4
+                      },
+                      "id": "n-1-1-v1-0-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "A",
+                        "octave": 7
+                      },
+                      "id": "n-1-1-v1-1-0"
+                    }
+                  ]
+                },
+                {
+                  "duration": {
+                    "base": "quarter"
+                  },
+                  "notes": [
+                    {
+                      "pitch": {
+                        "step": "C",
+                        "octave": 3
+                      },
+                      "id": "n-1-1-v1-2-0"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "ottavas": [
+            {
+              "value": 1,
+              "position": {
+                "fraction": [
+                  1,
+                  4
+                ]
+              },
+              "end": {
+                "measure": "m1",
+                "position": {
+                  "fraction": [
+                    1,
+                    4
+                  ]
+                }
+              }
+            },
+            {
+              "value": -1,
+              "position": {
+                "fraction": [
+                  1,
+                  2
+                ]
+              },
+              "end": {
+                "measure": "m1",
+                "position": {
+                  "fraction": [
+                    1,
+                    2
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "_x": {
+    "mnxLab": {
+      "encoding": {
+        "software": "musicxml-mnx",
+        "version": "0.1.0"
+      }
+    }
+  }
+}

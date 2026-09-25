@@ -1,0 +1,79 @@
+{
+  "id": "33a-Spanners",
+  "sourceSha256": "74406710c8c642fd53781236b0b73de167b67a5632437ea624d0e08087f856e3",
+  "testClass": "feature",
+  "description": "Several spanners as defined in MusicXML: tuplet, slur (solid, dashed), wedge (cresc, dim), trill with accidental mark and wavy-line (with another accidental mark on the second beat), single-note trill spanner, octave-shift (8va,15mb), bracket (solid down/down, dashed down/down, solid none/down, dashed none/up, solid none/none), dashes, glissando (wavy), slide (solid), grouping, two-note tremolo, hammer-on, pull-off, pedal line (down, change, up), pedal text (down, up).",
+  "views": [
+    {
+      "scrollTarget": "frame",
+      "visibleWidth": 1060,
+      "visibleHeight": 870,
+      "view": "notation",
+      "staffScale": 1,
+      "densityH": 2,
+      "renderErrors": [],
+      "systemRows": [
+        [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        [
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14
+        ],
+        [
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22
+        ]
+      ],
+      "svgCount": 1,
+      "diagnosticTitles": [],
+      "scrollWidth": 1060,
+      "scrollHeight": 870,
+      "clientWidth": 1060,
+      "clientHeight": 870,
+      "screenshots": [
+        "notation-0-0.png"
+      ]
+    }
+  ],
+  "suppliedLibraryTitle": "33a-Spanners",
+  "makeCurrentError": null,
+  "entryPath": "Local operator ingest: GP seed + unmodified XML original; Save → Versions → View XML → Make current",
+  "importError": null,
+  "viewingOriginal": false,
+  "editingSuspended": false,
+  "warnings": [],
+  "importedDocumentSha256": "733863448dc64167d02fcad886ec054135c0c25acfef55719beb52506a752cef",
+  "displayOptions": {
+    "lyrics": "all",
+    "timeSignatures": "show",
+    "clefs": "show",
+    "title": "hide",
+    "beams": "slanted",
+    "barNumbers": "every-system",
+    "instrumentNames": "hide"
+  },
+  "editorBound": true,
+  "availableViews": [
+    "notation"
+  ],
+  "consoleErrors": []
+}

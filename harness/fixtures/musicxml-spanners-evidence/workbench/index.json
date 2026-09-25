@@ -1,0 +1,604 @@
+{
+  "kind": "browser observations; not feature correctness or human verification",
+  "captureScriptSha256": "3380b20e5b203676d93d6b4742916e8f5ecff4322d5a56eac66e158a3c6a6d9f",
+  "shell": "workbench",
+  "applicationCommit": "a63d68d652286045b2c45e1023fe0d7d3e0365a7",
+  "corpusRevision": "77c19f7e819154c70ca1a1992e80dcda8ff82fea",
+  "viewport": {
+    "width": 1440,
+    "height": 1000,
+    "deviceScaleFactor": 1
+  },
+  "fixtures": [
+    {
+      "id": "33a-Spanners",
+      "sourceSha256": "74406710c8c642fd53781236b0b73de167b67a5632437ea624d0e08087f856e3",
+      "testClass": "feature",
+      "description": "Several spanners as defined in MusicXML: tuplet, slur (solid, dashed), wedge (cresc, dim), trill with accidental mark and wavy-line (with another accidental mark on the second beat), single-note trill spanner, octave-shift (8va,15mb), bracket (solid down/down, dashed down/down, solid none/down, dashed none/up, solid none/none), dashes, glissando (wavy), slide (solid), grouping, two-note tremolo, hammer-on, pull-off, pedal line (down, change, up), pedal text (down, up).",
+      "views": [
+        {
+          "scrollTarget": "viewer",
+          "visibleWidth": 750,
+          "visibleHeight": 753.125,
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0,
+              1,
+              2,
+              3
+            ],
+            [
+              4,
+              5,
+              6,
+              7,
+              8
+            ],
+            [
+              9,
+              10,
+              11,
+              12,
+              13
+            ],
+            [
+              14,
+              15,
+              16,
+              17,
+              18
+            ],
+            [
+              19,
+              20,
+              21,
+              22
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [],
+          "scrollWidth": 750,
+          "scrollHeight": 753,
+          "clientWidth": 750,
+          "clientHeight": 753,
+          "screenshots": [
+            "notation-0-0.png"
+          ]
+        }
+      ],
+      "importError": null,
+      "warnings": [],
+      "importedDocumentSha256": "733863448dc64167d02fcad886ec054135c0c25acfef55719beb52506a752cef",
+      "displayOptions": {
+        "lyrics": "all",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "33b-Spanners-Tie",
+      "sourceSha256": "748af2952913be4023f6e43993cc92668fb41f9ca4d639a80c284f85c393f70e",
+      "testClass": "feature",
+      "description": "Two whole notes with a tie inbetween.",
+      "views": [
+        {
+          "scrollTarget": "viewer",
+          "visibleWidth": 750,
+          "visibleHeight": 753.125,
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0,
+              1
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [],
+          "scrollWidth": 750,
+          "scrollHeight": 753,
+          "clientWidth": 750,
+          "clientHeight": 753,
+          "screenshots": [
+            "notation-0-0.png"
+          ]
+        }
+      ],
+      "importError": null,
+      "warnings": [],
+      "importedDocumentSha256": "49a84612ef6890bb45546d6dd9c97a2c5ee74a78d00ad00dff9442a04ec39cfa",
+      "displayOptions": {
+        "lyrics": "all",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "33c-Spanners-Slurs",
+      "sourceSha256": "103a6a750f7de792d5dd7684a7f724278327ebe78f94a57d58f4d45b5e21fcda",
+      "testClass": "feature",
+      "description": "A note can be the end of one slur and the start of a new slur. Also, in MusicXML, nested slurs are possible like in the second measure where one slur goes over all four notes, and another slur goes from the second to the third note. The third bar demonstrates a cross-voice slur starting at the first beat in the lower voice and ending on the third beat in the upper voice.",
+      "views": [
+        {
+          "scrollTarget": "viewer",
+          "visibleWidth": 750,
+          "visibleHeight": 753.125,
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0,
+              1,
+              2
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [],
+          "scrollWidth": 750,
+          "scrollHeight": 753,
+          "clientWidth": 750,
+          "clientHeight": 753,
+          "screenshots": [
+            "notation-0-0.png"
+          ]
+        }
+      ],
+      "importError": null,
+      "warnings": [],
+      "importedDocumentSha256": "01776e534cfc909d183401c06ef587a2d11b0d2b39b9c3e824a335f7773da360",
+      "displayOptions": {
+        "lyrics": "all",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "33d-Spanners-OctaveShifts",
+      "sourceSha256": "d85004755a25dab51838884037ff49ac3275fee46d6a1f1f895c20c8bca96a1c",
+      "testClass": "feature",
+      "description": "All types of octave shifts (15ma, 15mb, 8va, 8vb)",
+      "views": [
+        {
+          "scrollTarget": "viewer",
+          "visibleWidth": 750,
+          "visibleHeight": 789.125,
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [],
+          "scrollWidth": 750,
+          "scrollHeight": 789,
+          "clientWidth": 750,
+          "clientHeight": 789,
+          "screenshots": [
+            "notation-0-0.png"
+          ]
+        }
+      ],
+      "importError": null,
+      "warnings": [],
+      "importedDocumentSha256": "9fddfb41349a6b65118d6b6ec44e16826e6177403810e1b5e81aebd11a69e578",
+      "displayOptions": {
+        "lyrics": "all",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "33e-Spanners-OctaveShifts-InvalidSize",
+      "sourceSha256": "fcde3113d0d6c8f46a42ca65289c2f85dc29b12643a3b0445d4dcbfec0317987",
+      "testClass": "feature",
+      "description": "Invalid <octave-shifts> values: 27 down for the second note, and 11 up for the third note.",
+      "views": [
+        {
+          "scrollTarget": "viewer",
+          "visibleWidth": 750,
+          "visibleHeight": 789.125,
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [],
+          "scrollWidth": 750,
+          "scrollHeight": 789,
+          "clientWidth": 750,
+          "clientHeight": 789,
+          "screenshots": [
+            "notation-0-0.png"
+          ]
+        }
+      ],
+      "importError": null,
+      "warnings": [
+        "part P1, measure 1: incompatible time symbol common for 3/4; retaining numeric meter."
+      ],
+      "importedDocumentSha256": "ae11e9dbe9f63155b35536b0508a6c82d437a091dd48cc12eb3616ec5951966a",
+      "displayOptions": {
+        "lyrics": "all",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "33f-Trill-EndingOnGraceNote",
+      "sourceSha256": "1f40fdb834077ff30e49eb8a8dfa29d9570bfdff31388879709a23230745cd71",
+      "testClass": "feature",
+      "description": "A trill spanner that spans a grace note and ends on an after-grace note at the end of the measure.",
+      "views": [
+        {
+          "scrollTarget": "viewer",
+          "visibleWidth": 750,
+          "visibleHeight": 789.125,
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [],
+          "scrollWidth": 750,
+          "scrollHeight": 789,
+          "clientWidth": 750,
+          "clientHeight": 789,
+          "screenshots": [
+            "notation-0-0.png"
+          ]
+        }
+      ],
+      "importError": null,
+      "warnings": [],
+      "importedDocumentSha256": "d8e287fd1f9dda1b99016e26412179e6d5acfb68b52fd537e802572635df8d40",
+      "displayOptions": {
+        "lyrics": "all",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "33g-Slur-ChordedNotes",
+      "sourceSha256": "2d4b797bbb093f37e74ad261371cfc82e928c3bf7fb4a5e06531deccd01950c4",
+      "testClass": "feature",
+      "description": "Slurs on chorded notes. The upper slur connects the first and third chord; for both the start and end, the <slur> element is attached not to the first note of the chord but to the second one (tagged with <chord>). The lower slur connects the chord on the second beat and the note on fourth beat and is attached in the normal way.",
+      "views": [
+        {
+          "scrollTarget": "viewer",
+          "visibleWidth": 750,
+          "visibleHeight": 789.125,
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [],
+          "scrollWidth": 750,
+          "scrollHeight": 789,
+          "clientWidth": 750,
+          "clientHeight": 789,
+          "screenshots": [
+            "notation-0-0.png"
+          ]
+        }
+      ],
+      "importError": null,
+      "warnings": [],
+      "importedDocumentSha256": "f4638355d89736e06f05fa555635e16d78341627120cdb2329ec7e3bf1cefcad",
+      "displayOptions": {
+        "lyrics": "all",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "33h-Spanners-Glissando",
+      "sourceSha256": "478c3c1e33081506a9c1bdde2556e160565f7dccc9ec604a35daad84f5d2ae11",
+      "testClass": "feature",
+      "description": "All different types of glissando defined in MusicXML. The first two and a half measures contain <glissando> elements with various ‘line-type’ attributes, the rest contains <slide> elements (also with various ‘line-type’ attributes).",
+      "views": [
+        {
+          "scrollTarget": "viewer",
+          "visibleWidth": 750,
+          "visibleHeight": 753.125,
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0,
+              1
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              4
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [],
+          "scrollWidth": 750,
+          "scrollHeight": 753,
+          "clientWidth": 750,
+          "clientHeight": 753,
+          "screenshots": [
+            "notation-0-0.png"
+          ]
+        }
+      ],
+      "importError": null,
+      "warnings": [],
+      "importedDocumentSha256": "f227270ca66b2feab0ee0d9c6cbfacfdbb3fa4f5e58d501349a132d739c1af05",
+      "displayOptions": {
+        "lyrics": "all",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide",
+        "selectedVerse": "1"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "33i-Ties-NotEnded",
+      "sourceSha256": "7ca5ff5968e6f9273f971f3e702d06595a13b40b851231f38bb53f0e2e32c0f7",
+      "testClass": "feature",
+      "description": "Several ties that have their end tag missing. The end position of the tie starting at position A is at position C. The tie starting at position C has no end tag at all. The tie starting at position D is ended at position E.",
+      "views": [
+        {
+          "scrollTarget": "viewer",
+          "visibleWidth": 750,
+          "visibleHeight": 753.125,
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0,
+              1,
+              2,
+              3,
+              4
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [],
+          "scrollWidth": 750,
+          "scrollHeight": 753,
+          "clientWidth": 750,
+          "clientHeight": 753,
+          "screenshots": [
+            "notation-0-0.png"
+          ]
+        }
+      ],
+      "importError": null,
+      "warnings": [],
+      "importedDocumentSha256": "f05abe13ea5848d7e245e54aa89783585db2e2e9ea4e2493f86d41eb5e6208f8",
+      "displayOptions": {
+        "lyrics": "all",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide",
+        "selectedVerse": "1"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "33j-Beams-Tremolos",
+      "sourceSha256": "68aa7b6c7681d293b15481908bf6d4fdc9bc0e7dfe3a5d62af3f5202b09d9822",
+      "testClass": "feature",
+      "description": "Tests for double-note tremolo beams. The first bar shows a half-note tremolo (one beam, two strokes) followed by a dotted quarter-note tremolo with chords (three strokes). The second bar shows a half-note triplet with three tremolos (no beams, three strokes) followed by three beamed eighths-note chords with a tremolo (two strokes) between the second and third chord.",
+      "views": [
+        {
+          "scrollTarget": "viewer",
+          "visibleWidth": 750,
+          "visibleHeight": 753.125,
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0,
+              1
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [],
+          "scrollWidth": 750,
+          "scrollHeight": 753,
+          "clientWidth": 750,
+          "clientHeight": 753,
+          "screenshots": [
+            "notation-0-0.png"
+          ]
+        }
+      ],
+      "importError": null,
+      "warnings": [],
+      "importedDocumentSha256": "138bb6bf08a5310974bf3e6f144cc043a7d1a434b9d82298bbc61287a6f10ce1",
+      "displayOptions": {
+        "lyrics": "all",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    },
+    {
+      "id": "33k-Tie-Types",
+      "sourceSha256": "67f4d3c8748f2e42c73cf2fcba686fa56485ec2fa2af17f190dfe62abb45c64c",
+      "testClass": "feature",
+      "description": "Varies tie types. In measure 1, there is a cross-voice tie between beat 1 (in voice 1) and beat 2 (in voice 2). On beat 4, there is a enharmonic tie to the first note in measure 2. In measure 2, there are three “arpeggio ties” starting at the sixth, seventh, and eighth eighth note, respectively, tying to a chord on the first beat in measure 3. In measure 4, there is a laissez-vibrer tie on the eighth note.",
+      "views": [
+        {
+          "scrollTarget": "viewer",
+          "visibleWidth": 750,
+          "visibleHeight": 753.125,
+          "view": "notation",
+          "staffScale": 1,
+          "densityH": 2,
+          "renderErrors": [],
+          "systemRows": [
+            [
+              0,
+              1,
+              2
+            ],
+            [
+              3
+            ]
+          ],
+          "svgCount": 1,
+          "diagnosticTitles": [],
+          "scrollWidth": 750,
+          "scrollHeight": 753,
+          "clientWidth": 750,
+          "clientHeight": 753,
+          "screenshots": [
+            "notation-0-0.png"
+          ]
+        }
+      ],
+      "importError": null,
+      "warnings": [],
+      "importedDocumentSha256": "f1f72e6e1478cbbc56d37db6a14155e09ca6a4d2dab03c1e3125ce6895badc74",
+      "displayOptions": {
+        "lyrics": "all",
+        "timeSignatures": "show",
+        "clefs": "show",
+        "title": "hide",
+        "beams": "slanted",
+        "barNumbers": "every-system",
+        "instrumentNames": "hide"
+      },
+      "editorBound": true,
+      "availableViews": [
+        "notation"
+      ],
+      "consoleErrors": []
+    }
+  ],
+  "browser": {
+    "protocolVersion": "1.3",
+    "product": "Chrome/153.0.8010.36",
+    "revision": "@507c6ee3e2f3b2ca0e660547e5b9ea4820c67f4c",
+    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+    "jsVersion": "15.3.76.10"
+  }
+}

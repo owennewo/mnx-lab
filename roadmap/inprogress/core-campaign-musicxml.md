@@ -27,17 +27,17 @@ semantic and XSD measurements; their mismatch baselines identify further work. R
 produce separate, evidenced gap proposals; implementing those proposals is subsequent
 work. The historical log below records how the earlier baseline was reached.
 
-**Assessment checkpoint, 2026-09-24.** Items 1–17 and 20–23 have landed;
-items 18 (render) and 19 (write path) remain in progress. Current, detailed
-render verdicts cover **81/183** pinned originals across `01a`–`01h`, `02a`–`02f`,
-the `03`, `11`, `12`, `13`, `14a`, `21`, `22`, `23`, `24`, `31` and `32` families;
-**102 originals remain**. The historical both-shell sweep of all 183 files is a
-load/display baseline, not feature-level coverage. Item 19 has bounded meter,
-title and `01a`–`01h` authoring evidence, including the Studio GP storage loss
-of 15/108 `01a` notes; it has no corpus-wide task disposition. The next render
-slice is the eleven `33a`–`33k` spanner originals. Both shells have current
-captures, but no source-derived feature/variant verdicts are complete, so they
-are not counted. See the [render assessment](core-musicxml-render-assessment.md),
+**Assessment checkpoint, 2026-09-25.** Items 1–17 and 20–23 have landed;
+items 18 (render) and 19 (write path) remain in progress. Detailed current
+render verdicts cover **92/183** pinned originals across the 01, 02,
+03, 11, 12, 13, 14a, 21, 22, 23, 24, 31, 32 and
+33a–33k families; **91 originals remain**. The historical both-shell
+183-source sweep is only a load/display baseline. The [33-series source
+assessment](../../docs/musicxml-spanners-assessment.md) adds 63 feature IDs
+and 149 marker variants with complete original-file captures in both shells.
+Item 19 has bounded meter, title and 01a–01h authoring evidence but no
+spanner task or GP persistence pass and no corpus-wide disposition. See the
+[render assessment](core-musicxml-render-assessment.md),
 [write-path assessment](core-musicxml-write-assessment.md) and
 [initial sweep](../../docs/musicxml-editor-assessment.md) for scope and evidence rules.
 
@@ -225,6 +225,7 @@ deliberately **not** enumerated in advance: item 8 decides them from evidence.
 | 32 | [Grace fidelity](../proposed/core-musicxml-grace-fidelity.md) | Draw grace-origin slurs/ties and staff-2 grace notes from retained MNX fields; resolve grace-local dynamic/wedge attachment where metric fractions coincide. Keep playback stealing and absent slash defaults separately qualified. | accuracy | 24a–24h source/import/current both-shell notation evidence | **proposed 2026-09-24** |
 | 33 | [Direction fidelity](../proposed/core-musicxml-direction-fidelity.md) | Preserve timed offsets, multiple/compound direction marks and metric relations; draw above dynamics and source glyph/spanner signs, diagnosing unsupported specialist controls and missing image resources. The 32b text capture adds positioned-word styling and clipping. | accuracy | 31a/31b/31c/31d/31f + 32b source/import/current both-shell notation evidence | **proposed 2026-09-24** |
 | 34 | [Notation fidelity](../proposed/core-musicxml-notation-fidelity.md) | Import numbered arpeggios, non-arpeggio brackets, fermata shapes and representable event marks; repair retained harmonic/bend semantics and diagnose unsupported specialist controls. Deduplicates items 17, 29, 31 and 33. | accuracy | six 32-series source/import/current both-shell notation evidence | **proposed 2026-09-24** |
+| 35 | [Spanner fidelity](../proposed/core-musicxml-spanner-fidelity.md) | Repair valid ottava offsets and multi-system placement, invalid-size diagnostics, cross-voice/enharmonic/let-ring ties, gliss/slide styles and double-note tremolo. Deduplicates items 22/23 and proposed 29/31/33/34. | accuracy | 33a–33k source/import/current both-shell notation evidence | **proposed 2026-09-25** |
 | — | Feature parity | Dynamics, wedges, spanners, ottavas, articulations, SMuFL glyph names, percussion, layout breaks. **Deliberately unenumerated**: item 8 turns these into a ranked queue with evidence, and each becomes its own row when picked up. Note the schema already has `dynamic-*`, `ottava`, `slur` and `wedge-type` as standard objects — but **no pedal def**, so pedal is contract clause 2's first real test. | accuracy | 1 + 2 + 3 | not yet rows |
 
 ### Item 8's derivation rule
@@ -258,6 +259,26 @@ exactly as `verified` already works here. No backend: a generated JSON artifact
 committed to the repo, like `worker/models.json`.
 
 ## Progress + learnings
+
+### 2026-09-25 — item 18: 33-series spanner rendering slice
+
+[The eleven-source original-file review](../../docs/musicxml-spanners-assessment.md)
+adds 63 source-derived feature IDs, 149 marker variants, 126 feature ×
+shell and 298 marker × shell Notation rows. All 164 source pitches survive.
+Both current shells imported identical MNX and displayed complete scores
+with Show clefs/meters and All verses; no source declares known strings.
+Ordinary ties, chained/nested slurs, chord-member slurs, wedges and a tuplet
+draw. Valid octave shifts in 33d lose source offsets on import; retained
+33a ottavas draw in unrelated bars across systems. 33e silently turns
+semantically invalid sizes 27/11 into 8va/8vb without a size diagnostic.
+33c loses a cross-voice slur; 33k loses cross-voice and enharmonic ties
+and let-ring. Gliss/slide styles collapse to straight shift lines; double-note
+tremolo ink is absent. The 33i unended tie remains visually unresolved
+because the source supplies no stop. [Proposed item 35](../proposed/core-musicxml-spanner-fidelity.md)
+owns the new bounded gaps; direction signs, ordinary ornaments and tuplets
+remain with proposed items 33, 34 and 31. Detailed render coverage rises to
+**92/183 originals; 91 remain**. Items 18/19 remain open, and no spanner
+authoring, undo/redo or GP persistence result is inferred.
 
 ### 2026-09-24 — assessment pause before 33-series spanner verdicts
 
