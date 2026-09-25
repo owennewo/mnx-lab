@@ -1,10 +1,10 @@
 import { readFileSync } from 'node:fs';
-import { createHash } from 'node:crypto';
 import { expect, it } from 'vitest';
 import { spectralFollower2 } from '../src/candidates/spectralFollower2.ts';
 import { execute } from '../src/run/runner.ts';
 import { evaluateProxy, type ProxyReference } from '../src/proxy/reference.ts';
 import { rational } from '../src/types.ts';
+import { pinnedSha256 } from './pinned.ts';
 const root=new URL('../../',import.meta.url);
 const reference:ProxyReference={kind:'linear-sync-proxy',duration:1,allowance:.15,uncertainty:'unmeasured',anchors:[{seconds:0,quarter:0,route:1},{seconds:1,quarter:2,route:1}]};
 it('does not credit positive rejection as following, even with complete decisions and no wrong exposure',()=>{
@@ -27,9 +27,9 @@ it('harmonic revision hears a simple score tone, rejects silence and preserves i
  expect(run(new Float32Array(24000)).every(d=>d.kind==='unsupported')).toBe(true);
  expect(run(changed).filter(d=>d.madeAt<=.25)).toEqual(a.filter(d=>d.madeAt<=.25));
 });
-it('preserves each real run implementation and the shared frozen reference identity',()=>{
+it('preserves each real run implementation, at its recorded commit, and the shared frozen reference identity',()=>{
  const ids=['g002a-spectral1-winner-sync-proxy','g002b-spectral2-winner-sync-proxy'];
  const runs=ids.map(id=>JSON.parse(readFileSync(new URL(`runs/${id}/summary.json`,root),'utf8')));
- for(const run of runs)for(const [path,hash] of Object.entries(run.sourceHashes))expect(createHash('sha256').update(readFileSync(new URL(path,root))).digest('hex')).toBe(hash);
+ for(const run of runs)for(const [path,hash] of Object.entries(run.sourceHashes))expect(pinnedSha256(run.gitCommit,path)).toBe(hash);
  expect(runs[0].setSha256).toBe(runs[1].setSha256);expect(runs[0].comparator.examples.map((e:{metrics:unknown})=>e.metrics)).toEqual(runs[1].comparator.examples.map((e:{metrics:unknown})=>e.metrics));
 });

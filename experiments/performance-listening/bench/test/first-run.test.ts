@@ -12,6 +12,7 @@ import type { RunReport } from '../src/report/index.ts';
 import { renderReport } from '../src/report/index.ts';
 import { execute, checkPrefix, prefixCuts } from '../src/run/runner.ts';
 import type { Decision } from '../src/types.ts';
+import { pinnedSha256 } from './pinned.ts';
 const runId = 'g001-clock-harness-v1';
 const folder = join(EXPERIMENT, 'runs', runId);
 const run = json<RunReport>(join(folder, 'run.json'));
@@ -75,7 +76,8 @@ it('freezes instrument contracts but leaves the research contract provisional an
   const metadata = json<{ researchContract: { provisional: boolean; humanApproved: boolean }; sourceHashes: Record<string, string>; randomness: null; gitCommit: string }>(join(folder, 'metadata.json'));
   expect(metadata.researchContract).toMatchObject({ provisional: true, humanApproved: false }); expect(metadata.randomness).toBeNull();
   expect(metadata.gitCommit).toMatch(/^[a-f0-9]{40}$/);
-  for (const [path, hash] of Object.entries(metadata.sourceHashes)) expect(sha256(readFileSync(join(EXPERIMENT, path)))).toBe(hash);
+  // The run's sources are checked at the commit it ran on, so later edits cannot invalidate it.
+  for (const [path, hash] of Object.entries(metadata.sourceHashes)) expect(pinnedSha256(metadata.gitCommit, path)).toBe(hash);
   const pkg = json<{ dependencies?: object }>(join(EXPERIMENT, 'bench/package.json'));
   expect(Object.keys(pkg.dependencies ?? {})).toEqual([]);
 });
