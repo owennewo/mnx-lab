@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
+import { createRequire } from 'node:module';
 import { tmpdir } from 'node:os';
 import { spawnSync } from 'node:child_process';
 import { importMusicXML } from '../src/import/musicxml.js';
 import { exportMusicXML } from '../src/export/mnx.js';
+import { main } from '../src/cli.js';
 import { CONVERTER_NAME, CONVERTER_VERSION } from '../src/common/scoreMetadata.js';
 import { MnxLabWork, MnxStructure } from '../src/common/types.js';
 
@@ -239,41 +241,90 @@ it('stamps the version the package actually declares', () => {
 describe('the CLI', () => {
   // Nothing else in this package runs `cli.ts`, and the gap let a
   // `--encoding-date` helper ship undefined: every test passed and the command
-  // threw `ReferenceError` on the first real export. One end-to-end run is
-  // cheap insurance against that whole class of bug.
-  const cli = resolve(__dirname, '../src/cli.ts');
-  const run = (args: string[]): string => {
-    const result = spawnSync('npx', ['tsx', cli, ...args], {
-      cwd: resolve(__dirname, '..'),
-      encoding: 'utf-8'
-    });
-    if (result.status !== 0) throw new Error(result.stderr || result.stdout);
-    return result.stdout;
+  // threw `ReferenceError` on the first real export. The behaviour runs
+  // in-process through `main`; one real process proves the entry itself.
+  const recorder = () => {
+    const out = { log: [] as string[], warn: [] as string[], error: [] as string[] };
+    const io = {
+      log: (m: string) => out.log.push(m),
+      warn: (m: string) => out.warn.push(m),
+      error: (m: string) => out.error.push(m)
+    };
+    return { out, io };
   };
-
-  it('exports and re-imports metadata, stamping a date only when asked', () => {
+  const run = async (args: string[]): Promise<void> => {
+    const { out, io } = recorder();
+    const status = await main(args, io);
+    if (status !== 0) throw new Error(out.error.join('\n'));
+  };
+  const withSource = (): { dir: string; source: string } => {
     const dir = mkdtempSync(join(tmpdir(), 'mnx-cli-'));
     const source = join(dir, 'in.mnx.json');
     writeFileSync(
       source,
       JSON.stringify(documentWithWork({ title: 'T', creators: [{ role: 'composer', name: 'C' }] }))
     );
+    return { dir, source };
+  };
+
+  it('exports and re-imports metadata, stamping a date only when asked', async () => {
+    const { dir, source } = withSource();
 
     const undated = join(dir, 'undated.xml');
-    run(['--export', source, '--output', undated]);
+    await run(['--export', source, '--output', undated]);
     expect(readFileSync(undated, 'utf-8')).not.toContain('<encoding-date>');
 
     const dated = join(dir, 'dated.xml');
-    run(['--export', source, '--output', dated, '--encoding-date']);
+    await run(['--export', source, '--output', dated, '--encoding-date']);
     expect(readFileSync(dated, 'utf-8')).toMatch(/<encoding-date>\d{4}-\d{2}-\d{2}<\/encoding-date>/);
 
     const back = join(dir, 'back.mnx.json');
-    run(['--import', dated, '--output', back]);
+    await run(['--import', dated, '--output', back]);
     expect(JSON.parse(readFileSync(back, 'utf-8'))._x.mnxLab.work).toEqual({
       title: 'T',
       creators: [{ role: 'composer', name: 'C' }]
     });
 
     rmSync(dir, { recursive: true, force: true });
-  }, 60000);
+  });
+
+  it('prints usage and fails without a direction', async () => {
+    const { out, io } = recorder();
+    expect(await main([], io)).toBe(1);
+    expect(out.error[0]).toBe('Usage:');
+  });
+
+  it('refuses to overwrite a derived output name', async () => {
+    const { dir, source } = withSource();
+    const derived = join(dir, 'in.xml');
+    writeFileSync(derived, 'keep me');
+    const { out, io } = recorder();
+    expect(await main(['--export', source], io)).toBe(1);
+    expect(out.error.join('\n')).toContain('Refusing to overwrite');
+    expect(readFileSync(derived, 'utf-8')).toBe('keep me');
+    rmSync(dir, { recursive: true, force: true });
+  });
+
+  it('runs as a program', () => {
+    // The one real process: the module must load under a TypeScript runner and
+    // its entry guard must fire, which no in-process call can show. vite-node
+    // is a declared devDependency, so this never reaches for the network.
+    const require = createRequire(import.meta.url);
+    const viteNodeRoot = resolve(dirname(require.resolve('vite-node')), '..');
+    const bin = JSON.parse(readFileSync(join(viteNodeRoot, 'package.json'), 'utf-8')).bin[
+      'vite-node'
+    ];
+    const { dir, source } = withSource();
+    const dated = join(dir, 'dated.xml');
+    const result = spawnSync(
+      process.execPath,
+      [join(viteNodeRoot, bin), '--script', resolve(__dirname, '../src/cli.ts'),
+        '--export', source, '--output', dated, '--encoding-date'],
+      { cwd: resolve(__dirname, '..'), encoding: 'utf-8' }
+    );
+    expect(result.status, result.stderr).toBe(0);
+    expect(result.stdout).toContain('Conversion complete. Written to MusicXML');
+    expect(readFileSync(dated, 'utf-8')).toMatch(/<encoding-date>\d{4}-\d{2}-\d{2}<\/encoding-date>/);
+    rmSync(dir, { recursive: true, force: true });
+  }, 30000);
 });

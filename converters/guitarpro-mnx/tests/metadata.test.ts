@@ -1,9 +1,11 @@
 import { expect, it, describe } from 'vitest';
-import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
+import { createRequire } from 'node:module';
 import { tmpdir } from 'node:os';
 import { spawnSync } from 'node:child_process';
 import { importGuitarProCleanRoom } from '../src/cleanRoom.js';
+import { main } from '../src/cli.js';
 import { importGuitarPro as importOracle } from '../src/import/gp.js';
 import { writeGpContainer } from '../src/gpif/container.js';
 import { mnxToGpifXml } from '../src/gpif/fromMnx.js';
@@ -218,32 +220,87 @@ it('stamps the version the package actually declares', () => {
   expect(CONVERTER_VERSION).toBe(pkg.version);
 });
 
-it('stamps the encoding through the CLI, with a date only when asked', () => {
+describe('the CLI', () => {
   // Nothing else in this package runs `cli.ts`. The sibling converter shipped a
   // `--encoding-date` helper that was never defined, with every unit test
-  // green, so one end-to-end run guards both CLIs against that class of bug.
-  const dir = mkdtempSync(join(tmpdir(), 'mnx-gp-cli-'));
+  // green. The behaviour runs in-process through `main`; one real process
+  // proves the entry itself.
   const source = resolve(__dirname, '../../fixtures/Triplets-and-graces.gp');
-  const run = (args: string[]): void => {
-    const result = spawnSync('npx', ['tsx', resolve(__dirname, '../src/cli.ts'), ...args], {
-      cwd: resolve(__dirname, '..'),
-      encoding: 'utf-8'
-    });
-    if (result.status !== 0) throw new Error(result.stderr || result.stdout);
+  const recorder = () => {
+    const out = { log: [] as string[], warn: [] as string[], error: [] as string[] };
+    const io = {
+      log: (m: string) => out.log.push(m),
+      warn: (m: string) => out.warn.push(m),
+      error: (m: string) => out.error.push(m)
+    };
+    return { out, io };
+  };
+  const run = async (args: string[]): Promise<void> => {
+    const { out, io } = recorder();
+    const status = await main(args, io);
+    if (status !== 0) throw new Error(out.error.join('\n'));
   };
 
-  const plain = join(dir, 'plain.mnx.json');
-  run(['--import', source, '--output', plain]);
-  expect(JSON.parse(readFileSync(plain, 'utf-8'))._x.mnxLab).toEqual({
-    work: { title: 'Triplets and graces' },
-    encoding: { software: CONVERTER_NAME, version: CONVERTER_VERSION }
+  it('stamps the encoding, with a date only when asked', async () => {
+    const dir = mkdtempSync(join(tmpdir(), 'mnx-gp-cli-'));
+
+    const plain = join(dir, 'plain.mnx.json');
+    await run(['--import', source, '--output', plain]);
+    expect(JSON.parse(readFileSync(plain, 'utf-8'))._x.mnxLab).toEqual({
+      work: { title: 'Triplets and graces' },
+      encoding: { software: CONVERTER_NAME, version: CONVERTER_VERSION }
+    });
+
+    const dated = join(dir, 'dated.mnx.json');
+    await run(['--import', source, '--output', dated, '--encoding-date']);
+    expect(JSON.parse(readFileSync(dated, 'utf-8'))._x.mnxLab.encoding.date).toMatch(
+      /^\d{4}-\d{2}-\d{2}$/
+    );
+
+    rmSync(dir, { recursive: true, force: true });
   });
 
-  const dated = join(dir, 'dated.mnx.json');
-  run(['--import', source, '--output', dated, '--encoding-date']);
-  expect(JSON.parse(readFileSync(dated, 'utf-8'))._x.mnxLab.encoding.date).toMatch(
-    /^\d{4}-\d{2}-\d{2}$/
-  );
+  it('prints usage and fails without a direction', async () => {
+    const { out, io } = recorder();
+    expect(await main([], io)).toBe(1);
+    expect(out.error[0]).toBe('Usage:');
+  });
 
-  rmSync(dir, { recursive: true, force: true });
-}, 60000);
+  it('refuses to overwrite a derived output name', async () => {
+    const dir = mkdtempSync(join(tmpdir(), 'mnx-gp-cli-'));
+    const input = join(dir, 'in.mnx.json');
+    writeFileSync(input, readFileSync(resolve(__dirname, '../../fixtures/Triplets-and-graces.mnx.json')));
+    const derived = join(dir, 'in.gp');
+    writeFileSync(derived, 'keep me');
+    const { out, io } = recorder();
+    expect(await main(['--export', input], io)).toBe(1);
+    expect(out.error.join('\n')).toContain('Refusing to overwrite');
+    expect(readFileSync(derived, 'utf-8')).toBe('keep me');
+    rmSync(dir, { recursive: true, force: true });
+  });
+
+  it('runs as a program', () => {
+    // The one real process: the module must load under a TypeScript runner and
+    // its entry guard must fire, which no in-process call can show. vite-node
+    // is a declared devDependency, so this never reaches for the network.
+    const require = createRequire(import.meta.url);
+    const viteNodeRoot = resolve(dirname(require.resolve('vite-node')), '..');
+    const bin = JSON.parse(readFileSync(join(viteNodeRoot, 'package.json'), 'utf-8')).bin[
+      'vite-node'
+    ];
+    const dir = mkdtempSync(join(tmpdir(), 'mnx-gp-cli-'));
+    const dated = join(dir, 'dated.mnx.json');
+    const result = spawnSync(
+      process.execPath,
+      [join(viteNodeRoot, bin), '--script', resolve(__dirname, '../src/cli.ts'),
+        '--import', source, '--output', dated, '--encoding-date'],
+      { cwd: resolve(__dirname, '..'), encoding: 'utf-8' }
+    );
+    expect(result.status, result.stderr).toBe(0);
+    expect(result.stdout).toContain('Conversion complete. Written to MNX');
+    expect(JSON.parse(readFileSync(dated, 'utf-8'))._x.mnxLab.encoding.date).toMatch(
+      /^\d{4}-\d{2}-\d{2}$/
+    );
+    rmSync(dir, { recursive: true, force: true });
+  }, 30000);
+});
