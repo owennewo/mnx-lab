@@ -4,7 +4,7 @@ import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { serveStatic } from './staticServer.mjs';
 import { loadCorpus } from './check-scenarios.mjs';
-import { devtoolsPort, connect, client, waitFor, settle, SCORE_READY } from './browserHarness.mjs';
+import { devtoolsPort, connect, client, waitFor, settle, SCORE_READY, stopChrome } from './browserHarness.mjs';
 const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'mnx-unrolled-'));
 let chrome, ws, server, review;
 try {
@@ -156,11 +156,7 @@ try {
   console.log('Unrolled smoke OK');
 } finally {
   ws?.close();
-  if (chrome && chrome.exitCode === null) {
-    const done = new Promise((resolve) => chrome.once('exit', resolve));
-    chrome.kill();
-    await done;
-  }
+  await stopChrome(chrome);
   server?.server.close();
   review?.server.close();
   // Litter, not a failure: Chrome goes on flushing its cache after it reports

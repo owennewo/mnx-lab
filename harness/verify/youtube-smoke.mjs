@@ -6,7 +6,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import http from 'node:http';
 import { spawn } from 'node:child_process';
-import { devtoolsPort, connect, client } from './browserHarness.mjs';
+import { devtoolsPort, connect, client, stopChrome } from './browserHarness.mjs';
 const root=path.resolve(import.meta.dirname,'../..'),live=process.argv.includes('--live'),format=process.env.MNX_EMBED_FORMAT??'esm';
 const headers=Object.fromEntries(fs.readFileSync(root+'/public/_headers','utf8').split('\n').filter(s=>s.startsWith('  ')).map(s=>{const at=s.indexOf(':');return [s.slice(0,at).trim(),s.slice(at+1).trim()];}));
 const fixture=JSON.parse(fs.readFileSync(root+'/scenarios/lab/20-tab-part/01-standard-tuning-both/document.mnx.json'));
@@ -150,12 +150,9 @@ try{
  console.log('YouTube smoke OK',JSON.stringify({live,format,geometry,mobile,scripts}));
 }catch(error){if(c){const shot=await c.send('Page.captureScreenshot');if(shot.result?.data)fs.writeFileSync(`/tmp/youtube-${live?'live':format}-failure.png`,Buffer.from(shot.result.data,'base64'));}console.error('YouTube smoke FAILED',error.message);process.exitCode=1;}
 finally{
- if(chrome.exitCode===null){
-  const done=new Promise(r=>chrome.once('exit',r));
-  if(c&&ws?.readyState===WebSocket.OPEN)await Promise.race([c.send('Browser.close'),new Promise(r=>setTimeout(r,1000))]);
-  await Promise.race([done,new Promise(r=>setTimeout(r,2000))]);
-  if(chrome.exitCode===null){chrome.kill();await done;}
- }
+ // Ask Chrome to close itself first; stopChrome() takes it down if it has not.
+ if(chrome.exitCode===null&&c&&ws?.readyState===WebSocket.OPEN)await Promise.race([c.send('Browser.close'),new Promise(r=>setTimeout(r,1000))]);
+ await stopChrome(chrome,2000);
  ws?.close();server.close();
  await fs.promises.rm(profile,{recursive:true,force:true,maxRetries:10,retryDelay:100});
 }

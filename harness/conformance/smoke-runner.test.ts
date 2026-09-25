@@ -1,6 +1,50 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { expect, it } from 'vitest';
 // @ts-expect-error Plain Node harness module.
-import { planSmokes } from '../verify/run-smokes.mjs';
+import { planSmokes, smokeCoverage } from '../verify/run-smokes.mjs';
+// @ts-expect-error Plain Node tool module.
+import { planGate, SMOKE_AREAS } from '../../tools/gate.mjs';
+
+const VERIFY = fileURLToPath(new URL('../verify/', import.meta.url));
+type Coverage = { name: string; covers: string[]; files: string[] };
+const coverage = smokeCoverage() as Coverage[];
+
+it('registers every smoke on disk, and nothing that is not there — an unregistered smoke never runs', () => {
+  const onDisk = fs.readdirSync(VERIFY).filter(name => name.endsWith('-smoke.mjs')).map(name => `harness/verify/${name}`).sort();
+  const registered = [...new Set(coverage.flatMap(smoke => smoke.files).filter(file => file.endsWith('-smoke.mjs')))].sort();
+  expect(registered).toEqual(onDisk);
+});
+it('declares for every smoke areas the gate reaches, and each area really is reached by a change there', () => {
+  for (const smoke of coverage) {
+    expect(smoke.covers.length, smoke.name).toBeGreaterThan(0);
+    for (const area of smoke.covers) expect(SMOKE_AREAS, `${smoke.name} covers ${area}`).toContain(area);
+  }
+  // A representative change in each area, and a smoke covering it that the gate then runs.
+  const probes: Record<string, string> = {
+    workbench: 'src/workbench/ScenarioPage.ts', studio: 'apps/studio/src/PiecePage.ts', library: 'worker/api/library.ts',
+    embed: 'src/entries/embed.ts', lib: 'src/entries/lib.ts', audio: 'src/audio/transport.ts',
+  };
+  expect(Object.keys(probes).sort()).toEqual([...SMOKE_AREAS].sort());
+  for (const [area, file] of Object.entries(probes)) {
+    const runs: string[] = planGate([file]).smokes;
+    for (const smoke of coverage.filter(s => s.covers.includes(area))) expect(runs, `${file} → ${smoke.name}`).toContain(smoke.name);
+  }
+});
+it('refuses the two smoke traps that cost a leak and a hang', () => {
+  // A profile under a literal /tmp escapes the runner's scoped TMPDIR (6.3 GB of
+  // litter by 2026-09-24); waiting for Chrome's 'exit' by hand hangs forever on a
+  // Chrome that already exited — stopChrome() in browserHarness.mjs does it safely.
+  const traps: [RegExp, string][] = [
+    [/mkdtemp(Sync)?\(\s*['"`]\/tmp/, 'make temp directories under os.tmpdir(), not a literal /tmp'],
+    [/once\(\s*chrome\s*,\s*['"]exit['"]|chrome\.once\(\s*['"]exit['"]/, "stop Chrome with stopChrome(), not by waiting for 'exit'"],
+  ];
+  const found = fs.readdirSync(VERIFY).filter(name => name.endsWith('.mjs') && name !== 'browserHarness.mjs').flatMap(name =>
+    fs.readFileSync(path.join(VERIFY, name), 'utf8').split('\n').flatMap((line, index) =>
+      traps.filter(([pattern]) => pattern.test(line)).map(([, fix]) => `harness/verify/${name}:${index + 1}: ${fix}`)));
+  expect(found).toEqual([]);
+});
 
 type Command = { command: string; args: string[]; env?: Record<string, string> };
 type Job = { label: string; commands: Command[] };

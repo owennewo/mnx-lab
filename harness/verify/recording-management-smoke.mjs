@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import { Miniflare, convertV4MiniflareOptions } from 'miniflare';
 import { generateKeyPair, exportJWK, SignJWT } from 'jose';
 import { serveStatic } from './staticServer.mjs';
-import { devtoolsPort, connect, client } from './browserHarness.mjs';
+import { devtoolsPort, connect, client, stopChrome } from './browserHarness.mjs';
 const root=fileURLToPath(new URL('../../',import.meta.url));
 const {privateKey,publicKey}=await generateKeyPair('RS256');
 const jwk={...await exportJWK(publicKey),kid:'smoke',alg:'RS256',use:'sig'};
@@ -131,6 +131,6 @@ try {
 } catch(e) {if(c){const shot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync('/tmp/recording-management-failure.png',Buffer.from(shot.result.data,'base64'));}throw e;}
 finally {
   if(c&&ws?.readyState===WebSocket.OPEN)await Promise.race([c.send('Browser.close'),new Promise(r=>setTimeout(r,1000))]);
-  ws?.close();if(chrome.exitCode===null)chrome.kill();if(chrome.exitCode===null)await Promise.race([new Promise(r=>chrome.once('exit',r)),new Promise(r=>setTimeout(r,1000))]);
+  ws?.close();await stopChrome(chrome,1000);
   proxy.closeAllConnections();await new Promise(r=>proxy.close(r));staticServer.server.closeAllConnections();await new Promise(r=>staticServer.server.close(r));await mf.dispose();await fs.promises.rm(profile,{recursive:true,force:true,maxRetries:10,retryDelay:100});
 }

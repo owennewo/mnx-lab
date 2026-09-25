@@ -1,4 +1,5 @@
 // Permanent native-sink OfflineAudioContext smoke; requires google-chrome.
+import { stopChrome } from './browserHarness.mjs';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -97,11 +98,7 @@ try {
   console.log('Offline audio smoke OK', JSON.stringify(response.result.result.value, null, 2));
 } finally {
   ws?.close();
-  if (chrome && chrome.exitCode === null) {
-    const exited = new Promise((r) => chrome.once('exit', r));
-    chrome.kill('SIGTERM');
-    await exited;
-  }
+  await stopChrome(chrome);
   await server.close();
   // Litter, not a failure: Chrome goes on flushing its cache after it reports
   // exit, so this races and sometimes loses. Throwing here from `finally`

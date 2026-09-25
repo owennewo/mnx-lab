@@ -3,7 +3,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { serveStatic } from './staticServer.mjs';
-import { devtoolsPort, connect, client } from './browserHarness.mjs';
+import { devtoolsPort, connect, client, stopChrome } from './browserHarness.mjs';
 const profile=fs.mkdtempSync(path.join(os.tmpdir(),'mnx-player-workbench-'));
 let chrome,ws,server,review;
 try{
@@ -246,7 +246,7 @@ try{
   if(cdp.logs.length)throw new Error(cdp.logs.join('\n'));
   console.log('Player workbench/review smoke OK');
 }finally{
-  ws?.close();if(chrome && chrome.exitCode===null){const done=new Promise(r=>chrome.once('exit',r));chrome.kill();await done;}
+  ws?.close();await stopChrome(chrome);
   server?.server.close();review?.server.close();
   // A temp profile left behind is litter, not a failure. Chrome goes on
   // flushing its cache for a moment after it reports exit, so this races and
