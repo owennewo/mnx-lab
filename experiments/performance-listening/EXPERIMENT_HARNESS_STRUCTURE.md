@@ -92,6 +92,19 @@ versioned with the evaluator. This is how the evaluator is built and trusted bef
 any listener exists, and how a changed number is later traced to the candidate rather
 than to the instrument. No candidate is ever that oracle.
 
+**One instrument per kind of evidence.** Each kind of label has exactly one evaluator,
+and an experiment uses it rather than bringing its own:
+
+| Evidence | Instrument | Tier |
+|---|---|---|
+| Generated audio with exact labels, the development ladder | `following-evaluator`, v1 lineage | Development |
+| Real recordings with approximate sync labels, the thermometer | `sync-proxy-evaluator@1` | Development |
+| Any source with exact or supplied alignment, component recognition | The experiment 003 recognition diagnostic | Development |
+| Independently bounded real labels, reserved and final evidence | The v2 instrument | Qualification |
+
+A new kind of label, or a change to what an instrument can judge, is a new instrument
+version with hand-worked oracle cases, recorded before any candidate is judged by it.
+
 ### 4. Reports
 
 **Owns:** the view of results that the loop reads failures from.
@@ -101,6 +114,11 @@ summary appears, and compares two candidates on the same examples with the uncer
 of their difference. It exists before the first run, because the loop's next question
 is selected from it. Aggregates that would hide a failing case or category are not a
 report.
+
+**One renderer.** A numbered report is the experiment's own file plus the recorded run
+summaries it names, rendered by one shared exporter from a registry. A new experiment
+adds a registry row, not an exporter. Private playback follows the same rule: runs
+write their traces in one shape so one private page can play any run.
 
 ### 5. Generators
 
@@ -112,6 +130,13 @@ the harness profile: sine tones, one note per beat, constant tempo. Later genera
 add richer tones, instrument samples, expressive modulation and rhythmic variety, one
 dimension at a time and then in combination. New seeds from the same generator are
 not new sources.
+
+The development ladder needs two more generator parts. A **score renderer** turns any
+compiled score's sounding notes into audio, chords included, so a real piece can be
+rendered with exact labels. **Fuzz transforms** perturb one declared axis at a time,
+such as tempo, onset timing, envelope, timbre, tuning, or level and noise, either on
+the note list or on each note's synthesis. Each transform is seeded, its recipe is
+provenance, and its seeds are split into development and held-out groups before use.
 
 ### 6. Source ingestion
 
@@ -166,21 +191,33 @@ The first is a **trivial baseline** that proves the pipeline end to end and sets
 floor every later candidate must clear; a follower that assumes the score's tempo and
 advances a clock is one example. An **informative external comparator** follows, so
 that the first real hypothesis is measured against something other than the floor.
-From then on, candidates are whatever the loop proposes; no family is preferred.
+For following, that comparator is the published standard method: causal online time
+warping with onset-emphasised features. From then on, candidates are whatever the
+loop proposes; no family is preferred, and each is compared with the comparator as
+well as the floor.
 
 ### 9. Research contract and ledger
 
 **Owns:** the decision rules and the history.
 
-The **research contract** is written before a batch and is sufficient for another run
-to make the same retain-or-reject decisions: capability, profile, freedoms, tolerances,
-thresholds, budgets, partitions, evidence supply, comparator, priorities and stopping
-conditions. The first contract of each milestone, and any later loosening, is
-human-approved. The **retention rule** is a procedure, not a judgement: given two runs
-and the contract, it says retain, reject or inconclusive, accounting for uncertainty.
+Contracts come in two tiers. A **development contract** fixes the development ladder,
+the scoreboard every candidate runs, the pass bar per rung, the plateau rule and the
+exit to the next kind of evidence. It retains nothing, so it does not ration candidate
+versions. A **qualification contract** fixes everything a retain-or-reject decision
+needs. Both are recorded before they are used; the first qualification contract of a
+milestone, and any loosening in either tier, is human-approved.
+
+The qualification **research contract** is written before a batch and is sufficient
+for another run to make the same retain-or-reject decisions: capability, profile,
+freedoms, tolerances, thresholds, budgets, partitions, evidence supply, comparator,
+priorities and stopping conditions. The **retention rule** is a procedure, not a
+judgement: given two runs and the contract, it says retain, reject or inconclusive,
+accounting for uncertainty. It runs only on qualification evidence.
+
 The **ledger** records every experiment: hypothesis, sources, parent and candidate,
 data and evaluator versions, results by category, resource use, decision and next
-action. Rejected ideas stay in it.
+action. Rejected ideas stay in it. It holds one row per numbered experiment, pointing
+at that experiment's single file, where the pre-registration and the results live.
 
 ### 9a. Loop driver
 
@@ -194,7 +231,10 @@ experiment and evidence budgets, freezes a candidate before reserved evaluation,
 decides whether to continue, change direction or stop, and resumes an interrupted
 session from the research log (piece 11), which points it at the ledger rows that
 matter. It is a procedure the LLM executes with its state in the log and its history
-in the ledger, not necessarily a separate component. Its defining requirement is that
+in the ledger, not necessarily a separate component. On the development tier it is
+the ladder procedure in the development contract: run the scoreboard, attack the
+lowest failing rung, climb or stop by the plateau rule. On the qualification tier it
+is the bench's qualification driver, which spends the reserved-evidence budget. Its defining requirement is that
 every next action is traceable to the contract, the measured results and the recorded
 research, so that nobody has to read a report and decide.
 
@@ -218,6 +258,10 @@ lands; a **findings index**, one line per finding, each citing the note, ledger 
 per-experiment write-up that supports it; and the **open questions**, ranked as the
 driver ranks them, so the next question is visible without reading a report.
 
+It is the only prose that states the current state. The README, the report index,
+contract records and evidence records link to it rather than summarising it, because
+every restatement is another place to go stale.
+
 Three rules keep it honest. A finding cites its evidence or it is not a finding. A
 finding that later evidence contradicts is marked superseded, with the row that did
 it, and is never deleted, so the log carries the same history the ledger does.
@@ -235,6 +279,7 @@ figures that no longer held is the failure this rule prevents.
 | Pipeline | 5 (harness profile), 7, 8 (trivial baseline) | A run over the harness set produces a report the evaluator and oracle agree with, and the causality check passes |
 | Real evidence | 6 (library recordings, score perturbation) | Eligible solo library recordings are goldens with declared precision and unknown regions; a few are hand-checked; following controls exist on real audio |
 | Loop | 9 (retention rule), 9a | The first contract is human-approved; the retention rule runs on two recorded runs; the driver's next action is traceable |
+| Development ladder | 5 (score renderer, fuzz transforms), 3 (exact-label instrument for rendered scores), 8 (published comparator) | Rung 0 of the first real piece exists with exact labels; the scoreboard runs every candidate over every built rung, the recognition diagnostic and the real-audio thermometer |
 | Candidates | 8 | The first real hypothesis and a comparator are compared under the contract |
 
 Steps three and four run in parallel. Everything after the last step is the loop
@@ -245,9 +290,11 @@ milestone and a live microphone rig follow the same rule.
 
 ## How the pieces mature
 
-Inputs climb two ladders at once: the synthetic profile ladder, one dimension at a
-time and then in combination, and a real-source track that starts hard on timbre and
-recording conditions. Re-amplified sets hold every other dimension at level one by
+Inputs climb in sequence, with real audio always visible. Development starts on a
+synthetic ladder built from a real piece's score, one fuzz axis at a time and then in
+combination, with timbre early on the ladder. Real recordings run beside every
+development run as a thermometer and become the development evidence once a candidate
+passes the combined rung. Re-amplified sets hold every other dimension at level one by
 construction; real performances arrive with whatever profile they actually have, which
 is recorded rather than assumed. Candidates mature
 only by retained comparisons, so their pace is set by the supply of independent

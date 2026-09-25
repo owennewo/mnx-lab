@@ -1,0 +1,23 @@
+{
+  "note": "One row per numbered report rendered by export-report.mjs. A new experiment adds a row here, not an exporter.",
+  "reports": [
+    {
+      "number": "002",
+      "slug": "002-winner-sync-proxy",
+      "title": "002 · Winner with sync interpolation",
+      "banner": "Experiment complete · neither candidate passes · four bars retained",
+      "runs": ["g002a-spectral1-winner-sync-proxy", "g002b-spectral2-winner-sync-proxy"],
+      "private": { "href": "file:///home/williao/dev/mnx-listening-data/real-evidence-01/002-winner-sync-proxy.html", "label": "Open private audio and timing trace" },
+      "previous": { "href": "001-initial-two-scale.html", "label": "Experiment 001" }
+    },
+    {
+      "number": "003",
+      "slug": "003-recognition-at-sync",
+      "title": "003 · Recognition at supplied sync",
+      "banner": "Diagnostic complete · weak positive recognition and ambiguous nearby positions",
+      "runs": ["g003-recognition-at-sync"],
+      "private": { "href": "file:///home/williao/dev/mnx-listening-data/real-evidence-01/003-recognition-at-sync.html", "label": "Open private audio and similarity traces" },
+      "previous": { "href": "002-winner-sync-proxy.html", "label": "Experiment 002" }
+    }
+  ]
+}

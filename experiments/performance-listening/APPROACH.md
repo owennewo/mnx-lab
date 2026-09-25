@@ -9,7 +9,9 @@ The immediate focus is score following and performance assessment. Extracting a
 score from audio without being given the score is outside this experiment's scope.
 
 Start with deliberately simple, labelled examples. Increase difficulty as measured
-results justify it. The eventual destination is Studio, using the internal MNX model
+results justify it. Develop on synthetic renderings of a real score until a candidate
+survives controlled fuzzing, then return to real recordings; the section on
+complexity dimensions explains why. The eventual destination is Studio, using the internal MNX model
 to represent scores, guiding a player while they play. The listener that matters is
 therefore causal and prompt; offline results can help diagnose the cost of that
 constraint, but are not the goal or proof of an acoustic ceiling. This document
@@ -126,11 +128,20 @@ Recording conditions are additional declared factors: microphone, room, backgrou
 noise, recording level, and other instruments or voices sounding alongside the
 performer. Success on generated audio does not establish success on
 recordings of real instruments. The previous experiment's largest measured loss was
-timbre and recording transfer, not musical complexity, so raise the harmonic dimension
-and the recording conditions **early**, as a parallel track with every other dimension
-still at level 1, rather than after the synthetic ladder is exhausted. A real
-instrument playing one note per beat into a microphone is a level-1 source with a
-hard harmonic profile, and it is where the destination's difficulty actually lives.
+timbre and recording transfer, not musical complexity, so timbre enters the synthetic
+ladder **early**: plucked envelopes, ringing notes, harmonic partials and recorded
+instrument samples, not only sine tones.
+
+**Develop on a synthetic ladder first.** Experiments 002 and 003 went to a real
+recording before any candidate had been run on audio with an exact answer, and a
+failure there could not be split into a tracking defect and an acoustic limit. A
+rendering of a real piece's own score keeps its structural ambiguity and gives exact
+labels. Fuzzing that rendering one declared axis at a time, then in combination,
+attributes each failure to the axis that caused it. Real recordings run alongside
+every development run as a thermometer: recorded, never used to select. Once one
+candidate passes the combined rung, real recordings become the development evidence
+and the ladder becomes regression evidence. [Development contract 1](contracts/development-contract-1.md)
+defines the current ladder, its pass bar and its exit.
 
 ## Goldens and the meaning of a correct assessment
 
@@ -187,7 +198,9 @@ with it, so that a change in a measured result can be traced to the candidate ra
 than to the measuring instrument. A candidate is never that oracle.
 
 Separate examples used for development, reserved checks used to decide whether to
-retain a candidate, and final acceptance evidence. Split by the independence relevant
+retain a candidate, and final acceptance evidence. For generated fuzz, split the seeds
+into development and held-out groups before any candidate runs; held-out seeds test
+robustness to the draw, not transfer to a new source. Split by the independence relevant
 to the claim: for example, performer, piece, session or instrument/sample source.
 Keep variants of one recording together. New random seeds from the same generator
 do not demonstrate transfer to a new source.
@@ -289,8 +302,23 @@ outcome, not a reason to invent a citation or postpone a well-founded local test
 
 ## The iterative experiment
 
-Before a batch of experiments, record a **research contract** sufficient for another
-run to make the same selection decisions:
+Contracts come in two tiers, because learning and qualifying need different rules.
+
+- A **development contract** governs how the loop learns on development evidence:
+  which sets it builds, the order in which difficulty rises, the scoreboard every
+  candidate runs, what counts as a plateau and when development hands a candidate
+  to qualification. Development decisions are provisional and retain nothing, so
+  development iterations are **not rationed**.
+- A **qualification contract** governs formal retention and acceptance: reserved and
+  final evidence, numerical gates, the retention rule and their budgets. It is where
+  the listed items below are fixed in full.
+
+What is rationed is whatever would weaken a later claim or spend someone else's
+judgement: access to reserved and final evidence, and requests for human input.
+Rationing development iterations adds no rigour; it only slows learning.
+
+Before qualification, record a **research contract** sufficient for another run to
+make the same selection decisions:
 
 - The bounded capability, target source and complexity profile; permitted timing and
   navigation freedom; and which judgements are answerable.
@@ -301,31 +329,36 @@ run to make the same selection decisions:
   and player sessions, and the partition each belongs to.
 - The current best candidate or initial comparator, the priority among outcomes,
   minimum worthwhile improvement and permitted regressions by relevant category.
-- Limits on candidate trials, compute, web research and reserved-check access; and
-  what counts as a plateau, insufficient evidence or completion.
+- Limits on qualification trials, compute, web research and reserved-check access;
+  and what counts as a plateau, insufficient evidence or completion.
 
 These are experimental choices, not unspecified decisions to revisit after seeing
 results. Initial choices may be provisional, but must be explicit before comparison.
-The LLM may draft a contract, but the first contract of each milestone, and any later
-change that loosens a threshold, tolerance, freedom or budget, is approved by a human
-before use; tightening within an approved contract is not. This is where human
-judgement is spent: after approval the loop's honesty rests on the contract, not on
-the LLM's restraint.
+The LLM may draft a contract, but the first qualification contract of each milestone,
+and any later change that loosens a threshold, tolerance, freedom or budget in either
+tier, is approved by a human before use; tightening within an approved contract is
+not. A development contract's direction comes from the human; its details may be
+drafted by the LLM and tightened freely. This is where human judgement is spent:
+after approval the loop's honesty rests on the contract, not on the LLM's restraint.
 For example, a following experiment could prioritise reducing confidently wrong
 position time subject to coverage and latency limits. An assessment experiment needs
 its own trade-off between false accusations and missed discrepancies. Neither requires
 a single player grade or a prescribed algorithm.
 
-1. **Select the question.** Begin with the harness profile and, as soon as it stands,
-   a real-timbre or recorded variant. Subsequently rank measured failures by the
-   contract's priorities, frequency and uncertainty. Consult relevant web evidence
+1. **Select the question.** Begin at the lowest unpassed rung of the development
+   ladder. Subsequently rank measured failures by the contract's priorities,
+   frequency and uncertainty. Consult relevant web evidence
    and the experiment history before selecting a bounded hypothesis. State its
    predicted benefit, possible regressions and evidence that would contradict it.
 2. **Establish the evidence.** Freeze matching examples, controlled discrepancies and
    negative controls under the declared partition rules. Confirm that the labels and
    evaluator can answer the question. Choose informative comparators; lack of a
-   previous local algorithm is not a reason to omit comparison altogether.
-3. **Develop within budget.** Propose or revise candidates on development examples.
+   previous local algorithm is not a reason to omit comparison altogether. Start from
+   the published standard method for the capability, so home-grown candidates are
+   measured against it and not only against a trivial floor.
+3. **Develop on the scoreboard.** Propose or revise candidates on development
+   examples. Every candidate version runs the whole development scoreboard, never a
+   hand-picked part of it, and no experiment introduces an evaluator of its own.
    Diagnose concrete failures as acoustic ambiguity, incorrect alignment, incorrect
    judgement or uncertain labels. Diagnostic experiments may remove one uncertainty
    to test another: for example, supplying known alignment to isolate assessment
@@ -339,15 +372,19 @@ a single player grade or a prescribed algorithm.
    versions of both candidates. An inconclusive result is not a pass; gather additional
    evidence only within the declared budget. Rejected ideas remain in the history.
 6. **Choose the next action.** Continue against the highest-priority unresolved failure,
-   or expand a dimension/source after the capability passes independent checks.
+   climb to the next rung once the current one passes, or hand a candidate to
+   qualification once the development contract's exit is met.
    Retain earlier profiles as regression evidence and add combinations to test
    interactions. At a plateau, revisit the explanation and external research within
    budget, then change the question or report the limit. Do not repeat indefinitely
    until a favourable result appears.
 
-Each experiment leaves a concise record: hypothesis and research sources, parent and
-candidate versions, data and evaluator versions, conditions, results by category,
-uncertainty, resource use, decision and next action. Preserve unsuccessful approaches
+Each experiment leaves a concise record in **one file**: hypothesis and research
+sources, parent and candidate versions, data and evaluator versions, conditions,
+results by category, uncertainty, resource use, decision and next action. Its
+pre-registration is committed before the run and its results are appended after, so
+git dates the prediction. The ledger row and the research log point to that file;
+neither restates it. Preserve unsuccessful approaches
 and enough detail to reproduce comparisons. Improvement means a retained gain under
 these rules, not merely another algorithm or a better development score.
 

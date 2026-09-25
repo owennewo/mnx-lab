@@ -1,30 +1,8 @@
 # Readable experiment reports
 
-Current result: [003 — Recognition at supplied sync](003-recognition-at-sync.html).
-The diagnostic exposes weak positive recognition and frequent ties with nearby
-positions in both frozen representations. Its private companion embeds audio and
-similarity traces. Winner remains at four bars.
-
-Open [001 — Initial two-scale assessment](001-initial-two-scale.html) in a browser.
-It contains a plain-language summary, the complete recorded run report, and the R1
-evidence inventory. It is a self-contained local HTML file: no server, install,
-JavaScript or network request is needed to read it. Expand the two evidence sections
-for the detailed tables. Browser Find works after opening the relevant section.
-
-From the repository root on Linux:
-
-```sh
-xdg-open experiments/performance-listening/reports/001-initial-two-scale.html
-```
-
-## Names and evidence
-
-Use `NNN-short-description.html` for readable reports, with a matching Markdown
-summary. Numbers increase within the active performance-listening experiment and
-are not reused; archived work retains its original names. Each summary names the
-exact recorded run ID, candidate, set and evaluator. A presentation-only update keeps
-the report number. A new bounded experiment receives the next number and names every constituent run;
-002 groups the initial comparison and its one predeclared revision as 002a and 002b.
+Numbered, self-contained HTML reading copies of each experiment. They open in a
+browser without a server, install or network request. Current state and the next
+question are in [the research log](../RESEARCH_LOG.md), not here.
 
 | Number | Readable report | Recorded run |
 |---|---|---|
@@ -32,74 +10,73 @@ the report number. A new bounded experiment receives the next number and names e
 | 002 | [Winner with sync interpolation](002-winner-sync-proxy.html) | [002a](../runs/g002a-spectral1-winner-sync-proxy/summary.json), [002b](../runs/g002b-spectral2-winner-sync-proxy/summary.json) |
 | 003 | [Recognition at supplied sync](003-recognition-at-sync.html) | [g003-recognition-at-sync](../runs/g003-recognition-at-sync/summary.json) |
 
+## One experiment, one file
+
+From experiment 004 on, a numbered experiment is one file, `NNN-short-description.md`.
+Its pre-registration section is committed before the run: question, rung or evidence,
+candidates, prediction and what would contradict it. The results are appended to the
+same file after the run, so git dates the prediction. The experiment adds one
+[ledger](../ledger.md) row and one row in [reports.json](reports.json), which the shared
+exporter renders. It adds no contract file and no exporter of its own.
+[Development contract 1](../contracts/development-contract-1.md#records) sets this rule.
+Experiments 002 and 003 predate it and keep their separate pre-run plans.
+
+Numbers increase and are never reused; archived work keeps its original names. A
+presentation-only update keeps the number. A report names every constituent run; 002
+groups an initial comparison and its one predeclared revision as 002a and 002b.
+
 The run directory remains the original machine-readable evidence. Do not rename or
-rewrite its decisions, counts, metadata or report when improving the HTML. The
-[research log](../RESEARCH_LOG.md) is the current state; the [ledger](../ledger.md)
-records runs. The HTML is a reading copy with source hashes, not another assessment.
-The R1 section reproduces the approved local inventory snapshot, not a live library
-query or newly qualified evidence.
+rewrite its decisions, counts, metadata or report when improving the HTML. The HTML
+is a reading copy with source hashes, not another assessment.
 
-## Rebuild report 001
+## Rebuild
 
-Edit [the summary](001-initial-two-scale.md) or the presentation in the exporter, then:
+From the repository root:
+
+```sh
+node experiments/performance-listening/reports/export-report.mjs            # every registered report
+node experiments/performance-listening/reports/export-report.mjs 003        # one report
+node experiments/performance-listening/reports/export-report.mjs --check    # verify without writing
+```
+
+The shared exporter verifies every source hash that each registered run pins, then
+renders the summary and embeds each run's aggregate evidence. It uses Node built-ins
+only; its small Markdown reader supports headings, paragraphs, bullets and tables.
+
+Report 001 has a different layout, with the R1 evidence inventory embedded, and keeps
+its own exporter:
 
 ```sh
 node experiments/performance-listening/reports/export-html.mjs
 node experiments/performance-listening/reports/export-html.mjs --check
 ```
 
-The exporter uses Node built-ins only. It reads the summary, saved run report and
-approved R1 note without running a candidate or changing any scientific record. Its
-small Markdown reader supports the constructs in these three documents; it is not
-a general-purpose Markdown library. The generated HTML is committed so it opens
-immediately after checkout. It embeds both evidence documents and has optional links
-back to the source files when kept in this checkout. To print all evidence, expand
-both sections before using the browser's Print command.
+## Preparation review
 
-## Preparation reviews
+[Four-bar real-evidence preparation](real-evidence-review.html) contains the approval
+record, the exact reviewed contract snapshot and the preparation record, with a link
+to the private listening packet on this machine. It is approval history, not a
+numbered result. Rebuild it with `export-evidence-review.mjs`; add `--check` to verify
+it. Export also verifies the approved contract snapshot against its approval record.
 
-[Four-bar real-evidence preparation](real-evidence-review.html) contains the approval record, exact reviewed
-contract snapshot and the current preparation record, with a link to the private listening
-packet on this machine. It is preparation history, not a numbered experiment result; experiment 002 now
-records the actual comparisons under the subsequent development amendment. Rebuild it with `node experiments/performance-listening/reports/export-evidence-review.mjs`;
-add `--check` to verify that it matches its sources. Export also verifies the approved
-contract snapshot against the SHA-256 in its approval record.
+## Private playback
 
-## Loop readiness checkpoint
-
-[Research loop readiness](loop-readiness.html) records v2 instrument verification,
-the user's source confirmation and the historical bar-anchor sensitivity calculation.
-It now points to experiment 002 and explains why manual beat review is optional for
-initial proxy development, while independent precision matters for stronger claims.
-Rebuild with `node experiments/performance-listening/reports/export-loop-readiness.mjs`
-and verify with `--check`. Private embedded playback/beat-review pages are generated
-outside git; the report source lists their commands.
-
-## Rebuild report 002
+Audio, scores and per-frame traces stay outside git, in
+`/home/williao/dev/mnx-listening-data/real-evidence-01/`. Each exporter below refuses
+to write inside a git checkout and checks the recorded hashes before embedding audio.
+The pages use native WAV playback with no server or network request.
 
 ```sh
-node experiments/performance-listening/reports/export-sync-proxy.mjs
-node experiments/performance-listening/reports/export-sync-proxy.mjs --check
-node experiments/performance-listening/reports/export-private-sync-proxy.mjs /home/williao/dev/mnx-listening-data/real-evidence-01
-node experiments/performance-listening/reports/export-private-sync-proxy.mjs /home/williao/dev/mnx-listening-data/real-evidence-01 --check
+D=/home/williao/dev/mnx-listening-data/real-evidence-01
+node experiments/performance-listening/reports/export-private-sync-proxy.mjs $D    # 002 traces
+node experiments/performance-listening/reports/export-private-recognition.mjs $D   # 003 traces
+node experiments/performance-listening/reports/export-private-listening.mjs $D     # both four-bar clips
+node experiments/performance-listening/reports/export-beat-review.mjs $D           # optional beat bounds
+node experiments/performance-listening/reports/serve-private-review.mjs $D         # same pages over localhost
 ```
 
-The public exporter verifies every pinned implementation/policy hash in both runs.
-The private exporter verifies the saved evaluation hashes and reviewed WAV identity;
-it refuses output inside a git checkout. Both are presentation-only. The private page
-uses native WAV playback and inline SVG/JavaScript, with no server or network requests.
-
-## Rebuild report 003
-
-```sh
-node experiments/performance-listening/reports/export-recognition.mjs
-node experiments/performance-listening/reports/export-recognition.mjs --check
-node experiments/performance-listening/reports/export-private-recognition.mjs /home/williao/dev/mnx-listening-data/real-evidence-01
-node experiments/performance-listening/reports/export-private-recognition.mjs /home/williao/dev/mnx-listening-data/real-evidence-01 --check
-```
-
-The public exporter verifies pinned diagnostic sources. The private exporter checks
-the recorded frame hash and reviewed WAV, then embeds native audio and clickable
-similarity traces. No server or network request is needed. The offline page's script,
-audio and graph data are checked; its browser interaction has not been verified via
-the browser tool, which blocks file navigation.
+These per-experiment private exporters predate the one-renderer rule. From 004 on,
+runs write their traces in one shape so a single private page plays any run.
+Browser automation blocks `file://` navigation, so the offline pages have not been
+interactively verified through that tool; playback over localhost was checked in
+Chrome.

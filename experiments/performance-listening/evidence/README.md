@@ -1,14 +1,13 @@
 # Real evidence — first four bars
 
-Preparation record and subsequent outcome, 2026-09-25. **Experiment 002 completed
-on a frozen approximate sync-reference set; neither candidate passed.**
-[The report](../reports/002-winner-sync-proxy.html) records the full result. The user
-instructed us to interpolate `sync.json`; [the amendment](../contracts/sync-proxy-development-1.md)
-removes manual beat annotation as a prerequisite for initial development.
+Preparation record, 2026-09-25, for the real clips used in experiments 002 and 003.
 The user selected The Winner Takes It All first, then Dust in the Wind, four performed
 bars each, expanding only after measured success. Both pieces and every later crop
-remain development evidence. This replaces the earlier five-title shortlist for the
-next batch; it does not rewrite the historical R1 inventory.
+remain development evidence. This replaces the earlier five-title shortlist for that
+batch; it does not rewrite the historical R1 inventory. Under
+[development contract 1](../contracts/development-contract-1.md), the Winner clip is
+the real-audio thermometer until the synthetic ladder exits; the
+[research log](../RESEARCH_LOG.md) holds the current state.
 
 ## Reviewed sources
 
@@ -98,16 +97,6 @@ produces canonical review WAVs. The packet is regenerated from source evidence, 
 listener. Treat `preflight-summary.json` as a new preparation snapshot if its inputs
 change; do not replace frozen experiment evidence with it.
 
-## Stage status
-
-[003 — Recognition at supplied sync](../reports/003-recognition-at-sync.html) completed
-the subsequent component diagnostic on the same frozen set. Both representations
-remain weak and ambiguous with alignment supplied; no new listener was tried.
-[Experiment 002](../reports/002-winner-sync-proxy.html) remains the completed pair of
-failed following comparisons. There is no retained candidate or positive Dust expansion.
-The [bar-anchor sensitivity calculation](bar-anchor-precision-1.json) is historical
-analysis of guaranteed precision, not measured sync error or a proxy eligibility gate.
-
 ## Playback and optional independent beat review
 
 The private `003-recognition-at-sync.html` embeds Winner and similarity traces;
@@ -115,4 +104,4 @@ The private `003-recognition-at-sync.html` embeds Winner and similarity traces;
 `listen.html` embeds both reviewed WAVs. `beat-review.html` offers waveform seeking,
 playback speed and blank independent beat bounds for later precision work; it is not
 a requirement for current development. Commands and UI-check limitations are in the
-[readiness report](../reports/loop-readiness.md#private-playback-and-optional-precision-review).
+[report index](../reports/README.md#private-playback).

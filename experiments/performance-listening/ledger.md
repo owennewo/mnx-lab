@@ -4,6 +4,8 @@ Append-only. Every new row updates [the research log](RESEARCH_LOG.md) in the sa
 commit. Construction progress belongs in [FIRST_STEP §12](FIRST_STEP.md#12-progress-and-learnings).
 The original provisional contract 0 was not human-approved. Contract 1 is approved;
 experiment 002 uses the subsequent user-directed approximate-development amendment.
+From experiment 004, development runs under [development contract 1](contracts/development-contract-1.md):
+one row per numbered experiment, pointing at that experiment's single file.
 
 <a id="g001-clock-harness-v1"></a>
 

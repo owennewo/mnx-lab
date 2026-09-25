@@ -20,22 +20,16 @@ bars of The Winner Takes It All, then Dust in the Wind; expand to eight and twel
 only when the contract's measured gates and review requirements are met. There is
 no change to the frozen v1 instrument or experiment 001.
 
-## Subsequent user-directed development amendment
+## Amendments
 
-The user then instructed us to use `sync.json` and interpolation as “good enough” for
-initial development. [Sync-proxy development 1](sync-proxy-development-1.md) records
-that instruction and its bounded implementation without rewriting the approved draft.
-Manual beat annotation is not a prerequisite for this approximate-development loop.
-[Experiment 002](../reports/002-winner-sync-proxy.html) completed two candidate trials
-on a fixed proxy reference; neither passed. The user then authorized the
-[recognition diagnostic](recognition-diagnostic-1.md), completed as
-[experiment 003](../reports/003-recognition-at-sync.html), using supplied alignment
-without introducing or retaining a new listener.
+Each amendment is its own record; this list only points at them. The approved draft
+is unchanged.
 
-## What remains for stronger claims
+| Date | Record | Effect |
+|---|---|---|
+| 2026-09-25 | [Sync-proxy development 1](sync-proxy-development-1.md) | User direction: sync interpolation is good enough for initial development; manual beat marking is not a prerequisite |
+| 2026-09-25 | [Recognition diagnostic 1](recognition-diagnostic-1.md) | User-authorized component diagnostic at supplied alignment, run as experiment 003 |
+| 2026-09-25 | [Development contract 1](development-contract-1.md) | User direction: development moves to a synthetic ladder first; this contract becomes the qualification tier, and its version and assessment budget counts qualification candidates, not development iterations |
 
-Independent timing bounds and control distinguishability remain necessary for the
-original independently bounded comparisons. The separate v2 instrument implements
-those semantics; approximate proxy runs do not silently count as that evidence.
-Reserved retention and final microphone acceptance groups are still unallocated.
 Contract approval alone is neither candidate retention nor Studio qualification.
+Current state is in [the research log](../RESEARCH_LOG.md).

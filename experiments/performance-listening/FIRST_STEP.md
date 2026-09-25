@@ -1,5 +1,8 @@
 # First step: the first assessment against the first synthesized sources
 
+**Status: complete 2026-09-25.** Historical plan for the construction rows it names.
+Current state and the next question are in [the research log](RESEARCH_LOG.md).
+
 A campaign plan for the first three rows of the construction table in
 [EXPERIMENT_HARNESS_STRUCTURE.md](EXPERIMENT_HARNESS_STRUCTURE.md): **Contracts**,
 **Instrument** and **Pipeline**. It ends when one versioned candidate has been run over

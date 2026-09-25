@@ -4,9 +4,11 @@ The entry point to the performance-listening experiment. It answers three questi
 for a person or a resuming loop driver: what do we currently believe, on what evidence,
 and what is the next question. It is piece 11 of
 [EXPERIMENT_HARNESS_STRUCTURE.md](EXPERIMENT_HARNESS_STRUCTURE.md), and the only file
-in the experiment that is rewritten in place. `ledger.md` holds the history, one
-append-only row per run; `research/` holds one note per source read; a run's report
-holds its numbers. This file points at all three and repeats none of them.
+in the experiment that is rewritten in place. No other document restates the current
+state: the README, the report index and the evidence records link here instead.
+`ledger.md` holds the history, one append-only row per run; `research/` holds one note
+per source read; a run's report holds its numbers. This file points at all three and
+repeats none of them.
 
 How to maintain it:
 
@@ -30,20 +32,17 @@ How to maintain it:
 
 ## Current state
 
-2026-09-25. The supplied-alignment diagnostic is complete. Both frozen spectral
-representations reject much of the correct passage even when sync supplies its
-position, and nearby competing positions frequently tie. A scalar confidence cutoff
-cannot separate them reliably in this diagnostic. Prioritize attacks and short
-sequence evidence before another static-template tracking revision. This identifies
-a component weakness, not a ceiling on sequence-based following.
+2026-09-25. Development now climbs a synthetic ladder before returning to real audio.
+[Development contract 1](contracts/development-contract-1.md) records the user's
+direction: render Winner's first four bars as exact, perfectly timed audio, fuzz it
+one axis at a time, and switch to real audio once one candidate passes the combined
+rung. Research contract 1 remains the qualification contract.
 
-Winner remains at four bars. No new listener version, retention or positive Dust
-expansion occurred. Manual beat marking remains unnecessary for initial proxy
-development. Formal retention and microphone acceptance are separate and unassessed.
-The first two-version candidate sub-batch and this separately authorized diagnostic
-are both closed. Read [003 — Recognition at supplied sync](reports/003-recognition-at-sync.html),
-its [pre-run plan](contracts/recognition-diagnostic-1.md), and the unchanged
-[002 parent results](reports/002-winner-sync-proxy.html).
+No ladder rung has been built and no candidate has passed anything. The clock is the
+only floor; both spectral followers failed on the real clip in experiment 002, and
+experiment 003 traced part of that to static templates that tie with nearby positions.
+The planned attack-and-sequence experiment on real audio is abandoned, not tried. The
+next question is whether the frozen spectral followers can follow clean rung-0 audio.
 
 ## Findings
 
@@ -71,19 +70,23 @@ ledger row (`ledger.md#<row>`), or a findings write-up.
 | 17 | The register/harmonic revision increases rejection and loses more correct following; smaller exposure and residuals among fewer claims do not establish improvement. | [Run 002b](ledger.md#g002b-spectral2-winner-sync-proxy), [pre-run hypothesis](research/spectral-revision-2.md) | holds | 2026-09-25 | Hypothesis contradicted; neither version passes, sub-batch closed |
 | 18 | Supplying approximate sync alignment does not rescue either frozen representation's positive confidence, and nearby competing positions often tie; scalar cutoff adjustment cannot separate those framewise cases reliably. | [Experiment 003](reports/003-recognition-at-sync.html), [run](ledger.md#g003-recognition-at-sync) | holds | 2026-09-25 | Privileged component diagnosis; does not rule out sequence-based disambiguation |
 | 19 | The fixed constant-offset sensitivity test does not rescue recognition; shared normalized template decay erases within-active-set decay cues. | [Sensitivity and template analysis](reports/003-recognition-at-sync.md#what-explains-the-ties-and-what-to-try-next), [frozen template code](bench/src/candidates/spectralFollower1.ts) | holds | 2026-09-25 | Does not certify sync precision or attribute every tie to one cause |
+| 20 | Neither spectral follower has been run on audio with exact labels, so experiment 002 cannot separate tracking defects from acoustic limits. | [Run g001](ledger.md#g001-clock-harness-v1) ran only the clock; [runs 002a/002b](ledger.md#g002a-spectral1-winner-sync-proxy) ran only the real clip | holds | 2026-09-25 | Motivates [development contract 1](contracts/development-contract-1.md) |
 
 
 ## Open questions
 
-Ranked; the top row is the next question the driver asks. Status is `open`,
+Ranked by row order; the top row is the next question the driver asks. The number
+is an identifier given when a question opens and never reused, so citations stay valid. Status is `open`,
 `in progress`, `answered` (with the finding number) or `stopped` (with the reason).
 
 | Rank | Question | Why it is ranked here | Status | Owner item |
 |---|---|---|---|---|
-| 1 | Can attack-sensitive features and short sequence evidence distinguish passages while retaining positive recognition? | Supplied-alignment diagnosis exposes weak and ambiguous static-template matches | open | [Experiment 003 next action](reports/003-recognition-at-sync.md#what-explains-the-ties-and-what-to-try-next) |
+| 9 | Do the frozen spectral followers meet the following gates on rung 0, clean sine audio of Winner bars 1–4? | A failure on exact, clean audio is a tracking defect; it reinterprets 002 before any new candidate | open | [Development contract 1](contracts/development-contract-1.md#candidates) |
+| 10 | Does a causal online time-warping follower with onset-emphasised features pass rung 0 and the tempo rung? | The published standard method is the comparator every home-grown candidate faces; the tempo rung is where the clock floor breaks | open | [Development contract 1](contracts/development-contract-1.md#candidates) |
+| 11 | Which ladder rung first breaks the best candidate, and does recognition at supplied labels fail on that rung too? | Ranks the remaining rungs by the failure they expose | open | [Development contract 1](contracts/development-contract-1.md#the-ladder) |
+| 7 | Can independent source/label checks establish timing bounds for later formal qualification? | Still relevant to stronger claims; explicitly not required for current proxy development | open, deferred to qualification | [Real-evidence preparation](evidence/README.md) |
 | 8 | At supplied sync alignment, do the frozen templates discriminate the intended passage? | Separates component recognition/confidence from path-selection errors | answered (findings 18–19); diagnostic closed | [Experiment 003](reports/003-recognition-at-sync.html) |
 | 6 | Can the initial spectral follower or one harmonic/register revision improve control rejection without losing Winner following? | First fixed real-audio algorithm question | answered (findings 16–17); sub-batch stopped at its two-version limit | [Experiment 002](reports/002-winner-sync-proxy.html) |
-| 7 | Can independent source/label checks establish timing bounds for later formal qualification? | Still relevant to stronger claims; explicitly not required for current proxy development | open, deferred | [Real-evidence preparation](evidence/README.md) |
 | 2 | How has real-time score following been evaluated elsewhere, and do our ±0.25-quarter tolerance and 200 ms deadline sit inside those norms? | FIRST_STEP §10 question 1; answers whether the first contract's tolerances are defensible before anything is measured against them | answered (findings 1–2) | FIRST_STEP item A |
 | 3 | Is there a published trivial baseline for score following, so our clock floor can be compared with the usual one? | FIRST_STEP §10 question 2; decides whether the first ledger row has an external reference point | answered (findings 1–2) | FIRST_STEP item A |
 | 4 | Which library recordings and re-amplification opportunities are eligible real evidence for the following milestone, and with what anchor precision? | The structure document runs real evidence alongside the pipeline; without an answer the first human-approved contract cannot name its evidence supply | answered (finding 8; missing evidence explicit) | FIRST_STEP item R1 |
@@ -95,4 +98,4 @@ Rows moved here keep their original number or rank so citations stay valid.
 
 | # or rank | Was | Superseded or stopped by | Date |
 |---|---|---|---|
-| | | | |
+| Rank 1 | Can attack-sensitive features and short sequence evidence distinguish passages while retaining positive recognition, on the real Winner clip? | **Abandoned** by user direction before any work: development moves to the synthetic ladder first. The idea survives in the online time-warping comparator. [Development contract 1](contracts/development-contract-1.md#effect-on-existing-records) | 2026-09-25 |
