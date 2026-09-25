@@ -362,9 +362,9 @@ export class Library {
       const blob = r.blob ? await describeBlob('recordings', r.blob) : null;
       if (blob) blobs.set(blob.r2_key, blob);
       const row: Recording = {
-        ...(r.provenance === undefined
-          ? old && 'provenance' in old ? { provenance: old.provenance } : {}
-          : { provenance: json(r.provenance) }),
+        // Always present, null when there is none, so a write's reply is the row a
+        // read returns (migration 0004 added the column; every database has it).
+        provenance: r.provenance === undefined ? old?.provenance ?? null : json(r.provenance),
         id, piece_id: piece.id, kind: r.kind, name: r.name === undefined ? old?.name ?? null : r.name,
         source_id: old?.source_id ?? r.source_id ?? null,
         r2_key: blob?.r2_key ?? old?.r2_key ?? null, sha256: blob?.sha256 ?? old?.sha256 ?? null,
@@ -446,8 +446,7 @@ export class Library {
     for (const row of renditionUpdates) statements.push(this.statement('UPDATE renditions SET filename=?,fetched_at=?,provenance=? WHERE id=? AND piece_id=?', row.filename, row.fetched_at, row.provenance, row.id, piece.id));
     for (const { row, exists } of recordingUpdates) {
       if (!exists) statements.push(this.insert('recordings', row));
-      else if ('provenance' in row) statements.push(this.statement(`UPDATE recordings SET kind=?,name=?,r2_key=?,sha256=?,bytes=?,mime=?,external_id=?,duration_s=?,syncpoints=?,provenance=?,updated_at=? WHERE id=? AND piece_id=?`, row.kind, row.name, row.r2_key, row.sha256, row.bytes, row.mime, row.external_id, row.duration_s, row.syncpoints, row.provenance, now, row.id, piece.id));
-      else statements.push(this.statement(`UPDATE recordings SET kind=?,name=?,r2_key=?,sha256=?,bytes=?,mime=?,external_id=?,duration_s=?,syncpoints=?,updated_at=? WHERE id=? AND piece_id=?`, row.kind, row.name, row.r2_key, row.sha256, row.bytes, row.mime, row.external_id, row.duration_s, row.syncpoints, now, row.id, piece.id));
+      else statements.push(this.statement(`UPDATE recordings SET kind=?,name=?,r2_key=?,sha256=?,bytes=?,mime=?,external_id=?,duration_s=?,syncpoints=?,provenance=?,updated_at=? WHERE id=? AND piece_id=?`, row.kind, row.name, row.r2_key, row.sha256, row.bytes, row.mime, row.external_id, row.duration_s, row.syncpoints, row.provenance, now, row.id, piece.id));
     }
     statements.push(this.statement('UPDATE pieces SET canonical_rendition_id=?,source_url=? WHERE id=? AND owner=?', piece.canonical_rendition_id, piece.source_url, piece.id, owner));
     if (tagsChanged) {

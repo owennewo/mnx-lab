@@ -275,12 +275,21 @@ it('sorts by recently opened, most recent first, unopened last, and pages by off
   expect((await library.browsePieces('alice', [], '2')).pieces.map(p => p.id)).toEqual(['c']);
 });
 
+it('replies to a write with exactly what a read of the piece returns', async () => {
+  // A recording with no provenance came back from the write WITHOUT the key and
+  // from a read with provenance: null — two shapes of one row for a client.
+  const written = await library.writePiece('alice', { ...create(), recordings: [
+    { id: 'rec', kind: 'youtube', external_id: 'video', syncpoints: [[0, 1]] },
+  ] });
+  expect(written).toEqual(await library.getPiece('alice', 'piece'));
+  expect(written.recordings[0]).toHaveProperty('provenance', null);
+});
+
 it('validates syncpoint fields before serialization without rejecting unsupported but well-shaped maps', async () => {
   await library.writePiece('alice', { ...create(), recordings: [
     { id: 'rec', kind: 'youtube', external_id: 'video', syncpoints: [[0, 1], [1, 2.5, 106.66666666666666, 1]] },
   ] });
-  // What is STORED is the oracle: a rejected write must leave it as it was. (The
-  // write's own reply omits a null provenance that a read of the same row reports.)
+  // What is STORED is the oracle: a rejected write must leave it as it was.
   const initial = await library.getPiece('alice', 'piece');
   for (const points of [[[0, NaN]], [[0, Infinity]], [[0, 1, 481]], [[0, 1, -1]],
     [[0, 1, 0, 2]], [[0, 1, null]], [[Number.MAX_SAFE_INTEGER + 1, 1]]]) {

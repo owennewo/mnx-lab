@@ -18,7 +18,7 @@ export interface Rendition {
   created_at: string;
 }
 export interface Recording {
-  provenance?: string | null;
+  provenance: string | null;
   id: string; piece_id: string; kind: 'audio' | 'video' | 'youtube'; name: string | null;
   r2_key: string | null; sha256: string | null; bytes: number | null; mime: string | null;
   external_id: string | null; duration_s: number | null; syncpoints: string | null;
