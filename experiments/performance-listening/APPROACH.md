@@ -10,7 +10,9 @@ score from audio without being given the score is outside this experiment's scop
 
 Start with deliberately simple, labelled examples. Increase difficulty as measured
 results justify it. The eventual destination is Studio, using the internal MNX model
-to represent scores; this document defines objectives, not an implementation or
+to represent scores, guiding a player while they play. The listener that matters is
+therefore causal and prompt; offline accuracy locates the acoustic ceiling and is a
+diagnostic, not the goal. This document defines objectives, not an implementation or
 permission to integrate an experimental listener into the product.
 
 The [previous experiment](archive/ARCHIVED.md) is historical evidence. This restart
@@ -26,6 +28,14 @@ A **source** is a particular audio clip, paired with an aligned description of w
 sounds in it. The score may come first and drive a generator, or the recording may
 come first and receive human annotations. Both produce labelled examples. Record
 how the labels were obtained and where their precision is limited.
+
+Hand-annotating onsets to the precision a timing judgement needs is slow and itself
+uncertain, so prefer routes that keep labels exact while the audio becomes real:
+**re-amplified** generator output, played through a speaker and recorded through a
+microphone, keeps the generator's labels while the room, microphone, noise and level
+vary; a **click-guided** human performance keeps the intended timing known and makes
+the deviations small enough to measure. Free human performances remain necessary
+evidence, but they come after these, not instead of them.
 
 The aligned description includes pitch or frequency, note start and duration, and
 may include loudness, articulation and pitch or amplitude changes through time.
@@ -55,9 +65,19 @@ time to understand failures; later combine dimensions to expose interactions.
 For example, complex timbre need not imply complex rhythm. Sample-based generators
 may eventually use instrument collections such as nbrosowsky/tonejs-instruments.
 
+Level 1 in every dimension is a check of the harness, not of listening: a single
+spectral peak passes it. Its value is that the golden format, the evaluator and the
+reports exist and agree before any real challenge arrives. Passing further synthetic
+levels says little about the destination on its own.
+
 Recording conditions are additional declared factors: microphone, room, background
 noise and recording level. Success on generated audio does not establish success on
-recordings of real instruments.
+recordings of real instruments. The previous experiment's largest measured loss was
+timbre and recording transfer, not musical complexity, so raise the harmonic dimension
+and the recording conditions **early**, as a parallel track with every other dimension
+still at level 1, rather than after the synthetic ladder is exhausted. A real
+instrument playing one note per beat into a microphone is a level-1 source with a
+hard harmonic profile, and it is where the destination's difficulty actually lives.
 
 ## Goldens and the meaning of a correct assessment
 
@@ -83,6 +103,11 @@ an alignment that makes the performance appear correct.
 Golden sets therefore include correct performances and controlled discrepancies,
 even at the simplest musical complexity. Define how each discrepancy is counted so
 that, for example, a substitution is not accidentally counted differently by each run.
+
+The golden format, the counting rules and the evaluator are the **first deliverable**,
+fixed before any listener is written and versioned like the sets themselves. Otherwise
+the first algorithm's convenient output becomes the contract by default, and every
+later algorithm is measured on the first one's terms.
 
 ## What an algorithm does
 
@@ -122,7 +147,9 @@ Evaluate at least:
 - **Timeliness:** when a useful decision became available, distinct from the musical
   time it refers to. Include revisions where a listener changes an earlier judgement.
 - **Practical cost:** processing demand and whether the listener keeps up with the
-  declared audio delivery conditions and device.
+  declared audio delivery conditions and device. "Keeps up" needs a denominator:
+  name the target device and a decision-latency budget before measuring, provisional
+  until Studio names its own, and mark every cost result provisional against them.
 
 Pitch, onset and duration tolerances must be stated before judging a run. Assess
 additional qualities such as dynamics only when their labels and success criteria
@@ -132,7 +159,8 @@ stage.
 
 ## The iterative experiment
 
-1. Choose a bounded capability and complexity profile, beginning with level 1. State
+1. Choose a bounded capability and complexity profile, beginning with level 1 and,
+   as soon as the harness stands, a real-timbre or recorded variant of it. State
    a hypothesis, success criteria and the evidence that would contradict it.
 2. Establish fixed golden examples: matching performances, controlled errors and
    relevant negative controls. Keep development examples separate from fresh checks.
@@ -156,3 +184,11 @@ Passing a level establishes a capability only under the conditions tested. Progr
 means a growing, understandable body of evidence across sources and complexity
 profiles, eventually including real performances, sufficient to justify a separate
 Studio integration decision.
+
+State now what that decision would need to see, and revise it only as a recorded
+change: which source (a real instrument through a microphone, at minimum), which
+complexity profile, which assessment error rates and coverage, following which
+timing freedom, causally, within the declared budget on the declared device. This
+is not the single player grade avoided above; it is the experiment's exit criterion.
+Without one, a growing body of evidence has no direction to grow in, and the
+previous experiment's fusion log shows what an open-ended iteration looks like.
