@@ -308,6 +308,9 @@ export interface MnxFermata {
 }
 
 export interface MnxEvent {
+  /** The published schema's optional discriminator (`literal-string-event`);
+   *  most documents omit it, and a duration is what makes an item an event. */
+  type?: 'event';
   /** Referenced by beams and slurs. */
   id?: string;
   duration: {

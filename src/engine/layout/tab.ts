@@ -688,7 +688,7 @@ function layoutTabSystems(opts: LayoutTabOptions): LayoutResult {
         for (const diagnostic of result.diagnostics) {
           if (!diagnostics.some(existing => existing.measureIndex === diagnostic.measureIndex && existing.message === diagnostic.message)) diagnostics.push(diagnostic);
         }
-        const bands = result.rows ?? [];
+        const bands = result.rows;
         // Each verse stays with the row it hangs from: the measured reach.
         const boundaries = rowBoundariesSp(bands, lyricReachBelowRows(result.primitives, bands));
         const bins: Primitive[][] = bands.map(() => []);

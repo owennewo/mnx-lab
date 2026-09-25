@@ -2,7 +2,9 @@ import type { R2Bucket } from '@cloudflare/workers-types';
 import { LibraryError, type BlobInput } from './types.ts';
 
 export async function describeBlob(prefix: 'renditions' | 'recordings', input: BlobInput) {
-  const content = input.content.slice(0); // Caller mutation cannot change bytes after hashing.
+  // A copy of exactly the given bytes (a view's own, not its backing store), so
+  // caller mutation cannot change them after hashing.
+  const content = input.content.slice(0);
   const digest = await crypto.subtle.digest('SHA-256', content);
   const sha256 = [...new Uint8Array(digest)].map(b => b.toString(16).padStart(2, '0')).join('');
   if (input.sha256 !== undefined && input.sha256 !== sha256) throw new LibraryError('blob', 'SHA-256 mismatch');

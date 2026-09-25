@@ -289,7 +289,7 @@ export interface LayoutResult {
   /** Non-fatal problems encountered while laying out (forgiving render). */
   diagnostics: LayoutDiagnostic[];
   /** Staff bands per system row, in layout order (see RowBandSp). */
-  rows?: RowBandSp[];
+  rows: RowBandSp[];
   /** Per row, per display staff (notation staves, then any injected tab
    *  staff, in display order): the band from its top line to its bottom line.
    *  Metadata, like `rows` — never serialized into goldens. */

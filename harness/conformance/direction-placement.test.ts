@@ -68,7 +68,7 @@ describe('below-staff direction placement', () => {
     );
     expect(direction).toBeDefined();
     const ink = computeBoundsSp([direction!])!;
-    expect(ink.y).toBeGreaterThan(result.rows![0].staffBottom);
-    expect(ink.y + ink.h).toBeLessThan(result.rows![1].staffTop);
+    expect(ink.y).toBeGreaterThan(result.rows[0].staffBottom);
+    expect(ink.y + ink.h).toBeLessThan(result.rows[1].staffTop);
   });
 });

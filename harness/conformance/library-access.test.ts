@@ -1,7 +1,7 @@
 // Implementation loop: real signatures and local D1/R2 exercise the HTTP authorization boundary.
 import { beforeEach, expect, it } from 'vitest';
 import type { Miniflare } from 'miniflare';
-import { applyMigrations, useLibraryRuntime } from '../helpers/libraryRuntime.ts';
+import { applyMigrations, libraryBindings, useLibraryRuntime } from '../helpers/libraryRuntime.ts';
 import { SignJWT } from 'jose';
 import app from '../../worker/index.ts';
 import { Library } from '../../worker/library/index.ts';
@@ -14,7 +14,7 @@ const freshRuntime = useLibraryRuntime();
 beforeEach(async () => {
   identity = await testIdentity(); jwt = await identity.sign();
   mf = await freshRuntime();
-  env = { LIBRARY_DB: await mf.getD1Database('DB'), LIBRARY_BUCKET: await mf.getR2Bucket('BUCKET'), LIBRARY_WRITE_TOKEN: 'private-test', ...identity.config };
+  env = { ...(await libraryBindings(mf)), LIBRARY_WRITE_TOKEN: 'private-test', ...identity.config };
   await applyMigrations(env.LIBRARY_DB);
   await env.LIBRARY_DB.prepare("INSERT INTO users VALUES ('operator','owner@example.test',1,'now')").run();
 }, 15000);
@@ -94,7 +94,7 @@ it('lets the signed-in person open, tag and alias their own pieces only, and onl
 it('serves owner-checked audio with native byte ranges, HEAD and private cache headers', async () => {
   const lib = new Library(env.LIBRARY_DB, env.LIBRARY_BUCKET);
   for (const owner of ['operator','other']) await lib.writePiece(owner, { id: owner, expected_revision: null, recordings: [
-    { id: `${owner}-audio`, kind: 'audio', mime: 'audio/wav', blob: { content: new TextEncoder().encode('0123456789').buffer } },
+    { id: `${owner}-audio`, kind: 'audio', mime: 'audio/wav', blob: { content: new TextEncoder().encode('0123456789') } },
     { id: `${owner}-youtube`, kind: 'youtube', external_id: 'example' },
   ] });
   const path='/recordings/operator-audio/audio';

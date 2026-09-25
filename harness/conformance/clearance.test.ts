@@ -30,7 +30,7 @@ function rowInk(result: ReturnType<typeof layoutNotation>) {
   if (result.rowInkSp) {
     return result.rowInkSp.map(({ top, bottom }) => ({ y: top, h: bottom - top }));
   }
-  const rows = result.rows!;
+  const rows = result.rows;
   const boundaries = rows.slice(0, -1).map((row, index) =>
     (row.staffBottom + rows[index + 1].staffTop) / 2
   );

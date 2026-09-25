@@ -430,7 +430,7 @@ describe('a full row reaches the margin, whatever the staff scale', () => {
     const l = layoutTab({ mnx, widthSp, densityH, inkRatio: ink });
     const packing = planHorizontal(mnx, widthSp, { staffKind: 'tab', inkRatio: ink, densityH }).packing;
     const rows = packSystems(packing, densityH);
-    return l.rows!.map((b, r) => {
+    return l.rows.map((b, r) => {
       const xs = [
         ...new Set(
           l.primitives

@@ -17,7 +17,6 @@ import { describe, it, expect } from 'vitest';
 import { clearanceSpacing } from '../../src/engine/clearance.ts';
 import {
   layoutNotation,
-  type LayoutNotationOptions,
   MIN_STAFF_GAP_SP,
   MIN_NOTATION_TAB_GAP_SP,
   NOTATION_TAB_CLEAR_SP,
@@ -94,14 +93,14 @@ describe('navigation placement', () => {
       const targets = layout.primitives.filter(p => cls(p) === 'segno' || cls(p) === 'coda');
       expect(new Set(targets.map(cls))).toEqual(new Set(['segno', 'coda']));
       for (const target of targets) {
-        const staff = layout.rows!.find(row => row.staffTop > anchorY(target))!;
+        const staff = layout.rows.find(row => row.staffTop > anchorY(target))!;
         expect(staff.staffTop - computeBoundsSp([target])!.y - computeBoundsSp([target])!.h)
           .toBeCloseTo(NAV_BOTTOM_RISE_SP, 6);
       }
       const jumps = layout.primitives.filter(p => cls(p) === 'jump');
       expect(jumps.length).toBeGreaterThan(0);
       for (const jump of jumps) {
-        const staff = layout.rows!.find(row => row.staffTop > anchorY(jump))!;
+        const staff = layout.rows.find(row => row.staffTop > anchorY(jump))!;
         const ink = computeBoundsSp([jump])!;
         expect(staff.staffTop - ink.y - ink.h).toBeCloseTo(NAV_BOTTOM_RISE_SP, 6);
       }
@@ -144,7 +143,7 @@ function inkTopOver(
 
 /** Bars of a row, read off its barlines: consecutive distinct x's. */
 function barsOf(layout: LayoutResult, row: number): [number, number][] {
-  const band = layout.rows![row];
+  const band = layout.rows[row];
   const xs = [...new Set(
     layout.primitives
       .filter(p => p.kind === 'line' && cls(p) === 'barline' &&
@@ -167,7 +166,7 @@ function barsOf(layout: LayoutResult, row: number): [number, number][] {
  */
 const TEXT_ROW_CLASSES = new Set([...LABEL_CLASSES, 'tempo', 'swing', ...NAV_CLASSES]);
 function rowPrims(layout: LayoutResult, row: number): Primitive[] {
-  const rows = layout.rows!;
+  const rows = layout.rows;
   const bounds = rows.slice(0, -1).map((b, r) => (b.staffBottom + rows[r + 1].staffTop) / 2);
   return layout.primitives.filter(p => {
     const y = anchorY(p);
@@ -187,7 +186,7 @@ interface Checked { labels: number; tempos: number; swings: number; clear: numbe
 /** Every bar of every row: assert the clearance for each text group found. */
 function checkLayout(layout: LayoutResult): Checked {
   const out: Checked = { labels: 0, tempos: 0, swings: 0, clear: 0, atMinRise: 0 };
-  layout.rows!.forEach((band, row) => {
+  layout.rows.forEach((band, row) => {
     const staffTop = band.staffTop;
     const prims = rowPrims(layout, row);
     const floor = -Infinity;
@@ -303,8 +302,8 @@ describe('ink-measured gaps — stage A, the score-text row', () => {
     let overInk = 0;
     for (const label of labels) {
       const ly = (label as { y: number }).y;
-      const row = layout.rows!.findIndex((b, r, rows) => ly < b.staffTop && (r === 0 || ly > rows[r - 1].staffBottom));
-      const staffTop = layout.rows![row].staffTop;
+      const row = layout.rows.findIndex((b, r, rows) => ly < b.staffTop && (r === 0 || ly > rows[r - 1].staffBottom));
+      const staffTop = layout.rows[row].staffTop;
       const foot = computeBoundsSp([label])!;
       const ink = inkTopOver(
         rowPrims(layout, row).filter(p => !isLabel(p)),
@@ -350,7 +349,7 @@ describe('ink-measured gaps — stage B, display staves in the both view', () =>
    */
   function pairsOf(real: LayoutResult, probe: LayoutResult): Pair[] {
     const displays = probe.displays!;
-    const rows = probe.rows!;
+    const rows = probe.rows;
     const isTab = (b: { staffTop: number; staffBottom: number }) =>
       Math.abs(b.staffBottom - b.staffTop - TAB_STAFF_HEIGHT_SP) < 1e-6;
     const rowBounds = rows.slice(0, -1).map((b, r) => (b.staffBottom + rows[r + 1].staffTop) / 2);
@@ -422,10 +421,7 @@ describe('ink-measured gaps — stage B, display staves in the both view', () =>
 
   const PROBE = 100;
   const bothPair = (mnx: MnxStructure) => {
-    // layoutBothSystem forwards every option to layoutNotation, the probe
-    // included, though LayoutBothOptions does not declare it.
-    const probe: LayoutBothOptions & Pick<LayoutNotationOptions, 'displayGapProbeSp'> =
-      { mnx, widthSp: WIDTH_SP, displayGapProbeSp: PROBE };
+    const probe: LayoutBothOptions = { mnx, widthSp: WIDTH_SP, displayGapProbeSp: PROBE };
     return {
       real: layoutBothSystem({ mnx, widthSp: WIDTH_SP }),
       probe: layoutBothSystem(probe)
@@ -558,7 +554,7 @@ describe('ink-measured gaps — stage D, between systems', () => {
    *  the next system's ink and the identity below reads broken when it is
    *  not (found by lab/lyrics/tab-verses, the first wrapped lyric doc). */
   function rowInk(layout: LayoutResult, reservedBelowSp = 0): { top: number; bottom: number }[] {
-    const rows = layout.rows!;
+    const rows = layout.rows;
     // Once a compact gap moves its midpoint past overhanging ink, geometry can
     // no longer rediscover which row emitted that primitive. The layout carries
     // the ownership-preserving measurement from the pre-move pass.
@@ -581,7 +577,7 @@ describe('ink-measured gaps — stage D, between systems', () => {
   }
 
   const gapsOf = (layout: LayoutResult, reservedBelowSp = 0) => {
-    const rows = layout.rows!;
+    const rows = layout.rows;
     const ink = rowInk(layout, reservedBelowSp);
     return rows.slice(0, -1).map((b, r) => ({
       lineGap: rows[r + 1].staffTop - b.staffBottom,
@@ -602,7 +598,7 @@ describe('ink-measured gaps — stage D, between systems', () => {
    * scenarios are affected.
    */
   const holdsTitle = (layout: LayoutResult, r: number) => {
-    const rows = layout.rows!;
+    const rows = layout.rows;
     return layout.primitives.some(
       p => cls(p) === 'score-title' && anchorY(p) > rows[r].staffBottom && anchorY(p) < rows[r + 1].staffTop
     );
@@ -620,11 +616,11 @@ describe('ink-measured gaps — stage D, between systems', () => {
         const doc = readDoc(s.dir);
         layout = layoutNotation({ mnx: doc, widthSp: WIDTH_SP });
         // The layout's own reservation: how deep its verses actually hang.
-        reservedBelowSp = lyricReachBelowRows(layout.primitives, layout.rows ?? []);
+        reservedBelowSp = lyricReachBelowRows(layout.primitives, layout.rows);
       } catch {
         continue;
       }
-      if ((layout.rows?.length ?? 0) < 2) continue;
+      if (layout.rows.length < 2) continue;
       gapsOf(layout, reservedBelowSp).forEach((gap, r) => {
         if (holdsTitle(layout, r)) {
           skipped++;
@@ -648,7 +644,7 @@ describe('ink-measured gaps — stage D, between systems', () => {
     // The reported case: twelve-bar-blues as tab, wrapped narrow enough to
     // put "Head" and "Turnaround" on different systems.
     const layout = layoutTab({ mnx: readDoc(labelledTabDir), widthSp: 46 });
-    const rows = layout.rows!;
+    const rows = layout.rows;
     expect(rows.length).toBeGreaterThan(3);
     const labelTops = layout.primitives
       .filter(p => cls(p) === 'section-label')

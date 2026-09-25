@@ -45,6 +45,9 @@ export interface LayoutBothOptions {
   inkRatio?: number;
   /** Generic host-owned regions before/after the laid-out score. */
   systemBookends?: SystemBookends;
+  /** Harness-only gap probe, forwarded to layoutNotation like every option here
+   *  (see LayoutNotationOptions.displayGapProbeSp). Never set by a renderer. */
+  displayGapProbeSp?: number;
 }
 
 export function layoutBothSystem(opts: LayoutBothOptions): LayoutResult {

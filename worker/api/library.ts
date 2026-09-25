@@ -306,7 +306,7 @@ library.post('/pieces', async c => {
   const lib = reader(c); const owner = c.get('libraryUser').id;
   const snapshot = await lib.writePiece(owner, { id, expected_revision: null, source: { kind: 'studio', id: sourceId },
     renditions: [{ id: renditionId, format: 'gp', role: 'original', producer: 'studio', producer_version: version, producer_options: options,
-      filename, content: content.buffer as ArrayBuffer, sha256 }],
+      filename, content, sha256 }],
     canonical: { mode: 'initialize', rendition_id: renditionId }, tags: [], derived_tags: derived });
   return c.json({ snapshot: { ...snapshot, tags: Library.shown(snapshot.tags, await lib.listAliases(owner)) } }, 201);
 });
@@ -352,7 +352,7 @@ library.post('/pieces/:id/renditions', async c => {
   }
   const snapshot = await lib.writePiece(owner, { id, expected_revision: revision,
     renditions: [{ id: renditionId, format: 'gp', role: 'edit', producer: 'studio', producer_version: version, producer_options: options,
-      filename, content: content.buffer as ArrayBuffer, sha256, derived_from: derivedFrom,
+      filename, content, sha256, derived_from: derivedFrom,
       provenance: { kind: 'checkpoint', name, check: { verdict: String(check.verdict), differences, warnings }, evidence: evidenceNote } },
       ...(evidence ? [{ id: `${renditionId}-saved`, format: 'mnx' as const, role: 'evidence' as const, producer: 'studio', producer_version: version, producer_options: null,
         filename: filename.replace(/\.gp$/i, '.mnx.json'), content: evidence, derived_from: renditionId, provenance: { kind: 'saved-document' } }] : [])],

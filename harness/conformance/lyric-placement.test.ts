@@ -45,7 +45,7 @@ interface SystemVerses {
 }
 
 function versesBySystem(layout: LayoutResult): SystemVerses[] {
-  const rows = layout.rows ?? [];
+  const rows = layout.rows;
   const lyrics = layout.primitives.filter(isLyric);
   const ink = layout.primitives.filter(p => !FRAME.test(p.className ?? ''));
   const out: SystemVerses[] = [];

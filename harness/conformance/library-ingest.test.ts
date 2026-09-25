@@ -3,7 +3,7 @@ import { beforeEach, afterEach, expect, it } from 'vitest';
 import { writeFile, rm, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { Miniflare } from 'miniflare';
-import { applyMigrations, useLibraryRuntime } from '../helpers/libraryRuntime.ts';
+import { applyMigrations, libraryBindings, useLibraryRuntime } from '../helpers/libraryRuntime.ts';
 import realApp from '../../worker/index.ts';
 import { testIdentity } from '../helpers/libraryIdentity.ts';
 import { ingestSources } from '../helpers/ingestFixture.ts';
@@ -39,7 +39,7 @@ const freshRuntime = useLibraryRuntime();
 beforeEach(async () => {
   directory = await ingestSources();
   mf = await freshRuntime();
-  env = { LIBRARY_DB: await mf.getD1Database('DB'), LIBRARY_BUCKET: await mf.getR2Bucket('BUCKET'), LIBRARY_WRITE_TOKEN: token };
+  env = { ...(await libraryBindings(mf)), LIBRARY_WRITE_TOKEN: token };
   const identity = await testIdentity(); Object.assign(env, identity.config); assertion = await identity.sign({}, true);
   await applyMigrations(env.LIBRARY_DB);
   await env.LIBRARY_DB.prepare("INSERT INTO users VALUES ('operator','owner@example.test',1,'now')").run();

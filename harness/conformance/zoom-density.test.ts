@@ -691,7 +691,7 @@ describe('the fit answers about the score, not about the density knob', () => {
     });
     const forFit = useNatural ? layout.naturalWidthSp ?? layout.usedWidthSp : layout.usedWidthSp;
     const pxPerSp = fitPxPerSp(VIEWPORT_PX, forFit, BASE);
-    const top = layout.rows![0].staffTop;
+    const top = layout.rows[0].staffTop;
     const xs = [
       ...new Set(
         layout.primitives

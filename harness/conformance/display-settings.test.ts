@@ -143,9 +143,9 @@ describe('displayed measure and instrument labels', () => {
       for (const widthSp of [45, 90]) {
         const every = layout({ mnx, widthSp, display: { barNumbers: 'every-bar', instrumentNames: 'every-system' } });
         expect(text(every, 'measure-number')).toHaveLength(12);
-        expect(text(every, 'staff-label')).toHaveLength(every.rows!.length);
+        expect(text(every, 'staff-label')).toHaveLength(every.rows.length);
         const first = layout({ mnx, widthSp, display: { barNumbers: 'every-system', instrumentNames: 'first-system' } });
-        expect(text(first, 'measure-number')).toHaveLength(first.rows!.length);
+        expect(text(first, 'measure-number')).toHaveLength(first.rows.length);
         expect(text(first, 'staff-label')).toHaveLength(1);
         const hidden = layout({ mnx, widthSp, display: { barNumbers: 'hide', instrumentNames: 'hide' } });
         expect(text(hidden, 'measure-number')).toHaveLength(0);
@@ -191,9 +191,9 @@ describe('multi-part display systems and score blocks', () => {
       const mnx = ensemble();
       const before = JSON.stringify(mnx);
       const every = layout({ mnx, widthSp: 80, display: { instrumentNames: 'every-system', barNumbers: 'every-system', lyrics: 'current' } });
-      expect(every.rows!.length).toBeGreaterThan(1);
-      expect(texts(every, 'staff-label')).toHaveLength(every.rows!.length * 2);
-      expect(texts(every, 'measure-number')).toHaveLength(every.rows!.length);
+      expect(every.rows.length).toBeGreaterThan(1);
+      expect(texts(every, 'staff-label')).toHaveLength(every.rows.length * 2);
+      expect(texts(every, 'measure-number')).toHaveLength(every.rows.length);
       const first = layout({ mnx, widthSp: 80, display: { instrumentNames: 'first-system', lyrics: 'current' } });
       expect(texts(first, 'staff-label')).toHaveLength(2);
       expect([...first.index.keys()].some(key => key.startsWith('@p1.'))).toBe(true);

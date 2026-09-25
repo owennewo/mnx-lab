@@ -37,7 +37,10 @@ export type PieceSort = 'recent' | 'title' | 'artist';
 /** The owner's own setup for this piece (`piece_views.prefs`): opaque to the
  *  service, normalized by the shell that wrote it. Null until they change something. */
 export interface Snapshot { piece: Piece; renditions: Rendition[]; recordings: Recording[]; tags: Tag[]; prefs: Json | null }
-export interface BlobInput { content: ArrayBuffer; sha256?: string }
+/** Bytes as the Worker receives them: a whole ArrayBuffer (an uploaded file) or a
+ *  Uint8Array (decoded base64). Never an array's `.buffer`: for a view that is the
+ *  whole backing store, not the view's bytes. */
+export interface BlobInput { content: ArrayBuffer | Uint8Array; sha256?: string }
 export interface RenditionInput extends BlobInput {
   id: string; format: Format; role: Rendition['role']; producer: string;
   // Explicit null records that upstream did not supply a version/options.

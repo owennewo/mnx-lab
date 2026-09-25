@@ -16,7 +16,7 @@ const WORK_FIELDS = ['title', 'subtitle', 'artist', 'album', 'copyright', 'sourc
 export function isDerivedDimension(dimension: string) {
   return [...WORK_FIELDS, 'tuning', 'tuning-name', 'capo', 'part'].includes(dimension) || dimension.startsWith('creator.');
 }
-export function parseMnx(content: ArrayBuffer): MnxStructure {
+export function parseMnx(content: ArrayBuffer | Uint8Array): MnxStructure {
   let doc: MnxStructure;
   try { doc = JSON.parse(new TextDecoder('utf-8', { fatal: true, ignoreBOM: false }).decode(content)); }
   catch { throw new LibraryError('invalid', 'Invalid MNX JSON'); }

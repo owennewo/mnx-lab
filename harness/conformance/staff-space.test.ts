@@ -50,8 +50,8 @@ describe('Staff and Space own whitespace', () => {
         .map(p => { const { x: _x, ...other } = p; return other; });
       samples.forEach(result => {
         expect(sizes(result)).toEqual(sizes(samples[0]));
-        expect(result.rows!.map(row => [row.staffTop, row.staffBottom])).toEqual(
-          samples[0].rows!.map(row => [row.staffTop, row.staffBottom]));
+        expect(result.rows.map(row => [row.staffTop, row.staffBottom])).toEqual(
+          samples[0].rows.map(row => [row.staffTop, row.staffBottom]));
       });
       // The emitter scales vertical geometry once, together with the staff.
       const base = samples[0];

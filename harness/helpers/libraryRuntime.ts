@@ -1,6 +1,7 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { afterAll } from 'vitest';
 import { Miniflare, convertV4MiniflareOptions } from 'miniflare';
+import type { D1Database, R2Bucket } from '@cloudflare/workers-types';
 
 /** Sequential tests in one file share a process, never storage. Migrations still run
  * per test: some tests deliberately destroy schema. Do not use with it.concurrent. */
@@ -65,4 +66,14 @@ export async function applyMigrations(db: Batching): Promise<void> {
         return sql;
       }));
   await db.batch(statements.map(sql => db.prepare(sql)) as never[]);
+}
+
+/** The storage bindings as the Worker sees them. Miniflare types its Node-side
+ *  R2 proxy against undici's Headers, not the Workers runtime's; it IS the
+ *  Worker's R2Bucket, so the one cast lives here rather than in every test. */
+export async function libraryBindings(mf: Miniflare): Promise<{ LIBRARY_DB: D1Database; LIBRARY_BUCKET: R2Bucket }> {
+  return {
+    LIBRARY_DB: await mf.getD1Database('DB') as unknown as D1Database,
+    LIBRARY_BUCKET: await mf.getR2Bucket('BUCKET') as unknown as R2Bucket,
+  };
 }

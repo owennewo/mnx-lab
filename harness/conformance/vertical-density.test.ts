@@ -61,7 +61,7 @@ const MULTI_SYSTEM = 'lab/00-document/04-twelve-bar-blues';
  * baselines).
  */
 function rowInk(layout: LayoutResult): { top: number; bottom: number }[] {
-  const rows = layout.rows!;
+  const rows = layout.rows;
   const boundaries: number[] = [];
   for (let r = 0; r + 1 < rows.length; r++) {
     boundaries.push((rows[r].staffBottom + rows[r + 1].staffTop) / 2);
@@ -137,7 +137,7 @@ describe('vertical density — the floor is ink, not a constant', () => {
           view === 'tab'
             ? layoutTab({ mnx, widthSp: WIDTH_SP, densityPad: k })
             : layoutNotation({ mnx, widthSp: WIDTH_SP, densityPad: k });
-        expect(layout.rows!.length).toBeGreaterThan(1);
+        expect(layout.rows.length).toBeGreaterThan(1);
         const ink = rowInk(layout);
         for (let r = 0; r + 1 < ink.length; r++) {
           expect(ink[r + 1].top).toBeGreaterThan(ink[r].bottom);
