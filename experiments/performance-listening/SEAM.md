@@ -6,6 +6,28 @@ will eventually use, without disturbing the evidence already recorded. **Part 2*
 promotion, moves that seam into `src/` and changes Studio to match. Studio code is not
 touched until part 2, and part 2 needs the owner's go-ahead.
 
+**Status: part 1 complete, 2026-09-25.** Built in commits `83a904ba` (S0) and
+`1fb3f124` (S1–S9), and verified end to end on the private evidence by
+[experiment 012](reports/012-seam-verification.md). Every scoreboard run now goes through
+the seam. S10 is deliberately deferred; see below. Part 2 waits for the owner.
+
+| Step | Where it lives | Checked by |
+|---|---|---|
+| S0 | `bench/test/pinned.ts` and the three tests using it | A deliberate edit to a pinned file no longer fails old evidence |
+| S1 | `listen/`, the `listening-seam-imports-nothing-from-the-experiment` rule | The rule rejects a deliberate violation; `listen/` tests run in the bench suite |
+| S2 | `listen/liveView.ts` | `bench/test/seam-agreement.test.ts`; every scoreboard example |
+| S3 | [vocabulary-v2.md](contracts/vocabulary-v2.md), `listen/positions.ts`, `bench/src/seam/legacy.ts`, `bench/src/seam/records.ts` | `listen/test/positions.test.ts`, `bench/test/seam-legacy.test.ts`; `--reproduce` on the scoreboard |
+| S4 | `listen/contract.ts`, refusals in `bench/src/seam/legacy.ts` | `bench/test/seam-legacy.test.ts` |
+| S5 | `listen/backend.ts` | `listen/test/backend.test.ts`, inside the real `PlaybackSession` |
+| S6 | `bench/src/seam/replay.ts` | `bench/test/seam-replay.test.ts`; every scoreboard example |
+| S7 | `bench/src/seam/fixtures.ts` | The scoreboard's fixture answers |
+| S8 | `listen/contract.ts`, `listen/validate.ts` | `listen/test/note-verdicts.test.ts` and its oracle fixture |
+| S9 | `listen/delivery.ts` | `listen/test/delivery.test.ts`; the scoreboard's delivery checks |
+
+**S10 is deferred.** A capture page measures the capture chain's delay, which part 2's
+browser smoke measures anyway, together with Studio's display chain. Building it now
+would duplicate that measurement without advancing the seam.
+
 This is a plan, like [FIRST_STEP.md](FIRST_STEP.md), and its details may change as long
 as its goal holds: a listener Studio can drive through the same socket as its other
 playback sources. It does not state what the experiment believes; the
@@ -268,8 +290,10 @@ resamples to what a candidate wants internally, so candidates keep their fixed 4
 480 internals. The adapter's own added delay is measured and reported.
 
 *Done when* the scoreboard can deliver the same clip at 48 kHz/480, 48 kHz/128 and
-44.1 kHz/128; each run passes the prefix checks; 48 kHz/128 reproduces 48 kHz/480
-exactly; and 44.1 kHz positions agree within the ±0.25-quarter tolerance.
+44.1 kHz/128; each run passes the prefix checks; 48 kHz/480 through the adapter equals
+direct delivery; 48 kHz/128 gives the same decisions, each at most one block later,
+because 128-sample blocks do not end where 480-sample chunks do; and at 44.1 kHz,
+wherever both deliveries claim a position, they agree within the ±0.25-quarter tolerance.
 
 ### S10. A capture adapter, outside Studio (optional)
 
@@ -313,6 +337,9 @@ What part 1 cannot do, recorded as it is found. Part 2 is this list.
 | A source named for listening in the Source sheet and `Player`'s backend factory | Studio UI |
 | Microphone permission, capture lifecycle, no monitoring through the speakers | Studio shell |
 | An overlay for note verdicts, keyed by `noteKey` and ordinal | the viewer; a design item for the owner |
+| A listening host: runs the listener in a worker behind the delivery adapter, and feeds `ListeningBackend.receive` and `advance` | Studio owns workers and the audio clock; part 1 drives the backend from replays |
+| The rate control honours capabilities with a fixed rate of 1, and the volume control hides when `volume` is false | Studio UI; a listening source declares no rate or volume of its own |
+| A part without an `id` is named `#` and its index in the handoff; Studio's part picker must use the same names | Studio's part model |
 | Measured microphone-to-visible-feedback latency in the real browser chain | only Studio has the display chain |
 
 ## Part 2 — promotion

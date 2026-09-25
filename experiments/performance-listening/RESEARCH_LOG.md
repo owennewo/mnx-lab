@@ -45,6 +45,11 @@ alignment's own bursts remain; letting the path react faster made them worse. Th
 questions are whether favouring a steady tempo reduces the bursts, and what makes the
 rank-based test reject correct alignments.
 
+The Studio seam is in place ([SEAM.md](SEAM.md) part 1, verified by
+[experiment 012](reports/012-seam-verification.html)). Every scoreboard run now drives the
+candidates through the version-2 listener contract Studio will use, and reproduces the
+same results as before.
+
 ## Findings
 
 Status is `holds`, `superseded` or `withdrawn`. Evidence links a research note, a
@@ -91,6 +96,7 @@ ledger row (`ledger.md#<row>`), or a findings write-up.
 | 37 | In most frames where the incumbent's alignment is wrong on recorded guitar, its own features match the true position better; the path, not the features, carries it off. | [Run g010b](ledger.md#g010-slim-suite-and-burst-features), [report 010](reports/010-slim-suite-and-burst-features.md#the-features-do-not-explain-the-bursts) | holds | 2026-09-25 | Answers question 16 |
 | 38 | Letting the alignment path react faster, by fading old evidence or widening the tempo steps, makes its errors on recorded guitar two to three times more frequent. | [Run g011](ledger.md#g011-path-and-support), [report 011](reports/011-path-and-support.md#the-alignment-changes) | holds | 2026-09-25 | The whole-history cost stabilises the path |
 | 39 | Judging support by the rank of the path's reference frames rejects the wrong score on every rung-2 guitar and on rungs 0–1, but still rejects correct alignments on the harder guitars and everything on the real clip. | [Report 011 support change](reports/011-path-and-support.md#the-support-change) | holds | 2026-09-25 | Partly answers question 19 |
+| 40 | Running the scoreboard through the Studio seam, with legacy candidates wrapped as version-2 listeners, reproduces every earlier result exactly; Studio's display rule, backend and session draw exactly what the evaluator scores. | [Run g012](ledger.md#g012-seam-verification), [report 012](reports/012-seam-verification.md#results) | holds | 2026-09-25 | SEAM.md part 1; the seam adds no listening claim |
 
 
 ## Open questions

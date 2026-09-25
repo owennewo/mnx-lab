@@ -140,6 +140,19 @@
         "href": "010-slim-suite-and-burst-features.html",
         "label": "Experiment 010"
       }
+    },
+    {
+      "number": "012",
+      "slug": "012-seam-verification",
+      "title": "012 · The Studio seam, verified on the scoreboard",
+      "banner": "Seam part 1 verified · 57 of 57 results reproduce through it",
+      "runs": [
+        "g012-seam-verification"
+      ],
+      "previous": {
+        "href": "011-path-and-support.html",
+        "label": "Experiment 011"
+      }
     }
   ]
 }

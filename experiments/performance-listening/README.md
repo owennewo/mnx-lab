@@ -28,8 +28,10 @@ Records:
   rebuild their readable pages.
 - [Evidence preparation](evidence/README.md) records private real-source provenance.
 - [Research notes](research/README.md) hold one note per source read.
-- [SEAM.md](SEAM.md) plans where the listener meets Studio: making the experiment
-  seam-ready first, then promoting the seam into `src/`.
+- [SEAM.md](SEAM.md) plans where the listener meets Studio. Part 1 is done: `listen/`
+  holds the [version-2 listener contract](contracts/vocabulary-v2.md) and the backend
+  Studio will drive, and every scoreboard run goes through it. Part 2, promotion into
+  `src/`, waits for the owner.
 - [FIRST_STEP.md](FIRST_STEP.md) is the completed plan that built the contracts,
   instrument and pipeline.
 - [archive/](archive/ARCHIVED.md) keeps the earlier experiment for reference when a

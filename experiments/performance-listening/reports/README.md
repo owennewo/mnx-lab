@@ -17,6 +17,7 @@ question are in [the research log](../RESEARCH_LOG.md), not here.
 | 009 | [A reference that decays like a plucked string](009-plucked-reference.html) | [g009-plucked-reference](../runs/g009-plucked-reference/summary.json) |
 | 010 | [The slim suite, and what misleads the alignment](010-slim-suite-and-burst-features.html) | [g010a](../runs/g010a-slim-suite/summary.json), [g010b](../runs/g010b-burst-features/summary.json) |
 | 011 | [The alignment path and the support test](011-path-and-support.html) | [g011-path-and-support](../runs/g011-path-and-support/summary.json) |
+| 012 | [The Studio seam, verified on the scoreboard](012-seam-verification.html) | [g012-seam-verification](../runs/g012-seam-verification/summary.json) |
 
 ## One experiment, one file
 

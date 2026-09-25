@@ -88,3 +88,10 @@ one row per numbered experiment, pointing at that experiment's single file.
 | Run | Hypothesis / sources | Parent / candidate | Set / evaluator | Conditions / resources | Results / uncertainty | Decision / next action |
 |---|---|---|---|---|---|---|
 | [g011-path-and-support](runs/g011-path-and-support/summary.json) | [Pre-registered in report 011](reports/011-path-and-support.md#pre-registration); experiments 008 and 010 | online-time-warp@2 parent / @4 fading endpoint, @5 wider steps, @6 rank support, each one change; diagnostics for @4 and @5 | Slim active suite / following-evaluator@1; sync-proxy thermometer | 5.5 min wall, five new entries | Alignment wrong positions: v2 52, v4 168, v5 113. v6 rejects the wrong score on 98–100% of points on every rung-2 guitar and passes rungs 0–1; its rung-2 positives are unchanged. Real clip: v6 0% | Only v6 kept; it is the incumbent. Next: a steady-tempo preference for the path, and trace why v6 rejects correct alignments; [report 011](reports/011-path-and-support.html) |
+
+
+<a id="g012-seam-verification"></a>
+
+| Run | Hypothesis / sources | Parent / candidate | Set / evaluator | Conditions / resources | Results / uncertainty | Decision / next action |
+|---|---|---|---|---|---|---|
+| [g012-seam-verification](runs/g012-seam-verification/summary.json) | [Pre-registered in report 012](reports/012-seam-verification.md#pre-registration); [SEAM.md](SEAM.md) part 1 | No candidate change; clock, online-time-warp@6 and its alignment-only diagnostic through the seam | Slim active suite / following-evaluator@1 via the version-2 record adapter | 198 s wall; `--reproduce g011-path-and-support` | 57 of 57 results and the thermometer reproduce; display rule, replay, fixtures, deliveries and clamping all as predicted | Seam part 1 verified; the ladder continues through the seam on every run; [report 012](reports/012-seam-verification.html) |
