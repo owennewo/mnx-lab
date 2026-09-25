@@ -3,11 +3,19 @@ import { afterAll } from 'vitest';
 import { Miniflare, convertV4MiniflareOptions } from 'miniflare';
 import type { D1Database, R2Bucket } from '@cloudflare/workers-types';
 
-/** Sequential tests in one file share a process, never storage. Migrations still run
- * per test: some tests deliberately destroy schema. Do not use with it.concurrent. */
-export function useLibraryRuntime({ bucket = true } = {}) {
+/** Sequential tests in one file share a process, never storage. Do not use with it.concurrent.
+ *
+ *  By default each call hands back an EMPTY database (every table dropped) and bucket.
+ *  With `migrated`, it hands back the migrated schema with no rows: the schema is
+ *  applied once, and between tests only the rows are deleted (~55 ms against ~120 ms
+ *  for dropping and migrating again). A test that alters the schema on purpose needs
+ *  nothing special — the schema is compared with the pristine one on every reset, and
+ *  any difference rebuilds it from the migrations. */
+export function useLibraryRuntime({ bucket = true, migrated = false } = {}) {
   let runtime: Miniflare | undefined;
+  let pristine: string | undefined;
   afterAll(async () => { await runtime?.dispose(); });
+  const quote = (name: string) => '"' + name.replaceAll('"', '""') + '"';
   return async () => {
     if (!runtime) {
       runtime = new Miniflare(convertV4MiniflareOptions({
@@ -17,33 +25,45 @@ export function useLibraryRuntime({ bucket = true } = {}) {
         d1Databases: ['DB'],
         ...(bucket ? { r2Buckets: ['BUCKET'] } : {}),
       }));
-    } else {
-      const db = await runtime.getD1Database('DB');
-      const { results } = await db.prepare(
-        "SELECT name FROM sqlite_master WHERE type='table' AND name NOT GLOB 'sqlite_*' AND name NOT GLOB '_cf_*'",
-      ).all<{ name: string }>();
-      if (results.length) {
-        // D1 batch is a transaction; defer cyclic foreign keys until every table is gone.
-        // https://developers.cloudflare.com/d1/sql-api/foreign-keys/
-        const quote = (name: string) => '"' + name.replaceAll('"', '""') + '"';
-        await db.batch([
-          db.prepare('PRAGMA defer_foreign_keys = ON'),
-          ...results.map(({ name }) => db.prepare(`DROP TABLE ${quote(name)}`)),
-        ]);
+      if (migrated) {
+        const db = await runtime.getD1Database('DB');
+        await applyMigrations(db);
+        pristine = signature(await schema(db));
       }
-      if (bucket) {
-        const storage = await runtime.getR2Bucket('BUCKET');
-        // Re-list after deletion, avoiding cursors into a changing result set.
-        for (;;) {
-          const page = await storage.list({ limit: 1000 });
-          if (!page.objects.length) break;
-          await storage.delete(page.objects.map(object => object.key));
-        }
+      return runtime;
+    }
+    const db = await runtime.getD1Database('DB');
+    const objects = await schema(db);
+    const tables = objects.filter(object => object.type === 'table').map(object => object.name);
+    // D1 batch is a transaction; defer cyclic foreign keys until it commits.
+    // https://developers.cloudflare.com/d1/sql-api/foreign-keys/
+    if (migrated && signature(objects) === pristine) {
+      if (tables.length) await db.batch([db.prepare('PRAGMA defer_foreign_keys = ON'), ...tables.map(name => db.prepare(`DELETE FROM ${quote(name)}`))]);
+    } else {
+      if (tables.length) await db.batch([db.prepare('PRAGMA defer_foreign_keys = ON'), ...tables.map(name => db.prepare(`DROP TABLE ${quote(name)}`))]);
+      if (migrated) await applyMigrations(db);
+    }
+    if (bucket) {
+      const storage = await runtime.getR2Bucket('BUCKET');
+      // Re-list after deletion, avoiding cursors into a changing result set.
+      for (;;) {
+        const page = await storage.list({ limit: 1000 });
+        if (!page.objects.length) break;
+        await storage.delete(page.objects.map(object => object.key));
       }
     }
     return runtime;
   };
 }
+
+type SchemaObject = { type: string; name: string; sql: string | null };
+async function schema(db: { prepare(sql: string): { all<T>(): Promise<{ results: T[] }> } }): Promise<SchemaObject[]> {
+  const { results } = await db.prepare(
+    "SELECT type, name, sql FROM sqlite_master WHERE name NOT GLOB 'sqlite_*' AND name NOT GLOB '_cf_*' ORDER BY type, name",
+  ).all<SchemaObject>();
+  return results;
+}
+const signature = (objects: SchemaObject[]) => objects.map(o => `${o.type}:${o.name}:${o.sql ?? ''}`).join('\n');
 
 const MIGRATIONS = new URL('../../migrations/', import.meta.url);
 

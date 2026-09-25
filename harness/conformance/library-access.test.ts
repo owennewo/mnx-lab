@@ -1,7 +1,7 @@
 // Implementation loop: real signatures and local D1/R2 exercise the HTTP authorization boundary.
 import { beforeEach, expect, it } from 'vitest';
 import type { Miniflare } from 'miniflare';
-import { applyMigrations, libraryBindings, useLibraryRuntime } from '../helpers/libraryRuntime.ts';
+import { libraryBindings, useLibraryRuntime } from '../helpers/libraryRuntime.ts';
 import { SignJWT } from 'jose';
 import app from '../../worker/index.ts';
 import { Library } from '../../worker/library/index.ts';
@@ -10,12 +10,11 @@ import { testIdentity } from '../helpers/libraryIdentity.ts';
 import score from '../../scenarios/lab/00-document/01-minimal-single-note/document.mnx.json';
 let mf: Miniflare; let env: Env; let identity: Awaited<ReturnType<typeof testIdentity>>; let jwt: string;
 const request = (path: string, token = jwt, headers = {}) => app.request(`http://localhost/api/library${path}`, { headers: { 'Cf-Access-Jwt-Assertion': token, ...headers } }, env);
-const freshRuntime = useLibraryRuntime();
+const freshRuntime = useLibraryRuntime({ migrated: true });
 beforeEach(async () => {
   identity = await testIdentity(); jwt = await identity.sign();
   mf = await freshRuntime();
   env = { ...(await libraryBindings(mf)), LIBRARY_WRITE_TOKEN: 'private-test', ...identity.config };
-  await applyMigrations(env.LIBRARY_DB);
   await env.LIBRARY_DB.prepare("INSERT INTO users VALUES ('operator','owner@example.test',1,'now')").run();
 }, 15000);
 

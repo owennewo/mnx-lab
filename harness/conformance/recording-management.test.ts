@@ -1,6 +1,6 @@
 import { beforeEach, expect, it } from 'vitest';
 import type { Miniflare } from 'miniflare';
-import { applyMigrations, useLibraryRuntime } from '../helpers/libraryRuntime.ts';
+import { useLibraryRuntime } from '../helpers/libraryRuntime.ts';
 import type { D1Database, R2Bucket } from '@cloudflare/workers-types';
 import { Library } from '../../worker/library/index.ts';
 import { RecordingManager } from '../../worker/library/recordings.ts';
@@ -14,7 +14,7 @@ const change = { name: 'Take', video: 'https://youtu.be/M7lc1UVf-VE', rawSync: [
 const payload = new TextEncoder().encode('RIFF test audio integrity');
 async function audio() { return { sha256: Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', payload)), b => b.toString(16).padStart(2,'0')).join(''), bytes: payload.length, mime: 'audio/wav' }; }
 function request(bytes = payload) { return new Request('http://localhost/upload', { method: 'PUT', headers: { 'content-length': String(bytes.length) }, body: bytes }); }
-const freshRuntime = useLibraryRuntime();
+const freshRuntime = useLibraryRuntime({ migrated: true });
 beforeEach(async () => {
   mf = await freshRuntime();
   // Miniflare types its Node-side proxy against undici; it is the Worker's R2Bucket.
@@ -25,7 +25,6 @@ beforeEach(async () => {
     if (key === 'put') return async (key: string, value: Parameters<R2Bucket['put']>[1], options: Parameters<R2Bucket['put']>[2]) => nativeBucket.put(key, value instanceof ReadableStream ? await new Response(value).arrayBuffer() : value, options);
     const v=Reflect.get(target,key); return typeof v==='function' ? v.bind(target) : v;
   } });
-  await applyMigrations(db);
   library = new Library(db,bucket); manager = new RecordingManager(db,bucket);
   await library.writePiece('alice',{id:'piece',expected_revision:null});
 },15000);

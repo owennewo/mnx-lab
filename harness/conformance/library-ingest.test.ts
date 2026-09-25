@@ -3,7 +3,7 @@ import { beforeEach, afterEach, expect, it } from 'vitest';
 import { writeFile, rm, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { Miniflare } from 'miniflare';
-import { applyMigrations, libraryBindings, useLibraryRuntime } from '../helpers/libraryRuntime.ts';
+import { libraryBindings, useLibraryRuntime } from '../helpers/libraryRuntime.ts';
 import realApp from '../../worker/index.ts';
 import { testIdentity } from '../helpers/libraryIdentity.ts';
 import { ingestSources } from '../helpers/ingestFixture.ts';
@@ -35,13 +35,12 @@ async function form(manifest: object, files: Map<string, Uint8Array<ArrayBuffer>
   for (const [key, value] of files) f.set(key, new Blob([value]), key);
   return f;
 }
-const freshRuntime = useLibraryRuntime();
+const freshRuntime = useLibraryRuntime({ migrated: true });
 beforeEach(async () => {
   directory = await ingestSources();
   mf = await freshRuntime();
   env = { ...(await libraryBindings(mf)), LIBRARY_WRITE_TOKEN: token };
   const identity = await testIdentity(); Object.assign(env, identity.config); assertion = await identity.sign({}, true);
-  await applyMigrations(env.LIBRARY_DB);
   await env.LIBRARY_DB.prepare("INSERT INTO users VALUES ('operator','owner@example.test',1,'now')").run();
 }, 15000);
 afterEach(async () => { await rm(directory, { recursive: true, force: true }); });

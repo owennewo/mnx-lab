@@ -10,7 +10,7 @@
 // layer may not import: their proof is harness/verify/recording-studio-smoke.mjs.
 import { beforeEach, expect, it } from 'vitest';
 import type { Miniflare } from 'miniflare';
-import { applyMigrations, libraryBindings, useLibraryRuntime } from '../helpers/libraryRuntime.ts';
+import { libraryBindings, useLibraryRuntime } from '../helpers/libraryRuntime.ts';
 import app from '../../worker/index.ts';
 import type { Env } from '../../worker/env.ts';
 import { testIdentity } from '../helpers/libraryIdentity.ts';
@@ -31,12 +31,11 @@ const client = (token = () => jwt) => new LibraryClient((input, init) => {
 const make = async (document = blank()) => (await client().createPiece(file(document), derivedLibraryTags(document))).snapshot;
 const status = (promise: Promise<unknown>) => promise.then(() => 200, error => (error instanceof LibraryRequestError ? error.status : -1));
 
-const freshRuntime = useLibraryRuntime();
+const freshRuntime = useLibraryRuntime({ migrated: true });
 beforeEach(async () => {
   const identity = await testIdentity(); jwt = await identity.sign();
   mf = await freshRuntime();
   env = { ...(await libraryBindings(mf)), LIBRARY_WRITE_TOKEN: 'private-test', ...identity.config };
-  await applyMigrations(env.LIBRARY_DB);
   await env.LIBRARY_DB.prepare("INSERT INTO users VALUES ('operator','owner@example.test',1,'now')").run();
 }, 15000);
 

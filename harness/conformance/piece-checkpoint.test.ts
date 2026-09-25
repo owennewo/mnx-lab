@@ -7,7 +7,7 @@
 import { beforeEach, expect, it } from 'vitest';
 import type { Miniflare } from 'miniflare';
 import type { D1Result } from '@cloudflare/workers-types';
-import { applyMigrations, libraryBindings, useLibraryRuntime } from '../helpers/libraryRuntime.ts';
+import { libraryBindings, useLibraryRuntime } from '../helpers/libraryRuntime.ts';
 import app from '../../worker/index.ts';
 import type { Env } from '../../worker/env.ts';
 import { Library, pieceIdFor } from '../../worker/library/index.ts';
@@ -37,12 +37,11 @@ const checkpoint = (document: MnxStructure, from: { revision: number; canonical_
 const rows = (sql: string, ...bind: unknown[]): Promise<Record<string, unknown>[]> => env.LIBRARY_DB.prepare(sql).bind(...bind).all<Record<string, unknown>>().then((r: D1Result<Record<string, unknown>>) => r.results);
 const status = (promise: Promise<unknown>) => promise.then(() => 200, error => (error instanceof LibraryRequestError ? error.status : -1));
 
-const freshRuntime = useLibraryRuntime();
+const freshRuntime = useLibraryRuntime({ migrated: true });
 beforeEach(async () => {
   identity = await testIdentity(); jwt = await identity.sign();
   mf = await freshRuntime();
   env = { ...(await libraryBindings(mf)), LIBRARY_WRITE_TOKEN: 'private-test', ...identity.config };
-  await applyMigrations(env.LIBRARY_DB);
   await env.LIBRARY_DB.prepare("INSERT INTO users VALUES ('operator','owner@example.test',1,'now')").run();
 }, 15000);
 
