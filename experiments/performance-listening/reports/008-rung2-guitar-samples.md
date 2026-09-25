@@ -75,3 +75,104 @@ the real clip.
 - **The incumbent passes rung 2.** Timbre alone does not explain the real clip. The
   ladder continues with onset timing, and the other differences between the rendering
   and the real clip become the question.
+
+## Results
+
+Run [g008-rung2-guitar-samples](../runs/g008-rung2-guitar-samples/summary.json), on
+the pre-registration commit `386b6be1`.
+
+**Timbre alone breaks the incumbent.** With timing exact and only the sound changed,
+`online-time-warp@2` fails rung 2 on six of seven sample sets. Switching its support
+test off shows two defects of different sizes. The support test is the larger one: it
+rejects an alignment that is mostly right. The alignment is the smaller one: it goes
+briefly wrong in the same places for every guitar.
+
+### The incumbent and its alignment, by sample set
+
+Supported correct on the positive examples, and correct rejection on the wrong-score
+controls, each over 189 answerable points:
+
+| Group | Sample set | Incumbent: supported correct | Alignment only: correct | Incumbent: wrong-score rejection |
+|---|---|---|---|---|
+| Development | tonejs acoustic | 96.3% | 96.3% | **94.7%** |
+| Development | Martin | **94.2%** | **94.2%** | **90.5%** |
+| Development | Spanish | **91.0%** | **94.2%** | **94.7%** |
+| Development | Fender | 96.3% | 96.3% | **80.4%** |
+| Held out | tonejs nylon | **62.4%** | **90.5%** | **79.9%** |
+| Held out | tonejs electric | **78.8%** | 95.8% | **88.9%** |
+| Held out | Shinyguitar | **39.7%** | **87.8%** | 100% |
+
+Bold marks a value below the 95% gate. Silence was rejected everywhere, every prefix
+check passed, and rungs 0 and 1 reproduced experiment 007 exactly for every candidate.
+
+Summed over the seven positive examples, the incumbent's failed points are:
+
+| Failed points on the positives | Count |
+|---|---|
+| Lost: reported unsupported while its alignment was mostly right | 214 |
+| Wrong: a position outside ±0.25 quarter | 53 |
+
+### The support test is not calibrated across timbre
+
+It fails in both directions depending on the guitar. On the held-out nylon and
+Shinyguitar sets it rejects the correct score for a third to three fifths of the
+performance. On the Fender and nylon sets it accepts Dust's score for about a fifth of
+the time. The gap between path cost and free cost moves with timbre, and a single
+fixed limit cannot serve all seven guitars.
+
+### Where the alignment goes wrong
+
+The alignment-only diagnostic has no consistent lag: its median signed error is
+between −0.034 and 0.000 quarter on every set checked. Its wrong positions come in
+short bursts of 0.15–0.35 s, at the same score positions for every guitar, during
+the second half of sustained bass notes:
+
+| Score position | What is sounding | Direction of the error |
+|---|---|---|
+| Quarters 5.5–5.8 | G3 bass held for a beat under the arpeggio | Ahead, by up to 0.51 |
+| Quarters 13.5–13.8 | E3 bass held for a beat | Ahead, by up to 0.54 |
+| Quarters 6.5–7.0 and 10.1–11.0, some sets | D♯3 and E3 bass held for a beat or more | Behind, by up to 0.71 |
+
+The sine reference holds every note at full level until its score end, while a plucked
+string decays. The likely cause, not yet tested, is that decay, not tone colour, is what
+misleads the alignment in these places. It fits finding 19: decay cues matter, and the
+current reference has none.
+
+### Recognition and the thermometer
+
+With its own features at exact labels, the online time-warping reference prefers the
+exact position over the nearest wrong one on 49–69% of frames, depending on the set,
+compared with 100% on sine audio. The spectral features stay tie-dominated.
+
+On the real Winner clip, the alignment-only diagnostic agrees with the sync reference
+on 69.8% of points, against 12.7% for the incumbent with its support test. The real
+clip shows the same split as rung 2: most of the incumbent's real-audio failure is its
+support test.
+
+### Against the predictions
+
+| Prediction | Outcome |
+|---|---|
+| 1. The clock follows every positive and fails every control | **Held** |
+| 2. The incumbent is below 95% on most sets, mostly through losses | **Held**: 5 of 7 sets; 214 lost points against 53 wrong |
+| 3. With support off, the alignment is correct on at least 95% for most sets | **Contradicted**: 3 of 7 sets; the others 87.8–94.2% |
+| 4. Its wrong-score rejection stays at or above 95% on every set | **Contradicted**: 6 of 7 below, down to 79.9% |
+| 5. Version 1 follows the positives more often but fails the wrong score | **Contradicted** both ways: it collapses to 0% on Fender and Shinyguitar, and rejects the wrong score on at least 95% of points |
+| 6. The alignment-only diagnostic reaches at least 67.7% on the real clip | **Held**: 69.8% |
+| 7. Rungs 0 and 1 reproduce experiment 007 | **Held** |
+
+### Decision
+
+The pre-registered rules assumed one defect would dominate; the result shows both. By
+size, the support test comes first: it causes four times as many failed points as the
+alignment, and on the real clip it turns 69.8% into 12.7%. The alignment errors are
+smaller but systematic, and they have a specific suspected cause.
+
+Both defects may share that cause. The support test compares the in-order path with
+unconstrained matching, and a reference that never decays makes the in-order path
+look worse exactly where a real note is fading. So the next experiment tests one
+change: **render the listener's reference with a fixed plucked decay** instead of
+held sines, keeping the features, alignment and support test unchanged. It is
+developed on the development sample sets and rungs 0 and 1, and judged on the held-out
+sets. If the support test still fails across timbre after that, it is revised next,
+under the same discipline.

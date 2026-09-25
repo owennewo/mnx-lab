@@ -13,6 +13,7 @@ question are in [the research log](../RESEARCH_LOG.md), not here.
 | 005 | [Rung 0: online time-warping comparator](005-online-time-warp-rung0.html) | [g005-oltw-rung0](../runs/g005-oltw-rung0/summary.json) |
 | 006 | [Rung 0: sequence-based support](006-sequence-support-rung0.html) | [g006-sequence-support-rung0](../runs/g006-sequence-support-rung0/summary.json) |
 | 007 | [Rung 1: tempo](007-rung1-tempo.html) | [g007-rung1-tempo](../runs/g007-rung1-tempo/summary.json) |
+| 008 | [Rung 2: recorded guitar samples](008-rung2-guitar-samples.html) | [g008-rung2-guitar-samples](../runs/g008-rung2-guitar-samples/summary.json) |
 
 ## One experiment, one file
 

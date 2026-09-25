@@ -87,6 +87,19 @@
         "href": "006-sequence-support-rung0.html",
         "label": "Experiment 006"
       }
+    },
+    {
+      "number": "008",
+      "slug": "008-rung2-guitar-samples",
+      "title": "008 · Rung 2: recorded guitar samples",
+      "banner": "Rung 2 failed · support test not calibrated across timbre · alignment slips on decaying bass notes",
+      "runs": [
+        "g008-rung2-guitar-samples"
+      ],
+      "previous": {
+        "href": "007-rung1-tempo.html",
+        "label": "Experiment 007"
+      }
     }
   ]
 }
