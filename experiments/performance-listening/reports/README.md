@@ -12,6 +12,7 @@ question are in [the research log](../RESEARCH_LOG.md), not here.
 | 004 | [Rung 0: clean Winner](004-rung0-clean-winner.html) | [g004-rung0-clean-winner](../runs/g004-rung0-clean-winner/summary.json) |
 | 005 | [Rung 0: online time-warping comparator](005-online-time-warp-rung0.html) | [g005-oltw-rung0](../runs/g005-oltw-rung0/summary.json) |
 | 006 | [Rung 0: sequence-based support](006-sequence-support-rung0.html) | [g006-sequence-support-rung0](../runs/g006-sequence-support-rung0/summary.json) |
+| 007 | [Rung 1: tempo](007-rung1-tempo.html) | [g007-rung1-tempo](../runs/g007-rung1-tempo/summary.json) |
 
 ## One experiment, one file
 

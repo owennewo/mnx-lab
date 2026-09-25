@@ -74,6 +74,19 @@
         "href": "005-online-time-warp-rung0.html",
         "label": "Experiment 005"
       }
+    },
+    {
+      "number": "007",
+      "slug": "007-rung1-tempo",
+      "title": "007 · Rung 1: tempo",
+      "banner": "Rung 1 passed by online-time-warp@2 · wrong-score margin thinnest on fast performances",
+      "runs": [
+        "g007-rung1-tempo"
+      ],
+      "previous": {
+        "href": "006-sequence-support-rung0.html",
+        "label": "Experiment 006"
+      }
     }
   ]
 }
