@@ -18,7 +18,10 @@ export const MAXIMUM_PATH_COST = 0.7;     // and must stay a plausible match at 
 
 const DIAGONAL = 0, SKIP_LIVE = 1; // step 2 skips a reference frame
 
-export function onlineTimeWarp2(): Listener {
+/** alwaysClaim is a diagnostic, not a candidate: it reports the aligned position on every
+ * audible frame, ignoring the support test, so alignment accuracy can be measured apart
+ * from the support decision. The default behaviour is the frozen candidate. */
+export function onlineTimeWarp2(options: { alwaysClaim?: boolean } = {}): Listener {
   let reference: Frame[] = [], bpm = 0, quarters = 0, id = 0;
   let next = featureStream();
   // Recent rows: cumulative cost, local cost, chosen step and the free (best) local cost.
@@ -73,7 +76,7 @@ export function onlineTimeWarp2(): Listener {
           }
           pathCost = pathSum / counted;
           const gap = pathCost - freeSum / counted;
-          supported = rows >= MINIMUM_FRAMES && gap <= MAXIMUM_GAP && pathCost <= MAXIMUM_PATH_COST;
+          supported = rows >= MINIMUM_FRAMES && (options.alwaysClaim === true || (gap <= MAXIMUM_GAP && pathCost <= MAXIMUM_PATH_COST));
         }
       }
       if (!supported || !rows) return [{ id: `oltw2-${++id}`, kind: 'unsupported', refersTo: clock, reason: rows < MINIMUM_FRAMES ? 'gathering evidence' : 'path does not fit the recent audio, or silence' } satisfies Emission];

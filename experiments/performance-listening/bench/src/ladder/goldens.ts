@@ -6,7 +6,11 @@ import type { TempoFamily } from './tempo.ts';
 
 /** Rung 1 adds a tempo curve to rung 0's sine recipe; the handed tempo stays bpm. */
 export type RungOneRecipe = Omit<RungZeroRecipe, 'rung'> & { rung: 1; tempo: { family: TempoFamily; seed: number; segmentQuarters: 0.5; bpms: number[] } };
-export type LadderRecipe = RungZeroRecipe | RungOneRecipe;
+/** Rung 2 keeps rung 0's timing and replaces the sine with recorded guitar samples. */
+export type RungTwoRecipe = Omit<RungZeroRecipe, 'rung' | 'renderer'> & { rung: 2; renderer: 'sample-render@1';
+  samples: { id: string; name: string; source: string; licence: string; attribution: string; origin: string; files: number; shiftSemitones: { max: number; mean: number } };
+  preRollSamples: number; attackFraction: number; releaseSamples: number; paddedSamples: number };
+export type LadderRecipe = RungZeroRecipe | RungOneRecipe | RungTwoRecipe;
 
 /** A following golden for a rendered example. The labels have exactly the shape the
  * frozen following-evaluator@1 judges; only the recipe differs from sine-v1, so the

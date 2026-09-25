@@ -36,12 +36,14 @@ git('cat-file', '-e', `HEAD:${preregistration}`);
 const privateOut = join(requireOutsideGit(ladderDir), 'runs', runId), publicOut = join(EXPERIMENT, 'runs', runId);
 if (existsSync(privateOut) || existsSync(publicOut)) throw new Error('Run id exists; a run is never overwritten');
 
-const CANDIDATES: { id: string; factory: () => Listener; recognition?: 1 | 2 | 'oltw' }[] = [
+const CANDIDATES: { id: string; factory: () => Listener; recognition?: 1 | 2 | 'oltw'; diagnostic?: true }[] = [
   { id: CLOCK_VERSION, factory: clockFollower },
   { id: SPECTRAL_1, factory: spectralFollower1, recognition: 1 },
   { id: 'spectral-follower@2', factory: spectralFollower2, recognition: 2 },
   { id: OLTW_1, factory: onlineTimeWarp1, recognition: 'oltw' },
-  { id: OLTW_2, factory: onlineTimeWarp2 },
+  { id: OLTW_2, factory: () => onlineTimeWarp2() },
+  // Not a candidate: the incumbent's alignment with its support test switched off.
+  { id: `${OLTW_2}/alignment-only`, factory: () => onlineTimeWarp2({ alwaysClaim: true }), diagnostic: true },
 ];
 const rungDirs = readdirSync(ladderDir).filter(d => /^rung-\d+$/.test(d)).sort((a, b) => Number(a.slice(5)) - Number(b.slice(5)));
 if (!rungDirs.length) throw new Error('No built rung');
@@ -77,7 +79,7 @@ const rungs = rungDirs.map(dir => {
   const kindOf = (e: typeof manifest.examples[number]) => e.kind ?? (e.id as 'positive' | 'wrong-score' | 'silence');
   const groupOf = (e: typeof manifest.examples[number]) => e.group ?? 'fixed';
   const candidates = CANDIDATES.map(c => ({
-    candidate: c.id,
+    candidate: c.id, diagnostic: c.diagnostic ?? false,
     examples: manifest.examples.map(e => {
       const tempo: Tempo = { ...e.golden.intended.tempo };
       const s = score(e.scorePath), audio = readWav(readFileSync(e.audioPath));
