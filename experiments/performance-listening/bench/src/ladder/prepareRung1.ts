@@ -31,7 +31,12 @@ if (existsSync(out)) throw new Error('Rung 1 exists; a frozen set is never overw
 const winner = proxy.examples.find(e => e.id === 'winner-positive')!, dust = proxy.examples.find(e => e.id === 'winner-audio-dust-score')!;
 const score = JSON.parse(readFileSync(winner.scorePath, 'utf8')) as MnxStructure;
 const fromQuarter = 0, toQuarter = 16, handed = proxy.nominalBpm, segments = (toQuarter - fromQuarter) / SEGMENT_QUARTERS;
-const set = 'winner-ladder-rung1-v1';
+// v2: v1 crashed the frozen evaluator before any result. following-evaluator@1 rounds its
+// grid to 1e-9 s, so a duration with more decimals can put the last grid point past the
+// last label. Padding each clip to a multiple of 3 samples makes its duration exact at
+// that precision (k/48000 terminates within 7 decimals when 3 divides k).
+const set = 'winner-ladder-rung1-v2';
+const exactLength = (samples: number) => Math.ceil(samples / 3) * 3;
 const profileFor = (bpms: number[]) => ({
   ...rung0.manifest.examples[0]!.golden.profile,
   tempo: { level: 2, range: `Whole-BPM tempo per eighth note, ${Math.min(...bpms)}–${Math.max(...bpms)} BPM; handed ${handed} BPM` },
@@ -43,10 +48,11 @@ let longest = 0, polyphony = 0;
 for (const { group, family, seed } of RUNG_1_SEEDS) {
   const bpms = tempoCurve(family, seed, handed, segments);
   const map = timeMap(bpms, fromQuarter, SAMPLE_RATE);
-  const length = map.toSample(toQuarter), duration = length / SAMPLE_RATE;
+  const windowEnd = map.toSample(toQuarter), length = exactLength(windowEnd), duration = length / SAMPLE_RATE;
+  if (Math.round(duration * 1e9) / 1e9 !== duration) throw new Error('Duration is not exact at the evaluator grid precision');
   const recipe: RungOneRecipe = { renderer: RENDERER_VERSION, rung: 1, bpm: handed, fromQuarter, toQuarter, sampleRate: SAMPLE_RATE, peakDbfs: -12, rampSeconds: 0.01,
     tempo: { family, seed, segmentQuarters: SEGMENT_QUARTERS, bpms } };
-  const notes = windowNotes(score, fromQuarter, toQuarter, map.toSample, length, recipe.rampSeconds * SAMPLE_RATE);
+  const notes = windowNotes(score, fromQuarter, toQuarter, map.toSample, windowEnd, recipe.rampSeconds * SAMPLE_RATE);
   const labels = noteLabels(notes, recipe);
   polyphony = Math.max(polyphony, maxPolyphony(notes)); longest = Math.max(longest, length);
   const name = `${group}-${family}-${seed}`, audioPath = join(out, `${name}.wav`);
