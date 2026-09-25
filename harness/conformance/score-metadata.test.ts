@@ -63,7 +63,8 @@ describe('score metadata', () => {
     // An arranger is a role Guitar Pro cannot hold; the corpus carries one on
     // purpose so the lossy export path has something to warn about.
     expect(creatorsWithRole(doc, 'arranger')).toHaveLength(1);
-    expect(documentWork(doc)?.encoding).toBeUndefined();
+    // `encoding` left `work` in v6.2; nothing may still write it there.
+    expect((documentWork(doc) as { encoding?: unknown } | undefined)?.encoding).toBeUndefined();
   });
 
   it('states nothing for a document that carries no block', () => {

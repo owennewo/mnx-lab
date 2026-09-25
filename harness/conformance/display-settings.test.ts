@@ -1,7 +1,7 @@
 import { compilePerformance } from '../../src/audio/performance.ts';
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import type { MnxStructure } from '../../src/model/mnx.ts';
+import type { MnxPitch, MnxStructure } from '../../src/model/mnx.ts';
 import { displayedMeasureNumbers, normalizeDisplayOptions } from '../../src/engine/displayOptions.ts';
 import { selectedLyricLineIds } from '../../src/engine/layout/lyricRuns.ts';
 import { layoutNotation } from '../../src/engine/layout/notation.ts';
@@ -165,7 +165,7 @@ describe('displayed measure and instrument labels', () => {
 describe('multi-part display systems and score blocks', () => {
   const ensemble = (): MnxStructure => {
     const doc = fixture('lab/50-lyrics/01-verse-labels');
-    const strings = [{ step: 'E', octave: 4 }, { step: 'B', octave: 3 }, { step: 'G', octave: 3 }, { step: 'D', octave: 3 }, { step: 'A', octave: 2 }, { step: 'E', octave: 2 }].map((pitch, i) => ({ string: i + 1, pitch }));
+    const strings = ([{ step: 'E', octave: 4 }, { step: 'B', octave: 3 }, { step: 'G', octave: 3 }, { step: 'D', octave: 3 }, { step: 'A', octave: 2 }, { step: 'E', octave: 2 }] satisfies MnxPitch[]).map((pitch, i) => ({ string: i + 1, pitch }));
     doc.global.measures = Array.from({ length: 8 }, (_, i) => ({ id: `bar${i}`, ...(i === 0 ? { time: { count: 4, unit: 4 }, number: 0 } : {}) }));
     doc.parts[0].id = 'one';
     doc.parts[0].name = 'First instrument';

@@ -18,7 +18,8 @@ function request(bytes = payload) { return new Request('http://localhost/upload'
 const freshRuntime = useLibraryRuntime();
 beforeEach(async () => {
   mf = await freshRuntime();
-  db = await mf.getD1Database('DB'); const nativeBucket = await mf.getR2Bucket('BUCKET');
+  // Miniflare types its Node-side proxy against undici; it is the Worker's R2Bucket.
+  db = await mf.getD1Database('DB'); const nativeBucket = await mf.getR2Bucket('BUCKET') as unknown as R2Bucket;
   // Miniflare's Node RPC drops a Node stream's known-length tag. Adapt only this
   // test boundary; recording-management-smoke exercises the real Worker stream.
   bucket = new Proxy(nativeBucket, { get(target,key) {

@@ -16,7 +16,7 @@ const tuplet = (content: MnxTuplet['content']): MnxTuplet => ({
   outer: { multiple: 2, duration: { base: 'eighth' } },
   content,
 });
-export const nestedDocument = (): MnxStructure => ({
+export const nestedDocument = () => ({
   global: { measures: [{ time: { count: 4, unit: 4 } }] },
   parts: [
     {
@@ -25,7 +25,7 @@ export const nestedDocument = (): MnxStructure => ({
       ],
     },
   ],
-});
+}) satisfies Omit<MnxStructure, 'mnx'> as MnxStructure;
 it('preserves shallow keys and resolves deep notes consistently in edit, JSON and references', () => {
   const doc = nestedDocument();
   const keys = noteKeysOf(doc);

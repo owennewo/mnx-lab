@@ -42,6 +42,11 @@ const score = () => ({
   scores: [{ name: 'Full score', layout: 'ID_layout' }]
 });
 
+type Item = ReturnType<typeof score>['parts'][number]['measures'][number]['sequences'][number]['content'][number];
+/** The fixture's events that carry notes, and the one that also carries a slur. */
+type Played = Extract<Item, { notes: unknown }>;
+type Slurred = Extract<Item, { slurs: unknown[] }>;
+
 /** Respells ids by TEXT substitution — deliberately ignorant of the module's
  *  reference table, so the proof is not the table agreeing with itself. */
 function respell(document: unknown, spelling: (id: string) => string): unknown {
@@ -63,7 +68,7 @@ describe('document comparison: what is not a difference', () => {
   it('an id nothing references is not part of the music', () => {
     const bare = score();
     delete (bare.parts[0].measures[1].sequences[0].content[0] as { id?: string }).id;
-    delete (bare.parts[0].measures[0].sequences[0].content[1].notes![1] as { id?: string }).id;
+    delete ((bare.parts[0].measures[0].sequences[0].content[1] as Played).notes![1] as { id?: string }).id;
     expect(compareDocuments(score(), bare)).toEqual([]);
   });
 
@@ -97,14 +102,14 @@ describe('document comparison: what is not a difference', () => {
 describe('document comparison: what is', () => {
   it('a retargeted reference is a change, named by what it resolves to', () => {
     const retargeted = score();
-    retargeted.parts[0].measures[0].sequences[0].content[0].notes![0].ties = [{ target: 'ID_n3' }];
+    (retargeted.parts[0].measures[0].sequences[0].content[0] as Slurred).notes![0].ties = [{ target: 'ID_n3' }];
     const differences = compareDocuments(score(), retargeted);
     expect(differences.some(d => d.kind === 'changed' && d.path.join('/').endsWith('ties/0/target'))).toBe(true);
   });
 
   it('crossed targets differ even though the same ids are all still present', () => {
     const crossed = score();
-    const note = crossed.parts[0].measures[0].sequences[0].content[0].notes![0];
+    const note = (crossed.parts[0].measures[0].sequences[0].content[0] as Slurred).notes![0];
     note.ties = [{ target: 'ID_n3' }];
     note._x.mnxLab.tab.technique.slide.target = 'ID_n3';
     expect(compareDocuments(score(), crossed).length).toBeGreaterThan(0);
@@ -112,14 +117,14 @@ describe('document comparison: what is', () => {
 
   it('a dangling reference differs from a good one, and stays as spelled', () => {
     const dangling = score();
-    dangling.parts[0].measures[0].sequences[0].content[0].slurs = [{ target: 'ID_gone' }];
+    (dangling.parts[0].measures[0].sequences[0].content[0] as Slurred).slurs = [{ target: 'ID_gone' }];
     const differences = compareDocuments(score(), dangling);
     expect(differences.some(d => d.after === 'ID_gone')).toBe(true);
   });
 
   it('a duplicated id is left visible rather than named away', () => {
     const duplicated = score();
-    duplicated.parts[0].measures[0].sequences[0].content[1].notes![1].id = 'ID_n2';
+    (duplicated.parts[0].measures[0].sequences[0].content[1] as Played).notes![1].id = 'ID_n2';
     expect(compareDocuments(score(), duplicated).length).toBeGreaterThan(0);
   });
 
@@ -133,7 +138,7 @@ describe('document comparison: what is', () => {
 
   it('a spliced array reports its members, not every shifted index', () => {
     const shorter = score();
-    shorter.parts[0].measures[0].sequences[0].content[1].notes!.pop();
+    (shorter.parts[0].measures[0].sequences[0].content[1] as Played).notes!.pop();
     expect(collapseDifferences(compareDocuments(score(), shorter))).toEqual([
       { path: 'parts/[]/measures/[]/sequences/[]/content/[]/notes/[]', kind: 'lost', count: 1 }
     ]);

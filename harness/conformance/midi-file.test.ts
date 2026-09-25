@@ -103,7 +103,7 @@ it('orders releases and bend reset/setup before new attacks and clips exported c
   expect(result.diagnostics.some((d) => d.code === 'collapsed-curve')).toBe(true);
   const events = readMidi(result.bytes).tracks[1].filter((e) => e.tick === 960);
   expect(events[0].status >> 4).toBe(8);
-  expect(events.at(-1)?.status >> 4).toBe(9);
+  expect(events.at(-1)?.status! >> 4).toBe(9);
   expect(events.filter((e) => e.status >> 4 === 14).at(-1)?.data).toEqual([127, 127]);
 });
 it('reserves channel 10 for declared kit sounds', () => {

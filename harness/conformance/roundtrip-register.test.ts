@@ -33,6 +33,7 @@ import { describe, it, expect } from 'vitest';
 import { importGuitarProCleanRoom } from '../../converters/guitarpro-mnx/src/cleanRoom.ts';
 import { exportGuitarProGpif, STORAGE_EXPORT_OPTIONS } from '../../converters/guitarpro-mnx/src/gpif/fromMnx.ts';
 import { collapseDifferences, compareDocuments, type DifferenceShape } from '../../src/model/documentCompare.ts';
+// @ts-expect-error plain mjs
 import { loadCorpus } from '../verify/check-scenarios.mjs';
 
 const ROOT = path.join(__dirname, '..', '..');

@@ -7,6 +7,7 @@
 import { beforeEach, expect, it } from 'vitest';
 import { readFile } from 'node:fs/promises';
 import type { Miniflare } from 'miniflare';
+import type { D1Result } from '@cloudflare/workers-types';
 import { useLibraryRuntime } from '../helpers/libraryRuntime.ts';
 import app from '../../worker/index.ts';
 import type { Env } from '../../worker/env.ts';
@@ -34,7 +35,7 @@ const client = (token = () => jwt) => new LibraryClient((input, init) => {
 const checkpoint = (document: MnxStructure, from: { revision: number; canonical_rendition_id?: string | null }, over: Partial<Checkpoint> = {}): Checkpoint => ({
   expectedRevision: from.revision, derivedFrom: from.canonical_rendition_id!, file: file(document), derivedTags: derivedLibraryTags(document),
   check: { verdict: 'gains', differences: [{ path: 'parts/[]/transposition', kind: 'gained', count: 1 }], warnings: [] }, ...over });
-const rows = (sql: string, ...bind: unknown[]) => env.LIBRARY_DB.prepare(sql).bind(...bind).all<Record<string, unknown>>().then(r => r.results);
+const rows = (sql: string, ...bind: unknown[]): Promise<Record<string, unknown>[]> => env.LIBRARY_DB.prepare(sql).bind(...bind).all<Record<string, unknown>>().then((r: D1Result<Record<string, unknown>>) => r.results);
 const status = (promise: Promise<unknown>) => promise.then(() => 200, error => (error instanceof LibraryRequestError ? error.status : -1));
 
 const freshRuntime = useLibraryRuntime();
@@ -148,7 +149,8 @@ it('an ingest after a Studio edit adds what Soundslice exported and moves neithe
   const before = (await client().piece(id)).snapshot;
   const edited = await client().saveCheckpoint(id, checkpoint(retitled(first, 'My title'), before.piece));
 
-  const refetched = file(retitled(first, 'Soundslice changed it')).bytes;
+  // The exporter allocates its own ArrayBuffer; nothing here is shared memory.
+  const refetched = file(retitled(first, 'Soundslice changed it')).bytes as Uint8Array<ArrayBuffer>;
   const sha256 = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', refetched)), b => b.toString(16).padStart(2, '0')).join('');
   const form = new FormData();
   form.set('manifest', JSON.stringify({ expected_revision: edited.snapshot.piece.revision, source: { kind: 'soundslice', id: 'Edited1' },

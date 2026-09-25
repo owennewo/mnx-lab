@@ -3,6 +3,7 @@ import { afterEach, expect, it } from 'vitest';
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+// @ts-expect-error No declaration file for the Node operator tool.
 import { bootstrap, UNPROVISIONED } from '../../tools/bootstrap-storage.mjs';
 
 const dirs: string[] = [];

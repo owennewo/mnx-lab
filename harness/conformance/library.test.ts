@@ -35,7 +35,8 @@ const freshRuntime = useLibraryRuntime();
 beforeEach(async () => {
   mf = await freshRuntime();
   db = await mf.getD1Database('DB');
-  bucket = await mf.getR2Bucket('BUCKET');
+  // Miniflare types its Node-side proxy against undici; it is the Worker's R2Bucket.
+  bucket = await mf.getR2Bucket('BUCKET') as unknown as R2Bucket;
   // Split only between this migration's CREATE statements, preserving the trigger body.
   await db.batch([migration, views, lifecycle, prefs].map(m => m.replace(/--[^\n]*/g, '').trim().split(/;\s*(?=(?:CREATE|ALTER)\b)/).map(sql => db.prepare(sql))).flat());
   library = new Library(db, bucket);
@@ -163,7 +164,8 @@ it('refuses externally corrupted hash keys instead of overwriting them', async (
 });
 
 it('does not commit rows when R2 verification fails', async () => {
-  const broken=new Library(db,wrappedBucket({head:async()=>null,put:async()=>null}));
+  // A conditional put (storeBlob's onlyIf) resolves null; the unconditional overload cannot say so.
+  const broken=new Library(db,wrappedBucket({head:async()=>null,put:(async()=>null) as unknown as R2Bucket['put']}));
   await expect(broken.writePiece('alice',{...create(),renditions:[mnx('mnx')]})).rejects.toMatchObject({code:'blob'});
   expect(await library.listPieces('alice')).toEqual([]);
 });

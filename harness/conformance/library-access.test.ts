@@ -45,7 +45,7 @@ it('checks current membership on every call without creating users', async () =>
 it('isolates owners across list, tag completion, metadata, canonical and raw bytes', async () => {
   const lib = new Library(env.LIBRARY_DB, env.LIBRARY_BUCKET);
   for (const owner of ['operator','other']) {
-    await lib.writePiece(owner, { id: owner, expected_revision: null, renditions: [{ id: `${owner}-mnx`, format: 'mnx', role: 'original', producer: 'user-upload', producer_version: null, producer_options: null, content: new TextEncoder().encode(JSON.stringify(score)) }], canonical: { mode: 'initialize', rendition_id: `${owner}-mnx` }, tags: [{ dimension: 'list', value: owner }] });
+    await lib.writePiece(owner, { id: owner, expected_revision: null, renditions: [{ id: `${owner}-mnx`, format: 'mnx', role: 'original', producer: 'user-upload', producer_version: null, producer_options: null, content: new TextEncoder().encode(JSON.stringify(score)).buffer }], canonical: { mode: 'initialize', rendition_id: `${owner}-mnx` }, tags: [{ dimension: 'list', value: owner }] });
   }
   expect((await (await request('/pieces')).json()).pieces.map((p: { id: string }) => p.id)).toEqual(['operator']);
   expect((await (await request('/pieces?tag=list:other')).json()).pieces).toEqual([]);
@@ -99,7 +99,7 @@ it('lets the signed-in person open, tag and alias their own pieces only, and onl
 it('serves owner-checked audio with native byte ranges, HEAD and private cache headers', async () => {
   const lib = new Library(env.LIBRARY_DB, env.LIBRARY_BUCKET);
   for (const owner of ['operator','other']) await lib.writePiece(owner, { id: owner, expected_revision: null, recordings: [
-    { id: `${owner}-audio`, kind: 'audio', mime: 'audio/wav', blob: { content: new TextEncoder().encode('0123456789') } },
+    { id: `${owner}-audio`, kind: 'audio', mime: 'audio/wav', blob: { content: new TextEncoder().encode('0123456789').buffer } },
     { id: `${owner}-youtube`, kind: 'youtube', external_id: 'example' },
   ] });
   const path='/recordings/operator-audio/audio';

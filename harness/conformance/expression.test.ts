@@ -17,7 +17,7 @@ const note = (id: string, alter = 0, technique?: MnxTabTechnique): MnxEvent => (
     },
   ],
 });
-const doc = (events: MnxEvent[], dynamics: MnxDynamic[] = []): MnxStructure => ({
+const doc = (events: MnxEvent[], dynamics: MnxDynamic[] = []) => ({
   global: { measures: [{ id: 'm1', time: { count: 4, unit: 4 } }] },
   parts: [
     {
@@ -27,7 +27,7 @@ const doc = (events: MnxEvent[], dynamics: MnxDynamic[] = []): MnxStructure => (
       measures: [{ dynamics, sequences: [{ voice: 'upper', content: events }] }],
     },
   ],
-});
+}) satisfies Omit<MnxStructure, 'mnx'> as MnxStructure;
 const compile = (d: MnxStructure) => {
   const r = compilePerformance(d);
   if (!r.ok) throw Error(JSON.stringify(r.diagnostics));
@@ -231,7 +231,7 @@ it('connects a target slide and a hammer chain as logical transitions, and rejec
   expect(p.sounding[2].velocity).toBe(55);
   expect(centsAt(p.sounding[0], q(1n, 4n))).toBe(200);
   const d = doc([note('a', 0, { hammerPull: { target: 'b' } }), note('b', 2)]);
-  delete d.parts[0].measures[0].sequences![0].content[1].notes![0]._x;
+  delete (d.parts[0].measures[0].sequences![0].content[1] as MnxEvent).notes![0]._x;
   expect(compile(d).sounding[1].noReattack).toBeUndefined();
   expect(compile(d).diagnostics.some((d) => d.code === 'unresolved-technique-target')).toBe(true);
 });

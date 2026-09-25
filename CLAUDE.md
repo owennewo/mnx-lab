@@ -39,7 +39,8 @@ npm run sync:spec          # pinned spec fixture → scenarios/spec/ (owns that 
 npm run push:proposal -- <topic>   # inject a topic's evidence into the proposal branch
 npm run update:roster      # worker/models.query.json → worker/models.json (stored queries)
 npm run refresh:catalog    # refetch OpenRouter's catalog snapshot, then regenerate
-npm run build              # validators + boundaries + tsc (app+worker) + vite build
+npm run build              # validators + boundaries + tsc (app+worker+harness) + vite build
+npm run typecheck:harness  # the harness part alone (tsc over harness/; worker/ is judged by tsc -p worker)
 npm run build:lib          # the mnx-lab library face → dist/lib
 npm run build:embed        # the embed face → dist/embed/mnx-lab.js
 npm run smoke:lib          # npm pack → install → render SVG in Node via mnx-lab/engine

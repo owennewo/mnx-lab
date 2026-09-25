@@ -10,7 +10,7 @@ import type { MnxStructure } from '../../src/model/mnx.ts';
 import { syntheticEventKey } from '../../src/model/noteKeys.ts';
 import { initSmufl, WIDTH_SP } from '../helpers/corpusPrimitives.ts';
 import { layoutNotation } from '../../src/engine/layout/notation.ts';
-import type { Primitive } from '../../src/engine/primitives.ts';
+import type { GlyphPrim, Primitive } from '../../src/engine/primitives.ts';
 
 const draw = (doc: MnxStructure, selectedEventIds: string[] = []): Primitive[] => {
   initSmufl();
@@ -59,10 +59,10 @@ describe('a rest can be pointed at', () => {
     // interpolating its metric fraction across the bar. The x it should sit at
     // is the second column's — strictly right of the first note's.
     const s = barWithARestOnBeatTwo();
-    const heads = draw(s.doc).filter(p => p.className === 'notehead');
-    const restX = rests(s.doc)[0].x!;
-    expect(restX, 'the rest is not right of the first note').toBeGreaterThan(heads[0].x!);
-    expect(restX, 'the rest is not left of the second').toBeLessThan(heads[1].x!);
+    const heads = draw(s.doc).filter(p => p.className === 'notehead') as GlyphPrim[];
+    const restX = (rests(s.doc)[0] as GlyphPrim).x;
+    expect(restX, 'the rest is not right of the first note').toBeGreaterThan(heads[0].x);
+    expect(restX, 'the rest is not left of the second').toBeLessThan(heads[1].x);
   });
 
   it('lights up when its key is in selectedEventIds, and only then', () => {

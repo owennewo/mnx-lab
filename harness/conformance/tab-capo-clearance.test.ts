@@ -72,7 +72,7 @@ describe('capo clearance over opening hammer-ons', () => {
           mnx,
           widthSp: 80,
           inkRatio,
-          systemBookends: { leading: { label: '0:01' } }
+          systemBookends: { leading: { label: '0:01', title: 'Pre-roll: 0:01' } }
         });
         const tuning = result.primitives.find(p => p.kind === 'text' && p.className === 'tab-tuning-letter');
         const capo = result.primitives.find(p => p.kind === 'text' && p.className === 'tab-capo');

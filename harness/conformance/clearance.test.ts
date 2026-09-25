@@ -30,10 +30,11 @@ function rowInk(result: ReturnType<typeof layoutNotation>) {
   if (result.rowInkSp) {
     return result.rowInkSp.map(({ top, bottom }) => ({ y: top, h: bottom - top }));
   }
-  const boundaries = result.rows.slice(0, -1).map((row, index) =>
-    (row.staffBottom + result.rows[index + 1].staffTop) / 2
+  const rows = result.rows!;
+  const boundaries = rows.slice(0, -1).map((row, index) =>
+    (row.staffBottom + rows[index + 1].staffTop) / 2
   );
-  const buckets: Primitive[][] = result.rows.map(() => []);
+  const buckets: Primitive[][] = rows.map(() => []);
   for (const p of result.primitives) {
     let row = 0;
     while (row < boundaries.length && anchorY(p) >= boundaries[row]) row++;
@@ -203,7 +204,7 @@ it('moves every actual Both-view staff gap at every half step', () => {
 
 it('does not add prefix padding to a hidden system-opening repeat', () => {
   const doc = load('spec/repeats');
-  doc.global.measures[0].repeatStart = true;
+  doc.global.measures[0].repeatStart = {};
   for (const clearance of levels) {
     const plan = planHorizontal(doc, 80, { display: { clearance, clefs: 'hide', timeSignatures: 'hide' } });
     expect(plan.measures[0].repeatStartX).toBe(plan.measures[0].x);

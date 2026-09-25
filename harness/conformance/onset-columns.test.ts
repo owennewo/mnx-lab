@@ -9,7 +9,7 @@ import { planHorizontal } from '../../src/engine/layout/spacing.ts';
 import { WIDTH_SP } from '../helpers/corpusPrimitives.ts';
 import { isTimedEvent } from '../../src/model/mnx.ts';
 import { durationValue } from '../../src/model/durations.ts';
-import type { MnxSequenceItem, MnxStructure } from '../../src/model/mnx.ts';
+import type { MnxNote, MnxPitch, MnxSequenceItem, MnxStructure } from '../../src/model/mnx.ts';
 
 const quarter = { base: 'quarter' as const };
 const eighth = { base: 'eighth' as const };
@@ -40,7 +40,7 @@ function timedSlots(doc: MnxStructure): { voice: number; onset: number; x: numbe
   return out;
 }
 
-function note(step: string, octave: number, extra: object = {}) {
+function note(step: MnxPitch['step'], octave: number, extra: Partial<MnxNote> = {}): MnxNote {
   return { pitch: { step, octave }, ...extra };
 }
 

@@ -21,7 +21,7 @@ function fixture() {
   const api={time:0,duration:20,state:5,rate:1,volume:70,destroyed:false,plays:0,cues:[] as number[],rates:[.5,1,1.5,2],requestedRate:1,muted:false,onPlay:'idle' as 'idle'|'start'|'block',
     playVideo(){this.plays++;if(this.onPlay==='start'){this.state=1;queueMicrotask(()=>events.onStateChange({data:1}));}else if(this.onPlay==='block')queueMicrotask(()=>events.onAutoplayBlocked());},pauseVideo(){this.state=2;},seekTo(time:number){this.time=time;},cueVideoById({startSeconds}:{startSeconds:number}){this.cues.push(startSeconds);this.time=startSeconds;this.state=5;events.onStateChange({data:5});},
     getCurrentTime(){return this.time;},getDuration(){return this.duration;},getPlayerState(){return this.state;},getPlaybackRate(){return this.rate;},getAvailablePlaybackRates(){return this.rates;},setPlaybackRate(rate:number){this.requestedRate=rate;},getVolume(){return this.volume;},setVolume(volume:number){this.volume=volume;},mute(){this.muted=true;},unMute(){this.muted=false;},isMuted(){return this.muted;},destroy(){this.destroyed=true;},
-  } satisfies YouTubePlayerApi & Record<string,unknown>;
+  };
   const port=new YouTubePort(id,async next=>{events=next;queueMicrotask(()=>events.onReady());return api;},()=>visible);
   return {api,port,get events(){return events;},hide(){visible=false;},show(){visible=true;},state(data:number){api.state=data;events.onStateChange({data});}};
 }
@@ -113,7 +113,7 @@ describe('official IFrame API adapter',()=>{
     const f=fixture();await f.port.prepare();f.state(1);f.api.duration=30;f.port.sample();expect(f.port.clockReliable).toBe(false);expect(f.port.clockIssue).toContain('changing');f.port.dispose();
   });
   it('integrates repeat positions, inner-bar anchors, native Pause and explicit YouTube starts',async()=>{
-    const document:MnxStructure={global:{measures:[{time:{count:4,unit:4},repeatStart:{},repeatEnd:{}}]},parts:[{measures:[{sequences:[{content:[{duration:{base:'whole'},notes:[{pitch:{step:'C',octave:4}}]}]}]}]}]};
+    const document={global:{measures:[{time:{count:4,unit:4},repeatStart:{},repeatEnd:{}}]},parts:[{measures:[{sequences:[{content:[{duration:{base:'whole'},notes:[{pitch:{step:'C',octave:4}}]}]}]}]}]} as MnxStructure; // no `mnx` header: nothing under test reads it
     const passes=linearizePasses(document),compiled=compilePerformance(document,passes);if(!compiled.ok)throw new Error('fixture');
     const mapped=createRecordingSync([[0,0],[1,4],[1,8,240],[2,12]],compiled,passes);if(!mapped.ok)throw new Error(mapped.diagnostic.message);
     const f=fixture();const backend=new RecordingBackend('yt',f.port,compiled.performance,mapped.value);

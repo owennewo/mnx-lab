@@ -6,7 +6,8 @@ import { createRecordingSync } from '../../src/audio/recordingSync.ts';
 import { linearizePasses } from '../../src/model/passes.ts';
 import { ZERO, rational as q } from '../../src/audio/time.ts';
 import type { MnxStructure } from '../../src/model/mnx.ts';
-const document: MnxStructure = { global: { measures: [{ time: { count: 4, unit: 4 } }, {}] }, parts: [{ measures: ['a','b'].map(id => ({ sequences: [{ content: [{ duration: { base: 'whole' }, notes: [{ id, pitch: { step: 'C', octave: 4 } }] }] }] })) }] };
+// No `mnx` header: nothing under test reads it.
+const document = { global: { measures: [{ time: { count: 4, unit: 4 } }, {}] }, parts: [{ measures: ['a','b'].map(id => ({ sequences: [{ content: [{ duration: { base: 'whole' }, notes: [{ id, pitch: { step: 'C', octave: 4 } }] }] }] })) }] } as MnxStructure;
 const passes = linearizePasses(document), compiled = compilePerformance(document, passes);
 if (!compiled.ok) throw new Error('fixture did not compile');
 const performance = compiled.performance;

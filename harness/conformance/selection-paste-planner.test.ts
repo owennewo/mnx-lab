@@ -6,6 +6,7 @@ import type { EditorCursor } from '../../src/edit/cursor.ts';
 import type { SelectionLevel, SelectionState } from '../../src/edit/selection.ts';
 import type { MnxNote, MnxStructure } from '../../src/model/mnx.ts';
 import { STANDARD_GUITAR_STRINGS } from '../../src/model/mnx.ts';
+// @ts-expect-error precompiled validator is generated JS (no declaration)
 import validateMnxProposed from '../../worker/generated/validate-mnx-proposed.mjs';
 
 function note(id: string, step: MnxNote['pitch']['step'] = 'E', string = 1): MnxNote {

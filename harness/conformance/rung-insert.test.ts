@@ -264,8 +264,8 @@ describe('insert and the spans anchored by a bar COUNT', () => {
     s.doc.scores = [{ multimeasureRests: [{ start: 'm2', duration: 3 }] } as never];
     s.handleIntent({ type: 'goToMeasure', measureIndex: 2 });
     s.handleIntent({ type: 'insertAtRung', side: 'after' }); // lands at index 3
-    expect((s.doc.parts![0].measures![1] as { measureRepeat: { number: number } })
-      .measureRepeat.number).toBe(4);
+    expect((s.doc.parts![0].measures![1] as { measureRepeat?: { number: number } })
+      .measureRepeat!.number).toBe(4);
     expect(s.doc.scores![0].multimeasureRests![0].duration).toBe(4);
   });
 });
@@ -410,7 +410,8 @@ describe('the note rung inserts a note, and may overfill the bar', () => {
     const s = score(1);
     while (s.cursor.line !== -6) s.handleIntent({ type: 'lineDown' });
     s.handleIntent({ type: 'toggleNote' });
-    while (s.cursor.line !== 2) s.handleIntent({ type: 'lineUp' });
+    // The loop above narrowed `line` to -6; handleIntent moves it.
+    while ((s.cursor.line as number) !== 2) s.handleIntent({ type: 'lineUp' });
     expect(s.handleIntent({ type: 'insertAtRung', side: 'before' })).toBe(true);
     const first = s.doc.parts![0].measures![0].sequences![0].content[0] as {
       notes?: { pitch: { step: string; octave: number } }[];

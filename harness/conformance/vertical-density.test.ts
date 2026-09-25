@@ -61,15 +61,16 @@ const MULTI_SYSTEM = 'lab/00-document/04-twelve-bar-blues';
  * baselines).
  */
 function rowInk(layout: LayoutResult): { top: number; bottom: number }[] {
+  const rows = layout.rows!;
   const boundaries: number[] = [];
-  for (let r = 0; r + 1 < layout.rows.length; r++) {
-    boundaries.push((layout.rows[r].staffBottom + layout.rows[r + 1].staffTop) / 2);
+  for (let r = 0; r + 1 < rows.length; r++) {
+    boundaries.push((rows[r].staffBottom + rows[r + 1].staffTop) / 2);
   }
   const anchor = (p: Primitive): number =>
     p.kind === 'line' ? (p.y1 + p.y2) / 2
     : p.kind === 'curve' ? (p.points[0].y + p.points[3].y) / 2
     : p.y;
-  const buckets: Primitive[][] = layout.rows.map(() => []);
+  const buckets: Primitive[][] = rows.map(() => []);
   for (const p of layout.primitives) {
     let r = 0;
     while (r < boundaries.length && anchor(p) >= boundaries[r]) r++;
@@ -136,7 +137,7 @@ describe('vertical density — the floor is ink, not a constant', () => {
           view === 'tab'
             ? layoutTab({ mnx, widthSp: WIDTH_SP, densityPad: k })
             : layoutNotation({ mnx, widthSp: WIDTH_SP, densityPad: k });
-        expect(layout.rows.length).toBeGreaterThan(1);
+        expect(layout.rows!.length).toBeGreaterThan(1);
         const ink = rowInk(layout);
         for (let r = 0; r + 1 < ink.length; r++) {
           expect(ink[r + 1].top).toBeGreaterThan(ink[r].bottom);

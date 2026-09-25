@@ -20,6 +20,7 @@ import { derivedLibraryTags } from '../../src/model/libraryTags.ts';
 import { compareDocuments } from '../../src/model/documentCompare.ts';
 import { exportGuitarProGpif, STORAGE_EXPORT_OPTIONS } from '../../converters/guitarpro-mnx/src/gpif/fromMnx.ts';
 import { importGuitarProCleanRoom } from '../../converters/guitarpro-mnx/src/cleanRoom.ts';
+// @ts-expect-error No declaration file for the Node operator tool.
 import { conversionFacts, tuningName } from '../../tools/library-ingest.mjs';
 import validateMnx from '../../worker/generated/validate-mnx.mjs';
 import { validatePartExt, validateRootExt } from '../../worker/generated/validate-extensions.mjs';
@@ -90,7 +91,7 @@ describe('POST /api/library/pieces', () => {
   const post = (body: unknown, headers: Record<string, string> = { 'Content-Type': 'application/json' }) =>
     send('/pieces', { method: 'POST', headers, body: typeof body === 'string' ? body : JSON.stringify(body) });
   const valid = async () => {
-    const bytes = toGp(buildNewDocument(spec()));
+    const bytes = toGp(buildNewDocument(spec())) as Uint8Array<ArrayBuffer>; // the exporter's own buffer, never shared
     const sha256 = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', bytes)), b => b.toString(16).padStart(2, '0')).join('');
     return { rendition: { filename: 'Anji.gp', sha256, content: Buffer.from(bytes).toString('base64'), producer_version: null, producer_options: null },
       derived_tags: [{ dimension: 'title', value: 'Anji' }] };

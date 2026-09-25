@@ -14,7 +14,7 @@ import { layoutTab } from '../../src/engine/layout/tab.ts';
 import { LYRIC_LINE_SPACING_SP } from '../../src/engine/layout/lyricRuns.ts';
 import { clearanceSpacing } from '../../src/engine/clearance.ts';
 import { inkEdgesSp } from '../../src/engine/render/bounds.ts';
-import type { LayoutResult, Primitive } from '../../src/engine/primitives.ts';
+import type { LayoutResult, Primitive, TextPrim } from '../../src/engine/primitives.ts';
 import type { MnxStructure } from '../../src/model/mnx.ts';
 import { initSmufl } from '../helpers/corpusPrimitives.ts';
 
@@ -30,7 +30,7 @@ const WIDTH_SP = 60;
 
 // The staff's frame and the verses themselves are not ink a verse clears.
 const FRAME = /staff-line|barline|lyric|(^|\s)(brace|bracket)(\s|$)/;
-const isLyric = (p: Primitive) => p.kind === 'text' && p.className === 'lyric';
+const isLyric = (p: Primitive): p is TextPrim => p.kind === 'text' && p.className === 'lyric';
 /** Where a primitive hangs from — a line or curve by its top, else its anchor. */
 const hangY = (p: Primitive) =>
   p.kind === 'line' ? Math.min(p.y1, p.y2) : p.kind === 'curve' ? Math.min(...p.points.map(q => q.y)) : p.y;

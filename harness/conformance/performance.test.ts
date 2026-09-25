@@ -11,13 +11,13 @@ const n = (id: string, base: MnxEvent['duration']['base'] = 'quarter'): MnxEvent
   duration: { base },
   notes: [{ id, pitch: { step: 'C', octave: 4 } }],
 });
-const doc = (content: MnxSequenceItem[], other?: MnxSequenceItem[]): MnxStructure => ({
+const doc = (content: MnxSequenceItem[], other?: MnxSequenceItem[]) => ({
   global: { measures: [{ time: { count: 4, unit: 4 } }] },
   parts: [
     { measures: [{ sequences: [{ content }] }] },
     ...(other ? [{ measures: [{ sequences: [{ content: other }] }] }] : []),
   ],
-});
+}) satisfies Omit<MnxStructure, 'mnx'> as MnxStructure;
 const compile = (d: MnxStructure) => {
   const result = compilePerformance(d);
   if (!result.ok) throw Error(JSON.stringify(result.diagnostics));

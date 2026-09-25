@@ -3,5 +3,5 @@
   "compilerOptions": {
     "types": ["node", "vite/client"]
   },
-  "include": ["."]
+  "include": [".", "../worker/bindings.d.ts"]
 }

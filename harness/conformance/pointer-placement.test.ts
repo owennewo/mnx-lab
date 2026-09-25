@@ -30,6 +30,7 @@ import { isNavigationIntent } from '../../src/edit/intents.ts';
 import { layoutBothSystem } from '../../src/engine/layout/bothSystem.ts';
 import { initSmufl } from '../helpers/corpusPrimitives.ts';
 import type { MnxStructure } from '../../src/model/mnx.ts';
+import type { GlyphPrim, LinePrim } from '../../src/engine/primitives.ts';
 // @ts-expect-error — plain .mjs module without type declarations
 import { loadCorpus } from '../verify/check-scenarios.mjs';
 
@@ -277,14 +278,12 @@ describe('a click on drawn ink reaches the ink it was on', () => {
   const engraved = () => {
     const layout = layoutBothSystem({ mnx: doc, widthSp: 120, durationSpans: true });
     const bars = layout.primitives
-      .filter((p): p is { kind: 'line'; x1: number } =>
-        p.kind === 'line' && /barline/.test((p as { className?: string }).className ?? ''))
+      .filter((p): p is LinePrim => p.kind === 'line' && /barline/.test(p.className ?? ''))
       .map(p => p.x1)
       .sort((a, b) => a - b);
     const rests = layout.primitives
-      .filter((p): p is { kind: 'glyph'; x: number; sourceId: string } =>
-        p.kind === 'glyph' && /\brest\b/.test((p as { className?: string }).className ?? '') &&
-        typeof (p as { sourceId?: string }).sourceId === 'string')
+      .filter((p): p is GlyphPrim & { sourceId: string } =>
+        p.kind === 'glyph' && /\brest\b/.test(p.className ?? '') && typeof p.sourceId === 'string')
       .map(p => ({ key: p.sourceId, x: p.x }));
     return { bars, rests };
   };

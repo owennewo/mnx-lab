@@ -96,14 +96,14 @@ describe('derivation: string + pitch → fret', () => {
         ],
         notes: []
       })
-    );
+    )!;
     expect(resolveEventPositions([bare(p('D', 2))], dropD)[0]).toEqual({ str: 6, fret: 0 });
     // Standard tuning cannot reach D2 at all.
     expect(resolveEventPositions([bare(p('D', 2))], STANDARD)[0]).toBeNull();
   });
 
   it('applies the capo: frets are capo-relative and opens shift up', () => {
-    const capo2 = tabPositionContext(partWith({ capo: 2, notes: [] }));
+    const capo2 = tabPositionContext(partWith({ capo: 2, notes: [] }))!;
     // Effective open string 6 = E2 + 2 = F#2 → F#2 is fret 0, A2 is fret 3.
     expect(resolveEventPositions([bare(p('F', 2, 1))], capo2)[0]).toEqual({ str: 6, fret: 0 });
     expect(resolveEventPositions([onString(p('A', 2), 6)], capo2)[0]).toEqual({ str: 6, fret: 3 });

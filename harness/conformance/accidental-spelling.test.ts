@@ -71,7 +71,7 @@ describe('respell (J)', () => {
           ]
         }
       ]
-    }) as MnxStructure;
+    }) as unknown as MnxStructure;
 
   const pitchOf = (doc: MnxStructure) =>
     (doc.parts![0].measures![0].sequences![0].content[0] as { notes: MnxNote[] }).notes[0].pitch;

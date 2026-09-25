@@ -223,7 +223,7 @@ describe('pure audio-clock transport', () => {
     clock.tasks.clear();
     task.fn();
     expect(sink.actions.filter((e) => e.kind === 'attack').at(-1)!.time).toBe(0.7);
-    expect(events.filter((e) => e.kind === 'onset').every((e) => e.audioTime !== 0.5)).toBe(true);
+    expect(events.filter((e): e is Extract<TransportEvent, { audioTime: number }> => e.kind === 'onset').every((e) => e.audioTime !== 0.5)).toBe(true);
     transport.dispose();
     for (const fn of clock.stale) fn();
     expect(clock.tasks.size).toBe(0);

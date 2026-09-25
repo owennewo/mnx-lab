@@ -8,7 +8,7 @@ import { useLibraryRuntime } from '../helpers/libraryRuntime.ts';
 import realApp from '../../worker/index.ts';
 import { testIdentity } from '../helpers/libraryIdentity.ts';
 let assertion = '';
-const app = { request: (url: string, init?: RequestInit, bindings?: unknown) => realApp.request(url, { ...init, headers: { ...Object.fromEntries(new Headers(init?.headers)), 'Cf-Access-Jwt-Assertion': assertion } }, bindings) };
+const app = { request: (url: string, init?: RequestInit, bindings?: Parameters<typeof realApp.request>[2]) => realApp.request(url, { ...init, headers: { ...Object.fromEntries(new Headers(init?.headers)), 'Cf-Access-Jwt-Assertion': assertion } }, bindings) };
 import { Library } from '../../worker/library/index.ts';
 import type { Env } from '../../worker/env.ts';
 import { INGEST_OWNER, MAX_INGEST_BYTES } from '../../worker/api/library.ts';
@@ -27,10 +27,10 @@ const converters = Object.fromEntries(['guitarpro-mnx','musicxml-mnx'].map(produ
     Object.assign(doc.parts[0], { _x: { mnxLab: { capo: 3 } } }); return doc;
   }
 }]));
-const fetcher: typeof fetch = (input, init) => app.request(String(input), init, env);
+const fetcher = (input: RequestInfo | URL, init?: RequestInit) => app.request(String(input), init, env);
 const plan = async () => (await planIngest(directory))[0];
 const upload = (p: Awaited<ReturnType<typeof plan>>, options: object = { converters }) => uploadPlan(p, 'http://localhost', token, fetcher, {}, options);
-async function form(manifest: object, files: Map<string, Uint8Array>) {
+async function form(manifest: object, files: Map<string, Uint8Array<ArrayBuffer>>) {
   const f = new FormData(); f.set('manifest', JSON.stringify(manifest));
   for (const [key, value] of files) f.set(key, new Blob([value]), key);
   return f;
@@ -95,7 +95,7 @@ it('stores the sources only, projects tags from the sidecar and a validated conv
   expect(first.snapshot.tags.map((t: {dimension: string; value: string; origin: string; source_ref: string}) => `${t.dimension}:${t.value}:${t.origin}:${t.source_ref}`)).toEqual([
     'artist:Sidecar artist:derived:sidecar', 'capo:3:derived:guitarpro-mnx@test-version', 'list:Folder / List:asserted:L1', 'title:Sidecar song:derived:sidecar']);
   let posts = 0;
-  const second = await uploadPlan(p, 'http://localhost', token, (input, init) => { if (init?.method === 'POST') posts++; return fetcher(input, init); }, {}, { converters });
+  const second = await uploadPlan(p, 'http://localhost', token, (input: RequestInfo | URL, init?: RequestInit) => { if (init?.method === 'POST') posts++; return fetcher(input, init); }, {}, { converters });
   expect(second.status).toBe('skipped'); expect(posts).toBe(0); expect(second.snapshot).toEqual(first.snapshot);
   expect(second.validation).toBeNull();
 });
@@ -103,7 +103,7 @@ it('re-validates and refreshes only the projection when the converter version ch
   const p = await plan(); await upload(p);
   const next = Object.fromEntries(Object.entries(converters).map(([k, v]) => [k, { ...v, version: 'v2', convert: () => { const d = v.convert(); Object.assign(d.parts[0], { _x: { mnxLab: { capo: 5 } } }); return d; } }]));
   const files: string[] = [];
-  const result = await uploadPlan(p, 'http://localhost', token, async (input, init) => {
+  const result = await uploadPlan(p, 'http://localhost', token, async (input: RequestInfo | URL, init?: RequestInit) => {
     if (init?.method === 'POST') for (const key of (init.body as FormData).keys()) files.push(key);
     return fetcher(input, init);
   }, {}, { converters: next });

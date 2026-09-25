@@ -132,20 +132,6 @@ function makeTwoPartDoc(): MnxStructure {
   return doc;
 }
 
-function makeTwoPartContainerDoc(): MnxStructure {
-  const doc = makeTwoPartDoc();
-  for (const part of doc.parts) {
-    const sequence = part.measures![0].sequences[0];
-    sequence.content[0] = {
-      type: 'tuplet',
-      inner: { multiple: 1, duration: { base: 'quarter' } },
-      outer: { multiple: 1, duration: { base: 'quarter' } },
-      content: [sequence.content[0] as never]
-    };
-  }
-  return doc;
-}
-
 describe('keymap docs — the guard mirrors', () => {
   it('the Ctrl climb: documented per rung, and the session mirrors it', () => {
     // The climb's vertical, rung by rung (selection-ladder navigation map):
@@ -239,7 +225,7 @@ describe('keymap docs — the guard mirrors', () => {
     expect(Object.keys(cut.meaning)).toEqual([
       'note', 'event', 'voiceMeasure', 'partMeasure', 'measure'
     ]);
-    expect(cut.meaning.score).toBeUndefined();
+    expect(cut.meaning.document).toBeUndefined();
 
     const session = new EditorSession(makeDoc());
     while (session.selectionLevel !== 'document') session.handleIntent({ type: 'relaxSelection' });
@@ -249,7 +235,7 @@ describe('keymap docs — the guard mirrors', () => {
 
   it('arrows at score: no documented meaning, and the cursor stays put', () => {
     const doc = KEY_DOCS.find(d => d.keys === '←/→')!;
-    expect(doc.meaning.score).toBeUndefined();
+    expect(doc.meaning.document).toBeUndefined();
     expect(doc.meaning.all).toBeUndefined();
 
     const session = new EditorSession(makeDoc());

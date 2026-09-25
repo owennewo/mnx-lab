@@ -18,7 +18,7 @@ const result = (): StorageCheckResult => ({ bytes: new Uint8Array(), options: {}
 it('a delayed checkpoint keeps the departing piece’s sidecar title and filename', async () => {
   let visibleTags = tags('Piece A');
   let finish!: (value: StorageCheckResult) => void;
-  const context = new PieceSaveContext(visibleTags, 'test', () => new Promise(resolve => { finish = resolve; }));
+  const context = new PieceSaveContext(visibleTags, 'test', () => new Promise<StorageCheckResult>(resolve => { finish = resolve; }));
   const pending = context.prepare(document());
   visibleTags = tags('Piece B');
   finish(result());
@@ -54,6 +54,7 @@ it('lock releases belong to each acquisition and a contended lock is read-only',
     if (held.has(name)) return callback(null);
     held.add(name);
     try { await callback({}); } finally { held.delete(name); }
+    return undefined;
   } } as Pick<LockManager, 'request'>;
   const a = await acquirePieceLock('A', locks);
   const b = await acquirePieceLock('B', locks);

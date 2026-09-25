@@ -7,7 +7,7 @@
 import { describe, it, expect } from 'vitest';
 import { EditorSession } from '../../src/edit/session.ts';
 import { TAB_DIGIT_LAYER, resolveIntent } from '../../src/edit/keymap.ts';
-import type { MnxStructure, MnxTabTechnique } from '../../src/model/mnx.ts';
+import type { MnxEvent, MnxStructure, MnxTabTechnique } from '../../src/model/mnx.ts';
 import { STANDARD_GUITAR_STRINGS } from '../../src/model/mnx.ts';
 
 /** One 4/4 bar of quarters on a declared guitar; `null` is a rest. */
@@ -43,7 +43,7 @@ function bar(items: ({ string: number; id: string } | null)[]): MnxStructure {
   } as unknown as MnxStructure;
 }
 
-type Event = { rest?: unknown; notes?: { id?: string; pitch: { step: string; octave: number }; _x?: { mnxLab?: { string?: number; tab?: { technique?: MnxTabTechnique } } } }[] };
+type Event = { rest?: unknown; duration?: MnxEvent['duration']; notes?: { id?: string; pitch: { step: string; octave: number }; _x?: { mnxLab?: { string?: number; tab?: { technique?: MnxTabTechnique } } } }[] };
 const eventsOf = (session: EditorSession): Event[] =>
   (session.doc.parts![0].measures![0].sequences![0].content as Event[]);
 

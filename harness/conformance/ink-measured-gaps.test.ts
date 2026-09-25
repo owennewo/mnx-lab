@@ -17,13 +17,14 @@ import { describe, it, expect } from 'vitest';
 import { clearanceSpacing } from '../../src/engine/clearance.ts';
 import {
   layoutNotation,
+  type LayoutNotationOptions,
   MIN_STAFF_GAP_SP,
   MIN_NOTATION_TAB_GAP_SP,
   NOTATION_TAB_CLEAR_SP,
   SEPARATION_CLEAR_SP
 } from '../../src/engine/layout/notation.ts';
 import { layoutTab } from '../../src/engine/layout/tab.ts';
-import { layoutBothSystem } from '../../src/engine/layout/bothSystem.ts';
+import { layoutBothSystem, type LayoutBothOptions } from '../../src/engine/layout/bothSystem.ts';
 import {
   emitTabClef,
   TAB_CLEF_SCALE,
@@ -56,7 +57,7 @@ const hasScoreText = (mnx: MnxStructure) =>
     gm => gm.rehearsal || gm.section || (gm.tempos ?? []).length || gm._x?.mnxLab?.swing
   );
 
-const cls = (p: Primitive) => p.className.split(' ')[0];
+const cls = (p: Primitive) => p.className!.split(' ')[0];
 const LABEL_CLASSES = new Set(['rehearsal-label', 'section-label', 'rehearsal-box']);
 // Navigation marks sit at their own rise and are placed AFTER the tempo mark
 // on the tab staff, so the tempo does not clear them (they share no x); the
@@ -93,14 +94,14 @@ describe('navigation placement', () => {
       const targets = layout.primitives.filter(p => cls(p) === 'segno' || cls(p) === 'coda');
       expect(new Set(targets.map(cls))).toEqual(new Set(['segno', 'coda']));
       for (const target of targets) {
-        const staff = layout.rows.find(row => row.staffTop > anchorY(target))!;
+        const staff = layout.rows!.find(row => row.staffTop > anchorY(target))!;
         expect(staff.staffTop - computeBoundsSp([target])!.y - computeBoundsSp([target])!.h)
           .toBeCloseTo(NAV_BOTTOM_RISE_SP, 6);
       }
       const jumps = layout.primitives.filter(p => cls(p) === 'jump');
       expect(jumps.length).toBeGreaterThan(0);
       for (const jump of jumps) {
-        const staff = layout.rows.find(row => row.staffTop > anchorY(jump))!;
+        const staff = layout.rows!.find(row => row.staffTop > anchorY(jump))!;
         const ink = computeBoundsSp([jump])!;
         expect(staff.staffTop - ink.y - ink.h).toBeCloseTo(NAV_BOTTOM_RISE_SP, 6);
       }
@@ -143,7 +144,7 @@ function inkTopOver(
 
 /** Bars of a row, read off its barlines: consecutive distinct x's. */
 function barsOf(layout: LayoutResult, row: number): [number, number][] {
-  const band = layout.rows[row];
+  const band = layout.rows![row];
   const xs = [...new Set(
     layout.primitives
       .filter(p => p.kind === 'line' && cls(p) === 'barline' &&
@@ -186,7 +187,7 @@ interface Checked { labels: number; tempos: number; swings: number; clear: numbe
 /** Every bar of every row: assert the clearance for each text group found. */
 function checkLayout(layout: LayoutResult): Checked {
   const out: Checked = { labels: 0, tempos: 0, swings: 0, clear: 0, atMinRise: 0 };
-  layout.rows.forEach((band, row) => {
+  layout.rows!.forEach((band, row) => {
     const staffTop = band.staffTop;
     const prims = rowPrims(layout, row);
     const floor = -Infinity;
@@ -302,8 +303,8 @@ describe('ink-measured gaps — stage A, the score-text row', () => {
     let overInk = 0;
     for (const label of labels) {
       const ly = (label as { y: number }).y;
-      const row = layout.rows.findIndex((b, r) => ly < b.staffTop && (r === 0 || ly > layout.rows[r - 1].staffBottom));
-      const staffTop = layout.rows[row].staffTop;
+      const row = layout.rows!.findIndex((b, r, rows) => ly < b.staffTop && (r === 0 || ly > rows[r - 1].staffBottom));
+      const staffTop = layout.rows![row].staffTop;
       const foot = computeBoundsSp([label])!;
       const ink = inkTopOver(
         rowPrims(layout, row).filter(p => !isLabel(p)),
@@ -332,16 +333,6 @@ describe('ink-measured gaps — stage A, the score-text row', () => {
 // test can only agree by both being right.
 describe('ink-measured gaps — stage B, display staves in the both view', () => {
   const STRUCTURAL = new Set(['barline', 'staff-line', 'brace', 'bracket', 'group-label']);
-  // The tab staff's own vocabulary (tabStaff.ts). Everything else is the
-  // notation staff's — attributed to the NEAREST notation band, never to a
-  // tab band, which is the point: a verse row hanging 7sp under a notation
-  // staff belongs to that staff however close the strings below have come.
-  // The engine attributes by a different method (a probe layout with the gap
-  // thrown wide open); the two must agree.
-  const TAB_CLASSES = new Set(['fret-number', 'fret-bg', 'tab-clef', 'tab-capo', 'tab-tuning-letter']);
-  // Drawn on either kind of staff (time signatures, repeat dots, diagnostic
-  // badges): attributed by containment, else to the nearest band of any kind.
-  const SHARED_CLASSES = new Set(['time-sig', 'time-sig-num', 'time-sig-den', 'repeat-dot', 'diagnostic-marker']);
   const withBoth = corpus.filter(s => fs.existsSync(path.join(s.dir, 'expected.both.svg')));
 
   interface Pair { lineGap: number; inkGap: number; expected: number; measured: boolean; clearance: number }
@@ -367,7 +358,7 @@ describe('ink-measured gaps — stage B, display staves in the both view', () =>
     const buckets: Primitive[][][] = displays.map(bands => bands.map(() => []));
     const held: Primitive[][][] = displays.map(bands => bands.map(() => []));
     for (const p of probe.primitives) {
-      const tokens = p.className.split(' ');
+      const tokens = p.className!.split(' ');
       if (STRUCTURAL.has(tokens[0])) continue;
       const y = anchorY(p);
       const r = rowOf(y);
@@ -430,10 +421,16 @@ describe('ink-measured gaps — stage B, display staves in the both view', () =>
   }
 
   const PROBE = 100;
-  const bothPair = (mnx: MnxStructure) => ({
-    real: layoutBothSystem({ mnx, widthSp: WIDTH_SP }),
-    probe: layoutBothSystem({ mnx, widthSp: WIDTH_SP, displayGapProbeSp: PROBE })
-  });
+  const bothPair = (mnx: MnxStructure) => {
+    // layoutBothSystem forwards every option to layoutNotation, the probe
+    // included, though LayoutBothOptions does not declare it.
+    const probe: LayoutBothOptions & Pick<LayoutNotationOptions, 'displayGapProbeSp'> =
+      { mnx, widthSp: WIDTH_SP, displayGapProbeSp: PROBE };
+    return {
+      real: layoutBothSystem({ mnx, widthSp: WIDTH_SP }),
+      probe: layoutBothSystem(probe)
+    };
+  };
   const notationPair = (mnx: MnxStructure) => ({
     real: layoutNotation({ mnx, widthSp: WIDTH_SP }),
     probe: layoutNotation({ mnx, widthSp: WIDTH_SP, displayGapProbeSp: PROBE })

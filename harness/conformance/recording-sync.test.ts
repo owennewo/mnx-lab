@@ -14,10 +14,11 @@ const note = (id: string, base: MnxEvent['duration']['base'] = 'quarter'): MnxEv
   duration: { base }, notes: [{ id, pitch: { step: 'C', octave: 4 } }],
 });
 function score(content: MnxSequenceItem[][] = [[note('a', 'whole')], [note('b', 'whole')]], globals?: MnxGlobalMeasure[]): MnxStructure {
+  // No `mnx` header: nothing under test reads it.
   return {
     global: { measures: globals ?? content.map((_, i) => i === 0 ? { time: { count: 4, unit: 4 } } : {}) },
     parts: [{ measures: content.map(content => ({ sequences: [{ content }] })) }],
-  };
+  } as MnxStructure;
 }
 function compiled(document = score()) {
   const passes = linearizePasses(document);

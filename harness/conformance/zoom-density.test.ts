@@ -548,8 +548,8 @@ describe('zoom / density', () => {
       const m0 = plan.measures[0];
       const inFirstBar = (p: Primitive): p is GlyphPrim =>
         p.kind === 'glyph' && p.x >= m0.x - 1e-9 && p.x <= m0.x + m0.width;
-      const clef = prims.find(p => inFirstBar(p) && p.className === 'clef')!;
-      const keyGlyphs = prims.filter(p => inFirstBar(p) && p.className === 'key-sig');
+      const clef = prims.find((p): p is GlyphPrim => inFirstBar(p) && p.className === 'clef')!;
+      const keyGlyphs = prims.filter((p): p is GlyphPrim => inFirstBar(p) && p.className === 'key-sig');
       // Every staff draws the run at the same x's; dedupe to the run itself.
       const run = [...new Set(keyGlyphs.map(p => p.x))].sort((a, b) => a - b);
       expect(run.length).toBeGreaterThan(1);
@@ -561,7 +561,7 @@ describe('zoom / density', () => {
       const first = keyGlyphs.find(p => p.x === run[0])!;
       const last = keyGlyphs.find(p => p.x === run[run.length - 1])!;
       expect(inkSpan(first, s)[0]).toBeGreaterThan(inkSpan(clef, s)[1]);
-      const digit = prims.find(p => inFirstBar(p) && p.className === 'time-sig-num');
+      const digit = prims.find((p): p is GlyphPrim => inFirstBar(p) && p.className === 'time-sig-num');
       if (digit) expect(inkSpan(digit, s)[0]).toBeGreaterThan(inkSpan(last, s)[1]);
     });
 
@@ -591,10 +591,10 @@ describe('zoom / density', () => {
       const headSpan = (p: GlyphPrim): [number, number] => inkSpan(p, s);
       const check = (prims: readonly Primitive[]) => {
         const heads = prims.filter(
-          (p): p is GlyphPrim => p.kind === 'glyph' && p.className.split(' ')[0] === 'notehead'
+          (p): p is GlyphPrim => p.kind === 'glyph' && p.className!.split(' ')[0] === 'notehead'
         );
-        const stems = prims.filter(p => p.kind === 'line' && p.className.split(' ')[0] === 'stem');
-        const ledgers = prims.filter(p => p.kind === 'line' && p.className.split(' ')[0] === 'ledger-line');
+        const stems = prims.filter(p => p.kind === 'line' && p.className!.split(' ')[0] === 'stem');
+        const ledgers = prims.filter(p => p.kind === 'line' && p.className!.split(' ')[0] === 'ledger-line');
         // A stem sits on the head's ink EDGE (Bravura's stemUpSE is the
         // bbox's right edge, stemDownNW its left) — containment would not do,
         // because a stem left at its square offset lands INSIDE the grown
@@ -642,7 +642,7 @@ describe('zoom / density', () => {
       const drawnCentres = (prims: readonly Primitive[], ink: number) => {
         const rects = prims.filter(p => p.kind === 'rect' && p.className === 'fret-bg');
         const digits = prims.filter(
-          p => p.kind === 'text' && p.className.split(' ')[0] === 'fret-number'
+          p => p.kind === 'text' && p.className!.split(' ')[0] === 'fret-number'
         );
         expect(rects.length).toBeGreaterThan(0);
         expect(rects.length).toBe(digits.length);
@@ -697,7 +697,7 @@ describe('the fit answers about the score, not about the density knob', () => {
           .filter(
             (p): p is Extract<Primitive, { kind: 'line' }> =>
               p.kind === 'line' &&
-              p.className.split(' ')[0] === 'barline' &&
+              p.className!.split(' ')[0] === 'barline' &&
               Math.abs(p.y1 - top) < 1e-6
           )
           .map(p => Math.round(p.x1 * 1e4) / 1e4)

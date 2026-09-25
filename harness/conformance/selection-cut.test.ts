@@ -9,6 +9,7 @@ import {
 import { cutSelectionToStore } from '../../src/edit/selectionClipboardActions.ts';
 import { planSelectionCut } from '../../src/edit/selectionCutPlanner.ts';
 import { decodeSelectionClip } from '../../src/edit/selectionClip.ts';
+// @ts-expect-error precompiled validator is generated JS (no declaration)
 import validateMnxProposed from '../../worker/generated/validate-mnx-proposed.mjs';
 
 function event(id: string, step: 'C' | 'D' | 'E' | 'F' = 'C', chord = false) {
@@ -99,25 +100,6 @@ function score(): MnxStructure {
         multimeasureRests: [{ start: 'm0', duration: 3 }]
       }
     ]
-  };
-}
-
-function containerScore(kind: 'tuplet' | 'grace' = 'tuplet'): MnxStructure {
-  const container = kind === 'tuplet'
-    ? {
-        type: 'tuplet' as const,
-        inner: { duration: { base: 'eighth' as const }, multiple: 2 },
-        outer: { duration: { base: 'eighth' as const }, multiple: 1 },
-        content: [event('inner1'), event('inner2', 'D')]
-      }
-    : {
-        type: 'grace' as const,
-        content: [event('grace1')]
-      };
-  return {
-    mnx: { version: 1 },
-    global: { measures: [{ id: 'cm0' }] },
-    parts: [{ measures: [{ sequences: [{ content: [container, event('after')] }] }] }]
   };
 }
 

@@ -3,7 +3,7 @@
 // strain iterations each bar sounds on.
 import { describe, expect, it } from 'vitest';
 import { hasRepeatStructure, linearizePasses } from '../../src/model/passes.ts';
-import type { MnxGlobalMeasure, MnxStructure } from '../../src/model/mnx.ts';
+import type { MnxGlobalMeasure, MnxLabNavigation, MnxStructure } from '../../src/model/mnx.ts';
 import { MNX_JUMP_TYPES, MNX_LAB_JUMP_TYPES } from '../../src/model/mnx.ts';
 
 const docOf = (measures: MnxGlobalMeasure[]): MnxStructure =>
@@ -94,7 +94,7 @@ describe('linearizePasses', () => {
 
   it('performs the two-stage coda route distilled from Blackbird', () => {
     const measures: MnxGlobalMeasure[] = Array.from({ length: 34 }, () => ({}));
-    const nav = (at: number) => (measures[at]!._x = { mnxLab: { navigation: {} } }).mnxLab.navigation!;
+    const nav = (at: number): MnxLabNavigation => (measures[at]!._x = { mnxLab: { navigation: {} } }).mnxLab.navigation;
     nav(2).marks = [{ id: 'double-segno', kind: 'segno', count: 2, location: { fraction: [0, 1] } }];
     nav(8).jumps = [{ type: 'toCoda', target: 'double-coda', text: 'To Double Coda', location: { fraction: [1, 1] } }];
     measures[13]!.segno = { id: 'segno', location: { fraction: [0, 1] } };

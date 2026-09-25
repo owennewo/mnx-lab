@@ -6,12 +6,13 @@
 import { beforeEach, expect, it } from 'vitest';
 import { readFile } from 'node:fs/promises';
 import type { Miniflare } from 'miniflare';
+import type { D1Result } from '@cloudflare/workers-types';
 import { useLibraryRuntime } from '../helpers/libraryRuntime.ts';
 import app from '../../worker/index.ts';
 import type { Env } from '../../worker/env.ts';
 import { Library, pieceIdFor } from '../../worker/library/index.ts';
 import { testIdentity } from '../helpers/libraryIdentity.ts';
-import { LibraryClient, LibraryRequestError, type Checkpoint } from '../../src/storage/libraryClient.ts';
+import { LibraryClient, LibraryRequestError, type Checkpoint, type ProjectedTag } from '../../src/storage/libraryClient.ts';
 import { buildNewDocument } from '../../src/edit/newDocument.ts';
 import { applyOp } from '../../src/edit/ops.ts';
 import { parseTuning } from '../../src/edit/setupGrammar.ts';
@@ -20,6 +21,7 @@ import { projectPieceTags } from '../../src/storage/pieceSaveContext.ts';
 import { checkStorage } from '../../src/importers/storageCheckCore.ts';
 import { documentTitle, type MnxStructure } from '../../src/model/mnx.ts';
 import { importGuitarProCleanRoom } from '../../converters/guitarpro-mnx/src/cleanRoom.ts';
+// @ts-expect-error No declaration file for the Node operator tool.
 import { defectRows } from '../../tools/library-defects.mjs';
 
 let mf: Miniflare; let env: Env; let jwt: string; let identity: Awaited<ReturnType<typeof testIdentity>>;
@@ -151,7 +153,7 @@ it('a save that lost something leaves a defect report the operator can pull, and
   const lossy = applyOp(retitled(blank(), 'Angie'), { type: 'setWork', work: { source: 'a bootleg', creators: [{ role: 'arranger', name: 'Bert Jansch' }] } });
   expect(checkStorage(lossy).check.verdict).toBe('differs');
   const saved = await client().saveCheckpoint(made.piece.id, checkpoint(lossy, made.piece, { evidence: JSON.stringify(lossy) }));
-  const rows = await env.LIBRARY_DB.prepare('SELECT id, role, format, derived_from, provenance FROM renditions WHERE piece_id=? ORDER BY created_at, role').bind(made.piece.id).all<Record<string, string>>();
+  const rows: D1Result<Record<string, string>> = await env.LIBRARY_DB.prepare('SELECT id, role, format, derived_from, provenance FROM renditions WHERE piece_id=? ORDER BY created_at, role').bind(made.piece.id).all<Record<string, string>>();
   const evidence = rows.results.find(r => r.role === 'evidence')!;
   expect(evidence).toMatchObject({ format: 'mnx', derived_from: saved.snapshot.piece.canonical_rendition_id });
   expect(JSON.parse(rows.results.find(r => r.id === saved.snapshot.piece.canonical_rendition_id)!.provenance).evidence).toBe('kept');
@@ -162,7 +164,7 @@ it('a save that lost something leaves a defect report the operator can pull, and
   const again = await client().saveCheckpoint(made.piece.id, checkpoint(retitled(lossy, 'Angi'), saved.snapshot.piece, { evidence: '{"not":"mnx"}' }));
   expect(again.unchanged).toBe(false);
   const big = await client().saveCheckpoint(made.piece.id, checkpoint(retitled(lossy, 'Anjy'), again.snapshot.piece, { evidence: JSON.stringify({ pad: 'x'.repeat(1024 * 1024) }) }));
-  const notes = (await env.LIBRARY_DB.prepare("SELECT json_extract(provenance,'$.evidence') AS note FROM renditions WHERE piece_id=? AND role='edit' ORDER BY created_at").bind(made.piece.id).all<{ note: string }>()).results.map(r => r.note);
+  const notes = (await env.LIBRARY_DB.prepare("SELECT json_extract(provenance,'$.evidence') AS note FROM renditions WHERE piece_id=? AND role='edit' ORDER BY created_at").bind(made.piece.id).all<{ note: string }>() as D1Result<{ note: string }>).results.map(r => r.note);
   expect(notes).toEqual(['kept', 'invalid', 'too-large']);
   expect(titleOf((await client().canonical(made.piece.id)).bytes)).toBe('Anjy');
   expect(big.snapshot.renditions!.filter(r => r.role === 'evidence')).toHaveLength(1);
@@ -195,7 +197,7 @@ it('keeps a sidecar\'s title as the sidecar\'s, and lets the document clear what
     canonical: { mode: 'initialize', rendition_id: 'Sidecar1-gp' },
     derived_tags: [{ dimension: 'title', value: 'Sidecar title', source_ref: 'sidecar' }, { dimension: 'artist', value: 'Sidecar artist', source_ref: 'sidecar' }] });
   const kept = [{ dimension: 'title', value: 'Sidecar title', kept: true as const }, { dimension: 'artist', value: 'Sidecar artist', kept: true as const }];
-  const sources = async () => Object.fromEntries((await env.LIBRARY_DB.prepare("SELECT dimension, value, source_ref FROM tags WHERE piece_id=? AND origin='derived' AND dimension IN ('title','artist','subtitle')").bind(id).all<Record<string, string>>()).results.map(t => [t.dimension, `${t.value} ← ${t.source_ref}`]));
+  const sources = async () => Object.fromEntries((await env.LIBRARY_DB.prepare("SELECT dimension, value, source_ref FROM tags WHERE piece_id=? AND origin='derived' AND dimension IN ('title','artist','subtitle')").bind(id).all<Record<string, string>>() as D1Result<Record<string, string>>).results.map(t => [t.dimension, `${t.value} ← ${t.source_ref}`]));
 
   // Two saves that never touch the title: it stays the sidecar's both times (the second save is the one a restated tag would have broken).
   const subtitled = applyOp(untitled, { type: 'setWork', work: { subtitle: 'first' } });
@@ -214,7 +216,8 @@ it('keeps a sidecar\'s title as the sidecar\'s, and lets the document clear what
   // `kept` vouches for nothing new: it must already be the library's, and a new piece has nothing to keep.
   const now = (await client().piece(id)).snapshot.piece;
   expect(await status(client().saveCheckpoint(id, checkpoint(applyOp(cleared, { type: 'setWork', work: { subtitle: 'third' } }), now, { derivedTags: [{ dimension: 'title', value: 'Invented', kept: true }] })))).toBe(400);
-  expect(await status(client().createPiece(file(blank()), [{ dimension: 'title', value: 'Anji', kept: true }]))).toBe(400);
+  const forged: ProjectedTag[] = [{ dimension: 'title', value: 'Anji', kept: true }];
+  expect(await status(client().createPiece(file(blank()), forged))).toBe(400);
 }, 30_000);
 
 

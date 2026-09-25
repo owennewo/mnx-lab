@@ -11,7 +11,7 @@ import { SURFACE_INTENTS } from '../../src/edit/keymapDocs.ts';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { MnxStructure } from '../../src/model/mnx.ts';
+import type { MnxEvent, MnxStructure } from '../../src/model/mnx.ts';
 import { STANDARD_GUITAR_STRINGS } from '../../src/model/mnx.ts';
 import { findNoteAddress } from '../../src/model/noteWalk.ts';
 import {
@@ -25,12 +25,10 @@ import {
   parseInspectorLine,
   pillsFor,
   techniqueText,
-  timeAt,
-  wordsFor
+  timeAt
 } from '../../src/edit/inspector.ts';
 import { readPositionedAttributes, readTechniques, type PositionedAttribute, type TechniqueChoice } from '../../src/edit/ops.ts';
 import type { SelectionLevel } from '../../src/edit/selection.ts';
-import { parseRhythm } from '../../src/edit/setupGrammar.ts';
 
 const ROOT = path.dirname(path.dirname(path.dirname(fileURLToPath(import.meta.url))));
 
@@ -503,31 +501,31 @@ describe('note pills', () => {
     for (const technique of cases) {
       const session = at('note');
       expect(session.handleIntent({ type: 'setTechnique', technique })).toBe(true);
-      const note = session.doc.parts![0]!.measures![0]!.sequences![0]!.content[0]!.notes![0]!;
+      const note = (session.doc.parts![0]!.measures![0]!.sequences![0]!.content[0] as MnxEvent).notes![0]!;
       expect(readTechniques(note), techniqueText(technique)).toEqual([technique]);
       // Typed form parses back to the same thing.
       expect(parseInspectorLine('note', 'bend', techniqueText(technique))).toEqual({ intent: { type: 'setTechnique', technique } });
       // Amend: a second set replaces rather than removing.
       expect(session.handleIntent({ type: 'setTechnique', technique: { kind: 'bend', alters: [0, 4] } })).toBe(true);
-      expect(readTechniques(session.doc.parts![0]!.measures![0]!.sequences![0]!.content[0]!.notes![0]!)).toEqual([{ kind: 'bend', alters: [0, 4] }]);
+      expect(readTechniques((session.doc.parts![0]!.measures![0]!.sequences![0]!.content[0] as MnxEvent).notes![0]!)).toEqual([{ kind: 'bend', alters: [0, 4] }]);
     }
     // The toggle's plain form writes the curve it always wrote.
     const plain = at('note');
     plain.handleIntent({ type: 'toggleTechnique', kind: 'bend' });
-    expect(plain.doc.parts![0]!.measures![0]!.sequences![0]!.content[0]!.notes![0]!._x!.mnxLab!.tab!.technique!.bend).toEqual({
+    expect((plain.doc.parts![0]!.measures![0]!.sequences![0]!.content[0] as MnxEvent).notes![0]!._x!.mnxLab!.tab!.technique!.bend).toEqual({
       points: [{ position: 0, alter: 0 }, { position: 1, alter: 2 }]
     });
     // Weights place the points: 1:2 puts the peak a third of the way in.
     const weighted = at('note');
     weighted.handleIntent({ type: 'setTechnique', technique: { kind: 'bend', alters: [0, 2, 0], weights: [1, 2] } });
-    expect(weighted.doc.parts![0]!.measures![0]!.sequences![0]!.content[0]!.notes![0]!._x!.mnxLab!.tab!.technique!.bend).toEqual({
+    expect((weighted.doc.parts![0]!.measures![0]!.sequences![0]!.content[0] as MnxEvent).notes![0]!._x!.mnxLab!.tab!.technique!.bend).toEqual({
       points: [{ position: 0, alter: 0 }, { position: 1 / 3, alter: 2 }, { position: 1, alter: 0 }]
     });
   });
 
   it('a foreign curve whose positions fit no small weights reads ≈, and the ≈ is tolerated on the way back in', () => {
     const doc = makeNoteDoc();
-    const note = doc.parts![0]!.measures![0]!.sequences![0]!.content[0]!.notes![0]!;
+    const note = (doc.parts![0]!.measures![0]!.sequences![0]!.content[0] as MnxEvent).notes![0]!;
     note._x = { mnxLab: { ...note._x!.mnxLab, tab: { technique: { bend: { points: [
       { position: 0, alter: 0 }, { position: 0.57, alter: 2 }, { position: 1, alter: 0 }
     ] } } } } };

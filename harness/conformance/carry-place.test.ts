@@ -6,10 +6,10 @@ import { linearizePasses } from '../../src/model/passes.ts';
 import { ZERO, rational as q } from '../../src/audio/time.ts';
 import type { MnxStructure } from '../../src/model/mnx.ts';
 
-const score = (bars: number, meter = 4): MnxStructure => ({
+const score = (bars: number, meter = 4) => ({
   global: { measures: Array.from({ length: bars }, (_, i) => (i === 0 ? { time: { count: meter, unit: 4 } } : {})) },
   parts: [{ measures: Array.from({ length: bars }, (_, i) => ({ sequences: [{ content: [{ duration: { base: 'whole' }, notes: [{ id: `n${i}`, pitch: { step: 'C', octave: 4 } }] }] }] })) }],
-});
+}) satisfies Omit<MnxStructure, 'mnx'> as MnxStructure;
 const perf = (doc: MnxStructure) => { const c = compilePerformance(doc, linearizePasses(doc)); if (!c.ok) throw new Error('fixture'); return c.performance; };
 const place = (p: ReturnType<typeof perf>, position: { num: bigint; den: bigint }) => { const r = scorePositionAt(p, position); return r.ok ? r.value : null; };
 

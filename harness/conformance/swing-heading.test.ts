@@ -12,7 +12,7 @@ import type { MnxStructure } from '../../src/model/mnx.ts';
 import { resolveSwingTimeline } from '../../src/model/swing.ts';
 import { initSmufl } from '../helpers/corpusPrimitives.ts';
 
-const cls = (p: Primitive) => p.className.split(' ')[0];
+const cls = (p: Primitive) => p.className!.split(' ')[0];
 
 describe('tempo + swing heading', () => {
   it('is one same-size, same-baseline statement with a measured gap', () => {

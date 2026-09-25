@@ -50,8 +50,8 @@ describe('Staff and Space own whitespace', () => {
         .map(p => { const { x: _x, ...other } = p; return other; });
       samples.forEach(result => {
         expect(sizes(result)).toEqual(sizes(samples[0]));
-        expect(result.rows.map(row => [row.staffTop, row.staffBottom])).toEqual(
-          samples[0].rows.map(row => [row.staffTop, row.staffBottom]));
+        expect(result.rows!.map(row => [row.staffTop, row.staffBottom])).toEqual(
+          samples[0].rows!.map(row => [row.staffTop, row.staffBottom]));
       });
       // The emitter scales vertical geometry once, together with the staff.
       const base = samples[0];
@@ -63,7 +63,7 @@ describe('Staff and Space own whitespace', () => {
 
   it('keeps hidden-prefix forward repeats on their barline at every Space setting', () => {
     const mnx = structuredClone(blues);
-    mnx.global.measures[0].repeatStart = true;
+    mnx.global.measures[0].repeatStart = {};
     for (const densityH of densities) {
       const plan = planHorizontal(mnx, 42, { densityH, display: { clefs: 'hide', timeSignatures: 'hide' } });
       expect(plan.measures[0].repeatStartX).toBe(plan.measures[0].x);
