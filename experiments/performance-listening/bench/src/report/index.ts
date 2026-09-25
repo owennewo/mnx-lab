@@ -3,7 +3,7 @@ export interface Cost {
   machine: { hostname: string; cpu: string; platform: string; arch: string; node: string; cores: number };
   sampleRate: number; chunkSamples: number; chunks: number; audioSeconds: number;
   meanMs: number; p95Ms: number; p99Ms: number; sustainedRatio: number; maxBacklogMs: number;
-  provisional: true;
+  initializationMs: number; finishMs: number; provisional: true;
 }
 export interface RunReport {
   id: string; candidate: string; set: string; evaluator: string;
@@ -35,10 +35,17 @@ export function renderReport(run: RunReport): string {
     text.push(`Timeliness: missed deadlines ${rate(e.timeliness.missed, e.timeliness.denominator)}; correct-decision delay mean ${number(e.timeliness.mean)}, p95 ${number(e.timeliness.p95)}, max ${number(e.timeliness.max)} s. No correct decision: ${e.timeliness.delays.filter(d => d.seconds === null).length} points. Deadline: 0.2 s.`,
       `Exposure (as decided only): total ${e.exposure.totalSeconds} s; longest continuous episode ${e.exposure.longestSeconds} s.`);
   }
+  const confidence = Array.from({ length: 5 }, (_, i) => {
+    const bins = run.evaluations.map(e => e.asDecided.confidence[i]!);
+    return { bin: `${i / 5}–${(i + 1) / 5}`, claims: bins.reduce((n, b) => n + b.claims, 0),
+      correct: bins.reduce((n, b) => n + b.correct, 0), pending: bins.reduce((n, b) => n + b.pending, 0), answerable: bins.reduce((n, b) => n + b.answerable, 0) };
+  });
+  text.push('## Combined confidence (as decided)', table(['Bin', 'Correct / all claims', 'Pending claims', 'Correct / answerable claims'], confidence.map(b => [b.bin, rate(b.correct, b.claims), b.pending, rate(b.correct, b.answerable)])));
   text.push('## Causality', run.causality ? table(['Example', 'Result', 'Prefix checks'], run.causality.map(c => [c.example, c.pass ? 'pass' : 'FAIL', c.cuts.map(p => `${p.kind} @ ${p.seconds}s: ${p.pass ? 'pass' : 'FAIL'}`).join('; ')])) : 'Not run: oracle records are handwritten, with no listener.');
   text.push('## Processing cost — provisional', 'Development-machine budget: sustained ≤ 25% of real time; p99 chunk ≤ 10 ms. Wall-clock measurements vary with load; they do not measure microphone-to-feedback latency.');
   if (run.costs) for (const c of run.costs) {
     text.push(`### ${c.example}`, `${c.value.machine.hostname}; ${c.value.machine.cpu}; ${c.value.machine.cores} logical CPUs; ${c.value.machine.platform}/${c.value.machine.arch}; Node ${c.value.machine.node}.`,
+       `Initialization ${c.value.initializationMs} ms; finish ${c.value.finishMs} ms (included in sustained ratio).`,
       `${c.value.sampleRate} Hz mono; ${c.value.chunkSamples} samples/chunk; ${c.value.chunks} chunks; ${c.value.audioSeconds} s audio.`,
       table(['Mean ms/chunk', 'p95 ms', 'p99 ms', 'Sustained / real time', 'Maximum backlog ms', 'Provisional budget'], [[c.value.meanMs, c.value.p95Ms, c.value.p99Ms, c.value.sustainedRatio, c.value.maxBacklogMs, c.value.sustainedRatio <= .25 && c.value.p99Ms <= 10 ? 'within' : 'EXCEEDED']]));
   } else text.push('Not measured: no listener executed.');

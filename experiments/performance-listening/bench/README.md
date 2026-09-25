@@ -7,11 +7,12 @@ Private npm workspace. Zero runtime dependencies; TypeScript runs with developme
 npm -w mnx-listening-bench test
 npm -w mnx-listening-bench run generate -- harness-v1
 npm -w mnx-listening-bench run freeze -- harness-v1
-npm -w mnx-listening-bench run run -- harness-v1
+npm -w mnx-listening-bench run run -- harness-v1 <new-run-id>
 npm -w mnx-listening-bench run report -- <run-id>
 ```
 
-At E, `generate`, `freeze`, tests and `report -- oracle` are implemented.
-`run` still fails explicitly. Freeze is exercised only on temporary copies until G.
+All commands are implemented. `run` requires a frozen set and committed code,
+checks audio hashes and refuses to overwrite a run id. `report` renders recorded
+counts without rerunning a candidate. Freeze is exercised only on temporary copies until G.
 The committed oracle reports regenerate byte-identically.
 Start with [the research log](../RESEARCH_LOG.md). No product build imports this bench.

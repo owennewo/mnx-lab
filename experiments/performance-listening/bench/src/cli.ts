@@ -1,7 +1,10 @@
 import { renderOracleArtifacts } from './report/oracle.ts';
 import { generateSet, freezeSet } from './generate/set.ts';
-const [command, target] = process.argv.slice(2);
+import { runSet, reportRun } from './run/set.ts';
+const [command, target, runId] = process.argv.slice(2);
 if (command === 'report' && target === 'oracle') renderOracleArtifacts();
+else if (command === 'report' && target) process.stdout.write(reportRun(target));
 else if (command === 'generate' && target) console.log(generateSet(target));
 else if (command === 'freeze' && target) freezeSet(target);
-else throw new Error(`Bench ${command ?? 'command'} ${target ?? ''} is not implemented yet; see FIRST_STEP.`);
+else if (command === 'run' && target && runId) console.log(runSet(target, runId));
+else throw new Error('Usage: bench generate|freeze <set>; run <set> <new-run-id>; report <run-id>|oracle');

@@ -81,6 +81,17 @@ Timeliness: missed deadlines 40 / 158 (25.32%); correct-decision delay mean 0, p
 
 Exposure (as decided only): total 0 s; longest continuous episode 0 s.
 
+## Combined confidence (as decided)
+
+| Bin | Correct / all claims | Pending claims | Correct / answerable claims |
+| --- | --- | --- | --- |
+| 0–0.2 | 0 / 0 (n/a) | 0 | 0 / 0 (n/a) |
+| 0.2–0.4 | 0 / 0 (n/a) | 0 | 0 / 0 (n/a) |
+| 0.4–0.6 | 0 / 0 (n/a) | 0 | 0 / 0 (n/a) |
+| 0.6–0.8 | 0 / 0 (n/a) | 0 | 0 / 0 (n/a) |
+| 0.8–1 | 118 / 120 (98.33%) | 2 | 118 / 118 (100.00%) |
+
+
 ## Causality
 
 Not run: oracle records are handwritten, with no listener.

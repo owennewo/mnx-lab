@@ -30,13 +30,14 @@ How to maintain it:
 
 ## Current state
 
-2026-09-25. A through D are landed. E generates the five sine WAVs with pinned hashes
-and sample-aligned labels that agree with D; regeneration is deterministic. No
-candidate has run. R1's read-only inventory is drafted outside the repository;
-automatic approval review rejected copying its private library metadata here, so
-explicit user approval is pending. Next: land E, then prove the runner with the
-scripted oracle and add only the clock follower (F). The set and instrument contracts
-are not frozen; the research contract remains provisional and not human-approved.
+2026-09-25. A through E are landed. F now provides the chunk runner and permanent
+clock-follower@1 floor. The runner reproduces the scripted oracle record and passes
+prefix tests; the first end-to-end set assessment has not run. Next: land F, freeze
+harness-v1, record G and check every pre-registered prediction. Instrument contracts
+will freeze only after agreement; research-contract-0 stays provisional and not
+human-approved. R1 is complete as an inventory of the available snapshot, with the
+user-approved note in research/: no real-source set is ready to freeze; independent
+solo/route/precision checks and capture/access evidence remain necessary.
 
 ## Findings
 
@@ -51,6 +52,8 @@ ledger row (`ledger.md#<row>`), or a findings write-up.
 | 4 | The oracle distinguishes loss, abstention and live exposure; backdated corrections preserve the wrong live claim until replaced. | [Oracle arithmetic](bench/oracle/README.md), [o4 report](bench/oracle/o4-lost-then-found/report.md), [pair report](bench/oracle/comparison-o1-o4.md) | holds | 2026-09-25 | B/C instrument evidence; no listener result |
 | 5 | The vendor score compiles without adding event types or tempo; the fixed recipes distinguish positive tails from supported following and give the two controls different durations. | [Set records](sets/harness-v1/README.md), [score/set checks](bench/test/set.test.ts) | holds | 2026-09-25 | D; no generated audio yet |
 | 6 | Deterministic sine generation reproduces the independently drafted note boundaries and following labels; compiler sink counts do not measure musical polyphony. | [Generator checks](bench/test/generate.test.ts), [manifest](generators/sine-v1.json) | holds | 2026-09-25 | E |
+| 7 | The runner reproduces the independent oracle record with sample-clock stamps and isolated chunks; complete-record prefix checks catch divergent output identities. | [Runner tests](bench/test/runner.test.ts) | holds | 2026-09-25 | F; silence-only futures cannot discriminate causality |
+| 8 | The available library snapshot supplies structural following candidates, but no source is ready to freeze without independent solo/route/precision and access evidence. | [Evidence inventory](research/evidence-inventory.md) | holds | 2026-09-25 | R1; no real-source qualification |
 
 ## Open questions
 
@@ -61,7 +64,7 @@ Ranked; the top row is the next question the driver asks. Status is `open`,
 |---|---|---|---|---|
 | 1 | How has real-time score following been evaluated elsewhere, and do our ±0.25-quarter tolerance and 200 ms deadline sit inside those norms? | FIRST_STEP §10 question 1; answers whether the first contract's tolerances are defensible before anything is measured against them | answered (findings 1–2) | FIRST_STEP item A |
 | 2 | Is there a published trivial baseline for score following, so our clock floor can be compared with the usual one? | FIRST_STEP §10 question 2; decides whether the first ledger row has an external reference point | answered (findings 1–2) | FIRST_STEP item A |
-| 3 | Which library recordings and re-amplification opportunities are eligible real evidence for the following milestone, and with what anchor precision? | The structure document runs real evidence alongside the pipeline; without an answer the first human-approved contract cannot name its evidence supply | in progress; inventory copy awaits explicit authorization after automatic review rejection | FIRST_STEP item R1 |
+| 3 | Which library recordings and re-amplification opportunities are eligible real evidence for the following milestone, and with what anchor precision? | The structure document runs real evidence alongside the pipeline; without an answer the first human-approved contract cannot name its evidence supply | answered (finding 8; missing evidence explicit) | FIRST_STEP item R1 |
 | 4 | Does the first run of the clock follower over `harness-v1` reproduce the pre-registered predictions in FIRST_STEP §9? | The whole first step exists to answer it; a mismatch is an instrument defect, never a finding about the candidate | open | FIRST_STEP item G |
 
 ## Superseded and stopped

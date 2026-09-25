@@ -523,3 +523,23 @@ D labels agree without alteration. Two generates reproduce the committed SHA-256
 Waveform checks cover pitch, silent gaps, duration, envelope bounds and quantization;
 temporary freeze tests reject changed source bytes. Compiler “voices” are sink identities,
 so monophony is checked from event positions/durations, not the number of sinks.
+
+### 2026-09-25 — F: runner and permanent clock floor
+
+The runner copies 480-sample chunks, stamps logical release time, snapshots append-only
+decisions, measures separate wall cost/backlog and pins versions and source hashes.
+A scripted listener reproduces o1 byte for byte; prefix checks compare complete records
+from fresh instances and a divergent-id probe is detected. clock-follower@1 is the
+only candidate. Silence has no actual onset or sounding interior: its three cuts use
+explicitly labelled counterfactual beat positions and its identical futures are a
+vacuous check, while the other examples supply discriminating future changes.
+
+### 2026-09-25 — R1: read-only evidence inventory
+
+Inventoried every recording in the available local library snapshot and every missing
+sync sidecar, with score/annotation hashes, current score route lengths, anchor ranges,
+inner-bar offsets, gaps, access and exclusions. No real-source set is ready to freeze:
+metadata does not establish solo status, annotation-time score identity, precision or
+rights. The note names a hand-check shortlist and five re-amplification opportunities,
+with calibration and hardware evidence still missing. No source or golden was ingested.
+The user explicitly approved adding this metadata inventory to the repository.
