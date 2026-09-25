@@ -11,6 +11,7 @@ import { clockFollower, CLOCK_VERSION } from '../candidates/clockFollower.ts';
 import { spectralFollower1, SPECTRAL_1 } from '../candidates/spectralFollower1.ts';
 import { spectralFollower2 } from '../candidates/spectralFollower2.ts';
 import { onlineTimeWarp1, OLTW_1 } from '../candidates/onlineTimeWarp1.ts';
+import { onlineTimeWarp2, OLTW_2 } from '../candidates/onlineTimeWarp2.ts';
 import { evaluate } from '../evaluate/index.ts';
 import { readWav } from '../generate/wav.ts';
 import { EXPERIMENT, encode } from '../io.ts';
@@ -40,6 +41,7 @@ const CANDIDATES: { id: string; factory: () => Listener; recognition?: 1 | 2 | '
   { id: SPECTRAL_1, factory: spectralFollower1, recognition: 1 },
   { id: 'spectral-follower@2', factory: spectralFollower2, recognition: 2 },
   { id: OLTW_1, factory: onlineTimeWarp1, recognition: 'oltw' },
+  { id: OLTW_2, factory: onlineTimeWarp2 },
 ];
 const rungDirs = readdirSync(ladderDir).filter(d => /^rung-\d+$/.test(d)).sort((a, b) => Number(a.slice(5)) - Number(b.slice(5)));
 if (!rungDirs.length) throw new Error('No built rung');
