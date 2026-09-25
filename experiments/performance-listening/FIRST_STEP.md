@@ -505,3 +505,13 @@ exercised before any listener exists. Reports render from o4 and the o1/o4 pair,
 show failures before the summary and state the lack of independent-source intervals.
 The oracle makes the distinction between loss and wrong exposure concrete: unsupported
 on supported truth is a loss, while a backdated correction cannot erase live exposure.
+
+### 2026-09-25 — D: intended scores and draft set
+
+Copied s2 verbatim from the pinned vendor object and authored s1; both validate and
+compile to the expected rational quarter walk. Five draft records now carry actual
+note/following labels, the profile deviations and a development-only registry, without
+audio. The recipe makes c2 8 s and c1 explicitly 8.5 s; “as c1” uses the same exposure
+formula, not equal duration. Positive tails remain unknown beyond the final release.
+R1 has begun with the local Soundslice cache; metadata cannot by itself verify a solo
+performance, recording rights or anchor precision.

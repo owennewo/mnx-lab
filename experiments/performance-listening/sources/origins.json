@@ -1,0 +1,13 @@
+{
+  "s1": {
+    "path": "s1-one-bar-c4-f4.mnx.json",
+    "origin": "Handwritten one-bar C4 D4 E4 F4; no tempo."
+  },
+  "s2": {
+    "path": "s2-two-bar-scale.mnx.json",
+    "origin": "vendor/mnx/docs/static/examples/json/two-bar-c-major-scale.json",
+    "pin": "46fbe9393067221ee83ef08de209cb3c4edf0d8d",
+    "sha256": "63441ff16acfdedbeb1cec19a6f00b8eed646192eed7b0d23abec07295563582",
+    "copy": "verbatim bytes; no type:event or tempo added"
+  }
+}

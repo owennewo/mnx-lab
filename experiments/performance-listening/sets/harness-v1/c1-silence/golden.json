@@ -1,0 +1,102 @@
+{
+  "set": "harness-v1",
+  "example": "c1-silence",
+  "version": 1,
+  "intended": {
+    "score": "score.mnx.json",
+    "tempo": {
+      "bpm": 60,
+      "unit": "quarter"
+    },
+    "route": [
+      1,
+      1
+    ]
+  },
+  "audio": {
+    "path": "audio.wav",
+    "sampleRate": 48000,
+    "channels": 1,
+    "duration": 8.5,
+    "sha256": null,
+    "recipe": {
+      "manifest": "sine-v1",
+      "parameters": {
+        "bpm": 60,
+        "mode": "silence",
+        "sampleRate": 48000,
+        "peakDbfs": -12,
+        "attackSeconds": 0.01,
+        "releaseSeconds": 0.01,
+        "soundingBeatFraction": 0.5,
+        "finalSilenceSeconds": 0.5,
+        "silenceDuration": 8.5
+      }
+    }
+  },
+  "labels": {
+    "notes": [],
+    "following": [
+      {
+        "start": 0,
+        "precision": {
+          "kind": "exact"
+        },
+        "provenance": "sine-v1 controlled recipe; 150 ms detection allowance from the first distinguishing onset.",
+        "answerableFrom": 0.15,
+        "route": 1,
+        "end": 8.5,
+        "state": "unsupported"
+      }
+    ]
+  },
+  "expected": {
+    "summary": "FIRST_STEP \u00a79: all answerable points false following; all deadlines missed",
+    "correctThrough": null,
+    "maxWrongErrorQuarters": null,
+    "exposureSeconds": 8.35
+  },
+  "profile": {
+    "melodic": {
+      "level": 1,
+      "range": "no pitched audio (silence control)"
+    },
+    "polyphonic": {
+      "level": 1,
+      "range": "no voices"
+    },
+    "harmonic": {
+      "level": 1,
+      "range": "digital silence"
+    },
+    "dynamics": {
+      "level": 1,
+      "range": "zero"
+    },
+    "rhythm": {
+      "level": 1,
+      "range": "one quarter per beat, half-beat sounding; 10 ms attack/release"
+    },
+    "tempo": {
+      "level": 1,
+      "range": "60 BPM actual; 60 BPM handed"
+    },
+    "structuralAmbiguity": {
+      "level": 1,
+      "range": "no audio evidence"
+    },
+    "navigation": {
+      "level": 1,
+      "range": "negative following control"
+    }
+  },
+  "conditions": "none",
+  "provenance": {
+    "kind": "generated",
+    "manifest": "sine-v1",
+    "scoreOrigin": "vendor/mnx/docs/static/examples/json/two-bar-c-major-scale.json at 46fbe9393067221ee83ef08de209cb3c4edf0d8d, verbatim",
+    "perturbation": "Replace all audio with 8.5 s of digital silence."
+  },
+  "partition": "development",
+  "noteAssessment": null
+}

@@ -30,12 +30,12 @@ How to maintain it:
 
 ## Current state
 
-2026-09-25. A is landed. B/C now provide the independent evaluator, eleven hand-worked
-oracle cases and single/pair reports; no listener exists and no candidate has run.
-The oracle pins persistence, pending claims and abstention before the pipeline is
-built. Instrument contracts remain draft and the research contract is provisional,
-not human-approved. Next: the five-example score/set records (D) and the read-only
-real-source inventory (R1), then generator, runner and the clock floor.
+2026-09-25. A and B/C are landed. D now provides the two intended scores and five
+schema-valid development records, with profile deviations and unknown tails explicit.
+There is still no generated audio or listener. R1 is examining the local Soundslice
+cache read-only; no recording is yet approved as evidence. Next: land D, then generate
+and hash the set (E), complete the source inventory, and build the runner/clock floor.
+All contracts retain their draft/provisional status.
 
 ## Findings
 
@@ -48,6 +48,7 @@ ledger row (`ledger.md#<row>`), or a findings write-up.
 | 2 | The bounded search found no published audio-ignoring clock floor with comparable numbers. | [Search outcome](research/trivial-baseline-search.md) | holds | 2026-09-25 | An unsuccessful search, not a claim of absence |
 | 3 | The root gate needed an explicit workspace suite for the listening bench and its disk-read evidence. | [Gate rule](../../tools/gate.mjs), [contract test](bench/test/contracts.test.ts) | holds | 2026-09-25 | Item A; production boundary already exists |
 | 4 | The oracle distinguishes loss, abstention and live exposure; backdated corrections preserve the wrong live claim until replaced. | [Oracle arithmetic](bench/oracle/README.md), [o4 report](bench/oracle/o4-lost-then-found/report.md), [pair report](bench/oracle/comparison-o1-o4.md) | holds | 2026-09-25 | B/C instrument evidence; no listener result |
+| 5 | The vendor score compiles without adding event types or tempo; the fixed recipes distinguish positive tails from supported following and give the two controls different durations. | [Set records](sets/harness-v1/README.md), [score/set checks](bench/test/set.test.ts) | holds | 2026-09-25 | D; no generated audio yet |
 
 ## Open questions
 

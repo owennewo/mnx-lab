@@ -1,0 +1,14 @@
+{
+  "id": "harness-v1",
+  "version": 1,
+  "frozen": false,
+  "examples": [
+    "p1",
+    "p2",
+    "c1-silence",
+    "c2-wrong-piece",
+    "t1-tempo-90"
+  ],
+  "generator": "sine-v1",
+  "randomness": null
+}

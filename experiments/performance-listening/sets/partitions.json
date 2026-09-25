@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "sets": {
+    "harness-v1": {
+      "partition": "development",
+      "independenceUnit": "one deterministic generator; variants stay together",
+      "claim": "development only; no reserved or acceptance evidence"
+    }
+  }
+}

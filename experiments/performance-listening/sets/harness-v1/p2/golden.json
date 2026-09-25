@@ -1,0 +1,272 @@
+{
+  "set": "harness-v1",
+  "example": "p2",
+  "version": 1,
+  "intended": {
+    "score": "score.mnx.json",
+    "tempo": {
+      "bpm": 60,
+      "unit": "quarter"
+    },
+    "route": [
+      1,
+      1
+    ]
+  },
+  "audio": {
+    "path": "audio.wav",
+    "sampleRate": 48000,
+    "channels": 1,
+    "duration": 8.0,
+    "sha256": null,
+    "recipe": {
+      "manifest": "sine-v1",
+      "parameters": {
+        "bpm": 60,
+        "mode": "score",
+        "sampleRate": 48000,
+        "peakDbfs": -12,
+        "attackSeconds": 0.01,
+        "releaseSeconds": 0.01,
+        "soundingBeatFraction": 0.5,
+        "finalSilenceSeconds": 0.5
+      }
+    }
+  },
+  "labels": {
+    "notes": [
+      {
+        "pitch": {
+          "midi": 60,
+          "hz": 261.6255653005986
+        },
+        "onset": 0.0,
+        "audibleEnd": 0.5,
+        "scoreDuration": {
+          "num": 1,
+          "den": 1
+        },
+        "scoreNoteId": "@m0.v0.e0.n0",
+        "precision": {
+          "kind": "exact"
+        },
+        "provenance": "sine-v1 recipe; onset and release are sample boundaries; release is audible end."
+      },
+      {
+        "pitch": {
+          "midi": 62,
+          "hz": 293.6647679174076
+        },
+        "onset": 1.0,
+        "audibleEnd": 1.5,
+        "scoreDuration": {
+          "num": 1,
+          "den": 1
+        },
+        "scoreNoteId": "@m0.v0.e1.n0",
+        "precision": {
+          "kind": "exact"
+        },
+        "provenance": "sine-v1 recipe; onset and release are sample boundaries; release is audible end."
+      },
+      {
+        "pitch": {
+          "midi": 64,
+          "hz": 329.6275569128699
+        },
+        "onset": 2.0,
+        "audibleEnd": 2.5,
+        "scoreDuration": {
+          "num": 1,
+          "den": 1
+        },
+        "scoreNoteId": "@m0.v0.e2.n0",
+        "precision": {
+          "kind": "exact"
+        },
+        "provenance": "sine-v1 recipe; onset and release are sample boundaries; release is audible end."
+      },
+      {
+        "pitch": {
+          "midi": 65,
+          "hz": 349.2282314330039
+        },
+        "onset": 3.0,
+        "audibleEnd": 3.5,
+        "scoreDuration": {
+          "num": 1,
+          "den": 1
+        },
+        "scoreNoteId": "@m0.v0.e3.n0",
+        "precision": {
+          "kind": "exact"
+        },
+        "provenance": "sine-v1 recipe; onset and release are sample boundaries; release is audible end."
+      },
+      {
+        "pitch": {
+          "midi": 67,
+          "hz": 391.99543598174927
+        },
+        "onset": 4.0,
+        "audibleEnd": 4.5,
+        "scoreDuration": {
+          "num": 1,
+          "den": 1
+        },
+        "scoreNoteId": "@m1.v0.e0.n0",
+        "precision": {
+          "kind": "exact"
+        },
+        "provenance": "sine-v1 recipe; onset and release are sample boundaries; release is audible end."
+      },
+      {
+        "pitch": {
+          "midi": 69,
+          "hz": 440.0
+        },
+        "onset": 5.0,
+        "audibleEnd": 5.5,
+        "scoreDuration": {
+          "num": 1,
+          "den": 1
+        },
+        "scoreNoteId": "@m1.v0.e1.n0",
+        "precision": {
+          "kind": "exact"
+        },
+        "provenance": "sine-v1 recipe; onset and release are sample boundaries; release is audible end."
+      },
+      {
+        "pitch": {
+          "midi": 71,
+          "hz": 493.8833012561241
+        },
+        "onset": 6.0,
+        "audibleEnd": 6.5,
+        "scoreDuration": {
+          "num": 1,
+          "den": 1
+        },
+        "scoreNoteId": "@m1.v0.e2.n0",
+        "precision": {
+          "kind": "exact"
+        },
+        "provenance": "sine-v1 recipe; onset and release are sample boundaries; release is audible end."
+      },
+      {
+        "pitch": {
+          "midi": 72,
+          "hz": 523.2511306011972
+        },
+        "onset": 7.0,
+        "audibleEnd": 7.5,
+        "scoreDuration": {
+          "num": 1,
+          "den": 1
+        },
+        "scoreNoteId": "@m1.v0.e3.n0",
+        "precision": {
+          "kind": "exact"
+        },
+        "provenance": "sine-v1 recipe; onset and release are sample boundaries; release is audible end."
+      }
+    ],
+    "following": [
+      {
+        "start": 0,
+        "precision": {
+          "kind": "exact"
+        },
+        "provenance": "sine-v1 controlled recipe; 150 ms detection allowance from the first distinguishing onset.",
+        "answerableFrom": 0.15,
+        "route": 1,
+        "end": 7.5,
+        "state": "supported",
+        "truth": {
+          "atStart": {
+            "num": 0,
+            "den": 1
+          },
+          "quartersPerSecond": {
+            "num": 60,
+            "den": 60
+          },
+          "route": 1
+        },
+        "admissible": [
+          {
+            "atStart": {
+              "num": 0,
+              "den": 1
+            },
+            "quartersPerSecond": {
+              "num": 60,
+              "den": 60
+            },
+            "route": 1
+          }
+        ]
+      },
+      {
+        "start": 7.5,
+        "end": 8.0,
+        "state": "unknown",
+        "precision": {
+          "kind": "unknown"
+        },
+        "provenance": "Final silence beyond the last audible release; no following claim judged."
+      }
+    ]
+  },
+  "expected": {
+    "summary": "FIRST_STEP \u00a79: all answerable supported points correct; no missed deadlines",
+    "correctThrough": 7.5,
+    "maxWrongErrorQuarters": null,
+    "exposureSeconds": 0
+  },
+  "profile": {
+    "melodic": {
+      "level": 1,
+      "range": "C4\u2013C5",
+      "note": "C5 exceeds the level-1 C4\u2013B4 range."
+    },
+    "polyphonic": {
+      "level": 1,
+      "range": "one voice with silent gaps"
+    },
+    "harmonic": {
+      "level": 1,
+      "range": "pure sine"
+    },
+    "dynamics": {
+      "level": 1,
+      "range": "constant \u221212 dBFS peak"
+    },
+    "rhythm": {
+      "level": 1,
+      "range": "one quarter per beat, half-beat sounding; 10 ms attack/release"
+    },
+    "tempo": {
+      "level": 1,
+      "range": "60 BPM actual; 60 BPM handed"
+    },
+    "structuralAmbiguity": {
+      "level": 1,
+      "range": "8 distinct ascending notes; no repeats"
+    },
+    "navigation": {
+      "level": 1,
+      "range": "known start at zero; continuous traversal"
+    }
+  },
+  "conditions": "none",
+  "provenance": {
+    "kind": "generated",
+    "manifest": "sine-v1",
+    "scoreOrigin": "vendor/mnx/docs/static/examples/json/two-bar-c-major-scale.json at 46fbe9393067221ee83ef08de209cb3c4edf0d8d, verbatim",
+    "perturbation": null
+  },
+  "partition": "development",
+  "noteAssessment": null
+}
