@@ -44,15 +44,21 @@ export function scoreNotes(score: MnxStructure, recipe: RungZeroRecipe): Rendere
       recipe.peakDbfs !== -12 || recipe.rampSeconds !== 0.01 || !(recipe.bpm > 0) || !(recipe.toQuarter > recipe.fromQuarter)) {
     throw new Error('Unsupported rung-0 recipe');
   }
+  const toSample = (q: number) => Math.round((q - recipe.fromQuarter) * 60 / recipe.bpm * recipe.sampleRate);
+  return windowNotes(score, recipe.fromQuarter, recipe.toQuarter, toSample, durationSamples(recipe), recipe.rampSeconds * recipe.sampleRate);
+}
+
+/** The same selection under any monotone time map from score quarters to samples.
+ * Rung 0's constant tempo is one such map; later rungs supply their own. */
+export function windowNotes(score: MnxStructure, fromQuarter: number, toQuarter: number,
+  toSample: (quarter: number) => number, end: number, rampSamples: number): RenderedNote[] {
   const compiled = compilePerformance(score);
   if (!compiled.ok || compiled.performance.diagnostics.length) throw new Error('Score does not compile cleanly');
   const { performance } = compiled;
-  const end = durationSamples(recipe);
-  const toSample = (q: number) => Math.round((q - recipe.fromQuarter) * 60 / recipe.bpm * recipe.sampleRate);
   const notes = performance.sounding
-    .filter(n => quarters(n.position) >= recipe.fromQuarter && quarters(n.position) < recipe.toQuarter)
+    .filter(n => quarters(n.position) >= fromQuarter && quarters(n.position) < toQuarter)
     .map(n => {
-      if (n.curve.length) throw new Error('Rung 0 renders no pitch curves');
+      if (n.curve.length) throw new Error('The renderer renders no pitch curves');
       const start = quarters(n.position);
       const written = performance.written.find(w => n.writtenIds.includes(w.id));
       return {
@@ -67,8 +73,7 @@ export function scoreNotes(score: MnxStructure, recipe: RungZeroRecipe): Rendere
     })
     .sort((a, b) => a.fromSample - b.fromSample || a.midi - b.midi);
   if (!notes.length) throw new Error('The window contains no sounding notes');
-  const ramp = recipe.rampSeconds * recipe.sampleRate;
-  if (notes.some(n => n.toSample - n.fromSample < 2 * ramp)) throw new Error('A note is shorter than its attack and release');
+  if (notes.some(n => n.toSample - n.fromSample < 2 * rampSamples)) throw new Error('A note is shorter than its attack and release');
   return notes;
 }
 
@@ -85,22 +90,24 @@ export function maxPolyphony(notes: readonly RenderedNote[]): number {
  * own interval and restarts its phase at onset. The level per note is the peak divided
  * by the largest polyphony, so the mix never clips and does not depend on the notes. */
 export function renderSines(notes: readonly RenderedNote[], recipe: RungZeroRecipe): Int16Array {
-  const length = durationSamples(recipe);
+  return mixSines(notes, durationSamples(recipe), recipe.peakDbfs, recipe.rampSeconds * recipe.sampleRate, recipe.sampleRate);
+}
+
+export function mixSines(notes: readonly RenderedNote[], length: number, peakDbfs: number, ramp: number, sampleRate: number): Int16Array {
   const mix = new Float64Array(length);
-  const level = 10 ** (recipe.peakDbfs / 20) / maxPolyphony(notes);
-  const ramp = recipe.rampSeconds * recipe.sampleRate;
+  const level = 10 ** (peakDbfs / 20) / maxPolyphony(notes);
   for (const n of notes) {
     for (let i = n.fromSample; i < n.toSample; i++) {
       const elapsed = i - n.fromSample;
       const envelope = Math.min(1, elapsed / ramp, (n.toSample - i) / ramp);
-      mix[i]! += level * envelope * Math.sin(2 * Math.PI * n.hz * elapsed / recipe.sampleRate);
+      mix[i]! += level * envelope * Math.sin(2 * Math.PI * n.hz * elapsed / sampleRate);
     }
   }
   return Int16Array.from(mix, x => Math.round(32767 * x));
 }
 
 /** Labels describe the audio the renderer produced, not a listener's account. */
-export function noteLabels(notes: readonly RenderedNote[], recipe: RungZeroRecipe): NoteLabel[] {
+export function noteLabels(notes: readonly RenderedNote[], recipe: { sampleRate: number; rung: number }): NoteLabel[] {
   return notes.map(n => ({
     pitch: { midi: n.midi, hz: n.hz },
     onset: n.fromSample / recipe.sampleRate,
@@ -108,6 +115,6 @@ export function noteLabels(notes: readonly RenderedNote[], recipe: RungZeroRecip
     scoreDuration: n.scoreDuration,
     scoreNoteId: n.noteKey,
     precision: { kind: 'exact' },
-    provenance: `${RENDERER_VERSION} rung 0; onset and release are sample boundaries; release is the audible end.`,
+    provenance: `${RENDERER_VERSION} rung ${recipe.rung}; onset and release are sample boundaries; release is the audible end.`,
   }));
 }

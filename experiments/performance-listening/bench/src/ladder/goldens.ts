@@ -2,12 +2,17 @@ import { type Evaluation } from '../evaluate/index.ts';
 import type { Cost } from '../report/index.ts';
 import { type Following, type Golden, type NoteLabel, rational } from '../types.ts';
 import { RENDERER_VERSION, SAMPLE_RATE, type RungZeroRecipe } from './render.ts';
+import type { TempoFamily } from './tempo.ts';
+
+/** Rung 1 adds a tempo curve to rung 0's sine recipe; the handed tempo stays bpm. */
+export type RungOneRecipe = Omit<RungZeroRecipe, 'rung'> & { rung: 1; tempo: { family: TempoFamily; seed: number; segmentQuarters: 0.5; bpms: number[] } };
+export type LadderRecipe = RungZeroRecipe | RungOneRecipe;
 
 /** A following golden for a rendered example. The labels have exactly the shape the
  * frozen following-evaluator@1 judges; only the recipe differs from sine-v1, so the
  * set is not validated against the v1 golden schema's recipe field. */
 export type LadderGolden = Omit<Golden, 'audio'> & {
-  audio: Omit<Golden['audio'], 'recipe'> & { recipe: RungZeroRecipe };
+  audio: Omit<Golden['audio'], 'recipe'> & { recipe: LadderRecipe };
 };
 export type LadderExample = 'positive' | 'wrong-score' | 'silence';
 
@@ -17,11 +22,11 @@ export const asGolden = (g: LadderGolden): Golden => g as unknown as Golden;
 export const ALLOWANCE = 0.15;
 
 export function ladderGolden(args: {
-  set: string; example: LadderExample; recipe: RungZeroRecipe; duration: number; audioSha256: string;
+  set: string; example: LadderExample; recipe: LadderRecipe; duration: number; audioSha256: string;
   score: string; notes: NoteLabel[]; profile: Golden['profile']; scoreOrigin: string;
 }): LadderGolden {
   const { recipe, duration, notes } = args;
-  const provenance = `${RENDERER_VERSION} rung 0; exact by construction; ${ALLOWANCE * 1000} ms detection allowance from the first onset.`;
+  const provenance = `${RENDERER_VERSION} rung ${recipe.rung}; exact by construction; ${ALLOWANCE * 1000} ms detection allowance from the first onset.`;
   const firstOnset = notes.length ? Math.min(...notes.map(n => n.onset)) : 0;
   const following: Following[] = args.example === 'positive'
     ? [{

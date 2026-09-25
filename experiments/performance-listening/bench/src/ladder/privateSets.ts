@@ -29,7 +29,10 @@ export function readProxySet(dir: string): { manifest: ProxyManifest; sha256: st
 }
 
 export interface RungExample {
-  id: 'positive' | 'wrong-score' | 'silence';
+  /** Rung 0 names its three examples by kind; later rungs add a kind and a seed group. */
+  id: string;
+  kind?: 'positive' | 'wrong-score' | 'silence';
+  group?: 'development' | 'held-out' | 'fixed';
   scorePath: string;
   audioPath: string;
   golden: import('./goldens.ts').LadderGolden;

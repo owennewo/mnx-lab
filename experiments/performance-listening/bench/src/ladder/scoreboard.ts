@@ -17,7 +17,7 @@ import { readWav } from '../generate/wav.ts';
 import { EXPERIMENT, encode } from '../io.ts';
 import { evaluateProxy } from '../proxy/reference.ts';
 import { execute, machine } from '../run/runner.ts';
-import type { Decision, Listener, Tempo } from '../types.ts';
+import { type Decision, type Golden, type Listener, type Tempo, value } from '../types.ts';
 import { asGolden, gates } from './goldens.ts';
 import { readProxySet, readRungSet, requireOutsideGit, sha } from './privateSets.ts';
 import { recognitionAtLabels, recognitionOltw } from './recognition.ts';
@@ -62,33 +62,53 @@ function causality(factory: () => Listener, s: MnxStructure, tempo: Tempo, audio
 
 const cpuStart = process.cpuUsage();
 const records: Record<string, Decision[]> = {}, evaluations: Record<string, unknown> = {}, recognitionRows: Record<string, unknown> = {};
+/** The exact score position at audio time t, read from a golden's supported intervals. */
+function labelledPosition(golden: Golden) {
+  const supported = golden.labels.following.filter(l => l.state === 'supported');
+  return (t: number) => {
+    const l = supported.find(x => t >= x.start && t <= x.end) ?? (t < supported[0]!.start ? supported[0]! : supported.at(-1)!);
+    if (l.state !== 'supported') throw new Error('unreachable');
+    return value(l.truth.atStart) + (t - l.start) * value(l.truth.quartersPerSecond);
+  };
+}
+
 const rungs = rungDirs.map(dir => {
   const { manifest, sha256 } = readRungSet(join(ladderDir, dir));
-  const tempo: Tempo = { bpm: manifest.examples[0]!.golden.intended.tempo.bpm, unit: 'quarter' };
+  const kindOf = (e: typeof manifest.examples[number]) => e.kind ?? (e.id as 'positive' | 'wrong-score' | 'silence');
+  const groupOf = (e: typeof manifest.examples[number]) => e.group ?? 'fixed';
   const candidates = CANDIDATES.map(c => ({
     candidate: c.id,
     examples: manifest.examples.map(e => {
+      const tempo: Tempo = { ...e.golden.intended.tempo };
       const s = score(e.scorePath), audio = readWav(readFileSync(e.audioPath));
       const run = execute(c.factory, s, tempo, audio);
       const checks = causality(c.factory, s, tempo, audio, run.record);
       const evaluation = evaluate(asGolden(e.golden), run.record);
       records[`${dir}/${c.id}/${e.id}`] = run.record; evaluations[`${dir}/${c.id}/${e.id}`] = evaluation;
       const result = gates(evaluation, run.cost, checks);
-      return { example: e.id, gates: result, counts: evaluation.asDecided.counts, denominators: evaluation.asDecided.denominators,
+      return { example: e.id, kind: kindOf(e), group: groupOf(e), gates: result, counts: evaluation.asDecided.counts, denominators: evaluation.asDecided.denominators,
         errors: { ...evaluation.asDecided.errors, values: undefined }, losses: evaluation.asDecided.losses.length,
         exposure: evaluation.exposure, timeliness: { ...evaluation.timeliness, delays: undefined }, cost: run.cost, causality: checks };
     }),
-  })).map(c => ({ ...c, passes: c.examples.every(e => e.gates.failed.length === 0) }));
-  const positive = manifest.examples.find(e => e.id === 'positive')!, wrong = manifest.examples.find(e => e.id === 'wrong-score')!;
-  const recipe = positive.golden.audio.recipe;
-  const recognition = CANDIDATES.filter(c => c.recognition).map(c => {
-    const audio = readWav(readFileSync(positive.audioPath)), at = (seconds: number) => recipe.fromQuarter + seconds * recipe.bpm / 60;
-    const r = c.recognition === 'oltw'
-      ? recognitionOltw(audio, score(positive.scorePath), score(wrong.scorePath), at, recipe.bpm)
-      : recognitionAtLabels(audio, score(positive.scorePath), score(wrong.scorePath), c.recognition!, at, recipe.bpm);
-    recognitionRows[`${dir}/${c.id}`] = r.rows;
-    return { candidate: c.id, ...r, rows: undefined };
+  })).map(c => {
+    const clean = (group: string) => c.examples.filter(e => e.group === group).every(e => e.gates.failed.length === 0);
+    return { ...c, passes: c.examples.every(e => e.gates.failed.length === 0),
+      passesByGroup: { development: clean('development'), heldOut: clean('held-out'), fixed: clean('fixed') },
+      // The contract's verdict: every held-out example, and every fixed control, meets every gate.
+      rungVerdict: clean('held-out') && clean('fixed') };
   });
+  const wrongScore = manifest.examples.find(e => kindOf(e) === 'wrong-score')!;
+  const recognition = CANDIDATES.filter(c => c.recognition).map(c => ({
+    candidate: c.id,
+    examples: manifest.examples.filter(e => kindOf(e) === 'positive').map(positive => {
+      const audio = readWav(readFileSync(positive.audioPath)), at = labelledPosition(asGolden(positive.golden)), handed = positive.golden.intended.tempo.bpm;
+      const r = c.recognition === 'oltw'
+        ? recognitionOltw(audio, score(positive.scorePath), score(wrongScore.scorePath), at, handed)
+        : recognitionAtLabels(audio, score(positive.scorePath), score(wrongScore.scorePath), c.recognition!, at, handed);
+      recognitionRows[`${dir}/${c.id}/${positive.id}`] = r.rows;
+      return { example: positive.id, group: groupOf(positive), ...r, rows: undefined };
+    }),
+  }));
   return { rung: manifest.rung, set: manifest.id, sha256, candidates, recognition };
 });
 
@@ -125,4 +145,6 @@ const summary = {
 };
 mkdirSync(publicOut, { recursive: true });
 writeFileSync(join(publicOut, 'summary.json'), encode(summary));
-console.log(JSON.stringify({ runId, cpuSeconds, rungs: rungs.map(r => ({ rung: r.rung, candidates: r.candidates.map(c => ({ candidate: c.candidate, passes: c.passes, examples: c.examples.map(e => ({ example: e.example, failed: e.gates.failed, ...Object.fromEntries(Object.entries(e.gates).filter(([k]) => !['pass', 'failed'].includes(k))) })) })), recognition: r.recognition.map(x => ({ candidate: x.candidate, nearest: x.nearestAcceptance, local: x.localAcceptance, nearbyWrong: x.nearbyWrongAcceptance, other: x.otherScoreAcceptance, margins: { ...x.margins, quantiles: undefined }, best: 'cutoff' in x ? x.cutoff.best : null })) })), thermometer: thermometer.map(t => ({ candidate: t.candidate, examples: t.examples.map(e => ({ example: e.example, agreement: e.metrics.agreement, reproduces: e.reproducesExperiment002 })) })) }, null, 2));
+console.log(JSON.stringify({ runId, cpuSeconds, rungs: rungs.map(r => ({ rung: r.rung, candidates: r.candidates.map(c => ({ candidate: c.candidate, rungVerdict: c.rungVerdict, passesByGroup: c.passesByGroup,
+  failing: c.examples.filter(e => e.gates.failed.length).map(e => `${e.example}: ${e.gates.failed.join('+')}`) })) })),
+  thermometer: thermometer.map(t => ({ candidate: t.candidate, examples: t.examples.map(e => ({ example: e.example, agreement: e.metrics.agreement, reproduces: e.reproducesExperiment002 })) })) }, null, 2));
