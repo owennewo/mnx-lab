@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import type { MnxStructure } from '../../../../src/model/mnx.ts';
 import { onlineTimeWarp1 } from '../src/candidates/onlineTimeWarp1.ts';
 import { onlineTimeWarp2 } from '../src/candidates/onlineTimeWarp2.ts';
+import { onlineTimeWarp3, renderPlucked } from '../src/candidates/onlineTimeWarp3.ts';
 import { evaluate } from '../src/evaluate/index.ts';
 import { asGolden, gates, ladderGolden } from '../src/ladder/goldens.ts';
 import { durationSamples, noteLabels, renderSines, scoreNotes, type RungZeroRecipe } from '../src/ladder/render.ts';
@@ -17,9 +18,11 @@ const notes = scoreNotes(scale, recipe), duration = durationSamples(recipe) / 48
 const audio = Float32Array.from(renderSines(notes, recipe), x => x / 32768);
 const golden = (example: 'positive' | 'silence') => asGolden(ladderGolden({ set: 'test', example, recipe, duration, audioSha256: 'test', score: 'scale', notes: noteLabels(notes, recipe), profile, scoreOrigin: 'public s2' }));
 
-for (const [name, follower] of [['online-time-warp@1', onlineTimeWarp1], ['online-time-warp@2', onlineTimeWarp2]] as const) describe(name, () => {
+for (const [name, follower] of [['online-time-warp@1', onlineTimeWarp1], ['online-time-warp@2', onlineTimeWarp2], ['online-time-warp@3', onlineTimeWarp3]] as const) describe(name, () => {
   it('follows a rendered score at the handed tempo', () => {
-    const run = execute(follower, scale, { bpm: 60, unit: 'quarter' }, audio);
+    // Version 3's reference decays, so its implementation check is the matched rendering.
+    const heard = name === 'online-time-warp@3' ? renderPlucked(scale, 60).audio : audio;
+    const run = execute(follower, scale, { bpm: 60, unit: 'quarter' }, heard);
     const result = gates(evaluate(golden('positive'), run.record), run.cost, [{ pass: true }]);
     expect(result.supportedCorrect).toBeGreaterThanOrEqual(0.95);
     expect(result.exposureFraction).toBe(0);

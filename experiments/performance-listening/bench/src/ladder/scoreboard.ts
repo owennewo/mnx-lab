@@ -7,11 +7,6 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { MnxStructure } from '../../../../../src/model/mnx.ts';
-import { clockFollower, CLOCK_VERSION } from '../candidates/clockFollower.ts';
-import { spectralFollower1, SPECTRAL_1 } from '../candidates/spectralFollower1.ts';
-import { spectralFollower2 } from '../candidates/spectralFollower2.ts';
-import { onlineTimeWarp1, OLTW_1 } from '../candidates/onlineTimeWarp1.ts';
-import { onlineTimeWarp2, OLTW_2 } from '../candidates/onlineTimeWarp2.ts';
 import { evaluate } from '../evaluate/index.ts';
 import { readWav } from '../generate/wav.ts';
 import { EXPERIMENT, encode } from '../io.ts';
@@ -21,6 +16,11 @@ import { type Decision, type Golden, type Listener, type Tempo, value } from '..
 import { asGolden, gates } from './goldens.ts';
 import { readProxySet, readRungSet, requireOutsideGit, sha } from './privateSets.ts';
 import { recognitionAtLabels, recognitionOltw } from './recognition.ts';
+import { cachePath, comparable, fingerprint, readCached, writeCached } from './cache.ts';
+import { CANDIDATES } from './candidates.ts';
+import { pluckedReferenceFrames } from '../candidates/onlineTimeWarp3.ts';
+import { CLOCK_VERSION } from '../candidates/clockFollower.ts';
+import { SPECTRAL_1 } from '../candidates/spectralFollower1.ts';
 
 const [runId, slug, ladderDir, proxyDir] = process.argv.slice(2);
 if (!runId || !/^g\d{3}[a-z]?-[a-z0-9-]+$/.test(runId) || !slug || !/^\d{3}-[a-z0-9-]+$/.test(slug) || !ladderDir || !proxyDir) {
@@ -36,15 +36,7 @@ git('cat-file', '-e', `HEAD:${preregistration}`);
 const privateOut = join(requireOutsideGit(ladderDir), 'runs', runId), publicOut = join(EXPERIMENT, 'runs', runId);
 if (existsSync(privateOut) || existsSync(publicOut)) throw new Error('Run id exists; a run is never overwritten');
 
-const CANDIDATES: { id: string; factory: () => Listener; recognition?: 1 | 2 | 'oltw'; diagnostic?: true }[] = [
-  { id: CLOCK_VERSION, factory: clockFollower },
-  { id: SPECTRAL_1, factory: spectralFollower1, recognition: 1 },
-  { id: 'spectral-follower@2', factory: spectralFollower2, recognition: 2 },
-  { id: OLTW_1, factory: onlineTimeWarp1, recognition: 'oltw' },
-  { id: OLTW_2, factory: () => onlineTimeWarp2() },
-  // Not a candidate: the incumbent's alignment with its support test switched off.
-  { id: `${OLTW_2}/alignment-only`, factory: () => onlineTimeWarp2({ alwaysClaim: true }), diagnostic: true },
-];
+
 const rungDirs = readdirSync(ladderDir).filter(d => /^rung-\d+$/.test(d)).sort((a, b) => Number(a.slice(5)) - Number(b.slice(5)));
 if (!rungDirs.length) throw new Error('No built rung');
 const proxy = readProxySet(proxyDir);
@@ -78,21 +70,37 @@ const rungs = rungDirs.map(dir => {
   const { manifest, sha256 } = readRungSet(join(ladderDir, dir));
   const kindOf = (e: typeof manifest.examples[number]) => e.kind ?? (e.id as 'positive' | 'wrong-score' | 'silence');
   const groupOf = (e: typeof manifest.examples[number]) => e.group ?? 'fixed';
-  const candidates = CANDIDATES.map(c => ({
-    candidate: c.id, diagnostic: c.diagnostic ?? false,
-    examples: manifest.examples.map(e => {
+  const candidates = CANDIDATES.map(c => {
+    const print = fingerprint(c.module);
+    const compute = (e: typeof manifest.examples[number]) => {
       const tempo: Tempo = { ...e.golden.intended.tempo };
       const s = score(e.scorePath), audio = readWav(readFileSync(e.audioPath));
       const run = execute(c.factory, s, tempo, audio);
       const checks = causality(c.factory, s, tempo, audio, run.record);
       const evaluation = evaluate(asGolden(e.golden), run.record);
-      records[`${dir}/${c.id}/${e.id}`] = run.record; evaluations[`${dir}/${c.id}/${e.id}`] = evaluation;
-      const result = gates(evaluation, run.cost, checks);
-      return { example: e.id, kind: kindOf(e), group: groupOf(e), gates: result, counts: evaluation.asDecided.counts, denominators: evaluation.asDecided.denominators,
+      const result = { example: e.id, kind: kindOf(e), group: groupOf(e), gates: gates(evaluation, run.cost, checks), counts: evaluation.asDecided.counts, denominators: evaluation.asDecided.denominators,
         errors: { ...evaluation.asDecided.errors, values: undefined }, losses: evaluation.asDecided.losses.length,
         exposure: evaluation.exposure, timeliness: { ...evaluation.timeliness, delays: undefined }, cost: run.cost, causality: checks };
-    }),
-  })).map(c => {
+      return { result: JSON.parse(JSON.stringify(result)) as typeof result, record: run.record, evaluation };
+    };
+    const paths = manifest.examples.map(e => cachePath(ladderDir, c.id, print.hash, sha256, e.id));
+    const cached = paths.map(p => readCached<ReturnType<typeof compute>['result']>(p));
+    let spotCheck: { example: string; reproduced: true } | null = null;
+    if (cached.some(Boolean)) {
+      // Reuse is allowed only if one reused example recomputes to exactly the same result.
+      const i = cached.findIndex(Boolean), fresh = compute(manifest.examples[i]!);
+      if (comparable(fresh.result) !== comparable(cached[i]!.result)) throw new Error(`Cached result for ${c.id} on ${dir}/${manifest.examples[i]!.id} does not reproduce`);
+      spotCheck = { example: manifest.examples[i]!.id, reproduced: true };
+    }
+    const examples = manifest.examples.map((e, i) => {
+      const hit = cached[i];
+      const entry = hit ?? { ...compute(e), sourceRun: runId };
+      if (!hit) writeCached(paths[i]!, entry);
+      records[`${dir}/${c.id}/${e.id}`] = entry.record as Decision[]; evaluations[`${dir}/${c.id}/${e.id}`] = entry.evaluation;
+      return { ...entry.result, computedIn: hit ? hit.sourceRun : runId };
+    });
+    return { candidate: c.id, diagnostic: c.diagnostic ?? false, fingerprint: print.hash, cache: { reused: cached.filter(Boolean).length, computed: cached.filter(x => !x).length, spotCheck }, examples };
+  }).map(c => {
     const clean = (group: string) => c.examples.filter(e => e.group === group).every(e => e.gates.failed.length === 0);
     return { ...c, passes: c.examples.every(e => e.gates.failed.length === 0),
       passesByGroup: { development: clean('development'), heldOut: clean('held-out'), fixed: clean('fixed') },
@@ -104,9 +112,9 @@ const rungs = rungDirs.map(dir => {
     candidate: c.id,
     examples: manifest.examples.filter(e => kindOf(e) === 'positive').map(positive => {
       const audio = readWav(readFileSync(positive.audioPath)), at = labelledPosition(asGolden(positive.golden)), handed = positive.golden.intended.tempo.bpm;
-      const r = c.recognition === 'oltw'
-        ? recognitionOltw(audio, score(positive.scorePath), score(wrongScore.scorePath), at, handed)
-        : recognitionAtLabels(audio, score(positive.scorePath), score(wrongScore.scorePath), c.recognition!, at, handed);
+      const r = c.recognition === 'oltw' || c.recognition === 'oltw3'
+        ? recognitionOltw(audio, score(positive.scorePath), score(wrongScore.scorePath), at, handed, c.recognition === 'oltw3' ? pluckedReferenceFrames : undefined)
+        : recognitionAtLabels(audio, score(positive.scorePath), score(wrongScore.scorePath), c.recognition as 1 | 2, at, handed);
       recognitionRows[`${dir}/${c.id}/${positive.id}`] = r.rows;
       return { example: positive.id, group: groupOf(positive), ...r, rows: undefined };
     }),

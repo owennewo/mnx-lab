@@ -1,5 +1,6 @@
 import type { MnxStructure } from '../../../../../src/model/mnx.ts';
 import * as oltw from '../candidates/onlineTimeWarp1.ts';
+import type { MnxStructure as Score } from '../../../../../src/model/mnx.ts';
 import { frames, frontier, quantiles, similarity, STEP, templates, type Version } from '../diagnostic/features.ts';
 
 /** The experiment 003 recognition measure, with the supplied position taken from exact
@@ -40,8 +41,9 @@ export function recognitionAtLabels(audio: Float32Array, score: MnxStructure, ot
  * position, is the matching cost lower than at every nearby wrong position? Acceptance
  * uses that follower's fixed support threshold on cost. */
 export function recognitionOltw(audio: Float32Array, score: MnxStructure, otherScore: MnxStructure,
-  positionAt: (seconds: number) => number, nominalBpm: number) {
-  const live = oltw.frames(audio), own = oltw.referenceFrames(score, nominalBpm), other = oltw.referenceFrames(otherScore, nominalBpm);
+  positionAt: (seconds: number) => number, nominalBpm: number,
+  reference: (score: Score, bpm: number) => { frames: oltw.Frame[]; quarters: number } = oltw.referenceFrames) {
+  const live = oltw.frames(audio), own = reference(score, nominalBpm), other = reference(otherScore, nominalBpm);
   const quarterOf = (j: number) => (j + 1) * oltw.HOP_SECONDS * nominalBpm / 60;
   const accept = (c: number) => c < oltw.SUPPORT_THRESHOLD;
   const rows = live.filter(f => f.rms > 1e-4).map(f => {
