@@ -37,6 +37,12 @@ now prevents.
 **Converter suites** run when their package changes, and both run when `src/model/` or
 `converters/fixtures/` does (the shared model contract).
 
+**Listening bench suite** (`mnx-listening-bench`) runs for active performance-listening
+changes (including contracts, sets and oracle JSON), shared `src/audio/` and
+`src/model/`, the pinned MNX schema, root package inputs and the gate itself.
+A full or unknown-path gate includes it. Its test script also typechecks the bench.
+Production-to-experiment imports are already forbidden by dependency-cruiser.
+
 **Smokes by area.** Each smoke declares `covers` in `harness/verify/run-smokes.mjs`:
 the shell it drives (`workbench`, `studio`), `library` when it runs the Worker, or the
 face it loads (`embed`, `lib`, `audio`). A path maps to areas: `src/workbench/` →

@@ -1,0 +1,204 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://mnx-lab.totai.uk/experiments/listening/decisions/v1",
+  "type": "array",
+  "items": {
+    "oneOf": [
+      {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "const": "position"
+          },
+          "refersTo": {
+            "type": "number",
+            "minimum": 0
+          },
+          "madeAt": {
+            "type": "number",
+            "minimum": 0
+          },
+          "supersedes": {
+            "type": "string",
+            "minLength": 1
+          },
+          "candidates": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "position": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "quarters": {
+                      "$ref": "#/$defs/rational"
+                    },
+                    "route": {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  },
+                  "required": [
+                    "quarters",
+                    "route"
+                  ]
+                },
+                "weight": {
+                  "type": "number",
+                  "exclusiveMinimum": 0,
+                  "maximum": 1
+                }
+              },
+              "required": [
+                "position",
+                "weight"
+              ]
+            }
+          },
+          "confidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "refersTo",
+          "madeAt",
+          "candidates",
+          "confidence"
+        ]
+      },
+      {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "const": "unsupported"
+          },
+          "refersTo": {
+            "type": "number",
+            "minimum": 0
+          },
+          "madeAt": {
+            "type": "number",
+            "minimum": 0
+          },
+          "supersedes": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "refersTo",
+          "madeAt"
+        ]
+      },
+      {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "const": "note"
+          },
+          "refersTo": {
+            "type": "number",
+            "minimum": 0
+          },
+          "madeAt": {
+            "type": "number",
+            "minimum": 0
+          },
+          "supersedes": {
+            "type": "string",
+            "minLength": 1
+          },
+          "verdict": {
+            "enum": [
+              "match",
+              "missing",
+              "extra",
+              "substitution",
+              "timing"
+            ]
+          },
+          "noteId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "observedOnset": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "observedPitch": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "refersTo",
+          "madeAt",
+          "verdict",
+          "noteId",
+          "observedOnset",
+          "observedPitch"
+        ]
+      }
+    ]
+  },
+  "$defs": {
+    "rational": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "num": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "den": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "num",
+        "den"
+      ]
+    }
+  }
+}

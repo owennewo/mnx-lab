@@ -30,14 +30,12 @@ How to maintain it:
 
 ## Current state
 
-2026-09-25. Planning only. The governing documents are
-[APPROACH.md](APPROACH.md) and the structure document above; the first implementation
-campaign is [FIRST_STEP.md](FIRST_STEP.md), whose items A to G build the contracts,
-the evaluator and its oracle, a five-example synthetic set and a clock-follower
-baseline, with a read-only inventory of real recordings (R1) alongside. No contract
-is frozen, no set exists, no candidate has run, and no research note has been written.
-The previous experiment is archived under [archive/](archive/ARCHIVED.md); its
-findings are historical and are not carried over as findings here.
+2026-09-25. Item A is implemented: versioned draft instrument contracts, a strict
+golden schema with a handwritten example, the bench workspace skeleton and its gate
+coverage. The bounded research is recorded below. No evaluator or listener exists,
+no candidate has run, and no contract is frozen. The research contract remains
+provisional and not human-approved. Next: build B/C's independent oracle,
+evaluator and reports before pipeline work.
 
 ## Findings
 
@@ -46,7 +44,9 @@ ledger row (`ledger.md#<row>`), or a findings write-up.
 
 | # | Finding | Evidence | Status | Since | Notes |
 |---|---|---|---|---|---|
-| | | | | | |
+| 1 | The published evaluation distinguishes alignment error from reporting latency; its example threshold does not validate our musical-position tolerance or deadline. | [Cont 2007 note](research/cont-2007-evaluation.md), [MIREX note](research/mirex-2015.md) | holds | 2026-09-25 | Instrument tolerances unchanged |
+| 2 | The bounded search found no published audio-ignoring clock floor with comparable numbers. | [Search outcome](research/trivial-baseline-search.md) | holds | 2026-09-25 | An unsuccessful search, not a claim of absence |
+| 3 | The root gate needed an explicit workspace suite for the listening bench and its disk-read evidence. | [Gate rule](../../tools/gate.mjs), [contract test](bench/test/contracts.test.ts) | holds | 2026-09-25 | Item A; production boundary already exists |
 
 ## Open questions
 
@@ -55,8 +55,8 @@ Ranked; the top row is the next question the driver asks. Status is `open`,
 
 | Rank | Question | Why it is ranked here | Status | Owner item |
 |---|---|---|---|---|
-| 1 | How has real-time score following been evaluated elsewhere, and do our ±0.25-quarter tolerance and 200 ms deadline sit inside those norms? | FIRST_STEP §10 question 1; answers whether the first contract's tolerances are defensible before anything is measured against them | open | FIRST_STEP item A |
-| 2 | Is there a published trivial baseline for score following, so our clock floor can be compared with the usual one? | FIRST_STEP §10 question 2; decides whether the first ledger row has an external reference point | open | FIRST_STEP item A |
+| 1 | How has real-time score following been evaluated elsewhere, and do our ±0.25-quarter tolerance and 200 ms deadline sit inside those norms? | FIRST_STEP §10 question 1; answers whether the first contract's tolerances are defensible before anything is measured against them | answered (findings 1–2) | FIRST_STEP item A |
+| 2 | Is there a published trivial baseline for score following, so our clock floor can be compared with the usual one? | FIRST_STEP §10 question 2; decides whether the first ledger row has an external reference point | answered (findings 1–2) | FIRST_STEP item A |
 | 3 | Which library recordings and re-amplification opportunities are eligible real evidence for the following milestone, and with what anchor precision? | The structure document runs real evidence alongside the pipeline; without an answer the first human-approved contract cannot name its evidence supply | open | FIRST_STEP item R1 |
 | 4 | Does the first run of the clock follower over `harness-v1` reproduce the pre-registered predictions in FIRST_STEP §9? | The whole first step exists to answer it; a mismatch is an instrument defect, never a finding about the candidate | open | FIRST_STEP item G |
 

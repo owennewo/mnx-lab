@@ -1,0 +1,16 @@
+{
+  "name": "mnx-listening-bench",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest run --config vitest.config.ts && tsc -p tsconfig.json",
+    "generate": "tsx src/cli.ts generate",
+    "freeze": "tsx src/cli.ts freeze",
+    "run": "tsx src/cli.ts run",
+    "report": "tsx src/cli.ts report"
+  },
+  "devDependencies": {
+    "tsx": "^4.20.6"
+  }
+}

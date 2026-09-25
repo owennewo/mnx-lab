@@ -78,7 +78,7 @@ export function planGate(files, { full = false } = {}) {
     if (unknown.length) reasons.push(`unrecognised paths run everything: ${unknown.join(', ')}`);
     else reasons.push('--full');
     return {
-      tests: { mode: 'full' }, converters: CONVERTERS, build: true,
+      tests: { mode: 'full' }, converters: CONVERTERS, listeningBench: true, build: true,
       smokes: coverage.map(smoke => smoke.name), reasons,
     };
   }
@@ -114,7 +114,9 @@ export function planGate(files, { full = false } = {}) {
     ? coverage.map(smoke => smoke.name)
     : coverage.filter(smoke => areas.has(`smoke:${smoke.name}`) || smoke.covers.some(area => areas.has(area))).map(smoke => smoke.name);
   reasons.push(smokes.length === coverage.length ? 'every smoke' : smokes.length ? `smokes for ${[...areas].join(', ')}` : 'no smokes');
-  return { tests, converters, build, smokes, reasons };
+  const listeningBench = files.some(file => /^experiments\/performance-listening\/(?!archive\/)|^src\/(audio|model)\/|^package(-lock)?\.json$|^spec\/mnx-schema\.json$|^tools\/gate\.mjs$/.test(file));
+  if (listeningBench) reasons.push('listening bench: whole workspace suite (including disk-read contracts and oracles)');
+  return { tests, converters, listeningBench, build, smokes, reasons };
 }
 
 /**
@@ -175,6 +177,7 @@ function main() {
   for (const reason of plan.reasons) console.log(`  · ${reason}`);
   console.log(`  tests:      ${plan.tests.mode === 'full' ? 'npm test (all)' : tests.length ? `${tests.length} file(s)` : 'none'}`);
   console.log(`  converters: ${plan.converters.join(', ') || 'none'}`);
+  console.log(`  bench:      ${plan.listeningBench ? 'mnx-listening-bench' : 'none'}`);
   console.log(`  build:      ${plan.build ? 'npm run build' : 'none'}`);
   console.log(`  smokes:     ${plan.smokes.join(' ') || 'none'}`);
   if (args.includes('--plan')) {
@@ -185,6 +188,7 @@ function main() {
   if (plan.tests.mode === 'full') run('tests', 'npm', ['test']);
   else if (tests.length) run('tests', 'npx', ['vitest', 'run', ...tests]);
   for (const name of plan.converters) run(`converter ${name}`, 'npm', ['-w', `@mnx-editor/${name}`, 'test']);
+  if (plan.listeningBench) run('listening bench', 'npm', ['-w', 'mnx-listening-bench', 'test']);
   if (plan.build) run('build', 'npm', ['run', 'build']);
   if (plan.smokes.length) {
     // The gate build is the site face; embed and lib still build their own.

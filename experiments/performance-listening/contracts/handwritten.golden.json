@@ -1,0 +1,151 @@
+{
+  "set": "handwritten-v1",
+  "example": "one-quarter",
+  "version": 1,
+  "intended": {
+    "score": "handwritten.score.mnx.json",
+    "tempo": {
+      "bpm": 60,
+      "unit": "quarter"
+    },
+    "route": [
+      1
+    ]
+  },
+  "audio": {
+    "path": "audio.wav",
+    "sampleRate": 48000,
+    "channels": 1,
+    "duration": 1,
+    "sha256": null,
+    "recipe": {
+      "manifest": "sine-v1",
+      "parameters": {
+        "bpm": 60,
+        "mode": "score",
+        "sampleRate": 48000,
+        "peakDbfs": -12,
+        "attackSeconds": 0.01,
+        "releaseSeconds": 0.01,
+        "soundingBeatFraction": 0.5,
+        "finalSilenceSeconds": 0.5
+      }
+    }
+  },
+  "labels": {
+    "notes": [
+      {
+        "pitch": {
+          "midi": 60,
+          "hz": 261.6255653005986
+        },
+        "onset": 0,
+        "audibleEnd": 0.5,
+        "scoreDuration": {
+          "num": 1,
+          "den": 1
+        },
+        "scoreNoteId": "c4",
+        "precision": {
+          "kind": "exact"
+        },
+        "provenance": "Handwritten contract example; no audio generated."
+      }
+    ],
+    "following": [
+      {
+        "start": 0,
+        "end": 0.5,
+        "state": "supported",
+        "answerableFrom": 0.15,
+        "route": 1,
+        "truth": {
+          "atStart": {
+            "num": 0,
+            "den": 1
+          },
+          "quartersPerSecond": {
+            "num": 1,
+            "den": 1
+          },
+          "route": 1
+        },
+        "admissible": [
+          {
+            "atStart": {
+              "num": 0,
+              "den": 1
+            },
+            "quartersPerSecond": {
+              "num": 1,
+              "den": 1
+            },
+            "route": 1
+          }
+        ],
+        "precision": {
+          "kind": "exact"
+        },
+        "provenance": "Handwritten arithmetic."
+      },
+      {
+        "start": 0.5,
+        "end": 1,
+        "state": "unknown",
+        "precision": {
+          "kind": "unknown"
+        },
+        "provenance": "Trailing silence outside supported following."
+      }
+    ]
+  },
+  "expected": {
+    "summary": "Supported until the final release, unknown tail.",
+    "correctThrough": 0.5,
+    "maxWrongErrorQuarters": null,
+    "exposureSeconds": 0
+  },
+  "profile": {
+    "melodic": {
+      "level": 1,
+      "range": "C4"
+    },
+    "polyphonic": {
+      "level": 1,
+      "range": "one voice"
+    },
+    "harmonic": {
+      "level": 1,
+      "range": "sine"
+    },
+    "dynamics": {
+      "level": 1,
+      "range": "constant \u221212 dBFS"
+    },
+    "rhythm": {
+      "level": 1,
+      "range": "quarter; half-beat sounding"
+    },
+    "tempo": {
+      "level": 1,
+      "range": "60 BPM"
+    },
+    "structuralAmbiguity": {
+      "level": 1,
+      "range": "one note"
+    },
+    "navigation": {
+      "level": 1,
+      "range": "known start; continuous"
+    }
+  },
+  "conditions": "none",
+  "provenance": {
+    "kind": "handwritten",
+    "manifest": "sine-v1",
+    "scoreOrigin": "Handwritten contract example",
+    "perturbation": null
+  },
+  "partition": "development",
+  "noteAssessment": null
+}

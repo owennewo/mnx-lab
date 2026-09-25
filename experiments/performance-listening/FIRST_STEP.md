@@ -485,4 +485,13 @@ the next item should know. This log is per campaign; what it learns that outlive
 campaign goes to [RESEARCH_LOG.md](RESEARCH_LOG.md) as a finding or an open question,
 with the ledger row as its evidence, in the same commit.
 
-_(empty)_
+### 2026-09-25 — A: contracts
+
+Added the v1 vocabulary, golden format/schema, evaluator rules and the separately
+provisional research contract, a handwritten schema example, research notes and empty
+run ledger, and the private bench workspace. The two bounded questions are answered
+in the research log (including the unsuccessful baseline search). The existing gate
+did not run experiment workspaces, so it now includes this suite and its disk inputs.
+The production import boundary already excludes experiments. Endpoint and persistence
+semantics are explicit before oracle arithmetic; instrument contracts remain draft
+until G, and the research contract will remain provisional even then.

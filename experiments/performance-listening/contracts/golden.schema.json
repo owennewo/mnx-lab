@@ -1,0 +1,716 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://mnx-lab.totai.uk/experiments/listening/golden/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "set": {
+      "type": "string",
+      "minLength": 1
+    },
+    "example": {
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "const": 1
+    },
+    "intended": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "score": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tempo": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "bpm": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "unit": {
+              "const": "quarter"
+            }
+          },
+          "required": [
+            "bpm",
+            "unit"
+          ]
+        },
+        "route": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "score",
+        "tempo",
+        "route"
+      ]
+    },
+    "audio": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sampleRate": {
+          "const": 48000
+        },
+        "channels": {
+          "const": 1
+        },
+        "duration": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "sha256": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          ]
+        },
+        "recipe": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "manifest": {
+              "type": "string",
+              "minLength": 1
+            },
+            "parameters": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "bpm": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "mode": {
+                  "enum": [
+                    "score",
+                    "descending",
+                    "silence"
+                  ]
+                },
+                "sampleRate": {
+                  "const": 48000
+                },
+                "peakDbfs": {
+                  "const": -12
+                },
+                "attackSeconds": {
+                  "const": 0.01
+                },
+                "releaseSeconds": {
+                  "const": 0.01
+                },
+                "soundingBeatFraction": {
+                  "const": 0.5
+                },
+                "finalSilenceSeconds": {
+                  "const": 0.5
+                },
+                "silenceDuration": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "bpm",
+                "mode",
+                "sampleRate",
+                "peakDbfs",
+                "attackSeconds",
+                "releaseSeconds",
+                "soundingBeatFraction",
+                "finalSilenceSeconds"
+              ]
+            }
+          },
+          "required": [
+            "manifest",
+            "parameters"
+          ]
+        }
+      },
+      "required": [
+        "path",
+        "sampleRate",
+        "channels",
+        "duration",
+        "sha256",
+        "recipe"
+      ]
+    },
+    "labels": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "pitch": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "midi": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 127
+                  },
+                  "hz": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  }
+                },
+                "required": [
+                  "midi",
+                  "hz"
+                ]
+              },
+              "onset": {
+                "type": "number",
+                "minimum": 0
+              },
+              "audibleEnd": {
+                "type": "number",
+                "minimum": 0
+              },
+              "scoreDuration": {
+                "$ref": "#/$defs/rational"
+              },
+              "scoreNoteId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "precision": {
+                "$ref": "#/$defs/precision"
+              },
+              "provenance": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "pitch",
+              "onset",
+              "audibleEnd",
+              "scoreDuration",
+              "scoreNoteId",
+              "precision",
+              "provenance"
+            ]
+          },
+          "minItems": 0
+        },
+        "following": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "start": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "end": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "state": {
+                    "const": "supported"
+                  },
+                  "precision": {
+                    "$ref": "#/$defs/precision"
+                  },
+                  "provenance": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "answerableFrom": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "route": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740991
+                  },
+                  "truth": {
+                    "$ref": "#/$defs/trajectory"
+                  },
+                  "admissible": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/trajectory"
+                    },
+                    "minItems": 1
+                  },
+                  "abstainable": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "start",
+                  "end",
+                  "state",
+                  "precision",
+                  "provenance",
+                  "answerableFrom",
+                  "route",
+                  "truth",
+                  "admissible"
+                ]
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "start": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "end": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "state": {
+                    "const": "unsupported"
+                  },
+                  "precision": {
+                    "$ref": "#/$defs/precision"
+                  },
+                  "provenance": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "answerableFrom": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "route": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740991
+                  }
+                },
+                "required": [
+                  "start",
+                  "end",
+                  "state",
+                  "precision",
+                  "provenance",
+                  "answerableFrom",
+                  "route"
+                ]
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "start": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "end": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "state": {
+                    "const": "unknown"
+                  },
+                  "precision": {
+                    "$ref": "#/$defs/precision"
+                  },
+                  "provenance": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "start",
+                  "end",
+                  "state",
+                  "precision",
+                  "provenance"
+                ]
+              }
+            ]
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "notes",
+        "following"
+      ]
+    },
+    "expected": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "correctThrough": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "maxWrongErrorQuarters": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "exposureSeconds": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        }
+      },
+      "required": [
+        "summary",
+        "correctThrough",
+        "maxWrongErrorQuarters",
+        "exposureSeconds"
+      ]
+    },
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "melodic": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "level": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "range": {
+              "type": "string",
+              "minLength": 1
+            },
+            "note": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "level",
+            "range"
+          ]
+        },
+        "polyphonic": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "level": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "range": {
+              "type": "string",
+              "minLength": 1
+            },
+            "note": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "level",
+            "range"
+          ]
+        },
+        "harmonic": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "level": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "range": {
+              "type": "string",
+              "minLength": 1
+            },
+            "note": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "level",
+            "range"
+          ]
+        },
+        "dynamics": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "level": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "range": {
+              "type": "string",
+              "minLength": 1
+            },
+            "note": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "level",
+            "range"
+          ]
+        },
+        "rhythm": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "level": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "range": {
+              "type": "string",
+              "minLength": 1
+            },
+            "note": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "level",
+            "range"
+          ]
+        },
+        "tempo": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "level": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "range": {
+              "type": "string",
+              "minLength": 1
+            },
+            "note": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "level",
+            "range"
+          ]
+        },
+        "structuralAmbiguity": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "level": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "range": {
+              "type": "string",
+              "minLength": 1
+            },
+            "note": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "level",
+            "range"
+          ]
+        },
+        "navigation": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "level": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "range": {
+              "type": "string",
+              "minLength": 1
+            },
+            "note": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "level",
+            "range"
+          ]
+        }
+      },
+      "required": [
+        "melodic",
+        "polyphonic",
+        "harmonic",
+        "dynamics",
+        "rhythm",
+        "tempo",
+        "structuralAmbiguity",
+        "navigation"
+      ]
+    },
+    "conditions": {
+      "const": "none"
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "generated",
+            "handwritten"
+          ]
+        },
+        "manifest": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scoreOrigin": {
+          "type": "string",
+          "minLength": 1
+        },
+        "perturbation": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "manifest",
+        "scoreOrigin",
+        "perturbation"
+      ]
+    },
+    "partition": {
+      "enum": [
+        "development",
+        "reserved",
+        "acceptance"
+      ]
+    },
+    "noteAssessment": {
+      "type": "null"
+    }
+  },
+  "required": [
+    "set",
+    "example",
+    "version",
+    "intended",
+    "audio",
+    "labels",
+    "expected",
+    "profile",
+    "conditions",
+    "provenance",
+    "partition",
+    "noteAssessment"
+  ],
+  "$defs": {
+    "rational": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "num": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "den": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "num",
+        "den"
+      ]
+    },
+    "precision": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "exact",
+            "bounded",
+            "unknown"
+          ]
+        },
+        "uncertaintySeconds": {
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "kind"
+      ]
+    },
+    "trajectory": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "atStart": {
+          "$ref": "#/$defs/rational"
+        },
+        "quartersPerSecond": {
+          "$ref": "#/$defs/rational"
+        },
+        "route": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "atStart",
+        "quartersPerSecond",
+        "route"
+      ]
+    }
+  }
+}

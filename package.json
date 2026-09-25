@@ -4,7 +4,8 @@
   "version": "0.3.0",
   "type": "module",
   "workspaces": [
-    "converters/*"
+    "converters/*",
+    "experiments/performance-listening/bench"
   ],
   "files": [
     "dist/lib",

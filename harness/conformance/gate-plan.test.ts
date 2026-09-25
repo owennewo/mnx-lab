@@ -70,3 +70,15 @@ it('a path the rule does not know runs everything', () => {
   expect(plan.smokes).toEqual(ALL_SMOKES);
   expect(plan.reasons.join(' ')).toContain('some-new-root-file.txt');
 });
+
+it('the listening workspace gates its code, disk-read evidence, and shared timing inputs', () => {
+  for (const file of [
+    'experiments/performance-listening/bench/src/evaluate/index.ts',
+    'experiments/performance-listening/bench/oracle/o1/expected.json',
+    'experiments/performance-listening/contracts/golden.schema.json',
+    'experiments/performance-listening/sets/harness-v1/p1/golden.json',
+    'src/audio/performance.ts', 'src/model/mnx.ts', 'package-lock.json',
+  ]) expect(planGate([file]).listeningBench, file).toBe(true);
+  expect(planGate(['src/workbench/main.ts']).listeningBench).toBe(false);
+  expect(planGate([], { full: true }).listeningBench).toBe(true);
+});
