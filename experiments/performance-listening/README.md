@@ -26,6 +26,13 @@ This checks the measurement pipeline; it does not demonstrate listening capabili
 The instrument and synthetic set are frozen, while the research contract remains
 provisional and no real-source set is ready to freeze.
 
+Current work: [four-bar evidence and contract review (HTML)](reports/real-evidence-review.html)
+and [real-evidence preparation](evidence/README.md) has private four-bar
+review clips for The Winner Takes It All and Dust in the Wind. The
+[first research contract draft](contracts/research-contract-1-draft.md) records the
+confirmed scope and proposed progression; human label checks and contract approval
+are still pending.
+
 [FIRST_STEP.md](FIRST_STEP.md) records the work and its learnings.
 [RESEARCH_LOG.md](RESEARCH_LOG.md) holds the current state and next question;
 [ledger.md](ledger.md) records the runs. Audio-driven candidates and retention

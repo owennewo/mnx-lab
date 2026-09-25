@@ -30,15 +30,15 @@ How to maintain it:
 
 ## Current state
 
-2026-09-25. A–G and R1 are complete. The first end-to-end clock-follower@1 run
-matches the pre-registered predictions, including both controls and the tempo probe;
-causality passes and provisional costs are recorded. harness-v1 and the instrument
-contracts are frozen, with the exact pre-run bytes pinned. Research-contract-0 remains
-provisional and not human-approved; this is an instrument check, not qualification.
-The approved R1 inventory finds no real-source set ready to freeze. Next is a separate
-human-approved research contract informed by the research notes and independent
-solo/route/precision, access and capture evidence. No later candidate, harmonic
-generator or retention work has begun.
+2026-09-25. The synthetic first step remains complete and reproducible. Real-evidence
+preparation is now active: the user selected The Winner Takes It All, then Dust in
+the Wind, starting with four performed bars and expanding only on measured success.
+Private playable review crops and structural preflight are ready; no real interval
+has been independently approved or frozen. Research contract 1 is drafted for the
+confirmed solo-guitar/microphone/laptop scope but is not approved. Before comparison,
+we need source/label review and a separately versioned real-audio instrument that
+handles annotation uncertainty. No audio-driven candidate or retention run has begun.
+See the [preparation record](evidence/README.md) and [contract draft](contracts/research-contract-1-draft.md).
 
 Readable overview and complete evidence: [001 — Initial two-scale assessment](reports/001-initial-two-scale.html).
 
@@ -58,6 +58,8 @@ ledger row (`ledger.md#<row>`), or a findings write-up.
 | 7 | The runner reproduces the independent oracle record with sample-clock stamps and isolated chunks; complete-record prefix checks catch divergent output identities. | [Runner tests](bench/test/runner.test.ts) | holds | 2026-09-25 | F; silence-only futures cannot discriminate causality |
 | 8 | The available library snapshot supplies structural following candidates, but no source is ready to freeze without independent solo/route/precision and access evidence. | [Evidence inventory](research/evidence-inventory.md) | holds | 2026-09-25 | R1; no real-source qualification |
 | 9 | The first end-to-end clock run agrees with the independent predictions and exposes false following and tempo drift; this validates the instrument at the synthetic harness profile, not listening capability. | [First run](ledger.md#g001-clock-harness-v1), [prediction and reproduction checks](bench/test/first-run.test.ts), [instrument freeze](contracts/freeze.json) | holds | 2026-09-25 | G; research contract remains provisional |
+| 10 | The frozen v1 instrument cannot yet judge uncertain real-audio labels: its schema is generator-specific and its evaluator does not use annotation bounds. | [Contract prerequisite](contracts/research-contract-1-draft.md#instrument-prerequisite-and-activation), [v1 types](bench/src/types.ts), [v1 evaluator](bench/src/evaluate/index.ts) | holds | 2026-09-25 | A separate version is required before real comparisons |
+| 11 | The selected first four-bar windows map structurally and decode reproducibly, while independent score/audio and precision checks remain open; Dust has a later route mismatch. | [Preflight snapshot](evidence/initial-four-bars-preflight.json), [preparation record](evidence/README.md) | holds | 2026-09-25 | Human review pending, no real golden |
 
 ## Open questions
 
@@ -66,7 +68,7 @@ Ranked; the top row is the next question the driver asks. Status is `open`,
 
 | Rank | Question | Why it is ranked here | Status | Owner item |
 |---|---|---|---|---|
-| 1 | What device, tolerances and independently verified real evidence should the first human-approved research contract name? | The instrument is checked; qualification requires a separate approved contract and evidence beyond this synthetic profile | open | Subsequent plan, not started |
+| 1 | Can the user approve the draft numerical contract and independently check the selected four-bar source/label evidence? | Scope and sources are confirmed; playable review crops and a concrete draft now exist | in progress | [Real-evidence preparation](evidence/README.md) |
 | 2 | How has real-time score following been evaluated elsewhere, and do our ±0.25-quarter tolerance and 200 ms deadline sit inside those norms? | FIRST_STEP §10 question 1; answers whether the first contract's tolerances are defensible before anything is measured against them | answered (findings 1–2) | FIRST_STEP item A |
 | 3 | Is there a published trivial baseline for score following, so our clock floor can be compared with the usual one? | FIRST_STEP §10 question 2; decides whether the first ledger row has an external reference point | answered (findings 1–2) | FIRST_STEP item A |
 | 4 | Which library recordings and re-amplification opportunities are eligible real evidence for the following milestone, and with what anchor precision? | The structure document runs real evidence alongside the pipeline; without an answer the first human-approved contract cannot name its evidence supply | answered (finding 8; missing evidence explicit) | FIRST_STEP item R1 |

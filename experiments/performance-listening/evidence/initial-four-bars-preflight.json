@@ -1,0 +1,157 @@
+{
+  "version": 1,
+  "kind": "evidence-preparation",
+  "checkedAt": "2026-09-25T14:59:15.627Z",
+  "tools": {
+    "preflight": "551e36f18054caeba0693a0d967ae30bd269c53f0f7f3de503912d1530e94b87",
+    "prepare": "868a1f6534ae9b603da941e1b83adee334cecccbb701431ed5ce3b36df1af02e",
+    "ffprobe": "ffprobe version 8.0.1-3ubuntu2 Copyright (c) 2007-2025 the FFmpeg developers",
+    "ffmpeg": "ffmpeg version 8.0.1-3ubuntu2 Copyright (c) 2000-2025 the FFmpeg developers"
+  },
+  "limits": "Structural checks and decoded crop lengths only. ffprobe duration is container/stream metadata; each available review crop has a checked decoded sample count. No listening or anchor correction; nothing eligible; development preparation, no reserved access.",
+  "rows": [
+    {
+      "piece": "F2msc",
+      "recording": 1872366,
+      "title": "ABBA — The Winner Takes It All",
+      "name": "Video",
+      "mediaInfo": {
+        "sha256": "69e208a12506e04ac5117f9c7abf0b84f9adb765a631403bbc0bd268e3ca33b3",
+        "duration": 223.641,
+        "audioStreams": [
+          {
+            "codec_name": "opus",
+            "codec_type": "audio",
+            "sample_rate": "48000",
+            "channels": 2,
+            "start_time": "-0.007000"
+          }
+        ]
+      },
+      "remote": "https://www.youtube.com/watch?v=K643ZIiG-18",
+      "exportedDuration": null,
+      "issues": [],
+      "gaps": 0,
+      "eligible": false,
+      "downloadTool": "yt-dlp 2026.08.19",
+      "firstWindow": {
+        "performedBars": [
+          0,
+          4
+        ],
+        "startSeconds": 2.464,
+        "endSeconds": 11.97096781880188,
+        "durationSeconds": 9.50696781880188,
+        "anchorDerivedQuarterBpm": 100.97856838238299,
+        "structuralRangeFit": true,
+        "labelStatus": "unverified anchor proposal; no accepted intervals"
+      },
+      "score": {
+        "sha256": "5d6d05684894b113a88d318ed6a538dbf87d0e806c47ba794796190784408d8e",
+        "convertedSha256": "db689c645ed8c6ad2464210be8a30f35d4314450f8809ef939ffb1e49456167d",
+        "writtenBars": 75,
+        "performedBars": 91,
+        "issues": {}
+      },
+      "clip": {
+        "sha256": "be27e20e92f1eb98e94345f1865355d128f529a3330529f60024c22ca7eeeaf1",
+        "samples": 456334,
+        "sampleRate": 48000,
+        "fromSample": 118272,
+        "untilSample": 574606,
+        "sourceStartSeconds": 2.464,
+        "sourceEndSeconds": 11.970958333333334,
+        "status": "provisional review crop, not a golden or accepted interval",
+        "timeOrigin": "Decoded source sample zero; correspondence to cached video times still requires review"
+      },
+      "sidecarSha256": "364d561ab113a0657f49133c42fcc689104365d68bc8fae3a599b08600a36f0b",
+      "localMedia": true,
+      "anchorCount": 91,
+      "anchorRange": {
+        "seconds": [
+          2.464,
+          218.5195059256134
+        ],
+        "bars": [
+          0,
+          90
+        ]
+      },
+      "reviewPoints": 5,
+      "humanReview": "pending"
+    },
+    {
+      "piece": "qrpHc",
+      "recording": 1702681,
+      "title": "Sungha Jung — Dust In The Wind",
+      "name": "Video",
+      "mediaInfo": {
+        "sha256": "935587d1d93d9cbf63c94eb8edace1ea9a9ef3205294ee5557899ffd8904bcc8",
+        "duration": 216.941,
+        "audioStreams": [
+          {
+            "codec_name": "opus",
+            "codec_type": "audio",
+            "sample_rate": "48000",
+            "channels": 2,
+            "start_time": "-0.007000"
+          }
+        ]
+      },
+      "remote": "https://www.youtube.com/watch?v=6caUN3HLJSI",
+      "exportedDuration": 217,
+      "issues": [
+        "anchor 155: outside performed route",
+        "anchor 156: outside performed route"
+      ],
+      "gaps": 0,
+      "eligible": false,
+      "downloadTool": "yt-dlp 2026.08.19",
+      "firstWindow": {
+        "performedBars": [
+          0,
+          4
+        ],
+        "startSeconds": 9.032,
+        "endSeconds": 14.11188594277954,
+        "durationSeconds": 5.079885942779541,
+        "anchorDerivedQuarterBpm": 188.98062098510832,
+        "structuralRangeFit": true,
+        "labelStatus": "unverified anchor proposal; no accepted intervals"
+      },
+      "score": {
+        "sha256": "13a52cbbc25bf4ea1e9bafa50022c1920691c172445286c54612d021eed88f41",
+        "convertedSha256": "d7e00e0bae7b6000aab38bc1a31d75e40389f20cb429142828fce10557edd182",
+        "writtenBars": 128,
+        "performedBars": 154,
+        "issues": {}
+      },
+      "clip": {
+        "sha256": "03f182a7ebe6d6c4062047e628fbada7211fe06e0e92d1288929ced0ef76a138",
+        "samples": 243835,
+        "sampleRate": 48000,
+        "fromSample": 433536,
+        "untilSample": 677371,
+        "sourceStartSeconds": 9.032,
+        "sourceEndSeconds": 14.111895833333334,
+        "status": "provisional review crop, not a golden or accepted interval",
+        "timeOrigin": "Decoded source sample zero; correspondence to cached video times still requires review"
+      },
+      "sidecarSha256": "e333189ef299d9491734842027413abacdce845af532d47130b34dea0e07a23e",
+      "localMedia": true,
+      "anchorCount": 157,
+      "anchorRange": {
+        "seconds": [
+          9.032,
+          211.1406971144409
+        ],
+        "bars": [
+          0,
+          156
+        ]
+      },
+      "reviewPoints": 5,
+      "humanReview": "pending"
+    }
+  ]
+}
