@@ -28,8 +28,13 @@ export async function stopChrome(chrome, graceMs = 5000) {
   if (!chrome || chrome.exitCode !== null || chrome.signalCode !== null) return;
   const exited = new Promise(resolve => chrome.once('exit', resolve));
   chrome.kill();
-  const timer = new Promise(resolve => setTimeout(() => resolve('late'), graceMs));
-  if ((await Promise.race([exited, timer])) !== 'late') return;
+  // Cleared once Chrome is gone: a pending timer keeps node's event loop alive,
+  // and every smoke sat idle for the rest of the grace period before it exited.
+  let grace;
+  const timer = new Promise(resolve => { grace = setTimeout(() => resolve('late'), graceMs); });
+  const outcome = await Promise.race([exited, timer]);
+  clearTimeout(grace);
+  if (outcome !== 'late') return;
   chrome.kill('SIGKILL');
   await exited;
 }

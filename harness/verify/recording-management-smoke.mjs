@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import { Miniflare, convertV4MiniflareOptions } from 'miniflare';
 import { generateKeyPair, exportJWK, SignJWT } from 'jose';
 import { serveStatic } from './staticServer.mjs';
-import { devtoolsPort, connect, client, stopChrome } from './browserHarness.mjs';
+import { devtoolsPort, connect, client, stopChrome, until } from './browserHarness.mjs';
 const root=fileURLToPath(new URL('../../',import.meta.url));
 const {privateKey,publicKey}=await generateKeyPair('RS256');
 const jwk={...await exportJWK(publicKey),kid:'smoke',alg:'RS256',use:'sig'};
@@ -121,7 +121,8 @@ try {
     page.shadowRoot.querySelector('button[slot=title-action]').click();await page.updateComplete;check(!sheet()&&page.shadowRoot.querySelector('mnx-studio-edit-piece'),'Edit piece did not replace panel');
     return {audioId};
   })()`);
-  await c.send('Page.reload');await new Promise(r=>setTimeout(r,1200));
+  // Marked before the reload, so a page without the mark is the reloaded one (not the old one, still answering).
+  await c.evaluate('window.__beforeReload=true');await c.send('Page.reload');await until(c,'document.readyState==="complete"&&!window.__beforeReload',{timeoutMs:20000});
   const reloaded=await c.evaluate(`(async()=>{for(let i=0;i<100;i++){const page=document.querySelector('mnx-studio')?.shadowRoot?.querySelector('mnx-studio-piece'),p=page?.shadowRoot?.querySelector('mnx-player');if(p?.performance&&p.recordings.length===1)return p.recordings;await new Promise(r=>setTimeout(r,50));}return [];})()`);
   assert.equal(reloaded[0]?.id,result.audioId);assert.equal(reloaded[0]?.name,'Renamed take');assert.equal(reloaded[0]?.syncpoints.length,3);assert.equal(uploads,1);assert.ok(canonicalReads>=3);
   await c.send('Emulation.setDeviceMetricsOverride',{width:360,height:800,deviceScaleFactor:1,mobile:true});
@@ -130,7 +131,7 @@ try {
   assert.deepEqual(c.logs,[]);console.log('Recording management smoke OK',JSON.stringify({uploads,...result,reloaded:reloaded.length}));
 } catch(e) {if(c){const shot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync('/tmp/recording-management-failure.png',Buffer.from(shot.result.data,'base64'));}throw e;}
 finally {
-  if(c&&ws?.readyState===WebSocket.OPEN)await Promise.race([c.send('Browser.close'),new Promise(r=>setTimeout(r,1000))]);
+  if(c&&ws?.readyState===WebSocket.OPEN){let t;await Promise.race([c.send('Browser.close'),new Promise(r=>{t=setTimeout(r,1000);})]);clearTimeout(t);}
   ws?.close();await stopChrome(chrome,1000);
   proxy.closeAllConnections();await new Promise(r=>proxy.close(r));staticServer.server.closeAllConnections();await new Promise(r=>staticServer.server.close(r));await mf.dispose();await fs.promises.rm(profile,{recursive:true,force:true,maxRetries:10,retryDelay:100});
 }

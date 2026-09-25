@@ -92,7 +92,8 @@ try {
   await wait(`${chip}.textContent.trim().startsWith('1 edit unsaved')`);
   await c.evaluate(`[...${details}.querySelectorAll('button')].find(b => b.textContent === 'Undo').click()`);
   await wait(`${chip}.textContent.trim().startsWith('Saved ·') && ${chip}.dataset.save === 'clean'`);
-  await new Promise(r => setTimeout(r, 1500));
+  // Back on the saved document the recovery record is deleted — asynchronously, in IndexedDB.
+  for (let i = 0; i < 100 && (await record(pieceId)) !== null; i++) await new Promise(r => setTimeout(r, 50));
   assert.equal(await record(pieceId), null);
   assert.equal((await snapshot(pieceId)).piece.revision, second.piece.revision);
 

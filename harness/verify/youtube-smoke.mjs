@@ -6,7 +6,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import http from 'node:http';
 import { spawn } from 'node:child_process';
-import { devtoolsPort, connect, client, stopChrome } from './browserHarness.mjs';
+import { devtoolsPort, connect, client, stopChrome, settle } from './browserHarness.mjs';
 const root=path.resolve(import.meta.dirname,'../..'),live=process.argv.includes('--live'),format=process.env.MNX_EMBED_FORMAT??'esm';
 const headers=Object.fromEntries(fs.readFileSync(root+'/public/_headers','utf8').split('\n').filter(s=>s.startsWith('  ')).map(s=>{const at=s.indexOf(':');return [s.slice(0,at).trim(),s.slice(at+1).trim()];}));
 const fixture=JSON.parse(fs.readFileSync(root+'/scenarios/lab/20-tab-part/01-standard-tuning-both/document.mnx.json'));
@@ -109,7 +109,8 @@ try{
   await c.send('Input.dispatchMouseEvent',{type:'mousePressed',...b,button:'left',clickCount:1});await c.send('Input.dispatchMouseEvent',{type:'mouseReleased',...b,button:'left',clickCount:1});
  }else await c.evaluate(`test.player.play()`);
  await wait(`test.player.playback.state==='playing'`,15);
- await new Promise(r=>setTimeout(r,1000));
+ // The clock has to reach the repeat's second pass and light it: wait for that, not a second.
+ await wait(`test.viewer.playbackState.highlight.length>0&&test.player.scorePosition?.ordinal===1`,10);
  const playing=await c.evaluate(`({time:test.player.playback.mediaTime,ordinal:test.player.scorePosition?.ordinal,highlight:test.viewer.playbackState.highlight.length,rates:test.player.playback.capabilities.rate.values,issue:test.player.playback.issue})`);
  console.log('YouTube playing',JSON.stringify(playing));
  if(!playing.highlight||playing.ordinal!==1)throw new Error('YouTube clock did not follow the mapped repeat');
@@ -117,7 +118,7 @@ try{
  const sought=await c.evaluate(`({time:test.player.playback.mediaTime,ordinal:test.player.scorePosition?.ordinal,issue:test.player.playback.issue})`);console.log('YouTube seek',JSON.stringify(sought));
  if(sought.ordinal!==0)throw new Error('YouTube score seek failed');
  await c.evaluate(`test.frame.shadowRoot.querySelector('.video-divider').dispatchEvent(new KeyboardEvent('keydown',{key:'End'}))`);
- await c.send('Emulation.setDeviceMetricsOverride',{width:360,height:800,deviceScaleFactor:1,mobile:true});await new Promise(r=>setTimeout(r,300));
+ await c.send('Emulation.setDeviceMetricsOverride',{width:360,height:800,deviceScaleFactor:1,mobile:true});await settle(c);
  const mobile=await c.evaluate(`(()=>{const b=test.frame.shadowRoot.querySelector('iframe').getBoundingClientRect();return {width:b.width,height:b.height,bottom:b.bottom};})()`);
  if(mobile.width<200||mobile.width>270||mobile.height<200||mobile.bottom>800)throw new Error('Invalid narrow viewport '+JSON.stringify(mobile));
  await c.evaluate(`test.player.play()`);await wait(`test.player.playback.state==='playing'`);
@@ -151,7 +152,7 @@ try{
 }catch(error){if(c){const shot=await c.send('Page.captureScreenshot');if(shot.result?.data)fs.writeFileSync(`/tmp/youtube-${live?'live':format}-failure.png`,Buffer.from(shot.result.data,'base64'));}console.error('YouTube smoke FAILED',error.message);process.exitCode=1;}
 finally{
  // Ask Chrome to close itself first; stopChrome() takes it down if it has not.
- if(chrome.exitCode===null&&c&&ws?.readyState===WebSocket.OPEN)await Promise.race([c.send('Browser.close'),new Promise(r=>setTimeout(r,1000))]);
+ if(chrome.exitCode===null&&c&&ws?.readyState===WebSocket.OPEN){let t;await Promise.race([c.send('Browser.close'),new Promise(r=>{t=setTimeout(r,1000);})]);clearTimeout(t);}
  await stopChrome(chrome,2000);
  ws?.close();server.close();
  await fs.promises.rm(profile,{recursive:true,force:true,maxRetries:10,retryDelay:100});
