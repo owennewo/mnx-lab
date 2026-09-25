@@ -1,0 +1,35 @@
+{
+  "asDecided": {
+    "correct": 158,
+    "wrong": 0,
+    "overAmbiguous": 0,
+    "lost": 0,
+    "abstained": 0,
+    "uncovered": 0,
+    "falseFollowing": 0,
+    "correctRejection": 0,
+    "pending": 2,
+    "confidentPending": 2
+  },
+  "hindsight": {
+    "correct": 158,
+    "wrong": 0,
+    "overAmbiguous": 0,
+    "lost": 0,
+    "abstained": 0,
+    "uncovered": 0,
+    "falseFollowing": 0,
+    "correctRejection": 0,
+    "pending": 2,
+    "confidentPending": 2
+  },
+  "missedDeadlines": 0,
+  "exposureSeconds": 0,
+  "longestExposureSeconds": 0,
+  "liveLosses": [],
+  "latency": {
+    "mean": 0,
+    "p95": 0,
+    "max": 0
+  }
+}

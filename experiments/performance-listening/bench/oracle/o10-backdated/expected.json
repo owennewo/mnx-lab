@@ -1,0 +1,41 @@
+{
+  "asDecided": {
+    "correct": 8,
+    "wrong": 10,
+    "overAmbiguous": 0,
+    "lost": 0,
+    "abstained": 0,
+    "uncovered": 0,
+    "falseFollowing": 0,
+    "correctRejection": 0,
+    "pending": 2,
+    "confidentPending": 2
+  },
+  "hindsight": {
+    "correct": 10,
+    "wrong": 8,
+    "overAmbiguous": 0,
+    "lost": 0,
+    "abstained": 0,
+    "uncovered": 0,
+    "falseFollowing": 0,
+    "correctRejection": 0,
+    "pending": 2,
+    "confidentPending": 2
+  },
+  "missedDeadlines": 10,
+  "exposureSeconds": 0.5,
+  "longestExposureSeconds": 0.5,
+  "liveLosses": [
+    {
+      "start": 0.3,
+      "recoveredAt": 0.8,
+      "recoverySeconds": 0.5
+    }
+  ],
+  "latency": {
+    "mean": 0.055,
+    "p95": 0.3,
+    "max": 0.3
+  }
+}

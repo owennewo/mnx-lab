@@ -1,0 +1,27 @@
+[
+  {
+    "id": "p10",
+    "kind": "position",
+    "refersTo": 0.1,
+    "madeAt": 0.1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 10,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ],
+    "confidence": 1
+  },
+  {
+    "id": "u15",
+    "kind": "unsupported",
+    "refersTo": 0.15,
+    "madeAt": 0.15
+  }
+]

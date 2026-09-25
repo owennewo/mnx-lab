@@ -1,0 +1,250 @@
+[
+  {
+    "id": "p5",
+    "kind": "position",
+    "refersTo": 0.05,
+    "madeAt": 0.05,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 5,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ],
+    "confidence": 1
+  },
+  {
+    "id": "p10",
+    "kind": "position",
+    "refersTo": 0.1,
+    "madeAt": 0.1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 10,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ],
+    "confidence": 1
+  },
+  {
+    "id": "p15",
+    "kind": "position",
+    "refersTo": 0.15,
+    "madeAt": 0.15,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 15,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ],
+    "confidence": 1
+  },
+  {
+    "id": "p20",
+    "kind": "position",
+    "refersTo": 0.2,
+    "madeAt": 0.2,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 20,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ],
+    "confidence": 1
+  },
+  {
+    "id": "p25",
+    "kind": "position",
+    "refersTo": 0.25,
+    "madeAt": 0.25,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 25,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ],
+    "confidence": 1
+  },
+  {
+    "id": "old-wrong",
+    "kind": "position",
+    "refersTo": 0.3,
+    "madeAt": 0.3,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 500,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ],
+    "confidence": 1
+  },
+  {
+    "id": "live-wrong",
+    "kind": "position",
+    "refersTo": 0.4,
+    "madeAt": 0.4,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 500,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ],
+    "confidence": 1
+  },
+  {
+    "id": "backdated",
+    "kind": "position",
+    "refersTo": 0.3,
+    "madeAt": 0.6,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 30,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ],
+    "confidence": 1,
+    "supersedes": "old-wrong"
+  },
+  {
+    "id": "p80",
+    "kind": "position",
+    "refersTo": 0.8,
+    "madeAt": 0.8,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 80,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ],
+    "confidence": 1
+  },
+  {
+    "id": "p85",
+    "kind": "position",
+    "refersTo": 0.85,
+    "madeAt": 0.85,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 85,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ],
+    "confidence": 1
+  },
+  {
+    "id": "p90",
+    "kind": "position",
+    "refersTo": 0.9,
+    "madeAt": 0.9,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 90,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ],
+    "confidence": 1
+  },
+  {
+    "id": "p95",
+    "kind": "position",
+    "refersTo": 0.95,
+    "madeAt": 0.95,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 95,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ],
+    "confidence": 1
+  },
+  {
+    "id": "p100",
+    "kind": "position",
+    "refersTo": 1.0,
+    "madeAt": 1.0,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 100,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ],
+    "confidence": 1
+  }
+]

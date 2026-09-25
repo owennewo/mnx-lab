@@ -495,3 +495,13 @@ did not run experiment workspaces, so it now includes this suite and its disk in
 The production import boundary already excludes experiments. Endpoint and persistence
 semantics are explicit before oracle arithmetic; instrument contracts remain draft
 until G, and the research contract will remain provisional even then.
+
+### 2026-09-25 — B/C: instrument and reports
+
+Added following-evaluator@1 and eleven literal oracle records with handwritten
+expected counts and arithmetic tables. Both views, revision persistence, answerability,
+justified abstention, unknown evidence, confidence, loss/recovery and timeliness are
+exercised before any listener exists. Reports render from o4 and the o1/o4 pair,
+show failures before the summary and state the lack of independent-source intervals.
+The oracle makes the distinction between loss and wrong exposure concrete: unsupported
+on supported truth is a loss, while a backdated correction cannot erase live exposure.
