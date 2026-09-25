@@ -10,6 +10,7 @@ import type { MnxStructure } from '../../../../../src/model/mnx.ts';
 import { clockFollower, CLOCK_VERSION } from '../candidates/clockFollower.ts';
 import { spectralFollower1, SPECTRAL_1 } from '../candidates/spectralFollower1.ts';
 import { spectralFollower2 } from '../candidates/spectralFollower2.ts';
+import { onlineTimeWarp1, OLTW_1 } from '../candidates/onlineTimeWarp1.ts';
 import { evaluate } from '../evaluate/index.ts';
 import { readWav } from '../generate/wav.ts';
 import { EXPERIMENT, encode } from '../io.ts';
@@ -18,7 +19,7 @@ import { execute, machine } from '../run/runner.ts';
 import type { Decision, Listener, Tempo } from '../types.ts';
 import { asGolden, gates } from './goldens.ts';
 import { readProxySet, readRungSet, requireOutsideGit, sha } from './privateSets.ts';
-import { recognitionAtLabels } from './recognition.ts';
+import { recognitionAtLabels, recognitionOltw } from './recognition.ts';
 
 const [runId, slug, ladderDir, proxyDir] = process.argv.slice(2);
 if (!runId || !/^g\d{3}[a-z]?-[a-z0-9-]+$/.test(runId) || !slug || !/^\d{3}-[a-z0-9-]+$/.test(slug) || !ladderDir || !proxyDir) {
@@ -34,10 +35,11 @@ git('cat-file', '-e', `HEAD:${preregistration}`);
 const privateOut = join(requireOutsideGit(ladderDir), 'runs', runId), publicOut = join(EXPERIMENT, 'runs', runId);
 if (existsSync(privateOut) || existsSync(publicOut)) throw new Error('Run id exists; a run is never overwritten');
 
-const CANDIDATES: { id: string; factory: () => Listener; recognition?: 1 | 2 }[] = [
+const CANDIDATES: { id: string; factory: () => Listener; recognition?: 1 | 2 | 'oltw' }[] = [
   { id: CLOCK_VERSION, factory: clockFollower },
   { id: SPECTRAL_1, factory: spectralFollower1, recognition: 1 },
   { id: 'spectral-follower@2', factory: spectralFollower2, recognition: 2 },
+  { id: OLTW_1, factory: onlineTimeWarp1, recognition: 'oltw' },
 ];
 const rungDirs = readdirSync(ladderDir).filter(d => /^rung-\d+$/.test(d)).sort((a, b) => Number(a.slice(5)) - Number(b.slice(5)));
 if (!rungDirs.length) throw new Error('No built rung');
@@ -78,8 +80,10 @@ const rungs = rungDirs.map(dir => {
   const positive = manifest.examples.find(e => e.id === 'positive')!, wrong = manifest.examples.find(e => e.id === 'wrong-score')!;
   const recipe = positive.golden.audio.recipe;
   const recognition = CANDIDATES.filter(c => c.recognition).map(c => {
-    const r = recognitionAtLabels(readWav(readFileSync(positive.audioPath)), score(positive.scorePath), score(wrong.scorePath), c.recognition!,
-      seconds => recipe.fromQuarter + seconds * recipe.bpm / 60, recipe.bpm);
+    const audio = readWav(readFileSync(positive.audioPath)), at = (seconds: number) => recipe.fromQuarter + seconds * recipe.bpm / 60;
+    const r = c.recognition === 'oltw'
+      ? recognitionOltw(audio, score(positive.scorePath), score(wrong.scorePath), at, recipe.bpm)
+      : recognitionAtLabels(audio, score(positive.scorePath), score(wrong.scorePath), c.recognition!, at, recipe.bpm);
     recognitionRows[`${dir}/${c.id}`] = r.rows;
     return { candidate: c.id, ...r, rows: undefined };
   });
@@ -119,4 +123,4 @@ const summary = {
 };
 mkdirSync(publicOut, { recursive: true });
 writeFileSync(join(publicOut, 'summary.json'), encode(summary));
-console.log(JSON.stringify({ runId, cpuSeconds, rungs: rungs.map(r => ({ rung: r.rung, candidates: r.candidates.map(c => ({ candidate: c.candidate, passes: c.passes, examples: c.examples.map(e => ({ example: e.example, failed: e.gates.failed, ...Object.fromEntries(Object.entries(e.gates).filter(([k]) => !['pass', 'failed'].includes(k))) })) })), recognition: r.recognition.map(x => ({ candidate: x.candidate, nearest: x.nearestAcceptance, local: x.localAcceptance, nearbyWrong: x.nearbyWrongAcceptance, other: x.otherScoreAcceptance, margins: { ...x.margins, quantiles: undefined }, best: x.cutoff.best })) })), thermometer: thermometer.map(t => ({ candidate: t.candidate, examples: t.examples.map(e => ({ example: e.example, agreement: e.metrics.agreement, reproduces: e.reproducesExperiment002 })) })) }, null, 2));
+console.log(JSON.stringify({ runId, cpuSeconds, rungs: rungs.map(r => ({ rung: r.rung, candidates: r.candidates.map(c => ({ candidate: c.candidate, passes: c.passes, examples: c.examples.map(e => ({ example: e.example, failed: e.gates.failed, ...Object.fromEntries(Object.entries(e.gates).filter(([k]) => !['pass', 'failed'].includes(k))) })) })), recognition: r.recognition.map(x => ({ candidate: x.candidate, nearest: x.nearestAcceptance, local: x.localAcceptance, nearbyWrong: x.nearbyWrongAcceptance, other: x.otherScoreAcceptance, margins: { ...x.margins, quantiles: undefined }, best: 'cutoff' in x ? x.cutoff.best : null })) })), thermometer: thermometer.map(t => ({ candidate: t.candidate, examples: t.examples.map(e => ({ example: e.example, agreement: e.metrics.agreement, reproduces: e.reproducesExperiment002 })) })) }, null, 2));
