@@ -9,6 +9,7 @@ question are in [the research log](../RESEARCH_LOG.md), not here.
 | 001 | [Initial two-scale assessment](001-initial-two-scale.html) | [g001-clock-harness-v1](../runs/g001-clock-harness-v1/report.md) |
 | 002 | [Winner with sync interpolation](002-winner-sync-proxy.html) | [002a](../runs/g002a-spectral1-winner-sync-proxy/summary.json), [002b](../runs/g002b-spectral2-winner-sync-proxy/summary.json) |
 | 003 | [Recognition at supplied sync](003-recognition-at-sync.html) | [g003-recognition-at-sync](../runs/g003-recognition-at-sync/summary.json) |
+| 004 | [Rung 0: clean Winner](004-rung0-clean-winner.html) | [g004-rung0-clean-winner](../runs/g004-rung0-clean-winner/summary.json) |
 
 ## One experiment, one file
 
@@ -39,9 +40,11 @@ node experiments/performance-listening/reports/export-report.mjs 003        # on
 node experiments/performance-listening/reports/export-report.mjs --check    # verify without writing
 ```
 
-The shared exporter verifies every source hash that each registered run pins, then
-renders the summary and embeds each run's aggregate evidence. It uses Node built-ins
-only; its small Markdown reader supports headings, paragraphs, bullets and tables.
+The shared exporter checks every source hash a registered run pins against the commit
+that run recorded, so later edits to the same files never invalidate an earlier
+report. It then renders the summary and embeds each run's aggregate evidence. It uses
+Node built-ins only; its small Markdown reader supports headings, paragraphs, bullets
+and tables.
 
 Report 001 has a different layout, with the R1 evidence inventory embedded, and keeps
 its own exporter:

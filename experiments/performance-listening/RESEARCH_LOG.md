@@ -32,17 +32,15 @@ How to maintain it:
 
 ## Current state
 
-2026-09-25. Development now climbs a synthetic ladder before returning to real audio.
-[Development contract 1](contracts/development-contract-1.md) records the user's
-direction: render Winner's first four bars as exact, perfectly timed audio, fuzz it
-one axis at a time, and switch to real audio once one candidate passes the combined
-rung. Research contract 1 remains the qualification contract.
+2026-09-25. Development climbs a synthetic ladder before returning to real audio,
+under [development contract 1](contracts/development-contract-1.md). Rung 0, a clean
+and exactly timed rendering of Winner's first four bars, is built and frozen.
 
-No ladder rung has been built and no candidate has passed anything. The clock is the
-only floor; both spectral followers failed on the real clip in experiment 002, and
-experiment 003 traced part of that to static templates that tie with nearby positions.
-The planned attack-and-sequence experiment on real audio is abandoned, not tried. The
-next question is whether the frozen spectral followers can follow clean rung-0 audio.
+[Experiment 004](reports/004-rung0-clean-winner.html) ran every existing candidate on
+it. None passes. Both spectral followers fail on clean audio with an exact answer, so
+their tracking defect is not caused by real acoustics, and their template ties persist
+at exact alignment. The clock follows perfectly but cannot reject anything. The next
+question is whether the online time-warping comparator passes rung 0.
 
 ## Findings
 
@@ -70,7 +68,11 @@ ledger row (`ledger.md#<row>`), or a findings write-up.
 | 17 | The register/harmonic revision increases rejection and loses more correct following; smaller exposure and residuals among fewer claims do not establish improvement. | [Run 002b](ledger.md#g002b-spectral2-winner-sync-proxy), [pre-run hypothesis](research/spectral-revision-2.md) | holds | 2026-09-25 | Hypothesis contradicted; neither version passes, sub-batch closed |
 | 18 | Supplying approximate sync alignment does not rescue either frozen representation's positive confidence, and nearby competing positions often tie; scalar cutoff adjustment cannot separate those framewise cases reliably. | [Experiment 003](reports/003-recognition-at-sync.html), [run](ledger.md#g003-recognition-at-sync) | holds | 2026-09-25 | Privileged component diagnosis; does not rule out sequence-based disambiguation |
 | 19 | The fixed constant-offset sensitivity test does not rescue recognition; shared normalized template decay erases within-active-set decay cues. | [Sensitivity and template analysis](reports/003-recognition-at-sync.md#what-explains-the-ties-and-what-to-try-next), [frozen template code](bench/src/candidates/spectralFollower1.ts) | holds | 2026-09-25 | Does not certify sync precision or attribute every tie to one cause |
-| 20 | Neither spectral follower has been run on audio with exact labels, so experiment 002 cannot separate tracking defects from acoustic limits. | [Run g001](ledger.md#g001-clock-harness-v1) ran only the clock; [runs 002a/002b](ledger.md#g002a-spectral1-winner-sync-proxy) ran only the real clip | holds | 2026-09-25 | Motivates [development contract 1](contracts/development-contract-1.md) |
+| 20 | Neither spectral follower has been run on audio with exact labels, so experiment 002 cannot separate tracking defects from acoustic limits. | [Run g001](ledger.md#g001-clock-harness-v1) ran only the clock; [runs 002a/002b](ledger.md#g002a-spectral1-winner-sync-proxy) ran only the real clip | superseded | 2026-09-25 | Motivated [development contract 1](contracts/development-contract-1.md); superseded by finding 21, [run g004](ledger.md#g004-rung0-clean-winner) |
+| 21 | On clean, exactly timed rung-0 audio, both frozen spectral followers fail the following gates, so their tracking defect is not an acoustic effect. | [Run g004](ledger.md#g004-rung0-clean-winner), [report 004](reports/004-rung0-clean-winner.md#results) | holds | 2026-09-25 | Answers question 9; supersedes the premise of finding 20 |
+| 22 | Static-template ties with nearby wrong positions persist at exact alignment on pure sines, confirming they are structural. | [Report 004 recognition](reports/004-rung0-clean-winner.md#recognition-at-exact-labels) | holds | 2026-09-25 | Strengthens finding 19 |
+| 23 | A follower's control rejection on the real clip did not show discrimination: the same frozen follower rejects the wrong score far less often on clean audio, where it also recognises far more. | [Report 004](reports/004-rung0-clean-winner.md#what-this-changes), [run 002a](ledger.md#g002a-spectral1-winner-sync-proxy) | holds | 2026-09-25 | Read control rejection together with positive acceptance, never alone |
+| 24 | The development scoreboard reproduces experiment 002's real-clip metrics exactly for all three frozen candidates. | [Run g004 thermometer](runs/g004-rung0-clean-winner/summary.json) | holds | 2026-09-25 | The pipeline is deterministic |
 
 
 ## Open questions
@@ -81,10 +83,10 @@ is an identifier given when a question opens and never reused, so citations stay
 
 | Rank | Question | Why it is ranked here | Status | Owner item |
 |---|---|---|---|---|
-| 9 | Do the frozen spectral followers meet the following gates on rung 0, clean sine audio of Winner bars 1–4? | A failure on exact, clean audio is a tracking defect; it reinterprets 002 before any new candidate | open | [Development contract 1](contracts/development-contract-1.md#candidates) |
 | 10 | Does a causal online time-warping follower with onset-emphasised features pass rung 0 and the tempo rung? | The published standard method is the comparator every home-grown candidate faces; the tempo rung is where the clock floor breaks | open | [Development contract 1](contracts/development-contract-1.md#candidates) |
 | 11 | Which ladder rung first breaks the best candidate, and does recognition at supplied labels fail on that rung too? | Ranks the remaining rungs by the failure they expose | open | [Development contract 1](contracts/development-contract-1.md#the-ladder) |
 | 7 | Can independent source/label checks establish timing bounds for later formal qualification? | Still relevant to stronger claims; explicitly not required for current proxy development | open, deferred to qualification | [Real-evidence preparation](evidence/README.md) |
+| 9 | Do the frozen spectral followers meet the following gates on rung 0, clean sine audio of Winner bars 1–4? | A failure on exact, clean audio is a tracking defect; it reinterprets 002 before any new candidate | answered (findings 21–23) | [Development contract 1](contracts/development-contract-1.md#candidates) |
 | 8 | At supplied sync alignment, do the frozen templates discriminate the intended passage? | Separates component recognition/confidence from path-selection errors | answered (findings 18–19); diagnostic closed | [Experiment 003](reports/003-recognition-at-sync.html) |
 | 6 | Can the initial spectral follower or one harmonic/register revision improve control rejection without losing Winner following? | First fixed real-audio algorithm question | answered (findings 16–17); sub-batch stopped at its two-version limit | [Experiment 002](reports/002-winner-sync-proxy.html) |
 | 2 | How has real-time score following been evaluated elsewhere, and do our ±0.25-quarter tolerance and 200 ms deadline sit inside those norms? | FIRST_STEP §10 question 1; answers whether the first contract's tolerances are defensible before anything is measured against them | answered (findings 1–2) | FIRST_STEP item A |

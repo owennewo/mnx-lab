@@ -81,3 +81,109 @@ shape that evaluator already judges; only the recipe differs from sine-v1.
   next, and the comparator still follows.
 - **Either way**, the scoreboard records every gate for every example. A follower does
   not pass by passing on average.
+
+## Results
+
+Run [g004-rung0-clean-winner](../runs/g004-rung0-clean-winner/summary.json), on the
+pre-registration commit `2f17e836`. The rung-0 set `winner-ladder-rung0-v1` holds
+32 notes, at most two sounding at once, over 9.505 seconds at 101 BPM. It was frozen
+before the first candidate ran.
+
+**No candidate passes rung 0.** Both spectral followers fail on clean audio with an
+exact answer, so their failures in experiment 002 were not caused by the real
+recording alone. The decision rule fixed above applies: the next question is the
+online time-warping comparator on rung 0, before any revision of the spectral
+templates.
+
+### Rung 0, by example
+
+Each cell is the as-decided view over 189 answerable grid points. Failed gates are
+in bold.
+
+| Candidate | Example | Supported correct | Correct rejection | Exposure | Longest episode | Deadline missed | Failed gates |
+|---|---|---|---|---|---|---|---|
+| clock@1 | positive | 100% | — | 0% | 0 s | 0% | none |
+| clock@1 | wrong-score | — | **0%** | **100%** | **9.35 s** | **100%** | 4 |
+| clock@1 | silence | — | **0%** | **100%** | **9.35 s** | **100%** | 4 |
+| spectral@1 | positive | **79.9%** | — | 4.8% | 0.15 s | **20.1%** | 2 |
+| spectral@1 | wrong-score | — | **64.6%** | **35.8%** | **0.55 s** | **35.4%** | 4 |
+| spectral@1 | silence | — | 100% | 0% | 0 s | 0% | none |
+| spectral@2 | positive | **49.2%** | — | 0% | 0 s | **50.8%** | 2 |
+| spectral@2 | wrong-score | — | **77.8%** | **22.4%** | 0.5 s | **22.2%** | 3 |
+| spectral@2 | silence | — | 100% | 0% | 0 s | 0% | none |
+
+Coverage was 100% and every prefix causality check passed for every candidate and
+example. The heaviest processing was spectral@2 at about 6% of real time, with a
+per-chunk p99 of about 1.6 ms, well inside the cost gates.
+
+Spectral@1's positive failures are mostly rejections of correct following, not wrong
+positions:
+
+| spectral@1, positive | Grid points |
+|---|---|
+| Correct | 151 |
+| Lost: reported unsupported while following was supported | 29 |
+| Wrong: position outside ±0.25 quarter | 9 |
+| Separate loss episodes | 22 |
+
+Spectral@2 was never wrong on the positive example. All 96 of its failed points were
+losses, because its similarity to pure sines peaks near 0.78 and its median sits at
+the 0.65 cutoff.
+
+### Recognition at exact labels
+
+The experiment 003 measure, with the supplied position now exact. Each figure is over
+467 analysis frames.
+
+| Measure at the 0.65 cutoff | spectral@1 | spectral@2 |
+|---|---|---|
+| Template at the exact position accepted | 85.2% | 48.2% |
+| Best template within ±0.25 quarter accepted | 87.2% | 49.3% |
+| Strongest nearby wrong template accepted | 82.2% | 52.0% |
+| Strongest Dust template accepted | 42.6% | 23.6% |
+
+| Correct position against the strongest nearby wrong one | spectral@1 | spectral@2 |
+|---|---|---|
+| Strictly stronger | 39 | 44 |
+| Tied within 1e-9 | 313 | 296 |
+| Weaker | 115 | 127 |
+
+The best scalar cutoff that keeps each competitor at or below 5% accepts only 4.3%
+and 2.8% of the correct position.
+
+### Thermometer
+
+All three frozen candidates reproduced their experiment 002 metrics on the real
+Winner clip exactly, on all three examples. The pipeline is deterministic, and the
+thermometer carries no new information for frozen candidates.
+
+### Against the predictions
+
+| Prediction | Outcome |
+|---|---|
+| 1. The clock meets every accuracy gate on the positive example and fails both controls | **Held** |
+| 2. Spectral@1 beats its 46% real-clip agreement but fails the 95% gate; it rejects silence completely | **Held** at 79.9% |
+| 2. Spectral@1 rejects the wrong score on at least 90% of points | **Contradicted**: 64.6% |
+| 3. Spectral@2 follows worse than spectral@1 | **Held**: 49.2% against 79.9% |
+| 4. Exact-position acceptance rises above experiment 003's, yet ties and losses exceed half the frames | **Held**: ties and losses cover 91.6% and 90.6% of frames |
+| 5. The thermometer reproduces experiment 002 exactly | **Held** |
+
+### What this changes
+
+- **The tracking defect is established on clean audio.** A clean, exactly timed
+  rendering still loses spectral@1 on one point in five, so real-guitar acoustics
+  cannot be the whole explanation for experiment 002.
+- **The template ties are structural.** About two thirds of frames tie with a nearby
+  wrong position even with exact alignment and pure sines. This confirms the
+  normalisation explanation from experiment 003 rather than an acoustic or sync cause.
+- **The real clip's control rejection was not discrimination.** On the real clip,
+  spectral@1 rejected the wrong score 96% of the time. On clean audio it rejects it
+  only 65% of the time. The real clip lowered similarity to every template, correct
+  or not, so rejecting the wrong score there came from recognising almost nothing.
+  Control rejection must be read together with positive acceptance, never alone.
+
+### Next
+
+Build the causal online time-warping comparator from development contract 1 and run
+it on this frozen rung, with the same scoreboard. Rung 1, tempo, is built once a
+candidate passes rung 0.
