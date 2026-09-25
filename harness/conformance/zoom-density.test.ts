@@ -202,16 +202,17 @@ describe('zoom / density', () => {
         const ladder = ladderFor(mnx, widthSp);
         let missedChanges = 0;
         let flatRungs = 0;
-        let rung = ladder[0];
+        // The current rung's engraving is kept from when it was reached, not laid
+        // out again at every one of ~800 steps: the same comparison, half the layouts.
+        let rungEngraving = engraving(mnx, ladder[0], widthSp);
         for (let n = MIN_SPACE_SP * 100; n <= MAX_SPACE_SP * 100; n++) {
           const value = n / 100;
           const isRung = ladder.some(r => Math.abs(r - value) < 1e-9);
+          const here = engraving(mnx, value, widthSp);
           if (isRung) {
-            if (value !== ladder[0] && engraving(mnx, value, widthSp) === engraving(mnx, rung, widthSp)) {
-              flatRungs++;
-            }
-            rung = value;
-          } else if (engraving(mnx, value, widthSp) !== engraving(mnx, rung, widthSp)) {
+            if (value !== ladder[0] && here === rungEngraving) flatRungs++;
+            rungEngraving = here;
+          } else if (here !== rungEngraving) {
             missedChanges++;
           }
         }
