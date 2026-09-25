@@ -14,7 +14,9 @@ counting rules. They are written first, changed rarely, and versioned; a contrac
 change is an event after which earlier comparisons stand as history but are no
 longer comparable with new ones. **Contents** are everything
 that grows: golden sets, generators, sources, candidates, profiles, research notes and
-experiment records. A content change is a new row in a ledger.
+experiment records. A content change is a new row in a ledger. One piece is neither:
+the **research log** (piece 11) is the single file that is rewritten in place, because
+it states what is currently believed rather than what happened.
 
 The ordering below follows from one rule: exploratory examples may inform a draft
 contract, but a comparison used to retain a candidate requires a frozen one. Otherwise
@@ -190,9 +192,10 @@ responsibility is the loop driver: it selects the next question from measured fa
 ranked by the contract's priorities, initiates and applies web research, allocates
 experiment and evidence budgets, freezes a candidate before reserved evaluation,
 decides whether to continue, change direction or stop, and resumes an interrupted
-session from the ledger. It is a procedure the LLM executes with its state in the
-ledger, not necessarily a separate component. Its defining requirement is that every
-next action is traceable to the contract, the measured results and the recorded
+session from the research log (piece 11), which points it at the ledger rows that
+matter. It is a procedure the LLM executes with its state in the log and its history
+in the ledger, not necessarily a separate component. Its defining requirement is that
+every next action is traceable to the contract, the measured results and the recorded
 research, so that nobody has to read a report and decide.
 
 ### 10. Research notes
@@ -203,11 +206,31 @@ Each note records the source, its date or version, the claim, the conditions it 
 tested under, its limitations, whether the LLM is reporting or inferring, and the local
 experiment it motivates. Unsuccessful searches are notes too.
 
+### 11. Research log
+
+**Owns:** what is currently believed, and where a reader starts.
+
+The notes say what was read, the ledger says what was run and decided, and neither
+says what the experiment now knows. The research log does. It is one file at the top
+of the experiment, read first by a person or a resuming driver, and it holds three
+things: a **current state** of a few sentences, rewritten whenever an experiment
+lands; a **findings index**, one line per finding, each citing the note, ledger row or
+per-experiment write-up that supports it; and the **open questions**, ranked as the
+driver ranks them, so the next question is visible without reading a report.
+
+Three rules keep it honest. A finding cites its evidence or it is not a finding. A
+finding that later evidence contradicts is marked superseded, with the row that did
+it, and is never deleted, so the log carries the same history the ledger does.
+Numbers stay in the write-ups the findings cite; the log names the finding and points
+at the measurement, because a figure copied into a summary goes stale within days.
+The previous experiment's technique log is the precedent, and its header repeating
+figures that no longer held is the failure this rule prevents.
+
 ## Order of construction
 
 | Step | Pieces | Done when |
 |---|---|---|
-| Contracts | 1, 2, 9 (provisional contract), 10 | The vocabulary, interface and golden format are written and versioned; a provisional research contract names the labels, tolerances and delivery conditions the other pieces must support; provenance and research records exist |
+| Contracts | 1, 2, 9 (provisional contract), 10, 11 | The vocabulary, interface and golden format are written and versioned; a provisional research contract names the labels, tolerances and delivery conditions the other pieces must support; provenance and research records exist; the research log exists with its structure and no findings |
 | Instrument | 3, 4 | The evaluator passes its oracle and a report renders from an oracle case |
 | Pipeline | 5 (harness profile), 7, 8 (trivial baseline) | A run over the harness set produces a report the evaluator and oracle agree with, and the causality check passes |
 | Real evidence | 6 (library recordings, score perturbation) | Eligible solo library recordings are goldens with declared precision and unknown regions; a few are hand-checked; following controls exist on real audio |

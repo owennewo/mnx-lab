@@ -23,9 +23,10 @@ show that the instrument measures both correct following and false claims of
 following. Real-source preparation begins alongside the pipeline; audio-driven
 candidates and retention comparisons follow under an approved research contract.
 
-The first-step plan supplies the concrete work items and completion checks. The
-current state is planning: the new harness and its first measured report are still
-to be built.
+The first-step plan supplies the concrete work items and completion checks.
+[RESEARCH_LOG.md](RESEARCH_LOG.md) is where the experiment's current state lives: what
+is believed, on what evidence, and which question comes next. Read it before any
+ledger row or report, and read a report only when the log points you at it.
 
 Earlier work is retained in [archive/](archive/ARCHIVED.md) for reference when a
 specific question calls for it.

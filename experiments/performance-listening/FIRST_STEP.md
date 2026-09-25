@@ -285,11 +285,17 @@ document. This one exists so the other pieces have numbers to be built against:
 - **Budget for this step**: no candidate trials beyond the floor; web research is
   bounded to the two questions in §10.
 
-### 5.5 Research notes and ledger
+### 5.5 Research notes, ledger and log
 
 `research/` holds one note per source in the shape the structure document fixes;
 `ledger.md` holds one row per run. Both exist, empty apart from their headings, before
-the first line of bench code.
+the first line of bench code. [RESEARCH_LOG.md](RESEARCH_LOG.md) already exists and is
+the entry point: it states the current state, indexes findings with their evidence and
+ranks the open questions. Every item below that lands writes to it, in three ways: its
+ledger row is cited from any finding it supports, its learning in §12 is mirrored as a
+finding line or an open question, and the current-state paragraph is rewritten. The
+two research notes from §10 become its first findings, found or not found. Numbers
+stay in the run report the finding cites; the log points, it does not repeat.
 
 ## 6. Instrument: evaluator, oracle and report
 
@@ -393,7 +399,7 @@ wait for it.
 
 | Item | Delivers | Done when |
 |---|---|---|
-| **A. Contracts** | §5.1–§5.5 documents, `golden.schema.json`, empty `research/` and `ledger.md`, `bench/package.json` with `test`, `generate`, `freeze`, `run`, `report` scripts | The documents cross-reference each other, the schema validates a hand-written golden, and the two research questions in §10 have notes (found or not found) |
+| **A. Contracts** | §5.1–§5.5 documents, `golden.schema.json`, empty `research/` and `ledger.md`, `bench/package.json` with `test`, `generate`, `freeze`, `run`, `report` scripts | The documents cross-reference each other, the schema validates a hand-written golden, the two research questions in §10 have notes (found or not found), and `RESEARCH_LOG.md` indexes those notes as its first findings |
 | **B. Evaluator + oracle** | `bench/src/evaluate/`, eleven oracle cases with hand-worked counts | `bench test` passes the oracle; every counting rule in §5.3, including abstained, pending, confident pending and the persistence rule, is hit by at least one case |
 | **C. Report** | `bench/src/report/` | A report renders from `o4` and from the pair (`o1`, `o4`); a failing category is visible above the summary |
 | **D. Scores and set** | `s1`, `s2` documents; the five golden records without audio | `s2` validates against the pinned schema; the profile deviations in §3 and §4 are in the records; the partition registry says "development only" |
@@ -475,6 +481,8 @@ measured floor and not from an idea.
 ## 12. Progress and learnings
 
 Appended as items land. Each entry: date, item, what was done, what was learned that
-the next item should know.
+the next item should know. This log is per campaign; what it learns that outlives the
+campaign goes to [RESEARCH_LOG.md](RESEARCH_LOG.md) as a finding or an open question,
+with the ledger row as its evidence, in the same commit.
 
 _(empty)_
