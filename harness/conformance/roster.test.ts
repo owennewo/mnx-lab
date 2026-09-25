@@ -79,8 +79,8 @@ const next: RosterFile = {
 };
 
 describe('the roster is what the stored queries return', () => {
-  it('regenerates worker/models.json — UPDATE_ROSTER=1 only', () => {
-    if (!UPDATE) return;
+  // A generator, not a check: counted as skipped outside update mode, never as a pass.
+  it.runIf(UPDATE)('regenerates worker/models.json — UPDATE_ROSTER=1 only', () => {
     for (const row of built.trace) {
       report(
         `  ${row.lane}/${row.query}${row.duplicate ? ' (already taken)' : ''}: ` +

@@ -48,13 +48,12 @@ const MIRROR = 'spec/hello-world';
  */
 const GRAND = 'spec/grand-staff';
 
-const SAMPLES = [RICH, MIRROR, GRAND].filter(id => dirById.has(id));
+// Every sample must exist: a filter here once let one drop out of the corpus and
+// every loop below quietly test the rest.
+const SAMPLES = [RICH, MIRROR, GRAND];
+for (const id of SAMPLES) if (!dirById.has(id)) throw new Error(`json-view sample ${id} is not in the corpus`);
 
 describe('json view', () => {
-  it('has scenarios to test against', () => {
-    expect(SAMPLES.length, `neither ${RICH} nor ${MIRROR} is in the corpus`).toBeGreaterThan(0);
-  });
-
   describe('the text is exactly JSON.stringify', () => {
     // The pane advertises itself as the raw document. If the renderer ever
     // drifts — a key reordered, indentation changed, a number reformatted —
@@ -182,7 +181,6 @@ describe('json view', () => {
     }
 
     it('anchors a mirror document, where every key is positional', () => {
-      if (!dirById.has(MIRROR)) return;
       const view = buildJsonView(doc(MIRROR));
       // A spec mirror carries no ids, so nothing here can be anchored by one.
       const anchored = [...view.noteLineByKey.keys()];
