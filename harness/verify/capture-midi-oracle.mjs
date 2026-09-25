@@ -38,7 +38,7 @@ try {
     optimizeDeps: { noDiscovery: true },
     appType: 'custom',
   });
-  const { musescoreImportedEvidence } = await vite.ssrLoadModule('/harness/helpers/midiOracle.ts');
+  const { musescoreImportedEvidence, xmlEvidence } = await vite.ssrLoadModule('/harness/helpers/midiOracle.ts');
   const imports = new Set([
     'w3c/beams-inner-grace-notes',
     'w3c/jumps-dal-segno',
@@ -103,7 +103,11 @@ try {
     }
     manifest.cases.push({
       ...pair,
-      inputSha256: hash(fs.readFileSync(path.join(root, pair.xml))),
+      // Converter fixtures are our own XML: pin the music it carries, not its
+      // formatting (harness/conformance/midi-oracle.test.ts). Upstream W3C bytes keep a byte pin.
+      ...(pair.id.startsWith('converter/')
+        ? { inputEvidenceSha256: hash(Buffer.from(JSON.stringify(xmlEvidence(fs.readFileSync(path.join(root, pair.xml), 'utf8'))))) }
+        : { inputSha256: hash(fs.readFileSync(path.join(root, pair.xml))) }),
       midi: name,
       midiSha256: hash(bytes),
       ...imported,

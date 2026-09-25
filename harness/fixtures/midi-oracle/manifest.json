@@ -245,7 +245,7 @@
       "id": "converter/House-of-the-Rising-Sun",
       "xml": "converters/fixtures/House-of-the-Rising-Sun.xml",
       "mnx": "converters/fixtures/House-of-the-Rising-Sun.mnx.json",
-      "inputSha256": "f38c931731e7b105a742e75aab0cf3fee37722f62587c0ed0845f2055153bf08",
+      "inputEvidenceSha256": "f620ea4abdda37d640cc5bc76a8f79f05ff25ee44a09055abbce21dd4906445d",
       "midi": "converter--House-of-the-Rising-Sun.mid",
       "midiSha256": "7099a16f4ee19fe7b166d769e6f4ba3626fbb703e46c28a42771032c166acbdf"
     },
@@ -253,7 +253,7 @@
       "id": "converter/Sun-did-glide",
       "xml": "converters/fixtures/Sun-did-glide.xml",
       "mnx": "converters/fixtures/Sun-did-glide.mnx.json",
-      "inputSha256": "683ea7252eacc0bc51ccb5c173bb2a478be947bfcb5dc872decb1bff453cfa54",
+      "inputEvidenceSha256": "f62e72f8a6a06be0bdec20de634ded59cba859a5f480be593cc8da280fdaab67",
       "midi": "converter--Sun-did-glide.mid",
       "midiSha256": "eea12132eef909ea4f2b2f945d52bdd2c9d7a24db3717acbf211d26cc02c8c1b"
     },
@@ -261,7 +261,7 @@
       "id": "converter/Triplets-and-graces",
       "xml": "converters/fixtures/Triplets-and-graces.xml",
       "mnx": "converters/fixtures/Triplets-and-graces.mnx.json",
-      "inputSha256": "7c07292438975e40196b7d6eb80aa98cc2767287273e59cedd76afd9a49d2759",
+      "inputEvidenceSha256": "c7d56f683b98ed96254b8213dcfed238c1e1118a4cee0d99cef9d09bc99c5156",
       "midi": "converter--Triplets-and-graces.mid",
       "midiSha256": "6d2f857a12c60640699ec807ece8b5c2508b6a19ed644c7f5b0a0eae702bfa90"
     },
@@ -269,7 +269,7 @@
       "id": "converter/Vestapol",
       "xml": "converters/fixtures/Vestapol.xml",
       "mnx": "converters/fixtures/Vestapol.mnx.json",
-      "inputSha256": "a53fcb1c21b71de65baebd3a2833c9453db4d41b0999e628b852346166f3abf8",
+      "inputEvidenceSha256": "b12067561b49dda9a5281362d3b61445b96927d2285630507bd2b6eba5f65105",
       "midi": "converter--Vestapol.mid",
       "midiSha256": "04e34ce782389180b94d7a8b65a19a81441eed35c05ae593342ee4ad457e2ca5"
     }

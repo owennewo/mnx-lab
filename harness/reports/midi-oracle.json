@@ -5625,7 +5625,7 @@
         "finding": "The derived MusicXML serializes notation and TAB as separate sounding parts. MuseScore plays duplicate written pitches and realizes harmony symbols as additional accompaniment. MNX is a single-source score, so these extra notes are not normalized away.",
         "evidence": "Two MusicXML parts, one with a TAB clef, repeated note pitches, harmony elements, and additional simultaneous MIDI pitches. Derived XML is not an independent authoring oracle."
       },
-      "inputSha256": "f38c931731e7b105a742e75aab0cf3fee37722f62587c0ed0845f2055153bf08",
+      "inputEvidenceSha256": "f620ea4abdda37d640cc5bc76a8f79f05ff25ee44a09055abbce21dd4906445d",
       "mnxSha256": "2474c67f7eb25782ab53c33be95c07154c57fa0599b7fbe21905c8120a981fcd",
       "externalMidiSha256": "7099a16f4ee19fe7b166d769e6f4ba3626fbb703e46c28a42771032c166acbdf",
       "external": {
@@ -14252,7 +14252,7 @@
         "finding": "The derived MusicXML contains separate notation and TAB parts and MuseScore plays both, duplicating attacks. The MNX compiler plays the single-source score. No blanket pitch deduplication is applied.",
         "evidence": "MusicXML notation/TAB part split and raw MIDI duplicate pitch multiplicities."
       },
-      "inputSha256": "683ea7252eacc0bc51ccb5c173bb2a478be947bfcb5dc872decb1bff453cfa54",
+      "inputEvidenceSha256": "f62e72f8a6a06be0bdec20de634ded59cba859a5f480be593cc8da280fdaab67",
       "mnxSha256": "64034772a80f15e4fc20054ee32ca11a207b8aeed06ec40d321b9afbe52259ae",
       "externalMidiSha256": "eea12132eef909ea4f2b2f945d52bdd2c9d7a24db3717acbf211d26cc02c8c1b",
       "external": {
@@ -25874,7 +25874,7 @@
         "finding": "The exported notation and TAB parts both sound in MuseScore, so pitch multisets differ from the single-source MNX. This blocks direct grace/tuplet technique attribution for the full fixture until the input duplication is addressed.",
         "evidence": "Two MusicXML parts, TAB clef, and doubled MIDI note attacks. Unmatched groups are counted as failures, not excluded."
       },
-      "inputSha256": "7c07292438975e40196b7d6eb80aa98cc2767287273e59cedd76afd9a49d2759",
+      "inputEvidenceSha256": "c7d56f683b98ed96254b8213dcfed238c1e1118a4cee0d99cef9d09bc99c5156",
       "mnxSha256": "e228b043c8103174f80f1ce9166de85d0d93cc8f565a5ee6b7743e31f22e2dad",
       "externalMidiSha256": "6d2f857a12c60640699ec807ece8b5c2508b6a19ed644c7f5b0a0eae702bfa90",
       "external": {
@@ -26637,7 +26637,7 @@
         "finding": "MuseScore performs both notation and TAB parts of the derived XML and realizes its harmony symbols. The single-source MNX performance therefore differs in pitch multiplicity and added accompaniment. Harmonic and other technique comparisons are not independently attributable through this mismatched input.",
         "evidence": "MusicXML part split and harmony elements, with duplicate/additional pitches retained in raw MIDI."
       },
-      "inputSha256": "a53fcb1c21b71de65baebd3a2833c9453db4d41b0999e628b852346166f3abf8",
+      "inputEvidenceSha256": "b12067561b49dda9a5281362d3b61445b96927d2285630507bd2b6eba5f65105",
       "mnxSha256": "2e4341fee191330fb2682d6864fe6e5541ebc21a2a44feeccd1d2bb9bcceb0e7",
       "externalMidiSha256": "04e34ce782389180b94d7a8b65a19a81441eed35c05ae593342ee4ad457e2ca5",
       "external": {

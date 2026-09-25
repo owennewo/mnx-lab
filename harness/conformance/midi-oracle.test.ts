@@ -14,6 +14,11 @@ import {
 const dir = 'harness/fixtures/midi-oracle';
 const manifest = JSON.parse(fs.readFileSync(path.join(dir, 'manifest.json'), 'utf8'));
 const hash = (b: Uint8Array) => crypto.createHash('sha256').update(b).digest('hex');
+/** A converter fixture's XML is OURS, rewritten whenever the exporter's formatting
+ *  changes, and its byte hash was satisfied three times by editing it, with no
+ *  recapture. What the oracle depends on is the music the XML carries, so those
+ *  rows pin that; the W3C files are upstream bytes and keep their byte pin. */
+const evidenceHash = (xml: Uint8Array) => hash(Buffer.from(JSON.stringify(xmlEvidence(Buffer.from(xml).toString()))));
 const reportPath = 'harness/reports/midi-oracle.json';
 const attributions = JSON.parse(fs.readFileSync(path.join(dir, 'attributions.json'), 'utf8'));
 it('compares all 27 independent W3C pairs and four converter fixtures against pinned MuseScore evidence', () => {
@@ -24,7 +29,9 @@ it('compares all 27 independent W3C pairs and four converter fixtures against pi
   const rows = manifest.cases.map((row: any) => {
     const xml = fs.readFileSync(row.xml),
       bytes = fs.readFileSync(path.join(dir, row.midi));
-    expect(hash(xml), row.id + ' input changed: recapture the external tool').toBe(row.inputSha256);
+    if (row.inputEvidenceSha256)
+      expect(evidenceHash(xml), row.id + ' musical input changed: recapture the external tool').toBe(row.inputEvidenceSha256);
+    else expect(hash(xml), row.id + ' input changed: recapture the external tool').toBe(row.inputSha256);
     expect(hash(bytes), row.id + ' external recording hash').toBe(row.midiSha256);
     const doc = fs.readFileSync(row.mnx),
       compiled = compilePerformance(JSON.parse(doc.toString()));
@@ -62,7 +69,7 @@ it('compares all 27 independent W3C pairs and four converter fixtures against pi
       id: row.id,
       attribution,
       importedEvidence,
-      inputSha256: row.inputSha256,
+      ...(row.inputEvidenceSha256 ? { inputEvidenceSha256: row.inputEvidenceSha256 } : { inputSha256: row.inputSha256 }),
       mnxSha256: hash(doc),
       externalMidiSha256: row.midiSha256,
       external: {
