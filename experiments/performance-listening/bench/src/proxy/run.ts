@@ -1,0 +1,61 @@
+import { createHash } from 'node:crypto';
+import { execFileSync } from 'node:child_process';
+import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
+import type { MnxStructure } from '../../../../../src/model/mnx.ts';
+import type { Decision, Listener } from '../types.ts';
+import { clockFollower } from '../candidates/clockFollower.ts';
+import { spectralFollower1,SPECTRAL_1 } from '../candidates/spectralFollower1.ts';
+import { execute, machine } from '../run/runner.ts';
+import { readWav } from '../generate/wav.ts';
+import { encode, EXPERIMENT } from '../io.ts';
+import { evaluateProxy, type ProxyReference } from './reference.ts';
+const [setArg,runId,version='1']=process.argv.slice(2);
+if(!setArg||!runId||!/^g002[a-z]-[a-z0-9-]+$/.test(runId)||!['1','2'].includes(version))throw new Error('Usage: tsx proxy/run.ts <private-set-dir> <g002a-run-id> [1|2]');
+const set=resolve(setArg),sha=(b:Buffer|string)=>createHash('sha256').update(b).digest('hex'),bytes=readFileSync(join(set,'manifest.json'));
+if(JSON.parse(readFileSync(join(set,'freeze.json'),'utf8')).sha256!==sha(bytes))throw new Error('Frozen set changed');
+const manifest=JSON.parse(bytes.toString('utf8')) as {id:string;partition:string;nominalBpm:number;nominalRaw:number;assets:Record<string,string>;examples:{id:string;scorePath:string;audioPath:string;reference:ProxyReference}[]};
+if(manifest.partition!=='development')throw new Error('Proxy runner only accepts development');
+for(const [path,hash] of Object.entries(manifest.assets))if(sha(readFileSync(path))!==hash)throw new Error('Frozen asset changed');
+const repo=join(EXPERIMENT,'../..'),git=(...args:string[])=>execFileSync('git',args,{cwd:repo,encoding:'utf8'}).trim();
+if(git('status','--porcelain','--','experiments/performance-listening/bench/src','src/audio','src/model','experiments/performance-listening/contracts/sync-proxy-development-1.md'))throw new Error('Commit code and development policy before running');
+const out=join(set,'runs',runId),publicOut=join(EXPERIMENT,'runs',runId);if(existsSync(out)||existsSync(publicOut))throw new Error('Run ID exists');
+const historyPath=join(dirname(set),'sync-proxy-batch.json');
+const history=existsSync(historyPath)?JSON.parse(readFileSync(historyPath,'utf8')):{candidateVersions:[],assessments:0,cpuSeconds:0,runs:[]};
+if(history.runs.some((r:{status:string})=>r.status!=='complete'))throw new Error('Resolve the preserved incomplete run before continuing');
+const candidateId=version==='1'?SPECTRAL_1:'spectral-follower@2';
+const createCandidate:()=>Listener=version==='1'?spectralFollower1:(await import(new URL('../candidates/'+'spectralFollower2.ts',import.meta.url).href)).spectralFollower2;
+if(history.assessments+2>4||history.cpuSeconds>=7200||new Set([...history.candidateVersions,candidateId]).size>2)throw new Error('First sub-batch budget exhausted');
+history.candidateVersions=[...new Set([...history.candidateVersions,candidateId])];history.assessments+=2;history.runs.push({runId,candidate:candidateId,status:'started',cpuSeconds:0});writeFileSync(historyPath,encode(history));
+mkdirSync(out,{recursive:true});const startCpu=process.cpuUsage();
+try{
+ const records:Record<string,unknown>={},details:Record<string,unknown>={};
+ const run=(id:string,factory:()=>Listener)=>({id,examples:manifest.examples.map(example=>{
+  const score=JSON.parse(readFileSync(example.scorePath,'utf8')) as MnxStructure,pcm=readWav(readFileSync(example.audioPath)),tempo={bpm:manifest.nominalBpm,unit:'quarter' as const};
+  const executed=execute(factory,score,tempo,pcm),checks=[];
+  for(const fraction of [.25,.5,.75])for(const kind of ['silence','alternating']){
+   const sample=Math.floor(pcm.length*fraction),future=pcm.slice();for(let i=sample;i<future.length;i++)future[i]=kind==='silence'?0:(i%2?.125:-.125);
+   const changed=execute(factory,score,tempo,future),prefix=(r:Decision[])=>r.filter(d=>d.madeAt<=sample/48000);
+   checks.push({fraction,kind,pass:JSON.stringify(prefix(executed.record))===JSON.stringify(prefix(changed.record))});
+  }
+  const evaluation=evaluateProxy(example.reference,executed.record);records[`${id}/${example.id}`]=executed.record;details[`${id}/${example.id}`]=evaluation;
+  const m=evaluation.summary;
+  const targets={agreement:m.agreement>=.95,coverage:m.coverage>=.98,exposure:m.wrongReferenceExposure<=.05,longestExposure:m.longestWrongReferenceSeconds<=.5,deadline:m.deadlineMisses<=.1,causality:checks.every(c=>c.pass),sustained:executed.cost.sustainedRatio<=.25,chunkP99:executed.cost.p99Ms<=10};
+  return {example:example.id,referenceKind:example.reference.kind,referenceUncertainty:example.reference.uncertainty,metrics:m,cost:executed.cost,causality:checks,targets};
+ })});
+ const comparator=run('clock-follower@1',clockFollower),candidate=run(candidateId,createCandidate);
+ const mean=(r:typeof comparator)=>{const source=r.examples.filter(e=>e.referenceKind!=='digital-silence'),silence=r.examples.filter(e=>e.referenceKind==='digital-silence');return (source.reduce((s,e)=>s+e.metrics.wrongReferenceExposure,0)/source.length+silence.reduce((s,e)=>s+e.metrics.wrongReferenceExposure,0)/silence.length)/2;};
+ const baseExposure=mean(comparator),candidateExposure=mean(candidate),absolute=baseExposure-candidateExposure,relative=baseExposure?absolute/baseExposure:null;
+ const regressions=candidate.examples.map((e,i)=>({example:e.example,agreement:e.metrics.agreement-comparator.examples[i]!.metrics.agreement,deadline:e.metrics.deadlineMisses-comparator.examples[i]!.metrics.deadlineMisses}));
+ const allTargets=candidate.examples.every(e=>Object.values(e.targets).every(Boolean)),gain=absolute>=.05&&relative!==null&&relative>=.25,noRegression=regressions.every(r=>r.agreement>=-.02&&r.deadline<=.02);
+ const decision=allTargets&&gain&&noRegression?'proxy-targets-met':'proxy-targets-not-met';
+ const cpu=process.cpuUsage(startCpu),cpuSeconds=(cpu.user+cpu.system)/1e6;
+ const files=(dir:string):string[]=>readdirSync(dir,{withFileTypes:true}).flatMap(d=>d.isDirectory()?files(join(dir,d.name)):[join(dir,d.name)]);
+ const pinned=[...files(join(EXPERIMENT,'bench/src')),join(EXPERIMENT,'contracts/sync-proxy-development-1.md')];
+ const sourceHashes=Object.fromEntries(pinned.map(path=>[path.slice(EXPERIMENT.length),sha(readFileSync(path))]));
+ const summary={id:runId,kind:'approximate-sync-development',policy:'sync-proxy-development-1',referencePrecision:'unmeasured; sync interpolation accepted by the user for development',set:manifest.id,setSha256:sha(bytes),nominalBpm:manifest.nominalBpm,nominalRaw:manifest.nominalRaw,gitCommit:git('rev-parse','HEAD'),sourceHashes,machine:machine(),comparator,candidate,comparison:{baseExposure,candidateExposure,absolute,relative,regressions,allTargets,gain,noRegression,decision},cpuSeconds,next:allTargets?'Apply the same frozen candidate to Dust before any bar expansion.':'Inspect the recorded failures; at most one focused revision remains in this first sub-batch.',formalRetention:'not assessed',microphoneQualification:'not assessed'};
+ writeFileSync(join(out,'records.json'),encode(records));writeFileSync(join(out,'evaluations.json'),encode(details));writeFileSync(join(out,'summary.json'),encode(summary));
+ mkdirSync(publicOut,{recursive:true});writeFileSync(join(publicOut,'summary.json'),encode({...summary,privateRecordsSha256:sha(readFileSync(join(out,'records.json'))),privateEvaluationsSha256:sha(readFileSync(join(out,'evaluations.json')))}));
+ history.cpuSeconds+=cpuSeconds;Object.assign(history.runs.at(-1),{status:'complete',cpuSeconds,decision});writeFileSync(historyPath,encode(history));
+ console.log(JSON.stringify({runId,candidate:candidateId,results:candidate.examples.map(e=>({example:e.example,...e.metrics,failedTargets:Object.keys(e.targets).filter(k=>!e.targets[k as keyof typeof e.targets])})),comparison:summary.comparison,cpuSeconds},null,2));
+}catch(error){const cpu=process.cpuUsage(startCpu),cpuSeconds=(cpu.user+cpu.system)/1e6;history.cpuSeconds+=cpuSeconds;Object.assign(history.runs.at(-1),{status:'infrastructure-failure',cpuSeconds,error:String(error)});writeFileSync(historyPath,encode(history));writeFileSync(join(out,'failure.json'),encode(history.runs.at(-1)));throw error;}
