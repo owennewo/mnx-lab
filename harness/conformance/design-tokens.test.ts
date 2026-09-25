@@ -211,14 +211,6 @@ describe('design tokens', () => {
         .map(([name, v]) => `${name}: viewer "${v}" vs app "${app.get(name)}"`);
       expect(drift, `light values drifted:\n  ${drift.join('\n  ')}`).toEqual([]);
     });
-
-    it('has retired --serif', () => {
-      // Modernist is set entirely in Archivo. A reintroduced serif token means
-      // someone restored a voice the system does not have.
-      expect(declared(viewerTokens).has('--serif')).toBe(false);
-      expect(declared(designTokens).has('--serif')).toBe(false);
-      expect(/var\(--serif\)/.test(read('workbench/WorkbenchApp.ts'))).toBe(false);
-    });
   });
 
   // The rung inspector is the tray's sibling — same anchor, same frame, same

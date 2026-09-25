@@ -35,18 +35,37 @@ it('declares one identity for the installed app, scoped to studio', () => {
   expect(manifest.short_name.length).toBeLessThanOrEqual(12);
 });
 
+/** oklch() → sRGB bytes, so the stylesheet's grounds can be held to theme.ts's hexes. */
+function oklchToRgb(L: number, C: number, h: number): number[] {
+  const a = C * Math.cos((h * Math.PI) / 180), b = C * Math.sin((h * Math.PI) / 180);
+  const l = (L + 0.3963377774 * a + 0.2158037573 * b) ** 3;
+  const m = (L - 0.1055613458 * a - 0.0638541728 * b) ** 3;
+  const s = (L - 0.0894841775 * a - 1.291485548 * b) ** 3;
+  return [
+    4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s,
+    -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s,
+    -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s,
+  ].map(v => Math.round(255 * (v <= 0.0031308 ? 12.92 * v : 1.055 * v ** (1 / 2.4) - 0.055)));
+}
+const rgb = (hex: string) => [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16));
+
 it('paints the splash and the status bar in studio.css colours', () => {
-  const css = fs.readFileSync(path.resolve('apps/studio/studio.css'), 'utf8');
+  // Read, not hardcoded: three files state the same two grounds, and the test
+  // holds them to each other rather than keeping a fourth copy of the palette.
   const theme = fs.readFileSync(path.resolve('apps/studio/src/theme.ts'), 'utf8');
+  const css = fs.readFileSync(path.resolve('apps/studio/studio.css'), 'utf8');
+  const hexes = Object.fromEntries([...theme.matchAll(/\b(light|dark): '(#[0-9a-f]{6})'/g)].map(m => [m[1], m[2]]));
+  expect(Object.keys(hexes).sort()).toEqual(['dark', 'light']);
   // The manifest can carry only ONE colour, so it takes the light ground; the
   // dark one is reachable only through the meta element theme.ts rewrites.
-  expect(manifest.background_color).toBe('#f3f2f1');
-  expect(manifest.theme_color).toBe('#f3f2f1');
-  expect(theme).toContain("light: '#f3f2f1'");
-  expect(theme).toContain("dark: '#141211'");
-  // studio.css states those same two grounds in oklch(); if it is retuned, the
-  // hexes here and in the manifest are what go stale.
-  expect(css).toContain('light-dark(oklch(0.962 0.002 60), oklch(0.185 0.004 60))');
+  expect(manifest.background_color).toBe(hexes.light);
+  expect(manifest.theme_color).toBe(hexes.light);
+  // studio.css states the grounds in oklch(); retuning it without the hexes is the drift.
+  const ground = /background: light-dark\(oklch\(([\d.]+) ([\d.]+) ([\d.]+)\), oklch\(([\d.]+) ([\d.]+) ([\d.]+)\)\)/.exec(css);
+  expect(ground, 'studio.css states its ground as light-dark(oklch(), oklch())').not.toBeNull();
+  const [l1, c1, h1, l2, c2, h2] = ground!.slice(1).map(Number);
+  expect(oklchToRgb(l1, c1, h1)).toEqual(rgb(hexes.light));
+  expect(oklchToRgb(l2, c2, h2)).toEqual(rgb(hexes.dark));
   expect(html).toContain('<meta name="theme-color"');
 });
 
