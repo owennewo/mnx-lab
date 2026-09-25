@@ -53,7 +53,7 @@ export async function checkPlayer(cdp, base, format) {
         'Preset not loaded from artifact origin: '+preset);
       {const after=player.position;check(after.num*before.den>=before.num*after.den,'Preset reset playback position: '+preset+' from '+before.num+'/'+before.den+' to '+after.num+'/'+after.den+', then '+player.position.num+'/'+player.position.den+' on a second read (state '+player.snapshot?.state+', rate '+player.snapshot?.rate+', wants '+player.playback?.wantsPlayback+')');}
     }
-    player.pause();const frozen=player.position;await delay(60);check(player.position.num===frozen.num && player.position.den===frozen.den,'Pause did not freeze');
+    player.pause();const frozen=player.position;await delay(60);{const now=player.position;check(now.num===frozen.num && now.den===frozen.den,'Pause did not freeze');}
     const rate=player.shadowRoot.querySelector('input[aria-label="Playback rate"]');rate.value='1.5';rate.dispatchEvent(new Event('input'));await player.updateComplete;check(player.snapshot.rate===1.5,'Rate control did not reach transport');
     const volume=player.shadowRoot.querySelector('input[aria-label="Volume"]');volume.value='0';volume.dispatchEvent(new Event('input'));await player.play();
     const replaced=structuredClone(doc);replaced.id='replacement';binding.setDocument(replaced);await player.updateComplete;await delay(80);

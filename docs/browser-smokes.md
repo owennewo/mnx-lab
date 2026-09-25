@@ -97,6 +97,15 @@ group, and a job still running after 300 s (`--timeout S`) is killed with everyt
 started. Ctrl+C reaches the runner only, which kills the groups it started and removes
 their temp directories.
 
+### Read a live value once
+
+`player.position` is a getter over the running clock, and a rational comes back
+reduced — `…/1048576` one moment, `…/16384` the next. `player.position.num * b.den >=
+b.num * player.position.den` read it twice, paired one position's numerator with
+another's denominator, and failed about one gate run in ten on a comparison of
+nonsense: `embed`'s "Preset reset playback position", chased for a day as a player bug.
+Take `const p = player.position` and compare `p`.
+
 ### Shadow roots move
 
 An element the smoke reaches by `page.shadowRoot.querySelector(...)` may have
