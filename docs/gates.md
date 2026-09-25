@@ -14,7 +14,7 @@ everything regardless. The rule is `planGate()`, pure and pinned by
 | the diff touches | tests | build | smokes |
 |---|---|---|---|
 | only prose, plans, agent config (`roadmap/`, `research/`, `.claude/`, `*.md`) | none | none | none |
-| prose a test reads (`docs/`, `README.md`, `CLAUDE.md`) | the link and keymap checks | none | none |
+| prose a test reads (`docs/`, `README.md`, `CLAUDE.md`) | the link check | none | none |
 | data read from disk (below) | **all** (`npm test`) | yes | by area |
 | code (`src/`, `apps/`, `worker/`, `converters/`, `harness/`, `tools/`, `experiments/`) | what imports it (`vitest --changed`) + the source readers | yes | by area |
 | anything else | **all** | yes | **all** |

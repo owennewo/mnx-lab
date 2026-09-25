@@ -15,7 +15,7 @@ it('prose and plans run nothing', () => {
   expect(plan.build).toBe(false);
   expect(plan.smokes).toEqual([]);
 });
-it('prose a test reads runs the link and keymap checks, and nothing else', () => {
+it('prose a test reads runs the link check, and nothing else', () => {
   const plan = planGate(['docs/browser-smokes.md', 'CLAUDE.md']);
   expect(plan.tests.mode).toBe('files');
   expect(plan.tests.files).toEqual(expect.arrayContaining(['harness/conformance/local-markdown-links.test.ts']));

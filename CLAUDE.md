@@ -35,6 +35,7 @@ npm run check:scenarios    # corpus police
 npm run verify:scenarios   # attention queue / approval writer — drive via /verify
 npm run update:primitives  # regenerate layout goldens; keeps statuses honest
 npm run update:roundtrip-register   # what a .gp save loses, remeasured; git diff is the review
+npm run report:roundtrip-library -- <dir> <out.json>   # the same, over a private .gp library, reported outside the repo
 npm run sync:spec          # pinned spec fixture → scenarios/spec/ (owns that tree)
 npm run push:proposal -- <topic>   # inject a topic's evidence into the proposal branch
 npm run update:roster      # worker/models.query.json → worker/models.json (stored queries)
@@ -394,8 +395,10 @@ records the measured Guitar Pro storage losses. Six traps, all of which have bit
   must discount it. Its **date is opt-in** (`--encoding-date`): derived files are
   committed, and a timestamp makes every regeneration a diff.
 
-CLI: `npx musicxml-mnx|guitarpro-mnx --import|--export <file> [--output out] [--encoding-date]` (derived
-output names refuse to overwrite).
+CLI: `npx --no -- musicxml-mnx|guitarpro-mnx --import|--export <file> [--output out] [--encoding-date]`
+(derived output names refuse to overwrite). The `--` matters: without it npm keeps
+`--import`/`--output` for itself and the CLI prints its usage. The bin is the built
+`dist/cli.js`, so build the package first in a fresh worktree.
 
 ## Conventions
 

@@ -32,8 +32,9 @@ export const SOURCE_READERS = [
   'architecture-boundaries', 'audio-boundary', 'converter-matrix',
   'design-tokens', 'app-icons', 'smoke-runner',
 ].map(name => `harness/conformance/${name}.test.ts`);
-// The only tests that read prose: the link check and the keymap cheatsheet.
-const MARKDOWN_TESTS = ['local-markdown-links', 'keymap-docs'].map(name => `harness/conformance/${name}.test.ts`);
+// The only test that reads prose: the link check. (keymap-docs was listed too,
+// but reads no markdown — it is reached by import like any other.)
+const MARKDOWN_TESTS = ['local-markdown-links'].map(name => `harness/conformance/${name}.test.ts`);
 const MARKDOWN_READ = /^(docs\/|README\.md$|CLAUDE\.md$|apps\/[^/]+\/README\.md$)/;
 // Prose, plans and agent configuration: nothing builds, imports or reads them.
 const INERT = /^(docs\/|roadmap\/|research\/|\.claude\/)|^[^/]+\.md$|^apps\/[^/]+\/README\.md$|^\.gitignore$|^\.dev\.vars\.example$/;
@@ -94,7 +95,7 @@ export function planGate(files, { full = false } = {}) {
     reasons.push('code changed: the tests that import it, plus the source readers');
   } else if (markdown.length) {
     tests = { mode: 'files', files: MARKDOWN_TESTS };
-    reasons.push('prose read by tests changed: the link and keymap checks only');
+    reasons.push('prose read by tests changed: the link check only');
   } else {
     tests = { mode: 'none' };
     reasons.push('nothing any test reads changed');
