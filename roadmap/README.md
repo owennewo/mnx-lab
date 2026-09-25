@@ -275,16 +275,6 @@ back up to `proposed/` the moment it is.
   zoom button. The segments are stored as the sync's `provenance` beside the derived
   one-point-per-bar tuples — no migration. Ramps, the beat-unit control and creating bars
   from a sync are named out of scope.
-- **[studio-installable-app.md](inprogress/studio-installable-app.md)** — **built 2026-09-24**,
-  awaiting the device check: studio installs as a real app rather than a bookmark shortcut
-  — a manifest and a drawn icon set (fret 0 on the open string), a `theme-color` that
-  follows the tri-state toggle including a pinned choice, and **the screen held awake while
-  anything plays** (`elements/screenWakeLock.ts`, so the workbench and the embed get it
-  too). Two findings the conformance test now pins: manifest icons are fetched
-  **server-side by Google's WebAPK minting service with no Access cookie**, so they cannot
-  live under `/studio/`; and round line caps reach past their endpoints, which had the mark
-  11px outside the maskable safe circle. Media session, offline and share target were
-  assessed and declined — reasons in the doc.
 - **[studio-shell.md](inprogress/studio-shell.md)** — **studio started, built 2026-09-11**,
   awaiting the deployed checks: a Lit shell in `apps/studio/` at `/studio/` on the same
   Worker (a new dependency-cruiser leaf over `elements/` + `storage/`), the root redirected
@@ -525,6 +515,18 @@ back up to `proposed/` the moment it is.
   2026-08-24 — both never-seen rather than demoted, so the stale count is unchanged.
 
 ### complete/
+
+- **[studio-installable-app.md](complete/studio-installable-app.md)** — **complete 2026-09-25**:
+  studio installs as a real app rather than a bookmark shortcut — a manifest and a drawn
+  icon set (fret 0 on the open string), a `theme-color` that follows the tri-state toggle
+  including a pinned choice, and **the screen held awake while anything plays**
+  (`elements/screenWakeLock.ts`, so the workbench and the embed get it too). Two findings
+  the conformance test pins: manifest icons are fetched **server-side by Google's WebAPK
+  minting service with no Access cookie**, so they cannot live under `/studio/`; and round
+  line caps reach past their endpoints, which had the mark 11px outside the maskable safe
+  circle. Device-checked on Android. Media session, offline and share target were assessed
+  and declined; so was suppressing fullscreen in standalone to dodge Android's
+  immersive-mode toast — **the owner wants the status bar gone**, toast included.
 
 - **[core-musicxml-write-gaps.md](complete/core-musicxml-write-gaps.md)** — item 23: resolve missing title metadata for imported Studio versions and expose representable numeric meter ranges.
 
