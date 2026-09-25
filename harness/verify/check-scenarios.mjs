@@ -125,6 +125,18 @@ export function formatError(err) {
   return `${err.instancePath || '/'} [${err.schemaPath}] ${err.message}`;
 }
 
+/** Every note in a sequence's content, INSIDE containers too: a tuplet, a grace
+ *  group or a tremolo holds events in its own `content`, and a walk that stops
+ *  at the top level passes a bad note extension in any of them unchecked.
+ *  Structural rather than by container type, so a container MNX adds later is
+ *  covered without anyone remembering to list it. */
+export function* notesWithin(items) {
+  for (const item of Array.isArray(items) ? items : []) {
+    for (const note of item?.notes ?? []) yield note;
+    if (Array.isArray(item?.content)) yield* notesWithin(item.content);
+  }
+}
+
 /** Computes the `_x.mnxLab` verdict: 'n/a' when nothing carries one, else valid/invalid + errors. */
 export function computeExtensionVerdict(doc, ctx) {
   const errors = [];
@@ -144,10 +156,8 @@ export function computeExtensionVerdict(doc, ctx) {
     if (part?._x?.mnxLab !== undefined) check(ctx.validatePartExt, part._x.mnxLab);
     for (const measure of part?.measures ?? []) {
       for (const seq of measure?.sequences ?? []) {
-        for (const event of seq?.content ?? []) {
-          for (const note of event?.notes ?? []) {
-            if (note?._x?.mnxLab !== undefined) check(ctx.validateNoteExt, note._x.mnxLab);
-          }
+        for (const note of notesWithin(seq?.content)) {
+          if (note?._x?.mnxLab !== undefined) check(ctx.validateNoteExt, note._x.mnxLab);
         }
       }
     }

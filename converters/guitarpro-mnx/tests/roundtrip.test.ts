@@ -253,10 +253,10 @@ describe.each(FIXTURES)('schema conformance: %s', name => {
       if (part._x?.mnxLab) expect(validatePartExt(part._x.mnxLab)).toBe(true);
       for (const measure of part.measures)
         for (const sequence of measure.sequences ?? [])
-          for (const item of sequence.content ?? [])
-            if (isTimedEvent(item))
-              for (const note of item.notes ?? [])
-                if (note._x?.mnxLab) expect(validateNoteExt(note._x.mnxLab)).toBe(true);
+          // Inside tuplets and grace groups too: a top-level loop skipped them.
+          for (const { event } of walk(sequence.content ?? []))
+            for (const note of event.notes ?? [])
+              if (note._x?.mnxLab) expect(validateNoteExt(note._x.mnxLab)).toBe(true);
     }
   });
 });
