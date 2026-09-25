@@ -272,6 +272,10 @@ function sweepScenario(scenario: Scenario): ScenarioResult {
 /** Swept on first use, not when the file loads: the whole sweep is ~14 s of
  *  layout, and a run filtered to one scenario (`-t`) now pays for that one. */
 const swept = new Map<string, ScenarioResult>();
+// Sweeping now happens INSIDE a test, where vitest's 5 s default applies: the
+// largest scenario (twelve-bar-blues) exceeds it on a loaded machine. At import
+// it had no limit at all; these are generous, not tight.
+const SWEEP_TIMEOUT_MS = 60_000;
 function sweep(scenario: Scenario): ScenarioResult {
   let result = swept.get(scenario.id);
   if (!result) swept.set(scenario.id, (result = sweepScenario(scenario)));
@@ -349,7 +353,7 @@ describe('destruct sweep (element-ops campaign item 2)', () => {
         broken.map(row => `${row.path}: ${row.failures?.join(' / ')}`),
         'a removal applied and violated an oracle'
       ).toEqual([]);
-    });
+    }, SWEEP_TIMEOUT_MS);
   }
 
   it('the committed report matches this run', () => {
@@ -365,7 +369,7 @@ describe('destruct sweep (element-ops campaign item 2)', () => {
       report,
       'the sweep drifted from its committed report — if this is progress, run `npm run sweep:destruct` and commit the diff'
     ).toEqual(committed);
-  });
+  }, SWEEP_TIMEOUT_MS * 10);
 
   it('enumerates more elements than the entry surface can name', () => {
     // The gap between the two enumerations is the campaign's remaining work;
@@ -374,7 +378,7 @@ describe('destruct sweep (element-ops campaign item 2)', () => {
     const notes = allRows.filter(row => row.kind === 'note');
     expect(notes.length).toBeGreaterThan(0);
     expect(allRows.length).toBeGreaterThan(notes.length);
-  });
+  }, SWEEP_TIMEOUT_MS * 10);
 
   // Item 1's exhaustive pass, kept verbatim: the two exemplars must still tear
   // down to the literal {} in either order, with byte-identical undo-all.
