@@ -1,12 +1,15 @@
 # The Studio seam
 
-2026-09-25. A plan for where the listener meets Studio, in two parts. **Part 1** changes
-only this experiment, so every run exercises the seam Studio will eventually use.
-**Part 2**, the promotion, moves that seam into `src/` and changes Studio to match.
-Studio code is not touched until part 2, and part 2 needs the owner's go-ahead.
+2026-09-25, revised the same day. A plan for where the listener meets Studio, in two
+parts. **Part 1** changes only this experiment, so every run exercises the seam Studio
+will eventually use, without disturbing the evidence already recorded. **Part 2**, the
+promotion, moves that seam into `src/` and changes Studio to match. Studio code is not
+touched until part 2, and part 2 needs the owner's go-ahead.
 
-This is a plan, like [FIRST_STEP.md](FIRST_STEP.md). It does not state what the
-experiment believes; the [research log](RESEARCH_LOG.md) does.
+This is a plan, like [FIRST_STEP.md](FIRST_STEP.md), and its details may change as long
+as its goal holds: a listener Studio can drive through the same socket as its other
+playback sources. It does not state what the experiment believes; the
+[research log](RESEARCH_LOG.md) does.
 
 ## The destination
 
@@ -31,12 +34,16 @@ and `src/audio/performance.ts`. Part 1 therefore builds against Studio's real ty
 and interfaces, not copies of them. If Studio changes one of them, the bench stops
 compiling, and that failure is the tripwire that keeps the two sides agreed.
 
-Two caveats shape part 1:
+Three principles shape part 1:
 
-- **The v1 vocabulary is frozen** ([freeze.json](contracts/freeze.json)). The seam
-  changes the listener interface, so it arrives as a new contract version. Earlier
-  runs stay valid under the version they ran on, and older decision records are
-  translated by a pure function, never rewritten.
+- **Wrap, don't rewrite.** The frozen apparatus stays byte-identical: the v1
+  vocabulary ([freeze.json](contracts/freeze.json)), the candidates, the runner and the
+  evaluator. The seam arrives as a new contract in `listen/` and reaches them through
+  adapters. Recorded runs stay valid under the version they ran on, and their decision
+  records are translated by pure functions, never rewritten.
+- **Reproduction is the seam's regression test.** Run through the adapters, the current
+  scoreboard must reproduce its latest recorded results exactly. Any difference is a
+  seam defect, found before it can reach Studio.
 - **Some of the seam can only be declared here, not exercised.** Studio's source
   kinds, the microphone permission flow, the issue overlay and the real
   microphone-to-screen latency live in Studio. Part 1 records each of these as a
@@ -73,91 +80,112 @@ Two caveats shape part 1:
    has no duration verdict and no signed timing error. It has no repeat pass for a
    note in a repeated bar, and no string (on guitar the string is the authoritative
    choice). It gives no position for an extra note and no confidence.
-7. **Records.** Only `g001` kept its decision records. Ladder runs keep summaries,
-   so no candidate's stream can be replayed through anything.
+
+One apparent gap is not one. Every run keeps its candidates' complete decision records:
+`g001` in the repository, and every run from 002 onward privately beside its audio, at
+2–93 MB per run. Replaying recorded streams through the seam is possible from the start.
 
 ## Part 1 — make the experiment seam-ready
 
-Each step says when it is done. Steps 1–7 are independent of listening quality: they
-hold for the clock follower as much as for the best candidate. Seam work sits
-alongside the ladder, and a candidate's ladder standing never waits on it.
+Each step says when it is done. None of them changes a listening result, and all of them
+hold for the clock follower as much as for the best candidate. Seam work runs alongside
+the ladder; a candidate's ladder standing never waits on it.
+
+**Where the work may touch.** `listen/`, new adapter files in the bench, the three test
+files in S0, the scoreboard's registration of wrapped entries, and the dependency rules.
+It never edits a frozen candidate, the runner, the evaluator, `bench/src/types.ts` or a
+recorded run. That keeps it out of the way of ladder work in the same experiment, and
+keeps every recorded result reproducible.
+
+### S0. Old evidence is verified at the commit that made it
+
+Three bench tests check that working-tree files still match hashes recorded by runs
+`g001`, `g002a/b` and `g003`, so any edit to those files fails them, whatever the edit
+is for. Each of those runs records its commit. The tests verify the pinned files at
+that commit instead, as the report exporter already does. The v2 oracle checkpoint pins
+only `bench/src/v2/` and is left as it is.
+
+*Done when* the three tests pass against recorded commits, and a deliberate edit to a
+pinned file in a scratch branch no longer fails them.
 
 ### S1. `listen/`, a module that can move by `git mv`
 
 Create `experiments/performance-listening/listen/`, a sibling of `bench/`, named after
-what it becomes: `src/listen/`. It holds the listener contract and the adapters below.
-It is not part of the bench, because the bench is the measuring apparatus and this is
-the interface of what is measured; the bench and Studio are both its consumers. Nor
-is it named for Studio: it lands in `src/` as a library layer that `elements` can
-import, and Studio is its first consumer, not its owner.
+what it becomes: `src/listen/`. It holds the listener contract, the position conversions,
+`liveView` and `ListeningBackend`. It is not part of the bench, because the bench is the
+measuring apparatus and this is the interface of what is measured. It is not named for
+Studio either: it lands in `src/` as a library layer that `elements` can import, and
+Studio is its first consumer, not its owner.
 
 `listen/` imports only `src/audio` and `src/model`, which the existing
 `listening-bench-consumes-audio-and-model-only` rule already enforces for the whole
 experiment. One new dependency-cruiser rule adds that `listen/` imports nothing from
 `bench/`, so promotion is a move, not a rewrite. The bench's `tsconfig` and vitest
-includes gain `../listen`; the gate already runs the bench suite for any change under
-`experiments/performance-listening/`. Candidates, the runner and the evaluator import
-the contract from `listen/`, and `bench/src/types.ts` re-exports it for the existing
-code.
+includes gain `../listen`. The bench imports `listen/` only from new files: the
+adapters of S3 and S4, the replay of S6 and the scoreboard's registrations.
 
-*Done when* the new boundary rule is in the gate, and `listen/` compiles and its tests
-run under the bench suite, reaching only `src/audio` and `src/model`.
+*Done when* the boundary rule is in the gate, and `listen/` compiles and its tests run
+under the bench suite, reaching only `src/audio` and `src/model`.
 
-### S2. Positions in Studio's coordinate
+### S2. One display rule
 
-The wire position becomes Studio's `ScorePosition`: performed `ordinal` plus
-`metricOffset` in whole notes, imported from `src/audio/scorePosition.ts`, not
-redeclared. `route` is retired from the wire, because the ordinal already says which
-pass. The evaluator keeps its affine trajectories in a performed coordinate: the
-compiler's `PerformanceMeasure.metricPosition` is monotone along the route and maps
-one-to-one to a `ScorePosition`. A pure function in `listen/` converts between the two,
-and another translates v1 records (`quarters`, `route: 1`) for comparison with
-history.
+Built early, because everything after it is checked against it. `listen/` provides
+`liveView(record, clock)`: the effective decision at a clock under the vocabulary's four
+rules. It is the only function Studio will use to decide what to draw. The evaluator
+stays as it is. An **agreement test** asserts that `liveView` equals the evaluator's
+effective decision at every grid point: in the bench suite on `g001`'s committed records
+and the oracle fixtures, and in the scoreboard on every private record of the run. The
+rule is **held, not extrapolated**. If the owner later wants a smoothly moving cursor,
+extrapolation becomes part of the contract and the evaluator scores it; Studio never
+adds it by itself.
 
-*Done when* the new vocabulary version is written and approved, every candidate emits
-`ScorePosition`, and the conversion round-trips on every performed boundary of a score
-with repeats, a volta and a D.S.
+*Done when* the agreement test passes on the committed records and in a scoreboard run.
 
-### S3. A start handoff Studio can supply
+### S3. Positions in Studio's coordinate
+
+The wire position of the new contract is Studio's `ScorePosition`: performed `ordinal`
+plus `metricOffset` in whole notes, imported from `src/audio/scorePosition.ts`, not
+redeclared. `route` is retired, because the ordinal already says which pass. The
+conversions already exist there: `scorePositionAt` maps a performed position, which is
+quarters divided by four, to a `ScorePosition`, and `performancePositionAt` maps back.
+`listen/` wraps them as the translation between the two vocabularies.
+
+Two adapters in the bench carry it:
+
+- **Legacy listener adapter.** Wraps any existing candidate as a seam listener. The
+  candidate runs unchanged; the adapter converts each emitted position to
+  `ScorePosition`.
+- **Record adapter.** Translates a seam record back into v1 positions, so the frozen
+  evaluator judges it unchanged.
+
+*Done when* the new vocabulary version is written and approved, the conversion
+round-trips on every performed boundary of a score with repeats, a volta and a D.S.,
+and the slim suite run through both adapters reproduces the latest recorded
+scoreboard's results exactly.
+
+### S4. A start handoff Studio can supply
 
 ```
 start(score, handoff, delivery)
 handoff = { from: ScorePosition, parts: part ids, tempo: { quartersPerMinute: Rational }, rate: number }
 ```
 
-`from` covers Studio's seek, restart and loop. `parts` names what the performer
-plays; other parts are accompaniment the listener may use or ignore, but never
-expects to hear. Tuning and capo come from the score. Tempo is the score's tempo at
-`from`, times Studio's rate: rational, never rounded to an integer. A listener that
-cannot honour a handoff **refuses at `start`** with a reason. A refusal is a valid
-seam answer; silently assuming the top of the score and `route: 1` is not.
+`from` covers Studio's seek, restart and loop. `parts` names what the performer plays;
+other parts are accompaniment the listener may use or ignore, but never expects to hear.
+Tuning and capo come from the score. Tempo is the score's tempo at `from`, times
+Studio's rate: rational, never rounded. A listener that cannot honour a handoff
+**refuses at `start`** with a reason. A refusal is a valid seam answer; silently assuming
+the top of the score and `route: 1` is not.
 
-*Done when* every candidate either honours or refuses each field, and a test shows
-the refusal path.
+The legacy adapter refuses on behalf of the wrapped candidate whatever it cannot honour:
+a start other than the top of the score, a route with repeats inside the candidate's
+window, a tempo the candidate cannot represent, or a part list it cannot use. New
+candidates implement the seam contract directly and may honour more.
 
-### S4. Delivery at whatever the device gives
+*Done when* every scoreboard entry either honours or refuses each field, and a test
+shows the refusal path.
 
-The delivery settings become declarations (`sampleRate`, `chunkSamples`), not
-requirements. `listen/` provides the adapter that rechunks and resamples to what a
-candidate wants internally, so candidates keep their fixed 48 kHz / 480 internals.
-The adapter's own added delay is measured and reported.
-
-*Done when* the runner can deliver the same clip at 48 kHz/480, 48 kHz/128 and
-44.1 kHz/128, each run passes the prefix checks, and positions agree within tolerance.
-
-### S5. One display rule
-
-`listen/` provides `liveView(record, clock)`: the effective decision at a clock under
-the vocabulary's four rules. It is the only function Studio will use to decide what to
-draw. The evaluator stays as it is; changing it would be a new instrument. An
-**agreement test** asserts that `liveView` equals the evaluator's effective decision
-at every grid point of every recorded run. The rule is **held, not extrapolated**. If
-the owner later wants a smoothly moving cursor, extrapolation becomes part of the
-contract and the evaluator scores it; Studio never adds it by itself.
-
-*Done when* the agreement test passes on every retained record.
-
-### S6. `ListeningBackend implements PlaybackBackend`
+### S5. `ListeningBackend implements PlaybackBackend`
 
 This goes in `listen/`, DOM-free, and implements Studio's interface exactly. It is fed
 decisions and never audio, so it runs identically in a Node replay and live. The
@@ -177,26 +205,37 @@ reports `kind: 'audio'` and carries the rest in a `listening` field
 (`{ phase: 'warming' | 'following' | 'lost', confidence, alternatives }`). The type
 change is a promotion delta.
 
+S6's replay is written against this backend's interface first and needs the backend to
+pass, so the two land together.
+
 *Done when* the backend runs inside the real `PlaybackSession`
-(`src/audio/playbackSession.ts`, DOM-free) in Node, and select, seek, pause and resume
-behave as Studio expects.
+(`src/audio/playbackSession.ts`, DOM-free) in Node, select, seek, pause and resume
+behave as Studio expects, and S6's replay passes through it.
 
-### S7. Keep every decision record, and replay it through the seam
+### S6. Replay every run through the seam
 
-Every run keeps its candidates' decision records. They contain positions, ids and
-times, not score content or audio, so they follow the run's existing privacy policy.
-A **seam replay** runs each record through `ListeningBackend` inside `PlaybackSession`
-and asserts three things:
+A **seam replay** runs each decision record through `ListeningBackend` inside
+`PlaybackSession` and asserts three things:
 
 - at every grid point the cursor Studio would draw equals `liveView`;
 - `scorePosition` is `null` exactly where the record is unsupported or uncovered;
 - no snapshot shows a position the evaluator did not score.
 
-The replay is a pass/fail check on the seam and never a candidate metric; a candidate
-cannot fail the ladder because of it. It joins the scoreboard's run so it runs every
-time, and `g001`'s committed records are its first fixtures.
+It runs in the scoreboard on the run's private records, and in the bench suite on
+`g001`'s committed records. It is a pass/fail check on the seam and never a candidate
+metric; a candidate cannot fail the ladder because of it. It adds seconds to a run.
 
-*Done when* the replay passes on every run from the first run after S5.
+*Done when* the replay passes in a scoreboard run and in the bench suite.
+
+### S7. Routes and starts are exercised
+
+Add a seam fixture, not a ladder rung, with one repeat and a volta, and one start from
+mid-score. Every scoreboard entry either follows it on the correct ordinal or refuses at
+`start`. Wrapped legacy candidates will refuse, and that is their recorded answer. This
+fixture is what stops "route 1 only" from reaching Studio unnoticed.
+
+*Done when* every scoreboard entry has a recorded answer, following or refusing, for
+both fixtures.
 
 ### S8. The issue shape, fixed now and still unscored
 
@@ -217,31 +256,52 @@ note = { id, kind: 'note', refersTo, supersedes?,
 A revision supersedes by `id`, and Studio shows the latest. The record keeps every
 version, so a `missing` that becomes a late `match` stays visible in hindsight.
 
-*Done when* the schema is in the new vocabulary version, validated like positions,
-and at least one oracle fixture carries each verdict.
+*Done when* the schema is in the new vocabulary version, validated like positions, and
+at least one oracle fixture carries each verdict.
 
-### S9. Routes and starts are exercised
+### S9. Delivery at whatever the device gives
 
-Add a seam fixture, not a ladder rung, with one repeat and a volta, and one start from
-mid-score. Candidates either follow it on the correct ordinal or refuse at `start`.
-This fixture is what stops "route 1 only" from reaching Studio unnoticed.
+Last among the required steps, because it is the only one that changes the audio a
+candidate hears. The delivery settings become declarations (`sampleRate`,
+`chunkSamples`), not requirements. `listen/` provides a causal adapter that rechunks and
+resamples to what a candidate wants internally, so candidates keep their fixed 48 kHz /
+480 internals. The adapter's own added delay is measured and reported.
 
-*Done when* every candidate on the scoreboard has a recorded answer, following or
-refusing, for both fixtures.
+*Done when* the scoreboard can deliver the same clip at 48 kHz/480, 48 kHz/128 and
+44.1 kHz/128; each run passes the prefix checks; 48 kHz/128 reproduces 48 kHz/480
+exactly; and 44.1 kHz positions agree within the ±0.25-quarter tolerance.
 
 ### S10. A capture adapter, outside Studio (optional)
 
 A standalone page under the experiment, like `archive/microphone/`, runs AudioWorklet
-capture → S4's adapter → a worker running a `Listener` → `ListeningBackend`. Feeding a
+capture → S9's adapter → a worker running a `Listener` → `ListeningBackend`. Feeding a
 WAV file as a fake microphone first measures the capture chain's delay without a
 guitar. This is evidence toward the latency limits proposed in the
 [research contract 1 draft](contracts/research-contract-1-draft.md) (p95 ≤ 250 ms,
 p99 ≤ 400 ms), not a pass of them; that needs Studio's own display chain.
 
+### Order
+
+| Step | Why here |
+|---|---|
+| S0 | Unblocks everything else without touching evidence |
+| S1 | The module and its boundary exist before anything goes in them |
+| S2 | The display rule every later check is measured against |
+| S3 | The coordinate; its adapters make reproduction the regression test |
+| S4 | The handoff, with refusals for what legacy candidates cannot do |
+| S5, S6 | The backend and its replay land together |
+| S7 | Exercises routes and starts once the handoff and backend exist |
+| S8 | Shape only; needs the vocabulary approval S3 already asked for |
+| S9 | The only step that changes the audio a candidate hears |
+| S10 | Optional |
+
+The steps are numbered in the order they are built.
+
 ### Seam-ready means
 
-S1–S9 done, and S10 done or deliberately deferred. The seam replay passes on every
-current run, and the promotion deltas below are complete.
+S0–S9 done, and S10 done or deliberately deferred. The seam replay and the agreement
+test pass on every current run, the slim suite reproduces through the adapters, and the
+promotion deltas below are complete.
 
 ## Promotion deltas
 
@@ -263,7 +323,8 @@ listener reaches players only through the Studio integration decision that
 [APPROACH.md](APPROACH.md) and research contract 1 already require.
 
 1. **Move** `experiments/performance-listening/listen/` to `src/listen/` with `git mv`;
-   the name does not change. It becomes a layer over `model` and `audio`, which
+   the name does not change. The legacy adapters stay in the bench: they exist to
+   measure old candidates, not to ship. It becomes a layer over `model` and `audio`, which
    `elements` may import, and the layer order in `.dependency-cruiser.cjs` and
    `CLAUDE.md` gains it. The bench's imports change by path only, its includes drop
    `../listen`, and the `listen/`-to-`bench/` rule is deleted. The experiment's rule
@@ -285,8 +346,10 @@ the step named.
 
 | Decision | Recommended | Changes |
 |---|---|---|
-| Wire position | Studio's `ScorePosition` | S2 |
-| Accompaniment while listening | None at first: the listener is the only source, and no speaker bleeds into the microphone | S3's `parts`, S6 |
+| Wire position | Studio's `ScorePosition` | S3 |
+| Accompaniment while listening | None at first: the listener is the only source, and no speaker bleeds into the microphone | S4's `parts`, S5 |
 | Widen the note shape now | Yes, shape only | S8 |
 | Promote plumbing before a listener is accepted | Yes, behind the clock follower | part 2 |
-| Smooth cursor (extrapolated) or held | Held, until the evaluator scores extrapolation | S5 |
+| Approve the new vocabulary version | Yes, with S3's positions and S8's issue shape together | S3, S8 |
+| Who builds part 1 | One implementer at a time, in its own worktree, touching only what part 1 lists | all |
+| Smooth cursor (extrapolated) or held | Held, until the evaluator scores extrapolation | S2 |
