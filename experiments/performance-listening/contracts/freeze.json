@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "status": "frozen",
+  "date": "2026-09-25",
+  "run": "g001-clock-harness-v1",
+  "evidence": "../runs/g001-clock-harness-v1/report.md",
+  "condition": "FIRST_STEP section 9 predictions agree; all prefix checks pass. This manifest records the freeze without changing the exact pre-run contract bytes or their original draft headers. Subsequent instrument changes require a new version.",
+  "researchContract": {
+    "id": "research-contract-0",
+    "status": "provisional",
+    "humanApproved": false,
+    "frozen": false
+  },
+  "files": {
+    "vocabulary.md": "b03eeec8040a04cd4d3c6ce9f38130467939334ca5527d7d4718140fafd07b22",
+    "golden-format.md": "11a35ab6ba0a22b5ba6414cc2e955a9e4b15db55e7e13e1ac942c288898cec95",
+    "evaluator-rules.md": "11f903e2205fbc294d688992cbf34613f63860def2ac5f6f252a918cd34c89f5",
+    "golden.schema.json": "822faa6545ce728569ae3b33d7ae2fa7076f8d4995438e015814a311269e9b95",
+    "decisions.schema.json": "35765b205cd4747aa08d892ad1264c4717f0abbc6f9fbea0b8a5b1fc469ec4c3"
+  }
+}

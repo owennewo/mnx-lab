@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "hashes": {
+    "set.json": "ffd77e9688200e592b37658524bacdf6f21af87c0f661ab8082d1202f84211ea",
+    "p1/score.mnx.json": "5d25a83a856eca6d83e9f75f8b4ce5081392d3aedf2864fcac2eecc7712e1b81",
+    "p1/golden.json": "d0a632c7fe763ba421e33a689d4f646d0e9f1c00634b46c5b64e27e38faf8253",
+    "p2/score.mnx.json": "63441ff16acfdedbeb1cec19a6f00b8eed646192eed7b0d23abec07295563582",
+    "p2/golden.json": "8ae24f2d3f313e0ef18ff2a899befad7e19c3d6b3106a9d4cfeefea46d7017f0",
+    "c1-silence/score.mnx.json": "63441ff16acfdedbeb1cec19a6f00b8eed646192eed7b0d23abec07295563582",
+    "c1-silence/golden.json": "9e8e874209c249b70eac33da876f51d3f67df47080e61dacbead4e2fad8f8692",
+    "c2-wrong-piece/score.mnx.json": "63441ff16acfdedbeb1cec19a6f00b8eed646192eed7b0d23abec07295563582",
+    "c2-wrong-piece/golden.json": "959ec0413c6aa3efd099be2d28ccc5d36e15114296c426fb2fdfd8cb5c9a3c9a",
+    "t1-tempo-90/score.mnx.json": "63441ff16acfdedbeb1cec19a6f00b8eed646192eed7b0d23abec07295563582",
+    "t1-tempo-90/golden.json": "b1d16ee1d404f96df32d08670eec1c82de6ed051eff2acc5c7c939061a52366d",
+    "generator-manifest": "629215e6b47e77b9ebff96b07d7d7272c33fe637b0fc596cc9a3e632ccd369e8"
+  }
+}

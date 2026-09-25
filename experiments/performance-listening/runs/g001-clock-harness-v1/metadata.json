@@ -1,0 +1,57 @@
+{
+  "id": "g001-clock-harness-v1",
+  "candidate": "clock-follower@1",
+  "runner": "chunk-runner@1",
+  "evaluator": "following-evaluator@1",
+  "generator": "sine-v1",
+  "set": {
+    "id": "harness-v1",
+    "version": 1,
+    "lock": "c95372a6440c12c2862d75b1b0b435d54664e4823f698acabd724b52db906ddb"
+  },
+  "instrumentContract": "v1",
+  "researchContract": {
+    "id": "research-contract-0",
+    "provisional": true,
+    "humanApproved": false
+  },
+  "randomness": null,
+  "delivery": {
+    "sampleRate": 48000,
+    "chunkSamples": 480
+  },
+  "clock": "samples released / 48000; wall clock excluded from decisions",
+  "machine": {
+    "hostname": "williao-G3-3579",
+    "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+    "cores": 12,
+    "platform": "linux",
+    "arch": "x64",
+    "node": "v22.22.1"
+  },
+  "gitCommit": "08e957f4762fd839604abbb47d6073123e298df8",
+  "sourceHashes": {
+    "bench/src/candidates/clockFollower.ts": "687cbaaed6323594761986370ade1e7c4262fcd02deb4930ba5a0c64c35df5b9",
+    "bench/src/cli.ts": "4a0718e6135faa531bfcf0763dbb00cb20a2d03372186d45e28ae17d6a6f0600",
+    "bench/src/evaluate/index.ts": "33a85837d638734c01331f1aebb930c764ff7871ab5b9bf45d09c5f6af2cac7d",
+    "bench/src/generate/set.ts": "69795c1ad4e60cd31e88f152fc85b3e0bc5938b4f9bd81de972ff944c9489c2e",
+    "bench/src/generate/sine.ts": "c7aab46132f2461172d531751b251341ad76d832f03dffda206d5161f7a93f96",
+    "bench/src/generate/wav.ts": "a38ae9c13209414f103a2ec75007f2d904919bb2e0a8eaf24d26d9614d94a371",
+    "bench/src/io.ts": "62c62365425f2ca12ebca5290ad5164b851125a55bc45a2d1224a346af5c6a7e",
+    "bench/src/report/index.ts": "f008c0a07feb6b8286d19e1b2da2de022afe300800b78a3c22e198164369285b",
+    "bench/src/report/oracle.ts": "d5483693aec119928140b9eb53d71bc988df0843e3440d493b632c9acee10f21",
+    "bench/src/run/runner.ts": "c5bd7d90ccaacf1b1382f6663b5ac6f8c1dea930754eecbbf684f27635cb7cf6",
+    "bench/src/run/set.ts": "fde9901932e537981425f45f05442c15ee0a7ad70d3a9d70751fb4aff4c8aef4",
+    "bench/src/types.ts": "bcb4d528af893a4bcd872360915ff635e9cfc4d26328c4315433293a39fa9744",
+    "bench/src/validate.ts": "c22008ca22f8d196d2425858e85a9e7af885acc7a0dd0b5c41495f32b871e628",
+    "contracts/decisions.schema.json": "35765b205cd4747aa08d892ad1264c4717f0abbc6f9fbea0b8a5b1fc469ec4c3",
+    "contracts/evaluator-rules.md": "11f903e2205fbc294d688992cbf34613f63860def2ac5f6f252a918cd34c89f5",
+    "contracts/golden-format.md": "11a35ab6ba0a22b5ba6414cc2e955a9e4b15db55e7e13e1ac942c288898cec95",
+    "contracts/golden.schema.json": "822faa6545ce728569ae3b33d7ae2fa7076f8d4995438e015814a311269e9b95",
+    "contracts/research-contract-0.md": "a6e5e4bc0b23f93802f3a485f59d1b9400f3b6434aa6e21a605704c01f5a6852",
+    "contracts/vocabulary.md": "b03eeec8040a04cd4d3c6ce9f38130467939334ca5527d7d4718140fafd07b22",
+    "generators/sine-v1.json": "629215e6b47e77b9ebff96b07d7d7272c33fe637b0fc596cc9a3e632ccd369e8"
+  },
+  "conditions": "Node process on development machine; no forced pacing or warm-up; feed costs measured separately from logical clock; variable wall cost; sustained includes start/finish; maximum backlog is work remaining at the next chunk release",
+  "reproduce": "npm -w mnx-listening-bench run generate -- harness-v1; npm -w mnx-listening-bench run run -- harness-v1 <new-run-id>"
+}

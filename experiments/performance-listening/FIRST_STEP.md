@@ -543,3 +543,16 @@ metadata does not establish solo status, annotation-time score identity, precisi
 rights. The note names a hand-check shortlist and five re-amplification opportunities,
 with calibration and hardware evidence still missing. No source or golden was ingested.
 The user explicitly approved adding this metadata inventory to the repository.
+
+### 2026-09-25 — G: first end-to-end assessment
+
+Froze harness-v1, ran the committed clock-follower@1 once, and recorded the immutable
+[run and report](runs/g001-clock-harness-v1/report.md), machine/cost provenance and first
+[ledger row](ledger.md#g001-clock-harness-v1). Every §9 prediction agrees using the
+endpoint and control-duration conventions committed before the run. All prefix checks
+pass. Reproduction tests regenerate the pinned WAVs, reproduce decision bytes and
+recompute counts and the report without changing candidate or labels. Only then was
+the [instrument freeze](contracts/freeze.json) recorded, preserving the pre-run bytes.
+The controls demonstrate why matching the positive scores is not evidence of listening;
+the tempo probe measures the clock's growing error. Research-contract-0 remains
+provisional and not human-approved. No later candidate or generator work was started.

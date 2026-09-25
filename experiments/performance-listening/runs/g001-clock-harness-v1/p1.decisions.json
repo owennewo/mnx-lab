@@ -1,0 +1,7602 @@
+[
+  {
+    "id": "clock-1",
+    "kind": "position",
+    "refersTo": 0.01,
+    "madeAt": 0.01,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 1,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-2",
+    "kind": "position",
+    "refersTo": 0.02,
+    "madeAt": 0.02,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 1,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-3",
+    "kind": "position",
+    "refersTo": 0.03,
+    "madeAt": 0.03,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 3,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-4",
+    "kind": "position",
+    "refersTo": 0.04,
+    "madeAt": 0.04,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 1,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-5",
+    "kind": "position",
+    "refersTo": 0.05,
+    "madeAt": 0.05,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 1,
+            "den": 20
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-6",
+    "kind": "position",
+    "refersTo": 0.06,
+    "madeAt": 0.06,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 3,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-7",
+    "kind": "position",
+    "refersTo": 0.07,
+    "madeAt": 0.07,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 7,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-8",
+    "kind": "position",
+    "refersTo": 0.08,
+    "madeAt": 0.08,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 2,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-9",
+    "kind": "position",
+    "refersTo": 0.09,
+    "madeAt": 0.09,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 9,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-10",
+    "kind": "position",
+    "refersTo": 0.1,
+    "madeAt": 0.1,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 1,
+            "den": 10
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-11",
+    "kind": "position",
+    "refersTo": 0.11,
+    "madeAt": 0.11,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 11,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-12",
+    "kind": "position",
+    "refersTo": 0.12,
+    "madeAt": 0.12,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 3,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-13",
+    "kind": "position",
+    "refersTo": 0.13,
+    "madeAt": 0.13,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 13,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-14",
+    "kind": "position",
+    "refersTo": 0.14,
+    "madeAt": 0.14,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 7,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-15",
+    "kind": "position",
+    "refersTo": 0.15,
+    "madeAt": 0.15,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 3,
+            "den": 20
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-16",
+    "kind": "position",
+    "refersTo": 0.16,
+    "madeAt": 0.16,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 4,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-17",
+    "kind": "position",
+    "refersTo": 0.17,
+    "madeAt": 0.17,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 17,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-18",
+    "kind": "position",
+    "refersTo": 0.18,
+    "madeAt": 0.18,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 9,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-19",
+    "kind": "position",
+    "refersTo": 0.19,
+    "madeAt": 0.19,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 19,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-20",
+    "kind": "position",
+    "refersTo": 0.2,
+    "madeAt": 0.2,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 1,
+            "den": 5
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-21",
+    "kind": "position",
+    "refersTo": 0.21,
+    "madeAt": 0.21,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 21,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-22",
+    "kind": "position",
+    "refersTo": 0.22,
+    "madeAt": 0.22,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 11,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-23",
+    "kind": "position",
+    "refersTo": 0.23,
+    "madeAt": 0.23,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 23,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-24",
+    "kind": "position",
+    "refersTo": 0.24,
+    "madeAt": 0.24,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 6,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-25",
+    "kind": "position",
+    "refersTo": 0.25,
+    "madeAt": 0.25,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 1,
+            "den": 4
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-26",
+    "kind": "position",
+    "refersTo": 0.26,
+    "madeAt": 0.26,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 13,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-27",
+    "kind": "position",
+    "refersTo": 0.27,
+    "madeAt": 0.27,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 27,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-28",
+    "kind": "position",
+    "refersTo": 0.28,
+    "madeAt": 0.28,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 7,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-29",
+    "kind": "position",
+    "refersTo": 0.29,
+    "madeAt": 0.29,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 29,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-30",
+    "kind": "position",
+    "refersTo": 0.3,
+    "madeAt": 0.3,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 3,
+            "den": 10
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-31",
+    "kind": "position",
+    "refersTo": 0.31,
+    "madeAt": 0.31,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 31,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-32",
+    "kind": "position",
+    "refersTo": 0.32,
+    "madeAt": 0.32,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 8,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-33",
+    "kind": "position",
+    "refersTo": 0.33,
+    "madeAt": 0.33,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 33,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-34",
+    "kind": "position",
+    "refersTo": 0.34,
+    "madeAt": 0.34,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 17,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-35",
+    "kind": "position",
+    "refersTo": 0.35,
+    "madeAt": 0.35,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 7,
+            "den": 20
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-36",
+    "kind": "position",
+    "refersTo": 0.36,
+    "madeAt": 0.36,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 9,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-37",
+    "kind": "position",
+    "refersTo": 0.37,
+    "madeAt": 0.37,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 37,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-38",
+    "kind": "position",
+    "refersTo": 0.38,
+    "madeAt": 0.38,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 19,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-39",
+    "kind": "position",
+    "refersTo": 0.39,
+    "madeAt": 0.39,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 39,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-40",
+    "kind": "position",
+    "refersTo": 0.4,
+    "madeAt": 0.4,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 2,
+            "den": 5
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-41",
+    "kind": "position",
+    "refersTo": 0.41,
+    "madeAt": 0.41,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 41,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-42",
+    "kind": "position",
+    "refersTo": 0.42,
+    "madeAt": 0.42,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 21,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-43",
+    "kind": "position",
+    "refersTo": 0.43,
+    "madeAt": 0.43,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 43,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-44",
+    "kind": "position",
+    "refersTo": 0.44,
+    "madeAt": 0.44,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 11,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-45",
+    "kind": "position",
+    "refersTo": 0.45,
+    "madeAt": 0.45,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 9,
+            "den": 20
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-46",
+    "kind": "position",
+    "refersTo": 0.46,
+    "madeAt": 0.46,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 23,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-47",
+    "kind": "position",
+    "refersTo": 0.47,
+    "madeAt": 0.47,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 47,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-48",
+    "kind": "position",
+    "refersTo": 0.48,
+    "madeAt": 0.48,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 12,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-49",
+    "kind": "position",
+    "refersTo": 0.49,
+    "madeAt": 0.49,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 49,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-50",
+    "kind": "position",
+    "refersTo": 0.5,
+    "madeAt": 0.5,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 1,
+            "den": 2
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-51",
+    "kind": "position",
+    "refersTo": 0.51,
+    "madeAt": 0.51,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 51,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-52",
+    "kind": "position",
+    "refersTo": 0.52,
+    "madeAt": 0.52,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 13,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-53",
+    "kind": "position",
+    "refersTo": 0.53,
+    "madeAt": 0.53,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 53,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-54",
+    "kind": "position",
+    "refersTo": 0.54,
+    "madeAt": 0.54,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 27,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-55",
+    "kind": "position",
+    "refersTo": 0.55,
+    "madeAt": 0.55,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 11,
+            "den": 20
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-56",
+    "kind": "position",
+    "refersTo": 0.56,
+    "madeAt": 0.56,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 14,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-57",
+    "kind": "position",
+    "refersTo": 0.57,
+    "madeAt": 0.57,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 57,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-58",
+    "kind": "position",
+    "refersTo": 0.58,
+    "madeAt": 0.58,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 29,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-59",
+    "kind": "position",
+    "refersTo": 0.59,
+    "madeAt": 0.59,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 59,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-60",
+    "kind": "position",
+    "refersTo": 0.6,
+    "madeAt": 0.6,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 3,
+            "den": 5
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-61",
+    "kind": "position",
+    "refersTo": 0.61,
+    "madeAt": 0.61,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 61,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-62",
+    "kind": "position",
+    "refersTo": 0.62,
+    "madeAt": 0.62,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 31,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-63",
+    "kind": "position",
+    "refersTo": 0.63,
+    "madeAt": 0.63,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 63,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-64",
+    "kind": "position",
+    "refersTo": 0.64,
+    "madeAt": 0.64,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 16,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-65",
+    "kind": "position",
+    "refersTo": 0.65,
+    "madeAt": 0.65,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 13,
+            "den": 20
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-66",
+    "kind": "position",
+    "refersTo": 0.66,
+    "madeAt": 0.66,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 33,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-67",
+    "kind": "position",
+    "refersTo": 0.67,
+    "madeAt": 0.67,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 67,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-68",
+    "kind": "position",
+    "refersTo": 0.68,
+    "madeAt": 0.68,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 17,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-69",
+    "kind": "position",
+    "refersTo": 0.69,
+    "madeAt": 0.69,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 69,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-70",
+    "kind": "position",
+    "refersTo": 0.7,
+    "madeAt": 0.7,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 7,
+            "den": 10
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-71",
+    "kind": "position",
+    "refersTo": 0.71,
+    "madeAt": 0.71,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 71,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-72",
+    "kind": "position",
+    "refersTo": 0.72,
+    "madeAt": 0.72,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 18,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-73",
+    "kind": "position",
+    "refersTo": 0.73,
+    "madeAt": 0.73,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 73,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-74",
+    "kind": "position",
+    "refersTo": 0.74,
+    "madeAt": 0.74,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 37,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-75",
+    "kind": "position",
+    "refersTo": 0.75,
+    "madeAt": 0.75,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 3,
+            "den": 4
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-76",
+    "kind": "position",
+    "refersTo": 0.76,
+    "madeAt": 0.76,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 19,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-77",
+    "kind": "position",
+    "refersTo": 0.77,
+    "madeAt": 0.77,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 77,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-78",
+    "kind": "position",
+    "refersTo": 0.78,
+    "madeAt": 0.78,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 39,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-79",
+    "kind": "position",
+    "refersTo": 0.79,
+    "madeAt": 0.79,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 79,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-80",
+    "kind": "position",
+    "refersTo": 0.8,
+    "madeAt": 0.8,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 4,
+            "den": 5
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-81",
+    "kind": "position",
+    "refersTo": 0.81,
+    "madeAt": 0.81,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 81,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-82",
+    "kind": "position",
+    "refersTo": 0.82,
+    "madeAt": 0.82,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 41,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-83",
+    "kind": "position",
+    "refersTo": 0.83,
+    "madeAt": 0.83,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 83,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-84",
+    "kind": "position",
+    "refersTo": 0.84,
+    "madeAt": 0.84,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 21,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-85",
+    "kind": "position",
+    "refersTo": 0.85,
+    "madeAt": 0.85,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 17,
+            "den": 20
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-86",
+    "kind": "position",
+    "refersTo": 0.86,
+    "madeAt": 0.86,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 43,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-87",
+    "kind": "position",
+    "refersTo": 0.87,
+    "madeAt": 0.87,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 87,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-88",
+    "kind": "position",
+    "refersTo": 0.88,
+    "madeAt": 0.88,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 22,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-89",
+    "kind": "position",
+    "refersTo": 0.89,
+    "madeAt": 0.89,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 89,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-90",
+    "kind": "position",
+    "refersTo": 0.9,
+    "madeAt": 0.9,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 9,
+            "den": 10
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-91",
+    "kind": "position",
+    "refersTo": 0.91,
+    "madeAt": 0.91,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 91,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-92",
+    "kind": "position",
+    "refersTo": 0.92,
+    "madeAt": 0.92,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 23,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-93",
+    "kind": "position",
+    "refersTo": 0.93,
+    "madeAt": 0.93,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 93,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-94",
+    "kind": "position",
+    "refersTo": 0.94,
+    "madeAt": 0.94,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 47,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-95",
+    "kind": "position",
+    "refersTo": 0.95,
+    "madeAt": 0.95,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 19,
+            "den": 20
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-96",
+    "kind": "position",
+    "refersTo": 0.96,
+    "madeAt": 0.96,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 24,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-97",
+    "kind": "position",
+    "refersTo": 0.97,
+    "madeAt": 0.97,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 97,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-98",
+    "kind": "position",
+    "refersTo": 0.98,
+    "madeAt": 0.98,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 49,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-99",
+    "kind": "position",
+    "refersTo": 0.99,
+    "madeAt": 0.99,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 99,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-100",
+    "kind": "position",
+    "refersTo": 1,
+    "madeAt": 1,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 1,
+            "den": 1
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-101",
+    "kind": "position",
+    "refersTo": 1.01,
+    "madeAt": 1.01,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 101,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-102",
+    "kind": "position",
+    "refersTo": 1.02,
+    "madeAt": 1.02,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 51,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-103",
+    "kind": "position",
+    "refersTo": 1.03,
+    "madeAt": 1.03,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 103,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-104",
+    "kind": "position",
+    "refersTo": 1.04,
+    "madeAt": 1.04,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 26,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-105",
+    "kind": "position",
+    "refersTo": 1.05,
+    "madeAt": 1.05,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 21,
+            "den": 20
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-106",
+    "kind": "position",
+    "refersTo": 1.06,
+    "madeAt": 1.06,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 53,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-107",
+    "kind": "position",
+    "refersTo": 1.07,
+    "madeAt": 1.07,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 107,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-108",
+    "kind": "position",
+    "refersTo": 1.08,
+    "madeAt": 1.08,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 27,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-109",
+    "kind": "position",
+    "refersTo": 1.09,
+    "madeAt": 1.09,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 109,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-110",
+    "kind": "position",
+    "refersTo": 1.1,
+    "madeAt": 1.1,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 11,
+            "den": 10
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-111",
+    "kind": "position",
+    "refersTo": 1.11,
+    "madeAt": 1.11,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 111,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-112",
+    "kind": "position",
+    "refersTo": 1.12,
+    "madeAt": 1.12,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 28,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-113",
+    "kind": "position",
+    "refersTo": 1.13,
+    "madeAt": 1.13,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 113,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-114",
+    "kind": "position",
+    "refersTo": 1.14,
+    "madeAt": 1.14,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 57,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-115",
+    "kind": "position",
+    "refersTo": 1.15,
+    "madeAt": 1.15,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 23,
+            "den": 20
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-116",
+    "kind": "position",
+    "refersTo": 1.16,
+    "madeAt": 1.16,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 29,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-117",
+    "kind": "position",
+    "refersTo": 1.17,
+    "madeAt": 1.17,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 117,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-118",
+    "kind": "position",
+    "refersTo": 1.18,
+    "madeAt": 1.18,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 59,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-119",
+    "kind": "position",
+    "refersTo": 1.19,
+    "madeAt": 1.19,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 119,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-120",
+    "kind": "position",
+    "refersTo": 1.2,
+    "madeAt": 1.2,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 6,
+            "den": 5
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-121",
+    "kind": "position",
+    "refersTo": 1.21,
+    "madeAt": 1.21,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 121,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-122",
+    "kind": "position",
+    "refersTo": 1.22,
+    "madeAt": 1.22,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 61,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-123",
+    "kind": "position",
+    "refersTo": 1.23,
+    "madeAt": 1.23,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 123,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-124",
+    "kind": "position",
+    "refersTo": 1.24,
+    "madeAt": 1.24,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 31,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-125",
+    "kind": "position",
+    "refersTo": 1.25,
+    "madeAt": 1.25,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 5,
+            "den": 4
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-126",
+    "kind": "position",
+    "refersTo": 1.26,
+    "madeAt": 1.26,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 63,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-127",
+    "kind": "position",
+    "refersTo": 1.27,
+    "madeAt": 1.27,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 127,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-128",
+    "kind": "position",
+    "refersTo": 1.28,
+    "madeAt": 1.28,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 32,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-129",
+    "kind": "position",
+    "refersTo": 1.29,
+    "madeAt": 1.29,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 129,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-130",
+    "kind": "position",
+    "refersTo": 1.3,
+    "madeAt": 1.3,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 13,
+            "den": 10
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-131",
+    "kind": "position",
+    "refersTo": 1.31,
+    "madeAt": 1.31,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 131,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-132",
+    "kind": "position",
+    "refersTo": 1.32,
+    "madeAt": 1.32,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 33,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-133",
+    "kind": "position",
+    "refersTo": 1.33,
+    "madeAt": 1.33,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 133,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-134",
+    "kind": "position",
+    "refersTo": 1.34,
+    "madeAt": 1.34,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 67,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-135",
+    "kind": "position",
+    "refersTo": 1.35,
+    "madeAt": 1.35,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 27,
+            "den": 20
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-136",
+    "kind": "position",
+    "refersTo": 1.36,
+    "madeAt": 1.36,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 34,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-137",
+    "kind": "position",
+    "refersTo": 1.37,
+    "madeAt": 1.37,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 137,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-138",
+    "kind": "position",
+    "refersTo": 1.38,
+    "madeAt": 1.38,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 69,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-139",
+    "kind": "position",
+    "refersTo": 1.39,
+    "madeAt": 1.39,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 139,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-140",
+    "kind": "position",
+    "refersTo": 1.4,
+    "madeAt": 1.4,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 7,
+            "den": 5
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-141",
+    "kind": "position",
+    "refersTo": 1.41,
+    "madeAt": 1.41,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 141,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-142",
+    "kind": "position",
+    "refersTo": 1.42,
+    "madeAt": 1.42,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 71,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-143",
+    "kind": "position",
+    "refersTo": 1.43,
+    "madeAt": 1.43,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 143,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-144",
+    "kind": "position",
+    "refersTo": 1.44,
+    "madeAt": 1.44,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 36,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-145",
+    "kind": "position",
+    "refersTo": 1.45,
+    "madeAt": 1.45,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 29,
+            "den": 20
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-146",
+    "kind": "position",
+    "refersTo": 1.46,
+    "madeAt": 1.46,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 73,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-147",
+    "kind": "position",
+    "refersTo": 1.47,
+    "madeAt": 1.47,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 147,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-148",
+    "kind": "position",
+    "refersTo": 1.48,
+    "madeAt": 1.48,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 37,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-149",
+    "kind": "position",
+    "refersTo": 1.49,
+    "madeAt": 1.49,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 149,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-150",
+    "kind": "position",
+    "refersTo": 1.5,
+    "madeAt": 1.5,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 3,
+            "den": 2
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-151",
+    "kind": "position",
+    "refersTo": 1.51,
+    "madeAt": 1.51,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 151,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-152",
+    "kind": "position",
+    "refersTo": 1.52,
+    "madeAt": 1.52,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 38,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-153",
+    "kind": "position",
+    "refersTo": 1.53,
+    "madeAt": 1.53,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 153,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-154",
+    "kind": "position",
+    "refersTo": 1.54,
+    "madeAt": 1.54,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 77,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-155",
+    "kind": "position",
+    "refersTo": 1.55,
+    "madeAt": 1.55,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 31,
+            "den": 20
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-156",
+    "kind": "position",
+    "refersTo": 1.56,
+    "madeAt": 1.56,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 39,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-157",
+    "kind": "position",
+    "refersTo": 1.57,
+    "madeAt": 1.57,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 157,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-158",
+    "kind": "position",
+    "refersTo": 1.58,
+    "madeAt": 1.58,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 79,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-159",
+    "kind": "position",
+    "refersTo": 1.59,
+    "madeAt": 1.59,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 159,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-160",
+    "kind": "position",
+    "refersTo": 1.6,
+    "madeAt": 1.6,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 8,
+            "den": 5
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-161",
+    "kind": "position",
+    "refersTo": 1.61,
+    "madeAt": 1.61,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 161,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-162",
+    "kind": "position",
+    "refersTo": 1.62,
+    "madeAt": 1.62,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 81,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-163",
+    "kind": "position",
+    "refersTo": 1.63,
+    "madeAt": 1.63,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 163,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-164",
+    "kind": "position",
+    "refersTo": 1.64,
+    "madeAt": 1.64,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 41,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-165",
+    "kind": "position",
+    "refersTo": 1.65,
+    "madeAt": 1.65,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 33,
+            "den": 20
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-166",
+    "kind": "position",
+    "refersTo": 1.66,
+    "madeAt": 1.66,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 83,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-167",
+    "kind": "position",
+    "refersTo": 1.67,
+    "madeAt": 1.67,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 167,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-168",
+    "kind": "position",
+    "refersTo": 1.68,
+    "madeAt": 1.68,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 42,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-169",
+    "kind": "position",
+    "refersTo": 1.69,
+    "madeAt": 1.69,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 169,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-170",
+    "kind": "position",
+    "refersTo": 1.7,
+    "madeAt": 1.7,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 17,
+            "den": 10
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-171",
+    "kind": "position",
+    "refersTo": 1.71,
+    "madeAt": 1.71,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 171,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-172",
+    "kind": "position",
+    "refersTo": 1.72,
+    "madeAt": 1.72,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 43,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-173",
+    "kind": "position",
+    "refersTo": 1.73,
+    "madeAt": 1.73,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 173,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-174",
+    "kind": "position",
+    "refersTo": 1.74,
+    "madeAt": 1.74,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 87,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-175",
+    "kind": "position",
+    "refersTo": 1.75,
+    "madeAt": 1.75,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 7,
+            "den": 4
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-176",
+    "kind": "position",
+    "refersTo": 1.76,
+    "madeAt": 1.76,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 44,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-177",
+    "kind": "position",
+    "refersTo": 1.77,
+    "madeAt": 1.77,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 177,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-178",
+    "kind": "position",
+    "refersTo": 1.78,
+    "madeAt": 1.78,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 89,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-179",
+    "kind": "position",
+    "refersTo": 1.79,
+    "madeAt": 1.79,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 179,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-180",
+    "kind": "position",
+    "refersTo": 1.8,
+    "madeAt": 1.8,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 9,
+            "den": 5
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-181",
+    "kind": "position",
+    "refersTo": 1.81,
+    "madeAt": 1.81,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 181,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-182",
+    "kind": "position",
+    "refersTo": 1.82,
+    "madeAt": 1.82,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 91,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-183",
+    "kind": "position",
+    "refersTo": 1.83,
+    "madeAt": 1.83,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 183,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-184",
+    "kind": "position",
+    "refersTo": 1.84,
+    "madeAt": 1.84,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 46,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-185",
+    "kind": "position",
+    "refersTo": 1.85,
+    "madeAt": 1.85,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 37,
+            "den": 20
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-186",
+    "kind": "position",
+    "refersTo": 1.86,
+    "madeAt": 1.86,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 93,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-187",
+    "kind": "position",
+    "refersTo": 1.87,
+    "madeAt": 1.87,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 187,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-188",
+    "kind": "position",
+    "refersTo": 1.88,
+    "madeAt": 1.88,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 47,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-189",
+    "kind": "position",
+    "refersTo": 1.89,
+    "madeAt": 1.89,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 189,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-190",
+    "kind": "position",
+    "refersTo": 1.9,
+    "madeAt": 1.9,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 19,
+            "den": 10
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-191",
+    "kind": "position",
+    "refersTo": 1.91,
+    "madeAt": 1.91,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 191,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-192",
+    "kind": "position",
+    "refersTo": 1.92,
+    "madeAt": 1.92,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 48,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-193",
+    "kind": "position",
+    "refersTo": 1.93,
+    "madeAt": 1.93,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 193,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-194",
+    "kind": "position",
+    "refersTo": 1.94,
+    "madeAt": 1.94,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 97,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-195",
+    "kind": "position",
+    "refersTo": 1.95,
+    "madeAt": 1.95,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 39,
+            "den": 20
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-196",
+    "kind": "position",
+    "refersTo": 1.96,
+    "madeAt": 1.96,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 49,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-197",
+    "kind": "position",
+    "refersTo": 1.97,
+    "madeAt": 1.97,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 197,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-198",
+    "kind": "position",
+    "refersTo": 1.98,
+    "madeAt": 1.98,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 99,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-199",
+    "kind": "position",
+    "refersTo": 1.99,
+    "madeAt": 1.99,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 199,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-200",
+    "kind": "position",
+    "refersTo": 2,
+    "madeAt": 2,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 2,
+            "den": 1
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-201",
+    "kind": "position",
+    "refersTo": 2.01,
+    "madeAt": 2.01,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 201,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-202",
+    "kind": "position",
+    "refersTo": 2.02,
+    "madeAt": 2.02,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 101,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-203",
+    "kind": "position",
+    "refersTo": 2.03,
+    "madeAt": 2.03,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 203,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-204",
+    "kind": "position",
+    "refersTo": 2.04,
+    "madeAt": 2.04,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 51,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-205",
+    "kind": "position",
+    "refersTo": 2.05,
+    "madeAt": 2.05,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 41,
+            "den": 20
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-206",
+    "kind": "position",
+    "refersTo": 2.06,
+    "madeAt": 2.06,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 103,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-207",
+    "kind": "position",
+    "refersTo": 2.07,
+    "madeAt": 2.07,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 207,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-208",
+    "kind": "position",
+    "refersTo": 2.08,
+    "madeAt": 2.08,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 52,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-209",
+    "kind": "position",
+    "refersTo": 2.09,
+    "madeAt": 2.09,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 209,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-210",
+    "kind": "position",
+    "refersTo": 2.1,
+    "madeAt": 2.1,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 21,
+            "den": 10
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-211",
+    "kind": "position",
+    "refersTo": 2.11,
+    "madeAt": 2.11,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 211,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-212",
+    "kind": "position",
+    "refersTo": 2.12,
+    "madeAt": 2.12,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 53,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-213",
+    "kind": "position",
+    "refersTo": 2.13,
+    "madeAt": 2.13,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 213,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-214",
+    "kind": "position",
+    "refersTo": 2.14,
+    "madeAt": 2.14,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 107,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-215",
+    "kind": "position",
+    "refersTo": 2.15,
+    "madeAt": 2.15,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 43,
+            "den": 20
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-216",
+    "kind": "position",
+    "refersTo": 2.16,
+    "madeAt": 2.16,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 54,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-217",
+    "kind": "position",
+    "refersTo": 2.17,
+    "madeAt": 2.17,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 217,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-218",
+    "kind": "position",
+    "refersTo": 2.18,
+    "madeAt": 2.18,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 109,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-219",
+    "kind": "position",
+    "refersTo": 2.19,
+    "madeAt": 2.19,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 219,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-220",
+    "kind": "position",
+    "refersTo": 2.2,
+    "madeAt": 2.2,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 11,
+            "den": 5
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-221",
+    "kind": "position",
+    "refersTo": 2.21,
+    "madeAt": 2.21,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 221,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-222",
+    "kind": "position",
+    "refersTo": 2.22,
+    "madeAt": 2.22,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 111,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-223",
+    "kind": "position",
+    "refersTo": 2.23,
+    "madeAt": 2.23,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 223,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-224",
+    "kind": "position",
+    "refersTo": 2.24,
+    "madeAt": 2.24,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 56,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-225",
+    "kind": "position",
+    "refersTo": 2.25,
+    "madeAt": 2.25,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 9,
+            "den": 4
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-226",
+    "kind": "position",
+    "refersTo": 2.26,
+    "madeAt": 2.26,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 113,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-227",
+    "kind": "position",
+    "refersTo": 2.27,
+    "madeAt": 2.27,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 227,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-228",
+    "kind": "position",
+    "refersTo": 2.28,
+    "madeAt": 2.28,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 57,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-229",
+    "kind": "position",
+    "refersTo": 2.29,
+    "madeAt": 2.29,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 229,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-230",
+    "kind": "position",
+    "refersTo": 2.3,
+    "madeAt": 2.3,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 23,
+            "den": 10
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-231",
+    "kind": "position",
+    "refersTo": 2.31,
+    "madeAt": 2.31,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 231,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-232",
+    "kind": "position",
+    "refersTo": 2.32,
+    "madeAt": 2.32,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 58,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-233",
+    "kind": "position",
+    "refersTo": 2.33,
+    "madeAt": 2.33,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 233,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-234",
+    "kind": "position",
+    "refersTo": 2.34,
+    "madeAt": 2.34,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 117,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-235",
+    "kind": "position",
+    "refersTo": 2.35,
+    "madeAt": 2.35,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 47,
+            "den": 20
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-236",
+    "kind": "position",
+    "refersTo": 2.36,
+    "madeAt": 2.36,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 59,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-237",
+    "kind": "position",
+    "refersTo": 2.37,
+    "madeAt": 2.37,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 237,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-238",
+    "kind": "position",
+    "refersTo": 2.38,
+    "madeAt": 2.38,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 119,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-239",
+    "kind": "position",
+    "refersTo": 2.39,
+    "madeAt": 2.39,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 239,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-240",
+    "kind": "position",
+    "refersTo": 2.4,
+    "madeAt": 2.4,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 12,
+            "den": 5
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-241",
+    "kind": "position",
+    "refersTo": 2.41,
+    "madeAt": 2.41,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 241,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-242",
+    "kind": "position",
+    "refersTo": 2.42,
+    "madeAt": 2.42,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 121,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-243",
+    "kind": "position",
+    "refersTo": 2.43,
+    "madeAt": 2.43,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 243,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-244",
+    "kind": "position",
+    "refersTo": 2.44,
+    "madeAt": 2.44,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 61,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-245",
+    "kind": "position",
+    "refersTo": 2.45,
+    "madeAt": 2.45,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 49,
+            "den": 20
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-246",
+    "kind": "position",
+    "refersTo": 2.46,
+    "madeAt": 2.46,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 123,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-247",
+    "kind": "position",
+    "refersTo": 2.47,
+    "madeAt": 2.47,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 247,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-248",
+    "kind": "position",
+    "refersTo": 2.48,
+    "madeAt": 2.48,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 62,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-249",
+    "kind": "position",
+    "refersTo": 2.49,
+    "madeAt": 2.49,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 249,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-250",
+    "kind": "position",
+    "refersTo": 2.5,
+    "madeAt": 2.5,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 5,
+            "den": 2
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-251",
+    "kind": "position",
+    "refersTo": 2.51,
+    "madeAt": 2.51,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 251,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-252",
+    "kind": "position",
+    "refersTo": 2.52,
+    "madeAt": 2.52,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 63,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-253",
+    "kind": "position",
+    "refersTo": 2.53,
+    "madeAt": 2.53,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 253,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-254",
+    "kind": "position",
+    "refersTo": 2.54,
+    "madeAt": 2.54,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 127,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-255",
+    "kind": "position",
+    "refersTo": 2.55,
+    "madeAt": 2.55,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 51,
+            "den": 20
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-256",
+    "kind": "position",
+    "refersTo": 2.56,
+    "madeAt": 2.56,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 64,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-257",
+    "kind": "position",
+    "refersTo": 2.57,
+    "madeAt": 2.57,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 257,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-258",
+    "kind": "position",
+    "refersTo": 2.58,
+    "madeAt": 2.58,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 129,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-259",
+    "kind": "position",
+    "refersTo": 2.59,
+    "madeAt": 2.59,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 259,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-260",
+    "kind": "position",
+    "refersTo": 2.6,
+    "madeAt": 2.6,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 13,
+            "den": 5
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-261",
+    "kind": "position",
+    "refersTo": 2.61,
+    "madeAt": 2.61,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 261,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-262",
+    "kind": "position",
+    "refersTo": 2.62,
+    "madeAt": 2.62,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 131,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-263",
+    "kind": "position",
+    "refersTo": 2.63,
+    "madeAt": 2.63,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 263,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-264",
+    "kind": "position",
+    "refersTo": 2.64,
+    "madeAt": 2.64,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 66,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-265",
+    "kind": "position",
+    "refersTo": 2.65,
+    "madeAt": 2.65,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 53,
+            "den": 20
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-266",
+    "kind": "position",
+    "refersTo": 2.66,
+    "madeAt": 2.66,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 133,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-267",
+    "kind": "position",
+    "refersTo": 2.67,
+    "madeAt": 2.67,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 267,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-268",
+    "kind": "position",
+    "refersTo": 2.68,
+    "madeAt": 2.68,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 67,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-269",
+    "kind": "position",
+    "refersTo": 2.69,
+    "madeAt": 2.69,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 269,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-270",
+    "kind": "position",
+    "refersTo": 2.7,
+    "madeAt": 2.7,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 27,
+            "den": 10
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-271",
+    "kind": "position",
+    "refersTo": 2.71,
+    "madeAt": 2.71,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 271,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-272",
+    "kind": "position",
+    "refersTo": 2.72,
+    "madeAt": 2.72,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 68,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-273",
+    "kind": "position",
+    "refersTo": 2.73,
+    "madeAt": 2.73,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 273,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-274",
+    "kind": "position",
+    "refersTo": 2.74,
+    "madeAt": 2.74,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 137,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-275",
+    "kind": "position",
+    "refersTo": 2.75,
+    "madeAt": 2.75,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 11,
+            "den": 4
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-276",
+    "kind": "position",
+    "refersTo": 2.76,
+    "madeAt": 2.76,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 69,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-277",
+    "kind": "position",
+    "refersTo": 2.77,
+    "madeAt": 2.77,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 277,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-278",
+    "kind": "position",
+    "refersTo": 2.78,
+    "madeAt": 2.78,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 139,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-279",
+    "kind": "position",
+    "refersTo": 2.79,
+    "madeAt": 2.79,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 279,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-280",
+    "kind": "position",
+    "refersTo": 2.8,
+    "madeAt": 2.8,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 14,
+            "den": 5
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-281",
+    "kind": "position",
+    "refersTo": 2.81,
+    "madeAt": 2.81,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 281,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-282",
+    "kind": "position",
+    "refersTo": 2.82,
+    "madeAt": 2.82,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 141,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-283",
+    "kind": "position",
+    "refersTo": 2.83,
+    "madeAt": 2.83,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 283,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-284",
+    "kind": "position",
+    "refersTo": 2.84,
+    "madeAt": 2.84,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 71,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-285",
+    "kind": "position",
+    "refersTo": 2.85,
+    "madeAt": 2.85,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 57,
+            "den": 20
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-286",
+    "kind": "position",
+    "refersTo": 2.86,
+    "madeAt": 2.86,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 143,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-287",
+    "kind": "position",
+    "refersTo": 2.87,
+    "madeAt": 2.87,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 287,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-288",
+    "kind": "position",
+    "refersTo": 2.88,
+    "madeAt": 2.88,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 72,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-289",
+    "kind": "position",
+    "refersTo": 2.89,
+    "madeAt": 2.89,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 289,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-290",
+    "kind": "position",
+    "refersTo": 2.9,
+    "madeAt": 2.9,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 29,
+            "den": 10
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-291",
+    "kind": "position",
+    "refersTo": 2.91,
+    "madeAt": 2.91,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 291,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-292",
+    "kind": "position",
+    "refersTo": 2.92,
+    "madeAt": 2.92,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 73,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-293",
+    "kind": "position",
+    "refersTo": 2.93,
+    "madeAt": 2.93,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 293,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-294",
+    "kind": "position",
+    "refersTo": 2.94,
+    "madeAt": 2.94,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 147,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-295",
+    "kind": "position",
+    "refersTo": 2.95,
+    "madeAt": 2.95,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 59,
+            "den": 20
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-296",
+    "kind": "position",
+    "refersTo": 2.96,
+    "madeAt": 2.96,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 74,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-297",
+    "kind": "position",
+    "refersTo": 2.97,
+    "madeAt": 2.97,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 297,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-298",
+    "kind": "position",
+    "refersTo": 2.98,
+    "madeAt": 2.98,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 149,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-299",
+    "kind": "position",
+    "refersTo": 2.99,
+    "madeAt": 2.99,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 299,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-300",
+    "kind": "position",
+    "refersTo": 3,
+    "madeAt": 3,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 3,
+            "den": 1
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-301",
+    "kind": "position",
+    "refersTo": 3.01,
+    "madeAt": 3.01,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 301,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-302",
+    "kind": "position",
+    "refersTo": 3.02,
+    "madeAt": 3.02,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 151,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-303",
+    "kind": "position",
+    "refersTo": 3.03,
+    "madeAt": 3.03,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 303,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-304",
+    "kind": "position",
+    "refersTo": 3.04,
+    "madeAt": 3.04,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 76,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-305",
+    "kind": "position",
+    "refersTo": 3.05,
+    "madeAt": 3.05,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 61,
+            "den": 20
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-306",
+    "kind": "position",
+    "refersTo": 3.06,
+    "madeAt": 3.06,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 153,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-307",
+    "kind": "position",
+    "refersTo": 3.07,
+    "madeAt": 3.07,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 307,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-308",
+    "kind": "position",
+    "refersTo": 3.08,
+    "madeAt": 3.08,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 77,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-309",
+    "kind": "position",
+    "refersTo": 3.09,
+    "madeAt": 3.09,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 309,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-310",
+    "kind": "position",
+    "refersTo": 3.1,
+    "madeAt": 3.1,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 31,
+            "den": 10
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-311",
+    "kind": "position",
+    "refersTo": 3.11,
+    "madeAt": 3.11,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 311,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-312",
+    "kind": "position",
+    "refersTo": 3.12,
+    "madeAt": 3.12,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 78,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-313",
+    "kind": "position",
+    "refersTo": 3.13,
+    "madeAt": 3.13,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 313,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-314",
+    "kind": "position",
+    "refersTo": 3.14,
+    "madeAt": 3.14,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 157,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-315",
+    "kind": "position",
+    "refersTo": 3.15,
+    "madeAt": 3.15,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 63,
+            "den": 20
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-316",
+    "kind": "position",
+    "refersTo": 3.16,
+    "madeAt": 3.16,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 79,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-317",
+    "kind": "position",
+    "refersTo": 3.17,
+    "madeAt": 3.17,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 317,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-318",
+    "kind": "position",
+    "refersTo": 3.18,
+    "madeAt": 3.18,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 159,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-319",
+    "kind": "position",
+    "refersTo": 3.19,
+    "madeAt": 3.19,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 319,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-320",
+    "kind": "position",
+    "refersTo": 3.2,
+    "madeAt": 3.2,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 16,
+            "den": 5
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-321",
+    "kind": "position",
+    "refersTo": 3.21,
+    "madeAt": 3.21,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 321,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-322",
+    "kind": "position",
+    "refersTo": 3.22,
+    "madeAt": 3.22,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 161,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-323",
+    "kind": "position",
+    "refersTo": 3.23,
+    "madeAt": 3.23,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 323,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-324",
+    "kind": "position",
+    "refersTo": 3.24,
+    "madeAt": 3.24,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 81,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-325",
+    "kind": "position",
+    "refersTo": 3.25,
+    "madeAt": 3.25,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 13,
+            "den": 4
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-326",
+    "kind": "position",
+    "refersTo": 3.26,
+    "madeAt": 3.26,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 163,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-327",
+    "kind": "position",
+    "refersTo": 3.27,
+    "madeAt": 3.27,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 327,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-328",
+    "kind": "position",
+    "refersTo": 3.28,
+    "madeAt": 3.28,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 82,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-329",
+    "kind": "position",
+    "refersTo": 3.29,
+    "madeAt": 3.29,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 329,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-330",
+    "kind": "position",
+    "refersTo": 3.3,
+    "madeAt": 3.3,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 33,
+            "den": 10
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-331",
+    "kind": "position",
+    "refersTo": 3.31,
+    "madeAt": 3.31,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 331,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-332",
+    "kind": "position",
+    "refersTo": 3.32,
+    "madeAt": 3.32,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 83,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-333",
+    "kind": "position",
+    "refersTo": 3.33,
+    "madeAt": 3.33,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 333,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-334",
+    "kind": "position",
+    "refersTo": 3.34,
+    "madeAt": 3.34,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 167,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-335",
+    "kind": "position",
+    "refersTo": 3.35,
+    "madeAt": 3.35,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 67,
+            "den": 20
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-336",
+    "kind": "position",
+    "refersTo": 3.36,
+    "madeAt": 3.36,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 84,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-337",
+    "kind": "position",
+    "refersTo": 3.37,
+    "madeAt": 3.37,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 337,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-338",
+    "kind": "position",
+    "refersTo": 3.38,
+    "madeAt": 3.38,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 169,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-339",
+    "kind": "position",
+    "refersTo": 3.39,
+    "madeAt": 3.39,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 339,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-340",
+    "kind": "position",
+    "refersTo": 3.4,
+    "madeAt": 3.4,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 17,
+            "den": 5
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-341",
+    "kind": "position",
+    "refersTo": 3.41,
+    "madeAt": 3.41,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 341,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-342",
+    "kind": "position",
+    "refersTo": 3.42,
+    "madeAt": 3.42,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 171,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-343",
+    "kind": "position",
+    "refersTo": 3.43,
+    "madeAt": 3.43,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 343,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-344",
+    "kind": "position",
+    "refersTo": 3.44,
+    "madeAt": 3.44,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 86,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-345",
+    "kind": "position",
+    "refersTo": 3.45,
+    "madeAt": 3.45,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 69,
+            "den": 20
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-346",
+    "kind": "position",
+    "refersTo": 3.46,
+    "madeAt": 3.46,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 173,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-347",
+    "kind": "position",
+    "refersTo": 3.47,
+    "madeAt": 3.47,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 347,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-348",
+    "kind": "position",
+    "refersTo": 3.48,
+    "madeAt": 3.48,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 87,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-349",
+    "kind": "position",
+    "refersTo": 3.49,
+    "madeAt": 3.49,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 349,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-350",
+    "kind": "position",
+    "refersTo": 3.5,
+    "madeAt": 3.5,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 7,
+            "den": 2
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-351",
+    "kind": "position",
+    "refersTo": 3.51,
+    "madeAt": 3.51,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 351,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-352",
+    "kind": "position",
+    "refersTo": 3.52,
+    "madeAt": 3.52,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 88,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-353",
+    "kind": "position",
+    "refersTo": 3.53,
+    "madeAt": 3.53,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 353,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-354",
+    "kind": "position",
+    "refersTo": 3.54,
+    "madeAt": 3.54,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 177,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-355",
+    "kind": "position",
+    "refersTo": 3.55,
+    "madeAt": 3.55,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 71,
+            "den": 20
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-356",
+    "kind": "position",
+    "refersTo": 3.56,
+    "madeAt": 3.56,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 89,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-357",
+    "kind": "position",
+    "refersTo": 3.57,
+    "madeAt": 3.57,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 357,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-358",
+    "kind": "position",
+    "refersTo": 3.58,
+    "madeAt": 3.58,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 179,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-359",
+    "kind": "position",
+    "refersTo": 3.59,
+    "madeAt": 3.59,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 359,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-360",
+    "kind": "position",
+    "refersTo": 3.6,
+    "madeAt": 3.6,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 18,
+            "den": 5
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-361",
+    "kind": "position",
+    "refersTo": 3.61,
+    "madeAt": 3.61,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 361,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-362",
+    "kind": "position",
+    "refersTo": 3.62,
+    "madeAt": 3.62,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 181,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-363",
+    "kind": "position",
+    "refersTo": 3.63,
+    "madeAt": 3.63,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 363,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-364",
+    "kind": "position",
+    "refersTo": 3.64,
+    "madeAt": 3.64,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 91,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-365",
+    "kind": "position",
+    "refersTo": 3.65,
+    "madeAt": 3.65,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 73,
+            "den": 20
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-366",
+    "kind": "position",
+    "refersTo": 3.66,
+    "madeAt": 3.66,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 183,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-367",
+    "kind": "position",
+    "refersTo": 3.67,
+    "madeAt": 3.67,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 367,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-368",
+    "kind": "position",
+    "refersTo": 3.68,
+    "madeAt": 3.68,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 92,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-369",
+    "kind": "position",
+    "refersTo": 3.69,
+    "madeAt": 3.69,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 369,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-370",
+    "kind": "position",
+    "refersTo": 3.7,
+    "madeAt": 3.7,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 37,
+            "den": 10
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-371",
+    "kind": "position",
+    "refersTo": 3.71,
+    "madeAt": 3.71,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 371,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-372",
+    "kind": "position",
+    "refersTo": 3.72,
+    "madeAt": 3.72,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 93,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-373",
+    "kind": "position",
+    "refersTo": 3.73,
+    "madeAt": 3.73,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 373,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-374",
+    "kind": "position",
+    "refersTo": 3.74,
+    "madeAt": 3.74,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 187,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-375",
+    "kind": "position",
+    "refersTo": 3.75,
+    "madeAt": 3.75,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 15,
+            "den": 4
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-376",
+    "kind": "position",
+    "refersTo": 3.76,
+    "madeAt": 3.76,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 94,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-377",
+    "kind": "position",
+    "refersTo": 3.77,
+    "madeAt": 3.77,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 377,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-378",
+    "kind": "position",
+    "refersTo": 3.78,
+    "madeAt": 3.78,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 189,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-379",
+    "kind": "position",
+    "refersTo": 3.79,
+    "madeAt": 3.79,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 379,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-380",
+    "kind": "position",
+    "refersTo": 3.8,
+    "madeAt": 3.8,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 19,
+            "den": 5
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-381",
+    "kind": "position",
+    "refersTo": 3.81,
+    "madeAt": 3.81,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 381,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-382",
+    "kind": "position",
+    "refersTo": 3.82,
+    "madeAt": 3.82,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 191,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-383",
+    "kind": "position",
+    "refersTo": 3.83,
+    "madeAt": 3.83,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 383,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-384",
+    "kind": "position",
+    "refersTo": 3.84,
+    "madeAt": 3.84,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 96,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-385",
+    "kind": "position",
+    "refersTo": 3.85,
+    "madeAt": 3.85,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 77,
+            "den": 20
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-386",
+    "kind": "position",
+    "refersTo": 3.86,
+    "madeAt": 3.86,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 193,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-387",
+    "kind": "position",
+    "refersTo": 3.87,
+    "madeAt": 3.87,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 387,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-388",
+    "kind": "position",
+    "refersTo": 3.88,
+    "madeAt": 3.88,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 97,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-389",
+    "kind": "position",
+    "refersTo": 3.89,
+    "madeAt": 3.89,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 389,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-390",
+    "kind": "position",
+    "refersTo": 3.9,
+    "madeAt": 3.9,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 39,
+            "den": 10
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-391",
+    "kind": "position",
+    "refersTo": 3.91,
+    "madeAt": 3.91,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 391,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-392",
+    "kind": "position",
+    "refersTo": 3.92,
+    "madeAt": 3.92,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 98,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-393",
+    "kind": "position",
+    "refersTo": 3.93,
+    "madeAt": 3.93,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 393,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-394",
+    "kind": "position",
+    "refersTo": 3.94,
+    "madeAt": 3.94,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 197,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-395",
+    "kind": "position",
+    "refersTo": 3.95,
+    "madeAt": 3.95,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 79,
+            "den": 20
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-396",
+    "kind": "position",
+    "refersTo": 3.96,
+    "madeAt": 3.96,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 99,
+            "den": 25
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-397",
+    "kind": "position",
+    "refersTo": 3.97,
+    "madeAt": 3.97,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 397,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-398",
+    "kind": "position",
+    "refersTo": 3.98,
+    "madeAt": 3.98,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 199,
+            "den": 50
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-399",
+    "kind": "position",
+    "refersTo": 3.99,
+    "madeAt": 3.99,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 399,
+            "den": 100
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "clock-400",
+    "kind": "position",
+    "refersTo": 4,
+    "madeAt": 4,
+    "confidence": 1,
+    "candidates": [
+      {
+        "position": {
+          "quarters": {
+            "num": 4,
+            "den": 1
+          },
+          "route": 1
+        },
+        "weight": 1
+      }
+    ]
+  }
+]
