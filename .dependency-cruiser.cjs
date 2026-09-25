@@ -49,6 +49,13 @@ module.exports = {
       to: { path: '^(src|worker|apps|harness|converters)/', pathNot: '^src/(audio|model)/' }
     },
     {
+      // The listener contract moves to src/listen/ by git mv (SEAM.md), so nothing in it
+      // may reach the measuring bench or any other part of the experiment.
+      name: 'listening-seam-imports-nothing-from-the-experiment', severity: 'error',
+      from: { path: '^experiments/performance-listening/listen/' },
+      to: { path: '^experiments/performance-listening/', pathNot: '^experiments/performance-listening/listen/' }
+    },
+    {
       name: 'native-audio-only-at-browser-boundary',
       severity: 'error',
       from: { path: '^(src|worker|harness)/', pathNot: '^src/(audio/native|elements|entries)/|^harness/browser/' },

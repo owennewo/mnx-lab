@@ -1,0 +1,185 @@
+[
+  {
+    "id": "p1",
+    "kind": "position",
+    "refersTo": 0.1,
+    "madeAt": 0.12,
+    "confidence": 0.9,
+    "candidates": [
+      {
+        "at": {
+          "ordinal": 0,
+          "metricOffset": {
+            "num": "0",
+            "den": "1"
+          }
+        },
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "n-match",
+    "kind": "note",
+    "refersTo": 0.2,
+    "madeAt": 0.25,
+    "verdict": "match",
+    "at": {
+      "ordinal": 0,
+      "metricOffset": {
+        "num": "0",
+        "den": "1"
+      }
+    },
+    "noteKey": "KEY0",
+    "observed": {
+      "onset": 0.01,
+      "end": 0.5,
+      "midi": 60,
+      "string": null
+    },
+    "timingErrorSeconds": 0.01,
+    "durationErrorSeconds": 0.0,
+    "confidence": 0.9
+  },
+  {
+    "id": "n-missing",
+    "kind": "note",
+    "refersTo": 1.2,
+    "madeAt": 1.3,
+    "verdict": "missing",
+    "at": {
+      "ordinal": 0,
+      "metricOffset": {
+        "num": "1",
+        "den": "4"
+      }
+    },
+    "noteKey": "KEY1",
+    "observed": null,
+    "timingErrorSeconds": null,
+    "durationErrorSeconds": null,
+    "confidence": 0.6
+  },
+  {
+    "id": "n-missing-late",
+    "kind": "note",
+    "refersTo": 1.2,
+    "madeAt": 1.45,
+    "supersedes": "n-missing",
+    "verdict": "match",
+    "at": {
+      "ordinal": 0,
+      "metricOffset": {
+        "num": "1",
+        "den": "4"
+      }
+    },
+    "noteKey": "KEY1",
+    "observed": {
+      "onset": 1.18,
+      "end": 1.6,
+      "midi": 62,
+      "string": null
+    },
+    "timingErrorSeconds": 0.18,
+    "durationErrorSeconds": -0.08,
+    "confidence": 0.8
+  },
+  {
+    "id": "n-extra",
+    "kind": "note",
+    "refersTo": 1.6,
+    "madeAt": 1.7,
+    "verdict": "extra",
+    "at": {
+      "ordinal": 0,
+      "metricOffset": {
+        "num": "3",
+        "den": "8"
+      }
+    },
+    "noteKey": null,
+    "observed": {
+      "onset": 1.62,
+      "end": 1.8,
+      "midi": 61,
+      "string": null
+    },
+    "timingErrorSeconds": null,
+    "durationErrorSeconds": null,
+    "confidence": 0.7
+  },
+  {
+    "id": "n-substitution",
+    "kind": "note",
+    "refersTo": 2.1,
+    "madeAt": 2.2,
+    "verdict": "substitution",
+    "at": {
+      "ordinal": 0,
+      "metricOffset": {
+        "num": "1",
+        "den": "2"
+      }
+    },
+    "noteKey": "KEY2",
+    "observed": {
+      "onset": 2.0,
+      "end": 2.4,
+      "midi": 65,
+      "string": null
+    },
+    "timingErrorSeconds": 0.0,
+    "durationErrorSeconds": 0.0,
+    "confidence": 0.85
+  },
+  {
+    "id": "n-timing",
+    "kind": "note",
+    "refersTo": 3.1,
+    "madeAt": 3.2,
+    "verdict": "timing",
+    "at": {
+      "ordinal": 0,
+      "metricOffset": {
+        "num": "3",
+        "den": "4"
+      }
+    },
+    "noteKey": "KEY3",
+    "observed": {
+      "onset": 3.15,
+      "end": 3.5,
+      "midi": 65,
+      "string": null
+    },
+    "timingErrorSeconds": 0.15,
+    "durationErrorSeconds": null,
+    "confidence": 0.75
+  },
+  {
+    "id": "n-duration",
+    "kind": "note",
+    "refersTo": 4.3,
+    "madeAt": 4.4,
+    "verdict": "duration",
+    "at": {
+      "ordinal": 1,
+      "metricOffset": {
+        "num": "0",
+        "den": "1"
+      }
+    },
+    "noteKey": "KEY4",
+    "observed": {
+      "onset": 4.0,
+      "end": 4.2,
+      "midi": 67,
+      "string": null
+    },
+    "timingErrorSeconds": 0.0,
+    "durationErrorSeconds": -0.3,
+    "confidence": 0.8
+  }
+]

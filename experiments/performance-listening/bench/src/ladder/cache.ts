@@ -11,7 +11,7 @@ import { sha } from './privateSets.ts';
 const BENCH_SRC = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const REPO = resolve(BENCH_SRC, '../../../..');
 /** The code that turns a candidate's decisions into a result, whatever the candidate. */
-export const EVALUATION_PATH = ['run/runner.ts', 'evaluate/index.ts', 'ladder/goldens.ts', 'validate.ts', 'types.ts'];
+export const EVALUATION_PATH = ['run/runner.ts', 'evaluate/index.ts', 'ladder/goldens.ts', 'validate.ts', 'types.ts', 'seam/legacy.ts', 'seam/records.ts', 'seam/runner.ts'];
 
 /** Every .ts file reachable by static or dynamic relative imports from the roots. */
 export function closure(roots: string[]): string[] {
@@ -31,7 +31,7 @@ export function fingerprint(candidateModule: string): { hash: string; files: Rec
   return { hash: sha(JSON.stringify(files)), files };
 }
 
-export interface CachedExample<T> { result: T; record: unknown; evaluation: unknown; sourceRun: string }
+export interface CachedExample<T> { result: T; record: unknown; seamRecord?: import('../../../listen/json.ts').DecisionJSON[]; evaluation: unknown; sourceRun: string }
 const safe = (s: string) => s.replace(/[^a-z0-9@.-]+/gi, '_');
 export function cachePath(root: string, candidate: string, fingerprintHash: string, rungSha: string, example: string): string {
   return join(root, 'cache', 'examples', safe(candidate), fingerprintHash.slice(0, 16), rungSha.slice(0, 16), `${safe(example)}.json`);
@@ -46,7 +46,8 @@ export function writeCached<T>(path: string, entry: CachedExample<T>): void {
 
 /** What must reproduce exactly. Processing cost is measured on each run and is not. */
 export function comparable(result: { gates: object; cost?: unknown }): string {
-  const { cost: _cost, gates, ...rest } = result;
+  const { cost: _cost, gates, ...all } = result as typeof result & { seam?: unknown; computedIn?: unknown };
+  const { seam: _seam, computedIn: _computed, ...rest } = all;
   const { sustainedRatio: _s, chunkP99Ms: _p, pass, failed, ...logical } = gates as { sustainedRatio: unknown; chunkP99Ms: unknown; pass: Record<string, boolean>; failed: string[] };
   const { sustained: _a, chunkP99: _b, ...logicalPass } = pass;
   return JSON.stringify({ ...rest, gates: { ...logical, pass: logicalPass, failed: failed.filter(f => f !== 'sustained' && f !== 'chunkP99') } });
