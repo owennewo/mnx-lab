@@ -1,6 +1,6 @@
 import { beforeEach, expect, it } from 'vitest';
 import type { Miniflare } from 'miniflare';
-import { useLibraryRuntime } from '../helpers/libraryRuntime.ts';
+import { libraryDatabase, useLibraryRuntime } from '../helpers/libraryRuntime.ts';
 import type { D1Database, R2Bucket } from '@cloudflare/workers-types';
 import { Library } from '../../worker/library/index.ts';
 import { RecordingManager } from '../../worker/library/recordings.ts';
@@ -18,7 +18,7 @@ const freshRuntime = useLibraryRuntime({ migrated: true });
 beforeEach(async () => {
   mf = await freshRuntime();
   // Miniflare types its Node-side proxy against undici; it is the Worker's R2Bucket.
-  db = await mf.getD1Database('DB'); const nativeBucket = await mf.getR2Bucket('BUCKET') as unknown as R2Bucket;
+  db = libraryDatabase(mf); const nativeBucket = await mf.getR2Bucket('BUCKET') as unknown as R2Bucket;
   // Miniflare's Node RPC drops a Node stream's known-length tag. Adapt only this
   // test boundary; recording-management-smoke exercises the real Worker stream.
   bucket = new Proxy(nativeBucket, { get(target,key) {

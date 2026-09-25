@@ -2,6 +2,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { afterAll } from 'vitest';
 import { Miniflare, convertV4MiniflareOptions } from 'miniflare';
 import type { D1Database, R2Bucket } from '@cloudflare/workers-types';
+import { D1_EXECUTOR_SCRIPT, executorD1 } from './d1Executor.ts';
 
 /** Sequential tests in one file share a process, never storage. Do not use with it.concurrent.
  *
@@ -20,19 +21,20 @@ export function useLibraryRuntime({ bucket = true, migrated = false } = {}) {
     if (!runtime) {
       runtime = new Miniflare(convertV4MiniflareOptions({
         modules: true,
-        script: 'export default {fetch(){return new Response("test")}}',
+        // Executes D1 calls sent from Node in one request each (./d1Executor.ts).
+        script: D1_EXECUTOR_SCRIPT,
         compatibilityDate: '2026-06-01',
         d1Databases: ['DB'],
         ...(bucket ? { r2Buckets: ['BUCKET'] } : {}),
       }));
       if (migrated) {
-        const db = await runtime.getD1Database('DB');
+        const db = executorD1(runtime);
         await applyMigrations(db);
         pristine = signature(await schema(db));
       }
       return runtime;
     }
-    const db = await runtime.getD1Database('DB');
+    const db = executorD1(runtime);
     const objects = await schema(db);
     const tables = objects.filter(object => object.type === 'table').map(object => object.name);
     // D1 batch is a transaction; defer cyclic foreign keys until it commits.
@@ -93,7 +95,10 @@ export async function applyMigrations(db: Batching): Promise<void> {
  *  Worker's R2Bucket, so the one cast lives here rather than in every test. */
 export async function libraryBindings(mf: Miniflare): Promise<{ LIBRARY_DB: D1Database; LIBRARY_BUCKET: R2Bucket }> {
   return {
-    LIBRARY_DB: await mf.getD1Database('DB') as unknown as D1Database,
+    LIBRARY_DB: libraryDatabase(mf),
     LIBRARY_BUCKET: await mf.getR2Bucket('BUCKET') as unknown as R2Bucket,
   };
 }
+
+/** The runtime's D1, through the one-request executor rather than Miniflare's proxy. */
+export const libraryDatabase = (mf: Miniflare): D1Database => executorD1(mf);

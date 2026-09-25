@@ -1,7 +1,7 @@
 // Implementation loop: real D1/R2 semantics are the oracle, never SQL mocks.
 import { beforeEach, expect, it } from 'vitest';
 import type { Miniflare } from 'miniflare';
-import { useLibraryRuntime } from '../helpers/libraryRuntime.ts';
+import { libraryDatabase, useLibraryRuntime } from '../helpers/libraryRuntime.ts';
 import type { D1Database, R2Bucket } from '@cloudflare/workers-types';
 import { Library, type PieceWrite, type RenditionInput } from '../../worker/library/index.ts';
 import { describeBlob } from '../../worker/library/blobs.ts';
@@ -29,7 +29,7 @@ function wrappedBucket(overrides: Partial<R2Bucket>): R2Bucket {
 const freshRuntime = useLibraryRuntime({ migrated: true });
 beforeEach(async () => {
   mf = await freshRuntime();
-  db = await mf.getD1Database('DB');
+  db = libraryDatabase(mf);
   // Miniflare types its Node-side proxy against undici; it is the Worker's R2Bucket.
   bucket = await mf.getR2Bucket('BUCKET') as unknown as R2Bucket;
   library = new Library(db, bucket);
