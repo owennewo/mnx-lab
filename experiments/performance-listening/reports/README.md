@@ -15,6 +15,7 @@ question are in [the research log](../RESEARCH_LOG.md), not here.
 | 007 | [Rung 1: tempo](007-rung1-tempo.html) | [g007-rung1-tempo](../runs/g007-rung1-tempo/summary.json) |
 | 008 | [Rung 2: recorded guitar samples](008-rung2-guitar-samples.html) | [g008-rung2-guitar-samples](../runs/g008-rung2-guitar-samples/summary.json) |
 | 009 | [A reference that decays like a plucked string](009-plucked-reference.html) | [g009-plucked-reference](../runs/g009-plucked-reference/summary.json) |
+| 010 | [The slim suite, and what misleads the alignment](010-slim-suite-and-burst-features.html) | [g010a](../runs/g010a-slim-suite/summary.json), [g010b](../runs/g010b-burst-features/summary.json) |
 
 ## One experiment, one file
 

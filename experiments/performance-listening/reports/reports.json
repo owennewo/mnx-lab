@@ -113,6 +113,20 @@
         "href": "008-rung2-guitar-samples.html",
         "label": "Experiment 008"
       }
+    },
+    {
+      "number": "010",
+      "slug": "010-slim-suite-and-burst-features",
+      "title": "010 · The slim suite, and what misleads the alignment",
+      "banner": "Slim suite reproduces in 2 minutes · the path, not the features, carries the alignment off",
+      "runs": [
+        "g010a-slim-suite",
+        "g010b-burst-features"
+      ],
+      "previous": {
+        "href": "009-plucked-reference.html",
+        "label": "Experiment 009"
+      }
     }
   ]
 }

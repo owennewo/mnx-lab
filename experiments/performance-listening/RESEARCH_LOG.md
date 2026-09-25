@@ -32,18 +32,17 @@ How to maintain it:
 
 ## Current state
 
-2026-09-25. Development climbs a synthetic ladder under
-[development contract 1](contracts/development-contract-1.md). Rung 2 is recorded guitar
-samples at exact timing, which separates timbre from timing.
+2026-09-25. Development runs a slim active suite of 19 examples from rungs 0–2, at the
+user's direction, under [development contract 1](contracts/development-contract-1.md).
+A candidate that saturates it moves on to Winner's bars 5–8. A scoreboard run now takes
+about two minutes.
 
-`online-time-warp@2` remains the incumbent: it passes rungs 0 and 1 and fails rung 2.
-Its support test is miscalibrated across guitars, and its alignment slips in short
-bursts on certain sustained passages ([experiment 008](reports/008-rung2-guitar-samples.html)).
-A reference with a fixed plucked decay did not fix either overall; it helped only the
-guitars whose decay it matched ([experiment 009](reports/009-plucked-reference.html)).
-The next step is a diagnostic of which features mislead the alignment in those bursts.
-The held-out guitar sets have now been examined in detail, so a revised candidate needs
-fresh held-out guitar samples.
+`online-time-warp@2` remains the incumbent: it passes rungs 0 and 1 and fails rung 2,
+recorded guitar at exact timing. It has two separate defects there. Its support test is
+miscalibrated across guitars. Its alignment slips in short bursts, and
+[experiment 010](reports/010-slim-suite-and-burst-features.html) found that in most of
+those frames the features favour the true position: the alignment path carries it away.
+The next question is what in the path does that.
 
 ## Findings
 
@@ -86,7 +85,9 @@ ledger row (`ledger.md#<row>`), or a findings write-up.
 | 32 | With support ignored, the alignment is 87.8–96.3% correct on recorded guitars; its errors are short bursts during the decay of sustained bass notes, with no overall lag. | [Report 008 alignment](reports/008-rung2-guitar-samples.md#where-the-alignment-goes-wrong) | holds | 2026-09-25 | Suspected cause, untested: the sine reference never decays |
 | 33 | On the real clip, the incumbent's alignment agrees with the sync reference on 69.8% of points; its support test reduces that to 12.7%. | [Report 008 thermometer](reports/008-rung2-guitar-samples.md#recognition-and-the-thermometer) | holds | 2026-09-25 | Thermometer evidence, not used to select |
 | 34 | A reference with one fixed plucked decay removes the alignment bursts only on guitars whose decay it matches, and does not calibrate the support test across guitars. | [Run g009](ledger.md#g009-plucked-reference), [report 009](reports/009-plucked-reference.md#results) | holds | 2026-09-25 | Answers question 15: no; points toward envelope-insensitive features |
-| 35 | Rung 2's held-out guitar sets have informed revisions and now count as development evidence; judging a revised candidate needs fresh independent guitar sources. | [Report 009 what this changes](reports/009-plucked-reference.md#what-this-changes) | holds | 2026-09-25 | Seven sets from five independent origins are in hand |
+| 35 | Rung 2's held-out guitar sets have informed revisions and now count as development evidence; judging a revised candidate needs fresh independent guitar sources. | [Report 009 what this changes](reports/009-plucked-reference.md#what-this-changes) | superseded | 2026-09-25 | Superseded by the user's direction: the fresh check is Winner's next four bars, [development contract 1](contracts/development-contract-1.md#the-active-suite-and-the-next-bars) |
+| 36 | The slim active suite reproduces the full scoreboard's results on its examples exactly and runs in about two minutes. | [Run g010a](ledger.md#g010-slim-suite-and-burst-features), [report 010](reports/010-slim-suite-and-burst-features.md#the-slim-suite-reproduces-in-two-minutes) | holds | 2026-09-25 | Development evidence only; generalisation is checked on the next four bars |
+| 37 | In most frames where the incumbent's alignment is wrong on recorded guitar, its own features match the true position better; the path, not the features, carries it off. | [Run g010b](ledger.md#g010-slim-suite-and-burst-features), [report 010](reports/010-slim-suite-and-burst-features.md#the-features-do-not-explain-the-bursts) | holds | 2026-09-25 | Answers question 16 |
 
 
 ## Open questions
@@ -97,11 +98,13 @@ is an identifier given when a question opens and never reused, so citations stay
 
 | Rank | Question | Why it is ranked here | Status | Owner item |
 |---|---|---|---|---|
-| 16 | In the alignment's error bursts on recorded guitar, which feature bands make a wrong reference position look closer than the true one? | Needed before another candidate change, by experiment 009's rule | open | [Report 009 next](reports/009-plucked-reference.md#next) |
-| 17 | Which further independent guitar recordings can serve as fresh held-out evidence for rung 2? | The current held-out sets are spent | open | [Report 009 what this changes](reports/009-plucked-reference.md#what-this-changes) |
+| 18 | What in the alignment path carries it away from positions its features prefer: endpoint choice by length-normalised cost, or the step constraints that limit recovery? | The bursts are the incumbent's alignment defect on rung 2 | open | [Report 010 decision](reports/010-slim-suite-and-burst-features.md#decision) |
+| 19 | Can a support test be calibrated across guitars, rejecting Dust without rejecting correct alignments? | The incumbent's other rung-2 defect, and most of its real-clip failure | open | [Report 008](reports/008-rung2-guitar-samples.md#the-support-test-is-not-calibrated-across-timbre) |
 | 14 | Does the incumbent pass rung 3, per-note onset jitter up to ±40 ms and chord spread up to 30 ms, on held-out seeds, and does the fast-tempo rejection margin hold? | Deferred until a candidate passes rung 2; jitter blurs the onsets its features rely on | open | [Report 007 next](reports/007-rung1-tempo.md#next) |
 | 11 | Which ladder rung first breaks the best candidate, and does recognition at supplied labels fail on that rung too? | Ranks the remaining rungs by the failure they expose | open | [Development contract 1](contracts/development-contract-1.md#the-ladder) |
 | 7 | Can independent source/label checks establish timing bounds for later formal qualification? | Still relevant to stronger claims; explicitly not required for current proxy development | open, deferred to qualification | [Real-evidence preparation](evidence/README.md) |
+| 17 | Which further independent guitar recordings can serve as fresh held-out evidence for rung 2? | The current held-out sets are spent | stopped: the user chose the next four bars of Winner as the fresh check instead | [Report 009 what this changes](reports/009-plucked-reference.md#what-this-changes) |
+| 16 | In the alignment's error bursts on recorded guitar, which feature bands make a wrong reference position look closer than the true one? | Needed before another candidate change, by experiment 009's rule | answered (finding 37) | [Report 009 next](reports/009-plucked-reference.md#next) |
 | 15 | Does rendering the listener's reference with a fixed plucked decay, with nothing else changed, remove the alignment slips and bring the support test within the gates on rung 2's held-out sample sets? | Both rung-2 defects may share one cause: a reference that never decays | answered: no (finding 34) | [Report 008 decision](reports/008-rung2-guitar-samples.md#decision) |
 | 13 | Does the incumbent follow rung 1, tempo change within 80–120% of the handed tempo, on held-out seeds? | The next rung; the first where the clock floor must fail on the positive | answered (finding 29) | [Report 006 next](reports/006-sequence-support-rung0.md#next) |
 | 12 | Does judging support from the aligned sequence, by comparing a tempo-consistent path with unconstrained frame-by-frame matching, reject the wrong score on rung 0 while keeping the positive? | The only rung-0 failure left for the comparator; the comparison is also meant to survive timbre change | answered for rung 0 (finding 27) | [Report 005 next](reports/005-online-time-warp-rung0.md#next) |

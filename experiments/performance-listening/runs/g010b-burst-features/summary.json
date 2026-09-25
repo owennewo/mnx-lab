@@ -1,0 +1,187 @@
+{
+  "id": "g010b-burst-features",
+  "kind": "feature-diagnostic",
+  "preregistration": "reports/010-slim-suite-and-burst-features.md",
+  "gitCommit": "8718e4760a2d9c8c24c02eba80be491e0462f634",
+  "machine": {
+    "hostname": "williao-G3-3579",
+    "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+    "cores": 12,
+    "platform": "linux",
+    "arch": "x64",
+    "node": "v22.22.1"
+  },
+  "sourceHashes": {
+    "bench/src/ladder/burstDiagnostic.ts": "696eb339acd759949a97a5147e61da6ec55fc97e2636996928d57867b8ea9b6e",
+    "bench/src/candidates/onlineTimeWarp1.ts": "1f87dbf4ad65ae4ce7c48d8b05b751113e18948148267895a517dfc639f45356",
+    "bench/src/candidates/onlineTimeWarp2.ts": "b64d4adfe14d0d93cc9a32dc8a6d831b2b073efb7c6801eee4c8c94fe34f3c4b"
+  },
+  "set": "winner-ladder-rung2-v1",
+  "perSet": [
+    {
+      "example": "development-tonejs-acoustic-positive",
+      "wrongFrames": 14,
+      "rightFrames": 452,
+      "wrong": {
+        "levelAdvantage": 0.15850217695155705,
+        "onsetAdvantage": 0.0841088871349834,
+        "levelShare": 0.6533180073560809
+      },
+      "right": {
+        "meanLevel": 0.003532615055323063,
+        "meanOnset": -0.011557134641210946
+      },
+      "topBands": [
+        {
+          "note": "A3",
+          "midi": 57,
+          "share": 1.6428832594037663
+        },
+        {
+          "note": "G♯3",
+          "midi": 56,
+          "share": 1.6009891274186636
+        },
+        {
+          "note": "A♯3",
+          "midi": 58,
+          "share": 0.8755653794230963
+        },
+        {
+          "note": "B3",
+          "midi": 59,
+          "share": 0.868244383782801
+        },
+        {
+          "note": "C♯3",
+          "midi": 49,
+          "share": 0.477464612646105
+        }
+      ]
+    },
+    {
+      "example": "held-out-tonejs-nylon-positive",
+      "wrongFrames": 42,
+      "rightFrames": 424,
+      "wrong": {
+        "levelAdvantage": -1.9781395211486696,
+        "onsetAdvantage": -1.1453394003792983,
+        "levelShare": 0.6333129087296634
+      },
+      "right": {
+        "meanLevel": 0.004736110006471448,
+        "meanOnset": -0.014861678169804639
+      },
+      "topBands": [
+        {
+          "note": "G4",
+          "midi": 67,
+          "share": 0.7310164861221504
+        },
+        {
+          "note": "G3",
+          "midi": 55,
+          "share": 0.450335188135241
+        },
+        {
+          "note": "E4",
+          "midi": 64,
+          "share": 0.13198028291393804
+        },
+        {
+          "note": "F4",
+          "midi": 65,
+          "share": 0.12813648681627177
+        },
+        {
+          "note": "F♯3",
+          "midi": 54,
+          "share": 0.12177506998091879
+        }
+      ]
+    },
+    {
+      "example": "held-out-tonejs-electric-positive",
+      "wrongFrames": 18,
+      "rightFrames": 448,
+      "wrong": {
+        "levelAdvantage": 0.3152063992697951,
+        "onsetAdvantage": -0.29430584094606976,
+        "levelShare": 15.081243016938332
+      },
+      "right": {
+        "meanLevel": -0.0006275368926646269,
+        "meanOnset": -0.004897758700894018
+      },
+      "topBands": [
+        {
+          "note": "E4",
+          "midi": 64,
+          "share": 31.479365033676117
+        },
+        {
+          "note": "G4",
+          "midi": 67,
+          "share": 29.697440185869738
+        },
+        {
+          "note": "A3",
+          "midi": 57,
+          "share": 3.066664760125232
+        },
+        {
+          "note": "B3",
+          "midi": 59,
+          "share": 1.7792076343603076
+        },
+        {
+          "note": "A♯3",
+          "midi": 58,
+          "share": 1.4245318636459157
+        }
+      ]
+    },
+    {
+      "example": "held-out-shinyguitar-positive",
+      "wrongFrames": 57,
+      "rightFrames": 409,
+      "wrong": {
+        "levelAdvantage": -1.7484523751745817,
+        "onsetAdvantage": -1.2341633625483888,
+        "levelShare": 0.5862144268404516
+      },
+      "right": {
+        "meanLevel": 0.0021299576669328653,
+        "meanOnset": -0.009636203774898615
+      },
+      "topBands": [
+        {
+          "note": "G3",
+          "midi": 55,
+          "share": 0.2716410381784749
+        },
+        {
+          "note": "A3",
+          "midi": 57,
+          "share": 0.07542294133832
+        },
+        {
+          "note": "F♯3",
+          "midi": 54,
+          "share": 0.07218811159315727
+        },
+        {
+          "note": "C♯3",
+          "midi": 49,
+          "share": 0.0675614907341811
+        },
+        {
+          "note": "F♯4",
+          "midi": 66,
+          "share": 0.0653857494198464
+        }
+      ]
+    }
+  ],
+  "privateFramesSha256": "e49f1bf8ce6aac56af6bf435087c238782970fe0b54b2245906d23c9134c4b61"
+}
