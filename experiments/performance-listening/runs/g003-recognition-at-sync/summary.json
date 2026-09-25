@@ -1,0 +1,334 @@
+{
+  "id": "g003-recognition-at-sync",
+  "kind": "privileged-alignment-diagnostic",
+  "policy": "recognition-diagnostic-1",
+  "set": "winner-four-bars-sync-proxy-v1",
+  "setSha256": "80c8a6358751f356e164f75389dd50d49a2a0da6ad094f95847bd304eb5c5b8b",
+  "gitCommit": "3f10140ec2873946a9c9447f0a996898dd86200c",
+  "machine": {
+    "hostname": "williao-G3-3579",
+    "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+    "cores": 12,
+    "platform": "linux",
+    "arch": "x64",
+    "node": "v22.22.1"
+  },
+  "sourceHashes": {
+    "bench/src/candidates/clockFollower.ts": "687cbaaed6323594761986370ade1e7c4262fcd02deb4930ba5a0c64c35df5b9",
+    "bench/src/candidates/spectralFollower1.ts": "e86ef1b9aaf6d1072a9082fe126e0199d0675991740206179db188f194a2486a",
+    "bench/src/candidates/spectralFollower2.ts": "b21fa0dbb735a06561a4004eb8e54368b0c08e35663722257426a1278a812aaa",
+    "bench/src/cli.ts": "4a0718e6135faa531bfcf0763dbb00cb20a2d03372186d45e28ae17d6a6f0600",
+    "bench/src/diagnostic/features.ts": "eafb23ad35b140cd7872e6080a0158257a137998c462115b6ac7b528b3f4d232",
+    "bench/src/diagnostic/run.ts": "4c183dbdcb796cc16b6fe82a3db23def80fa220473714281dfc1ce035eadeb8d",
+    "bench/src/evaluate/index.ts": "33a85837d638734c01331f1aebb930c764ff7871ab5b9bf45d09c5f6af2cac7d",
+    "bench/src/evidence/inspect-anchor-precision.ts": "58a7c6cd3109af1638fc2380f1972b282fee86e3d338e10cdce5201dc71413a3",
+    "bench/src/evidence/preflight.ts": "551e36f18054caeba0693a0d967ae30bd269c53f0f7f3de503912d1530e94b87",
+    "bench/src/evidence/prepare-review.ts": "868a1f6534ae9b603da941e1b83adee334cecccbb701431ed5ce3b36df1af02e",
+    "bench/src/generate/set.ts": "69795c1ad4e60cd31e88f152fc85b3e0bc5938b4f9bd81de972ff944c9489c2e",
+    "bench/src/generate/sine.ts": "c7aab46132f2461172d531751b251341ad76d832f03dffda206d5161f7a93f96",
+    "bench/src/generate/wav.ts": "a38ae9c13209414f103a2ec75007f2d904919bb2e0a8eaf24d26d9614d94a371",
+    "bench/src/io.ts": "62c62365425f2ca12ebca5290ad5164b851125a55bc45a2d1224a346af5c6a7e",
+    "bench/src/proxy/prepare.ts": "dc249e05527d02ffd718eb6a72d5199934828bd8b0346def8edc644fdba590f2",
+    "bench/src/proxy/reference.ts": "450adc25b1dd24169b20ea3c1dde3c1a9b8479bae309230b94f635512c04c456",
+    "bench/src/proxy/run.ts": "da3171b3fe6747f752a33b050192896ac99da2e09b05a0f8b6c391d9bd759109",
+    "bench/src/report/index.ts": "f008c0a07feb6b8286d19e1b2da2de022afe300800b78a3c22e198164369285b",
+    "bench/src/report/oracle.ts": "d5483693aec119928140b9eb53d71bc988df0843e3440d493b632c9acee10f21",
+    "bench/src/run/runner.ts": "c5bd7d90ccaacf1b1382f6663b5ac6f8c1dea930754eecbbf684f27635cb7cf6",
+    "bench/src/run/set.ts": "fde9901932e537981425f45f05442c15ee0a7ad70d3a9d70751fb4aff4c8aef4",
+    "bench/src/types.ts": "bcb4d528af893a4bcd872360915ff635e9cfc4d26328c4315433293a39fa9744",
+    "bench/src/v2/anchor-limits.ts": "b955c00409a5fa03625160eb49aa12813ddf82d4ddbaaa9a649458906730e5d0",
+    "bench/src/v2/checkpoint.ts": "c2ecec5401418846faa4d908a2e528219290abd2c6e782141070cb3530e93490",
+    "bench/src/v2/driver.ts": "ebfcc84a1b660665ea6f9de9cabb6b997de4292047a8a565806e747b12f7600c",
+    "bench/src/v2/evaluate.ts": "88ec56c29bd22194f7f2d530f49663d648b11416794564cc32c0db7fba4d2a42",
+    "bench/src/v2/partitions.ts": "3d266e42aa1cdcbf40adc3bbc7d69321fe83f59b993b01ee68496783b71f56d5",
+    "bench/src/v2/retain.ts": "0a272adbe0fc0c7721058352f191032651fa2cf511603571668c29e95f558814",
+    "bench/src/v2/run-pair.ts": "3b9a02a6e5783f7472330ab9fdd19ef378383b8f287c52a095e86eafb913ff70",
+    "bench/src/v2/types.ts": "5b3d48d6ab30f0e1c8bf686f62595d1ecc0c13716d14489555bd383f21f63f32",
+    "bench/src/v2/validate.ts": "4eb351d4f38a14462d2b0b6b54a21f5ed8b83dd8226b511d048a07cea23849d0",
+    "bench/src/validate.ts": "c22008ca22f8d196d2425858e85a9e7af885acc7a0dd0b5c41495f32b871e628",
+    "contracts/recognition-diagnostic-1.md": "8c86e1967ee2a6760c83d5b4cd8ab54ea3097a932cd73ed74f2c1c64b84d7c05"
+  },
+  "reference": "Original sync interpolation at causal window center; acoustic precision unmeasured.",
+  "results": [
+    {
+      "version": 1,
+      "frames": 467,
+      "clockSpan": [
+        0.19,
+        9.506958333333333
+      ],
+      "audit": {
+        "compared": 312,
+        "maxAbsoluteDifference": 0
+      },
+      "nearest": {
+        "acceptance": 0.4753747323340471,
+        "similarity": {
+          "n": 467,
+          "min": 0.3133791370098879,
+          "p05": 0.46067563157709,
+          "median": 0.6436224453554229,
+          "p95": 0.7997263749884792,
+          "max": 0.8642020357832554
+        }
+      },
+      "localPositive": {
+        "similarity": {
+          "n": 467,
+          "min": 0.46067563157709,
+          "p05": 0.5149287865570157,
+          "median": 0.6680938820527197,
+          "p95": 0.8007558402950101,
+          "max": 0.8642020357832555
+        }
+      },
+      "localWrong": {
+        "similarity": {
+          "n": 467,
+          "min": 0.4994201900643861,
+          "p05": 0.5690748802733333,
+          "median": 0.6793783780056956,
+          "p95": 0.7992276212691527,
+          "max": 0.8642020357832555
+        },
+        "margins": {
+          "count": 467,
+          "wins": 34,
+          "ties": 278,
+          "losses": 155,
+          "quantiles": {
+            "n": 467,
+            "min": -0.1600149666692282,
+            "p05": -0.09422082310399615,
+            "median": 0,
+            "p95": 0.07547797269930334,
+            "max": 0.2350229326814648
+          }
+        }
+      },
+      "globalWrong": {
+        "margins": {
+          "count": 467,
+          "wins": 22,
+          "ties": 185,
+          "losses": 260,
+          "quantiles": {
+            "n": 467,
+            "min": -0.1600149666692282,
+            "p05": -0.10111286266145181,
+            "median": -0.009992812680415408,
+            "p95": 3.3306690738754696e-16,
+            "max": 0.15462751746299275
+          }
+        }
+      },
+      "dust": {
+        "similarity": {
+          "n": 467,
+          "min": 0.11281087466195583,
+          "p05": 0.18491973493086267,
+          "median": 0.5194489802637661,
+          "p95": 0.653365187368908,
+          "max": 0.7251423044545462
+        }
+      },
+      "silence": {
+        "frames": 467,
+        "rejection": 1
+      },
+      "threshold": {
+        "tested": 2252,
+        "atOriginal": {
+          "threshold": 0.65,
+          "positive": 0.5781584582441114,
+          "wrong": 0.6402569593147751,
+          "dust": 0.057815845824411134
+        },
+        "best": {
+          "threshold": 0.7992276212691528,
+          "positive": 0.059957173447537475,
+          "wrong": 0.04925053533190578,
+          "dust": 0
+        }
+      },
+      "offsets": [
+        {
+          "seconds": -0.2,
+          "count": 456,
+          "accepted": 177,
+          "rate": 0.3881578947368421
+        },
+        {
+          "seconds": -0.1,
+          "count": 456,
+          "accepted": 230,
+          "rate": 0.5043859649122807
+        },
+        {
+          "seconds": 0,
+          "count": 456,
+          "accepted": 219,
+          "rate": 0.48026315789473684
+        },
+        {
+          "seconds": 0.1,
+          "count": 456,
+          "accepted": 135,
+          "rate": 0.29605263157894735
+        },
+        {
+          "seconds": 0.2,
+          "count": 456,
+          "accepted": 48,
+          "rate": 0.10526315789473684
+        }
+      ],
+      "interpretation": "Even optimistic local alignment cannot reach 95% acceptance with each competitor at most 5%; prioritize discrimination before another tracker revision."
+    },
+    {
+      "version": 2,
+      "frames": 467,
+      "clockSpan": [
+        0.19,
+        9.506958333333333
+      ],
+      "audit": {
+        "compared": 108,
+        "maxAbsoluteDifference": 0
+      },
+      "nearest": {
+        "acceptance": 0.16274089935760172,
+        "similarity": {
+          "n": 467,
+          "min": 0.21067919705316007,
+          "p05": 0.3206475750925717,
+          "median": 0.5534838457356979,
+          "p95": 0.701745183814458,
+          "max": 0.7714085365024366
+        }
+      },
+      "localPositive": {
+        "similarity": {
+          "n": 467,
+          "min": 0.3031028913680782,
+          "p05": 0.36948372849489586,
+          "median": 0.5741239338584445,
+          "p95": 0.7035806801022548,
+          "max": 0.7714085365024367
+        }
+      },
+      "localWrong": {
+        "similarity": {
+          "n": 467,
+          "min": 0.3494146308866697,
+          "p05": 0.4249043929890546,
+          "median": 0.5679551245479211,
+          "p95": 0.700105165102497,
+          "max": 0.7714085365024367
+        },
+        "margins": {
+          "count": 467,
+          "wins": 35,
+          "ties": 308,
+          "losses": 124,
+          "quantiles": {
+            "n": 467,
+            "min": -0.1889568968365185,
+            "p05": -0.07197149096902661,
+            "median": 0,
+            "p95": 0.0842695515110854,
+            "max": 0.2612389013251952
+          }
+        }
+      },
+      "globalWrong": {
+        "margins": {
+          "count": 467,
+          "wins": 30,
+          "ties": 231,
+          "losses": 206,
+          "quantiles": {
+            "n": 467,
+            "min": -0.1889568968365185,
+            "p05": -0.07806975399794358,
+            "median": -1.1102230246251565e-16,
+            "p95": 0.021682758787188394,
+            "max": 0.2231720269092447
+          }
+        }
+      },
+      "dust": {
+        "similarity": {
+          "n": 467,
+          "min": 0.1666167022511637,
+          "p05": 0.197478608098075,
+          "median": 0.3238620324031896,
+          "p95": 0.4820914693526037,
+          "max": 0.6029978898495862
+        }
+      },
+      "silence": {
+        "frames": 467,
+        "rejection": 1
+      },
+      "threshold": {
+        "tested": 2273,
+        "atOriginal": {
+          "threshold": 0.65,
+          "positive": 0.20342612419700215,
+          "wrong": 0.19914346895074947,
+          "dust": 0
+        },
+        "best": {
+          "threshold": 0.7001051651024971,
+          "positive": 0.06209850107066381,
+          "wrong": 0.04925053533190578,
+          "dust": 0
+        }
+      },
+      "offsets": [
+        {
+          "seconds": -0.2,
+          "count": 456,
+          "accepted": 64,
+          "rate": 0.14035087719298245
+        },
+        {
+          "seconds": -0.1,
+          "count": 456,
+          "accepted": 87,
+          "rate": 0.19078947368421054
+        },
+        {
+          "seconds": 0,
+          "count": 456,
+          "accepted": 76,
+          "rate": 0.16666666666666666
+        },
+        {
+          "seconds": 0.1,
+          "count": 456,
+          "accepted": 44,
+          "rate": 0.09649122807017543
+        },
+        {
+          "seconds": 0.2,
+          "count": 456,
+          "accepted": 7,
+          "rate": 0.015350877192982455
+        }
+      ],
+      "interpretation": "Even optimistic local alignment cannot reach 95% acceptance with each competitor at most 5%; prioritize discrimination before another tracker revision."
+    }
+  ],
+  "cpuSeconds": 2.947644,
+  "budget": {
+    "newCandidateVersions": 0,
+    "chargedDiagnosticAssessments": 2,
+    "totalCandidateVersions": 2,
+    "totalAssessments": 6,
+    "totalCpuSeconds": 37.53314999999999
+  },
+  "decision": "Diagnostic complete; no candidate retention or scope expansion.",
+  "privateFramesSha256": "a6f228f2ff976b4f39805495a0eed405e765a7095fe07a20eefdbf5f1350c062"
+}

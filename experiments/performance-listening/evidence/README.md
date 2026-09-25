@@ -100,16 +100,18 @@ change; do not replace frozen experiment evidence with it.
 
 ## Stage status
 
-The first real-audio development loop is complete; see
-[002 — Winner with sync interpolation](../reports/002-winner-sync-proxy.html).
-Two spectral versions improve control rejection but regress on positive following.
-The bounded sub-batch is closed, with no retained candidate or positive Dust expansion.
-The [bar-anchor sensitivity calculation](bar-anchor-precision-1.json) remains historical
-analysis of guaranteed precision, not measured sync error and not a proxy eligibility gate.
+[003 — Recognition at supplied sync](../reports/003-recognition-at-sync.html) completed
+the subsequent component diagnostic on the same frozen set. Both representations
+remain weak and ambiguous with alignment supplied; no new listener was tried.
+[Experiment 002](../reports/002-winner-sync-proxy.html) remains the completed pair of
+failed following comparisons. There is no retained candidate or positive Dust expansion.
+The [bar-anchor sensitivity calculation](bar-anchor-precision-1.json) is historical
+analysis of guaranteed precision, not measured sync error or a proxy eligibility gate.
 
 ## Playback and optional independent beat review
 
-The private `002-winner-sync-proxy.html` embeds Winner and recorded timing traces.
+The private `003-recognition-at-sync.html` embeds Winner and similarity traces;
+`002-winner-sync-proxy.html` retains the recorded following traces.
 `listen.html` embeds both reviewed WAVs. `beat-review.html` offers waveform seeking,
 playback speed and blank independent beat bounds for later precision work; it is not
 a requirement for current development. Commands and UI-check limitations are in the

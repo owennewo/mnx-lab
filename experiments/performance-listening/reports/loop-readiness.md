@@ -1,4 +1,9 @@
-# Research loop: first real-audio experiment complete
+# Research loop: recognition diagnostic complete
+
+[003 — Recognition at supplied sync](003-recognition-at-sync.html) is now complete.
+Supplying approximate alignment exposes weak positive recognition and frequent ties
+with nearby positions. No new candidate was tried; the next hypothesis is attack and
+short-sequence evidence. The four-bar scope remains unchanged.
 
 [002 — Winner with sync interpolation](002-winner-sync-proxy.html) now records the
 completed development loop: fixed evidence, initial spectral follower, one focused

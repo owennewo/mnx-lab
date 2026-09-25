@@ -14,20 +14,25 @@ Two documents govern the work. Read them in this order:
    contracts, components, responsibilities and construction order that implement
    that approach.
 
-The first real-audio development loop is complete. Open
-[002 — Winner with sync interpolation](reports/002-winner-sync-proxy.html) for its
-results and a link to private embedded playback with timing traces. Two causal
-spectral followers were compared with the clock on the same four-bar Winner clip,
-wrong-score probe and silence. Neither passes: control rejection improves, but
-positive following regresses. Winner stays at four bars; positive Dust is next only
-after Winner passes. No candidate is retained or microphone-qualified.
+The latest completed experiment is
+[003 — Recognition at supplied sync](reports/003-recognition-at-sync.html).
+Giving the existing spectral representations the approximate position still leaves
+weak positive recognition and frequent ties with nearby wrong positions. A scalar
+confidence cutoff cannot separate these cases reliably. The next hypothesis is to
+use attack-sensitive features and short sequence evidence; no new listener was tried
+in this diagnostic.
 
-The user directed us to use `sync.json` with interpolation for this initial development
-work. [That direction and the bounded plan](contracts/sync-proxy-development-1.md)
-are recorded separately from the unchanged approved contract 1. Manual beat marking
-is not a prerequisite for this approximate-development experiment. The next question
-is to diagnose score-template discrimination at a supplied alignment before another
-end-to-end tracking trial; see [the research log](RESEARCH_LOG.md).
+[002 — Winner with sync interpolation](reports/002-winner-sync-proxy.html) preserves
+the preceding two failed end-to-end candidates. Winner stays at four bars; positive
+Dust is next only after Winner passes. No candidate is retained or microphone-qualified.
+Both reports link to private embedded playback with their saved traces.
+
+The user directed us to use `sync.json` with interpolation for initial development.
+[That direction](contracts/sync-proxy-development-1.md) and the subsequently authorized
+[diagnostic plan](contracts/recognition-diagnostic-1.md) are recorded separately from
+the unchanged approved contract 1. Manual beat marking is not a prerequisite for this
+approximate-development work. [The research log](RESEARCH_LOG.md) records current
+findings and the next question.
 
 [001 — Initial two-scale assessment](reports/001-initial-two-scale.html) remains the
 frozen synthetic instrument check and approved R1 inventory. Its matching clock

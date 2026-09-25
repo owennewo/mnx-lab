@@ -30,18 +30,20 @@ How to maintain it:
 
 ## Current state
 
-2026-09-25. The first real-audio development loop is complete under the user's
-instruction to interpolate the existing sync.json. Both spectral versions fail the
-fixed Winner proxy targets: they reject controls but lose correct following. Neither
-is retained. The predeclared two-version sub-batch is closed, with references and
-thresholds unchanged. Stay at four bars; no positive Dust expansion yet. Independent
-beat annotation is not a development prerequisite. Formal retention and microphone
-acceptance remain separate and unassessed.
+2026-09-25. The supplied-alignment diagnostic is complete. Both frozen spectral
+representations reject much of the correct passage even when sync supplies its
+position, and nearby competing positions frequently tie. A scalar confidence cutoff
+cannot separate them reliably in this diagnostic. Prioritize attacks and short
+sequence evidence before another static-template tracking revision. This identifies
+a component weakness, not a ceiling on sequence-based following.
 
-Readable results, budget and the next diagnostic question:
-[002 — Winner with sync interpolation](reports/002-winner-sync-proxy.html).
-The [development amendment](contracts/sync-proxy-development-1.md) records the user's
-direction. The original approved contract, v1 experiment and v2 checkpoint remain intact.
+Winner remains at four bars. No new listener version, retention or positive Dust
+expansion occurred. Manual beat marking remains unnecessary for initial proxy
+development. Formal retention and microphone acceptance are separate and unassessed.
+The first two-version candidate sub-batch and this separately authorized diagnostic
+are both closed. Read [003 — Recognition at supplied sync](reports/003-recognition-at-sync.html),
+its [pre-run plan](contracts/recognition-diagnostic-1.md), and the unchanged
+[002 parent results](reports/002-winner-sync-proxy.html).
 
 ## Findings
 
@@ -67,6 +69,9 @@ ledger row (`ledger.md#<row>`), or a findings write-up.
 | 15 | Existing sync anchors can be used as a fixed approximate development reference under the user's explicit direction; independent timing precision remains unmeasured. | [Development policy](contracts/sync-proxy-development-1.md), [experiment 002](reports/002-winner-sync-proxy.html) | holds | 2026-09-25 | Supersedes the manual-beat prerequisite for this initial loop only |
 | 16 | The first spectral candidate improves control rejection but worsens positive following versus the clock on the frozen Winner proxy set. | [Run 002a](ledger.md#g002a-spectral1-winner-sync-proxy) | holds | 2026-09-25 | Failed positive agreement, exposure, episode and deadline targets |
 | 17 | The register/harmonic revision increases rejection and loses more correct following; smaller exposure and residuals among fewer claims do not establish improvement. | [Run 002b](ledger.md#g002b-spectral2-winner-sync-proxy), [pre-run hypothesis](research/spectral-revision-2.md) | holds | 2026-09-25 | Hypothesis contradicted; neither version passes, sub-batch closed |
+| 18 | Supplying approximate sync alignment does not rescue either frozen representation's positive confidence, and nearby competing positions often tie; scalar cutoff adjustment cannot separate those framewise cases reliably. | [Experiment 003](reports/003-recognition-at-sync.html), [run](ledger.md#g003-recognition-at-sync) | holds | 2026-09-25 | Privileged component diagnosis; does not rule out sequence-based disambiguation |
+| 19 | The fixed constant-offset sensitivity test does not rescue recognition; shared normalized template decay erases within-active-set decay cues. | [Sensitivity and template analysis](reports/003-recognition-at-sync.md#what-explains-the-ties-and-what-to-try-next), [frozen template code](bench/src/candidates/spectralFollower1.ts) | holds | 2026-09-25 | Does not certify sync precision or attribute every tie to one cause |
+
 
 ## Open questions
 
@@ -75,7 +80,8 @@ Ranked; the top row is the next question the driver asks. Status is `open`,
 
 | Rank | Question | Why it is ranked here | Status | Owner item |
 |---|---|---|---|---|
-| 1 | At a supplied sync alignment, does score-template similarity distinguish correct positions from alternatives and negative controls? | Both spectral versions lose positive following; separate representation/confidence from alignment before another tracker trial | open | [Experiment 002 next action](reports/002-winner-sync-proxy.md#where-the-loop-is-now) |
+| 1 | Can attack-sensitive features and short sequence evidence distinguish passages while retaining positive recognition? | Supplied-alignment diagnosis exposes weak and ambiguous static-template matches | open | [Experiment 003 next action](reports/003-recognition-at-sync.md#what-explains-the-ties-and-what-to-try-next) |
+| 8 | At supplied sync alignment, do the frozen templates discriminate the intended passage? | Separates component recognition/confidence from path-selection errors | answered (findings 18–19); diagnostic closed | [Experiment 003](reports/003-recognition-at-sync.html) |
 | 6 | Can the initial spectral follower or one harmonic/register revision improve control rejection without losing Winner following? | First fixed real-audio algorithm question | answered (findings 16–17); sub-batch stopped at its two-version limit | [Experiment 002](reports/002-winner-sync-proxy.html) |
 | 7 | Can independent source/label checks establish timing bounds for later formal qualification? | Still relevant to stronger claims; explicitly not required for current proxy development | open, deferred | [Real-evidence preparation](evidence/README.md) |
 | 2 | How has real-time score following been evaluated elsewhere, and do our ±0.25-quarter tolerance and 200 ms deadline sit inside those norms? | FIRST_STEP §10 question 1; answers whether the first contract's tolerances are defensible before anything is measured against them | answered (findings 1–2) | FIRST_STEP item A |

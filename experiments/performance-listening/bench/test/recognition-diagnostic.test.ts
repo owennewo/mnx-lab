@@ -19,3 +19,11 @@ it('cannot manufacture separation by splitting tied scores or accepting silent f
  expect(frontier(separated).best).toMatchObject({positive:1,wrong:0,dust:0});
  expect(frontier(separated.map(r=>({...r,audible:false}))).best.positive).toBe(0);
 });
+it('preserves the recorded diagnostic implementation and its frozen set identity',async()=>{
+ const {createHash}=await import('node:crypto');
+ const root=new URL('../../',import.meta.url);
+ const summary=JSON.parse(readFileSync(new URL('runs/g003-recognition-at-sync/summary.json',root),'utf8'));
+ const parent=JSON.parse(readFileSync(new URL('runs/g002a-spectral1-winner-sync-proxy/summary.json',root),'utf8'));
+ expect(summary.setSha256).toBe(parent.setSha256);
+ for(const [path,hash] of Object.entries(summary.sourceHashes))expect(createHash('sha256').update(readFileSync(new URL(path,root))).digest('hex')).toBe(hash);
+});

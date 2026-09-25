@@ -1,0 +1,384 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>003 · Recognition at supplied sync</title><style>body{margin:0;background:#f3f4ef;color:#21383c;font:16px/1.65 system-ui}main{max-width:1080px;margin:auto;padding:32px}article,details{background:white;border:1px solid #ccd8d1;border-radius:10px;padding:28px;margin:0 0 22px}h1{font-size:2.25rem;line-height:1.2}h2{margin-top:32px}a{color:#14616a}p,li{max-width:90ch}.table-wrap{overflow:auto}table{border-collapse:collapse;width:100%;font-size:.9rem}td,th{border:1px solid #ccd8d1;padding:10px;text-align:left}th{background:#edf3ee}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#f4f6f3;padding:16px;font-size:.8rem}code{overflow-wrap:anywhere;font-size:.86em}.banner{padding:18px;background:#f8edce;border-left:5px solid #ad782e}summary{cursor:pointer;font-weight:650}footer{font-size:.85rem}@media(max-width:650px){main{padding:12px}article,details{padding:18px}h1{font-size:1.8rem}}</style></head><body><main><article><div class="banner">Diagnostic complete · weak positive recognition and ambiguous nearby positions</div><p><a href="file:///home/williao/dev/mnx-listening-data/real-evidence-01/003-recognition-at-sync.html">Open private audio and similarity traces</a> · <a href="002-winner-sync-proxy.html">Experiment 002</a></p><h1 id="summary-003-can-the-features-recognize-the-right-passage">003 — Can the features recognize the right passage?</h1>
+<p><strong>Supplying alignment did not rescue either representation.</strong> Their fixed confidence test rejects much of the intended passage, while nearby wrong positions often look just as convincing. This identifies a weakness in the current frame-by-frame features/templates and confidence test. It does not rule out sequence-based alignment resolving ambiguities that an isolated spectrum cannot.</p>
+<p>The diagnostic is complete. No listener was changed or retained. Winner stays at four bars; the next useful experiment is to use attacks and short note sequences to distinguish passages, before another confidence-cutoff adjustment.</p>
+<h2 id="summary-the-controlled-question">The controlled question</h2>
+<p>Experiment 002 could not tell whether a poor match came from choosing the wrong position or failing to recognize the right one. Here we supplied the position from the unchanged <code>sync.json</code> interpolation and measured both frozen representations. This is privileged-input component diagnosis, not an end-to-end following test.</p>
+<p>We used the same 9.507-second Winner clip, score and frozen set as 002. A 170.7 ms past-only audio window supplies each spectrum; the expected score position is taken at its center. There are 467 analysis frames per representation, ending at audio times 0.19–9.506958 seconds. An optimistic local score picks the best template within ±0.25 quarter of the supplied position. Competitors are the strongest same-piece match outside that band but inside the original tempo search corridor, and the strongest Dust-score match inside that corridor. Silence is also checked.</p>
+<p>The interpolation remains approximate. A score outside the tolerance band can still sound identical to one inside it. These are competing template scores, not verified musician mistakes or counts of actual false-following decisions. Frames from this one reused recording are not independent trials.</p>
+<h2 id="summary-recognition-with-alignment-supplied">Recognition with alignment supplied</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Diagnostic at the existing 0.65 cutoff, Pitch-class version 1, Register/harmonic version 2"><table><thead><tr><th scope="col">Diagnostic at the existing 0.65 cutoff</th><th scope="col">Pitch-class version 1</th><th scope="col">Register/harmonic version 2</th></tr></thead><tbody><tr><td>Nearest supplied-position template accepted</td><td>47.54% (222/467)</td><td>16.27% (76/467)</td></tr>
+<tr><td>Best template within ±0.25 quarter accepted</td><td>57.82% (270/467)</td><td>20.34% (95/467)</td></tr>
+<tr><td>Strongest nearby wrong-position template accepted</td><td>64.03% (299/467)</td><td>19.91% (93/467)</td></tr>
+<tr><td>Strongest Dust-score template accepted</td><td>5.78% (27/467)</td><td>0%</td></tr>
+<tr><td>Digital silence rejected</td><td>100%</td><td>100%</td></tr></tbody></table></div>
+<p>Version 2 separates this other piece more strongly, but also rejects much of Winner. Neither representation&#39;s optimistic correct-position score reliably beats nearby wrong positions:</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Local correct match versus strongest nearby competitor, Version 1, Version 2"><table><thead><tr><th scope="col">Local correct match versus strongest nearby competitor</th><th scope="col">Version 1</th><th scope="col">Version 2</th></tr></thead><tbody><tr><td>Strictly stronger</td><td>34/467 (7.28%)</td><td>35/467 (7.49%)</td></tr>
+<tr><td>Tied within 1e-9</td><td>278/467 (59.53%)</td><td>308/467 (65.95%)</td></tr>
+<tr><td>Weaker</td><td>155/467 (33.19%)</td><td>124/467 (26.55%)</td></tr></tbody></table></div>
+<p>Across all four bars, unrestricted wrong-position templates are stronger still: version 1 wins only 22/467 comparisons and version 2 wins 30/467. The complete aggregate evidence includes both global and corridor-limited margin distributions.</p>
+<p>These percentages do not replace the 46% and 18% following results from 002. This experiment uses analysis frames and window-center alignment, while 002 judged emitted positions on a 50 ms grid. There is no claimed following improvement.</p>
+<h2 id="summary-would-changing-the-confidence-cutoff-fix-it">Would changing the confidence cutoff fix it?</h2>
+<p>We predeclared a descriptive sweep over every distinct observed similarity and the next representable cutoff above it. Require each competing-control acceptance rate to stay at or below 5%. Among those cutoffs, maximize optimistic local positive acceptance. The result is an in-sample diagnostic bound for this specific scalar rule, not a retained threshold or a bound on all possible sequence-based listeners.</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Best qualifying scalar cutoff, Version 1, Version 2"><table><thead><tr><th scope="col">Best qualifying scalar cutoff</th><th scope="col">Version 1</th><th scope="col">Version 2</th></tr></thead><tbody><tr><td>Cutoff, approximately</td><td>0.79923</td><td>0.70011</td></tr>
+<tr><td>Optimistic local positive acceptance</td><td>6.00% (28/467)</td><td>6.21% (29/467)</td></tr>
+<tr><td>Nearby wrong-position acceptance</td><td>4.93% (23/467)</td><td>4.93% (23/467)</td></tr>
+<tr><td>Dust acceptance</td><td>0%</td><td>0%</td></tr>
+<tr><td>Distinct cutoffs examined</td><td>2252</td><td>2273</td></tr></tbody></table></div>
+<p>This is far from 95% positive acceptance. Lowering the cutoff to accept Winner also admits nearby competing templates. A scalar cutoff alone does not resolve the ambiguity; no candidate threshold was changed after this sweep.</p>
+<h2 id="summary-is-the-reference-simply-early-or-late">Is the reference simply early or late?</h2>
+<p>The fixed sensitivity probe shifted the reference lookup by −200, −100, 0, +100 and +200 ms. All offsets use the same 456 eligible frames, so the denominator is stable. Positive offsets look later in the score; they do not shift the audio.</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Reference offset, Version 1 nearest-template acceptance, Version 2"><table><thead><tr><th scope="col">Reference offset</th><th scope="col">Version 1 nearest-template acceptance</th><th scope="col">Version 2</th></tr></thead><tbody><tr><td>−200 ms</td><td>38.82%</td><td>14.04%</td></tr>
+<tr><td>−100 ms</td><td>50.44%</td><td>19.08%</td></tr>
+<tr><td>0 ms</td><td>48.03%</td><td>16.67%</td></tr>
+<tr><td>+100 ms</td><td>29.61%</td><td>9.65%</td></tr>
+<tr><td>+200 ms</td><td>10.53%</td><td>1.54%</td></tr></tbody></table></div>
+<p>The best tested offset gains only 2.41 percentage points for either representation, below the predeclared 10-point investigation trigger. A simple constant offset in this range does not rescue recognition. This does not establish precise sync accuracy or exclude local timing differences; the original anchors remain unchanged.</p>
+<h2 id="summary-what-explains-the-ties-and-what-to-try-next">What explains the ties, and what to try next</h2>
+<p>The template code gives every active score note the same exponential decay constant, then normalizes the combined vector. While the active-note set is unchanged, advancing time multiplies every component by the same factor; normalization cancels that factor. The normalized template therefore carries no changing decay cue within that interval. The measured ties are consistent with that structural limitation, although this experiment does not assign every tie to a unique cause.</p>
+<p>The next bounded hypothesis should test <strong>attack-sensitive features plus evidence across a short sequence</strong>, rather than static snapshot similarity alone. The existing <a href="../research/dixon-2005-online-alignment.md">alignment research note</a> already motivates onset emphasis; it does not prove it will work for this guitar recording. Keep the same four-bar reference and controls, compare against the frozen versions, and judge any new listener end to end. The diagnostic&#39;s privileged alignment must not enter that listener. This next candidate has not been implemented or assessed here.</p>
+<h2 id="summary-verification-resources-and-stopping">Verification, resources and stopping</h2>
+<p>The independent diagnostic reconstruction exactly matches saved original confidence values on all available unclamped emitted analysis frames: 312 comparisons for version 1 and 108 for version 2, with maximum absolute difference zero. Synthetic checks cover the original analysis cadence, window center, future-audio independence, known-tone recognition, silence and tied-score handling. Thus this is a measurement of the existing representations, not a subtly rewritten candidate.</p>
+<p>The plan was committed before the run at <code>3f10140e</code>. The run consumed 2.947644 CPU seconds. Conservatively charging two feature/set assessments brings contract 1 to six of twelve assessments, two of six candidate versions and 37.533150 CPU seconds of its two-hour budget. No new candidate version, reserved access or web search was used. The separately authorized diagnostic is now closed; experiment 002&#39;s original two-version sub-batch remains closed as well.</p>
+<p>No formal retention, microphone qualification, positive Dust advancement or bar expansion follows from this result.</p>
+<h2 id="summary-evidence-and-reproduction">Evidence and reproduction</h2>
+<ul><li><a href="../contracts/recognition-diagnostic-1.md">Pre-run plan</a>.</li>
+<li><a href="../runs/g003-recognition-at-sync/summary.json">Complete aggregate run</a>, including source hashes, distributions, audit and resource records.</li>
+<li><a href="002-winner-sync-proxy.html">Experiment 002</a>, the unchanged parent results.</li></ul>
+<p>Set: <code>winner-four-bars-sync-proxy-v1</code>, SHA-256 <code>80c8a6358751f356e164f75389dd50d49a2a0da6ad094f95847bd304eb5c5b8b</code>. Private frame evidence lives under <code>/home/williao/dev/mnx-listening-data/real-evidence-01/g003-recognition-at-sync/</code>. The private <code>003-recognition-at-sync.html</code> embeds Winner audio and clickable similarity traces. No private frames, audio, score or raw sync anchors are committed.</p>
+<p>The diagnostic refuses an existing output and verifies all original assets and candidate hashes. Reproduction uses the recorded source commit, a fresh private parent containing a copy of the frozen set (including experiment 002 records), and a reconstructed copy of the pre-diagnostic budget history (the first two entries of the preserved history, four assessments and 34.585506 CPU seconds). Preserve the original absolute asset paths or document a separately relocated manifest identity; do not erase original history. Public output must also be absent in that isolated reproduction checkout.</p>
+<pre><code>npx tsx experiments/performance-listening/bench/src/diagnostic/run.ts /private/reproduction/proxy-winner-v1</code></pre>
+<p>Exact diagnostic values should reproduce; CPU timing can vary. HTML exporters only render saved evidence and never rerun the diagnostic.</p></article><details><summary>g003-recognition-at-sync — complete aggregate evidence</summary><pre>{
+  &quot;id&quot;: &quot;g003-recognition-at-sync&quot;,
+  &quot;kind&quot;: &quot;privileged-alignment-diagnostic&quot;,
+  &quot;policy&quot;: &quot;recognition-diagnostic-1&quot;,
+  &quot;set&quot;: &quot;winner-four-bars-sync-proxy-v1&quot;,
+  &quot;setSha256&quot;: &quot;80c8a6358751f356e164f75389dd50d49a2a0da6ad094f95847bd304eb5c5b8b&quot;,
+  &quot;gitCommit&quot;: &quot;3f10140ec2873946a9c9447f0a996898dd86200c&quot;,
+  &quot;machine&quot;: {
+    &quot;hostname&quot;: &quot;williao-G3-3579&quot;,
+    &quot;cpu&quot;: &quot;Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz&quot;,
+    &quot;cores&quot;: 12,
+    &quot;platform&quot;: &quot;linux&quot;,
+    &quot;arch&quot;: &quot;x64&quot;,
+    &quot;node&quot;: &quot;v22.22.1&quot;
+  },
+  &quot;sourceHashes&quot;: {
+    &quot;bench/src/candidates/clockFollower.ts&quot;: &quot;687cbaaed6323594761986370ade1e7c4262fcd02deb4930ba5a0c64c35df5b9&quot;,
+    &quot;bench/src/candidates/spectralFollower1.ts&quot;: &quot;e86ef1b9aaf6d1072a9082fe126e0199d0675991740206179db188f194a2486a&quot;,
+    &quot;bench/src/candidates/spectralFollower2.ts&quot;: &quot;b21fa0dbb735a06561a4004eb8e54368b0c08e35663722257426a1278a812aaa&quot;,
+    &quot;bench/src/cli.ts&quot;: &quot;4a0718e6135faa531bfcf0763dbb00cb20a2d03372186d45e28ae17d6a6f0600&quot;,
+    &quot;bench/src/diagnostic/features.ts&quot;: &quot;eafb23ad35b140cd7872e6080a0158257a137998c462115b6ac7b528b3f4d232&quot;,
+    &quot;bench/src/diagnostic/run.ts&quot;: &quot;4c183dbdcb796cc16b6fe82a3db23def80fa220473714281dfc1ce035eadeb8d&quot;,
+    &quot;bench/src/evaluate/index.ts&quot;: &quot;33a85837d638734c01331f1aebb930c764ff7871ab5b9bf45d09c5f6af2cac7d&quot;,
+    &quot;bench/src/evidence/inspect-anchor-precision.ts&quot;: &quot;58a7c6cd3109af1638fc2380f1972b282fee86e3d338e10cdce5201dc71413a3&quot;,
+    &quot;bench/src/evidence/preflight.ts&quot;: &quot;551e36f18054caeba0693a0d967ae30bd269c53f0f7f3de503912d1530e94b87&quot;,
+    &quot;bench/src/evidence/prepare-review.ts&quot;: &quot;868a1f6534ae9b603da941e1b83adee334cecccbb701431ed5ce3b36df1af02e&quot;,
+    &quot;bench/src/generate/set.ts&quot;: &quot;69795c1ad4e60cd31e88f152fc85b3e0bc5938b4f9bd81de972ff944c9489c2e&quot;,
+    &quot;bench/src/generate/sine.ts&quot;: &quot;c7aab46132f2461172d531751b251341ad76d832f03dffda206d5161f7a93f96&quot;,
+    &quot;bench/src/generate/wav.ts&quot;: &quot;a38ae9c13209414f103a2ec75007f2d904919bb2e0a8eaf24d26d9614d94a371&quot;,
+    &quot;bench/src/io.ts&quot;: &quot;62c62365425f2ca12ebca5290ad5164b851125a55bc45a2d1224a346af5c6a7e&quot;,
+    &quot;bench/src/proxy/prepare.ts&quot;: &quot;dc249e05527d02ffd718eb6a72d5199934828bd8b0346def8edc644fdba590f2&quot;,
+    &quot;bench/src/proxy/reference.ts&quot;: &quot;450adc25b1dd24169b20ea3c1dde3c1a9b8479bae309230b94f635512c04c456&quot;,
+    &quot;bench/src/proxy/run.ts&quot;: &quot;da3171b3fe6747f752a33b050192896ac99da2e09b05a0f8b6c391d9bd759109&quot;,
+    &quot;bench/src/report/index.ts&quot;: &quot;f008c0a07feb6b8286d19e1b2da2de022afe300800b78a3c22e198164369285b&quot;,
+    &quot;bench/src/report/oracle.ts&quot;: &quot;d5483693aec119928140b9eb53d71bc988df0843e3440d493b632c9acee10f21&quot;,
+    &quot;bench/src/run/runner.ts&quot;: &quot;c5bd7d90ccaacf1b1382f6663b5ac6f8c1dea930754eecbbf684f27635cb7cf6&quot;,
+    &quot;bench/src/run/set.ts&quot;: &quot;fde9901932e537981425f45f05442c15ee0a7ad70d3a9d70751fb4aff4c8aef4&quot;,
+    &quot;bench/src/types.ts&quot;: &quot;bcb4d528af893a4bcd872360915ff635e9cfc4d26328c4315433293a39fa9744&quot;,
+    &quot;bench/src/v2/anchor-limits.ts&quot;: &quot;b955c00409a5fa03625160eb49aa12813ddf82d4ddbaaa9a649458906730e5d0&quot;,
+    &quot;bench/src/v2/checkpoint.ts&quot;: &quot;c2ecec5401418846faa4d908a2e528219290abd2c6e782141070cb3530e93490&quot;,
+    &quot;bench/src/v2/driver.ts&quot;: &quot;ebfcc84a1b660665ea6f9de9cabb6b997de4292047a8a565806e747b12f7600c&quot;,
+    &quot;bench/src/v2/evaluate.ts&quot;: &quot;88ec56c29bd22194f7f2d530f49663d648b11416794564cc32c0db7fba4d2a42&quot;,
+    &quot;bench/src/v2/partitions.ts&quot;: &quot;3d266e42aa1cdcbf40adc3bbc7d69321fe83f59b993b01ee68496783b71f56d5&quot;,
+    &quot;bench/src/v2/retain.ts&quot;: &quot;0a272adbe0fc0c7721058352f191032651fa2cf511603571668c29e95f558814&quot;,
+    &quot;bench/src/v2/run-pair.ts&quot;: &quot;3b9a02a6e5783f7472330ab9fdd19ef378383b8f287c52a095e86eafb913ff70&quot;,
+    &quot;bench/src/v2/types.ts&quot;: &quot;5b3d48d6ab30f0e1c8bf686f62595d1ecc0c13716d14489555bd383f21f63f32&quot;,
+    &quot;bench/src/v2/validate.ts&quot;: &quot;4eb351d4f38a14462d2b0b6b54a21f5ed8b83dd8226b511d048a07cea23849d0&quot;,
+    &quot;bench/src/validate.ts&quot;: &quot;c22008ca22f8d196d2425858e85a9e7af885acc7a0dd0b5c41495f32b871e628&quot;,
+    &quot;contracts/recognition-diagnostic-1.md&quot;: &quot;8c86e1967ee2a6760c83d5b4cd8ab54ea3097a932cd73ed74f2c1c64b84d7c05&quot;
+  },
+  &quot;reference&quot;: &quot;Original sync interpolation at causal window center; acoustic precision unmeasured.&quot;,
+  &quot;results&quot;: [
+    {
+      &quot;version&quot;: 1,
+      &quot;frames&quot;: 467,
+      &quot;clockSpan&quot;: [
+        0.19,
+        9.506958333333333
+      ],
+      &quot;audit&quot;: {
+        &quot;compared&quot;: 312,
+        &quot;maxAbsoluteDifference&quot;: 0
+      },
+      &quot;nearest&quot;: {
+        &quot;acceptance&quot;: 0.4753747323340471,
+        &quot;similarity&quot;: {
+          &quot;n&quot;: 467,
+          &quot;min&quot;: 0.3133791370098879,
+          &quot;p05&quot;: 0.46067563157709,
+          &quot;median&quot;: 0.6436224453554229,
+          &quot;p95&quot;: 0.7997263749884792,
+          &quot;max&quot;: 0.8642020357832554
+        }
+      },
+      &quot;localPositive&quot;: {
+        &quot;similarity&quot;: {
+          &quot;n&quot;: 467,
+          &quot;min&quot;: 0.46067563157709,
+          &quot;p05&quot;: 0.5149287865570157,
+          &quot;median&quot;: 0.6680938820527197,
+          &quot;p95&quot;: 0.8007558402950101,
+          &quot;max&quot;: 0.8642020357832555
+        }
+      },
+      &quot;localWrong&quot;: {
+        &quot;similarity&quot;: {
+          &quot;n&quot;: 467,
+          &quot;min&quot;: 0.4994201900643861,
+          &quot;p05&quot;: 0.5690748802733333,
+          &quot;median&quot;: 0.6793783780056956,
+          &quot;p95&quot;: 0.7992276212691527,
+          &quot;max&quot;: 0.8642020357832555
+        },
+        &quot;margins&quot;: {
+          &quot;count&quot;: 467,
+          &quot;wins&quot;: 34,
+          &quot;ties&quot;: 278,
+          &quot;losses&quot;: 155,
+          &quot;quantiles&quot;: {
+            &quot;n&quot;: 467,
+            &quot;min&quot;: -0.1600149666692282,
+            &quot;p05&quot;: -0.09422082310399615,
+            &quot;median&quot;: 0,
+            &quot;p95&quot;: 0.07547797269930334,
+            &quot;max&quot;: 0.2350229326814648
+          }
+        }
+      },
+      &quot;globalWrong&quot;: {
+        &quot;margins&quot;: {
+          &quot;count&quot;: 467,
+          &quot;wins&quot;: 22,
+          &quot;ties&quot;: 185,
+          &quot;losses&quot;: 260,
+          &quot;quantiles&quot;: {
+            &quot;n&quot;: 467,
+            &quot;min&quot;: -0.1600149666692282,
+            &quot;p05&quot;: -0.10111286266145181,
+            &quot;median&quot;: -0.009992812680415408,
+            &quot;p95&quot;: 3.3306690738754696e-16,
+            &quot;max&quot;: 0.15462751746299275
+          }
+        }
+      },
+      &quot;dust&quot;: {
+        &quot;similarity&quot;: {
+          &quot;n&quot;: 467,
+          &quot;min&quot;: 0.11281087466195583,
+          &quot;p05&quot;: 0.18491973493086267,
+          &quot;median&quot;: 0.5194489802637661,
+          &quot;p95&quot;: 0.653365187368908,
+          &quot;max&quot;: 0.7251423044545462
+        }
+      },
+      &quot;silence&quot;: {
+        &quot;frames&quot;: 467,
+        &quot;rejection&quot;: 1
+      },
+      &quot;threshold&quot;: {
+        &quot;tested&quot;: 2252,
+        &quot;atOriginal&quot;: {
+          &quot;threshold&quot;: 0.65,
+          &quot;positive&quot;: 0.5781584582441114,
+          &quot;wrong&quot;: 0.6402569593147751,
+          &quot;dust&quot;: 0.057815845824411134
+        },
+        &quot;best&quot;: {
+          &quot;threshold&quot;: 0.7992276212691528,
+          &quot;positive&quot;: 0.059957173447537475,
+          &quot;wrong&quot;: 0.04925053533190578,
+          &quot;dust&quot;: 0
+        }
+      },
+      &quot;offsets&quot;: [
+        {
+          &quot;seconds&quot;: -0.2,
+          &quot;count&quot;: 456,
+          &quot;accepted&quot;: 177,
+          &quot;rate&quot;: 0.3881578947368421
+        },
+        {
+          &quot;seconds&quot;: -0.1,
+          &quot;count&quot;: 456,
+          &quot;accepted&quot;: 230,
+          &quot;rate&quot;: 0.5043859649122807
+        },
+        {
+          &quot;seconds&quot;: 0,
+          &quot;count&quot;: 456,
+          &quot;accepted&quot;: 219,
+          &quot;rate&quot;: 0.48026315789473684
+        },
+        {
+          &quot;seconds&quot;: 0.1,
+          &quot;count&quot;: 456,
+          &quot;accepted&quot;: 135,
+          &quot;rate&quot;: 0.29605263157894735
+        },
+        {
+          &quot;seconds&quot;: 0.2,
+          &quot;count&quot;: 456,
+          &quot;accepted&quot;: 48,
+          &quot;rate&quot;: 0.10526315789473684
+        }
+      ],
+      &quot;interpretation&quot;: &quot;Even optimistic local alignment cannot reach 95% acceptance with each competitor at most 5%; prioritize discrimination before another tracker revision.&quot;
+    },
+    {
+      &quot;version&quot;: 2,
+      &quot;frames&quot;: 467,
+      &quot;clockSpan&quot;: [
+        0.19,
+        9.506958333333333
+      ],
+      &quot;audit&quot;: {
+        &quot;compared&quot;: 108,
+        &quot;maxAbsoluteDifference&quot;: 0
+      },
+      &quot;nearest&quot;: {
+        &quot;acceptance&quot;: 0.16274089935760172,
+        &quot;similarity&quot;: {
+          &quot;n&quot;: 467,
+          &quot;min&quot;: 0.21067919705316007,
+          &quot;p05&quot;: 0.3206475750925717,
+          &quot;median&quot;: 0.5534838457356979,
+          &quot;p95&quot;: 0.701745183814458,
+          &quot;max&quot;: 0.7714085365024366
+        }
+      },
+      &quot;localPositive&quot;: {
+        &quot;similarity&quot;: {
+          &quot;n&quot;: 467,
+          &quot;min&quot;: 0.3031028913680782,
+          &quot;p05&quot;: 0.36948372849489586,
+          &quot;median&quot;: 0.5741239338584445,
+          &quot;p95&quot;: 0.7035806801022548,
+          &quot;max&quot;: 0.7714085365024367
+        }
+      },
+      &quot;localWrong&quot;: {
+        &quot;similarity&quot;: {
+          &quot;n&quot;: 467,
+          &quot;min&quot;: 0.3494146308866697,
+          &quot;p05&quot;: 0.4249043929890546,
+          &quot;median&quot;: 0.5679551245479211,
+          &quot;p95&quot;: 0.700105165102497,
+          &quot;max&quot;: 0.7714085365024367
+        },
+        &quot;margins&quot;: {
+          &quot;count&quot;: 467,
+          &quot;wins&quot;: 35,
+          &quot;ties&quot;: 308,
+          &quot;losses&quot;: 124,
+          &quot;quantiles&quot;: {
+            &quot;n&quot;: 467,
+            &quot;min&quot;: -0.1889568968365185,
+            &quot;p05&quot;: -0.07197149096902661,
+            &quot;median&quot;: 0,
+            &quot;p95&quot;: 0.0842695515110854,
+            &quot;max&quot;: 0.2612389013251952
+          }
+        }
+      },
+      &quot;globalWrong&quot;: {
+        &quot;margins&quot;: {
+          &quot;count&quot;: 467,
+          &quot;wins&quot;: 30,
+          &quot;ties&quot;: 231,
+          &quot;losses&quot;: 206,
+          &quot;quantiles&quot;: {
+            &quot;n&quot;: 467,
+            &quot;min&quot;: -0.1889568968365185,
+            &quot;p05&quot;: -0.07806975399794358,
+            &quot;median&quot;: -1.1102230246251565e-16,
+            &quot;p95&quot;: 0.021682758787188394,
+            &quot;max&quot;: 0.2231720269092447
+          }
+        }
+      },
+      &quot;dust&quot;: {
+        &quot;similarity&quot;: {
+          &quot;n&quot;: 467,
+          &quot;min&quot;: 0.1666167022511637,
+          &quot;p05&quot;: 0.197478608098075,
+          &quot;median&quot;: 0.3238620324031896,
+          &quot;p95&quot;: 0.4820914693526037,
+          &quot;max&quot;: 0.6029978898495862
+        }
+      },
+      &quot;silence&quot;: {
+        &quot;frames&quot;: 467,
+        &quot;rejection&quot;: 1
+      },
+      &quot;threshold&quot;: {
+        &quot;tested&quot;: 2273,
+        &quot;atOriginal&quot;: {
+          &quot;threshold&quot;: 0.65,
+          &quot;positive&quot;: 0.20342612419700215,
+          &quot;wrong&quot;: 0.19914346895074947,
+          &quot;dust&quot;: 0
+        },
+        &quot;best&quot;: {
+          &quot;threshold&quot;: 0.7001051651024971,
+          &quot;positive&quot;: 0.06209850107066381,
+          &quot;wrong&quot;: 0.04925053533190578,
+          &quot;dust&quot;: 0
+        }
+      },
+      &quot;offsets&quot;: [
+        {
+          &quot;seconds&quot;: -0.2,
+          &quot;count&quot;: 456,
+          &quot;accepted&quot;: 64,
+          &quot;rate&quot;: 0.14035087719298245
+        },
+        {
+          &quot;seconds&quot;: -0.1,
+          &quot;count&quot;: 456,
+          &quot;accepted&quot;: 87,
+          &quot;rate&quot;: 0.19078947368421054
+        },
+        {
+          &quot;seconds&quot;: 0,
+          &quot;count&quot;: 456,
+          &quot;accepted&quot;: 76,
+          &quot;rate&quot;: 0.16666666666666666
+        },
+        {
+          &quot;seconds&quot;: 0.1,
+          &quot;count&quot;: 456,
+          &quot;accepted&quot;: 44,
+          &quot;rate&quot;: 0.09649122807017543
+        },
+        {
+          &quot;seconds&quot;: 0.2,
+          &quot;count&quot;: 456,
+          &quot;accepted&quot;: 7,
+          &quot;rate&quot;: 0.015350877192982455
+        }
+      ],
+      &quot;interpretation&quot;: &quot;Even optimistic local alignment cannot reach 95% acceptance with each competitor at most 5%; prioritize discrimination before another tracker revision.&quot;
+    }
+  ],
+  &quot;cpuSeconds&quot;: 2.947644,
+  &quot;budget&quot;: {
+    &quot;newCandidateVersions&quot;: 0,
+    &quot;chargedDiagnosticAssessments&quot;: 2,
+    &quot;totalCandidateVersions&quot;: 2,
+    &quot;totalAssessments&quot;: 6,
+    &quot;totalCpuSeconds&quot;: 37.53314999999999
+  },
+  &quot;decision&quot;: &quot;Diagnostic complete; no candidate retention or scope expansion.&quot;,
+  &quot;privateFramesSha256&quot;: &quot;a6f228f2ff976b4f39805495a0eed405e765a7095fe07a20eefdbf5f1350c062&quot;
+}
+</pre><p>SHA-256 <code>b80be51f5da973ed7d41e3dc57fd53b16a6a64e807f0c553923999a31dfb44b9</code></p></details><footer>Summary SHA-256 <code>d832ed50fb63786e67c146af90b9a48101433620a6ed4938b5286c0ca40bfc39</code>. This report does not rerun or alter an experiment.</footer></main></body></html>

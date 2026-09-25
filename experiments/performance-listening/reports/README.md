@@ -1,9 +1,9 @@
-Current result: [002 — Winner with sync interpolation](002-winner-sync-proxy.html).
-The first two real-audio candidate versions fail the development targets; the loop is
-closed and Winner stays at four bars. Its private companion embeds audio and timing
-traces, with a link from the public report.
-
 # Readable experiment reports
+
+Current result: [003 — Recognition at supplied sync](003-recognition-at-sync.html).
+The diagnostic exposes weak positive recognition and frequent ties with nearby
+positions in both frozen representations. Its private companion embeds audio and
+similarity traces. Winner remains at four bars.
 
 Open [001 — Initial two-scale assessment](001-initial-two-scale.html) in a browser.
 It contains a plain-language summary, the complete recorded run report, and the R1
@@ -30,6 +30,7 @@ the report number. A new bounded experiment receives the next number and names e
 |---|---|---|
 | 001 | [Initial two-scale assessment](001-initial-two-scale.html) | [g001-clock-harness-v1](../runs/g001-clock-harness-v1/report.md) |
 | 002 | [Winner with sync interpolation](002-winner-sync-proxy.html) | [002a](../runs/g002a-spectral1-winner-sync-proxy/summary.json), [002b](../runs/g002b-spectral2-winner-sync-proxy/summary.json) |
+| 003 | [Recognition at supplied sync](003-recognition-at-sync.html) | [g003-recognition-at-sync](../runs/g003-recognition-at-sync/summary.json) |
 
 The run directory remains the original machine-readable evidence. Do not rename or
 rewrite its decisions, counts, metadata or report when improving the HTML. The
@@ -87,3 +88,18 @@ The public exporter verifies every pinned implementation/policy hash in both run
 The private exporter verifies the saved evaluation hashes and reviewed WAV identity;
 it refuses output inside a git checkout. Both are presentation-only. The private page
 uses native WAV playback and inline SVG/JavaScript, with no server or network requests.
+
+## Rebuild report 003
+
+```sh
+node experiments/performance-listening/reports/export-recognition.mjs
+node experiments/performance-listening/reports/export-recognition.mjs --check
+node experiments/performance-listening/reports/export-private-recognition.mjs /home/williao/dev/mnx-listening-data/real-evidence-01
+node experiments/performance-listening/reports/export-private-recognition.mjs /home/williao/dev/mnx-listening-data/real-evidence-01 --check
+```
+
+The public exporter verifies pinned diagnostic sources. The private exporter checks
+the recorded frame hash and reviewed WAV, then embeds native audio and clickable
+similarity traces. No server or network request is needed. The offline page's script,
+audio and graph data are checked; its browser interaction has not been verified via
+the browser tool, which blocks file navigation.

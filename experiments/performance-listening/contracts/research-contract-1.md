@@ -27,7 +27,10 @@ initial development. [Sync-proxy development 1](sync-proxy-development-1.md) rec
 that instruction and its bounded implementation without rewriting the approved draft.
 Manual beat annotation is not a prerequisite for this approximate-development loop.
 [Experiment 002](../reports/002-winner-sync-proxy.html) completed two candidate trials
-on a fixed proxy reference; neither passed.
+on a fixed proxy reference; neither passed. The user then authorized the
+[recognition diagnostic](recognition-diagnostic-1.md), completed as
+[experiment 003](../reports/003-recognition-at-sync.html), using supplied alignment
+without introducing or retaining a new listener.
 
 ## What remains for stronger claims
 
