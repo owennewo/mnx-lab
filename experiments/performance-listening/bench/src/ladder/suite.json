@@ -1,19 +1,39 @@
 {
   "note": "The active development suite (development contract 1, user direction 2026-09-25). Fewer examples, fewer entries, causality once per candidate per rung. `--full` runs every frozen example and every registered entry.",
-  "entries": ["clock-follower@1", "online-time-warp@2", "online-time-warp@2/alignment-only"],
+  "entries": [
+    "clock-follower@1",
+    "online-time-warp@2",
+    "online-time-warp@2/alignment-only",
+    "online-time-warp@4",
+    "online-time-warp@4/alignment-only",
+    "online-time-warp@5",
+    "online-time-warp@5/alignment-only",
+    "online-time-warp@6"
+  ],
   "examples": {
-    "winner-ladder-rung0-v1": ["positive", "wrong-score", "silence"],
+    "winner-ladder-rung0-v1": [
+      "positive",
+      "wrong-score",
+      "silence"
+    ],
     "winner-ladder-rung1-v2": [
-      "development-constant-2-positive", "development-constant-2-wrong-score",
-      "held-out-ramp-103-positive", "held-out-ramp-103-wrong-score",
-      "development-drift-5-positive", "development-drift-5-wrong-score",
+      "development-constant-2-positive",
+      "development-constant-2-wrong-score",
+      "held-out-ramp-103-positive",
+      "held-out-ramp-103-wrong-score",
+      "development-drift-5-positive",
+      "development-drift-5-wrong-score",
       "silence"
     ],
     "winner-ladder-rung2-v1": [
-      "development-tonejs-acoustic-positive", "development-tonejs-acoustic-wrong-score",
-      "held-out-tonejs-nylon-positive", "held-out-tonejs-nylon-wrong-score",
-      "held-out-tonejs-electric-positive", "held-out-tonejs-electric-wrong-score",
-      "held-out-shinyguitar-positive", "held-out-shinyguitar-wrong-score",
+      "development-tonejs-acoustic-positive",
+      "development-tonejs-acoustic-wrong-score",
+      "held-out-tonejs-nylon-positive",
+      "held-out-tonejs-nylon-wrong-score",
+      "held-out-tonejs-electric-positive",
+      "held-out-tonejs-electric-wrong-score",
+      "held-out-shinyguitar-positive",
+      "held-out-shinyguitar-wrong-score",
       "silence"
     ]
   }
