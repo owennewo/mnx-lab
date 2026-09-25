@@ -28,7 +28,7 @@ npm run dev                # Vite dev server + Worker API (via @cloudflare/vite-
                            # prepares the local library, signs studio in, on this checkout's port
 npm run -s dev:port        # that port: 5173 in the primary checkout, a fixed one per worktree
 npm run gate               # the landing gate: tests, build, smokes this branch's diff reaches
-npm run gate -- --plan     # what it would run and why, without running it
+npm run gate -- --plan     # what it would run and why, without running it (tests ∥ build+smokes; --sequential)
 npm run smoke -- <names>   # browser smokes (--help lists them); each brings its own library
 npm test                   # harness suites over the corpus (root vitest)
 npm run check:scenarios    # corpus police

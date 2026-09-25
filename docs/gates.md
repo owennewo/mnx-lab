@@ -9,6 +9,16 @@ paths can reach. `--plan` prints the plan and the reasons and stops; `--full` ru
 everything regardless. The rule is `planGate()`, pure and pinned by
 `harness/conformance/gate-plan.test.ts`.
 
+## Two lanes, side by side
+
+The tests (with the converter suites and any bench) need no build, and the smokes need
+only the build, so the gate runs them as two lanes at once — *checks*, and *build and
+smokes* — each printed whole when it finishes, failing if either fails. Paired full gates
+on 2026-09-25: 145 and 157 s one after the other, 131–136 s overlapped, green 4 of 4 at
+load averages up to 11. The build-and-smokes lane is the floor (~130 s); the checks lane
+finishes inside it (~75 s). `--sequential` runs every step in turn, streaming, which is
+easier to read when chasing a failure.
+
 ## The rule
 
 | the diff touches | tests | build | smokes |

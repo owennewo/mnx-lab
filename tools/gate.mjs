@@ -6,7 +6,8 @@
 //   npm run gate               run it
 //   npm run gate -- --plan     say what would run, and why, and stop
 //   npm run gate -- --full     everything, whatever changed
-import { spawnSync } from 'node:child_process';
+//   npm run gate -- --sequential   one step after another (for reading a failure's output in order)
+import { spawn, spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -164,7 +165,7 @@ function testFiles(tests, since) {
   return [...new Set([...affected, ...tests.always])].filter(file => fs.existsSync(path.join(ROOT, file))).sort();
 }
 
-function main() {
+async function main() {
   const args = process.argv.slice(2);
   const full = args.includes('--full');
   const baseAt = args.indexOf('--base');
@@ -185,19 +186,53 @@ function main() {
     return;
   }
 
-  if (plan.tests.mode === 'full') run('tests', 'npm', ['test']);
-  else if (tests.length) run('tests', 'npx', ['vitest', 'run', ...tests]);
-  for (const name of plan.converters) run(`converter ${name}`, 'npm', ['-w', `@mnx-editor/${name}`, 'test']);
-  if (plan.listeningBench) run('listening bench', 'npm', ['-w', 'mnx-listening-bench', 'test']);
-  if (plan.build) run('build', 'npm', ['run', 'build']);
-  if (plan.smokes.length) {
-    // The gate build is the site face; embed and lib still build their own.
-    const onlySite = planSmokes(plan.smokes).builds.every(build => build.args[1] === 'build:site');
-    run('smokes', process.execPath, ['harness/verify/run-smokes.mjs', ...(plan.build && onlySite ? ['--built'] : []), ...plan.smokes]);
+  // Two lanes that share nothing: the tests (and converter suites, and the
+  // bench) need no build, and the smokes need only the build.
+  const checks = [
+    ...(plan.tests.mode === 'full' ? [['tests', 'npm', ['test']]] : tests.length ? [['tests', 'npx', ['vitest', 'run', ...tests]]] : []),
+    ...plan.converters.map(name => [`converter ${name}`, 'npm', ['-w', `@mnx-editor/${name}`, 'test']]),
+    ...(plan.listeningBench ? [['listening bench', 'npm', ['-w', 'mnx-listening-bench', 'test']]] : []),
+  ];
+  // The gate build is the site face; embed and lib still build their own.
+  const onlySite = plan.smokes.length && planSmokes(plan.smokes).builds.every(build => build.args[1] === 'build:site');
+  const browser = [
+    ...(plan.build ? [['build', 'npm', ['run', 'build']]] : []),
+    ...(plan.smokes.length ? [['smokes', process.execPath, ['harness/verify/run-smokes.mjs', ...(plan.build && onlySite ? ['--built'] : []), ...plan.smokes]]] : []),
+  ];
+  // The lanes run side by side unless asked not to: measured on 2026-09-25, full
+  // gates took 145/157 s one after the other and 131-136 s overlapped, green 4 of 4.
+  if (args.includes('--sequential')) {
+    for (const [label, command, commandArgs] of [...checks, ...browser]) run(label, command, commandArgs);
+    console.log('\n✓ gate passed');
+    return;
+  }
+  const failed = (await Promise.all([lane('checks', checks), lane('build and smokes', browser)])).flat();
+  if (failed.length) {
+    console.error(`\n✗ gate failed at: ${failed.join(', ')}`);
+    process.exit(1);
   }
   console.log('\n✓ gate passed');
 }
 
+/** A lane's commands in order, output held and printed whole; the failed labels. */
+async function lane(name, commands) {
+  const output = [];
+  const failed = [];
+  const started = performance.now();
+  for (const [label, command, commandArgs] of commands) {
+    output.push(Buffer.from(`\n▶ ${label}\n> ${command} ${commandArgs.join(' ')}\n`));
+    const status = await new Promise(resolve => {
+      const child = spawn(command, commandArgs, { cwd: ROOT, stdio: ['ignore', 'pipe', 'pipe'] });
+      child.stdout.on('data', chunk => output.push(chunk));
+      child.stderr.on('data', chunk => output.push(chunk));
+      child.on('close', code => resolve(code ?? 1));
+    });
+    if (status !== 0) { failed.push(label); break; }
+  }
+  process.stdout.write(Buffer.concat([Buffer.from(`\n━━ ${name} ${failed.length ? 'FAILED' : 'passed'} in ${((performance.now() - started) / 1000).toFixed(1)}s\n`), ...output]));
+  return failed;
+}
+
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  try { main(); } catch (error) { console.error(error.message); process.exitCode = 1; }
+  main().catch(error => { console.error(error.message); process.exitCode = 1; });
 }
