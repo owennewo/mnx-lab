@@ -1,0 +1,30 @@
+{
+  "kind": "source-review",
+  "version": 1,
+  "reviewedOn": "2026-09-25",
+  "reviewer": "user in this conversation",
+  "statement": "the music is solo guitars, and have 4 bars each.  as mentioned before Winner is far easier",
+  "interpretation": "Confirms solo guitar and four bars in both reviewed clips; Winner remains first. Does not establish precise beat timing, exact crop time origin, note/route correspondence or wrong-score distinguishing events.",
+  "rows": [
+    {
+      "piece": "F2msc",
+      "recording": 1872366,
+      "clipSha256": "be27e20e92f1eb98e94345f1865355d128f529a3330529f60024c22ca7eeeaf1",
+      "intendedScoreSha256": "db689c645ed8c6ad2464210be8a30f35d4314450f8809ef939ffb1e49456167d",
+      "soloGuitar": true,
+      "fourBars": true,
+      "preciseTiming": null,
+      "exactScoreRouteCorrespondence": null
+    },
+    {
+      "piece": "qrpHc",
+      "recording": 1702681,
+      "clipSha256": "03f182a7ebe6d6c4062047e628fbada7211fe06e0e92d1288929ced0ef76a138",
+      "intendedScoreSha256": "d7e00e0bae7b6000aab38bc1a31d75e40389f20cb429142828fce10557edd182",
+      "soloGuitar": true,
+      "fourBars": true,
+      "preciseTiming": null,
+      "exactScoreRouteCorrespondence": null
+    }
+  ]
+}

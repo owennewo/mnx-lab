@@ -54,7 +54,10 @@ bounds rather than simply accepting the cached decimal timestamps. Check the ini
 wrong-score control against the other piece and mark its first distinguishing evidence.
 Unresolved interiors remain unknown. A high-level “sounds right” is not a precision bound.
 
-The private `review.json` keeps these facts as null. It does not write approvals.
+The user subsequently confirmed solo guitar and four bars for both clips;
+[source-review-1.json](source-review-1.json) pins that exact statement to the clip
+hashes. It does not assert unmentioned timing or route facts. The original private
+`review.json` keeps its preparation-time review placeholders as null. It does not write approvals.
 Preserve the cached sidecars. Record corrections separately with their evidence and
 source identities; a later accepted label set will be a new version. No pitch/onset
 assessment labels are being inferred from the score.
@@ -62,8 +65,8 @@ assessment labels are being inferred from the score.
 The user approved [research contract 1](../contracts/research-contract-1.md) on
 2026-09-25, including its numerical gates and progression 4 → 8 → 12 bars. Source
 selection and intended use are confirmed; independent source/label review and set
-freezing remain separate acts. The current v1 instrument also needs a versioned real-audio and
-annotation-uncertainty extension before it can evaluate these clips honestly.
+freezing remain separate acts. The separate [v2 instrument](../contracts/instrument-v2.md) now implements bounded
+real-audio evaluation without changing v1; it refuses unchecked recording inputs.
 
 ## Reproduce the private preparation
 
@@ -90,9 +93,17 @@ change; do not replace frozen experiment evidence with it.
 
 ## Stage status
 
-Contracts, instrument-v1 and synthetic pipeline remain complete. Real evidence is now
-at **selected sources and playable review crops**, awaiting independent label checks.
-Research contract 1 is approved. Its retention rule is specified, but the
-uncertainty-aware instrument and real goldens are not yet implemented or frozen;
-no audio-driven candidate or retention comparison has run. Experiment 002 is not assigned until
-there is an actual new assessment; this review packet is not an experiment result.
+Contracts, instrument-v1 and the synthetic pipeline remain complete. Contract 1 is
+approved and v2 instrument/decision checks pass. Solo guitar and four bars are confirmed;
+independent beat/route/control labels and a frozen real manifest remain missing.
+[The bar-anchor precision calculation](bar-anchor-precision-1.json) shows why cached
+bar counts cannot supply those labels. No audio-driven comparison has run and
+experiment 002 remains unassigned. See the [loop readiness report](../reports/loop-readiness.html).
+
+## Playback and independent beat review
+
+The private `listen.html` embeds the review WAVs, avoiding blocked `file://` media
+references. `beat-review.html` adds waveform seeking, playback speed and blank beat
+bounds with a draft JSON export. Both are generated locally, outside git. Commands,
+limitations and the local-only server are in the
+[readiness report source](../reports/loop-readiness.md#private-review-tools).

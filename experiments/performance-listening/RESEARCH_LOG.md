@@ -30,15 +30,15 @@ How to maintain it:
 
 ## Current state
 
-2026-09-25. The synthetic first step remains complete and reproducible. Real-evidence
-preparation is now active: the user selected The Winner Takes It All, then Dust in
-the Wind, starting with four performed bars and expanding only on measured success.
-Private playable review crops and structural preflight are ready; no real interval
-has been independently approved or frozen. The user approved research contract 1
-as drafted on 2026-09-25 for the solo-guitar/microphone/laptop scope. Before comparison,
-we need source/label review and a separately versioned real-audio instrument that
-handles annotation uncertainty. No audio-driven candidate or retention run has begun.
-See the [preparation record](evidence/README.md) and [approved contract and provenance](contracts/research-contract-1.md).
+2026-09-25. Contract 1 is approved. The user confirmed solo guitar and four bars for
+both selected clips, with Winner easier and first. The separate uncertainty-aware v2
+instrument, paired development runner, decision rule and bounded driver are checked.
+Bar-only anchors cannot establish the required interior precision even under optimistic
+assumptions. Independent beat/route/time-origin and control labels remain the next
+prerequisite; no real golden, audio-driven candidate comparison or retention exists.
+An offline beat-review page has blank observations and preserves cached proposals.
+The candidate budget remains unused. See the [readiness report](reports/loop-readiness.html),
+[v2 instrument](contracts/instrument-v2.md) and [source confirmation](evidence/source-review-1.json).
 
 Readable overview and complete evidence: [001 — Initial two-scale assessment](reports/001-initial-two-scale.html).
 
@@ -60,6 +60,9 @@ ledger row (`ledger.md#<row>`), or a findings write-up.
 | 9 | The first end-to-end clock run agrees with the independent predictions and exposes false following and tempo drift; this validates the instrument at the synthetic harness profile, not listening capability. | [First run](ledger.md#g001-clock-harness-v1), [prediction and reproduction checks](bench/test/first-run.test.ts), [instrument freeze](contracts/freeze.json) | holds | 2026-09-25 | G; research contract remains provisional |
 | 10 | The frozen v1 instrument cannot yet judge uncertain real-audio labels: its schema is generator-specific and its evaluator does not use annotation bounds. | [Contract prerequisite](contracts/research-contract-1-draft.md#instrument-prerequisite-and-activation), [v1 types](bench/src/types.ts), [v1 evaluator](bench/src/evaluate/index.ts) | holds | 2026-09-25 | A separate version is required before real comparisons |
 | 11 | The selected first four-bar windows map structurally and decode reproducibly, while independent score/audio and precision checks remain open; Dust has a later route mismatch. | [Preflight snapshot](evidence/initial-four-bars-preflight.json), [preparation record](evidence/README.md) | holds | 2026-09-25 | Human review pending, no real golden |
+| 12 | The user confirmed both selected clips are solo guitar and contain four bars; this does not establish beat precision or exact score/route correspondence. | [Source confirmation with clip hashes](evidence/source-review-1.json) | holds | 2026-09-25 | Winner remains first |
+| 13 | Exact bar anchors alone, even under an assumed bounded local speed, cannot provide the approved interior timing coverage for these windows. | [Precision sensitivity](evidence/bar-anchor-precision-1.json), [analytic oracle](bench/test/v2-anchor-limits.test.ts) | holds | 2026-09-25 | Assumption calculation, not accepted labels |
+| 14 | The v2 instrument distinguishes guaranteed, impossible and indeterminate correctness, preserves live exposure and applies conservative comparison decisions. | [Hand-worked oracle](bench/oracle-v2/README.md), [recorded checkpoint](bench/oracle-v2/recorded/checkpoint.json), [instrument contract](contracts/instrument-v2.md) | holds | 2026-09-25 | Instrument proof, not listener qualification |
 
 ## Open questions
 
@@ -68,7 +71,7 @@ Ranked; the top row is the next question the driver asks. Status is `open`,
 
 | Rank | Question | Why it is ranked here | Status | Owner item |
 |---|---|---|---|---|
-| 1 | Can independent source/label checks establish usable timing bounds for the selected four-bar clips? | Contract 1 is approved; labels and the versioned uncertainty-aware instrument must be ready before comparison | in progress | [Real-evidence preparation](evidence/README.md) |
+| 1 | Can independent source/label checks establish usable timing bounds for the selected four-bar clips? | Contract 1 and the v2 instrument are ready; solo/four-bar confirmation does not supply interior timing bounds | in progress | [Real-evidence preparation](evidence/README.md) |
 | 2 | How has real-time score following been evaluated elsewhere, and do our ±0.25-quarter tolerance and 200 ms deadline sit inside those norms? | FIRST_STEP §10 question 1; answers whether the first contract's tolerances are defensible before anything is measured against them | answered (findings 1–2) | FIRST_STEP item A |
 | 3 | Is there a published trivial baseline for score following, so our clock floor can be compared with the usual one? | FIRST_STEP §10 question 2; decides whether the first ledger row has an external reference point | answered (findings 1–2) | FIRST_STEP item A |
 | 4 | Which library recordings and re-amplification opportunities are eligible real evidence for the following milestone, and with what anchor precision? | The structure document runs real evidence alongside the pipeline; without an answer the first human-approved contract cannot name its evidence supply | answered (finding 8; missing evidence explicit) | FIRST_STEP item R1 |

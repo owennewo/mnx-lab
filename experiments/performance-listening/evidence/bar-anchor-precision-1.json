@@ -1,0 +1,26 @@
+{
+  "kind": "bar-anchor-precision-sensitivity",
+  "reviewSha256": "e027a8b54648b9dfbcadc8bcf8a5875453ac1f8a9ad7eb08545070e74289b2f7",
+  "warning": "Optimistic assumption calculation, not accepted labels or a candidate assessment. Even exact endpoints cannot establish interior precision from bar counts alone.",
+  "requiredAnswerableFraction": 0.8,
+  "rows": [
+    {
+      "piece": "F2msc",
+      "recording": 1872366,
+      "clipSha256": "be27e20e92f1eb98e94345f1865355d128f529a3330529f60024c22ca7eeeaf1",
+      "assumptions": "Exact cached bar endpoints and a known continuous 80–120% nominal speed bound; neither is independently established for these sources.",
+      "barCount": 4,
+      "maximumAnswerableFractionUnderAssumptions": 0.3125,
+      "worstPositionHalfWidthQuarters": 0.365212
+    },
+    {
+      "piece": "qrpHc",
+      "recording": 1702681,
+      "clipSha256": "03f182a7ebe6d6c4062047e628fbada7211fe06e0e92d1288929ced0ef76a138",
+      "assumptions": "Exact cached bar endpoints and a known continuous 80–120% nominal speed bound; neither is independently established for these sources.",
+      "barCount": 4,
+      "maximumAnswerableFractionUnderAssumptions": 0.3125,
+      "worstPositionHalfWidthQuarters": 0.392254
+    }
+  ]
+}

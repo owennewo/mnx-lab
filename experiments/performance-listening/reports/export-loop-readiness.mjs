@@ -1,0 +1,12 @@
+import { readFileSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { escape, markdown } from './markdown.mjs';
+const here=dirname(fileURLToPath(import.meta.url));
+const source={id:'summary',path:resolve(here,'loop-readiness.md'),text:readFileSync(resolve(here,'loop-readiness.md'),'utf8')};
+const evidence=readFileSync(resolve(here,'../bench/oracle-v2/recorded/checkpoint.json'));
+const hash=b=>createHash('sha256').update(b).digest('hex');
+const html=`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Research loop readiness · MNX Lab</title><style>body{font:16px/1.65 system-ui;color:#20383c;background:#f4f5f0;margin:0}main{max-width:1000px;margin:auto;padding:32px}article{background:white;border:1px solid #ccd8d1;border-radius:8px;padding:30px}h1{line-height:1.25}h2{margin-top:32px}p,li{max-width:88ch}a{color:#17606a}code,pre{font-family:ui-monospace,monospace;font-size:.86em;overflow-wrap:anywhere}pre{background:#f3f5f2;padding:16px;white-space:pre-wrap}.table-wrap{overflow:auto}table{border-collapse:collapse;width:100%}td,th{border:1px solid #ccd8d1;padding:12px;text-align:left}.links{padding:18px;background:#e5efe8;border-radius:8px}footer{font-size:.85rem;margin-top:24px}@media(max-width:600px){main{padding:12px}article{padding:18px}}</style></head><body><main><article><div class="links"><a href="file:///home/williao/dev/mnx-listening-data/real-evidence-01/listen.html">Open embedded listening clips</a> · <a href="file:///home/williao/dev/mnx-listening-data/real-evidence-01/beat-review.html">Open independent beat review</a></div>${markdown(source,here)}<details><summary>Complete recorded instrument checkpoint</summary><pre>${escape(evidence.toString('utf8'))}</pre></details><footer>Summary SHA-256: <code>${hash(source.text)}</code><br>Checkpoint SHA-256: <code>${hash(evidence)}</code><p><a href="001-initial-two-scale.html">Experiment 001</a> · <a href="real-evidence-review.html">Approved contract and evidence preparation</a></p></footer></article></main></body></html>\n`;
+const output=resolve(here,'loop-readiness.html');
+if(process.argv.includes('--check')){if(readFileSync(output,'utf8')!==html)throw new Error('Loop readiness HTML is stale');console.log('Loop readiness report matches sources.');}else{writeFileSync(output,html);console.log('Wrote loop-readiness.html');}

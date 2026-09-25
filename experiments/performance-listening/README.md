@@ -31,8 +31,11 @@ Current work: [four-bar evidence and contract review (HTML)](reports/real-eviden
 and [real-evidence preparation](evidence/README.md) has private four-bar
 review clips for The Winner Takes It All and Dust in the Wind. The
 [research contract 1](contracts/research-contract-1.md) was approved by the user on
-2026-09-25. Independent source/label checks and the versioned uncertainty-aware
-instrument remain prerequisites for the first real comparison.
+2026-09-25. The user has confirmed solo guitar and four bars. The separate v2
+instrument, paired runner and decision rule are checked; independent timing/route
+and control labels remain prerequisites for the first real comparison. Open the
+[loop readiness report (HTML)](reports/loop-readiness.html) for the outcome and next
+review step. Bar anchors alone do not meet the approved precision/coverage requirement.
 
 [FIRST_STEP.md](FIRST_STEP.md) records the work and its learnings.
 [RESEARCH_LOG.md](RESEARCH_LOG.md) holds the current state and next question;

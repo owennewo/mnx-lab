@@ -56,3 +56,12 @@ packet on this machine. It is not a numbered experiment result: report 002 is re
 for an actual new assessment. Rebuild it with `node experiments/performance-listening/reports/export-evidence-review.mjs`;
 add `--check` to verify that it matches its sources. Export also verifies the approved
 contract snapshot against the SHA-256 in its approval record.
+
+## Loop readiness checkpoint
+
+[Research loop readiness](loop-readiness.html) records v2 instrument verification,
+the user's source confirmation, the bar-anchor precision limit and the remaining
+independent beat-review step. It is not experiment 002 or a candidate result.
+Rebuild with `node experiments/performance-listening/reports/export-loop-readiness.mjs`
+and verify with `--check`. Private embedded playback/beat-review pages are generated
+outside git; the report source lists their commands.
