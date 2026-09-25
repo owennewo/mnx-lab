@@ -36,6 +36,17 @@ timing, so timbre is the only change from the sine rungs. The axes, order and ra
 drafted from that direction. Tightening them needs no approval; loosening a range,
 a pass bar or the exit rule needs the user.
 
+After experiment 009 they wrote:
+
+> i don't think we need to add more pieces as we are not correctly following these known
+> audio files. I'd prefer to look at fewer and get the number of tests down (speeding up
+> iterations/research loop) - when our algorithms saturate these audio files then we pick
+> the next 4 bars of the same song.
+
+That direction is recorded under [the active suite](#the-active-suite-and-the-next-bars)
+below. It replaces the held-out split during development and the search for fresh
+held-out guitars.
+
 ## Why
 
 Neither spectral follower was ever run on audio whose answer is exact. Both went
@@ -103,6 +114,32 @@ gates apply unchanged, with exact labels in place of bounded ones:
 Real-audio development then resumes on the Winner clip under
 [sync-proxy development 1](sync-proxy-development-1.md), with that document's Winner,
 then Dust, then longer windows progression. The ladder stays as regression evidence.
+
+## The active suite and the next bars
+
+Iterations are kept short by running a small, fixed suite instead of every frozen
+example. The suite is listed in `bench/src/ladder/suite.json`:
+
+| Rung | Active examples |
+|---|---|
+| 0 | All three: positive, wrong score, silence |
+| 1 | One example per tempo family, the one where the incumbent's wrong-score rejection was weakest: constant 110 BPM, the 92–119 BPM ramp and the 90–120 BPM drift, each with its wrong-score control, plus silence |
+| 2 | The three tonejs-instruments guitars and Shinyguitar, the hardest set, each with its wrong-score control, plus silence |
+
+- **Entries.** Only the clock floor, the incumbent, any challenger and their
+  alignment-only diagnostics run. Retired candidates keep their recorded results.
+- **Causality** is checked once per candidate per rung, on the rung's first positive
+  example, since it is a property of the listener's code.
+- **No held-out split during development.** Every active example is development
+  evidence. A candidate **saturates** the suite when it meets every gate on every active
+  example of every built rung.
+- **The next four bars are the fresh check.** On saturation, Winner's bars 5–8 are
+  rendered the same way, rungs 0 to 2, and become the next suite, with bars 1–4 kept as
+  regression evidence. New music is evidence the candidate was never tuned on.
+- **`--full`** runs every frozen example and every registered entry, for a wider check
+  when one is wanted.
+
+Rungs 3 to 7 stay in the ladder, taken up when the user chooses.
 
 ## The scoreboard
 

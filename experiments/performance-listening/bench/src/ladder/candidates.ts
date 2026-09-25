@@ -13,7 +13,7 @@ export const CANDIDATES: { id: string; module: string; factory: () => Listener; 
   { id: SPECTRAL_1, module: 'candidates/spectralFollower1.ts', factory: spectralFollower1, recognition: 1 },
   { id: 'spectral-follower@2', module: 'candidates/spectralFollower2.ts', factory: spectralFollower2, recognition: 2 },
   { id: OLTW_1, module: 'candidates/onlineTimeWarp1.ts', factory: onlineTimeWarp1, recognition: 'oltw' },
-  { id: OLTW_2, module: 'candidates/onlineTimeWarp2.ts', factory: () => onlineTimeWarp2() },
+  { id: OLTW_2, module: 'candidates/onlineTimeWarp2.ts', factory: () => onlineTimeWarp2(), recognition: 'oltw' },
   // Not a candidate: the incumbent's alignment with its support test switched off.
   { id: `${OLTW_2}/alignment-only`, module: 'candidates/onlineTimeWarp2.ts', factory: () => onlineTimeWarp2({ alwaysClaim: true }), diagnostic: true },
   { id: OLTW_3, module: 'candidates/onlineTimeWarp3.ts', factory: () => onlineTimeWarp3(), recognition: 'oltw3' },

@@ -22,7 +22,13 @@ import { pluckedReferenceFrames } from '../candidates/onlineTimeWarp3.ts';
 import { CLOCK_VERSION } from '../candidates/clockFollower.ts';
 import { SPECTRAL_1 } from '../candidates/spectralFollower1.ts';
 
-const [runId, slug, ladderDir, proxyDir] = process.argv.slice(2);
+const full = process.argv.includes('--full');
+const [runId, slug, ladderDir, proxyDir] = process.argv.slice(2).filter(a => a !== '--full');
+// The active suite: which entries run and which frozen examples they run on. --full runs everything.
+const suite = JSON.parse(readFileSync(new URL('./suite.json', import.meta.url), 'utf8')) as { entries: string[]; examples: Record<string, string[]> };
+const ENTRIES = full ? CANDIDATES : CANDIDATES.filter(c => suite.entries.includes(c.id));
+if (!full && ENTRIES.length !== suite.entries.length) throw new Error('suite.json names an entry that is not registered');
+const CAUSALITY_MODE = full ? 'every-example' : 'one-positive-per-rung';
 if (!runId || !/^g\d{3}[a-z]?-[a-z0-9-]+$/.test(runId) || !slug || !/^\d{3}-[a-z0-9-]+$/.test(slug) || !ladderDir || !proxyDir) {
   throw new Error('Usage: tsx src/ladder/scoreboard.ts <run-id> <report-slug> <ladder-dir> <frozen-002-set-dir>');
 }
@@ -67,23 +73,36 @@ function labelledPosition(golden: Golden) {
 }
 
 const rungs = rungDirs.map(dir => {
-  const { manifest, sha256 } = readRungSet(join(ladderDir, dir));
+  const frozen = readRungSet(join(ladderDir, dir)), sha256 = frozen.sha256;
+  const active = full ? null : suite.examples[frozen.manifest.id];
+  if (!full && !active) throw new Error(`suite.json does not list ${frozen.manifest.id}`);
+  if (active?.some(id => !frozen.manifest.examples.some(e => e.id === id))) throw new Error(`suite.json names an unknown example in ${frozen.manifest.id}`);
+  const manifest = { ...frozen.manifest, examples: frozen.manifest.examples.filter(e => !active || active.includes(e.id)) };
   const kindOf = (e: typeof manifest.examples[number]) => e.kind ?? (e.id as 'positive' | 'wrong-score' | 'silence');
   const groupOf = (e: typeof manifest.examples[number]) => e.group ?? 'fixed';
-  const candidates = CANDIDATES.map(c => {
+  const causalityExample = manifest.examples.find(e => kindOf(e) === 'positive')!;
+  const candidates = ENTRIES.map(c => {
     const print = fingerprint(c.module);
+    // Causality is a property of the listener's code, so the slim suite checks it once per rung.
+    let rungCausality: ReturnType<typeof causality> | null = null;
+    const causalityFor = (e: typeof manifest.examples[number], s: MnxStructure, tempo: Tempo, audio: Float32Array, record: Decision[]) => {
+      if (CAUSALITY_MODE === 'every-example') return causality(c.factory, s, tempo, audio, record);
+      if (e.id === causalityExample.id) return (rungCausality = causality(c.factory, s, tempo, audio, record));
+      return rungCausality ??= (() => { const ce = causalityExample, cs = score(ce.scorePath), ct = { ...ce.golden.intended.tempo }, ca = readWav(readFileSync(ce.audioPath));
+        return causality(c.factory, cs, ct, ca, execute(c.factory, cs, ct, ca).record); })();
+    };
     const compute = (e: typeof manifest.examples[number]) => {
       const tempo: Tempo = { ...e.golden.intended.tempo };
       const s = score(e.scorePath), audio = readWav(readFileSync(e.audioPath));
       const run = execute(c.factory, s, tempo, audio);
-      const checks = causality(c.factory, s, tempo, audio, run.record);
+      const checks = causalityFor(e, s, tempo, audio, run.record);
       const evaluation = evaluate(asGolden(e.golden), run.record);
       const result = { example: e.id, kind: kindOf(e), group: groupOf(e), gates: gates(evaluation, run.cost, checks), counts: evaluation.asDecided.counts, denominators: evaluation.asDecided.denominators,
         errors: { ...evaluation.asDecided.errors, values: undefined }, losses: evaluation.asDecided.losses.length,
         exposure: evaluation.exposure, timeliness: { ...evaluation.timeliness, delays: undefined }, cost: run.cost, causality: checks };
       return { result: JSON.parse(JSON.stringify(result)) as typeof result, record: run.record, evaluation };
     };
-    const paths = manifest.examples.map(e => cachePath(ladderDir, c.id, print.hash, sha256, e.id));
+    const paths = manifest.examples.map(e => cachePath(ladderDir, c.id, CAUSALITY_MODE === 'every-example' ? print.hash : `rc-${print.hash}`, sha256, e.id));
     const cached = paths.map(p => readCached<ReturnType<typeof compute>['result']>(p));
     let spotCheck: { example: string; reproduced: true } | null = null;
     if (cached.some(Boolean)) {
@@ -108,7 +127,7 @@ const rungs = rungDirs.map(dir => {
       rungVerdict: clean('held-out') && clean('fixed') };
   });
   const wrongScore = manifest.examples.find(e => kindOf(e) === 'wrong-score')!;
-  const recognition = CANDIDATES.filter(c => c.recognition).map(c => ({
+  const recognition = ENTRIES.filter(c => c.recognition).map(c => ({
     candidate: c.id,
     examples: manifest.examples.filter(e => kindOf(e) === 'positive').map(positive => {
       const audio = readWav(readFileSync(positive.audioPath)), at = labelledPosition(asGolden(positive.golden)), handed = positive.golden.intended.tempo.bpm;
@@ -128,7 +147,7 @@ const recorded002: Record<string, { example: string; metrics: unknown }[]> = {};
 for (const [runName, side, id] of [['g002a-spectral1-winner-sync-proxy', 'comparator', CLOCK_VERSION], ['g002a-spectral1-winner-sync-proxy', 'candidate', SPECTRAL_1], ['g002b-spectral2-winner-sync-proxy', 'candidate', 'spectral-follower@2']] as const) {
   recorded002[id] = JSON.parse(readFileSync(join(EXPERIMENT, 'runs', runName, 'summary.json'), 'utf8'))[side].examples;
 }
-const thermometer = CANDIDATES.map(c => ({
+const thermometer = ENTRIES.map(c => ({
   candidate: c.id,
   examples: proxy.manifest.examples.map(e => {
     const run = execute(c.factory, score(e.scorePath), { bpm: proxy.manifest.nominalBpm, unit: 'quarter' }, readWav(readFileSync(e.audioPath)));
@@ -147,6 +166,7 @@ const files = (dir: string): string[] => readdirSync(dir, { withFileTypes: true 
 const sourceFiles = [...files(join(EXPERIMENT, 'bench/src')), join(EXPERIMENT, 'contracts/development-contract-1.md')];
 const summary = {
   id: runId, kind: 'development-scoreboard', policy: 'development-contract-1', preregistration: `reports/${slug}.md`,
+  suite: full ? 'full' : suite, causality: CAUSALITY_MODE,
   gitCommit: git('rev-parse', 'HEAD'), machine: machine(),
   sourceHashes: Object.fromEntries(sourceFiles.map(p => [p.slice(EXPERIMENT.length), sha(readFileSync(p))])),
   rungs, thermometer: { set: proxy.manifest.id, sha256: proxy.sha256, evaluator: 'sync-proxy-evaluator@1', use: 'recorded, never used to select', candidates: thermometer },
