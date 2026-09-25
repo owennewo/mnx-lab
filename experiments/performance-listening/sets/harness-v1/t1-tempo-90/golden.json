@@ -18,7 +18,7 @@
     "sampleRate": 48000,
     "channels": 1,
     "duration": 5.5,
-    "sha256": null,
+    "sha256": "daa0833b9d2837d10e90b12c60d10f0c3ce2f591934f8617829c28a7ad8cced5",
     "recipe": {
       "manifest": "sine-v1",
       "parameters": {
@@ -40,7 +40,7 @@
           "midi": 60,
           "hz": 261.6255653005986
         },
-        "onset": 0.0,
+        "onset": 0,
         "audibleEnd": 0.3333333333333333,
         "scoreDuration": {
           "num": 1,
@@ -58,7 +58,7 @@
           "hz": 293.6647679174076
         },
         "onset": 0.6666666666666666,
-        "audibleEnd": 1.0,
+        "audibleEnd": 1,
         "scoreDuration": {
           "num": 1,
           "den": 1
@@ -91,7 +91,7 @@
           "midi": 65,
           "hz": 349.2282314330039
         },
-        "onset": 2.0,
+        "onset": 2,
         "audibleEnd": 2.3333333333333335,
         "scoreDuration": {
           "num": 1,
@@ -109,7 +109,7 @@
           "hz": 391.99543598174927
         },
         "onset": 2.6666666666666665,
-        "audibleEnd": 3.0,
+        "audibleEnd": 3,
         "scoreDuration": {
           "num": 1,
           "den": 1
@@ -123,7 +123,7 @@
       {
         "pitch": {
           "midi": 69,
-          "hz": 440.0
+          "hz": 440
         },
         "onset": 3.3333333333333335,
         "audibleEnd": 3.6666666666666665,
@@ -142,7 +142,7 @@
           "midi": 71,
           "hz": 493.8833012561241
         },
-        "onset": 4.0,
+        "onset": 4,
         "audibleEnd": 4.333333333333333,
         "scoreDuration": {
           "num": 1,
@@ -160,7 +160,7 @@
           "hz": 523.2511306011972
         },
         "onset": 4.666666666666667,
-        "audibleEnd": 5.0,
+        "audibleEnd": 5,
         "scoreDuration": {
           "num": 1,
           "den": 1
@@ -181,7 +181,7 @@
         "provenance": "sine-v1 controlled recipe; 150 ms detection allowance from the first distinguishing onset.",
         "answerableFrom": 0.15,
         "route": 1,
-        "end": 5.0,
+        "end": 5,
         "state": "supported",
         "truth": {
           "atStart": {
@@ -209,7 +209,7 @@
         ]
       },
       {
-        "start": 5.0,
+        "start": 5,
         "end": 5.5,
         "state": "unknown",
         "precision": {
@@ -220,7 +220,7 @@
     ]
   },
   "expected": {
-    "summary": "FIRST_STEP \u00a79: correct through .5 s, then wrong; all later deadlines missed",
+    "summary": "FIRST_STEP §9: correct through .5 s, then wrong; all later deadlines missed",
     "correctThrough": 0.5,
     "maxWrongErrorQuarters": 2.5,
     "exposureSeconds": 4.5
@@ -228,8 +228,8 @@
   "profile": {
     "melodic": {
       "level": 1,
-      "range": "C4\u2013C5",
-      "note": "C5 exceeds the level-1 C4\u2013B4 range."
+      "range": "C4–C5",
+      "note": "C5 exceeds the level-1 C4–B4 range."
     },
     "polyphonic": {
       "level": 1,
@@ -241,7 +241,7 @@
     },
     "dynamics": {
       "level": 1,
-      "range": "constant \u221212 dBFS peak"
+      "range": "constant −12 dBFS peak"
     },
     "rhythm": {
       "level": 1,

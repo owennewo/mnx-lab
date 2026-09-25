@@ -515,3 +515,11 @@ audio. The recipe makes c2 8 s and c1 explicitly 8.5 s; “as c1” uses the sam
 formula, not equal duration. Positive tails remain unknown beyond the final release.
 R1 has begun with the local Soundslice cache; metadata cannot by itself verify a solo
 performance, recording rights or anchor precision.
+
+### 2026-09-25 — E: deterministic generator
+
+sine-v1 now writes all five PCM16 WAVs and actual sample-boundary labels; independent
+D labels agree without alteration. Two generates reproduce the committed SHA-256s.
+Waveform checks cover pitch, silent gaps, duration, envelope bounds and quantization;
+temporary freeze tests reject changed source bytes. Compiler “voices” are sink identities,
+so monophony is checked from event positions/durations, not the number of sinks.

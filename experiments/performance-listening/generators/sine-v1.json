@@ -1,0 +1,29 @@
+{
+  "id": "sine-v1",
+  "version": 1,
+  "controls": {
+    "harmonic": "sine only, no added harmonics",
+    "rhythm": "one quarter per beat; half-beat sounding, 10 ms linear attack and release",
+    "tempo": "any constant positive BPM whose half-beat accommodates attack/release; boundaries rounded to nearest sample",
+    "dynamics": "constant -12 dBFS peak"
+  },
+  "doesNotControl": {
+    "polyphony": "one voice only",
+    "expression": "none",
+    "navigation": "known start, continuous"
+  },
+  "format": {
+    "sampleRate": 48000,
+    "channels": 1,
+    "encoding": "PCM signed 16-bit little endian"
+  },
+  "randomness": null,
+  "envelope": "min(1, sampleFromOnset/480, samplesUntilRelease/480); note phase resets at onset",
+  "quantization": "round(amplitude * 32767); no dither, no noise",
+  "end": "last audible release + 0.5 seconds; silence control uses explicit 8.5 seconds",
+  "perturbations": {
+    "descending": "reverse the score walk pitches while preserving its times; scoreNoteId=null",
+    "silence": "no sounding notes, explicit duration"
+  },
+  "labels": "actual rendered sample boundaries; score duration is separate; positive following ends at final release; trailing silence unknown"
+}

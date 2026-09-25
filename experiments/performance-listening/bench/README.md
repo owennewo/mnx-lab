@@ -11,6 +11,7 @@ npm -w mnx-listening-bench run run -- harness-v1
 npm -w mnx-listening-bench run report -- <run-id>
 ```
 
-At B/C, the contract and oracle tests and `report -- oracle` are implemented;
-remaining commands fail explicitly. The committed oracle reports regenerate byte-identically.
+At E, `generate`, `freeze`, tests and `report -- oracle` are implemented.
+`run` still fails explicitly. Freeze is exercised only on temporary copies until G.
+The committed oracle reports regenerate byte-identically.
 Start with [the research log](../RESEARCH_LOG.md). No product build imports this bench.

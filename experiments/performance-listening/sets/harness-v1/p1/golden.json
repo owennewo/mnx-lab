@@ -16,8 +16,8 @@
     "path": "audio.wav",
     "sampleRate": 48000,
     "channels": 1,
-    "duration": 4.0,
-    "sha256": null,
+    "duration": 4,
+    "sha256": "4a6ff7ec8696d81a2c9883198053aa3c6ecfbcd2ad58dd1b3489dc617faecaf6",
     "recipe": {
       "manifest": "sine-v1",
       "parameters": {
@@ -39,7 +39,7 @@
           "midi": 60,
           "hz": 261.6255653005986
         },
-        "onset": 0.0,
+        "onset": 0,
         "audibleEnd": 0.5,
         "scoreDuration": {
           "num": 1,
@@ -56,7 +56,7 @@
           "midi": 62,
           "hz": 293.6647679174076
         },
-        "onset": 1.0,
+        "onset": 1,
         "audibleEnd": 1.5,
         "scoreDuration": {
           "num": 1,
@@ -73,7 +73,7 @@
           "midi": 64,
           "hz": 329.6275569128699
         },
-        "onset": 2.0,
+        "onset": 2,
         "audibleEnd": 2.5,
         "scoreDuration": {
           "num": 1,
@@ -90,7 +90,7 @@
           "midi": 65,
           "hz": 349.2282314330039
         },
-        "onset": 3.0,
+        "onset": 3,
         "audibleEnd": 3.5,
         "scoreDuration": {
           "num": 1,
@@ -141,7 +141,7 @@
       },
       {
         "start": 3.5,
-        "end": 4.0,
+        "end": 4,
         "state": "unknown",
         "precision": {
           "kind": "unknown"
@@ -151,7 +151,7 @@
     ]
   },
   "expected": {
-    "summary": "FIRST_STEP \u00a79: all answerable supported points correct; no missed deadlines",
+    "summary": "FIRST_STEP §9: all answerable supported points correct; no missed deadlines",
     "correctThrough": 3.5,
     "maxWrongErrorQuarters": null,
     "exposureSeconds": 0
@@ -159,7 +159,7 @@
   "profile": {
     "melodic": {
       "level": 1,
-      "range": "C4\u2013F4"
+      "range": "C4–F4"
     },
     "polyphonic": {
       "level": 1,
@@ -171,7 +171,7 @@
     },
     "dynamics": {
       "level": 1,
-      "range": "constant \u221212 dBFS peak"
+      "range": "constant −12 dBFS peak"
     },
     "rhythm": {
       "level": 1,

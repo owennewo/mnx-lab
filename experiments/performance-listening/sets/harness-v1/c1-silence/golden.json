@@ -18,7 +18,7 @@
     "sampleRate": 48000,
     "channels": 1,
     "duration": 8.5,
-    "sha256": null,
+    "sha256": "cca30d9f2d110d3add5cb52022ef3324fa7c183cca2ceb717b9aff471e18f1f9",
     "recipe": {
       "manifest": "sine-v1",
       "parameters": {
@@ -51,7 +51,7 @@
     ]
   },
   "expected": {
-    "summary": "FIRST_STEP \u00a79: all answerable points false following; all deadlines missed",
+    "summary": "FIRST_STEP §9: all answerable points false following; all deadlines missed",
     "correctThrough": null,
     "maxWrongErrorQuarters": null,
     "exposureSeconds": 8.35
