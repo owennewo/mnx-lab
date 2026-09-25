@@ -32,17 +32,18 @@ How to maintain it:
 
 ## Current state
 
-2026-09-25. Development runs a slim active suite of 19 examples from rungs 0–2, at the
-user's direction, under [development contract 1](contracts/development-contract-1.md).
-A candidate that saturates it moves on to Winner's bars 5–8. A scoreboard run now takes
-about two minutes.
+2026-09-25. Development runs a slim active suite of 19 examples from rungs 0–2 under
+[development contract 1](contracts/development-contract-1.md). A candidate that
+saturates it moves on to Winner's bars 5–8.
 
-`online-time-warp@2` remains the incumbent: it passes rungs 0 and 1 and fails rung 2,
-recorded guitar at exact timing. It has two separate defects there. Its support test is
-miscalibrated across guitars. Its alignment slips in short bursts, and
-[experiment 010](reports/010-slim-suite-and-burst-features.html) found that in most of
-those frames the features favour the true position: the alignment path carries it away.
-The next question is what in the path does that.
+`online-time-warp@6` is the incumbent ([experiment 011](reports/011-path-and-support.html)).
+It keeps version 2's alignment and judges support by how highly the path's reference
+frames rank for the current sound. That rejects the wrong score on every guitar and
+passes rungs 0 and 1. It still fails rung 2 on the positives: it rejects correct
+alignments on the harder guitars, and on the real clip it rejects everything. The
+alignment's own bursts remain; letting the path react faster made them worse. The next
+questions are whether favouring a steady tempo reduces the bursts, and what makes the
+rank-based test reject correct alignments.
 
 ## Findings
 
@@ -88,6 +89,8 @@ ledger row (`ledger.md#<row>`), or a findings write-up.
 | 35 | Rung 2's held-out guitar sets have informed revisions and now count as development evidence; judging a revised candidate needs fresh independent guitar sources. | [Report 009 what this changes](reports/009-plucked-reference.md#what-this-changes) | superseded | 2026-09-25 | Superseded by the user's direction: the fresh check is Winner's next four bars, [development contract 1](contracts/development-contract-1.md#the-active-suite-and-the-next-bars) |
 | 36 | The slim active suite reproduces the full scoreboard's results on its examples exactly and runs in about two minutes. | [Run g010a](ledger.md#g010-slim-suite-and-burst-features), [report 010](reports/010-slim-suite-and-burst-features.md#the-slim-suite-reproduces-in-two-minutes) | holds | 2026-09-25 | Development evidence only; generalisation is checked on the next four bars |
 | 37 | In most frames where the incumbent's alignment is wrong on recorded guitar, its own features match the true position better; the path, not the features, carries it off. | [Run g010b](ledger.md#g010-slim-suite-and-burst-features), [report 010](reports/010-slim-suite-and-burst-features.md#the-features-do-not-explain-the-bursts) | holds | 2026-09-25 | Answers question 16 |
+| 38 | Letting the alignment path react faster, by fading old evidence or widening the tempo steps, makes its errors on recorded guitar two to three times more frequent. | [Run g011](ledger.md#g011-path-and-support), [report 011](reports/011-path-and-support.md#the-alignment-changes) | holds | 2026-09-25 | The whole-history cost stabilises the path |
+| 39 | Judging support by the rank of the path's reference frames rejects the wrong score on every rung-2 guitar and on rungs 0–1, but still rejects correct alignments on the harder guitars and everything on the real clip. | [Report 011 support change](reports/011-path-and-support.md#the-support-change) | holds | 2026-09-25 | Partly answers question 19 |
 
 
 ## Open questions
@@ -98,11 +101,13 @@ is an identifier given when a question opens and never reused, so citations stay
 
 | Rank | Question | Why it is ranked here | Status | Owner item |
 |---|---|---|---|---|
-| 18 | What in the alignment path carries it away from positions its features prefer: endpoint choice by length-normalised cost, or the step constraints that limit recovery? | The bursts are the incumbent's alignment defect on rung 2 | open | [Report 010 decision](reports/010-slim-suite-and-burst-features.md#decision) |
-| 19 | Can a support test be calibrated across guitars, rejecting Dust without rejecting correct alignments? | The incumbent's other rung-2 defect, and most of its real-clip failure | open | [Report 008](reports/008-rung2-guitar-samples.md#the-support-test-is-not-calibrated-across-timbre) |
+| 20 | Does preferring a steady tempo where the audio gives little evidence reduce the alignment's bursts on recorded guitar? | Faster-reacting paths made them worse, so the opposite direction is the next test | open | [Report 011 decision](reports/011-path-and-support.md#decision) |
+| 21 | When the rank-based support test rejects a correct alignment, is it the rank limit or the path-cost cap? | The incumbent's remaining rung-2 failure and all of its real-clip failure | open | [Report 011 support change](reports/011-path-and-support.md#the-support-change) |
+| 19 | Can a support test be calibrated across guitars, rejecting Dust without rejecting correct alignments? | The incumbent's other rung-2 defect, and most of its real-clip failure | in progress: wrong-score side solved (finding 39) | [Report 008](reports/008-rung2-guitar-samples.md#the-support-test-is-not-calibrated-across-timbre) |
 | 14 | Does the incumbent pass rung 3, per-note onset jitter up to ±40 ms and chord spread up to 30 ms, on held-out seeds, and does the fast-tempo rejection margin hold? | Deferred until a candidate passes rung 2; jitter blurs the onsets its features rely on | open | [Report 007 next](reports/007-rung1-tempo.md#next) |
 | 11 | Which ladder rung first breaks the best candidate, and does recognition at supplied labels fail on that rung too? | Ranks the remaining rungs by the failure they expose | open | [Development contract 1](contracts/development-contract-1.md#the-ladder) |
 | 7 | Can independent source/label checks establish timing bounds for later formal qualification? | Still relevant to stronger claims; explicitly not required for current proxy development | open, deferred to qualification | [Real-evidence preparation](evidence/README.md) |
+| 18 | What in the alignment path carries it away from positions its features prefer: endpoint choice by length-normalised cost, or the step constraints that limit recovery? | The bursts are the incumbent's alignment defect on rung 2 | answered: neither; faster paths are worse (finding 38) | [Report 010 decision](reports/010-slim-suite-and-burst-features.md#decision) |
 | 17 | Which further independent guitar recordings can serve as fresh held-out evidence for rung 2? | The current held-out sets are spent | stopped: the user chose the next four bars of Winner as the fresh check instead | [Report 009 what this changes](reports/009-plucked-reference.md#what-this-changes) |
 | 16 | In the alignment's error bursts on recorded guitar, which feature bands make a wrong reference position look closer than the true one? | Needed before another candidate change, by experiment 009's rule | answered (finding 37) | [Report 009 next](reports/009-plucked-reference.md#next) |
 | 15 | Does rendering the listener's reference with a fixed plucked decay, with nothing else changed, remove the alignment slips and bring the support test within the gates on rung 2's held-out sample sets? | Both rung-2 defects may share one cause: a reference that never decays | answered: no (finding 34) | [Report 008 decision](reports/008-rung2-guitar-samples.md#decision) |

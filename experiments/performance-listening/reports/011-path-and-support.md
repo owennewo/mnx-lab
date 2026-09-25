@@ -59,3 +59,73 @@ one of the four.
 - **Kept changes are combined** into one version, run next on the same suite.
 - **No change is kept.** The path and support explanations are both wrong as posed, and
   the next step is diagnosis, not another variation.
+
+## Results
+
+Run [g011-path-and-support](../runs/g011-path-and-support/summary.json), on the
+pre-registration commit `20a25255`. The clock, version 2 and its diagnostic were reused
+from the cache; their spot checks reproduced. The run took 5.5 minutes of wall time,
+almost all of it computing five new entries.
+
+**Neither path change helps; the rank-based support test does, on one side.** Letting the
+path react faster made the alignment much worse. Judging support by rank made rejection
+of the wrong score reliable on every guitar, but did not stop the test rejecting correct
+alignments on the hard guitars. Version 6 is kept and becomes the incumbent.
+
+### The alignment changes
+
+Wrong positions made by each alignment-only diagnostic on the four active guitars:
+
+| Alignment | tonejs acoustic | tonejs nylon | tonejs electric | Shinyguitar | Total |
+|---|---|---|---|---|---|
+| Version 2: normalised endpoint, half-to-double steps | 96.3% correct | 90.5% | 95.8% | 87.8% | 52 wrong |
+| Version 4: endpoint by evidence fading over 1 s | 96.3% | 68.3% | 86.8% | 57.7% | 168 wrong |
+| Version 5: steps from a third to three times | 94.2% | 80.4% | 90.5% | 73.0% | 113 wrong |
+
+Both changes give the path more freedom to follow the latest frames, and both make it
+follow them wrongly more often. The whole-history normalised cost is a stabiliser, not
+the cause of the bursts. Both versions also fall below the wrong-score gate on rung 0 or
+rung 1, so neither passes the sine rungs any more.
+
+### The support change
+
+| Wrong-score rejection | Rung 0 | Rung 1, three tempi | Rung 2, four guitars |
+|---|---|---|---|
+| Version 2: fixed gap | 97.9% | 95.4%, 97.3%, 97.2% | 94.7%, 79.9%, 88.9%, 100% |
+| Version 6: rank within the best 10% | 98.4% | 98.8%, 98.4%, 100% | 100%, 100%, 98.4%, 100% |
+
+| Positive supported correct, rung 2 | tonejs acoustic | tonejs nylon | tonejs electric | Shinyguitar |
+|---|---|---|---|---|
+| Version 2 | 96.3% | 62.4% | 78.8% | 39.7% |
+| Version 6 | 96.3% | 62.4% | 79.9% | 38.6% |
+
+Version 6 passes rungs 0 and 1 with wider margins than version 2 and rejects Dust on
+every guitar. Its alignment is version 2's, which is right on 87.8–96.3% of points, yet
+it still reports unsupported on up to 61% of the performance on the hardest guitars.
+Whether the 10% rank limit or the path-cost cap rejects those correct alignments was not
+measured here.
+
+On the real clip, version 6 agrees with the sync reference on no points: it rejects the
+whole positive clip.
+
+### Against the predictions
+
+| Prediction | Outcome |
+|---|---|
+| 1. Version 4's alignment makes at most 26 wrong positions | **Contradicted**: 168 |
+| 2. Version 5's alignment improves, but less than version 4's | **Contradicted**: 113, worse than version 2 |
+| 3. Version 6 rejects the wrong score on 3 of 4 guitars and matches version 2's positives on 3 of 4 | **Held**: 4 of 4 and 3 of 4, though the positives did not improve |
+| 4. All three versions still pass rungs 0 and 1 | **Contradicted** for versions 4 and 5; held for version 6 |
+| 5. No single change passes rung 2 | **Held** |
+| 6. Version 6 beats version 2 on the real clip | **Contradicted**: 0% against 12.7% |
+
+### Decision
+
+By the rules fixed above, only version 6's change is kept. It becomes the incumbent: it
+passes rungs 0 and 1, and on rung 2 it fails only on the positive examples.
+
+Two findings shape the next step. Faster-reacting paths made the bursts worse, so the
+opposite direction is worth testing: favour a steady tempo where the audio gives little
+evidence, such as during sustained notes. And the rank-based support test's rejection of
+correct alignments has to be traced to its cause, the rank limit or the path-cost cap,
+before either is changed.

@@ -127,6 +127,19 @@
         "href": "009-plucked-reference.html",
         "label": "Experiment 009"
       }
+    },
+    {
+      "number": "011",
+      "slug": "011-path-and-support",
+      "title": "011 · The alignment path and the support test",
+      "banner": "Faster paths make the alignment worse · rank-based support rejects the wrong score on every guitar",
+      "runs": [
+        "g011-path-and-support"
+      ],
+      "previous": {
+        "href": "010-slim-suite-and-burst-features.html",
+        "label": "Experiment 010"
+      }
     }
   ]
 }

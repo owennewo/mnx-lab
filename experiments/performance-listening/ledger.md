@@ -81,3 +81,10 @@ one row per numbered experiment, pointing at that experiment's single file.
 | Run | Hypothesis / sources | Parent / candidate | Set / evaluator | Conditions / resources | Results / uncertainty | Decision / next action |
 |---|---|---|---|---|---|---|
 | [g010a](runs/g010a-slim-suite/summary.json), [g010b](runs/g010b-burst-features/summary.json) | [Pre-registered in report 010](reports/010-slim-suite-and-burst-features.md#pre-registration); user direction to cut test count | Incumbent online-time-warp@2, its alignment-only diagnostic, clock; no new candidate | Slim active suite, 19 examples of rungs 0–2 / following-evaluator@1; burst feature diagnostic | Causality once per rung; 123 s wall for the scoreboard, 11 s for the diagnostic | Slim suite reproduces 57 of 57 results of 009. In wrong frames the true position matches better on 82 of 117 frames on the three hardest guitars | Features do not explain the bursts; the alignment's path is examined next; [report 010](reports/010-slim-suite-and-burst-features.html) |
+
+
+<a id="g011-path-and-support"></a>
+
+| Run | Hypothesis / sources | Parent / candidate | Set / evaluator | Conditions / resources | Results / uncertainty | Decision / next action |
+|---|---|---|---|---|---|---|
+| [g011-path-and-support](runs/g011-path-and-support/summary.json) | [Pre-registered in report 011](reports/011-path-and-support.md#pre-registration); experiments 008 and 010 | online-time-warp@2 parent / @4 fading endpoint, @5 wider steps, @6 rank support, each one change; diagnostics for @4 and @5 | Slim active suite / following-evaluator@1; sync-proxy thermometer | 5.5 min wall, five new entries | Alignment wrong positions: v2 52, v4 168, v5 113. v6 rejects the wrong score on 98–100% of points on every rung-2 guitar and passes rungs 0–1; its rung-2 positives are unchanged. Real clip: v6 0% | Only v6 kept; it is the incumbent. Next: a steady-tempo preference for the path, and trace why v6 rejects correct alignments; [report 011](reports/011-path-and-support.html) |
