@@ -48,6 +48,19 @@
         "href": "003-recognition-at-sync.html",
         "label": "Experiment 003"
       }
+    },
+    {
+      "number": "005",
+      "slug": "005-online-time-warp-rung0",
+      "title": "005 · Rung 0: online time-warping comparator",
+      "banner": "Rung 0 complete · follows perfectly · fails the wrong-score control",
+      "runs": [
+        "g005-oltw-rung0"
+      ],
+      "previous": {
+        "href": "004-rung0-clean-winner.html",
+        "label": "Experiment 004"
+      }
     }
   ]
 }

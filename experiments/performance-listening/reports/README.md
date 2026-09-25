@@ -10,6 +10,7 @@ question are in [the research log](../RESEARCH_LOG.md), not here.
 | 002 | [Winner with sync interpolation](002-winner-sync-proxy.html) | [002a](../runs/g002a-spectral1-winner-sync-proxy/summary.json), [002b](../runs/g002b-spectral2-winner-sync-proxy/summary.json) |
 | 003 | [Recognition at supplied sync](003-recognition-at-sync.html) | [g003-recognition-at-sync](../runs/g003-recognition-at-sync/summary.json) |
 | 004 | [Rung 0: clean Winner](004-rung0-clean-winner.html) | [g004-rung0-clean-winner](../runs/g004-rung0-clean-winner/summary.json) |
+| 005 | [Rung 0: online time-warping comparator](005-online-time-warp-rung0.html) | [g005-oltw-rung0](../runs/g005-oltw-rung0/summary.json) |
 
 ## One experiment, one file
 
