@@ -14,19 +14,22 @@ Two documents govern the work. Read them in this order:
    contracts, components, responsibilities and construction order that implement
    that approach.
 
-Implementation is the next phase, planned in [FIRST_STEP.md](FIRST_STEP.md). Start
-with the assessment vocabulary, golden format and evaluator counting rules, then
-prove the evaluator against hand-worked oracle
-cases and render the first report. A frozen synthetic set, chunked audio runner and
-trivial clock follower establish the first end-to-end pipeline. Its result should
-show that the instrument measures both correct following and false claims of
-following. Real-source preparation begins alongside the pipeline; audio-driven
-candidates and retention comparisons follow under an approved research contract.
+The first step (A–G and R1) is complete. Open
+[001 — Initial two-scale assessment](reports/001-initial-two-scale.html) in a browser
+for the summary, full run report and real-source inventory. It works offline with no
+server. [Report names and regeneration](reports/README.md) explain the numbering and
+how the HTML relates to the original run records.
 
-The first-step plan supplies the concrete work items and completion checks.
-[RESEARCH_LOG.md](RESEARCH_LOG.md) is where the experiment's current state lives: what
-is believed, on what evidence, and which question comes next. Read it before any
-ledger row or report, and read a report only when the log points you at it.
+The first clock run reproduced every pre-registered prediction: matching scores pass,
+while silence, a wrong tune and a faster performance expose the clock's false claims.
+This checks the measurement pipeline; it does not demonstrate listening capability.
+The instrument and synthetic set are frozen, while the research contract remains
+provisional and no real-source set is ready to freeze.
+
+[FIRST_STEP.md](FIRST_STEP.md) records the work and its learnings.
+[RESEARCH_LOG.md](RESEARCH_LOG.md) holds the current state and next question;
+[ledger.md](ledger.md) records the runs. Audio-driven candidates and retention
+comparisons follow under a separate approved research contract.
 
 Earlier work is retained in [archive/](archive/ARCHIVED.md) for reference when a
 specific question calls for it.

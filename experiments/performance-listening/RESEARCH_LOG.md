@@ -40,6 +40,8 @@ human-approved research contract informed by the research notes and independent
 solo/route/precision, access and capture evidence. No later candidate, harmonic
 generator or retention work has begun.
 
+Readable overview and complete evidence: [001 — Initial two-scale assessment](reports/001-initial-two-scale.html).
+
 ## Findings
 
 Status is `holds`, `superseded` or `withdrawn`. Evidence links a research note, a
