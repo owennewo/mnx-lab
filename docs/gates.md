@@ -27,8 +27,12 @@ HTML entry pages, and `docs/studio-storage.md` (two library tests read it).
 
 **The source readers** are tests that read source files from disk instead of importing
 them, so an import graph never selects them: `architecture-boundaries`,
-`audio-boundary`, `musicxml-independent`, `rung-inspector`, `converter-matrix`, `roster`.
-They run with any code change.
+`audio-boundary`, `rung-inspector`, `converter-matrix`, `design-tokens`, `app-icons`,
+`smoke-runner`.
+They run with any code change. The list was first written from a grep and was wrong
+both ways — `design-tokens` and `app-icons` scan the shells' source and were missing,
+`musicxml-independent` and `roster` read none — which is what the read audit below
+now prevents.
 
 **Converter suites** run when their package changes, and both run when `src/model/` or
 `converters/fixtures/` does (the shared model contract).
@@ -64,10 +68,23 @@ slow gate; a wrong "none" costs a red `main` for every other agent.
 
 ## Keeping it honest
 
-- A new test that reads a path from disk: if the path is not already data or prose the
-  test reads, add it to `DATA` in `tools/gate.mjs`. If it reads **source**, add it to
-  `SOURCE_READERS`.
-- A new smoke declares `covers`; a new shell or face adds its area and its path rule.
+These are enforced, not remembered:
+
+- **The read audit** (`harness/helpers/readAudit.ts`, a vitest setup file) records every
+  repository file each test file reads through `fs` and asks the gate, per file,
+  `gateReaches(path, test)`: would a change to that path alone run this test? If not,
+  the test file fails, naming the path — add it to `DATA`, or the test to
+  `SOURCE_READERS`. A new test runs in its author's own gate (it is a changed file), so
+  the author meets this first. It also fails a declared source reader that reads no
+  source. Blind spot: reads by a spawned process (dependency-cruiser, `uv`) are not
+  seen; a test that spawns one is trusted, and is declared by hand if it reads source.
+- **The smoke table** (`harness/conformance/smoke-runner.test.ts`): every
+  `harness/verify/*-smoke.mjs` is registered in `run-smokes.mjs` — an unregistered smoke
+  never runs — and every smoke's `covers` names only areas the gate maps paths to.
+- **Two smoke traps are refused outright** (same test): a profile made under a literal
+  `/tmp` (outside the runner's scoped `TMPDIR`: the 6.3 GB leak) and waiting for Chrome's
+  `'exit'` event by hand (the teardown hang) — `stopChrome()` does it safely.
+- A new top-level directory is unknown — and runs everything — until it is classified.
 - A new top-level directory is unknown — and runs everything — until it is classified.
 - When in doubt, `npm run gate -- --full`. The gate narrows the work; it never
   replaces judgement about what a change could break.

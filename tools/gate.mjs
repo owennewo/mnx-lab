@@ -24,11 +24,14 @@ const DATA = [
   /^\.dependency-cruiser\.cjs$/, /^(studio|workbench)\/index\.html$/, /^embed\.html$/,
   /^docs\/studio-storage\.md$/,
 ];
-// Tests that read SOURCE from disk (a boundary check, a source census), so a
-// code change reaches them without an import: they run with any code change.
-const SOURCE_READERS = [
-  'architecture-boundaries', 'audio-boundary', 'musicxml-independent', 'rung-inspector',
-  'converter-matrix', 'roster',
+// Tests that read SOURCE from disk (a boundary check, a source census, a token
+// scan of the shells' styles), so a code change reaches them without an import:
+// they run with any code change. harness/helpers/readAudit.ts keeps this list
+// true both ways — an undeclared reader fails, and so does a declared one that
+// reads no source (unless it spawns a tool, whose reads it cannot see).
+export const SOURCE_READERS = [
+  'architecture-boundaries', 'audio-boundary', 'rung-inspector', 'converter-matrix',
+  'design-tokens', 'app-icons', 'smoke-runner',
 ].map(name => `harness/conformance/${name}.test.ts`);
 // The only tests that read prose: the link check and the keymap cheatsheet.
 const MARKDOWN_TESTS = ['local-markdown-links', 'keymap-docs'].map(name => `harness/conformance/${name}.test.ts`);
@@ -37,6 +40,10 @@ const MARKDOWN_READ = /^(docs\/|README\.md$|CLAUDE\.md$|apps\/[^/]+\/README\.md$
 const INERT = /^(docs\/|roadmap\/|research\/|\.claude\/)|^[^/]+\.md$|^apps\/[^/]+\/README\.md$|^\.gitignore$|^\.dev\.vars\.example$/;
 // Code the build and vitest's import graph see.
 const CODE = /^(src|apps|worker|converters|harness|tools|experiments)\//;
+
+/** The areas a smoke may declare in `covers` (harness/verify/run-smokes.mjs).
+ *  `audio` is reached through the shared src/ layers, which run every smoke. */
+export const SMOKE_AREAS = ['workbench', 'studio', 'library', 'embed', 'lib', 'audio'];
 
 const SHARED_SRC = /^src\/(model|engine|audio|edit|elements|storage|importers|corpus|assist)\//;
 const CONVERTERS = ['guitarpro-mnx', 'musicxml-mnx'];
@@ -108,6 +115,19 @@ export function planGate(files, { full = false } = {}) {
     : coverage.filter(smoke => areas.has(`smoke:${smoke.name}`) || smoke.covers.some(area => areas.has(area))).map(smoke => smoke.name);
   reasons.push(smokes.length === coverage.length ? 'every smoke' : smokes.length ? `smokes for ${[...areas].join(', ')}` : 'no smokes');
   return { tests, converters, build, smokes, reasons };
+}
+
+/**
+ * Would a change to `file` alone make the gate run `test`, for a test that
+ * READS the file from disk? An import is vitest's to follow; a read is not, so
+ * only a full suite, the prose checks' file list or the declared source readers
+ * can reach it. harness/helpers/readAudit.ts asks this of every read a test makes.
+ */
+export function gateReaches(file, test) {
+  const { tests } = planGate([file]);
+  return tests.mode === 'full' ||
+    (tests.mode === 'files' && tests.files.includes(test)) ||
+    (tests.mode === 'changed' && tests.always.includes(test));
 }
 
 const git = args => spawnSync('git', args, { cwd: ROOT, encoding: 'utf8' }).stdout.trim();
