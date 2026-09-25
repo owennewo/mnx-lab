@@ -27,7 +27,7 @@ HTML entry pages.
 
 **The source readers** are tests that read source files from disk instead of importing
 them, so an import graph never selects them: `architecture-boundaries`,
-`audio-boundary`, `rung-inspector`, `converter-matrix`, `design-tokens`, `app-icons`,
+`audio-boundary`, `converter-matrix`, `design-tokens`, `app-icons`,
 `smoke-runner`.
 They run with any code change. The list was first written from a grep and was wrong
 both ways — `design-tokens` and `app-icons` scan the shells' source and were missing,

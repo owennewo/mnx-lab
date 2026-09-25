@@ -19,6 +19,7 @@ import {
   type KeyStroke
 } from './keymap.ts';
 import type { SelectionLevel } from './selection.ts';
+import type { EditorIntent } from './intents.ts';
 import type { Projection } from './cursor.ts';
 
 /** Display groups, in cheatsheet order. */
@@ -510,7 +511,10 @@ export const KEY_DOCS: KeyDoc[] = [
  * claims its type or a surface here emits it. Keep honest — a surface listed
  * here must really emit that intent in the workbench.
  */
-export const SURFACE_INTENTS: Record<string, string[]> = {
+// Typed as real intent types, so a name the session has never heard of is a
+// compile error — and session.ts's intent switches are exhaustive under tsc,
+// so every listed intent is one the session handles.
+export const SURFACE_INTENTS: Record<string, EditorIntent['type'][]> = {
   // The rung inspector (roadmap/inprogress/workbench-rung-inspector.md):
   // Enter with nothing pending. Its pills at the bar rung fire the two
   // signatures and the measure-attribute pair; its crumbs go to a bar or a

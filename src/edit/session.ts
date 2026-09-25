@@ -6,7 +6,7 @@ import type { ContainerIndex } from '../model/noteKeys.ts';
 // drive the exact same object. The session records every intent it handles;
 // that log IS the trace fixture ("recording is the same stream as undo").
 import type { MnxEvent, MnxGlobalMeasure, MnxNote, MnxNoteValueBase, MnxStructure } from '../model/mnx.ts';
-import type { EditorIntent } from './intents.ts';
+import type { EditorIntent, NavigationIntent } from './intents.ts';
 import { isNavigationIntent, MAX_ENTRY_FRET } from './intents.ts';
 import { hasRepeatStructure, linearizePasses, type PassModel } from '../model/passes.ts';
 import { choosePerformance, entryContains, entryStart, performancesAt, performedStep, remapPerformance } from './performedCursor.ts';
@@ -1779,7 +1779,7 @@ export class EditorSession {
     return coincidentSlots(this.grid, this.cursorState, this.activeProjection).length;
   }
 
-  private navigate(intent: EditorIntent): boolean {
+  private navigate(intent: NavigationIntent): boolean {
     const before = this.cursorState;
     switch (intent.type) {
       // The ladder walk. Presence is computed fresh at the cursor, so absent
@@ -2130,6 +2130,11 @@ export class EditorSession {
           default:
             return false;
         }
+      }
+      default: {
+        // Every navigation intent has a case: a new one fails to compile here.
+        const unhandled: never = intent;
+        void unhandled;
       }
     }
     const changed = this.cursorState !== before;

@@ -48,7 +48,7 @@ function keyLabelFor(type: string): string {
     const row = KEY_DOCS.find(doc => doc.strokes.some(s => strokeKey(s) === stroke));
     if (row) return row.keys;
   }
-  const surface = Object.entries(SURFACE_INTENTS).find(([, types]) => types.includes(type));
+  const surface = Object.entries(SURFACE_INTENTS).find(([, types]) => (types as readonly string[]).includes(type));
   if (surface) return SURFACE_LABELS[surface[0]] ?? surface[0];
   return '(no key)';
 }

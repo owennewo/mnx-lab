@@ -29,7 +29,7 @@ const DATA = [
 // true both ways — an undeclared reader fails, and so does a declared one that
 // reads no source (unless it spawns a tool, whose reads it cannot see).
 export const SOURCE_READERS = [
-  'architecture-boundaries', 'audio-boundary', 'rung-inspector', 'converter-matrix',
+  'architecture-boundaries', 'audio-boundary', 'converter-matrix',
   'design-tokens', 'app-icons', 'smoke-runner',
 ].map(name => `harness/conformance/${name}.test.ts`);
 // The only tests that read prose: the link check and the keymap cheatsheet.

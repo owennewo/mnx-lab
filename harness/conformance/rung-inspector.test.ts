@@ -7,10 +7,6 @@
 import { describe, it, expect } from 'vitest';
 import { EditorSession } from '../../src/edit/session.ts';
 import { applyOp, MEASURE_ATTRIBUTE_FIELDS, readMeasureAttributes, type MeasureAttribute, type MeasureAttributeKind } from '../../src/edit/ops.ts';
-import { SURFACE_INTENTS } from '../../src/edit/keymapDocs.ts';
-import fs from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import type { MnxEvent, MnxStructure } from '../../src/model/mnx.ts';
 import { STANDARD_GUITAR_STRINGS } from '../../src/model/mnx.ts';
 import { findNoteAddress } from '../../src/model/noteWalk.ts';
@@ -30,7 +26,6 @@ import {
 import { readPositionedAttributes, readTechniques, type PositionedAttribute, type TechniqueChoice } from '../../src/edit/ops.ts';
 import type { SelectionLevel } from '../../src/edit/selection.ts';
 
-const ROOT = path.dirname(path.dirname(path.dirname(fileURLToPath(import.meta.url))));
 
 function makeDoc(): MnxStructure {
   return {
@@ -328,16 +323,6 @@ describe('writers for what already rendered (core-measure-attributes-gaps.md, it
     session.handleIntent({ type: 'goToLevel', level: 'note' });
     expect(session.handleIntent(beam!.remove!)).toBe(true);
     expect(session.doc.parts![0]!.measures![0]!.beams ?? []).toEqual([]);
-  });
-});
-
-describe('the surface is honest about what it emits', () => {
-  it('every intent the inspector lists is one the session handles', () => {
-    const source = fs.readFileSync(path.join(ROOT, 'src/edit/session.ts'), 'utf8');
-    const handled = new Set([...source.matchAll(/case '([a-zA-Z]+)'/g)].map(m => m[1]));
-    for (const type of SURFACE_INTENTS.rungInspector ?? []) {
-      expect(handled.has(type), type).toBe(true);
-    }
   });
 });
 
