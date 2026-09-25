@@ -59,10 +59,10 @@ Preserve the cached sidecars. Record corrections separately with their evidence 
 source identities; a later accepted label set will be a new version. No pitch/onset
 assessment labels are being inferred from the score.
 
-The draft [research contract 1](../contracts/research-contract-1-draft.md) proposes the
-numerical gates and the progression 4 → 8 → 12 bars. Confirmation of the sources and
-intended use is already recorded; contract approval, source review and set freezing
-are separate acts. The current v1 instrument also needs a versioned real-audio and
+The user approved [research contract 1](../contracts/research-contract-1.md) on
+2026-09-25, including its numerical gates and progression 4 → 8 → 12 bars. Source
+selection and intended use are confirmed; independent source/label review and set
+freezing remain separate acts. The current v1 instrument also needs a versioned real-audio and
 annotation-uncertainty extension before it can evaluate these clips honestly.
 
 ## Reproduce the private preparation
@@ -92,7 +92,7 @@ change; do not replace frozen experiment evidence with it.
 
 Contracts, instrument-v1 and synthetic pipeline remain complete. Real evidence is now
 at **selected sources and playable review crops**, awaiting independent label checks.
-The research contract is a concrete draft awaiting approval. The uncertainty-aware
-instrument, real goldens, retention rule and audio-driven candidate have not been
-implemented or run in this preparation step. Experiment 002 is not assigned until
+Research contract 1 is approved. Its retention rule is specified, but the
+uncertainty-aware instrument and real goldens are not yet implemented or frozen;
+no audio-driven candidate or retention comparison has run. Experiment 002 is not assigned until
 there is an actual new assessment; this review packet is not an experiment result.

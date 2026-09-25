@@ -50,8 +50,9 @@ both sections before using the browser's Print command.
 
 ## Preparation reviews
 
-[Four-bar real-evidence preparation](real-evidence-review.html) contains the draft
-contract and the current preparation record, with a link to the private listening
+[Four-bar real-evidence preparation](real-evidence-review.html) contains the approval record, exact reviewed
+contract snapshot and the current preparation record, with a link to the private listening
 packet on this machine. It is not a numbered experiment result: report 002 is reserved
 for an actual new assessment. Rebuild it with `node experiments/performance-listening/reports/export-evidence-review.mjs`;
-add `--check` to verify that it matches its Markdown sources.
+add `--check` to verify that it matches its sources. Export also verifies the approved
+contract snapshot against the SHA-256 in its approval record.

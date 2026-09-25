@@ -34,11 +34,11 @@ How to maintain it:
 preparation is now active: the user selected The Winner Takes It All, then Dust in
 the Wind, starting with four performed bars and expanding only on measured success.
 Private playable review crops and structural preflight are ready; no real interval
-has been independently approved or frozen. Research contract 1 is drafted for the
-confirmed solo-guitar/microphone/laptop scope but is not approved. Before comparison,
+has been independently approved or frozen. The user approved research contract 1
+as drafted on 2026-09-25 for the solo-guitar/microphone/laptop scope. Before comparison,
 we need source/label review and a separately versioned real-audio instrument that
 handles annotation uncertainty. No audio-driven candidate or retention run has begun.
-See the [preparation record](evidence/README.md) and [contract draft](contracts/research-contract-1-draft.md).
+See the [preparation record](evidence/README.md) and [approved contract and provenance](contracts/research-contract-1.md).
 
 Readable overview and complete evidence: [001 — Initial two-scale assessment](reports/001-initial-two-scale.html).
 
@@ -68,7 +68,7 @@ Ranked; the top row is the next question the driver asks. Status is `open`,
 
 | Rank | Question | Why it is ranked here | Status | Owner item |
 |---|---|---|---|---|
-| 1 | Can the user approve the draft numerical contract and independently check the selected four-bar source/label evidence? | Scope and sources are confirmed; playable review crops and a concrete draft now exist | in progress | [Real-evidence preparation](evidence/README.md) |
+| 1 | Can independent source/label checks establish usable timing bounds for the selected four-bar clips? | Contract 1 is approved; labels and the versioned uncertainty-aware instrument must be ready before comparison | in progress | [Real-evidence preparation](evidence/README.md) |
 | 2 | How has real-time score following been evaluated elsewhere, and do our ±0.25-quarter tolerance and 200 ms deadline sit inside those norms? | FIRST_STEP §10 question 1; answers whether the first contract's tolerances are defensible before anything is measured against them | answered (findings 1–2) | FIRST_STEP item A |
 | 3 | Is there a published trivial baseline for score following, so our clock floor can be compared with the usual one? | FIRST_STEP §10 question 2; decides whether the first ledger row has an external reference point | answered (findings 1–2) | FIRST_STEP item A |
 | 4 | Which library recordings and re-amplification opportunities are eligible real evidence for the following milestone, and with what anchor precision? | The structure document runs real evidence alongside the pipeline; without an answer the first human-approved contract cannot name its evidence supply | answered (finding 8; missing evidence explicit) | FIRST_STEP item R1 |

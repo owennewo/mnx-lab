@@ -23,20 +23,21 @@ how the HTML relates to the original run records.
 The first clock run reproduced every pre-registered prediction: matching scores pass,
 while silence, a wrong tune and a faster performance expose the clock's false claims.
 This checks the measurement pipeline; it does not demonstrate listening capability.
-The instrument and synthetic set are frozen, while the research contract remains
-provisional and no real-source set is ready to freeze.
+The v1 instrument and synthetic set are frozen. That run used provisional research
+contract 0; the next milestone now has approved contract 1. No real-source set is ready
+to freeze.
 
 Current work: [four-bar evidence and contract review (HTML)](reports/real-evidence-review.html)
 and [real-evidence preparation](evidence/README.md) has private four-bar
 review clips for The Winner Takes It All and Dust in the Wind. The
-[first research contract draft](contracts/research-contract-1-draft.md) records the
-confirmed scope and proposed progression; human label checks and contract approval
-are still pending.
+[research contract 1](contracts/research-contract-1.md) was approved by the user on
+2026-09-25. Independent source/label checks and the versioned uncertainty-aware
+instrument remain prerequisites for the first real comparison.
 
 [FIRST_STEP.md](FIRST_STEP.md) records the work and its learnings.
 [RESEARCH_LOG.md](RESEARCH_LOG.md) holds the current state and next question;
 [ledger.md](ledger.md) records the runs. Audio-driven candidates and retention
-comparisons follow under a separate approved research contract.
+comparisons follow under approved research contract 1 once its prerequisites are met.
 
 Earlier work is retained in [archive/](archive/ARCHIVED.md) for reference when a
 specific question calls for it.

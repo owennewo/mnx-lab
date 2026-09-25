@@ -1,0 +1,13 @@
+{
+  "contractId": "research-contract-1",
+  "status": "approved",
+  "approvedOn": "2026-09-25",
+  "approvedBy": "user in this conversation",
+  "approvalText": "Approve contract 1 as drafted",
+  "reviewedReport": "reports/real-evidence-review.html",
+  "snapshot": {
+    "path": "contracts/research-contract-1-draft.md",
+    "sha256": "bd263c8bc041b1d43ba0c448445c8073377f3312a79d33c5ed7b911866825388"
+  },
+  "scope": "Full draft, including numerical criteria, budgets, stopping, progression and acceptance requirements. Source/label approval and set freezing remain separate."
+}
