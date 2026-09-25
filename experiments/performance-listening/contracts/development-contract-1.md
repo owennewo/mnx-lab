@@ -19,7 +19,9 @@ After reviewing experiments 001–003, the user wrote:
 
 They then directed that the next planned experiment be marked abandoned and that the
 experiment's documents and procedure be brought in line with this approach, including
-splitting development from qualification. The axes, order and ranges below were
+splitting development from qualification. When asking for rung 0 to be built, they
+added that real samples are worth trying once sine, jitter and the other early rungs
+work, naming the tonejs-instruments guitars. The axes, order and ranges below were
 drafted from that direction. Tightening them needs no approval; loosening a range,
 a pass bar or the exit rule needs the user.
 
@@ -47,10 +49,18 @@ clips; committed records hold the recipe, seed and hashes.
 | 1 | Tempo | Constant tempo away from nominal, smooth ramps and slow drift | Local beat durations 80–120% of the supplied nominal tempo, as contract 1 defines modest variation |
 | 2 | Onset timing | Independent per-note jitter; chord notes spread like a strum | Jitter up to ±40 ms; spread up to 30 ms |
 | 3 | Envelope | Attack, sustain and release shapes; notes ringing past their score duration | Plucked exponential decay 0.3–3 s; ringing into following notes allowed |
-| 4 | Timbre | Harmonic partials with slight inharmonicity, plucked-string synthesis, then the repository's CC0 guitar sample sets | Develop on three sample sets, hold one out |
+| 4 | Timbre | Harmonic partials with slight inharmonicity, plucked-string synthesis, then recorded guitar samples | Develop on most sample sets; hold out at least one set from each source |
 | 5 | Tuning | Global reference offset and small per-note detune | Global ±25 cents; per note ±10 cents |
 | 6 | Level and noise | Per-note level and a noise floor | Per note ±6 dB; signal-to-noise 40 dB down to 20 dB |
 | 7 | Combined | All axes sampled jointly within their ranges | As above |
+
+Recorded samples come from two sources. The repository ships four CC0 guitar sets
+under `public/samples/`. The user also proposed the tonejs-instruments collection
+(github.com/nbrosowsky/tonejs-instruments): its `guitar-acoustic`, `guitar-electric`
+and `guitar-nylon` sets are licensed CC BY 3.0, per its README, read 2026-09-25. Those
+samples are fetched outside git for local research, and each set's provenance carries
+the attribution. Recorded samples come after the jitter and envelope rungs work, as
+the user asked.
 
 Each rung is a frozen, versioned set. Its fuzz draws come from seeds split into
 development and held-out groups before any candidate runs on it. Held-out seeds from
