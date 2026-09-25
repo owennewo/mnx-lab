@@ -1,6 +1,15 @@
 import { generateKeyPair, exportJWK, SignJWT } from 'jose';
 import type { Env } from '../../worker/env.ts';
-export async function testIdentity() {
+/** A signing identity for the library routes. One key pair per test file is
+ *  shared: generating an RS256 pair costs ~150 ms, and every test used to pay it.
+ *  `fresh` makes an unrelated one — for the test that a foreign key is refused. */
+export function testIdentity({ fresh = false } = {}): ReturnType<typeof makeIdentity> {
+  if (fresh) return makeIdentity();
+  return (shared ??= makeIdentity());
+}
+let shared: ReturnType<typeof makeIdentity> | undefined;
+
+async function makeIdentity() {
   const { privateKey, publicKey } = await generateKeyPair('RS256');
   const jwk = { ...await exportJWK(publicKey), kid: 'local-test', alg: 'RS256', use: 'sig' };
   const config: Partial<Env> = { LIBRARY_ACCESS_ISSUER: 'urn:mnx-library-local', LIBRARY_ACCESS_AUD: 'browser-test', LIBRARY_INGEST_AUD: 'machine-test', LIBRARY_INGEST_CLIENT_ID: 'test-client.access', LIBRARY_LOCAL_JWKS: JSON.stringify({ keys: [jwk] }) };

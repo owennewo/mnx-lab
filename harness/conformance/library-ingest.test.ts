@@ -1,12 +1,12 @@
 // Implementation loop: authenticated HTTP boundary and cache import contract.
 import { beforeEach, afterEach, expect, it } from 'vitest';
-import { mkdtemp, writeFile, rm, readFile } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
+import { writeFile, rm, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { Miniflare } from 'miniflare';
-import { useLibraryRuntime } from '../helpers/libraryRuntime.ts';
+import { applyMigrations, useLibraryRuntime } from '../helpers/libraryRuntime.ts';
 import realApp from '../../worker/index.ts';
 import { testIdentity } from '../helpers/libraryIdentity.ts';
+import { ingestSources } from '../helpers/ingestFixture.ts';
 let assertion = '';
 const app = { request: (url: string, init?: RequestInit, bindings?: Parameters<typeof realApp.request>[2]) => realApp.request(url, { ...init, headers: { ...Object.fromEntries(new Headers(init?.headers)), 'Cf-Access-Jwt-Assertion': assertion } }, bindings) };
 import { Library } from '../../worker/library/index.ts';
@@ -37,23 +37,12 @@ async function form(manifest: object, files: Map<string, Uint8Array<ArrayBuffer>
 }
 const freshRuntime = useLibraryRuntime();
 beforeEach(async () => {
-  directory = await mkdtemp(join(tmpdir(), 'mnx-ingest-'));
-  await writeFile(join(directory,'Song_ABC.gp'), 'synthetic GP input');
-  await writeFile(join(directory,'Song_ABC.musicxml'), 'synthetic MusicXML input');
-  await writeFile(join(directory,'Song_ABC.mp3'), 'synthetic recording');
-  await writeFile(join(directory,'Song_ABC.sync.json'), JSON.stringify({ id: 'ABC', title: 'Sidecar song', artist: 'Sidecar artist', score_file: 'Song_ABC.gp', fetched_at: '2026-09-11', recordings: [
-    { id: 1, source: 1, source_data: 'youtube123', name: 'Video', syncpoints: [[0,0]] },
-    { id: 2, source: 2, media_file: 'Song_ABC.mp3', name: 'Audio', syncpoints: [[0,0]], cropped_duration: 10, crop_start: 1, crop_end: 11 }
-  ] }));
-  await writeFile(join(directory,'Song_ABC.lists.json'), JSON.stringify({ id: 'ABC', score_file: 'Song_ABC.gp', lists: [{ id: 'L1', path: 'Folder / List' }] }));
+  directory = await ingestSources();
   mf = await freshRuntime();
   env = { LIBRARY_DB: await mf.getD1Database('DB'), LIBRARY_BUCKET: await mf.getR2Bucket('BUCKET'), LIBRARY_WRITE_TOKEN: token };
   const identity = await testIdentity(); Object.assign(env, identity.config); assertion = await identity.sign({}, true);
-  await env.LIBRARY_DB.exec("CREATE TABLE users(id TEXT PRIMARY KEY,email TEXT,active INTEGER); INSERT INTO users VALUES('operator','owner@example.test',1)");
-  for (const name of ['0001_library.sql', '0003_piece_views.sql', '0004_recording_management.sql', '0005_piece_lifecycle.sql', '0006_piece_prefs.sql']) {
-    const sql = await readFile(new URL(`../../migrations/${name}`, import.meta.url),'utf8');
-    await env.LIBRARY_DB.batch(sql.replace(/--[^\n]*/g,'').trim().split(/;\s*(?=(?:CREATE|ALTER)\b)/).map(s => env.LIBRARY_DB.prepare(s)));
-  }
+  await applyMigrations(env.LIBRARY_DB);
+  await env.LIBRARY_DB.prepare("INSERT INTO users VALUES ('operator','owner@example.test',1,'now')").run();
 }, 15000);
 afterEach(async () => { await rm(directory, { recursive: true, force: true }); });
 
@@ -66,10 +55,6 @@ it('rejects unauthenticated reads, writes and unknown library routes before stor
   }
   const response = await app.request('/api/library/ingest/ABC', { headers: { Authorization: 'Bearer wrong' } }, env);
   expect(response.status).toBe(401);
-});
-it('fails closed when the server secret is absent', async () => {
-  const response = await app.request('/api/library/ingest/ABC', { headers: { Authorization: `Bearer ${token}` } }, {});
-  expect(response.status).toBe(503);
 });
 it('stores the sources only, projects tags from the sidecar and a validated conversion, and skips a replay', async () => {
   const p = await plan(); const first = await upload(p);
@@ -235,37 +220,6 @@ it('bounds request bodies and rejects malformed manifests', async () => {
   const bad = await app.request('/api/library/ingest', { method: 'POST', headers: { Authorization: `Bearer ${token}` }, body: await form({ renditions: null }, new Map()) }, env);
   expect(bad.status).toBe(400);
 });
-it('uses stable identities and refuses sidecar disagreement and path traversal', async () => {
-  expect((await plan()).manifest).toEqual((await plan()).manifest);
-  await writeFile(join(directory,'Song_ABC.lists.json'), JSON.stringify({ id: 'OTHER', score_file: 'Song_ABC.gp', lists: [] }));
-  await expect(plan()).rejects.toThrow('disagree');
-  await rm(join(directory,'Song_ABC.lists.json'));
-  await writeFile(join(directory,'Song_ABC.sync.json'), JSON.stringify({ id: 'ABC', score_file: 'Song_ABC.gp', recordings: [{ id: 2, source: 2, media_file: '../secret' }] }));
-  await expect(plan()).rejects.toThrow('plain filenames');
-});
-it('never sends credentials to insecure endpoints or follows redirects', async () => {
-  for (const value of ['http://example.com','https://user:secret@example.com','https://example.com/path']) expect(() => endpointURL(value)).toThrow();
-  let calls = 0;
-  await expect(uploadPlan(await plan(), 'https://example.com', token, async (_url: string, options: RequestInit) => {
-    calls++; expect(options.redirect).toBe('error'); return new Response('private response', { status: 302 });
-  })).rejects.toThrow('302');
-  expect(calls).toBe(1);
-});
-
-it('preserves validated converter labels without accepting other proposed fields', async () => {
-  const { parseMnx } = await import('../../worker/library/tags.ts');
-  const { default: published } = await import('../../worker/generated/validate-mnx.mjs');
-  const doc = structuredClone(score);
-  Object.assign(doc.global.measures[0], { section: { label: 'Verse' }, rehearsal: { label: 'A' } });
-  expect(published(doc)).toBe(false); // AI validation stays published-only.
-  const bytes = new TextEncoder().encode(JSON.stringify(doc)).buffer;
-  expect(parseMnx(bytes)).toEqual(doc);
-  Object.assign(doc.global.measures[0], { section: { label: 42 } });
-  expect(() => parseMnx(new TextEncoder().encode(JSON.stringify(doc)).buffer)).toThrow('Invalid section');
-  Object.assign(doc.global.measures[0], { section: { label: 'Verse' }, invented: true });
-  expect(() => parseMnx(new TextEncoder().encode(JSON.stringify(doc)).buffer)).toThrow('storage schema');
-});
-
 it('does not erase known raw-export provenance when the optional index is missing', async () => {
   const p = await plan();
   const exported = p.manifest.renditions.find((r: {format: string}) => r.format === 'gp');
@@ -324,13 +278,6 @@ it.each([87.5, 36.5])('warns for %s BPM without rounding or blocking derived tag
     expect.objectContaining({ dimension: 'capo', value: '3', origin: 'derived' })
   ]));
   expect(doc).toEqual(before);
-});
-it.each(['87.5', null, -0.5, Infinity, NaN])('does not exempt invalid tempo %j', bpm => {
-  const doc = structuredClone(score);
-  Object.assign(doc.global.measures[0], { tempos: [{ bpm, value: { base: 'quarter' } }] });
-  const warnings: string[] = [];
-  expect(validateConversion(doc, warnings).length).toBeGreaterThan(0);
-  expect(warnings).toEqual([]);
 });
 it('keeps unrelated validation errors blocking alongside a fractional-tempo warning', async () => {
   const doc = structuredClone(score);

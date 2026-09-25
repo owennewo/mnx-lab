@@ -29,7 +29,6 @@ it('data read from disk runs every test — the misses the import graph had', ()
     'migrations/0006_piece_prefs.sql',
     'harness/fixtures/roundtrip-register.json',
     'converters/fixtures/Binary-suite.gp3',
-    'docs/studio-storage.md',
     'package.json',
   ]) expect(planGate([file]).tests, file).toEqual({ mode: 'full' });
 });

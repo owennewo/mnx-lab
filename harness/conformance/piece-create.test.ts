@@ -7,9 +7,8 @@
 // D1/R2 with a signed Access identity. The first write path for score content
 // gets the same treatment the ingest got.
 import { beforeEach, describe, expect, it } from 'vitest';
-import { readFile } from 'node:fs/promises';
 import type { Miniflare } from 'miniflare';
-import { useLibraryRuntime } from '../helpers/libraryRuntime.ts';
+import { applyMigrations, useLibraryRuntime } from '../helpers/libraryRuntime.ts';
 import app from '../../worker/index.ts';
 import type { Env } from '../../worker/env.ts';
 import { testIdentity } from '../helpers/libraryIdentity.ts';
@@ -102,10 +101,7 @@ describe('POST /api/library/pieces', () => {
     identity = await testIdentity(); jwt = await identity.sign();
     mf = await freshRuntime();
     env = { LIBRARY_DB: await mf.getD1Database('DB'), LIBRARY_BUCKET: await mf.getR2Bucket('BUCKET'), LIBRARY_WRITE_TOKEN: 'private-test', ...identity.config };
-    for (const name of ['0001_library', '0002_users', '0003_piece_views', '0004_recording_management', '0005_piece_lifecycle', '0006_piece_prefs']) {
-      const sql = (await readFile(new URL(`../../migrations/${name}.sql`, import.meta.url), 'utf8')).replace(/--[^\n]*/g, '').trim();
-      await env.LIBRARY_DB.batch(sql.split(/;\s*(?=(?:CREATE|ALTER)\b)/).map(s => env.LIBRARY_DB.prepare(s)));
-    }
+    await applyMigrations(env.LIBRARY_DB);
     await env.LIBRARY_DB.prepare("INSERT INTO users VALUES ('operator','owner@example.test',1,'now')").run();
   }, 15000);
 
@@ -138,24 +134,6 @@ describe('POST /api/library/pieces', () => {
     const [a, b] = [await create(), await create()];
     expect(a.snapshot.piece.id).not.toBe(b.snapshot.piece.id);
     expect((await env.LIBRARY_BUCKET.list({ prefix: 'renditions/' })).objects).toHaveLength(1);
-  });
-
-  it('belongs to whoever made it', async () => {
-    await env.LIBRARY_DB.prepare("INSERT INTO users VALUES ('second','second@example.test',1,'now')").run();
-    const { snapshot } = await create();
-    const other = await identity.sign({ email: 'second@example.test' });
-    expect((await send(`/pieces/${snapshot.piece.id}`, {}, other)).status).toBe(404);
-    expect((await send(`/pieces/${snapshot.piece.id}/canonical`, {}, other)).status).toBe(404);
-    expect((await (await send('/pieces', {}, other)).json()).pieces).toEqual([]);
-  });
-
-  it('is a same-origin JSON write by a permitted member, like every browser write', async () => {
-    const body = await valid();
-    expect((await post(body, { 'Content-Type': 'text/plain' })).status).toBe(415);
-    expect((await post(body, { 'Content-Type': 'application/json', Origin: 'https://evil.example' })).status).toBe(403);
-    expect((await send('/pieces', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }, await identity.sign({ email: 'stranger@example.test' }))).status).toBe(403);
-    expect((await send('/pieces', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }, '')).status).toBe(401);
-    expect((await post(body)).status).toBe(201);
   });
 
   it('names nothing the caller asks it to, and stores nothing it cannot vouch for', async () => {

@@ -1,8 +1,7 @@
 // Implementation loop: real signatures and local D1/R2 exercise the HTTP authorization boundary.
 import { beforeEach, expect, it } from 'vitest';
-import { readFile } from 'node:fs/promises';
 import type { Miniflare } from 'miniflare';
-import { useLibraryRuntime } from '../helpers/libraryRuntime.ts';
+import { applyMigrations, useLibraryRuntime } from '../helpers/libraryRuntime.ts';
 import { SignJWT } from 'jose';
 import app from '../../worker/index.ts';
 import { Library } from '../../worker/library/index.ts';
@@ -16,17 +15,14 @@ beforeEach(async () => {
   identity = await testIdentity(); jwt = await identity.sign();
   mf = await freshRuntime();
   env = { LIBRARY_DB: await mf.getD1Database('DB'), LIBRARY_BUCKET: await mf.getR2Bucket('BUCKET'), LIBRARY_WRITE_TOKEN: 'private-test', ...identity.config };
-  for (const name of ['0001_library.sql','0002_users.sql', '0003_piece_views.sql', '0005_piece_lifecycle.sql', '0006_piece_prefs.sql']) {
-    const sql = await readFile(new URL(`../../migrations/${name}`, import.meta.url), 'utf8');
-    await env.LIBRARY_DB.batch(sql.replace(/--[^\n]*/g,'').trim().split(/;\s*(?=(?:CREATE|ALTER)\b)/).map(s => env.LIBRARY_DB.prepare(s)));
-  }
+  await applyMigrations(env.LIBRARY_DB);
   await env.LIBRARY_DB.prepare("INSERT INTO users VALUES ('operator','owner@example.test',1,'now')").run();
 }, 15000);
 
 it('requires signed identities, never email headers or browser bearer tokens', async () => {
   expect((await request('/me','', { 'Cf-Access-Authenticated-User-Email': 'owner@example.test', Authorization: 'Bearer private-test' })).status).toBe(401);
   expect((await request('/me', jwt.slice(0,-8) + 'aaaaaaaa')).status).toBe(401);
-  const other = await testIdentity(); expect((await request('/me', await other.sign())).status).toBe(401);
+  const other = await testIdentity({ fresh: true }); expect((await request('/me', await other.sign())).status).toBe(401);
   expect((await request('/me', await identity.sign({}, true))).status).toBe(401);
   for (const change of [{ exp: 1 }, { aud: 'wrong' }, { iss: 'https://wrong.cloudflareaccess.com' }, { iat: 9999999999 }]) {
     const token = await new SignJWT({ type: 'app', email: 'owner@example.test', sub: 'test', iss: env.LIBRARY_ACCESS_ISSUER, aud: env.LIBRARY_ACCESS_AUD, exp: Math.floor(Date.now()/1000)+60, iat: Math.floor(Date.now()/1000), ...change }).setProtectedHeader({ alg: 'RS256', kid: 'local-test' }).sign(identity.privateKey);
@@ -79,7 +75,6 @@ it('lets the signed-in person open, tag and alias their own pieces only, and onl
   const send = (path: string, method: string, payload: unknown, type = 'application/json') => app.request(`http://localhost/api/library${path}`, { method, body: JSON.stringify(payload), headers: { 'Cf-Access-Jwt-Assertion': jwt, 'Content-Type': type } }, env);
   expect((await send('/pieces/mine/opened', 'POST', {})).status).toBe(204);
   expect((await send('/pieces/theirs/opened', 'POST', {})).status).toBe(404);
-  expect((await send('/pieces/mine/opened', 'POST', {}, 'text/plain')).status).toBe(415);
   expect((await (await request('/pieces?sort=recent')).json()).pieces.map((p: { id: string; opened_at: string | null }) => [p.id, p.opened_at !== null])).toEqual([['mine', true]]);
   const tagged = await send('/pieces/mine/tags', 'PATCH', { expected_revision: 0, add: [{ dimension: 'favourite', value: 'yes' }] });
   expect(tagged.status).toBe(200);
@@ -122,4 +117,36 @@ it('serves owner-checked audio with native byte ranges, HEAD and private cache h
   expect((await request('/recordings/other-audio/audio')).status).toBe(404);
   expect((await request('/recordings/operator-youtube/audio')).status).toBe(404);
   await env.LIBRARY_DB.prepare('UPDATE users SET active=0').run(); expect((await request(path)).status).toBe(403);
+});
+it('refuses every browser write that is cross-site or not JSON, before any route — but a marked audio upload', async () => {
+  // One middleware (worker/api/library.ts) guards every write; this is its one
+  // test, over every write route, rather than a copy in each route's file.
+  const upload = '/uploads/studio-00000000-0000-4000-8000-000000000000';
+  const writes: [string, string][] = [
+    ['POST', '/pieces'], ['POST', '/pieces/x/opened'], ['POST', '/pieces/x/renditions'], ['POST', '/pieces/x/restore'],
+    ['POST', '/pieces/x/uploads/y'], ['PATCH', '/pieces/x/tags'], ['PUT', '/pieces/x/canonical'], ['PUT', '/pieces/x/prefs'],
+    ['PUT', '/pieces/x/recordings/y'], ['PUT', '/aliases'], ['PUT', upload],
+    ['DELETE', '/aliases'], ['DELETE', '/pieces/x'], ['DELETE', '/pieces/x/recordings/y'], ['DELETE', '/uploads/y'],
+  ];
+  const write = (method: string, path: string, headers: Record<string, string>) =>
+    app.request(`http://localhost/api/library${path}`, { method, headers: { 'Cf-Access-Jwt-Assertion': jwt, ...headers }, body: '{}' }, env);
+  for (const [method, path] of writes) {
+    expect((await write(method, path, { 'Content-Type': 'application/json', Origin: 'https://evil.example' })).status, `${method} ${path} cross-site`).toBe(403);
+    expect((await write(method, path, { 'Content-Type': 'text/plain' })).status, `${method} ${path} not JSON`).toBe(415);
+  }
+  const marked = { 'Content-Type': 'application/octet-stream', 'X-Recording-Upload': '1' };
+  expect((await write('PUT', upload, marked)).status, 'a marked audio upload is not a JSON write').not.toBe(415);
+  expect((await write('PUT', upload, { ...marked, Origin: 'https://evil.example' })).status, 'but it is still same-origin').toBe(403);
+  expect((await write('PUT', upload, { 'Content-Type': 'application/octet-stream' })).status, 'and only when marked').toBe(415);
+});
+it('requires unique normalized email, nonempty stable identity and boolean activity', async () => {
+  // (Moved from library-users.test.ts; its other test only proved that SQLite joins.)
+  const add = (id: string, email: string, active = 1) => env.LIBRARY_DB.prepare('INSERT INTO users (id,email,active,created_at) VALUES (?,?,?,?)').bind(id, email, active, '2026-09-11').run();
+  await add('person', 'person@example.com');
+  await expect(add('other', 'person@example.com')).rejects.toThrow();
+  await expect(add('other', 'Person@example.com')).rejects.toThrow();
+  await expect(add('other', ' person@example.com ')).rejects.toThrow();
+  await expect(add('', 'other@example.com')).rejects.toThrow();
+  await expect(add('other', 'other@example.com', 2)).rejects.toThrow();
+  expect((await env.LIBRARY_DB.prepare("SELECT COUNT(*) AS n FROM users WHERE id <> 'operator'").first<{ n: number }>())?.n).toBe(1);
 });

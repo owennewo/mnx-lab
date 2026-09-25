@@ -1,3 +1,4 @@
+import { readdirSync, readFileSync } from 'node:fs';
 import { afterAll } from 'vitest';
 import { Miniflare, convertV4MiniflareOptions } from 'miniflare';
 
@@ -41,4 +42,27 @@ export function useLibraryRuntime({ bucket = true } = {}) {
     }
     return runtime;
   };
+}
+
+const MIGRATIONS = new URL('../../migrations/', import.meta.url);
+
+/** Anything that can prepare and batch statements — the D1 binding or Miniflare's proxy of it. */
+interface Batching { prepare(sql: string): unknown; batch(statements: never[]): Promise<unknown> }
+
+/**
+ * Every migration in migrations/, in order — the schema production has — as ONE
+ * batch. Nine test files used to keep hand-written lists that had drifted apart
+ * (library.test lacked 0002 and 0004, library-users stopped at 0005, two built
+ * their own `users` table) and paid a round trip per file. The migrations hold
+ * only CREATE and ALTER statements, so they split between those; anything else
+ * is refused rather than mis-split, so a new kind of statement is noticed.
+ */
+export async function applyMigrations(db: Batching): Promise<void> {
+  const statements = readdirSync(MIGRATIONS).filter(name => name.endsWith('.sql')).sort().flatMap(name =>
+    readFileSync(new URL(name, MIGRATIONS), 'utf8').replace(/--[^\n]*/g, '').trim()
+      .split(/;\s*(?=(?:CREATE|ALTER)\b)/).map(sql => {
+        if (!/^(CREATE|ALTER)\b/.test(sql)) throw new Error(`migrations/${name}: cannot split a statement that is not CREATE or ALTER: ${sql.slice(0, 60)}`);
+        return sql;
+      }));
+  await db.batch(statements.map(sql => db.prepare(sql)) as never[]);
 }

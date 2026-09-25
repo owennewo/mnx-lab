@@ -9,9 +9,8 @@
 // (`normalizePiecePrefs`) and the cueing it feeds belong to studio, which this
 // layer may not import: their proof is harness/verify/recording-studio-smoke.mjs.
 import { beforeEach, expect, it } from 'vitest';
-import { readFile } from 'node:fs/promises';
 import type { Miniflare } from 'miniflare';
-import { useLibraryRuntime } from '../helpers/libraryRuntime.ts';
+import { applyMigrations, useLibraryRuntime } from '../helpers/libraryRuntime.ts';
 import app from '../../worker/index.ts';
 import type { Env } from '../../worker/env.ts';
 import { testIdentity } from '../helpers/libraryIdentity.ts';
@@ -37,10 +36,7 @@ beforeEach(async () => {
   const identity = await testIdentity(); jwt = await identity.sign();
   mf = await freshRuntime();
   env = { LIBRARY_DB: await mf.getD1Database('DB'), LIBRARY_BUCKET: await mf.getR2Bucket('BUCKET'), LIBRARY_WRITE_TOKEN: 'private-test', ...identity.config };
-  for (const name of ['0001_library', '0002_users', '0003_piece_views', '0004_recording_management', '0005_piece_lifecycle', '0006_piece_prefs']) {
-    const sql = (await readFile(new URL(`../../migrations/${name}.sql`, import.meta.url), 'utf8')).replace(/--[^\n]*/g, '').trim();
-    await env.LIBRARY_DB.batch(sql.split(/;\s*(?=(?:CREATE|ALTER)\b)/).map(s => env.LIBRARY_DB.prepare(s)));
-  }
+  await applyMigrations(env.LIBRARY_DB);
   await env.LIBRARY_DB.prepare("INSERT INTO users VALUES ('operator','owner@example.test',1,'now')").run();
 }, 15000);
 
@@ -68,6 +64,11 @@ it('carries the setup in the snapshot, replaces it wholesale, and never moves th
 it('refuses a setup for a piece that is not the owner’s, and one too large to be a setup', async () => {
   const piece = await make();
   expect(await status(client().savePrefs('not-a-piece', { source: 'synth' }))).toBe(404);
+  // Another member's piece is not there at all, to them.
+  await env.LIBRARY_DB.prepare("INSERT INTO users VALUES ('second','second@example.test',1,'now')").run();
+  const other = await (await testIdentity()).sign({ email: 'second@example.test' });
+  expect(await status(client(() => other).savePrefs(piece.piece.id, { source: 'synth' }))).toBe(404);
+  expect((await client().piece(piece.piece.id)).snapshot.prefs ?? null).toBe(null);
   await client().deletePiece(piece.piece.id, piece.piece.revision);
   expect(await status(client().savePrefs(piece.piece.id, { source: 'synth' }))).toBe(404);
 

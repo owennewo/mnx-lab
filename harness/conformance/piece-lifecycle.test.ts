@@ -4,10 +4,9 @@
 // and the defect report a lossy save leaves for the operator. The tests make dozens
 // of requests each through Miniflare, so they are given room for a loaded full run.
 import { beforeEach, expect, it } from 'vitest';
-import { readFile } from 'node:fs/promises';
 import type { Miniflare } from 'miniflare';
 import type { D1Result } from '@cloudflare/workers-types';
-import { useLibraryRuntime } from '../helpers/libraryRuntime.ts';
+import { applyMigrations, useLibraryRuntime } from '../helpers/libraryRuntime.ts';
 import app from '../../worker/index.ts';
 import type { Env } from '../../worker/env.ts';
 import { Library, pieceIdFor } from '../../worker/library/index.ts';
@@ -27,7 +26,7 @@ import { defectRows } from '../../tools/library-defects.mjs';
 let mf: Miniflare; let env: Env; let jwt: string; let identity: Awaited<ReturnType<typeof testIdentity>>;
 const blank = (title = 'Anji') => buildNewDocument({ title, artist: 'Davy Graham', tuning: parseTuning('standard')!, time: { count: 4, unit: 4 }, fifths: 0, bars: 4 });
 const retitled = (document: MnxStructure, title: string) => applyOp(document, { type: 'setWork', work: { title } });
-const file = (document: MnxStructure) => { const { bytes, options } = checkStorage(document); return { filename: `${documentTitle(document)}.gp`, bytes, producerVersion: '0.3.0+test', producerOptions: options }; };
+const file = (document: MnxStructure, stored = checkStorage(document)) => ({ filename: `${documentTitle(document)}.gp`, bytes: stored.bytes, producerVersion: '0.3.0+test', producerOptions: stored.options });
 const send = (path: string, init: RequestInit = {}, token = jwt) => app.request(`http://localhost/api/library${path}`, { ...init, headers: { 'Cf-Access-Jwt-Assertion': token, ...(init.headers ?? {}) } }, env);
 const client = (token = () => jwt) => new LibraryClient((input, init) => {
   const { signal: _signal, ...rest } = init ?? {};
@@ -35,8 +34,9 @@ const client = (token = () => jwt) => new LibraryClient((input, init) => {
 });
 const make = async (document = blank()) => (await client().createPiece(file(document), derivedLibraryTags(document))).snapshot;
 const checkpoint = (document: MnxStructure, from: { revision: number; canonical_rendition_id?: string | null }, over: Partial<Checkpoint> = {}): Checkpoint => {
-  const { check } = checkStorage(document);
-  return { expectedRevision: from.revision, derivedFrom: from.canonical_rendition_id!, file: file(document), derivedTags: derivedLibraryTags(document), check, ...over };
+  // One export and round trip serves both the file and its verdict — it is the costly step.
+  const stored = checkStorage(document);
+  return { expectedRevision: from.revision, derivedFrom: from.canonical_rendition_id!, file: file(document, stored), derivedTags: derivedLibraryTags(document), check: stored.check, ...over };
 };
 const status = (promise: Promise<unknown>) => promise.then(() => 200, error => (error instanceof LibraryRequestError ? error.status : -1));
 const count = async (table: string) => (await env.LIBRARY_DB.prepare(`SELECT count(*) AS n FROM ${table}`).first<{ n: number }>())!.n;
@@ -47,10 +47,7 @@ beforeEach(async () => {
   identity = await testIdentity(); jwt = await identity.sign();
   mf = await freshRuntime();
   env = { LIBRARY_DB: await mf.getD1Database('DB'), LIBRARY_BUCKET: await mf.getR2Bucket('BUCKET'), LIBRARY_WRITE_TOKEN: 'private-test', ...identity.config };
-  for (const name of ['0001_library', '0002_users', '0003_piece_views', '0004_recording_management', '0005_piece_lifecycle', '0006_piece_prefs']) {
-    const sql = (await readFile(new URL(`../../migrations/${name}.sql`, import.meta.url), 'utf8')).replace(/--[^\n]*/g, '').trim();
-    await env.LIBRARY_DB.batch(sql.split(/;\s*(?=(?:CREATE|ALTER)\b)/).map(s => env.LIBRARY_DB.prepare(s)));
-  }
+  await applyMigrations(env.LIBRARY_DB);
   await env.LIBRARY_DB.prepare("INSERT INTO users VALUES ('operator','owner@example.test',1,'now')").run();
 }, 15000);
 

@@ -22,8 +22,8 @@ everything regardless. The rule is `planGate()`, pure and pinned by
 **Data read from disk** runs every test because vitest's import graph cannot see it:
 `scenarios/`, `public/`, `migrations/`, `spec/`, `vendor/`, `harness/{fixtures,reports,musicxml-oracle}/`,
 `converters/fixtures/`, `worker/generated/`, `worker/models*.json`, `package*.json`,
-`tsconfig*.json`, `*.config.ts`, `wrangler.jsonc`, `.dependency-cruiser.cjs`, the three
-HTML entry pages, and `docs/studio-storage.md` (two library tests read it).
+`tsconfig*.json`, `*.config.ts`, `wrangler.jsonc`, `.dependency-cruiser.cjs`, and the three
+HTML entry pages.
 
 **The source readers** are tests that read source files from disk instead of importing
 them, so an import graph never selects them: `architecture-boundaries`,

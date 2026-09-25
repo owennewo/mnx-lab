@@ -22,7 +22,6 @@ const DATA = [
   /^worker\/generated\//, /^worker\/models[^/]*\.json$/,
   /^package(-lock)?\.json$/, /^tsconfig[^/]*\.json$/, /^[^/]*\.config\.ts$/, /^wrangler\.jsonc$/,
   /^\.dependency-cruiser\.cjs$/, /^(studio|workbench)\/index\.html$/, /^embed\.html$/,
-  /^docs\/studio-storage\.md$/,
 ];
 // Tests that read SOURCE from disk (a boundary check, a source census, a token
 // scan of the shells' styles), so a code change reaches them without an import:

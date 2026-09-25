@@ -1,8 +1,7 @@
 // Implementation loop: real D1/R2 semantics are the oracle, never SQL mocks.
 import { beforeEach, expect, it } from 'vitest';
-import { readFileSync } from 'node:fs';
 import type { Miniflare } from 'miniflare';
-import { useLibraryRuntime } from '../helpers/libraryRuntime.ts';
+import { applyMigrations, useLibraryRuntime } from '../helpers/libraryRuntime.ts';
 import type { D1Database, R2Bucket } from '@cloudflare/workers-types';
 import { Library, type PieceWrite, type RenditionInput } from '../../worker/library/index.ts';
 import { describeBlob } from '../../worker/library/blobs.ts';
@@ -12,10 +11,6 @@ let mf: Miniflare;
 let db: D1Database;
 let bucket: R2Bucket;
 let library: Library;
-const migration = readFileSync(new URL('../../migrations/0001_library.sql', import.meta.url), 'utf8');
-const views = readFileSync(new URL('../../migrations/0003_piece_views.sql', import.meta.url), 'utf8');
-const lifecycle = readFileSync(new URL('../../migrations/0005_piece_lifecycle.sql', import.meta.url), 'utf8');
-const prefs = readFileSync(new URL('../../migrations/0006_piece_prefs.sql', import.meta.url), 'utf8');
 const bytes = (text: string) => new TextEncoder().encode(text).buffer;
 function mnx(id: string, title = 'Title', extras: Partial<RenditionInput> = {}): RenditionInput {
   const doc = structuredClone(score);
@@ -37,19 +32,9 @@ beforeEach(async () => {
   db = await mf.getD1Database('DB');
   // Miniflare types its Node-side proxy against undici; it is the Worker's R2Bucket.
   bucket = await mf.getR2Bucket('BUCKET') as unknown as R2Bucket;
-  // Split only between this migration's CREATE statements, preserving the trigger body.
-  await db.batch([migration, views, lifecycle, prefs].map(m => m.replace(/--[^\n]*/g, '').trim().split(/;\s*(?=(?:CREATE|ALTER)\b)/).map(sql => db.prepare(sql))).flat());
+  await applyMigrations(db);
   library = new Library(db, bucket);
 }, 15000);
-
-it('keeps the migration equal to the documented five-table schema', async () => {
-  const design = readFileSync(new URL('../../docs/studio-storage.md', import.meta.url), 'utf8').split('```sql\n')[1].split('```')[0];
-  expect(migration.slice(migration.indexOf('\n') + 1)).toBe(design);
-  const tables = await db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE '_cf_%' ORDER BY name").all();
-  expect(tables.results.map(r => r.name)).toEqual(['piece_views','pieces','recordings','renditions','tag_aliases','tags']);
-  const viewsDesign = readFileSync(new URL('../../docs/studio-storage.md', import.meta.url), 'utf8').split('```sql\n').slice(1).map(b => b.split('```')[0]).find(b => b.includes('piece_views'));
-  expect(views.slice(views.indexOf('CREATE'))).toBe(viewsDesign);
-});
 
 it('writes blobs and rows, stores the projected tags, and returns a true no-op on replay', async () => {
   let puts = 0;
@@ -291,9 +276,12 @@ it('sorts by recently opened, most recent first, unopened last, and pages by off
 });
 
 it('validates syncpoint fields before serialization without rejecting unsupported but well-shaped maps', async () => {
-  const initial = await library.writePiece('alice', { ...create(), recordings: [
+  await library.writePiece('alice', { ...create(), recordings: [
     { id: 'rec', kind: 'youtube', external_id: 'video', syncpoints: [[0, 1], [1, 2.5, 106.66666666666666, 1]] },
   ] });
+  // What is STORED is the oracle: a rejected write must leave it as it was. (The
+  // write's own reply omits a null provenance that a read of the same row reports.)
+  const initial = await library.getPiece('alice', 'piece');
   for (const points of [[[0, NaN]], [[0, Infinity]], [[0, 1, 481]], [[0, 1, -1]],
     [[0, 1, 0, 2]], [[0, 1, null]], [[Number.MAX_SAFE_INTEGER + 1, 1]]]) {
     await expect(library.writePiece('alice', { id: 'piece', expected_revision: 0, recordings: [

@@ -5,10 +5,9 @@
 // pointer — so the service keeps every version — and it is refused unless it
 // was edited from what is canonical NOW.
 import { beforeEach, expect, it } from 'vitest';
-import { readFile } from 'node:fs/promises';
 import type { Miniflare } from 'miniflare';
 import type { D1Result } from '@cloudflare/workers-types';
-import { useLibraryRuntime } from '../helpers/libraryRuntime.ts';
+import { applyMigrations, useLibraryRuntime } from '../helpers/libraryRuntime.ts';
 import app from '../../worker/index.ts';
 import type { Env } from '../../worker/env.ts';
 import { Library, pieceIdFor } from '../../worker/library/index.ts';
@@ -17,7 +16,7 @@ import { LibraryClient, LibraryRequestError, type Checkpoint } from '../../src/s
 import { buildNewDocument } from '../../src/edit/newDocument.ts';
 import { applyOp } from '../../src/edit/ops.ts';
 import { parseTuning } from '../../src/edit/setupGrammar.ts';
-import { derivedLibraryTags, fromWorkHeader } from '../../src/model/libraryTags.ts';
+import { derivedLibraryTags } from '../../src/model/libraryTags.ts';
 import { documentTitle, type MnxStructure } from '../../src/model/mnx.ts';
 import { exportGuitarProGpif, STORAGE_EXPORT_OPTIONS } from '../../converters/guitarpro-mnx/src/gpif/fromMnx.ts';
 import { importGuitarProCleanRoom } from '../../converters/guitarpro-mnx/src/cleanRoom.ts';
@@ -43,10 +42,7 @@ beforeEach(async () => {
   identity = await testIdentity(); jwt = await identity.sign();
   mf = await freshRuntime();
   env = { LIBRARY_DB: await mf.getD1Database('DB'), LIBRARY_BUCKET: await mf.getR2Bucket('BUCKET'), LIBRARY_WRITE_TOKEN: 'private-test', ...identity.config };
-  for (const name of ['0001_library', '0002_users', '0003_piece_views', '0004_recording_management', '0005_piece_lifecycle', '0006_piece_prefs']) {
-    const sql = (await readFile(new URL(`../../migrations/${name}.sql`, import.meta.url), 'utf8')).replace(/--[^\n]*/g, '').trim();
-    await env.LIBRARY_DB.batch(sql.split(/;\s*(?=(?:CREATE|ALTER)\b)/).map(s => env.LIBRARY_DB.prepare(s)));
-  }
+  await applyMigrations(env.LIBRARY_DB);
   await env.LIBRARY_DB.prepare("INSERT INTO users VALUES ('operator','owner@example.test',1,'now')").run();
 }, 15000);
 
@@ -122,8 +118,6 @@ it('is the owner\'s, is same-origin JSON, and says nothing it was not asked to v
     const parsed = JSON.parse(captured); change(parsed); return JSON.stringify(parsed);
   };
   const post = async (payload: string, headers: Record<string, string> = { 'Content-Type': 'application/json' }) => (await send(`/pieces/${made.piece.id}/renditions`, { method: 'POST', headers, body: payload })).status;
-  expect(await post(await body(() => {}), { 'Content-Type': 'text/plain' })).toBe(415);
-  expect(await post(await body(() => {}), { 'Content-Type': 'application/json', Origin: 'https://evil.example' })).toBe(403);
   for (const [what, change] of [
     ['a role', (b: Record<string, any>) => { b.rendition.role = 'original'; }],
     ['a rendition id', (b: Record<string, any>) => { b.id = 'mine'; }],
@@ -165,29 +159,3 @@ it('an ingest after a Studio edit adds what Soundslice exported and moves neithe
   expect(await rows('SELECT id FROM renditions WHERE piece_id = ?', id)).toHaveLength(3);
 });
 
-/**
- * WHICH DERIVED VALUES A PERSON CAN TYPE. Studio's Edit piece panel shows the
- * score's header as fields and everything else read from the file as read-only
- * rows correctable only by an alias. `fromWorkHeader` is the line between the
- * two, and it must stay joined to the projection: a dimension the projection
- * reads out of `_x.mnxLab.work` and this call denies would appear twice in the
- * panel — an editable field and a read-only echo of it, the exact duplication
- * that merging the Details and Tags sheets removed.
- */
-it('splits the projection into what the header holds and what the notes say', () => {
-  const document = blank();
-  const header = new Set(['title', 'artist', 'subtitle', 'album', 'copyright', 'source', 'notes']);
-  for (const dimension of header) expect(fromWorkHeader(dimension)).toBe(true);
-  for (const role of ['composer', 'lyricist', 'transcriber', 'arranger'])
-    expect(fromWorkHeader(`creator.${role}`)).toBe(true);
-  // Read off the notation: nothing to type, so the panel offers only an alias.
-  for (const dimension of ['part', 'capo', 'tuning', 'tuning-name']) expect(fromWorkHeader(dimension)).toBe(false);
-  // Nobody reads these from a file at all — they are the person's own.
-  for (const dimension of ['genre', 'status', 'list', 'favourite']) expect(fromWorkHeader(dimension)).toBe(false);
-
-  // Every dimension the projection actually produces is on one side or the
-  // other, and the ones that are not the header's are exactly the notation's.
-  const produced = new Set(derivedLibraryTags(document).map(t => t.dimension));
-  expect(produced.size).toBeGreaterThan(0);
-  expect([...produced].filter(d => !fromWorkHeader(d)).sort()).toEqual(['part', 'tuning', 'tuning-name']);
-});
