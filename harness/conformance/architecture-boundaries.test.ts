@@ -76,6 +76,7 @@ it('checks real forbidden graphs and admits supported architecture seams', () =>
     write('converters/example/oracle.ts', "import 'alphatab';");
     // These generated/installed trees must never become additional source entry points.
     edge('experiments/performance-listening/output/bundle.js', 'src/engine/layout.ts');
+    edge('experiments/performance-listening/archive/old-probe.mjs', 'src/engine/layout.ts');
     edge('experiments/performance-listening/node_modules/tool/index.js', 'src/engine/layout.ts');
     const allowed = run();
     expect(allowed.status, allowed.stdout + allowed.stderr).toBe(0);

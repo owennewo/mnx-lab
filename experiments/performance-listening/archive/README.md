@@ -1,0 +1,299 @@
+# Performance listening bench
+
+Implementation-loop experiment for future Studio tracking, assessment and guitar control.
+This unit measures detection on digitally rendered player audio and offers a local
+microphone experiment. It does not grade a real performer. Production cannot import it.
+
+The [fused algorithm log](fusion-log.md) is the living index of techniques, configurations
+tried, decisions and possible next experiments. Detailed records use the
+[technique template](fusion-techniques/_template.md). The bench includes separate detector baselines and an optional fused attack experiment;
+no fused configuration has been adopted as the default.
+
+## Run
+
+Requires Node >=22.12, the root development dependencies, and installed Chrome
+(`CHROME_BIN=/absolute/path/to/chrome` overrides discovery). From the repository root:
+
+```bash
+npm ci
+npm --prefix experiments/performance-listening ci
+npm --prefix experiments/performance-listening test
+npm --prefix experiments/performance-listening run check:boundaries
+npm --prefix experiments/performance-listening run render
+npm --prefix experiments/performance-listening run compare
+npm --prefix experiments/performance-listening run inspect
+```
+
+Open the printed localhost URL. Choose a sound/case/strategy/mode, listen, inspect the
+piano roll, and jump to the first unmatched attack. The inspector is read-only and serves
+only its selected run and recording files. Nothing is deployed.
+
+Rendering creates `output/audio-v1`; comparison creates `output/run-v1`. Both refuse to
+overwrite an existing directory. npm runs these scripts from the bench directory;
+use absolute paths for explicit input/output arguments. To create a new version:
+
+```bash
+npm --prefix experiments/performance-listening run render -- /absolute/path/audio-v2
+npm --prefix experiments/performance-listening run compare -- /absolute/path/audio-v2 /absolute/path/run-v2
+npm --prefix experiments/performance-listening run inspect -- /absolute/path/run-v2
+```
+
+A quick adapter check can use `compare -- AUDIO RUN --limit=2`. The limit is recorded;
+that subset is not the reference comparison. Whole-file neural CPU inference takes several
+minutes for the full matrix. No paid service, native TensorFlow binary or model download
+is used: the pinned Basic Pitch npm distribution includes its model weights.
+
+## Live microphone test
+
+Run `npm --prefix experiments/performance-listening run microphone`, then open
+http://127.0.0.1:5175/microphone/ (set `PORT` to choose another port). No existing benchmark
+outputs are needed. Press **Record microphone**, grant permission, and keep quiet for two seconds before playing. **Stop**
+releases the microphone and offers WAV playback/download and a JSON detection log.
+
+Microphone-only settings now default to a two-second background calibration with a +12 dB
+margin and 75 ms requested confirmation (eight frames, 81.3 ms from first to last evidence).
+The calibration takes the 90th percentile of full 4096-sample window RMS measurements,
+excluding startup padding. It sets a fixed take-level gate to max(−80 dBFS, background +
+margin). No notes are emitted during calibration; its audio remains in the WAV and event
+times retain the recording origin. This is an overall energy gate, not spectral noise
+subtraction or a calibrated probability. A constant hum above the gate can still mislead
+pitch detection. Playing during calibration can set the gate too high; restart to retry.
+
+Noise margins Off/6/12/18 dB and confirmation Original/50/75/100 ms can be varied independently
+between takes. Original restores two-frame confirmation; Off retains the original −80 dBFS
+floor. Longer confirmation requires consecutive qualifying pitch frames, including re-strikes;
+it may reject brief notes or unstable true pitches. It adds no FFT and does not validate
+harmonic attribution. No accuracy improvement on real guitar is claimed yet. JSON v2
+exports measured background, effective gate, actual confirmation span and browser AGC settings.
+The meter now covers −100…0 dBFS and reports numeric input and threshold levels.
+
+F-006 is preselected only on this experimental page; F-003 is available for another take.
+Production and benchmark defaults are unchanged. Current pitches and the newest 200
+attack events are shown. All events and captured mono PCM are retained for download,
+with a five-minute take limit. A new take replaces the previous one. No audio is uploaded
+or persisted by the server. The browser's default microphone is used.
+
+Capture uses an AudioWorklet at the detector's 22,050 Hz rate, with pitch analysis in a
+separate Web Worker. Browser input processing is requested off; actual track settings
+are exported. The browser resamples device input into the requested AudioContext rate;
+unsupported rates fail explicitly. Worklet delivery uses 512 samples (~23 ms); stopping
+may omit the incomplete final block. Queue overflow stops the take rather than silently
+skipping chunks. Historical frame scores are discarded; active detector state is retained.
+The UI stream timestamps are audio decision times, not measured end-to-end latency.
+
+[AudioWorklet capture](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API/Using_AudioWorklet)
+and [AudioContext sample-rate behaviour](https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/AudioContext)
+follow browser APIs. Browser permission, scheduling, input hardware, room acoustics and
+real guitar tone are new variables; synthetic fixture accuracy is not a microphone score.
+
+Run `npm --prefix experiments/performance-listening run test:microphone` for the Chrome
+smoke check with a synthetic fake microphone (it never accesses a physical device).
+
+## First fused iteration
+
+The [F-001 protocol](experiments/fusion-attack-protocol.md) freezes a 12-setting attack
+sweep around the unchanged harmonic parent. From the bench directory, with original
+`output/audio-v1` and `output/run-v1/results.json` preserved:
+
+```bash
+node rendering/render.mjs output/audio-fusion-heldout-v1 --fusion-heldout
+npm run fusion:attack -- output/fusion-attack-v1
+npm run fusion:export -- output/fusion-attack-v1 findings/fusion-attack-v1
+```
+
+All three commands refuse existing destinations. Set `FUSION_PARENT_RESULTS` to an
+absolute archived baseline results path if it lives elsewhere. The runner checks all
+102 parent musical outputs and decision samples against that archive. It measures three
+counterbalanced processing passes, writes a selection lock, then evaluates only the
+locked candidate and parent on held-out audio. The held-out set tests new schedules and
+pitches using existing sample packs; it is not an unseen-instrument or microphone test.
+After the first run, keep both audio directories for later ablations; rerendering creates
+a new input version. Use a fresh run/export destination for every subsequent run.
+
+Full `development-results.json` / `heldout-results.json` retain events and evaluator
+outputs. To use the existing inspector, copy one split file into a fresh directory named
+`results.json`, updating `audioDirectory` to its relative audio path. The committed export
+retains all configuration summaries and parent/selected per-case evidence; ignored full
+outputs retain all settings. Read the [fusion log](fusion-log.md) for the decision.
+
+## Re-strike-only iteration
+
+[F-002's frozen protocol](experiments/fusion-restrike-protocol.md) holds the F-001-01
+parameters fixed and changes only their integration: preserve parent pitch tracks and
+emit additional, two-frame-confirmed re-strikes. It does not enable attack gating for
+new pitch tracks. Every original event and active-pitch set must survive unchanged.
+The overlapping event intervals are intentional: the evaluator deduplicates active pitches
+while matching each attack separately. This is bench machinery, not a production note API.
+
+From the bench directory, retaining the original and first held-out audio and full runs:
+
+```bash
+node rendering/render.mjs output/audio-fusion-heldout-v2 --fusion-heldout-v2
+npm run fusion:attack -- output/fusion-restrike-v1 experiments/fusion-restrike.json
+npm run fusion:export -- output/fusion-restrike-v1 findings/fusion-restrike-v1
+```
+
+`FUSION_ADDITIONAL_PARENT_RESULTS` can point to the original F-001 `heldout-results.json`
+when it lives elsewhere; `FUSION_PARENT_RESULTS` still points to the original baseline.
+The runner pools both previous audio sets for development, then locks disposition before
+scoring the fresh v2 set. There is one candidate and no parameter selection or retuning.
+Use new destinations for subsequent runs; preserve rendered WAVs for identical inputs.
+
+## Attribution iterations
+
+F-003 adds optional neighbouring-pitch competition to F-002's additional attacks. Run the
+[frozen plan](experiments/fusion-attribution-protocol.md) from the bench directory:
+
+```bash
+node rendering/render.mjs output/audio-fusion-heldout-v3 --fusion-heldout-v3
+npm run fusion:attack -- output/fusion-attribution-v1 experiments/fusion-attribution.json
+npm run fusion:export -- output/fusion-attribution-v1 findings/fusion-attribution-v1
+node experiments/fusion-report.mjs output/fusion-attribution-v1 findings/fusion-attribution-v1
+```
+
+`FUSION_ARCHIVE_ROOT` optionally locates archived parent runs outside this bench's `output`.
+The plan lists those archives explicitly. All prior frozen recordings are regression inputs;
+selected settings and diagnostic references are evaluated on the new split only after the
+selection lock. References cannot be selected as candidates. Exports retain reference event
+streams as well as the parent and selected candidate. Merged manifests retain source hashes
+and metadata, with evaluation records once in the combined record list.
+
+F-004 uses `--fusion-heldout-v4`, `experiments/fusion-harmonic-attribution.json` and fresh
+`output/fusion-harmonic-attribution-v1` / `findings/fusion-harmonic-attribution-v1`
+destinations with the same commands. The compact report command adds a comparison table
+and exact unmatched re-strike diagnostics to an exported reference; it refuses existing
+report files. [F-003 results](findings/fusion-attribution-v1/README.md) and
+[F-004 results](findings/fusion-harmonic-attribution-v1/README.md) retain the stopping decision.
+No new recipe is enabled by default.
+
+## What is independent
+
+`rendering/browser.mjs` imports the production NativeSink and sample loader. A supplied
+OfflineAudioContext renders the real sample path; the adapter counts buffer sources and
+checks silence, nonzero output and clipping. Three sample packs are evaluated: archtop
+(the template source), held-out nylon, and held-out upright piano. The bench does not
+implement its own synthesizer. Sound decoding is shared across contexts, while each
+fixture gets a fresh sink and deterministic attack counter.
+
+`fixtures/cases.mjs` supplies explicit schedules, including errors. A separate two-note
+MNX example passes through the performance compiler and is checked against an independently
+specified 120 BPM schedule. This checks the adapter, not the compiler's general musical
+correctness. Those responsibilities remain with the existing corpus.
+
+Actual events, target events and recorded PCM remain separate. Acoustic detectors receive
+only PCM and fixed configurations. Templates receive only the isolated training recordings.
+No detector sees target labels, actual labels, fixture ids or the mutation recipe.
+
+All configurations were fixed before the reference evaluation; v1 is an intentionally
+simple baseline, not tuned for the test set. There are no random variations in v1 (`seed=0`).
+After reviewing these findings, these cases are a regression set, not an unseen test set.
+Future tuning needs newly held-out fixtures/sounds for independent transfer claims.
+
+## Detector contracts
+
+- **Harmonic:** Hann-window FFT magnitudes; 12 harmonics weighted 1/h, a Gaussian bin
+  kernel, greedy matching pursuit capped at six pitches. An interpretable baseline;
+  no trained parameters.
+- **Template:** mean isolated archtop spectra over .45–.75 seconds, unit-norm columns,
+  fixed-iteration nonnegative coordinate descent. Same-source and held-out results
+  are labelled separately by preset. It is not trained on test chords.
+- **Neural:** Basic Pitch 1.0.1 on TensorFlow.js CPU, model/weight hashes recorded.
+  Uses upstream note decoding, fixed onset/frame thresholds, no confidence calibration.
+  The adapter is whole-file only. Every requested neural stream mode is explicitly
+  `unavailable`, with a reason; it is never counted as zero accuracy or live-ready.
+
+Both DSP baselines share an activity gate and event grouping, with two qualifying frames
+and no separate re-strike onset detector. This is a known limit on repeated notes, not a
+claim that the spectral family cannot recognise them. All pitches MIDI 40–88 are searched;
+Basic Pitch emits its native range, and out-of-range false positives still count.
+
+StreamingDetector owns a ring buffer and receives only chunks, never the original file.
+A 4096-sample trailing window at 22050 Hz spans 185.8 ms; frames arrive every 256 samples.
+Event positions use the window centre. Availability uses the full input chunk end;
+simulated delivery additionally includes measured serial compute and carried backlog.
+Chunk sizes 256 and 2048 compare buffering delay. Whole-file DSP uses the identical
+algorithm but withholds all decisions until the whole file arrives. No end padding is
+invented; the recording includes release tail. Timing uses audio samples, not timer sleeps.
+
+These replay measurements are algorithmic availability plus measured compute on the
+recorded machine. They exclude microphone, browser scheduling and display latency, and
+do not establish browser real-time performance. Neural latency is whole-file wait plus
+inference/postprocessing time. Startup/model load and dictionary construction are excluded from steady-state compute
+and are not benchmarked in v1. The output field `cpuMs` is wall-clock elapsed processing
+time, including GC and runtime overhead, not operating-system CPU accounting.
+
+## Evaluation conventions
+
+- One-to-one maximum-cardinality attack matching: pitch within 0.5 semitone, onset
+  within 100 ms (inclusive). Duplicate detections create false positives. Simultaneous
+  unison voices collapse to one observable pitch attack; string completeness is unknown.
+- Active-pitch sets sampled every 20 ms, including bends' continuous expected pitch.
+  Silence has its own false-active-frame count. Exact chord recovery is the fraction of
+  **active** frames with the complete pitch set; silence cannot inflate it.
+- Scheduled release is the reference for release error; sample attacks and tails need
+  not match it exactly. Release error is reported separately from attack matching. The
+  audible envelope has no human-labelled ground truth yet.
+- Raw counts accompany precision/recall/F1. Undefined ratios are `null`, not perfect
+  scores. Category, preset and instantaneous pitch-count breakdowns expose weak cases.
+- Quantiles use the sorted observation at `floor(q * (n - 1))`; small per-case
+  populations have coarse quantiles. Aggregate latency pools matched attacks.
+- Latency only covers successfully matched attacks, so always read it with recall.
+  Available time and emitted time are retained separately from estimated musical time.
+- Scores are uncalibrated coefficients/activations. Score bins expose empirical hit rates;
+  threshold curves report retained detections, precision and recall. They do not claim
+  calibrated probabilities or that discarded target notes were assessed. These curves
+  use finalized event peak scores (DSP) or mean activations (neural), which may require
+  later audio than the initial attack decision. Do not combine threshold-filtered
+  precision with the unfiltered first-emission latency as a live acceptance guarantee.
+  Event ends and peak scores can grow with subsequent chunks; initial pitch, start and
+  decision-sample records do not change.
+- The conservative assessment probe only accuses unexpected observed attacks. A target
+  attack without a match stays unassessed. Known missing-target errors are counted as
+  such in ground truth but this policy cannot diagnose them. Wrong substitutions can
+  create an unexpected attack and an absent target. No overall player grade is produced.
+
+Evaluator tests independently cover duplicates, silence, octave errors, tolerance edges,
+ambiguous bipartite matching, abstention and accusations. Detector tests cover a known
+sinusoid and causal-prefix/chunk-boundary invariance. They are not an accuracy threshold
+on the experimental detectors: disappointing measured accuracy remains a valid result.
+
+## Artifacts and provenance
+
+`manifest.json` pins audio and fixture hashes, sample files, source-pack attribution,
+Chrome version and renderer source hashes. `results.json` retains actual/target labels,
+predictions, metrics, unavailable/failed outcomes and the input manifest. `summary.json`
+aggregates by strategy, mode, preset and case category. `npm --prefix
+experiments/performance-listening run report -- RUN NEW_REFERENCE_DIRECTORY` creates a
+compact reference export with pitch-range, relative-level and confidence breakdowns;
+it refuses to overwrite the committed reference directory. Changed or corrupted audio refuses
+comparison. A partially failed run remains inspectable and exits nonzero; missing strategy
+support is explicit.
+
+The exact npm dependency tree is locked here, separate from root dependencies. Input
+manifests and compact measured reports are committed under `findings/`; bulky audio and
+full runs live under ignored `output/`. Preserve an output directory to reproduce identical
+PCM. Re-rendering may differ across browser/codec/platform versions: verify hashes rather
+than assuming equivalence. A new render is a new input version. The initial repeat-render check found 28/151
+polyphonic recordings differed at floating-point roundoff scale even with the same
+Chrome and renderer source. Preserve the original WAVs for exact input identity.
+Compare two generated sets without changing either:
+
+```bash
+npm --prefix experiments/performance-listening run compare:renders -- AUDIO_A AUDIO_B NEW_REPORT.json
+```
+
+Sample pack licenses and origins are retained from `public/samples/*/manifest.json` and
+in the audio manifest. Basic Pitch/model distribution: Apache-2.0; TensorFlow.js: Apache-2.0;
+fft.js and Puppeteer: MIT/Apache-2.0 respectively (see installed licenses). No third-party
+source or weights are copied into this repository.
+
+## Boundaries and next decisions
+
+Root dependency-cruiser forbids production imports of experiments and restricts this bench
+to audio/model. The bench's boundary command includes its own graph in addition to root
+sources. It has no dependency on Studio, elements, workbench, Worker, storage or corpus
+status writers. No existing production package dependency or audio implementation changes.
+
+Read `findings/README.md` for measured capabilities and the next experiment justified by
+evidence. Score-informed following, command gestures and production promotion need a subsequent
+decision. Microphone capture is now a manual experiment, not validated player assessment.

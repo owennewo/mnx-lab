@@ -223,8 +223,8 @@ extension or new roadmap campaign is authorised by implementing this bench.
 ## Implementation outcome — 2026-09-13
 
 The three bounded stages are implemented in
-[`experiments/performance-listening/`](../../experiments/performance-listening/README.md).
-The [findings](../../experiments/performance-listening/findings/README.md) retain the
+[`experiments/performance-listening/`](../../experiments/performance-listening/archive/README.md).
+The [findings](../../experiments/performance-listening/archive/findings/README.md) retain the
 initial measurement, limitations and a recommendation to continue the isolated bench.
 There are 151 player-rendered recordings (102 evaluation cases and 49 templates), three
 detector adapters, independent evaluator/causality tests, a read-only local inspector,

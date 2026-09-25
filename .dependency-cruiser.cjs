@@ -128,8 +128,9 @@ module.exports = {
     }
   ],
   options: {
+    // Archived experiments are historical snapshots, not active source entry points.
     // Experiment output can contain generated bundles; dependencies are never entry points.
-    exclude: { path: '^experiments/[^/]+/(output|dist)(/|$)' },
+    exclude: { path: '^experiments/[^/]+/(output|dist)(/|$)|^experiments/performance-listening/archive(/|$)' },
     doNotFollow: { path: 'node_modules' },
     tsPreCompilationDeps: true,
     tsConfig: { fileName: 'tsconfig.json' }
