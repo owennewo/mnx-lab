@@ -100,6 +100,19 @@
         "href": "007-rung1-tempo.html",
         "label": "Experiment 007"
       }
+    },
+    {
+      "number": "009",
+      "slug": "009-plucked-reference",
+      "title": "009 · A reference that decays like a plucked string",
+      "banner": "Hypothesis contradicted · one fixed decay helps only the guitar it matches",
+      "runs": [
+        "g009-plucked-reference"
+      ],
+      "previous": {
+        "href": "008-rung2-guitar-samples.html",
+        "label": "Experiment 008"
+      }
     }
   ]
 }

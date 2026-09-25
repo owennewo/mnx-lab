@@ -14,6 +14,7 @@ question are in [the research log](../RESEARCH_LOG.md), not here.
 | 006 | [Rung 0: sequence-based support](006-sequence-support-rung0.html) | [g006-sequence-support-rung0](../runs/g006-sequence-support-rung0/summary.json) |
 | 007 | [Rung 1: tempo](007-rung1-tempo.html) | [g007-rung1-tempo](../runs/g007-rung1-tempo/summary.json) |
 | 008 | [Rung 2: recorded guitar samples](008-rung2-guitar-samples.html) | [g008-rung2-guitar-samples](../runs/g008-rung2-guitar-samples/summary.json) |
+| 009 | [A reference that decays like a plucked string](009-plucked-reference.html) | [g009-plucked-reference](../runs/g009-plucked-reference/summary.json) |
 
 ## One experiment, one file
 
