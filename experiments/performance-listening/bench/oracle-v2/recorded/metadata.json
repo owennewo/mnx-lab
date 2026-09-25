@@ -1,0 +1,6 @@
+{
+  "kind": "instrument-verification",
+  "gitCommit": "42bc2a30d6ed47cb03d9ecd8d7bb6dab1cc6d915",
+  "checkpointSha256": "c4a287f785c609fcdd1ee2649eaa4c111873d9c11e255d74926fb1863823516c",
+  "instrumentHash": "d09e248bb34890f14b3c33d5068fd9b87a83611badbe52404873354f8e1a6ba4"
+}
