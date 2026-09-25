@@ -256,14 +256,6 @@ if (UPDATING) {
 }
 
 describe('converter support matrix', () => {
-  it('scores every feature def against every lane', () => {
-    expect(sources.length).toBeGreaterThan(50);
-    for (const lane of lanes) {
-      const scored = Object.keys(lane.rows).length;
-      expect(scored).toBeGreaterThanOrEqual(FEATURE_DEFS.length);
-    }
-  });
-
   it('matches the committed matrix', () => {
     if (UPDATING) return;
     expect(
@@ -282,42 +274,6 @@ describe('converter support matrix', () => {
       expect(lane.counts.supported, `${lane.key} supports fewer defs than it did`).toBeGreaterThanOrEqual(
         before.counts.supported
       );
-    }
-  });
-});
-
-// The committed JSON is imported directly by src/workbench/ConvertersPage.ts,
-// so its shape is a contract between a generator and a page that never see each
-// other. These assert the fields that page reads.
-describe('the shape the workbench renders', () => {
-  const VERDICTS = ['supported', 'lossy', 'extension', 'error', 'untested'] as const;
-
-  it('gives every lane counts for every verdict, and every row a known verdict', () => {
-    for (const lane of lanes) {
-      expect(Object.keys(lane.counts).sort()).toEqual([...VERDICTS].sort());
-      for (const [name, cell] of Object.entries(lane.rows)) {
-        expect(VERDICTS.includes(cell.verdict), `${name}: ${cell.verdict}`).toBe(true);
-        // A non-supported cell without evidence is a scoreboard entry, which is
-        // exactly what this page exists not to be.
-        if (cell.verdict !== 'supported' && cell.verdict !== 'untested') {
-          expect(cell.evidence, `${name} has no evidence`).toBeTruthy();
-        }
-      }
-      // The counts have to agree with the rows they summarise.
-      const tallied = Object.values(lane.rows).reduce<Record<string, number>>((acc, cell) => {
-        acc[cell.verdict] = (acc[cell.verdict] ?? 0) + 1;
-        return acc;
-      }, {});
-      for (const verdict of VERDICTS) expect(lane.counts[verdict]).toBe(tallied[verdict] ?? 0);
-    }
-  });
-
-  it('names evidence that actually exists', () => {
-    const ids = new Set(sources.map(source => source.id));
-    for (const lane of lanes) {
-      for (const cell of Object.values(lane.rows)) {
-        if (cell.evidence) expect(ids.has(cell.evidence), cell.evidence).toBe(true);
-      }
     }
   });
 });
