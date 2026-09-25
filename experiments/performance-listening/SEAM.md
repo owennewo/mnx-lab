@@ -82,16 +82,26 @@ Each step says when it is done. Steps 1–7 are independent of listening quality
 hold for the clock follower as much as for the best candidate. Seam work sits
 alongside the ladder, and a candidate's ladder standing never waits on it.
 
-### S1. A seam module that can move by `git mv`
+### S1. `listen/`, a module that can move by `git mv`
 
-Create `bench/src/seam/`. It holds the listener contract and the adapters below, and it
-imports **only** from `src/` and from itself, never from the rest of the bench. A
-dependency-cruiser rule enforces this, so promotion is a move, not a rewrite.
-Candidates, the runner and the evaluator import the contract from `seam/`;
-`bench/src/types.ts` re-exports it for the existing code.
+Create `experiments/performance-listening/listen/`, a sibling of `bench/`, named after
+what it becomes: `src/listen/`. It holds the listener contract and the adapters below.
+It is not part of the bench, because the bench is the measuring apparatus and this is
+the interface of what is measured; the bench and Studio are both its consumers. Nor
+is it named for Studio: it lands in `src/` as a library layer that `elements` can
+import, and Studio is its first consumer, not its owner.
 
-*Done when* the boundary rule is in the gate and `seam/` compiles against `src/`
-alone.
+`listen/` imports only `src/audio` and `src/model`, which the existing
+`listening-bench-consumes-audio-and-model-only` rule already enforces for the whole
+experiment. One new dependency-cruiser rule adds that `listen/` imports nothing from
+`bench/`, so promotion is a move, not a rewrite. The bench's `tsconfig` and vitest
+includes gain `../listen`; the gate already runs the bench suite for any change under
+`experiments/performance-listening/`. Candidates, the runner and the evaluator import
+the contract from `listen/`, and `bench/src/types.ts` re-exports it for the existing
+code.
+
+*Done when* the new boundary rule is in the gate, and `listen/` compiles and its tests
+run under the bench suite, reaching only `src/audio` and `src/model`.
 
 ### S2. Positions in Studio's coordinate
 
@@ -100,7 +110,7 @@ The wire position becomes Studio's `ScorePosition`: performed `ordinal` plus
 redeclared. `route` is retired from the wire, because the ordinal already says which
 pass. The evaluator keeps its affine trajectories in a performed coordinate: the
 compiler's `PerformanceMeasure.metricPosition` is monotone along the route and maps
-one-to-one to a `ScorePosition`. A pure function in `seam/` converts between the two,
+one-to-one to a `ScorePosition`. A pure function in `listen/` converts between the two,
 and another translates v1 records (`quarters`, `route: 1`) for comparison with
 history.
 
@@ -128,7 +138,7 @@ the refusal path.
 ### S4. Delivery at whatever the device gives
 
 The delivery settings become declarations (`sampleRate`, `chunkSamples`), not
-requirements. `seam/` provides the adapter that rechunks and resamples to what a
+requirements. `listen/` provides the adapter that rechunks and resamples to what a
 candidate wants internally, so candidates keep their fixed 48 kHz / 480 internals.
 The adapter's own added delay is measured and reported.
 
@@ -137,7 +147,7 @@ The adapter's own added delay is measured and reported.
 
 ### S5. One display rule
 
-`seam/` provides `liveView(record, clock)`: the effective decision at a clock under
+`listen/` provides `liveView(record, clock)`: the effective decision at a clock under
 the vocabulary's four rules. It is the only function Studio will use to decide what to
 draw. The evaluator stays as it is; changing it would be a new instrument. An
 **agreement test** asserts that `liveView` equals the evaluator's effective decision
@@ -149,7 +159,7 @@ contract and the evaluator scores it; Studio never adds it by itself.
 
 ### S6. `ListeningBackend implements PlaybackBackend`
 
-This goes in `seam/`, DOM-free, and implements Studio's interface exactly. It is fed
+This goes in `listen/`, DOM-free, and implements Studio's interface exactly. It is fed
 decisions and never audio, so it runs identically in a Node replay and live. The
 mapping:
 
@@ -252,10 +262,12 @@ promoted with the clock follower behind it, before any candidate is accepted. A
 listener reaches players only through the Studio integration decision that
 [APPROACH.md](APPROACH.md) and research contract 1 already require.
 
-1. **Move** `bench/src/seam/` to `src/listen/` with `git mv`. It becomes a layer over
-   `model` and `audio`, which `elements` may import, and the layer order in
-   `.dependency-cruiser.cjs` and `CLAUDE.md` gains it. The bench switches its imports
-   to `src/listen/`, and its boundary rule is deleted.
+1. **Move** `experiments/performance-listening/listen/` to `src/listen/` with `git mv`;
+   the name does not change. It becomes a layer over `model` and `audio`, which
+   `elements` may import, and the layer order in `.dependency-cruiser.cjs` and
+   `CLAUDE.md` gains it. The bench's imports change by path only, its includes drop
+   `../listen`, and the `listen/`-to-`bench/` rule is deleted. The experiment's rule
+   widens from `src/(audio|model)` to include `src/listen`.
 2. **Apply the deltas**, one reviewed change each: the snapshot type, the source, the
    capture path, and the overlay.
 3. **Prove it in a browser.** A smoke drives Chrome with a WAV as a fake microphone
