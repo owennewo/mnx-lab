@@ -174,6 +174,8 @@ try {
   await settle(c);
   // The sweep dissolves the score to `{}`, which the page must survive showing (it compiles every revision).
   assert.deepEqual(await run(`const s = page().editor.session; return [s.appliedOps.length > 0, page().doc.mnxJson === s.doc];`), [true, true], 'the sweep’s ops did not reach the page');
+  // …and survive RENDERING it: settle() counts a thrown update as finished, so ask the page directly.
+  assert.equal(await run(`try { await page().updateComplete; return 'rendered'; } catch (error) { return String(error); }`), 'rendered', 'the page threw rendering the swept {}');
   await press('z', 'KeyZ', 90, 2);
   assert.equal(await run(`const s = page().editor.session; return s.canRedo && page().doc.mnxJson === s.doc;`), true, 'Ctrl+Z after the sweep did not rebuild through the binding');
 

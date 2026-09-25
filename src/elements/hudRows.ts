@@ -113,16 +113,20 @@ export function buildHudRows(
 
   // Each row carries the identity AND the properties that live at that level
   // of the document — the ladder's thesis, made readable.
+  // A document the destruct sweep dissolved to {} has neither: zero of each.
   const measureCount = Math.max(
-    doc.global.measures.length,
-    ...doc.parts.map(part => part.measures?.length ?? 0)
+    doc.global?.measures?.length ?? 0,
+    ...(doc.parts ?? []).map(part => part.measures?.length ?? 0)
   );
-  const partCount = doc.parts.length;
+  const partCount = doc.parts?.length ?? 0;
   row(
     'document',
     'document',
     `${title} · ${measureCount} bar${measureCount === 1 ? '' : 's'} · ${partCount} part${partCount === 1 ? '' : 's'}`
   );
+  // Nothing below the document rung exists to describe: no bar, part, voice or
+  // event. (The destruct sweep dissolves a score to exactly this.)
+  if (!doc.global || !doc.parts) return rows;
 
   const time = timeAt(doc, cursor.measureIndex);
   // Past the end of the score the cursor stands on the ghost bar

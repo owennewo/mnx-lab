@@ -71,7 +71,8 @@ export interface LyricSyllable {
 /** The verse-row order for a set of used line ids: global `lineOrder` first,
  *  unlisted ids after, sorted — the renderer's one stacking rule. */
 export function orderedLyricLineIds(mnx: MnxStructure, used: ReadonlySet<string>): string[] {
-  const order = mnx.global.lyrics?.lineOrder ?? [];
+  // A document dissolved to {} (the destruct sweep's end state) has no global at all.
+  const order = mnx.global?.lyrics?.lineOrder ?? [];
   const ordered = [...new Set(order)].filter(id => used.has(id));
   const rest = [...used].filter(id => !order.includes(id)).sort();
   return [...ordered, ...rest];
