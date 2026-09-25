@@ -5,8 +5,11 @@ A campaign plan for the first three rows of the construction table in
 **Instrument** and **Pipeline**. It ends when one versioned candidate has been run over
 one frozen synthetic set, the evaluator has produced a report that agrees with numbers
 predicted by hand before the run, and the causality check has passed. Nothing after
-that row (real evidence, the retention rule, a second candidate) is started here,
-though the plan names the question the loop asks next.
+that row (the retention rule, a second candidate) is started here, though the plan
+names the question the loop asks next. The one exception is the structure document's
+own: **Real evidence** runs in parallel with **Pipeline**, so the read-only inventory
+of eligible library recordings (item R1 in §8) begins alongside the pipeline items and
+writes no code.
 
 The structure document declines to choose technology; this plan makes those choices
 and marks each one. Every choice is provisional in the sense that the ledger records
@@ -83,7 +86,7 @@ listener.
 | `p1` | s1 | generated s1 | Position = clock × 60 BPM, supported from the first onset to the last release; single admissible position throughout | Smallest positive |
 | `p2` | s2 | generated s2 | As p1 over two bars | Positive on the spec example |
 | `c1-silence` | s2 | 8.5 s of digital silence | **Unsupported** throughout. Any position claim is false following | The clock follower must be caught |
-| `c2-wrong-piece` | s2 | generated **descending** scale C5…C4 (same rhythm, same tempo) | Unsupported. Answerable from the first onset plus the declared detection allowance (see §5); before that, abstention or a position claim covering position 0 is justified | A plausible negative: right rhythm, wrong pitches, same length |
+| `c2-wrong-piece` | s2 | generated **descending** scale C5…C4 (same rhythm, same tempo) | Unsupported. Answerable from the first onset plus the declared detection allowance (see §5); before that, the interval is pending and neither abstention nor a position claim covering position 0 is charged | A plausible negative: right rhythm, wrong pitches, same length |
 | `t1-tempo-90` | s2 | generated s2 at **90 BPM** | Supported; true position runs 1.5× the clock. **Tempo dimension above level 1**, recorded as such | The one example where a follower and a clock disagree |
 
 Partition: the whole set is **development**. A deterministic generator has no seeds,
@@ -92,10 +95,19 @@ records that no reserved claim can be made from `harness-v1`. This discharges th
 "new seeds are not new sources" rule by making it impossible to break.
 
 Deferred, named so the next set does not rediscover them: a late start (lead-in
-silence, navigation level 2), a dropped note and an extra note in the audio (assessment
-milestone), a repeated bar (structural ambiguity level 2), and the same five examples
-re-amplified through a speaker and microphone (recording conditions, the parallel track
-APPROACH asks for early).
+silence, navigation level 2), a dropped note and an extra note in the audio, a repeated
+bar (structural ambiguity level 2), and the same five examples re-amplified through a
+speaker and microphone (recording conditions, the parallel track APPROACH asks for
+early).
+
+A dropped or extra note is a **following** question before it is a note-assessment
+one: a musician's mistake does not make the performed route a different piece, and the
+question is whether a follower keeps the route while acoustic support is briefly gone.
+The golden format therefore expresses it now (`abstainable` in §5.2) and the evaluator
+counts it now (§5.3), so that adding those cases later changes no contract. They are
+not in `harness-v1` because the clock follower is perfect on both and they would test
+only the labels; their label semantics is confirmed by the first human-approved
+contract, not by this plan.
 
 ## 5. The contracts
 
@@ -124,9 +136,19 @@ moment of the decision) and `refersTo` (the audio time it describes):
 - `note` — reserved; the shape is fixed (`match | missing | extra | substitution | timing`,
   note id, observed onset and pitch) and the evaluator ignores it at this milestone.
 
-The record is append-only. A later decision with the same or earlier `refersTo`
-supersedes for the as-decided view but never removes the earlier one. Silence is not a
-statement: an audio interval with no decision referring to it is **uncovered**.
+The record is append-only, and the two views it feeds (§5.3) obey four rules:
+
+- **The live estimate persists until replaced.** What the player was shown at `madeAt`
+  stays shown until a later decision with a later or equal `refersTo` arrives. A stale
+  confident claim therefore keeps accruing exposure for as long as it stands.
+- **A historical correction never rewrites what was shown.** A later decision with an
+  earlier `refersTo` appends to the record and changes the hindsight view; it does not
+  remove the earlier decision and it does not touch the live estimate unless it also
+  supplies a decision for the current time.
+- **Revisions stop future exposure, never erase past exposure.** Live correctness and
+  retrospective correctness are reported apart and never netted.
+- **Silence is not a statement.** An audio interval with no decision referring to it is
+  **uncovered**, never an implicit correct abstention.
 
 Chunked, clocked delivery is the runner's job (§7.2), but the interface is shaped so a
 listener cannot ask for more than has been released.
@@ -157,6 +179,11 @@ sets/harness-v1/<example>/
   intervals (one entry at level 1), `route`, and **`answerableFrom`**: the audio time
   from which the interval's state can be established from the audio alone. Regions
   the labels cannot speak for are `unknown` and are neither success nor failure.
+  A supported interval may be marked **`abstainable: true`** (optional, default
+  false): the route continues but no acoustic support for it is present, as across an
+  omitted note or a sustained extra one. There, `unsupported` is an abstention rather
+  than a loss (§5.3). No interval in `harness-v1` is abstainable; the field exists so
+  the dropped-note and extra-note cases named in §4 need no format change.
 - `expected` — the following verdict summary the evaluator should reproduce
   (§9's predictions live here, per example).
 - `profile` — the eight dimensions, each with its level and the actual range
@@ -183,8 +210,11 @@ not, taken as 150 ms into the first beat.
 The evaluator samples audio time on a fixed **50 ms grid** and evaluates two views at
 each grid point:
 
-- **As-decided**: the decision a player would have been shown at that moment, i.e. the
-  latest decision with `madeAt ≤ t` whose `refersTo` is the largest not exceeding `t`.
+- **As-decided**: the decision a player would have been shown at that moment. Among
+  decisions with `madeAt ≤ t`, take the one with the largest `refersTo` not exceeding
+  `t`; among equals, the latest `madeAt`. This is the persistence rule of §5.1 made
+  operational: a decision stands until one with a later or equal `refersTo` arrives,
+  and a backdated correction cannot displace it.
 - **Hindsight**: the final superseding decision for each `refersTo`.
 
 At each grid point in a `supported` interval, at or after `answerableFrom`:
@@ -194,13 +224,17 @@ At each grid point in a `supported` interval, at or after `answerableFrom`:
 | `position`, some candidate within ±0.25 quarter of the true position and the candidate set within the admissible set | **correct** |
 | `position`, a candidate within tolerance but the set wider than admissible | **over-ambiguous** (reported separately, never as correct) |
 | `position`, no candidate within tolerance | **wrong**; its error in quarters is recorded |
-| `unsupported` | **lost** |
+| `unsupported`, interval not `abstainable` | **lost** |
+| `unsupported`, interval `abstainable` | **abstained** (its own column; neither correct nor lost) |
 | nothing | **uncovered** |
 
 In an `unsupported` interval at or after `answerableFrom`: `position` is **false
 following**, `unsupported` is **correct rejection**, nothing is **uncovered**. Before
-`answerableFrom` in either state, any statement is **justified** and is counted in its
-own column; it is neither credited nor charged. In `unknown` regions nothing is counted.
+`answerableFrom` in either state the point is **pending**: any statement is counted in
+the pending column and is neither credited nor charged, but a `position` there with
+confidence ≥ 0.8 is additionally counted as a **confident pending claim**, so a
+listener that guesses before the evidence exists is visible even though it is not
+penalised. In `unknown` regions nothing is counted.
 
 Derived measures, each with its denominator stated in the report:
 
@@ -215,11 +249,15 @@ Derived measures, each with its denominator stated in the report:
   where the truth was supported.
 - **Confidence agreement** — decisions binned by claimed confidence into five bins;
   per bin, the observed fraction correct.
-- **Timeliness** — for each grid point, the delay from `t` to the `madeAt` of the first
-  decision covering it; the fraction exceeding the **decision deadline** (§5.4) is
-  "missed deadlines".
+- **Timeliness** — for each answerable grid point, the delay from `t` to the `madeAt`
+  of the first decision covering it **that the rules above count as correct or as a
+  correct rejection**. A point whose first such decision arrives after the **decision
+  deadline** (§5.4), or never, is a missed deadline; a wrong or absent decision is a
+  missed deadline, not a missing latency observation. Prompt output that says the
+  wrong thing earns nothing here.
 - **Exposure** — the total audio time during which the as-decided view was wrong or
-  false following.
+  false following, plus the longest continuous such episode. It is computed from the
+  as-decided view alone, so a later correction shortens nothing already accrued.
 - **Causality** — pass/fail from the runner's prefix-invariance test (§7.2).
 
 Assessment-accuracy categories are absent and will be added only at the second
@@ -273,10 +311,13 @@ in isolation:
 | `o2-late` | as o1 but every decision made 300 ms after `refersTo` | correct in hindsight, 100 % missed deadlines, as-decided view lags |
 | `o3-silent` | no decisions | 100 % uncovered, nothing charged as wrong |
 | `o4-lost-then-found` | `unsupported` for the second bar's first two beats, then correct | one loss, recovery time 2 s |
-| `o5-false-follow` | o1's record against the silence control | 100 % false following after `answerableFrom`, justified before |
+| `o5-false-follow` | o1's record against the silence control | 100 % false following after `answerableFrom`, pending before; 100 % missed deadlines, because no correct rejection ever arrives |
 | `o6-ambiguous` | two candidates half the time, one of them true, on a golden admitting only one | over-ambiguous counted apart from correct |
 | `o7-revised` | a wrong decision superseded 100 ms later by a correct one | hindsight correct, as-decided exposure of 100 ms, the earlier decision still present |
 | `o8-unknown` | o1 against a golden with an `unknown` middle region | nothing counted in the region, denominators shrink |
+| `o9-abstained` | `unsupported` across one beat marked `abstainable`, correct elsewhere | abstained counted apart from lost; no loss episode, zero exposure |
+| `o10-backdated` | a wrong live claim, then a correct decision for an earlier `refersTo` made 300 ms later with no current-time decision | hindsight correct for the earlier time; the live view still shows the wrong claim and exposure keeps accruing until a current-time decision replaces it |
+| `o11-confident-pending` | a `position` at confidence 1 before `answerableFrom` on the silence control, then `unsupported` | pending, not false following; one confident pending claim; correct rejection afterwards |
 
 The oracle's expected counts are committed and tested; a change to any is a versioned
 evaluator change with a ledger row.
@@ -317,10 +358,14 @@ the set version. A frozen set refuses regeneration to a different hash.
 2. Measures wall-clock processing per chunk separately and reports mean, p95, p99,
    the sustained ratio to real time and the maximum backlog had chunks arrived in real
    time. These carry the machine's identity and are declared variable.
-3. **Prefix-invariance test**: takes the first half of the example's audio as the
-   prefix, runs it followed by (a) the true second half and (b) silence, and requires
-   the two decision records to be identical for every decision with `madeAt` inside
-   the prefix. A difference is a causality failure recorded on the run.
+3. **Prefix-invariance test**: cuts the example's audio at three points, chosen from
+   the labels so that one falls inside a sounding note, one exactly at an onset and
+   one inside a silent gap. For each cut it runs the prefix followed by (a) the true
+   remainder and (b) silence of the same length, in **fresh listener instances**, and
+   requires the two decision records to be byte-identical after wall-clock fields are
+   removed, for every decision with `madeAt` inside the prefix, including revisions,
+   abstentions and decision ids. Any difference is a causality failure recorded on the
+   run; nothing that depends on audio after the cut may appear before it.
 4. Pins the candidate id and version, set version, evaluator version, delivery
    conditions and machine into `runs/<run-id>/` alongside the record, the counts and
    the report. No randomness exists at this step; the pin field is present and `null`.
@@ -342,17 +387,20 @@ error is measured and not merely counted.
 
 Each item's done-when is the condition the ledger row records. Items B and C do not
 start until A's documents exist; D, E and F are independent of each other once A is
-done; G needs everything.
+done; G needs everything. R1 is the real-evidence track the structure document runs
+in parallel with the pipeline: it starts once A exists, writes no code, and G does not
+wait for it.
 
 | Item | Delivers | Done when |
 |---|---|---|
 | **A. Contracts** | §5.1–§5.5 documents, `golden.schema.json`, empty `research/` and `ledger.md`, `bench/package.json` with `test`, `generate`, `freeze`, `run`, `report` scripts | The documents cross-reference each other, the schema validates a hand-written golden, and the two research questions in §10 have notes (found or not found) |
-| **B. Evaluator + oracle** | `bench/src/evaluate/`, eight oracle cases with hand-worked counts | `bench test` passes the oracle; every counting rule in §5.3 is hit by at least one case |
+| **B. Evaluator + oracle** | `bench/src/evaluate/`, eleven oracle cases with hand-worked counts | `bench test` passes the oracle; every counting rule in §5.3, including abstained, pending, confident pending and the persistence rule, is hit by at least one case |
 | **C. Report** | `bench/src/report/` | A report renders from `o4` and from the pair (`o1`, `o4`); a failing category is visible above the summary |
 | **D. Scores and set** | `s1`, `s2` documents; the five golden records without audio | `s2` validates against the pinned schema; the profile deviations in §3 and §4 are in the records; the partition registry says "development only" |
 | **E. Generator** | `sine-v1` with manifest | `bench generate` writes five WAVs whose note labels match the score walk from `compilePerformance` to the sample; a second `generate` reproduces the hashes |
 | **F. Runner + candidate 0** | `bench/src/run/`, `clock-follower@1` | A run over `o1`'s golden with a scripted listener reproduces `o1`'s record; the prefix test runs |
 | **G. First assessment** | The run of `clock-follower@1` over `harness-v1`, its report, the first ledger row, the set and contracts frozen | The report matches §9 exactly; causality passes; cost figures are recorded with the machine's name |
+| **R1. Evidence inventory** | `research/evidence-inventory.md`: every solo library recording and re-amplification opportunity eligible for the following milestone, with score and route compatibility, anchor precision, rights and access, calibration needs and what is missing | Each candidate source has a row or a reason for exclusion; the note names the first real-source set the next plan could freeze, or says that none exists yet. No golden, no code, no reserved access |
 
 ## 9. Pre-registered predictions for the first run
 
@@ -363,15 +411,18 @@ Written before the run and committed with the plan. The evaluator's grid is 50 m
 |---|---|---|---|---|---|---|---|---|
 | p1 | 100 % of answerable points | 0 | n/a | 0 | 0 | 0 | 0 s | pass |
 | p2 | 100 % | 0 | n/a | 0 | 0 | 0 | 0 s | pass |
-| c1-silence | n/a | n/a | 100 % of answerable points | n/a | 0 | 0 | full length after 150 ms | pass |
-| c2-wrong-piece | n/a | n/a | 100 % | n/a | 0 | 0 | as c1 | pass |
-| t1-tempo-90 | until the clock and the true position part by more than 0.25 quarter, i.e. through **0.5 s** of audio (clock 0.5 q, truth 0.75 q) | every later point, error rising linearly to 2.5 q at the last release (5.0 s: truth 7.5 q, clock 5.0 q) | n/a | 0 | 0 | 0 | 4.5 s | pass |
+| c1-silence | n/a | n/a | 100 % of answerable points | n/a | 0 | **100 %**: no correct rejection ever arrives | full length after 150 ms | pass |
+| c2-wrong-piece | n/a | n/a | 100 % | n/a | 0 | **100 %** | as c1 | pass |
+| t1-tempo-90 | until the clock and the true position part by more than 0.25 quarter, i.e. through **0.5 s** of audio (clock 0.5 q, truth 0.75 q) | every later point, error rising linearly to 2.5 q at the last release (5.0 s: truth 7.5 q, clock 5.0 q) | n/a | 0 | 0 | every point after 0.5 s, the same set as Wrong | 4.5 s | pass |
 
 Confidence agreement: one bin (1.0) with an observed correct fraction equal to the
-weighted share of p1/p2/t1-early points among all position claims. Timeliness: every
-decision is made at the chunk that releases its `refersTo`, so delay is 0 to 10 ms and
-no deadline is missed. Cost: unmeasurable in effect; the run records whatever the
-machine reports, marked provisional.
+weighted share of p1/p2/t1-early points among all position claims. Confident pending
+claims: every pending point on every example, since the clock claims at confidence 1
+from the first chunk. Timeliness: every decision is made at the chunk that releases
+its `refersTo`, so delay is 0 to 10 ms wherever the decision is correct; on p1 and p2
+no deadline is missed, and on the controls every deadline is, because timeliness
+counts correct decisions only. Cost: unmeasurable in effect; the run records whatever
+the machine reports, marked provisional.
 
 If the numbers differ, the ledger row says which piece was wrong and the fix is a
 versioned change to that piece. The candidate is not touched.
@@ -405,6 +456,13 @@ pipeline is for:
   matched note. Expected to match candidate 0 on p1/p2, reject c1 and c2 after their
   `answerableFrom`, and follow t1. That expectation is the hypothesis, and its
   contradicting evidence is any false following on c1 or c2.
+- **A harmonic generator, `partials-v1`**: the same five examples with partials 1–5
+  at amplitudes proportional to 1/k, the same envelope, normalised to the sine
+  counterpart's RMS without clipping. It raises the harmonic dimension to level 2 with
+  everything else at level 1, as APPROACH asks, and it is the cheapest early warning
+  that a single-peak follower is reading the fundamental and not the loudest partial.
+  It is a probe of this generator, not evidence of real-instrument transfer, and its
+  results are reported apart from the sine set's.
 - **The re-amplified `harness-v1`**: the same five examples through a speaker and a
   microphone, with the delay declared, as the first entry on the recording-conditions
   track APPROACH asks to raise early.
