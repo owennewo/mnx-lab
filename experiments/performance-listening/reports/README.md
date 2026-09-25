@@ -11,6 +11,7 @@ question are in [the research log](../RESEARCH_LOG.md), not here.
 | 003 | [Recognition at supplied sync](003-recognition-at-sync.html) | [g003-recognition-at-sync](../runs/g003-recognition-at-sync/summary.json) |
 | 004 | [Rung 0: clean Winner](004-rung0-clean-winner.html) | [g004-rung0-clean-winner](../runs/g004-rung0-clean-winner/summary.json) |
 | 005 | [Rung 0: online time-warping comparator](005-online-time-warp-rung0.html) | [g005-oltw-rung0](../runs/g005-oltw-rung0/summary.json) |
+| 006 | [Rung 0: sequence-based support](006-sequence-support-rung0.html) | [g006-sequence-support-rung0](../runs/g006-sequence-support-rung0/summary.json) |
 
 ## One experiment, one file
 

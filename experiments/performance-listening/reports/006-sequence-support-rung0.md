@@ -68,3 +68,70 @@ rerun alongside it and must reproduce their earlier results exactly.
   pre-registered next as experiment 007.
 - **It fails rung 0.** The failure is diagnosed against the categories above before
   any revision.
+
+## Results
+
+Run [g006-sequence-support-rung0](../runs/g006-sequence-support-rung0/summary.json),
+on the pre-registration commit `3276e284`, over the unchanged frozen set
+`winner-ladder-rung0-v1`.
+
+**`online-time-warp@2` passes rung 0**, the first candidate to do so. It meets every
+gate on all three examples. Under the rule fixed above it becomes the incumbent, and
+rung 1 is built next.
+
+### Rung 0, by example
+
+| Candidate | Example | Supported correct | Correct rejection | Exposure | Longest episode | Deadline missed | Failed gates |
+|---|---|---|---|---|---|---|---|
+| oltw@2 | positive | 99.5% | — | 0% | 0 s | 0.5% | none |
+| oltw@2 | wrong-score | — | 97.9% | 2.1% | 0.2 s | 2.1% | none |
+| oltw@2 | silence | — | 100% | 0% | 0 s | 0% | none |
+
+The one positive point it misses is at the start, while it gathers 0.2 s of evidence.
+It claims to follow Dust's score on 4 of 189 wrong-score points, against 77 for
+version 1. Coverage was 100%, every prefix check passed, and processing took about
+14% of real time with a per-chunk p99 of about 1.6 ms.
+
+The four earlier candidates reproduced their recorded rung-0 and thermometer results
+exactly.
+
+### Thermometer
+
+| Real Winner clip | oltw@1 | oltw@2 | Clock |
+|---|---|---|---|
+| Positive: agreement with sync | 67.7% | **12.7%** | 88.4% |
+| Wrong score: correct rejection | 76.2% | 99.5% | 0% |
+| Silence: correct rejection | 100% | 100% | 0% |
+
+On real guitar, version 2 rejects almost everything, the correct score included. This
+is recorded, not used to select, but it is a clear warning about the next rungs.
+
+### Against the predictions
+
+| Prediction | Outcome |
+|---|---|
+| 1. It passes rung 0, missing at most two positive points while it gathers evidence | **Held**: one point missed |
+| 2. Wrong-score rejection of at least 95% | **Held**: 97.9% |
+| 3. On the real clip it rejects the wrong score more often than version 1 | **Held**: 99.5% against 76.2% |
+| 3. On the real clip it still agrees on at least 60% of positive points | **Contradicted**: 12.7% |
+| 4. The earlier candidates reproduce exactly | **Held** |
+
+### What this changes
+
+- **Sequence evidence separates the pieces.** A tempo-consistent path through the
+  wrong score cannot match Winner's audio as well as unconstrained matching can,
+  which answers question 12 for rung 0.
+- **The cost gap is not robust to timbre.** The prediction assumed a timbre mismatch
+  raises every frame's cost evenly. On real guitar it does not: unconstrained
+  matching finds out-of-order reference frames that happen to fit the guitar's
+  harmonics better, so the gap opens even on the correct score. This is the same
+  pattern as finding 23: a follower that rejects the wrong score on real audio may
+  simply be rejecting everything.
+- **The ladder will test this directly.** Rungs 1 to 3 keep sine timbre, so version 2
+  can be measured on tempo, timing and envelope first. The timbre rung is where the
+  gap test must be replaced or recalibrated, and the thermometer says it will need to be.
+
+### Next
+
+Build rung 1, tempo, with development and held-out seeds, and pre-register
+`online-time-warp@2` on it as experiment 007.

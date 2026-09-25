@@ -34,15 +34,14 @@ How to maintain it:
 
 2026-09-25. Development climbs a synthetic ladder before returning to real audio,
 under [development contract 1](contracts/development-contract-1.md). Rung 0, a clean
-and exactly timed rendering of Winner's first four bars, is frozen, and no candidate
-has passed it yet.
+and exactly timed rendering of Winner's first four bars, is frozen.
 
-The spectral followers fail it outright ([experiment 004](reports/004-rung0-clean-winner.html)).
-The online time-warping comparator follows it perfectly but accepts Dust's score for
-Winner's audio too often, because its support test judges single frames, and a lone
-sustained note matches the other piece well ([experiment 005](reports/005-online-time-warp-rung0.html)).
-The next question is whether judging support from the aligned sequence fixes that
-without losing the positive.
+`online-time-warp@2` is the first candidate to pass rung 0 and is the incumbent
+([experiment 006](reports/006-sequence-support-rung0.html)). It judges support by
+comparing its tempo-consistent path with unconstrained frame matching, which rejects
+the wrong score. On the real clip, though, that test rejects almost everything, so it
+is not robust to timbre. Rung 1, tempo, is next; the timbre rung is where the support
+test will be challenged.
 
 ## Findings
 
@@ -77,6 +76,8 @@ ledger row (`ledger.md#<row>`), or a findings write-up.
 | 24 | The development scoreboard reproduces experiment 002's real-clip metrics exactly for all three frozen candidates. | [Run g004 thermometer](runs/g004-rung0-clean-winner/summary.json) | holds | 2026-09-25 | The pipeline is deterministic |
 | 25 | A per-frame support test cannot reject a different piece: single sustained notes shared by Winner and Dust match below the online time-warping follower's threshold on most frames. | [Run g005](ledger.md#g005-oltw-rung0), [report 005](reports/005-online-time-warp-rung0.md#why-the-wrong-score-is-accepted) | holds | 2026-09-25 | Same failure family as finding 23: support judged from the current sound, not the sequence |
 | 26 | Onset-weighted semitone features remove the static templates' exact ties at exact alignment, though repeated passages still leave near-ties. | [Report 005 recognition](reports/005-online-time-warp-rung0.md#recognition-at-exact-labels) | holds | 2026-09-25 | Reference and audio share synthesis on rung 0, so this is an upper bound |
+| 27 | Judging support from the aligned sequence, by comparing the tempo-consistent path with unconstrained frame matching, rejects the wrong score on rung 0 without losing the positive. | [Run g006](ledger.md#g006-sequence-support-rung0), [report 006](reports/006-sequence-support-rung0.md#results) | holds | 2026-09-25 | Answers question 12 for rung 0; reference shares synthesis with the audio |
+| 28 | That path-versus-free cost gap is not robust to timbre: on the real clip it rejects the correct score almost everywhere. | [Report 006 thermometer](reports/006-sequence-support-rung0.md#thermometer) | holds | 2026-09-25 | Thermometer evidence, not used to select; the timbre rung must test it |
 
 
 ## Open questions
@@ -87,9 +88,10 @@ is an identifier given when a question opens and never reused, so citations stay
 
 | Rank | Question | Why it is ranked here | Status | Owner item |
 |---|---|---|---|---|
-| 12 | Does judging support from the aligned sequence, by comparing a tempo-consistent path with unconstrained frame-by-frame matching, reject the wrong score on rung 0 while keeping the positive? | The only rung-0 failure left for the comparator; the comparison is also meant to survive timbre change | open | [Report 005 next](reports/005-online-time-warp-rung0.md#next) |
+| 13 | Does the incumbent follow rung 1, tempo change within 80–120% of the handed tempo, on held-out seeds? | The next rung; the first where the clock floor must fail on the positive | open | [Report 006 next](reports/006-sequence-support-rung0.md#next) |
 | 11 | Which ladder rung first breaks the best candidate, and does recognition at supplied labels fail on that rung too? | Ranks the remaining rungs by the failure they expose | open | [Development contract 1](contracts/development-contract-1.md#the-ladder) |
 | 7 | Can independent source/label checks establish timing bounds for later formal qualification? | Still relevant to stronger claims; explicitly not required for current proxy development | open, deferred to qualification | [Real-evidence preparation](evidence/README.md) |
+| 12 | Does judging support from the aligned sequence, by comparing a tempo-consistent path with unconstrained frame-by-frame matching, reject the wrong score on rung 0 while keeping the positive? | The only rung-0 failure left for the comparator; the comparison is also meant to survive timbre change | answered for rung 0 (finding 27) | [Report 005 next](reports/005-online-time-warp-rung0.md#next) |
 | 10 | Does a causal online time-warping follower with onset-emphasised features pass rung 0 and the tempo rung? | The published standard method is the comparator every home-grown candidate faces; the tempo rung is where the clock floor breaks | answered for rung 0: fails the wrong-score control (finding 25) | [Development contract 1](contracts/development-contract-1.md#candidates) |
 | 9 | Do the frozen spectral followers meet the following gates on rung 0, clean sine audio of Winner bars 1–4? | A failure on exact, clean audio is a tracking defect; it reinterprets 002 before any new candidate | answered (findings 21–23) | [Development contract 1](contracts/development-contract-1.md#candidates) |
 | 8 | At supplied sync alignment, do the frozen templates discriminate the intended passage? | Separates component recognition/confidence from path-selection errors | answered (findings 18–19); diagnostic closed | [Experiment 003](reports/003-recognition-at-sync.html) |

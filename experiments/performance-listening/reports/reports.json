@@ -61,6 +61,19 @@
         "href": "004-rung0-clean-winner.html",
         "label": "Experiment 004"
       }
+    },
+    {
+      "number": "006",
+      "slug": "006-sequence-support-rung0",
+      "title": "006 · Rung 0: sequence-based support",
+      "banner": "Rung 0 passed by online-time-warp@2 · real-clip thermometer warns about timbre",
+      "runs": [
+        "g006-sequence-support-rung0"
+      ],
+      "previous": {
+        "href": "005-online-time-warp-rung0.html",
+        "label": "Experiment 005"
+      }
     }
   ]
 }
