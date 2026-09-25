@@ -11,13 +11,14 @@ example, not a decision.
 The harness has two kinds of piece. **Contracts** are the few things every other piece
 is measured against: the assessment vocabulary, the golden format and the evaluator's
 counting rules. They are written first, changed rarely, and versioned; a contract
-change is an event that invalidates earlier comparisons. **Contents** are everything
+change is an event after which earlier comparisons stand as history but are no
+longer comparable with new ones. **Contents** are everything
 that grows: golden sets, generators, sources, candidates, profiles, research notes and
 experiment records. A content change is a new row in a ledger.
 
-The ordering below follows from one rule: no content is produced until the contract it
-depends on is fixed. Otherwise the first convenient output becomes the contract by
-default.
+The ordering below follows from one rule: exploratory examples may inform a draft
+contract, but a comparison used to retain a candidate requires a frozen one. Otherwise
+the first convenient output becomes the contract by default.
 
 ## The pieces
 
@@ -28,9 +29,10 @@ default.
 A listener receives the intended score and audio delivered in timed chunks under
 declared delivery conditions. It emits decisions, each stamped with the moment it was
 made as well as the musical time it refers to. The first milestone needs three kinds of
-statement: an estimated position with a confidence, a declaration that following is not
-supported, and, later, a note-level verdict (match, missing, extra, substitution,
-timing error). Abstention is a statement, not silence.
+statement: an estimated position with a confidence, which must be able to express
+unresolved ambiguity between positions rather than forcing one; a declaration that
+following is not supported; and, later, a note-level verdict (match, missing, extra,
+substitution, timing error). Abstention is a statement, not silence.
 
 Two properties are built in from the start because they cannot be retrofitted:
 
@@ -41,8 +43,9 @@ Two properties are built in from the start because they cannot be retrofitted:
   one, but the earlier one stays in the record so exposure time of a wrong judgement
   can be counted.
 
-The golden format is this same contract seen from the label side, so the two are
-written together.
+The golden format shares this vocabulary's meanings, so the two are written together,
+but they are not the same contract: reference evidence may be richer, coarser or more
+uncertain than a listener's decision record.
 
 ### 2. Golden format and corpus store
 
@@ -51,10 +54,15 @@ written together.
 Each golden carries the intended score, the actual-performance labels, the expected
 assessment, a complexity profile across the declared dimensions, recording conditions,
 provenance (how each label was obtained and its stated precision), and a partition
-(development, reserved, acceptance). Following labels include the performed route.
-Where the score has repeated material, the expected assessment lists the set of
-positions the audio so far supports rather than a single one, so justified ambiguity
-is rewarded and unsupported certainty is not.
+(development, reserved, acceptance). Following labels include the performed route where it is known.
+
+Labels are allowed to be partial. A label may be exact, bounded by a stated
+uncertainty, a set of positions the audio so far cannot distinguish, or explicitly
+unknown for a region. Where the score has repeated material the expected assessment
+names the equivalent positions rather than one, so justified ambiguity is rewarded and
+unsupported certainty is not. Exhaustive annotation is not required; the evaluator
+measures only the claims the labels can support, and unknown regions count as
+unassessed evidence, not as either success or failure.
 
 A set is frozen once used for comparison; any change to audio or labels is a new
 version. The store also keeps the **partition registry** and a log of every access to
@@ -110,15 +118,23 @@ not new sources.
 Three ingestion routes are foreseen, each recording how its labels were obtained and
 where their precision ends:
 
-- **Library recordings.** Studio's synced scores give performed-bar start times, route
-  included, against real recordings. Ingestion extracts the audio, converts the sync
-  points into bar-level following labels with their stated precision, partitions by
-  piece and performer, and marks the solo-guitar subset apart from the mixed one. The
-  fetched audio stays uncommitted.
+- **Library recordings.** Studio's synced scores anchor performed bars to seconds in
+  real recordings. The anchors reference no particular score version, may be sparse,
+  and may fall inside bars, so ingestion begins with an eligibility check: which score
+  the anchors describe, whether its repeat structure matches the recording's route,
+  which regions are anchored and at what precision. Observed anchors stay
+  distinguishable from positions interpolated between them, and unanchored regions
+  stay unlabelled. Each recording gets its actual complexity profile recorded rather
+  than an assumed one. Ingestion partitions by piece and performer and marks the
+  solo-guitar subset apart from the mixed one. The fetched audio stays uncommitted.
 - **Score perturbation.** Keeping a real recording's audio and altering the score the
-  listener is given yields exact discrepancy and navigation labels on real audio: a
-  removed score note, a changed pitch, an added or removed repeat, an unrelated piece.
-  The recipe is provenance, hidden from the listener.
+  listener is given produces a controlled change to the intended score. The expected
+  discrepancy is exact only where independent performance labels establish the affected
+  events: an unrelated piece or a changed repeat structure is a following control on
+  any bar-labelled recording, but a removed or altered score note is an exact
+  note-level discrepancy only where the recording is independently known to contain
+  that note. Otherwise the example supports a coarser judgement or is partially
+  labelled. The recipe is provenance, hidden from the listener.
 - **Re-amplification.** Generator output played through a speaker and recorded through
   a microphone, with the delay and drift calibrated or declared. This tests recording
   transfer without a player.
@@ -134,17 +150,20 @@ performances.
 The runner delivers audio to a candidate under the declared conditions, records every
 decision with its clock time, measures processing cost including sustained backlog and
 tail latency, performs the prefix-invariance test, and pins the versions of candidate,
-set, evaluator and conditions into the result. Two runs with the same pins produce the
-same record.
+set, evaluator, conditions and any randomness into the result. Two runs with the same
+pins produce the same logical decision record. Timing and cost measurements are
+repeatable rather than identical: they carry their execution conditions and declared
+variability, and a busier machine is not a reproducibility failure.
 
 ### 8. Candidates and comparators
 
 **Owns:** the hypotheses under test.
 
 Every candidate is a versioned, reproducible artefact behind the listener interface.
-The first is a **null follower**: it assumes the score's tempo and advances a clock.
-It exists to prove the pipeline end to end and to be the floor every later candidate
-must clear. The second is an established method from the literature as a comparator.
+The first is a **trivial baseline** that proves the pipeline end to end and sets the
+floor every later candidate must clear; a follower that assumes the score's tempo and
+advances a clock is one example. An **informative external comparator** follows, so
+that the first real hypothesis is measured against something other than the floor.
 From then on, candidates are whatever the loop proposes; no family is preferred.
 
 ### 9. Research contract and ledger
@@ -161,6 +180,21 @@ The **ledger** records every experiment: hypothesis, sources, parent and candida
 data and evaluator versions, results by category, resource use, decision and next
 action. Rejected ideas stay in it.
 
+### 9a. Loop driver
+
+**Owns:** deciding what happens next, traceably.
+
+The runner executes, the reports explain, the ledger remembers and the retention rule
+chooses between two candidates. None of them chooses the next question. That
+responsibility is the loop driver: it selects the next question from measured failures
+ranked by the contract's priorities, initiates and applies web research, allocates
+experiment and evidence budgets, freezes a candidate before reserved evaluation,
+decides whether to continue, change direction or stop, and resumes an interrupted
+session from the ledger. It is a procedure the LLM executes with its state in the
+ledger, not necessarily a separate component. Its defining requirement is that every
+next action is traceable to the contract, the measured results and the recorded
+research, so that nobody has to read a report and decide.
+
 ### 10. Research notes
 
 **Owns:** what was read and what it motivated.
@@ -173,22 +207,26 @@ experiment it motivates. Unsuccessful searches are notes too.
 
 | Step | Pieces | Done when |
 |---|---|---|
-| Contracts | 1, 2 | The vocabulary, interface and golden format are written and versioned |
+| Contracts | 1, 2, 9 (provisional contract), 10 | The vocabulary, interface and golden format are written and versioned; a provisional research contract names the labels, tolerances and delivery conditions the other pieces must support; provenance and research records exist |
 | Instrument | 3, 4 | The evaluator passes its oracle and a report renders from an oracle case |
-| Pipeline | 5 (harness profile), 7, 8 (null follower) | A run over the harness set produces a report the evaluator and oracle agree with, and the causality check passes |
-| Real evidence | 6 (library recordings, score perturbation) | Solo library recordings are goldens with declared precision; a few are hand-checked; negative controls exist on real audio |
-| Loop | 9, 10 | The first contract is approved; the retention rule runs on two recorded runs |
+| Pipeline | 5 (harness profile), 7, 8 (trivial baseline) | A run over the harness set produces a report the evaluator and oracle agree with, and the causality check passes |
+| Real evidence | 6 (library recordings, score perturbation) | Eligible solo library recordings are goldens with declared precision and unknown regions; a few are hand-checked; following controls exist on real audio |
+| Loop | 9 (retention rule), 9a | The first contract is human-approved; the retention rule runs on two recorded runs; the driver's next action is traceable |
 | Candidates | 8 | The first real hypothesis and a comparator are compared under the contract |
 
 Steps three and four run in parallel. Everything after the last step is the loop
-itself. Re-amplification, sample-based generators, the assessment milestone and a live
-microphone rig arrive once a candidate has been retained on real evidence.
+itself. Further evidence arrives according to the question being tested, not on a fixed
+sequence: re-amplified or microphone evidence may be needed to achieve the first
+retention on real audio, not only after it. Sample-based generators, the assessment
+milestone and a live microphone rig follow the same rule.
 
 ## How the pieces mature
 
 Inputs climb two ladders at once: the synthetic profile ladder, one dimension at a
 time and then in combination, and a real-source track that starts hard on timbre and
-recording conditions while every other dimension stays at level one. Candidates mature
+recording conditions. Re-amplified sets hold every other dimension at level one by
+construction; real performances arrive with whatever profile they actually have, which
+is recorded rather than assumed. Candidates mature
 only by retained comparisons, so their pace is set by the supply of independent
 evidence, not by the supply of ideas. Assessments mature in two steps, following then
 note-level judgement, with the evaluator's categories widening at the milestone

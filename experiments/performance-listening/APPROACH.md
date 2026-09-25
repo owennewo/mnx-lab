@@ -60,14 +60,17 @@ events with observed events:
   score the musician intended to follow.
 - **Library recordings with sync points.** Studio's library holds about ninety Guitar
   Pro scores, each synced to a recording, usually a YouTube video, as a list of
-  performed-bar start times with repeats unrolled. Roughly one in seven is a solo
+  performed-bar anchors with repeats unrolled. Roughly one in seven is a solo
   guitar performance that follows the score closely; the rest have vocals or other
   instruments. The audio is extractable with a little effort. This is following ground
-  truth at bar resolution, route included, from real players on real instruments in
-  real recording conditions, and it costs no new annotation. Its limits are declared,
-  not assumed: sync points were placed by hand or by import, so their precision is
-  bar-level and uneven; scores may carry transcription mistakes; and a solo recording
-  is not guaranteed note-for-note. It says nothing about note onsets or actual pitch,
+  truth at bar resolution, route included where the anchors establish it, from real
+  players on real instruments in real recording conditions, and it costs no new
+  annotation. Its limits are declared, not assumed: anchors may be sparse or sit
+  inside bars and reference no particular score version, so ingestion must establish
+  which score they describe and which regions they support, keeping interpolated
+  positions distinct from observed anchors and unknown regions unlabelled; their
+  precision is bar-level and uneven; scores may carry transcription mistakes; and a
+  solo recording is not guaranteed note-for-note. It says nothing about note onsets or actual pitch,
   so it serves following, not assessment. The mixed recordings are a harder profile,
   other instruments and voices alongside the performer, and remain following evidence
   for later. A label is corrected only when a failure has been traced to it with
@@ -158,12 +161,16 @@ pitches, notes in the wrong order, initially matching playing that diverges, sil
 and background music or metronome bleed. Advancing through a score is not itself
 evidence of following.
 
-Controlled discrepancies do not require new recordings. Keeping a real recording's
-audio and altering the score given to the listener yields exact labels on real audio:
-removing a score note makes the performed note extra, changing a pitch makes a
-substitution, adding or removing a repeat makes a navigation control, and handing
-over a different piece makes an unrelated pair. The perturbation recipe is part of
-the golden's provenance and is hidden from the listener like any other label.
+Controlled discrepancies do not all require new recordings. Keeping a real recording's
+audio and altering the score given to the listener produces a controlled change to
+the intended score. The expected discrepancy is exact only where independent
+performance labels establish the affected events and their correspondence: handing
+over a different piece or altering the repeat structure makes a following control on
+any bar-labelled recording, while removing a score note or changing a pitch is an exact
+note-level discrepancy only where the recording is independently known to contain the
+original note. Otherwise the example supports a coarser judgement or remains partially
+labelled. The perturbation recipe is part of the golden's provenance and is hidden
+from the listener like any other label.
 
 Following labels include the performed route through the score, including repeat
 occurrences, where that route is known. Distinguish hindsight truth from what the
