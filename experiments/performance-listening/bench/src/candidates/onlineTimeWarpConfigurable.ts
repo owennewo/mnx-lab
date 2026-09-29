@@ -19,7 +19,10 @@ export interface OltwConfig {
    * of all reference frames for the same sound. Both also cap the path cost. */
   support: { kind: 'gap' } | { kind: 'rank'; limit: number };
   alwaysClaim?: boolean;
+  /** Diagnostic only: reports the values each support decision used. Never changes one. */
+  trace?: (frame: SupportTrace) => void;
 }
+export interface SupportTrace { clock: number; rows: number; best: number; pathCost: number; freeCost: number; meanRank: number | null; fits: boolean; supported: boolean }
 export const V2_CONFIG: OltwConfig = { label: 'oltw2', endpoint: { kind: 'normalised' }, steps: 'p1', support: { kind: 'gap' } };
 
 /** A step: the predecessor offset and the local costs it adds, as (rows back, columns back,
@@ -101,6 +104,7 @@ export function onlineTimeWarpWith(config: OltwConfig): Listener {
             ? pathCost - freeSum / counted <= MAXIMUM_GAP
             : rankSum / counted <= config.support.limit;
           supported = rows >= MINIMUM_FRAMES && (config.alwaysClaim === true || (fits && pathCost <= MAXIMUM_PATH_COST));
+          config.trace?.({ clock, rows, best, pathCost, freeCost: freeSum / counted, meanRank: config.support.kind === 'rank' ? rankSum / counted : null, fits, supported });
         }
       }
       if (!supported || !rows) return [{ id: `${config.label}-${++id}`, kind: 'unsupported', refersTo: clock, reason: rows < MINIMUM_FRAMES ? 'gathering evidence' : 'path does not fit the recent audio, or silence' } satisfies Emission];
