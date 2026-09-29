@@ -1,0 +1,2885 @@
+{
+  "id": "g015b-decoy-null-traces",
+  "kind": "decoy-null-diagnostic",
+  "preregistration": "reports/015-decoy-null.md",
+  "gitCommit": "21fcc9ec09adbf7d6caf3021081cae3d28750d5d",
+  "sourceHashes": {
+    "bench/src/candidates/clockFollower.ts": "687cbaaed6323594761986370ade1e7c4262fcd02deb4930ba5a0c64c35df5b9",
+    "bench/src/candidates/onlineTimeWarp1.ts": "1f87dbf4ad65ae4ce7c48d8b05b751113e18948148267895a517dfc639f45356",
+    "bench/src/candidates/onlineTimeWarp2.ts": "b64d4adfe14d0d93cc9a32dc8a6d831b2b073efb7c6801eee4c8c94fe34f3c4b",
+    "bench/src/candidates/onlineTimeWarp3.ts": "2147402e7067f3e4b5643b0e2523a243f3c5730e2b1399894ba2177fd3ea7d3d",
+    "bench/src/candidates/onlineTimeWarp7.ts": "716df1c6e45a871618b2c14521c33ce226528af9055c54080e7d22c82fdd799c",
+    "bench/src/candidates/onlineTimeWarpConfigurable.ts": "312c29450533c289f6756fc4e985e3c6b8bed0ba858183e403a2c267000845c6",
+    "bench/src/candidates/spectralFollower1.ts": "e86ef1b9aaf6d1072a9082fe126e0199d0675991740206179db188f194a2486a",
+    "bench/src/candidates/spectralFollower2.ts": "b21fa0dbb735a06561a4004eb8e54368b0c08e35663722257426a1278a812aaa",
+    "bench/src/evaluate/index.ts": "33a85837d638734c01331f1aebb930c764ff7871ab5b9bf45d09c5f6af2cac7d",
+    "bench/src/generate/wav.ts": "a38ae9c13209414f103a2ec75007f2d904919bb2e0a8eaf24d26d9614d94a371",
+    "bench/src/io.ts": "62c62365425f2ca12ebca5290ad5164b851125a55bc45a2d1224a346af5c6a7e",
+    "bench/src/ladder/cache.ts": "c65ad74587983620777fd6dc0860d5d69a60f405d33123c35294a02ab26b5d1c",
+    "bench/src/ladder/candidates.ts": "be019eb08ac15c075eb0e527960868cf07d9697a5ccaafe4fd0a5bbfcda0aaa9",
+    "bench/src/ladder/decoyNullDiagnostic.ts": "7ff66eb390a2d7ee05d1896a634aea86648d0ac4ada2da31160fc6ef20a5524d",
+    "bench/src/ladder/goldens.ts": "f874ae1dc557808a02974ddae59757576beb6a23394834bd253dac109af8d12c",
+    "bench/src/ladder/privateSets.ts": "9845c8b026317f285f1199948098b71a66045041883a14b4a6a950d075047004",
+    "bench/src/ladder/render.ts": "8fede73efbfd588ade8526752c4952fa99c58f80bee33fd88093b94e67f1bda3",
+    "bench/src/ladder/tempo.ts": "eacdf924c635b45cda0d8763fbb79b934c7f67f7a16baaa50815410545143888",
+    "bench/src/proxy/reference.ts": "450adc25b1dd24169b20ea3c1dde3c1a9b8479bae309230b94f635512c04c456",
+    "bench/src/report/index.ts": "f008c0a07feb6b8286d19e1b2da2de022afe300800b78a3c22e198164369285b",
+    "bench/src/run/runner.ts": "c5bd7d90ccaacf1b1382f6663b5ac6f8c1dea930754eecbbf684f27635cb7cf6",
+    "bench/src/seam/legacy.ts": "b833b6949b6e2b25fe0f2e6497f58a80513312951bc2459f58506f71ddd22688",
+    "bench/src/types.ts": "bcb4d528af893a4bcd872360915ff635e9cfc4d26328c4315433293a39fa9744",
+    "bench/src/validate.ts": "c22008ca22f8d196d2425858e85a9e7af885acc7a0dd0b5c41495f32b871e628",
+    "listen/contract.ts": "d5f62d57fd9005c719ce545909223304438bec3cc629c3fd7dbf690e9c435d84",
+    "listen/json.ts": "3f60897cdbb2f4019fc7544eb6485a9081aaf11076eadf0c6e910ba7aa10d11c",
+    "listen/positions.ts": "2cd20b98683df8c45e0a063d3fb028b56c258fc5d693814c88ba08c4623f29c2",
+    "listen/validate.ts": "9c2c326cfd6cdded44033df4428aeb5dc4cc4cbae99bcf65fbcf8ccfd66a4606",
+    "../../src/audio/expression.ts": "7b1efc5c38a046304aeafe0c1b8000f6c1e338d497e4f17a950e38755cf38f06",
+    "../../src/audio/performance.ts": "38058a706c5257294d35a61b90f0f7e44b44c77a8e3faad36fd7dee90dee8a78",
+    "../../src/audio/performanceTypes.ts": "dc5a3663d8e1cb0f3442704588a6773157a500ad64a374123847221f8b261b55",
+    "../../src/audio/pitch.ts": "fc10675a975054f80f136f875aeb252dc053b5ab7355f1fd54f05b0b726ccc75",
+    "../../src/audio/scorePosition.ts": "971a45b0520ebabffd00717f2e028f4061421ec2816cd358e4633c745b9de17a",
+    "../../src/audio/swing.ts": "6dabbb2b53bbb44605efe5674c41a5d7874da3275e562c5d92b83a6e95541073",
+    "../../src/audio/time.ts": "b5ca99070b3d82a9cf073c0512d796f8f014e0472181123998d8eb5a944bc98a",
+    "../../src/audio/timingConventions.ts": "75b4b2c79c82f87fe376fc15d6ef1eb5ca9cd8bbe45cc236f5d0edb2890c9308",
+    "../../src/audio/writtenState.ts": "ff2d2d8118f76a427084f1e7a899eeb82f648619dfde9daa4e3d2b8721d0b405",
+    "../../src/model/durations.ts": "a9edbc6d06fe5587f6616dd008270f0e7440d7f4ebe17b228a49b20283d687a5",
+    "../../src/model/mnx.ts": "9251414ce5b3bc4b3b07c9f69a72eb37538ec76e6d733510013d71e667dbee84",
+    "../../src/model/navigation.ts": "3d4cc4c76813f31aa19fe5d3b90e8603bab8acb0994b5a95a333c5cf868e6376",
+    "../../src/model/noteKeys.ts": "166d89788dc4f22d89dc418e929c99c78c420177eb8ac9908d2012ae289db337",
+    "../../src/model/noteWalk.ts": "386416de4d56116fe42a0cde4553f40698c00692676562641f577c9fc1499ed2",
+    "../../src/model/passes.ts": "fc14af0b5e3ec7aeb421c1ebf21fad1784a8548bdbf4b4f5cf4f2408cf183fb1",
+    "../../src/model/recordingSync.ts": "99d0e5f5cc786249f3657291b5d145059abfeaaa857f0ba3b6bc06483e1959af",
+    "../../src/model/swing.ts": "f1b71101ead4af009e7cb9065298611971145279a90f3be72417fd23d5af01fe",
+    "../../src/model/time.ts": "335406865ea0bed2a76fa635121f09233a8b462aeac66f977c6edd8170d669cc",
+    "reports/015-decoy-null.md": "155cb019a9a839e3f69b8a75305444489fcb7e1583112fb0952fa978e30a2e10"
+  },
+  "investigator": {
+    "model": "Claude Opus 5.5 (1M context)",
+    "tool": "Claude Code"
+  },
+  "machine": {
+    "hostname": "williao-G3-3579",
+    "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+    "cores": 12,
+    "platform": "linux",
+    "arch": "x64",
+    "node": "v22.22.1"
+  },
+  "forwardPath": "online-time-warp@6, alignment and rank trace",
+  "paths": [
+    {
+      "id": "forward-08",
+      "order": "forward",
+      "rotation": 0
+    },
+    {
+      "id": "forward-18",
+      "order": "forward",
+      "rotation": 0.125
+    },
+    {
+      "id": "forward-28",
+      "order": "forward",
+      "rotation": 0.25
+    },
+    {
+      "id": "forward-38",
+      "order": "forward",
+      "rotation": 0.375
+    },
+    {
+      "id": "forward-48",
+      "order": "forward",
+      "rotation": 0.5
+    },
+    {
+      "id": "forward-58",
+      "order": "forward",
+      "rotation": 0.625
+    },
+    {
+      "id": "forward-68",
+      "order": "forward",
+      "rotation": 0.75
+    },
+    {
+      "id": "forward-78",
+      "order": "forward",
+      "rotation": 0.875
+    },
+    {
+      "id": "reverse-08",
+      "order": "reverse",
+      "rotation": 0
+    },
+    {
+      "id": "reverse-18",
+      "order": "reverse",
+      "rotation": 0.125
+    },
+    {
+      "id": "reverse-28",
+      "order": "reverse",
+      "rotation": 0.25
+    },
+    {
+      "id": "reverse-38",
+      "order": "reverse",
+      "rotation": 0.375
+    },
+    {
+      "id": "reverse-48",
+      "order": "reverse",
+      "rotation": 0.5
+    },
+    {
+      "id": "reverse-58",
+      "order": "reverse",
+      "rotation": 0.625
+    },
+    {
+      "id": "reverse-68",
+      "order": "reverse",
+      "rotation": 0.75
+    },
+    {
+      "id": "reverse-78",
+      "order": "reverse",
+      "rotation": 0.875
+    }
+  ],
+  "sets": [
+    {
+      "id": "winner-ladder-rung0-v1",
+      "sha256": "f658adb47d452985bc578c73f96aa22063256e35a32ac8b3aa51cb468c897a79"
+    },
+    {
+      "id": "winner-ladder-rung1-v2",
+      "sha256": "bee05932cf87d8a57cd22185919710427f77e3f1926d3c8eca549f2c8bc1d6d1"
+    },
+    {
+      "id": "winner-ladder-rung2-v1",
+      "sha256": "71211bce7991353b12dfee2a24063f15f1a4e1d2b4b9b0099f6ee54a33c134e2"
+    }
+  ],
+  "proxySha256": "80c8a6358751f356e164f75389dd50d49a2a0da6ad094f95847bd304eb5c5b8b",
+  "earlierFrames": {
+    "path": "/home/williao/dev/mnx-listening-data/ladder-winner-v1/runs/g014b-decoy-traces/frames.json",
+    "sha256": "54a162cc624e8a99833db852f1953aa45c41ed453069351d030ef4342c7830d4"
+  },
+  "cpuSeconds": 429.51841,
+  "aggregate": {
+    "wrongScoreExamples": 9,
+    "winVsReversedStart": 0.4170590372899292,
+    "winVsForwardRotations": 0.42690969612488056,
+    "winVsReversedFamily": 0.45512263869856834,
+    "meanPosition": 0.548261719624597,
+    "bestOfAll": 0.026370266089581155
+  },
+  "perSet": [
+    {
+      "rung": 0,
+      "kind": "positive",
+      "example": "rung-0/positive",
+      "reproducesExperiment014": true,
+      "all": {
+        "frames": 466,
+        "winVsReversedStart": 1,
+        "winVsForwardRotations": 0.9874310239117106,
+        "winVsReversedFamily": 1,
+        "perDecoy": {
+          "forward-18": {
+            "wins": 446,
+            "ties": 20
+          },
+          "forward-28": {
+            "wins": 464,
+            "ties": 2
+          },
+          "forward-38": {
+            "wins": 465,
+            "ties": 1
+          },
+          "forward-48": {
+            "wins": 466,
+            "ties": 0
+          },
+          "forward-58": {
+            "wins": 465,
+            "ties": 1
+          },
+          "forward-68": {
+            "wins": 465,
+            "ties": 1
+          },
+          "forward-78": {
+            "wins": 450,
+            "ties": 16
+          },
+          "reverse-08": {
+            "wins": 466,
+            "ties": 0
+          },
+          "reverse-18": {
+            "wins": 466,
+            "ties": 0
+          },
+          "reverse-28": {
+            "wins": 466,
+            "ties": 0
+          },
+          "reverse-38": {
+            "wins": 466,
+            "ties": 0
+          },
+          "reverse-48": {
+            "wins": 466,
+            "ties": 0
+          },
+          "reverse-58": {
+            "wins": 466,
+            "ties": 0
+          },
+          "reverse-68": {
+            "wins": 466,
+            "ties": 0
+          },
+          "reverse-78": {
+            "wins": 466,
+            "ties": 0
+          }
+        },
+        "meanPosition": 0.002932761087267526,
+        "bestOfAll": 0.944206008583691,
+        "underCap": 1
+      },
+      "correctAlignment": {
+        "frames": 466,
+        "winVsReversedStart": 1,
+        "winVsForwardRotations": 0.9874310239117106,
+        "winVsReversedFamily": 1,
+        "perDecoy": {
+          "forward-18": {
+            "wins": 446,
+            "ties": 20
+          },
+          "forward-28": {
+            "wins": 464,
+            "ties": 2
+          },
+          "forward-38": {
+            "wins": 465,
+            "ties": 1
+          },
+          "forward-48": {
+            "wins": 466,
+            "ties": 0
+          },
+          "forward-58": {
+            "wins": 465,
+            "ties": 1
+          },
+          "forward-68": {
+            "wins": 465,
+            "ties": 1
+          },
+          "forward-78": {
+            "wins": 450,
+            "ties": 16
+          },
+          "reverse-08": {
+            "wins": 466,
+            "ties": 0
+          },
+          "reverse-18": {
+            "wins": 466,
+            "ties": 0
+          },
+          "reverse-28": {
+            "wins": 466,
+            "ties": 0
+          },
+          "reverse-38": {
+            "wins": 466,
+            "ties": 0
+          },
+          "reverse-48": {
+            "wins": 466,
+            "ties": 0
+          },
+          "reverse-58": {
+            "wins": 466,
+            "ties": 0
+          },
+          "reverse-68": {
+            "wins": 466,
+            "ties": 0
+          },
+          "reverse-78": {
+            "wins": 466,
+            "ties": 0
+          }
+        },
+        "meanPosition": 0.002932761087267526,
+        "bestOfAll": 0.944206008583691,
+        "underCap": 1
+      },
+      "byTime": [
+        {
+          "from": 0,
+          "frames": 90,
+          "winVsReversedStart": 1,
+          "winVsForwardRotations": 1,
+          "winVsReversedFamily": 1
+        },
+        {
+          "from": 2,
+          "frames": 100,
+          "winVsReversedStart": 1,
+          "winVsForwardRotations": 0.9942857142857143,
+          "winVsReversedFamily": 1
+        },
+        {
+          "from": 4,
+          "frames": 100,
+          "winVsReversedStart": 1,
+          "winVsForwardRotations": 0.9871428571428571,
+          "winVsReversedFamily": 1
+        },
+        {
+          "from": 6,
+          "frames": 100,
+          "winVsReversedStart": 1,
+          "winVsForwardRotations": 0.98,
+          "winVsReversedFamily": 1
+        },
+        {
+          "from": 8,
+          "frames": 76,
+          "winVsReversedStart": 1,
+          "winVsForwardRotations": 0.9736842105263158,
+          "winVsReversedFamily": 1
+        }
+      ]
+    },
+    {
+      "rung": 0,
+      "kind": "wrong-score",
+      "example": "rung-0/wrong-score",
+      "reproducesExperiment014": true,
+      "all": {
+        "frames": 466,
+        "winVsReversedStart": 0.3197424892703863,
+        "winVsForwardRotations": 0.4331698344573881,
+        "winVsReversedFamily": 0.38599785407725323,
+        "perDecoy": {
+          "forward-18": {
+            "wins": 264,
+            "ties": 1
+          },
+          "forward-28": {
+            "wins": 256,
+            "ties": 0
+          },
+          "forward-38": {
+            "wins": 195,
+            "ties": 0
+          },
+          "forward-48": {
+            "wins": 194,
+            "ties": 0
+          },
+          "forward-58": {
+            "wins": 172,
+            "ties": 0
+          },
+          "forward-68": {
+            "wins": 201,
+            "ties": 39
+          },
+          "forward-78": {
+            "wins": 131,
+            "ties": 175
+          },
+          "reverse-08": {
+            "wins": 149,
+            "ties": 0
+          },
+          "reverse-18": {
+            "wins": 165,
+            "ties": 0
+          },
+          "reverse-28": {
+            "wins": 151,
+            "ties": 0
+          },
+          "reverse-38": {
+            "wins": 170,
+            "ties": 0
+          },
+          "reverse-48": {
+            "wins": 195,
+            "ties": 0
+          },
+          "reverse-58": {
+            "wins": 222,
+            "ties": 0
+          },
+          "reverse-68": {
+            "wins": 180,
+            "ties": 0
+          },
+          "reverse-78": {
+            "wins": 207,
+            "ties": 0
+          }
+        },
+        "meanPosition": 0.5766094420600869,
+        "bestOfAll": 0.002145922746781116,
+        "underCap": 0.9699570815450643
+      },
+      "correctAlignment": null,
+      "byTime": [
+        {
+          "from": 0,
+          "frames": 90,
+          "winVsReversedStart": 0.08888888888888889,
+          "winVsForwardRotations": 0.19047619047619047,
+          "winVsReversedFamily": 0.16527777777777777
+        },
+        {
+          "from": 2,
+          "frames": 100,
+          "winVsReversedStart": 0.35,
+          "winVsForwardRotations": 0.2757142857142857,
+          "winVsReversedFamily": 0.365
+        },
+        {
+          "from": 4,
+          "frames": 100,
+          "winVsReversedStart": 0.24,
+          "winVsForwardRotations": 0.6057142857142858,
+          "winVsReversedFamily": 0.4075
+        },
+        {
+          "from": 6,
+          "frames": 100,
+          "winVsReversedStart": 0.37,
+          "winVsForwardRotations": 0.5528571428571428,
+          "winVsReversedFamily": 0.41875
+        },
+        {
+          "from": 8,
+          "frames": 76,
+          "winVsReversedStart": 0.5921052631578947,
+          "winVsForwardRotations": 0.543233082706767,
+          "winVsReversedFamily": 0.6036184210526315
+        }
+      ]
+    },
+    {
+      "rung": 1,
+      "kind": "positive",
+      "example": "rung-1/development-constant-2-positive",
+      "reproducesExperiment014": true,
+      "all": {
+        "frames": 427,
+        "winVsReversedStart": 1,
+        "winVsForwardRotations": 0.9652057544329207,
+        "winVsReversedFamily": 1,
+        "perDecoy": {
+          "forward-18": {
+            "wins": 373,
+            "ties": 42
+          },
+          "forward-28": {
+            "wins": 414,
+            "ties": 7
+          },
+          "forward-38": {
+            "wins": 423,
+            "ties": 4
+          },
+          "forward-48": {
+            "wins": 427,
+            "ties": 0
+          },
+          "forward-58": {
+            "wins": 427,
+            "ties": 0
+          },
+          "forward-68": {
+            "wins": 420,
+            "ties": 4
+          },
+          "forward-78": {
+            "wins": 401,
+            "ties": 16
+          },
+          "reverse-08": {
+            "wins": 427,
+            "ties": 0
+          },
+          "reverse-18": {
+            "wins": 427,
+            "ties": 0
+          },
+          "reverse-28": {
+            "wins": 427,
+            "ties": 0
+          },
+          "reverse-38": {
+            "wins": 427,
+            "ties": 0
+          },
+          "reverse-48": {
+            "wins": 427,
+            "ties": 0
+          },
+          "reverse-58": {
+            "wins": 427,
+            "ties": 0
+          },
+          "reverse-68": {
+            "wins": 427,
+            "ties": 0
+          },
+          "reverse-78": {
+            "wins": 427,
+            "ties": 0
+          }
+        },
+        "meanPosition": 0.010538641686182668,
+        "bestOfAll": 0.8688524590163934,
+        "underCap": 1
+      },
+      "correctAlignment": {
+        "frames": 427,
+        "winVsReversedStart": 1,
+        "winVsForwardRotations": 0.9652057544329207,
+        "winVsReversedFamily": 1,
+        "perDecoy": {
+          "forward-18": {
+            "wins": 373,
+            "ties": 42
+          },
+          "forward-28": {
+            "wins": 414,
+            "ties": 7
+          },
+          "forward-38": {
+            "wins": 423,
+            "ties": 4
+          },
+          "forward-48": {
+            "wins": 427,
+            "ties": 0
+          },
+          "forward-58": {
+            "wins": 427,
+            "ties": 0
+          },
+          "forward-68": {
+            "wins": 420,
+            "ties": 4
+          },
+          "forward-78": {
+            "wins": 401,
+            "ties": 16
+          },
+          "reverse-08": {
+            "wins": 427,
+            "ties": 0
+          },
+          "reverse-18": {
+            "wins": 427,
+            "ties": 0
+          },
+          "reverse-28": {
+            "wins": 427,
+            "ties": 0
+          },
+          "reverse-38": {
+            "wins": 427,
+            "ties": 0
+          },
+          "reverse-48": {
+            "wins": 427,
+            "ties": 0
+          },
+          "reverse-58": {
+            "wins": 427,
+            "ties": 0
+          },
+          "reverse-68": {
+            "wins": 427,
+            "ties": 0
+          },
+          "reverse-78": {
+            "wins": 427,
+            "ties": 0
+          }
+        },
+        "meanPosition": 0.010538641686182668,
+        "bestOfAll": 0.8688524590163934,
+        "underCap": 1
+      },
+      "byTime": [
+        {
+          "from": 0,
+          "frames": 90,
+          "winVsReversedStart": 1,
+          "winVsForwardRotations": 1,
+          "winVsReversedFamily": 1
+        },
+        {
+          "from": 2,
+          "frames": 100,
+          "winVsReversedStart": 1,
+          "winVsForwardRotations": 0.9942857142857143,
+          "winVsReversedFamily": 1
+        },
+        {
+          "from": 4,
+          "frames": 100,
+          "winVsReversedStart": 1,
+          "winVsForwardRotations": 0.96,
+          "winVsReversedFamily": 1
+        },
+        {
+          "from": 6,
+          "frames": 100,
+          "winVsReversedStart": 1,
+          "winVsForwardRotations": 0.9214285714285714,
+          "winVsReversedFamily": 1
+        },
+        {
+          "from": 8,
+          "frames": 37,
+          "winVsReversedStart": 1,
+          "winVsForwardRotations": 0.9343629343629344,
+          "winVsReversedFamily": 1
+        }
+      ]
+    },
+    {
+      "rung": 1,
+      "kind": "wrong-score",
+      "example": "rung-1/development-constant-2-wrong-score",
+      "reproducesExperiment014": true,
+      "all": {
+        "frames": 427,
+        "winVsReversedStart": 0.3559718969555035,
+        "winVsForwardRotations": 0.44764135162261626,
+        "winVsReversedFamily": 0.4218384074941452,
+        "perDecoy": {
+          "forward-18": {
+            "wins": 163,
+            "ties": 50
+          },
+          "forward-28": {
+            "wins": 263,
+            "ties": 0
+          },
+          "forward-38": {
+            "wins": 216,
+            "ties": 0
+          },
+          "forward-48": {
+            "wins": 217,
+            "ties": 0
+          },
+          "forward-58": {
+            "wins": 171,
+            "ties": 0
+          },
+          "forward-68": {
+            "wins": 217,
+            "ties": 0
+          },
+          "forward-78": {
+            "wins": 91,
+            "ties": 205
+          },
+          "reverse-08": {
+            "wins": 152,
+            "ties": 0
+          },
+          "reverse-18": {
+            "wins": 174,
+            "ties": 0
+          },
+          "reverse-28": {
+            "wins": 158,
+            "ties": 0
+          },
+          "reverse-38": {
+            "wins": 167,
+            "ties": 0
+          },
+          "reverse-48": {
+            "wins": 197,
+            "ties": 0
+          },
+          "reverse-58": {
+            "wins": 213,
+            "ties": 0
+          },
+          "reverse-68": {
+            "wins": 175,
+            "ties": 0
+          },
+          "reverse-78": {
+            "wins": 205,
+            "ties": 0
+          }
+        },
+        "meanPosition": 0.5462138953942219,
+        "bestOfAll": 0.00468384074941452,
+        "underCap": 0.9578454332552693
+      },
+      "correctAlignment": null,
+      "byTime": [
+        {
+          "from": 0,
+          "frames": 90,
+          "winVsReversedStart": 0.06666666666666667,
+          "winVsForwardRotations": 0.16666666666666666,
+          "winVsReversedFamily": 0.15555555555555556
+        },
+        {
+          "from": 2,
+          "frames": 100,
+          "winVsReversedStart": 0.31,
+          "winVsForwardRotations": 0.3842857142857143,
+          "winVsReversedFamily": 0.33375
+        },
+        {
+          "from": 4,
+          "frames": 100,
+          "winVsReversedStart": 0.43,
+          "winVsForwardRotations": 0.7114285714285714,
+          "winVsReversedFamily": 0.51125
+        },
+        {
+          "from": 6,
+          "frames": 100,
+          "winVsReversedStart": 0.35,
+          "winVsForwardRotations": 0.4785714285714286,
+          "winVsReversedFamily": 0.47
+        },
+        {
+          "from": 8,
+          "frames": 37,
+          "winVsReversedStart": 1,
+          "winVsForwardRotations": 0.5057915057915058,
+          "winVsReversedFamily": 0.9358108108108109
+        }
+      ]
+    },
+    {
+      "rung": 1,
+      "kind": "positive",
+      "example": "rung-1/development-drift-5-positive",
+      "reproducesExperiment014": true,
+      "all": {
+        "frames": 450,
+        "winVsReversedStart": 1,
+        "winVsForwardRotations": 0.9606349206349206,
+        "winVsReversedFamily": 1,
+        "perDecoy": {
+          "forward-18": {
+            "wins": 398,
+            "ties": 31
+          },
+          "forward-28": {
+            "wins": 435,
+            "ties": 10
+          },
+          "forward-38": {
+            "wins": 442,
+            "ties": 6
+          },
+          "forward-48": {
+            "wins": 450,
+            "ties": 0
+          },
+          "forward-58": {
+            "wins": 446,
+            "ties": 4
+          },
+          "forward-68": {
+            "wins": 441,
+            "ties": 4
+          },
+          "forward-78": {
+            "wins": 414,
+            "ties": 20
+          },
+          "reverse-08": {
+            "wins": 450,
+            "ties": 0
+          },
+          "reverse-18": {
+            "wins": 450,
+            "ties": 0
+          },
+          "reverse-28": {
+            "wins": 450,
+            "ties": 0
+          },
+          "reverse-38": {
+            "wins": 450,
+            "ties": 0
+          },
+          "reverse-48": {
+            "wins": 450,
+            "ties": 0
+          },
+          "reverse-58": {
+            "wins": 450,
+            "ties": 0
+          },
+          "reverse-68": {
+            "wins": 450,
+            "ties": 0
+          },
+          "reverse-78": {
+            "wins": 450,
+            "ties": 0
+          }
+        },
+        "meanPosition": 0.012814814814814808,
+        "bestOfAll": 0.8622222222222222,
+        "underCap": 1
+      },
+      "correctAlignment": {
+        "frames": 450,
+        "winVsReversedStart": 1,
+        "winVsForwardRotations": 0.9606349206349206,
+        "winVsReversedFamily": 1,
+        "perDecoy": {
+          "forward-18": {
+            "wins": 398,
+            "ties": 31
+          },
+          "forward-28": {
+            "wins": 435,
+            "ties": 10
+          },
+          "forward-38": {
+            "wins": 442,
+            "ties": 6
+          },
+          "forward-48": {
+            "wins": 450,
+            "ties": 0
+          },
+          "forward-58": {
+            "wins": 446,
+            "ties": 4
+          },
+          "forward-68": {
+            "wins": 441,
+            "ties": 4
+          },
+          "forward-78": {
+            "wins": 414,
+            "ties": 20
+          },
+          "reverse-08": {
+            "wins": 450,
+            "ties": 0
+          },
+          "reverse-18": {
+            "wins": 450,
+            "ties": 0
+          },
+          "reverse-28": {
+            "wins": 450,
+            "ties": 0
+          },
+          "reverse-38": {
+            "wins": 450,
+            "ties": 0
+          },
+          "reverse-48": {
+            "wins": 450,
+            "ties": 0
+          },
+          "reverse-58": {
+            "wins": 450,
+            "ties": 0
+          },
+          "reverse-68": {
+            "wins": 450,
+            "ties": 0
+          },
+          "reverse-78": {
+            "wins": 450,
+            "ties": 0
+          }
+        },
+        "meanPosition": 0.012814814814814808,
+        "bestOfAll": 0.8622222222222222,
+        "underCap": 1
+      },
+      "byTime": [
+        {
+          "from": 0,
+          "frames": 90,
+          "winVsReversedStart": 1,
+          "winVsForwardRotations": 1,
+          "winVsReversedFamily": 1
+        },
+        {
+          "from": 2,
+          "frames": 100,
+          "winVsReversedStart": 1,
+          "winVsForwardRotations": 0.9928571428571429,
+          "winVsReversedFamily": 1
+        },
+        {
+          "from": 4,
+          "frames": 100,
+          "winVsReversedStart": 1,
+          "winVsForwardRotations": 0.9628571428571429,
+          "winVsReversedFamily": 1
+        },
+        {
+          "from": 6,
+          "frames": 100,
+          "winVsReversedStart": 1,
+          "winVsForwardRotations": 0.9214285714285714,
+          "winVsReversedFamily": 1
+        },
+        {
+          "from": 8,
+          "frames": 60,
+          "winVsReversedStart": 1,
+          "winVsForwardRotations": 0.9095238095238095,
+          "winVsReversedFamily": 1
+        }
+      ]
+    },
+    {
+      "rung": 1,
+      "kind": "wrong-score",
+      "example": "rung-1/development-drift-5-wrong-score",
+      "reproducesExperiment014": true,
+      "all": {
+        "frames": 450,
+        "winVsReversedStart": 0.32222222222222224,
+        "winVsForwardRotations": 0.4288888888888889,
+        "winVsReversedFamily": 0.37416666666666665,
+        "perDecoy": {
+          "forward-18": {
+            "wins": 203,
+            "ties": 3
+          },
+          "forward-28": {
+            "wins": 258,
+            "ties": 0
+          },
+          "forward-38": {
+            "wins": 209,
+            "ties": 0
+          },
+          "forward-48": {
+            "wins": 198,
+            "ties": 0
+          },
+          "forward-58": {
+            "wins": 153,
+            "ties": 0
+          },
+          "forward-68": {
+            "wins": 173,
+            "ties": 36
+          },
+          "forward-78": {
+            "wins": 157,
+            "ties": 81
+          },
+          "reverse-08": {
+            "wins": 145,
+            "ties": 0
+          },
+          "reverse-18": {
+            "wins": 156,
+            "ties": 0
+          },
+          "reverse-28": {
+            "wins": 154,
+            "ties": 0
+          },
+          "reverse-38": {
+            "wins": 148,
+            "ties": 0
+          },
+          "reverse-48": {
+            "wins": 186,
+            "ties": 0
+          },
+          "reverse-58": {
+            "wins": 198,
+            "ties": 0
+          },
+          "reverse-68": {
+            "wins": 159,
+            "ties": 0
+          },
+          "reverse-78": {
+            "wins": 201,
+            "ties": 0
+          }
+        },
+        "meanPosition": 0.591407407407408,
+        "bestOfAll": 0.013333333333333334,
+        "underCap": 0.9755555555555555
+      },
+      "correctAlignment": null,
+      "byTime": [
+        {
+          "from": 0,
+          "frames": 90,
+          "winVsReversedStart": 0.07777777777777778,
+          "winVsForwardRotations": 0.18571428571428572,
+          "winVsReversedFamily": 0.1625
+        },
+        {
+          "from": 2,
+          "frames": 100,
+          "winVsReversedStart": 0.43,
+          "winVsForwardRotations": 0.27,
+          "winVsReversedFamily": 0.39625
+        },
+        {
+          "from": 4,
+          "frames": 100,
+          "winVsReversedStart": 0.17,
+          "winVsForwardRotations": 0.5585714285714286,
+          "winVsReversedFamily": 0.30625
+        },
+        {
+          "from": 6,
+          "frames": 100,
+          "winVsReversedStart": 0.31,
+          "winVsForwardRotations": 0.63,
+          "winVsReversedFamily": 0.41
+        },
+        {
+          "from": 8,
+          "frames": 60,
+          "winVsReversedStart": 0.7833333333333333,
+          "winVsForwardRotations": 0.5071428571428571,
+          "winVsReversedFamily": 0.7083333333333334
+        }
+      ]
+    },
+    {
+      "rung": 1,
+      "kind": "positive",
+      "example": "rung-1/held-out-ramp-103-positive",
+      "reproducesExperiment014": true,
+      "all": {
+        "frames": 448,
+        "winVsReversedStart": 1,
+        "winVsForwardRotations": 0.9709821428571429,
+        "winVsReversedFamily": 1,
+        "perDecoy": {
+          "forward-18": {
+            "wins": 409,
+            "ties": 24
+          },
+          "forward-28": {
+            "wins": 443,
+            "ties": 3
+          },
+          "forward-38": {
+            "wins": 445,
+            "ties": 2
+          },
+          "forward-48": {
+            "wins": 448,
+            "ties": 0
+          },
+          "forward-58": {
+            "wins": 445,
+            "ties": 3
+          },
+          "forward-68": {
+            "wins": 440,
+            "ties": 3
+          },
+          "forward-78": {
+            "wins": 415,
+            "ties": 21
+          },
+          "reverse-08": {
+            "wins": 448,
+            "ties": 0
+          },
+          "reverse-18": {
+            "wins": 448,
+            "ties": 0
+          },
+          "reverse-28": {
+            "wins": 448,
+            "ties": 0
+          },
+          "reverse-38": {
+            "wins": 448,
+            "ties": 0
+          },
+          "reverse-48": {
+            "wins": 448,
+            "ties": 0
+          },
+          "reverse-58": {
+            "wins": 448,
+            "ties": 0
+          },
+          "reverse-68": {
+            "wins": 448,
+            "ties": 0
+          },
+          "reverse-78": {
+            "wins": 448,
+            "ties": 0
+          }
+        },
+        "meanPosition": 0.009375000000000003,
+        "bestOfAll": 0.890625,
+        "underCap": 1
+      },
+      "correctAlignment": {
+        "frames": 448,
+        "winVsReversedStart": 1,
+        "winVsForwardRotations": 0.9709821428571429,
+        "winVsReversedFamily": 1,
+        "perDecoy": {
+          "forward-18": {
+            "wins": 409,
+            "ties": 24
+          },
+          "forward-28": {
+            "wins": 443,
+            "ties": 3
+          },
+          "forward-38": {
+            "wins": 445,
+            "ties": 2
+          },
+          "forward-48": {
+            "wins": 448,
+            "ties": 0
+          },
+          "forward-58": {
+            "wins": 445,
+            "ties": 3
+          },
+          "forward-68": {
+            "wins": 440,
+            "ties": 3
+          },
+          "forward-78": {
+            "wins": 415,
+            "ties": 21
+          },
+          "reverse-08": {
+            "wins": 448,
+            "ties": 0
+          },
+          "reverse-18": {
+            "wins": 448,
+            "ties": 0
+          },
+          "reverse-28": {
+            "wins": 448,
+            "ties": 0
+          },
+          "reverse-38": {
+            "wins": 448,
+            "ties": 0
+          },
+          "reverse-48": {
+            "wins": 448,
+            "ties": 0
+          },
+          "reverse-58": {
+            "wins": 448,
+            "ties": 0
+          },
+          "reverse-68": {
+            "wins": 448,
+            "ties": 0
+          },
+          "reverse-78": {
+            "wins": 448,
+            "ties": 0
+          }
+        },
+        "meanPosition": 0.009375000000000003,
+        "bestOfAll": 0.890625,
+        "underCap": 1
+      },
+      "byTime": [
+        {
+          "from": 0,
+          "frames": 90,
+          "winVsReversedStart": 1,
+          "winVsForwardRotations": 1,
+          "winVsReversedFamily": 1
+        },
+        {
+          "from": 2,
+          "frames": 100,
+          "winVsReversedStart": 1,
+          "winVsForwardRotations": 0.9914285714285714,
+          "winVsReversedFamily": 1
+        },
+        {
+          "from": 4,
+          "frames": 100,
+          "winVsReversedStart": 1,
+          "winVsForwardRotations": 0.9671428571428572,
+          "winVsReversedFamily": 1
+        },
+        {
+          "from": 6,
+          "frames": 100,
+          "winVsReversedStart": 1,
+          "winVsForwardRotations": 0.9457142857142857,
+          "winVsReversedFamily": 1
+        },
+        {
+          "from": 8,
+          "frames": 58,
+          "winVsReversedStart": 1,
+          "winVsForwardRotations": 0.9408866995073891,
+          "winVsReversedFamily": 1
+        }
+      ]
+    },
+    {
+      "rung": 1,
+      "kind": "wrong-score",
+      "example": "rung-1/held-out-ramp-103-wrong-score",
+      "reproducesExperiment014": true,
+      "all": {
+        "frames": 448,
+        "winVsReversedStart": 0.3392857142857143,
+        "winVsForwardRotations": 0.3807397959183674,
+        "winVsReversedFamily": 0.3872767857142857,
+        "perDecoy": {
+          "forward-18": {
+            "wins": 199,
+            "ties": 12
+          },
+          "forward-28": {
+            "wins": 203,
+            "ties": 0
+          },
+          "forward-38": {
+            "wins": 155,
+            "ties": 0
+          },
+          "forward-48": {
+            "wins": 164,
+            "ties": 0
+          },
+          "forward-58": {
+            "wins": 168,
+            "ties": 0
+          },
+          "forward-68": {
+            "wins": 178,
+            "ties": 3
+          },
+          "forward-78": {
+            "wins": 127,
+            "ties": 64
+          },
+          "reverse-08": {
+            "wins": 152,
+            "ties": 0
+          },
+          "reverse-18": {
+            "wins": 158,
+            "ties": 0
+          },
+          "reverse-28": {
+            "wins": 149,
+            "ties": 0
+          },
+          "reverse-38": {
+            "wins": 167,
+            "ties": 0
+          },
+          "reverse-48": {
+            "wins": 189,
+            "ties": 0
+          },
+          "reverse-58": {
+            "wins": 212,
+            "ties": 0
+          },
+          "reverse-68": {
+            "wins": 161,
+            "ties": 0
+          },
+          "reverse-78": {
+            "wins": 200,
+            "ties": 0
+          }
+        },
+        "meanPosition": 0.6098958333333339,
+        "bestOfAll": 0.011160714285714286,
+        "underCap": 0.9709821428571429
+      },
+      "correctAlignment": null,
+      "byTime": [
+        {
+          "from": 0,
+          "frames": 90,
+          "winVsReversedStart": 0.03333333333333333,
+          "winVsForwardRotations": 0.2222222222222222,
+          "winVsReversedFamily": 0.15138888888888888
+        },
+        {
+          "from": 2,
+          "frames": 100,
+          "winVsReversedStart": 0.46,
+          "winVsForwardRotations": 0.27714285714285714,
+          "winVsReversedFamily": 0.41625
+        },
+        {
+          "from": 4,
+          "frames": 100,
+          "winVsReversedStart": 0.13,
+          "winVsForwardRotations": 0.42,
+          "winVsReversedFamily": 0.21625
+        },
+        {
+          "from": 6,
+          "frames": 100,
+          "winVsReversedStart": 0.55,
+          "winVsForwardRotations": 0.51,
+          "winVsReversedFamily": 0.6125
+        },
+        {
+          "from": 8,
+          "frames": 58,
+          "winVsReversedStart": 0.603448275862069,
+          "winVsForwardRotations": 0.5147783251231527,
+          "winVsReversedFamily": 0.6099137931034483
+        }
+      ]
+    },
+    {
+      "rung": 2,
+      "kind": "positive",
+      "example": "rung-2/development-tonejs-acoustic-positive",
+      "reproducesExperiment014": true,
+      "all": {
+        "frames": 466,
+        "winVsReversedStart": 1,
+        "winVsForwardRotations": 0.9055793991416309,
+        "winVsReversedFamily": 1,
+        "perDecoy": {
+          "forward-18": {
+            "wins": 327,
+            "ties": 89
+          },
+          "forward-28": {
+            "wins": 436,
+            "ties": 12
+          },
+          "forward-38": {
+            "wins": 455,
+            "ties": 1
+          },
+          "forward-48": {
+            "wins": 466,
+            "ties": 0
+          },
+          "forward-58": {
+            "wins": 458,
+            "ties": 4
+          },
+          "forward-68": {
+            "wins": 440,
+            "ties": 7
+          },
+          "forward-78": {
+            "wins": 372,
+            "ties": 47
+          },
+          "reverse-08": {
+            "wins": 466,
+            "ties": 0
+          },
+          "reverse-18": {
+            "wins": 466,
+            "ties": 0
+          },
+          "reverse-28": {
+            "wins": 466,
+            "ties": 0
+          },
+          "reverse-38": {
+            "wins": 466,
+            "ties": 0
+          },
+          "reverse-48": {
+            "wins": 466,
+            "ties": 0
+          },
+          "reverse-58": {
+            "wins": 466,
+            "ties": 0
+          },
+          "reverse-68": {
+            "wins": 466,
+            "ties": 0
+          },
+          "reverse-78": {
+            "wins": 466,
+            "ties": 0
+          }
+        },
+        "meanPosition": 0.03261802575107292,
+        "bestOfAll": 0.6502145922746781,
+        "underCap": 1
+      },
+      "correctAlignment": {
+        "frames": 452,
+        "winVsReversedStart": 1,
+        "winVsForwardRotations": 0.9064475347661188,
+        "winVsReversedFamily": 1,
+        "perDecoy": {
+          "forward-18": {
+            "wins": 316,
+            "ties": 86
+          },
+          "forward-28": {
+            "wins": 422,
+            "ties": 12
+          },
+          "forward-38": {
+            "wins": 441,
+            "ties": 1
+          },
+          "forward-48": {
+            "wins": 452,
+            "ties": 0
+          },
+          "forward-58": {
+            "wins": 445,
+            "ties": 4
+          },
+          "forward-68": {
+            "wins": 427,
+            "ties": 7
+          },
+          "forward-78": {
+            "wins": 365,
+            "ties": 47
+          },
+          "reverse-08": {
+            "wins": 452,
+            "ties": 0
+          },
+          "reverse-18": {
+            "wins": 452,
+            "ties": 0
+          },
+          "reverse-28": {
+            "wins": 452,
+            "ties": 0
+          },
+          "reverse-38": {
+            "wins": 452,
+            "ties": 0
+          },
+          "reverse-48": {
+            "wins": 452,
+            "ties": 0
+          },
+          "reverse-58": {
+            "wins": 452,
+            "ties": 0
+          },
+          "reverse-68": {
+            "wins": 452,
+            "ties": 0
+          },
+          "reverse-78": {
+            "wins": 452,
+            "ties": 0
+          }
+        },
+        "meanPosition": 0.032079646017699075,
+        "bestOfAll": 0.6570796460176991,
+        "underCap": 1
+      },
+      "byTime": [
+        {
+          "from": 0,
+          "frames": 90,
+          "winVsReversedStart": 1,
+          "winVsForwardRotations": 1,
+          "winVsReversedFamily": 1
+        },
+        {
+          "from": 2,
+          "frames": 100,
+          "winVsReversedStart": 1,
+          "winVsForwardRotations": 0.9685714285714285,
+          "winVsReversedFamily": 1
+        },
+        {
+          "from": 4,
+          "frames": 100,
+          "winVsReversedStart": 1,
+          "winVsForwardRotations": 0.9,
+          "winVsReversedFamily": 1
+        },
+        {
+          "from": 6,
+          "frames": 100,
+          "winVsReversedStart": 1,
+          "winVsForwardRotations": 0.8314285714285714,
+          "winVsReversedFamily": 1
+        },
+        {
+          "from": 8,
+          "frames": 76,
+          "winVsReversedStart": 1,
+          "winVsForwardRotations": 0.8157894736842105,
+          "winVsReversedFamily": 1
+        }
+      ]
+    },
+    {
+      "rung": 2,
+      "kind": "wrong-score",
+      "example": "rung-2/development-tonejs-acoustic-wrong-score",
+      "reproducesExperiment014": true,
+      "all": {
+        "frames": 466,
+        "winVsReversedStart": 0.5858369098712446,
+        "winVsForwardRotations": 0.4184549356223176,
+        "winVsReversedFamily": 0.5112660944206009,
+        "perDecoy": {
+          "forward-18": {
+            "wins": 215,
+            "ties": 0
+          },
+          "forward-28": {
+            "wins": 243,
+            "ties": 0
+          },
+          "forward-38": {
+            "wins": 183,
+            "ties": 0
+          },
+          "forward-48": {
+            "wins": 180,
+            "ties": 0
+          },
+          "forward-58": {
+            "wins": 161,
+            "ties": 0
+          },
+          "forward-68": {
+            "wins": 212,
+            "ties": 0
+          },
+          "forward-78": {
+            "wins": 171,
+            "ties": 28
+          },
+          "reverse-08": {
+            "wins": 273,
+            "ties": 0
+          },
+          "reverse-18": {
+            "wins": 209,
+            "ties": 0
+          },
+          "reverse-28": {
+            "wins": 233,
+            "ties": 0
+          },
+          "reverse-38": {
+            "wins": 240,
+            "ties": 0
+          },
+          "reverse-48": {
+            "wins": 220,
+            "ties": 0
+          },
+          "reverse-58": {
+            "wins": 258,
+            "ties": 0
+          },
+          "reverse-68": {
+            "wins": 221,
+            "ties": 0
+          },
+          "reverse-78": {
+            "wins": 252,
+            "ties": 0
+          }
+        },
+        "meanPosition": 0.5300429184549359,
+        "bestOfAll": 0.07939914163090128,
+        "underCap": 0.907725321888412
+      },
+      "correctAlignment": null,
+      "byTime": [
+        {
+          "from": 0,
+          "frames": 90,
+          "winVsReversedStart": 0.3,
+          "winVsForwardRotations": 0.3333333333333333,
+          "winVsReversedFamily": 0.2861111111111111
+        },
+        {
+          "from": 2,
+          "frames": 100,
+          "winVsReversedStart": 0.71,
+          "winVsForwardRotations": 0.36,
+          "winVsReversedFamily": 0.56125
+        },
+        {
+          "from": 4,
+          "frames": 100,
+          "winVsReversedStart": 0.48,
+          "winVsForwardRotations": 0.3,
+          "winVsReversedFamily": 0.3625
+        },
+        {
+          "from": 6,
+          "frames": 100,
+          "winVsReversedStart": 0.77,
+          "winVsForwardRotations": 0.7585714285714286,
+          "winVsReversedFamily": 0.75625
+        },
+        {
+          "from": 8,
+          "frames": 76,
+          "winVsReversedStart": 0.6578947368421053,
+          "winVsForwardRotations": 0.30451127819548873,
+          "winVsReversedFamily": 0.5855263157894737
+        }
+      ]
+    },
+    {
+      "rung": 2,
+      "kind": "positive",
+      "example": "rung-2/held-out-tonejs-nylon-positive",
+      "reproducesExperiment014": true,
+      "all": {
+        "frames": 466,
+        "winVsReversedStart": 1,
+        "winVsForwardRotations": 0.8381361128142244,
+        "winVsReversedFamily": 0.993293991416309,
+        "perDecoy": {
+          "forward-18": {
+            "wins": 254,
+            "ties": 169
+          },
+          "forward-28": {
+            "wins": 425,
+            "ties": 20
+          },
+          "forward-38": {
+            "wins": 466,
+            "ties": 0
+          },
+          "forward-48": {
+            "wins": 465,
+            "ties": 0
+          },
+          "forward-58": {
+            "wins": 458,
+            "ties": 0
+          },
+          "forward-68": {
+            "wins": 383,
+            "ties": 53
+          },
+          "forward-78": {
+            "wins": 283,
+            "ties": 155
+          },
+          "reverse-08": {
+            "wins": 466,
+            "ties": 0
+          },
+          "reverse-18": {
+            "wins": 466,
+            "ties": 0
+          },
+          "reverse-28": {
+            "wins": 466,
+            "ties": 0
+          },
+          "reverse-38": {
+            "wins": 455,
+            "ties": 0
+          },
+          "reverse-48": {
+            "wins": 455,
+            "ties": 0
+          },
+          "reverse-58": {
+            "wins": 465,
+            "ties": 0
+          },
+          "reverse-68": {
+            "wins": 465,
+            "ties": 0
+          },
+          "reverse-78": {
+            "wins": 465,
+            "ties": 0
+          }
+        },
+        "meanPosition": 0.05071530758226045,
+        "bestOfAll": 0.4978540772532189,
+        "underCap": 1
+      },
+      "correctAlignment": {
+        "frames": 424,
+        "winVsReversedStart": 1,
+        "winVsForwardRotations": 0.8500673854447439,
+        "winVsReversedFamily": 0.9946933962264151,
+        "perDecoy": {
+          "forward-18": {
+            "wins": 238,
+            "ties": 152
+          },
+          "forward-28": {
+            "wins": 385,
+            "ties": 20
+          },
+          "forward-38": {
+            "wins": 424,
+            "ties": 0
+          },
+          "forward-48": {
+            "wins": 424,
+            "ties": 0
+          },
+          "forward-58": {
+            "wins": 421,
+            "ties": 0
+          },
+          "forward-68": {
+            "wins": 356,
+            "ties": 48
+          },
+          "forward-78": {
+            "wins": 275,
+            "ties": 127
+          },
+          "reverse-08": {
+            "wins": 424,
+            "ties": 0
+          },
+          "reverse-18": {
+            "wins": 424,
+            "ties": 0
+          },
+          "reverse-28": {
+            "wins": 424,
+            "ties": 0
+          },
+          "reverse-38": {
+            "wins": 415,
+            "ties": 0
+          },
+          "reverse-48": {
+            "wins": 415,
+            "ties": 0
+          },
+          "reverse-58": {
+            "wins": 424,
+            "ties": 0
+          },
+          "reverse-68": {
+            "wins": 424,
+            "ties": 0
+          },
+          "reverse-78": {
+            "wins": 424,
+            "ties": 0
+          }
+        },
+        "meanPosition": 0.04551886792452834,
+        "bestOfAll": 0.5330188679245284,
+        "underCap": 1
+      },
+      "byTime": [
+        {
+          "from": 0,
+          "frames": 90,
+          "winVsReversedStart": 1,
+          "winVsForwardRotations": 0.9920634920634921,
+          "winVsReversedFamily": 1
+        },
+        {
+          "from": 2,
+          "frames": 100,
+          "winVsReversedStart": 1,
+          "winVsForwardRotations": 0.9342857142857143,
+          "winVsReversedFamily": 1
+        },
+        {
+          "from": 4,
+          "frames": 100,
+          "winVsReversedStart": 1,
+          "winVsForwardRotations": 0.7785714285714286,
+          "winVsReversedFamily": 1
+        },
+        {
+          "from": 6,
+          "frames": 100,
+          "winVsReversedStart": 1,
+          "winVsForwardRotations": 0.6942857142857143,
+          "winVsReversedFamily": 0.96875
+        },
+        {
+          "from": 8,
+          "frames": 76,
+          "winVsReversedStart": 1,
+          "winVsForwardRotations": 0.7969924812030075,
+          "winVsReversedFamily": 1
+        }
+      ]
+    },
+    {
+      "rung": 2,
+      "kind": "wrong-score",
+      "example": "rung-2/held-out-tonejs-nylon-wrong-score",
+      "reproducesExperiment014": true,
+      "all": {
+        "frames": 466,
+        "winVsReversedStart": 0.5622317596566524,
+        "winVsForwardRotations": 0.41600245248313916,
+        "winVsReversedFamily": 0.5836909871244635,
+        "perDecoy": {
+          "forward-18": {
+            "wins": 193,
+            "ties": 52
+          },
+          "forward-28": {
+            "wins": 209,
+            "ties": 0
+          },
+          "forward-38": {
+            "wins": 182,
+            "ties": 0
+          },
+          "forward-48": {
+            "wins": 215,
+            "ties": 0
+          },
+          "forward-58": {
+            "wins": 211,
+            "ties": 0
+          },
+          "forward-68": {
+            "wins": 170,
+            "ties": 0
+          },
+          "forward-78": {
+            "wins": 177,
+            "ties": 26
+          },
+          "reverse-08": {
+            "wins": 262,
+            "ties": 0
+          },
+          "reverse-18": {
+            "wins": 235,
+            "ties": 0
+          },
+          "reverse-28": {
+            "wins": 255,
+            "ties": 0
+          },
+          "reverse-38": {
+            "wins": 252,
+            "ties": 0
+          },
+          "reverse-48": {
+            "wins": 303,
+            "ties": 0
+          },
+          "reverse-58": {
+            "wins": 301,
+            "ties": 0
+          },
+          "reverse-68": {
+            "wins": 295,
+            "ties": 0
+          },
+          "reverse-78": {
+            "wins": 273,
+            "ties": 0
+          }
+        },
+        "meanPosition": 0.48898426323318966,
+        "bestOfAll": 0.04721030042918455,
+        "underCap": 0.8433476394849786
+      },
+      "correctAlignment": null,
+      "byTime": [
+        {
+          "from": 0,
+          "frames": 90,
+          "winVsReversedStart": 0.3333333333333333,
+          "winVsForwardRotations": 0.2396825396825397,
+          "winVsReversedFamily": 0.25
+        },
+        {
+          "from": 2,
+          "frames": 100,
+          "winVsReversedStart": 0.49,
+          "winVsForwardRotations": 0.4157142857142857,
+          "winVsReversedFamily": 0.54875
+        },
+        {
+          "from": 4,
+          "frames": 100,
+          "winVsReversedStart": 0.54,
+          "winVsForwardRotations": 0.36,
+          "winVsReversedFamily": 0.71375
+        },
+        {
+          "from": 6,
+          "frames": 100,
+          "winVsReversedStart": 0.73,
+          "winVsForwardRotations": 0.6371428571428571,
+          "winVsReversedFamily": 0.71125
+        },
+        {
+          "from": 8,
+          "frames": 76,
+          "winVsReversedStart": 0.7368421052631579,
+          "winVsForwardRotations": 0.40789473684210525,
+          "winVsReversedFamily": 0.6858552631578947
+        }
+      ]
+    },
+    {
+      "rung": 2,
+      "kind": "positive",
+      "example": "rung-2/held-out-tonejs-electric-positive",
+      "reproducesExperiment014": true,
+      "all": {
+        "frames": 466,
+        "winVsReversedStart": 1,
+        "winVsForwardRotations": 0.8727774371551196,
+        "winVsReversedFamily": 0.9975858369098712,
+        "perDecoy": {
+          "forward-18": {
+            "wins": 294,
+            "ties": 64
+          },
+          "forward-28": {
+            "wins": 409,
+            "ties": 7
+          },
+          "forward-38": {
+            "wins": 453,
+            "ties": 0
+          },
+          "forward-48": {
+            "wins": 457,
+            "ties": 0
+          },
+          "forward-58": {
+            "wins": 466,
+            "ties": 0
+          },
+          "forward-68": {
+            "wins": 431,
+            "ties": 5
+          },
+          "forward-78": {
+            "wins": 337,
+            "ties": 49
+          },
+          "reverse-08": {
+            "wins": 466,
+            "ties": 0
+          },
+          "reverse-18": {
+            "wins": 466,
+            "ties": 0
+          },
+          "reverse-28": {
+            "wins": 466,
+            "ties": 0
+          },
+          "reverse-38": {
+            "wins": 466,
+            "ties": 0
+          },
+          "reverse-48": {
+            "wins": 466,
+            "ties": 0
+          },
+          "reverse-58": {
+            "wins": 457,
+            "ties": 0
+          },
+          "reverse-68": {
+            "wins": 466,
+            "ties": 0
+          },
+          "reverse-78": {
+            "wins": 466,
+            "ties": 0
+          }
+        },
+        "meanPosition": 0.0517167381974249,
+        "bestOfAll": 0.5772532188841202,
+        "underCap": 1
+      },
+      "correctAlignment": {
+        "frames": 448,
+        "winVsReversedStart": 1,
+        "winVsForwardRotations": 0.8759566326530612,
+        "winVsReversedFamily": 0.9974888392857143,
+        "perDecoy": {
+          "forward-18": {
+            "wins": 285,
+            "ties": 57
+          },
+          "forward-28": {
+            "wins": 393,
+            "ties": 7
+          },
+          "forward-38": {
+            "wins": 435,
+            "ties": 0
+          },
+          "forward-48": {
+            "wins": 439,
+            "ties": 0
+          },
+          "forward-58": {
+            "wins": 448,
+            "ties": 0
+          },
+          "forward-68": {
+            "wins": 414,
+            "ties": 5
+          },
+          "forward-78": {
+            "wins": 333,
+            "ties": 44
+          },
+          "reverse-08": {
+            "wins": 448,
+            "ties": 0
+          },
+          "reverse-18": {
+            "wins": 448,
+            "ties": 0
+          },
+          "reverse-28": {
+            "wins": 448,
+            "ties": 0
+          },
+          "reverse-38": {
+            "wins": 448,
+            "ties": 0
+          },
+          "reverse-48": {
+            "wins": 448,
+            "ties": 0
+          },
+          "reverse-58": {
+            "wins": 439,
+            "ties": 0
+          },
+          "reverse-68": {
+            "wins": 448,
+            "ties": 0
+          },
+          "reverse-78": {
+            "wins": 448,
+            "ties": 0
+          }
+        },
+        "meanPosition": 0.05081845238095239,
+        "bestOfAll": 0.5915178571428571,
+        "underCap": 1
+      },
+      "byTime": [
+        {
+          "from": 0,
+          "frames": 90,
+          "winVsReversedStart": 1,
+          "winVsForwardRotations": 0.973015873015873,
+          "winVsReversedFamily": 0.9875
+        },
+        {
+          "from": 2,
+          "frames": 100,
+          "winVsReversedStart": 1,
+          "winVsForwardRotations": 0.9414285714285714,
+          "winVsReversedFamily": 1
+        },
+        {
+          "from": 4,
+          "frames": 100,
+          "winVsReversedStart": 1,
+          "winVsForwardRotations": 0.83,
+          "winVsReversedFamily": 1
+        },
+        {
+          "from": 6,
+          "frames": 100,
+          "winVsReversedStart": 1,
+          "winVsForwardRotations": 0.8257142857142857,
+          "winVsReversedFamily": 1
+        },
+        {
+          "from": 8,
+          "frames": 76,
+          "winVsReversedStart": 1,
+          "winVsForwardRotations": 0.7819548872180451,
+          "winVsReversedFamily": 1
+        }
+      ]
+    },
+    {
+      "rung": 2,
+      "kind": "wrong-score",
+      "example": "rung-2/held-out-tonejs-electric-wrong-score",
+      "reproducesExperiment014": true,
+      "all": {
+        "frames": 466,
+        "winVsReversedStart": 0.4356223175965665,
+        "winVsForwardRotations": 0.46290619251992643,
+        "winVsReversedFamily": 0.483637339055794,
+        "perDecoy": {
+          "forward-18": {
+            "wins": 163,
+            "ties": 100
+          },
+          "forward-28": {
+            "wins": 268,
+            "ties": 0
+          },
+          "forward-38": {
+            "wins": 210,
+            "ties": 0
+          },
+          "forward-48": {
+            "wins": 189,
+            "ties": 0
+          },
+          "forward-58": {
+            "wins": 222,
+            "ties": 0
+          },
+          "forward-68": {
+            "wins": 219,
+            "ties": 4
+          },
+          "forward-78": {
+            "wins": 239,
+            "ties": 25
+          },
+          "reverse-08": {
+            "wins": 203,
+            "ties": 0
+          },
+          "reverse-18": {
+            "wins": 202,
+            "ties": 0
+          },
+          "reverse-28": {
+            "wins": 174,
+            "ties": 0
+          },
+          "reverse-38": {
+            "wins": 219,
+            "ties": 0
+          },
+          "reverse-48": {
+            "wins": 250,
+            "ties": 0
+          },
+          "reverse-58": {
+            "wins": 291,
+            "ties": 0
+          },
+          "reverse-68": {
+            "wins": 211,
+            "ties": 0
+          },
+          "reverse-78": {
+            "wins": 253,
+            "ties": 0
+          }
+        },
+        "meanPosition": 0.5168097281831192,
+        "bestOfAll": 0.006437768240343348,
+        "underCap": 0.3669527896995708
+      },
+      "correctAlignment": null,
+      "byTime": [
+        {
+          "from": 0,
+          "frames": 90,
+          "winVsReversedStart": 0.23333333333333334,
+          "winVsForwardRotations": 0.273015873015873,
+          "winVsReversedFamily": 0.325
+        },
+        {
+          "from": 2,
+          "frames": 100,
+          "winVsReversedStart": 0.39,
+          "winVsForwardRotations": 0.3385714285714286,
+          "winVsReversedFamily": 0.46625
+        },
+        {
+          "from": 4,
+          "frames": 100,
+          "winVsReversedStart": 0.28,
+          "winVsForwardRotations": 0.4942857142857143,
+          "winVsReversedFamily": 0.49625
+        },
+        {
+          "from": 6,
+          "frames": 100,
+          "winVsReversedStart": 0.63,
+          "winVsForwardRotations": 0.6957142857142857,
+          "winVsReversedFamily": 0.56
+        },
+        {
+          "from": 8,
+          "frames": 76,
+          "winVsReversedStart": 0.6842105263157895,
+          "winVsForwardRotations": 0.5037593984962406,
+          "winVsReversedFamily": 0.5773026315789473
+        }
+      ]
+    },
+    {
+      "rung": 2,
+      "kind": "positive",
+      "example": "rung-2/held-out-shinyguitar-positive",
+      "reproducesExperiment014": true,
+      "all": {
+        "frames": 466,
+        "winVsReversedStart": 0.9742489270386266,
+        "winVsForwardRotations": 0.8200490496627836,
+        "winVsReversedFamily": 0.9863197424892703,
+        "perDecoy": {
+          "forward-18": {
+            "wins": 269,
+            "ties": 123
+          },
+          "forward-28": {
+            "wins": 404,
+            "ties": 31
+          },
+          "forward-38": {
+            "wins": 438,
+            "ties": 5
+          },
+          "forward-48": {
+            "wins": 448,
+            "ties": 0
+          },
+          "forward-58": {
+            "wins": 452,
+            "ties": 0
+          },
+          "forward-68": {
+            "wins": 372,
+            "ties": 32
+          },
+          "forward-78": {
+            "wins": 292,
+            "ties": 113
+          },
+          "reverse-08": {
+            "wins": 454,
+            "ties": 0
+          },
+          "reverse-18": {
+            "wins": 452,
+            "ties": 0
+          },
+          "reverse-28": {
+            "wins": 460,
+            "ties": 0
+          },
+          "reverse-38": {
+            "wins": 460,
+            "ties": 0
+          },
+          "reverse-48": {
+            "wins": 463,
+            "ties": 0
+          },
+          "reverse-58": {
+            "wins": 456,
+            "ties": 0
+          },
+          "reverse-68": {
+            "wins": 466,
+            "ties": 0
+          },
+          "reverse-78": {
+            "wins": 466,
+            "ties": 0
+          }
+        },
+        "meanPosition": 0.06952789699570827,
+        "bestOfAll": 0.5150214592274678,
+        "underCap": 0.9742489270386266
+      },
+      "correctAlignment": {
+        "frames": 409,
+        "winVsReversedStart": 0.9853300733496333,
+        "winVsForwardRotations": 0.8358365351030388,
+        "winVsReversedFamily": 0.992359413202934,
+        "perDecoy": {
+          "forward-18": {
+            "wins": 250,
+            "ties": 112
+          },
+          "forward-28": {
+            "wins": 351,
+            "ties": 31
+          },
+          "forward-38": {
+            "wins": 383,
+            "ties": 5
+          },
+          "forward-48": {
+            "wins": 394,
+            "ties": 0
+          },
+          "forward-58": {
+            "wins": 401,
+            "ties": 0
+          },
+          "forward-68": {
+            "wins": 345,
+            "ties": 26
+          },
+          "forward-78": {
+            "wins": 269,
+            "ties": 103
+          },
+          "reverse-08": {
+            "wins": 403,
+            "ties": 0
+          },
+          "reverse-18": {
+            "wins": 402,
+            "ties": 0
+          },
+          "reverse-28": {
+            "wins": 408,
+            "ties": 0
+          },
+          "reverse-38": {
+            "wins": 408,
+            "ties": 0
+          },
+          "reverse-48": {
+            "wins": 409,
+            "ties": 0
+          },
+          "reverse-58": {
+            "wins": 399,
+            "ties": 0
+          },
+          "reverse-68": {
+            "wins": 409,
+            "ties": 0
+          },
+          "reverse-78": {
+            "wins": 409,
+            "ties": 0
+          }
+        },
+        "meanPosition": 0.05810920945395284,
+        "bestOfAll": 0.5427872860635696,
+        "underCap": 0.980440097799511
+      },
+      "byTime": [
+        {
+          "from": 0,
+          "frames": 90,
+          "winVsReversedStart": 1,
+          "winVsForwardRotations": 0.9523809523809523,
+          "winVsReversedFamily": 0.9861111111111112
+        },
+        {
+          "from": 2,
+          "frames": 100,
+          "winVsReversedStart": 1,
+          "winVsForwardRotations": 0.9442857142857143,
+          "winVsReversedFamily": 1
+        },
+        {
+          "from": 4,
+          "frames": 100,
+          "winVsReversedStart": 0.88,
+          "winVsForwardRotations": 0.6257142857142857,
+          "winVsReversedFamily": 0.955
+        },
+        {
+          "from": 6,
+          "frames": 100,
+          "winVsReversedStart": 1,
+          "winVsForwardRotations": 0.7442857142857143,
+          "winVsReversedFamily": 0.99375
+        },
+        {
+          "from": 8,
+          "frames": 76,
+          "winVsReversedStart": 1,
+          "winVsForwardRotations": 0.8552631578947368,
+          "winVsReversedFamily": 1
+        }
+      ]
+    },
+    {
+      "rung": 2,
+      "kind": "wrong-score",
+      "example": "rung-2/held-out-shinyguitar-wrong-score",
+      "reproducesExperiment014": true,
+      "all": {
+        "frames": 466,
+        "winVsReversedStart": 0.38626609442060084,
+        "winVsForwardRotations": 0.41140404659717966,
+        "winVsReversedFamily": 0.4342811158798283,
+        "perDecoy": {
+          "forward-18": {
+            "wins": 183,
+            "ties": 13
+          },
+          "forward-28": {
+            "wins": 210,
+            "ties": 0
+          },
+          "forward-38": {
+            "wins": 180,
+            "ties": 0
+          },
+          "forward-48": {
+            "wins": 180,
+            "ties": 0
+          },
+          "forward-58": {
+            "wins": 159,
+            "ties": 0
+          },
+          "forward-68": {
+            "wins": 258,
+            "ties": 0
+          },
+          "forward-78": {
+            "wins": 172,
+            "ties": 14
+          },
+          "reverse-08": {
+            "wins": 180,
+            "ties": 0
+          },
+          "reverse-18": {
+            "wins": 175,
+            "ties": 0
+          },
+          "reverse-28": {
+            "wins": 183,
+            "ties": 0
+          },
+          "reverse-38": {
+            "wins": 212,
+            "ties": 0
+          },
+          "reverse-48": {
+            "wins": 264,
+            "ties": 0
+          },
+          "reverse-58": {
+            "wins": 204,
+            "ties": 0
+          },
+          "reverse-68": {
+            "wins": 225,
+            "ties": 0
+          },
+          "reverse-78": {
+            "wins": 176,
+            "ties": 0
+          }
+        },
+        "meanPosition": 0.5744635193133041,
+        "bestOfAll": 0.045064377682403435,
+        "underCap": 0
+      },
+      "correctAlignment": null,
+      "byTime": [
+        {
+          "from": 0,
+          "frames": 90,
+          "winVsReversedStart": 0.23333333333333334,
+          "winVsForwardRotations": 0.14444444444444443,
+          "winVsReversedFamily": 0.15833333333333333
+        },
+        {
+          "from": 2,
+          "frames": 100,
+          "winVsReversedStart": 0.08,
+          "winVsForwardRotations": 0.26857142857142857,
+          "winVsReversedFamily": 0.34375
+        },
+        {
+          "from": 4,
+          "frames": 100,
+          "winVsReversedStart": 0.32,
+          "winVsForwardRotations": 0.5742857142857143,
+          "winVsReversedFamily": 0.5875
+        },
+        {
+          "from": 6,
+          "frames": 100,
+          "winVsReversedStart": 0.61,
+          "winVsForwardRotations": 0.5728571428571428,
+          "winVsReversedFamily": 0.55375
+        },
+        {
+          "from": 8,
+          "frames": 76,
+          "winVsReversedStart": 0.7631578947368421,
+          "winVsForwardRotations": 0.48872180451127817,
+          "winVsReversedFamily": 0.5213815789473685
+        }
+      ]
+    }
+  ],
+  "thermometer": [
+    {
+      "kind": "positive",
+      "example": "thermometer/winner-positive",
+      "reproducesExperiment014": true,
+      "all": {
+        "frames": 466,
+        "winVsReversedStart": 0.9785407725321889,
+        "winVsForwardRotations": 0.8001226241569589,
+        "winVsReversedFamily": 0.9892703862660944,
+        "perDecoy": {
+          "forward-18": {
+            "wins": 209,
+            "ties": 237
+          },
+          "forward-28": {
+            "wins": 415,
+            "ties": 44
+          },
+          "forward-38": {
+            "wins": 437,
+            "ties": 16
+          },
+          "forward-48": {
+            "wins": 465,
+            "ties": 0
+          },
+          "forward-58": {
+            "wins": 461,
+            "ties": 3
+          },
+          "forward-68": {
+            "wins": 351,
+            "ties": 86
+          },
+          "forward-78": {
+            "wins": 272,
+            "ties": 168
+          },
+          "reverse-08": {
+            "wins": 456,
+            "ties": 0
+          },
+          "reverse-18": {
+            "wins": 461,
+            "ties": 0
+          },
+          "reverse-28": {
+            "wins": 461,
+            "ties": 0
+          },
+          "reverse-38": {
+            "wins": 466,
+            "ties": 0
+          },
+          "reverse-48": {
+            "wins": 463,
+            "ties": 0
+          },
+          "reverse-58": {
+            "wins": 459,
+            "ties": 0
+          },
+          "reverse-68": {
+            "wins": 463,
+            "ties": 0
+          },
+          "reverse-78": {
+            "wins": 459,
+            "ties": 0
+          }
+        },
+        "meanPosition": 0.059370529327610916,
+        "bestOfAll": 0.3905579399141631,
+        "underCap": 1
+      },
+      "correctAlignment": {
+        "frames": 325,
+        "winVsReversedStart": 0.9815384615384616,
+        "winVsForwardRotations": 0.8013186813186813,
+        "winVsReversedFamily": 0.9907692307692307,
+        "perDecoy": {
+          "forward-18": {
+            "wins": 151,
+            "ties": 159
+          },
+          "forward-28": {
+            "wins": 300,
+            "ties": 21
+          },
+          "forward-38": {
+            "wins": 310,
+            "ties": 7
+          },
+          "forward-48": {
+            "wins": 324,
+            "ties": 0
+          },
+          "forward-58": {
+            "wins": 320,
+            "ties": 3
+          },
+          "forward-68": {
+            "wins": 232,
+            "ties": 70
+          },
+          "forward-78": {
+            "wins": 186,
+            "ties": 117
+          },
+          "reverse-08": {
+            "wins": 319,
+            "ties": 0
+          },
+          "reverse-18": {
+            "wins": 322,
+            "ties": 0
+          },
+          "reverse-28": {
+            "wins": 322,
+            "ties": 0
+          },
+          "reverse-38": {
+            "wins": 325,
+            "ties": 0
+          },
+          "reverse-48": {
+            "wins": 323,
+            "ties": 0
+          },
+          "reverse-58": {
+            "wins": 321,
+            "ties": 0
+          },
+          "reverse-68": {
+            "wins": 323,
+            "ties": 0
+          },
+          "reverse-78": {
+            "wins": 321,
+            "ties": 0
+          }
+        },
+        "meanPosition": 0.05897435897435891,
+        "bestOfAll": 0.4,
+        "underCap": 1
+      },
+      "byTime": [
+        {
+          "from": 0,
+          "frames": 90,
+          "winVsReversedStart": 1,
+          "winVsForwardRotations": 0.9507936507936507,
+          "winVsReversedFamily": 1
+        },
+        {
+          "from": 2,
+          "frames": 100,
+          "winVsReversedStart": 1,
+          "winVsForwardRotations": 0.9385714285714286,
+          "winVsReversedFamily": 0.995
+        },
+        {
+          "from": 4,
+          "frames": 100,
+          "winVsReversedStart": 0.96,
+          "winVsForwardRotations": 0.7014285714285714,
+          "winVsReversedFamily": 0.97
+        },
+        {
+          "from": 6,
+          "frames": 100,
+          "winVsReversedStart": 0.97,
+          "winVsForwardRotations": 0.71,
+          "winVsReversedFamily": 0.9925
+        },
+        {
+          "from": 8,
+          "frames": 76,
+          "winVsReversedStart": 0.9605263157894737,
+          "winVsForwardRotations": 0.6879699248120301,
+          "winVsReversedFamily": 0.9901315789473685
+        }
+      ]
+    },
+    {
+      "kind": "wrong-score",
+      "example": "thermometer/winner-audio-dust-score",
+      "reproducesExperiment014": true,
+      "all": {
+        "frames": 466,
+        "winVsReversedStart": 0.44635193133047213,
+        "winVsForwardRotations": 0.4429797670141018,
+        "winVsReversedFamily": 0.5139484978540773,
+        "perDecoy": {
+          "forward-18": {
+            "wins": 208,
+            "ties": 71
+          },
+          "forward-28": {
+            "wins": 211,
+            "ties": 9
+          },
+          "forward-38": {
+            "wins": 195,
+            "ties": 0
+          },
+          "forward-48": {
+            "wins": 243,
+            "ties": 0
+          },
+          "forward-58": {
+            "wins": 218,
+            "ties": 1
+          },
+          "forward-68": {
+            "wins": 239,
+            "ties": 1
+          },
+          "forward-78": {
+            "wins": 131,
+            "ties": 187
+          },
+          "reverse-08": {
+            "wins": 208,
+            "ties": 0
+          },
+          "reverse-18": {
+            "wins": 219,
+            "ties": 0
+          },
+          "reverse-28": {
+            "wins": 229,
+            "ties": 0
+          },
+          "reverse-38": {
+            "wins": 245,
+            "ties": 0
+          },
+          "reverse-48": {
+            "wins": 257,
+            "ties": 0
+          },
+          "reverse-58": {
+            "wins": 279,
+            "ties": 0
+          },
+          "reverse-68": {
+            "wins": 242,
+            "ties": 0
+          },
+          "reverse-78": {
+            "wins": 237,
+            "ties": 0
+          }
+        },
+        "meanPosition": 0.4999284692417742,
+        "bestOfAll": 0.027896995708154508,
+        "underCap": 1
+      },
+      "correctAlignment": null,
+      "byTime": [
+        {
+          "from": 0,
+          "frames": 90,
+          "winVsReversedStart": 0.3111111111111111,
+          "winVsForwardRotations": 0.30793650793650795,
+          "winVsReversedFamily": 0.3347222222222222
+        },
+        {
+          "from": 2,
+          "frames": 100,
+          "winVsReversedStart": 0.58,
+          "winVsForwardRotations": 0.46714285714285714,
+          "winVsReversedFamily": 0.6825
+        },
+        {
+          "from": 4,
+          "frames": 100,
+          "winVsReversedStart": 0.42,
+          "winVsForwardRotations": 0.47285714285714286,
+          "winVsReversedFamily": 0.60625
+        },
+        {
+          "from": 6,
+          "frames": 100,
+          "winVsReversedStart": 0.4,
+          "winVsForwardRotations": 0.5528571428571428,
+          "winVsReversedFamily": 0.415
+        },
+        {
+          "from": 8,
+          "frames": 76,
+          "winVsReversedStart": 0.5263157894736842,
+          "winVsForwardRotations": 0.38721804511278196,
+          "winVsReversedFamily": 0.5131578947368421
+        }
+      ]
+    }
+  ],
+  "privateFrames": {
+    "path": "/home/williao/dev/mnx-listening-data/ladder-winner-v1/runs/g015b-decoy-null-traces/frames.json",
+    "sha256": "9846ccfacc896963957ddb9683191efc0c31657e90e01a134729828433b5da98"
+  },
+  "reproducesExperiment014": true
+}

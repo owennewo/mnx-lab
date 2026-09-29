@@ -20,6 +20,7 @@ question are in [the research log](../RESEARCH_LOG.md), not here.
 | 012 | [The Studio seam, verified on the scoreboard](012-seam-verification.html) | [g012-seam-verification](../runs/g012-seam-verification/summary.json) |
 | 013 | [Why the support test rejects correct alignments](013-why-support-rejects.html) | [g013-why-support-rejects](../runs/g013-why-support-rejects/summary.json) |
 | 014 | [Support relative to a reversed reference](014-reversed-decoy-support.html) | [g014a](../runs/g014a-reversed-decoy-support/summary.json), [g014b](../runs/g014b-decoy-traces/summary.json) |
+| 015 | [Is one decoy a null at all?](015-decoy-null.html) | [g015a](../runs/g015a-rotation-reproduce/summary.json), [g015b](../runs/g015b-decoy-null-traces/summary.json) |
 
 ## One experiment, one file
 

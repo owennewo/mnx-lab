@@ -180,6 +180,20 @@
         "href": "013-why-support-rejects.html",
         "label": "Experiment 013"
       }
+    },
+    {
+      "number": "015",
+      "slug": "015-decoy-null",
+      "title": "015 · Is one decoy a null at all?",
+      "banner": "Diagnostic complete · the wrong score's path is exchangeable with its decoys · one decoy is a coin flip",
+      "runs": [
+        "g015a-rotation-reproduce",
+        "g015b-decoy-null-traces"
+      ],
+      "previous": {
+        "href": "014-reversed-decoy-support.html",
+        "label": "Experiment 014"
+      }
     }
   ]
 }
