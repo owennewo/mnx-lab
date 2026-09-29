@@ -38,26 +38,25 @@ How to maintain it:
 
 ## Current state
 
-2026-09-29. Development runs a slim active suite of 19 examples from rungs 0–2 under
+2026-09-29. Development runs the slim active suite under
 [development contract 1](contracts/development-contract-1.md). A candidate that
-saturates it moves on to Winner's bars 5–8.
+saturates it moves on to Winner's bars 5–8; those bars remain unexamined.
 
-`online-time-warp@6` is the incumbent ([experiment 011](reports/011-path-and-support.html)).
-It keeps version 2's alignment and judges support by how highly the path's reference
-frames rank for the current sound. That rejects the wrong score on every guitar and
-passes rungs 0 and 1. It still fails rung 2 on the positives: it rejects correct
-alignments on the harder guitars, and on the real clip it rejects everything. The
-alignment's own bursts remain; letting the path react faster made them worse. The next
-question is how to judge support so that correct alignments on recorded guitar survive and
-the wrong score is still rejected, without a looser fixed limit
-([experiment 013](reports/013-why-support-rejects.html) found the fixed 10% rank limit does
-the rejecting, and its rule forbids simply loosening it).
-Whether favouring a steady tempo reduces the alignment's bursts follows.
+`online-time-warp@6` remains incumbent. It passes the sine rungs and rejects the
+wrong score across recorded guitars, but its fixed rank cutoff refuses correct
+alignments on harder guitars and the real clip. Its alignment bursts also remain.
+[Experiment 014](reports/014-reversed-decoy-support.html) compared the forward path
+with a fitted reversed-reference path. That restored much positive support while
+losing wrong-score rejection and exceeding sustained cost, so the version was rejected.
+The next question is why the wrong score can beat its own reverse on unrelated
+audio: an origin advantage or subsequent sequence fitting. The broader support
+calibration and steady-tempo alignment questions remain open.
 
-The Studio seam is in place ([SEAM.md](SEAM.md) part 1, verified by
-[experiment 012](reports/012-seam-verification.html)). Every scoreboard run now drives the
-candidates through the version-2 listener contract Studio will use, and reproduces the
-same results as before.
+The [Studio seam](SEAM.md) stays verified: experiment 014 reproduced prior results
+and passed its seam checks. No listener was qualified or integrated into Studio.
+The carried-over and resulting plateau, budget and evidence-access state are explicit
+in [report 014](reports/014-reversed-decoy-support.md#resulting-plateau-budgets-and-evidence-access);
+there is no stopping rule currently triggered, and no evidence freshness reset.
 
 ## Findings
 
@@ -107,6 +106,8 @@ ledger row (`ledger.md#<row>`), or a findings write-up.
 | 39 | Judging support by the rank of the path's reference frames rejects the wrong score on every rung-2 guitar and on rungs 0–1, but still rejects correct alignments on the harder guitars and everything on the real clip. | [Report 011 support change](reports/011-path-and-support.md#the-support-change) | holds | 2026-09-25 | Partly answers question 19 |
 | 40 | Running the scoreboard through the Studio seam, with legacy candidates wrapped as version-2 listeners, reproduces every earlier result exactly; Studio's display rule, backend and session draw exactly what the evaluator scores. | [Run g012](ledger.md#g012-seam-verification), [report 012](reports/012-seam-verification.md#results) | holds | 2026-09-25 | SEAM.md part 1; the seam adds no listening claim |
 | 41 | The incumbent's rejection of correct alignments on recorded guitar and on the real clip is the fixed 10% rank limit, not the path-cost cap: correct frames rank in the best 12–17% on average there. | [Run g013](ledger.md#g013-why-support-rejects), [report 013](reports/013-why-support-rejects.md#results) | holds | 2026-09-29 | Answers question 21 |
+| 42 | Beating one fitted reversed-reference path restores positive guitar support but does not establish the intended score: unrelated Winner audio often fits Dust's forward sequence better than its reverse. | [Experiment 014](reports/014-reversed-decoy-support.md#wrong-score-rejection), [rank traces](reports/014-reversed-decoy-support.md#what-the-relative-comparison-admits) | holds | 2026-09-29 | Version 7 rejected; origin bias versus later sequence matching is unresolved; not a rejection of all relative methods |
+| 43 | The reversed-decoy rule's perfect wrong-score rejection on Shinyguitar comes from the unchanged absolute cost cap; its comparison alone admits many frames there. | [Experiment 014 trace](reports/014-reversed-decoy-support.md#what-the-relative-comparison-admits) | holds | 2026-09-29 | A passing control does not establish the proposed support mechanism works |
 
 
 ## Open questions
@@ -117,7 +118,8 @@ is an identifier given when a question opens and never reused, so citations stay
 
 | Rank | Question | Why it is ranked here | Status | Owner item |
 |---|---|---|---|---|
-| 22 | How can support be judged so that it keeps correct alignments on recorded guitar and the real clip and still rejects the wrong score in every timbre, without a looser fixed limit? | The incumbent's largest remaining failure, by finding 41; experiment 013's decision rule forbids a looser fixed number | open | [Report 013 decision](reports/013-why-support-rejects.md#decision) |
+| 23 | What causes the wrong score's forward path to beat its reversed reference on unrelated audio: the fixed start or later sequence matching? | Experiment 014 restores positive support but loses rejection; the decoy's matching opportunity is unresolved | open | [Report 014 next](reports/014-reversed-decoy-support.md#next) |
+| 22 | How can support be judged so that it keeps correct alignments on recorded guitar and the real clip and still rejects the wrong score in every timbre, without a looser fixed limit? | The incumbent's largest remaining failure, by finding 41; the single reversed decoy also fails discrimination (finding 42) | open | [Report 013 decision](reports/013-why-support-rejects.md#decision) |
 | 20 | Does preferring a steady tempo where the audio gives little evidence reduce the alignment's bursts on recorded guitar? | Faster-reacting paths made them worse, so the opposite direction is the next test | open | [Report 011 decision](reports/011-path-and-support.md#decision) |
 | 19 | Can a support test be calibrated across guitars, rejecting Dust without rejecting correct alignments? | The incumbent's other rung-2 defect, and most of its real-clip failure | in progress: wrong-score side solved (finding 39) | [Report 008](reports/008-rung2-guitar-samples.md#the-support-test-is-not-calibrated-across-timbre) |
 | 14 | Does the incumbent pass rung 3, per-note onset jitter up to ±40 ms and chord spread up to 30 ms, on held-out seeds, and does the fast-tempo rejection margin hold? | Deferred until a candidate passes rung 2; jitter blurs the onsets its features rely on | open | [Report 007 next](reports/007-rung1-tempo.md#next) |

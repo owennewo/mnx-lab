@@ -166,6 +166,20 @@
         "href": "012-seam-verification.html",
         "label": "Experiment 012"
       }
+    },
+    {
+      "number": "014",
+      "slug": "014-reversed-decoy-support",
+      "title": "014 · Support relative to a reversed reference",
+      "banner": "Candidate rejected · positive support improves, wrong-score discrimination and sustained cost fail",
+      "runs": [
+        "g014a-reversed-decoy-support",
+        "g014b-decoy-traces"
+      ],
+      "previous": {
+        "href": "013-why-support-rejects.html",
+        "label": "Experiment 013"
+      }
     }
   ]
 }

@@ -1,0 +1,935 @@
+{
+  "id": "g014b-decoy-traces",
+  "kind": "decoy-support-diagnostic",
+  "preregistration": "reports/014-reversed-decoy-support.md",
+  "gitCommit": "b932f7b142cba6fadbd4015a682ab67e400bbde8",
+  "sourceHashes": {
+    "bench/src/candidates/clockFollower.ts": "687cbaaed6323594761986370ade1e7c4262fcd02deb4930ba5a0c64c35df5b9",
+    "bench/src/candidates/onlineTimeWarp1.ts": "1f87dbf4ad65ae4ce7c48d8b05b751113e18948148267895a517dfc639f45356",
+    "bench/src/candidates/onlineTimeWarp2.ts": "b64d4adfe14d0d93cc9a32dc8a6d831b2b073efb7c6801eee4c8c94fe34f3c4b",
+    "bench/src/candidates/onlineTimeWarp3.ts": "2147402e7067f3e4b5643b0e2523a243f3c5730e2b1399894ba2177fd3ea7d3d",
+    "bench/src/candidates/onlineTimeWarp7.ts": "716df1c6e45a871618b2c14521c33ce226528af9055c54080e7d22c82fdd799c",
+    "bench/src/candidates/onlineTimeWarpConfigurable.ts": "b73196f6d80c882fa3b75727ea1df7181b6b2dab6232889320f77bfa77082cfd",
+    "bench/src/candidates/spectralFollower1.ts": "e86ef1b9aaf6d1072a9082fe126e0199d0675991740206179db188f194a2486a",
+    "bench/src/candidates/spectralFollower2.ts": "b21fa0dbb735a06561a4004eb8e54368b0c08e35663722257426a1278a812aaa",
+    "bench/src/evaluate/index.ts": "33a85837d638734c01331f1aebb930c764ff7871ab5b9bf45d09c5f6af2cac7d",
+    "bench/src/generate/wav.ts": "a38ae9c13209414f103a2ec75007f2d904919bb2e0a8eaf24d26d9614d94a371",
+    "bench/src/io.ts": "62c62365425f2ca12ebca5290ad5164b851125a55bc45a2d1224a346af5c6a7e",
+    "bench/src/ladder/cache.ts": "c65ad74587983620777fd6dc0860d5d69a60f405d33123c35294a02ab26b5d1c",
+    "bench/src/ladder/candidates.ts": "be019eb08ac15c075eb0e527960868cf07d9697a5ccaafe4fd0a5bbfcda0aaa9",
+    "bench/src/ladder/decoyDiagnostic.ts": "2478f98840e330935706e7cd3e47b248282ec8b840baacc0006e9e314a2ad5ce",
+    "bench/src/ladder/goldens.ts": "f874ae1dc557808a02974ddae59757576beb6a23394834bd253dac109af8d12c",
+    "bench/src/ladder/privateSets.ts": "9845c8b026317f285f1199948098b71a66045041883a14b4a6a950d075047004",
+    "bench/src/ladder/render.ts": "8fede73efbfd588ade8526752c4952fa99c58f80bee33fd88093b94e67f1bda3",
+    "bench/src/ladder/tempo.ts": "eacdf924c635b45cda0d8763fbb79b934c7f67f7a16baaa50815410545143888",
+    "bench/src/proxy/reference.ts": "450adc25b1dd24169b20ea3c1dde3c1a9b8479bae309230b94f635512c04c456",
+    "bench/src/report/index.ts": "f008c0a07feb6b8286d19e1b2da2de022afe300800b78a3c22e198164369285b",
+    "bench/src/run/runner.ts": "c5bd7d90ccaacf1b1382f6663b5ac6f8c1dea930754eecbbf684f27635cb7cf6",
+    "bench/src/seam/legacy.ts": "b833b6949b6e2b25fe0f2e6497f58a80513312951bc2459f58506f71ddd22688",
+    "bench/src/types.ts": "bcb4d528af893a4bcd872360915ff635e9cfc4d26328c4315433293a39fa9744",
+    "bench/src/validate.ts": "c22008ca22f8d196d2425858e85a9e7af885acc7a0dd0b5c41495f32b871e628",
+    "listen/contract.ts": "d5f62d57fd9005c719ce545909223304438bec3cc629c3fd7dbf690e9c435d84",
+    "listen/json.ts": "3f60897cdbb2f4019fc7544eb6485a9081aaf11076eadf0c6e910ba7aa10d11c",
+    "listen/positions.ts": "2cd20b98683df8c45e0a063d3fb028b56c258fc5d693814c88ba08c4623f29c2",
+    "listen/validate.ts": "9c2c326cfd6cdded44033df4428aeb5dc4cc4cbae99bcf65fbcf8ccfd66a4606",
+    "../../src/audio/expression.ts": "7b1efc5c38a046304aeafe0c1b8000f6c1e338d497e4f17a950e38755cf38f06",
+    "../../src/audio/performance.ts": "38058a706c5257294d35a61b90f0f7e44b44c77a8e3faad36fd7dee90dee8a78",
+    "../../src/audio/performanceTypes.ts": "dc5a3663d8e1cb0f3442704588a6773157a500ad64a374123847221f8b261b55",
+    "../../src/audio/pitch.ts": "fc10675a975054f80f136f875aeb252dc053b5ab7355f1fd54f05b0b726ccc75",
+    "../../src/audio/scorePosition.ts": "971a45b0520ebabffd00717f2e028f4061421ec2816cd358e4633c745b9de17a",
+    "../../src/audio/swing.ts": "6dabbb2b53bbb44605efe5674c41a5d7874da3275e562c5d92b83a6e95541073",
+    "../../src/audio/time.ts": "b5ca99070b3d82a9cf073c0512d796f8f014e0472181123998d8eb5a944bc98a",
+    "../../src/audio/timingConventions.ts": "75b4b2c79c82f87fe376fc15d6ef1eb5ca9cd8bbe45cc236f5d0edb2890c9308",
+    "../../src/audio/writtenState.ts": "ff2d2d8118f76a427084f1e7a899eeb82f648619dfde9daa4e3d2b8721d0b405",
+    "../../src/model/durations.ts": "a9edbc6d06fe5587f6616dd008270f0e7440d7f4ebe17b228a49b20283d687a5",
+    "../../src/model/mnx.ts": "9251414ce5b3bc4b3b07c9f69a72eb37538ec76e6d733510013d71e667dbee84",
+    "../../src/model/navigation.ts": "3d4cc4c76813f31aa19fe5d3b90e8603bab8acb0994b5a95a333c5cf868e6376",
+    "../../src/model/noteKeys.ts": "166d89788dc4f22d89dc418e929c99c78c420177eb8ac9908d2012ae289db337",
+    "../../src/model/noteWalk.ts": "386416de4d56116fe42a0cde4553f40698c00692676562641f577c9fc1499ed2",
+    "../../src/model/passes.ts": "fc14af0b5e3ec7aeb421c1ebf21fad1784a8548bdbf4b4f5cf4f2408cf183fb1",
+    "../../src/model/recordingSync.ts": "99d0e5f5cc786249f3657291b5d145059abfeaaa857f0ba3b6bc06483e1959af",
+    "../../src/model/swing.ts": "f1b71101ead4af009e7cb9065298611971145279a90f3be72417fd23d5af01fe",
+    "../../src/model/time.ts": "335406865ea0bed2a76fa635121f09233a8b462aeac66f977c6edd8170d669cc",
+    "reports/014-reversed-decoy-support.md": "55caee1f71e18eee8bcb1c3cb2ae046d9d38aab445364d77ee8837f42b5d7461"
+  },
+  "investigator": {
+    "model": "GPT-6",
+    "tool": "Codex"
+  },
+  "machine": {
+    "hostname": "williao-G3-3579",
+    "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+    "cores": 12,
+    "platform": "linux",
+    "arch": "x64",
+    "node": "v22.22.1"
+  },
+  "candidate": "online-time-warp@7",
+  "sets": [
+    {
+      "id": "winner-ladder-rung0-v1",
+      "sha256": "f658adb47d452985bc578c73f96aa22063256e35a32ac8b3aa51cb468c897a79"
+    },
+    {
+      "id": "winner-ladder-rung1-v2",
+      "sha256": "bee05932cf87d8a57cd22185919710427f77e3f1926d3c8eca549f2c8bc1d6d1"
+    },
+    {
+      "id": "winner-ladder-rung2-v1",
+      "sha256": "71211bce7991353b12dfee2a24063f15f1a4e1d2b4b9b0099f6ee54a33c134e2"
+    }
+  ],
+  "proxySha256": "80c8a6358751f356e164f75389dd50d49a2a0da6ad094f95847bd304eb5c5b8b",
+  "cpuSeconds": 80.765753,
+  "perSet": [
+    {
+      "rung": 0,
+      "kind": "positive",
+      "example": "rung-0/positive",
+      "alignmentInvariant": {
+        "claimedPositions": 932,
+        "mismatches": 0
+      },
+      "all": {
+        "frames": 466,
+        "forwardBetter": 466,
+        "ties": 0,
+        "reverseBetter": 0,
+        "refusedByComparisonOnly": 0,
+        "refusedByCapOnly": 0,
+        "refusedByBoth": 0,
+        "accepted": 466,
+        "forwardRank": {
+          "p05": 0,
+          "median": 0,
+          "p95": 0
+        },
+        "reverseRank": {
+          "p05": 0.05082105263157895,
+          "median": 0.23978947368421052,
+          "p95": 0.5294736842105262
+        },
+        "rankAdvantage": {
+          "p05": 0.05082105263157895,
+          "median": 0.23978947368421052,
+          "p95": 0.5294736842105262
+        }
+      },
+      "correctAlignment": {
+        "frames": 466,
+        "forwardBetter": 466,
+        "ties": 0,
+        "reverseBetter": 0,
+        "refusedByComparisonOnly": 0,
+        "refusedByCapOnly": 0,
+        "refusedByBoth": 0,
+        "accepted": 466,
+        "forwardRank": {
+          "p05": 0,
+          "median": 0,
+          "p95": 0
+        },
+        "reverseRank": {
+          "p05": 0.05082105263157895,
+          "median": 0.23978947368421052,
+          "p95": 0.5294736842105262
+        },
+        "rankAdvantage": {
+          "p05": 0.05082105263157895,
+          "median": 0.23978947368421052,
+          "p95": 0.5294736842105262
+        }
+      }
+    },
+    {
+      "rung": 0,
+      "kind": "wrong-score",
+      "example": "rung-0/wrong-score",
+      "alignmentInvariant": {
+        "claimedPositions": 298,
+        "mismatches": 0
+      },
+      "all": {
+        "frames": 466,
+        "forwardBetter": 149,
+        "ties": 0,
+        "reverseBetter": 317,
+        "refusedByComparisonOnly": 303,
+        "refusedByCapOnly": 0,
+        "refusedByBoth": 14,
+        "accepted": 149,
+        "forwardRank": {
+          "p05": 0.1277052631578948,
+          "median": 0.298821052631579,
+          "p95": 0.5098947368421052
+        },
+        "reverseRank": {
+          "p05": 0.16252631578947366,
+          "median": 0.26021052631578945,
+          "p95": 0.36631578947368415
+        },
+        "rankAdvantage": {
+          "p05": -0.26231578947368417,
+          "median": -0.05292631578947363,
+          "p95": 0.16917894736842107
+        }
+      },
+      "correctAlignment": null
+    },
+    {
+      "rung": 1,
+      "kind": "positive",
+      "example": "rung-1/development-constant-2-positive",
+      "alignmentInvariant": {
+        "claimedPositions": 854,
+        "mismatches": 0
+      },
+      "all": {
+        "frames": 427,
+        "forwardBetter": 427,
+        "ties": 0,
+        "reverseBetter": 0,
+        "refusedByComparisonOnly": 0,
+        "refusedByCapOnly": 0,
+        "refusedByBoth": 0,
+        "accepted": 427,
+        "forwardRank": {
+          "p05": 0.0019789473684210523,
+          "median": 0.0076210526315789485,
+          "p95": 0.013810526315789471
+        },
+        "reverseRank": {
+          "p05": 0.05566315789473686,
+          "median": 0.23877894736842106,
+          "p95": 0.5361629881154499
+        },
+        "rankAdvantage": {
+          "p05": 0.04867368421052633,
+          "median": 0.2327157894736843,
+          "p95": 0.5263157894736842
+        }
+      },
+      "correctAlignment": {
+        "frames": 427,
+        "forwardBetter": 427,
+        "ties": 0,
+        "reverseBetter": 0,
+        "refusedByComparisonOnly": 0,
+        "refusedByCapOnly": 0,
+        "refusedByBoth": 0,
+        "accepted": 427,
+        "forwardRank": {
+          "p05": 0.0019789473684210523,
+          "median": 0.0076210526315789485,
+          "p95": 0.013810526315789471
+        },
+        "reverseRank": {
+          "p05": 0.05566315789473686,
+          "median": 0.23877894736842106,
+          "p95": 0.5361629881154499
+        },
+        "rankAdvantage": {
+          "p05": 0.04867368421052633,
+          "median": 0.2327157894736843,
+          "p95": 0.5263157894736842
+        }
+      }
+    },
+    {
+      "rung": 1,
+      "kind": "wrong-score",
+      "example": "rung-1/development-constant-2-wrong-score",
+      "alignmentInvariant": {
+        "claimedPositions": 304,
+        "mismatches": 0
+      },
+      "all": {
+        "frames": 427,
+        "forwardBetter": 152,
+        "ties": 0,
+        "reverseBetter": 275,
+        "refusedByComparisonOnly": 257,
+        "refusedByCapOnly": 0,
+        "refusedByBoth": 18,
+        "accepted": 152,
+        "forwardRank": {
+          "p05": 0.12311578947368423,
+          "median": 0.29654736842105267,
+          "p95": 0.5213834586466166
+        },
+        "reverseRank": {
+          "p05": 0.1454847645429363,
+          "median": 0.25528421052631584,
+          "p95": 0.3653894736842103
+        },
+        "rankAdvantage": {
+          "p05": -0.3071578947368423,
+          "median": -0.05284210526315791,
+          "p95": 0.15688421052631585
+        }
+      },
+      "correctAlignment": null
+    },
+    {
+      "rung": 1,
+      "kind": "positive",
+      "example": "rung-1/development-drift-5-positive",
+      "alignmentInvariant": {
+        "claimedPositions": 899,
+        "mismatches": 0
+      },
+      "all": {
+        "frames": 450,
+        "forwardBetter": 450,
+        "ties": 0,
+        "reverseBetter": 0,
+        "refusedByComparisonOnly": 0,
+        "refusedByCapOnly": 0,
+        "refusedByBoth": 0,
+        "accepted": 450,
+        "forwardRank": {
+          "p05": 0.0021894736842105263,
+          "median": 0.005094736842105264,
+          "p95": 0.01056842105263157
+        },
+        "reverseRank": {
+          "p05": 0.05730526315789474,
+          "median": 0.2429052631578947,
+          "p95": 0.5365096952908587
+        },
+        "rankAdvantage": {
+          "p05": 0.05039999999999999,
+          "median": 0.23696842105263152,
+          "p95": 0.5321329639889196
+        }
+      },
+      "correctAlignment": {
+        "frames": 450,
+        "forwardBetter": 450,
+        "ties": 0,
+        "reverseBetter": 0,
+        "refusedByComparisonOnly": 0,
+        "refusedByCapOnly": 0,
+        "refusedByBoth": 0,
+        "accepted": 450,
+        "forwardRank": {
+          "p05": 0.0021894736842105263,
+          "median": 0.005094736842105264,
+          "p95": 0.01056842105263157
+        },
+        "reverseRank": {
+          "p05": 0.05730526315789474,
+          "median": 0.2429052631578947,
+          "p95": 0.5365096952908587
+        },
+        "rankAdvantage": {
+          "p05": 0.05039999999999999,
+          "median": 0.23696842105263152,
+          "p95": 0.5321329639889196
+        }
+      }
+    },
+    {
+      "rung": 1,
+      "kind": "wrong-score",
+      "example": "rung-1/development-drift-5-wrong-score",
+      "alignmentInvariant": {
+        "claimedPositions": 289,
+        "mismatches": 0
+      },
+      "all": {
+        "frames": 450,
+        "forwardBetter": 145,
+        "ties": 0,
+        "reverseBetter": 305,
+        "refusedByComparisonOnly": 294,
+        "refusedByCapOnly": 0,
+        "refusedByBoth": 11,
+        "accepted": 145,
+        "forwardRank": {
+          "p05": 0.12618947368421052,
+          "median": 0.30884210526315786,
+          "p95": 0.5085448916408669
+        },
+        "reverseRank": {
+          "p05": 0.1637894736842105,
+          "median": 0.26408421052631575,
+          "p95": 0.3589052631578947
+        },
+        "rankAdvantage": {
+          "p05": -0.2529554655870445,
+          "median": -0.050231578947368294,
+          "p95": 0.16151578947368417
+        }
+      },
+      "correctAlignment": null
+    },
+    {
+      "rung": 1,
+      "kind": "positive",
+      "example": "rung-1/held-out-ramp-103-positive",
+      "alignmentInvariant": {
+        "claimedPositions": 895,
+        "mismatches": 0
+      },
+      "all": {
+        "frames": 448,
+        "forwardBetter": 448,
+        "ties": 0,
+        "reverseBetter": 0,
+        "refusedByComparisonOnly": 0,
+        "refusedByCapOnly": 0,
+        "refusedByBoth": 0,
+        "accepted": 448,
+        "forwardRank": {
+          "p05": 0.0018947368421052633,
+          "median": 0.006610526315789473,
+          "p95": 0.011999999999999995
+        },
+        "reverseRank": {
+          "p05": 0.05414736842105263,
+          "median": 0.262021052631579,
+          "p95": 0.4912421052631579
+        },
+        "rankAdvantage": {
+          "p05": 0.04846315789473685,
+          "median": 0.2565052631578948,
+          "p95": 0.48471578947368427
+        }
+      },
+      "correctAlignment": {
+        "frames": 448,
+        "forwardBetter": 448,
+        "ties": 0,
+        "reverseBetter": 0,
+        "refusedByComparisonOnly": 0,
+        "refusedByCapOnly": 0,
+        "refusedByBoth": 0,
+        "accepted": 448,
+        "forwardRank": {
+          "p05": 0.0018947368421052633,
+          "median": 0.006610526315789473,
+          "p95": 0.011999999999999995
+        },
+        "reverseRank": {
+          "p05": 0.05414736842105263,
+          "median": 0.262021052631579,
+          "p95": 0.4912421052631579
+        },
+        "rankAdvantage": {
+          "p05": 0.04846315789473685,
+          "median": 0.2565052631578948,
+          "p95": 0.48471578947368427
+        }
+      }
+    },
+    {
+      "rung": 1,
+      "kind": "wrong-score",
+      "example": "rung-1/held-out-ramp-103-wrong-score",
+      "alignmentInvariant": {
+        "claimedPositions": 303,
+        "mismatches": 0
+      },
+      "all": {
+        "frames": 448,
+        "forwardBetter": 152,
+        "ties": 0,
+        "reverseBetter": 296,
+        "refusedByComparisonOnly": 283,
+        "refusedByCapOnly": 0,
+        "refusedByBoth": 13,
+        "accepted": 152,
+        "forwardRank": {
+          "p05": 0.12589473684210525,
+          "median": 0.30825263157894733,
+          "p95": 0.5202105263157895
+        },
+        "reverseRank": {
+          "p05": 0.16366315789473687,
+          "median": 0.26383157894736853,
+          "p95": 0.3804631578947365
+        },
+        "rankAdvantage": {
+          "p05": -0.24981052631578926,
+          "median": -0.055031578947368875,
+          "p95": 0.12698947368421049
+        }
+      },
+      "correctAlignment": null
+    },
+    {
+      "rung": 2,
+      "kind": "positive",
+      "example": "rung-2/development-tonejs-acoustic-positive",
+      "alignmentInvariant": {
+        "claimedPositions": 932,
+        "mismatches": 0
+      },
+      "all": {
+        "frames": 466,
+        "forwardBetter": 466,
+        "ties": 0,
+        "reverseBetter": 0,
+        "refusedByComparisonOnly": 0,
+        "refusedByCapOnly": 0,
+        "refusedByBoth": 0,
+        "accepted": 466,
+        "forwardRank": {
+          "p05": 0.011157894736842106,
+          "median": 0.02534736842105264,
+          "p95": 0.039542334096109834
+        },
+        "reverseRank": {
+          "p05": 0.08842105263157897,
+          "median": 0.2825684210526315,
+          "p95": 0.480336842105263
+        },
+        "rankAdvantage": {
+          "p05": 0.06357894736842107,
+          "median": 0.2548210526315789,
+          "p95": 0.4526315789473685
+        }
+      },
+      "correctAlignment": {
+        "frames": 452,
+        "forwardBetter": 452,
+        "ties": 0,
+        "reverseBetter": 0,
+        "refusedByComparisonOnly": 0,
+        "refusedByCapOnly": 0,
+        "refusedByBoth": 0,
+        "accepted": 452,
+        "forwardRank": {
+          "p05": 0.011115789473684214,
+          "median": 0.02517894736842105,
+          "p95": 0.036505263157894735
+        },
+        "reverseRank": {
+          "p05": 0.08564210526315788,
+          "median": 0.28484210526315795,
+          "p95": 0.48378947368421055
+        },
+        "rankAdvantage": {
+          "p05": 0.061305263157894724,
+          "median": 0.2578105263157895,
+          "p95": 0.45359999999999984
+        }
+      }
+    },
+    {
+      "rung": 2,
+      "kind": "wrong-score",
+      "example": "rung-2/development-tonejs-acoustic-wrong-score",
+      "alignmentInvariant": {
+        "claimedPositions": 546,
+        "mismatches": 0
+      },
+      "all": {
+        "frames": 466,
+        "forwardBetter": 273,
+        "ties": 0,
+        "reverseBetter": 193,
+        "refusedByComparisonOnly": 150,
+        "refusedByCapOnly": 0,
+        "refusedByBoth": 43,
+        "accepted": 273,
+        "forwardRank": {
+          "p05": 0.1762105263157895,
+          "median": 0.28155789473684206,
+          "p95": 0.45355789473684205
+        },
+        "reverseRank": {
+          "p05": 0.1944,
+          "median": 0.29894736842105263,
+          "p95": 0.41915789473684206
+        },
+        "rankAdvantage": {
+          "p05": -0.17296842105263155,
+          "median": 0.013978947368421146,
+          "p95": 0.18741052631578942
+        }
+      },
+      "correctAlignment": null
+    },
+    {
+      "rung": 2,
+      "kind": "positive",
+      "example": "rung-2/held-out-tonejs-nylon-positive",
+      "alignmentInvariant": {
+        "claimedPositions": 932,
+        "mismatches": 0
+      },
+      "all": {
+        "frames": 466,
+        "forwardBetter": 466,
+        "ties": 0,
+        "reverseBetter": 0,
+        "refusedByComparisonOnly": 0,
+        "refusedByCapOnly": 0,
+        "refusedByBoth": 0,
+        "accepted": 466,
+        "forwardRank": {
+          "p05": 0.031031578947368414,
+          "median": 0.07726315789473684,
+          "p95": 0.18766315789473684
+        },
+        "reverseRank": {
+          "p05": 0.19726315789473683,
+          "median": 0.3044631578947369,
+          "p95": 0.5042105263157893
+        },
+        "rankAdvantage": {
+          "p05": 0.08648421052631583,
+          "median": 0.21818947368421035,
+          "p95": 0.4544421052631577
+        }
+      },
+      "correctAlignment": {
+        "frames": 424,
+        "forwardBetter": 424,
+        "ties": 0,
+        "reverseBetter": 0,
+        "refusedByComparisonOnly": 0,
+        "refusedByCapOnly": 0,
+        "refusedByBoth": 0,
+        "accepted": 424,
+        "forwardRank": {
+          "p05": 0.02993684210526316,
+          "median": 0.07625263157894738,
+          "p95": 0.17456842105263154
+        },
+        "reverseRank": {
+          "p05": 0.19713684210526314,
+          "median": 0.3074526315789473,
+          "p95": 0.4963789473684208
+        },
+        "rankAdvantage": {
+          "p05": 0.10239999999999991,
+          "median": 0.219157894736842,
+          "p95": 0.4391423001949317
+        }
+      }
+    },
+    {
+      "rung": 2,
+      "kind": "wrong-score",
+      "example": "rung-2/held-out-tonejs-nylon-wrong-score",
+      "alignmentInvariant": {
+        "claimedPositions": 502,
+        "mismatches": 0
+      },
+      "all": {
+        "frames": 466,
+        "forwardBetter": 262,
+        "ties": 0,
+        "reverseBetter": 204,
+        "refusedByComparisonOnly": 142,
+        "refusedByCapOnly": 11,
+        "refusedByBoth": 62,
+        "accepted": 251,
+        "forwardRank": {
+          "p05": 0.19814736842105257,
+          "median": 0.2848,
+          "p95": 0.5032951945080092
+        },
+        "reverseRank": {
+          "p05": 0.19142857142857145,
+          "median": 0.3018105263157896,
+          "p95": 0.44218947368421047
+        },
+        "rankAdvantage": {
+          "p05": -0.21494736842105264,
+          "median": 0.024842105263157777,
+          "p95": 0.17216842105263136
+        }
+      },
+      "correctAlignment": null
+    },
+    {
+      "rung": 2,
+      "kind": "positive",
+      "example": "rung-2/held-out-tonejs-electric-positive",
+      "alignmentInvariant": {
+        "claimedPositions": 932,
+        "mismatches": 0
+      },
+      "all": {
+        "frames": 466,
+        "forwardBetter": 466,
+        "ties": 0,
+        "reverseBetter": 0,
+        "refusedByComparisonOnly": 0,
+        "refusedByCapOnly": 0,
+        "refusedByBoth": 0,
+        "accepted": 466,
+        "forwardRank": {
+          "p05": 0.018021052631578948,
+          "median": 0.06374736842105262,
+          "p95": 0.12004210526315791
+        },
+        "reverseRank": {
+          "p05": 0.19288421052631585,
+          "median": 0.32000000000000006,
+          "p95": 0.4619789473684211
+        },
+        "rankAdvantage": {
+          "p05": 0.10698947368421058,
+          "median": 0.24728421052631577,
+          "p95": 0.41814736842105277
+        }
+      },
+      "correctAlignment": {
+        "frames": 448,
+        "forwardBetter": 448,
+        "ties": 0,
+        "reverseBetter": 0,
+        "refusedByComparisonOnly": 0,
+        "refusedByCapOnly": 0,
+        "refusedByBoth": 0,
+        "accepted": 448,
+        "forwardRank": {
+          "p05": 0.01797894736842105,
+          "median": 0.06349473684210526,
+          "p95": 0.11991578947368423
+        },
+        "reverseRank": {
+          "p05": 0.18875789473684215,
+          "median": 0.32181052631578955,
+          "p95": 0.4637052631578949
+        },
+        "rankAdvantage": {
+          "p05": 0.1050526315789474,
+          "median": 0.25098947368421054,
+          "p95": 0.41861052631578954
+        }
+      }
+    },
+    {
+      "rung": 2,
+      "kind": "wrong-score",
+      "example": "rung-2/held-out-tonejs-electric-wrong-score",
+      "alignmentInvariant": {
+        "claimedPositions": 206,
+        "mismatches": 0
+      },
+      "all": {
+        "frames": 466,
+        "forwardBetter": 203,
+        "ties": 0,
+        "reverseBetter": 263,
+        "refusedByComparisonOnly": 68,
+        "refusedByCapOnly": 100,
+        "refusedByBoth": 195,
+        "accepted": 103,
+        "forwardRank": {
+          "p05": 0.1359157894736842,
+          "median": 0.2984,
+          "p95": 0.44608187134502914
+        },
+        "reverseRank": {
+          "p05": 0.19275789473684207,
+          "median": 0.29645933014354064,
+          "p95": 0.47595789473684197
+        },
+        "rankAdvantage": {
+          "p05": -0.15077894736842112,
+          "median": -0.011326315789473906,
+          "p95": 0.25684210526315776
+        }
+      },
+      "correctAlignment": null
+    },
+    {
+      "rung": 2,
+      "kind": "positive",
+      "example": "rung-2/held-out-shinyguitar-positive",
+      "alignmentInvariant": {
+        "claimedPositions": 892,
+        "mismatches": 0
+      },
+      "all": {
+        "frames": 466,
+        "forwardBetter": 454,
+        "ties": 0,
+        "reverseBetter": 12,
+        "refusedByComparisonOnly": 8,
+        "refusedByCapOnly": 8,
+        "refusedByBoth": 4,
+        "accepted": 446,
+        "forwardRank": {
+          "p05": 0.0431578947368421,
+          "median": 0.12324210526315785,
+          "p95": 0.21717894736842108
+        },
+        "reverseRank": {
+          "p05": 0.196,
+          "median": 0.2921263157894737,
+          "p95": 0.4714526315789474
+        },
+        "rankAdvantage": {
+          "p05": 0.017389473684210482,
+          "median": 0.1597052631578948,
+          "p95": 0.3771368421052632
+        }
+      },
+      "correctAlignment": {
+        "frames": 409,
+        "forwardBetter": 403,
+        "ties": 0,
+        "reverseBetter": 6,
+        "refusedByComparisonOnly": 6,
+        "refusedByCapOnly": 8,
+        "refusedByBoth": 0,
+        "accepted": 395,
+        "forwardRank": {
+          "p05": 0.04273684210526316,
+          "median": 0.11789473684210522,
+          "p95": 0.21389473684210528
+        },
+        "reverseRank": {
+          "p05": 0.18943157894736845,
+          "median": 0.29663157894736847,
+          "p95": 0.48892631578947365
+        },
+        "rankAdvantage": {
+          "p05": 0.0273263157894737,
+          "median": 0.1778526315789474,
+          "p95": 0.377799043062201
+        }
+      }
+    },
+    {
+      "rung": 2,
+      "kind": "wrong-score",
+      "example": "rung-2/held-out-shinyguitar-wrong-score",
+      "alignmentInvariant": {
+        "claimedPositions": 0,
+        "mismatches": 0
+      },
+      "all": {
+        "frames": 466,
+        "forwardBetter": 180,
+        "ties": 0,
+        "reverseBetter": 286,
+        "refusedByComparisonOnly": 0,
+        "refusedByCapOnly": 180,
+        "refusedByBoth": 286,
+        "accepted": 0,
+        "forwardRank": {
+          "p05": 0.193221052631579,
+          "median": 0.2877052631578947,
+          "p95": 0.49431578947368426
+        },
+        "reverseRank": {
+          "p05": 0.17680000000000007,
+          "median": 0.27040000000000003,
+          "p95": 0.4422315789473686
+        },
+        "rankAdvantage": {
+          "p05": -0.20919667590027696,
+          "median": -0.030315789473684185,
+          "p95": 0.23557894736842117
+        }
+      },
+      "correctAlignment": null
+    }
+  ],
+  "thermometer": [
+    {
+      "example": "thermometer/winner-positive",
+      "alignmentInvariant": {
+        "claimedPositions": 912,
+        "mismatches": 0
+      },
+      "all": {
+        "frames": 466,
+        "forwardBetter": 456,
+        "ties": 0,
+        "reverseBetter": 10,
+        "refusedByComparisonOnly": 10,
+        "refusedByCapOnly": 0,
+        "refusedByBoth": 0,
+        "accepted": 456,
+        "forwardRank": {
+          "p05": 0.11490526315789472,
+          "median": 0.15536842105263157,
+          "p95": 0.20037894736842113
+        },
+        "reverseRank": {
+          "p05": 0.1618526315789474,
+          "median": 0.2634105263157895,
+          "p95": 0.4707060333761231
+        },
+        "rankAdvantage": {
+          "p05": 0.015789473684210548,
+          "median": 0.13014736842105273,
+          "p95": 0.3312054329371817
+        }
+      },
+      "correctAlignment": {
+        "frames": 325,
+        "forwardBetter": 319,
+        "ties": 0,
+        "reverseBetter": 6,
+        "refusedByComparisonOnly": 6,
+        "refusedByCapOnly": 0,
+        "refusedByBoth": 0,
+        "accepted": 319,
+        "forwardRank": {
+          "p05": 0.11385263157894737,
+          "median": 0.15519999999999998,
+          "p95": 0.19578947368421054
+        },
+        "reverseRank": {
+          "p05": 0.1618526315789474,
+          "median": 0.2624842105263158,
+          "p95": 0.5406477732793522
+        },
+        "rankAdvantage": {
+          "p05": 0.0214315789473683,
+          "median": 0.1292210526315789,
+          "p95": 0.37036437246963566
+        }
+      }
+    },
+    {
+      "example": "thermometer/winner-audio-dust-score",
+      "alignmentInvariant": {
+        "claimedPositions": 416,
+        "mismatches": 0
+      },
+      "all": {
+        "frames": 466,
+        "forwardBetter": 208,
+        "ties": 0,
+        "reverseBetter": 258,
+        "refusedByComparisonOnly": 258,
+        "refusedByCapOnly": 0,
+        "refusedByBoth": 0,
+        "accepted": 208,
+        "forwardRank": {
+          "p05": 0.23065263157894736,
+          "median": 0.2962947368421053,
+          "p95": 0.3957894736842105
+        },
+        "reverseRank": {
+          "p05": 0.23010526315789473,
+          "median": 0.29309473684210524,
+          "p95": 0.35006315789473674
+        },
+        "rankAdvantage": {
+          "p05": -0.09966315789473701,
+          "median": -0.007115789473684131,
+          "p95": 0.08122105263157897
+        }
+      },
+      "correctAlignment": null
+    }
+  ],
+  "privateFrames": {
+    "path": "/home/williao/dev/mnx-listening-data/ladder-winner-v1/runs/g014b-decoy-traces/frames.json",
+    "sha256": "54a162cc624e8a99833db852f1953aa45c41ed453069351d030ef4342c7830d4"
+  },
+  "alignmentInvariant": true
+}

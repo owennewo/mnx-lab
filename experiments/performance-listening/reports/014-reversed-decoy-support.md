@@ -124,3 +124,199 @@ under the contract's amendment. No qualification manifests or decision are creat
 This one-question, one-new-source research note is development research, outside the
 historical two-question proxy sub-batch. Neither history nor evidence freshness resets
 with this model handover.
+
+## Results
+
+**Reject version 7.** Comparing the score with its own reversed reference restores
+positive support, but does not establish that the score is the intended piece.
+The wrong-score safeguard fails, and the second aligner exceeds the sustained
+processing budget. Version 6 remains incumbent.
+
+The frozen design and code ran at commit `b932f7b142cba6fadbd4015a682ab67e400bbde8`:
+
+| Run | Purpose | CPU seconds |
+|---|---|---|
+| [g014a-reversed-decoy-support](../runs/g014a-reversed-decoy-support/summary.json) | Whole active scoreboard, recognition, thermometer and seam | 370.078 |
+| [g014b-decoy-traces](../runs/g014b-decoy-traces/summary.json) | Frozen rule's explanatory traces and forward-position invariance | 80.766 |
+
+Execution completed unchanged across a user interruption; there was no failed private
+attempt or technical rerun. Private artifacts live under
+`/home/williao/dev/mnx-listening-data/ladder-winner-v1/runs/`, in those two run directories.
+The scoreboard summary hashes its records, evaluations, recognition and seam records;
+the diagnostic summary names and hashes `frames.json`. The frozen sets, labels and
+instruments were unchanged.
+
+### Positive following
+
+The exact-label evaluator's rates on the four active guitars (189 answerable grid
+points each). Wrong exposure includes only claimed wrong positions, whereas the
+supported-correct and deadline denominators also penalise refused support.
+
+| Guitar | Version 6 supported correct | Version 7 supported correct | Gain | Version 7 wrong exposure | Version 7 missed deadlines |
+|---|---|---|---|---|---|
+| tonejs acoustic | 96.3% | 96.3% | +0.0 points | 3.2% | 3.7% |
+| tonejs nylon | 62.4% | 90.5% | +28.0 points | 9.1% | 9.5% |
+| tonejs electric | 79.9% | 95.8% | +15.9 points | 3.7% | 4.2% |
+| Shinyguitar | 38.6% | 84.7% | +46.0 points | 10.2% | 15.3% |
+
+Nylon and Shinyguitar still fail the 95% following gate and the 5% exposure gate;
+Shinyguitar also misses the 10% deadline bar. Acoustic and electric meet those
+logical positive gates, but fail cost. Increased support exposes the forward path's
+existing wrong-position bursts; it does not fix them.
+
+### Wrong-score rejection
+
+| Guitar control | Version 6 rejection | Version 7 rejection | Version 7 longest false exposure |
+|---|---|---|---|
+| tonejs acoustic | 100.0% | 42.3% | 1.50 s |
+| tonejs nylon | 100.0% | 46.0% | 1.85 s |
+| tonejs electric | 98.4% | 77.8% | 0.75 s |
+| Shinyguitar | 100.0% | 100.0% | 0.00 s |
+
+Version 7 rejects only 66.7% on rung 0, and 64.7%, 66.3% and 68.7% on the active
+constant, ramp and drift controls. Seven of eight active wrong-score examples fail
+95% rejection, exposure and deadline gates. All three silence examples reject 100%.
+The sine positives retain their previous 99.4–99.5% rates, but rungs 0 and 1 no
+longer pass because of their controls and cost.
+
+### What the relative comparison admits
+
+Each guitar has 466 traced non-silent analysis frames after warm-up. The following
+counts use supplied exact positions for explanation, not a new evaluator. They
+therefore differ from the scoreboard's 50 ms grid counts.
+
+| Guitar | Correctly aligned frames | Given support | Refused by comparison alone | By cap alone | By both |
+|---|---|---|---|---|---|
+| tonejs acoustic | 452 | 452 | 0 | 0 | 0 |
+| tonejs nylon | 424 | 424 | 0 | 0 | 0 |
+| tonejs electric | 448 | 448 | 0 | 0 | 0 |
+| Shinyguitar | 409 | 395 | 6 | 8 | 0 |
+
+The three tonejs positives keep every correctly aligned frame. Shinyguitar keeps
+395/409; its remaining refusals split between the comparison and cap.
+
+On the wrong-score controls, being better than a reversed sequence frequently
+happens even though the handed score is Dust and the audio is Winner:
+
+| Guitar control | Forward rank beats reverse | Support admitted after cap | Median reverse-minus-forward rank |
+|---|---|---|---|
+| tonejs acoustic | 273/466 | 273/466 | +0.0140 |
+| tonejs nylon | 262/466 | 251/466 | +0.0248 |
+| tonejs electric | 203/466 | 103/466 | -0.0113 |
+| Shinyguitar | 180/466 | 0/466 | -0.0303 |
+
+**Shinyguitar is rejected entirely by the cost cap.** Its forward path beats the
+decoy on 180 frames, but all 466 forward costs exceed 0.7. The comparison alone
+would not reject this control reliably. On acoustic and nylon the forward path
+beats the decoy in over half the frames, and the cap admits almost all those wins.
+
+These traces establish that superiority to one reversed sequence is insufficient;
+they do not identify whether the fixed start, repeated/shared notes or later
+path fitting causes those wins. The boundary changes under reversal, and the
+whole-history path can retain that disadvantage. No causal explanation beyond the
+measured admissions is claimed.
+
+### Thermometer, recorded without selection
+
+| Real Winner clip | Version 6 | Version 7 |
+|---|---|---|
+| Positive agreement with sync interpolation | 0.0% | 68.3% |
+| Wrong-score rejection | 100.0% | 55.0% |
+| Silence rejection | 100.0% | 100.0% |
+
+The trace keeps 319/325 correctly aligned real-positive frames, but admits 208/466
+wrong-score frames. Positive acceptance and negative discrimination separate here
+too. The sync interpolation's precision remains unmeasured; neither this clip nor
+its improvements selected the candidate or qualified it.
+
+### Integrity, seam, recognition and cost
+
+| Check | Result |
+|---|---|
+| Shared scoreboard reproduction against experiment 012 | 57/57 identical, excluding measured cost |
+| All three incumbent/floor thermometer entries against experiment 012 | Identical |
+| Version 7 position invariance | 11,044 emitted positions across the traced examples; zero mismatches with the incumbent's alignment-only path |
+| Supplied-label recognition | All eight positives reproduce version 2's experiment-010 results exactly; features/reference unchanged |
+| Causality | All rung prefix and delivery checks pass |
+| Display and replay | All 76 examples agree; 14,400 replay grid points, zero failures; no positions clamped |
+| Navigation fixtures | Expected scope refusals; clock follows the repeat fixture and refuses the mid-score start |
+| Delivery | 48 kHz/480 equals direct; 48 kHz/128 same decisions within one block; at 44.1 kHz/128 all 186 jointly claimed version-7 positions agree within tolerance |
+| Version 7 sustained cost | 17/19 examples exceed 25% real time; worst 39.45% |
+| Version 7 per-chunk p99 | Worst 5.91 ms, below 10 ms |
+
+Cost is measured on the declared development laptop, Intel i7-8750H, Node 22.22.1,
+48 kHz mono in 480-sample chunks. It is provisional, includes initialization, and
+is not microphone-to-display latency. The second full reference render and aligner
+are a real cost of this implementation; a cost failure is not treated as permission
+to rerun for a favourable measurement. The combined two-run CPU total is 450.844 s.
+
+A reporting correction after execution normalises relative source paths before
+`git show` in the shared exporter. The diagnostic pins imported root sources as
+`../../src/...`; git does not normalise those itself. This ensures they are checked
+against the run's commit rather than falling back to present-day files. No frozen
+run, source hash, candidate or experimental metric was edited, and all registered
+reports were checked with the corrected exporter.
+
+The data remain one piece's controlled renderings and one reused real recording;
+correlated grid points are not independent performances. No population interval,
+new-source transfer, qualification or Studio integration is established.
+
+## Against the predictions
+
+| Prediction | Outcome | Evidence |
+|---|---|---|
+| 1. At least 10-point gains on all three harder guitars, acoustic stays above 95% | **Held** | Gains +28.0, +15.9, +46.0 points; acoustic unchanged at 96.3% |
+| 2. Every wrong-score rejection at least 95%, every silence 100% | **Contradicted, mixed** | Silence holds; seven of eight wrong-score controls fail |
+| 3. Rungs 0–1, causality and cost all pass | **Contradicted, mixed** | Sine positives and causality hold; controls and sustained cost fail |
+| 4. Every emitted position is the existing forward alignment | **Held** | 11,044 checked positions, zero mismatches |
+| 5. Real positive exceeds 0% with wrong-score rejection at least 95% | **Contradicted, mixed** | Positive reaches 68.3%, rejection falls to 55.0% |
+
+## Decision
+
+The pre-registered rejection branch applies. The three hard-positive gains exceed
+the 5-point minimum and acoustic survives, but the required wrong-score, earlier-rung
+and cost safeguards fail. **Version 7 is rejected; version 6 stays incumbent.**
+No rung is saturated and no next bars or later rungs are opened. Version 7 and both
+run records remain frozen; it is removed from the active suite.
+
+The experiment resolves this one reversed-decoy rule's question: it recovers positive
+support while losing discrimination. That is a tradeoff, not calibrated support.
+It does not disprove every relative or decoy method, and does not licence a looser
+fixed cutoff. Correct alignment, sufficient support and acceptable compute remain
+separate failures to resolve.
+
+### Resulting plateau, budgets and evidence access
+
+Incoming plateau was 0. By the pre-registered accounting, the version gains on the
+current failing positive gate (more than 5 points on all three harder guitars),
+so the resulting count is **0 consecutive versions without a gain** despite rejection.
+No plateau stopping rule applies and no post-refresh sequence begins. This records
+metric progress separately from a viable incumbent; it is not a retention claim.
+The [preflight](#carried-over-state-and-preflight) preserves the historical sequence
+and the legacy 002–003 budget history.
+
+Development remains unrationed: this experiment used one new candidate version,
+one scoreboard run and one diagnostic run. Qualification remains at zero frozen
+versions and zero assessments, with its six version and twelve assessment slots
+unused; no reserved comparison or final acceptance access occurred. All active
+examples remain development evidence, and bars 5–8 remain unexamined. One bounded
+research question consulted one new primary-source notebook; the full Dixon PDF
+attempt failed and supplied no new evidence. No user judgement or contract change
+was spent, and the interrupted session did not reset any state.
+
+## Next
+
+Advice for the next experiment: first distinguish whether Dust's forward advantage
+on unrelated audio comes from the fixed origin or from subsequent sequence fitting.
+A comparator's ability to keep positive frames is established here; its ability to
+calibrate rejection is not. A future null needs a justified matching opportunity,
+with start and temporal dependence addressed, rather than merely a weaker sequence.
+This suggests a diagnostic before another support variation, not a restriction on
+which method a later pre-registration may test. The steady-tempo alignment question
+remains open, and any added support computation must address the measured cost.
+
+## Attribution
+
+Designed, implemented, run, interpreted and recorded by **GPT-6 in Codex**.
+The same model resumed after interruption and completed the frozen experiment.
+No delegated agent, independent executor or subsequent numbered experiment was used.

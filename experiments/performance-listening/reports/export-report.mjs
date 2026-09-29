@@ -8,7 +8,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
-import { dirname, resolve } from 'node:path';
+import { dirname, resolve, posix } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { escape, markdown } from './markdown.mjs';
 
@@ -21,7 +21,7 @@ const sha = b => createHash('sha256').update(b).digest('hex');
 function recordedBytes(commit, path) {
   if (commit) {
     try {
-      return execFileSync('git', ['show', `${commit}:experiments/performance-listening/${path}`], { cwd: here, maxBuffer: 1 << 26 });
+      return execFileSync('git', ['show', `${commit}:${posix.normalize(`experiments/performance-listening/${path}`)}`], { cwd: here, maxBuffer: 1 << 26 });
     } catch { /* commit or path absent from this clone */ }
   }
   return readFileSync(resolve(root, path));
