@@ -48,9 +48,10 @@ frames rank for the current sound. That rejects the wrong score on every guitar 
 passes rungs 0 and 1. It still fails rung 2 on the positives: it rejects correct
 alignments on the harder guitars, and on the real clip it rejects everything. The
 alignment's own bursts remain; letting the path react faster made them worse. The next
-question is where Dust's ranks sit on recorded guitar, so the rank test can be calibrated
-against a wrong score in the same timbre rather than a fixed 10%
-([experiment 013](reports/013-why-support-rejects.html) found that limit does the rejecting).
+question is how to judge support so that correct alignments on recorded guitar survive and
+the wrong score is still rejected, without a looser fixed limit
+([experiment 013](reports/013-why-support-rejects.html) found the fixed 10% rank limit does
+the rejecting, and its rule forbids simply loosening it).
 Whether favouring a steady tempo reduces the alignment's bursts follows.
 
 The Studio seam is in place ([SEAM.md](SEAM.md) part 1, verified by
@@ -116,7 +117,7 @@ is an identifier given when a question opens and never reused, so citations stay
 
 | Rank | Question | Why it is ranked here | Status | Owner item |
 |---|---|---|---|---|
-| 22 | Where do the wrong score's path ranks sit on recorded guitar and the real clip, and does a decoy score calibrate a rank test that keeps correct alignments and rejects Dust in every timbre? | The incumbent's largest remaining failure, by finding 41 | open | [Report 013 decision](reports/013-why-support-rejects.md#decision) |
+| 22 | How can support be judged so that it keeps correct alignments on recorded guitar and the real clip and still rejects the wrong score in every timbre, without a looser fixed limit? | The incumbent's largest remaining failure, by finding 41; experiment 013's decision rule forbids a looser fixed number | open | [Report 013 decision](reports/013-why-support-rejects.md#decision) |
 | 20 | Does preferring a steady tempo where the audio gives little evidence reduce the alignment's bursts on recorded guitar? | Faster-reacting paths made them worse, so the opposite direction is the next test | open | [Report 011 decision](reports/011-path-and-support.md#decision) |
 | 19 | Can a support test be calibrated across guitars, rejecting Dust without rejecting correct alignments? | The incumbent's other rung-2 defect, and most of its real-clip failure | in progress: wrong-score side solved (finding 39) | [Report 008](reports/008-rung2-guitar-samples.md#the-support-test-is-not-calibrated-across-timbre) |
 | 14 | Does the incumbent pass rung 3, per-note onset jitter up to ±40 ms and chord spread up to 30 ms, on held-out seeds, and does the fast-tempo rejection margin hold? | Deferred until a candidate passes rung 2; jitter blurs the onsets its features rely on | open | [Report 007 next](reports/007-rung1-tempo.md#next) |

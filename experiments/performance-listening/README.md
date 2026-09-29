@@ -12,7 +12,8 @@ next. This README does not repeat it.
 
 Experiments are run one at a time, each by one model from pre-registration to landed
 record; a different model may run the next. [APPROACH.md](APPROACH.md#who-runs-an-experiment-one-model-one-experiment)
-describes the handover.
+describes the handover, and [RUNNING_AN_EXPERIMENT.md](RUNNING_AN_EXPERIMENT.md) is the
+prompt to give the model that runs the next one.
 
 Then read, in this order:
 

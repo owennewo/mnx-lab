@@ -86,14 +86,30 @@ of 466 frames, and the rank limit refuses every one.
 ### Decision
 
 The rule fixed above for this case applies: **the 10% rank limit is too strict for recorded
-guitar, and the next version replaces it with a limit the evidence cannot cheat, not a looser
-number.** A looser fixed limit, 20% say, would admit these frames today, but the wrong score
-was only ever measured against 10%. Nothing yet says where Dust's ranks sit on recorded
-guitar.
+guitar.** It binds whoever runs the next experiment on support in two ways:
 
-The next step is to record the same rank distributions on the wrong-score controls, rung 2's
-guitars and the real clip, then design a test that compares the path's rank with what a wrong
-score achieves in the same timbre. One candidate for that is a decoy: align the same audio
-against a version of the score that cannot be right, and require the real path to rank
-clearly better than the decoy's. The decoy's rank moves with timbre just as the true path's
-does.
+- The next support test does not replace the limit with a looser fixed number. A looser
+  limit, 20% say, would admit these frames today, but the wrong score was only ever
+  measured against 10%, so nothing says it would still be rejected.
+- Its replacement is one the evidence cannot cheat: a correct alignment in any timbre
+  must be able to meet it, and the wrong score in the same timbre must not.
+
+### Next
+
+Advice for the next experiment, not binding on it:
+
+- Nothing yet says where the wrong score's ranks sit on recorded guitar or the real clip.
+  Recording them with this diagnostic's trace, on the rung-2 wrong-score controls and the
+  real clip's, would show how much room a test has.
+- One way to set a limit the evidence cannot cheat is a decoy: align the same audio
+  against a version of the score that cannot be right, and require the real path to rank
+  clearly better than the decoy's. The decoy's rank moves with timbre as the true path's
+  does.
+
+### Attribution
+
+Designed and run by Claude Opus 5.5 (1M context) in Claude Code. Recorded after the run,
+because naming the model in the pre-registration began with experiment 014.
+
+This closing section was split into Decision and Next on 2026-09-29, when the handover
+procedure was adopted. The findings and figures above are unchanged.
