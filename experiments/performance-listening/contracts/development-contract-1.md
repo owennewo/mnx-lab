@@ -198,6 +198,13 @@ experiment adds one ledger row, one run summary per scoreboard run and one row i
 the report registry that the shared exporter reads. It does not add a contract file
 or an exporter of its own.
 
+Each experiment is run by one model from pre-registration to landed record, and models
+may change only between experiments. The pre-registration names the model and fixes
+the decision rules, which bind whoever runs next; a report's **Next** section only
+advises. [APPROACH.md](../APPROACH.md#who-runs-an-experiment-one-model-one-experiment)
+sets out the procedure. A user direction given in conversation is recorded in this
+contract, or another repository record, before the experiment it shaped ends.
+
 ## Effect on existing records
 
 - The open question "can attack-sensitive features and short sequence evidence

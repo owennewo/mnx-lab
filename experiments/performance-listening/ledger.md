@@ -6,6 +6,8 @@ The original provisional contract 0 was not human-approved. Contract 1 is approv
 experiment 002 uses the subsequent user-directed approximate-development amendment.
 From experiment 004, development runs under [development contract 1](contracts/development-contract-1.md):
 one row per numbered experiment, pointing at that experiment's single file.
+From experiment 014, each row's conditions name the model and tool that ran it; earlier
+rows record the model only in their commits' trailers.
 
 <a id="g001-clock-harness-v1"></a>
 

@@ -29,6 +29,12 @@ How to maintain it:
   in this file, the report it comes from matters more, so link it.
 - Every commit that adds a ledger row updates this file in the same commit, even if
   the update is only to the current-state paragraph.
+- **This file is the handover.** Each experiment may be run by a different model, and
+  the incoming model reads this whole file before choosing its question: the findings
+  and the stopped questions as well as the open ones. A model's private memory is not
+  handover state, so nothing a later model needs may live only there.
+  [APPROACH.md](APPROACH.md#who-runs-an-experiment-one-model-one-experiment) sets out
+  the procedure.
 
 ## Current state
 

@@ -10,6 +10,10 @@ criteria.
 states what the experiment currently believes, on what evidence, and what it asks
 next. This README does not repeat it.
 
+Experiments are run one at a time, each by one model from pre-registration to landed
+record; a different model may run the next. [APPROACH.md](APPROACH.md#who-runs-an-experiment-one-model-one-experiment)
+describes the handover.
+
 Then read, in this order:
 
 1. [APPROACH.md](APPROACH.md) defines the objectives, evidence requirements,

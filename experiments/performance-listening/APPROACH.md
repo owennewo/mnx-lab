@@ -388,6 +388,60 @@ neither restates it. Preserve unsuccessful approaches
 and enough detail to reproduce comparisons. Improvement means a retained gain under
 these rules, not merely another algorithm or a better development score.
 
+### Who runs an experiment: one model, one experiment
+
+Experiments are run one numbered experiment at a time, and **one model runs each
+experiment from start to end**. Different experiments may be run by different models,
+or by the same model in different sessions. The handover happens only between
+experiments: after experiment N is recorded and landed, and before experiment N+1 is
+designed or pre-registered.
+
+**The start.** The incoming model reads the [research log](RESEARCH_LOG.md) in full,
+not only its top question: the current state, every finding including the superseded
+ones, the ranked open questions and the stopped ones. The findings are what keep a
+fresh model from retrying an idea that has already failed. It then reads the previous
+experiment's report and the contracts in force. It selects the question, normally the
+top open one, and may re-rank the questions if it states the reason from the evidence.
+It designs the experiment and writes the pre-registration, naming itself, then
+commits and lands that pre-registration before anything runs.
+
+**The end.** The same model runs the experiment, appends the results to the same file,
+applies the decision rules it fixed, adds the ledger row, updates the research log's
+current state, findings and ranked questions, lands the work and retires its worktree.
+An experiment has not ended until it is landed.
+
+**What binds the next model, and what only advises it.** A pre-registration's decision
+rules are binding: once the results are in, they decide the next step, whoever takes
+it. That is how the loop stays honest across models. Everything else a report proposes
+is advice. Each report therefore keeps two sections apart:
+
+- **Decision**, which applies the rules fixed before the run and says what they require.
+- **Next**, which suggests how the next problem might be investigated. The incoming
+  model chooses its own method for that problem.
+
+**State lives in the repository.** A model's private memory and its conversation are
+not handover state. Any direction the user gives in conversation reaches a repository
+record, usually the development contract, before the experiment it shaped ends.
+Private artifacts are named in the run summaries by path and hash.
+
+**Attribution.** From experiment 014 on, each pre-registration and ledger row names the
+model and the tool that ran it. Earlier experiments record the model only in their
+commits' trailers.
+
+**Independent execution, the one exception.** For a claim that matters, such as a
+qualification comparison, a different model may execute another model's frozen
+pre-registration without changing it, as a check against an implementation shaped by
+its author's hopes. The report records that the design and the execution came from
+different models.
+
+**An interrupted experiment.** If a model stops before its experiment ends, the next
+model either completes the frozen pre-registration unchanged or abandons it, and the
+report records which. It never edits the pre-registration.
+
+**A new model does not make evidence new.** Budgets, plateau counts, access to reserved
+and final evidence, and examples already inspected carry over unchanged. A handover
+refreshes the investigator, not the experiment's ground truth.
+
 ## Autonomy, stopping and the destination
 
 Within the research contract, an LLM can research, select experiments, develop and

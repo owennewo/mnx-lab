@@ -28,6 +28,16 @@ candidates, prediction and what would contradict it. The results are appended to
 same file after the run, so git dates the prediction. The experiment adds one
 [ledger](../ledger.md) row and one row in [reports.json](reports.json), which the shared
 exporter renders. It adds no contract file and no exporter of its own.
+
+From experiment 014 on, the file follows the handover procedure in
+[APPROACH.md](../APPROACH.md#who-runs-an-experiment-one-model-one-experiment):
+
+- The pre-registration names the model and the tool that run the experiment, and fixes
+  the decision rules. One model runs the experiment from that commit to its landed
+  results.
+- The results end with two separate sections. **Decision** applies the rules fixed
+  before the run, and binds whoever runs the next experiment. **Next** suggests how the
+  next problem might be investigated, and binds nobody.
 [Development contract 1](../contracts/development-contract-1.md#records) sets this rule.
 Experiments 002 and 003 predate it and keep their separate pre-run plans.
 

@@ -238,6 +238,13 @@ is the bench's qualification driver, which spends the reserved-evidence budget. 
 every next action is traceable to the contract, the measured results and the recorded
 research, so that nobody has to read a report and decide.
 
+The driver may be a different model for each experiment. One model runs one numbered
+experiment from pre-registration to landed record, and the handover happens only
+between experiments. The research log is the incoming model's entry point, and a
+report's pre-registered decision rules are the only instructions that bind it.
+[APPROACH.md](APPROACH.md#who-runs-an-experiment-one-model-one-experiment) sets out the
+procedure.
+
 ### 10. Research notes
 
 **Owns:** what was read and what it motivated.
