@@ -32,4 +32,14 @@ describe('the reversed-reference support comparator', () => {
     // The 2048-sample window at 12 kHz clears after 171 ms; allow the next hop.
     expect(run.record.filter(d => d.madeAt >= 3.2).every(d => d.kind === 'unsupported')).toBe(true);
   }, 60_000);
+  it('rotates decoys over exactly the same frames, and an unrotated reference is unchanged', () => {
+    const traceOf = (extra: object) => { const rows: SupportTrace[] = []; execute(() => onlineTimeWarpWith({ ...V2_CONFIG, support: { kind: 'rank', limit: .1 }, alwaysClaim: true, ...extra, trace: f => rows.push(f) }), score, tempo, audio); return rows; };
+    const forward = traceOf({});
+    expect(traceOf({ referenceRotation: 0 })).toEqual(forward);
+    expect(traceOf({ referenceRotation: 1 })).toEqual(forward);
+    for (const decoy of [traceOf({ referenceRotation: 3 / 8 }), traceOf({ referenceOrder: 'reverse', referenceRotation: 5 / 8 })]) {
+      expect(decoy.map(f => [f.clock, f.freeCost])).toEqual(forward.map(f => [f.clock, f.freeCost]));
+      expect(decoy.map(f => f.best)).not.toEqual(forward.map(f => f.best));
+    }
+  }, 60_000);
 });

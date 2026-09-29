@@ -20,6 +20,9 @@ export interface OltwConfig {
   support: { kind: 'gap' } | { kind: 'rank'; limit: number };
   /** A score-derived temporal decoy; forward is the default for every older version. */
   referenceOrder?: 'forward' | 'reverse';
+  /** Diagnostic decoys only: this fraction of the reference frames, after any reversal,
+   * moves from the front to the back, so the path starts elsewhere in the same frames. */
+  referenceRotation?: number;
   alwaysClaim?: boolean;
   /** Diagnostic only: reports the values each support decision used. Never changes one. */
   trace?: (frame: SupportTrace) => void;
@@ -55,6 +58,8 @@ export function onlineTimeWarpWith(config: OltwConfig): Listener {
       bpm = tempo.bpm;
       ({ frames: reference, quarters } = referenceFrames(score, bpm));
       if (config.referenceOrder === 'reverse') reference = [...reference].reverse();
+      const shift = Math.round((config.referenceRotation ?? 0) * reference.length) % reference.length;
+      if (shift) reference = [...reference.slice(shift), ...reference.slice(0, shift)];
       next = featureStream(); history = []; rows = 0; best = 0; lastFrameClock = 0; supported = false; pathCost = 1; id = 0;
     },
     feed(chunk, clock) {
