@@ -410,14 +410,26 @@ applies the decision rules it fixed, adds the ledger row, updates the research l
 current state, findings and ranked questions, lands the work and retires its worktree.
 An experiment has not ended until it is landed.
 
-**What binds the next model, and what only advises it.** A pre-registration's decision
-rules are binding: once the results are in, they decide the next step, whoever takes
-it. That is how the loop stays honest across models. Everything else a report proposes
-is advice. Each report therefore keeps two sections apart:
+**What binds the next model, and what can be challenged.** Approved contracts, user
+directions and frozen evaluation rules remain binding. A pre-registration's decision
+rules govern the verdict on that experiment, which is preserved rather than rewritten
+after seeing the results. They do not turn its author's scientific explanations or
+restrictions on future methods into permanent rules. The incoming model may challenge
+those in a new pre-registration, citing the evidence, its disagreement and a test that
+could resolve it. Loosening a contract still requires approval. Each report keeps two
+sections apart:
 
-- **Decision**, which applies the rules fixed before the run and says what they require.
-- **Next**, which suggests how the next problem might be investigated. The incoming
-  model chooses its own method for that problem.
+- **Decision**, which applies the rules fixed before the run and records its verdict.
+- **Next**, which suggests how the next problem might be investigated. Its method and
+  any methodological restrictions are advice unless an approved contract or user
+  direction establishes them.
+
+**Success is information gained.** A contradicted hypothesis with a well-supported
+explanation is useful even when no candidate improves. Mixed or unanswerable evidence
+and infrastructure failures are recorded explicitly. If observations fit no
+pre-registered decision branch, the result is inconclusive; the model does not invent
+a favourable branch after the run. Before designing a change it reads the relevant
+implementation, tests, diagnostic traces and primary research, not only the summaries.
 
 **State lives in the repository.** A model's private memory and its conversation are
 not handover state. Any direction the user gives in conversation reaches a repository
@@ -440,7 +452,11 @@ report records which. It never edits the pre-registration.
 
 **A new model does not make evidence new.** Budgets, plateau counts, access to reserved
 and final evidence, and examples already inspected carry over unchanged. A handover
-refreshes the investigator, not the experiment's ground truth.
+refreshes the investigator, not the experiment's ground truth. The pre-registration
+records the incoming plateau and budget state with its evidence; the completed report
+records the resulting state, and the research log points to it. Before starting, the
+model checks for another experiment's owner and verifies numbering, artifact access,
+dependencies and output permissions, following [the pickup guide](RUNNING_AN_EXPERIMENT.md).
 
 ## Autonomy, stopping and the destination
 

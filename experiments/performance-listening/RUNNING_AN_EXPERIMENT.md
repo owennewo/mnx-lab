@@ -14,6 +14,10 @@ experiment, from choosing its question to landing its record, and then stop.** T
 experiment may be run by a different model, starting from what you leave in the
 repository.
 
+**Success means resolving the question, not necessarily improving the incumbent.** A
+contradicted hypothesis with a well-supported explanation is a useful experiment.
+Do not optimise for a favourable verdict or claim more than the evidence establishes.
+
 ## 1. Read, in this order, before touching anything
 
 1. `CLAUDE.md` at the repository root: worktrees, landing, the gate, and why you never
@@ -25,10 +29,31 @@ repository.
 3. `APPROACH.md`, especially "The iterative experiment" and "Who runs an experiment".
 4. `contracts/development-contract-1.md`: the synthetic ladder, the active suite, the
    pass bar, the plateau rule and the user's directions, quoted.
-5. The most recent reports in `reports/`, highest number first. Their **Decision**
-   sections bind you. Their **Next** sections are advice you may take or leave.
+5. The most recent reports in `reports/`, highest number first. Preserve their recorded
+   verdicts. Contracts and user directions remain binding; scientific explanations and
+   restrictions on future methods may be challenged as described in section 3.
 6. As needed: `EXPERIMENT_HARNESS_STRUCTURE.md` for the pieces, `SEAM.md` for the Studio
    interface, `contracts/vocabulary-v2.md` for the listener contract.
+7. Before designing a change: the incumbent's implementation and relevant tests, the
+   reports and diagnostic traces behind the chosen question, and relevant research notes
+   and their primary sources. Understand the mechanism, not only its summary. Keep new
+   research bounded to the question; distinguish published evidence from your inference.
+
+### Preflight
+
+- Check `git worktree list`, recent reports and the ledger for an experiment already in
+  progress. Do not start another while it has an owner. An interrupted experiment is
+  completed unchanged or explicitly abandoned under `APPROACH.md`, never silently replaced.
+- Establish the next unused experiment number and run ID, checking both committed records
+  and private run directories. Take your own worktree before the first edit; install its
+  dependencies once, following `CLAUDE.md`. Recheck ownership and numbering before landing.
+- Verify the required frozen sets and private artifacts are accessible, dependencies and
+  tools such as `ffmpeg` are available, and you have permission to write private outputs.
+  Missing access is a prerequisite to resolve, not a reason to substitute different data.
+- Reconstruct the applicable plateau count and any remaining budgets or evidence-access
+  limits from the ledger and contracts. Record that state and its evidence in the
+  pre-registration; a new model does not reset it. If a stopping rule already applies,
+  follow it instead of launching another candidate variation.
 
 ## 2. Where things are
 
@@ -48,7 +73,15 @@ repository.
 ## 3. Choose and design
 
 - **Choose one question.** Normally it is the top open question in the research log. If
-  you take another, say why from the evidence. Respect every binding Decision.
+  you take another, say why from the evidence. Consider alternative explanations and
+  state how the experiment distinguishes them.
+- **Preserve the rules, not a predecessor's assumptions.** Approved contracts, user
+  directions and frozen evaluation rules bind you. Apply a pre-registration's decision
+  rules to that experiment without rewriting its verdict. A report's scientific
+  explanation or restriction on future methods is not itself a contract: you may
+  challenge it in a new pre-registration, citing the evidence, the disagreement and
+  the test that could resolve it. This does not permit loosening a contract or ignoring
+  a user direction; those still need approval.
 - **Change one thing per version,** so the result can be attributed to it. Add a new
   version rather than editing a frozen candidate or a recorded run. A diagnostic is
   often the right first step when the cause of a failure is unclear.
@@ -58,9 +91,11 @@ repository.
   - the method and evidence;
   - numbered predictions, with numbers wherever possible;
   - what would contradict them;
-  - decision rules for each outcome, fixed now. They will bind the next model.
-- **Land the pre-registration before anything runs.** Take your own worktree (see
-  `CLAUDE.md`), commit, run `npm run gate`, fast-forward `main` and push. The scoreboard
+  - decision rules for each outcome, fixed now for this experiment, including mixed or
+    inconclusive evidence and infrastructure failure where relevant;
+  - the carried-over plateau and budget state, with the records establishing it.
+- **Land the pre-registration before anything runs.** In your worktree, follow
+  `CLAUDE.md`'s full landing sequence, including rebase, gate, fast-forward and push. The scoreboard
   refuses to run until the code and the pre-registration are committed.
 
 ## 4. Run
@@ -84,14 +119,20 @@ npx tsx src/ladder/scoreboard.ts <run-id> <NNN-slug> \
 - Every run also checks the Studio seam: the display rule, the replay, the navigation
   fixtures and the deliveries. Those must keep passing.
 - Bench tests: `npm -w mnx-listening-bench test` from the repository root.
+- If infrastructure fails, preserve the failed attempt and diagnose it before rerunning;
+  follow the contract's technical-rerun rules. Do not tune a candidate and call that a
+  technical rerun, or overwrite a run ID.
 
 ## 5. Record, land, stop
 
 In the report, below the pre-registration, which never changes after the run:
 
 - **Results**, with the numbers in tables;
-- **Against the predictions**, one row each, marked held or contradicted;
-- **Decision**, applying the rules you fixed;
+- **Against the predictions**, one row each, marked held, contradicted or not answerable,
+  with the reason and any mixed evidence made explicit;
+- **Decision**, applying the rules you fixed. If observations fit no pre-registered
+  branch, record that limitation and an inconclusive decision rather than inventing a
+  favourable rule after seeing the result;
 - **Next**, as advice;
 - your attribution.
 
@@ -102,7 +143,8 @@ Then:
 - add a ledger row whose conditions name you;
 - update the research log. Rewrite the current state, add findings with their evidence,
   and re-rank the open questions. Write the questions so they state what the evidence
-  demands, not a method.
+  demands, not a method. Record the resulting plateau and budget state with its evidence
+  in the report and point to it from the log, so the next model need not infer a reset.
 
 Land it, retire your worktree, and stop. Do not start the next experiment.
 
