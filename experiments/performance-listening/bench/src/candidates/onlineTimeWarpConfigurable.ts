@@ -18,6 +18,8 @@ export interface OltwConfig {
    * rank: the path's reference frames rank, on average, within the best `limit` fraction
    * of all reference frames for the same sound. Both also cap the path cost. */
   support: { kind: 'gap' } | { kind: 'rank'; limit: number };
+  /** A score-derived temporal decoy; forward is the default for every older version. */
+  referenceOrder?: 'forward' | 'reverse';
   alwaysClaim?: boolean;
   /** Diagnostic only: reports the values each support decision used. Never changes one. */
   trace?: (frame: SupportTrace) => void;
@@ -52,6 +54,7 @@ export function onlineTimeWarpWith(config: OltwConfig): Listener {
       if (delivery.sampleRate !== 48000 || delivery.chunkSamples !== 480) throw new Error('Fixed delivery required');
       bpm = tempo.bpm;
       ({ frames: reference, quarters } = referenceFrames(score, bpm));
+      if (config.referenceOrder === 'reverse') reference = [...reference].reverse();
       next = featureStream(); history = []; rows = 0; best = 0; lastFrameClock = 0; supported = false; pathCost = 1; id = 0;
     },
     feed(chunk, clock) {

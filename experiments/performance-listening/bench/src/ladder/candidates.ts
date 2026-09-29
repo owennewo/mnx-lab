@@ -2,6 +2,7 @@ import { clockFollower, CLOCK_VERSION } from '../candidates/clockFollower.ts';
 import { onlineTimeWarp1, OLTW_1 } from '../candidates/onlineTimeWarp1.ts';
 import { onlineTimeWarp2, OLTW_2 } from '../candidates/onlineTimeWarp2.ts';
 import { onlineTimeWarp3, OLTW_3 } from '../candidates/onlineTimeWarp3.ts';
+import { onlineTimeWarp7, OLTW_7 } from '../candidates/onlineTimeWarp7.ts';
 import { onlineTimeWarpWith, V2_CONFIG } from '../candidates/onlineTimeWarpConfigurable.ts';
 import { spectralFollower1, SPECTRAL_1 } from '../candidates/spectralFollower1.ts';
 import { spectralFollower2 } from '../candidates/spectralFollower2.ts';
@@ -34,5 +35,6 @@ export const CANDIDATES: { id: string; module: string; factory: () => Listener; 
   { id: 'online-time-warp@4/alignment-only', module: 'candidates/onlineTimeWarpConfigurable.ts', legacy: FOUR, factory: () => onlineTimeWarpWith({ ...V4, alwaysClaim: true }), diagnostic: true },
   { id: 'online-time-warp@5', module: 'candidates/onlineTimeWarpConfigurable.ts', legacy: FOUR, factory: () => onlineTimeWarpWith(V5) },
   { id: 'online-time-warp@5/alignment-only', module: 'candidates/onlineTimeWarpConfigurable.ts', legacy: FOUR, factory: () => onlineTimeWarpWith({ ...V5, alwaysClaim: true }), diagnostic: true },
+  { id: OLTW_7, module: 'candidates/onlineTimeWarp7.ts', legacy: FOUR, factory: onlineTimeWarp7, recognition: 'oltw' },
   { id: 'online-time-warp@6', module: 'candidates/onlineTimeWarpConfigurable.ts', legacy: FOUR, factory: () => onlineTimeWarpWith(V6) },
 ];
