@@ -3,7 +3,8 @@
   "entries": [
     "clock-follower@1",
     "online-time-warp@6",
-    "online-time-warp@2/alignment-only"
+    "online-time-warp@2/alignment-only",
+    "online-time-warp@8"
   ],
   "examples": {
     "winner-ladder-rung0-v1": [
