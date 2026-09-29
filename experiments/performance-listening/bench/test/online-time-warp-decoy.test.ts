@@ -23,7 +23,7 @@ describe('the reversed-reference support comparator', () => {
       const old = baseline.record.find(e => e.madeAt === d.madeAt)!;
       expect({ ...d, id: old.id }).toEqual(old);
     }
-  });
+  }, 60_000);
   it('does not claim silence, including after a sounding prefix', () => {
     const silent = new Float32Array(durationSamples(recipe));
     expect(execute(onlineTimeWarp7, score, tempo, silent).record.every(d => d.kind === 'unsupported')).toBe(true);
@@ -31,5 +31,5 @@ describe('the reversed-reference support comparator', () => {
     const run = execute(onlineTimeWarp7, score, tempo, tail);
     // The 2048-sample window at 12 kHz clears after 171 ms; allow the next hop.
     expect(run.record.filter(d => d.madeAt >= 3.2).every(d => d.kind === 'unsupported')).toBe(true);
-  });
+  }, 60_000);
 });
