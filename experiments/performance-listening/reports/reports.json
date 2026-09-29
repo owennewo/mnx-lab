@@ -194,6 +194,19 @@
         "href": "014-reversed-decoy-support.html",
         "label": "Experiment 014"
       }
+    },
+    {
+      "number": "016",
+      "slug": "016-windowed-rank",
+      "title": "016 · Support from the path's rank over two seconds",
+      "banner": "Version 8 kept · every control and two recorded guitars pass · the alignment is now the limit",
+      "runs": [
+        "g016-windowed-rank"
+      ],
+      "previous": {
+        "href": "015-decoy-null.html",
+        "label": "Experiment 015"
+      }
     }
   ]
 }

@@ -42,22 +42,20 @@ How to maintain it:
 [development contract 1](contracts/development-contract-1.md). A candidate that
 saturates it moves on to Winner's bars 5–8; those bars remain unexamined.
 
-`online-time-warp@6` remains incumbent. It passes the sine rungs and rejects the
-wrong score across recorded guitars, but its fixed rank cutoff refuses correct
-alignments on harder guitars and the real clip. Its alignment bursts also remain.
-[Experiment 014](reports/014-reversed-decoy-support.html) tried support relative to one
-reversed-reference decoy and lost wrong-score rejection.
-[Experiment 015](reports/015-decoy-null.html) found why: on unrelated audio the wrong
-score's path is exchangeable with rearrangements of its own reference, so a single decoy
-admits about half of unrelated frames by chance. Neither the fixed start nor sequence
-direction is the cause. The next question is a support statistic whose false acceptance
-on unrelated audio is measured rather than assumed. The steady-tempo alignment question
-remains open.
+`online-time-warp@8` is incumbent since [experiment 016](reports/016-windowed-rank.html).
+It keeps version 6's alignment and judges support by the path's rank averaged over two
+seconds. It passes every gate on the sine rungs, on every wrong-score and silence
+control, and on two of the four recorded guitars. On the real clip it keeps everything
+its alignment gets right while still rejecting the wrong score. Experiments 014 and 015
+showed decoy comparisons cannot calibrate rejection. 016 instead set a limit from the
+wrong score's measured ranks, fitted to one wrong piece. The remaining failures on
+nylon and Shinyguitar are the alignment's wrong-position bursts, which support now
+claims. The next question is the alignment: whether a steadier path removes those bursts.
 
-The [Studio seam](SEAM.md) stays verified: experiment 015 reproduced prior results
+The [Studio seam](SEAM.md) stays verified: experiment 016 reproduced prior results
 and passed its seam checks. No listener was qualified or integrated into Studio.
 The carried-over and resulting plateau, budget and evidence-access state are explicit
-in [report 015](reports/015-decoy-null.md#resulting-plateau-budgets-and-evidence-access);
+in [report 016](reports/016-windowed-rank.md#resulting-plateau-budgets-and-evidence-access);
 there is no stopping rule currently triggered, and no evidence freshness reset.
 
 ## Findings
@@ -113,6 +111,8 @@ ledger row (`ledger.md#<row>`), or a findings write-up.
 | 44 | On unrelated audio the wrong score's forward path is exchangeable with rotations and reversals of its own reference: neither its fixed start nor its sequence direction gives it an advantage, so one decoy admits about half of unrelated frames. | [Experiment 015](reports/015-decoy-null.md#the-wrong-score-forward-path-against-the-family), [run g015b](ledger.md#g015-decoy-null) | holds | 2026-09-29 | Answers question 23; one piece pair; the handed start is a small early disadvantage on this pair |
 | 45 | Rotations of the handed reference are not valid decoys for a positive: they keep the true order and can become right after a lag; reversed decoys cannot, and the correct path beats each on 99–100% of correct frames. | [Experiment 015 positives](reports/015-decoy-null.md#the-positives-where-prediction-4-failed-and-why) | holds | 2026-09-29 | Design limit of the 015 family, recorded instead of prediction 4 |
 | 46 | Beating all eight correlated reversed decoys still admits 14–32% of unrelated frames, at many times the cost budget. | [Experiment 015 exploratory tabulation](reports/015-decoy-null.md#an-exploratory-tabulation-not-a-decision) | holds | 2026-09-29 | Exploratory, post-run; no rule depended on it |
+| 47 | The incumbent path's rank averaged over two seconds separates correct alignments from the wrong score in every active timbre: a 0.20 limit keeps what the alignment gets right and rejects Dust at 98.9–100%, at negligible cost. | [Run g016](ledger.md#g016-windowed-rank), [report 016](reports/016-windowed-rank.md#results) | holds | 2026-09-29 | Limit fitted on these examples and one wrong piece; transfer to bars 5–8 or a closer wrong score untested. Answers question 22 for the active suite |
+| 48 | With support no longer refusing correct frames, the remaining rung-2 failures are alignment: nylon and Shinyguitar are aligned correctly on only about 91% and 88% of frames, and their bursts become wrong exposure. | [Report 016 recorded guitar](reports/016-windowed-rank.md#recorded-guitar) | holds | 2026-09-29 | Moves the limit from support to alignment |
 
 
 ## Open questions
@@ -123,12 +123,12 @@ is an identifier given when a question opens and never reused, so citations stay
 
 | Rank | Question | Why it is ranked here | Status | Owner item |
 |---|---|---|---|---|
-| 22 | How can support be judged so that it keeps correct alignments on recorded guitar and the real clip and rejects the wrong score in every timbre, with its false acceptance on unrelated audio measured rather than assumed, and without a looser fixed limit or a cost beyond budget? | The incumbent's largest remaining failure (finding 41); a single decoy is a coin flip (finding 44) and decoy families are too costly and too loose (finding 46) | open | [Report 015 next](reports/015-decoy-null.md#next) |
-| 20 | Does preferring a steady tempo where the audio gives little evidence reduce the alignment's bursts on recorded guitar? | Faster-reacting paths made them worse, so the opposite direction is the next test | open | [Report 011 decision](reports/011-path-and-support.md#decision) |
-| 19 | Can a support test be calibrated across guitars, rejecting Dust without rejecting correct alignments? | The incumbent's other rung-2 defect, and most of its real-clip failure | in progress: wrong-score side solved (finding 39) | [Report 008](reports/008-rung2-guitar-samples.md#the-support-test-is-not-calibrated-across-timbre) |
+| 20 | Does preferring a steady tempo where the audio gives little evidence reduce the alignment's bursts on recorded guitar? | Now the incumbent's only rung-2 failure: support claims what the path aligns (finding 48); faster-reacting paths made bursts worse, so the opposite direction is next | open | [Report 016 next](reports/016-windowed-rank.md#next) |
 | 14 | Does the incumbent pass rung 3, per-note onset jitter up to ±40 ms and chord spread up to 30 ms, on held-out seeds, and does the fast-tempo rejection margin hold? | Deferred until a candidate passes rung 2; jitter blurs the onsets its features rely on | open | [Report 007 next](reports/007-rung1-tempo.md#next) |
 | 11 | Which ladder rung first breaks the best candidate, and does recognition at supplied labels fail on that rung too? | Ranks the remaining rungs by the failure they expose | open | [Development contract 1](contracts/development-contract-1.md#the-ladder) |
 | 7 | Can independent source/label checks establish timing bounds for later formal qualification? | Still relevant to stronger claims; explicitly not required for current proxy development | open, deferred to qualification | [Real-evidence preparation](evidence/README.md) |
+| 22 | How can support be judged so that it keeps correct alignments on recorded guitar and the real clip and rejects the wrong score in every timbre, with its false acceptance on unrelated audio measured rather than assumed, and without a looser fixed limit or a cost beyond budget? | The incumbent's largest remaining failure (finding 41); a single decoy is a coin flip (finding 44) and decoy families are too costly and too loose (finding 46) | answered for the active suite (finding 47); transfer untested | [Report 015 next](reports/015-decoy-null.md#next) |
+| 19 | Can a support test be calibrated across guitars, rejecting Dust without rejecting correct alignments? | The incumbent's other rung-2 defect, and most of its real-clip failure | answered for the active suite (finding 47) | [Report 008](reports/008-rung2-guitar-samples.md#the-support-test-is-not-calibrated-across-timbre) |
 | 23 | What causes the wrong score's forward path to beat its reversed reference on unrelated audio: the fixed start or later sequence matching? | Experiment 014's decoy lost rejection | answered: neither; exchangeable with its decoys (finding 44) | [Report 014 next](reports/014-reversed-decoy-support.md#next) |
 | 21 | When the rank-based support test rejects a correct alignment, is it the rank limit or the path-cost cap? | The incumbent's remaining rung-2 failure and all of its real-clip failure | answered: the rank limit (finding 41) | [Report 011 support change](reports/011-path-and-support.md#the-support-change) |
 | 18 | What in the alignment path carries it away from positions its features prefer: endpoint choice by length-normalised cost, or the step constraints that limit recovery? | The bursts are the incumbent's alignment defect on rung 2 | answered: neither; faster paths are worse (finding 38) | [Report 010 decision](reports/010-slim-suite-and-burst-features.md#decision) |
