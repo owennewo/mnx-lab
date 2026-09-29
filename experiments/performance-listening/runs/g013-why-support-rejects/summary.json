@@ -1,0 +1,112 @@
+{
+  "id": "g013-why-support-rejects",
+  "kind": "support-diagnostic",
+  "preregistration": "reports/013-why-support-rejects.md",
+  "gitCommit": "b9245ebdedc3b4aa2464d3fb59102011bcd7b942",
+  "machine": {
+    "hostname": "williao-G3-3579",
+    "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+    "cores": 12,
+    "platform": "linux",
+    "arch": "x64",
+    "node": "v22.22.1"
+  },
+  "candidate": "online-time-warp@6",
+  "rankLimit": 0.1,
+  "pathCostCap": 0.7,
+  "perSet": [
+    {
+      "example": "development-tonejs-acoustic-positive",
+      "frames": 466,
+      "correctAlignment": 452,
+      "rejectedCorrect": 0,
+      "byRank": 0,
+      "byCap": 0,
+      "byBoth": 0,
+      "warming": 9,
+      "pathCost": null,
+      "meanRank": null
+    },
+    {
+      "example": "held-out-tonejs-nylon-positive",
+      "frames": 466,
+      "correctAlignment": 424,
+      "rejectedCorrect": 132,
+      "byRank": 132,
+      "byCap": 0,
+      "byBoth": 0,
+      "warming": 9,
+      "pathCost": {
+        "p05": 0.4727312217276214,
+        "median": 0.49427882915493704,
+        "p95": 0.5589356899192727
+      },
+      "meanRank": {
+        "p05": 0.10214736842105265,
+        "median": 0.13073684210526323,
+        "p95": 0.18799999999999997
+      }
+    },
+    {
+      "example": "held-out-tonejs-electric-positive",
+      "frames": 466,
+      "correctAlignment": 448,
+      "rejectedCorrect": 70,
+      "byRank": 70,
+      "byCap": 0,
+      "byBoth": 0,
+      "warming": 9,
+      "pathCost": {
+        "p05": 0.4842384952208624,
+        "median": 0.48994278620513887,
+        "p95": 0.5539825203404068
+      },
+      "meanRank": {
+        "p05": 0.10172631578947368,
+        "median": 0.1192,
+        "p95": 0.15596491228070172
+      }
+    },
+    {
+      "example": "held-out-shinyguitar-positive",
+      "frames": 466,
+      "correctAlignment": 409,
+      "rejectedCorrect": 230,
+      "byRank": 222,
+      "byCap": 0,
+      "byBoth": 8,
+      "warming": 9,
+      "pathCost": {
+        "p05": 0.5937436065436447,
+        "median": 0.6394919433190606,
+        "p95": 0.6903528752518449
+      },
+      "meanRank": {
+        "p05": 0.10673684210526314,
+        "median": 0.16492631578947364,
+        "p95": 0.21578947368421061
+      }
+    }
+  ],
+  "thermometer": {
+    "example": "real Winner clip, sync-interpolated truth",
+    "frames": 466,
+    "correctAlignment": 325,
+    "rejectedCorrect": 325,
+    "byRank": 325,
+    "byCap": 0,
+    "byBoth": 0,
+    "warming": 9,
+    "pathCost": {
+      "p05": 0.3325936924999312,
+      "median": 0.3744506920470422,
+      "p95": 0.42857166863353524
+    },
+    "meanRank": {
+      "p05": 0.11385263157894737,
+      "median": 0.15519999999999998,
+      "p95": 0.19578947368421054
+    }
+  },
+  "privateFramesSha256": "006c281d586e05f8e5b90b8dea6ec0aef3de98e2225e0539a0944c4bbd3ab395"
+}

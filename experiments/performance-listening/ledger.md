@@ -95,3 +95,10 @@ one row per numbered experiment, pointing at that experiment's single file.
 | Run | Hypothesis / sources | Parent / candidate | Set / evaluator | Conditions / resources | Results / uncertainty | Decision / next action |
 |---|---|---|---|---|---|---|
 | [g012-seam-verification](runs/g012-seam-verification/summary.json) | [Pre-registered in report 012](reports/012-seam-verification.md#pre-registration); [SEAM.md](SEAM.md) part 1 | No candidate change; clock, online-time-warp@6 and its alignment-only diagnostic through the seam | Slim active suite / following-evaluator@1 via the version-2 record adapter | 198 s wall; `--reproduce g011-path-and-support` | 57 of 57 results and the thermometer reproduce; display rule, replay, fixtures, deliveries and clamping all as predicted | Seam part 1 verified; the ladder continues through the seam on every run; [report 012](reports/012-seam-verification.html) |
+
+
+<a id="g013-why-support-rejects"></a>
+
+| Run | Hypothesis / sources | Parent / candidate | Set / evaluator | Conditions / resources | Results / uncertainty | Decision / next action |
+|---|---|---|---|---|---|---|
+| [g013-why-support-rejects](runs/g013-why-support-rejects/summary.json) | [Pre-registered in report 013](reports/013-why-support-rejects.md#pre-registration); question 21 | online-time-warp@6 with a trace; no candidate change | Active rung-2 positives and the real Winner clip / trace, truth from the rendering or the sync interpolation | Seconds of CPU | The rank limit alone refuses every rejected correct frame on nylon, electric and the real clip, and 222 of 230 on Shinyguitar; the cost cap never refuses alone. Correct frames rank in the best 12–17% on average | Both predictions contradicted. Next: record wrong-score rank distributions, then design a rank test calibrated against a decoy; [report 013](reports/013-why-support-rejects.html) |

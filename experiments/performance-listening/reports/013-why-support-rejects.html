@@ -1,0 +1,146 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>013 · Why the support test rejects correct alignments</title><style>body{margin:0;background:#f3f4ef;color:#21383c;font:16px/1.65 system-ui}main{max-width:1080px;margin:auto;padding:32px}article,details{background:white;border:1px solid #ccd8d1;border-radius:10px;padding:28px;margin:0 0 22px}h1{font-size:2.25rem;line-height:1.2}h2{margin-top:32px}a{color:#14616a}p,li{max-width:90ch}.table-wrap{overflow:auto}table{border-collapse:collapse;width:100%;font-size:.9rem}td,th{border:1px solid #ccd8d1;padding:10px;text-align:left}th{background:#edf3ee}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#f4f6f3;padding:16px;font-size:.8rem}code{overflow-wrap:anywhere;font-size:.86em}.banner{padding:18px;background:#f8edce;border-left:5px solid #ad782e}summary{cursor:pointer;font-weight:650}footer{font-size:.85rem}@media(max-width:650px){main{padding:12px}article,details{padding:18px}h1{font-size:1.8rem}}</style></head><body><main><article><div class="banner">The 10% rank limit, not the cost cap, rejects correct alignments on guitar and the real clip</div><p><a href="012-seam-verification.html">Experiment 012</a></p><h1 id="summary-013-why-the-support-test-rejects-correct-alignments">013 — Why the support test rejects correct alignments</h1>
+<h2 id="summary-pre-registration">Pre-registration</h2>
+<p>Committed 2026-09-29, before the diagnostic runs. A diagnostic, not a candidate. Governed by <a href="../contracts/development-contract-1.md">development contract 1</a>. Results are appended below; nothing above this line changes after the run.</p>
+<h3 id="summary-question">Question</h3>
+<p>The incumbent <code>online-time-warp@6</code> claims support only when two conditions hold over the last second: the path&#39;s reference frames rank, on average, within the best 10% for the current sound, and the path&#39;s average matching cost is at most 0.7. On rung 2&#39;s harder guitars it reports unsupported for a third to three fifths of the performance, though its alignment is right on most of those frames. On the real clip it rejects everything. Which condition is doing the rejecting?</p>
+<h3 id="summary-method">Method</h3>
+<p>Run the incumbent with a trace, which reports the values behind each support decision and changes none of them, on the four active rung-2 guitars and on the real Winner clip. At every analysis frame after the 0.2 s warm-up where the aligned position is within ±0.25 quarter of the truth but support is refused, record whether the rank limit refused, the path-cost cap refused, or both. The truth on rung 2 is the exact rendering. On the real clip it is the sync interpolation, whose precision is unmeasured.</p>
+<h3 id="summary-predictions">Predictions</h3>
+<p>1. <strong>The cost cap does most of the rejecting.</strong> Recorded guitar raises every frame&#39;s cost    against a sine reference, but the rank of the right frame survives that. On each of the    three harder guitars, tonejs nylon, tonejs electric and Shinyguitar, the cap alone or    together with the rank refuses more than half of the rejected correct frames. 2. <strong>The real clip is the same.</strong> On the real clip, the cap refuses more than half of the    rejected correct frames.</p>
+<h3 id="summary-decision-rules-fixed-now">Decision rules, fixed now</h3>
+<ul><li><strong>The cap dominates.</strong> The next version drops the absolute cost cap and relies on the rank, which already rejects the wrong score on every guitar, with silence still rejected by level. It is run on the slim suite.</li>
+<li><strong>The rank limit dominates.</strong> The limit is too strict for recorded guitar. The next version replaces the fixed limit with one the evidence cannot cheat, not a looser number. That design needs the distribution of ranks this diagnostic records.</li>
+<li><strong>Both refuse together.</strong> Both conditions measure the same timbre mismatch. The next version changes the features&#39; sensitivity to timbre before either condition is revisited.</li></ul>
+<h2 id="summary-results">Results</h2>
+<p>Run <a href="../runs/g013-why-support-rejects/summary.json">g013-why-support-rejects</a>, on the pre-registration commit <code>b9245ebd</code>.</p>
+<p><strong>The rank limit does almost all the rejecting; the cost cap almost none.</strong> Both predictions were wrong.</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Clip, Frames with a correct alignment, Refused support, Refused by the rank limit alone, By the cost cap alone, By both"><table><thead><tr><th scope="col">Clip</th><th scope="col">Frames with a correct alignment</th><th scope="col">Refused support</th><th scope="col">Refused by the rank limit alone</th><th scope="col">By the cost cap alone</th><th scope="col">By both</th></tr></thead><tbody><tr><td>tonejs acoustic</td><td>452</td><td>0</td><td>—</td><td>—</td><td>—</td></tr>
+<tr><td>tonejs nylon</td><td>424</td><td>132</td><td>132</td><td>0</td><td>0</td></tr>
+<tr><td>tonejs electric</td><td>448</td><td>70</td><td>70</td><td>0</td><td>0</td></tr>
+<tr><td>Shinyguitar</td><td>409</td><td>230</td><td>222</td><td>0</td><td>8</td></tr>
+<tr><td>Real Winner clip</td><td>325</td><td>325</td><td>325</td><td>0</td><td>0</td></tr></tbody></table></div>
+<p>Each clip has 466 analysis frames after the 0.2 s warm-up.</p>
+<h3 id="summary-what-the-refused-frames-look-like">What the refused frames look like</h3>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Refused correct frames, Path cost, median, Mean rank, 5th percentile, Mean rank, median, Mean rank, 95th percentile"><table><thead><tr><th scope="col">Refused correct frames</th><th scope="col">Path cost, median</th><th scope="col">Mean rank, 5th percentile</th><th scope="col">Mean rank, median</th><th scope="col">Mean rank, 95th percentile</th></tr></thead><tbody><tr><td>tonejs nylon</td><td>0.49</td><td>0.102</td><td>0.131</td><td>0.188</td></tr>
+<tr><td>tonejs electric</td><td>0.49</td><td>0.102</td><td>0.119</td><td>0.156</td></tr>
+<tr><td>Shinyguitar</td><td>0.64</td><td>0.107</td><td>0.165</td><td>0.216</td></tr>
+<tr><td>Real Winner clip</td><td>0.37</td><td>0.114</td><td>0.155</td><td>0.196</td></tr></tbody></table></div>
+<p>On recorded guitar, the frames the incumbent aligns correctly rank on average in the best 12–17% of the reference, not the best 10%. The real clip&#39;s path cost is lower than on any rendered guitar, so its failure has nothing to do with cost: its alignment is right on 325 of 466 frames, and the rank limit refuses every one.</p>
+<h3 id="summary-against-the-predictions">Against the predictions</h3>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Prediction, Outcome"><table><thead><tr><th scope="col">Prediction</th><th scope="col">Outcome</th></tr></thead><tbody><tr><td>1. The cost cap refuses more than half of the rejected correct frames on each harder guitar</td><td><strong>Contradicted</strong>: at most 8 of 230 frames, always with the rank</td></tr>
+<tr><td>2. The same on the real clip</td><td><strong>Contradicted</strong>: 0 of 325</td></tr></tbody></table></div>
+<h3 id="summary-decision">Decision</h3>
+<p>The rule fixed above for this case applies: <strong>the 10% rank limit is too strict for recorded guitar, and the next version replaces it with a limit the evidence cannot cheat, not a looser number.</strong> A looser fixed limit, 20% say, would admit these frames today, but the wrong score was only ever measured against 10%. Nothing yet says where Dust&#39;s ranks sit on recorded guitar.</p>
+<p>The next step is to record the same rank distributions on the wrong-score controls, rung 2&#39;s guitars and the real clip, then design a test that compares the path&#39;s rank with what a wrong score achieves in the same timbre. One candidate for that is a decoy: align the same audio against a version of the score that cannot be right, and require the real path to rank clearly better than the decoy&#39;s. The decoy&#39;s rank moves with timbre just as the true path&#39;s does.</p></article><details><summary>g013-why-support-rejects — complete aggregate evidence</summary><pre>{
+  &quot;id&quot;: &quot;g013-why-support-rejects&quot;,
+  &quot;kind&quot;: &quot;support-diagnostic&quot;,
+  &quot;preregistration&quot;: &quot;reports/013-why-support-rejects.md&quot;,
+  &quot;gitCommit&quot;: &quot;b9245ebdedc3b4aa2464d3fb59102011bcd7b942&quot;,
+  &quot;machine&quot;: {
+    &quot;hostname&quot;: &quot;williao-G3-3579&quot;,
+    &quot;cpu&quot;: &quot;Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz&quot;,
+    &quot;cores&quot;: 12,
+    &quot;platform&quot;: &quot;linux&quot;,
+    &quot;arch&quot;: &quot;x64&quot;,
+    &quot;node&quot;: &quot;v22.22.1&quot;
+  },
+  &quot;candidate&quot;: &quot;online-time-warp@6&quot;,
+  &quot;rankLimit&quot;: 0.1,
+  &quot;pathCostCap&quot;: 0.7,
+  &quot;perSet&quot;: [
+    {
+      &quot;example&quot;: &quot;development-tonejs-acoustic-positive&quot;,
+      &quot;frames&quot;: 466,
+      &quot;correctAlignment&quot;: 452,
+      &quot;rejectedCorrect&quot;: 0,
+      &quot;byRank&quot;: 0,
+      &quot;byCap&quot;: 0,
+      &quot;byBoth&quot;: 0,
+      &quot;warming&quot;: 9,
+      &quot;pathCost&quot;: null,
+      &quot;meanRank&quot;: null
+    },
+    {
+      &quot;example&quot;: &quot;held-out-tonejs-nylon-positive&quot;,
+      &quot;frames&quot;: 466,
+      &quot;correctAlignment&quot;: 424,
+      &quot;rejectedCorrect&quot;: 132,
+      &quot;byRank&quot;: 132,
+      &quot;byCap&quot;: 0,
+      &quot;byBoth&quot;: 0,
+      &quot;warming&quot;: 9,
+      &quot;pathCost&quot;: {
+        &quot;p05&quot;: 0.4727312217276214,
+        &quot;median&quot;: 0.49427882915493704,
+        &quot;p95&quot;: 0.5589356899192727
+      },
+      &quot;meanRank&quot;: {
+        &quot;p05&quot;: 0.10214736842105265,
+        &quot;median&quot;: 0.13073684210526323,
+        &quot;p95&quot;: 0.18799999999999997
+      }
+    },
+    {
+      &quot;example&quot;: &quot;held-out-tonejs-electric-positive&quot;,
+      &quot;frames&quot;: 466,
+      &quot;correctAlignment&quot;: 448,
+      &quot;rejectedCorrect&quot;: 70,
+      &quot;byRank&quot;: 70,
+      &quot;byCap&quot;: 0,
+      &quot;byBoth&quot;: 0,
+      &quot;warming&quot;: 9,
+      &quot;pathCost&quot;: {
+        &quot;p05&quot;: 0.4842384952208624,
+        &quot;median&quot;: 0.48994278620513887,
+        &quot;p95&quot;: 0.5539825203404068
+      },
+      &quot;meanRank&quot;: {
+        &quot;p05&quot;: 0.10172631578947368,
+        &quot;median&quot;: 0.1192,
+        &quot;p95&quot;: 0.15596491228070172
+      }
+    },
+    {
+      &quot;example&quot;: &quot;held-out-shinyguitar-positive&quot;,
+      &quot;frames&quot;: 466,
+      &quot;correctAlignment&quot;: 409,
+      &quot;rejectedCorrect&quot;: 230,
+      &quot;byRank&quot;: 222,
+      &quot;byCap&quot;: 0,
+      &quot;byBoth&quot;: 8,
+      &quot;warming&quot;: 9,
+      &quot;pathCost&quot;: {
+        &quot;p05&quot;: 0.5937436065436447,
+        &quot;median&quot;: 0.6394919433190606,
+        &quot;p95&quot;: 0.6903528752518449
+      },
+      &quot;meanRank&quot;: {
+        &quot;p05&quot;: 0.10673684210526314,
+        &quot;median&quot;: 0.16492631578947364,
+        &quot;p95&quot;: 0.21578947368421061
+      }
+    }
+  ],
+  &quot;thermometer&quot;: {
+    &quot;example&quot;: &quot;real Winner clip, sync-interpolated truth&quot;,
+    &quot;frames&quot;: 466,
+    &quot;correctAlignment&quot;: 325,
+    &quot;rejectedCorrect&quot;: 325,
+    &quot;byRank&quot;: 325,
+    &quot;byCap&quot;: 0,
+    &quot;byBoth&quot;: 0,
+    &quot;warming&quot;: 9,
+    &quot;pathCost&quot;: {
+      &quot;p05&quot;: 0.3325936924999312,
+      &quot;median&quot;: 0.3744506920470422,
+      &quot;p95&quot;: 0.42857166863353524
+    },
+    &quot;meanRank&quot;: {
+      &quot;p05&quot;: 0.11385263157894737,
+      &quot;median&quot;: 0.15519999999999998,
+      &quot;p95&quot;: 0.19578947368421054
+    }
+  },
+  &quot;privateFramesSha256&quot;: &quot;006c281d586e05f8e5b90b8dea6ec0aef3de98e2225e0539a0944c4bbd3ab395&quot;
+}
+</pre><p>SHA-256 <code>6001b6e3b120b7573638196f5c482344ff56657c71fb4b97a38aabdd874a5b05</code></p></details><footer>Summary SHA-256 <code>ccd4e33db8bb69e2e33ab46f6c197e1c227a3b2ae568576172217de92dcfa78e</code>. This report does not rerun or alter an experiment.</footer></main></body></html>

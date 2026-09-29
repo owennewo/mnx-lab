@@ -153,6 +153,19 @@
         "href": "011-path-and-support.html",
         "label": "Experiment 011"
       }
+    },
+    {
+      "number": "013",
+      "slug": "013-why-support-rejects",
+      "title": "013 · Why the support test rejects correct alignments",
+      "banner": "The 10% rank limit, not the cost cap, rejects correct alignments on guitar and the real clip",
+      "runs": [
+        "g013-why-support-rejects"
+      ],
+      "previous": {
+        "href": "012-seam-verification.html",
+        "label": "Experiment 012"
+      }
     }
   ]
 }
