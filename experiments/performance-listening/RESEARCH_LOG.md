@@ -48,6 +48,14 @@ Three of four sampled guitars and 18/19 active examples pass; **not saturated**.
 The next question is why Shinyguitar still loses correct points to both position
 and support while the earlier rungs and controls hold.
 
+**A measurement change awaits the user's approval.** On 2026-09-30 the user questioned
+what contract 1 measures and gave directions: a live cursor judged at event resolution
+that recovers after missing notes, and an end-of-piece assessment of tempo variation
+and note sequence, reported per bar. [Development contract 2 (draft)](contracts/development-contract-2-draft.md)
+records those directions verbatim and proposes the instruments and evidence. Until it
+is approved, contract 1 governs; the next model should not start experiment 022 under
+contract 1 without checking whether the draft has been approved or withdrawn.
+
 The user-authorized five-experiment batch **017–021 is 5/5 complete**. The original
 bar is partly met: nylon and exposure/deadline targets met, Shinyguitar ≥95% and
 4/4 guitars not met. [The full before/after and experiment-by-experiment account](reports/021-stability-calibration.md#five-experiment-outcome-against-the-original-bar)
