@@ -139,3 +139,10 @@ rows record the model only in their commits' trailers.
 | Run | Hypothesis / sources | Parent / candidate | Set / evaluator | Conditions / resources | Results / uncertainty | Decision / next action |
 |---|---|---|---|---|---|---|
 | [g018](runs/g018-acoustic-anchor/summary.json) | [018 pre-registration](reports/018-acoustic-anchor.md#pre-registration); question 24; 017 predictor diagnosis | v9 design parent, v8 incumbent / v10 acoustic-anchored predictor and alignment-only diagnostic | Unchanged 19-example active suite / following-evaluator@1; recognition; sync-proxy thermometer | GPT-6 in Codex; known start, 101 BPM, 48 kHz/480; CPU/commit in report; no rerun | Nylon 89.9%; Shinyguitar supported 87.3%, alignment 99.5%; earlier rungs/controls/acoustic/electric all pass; 57/57 reproduce. Reused development evidence, correlated points | Reject v10, retain v8; plateau 2, budgets/access unchanged. Batch 2/5; next support/path interaction and residual nylon alignment |
+
+
+<a id="g019-emitted-support"></a>
+
+| Run | Hypothesis / sources | Parent / candidate | Set / evaluator | Conditions / resources | Results / uncertainty | Decision / next action |
+|---|---|---|---|---|---|---|
+| [g019](runs/g019-emitted-support/summary.json) | [019 pre-registration](reports/019-emitted-support.md#pre-registration); question 25; reused 017 source note | v10 design parent, v8 incumbent / v11 endpoint-rank support; v10 alignment-only | Unchanged 19-example active suite / following-evaluator@1; recognition; sync-proxy thermometer | GPT-6 in Codex; 101 BPM, known start, 48 kHz/480; 362.107 CPU s; one private attempt | Shinyguitar 47.1%, nylon 67.7%; every safeguard passes, positions unchanged, 76/76 reproduce. Reused correlated development evidence | Reject v11; v8 remains; plateau 3 triggers bounded research refresh before next candidate. Batch 3/5; budgets/access unchanged |

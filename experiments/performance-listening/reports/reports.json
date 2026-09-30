@@ -233,6 +233,19 @@
         "href": "017-tempo-continuity.html",
         "label": "Experiment 017"
       }
+    },
+    {
+      "number": "019",
+      "slug": "019-emitted-support",
+      "title": "019 · Support on the emitted trajectory",
+      "banner": "Version 11 rejected · endpoint ranks reject correct guitar positions · mandatory research refresh",
+      "runs": [
+        "g019-emitted-support"
+      ],
+      "previous": {
+        "href": "018-acoustic-anchor.html",
+        "label": "Experiment 018"
+      }
     }
   ]
 }
