@@ -425,6 +425,33 @@ CLI: `npx --no -- musicxml-mnx|guitarpro-mnx --import|--export <file> [--output 
   deleted before the roadmap doc moves to `complete/` — *Working in parallel* above
   governs every session that edits a tracked file.
 
+## Research loops: experiment, audit, review
+
+Research that iterates on an algorithm against measured evidence runs as a loop with
+separate roles. This is the general approach; `experiments/performance-listening/` is
+the current instance, and its documents are the reference:
+
+- **The user sets direction** and approves anything that loosens a contract, sets gates
+  or decides product questions. Their directions are quoted into a repository record
+  before the work they shape ends.
+- **Experimenters** run one numbered experiment each, from pre-registration to landed
+  record ([RUNNING_AN_EXPERIMENT.md](experiments/performance-listening/RUNNING_AN_EXPERIMENT.md)).
+  The pre-registration lands before anything runs, and results are appended below it.
+- **Auditors** check every new evaluator oracle before anything is judged by it
+  ([AUDITING_AN_ORACLE.md](experiments/performance-listening/AUDITING_AN_ORACLE.md)).
+- **A process reviewer** checks, after each experiment or batch, that the process was
+  followed, that the claims follow from the evidence, and that the loop still measures
+  what the user wants. It fixes process documents directly and brings course
+  corrections to the user ([REVIEWING_THE_PROCESS.md](experiments/performance-listening/REVIEWING_THE_PROCESS.md),
+  recorded in [reviews.md](experiments/performance-listening/reviews.md)).
+- Audits and reviews are done by a session that did not write what it checks, on a
+  different model where possible. State lives in the repository (research log, ledger,
+  reports, reviews), never in a model's memory.
+- The user may ask for a **batch** of experiments, often five, with a goal and no review
+  in between; the batch stops where it needs the user, and the reviewer then assesses
+  the batch as a whole.
+- Whoever launches a session states its model and tool; the records carry it.
+
 ## Roadmap-driven development
 
 Interpret roadmap-shaped requests against `roadmap/`: "add to the roadmap" → new doc in

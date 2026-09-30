@@ -88,7 +88,9 @@ research log says is current.
 ## 3. Choose and design
 
 - **Choose one question.** Normally it is the top open question in the research log. If
-  you take another, say why from the evidence. Consider alternative explanations and
+  you take another, say why from the evidence. If the log has a **current batch**, your
+  experiment is one of its runs: choose the question that best serves the batch's goal
+  within the contract and the approved gates, and say how it does. Consider alternative explanations and
   state how the experiment distinguishes them.
 - **Preserve the rules, not a predecessor's assumptions.** Contract 2, user directions
   and frozen evaluation rules bind you. A report's scientific explanation or
@@ -205,7 +207,10 @@ session that did not write the oracle. If you were asked to act as the parent, t
 your whole job:
 
 1. **Do no work yourself.** Do not edit files, design, run or interpret. Read `CLAUDE.md`
-   and the research log's current state and top question, only to check facts.
+   and the research log's current state and top question, only to check facts. The one
+   exception: if the user asked for a batch, first land the research log's **Current
+   batch** section (section 9), quoting their request and goal verbatim, and nothing
+   else.
 2. **Run the next experiment.** Launch one general-purpose subagent with exactly this
    prompt, adding nothing, since any summary or hint of yours would pass your
    interpretation on:
@@ -236,8 +241,30 @@ your whole job:
    Give it nothing about the experiment except the same final line naming its model
    and tool. Then check that the audit file landed and the
    research log's audit question links it.
-5. **Stop** before any further experiment, even if the audit agrees. Report to the user:
+5. **Stop** before any further experiment, even if the audit agrees, unless the user
+   asked for a batch: then return to step 2 for the next run, until the count is reached
+   or the batch ends early under section 9. Do not run the process review yourself. At
+   the end, report to the user:
    what the experiment did and showed, anything awaiting their approval, and the audit's
    verdict case by case, quoting every disagreement or ambiguity in full. Subagents'
    replies are not shown to the user, so what matters must be in your report.
 
+## 9. Batches
+
+The user may ask for several experiments in a row, often five, without a review in
+between, and may give the batch a goal, such as "start introducing different
+instruments slowly whilst working to pass existing quality gates". The batch's goal is
+a user direction, so it lives in the repository before the first run: a **Current
+batch** section at the top of the research log's current state quotes the user's
+request, gives the count, and is updated by each experiment ("run 2 of 5").
+
+- A goal steers the choice of question; it never loosens the contract, the gates or a
+  rule here. Earlier stages and controls must keep passing while the goal is pursued.
+- Where the goal needs something only the user can grant, such as gates for a new
+  stage, a wider range or a product decision, record the proposal in the report and the
+  log, and either continue with work that does not need it or end the batch there,
+  saying which. Never proceed on your own authority.
+- An inconclusive or infrastructure outcome ends the batch.
+- The last experiment of a batch, or the one that ends it early, closes the Current
+  batch section: how far the goal got, and why it stopped. A process review of the
+  whole batch follows ([REVIEWING_THE_PROCESS.md](REVIEWING_THE_PROCESS.md)).
