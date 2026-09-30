@@ -13,7 +13,7 @@ it. Each thing below was written before any code that implements it.
 | `following-evaluator@2` | **unchanged** | Reads `performance-label@1` and `@2`. None of its rules changed |
 | `assessment-report@2` | new version | Intervals as durations in seconds; notes as [vocabulary 2.1](vocabulary-v2.md#version-21-the-dead-verdict) statements, with the `dead` verdict |
 | `assessment-evaluator@2` | new version | Flags against the typical tempo; interval durations with their tolerance; clean examples and false findings; the `dead` verdict; intended dead notes matched; what a control's assessment claims |
-| `stage-gates@1` | new | The gates approved for stages 1–3, applied per example and pooled over a stage; the control-assessment gate, **proposed and awaiting the user** |
+| `stage-gates@1` | new | The gates approved for stages 1–3, applied per example and pooled over a stage; the control-assessment gate, proposed by experiment 023 and **approved by the user on 2026-09-30** |
 
 The oracle cases that pin these rules are **event-oracle@2** in
 [`bench/oracle-events/`](../bench/oracle-events/README.md). The constants D = 0.2 s and
@@ -219,7 +219,7 @@ control gates, unchanged:
 | `notes` | no score note is unassessed |
 | `clean` | the example is not clean, or it has no false finding at all |
 
-On a *control* (**proposed by experiment 023, awaiting the user's approval**):
+On a *control* (proposed by experiment 023, **approved by the user on 2026-09-30**, as [contract 2](development-contract-2.md#the-gates-approved-for-stages-13) records):
 
 | Gate | Passes when |
 |---|---|
@@ -231,7 +231,7 @@ A control's notes may be stated missing or left unassessed: an assessor that say
 assessment fails every assessment gate that applies to the example.
 
 **Pooled over a stage's performances.** Controls are excluded here and judged only by
-their own gates (**part of the same proposal**), because a control's every note is
+their own gates (part of the same approval), because a control's every note is
 missing and would otherwise dominate the missing-note rates.
 
 | Gate | Passes when |
@@ -247,3 +247,17 @@ them and the runner measures them.
 
 A stage passes when every example of it, its controls and every earlier stage pass,
 the pooled gates pass, and causality and cost pass.
+
+## Clarification, 2026-09-30
+
+Added after [audit 2](../bench/oracle-events/audit-2.md) found one rule that reads two
+ways. It changes no number in event-oracle@1 or event-oracle@2, and the evaluators
+already follow it; no oracle version or audit is needed.
+
+- **following-evaluator@2, rule 3, excluded time.** Time that is both *pending* and
+  *indeterminate*, because a label's first segment starts at 0 with a non-zero
+  `uncertainty`, is counted **once, as pending**. *Indeterminate* counts only excluded
+  time that is not pending. This is the reading event-oracle@2's case F9 already uses
+  (indeterminate 0.1, 1.0 and 0.1 s). The user chose it over the other reading, which
+  would count the overlap as both, because it keeps the excluded categories disjoint.
+

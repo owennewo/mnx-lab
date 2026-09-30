@@ -105,6 +105,13 @@ against the player's typical tempo, and a distinct dead-note verdict. The user w
 That accepts the recommendations recorded below under the gates, tempo variation and
 notes, and makes experiment 023 the small experiment that implements them.
 
+After experiment 023 and the audit of its oracle, the author recommended approving the
+control-assessment gate, moving the near-miss wrong score `w1` to stage 2 and giving
+stage 1 a distant one, and settling the audit's one ambiguity by a clarification that
+changes no number. The user wrote:
+
+> yes can you make those changes, including recommendations and 024 tweak
+
 ## Why
 
 Contract 1 measures one thing: whether the live cursor is within ±¼ quarter of the
@@ -191,11 +198,22 @@ before the next begins. Earlier stages stay as regression evidence.
 | 5 | The same | The same | The category bundles: advanced, then intermediate, then beginner |
 
 **Every stage carries two negative controls**, like contract 1's ladder: digital
-silence of the same length, and the stage's audio handed a **wrong score**, an unrelated
-simple score that shares no opening with the performed one. The cursor must not claim a
-position in either, and the assessment must not report a control's notes as played.
-A perfect-performance stage without controls cannot tell a listener that hears from one
-that always follows (lesson L8).
+silence of the same length, and the stage's audio handed a **wrong score**. The cursor
+must not claim a position in either, and the assessment must not report a control's
+notes as played. A perfect-performance stage without controls cannot tell a listener
+that hears from one that always follows (lesson L8).
+
+- **Stage 1's wrong score is distant**: a different register and a different rhythm
+  from the performed scores, and no three consecutive notes whose intervals match
+  three consecutive notes of a performed score, at any transposition. Leaps rather than
+  steps make that easy.
+  Stage 1 is the happy path, so its control must be plainly unrelated.
+- **The near-miss wrong score `w1`** ([`sources/w1-two-bar-black-keys.mnx.json`](../sources/w1-two-bar-black-keys.mnx.json))
+  moves to **stage 2**, beside the wrong-note deviations. Its first bar is the two-bar
+  scale's second bar a semitone away, in the same rhythm, so it asks the harder
+  question: accept one neighbouring wrong note, but reject a bar of them. Experiment 023
+  found the frozen time warpers follow it. Its examples in `contract2-stage1-v2` are
+  judged as stage 2 evidence, not stage 1.
 
 Deviations, added one at a time in this order: steady tempo away from the handed one;
 a hesitation; a slowed bar; a rushed bar; a missing event; a wrong note; a dead note;
@@ -272,7 +290,7 @@ loosened under pressure once a stage proves them unreachable.
 | Measure | Gate |
 |---|---|
 | Live cursor, per example | On event ≥ 95% of supported answerable time; ahead ≤ 1%; exposure ≤ 5% with no episode over 0.5 s; every event reached within 0.2 s where an example has fewer than 20, otherwise ≥ 95% |
-| Controls, per example | Contract 1's approved control gates, unchanged: correct rejection ≥ 95% of answerable time, false-following exposure ≤ 5%, no episode over 0.5 s. How the assessment of a control is judged is proposed by experiment 023 for approval |
+| Controls, per example | Contract 1's approved control gates, unchanged: correct rejection ≥ 95% of answerable time, false-following exposure ≤ 5%, no episode over 0.5 s. The assessment of a control claims no score note played and reports no tempo, overall, interval or flag; controls are excluded from the pooled finding rates. Proposed by experiment 023, approved by the user on 2026-09-30 |
 | Live cursor, pooled over a stage | Recovery after a missing event ≥ 90%; extra notes held ≥ 90% |
 | Causality and cost | Every prefix check; sustained cost ratio ≤ 0.25; chunk p99 ≤ 10 ms |
 | Assessment, per example | Overall tempo within ±5%; every expected interval reported, each **duration within ±10% or ±30 ms, whichever is larger** (changed from ±10% of tempo, which is ill-conditioned near a hesitation and tighter than onset precision on short notes); every score note assessed; **no false finding at all on a clean example** (changed from a pooled rate, which could hide one) |
@@ -332,23 +350,25 @@ it. The assessment can start from a whole-recording offline alignment.
 
 1. **Experiment 022: the instruments.** Done: version 1 of both evaluators, their
    oracle, stage 1 and the baselines; gates proposed.
-2. **Experiment 023: the decisions, implemented.** Version the instruments and the
-   oracle for the typical-tempo reference, interval durations with their floor, zero
-   findings on clean examples, the `dead` verdict with intended dead notes matched, and
-   the controls' scoring, as `event-instruments-2`, never editing version 1. Hand-work
-   and freeze the new oracle before implementing, as 022 did, re-working case A3 and
-   carrying the other version-1 cases over unchanged where their rules did not
-   change. Add the `dead` verdict to the vocabulary and `listen/`. Add
-   the silence and wrong-score controls to stage 1 as a new frozen set, committing the
-   unrelated wrong score to `sources/`. Remeasure the frozen baselines on it. No
-   listener is developed.
-3. **The oracle audit** of 023's oracle, by a different session.
-4. **Experiment 024: the first new listener, on stage 1.** Research event-based
-   following first, then build the simplest live cursor and end-of-piece assessor that
-   pass stage 1 under the approved gates.
-5. **Then the stages in order,** one deviation at a time. A stage is done when the
-   cursor and the assessment meet the approved gates on every example of it, its
-   controls and every earlier stage.
+2. **Experiment 023: the decisions, implemented.** Done: event instruments 2,
+   event-oracle@2, the `dead` verdict as vocabulary 2.1, stage 1 with controls as
+   `contract2-stage1-v2`, and the baselines remeasured.
+3. **The oracle audit.** Done: [audit 2](../bench/oracle-events/audit-2.md), 63 agree,
+   0 disagree, 3 ambiguous. The ambiguity is settled by the clarification in
+   [event instruments 2](event-instruments-2.md#clarification-2026-09-30), with no
+   oracle change.
+4. **Experiment 024: stage 1's distant control, then the first new listener.** First,
+   commit a distant wrong score to `sources/` under the rule above and freeze stage 1
+   again as a new private set: the eight performances and their silence controls as in
+   `contract2-stage1-v2`, and wrong-score controls handed the distant score. Leave
+   `contract2-stage1-v2` untouched; its `w1` controls wait for stage 2. The event
+   oracle's control cases do not depend on which wrong score is used, so no oracle
+   version or audit is needed. Then research event-based following, and build the
+   simplest live cursor and end-of-piece assessor that pass stage 1 under
+   `stage-gates@1`, controls included.
+5. **Then the stages in order,** one deviation at a time, with `w1` joining stage 2. A
+   stage is done when the cursor and the assessment meet the approved gates on every
+   example of it, its controls and every earlier stage.
 
 ## Still open for the user
 

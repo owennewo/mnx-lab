@@ -79,9 +79,12 @@ Write `bench/oracle-events/audit-N.md`, with N the oracle's version:
 - a summary line: the number of cases agreed, disagreed and ambiguous;
 - your model and tool.
 
-Then update the research log's question for this audit: its status to `answered` with
-the verdict and a link, or, where there are disagreements or ambiguities, a new top
-question for the next numbered experiment to resolve them. Change nothing else: not the
-oracle, the instrument definitions, the contract or any code. The audit is not a numbered
+Then update the research log: the question for this audit, its status to `answered`
+with the verdict and a link, or, where there are disagreements or ambiguities, a new top
+question for the next numbered experiment to resolve them; and the **current state**
+paragraph, whose sentence about the oracle awaiting its audit becomes the audit's
+outcome. You may also fill in the oracle README's audit entry for this version with a
+link and the summary line. Change nothing else: not the oracle, the instrument
+definitions, the contract or any code. The audit is not a numbered
 experiment and adds no ledger row. Land it following `CLAUDE.md`, retire your worktree,
 and stop.

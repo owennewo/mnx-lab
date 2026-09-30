@@ -45,17 +45,22 @@ into the instruments: [event instruments 2](contracts/event-instruments-2.md) ju
 variation against the player's typical tempo, interval durations to ±10% or ±30 ms, zero
 false findings on clean examples, a distinct `dead` verdict (vocabulary 2.1) with
 intended dead notes matched, and the approved gates as `stage-gates@1`. They reproduce
-the hand-worked, frozen **event-oracle@2** exactly, and **that oracle now awaits its
-audit** by a different session before any listener is judged by it. Stage 1 now carries
-its controls, frozen as the private set `contract2-stage1-v2`: the clock fails every one,
-so stage 1 now separates listening from following; the frozen time warpers reject
-silence but follow the wrong score where its notes sit a semitone from the audio's.
-There is still no listener built for this contract, and none passes stage 1.
+the hand-worked, frozen **event-oracle@2** exactly, and an independent session on a
+different model [audited it](bench/oracle-events/audit-2.md): 63 agree, 0 disagree, 3
+ambiguous. The ambiguity, which owns time that is both pending and indeterminate, is
+settled by a [clarification](contracts/event-instruments-2.md#clarification-2026-09-30)
+that changes no number. The instruments are trusted.
 
-**Awaiting the user** ([report 023](reports/023-instruments-decisions.md#for-the-user-two-decisions-and-one-observation)):
-approval of the proposed control-assessment gate and the exclusion of controls from the
-pooled finding rates, and whether the wrong score `w1` stays as stage 1's control. The
-first new listener is **024**, after the audit.
+The user then approved the control-assessment gate: on a control, the assessment claims
+no note played and reports no tempo. Stage 1's controls showed that the clock follows
+everything, and that the frozen time warpers follow the wrong score `w1`, whose first bar
+is the scale's second bar a semitone away. `w1` is a near miss, too hard for the happy
+path, so it **moves to stage 2** and stage 1 gets a distant wrong score. There is still
+no listener built for this contract.
+
+The next experiment is **024**: first commit the distant wrong score and freeze stage 1
+again with it, then build the first new listener, a live cursor and an end-of-piece
+assessor, to pass stage 1 under `stage-gates@1`, controls included.
 
 No plateau: neither 022 nor 023 developed a listener.
 [Report 023](reports/023-instruments-decisions.md#resulting-plateau-budgets-and-evidence-access)
@@ -106,14 +111,14 @@ given when a question opens and never reused.
 
 | Rank | Question | Why it is ranked here | Status | Owner item |
 |---|---|---|---|---|
-| 8 | Which figure owns the excluded time that is both pending and indeterminate, when a label's first segment starts at 0 with a non-zero `uncertainty`? The audit read `following-evaluator@2`'s rule 3 two ways: the oracle counts it as pending (F9 indeterminate 0.1 / 1.0 / 0.1); read on its own definition it is indeterminate too (0.15 / 1.2 / 0.15). Answerable time, every category and every gate are the same under both | The audit's one ambiguity, to be resolved by the next numbered experiment: a one-sentence tie-break in the instruments, a tightening. Nothing waits on it | open | [Audit 2](bench/oracle-events/audit-2.md#the-ambiguity-f9s-indeterminate-figure); experiment 024 |
+| 4 | Can the simplest event-based live cursor and end-of-piece assessor pass stage 1, controls included, with stage 1's wrong score replaced by a distant one? | The first listener; the instruments are trusted and audited | open | [Contract 2 order of work](contracts/development-contract-2.md#order-of-work), experiment 024 |
 | 6 | Does an independent session, re-deriving **event-oracle@2** by hand from [event instruments 2](contracts/event-instruments-2.md), agree with it? | Answered: yes on every number a gate reads. 66 records and reports re-derived, all 13 derived blocks included: 63 agree, 0 disagree, 3 ambiguous (F9's `indeterminate` figure only, question 8) | answered | [Audit 2](bench/oracle-events/audit-2.md), Claude Fable 5.1 |
-| 7 | Does the user approve the proposed control-assessment gates (`claims`, `tempo`) and the exclusion of controls from the pooled finding rates, and does `w1` stay as stage 1's wrong score? | Needed before 024's assessment of a control can be passed or failed; `w1` turned out to be a semitone neighbour of s2's second bar (finding 8) | awaiting the user | [Report 023](reports/023-instruments-decisions.md#for-the-user-two-decisions-and-one-observation) |
-| 4 | Can the simplest event-based live cursor and end-of-piece assessor pass stage 1, controls included? | The first listener, once event-oracle@2 is audited | open | [Contract 2 order of work](contracts/development-contract-2.md#order-of-work), experiment 024, on `contract2-stage1-v2` |
 | 5 | Do the instruments, versioned for the user's decisions (typical-tempo reference, interval durations with a floor, clean examples, the dead verdict, the controls), reproduce a re-worked hand oracle, and what do the frozen baselines do on stage 1's new controls? | Answered: yes, exactly (finding 6); the clock fails every control and the time warpers fail two wrong-score controls (findings 7, 8) | answered | [Report 023](reports/023-instruments-decisions.md) |
 | 1 | Do following-evaluator@2 and assessment-evaluator@1 reproduce independently hand-worked oracle cases? | Answered: yes, exactly (finding 1) | answered | Experiment 022 |
 | 2 | On stage 1, where do the clock and the frozen versions 8, 12 and 14 fail, and do the failures show the forward-only, tempo-clamped design? | Answered: ahead of a slow player; indistinguishable at the handed tempo (findings 2–3) | answered | Experiment 022 |
 | 3 | Which numerical gates, flag reference tempo and dead-note verdict does the user approve? | Decided by the user after 022 | answered: gates approved for stages 1–3 with two changes; typical tempo; a dead verdict | [Report 022](reports/022-event-instruments.md#proposed-gates-awaiting-the-users-approval) |
+| 7 | Does the user approve the proposed control-assessment gates and the exclusion of controls from the pooled finding rates, and does `w1` stay as stage 1's wrong score? | Decided by the user after 023 | answered: gates approved; `w1` moves to stage 2, and stage 1 gets a distant wrong score | [Contract 2](contracts/development-contract-2.md#the-progression-start-simple-one-change-at-a-time) |
+| 8 | Which figure owns the excluded time that is both pending and indeterminate? | The audit's one ambiguity | answered: once, as pending, by the [clarification](contracts/event-instruments-2.md#clarification-2026-09-30); no oracle number changes | [Audit 2](bench/oracle-events/audit-2.md) |
 
 ## Superseded and stopped
 
