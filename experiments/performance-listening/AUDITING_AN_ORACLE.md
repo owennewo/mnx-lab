@@ -57,6 +57,12 @@ Re-derive by hand, from the rules alone:
 - **at least one case for every rule** in the instrument definitions; and
 - **every case the version added or changed.**
 
+A rule without a frozen hand-worked case is **uncovered**, not agreement. Record it
+under the rules you could not exercise, and carry it into the next numbered
+experiment's resolution question alongside disagreements or ambiguities. Do not
+invent an expected answer during the audit or treat a passing implementation test
+as its oracle; missing coverage must be frozen and audited before listener judgment.
+
 Work each number fully: times, durations, tempi, fractions and counts, with the
 arithmetic shown. Compare only after you have your own number. Give each case one
 verdict:

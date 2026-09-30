@@ -16,6 +16,7 @@ is visible: a process that gains rules every time is getting heavier, not better
 | R4 | 2026-09-30 | [025](reports/025-single-hesitation.md) | Claude Opus 5.5 (1M context) in Claude Code | Held; model identity vague again | [Landed with this entry](#r4-after-experiment-025) | Outside review; several deviations per experiment; report weight | +2 −2 |
 | R5 | 2026-09-30 | [026](reports/026-single-slowed-bar.md), post-R4 process changes and outside process check | Sol 6.1 (high) in Codex | Held; failure supported | [Landed with this entry](#r5-after-experiment-026-and-the-post-r4-process-changes) | Multiple substages still pending; no new decision needed for 027 | +0 −0 |
 | R6 | 2026-09-30 | [027](reports/027-live-confirmation.md) and post-R5 user decisions | Sol 6.1 (high) in Codex | Held; bounded repair supported | [Landed with this entry](#r6-after-experiment-027-and-the-post-r5-decisions) | Different-model milestone review remains due; no new decision for 028 | +0 −0 |
+| R7 | 2026-09-30 | [028](reports/028-other-bars-suite.md) | Sol 6.1 (high) in Codex | Held; mixed verdict supported, oracle coverage incomplete | [Landed with this entry](#r7-after-experiment-028) | No new decision; different-model milestone review remains due | +1 −0 |
 
 Reviews R1–R3 were given in conversation with the user and recorded here when this file
 was created. The same reviewer wrote contract 2 and most of the process it reviewed.
@@ -359,3 +360,86 @@ session log do not establish absence of unrecorded private-data access.
 approved rules. R1–R4 added ten rules and relaxed four; R5–R6 add none. The evidence
 supports continuing the lighter process rather than adding procedure.
 
+
+## R7, after experiment 028
+
+**Held: the mixed result is the correct stop.** Reviewed all three commits since R6
+(`78f3339f`), through `db0cddb4`. No experiment or audit is mid-flight, no batch is
+active, and 028's worktree and branch are retired. Reviewer: **Sol 6.1 (high) in
+Codex**, session `01a0f41f-58f2-7012-8d70-80ae53ee6224`. The separate experimenter
+session `01a0f406-46ce-7632-8cd6-6aed506ef84a` records `gpt-6.1-sol`, effort
+`high`, matching its report, ledger and commit bodies. This is session independence,
+not a different-model oracle audit.
+
+**Integrity and scope.** Main's reflog places pre-registration `309c845e` on main
+at 21:42:46 BST; the session records instrument implementation after that, at
+21:45:31. Execution starts at 21:53:50 and ends at 21:54:14; results land at
+22:00:39. The report begins with the exact pre-registration bytes. Instruments 3,
+s3, oracle 3 and its freeze remain byte-identical to their pre-registration commit.
+Changed paths leave earlier definitions, oracles, listeners, baselines, archive and
+product code untouched. The execution tag resolves to `ef679158` locally and on
+origin. One instrument run, no listener execution, no tuning or technical rerun,
+no new gates, and unchanged stopping/qualification state follow the frozen scope.
+
+Recomputed all six current-series manifests and their assets, resolving retired
+absolute score paths to the same committed bytes. Checked all cited current-series
+private artifacts and 028's validation/suite artifacts: **2,382 distinct hashed
+files**, plus **670 pinned source-hash checks** across 022–028. Independently summed
+per-beat durations for all 84 new performances: all **5,376** label/boundary checks
+match, and all 84 silence and 84 wrong-score pairs have the stated length/content.
+The committed suite record is byte-identical to its private artifact. Report exports
+022–028 reproduce with pinned sources; the initial sandboxed exporter could not
+read Git subprocess streams, and the permitted unsandboxed check passed. No listener
+or experimental runner was executed by this review.
+
+**Claims and the rising tide.** D2 is supported: the recorded validation preserves
+B1's disagreement rather than calling green implementation tests oracle agreement.
+The report expressly leaves independent arithmetic resolution to the audit and
+claims no listener pass under version 3. I recomputed normalized headroom from all
+264 historical detailed measurements without invoking an evaluator or listener;
+all 19 sentinel IDs and margins reproduce under the declared selection rule.
+Neither repaired F4 example was inserted by hand or retired to conceal its former
+failure. Historical passes remain instruments-2 evidence, confirmation is absent,
+and one incumbent evaluation cannot justify any performance retirement. The
+three-evaluation rule and sweep-only baseline exception remain distinct. The full
+sweep stays due by 031, earlier at stage completion, new gates or batch end.
+
+**Finding: frozen oracle coverage is incomplete.** As 028 itself discloses, routine
+and sweep plans and missing-control/duplicate-ID refusals have only post-freeze
+behavioral tests; report@3 summary-error/null handling lacks a frozen bad-report
+case. These tests cannot supply the independent hand-worked answers required by
+the contract. B1 is therefore not the only work the audit/correction handoff must
+carry. This does not justify changing 028's mixed verdict or frozen oracle, and
+no listener has yet been judged by the incomplete instrument.
+
+**Fixed directly.** Clarified the existing audit coverage obligation in
+[AUDITING_AN_ORACLE.md](AUDITING_AN_ORACLE.md): a rule without a frozen hand case
+is uncovered, not agreement, and joins disagreements/ambiguities in the next
+numbered resolution question. An auditor must not invent the missing oracle or
+substitute implementation tests for it. Updated the research log with this review
+and restored its findings to one Markdown table. No verdict, pre-registration,
+contract, definition, code or frozen evidence was edited.
+
+**Direction and recommendation.** The instrument work pursues the user's approved
+other-bars assessment and cheaper regression suite; it neither trades gates for
+speed nor presents data preparation as listener progress. The recorded 24.482 s
+is preparation/validation time; the 26,731-byte public summary stays small. The
+other-bars reference still has endpoint and multiple-deviating-bar limitations,
+which B4 and B7 expose openly. All evidence remains short monophonic sine development
+material; missing-note recovery, ringing hesitation, chords, recorded guitar and
+real players remain untested. Continue the already-ranked independent oracle@3
+audit, preferably on a different model, then a numbered correction addressing its
+findings and missing frozen coverage, followed by audit before listener evaluation.
+No new user decision is needed. The different-model milestone review of the whole
+process remains recommended at the next stage completion.
+
+**Could not check.** This is not a complete independent oracle arithmetic audit,
+listener replication, archived private-set sweep, real-player transfer test or
+microphone/mobile latency check. File hashes and session records establish the
+recorded provenance, not absence of unrecorded private-data access. Historical
+cost and causality are verified records, not fresh measurements.
+
+**Trend:** +1 −0, one explicit tightening of the audit handoff for uncovered rules;
+R5–R6 added none. R1–R4 added ten rules and relaxed four. The frozen counterexample
+shows that independence and preserving failures earn their place; no additional
+run stage, approval request or recurring checklist was added.
