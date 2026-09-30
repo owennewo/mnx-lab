@@ -9,5 +9,9 @@
     "pin": "46fbe9393067221ee83ef08de209cb3c4edf0d8d",
     "sha256": "63441ff16acfdedbeb1cec19a6f00b8eed646192eed7b0d23abec07295563582",
     "copy": "verbatim bytes; no type:event or tempo added"
+  },
+  "w1": {
+    "path": "w1-two-bar-black-keys.mnx.json",
+    "origin": "Handwritten for experiment 023: two bars of quarters, F#4 G#4 A#4 C#5 | D#5 F#5 G#5 A#5; no tempo. The stage-1 wrong score: the same rhythm as s1 and s2 and not one pitch in common with them."
   }
 }

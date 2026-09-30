@@ -1,0 +1,7 @@
+{
+  "oracle": "event-oracle@2",
+  "file": "oracle-2.json",
+  "sha256": "e29ba389170181cffdf6f67fd51052f5ca58709927a1767e42819ccf3f157a2c",
+  "frozen": "2026-09-30",
+  "condition": "Hand-worked from contracts/event-instruments-2.md before assessment-evaluator@2 or stage-gates@1 existed, and before any listener ran on stage 1's controls. Following cases F1-F10 are event-oracle@1's, with gate verdicts added. A correction is a new version with its reason, never an edit to match an evaluator. It awaits an audit by a session that did not write it."
+}

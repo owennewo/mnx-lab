@@ -1,0 +1,1110 @@
+{
+  "format": "event-oracle@2",
+  "instruments": "contracts/event-instruments-2.md",
+  "evaluators": ["following-evaluator@2", "assessment-evaluator@2", "stage-gates@1"],
+  "note": "Hand-worked from the rules before assessment-evaluator@2 or stage-gates@1 existed. Times in seconds; D = 0.2 s, theta = 0.10. Following cases F1-F10 and their labels are version 1's, unchanged, with their gate verdicts added. Omitted following measures are zero; omitted recovery and extras are [0, 0, 0]. `gates` lists the stage-gates@1 gates a record or report fails; an empty list passes.",
+  "scores": {
+    "toy8": [
+      {"at": "0:0/4", "quarter": 0, "notes": [["n0", 60]]},
+      {"at": "0:1/4", "quarter": 1, "notes": [["n1", 62]]},
+      {"at": "0:2/4", "quarter": 2, "notes": [["n2", 64]]},
+      {"at": "0:3/4", "quarter": 3, "notes": [["n3", 65]]},
+      {"at": "1:0/4", "quarter": 4, "notes": [["n4", 67]]},
+      {"at": "1:1/4", "quarter": 5, "notes": [["n5", 69]]},
+      {"at": "1:2/4", "quarter": 6, "notes": [["n6", 71]]},
+      {"at": "1:3/4", "quarter": 7, "notes": [["n7", 72]]}
+    ],
+    "chordsRepeat": [
+      {"at": "0:0/4", "quarter": 0, "notes": [["r0a", 48], ["r0b", 52], ["r0c", 55]]},
+      {"at": "0:1/4", "quarter": 1, "notes": [["r1a", 48], ["r1b", 52], ["r1c", 55]]},
+      {"at": "0:2/4", "quarter": 2, "notes": [["r2a", 48], ["r2b", 52], ["r2c", 55]]},
+      {"at": "0:3/4", "quarter": 3, "notes": [["r3a", 43], ["r3b", 47], ["r3c", 50]]}
+    ],
+    "chordsVaried": [
+      {"at": "0:0/4", "quarter": 0, "notes": [["v0a", 48], ["v0b", 52], ["v0c", 55]]},
+      {"at": "0:1/4", "quarter": 1, "notes": [["v1a", 53], ["v1b", 57], ["v1c", 60]]},
+      {"at": "0:2/4", "quarter": 2, "notes": [["v2a", 43], ["v2b", 47], ["v2c", 50]]},
+      {"at": "0:3/4", "quarter": 3, "notes": [["v3a", 48], ["v3b", 52], ["v3c", 55]]}
+    ],
+    "toyDD": [
+      {"at": "0:0/4", "quarter": 0, "notes": [["d0", 60]]},
+      {"at": "0:1/4", "quarter": 1, "notes": [["d1", 62]]},
+      {"at": "0:2/4", "quarter": 2, "notes": [["d2", 62]]},
+      {"at": "0:3/4", "quarter": 3, "notes": [["d3", 64]]}
+    ],
+    "toyDW": [
+      {"at": "0:0/4", "quarter": 0, "notes": [["n0", 60]]},
+      {"at": "0:1/4", "quarter": 1, "notes": [["n1", 62]]},
+      {"at": "0:2/4", "quarter": 2, "notes": [["n2", 64, "dead"]]},
+      {"at": "0:3/4", "quarter": 3, "notes": [["n3", 65]]},
+      {"at": "1:0/4", "quarter": 4, "notes": [["n4", 67]]},
+      {"at": "1:1/4", "quarter": 5, "notes": [["n5", 69]]},
+      {"at": "1:2/4", "quarter": 6, "notes": [["n6", 71]]},
+      {"at": "1:3/4", "quarter": 7, "notes": [["n7", 72]]}
+    ],
+    "toyW": [
+      {"at": "0:0/4", "quarter": 0, "notes": [["w0", 66]]},
+      {"at": "0:1/4", "quarter": 1, "notes": [["w1", 68]]},
+      {"at": "0:2/4", "quarter": 2, "notes": [["w2", 70]]},
+      {"at": "0:3/4", "quarter": 3, "notes": [["w3", 73]]},
+      {"at": "1:0/4", "quarter": 4, "notes": [["w4", 75]]},
+      {"at": "1:1/4", "quarter": 5, "notes": [["w5", 78]]},
+      {"at": "1:2/4", "quarter": 6, "notes": [["w6", 80]]},
+      {"at": "1:3/4", "quarter": 7, "notes": [["w7", 82]]}
+    ]
+  },
+  "labels": {
+    "toy8-perfect-60": {
+      "score": "toy8",
+      "handed": 60,
+      "duration": 8,
+      "resolution": "event",
+      "note": "Every note at 60 per minute, each ringing until the next onset.",
+      "played": [
+        {"e": 0, "onset": 0, "end": 1},
+        {"e": 1, "onset": 1, "end": 2},
+        {"e": 2, "onset": 2, "end": 3},
+        {"e": 3, "onset": 3, "end": 4},
+        {"e": 4, "onset": 4, "end": 5},
+        {"e": 5, "onset": 5, "end": 6},
+        {"e": 6, "onset": 6, "end": 7},
+        {"e": 7, "onset": 7, "end": 8}
+      ],
+      "distinguishable": [0, 1, 2, 3, 4, 5, 6, 7],
+      "extras": [],
+      "segments": [
+        {"from": 0, "truth": 0, "admissible": [0], "rule": ["sounded"]},
+        {"from": 1, "truth": 1, "admissible": [1], "rule": ["sounded"]},
+        {"from": 2, "truth": 2, "admissible": [2], "rule": ["sounded"]},
+        {"from": 3, "truth": 3, "admissible": [3], "rule": ["sounded"]},
+        {"from": 4, "truth": 4, "admissible": [4], "rule": ["sounded"]},
+        {"from": 5, "truth": 5, "admissible": [5], "rule": ["sounded"]},
+        {"from": 6, "truth": 6, "admissible": [6], "rule": ["sounded"]},
+        {"from": 7, "truth": 7, "admissible": [7], "rule": ["sounded"]}
+      ]
+    },
+    "toy8-hesitation": {
+      "score": "toy8",
+      "handed": 60,
+      "duration": 11,
+      "resolution": "event",
+      "note": "At 60 per minute, with 3 s of silence after F4 before G4: a hesitation at the barline.",
+      "played": [
+        {"e": 0, "onset": 0, "end": 1},
+        {"e": 1, "onset": 1, "end": 2},
+        {"e": 2, "onset": 2, "end": 3},
+        {"e": 3, "onset": 3, "end": 4},
+        {"e": 4, "onset": 7, "end": 8},
+        {"e": 5, "onset": 8, "end": 9},
+        {"e": 6, "onset": 9, "end": 10},
+        {"e": 7, "onset": 10, "end": 11}
+      ],
+      "distinguishable": [0, 1, 2, 3, 7, 8, 9, 10],
+      "extras": [],
+      "segments": [
+        {"from": 0, "truth": 0, "admissible": [0], "rule": ["sounded"]},
+        {"from": 1, "truth": 1, "admissible": [1], "rule": ["sounded"]},
+        {"from": 2, "truth": 2, "admissible": [2], "rule": ["sounded"]},
+        {"from": 3, "truth": 3, "admissible": [3], "rule": ["sounded"]},
+        {"from": 7, "truth": 4, "admissible": [4], "rule": ["sounded"]},
+        {"from": 8, "truth": 5, "admissible": [5], "rule": ["sounded"]},
+        {"from": 9, "truth": 6, "admissible": [6], "rule": ["sounded"]},
+        {"from": 10, "truth": 7, "admissible": [7], "rule": ["sounded"]}
+      ]
+    },
+    "toy8-missing-e3": {
+      "score": "toy8",
+      "handed": 60,
+      "duration": 8,
+      "resolution": "event",
+      "note": "At 60 per minute with F4 (event 3) not played: silence from 3 to 4 s.",
+      "played": [
+        {"e": 0, "onset": 0, "end": 1},
+        {"e": 1, "onset": 1, "end": 2},
+        {"e": 2, "onset": 2, "end": 3},
+        {"e": 3, "missing": true},
+        {"e": 4, "onset": 4, "end": 5},
+        {"e": 5, "onset": 5, "end": 6},
+        {"e": 6, "onset": 6, "end": 7},
+        {"e": 7, "onset": 7, "end": 8}
+      ],
+      "distinguishable": [0, 1, 2, null, 4, 5, 6, 7],
+      "extras": [],
+      "segments": [
+        {"from": 0, "truth": 0, "admissible": [0], "rule": ["sounded"]},
+        {"from": 1, "truth": 1, "admissible": [1], "rule": ["sounded"]},
+        {"from": 2, "truth": 2, "admissible": [2], "rule": ["sounded"]},
+        {"from": 4, "truth": 4, "admissible": [4], "rule": ["sounded"]},
+        {"from": 5, "truth": 5, "admissible": [5], "rule": ["sounded"]},
+        {"from": 6, "truth": 6, "admissible": [6], "rule": ["sounded"]},
+        {"from": 7, "truth": 7, "admissible": [7], "rule": ["sounded"]}
+      ]
+    },
+    "toy8-dead-e2": {
+      "score": "toy8",
+      "handed": 60,
+      "duration": 8,
+      "resolution": "event",
+      "note": "At 60 per minute; E4 (event 2) is a dead note, a pitchless onset lasting 0.1 s.",
+      "played": [
+        {"e": 0, "onset": 0, "end": 1},
+        {"e": 1, "onset": 1, "end": 2},
+        {"e": 2, "onset": 2, "end": 3, "notes": {"n2": {"dead": 2.1}}},
+        {"e": 3, "onset": 3, "end": 4},
+        {"e": 4, "onset": 4, "end": 5},
+        {"e": 5, "onset": 5, "end": 6},
+        {"e": 6, "onset": 6, "end": 7},
+        {"e": 7, "onset": 7, "end": 8}
+      ],
+      "distinguishable": [0, 1, null, 3, 4, 5, 6, 7],
+      "extras": [],
+      "segments": [
+        {"from": 0, "truth": 0, "admissible": [0], "rule": ["sounded"]},
+        {"from": 1, "truth": 1, "admissible": [1], "rule": ["sounded"]},
+        {"from": 2, "truth": 2, "admissible": [1, 2], "rule": ["dead"]},
+        {"from": 3, "truth": 3, "admissible": [3], "rule": ["sounded"]},
+        {"from": 4, "truth": 4, "admissible": [4], "rule": ["sounded"]},
+        {"from": 5, "truth": 5, "admissible": [5], "rule": ["sounded"]},
+        {"from": 6, "truth": 6, "admissible": [6], "rule": ["sounded"]},
+        {"from": 7, "truth": 7, "admissible": [7], "rule": ["sounded"]}
+      ]
+    },
+    "toy8-dead-e2-e3": {
+      "score": "toy8",
+      "handed": 60,
+      "duration": 8,
+      "resolution": "event",
+      "note": "At 60 per minute; E4 and F4 (events 2 and 3) are consecutive dead notes.",
+      "played": [
+        {"e": 0, "onset": 0, "end": 1},
+        {"e": 1, "onset": 1, "end": 2},
+        {"e": 2, "onset": 2, "end": 3, "notes": {"n2": {"dead": 2.1}}},
+        {"e": 3, "onset": 3, "end": 4, "notes": {"n3": {"dead": 3.1}}},
+        {"e": 4, "onset": 4, "end": 5},
+        {"e": 5, "onset": 5, "end": 6},
+        {"e": 6, "onset": 6, "end": 7},
+        {"e": 7, "onset": 7, "end": 8}
+      ],
+      "distinguishable": [0, 1, null, null, 4, 5, 6, 7],
+      "extras": [],
+      "segments": [
+        {"from": 0, "truth": 0, "admissible": [0], "rule": ["sounded"]},
+        {"from": 1, "truth": 1, "admissible": [1], "rule": ["sounded"]},
+        {"from": 2, "truth": 2, "admissible": [1, 2], "rule": ["dead"]},
+        {"from": 3, "truth": 3, "admissible": [1, 2, 3], "rule": ["dead"]},
+        {"from": 4, "truth": 4, "admissible": [4], "rule": ["sounded"]},
+        {"from": 5, "truth": 5, "admissible": [5], "rule": ["sounded"]},
+        {"from": 6, "truth": 6, "admissible": [6], "rule": ["sounded"]},
+        {"from": 7, "truth": 7, "admissible": [7], "rule": ["sounded"]}
+      ]
+    },
+    "chordsRepeat-60": {
+      "score": "chordsRepeat",
+      "handed": 60,
+      "duration": 4,
+      "resolution": "event",
+      "note": "C major struck three times at 60 per minute, then G major.",
+      "played": [
+        {"e": 0, "onset": 0, "end": 1},
+        {"e": 1, "onset": 1, "end": 2},
+        {"e": 2, "onset": 2, "end": 3},
+        {"e": 3, "onset": 3, "end": 4}
+      ],
+      "distinguishable": [0, null, null, 3],
+      "extras": [],
+      "segments": [
+        {"from": 0, "truth": 0, "admissible": [0], "rule": ["sounded"]},
+        {"from": 1, "truth": 1, "admissible": [0, 1], "rule": ["repeated"]},
+        {"from": 2, "truth": 2, "admissible": [0, 1, 2], "rule": ["repeated"]},
+        {"from": 3, "truth": 3, "admissible": [3], "rule": ["sounded"]}
+      ]
+    },
+    "chordsVaried-60-partial-wrong": {
+      "score": "chordsVaried",
+      "handed": 60,
+      "duration": 4,
+      "resolution": "event",
+      "note": "C, F, G, C at 60 per minute. The F chord is partial (A3, 57, not played); the G chord has B2 (47) played as B-flat 2 (46).",
+      "played": [
+        {"e": 0, "onset": 0, "end": 1},
+        {"e": 1, "onset": 1, "end": 2, "notes": {"v1b": "missing"}},
+        {"e": 2, "onset": 2, "end": 3, "notes": {"v2b": {"wrong": 46}}},
+        {"e": 3, "onset": 3, "end": 4}
+      ],
+      "distinguishable": [0, 1, 2, 3],
+      "extras": [],
+      "segments": [
+        {"from": 0, "truth": 0, "admissible": [0], "rule": ["sounded"]},
+        {"from": 1, "truth": 1, "admissible": [1], "rule": ["sounded"]},
+        {"from": 2, "truth": 2, "admissible": [2], "rule": ["sounded"]},
+        {"from": 3, "truth": 3, "admissible": [3], "rule": ["sounded"]}
+      ]
+    },
+    "toy8-extra": {
+      "score": "toy8",
+      "handed": 60,
+      "duration": 8,
+      "resolution": "event",
+      "note": "The perfect performance plus a stray open low E (MIDI 40) from 2.5 to 2.8 s.",
+      "played": [
+        {"e": 0, "onset": 0, "end": 1},
+        {"e": 1, "onset": 1, "end": 2},
+        {"e": 2, "onset": 2, "end": 3},
+        {"e": 3, "onset": 3, "end": 4},
+        {"e": 4, "onset": 4, "end": 5},
+        {"e": 5, "onset": 5, "end": 6},
+        {"e": 6, "onset": 6, "end": 7},
+        {"e": 7, "onset": 7, "end": 8}
+      ],
+      "distinguishable": [0, 1, 2, 3, 4, 5, 6, 7],
+      "extras": [[2.5, 2.8, 40]],
+      "segments": [
+        {"from": 0, "truth": 0, "admissible": [0], "rule": ["sounded"]},
+        {"from": 1, "truth": 1, "admissible": [1], "rule": ["sounded"]},
+        {"from": 2, "truth": 2, "admissible": [2], "rule": ["sounded"]},
+        {"from": 3, "truth": 3, "admissible": [3], "rule": ["sounded"]},
+        {"from": 4, "truth": 4, "admissible": [4], "rule": ["sounded"]},
+        {"from": 5, "truth": 5, "admissible": [5], "rule": ["sounded"]},
+        {"from": 6, "truth": 6, "admissible": [6], "rule": ["sounded"]},
+        {"from": 7, "truth": 7, "admissible": [7], "rule": ["sounded"]}
+      ]
+    },
+    "toy8-silence": {
+      "score": "toy8",
+      "handed": 60,
+      "duration": 4,
+      "resolution": "event",
+      "note": "Four seconds of silence handed with toy8: nothing of the score is played.",
+      "played": [
+        {"e": 0, "missing": true},
+        {"e": 1, "missing": true},
+        {"e": 2, "missing": true},
+        {"e": 3, "missing": true},
+        {"e": 4, "missing": true},
+        {"e": 5, "missing": true},
+        {"e": 6, "missing": true},
+        {"e": 7, "missing": true}
+      ],
+      "distinguishable": [null, null, null, null, null, null, null, null],
+      "extras": [],
+      "segments": [
+        {"from": 0, "state": "unsupported", "truth": null, "admissible": [], "rule": []}
+      ],
+      "control": "silence"
+    },
+    "toy8-sync-good": {
+      "score": "toy8",
+      "handed": 60,
+      "duration": 8,
+      "resolution": "bar",
+      "note": "The perfect performance known only by bar anchors at 0 and 4 s, each within 0.05 s.",
+      "played": [
+        {"e": 0, "onset": 0, "end": 1},
+        {"e": 1, "onset": 1, "end": 2},
+        {"e": 2, "onset": 2, "end": 3},
+        {"e": 3, "onset": 3, "end": 4},
+        {"e": 4, "onset": 4, "end": 5},
+        {"e": 5, "onset": 5, "end": 6},
+        {"e": 6, "onset": 6, "end": 7},
+        {"e": 7, "onset": 7, "end": 8}
+      ],
+      "distinguishable": [null, null, null, null, null, null, null, null],
+      "extras": [],
+      "segments": [
+        {"from": 0, "uncertainty": 0.05, "truth": null, "admissible": [0, 1, 2, 3], "rule": ["bar-anchor"]},
+        {"from": 4, "uncertainty": 0.05, "truth": null, "admissible": [4, 5, 6, 7], "rule": ["bar-anchor"]}
+      ]
+    },
+    "toy8-sync-late-honest": {
+      "score": "toy8",
+      "handed": 60,
+      "duration": 8,
+      "resolution": "bar",
+      "note": "The same audio with the second bar's anchor 0.3 s late, and every anchor honestly declared within 0.4 s.",
+      "played": [
+        {"e": 0, "onset": 0, "end": 1},
+        {"e": 1, "onset": 1, "end": 2},
+        {"e": 2, "onset": 2, "end": 3},
+        {"e": 3, "onset": 3, "end": 4},
+        {"e": 4, "onset": 4, "end": 5},
+        {"e": 5, "onset": 5, "end": 6},
+        {"e": 6, "onset": 6, "end": 7},
+        {"e": 7, "onset": 7, "end": 8}
+      ],
+      "distinguishable": [null, null, null, null, null, null, null, null],
+      "extras": [],
+      "segments": [
+        {"from": 0, "uncertainty": 0.4, "truth": null, "admissible": [0, 1, 2, 3], "rule": ["bar-anchor"]},
+        {"from": 4.3, "uncertainty": 0.4, "truth": null, "admissible": [4, 5, 6, 7], "rule": ["bar-anchor"]}
+      ]
+    },
+    "toy8-sync-late-narrow": {
+      "score": "toy8",
+      "handed": 60,
+      "duration": 8,
+      "resolution": "bar",
+      "note": "The same late anchor declared within only 0.05 s: the band does not cover the sync error.",
+      "played": [
+        {"e": 0, "onset": 0, "end": 1},
+        {"e": 1, "onset": 1, "end": 2},
+        {"e": 2, "onset": 2, "end": 3},
+        {"e": 3, "onset": 3, "end": 4},
+        {"e": 4, "onset": 4, "end": 5},
+        {"e": 5, "onset": 5, "end": 6},
+        {"e": 6, "onset": 6, "end": 7},
+        {"e": 7, "onset": 7, "end": 8}
+      ],
+      "distinguishable": [null, null, null, null, null, null, null, null],
+      "extras": [],
+      "segments": [
+        {"from": 0, "uncertainty": 0.05, "truth": null, "admissible": [0, 1, 2, 3], "rule": ["bar-anchor"]},
+        {"from": 4.3, "uncertainty": 0.05, "truth": null, "admissible": [4, 5, 6, 7], "rule": ["bar-anchor"]}
+      ]
+    },
+    "toyDD-omit-e1": {
+      "score": "toyDD",
+      "handed": 60,
+      "duration": 4,
+      "resolution": "event",
+      "note": "C4 D4 D4 E4 at 60 per minute with the first D4 (event 1) omitted: the D heard at 2 s could be either D.",
+      "played": [
+        {"e": 0, "onset": 0, "end": 1},
+        {"e": 1, "missing": true},
+        {"e": 2, "onset": 2, "end": 3},
+        {"e": 3, "onset": 3, "end": 4}
+      ],
+      "distinguishable": [0, null, null, 3],
+      "extras": [],
+      "segments": [
+        {"from": 0, "truth": 0, "admissible": [0], "rule": ["sounded"]},
+        {"from": 2, "truth": 2, "admissible": [1, 2], "rule": ["omission-similar"]},
+        {"from": 3, "truth": 3, "admissible": [3], "rule": ["sounded"]}
+      ]
+    },
+    "toy8-slow-30": {
+      "score": "toy8",
+      "handed": 60,
+      "duration": 16,
+      "resolution": "event",
+      "note": "Every note right and perfectly steady at 30 per minute, half the handed tempo.",
+      "played": [
+        {"e": 0, "onset": 0, "end": 2},
+        {"e": 1, "onset": 2, "end": 4},
+        {"e": 2, "onset": 4, "end": 6},
+        {"e": 3, "onset": 6, "end": 8},
+        {"e": 4, "onset": 8, "end": 10},
+        {"e": 5, "onset": 10, "end": 12},
+        {"e": 6, "onset": 12, "end": 14},
+        {"e": 7, "onset": 14, "end": 16}
+      ],
+      "distinguishable": [0, 2, 4, 6, 8, 10, 12, 14],
+      "extras": [],
+      "segments": [
+        {"from": 0, "truth": 0, "admissible": [0], "rule": ["sounded"]},
+        {"from": 2, "truth": 1, "admissible": [1], "rule": ["sounded"]},
+        {"from": 4, "truth": 2, "admissible": [2], "rule": ["sounded"]},
+        {"from": 6, "truth": 3, "admissible": [3], "rule": ["sounded"]},
+        {"from": 8, "truth": 4, "admissible": [4], "rule": ["sounded"]},
+        {"from": 10, "truth": 5, "admissible": [5], "rule": ["sounded"]},
+        {"from": 12, "truth": 6, "admissible": [6], "rule": ["sounded"]},
+        {"from": 14, "truth": 7, "admissible": [7], "rule": ["sounded"]}
+      ]
+    },
+    "toy8-slight-drag": {
+      "score": "toy8",
+      "handed": 60,
+      "duration": 8.6,
+      "resolution": "event",
+      "note": "Bar 1 at 60 per minute, then each step of bar 2 takes 1.15 s: a mild drag close to the flag threshold.",
+      "played": [
+        {"e": 0, "onset": 0, "end": 1},
+        {"e": 1, "onset": 1, "end": 2},
+        {"e": 2, "onset": 2, "end": 3},
+        {"e": 3, "onset": 3, "end": 4.15},
+        {"e": 4, "onset": 4.15, "end": 5.3},
+        {"e": 5, "onset": 5.3, "end": 6.45},
+        {"e": 6, "onset": 6.45, "end": 7.6},
+        {"e": 7, "onset": 7.6, "end": 8.6}
+      ],
+      "distinguishable": [0, 1, 2, 3, 4.15, 5.3, 6.45, 7.6],
+      "extras": [],
+      "segments": [
+        {"from": 0, "truth": 0, "admissible": [0], "rule": ["sounded"]},
+        {"from": 1, "truth": 1, "admissible": [1], "rule": ["sounded"]},
+        {"from": 2, "truth": 2, "admissible": [2], "rule": ["sounded"]},
+        {"from": 3, "truth": 3, "admissible": [3], "rule": ["sounded"]},
+        {"from": 4.15, "truth": 4, "admissible": [4], "rule": ["sounded"]},
+        {"from": 5.3, "truth": 5, "admissible": [5], "rule": ["sounded"]},
+        {"from": 6.45, "truth": 6, "admissible": [6], "rule": ["sounded"]},
+        {"from": 7.6, "truth": 7, "admissible": [7], "rule": ["sounded"]}
+      ]
+    },
+    "toyDW-as-written-60": {
+      "score": "toyDW",
+      "handed": 60,
+      "duration": 8,
+      "resolution": "event",
+      "note": "toy8 with E4 written as a dead note, played as written at 60 per minute: a pitchless onset at 2 s lasting 0.1 s.",
+      "played": [
+        {"e": 0, "onset": 0, "end": 1},
+        {"e": 1, "onset": 1, "end": 2},
+        {"e": 2, "onset": 2, "end": 2.1},
+        {"e": 3, "onset": 3, "end": 4},
+        {"e": 4, "onset": 4, "end": 5},
+        {"e": 5, "onset": 5, "end": 6},
+        {"e": 6, "onset": 6, "end": 7},
+        {"e": 7, "onset": 7, "end": 8}
+      ],
+      "distinguishable": [0, 1, null, 3, 4, 5, 6, 7],
+      "extras": [],
+      "segments": [
+        {"from": 0, "truth": 0, "admissible": [0], "rule": ["sounded"]},
+        {"from": 1, "truth": 1, "admissible": [1], "rule": ["sounded"]},
+        {"from": 2, "truth": 2, "admissible": [1, 2], "rule": ["dead"]},
+        {"from": 3, "truth": 3, "admissible": [3], "rule": ["sounded"]},
+        {"from": 4, "truth": 4, "admissible": [4], "rule": ["sounded"]},
+        {"from": 5, "truth": 5, "admissible": [5], "rule": ["sounded"]},
+        {"from": 6, "truth": 6, "admissible": [6], "rule": ["sounded"]},
+        {"from": 7, "truth": 7, "admissible": [7], "rule": ["sounded"]}
+      ]
+    },
+    "toyDW-rang-60": {
+      "score": "toyDW",
+      "handed": 60,
+      "duration": 8,
+      "resolution": "event",
+      "note": "toy8 with E4 written as a dead note, but let ring at its written pitch (MIDI 64) at 60 per minute.",
+      "played": [
+        {"e": 0, "onset": 0, "end": 1},
+        {"e": 1, "onset": 1, "end": 2},
+        {"e": 2, "onset": 2, "end": 3, "notes": {"n2": {"wrong": 64}}},
+        {"e": 3, "onset": 3, "end": 4},
+        {"e": 4, "onset": 4, "end": 5},
+        {"e": 5, "onset": 5, "end": 6},
+        {"e": 6, "onset": 6, "end": 7},
+        {"e": 7, "onset": 7, "end": 8}
+      ],
+      "distinguishable": [0, 1, 2, 3, 4, 5, 6, 7],
+      "extras": [],
+      "segments": [
+        {"from": 0, "truth": 0, "admissible": [0], "rule": ["sounded"]},
+        {"from": 1, "truth": 1, "admissible": [1], "rule": ["sounded"]},
+        {"from": 2, "truth": 2, "admissible": [2], "rule": ["sounded"]},
+        {"from": 3, "truth": 3, "admissible": [3], "rule": ["sounded"]},
+        {"from": 4, "truth": 4, "admissible": [4], "rule": ["sounded"]},
+        {"from": 5, "truth": 5, "admissible": [5], "rule": ["sounded"]},
+        {"from": 6, "truth": 6, "admissible": [6], "rule": ["sounded"]},
+        {"from": 7, "truth": 7, "admissible": [7], "rule": ["sounded"]}
+      ]
+    },
+    "toyW-hears-toy8": {
+      "score": "toyW",
+      "handed": 60,
+      "duration": 8,
+      "resolution": "event",
+      "control": "wrong-score",
+      "note": "The wrong-score control: the audio of toy8-perfect-60 handed toyW, which shares no pitch with it. Nothing of toyW is played; every note heard is an extra.",
+      "played": [
+        {"e": 0, "missing": true},
+        {"e": 1, "missing": true},
+        {"e": 2, "missing": true},
+        {"e": 3, "missing": true},
+        {"e": 4, "missing": true},
+        {"e": 5, "missing": true},
+        {"e": 6, "missing": true},
+        {"e": 7, "missing": true}
+      ],
+      "distinguishable": [null, null, null, null, null, null, null, null],
+      "extras": [[0, 1, 60], [1, 2, 62], [2, 3, 64], [3, 4, 65], [4, 5, 67], [5, 6, 69], [6, 7, 71], [7, 8, 72]],
+      "segments": [
+        {"from": 0, "state": "unsupported", "truth": null, "admissible": [], "rule": []}
+      ]
+    },
+    "toy8-fast-240": {
+      "score": "toy8",
+      "handed": 60,
+      "duration": 2,
+      "resolution": "event",
+      "note": "Every note right and perfectly steady at 240 per minute, four times the handed tempo: 0.25 s between onsets.",
+      "played": [
+        {"e": 0, "onset": 0, "end": 0.25},
+        {"e": 1, "onset": 0.25, "end": 0.5},
+        {"e": 2, "onset": 0.5, "end": 0.75},
+        {"e": 3, "onset": 0.75, "end": 1},
+        {"e": 4, "onset": 1, "end": 1.25},
+        {"e": 5, "onset": 1.25, "end": 1.5},
+        {"e": 6, "onset": 1.5, "end": 1.75},
+        {"e": 7, "onset": 1.75, "end": 2}
+      ],
+      "distinguishable": [0, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75],
+      "extras": [],
+      "segments": [
+        {"from": 0, "truth": 0, "admissible": [0], "rule": ["sounded"]},
+        {"from": 0.25, "truth": 1, "admissible": [1], "rule": ["sounded"]},
+        {"from": 0.5, "truth": 2, "admissible": [2], "rule": ["sounded"]},
+        {"from": 0.75, "truth": 3, "admissible": [3], "rule": ["sounded"]},
+        {"from": 1, "truth": 4, "admissible": [4], "rule": ["sounded"]},
+        {"from": 1.25, "truth": 5, "admissible": [5], "rule": ["sounded"]},
+        {"from": 1.5, "truth": 6, "admissible": [6], "rule": ["sounded"]},
+        {"from": 1.75, "truth": 7, "admissible": [7], "rule": ["sounded"]}
+      ]
+    },
+    "toy8-drag-last-missing": {
+      "score": "toy8",
+      "handed": 60,
+      "duration": 7.8,
+      "resolution": "event",
+      "note": "Bar 1 at 60 per minute, then 1.2 s steps in bar 2, and the final C5 (event 7) not played.",
+      "played": [
+        {"e": 0, "onset": 0, "end": 1},
+        {"e": 1, "onset": 1, "end": 2},
+        {"e": 2, "onset": 2, "end": 3},
+        {"e": 3, "onset": 3, "end": 4.2},
+        {"e": 4, "onset": 4.2, "end": 5.4},
+        {"e": 5, "onset": 5.4, "end": 6.6},
+        {"e": 6, "onset": 6.6, "end": 7.8},
+        {"e": 7, "missing": true}
+      ],
+      "distinguishable": [0, 1, 2, 3, 4.2, 5.4, 6.6, null],
+      "extras": [],
+      "segments": [
+        {"from": 0, "truth": 0, "admissible": [0], "rule": ["sounded"]},
+        {"from": 1, "truth": 1, "admissible": [1], "rule": ["sounded"]},
+        {"from": 2, "truth": 2, "admissible": [2], "rule": ["sounded"]},
+        {"from": 3, "truth": 3, "admissible": [3], "rule": ["sounded"]},
+        {"from": 4.2, "truth": 4, "admissible": [4], "rule": ["sounded"]},
+        {"from": 5.4, "truth": 5, "admissible": [5], "rule": ["sounded"]},
+        {"from": 6.6, "truth": 6, "admissible": [6], "rule": ["sounded"]}
+      ]
+    }
+  },
+  "following": [
+    {
+      "id": "F1",
+      "title": "Holding through a hesitation",
+      "label": "toy8-hesitation",
+      "records": {
+        "A": {
+          "note": "Moves 0.1 s after each onset and holds F4 through the 3 s silence.",
+          "decisions": [[0.1, 0], [1.1, 1], [2.1, 2], [3.1, 3], [7.1, 4], [8.1, 5], [9.1, 6], [10.1, 7]],
+          "expected": {"onEvent": 10.8, "pending": 0.2, "answerable": 10.8, "supportedAnswerable": 10.8, "byEvent": [8, 8], "delays": [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1], "hindsight": "same", "gates": []}
+        },
+        "B": {
+          "note": "Advances every second at the handed tempo regardless of the audio, as a clock would.",
+          "decisions": [[0, 0], [1, 1], [2, 2], [3, 3], [4, 4], [5, 5], [6, 6], [7, 7]],
+          "expected": {"onEvent": 4.8, "ahead": 6.0, "pending": 0.2, "answerable": 10.8, "supportedAnswerable": 10.8, "exposure": 6.0, "longest": 6.0, "byEvent": [5, 8], "delays": [0, 0, 0, 0, null, null, null, 0], "hindsight": "same", "gates": ["onEvent", "ahead", "exposure", "episode", "byEvent"]}
+        }
+      }
+    },
+    {
+      "id": "F2",
+      "title": "Recovery after a missing event",
+      "label": "toy8-missing-e3",
+      "records": {
+        "A": {
+          "note": "Holds E4 through the gap and moves to G4 0.15 s after it sounds.",
+          "decisions": [[0.1, 0], [1.1, 1], [2.1, 2], [4.15, 4], [5.1, 5], [6.1, 6], [7.1, 7]],
+          "expected": {"onEvent": 7.8, "pending": 0.2, "answerable": 7.8, "supportedAnswerable": 7.8, "byEvent": [7, 7], "delays": [0.1, 0.1, 0.1, 0.15, 0.1, 0.1, 0.1], "recovery": [1, 1, 0], "hindsight": "same", "gates": []}
+        },
+        "B": {
+          "note": "Waits for the missing F4 for ever.",
+          "decisions": [[0.1, 0], [1.1, 1], [2.1, 2]],
+          "expected": {"onEvent": 4.0, "behind": 3.8, "pending": 0.2, "answerable": 7.8, "supportedAnswerable": 7.8, "exposure": 3.8, "longest": 3.8, "byEvent": [3, 7], "delays": [0.1, 0.1, 0.1, null, null, null, null], "recovery": [0, 1, 0], "hindsight": "same", "gates": ["onEvent", "exposure", "episode", "byEvent"]}
+        },
+        "C": {
+          "note": "Steps onto the missing F4 on schedule, then on to G4 once it sounds.",
+          "decisions": [[0.1, 0], [1.1, 1], [2.1, 2], [3.1, 3], [4.1, 4], [5.1, 5], [6.1, 6], [7.1, 7]],
+          "expected": {"onEvent": 6.8, "ahead": 0.9, "behind": 0.1, "pending": 0.2, "answerable": 7.8, "supportedAnswerable": 7.8, "exposure": 1.0, "longest": 1.0, "byEvent": [7, 7], "delays": [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1], "recovery": [1, 1, 0], "hindsight": "same", "gates": ["onEvent", "ahead", "exposure", "episode"]}
+        }
+      }
+    },
+    {
+      "id": "F3",
+      "title": "A dead note; the deadline runs from the distinguishing event",
+      "label": "toy8-dead-e2",
+      "records": {
+        "A": {
+          "note": "Stays on D4 through the dead onset and moves to F4 when it sounds.",
+          "decisions": [[0.1, 0], [1.1, 1], [3.1, 3], [4.1, 4], [5.1, 5], [6.1, 6], [7.1, 7]],
+          "expected": {"onEvent": 7.8, "pending": 0.2, "answerable": 7.8, "supportedAnswerable": 7.8, "byEvent": [7, 7], "delays": [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1], "hindsight": "same", "gates": []}
+        },
+        "B": {
+          "note": "Shows the dead event itself: also correct.",
+          "decisions": [[0.1, 0], [1.1, 1], [2.1, 2], [3.1, 3], [4.1, 4], [5.1, 5], [6.1, 6], [7.1, 7]],
+          "expected": {"onEvent": 7.8, "pending": 0.2, "answerable": 7.8, "supportedAnswerable": 7.8, "byEvent": [7, 7], "delays": [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1], "hindsight": "same", "gates": []}
+        },
+        "C": {
+          "note": "A lucky guess: jumps to F4 on the dead onset, before F4 sounds.",
+          "decisions": [[0.1, 0], [1.1, 1], [2.1, 3], [4.1, 4], [5.1, 5], [6.1, 6], [7.1, 7]],
+          "expected": {"onEvent": 6.9, "ahead": 0.9, "pending": 0.2, "answerable": 7.8, "supportedAnswerable": 7.8, "exposure": 0.9, "longest": 0.9, "byEvent": [7, 7], "delays": [0.1, 0.1, 0, 0.1, 0.1, 0.1, 0.1], "hindsight": "same", "gates": ["onEvent", "ahead", "exposure", "episode"]}
+        },
+        "D": {
+          "note": "Correct through the dead note, but reaches F4 0.3 s after it sounds.",
+          "decisions": [[0.1, 0], [1.1, 1], [3.3, 3], [4.1, 4], [5.1, 5], [6.1, 6], [7.1, 7]],
+          "expected": {"onEvent": 7.7, "behind": 0.1, "pending": 0.2, "answerable": 7.8, "supportedAnswerable": 7.8, "exposure": 0.1, "longest": 0.1, "byEvent": [6, 7], "delays": [0.1, 0.1, 0.3, 0.1, 0.1, 0.1, 0.1], "hindsight": "same", "gates": ["byEvent"]}
+        }
+      }
+    },
+    {
+      "id": "F3b",
+      "title": "Consecutive dead notes",
+      "label": "toy8-dead-e2-e3",
+      "records": {
+        "A": {
+          "note": "Stays on D4 across both dead onsets until G4.",
+          "decisions": [[0.1, 0], [1.1, 1], [4.1, 4], [5.1, 5], [6.1, 6], [7.1, 7]],
+          "expected": {"onEvent": 7.8, "pending": 0.2, "answerable": 7.8, "supportedAnswerable": 7.8, "byEvent": [6, 6], "delays": [0.1, 0.1, 0.1, 0.1, 0.1, 0.1], "hindsight": "same", "gates": []}
+        },
+        "C": {
+          "note": "Runs ahead to G4 on the second dead onset.",
+          "decisions": [[0.1, 0], [1.1, 1], [3.1, 4], [5.1, 5], [6.1, 6], [7.1, 7]],
+          "expected": {"onEvent": 6.9, "ahead": 0.9, "pending": 0.2, "answerable": 7.8, "supportedAnswerable": 7.8, "exposure": 0.9, "longest": 0.9, "byEvent": [6, 6], "delays": [0.1, 0.1, 0, 0.1, 0.1, 0.1], "hindsight": "same", "gates": ["onEvent", "ahead", "exposure", "episode"]}
+        }
+      }
+    },
+    {
+      "id": "F4",
+      "title": "Repeated chords; the deadline runs from the distinguishing chord",
+      "label": "chordsRepeat-60",
+      "records": {
+        "A": {
+          "note": "Stays on the first C chord until the G chord.",
+          "decisions": [[0.1, 0], [3.1, 3]],
+          "expected": {"onEvent": 3.8, "pending": 0.2, "answerable": 3.8, "supportedAnswerable": 3.8, "byEvent": [2, 2], "delays": [0.1, 0.1], "hindsight": "same", "gates": []}
+        },
+        "B": {
+          "note": "Counts each re-strike.",
+          "decisions": [[0.1, 0], [1.1, 1], [2.1, 2], [3.1, 3]],
+          "expected": {"onEvent": 3.8, "pending": 0.2, "answerable": 3.8, "supportedAnswerable": 3.8, "byEvent": [2, 2], "delays": [0.1, 0.1], "hindsight": "same", "gates": []}
+        },
+        "C": {
+          "note": "Reaches the G chord 0.25 s after it sounds.",
+          "decisions": [[0.1, 0], [3.25, 3]],
+          "expected": {"onEvent": 3.75, "behind": 0.05, "pending": 0.2, "answerable": 3.8, "supportedAnswerable": 3.8, "exposure": 0.05, "longest": 0.05, "byEvent": [1, 2], "delays": [0.1, 0.25], "hindsight": "same", "gates": ["byEvent"]}
+        },
+        "D": {
+          "note": "Jumps to the third C on the second strike: overcounts the run.",
+          "decisions": [[0.1, 0], [1.1, 2], [3.1, 3]],
+          "expected": {"onEvent": 2.9, "ahead": 0.9, "pending": 0.2, "answerable": 3.8, "supportedAnswerable": 3.8, "exposure": 0.9, "longest": 0.9, "byEvent": [2, 2], "delays": [0.1, 0.1], "hindsight": "same", "gates": ["onEvent", "ahead", "exposure", "episode"]}
+        }
+      }
+    },
+    {
+      "id": "F5",
+      "title": "A partial chord and a wrong note still sound their events",
+      "label": "chordsVaried-60-partial-wrong",
+      "records": {
+        "A": {
+          "note": "Moves on every chord.",
+          "decisions": [[0.1, 0], [1.1, 1], [2.1, 2], [3.1, 3]],
+          "expected": {"onEvent": 3.8, "pending": 0.2, "answerable": 3.8, "supportedAnswerable": 3.8, "byEvent": [4, 4], "delays": [0.1, 0.1, 0.1, 0.1], "hindsight": "same", "gates": []}
+        },
+        "B": {
+          "note": "Moves only on complete, correct chords.",
+          "decisions": [[0.1, 0], [3.1, 3]],
+          "expected": {"onEvent": 1.9, "behind": 1.9, "pending": 0.2, "answerable": 3.8, "supportedAnswerable": 3.8, "exposure": 1.9, "longest": 1.9, "byEvent": [2, 4], "delays": [0.1, null, null, 0.1], "hindsight": "same", "gates": ["onEvent", "exposure", "episode", "byEvent"]}
+        }
+      }
+    },
+    {
+      "id": "F6",
+      "title": "An extra note must not move the cursor",
+      "label": "toy8-extra",
+      "records": {
+        "A": {
+          "note": "Ignores the stray open string.",
+          "decisions": [[0.1, 0], [1.1, 1], [2.1, 2], [3.1, 3], [4.1, 4], [5.1, 5], [6.1, 6], [7.1, 7]],
+          "expected": {"onEvent": 7.8, "pending": 0.2, "answerable": 7.8, "supportedAnswerable": 7.8, "byEvent": [8, 8], "delays": [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1], "extras": [1, 0, 0], "hindsight": "same", "gates": []}
+        },
+        "B": {
+          "note": "Takes the stray note for F4 and moves early.",
+          "decisions": [[0.1, 0], [1.1, 1], [2.1, 2], [2.6, 3], [4.1, 4], [5.1, 5], [6.1, 6], [7.1, 7]],
+          "expected": {"onEvent": 7.4, "ahead": 0.4, "pending": 0.2, "answerable": 7.8, "supportedAnswerable": 7.8, "exposure": 0.4, "longest": 0.4, "byEvent": [8, 8], "delays": [0.1, 0.1, 0.1, 0, 0.1, 0.1, 0.1, 0.1], "extras": [0, 1, 0], "hindsight": "same", "gates": ["onEvent", "ahead", "exposure"]}
+        }
+      }
+    },
+    {
+      "id": "F7",
+      "title": "Abstention, no statement yet, and a late revision",
+      "label": "toy8-perfect-60",
+      "records": {
+        "A": {
+          "note": "Says nothing until 1 s, says unsupported until 2.1 s, then follows.",
+          "decisions": [[1.0, "u"], [2.1, 2], [3.1, 3], [4.1, 4], [5.1, 5], [6.1, 6], [7.1, 7]],
+          "expected": {"onEvent": 5.9, "abstained": 1.1, "uncovered": 0.8, "pending": 0.2, "answerable": 7.8, "supportedAnswerable": 7.8, "byEvent": [6, 8], "delays": [null, null, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1], "hindsight": "same", "gates": ["onEvent", "byEvent"]}
+        },
+        "B": {
+          "note": "Decides at 3.5 s that F4 began at 3.05 s: late live, right in hindsight.",
+          "decisions": [[0.1, 0], [1.1, 1], [2.1, 2], [3.5, 3, 3.05], [4.1, 4], [5.1, 5], [6.1, 6], [7.1, 7]],
+          "expected": {"onEvent": 7.5, "behind": 0.3, "pending": 0.2, "answerable": 7.8, "supportedAnswerable": 7.8, "exposure": 0.3, "longest": 0.3, "byEvent": [7, 8], "delays": [0.1, 0.1, 0.1, 0.5, 0.1, 0.1, 0.1, 0.1], "hindsight": {"onEvent": 7.8, "pending": 0.2, "answerable": 7.8, "supportedAnswerable": 7.8}, "gates": ["byEvent"]}
+        }
+      }
+    },
+    {
+      "id": "F8",
+      "title": "False following on a non-performance",
+      "label": "toy8-silence",
+      "records": {
+        "A": {
+          "note": "Says unsupported throughout.",
+          "decisions": [[0.1, "u"]],
+          "expected": {"correctRejection": 3.8, "pending": 0.2, "answerable": 3.8, "supportedAnswerable": 0, "byEvent": [0, 0], "delays": [], "recovery": [0, 0, 1], "hindsight": "same", "gates": []}
+        },
+        "B": {
+          "note": "Claims the first note throughout.",
+          "decisions": [[0.1, 0]],
+          "expected": {"falseFollowing": 3.8, "pending": 0.2, "answerable": 3.8, "supportedAnswerable": 0, "exposure": 3.8, "longest": 3.8, "byEvent": [0, 0], "delays": [], "recovery": [0, 0, 1], "hindsight": "same", "gates": ["rejection", "exposure", "episode"]}
+        }
+      }
+    },
+    {
+      "id": "F9",
+      "title": "Bad sync: the same cursor against good, late-but-honest and late-and-narrow anchors",
+      "labels": ["toy8-sync-good", "toy8-sync-late-honest", "toy8-sync-late-narrow"],
+      "records": {
+        "toy8-sync-good": {
+          "note": "An event-perfect cursor.",
+          "decisions": [[0.1, 0], [1.1, 1], [2.1, 2], [3.1, 3], [4.1, 4], [5.1, 5], [6.1, 6], [7.1, 7]],
+          "expected": {"onEvent": 7.7, "pending": 0.2, "indeterminate": 0.1, "answerable": 7.7, "supportedAnswerable": 7.7, "byEvent": [0, 0], "delays": [], "hindsight": "same", "gates": []}
+        },
+        "toy8-sync-late-honest": {
+          "note": "The same cursor: more is indeterminate, nothing is wrong.",
+          "decisions": [[0.1, 0], [1.1, 1], [2.1, 2], [3.1, 3], [4.1, 4], [5.1, 5], [6.1, 6], [7.1, 7]],
+          "expected": {"onEvent": 6.8, "pending": 0.2, "indeterminate": 1.0, "answerable": 6.8, "supportedAnswerable": 6.8, "byEvent": [0, 0], "delays": [], "hindsight": "same", "gates": []}
+        },
+        "toy8-sync-late-narrow": {
+          "note": "The same cursor: a band narrower than the sync error turns it into apparent ahead time.",
+          "decisions": [[0.1, 0], [1.1, 1], [2.1, 2], [3.1, 3], [4.1, 4], [5.1, 5], [6.1, 6], [7.1, 7]],
+          "expected": {"onEvent": 7.55, "ahead": 0.15, "pending": 0.2, "indeterminate": 0.1, "answerable": 7.7, "supportedAnswerable": 7.7, "exposure": 0.15, "longest": 0.15, "byEvent": [0, 0], "delays": [], "hindsight": "same", "gates": ["ahead"]}
+        }
+      }
+    },
+    {
+      "id": "F10",
+      "title": "An omission before a similar event",
+      "label": "toyDD-omit-e1",
+      "records": {
+        "A": {
+          "note": "Takes the D it hears for the first D.",
+          "decisions": [[0.1, 0], [2.1, 1], [3.1, 3]],
+          "expected": {"onEvent": 3.8, "pending": 0.2, "answerable": 3.8, "supportedAnswerable": 3.8, "byEvent": [2, 2], "delays": [0.1, 0.1], "recovery": [1, 1, 0], "hindsight": "same", "gates": []}
+        },
+        "B": {
+          "note": "Stays on C4 until E4.",
+          "decisions": [[0.1, 0], [3.1, 3]],
+          "expected": {"onEvent": 2.9, "behind": 0.9, "pending": 0.2, "answerable": 3.8, "supportedAnswerable": 3.8, "exposure": 0.9, "longest": 0.9, "byEvent": [2, 2], "delays": [0.1, 0.1], "recovery": [1, 1, 0], "hindsight": "same", "gates": ["onEvent", "exposure", "episode"]}
+        }
+      }
+    },
+    {
+      "id": "F11",
+      "title": "A dead note the score writes: the cursor may show it or its predecessor",
+      "label": "toyDW-as-written-60",
+      "records": {
+        "A": {
+          "note": "Shows the written dead note when it sounds.",
+          "decisions": [[0.1, 0], [1.1, 1], [2.1, 2], [3.1, 3], [4.1, 4], [5.1, 5], [6.1, 6], [7.1, 7]],
+          "expected": {"onEvent": 7.8, "pending": 0.2, "answerable": 7.8, "supportedAnswerable": 7.8, "byEvent": [7, 7], "delays": [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1], "hindsight": "same", "gates": []}
+        },
+        "C": {
+          "note": "A lucky guess: jumps to F4 on the dead onset, before F4 sounds.",
+          "decisions": [[0.1, 0], [1.1, 1], [2.1, 3], [4.1, 4], [5.1, 5], [6.1, 6], [7.1, 7]],
+          "expected": {"onEvent": 6.9, "ahead": 0.9, "pending": 0.2, "answerable": 7.8, "supportedAnswerable": 7.8, "exposure": 0.9, "longest": 0.9, "byEvent": [7, 7], "delays": [0.1, 0.1, 0, 0.1, 0.1, 0.1, 0.1], "hindsight": "same", "gates": ["onEvent", "ahead", "exposure", "episode"]}
+        }
+      }
+    },
+    {
+      "id": "F12",
+      "title": "The wrong-score control: the audio is another piece",
+      "label": "toyW-hears-toy8",
+      "records": {
+        "A": {
+          "note": "Says unsupported throughout.",
+          "decisions": [[0.1, "u"]],
+          "expected": {"correctRejection": 7.8, "pending": 0.2, "answerable": 7.8, "supportedAnswerable": 0, "byEvent": [0, 0], "delays": [], "recovery": [0, 0, 1], "extras": [0, 0, 8], "hindsight": "same", "gates": []}
+        },
+        "B": {
+          "note": "Follows the handed score in step with the other piece's onsets.",
+          "decisions": [[0.1, 0], [1.1, 1], [2.1, 2], [3.1, 3], [4.1, 4], [5.1, 5], [6.1, 6], [7.1, 7]],
+          "expected": {"falseFollowing": 7.8, "pending": 0.2, "answerable": 7.8, "supportedAnswerable": 0, "exposure": 7.8, "longest": 7.8, "byEvent": [0, 0], "delays": [], "recovery": [0, 0, 1], "extras": [0, 0, 8], "hindsight": "same", "gates": ["rejection", "exposure", "episode"]}
+        }
+      }
+    }
+  ],
+  "assessment": [
+    {
+      "id": "A1",
+      "title": "A partial chord and a wrong note, marked note by note",
+      "labels": ["chordsVaried-60-partial-wrong"],
+      "derived": {"handed": 60, "overall": 60, "typical": 60, "intervals": [[0, 1, 1, 60], [1, 2, 1, 60], [2, 3, 1, 60]], "bars": [[0, 60, 1, "none"]], "clean": false},
+      "reports": {
+        "A": {
+          "note": "Correct.",
+          "report": {"overall": 60, "intervals": [[0, 1, 1], [1, 2, 1], [2, 3, 1]], "flags": [], "notes": {"default": "match", "v1b": "missing", "v2b": ["substitution", 46]}},
+          "expected": {"overallError": 0, "intervals": [3, 3, 0, 0, 3], "worst": [0, 0], "slow": [0, 0, 1, 0], "fast": [0, 0, 1, 0], "missing": [1, 1, 11, 0], "wrong": [1, 1, 11, 0, 1], "dead": [0, 0, 12, 0], "matched": [10, 10], "unassessed": 0, "unplaced": 0, "falseFindings": 0, "claimedPlayed": 11, "tempoClaims": 4, "clean": false, "gates": []}
+        },
+        "B": {
+          "note": "Calls the whole partial chord missing and hears the wrong note as right. Not clean, so no per-example gate fails; the pooled false-alarm gate is what catches it.",
+          "report": {"overall": 60, "intervals": [[0, 1, 1], [1, 2, 1], [2, 3, 1]], "flags": [], "notes": {"default": "match", "v1a": "missing", "v1b": "missing", "v1c": "missing"}},
+          "expected": {"overallError": 0, "intervals": [3, 3, 0, 0, 3], "worst": [0, 0], "slow": [0, 0, 1, 0], "fast": [0, 0, 1, 0], "missing": [1, 1, 11, 2], "wrong": [1, 0, 11, 0, 0], "dead": [0, 0, 12, 0], "matched": [10, 8], "unassessed": 0, "unplaced": 0, "falseFindings": 2, "claimedPlayed": 9, "tempoClaims": 4, "clean": false, "gates": []}
+        },
+        "C": {
+          "note": "Correct, except that it omits one note and places another at the wrong chord.",
+          "report": {"overall": 60, "intervals": [[0, 1, 1], [1, 2, 1], [2, 3, 1]], "flags": [], "notes": {"default": "match", "v1b": "missing", "v2b": ["substitution", 46], "omit": ["v3c"], "misplace": {"v0a": 1}}},
+          "expected": {"overallError": 0, "intervals": [3, 3, 0, 0, 3], "worst": [0, 0], "slow": [0, 0, 1, 0], "fast": [0, 0, 1, 0], "missing": [1, 1, 11, 0], "wrong": [1, 1, 11, 0, 1], "dead": [0, 0, 12, 0], "matched": [10, 8], "unassessed": 2, "unplaced": 1, "falseFindings": 0, "claimedPlayed": 9, "tempoClaims": 4, "clean": false, "gates": ["notes"]}
+        }
+      }
+    },
+    {
+      "id": "A2",
+      "title": "Durations between matched onsets: a missing note is not slowing",
+      "labels": ["toy8-missing-e3"],
+      "derived": {"handed": 60, "overall": 60, "typical": 60, "intervals": [[0, 1, 1, 60], [1, 2, 1, 60], [2, 4, 2, 60], [4, 5, 1, 60], [5, 6, 1, 60], [6, 7, 1, 60]], "bars": [[0, 60, 1, "none"], [1, 60, 1, "none"]], "clean": false},
+      "reports": {
+        "A": {
+          "note": "Correct: two seconds across the gap.",
+          "report": {"overall": 60, "intervals": [[0, 1, 1], [1, 2, 1], [2, 4, 2], [4, 5, 1], [5, 6, 1], [6, 7, 1]], "flags": [], "notes": {"default": "match", "n3": "missing"}},
+          "expected": {"overallError": 0, "intervals": [6, 6, 0, 0, 6], "worst": [0, 0], "slow": [0, 0, 2, 0], "fast": [0, 0, 2, 0], "missing": [1, 1, 7, 0], "wrong": [0, 0, 8, 0, 0], "dead": [0, 0, 8, 0], "matched": [7, 7], "unassessed": 0, "unplaced": 0, "falseFindings": 0, "claimedPlayed": 7, "tempoClaims": 7, "clean": false, "gates": []}
+        },
+        "B": {
+          "note": "Reads the gap as slowing and flags bar 2 slow.",
+          "report": {"overall": 60, "intervals": [[0, 1, 1], [1, 2, 1], [2, 4, 2], [4, 5, 1], [5, 6, 1], [6, 7, 1]], "flags": [[1, "slow"]], "notes": {"default": "match", "n3": "missing"}},
+          "expected": {"overallError": 0, "intervals": [6, 6, 0, 0, 6], "worst": [0, 0], "slow": [0, 0, 2, 1], "fast": [0, 0, 2, 0], "missing": [1, 1, 7, 0], "wrong": [0, 0, 8, 0, 0], "dead": [0, 0, 8, 0], "matched": [7, 7], "unassessed": 0, "unplaced": 0, "falseFindings": 1, "claimedPlayed": 7, "tempoClaims": 8, "clean": false, "gates": []}
+        },
+        "C": {
+          "note": "Flags everything: every note missing, every bar both slow and fast. Not clean, so the pooled false-alarm gates are what fail it.",
+          "report": {"overall": 60, "intervals": [[0, 1, 1], [1, 2, 1], [2, 4, 2], [4, 5, 1], [5, 6, 1], [6, 7, 1]], "flags": [[0, "slow"], [0, "fast"], [1, "slow"], [1, "fast"]], "notes": {"default": "missing"}},
+          "expected": {"overallError": 0, "intervals": [6, 6, 0, 0, 6], "worst": [0, 0], "slow": [0, 0, 2, 2], "fast": [0, 0, 2, 2], "missing": [1, 1, 7, 7], "wrong": [0, 0, 8, 0, 0], "dead": [0, 0, 8, 0], "matched": [7, 0], "unassessed": 0, "unplaced": 0, "falseFindings": 11, "claimedPlayed": 0, "tempoClaims": 11, "clean": false, "gates": []}
+        },
+        "D": {
+          "note": "Hears F4 as played at 3 s and reports the intervals of a complete performance.",
+          "report": {"overall": 60, "intervals": [[0, 1, 1], [1, 2, 1], [2, 3, 1], [3, 4, 1], [4, 5, 1], [5, 6, 1], [6, 7, 1]], "flags": [], "notes": {"default": "match"}},
+          "expected": {"overallError": 0, "intervals": [6, 5, 1, 2, 5], "worst": [0, 0], "slow": [0, 0, 2, 0], "fast": [0, 0, 2, 0], "missing": [1, 0, 7, 0], "wrong": [0, 0, 8, 0, 0], "dead": [0, 0, 8, 0], "matched": [7, 7], "unassessed": 0, "unplaced": 0, "falseFindings": 0, "claimedPlayed": 8, "tempoClaims": 8, "clean": false, "gates": ["intervals"]}
+        }
+      }
+    },
+    {
+      "id": "A3",
+      "title": "A hesitation, located by bar against the player's typical tempo",
+      "labels": ["toy8-hesitation"],
+      "derived": {"handed": 60, "overall": 42, "typical": 60, "intervals": [[0, 1, 1, 60], [1, 2, 1, 60], [2, 3, 1, 60], [3, 4, 4, 15], [4, 5, 1, 60], [5, 6, 1, 60], [6, 7, 1, 60]], "bars": [[0, 60, 1, "none"], [1, 34.285714285714285, 0.5714285714285714, "slow"]], "clean": false},
+      "reports": {
+        "A": {
+          "note": "Version 1's correct report: bar 1 fast against the overall tempo of 42. Against the typical tempo of 60, bar 1 is steady, so the fast flag is a false alarm.",
+          "report": {"overall": 42, "intervals": [[0, 1, 1], [1, 2, 1], [2, 3, 1], [3, 4, 4], [4, 5, 1], [5, 6, 1], [6, 7, 1]], "flags": [[0, "fast"], [1, "slow"]], "notes": {"default": "match"}},
+          "expected": {"overallError": 0, "intervals": [7, 7, 0, 0, 7], "worst": [0, 0], "slow": [1, 1, 1, 0], "fast": [0, 0, 2, 1], "missing": [0, 0, 8, 0], "wrong": [0, 0, 8, 0, 0], "dead": [0, 0, 8, 0], "matched": [8, 8], "unassessed": 0, "unplaced": 0, "falseFindings": 1, "claimedPlayed": 8, "tempoClaims": 10, "clean": false, "gates": []}
+        },
+        "B": {
+          "note": "Says only that bar 2 slowed: now correct.",
+          "report": {"overall": 42, "intervals": [[0, 1, 1], [1, 2, 1], [2, 3, 1], [3, 4, 4], [4, 5, 1], [5, 6, 1], [6, 7, 1]], "flags": [[1, "slow"]], "notes": {"default": "match"}},
+          "expected": {"overallError": 0, "intervals": [7, 7, 0, 0, 7], "worst": [0, 0], "slow": [1, 1, 1, 0], "fast": [0, 0, 2, 0], "missing": [0, 0, 8, 0], "wrong": [0, 0, 8, 0, 0], "dead": [0, 0, 8, 0], "matched": [8, 8], "unassessed": 0, "unplaced": 0, "falseFindings": 0, "claimedPlayed": 8, "tempoClaims": 9, "clean": false, "gates": []}
+        },
+        "C": {
+          "note": "Durations near the tolerance: 1.09 s for 1 s and 4.35 s for the 4 s hesitation are within it; 0.88 s for 1 s is not.",
+          "report": {"overall": 42, "intervals": [[0, 1, 1.09], [1, 2, 1], [2, 3, 1], [3, 4, 4.35], [4, 5, 0.88], [5, 6, 1], [6, 7, 1]], "flags": [[1, "slow"]], "notes": {"default": "match"}},
+          "expected": {"overallError": 0, "intervals": [7, 7, 0, 0, 6], "worst": [0.35, 0.12], "slow": [1, 1, 1, 0], "fast": [0, 0, 2, 0], "missing": [0, 0, 8, 0], "wrong": [0, 0, 8, 0, 0], "dead": [0, 0, 8, 0], "matched": [8, 8], "unassessed": 0, "unplaced": 0, "falseFindings": 0, "claimedPlayed": 8, "tempoClaims": 9, "clean": false, "gates": ["intervals"]}
+        }
+      }
+    },
+    {
+      "id": "A4",
+      "title": "Slow but steady: a clean example with no flags",
+      "labels": ["toy8-slow-30"],
+      "derived": {"handed": 60, "overall": 30, "typical": 30, "intervals": [[0, 1, 2, 30], [1, 2, 2, 30], [2, 3, 2, 30], [3, 4, 2, 30], [4, 5, 2, 30], [5, 6, 2, 30], [6, 7, 2, 30]], "bars": [[0, 30, 1, "none"], [1, 30, 1, "none"]], "clean": true},
+      "reports": {
+        "A": {
+          "note": "Correct: overall 30 beside the handed 60, and no flags.",
+          "report": {"overall": 30, "intervals": [[0, 1, 2], [1, 2, 2], [2, 3, 2], [3, 4, 2], [4, 5, 2], [5, 6, 2], [6, 7, 2]], "flags": [], "notes": {"default": "match"}},
+          "expected": {"overallError": 0, "intervals": [7, 7, 0, 0, 7], "worst": [0, 0], "slow": [0, 0, 2, 0], "fast": [0, 0, 2, 0], "missing": [0, 0, 8, 0], "wrong": [0, 0, 8, 0, 0], "dead": [0, 0, 8, 0], "matched": [8, 8], "unassessed": 0, "unplaced": 0, "falseFindings": 0, "claimedPlayed": 8, "tempoClaims": 8, "clean": true, "gates": []}
+        },
+        "B": {
+          "note": "Judges timing against the handed tempo and calls both bars slow: two false findings on a clean example.",
+          "report": {"overall": 30, "intervals": [[0, 1, 2], [1, 2, 2], [2, 3, 2], [3, 4, 2], [4, 5, 2], [5, 6, 2], [6, 7, 2]], "flags": [[0, "slow"], [1, "slow"]], "notes": {"default": "match"}},
+          "expected": {"overallError": 0, "intervals": [7, 7, 0, 0, 7], "worst": [0, 0], "slow": [0, 0, 2, 2], "fast": [0, 0, 2, 0], "missing": [0, 0, 8, 0], "wrong": [0, 0, 8, 0, 0], "dead": [0, 0, 8, 0], "matched": [8, 8], "unassessed": 0, "unplaced": 0, "falseFindings": 2, "claimedPlayed": 8, "tempoClaims": 10, "clean": true, "gates": ["clean"]}
+        },
+        "C": {
+          "note": "Reports the handed tempo as the overall tempo.",
+          "report": {"overall": 60, "intervals": [[0, 1, 2], [1, 2, 2], [2, 3, 2], [3, 4, 2], [4, 5, 2], [5, 6, 2], [6, 7, 2]], "flags": [], "notes": {"default": "match"}},
+          "expected": {"overallError": 1, "intervals": [7, 7, 0, 0, 7], "worst": [0, 0], "slow": [0, 0, 2, 0], "fast": [0, 0, 2, 0], "missing": [0, 0, 8, 0], "wrong": [0, 0, 8, 0, 0], "dead": [0, 0, 8, 0], "matched": [8, 8], "unassessed": 0, "unplaced": 0, "falseFindings": 0, "claimedPlayed": 8, "tempoClaims": 8, "clean": true, "gates": ["overall"]}
+        }
+      }
+    },
+    {
+      "id": "A5",
+      "title": "An unintended dead note in the assessment",
+      "labels": ["toy8-dead-e2"],
+      "derived": {"handed": 60, "overall": 60, "typical": 60, "intervals": [[0, 1, 1, 60], [1, 2, 1, 60], [2, 3, 1, 60], [3, 4, 1, 60], [4, 5, 1, 60], [5, 6, 1, 60], [6, 7, 1, 60]], "bars": [[0, 60, 1, "none"], [1, 60, 1, "none"]], "clean": false},
+      "reports": {
+        "A": {
+          "note": "Marks E4 dead.",
+          "report": {"overall": 60, "intervals": [[0, 1, 1], [1, 2, 1], [2, 3, 1], [3, 4, 1], [4, 5, 1], [5, 6, 1], [6, 7, 1]], "flags": [], "notes": {"default": "match", "n2": "dead"}},
+          "expected": {"overallError": 0, "intervals": [7, 7, 0, 0, 7], "worst": [0, 0], "slow": [0, 0, 2, 0], "fast": [0, 0, 2, 0], "missing": [0, 0, 8, 0], "wrong": [0, 0, 8, 0, 0], "dead": [1, 1, 7, 0], "matched": [7, 7], "unassessed": 0, "unplaced": 0, "falseFindings": 0, "claimedPlayed": 8, "tempoClaims": 8, "clean": false, "gates": []}
+        },
+        "B": {
+          "note": "Calls E4 missing and measures the duration across it.",
+          "report": {"overall": 60, "intervals": [[0, 1, 1], [1, 3, 2], [3, 4, 1], [4, 5, 1], [5, 6, 1], [6, 7, 1]], "flags": [], "notes": {"default": "match", "n2": "missing"}},
+          "expected": {"overallError": 0, "intervals": [7, 5, 2, 1, 5], "worst": [0, 0], "slow": [0, 0, 2, 0], "fast": [0, 0, 2, 0], "missing": [0, 0, 8, 1], "wrong": [0, 0, 8, 0, 0], "dead": [1, 0, 7, 0], "matched": [7, 7], "unassessed": 0, "unplaced": 0, "falseFindings": 1, "claimedPlayed": 7, "tempoClaims": 7, "clean": false, "gates": ["intervals"]}
+        },
+        "C": {
+          "note": "Hears E4 but cannot identify its pitch: a wrong note of unknown pitch, which is not the dead finding.",
+          "report": {"overall": 60, "intervals": [[0, 1, 1], [1, 2, 1], [2, 3, 1], [3, 4, 1], [4, 5, 1], [5, 6, 1], [6, 7, 1]], "flags": [], "notes": {"default": "match", "n2": ["substitution", null]}},
+          "expected": {"overallError": 0, "intervals": [7, 7, 0, 0, 7], "worst": [0, 0], "slow": [0, 0, 2, 0], "fast": [0, 0, 2, 0], "missing": [0, 0, 8, 0], "wrong": [0, 0, 8, 1, 0], "dead": [1, 0, 7, 0], "matched": [7, 7], "unassessed": 0, "unplaced": 0, "falseFindings": 1, "claimedPlayed": 8, "tempoClaims": 8, "clean": false, "gates": []}
+        }
+      }
+    },
+    {
+      "id": "A6",
+      "title": "Bad sync leaves the musical assessment unchanged",
+      "labels": ["toy8-perfect-60", "toy8-sync-good", "toy8-sync-late-honest", "toy8-sync-late-narrow"],
+      "derived": {"handed": 60, "overall": 60, "typical": 60, "intervals": [[0, 1, 1, 60], [1, 2, 1, 60], [2, 3, 1, 60], [3, 4, 1, 60], [4, 5, 1, 60], [5, 6, 1, 60], [6, 7, 1, 60]], "bars": [[0, 60, 1, "none"], [1, 60, 1, "none"]], "clean": true},
+      "reports": {
+        "A": {
+          "note": "The correct assessment of the perfect performance, judged against each label.",
+          "report": {"overall": 60, "intervals": [[0, 1, 1], [1, 2, 1], [2, 3, 1], [3, 4, 1], [4, 5, 1], [5, 6, 1], [6, 7, 1]], "flags": [], "notes": {"default": "match"}},
+          "expected": {"overallError": 0, "intervals": [7, 7, 0, 0, 7], "worst": [0, 0], "slow": [0, 0, 2, 0], "fast": [0, 0, 2, 0], "missing": [0, 0, 8, 0], "wrong": [0, 0, 8, 0, 0], "dead": [0, 0, 8, 0], "matched": [8, 8], "unassessed": 0, "unplaced": 0, "falseFindings": 0, "claimedPlayed": 8, "tempoClaims": 8, "clean": true, "gates": []}
+        }
+      }
+    },
+    {
+      "id": "A7",
+      "title": "A dragged second bar sets the typical tempo, so the steady first bar reads fast",
+      "labels": ["toy8-slight-drag"],
+      "derived": {"handed": 60, "overall": 55.26315789473684, "typical": 52.17391304347826, "intervals": [[0, 1, 1, 60], [1, 2, 1, 60], [2, 3, 1, 60], [3, 4, 1.15, 52.17391304347826], [4, 5, 1.15, 52.17391304347826], [5, 6, 1.15, 52.17391304347826], [6, 7, 1.15, 52.17391304347826]], "bars": [[0, 60, 1.15, "fast"], [1, 52.17391304347826, 1, "none"]], "clean": false},
+      "reports": {
+        "A": {
+          "note": "No flags: misses the fast first bar.",
+          "report": {"overall": 55.26315789473684, "intervals": [[0, 1, 1], [1, 2, 1], [2, 3, 1], [3, 4, 1.15], [4, 5, 1.15], [5, 6, 1.15], [6, 7, 1.15]], "flags": [], "notes": {"default": "match"}},
+          "expected": {"overallError": 0, "intervals": [7, 7, 0, 0, 7], "worst": [0, 0], "slow": [0, 0, 2, 0], "fast": [1, 0, 1, 0], "missing": [0, 0, 8, 0], "wrong": [0, 0, 8, 0, 0], "dead": [0, 0, 8, 0], "matched": [8, 8], "unassessed": 0, "unplaced": 0, "falseFindings": 0, "claimedPlayed": 8, "tempoClaims": 8, "clean": false, "gates": []}
+        },
+        "B": {
+          "note": "Version 1's optional flags, bar 1 fast and bar 2 slow: the fast flag is now found, the slow one a false alarm.",
+          "report": {"overall": 55.26315789473684, "intervals": [[0, 1, 1], [1, 2, 1], [2, 3, 1], [3, 4, 1.15], [4, 5, 1.15], [5, 6, 1.15], [6, 7, 1.15]], "flags": [[0, "fast"], [1, "slow"]], "notes": {"default": "match"}},
+          "expected": {"overallError": 0, "intervals": [7, 7, 0, 0, 7], "worst": [0, 0], "slow": [0, 0, 2, 1], "fast": [1, 1, 1, 0], "missing": [0, 0, 8, 0], "wrong": [0, 0, 8, 0, 0], "dead": [0, 0, 8, 0], "matched": [8, 8], "unassessed": 0, "unplaced": 0, "falseFindings": 1, "claimedPlayed": 8, "tempoClaims": 10, "clean": false, "gates": []}
+        }
+      }
+    },
+    {
+      "id": "A8",
+      "title": "The typical tempo at an exact half: the mean of the two middle tempi, and both bars optional",
+      "labels": ["toy8-drag-last-missing"],
+      "derived": {"handed": 60, "overall": 54.54545454545455, "typical": 55, "intervals": [[0, 1, 1, 60], [1, 2, 1, 60], [2, 3, 1, 60], [3, 4, 1.2, 50], [4, 5, 1.2, 50], [5, 6, 1.2, 50]], "bars": [[0, 60, 1.0909090909090908, "either"], [1, 50, 0.9090909090909091, "either"]], "clean": false},
+      "reports": {
+        "A": {
+          "note": "No flags.",
+          "report": {"overall": 54.54545454545455, "intervals": [[0, 1, 1], [1, 2, 1], [2, 3, 1], [3, 4, 1.2], [4, 5, 1.2], [5, 6, 1.2]], "flags": [], "notes": {"default": "match", "n7": "missing"}},
+          "expected": {"overallError": 0, "intervals": [6, 6, 0, 0, 6], "worst": [0, 0], "slow": [0, 0, 0, 0], "fast": [0, 0, 0, 0], "missing": [1, 1, 7, 0], "wrong": [0, 0, 8, 0, 0], "dead": [0, 0, 8, 0], "matched": [7, 7], "unassessed": 0, "unplaced": 0, "falseFindings": 0, "claimedPlayed": 7, "tempoClaims": 7, "clean": false, "gates": []}
+        },
+        "B": {
+          "note": "Flags bar 1 fast and bar 2 slow: neither required nor a false alarm.",
+          "report": {"overall": 54.54545454545455, "intervals": [[0, 1, 1], [1, 2, 1], [2, 3, 1], [3, 4, 1.2], [4, 5, 1.2], [5, 6, 1.2]], "flags": [[0, "fast"], [1, "slow"]], "notes": {"default": "match", "n7": "missing"}},
+          "expected": {"overallError": 0, "intervals": [6, 6, 0, 0, 6], "worst": [0, 0], "slow": [0, 0, 0, 0], "fast": [0, 0, 0, 0], "missing": [1, 1, 7, 0], "wrong": [0, 0, 8, 0, 0], "dead": [0, 0, 8, 0], "matched": [7, 7], "unassessed": 0, "unplaced": 0, "falseFindings": 0, "claimedPlayed": 7, "tempoClaims": 9, "clean": false, "gates": []}
+        }
+      }
+    },
+    {
+      "id": "A9",
+      "title": "Short intervals: the 30 ms floor of the duration tolerance",
+      "labels": ["toy8-fast-240"],
+      "derived": {"handed": 60, "overall": 240, "typical": 240, "intervals": [[0, 1, 0.25, 240], [1, 2, 0.25, 240], [2, 3, 0.25, 240], [3, 4, 0.25, 240], [4, 5, 0.25, 240], [5, 6, 0.25, 240], [6, 7, 0.25, 240]], "bars": [[0, 240, 1, "none"], [1, 240, 1, "none"]], "clean": true},
+      "reports": {
+        "A": {
+          "note": "Errors of 20 and 28 ms on 250 ms intervals, up to 11.2%, all within the 30 ms floor.",
+          "report": {"overall": 240, "intervals": [[0, 1, 0.27], [1, 2, 0.25], [2, 3, 0.23], [3, 4, 0.25], [4, 5, 0.278], [5, 6, 0.25], [6, 7, 0.25]], "flags": [], "notes": {"default": "match"}},
+          "expected": {"overallError": 0, "intervals": [7, 7, 0, 0, 7], "worst": [0.028, 0.112], "slow": [0, 0, 2, 0], "fast": [0, 0, 2, 0], "missing": [0, 0, 8, 0], "wrong": [0, 0, 8, 0, 0], "dead": [0, 0, 8, 0], "matched": [8, 8], "unassessed": 0, "unplaced": 0, "falseFindings": 0, "claimedPlayed": 8, "tempoClaims": 8, "clean": true, "gates": []}
+        },
+        "B": {
+          "note": "One interval 40 ms long: beyond both 10% and 30 ms.",
+          "report": {"overall": 240, "intervals": [[0, 1, 0.25], [1, 2, 0.25], [2, 3, 0.25], [3, 4, 0.25], [4, 5, 0.29], [5, 6, 0.25], [6, 7, 0.25]], "flags": [], "notes": {"default": "match"}},
+          "expected": {"overallError": 0, "intervals": [7, 7, 0, 0, 6], "worst": [0.04, 0.16], "slow": [0, 0, 2, 0], "fast": [0, 0, 2, 0], "missing": [0, 0, 8, 0], "wrong": [0, 0, 8, 0, 0], "dead": [0, 0, 8, 0], "matched": [8, 8], "unassessed": 0, "unplaced": 0, "falseFindings": 0, "claimedPlayed": 8, "tempoClaims": 8, "clean": true, "gates": ["intervals"]}
+        },
+        "C": {
+          "note": "Overall 250, within 5%, but flags the steady second bar fast: one false finding on a clean example.",
+          "report": {"overall": 250, "intervals": [[0, 1, 0.25], [1, 2, 0.25], [2, 3, 0.25], [3, 4, 0.25], [4, 5, 0.25], [5, 6, 0.25], [6, 7, 0.25]], "flags": [[1, "fast"]], "notes": {"default": "match"}},
+          "expected": {"overallError": 0.041666666666666664, "intervals": [7, 7, 0, 0, 7], "worst": [0, 0], "slow": [0, 0, 2, 0], "fast": [0, 0, 2, 1], "missing": [0, 0, 8, 0], "wrong": [0, 0, 8, 0, 0], "dead": [0, 0, 8, 0], "matched": [8, 8], "unassessed": 0, "unplaced": 0, "falseFindings": 1, "claimedPlayed": 8, "tempoClaims": 9, "clean": true, "gates": ["clean"]}
+        }
+      }
+    },
+    {
+      "id": "A10",
+      "title": "A dead note the score writes, played as written, is matched",
+      "labels": ["toyDW-as-written-60"],
+      "derived": {"handed": 60, "overall": 60, "typical": 60, "intervals": [[0, 1, 1, 60], [1, 2, 1, 60], [2, 3, 1, 60], [3, 4, 1, 60], [4, 5, 1, 60], [5, 6, 1, 60], [6, 7, 1, 60]], "bars": [[0, 60, 1, "none"], [1, 60, 1, "none"]], "clean": true},
+      "reports": {
+        "A": {
+          "note": "Correct: every note matched, the written dead note included.",
+          "report": {"overall": 60, "intervals": [[0, 1, 1], [1, 2, 1], [2, 3, 1], [3, 4, 1], [4, 5, 1], [5, 6, 1], [6, 7, 1]], "flags": [], "notes": {"default": "match"}},
+          "expected": {"overallError": 0, "intervals": [7, 7, 0, 0, 7], "worst": [0, 0], "slow": [0, 0, 2, 0], "fast": [0, 0, 2, 0], "missing": [0, 0, 8, 0], "wrong": [0, 0, 8, 0, 0], "dead": [0, 0, 8, 0], "matched": [8, 8], "unassessed": 0, "unplaced": 0, "falseFindings": 0, "claimedPlayed": 8, "tempoClaims": 8, "clean": true, "gates": []}
+        },
+        "B": {
+          "note": "Reports the written dead note as a dead-note finding.",
+          "report": {"overall": 60, "intervals": [[0, 1, 1], [1, 2, 1], [2, 3, 1], [3, 4, 1], [4, 5, 1], [5, 6, 1], [6, 7, 1]], "flags": [], "notes": {"default": "match", "n2": "dead"}},
+          "expected": {"overallError": 0, "intervals": [7, 7, 0, 0, 7], "worst": [0, 0], "slow": [0, 0, 2, 0], "fast": [0, 0, 2, 0], "missing": [0, 0, 8, 0], "wrong": [0, 0, 8, 0, 0], "dead": [0, 0, 8, 1], "matched": [8, 7], "unassessed": 0, "unplaced": 0, "falseFindings": 1, "claimedPlayed": 8, "tempoClaims": 8, "clean": true, "gates": ["clean"]}
+        },
+        "C": {
+          "note": "Hears no pitch, calls the note missing and measures across it.",
+          "report": {"overall": 60, "intervals": [[0, 1, 1], [1, 3, 2], [3, 4, 1], [4, 5, 1], [5, 6, 1], [6, 7, 1]], "flags": [], "notes": {"default": "match", "n2": "missing"}},
+          "expected": {"overallError": 0, "intervals": [7, 5, 2, 1, 5], "worst": [0, 0], "slow": [0, 0, 2, 0], "fast": [0, 0, 2, 0], "missing": [0, 0, 8, 1], "wrong": [0, 0, 8, 0, 0], "dead": [0, 0, 8, 0], "matched": [8, 7], "unassessed": 0, "unplaced": 0, "falseFindings": 1, "claimedPlayed": 7, "tempoClaims": 7, "clean": true, "gates": ["intervals", "clean"]}
+        }
+      }
+    },
+    {
+      "id": "A11",
+      "title": "A dead note the score writes, let ring at its written pitch, is wrong",
+      "labels": ["toyDW-rang-60"],
+      "derived": {"handed": 60, "overall": 60, "typical": 60, "intervals": [[0, 1, 1, 60], [1, 2, 1, 60], [2, 3, 1, 60], [3, 4, 1, 60], [4, 5, 1, 60], [5, 6, 1, 60], [6, 7, 1, 60]], "bars": [[0, 60, 1, "none"], [1, 60, 1, "none"]], "clean": false},
+      "reports": {
+        "A": {
+          "note": "Marks it wrong, heard at MIDI 64.",
+          "report": {"overall": 60, "intervals": [[0, 1, 1], [1, 2, 1], [2, 3, 1], [3, 4, 1], [4, 5, 1], [5, 6, 1], [6, 7, 1]], "flags": [], "notes": {"default": "match", "n2": ["substitution", 64]}},
+          "expected": {"overallError": 0, "intervals": [7, 7, 0, 0, 7], "worst": [0, 0], "slow": [0, 0, 2, 0], "fast": [0, 0, 2, 0], "missing": [0, 0, 8, 0], "wrong": [1, 1, 7, 0, 1], "dead": [0, 0, 8, 0], "matched": [7, 7], "unassessed": 0, "unplaced": 0, "falseFindings": 0, "claimedPlayed": 8, "tempoClaims": 8, "clean": false, "gates": []}
+        },
+        "B": {
+          "note": "Hears the written pitch and calls it matched.",
+          "report": {"overall": 60, "intervals": [[0, 1, 1], [1, 2, 1], [2, 3, 1], [3, 4, 1], [4, 5, 1], [5, 6, 1], [6, 7, 1]], "flags": [], "notes": {"default": "match"}},
+          "expected": {"overallError": 0, "intervals": [7, 7, 0, 0, 7], "worst": [0, 0], "slow": [0, 0, 2, 0], "fast": [0, 0, 2, 0], "missing": [0, 0, 8, 0], "wrong": [1, 0, 7, 0, 0], "dead": [0, 0, 8, 0], "matched": [7, 7], "unassessed": 0, "unplaced": 0, "falseFindings": 0, "claimedPlayed": 8, "tempoClaims": 8, "clean": false, "gates": []}
+        }
+      }
+    },
+    {
+      "id": "A12",
+      "title": "The silence control: nothing of the score was played",
+      "labels": ["toy8-silence"],
+      "derived": {"handed": 60, "overall": null, "typical": null, "intervals": [], "bars": [[0, null, null, "none"], [1, null, null, "none"]], "clean": false},
+      "reports": {
+        "A": {
+          "note": "Every note missing, no tempo.",
+          "report": {"overall": null, "intervals": [], "flags": [], "notes": {"default": "missing"}},
+          "expected": {"overallError": null, "intervals": [0, 0, 0, 0, 0], "worst": [null, null], "slow": [0, 0, 2, 0], "fast": [0, 0, 2, 0], "missing": [8, 8, 0, 0], "wrong": [0, 0, 8, 0, 0], "dead": [0, 0, 8, 0], "matched": [0, 0], "unassessed": 0, "unplaced": 0, "falseFindings": 0, "claimedPlayed": 0, "tempoClaims": 0, "clean": false, "gates": []}
+        },
+        "B": {
+          "note": "Says nothing at all: honest on a control.",
+          "report": {"overall": null, "intervals": [], "flags": [], "notes": {"default": "match", "omit": ["n0", "n1", "n2", "n3", "n4", "n5", "n6", "n7"]}},
+          "expected": {"overallError": null, "intervals": [0, 0, 0, 0, 0], "worst": [null, null], "slow": [0, 0, 2, 0], "fast": [0, 0, 2, 0], "missing": [8, 0, 0, 0], "wrong": [0, 0, 8, 0, 0], "dead": [0, 0, 8, 0], "matched": [0, 0], "unassessed": 8, "unplaced": 0, "falseFindings": 0, "claimedPlayed": 0, "tempoClaims": 0, "clean": false, "gates": []}
+        },
+        "C": {
+          "note": "Hears the handed score in silence: every note matched, at 60.",
+          "report": {"overall": 60, "intervals": [[0, 1, 1], [1, 2, 1], [2, 3, 1], [3, 4, 1], [4, 5, 1], [5, 6, 1], [6, 7, 1]], "flags": [], "notes": {"default": "match"}},
+          "expected": {"overallError": null, "intervals": [0, 0, 0, 7, 0], "worst": [null, null], "slow": [0, 0, 2, 0], "fast": [0, 0, 2, 0], "missing": [8, 0, 0, 0], "wrong": [0, 0, 8, 0, 0], "dead": [0, 0, 8, 0], "matched": [0, 0], "unassessed": 0, "unplaced": 0, "falseFindings": 0, "claimedPlayed": 8, "tempoClaims": 8, "clean": false, "gates": ["claims", "tempo"]}
+        }
+      }
+    },
+    {
+      "id": "A13",
+      "title": "The wrong-score control: another piece was played",
+      "labels": ["toyW-hears-toy8"],
+      "derived": {"handed": 60, "overall": null, "typical": null, "intervals": [], "bars": [[0, null, null, "none"], [1, null, null, "none"]], "clean": false},
+      "reports": {
+        "A": {
+          "note": "Every note of the handed score missing, no tempo.",
+          "report": {"overall": null, "intervals": [], "flags": [], "notes": {"default": "missing"}},
+          "expected": {"overallError": null, "intervals": [0, 0, 0, 0, 0], "worst": [null, null], "slow": [0, 0, 2, 0], "fast": [0, 0, 2, 0], "missing": [8, 8, 0, 0], "wrong": [0, 0, 8, 0, 0], "dead": [0, 0, 8, 0], "matched": [0, 0], "unassessed": 0, "unplaced": 0, "falseFindings": 0, "claimedPlayed": 0, "tempoClaims": 0, "clean": false, "gates": []}
+        },
+        "B": {
+          "note": "Maps what it hears onto the handed score: every note wrong, heard at the other piece's pitch, at 60.",
+          "report": {"overall": 60, "intervals": [[0, 1, 1], [1, 2, 1], [2, 3, 1], [3, 4, 1], [4, 5, 1], [5, 6, 1], [6, 7, 1]], "flags": [], "notes": {"default": "match", "w0": ["substitution", 60], "w1": ["substitution", 62], "w2": ["substitution", 64], "w3": ["substitution", 65], "w4": ["substitution", 67], "w5": ["substitution", 69], "w6": ["substitution", 71], "w7": ["substitution", 72]}},
+          "expected": {"overallError": null, "intervals": [0, 0, 0, 7, 0], "worst": [null, null], "slow": [0, 0, 2, 0], "fast": [0, 0, 2, 0], "missing": [8, 0, 0, 0], "wrong": [0, 0, 8, 8, 0], "dead": [0, 0, 8, 0], "matched": [0, 0], "unassessed": 0, "unplaced": 0, "falseFindings": 8, "claimedPlayed": 8, "tempoClaims": 8, "clean": false, "gates": ["claims", "tempo"]}
+        }
+      }
+    }
+  ]
+}

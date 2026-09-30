@@ -84,3 +84,27 @@ For the frozen evaluator, version-2 records are converted back with
 `performancePositionAt`. The conversion is exact everywhere inside the performed score.
 A version-1 claim past the end, which only the audio-ignoring clock makes, is held at the
 final boundary and counted.
+
+## Version 2.1: the dead verdict
+
+Added 2026-09-30 by [experiment 023](../reports/023-instruments-decisions.md), at the
+user's direction recorded in [development contract 2](development-contract-2.md#two-outputs-judged-separately):
+"Studio's vocabulary gains a distinct `dead` verdict (version 2.1, additive), rather than
+reading a pitchless substitution as dead: a note heard but not identified is not the
+same finding as a muted one."
+
+```
+note.verdict: 'match' | 'missing' | 'extra' | 'substitution' | 'timing' | 'duration' | 'dead'
+```
+
+- `dead` says the score note was sounded as a pitchless onset, muted or percussive, where
+  the score does not write it dead. A dead note the score writes is a `match` when it is
+  played as written.
+- A `dead` statement names its score note (`noteKey` is not null) and, when it gives
+  `observed`, gives no pitch: `observed.midi` is null.
+- `substitution` with no pitch now means a note heard whose pitch was not identified.
+
+The change is additive: every record valid under version 2 is valid under 2.1 and means
+the same, except that assessment-evaluator@1's reading of a pitchless substitution as
+dead is replaced, from assessment-evaluator@2 on, by the `dead` verdict. The code
+constant becomes `listening-vocabulary@2.1`.
