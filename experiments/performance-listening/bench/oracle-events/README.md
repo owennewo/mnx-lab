@@ -8,9 +8,23 @@ before any listener is judged by it.
 
 | Version | File | Freeze | Instruments | Audit |
 |---|---|---|---|---|
+| event-oracle@4 | `oracle-4.json` | `freeze-4.json` | [event instruments4](../../contracts/event-instruments-4.md), unchanged assessment-evaluator@3/stage-gates@2 | Pending independent audit4; [029](../../reports/029-oracle-coverage.md) agrees with implementation on corrected B1/B11 and added coverage. Author validation is not independent audit |
 | event-oracle@3 | `oracle-3.json` | `freeze-3.json` | [event instruments 3](../../contracts/event-instruments-3.md) | [audit-3.md](audit-3.md): 34 cases, 32 agree, 1 disagree (B1's bar 0 reference and ratio: 30 and 1, not 60 and 0.5, as the freeze recorded), 1 ambiguous (B11's decimal onsets read literally give `none` and clean; as the intended rationals, `either` and unclean); report-level bar measures, the null reference and several suite states uncovered. A corrected version is required before any listener is judged |
 | event-oracle@2 | `oracle-2.json` | `freeze-2.json` | [event instruments 2](../../contracts/event-instruments-2.md) | [audit-2.md](audit-2.md): 63 agree, 0 disagree, 3 ambiguous (F9's `indeterminate` figure; no gate affected), settled by the [clarification](../../contracts/event-instruments-2.md#clarification-2026-09-30) |
 | event-oracle@1 | `oracle.json` | `freeze.json` | [event instruments 1](../../contracts/event-instruments-1.md) | none; written before the audit rule |
+
+## Event oracle, version 4
+
+Frozen and landed before validation implementation by **Sol 6.1 (high) in Codex**.
+B1 corrects the endpoint-reference arithmetic; B11 uses exact integer onsets and
+84/80 for the boundary. B13–B15 add null-reference, no-interval and omission cases.
+Hand reports/pools pin ordinal matching, signed/null errors and flag denominators;
+additional suite cases cover audit3's state/selection/headroom/plan gaps. Expected
+answers are literal hand numbers, never listener output. [Instruments4](../../contracts/event-instruments-4.md)
+describes the shorthand, adapters and procedural coverage limits. New loader and
+validation live in `src/events/oracle4.ts` and `validateOracle4.ts`; tests in
+`test/event-oracle-4.test.ts`. An independent session must rederive these before
+listener judgment. Oracle3's historical answers and disagreement remain unchanged.
 
 ## Event oracle, version 3
 

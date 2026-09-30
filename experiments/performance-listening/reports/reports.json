@@ -92,6 +92,19 @@
         "href": "027-live-confirmation.html",
         "label": "Experiment 027"
       }
+    },
+    {
+      "number": "029",
+      "slug": "029-oracle-coverage",
+      "title": "029 \u00b7 Correct and complete the event oracle",
+      "banner": "Oracle4 implementation agreement \u00b7 110/110 checks \u00b7 B1/B11 corrected \u00b7 independent audit4 required \u00b7 no listener evaluated",
+      "runs": [
+        "g029-oracle-coverage"
+      ],
+      "previous": {
+        "href": "028-other-bars-suite.html",
+        "label": "Experiment 028"
+      }
     }
   ]
 }

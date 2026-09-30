@@ -115,3 +115,13 @@ instruments-2 passes and sentinels without claiming confirmation or retiring a s
 a listener; `run028.ts` records validation, provenance and the oracle disagreement.
 Use audited instruments2 until oracle3 has been independently resolved; do not mistake
 a green regression test preserving the counterexample for an oracle approval.
+
+**Experiment029, corrected oracle coverage (pending independent audit4).**
+`oracle-events/oracle-4.json` and its freeze resolve audit3's B1/B11 and add missing
+hand cases without editing instruments3 or any listener. `src/events/oracle4.ts`
+loads the frozen inputs; `validateOracle4.ts` checks hand reports, states, selection,
+headroom and plans; `src/stages/run029.ts` records provenance and historical suite
+integrity. `test/event-oracle-4.test.ts` pins all110 checks and8 wrong-answer probes.
+The [version4 definitions](../contracts/event-instruments-4.md) state adapter and
+procedural limits. Use the research log for the current audit prerequisite; these
+checks never constitute an independent audit or a listener approval.

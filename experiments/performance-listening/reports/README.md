@@ -18,6 +18,8 @@ not here. The first series' reports, 001–021, are in
 
 | 028 | [Other-bars tempo reference and a recorded rising tide](028-other-bars-suite.html) | [g028](../runs/g028-other-bars-suite/summary.json) |
 
+| 029 | [Correct and complete the event oracle](029-oracle-coverage.html) | [g029](../runs/g029-oracle-coverage/summary.json) |
+
 ## One experiment, one file
 
 Its pre-registration section is committed and landed before anything runs: the
