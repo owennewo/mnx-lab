@@ -220,6 +220,19 @@
         "href": "016-windowed-rank.html",
         "label": "Experiment 016"
       }
+    },
+    {
+      "number": "018",
+      "slug": "018-acoustic-anchor",
+      "title": "018 · Anchor continuity to the acoustic path",
+      "banner": "Version 10 rejected · Shinyguitar alignment fixed, support still fails · nylon remains below target",
+      "runs": [
+        "g018-acoustic-anchor"
+      ],
+      "previous": {
+        "href": "017-tempo-continuity.html",
+        "label": "Experiment 017"
+      }
     }
   ]
 }

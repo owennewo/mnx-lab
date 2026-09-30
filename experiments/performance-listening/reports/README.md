@@ -23,6 +23,7 @@ question are in [the research log](../RESEARCH_LOG.md), not here.
 | 015 | [Is one decoy a null at all?](015-decoy-null.html) | [g015a](../runs/g015a-rotation-reproduce/summary.json), [g015b](../runs/g015b-decoy-null-traces/summary.json) |
 | 016 | [Support from the path's rank over two seconds](016-windowed-rank.html) | [g016](../runs/g016-windowed-rank/summary.json) |
 | 017 | [Causal endpoint tempo continuity](017-tempo-continuity.html) | [g017](../runs/g017-tempo-continuity/summary.json) |
+| 018 | [Anchor continuity to the acoustic path](018-acoustic-anchor.html) | [g018](../runs/g018-acoustic-anchor/summary.json) |
 
 ## One experiment, one file
 

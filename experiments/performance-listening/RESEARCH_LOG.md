@@ -40,17 +40,18 @@ How to maintain it:
 
 2026-09-30. Development runs the slim active suite under
 [development contract 1](contracts/development-contract-1.md). `online-time-warp@8`
-remains incumbent. [Experiment 017](reports/017-tempo-continuity.md) rejected a causal
-endpoint tempo prior: it improved acoustic/electric but made nylon alignment much
-worse and lost supported-correct on Shinyguitar despite a better alignment there.
-The next question is whether the prior's prediction can avoid reinforcing its own
-selected endpoint. The Studio seam and baseline reproduction passed.
+remains incumbent. [Experiment 018](reports/018-acoustic-anchor.md) rejected v10:
+anchoring the continuity predictor to raw acoustic endpoints largely reverses 017's
+nylon regression and fixes Shinyguitar alignment, but the unchanged support rule
+refuses correct Shinyguitar positions, and nylon still does not beat v8. The next
+question is the interaction between support and the emitted path, alongside the
+remaining nylon alignment bursts. Baseline reproduction and the Studio seam pass.
 
-The user authorized five sequential experiments, 017–021, aiming at all current
-gates and the specified nylon/Shinyguitar improvements. **1/5 complete**. Bars 5–8
-remain unopened until saturation. Plateau is 1 candidate without gain; qualification
-budgets and reserved/final access remain unused, no evidence freshness reset. State
-and evidence are explicit in [report 017](reports/017-tempo-continuity.md#resulting-plateau-budgets-and-evidence-access).
+The five-experiment batch (017–021) is **2/5 complete**. Bars 5–8 remain unopened
+until saturation; the agreed numerical improvement target remains unmet. Plateau
+is 2 candidate versions without gain; qualification budgets and reserved/final access
+remain unused. [Report 018](reports/018-acoustic-anchor.md#resulting-plateau-budgets-and-evidence-access)
+records carried-over and resulting state; there is no freshness reset.
 
 ## Findings
 
@@ -108,6 +109,7 @@ ledger row (`ledger.md#<row>`), or a findings write-up.
 | 47 | The incumbent path's rank averaged over two seconds separates correct alignments from the wrong score in every active timbre: a 0.20 limit keeps what the alignment gets right and rejects Dust at 98.9–100%, at negligible cost. | [Run g016](ledger.md#g016-windowed-rank), [report 016](reports/016-windowed-rank.md#results) | holds | 2026-09-29 | Limit fitted on these examples and one wrong piece; transfer to bars 5–8 or a closer wrong score untested. Answers question 22 for the active suite |
 | 48 | With support no longer refusing correct frames, the remaining rung-2 failures are alignment: nylon and Shinyguitar are aligned correctly on only about 91% and 88% of frames, and their bursts become wrong exposure. | [Report 016 recorded guitar](reports/016-windowed-rank.md#recorded-guitar) | holds | 2026-09-29 | Moves the limit from support to alignment |
 | 49 | A continuity prior estimated from its own chosen endpoints improves acoustic/electric but worsens nylon alignment; Shinyguitar alignment gains do not survive the unchanged support rule. | [Report 017](reports/017-tempo-continuity.md#alignment-diagnosis), [run g017](runs/g017-tempo-continuity/summary.json) | holds | 2026-09-30 | Predictor feedback is a plausible mechanism, not isolated; v9 rejected |
+| 50 | A predictor anchored to unregularized acoustic endpoints fixes Shinyguitar alignment, but its unchanged support rejects correct positions; nylon recovers from v9 but stays slightly below v8. | [Report 018](reports/018-acoustic-anchor.md#alignment-versus-support), [g018](runs/g018-acoustic-anchor/summary.json) | holds | 2026-09-30 | Predictor-specific gain, not unique proof of feedback mechanism; v10 rejected |
 
 
 ## Open questions
@@ -118,7 +120,8 @@ is an identifier given when a question opens and never reused, so citations stay
 
 | Rank | Question | Why it is ranked here | Status | Owner item |
 |---|---|---|---|---|
-| 24 | Can a continuity preference suppress bursts without reinforcing its own selected endpoint, while retaining support on correct paths? | 017 prolongs nylon errors; Shinyguitar alignment improves but support falls | open | [Report 017 next](reports/017-tempo-continuity.md#next) |
+| 25 | Can support retain the improved alignment by judging the actual emitted path, while preserving wrong-score rejection? | Shinyguitar's alignment passes but support refuses correct points (finding 50); nylon still needs alignment work | open | [Report 018 next](reports/018-acoustic-anchor.md#next) |
+| 24 | Can a continuity preference suppress bursts without reinforcing its own selected endpoint, while retaining support on correct paths? | 017 prolongs nylon errors | partly answered: acoustic anchor fixes Shinyguitar alignment but support fails; nylon remains (finding 50) | [Report 018](reports/018-acoustic-anchor.md) |
 | 20 | Does preferring a steady tempo where the audio gives little evidence reduce the alignment's bursts on recorded guitar? | Remaining alignment defect | partly answered: unconditional self-predicted prior fails (finding 49); other predictors untested | [Report 017](reports/017-tempo-continuity.md) |
 | 14 | Does the incumbent pass rung 3, per-note onset jitter up to ±40 ms and chord spread up to 30 ms, on held-out seeds, and does the fast-tempo rejection margin hold? | Deferred until a candidate passes rung 2; jitter blurs the onsets its features rely on | open | [Report 007 next](reports/007-rung1-tempo.md#next) |
 | 11 | Which ladder rung first breaks the best candidate, and does recognition at supplied labels fail on that rung too? | Ranks the remaining rungs by the failure they expose | open | [Development contract 1](contracts/development-contract-1.md#the-ladder) |

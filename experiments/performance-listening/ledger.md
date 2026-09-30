@@ -132,3 +132,10 @@ rows record the model only in their commits' trailers.
 | Run | Hypothesis / sources | Parent / candidate | Set / evaluator | Conditions / resources | Results / uncertainty | Decision / next action |
 |---|---|---|---|---|---|---|
 | [g017](runs/g017-tempo-continuity/summary.json) | [017 pre-registration](reports/017-tempo-continuity.md#pre-registration); question 20; [bounded note](research/tempo-continuity-017.md) | online-time-warp@8 / @9, endpoint tempo prior; alignment-only diagnostic | Unchanged 19-example active suite / following-evaluator@1; supplied-label recognition; sync-proxy thermometer | GPT-6 in Codex; known start, 101 BPM handoff, 48 kHz/480; CPU and commit in report; no technical rerun | Acoustic/electric 99.5%; nylon 59.3%, Shinyguitar 82.0%; nylon alignment wrong episode 2.85 s. Every safeguard passes; 57/57 reproduce. One reused piece pair, correlated points | Reject @9; @8 remains. Plateau 1; budgets/access unchanged. Batch 1/5; next: predictor feedback and path/support interaction |
+
+
+<a id="g018-acoustic-anchor"></a>
+
+| Run | Hypothesis / sources | Parent / candidate | Set / evaluator | Conditions / resources | Results / uncertainty | Decision / next action |
+|---|---|---|---|---|---|---|
+| [g018](runs/g018-acoustic-anchor/summary.json) | [018 pre-registration](reports/018-acoustic-anchor.md#pre-registration); question 24; 017 predictor diagnosis | v9 design parent, v8 incumbent / v10 acoustic-anchored predictor and alignment-only diagnostic | Unchanged 19-example active suite / following-evaluator@1; recognition; sync-proxy thermometer | GPT-6 in Codex; known start, 101 BPM, 48 kHz/480; CPU/commit in report; no rerun | Nylon 89.9%; Shinyguitar supported 87.3%, alignment 99.5%; earlier rungs/controls/acoustic/electric all pass; 57/57 reproduce. Reused development evidence, correlated points | Reject v10, retain v8; plateau 2, budgets/access unchanged. Batch 2/5; next support/path interaction and residual nylon alignment |
