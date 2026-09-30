@@ -1,0 +1,7 @@
+{
+  "oracle": "event-oracle@3",
+  "file": "oracle-3.json",
+  "sha256": "3b83278b5df9ece9317343b4a5b02a49fa7c737a59f6b74e3a98bfc73a55fd48",
+  "frozen": "2026-09-30",
+  "condition": "Hand-worked before assessment-evaluator@3 or stage-gates@2 exists, never from listener output. Independent audit required before listener judgment. Inherited oracle@2 remains unchanged and covers all unchanged rules."
+}

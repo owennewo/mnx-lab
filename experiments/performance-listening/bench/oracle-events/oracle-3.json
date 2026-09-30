@@ -1,0 +1,1162 @@
+{
+  "format": "event-oracle@3",
+  "author": "Sol 6.1 (high) in Codex",
+  "assessment": [
+    {
+      "id": "B1",
+      "arithmetic": "Two bars: distances 1,3,1; seconds 2,6,1. Bar0=30, other reference60; bar1=240/7, other30. Neither has three others.",
+      "quarters": [
+        0,
+        1,
+        4,
+        5
+      ],
+      "ordinals": [
+        0,
+        0,
+        1,
+        1
+      ],
+      "onsets": [
+        0,
+        2,
+        8,
+        9
+      ],
+      "expected": {
+        "overall": 33.333333333333336,
+        "typical": 30,
+        "bars": [
+          {
+            "ordinal": 0,
+            "quartersPerMinute": 30,
+            "reference": 60,
+            "ratio": 0.5,
+            "otherBars": 1,
+            "eligible": false,
+            "expected": "none"
+          },
+          {
+            "ordinal": 1,
+            "quartersPerMinute": 34.285714285714285,
+            "reference": 30,
+            "ratio": 1.1428571428571428,
+            "otherBars": 1,
+            "eligible": false,
+            "expected": "none"
+          }
+        ],
+        "clean": false
+      },
+      "flags": []
+    },
+    {
+      "id": "B2",
+      "arithmetic": "Steady60: endpoint distance totals 1,4,4,4. Every reference is60, with exactly3 other contributors.",
+      "quarters": [
+        0,
+        1,
+        4,
+        5,
+        8,
+        9,
+        12,
+        13
+      ],
+      "ordinals": [
+        0,
+        0,
+        1,
+        1,
+        2,
+        2,
+        3,
+        3
+      ],
+      "onsets": [
+        0,
+        1,
+        4,
+        5,
+        8,
+        9,
+        12,
+        13
+      ],
+      "expected": {
+        "overall": 60,
+        "typical": 60,
+        "bars": [
+          {
+            "ordinal": 0,
+            "quartersPerMinute": 60,
+            "reference": 60,
+            "ratio": 1,
+            "otherBars": 3,
+            "eligible": true,
+            "expected": "none"
+          },
+          {
+            "ordinal": 1,
+            "quartersPerMinute": 60,
+            "reference": 60,
+            "ratio": 1,
+            "otherBars": 3,
+            "eligible": true,
+            "expected": "none"
+          },
+          {
+            "ordinal": 2,
+            "quartersPerMinute": 60,
+            "reference": 60,
+            "ratio": 1,
+            "otherBars": 3,
+            "eligible": true,
+            "expected": "none"
+          },
+          {
+            "ordinal": 3,
+            "quartersPerMinute": 60,
+            "reference": 60,
+            "ratio": 1,
+            "otherBars": 3,
+            "eligible": true,
+            "expected": "none"
+          }
+        ],
+        "clean": true
+      },
+      "flags": []
+    },
+    {
+      "id": "B3",
+      "arithmetic": "Last interval lasts2 not1. Last bar=240/5=48. Other-bars median60. Every other reference still60.",
+      "quarters": [
+        0,
+        1,
+        4,
+        5,
+        8,
+        9,
+        12,
+        13
+      ],
+      "ordinals": [
+        0,
+        0,
+        1,
+        1,
+        2,
+        2,
+        3,
+        3
+      ],
+      "onsets": [
+        0,
+        1,
+        4,
+        5,
+        8,
+        9,
+        12,
+        14
+      ],
+      "expected": {
+        "overall": 55.714285714285715,
+        "typical": 60,
+        "bars": [
+          {
+            "ordinal": 0,
+            "quartersPerMinute": 60,
+            "reference": 60,
+            "ratio": 1,
+            "otherBars": 3,
+            "eligible": true,
+            "expected": "none"
+          },
+          {
+            "ordinal": 1,
+            "quartersPerMinute": 60,
+            "reference": 60,
+            "ratio": 1,
+            "otherBars": 3,
+            "eligible": true,
+            "expected": "none"
+          },
+          {
+            "ordinal": 2,
+            "quartersPerMinute": 60,
+            "reference": 60,
+            "ratio": 1,
+            "otherBars": 3,
+            "eligible": true,
+            "expected": "none"
+          },
+          {
+            "ordinal": 3,
+            "quartersPerMinute": 48,
+            "reference": 60,
+            "ratio": 0.8,
+            "otherBars": 3,
+            "eligible": true,
+            "expected": "slow"
+          }
+        ],
+        "clean": false
+      },
+      "flags": [
+        [
+          3,
+          "slow"
+        ]
+      ]
+    },
+    {
+      "id": "B4",
+      "arithmetic": "First bar stretched: seconds2,6,1,3,1,3,1. Bar0=30; crossing interval ends inbar1 so bar1=240/7. Both slow; other medians60.",
+      "quarters": [
+        0,
+        1,
+        4,
+        5,
+        8,
+        9,
+        12,
+        13
+      ],
+      "ordinals": [
+        0,
+        0,
+        1,
+        1,
+        2,
+        2,
+        3,
+        3
+      ],
+      "onsets": [
+        0,
+        2,
+        8,
+        9,
+        12,
+        13,
+        16,
+        17
+      ],
+      "expected": {
+        "overall": 45.88235294117647,
+        "typical": 60,
+        "bars": [
+          {
+            "ordinal": 0,
+            "quartersPerMinute": 30,
+            "reference": 60,
+            "ratio": 0.5,
+            "otherBars": 3,
+            "eligible": true,
+            "expected": "slow"
+          },
+          {
+            "ordinal": 1,
+            "quartersPerMinute": 34.285714285714285,
+            "reference": 60,
+            "ratio": 0.5714285714285714,
+            "otherBars": 3,
+            "eligible": true,
+            "expected": "slow"
+          },
+          {
+            "ordinal": 2,
+            "quartersPerMinute": 60,
+            "reference": 60,
+            "ratio": 1,
+            "otherBars": 3,
+            "eligible": true,
+            "expected": "none"
+          },
+          {
+            "ordinal": 3,
+            "quartersPerMinute": 60,
+            "reference": 60,
+            "ratio": 1,
+            "otherBars": 3,
+            "eligible": true,
+            "expected": "none"
+          }
+        ],
+        "clean": false
+      },
+      "flags": [
+        [
+          0,
+          "slow"
+        ],
+        [
+          1,
+          "slow"
+        ]
+      ]
+    },
+    {
+      "id": "B5",
+      "arithmetic": "Uniform half speed: every interval doubles; every ratio1. No timing finding.",
+      "quarters": [
+        0,
+        1,
+        4,
+        5,
+        8,
+        9,
+        12,
+        13
+      ],
+      "ordinals": [
+        0,
+        0,
+        1,
+        1,
+        2,
+        2,
+        3,
+        3
+      ],
+      "onsets": [
+        0,
+        2,
+        8,
+        10,
+        16,
+        18,
+        24,
+        26
+      ],
+      "expected": {
+        "overall": 30,
+        "typical": 30,
+        "bars": [
+          {
+            "ordinal": 0,
+            "quartersPerMinute": 30,
+            "reference": 30,
+            "ratio": 1,
+            "otherBars": 3,
+            "eligible": true,
+            "expected": "none"
+          },
+          {
+            "ordinal": 1,
+            "quartersPerMinute": 30,
+            "reference": 30,
+            "ratio": 1,
+            "otherBars": 3,
+            "eligible": true,
+            "expected": "none"
+          },
+          {
+            "ordinal": 2,
+            "quartersPerMinute": 30,
+            "reference": 30,
+            "ratio": 1,
+            "otherBars": 3,
+            "eligible": true,
+            "expected": "none"
+          },
+          {
+            "ordinal": 3,
+            "quartersPerMinute": 30,
+            "reference": 30,
+            "ratio": 1,
+            "otherBars": 3,
+            "eligible": true,
+            "expected": "none"
+          }
+        ],
+        "clean": true
+      },
+      "flags": []
+    },
+    {
+      "id": "B6",
+      "arithmetic": "One onset per bar: only ordinals1,2,3 have incoming intervals. Each sees2 others, bar0 sees3 but has no own tempo.",
+      "quarters": [
+        0,
+        4,
+        8,
+        12
+      ],
+      "ordinals": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "onsets": [
+        0,
+        4,
+        8,
+        12
+      ],
+      "expected": {
+        "overall": 60,
+        "typical": 60,
+        "bars": [
+          {
+            "ordinal": 0,
+            "quartersPerMinute": null,
+            "reference": 60,
+            "ratio": null,
+            "otherBars": 3,
+            "eligible": false,
+            "expected": "none"
+          },
+          {
+            "ordinal": 1,
+            "quartersPerMinute": 60,
+            "reference": 60,
+            "ratio": 1,
+            "otherBars": 2,
+            "eligible": false,
+            "expected": "none"
+          },
+          {
+            "ordinal": 2,
+            "quartersPerMinute": 60,
+            "reference": 60,
+            "ratio": 1,
+            "otherBars": 2,
+            "eligible": false,
+            "expected": "none"
+          },
+          {
+            "ordinal": 3,
+            "quartersPerMinute": 60,
+            "reference": 60,
+            "ratio": 1,
+            "otherBars": 2,
+            "eligible": false,
+            "expected": "none"
+          }
+        ],
+        "clean": true
+      },
+      "flags": []
+    },
+    {
+      "id": "B7",
+      "arithmetic": "Own final interval has distance12 at30, outweighing three unit intervals at60: whole median30, leave-final-out60. Other refs30.",
+      "quarters": [
+        0,
+        1,
+        2,
+        3,
+        15
+      ],
+      "ordinals": [
+        0,
+        0,
+        1,
+        2,
+        3
+      ],
+      "onsets": [
+        0,
+        1,
+        2,
+        3,
+        27
+      ],
+      "expected": {
+        "overall": 33.333333333333336,
+        "typical": 30,
+        "bars": [
+          {
+            "ordinal": 0,
+            "quartersPerMinute": 60,
+            "reference": 30,
+            "ratio": 2,
+            "otherBars": 3,
+            "eligible": true,
+            "expected": "fast"
+          },
+          {
+            "ordinal": 1,
+            "quartersPerMinute": 60,
+            "reference": 30,
+            "ratio": 2,
+            "otherBars": 3,
+            "eligible": true,
+            "expected": "fast"
+          },
+          {
+            "ordinal": 2,
+            "quartersPerMinute": 60,
+            "reference": 30,
+            "ratio": 2,
+            "otherBars": 3,
+            "eligible": true,
+            "expected": "fast"
+          },
+          {
+            "ordinal": 3,
+            "quartersPerMinute": 30,
+            "reference": 60,
+            "ratio": 0.5,
+            "otherBars": 3,
+            "eligible": true,
+            "expected": "slow"
+          }
+        ],
+        "clean": false
+      },
+      "flags": [
+        [
+          0,
+          "fast"
+        ],
+        [
+          1,
+          "fast"
+        ],
+        [
+          2,
+          "fast"
+        ],
+        [
+          3,
+          "slow"
+        ]
+      ]
+    },
+    {
+      "id": "B8",
+      "arithmetic": "Final bar local54/reference60. Threshold/central-band boundary; others reference60.",
+      "quarters": [
+        0,
+        1,
+        4,
+        5,
+        8,
+        9,
+        12,
+        13
+      ],
+      "ordinals": [
+        0,
+        0,
+        1,
+        1,
+        2,
+        2,
+        3,
+        3
+      ],
+      "onsets": [
+        0,
+        1,
+        4,
+        5,
+        8,
+        9,
+        12.333333333333334,
+        13.444444444444445
+      ],
+      "expected": {
+        "overall": 58.01652892561983,
+        "typical": 60,
+        "bars": [
+          {
+            "ordinal": 0,
+            "quartersPerMinute": 60,
+            "reference": 60,
+            "ratio": 1,
+            "otherBars": 3,
+            "eligible": true,
+            "expected": "none"
+          },
+          {
+            "ordinal": 1,
+            "quartersPerMinute": 60,
+            "reference": 60,
+            "ratio": 1,
+            "otherBars": 3,
+            "eligible": true,
+            "expected": "none"
+          },
+          {
+            "ordinal": 2,
+            "quartersPerMinute": 60,
+            "reference": 60,
+            "ratio": 1,
+            "otherBars": 3,
+            "eligible": true,
+            "expected": "none"
+          },
+          {
+            "ordinal": 3,
+            "quartersPerMinute": 54,
+            "reference": 60,
+            "ratio": 0.9,
+            "otherBars": 3,
+            "eligible": true,
+            "expected": "slow"
+          }
+        ],
+        "clean": false
+      },
+      "flags": [
+        [
+          3,
+          "slow"
+        ]
+      ]
+    },
+    {
+      "id": "B9",
+      "arithmetic": "Final bar local66/reference60. Threshold/central-band boundary; others reference60.",
+      "quarters": [
+        0,
+        1,
+        4,
+        5,
+        8,
+        9,
+        12,
+        13
+      ],
+      "ordinals": [
+        0,
+        0,
+        1,
+        1,
+        2,
+        2,
+        3,
+        3
+      ],
+      "onsets": [
+        0,
+        1,
+        4,
+        5,
+        8,
+        9,
+        11.727272727272727,
+        12.636363636363635
+      ],
+      "expected": {
+        "overall": 61.72661870503598,
+        "typical": 60,
+        "bars": [
+          {
+            "ordinal": 0,
+            "quartersPerMinute": 60,
+            "reference": 60,
+            "ratio": 1,
+            "otherBars": 3,
+            "eligible": true,
+            "expected": "none"
+          },
+          {
+            "ordinal": 1,
+            "quartersPerMinute": 60,
+            "reference": 60,
+            "ratio": 1,
+            "otherBars": 3,
+            "eligible": true,
+            "expected": "none"
+          },
+          {
+            "ordinal": 2,
+            "quartersPerMinute": 60,
+            "reference": 60,
+            "ratio": 1,
+            "otherBars": 3,
+            "eligible": true,
+            "expected": "none"
+          },
+          {
+            "ordinal": 3,
+            "quartersPerMinute": 66,
+            "reference": 60,
+            "ratio": 1.1,
+            "otherBars": 3,
+            "eligible": true,
+            "expected": "fast"
+          }
+        ],
+        "clean": false
+      },
+      "flags": [
+        [
+          3,
+          "fast"
+        ]
+      ]
+    },
+    {
+      "id": "B10",
+      "arithmetic": "Final bar local57/reference60. Threshold/central-band boundary; others reference60.",
+      "quarters": [
+        0,
+        1,
+        4,
+        5,
+        8,
+        9,
+        12,
+        13
+      ],
+      "ordinals": [
+        0,
+        0,
+        1,
+        1,
+        2,
+        2,
+        3,
+        3
+      ],
+      "onsets": [
+        0,
+        1,
+        4,
+        5,
+        8,
+        9,
+        12.157894736842106,
+        13.210526315789474
+      ],
+      "expected": {
+        "overall": 59.04382470119521,
+        "typical": 60,
+        "bars": [
+          {
+            "ordinal": 0,
+            "quartersPerMinute": 60,
+            "reference": 60,
+            "ratio": 1,
+            "otherBars": 3,
+            "eligible": true,
+            "expected": "none"
+          },
+          {
+            "ordinal": 1,
+            "quartersPerMinute": 60,
+            "reference": 60,
+            "ratio": 1,
+            "otherBars": 3,
+            "eligible": true,
+            "expected": "none"
+          },
+          {
+            "ordinal": 2,
+            "quartersPerMinute": 60,
+            "reference": 60,
+            "ratio": 1,
+            "otherBars": 3,
+            "eligible": true,
+            "expected": "none"
+          },
+          {
+            "ordinal": 3,
+            "quartersPerMinute": 57,
+            "reference": 60,
+            "ratio": 0.95,
+            "otherBars": 3,
+            "eligible": true,
+            "expected": "either"
+          }
+        ],
+        "clean": false
+      },
+      "flags": []
+    },
+    {
+      "id": "B11",
+      "arithmetic": "Final bar local63/reference60. Threshold/central-band boundary; others reference60.",
+      "quarters": [
+        0,
+        1,
+        4,
+        5,
+        8,
+        9,
+        12,
+        13
+      ],
+      "ordinals": [
+        0,
+        0,
+        1,
+        1,
+        2,
+        2,
+        3,
+        3
+      ],
+      "onsets": [
+        0,
+        1,
+        4,
+        5,
+        8,
+        9,
+        11.857142857142858,
+        12.80952380952381
+      ],
+      "expected": {
+        "overall": 60.89219330855018,
+        "typical": 60,
+        "bars": [
+          {
+            "ordinal": 0,
+            "quartersPerMinute": 60,
+            "reference": 60,
+            "ratio": 1,
+            "otherBars": 3,
+            "eligible": true,
+            "expected": "none"
+          },
+          {
+            "ordinal": 1,
+            "quartersPerMinute": 60,
+            "reference": 60,
+            "ratio": 1,
+            "otherBars": 3,
+            "eligible": true,
+            "expected": "none"
+          },
+          {
+            "ordinal": 2,
+            "quartersPerMinute": 60,
+            "reference": 60,
+            "ratio": 1,
+            "otherBars": 3,
+            "eligible": true,
+            "expected": "none"
+          },
+          {
+            "ordinal": 3,
+            "quartersPerMinute": 63,
+            "reference": 60,
+            "ratio": 1.05,
+            "otherBars": 3,
+            "eligible": true,
+            "expected": "either"
+          }
+        ],
+        "clean": false
+      },
+      "flags": []
+    },
+    {
+      "id": "B12",
+      "arithmetic": "Unequal toy meters: exclude bar0; sorted other tempi40(w1),60(w1),80(w2), cumulative2 of4 exactlyhalf =>70. Other references80,80,60.",
+      "quarters": [
+        0,
+        1,
+        2,
+        3,
+        5
+      ],
+      "ordinals": [
+        0,
+        0,
+        1,
+        2,
+        3
+      ],
+      "onsets": [
+        0,
+        0.5,
+        2.0,
+        3.0,
+        4.5
+      ],
+      "expected": {
+        "overall": 66.66666666666667,
+        "typical": 80,
+        "bars": [
+          {
+            "ordinal": 0,
+            "quartersPerMinute": 120,
+            "reference": 70,
+            "ratio": 1.7142857142857142,
+            "otherBars": 3,
+            "eligible": true,
+            "expected": "fast"
+          },
+          {
+            "ordinal": 1,
+            "quartersPerMinute": 40,
+            "reference": 80,
+            "ratio": 0.5,
+            "otherBars": 3,
+            "eligible": true,
+            "expected": "slow"
+          },
+          {
+            "ordinal": 2,
+            "quartersPerMinute": 60,
+            "reference": 80,
+            "ratio": 0.75,
+            "otherBars": 3,
+            "eligible": true,
+            "expected": "slow"
+          },
+          {
+            "ordinal": 3,
+            "quartersPerMinute": 80,
+            "reference": 60,
+            "ratio": 1.3333333333333333,
+            "otherBars": 3,
+            "eligible": true,
+            "expected": "fast"
+          }
+        ],
+        "clean": false
+      },
+      "flags": [
+        [
+          0,
+          "fast"
+        ],
+        [
+          1,
+          "slow"
+        ],
+        [
+          2,
+          "slow"
+        ],
+        [
+          3,
+          "fast"
+        ]
+      ]
+    }
+  ],
+  "states": [
+    {
+      "id": "S1",
+      "before": "open",
+      "attempted": true,
+      "fullSweep": false,
+      "passed": true,
+      "sentinelsPassed": true,
+      "expected": "passed"
+    },
+    {
+      "id": "S2",
+      "before": "open",
+      "attempted": true,
+      "fullSweep": true,
+      "passed": true,
+      "sentinelsPassed": true,
+      "expected": "passed"
+    },
+    {
+      "id": "S3",
+      "before": "passed",
+      "attempted": false,
+      "fullSweep": false,
+      "passed": true,
+      "sentinelsPassed": true,
+      "expected": "passed"
+    },
+    {
+      "id": "S4",
+      "before": "passed",
+      "attempted": false,
+      "fullSweep": true,
+      "passed": true,
+      "sentinelsPassed": true,
+      "expected": "confirmed"
+    },
+    {
+      "id": "S5",
+      "before": "confirmed",
+      "attempted": false,
+      "fullSweep": false,
+      "passed": true,
+      "sentinelsPassed": false,
+      "expected": "open"
+    },
+    {
+      "id": "S6",
+      "before": "confirmed",
+      "attempted": false,
+      "fullSweep": true,
+      "passed": false,
+      "sentinelsPassed": true,
+      "expected": "open"
+    },
+    {
+      "id": "S7",
+      "before": "open",
+      "attempted": false,
+      "fullSweep": false,
+      "passed": true,
+      "sentinelsPassed": true,
+      "expected": "open"
+    },
+    {
+      "id": "S8",
+      "before": "open",
+      "attempted": true,
+      "fullSweep": false,
+      "passed": false,
+      "sentinelsPassed": true,
+      "expected": "open"
+    }
+  ],
+  "selection": {
+    "inputs": [
+      {
+        "id": "p-z",
+        "score": "a",
+        "kind": "performance",
+        "margin": 0.2
+      },
+      {
+        "id": "p-a",
+        "score": "a",
+        "kind": "performance",
+        "margin": 0.2
+      },
+      {
+        "id": "p-b",
+        "score": "b",
+        "kind": "performance",
+        "margin": 0.1
+      },
+      {
+        "id": "p-c",
+        "score": "b",
+        "kind": "performance",
+        "margin": 0.9
+      },
+      {
+        "id": "sil-z",
+        "score": "a",
+        "kind": "silence",
+        "margin": 0.4
+      },
+      {
+        "id": "sil-a",
+        "score": "a",
+        "kind": "silence",
+        "margin": 0.4
+      },
+      {
+        "id": "wrong-a",
+        "score": "a",
+        "kind": "wrong-score",
+        "margin": 0.5
+      },
+      {
+        "id": "sil-b",
+        "score": "b",
+        "kind": "silence",
+        "margin": 0.3
+      },
+      {
+        "id": "wrong-b",
+        "score": "b",
+        "kind": "wrong-score",
+        "margin": 0.2
+      }
+    ],
+    "performances": [
+      "p-b",
+      "p-a",
+      "p-z"
+    ],
+    "controls": [
+      "sil-a",
+      "wrong-a",
+      "sil-b",
+      "wrong-b"
+    ]
+  },
+  "marginCases": [
+    {
+      "name": "onEvent",
+      "value": 0.96,
+      "expected": 0.2
+    },
+    {
+      "name": "ahead",
+      "value": 0.002,
+      "expected": 0.8
+    },
+    {
+      "name": "exposure",
+      "value": 0.01,
+      "expected": 0.8
+    },
+    {
+      "name": "episode",
+      "value": 0.1,
+      "expected": 0.8
+    },
+    {
+      "name": "delay",
+      "value": 0.04,
+      "expected": 0.8
+    },
+    {
+      "name": "overall",
+      "value": 0.01,
+      "expected": 0.8
+    },
+    {
+      "name": "sustained",
+      "value": 0.05,
+      "expected": 0.8
+    },
+    {
+      "name": "p99",
+      "value": 2,
+      "expected": 0.8
+    }
+  ],
+  "retirement": [
+    {
+      "history": [
+        true,
+        true,
+        true
+      ],
+      "harder": true,
+      "expected": true
+    },
+    {
+      "history": [
+        true,
+        true
+      ],
+      "harder": true,
+      "expected": false
+    },
+    {
+      "history": [
+        true,
+        false,
+        true
+      ],
+      "harder": true,
+      "expected": false
+    },
+    {
+      "history": [
+        true,
+        true,
+        true
+      ],
+      "harder": false,
+      "expected": false
+    }
+  ]
+}
