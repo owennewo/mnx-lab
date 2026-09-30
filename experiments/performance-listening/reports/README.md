@@ -9,6 +9,7 @@ not here. The first series' reports, 001–021, are in
 | Number | Readable report | Recorded runs |
 |---|---|---|
 | 022 | [Event instruments, stage 1 and the frozen baselines](022-event-instruments.html) | [g022](../runs/g022-stage1-baselines/summary.json) |
+| 023 | [The user's decisions in the instruments, and stage 1's controls](023-instruments-decisions.html) | [g023](../runs/g023-stage1-controls/summary.json) |
 
 ## One experiment, one file
 

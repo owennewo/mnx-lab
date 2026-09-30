@@ -13,6 +13,19 @@
         "href": "../archive/ladder-1/reports/021-stability-calibration.html",
         "label": "Experiment 021 (first series)"
       }
+    },
+    {
+      "number": "023",
+      "slug": "023-instruments-decisions",
+      "title": "023 · The user's decisions in the instruments, and stage 1's controls",
+      "banner": "Instruments versioned and every oracle@2 number reproduced · awaiting audit · the clock fails every control · the time warpers follow a semitone-neighbour wrong score on 2 of 8 · control-assessment gate proposed, awaiting the user",
+      "runs": [
+        "g023-stage1-controls"
+      ],
+      "previous": {
+        "href": "022-event-instruments.html",
+        "label": "Experiment 022"
+      }
     }
   ]
 }
