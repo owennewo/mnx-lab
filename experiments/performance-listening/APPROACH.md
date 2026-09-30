@@ -37,8 +37,10 @@ Since contract 2, the milestone has two parts: the live cursor follows the perfo
 event by event, holding through hesitations and recovering after missing notes; and
 the end-of-piece assessment reports the performer's tempo variation, located by bar,
 and marks every score note matched, missing, wrong or dead. Tempo variation is judged
-against the performer's typical tempo (the score-distance-weighted median of local tempi);
-overall and handed tempo are reported separately, as contract 2 specifies.
+against the performer's typical tempo (the score-distance-weighted median of local tempi).
+The approved bar reference excludes the bar being judged and requires at least three
+other bars supplying intervals; instruments 3 and its audit implement that change
+under contract 2's order of work. Overall and handed tempo are reported separately.
 
 The research should be runnable by an LLM with little ongoing human judgement.
 That requires independent evidence and explicit decision rules, not just permission
@@ -379,8 +381,11 @@ a single player grade or a prescribed algorithm.
    the published standard method for the capability, so home-grown candidates are
    measured against it and not only against a trivial floor.
 3. **Develop on the scoreboard.** Propose or revise candidates on development
-   examples. Every candidate version runs the whole development scoreboard, never a
-   hand-picked part of it, and no experiment introduces an evaluator of its own.
+   examples. Every candidate version runs the suite required by its development
+   contract, never a hand-picked part of it. Under contract 2, routine runs use the
+   [active substages and frozen sentinels](contracts/development-contract-2.md#keeping-the-suite-lean-the-rising-tide);
+   full sweeps include retired sets and baselines, with unchanged evidence reused by
+   hash. No listener experiment introduces an evaluator of its own.
    Diagnose concrete failures as acoustic ambiguity, incorrect alignment, incorrect
    judgement or uncertain labels. Diagnostic experiments may remove one uncertainty
    to test another: for example, supplying known alignment to isolate assessment
@@ -478,10 +483,10 @@ different models.
 model either completes the frozen pre-registration unchanged or abandons it, and the
 report records which. It never edits the pre-registration.
 
-**A new model does not make evidence new.** Budgets, plateau counts, access to reserved
+**A new model does not make evidence new.** Budgets, stopping counts, access to reserved
 and final evidence, and examples already inspected carry over unchanged. A handover
 refreshes the investigator, not the experiment's ground truth. The pre-registration
-records the incoming plateau and budget state with its evidence; the completed report
+records the incoming stopping count and budget state with its evidence; the completed report
 records the resulting state, and the research log points to it. Before starting, the
 model checks for another experiment's owner and verifies numbering, artifact access,
 dependencies and output permissions, following [the pickup guide](PROMPT_EXPERIMENTER.md).

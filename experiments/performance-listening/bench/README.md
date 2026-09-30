@@ -66,14 +66,14 @@ Their tests keep passing; the archived runs they read are under
   (following-evaluator@2, unchanged by version 2), `assessment.ts` (assessment-report@1
   and assessment-evaluator@1, frozen), `assessment2.ts` (assessment-report@2 and
   assessment-evaluator@2), `gates.ts` (stage-gates@1: the approved gates, and the
-  proposed control-assessment gates) and `oracle.ts` (reads both oracles' shorthand).
+  approved control-assessment gates) and `oracle.ts` (reads both oracles' shorthand).
 - `oracle-events/`: event-oracle@1 and @2, hand-worked and frozen;
   `test/event-oracle.test.ts` and `test/event-oracle-2.test.ts` hold the evaluators and
   gates to them. Use version 2 and the version-2 evaluators for anything new.
 - `src/stages/`: `stage1.ts` rendered `contract2-stage1-v1`; `stage1v2.ts` renders
   `contract2-stage1-v2`, the same eight performances with a silence and a wrong-score
   control beside each; `run.ts` (022) and `run023.ts` (023) measure frozen listeners on a
-  frozen stage set. Deviation renderers, a scoreboard and new listeners come later.
+  frozen stage set. Later deviation renderers and listener runners are mapped below.
   `contract2-stage1-v1`'s manifest names its score files by absolute path in a worktree
   that no longer exists, so `readStageSet` cannot re-verify it; v2 names scores relative
   to the experiment (`assetPath`).
@@ -86,3 +86,18 @@ Their tests keep passing; the archived runs they read are under
   the approved distant `w2` wrong-score controls. `run024.ts` runs the fresh listener
   and all four frozen baselines, writes private assessments as well as records and
   uses the audited evaluators and approved gates unchanged.
+
+- `src/listeners/eventChain2.ts`: experiment 027's `event-chain@2`, separating
+  three-window live pitch confirmation from unchanged two-window offline tokens.
+  It reuses @1's pitch estimator and offline aligner; its behavioral tests are in
+  `test/event-chain-2.test.ts`.
+- `src/stages/hesitation1.ts` and `slowedBar1.ts`: the frozen silent-hesitation and
+  single-slowed-bar set builders. `run025.ts` and `run026.ts` compare the listener and
+  frozen baselines on those sets. `run027.ts` evaluates @2 over the complete frozen
+  slowed-bar set, re-evaluates @1's verified records, and cites the sweep-only baseline
+  evidence. Its failed provenance preflight and technical rerun have separate run IDs.
+
+The legacy bar flags above are instruments-2 evidence. Contract 2's approved
+other-bars reference, instruments 3, and the rising-tide suite record follow its
+[order of work](../contracts/development-contract-2.md#order-of-work); no existing
+module or historical verdict is silently reinterpreted as that new version.

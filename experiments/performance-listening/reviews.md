@@ -15,6 +15,7 @@ is visible: a process that gains rules every time is getting heavier, not better
 | R3 | 2026-09-30 | [024](reports/024-event-chain-stage1.md) | Claude Opus 5.5 (1M context) in Claude Code | Held; cleanest run yet | [de3ef9cb](#r3-after-experiment-024) | None | +3 −0 |
 | R4 | 2026-09-30 | [025](reports/025-single-hesitation.md) | Claude Opus 5.5 (1M context) in Claude Code | Held; model identity vague again | [Landed with this entry](#r4-after-experiment-025) | Outside review; several deviations per experiment; report weight | +2 −2 |
 | R5 | 2026-09-30 | [026](reports/026-single-slowed-bar.md), post-R4 process changes and outside process check | Sol 6.1 (high) in Codex | Held; failure supported | [Landed with this entry](#r5-after-experiment-026-and-the-post-r4-process-changes) | Multiple substages still pending; no new decision needed for 027 | +0 −0 |
+| R6 | 2026-09-30 | [027](reports/027-live-confirmation.md) and post-R5 user decisions | Sol 6.1 (high) in Codex | Held; bounded repair supported | [Landed with this entry](#r6-after-experiment-027-and-the-post-r5-decisions) | Different-model milestone review remains due; no new decision for 028 | +0 −0 |
 
 Reviews R1–R3 were given in conversation with the user and recorded here when this file
 was created. The same reviewer wrote contract 2 and most of the process it reviewed.
@@ -269,4 +270,92 @@ outside process review; it was a different model from the process's author, but 
 light review of 026 rather than a milestone review of the series, and the same model as
 026's experimenter. A milestone review by a different model remains due at the next
 stage passed.
+
+## R6, after experiment 027 and the post-R5 decisions
+
+**Held: the bounded repair passes under its frozen rules.** Reviewed everything
+landed since R5 (`48c7c750`): the user's approved rising tide, stopping rule,
+other-bars reference and grouped substages (`c86bc723`), then 027. No experiment or
+audit was mid-flight and no batch was active. Experiment 027's worktree and branch
+are retired. Reviewer: **Sol 6.1 (high) in Codex**, session
+`01a0f3e4-0795-73f0-9f94-7befc84ce4b4`. Experimenter's separate session
+`01a0f3e3-8399-7123-bbdd-4cac5d5ec481` records `gpt-6.1-sol`, effort `high`, matching
+its report, ledger and commit bodies. This is session independence, not a
+different-model replication.
+
+**Integrity and procedure.** Main's reflog puts pre-registration `4ebc3cad` on main
+at 21:05:26 BST; the session log puts candidate creation after it, at 21:07:39.
+The initial frozen runner executed at 21:14:14, the technical rerun at 21:14:58,
+and results landed at 21:21:44. The report still begins with the exact
+pre-registration bytes. The sole post-freeze code change normalizes one Git
+provenance lookup path; candidate bytes are identical across both execution commits.
+The failed attempt, private log and failure artifact agree that zero candidate
+examples ran before that repair. D1 explicitly permits this technical rerun with a
+new ID. Both source tags resolve to the reported commits and exist on origin.
+No tuning, changed gates, new oracle or unauthorized contract change occurred.
+
+Recomputed all five current-series manifests and their assets, resolving 022's
+retired worktree paths to the committed source bytes. Checked the successful and
+failed attempts, fresh detail/comparison bundles, and recursively cited private
+artifacts: **2,365 distinct files**, plus **468 pinned source-hash checks** across
+022–027. The comparator's 155 current producer files, 165 historical source pins
+and 986 private artifacts match their records. Earlier instruments, oracles,
+listeners, archive and product files are untouched by 027. The contract amendment
+is the user's recorded policy change, explicitly excluded from claims of unchanged
+producer bytes.
+
+Independently re-evaluated **264 old and 264 fresh examples**, without running a
+listener. Following, assessment, per-example gates, substage pools, combined pool
+and fresh cost gates reproduce. The old two cursor failures remain failures; all
+264 new examples pass. Counts reproduce: 608 event reaches/notes, 520 intervals,
+176 controls, 1,584 recorded fresh prefix checks, 264 identical musical reports and
+evaluations, and only two ID-only report differences. All 606 shared reaches add
+10 ms; every hesitation adds 10 ms of resumption abstention. Report 027's exporter
+reproduces and verifies both runs' pinned sources. The sandbox blocked its Git
+subprocess reads on the first check; the permitted unsandboxed check passed.
+
+**Claims and direction.** The experiment repairs prevention on two known sine
+transients; it does not claim recovery after commitment, a stronger pitch detector
+or independent generalisation. It honestly names the longer hesitation abstention,
+200 ms scoring allowance, easy distant controls, vacuous omission/extra-note and
+wrong/dead/missing recall gates, and reused comparator timing. Assessment still
+uses instruments 2's legacy flags, exactly as the user's explicit order for 027
+allows; it is not presented as the new other-bars rule. Stage 2 remains incomplete.
+The failing-version count stays zero, qualification access is unchanged, and the
+stop before 028's instrument work and audit is correct.
+
+The rising tide has already paid: evaluation takes **19.480 s**, down from 026's
+414.245 s, with the complete 264-example repair/regression set still present.
+The speedup comes from sweep-only baselines and verified reuse, not an algorithm
+speed claim. No passed set or failing example was retired, no sentinel was selected
+by hand, and no full sweep is overdue: 026 is the last complete comparison. The
+ordered progression still serves the user's cursor and end-of-piece judgement;
+ringing hesitation, omissions, note errors, chords and recorded guitar remain
+unmeasured, as the report says.
+
+**Fixed directly.** APPROACH still demanded the whole historical scoreboard despite
+the rising tide and omitted the approved other-bars reference. The harness overview
+still prescribed early timbre, an every-run real thermometer, two sequential output
+milestones, and a handover bound only by a predecessor's report. Aligned those
+passages with the existing contract and APPROACH. Updated the bench code map through
+027 and its already-approved control gates, and the log's review-due sentence.
+No frozen report, verdict, data, code, instrument or contract was edited.
+
+**Recommendation.** Continue the approved 028 instrument/suite step, followed by
+its independent oracle audit. Its operational definitions should make cross-gate
+sentinel margins, ties and sweep cadence reproducible; the two repaired examples
+must receive the same selection rule as every other example. This is work within
+the existing contract, not a request for new gates or a change of question. No new
+user decision is needed now. R6 is every third review: the different-model review
+of the whole process remains recommended at the next stage-completion milestone,
+as already recorded after R5.
+
+**Could not check.** No independent listener execution, oracle arithmetic re-audit,
+archived private-set sweep, real-player transfer or microphone/mobile latency.
+Recorded prefix checks were verified, not independently rerun. Git, hashes and the
+session log do not establish absence of unrecorded private-data access.
+
+**Trend:** +0 −0; these are stale-description and bookkeeping corrections to already
+approved rules. R1–R4 added ten rules and relaxed four; R5–R6 add none. The evidence
+supports continuing the lighter process rather than adding procedure.
 

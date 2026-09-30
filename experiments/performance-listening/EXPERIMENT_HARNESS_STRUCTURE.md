@@ -4,7 +4,9 @@
 structural pieces that discharge them, what each one owns, and the order in which they
 have to exist. It describes shape and responsibility, not technology: no file format,
 language, library or algorithm is chosen here. Where an example is given it is an
-example, not a decision.
+example, not a decision. The construction sketch originated under contract 1;
+[contract 2](contracts/development-contract-2.md) governs the current outputs,
+progression, comparator schedule and stopping rule.
 
 ## Contracts and contents
 
@@ -193,15 +195,16 @@ advances a clock is one example. An **informative external comparator** follows,
 that the first real hypothesis is measured against something other than the floor.
 For following, that comparator is the published standard method: causal online time
 warping with onset-emphasised features. From then on, candidates are whatever the
-loop proposes; no family is preferred, and each is compared with the comparator as
-well as the floor.
+loop proposes; no family is preferred. Under contract 2, the clock and time warpers
+are frozen comparators used only in full sweeps; routine runs compare with the
+previous listener, reusing unchanged records by hash.
 
 ### 9. Research contract and ledger
 
 **Owns:** the decision rules and the history.
 
 Contracts come in two tiers. A **development contract** fixes the development ladder,
-the scoreboard every candidate runs, the pass bar per rung, the plateau rule and the
+the suite every candidate runs, the pass bar per substage, the stopping rule and the
 exit to the next kind of evidence. It retains nothing, so it does not ration candidate
 versions. A **qualification contract** fixes everything a retain-or-reject decision
 needs. Both are recorded before they are used; the first qualification contract of a
@@ -232,8 +235,8 @@ decides whether to continue, change direction or stop, and resumes an interrupte
 session from the research log (piece 11), which points it at the ledger rows that
 matter. It is a procedure the LLM executes with its state in the log and its history
 in the ledger, not necessarily a separate component. On the development tier it is
-the ladder procedure in the development contract: run the scoreboard, attack the
-lowest failing rung, climb or stop by the plateau rule. On the qualification tier it
+the progression in the development contract: run its required suite, attack the
+lowest open substage, climb or stop by its stopping rule. On the qualification tier it
 is the bench's qualification driver, which spends the reserved-evidence budget. Its defining requirement is that
 every next action is traceable to the contract, the measured results and the recorded
 research, so that nobody has to read a report and decide.
@@ -241,7 +244,8 @@ research, so that nobody has to read a report and decide.
 The driver may be a different model for each experiment. One model runs one numbered
 experiment from pre-registration to landed record, and the handover happens only
 between experiments. The research log is the incoming model's entry point, and a
-report's pre-registered decision rules are the only instructions that bind it.
+report's pre-registered decision rules bind that experiment's verdict. Approved
+contracts and user directions continue to bind later work; a report's Next is advice.
 [APPROACH.md](APPROACH.md#who-runs-an-experiment-one-model-one-experiment) sets out the
 procedure.
 
@@ -286,7 +290,7 @@ figures that no longer held is the failure this rule prevents.
 | Pipeline | 5 (harness profile), 7, 8 (trivial baseline) | A run over the harness set produces a report the evaluator and oracle agree with, and the causality check passes |
 | Real evidence | 6 (library recordings, score perturbation) | Eligible solo library recordings are goldens with declared precision and unknown regions; a few are hand-checked; following controls exist on real audio |
 | Loop | 9 (retention rule), 9a | The first contract is human-approved; the retention rule runs on two recorded runs; the driver's next action is traceable |
-| Development ladder | 5 (score renderer, fuzz transforms), 3 (exact-label instrument for rendered scores), 8 (published comparator) | Rung 0 of the first real piece exists with exact labels; the scoreboard runs every candidate over every built rung, the recognition diagnostic and the real-audio thermometer |
+| Development ladder | 5 (score renderer, fuzz transforms), 3 (exact-label instrument for rendered scores), 8 (published comparator) | Exact-label sets and audited instruments implement the development contract; every candidate runs its required suite and controls, with full sweeps and thermometer checks on the contract's schedule |
 | Candidates | 8 | The first real hypothesis and a comparator are compared under the contract |
 
 Steps three and four run in parallel. Everything after the last step is the loop
@@ -297,19 +301,21 @@ milestone and a live microphone rig follow the same rule.
 
 ## How the pieces mature
 
-Inputs climb in sequence, with real audio always visible. Development starts on a
-synthetic ladder built from a real piece's score, one fuzz axis at a time and then in
-combination, with timbre early on the ladder. Real recordings run beside every
-development run as a thermometer and become the development evidence once a candidate
-passes the combined rung. Re-amplified sets hold every other dimension at level one by
-construction; real performances arrive with whatever profile they actually have, which
-is recorded rather than assumed. Candidates mature
-only by retained comparisons, so their pace is set by the supply of independent
-evidence, not by the supply of ideas. Assessments mature in two steps, following then
-note-level judgement, with the evaluator's categories widening at the milestone
-boundary and nowhere else. Timeliness and cost are measured from the first run against
-a provisional budget, because they are cheap to measure and they shape what candidates
-get proposed.
+Inputs climb in the approved contract's sequence. Under contract 2, development
+starts with simple sine scores and exact labels, then one deviation at a time, chords,
+one recorded guitar sample set, and category bundles. Real recordings are occasional
+bar-level thermometers with uncertain anchors, never a selection criterion; they become
+development evidence later. Routine evaluations use the attempted substages, passed
+substages' frozen sentinels and controls; full sweeps include the retired sets and
+baselines. Re-amplified sets hold other dimensions fixed; real performances arrive with
+whatever profile they have, recorded rather than assumed.
+
+Development gains remain provisional, and qualification needs independent evidence.
+The live cursor and end-of-piece note/timing assessment are measured separately from
+the first contract-2 stage. A new or versioned instrument needs its frozen oracle and
+independent audit before judging a listener; new numerical gates need the user's
+approval. Timeliness and cost are measured against a provisional budget from the
+first run, because they shape what candidates get proposed.
 
 ## What stays outside
 
