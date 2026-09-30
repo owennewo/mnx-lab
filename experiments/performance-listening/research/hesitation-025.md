@@ -1,0 +1,7 @@
+# Hesitation research refresh for 025
+
+Read 2026-09-30 by GPT-6 in Codex (exact version unverified). Bounded to whether the existing event chain has a reason to hold through one silent pause.
+
+Primary source: Nakamura, Nakamura and Sagayama, *Real-Time Audio-to-Score Alignment of Music Performances Containing Errors and Arbitrary Repeats and Skips*, accepted IEEE/ACM TASLP 24(2), February 2016; arXiv v1 submitted 2015-12-24, https://arxiv.org/abs/1512.07748. The abstract describes monophonic HMMs addressing tempo changes, errors and arbitrary navigation, with real-time clarinet evaluation. Re-read the abstract and metadata; no new quantitative claim is imported. The previous [024 note](event-chain-024.md) records this family's motivation and the elementary pitch estimator's limitations.
+
+Local inference from eventChain1.ts, not a published result: acquired pitch-event states remain visible during silence, and tokens start only on new agreed pitch. Thus inserting silence between distinct notes should preserve the cursor and add the pause to the one inter-onset interval. The offline sequence alignment should still match every pitch. Alternatives are release/re-entry transients causing unsupported output, missed new pitches or biased onset timing changing a borderline slow flag. The experiment tests unchanged code on exact pauses and its controls, retaining the complete stage-1 regression set. It does not test the source paper's method, clarinet results, chords, guitar decay or repeated identical notes.
