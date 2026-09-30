@@ -17,7 +17,8 @@ question, the stage and evidence, the listeners, numbered predictions, what woul
 contradict them, and decision rules. The results are appended to the same file after
 the run, so git dates the prediction; the pre-registration never changes. The
 experiment adds one [ledger](../ledger.md) row and one row in [reports.json](reports.json),
-which the shared exporter renders. It adds no contract file and no exporter of its own.
+which the shared exporter renders. It adds no exporter of its own, and no contract file
+except a new version of an instrument definition (`contracts/event-instruments-N.md`).
 [RUNNING_AN_EXPERIMENT.md](../RUNNING_AN_EXPERIMENT.md) is the procedure.
 
 ## Rebuilding the readable copies

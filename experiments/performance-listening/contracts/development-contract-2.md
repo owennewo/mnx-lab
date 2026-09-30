@@ -94,6 +94,17 @@ categories, wrong-note handling and extra notes, they wrote:
 That message adopts this contract. The numerical gates are still proposals: they are
 chosen only after the oracle cases are frozen, and the user approves them then.
 
+After experiment 022 proposed gates and raised two definitional questions, the author
+recommended approving the gates for the sine stages with two changes, judging variation
+against the player's typical tempo, and a distinct dead-note verdict. The user wrote:
+
+> Can you make the necessary updates to the docs and experiment to make the process
+> improvements. How do you propose to do the small experiment? Perhaps we should simply
+> delete the next experiment and replace it with your small experiment
+
+That accepts the recommendations recorded below under the gates, tempo variation and
+notes, and makes experiment 023 the small experiment that implements them.
+
 ## Why
 
 Contract 1 measures one thing: whether the live cursor is within ±¼ quarter of the
@@ -142,15 +153,23 @@ by event.
   pause is included, and the final ringing is excluded. It is reported beside the handed
   tempo and never counts against timing.
 - **Tempo variation** is the main timing judgement: local tempo relative to the player's
-  overall tempo. A hesitation is not a separate category; it is the local tempo falling
-  towards zero. The report flags bars well below or above the player's own tempo, such
-  as "slowed in bar 4", as practice cues.
+  **typical tempo**, the median of their local tempi weighted by score distance. A
+  hesitation is not a separate category; it is the local tempo falling towards zero.
+  The report flags bars well below or above the player's typical tempo, such as "slowed
+  in bar 4", as practice cues. The overall tempo is not the reference: one long
+  hesitation drags it down until steady bars read fast (experiment 022, oracle case
+  A3), whereas a median barely moves.
 - **Notes.** Every score note in every event is marked **matched**, **missing**,
-  **wrong pitch** (with the pitch heard instead) or **dead**. A partial chord is an
+  **wrong pitch** (with the pitch heard instead) or **dead**. A dead note where the score
+  itself writes one (`technique.dead`, as Guitar Pro scores carry) is **matched**; only
+  an unintended dead note is a finding. Studio's vocabulary gains a distinct `dead`
+  verdict (version 2.1, additive), rather than reading a pitchless substitution as dead:
+  a note heard but not identified is not the same finding as a muted one. A partial chord is an
   event with one or more missing notes. The summary says which notes and chords were
   played in order, and what differed. Extra notes are not assessed yet, so the report
   does not claim the performance contained nothing else. The shape already exists as
-  the `note` statement of the [version-2 vocabulary](vocabulary-v2.md).
+  the `note` statement of the [version-2 vocabulary](vocabulary-v2.md), with the `dead`
+  verdict above added.
 - **Same audio, same assessment.** The expected assessment depends only on what sounded
   and when, never on how the generator recipe named the deviation.
 
@@ -170,6 +189,13 @@ before the next begins. Earlier stages stay as regression evidence.
 | 3 | Winner bars 1–4, the first score with chords | The same | Perfect, then one deviation at a time, now including partial chords |
 | 4 | The same | One recorded guitar sample set | Perfect, then one deviation at a time |
 | 5 | The same | The same | The category bundles: advanced, then intermediate, then beginner |
+
+**Every stage carries two negative controls**, like contract 1's ladder: digital
+silence of the same length, and the stage's audio handed a **wrong score**, an unrelated
+simple score that shares no opening with the performed one. The cursor must not claim a
+position in either, and the assessment must not report a control's notes as played.
+A perfect-performance stage without controls cannot tell a listener that hears from one
+that always follows (lesson L8).
 
 Deviations, added one at a time in this order: steady tempo away from the handed one;
 a hesitation; a slowed bar; a rushed bar; a missing event; a wrong note; a dead note;
@@ -210,33 +236,61 @@ them from experience.
 
 ## Instruments
 
-No listener is judged by a new instrument until it has its own hand-worked oracle
-cases. **The oracle cases are frozen before any numerical gate is chosen.**
+No listener is judged by an instrument until it has its own hand-worked oracle cases,
+and **a different session has audited them** (below). Numerical gates are chosen only
+after the oracle cases are frozen, and the user approves them.
 
-- **following-evaluator@2** judges the live cursor, with the as-decided and hindsight
-  views of version 1. It measures:
+- **following-evaluator** judges the live cursor, with the as-decided and hindsight
+  views. It measures:
   - by time: on a supported event, with **ahead** (on an event not yet sounded)
     reported separately, plus wrong or false-following exposure and the longest
-    episode;
+    episode, including false following on the controls;
   - **by event**: the fraction of distinguishable events the cursor reaches within the
     deadline, so a long hesitation waited out correctly cannot hide short events that
     were missed;
   - recovery after a missing event; no movement on an extra note; deadline, causality
     and cost, as contract 1 defined them.
-
-  Placeholders: on a supported event for 95% of answerable time and 95% of events;
-  ahead at most 1%; exposure at most 5%, with no episode over 0.5 s; recovery in 90% of
-  cases.
-- **assessment-evaluator@1** judges the end-of-piece report:
-  - local tempo, interval by interval, and overall tempo;
+- **assessment-evaluator** judges the end-of-piece report:
+  - overall tempo, and each interval's **duration** between sounded events;
   - **detections and false alarms for every kind of finding**: tempo-variation flags,
     missing, wrong-pitch and dead notes. An assessor that flags everything must fail.
-
-  Placeholders: overall tempo within ±5%; interval tempo within ±10%; every kind of
-  finding at least 90% found and at most 5% false.
 - **An oracle case for bad sync.** The audio is unchanged while the anchors move by
   100–400 ms. The musical assessment must not change; only the reference's
   uncertainty grows, and more of the real-clip cursor result becomes indeterminate.
+
+Experiment 022 built version 1 of both, [event instruments 1](event-instruments-1.md),
+with [event-oracle@1](../bench/oracle-events/README.md). Experiment 023 versions them for
+the decisions above.
+
+### The gates, approved for stages 1–3
+
+The gates [proposed in experiment 022](../reports/022-event-instruments.md#proposed-gates-awaiting-the-users-approval)
+are approved **for the sine stages, 1–3 only**, with two changes. Before stage 4,
+recorded guitar, a new proposal is made from evidence and approved again, rather than
+loosened under pressure once a stage proves them unreachable.
+
+| Measure | Gate |
+|---|---|
+| Live cursor, per example | On event ≥ 95% of supported answerable time; ahead ≤ 1%; exposure ≤ 5% with no episode over 0.5 s; every event reached within 0.2 s where an example has fewer than 20, otherwise ≥ 95% |
+| Controls, per example | Contract 1's approved control gates, unchanged: correct rejection ≥ 95% of answerable time, false-following exposure ≤ 5%, no episode over 0.5 s. How the assessment of a control is judged is proposed by experiment 023 for approval |
+| Live cursor, pooled over a stage | Recovery after a missing event ≥ 90%; extra notes held ≥ 90% |
+| Causality and cost | Every prefix check; sustained cost ratio ≤ 0.25; chunk p99 ≤ 10 ms |
+| Assessment, per example | Overall tempo within ±5%; every expected interval reported, each **duration within ±10% or ±30 ms, whichever is larger** (changed from ±10% of tempo, which is ill-conditioned near a hesitation and tighter than onset precision on short notes); every score note assessed; **no false finding at all on a clean example** (changed from a pooled rate, which could hide one) |
+| Assessment, pooled over a stage | For each kind of finding: at least 90% found and false alarms at most 5% of negatives |
+| Bar-flag threshold θ | 0.10, as defined in the instruments, now against the typical tempo |
+
+### Auditing an oracle
+
+A new or re-versioned oracle is audited before any listener is judged by it. A session
+that did not write it, ideally a different model, re-derives a sample of its expected
+numbers by hand from the contract and the instrument definitions alone, without
+reading the evaluator code: at least one case per rule, and every case the version
+added or changed. It records each case checked, its own arithmetic, and agree or
+disagree, in `bench/oracle-events/audit-N.md`. The audit runs no listener and is not a
+numbered experiment. A disagreement is resolved by the next numbered experiment,
+which either versions the oracle with the corrected arithmetic or shows why the audit
+misread the rule. The audit exists because one author writing both the oracle and the
+evaluator makes a shared misreading invisible: they agree by construction.
 
 ## The fresh experimental context
 
@@ -275,18 +329,24 @@ it. The assessment can start from a whole-recording offline alignment.
 
 ## Order of work
 
-1. **Experiment 022: the instruments.** Build following-evaluator@2 and
-   assessment-evaluator@1, write and freeze their oracle cases, including the bad-sync
-   case. Render stage 1, and measure the clock and versions 8, 12 and 14 on it. Then
-   propose numerical gates from that evidence, for the user's approval.
-2. **Experiment 023: the first new listener, on stage 1.** Research event-based
+1. **Experiment 022: the instruments.** Done: version 1 of both evaluators, their
+   oracle, stage 1 and the baselines; gates proposed.
+2. **Experiment 023: the decisions, implemented.** Version the instruments and the
+   oracle for the typical-tempo reference, interval durations with their floor, zero
+   findings on clean examples, the `dead` verdict with intended dead notes matched, and
+   the controls' scoring. Add the `dead` verdict to the vocabulary and `listen/`. Add
+   the silence and wrong-score controls to stage 1 as a new frozen set, committing the
+   unrelated wrong score to `sources/`. Remeasure the frozen baselines on it. No
+   listener is developed.
+3. **The oracle audit** of 023's oracle, by a different session.
+4. **Experiment 024: the first new listener, on stage 1.** Research event-based
    following first, then build the simplest live cursor and end-of-piece assessor that
-   pass stage 1.
-3. **Then the stages in order,** one deviation at a time. A stage is done when the
-   cursor and the assessment meet the approved gates on every example of it and every
-   earlier stage.
+   pass stage 1 under the approved gates.
+5. **Then the stages in order,** one deviation at a time. A stage is done when the
+   cursor and the assessment meet the approved gates on every example of it, its
+   controls and every earlier stage.
 
 ## Still open for the user
 
-- The numerical gates, once the oracle cases exist.
+- New gates before stage 4, recorded guitar, from the evidence of stages 1–3.
 - The category figures, if experience says the estimates are wrong.

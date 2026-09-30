@@ -461,6 +461,12 @@ Private artifacts are named in the run summaries by path and hash.
 model and the tool that ran it. Earlier experiments record the model only in their
 commits' trailers.
 
+**Oracle audits.** Under contract 2, every new or re-versioned evaluator oracle is
+audited by a session that did not write it before any listener is judged by it, as
+[the contract](contracts/development-contract-2.md#auditing-an-oracle) sets out. One
+author writing both an oracle and its evaluator would make a shared misreading of the
+rules invisible.
+
 **Independent execution, the one exception.** For a claim that matters, such as a
 qualification comparison, a different model may execute another model's frozen
 pre-registration without changing it, as a check against an implementation shaped by

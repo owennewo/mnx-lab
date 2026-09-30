@@ -48,12 +48,16 @@ all fail by running ahead of a slow player, as the contract predicted; at the ha
 tempo they are indistinguishable from the clock. There is still no listener built for
 this contract.
 
-**Awaiting the user:** the [proposed numerical gates](reports/022-event-instruments.md#proposed-gates-awaiting-the-users-approval),
-and two definitional questions the oracle raised: whether bar flags compare against
-the overall tempo as the contract says, or against a typical tempo (case A3); and
-whether dead notes need their own verdict in the Studio vocabulary. The contract's gates
-stay placeholders until the user approves numbers. The next experiment is **023**, the
-first new listener on stage 1.
+**The user decided on 022's open questions** ([contract 2](contracts/development-contract-2.md#the-gates-approved-for-stages-13)).
+The proposed gates are approved for the sine stages, 1–3, with interval durations
+judged to ±10% or ±30 ms and no false finding allowed on a clean example. Variation
+flags compare against the player's typical (median) tempo, not the overall tempo. Dead
+notes get their own verdict, and a dead note the score writes is a match. Every stage
+now carries silence and wrong-score controls, which 022's stage 1 lacked. Every new
+oracle is audited by a different session before a listener is judged by it. So the next
+experiment, **023**, versions the instruments and the oracle for these decisions, adds
+the controls to stage 1 and remeasures the baselines; it develops no listener. The oracle
+audit follows it, and the first new listener is **024**.
 
 No plateau: 022 developed no listener. [Report 022](reports/022-event-instruments.md#resulting-plateau-budgets-and-evidence-access)
 records the budget state. Qualification under
@@ -99,10 +103,12 @@ given when a question opens and never reused.
 
 | Rank | Question | Why it is ranked here | Status | Owner item |
 |---|---|---|---|---|
-| 4 | Can the simplest event-based live cursor and end-of-piece assessor pass stage 1? | The contract's next step; the instruments are trusted | open | [Contract 2 order of work](contracts/development-contract-2.md#order-of-work), experiment 023 |
-| 3 | Which numerical gates, flag reference tempo and dead-note verdict does the user approve? | Proposed in 022; widened to the two definitional questions the oracle raised. Nothing passes or fails a stage until approved | **awaiting the user** | [Report 022](reports/022-event-instruments.md#proposed-gates-awaiting-the-users-approval) |
+| 5 | Do the instruments, versioned for the user's decisions (typical-tempo reference, interval durations with a floor, clean examples, the dead verdict, the controls), reproduce a re-worked hand oracle, and what do the frozen baselines do on stage 1's new controls? | The decisions change what 022's oracle expects; stage 1 lacked controls | open | [Contract 2 order of work](contracts/development-contract-2.md#order-of-work), experiment 023 |
+| 6 | Does an independent session, re-deriving the new oracle by hand, agree with it? | No listener is judged by an unaudited oracle | open | [The audit rule](contracts/development-contract-2.md#auditing-an-oracle), after 023 |
+| 4 | Can the simplest event-based live cursor and end-of-piece assessor pass stage 1? | The first listener, once the versioned instruments are audited | open | [Contract 2 order of work](contracts/development-contract-2.md#order-of-work), experiment 024 |
 | 1 | Do following-evaluator@2 and assessment-evaluator@1 reproduce independently hand-worked oracle cases? | Answered: yes, exactly (finding 1) | answered | Experiment 022 |
 | 2 | On stage 1, where do the clock and the frozen versions 8, 12 and 14 fail, and do the failures show the forward-only, tempo-clamped design? | Answered: ahead of a slow player; indistinguishable at the handed tempo (findings 2–3) | answered | Experiment 022 |
+| 3 | Which numerical gates, flag reference tempo and dead-note verdict does the user approve? | Decided by the user after 022 | answered: gates approved for stages 1–3 with two changes; typical tempo; a dead verdict | [Report 022](reports/022-event-instruments.md#proposed-gates-awaiting-the-users-approval) |
 
 ## Superseded and stopped
 

@@ -91,8 +91,17 @@ research log says is current.
   it. Loosening the contract still needs the user.
 - **Instruments before listeners.** No listener is judged by a new instrument until
   that instrument has its own hand-worked oracle cases, written independently of any
-  listener's output. Numerical gates are chosen only after those cases are frozen, and
-  the user approves them.
+  listener's output, and **a different session has audited them**
+  ([the audit rule](contracts/development-contract-2.md#auditing-an-oracle)). If you
+  write or re-version an oracle, you do not audit it; the log's next question is then
+  the audit. If you are asked to audit one, follow that rule and run nothing else.
+  Numerical gates are chosen only after the oracle cases are frozen, and the user
+  approves them.
+- **Instrument definitions are versioned contracts.** An experiment that defines or
+  changes an instrument writes `contracts/event-instruments-N.md` as a new version,
+  never editing an earlier one. That is the one contract file an experiment may add.
+- **Every stage has its controls.** Silence and a wrong score run beside every stage's
+  examples; a listener that passes a stage without its controls has not passed it.
 - **Change one thing per version,** so the result can be attributed to it. Add a new
   version rather than editing a frozen one.
 - **Pre-register** in `reports/NNN-slug.md`:
