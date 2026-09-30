@@ -8,8 +8,28 @@ before any listener is judged by it.
 
 | Version | File | Freeze | Instruments | Audit |
 |---|---|---|---|---|
+| event-oracle@3 | `oracle-3.json` | `freeze-3.json` | [event instruments 3](../../contracts/event-instruments-3.md) | **Pending independent audit; B1 frozen arithmetic disagreement recorded in [028](../../reports/028-other-bars-suite.md)** |
 | event-oracle@2 | `oracle-2.json` | `freeze-2.json` | [event instruments 2](../../contracts/event-instruments-2.md) | [audit-2.md](audit-2.md): 63 agree, 0 disagree, 3 ambiguous (F9's `indeterminate` figure; no gate affected), settled by the [clarification](../../contracts/event-instruments-2.md#clarification-2026-09-30) |
 | event-oracle@1 | `oracle.json` | `freeze.json` | [event instruments 1](../../contracts/event-instruments-1.md) | none; written before the audit rule |
+
+## Event oracle, version 3
+
+Written and frozen before implementation by **Sol 6.1 (high) in Codex** for
+[028](../../reports/028-other-bars-suite.md). New cases use direct quarter/ordinal/onset
+arrays, one matched note per onset; B7 and B12 use toy unequal-length measures. Every
+case carries its hand arithmetic and expected bar fields. B1–B12 cover other-bar exclusion,
+three-contributor eligibility, sparse bars, endpoint attribution, steady half speed,
+self-dominating intervals, exact-half weights and inclusive threshold/optional boundaries.
+S1–S8 cover suite states; selection, normalized margin and retirement cases use synthetic
+numbers independent of listener output. Original oracles keep every unchanged rule.
+
+**B1 is a frozen counterexample, not a passing oracle case.** Its first-bar reference
+was handwritten as 60; the three-quarter crossing interval ends in the second bar and
+makes the other-bar weighted median 30, with ratio 1. Tests preserve the frozen wrong
+answer and explicitly reproduce the disagreement. No frozen byte was edited. The
+independent audit must decide it; any correction is a later numbered version. The audit
+should cover every new case and every added/changed rule, including suite selection and
+state arithmetic. Version3 has not judged any listener.
 
 ## Event oracle, version 2
 

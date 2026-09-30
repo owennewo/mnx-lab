@@ -101,3 +101,17 @@ The legacy bar flags above are instruments-2 evidence. Contract 2's approved
 other-bars reference, instruments 3, and the rising-tide suite record follow its
 [order of work](../contracts/development-contract-2.md#order-of-work); no existing
 module or historical verdict is silently reinterpreted as that new version.
+
+
+**Experiment 028 instrument work (pending oracle@3 audit).** `src/events/assessment3.ts`
+implements other-bars references and informational report@3 bar summaries;
+`src/events/gates2.ts` reuses approved numerical gates and adds deterministic sentinel
+selection, suite states, retirement eligibility and routine/sweep plans. `oracle3.ts`
+loads the frozen hand cases; `test/event-oracle-3.test.ts` preserves B1's recorded
+arithmetic disagreement and checks unchanged handwritten report rules. No listener has
+been evaluated under version3. [The suite record](suite-record.json) bootstraps historical
+instruments-2 passes and sentinels without claiming confirmation or retiring a set.
+`src/stages/fourBarTempo1.ts` prepares the new private four-bar evidence without running
+a listener; `run028.ts` records validation, provenance and the oracle disagreement.
+Use audited instruments2 until oracle3 has been independently resolved; do not mistake
+a green regression test preserving the counterexample for an oracle approval.
