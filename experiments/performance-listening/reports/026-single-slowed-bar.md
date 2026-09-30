@@ -146,3 +146,9 @@ No current user decision is needed. Later recorded-guitar gates, qualification/p
 ## Attribution and validation
 
 Designed, implemented, executed, diagnosed and recorded by **GPT-6 in Codex (version unverified)**, one model throughout, terminal/TypeScript/tsx/Vitest. Pre-registration suite: 299 bench tests plus typecheck and repository gate. New comparison source typechecked before execution; final repository gate runs on the rebased complete record before landing. The report exporter verifies all recorded source hashes against the pinned source commit.
+
+
+**Attribution correction, review R5 (2026-09-30):** the experimenter's Codex session
+`01a0f364-e751-7bb2-a2b7-a4117ba26aac` records `model: gpt-6.1-sol` and `effort: high`:
+**Sol 6.1 (high) in Codex**. The original attribution and frozen pre-registration
+remain above unchanged. This identifies the runtime, not independent replication.

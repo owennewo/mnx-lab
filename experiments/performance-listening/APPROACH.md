@@ -36,9 +36,9 @@ separate acceptance criteria; neither capability's success implies the other's.
 Since contract 2, the milestone has two parts: the live cursor follows the performer
 event by event, holding through hesitations and recovering after missing notes; and
 the end-of-piece assessment reports the performer's tempo variation, located by bar,
-and marks every score note matched, missing, wrong or dead. Timing is judged against
-the performer's own overall tempo, never against the handed tempo, which is only
-reported.
+and marks every score note matched, missing, wrong or dead. Tempo variation is judged
+against the performer's typical tempo (the score-distance-weighted median of local tempi);
+overall and handed tempo are reported separately, as contract 2 specifies.
 
 The research should be runnable by an LLM with little ongoing human judgement.
 That requires independent evidence and explicit decision rules, not just permission
@@ -144,20 +144,21 @@ Recording conditions are additional declared factors: microphone, room, backgrou
 noise, recording level, and other instruments or voices sounding alongside the
 performer. Success on generated audio does not establish success on
 recordings of real instruments. The previous experiment's largest measured loss was
-timbre and recording transfer, not musical complexity, so timbre enters the synthetic
-ladder **early**: plucked envelopes, ringing notes, harmonic partials and recorded
-instrument samples, not only sine tones.
+timbre and recording transfer, not musical complexity. That remains a transfer risk
+for sine results. Contract 2 fixes when timbre enters: stages 1–3 use sines, stage 4
+adds one recorded guitar sample set, and further sounds follow the approved progression.
 
 **Develop on a synthetic ladder first.** Experiments 002 and 003 went to a real
 recording before any candidate had been run on audio with an exact answer, and a
 failure there could not be split into a tracking defect and an acoustic limit. A
 rendering of a real piece's own score keeps its structural ambiguity and gives exact
 labels. Fuzzing that rendering one declared axis at a time, then in combination,
-attributes each failure to the axis that caused it. Real recordings run alongside
-every development run as a thermometer: recorded, never used to select. Once one
-candidate passes the combined rung, real recordings become the development evidence
-and the ladder becomes regression evidence. [Development contract 1](contracts/development-contract-1.md)
-defined that ladder. [Development contract 2](contracts/development-contract-2.md#the-progression-start-simple-one-change-at-a-time)
+attributes each failure to the axis that caused it. Under [development contract 1](contracts/development-contract-1.md), real recordings
+ran alongside every development run as a thermometer: recorded, never used to select.
+Passing its combined rung would have made real recordings the development evidence
+and the ladder regression evidence. Under contract 2, real music is tested
+occasionally as a bar-level thermometer with anchor uncertainty, never to select a
+listener; it becomes development evidence later in the approved progression. [Development contract 2](contracts/development-contract-2.md#the-progression-start-simple-one-change-at-a-time)
 now starts one step simpler still: the simplest committed scores, one synth and a
 perfect performance, then one performer deviation at a time, then Winner's chords,
 then one recorded guitar, then bundled beginner, intermediate and advanced
