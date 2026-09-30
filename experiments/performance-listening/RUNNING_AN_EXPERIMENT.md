@@ -94,7 +94,7 @@ research log says is current.
   listener's output, and **a different session has audited them**
   ([the audit rule](contracts/development-contract-2.md#auditing-an-oracle)). If you
   write or re-version an oracle, you do not audit it; the log's next question is then
-  the audit. If you are asked to audit one, follow that rule and run nothing else.
+  the audit, which follows [AUDITING_AN_ORACLE.md](AUDITING_AN_ORACLE.md).
   Numerical gates are chosen only after the oracle cases are frozen, and the user
   approves them.
 - **Instrument definitions are versioned contracts.** An experiment that defines or
@@ -154,6 +154,9 @@ Then:
   re-ranked questions. Record the resulting plateau and budget state in the report and
   point to it from the log.
 
+If your experiment created or re-versioned an oracle, make its audit the research log's
+top open question, naming the oracle version.
+
 Land it, retire your worktree, and stop. Do not start the next experiment.
 
 ## 6. Ask the user only for
@@ -181,3 +184,46 @@ Everything else is yours to decide within the contract. When you decide, record 
   development evidence.
 - Several tests read the first series' runs under `archive/ladder-1/runs/`; keep those
   paths if you touch the tests.
+
+## 8. Running through a parent session (optional)
+
+A user may start one session that runs the next step through subagents, each with a
+fresh context, instead of starting each session by hand. The rules are unchanged: each
+subagent is one session, one model runs each experiment, and an audit is done by a
+session that did not write the oracle. If you were asked to act as the parent, this is
+your whole job:
+
+1. **Do no work yourself.** Do not edit files, design, run or interpret. Read `CLAUDE.md`
+   and the research log's current state and top question, only to check facts.
+2. **Run the next experiment.** Launch one general-purpose subagent with exactly this
+   prompt, adding nothing, since any summary or hint of yours would pass your
+   interpretation on:
+
+   > Read experiments/performance-listening/RUNNING_AN_EXPERIMENT.md and follow it. You
+   > cannot ask the user questions: record anything that needs them in your report and
+   > the research log. When you have landed and retired your worktree, stop, and reply
+   > with what you did, what it showed, and anything awaiting the user.
+
+   If the log's top question is itself an oracle audit, skip to step 4.
+3. **Check the facts** from git and the files, not from the subagent's reply. The report
+   landed with its pre-registration section unchanged since the pre-registration commit,
+   which reached `main` before the results; the ledger, the report registry and the
+   research log were updated; no worktree of the experiment remains. If a check fails,
+   or the experiment recorded an inconclusive or infrastructure outcome, stop and
+   report.
+4. **Run the audit, if one is due**: when the experiment created or re-versioned an
+   oracle, or the log's top question is an audit. Launch a second general-purpose
+   subagent **on a different model** from the experiment's, choosing a capable one
+   (`fable` or `sonnet`, for example), with exactly this prompt:
+
+   > Read experiments/performance-listening/AUDITING_AN_ORACLE.md and follow it. When you
+   > have landed and retired your worktree, stop, and reply with your verdict case by
+   > case.
+
+   Give it nothing about the experiment. Then check that the audit file landed and the
+   research log's audit question links it.
+5. **Stop** before any further experiment, even if the audit agrees. Report to the user:
+   what the experiment did and showed, anything awaiting their approval, and the audit's
+   verdict case by case, quoting every disagreement or ambiguity in full. Subagents'
+   replies are not shown to the user, so what matters must be in your report.
+

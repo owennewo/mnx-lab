@@ -286,7 +286,8 @@ that did not write it, ideally a different model, re-derives a sample of its exp
 numbers by hand from the contract and the instrument definitions alone, without
 reading the evaluator code: at least one case per rule, and every case the version
 added or changed. It records each case checked, its own arithmetic, and agree or
-disagree, in `bench/oracle-events/audit-N.md`. The audit runs no listener and is not a
+disagree, in `bench/oracle-events/audit-N.md`.
+[AUDITING_AN_ORACLE.md](../AUDITING_AN_ORACLE.md) is the prompt for that session. The audit runs no listener and is not a
 numbered experiment. A disagreement is resolved by the next numbered experiment,
 which either versions the oracle with the corrected arithmetic or shows why the audit
 misread the rule. The audit exists because one author writing both the oracle and the
@@ -334,7 +335,10 @@ it. The assessment can start from a whole-recording offline alignment.
 2. **Experiment 023: the decisions, implemented.** Version the instruments and the
    oracle for the typical-tempo reference, interval durations with their floor, zero
    findings on clean examples, the `dead` verdict with intended dead notes matched, and
-   the controls' scoring. Add the `dead` verdict to the vocabulary and `listen/`. Add
+   the controls' scoring, as `event-instruments-2`, never editing version 1. Hand-work
+   and freeze the new oracle before implementing, as 022 did, re-working case A3 and
+   carrying the other version-1 cases over unchanged where their rules did not
+   change. Add the `dead` verdict to the vocabulary and `listen/`. Add
    the silence and wrong-score controls to stage 1 as a new frozen set, committing the
    unrelated wrong score to `sources/`. Remeasure the frozen baselines on it. No
    listener is developed.
