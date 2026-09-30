@@ -8,7 +8,7 @@ before any listener is judged by it.
 
 | Version | File | Freeze | Instruments | Audit |
 |---|---|---|---|---|
-| event-oracle@3 | `oracle-3.json` | `freeze-3.json` | [event instruments 3](../../contracts/event-instruments-3.md) | **Pending independent audit; B1 frozen arithmetic disagreement recorded in [028](../../reports/028-other-bars-suite.md)** |
+| event-oracle@3 | `oracle-3.json` | `freeze-3.json` | [event instruments 3](../../contracts/event-instruments-3.md) | [audit-3.md](audit-3.md): 34 cases, 32 agree, 1 disagree (B1's bar 0 reference and ratio: 30 and 1, not 60 and 0.5, as the freeze recorded), 1 ambiguous (B11's decimal onsets read literally give `none` and clean; as the intended rationals, `either` and unclean); report-level bar measures, the null reference and several suite states uncovered. A corrected version is required before any listener is judged |
 | event-oracle@2 | `oracle-2.json` | `freeze-2.json` | [event instruments 2](../../contracts/event-instruments-2.md) | [audit-2.md](audit-2.md): 63 agree, 0 disagree, 3 ambiguous (F9's `indeterminate` figure; no gate affected), settled by the [clarification](../../contracts/event-instruments-2.md#clarification-2026-09-30) |
 | event-oracle@1 | `oracle.json` | `freeze.json` | [event instruments 1](../../contracts/event-instruments-1.md) | none; written before the audit rule |
 
