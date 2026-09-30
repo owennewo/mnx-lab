@@ -259,6 +259,19 @@
         "href": "019-emitted-support.html",
         "label": "Experiment 019"
       }
+    },
+    {
+      "number": "021",
+      "slug": "021-stability-calibration",
+      "title": "021 · Longer history and bounded support calibration",
+      "banner": "Five experiments complete · version 14 kept provisionally · nylon passes, Shinyguitar remains below target",
+      "runs": [
+        "g021-stability-calibration"
+      ],
+      "previous": {
+        "href": "020-robust-trajectory.html",
+        "label": "Experiment 020"
+      }
     }
   ]
 }

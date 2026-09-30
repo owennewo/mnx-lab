@@ -38,21 +38,29 @@ How to maintain it:
 
 ## Current state
 
-2026-09-30. `online-time-warp@12` is incumbent under
+2026-09-30. `online-time-warp@14` is the provisional incumbent under
 [development contract 1](contracts/development-contract-1.md).
-[Experiment 020](reports/020-robust-trajectory.md) keeps raw alignment/support from v8
-and stabilizes only the reported position. Both failing guitars improve without
-more abstention; the earlier rungs, controls, acoustic/electric and seam still pass.
-Position bursts remain, and unchanged support also limits Shinyguitar. The next
-question is whether a more stable causal history and a separately demonstrated
-support revision can close the remaining gates.
+[Experiment 021](reports/021-stability-calibration.md) keeps a four-second robust
+position history and a separately tested rank-limit change from 0.20 to 0.21.
+Nylon is 98.9% supported-correct with 0.5% wrong exposure; Shinyguitar is 91.5%
+with 4.8% exposure and 8.5% missed deadlines. Every other active example passes.
+Three of four sampled guitars and 18/19 active examples pass; **not saturated**.
+The next question is why Shinyguitar still loses correct points to both position
+and support while the earlier rungs and controls hold.
 
-The five-experiment batch is **4/5 complete**, 021 remains; full improvement bar is
-unmet. Mandatory bounded refresh after plateau 3 was completed before v12; a measured
-gain then resets plateau to **0**. This is no evidence-freshness reset: all current
-audio remains development evidence, bars 5–8 unopened, qualification budgets and
-reserved/final access unused. [Report 020](reports/020-robust-trajectory.md#resulting-plateau-budgets-and-evidence-access)
-records the resulting state.
+The user-authorized five-experiment batch **017–021 is 5/5 complete**. The original
+bar is partly met: nylon and exposure/deadline targets met, Shinyguitar ≥95% and
+4/4 guitars not met. [The full before/after and experiment-by-experiment account](reports/021-stability-calibration.md#five-experiment-outcome-against-the-original-bar)
+records the outcome. No sixth experiment is running.
+
+Resulting plateau **1**: v13 and v14 each qualified against v12, v15 did not.
+Mandatory bounded refresh after 019 was completed before 020. All current audio
+remains reused development evidence; bars 5–8 unopened, qualification zero
+versions/assessments (six/twelve slots unused), reserved/final access untouched.
+[Report 021](reports/021-stability-calibration.md#resulting-plateau-budgets-and-evidence-access)
+records the state. The real-clip thermometer also regressed to 32.3% agreement (from v8 69.8%);
+its fixed non-selection role does not erase this limitation. Transfer and Studio
+readiness remain unestablished.
 
 ## Findings
 
@@ -113,6 +121,8 @@ ledger row (`ledger.md#<row>`), or a findings write-up.
 | 50 | A predictor anchored to unregularized acoustic endpoints fixes Shinyguitar alignment, but its unchanged support rejects correct positions; nylon recovers from v9 but stays slightly below v8. | [Report 018](reports/018-acoustic-anchor.md#alignment-versus-support), [g018](runs/g018-acoustic-anchor/summary.json) | holds | 2026-09-30 | Predictor-specific gain, not unique proof of feedback mechanism; v10 rejected |
 | 51 | Under unchanged v10 alignment, replacing DP-backtrace ranks by emitted-endpoint ranks rejects much more correct guitar playing at the same limit; controls remain passing. | [Report 019](reports/019-emitted-support.md#what-the-comparison-establishes), [g019](runs/g019-emitted-support/summary.json) | holds | 2026-09-30 | v11 rejected; finer feature/phase/cap explanation unresolved |
 | 52 | A robust fit of raw endpoints, without feeding it into alignment or confidence, improves both hard guitars while preserving every incumbent support state and safeguard; neither hard guitar yet passes. | [Report 020](reports/020-robust-trajectory.md#recorded-guitars), [g020](runs/g020-robust-trajectory/summary.json) | holds | 2026-09-30 | v12 kept; remaining history bias and Shinyguitar support ceiling |
+| 53 | Four-second robust history solves nylon's active gates; a separate rank-limit change adds correct Shinyguitar support with controls preserved, but Shinyguitar still fails accuracy and six-second history severely regresses it. | [Report 021](reports/021-stability-calibration.md#all-three-variants-against-the-incumbent), [g021](runs/g021-stability-calibration/summary.json) | holds | 2026-09-30 | v14 kept provisionally by fixed branch 3; 18/19 pass, original full target unmet; bars 5–8 unopened |
+| 54 | The history change that improves exact-timing guitar development audio badly worsens agreement on the real-clip thermometer (77.2% to 32.3%); synthetic progress does not establish real-playing progress. | [Report 021 thermometer](reports/021-stability-calibration.md#real-clip-thermometer-not-used-for-selection), [g021](runs/g021-stability-calibration/summary.json) | holds | 2026-09-30 | Fixed non-selection role preserved; approximate labels do not erase this regression; cause unresolved |
 
 
 ## Open questions
@@ -123,7 +133,8 @@ is an identifier given when a question opens and never reused, so citations stay
 
 | Rank | Question | Why it is ranked here | Status | Owner item |
 |---|---|---|---|---|
-| 27 | Can a more stable causal history close the remaining position gates while a separately tested support change removes Shinyguitar's ceiling without losing controls? | Both hard guitars still fail; position-only success cannot saturate Shinyguitar under current support (finding 52) | open | [Report 020 next](reports/020-robust-trajectory.md#next) |
+| 28 | Why does the remaining Shinyguitar case still miss ≥95% supported-correct while both position and support contribute losses? | Only active example still failing; preserve the 18 passing examples and diagnose from recorded evidence (finding 53) | open | [Report 021 next](reports/021-stability-calibration.md#next) |
+| 27 | Can a more stable causal history close the remaining position gates while a separately tested support change removes Shinyguitar's ceiling without losing controls? | Tested three finite one-change variants | partly answered: nylon solved; controls preserved, Shinyguitar still below gate, six seconds regresses (finding 53) | [Report 021](reports/021-stability-calibration.md) |
 | 26 | Can causal trajectory stabilization improve nylon and Shinyguitar without losing the incumbent's support calibration? | Tested after required bounded refresh | answered: yes, smaller than full gate improvement (finding 52) | [Report 020](reports/020-robust-trajectory.md) |
 | 25 | Can support retain the improved alignment by judging the actual emitted path, while preserving wrong-score rejection? | Support/path interaction | answered for this rank-source change: no (finding 51); finer diagnosis untested | [Report 019](reports/019-emitted-support.md) |
 | 24 | Can a continuity preference suppress bursts without reinforcing its own selected endpoint, while retaining support on correct paths? | 017 prolongs nylon errors | partly answered: acoustic anchor fixes Shinyguitar alignment but support fails; nylon remains (finding 50) | [Report 018](reports/018-acoustic-anchor.md) |

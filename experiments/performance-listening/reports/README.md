@@ -26,6 +26,7 @@ question are in [the research log](../RESEARCH_LOG.md), not here.
 | 018 | [Anchor continuity to the acoustic path](018-acoustic-anchor.html) | [g018](../runs/g018-acoustic-anchor/summary.json) |
 | 019 | [Support on the emitted trajectory](019-emitted-support.html) | [g019](../runs/g019-emitted-support/summary.json) |
 | 020 | [Robust position with calibrated support](020-robust-trajectory.html) | [g020](../runs/g020-robust-trajectory/summary.json) |
+| 021 | [Longer history and bounded support calibration](021-stability-calibration.html) | [g021](../runs/g021-stability-calibration/summary.json) |
 
 ## One experiment, one file
 

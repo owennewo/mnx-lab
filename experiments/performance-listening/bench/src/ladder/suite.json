@@ -2,13 +2,8 @@
   "note": "The active development suite (development contract 1, user direction 2026-09-25). Fewer examples, fewer entries, causality once per candidate per rung. `--full` runs every frozen example and every registered entry.",
   "entries": [
     "clock-follower@1",
-    "online-time-warp@12",
-    "online-time-warp@12/alignment-only",
-    "online-time-warp@13",
-    "online-time-warp@13/alignment-only",
     "online-time-warp@14",
-    "online-time-warp@15",
-    "online-time-warp@15/alignment-only"
+    "online-time-warp@13/alignment-only"
   ],
   "examples": {
     "winner-ladder-rung0-v1": [
