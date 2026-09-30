@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import type { MnxStructure } from '../../../../src/model/mnx.ts';
 import { onlineTimeWarp11, RANK_LIMIT, type WindowedRankTrace } from '../src/candidates/onlineTimeWarp11.ts';
 import { acousticAnchoredPath } from '../src/candidates/onlineTimeWarpAcousticAnchorPath.ts';
-import { onlineTimeWarpWith, V2_CONFIG } from '../src/candidates/onlineTimeWarpConfigurable.ts';
+import { V2_CONFIG } from '../src/candidates/onlineTimeWarpConfigurable.ts';
 import { durationSamples, renderSines, scoreNotes, type RungZeroRecipe } from '../src/ladder/render.ts';
 import { execute } from '../src/run/runner.ts';
 const score = JSON.parse(readFileSync(new URL('../../sources/s2-two-bar-scale.mnx.json', import.meta.url), 'utf8')) as MnxStructure;
