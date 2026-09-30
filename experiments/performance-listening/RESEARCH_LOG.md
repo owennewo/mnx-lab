@@ -38,29 +38,11 @@ How to maintain it:
 
 ## Current state
 
-2026-09-30. [Development contract 2](contracts/development-contract-2.md) is in force,
-with approved sine-stage gates and the trusted, independently audited event-oracle@2.
-[Experiment 024](reports/024-event-chain-stage1.md) froze stage 1 again with the
-approved distant wrong score w2, preserving v2's performance and silence WAVs.
-Its fresh **event-chain@1** is the provisional development listener: a causal pitch-driven
-event chain and a separate end-of-piece pitch-token alignment. It passes stage 1,
-including both outputs and both controls, under stage-gates@1. The frozen baseline
-records on reused performances reproduce exactly. Their distant-control rejection
-does not resolve the semitone-neighbour w1 failure, which stays stage-2 evidence.
-The report records the departure from freezing-before-implementation order.
+2026-09-30. [Development contract 2](contracts/development-contract-2.md) remains in force, with approved sine-stage gates and independently audited event-oracle@2. [Experiment 025](reports/025-single-hesitation.md) tested the first stage-2 deviation, one silent hesitation, on the same scores and sine sound. Unchanged **event-chain@1** passes both outputs and controls, preserving all stage-1 deterministic records and assessments. It holds through each pause and reconstructs its interval and slow-bar effect; brief abstention when sound resumes is documented within the gates. No frozen listener, instrument or oracle changed, so no audit is due. Stage 2 as a whole remains incomplete, and w1 remains for the wrong-note deviation.
 
-The next experiment is **025**, stage 2's first deviation, a hesitation, on the same
-simple scores and sine sound, with stage 1 v3 retained as regression evidence.
-No new instrument or oracle was written, so no audit is due. No current user decision
-is needed; the later recorded-guitar gates and product/qualification decisions remain.
+The next experiment is **026**, one slowed bar, retaining the stage-1 and hesitation sets as regressions. An independent process review, introduced on main during 025, is due after this experiment. No current user decision is needed; later recorded-guitar gates and product/qualification decisions remain.
 
-Plateau is zero: the first new listener cleared stage 1.
-[Report 024](reports/024-event-chain-stage1.md#resulting-plateau-budgets-and-evidence-access)
-records the carried-over budgets. Qualification under
-[research contract 1](contracts/research-contract-1.md) is untouched, with zero frozen
-versions and zero assessments; its six version slots, twelve assessment slots and
-reserved/final access remain unused. Winner bars 5–8 remain unexamined. This is
-short-score sine development evidence, with no generalisation or product claim.
+Plateau remains zero. [Report 025](reports/025-single-hesitation.md#resulting-plateau-budgets-and-evidence-access) records the carried-over budgets and access: qualification is untouched and Winner bars 5–8 remain unexamined. This is short-score sine development evidence, with no generalisation or product claim.
 
 ## Inherited lessons
 
@@ -98,6 +80,8 @@ Status is `holds`, `superseded` or `withdrawn`.
 | 9 | In a two-bar piece the bar with more intervals sets the typical tempo, so a second bar that drags throughout makes a steady first bar read fast | Oracle case A7, [report 023](reports/023-instruments-decisions.md#for-the-user-two-decisions-and-one-observation) | holds | 023 | A consequence of the approved definition, reported to the user; not a listener result |
 | 10 | event-chain@1 passes stage 1 with both outputs, at every tested steady tempo, with no false findings and rejection of both controls | [Report 024](reports/024-event-chain-stage1.md#new-listener-the-eight-performances), [g024](runs/g024-event-chain-stage1/summary.json) | holds | 024 | Restricted to distinct-pitch monophonic sines on s1/s2; finding recall/recovery/extra-note gates have no positives here |
 | 11 | Replacing w1 with the approved distant w2 makes every frozen time warper pass all stage-1 cursor controls without changing its performance records | [Report 024](reports/024-event-chain-stage1.md#comparators-causality-and-cost) | holds | 024 | A change to the control's difficulty, not an algorithm improvement; the original w1 failure remains |
+| 12 | event-chain@1 holds through a single silent hesitation and passes its cursor, interval and bar-flag gates without losing stage 1; short resumption abstention stays within the gates | [Report 025](reports/025-single-hesitation.md#both-outputs-on-the-40-hesitations), [g025](runs/g025-single-hesitation/summary.json) | holds | 025 | Two distinct-pitch sine scores, fixed pause locations; no claim for chords, ringing guitar or other deviations |
+| 13 | All four frozen comparators run ahead and fail every tested hesitation cursor example; the time warpers still reject the distant controls | [Report 025](reports/025-single-hesitation.md#controls-regressions-causality-and-cost) | holds | 025 | Some slow parents already fail, so not every failure is attributable solely to the pause; none assesses |
 
 ## Open questions
 
@@ -106,7 +90,8 @@ given when a question opens and never reused.
 
 | Rank | Question | Why it is ranked here | Status | Owner item |
 |---|---|---|---|---|
-| 9 | Does event-chain@1 hold its cursor through a single hesitation and report the resulting tempo variation, without losing stage 1? | Stage 1 now passes; hesitation is the first remaining deviation in the approved order | open | [Report 024 next](reports/024-event-chain-stage1.md#next), experiment 025 |
+| 10 | Does event-chain@1 follow a single slowed bar and assess its variation correctly, preserving stage 1 and the hesitation substage? | The hesitation passes; a slowed bar is next in the approved deviation order, with the typical-tempo asymmetry already documented in oracle A7 | open | [Report 025 next](reports/025-single-hesitation.md#next), experiment 026 |
+| 9 | Does event-chain@1 hold its cursor through a single hesitation and report the resulting tempo variation, without losing stage 1? | Answered: both outputs and controls pass; exact regression records and assessments preserved (finding 12) | answered | [Report 025](reports/025-single-hesitation.md) |
 | 4 | Can the simplest event-based live cursor and end-of-piece assessor pass stage 1, controls included, with stage 1's wrong score replaced by a distant one? | Answered: event-chain@1 passes both outputs and all controls (finding 10) | answered | [Report 024](reports/024-event-chain-stage1.md) |
 | 6 | Does an independent session, re-deriving **event-oracle@2** by hand from [event instruments 2](contracts/event-instruments-2.md), agree with it? | Answered: yes on every number a gate reads. 66 records and reports re-derived, all 13 derived blocks included: 63 agree, 0 disagree, 3 ambiguous (F9's `indeterminate` figure only, question 8) | answered | [Audit 2](bench/oracle-events/audit-2.md), Claude Fable 5.1 |
 | 5 | Do the instruments, versioned for the user's decisions (typical-tempo reference, interval durations with a floor, clean examples, the dead verdict, the controls), reproduce a re-worked hand oracle, and what do the frozen baselines do on stage 1's new controls? | Answered: yes, exactly (finding 6); the clock fails every control and the time warpers fail two wrong-score controls (findings 7, 8) | answered | [Report 023](reports/023-instruments-decisions.md) |

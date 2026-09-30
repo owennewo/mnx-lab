@@ -11,6 +11,7 @@ not here. The first series' reports, 001–021, are in
 | 022 | [Event instruments, stage 1 and the frozen baselines](022-event-instruments.html) | [g022](../runs/g022-stage1-baselines/summary.json) |
 | 023 | [The user's decisions in the instruments, and stage 1's controls](023-instruments-decisions.html) | [g023](../runs/g023-stage1-controls/summary.json) |
 | 024 | [A fresh event listener on the sine happy path](024-event-chain-stage1.html) | [g024](../runs/g024-event-chain-stage1/summary.json) |
+| 025 | [One hesitation on the same sine scores](025-single-hesitation.html) | [g025](../runs/g025-single-hesitation/summary.json) |
 
 ## One experiment, one file
 
