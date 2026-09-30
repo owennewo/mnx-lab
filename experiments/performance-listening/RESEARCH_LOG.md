@@ -38,25 +38,19 @@ How to maintain it:
 
 ## Current state
 
-2026-09-29. Development runs the slim active suite under
-[development contract 1](contracts/development-contract-1.md). A candidate that
-saturates it moves on to Winner's bars 5–8; those bars remain unexamined.
+2026-09-30. Development runs the slim active suite under
+[development contract 1](contracts/development-contract-1.md). `online-time-warp@8`
+remains incumbent. [Experiment 017](reports/017-tempo-continuity.md) rejected a causal
+endpoint tempo prior: it improved acoustic/electric but made nylon alignment much
+worse and lost supported-correct on Shinyguitar despite a better alignment there.
+The next question is whether the prior's prediction can avoid reinforcing its own
+selected endpoint. The Studio seam and baseline reproduction passed.
 
-`online-time-warp@8` is incumbent since [experiment 016](reports/016-windowed-rank.html).
-It keeps version 6's alignment and judges support by the path's rank averaged over two
-seconds. It passes every gate on the sine rungs, on every wrong-score and silence
-control, and on two of the four recorded guitars. On the real clip it keeps everything
-its alignment gets right while still rejecting the wrong score. Experiments 014 and 015
-showed decoy comparisons cannot calibrate rejection. 016 instead set a limit from the
-wrong score's measured ranks, fitted to one wrong piece. The remaining failures on
-nylon and Shinyguitar are the alignment's wrong-position bursts, which support now
-claims. The next question is the alignment: whether a steadier path removes those bursts.
-
-The [Studio seam](SEAM.md) stays verified: experiment 016 reproduced prior results
-and passed its seam checks. No listener was qualified or integrated into Studio.
-The carried-over and resulting plateau, budget and evidence-access state are explicit
-in [report 016](reports/016-windowed-rank.md#resulting-plateau-budgets-and-evidence-access);
-there is no stopping rule currently triggered, and no evidence freshness reset.
+The user authorized five sequential experiments, 017–021, aiming at all current
+gates and the specified nylon/Shinyguitar improvements. **1/5 complete**. Bars 5–8
+remain unopened until saturation. Plateau is 1 candidate without gain; qualification
+budgets and reserved/final access remain unused, no evidence freshness reset. State
+and evidence are explicit in [report 017](reports/017-tempo-continuity.md#resulting-plateau-budgets-and-evidence-access).
 
 ## Findings
 
@@ -114,6 +108,8 @@ ledger row (`ledger.md#<row>`), or a findings write-up.
 | 47 | The incumbent path's rank averaged over two seconds separates correct alignments from the wrong score in every active timbre: a 0.20 limit keeps what the alignment gets right and rejects Dust at 98.9–100%, at negligible cost. | [Run g016](ledger.md#g016-windowed-rank), [report 016](reports/016-windowed-rank.md#results) | holds | 2026-09-29 | Limit fitted on these examples and one wrong piece; transfer to bars 5–8 or a closer wrong score untested. Answers question 22 for the active suite |
 | 48 | With support no longer refusing correct frames, the remaining rung-2 failures are alignment: nylon and Shinyguitar are aligned correctly on only about 91% and 88% of frames, and their bursts become wrong exposure. | [Report 016 recorded guitar](reports/016-windowed-rank.md#recorded-guitar) | holds | 2026-09-29 | Moves the limit from support to alignment |
 
+| 49 | A continuity prior estimated from its own chosen endpoints improves acoustic/electric but worsens nylon alignment; Shinyguitar alignment gains do not survive the unchanged support rule. | [Report 017](reports/017-tempo-continuity.md#alignment-diagnosis), [run g017](runs/g017-tempo-continuity/summary.json) | holds | 2026-09-30 | Predictor feedback is a plausible mechanism, not isolated; v9 rejected |
+
 
 ## Open questions
 
@@ -123,7 +119,8 @@ is an identifier given when a question opens and never reused, so citations stay
 
 | Rank | Question | Why it is ranked here | Status | Owner item |
 |---|---|---|---|---|
-| 20 | Does preferring a steady tempo where the audio gives little evidence reduce the alignment's bursts on recorded guitar? | Now the incumbent's only rung-2 failure: support claims what the path aligns (finding 48); faster-reacting paths made bursts worse, so the opposite direction is next | open | [Report 016 next](reports/016-windowed-rank.md#next) |
+| 24 | Can a continuity preference suppress bursts without reinforcing its own selected endpoint, while retaining support on correct paths? | 017 prolongs nylon errors; Shinyguitar alignment improves but support falls | open | [Report 017 next](reports/017-tempo-continuity.md#next) |
+| 20 | Does preferring a steady tempo where the audio gives little evidence reduce the alignment's bursts on recorded guitar? | Remaining alignment defect | partly answered: unconditional self-predicted prior fails (finding 49); other predictors untested | [Report 017](reports/017-tempo-continuity.md) |
 | 14 | Does the incumbent pass rung 3, per-note onset jitter up to ±40 ms and chord spread up to 30 ms, on held-out seeds, and does the fast-tempo rejection margin hold? | Deferred until a candidate passes rung 2; jitter blurs the onsets its features rely on | open | [Report 007 next](reports/007-rung1-tempo.md#next) |
 | 11 | Which ladder rung first breaks the best candidate, and does recognition at supplied labels fail on that rung too? | Ranks the remaining rungs by the failure they expose | open | [Development contract 1](contracts/development-contract-1.md#the-ladder) |
 | 7 | Can independent source/label checks establish timing bounds for later formal qualification? | Still relevant to stronger claims; explicitly not required for current proxy development | open, deferred to qualification | [Real-evidence preparation](evidence/README.md) |

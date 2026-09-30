@@ -207,6 +207,19 @@
         "href": "015-decoy-null.html",
         "label": "Experiment 015"
       }
+    },
+    {
+      "number": "017",
+      "slug": "017-tempo-continuity",
+      "title": "017 · Causal endpoint tempo continuity",
+      "banner": "Version 9 rejected · acoustic/electric improve, nylon deteriorates · version 8 remains incumbent",
+      "runs": [
+        "g017-tempo-continuity"
+      ],
+      "previous": {
+        "href": "016-windowed-rank.html",
+        "label": "Experiment 016"
+      }
     }
   ]
 }

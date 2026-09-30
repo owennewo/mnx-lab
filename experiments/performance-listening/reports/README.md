@@ -22,6 +22,7 @@ question are in [the research log](../RESEARCH_LOG.md), not here.
 | 014 | [Support relative to a reversed reference](014-reversed-decoy-support.html) | [g014a](../runs/g014a-reversed-decoy-support/summary.json), [g014b](../runs/g014b-decoy-traces/summary.json) |
 | 015 | [Is one decoy a null at all?](015-decoy-null.html) | [g015a](../runs/g015a-rotation-reproduce/summary.json), [g015b](../runs/g015b-decoy-null-traces/summary.json) |
 | 016 | [Support from the path's rank over two seconds](016-windowed-rank.html) | [g016](../runs/g016-windowed-rank/summary.json) |
+| 017 | [Causal endpoint tempo continuity](017-tempo-continuity.html) | [g017](../runs/g017-tempo-continuity/summary.json) |
 
 ## One experiment, one file
 
