@@ -19,6 +19,9 @@ is the prompt for the session that audits a new evaluator oracle, and section 8 
 pickup prompt describes running both through one parent session, for one experiment or
 a batch. [PROMPT_REVIEWER.md](PROMPT_REVIEWER.md) is the prompt for the
 process review after each experiment or batch; [reviews.md](reviews.md) records them.
+[TRACK_PROPOSALS.md](TRACK_PROPOSALS.md) makes the case for a second line of listener
+development and keeps the avenues proposed for one; nothing in it is adopted until the
+contract quotes the user's direction.
 
 Then read, in this order:
 
