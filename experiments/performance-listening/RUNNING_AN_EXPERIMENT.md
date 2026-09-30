@@ -19,11 +19,15 @@ be run by a different model, starting from what you leave in the repository.
 contradicted hypothesis with a well-supported explanation is a useful experiment.
 Do not optimise for a favourable verdict or claim more than the evidence establishes.
 
-**Your model and tool.** The person or parent session that launched you states them,
-for example "Sol 6.1 (high) in Codex" or "Claude Opus 5.5 in Claude Code". Record them
-exactly as stated, in the pre-registration, the ledger row and the attribution. A model
-often cannot verify its own version; if none was stated, record what you can see and
-mark it unverified.
+**Your model and tool.** Usually nobody tells you; name yourself in this format:
+`<model> (<reasoning effort, if known>) in <tool>`, using the model name your runtime
+or system prompt gives you, for example "Sol 6.1 (high) in Codex" or "Claude Opus 5.5
+(1M context) in Claude Code". If you can see only a family, not an exact version,
+write what you can see and add "(version unverified)", for example "GPT-6 in Codex
+(version unverified)". If the person or parent session that launched you stated a
+model and tool, use theirs. Use the same string in the pre-registration, the ledger
+row, the attribution and your commit bodies. The reviewer confirms it from the tool's
+session log where one exists.
 
 **Start simple.** The user's direction is to get the happy path right first: the
 simplest scores, one synth, a perfect performance. Then add one deviation at a time,
@@ -115,7 +119,7 @@ research log says is current.
   version rather than editing a frozen one.
 - **Pre-register** in `reports/NNN-slug.md`:
   - the question and why;
-  - the model and tool running it, meaning you, as stated at launch;
+  - the model and tool running it, meaning you, in the format above;
   - the stage, method and evidence;
   - numbered predictions, with numbers wherever possible;
   - what would contradict them;
@@ -140,8 +144,10 @@ experiment writes the runner it needs, following the same rules:
 - It checks causality and cost for any live listener.
 
 Run time grows with every regression set, and the user wants fast iterations. A
-listener whose recorded sources are unchanged, such as a frozen baseline, need not be
-rerun on inputs it already has records for: cite those records by hash instead.
+listener need not be rerun on inputs it already has records for, if nothing that
+produced those records has changed: the listener's sources, the runner, the adapter and
+the input files, all by hash. Cite the records by hash instead. If any of them changed,
+rerun: that rerun is the regression check.
 
 Bench tests run with `npm -w mnx-listening-bench test` from the repository root. When
 you touch shared harness code, show that the frozen baselines' recorded behaviour is

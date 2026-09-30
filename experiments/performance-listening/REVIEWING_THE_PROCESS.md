@@ -62,7 +62,8 @@ For each experiment:
   (new versions are new files), frozen baselines, `archive/`, and private sets whose
   hashes are recorded in earlier run summaries (recompute them);
 - reused records reproduce where the report says they do;
-- the experiment's worktree is retired, and its model and tool are recorded as stated at
+- the experiment's worktree is retired, and its model and tool are recorded in the
+  format `<model> (<effort, if known>) in <tool>`, as stated at
   launch. Where the tool keeps a session log, check the record against it: Codex's
   `~/.codex/sessions/` files carry `model` and `effort` fields. Add a correction beside
   a vaguer record, as R3 and R4 did, without rewriting it.
@@ -123,7 +124,7 @@ Beyond each experiment:
 
 | Do directly, then report | Propose; the user decides | Never |
 |---|---|---|
-| Fix a gap, an ambiguity or a stale line in the process documents (this file, RUNNING, AUDITING, APPROACH, READMEs); tighten a rule; correct links, attribution or bookkeeping in records | Anything that loosens the contract; changes gates, stages, scope or the order of work; overrules an experiment's choice of next question; product decisions | Edit a pre-registration, a recorded verdict, frozen data or code; run or redesign an experiment; re-rank the research log's questions on your own authority |
+| Fix a gap, an ambiguity or a stale line in the process documents (this file, RUNNING, AUDITING, APPROACH, READMEs); tighten a rule; relax a procedural rule only where no evidence standard falls, stating the condition that keeps it safe; correct links, attribution or bookkeeping in records | Anything that loosens the contract; changes gates, stages, scope or the order of work; overrules an experiment's choice of next question; product decisions | Edit a pre-registration, a recorded verdict, frozen data or code; run or redesign an experiment; re-rank the research log's questions on your own authority |
 
 **Keep the process light.** Prefer clarifying or removing a rule to adding one. Count
 the rules you add and remove in each review, and read the trend in reviews.md: if
@@ -139,7 +140,9 @@ the process as a whole by a different model.
 
 1. Make any direct fixes in a worktree, following `CLAUDE.md`.
 2. Append a review to [reviews.md](reviews.md): a row in the table and a short section
-   below it, as the file describes. If the research log's current state says a review
+   below it, as the file describes. Name yourself in the Reviewer column in the same
+   format, `<model> (<effort, if known>) in <tool>`, adding "(version unverified)" where
+   you can see only a family. If the research log's current state says a review
    is due, update that sentence.
 3. Land it, retire your worktree, and stop.
 4. Reply to the user: your verdict in a sentence, what held, what you fixed, and what you
