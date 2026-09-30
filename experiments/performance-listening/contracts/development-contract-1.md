@@ -217,3 +217,23 @@ contract, or another repository record, before the experiment it shaped ends.
   not development iterations. Its reserved-access, final-acceptance and technical-rerun
   rules are unchanged. The qualification driver in the bench implements that tier.
 - Experiments 001–003, their runs, plans and frozen code are unchanged.
+
+
+## Five-experiment batch directed 2026-09-30
+
+The user asked Codex to "run the experiment loop 5 times, aiming to achieve your target".
+This explicitly authorizes five sequential numbered experiments by the same model,
+017–021, each separately pre-registered, executed, recorded and landed. It overrides
+pickup guide's stop-after-one instruction for this batch; all other rules remain.
+
+The agreed improvement target is one frozen candidate passing every gate on all 19
+current active examples, moving sampled-guitar passes from 2/4 to 4/4. Specifically:
+nylon and Shinyguitar supported-correct at least 95%; nylon wrong exposure at most
+4.5%, Shinyguitar at most 5%; Shinyguitar missed deadlines at most 10%. Coverage,
+earlier-rung gates, controls, episode limits, causality, cost and the Studio seam
+must still pass. Audio, labels and evaluators stay fixed. Saturation permits the
+existing bars 5–8 fresh check; testing an unchanged candidate there is the stretch
+result, ideally by experiment 021. Real audio remains a non-selection thermometer.
+A useful negative result does not itself satisfy the numerical improvement target.
+The batch does not reset plateau, qualification budgets or evidence freshness and
+does not authorize rungs 3–7, reserved evidence or product integration.
