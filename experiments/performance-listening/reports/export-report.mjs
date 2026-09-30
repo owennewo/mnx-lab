@@ -39,7 +39,11 @@ function render(entry) {
     }
   }
   const links = [entry.private, entry.previous].filter(Boolean).map(l => `<a href="${l.href}">${l.label}</a>`).join(' · ');
-  const details = evidence.map(e => `<details><summary>${escape(e.id)} — complete aggregate evidence</summary><pre>${escape(e.text)}</pre><p>SHA-256 <code>${sha(e.text)}</code></p></details>`).join('');
+  // Link each run summary rather than embedding it: the summary is committed beside
+  // the report, and embedding it made every report carry its evidence twice.
+  const kb = text => `${(Buffer.byteLength(text) / 1024).toFixed(0)} KB`;
+  const rows = evidence.map(e => `<tr><td><a href="../runs/${escape(e.id)}/summary.json">${escape(e.id)}</a></td><td>${kb(e.text)}</td><td><code>${sha(e.text)}</code></td></tr>`).join('');
+  const details = `<article><h2>Run evidence</h2><p>Each run's complete public summary, with every pinned source hash checked against its recorded commit when this page was built.</p><div class="table-wrap"><table><thead><tr><th>Run summary</th><th>Size</th><th>SHA-256</th></tr></thead><tbody>${rows}</tbody></table></div></article>`;
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${entry.title}</title><style>${css}</style></head><body><main><article><div class="banner">${entry.banner}</div><p>${links}</p>${markdown(source, here)}</article>${details}<footer>Summary SHA-256 <code>${sha(source.text)}</code>. This report does not rerun or alter an experiment.</footer></main></body></html>\n`;
 }
 

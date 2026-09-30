@@ -435,14 +435,14 @@ the current instance, and its documents are the reference:
   or decides product questions. Their directions are quoted into a repository record
   before the work they shape ends.
 - **Experimenters** run one numbered experiment each, from pre-registration to landed
-  record ([RUNNING_AN_EXPERIMENT.md](experiments/performance-listening/RUNNING_AN_EXPERIMENT.md)).
+  record ([PROMPT_EXPERIMENTER.md](experiments/performance-listening/PROMPT_EXPERIMENTER.md)).
   The pre-registration lands before anything runs, and results are appended below it.
 - **Auditors** check every new evaluator oracle before anything is judged by it
   ([AUDITING_AN_ORACLE.md](experiments/performance-listening/AUDITING_AN_ORACLE.md)).
 - **A process reviewer** checks, after each experiment or batch, that the process was
   followed, that the claims follow from the evidence, and that the loop still measures
   what the user wants. It fixes process documents directly and brings course
-  corrections to the user ([REVIEWING_THE_PROCESS.md](experiments/performance-listening/REVIEWING_THE_PROCESS.md),
+  corrections to the user ([PROMPT_REVIEWER.md](experiments/performance-listening/PROMPT_REVIEWER.md),
   recorded in [reviews.md](experiments/performance-listening/reviews.md)).
 - Audits and reviews are done by a session that did not write what it checks, on a
   different model where possible. State lives in the repository (research log, ledger,

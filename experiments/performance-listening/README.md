@@ -13,11 +13,11 @@ next. This README does not repeat it.
 
 Experiments are run one at a time, each by one model from pre-registration to landed
 record; a different model may run the next. [APPROACH.md](APPROACH.md#who-runs-an-experiment-one-model-one-experiment)
-describes the handover, and [RUNNING_AN_EXPERIMENT.md](RUNNING_AN_EXPERIMENT.md) is the
+describes the handover, and [PROMPT_EXPERIMENTER.md](PROMPT_EXPERIMENTER.md) is the
 prompt to give the model that runs the next one. [AUDITING_AN_ORACLE.md](AUDITING_AN_ORACLE.md)
 is the prompt for the session that audits a new evaluator oracle, and section 8 of the
 pickup prompt describes running both through one parent session, for one experiment or
-a batch. [REVIEWING_THE_PROCESS.md](REVIEWING_THE_PROCESS.md) is the prompt for the
+a batch. [PROMPT_REVIEWER.md](PROMPT_REVIEWER.md) is the prompt for the
 process review after each experiment or batch; [reviews.md](reviews.md) records them.
 
 Then read, in this order:

@@ -483,7 +483,7 @@ refreshes the investigator, not the experiment's ground truth. The pre-registrat
 records the incoming plateau and budget state with its evidence; the completed report
 records the resulting state, and the research log points to it. Before starting, the
 model checks for another experiment's owner and verifies numbering, artifact access,
-dependencies and output permissions, following [the pickup guide](RUNNING_AN_EXPERIMENT.md).
+dependencies and output permissions, following [the pickup guide](PROMPT_EXPERIMENTER.md).
 
 ## Autonomy, stopping and the destination
 

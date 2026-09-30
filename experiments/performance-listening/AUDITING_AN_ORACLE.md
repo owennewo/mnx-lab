@@ -77,7 +77,7 @@ Write `bench/oracle-events/audit-N.md`, with N the oracle's version:
   verdict; then your arithmetic for each case below it;
 - the rules you could not exercise and why;
 - a summary line: the number of cases agreed, disagreed and ambiguous;
-- your model and tool, in the format of [RUNNING_AN_EXPERIMENT.md](RUNNING_AN_EXPERIMENT.md#running-the-next-experiment):
+- your model and tool, in the format of [PROMPT_EXPERIMENTER.md](PROMPT_EXPERIMENTER.md#running-the-next-experiment):
   `<model> (<effort, if known>) in <tool>`, with "(version unverified)" where you can see
   only a family.
 

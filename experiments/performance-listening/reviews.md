@@ -1,7 +1,7 @@
 # Process reviews
 
 One entry per process review, appended after each experiment, audit or batch, following
-[REVIEWING_THE_PROCESS.md](REVIEWING_THE_PROCESS.md). The table is the index; each review
+[PROMPT_REVIEWER.md](PROMPT_REVIEWER.md), formerly `REVIEWING_THE_PROCESS.md`. The table is the index; each review
 has a short section below it. Append-only: a later review that disagrees with an earlier
 one says so in its own entry.
 
@@ -158,3 +158,12 @@ stores that message encrypted.
 
 **Trend:** R1–R4 added ten rules and relaxed four. This review added as many as it
 relaxed.
+
+## After R4: decisions
+
+The user took escalation 3, lighter reports: the exporter now links each run summary
+instead of embedding it, and a run summary stays a few hundred KB at most, with detail in
+the private records. Report pages for 022–025 went from up to 5 MB to about 30 KB.
+Escalations 1 (an outside review of the process) and 2 (several single-deviation
+substages per experiment) remain with the user. At the user's request the prompts were
+renamed `PROMPT_EXPERIMENTER.md` and `PROMPT_REVIEWER.md`; the old names are pointers.
