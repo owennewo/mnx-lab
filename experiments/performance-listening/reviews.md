@@ -17,6 +17,7 @@ is visible: a process that gains rules every time is getting heavier, not better
 | R5 | 2026-09-30 | [026](reports/026-single-slowed-bar.md), post-R4 process changes and outside process check | Sol 6.1 (high) in Codex | Held; failure supported | [Landed with this entry](#r5-after-experiment-026-and-the-post-r4-process-changes) | Multiple substages still pending; no new decision needed for 027 | +0 −0 |
 | R6 | 2026-09-30 | [027](reports/027-live-confirmation.md) and post-R5 user decisions | Sol 6.1 (high) in Codex | Held; bounded repair supported | [Landed with this entry](#r6-after-experiment-027-and-the-post-r5-decisions) | Different-model milestone review remains due; no new decision for 028 | +0 −0 |
 | R7 | 2026-09-30 | [028](reports/028-other-bars-suite.md) | Sol 6.1 (high) in Codex | Held; mixed verdict supported, oracle coverage incomplete | [Landed with this entry](#r7-after-experiment-028) | No new decision; different-model milestone review remains due | +1 −0 |
+| R8 | 2026-09-30 | [audit 3](bench/oracle-events/audit-3.md) and [029](reports/029-oracle-coverage.md) | Sol 6.1 (high) in Codex | Held; audit procedure needed clarification | [Landed with this entry](#r8-after-audit-3-and-experiment-029) | No new decision; different-model milestone review remains due | +0 −1 |
 
 Reviews R1–R3 were given in conversation with the user and recorded here when this file
 was created. The same reviewer wrote contract 2 and most of the process it reviewed.
@@ -443,3 +444,101 @@ cost and causality are verified records, not fresh measurements.
 R5–R6 added none. R1–R4 added ten rules and relaxed four. The frozen counterexample
 shows that independence and preserving failures earn their place; no additional
 run stage, approval request or recurring checklist was added.
+
+
+## R8, after audit 3 and experiment 029
+
+**Held: oracle correction and implementation agreement are supported; audit 4 is
+still required.** Reviewed all four commits since R7 (`da8eea6e`), through
+`d166fe5b`. No experiment or audit was mid-flight, no batch was active, and both
+worktrees and branches are retired. Reviewer: **Sol 6.1 (high) in Codex**, session
+`01a0f44b-5209-7793-9ad5-0f8319d5122d`. Experimenter session
+`01a0f43c-3f67-76e1-9b00-cac85a7434b0` records `gpt-6.1-sol`, effort `high`,
+matching 029's report, ledger and commits. Audit3's separate Claude Code session
+records `claude-fable-5-1`, effort `high`: different-session and different-model
+independence from the oracle author. This review is a separate session from 029,
+not a different-model replication or oracle audit.
+
+**Integrity and claims.** Main's reflog places audit 3 on main at 22:26:56 BST and
+029's pre-registration/oracle freeze `9cba7778` at 22:39:34. The experimenter's log
+places loader/validation creation at 22:41:29, runner creation at 22:43:33 and the
+committed run at 22:44:22–23; results landed at 22:49:03. The report begins with the
+exact pre-registration bytes. The oracle4, freeze and instruments4 files still
+match their pre-registration bytes. Changed paths preserve earlier definitions,
+evaluators, listeners, baselines, archive, scores and product code. The source tag
+resolves to `65376fbf` locally and on origin. The failed pre-run git-add command
+never executed the runner; no instrument attempt failed or reran.
+
+Verified **242 source pins** against the execution commit, **214 inherited files**
+against the pre-registration tree, and **2,537 distinct files** through current-series
+hash citations, including all six manifests and **496 asset entries**. Retired
+worktree score paths and inherited parent-set references resolve to the same hashed
+bytes. The private attempt, oracle comparison and historical validation match their
+public citations. All 110 stored checks and eight wrong-answer probes have the
+reported outcome and group counts. Report 029 reproduces with every pinned source
+hash; the initial sandboxed exporter could not read Git subprocess streams, and
+the permitted unsandboxed check passed. No numbered runner or listener was executed
+by this review.
+
+The B1 correction preserves endpoint attribution and changes its informational
+reference/ratio, not its verdict or clean status. B11's new exact inputs avoid the
+old rounded-onset ambiguity without rewriting it. Author agreement is correctly
+labelled pending independent audit; wrong-answer perturbations establish assertion
+sensitivity, not independent arithmetic or evaluator-mutation coverage. The
+missing-evidence and parent-score adapters are openly synthetic, and retirement
+record validation is openly vacuous because no performance set retired. These
+limits qualify the claim rather than contradict D1. No gates, scope, contract,
+listener version, stopping count or qualification access changed.
+
+**Audit process findings and direct fixes.** Audit3's tools read no evaluator code
+or tests during re-derivation, and ran only arithmetic calculators then. After the
+audit commit, its mandatory repository gate ran 369 bench tests and static checks.
+Thus its “nothing was run” wording and the prompt's absolute test prohibition
+conflicted with the required landing procedure. Clarified the prompt: the mandatory
+gate may run only after the completed audit is committed, its output supplies no
+audit evidence, and recorded arithmetic/verdicts cannot be rewritten from it.
+Added a provenance note beside the audit's original wording, preserving its verdicts.
+
+Audit3 checks every new oracle 3 case, but does not freshly sample inherited cursor,
+note and control rules. Audit2 remains historical evidence; it is not a fresh
+inherited-rule audit by audit 3. The prompt now makes explicit that inherited samples
+may come from earlier oracle files and belong in the audit table. It also clarifies
+that research-log reading identifies the current oracle rather than consulting
+findings or completed run results: audit 3 read the whole log, including reported
+findings, an avoidable exposure to the author's interpretation. B1's disagreement
+was already disclosed in the allowed oracle README; B11 and the coverage gaps were
+independent findings, but the recorded reading cannot establish complete isolation
+from author results. Audit4 must follow the narrower reading boundary. Corrected
+question14's stale implication that B1 changes gate-read verdicts, updated finding17's
+audit bookkeeping, and recorded this review in the current state.
+
+**Direction and the rising tide.** Instrument work addresses the user's other-bars
+assessment and cheaper regression suite, without substituting arithmetic agreement
+for listener progress. Independently recomputed normalized headroom for all 264
+historical event-chain@2 examples and reproduced all 19 sentinel IDs and margins.
+No weak example was retired or manually avoided; historical instruments2 passes
+remain unconfirmed and await revalidation. The 1.086 s validation and 28,791-byte
+summary are small, but are not fresh listener cost measurements. The full sweep
+remains due by 031 after 026, earlier at stage completion, new gates or batch end.
+The loop still has no contract 2 evidence for ringing hesitation, missing-note
+recovery, wrong/dead notes, chords or recorded guitar; 029 claims none.
+
+**Recommendation.** Continue the already-ranked independent audit 4, including
+changed/new cases and inherited-rule samples. Do not treat 110 implementation checks
+as 110 independent hand cases: some are adapter expansions or reversed-order repeats.
+Record any absent inherited case, including the README's known ≥20-event by-event
+branch, as uncovered rather than assuming earlier audit agreement supplies it.
+Resolve any audit finding in a numbered experiment before listener judgment. No new
+user decision is needed now. The already-recommended different-model milestone
+review of the whole process remains due at the next stage completion.
+
+**Could not check.** This is not a complete oracle arithmetic re-audit, listener
+replication, archived private-set sweep, real-player transfer or device-latency test.
+Historical cost/causality are records, not fresh measurements. Session logs establish
+recorded tool use and attribution, not absence of unrecorded evidence access.
+
+**Trend:** +0 −1. The conditional landing-gate exception relaxes an absolute
+procedural prohibition without reducing independent evidence. Inherited sampling,
+reading boundaries and bookkeeping clarify existing obligations. R7 added one rule;
+R5–R6 added none, and this review removes a conflict rather than adding a new stage
+or approval flow. Independence and preserving counterexamples still earn their place.

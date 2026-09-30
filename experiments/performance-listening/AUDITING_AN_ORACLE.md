@@ -22,7 +22,9 @@ disagreement is as valuable as an agreement. Do not soften one to be polite.
 ## 1. Which oracle
 
 The research log's top open question names the oracle awaiting audit and the experiment
-that created or re-versioned it. Check that no audit of that version already exists in
+that created or re-versioned it. Use the current state and top audit question to
+identify the work; do not read the findings or completed run results for that purpose.
+Check that no audit of that version already exists in
 `bench/oracle-events/` and that no other worktree is doing one. If the log names no
 oracle awaiting an audit, stop and say so.
 
@@ -47,15 +49,26 @@ Do **not** read:
 - any run's results.
 
 They carry the author's reading of the rules, which is exactly what you are checking.
-Run nothing: no evaluator, listener or test. If a rule cannot be applied without reading
-code, that is a finding about the rule; record it.
+During re-derivation, run no evaluator, listener or test. If a rule cannot be applied
+without reading code, that is a finding about the rule; record it.
+
+After committing the completed audit, run the mandatory repository landing gate
+from `CLAUDE.md`. Its tests are repository validation, never audit evidence. Do not
+revise the committed arithmetic or verdicts from their output; record any resulting
+issue separately for the next numbered resolution. This exception keeps the audit
+independent while allowing the required landing checks.
 
 ## 3. What to check
 
 Re-derive by hand, from the rules alone:
 
-- **at least one case for every rule** in the instrument definitions; and
+- **at least one case for every rule** in the instrument definitions, including rules
+  inherited from earlier versions; and
 - **every case the version added or changed.**
+
+Cases for unchanged inherited rules may live in earlier oracle files. Sample them
+under the current definitions and name them in the audit table; checking every case
+in the newest file alone does not establish inherited-rule coverage.
 
 A rule without a frozen hand-worked case is **uncovered**, not agreement. Record it
 under the rules you could not exercise, and carry it into the next numbered

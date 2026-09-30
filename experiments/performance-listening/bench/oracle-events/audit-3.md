@@ -402,3 +402,21 @@ above; those need frozen and audited cases before instruments 3 judge a listener
 
 Model: Claude Fable 5.1 (high) in Claude Code, a session distinct from the one that wrote
 the oracle (Sol 6.1 (high) in Codex).
+
+
+### R8 provenance and scope note
+
+[Process review R8](../../reviews.md#r8-after-audit-3-and-experiment-029) checked the
+Claude Code session `b0318502-4451-460e-8ebb-a4b65e03a74a`: model
+`claude-fable-5-1`, effort `high`, matching the recorded attribution. Re-derivation
+preceded commit `8f998e0e`; the mandatory landing gate subsequently ran 369 bench
+tests and static checks. “Nothing was run” above describes the re-derivation phase,
+not that later repository validation. No audit arithmetic or verdict changed after
+the gate.
+
+The 34-case count covers oracle3's additions. Audit3 did not freshly sample the
+unchanged following, note and control rules from earlier oracle files; audit2's
+historical coverage remains separate evidence. Audit4 must include inherited-rule
+samples as the contract requires, and record absent cases as uncovered. In particular,
+the oracle README already identifies the unexercised by-event branch for examples
+with at least 20 distinguishable events. This note changes no audit verdict.
