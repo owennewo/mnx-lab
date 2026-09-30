@@ -78,7 +78,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     // New listener sources require a fresh candidate run, but cannot alter the old producer closure.
     const changed = producerChecks.filter(c => !c.unchanged).map(c => c.path);
     const pinnedChecks = Object.entries(old.sourceHashes as Record<string, string>).map(([path, hash]) => {
-      const bytes = execFileSync('git', ['show', `${old.gitCommit}:experiments/performance-listening/${path}`], { cwd: root, maxBuffer: 32 << 20 });
+      const bytes = execFileSync('git', ['show', `${old.gitCommit}:${relative(root, resolve(EXPERIMENT, path))}`], { cwd: root, maxBuffer: 32 << 20 });
       if (sha(bytes) !== hash) throw new Error(`Invalid old source hash ${path}`);
       const historical = path.startsWith('reports/') || path.startsWith('research/') || path === POLICY;
       const unchanged = sha(readFileSync(resolve(EXPERIMENT, path))) === hash;

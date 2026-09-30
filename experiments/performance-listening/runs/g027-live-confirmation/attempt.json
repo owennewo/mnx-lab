@@ -1,0 +1,10 @@
+{
+  "runId": "g027-live-confirmation",
+  "commit": "b106501c9b7cdd0e144cbb2592024e5c32c777f2",
+  "startedAt": "2026-09-30T20:14:14.880Z",
+  "state": "failed",
+  "error": "Error: Command failed: git show ac598a899c9d2ea40a96dd745e67c63a390f5ec1:experiments/performance-listening/../../src/audio/carryPlace.ts\nfatal: path 'experiments/performance-listening/../../src/audio/carryPlace.ts' exists on disk, but not in 'ac598a899c9d2ea40a96dd745e67c63a390f5ec1'\n",
+  "results": {
+    "event-chain@2": {}
+  }
+}
