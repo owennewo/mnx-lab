@@ -109,3 +109,155 @@ versions and zero assessments: all six version slots, twelve assessment slots an
 reserved/final accesses are unused and will remain so. Winner bars 5–8 are untouched.
 The eight performances are already examined development evidence; passing them is
 stage progress, not independent generalisation or qualification.
+
+## Results
+
+Run [g024-event-chain-stage1](../runs/g024-event-chain-stage1/summary.json), at commit
+`36b6807a`, completed on its first attempt in 74.7 s. No listener was changed after
+observing results. The pre-registration above is unchanged. The new private set is
+`contract2-stage1-v3`, SHA-256
+`170fe62059038a9d584ffd991599b6b95d53b40db754aebedcf75369a8281b04`.
+The summary pins the set, code, pre-registration, private records and assessments.
+
+### Set integrity and procedure
+
+All 16 reused WAVs retain the v2 asset paths and hashes, verified by readStageSet2
+before freezing and again before execution. w2 compiled cleanly and passed all
+pre-registered structural checks. Its MIDI pitches are 36, 43, 37, 46, 40, 35, 42;
+its onsets in quarters are 0, 2, 3, 4, 5, 5.5, 6. Every adjacent interval pair differs
+from every three-note pair in s1/s2, even allowing transposition. v2 is unchanged;
+its w1 controls stay stage-2 evidence. All 32 baseline records on the eight reused
+performances are byte-identical to g023. No shared harness, baseline, instrument,
+oracle or product source was edited.
+
+**Procedure departure:** the new set builder and the listener source were written
+in the same implementation batch, before the set was frozen. The pre-registration
+ordered freezing before building the listener. No listener had run, no observation
+was available, and the already-landed w2 and reused audio were not changed. Thus the
+set was frozen before any candidate evaluation, but not before its code existed.
+This departure is recorded rather than silently treating the order as followed.
+The runner's legacy-factory typing mistake and an initial Vitest invocation from the
+wrong working directory were corrected before execution; neither ran a listener or
+changed its method. There was no infrastructure failure or technical rerun.
+
+### New listener: the eight performances
+
+All eight pass every cursor and assessment gate. On-event time uses the instrument's
+200 ms transition allowance; it does not imply instantaneous detection. The actual
+48 event delays are 19.7–38.1 ms, with no early claim and no wrong-position exposure.
+The table gives each example's longest delay and largest interval-duration error.
+
+| Example | On-event | Reached | Max delay, ms | Reported BPM | Overall error | Intervals within | Max interval error, ms |
+|---|---|---|---|---|---|---|---|
+| s1-45 | 100% | 4/4 | 33.3 | 45.000 | 0.000% | 3/3 | 6.67 |
+| s1-63 | 100% | 4/4 | 37.6 | 63.158 | 0.251% | 3/3 | 12.38 |
+| s1-90 | 100% | 4/4 | 36.7 | 90.452 | 0.503% | 3/3 | 16.67 |
+| s1-99 | 100% | 4/4 | 33.9 | 98.901 | 0.100% | 3/3 | 6.06 |
+| s2-45 | 100% | 8/8 | 36.7 | 44.968 | 0.071% | 7/7 | 16.67 |
+| s2-63 | 100% | 8/8 | 38.1 | 62.969 | 0.050% | 7/7 | 17.63 |
+| s2-90 | 100% | 8/8 | 36.7 | 89.936 | 0.071% | 7/7 | 16.67 |
+| s2-99 | 100% | 8/8 | 37.6 | 98.824 | 0.178% | 7/7 | 16.06 |
+
+All **48 score notes** are assessed and matched. All **40 intervals** are present
+and within tolerance. Every clean assessment has zero false findings: no missing,
+wrong or dead note and no fast/slow bar flag. At half speed the assessor reports
+approximately 45 BPM while matching all notes and flagging no tempo variation,
+as the user's example requires. This establishes steady slow timing only, not
+hesitations or beginner bundles.
+
+### Controls
+
+| Control kind | Examples | Correct rejection | False-following exposure | Played-note claims | Tempo claims | Cursor + assessment gates |
+|---|---|---|---|---|---|---|
+| Silence | 8 | 100% each | 0 s each | 0 each | 0 each | all pass |
+| Distant wrong score w2 | 8 | 100% each | 0 s each | 0 each | 0 each | all pass |
+
+The assessor marks every handed-score note missing on the controls. These reports
+are honest rejections, and controls are excluded from pooled finding counts as
+approved. Because the score and audio have disjoint registers, this is an easy
+rejection result; it establishes nothing about w1 or wrong-note acceptance.
+
+### Comparators, causality and cost
+
+| Listener | Performance cursor gates | Control cursor gates | Max sustained ratio | Max chunk p99, ms | Whole stage |
+|---|---|---|---|---|---|
+| clock-follower@1 | 3/8 | 0/16 | 0.00263 | 0.073 | fail |
+| online-time-warp@8 | 3/8 | 16/16 | 0.18271 | 1.853 | fail |
+| online-time-warp@12 | 2/8 | 16/16 | 0.17486 | 1.557 | fail |
+| online-time-warp@14 | 2/8 | 16/16 | 0.16315 | 1.711 | fail |
+| event-chain@1 | 8/8 | 16/16 | 0.00215 | 0.115 | pass |
+
+The baseline performance-gate pattern is unchanged. Each time warper now passes all
+16 cursor controls, including all eight distant-score controls. That differs from
+023 because the approved control changed, not because the baseline improved; its
+recorded failure on w1 remains intact. Every baseline fails the assessment gates
+because it emits no assessment.
+
+All **240 prefix checks pass**: 144 for the new listener (six on every example),
+and 96 for the four baselines (six on each of four examples). No start was refused.
+Every listener meets the cost budget and has zero backlog. The new listener's maximum
+sustained ratio is **0.00215** and chunk p99 **0.115 ms**; maximum initialization and
+finish times are recorded per example in the summary. The measurement includes the
+whole-recording alignment at finish. This is a provisional Node measurement on the
+summary's Linux host, not a microphone/browser/mobile claim.
+
+The new listener also passes all applicable pooled gates: zero false alarms among
+12 bar negatives for each tempo direction and 48 note negatives for each note-finding
+kind. Finding recall, recovery and extra-note handling have no positives here and
+are **not applicable**. Passing vacuous recall gates establishes no error detection.
+
+## Against the predictions
+
+| # | Verdict | Evidence |
+|---|---|---|
+| 1 | Held | All 16 reused WAV hashes match v2, every w2 structural check passes, all 32 baseline performance records equal g023. |
+| 2 | Held | All eight cursor verdicts pass: 100% on-event under the transition allowance, zero ahead/exposure, 48/48 reached within 38.1 ms. |
+| 3 | Held | All 16 controls reject for 100% of answerable time, with zero played-note or tempo claims. |
+| 4 | Held | 48/48 notes matched, 40/40 intervals within tolerance (maximum error 17.63 ms), overall error at most 0.503%, no false finding or flag. |
+| 5 | Held | All 240 prefix checks pass; the new listener's maxima are ratio 0.00215 and p99 0.115 ms. |
+| 6 | Held | event-chain@1 passes every applicable per-example, pooled, causality and cost gate; no baseline passes the stage; every time warper rejects all distant-score controls. |
+
+## Decision
+
+**D1:** set integrity holds. **D2:** stage 1 passes under stage-gates@1, controls and
+both outputs included. event-chain@1 is the provisional development listener; it
+is preserved as this version, with no qualification or product retention claimed.
+**D3:** the comparisons are trusted because all reused baseline records reproduce;
+w1's failure is unchanged. **D4:** no infrastructure failure, failed prefix or rerun.
+The recorded implementation-order departure does not fit the outcomes tested by D1–D4;
+it limits the procedural claim, not the measured stage verdict. No favourable new
+branch is invented for it. No instrument or oracle changed, so no audit is due.
+
+### Resulting plateau, budgets and evidence access
+
+Plateau **0**: the first candidate cleared the lowest unpassed stage on this evidence.
+Contract 2 has three numbered experiments and one new listener version, with one
+completed listener comparison here and no technical rerun. Development versions are
+not rationed. Qualification contract 1 is untouched: zero frozen qualification
+versions and zero assessments; all six version slots, twelve assessment slots,
+reserved and final access remain unused. Winner bars 5–8 remain unexamined.
+All stage-1 sets are reused development evidence. Passing these short pure-tone
+scales does not demonstrate transfer to another piece, synth, guitar or player.
+
+## Next
+
+The top question is stage 2's **first deviation, a hesitation**, with the same scores
+and sine sound, keeping the full stage-1 v3 set as regression evidence. Declare
+hesitation labels from generation and test the approved ranges before adding another
+deviation. The live chain's absence of clock advancement predicts a held cursor;
+the independent interval assessor predicts a slow-bar finding. Those are hypotheses,
+not findings from this run. The near-miss w1 belongs to stage 2 beside wrong-note
+handling; it must not be forgotten or reclassified as solved by w2.
+
+No current user approval is required. Existing gates cover stages 1–3. Gates before
+recorded guitar in stage 4, qualification evidence and Studio promotion remain future
+user decisions, and are not entered here. Do not test the next stage in this session.
+
+## Attribution and validation
+
+Designed, implemented, executed and recorded by the GPT-6-based Codex agent in this
+session, terminal/TypeScript/tsx/Vitest. The pre-registration called it GPT-6.1; the
+runtime instructions identify the GPT-6 family but expose no independently verifiable
+minor model identity, so that narrower attribution is not asserted as evidence.
+The focused behavioral suite passed before execution; the final repository gate
+validates the completed record and complete bench suite before landing.

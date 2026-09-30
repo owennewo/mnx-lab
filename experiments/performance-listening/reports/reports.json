@@ -4,8 +4,8 @@
     {
       "number": "022",
       "slug": "022-event-instruments",
-      "title": "022 · Event instruments, stage 1 and the frozen baselines",
-      "banner": "Instruments trusted · every oracle number reproduced · every baseline fails stage 1 by running ahead · gates proposed, awaiting the user",
+      "title": "022 \u00b7 Event instruments, stage 1 and the frozen baselines",
+      "banner": "Instruments trusted \u00b7 every oracle number reproduced \u00b7 every baseline fails stage 1 by running ahead \u00b7 gates proposed, awaiting the user",
       "runs": [
         "g022-stage1-baselines"
       ],
@@ -17,14 +17,27 @@
     {
       "number": "023",
       "slug": "023-instruments-decisions",
-      "title": "023 · The user's decisions in the instruments, and stage 1's controls",
-      "banner": "Instruments versioned and every oracle@2 number reproduced · awaiting audit · the clock fails every control · the time warpers follow a semitone-neighbour wrong score on 2 of 8 · control-assessment gate proposed, awaiting the user",
+      "title": "023 \u00b7 The user's decisions in the instruments, and stage 1's controls",
+      "banner": "Instruments versioned and every oracle@2 number reproduced \u00b7 awaiting audit \u00b7 the clock fails every control \u00b7 the time warpers follow a semitone-neighbour wrong score on 2 of 8 \u00b7 control-assessment gate proposed, awaiting the user",
       "runs": [
         "g023-stage1-controls"
       ],
       "previous": {
         "href": "022-event-instruments.html",
         "label": "Experiment 022"
+      }
+    },
+    {
+      "number": "024",
+      "slug": "024-event-chain-stage1",
+      "title": "024 \u00b7 A fresh event listener on the sine happy path",
+      "banner": "Stage 1 passes \u00b7 48/48 events and notes \u00b7 all 40 intervals within tolerance \u00b7 all 16 controls reject \u00b7 240 prefix checks pass \u00b7 next: one hesitation",
+      "runs": [
+        "g024-event-chain-stage1"
+      ],
+      "previous": {
+        "href": "023-instruments-decisions.html",
+        "label": "Experiment 023"
       }
     }
   ]

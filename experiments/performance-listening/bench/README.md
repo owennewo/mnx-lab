@@ -77,3 +77,12 @@ Their tests keep passing; the archived runs they read are under
   `contract2-stage1-v1`'s manifest names its score files by absolute path in a worktree
   that no longer exists, so `readStageSet` cannot re-verify it; v2 names scores relative
   to the experiment (`assetPath`).
+
+- `src/listeners/eventChain1.ts`: experiment 024's `event-chain@1`, a monophonic
+  hard pitch-emission event chain with a separate offline token alignment. It implements
+  the version-2 Listener directly; later changes get a new version. Its behavioral
+  tests are in `test/event-chain-1.test.ts`.
+- `src/stages/stage1v3.ts`: freezes `contract2-stage1-v3` with v2's unchanged WAVs and
+  the approved distant `w2` wrong-score controls. `run024.ts` runs the fresh listener
+  and all four frozen baselines, writes private assessments as well as records and
+  uses the audited evaluators and approved gates unchanged.
