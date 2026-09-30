@@ -146,3 +146,10 @@ rows record the model only in their commits' trailers.
 | Run | Hypothesis / sources | Parent / candidate | Set / evaluator | Conditions / resources | Results / uncertainty | Decision / next action |
 |---|---|---|---|---|---|---|
 | [g019](runs/g019-emitted-support/summary.json) | [019 pre-registration](reports/019-emitted-support.md#pre-registration); question 25; reused 017 source note | v10 design parent, v8 incumbent / v11 endpoint-rank support; v10 alignment-only | Unchanged 19-example active suite / following-evaluator@1; recognition; sync-proxy thermometer | GPT-6 in Codex; 101 BPM, known start, 48 kHz/480; 362.107 CPU s; one private attempt | Shinyguitar 47.1%, nylon 67.7%; every safeguard passes, positions unchanged, 76/76 reproduce. Reused correlated development evidence | Reject v11; v8 remains; plateau 3 triggers bounded research refresh before next candidate. Batch 3/5; budgets/access unchanged |
+
+
+<a id="g020-robust-trajectory"></a>
+
+| Run | Hypothesis / sources | Parent / candidate | Set / evaluator | Conditions / resources | Results / uncertainty | Decision / next action |
+|---|---|---|---|---|---|---|
+| [g020](runs/g020-robust-trajectory/summary.json) | [020 pre-registration](reports/020-robust-trajectory.md#pre-registration); question 26; [mandatory refresh](research/tempo-refresh-020.md) | v8 / v12 robust reported trajectory, raw support unchanged; alignment-only diagnostic | Unchanged 19-example active suite / following-evaluator@1; recognition; sync-proxy thermometer | GPT-6 in Codex; 101 BPM, known start, 48 kHz/480; 392.635 CPU s; one attempt | Nylon 92.6%, Shinyguitar 87.8%, both exposure 6.9%; safeguards pass, support states unchanged, 57/57 reproduce. Thermometer 77.2% / 96.8%, non-selection; reused development evidence | Keep v12, not saturated; plateau resets to 0 after measured gain, mandatory refresh discharged. Batch 4/5; next longer-history stabilization and support ceiling, original target unchanged |

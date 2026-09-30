@@ -25,6 +25,7 @@ question are in [the research log](../RESEARCH_LOG.md), not here.
 | 017 | [Causal endpoint tempo continuity](017-tempo-continuity.html) | [g017](../runs/g017-tempo-continuity/summary.json) |
 | 018 | [Anchor continuity to the acoustic path](018-acoustic-anchor.html) | [g018](../runs/g018-acoustic-anchor/summary.json) |
 | 019 | [Support on the emitted trajectory](019-emitted-support.html) | [g019](../runs/g019-emitted-support/summary.json) |
+| 020 | [Robust position with calibrated support](020-robust-trajectory.html) | [g020](../runs/g020-robust-trajectory/summary.json) |
 
 ## One experiment, one file
 

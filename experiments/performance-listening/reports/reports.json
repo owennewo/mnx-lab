@@ -246,6 +246,19 @@
         "href": "018-acoustic-anchor.html",
         "label": "Experiment 018"
       }
+    },
+    {
+      "number": "020",
+      "slug": "020-robust-trajectory",
+      "title": "020 · Robust position with calibrated support",
+      "banner": "Version 12 kept · both difficult guitars improve · full target not yet met",
+      "runs": [
+        "g020-robust-trajectory"
+      ],
+      "previous": {
+        "href": "019-emitted-support.html",
+        "label": "Experiment 019"
+      }
     }
   ]
 }
