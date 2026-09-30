@@ -172,3 +172,185 @@ less than 10 points (9).
   series' sets; the new set goes beside them. The stage-1 scores compile cleanly in
   Studio's performance model, with positions at barlines resolving to the next bar's
   start (checked by a read-only probe).
+
+## Results
+
+Run [`g022-stage1-baselines`](../runs/g022-stage1-baselines/summary.json) at commit
+`f80fc51e`, on the frozen set `contract2-stage1-v1` (SHA-256 `debf0174…`, 8 clips,
+42.7 s of audio), in 30 s of wall time. The pre-registration above is unchanged.
+
+### The instruments against their oracle
+
+Both evaluators reproduced **every number in event-oracle@1 on their first complete
+run, with no erratum**: all 28 following records (every category's seconds, exposure,
+longest episode, by-event reach and each delay, recovery, extra notes, and hindsight)
+and all 18 assessment evaluations plus the 10 derived expected assessments
+(`bench/test/event-oracle.test.ts`, 57 checks, under a second). The pre-registration
+counted 26 following records; the frozen file holds 28, because the count missed case
+F10's two, which were in the file when it was frozen. The one failure before
+that was in the shorthand expander, not in an evaluator or the oracle: the oracle writes
+offsets such as `2/4`, and Studio's JSON form refuses unreduced fractions, so the
+expander now reduces them. To check that the test bites, two deliberate faults were
+introduced and removed: turning off the grace rule failed 23 checks, and charging an
+interval to the bar of its *starting* event failed 6. `bench/test/event-label.test.ts`
+checks the perfect-performance labeller (sample-exact onsets, singleton admissible sets,
+refusal of repeated identical events) and five kinds of inconsistent label.
+
+### The baselines on stage 1
+
+On event and ahead are fractions of supported answerable time; by event is events
+reached within 0.2 s of sounding. Handed tempo 90 throughout.
+
+| Listener | Played at | s1 on event | s1 ahead | s1 by event | s2 on event | s2 ahead | s2 by event |
+|---|---|---|---|---|---|---|---|
+| clock | 45 | 35.3% | 64.7% | 3/4 | 17.3% | 82.7% | 3/8 |
+| clock | 63 | 52.8% | 47.2% | 4/4 | 25.7% | 74.3% | 4/8 |
+| clock | 90 | 100% | 0 | 4/4 | 100% | 0 | 8/8 |
+| clock | 99 | 100% | 0 | 4/4 | 88.2% (behind 11.8%) | 0 | 4/8 |
+| v8 | 45 | 76.4% | 23.6% | 4/4 | 68.2% | 31.8% | 8/8 |
+| v8 | 63 | 92.2% | 7.8% | 4/4 | 89.2% | 10.8% | 8/8 |
+| v8 | 90 | 100% | 0 | 4/4 | 100% | 0 | 8/8 |
+| v8 | 99 | 100% | 0 | 4/4 | 96.1% | 3.9% | 8/8 |
+| v12 | 45 | 63.0% | 37.0% | 4/4 | 60.8% | 39.2% | 8/8 |
+| v12 | 63 | 71.6% | 28.4% | 4/4 | 66.1% | 33.9% | 8/8 |
+| v12 | 90 | 100% | 0 | 4/4 | 100% | 0 | 8/8 |
+| v12 | 99 | 95.0% | 5.0% | 4/4 | 92.0% | 8.0% | 8/8 |
+| v14 | 45 | 61.8% | 38.2% | 4/4 | 64.6% | 35.4% | 8/8 |
+| v14 | 63 | 71.1% | 28.9% | 4/4 | 67.0% | 33.0% | 8/8 |
+| v14 | 90 | 100% | 0 | 4/4 | 100% | 0 | 8/8 |
+| v14 | 99 | 95.0% | 5.0% | 4/4 | 93.9% | 6.1% | 8/8 |
+
+No listener abstained or was silent in answerable time, and apart from the clock at 99
+no time was behind: **every failure is ahead time**. The longest exposure episodes were
+the clock's (up to 8.0 s at 45), then v8's 0.92 s and v12/v14's 0.70 s at 45.
+
+**How early they move.** The first moment each listener shows each event, against its
+onset (negative is early), from the private records:
+
+| Listener | At 45 (s2) | At 63 (s2) | At 99 (s2) |
+|---|---|---|---|
+| clock | −0.66 s growing to −4.66 s | −0.28 s growing to −2.0 s | +0.06 s growing to +0.43 s |
+| v8 | −0.15 to −0.18 s on events 1, 2 and 5, −0.92 s on events 3, 4, 6 and 7 | +0.02 s on most, about −0.53 s on events 3, 4 and 7 | +0.01 s on most, −0.17 s on events 4 and 7 |
+| v12 | −0.54 to −0.70 s on every event | −0.28 to −0.38 s on every event | +0.05 s on event 1, −0.04 to −0.08 s after |
+| v14 | −0.41 to −0.70 s on every event | −0.28 to −0.40 s on every event | +0.05 s on event 1, −0.02 to −0.07 s after |
+
+Every time warper shows the first event exactly 0.2 s after it sounds, the end of its
+ten-frame warm-up; that is just inside the 0.2 s deadline. At 90, every time warper's
+record gives the same event timeline as the clock's, because the audio is the very
+sine rendering it aligns against: **at the handed tempo, stage 1 cannot tell listening
+from a clock**.
+
+**The mapping.** Under the diagnostic nearest-onset mapping, the clock at 90 falls from
+100% to 59.9% (s1) and 55.1% (s2) on event, with 40.1% and 44.9% ahead, and every time
+warper at 90 falls identically. The scored rule decides the baselines' scores; it was
+fixed before they ran.
+
+**Integrity and cost.** No listener refused at start. The legacy adapter held the
+clock's claims past the end of the score at the final boundary (268 and 534 times at 45,
+115 and 229 at 63); no time warper was clamped. All 48 prefix checks passed (six per
+listener per score). The largest sustained cost ratio was 0.12 (v12), the largest
+99th-percentile chunk time 1.5 ms, with no backlog.
+
+## Against the predictions
+
+| # | Verdict | Evidence |
+|---|---|---|
+| 1 | **Held** | Every oracle number reproduced; no erratum, no new instruments version. |
+| 2 | **Held** | Clock at 90: 100% on event, no ahead time, every event reached, both scores. |
+| 3 | **Held** | Clock at 99: s1 100%, 4/4; s2 behind 11.8%, 4/8. |
+| 4 | **Held** | Clock at 63: ahead 47.2% (s1) and 74.3% (s2). |
+| 5 | **Held** | Clock at 45: ahead 64.7% (s1) and 82.7% (s2). |
+| 6 | **Contradicted** for v12 and v14, held for v8 | At 99 on s2, v12 was ahead 8.0% and v14 6.1%, above the predicted 5%; on s1 both were 4.96%, just inside. v8 held: at least 96.1% on event and at most 3.9% ahead at 90 and 99. |
+| 7 | **Held** | At 45 every time warper was below 80% on event on both scores, from ahead time of 23.6–39.2%. |
+| 8 | **Held** | On all 12 slow-tempo pairings, every time warper had less ahead time than the clock. |
+| 9 | **Held** | Nearest mapping: the clock at 90 was ahead 40.1% and 44.9%. |
+| 10 | **Held** | All prefix checks passed; the largest sustained ratio was 0.12. |
+
+## Decision
+
+- **D1:** the instruments are **trusted**: following-evaluator@2 and
+  assessment-evaluator@1 reproduce the frozen oracle, which covers every rule named in
+  contract 2, and the oracle catches deliberate faults. Question 1 is answered.
+- **D2:** the baselines are recorded as they ran; none was tuned, rerun or dropped.
+- **D3:** the new measures **see the known defect**: the clock's ahead time at 63 and 45
+  is what the definitions predict (predictions 4 and 5). The contract's prediction about
+  the forward-only, tempo-clamped path is **supported** (prediction 7): at half speed
+  every time warper runs ahead of the player, by 0.15–0.9 s. On stage 1, v12 and v14
+  ran ahead of v8 at 63 and 99. That is recorded, not concluded from, since stage 1 has
+  no deviation. Question 2 is answered.
+- **D4:** gates are proposed below and **not adopted**. Question 3 now waits for the
+  user.
+
+### Proposed gates, awaiting the user's approval
+
+Each value was checked against rules (a)–(d) of D4. Every oracle record meant to be
+correct passes. Every record built to show a defect fails, on the measure that shows it.
+The clock fails stage 1 at 45 and 63. No value was moved for a time warper.
+
+**The live cursor, on every example of a stage:**
+
+| Measure | Proposed | Placeholder | What in the oracle needs it |
+|---|---|---|---|
+| On event, of supported answerable time | ≥ 95% | 95% | F6-B (an extra note moves it early) reaches 94.9% |
+| Ahead | ≤ 1% | 1% | F9 with a too-narrow sync band gives 1.9%, F6-B 5.1%; a correct cursor gives 0 |
+| Exposure, of answerable time | ≤ 5% | 5% | F6-B 5.1% |
+| Longest exposure episode | ≤ 0.5 s | 0.5 s | F2-C 1.0 s, F3-C 0.9 s |
+| By event, reached within 0.2 s | ≥ 95%, so every event on an example with fewer than 20 | 95% | F3-D and F4-C (late after a distinguishing event) and F7-B (late live, right in hindsight) pass every time measure and fail only here |
+| Causality, sustained cost ratio, chunk p99 | every check; ≤ 0.25; ≤ 10 ms | contract 1's | |
+
+**Pooled over each stage** rather than per example, because a one-deviation example
+holds one such case: **recovery after a missing event ≥ 90%** (placeholder 90%) and,
+proposed new, **extra notes held ≥ 90%**.
+
+**The assessment:** per example, **overall tempo within ±5%**, **every expected interval
+reported and within ±10%** (placeholders ±5% and ±10%; "every interval reported" is new,
+because A5-B otherwise passes having skipped two), and **every score note assessed**
+(new, from A1-C). Pooled over each stage, for each kind of finding (slow and fast flags,
+missing, wrong and dead notes): **≥ 90% found and false alarms ≤ 5% of negatives**
+(placeholders). On an eight-note example, one false alarm is 12.5%, so the happy path
+must be clean. **θ = 0.10**, with the optional band from θ/2, is proposed as defined.
+
+Under this proposal the oracle's correct records all pass and each defect record fails.
+On stage 1, no baseline passes, even on the cursor gates alone (none makes an
+assessment). The clock meets the cursor gates on three examples: both at 90 and s1 at
+99. v8 meets them on the same three, and v12 and v14 only on the two at 90.
+
+### For the user: three decisions the evidence raises
+
+1. **The gates above.**
+2. **What "the player's own tempo" is for flags.** Oracle case A3 applies the
+   contract's definition to a 3 s hesitation in two bars. The overall tempo falls to 42,
+   so the steady first bar reads **fast** (ratio 1.43) as well as the second **slow**. A
+   report that says only "slowed in bar 2" misses a required flag. If the user meant
+   variation relative to the player's typical tempo, the reference could be the median
+   local tempo, which is 60 here. That would be a new version of the instruments and a
+   change to the contract, so it is the user's call.
+3. **Dead notes in the Studio vocabulary.** Vocabulary 2 has no `dead` verdict, so
+   assessment-report@1 reads a `substitution` with no heard pitch as dead. A distinct
+   verdict would be a vocabulary change for SEAM part 2.
+
+### Resulting plateau, budgets and evidence access
+
+No plateau: this experiment built instruments and developed no listener. Under contract
+2, one experiment has run. Research contract 1's version and assessment slots and its
+reserved and final access remain unused. Winner bars 5–8 remain unexamined. The new
+private set `contract2-stage1-v1` is development evidence, now examined by the four
+frozen baselines.
+
+## Next
+
+Advice, not a rule. Experiment 023 is the contract's step 2: research event-based
+following first (score followers with explicit stay and skip transitions), then build
+the simplest live cursor and end-of-piece assessor that pass stage 1, judged under the
+gates the user approves. Three things this run suggests:
+
+- A listener that moves only on evidence of an onset never runs ahead. Every baseline
+  failure on stage 1 was ahead time, so that is the cheapest thing to get right.
+- The 0.2 s grace forgives lag and the first event's deadline is tight: the time
+  warpers' ten-frame warm-up lands exactly on it.
+- Stage 1 at the handed tempo cannot tell a listener from a clock; the off-tempo
+  examples carry stage 1.
+
+## Attribution
+
+Designed, run and recorded by Claude Opus 5.5 (1M context) in Claude Code.

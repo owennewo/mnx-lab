@@ -1,0 +1,3222 @@
+{
+  "id": "g022-stage1-baselines",
+  "kind": "stage-baselines",
+  "policy": "development-contract-2",
+  "preregistration": "reports/022-event-instruments.md",
+  "gitCommit": "f80fc51e47c41a6aba88fed4afe021b50ba340bc",
+  "evaluators": {
+    "following": "following-evaluator@2",
+    "assessment": "assessment-evaluator@1 (oracle only: the baselines emit no assessment)"
+  },
+  "mapping": "Scored: rule 1 of following-evaluator@2, the last event whose onset a position has reached. diagnosticNearest: the nearest onset, never scored.",
+  "oracle": {
+    "sha256": "8c192851e571f26716b3bd878b6cd293fcabf7b99198de625b17b9e8cdfbe9aa"
+  },
+  "set": {
+    "id": "contract2-stage1-v1",
+    "dir": "/home/williao/dev/mnx-listening-data/contract2-stage1-v1",
+    "sha256": "debf0174e41e7b6ee5803b5f7b07a1f8fa5da6384fc4c42a48ab8780931d48c5",
+    "handedQuartersPerMinute": 90,
+    "examples": [
+      {
+        "id": "s1-45",
+        "tempo": 45,
+        "duration": 5.333333333333333,
+        "audioSha256": "747c5575947ebe8dbc3671c75162e19e35c8bf2d9c1c793d85e262534bf771d8"
+      },
+      {
+        "id": "s1-63",
+        "tempo": 63,
+        "duration": 3.8095208333333335,
+        "audioSha256": "9aeb9696f05137f02470b00828d293311b12147b7b5ca308f3bf5dd3ff09175e"
+      },
+      {
+        "id": "s1-90",
+        "tempo": 90,
+        "duration": 2.6666666666666665,
+        "audioSha256": "10d93860f390c2d3c3fef4cab11acdad2e46ae882d8f4444c8e1b1608d7055f1"
+      },
+      {
+        "id": "s1-99",
+        "tempo": 99,
+        "duration": 2.42425,
+        "audioSha256": "a365d01c9d3fa00b3e1ff590e01f0a276076c8b6e3dbaab5c8ece8f2f932565b"
+      },
+      {
+        "id": "s2-45",
+        "tempo": 45,
+        "duration": 10.666666666666666,
+        "audioSha256": "46f7be873c66d8a5b2b7d585937156292fd6681689458411914bf51e6166e676"
+      },
+      {
+        "id": "s2-63",
+        "tempo": 63,
+        "duration": 7.619041666666667,
+        "audioSha256": "b2cb92486212c6a2f1debe8ae6a4fb4b0760cfcf9437c1f8cae86b624edbe761"
+      },
+      {
+        "id": "s2-90",
+        "tempo": 90,
+        "duration": 5.333333333333333,
+        "audioSha256": "0758e7793bff3c891a2b8ca8f45268595f5023f447e7b971f12496d3aa708e3c"
+      },
+      {
+        "id": "s2-99",
+        "tempo": 99,
+        "duration": 4.8484791666666665,
+        "audioSha256": "1298ac6971f28265b626d810bb13de4ed12695f946192e9a3c0635ff133f1277"
+      }
+    ]
+  },
+  "delivery": {
+    "sampleRate": 48000,
+    "chunkSamples": 480
+  },
+  "listeners": [
+    "clock-follower@1",
+    "online-time-warp@8",
+    "online-time-warp@12",
+    "online-time-warp@14"
+  ],
+  "results": {
+    "clock-follower@1": {
+      "s1-45": {
+        "started": {
+          "ok": true
+        },
+        "legacy": {
+          "clamped": 268,
+          "droppedNotes": 0
+        },
+        "cost": {
+          "machine": {
+            "hostname": "williao-G3-3579",
+            "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+            "cores": 12,
+            "platform": "linux",
+            "arch": "x64",
+            "node": "v22.22.1"
+          },
+          "sampleRate": 48000,
+          "chunkSamples": 480,
+          "chunks": 534,
+          "audioSeconds": 5.333333333333333,
+          "initializationMs": 1.418063,
+          "finishMs": 0.070306,
+          "meanMs": 0.02106912,
+          "p95Ms": 0.030616,
+          "p99Ms": 0.061776,
+          "sustainedRatio": 0.002388615,
+          "maxBacklogMs": 0,
+          "provisional": true
+        },
+        "following": {
+          "onEvent": 0.3525974025974026,
+          "ahead": 0.6474025974025973,
+          "seconds": {
+            "onEvent": 1.8099999999999998,
+            "ahead": 3.323333333333333,
+            "behind": 0,
+            "abstained": 0,
+            "uncovered": 0,
+            "falseFollowing": 0,
+            "correctRejection": 0,
+            "pending": 0.2,
+            "indeterminate": 0,
+            "answerable": 5.133333333333333,
+            "supportedAnswerable": 5.133333333333333
+          },
+          "hindsightOnEvent": 0.3525974025974026,
+          "exposure": {
+            "seconds": 3.323333333333333,
+            "fraction": 0.6474025974025973,
+            "longest": 2.6599999999999997
+          },
+          "byEvent": {
+            "reached": 3,
+            "of": 4,
+            "delays": [
+              0.01,
+              0,
+              null,
+              0
+            ]
+          },
+          "recovery": {
+            "recovered": 0,
+            "of": 0,
+            "notAssessable": 0
+          },
+          "extras": {
+            "held": 0,
+            "moved": 0,
+            "notAssessable": 0
+          }
+        },
+        "diagnosticNearest": {
+          "onEvent": 0.287012987012987,
+          "ahead": 0.712987012987013,
+          "byEvent": {
+            "reached": 2,
+            "of": 4
+          }
+        },
+        "record": {
+          "path": "/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/clock-follower-1.s1-45.json",
+          "sha256": "44db94249458bdb12bd11da343d31cbcacb7d29ab89616daacce9e6773e33162",
+          "decisions": 534
+        }
+      },
+      "s1-63": {
+        "started": {
+          "ok": true
+        },
+        "legacy": {
+          "clamped": 115,
+          "droppedNotes": 0
+        },
+        "cost": {
+          "machine": {
+            "hostname": "williao-G3-3579",
+            "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+            "cores": 12,
+            "platform": "linux",
+            "arch": "x64",
+            "node": "v22.22.1"
+          },
+          "sampleRate": 48000,
+          "chunkSamples": 480,
+          "chunks": 381,
+          "audioSeconds": 3.8095208333333335,
+          "initializationMs": 0.968062,
+          "finishMs": 0.003028,
+          "meanMs": 0.017467785,
+          "p95Ms": 0.021278,
+          "p99Ms": 0.031165,
+          "sustainedRatio": 0.00200191,
+          "maxBacklogMs": 0,
+          "provisional": true
+        },
+        "following": {
+          "onEvent": 0.5278343732143579,
+          "ahead": 0.47216562678564217,
+          "seconds": {
+            "onEvent": 1.9052291666666668,
+            "ahead": 1.7042916666666668,
+            "behind": 0,
+            "abstained": 0,
+            "uncovered": 0,
+            "falseFollowing": 0,
+            "correctRejection": 0,
+            "pending": 0.2,
+            "indeterminate": 0,
+            "answerable": 3.6095208333333333,
+            "supportedAnswerable": 3.6095208333333333
+          },
+          "hindsightOnEvent": 0.5278343732143579,
+          "exposure": {
+            "seconds": 1.7042916666666668,
+            "fraction": 0.47216562678564217,
+            "longest": 0.8571458333333335
+          },
+          "byEvent": {
+            "reached": 4,
+            "of": 4,
+            "delays": [
+              0.01,
+              0,
+              0,
+              0
+            ]
+          },
+          "recovery": {
+            "recovered": 0,
+            "of": 0,
+            "notAssessable": 0
+          },
+          "extras": {
+            "held": 0,
+            "moved": 0,
+            "notAssessable": 0
+          }
+        },
+        "diagnosticNearest": {
+          "onEvent": 0.31583139497971224,
+          "ahead": 0.6841686050202878,
+          "byEvent": {
+            "reached": 3,
+            "of": 4
+          }
+        },
+        "record": {
+          "path": "/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/clock-follower-1.s1-63.json",
+          "sha256": "522fc000a45b3e8f4d286062b395605bc12cd2421c6797f491ab53f2122478ae",
+          "decisions": 381
+        }
+      },
+      "s1-90": {
+        "started": {
+          "ok": true
+        },
+        "legacy": {
+          "clamped": 0,
+          "droppedNotes": 0
+        },
+        "cost": {
+          "machine": {
+            "hostname": "williao-G3-3579",
+            "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+            "cores": 12,
+            "platform": "linux",
+            "arch": "x64",
+            "node": "v22.22.1"
+          },
+          "sampleRate": 48000,
+          "chunkSamples": 480,
+          "chunks": 267,
+          "audioSeconds": 2.6666666666666665,
+          "initializationMs": 0.582944,
+          "finishMs": 0.002013,
+          "meanMs": 0.019481262,
+          "p95Ms": 0.021768,
+          "p99Ms": 0.0308,
+          "sustainedRatio": 0.00216992,
+          "maxBacklogMs": 0,
+          "provisional": true
+        },
+        "following": {
+          "onEvent": 1,
+          "ahead": 0,
+          "seconds": {
+            "onEvent": 2.4666666666666663,
+            "ahead": 0,
+            "behind": 0,
+            "abstained": 0,
+            "uncovered": 0,
+            "falseFollowing": 0,
+            "correctRejection": 0,
+            "pending": 0.2,
+            "indeterminate": 0,
+            "answerable": 2.4666666666666663,
+            "supportedAnswerable": 2.4666666666666663
+          },
+          "hindsightOnEvent": 1,
+          "exposure": {
+            "seconds": 0,
+            "fraction": 0,
+            "longest": 0
+          },
+          "byEvent": {
+            "reached": 4,
+            "of": 4,
+            "delays": [
+              0.01,
+              0.0033333333333334103,
+              0.006666666666666821,
+              0
+            ]
+          },
+          "recovery": {
+            "recovered": 0,
+            "of": 0,
+            "notAssessable": 0
+          },
+          "extras": {
+            "held": 0,
+            "moved": 0,
+            "notAssessable": 0
+          }
+        },
+        "diagnosticNearest": {
+          "onEvent": 0.5986486486486486,
+          "ahead": 0.4013513513513514,
+          "byEvent": {
+            "reached": 4,
+            "of": 4
+          }
+        },
+        "record": {
+          "path": "/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/clock-follower-1.s1-90.json",
+          "sha256": "185ecacafde021ab82c0b1783c0f5943eec6e97beec6c259e4fbd03668980dff",
+          "decisions": 267
+        }
+      },
+      "s1-99": {
+        "started": {
+          "ok": true
+        },
+        "legacy": {
+          "clamped": 0,
+          "droppedNotes": 0
+        },
+        "cost": {
+          "machine": {
+            "hostname": "williao-G3-3579",
+            "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+            "cores": 12,
+            "platform": "linux",
+            "arch": "x64",
+            "node": "v22.22.1"
+          },
+          "sampleRate": 48000,
+          "chunkSamples": 480,
+          "chunks": 243,
+          "audioSeconds": 2.42425,
+          "initializationMs": 0.306238,
+          "finishMs": 0.004568,
+          "meanMs": 0.015028379,
+          "p95Ms": 0.022584,
+          "p99Ms": 0.038396,
+          "sustainedRatio": 0.001634609,
+          "maxBacklogMs": 0,
+          "provisional": true
+        },
+        "following": {
+          "onEvent": 1,
+          "ahead": 0,
+          "seconds": {
+            "onEvent": 2.2242499999999996,
+            "ahead": 0,
+            "behind": 0,
+            "abstained": 0,
+            "uncovered": 0,
+            "falseFollowing": 0,
+            "correctRejection": 0,
+            "pending": 0.2,
+            "indeterminate": 0,
+            "answerable": 2.2242499999999996,
+            "supportedAnswerable": 2.2242499999999996
+          },
+          "hindsightOnEvent": 1,
+          "exposure": {
+            "seconds": 0,
+            "fraction": 0,
+            "longest": 0
+          },
+          "byEvent": {
+            "reached": 4,
+            "of": 4,
+            "delays": [
+              0.01,
+              0.06393750000000009,
+              0.12787500000000018,
+              0.18181249999999993
+            ]
+          },
+          "recovery": {
+            "recovered": 0,
+            "of": 0,
+            "notAssessable": 0
+          },
+          "extras": {
+            "held": 0,
+            "moved": 0,
+            "notAssessable": 0
+          }
+        },
+        "diagnosticNearest": {
+          "onEvent": 0.7183882207485669,
+          "ahead": 0.28161177925143305,
+          "byEvent": {
+            "reached": 4,
+            "of": 4
+          }
+        },
+        "record": {
+          "path": "/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/clock-follower-1.s1-99.json",
+          "sha256": "ee7c8cd376c6ffcc10a8b93d61f3c35925c927b9d60d0f24fb4a9b28a5db6eb5",
+          "decisions": 243
+        }
+      },
+      "s2-45": {
+        "started": {
+          "ok": true
+        },
+        "legacy": {
+          "clamped": 534,
+          "droppedNotes": 0
+        },
+        "cost": {
+          "machine": {
+            "hostname": "williao-G3-3579",
+            "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+            "cores": 12,
+            "platform": "linux",
+            "arch": "x64",
+            "node": "v22.22.1"
+          },
+          "sampleRate": 48000,
+          "chunkSamples": 480,
+          "chunks": 1067,
+          "audioSeconds": 10.666666666666666,
+          "initializationMs": 0.715089,
+          "finishMs": 0.001656,
+          "meanMs": 0.008215107,
+          "p95Ms": 0.009501,
+          "p99Ms": 0.015727,
+          "sustainedRatio": 0.000888962,
+          "maxBacklogMs": 0,
+          "provisional": true
+        },
+        "following": {
+          "onEvent": 0.1729299363057324,
+          "ahead": 0.8270700636942675,
+          "seconds": {
+            "onEvent": 1.809999999999999,
+            "ahead": 8.656666666666666,
+            "behind": 0,
+            "abstained": 0,
+            "uncovered": 0,
+            "falseFollowing": 0,
+            "correctRejection": 0,
+            "pending": 0.2,
+            "indeterminate": 0,
+            "answerable": 10.466666666666667,
+            "supportedAnswerable": 10.466666666666667
+          },
+          "hindsightOnEvent": 0.1729299363057324,
+          "exposure": {
+            "seconds": 8.656666666666666,
+            "fraction": 0.8270700636942675,
+            "longest": 7.993333333333334
+          },
+          "byEvent": {
+            "reached": 3,
+            "of": 8,
+            "delays": [
+              0.01,
+              0,
+              null,
+              null,
+              null,
+              null,
+              null,
+              0
+            ]
+          },
+          "recovery": {
+            "recovered": 0,
+            "of": 0,
+            "notAssessable": 0
+          },
+          "extras": {
+            "held": 0,
+            "moved": 0,
+            "notAssessable": 0
+          }
+        },
+        "diagnosticNearest": {
+          "onEvent": 0.14076433121019097,
+          "ahead": 0.859235668789809,
+          "byEvent": {
+            "reached": 2,
+            "of": 8
+          }
+        },
+        "record": {
+          "path": "/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/clock-follower-1.s2-45.json",
+          "sha256": "98c1ced6f9d9f4935810375ed8b48ab030afb459c53863bf420949750b4eafec",
+          "decisions": 1067
+        }
+      },
+      "s2-63": {
+        "started": {
+          "ok": true
+        },
+        "legacy": {
+          "clamped": 229,
+          "droppedNotes": 0
+        },
+        "cost": {
+          "machine": {
+            "hostname": "williao-G3-3579",
+            "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+            "cores": 12,
+            "platform": "linux",
+            "arch": "x64",
+            "node": "v22.22.1"
+          },
+          "sampleRate": 48000,
+          "chunkSamples": 480,
+          "chunks": 762,
+          "audioSeconds": 7.619041666666667,
+          "initializationMs": 0.485815,
+          "finishMs": 0.001481,
+          "meanMs": 0.008065444,
+          "p95Ms": 0.009597,
+          "p99Ms": 0.01784,
+          "sustainedRatio": 0.000870603,
+          "maxBacklogMs": 0,
+          "provisional": true
+        },
+        "following": {
+          "onEvent": 0.25680259692121066,
+          "ahead": 0.7431974030787893,
+          "seconds": {
+            "onEvent": 1.9052291666666668,
+            "ahead": 5.5138125,
+            "behind": 0,
+            "abstained": 0,
+            "uncovered": 0,
+            "falseFollowing": 0,
+            "correctRejection": 0,
+            "pending": 0.2,
+            "indeterminate": 0,
+            "answerable": 7.419041666666667,
+            "supportedAnswerable": 7.419041666666667
+          },
+          "hindsightOnEvent": 0.25680259692121066,
+          "exposure": {
+            "seconds": 5.5138125,
+            "fraction": 0.7431974030787893,
+            "longest": 4.666666666666667
+          },
+          "byEvent": {
+            "reached": 4,
+            "of": 8,
+            "delays": [
+              0.01,
+              0,
+              0,
+              null,
+              null,
+              null,
+              null,
+              0
+            ]
+          },
+          "recovery": {
+            "recovered": 0,
+            "of": 0,
+            "notAssessable": 0
+          },
+          "extras": {
+            "held": 0,
+            "moved": 0,
+            "notAssessable": 0
+          }
+        },
+        "diagnosticNearest": {
+          "onEvent": 0.15365865986734586,
+          "ahead": 0.846341340132654,
+          "byEvent": {
+            "reached": 3,
+            "of": 8
+          }
+        },
+        "record": {
+          "path": "/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/clock-follower-1.s2-63.json",
+          "sha256": "a3b08b954a84c4bcd2711c3f18b8c124c1dfb5120d092e9d63657bdd5901704f",
+          "decisions": 762
+        }
+      },
+      "s2-90": {
+        "started": {
+          "ok": true
+        },
+        "legacy": {
+          "clamped": 0,
+          "droppedNotes": 0
+        },
+        "cost": {
+          "machine": {
+            "hostname": "williao-G3-3579",
+            "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+            "cores": 12,
+            "platform": "linux",
+            "arch": "x64",
+            "node": "v22.22.1"
+          },
+          "sampleRate": 48000,
+          "chunkSamples": 480,
+          "chunks": 534,
+          "audioSeconds": 5.333333333333333,
+          "initializationMs": 0.636948,
+          "finishMs": 0.001347,
+          "meanMs": 0.008840399,
+          "p95Ms": 0.012402,
+          "p99Ms": 0.01775,
+          "sustainedRatio": 0.001004825,
+          "maxBacklogMs": 0,
+          "provisional": true
+        },
+        "following": {
+          "onEvent": 1,
+          "ahead": 0,
+          "seconds": {
+            "onEvent": 5.133333333333333,
+            "ahead": 0,
+            "behind": 0,
+            "abstained": 0,
+            "uncovered": 0,
+            "falseFollowing": 0,
+            "correctRejection": 0,
+            "pending": 0.2,
+            "indeterminate": 0,
+            "answerable": 5.133333333333333,
+            "supportedAnswerable": 5.133333333333333
+          },
+          "hindsightOnEvent": 1,
+          "exposure": {
+            "seconds": 0,
+            "fraction": 0,
+            "longest": 0
+          },
+          "byEvent": {
+            "reached": 8,
+            "of": 8,
+            "delays": [
+              0.01,
+              0.0033333333333334103,
+              0.006666666666666821,
+              0,
+              0.0033333333333334103,
+              0.0066666666666663765,
+              0,
+              0.0033333333333329662
+            ]
+          },
+          "recovery": {
+            "recovered": 0,
+            "of": 0,
+            "notAssessable": 0
+          },
+          "extras": {
+            "held": 0,
+            "moved": 0,
+            "notAssessable": 0
+          }
+        },
+        "diagnosticNearest": {
+          "onEvent": 0.5506493506493505,
+          "ahead": 0.44935064935064956,
+          "byEvent": {
+            "reached": 8,
+            "of": 8
+          }
+        },
+        "record": {
+          "path": "/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/clock-follower-1.s2-90.json",
+          "sha256": "6ad81b20896f80164442746e6acc79bda4ccbe5db1b58e33be615594fcfce813",
+          "decisions": 534
+        }
+      },
+      "s2-99": {
+        "started": {
+          "ok": true
+        },
+        "legacy": {
+          "clamped": 0,
+          "droppedNotes": 0
+        },
+        "cost": {
+          "machine": {
+            "hostname": "williao-G3-3579",
+            "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+            "cores": 12,
+            "platform": "linux",
+            "arch": "x64",
+            "node": "v22.22.1"
+          },
+          "sampleRate": 48000,
+          "chunkSamples": 480,
+          "chunks": 485,
+          "audioSeconds": 4.8484791666666665,
+          "initializationMs": 0.41149,
+          "finishMs": 0.001186,
+          "meanMs": 0.009640664,
+          "p95Ms": 0.011949,
+          "p99Ms": 0.017792,
+          "sustainedRatio": 0.001049483,
+          "maxBacklogMs": 0,
+          "provisional": true
+        },
+        "following": {
+          "onEvent": 0.8823988132319264,
+          "ahead": 0,
+          "seconds": {
+            "onEvent": 4.1018125,
+            "ahead": 0,
+            "behind": 0.5466666666666664,
+            "abstained": 0,
+            "uncovered": 0,
+            "falseFollowing": 0,
+            "correctRejection": 0,
+            "pending": 0.2,
+            "indeterminate": 0,
+            "answerable": 4.648479166666666,
+            "supportedAnswerable": 4.648479166666666
+          },
+          "hindsightOnEvent": 0.8823988132319264,
+          "exposure": {
+            "seconds": 0.5466666666666664,
+            "fraction": 0.11760118676807374,
+            "longest": 0.22758333333333347
+          },
+          "byEvent": {
+            "reached": 4,
+            "of": 8,
+            "delays": [
+              0.01,
+              0.06393750000000009,
+              0.12787500000000018,
+              0.18181249999999993,
+              0.24575000000000014,
+              0.3096874999999999,
+              0.36364583333333345,
+              0.42758333333333365
+            ]
+          },
+          "recovery": {
+            "recovered": 0,
+            "of": 0,
+            "notAssessable": 0
+          },
+          "extras": {
+            "held": 0,
+            "moved": 0,
+            "notAssessable": 0
+          }
+        },
+        "diagnosticNearest": {
+          "onEvent": 0.8406064707543238,
+          "ahead": 0.1593935292456762,
+          "byEvent": {
+            "reached": 8,
+            "of": 8
+          }
+        },
+        "record": {
+          "path": "/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/clock-follower-1.s2-99.json",
+          "sha256": "6c4b66de97025f2c882479b6c7243bf8524e0eb402d9bd93b284733fd3f0ca67",
+          "decisions": 485
+        }
+      }
+    },
+    "online-time-warp@8": {
+      "s1-45": {
+        "started": {
+          "ok": true
+        },
+        "legacy": {
+          "clamped": 0,
+          "droppedNotes": 0
+        },
+        "cost": {
+          "machine": {
+            "hostname": "williao-G3-3579",
+            "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+            "cores": 12,
+            "platform": "linux",
+            "arch": "x64",
+            "node": "v22.22.1"
+          },
+          "sampleRate": 48000,
+          "chunkSamples": 480,
+          "chunks": 534,
+          "audioSeconds": 5.333333333333333,
+          "initializationMs": 171.154142,
+          "finishMs": 0.090268,
+          "meanMs": 0.51936588,
+          "p95Ms": 1.156159,
+          "p99Ms": 1.32058,
+          "sustainedRatio": 0.084109836,
+          "maxBacklogMs": 0,
+          "provisional": true
+        },
+        "following": {
+          "onEvent": 0.7642857142857143,
+          "ahead": 0.23571428571428568,
+          "seconds": {
+            "onEvent": 3.9233333333333333,
+            "ahead": 1.2099999999999997,
+            "behind": 0,
+            "abstained": 0,
+            "uncovered": 0,
+            "falseFollowing": 0,
+            "correctRejection": 0,
+            "pending": 0.2,
+            "indeterminate": 0,
+            "answerable": 5.133333333333333,
+            "supportedAnswerable": 5.133333333333333
+          },
+          "hindsightOnEvent": 0.7642857142857143,
+          "exposure": {
+            "seconds": 1.2099999999999997,
+            "fraction": 0.23571428571428568,
+            "longest": 0.9199999999999999
+          },
+          "byEvent": {
+            "reached": 4,
+            "of": 4,
+            "delays": [
+              0.2,
+              0,
+              0,
+              0
+            ]
+          },
+          "recovery": {
+            "recovered": 0,
+            "of": 0,
+            "notAssessable": 0
+          },
+          "extras": {
+            "held": 0,
+            "moved": 0,
+            "notAssessable": 0
+          }
+        },
+        "diagnosticNearest": {
+          "onEvent": 0.38441558441558443,
+          "ahead": 0.6155844155844156,
+          "byEvent": {
+            "reached": 4,
+            "of": 4
+          }
+        },
+        "record": {
+          "path": "/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/online-time-warp-8.s1-45.json",
+          "sha256": "d74c3045e4eae330d54c629362c1972a1ceef1ae70d4fe17dcc3da475829c93a",
+          "decisions": 534
+        }
+      },
+      "s1-63": {
+        "started": {
+          "ok": true
+        },
+        "legacy": {
+          "clamped": 0,
+          "droppedNotes": 0
+        },
+        "cost": {
+          "machine": {
+            "hostname": "williao-G3-3579",
+            "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+            "cores": 12,
+            "platform": "linux",
+            "arch": "x64",
+            "node": "v22.22.1"
+          },
+          "sampleRate": 48000,
+          "chunkSamples": 480,
+          "chunks": 381,
+          "audioSeconds": 3.8095208333333335,
+          "initializationMs": 144.471012,
+          "finishMs": 0.002973,
+          "meanMs": 0.512184759,
+          "p95Ms": 1.127855,
+          "p99Ms": 1.37248,
+          "sustainedRatio": 0.089149369,
+          "maxBacklogMs": 0,
+          "provisional": true
+        },
+        "following": {
+          "onEvent": 0.9224273766716495,
+          "ahead": 0.07757262332835044,
+          "seconds": {
+            "onEvent": 3.329520833333333,
+            "ahead": 0.28000000000000025,
+            "behind": 0,
+            "abstained": 0,
+            "uncovered": 0,
+            "falseFollowing": 0,
+            "correctRejection": 0,
+            "pending": 0.2,
+            "indeterminate": 0,
+            "answerable": 3.6095208333333333,
+            "supportedAnswerable": 3.6095208333333333
+          },
+          "hindsightOnEvent": 0.9224273766716495,
+          "exposure": {
+            "seconds": 0.28000000000000025,
+            "fraction": 0.07757262332835044,
+            "longest": 0.28000000000000025
+          },
+          "byEvent": {
+            "reached": 4,
+            "of": 4,
+            "delays": [
+              0.2,
+              0.017625000000000002,
+              0.015229166666666627,
+              0.00285416666666638
+            ]
+          },
+          "recovery": {
+            "recovered": 0,
+            "of": 0,
+            "notAssessable": 0
+          },
+          "extras": {
+            "held": 0,
+            "moved": 0,
+            "notAssessable": 0
+          }
+        },
+        "diagnosticNearest": {
+          "onEvent": 0.44195039738654146,
+          "ahead": 0.5580496026134587,
+          "byEvent": {
+            "reached": 4,
+            "of": 4
+          }
+        },
+        "record": {
+          "path": "/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/online-time-warp-8.s1-63.json",
+          "sha256": "82f3e3ceb8de226d0023bfe32d4ca7dc8e74676f8c64035325c1623290e821a8",
+          "decisions": 381
+        }
+      },
+      "s1-90": {
+        "started": {
+          "ok": true
+        },
+        "legacy": {
+          "clamped": 0,
+          "droppedNotes": 0
+        },
+        "cost": {
+          "machine": {
+            "hostname": "williao-G3-3579",
+            "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+            "cores": 12,
+            "platform": "linux",
+            "arch": "x64",
+            "node": "v22.22.1"
+          },
+          "sampleRate": 48000,
+          "chunkSamples": 480,
+          "chunks": 267,
+          "audioSeconds": 2.6666666666666665,
+          "initializationMs": 142.668988,
+          "finishMs": 0.003043,
+          "meanMs": 0.502268217,
+          "p95Ms": 1.003526,
+          "p99Ms": 1.313289,
+          "sustainedRatio": 0.103791617,
+          "maxBacklogMs": 0,
+          "provisional": true
+        },
+        "following": {
+          "onEvent": 1,
+          "ahead": 0,
+          "seconds": {
+            "onEvent": 2.4666666666666663,
+            "ahead": 0,
+            "behind": 0,
+            "abstained": 0,
+            "uncovered": 0,
+            "falseFollowing": 0,
+            "correctRejection": 0,
+            "pending": 0.2,
+            "indeterminate": 0,
+            "answerable": 2.4666666666666663,
+            "supportedAnswerable": 2.4666666666666663
+          },
+          "hindsightOnEvent": 1,
+          "exposure": {
+            "seconds": 0,
+            "fraction": 0,
+            "longest": 0
+          },
+          "byEvent": {
+            "reached": 4,
+            "of": 4,
+            "delays": [
+              0.2,
+              0.0033333333333334103,
+              0.006666666666666821,
+              0
+            ]
+          },
+          "recovery": {
+            "recovered": 0,
+            "of": 0,
+            "notAssessable": 0
+          },
+          "extras": {
+            "held": 0,
+            "moved": 0,
+            "notAssessable": 0
+          }
+        },
+        "diagnosticNearest": {
+          "onEvent": 0.5986486486486486,
+          "ahead": 0.4013513513513514,
+          "byEvent": {
+            "reached": 4,
+            "of": 4
+          }
+        },
+        "record": {
+          "path": "/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/online-time-warp-8.s1-90.json",
+          "sha256": "83ac1a1d9ce1e0589c89d39424bd7c12f7b0204e2f8cd99403fa7fa0f84d76f7",
+          "decisions": 267
+        }
+      },
+      "s1-99": {
+        "started": {
+          "ok": true
+        },
+        "legacy": {
+          "clamped": 0,
+          "droppedNotes": 0
+        },
+        "cost": {
+          "machine": {
+            "hostname": "williao-G3-3579",
+            "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+            "cores": 12,
+            "platform": "linux",
+            "arch": "x64",
+            "node": "v22.22.1"
+          },
+          "sampleRate": 48000,
+          "chunkSamples": 480,
+          "chunks": 243,
+          "audioSeconds": 2.42425,
+          "initializationMs": 143.837153,
+          "finishMs": 0.0088,
+          "meanMs": 0.493580572,
+          "p95Ms": 1.004959,
+          "p99Ms": 1.236101,
+          "sustainedRatio": 0.108811398,
+          "maxBacklogMs": 0,
+          "provisional": true
+        },
+        "following": {
+          "onEvent": 1,
+          "ahead": 0,
+          "seconds": {
+            "onEvent": 2.2242499999999996,
+            "ahead": 0,
+            "behind": 0,
+            "abstained": 0,
+            "uncovered": 0,
+            "falseFollowing": 0,
+            "correctRejection": 0,
+            "pending": 0.2,
+            "indeterminate": 0,
+            "answerable": 2.2242499999999996,
+            "supportedAnswerable": 2.2242499999999996
+          },
+          "hindsightOnEvent": 1,
+          "exposure": {
+            "seconds": 0,
+            "fraction": 0,
+            "longest": 0
+          },
+          "byEvent": {
+            "reached": 4,
+            "of": 4,
+            "delays": [
+              0.2,
+              0.003937500000000038,
+              0.007875000000000076,
+              0.0018124999999999947
+            ]
+          },
+          "recovery": {
+            "recovered": 0,
+            "of": 0,
+            "notAssessable": 0
+          },
+          "extras": {
+            "held": 0,
+            "moved": 0,
+            "notAssessable": 0
+          }
+        },
+        "diagnosticNearest": {
+          "onEvent": 0.5655277059683039,
+          "ahead": 0.4344722940316961,
+          "byEvent": {
+            "reached": 4,
+            "of": 4
+          }
+        },
+        "record": {
+          "path": "/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/online-time-warp-8.s1-99.json",
+          "sha256": "d5aeb1c792f0c73670009baa2be955107ee6c5bd04070085dbeb87358b6f085f",
+          "decisions": 243
+        }
+      },
+      "s2-45": {
+        "started": {
+          "ok": true
+        },
+        "legacy": {
+          "clamped": 0,
+          "droppedNotes": 0
+        },
+        "cost": {
+          "machine": {
+            "hostname": "williao-G3-3579",
+            "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+            "cores": 12,
+            "platform": "linux",
+            "arch": "x64",
+            "node": "v22.22.1"
+          },
+          "sampleRate": 48000,
+          "chunkSamples": 480,
+          "chunks": 1067,
+          "audioSeconds": 10.666666666666666,
+          "initializationMs": 298.248119,
+          "finishMs": 0.015149,
+          "meanMs": 0.571406203,
+          "p95Ms": 1.270641,
+          "p99Ms": 1.478802,
+          "sustainedRatio": 0.085120658,
+          "maxBacklogMs": 0,
+          "provisional": true
+        },
+        "following": {
+          "onEvent": 0.6824840764331213,
+          "ahead": 0.3175159235668787,
+          "seconds": {
+            "onEvent": 7.143333333333336,
+            "ahead": 3.3233333333333306,
+            "behind": 0,
+            "abstained": 0,
+            "uncovered": 0,
+            "falseFollowing": 0,
+            "correctRejection": 0,
+            "pending": 0.2,
+            "indeterminate": 0,
+            "answerable": 10.466666666666667,
+            "supportedAnswerable": 10.466666666666667
+          },
+          "hindsightOnEvent": 0.6824840764331213,
+          "exposure": {
+            "seconds": 3.3233333333333306,
+            "fraction": 0.3175159235668787,
+            "longest": 0.9199999999999999
+          },
+          "byEvent": {
+            "reached": 8,
+            "of": 8,
+            "delays": [
+              0.2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "recovery": {
+            "recovered": 0,
+            "of": 0,
+            "notAssessable": 0
+          },
+          "extras": {
+            "held": 0,
+            "moved": 0,
+            "notAssessable": 0
+          }
+        },
+        "diagnosticNearest": {
+          "onEvent": 0.28216560509554134,
+          "ahead": 0.7178343949044587,
+          "byEvent": {
+            "reached": 8,
+            "of": 8
+          }
+        },
+        "record": {
+          "path": "/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/online-time-warp-8.s2-45.json",
+          "sha256": "99a83eb08c1e8d0c2a0f778b032d7ef26a895db122185104ff0f554115f20c9a",
+          "decisions": 1067
+        }
+      },
+      "s2-63": {
+        "started": {
+          "ok": true
+        },
+        "legacy": {
+          "clamped": 0,
+          "droppedNotes": 0
+        },
+        "cost": {
+          "machine": {
+            "hostname": "williao-G3-3579",
+            "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+            "cores": 12,
+            "platform": "linux",
+            "arch": "x64",
+            "node": "v22.22.1"
+          },
+          "sampleRate": 48000,
+          "chunkSamples": 480,
+          "chunks": 762,
+          "audioSeconds": 7.619041666666667,
+          "initializationMs": 297.370002,
+          "finishMs": 0.00376,
+          "meanMs": 0.562501748,
+          "p95Ms": 1.230512,
+          "p99Ms": 1.36205,
+          "sustainedRatio": 0.095287587,
+          "maxBacklogMs": 0,
+          "provisional": true
+        },
+        "following": {
+          "onEvent": 0.8921693614965994,
+          "ahead": 0.10783063850340058,
+          "seconds": {
+            "onEvent": 6.619041666666667,
+            "ahead": 0.7999999999999998,
+            "behind": 0,
+            "abstained": 0,
+            "uncovered": 0,
+            "falseFollowing": 0,
+            "correctRejection": 0,
+            "pending": 0.2,
+            "indeterminate": 0,
+            "answerable": 7.419041666666667,
+            "supportedAnswerable": 7.419041666666667
+          },
+          "hindsightOnEvent": 0.8921693614965994,
+          "exposure": {
+            "seconds": 0.7999999999999998,
+            "fraction": 0.10783063850340058,
+            "longest": 0.28000000000000025
+          },
+          "byEvent": {
+            "reached": 8,
+            "of": 8,
+            "delays": [
+              0.2,
+              0.017625000000000002,
+              0.015229166666666627,
+              0.00285416666666638,
+              0.00047916666666658614,
+              0.018104166666667254,
+              0.00570833333333276,
+              0.0033333333333329662
+            ]
+          },
+          "recovery": {
+            "recovered": 0,
+            "of": 0,
+            "notAssessable": 0
+          },
+          "extras": {
+            "held": 0,
+            "moved": 0,
+            "notAssessable": 0
+          }
+        },
+        "diagnosticNearest": {
+          "onEvent": 0.35346546330669393,
+          "ahead": 0.6465345366933062,
+          "byEvent": {
+            "reached": 8,
+            "of": 8
+          }
+        },
+        "record": {
+          "path": "/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/online-time-warp-8.s2-63.json",
+          "sha256": "206779d5faf8bf6caeae73564bc05de80b806b97f9ff5f53a292693a32491a9b",
+          "decisions": 762
+        }
+      },
+      "s2-90": {
+        "started": {
+          "ok": true
+        },
+        "legacy": {
+          "clamped": 0,
+          "droppedNotes": 0
+        },
+        "cost": {
+          "machine": {
+            "hostname": "williao-G3-3579",
+            "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+            "cores": 12,
+            "platform": "linux",
+            "arch": "x64",
+            "node": "v22.22.1"
+          },
+          "sampleRate": 48000,
+          "chunkSamples": 480,
+          "chunks": 534,
+          "audioSeconds": 5.333333333333333,
+          "initializationMs": 299.997382,
+          "finishMs": 0.003595,
+          "meanMs": 0.556999466,
+          "p95Ms": 1.184463,
+          "p99Ms": 1.357627,
+          "sustainedRatio": 0.112019755,
+          "maxBacklogMs": 0,
+          "provisional": true
+        },
+        "following": {
+          "onEvent": 1,
+          "ahead": 0,
+          "seconds": {
+            "onEvent": 5.133333333333333,
+            "ahead": 0,
+            "behind": 0,
+            "abstained": 0,
+            "uncovered": 0,
+            "falseFollowing": 0,
+            "correctRejection": 0,
+            "pending": 0.2,
+            "indeterminate": 0,
+            "answerable": 5.133333333333333,
+            "supportedAnswerable": 5.133333333333333
+          },
+          "hindsightOnEvent": 1,
+          "exposure": {
+            "seconds": 0,
+            "fraction": 0,
+            "longest": 0
+          },
+          "byEvent": {
+            "reached": 8,
+            "of": 8,
+            "delays": [
+              0.2,
+              0.0033333333333334103,
+              0.006666666666666821,
+              0,
+              0.0033333333333334103,
+              0.0066666666666663765,
+              0,
+              0.0033333333333329662
+            ]
+          },
+          "recovery": {
+            "recovered": 0,
+            "of": 0,
+            "notAssessable": 0
+          },
+          "extras": {
+            "held": 0,
+            "moved": 0,
+            "notAssessable": 0
+          }
+        },
+        "diagnosticNearest": {
+          "onEvent": 0.5506493506493505,
+          "ahead": 0.44935064935064956,
+          "byEvent": {
+            "reached": 8,
+            "of": 8
+          }
+        },
+        "record": {
+          "path": "/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/online-time-warp-8.s2-90.json",
+          "sha256": "76575f97a1d07ed94f7ae936393cfac9b3ae0e6f5b783ec912d7de4fbb35ee80",
+          "decisions": 534
+        }
+      },
+      "s2-99": {
+        "started": {
+          "ok": true
+        },
+        "legacy": {
+          "clamped": 0,
+          "droppedNotes": 0
+        },
+        "cost": {
+          "machine": {
+            "hostname": "williao-G3-3579",
+            "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+            "cores": 12,
+            "platform": "linux",
+            "arch": "x64",
+            "node": "v22.22.1"
+          },
+          "sampleRate": 48000,
+          "chunkSamples": 480,
+          "chunks": 485,
+          "audioSeconds": 4.8484791666666665,
+          "initializationMs": 291.512941,
+          "finishMs": 0.004575,
+          "meanMs": 0.551582765,
+          "p95Ms": 1.131309,
+          "p99Ms": 1.332834,
+          "sustainedRatio": 0.115301136,
+          "maxBacklogMs": 0,
+          "provisional": true
+        },
+        "following": {
+          "onEvent": 0.9612776580153911,
+          "ahead": 0.03872234198460884,
+          "seconds": {
+            "onEvent": 4.46847916666667,
+            "ahead": 0.17999999999999616,
+            "behind": 0,
+            "abstained": 0,
+            "uncovered": 0,
+            "falseFollowing": 0,
+            "correctRejection": 0,
+            "pending": 0.2,
+            "indeterminate": 0,
+            "answerable": 4.648479166666666,
+            "supportedAnswerable": 4.648479166666666
+          },
+          "hindsightOnEvent": 0.9612776580153911,
+          "exposure": {
+            "seconds": 0.17999999999999616,
+            "fraction": 0.03872234198460884,
+            "longest": 0.009999999999999787
+          },
+          "byEvent": {
+            "reached": 8,
+            "of": 8,
+            "delays": [
+              0.2,
+              0.003937500000000038,
+              0.007875000000000076,
+              0.0018124999999999947,
+              0.005750000000000366,
+              0.009687500000000071,
+              0.00364583333333357,
+              0.007583333333333719
+            ]
+          },
+          "recovery": {
+            "recovered": 0,
+            "of": 0,
+            "notAssessable": 0
+          },
+          "extras": {
+            "held": 0,
+            "moved": 0,
+            "notAssessable": 0
+          }
+        },
+        "diagnosticNearest": {
+          "onEvent": 0.4945210575143306,
+          "ahead": 0.5054789424856694,
+          "byEvent": {
+            "reached": 8,
+            "of": 8
+          }
+        },
+        "record": {
+          "path": "/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/online-time-warp-8.s2-99.json",
+          "sha256": "76de5fae1c9a7d6240a301f4ac246c78d07a1b297a21b53f4a42f33844fa1968",
+          "decisions": 485
+        }
+      }
+    },
+    "online-time-warp@12": {
+      "s1-45": {
+        "started": {
+          "ok": true
+        },
+        "legacy": {
+          "clamped": 0,
+          "droppedNotes": 0
+        },
+        "cost": {
+          "machine": {
+            "hostname": "williao-G3-3579",
+            "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+            "cores": 12,
+            "platform": "linux",
+            "arch": "x64",
+            "node": "v22.22.1"
+          },
+          "sampleRate": 48000,
+          "chunkSamples": 480,
+          "chunks": 534,
+          "audioSeconds": 5.333333333333333,
+          "initializationMs": 150.715452,
+          "finishMs": 0.07594,
+          "meanMs": 0.53728123,
+          "p95Ms": 1.179812,
+          "p99Ms": 1.439293,
+          "sustainedRatio": 0.082068669,
+          "maxBacklogMs": 0,
+          "provisional": true
+        },
+        "following": {
+          "onEvent": 0.6298701298701299,
+          "ahead": 0.37012987012987014,
+          "seconds": {
+            "onEvent": 3.2333333333333334,
+            "ahead": 1.9,
+            "behind": 0,
+            "abstained": 0,
+            "uncovered": 0,
+            "falseFollowing": 0,
+            "correctRejection": 0,
+            "pending": 0.2,
+            "indeterminate": 0,
+            "answerable": 5.133333333333333,
+            "supportedAnswerable": 5.133333333333333
+          },
+          "hindsightOnEvent": 0.6298701298701299,
+          "exposure": {
+            "seconds": 1.9,
+            "fraction": 0.37012987012987014,
+            "longest": 0.6966666666666665
+          },
+          "byEvent": {
+            "reached": 4,
+            "of": 4,
+            "delays": [
+              0.2,
+              0,
+              0,
+              0
+            ]
+          },
+          "recovery": {
+            "recovered": 0,
+            "of": 0,
+            "notAssessable": 0
+          },
+          "extras": {
+            "held": 0,
+            "moved": 0,
+            "notAssessable": 0
+          }
+        },
+        "diagnosticNearest": {
+          "onEvent": 0.4331168831168831,
+          "ahead": 0.566883116883117,
+          "byEvent": {
+            "reached": 4,
+            "of": 4
+          }
+        },
+        "record": {
+          "path": "/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/online-time-warp-12.s1-45.json",
+          "sha256": "6c3095b78e5a7979d167af810c05dfb834265d55b294bc3d9250e69d8bb93906",
+          "decisions": 534
+        }
+      },
+      "s1-63": {
+        "started": {
+          "ok": true
+        },
+        "legacy": {
+          "clamped": 0,
+          "droppedNotes": 0
+        },
+        "cost": {
+          "machine": {
+            "hostname": "williao-G3-3579",
+            "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+            "cores": 12,
+            "platform": "linux",
+            "arch": "x64",
+            "node": "v22.22.1"
+          },
+          "sampleRate": 48000,
+          "chunkSamples": 480,
+          "chunks": 381,
+          "audioSeconds": 3.8095208333333335,
+          "initializationMs": 144.222548,
+          "finishMs": 0.004027,
+          "meanMs": 0.514769619,
+          "p95Ms": 1.05799,
+          "p99Ms": 1.299729,
+          "sustainedRatio": 0.089342942,
+          "maxBacklogMs": 0,
+          "provisional": true
+        },
+        "following": {
+          "onEvent": 0.7162250298689231,
+          "ahead": 0.28377497013107694,
+          "seconds": {
+            "onEvent": 2.5852291666666667,
+            "ahead": 1.0242916666666666,
+            "behind": 0,
+            "abstained": 0,
+            "uncovered": 0,
+            "falseFollowing": 0,
+            "correctRejection": 0,
+            "pending": 0.2,
+            "indeterminate": 0,
+            "answerable": 3.6095208333333333,
+            "supportedAnswerable": 3.6095208333333333
+          },
+          "hindsightOnEvent": 0.7162250298689231,
+          "exposure": {
+            "seconds": 1.0242916666666666,
+            "fraction": 0.28377497013107694,
+            "longest": 0.3771458333333335
+          },
+          "byEvent": {
+            "reached": 4,
+            "of": 4,
+            "delays": [
+              0.2,
+              0,
+              0,
+              0
+            ]
+          },
+          "recovery": {
+            "recovered": 0,
+            "of": 0,
+            "notAssessable": 0
+          },
+          "extras": {
+            "held": 0,
+            "moved": 0,
+            "notAssessable": 0
+          }
+        },
+        "diagnosticNearest": {
+          "onEvent": 0.5195230207148918,
+          "ahead": 0.4804769792851083,
+          "byEvent": {
+            "reached": 4,
+            "of": 4
+          }
+        },
+        "record": {
+          "path": "/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/online-time-warp-12.s1-63.json",
+          "sha256": "0ccf1285d5fb5b28907844c455e83cde0267086666507d68b254bd9529168666",
+          "decisions": 381
+        }
+      },
+      "s1-90": {
+        "started": {
+          "ok": true
+        },
+        "legacy": {
+          "clamped": 0,
+          "droppedNotes": 0
+        },
+        "cost": {
+          "machine": {
+            "hostname": "williao-G3-3579",
+            "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+            "cores": 12,
+            "platform": "linux",
+            "arch": "x64",
+            "node": "v22.22.1"
+          },
+          "sampleRate": 48000,
+          "chunkSamples": 480,
+          "chunks": 267,
+          "audioSeconds": 2.6666666666666665,
+          "initializationMs": 143.348854,
+          "finishMs": 0.004553,
+          "meanMs": 0.503833536,
+          "p95Ms": 1.03428,
+          "p99Ms": 1.247196,
+          "sustainedRatio": 0.10420386,
+          "maxBacklogMs": 0,
+          "provisional": true
+        },
+        "following": {
+          "onEvent": 1,
+          "ahead": 0,
+          "seconds": {
+            "onEvent": 2.4666666666666663,
+            "ahead": 0,
+            "behind": 0,
+            "abstained": 0,
+            "uncovered": 0,
+            "falseFollowing": 0,
+            "correctRejection": 0,
+            "pending": 0.2,
+            "indeterminate": 0,
+            "answerable": 2.4666666666666663,
+            "supportedAnswerable": 2.4666666666666663
+          },
+          "hindsightOnEvent": 1,
+          "exposure": {
+            "seconds": 0,
+            "fraction": 0,
+            "longest": 0
+          },
+          "byEvent": {
+            "reached": 4,
+            "of": 4,
+            "delays": [
+              0.2,
+              0.0033333333333334103,
+              0.006666666666666821,
+              0
+            ]
+          },
+          "recovery": {
+            "recovered": 0,
+            "of": 0,
+            "notAssessable": 0
+          },
+          "extras": {
+            "held": 0,
+            "moved": 0,
+            "notAssessable": 0
+          }
+        },
+        "diagnosticNearest": {
+          "onEvent": 0.5986486486486486,
+          "ahead": 0.4013513513513514,
+          "byEvent": {
+            "reached": 4,
+            "of": 4
+          }
+        },
+        "record": {
+          "path": "/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/online-time-warp-12.s1-90.json",
+          "sha256": "cc306cdd6f8746d31767d65398e36334f624047be84af892f74bb091c9b524cc",
+          "decisions": 267
+        }
+      },
+      "s1-99": {
+        "started": {
+          "ok": true
+        },
+        "legacy": {
+          "clamped": 0,
+          "droppedNotes": 0
+        },
+        "cost": {
+          "machine": {
+            "hostname": "williao-G3-3579",
+            "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+            "cores": 12,
+            "platform": "linux",
+            "arch": "x64",
+            "node": "v22.22.1"
+          },
+          "sampleRate": 48000,
+          "chunkSamples": 480,
+          "chunks": 243,
+          "audioSeconds": 2.42425,
+          "initializationMs": 141.68924,
+          "finishMs": 0.007527,
+          "meanMs": 0.498979724,
+          "p95Ms": 1.009803,
+          "p99Ms": 1.252575,
+          "sustainedRatio": 0.108466058,
+          "maxBacklogMs": 0,
+          "provisional": true
+        },
+        "following": {
+          "onEvent": 0.9504046307744185,
+          "ahead": 0.04959536922558168,
+          "seconds": {
+            "onEvent": 2.1139375,
+            "ahead": 0.11031250000000004,
+            "behind": 0,
+            "abstained": 0,
+            "uncovered": 0,
+            "falseFollowing": 0,
+            "correctRejection": 0,
+            "pending": 0.2,
+            "indeterminate": 0,
+            "answerable": 2.2242499999999996,
+            "supportedAnswerable": 2.2242499999999996
+          },
+          "hindsightOnEvent": 0.9504046307744185,
+          "exposure": {
+            "seconds": 0.11031250000000004,
+            "fraction": 0.04959536922558168,
+            "longest": 0.072125
+          },
+          "byEvent": {
+            "reached": 4,
+            "of": 4,
+            "delays": [
+              0.2,
+              0.05393750000000008,
+              0,
+              0
+            ]
+          },
+          "recovery": {
+            "recovered": 0,
+            "of": 0,
+            "notAssessable": 0
+          },
+          "extras": {
+            "held": 0,
+            "moved": 0,
+            "notAssessable": 0
+          }
+        },
+        "diagnosticNearest": {
+          "onEvent": 0.6104866809036755,
+          "ahead": 0.38951331909632464,
+          "byEvent": {
+            "reached": 4,
+            "of": 4
+          }
+        },
+        "record": {
+          "path": "/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/online-time-warp-12.s1-99.json",
+          "sha256": "dfaa72453e0a42081cc5edb4972ff944e9d22ce6283cac679c53340065c3419f",
+          "decisions": 243
+        }
+      },
+      "s2-45": {
+        "started": {
+          "ok": true
+        },
+        "legacy": {
+          "clamped": 0,
+          "droppedNotes": 0
+        },
+        "cost": {
+          "machine": {
+            "hostname": "williao-G3-3579",
+            "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+            "cores": 12,
+            "platform": "linux",
+            "arch": "x64",
+            "node": "v22.22.1"
+          },
+          "sampleRate": 48000,
+          "chunkSamples": 480,
+          "chunks": 1067,
+          "audioSeconds": 10.666666666666666,
+          "initializationMs": 294.062733,
+          "finishMs": 0.001895,
+          "meanMs": 0.573910793,
+          "p95Ms": 1.155957,
+          "p99Ms": 1.383739,
+          "sustainedRatio": 0.084977573,
+          "maxBacklogMs": 0,
+          "provisional": true
+        },
+        "following": {
+          "onEvent": 0.6079617834394903,
+          "ahead": 0.39203821656050974,
+          "seconds": {
+            "onEvent": 6.3633333333333315,
+            "ahead": 4.103333333333335,
+            "behind": 0,
+            "abstained": 0,
+            "uncovered": 0,
+            "falseFollowing": 0,
+            "correctRejection": 0,
+            "pending": 0.2,
+            "indeterminate": 0,
+            "answerable": 10.466666666666667,
+            "supportedAnswerable": 10.466666666666667
+          },
+          "hindsightOnEvent": 0.6079617834394903,
+          "exposure": {
+            "seconds": 4.103333333333335,
+            "fraction": 0.39203821656050974,
+            "longest": 0.6966666666666665
+          },
+          "byEvent": {
+            "reached": 8,
+            "of": 8,
+            "delays": [
+              0.2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "recovery": {
+            "recovered": 0,
+            "of": 0,
+            "notAssessable": 0
+          },
+          "extras": {
+            "held": 0,
+            "moved": 0,
+            "notAssessable": 0
+          }
+        },
+        "diagnosticNearest": {
+          "onEvent": 0.3528662420382164,
+          "ahead": 0.6471337579617835,
+          "byEvent": {
+            "reached": 8,
+            "of": 8
+          }
+        },
+        "record": {
+          "path": "/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/online-time-warp-12.s2-45.json",
+          "sha256": "cc598c51375b0cde5884ed3303d296b33d1b07a12c22a1ab9119e6b104535f8a",
+          "decisions": 1067
+        }
+      },
+      "s2-63": {
+        "started": {
+          "ok": true
+        },
+        "legacy": {
+          "clamped": 0,
+          "droppedNotes": 0
+        },
+        "cost": {
+          "machine": {
+            "hostname": "williao-G3-3579",
+            "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+            "cores": 12,
+            "platform": "linux",
+            "arch": "x64",
+            "node": "v22.22.1"
+          },
+          "sampleRate": 48000,
+          "chunkSamples": 480,
+          "chunks": 762,
+          "audioSeconds": 7.619041666666667,
+          "initializationMs": 301.471394,
+          "finishMs": 0.002116,
+          "meanMs": 0.585511395,
+          "p95Ms": 1.225767,
+          "p99Ms": 1.43538,
+          "sustainedRatio": 0.098126933,
+          "maxBacklogMs": 0,
+          "provisional": true
+        },
+        "following": {
+          "onEvent": 0.6607827830413855,
+          "ahead": 0.3392172169586145,
+          "seconds": {
+            "onEvent": 4.902374999999999,
+            "ahead": 2.5166666666666675,
+            "behind": 0,
+            "abstained": 0,
+            "uncovered": 0,
+            "falseFollowing": 0,
+            "correctRejection": 0,
+            "pending": 0.2,
+            "indeterminate": 0,
+            "answerable": 7.419041666666667,
+            "supportedAnswerable": 7.419041666666667
+          },
+          "hindsightOnEvent": 0.6607827830413855,
+          "exposure": {
+            "seconds": 2.5166666666666675,
+            "fraction": 0.3392172169586145,
+            "longest": 0.3818958333333331
+          },
+          "byEvent": {
+            "reached": 8,
+            "of": 8,
+            "delays": [
+              0.2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "recovery": {
+            "recovered": 0,
+            "of": 0,
+            "notAssessable": 0
+          },
+          "extras": {
+            "held": 0,
+            "moved": 0,
+            "notAssessable": 0
+          }
+        },
+        "diagnosticNearest": {
+          "onEvent": 0.484210112492067,
+          "ahead": 0.515789887507933,
+          "byEvent": {
+            "reached": 8,
+            "of": 8
+          }
+        },
+        "record": {
+          "path": "/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/online-time-warp-12.s2-63.json",
+          "sha256": "3f360673833ac8e8e1431fe6f8928b38516d22a7384b8eb2fd72ca9377413b83",
+          "decisions": 762
+        }
+      },
+      "s2-90": {
+        "started": {
+          "ok": true
+        },
+        "legacy": {
+          "clamped": 0,
+          "droppedNotes": 0
+        },
+        "cost": {
+          "machine": {
+            "hostname": "williao-G3-3579",
+            "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+            "cores": 12,
+            "platform": "linux",
+            "arch": "x64",
+            "node": "v22.22.1"
+          },
+          "sampleRate": 48000,
+          "chunkSamples": 480,
+          "chunks": 534,
+          "audioSeconds": 5.333333333333333,
+          "initializationMs": 294.539882,
+          "finishMs": 0.001936,
+          "meanMs": 0.569510464,
+          "p95Ms": 1.15708,
+          "p99Ms": 1.392616,
+          "sustainedRatio": 0.112248826,
+          "maxBacklogMs": 0,
+          "provisional": true
+        },
+        "following": {
+          "onEvent": 1,
+          "ahead": 0,
+          "seconds": {
+            "onEvent": 5.133333333333333,
+            "ahead": 0,
+            "behind": 0,
+            "abstained": 0,
+            "uncovered": 0,
+            "falseFollowing": 0,
+            "correctRejection": 0,
+            "pending": 0.2,
+            "indeterminate": 0,
+            "answerable": 5.133333333333333,
+            "supportedAnswerable": 5.133333333333333
+          },
+          "hindsightOnEvent": 1,
+          "exposure": {
+            "seconds": 0,
+            "fraction": 0,
+            "longest": 0
+          },
+          "byEvent": {
+            "reached": 8,
+            "of": 8,
+            "delays": [
+              0.2,
+              0.0033333333333334103,
+              0.006666666666666821,
+              0,
+              0.0033333333333334103,
+              0.0066666666666663765,
+              0,
+              0.0033333333333329662
+            ]
+          },
+          "recovery": {
+            "recovered": 0,
+            "of": 0,
+            "notAssessable": 0
+          },
+          "extras": {
+            "held": 0,
+            "moved": 0,
+            "notAssessable": 0
+          }
+        },
+        "diagnosticNearest": {
+          "onEvent": 0.5506493506493505,
+          "ahead": 0.44935064935064956,
+          "byEvent": {
+            "reached": 8,
+            "of": 8
+          }
+        },
+        "record": {
+          "path": "/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/online-time-warp-12.s2-90.json",
+          "sha256": "b055570b0f58e418a60b8505388c7a77080bf065887abc362a58f038a438243a",
+          "decisions": 534
+        }
+      },
+      "s2-99": {
+        "started": {
+          "ok": true
+        },
+        "legacy": {
+          "clamped": 0,
+          "droppedNotes": 0
+        },
+        "cost": {
+          "machine": {
+            "hostname": "williao-G3-3579",
+            "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+            "cores": 12,
+            "platform": "linux",
+            "arch": "x64",
+            "node": "v22.22.1"
+          },
+          "sampleRate": 48000,
+          "chunkSamples": 480,
+          "chunks": 485,
+          "audioSeconds": 4.8484791666666665,
+          "initializationMs": 302.395741,
+          "finishMs": 0.001863,
+          "meanMs": 0.587440788,
+          "p95Ms": 1.228183,
+          "p99Ms": 1.484273,
+          "sustainedRatio": 0.121132084,
+          "maxBacklogMs": 0,
+          "provisional": true
+        },
+        "following": {
+          "onEvent": 0.9196197681141236,
+          "ahead": 0.08038023188587655,
+          "seconds": {
+            "onEvent": 4.274833333333334,
+            "ahead": 0.3736458333333328,
+            "behind": 0,
+            "abstained": 0,
+            "uncovered": 0,
+            "falseFollowing": 0,
+            "correctRejection": 0,
+            "pending": 0.2,
+            "indeterminate": 0,
+            "answerable": 4.648479166666666,
+            "supportedAnswerable": 4.648479166666666
+          },
+          "hindsightOnEvent": 0.9196197681141236,
+          "exposure": {
+            "seconds": 0.3736458333333328,
+            "fraction": 0.08038023188587655,
+            "longest": 0.0763541666666665
+          },
+          "byEvent": {
+            "reached": 8,
+            "of": 8,
+            "delays": [
+              0.2,
+              0.05393750000000008,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "recovery": {
+            "recovered": 0,
+            "of": 0,
+            "notAssessable": 0
+          },
+          "extras": {
+            "held": 0,
+            "moved": 0,
+            "notAssessable": 0
+          }
+        },
+        "diagnosticNearest": {
+          "onEvent": 0.5353946407203075,
+          "ahead": 0.46460535927969265,
+          "byEvent": {
+            "reached": 8,
+            "of": 8
+          }
+        },
+        "record": {
+          "path": "/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/online-time-warp-12.s2-99.json",
+          "sha256": "b6a137168b22f50c42aa5661130825dc3bfccaee5ef2682dc2784dd2cf41abbb",
+          "decisions": 485
+        }
+      }
+    },
+    "online-time-warp@14": {
+      "s1-45": {
+        "started": {
+          "ok": true
+        },
+        "legacy": {
+          "clamped": 0,
+          "droppedNotes": 0
+        },
+        "cost": {
+          "machine": {
+            "hostname": "williao-G3-3579",
+            "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+            "cores": 12,
+            "platform": "linux",
+            "arch": "x64",
+            "node": "v22.22.1"
+          },
+          "sampleRate": 48000,
+          "chunkSamples": 480,
+          "chunks": 534,
+          "audioSeconds": 5.333333333333333,
+          "initializationMs": 147.08316,
+          "finishMs": 0.080635,
+          "meanMs": 0.533660238,
+          "p95Ms": 1.082348,
+          "p99Ms": 1.374467,
+          "sustainedRatio": 0.081025943,
+          "maxBacklogMs": 0,
+          "provisional": true
+        },
+        "following": {
+          "onEvent": 0.6181818181818182,
+          "ahead": 0.38181818181818183,
+          "seconds": {
+            "onEvent": 3.173333333333333,
+            "ahead": 1.96,
+            "behind": 0,
+            "abstained": 0,
+            "uncovered": 0,
+            "falseFollowing": 0,
+            "correctRejection": 0,
+            "pending": 0.2,
+            "indeterminate": 0,
+            "answerable": 5.133333333333333,
+            "supportedAnswerable": 5.133333333333333
+          },
+          "hindsightOnEvent": 0.6181818181818182,
+          "exposure": {
+            "seconds": 1.96,
+            "fraction": 0.38181818181818183,
+            "longest": 0.6966666666666665
+          },
+          "byEvent": {
+            "reached": 4,
+            "of": 4,
+            "delays": [
+              0.2,
+              0,
+              0,
+              0
+            ]
+          },
+          "recovery": {
+            "recovered": 0,
+            "of": 0,
+            "notAssessable": 0
+          },
+          "extras": {
+            "held": 0,
+            "moved": 0,
+            "notAssessable": 0
+          }
+        },
+        "diagnosticNearest": {
+          "onEvent": 0.4233766233766234,
+          "ahead": 0.5766233766233767,
+          "byEvent": {
+            "reached": 4,
+            "of": 4
+          }
+        },
+        "record": {
+          "path": "/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/online-time-warp-14.s1-45.json",
+          "sha256": "2ce1772fdeea9303d65643ea365fc30147eaf4a7b6c117fd9994f432df7a1d27",
+          "decisions": 534
+        }
+      },
+      "s1-63": {
+        "started": {
+          "ok": true
+        },
+        "legacy": {
+          "clamped": 0,
+          "droppedNotes": 0
+        },
+        "cost": {
+          "machine": {
+            "hostname": "williao-G3-3579",
+            "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+            "cores": 12,
+            "platform": "linux",
+            "arch": "x64",
+            "node": "v22.22.1"
+          },
+          "sampleRate": 48000,
+          "chunkSamples": 480,
+          "chunks": 381,
+          "audioSeconds": 3.8095208333333335,
+          "initializationMs": 143.910285,
+          "finishMs": 0.003414,
+          "meanMs": 0.519968249,
+          "p95Ms": 1.054471,
+          "p99Ms": 1.342617,
+          "sustainedRatio": 0.089780741,
+          "maxBacklogMs": 0,
+          "provisional": true
+        },
+        "following": {
+          "onEvent": 0.7106841282026123,
+          "ahead": 0.28931587179738766,
+          "seconds": {
+            "onEvent": 2.5652291666666667,
+            "ahead": 1.0442916666666666,
+            "behind": 0,
+            "abstained": 0,
+            "uncovered": 0,
+            "falseFollowing": 0,
+            "correctRejection": 0,
+            "pending": 0.2,
+            "indeterminate": 0,
+            "answerable": 3.6095208333333333,
+            "supportedAnswerable": 3.6095208333333333
+          },
+          "hindsightOnEvent": 0.7106841282026123,
+          "exposure": {
+            "seconds": 1.0442916666666666,
+            "fraction": 0.28931587179738766,
+            "longest": 0.39714583333333353
+          },
+          "byEvent": {
+            "reached": 4,
+            "of": 4,
+            "delays": [
+              0.2,
+              0,
+              0,
+              0
+            ]
+          },
+          "recovery": {
+            "recovered": 0,
+            "of": 0,
+            "notAssessable": 0
+          },
+          "extras": {
+            "held": 0,
+            "moved": 0,
+            "notAssessable": 0
+          }
+        },
+        "diagnosticNearest": {
+          "onEvent": 0.4890480615501827,
+          "ahead": 0.5109519384498173,
+          "byEvent": {
+            "reached": 4,
+            "of": 4
+          }
+        },
+        "record": {
+          "path": "/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/online-time-warp-14.s1-63.json",
+          "sha256": "c423017ea01f9378e881872e5a290167a13fef071111e9f8bb421e6c05efabba",
+          "decisions": 381
+        }
+      },
+      "s1-90": {
+        "started": {
+          "ok": true
+        },
+        "legacy": {
+          "clamped": 0,
+          "droppedNotes": 0
+        },
+        "cost": {
+          "machine": {
+            "hostname": "williao-G3-3579",
+            "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+            "cores": 12,
+            "platform": "linux",
+            "arch": "x64",
+            "node": "v22.22.1"
+          },
+          "sampleRate": 48000,
+          "chunkSamples": 480,
+          "chunks": 267,
+          "audioSeconds": 2.6666666666666665,
+          "initializationMs": 143.906415,
+          "finishMs": 0.003647,
+          "meanMs": 0.504663539,
+          "p95Ms": 1.019456,
+          "p99Ms": 1.287321,
+          "sustainedRatio": 0.10449571,
+          "maxBacklogMs": 0,
+          "provisional": true
+        },
+        "following": {
+          "onEvent": 1,
+          "ahead": 0,
+          "seconds": {
+            "onEvent": 2.4666666666666663,
+            "ahead": 0,
+            "behind": 0,
+            "abstained": 0,
+            "uncovered": 0,
+            "falseFollowing": 0,
+            "correctRejection": 0,
+            "pending": 0.2,
+            "indeterminate": 0,
+            "answerable": 2.4666666666666663,
+            "supportedAnswerable": 2.4666666666666663
+          },
+          "hindsightOnEvent": 1,
+          "exposure": {
+            "seconds": 0,
+            "fraction": 0,
+            "longest": 0
+          },
+          "byEvent": {
+            "reached": 4,
+            "of": 4,
+            "delays": [
+              0.2,
+              0.0033333333333334103,
+              0.006666666666666821,
+              0
+            ]
+          },
+          "recovery": {
+            "recovered": 0,
+            "of": 0,
+            "notAssessable": 0
+          },
+          "extras": {
+            "held": 0,
+            "moved": 0,
+            "notAssessable": 0
+          }
+        },
+        "diagnosticNearest": {
+          "onEvent": 0.5986486486486486,
+          "ahead": 0.4013513513513514,
+          "byEvent": {
+            "reached": 4,
+            "of": 4
+          }
+        },
+        "record": {
+          "path": "/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/online-time-warp-14.s1-90.json",
+          "sha256": "062b60a843d37c0a7e3aa8f8bc678eb05c2ba271cb8add910262270d2c675dcc",
+          "decisions": 267
+        }
+      },
+      "s1-99": {
+        "started": {
+          "ok": true
+        },
+        "legacy": {
+          "clamped": 0,
+          "droppedNotes": 0
+        },
+        "cost": {
+          "machine": {
+            "hostname": "williao-G3-3579",
+            "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+            "cores": 12,
+            "platform": "linux",
+            "arch": "x64",
+            "node": "v22.22.1"
+          },
+          "sampleRate": 48000,
+          "chunkSamples": 480,
+          "chunks": 243,
+          "audioSeconds": 2.42425,
+          "initializationMs": 143.329625,
+          "finishMs": 0.009109,
+          "meanMs": 0.500234193,
+          "p95Ms": 1.004277,
+          "p99Ms": 1.289887,
+          "sustainedRatio": 0.109269111,
+          "maxBacklogMs": 0,
+          "provisional": true
+        },
+        "following": {
+          "onEvent": 0.9504046307744185,
+          "ahead": 0.04959536922558168,
+          "seconds": {
+            "onEvent": 2.1139375,
+            "ahead": 0.11031250000000004,
+            "behind": 0,
+            "abstained": 0,
+            "uncovered": 0,
+            "falseFollowing": 0,
+            "correctRejection": 0,
+            "pending": 0.2,
+            "indeterminate": 0,
+            "answerable": 2.2242499999999996,
+            "supportedAnswerable": 2.2242499999999996
+          },
+          "hindsightOnEvent": 0.9504046307744185,
+          "exposure": {
+            "seconds": 0.11031250000000004,
+            "fraction": 0.04959536922558168,
+            "longest": 0.072125
+          },
+          "byEvent": {
+            "reached": 4,
+            "of": 4,
+            "delays": [
+              0.2,
+              0.05393750000000008,
+              0,
+              0
+            ]
+          },
+          "recovery": {
+            "recovered": 0,
+            "of": 0,
+            "notAssessable": 0
+          },
+          "extras": {
+            "held": 0,
+            "moved": 0,
+            "notAssessable": 0
+          }
+        },
+        "diagnosticNearest": {
+          "onEvent": 0.6104866809036755,
+          "ahead": 0.38951331909632464,
+          "byEvent": {
+            "reached": 4,
+            "of": 4
+          }
+        },
+        "record": {
+          "path": "/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/online-time-warp-14.s1-99.json",
+          "sha256": "ebb76b62731c614eddcbaf248feb2251d777e8f42b6ffe0b07616711b14e958f",
+          "decisions": 243
+        }
+      },
+      "s2-45": {
+        "started": {
+          "ok": true
+        },
+        "legacy": {
+          "clamped": 0,
+          "droppedNotes": 0
+        },
+        "cost": {
+          "machine": {
+            "hostname": "williao-G3-3579",
+            "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+            "cores": 12,
+            "platform": "linux",
+            "arch": "x64",
+            "node": "v22.22.1"
+          },
+          "sampleRate": 48000,
+          "chunkSamples": 480,
+          "chunks": 1067,
+          "audioSeconds": 10.666666666666666,
+          "initializationMs": 292.403081,
+          "finishMs": 0.003157,
+          "meanMs": 0.591601081,
+          "p95Ms": 1.198285,
+          "p99Ms": 1.453428,
+          "sustainedRatio": 0.08659168,
+          "maxBacklogMs": 0,
+          "provisional": true
+        },
+        "following": {
+          "onEvent": 0.6461783439490444,
+          "ahead": 0.3538216560509555,
+          "seconds": {
+            "onEvent": 6.763333333333332,
+            "ahead": 3.703333333333334,
+            "behind": 0,
+            "abstained": 0,
+            "uncovered": 0,
+            "falseFollowing": 0,
+            "correctRejection": 0,
+            "pending": 0.2,
+            "indeterminate": 0,
+            "answerable": 10.466666666666667,
+            "supportedAnswerable": 10.466666666666667
+          },
+          "hindsightOnEvent": 0.6461783439490444,
+          "exposure": {
+            "seconds": 3.703333333333334,
+            "fraction": 0.3538216560509555,
+            "longest": 0.6966666666666665
+          },
+          "byEvent": {
+            "reached": 8,
+            "of": 8,
+            "delays": [
+              0.2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "recovery": {
+            "recovered": 0,
+            "of": 0,
+            "notAssessable": 0
+          },
+          "extras": {
+            "held": 0,
+            "moved": 0,
+            "notAssessable": 0
+          }
+        },
+        "diagnosticNearest": {
+          "onEvent": 0.3070063694267515,
+          "ahead": 0.6929936305732485,
+          "byEvent": {
+            "reached": 8,
+            "of": 8
+          }
+        },
+        "record": {
+          "path": "/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/online-time-warp-14.s2-45.json",
+          "sha256": "4ab59108459bb7dbf81852e97b3e5f6791935d6b42f7ee96094bfc92803bafd1",
+          "decisions": 1067
+        }
+      },
+      "s2-63": {
+        "started": {
+          "ok": true
+        },
+        "legacy": {
+          "clamped": 0,
+          "droppedNotes": 0
+        },
+        "cost": {
+          "machine": {
+            "hostname": "williao-G3-3579",
+            "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+            "cores": 12,
+            "platform": "linux",
+            "arch": "x64",
+            "node": "v22.22.1"
+          },
+          "sampleRate": 48000,
+          "chunkSamples": 480,
+          "chunks": 762,
+          "audioSeconds": 7.619041666666667,
+          "initializationMs": 301.915146,
+          "finishMs": 0.003249,
+          "meanMs": 0.584887786,
+          "p95Ms": 1.189035,
+          "p99Ms": 1.41498,
+          "sustainedRatio": 0.098122956,
+          "maxBacklogMs": 0,
+          "provisional": true
+        },
+        "following": {
+          "onEvent": 0.6702179639104332,
+          "ahead": 0.3297820360895668,
+          "seconds": {
+            "onEvent": 4.972375,
+            "ahead": 2.4466666666666663,
+            "behind": 0,
+            "abstained": 0,
+            "uncovered": 0,
+            "falseFollowing": 0,
+            "correctRejection": 0,
+            "pending": 0.2,
+            "indeterminate": 0,
+            "answerable": 7.419041666666667,
+            "supportedAnswerable": 7.419041666666667
+          },
+          "hindsightOnEvent": 0.6702179639104332,
+          "exposure": {
+            "seconds": 2.4466666666666663,
+            "fraction": 0.3297820360895668,
+            "longest": 0.39714583333333353
+          },
+          "byEvent": {
+            "reached": 8,
+            "of": 8,
+            "delays": [
+              0.2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "recovery": {
+            "recovered": 0,
+            "of": 0,
+            "notAssessable": 0
+          },
+          "extras": {
+            "held": 0,
+            "moved": 0,
+            "notAssessable": 0
+          }
+        },
+        "diagnosticNearest": {
+          "onEvent": 0.44512150603458445,
+          "ahead": 0.5548784939654157,
+          "byEvent": {
+            "reached": 8,
+            "of": 8
+          }
+        },
+        "record": {
+          "path": "/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/online-time-warp-14.s2-63.json",
+          "sha256": "2f6c4087f93a98a29bfc33abf06181607498e355d9f6b1146818d01b77f97a39",
+          "decisions": 762
+        }
+      },
+      "s2-90": {
+        "started": {
+          "ok": true
+        },
+        "legacy": {
+          "clamped": 0,
+          "droppedNotes": 0
+        },
+        "cost": {
+          "machine": {
+            "hostname": "williao-G3-3579",
+            "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+            "cores": 12,
+            "platform": "linux",
+            "arch": "x64",
+            "node": "v22.22.1"
+          },
+          "sampleRate": 48000,
+          "chunkSamples": 480,
+          "chunks": 534,
+          "audioSeconds": 5.333333333333333,
+          "initializationMs": 299.874413,
+          "finishMs": 0.00346,
+          "meanMs": 0.592658904,
+          "p95Ms": 1.195863,
+          "p99Ms": 1.492697,
+          "sustainedRatio": 0.115567074,
+          "maxBacklogMs": 0,
+          "provisional": true
+        },
+        "following": {
+          "onEvent": 1,
+          "ahead": 0,
+          "seconds": {
+            "onEvent": 5.133333333333333,
+            "ahead": 0,
+            "behind": 0,
+            "abstained": 0,
+            "uncovered": 0,
+            "falseFollowing": 0,
+            "correctRejection": 0,
+            "pending": 0.2,
+            "indeterminate": 0,
+            "answerable": 5.133333333333333,
+            "supportedAnswerable": 5.133333333333333
+          },
+          "hindsightOnEvent": 1,
+          "exposure": {
+            "seconds": 0,
+            "fraction": 0,
+            "longest": 0
+          },
+          "byEvent": {
+            "reached": 8,
+            "of": 8,
+            "delays": [
+              0.2,
+              0.0033333333333334103,
+              0.006666666666666821,
+              0,
+              0.0033333333333334103,
+              0.0066666666666663765,
+              0,
+              0.0033333333333329662
+            ]
+          },
+          "recovery": {
+            "recovered": 0,
+            "of": 0,
+            "notAssessable": 0
+          },
+          "extras": {
+            "held": 0,
+            "moved": 0,
+            "notAssessable": 0
+          }
+        },
+        "diagnosticNearest": {
+          "onEvent": 0.5506493506493505,
+          "ahead": 0.44935064935064956,
+          "byEvent": {
+            "reached": 8,
+            "of": 8
+          }
+        },
+        "record": {
+          "path": "/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/online-time-warp-14.s2-90.json",
+          "sha256": "50fdea827c98337f8fead6034d8680d2981025c711402061930cf78e91f86b0c",
+          "decisions": 534
+        }
+      },
+      "s2-99": {
+        "started": {
+          "ok": true
+        },
+        "legacy": {
+          "clamped": 0,
+          "droppedNotes": 0
+        },
+        "cost": {
+          "machine": {
+            "hostname": "williao-G3-3579",
+            "cpu": "Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz",
+            "cores": 12,
+            "platform": "linux",
+            "arch": "x64",
+            "node": "v22.22.1"
+          },
+          "sampleRate": 48000,
+          "chunkSamples": 480,
+          "chunks": 485,
+          "audioSeconds": 4.8484791666666665,
+          "initializationMs": 300.470173,
+          "finishMs": 0.003198,
+          "meanMs": 0.578013167,
+          "p95Ms": 1.191361,
+          "p99Ms": 1.45405,
+          "sustainedRatio": 0.119792153,
+          "maxBacklogMs": 0,
+          "provisional": true
+        },
+        "following": {
+          "onEvent": 0.9389809391064284,
+          "ahead": 0.06101906089357174,
+          "seconds": {
+            "onEvent": 4.364833333333334,
+            "ahead": 0.28364583333333293,
+            "behind": 0,
+            "abstained": 0,
+            "uncovered": 0,
+            "falseFollowing": 0,
+            "correctRejection": 0,
+            "pending": 0.2,
+            "indeterminate": 0,
+            "answerable": 4.648479166666666,
+            "supportedAnswerable": 4.648479166666666
+          },
+          "hindsightOnEvent": 0.9389809391064284,
+          "exposure": {
+            "seconds": 0.28364583333333293,
+            "fraction": 0.06101906089357174,
+            "longest": 0.072125
+          },
+          "byEvent": {
+            "reached": 8,
+            "of": 8,
+            "delays": [
+              0.2,
+              0.05393750000000008,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "recovery": {
+            "recovered": 0,
+            "of": 0,
+            "notAssessable": 0
+          },
+          "extras": {
+            "held": 0,
+            "moved": 0,
+            "notAssessable": 0
+          }
+        },
+        "diagnosticNearest": {
+          "onEvent": 0.5224871933921044,
+          "ahead": 0.47751280660789575,
+          "byEvent": {
+            "reached": 8,
+            "of": 8
+          }
+        },
+        "record": {
+          "path": "/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/online-time-warp-14.s2-99.json",
+          "sha256": "1d07ecbe8511101d0143d95cd90587d94a65276d2a49496f16cd213e24c960ae",
+          "decisions": 485
+        }
+      }
+    }
+  },
+  "causality": {
+    "clock-follower@1 s1": [
+      {
+        "fraction": 0.25,
+        "kind": "silence",
+        "pass": true
+      },
+      {
+        "fraction": 0.25,
+        "kind": "alternating",
+        "pass": true
+      },
+      {
+        "fraction": 0.5,
+        "kind": "silence",
+        "pass": true
+      },
+      {
+        "fraction": 0.5,
+        "kind": "alternating",
+        "pass": true
+      },
+      {
+        "fraction": 0.75,
+        "kind": "silence",
+        "pass": true
+      },
+      {
+        "fraction": 0.75,
+        "kind": "alternating",
+        "pass": true
+      }
+    ],
+    "clock-follower@1 s2": [
+      {
+        "fraction": 0.25,
+        "kind": "silence",
+        "pass": true
+      },
+      {
+        "fraction": 0.25,
+        "kind": "alternating",
+        "pass": true
+      },
+      {
+        "fraction": 0.5,
+        "kind": "silence",
+        "pass": true
+      },
+      {
+        "fraction": 0.5,
+        "kind": "alternating",
+        "pass": true
+      },
+      {
+        "fraction": 0.75,
+        "kind": "silence",
+        "pass": true
+      },
+      {
+        "fraction": 0.75,
+        "kind": "alternating",
+        "pass": true
+      }
+    ],
+    "online-time-warp@8 s1": [
+      {
+        "fraction": 0.25,
+        "kind": "silence",
+        "pass": true
+      },
+      {
+        "fraction": 0.25,
+        "kind": "alternating",
+        "pass": true
+      },
+      {
+        "fraction": 0.5,
+        "kind": "silence",
+        "pass": true
+      },
+      {
+        "fraction": 0.5,
+        "kind": "alternating",
+        "pass": true
+      },
+      {
+        "fraction": 0.75,
+        "kind": "silence",
+        "pass": true
+      },
+      {
+        "fraction": 0.75,
+        "kind": "alternating",
+        "pass": true
+      }
+    ],
+    "online-time-warp@8 s2": [
+      {
+        "fraction": 0.25,
+        "kind": "silence",
+        "pass": true
+      },
+      {
+        "fraction": 0.25,
+        "kind": "alternating",
+        "pass": true
+      },
+      {
+        "fraction": 0.5,
+        "kind": "silence",
+        "pass": true
+      },
+      {
+        "fraction": 0.5,
+        "kind": "alternating",
+        "pass": true
+      },
+      {
+        "fraction": 0.75,
+        "kind": "silence",
+        "pass": true
+      },
+      {
+        "fraction": 0.75,
+        "kind": "alternating",
+        "pass": true
+      }
+    ],
+    "online-time-warp@12 s1": [
+      {
+        "fraction": 0.25,
+        "kind": "silence",
+        "pass": true
+      },
+      {
+        "fraction": 0.25,
+        "kind": "alternating",
+        "pass": true
+      },
+      {
+        "fraction": 0.5,
+        "kind": "silence",
+        "pass": true
+      },
+      {
+        "fraction": 0.5,
+        "kind": "alternating",
+        "pass": true
+      },
+      {
+        "fraction": 0.75,
+        "kind": "silence",
+        "pass": true
+      },
+      {
+        "fraction": 0.75,
+        "kind": "alternating",
+        "pass": true
+      }
+    ],
+    "online-time-warp@12 s2": [
+      {
+        "fraction": 0.25,
+        "kind": "silence",
+        "pass": true
+      },
+      {
+        "fraction": 0.25,
+        "kind": "alternating",
+        "pass": true
+      },
+      {
+        "fraction": 0.5,
+        "kind": "silence",
+        "pass": true
+      },
+      {
+        "fraction": 0.5,
+        "kind": "alternating",
+        "pass": true
+      },
+      {
+        "fraction": 0.75,
+        "kind": "silence",
+        "pass": true
+      },
+      {
+        "fraction": 0.75,
+        "kind": "alternating",
+        "pass": true
+      }
+    ],
+    "online-time-warp@14 s1": [
+      {
+        "fraction": 0.25,
+        "kind": "silence",
+        "pass": true
+      },
+      {
+        "fraction": 0.25,
+        "kind": "alternating",
+        "pass": true
+      },
+      {
+        "fraction": 0.5,
+        "kind": "silence",
+        "pass": true
+      },
+      {
+        "fraction": 0.5,
+        "kind": "alternating",
+        "pass": true
+      },
+      {
+        "fraction": 0.75,
+        "kind": "silence",
+        "pass": true
+      },
+      {
+        "fraction": 0.75,
+        "kind": "alternating",
+        "pass": true
+      }
+    ],
+    "online-time-warp@14 s2": [
+      {
+        "fraction": 0.25,
+        "kind": "silence",
+        "pass": true
+      },
+      {
+        "fraction": 0.25,
+        "kind": "alternating",
+        "pass": true
+      },
+      {
+        "fraction": 0.5,
+        "kind": "silence",
+        "pass": true
+      },
+      {
+        "fraction": 0.5,
+        "kind": "alternating",
+        "pass": true
+      },
+      {
+        "fraction": 0.75,
+        "kind": "silence",
+        "pass": true
+      },
+      {
+        "fraction": 0.75,
+        "kind": "alternating",
+        "pass": true
+      }
+    ]
+  },
+  "sourceHashes": {
+    "contracts/event-instruments-1.md": "a3606ed14b32a38204822dd3d12fbd04e095575a6f6e224d25279c55af550045",
+    "bench/oracle-events/oracle.json": "8c192851e571f26716b3bd878b6cd293fcabf7b99198de625b17b9e8cdfbe9aa",
+    "bench/src/events/label.ts": "a9a1950505454ded512c23bfeeb4092a2935bcb838f87b623202d30f06fcb706",
+    "bench/src/events/following.ts": "644ba7adc9b43be5ad96768fcaa2ed85e78a655e8f54a204f66a058a9b363353",
+    "bench/src/events/assessment.ts": "d8c76ce14523f2664d1c1e190f0a7a69814cd2bc7849cd383ecda1b440570ae0",
+    "bench/src/events/oracle.ts": "14e78b6823b533f2b490cfae6d1a6386701812015a334e6a0ddf1fc5b091bd41",
+    "bench/src/stages/stage1.ts": "041f0c026dc8eca4ce48e1edd6b1a261e2fbd6f83b231890211712dd92023358",
+    "bench/src/stages/run.ts": "4ca968bb7ca7693c4c54a034be345902023bce410bdc3b3b2aaa49843d32b95d",
+    "bench/src/seam/legacy.ts": "b833b6949b6e2b25fe0f2e6497f58a80513312951bc2459f58506f71ddd22688",
+    "bench/src/seam/runner.ts": "ad6171f1bded35442558bf81b1c3ad79a128eb11f5aa7c7f9bd38feadc04f2ac",
+    "bench/src/ladder/render.ts": "8fede73efbfd588ade8526752c4952fa99c58f80bee33fd88093b94e67f1bda3",
+    "bench/src/ladder/candidates.ts": "b86b40f7c50771669e25bd86c22d95896e0b6388a6758632ec94090ff908b554",
+    "bench/src/candidates/clockFollower.ts": "687cbaaed6323594761986370ade1e7c4262fcd02deb4930ba5a0c64c35df5b9",
+    "bench/src/candidates/onlineTimeWarp1.ts": "1f87dbf4ad65ae4ce7c48d8b05b751113e18948148267895a517dfc639f45356",
+    "bench/src/candidates/onlineTimeWarp2.ts": "b64d4adfe14d0d93cc9a32dc8a6d831b2b073efb7c6801eee4c8c94fe34f3c4b",
+    "bench/src/candidates/onlineTimeWarpConfigurable.ts": "312c29450533c289f6756fc4e985e3c6b8bed0ba858183e403a2c267000845c6",
+    "bench/src/candidates/onlineTimeWarp8.ts": "cef239ceec5844f48eb91b25618e5c4351dbccd1d162b5377b9683a5881721a5",
+    "bench/src/candidates/onlineTimeWarp12.ts": "0438d85c0a96d831e747da0cef72ced3d9e4e1015f2071cb7d683215753a9719",
+    "bench/src/candidates/onlineTimeWarp14.ts": "6a77d3038c68420f35988de9755268d5cf1fc597044a10ed2fdf7b8d06e39c7e",
+    "listen/liveView.ts": "dd318f593588cad27390d6008de3736dae3e0e03579473307903c8b49caf6ff4",
+    "listen/backend.ts": "d42ad1152a60cf32f9216088c8be43ae03e690215049aaabeb6aec2644229164",
+    "listen/validate.ts": "9c2c326cfd6cdded44033df4428aeb5dc4cc4cbae99bcf65fbcf8ccfd66a4606",
+    "listen/positions.ts": "2cd20b98683df8c45e0a063d3fb028b56c258fc5d693814c88ba08c4623f29c2"
+  }
+}

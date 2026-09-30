@@ -39,16 +39,24 @@ How to maintain it:
 ## Current state
 
 2026-09-30. [Development contract 2](contracts/development-contract-2.md) is in force.
-The listener now has two outputs: a live cursor judged on score events, and an
-end-of-piece assessment of tempo variation and every note. Progress starts on the
-simplest committed scores with one synth and perfect performances, then adds one
-deviation at a time. Nothing has run under this contract. Its evaluators do not exist
-yet, and there is no listener built for it: the clock and `online-time-warp@8`, `@12`
-and `@14` from the first series are frozen baselines, never to be developed. The next
-experiment is **022**, which builds the two evaluators and their oracle cases,
-renders stage 1 and measures the baselines.
+[Experiment 022](reports/022-event-instruments.md) built its instruments: the
+`performance-label@1` format, following-evaluator@2 and assessment-evaluator@1
+([event instruments 1](contracts/event-instruments-1.md)), which reproduce a
+hand-worked, frozen oracle exactly. Stage 1 is rendered and frozen as the private set
+`contract2-stage1-v1`. On it, the frozen clock and `online-time-warp@8`, `@12` and `@14`
+all fail by running ahead of a slow player, as the contract predicted; at the handed
+tempo they are indistinguishable from the clock. There is still no listener built for
+this contract.
 
-No plateau or budget carries over: contract 2 starts its own. Qualification under
+**Awaiting the user:** the [proposed numerical gates](reports/022-event-instruments.md#proposed-gates-awaiting-the-users-approval),
+and two definitional questions the oracle raised: whether bar flags compare against
+the overall tempo as the contract says, or against a typical tempo (case A3); and
+whether dead notes need their own verdict in the Studio vocabulary. The contract's gates
+stay placeholders until the user approves numbers. The next experiment is **023**, the
+first new listener on stage 1.
+
+No plateau: 022 developed no listener. [Report 022](reports/022-event-instruments.md#resulting-plateau-budgets-and-evidence-access)
+records the budget state. Qualification under
 [research contract 1](contracts/research-contract-1.md) is untouched, with zero frozen
 versions and zero assessments; its six version slots, twelve assessment slots and
 reserved and final access remain unused. Winner bars 5–8 remain unexamined.
@@ -78,6 +86,11 @@ Status is `holds`, `superseded` or `withdrawn`.
 
 | # | Finding | Evidence | Status | Since | Notes |
 |---|---|---|---|---|---|
+| 1 | following-evaluator@2 and assessment-evaluator@1 reproduce every number of the hand-worked event-oracle@1, which covers every rule named in contract 2, and the oracle catches deliberate evaluator faults | [Report 022](reports/022-event-instruments.md#the-instruments-against-their-oracle), [oracle](bench/oracle-events/README.md) | holds | 022 | The oracle was frozen before the evaluators existed |
+| 2 | On stage 1, the frozen time warpers' only failure is running ahead: at half speed all three reach events 0.15–0.9 s before they sound, and v12 and v14 are also ahead at 70% and 110% | [Report 022](reports/022-event-instruments.md#the-baselines-on-stage-1) | holds | 022 | Supports the contract's forward-only, tempo-clamped prediction; no deviation yet, so nothing about smoothing is concluded |
+| 3 | At the handed tempo, stage 1 cannot tell any listener from the clock: the sine audio is the time warpers' own reference, and their event timelines equal the clock's | [Report 022](reports/022-event-instruments.md#the-baselines-on-stage-1) | holds | 022 | The off-tempo examples carry stage 1 |
+| 4 | How a continuous position maps to an event decides a baseline's score: under a nearest-onset mapping the clock at the handed tempo falls from 100% to 55–60% on event | [Report 022](reports/022-event-instruments.md#the-baselines-on-stage-1) | holds | 022 | The scored rule (the last onset reached) was fixed before any run |
+| 5 | Under the contract's definition of variation, a single long hesitation in a short piece lowers the overall tempo enough that steady bars must be flagged fast | Oracle case A3, [report 022](reports/022-event-instruments.md#for-the-user-three-decisions-the-evidence-raises) | holds | 022 | A definitional question for the user, not a listener result |
 
 ## Open questions
 
@@ -86,10 +99,10 @@ given when a question opens and never reused.
 
 | Rank | Question | Why it is ranked here | Status | Owner item |
 |---|---|---|---|---|
-| 1 | Do following-evaluator@2 and assessment-evaluator@1 reproduce independently hand-worked oracle cases: hesitations, missing, wrong and dead notes, partial chords, extra notes, ambiguous events and the bad-sync case? | Nothing can be judged until the instruments are trusted | open | [Contract 2 order of work](contracts/development-contract-2.md#order-of-work), experiment 022 |
-| 2 | On stage 1, where do the clock and the frozen versions 8, 12 and 14 fail under the new measures, and do those failures show the forward-only, tempo-clamped design the contract predicts? | A new instrument that cannot see a known defect is wrong; the baselines also fix the floor | open | Experiment 022 |
-| 3 | Which numerical gates should the user approve, given the oracle cases and the baselines? | The contract's gates are placeholders until then | open | Experiment 022, then the user |
-| 4 | Can the simplest event-based live cursor and end-of-piece assessor pass stage 1? | The first listener built for contract 2 | open | Experiment 023 |
+| 4 | Can the simplest event-based live cursor and end-of-piece assessor pass stage 1? | The contract's next step; the instruments are trusted | open | [Contract 2 order of work](contracts/development-contract-2.md#order-of-work), experiment 023 |
+| 3 | Which numerical gates, flag reference tempo and dead-note verdict does the user approve? | Proposed in 022; widened to the two definitional questions the oracle raised. Nothing passes or fails a stage until approved | **awaiting the user** | [Report 022](reports/022-event-instruments.md#proposed-gates-awaiting-the-users-approval) |
+| 1 | Do following-evaluator@2 and assessment-evaluator@1 reproduce independently hand-worked oracle cases? | Answered: yes, exactly (finding 1) | answered | Experiment 022 |
+| 2 | On stage 1, where do the clock and the frozen versions 8, 12 and 14 fail, and do the failures show the forward-only, tempo-clamped design? | Answered: ahead of a slow player; indistinguishable at the handed tempo (findings 2–3) | answered | Experiment 022 |
 
 ## Superseded and stopped
 

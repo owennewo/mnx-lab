@@ -58,7 +58,14 @@ splits this bench three ways. Nothing frozen is edited: a change is a new module
 Their tests keep passing; the archived runs they read are under
 `../archive/ladder-1/runs/`.
 
-**New under contract 2.** following-evaluator@2, assessment-evaluator@1 and their
-oracle cases, the stage and deviation renderers, a new scoreboard, and new listeners.
-Put them in new folders rather than beside the frozen modules, so the split stays
-visible. Experiment 022 chooses the names.
+**New under contract 2.** Kept in new folders, so the split stays visible:
+
+- `src/events/`: the instruments of [event instruments 1](../contracts/event-instruments-1.md):
+  `label.ts` (performance-label@1 and the perfect-performance labeller),
+  `following.ts` (following-evaluator@2), `assessment.ts` (assessment-report@1 and
+  assessment-evaluator@1) and `oracle.ts` (reads the oracle's shorthand).
+- `oracle-events/`: event-oracle@1, hand-worked and frozen; `test/event-oracle.test.ts`
+  holds both evaluators to it.
+- `src/stages/`: `stage1.ts` renders and freezes stage 1; `run.ts` measures frozen
+  listeners on a frozen stage set. Deviation renderers, a scoreboard and new listeners
+  come later.

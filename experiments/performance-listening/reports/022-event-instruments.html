@@ -1,0 +1,3341 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>022 · Event instruments, stage 1 and the frozen baselines</title><style>body{margin:0;background:#f3f4ef;color:#21383c;font:16px/1.65 system-ui}main{max-width:1080px;margin:auto;padding:32px}article,details{background:white;border:1px solid #ccd8d1;border-radius:10px;padding:28px;margin:0 0 22px}h1{font-size:2.25rem;line-height:1.2}h2{margin-top:32px}a{color:#14616a}p,li{max-width:90ch}.table-wrap{overflow:auto}table{border-collapse:collapse;width:100%;font-size:.9rem}td,th{border:1px solid #ccd8d1;padding:10px;text-align:left}th{background:#edf3ee}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#f4f6f3;padding:16px;font-size:.8rem}code{overflow-wrap:anywhere;font-size:.86em}.banner{padding:18px;background:#f8edce;border-left:5px solid #ad782e}summary{cursor:pointer;font-weight:650}footer{font-size:.85rem}@media(max-width:650px){main{padding:12px}article,details{padding:18px}h1{font-size:1.8rem}}</style></head><body><main><article><div class="banner">Instruments trusted · every oracle number reproduced · every baseline fails stage 1 by running ahead · gates proposed, awaiting the user</div><p><a href="../archive/ladder-1/reports/021-stability-calibration.html">Experiment 021 (first series)</a></p><h1 id="summary-022-event-instruments-stage-1-and-the-frozen-baselines">022 — Event instruments, stage 1 and the frozen baselines</h1>
+<h2 id="summary-pre-registration">Pre-registration</h2>
+<p>2026-09-30. Designed and run by <strong>Claude Opus 5.5 (1M context) in Claude Code</strong>, terminal/TypeScript/tsx/Vitest. The first experiment under <a href="../contracts/development-contract-2.md">development contract 2</a>, scoped to its <a href="../contracts/development-contract-2.md#order-of-work">order of work</a>, step 1, and no further. It builds and checks instruments and measures baselines; it develops no listener. Landed before any evaluator code exists and before anything runs.</p>
+<h3 id="summary-question-and-why">Question and why</h3>
+<p>The research log&#39;s questions 1–3, which together are step 1:</p>
+<p>1. Do following-evaluator@2 and assessment-evaluator@1 reproduce independently    hand-worked oracle cases covering every rule of the contract? 2. On stage 1, where do the clock and the frozen <code>online-time-warp@8</code>, <code>@12</code> and <code>@14</code>    fail under the new measures, and do the failures show the forward-only,    tempo-clamped design the contract predicts? 3. Which numerical gates should the user approve?</p>
+<p>Nothing can be judged until the instruments are trusted (question 1), and an instrument that cannot see a known defect is wrong (question 2). The gates are placeholders until both are answered (question 3).</p>
+<p><strong>One experiment, not split.</strong> Stage 1 is eight clips of under a minute of audio in all, rendered with the existing sine renderer, and the baselines run unchanged through the existing legacy adapter, so rendering and measuring them is small beside the instruments. The pre-registered fallback: if the evaluators do not reproduce the frozen oracle (rule D1 below), nothing is rendered or run, question 1 is recorded as unresolved, and rendering and baselines become experiment 023&#39;s first part.</p>
+<h3 id="summary-what-is-defined-now-and-what-is-built-after">What is defined now, and what is built after</h3>
+<p>Landed with this pre-registration, before any code implements them:</p>
+<ul><li><a href="../contracts/event-instruments-1.md">`contracts/event-instruments-1.md`</a>: <code>performance-label@1</code> (the label format with exact truth), <code>following-evaluator@2</code>, <code>assessment-report@1</code> and <code>assessment-evaluator@1</code>, including the position-to-event rule for the legacy baselines.</li>
+<li><a href="../bench/oracle-events/README.md">`bench/oracle-events/`</a>: the hand-worked oracle, <strong>event-oracle@1</strong>, 11 following cases with 26 hand-placed records and 7 assessment cases with 18 report evaluations, each expected number worked by hand from the rules. Its SHA-256 is <code>8c192851e571f26716b3bd878b6cd293fcabf7b99198de625b17b9e8cdfbe9aa</code>. No listener&#39;s output was consulted; there is none under contract 2.</li></ul>
+<p>Built after this lands, in this order, each step only once the previous one holds:</p>
+<p>1. <code>bench/src/events/</code>: <code>label.ts</code> (types, validation, the perfect-performance    labeller), <code>following.ts</code>, <code>assessment.ts</code>, <code>oracle.ts</code> (the shorthand expander), and    a bench test that checks the oracle&#39;s frozen hash and requires both evaluators to    reproduce every expected number: seconds to 1e-9, tempi to 1e-6, counts exactly. 2. <code>bench/src/stages/stage1.ts</code>: renders and freezes stage 1, only after step 1 passes. 3. <code>bench/src/stages/run.ts</code>: the 022 runner, committed before run <code>g022-stage1-baselines</code>.</p>
+<p>No existing bench file is edited; the frozen evaluator, scoreboard, adapter and baselines are imported unchanged.</p>
+<h3 id="summary-stage-1">Stage 1</h3>
+<ul><li><strong>Scores</strong>: the committed <a href="../sources/s1-one-bar-c4-f4.mnx.json">one bar, C4–F4</a> and <a href="../sources/s2-two-bar-scale.mnx.json">two-bar scale</a>.</li>
+<li><strong>Sound</strong>: one sine synth, <code>mixSines</code> from <code>ladder/render.ts</code> unchanged: one sine per note, 10 ms linear attack and release, −12 dBFS peak, each note sounding its written length so consecutive notes abut. The clip ends when the last note does.</li>
+<li><strong>Performances</strong>: perfect, steady, handed <strong>90</strong> quarters per minute; played at <strong>45, 63, 90 and 99</strong> (50%, 70%, 100%, 110%): the beginner, intermediate and advanced ranges of the contract&#39;s categories, half speed included. 2 scores × 4 tempi = <strong>8 examples</strong>. No deviations and no negative controls: stage 1 is perfect performances, and deviations are stage 2.</li>
+<li><strong>Labels</strong>: generated by the perfect-performance labeller from Studio&#39;s compiled performance: events, note keys, sample-exact onsets and ends, every note matched, event-resolution segments with singleton admissible sets. It refuses a score with two consecutive events of identical pitches, because it implements no ambiguity rule.</li>
+<li><strong>Freezing</strong>: a new private set, <code>contract2-stage1-v1</code>, beside the old ones in <code>/home/williao/dev/mnx-listening-data/</code>: WAVs, labels and a manifest whose hash is recorded in <code>freeze.json</code>; it is never overwritten.</li></ul>
+<h3 id="summary-baselines-and-how-their-positions-map-to-events">Baselines and how their positions map to events</h3>
+<p><code>clock-follower@1</code>, <code>online-time-warp@8</code>, <code>@12</code> and <code>@14</code>, run unchanged through <code>seam/legacy.ts</code> with the registry&#39;s abilities (the clock the whole score, the others the first four measures), handed <code>{ from: top, parts: all, 90 per minute, rate 1 }</code> at 48 kHz in 480-sample chunks by <code>seam/runner.ts</code>. They emit continuous positions in quarters, which the adapter converts with Studio&#39;s <code>scorePositionAt</code>, holding a claim past the end at the final boundary.</p>
+<p><strong>The scored mapping</strong> is the contract&#39;s rule 1: a position shows the <strong>last event whose onset it has reached</strong>, comparing <code>(ordinal, metricOffset)</code>. So a cursor 0.01 quarter short of an onset is still on the previous event, and the final boundary shows the last event. Lag is forgiven up to D = 0.2 s by the grace rule; running ahead of an onset is not.</p>
+<p><strong>A diagnostic mapping</strong>, reported beside and never scored: each position is replaced by the event whose onset quarter is nearest to it (ties to the later event) before the same evaluation. It measures how much the choice of mapping, rather than the listener, decides a baseline&#39;s score.</p>
+<p>The baselines produce no assessment, so assessment-evaluator@1 is exercised only by its oracle. Causality is checked once per listener per score, on the example at the handed tempo, by <code>seamCausality</code> (six prefix checks). Cost is <code>executeSeam</code>&#39;s.</p>
+<h3 id="summary-predictions">Predictions</h3>
+<p>The clock&#39;s numbers follow from the definitions (it ignores the audio), so predictions 2–5 check the runner and evaluator together. The online time warpers&#39; are genuine predictions.</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="#, Prediction"><table><thead><tr><th scope="col">#</th><th scope="col">Prediction</th></tr></thead><tbody><tr><td>1</td><td>Both evaluators reproduce every number in event-oracle@1 without an erratum.</td></tr>
+<tr><td>2</td><td>Clock at 90: on event ≥ 99% of supported answerable time on both scores, ahead 0, by event 100%.</td></tr>
+<tr><td>3</td><td>Clock at 99: s1 on event 100%, by event 4/4; s2 behind 10–14% (the clock reaches events 4–7 more than 0.2 s late), by event 4/8.</td></tr>
+<tr><td>4</td><td>Clock at 63: ahead 42–52% on s1 and 70–78% on s2.</td></tr>
+<tr><td>5</td><td>Clock at 45: ahead 60–70% on s1 and 78–88% on s2.</td></tr>
+<tr><td>6</td><td>Each time warper at 90 and 99: on event ≥ 85%, ahead ≤ 5% on both scores. By event may miss event 0 during the 0.2 s warm-up.</td></tr>
+<tr><td>7</td><td>The contract&#39;s prediction: at 45, every time warper fails visibly on at least one score, with on event &lt; 80% from ahead time ≥ 10% or abstention ≥ 20%.</td></tr>
+<tr><td>8</td><td>At 45 and 63, every time warper has less ahead time than the clock on every example.</td></tr>
+<tr><td>9</td><td>Under the diagnostic nearest mapping, the clock at 90 is ahead ≥ 40% of the time on both scores: the mapping, not the listener, would decide its score.</td></tr>
+<tr><td>10</td><td>Every causality check passes; each listener&#39;s sustained cost ratio is ≤ 0.25.</td></tr></tbody></table></div>
+<p>Contradictions: any oracle number the evaluators cannot reproduce (1); a clock figure outside its derived range, which would point at the runner, adapter or evaluator rather than the clock (2–5); a time warper below 85% on event or above 5% ahead at 90 or 99 (6); every time warper at 45 with on event ≥ 90% and ahead ≤ 5% on both scores (contradicts 7 and the contract&#39;s expectation); the nearest mapping changing the clock&#39;s score at 90 by less than 10 points (9).</p>
+<h3 id="summary-decision-rules-fixed-now">Decision rules, fixed now</h3>
+<ul><li><strong>D1, the instruments.</strong> They are trusted if the bench test reproduces every oracle number. A disagreement is diagnosed. An evaluator defect is fixed in the evaluator. If the hand-work is wrong by the contract&#39;s own rules, the correction is a new oracle version (event-oracle@2) with the arithmetic and the rule shown, recorded in this report; an oracle number is never changed to match an evaluator&#39;s output. If a rule itself turns out ambiguous, the instruments contract gets a new version, and the change is recorded. If the evaluators still disagree after that, stop: question 1 is unresolved and nothing is rendered or run (the split above).</li>
+<li><strong>D2, stage 1 and the baselines</strong> are recorded whatever they show; no baseline is tuned, rerun with other settings or dropped. A refusal at <code>start</code> is a valid answer, recorded as a refusal. A crash or a failed prefix check is an infrastructure or causality finding: the failed attempt is preserved and diagnosed before any rerun, which is a new run ID.</li>
+<li><strong>D3, question 2.</strong> The new measures *see the known defect* if predictions 4 and 5 hold (the clock&#39;s ahead time at slow tempi). The contract&#39;s prediction about the forward-only, tempo-clamped path is *supported* if 7 holds, *contradicted* if every time warper at 45 has on event ≥ 90% and ahead ≤ 5% on both scores, and *mixed* otherwise, with the pattern recorded. Differences between v8 and v12/v14 are reported; stage 1 has no deviation, so no conclusion about smoothing is drawn from it.</li>
+<li><strong>D4, gates: proposed, never adopted.</strong> After the run, one number is proposed for each placeholder in the contract (and for θ), chosen so that (a) every oracle record meant to be correct passes, (b) every oracle record built to show a defect fails on the measure that shows it, (c) the clock fails stage 1 at 45 and 63, and (d) no value is moved to make a particular time warper pass or fail. The proposal goes in this report and is flagged in the research log as <strong>awaiting the user&#39;s approval</strong>. Nothing in the contract changes.</li>
+<li><strong>Inconclusive.</strong> Observations that fit no branch above are recorded as inconclusive, with no favourable branch invented afterwards.</li></ul>
+<h3 id="summary-carried-over-state-and-preflight">Carried-over state and preflight</h3>
+<ul><li><strong>Plateau and budgets.</strong> None carry over: the <a href="../RESEARCH_LOG.md#current-state">research log</a> records that contract 2 starts its own, and no experiment has run under it. Research contract 1&#39;s six version slots, twelve assessment slots and reserved and final access are unused; this experiment uses none of them. Winner bars 5–8 remain unexamined and are not touched.</li>
+<li><strong>Ownership.</strong> No other worktree or report claims 022; this one is <code>~/dev/mnx-labs-worktrees/listening-022</code>. Run IDs from 022 on land in <code>runs/</code>; none exists yet.</li>
+<li><strong>Access.</strong> <code>/home/williao/dev/mnx-listening-data/</code> is writable and holds the first series&#39; sets; the new set goes beside them. The stage-1 scores compile cleanly in Studio&#39;s performance model, with positions at barlines resolving to the next bar&#39;s start (checked by a read-only probe).</li></ul>
+<h2 id="summary-results">Results</h2>
+<p>Run <a href="../runs/g022-stage1-baselines/summary.json">`g022-stage1-baselines`</a> at commit <code>f80fc51e</code>, on the frozen set <code>contract2-stage1-v1</code> (SHA-256 <code>debf0174…</code>, 8 clips, 42.7 s of audio), in 30 s of wall time. The pre-registration above is unchanged.</p>
+<h3 id="summary-the-instruments-against-their-oracle">The instruments against their oracle</h3>
+<p>Both evaluators reproduced <strong>every number in event-oracle@1 on their first complete run, with no erratum</strong>: all 28 following records (every category&#39;s seconds, exposure, longest episode, by-event reach and each delay, recovery, extra notes, and hindsight) and all 18 assessment evaluations plus the 10 derived expected assessments (<code>bench/test/event-oracle.test.ts</code>, 57 checks, under a second). The pre-registration counted 26 following records; the frozen file holds 28, because the count missed case F10&#39;s two, which were in the file when it was frozen. The one failure before that was in the shorthand expander, not in an evaluator or the oracle: the oracle writes offsets such as <code>2/4</code>, and Studio&#39;s JSON form refuses unreduced fractions, so the expander now reduces them. To check that the test bites, two deliberate faults were introduced and removed: turning off the grace rule failed 23 checks, and charging an interval to the bar of its *starting* event failed 6. <code>bench/test/event-label.test.ts</code> checks the perfect-performance labeller (sample-exact onsets, singleton admissible sets, refusal of repeated identical events) and five kinds of inconsistent label.</p>
+<h3 id="summary-the-baselines-on-stage-1">The baselines on stage 1</h3>
+<p>On event and ahead are fractions of supported answerable time; by event is events reached within 0.2 s of sounding. Handed tempo 90 throughout.</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Listener, Played at, s1 on event, s1 ahead, s1 by event, s2 on event, s2 ahead, s2 by event"><table><thead><tr><th scope="col">Listener</th><th scope="col">Played at</th><th scope="col">s1 on event</th><th scope="col">s1 ahead</th><th scope="col">s1 by event</th><th scope="col">s2 on event</th><th scope="col">s2 ahead</th><th scope="col">s2 by event</th></tr></thead><tbody><tr><td>clock</td><td>45</td><td>35.3%</td><td>64.7%</td><td>3/4</td><td>17.3%</td><td>82.7%</td><td>3/8</td></tr>
+<tr><td>clock</td><td>63</td><td>52.8%</td><td>47.2%</td><td>4/4</td><td>25.7%</td><td>74.3%</td><td>4/8</td></tr>
+<tr><td>clock</td><td>90</td><td>100%</td><td>0</td><td>4/4</td><td>100%</td><td>0</td><td>8/8</td></tr>
+<tr><td>clock</td><td>99</td><td>100%</td><td>0</td><td>4/4</td><td>88.2% (behind 11.8%)</td><td>0</td><td>4/8</td></tr>
+<tr><td>v8</td><td>45</td><td>76.4%</td><td>23.6%</td><td>4/4</td><td>68.2%</td><td>31.8%</td><td>8/8</td></tr>
+<tr><td>v8</td><td>63</td><td>92.2%</td><td>7.8%</td><td>4/4</td><td>89.2%</td><td>10.8%</td><td>8/8</td></tr>
+<tr><td>v8</td><td>90</td><td>100%</td><td>0</td><td>4/4</td><td>100%</td><td>0</td><td>8/8</td></tr>
+<tr><td>v8</td><td>99</td><td>100%</td><td>0</td><td>4/4</td><td>96.1%</td><td>3.9%</td><td>8/8</td></tr>
+<tr><td>v12</td><td>45</td><td>63.0%</td><td>37.0%</td><td>4/4</td><td>60.8%</td><td>39.2%</td><td>8/8</td></tr>
+<tr><td>v12</td><td>63</td><td>71.6%</td><td>28.4%</td><td>4/4</td><td>66.1%</td><td>33.9%</td><td>8/8</td></tr>
+<tr><td>v12</td><td>90</td><td>100%</td><td>0</td><td>4/4</td><td>100%</td><td>0</td><td>8/8</td></tr>
+<tr><td>v12</td><td>99</td><td>95.0%</td><td>5.0%</td><td>4/4</td><td>92.0%</td><td>8.0%</td><td>8/8</td></tr>
+<tr><td>v14</td><td>45</td><td>61.8%</td><td>38.2%</td><td>4/4</td><td>64.6%</td><td>35.4%</td><td>8/8</td></tr>
+<tr><td>v14</td><td>63</td><td>71.1%</td><td>28.9%</td><td>4/4</td><td>67.0%</td><td>33.0%</td><td>8/8</td></tr>
+<tr><td>v14</td><td>90</td><td>100%</td><td>0</td><td>4/4</td><td>100%</td><td>0</td><td>8/8</td></tr>
+<tr><td>v14</td><td>99</td><td>95.0%</td><td>5.0%</td><td>4/4</td><td>93.9%</td><td>6.1%</td><td>8/8</td></tr></tbody></table></div>
+<p>No listener abstained or was silent in answerable time, and apart from the clock at 99 no time was behind: <strong>every failure is ahead time</strong>. The longest exposure episodes were the clock&#39;s (up to 8.0 s at 45), then v8&#39;s 0.92 s and v12/v14&#39;s 0.70 s at 45.</p>
+<p><strong>How early they move.</strong> The first moment each listener shows each event, against its onset (negative is early), from the private records:</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Listener, At 45 (s2), At 63 (s2), At 99 (s2)"><table><thead><tr><th scope="col">Listener</th><th scope="col">At 45 (s2)</th><th scope="col">At 63 (s2)</th><th scope="col">At 99 (s2)</th></tr></thead><tbody><tr><td>clock</td><td>−0.66 s growing to −4.66 s</td><td>−0.28 s growing to −2.0 s</td><td>+0.06 s growing to +0.43 s</td></tr>
+<tr><td>v8</td><td>−0.15 to −0.18 s on events 1, 2 and 5, −0.92 s on events 3, 4, 6 and 7</td><td>+0.02 s on most, about −0.53 s on events 3, 4 and 7</td><td>+0.01 s on most, −0.17 s on events 4 and 7</td></tr>
+<tr><td>v12</td><td>−0.54 to −0.70 s on every event</td><td>−0.28 to −0.38 s on every event</td><td>+0.05 s on event 1, −0.04 to −0.08 s after</td></tr>
+<tr><td>v14</td><td>−0.41 to −0.70 s on every event</td><td>−0.28 to −0.40 s on every event</td><td>+0.05 s on event 1, −0.02 to −0.07 s after</td></tr></tbody></table></div>
+<p>Every time warper shows the first event exactly 0.2 s after it sounds, the end of its ten-frame warm-up; that is just inside the 0.2 s deadline. At 90, every time warper&#39;s record gives the same event timeline as the clock&#39;s, because the audio is the very sine rendering it aligns against: <strong>at the handed tempo, stage 1 cannot tell listening from a clock</strong>.</p>
+<p><strong>The mapping.</strong> Under the diagnostic nearest-onset mapping, the clock at 90 falls from 100% to 59.9% (s1) and 55.1% (s2) on event, with 40.1% and 44.9% ahead, and every time warper at 90 falls identically. The scored rule decides the baselines&#39; scores; it was fixed before they ran.</p>
+<p><strong>Integrity and cost.</strong> No listener refused at start. The legacy adapter held the clock&#39;s claims past the end of the score at the final boundary (268 and 534 times at 45, 115 and 229 at 63); no time warper was clamped. All 48 prefix checks passed (six per listener per score). The largest sustained cost ratio was 0.12 (v12), the largest 99th-percentile chunk time 1.5 ms, with no backlog.</p>
+<h2 id="summary-against-the-predictions">Against the predictions</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-label="#, Verdict, Evidence"><table><thead><tr><th scope="col">#</th><th scope="col">Verdict</th><th scope="col">Evidence</th></tr></thead><tbody><tr><td>1</td><td><strong>Held</strong></td><td>Every oracle number reproduced; no erratum, no new instruments version.</td></tr>
+<tr><td>2</td><td><strong>Held</strong></td><td>Clock at 90: 100% on event, no ahead time, every event reached, both scores.</td></tr>
+<tr><td>3</td><td><strong>Held</strong></td><td>Clock at 99: s1 100%, 4/4; s2 behind 11.8%, 4/8.</td></tr>
+<tr><td>4</td><td><strong>Held</strong></td><td>Clock at 63: ahead 47.2% (s1) and 74.3% (s2).</td></tr>
+<tr><td>5</td><td><strong>Held</strong></td><td>Clock at 45: ahead 64.7% (s1) and 82.7% (s2).</td></tr>
+<tr><td>6</td><td><strong>Contradicted</strong> for v12 and v14, held for v8</td><td>At 99 on s2, v12 was ahead 8.0% and v14 6.1%, above the predicted 5%; on s1 both were 4.96%, just inside. v8 held: at least 96.1% on event and at most 3.9% ahead at 90 and 99.</td></tr>
+<tr><td>7</td><td><strong>Held</strong></td><td>At 45 every time warper was below 80% on event on both scores, from ahead time of 23.6–39.2%.</td></tr>
+<tr><td>8</td><td><strong>Held</strong></td><td>On all 12 slow-tempo pairings, every time warper had less ahead time than the clock.</td></tr>
+<tr><td>9</td><td><strong>Held</strong></td><td>Nearest mapping: the clock at 90 was ahead 40.1% and 44.9%.</td></tr>
+<tr><td>10</td><td><strong>Held</strong></td><td>All prefix checks passed; the largest sustained ratio was 0.12.</td></tr></tbody></table></div>
+<h2 id="summary-decision">Decision</h2>
+<ul><li><strong>D1:</strong> the instruments are <strong>trusted</strong>: following-evaluator@2 and assessment-evaluator@1 reproduce the frozen oracle, which covers every rule named in contract 2, and the oracle catches deliberate faults. Question 1 is answered.</li>
+<li><strong>D2:</strong> the baselines are recorded as they ran; none was tuned, rerun or dropped.</li>
+<li><strong>D3:</strong> the new measures <strong>see the known defect</strong>: the clock&#39;s ahead time at 63 and 45 is what the definitions predict (predictions 4 and 5). The contract&#39;s prediction about the forward-only, tempo-clamped path is <strong>supported</strong> (prediction 7): at half speed every time warper runs ahead of the player, by 0.15–0.9 s. On stage 1, v12 and v14 ran ahead of v8 at 63 and 99. That is recorded, not concluded from, since stage 1 has no deviation. Question 2 is answered.</li>
+<li><strong>D4:</strong> gates are proposed below and <strong>not adopted</strong>. Question 3 now waits for the user.</li></ul>
+<h3 id="summary-proposed-gates-awaiting-the-user-s-approval">Proposed gates, awaiting the user&#39;s approval</h3>
+<p>Each value was checked against rules (a)–(d) of D4. Every oracle record meant to be correct passes. Every record built to show a defect fails, on the measure that shows it. The clock fails stage 1 at 45 and 63. No value was moved for a time warper.</p>
+<p><strong>The live cursor, on every example of a stage:</strong></p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Measure, Proposed, Placeholder, What in the oracle needs it"><table><thead><tr><th scope="col">Measure</th><th scope="col">Proposed</th><th scope="col">Placeholder</th><th scope="col">What in the oracle needs it</th></tr></thead><tbody><tr><td>On event, of supported answerable time</td><td>≥ 95%</td><td>95%</td><td>F6-B (an extra note moves it early) reaches 94.9%</td></tr>
+<tr><td>Ahead</td><td>≤ 1%</td><td>1%</td><td>F9 with a too-narrow sync band gives 1.9%, F6-B 5.1%; a correct cursor gives 0</td></tr>
+<tr><td>Exposure, of answerable time</td><td>≤ 5%</td><td>5%</td><td>F6-B 5.1%</td></tr>
+<tr><td>Longest exposure episode</td><td>≤ 0.5 s</td><td>0.5 s</td><td>F2-C 1.0 s, F3-C 0.9 s</td></tr>
+<tr><td>By event, reached within 0.2 s</td><td>≥ 95%, so every event on an example with fewer than 20</td><td>95%</td><td>F3-D and F4-C (late after a distinguishing event) and F7-B (late live, right in hindsight) pass every time measure and fail only here</td></tr>
+<tr><td>Causality, sustained cost ratio, chunk p99</td><td>every check; ≤ 0.25; ≤ 10 ms</td><td>contract 1&#39;s</td><td></td></tr></tbody></table></div>
+<p><strong>Pooled over each stage</strong> rather than per example, because a one-deviation example holds one such case: <strong>recovery after a missing event ≥ 90%</strong> (placeholder 90%) and, proposed new, <strong>extra notes held ≥ 90%</strong>.</p>
+<p><strong>The assessment:</strong> per example, <strong>overall tempo within ±5%</strong>, <strong>every expected interval reported and within ±10%</strong> (placeholders ±5% and ±10%; &quot;every interval reported&quot; is new, because A5-B otherwise passes having skipped two), and <strong>every score note assessed</strong> (new, from A1-C). Pooled over each stage, for each kind of finding (slow and fast flags, missing, wrong and dead notes): <strong>≥ 90% found and false alarms ≤ 5% of negatives</strong> (placeholders). On an eight-note example, one false alarm is 12.5%, so the happy path must be clean. <strong>θ = 0.10</strong>, with the optional band from θ/2, is proposed as defined.</p>
+<p>Under this proposal the oracle&#39;s correct records all pass and each defect record fails. On stage 1, no baseline passes, even on the cursor gates alone (none makes an assessment). The clock meets the cursor gates on three examples: both at 90 and s1 at 99. v8 meets them on the same three, and v12 and v14 only on the two at 90.</p>
+<h3 id="summary-for-the-user-three-decisions-the-evidence-raises">For the user: three decisions the evidence raises</h3>
+<p>1. <strong>The gates above.</strong> 2. <strong>What &quot;the player&#39;s own tempo&quot; is for flags.</strong> Oracle case A3 applies the    contract&#39;s definition to a 3 s hesitation in two bars. The overall tempo falls to 42,    so the steady first bar reads <strong>fast</strong> (ratio 1.43) as well as the second <strong>slow</strong>. A    report that says only &quot;slowed in bar 2&quot; misses a required flag. If the user meant    variation relative to the player&#39;s typical tempo, the reference could be the median    local tempo, which is 60 here. That would be a new version of the instruments and a    change to the contract, so it is the user&#39;s call. 3. <strong>Dead notes in the Studio vocabulary.</strong> Vocabulary 2 has no <code>dead</code> verdict, so    assessment-report@1 reads a <code>substitution</code> with no heard pitch as dead. A distinct    verdict would be a vocabulary change for SEAM part 2.</p>
+<h3 id="summary-resulting-plateau-budgets-and-evidence-access">Resulting plateau, budgets and evidence access</h3>
+<p>No plateau: this experiment built instruments and developed no listener. Under contract 2, one experiment has run. Research contract 1&#39;s version and assessment slots and its reserved and final access remain unused. Winner bars 5–8 remain unexamined. The new private set <code>contract2-stage1-v1</code> is development evidence, now examined by the four frozen baselines.</p>
+<h2 id="summary-next">Next</h2>
+<p>Advice, not a rule. Experiment 023 is the contract&#39;s step 2: research event-based following first (score followers with explicit stay and skip transitions), then build the simplest live cursor and end-of-piece assessor that pass stage 1, judged under the gates the user approves. Three things this run suggests:</p>
+<ul><li>A listener that moves only on evidence of an onset never runs ahead. Every baseline failure on stage 1 was ahead time, so that is the cheapest thing to get right.</li>
+<li>The 0.2 s grace forgives lag and the first event&#39;s deadline is tight: the time warpers&#39; ten-frame warm-up lands exactly on it.</li>
+<li>Stage 1 at the handed tempo cannot tell a listener from a clock; the off-tempo examples carry stage 1.</li></ul>
+<h2 id="summary-attribution">Attribution</h2>
+<p>Designed, run and recorded by Claude Opus 5.5 (1M context) in Claude Code.</p></article><details><summary>g022-stage1-baselines — complete aggregate evidence</summary><pre>{
+  &quot;id&quot;: &quot;g022-stage1-baselines&quot;,
+  &quot;kind&quot;: &quot;stage-baselines&quot;,
+  &quot;policy&quot;: &quot;development-contract-2&quot;,
+  &quot;preregistration&quot;: &quot;reports/022-event-instruments.md&quot;,
+  &quot;gitCommit&quot;: &quot;f80fc51e47c41a6aba88fed4afe021b50ba340bc&quot;,
+  &quot;evaluators&quot;: {
+    &quot;following&quot;: &quot;following-evaluator@2&quot;,
+    &quot;assessment&quot;: &quot;assessment-evaluator@1 (oracle only: the baselines emit no assessment)&quot;
+  },
+  &quot;mapping&quot;: &quot;Scored: rule 1 of following-evaluator@2, the last event whose onset a position has reached. diagnosticNearest: the nearest onset, never scored.&quot;,
+  &quot;oracle&quot;: {
+    &quot;sha256&quot;: &quot;8c192851e571f26716b3bd878b6cd293fcabf7b99198de625b17b9e8cdfbe9aa&quot;
+  },
+  &quot;set&quot;: {
+    &quot;id&quot;: &quot;contract2-stage1-v1&quot;,
+    &quot;dir&quot;: &quot;/home/williao/dev/mnx-listening-data/contract2-stage1-v1&quot;,
+    &quot;sha256&quot;: &quot;debf0174e41e7b6ee5803b5f7b07a1f8fa5da6384fc4c42a48ab8780931d48c5&quot;,
+    &quot;handedQuartersPerMinute&quot;: 90,
+    &quot;examples&quot;: [
+      {
+        &quot;id&quot;: &quot;s1-45&quot;,
+        &quot;tempo&quot;: 45,
+        &quot;duration&quot;: 5.333333333333333,
+        &quot;audioSha256&quot;: &quot;747c5575947ebe8dbc3671c75162e19e35c8bf2d9c1c793d85e262534bf771d8&quot;
+      },
+      {
+        &quot;id&quot;: &quot;s1-63&quot;,
+        &quot;tempo&quot;: 63,
+        &quot;duration&quot;: 3.8095208333333335,
+        &quot;audioSha256&quot;: &quot;9aeb9696f05137f02470b00828d293311b12147b7b5ca308f3bf5dd3ff09175e&quot;
+      },
+      {
+        &quot;id&quot;: &quot;s1-90&quot;,
+        &quot;tempo&quot;: 90,
+        &quot;duration&quot;: 2.6666666666666665,
+        &quot;audioSha256&quot;: &quot;10d93860f390c2d3c3fef4cab11acdad2e46ae882d8f4444c8e1b1608d7055f1&quot;
+      },
+      {
+        &quot;id&quot;: &quot;s1-99&quot;,
+        &quot;tempo&quot;: 99,
+        &quot;duration&quot;: 2.42425,
+        &quot;audioSha256&quot;: &quot;a365d01c9d3fa00b3e1ff590e01f0a276076c8b6e3dbaab5c8ece8f2f932565b&quot;
+      },
+      {
+        &quot;id&quot;: &quot;s2-45&quot;,
+        &quot;tempo&quot;: 45,
+        &quot;duration&quot;: 10.666666666666666,
+        &quot;audioSha256&quot;: &quot;46f7be873c66d8a5b2b7d585937156292fd6681689458411914bf51e6166e676&quot;
+      },
+      {
+        &quot;id&quot;: &quot;s2-63&quot;,
+        &quot;tempo&quot;: 63,
+        &quot;duration&quot;: 7.619041666666667,
+        &quot;audioSha256&quot;: &quot;b2cb92486212c6a2f1debe8ae6a4fb4b0760cfcf9437c1f8cae86b624edbe761&quot;
+      },
+      {
+        &quot;id&quot;: &quot;s2-90&quot;,
+        &quot;tempo&quot;: 90,
+        &quot;duration&quot;: 5.333333333333333,
+        &quot;audioSha256&quot;: &quot;0758e7793bff3c891a2b8ca8f45268595f5023f447e7b971f12496d3aa708e3c&quot;
+      },
+      {
+        &quot;id&quot;: &quot;s2-99&quot;,
+        &quot;tempo&quot;: 99,
+        &quot;duration&quot;: 4.8484791666666665,
+        &quot;audioSha256&quot;: &quot;1298ac6971f28265b626d810bb13de4ed12695f946192e9a3c0635ff133f1277&quot;
+      }
+    ]
+  },
+  &quot;delivery&quot;: {
+    &quot;sampleRate&quot;: 48000,
+    &quot;chunkSamples&quot;: 480
+  },
+  &quot;listeners&quot;: [
+    &quot;clock-follower@1&quot;,
+    &quot;online-time-warp@8&quot;,
+    &quot;online-time-warp@12&quot;,
+    &quot;online-time-warp@14&quot;
+  ],
+  &quot;results&quot;: {
+    &quot;clock-follower@1&quot;: {
+      &quot;s1-45&quot;: {
+        &quot;started&quot;: {
+          &quot;ok&quot;: true
+        },
+        &quot;legacy&quot;: {
+          &quot;clamped&quot;: 268,
+          &quot;droppedNotes&quot;: 0
+        },
+        &quot;cost&quot;: {
+          &quot;machine&quot;: {
+            &quot;hostname&quot;: &quot;williao-G3-3579&quot;,
+            &quot;cpu&quot;: &quot;Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz&quot;,
+            &quot;cores&quot;: 12,
+            &quot;platform&quot;: &quot;linux&quot;,
+            &quot;arch&quot;: &quot;x64&quot;,
+            &quot;node&quot;: &quot;v22.22.1&quot;
+          },
+          &quot;sampleRate&quot;: 48000,
+          &quot;chunkSamples&quot;: 480,
+          &quot;chunks&quot;: 534,
+          &quot;audioSeconds&quot;: 5.333333333333333,
+          &quot;initializationMs&quot;: 1.418063,
+          &quot;finishMs&quot;: 0.070306,
+          &quot;meanMs&quot;: 0.02106912,
+          &quot;p95Ms&quot;: 0.030616,
+          &quot;p99Ms&quot;: 0.061776,
+          &quot;sustainedRatio&quot;: 0.002388615,
+          &quot;maxBacklogMs&quot;: 0,
+          &quot;provisional&quot;: true
+        },
+        &quot;following&quot;: {
+          &quot;onEvent&quot;: 0.3525974025974026,
+          &quot;ahead&quot;: 0.6474025974025973,
+          &quot;seconds&quot;: {
+            &quot;onEvent&quot;: 1.8099999999999998,
+            &quot;ahead&quot;: 3.323333333333333,
+            &quot;behind&quot;: 0,
+            &quot;abstained&quot;: 0,
+            &quot;uncovered&quot;: 0,
+            &quot;falseFollowing&quot;: 0,
+            &quot;correctRejection&quot;: 0,
+            &quot;pending&quot;: 0.2,
+            &quot;indeterminate&quot;: 0,
+            &quot;answerable&quot;: 5.133333333333333,
+            &quot;supportedAnswerable&quot;: 5.133333333333333
+          },
+          &quot;hindsightOnEvent&quot;: 0.3525974025974026,
+          &quot;exposure&quot;: {
+            &quot;seconds&quot;: 3.323333333333333,
+            &quot;fraction&quot;: 0.6474025974025973,
+            &quot;longest&quot;: 2.6599999999999997
+          },
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 3,
+            &quot;of&quot;: 4,
+            &quot;delays&quot;: [
+              0.01,
+              0,
+              null,
+              0
+            ]
+          },
+          &quot;recovery&quot;: {
+            &quot;recovered&quot;: 0,
+            &quot;of&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          },
+          &quot;extras&quot;: {
+            &quot;held&quot;: 0,
+            &quot;moved&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          }
+        },
+        &quot;diagnosticNearest&quot;: {
+          &quot;onEvent&quot;: 0.287012987012987,
+          &quot;ahead&quot;: 0.712987012987013,
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 2,
+            &quot;of&quot;: 4
+          }
+        },
+        &quot;record&quot;: {
+          &quot;path&quot;: &quot;/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/clock-follower-1.s1-45.json&quot;,
+          &quot;sha256&quot;: &quot;44db94249458bdb12bd11da343d31cbcacb7d29ab89616daacce9e6773e33162&quot;,
+          &quot;decisions&quot;: 534
+        }
+      },
+      &quot;s1-63&quot;: {
+        &quot;started&quot;: {
+          &quot;ok&quot;: true
+        },
+        &quot;legacy&quot;: {
+          &quot;clamped&quot;: 115,
+          &quot;droppedNotes&quot;: 0
+        },
+        &quot;cost&quot;: {
+          &quot;machine&quot;: {
+            &quot;hostname&quot;: &quot;williao-G3-3579&quot;,
+            &quot;cpu&quot;: &quot;Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz&quot;,
+            &quot;cores&quot;: 12,
+            &quot;platform&quot;: &quot;linux&quot;,
+            &quot;arch&quot;: &quot;x64&quot;,
+            &quot;node&quot;: &quot;v22.22.1&quot;
+          },
+          &quot;sampleRate&quot;: 48000,
+          &quot;chunkSamples&quot;: 480,
+          &quot;chunks&quot;: 381,
+          &quot;audioSeconds&quot;: 3.8095208333333335,
+          &quot;initializationMs&quot;: 0.968062,
+          &quot;finishMs&quot;: 0.003028,
+          &quot;meanMs&quot;: 0.017467785,
+          &quot;p95Ms&quot;: 0.021278,
+          &quot;p99Ms&quot;: 0.031165,
+          &quot;sustainedRatio&quot;: 0.00200191,
+          &quot;maxBacklogMs&quot;: 0,
+          &quot;provisional&quot;: true
+        },
+        &quot;following&quot;: {
+          &quot;onEvent&quot;: 0.5278343732143579,
+          &quot;ahead&quot;: 0.47216562678564217,
+          &quot;seconds&quot;: {
+            &quot;onEvent&quot;: 1.9052291666666668,
+            &quot;ahead&quot;: 1.7042916666666668,
+            &quot;behind&quot;: 0,
+            &quot;abstained&quot;: 0,
+            &quot;uncovered&quot;: 0,
+            &quot;falseFollowing&quot;: 0,
+            &quot;correctRejection&quot;: 0,
+            &quot;pending&quot;: 0.2,
+            &quot;indeterminate&quot;: 0,
+            &quot;answerable&quot;: 3.6095208333333333,
+            &quot;supportedAnswerable&quot;: 3.6095208333333333
+          },
+          &quot;hindsightOnEvent&quot;: 0.5278343732143579,
+          &quot;exposure&quot;: {
+            &quot;seconds&quot;: 1.7042916666666668,
+            &quot;fraction&quot;: 0.47216562678564217,
+            &quot;longest&quot;: 0.8571458333333335
+          },
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 4,
+            &quot;of&quot;: 4,
+            &quot;delays&quot;: [
+              0.01,
+              0,
+              0,
+              0
+            ]
+          },
+          &quot;recovery&quot;: {
+            &quot;recovered&quot;: 0,
+            &quot;of&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          },
+          &quot;extras&quot;: {
+            &quot;held&quot;: 0,
+            &quot;moved&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          }
+        },
+        &quot;diagnosticNearest&quot;: {
+          &quot;onEvent&quot;: 0.31583139497971224,
+          &quot;ahead&quot;: 0.6841686050202878,
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 3,
+            &quot;of&quot;: 4
+          }
+        },
+        &quot;record&quot;: {
+          &quot;path&quot;: &quot;/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/clock-follower-1.s1-63.json&quot;,
+          &quot;sha256&quot;: &quot;522fc000a45b3e8f4d286062b395605bc12cd2421c6797f491ab53f2122478ae&quot;,
+          &quot;decisions&quot;: 381
+        }
+      },
+      &quot;s1-90&quot;: {
+        &quot;started&quot;: {
+          &quot;ok&quot;: true
+        },
+        &quot;legacy&quot;: {
+          &quot;clamped&quot;: 0,
+          &quot;droppedNotes&quot;: 0
+        },
+        &quot;cost&quot;: {
+          &quot;machine&quot;: {
+            &quot;hostname&quot;: &quot;williao-G3-3579&quot;,
+            &quot;cpu&quot;: &quot;Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz&quot;,
+            &quot;cores&quot;: 12,
+            &quot;platform&quot;: &quot;linux&quot;,
+            &quot;arch&quot;: &quot;x64&quot;,
+            &quot;node&quot;: &quot;v22.22.1&quot;
+          },
+          &quot;sampleRate&quot;: 48000,
+          &quot;chunkSamples&quot;: 480,
+          &quot;chunks&quot;: 267,
+          &quot;audioSeconds&quot;: 2.6666666666666665,
+          &quot;initializationMs&quot;: 0.582944,
+          &quot;finishMs&quot;: 0.002013,
+          &quot;meanMs&quot;: 0.019481262,
+          &quot;p95Ms&quot;: 0.021768,
+          &quot;p99Ms&quot;: 0.0308,
+          &quot;sustainedRatio&quot;: 0.00216992,
+          &quot;maxBacklogMs&quot;: 0,
+          &quot;provisional&quot;: true
+        },
+        &quot;following&quot;: {
+          &quot;onEvent&quot;: 1,
+          &quot;ahead&quot;: 0,
+          &quot;seconds&quot;: {
+            &quot;onEvent&quot;: 2.4666666666666663,
+            &quot;ahead&quot;: 0,
+            &quot;behind&quot;: 0,
+            &quot;abstained&quot;: 0,
+            &quot;uncovered&quot;: 0,
+            &quot;falseFollowing&quot;: 0,
+            &quot;correctRejection&quot;: 0,
+            &quot;pending&quot;: 0.2,
+            &quot;indeterminate&quot;: 0,
+            &quot;answerable&quot;: 2.4666666666666663,
+            &quot;supportedAnswerable&quot;: 2.4666666666666663
+          },
+          &quot;hindsightOnEvent&quot;: 1,
+          &quot;exposure&quot;: {
+            &quot;seconds&quot;: 0,
+            &quot;fraction&quot;: 0,
+            &quot;longest&quot;: 0
+          },
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 4,
+            &quot;of&quot;: 4,
+            &quot;delays&quot;: [
+              0.01,
+              0.0033333333333334103,
+              0.006666666666666821,
+              0
+            ]
+          },
+          &quot;recovery&quot;: {
+            &quot;recovered&quot;: 0,
+            &quot;of&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          },
+          &quot;extras&quot;: {
+            &quot;held&quot;: 0,
+            &quot;moved&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          }
+        },
+        &quot;diagnosticNearest&quot;: {
+          &quot;onEvent&quot;: 0.5986486486486486,
+          &quot;ahead&quot;: 0.4013513513513514,
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 4,
+            &quot;of&quot;: 4
+          }
+        },
+        &quot;record&quot;: {
+          &quot;path&quot;: &quot;/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/clock-follower-1.s1-90.json&quot;,
+          &quot;sha256&quot;: &quot;185ecacafde021ab82c0b1783c0f5943eec6e97beec6c259e4fbd03668980dff&quot;,
+          &quot;decisions&quot;: 267
+        }
+      },
+      &quot;s1-99&quot;: {
+        &quot;started&quot;: {
+          &quot;ok&quot;: true
+        },
+        &quot;legacy&quot;: {
+          &quot;clamped&quot;: 0,
+          &quot;droppedNotes&quot;: 0
+        },
+        &quot;cost&quot;: {
+          &quot;machine&quot;: {
+            &quot;hostname&quot;: &quot;williao-G3-3579&quot;,
+            &quot;cpu&quot;: &quot;Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz&quot;,
+            &quot;cores&quot;: 12,
+            &quot;platform&quot;: &quot;linux&quot;,
+            &quot;arch&quot;: &quot;x64&quot;,
+            &quot;node&quot;: &quot;v22.22.1&quot;
+          },
+          &quot;sampleRate&quot;: 48000,
+          &quot;chunkSamples&quot;: 480,
+          &quot;chunks&quot;: 243,
+          &quot;audioSeconds&quot;: 2.42425,
+          &quot;initializationMs&quot;: 0.306238,
+          &quot;finishMs&quot;: 0.004568,
+          &quot;meanMs&quot;: 0.015028379,
+          &quot;p95Ms&quot;: 0.022584,
+          &quot;p99Ms&quot;: 0.038396,
+          &quot;sustainedRatio&quot;: 0.001634609,
+          &quot;maxBacklogMs&quot;: 0,
+          &quot;provisional&quot;: true
+        },
+        &quot;following&quot;: {
+          &quot;onEvent&quot;: 1,
+          &quot;ahead&quot;: 0,
+          &quot;seconds&quot;: {
+            &quot;onEvent&quot;: 2.2242499999999996,
+            &quot;ahead&quot;: 0,
+            &quot;behind&quot;: 0,
+            &quot;abstained&quot;: 0,
+            &quot;uncovered&quot;: 0,
+            &quot;falseFollowing&quot;: 0,
+            &quot;correctRejection&quot;: 0,
+            &quot;pending&quot;: 0.2,
+            &quot;indeterminate&quot;: 0,
+            &quot;answerable&quot;: 2.2242499999999996,
+            &quot;supportedAnswerable&quot;: 2.2242499999999996
+          },
+          &quot;hindsightOnEvent&quot;: 1,
+          &quot;exposure&quot;: {
+            &quot;seconds&quot;: 0,
+            &quot;fraction&quot;: 0,
+            &quot;longest&quot;: 0
+          },
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 4,
+            &quot;of&quot;: 4,
+            &quot;delays&quot;: [
+              0.01,
+              0.06393750000000009,
+              0.12787500000000018,
+              0.18181249999999993
+            ]
+          },
+          &quot;recovery&quot;: {
+            &quot;recovered&quot;: 0,
+            &quot;of&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          },
+          &quot;extras&quot;: {
+            &quot;held&quot;: 0,
+            &quot;moved&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          }
+        },
+        &quot;diagnosticNearest&quot;: {
+          &quot;onEvent&quot;: 0.7183882207485669,
+          &quot;ahead&quot;: 0.28161177925143305,
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 4,
+            &quot;of&quot;: 4
+          }
+        },
+        &quot;record&quot;: {
+          &quot;path&quot;: &quot;/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/clock-follower-1.s1-99.json&quot;,
+          &quot;sha256&quot;: &quot;ee7c8cd376c6ffcc10a8b93d61f3c35925c927b9d60d0f24fb4a9b28a5db6eb5&quot;,
+          &quot;decisions&quot;: 243
+        }
+      },
+      &quot;s2-45&quot;: {
+        &quot;started&quot;: {
+          &quot;ok&quot;: true
+        },
+        &quot;legacy&quot;: {
+          &quot;clamped&quot;: 534,
+          &quot;droppedNotes&quot;: 0
+        },
+        &quot;cost&quot;: {
+          &quot;machine&quot;: {
+            &quot;hostname&quot;: &quot;williao-G3-3579&quot;,
+            &quot;cpu&quot;: &quot;Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz&quot;,
+            &quot;cores&quot;: 12,
+            &quot;platform&quot;: &quot;linux&quot;,
+            &quot;arch&quot;: &quot;x64&quot;,
+            &quot;node&quot;: &quot;v22.22.1&quot;
+          },
+          &quot;sampleRate&quot;: 48000,
+          &quot;chunkSamples&quot;: 480,
+          &quot;chunks&quot;: 1067,
+          &quot;audioSeconds&quot;: 10.666666666666666,
+          &quot;initializationMs&quot;: 0.715089,
+          &quot;finishMs&quot;: 0.001656,
+          &quot;meanMs&quot;: 0.008215107,
+          &quot;p95Ms&quot;: 0.009501,
+          &quot;p99Ms&quot;: 0.015727,
+          &quot;sustainedRatio&quot;: 0.000888962,
+          &quot;maxBacklogMs&quot;: 0,
+          &quot;provisional&quot;: true
+        },
+        &quot;following&quot;: {
+          &quot;onEvent&quot;: 0.1729299363057324,
+          &quot;ahead&quot;: 0.8270700636942675,
+          &quot;seconds&quot;: {
+            &quot;onEvent&quot;: 1.809999999999999,
+            &quot;ahead&quot;: 8.656666666666666,
+            &quot;behind&quot;: 0,
+            &quot;abstained&quot;: 0,
+            &quot;uncovered&quot;: 0,
+            &quot;falseFollowing&quot;: 0,
+            &quot;correctRejection&quot;: 0,
+            &quot;pending&quot;: 0.2,
+            &quot;indeterminate&quot;: 0,
+            &quot;answerable&quot;: 10.466666666666667,
+            &quot;supportedAnswerable&quot;: 10.466666666666667
+          },
+          &quot;hindsightOnEvent&quot;: 0.1729299363057324,
+          &quot;exposure&quot;: {
+            &quot;seconds&quot;: 8.656666666666666,
+            &quot;fraction&quot;: 0.8270700636942675,
+            &quot;longest&quot;: 7.993333333333334
+          },
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 3,
+            &quot;of&quot;: 8,
+            &quot;delays&quot;: [
+              0.01,
+              0,
+              null,
+              null,
+              null,
+              null,
+              null,
+              0
+            ]
+          },
+          &quot;recovery&quot;: {
+            &quot;recovered&quot;: 0,
+            &quot;of&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          },
+          &quot;extras&quot;: {
+            &quot;held&quot;: 0,
+            &quot;moved&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          }
+        },
+        &quot;diagnosticNearest&quot;: {
+          &quot;onEvent&quot;: 0.14076433121019097,
+          &quot;ahead&quot;: 0.859235668789809,
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 2,
+            &quot;of&quot;: 8
+          }
+        },
+        &quot;record&quot;: {
+          &quot;path&quot;: &quot;/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/clock-follower-1.s2-45.json&quot;,
+          &quot;sha256&quot;: &quot;98c1ced6f9d9f4935810375ed8b48ab030afb459c53863bf420949750b4eafec&quot;,
+          &quot;decisions&quot;: 1067
+        }
+      },
+      &quot;s2-63&quot;: {
+        &quot;started&quot;: {
+          &quot;ok&quot;: true
+        },
+        &quot;legacy&quot;: {
+          &quot;clamped&quot;: 229,
+          &quot;droppedNotes&quot;: 0
+        },
+        &quot;cost&quot;: {
+          &quot;machine&quot;: {
+            &quot;hostname&quot;: &quot;williao-G3-3579&quot;,
+            &quot;cpu&quot;: &quot;Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz&quot;,
+            &quot;cores&quot;: 12,
+            &quot;platform&quot;: &quot;linux&quot;,
+            &quot;arch&quot;: &quot;x64&quot;,
+            &quot;node&quot;: &quot;v22.22.1&quot;
+          },
+          &quot;sampleRate&quot;: 48000,
+          &quot;chunkSamples&quot;: 480,
+          &quot;chunks&quot;: 762,
+          &quot;audioSeconds&quot;: 7.619041666666667,
+          &quot;initializationMs&quot;: 0.485815,
+          &quot;finishMs&quot;: 0.001481,
+          &quot;meanMs&quot;: 0.008065444,
+          &quot;p95Ms&quot;: 0.009597,
+          &quot;p99Ms&quot;: 0.01784,
+          &quot;sustainedRatio&quot;: 0.000870603,
+          &quot;maxBacklogMs&quot;: 0,
+          &quot;provisional&quot;: true
+        },
+        &quot;following&quot;: {
+          &quot;onEvent&quot;: 0.25680259692121066,
+          &quot;ahead&quot;: 0.7431974030787893,
+          &quot;seconds&quot;: {
+            &quot;onEvent&quot;: 1.9052291666666668,
+            &quot;ahead&quot;: 5.5138125,
+            &quot;behind&quot;: 0,
+            &quot;abstained&quot;: 0,
+            &quot;uncovered&quot;: 0,
+            &quot;falseFollowing&quot;: 0,
+            &quot;correctRejection&quot;: 0,
+            &quot;pending&quot;: 0.2,
+            &quot;indeterminate&quot;: 0,
+            &quot;answerable&quot;: 7.419041666666667,
+            &quot;supportedAnswerable&quot;: 7.419041666666667
+          },
+          &quot;hindsightOnEvent&quot;: 0.25680259692121066,
+          &quot;exposure&quot;: {
+            &quot;seconds&quot;: 5.5138125,
+            &quot;fraction&quot;: 0.7431974030787893,
+            &quot;longest&quot;: 4.666666666666667
+          },
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 4,
+            &quot;of&quot;: 8,
+            &quot;delays&quot;: [
+              0.01,
+              0,
+              0,
+              null,
+              null,
+              null,
+              null,
+              0
+            ]
+          },
+          &quot;recovery&quot;: {
+            &quot;recovered&quot;: 0,
+            &quot;of&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          },
+          &quot;extras&quot;: {
+            &quot;held&quot;: 0,
+            &quot;moved&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          }
+        },
+        &quot;diagnosticNearest&quot;: {
+          &quot;onEvent&quot;: 0.15365865986734586,
+          &quot;ahead&quot;: 0.846341340132654,
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 3,
+            &quot;of&quot;: 8
+          }
+        },
+        &quot;record&quot;: {
+          &quot;path&quot;: &quot;/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/clock-follower-1.s2-63.json&quot;,
+          &quot;sha256&quot;: &quot;a3b08b954a84c4bcd2711c3f18b8c124c1dfb5120d092e9d63657bdd5901704f&quot;,
+          &quot;decisions&quot;: 762
+        }
+      },
+      &quot;s2-90&quot;: {
+        &quot;started&quot;: {
+          &quot;ok&quot;: true
+        },
+        &quot;legacy&quot;: {
+          &quot;clamped&quot;: 0,
+          &quot;droppedNotes&quot;: 0
+        },
+        &quot;cost&quot;: {
+          &quot;machine&quot;: {
+            &quot;hostname&quot;: &quot;williao-G3-3579&quot;,
+            &quot;cpu&quot;: &quot;Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz&quot;,
+            &quot;cores&quot;: 12,
+            &quot;platform&quot;: &quot;linux&quot;,
+            &quot;arch&quot;: &quot;x64&quot;,
+            &quot;node&quot;: &quot;v22.22.1&quot;
+          },
+          &quot;sampleRate&quot;: 48000,
+          &quot;chunkSamples&quot;: 480,
+          &quot;chunks&quot;: 534,
+          &quot;audioSeconds&quot;: 5.333333333333333,
+          &quot;initializationMs&quot;: 0.636948,
+          &quot;finishMs&quot;: 0.001347,
+          &quot;meanMs&quot;: 0.008840399,
+          &quot;p95Ms&quot;: 0.012402,
+          &quot;p99Ms&quot;: 0.01775,
+          &quot;sustainedRatio&quot;: 0.001004825,
+          &quot;maxBacklogMs&quot;: 0,
+          &quot;provisional&quot;: true
+        },
+        &quot;following&quot;: {
+          &quot;onEvent&quot;: 1,
+          &quot;ahead&quot;: 0,
+          &quot;seconds&quot;: {
+            &quot;onEvent&quot;: 5.133333333333333,
+            &quot;ahead&quot;: 0,
+            &quot;behind&quot;: 0,
+            &quot;abstained&quot;: 0,
+            &quot;uncovered&quot;: 0,
+            &quot;falseFollowing&quot;: 0,
+            &quot;correctRejection&quot;: 0,
+            &quot;pending&quot;: 0.2,
+            &quot;indeterminate&quot;: 0,
+            &quot;answerable&quot;: 5.133333333333333,
+            &quot;supportedAnswerable&quot;: 5.133333333333333
+          },
+          &quot;hindsightOnEvent&quot;: 1,
+          &quot;exposure&quot;: {
+            &quot;seconds&quot;: 0,
+            &quot;fraction&quot;: 0,
+            &quot;longest&quot;: 0
+          },
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 8,
+            &quot;of&quot;: 8,
+            &quot;delays&quot;: [
+              0.01,
+              0.0033333333333334103,
+              0.006666666666666821,
+              0,
+              0.0033333333333334103,
+              0.0066666666666663765,
+              0,
+              0.0033333333333329662
+            ]
+          },
+          &quot;recovery&quot;: {
+            &quot;recovered&quot;: 0,
+            &quot;of&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          },
+          &quot;extras&quot;: {
+            &quot;held&quot;: 0,
+            &quot;moved&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          }
+        },
+        &quot;diagnosticNearest&quot;: {
+          &quot;onEvent&quot;: 0.5506493506493505,
+          &quot;ahead&quot;: 0.44935064935064956,
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 8,
+            &quot;of&quot;: 8
+          }
+        },
+        &quot;record&quot;: {
+          &quot;path&quot;: &quot;/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/clock-follower-1.s2-90.json&quot;,
+          &quot;sha256&quot;: &quot;6ad81b20896f80164442746e6acc79bda4ccbe5db1b58e33be615594fcfce813&quot;,
+          &quot;decisions&quot;: 534
+        }
+      },
+      &quot;s2-99&quot;: {
+        &quot;started&quot;: {
+          &quot;ok&quot;: true
+        },
+        &quot;legacy&quot;: {
+          &quot;clamped&quot;: 0,
+          &quot;droppedNotes&quot;: 0
+        },
+        &quot;cost&quot;: {
+          &quot;machine&quot;: {
+            &quot;hostname&quot;: &quot;williao-G3-3579&quot;,
+            &quot;cpu&quot;: &quot;Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz&quot;,
+            &quot;cores&quot;: 12,
+            &quot;platform&quot;: &quot;linux&quot;,
+            &quot;arch&quot;: &quot;x64&quot;,
+            &quot;node&quot;: &quot;v22.22.1&quot;
+          },
+          &quot;sampleRate&quot;: 48000,
+          &quot;chunkSamples&quot;: 480,
+          &quot;chunks&quot;: 485,
+          &quot;audioSeconds&quot;: 4.8484791666666665,
+          &quot;initializationMs&quot;: 0.41149,
+          &quot;finishMs&quot;: 0.001186,
+          &quot;meanMs&quot;: 0.009640664,
+          &quot;p95Ms&quot;: 0.011949,
+          &quot;p99Ms&quot;: 0.017792,
+          &quot;sustainedRatio&quot;: 0.001049483,
+          &quot;maxBacklogMs&quot;: 0,
+          &quot;provisional&quot;: true
+        },
+        &quot;following&quot;: {
+          &quot;onEvent&quot;: 0.8823988132319264,
+          &quot;ahead&quot;: 0,
+          &quot;seconds&quot;: {
+            &quot;onEvent&quot;: 4.1018125,
+            &quot;ahead&quot;: 0,
+            &quot;behind&quot;: 0.5466666666666664,
+            &quot;abstained&quot;: 0,
+            &quot;uncovered&quot;: 0,
+            &quot;falseFollowing&quot;: 0,
+            &quot;correctRejection&quot;: 0,
+            &quot;pending&quot;: 0.2,
+            &quot;indeterminate&quot;: 0,
+            &quot;answerable&quot;: 4.648479166666666,
+            &quot;supportedAnswerable&quot;: 4.648479166666666
+          },
+          &quot;hindsightOnEvent&quot;: 0.8823988132319264,
+          &quot;exposure&quot;: {
+            &quot;seconds&quot;: 0.5466666666666664,
+            &quot;fraction&quot;: 0.11760118676807374,
+            &quot;longest&quot;: 0.22758333333333347
+          },
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 4,
+            &quot;of&quot;: 8,
+            &quot;delays&quot;: [
+              0.01,
+              0.06393750000000009,
+              0.12787500000000018,
+              0.18181249999999993,
+              0.24575000000000014,
+              0.3096874999999999,
+              0.36364583333333345,
+              0.42758333333333365
+            ]
+          },
+          &quot;recovery&quot;: {
+            &quot;recovered&quot;: 0,
+            &quot;of&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          },
+          &quot;extras&quot;: {
+            &quot;held&quot;: 0,
+            &quot;moved&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          }
+        },
+        &quot;diagnosticNearest&quot;: {
+          &quot;onEvent&quot;: 0.8406064707543238,
+          &quot;ahead&quot;: 0.1593935292456762,
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 8,
+            &quot;of&quot;: 8
+          }
+        },
+        &quot;record&quot;: {
+          &quot;path&quot;: &quot;/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/clock-follower-1.s2-99.json&quot;,
+          &quot;sha256&quot;: &quot;6c4b66de97025f2c882479b6c7243bf8524e0eb402d9bd93b284733fd3f0ca67&quot;,
+          &quot;decisions&quot;: 485
+        }
+      }
+    },
+    &quot;online-time-warp@8&quot;: {
+      &quot;s1-45&quot;: {
+        &quot;started&quot;: {
+          &quot;ok&quot;: true
+        },
+        &quot;legacy&quot;: {
+          &quot;clamped&quot;: 0,
+          &quot;droppedNotes&quot;: 0
+        },
+        &quot;cost&quot;: {
+          &quot;machine&quot;: {
+            &quot;hostname&quot;: &quot;williao-G3-3579&quot;,
+            &quot;cpu&quot;: &quot;Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz&quot;,
+            &quot;cores&quot;: 12,
+            &quot;platform&quot;: &quot;linux&quot;,
+            &quot;arch&quot;: &quot;x64&quot;,
+            &quot;node&quot;: &quot;v22.22.1&quot;
+          },
+          &quot;sampleRate&quot;: 48000,
+          &quot;chunkSamples&quot;: 480,
+          &quot;chunks&quot;: 534,
+          &quot;audioSeconds&quot;: 5.333333333333333,
+          &quot;initializationMs&quot;: 171.154142,
+          &quot;finishMs&quot;: 0.090268,
+          &quot;meanMs&quot;: 0.51936588,
+          &quot;p95Ms&quot;: 1.156159,
+          &quot;p99Ms&quot;: 1.32058,
+          &quot;sustainedRatio&quot;: 0.084109836,
+          &quot;maxBacklogMs&quot;: 0,
+          &quot;provisional&quot;: true
+        },
+        &quot;following&quot;: {
+          &quot;onEvent&quot;: 0.7642857142857143,
+          &quot;ahead&quot;: 0.23571428571428568,
+          &quot;seconds&quot;: {
+            &quot;onEvent&quot;: 3.9233333333333333,
+            &quot;ahead&quot;: 1.2099999999999997,
+            &quot;behind&quot;: 0,
+            &quot;abstained&quot;: 0,
+            &quot;uncovered&quot;: 0,
+            &quot;falseFollowing&quot;: 0,
+            &quot;correctRejection&quot;: 0,
+            &quot;pending&quot;: 0.2,
+            &quot;indeterminate&quot;: 0,
+            &quot;answerable&quot;: 5.133333333333333,
+            &quot;supportedAnswerable&quot;: 5.133333333333333
+          },
+          &quot;hindsightOnEvent&quot;: 0.7642857142857143,
+          &quot;exposure&quot;: {
+            &quot;seconds&quot;: 1.2099999999999997,
+            &quot;fraction&quot;: 0.23571428571428568,
+            &quot;longest&quot;: 0.9199999999999999
+          },
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 4,
+            &quot;of&quot;: 4,
+            &quot;delays&quot;: [
+              0.2,
+              0,
+              0,
+              0
+            ]
+          },
+          &quot;recovery&quot;: {
+            &quot;recovered&quot;: 0,
+            &quot;of&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          },
+          &quot;extras&quot;: {
+            &quot;held&quot;: 0,
+            &quot;moved&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          }
+        },
+        &quot;diagnosticNearest&quot;: {
+          &quot;onEvent&quot;: 0.38441558441558443,
+          &quot;ahead&quot;: 0.6155844155844156,
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 4,
+            &quot;of&quot;: 4
+          }
+        },
+        &quot;record&quot;: {
+          &quot;path&quot;: &quot;/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/online-time-warp-8.s1-45.json&quot;,
+          &quot;sha256&quot;: &quot;d74c3045e4eae330d54c629362c1972a1ceef1ae70d4fe17dcc3da475829c93a&quot;,
+          &quot;decisions&quot;: 534
+        }
+      },
+      &quot;s1-63&quot;: {
+        &quot;started&quot;: {
+          &quot;ok&quot;: true
+        },
+        &quot;legacy&quot;: {
+          &quot;clamped&quot;: 0,
+          &quot;droppedNotes&quot;: 0
+        },
+        &quot;cost&quot;: {
+          &quot;machine&quot;: {
+            &quot;hostname&quot;: &quot;williao-G3-3579&quot;,
+            &quot;cpu&quot;: &quot;Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz&quot;,
+            &quot;cores&quot;: 12,
+            &quot;platform&quot;: &quot;linux&quot;,
+            &quot;arch&quot;: &quot;x64&quot;,
+            &quot;node&quot;: &quot;v22.22.1&quot;
+          },
+          &quot;sampleRate&quot;: 48000,
+          &quot;chunkSamples&quot;: 480,
+          &quot;chunks&quot;: 381,
+          &quot;audioSeconds&quot;: 3.8095208333333335,
+          &quot;initializationMs&quot;: 144.471012,
+          &quot;finishMs&quot;: 0.002973,
+          &quot;meanMs&quot;: 0.512184759,
+          &quot;p95Ms&quot;: 1.127855,
+          &quot;p99Ms&quot;: 1.37248,
+          &quot;sustainedRatio&quot;: 0.089149369,
+          &quot;maxBacklogMs&quot;: 0,
+          &quot;provisional&quot;: true
+        },
+        &quot;following&quot;: {
+          &quot;onEvent&quot;: 0.9224273766716495,
+          &quot;ahead&quot;: 0.07757262332835044,
+          &quot;seconds&quot;: {
+            &quot;onEvent&quot;: 3.329520833333333,
+            &quot;ahead&quot;: 0.28000000000000025,
+            &quot;behind&quot;: 0,
+            &quot;abstained&quot;: 0,
+            &quot;uncovered&quot;: 0,
+            &quot;falseFollowing&quot;: 0,
+            &quot;correctRejection&quot;: 0,
+            &quot;pending&quot;: 0.2,
+            &quot;indeterminate&quot;: 0,
+            &quot;answerable&quot;: 3.6095208333333333,
+            &quot;supportedAnswerable&quot;: 3.6095208333333333
+          },
+          &quot;hindsightOnEvent&quot;: 0.9224273766716495,
+          &quot;exposure&quot;: {
+            &quot;seconds&quot;: 0.28000000000000025,
+            &quot;fraction&quot;: 0.07757262332835044,
+            &quot;longest&quot;: 0.28000000000000025
+          },
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 4,
+            &quot;of&quot;: 4,
+            &quot;delays&quot;: [
+              0.2,
+              0.017625000000000002,
+              0.015229166666666627,
+              0.00285416666666638
+            ]
+          },
+          &quot;recovery&quot;: {
+            &quot;recovered&quot;: 0,
+            &quot;of&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          },
+          &quot;extras&quot;: {
+            &quot;held&quot;: 0,
+            &quot;moved&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          }
+        },
+        &quot;diagnosticNearest&quot;: {
+          &quot;onEvent&quot;: 0.44195039738654146,
+          &quot;ahead&quot;: 0.5580496026134587,
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 4,
+            &quot;of&quot;: 4
+          }
+        },
+        &quot;record&quot;: {
+          &quot;path&quot;: &quot;/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/online-time-warp-8.s1-63.json&quot;,
+          &quot;sha256&quot;: &quot;82f3e3ceb8de226d0023bfe32d4ca7dc8e74676f8c64035325c1623290e821a8&quot;,
+          &quot;decisions&quot;: 381
+        }
+      },
+      &quot;s1-90&quot;: {
+        &quot;started&quot;: {
+          &quot;ok&quot;: true
+        },
+        &quot;legacy&quot;: {
+          &quot;clamped&quot;: 0,
+          &quot;droppedNotes&quot;: 0
+        },
+        &quot;cost&quot;: {
+          &quot;machine&quot;: {
+            &quot;hostname&quot;: &quot;williao-G3-3579&quot;,
+            &quot;cpu&quot;: &quot;Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz&quot;,
+            &quot;cores&quot;: 12,
+            &quot;platform&quot;: &quot;linux&quot;,
+            &quot;arch&quot;: &quot;x64&quot;,
+            &quot;node&quot;: &quot;v22.22.1&quot;
+          },
+          &quot;sampleRate&quot;: 48000,
+          &quot;chunkSamples&quot;: 480,
+          &quot;chunks&quot;: 267,
+          &quot;audioSeconds&quot;: 2.6666666666666665,
+          &quot;initializationMs&quot;: 142.668988,
+          &quot;finishMs&quot;: 0.003043,
+          &quot;meanMs&quot;: 0.502268217,
+          &quot;p95Ms&quot;: 1.003526,
+          &quot;p99Ms&quot;: 1.313289,
+          &quot;sustainedRatio&quot;: 0.103791617,
+          &quot;maxBacklogMs&quot;: 0,
+          &quot;provisional&quot;: true
+        },
+        &quot;following&quot;: {
+          &quot;onEvent&quot;: 1,
+          &quot;ahead&quot;: 0,
+          &quot;seconds&quot;: {
+            &quot;onEvent&quot;: 2.4666666666666663,
+            &quot;ahead&quot;: 0,
+            &quot;behind&quot;: 0,
+            &quot;abstained&quot;: 0,
+            &quot;uncovered&quot;: 0,
+            &quot;falseFollowing&quot;: 0,
+            &quot;correctRejection&quot;: 0,
+            &quot;pending&quot;: 0.2,
+            &quot;indeterminate&quot;: 0,
+            &quot;answerable&quot;: 2.4666666666666663,
+            &quot;supportedAnswerable&quot;: 2.4666666666666663
+          },
+          &quot;hindsightOnEvent&quot;: 1,
+          &quot;exposure&quot;: {
+            &quot;seconds&quot;: 0,
+            &quot;fraction&quot;: 0,
+            &quot;longest&quot;: 0
+          },
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 4,
+            &quot;of&quot;: 4,
+            &quot;delays&quot;: [
+              0.2,
+              0.0033333333333334103,
+              0.006666666666666821,
+              0
+            ]
+          },
+          &quot;recovery&quot;: {
+            &quot;recovered&quot;: 0,
+            &quot;of&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          },
+          &quot;extras&quot;: {
+            &quot;held&quot;: 0,
+            &quot;moved&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          }
+        },
+        &quot;diagnosticNearest&quot;: {
+          &quot;onEvent&quot;: 0.5986486486486486,
+          &quot;ahead&quot;: 0.4013513513513514,
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 4,
+            &quot;of&quot;: 4
+          }
+        },
+        &quot;record&quot;: {
+          &quot;path&quot;: &quot;/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/online-time-warp-8.s1-90.json&quot;,
+          &quot;sha256&quot;: &quot;83ac1a1d9ce1e0589c89d39424bd7c12f7b0204e2f8cd99403fa7fa0f84d76f7&quot;,
+          &quot;decisions&quot;: 267
+        }
+      },
+      &quot;s1-99&quot;: {
+        &quot;started&quot;: {
+          &quot;ok&quot;: true
+        },
+        &quot;legacy&quot;: {
+          &quot;clamped&quot;: 0,
+          &quot;droppedNotes&quot;: 0
+        },
+        &quot;cost&quot;: {
+          &quot;machine&quot;: {
+            &quot;hostname&quot;: &quot;williao-G3-3579&quot;,
+            &quot;cpu&quot;: &quot;Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz&quot;,
+            &quot;cores&quot;: 12,
+            &quot;platform&quot;: &quot;linux&quot;,
+            &quot;arch&quot;: &quot;x64&quot;,
+            &quot;node&quot;: &quot;v22.22.1&quot;
+          },
+          &quot;sampleRate&quot;: 48000,
+          &quot;chunkSamples&quot;: 480,
+          &quot;chunks&quot;: 243,
+          &quot;audioSeconds&quot;: 2.42425,
+          &quot;initializationMs&quot;: 143.837153,
+          &quot;finishMs&quot;: 0.0088,
+          &quot;meanMs&quot;: 0.493580572,
+          &quot;p95Ms&quot;: 1.004959,
+          &quot;p99Ms&quot;: 1.236101,
+          &quot;sustainedRatio&quot;: 0.108811398,
+          &quot;maxBacklogMs&quot;: 0,
+          &quot;provisional&quot;: true
+        },
+        &quot;following&quot;: {
+          &quot;onEvent&quot;: 1,
+          &quot;ahead&quot;: 0,
+          &quot;seconds&quot;: {
+            &quot;onEvent&quot;: 2.2242499999999996,
+            &quot;ahead&quot;: 0,
+            &quot;behind&quot;: 0,
+            &quot;abstained&quot;: 0,
+            &quot;uncovered&quot;: 0,
+            &quot;falseFollowing&quot;: 0,
+            &quot;correctRejection&quot;: 0,
+            &quot;pending&quot;: 0.2,
+            &quot;indeterminate&quot;: 0,
+            &quot;answerable&quot;: 2.2242499999999996,
+            &quot;supportedAnswerable&quot;: 2.2242499999999996
+          },
+          &quot;hindsightOnEvent&quot;: 1,
+          &quot;exposure&quot;: {
+            &quot;seconds&quot;: 0,
+            &quot;fraction&quot;: 0,
+            &quot;longest&quot;: 0
+          },
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 4,
+            &quot;of&quot;: 4,
+            &quot;delays&quot;: [
+              0.2,
+              0.003937500000000038,
+              0.007875000000000076,
+              0.0018124999999999947
+            ]
+          },
+          &quot;recovery&quot;: {
+            &quot;recovered&quot;: 0,
+            &quot;of&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          },
+          &quot;extras&quot;: {
+            &quot;held&quot;: 0,
+            &quot;moved&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          }
+        },
+        &quot;diagnosticNearest&quot;: {
+          &quot;onEvent&quot;: 0.5655277059683039,
+          &quot;ahead&quot;: 0.4344722940316961,
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 4,
+            &quot;of&quot;: 4
+          }
+        },
+        &quot;record&quot;: {
+          &quot;path&quot;: &quot;/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/online-time-warp-8.s1-99.json&quot;,
+          &quot;sha256&quot;: &quot;d5aeb1c792f0c73670009baa2be955107ee6c5bd04070085dbeb87358b6f085f&quot;,
+          &quot;decisions&quot;: 243
+        }
+      },
+      &quot;s2-45&quot;: {
+        &quot;started&quot;: {
+          &quot;ok&quot;: true
+        },
+        &quot;legacy&quot;: {
+          &quot;clamped&quot;: 0,
+          &quot;droppedNotes&quot;: 0
+        },
+        &quot;cost&quot;: {
+          &quot;machine&quot;: {
+            &quot;hostname&quot;: &quot;williao-G3-3579&quot;,
+            &quot;cpu&quot;: &quot;Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz&quot;,
+            &quot;cores&quot;: 12,
+            &quot;platform&quot;: &quot;linux&quot;,
+            &quot;arch&quot;: &quot;x64&quot;,
+            &quot;node&quot;: &quot;v22.22.1&quot;
+          },
+          &quot;sampleRate&quot;: 48000,
+          &quot;chunkSamples&quot;: 480,
+          &quot;chunks&quot;: 1067,
+          &quot;audioSeconds&quot;: 10.666666666666666,
+          &quot;initializationMs&quot;: 298.248119,
+          &quot;finishMs&quot;: 0.015149,
+          &quot;meanMs&quot;: 0.571406203,
+          &quot;p95Ms&quot;: 1.270641,
+          &quot;p99Ms&quot;: 1.478802,
+          &quot;sustainedRatio&quot;: 0.085120658,
+          &quot;maxBacklogMs&quot;: 0,
+          &quot;provisional&quot;: true
+        },
+        &quot;following&quot;: {
+          &quot;onEvent&quot;: 0.6824840764331213,
+          &quot;ahead&quot;: 0.3175159235668787,
+          &quot;seconds&quot;: {
+            &quot;onEvent&quot;: 7.143333333333336,
+            &quot;ahead&quot;: 3.3233333333333306,
+            &quot;behind&quot;: 0,
+            &quot;abstained&quot;: 0,
+            &quot;uncovered&quot;: 0,
+            &quot;falseFollowing&quot;: 0,
+            &quot;correctRejection&quot;: 0,
+            &quot;pending&quot;: 0.2,
+            &quot;indeterminate&quot;: 0,
+            &quot;answerable&quot;: 10.466666666666667,
+            &quot;supportedAnswerable&quot;: 10.466666666666667
+          },
+          &quot;hindsightOnEvent&quot;: 0.6824840764331213,
+          &quot;exposure&quot;: {
+            &quot;seconds&quot;: 3.3233333333333306,
+            &quot;fraction&quot;: 0.3175159235668787,
+            &quot;longest&quot;: 0.9199999999999999
+          },
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 8,
+            &quot;of&quot;: 8,
+            &quot;delays&quot;: [
+              0.2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          &quot;recovery&quot;: {
+            &quot;recovered&quot;: 0,
+            &quot;of&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          },
+          &quot;extras&quot;: {
+            &quot;held&quot;: 0,
+            &quot;moved&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          }
+        },
+        &quot;diagnosticNearest&quot;: {
+          &quot;onEvent&quot;: 0.28216560509554134,
+          &quot;ahead&quot;: 0.7178343949044587,
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 8,
+            &quot;of&quot;: 8
+          }
+        },
+        &quot;record&quot;: {
+          &quot;path&quot;: &quot;/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/online-time-warp-8.s2-45.json&quot;,
+          &quot;sha256&quot;: &quot;99a83eb08c1e8d0c2a0f778b032d7ef26a895db122185104ff0f554115f20c9a&quot;,
+          &quot;decisions&quot;: 1067
+        }
+      },
+      &quot;s2-63&quot;: {
+        &quot;started&quot;: {
+          &quot;ok&quot;: true
+        },
+        &quot;legacy&quot;: {
+          &quot;clamped&quot;: 0,
+          &quot;droppedNotes&quot;: 0
+        },
+        &quot;cost&quot;: {
+          &quot;machine&quot;: {
+            &quot;hostname&quot;: &quot;williao-G3-3579&quot;,
+            &quot;cpu&quot;: &quot;Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz&quot;,
+            &quot;cores&quot;: 12,
+            &quot;platform&quot;: &quot;linux&quot;,
+            &quot;arch&quot;: &quot;x64&quot;,
+            &quot;node&quot;: &quot;v22.22.1&quot;
+          },
+          &quot;sampleRate&quot;: 48000,
+          &quot;chunkSamples&quot;: 480,
+          &quot;chunks&quot;: 762,
+          &quot;audioSeconds&quot;: 7.619041666666667,
+          &quot;initializationMs&quot;: 297.370002,
+          &quot;finishMs&quot;: 0.00376,
+          &quot;meanMs&quot;: 0.562501748,
+          &quot;p95Ms&quot;: 1.230512,
+          &quot;p99Ms&quot;: 1.36205,
+          &quot;sustainedRatio&quot;: 0.095287587,
+          &quot;maxBacklogMs&quot;: 0,
+          &quot;provisional&quot;: true
+        },
+        &quot;following&quot;: {
+          &quot;onEvent&quot;: 0.8921693614965994,
+          &quot;ahead&quot;: 0.10783063850340058,
+          &quot;seconds&quot;: {
+            &quot;onEvent&quot;: 6.619041666666667,
+            &quot;ahead&quot;: 0.7999999999999998,
+            &quot;behind&quot;: 0,
+            &quot;abstained&quot;: 0,
+            &quot;uncovered&quot;: 0,
+            &quot;falseFollowing&quot;: 0,
+            &quot;correctRejection&quot;: 0,
+            &quot;pending&quot;: 0.2,
+            &quot;indeterminate&quot;: 0,
+            &quot;answerable&quot;: 7.419041666666667,
+            &quot;supportedAnswerable&quot;: 7.419041666666667
+          },
+          &quot;hindsightOnEvent&quot;: 0.8921693614965994,
+          &quot;exposure&quot;: {
+            &quot;seconds&quot;: 0.7999999999999998,
+            &quot;fraction&quot;: 0.10783063850340058,
+            &quot;longest&quot;: 0.28000000000000025
+          },
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 8,
+            &quot;of&quot;: 8,
+            &quot;delays&quot;: [
+              0.2,
+              0.017625000000000002,
+              0.015229166666666627,
+              0.00285416666666638,
+              0.00047916666666658614,
+              0.018104166666667254,
+              0.00570833333333276,
+              0.0033333333333329662
+            ]
+          },
+          &quot;recovery&quot;: {
+            &quot;recovered&quot;: 0,
+            &quot;of&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          },
+          &quot;extras&quot;: {
+            &quot;held&quot;: 0,
+            &quot;moved&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          }
+        },
+        &quot;diagnosticNearest&quot;: {
+          &quot;onEvent&quot;: 0.35346546330669393,
+          &quot;ahead&quot;: 0.6465345366933062,
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 8,
+            &quot;of&quot;: 8
+          }
+        },
+        &quot;record&quot;: {
+          &quot;path&quot;: &quot;/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/online-time-warp-8.s2-63.json&quot;,
+          &quot;sha256&quot;: &quot;206779d5faf8bf6caeae73564bc05de80b806b97f9ff5f53a292693a32491a9b&quot;,
+          &quot;decisions&quot;: 762
+        }
+      },
+      &quot;s2-90&quot;: {
+        &quot;started&quot;: {
+          &quot;ok&quot;: true
+        },
+        &quot;legacy&quot;: {
+          &quot;clamped&quot;: 0,
+          &quot;droppedNotes&quot;: 0
+        },
+        &quot;cost&quot;: {
+          &quot;machine&quot;: {
+            &quot;hostname&quot;: &quot;williao-G3-3579&quot;,
+            &quot;cpu&quot;: &quot;Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz&quot;,
+            &quot;cores&quot;: 12,
+            &quot;platform&quot;: &quot;linux&quot;,
+            &quot;arch&quot;: &quot;x64&quot;,
+            &quot;node&quot;: &quot;v22.22.1&quot;
+          },
+          &quot;sampleRate&quot;: 48000,
+          &quot;chunkSamples&quot;: 480,
+          &quot;chunks&quot;: 534,
+          &quot;audioSeconds&quot;: 5.333333333333333,
+          &quot;initializationMs&quot;: 299.997382,
+          &quot;finishMs&quot;: 0.003595,
+          &quot;meanMs&quot;: 0.556999466,
+          &quot;p95Ms&quot;: 1.184463,
+          &quot;p99Ms&quot;: 1.357627,
+          &quot;sustainedRatio&quot;: 0.112019755,
+          &quot;maxBacklogMs&quot;: 0,
+          &quot;provisional&quot;: true
+        },
+        &quot;following&quot;: {
+          &quot;onEvent&quot;: 1,
+          &quot;ahead&quot;: 0,
+          &quot;seconds&quot;: {
+            &quot;onEvent&quot;: 5.133333333333333,
+            &quot;ahead&quot;: 0,
+            &quot;behind&quot;: 0,
+            &quot;abstained&quot;: 0,
+            &quot;uncovered&quot;: 0,
+            &quot;falseFollowing&quot;: 0,
+            &quot;correctRejection&quot;: 0,
+            &quot;pending&quot;: 0.2,
+            &quot;indeterminate&quot;: 0,
+            &quot;answerable&quot;: 5.133333333333333,
+            &quot;supportedAnswerable&quot;: 5.133333333333333
+          },
+          &quot;hindsightOnEvent&quot;: 1,
+          &quot;exposure&quot;: {
+            &quot;seconds&quot;: 0,
+            &quot;fraction&quot;: 0,
+            &quot;longest&quot;: 0
+          },
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 8,
+            &quot;of&quot;: 8,
+            &quot;delays&quot;: [
+              0.2,
+              0.0033333333333334103,
+              0.006666666666666821,
+              0,
+              0.0033333333333334103,
+              0.0066666666666663765,
+              0,
+              0.0033333333333329662
+            ]
+          },
+          &quot;recovery&quot;: {
+            &quot;recovered&quot;: 0,
+            &quot;of&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          },
+          &quot;extras&quot;: {
+            &quot;held&quot;: 0,
+            &quot;moved&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          }
+        },
+        &quot;diagnosticNearest&quot;: {
+          &quot;onEvent&quot;: 0.5506493506493505,
+          &quot;ahead&quot;: 0.44935064935064956,
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 8,
+            &quot;of&quot;: 8
+          }
+        },
+        &quot;record&quot;: {
+          &quot;path&quot;: &quot;/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/online-time-warp-8.s2-90.json&quot;,
+          &quot;sha256&quot;: &quot;76575f97a1d07ed94f7ae936393cfac9b3ae0e6f5b783ec912d7de4fbb35ee80&quot;,
+          &quot;decisions&quot;: 534
+        }
+      },
+      &quot;s2-99&quot;: {
+        &quot;started&quot;: {
+          &quot;ok&quot;: true
+        },
+        &quot;legacy&quot;: {
+          &quot;clamped&quot;: 0,
+          &quot;droppedNotes&quot;: 0
+        },
+        &quot;cost&quot;: {
+          &quot;machine&quot;: {
+            &quot;hostname&quot;: &quot;williao-G3-3579&quot;,
+            &quot;cpu&quot;: &quot;Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz&quot;,
+            &quot;cores&quot;: 12,
+            &quot;platform&quot;: &quot;linux&quot;,
+            &quot;arch&quot;: &quot;x64&quot;,
+            &quot;node&quot;: &quot;v22.22.1&quot;
+          },
+          &quot;sampleRate&quot;: 48000,
+          &quot;chunkSamples&quot;: 480,
+          &quot;chunks&quot;: 485,
+          &quot;audioSeconds&quot;: 4.8484791666666665,
+          &quot;initializationMs&quot;: 291.512941,
+          &quot;finishMs&quot;: 0.004575,
+          &quot;meanMs&quot;: 0.551582765,
+          &quot;p95Ms&quot;: 1.131309,
+          &quot;p99Ms&quot;: 1.332834,
+          &quot;sustainedRatio&quot;: 0.115301136,
+          &quot;maxBacklogMs&quot;: 0,
+          &quot;provisional&quot;: true
+        },
+        &quot;following&quot;: {
+          &quot;onEvent&quot;: 0.9612776580153911,
+          &quot;ahead&quot;: 0.03872234198460884,
+          &quot;seconds&quot;: {
+            &quot;onEvent&quot;: 4.46847916666667,
+            &quot;ahead&quot;: 0.17999999999999616,
+            &quot;behind&quot;: 0,
+            &quot;abstained&quot;: 0,
+            &quot;uncovered&quot;: 0,
+            &quot;falseFollowing&quot;: 0,
+            &quot;correctRejection&quot;: 0,
+            &quot;pending&quot;: 0.2,
+            &quot;indeterminate&quot;: 0,
+            &quot;answerable&quot;: 4.648479166666666,
+            &quot;supportedAnswerable&quot;: 4.648479166666666
+          },
+          &quot;hindsightOnEvent&quot;: 0.9612776580153911,
+          &quot;exposure&quot;: {
+            &quot;seconds&quot;: 0.17999999999999616,
+            &quot;fraction&quot;: 0.03872234198460884,
+            &quot;longest&quot;: 0.009999999999999787
+          },
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 8,
+            &quot;of&quot;: 8,
+            &quot;delays&quot;: [
+              0.2,
+              0.003937500000000038,
+              0.007875000000000076,
+              0.0018124999999999947,
+              0.005750000000000366,
+              0.009687500000000071,
+              0.00364583333333357,
+              0.007583333333333719
+            ]
+          },
+          &quot;recovery&quot;: {
+            &quot;recovered&quot;: 0,
+            &quot;of&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          },
+          &quot;extras&quot;: {
+            &quot;held&quot;: 0,
+            &quot;moved&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          }
+        },
+        &quot;diagnosticNearest&quot;: {
+          &quot;onEvent&quot;: 0.4945210575143306,
+          &quot;ahead&quot;: 0.5054789424856694,
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 8,
+            &quot;of&quot;: 8
+          }
+        },
+        &quot;record&quot;: {
+          &quot;path&quot;: &quot;/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/online-time-warp-8.s2-99.json&quot;,
+          &quot;sha256&quot;: &quot;76de5fae1c9a7d6240a301f4ac246c78d07a1b297a21b53f4a42f33844fa1968&quot;,
+          &quot;decisions&quot;: 485
+        }
+      }
+    },
+    &quot;online-time-warp@12&quot;: {
+      &quot;s1-45&quot;: {
+        &quot;started&quot;: {
+          &quot;ok&quot;: true
+        },
+        &quot;legacy&quot;: {
+          &quot;clamped&quot;: 0,
+          &quot;droppedNotes&quot;: 0
+        },
+        &quot;cost&quot;: {
+          &quot;machine&quot;: {
+            &quot;hostname&quot;: &quot;williao-G3-3579&quot;,
+            &quot;cpu&quot;: &quot;Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz&quot;,
+            &quot;cores&quot;: 12,
+            &quot;platform&quot;: &quot;linux&quot;,
+            &quot;arch&quot;: &quot;x64&quot;,
+            &quot;node&quot;: &quot;v22.22.1&quot;
+          },
+          &quot;sampleRate&quot;: 48000,
+          &quot;chunkSamples&quot;: 480,
+          &quot;chunks&quot;: 534,
+          &quot;audioSeconds&quot;: 5.333333333333333,
+          &quot;initializationMs&quot;: 150.715452,
+          &quot;finishMs&quot;: 0.07594,
+          &quot;meanMs&quot;: 0.53728123,
+          &quot;p95Ms&quot;: 1.179812,
+          &quot;p99Ms&quot;: 1.439293,
+          &quot;sustainedRatio&quot;: 0.082068669,
+          &quot;maxBacklogMs&quot;: 0,
+          &quot;provisional&quot;: true
+        },
+        &quot;following&quot;: {
+          &quot;onEvent&quot;: 0.6298701298701299,
+          &quot;ahead&quot;: 0.37012987012987014,
+          &quot;seconds&quot;: {
+            &quot;onEvent&quot;: 3.2333333333333334,
+            &quot;ahead&quot;: 1.9,
+            &quot;behind&quot;: 0,
+            &quot;abstained&quot;: 0,
+            &quot;uncovered&quot;: 0,
+            &quot;falseFollowing&quot;: 0,
+            &quot;correctRejection&quot;: 0,
+            &quot;pending&quot;: 0.2,
+            &quot;indeterminate&quot;: 0,
+            &quot;answerable&quot;: 5.133333333333333,
+            &quot;supportedAnswerable&quot;: 5.133333333333333
+          },
+          &quot;hindsightOnEvent&quot;: 0.6298701298701299,
+          &quot;exposure&quot;: {
+            &quot;seconds&quot;: 1.9,
+            &quot;fraction&quot;: 0.37012987012987014,
+            &quot;longest&quot;: 0.6966666666666665
+          },
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 4,
+            &quot;of&quot;: 4,
+            &quot;delays&quot;: [
+              0.2,
+              0,
+              0,
+              0
+            ]
+          },
+          &quot;recovery&quot;: {
+            &quot;recovered&quot;: 0,
+            &quot;of&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          },
+          &quot;extras&quot;: {
+            &quot;held&quot;: 0,
+            &quot;moved&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          }
+        },
+        &quot;diagnosticNearest&quot;: {
+          &quot;onEvent&quot;: 0.4331168831168831,
+          &quot;ahead&quot;: 0.566883116883117,
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 4,
+            &quot;of&quot;: 4
+          }
+        },
+        &quot;record&quot;: {
+          &quot;path&quot;: &quot;/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/online-time-warp-12.s1-45.json&quot;,
+          &quot;sha256&quot;: &quot;6c3095b78e5a7979d167af810c05dfb834265d55b294bc3d9250e69d8bb93906&quot;,
+          &quot;decisions&quot;: 534
+        }
+      },
+      &quot;s1-63&quot;: {
+        &quot;started&quot;: {
+          &quot;ok&quot;: true
+        },
+        &quot;legacy&quot;: {
+          &quot;clamped&quot;: 0,
+          &quot;droppedNotes&quot;: 0
+        },
+        &quot;cost&quot;: {
+          &quot;machine&quot;: {
+            &quot;hostname&quot;: &quot;williao-G3-3579&quot;,
+            &quot;cpu&quot;: &quot;Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz&quot;,
+            &quot;cores&quot;: 12,
+            &quot;platform&quot;: &quot;linux&quot;,
+            &quot;arch&quot;: &quot;x64&quot;,
+            &quot;node&quot;: &quot;v22.22.1&quot;
+          },
+          &quot;sampleRate&quot;: 48000,
+          &quot;chunkSamples&quot;: 480,
+          &quot;chunks&quot;: 381,
+          &quot;audioSeconds&quot;: 3.8095208333333335,
+          &quot;initializationMs&quot;: 144.222548,
+          &quot;finishMs&quot;: 0.004027,
+          &quot;meanMs&quot;: 0.514769619,
+          &quot;p95Ms&quot;: 1.05799,
+          &quot;p99Ms&quot;: 1.299729,
+          &quot;sustainedRatio&quot;: 0.089342942,
+          &quot;maxBacklogMs&quot;: 0,
+          &quot;provisional&quot;: true
+        },
+        &quot;following&quot;: {
+          &quot;onEvent&quot;: 0.7162250298689231,
+          &quot;ahead&quot;: 0.28377497013107694,
+          &quot;seconds&quot;: {
+            &quot;onEvent&quot;: 2.5852291666666667,
+            &quot;ahead&quot;: 1.0242916666666666,
+            &quot;behind&quot;: 0,
+            &quot;abstained&quot;: 0,
+            &quot;uncovered&quot;: 0,
+            &quot;falseFollowing&quot;: 0,
+            &quot;correctRejection&quot;: 0,
+            &quot;pending&quot;: 0.2,
+            &quot;indeterminate&quot;: 0,
+            &quot;answerable&quot;: 3.6095208333333333,
+            &quot;supportedAnswerable&quot;: 3.6095208333333333
+          },
+          &quot;hindsightOnEvent&quot;: 0.7162250298689231,
+          &quot;exposure&quot;: {
+            &quot;seconds&quot;: 1.0242916666666666,
+            &quot;fraction&quot;: 0.28377497013107694,
+            &quot;longest&quot;: 0.3771458333333335
+          },
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 4,
+            &quot;of&quot;: 4,
+            &quot;delays&quot;: [
+              0.2,
+              0,
+              0,
+              0
+            ]
+          },
+          &quot;recovery&quot;: {
+            &quot;recovered&quot;: 0,
+            &quot;of&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          },
+          &quot;extras&quot;: {
+            &quot;held&quot;: 0,
+            &quot;moved&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          }
+        },
+        &quot;diagnosticNearest&quot;: {
+          &quot;onEvent&quot;: 0.5195230207148918,
+          &quot;ahead&quot;: 0.4804769792851083,
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 4,
+            &quot;of&quot;: 4
+          }
+        },
+        &quot;record&quot;: {
+          &quot;path&quot;: &quot;/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/online-time-warp-12.s1-63.json&quot;,
+          &quot;sha256&quot;: &quot;0ccf1285d5fb5b28907844c455e83cde0267086666507d68b254bd9529168666&quot;,
+          &quot;decisions&quot;: 381
+        }
+      },
+      &quot;s1-90&quot;: {
+        &quot;started&quot;: {
+          &quot;ok&quot;: true
+        },
+        &quot;legacy&quot;: {
+          &quot;clamped&quot;: 0,
+          &quot;droppedNotes&quot;: 0
+        },
+        &quot;cost&quot;: {
+          &quot;machine&quot;: {
+            &quot;hostname&quot;: &quot;williao-G3-3579&quot;,
+            &quot;cpu&quot;: &quot;Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz&quot;,
+            &quot;cores&quot;: 12,
+            &quot;platform&quot;: &quot;linux&quot;,
+            &quot;arch&quot;: &quot;x64&quot;,
+            &quot;node&quot;: &quot;v22.22.1&quot;
+          },
+          &quot;sampleRate&quot;: 48000,
+          &quot;chunkSamples&quot;: 480,
+          &quot;chunks&quot;: 267,
+          &quot;audioSeconds&quot;: 2.6666666666666665,
+          &quot;initializationMs&quot;: 143.348854,
+          &quot;finishMs&quot;: 0.004553,
+          &quot;meanMs&quot;: 0.503833536,
+          &quot;p95Ms&quot;: 1.03428,
+          &quot;p99Ms&quot;: 1.247196,
+          &quot;sustainedRatio&quot;: 0.10420386,
+          &quot;maxBacklogMs&quot;: 0,
+          &quot;provisional&quot;: true
+        },
+        &quot;following&quot;: {
+          &quot;onEvent&quot;: 1,
+          &quot;ahead&quot;: 0,
+          &quot;seconds&quot;: {
+            &quot;onEvent&quot;: 2.4666666666666663,
+            &quot;ahead&quot;: 0,
+            &quot;behind&quot;: 0,
+            &quot;abstained&quot;: 0,
+            &quot;uncovered&quot;: 0,
+            &quot;falseFollowing&quot;: 0,
+            &quot;correctRejection&quot;: 0,
+            &quot;pending&quot;: 0.2,
+            &quot;indeterminate&quot;: 0,
+            &quot;answerable&quot;: 2.4666666666666663,
+            &quot;supportedAnswerable&quot;: 2.4666666666666663
+          },
+          &quot;hindsightOnEvent&quot;: 1,
+          &quot;exposure&quot;: {
+            &quot;seconds&quot;: 0,
+            &quot;fraction&quot;: 0,
+            &quot;longest&quot;: 0
+          },
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 4,
+            &quot;of&quot;: 4,
+            &quot;delays&quot;: [
+              0.2,
+              0.0033333333333334103,
+              0.006666666666666821,
+              0
+            ]
+          },
+          &quot;recovery&quot;: {
+            &quot;recovered&quot;: 0,
+            &quot;of&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          },
+          &quot;extras&quot;: {
+            &quot;held&quot;: 0,
+            &quot;moved&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          }
+        },
+        &quot;diagnosticNearest&quot;: {
+          &quot;onEvent&quot;: 0.5986486486486486,
+          &quot;ahead&quot;: 0.4013513513513514,
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 4,
+            &quot;of&quot;: 4
+          }
+        },
+        &quot;record&quot;: {
+          &quot;path&quot;: &quot;/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/online-time-warp-12.s1-90.json&quot;,
+          &quot;sha256&quot;: &quot;cc306cdd6f8746d31767d65398e36334f624047be84af892f74bb091c9b524cc&quot;,
+          &quot;decisions&quot;: 267
+        }
+      },
+      &quot;s1-99&quot;: {
+        &quot;started&quot;: {
+          &quot;ok&quot;: true
+        },
+        &quot;legacy&quot;: {
+          &quot;clamped&quot;: 0,
+          &quot;droppedNotes&quot;: 0
+        },
+        &quot;cost&quot;: {
+          &quot;machine&quot;: {
+            &quot;hostname&quot;: &quot;williao-G3-3579&quot;,
+            &quot;cpu&quot;: &quot;Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz&quot;,
+            &quot;cores&quot;: 12,
+            &quot;platform&quot;: &quot;linux&quot;,
+            &quot;arch&quot;: &quot;x64&quot;,
+            &quot;node&quot;: &quot;v22.22.1&quot;
+          },
+          &quot;sampleRate&quot;: 48000,
+          &quot;chunkSamples&quot;: 480,
+          &quot;chunks&quot;: 243,
+          &quot;audioSeconds&quot;: 2.42425,
+          &quot;initializationMs&quot;: 141.68924,
+          &quot;finishMs&quot;: 0.007527,
+          &quot;meanMs&quot;: 0.498979724,
+          &quot;p95Ms&quot;: 1.009803,
+          &quot;p99Ms&quot;: 1.252575,
+          &quot;sustainedRatio&quot;: 0.108466058,
+          &quot;maxBacklogMs&quot;: 0,
+          &quot;provisional&quot;: true
+        },
+        &quot;following&quot;: {
+          &quot;onEvent&quot;: 0.9504046307744185,
+          &quot;ahead&quot;: 0.04959536922558168,
+          &quot;seconds&quot;: {
+            &quot;onEvent&quot;: 2.1139375,
+            &quot;ahead&quot;: 0.11031250000000004,
+            &quot;behind&quot;: 0,
+            &quot;abstained&quot;: 0,
+            &quot;uncovered&quot;: 0,
+            &quot;falseFollowing&quot;: 0,
+            &quot;correctRejection&quot;: 0,
+            &quot;pending&quot;: 0.2,
+            &quot;indeterminate&quot;: 0,
+            &quot;answerable&quot;: 2.2242499999999996,
+            &quot;supportedAnswerable&quot;: 2.2242499999999996
+          },
+          &quot;hindsightOnEvent&quot;: 0.9504046307744185,
+          &quot;exposure&quot;: {
+            &quot;seconds&quot;: 0.11031250000000004,
+            &quot;fraction&quot;: 0.04959536922558168,
+            &quot;longest&quot;: 0.072125
+          },
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 4,
+            &quot;of&quot;: 4,
+            &quot;delays&quot;: [
+              0.2,
+              0.05393750000000008,
+              0,
+              0
+            ]
+          },
+          &quot;recovery&quot;: {
+            &quot;recovered&quot;: 0,
+            &quot;of&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          },
+          &quot;extras&quot;: {
+            &quot;held&quot;: 0,
+            &quot;moved&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          }
+        },
+        &quot;diagnosticNearest&quot;: {
+          &quot;onEvent&quot;: 0.6104866809036755,
+          &quot;ahead&quot;: 0.38951331909632464,
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 4,
+            &quot;of&quot;: 4
+          }
+        },
+        &quot;record&quot;: {
+          &quot;path&quot;: &quot;/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/online-time-warp-12.s1-99.json&quot;,
+          &quot;sha256&quot;: &quot;dfaa72453e0a42081cc5edb4972ff944e9d22ce6283cac679c53340065c3419f&quot;,
+          &quot;decisions&quot;: 243
+        }
+      },
+      &quot;s2-45&quot;: {
+        &quot;started&quot;: {
+          &quot;ok&quot;: true
+        },
+        &quot;legacy&quot;: {
+          &quot;clamped&quot;: 0,
+          &quot;droppedNotes&quot;: 0
+        },
+        &quot;cost&quot;: {
+          &quot;machine&quot;: {
+            &quot;hostname&quot;: &quot;williao-G3-3579&quot;,
+            &quot;cpu&quot;: &quot;Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz&quot;,
+            &quot;cores&quot;: 12,
+            &quot;platform&quot;: &quot;linux&quot;,
+            &quot;arch&quot;: &quot;x64&quot;,
+            &quot;node&quot;: &quot;v22.22.1&quot;
+          },
+          &quot;sampleRate&quot;: 48000,
+          &quot;chunkSamples&quot;: 480,
+          &quot;chunks&quot;: 1067,
+          &quot;audioSeconds&quot;: 10.666666666666666,
+          &quot;initializationMs&quot;: 294.062733,
+          &quot;finishMs&quot;: 0.001895,
+          &quot;meanMs&quot;: 0.573910793,
+          &quot;p95Ms&quot;: 1.155957,
+          &quot;p99Ms&quot;: 1.383739,
+          &quot;sustainedRatio&quot;: 0.084977573,
+          &quot;maxBacklogMs&quot;: 0,
+          &quot;provisional&quot;: true
+        },
+        &quot;following&quot;: {
+          &quot;onEvent&quot;: 0.6079617834394903,
+          &quot;ahead&quot;: 0.39203821656050974,
+          &quot;seconds&quot;: {
+            &quot;onEvent&quot;: 6.3633333333333315,
+            &quot;ahead&quot;: 4.103333333333335,
+            &quot;behind&quot;: 0,
+            &quot;abstained&quot;: 0,
+            &quot;uncovered&quot;: 0,
+            &quot;falseFollowing&quot;: 0,
+            &quot;correctRejection&quot;: 0,
+            &quot;pending&quot;: 0.2,
+            &quot;indeterminate&quot;: 0,
+            &quot;answerable&quot;: 10.466666666666667,
+            &quot;supportedAnswerable&quot;: 10.466666666666667
+          },
+          &quot;hindsightOnEvent&quot;: 0.6079617834394903,
+          &quot;exposure&quot;: {
+            &quot;seconds&quot;: 4.103333333333335,
+            &quot;fraction&quot;: 0.39203821656050974,
+            &quot;longest&quot;: 0.6966666666666665
+          },
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 8,
+            &quot;of&quot;: 8,
+            &quot;delays&quot;: [
+              0.2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          &quot;recovery&quot;: {
+            &quot;recovered&quot;: 0,
+            &quot;of&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          },
+          &quot;extras&quot;: {
+            &quot;held&quot;: 0,
+            &quot;moved&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          }
+        },
+        &quot;diagnosticNearest&quot;: {
+          &quot;onEvent&quot;: 0.3528662420382164,
+          &quot;ahead&quot;: 0.6471337579617835,
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 8,
+            &quot;of&quot;: 8
+          }
+        },
+        &quot;record&quot;: {
+          &quot;path&quot;: &quot;/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/online-time-warp-12.s2-45.json&quot;,
+          &quot;sha256&quot;: &quot;cc598c51375b0cde5884ed3303d296b33d1b07a12c22a1ab9119e6b104535f8a&quot;,
+          &quot;decisions&quot;: 1067
+        }
+      },
+      &quot;s2-63&quot;: {
+        &quot;started&quot;: {
+          &quot;ok&quot;: true
+        },
+        &quot;legacy&quot;: {
+          &quot;clamped&quot;: 0,
+          &quot;droppedNotes&quot;: 0
+        },
+        &quot;cost&quot;: {
+          &quot;machine&quot;: {
+            &quot;hostname&quot;: &quot;williao-G3-3579&quot;,
+            &quot;cpu&quot;: &quot;Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz&quot;,
+            &quot;cores&quot;: 12,
+            &quot;platform&quot;: &quot;linux&quot;,
+            &quot;arch&quot;: &quot;x64&quot;,
+            &quot;node&quot;: &quot;v22.22.1&quot;
+          },
+          &quot;sampleRate&quot;: 48000,
+          &quot;chunkSamples&quot;: 480,
+          &quot;chunks&quot;: 762,
+          &quot;audioSeconds&quot;: 7.619041666666667,
+          &quot;initializationMs&quot;: 301.471394,
+          &quot;finishMs&quot;: 0.002116,
+          &quot;meanMs&quot;: 0.585511395,
+          &quot;p95Ms&quot;: 1.225767,
+          &quot;p99Ms&quot;: 1.43538,
+          &quot;sustainedRatio&quot;: 0.098126933,
+          &quot;maxBacklogMs&quot;: 0,
+          &quot;provisional&quot;: true
+        },
+        &quot;following&quot;: {
+          &quot;onEvent&quot;: 0.6607827830413855,
+          &quot;ahead&quot;: 0.3392172169586145,
+          &quot;seconds&quot;: {
+            &quot;onEvent&quot;: 4.902374999999999,
+            &quot;ahead&quot;: 2.5166666666666675,
+            &quot;behind&quot;: 0,
+            &quot;abstained&quot;: 0,
+            &quot;uncovered&quot;: 0,
+            &quot;falseFollowing&quot;: 0,
+            &quot;correctRejection&quot;: 0,
+            &quot;pending&quot;: 0.2,
+            &quot;indeterminate&quot;: 0,
+            &quot;answerable&quot;: 7.419041666666667,
+            &quot;supportedAnswerable&quot;: 7.419041666666667
+          },
+          &quot;hindsightOnEvent&quot;: 0.6607827830413855,
+          &quot;exposure&quot;: {
+            &quot;seconds&quot;: 2.5166666666666675,
+            &quot;fraction&quot;: 0.3392172169586145,
+            &quot;longest&quot;: 0.3818958333333331
+          },
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 8,
+            &quot;of&quot;: 8,
+            &quot;delays&quot;: [
+              0.2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          &quot;recovery&quot;: {
+            &quot;recovered&quot;: 0,
+            &quot;of&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          },
+          &quot;extras&quot;: {
+            &quot;held&quot;: 0,
+            &quot;moved&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          }
+        },
+        &quot;diagnosticNearest&quot;: {
+          &quot;onEvent&quot;: 0.484210112492067,
+          &quot;ahead&quot;: 0.515789887507933,
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 8,
+            &quot;of&quot;: 8
+          }
+        },
+        &quot;record&quot;: {
+          &quot;path&quot;: &quot;/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/online-time-warp-12.s2-63.json&quot;,
+          &quot;sha256&quot;: &quot;3f360673833ac8e8e1431fe6f8928b38516d22a7384b8eb2fd72ca9377413b83&quot;,
+          &quot;decisions&quot;: 762
+        }
+      },
+      &quot;s2-90&quot;: {
+        &quot;started&quot;: {
+          &quot;ok&quot;: true
+        },
+        &quot;legacy&quot;: {
+          &quot;clamped&quot;: 0,
+          &quot;droppedNotes&quot;: 0
+        },
+        &quot;cost&quot;: {
+          &quot;machine&quot;: {
+            &quot;hostname&quot;: &quot;williao-G3-3579&quot;,
+            &quot;cpu&quot;: &quot;Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz&quot;,
+            &quot;cores&quot;: 12,
+            &quot;platform&quot;: &quot;linux&quot;,
+            &quot;arch&quot;: &quot;x64&quot;,
+            &quot;node&quot;: &quot;v22.22.1&quot;
+          },
+          &quot;sampleRate&quot;: 48000,
+          &quot;chunkSamples&quot;: 480,
+          &quot;chunks&quot;: 534,
+          &quot;audioSeconds&quot;: 5.333333333333333,
+          &quot;initializationMs&quot;: 294.539882,
+          &quot;finishMs&quot;: 0.001936,
+          &quot;meanMs&quot;: 0.569510464,
+          &quot;p95Ms&quot;: 1.15708,
+          &quot;p99Ms&quot;: 1.392616,
+          &quot;sustainedRatio&quot;: 0.112248826,
+          &quot;maxBacklogMs&quot;: 0,
+          &quot;provisional&quot;: true
+        },
+        &quot;following&quot;: {
+          &quot;onEvent&quot;: 1,
+          &quot;ahead&quot;: 0,
+          &quot;seconds&quot;: {
+            &quot;onEvent&quot;: 5.133333333333333,
+            &quot;ahead&quot;: 0,
+            &quot;behind&quot;: 0,
+            &quot;abstained&quot;: 0,
+            &quot;uncovered&quot;: 0,
+            &quot;falseFollowing&quot;: 0,
+            &quot;correctRejection&quot;: 0,
+            &quot;pending&quot;: 0.2,
+            &quot;indeterminate&quot;: 0,
+            &quot;answerable&quot;: 5.133333333333333,
+            &quot;supportedAnswerable&quot;: 5.133333333333333
+          },
+          &quot;hindsightOnEvent&quot;: 1,
+          &quot;exposure&quot;: {
+            &quot;seconds&quot;: 0,
+            &quot;fraction&quot;: 0,
+            &quot;longest&quot;: 0
+          },
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 8,
+            &quot;of&quot;: 8,
+            &quot;delays&quot;: [
+              0.2,
+              0.0033333333333334103,
+              0.006666666666666821,
+              0,
+              0.0033333333333334103,
+              0.0066666666666663765,
+              0,
+              0.0033333333333329662
+            ]
+          },
+          &quot;recovery&quot;: {
+            &quot;recovered&quot;: 0,
+            &quot;of&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          },
+          &quot;extras&quot;: {
+            &quot;held&quot;: 0,
+            &quot;moved&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          }
+        },
+        &quot;diagnosticNearest&quot;: {
+          &quot;onEvent&quot;: 0.5506493506493505,
+          &quot;ahead&quot;: 0.44935064935064956,
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 8,
+            &quot;of&quot;: 8
+          }
+        },
+        &quot;record&quot;: {
+          &quot;path&quot;: &quot;/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/online-time-warp-12.s2-90.json&quot;,
+          &quot;sha256&quot;: &quot;b055570b0f58e418a60b8505388c7a77080bf065887abc362a58f038a438243a&quot;,
+          &quot;decisions&quot;: 534
+        }
+      },
+      &quot;s2-99&quot;: {
+        &quot;started&quot;: {
+          &quot;ok&quot;: true
+        },
+        &quot;legacy&quot;: {
+          &quot;clamped&quot;: 0,
+          &quot;droppedNotes&quot;: 0
+        },
+        &quot;cost&quot;: {
+          &quot;machine&quot;: {
+            &quot;hostname&quot;: &quot;williao-G3-3579&quot;,
+            &quot;cpu&quot;: &quot;Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz&quot;,
+            &quot;cores&quot;: 12,
+            &quot;platform&quot;: &quot;linux&quot;,
+            &quot;arch&quot;: &quot;x64&quot;,
+            &quot;node&quot;: &quot;v22.22.1&quot;
+          },
+          &quot;sampleRate&quot;: 48000,
+          &quot;chunkSamples&quot;: 480,
+          &quot;chunks&quot;: 485,
+          &quot;audioSeconds&quot;: 4.8484791666666665,
+          &quot;initializationMs&quot;: 302.395741,
+          &quot;finishMs&quot;: 0.001863,
+          &quot;meanMs&quot;: 0.587440788,
+          &quot;p95Ms&quot;: 1.228183,
+          &quot;p99Ms&quot;: 1.484273,
+          &quot;sustainedRatio&quot;: 0.121132084,
+          &quot;maxBacklogMs&quot;: 0,
+          &quot;provisional&quot;: true
+        },
+        &quot;following&quot;: {
+          &quot;onEvent&quot;: 0.9196197681141236,
+          &quot;ahead&quot;: 0.08038023188587655,
+          &quot;seconds&quot;: {
+            &quot;onEvent&quot;: 4.274833333333334,
+            &quot;ahead&quot;: 0.3736458333333328,
+            &quot;behind&quot;: 0,
+            &quot;abstained&quot;: 0,
+            &quot;uncovered&quot;: 0,
+            &quot;falseFollowing&quot;: 0,
+            &quot;correctRejection&quot;: 0,
+            &quot;pending&quot;: 0.2,
+            &quot;indeterminate&quot;: 0,
+            &quot;answerable&quot;: 4.648479166666666,
+            &quot;supportedAnswerable&quot;: 4.648479166666666
+          },
+          &quot;hindsightOnEvent&quot;: 0.9196197681141236,
+          &quot;exposure&quot;: {
+            &quot;seconds&quot;: 0.3736458333333328,
+            &quot;fraction&quot;: 0.08038023188587655,
+            &quot;longest&quot;: 0.0763541666666665
+          },
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 8,
+            &quot;of&quot;: 8,
+            &quot;delays&quot;: [
+              0.2,
+              0.05393750000000008,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          &quot;recovery&quot;: {
+            &quot;recovered&quot;: 0,
+            &quot;of&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          },
+          &quot;extras&quot;: {
+            &quot;held&quot;: 0,
+            &quot;moved&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          }
+        },
+        &quot;diagnosticNearest&quot;: {
+          &quot;onEvent&quot;: 0.5353946407203075,
+          &quot;ahead&quot;: 0.46460535927969265,
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 8,
+            &quot;of&quot;: 8
+          }
+        },
+        &quot;record&quot;: {
+          &quot;path&quot;: &quot;/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/online-time-warp-12.s2-99.json&quot;,
+          &quot;sha256&quot;: &quot;b6a137168b22f50c42aa5661130825dc3bfccaee5ef2682dc2784dd2cf41abbb&quot;,
+          &quot;decisions&quot;: 485
+        }
+      }
+    },
+    &quot;online-time-warp@14&quot;: {
+      &quot;s1-45&quot;: {
+        &quot;started&quot;: {
+          &quot;ok&quot;: true
+        },
+        &quot;legacy&quot;: {
+          &quot;clamped&quot;: 0,
+          &quot;droppedNotes&quot;: 0
+        },
+        &quot;cost&quot;: {
+          &quot;machine&quot;: {
+            &quot;hostname&quot;: &quot;williao-G3-3579&quot;,
+            &quot;cpu&quot;: &quot;Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz&quot;,
+            &quot;cores&quot;: 12,
+            &quot;platform&quot;: &quot;linux&quot;,
+            &quot;arch&quot;: &quot;x64&quot;,
+            &quot;node&quot;: &quot;v22.22.1&quot;
+          },
+          &quot;sampleRate&quot;: 48000,
+          &quot;chunkSamples&quot;: 480,
+          &quot;chunks&quot;: 534,
+          &quot;audioSeconds&quot;: 5.333333333333333,
+          &quot;initializationMs&quot;: 147.08316,
+          &quot;finishMs&quot;: 0.080635,
+          &quot;meanMs&quot;: 0.533660238,
+          &quot;p95Ms&quot;: 1.082348,
+          &quot;p99Ms&quot;: 1.374467,
+          &quot;sustainedRatio&quot;: 0.081025943,
+          &quot;maxBacklogMs&quot;: 0,
+          &quot;provisional&quot;: true
+        },
+        &quot;following&quot;: {
+          &quot;onEvent&quot;: 0.6181818181818182,
+          &quot;ahead&quot;: 0.38181818181818183,
+          &quot;seconds&quot;: {
+            &quot;onEvent&quot;: 3.173333333333333,
+            &quot;ahead&quot;: 1.96,
+            &quot;behind&quot;: 0,
+            &quot;abstained&quot;: 0,
+            &quot;uncovered&quot;: 0,
+            &quot;falseFollowing&quot;: 0,
+            &quot;correctRejection&quot;: 0,
+            &quot;pending&quot;: 0.2,
+            &quot;indeterminate&quot;: 0,
+            &quot;answerable&quot;: 5.133333333333333,
+            &quot;supportedAnswerable&quot;: 5.133333333333333
+          },
+          &quot;hindsightOnEvent&quot;: 0.6181818181818182,
+          &quot;exposure&quot;: {
+            &quot;seconds&quot;: 1.96,
+            &quot;fraction&quot;: 0.38181818181818183,
+            &quot;longest&quot;: 0.6966666666666665
+          },
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 4,
+            &quot;of&quot;: 4,
+            &quot;delays&quot;: [
+              0.2,
+              0,
+              0,
+              0
+            ]
+          },
+          &quot;recovery&quot;: {
+            &quot;recovered&quot;: 0,
+            &quot;of&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          },
+          &quot;extras&quot;: {
+            &quot;held&quot;: 0,
+            &quot;moved&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          }
+        },
+        &quot;diagnosticNearest&quot;: {
+          &quot;onEvent&quot;: 0.4233766233766234,
+          &quot;ahead&quot;: 0.5766233766233767,
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 4,
+            &quot;of&quot;: 4
+          }
+        },
+        &quot;record&quot;: {
+          &quot;path&quot;: &quot;/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/online-time-warp-14.s1-45.json&quot;,
+          &quot;sha256&quot;: &quot;2ce1772fdeea9303d65643ea365fc30147eaf4a7b6c117fd9994f432df7a1d27&quot;,
+          &quot;decisions&quot;: 534
+        }
+      },
+      &quot;s1-63&quot;: {
+        &quot;started&quot;: {
+          &quot;ok&quot;: true
+        },
+        &quot;legacy&quot;: {
+          &quot;clamped&quot;: 0,
+          &quot;droppedNotes&quot;: 0
+        },
+        &quot;cost&quot;: {
+          &quot;machine&quot;: {
+            &quot;hostname&quot;: &quot;williao-G3-3579&quot;,
+            &quot;cpu&quot;: &quot;Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz&quot;,
+            &quot;cores&quot;: 12,
+            &quot;platform&quot;: &quot;linux&quot;,
+            &quot;arch&quot;: &quot;x64&quot;,
+            &quot;node&quot;: &quot;v22.22.1&quot;
+          },
+          &quot;sampleRate&quot;: 48000,
+          &quot;chunkSamples&quot;: 480,
+          &quot;chunks&quot;: 381,
+          &quot;audioSeconds&quot;: 3.8095208333333335,
+          &quot;initializationMs&quot;: 143.910285,
+          &quot;finishMs&quot;: 0.003414,
+          &quot;meanMs&quot;: 0.519968249,
+          &quot;p95Ms&quot;: 1.054471,
+          &quot;p99Ms&quot;: 1.342617,
+          &quot;sustainedRatio&quot;: 0.089780741,
+          &quot;maxBacklogMs&quot;: 0,
+          &quot;provisional&quot;: true
+        },
+        &quot;following&quot;: {
+          &quot;onEvent&quot;: 0.7106841282026123,
+          &quot;ahead&quot;: 0.28931587179738766,
+          &quot;seconds&quot;: {
+            &quot;onEvent&quot;: 2.5652291666666667,
+            &quot;ahead&quot;: 1.0442916666666666,
+            &quot;behind&quot;: 0,
+            &quot;abstained&quot;: 0,
+            &quot;uncovered&quot;: 0,
+            &quot;falseFollowing&quot;: 0,
+            &quot;correctRejection&quot;: 0,
+            &quot;pending&quot;: 0.2,
+            &quot;indeterminate&quot;: 0,
+            &quot;answerable&quot;: 3.6095208333333333,
+            &quot;supportedAnswerable&quot;: 3.6095208333333333
+          },
+          &quot;hindsightOnEvent&quot;: 0.7106841282026123,
+          &quot;exposure&quot;: {
+            &quot;seconds&quot;: 1.0442916666666666,
+            &quot;fraction&quot;: 0.28931587179738766,
+            &quot;longest&quot;: 0.39714583333333353
+          },
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 4,
+            &quot;of&quot;: 4,
+            &quot;delays&quot;: [
+              0.2,
+              0,
+              0,
+              0
+            ]
+          },
+          &quot;recovery&quot;: {
+            &quot;recovered&quot;: 0,
+            &quot;of&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          },
+          &quot;extras&quot;: {
+            &quot;held&quot;: 0,
+            &quot;moved&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          }
+        },
+        &quot;diagnosticNearest&quot;: {
+          &quot;onEvent&quot;: 0.4890480615501827,
+          &quot;ahead&quot;: 0.5109519384498173,
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 4,
+            &quot;of&quot;: 4
+          }
+        },
+        &quot;record&quot;: {
+          &quot;path&quot;: &quot;/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/online-time-warp-14.s1-63.json&quot;,
+          &quot;sha256&quot;: &quot;c423017ea01f9378e881872e5a290167a13fef071111e9f8bb421e6c05efabba&quot;,
+          &quot;decisions&quot;: 381
+        }
+      },
+      &quot;s1-90&quot;: {
+        &quot;started&quot;: {
+          &quot;ok&quot;: true
+        },
+        &quot;legacy&quot;: {
+          &quot;clamped&quot;: 0,
+          &quot;droppedNotes&quot;: 0
+        },
+        &quot;cost&quot;: {
+          &quot;machine&quot;: {
+            &quot;hostname&quot;: &quot;williao-G3-3579&quot;,
+            &quot;cpu&quot;: &quot;Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz&quot;,
+            &quot;cores&quot;: 12,
+            &quot;platform&quot;: &quot;linux&quot;,
+            &quot;arch&quot;: &quot;x64&quot;,
+            &quot;node&quot;: &quot;v22.22.1&quot;
+          },
+          &quot;sampleRate&quot;: 48000,
+          &quot;chunkSamples&quot;: 480,
+          &quot;chunks&quot;: 267,
+          &quot;audioSeconds&quot;: 2.6666666666666665,
+          &quot;initializationMs&quot;: 143.906415,
+          &quot;finishMs&quot;: 0.003647,
+          &quot;meanMs&quot;: 0.504663539,
+          &quot;p95Ms&quot;: 1.019456,
+          &quot;p99Ms&quot;: 1.287321,
+          &quot;sustainedRatio&quot;: 0.10449571,
+          &quot;maxBacklogMs&quot;: 0,
+          &quot;provisional&quot;: true
+        },
+        &quot;following&quot;: {
+          &quot;onEvent&quot;: 1,
+          &quot;ahead&quot;: 0,
+          &quot;seconds&quot;: {
+            &quot;onEvent&quot;: 2.4666666666666663,
+            &quot;ahead&quot;: 0,
+            &quot;behind&quot;: 0,
+            &quot;abstained&quot;: 0,
+            &quot;uncovered&quot;: 0,
+            &quot;falseFollowing&quot;: 0,
+            &quot;correctRejection&quot;: 0,
+            &quot;pending&quot;: 0.2,
+            &quot;indeterminate&quot;: 0,
+            &quot;answerable&quot;: 2.4666666666666663,
+            &quot;supportedAnswerable&quot;: 2.4666666666666663
+          },
+          &quot;hindsightOnEvent&quot;: 1,
+          &quot;exposure&quot;: {
+            &quot;seconds&quot;: 0,
+            &quot;fraction&quot;: 0,
+            &quot;longest&quot;: 0
+          },
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 4,
+            &quot;of&quot;: 4,
+            &quot;delays&quot;: [
+              0.2,
+              0.0033333333333334103,
+              0.006666666666666821,
+              0
+            ]
+          },
+          &quot;recovery&quot;: {
+            &quot;recovered&quot;: 0,
+            &quot;of&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          },
+          &quot;extras&quot;: {
+            &quot;held&quot;: 0,
+            &quot;moved&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          }
+        },
+        &quot;diagnosticNearest&quot;: {
+          &quot;onEvent&quot;: 0.5986486486486486,
+          &quot;ahead&quot;: 0.4013513513513514,
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 4,
+            &quot;of&quot;: 4
+          }
+        },
+        &quot;record&quot;: {
+          &quot;path&quot;: &quot;/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/online-time-warp-14.s1-90.json&quot;,
+          &quot;sha256&quot;: &quot;062b60a843d37c0a7e3aa8f8bc678eb05c2ba271cb8add910262270d2c675dcc&quot;,
+          &quot;decisions&quot;: 267
+        }
+      },
+      &quot;s1-99&quot;: {
+        &quot;started&quot;: {
+          &quot;ok&quot;: true
+        },
+        &quot;legacy&quot;: {
+          &quot;clamped&quot;: 0,
+          &quot;droppedNotes&quot;: 0
+        },
+        &quot;cost&quot;: {
+          &quot;machine&quot;: {
+            &quot;hostname&quot;: &quot;williao-G3-3579&quot;,
+            &quot;cpu&quot;: &quot;Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz&quot;,
+            &quot;cores&quot;: 12,
+            &quot;platform&quot;: &quot;linux&quot;,
+            &quot;arch&quot;: &quot;x64&quot;,
+            &quot;node&quot;: &quot;v22.22.1&quot;
+          },
+          &quot;sampleRate&quot;: 48000,
+          &quot;chunkSamples&quot;: 480,
+          &quot;chunks&quot;: 243,
+          &quot;audioSeconds&quot;: 2.42425,
+          &quot;initializationMs&quot;: 143.329625,
+          &quot;finishMs&quot;: 0.009109,
+          &quot;meanMs&quot;: 0.500234193,
+          &quot;p95Ms&quot;: 1.004277,
+          &quot;p99Ms&quot;: 1.289887,
+          &quot;sustainedRatio&quot;: 0.109269111,
+          &quot;maxBacklogMs&quot;: 0,
+          &quot;provisional&quot;: true
+        },
+        &quot;following&quot;: {
+          &quot;onEvent&quot;: 0.9504046307744185,
+          &quot;ahead&quot;: 0.04959536922558168,
+          &quot;seconds&quot;: {
+            &quot;onEvent&quot;: 2.1139375,
+            &quot;ahead&quot;: 0.11031250000000004,
+            &quot;behind&quot;: 0,
+            &quot;abstained&quot;: 0,
+            &quot;uncovered&quot;: 0,
+            &quot;falseFollowing&quot;: 0,
+            &quot;correctRejection&quot;: 0,
+            &quot;pending&quot;: 0.2,
+            &quot;indeterminate&quot;: 0,
+            &quot;answerable&quot;: 2.2242499999999996,
+            &quot;supportedAnswerable&quot;: 2.2242499999999996
+          },
+          &quot;hindsightOnEvent&quot;: 0.9504046307744185,
+          &quot;exposure&quot;: {
+            &quot;seconds&quot;: 0.11031250000000004,
+            &quot;fraction&quot;: 0.04959536922558168,
+            &quot;longest&quot;: 0.072125
+          },
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 4,
+            &quot;of&quot;: 4,
+            &quot;delays&quot;: [
+              0.2,
+              0.05393750000000008,
+              0,
+              0
+            ]
+          },
+          &quot;recovery&quot;: {
+            &quot;recovered&quot;: 0,
+            &quot;of&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          },
+          &quot;extras&quot;: {
+            &quot;held&quot;: 0,
+            &quot;moved&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          }
+        },
+        &quot;diagnosticNearest&quot;: {
+          &quot;onEvent&quot;: 0.6104866809036755,
+          &quot;ahead&quot;: 0.38951331909632464,
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 4,
+            &quot;of&quot;: 4
+          }
+        },
+        &quot;record&quot;: {
+          &quot;path&quot;: &quot;/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/online-time-warp-14.s1-99.json&quot;,
+          &quot;sha256&quot;: &quot;ebb76b62731c614eddcbaf248feb2251d777e8f42b6ffe0b07616711b14e958f&quot;,
+          &quot;decisions&quot;: 243
+        }
+      },
+      &quot;s2-45&quot;: {
+        &quot;started&quot;: {
+          &quot;ok&quot;: true
+        },
+        &quot;legacy&quot;: {
+          &quot;clamped&quot;: 0,
+          &quot;droppedNotes&quot;: 0
+        },
+        &quot;cost&quot;: {
+          &quot;machine&quot;: {
+            &quot;hostname&quot;: &quot;williao-G3-3579&quot;,
+            &quot;cpu&quot;: &quot;Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz&quot;,
+            &quot;cores&quot;: 12,
+            &quot;platform&quot;: &quot;linux&quot;,
+            &quot;arch&quot;: &quot;x64&quot;,
+            &quot;node&quot;: &quot;v22.22.1&quot;
+          },
+          &quot;sampleRate&quot;: 48000,
+          &quot;chunkSamples&quot;: 480,
+          &quot;chunks&quot;: 1067,
+          &quot;audioSeconds&quot;: 10.666666666666666,
+          &quot;initializationMs&quot;: 292.403081,
+          &quot;finishMs&quot;: 0.003157,
+          &quot;meanMs&quot;: 0.591601081,
+          &quot;p95Ms&quot;: 1.198285,
+          &quot;p99Ms&quot;: 1.453428,
+          &quot;sustainedRatio&quot;: 0.08659168,
+          &quot;maxBacklogMs&quot;: 0,
+          &quot;provisional&quot;: true
+        },
+        &quot;following&quot;: {
+          &quot;onEvent&quot;: 0.6461783439490444,
+          &quot;ahead&quot;: 0.3538216560509555,
+          &quot;seconds&quot;: {
+            &quot;onEvent&quot;: 6.763333333333332,
+            &quot;ahead&quot;: 3.703333333333334,
+            &quot;behind&quot;: 0,
+            &quot;abstained&quot;: 0,
+            &quot;uncovered&quot;: 0,
+            &quot;falseFollowing&quot;: 0,
+            &quot;correctRejection&quot;: 0,
+            &quot;pending&quot;: 0.2,
+            &quot;indeterminate&quot;: 0,
+            &quot;answerable&quot;: 10.466666666666667,
+            &quot;supportedAnswerable&quot;: 10.466666666666667
+          },
+          &quot;hindsightOnEvent&quot;: 0.6461783439490444,
+          &quot;exposure&quot;: {
+            &quot;seconds&quot;: 3.703333333333334,
+            &quot;fraction&quot;: 0.3538216560509555,
+            &quot;longest&quot;: 0.6966666666666665
+          },
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 8,
+            &quot;of&quot;: 8,
+            &quot;delays&quot;: [
+              0.2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          &quot;recovery&quot;: {
+            &quot;recovered&quot;: 0,
+            &quot;of&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          },
+          &quot;extras&quot;: {
+            &quot;held&quot;: 0,
+            &quot;moved&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          }
+        },
+        &quot;diagnosticNearest&quot;: {
+          &quot;onEvent&quot;: 0.3070063694267515,
+          &quot;ahead&quot;: 0.6929936305732485,
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 8,
+            &quot;of&quot;: 8
+          }
+        },
+        &quot;record&quot;: {
+          &quot;path&quot;: &quot;/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/online-time-warp-14.s2-45.json&quot;,
+          &quot;sha256&quot;: &quot;4ab59108459bb7dbf81852e97b3e5f6791935d6b42f7ee96094bfc92803bafd1&quot;,
+          &quot;decisions&quot;: 1067
+        }
+      },
+      &quot;s2-63&quot;: {
+        &quot;started&quot;: {
+          &quot;ok&quot;: true
+        },
+        &quot;legacy&quot;: {
+          &quot;clamped&quot;: 0,
+          &quot;droppedNotes&quot;: 0
+        },
+        &quot;cost&quot;: {
+          &quot;machine&quot;: {
+            &quot;hostname&quot;: &quot;williao-G3-3579&quot;,
+            &quot;cpu&quot;: &quot;Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz&quot;,
+            &quot;cores&quot;: 12,
+            &quot;platform&quot;: &quot;linux&quot;,
+            &quot;arch&quot;: &quot;x64&quot;,
+            &quot;node&quot;: &quot;v22.22.1&quot;
+          },
+          &quot;sampleRate&quot;: 48000,
+          &quot;chunkSamples&quot;: 480,
+          &quot;chunks&quot;: 762,
+          &quot;audioSeconds&quot;: 7.619041666666667,
+          &quot;initializationMs&quot;: 301.915146,
+          &quot;finishMs&quot;: 0.003249,
+          &quot;meanMs&quot;: 0.584887786,
+          &quot;p95Ms&quot;: 1.189035,
+          &quot;p99Ms&quot;: 1.41498,
+          &quot;sustainedRatio&quot;: 0.098122956,
+          &quot;maxBacklogMs&quot;: 0,
+          &quot;provisional&quot;: true
+        },
+        &quot;following&quot;: {
+          &quot;onEvent&quot;: 0.6702179639104332,
+          &quot;ahead&quot;: 0.3297820360895668,
+          &quot;seconds&quot;: {
+            &quot;onEvent&quot;: 4.972375,
+            &quot;ahead&quot;: 2.4466666666666663,
+            &quot;behind&quot;: 0,
+            &quot;abstained&quot;: 0,
+            &quot;uncovered&quot;: 0,
+            &quot;falseFollowing&quot;: 0,
+            &quot;correctRejection&quot;: 0,
+            &quot;pending&quot;: 0.2,
+            &quot;indeterminate&quot;: 0,
+            &quot;answerable&quot;: 7.419041666666667,
+            &quot;supportedAnswerable&quot;: 7.419041666666667
+          },
+          &quot;hindsightOnEvent&quot;: 0.6702179639104332,
+          &quot;exposure&quot;: {
+            &quot;seconds&quot;: 2.4466666666666663,
+            &quot;fraction&quot;: 0.3297820360895668,
+            &quot;longest&quot;: 0.39714583333333353
+          },
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 8,
+            &quot;of&quot;: 8,
+            &quot;delays&quot;: [
+              0.2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          &quot;recovery&quot;: {
+            &quot;recovered&quot;: 0,
+            &quot;of&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          },
+          &quot;extras&quot;: {
+            &quot;held&quot;: 0,
+            &quot;moved&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          }
+        },
+        &quot;diagnosticNearest&quot;: {
+          &quot;onEvent&quot;: 0.44512150603458445,
+          &quot;ahead&quot;: 0.5548784939654157,
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 8,
+            &quot;of&quot;: 8
+          }
+        },
+        &quot;record&quot;: {
+          &quot;path&quot;: &quot;/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/online-time-warp-14.s2-63.json&quot;,
+          &quot;sha256&quot;: &quot;2f6c4087f93a98a29bfc33abf06181607498e355d9f6b1146818d01b77f97a39&quot;,
+          &quot;decisions&quot;: 762
+        }
+      },
+      &quot;s2-90&quot;: {
+        &quot;started&quot;: {
+          &quot;ok&quot;: true
+        },
+        &quot;legacy&quot;: {
+          &quot;clamped&quot;: 0,
+          &quot;droppedNotes&quot;: 0
+        },
+        &quot;cost&quot;: {
+          &quot;machine&quot;: {
+            &quot;hostname&quot;: &quot;williao-G3-3579&quot;,
+            &quot;cpu&quot;: &quot;Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz&quot;,
+            &quot;cores&quot;: 12,
+            &quot;platform&quot;: &quot;linux&quot;,
+            &quot;arch&quot;: &quot;x64&quot;,
+            &quot;node&quot;: &quot;v22.22.1&quot;
+          },
+          &quot;sampleRate&quot;: 48000,
+          &quot;chunkSamples&quot;: 480,
+          &quot;chunks&quot;: 534,
+          &quot;audioSeconds&quot;: 5.333333333333333,
+          &quot;initializationMs&quot;: 299.874413,
+          &quot;finishMs&quot;: 0.00346,
+          &quot;meanMs&quot;: 0.592658904,
+          &quot;p95Ms&quot;: 1.195863,
+          &quot;p99Ms&quot;: 1.492697,
+          &quot;sustainedRatio&quot;: 0.115567074,
+          &quot;maxBacklogMs&quot;: 0,
+          &quot;provisional&quot;: true
+        },
+        &quot;following&quot;: {
+          &quot;onEvent&quot;: 1,
+          &quot;ahead&quot;: 0,
+          &quot;seconds&quot;: {
+            &quot;onEvent&quot;: 5.133333333333333,
+            &quot;ahead&quot;: 0,
+            &quot;behind&quot;: 0,
+            &quot;abstained&quot;: 0,
+            &quot;uncovered&quot;: 0,
+            &quot;falseFollowing&quot;: 0,
+            &quot;correctRejection&quot;: 0,
+            &quot;pending&quot;: 0.2,
+            &quot;indeterminate&quot;: 0,
+            &quot;answerable&quot;: 5.133333333333333,
+            &quot;supportedAnswerable&quot;: 5.133333333333333
+          },
+          &quot;hindsightOnEvent&quot;: 1,
+          &quot;exposure&quot;: {
+            &quot;seconds&quot;: 0,
+            &quot;fraction&quot;: 0,
+            &quot;longest&quot;: 0
+          },
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 8,
+            &quot;of&quot;: 8,
+            &quot;delays&quot;: [
+              0.2,
+              0.0033333333333334103,
+              0.006666666666666821,
+              0,
+              0.0033333333333334103,
+              0.0066666666666663765,
+              0,
+              0.0033333333333329662
+            ]
+          },
+          &quot;recovery&quot;: {
+            &quot;recovered&quot;: 0,
+            &quot;of&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          },
+          &quot;extras&quot;: {
+            &quot;held&quot;: 0,
+            &quot;moved&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          }
+        },
+        &quot;diagnosticNearest&quot;: {
+          &quot;onEvent&quot;: 0.5506493506493505,
+          &quot;ahead&quot;: 0.44935064935064956,
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 8,
+            &quot;of&quot;: 8
+          }
+        },
+        &quot;record&quot;: {
+          &quot;path&quot;: &quot;/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/online-time-warp-14.s2-90.json&quot;,
+          &quot;sha256&quot;: &quot;50fdea827c98337f8fead6034d8680d2981025c711402061930cf78e91f86b0c&quot;,
+          &quot;decisions&quot;: 534
+        }
+      },
+      &quot;s2-99&quot;: {
+        &quot;started&quot;: {
+          &quot;ok&quot;: true
+        },
+        &quot;legacy&quot;: {
+          &quot;clamped&quot;: 0,
+          &quot;droppedNotes&quot;: 0
+        },
+        &quot;cost&quot;: {
+          &quot;machine&quot;: {
+            &quot;hostname&quot;: &quot;williao-G3-3579&quot;,
+            &quot;cpu&quot;: &quot;Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz&quot;,
+            &quot;cores&quot;: 12,
+            &quot;platform&quot;: &quot;linux&quot;,
+            &quot;arch&quot;: &quot;x64&quot;,
+            &quot;node&quot;: &quot;v22.22.1&quot;
+          },
+          &quot;sampleRate&quot;: 48000,
+          &quot;chunkSamples&quot;: 480,
+          &quot;chunks&quot;: 485,
+          &quot;audioSeconds&quot;: 4.8484791666666665,
+          &quot;initializationMs&quot;: 300.470173,
+          &quot;finishMs&quot;: 0.003198,
+          &quot;meanMs&quot;: 0.578013167,
+          &quot;p95Ms&quot;: 1.191361,
+          &quot;p99Ms&quot;: 1.45405,
+          &quot;sustainedRatio&quot;: 0.119792153,
+          &quot;maxBacklogMs&quot;: 0,
+          &quot;provisional&quot;: true
+        },
+        &quot;following&quot;: {
+          &quot;onEvent&quot;: 0.9389809391064284,
+          &quot;ahead&quot;: 0.06101906089357174,
+          &quot;seconds&quot;: {
+            &quot;onEvent&quot;: 4.364833333333334,
+            &quot;ahead&quot;: 0.28364583333333293,
+            &quot;behind&quot;: 0,
+            &quot;abstained&quot;: 0,
+            &quot;uncovered&quot;: 0,
+            &quot;falseFollowing&quot;: 0,
+            &quot;correctRejection&quot;: 0,
+            &quot;pending&quot;: 0.2,
+            &quot;indeterminate&quot;: 0,
+            &quot;answerable&quot;: 4.648479166666666,
+            &quot;supportedAnswerable&quot;: 4.648479166666666
+          },
+          &quot;hindsightOnEvent&quot;: 0.9389809391064284,
+          &quot;exposure&quot;: {
+            &quot;seconds&quot;: 0.28364583333333293,
+            &quot;fraction&quot;: 0.06101906089357174,
+            &quot;longest&quot;: 0.072125
+          },
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 8,
+            &quot;of&quot;: 8,
+            &quot;delays&quot;: [
+              0.2,
+              0.05393750000000008,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          &quot;recovery&quot;: {
+            &quot;recovered&quot;: 0,
+            &quot;of&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          },
+          &quot;extras&quot;: {
+            &quot;held&quot;: 0,
+            &quot;moved&quot;: 0,
+            &quot;notAssessable&quot;: 0
+          }
+        },
+        &quot;diagnosticNearest&quot;: {
+          &quot;onEvent&quot;: 0.5224871933921044,
+          &quot;ahead&quot;: 0.47751280660789575,
+          &quot;byEvent&quot;: {
+            &quot;reached&quot;: 8,
+            &quot;of&quot;: 8
+          }
+        },
+        &quot;record&quot;: {
+          &quot;path&quot;: &quot;/home/williao/dev/mnx-listening-data/contract2-stage1-v1/runs/g022-stage1-baselines/online-time-warp-14.s2-99.json&quot;,
+          &quot;sha256&quot;: &quot;1d07ecbe8511101d0143d95cd90587d94a65276d2a49496f16cd213e24c960ae&quot;,
+          &quot;decisions&quot;: 485
+        }
+      }
+    }
+  },
+  &quot;causality&quot;: {
+    &quot;clock-follower@1 s1&quot;: [
+      {
+        &quot;fraction&quot;: 0.25,
+        &quot;kind&quot;: &quot;silence&quot;,
+        &quot;pass&quot;: true
+      },
+      {
+        &quot;fraction&quot;: 0.25,
+        &quot;kind&quot;: &quot;alternating&quot;,
+        &quot;pass&quot;: true
+      },
+      {
+        &quot;fraction&quot;: 0.5,
+        &quot;kind&quot;: &quot;silence&quot;,
+        &quot;pass&quot;: true
+      },
+      {
+        &quot;fraction&quot;: 0.5,
+        &quot;kind&quot;: &quot;alternating&quot;,
+        &quot;pass&quot;: true
+      },
+      {
+        &quot;fraction&quot;: 0.75,
+        &quot;kind&quot;: &quot;silence&quot;,
+        &quot;pass&quot;: true
+      },
+      {
+        &quot;fraction&quot;: 0.75,
+        &quot;kind&quot;: &quot;alternating&quot;,
+        &quot;pass&quot;: true
+      }
+    ],
+    &quot;clock-follower@1 s2&quot;: [
+      {
+        &quot;fraction&quot;: 0.25,
+        &quot;kind&quot;: &quot;silence&quot;,
+        &quot;pass&quot;: true
+      },
+      {
+        &quot;fraction&quot;: 0.25,
+        &quot;kind&quot;: &quot;alternating&quot;,
+        &quot;pass&quot;: true
+      },
+      {
+        &quot;fraction&quot;: 0.5,
+        &quot;kind&quot;: &quot;silence&quot;,
+        &quot;pass&quot;: true
+      },
+      {
+        &quot;fraction&quot;: 0.5,
+        &quot;kind&quot;: &quot;alternating&quot;,
+        &quot;pass&quot;: true
+      },
+      {
+        &quot;fraction&quot;: 0.75,
+        &quot;kind&quot;: &quot;silence&quot;,
+        &quot;pass&quot;: true
+      },
+      {
+        &quot;fraction&quot;: 0.75,
+        &quot;kind&quot;: &quot;alternating&quot;,
+        &quot;pass&quot;: true
+      }
+    ],
+    &quot;online-time-warp@8 s1&quot;: [
+      {
+        &quot;fraction&quot;: 0.25,
+        &quot;kind&quot;: &quot;silence&quot;,
+        &quot;pass&quot;: true
+      },
+      {
+        &quot;fraction&quot;: 0.25,
+        &quot;kind&quot;: &quot;alternating&quot;,
+        &quot;pass&quot;: true
+      },
+      {
+        &quot;fraction&quot;: 0.5,
+        &quot;kind&quot;: &quot;silence&quot;,
+        &quot;pass&quot;: true
+      },
+      {
+        &quot;fraction&quot;: 0.5,
+        &quot;kind&quot;: &quot;alternating&quot;,
+        &quot;pass&quot;: true
+      },
+      {
+        &quot;fraction&quot;: 0.75,
+        &quot;kind&quot;: &quot;silence&quot;,
+        &quot;pass&quot;: true
+      },
+      {
+        &quot;fraction&quot;: 0.75,
+        &quot;kind&quot;: &quot;alternating&quot;,
+        &quot;pass&quot;: true
+      }
+    ],
+    &quot;online-time-warp@8 s2&quot;: [
+      {
+        &quot;fraction&quot;: 0.25,
+        &quot;kind&quot;: &quot;silence&quot;,
+        &quot;pass&quot;: true
+      },
+      {
+        &quot;fraction&quot;: 0.25,
+        &quot;kind&quot;: &quot;alternating&quot;,
+        &quot;pass&quot;: true
+      },
+      {
+        &quot;fraction&quot;: 0.5,
+        &quot;kind&quot;: &quot;silence&quot;,
+        &quot;pass&quot;: true
+      },
+      {
+        &quot;fraction&quot;: 0.5,
+        &quot;kind&quot;: &quot;alternating&quot;,
+        &quot;pass&quot;: true
+      },
+      {
+        &quot;fraction&quot;: 0.75,
+        &quot;kind&quot;: &quot;silence&quot;,
+        &quot;pass&quot;: true
+      },
+      {
+        &quot;fraction&quot;: 0.75,
+        &quot;kind&quot;: &quot;alternating&quot;,
+        &quot;pass&quot;: true
+      }
+    ],
+    &quot;online-time-warp@12 s1&quot;: [
+      {
+        &quot;fraction&quot;: 0.25,
+        &quot;kind&quot;: &quot;silence&quot;,
+        &quot;pass&quot;: true
+      },
+      {
+        &quot;fraction&quot;: 0.25,
+        &quot;kind&quot;: &quot;alternating&quot;,
+        &quot;pass&quot;: true
+      },
+      {
+        &quot;fraction&quot;: 0.5,
+        &quot;kind&quot;: &quot;silence&quot;,
+        &quot;pass&quot;: true
+      },
+      {
+        &quot;fraction&quot;: 0.5,
+        &quot;kind&quot;: &quot;alternating&quot;,
+        &quot;pass&quot;: true
+      },
+      {
+        &quot;fraction&quot;: 0.75,
+        &quot;kind&quot;: &quot;silence&quot;,
+        &quot;pass&quot;: true
+      },
+      {
+        &quot;fraction&quot;: 0.75,
+        &quot;kind&quot;: &quot;alternating&quot;,
+        &quot;pass&quot;: true
+      }
+    ],
+    &quot;online-time-warp@12 s2&quot;: [
+      {
+        &quot;fraction&quot;: 0.25,
+        &quot;kind&quot;: &quot;silence&quot;,
+        &quot;pass&quot;: true
+      },
+      {
+        &quot;fraction&quot;: 0.25,
+        &quot;kind&quot;: &quot;alternating&quot;,
+        &quot;pass&quot;: true
+      },
+      {
+        &quot;fraction&quot;: 0.5,
+        &quot;kind&quot;: &quot;silence&quot;,
+        &quot;pass&quot;: true
+      },
+      {
+        &quot;fraction&quot;: 0.5,
+        &quot;kind&quot;: &quot;alternating&quot;,
+        &quot;pass&quot;: true
+      },
+      {
+        &quot;fraction&quot;: 0.75,
+        &quot;kind&quot;: &quot;silence&quot;,
+        &quot;pass&quot;: true
+      },
+      {
+        &quot;fraction&quot;: 0.75,
+        &quot;kind&quot;: &quot;alternating&quot;,
+        &quot;pass&quot;: true
+      }
+    ],
+    &quot;online-time-warp@14 s1&quot;: [
+      {
+        &quot;fraction&quot;: 0.25,
+        &quot;kind&quot;: &quot;silence&quot;,
+        &quot;pass&quot;: true
+      },
+      {
+        &quot;fraction&quot;: 0.25,
+        &quot;kind&quot;: &quot;alternating&quot;,
+        &quot;pass&quot;: true
+      },
+      {
+        &quot;fraction&quot;: 0.5,
+        &quot;kind&quot;: &quot;silence&quot;,
+        &quot;pass&quot;: true
+      },
+      {
+        &quot;fraction&quot;: 0.5,
+        &quot;kind&quot;: &quot;alternating&quot;,
+        &quot;pass&quot;: true
+      },
+      {
+        &quot;fraction&quot;: 0.75,
+        &quot;kind&quot;: &quot;silence&quot;,
+        &quot;pass&quot;: true
+      },
+      {
+        &quot;fraction&quot;: 0.75,
+        &quot;kind&quot;: &quot;alternating&quot;,
+        &quot;pass&quot;: true
+      }
+    ],
+    &quot;online-time-warp@14 s2&quot;: [
+      {
+        &quot;fraction&quot;: 0.25,
+        &quot;kind&quot;: &quot;silence&quot;,
+        &quot;pass&quot;: true
+      },
+      {
+        &quot;fraction&quot;: 0.25,
+        &quot;kind&quot;: &quot;alternating&quot;,
+        &quot;pass&quot;: true
+      },
+      {
+        &quot;fraction&quot;: 0.5,
+        &quot;kind&quot;: &quot;silence&quot;,
+        &quot;pass&quot;: true
+      },
+      {
+        &quot;fraction&quot;: 0.5,
+        &quot;kind&quot;: &quot;alternating&quot;,
+        &quot;pass&quot;: true
+      },
+      {
+        &quot;fraction&quot;: 0.75,
+        &quot;kind&quot;: &quot;silence&quot;,
+        &quot;pass&quot;: true
+      },
+      {
+        &quot;fraction&quot;: 0.75,
+        &quot;kind&quot;: &quot;alternating&quot;,
+        &quot;pass&quot;: true
+      }
+    ]
+  },
+  &quot;sourceHashes&quot;: {
+    &quot;contracts/event-instruments-1.md&quot;: &quot;a3606ed14b32a38204822dd3d12fbd04e095575a6f6e224d25279c55af550045&quot;,
+    &quot;bench/oracle-events/oracle.json&quot;: &quot;8c192851e571f26716b3bd878b6cd293fcabf7b99198de625b17b9e8cdfbe9aa&quot;,
+    &quot;bench/src/events/label.ts&quot;: &quot;a9a1950505454ded512c23bfeeb4092a2935bcb838f87b623202d30f06fcb706&quot;,
+    &quot;bench/src/events/following.ts&quot;: &quot;644ba7adc9b43be5ad96768fcaa2ed85e78a655e8f54a204f66a058a9b363353&quot;,
+    &quot;bench/src/events/assessment.ts&quot;: &quot;d8c76ce14523f2664d1c1e190f0a7a69814cd2bc7849cd383ecda1b440570ae0&quot;,
+    &quot;bench/src/events/oracle.ts&quot;: &quot;14e78b6823b533f2b490cfae6d1a6386701812015a334e6a0ddf1fc5b091bd41&quot;,
+    &quot;bench/src/stages/stage1.ts&quot;: &quot;041f0c026dc8eca4ce48e1edd6b1a261e2fbd6f83b231890211712dd92023358&quot;,
+    &quot;bench/src/stages/run.ts&quot;: &quot;4ca968bb7ca7693c4c54a034be345902023bce410bdc3b3b2aaa49843d32b95d&quot;,
+    &quot;bench/src/seam/legacy.ts&quot;: &quot;b833b6949b6e2b25fe0f2e6497f58a80513312951bc2459f58506f71ddd22688&quot;,
+    &quot;bench/src/seam/runner.ts&quot;: &quot;ad6171f1bded35442558bf81b1c3ad79a128eb11f5aa7c7f9bd38feadc04f2ac&quot;,
+    &quot;bench/src/ladder/render.ts&quot;: &quot;8fede73efbfd588ade8526752c4952fa99c58f80bee33fd88093b94e67f1bda3&quot;,
+    &quot;bench/src/ladder/candidates.ts&quot;: &quot;b86b40f7c50771669e25bd86c22d95896e0b6388a6758632ec94090ff908b554&quot;,
+    &quot;bench/src/candidates/clockFollower.ts&quot;: &quot;687cbaaed6323594761986370ade1e7c4262fcd02deb4930ba5a0c64c35df5b9&quot;,
+    &quot;bench/src/candidates/onlineTimeWarp1.ts&quot;: &quot;1f87dbf4ad65ae4ce7c48d8b05b751113e18948148267895a517dfc639f45356&quot;,
+    &quot;bench/src/candidates/onlineTimeWarp2.ts&quot;: &quot;b64d4adfe14d0d93cc9a32dc8a6d831b2b073efb7c6801eee4c8c94fe34f3c4b&quot;,
+    &quot;bench/src/candidates/onlineTimeWarpConfigurable.ts&quot;: &quot;312c29450533c289f6756fc4e985e3c6b8bed0ba858183e403a2c267000845c6&quot;,
+    &quot;bench/src/candidates/onlineTimeWarp8.ts&quot;: &quot;cef239ceec5844f48eb91b25618e5c4351dbccd1d162b5377b9683a5881721a5&quot;,
+    &quot;bench/src/candidates/onlineTimeWarp12.ts&quot;: &quot;0438d85c0a96d831e747da0cef72ced3d9e4e1015f2071cb7d683215753a9719&quot;,
+    &quot;bench/src/candidates/onlineTimeWarp14.ts&quot;: &quot;6a77d3038c68420f35988de9755268d5cf1fc597044a10ed2fdf7b8d06e39c7e&quot;,
+    &quot;listen/liveView.ts&quot;: &quot;dd318f593588cad27390d6008de3736dae3e0e03579473307903c8b49caf6ff4&quot;,
+    &quot;listen/backend.ts&quot;: &quot;d42ad1152a60cf32f9216088c8be43ae03e690215049aaabeb6aec2644229164&quot;,
+    &quot;listen/validate.ts&quot;: &quot;9c2c326cfd6cdded44033df4428aeb5dc4cc4cbae99bcf65fbcf8ccfd66a4606&quot;,
+    &quot;listen/positions.ts&quot;: &quot;2cd20b98683df8c45e0a063d3fb028b56c258fc5d693814c88ba08c4623f29c2&quot;
+  }
+}
+</pre><p>SHA-256 <code>66cd6f6e75028beaaf77e834faf083bd8c3445b32aa6045ce93c4067a1fae792</code></p></details><footer>Summary SHA-256 <code>bbc4d1d38f91d93b50ac15d5018d134821ce3e333ac79a35ea95553f8d04b239</code>. This report does not rerun or alter an experiment.</footer></main></body></html>

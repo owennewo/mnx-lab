@@ -1,4 +1,18 @@
 {
   "note": "One row per numbered report rendered by export-report.mjs. A new experiment adds a row here, not an exporter. The first series' registry is archive/ladder-1/reports/reports.json.",
-  "reports": []
+  "reports": [
+    {
+      "number": "022",
+      "slug": "022-event-instruments",
+      "title": "022 · Event instruments, stage 1 and the frozen baselines",
+      "banner": "Instruments trusted · every oracle number reproduced · every baseline fails stage 1 by running ahead · gates proposed, awaiting the user",
+      "runs": [
+        "g022-stage1-baselines"
+      ],
+      "previous": {
+        "href": "../archive/ladder-1/reports/021-stability-calibration.html",
+        "label": "Experiment 021 (first series)"
+      }
+    }
+  ]
 }
