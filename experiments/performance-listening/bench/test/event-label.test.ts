@@ -2,8 +2,8 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { compilePerformance } from '../../../../src/audio/performance.ts';
 import type { MnxStructure } from '../../../../src/model/mnx.ts';
-import { perfectLabel, type PerformanceLabel, validateLabel } from '../src/events/label.ts';
-import { expandLabel, readOracle } from '../src/events/oracle.ts';
+import { controlLabel, perfectLabel, type PerformanceLabel, validateLabel, writesDeadNotes } from '../src/events/label.ts';
+import { expandLabel, expandLabel2, readOracle, readOracle2 } from '../src/events/oracle.ts';
 import { windowNotes } from '../src/ladder/render.ts';
 import { totalQuarters } from '../src/stages/stage1.ts';
 
@@ -41,5 +41,28 @@ describe('performance-label@1', () => {
     expect(broken(l => { l.performance.events[2]!.distinguishableAt = 2; })).toThrow(/distinguishableAt/);
     expect(broken(l => { l.performance.events[3]!.notes[0] = { noteKey: 'n3', outcome: 'wrong', onset: 3, end: 4, heardMidi: 65 }; })).toThrow(/names the pitch heard/);
     expect(broken(l => { l.performance.events[5]!.onset = 4.5; })).toThrow(/earliest sounded note/);
+  });
+
+  it('version 2: a written dead note played dead is matched, and may ring at its written pitch as a wrong note', () => {
+    const oracle = readOracle2(), broken = (id: string, edit: (l: PerformanceLabel) => void) => { const l = expandLabel2(oracle, id); edit(l); return () => validateLabel(l); };
+    expect(broken('toyDW-as-written-60', () => {})).not.toThrow();
+    expect(broken('toyDW-rang-60', () => {})).not.toThrow();
+    expect(broken('toyDW-as-written-60', l => { l.performance.events[2]!.notes[0] = { noteKey: 'n2', outcome: 'dead', onset: 2, end: 2.1 }; })).toThrow(/is matched/);
+    expect(broken('toy8-perfect-60', l => { l.performance.events[2]!.notes[0] = { noteKey: 'n2', outcome: 'wrong', onset: 2, end: 3, heardMidi: 64 }; })).toThrow(/names the pitch heard/);
+    expect(broken('toy8-perfect-60', l => { l.format = 'performance-label@1'; l.events[2]!.notes[0]!.dead = true; })).toThrow(/version-2 label/);
+    expect(broken('toyW-hears-toy8', l => { l.performance.events[0]!.notes[0] = { noteKey: 'w0', outcome: 'matched', onset: 0, end: 1 }; l.performance.events[0]!.onset = 0; })).toThrow(/control plays no note/);
+  });
+
+  it('labels a control: every event of the handed score missing, the whole clip unsupported', () => {
+    const score = source('w1-two-bar-black-keys.mnx.json'), c = compilePerformance(score);
+    if (!c.ok) throw new Error('compile');
+    expect(writesDeadNotes(score)).toBe(false);
+    const label = controlLabel({ id: 'w', performance: c.performance, score: { path: 'p', sha256: 'x' }, handedQuartersPerMinute: 90, duration: 2,
+      audio: null, control: 'wrong-score', extras: [{ onset: 0, end: 1, midi: 60 }], recipe: {}, note: 'test' });
+    expect(label.events.map(e => e.notes[0]!.midi)).toEqual([66, 68, 70, 73, 75, 78, 80, 82]);
+    expect(label.performance.events.every(p => p.onset === null && p.notes.every(n => n.outcome === 'missing'))).toBe(true);
+    expect(label.cursor.segments).toEqual([{ from: 0, uncertainty: 0, state: 'unsupported', truth: null, admissible: [], rule: [] }]);
+    expect(() => controlLabel({ id: 's', performance: c.performance, score: { path: 'p', sha256: 'x' }, handedQuartersPerMinute: 90, duration: 2,
+      audio: null, control: 'silence', extras: [{ onset: 0, end: 1, midi: 60 }], recipe: {}, note: 'test' })).toThrow(/Silence has no extras/);
   });
 });

@@ -35,4 +35,12 @@ describe('the note-verdict shape (unscored until the assessment milestone)', () 
     expect(bad({ timingErrorSeconds: Number.NaN })).toThrow(/measures/);
     expect(bad({ at: { ordinal: 9, metricOffset: note.kind === 'note' ? note.at.metricOffset : null } })).toThrow(/outside/);
   });
+  it('accepts the version 2.1 dead verdict, which names its note and hears no pitch', () => {
+    const note = record.find(d => d.id === 'n-match')!;
+    const dead = (patch: object) => () => validateRecord([{ ...note, verdict: 'dead', ...patch } as typeof note], compiled.performance);
+    expect(dead({ observed: null })).not.toThrow();
+    expect(dead({ observed: { onset: 0.2, end: 0.25, midi: null, string: 6 } })).not.toThrow();
+    expect(dead({ observed: { onset: 0.2, end: 0.25, midi: 60, string: 6 } })).toThrow(/no observed pitch/);
+    expect(dead({ noteKey: null })).toThrow(/extra/);
+  });
 });

@@ -1,18 +1,24 @@
-/** performance-label@1 (contracts/event-instruments-1.md): what a performance was, with
- * exact truth. The evaluators read labels; they never infer an admissible set. */
+/** performance-label@1 (contracts/event-instruments-1.md) and performance-label@2
+ * (contracts/event-instruments-2.md): what a performance was, with exact truth. Version 2
+ * adds written dead notes and negative controls. The evaluators read labels; they never
+ * infer an admissible set. */
 import type { Performance } from '../../../../../src/audio/performanceTypes.ts';
 import { scorePositionAt } from '../../../../../src/audio/scorePosition.ts';
 import { compare } from '../../../../../src/audio/time.ts';
 import type { ScorePosition } from '../../../listen/contract.ts';
 import { positionFromJSON, positionToJSON, type ScorePositionJSON } from '../../../listen/json.ts';
 import { topOfScore } from '../../../listen/positions.ts';
+import type { MnxStructure } from '../../../../../src/model/mnx.ts';
 
 export const LABEL_FORMAT = 'performance-label@1';
+export const LABEL_FORMAT_2 = 'performance-label@2';
+export type LabelFormat = typeof LABEL_FORMAT | typeof LABEL_FORMAT_2;
 /** The decision deadline, as contract 1 set it and contract 2 keeps it. */
 export const DEADLINE = 0.2;
 
 export type Outcome = 'matched' | 'missing' | 'wrong' | 'dead';
-export interface LabelEvent { index: number; at: ScorePositionJSON; quarter: number; notes: { noteKey: string; midi: number }[] }
+/** `dead` (version 2 only): the score writes the note as a dead note; `midi` is its written pitch. */
+export interface LabelEvent { index: number; at: ScorePositionJSON; quarter: number; notes: { noteKey: string; midi: number; dead?: true }[] }
 export interface PlayedNote { noteKey: string; outcome: Outcome; onset?: number; end?: number; heardMidi?: number }
 export interface PlayedEvent { index: number; onset: number | null; distinguishableAt: number | null; notes: PlayedNote[] }
 export interface Extra { onset: number; end: number; midi: number | null }
@@ -21,7 +27,7 @@ export interface Segment {
   truth: number | null; admissible: number[]; rule: string[];
 }
 export interface PerformanceLabel {
-  format: typeof LABEL_FORMAT;
+  format: LabelFormat;
   id: string;
   score: { path: string; sha256: string | null };
   handoff: { from: ScorePositionJSON; quartersPerMinute: number };
@@ -36,6 +42,8 @@ export interface PerformanceLabel {
 export const comparePositions = (a: ScorePosition, b: ScorePosition): number =>
   a.ordinal !== b.ordinal ? Math.sign(a.ordinal - b.ordinal) : compare(a.metricOffset, b.metricOffset);
 export const eventPositions = (label: PerformanceLabel): ScorePosition[] => label.events.map(e => positionFromJSON(e.at));
+/** Version 2: a label with no supported segment is a negative control. */
+export const isControl = (label: PerformanceLabel): boolean => label.cursor.segments.every(s => s.state === 'unsupported');
 
 const requireThat = (ok: boolean, message: string) => { if (!ok) throw new Error(`${message}`); };
 const finite = (n: unknown): n is number => typeof n === 'number' && Number.isFinite(n);
@@ -43,12 +51,14 @@ const same = (a: readonly number[], b: readonly number[]) => a.length === b.leng
 
 export function validateLabel(label: PerformanceLabel): void {
   const at = (m: string) => `Label ${label.id}: ${m}`;
-  requireThat(label.format === LABEL_FORMAT, at('unknown format'));
+  requireThat(label.format === LABEL_FORMAT || label.format === LABEL_FORMAT_2, at('unknown format'));
+  const version2 = label.format === LABEL_FORMAT_2;
   requireThat(finite(label.duration) && label.duration > 0, at('invalid duration'));
   requireThat(finite(label.handoff.quartersPerMinute) && label.handoff.quartersPerMinute > 0, at('invalid handed tempo'));
   const positions = eventPositions(label);
   label.events.forEach((e, i) => {
     requireThat(e.index === i && e.notes.length > 0 && finite(e.quarter), at(`event ${i} is malformed`));
+    requireThat(e.notes.every(n => n.dead === undefined || (version2 && n.dead === true)), at(`event ${i}: only a version-2 label writes dead notes`));
     if (i) requireThat(comparePositions(positions[i - 1]!, positions[i]!) < 0 && label.events[i - 1]!.quarter < e.quarter, at(`event ${i} is out of order`));
   });
   requireThat(label.performance.events.length === label.events.length, at('one played entry per event'));
@@ -63,7 +73,8 @@ export function validateLabel(label: PerformanceLabel): void {
       if (n.outcome === 'missing') { requireThat(n.onset === undefined && n.end === undefined && n.heardMidi === undefined, at(`${n.noteKey}: a missing note has no timing`)); continue; }
       requireThat(['matched', 'wrong', 'dead'].includes(n.outcome), at(`${n.noteKey}: unknown outcome`));
       requireThat(finite(n.onset) && finite(n.end) && n.onset >= 0 && n.onset < n.end, at(`${n.noteKey}: a sounded note needs onset < end`));
-      requireThat(n.outcome === 'wrong' ? finite(n.heardMidi) && n.heardMidi !== written.midi : n.heardMidi === undefined, at(`${n.noteKey}: only a wrong note names the pitch heard`));
+      requireThat(!(written.dead && n.outcome === 'dead'), at(`${n.noteKey}: a dead note the score writes, played dead, is matched`));
+      requireThat(n.outcome === 'wrong' ? finite(n.heardMidi) && (written.dead === true || n.heardMidi !== written.midi) : n.heardMidi === undefined, at(`${n.noteKey}: only a wrong note names the pitch heard`));
       onsets.push(n.onset!);
     }
     const onset = onsets.length ? Math.min(...onsets) : null;
@@ -81,6 +92,7 @@ export function validateLabel(label: PerformanceLabel): void {
     else requireThat(s.state === 'supported' && (s.truth === null || s.admissible.includes(s.truth)), at(`segment ${i}'s admissible set omits its truth`));
   });
   const sounded = label.performance.events.filter(p => p.onset !== null);
+  if (version2 && isControl(label)) requireThat(sounded.length === 0, at('a control plays no note of the handed score'));
   if (label.cursor.resolution === 'event') {
     const supported = segments.filter(s => s.state === 'supported');
     if (supported.length) {
@@ -98,30 +110,42 @@ export function validateLabel(label: PerformanceLabel): void {
   });
 }
 
-/** The label of a perfect performance: every note matched at the time it was rendered.
- * It implements no ambiguity rule, so it refuses consecutive events of identical pitches. */
-export function perfectLabel(args: {
-  id: string; performance: Performance; score: { path: string; sha256: string };
-  handedQuartersPerMinute: number; duration: number;
-  audio: PerformanceLabel['audio'];
-  rendered: readonly { fromSample: number; toSample: number; midi: number; scoreQuarter: number; noteKey: string | null }[];
-  sampleRate: number; recipe: unknown;
-}): PerformanceLabel {
+/** A score's events from Studio's compiled performance: its notes grouped by onset. */
+export function scoreEvents(performance: Performance): LabelEvent[] {
   const quartersOf = (r: { num: bigint; den: bigint }) => 4 * Number(r.num) / Number(r.den);
   const byPosition = new Map<number, { position: Performance['sounding'][number]['position']; notes: { noteKey: string; midi: number }[] }>();
-  for (const n of args.performance.sounding) {
-    const written = args.performance.written.find(w => n.writtenIds.includes(w.id));
+  for (const n of performance.sounding) {
+    const written = performance.written.find(w => n.writtenIds.includes(w.id));
     if (!written) throw new Error('A sounding note has no written note');
     const q = quartersOf(n.position), group = byPosition.get(q) ?? { position: n.position, notes: [] };
     group.notes.push({ noteKey: written.noteKey, midi: n.midi });
     byPosition.set(q, group);
   }
   const groups = [...byPosition.entries()].sort((a, b) => a[0] - b[0]);
-  const events: LabelEvent[] = groups.map(([quarter, g], index) => {
-    const at = scorePositionAt(args.performance, g.position);
+  return groups.map(([quarter, g], index) => {
+    const at = scorePositionAt(performance, g.position);
     if (!at.ok) throw new Error(at.diagnostic.message);
     return { index, at: positionToJSON(at.value), quarter, notes: g.notes.sort((a, b) => a.midi - b.midi) };
   });
+}
+
+/** Whether an MNX document writes any dead note (`_x.mnxLab.tab.technique.dead`). */
+export function writesDeadNotes(score: MnxStructure): boolean {
+  return score.parts.some(p => (p.measures ?? []).some(m => JSON.stringify(m).includes('"dead":true')));
+}
+
+/** The label of a perfect performance: every note matched at the time it was rendered.
+ * It implements no ambiguity rule, so it refuses consecutive events of identical pitches.
+ * A sine rendering sounds every note's pitch, so the caller must refuse a score that
+ * writes dead notes (`writesDeadNotes`); this labeller never marks one. */
+export function perfectLabel(args: {
+  id: string; performance: Performance; score: { path: string; sha256: string };
+  handedQuartersPerMinute: number; duration: number;
+  audio: PerformanceLabel['audio'];
+  rendered: readonly { fromSample: number; toSample: number; midi: number; scoreQuarter: number; noteKey: string | null }[];
+  sampleRate: number; recipe: unknown; format?: LabelFormat;
+}): PerformanceLabel {
+  const events = scoreEvents(args.performance);
   const pitches = (e: LabelEvent) => e.notes.map(n => n.midi).join(',');
   events.forEach((e, i) => { if (i && pitches(e) === pitches(events[i - 1]!)) throw new Error('Consecutive identical events need an ambiguity rule this labeller does not implement'); });
   const played: PlayedEvent[] = events.map(e => {
@@ -137,12 +161,36 @@ export function perfectLabel(args: {
   const segments: Segment[] = played.map(p => ({ from: p.onset!, uncertainty: 0, state: 'supported', truth: p.index, admissible: [p.index], rule: ['sounded'] }));
   if (segments[0]!.from > 0) segments.unshift({ from: 0, uncertainty: 0, state: 'supported', truth: null, admissible: [], rule: [] });
   const label: PerformanceLabel = {
-    format: LABEL_FORMAT, id: args.id, score: args.score,
+    format: args.format ?? LABEL_FORMAT, id: args.id, score: args.score,
     handoff: { from: positionToJSON(topOfScore(args.performance)), quartersPerMinute: args.handedQuartersPerMinute },
     duration: args.duration, audio: args.audio, events,
     performance: { events: played, extras: [] },
     cursor: { resolution: 'event', segments },
     provenance: { kind: 'generated', recipe: args.recipe, note: 'Perfect performance: every note matched at its rendered sample boundaries.' },
+  };
+  validateLabel(label);
+  return label;
+}
+
+/** A performance-label@2 negative control: the handed score's every event missing, the
+ * whole clip unsupported, and whatever sounded listed as extras (none for silence). */
+export function controlLabel(args: {
+  id: string; performance: Performance; score: { path: string; sha256: string };
+  handedQuartersPerMinute: number; duration: number; audio: PerformanceLabel['audio'];
+  control: 'silence' | 'wrong-score'; extras: Extra[]; recipe: Record<string, unknown>; note: string;
+}): PerformanceLabel {
+  if ((args.control === 'silence') !== (args.extras.length === 0)) throw new Error('Silence has no extras; a wrong-score control has the other piece\'s notes');
+  const events = scoreEvents(args.performance);
+  const label: PerformanceLabel = {
+    format: LABEL_FORMAT_2, id: args.id, score: args.score,
+    handoff: { from: positionToJSON(topOfScore(args.performance)), quartersPerMinute: args.handedQuartersPerMinute },
+    duration: args.duration, audio: args.audio, events,
+    performance: {
+      events: events.map(e => ({ index: e.index, onset: null, distinguishableAt: null, notes: e.notes.map(n => ({ noteKey: n.noteKey, outcome: 'missing' as const })) })),
+      extras: args.extras,
+    },
+    cursor: { resolution: 'event', segments: [{ from: 0, uncertainty: 0, state: 'unsupported', truth: null, admissible: [], rule: [] }] },
+    provenance: { kind: 'generated', recipe: { ...args.recipe, control: args.control }, note: args.note },
   };
   validateLabel(label);
   return label;

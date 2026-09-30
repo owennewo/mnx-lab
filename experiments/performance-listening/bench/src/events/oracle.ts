@@ -1,12 +1,13 @@
-/** Reads event-oracle@1 and expands its shorthand into labels, version-2 records and
- * assessment reports. It computes nothing the oracle is meant to check. */
+/** Reads event-oracle@1 and event-oracle@2 and expands their shorthand into labels,
+ * version-2 records and assessment reports. It computes nothing the oracles check. */
 import { readFileSync } from 'node:fs';
 import { rational, toRationalJSON } from '../../../../../src/audio/time.ts';
 import type { Decision } from '../../../listen/contract.ts';
 import { positionFromJSON, type ScorePositionJSON } from '../../../listen/json.ts';
 import { sha } from '../ladder/privateSets.ts';
 import { type AssessmentReport, REPORT_FORMAT } from './assessment.ts';
-import { LABEL_FORMAT, type PerformanceLabel, type PlayedNote } from './label.ts';
+import { type AssessmentReport2, REPORT_FORMAT_2 } from './assessment2.ts';
+import { LABEL_FORMAT, LABEL_FORMAT_2, type PerformanceLabel, type PlayedNote } from './label.ts';
 
 export const ORACLE_DIR = new URL('../../oracle-events/', import.meta.url);
 
@@ -110,5 +111,72 @@ export function expandReport(label: PerformanceLabel, r: ReportShorthand): Asses
   }
   return { format: REPORT_FORMAT, notes, tempo: { overall: r.overall,
     intervals: r.intervals.map(([from, to, quartersPerMinute]) => ({ from: at(from), to: at(to), quartersPerMinute })),
+    flags: r.flags.map(([ordinal, direction]) => ({ ordinal, direction })) } };
+}
+
+// ---- event-oracle@2 (contracts/event-instruments-2.md) ----
+
+type ScoreShorthand2 = { at: string; quarter: number; notes: ([string, number] | [string, number, 'dead'])[] }[];
+interface LabelShorthand2 extends Omit<LabelShorthand, 'score'> { score: string; control?: 'silence' | 'wrong-score' }
+export interface ReportShorthand2 {
+  overall: number | null; intervals: [number, number, number][]; flags: [number, 'slow' | 'fast'][];
+  notes: { default: 'match' | 'missing'; omit?: string[]; misplace?: Record<string, number> } & Record<string, unknown>;
+}
+export type GateName = string;
+export interface FollowingExpected2 extends FollowingExpected { gates: GateName[] }
+export interface AssessmentExpected2 {
+  overallError: number | null; intervals: [number, number, number, number, number]; worst: [number | null, number | null];
+  slow: [number, number, number, number]; fast: [number, number, number, number];
+  missing: [number, number, number, number]; wrong: [number, number, number, number, number]; dead: [number, number, number, number];
+  matched: [number, number]; unassessed: number; unplaced: number;
+  falseFindings: number; claimedPlayed: number; tempoClaims: number; clean: boolean; gates: GateName[];
+}
+export interface Oracle2 {
+  format: 'event-oracle@2';
+  scores: Record<string, ScoreShorthand2>;
+  labels: Record<string, LabelShorthand2>;
+  following: { id: string; title: string; label?: string; labels?: string[]; records: Record<string, { note: string; decisions: RecordShorthand; expected: FollowingExpected2 }> }[];
+  assessment: { id: string; title: string; labels: string[];
+    derived: { handed: number; overall: number | null; typical: number | null; intervals: [number, number, number, number][];
+      bars: [number, number | null, number | null, string][]; clean: boolean };
+    reports: Record<string, { note: string; report: ReportShorthand2; expected: AssessmentExpected2 }> }[];
+}
+
+/** Version 2, refused unless its bytes are the frozen ones. */
+export function readOracle2(): Oracle2 {
+  const bytes = readFileSync(new URL('oracle-2.json', ORACLE_DIR));
+  const frozen = JSON.parse(readFileSync(new URL('freeze-2.json', ORACLE_DIR), 'utf8')) as { sha256: string };
+  if (sha(bytes) !== frozen.sha256) throw new Error('event-oracle@2 changed since it was frozen');
+  return JSON.parse(bytes.toString('utf8')) as Oracle2;
+}
+
+/** A performance-label@2: as version 1's expansion, with written dead notes marked and a
+ * played note on one matched unless overridden. */
+export function expandLabel2(oracle: Oracle2, id: string): PerformanceLabel {
+  const s = oracle.labels[id];
+  if (!s) throw new Error(`No oracle label ${id}`);
+  const score = oracle.scores[s.score]!;
+  const events = score.map((e, index) => ({ index, at: position(e.at), quarter: e.quarter,
+    notes: e.notes.map(([noteKey, midi, dead]) => (dead === 'dead' ? { noteKey, midi, dead: true as const } : { noteKey, midi })) }));
+  const asVersion1 = { ...oracle, format: 'event-oracle@1', scores: { [s.score]: score.map(e => ({ ...e, notes: e.notes.map(([k, m]) => [k, m] as [string, number]) })) } } as unknown as Oracle;
+  const label = expandLabel(asVersion1, id);
+  return { ...label, format: LABEL_FORMAT_2, events,
+    provenance: { kind: 'hand-worked', ...(s.control ? { recipe: { control: s.control } } : {}), note: s.note } };
+}
+
+export function expandReport2(label: PerformanceLabel, r: ReportShorthand2): AssessmentReport2 {
+  const at = (index: number) => positionFromJSON(label.events[index]!.at);
+  const notes: Decision[] = [];
+  for (const e of label.events) for (const { noteKey } of e.notes) {
+    if (r.notes.omit?.includes(noteKey)) continue;
+    const o = (r.notes[noteKey] ?? r.notes.default) as 'match' | 'missing' | 'dead' | ['substitution', number | null];
+    const verdict = Array.isArray(o) ? 'substitution' as const : o;
+    notes.push({ id: `note-${noteKey}`, kind: 'note', refersTo: label.duration, madeAt: label.duration, verdict,
+      at: at(r.notes.misplace?.[noteKey] ?? e.index), noteKey,
+      observed: Array.isArray(o) ? { onset: null, end: null, midi: o[1], string: null } : null,
+      timingErrorSeconds: null, durationErrorSeconds: null, confidence: 1 });
+  }
+  return { format: REPORT_FORMAT_2, notes, tempo: { overall: r.overall,
+    intervals: r.intervals.map(([from, to, seconds]) => ({ from: at(from), to: at(to), seconds })),
     flags: r.flags.map(([ordinal, direction]) => ({ ordinal, direction })) } };
 }

@@ -6,7 +6,7 @@ import type { MnxStructure } from '../../../src/model/mnx.ts';
 import type { Decision, NoteVerdict, ScorePosition } from './contract.ts';
 import { canonical } from './positions.ts';
 
-const VERDICTS: readonly NoteVerdict[] = ['match', 'missing', 'extra', 'substitution', 'timing', 'duration'];
+const VERDICTS: readonly NoteVerdict[] = ['match', 'missing', 'extra', 'substitution', 'timing', 'duration', 'dead'];
 const requireThat = (ok: boolean, message: string) => { if (!ok) throw new Error(message); };
 const finite = (n: unknown) => typeof n === 'number' && Number.isFinite(n);
 const nullableFinite = (n: unknown) => n === null || finite(n);
@@ -35,6 +35,7 @@ export function validateRecord(record: readonly Decision[], performance?: Perfor
       requireThat(d.noteKey === null || (typeof d.noteKey === 'string' && d.noteKey.length > 0), 'Invalid note key');
       requireThat((d.verdict === 'extra') === (d.noteKey === null), 'Only an extra note has no note key');
       if (d.observed !== null) requireThat(['onset', 'end', 'midi', 'string'].every(k => nullableFinite((d.observed as Record<string, unknown>)[k])), 'Invalid observation');
+      requireThat(d.verdict !== 'dead' || d.observed === null || d.observed.midi === null, 'A dead note has no observed pitch');
       requireThat(nullableFinite(d.timingErrorSeconds) && nullableFinite(d.durationErrorSeconds) && unit(d.confidence), 'Invalid note measures');
     } else requireThat(d.kind === 'unsupported', 'Invalid decision kind');
     ids.set(d.id, d); clock = d.madeAt;

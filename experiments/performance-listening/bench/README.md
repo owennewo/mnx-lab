@@ -60,12 +60,20 @@ Their tests keep passing; the archived runs they read are under
 
 **New under contract 2.** Kept in new folders, so the split stays visible:
 
-- `src/events/`: the instruments of [event instruments 1](../contracts/event-instruments-1.md):
-  `label.ts` (performance-label@1 and the perfect-performance labeller),
-  `following.ts` (following-evaluator@2), `assessment.ts` (assessment-report@1 and
-  assessment-evaluator@1) and `oracle.ts` (reads the oracle's shorthand).
-- `oracle-events/`: event-oracle@1, hand-worked and frozen; `test/event-oracle.test.ts`
-  holds both evaluators to it.
-- `src/stages/`: `stage1.ts` renders and freezes stage 1; `run.ts` measures frozen
-  listeners on a frozen stage set. Deviation renderers, a scoreboard and new listeners
-  come later.
+- `src/events/`: the instruments of [event instruments 1](../contracts/event-instruments-1.md)
+  and [2](../contracts/event-instruments-2.md): `label.ts` (performance-label@1 and @2,
+  the perfect-performance labeller and the control labeller), `following.ts`
+  (following-evaluator@2, unchanged by version 2), `assessment.ts` (assessment-report@1
+  and assessment-evaluator@1, frozen), `assessment2.ts` (assessment-report@2 and
+  assessment-evaluator@2), `gates.ts` (stage-gates@1: the approved gates, and the
+  proposed control-assessment gates) and `oracle.ts` (reads both oracles' shorthand).
+- `oracle-events/`: event-oracle@1 and @2, hand-worked and frozen;
+  `test/event-oracle.test.ts` and `test/event-oracle-2.test.ts` hold the evaluators and
+  gates to them. Use version 2 and the version-2 evaluators for anything new.
+- `src/stages/`: `stage1.ts` rendered `contract2-stage1-v1`; `stage1v2.ts` renders
+  `contract2-stage1-v2`, the same eight performances with a silence and a wrong-score
+  control beside each; `run.ts` (022) and `run023.ts` (023) measure frozen listeners on a
+  frozen stage set. Deviation renderers, a scoreboard and new listeners come later.
+  `contract2-stage1-v1`'s manifest names its score files by absolute path in a worktree
+  that no longer exists, so `readStageSet` cannot re-verify it; v2 names scores relative
+  to the experiment (`assetPath`).

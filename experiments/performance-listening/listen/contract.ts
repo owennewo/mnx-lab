@@ -6,7 +6,8 @@ import type { Rational } from '../../../src/audio/time.ts';
 import type { MnxStructure } from '../../../src/model/mnx.ts';
 
 export type { ScorePosition };
-export const VOCABULARY_VERSION = 'listening-vocabulary@2';
+/** Version 2.1 added the `dead` note verdict (contracts/vocabulary-v2.md#version-21-the-dead-verdict). */
+export const VOCABULARY_VERSION = 'listening-vocabulary@2.1';
 
 /** Where and how a listening session starts. Studio supplies all of it. */
 export interface Handoff {
@@ -31,7 +32,8 @@ export interface PositionStatement {
   confidence: number;
 }
 export interface UnsupportedStatement { kind: 'unsupported'; reason?: string }
-export type NoteVerdict = 'match' | 'missing' | 'extra' | 'substitution' | 'timing' | 'duration';
+/** `dead` (version 2.1): sounded as a pitchless onset where the score does not write a dead note. */
+export type NoteVerdict = 'match' | 'missing' | 'extra' | 'substitution' | 'timing' | 'duration' | 'dead';
 /** The issue shape for the note-assessment milestone: fixed now, scored later. */
 export interface NoteStatement {
   kind: 'note';
