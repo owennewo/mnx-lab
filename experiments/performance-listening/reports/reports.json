@@ -65,6 +65,20 @@
         "href": "025-single-hesitation.html",
         "label": "Experiment 025"
       }
+    },
+    {
+      "number": "027",
+      "slug": "027-live-confirmation",
+      "title": "027 · Confirm live pitch evidence before committing",
+      "banner": "Slowed-bar repair passes · 264/264 examples · 1584 fresh prefix checks · unchanged musical assessment · one-hop latency cost",
+      "runs": [
+        "g027-live-confirmation",
+        "g027a-live-confirmation"
+      ],
+      "previous": {
+        "href": "026-single-slowed-bar.html",
+        "label": "Experiment 026"
+      }
     }
   ]
 }

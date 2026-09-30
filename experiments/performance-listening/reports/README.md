@@ -14,6 +14,8 @@ not here. The first series' reports, 001–021, are in
 | 025 | [One hesitation on the same sine scores](025-single-hesitation.html) | [g025](../runs/g025-single-hesitation/summary.json) |
 | 026 | [One slowed bar on the same sine scale](026-single-slowed-bar.html) | [g026](../runs/g026-single-slowed-bar/summary.json) |
 
+| 027 | [Confirm live pitch evidence before committing](027-live-confirmation.html) | [g027a](../runs/g027a-live-confirmation/summary.json), [preserved g027 preflight failure](../runs/g027-live-confirmation/summary.json) |
+
 ## One experiment, one file
 
 Its pre-registration section is committed and landed before anything runs: the
