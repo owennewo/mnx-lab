@@ -8,7 +8,7 @@ before any listener is judged by it.
 
 | Version | File | Freeze | Instruments | Audit |
 |---|---|---|---|---|
-| event-oracle@2 | `oracle-2.json` | `freeze-2.json` | [event instruments 2](../../contracts/event-instruments-2.md) | awaiting |
+| event-oracle@2 | `oracle-2.json` | `freeze-2.json` | [event instruments 2](../../contracts/event-instruments-2.md) | [audit-2.md](audit-2.md): 63 agree, 0 disagree, 3 ambiguous (F9's `indeterminate` figure; no gate affected) |
 | event-oracle@1 | `oracle.json` | `freeze.json` | [event instruments 1](../../contracts/event-instruments-1.md) | none; written before the audit rule |
 
 ## Event oracle, version 2
