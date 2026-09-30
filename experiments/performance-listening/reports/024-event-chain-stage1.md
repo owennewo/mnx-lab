@@ -259,5 +259,7 @@ Designed, implemented, executed and recorded by the GPT-6-based Codex agent in t
 session, terminal/TypeScript/tsx/Vitest. The pre-registration called it GPT-6.1; the
 runtime instructions identify the GPT-6 family but expose no independently verifiable
 minor model identity, so that narrower attribution is not asserted as evidence.
+The user, who launched the session, identified it afterwards as **Sol 6.1 (high) in
+Codex** (recorded 2026-09-30, after the experiment landed).
 The focused behavioral suite passed before execution; the final repository gate
 validates the completed record and complete bench suite before landing.

@@ -19,6 +19,12 @@ be run by a different model, starting from what you leave in the repository.
 contradicted hypothesis with a well-supported explanation is a useful experiment.
 Do not optimise for a favourable verdict or claim more than the evidence establishes.
 
+**Your model and tool.** The person or parent session that launched you states them,
+for example "Sol 6.1 (high) in Codex" or "Claude Opus 5.5 in Claude Code". Record them
+exactly as stated, in the pre-registration, the ledger row and the attribution. A model
+often cannot verify its own version; if none was stated, record what you can see and
+mark it unverified.
+
 **Start simple.** The user's direction is to get the happy path right first: the
 simplest scores, one synth, a perfect performance. Then add one deviation at a time,
 such as a hesitation or a wrong note, and only then more sounds, bars, scores and real
@@ -106,7 +112,7 @@ research log says is current.
   version rather than editing a frozen one.
 - **Pre-register** in `reports/NNN-slug.md`:
   - the question and why;
-  - the model and tool running it, meaning you;
+  - the model and tool running it, meaning you, as stated at launch;
   - the stage, method and evidence;
   - numbered predictions, with numbers wherever possible;
   - what would contradict them;
@@ -142,7 +148,9 @@ In the report, below the pre-registration, which never changes after the run:
   answerable, with the reason and any mixed evidence made explicit;
 - **Decision**, applying the rules you fixed. If observations fit no pre-registered
   branch, record that and an inconclusive decision;
-- **Next**, as advice;
+- **Next**, as advice, including one line on the direction of travel: which parts of the
+  listener you expect to survive the next stages (chords, recorded guitar, real music)
+  and which will need replacing;
 - your attribution.
 
 Then:
@@ -156,6 +164,9 @@ Then:
 
 If your experiment created or re-versioned an oracle, make its audit the research log's
 top open question, naming the oracle version.
+
+Every commit you make has a short body saying what changed and why, and names your
+model and tool; `git log` should be readable without opening the report.
 
 Land it, retire your worktree, and stop. Do not start the next experiment.
 
@@ -204,7 +215,9 @@ your whole job:
    > the research log. When you have landed and retired your worktree, stop, and reply
    > with what you did, what it showed, and anything awaiting the user.
 
-   If the log's top question is itself an oracle audit, skip to step 4.
+   The one addition allowed is a final line naming the subagent's model and tool, for
+   example "Your model and tool: Claude Fable 5.1 in Claude Code." If the log's top
+   question is itself an oracle audit, skip to step 4.
 3. **Check the facts** from git and the files, not from the subagent's reply. The report
    landed with its pre-registration section unchanged since the pre-registration commit,
    which reached `main` before the results; the ledger, the report registry and the
@@ -220,7 +233,8 @@ your whole job:
    > have landed and retired your worktree, stop, and reply with your verdict case by
    > case.
 
-   Give it nothing about the experiment. Then check that the audit file landed and the
+   Give it nothing about the experiment except the same final line naming its model
+   and tool. Then check that the audit file landed and the
    research log's audit question links it.
 5. **Stop** before any further experiment, even if the audit agrees. Report to the user:
    what the experiment did and showed, anything awaiting their approval, and the audit's

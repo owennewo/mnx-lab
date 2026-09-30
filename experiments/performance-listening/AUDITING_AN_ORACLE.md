@@ -77,7 +77,7 @@ Write `bench/oracle-events/audit-N.md`, with N the oracle's version:
   verdict; then your arithmetic for each case below it;
 - the rules you could not exercise and why;
 - a summary line: the number of cases agreed, disagreed and ambiguous;
-- your model and tool.
+- your model and tool, as stated when you were launched, or marked unverified.
 
 Then update the research log: the question for this audit, its status to `answered`
 with the verdict and a link, or, where there are disagreements or ambiguities, a new top
