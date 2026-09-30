@@ -3,6 +3,8 @@ import { onlineTimeWarp1, OLTW_1 } from '../candidates/onlineTimeWarp1.ts';
 import { onlineTimeWarp2, OLTW_2 } from '../candidates/onlineTimeWarp2.ts';
 import { onlineTimeWarp3, OLTW_3 } from '../candidates/onlineTimeWarp3.ts';
 import { onlineTimeWarp7, OLTW_7 } from '../candidates/onlineTimeWarp7.ts';
+import { onlineTimeWarp10, OLTW_10 } from '../candidates/onlineTimeWarp10.ts';
+import { acousticAnchoredPath } from '../candidates/onlineTimeWarpAcousticAnchorPath.ts';
 import { onlineTimeWarp9, OLTW_9 } from '../candidates/onlineTimeWarp9.ts';
 import { continuityPath } from '../candidates/onlineTimeWarpContinuityPath.ts';
 import { onlineTimeWarp8, OLTW_8 } from '../candidates/onlineTimeWarp8.ts';
@@ -43,4 +45,6 @@ export const CANDIDATES: { id: string; module: string; factory: () => Listener; 
   { id: OLTW_8, module: 'candidates/onlineTimeWarp8.ts', legacy: FOUR, factory: () => onlineTimeWarp8(), recognition: 'oltw' },
   { id: OLTW_9, module: 'candidates/onlineTimeWarp9.ts', legacy: FOUR, factory: onlineTimeWarp9, recognition: 'oltw' },
   { id: `${OLTW_9}/alignment-only`, module: 'candidates/onlineTimeWarpContinuityPath.ts', legacy: FOUR, factory: () => continuityPath({ ...V6, label: 'oltw9-diag', alwaysClaim: true }, .02), diagnostic: true },
+  { id: OLTW_10, module: 'candidates/onlineTimeWarp10.ts', legacy: FOUR, factory: onlineTimeWarp10, recognition: 'oltw' },
+  { id: `${OLTW_10}/alignment-only`, module: 'candidates/onlineTimeWarpAcousticAnchorPath.ts', legacy: FOUR, factory: () => acousticAnchoredPath({ ...V6, label: 'oltw10-diag', alwaysClaim: true }, .02), diagnostic: true },
 ];
