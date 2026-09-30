@@ -97,7 +97,12 @@ This is the check that matters most. The first series followed its rules faithfu
   each stage's listener is a throwaway or a step toward chords, recorded guitar and real
   playing (each report's Next now names what should survive).
 - Are the gates rewarding something the user would not want, or becoming unreachable?
-- Is test and run time growing? The user wants fast iterations.
+- Is test and run time growing? The user wants fast iterations: a routine evaluation
+  should take about two minutes, and one over five calls for proposed retirements.
+- **The rising tide.** Were retirements justified by the rule (three passing
+  evaluations and harder active evidence of the same capability), sentinels chosen by
+  rule rather than by hand, and full sweeps run when due? Look hardest at anything
+  retired soon after it failed, or a sentinel set that avoids the known weak spots.
 
 ### 3.5 The process documents
 

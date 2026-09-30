@@ -253,3 +253,20 @@ or transfer claim can be checked from this evidence.
 rules. R1–R4 added ten rules and relaxed four; this review adds none. The independent
 oracle audit, frozen pre-registration, separate outputs and explicit stops are earning
 their place. Further procedural weight is unwarranted on this evidence.
+
+## After R5: decisions
+
+The user adopted four decisions and a new rule, recorded in
+[contract 2](contracts/development-contract-2.md): a stopping rule counting listener
+versions that fail the lowest open substage; bar flags judged against the other bars,
+only with at least three of them (026 showed the whole-piece median flag the unchanged
+bar of a two-bar piece); grouping of single-deviation substages the unchanged listener
+is predicted to pass; and **the rising tide**, which keeps routine runs lean: the open
+substages, sentinels chosen by rule from passed ones, gimmes retired to sweep-only once
+harder evidence covers the same capability, and full sweeps at milestones. The frozen
+baselines, nearly all of 026's run time, are now sweep-only. R5 counted itself as R4's
+outside process review; it was a different model from the process's author, but a
+light review of 026 rather than a milestone review of the series, and the same model as
+026's experimenter. A milestone review by a different model remains due at the next
+stage passed.
+

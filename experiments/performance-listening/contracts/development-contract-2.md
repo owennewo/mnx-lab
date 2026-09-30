@@ -112,6 +112,18 @@ changes no number. The user wrote:
 
 > yes can you make those changes, including recommendations and 024 tweak
 
+After experiment 026 and review R5, the author recommended a stopping rule, bar flags
+that need enough other bars, cheaper comparators and grouped substages. The user wrote:
+
+> can you make improvements to the above decisions and also suggest a way to reduce the
+> continued test bloat. The way I see it is "as the tide rises" (we get compforatble
+> with harder things) we test only the harder things dropping things that are gimmes
+> (using golfing metephor) e.g. once we've got a guitar sample reliable we no longer
+> need sine wave (unless we do a full/thorough sweep occasionally)
+
+That adopts the four decisions below as improved, and the rising-tide rule in
+[Keeping the suite lean](#keeping-the-suite-lean-the-rising-tide).
+
 ## Why
 
 Contract 1 measures one thing: whether the live cursor is within ±¼ quarter of the
@@ -166,6 +178,14 @@ by event.
   in bar 4", as practice cues. The overall tempo is not the reference: one long
   hesitation drags it down until steady bars read fast (experiment 022, oracle case
   A3), whereas a median barely moves.
+- **A bar is judged against the other bars**, and only when there are enough of them.
+  Each bar's reference is the typical tempo of the *other* bars, so a slowed bar cannot
+  set its own reference. A bar is flagged only when at least three other bars supply
+  intervals; otherwise the report gives its local tempo and ratio without a verdict.
+  With two bars no rule can know which bar was the normal one: experiment 026 showed
+  the whole-piece median flag the unchanged bar of a two-bar scale "fast" when the
+  other was slowed. Implemented as a new instruments and oracle version, with its
+  audit, before any listener is judged by it (see the order of work).
 - **Notes.** Every score note in every event is marked **matched**, **missing**,
   **wrong pitch** (with the pitch heard instead) or **dead**. A dead note where the score
   itself writes one (`technique.dead`, as Guitar Pro scores carry) is **matched**; only
@@ -187,7 +207,9 @@ no variation flags and every note matched.
 
 Progress is made first on synthesized performances, starting from the happy path and
 adding one difficulty at a time. Each stage must work, cursor and assessment both,
-before the next begins. Earlier stages stay as regression evidence.
+before the next begins. Earlier stages stay as regression evidence, under the
+[rising-tide rule](#keeping-the-suite-lean-the-rising-tide): their hardest examples keep
+running, and all of them run in a full sweep at milestones.
 
 | Stage | Score | Sound | Performance |
 |---|---|---|---|
@@ -252,6 +274,65 @@ They must produce no flags.
 The intermediate and beginner figures are the author's estimates; the user may revise
 them from experience.
 
+## Keeping the suite lean: the rising tide
+
+As the loop gets comfortable with harder things, routine runs test the harder things
+and drop the gimmes. Everything still runs in a full sweep from time to time. A run that
+repeats what is already known costs time the user would rather spend learning.
+
+- **The active suite** of a routine experiment is every example of the substages it
+  attempts, plus the **sentinels** of every substage already passed, plus their
+  controls. Nothing else runs routinely.
+- **Sentinels** are chosen when a substage passes, by rule rather than by hand: the
+  three examples with the least margin on any gate in its passing evaluation, plus one
+  silence and one wrong-score control per score. They are frozen with the substage and
+  re-chosen only at a full sweep. A sentinel that fails reopens its substage.
+- **A gimme retires to sweep-only** when two things hold: the incumbent listener has
+  passed it in its last three evaluations, and harder active evidence exercises the
+  same capability. A deviation on recorded guitar makes the same deviation on sines a
+  gimme; a category bundle makes its single deviations gimmes; a longer score makes a
+  shorter one a gimme. Its sentinels keep running until the harder evidence is itself
+  retired or replaced. Retirement is recorded, with the evidence, in the suite record.
+- **The frozen baselines are sweep-only now.** The clock and `online-time-warp@8`, `@12`
+  and `@14` fail every new example and take nearly all of a routine run's time (about
+  0.13 of real time each, against the event chain's 0.002). Their existing records stay
+  cited by hash.
+- **A full sweep** runs everything, retired sets and baselines included: when a stage
+  is claimed passed, before new gates are proposed, at the end of a batch, and at least
+  every fifth experiment. A stage is **passed** when its own examples and every
+  sentinel pass; it is **confirmed** at the next full sweep, and a failure in the sweep
+  reopens it.
+- **Reuse still applies.** Evidence whose producers are unchanged by hash is cited, not
+  rerun, in routine runs and sweeps alike.
+- **A time budget.** A routine experiment's evaluation should take about two minutes.
+  If one takes more than five, the next review proposes retirements.
+- **The suite record** is a committed file listing each substage's status (open,
+  passed, confirmed), its sentinels, and each retired set with the date and evidence,
+  so the reviewer can check that nothing was retired to hide a failure.
+
+This loosens contract 2's first rule that every example of every earlier stage runs
+each time, at the user's direction. The evidence standard is kept by the sentinels, the
+retirement conditions and the sweeps.
+
+## Stopping
+
+Count **listener versions that fail to clear the lowest open substage**, in a row. After
+three, the next experiment is a bounded research refresh on that failure: primary
+sources, recorded as research notes, before any further version. After three more
+without clearing it, stop, and report the limit to the user with the evidence. A
+version that clears the substage resets the count to zero. Diagnostics and instrument
+work add no versions. This replaces contract 1's plateau rule, which contract 2 had
+not restated; experiment 026's "plateau 1" counts under it as one failed attempt, not
+yet a version.
+
+## Grouping substages
+
+Several single-deviation substages may share one experiment when the unchanged
+listener is predicted to pass them all: each example still carries exactly one
+deviation, and each substage gets its own verdict. Any change to the listener gets an
+experiment of its own. A failed substage is repaired before later substages are
+grouped past it: the lowest open substage comes first.
+
 ## Instruments
 
 No listener is judged by an instrument until it has its own hand-worked oracle cases,
@@ -295,7 +376,7 @@ loosened under pressure once a stage proves them unreachable.
 | Causality and cost | Every prefix check; sustained cost ratio ≤ 0.25; chunk p99 ≤ 10 ms |
 | Assessment, per example | Overall tempo within ±5%; every expected interval reported, each **duration within ±10% or ±30 ms, whichever is larger** (changed from ±10% of tempo, which is ill-conditioned near a hesitation and tighter than onset precision on short notes); every score note assessed; **no false finding at all on a clean example** (changed from a pooled rate, which could hide one) |
 | Assessment, pooled over a stage | For each kind of finding: at least 90% found and false alarms at most 5% of negatives |
-| Bar-flag threshold θ | 0.10, as defined in the instruments, now against the typical tempo |
+| Bar-flag threshold θ | 0.10, as defined in the instruments, against the other bars' typical tempo, and only with at least three other bars |
 
 ### Auditing an oracle
 
@@ -348,27 +429,26 @@ it. The assessment can start from a whole-recording offline alignment.
 
 ## Order of work
 
-1. **Experiment 022: the instruments.** Done: version 1 of both evaluators, their
-   oracle, stage 1 and the baselines; gates proposed.
-2. **Experiment 023: the decisions, implemented.** Done: event instruments 2,
-   event-oracle@2, the `dead` verdict as vocabulary 2.1, stage 1 with controls as
-   `contract2-stage1-v2`, and the baselines remeasured.
-3. **The oracle audit.** Done: [audit 2](../bench/oracle-events/audit-2.md), 63 agree,
-   0 disagree, 3 ambiguous. The ambiguity is settled by the clarification in
-   [event instruments 2](event-instruments-2.md#clarification-2026-09-30), with no
-   oracle change.
-4. **Experiment 024: stage 1's distant control, then the first new listener.** First,
-   commit a distant wrong score to `sources/` under the rule above and freeze stage 1
-   again as a new private set: the eight performances and their silence controls as in
-   `contract2-stage1-v2`, and wrong-score controls handed the distant score. Leave
-   `contract2-stage1-v2` untouched; its `w1` controls wait for stage 2. The event
-   oracle's control cases do not depend on which wrong score is used, so no oracle
-   version or audit is needed. Then research event-based following, and build the
-   simplest live cursor and end-of-piece assessor that pass stage 1 under
-   `stage-gates@1`, controls included.
-5. **Then the stages in order,** one deviation at a time, with `w1` joining stage 2. A
-   stage is done when the cursor and the assessment meet the approved gates on every
-   example of it, its controls and every earlier stage.
+1. **Experiments 022–023 and audit 2: the instruments.** Done.
+2. **Experiment 024: stage 1.** Passed by `event-chain@1`.
+3. **Experiments 025–026: stage 2 begins.** The hesitation (silence) passed; the slowed
+   bar failed on two examples, a transient pitch skip in the live cursor.
+4. **Experiment 027: repair the live cursor.** A new listener version that passes both
+   failed slowed-bar examples without losing anything else. The frozen baselines no
+   longer run; their records are cited. Stage 1, the hesitation and the slowed bar run
+   in full, since no sentinels have been chosen yet and the event chain is cheap.
+5. **Experiment 028: event instruments 3 and the suite record.** Bar flags against the
+   other bars, only with three other bars; a four-bar sine score committed to
+   `sources/`, so stage 2's tempo substages can still test flags; `stage-gates@2` with
+   the rising tide's passed and confirmed states; the suite record, with sentinels chosen
+   for the substages already passed; a new oracle version, frozen before implementing.
+   No listener is developed.
+6. **The oracle audit** of 028's oracle, by a different session.
+7. **Then stage 2's remaining deviations**, grouped where the unchanged listener is
+   predicted to pass: a held-note hesitation (the previous note ringing through the
+   pause), a rushed bar, a missing event, a wrong note with `w1`, a dead note, an extra
+   note, onset jitter and a frequency offset. Then stages 3–5, each passed stage
+   retiring its gimmes under the rising tide.
 
 ## Still open for the user
 

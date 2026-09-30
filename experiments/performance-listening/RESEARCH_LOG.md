@@ -40,9 +40,17 @@ How to maintain it:
 
 2026-09-30. [Development contract 2](contracts/development-contract-2.md) remains in force, with approved sine-stage gates and independently audited event-oracle@2. [Experiment 026](reports/026-single-slowed-bar.md) tested one slowed bar with unchanged **event-chain@1**. Assessment and controls pass, but the live cursor fails on two E4→F4 transitions: overlapping pitch windows both read as a future G4, and the live chain commits to a skip from which it cannot move backward. Whole-recording alignment discards the spurious token. Stage 1 and hesitation remain passed through hash-verified unchanged regression evidence. No frozen listener, instrument or oracle changed; no audit is due.
 
-The next experiment is **027**, investigating transient pitch skips and live-state recovery on the frozen slowed-bar set while preserving earlier substages and controls. Rushed bars wait for this lowest unpassed substage. [Review R5](reviews.md#r5-after-experiment-026-and-the-post-r4-process-changes) found the failed verdict supported and completed R4's outside process check on a different model from the process author. R4's multiple-substage question remains with the user, alongside later recorded-guitar gates and product/qualification decisions; none blocks this next bounded investigation.
+**The user adjusted the rules after 026** ([contract 2](contracts/development-contract-2.md#keeping-the-suite-lean-the-rising-tide)):
+routine runs use a lean active suite, the rising tide, with sentinels from passed
+substages, gimmes retired to sweep-only and full sweeps at milestones; the frozen
+baselines are sweep-only from now; a stopping rule counts listener versions that fail
+the lowest open substage; bar flags will compare a bar with the other bars and need
+three of them; single-deviation substages may be grouped. 027 still repairs the live
+cursor; 028 then builds event instruments 3 and the suite record, with its audit.
 
-Plateau count is now one (one unsuccessful substage attempt); this is not a declaration of a sustained plateau. [Report 026](reports/026-single-slowed-bar.md#resulting-plateau-budgets-and-evidence-access) records the state and unchanged budgets/access. Qualification is untouched and Winner bars 5–8 remain unexamined. Evidence remains short-score sine development transformations, with no generalisation or product claim.
+The next experiment is **027**, investigating transient pitch skips and live-state recovery on the frozen slowed-bar set while preserving earlier substages and controls. Rushed bars wait for this lowest unpassed substage. [Review R5](reviews.md#r5-after-experiment-026-and-the-post-r4-process-changes) found the failed verdict supported and completed R4's outside process check on a different model from the process author. Grouping substages is now allowed; later recorded-guitar gates and product/qualification decisions remain with the user, and none blocks this next bounded investigation.
+
+Under the [stopping rule](contracts/development-contract-2.md#stopping), 026 was one failed attempt with an unchanged listener, not a failing version: the count of failing listener versions is 0. [Report 026](reports/026-single-slowed-bar.md#resulting-plateau-budgets-and-evidence-access) records the state and unchanged budgets/access. Qualification is untouched and Winner bars 5–8 remain unexamined. Evidence remains short-score sine development transformations, with no generalisation or product claim.
 
 ## Inherited lessons
 

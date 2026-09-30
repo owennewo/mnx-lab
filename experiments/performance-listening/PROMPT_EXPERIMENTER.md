@@ -70,7 +70,8 @@ research log says is current.
 - Verify the private data you need is accessible, tools such as `ffmpeg` are available,
   and you can write private outputs. Missing access is a prerequisite to resolve, not a
   reason to substitute different data.
-- Reconstruct the plateau count and any budgets from the latest report and the log.
+- Reconstruct the stopping count ([contract 2, Stopping](contracts/development-contract-2.md#stopping))
+  and any budgets from the latest report and the log.
   Record them in the pre-registration; a new model does not reset them. Where nothing
   has changed since the latest report, one line saying so, linking it, is enough.
 
@@ -125,7 +126,7 @@ research log says is current.
   - what would contradict them;
   - decision rules for each outcome, fixed now, including mixed or inconclusive
     evidence and infrastructure failure;
-  - the carried-over plateau and budget state, with the records establishing it.
+  - the carried-over stopping count and budget state, with the records establishing it.
 - **Land the pre-registration before anything runs.** In your worktree, follow
   `CLAUDE.md`'s full landing sequence: rebase, gate, fast-forward and push.
 
@@ -144,6 +145,14 @@ experiment writes the runner it needs, following the same rules:
   `<run-id>-source` and push the tag when you land: if `main` moved meanwhile, the
   landing rebase rewrites the commit and only the tag keeps the pinned source reachable.
 - It checks causality and cost for any live listener.
+
+**Run only the active suite.** A routine run evaluates the substages you attempt, the
+sentinels of every passed substage and their controls, as
+[the rising tide](contracts/development-contract-2.md#keeping-the-suite-lean-the-rising-tide)
+defines them; retired sets and the frozen baselines run only in a full sweep, which is
+due when you claim a stage passed, at the end of a batch, and at least every fifth
+experiment. Say in the pre-registration which you are running and why. A routine
+evaluation should take about two minutes.
 
 Run time grows with every regression set, and the user wants fast iterations. A
 listener need not be rerun on inputs it already has records for, if nothing that
@@ -176,7 +185,7 @@ Then:
 - add a row to the table in `reports/README.md`;
 - add a ledger row whose conditions name you;
 - update the research log: the current state, findings with their evidence, and the
-  re-ranked questions. Record the resulting plateau and budget state in the report (one
+  re-ranked questions. Record the resulting stopping count and budget state in the report (one
   line if unchanged) and point to it from the log.
 
 If your experiment created or re-versioned an oracle, make its audit the research log's
