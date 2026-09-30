@@ -1,0 +1,7 @@
+{
+  "oracle": "event-oracle@4",
+  "file": "oracle-4.json",
+  "sha256": "6fe74176cc66daeec5fccd3e07c0c8cb84051293fedd78a6b3641fb628103c02",
+  "frozen": "2026-09-30",
+  "condition": "Hand-worked corrected and additional cases frozen and landed before validation implementation. Never listener outputs; independent audit4 required before listener judgment. Oracle3 remains byte-identical."
+}
