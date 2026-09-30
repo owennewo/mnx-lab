@@ -3,6 +3,9 @@ import { onlineTimeWarp1, OLTW_1 } from '../candidates/onlineTimeWarp1.ts';
 import { onlineTimeWarp2, OLTW_2 } from '../candidates/onlineTimeWarp2.ts';
 import { onlineTimeWarp3, OLTW_3 } from '../candidates/onlineTimeWarp3.ts';
 import { onlineTimeWarp7, OLTW_7 } from '../candidates/onlineTimeWarp7.ts';
+import { onlineTimeWarp13, OLTW_13 } from '../candidates/onlineTimeWarp13.ts';
+import { onlineTimeWarp14, OLTW_14 } from '../candidates/onlineTimeWarp14.ts';
+import { onlineTimeWarp15, OLTW_15 } from '../candidates/onlineTimeWarp15.ts';
 import { onlineTimeWarp12, OLTW_12 } from '../candidates/onlineTimeWarp12.ts';
 import { onlineTimeWarp11, OLTW_11 } from '../candidates/onlineTimeWarp11.ts';
 import { onlineTimeWarp10, OLTW_10 } from '../candidates/onlineTimeWarp10.ts';
@@ -52,4 +55,9 @@ export const CANDIDATES: { id: string; module: string; factory: () => Listener; 
   { id: OLTW_11, module: 'candidates/onlineTimeWarp11.ts', legacy: FOUR, factory: onlineTimeWarp11, recognition: 'oltw' },
   { id: OLTW_12, module: 'candidates/onlineTimeWarp12.ts', legacy: FOUR, factory: () => onlineTimeWarp12(), recognition: 'oltw' },
   { id: `${OLTW_12}/alignment-only`, module: 'candidates/onlineTimeWarp12.ts', legacy: FOUR, factory: () => onlineTimeWarp12({ alwaysClaim: true }), diagnostic: true },
+  { id: OLTW_13, module: 'candidates/onlineTimeWarp13.ts', legacy: FOUR, factory: () => onlineTimeWarp13(), recognition: 'oltw' },
+  { id: `${OLTW_13}/alignment-only`, module: 'candidates/onlineTimeWarp13.ts', legacy: FOUR, factory: () => onlineTimeWarp13({ alwaysClaim: true }), diagnostic: true },
+  { id: OLTW_14, module: 'candidates/onlineTimeWarp14.ts', legacy: FOUR, factory: () => onlineTimeWarp14(), recognition: 'oltw' },
+  { id: OLTW_15, module: 'candidates/onlineTimeWarp15.ts', legacy: FOUR, factory: () => onlineTimeWarp15(), recognition: 'oltw' },
+  { id: `${OLTW_15}/alignment-only`, module: 'candidates/onlineTimeWarp15.ts', legacy: FOUR, factory: () => onlineTimeWarp15({ alwaysClaim: true }), diagnostic: true },
 ];
