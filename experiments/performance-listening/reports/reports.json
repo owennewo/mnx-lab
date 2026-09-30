@@ -52,6 +52,19 @@
         "href": "024-event-chain-stage1.html",
         "label": "Experiment 024"
       }
+    },
+    {
+      "number": "026",
+      "slug": "026-single-slowed-bar",
+      "title": "026 · One slowed bar on the same sine scale",
+      "banner": "Slowed-bar substage fails · live cursor 38/40 · assessment 40/40 · transient pitch skips diagnosed · earlier evidence unchanged",
+      "runs": [
+        "g026-single-slowed-bar"
+      ],
+      "previous": {
+        "href": "025-single-hesitation.html",
+        "label": "Experiment 025"
+      }
     }
   ]
 }
