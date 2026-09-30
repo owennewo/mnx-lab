@@ -1,5 +1,12 @@
 # Performance listening: a fresh approach
 
+**Revised 2026-09-30** for [development contract 2](contracts/development-contract-2.md),
+at the user's direction. The listener now has two outputs judged separately: a causal
+**live cursor** at event resolution, and an **end-of-piece assessment** of tempo
+variation and every note, which may use hindsight. Development starts from the
+simplest score and a perfect synthesized performance and adds one deviation at a time.
+The passages below that this changed say so; the rest stands.
+
 ## Objective and scope
 
 Develop a listener that is given an intended score and assesses how an audio
@@ -9,27 +16,36 @@ The immediate focus is score following and performance assessment. Extracting a
 score from audio without being given the score is outside this experiment's scope.
 
 Start with deliberately simple, labelled examples. Increase difficulty as measured
-results justify it. Develop on synthetic renderings of a real score until a candidate
-survives controlled fuzzing, then return to real recordings; the section on
-complexity dimensions explains why. The eventual destination is Studio, using the internal MNX model
-to represent scores, guiding a player while they play. The listener that matters is
-therefore causal and prompt; offline results can help diagnose the cost of that
-constraint, but are not the goal or proof of an acoustic ceiling. This document
-defines objectives, not an implementation or permission to integrate an experimental
-listener into the product.
+results justify it. Develop on synthesized performances of real scores, starting from
+the simplest, until a listener survives controlled deviations one at a time; real
+recordings are tested occasionally along the way and become development evidence
+later. The eventual destination is Studio, using the internal MNX model to represent
+scores, guiding a player while they play and telling them afterwards how it went.
+The **live cursor** must therefore be causal and prompt. The **end-of-piece assessment**
+is made once the piece ends and may use the whole recording: a player who played
+perfectly but slowly is judged against their own tempo, which only hindsight knows.
+This document defines objectives, not an implementation or permission to integrate an
+experimental listener into the product.
 
-The first useful milestone is supported following: locate the performer, follow
+The first useful milestone was defined as supported following: locate the performer, follow
 permitted timing variation, recognise when the evidence no longer supports following,
 and recover within a declared scope. A musician can be following the score while
 making mistakes. Detailed note and timing assessment is a separate capability with
 separate acceptance criteria; neither capability's success implies the other's.
+
+Since contract 2, the milestone has two parts: the live cursor follows the performer
+event by event, holding through hesitations and recovering after missing notes; and
+the end-of-piece assessment reports the performer's tempo variation, located by bar,
+and marks every score note matched, missing, wrong or dead. Timing is judged against
+the performer's own overall tempo, never against the handed tempo, which is only
+reported.
 
 The research should be runnable by an LLM with little ongoing human judgement.
 That requires independent evidence and explicit decision rules, not just permission
 to keep trying algorithms. This document specifies the research obligations; algorithm
 families, representations and software structure remain choices for experiments.
 
-The [previous experiment](archive/ARCHIVED.md) is historical evidence. This restart
+The [previous experiment](archive/ARCHIVED.md) is historical evidence, and so is the first series under this approach, [experiments 001–021](archive/ladder-1/README.md), whose lessons the research log carries. This restart
 does not inherit its algorithms, event contracts, thresholds or acceptance budgets.
 
 ## Inputs: generators and sources
@@ -141,7 +157,11 @@ attributes each failure to the axis that caused it. Real recordings run alongsid
 every development run as a thermometer: recorded, never used to select. Once one
 candidate passes the combined rung, real recordings become the development evidence
 and the ladder becomes regression evidence. [Development contract 1](contracts/development-contract-1.md)
-defines the current ladder, its pass bar and its exit.
+defined that ladder. [Development contract 2](contracts/development-contract-2.md#the-progression-start-simple-one-change-at-a-time)
+now starts one step simpler still: the simplest committed scores, one synth and a
+perfect performance, then one performer deviation at a time, then Winner's chords,
+then one recorded guitar, then bundled beginner, intermediate and advanced
+performances.
 
 ## Goldens and the meaning of a correct assessment
 
@@ -226,7 +246,8 @@ judgement becomes answerable and how unresolved cases are counted.
 
 Real-time following uses only audio available at the moment of a decision. Experiments
 that use the complete clip declare that access separately. A listener may be accurate
-with hindsight and still be too late to guide a player.
+with hindsight and still be too late to guide a player. Under contract 2 this binds the
+live cursor; the end-of-piece assessment is declared to use the complete recording.
 
 Algorithms are hypotheses to test and replace. There is no requirement to preserve an
 older algorithm's detections or to select a particular signal-processing family.

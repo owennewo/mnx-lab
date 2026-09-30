@@ -14,7 +14,7 @@ import { execute, checkPrefix, prefixCuts } from '../src/run/runner.ts';
 import type { Decision } from '../src/types.ts';
 import { pinnedSha256 } from './pinned.ts';
 const runId = 'g001-clock-harness-v1';
-const folder = join(EXPERIMENT, 'runs', runId);
+const folder = join(EXPERIMENT, 'archive/ladder-1/runs', runId);
 const run = json<RunReport>(join(folder, 'run.json'));
 // Literal arithmetic from FIRST_STEP §9 and the pre-run endpoint convention.
 const predicted = {

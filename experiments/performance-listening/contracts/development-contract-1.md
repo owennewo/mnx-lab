@@ -1,5 +1,9 @@
 # Development contract 1 — the synthetic-first following ladder
 
+**Superseded on 2026-09-30** by [development contract 2](development-contract-2.md), at
+the user's direction. This text is unchanged below; it governed experiments 004–021,
+which are archived in [archive/ladder-1/](../archive/ladder-1/README.md).
+
 2026-09-25. Loop: implementation research. This contract governs **development**:
 how the loop learns, which evidence it builds and when a candidate is ready for
 real audio. It retains nothing. [Research contract 1](research-contract-1.md) stays

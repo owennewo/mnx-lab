@@ -14,7 +14,7 @@ const read = <T>(path: string) => JSON.parse(readFileSync(new URL(path, experime
 
 describe('g001\'s committed records replayed through the seam', () => {
   for (const id of ['p1', 'p2', 't1-tempo-90', 'c1-silence', 'c2-wrong-piece']) it(`draws exactly what the evaluator scored on ${id}`, async () => {
-    const golden = read<Golden>(`sets/harness-v1/${id}/golden.json`), record = read<Decision[]>(`runs/g001-clock-harness-v1/${id}.decisions.json`);
+    const golden = read<Golden>(`sets/harness-v1/${id}/golden.json`), record = read<Decision[]>(`archive/ladder-1/runs/g001-clock-harness-v1/${id}.decisions.json`);
     const score = read<MnxStructure>(`sets/harness-v1/${id}/score.mnx.json`), compiled = compilePerformance(score);
     if (!compiled.ok) throw new Error('compile');
     const stats = { clamped: 0, droppedNotes: 0 };

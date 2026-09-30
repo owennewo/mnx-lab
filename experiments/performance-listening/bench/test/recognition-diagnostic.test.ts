@@ -22,8 +22,8 @@ it('cannot manufacture separation by splitting tied scores or accepting silent f
 it('preserves the recorded diagnostic implementation, at its recorded commit, and its frozen set identity',async()=>{
  const {pinnedSha256}=await import('./pinned.ts');
  const root=new URL('../../',import.meta.url);
- const summary=JSON.parse(readFileSync(new URL('runs/g003-recognition-at-sync/summary.json',root),'utf8'));
- const parent=JSON.parse(readFileSync(new URL('runs/g002a-spectral1-winner-sync-proxy/summary.json',root),'utf8'));
+ const summary=JSON.parse(readFileSync(new URL('archive/ladder-1/runs/g003-recognition-at-sync/summary.json',root),'utf8'));
+ const parent=JSON.parse(readFileSync(new URL('archive/ladder-1/runs/g002a-spectral1-winner-sync-proxy/summary.json',root),'utf8'));
  expect(summary.setSha256).toBe(parent.setSha256);
  for(const [path,hash] of Object.entries(summary.sourceHashes))expect(pinnedSha256(summary.gitCommit,path)).toBe(hash);
 });

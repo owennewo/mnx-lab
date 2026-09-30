@@ -8,7 +8,7 @@ touched until part 2, and part 2 needs the owner's go-ahead.
 
 **Status: part 1 complete, 2026-09-25.** Built in commits `83a904ba` (S0) and
 `1fb3f124` (S1–S9), and verified end to end on the private evidence by
-[experiment 012](reports/012-seam-verification.md). Every scoreboard run now goes through
+[experiment 012](archive/ladder-1/reports/012-seam-verification.md). Every scoreboard run now goes through
 the seam. S10 is deliberately deferred; see below. Part 2 waits for the owner.
 
 | Step | Where it lives | Checked by |
@@ -28,7 +28,7 @@ the seam. S10 is deliberately deferred; see below. Part 2 waits for the owner.
 browser smoke measures anyway, together with Studio's display chain. Building it now
 would duplicate that measurement without advancing the seam.
 
-This is a plan, like [FIRST_STEP.md](FIRST_STEP.md), and its details may change as long
+This is a plan, like [FIRST_STEP.md](archive/ladder-1/FIRST_STEP.md), and its details may change as long
 as its goal holds: a listener Studio can drive through the same socket as its other
 playback sources. It does not state what the experiment believes; the
 [research log](RESEARCH_LOG.md) does.

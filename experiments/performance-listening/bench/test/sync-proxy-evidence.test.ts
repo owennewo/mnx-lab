@@ -29,7 +29,7 @@ it('harmonic revision hears a simple score tone, rejects silence and preserves i
 });
 it('preserves each real run implementation, at its recorded commit, and the shared frozen reference identity',()=>{
  const ids=['g002a-spectral1-winner-sync-proxy','g002b-spectral2-winner-sync-proxy'];
- const runs=ids.map(id=>JSON.parse(readFileSync(new URL(`runs/${id}/summary.json`,root),'utf8')));
+ const runs=ids.map(id=>JSON.parse(readFileSync(new URL(`archive/ladder-1/runs/${id}/summary.json`,root),'utf8')));
  for(const run of runs)for(const [path,hash] of Object.entries(run.sourceHashes))expect(pinnedSha256(run.gitCommit,path)).toBe(hash);
  expect(runs[0].setSha256).toBe(runs[1].setSha256);expect(runs[0].comparator.examples.map((e:{metrics:unknown})=>e.metrics)).toEqual(runs[1].comparator.examples.map((e:{metrics:unknown})=>e.metrics));
 });

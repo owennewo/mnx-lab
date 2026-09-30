@@ -104,4 +104,4 @@ The private `003-recognition-at-sync.html` embeds Winner and similarity traces;
 `listen.html` embeds both reviewed WAVs. `beat-review.html` offers waveform seeking,
 playback speed and blank independent beat bounds for later precision work; it is not
 a requirement for current development. Commands and UI-check limitations are in the
-[report index](../reports/README.md#private-playback).
+[report index](../archive/ladder-1/reports/README.md#private-playback).

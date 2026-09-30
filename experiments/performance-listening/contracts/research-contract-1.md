@@ -2,7 +2,7 @@
 
 **Approved by the user on 2026-09-25:** “Approve contract 1 as drafted”.
 This records approval of the full contract presented in the
-[four-bar evidence review](../reports/real-evidence-review.html), including its
+[four-bar evidence review](../archive/ladder-1/reports/real-evidence-review.html), including its
 numerical criteria, budgets, stopping rules, progression and acceptance requirements.
 
 The [reviewed draft](research-contract-1-draft.md) is the immutable approved text.
