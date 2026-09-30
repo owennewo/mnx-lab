@@ -1,0 +1,7 @@
+{
+  "oracle": "event-oracle@1",
+  "file": "oracle.json",
+  "sha256": "8c192851e571f26716b3bd878b6cd293fcabf7b99198de625b17b9e8cdfbe9aa",
+  "frozen": "2026-09-30",
+  "condition": "Hand-worked from contracts/event-instruments-1.md before following-evaluator@2 or assessment-evaluator@1 existed, and before any listener ran under contract 2. A correction is a new version with its reason, never an edit to match an evaluator."
+}
