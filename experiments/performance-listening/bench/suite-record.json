@@ -1,0 +1,608 @@
+{
+  "format": "contract2-suite@1",
+  "policy": "contracts/development-contract-2.md",
+  "definition": "contracts/event-instruments-3.md",
+  "bootstrapRun": "g028-other-bars-suite",
+  "listener": "event-chain@2",
+  "instrumentAudit": "event-oracle@3 pending; B1 discrepancy requires independent resolution",
+  "stages": [
+    {
+      "id": "stage1",
+      "status": "passed",
+      "listener": "event-chain@2",
+      "instruments": {
+        "following": "following-evaluator@2",
+        "assessment": "assessment-evaluator@2",
+        "gates": "stage-gates@1"
+      },
+      "passEvidence": {
+        "path": "runs/g027a-live-confirmation/summary.json",
+        "sha256": "10ab4aa8faaa1b3f8f49bef674bbfe0bc0e8cab3e41705302aceadfda728f840"
+      },
+      "confirmedEvidence": null,
+      "version3Revalidation": "pending independent oracle audit and a future listener evaluation",
+      "examples": [
+        "s1-45",
+        "s1-63",
+        "s1-90",
+        "s1-99",
+        "s2-45",
+        "s2-63",
+        "s2-90",
+        "s2-99",
+        "sil-s1-45",
+        "sil-s1-63",
+        "sil-s1-90",
+        "sil-s1-99",
+        "sil-s2-45",
+        "sil-s2-63",
+        "sil-s2-90",
+        "sil-s2-99",
+        "w2-s1-45",
+        "w2-s1-63",
+        "w2-s1-90",
+        "w2-s1-99",
+        "w2-s2-45",
+        "w2-s2-63",
+        "w2-s2-90",
+        "w2-s2-99"
+      ],
+      "sentinels": [
+        {
+          "id": "s2-99",
+          "score": "s2",
+          "kind": "performance",
+          "margin": 0.734969578220063,
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.s2-99.json",
+            "sha256": "7b03e3e680737107ca2ac31c81f59d83ff53f1448f235395f04a330ad884c928"
+          }
+        },
+        {
+          "id": "s1-90",
+          "score": "s1",
+          "kind": "performance",
+          "margin": 0.7499999999999942,
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.s1-90.json",
+            "sha256": "bf2fba6b3b47bece3cd5c893820f352d69aff433b5acdd32370cbdc6779bec03"
+          }
+        },
+        {
+          "id": "s2-90",
+          "score": "s2",
+          "kind": "performance",
+          "margin": 0.7499999999999942,
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.s2-90.json",
+            "sha256": "2b244f8448bc96899be8f64177fbd330bb90a56fa1f1d0e163712746d4e03660"
+          }
+        },
+        {
+          "id": "sil-s1-45",
+          "score": "s1",
+          "kind": "silence",
+          "margin": 0.997613772,
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.sil-s1-45.json",
+            "sha256": "cbf020220f40c316d648a51a63d20eb9b9fe9ff423ea1f7364e41a5293fc792c"
+          }
+        },
+        {
+          "id": "w2-s1-99",
+          "score": "s1",
+          "kind": "wrong-score",
+          "margin": 0.997513884,
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.w2-s1-99.json",
+            "sha256": "1bccc2422549c220a41a63780fbb67e7009a4a8adb4a07251605d5582fe4d37c"
+          }
+        },
+        {
+          "id": "sil-s2-99",
+          "score": "s2",
+          "kind": "silence",
+          "margin": 0.99782828,
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.sil-s2-99.json",
+            "sha256": "08d8ce211ab2cce0efedc4b807ad99416a81860ebf1ab59f7387060d11a6468c"
+          }
+        },
+        {
+          "id": "w2-s2-99",
+          "score": "s2",
+          "kind": "wrong-score",
+          "margin": 0.997750812,
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.w2-s2-99.json",
+            "sha256": "6f3005982908776ab340b94a6d66574c8069b12e85164cac29e350e8cec4df5f"
+          }
+        }
+      ],
+      "incumbentPassHistory": [
+        "g027a-live-confirmation"
+      ],
+      "retired": false
+    },
+    {
+      "id": "hesitation",
+      "status": "passed",
+      "listener": "event-chain@2",
+      "instruments": {
+        "following": "following-evaluator@2",
+        "assessment": "assessment-evaluator@2",
+        "gates": "stage-gates@1"
+      },
+      "passEvidence": {
+        "path": "runs/g027a-live-confirmation/summary.json",
+        "sha256": "10ab4aa8faaa1b3f8f49bef674bbfe0bc0e8cab3e41705302aceadfda728f840"
+      },
+      "confirmedEvidence": null,
+      "version3Revalidation": "pending independent oracle audit and a future listener evaluation",
+      "examples": [
+        "h-s1-45-1000",
+        "h-s1-45-2000",
+        "h-s1-45-300",
+        "h-s1-45-500",
+        "h-s1-45-700",
+        "h-s1-63-1000",
+        "h-s1-63-2000",
+        "h-s1-63-300",
+        "h-s1-63-500",
+        "h-s1-63-700",
+        "h-s1-90-1000",
+        "h-s1-90-2000",
+        "h-s1-90-300",
+        "h-s1-90-500",
+        "h-s1-90-700",
+        "h-s1-99-1000",
+        "h-s1-99-2000",
+        "h-s1-99-300",
+        "h-s1-99-500",
+        "h-s1-99-700",
+        "h-s2-45-1000",
+        "h-s2-45-2000",
+        "h-s2-45-300",
+        "h-s2-45-500",
+        "h-s2-45-700",
+        "h-s2-63-1000",
+        "h-s2-63-2000",
+        "h-s2-63-300",
+        "h-s2-63-500",
+        "h-s2-63-700",
+        "h-s2-90-1000",
+        "h-s2-90-2000",
+        "h-s2-90-300",
+        "h-s2-90-500",
+        "h-s2-90-700",
+        "h-s2-99-1000",
+        "h-s2-99-2000",
+        "h-s2-99-300",
+        "h-s2-99-500",
+        "h-s2-99-700",
+        "sil-h-s1-45-1000",
+        "sil-h-s1-45-2000",
+        "sil-h-s1-45-300",
+        "sil-h-s1-45-500",
+        "sil-h-s1-45-700",
+        "sil-h-s1-63-1000",
+        "sil-h-s1-63-2000",
+        "sil-h-s1-63-300",
+        "sil-h-s1-63-500",
+        "sil-h-s1-63-700",
+        "sil-h-s1-90-1000",
+        "sil-h-s1-90-2000",
+        "sil-h-s1-90-300",
+        "sil-h-s1-90-500",
+        "sil-h-s1-90-700",
+        "sil-h-s1-99-1000",
+        "sil-h-s1-99-2000",
+        "sil-h-s1-99-300",
+        "sil-h-s1-99-500",
+        "sil-h-s1-99-700",
+        "sil-h-s2-45-1000",
+        "sil-h-s2-45-2000",
+        "sil-h-s2-45-300",
+        "sil-h-s2-45-500",
+        "sil-h-s2-45-700",
+        "sil-h-s2-63-1000",
+        "sil-h-s2-63-2000",
+        "sil-h-s2-63-300",
+        "sil-h-s2-63-500",
+        "sil-h-s2-63-700",
+        "sil-h-s2-90-1000",
+        "sil-h-s2-90-2000",
+        "sil-h-s2-90-300",
+        "sil-h-s2-90-500",
+        "sil-h-s2-90-700",
+        "sil-h-s2-99-1000",
+        "sil-h-s2-99-2000",
+        "sil-h-s2-99-300",
+        "sil-h-s2-99-500",
+        "sil-h-s2-99-700",
+        "w2-h-s1-45-1000",
+        "w2-h-s1-45-2000",
+        "w2-h-s1-45-300",
+        "w2-h-s1-45-500",
+        "w2-h-s1-45-700",
+        "w2-h-s1-63-1000",
+        "w2-h-s1-63-2000",
+        "w2-h-s1-63-300",
+        "w2-h-s1-63-500",
+        "w2-h-s1-63-700",
+        "w2-h-s1-90-1000",
+        "w2-h-s1-90-2000",
+        "w2-h-s1-90-300",
+        "w2-h-s1-90-500",
+        "w2-h-s1-90-700",
+        "w2-h-s1-99-1000",
+        "w2-h-s1-99-2000",
+        "w2-h-s1-99-300",
+        "w2-h-s1-99-500",
+        "w2-h-s1-99-700",
+        "w2-h-s2-45-1000",
+        "w2-h-s2-45-2000",
+        "w2-h-s2-45-300",
+        "w2-h-s2-45-500",
+        "w2-h-s2-45-700",
+        "w2-h-s2-63-1000",
+        "w2-h-s2-63-2000",
+        "w2-h-s2-63-300",
+        "w2-h-s2-63-500",
+        "w2-h-s2-63-700",
+        "w2-h-s2-90-1000",
+        "w2-h-s2-90-2000",
+        "w2-h-s2-90-300",
+        "w2-h-s2-90-500",
+        "w2-h-s2-90-700",
+        "w2-h-s2-99-1000",
+        "w2-h-s2-99-2000",
+        "w2-h-s2-99-300",
+        "w2-h-s2-99-500",
+        "w2-h-s2-99-700"
+      ],
+      "sentinels": [
+        {
+          "id": "h-s2-90-1000",
+          "score": "s2",
+          "kind": "performance",
+          "margin": 0.7499999999999942,
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.h-s2-90-1000.json",
+            "sha256": "06a92d615348423b447a812ecff2153bd6c592b8e0ae707fb2888347da18a27d"
+          }
+        },
+        {
+          "id": "h-s2-90-2000",
+          "score": "s2",
+          "kind": "performance",
+          "margin": 0.7499999999999942,
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.h-s2-90-2000.json",
+            "sha256": "c34c84bea0ba287abbb7ce1abb7234a788f6c85496b3a29991a1ba47a5d5ab6f"
+          }
+        },
+        {
+          "id": "h-s2-90-300",
+          "score": "s2",
+          "kind": "performance",
+          "margin": 0.7499999999999942,
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.h-s2-90-300.json",
+            "sha256": "23966716dee8e6324d744f464093c4bcdf11b8781715d5d656d532921e3d0800"
+          }
+        },
+        {
+          "id": "sil-h-s1-99-1000",
+          "score": "s1",
+          "kind": "silence",
+          "margin": 0.996156392,
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.sil-h-s1-99-1000.json",
+            "sha256": "4563545b17ebd62741e69d129bc0af968fa53b1989ab2038ad4df14bb688d847"
+          }
+        },
+        {
+          "id": "w2-h-s1-63-1000",
+          "score": "s1",
+          "kind": "wrong-score",
+          "margin": 0.996385788,
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.w2-h-s1-63-1000.json",
+            "sha256": "a649bfcf7ae020d82597f7c831212350f4313d105df3ef8678e443293bd865bb"
+          }
+        },
+        {
+          "id": "sil-h-s2-63-2000",
+          "score": "s2",
+          "kind": "silence",
+          "margin": 0.995925368,
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.sil-h-s2-63-2000.json",
+            "sha256": "df1cc8c7dcfab7d2a070008d0b1031431f5b446d06a27536e1db14211b2e8330"
+          }
+        },
+        {
+          "id": "w2-h-s2-99-300",
+          "score": "s2",
+          "kind": "wrong-score",
+          "margin": 0.997352592,
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.w2-h-s2-99-300.json",
+            "sha256": "d2dc85d94f814390ef69bb173d4268bbe2e01cfbdcca371b6ac47c3b342e7f9c"
+          }
+        }
+      ],
+      "incumbentPassHistory": [
+        "g027a-live-confirmation"
+      ],
+      "retired": false
+    },
+    {
+      "id": "slowedBar",
+      "status": "passed",
+      "listener": "event-chain@2",
+      "instruments": {
+        "following": "following-evaluator@2",
+        "assessment": "assessment-evaluator@2",
+        "gates": "stage-gates@1"
+      },
+      "passEvidence": {
+        "path": "runs/g027a-live-confirmation/summary.json",
+        "sha256": "10ab4aa8faaa1b3f8f49bef674bbfe0bc0e8cab3e41705302aceadfda728f840"
+      },
+      "confirmedEvidence": null,
+      "version3Revalidation": "pending independent oracle audit and a future listener evaluation",
+      "examples": [
+        "sb-s2-45-b1-50",
+        "sb-s2-45-b1-60",
+        "sb-s2-45-b1-70",
+        "sb-s2-45-b1-80",
+        "sb-s2-45-b1-90",
+        "sb-s2-45-b2-50",
+        "sb-s2-45-b2-60",
+        "sb-s2-45-b2-70",
+        "sb-s2-45-b2-80",
+        "sb-s2-45-b2-90",
+        "sb-s2-63-b1-50",
+        "sb-s2-63-b1-60",
+        "sb-s2-63-b1-70",
+        "sb-s2-63-b1-80",
+        "sb-s2-63-b1-90",
+        "sb-s2-63-b2-50",
+        "sb-s2-63-b2-60",
+        "sb-s2-63-b2-70",
+        "sb-s2-63-b2-80",
+        "sb-s2-63-b2-90",
+        "sb-s2-90-b1-50",
+        "sb-s2-90-b1-60",
+        "sb-s2-90-b1-70",
+        "sb-s2-90-b1-80",
+        "sb-s2-90-b1-90",
+        "sb-s2-90-b2-50",
+        "sb-s2-90-b2-60",
+        "sb-s2-90-b2-70",
+        "sb-s2-90-b2-80",
+        "sb-s2-90-b2-90",
+        "sb-s2-99-b1-50",
+        "sb-s2-99-b1-60",
+        "sb-s2-99-b1-70",
+        "sb-s2-99-b1-80",
+        "sb-s2-99-b1-90",
+        "sb-s2-99-b2-50",
+        "sb-s2-99-b2-60",
+        "sb-s2-99-b2-70",
+        "sb-s2-99-b2-80",
+        "sb-s2-99-b2-90",
+        "sil-sb-s2-45-b1-50",
+        "sil-sb-s2-45-b1-60",
+        "sil-sb-s2-45-b1-70",
+        "sil-sb-s2-45-b1-80",
+        "sil-sb-s2-45-b1-90",
+        "sil-sb-s2-45-b2-50",
+        "sil-sb-s2-45-b2-60",
+        "sil-sb-s2-45-b2-70",
+        "sil-sb-s2-45-b2-80",
+        "sil-sb-s2-45-b2-90",
+        "sil-sb-s2-63-b1-50",
+        "sil-sb-s2-63-b1-60",
+        "sil-sb-s2-63-b1-70",
+        "sil-sb-s2-63-b1-80",
+        "sil-sb-s2-63-b1-90",
+        "sil-sb-s2-63-b2-50",
+        "sil-sb-s2-63-b2-60",
+        "sil-sb-s2-63-b2-70",
+        "sil-sb-s2-63-b2-80",
+        "sil-sb-s2-63-b2-90",
+        "sil-sb-s2-90-b1-50",
+        "sil-sb-s2-90-b1-60",
+        "sil-sb-s2-90-b1-70",
+        "sil-sb-s2-90-b1-80",
+        "sil-sb-s2-90-b1-90",
+        "sil-sb-s2-90-b2-50",
+        "sil-sb-s2-90-b2-60",
+        "sil-sb-s2-90-b2-70",
+        "sil-sb-s2-90-b2-80",
+        "sil-sb-s2-90-b2-90",
+        "sil-sb-s2-99-b1-50",
+        "sil-sb-s2-99-b1-60",
+        "sil-sb-s2-99-b1-70",
+        "sil-sb-s2-99-b1-80",
+        "sil-sb-s2-99-b1-90",
+        "sil-sb-s2-99-b2-50",
+        "sil-sb-s2-99-b2-60",
+        "sil-sb-s2-99-b2-70",
+        "sil-sb-s2-99-b2-80",
+        "sil-sb-s2-99-b2-90",
+        "w2-sb-s2-45-b1-50",
+        "w2-sb-s2-45-b1-60",
+        "w2-sb-s2-45-b1-70",
+        "w2-sb-s2-45-b1-80",
+        "w2-sb-s2-45-b1-90",
+        "w2-sb-s2-45-b2-50",
+        "w2-sb-s2-45-b2-60",
+        "w2-sb-s2-45-b2-70",
+        "w2-sb-s2-45-b2-80",
+        "w2-sb-s2-45-b2-90",
+        "w2-sb-s2-63-b1-50",
+        "w2-sb-s2-63-b1-60",
+        "w2-sb-s2-63-b1-70",
+        "w2-sb-s2-63-b1-80",
+        "w2-sb-s2-63-b1-90",
+        "w2-sb-s2-63-b2-50",
+        "w2-sb-s2-63-b2-60",
+        "w2-sb-s2-63-b2-70",
+        "w2-sb-s2-63-b2-80",
+        "w2-sb-s2-63-b2-90",
+        "w2-sb-s2-90-b1-50",
+        "w2-sb-s2-90-b1-60",
+        "w2-sb-s2-90-b1-70",
+        "w2-sb-s2-90-b1-80",
+        "w2-sb-s2-90-b1-90",
+        "w2-sb-s2-90-b2-50",
+        "w2-sb-s2-90-b2-60",
+        "w2-sb-s2-90-b2-70",
+        "w2-sb-s2-90-b2-80",
+        "w2-sb-s2-90-b2-90",
+        "w2-sb-s2-99-b1-50",
+        "w2-sb-s2-99-b1-60",
+        "w2-sb-s2-99-b1-70",
+        "w2-sb-s2-99-b1-80",
+        "w2-sb-s2-99-b1-90",
+        "w2-sb-s2-99-b2-50",
+        "w2-sb-s2-99-b2-60",
+        "w2-sb-s2-99-b2-70",
+        "w2-sb-s2-99-b2-80",
+        "w2-sb-s2-99-b2-90"
+      ],
+      "sentinels": [
+        {
+          "id": "sb-s2-99-b1-90",
+          "score": "s2",
+          "kind": "performance",
+          "margin": 0.7349695782200701,
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.sb-s2-99-b1-90.json",
+            "sha256": "106d97ad2dd944e7d2883246ed0cce43e701c9e2efb572bc7d5a11352fc3d427"
+          }
+        },
+        {
+          "id": "sb-s2-99-b1-70",
+          "score": "s2",
+          "kind": "performance",
+          "margin": 0.7349695782200704,
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.sb-s2-99-b1-70.json",
+            "sha256": "7b82299498d3f2a076e8127260ca973e3db01ac745b515e3df67a11b79f4efa9"
+          }
+        },
+        {
+          "id": "sb-s2-90-b2-50",
+          "score": "s2",
+          "kind": "performance",
+          "margin": 0.7499999999999942,
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.sb-s2-90-b2-50.json",
+            "sha256": "309bbef2ba87e57b30870e0f22143995ea9b9c46b6634cdc56640bc3cc4366ea"
+          }
+        },
+        {
+          "id": "sil-sb-s2-63-b1-60",
+          "score": "s2",
+          "kind": "silence",
+          "margin": 0.995845436,
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.sil-sb-s2-63-b1-60.json",
+            "sha256": "2bd23a21c8e637d526f2ce96bcfcffdd6c02b37453433f23f5248ef9eb1adc19"
+          }
+        },
+        {
+          "id": "w2-sb-s2-90-b2-50",
+          "score": "s2",
+          "kind": "wrong-score",
+          "margin": 0.996809424,
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.w2-sb-s2-90-b2-50.json",
+            "sha256": "013b14bab86e23693dea0fe290569dd35f5b8beb8224163eb54b85fcb2024602"
+          }
+        }
+      ],
+      "incumbentPassHistory": [
+        "g027a-live-confirmation"
+      ],
+      "retired": false
+    }
+  ],
+  "openSubstages": [
+    "four-bar-tempo-revalidation",
+    "held-note-hesitation",
+    "rushed-bar",
+    "missing-event",
+    "wrong-note-with-w1",
+    "dead-note",
+    "extra-note",
+    "onset-jitter",
+    "frequency-offset",
+    "stage3-chords",
+    "stage4-recorded-guitar",
+    "stage5-categories"
+  ],
+  "retiredSets": [],
+  "retirementReason": "One evaluation of incumbent@2; no performance set meets three-evaluation condition.",
+  "baselinePolicy": {
+    "mode": "sweep-only",
+    "since": "2026-09-30",
+    "authority": "contracts/development-contract-2.md#keeping-the-suite-lean-the-rising-tide",
+    "listeners": [
+      "clock-follower@1",
+      "online-time-warp@8",
+      "online-time-warp@12",
+      "online-time-warp@14"
+    ],
+    "citations": [
+      {
+        "path": "runs/g025-single-hesitation/summary.json",
+        "sha256": "42673f74addf5f96c05339438de4085234aff675f08a7567fbdd6bb1e66fc379",
+        "use": "Frozen baseline sweep-only evidence, no fresh baseline execution."
+      },
+      {
+        "path": "runs/g026-single-slowed-bar/summary.json",
+        "sha256": "758ea9410c44dddfe2066e47cb9286ba2a933945c5e5ac37756f907aee000f34",
+        "use": "Frozen baseline sweep-only evidence, no fresh baseline execution."
+      }
+    ]
+  },
+  "lastFullComparison": "g026-single-slowed-bar",
+  "nextFullSweepNoLaterThan": 31,
+  "confirmation": "No historical pass is claimed newly confirmed; 027 was a routine repair.",
+  "routineRegressionIds": [
+    "h-s2-90-1000",
+    "h-s2-90-2000",
+    "h-s2-90-300",
+    "s1-90",
+    "s2-90",
+    "s2-99",
+    "sb-s2-90-b2-50",
+    "sb-s2-99-b1-70",
+    "sb-s2-99-b1-90",
+    "sil-h-s1-99-1000",
+    "sil-h-s2-63-2000",
+    "sil-s1-45",
+    "sil-s2-99",
+    "sil-sb-s2-63-b1-60",
+    "w2-h-s1-63-1000",
+    "w2-h-s2-99-300",
+    "w2-s1-99",
+    "w2-s2-99",
+    "w2-sb-s2-90-b2-50"
+  ],
+  "futureEvidence": {
+    "manifest": "/home/williao/dev/mnx-listening-data/contract2-four-bar-tempo-v1/manifest.json",
+    "sha256": "870363f2f36aa19a13aeee4d0faccff4e59d55ff8183fe8c32c868a803b5b60e",
+    "listenerEvaluated": false
+  },
+  "validation": {
+    "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g028-other-bars-suite/historical-validation.json",
+    "sha256": "94e5f2f8bb1b16e0fa630813a00a0c3de96ad072219ddee0974815e3c97bbf5a"
+  }
+}

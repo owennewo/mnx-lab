@@ -4,8 +4,8 @@
     {
       "number": "022",
       "slug": "022-event-instruments",
-      "title": "022 · Event instruments, stage 1 and the frozen baselines",
-      "banner": "Instruments trusted · every oracle number reproduced · every baseline fails stage 1 by running ahead · gates proposed, awaiting the user",
+      "title": "022 \u00b7 Event instruments, stage 1 and the frozen baselines",
+      "banner": "Instruments trusted \u00b7 every oracle number reproduced \u00b7 every baseline fails stage 1 by running ahead \u00b7 gates proposed, awaiting the user",
       "runs": [
         "g022-stage1-baselines"
       ],
@@ -17,8 +17,8 @@
     {
       "number": "023",
       "slug": "023-instruments-decisions",
-      "title": "023 · The user's decisions in the instruments, and stage 1's controls",
-      "banner": "Instruments versioned and every oracle@2 number reproduced · awaiting audit · the clock fails every control · the time warpers follow a semitone-neighbour wrong score on 2 of 8 · control-assessment gate proposed, awaiting the user",
+      "title": "023 \u00b7 The user's decisions in the instruments, and stage 1's controls",
+      "banner": "Instruments versioned and every oracle@2 number reproduced \u00b7 awaiting audit \u00b7 the clock fails every control \u00b7 the time warpers follow a semitone-neighbour wrong score on 2 of 8 \u00b7 control-assessment gate proposed, awaiting the user",
       "runs": [
         "g023-stage1-controls"
       ],
@@ -30,8 +30,8 @@
     {
       "number": "024",
       "slug": "024-event-chain-stage1",
-      "title": "024 · A fresh event listener on the sine happy path",
-      "banner": "Stage 1 passes · 48/48 events and notes · all 40 intervals within tolerance · all 16 controls reject · 240 prefix checks pass · next: one hesitation",
+      "title": "024 \u00b7 A fresh event listener on the sine happy path",
+      "banner": "Stage 1 passes \u00b7 48/48 events and notes \u00b7 all 40 intervals within tolerance \u00b7 all 16 controls reject \u00b7 240 prefix checks pass \u00b7 next: one hesitation",
       "runs": [
         "g024-event-chain-stage1"
       ],
@@ -43,8 +43,8 @@
     {
       "number": "025",
       "slug": "025-single-hesitation",
-      "title": "025 · One hesitation on the same sine scores",
-      "banner": "Hesitation passes · 240/240 events and notes · 200/200 intervals · 35/35 slow-bar findings · stage 1 unchanged · next: a slowed bar",
+      "title": "025 \u00b7 One hesitation on the same sine scores",
+      "banner": "Hesitation passes \u00b7 240/240 events and notes \u00b7 200/200 intervals \u00b7 35/35 slow-bar findings \u00b7 stage 1 unchanged \u00b7 next: a slowed bar",
       "runs": [
         "g025-single-hesitation"
       ],
@@ -56,8 +56,8 @@
     {
       "number": "026",
       "slug": "026-single-slowed-bar",
-      "title": "026 · One slowed bar on the same sine scale",
-      "banner": "Slowed-bar substage fails · live cursor 38/40 · assessment 40/40 · transient pitch skips diagnosed · earlier evidence unchanged",
+      "title": "026 \u00b7 One slowed bar on the same sine scale",
+      "banner": "Slowed-bar substage fails \u00b7 live cursor 38/40 \u00b7 assessment 40/40 \u00b7 transient pitch skips diagnosed \u00b7 earlier evidence unchanged",
       "runs": [
         "g026-single-slowed-bar"
       ],
@@ -69,8 +69,8 @@
     {
       "number": "027",
       "slug": "027-live-confirmation",
-      "title": "027 · Confirm live pitch evidence before committing",
-      "banner": "Slowed-bar repair passes · 264/264 examples · 1584 fresh prefix checks · unchanged musical assessment · one-hop latency cost",
+      "title": "027 \u00b7 Confirm live pitch evidence before committing",
+      "banner": "Slowed-bar repair passes \u00b7 264/264 examples \u00b7 1584 fresh prefix checks \u00b7 unchanged musical assessment \u00b7 one-hop latency cost",
       "runs": [
         "g027-live-confirmation",
         "g027a-live-confirmation"
@@ -78,6 +78,19 @@
       "previous": {
         "href": "026-single-slowed-bar.html",
         "label": "Experiment 026"
+      }
+    },
+    {
+      "number": "028",
+      "slug": "028-other-bars-suite",
+      "title": "028 \u00b7 Other-bars tempo reference and a recorded rising tide",
+      "banner": "Mixed oracle result \u00b7 11/12 assessment cases agree \u00b7 B1 frozen arithmetic disagreement \u00b7 19 historical sentinels \u00b7 252 examples frozen \u00b7 independent audit required",
+      "runs": [
+        "g028-other-bars-suite"
+      ],
+      "previous": {
+        "href": "027-live-confirmation.html",
+        "label": "Experiment 027"
       }
     }
   ]

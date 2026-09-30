@@ -16,6 +16,8 @@ not here. The first series' reports, 001–021, are in
 
 | 027 | [Confirm live pitch evidence before committing](027-live-confirmation.html) | [g027a](../runs/g027a-live-confirmation/summary.json), [preserved g027 preflight failure](../runs/g027-live-confirmation/summary.json) |
 
+| 028 | [Other-bars tempo reference and a recorded rising tide](028-other-bars-suite.html) | [g028](../runs/g028-other-bars-suite/summary.json) |
+
 ## One experiment, one file
 
 Its pre-registration section is committed and landed before anything runs: the

@@ -1,0 +1,396 @@
+{
+  "id": "g028-other-bars-suite",
+  "kind": "instrument-validation",
+  "modelAndTool": "Sol 6.1 (high) in Codex",
+  "preregistration": "reports/028-other-bars-suite.md",
+  "preregistrationCommit": "309c845e0e95481e36ce6a0969e71b2e5ca45d93",
+  "gitCommit": "ef679158249f3b35188172bc4843b0cf643e4e39",
+  "startedAt": "2026-09-30T20:53:50.329Z",
+  "sourceHashes": {
+    "bench/oracle-events/README.md": "b1c6c4217bc4c747308b5b48165e72f53964adc059f1951112e60608f68ad46b",
+    "bench/oracle-events/audit-2.md": "6f5fbddd88e2d808d21c87c51d4485823eeab7a2a13be63dc4963d221a49572d",
+    "bench/oracle-events/freeze-2.json": "a9bfcdbe71d95c3fcb7249549996f7fdc78dee57f3151e37726591ea278262b2",
+    "bench/oracle-events/freeze-3.json": "f84a5e39d774f1d323718ced63b8c1ec540a89fc17cc101b21ebf43f60de7c1f",
+    "bench/oracle-events/freeze.json": "44bc6d74a61277f552a549ef8ab0bcb3df2a35a847dab363305aa2a62f79e830",
+    "bench/oracle-events/oracle-2.json": "e29ba389170181cffdf6f67fd51052f5ca58709927a1767e42819ccf3f157a2c",
+    "bench/oracle-events/oracle-3.json": "3b83278b5df9ece9317343b4a5b02a49fa7c737a59f6b74e3a98bfc73a55fd48",
+    "bench/oracle-events/oracle.json": "8c192851e571f26716b3bd878b6cd293fcabf7b99198de625b17b9e8cdfbe9aa",
+    "bench/src/candidates/clockFollower.ts": "687cbaaed6323594761986370ade1e7c4262fcd02deb4930ba5a0c64c35df5b9",
+    "bench/src/candidates/onlineTimeWarp1.ts": "1f87dbf4ad65ae4ce7c48d8b05b751113e18948148267895a517dfc639f45356",
+    "bench/src/candidates/onlineTimeWarp10.ts": "53e04a41a365f29555d3743b941b48ebb7638efe5afd30689c56e1dce174823f",
+    "bench/src/candidates/onlineTimeWarp11.ts": "e4879ee956b27917e017764a702279c7f981c044fec4898dac7b1ef00cbeecab",
+    "bench/src/candidates/onlineTimeWarp12.ts": "0438d85c0a96d831e747da0cef72ced3d9e4e1015f2071cb7d683215753a9719",
+    "bench/src/candidates/onlineTimeWarp13.ts": "b9360acb77fc7fa2a21cd9c615a9510b109645b001500ce5c1566f404d2ad912",
+    "bench/src/candidates/onlineTimeWarp14.ts": "6a77d3038c68420f35988de9755268d5cf1fc597044a10ed2fdf7b8d06e39c7e",
+    "bench/src/candidates/onlineTimeWarp15.ts": "2b48d421a333400d6795ac593e330fa63f180a2a01849ab3aa54eaea3476dd72",
+    "bench/src/candidates/onlineTimeWarp2.ts": "b64d4adfe14d0d93cc9a32dc8a6d831b2b073efb7c6801eee4c8c94fe34f3c4b",
+    "bench/src/candidates/onlineTimeWarp3.ts": "2147402e7067f3e4b5643b0e2523a243f3c5730e2b1399894ba2177fd3ea7d3d",
+    "bench/src/candidates/onlineTimeWarp7.ts": "716df1c6e45a871618b2c14521c33ce226528af9055c54080e7d22c82fdd799c",
+    "bench/src/candidates/onlineTimeWarp8.ts": "cef239ceec5844f48eb91b25618e5c4351dbccd1d162b5377b9683a5881721a5",
+    "bench/src/candidates/onlineTimeWarp9.ts": "d80abc3f7fb305342e6bc6622f894bf066f30a9be20cbea54622a6180e7cc271",
+    "bench/src/candidates/onlineTimeWarpAcousticAnchorPath.ts": "5bf42795b28fab2aea0b0c06cf791eef009f24a8d02f8c68988c36443ca6b783",
+    "bench/src/candidates/onlineTimeWarpConfigurable.ts": "312c29450533c289f6756fc4e985e3c6b8bed0ba858183e403a2c267000845c6",
+    "bench/src/candidates/onlineTimeWarpContinuityPath.ts": "0f3e73ae0070bc7b34c097806e38dee56868bf4cb1be1fb23881aba0aa17341f",
+    "bench/src/candidates/onlineTimeWarpEmittedRankPath.ts": "d033f959907325a572c588c9b8030b8b9e43bebd4239cd7ac7deed3e8c75b681",
+    "bench/src/candidates/spectralFollower1.ts": "e86ef1b9aaf6d1072a9082fe126e0199d0675991740206179db188f194a2486a",
+    "bench/src/candidates/spectralFollower2.ts": "b21fa0dbb735a06561a4004eb8e54368b0c08e35663722257426a1278a812aaa",
+    "bench/src/cli.ts": "4a0718e6135faa531bfcf0763dbb00cb20a2d03372186d45e28ae17d6a6f0600",
+    "bench/src/diagnostic/features.ts": "eafb23ad35b140cd7872e6080a0158257a137998c462115b6ac7b528b3f4d232",
+    "bench/src/diagnostic/run.ts": "4c183dbdcb796cc16b6fe82a3db23def80fa220473714281dfc1ce035eadeb8d",
+    "bench/src/evaluate/index.ts": "33a85837d638734c01331f1aebb930c764ff7871ab5b9bf45d09c5f6af2cac7d",
+    "bench/src/events/assessment.ts": "d8c76ce14523f2664d1c1e190f0a7a69814cd2bc7849cd383ecda1b440570ae0",
+    "bench/src/events/assessment2.ts": "d3a0b19c9fb4e18c026c88c30abb56f70e4c25f9808c010a98ae1f4f4e515a57",
+    "bench/src/events/assessment3.ts": "bfcab4f77a616b8d369e8536a58a22fda417295aa8a911717442b26216cd8bf5",
+    "bench/src/events/following.ts": "644ba7adc9b43be5ad96768fcaa2ed85e78a655e8f54a204f66a058a9b363353",
+    "bench/src/events/gates.ts": "60647d6c7caaeb399e79a91e8f886909d1a92aeb1ff45355e5a921466767b108",
+    "bench/src/events/gates2.ts": "8f506176bae2bde8af186a315c623c4a63c749cd68a4dcbf11e74d3d0ffa2aba",
+    "bench/src/events/label.ts": "e250c46b8068b02862cdb1f6bdf3085453f52e9e7155e3d5680b29deb8a524ca",
+    "bench/src/events/oracle.ts": "b8e0aee77377c490c719f445246412a99b4f539fcd9c213b9ae3200ba9d23b64",
+    "bench/src/events/oracle3.ts": "4829638aa660239520bc080aea77d1e5d884e2bbaff8d5ff6ad1a43cb6b9f7f0",
+    "bench/src/evidence/inspect-anchor-precision.ts": "58a7c6cd3109af1638fc2380f1972b282fee86e3d338e10cdce5201dc71413a3",
+    "bench/src/evidence/preflight.ts": "551e36f18054caeba0693a0d967ae30bd269c53f0f7f3de503912d1530e94b87",
+    "bench/src/evidence/prepare-review.ts": "868a1f6534ae9b603da941e1b83adee334cecccbb701431ed5ce3b36df1af02e",
+    "bench/src/generate/set.ts": "69795c1ad4e60cd31e88f152fc85b3e0bc5938b4f9bd81de972ff944c9489c2e",
+    "bench/src/generate/sine.ts": "c7aab46132f2461172d531751b251341ad76d832f03dffda206d5161f7a93f96",
+    "bench/src/generate/wav.ts": "a38ae9c13209414f103a2ec75007f2d904919bb2e0a8eaf24d26d9614d94a371",
+    "bench/src/io.ts": "62c62365425f2ca12ebca5290ad5164b851125a55bc45a2d1224a346af5c6a7e",
+    "bench/src/ladder/burstDiagnostic.ts": "696eb339acd759949a97a5147e61da6ec55fc97e2636996928d57867b8ea9b6e",
+    "bench/src/ladder/cache.ts": "c65ad74587983620777fd6dc0860d5d69a60f405d33123c35294a02ab26b5d1c",
+    "bench/src/ladder/candidates.ts": "b86b40f7c50771669e25bd86c22d95896e0b6388a6758632ec94090ff908b554",
+    "bench/src/ladder/decay.ts": "986ea25d6112c92bb3bee61d91cc75e32177b24ffecfca3f19ec3401d45592e9",
+    "bench/src/ladder/decoyDiagnostic.ts": "2478f98840e330935706e7cd3e47b248282ec8b840baacc0006e9e314a2ad5ce",
+    "bench/src/ladder/decoyNullDiagnostic.ts": "7ff66eb390a2d7ee05d1896a634aea86648d0ac4ada2da31160fc6ef20a5524d",
+    "bench/src/ladder/goldens.ts": "f874ae1dc557808a02974ddae59757576beb6a23394834bd253dac109af8d12c",
+    "bench/src/ladder/prepare.ts": "4026d641fdebf94ac14b467784738ad96ddd0522aa24557d3d1ca0acb743920e",
+    "bench/src/ladder/prepareRung1.ts": "1445476e22d220bce088b9b81abbe985bece5e524eb388ed0118dbcaf459b66d",
+    "bench/src/ladder/prepareRung2.ts": "67c2da3acfe63225ec5890fbeca8f77e9cae7fe88194a7f478aea5b58f45f7de",
+    "bench/src/ladder/privateSets.ts": "9845c8b026317f285f1199948098b71a66045041883a14b4a6a950d075047004",
+    "bench/src/ladder/recognition.ts": "cc801e2507c5486304ba2606e3fecb6be02219656cfb5a463e6de4eb2e2df90e",
+    "bench/src/ladder/render.ts": "8fede73efbfd588ade8526752c4952fa99c58f80bee33fd88093b94e67f1bda3",
+    "bench/src/ladder/samples.ts": "367eaab6e42a275ab84cee29159a8ce0fe385c3c745171ed08e8aaed53b80f43",
+    "bench/src/ladder/scoreboard.ts": "c8519cd996273aff1e2049c5bb09bcbfe83e6e036490efb3ba2ca38bf084aa13",
+    "bench/src/ladder/seedCache.ts": "b8cb9dbbb0d0278ab5ef9a290c0ace93271362dbea9f30a857cf7c426c671600",
+    "bench/src/ladder/sources.ts": "a9ba09eb9d873dc9dee56e865c190f9171ab2474c97b9315e3b26672ad17e295",
+    "bench/src/ladder/suite.json": "00e220f2a8ded2e683f6b6df2c19be65ec1106b20a6132d0c3e9bc39f85740e4",
+    "bench/src/ladder/supportDiagnostic.ts": "c4f1316ff79c98eb45fc5f12f82cef64089545d6f40fdb9280642d28b441615a",
+    "bench/src/ladder/tempo.ts": "eacdf924c635b45cda0d8763fbb79b934c7f67f7a16baaa50815410545143888",
+    "bench/src/listeners/eventChain1.ts": "c8e43c445cd53331d3195b6f47542bc759d853d4d665085300e6035ce9fc6c5a",
+    "bench/src/listeners/eventChain2.ts": "069a785c5217eb674cf92e9788cff65343cc32bb9398db8c718827191885b8f4",
+    "bench/src/proxy/prepare.ts": "dc249e05527d02ffd718eb6a72d5199934828bd8b0346def8edc644fdba590f2",
+    "bench/src/proxy/reference.ts": "450adc25b1dd24169b20ea3c1dde3c1a9b8479bae309230b94f635512c04c456",
+    "bench/src/proxy/run.ts": "da3171b3fe6747f752a33b050192896ac99da2e09b05a0f8b6c391d9bd759109",
+    "bench/src/report/index.ts": "f008c0a07feb6b8286d19e1b2da2de022afe300800b78a3c22e198164369285b",
+    "bench/src/report/oracle.ts": "d5483693aec119928140b9eb53d71bc988df0843e3440d493b632c9acee10f21",
+    "bench/src/run/runner.ts": "c5bd7d90ccaacf1b1382f6663b5ac6f8c1dea930754eecbbf684f27635cb7cf6",
+    "bench/src/run/set.ts": "fde9901932e537981425f45f05442c15ee0a7ad70d3a9d70751fb4aff4c8aef4",
+    "bench/src/seam/fixtures.ts": "679f9de3421d6abdb3a579cdf68aaf72bc41c98e1d01eff42d423df1d946527f",
+    "bench/src/seam/legacy.ts": "b833b6949b6e2b25fe0f2e6497f58a80513312951bc2459f58506f71ddd22688",
+    "bench/src/seam/records.ts": "cc00132cc2c4856735c607b6dca25106d7c68b9fa900c98358af4922111eb487",
+    "bench/src/seam/replay.ts": "d96e909801d44e031a31fc4d5b743cc41e842c2e1634db0625986b0c51dc8724",
+    "bench/src/seam/runner.ts": "ad6171f1bded35442558bf81b1c3ad79a128eb11f5aa7c7f9bd38feadc04f2ac",
+    "bench/src/stages/diagnose026.ts": "b445ef99680f4f479fd694f20c17625ccc3fb5778ec91aeea7f4abd7e9c89e7c",
+    "bench/src/stages/fourBarTempo1.ts": "a5e2c6f3fea53f7d54c022a4cd008f0a2311da6fc7206eee0d686423522eba1c",
+    "bench/src/stages/hesitation1.ts": "85a25411dfd3755b576aadc5bba99490be04e189e341a9211a627c41524805a2",
+    "bench/src/stages/run.ts": "4ca968bb7ca7693c4c54a034be345902023bce410bdc3b3b2aaa49843d32b95d",
+    "bench/src/stages/run023.ts": "a8ce68b7dc6868fcdda4db11d7ee264fe54e7df3a7ff9e0ad8e288a49858056b",
+    "bench/src/stages/run024.ts": "03c4e10a65f041ba84836b5f992bc7513ab72558091ebf07ce141392fb73a7f7",
+    "bench/src/stages/run025.ts": "266ad25654230a6a1c59cce0b9e9b5532b5f6f70ab44acb0576648ff039b329c",
+    "bench/src/stages/run026.ts": "f9c7fcffc9df727fad1fa1c0472b6784330c2bf1c40765130dc467d3883040b5",
+    "bench/src/stages/run027.ts": "cc374bef575157481f3931bd7973cd5217ed94d38da55306bd259a74c0578b4d",
+    "bench/src/stages/run028.ts": "784e9944cc59d1d46238d8411bd00e9c6102a8be11e0103a141dc897bd95f5bb",
+    "bench/src/stages/slowedBar1.ts": "ee8e428a85ff3df784c7abe77b7e6c2e852ce10463e24fcb6c62abe8e001f0db",
+    "bench/src/stages/stage1.ts": "041f0c026dc8eca4ce48e1edd6b1a261e2fbd6f83b231890211712dd92023358",
+    "bench/src/stages/stage1v2.ts": "7204da96a5b101f5dca88cfbce9bae9124fe147dba1a5c3a8c00cd77ecbcfe38",
+    "bench/src/stages/stage1v3.ts": "0055d6110315ef25353526fc60789fd0754fc65db23a8d35f1856d96a20874d8",
+    "bench/src/types.ts": "bcb4d528af893a4bcd872360915ff635e9cfc4d26328c4315433293a39fa9744",
+    "bench/src/v2/anchor-limits.ts": "b955c00409a5fa03625160eb49aa12813ddf82d4ddbaaa9a649458906730e5d0",
+    "bench/src/v2/checkpoint.ts": "c2ecec5401418846faa4d908a2e528219290abd2c6e782141070cb3530e93490",
+    "bench/src/v2/driver.ts": "ebfcc84a1b660665ea6f9de9cabb6b997de4292047a8a565806e747b12f7600c",
+    "bench/src/v2/evaluate.ts": "88ec56c29bd22194f7f2d530f49663d648b11416794564cc32c0db7fba4d2a42",
+    "bench/src/v2/partitions.ts": "3d266e42aa1cdcbf40adc3bbc7d69321fe83f59b993b01ee68496783b71f56d5",
+    "bench/src/v2/retain.ts": "0a272adbe0fc0c7721058352f191032651fa2cf511603571668c29e95f558814",
+    "bench/src/v2/run-pair.ts": "3b9a02a6e5783f7472330ab9fdd19ef378383b8f287c52a095e86eafb913ff70",
+    "bench/src/v2/types.ts": "5b3d48d6ab30f0e1c8bf686f62595d1ecc0c13716d14489555bd383f21f63f32",
+    "bench/src/v2/validate.ts": "4eb351d4f38a14462d2b0b6b54a21f5ed8b83dd8226b511d048a07cea23849d0",
+    "bench/src/validate.ts": "c22008ca22f8d196d2425858e85a9e7af885acc7a0dd0b5c41495f32b871e628",
+    "bench/test/event-oracle-3.test.ts": "950ba647e2012897ed3388c7c421d7e1629679d78a036685d1c42e50f4e3ea7d",
+    "contracts/decisions.schema.json": "35765b205cd4747aa08d892ad1264c4717f0abbc6f9fbea0b8a5b1fc469ec4c3",
+    "contracts/development-contract-1.md": "e4508b9b4a3a834c417ff351812347822304984bc45950e941f2221f49c5b175",
+    "contracts/development-contract-2.md": "52ccb9791a0efab86141203ba7d46d11ef15c65be1a61f59ebc87089d1ead955",
+    "contracts/evaluator-rules.md": "11f903e2205fbc294d688992cbf34613f63860def2ac5f6f252a918cd34c89f5",
+    "contracts/event-instruments-1.md": "a3606ed14b32a38204822dd3d12fbd04e095575a6f6e224d25279c55af550045",
+    "contracts/event-instruments-2.md": "e65ad5f0a36e491d0b1d3639701a60d83a625b6cfc494e3b5063ab0dc08f95b0",
+    "contracts/event-instruments-3.md": "e23580eb99305ff6f8095d3c0a2efd240e8185544fc0be6f70570f74e362d024",
+    "contracts/freeze.json": "2679db4464f66d36ae47bd2e689817ca799c3af25afe7410af253a50e919530b",
+    "contracts/golden-format.md": "11a35ab6ba0a22b5ba6414cc2e955a9e4b15db55e7e13e1ac942c288898cec95",
+    "contracts/golden.schema.json": "822faa6545ce728569ae3b33d7ae2fa7076f8d4995438e015814a311269e9b95",
+    "contracts/handwritten.golden.json": "458e97d8ca077d7a9ceca3abc62a4c68cf20cc110b2be5a6b6ab6eb673a52b8d",
+    "contracts/handwritten.score.mnx.json": "3cb0f4438f188de9cba727aa28b244f02185b9f4983defefc08b1aaba8155159",
+    "contracts/instrument-v2.md": "d4673eadd65200b022db501c43dabdc67046ac9d0e1ebbf98d4a4fda454d63a6",
+    "contracts/recognition-diagnostic-1.md": "8c86e1967ee2a6760c83d5b4cd8ab54ea3097a932cd73ed74f2c1c64b84d7c05",
+    "contracts/research-contract-0.md": "a6e5e4bc0b23f93802f3a485f59d1b9400f3b6434aa6e21a605704c01f5a6852",
+    "contracts/research-contract-1-draft.md": "bd263c8bc041b1d43ba0c448445c8073377f3312a79d33c5ed7b911866825388",
+    "contracts/research-contract-1.approval.json": "5d60cf493738fcc9b9969f50f9ac2d021e8d749c0f05cf1ef95461d91ca4f06c",
+    "contracts/research-contract-1.md": "af18386fc88bce5d2b2eb2bc3f4da2bc91edba38713f21549b4ef3585432aee5",
+    "contracts/sync-proxy-development-1.md": "ed39195f9d22f6d698052cec7230a763bef12c56c3077c92445616103c08ae02",
+    "contracts/vocabulary-v2.md": "199c6195c03d4fa88999d5deed22eb6b029d30e2d2e4dad99e59da4a7a810cc9",
+    "contracts/vocabulary.md": "b03eeec8040a04cd4d3c6ce9f38130467939334ca5527d7d4718140fafd07b22",
+    "listen/backend.ts": "d42ad1152a60cf32f9216088c8be43ae03e690215049aaabeb6aec2644229164",
+    "listen/contract.ts": "945c00d1289ee4a4e41bd9dec860b5255cad38e9a9dc2c9dd02e4723be726059",
+    "listen/delivery.ts": "c21ef4d634ec2ca90703baa3c42424ee59d4b3ebeddc9087ba3aaa7ea26cf9d0",
+    "listen/index.ts": "c1195918a09a6f795dd2ddcafe08354210f5e090f4f2f793c7e9619afc45fd36",
+    "listen/json.ts": "3f60897cdbb2f4019fc7544eb6485a9081aaf11076eadf0c6e910ba7aa10d11c",
+    "listen/liveView.ts": "dd318f593588cad27390d6008de3736dae3e0e03579473307903c8b49caf6ff4",
+    "listen/positions.ts": "2cd20b98683df8c45e0a063d3fb028b56c258fc5d693814c88ba08c4623f29c2",
+    "listen/test/backend.test.ts": "98ee92069d9b9738a5a5ec6767ec3c248fea1132d2a4fcb5f65b4fb7e13b47bb",
+    "listen/test/delivery.test.ts": "2043cc8e5e8add4ec282c9b06bc4ba091ed1e566d2a86430952a34697ac0cb02",
+    "listen/test/fixtures/note-verdicts.decisions.json": "fa274c95ea1b30a69b2f0f86acd5e816f5d1ac6d98bebdb3dc3c2222229ce9cb",
+    "listen/test/liveView.test.ts": "6552976aed2789bad38488f719d72f178a131b7d204701419ef05e8bab3582a9",
+    "listen/test/note-verdicts.test.ts": "b1e4654ed9f9964af875412e1f76f623772fcae7cc0d93a496d05dc12d4e4891",
+    "listen/test/positions.test.ts": "510f34d4904e9045227472b63741ea488f6e7e53072d504130707980724c22ff",
+    "listen/validate.ts": "6e8b245a7fa77d3bec49615694097dcf786638bf0776da3516b26367fcdf35ff",
+    "sources/origins.json": "c9b829e7e8bbe9d0e2956305e12c1f51eb57b8c52a3a36de0f13275b34f12017",
+    "sources/s1-one-bar-c4-f4.mnx.json": "5d25a83a856eca6d83e9f75f8b4ce5081392d3aedf2864fcac2eecc7712e1b81",
+    "sources/s2-two-bar-scale.mnx.json": "63441ff16acfdedbeb1cec19a6f00b8eed646192eed7b0d23abec07295563582",
+    "sources/s3-four-bar-melody.mnx.json": "d11674f59e8e4533b2fbf685500612babecc5bdc779e082a93c8214969ad7f11",
+    "sources/w1-two-bar-black-keys.mnx.json": "0cdad694d2d3c494e0189aa891b11c2631178386b1515269fcda61b1f1602c62",
+    "sources/w2-two-bar-leaps.mnx.json": "51e23554d117727988d8b7d36ea7d7b7e2e3944ef699f954ad4f12c28d1fd484",
+    "../../src/audio/carryPlace.ts": "f0eb62902173491ad5e6a7221f092aa4dd18054f2ad44c6f287d60bf43e6fd54",
+    "../../src/audio/clickSchedule.ts": "697e7ee1d5a98aace6b0866c5be8b6b70be04b1e2f8d6217a80670c59a468f40",
+    "../../src/audio/expression.ts": "7b1efc5c38a046304aeafe0c1b8000f6c1e338d497e4f17a950e38755cf38f06",
+    "../../src/audio/midiFile.ts": "8667fc5e26da58c349605fe4875d330ccfe848bb67d9634ca0ade0d84f2b1afa",
+    "../../src/audio/native/click.ts": "d6caab43b1f02f360ccb4e0e60312c9c33ae0f66b33d168c50e61c34cee1c265",
+    "../../src/audio/native/htmlAudio.ts": "3b8302f392e7c955c43ff84f2c0de105c834880372375369f1e1c1f100890665",
+    "../../src/audio/native/samplePacks.ts": "4a6cf1b2775df1c6efe657c3ee62e4fa726dfa0005fd25ee238e8b75a9226915",
+    "../../src/audio/native/sink.ts": "bf4d5988c67a14cdfbfbdcee62df63c99ea054d9be0abb9e4e1122cb71b712e9",
+    "../../src/audio/native/synthBackend.ts": "355e288d6de211dd6c720b7559fe1b12a5341d60e76277efa1b140d09148e35a",
+    "../../src/audio/native/youtube.ts": "32ea57e673d88ac70148e4298318a08de634724af284f97712989cfa9a2c64f0",
+    "../../src/audio/partMix.ts": "66fbb8e2d1b2f123ed03e18594922a38d219539dd783ed4f5d46743b5f9594a4",
+    "../../src/audio/performance.ts": "38058a706c5257294d35a61b90f0f7e44b44c77a8e3faad36fd7dee90dee8a78",
+    "../../src/audio/performanceTypes.ts": "dc5a3663d8e1cb0f3442704588a6773157a500ad64a374123847221f8b261b55",
+    "../../src/audio/pitch.ts": "fc10675a975054f80f136f875aeb252dc053b5ab7355f1fd54f05b0b726ccc75",
+    "../../src/audio/playbackBackend.ts": "50a2bdec85214de6a464c85a073ed1293009fd04586444ba9cbc60e0be49da8f",
+    "../../src/audio/playbackPosition.ts": "4dd15060da8bbd136be26f93bcf35f70b879f78c160170cdf9b35c65a2a75067",
+    "../../src/audio/playbackSession.ts": "b1d9759841e458334338436bc202dce15a8e6bb753b94248c338573dfa560c25",
+    "../../src/audio/recordingBackend.ts": "1fa6c939ba4f74be76e3c638c6b7b1145dc6ff0ed668cef2c28bd4957117b736",
+    "../../src/audio/recordingSync.ts": "6c3606bbcd7880e6eb6eb8d7a3e00c5caa433ed871c1f96f2c4cae8067931e9e",
+    "../../src/audio/sampleSelection.ts": "5c984677467039242e1b507f3e72d634b491ebfdefb5532e5836f6be6533e9ae",
+    "../../src/audio/scorePosition.ts": "971a45b0520ebabffd00717f2e028f4061421ec2816cd358e4633c745b9de17a",
+    "../../src/audio/scoreShape.ts": "291487dd42cc8d64e2d33dda9f60b34bca7d224c0ff129f1371bd7589256fb80",
+    "../../src/audio/sink.ts": "e79b4bf1f6161b8cadd82e94483ef05f4e4c7dfcb4b572603bec8ebc74a9e2d2",
+    "../../src/audio/swing.ts": "6dabbb2b53bbb44605efe5674c41a5d7874da3275e562c5d92b83a6e95541073",
+    "../../src/audio/time.ts": "b5ca99070b3d82a9cf073c0512d796f8f014e0472181123998d8eb5a944bc98a",
+    "../../src/audio/timingConventions.ts": "75b4b2c79c82f87fe376fc15d6ef1eb5ca9cd8bbe45cc236f5d0edb2890c9308",
+    "../../src/audio/transport.ts": "eba65c8291af7ae885772854f10644933299b4ae432ea982dd546f52d1644905",
+    "../../src/audio/writtenState.ts": "ff2d2d8118f76a427084f1e7a899eeb82f648619dfde9daa4e3d2b8721d0b405",
+    "../../src/audio/youtubePort.ts": "2955200fbb4fa19bfc94133ba1d7ac8cc8e8282eb0be28bb5ef1026e5f6a3f2f",
+    "../../src/audio/youtubeUrl.ts": "de5a7d0accb0684349a8340396c34d3aa61ebe4a1044062120e985d2977d54d1",
+    "../../src/model/documentCompare.ts": "ad81eda7fa62f8f29be5dec93bcf32d5a0c19287d4e00a8459fdc7cd5c108ed1",
+    "../../src/model/durations.ts": "a9edbc6d06fe5587f6616dd008270f0e7440d7f4ebe17b228a49b20283d687a5",
+    "../../src/model/harmony.ts": "14dac8c1e4119a5c44d3f7fff166164d964e6308aa76601ea0701a92dea6ab88",
+    "../../src/model/jsonView.ts": "d6d81f32d1a40a0d7081cb0944c4c3f5bb8a1bceaa1ca9dd2c3a941d93c39e27",
+    "../../src/model/libraryTags.ts": "8558912d2da78b57d3483bbf0c62c1b1c5bff231043a72289c1f44d8183b0fb9",
+    "../../src/model/mnx.ts": "9251414ce5b3bc4b3b07c9f69a72eb37538ec76e6d733510013d71e667dbee84",
+    "../../src/model/navigation.ts": "3d4cc4c76813f31aa19fe5d3b90e8603bab8acb0994b5a95a333c5cf868e6376",
+    "../../src/model/noteKeys.ts": "166d89788dc4f22d89dc418e929c99c78c420177eb8ac9908d2012ae289db337",
+    "../../src/model/noteWalk.ts": "386416de4d56116fe42a0cde4553f40698c00692676562641f577c9fc1499ed2",
+    "../../src/model/partVisibility.ts": "cedaabd4d207fe5a3e9dfaa0c8757369e2046d4631051af3fd48f5b47bc69e65",
+    "../../src/model/passes.ts": "fc14af0b5e3ec7aeb421c1ebf21fad1784a8548bdbf4b4f5cf4f2408cf183fb1",
+    "../../src/model/pinnedErrors.ts": "b9c11bea537bf9f858ad7bd6452ccfc2b55f01323c740ff5aa255ea8033cf374",
+    "../../src/model/playback.ts": "17536cce4c59824baa8fc5ad45ee70effcbb2a57faddfbd982c5b91784077888",
+    "../../src/model/recordingAttachment.ts": "c0cc5d062d230740138c0eb3bb2e7b1bf0f7eb2ed488ad4e4ec6e9dc39c09640",
+    "../../src/model/recordingSync.ts": "99d0e5f5cc786249f3657291b5d145059abfeaaa857f0ba3b6bc06483e1959af",
+    "../../src/model/references.ts": "f93973f502d9e42e541d85e943a0c10166058f7b28c24f93c1f35ccad6f94fe9",
+    "../../src/model/restSpans.ts": "28a481de199b13e8d63daf35892475b1fa150b3de495d8ae3d4505233bd2efa2",
+    "../../src/model/swing.ts": "f1b71101ead4af009e7cb9065298611971145279a90f3be72417fd23d5af01fe",
+    "../../src/model/syncSegments.ts": "2365fdcf3b558add670843daaa486db397866dccf5971831270c7ca7d755e2a3",
+    "../../src/model/time.ts": "335406865ea0bed2a76fa635121f09233a8b462aeac66f977c6edd8170d669cc",
+    "../../src/model/transposition.ts": "3d814d423b27d55bd6fbd43585aec8fa6cada14ace55fedf2caf7a760588e0aa",
+    "../../src/model/upgradeTabExtension.ts": "311c289bdd8eb788e01771f33512d6665aa30018a2297327be9fe6394836f86f",
+    "../../src/model/youtubeUrl.ts": "5087947857037d0a2dd9d0b996b975ee7bb6d8ec9925270d80d9210f12b05fd8",
+    "reports/028-other-bars-suite.md": "c6617c69e37c88863ada0d1469e49805f88a3e11674e990af82594e3e520d95b"
+  },
+  "listenersExecuted": 0,
+  "listenerVerdictsChanged": 0,
+  "evaluators": {
+    "assessment": "assessment-evaluator@3",
+    "gates": "stage-gates@2",
+    "oracle": "event-oracle@3",
+    "audit": "required before listener judgment"
+  },
+  "finishedAt": "2026-09-30T20:54:14.811Z",
+  "status": "mixed-oracle-disagreement",
+  "decision": "D2: B1 frozen arithmetic disagrees; pending independent audit, no version3 listener judgment.",
+  "attempt": {
+    "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g028-other-bars-suite/attempt.json",
+    "sha256": "ea6b51bcf6069f4d0e6a8dddafb741bfd54244bb06476b82186fbce68037897b"
+  },
+  "oracle": {
+    "cases": 12,
+    "agree": 11,
+    "disagree": [
+      "B1"
+    ],
+    "states": 8,
+    "margins": 8,
+    "retirementCases": 4,
+    "validation": {
+      "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g028-other-bars-suite/oracle-validation.json",
+      "sha256": "a1eb44cc555ce7b08905847c7237bba90ebbc9756f8ca4eee48ba35784ebbe3e"
+    }
+  },
+  "historical": {
+    "summary": {
+      "path": "runs/g027a-live-confirmation/summary.json",
+      "sha256": "10ab4aa8faaa1b3f8f49bef674bbfe0bc0e8cab3e41705302aceadfda728f840"
+    },
+    "examples": 264,
+    "pinnedSources": 168,
+    "validation": {
+      "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g028-other-bars-suite/historical-validation.json",
+      "sha256": "94e5f2f8bb1b16e0fa630813a00a0c3de96ad072219ddee0974815e3c97bbf5a"
+    }
+  },
+  "suite": {
+    "record": "bench/suite-record.json",
+    "sha256": "1d83b5b85890ca031e411dc031f0f8562dfbfe487ddcc83691c1fb6c660d7ff2",
+    "artifact": {
+      "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g028-other-bars-suite/suite-record.json",
+      "sha256": "1d83b5b85890ca031e411dc031f0f8562dfbfe487ddcc83691c1fb6c660d7ff2"
+    },
+    "stages": [
+      {
+        "id": "stage1",
+        "status": "passed",
+        "sentinels": [
+          {
+            "id": "s2-99",
+            "margin": 0.734969578220063
+          },
+          {
+            "id": "s1-90",
+            "margin": 0.7499999999999942
+          },
+          {
+            "id": "s2-90",
+            "margin": 0.7499999999999942
+          },
+          {
+            "id": "sil-s1-45",
+            "margin": 0.997613772
+          },
+          {
+            "id": "w2-s1-99",
+            "margin": 0.997513884
+          },
+          {
+            "id": "sil-s2-99",
+            "margin": 0.99782828
+          },
+          {
+            "id": "w2-s2-99",
+            "margin": 0.997750812
+          }
+        ]
+      },
+      {
+        "id": "hesitation",
+        "status": "passed",
+        "sentinels": [
+          {
+            "id": "h-s2-90-1000",
+            "margin": 0.7499999999999942
+          },
+          {
+            "id": "h-s2-90-2000",
+            "margin": 0.7499999999999942
+          },
+          {
+            "id": "h-s2-90-300",
+            "margin": 0.7499999999999942
+          },
+          {
+            "id": "sil-h-s1-99-1000",
+            "margin": 0.996156392
+          },
+          {
+            "id": "w2-h-s1-63-1000",
+            "margin": 0.996385788
+          },
+          {
+            "id": "sil-h-s2-63-2000",
+            "margin": 0.995925368
+          },
+          {
+            "id": "w2-h-s2-99-300",
+            "margin": 0.997352592
+          }
+        ]
+      },
+      {
+        "id": "slowedBar",
+        "status": "passed",
+        "sentinels": [
+          {
+            "id": "sb-s2-99-b1-90",
+            "margin": 0.7349695782200701
+          },
+          {
+            "id": "sb-s2-99-b1-70",
+            "margin": 0.7349695782200704
+          },
+          {
+            "id": "sb-s2-90-b2-50",
+            "margin": 0.7499999999999942
+          },
+          {
+            "id": "sil-sb-s2-63-b1-60",
+            "margin": 0.995845436
+          },
+          {
+            "id": "w2-sb-s2-90-b2-50",
+            "margin": 0.996809424
+          }
+        ]
+      }
+    ],
+    "regressions": 19,
+    "retiredPerformanceSets": 0
+  },
+  "data": {
+    "manifest": {
+      "path": "/home/williao/dev/mnx-listening-data/contract2-four-bar-tempo-v1/manifest.json",
+      "sha256": "870363f2f36aa19a13aeee4d0faccff4e59d55ff8183fe8c32c868a803b5b60e"
+    },
+    "validation": {
+      "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g028-other-bars-suite/four-bar-validation.json",
+      "sha256": "4be98cc50396ed6b5aa8225f19b49a88ebca5db2f0dfbd81aa32be8c74b0f55c"
+    },
+    "performances": 84,
+    "examples": 252,
+    "notes": 1344,
+    "boundaryChecks": 5376,
+    "silenceChecks": 84,
+    "wrongScoreChecks": 84,
+    "measures": 4,
+    "sourceMidi": [
+      60,
+      62,
+      64,
+      65,
+      67,
+      69,
+      71,
+      72,
+      71,
+      69,
+      67,
+      65,
+      64,
+      62,
+      60,
+      62
+    ]
+  },
+  "qualification": "unchanged; failing listener version count0; reserved/final unused; Winner5–8 unexamined"
+}
