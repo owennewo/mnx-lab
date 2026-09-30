@@ -123,3 +123,5 @@ No current user decision is needed. Future recorded-guitar gates, qualification/
 ## Attribution and validation
 
 Designed, implemented, executed and recorded by **GPT-6 in Codex (exact version unverified)**, exactly as stated at launch. Terminal, TypeScript/tsx/Vitest; one model throughout. The full listening bench passed before execution (299 tests and typecheck); the final repository gate is run on the rebased completed record before landing. The report registry/exporter validates recorded source hashes against the pinned source commit.
+
+Codex's own session record for this run names the model `gpt-6.1-sol` at reasoning effort `high`: **Sol 6.1 (high) in Codex**, the same as experiment 024 (added by process review R4, 2026-09-30, after the experiment landed).

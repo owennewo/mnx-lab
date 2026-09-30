@@ -63,7 +63,9 @@ For each experiment:
   hashes are recorded in earlier run summaries (recompute them);
 - reused records reproduce where the report says they do;
 - the experiment's worktree is retired, and its model and tool are recorded as stated at
-  launch.
+  launch. Where the tool keeps a session log, check the record against it: Codex's
+  `~/.codex/sessions/` files carry `model` and `effort` fields. Add a correction beside
+  a vaguer record, as R3 and R4 did, without rewriting it.
 
 ### 3.2 Rule-following
 
@@ -137,7 +139,8 @@ the process as a whole by a different model.
 
 1. Make any direct fixes in a worktree, following `CLAUDE.md`.
 2. Append a review to [reviews.md](reviews.md): a row in the table and a short section
-   below it, as the file describes.
+   below it, as the file describes. If the research log's current state says a review
+   is due, update that sentence.
 3. Land it, retire your worktree, and stop.
 4. Reply to the user: your verdict in a sentence, what held, what you fixed, and what you
    recommend they decide, with the evidence. Name what you could not check.

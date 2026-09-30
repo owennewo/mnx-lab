@@ -67,7 +67,8 @@ research log says is current.
   and you can write private outputs. Missing access is a prerequisite to resolve, not a
   reason to substitute different data.
 - Reconstruct the plateau count and any budgets from the latest report and the log.
-  Record them in the pre-registration; a new model does not reset them.
+  Record them in the pre-registration; a new model does not reset them. Where nothing
+  has changed since the latest report, one line saying so, linking it, is enough.
 
 ## 2. Where things are
 
@@ -133,8 +134,14 @@ experiment writes the runner it needs, following the same rules:
 - It refuses to run until its code and the pre-registration are committed.
 - It never overwrites a run ID. Run IDs look like `g0NN-short-name`.
 - It writes a public `runs/<run-id>/summary.json` that names private artifacts by path
-  and hash, and pins the git commit and source hashes.
+  and hash, and pins the git commit and source hashes. Tag that commit
+  `<run-id>-source` and push the tag when you land: if `main` moved meanwhile, the
+  landing rebase rewrites the commit and only the tag keeps the pinned source reachable.
 - It checks causality and cost for any live listener.
+
+Run time grows with every regression set, and the user wants fast iterations. A
+listener whose recorded sources are unchanged, such as a frozen baseline, need not be
+rerun on inputs it already has records for: cite those records by hash instead.
 
 Bench tests run with `npm -w mnx-listening-bench test` from the repository root. When
 you touch shared harness code, show that the frozen baselines' recorded behaviour is
@@ -161,8 +168,8 @@ Then:
 - add a row to the table in `reports/README.md`;
 - add a ledger row whose conditions name you;
 - update the research log: the current state, findings with their evidence, and the
-  re-ranked questions. Record the resulting plateau and budget state in the report and
-  point to it from the log.
+  re-ranked questions. Record the resulting plateau and budget state in the report (one
+  line if unchanged) and point to it from the log.
 
 If your experiment created or re-versioned an oracle, make its audit the research log's
 top open question, naming the oracle version.
