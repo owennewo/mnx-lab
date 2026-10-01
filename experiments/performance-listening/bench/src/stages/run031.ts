@@ -54,7 +54,9 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const commit = git('rev-parse', 'HEAD'), reportPath = `experiments/performance-listening/${PREREG}`;
   const preregCommit = git('log', '--diff-filter=A', '--format=%H', '--', reportPath).split('\n').at(-1)!;
   git('merge-base', '--is-ancestor', preregCommit, 'origin/main');
-  assert.equal(git('show', `${preregCommit}:${reportPath}`), readFileSync(join(EXPERIMENT, PREREG), 'utf8').trim());
+  // Results are appended below the pre-registration, which itself must never change.
+  const preregistered = git('show', `${preregCommit}:${reportPath}`);
+  assert(readFileSync(join(EXPERIMENT, PREREG), 'utf8').startsWith(preregistered), 'Pre-registration changed since it landed');
   const privateDir = join(requireOutsideGit(dataRoot), 'diagnostic-runs', runId), publicDir = join(EXPERIMENT, 'runs', runId);
   if (existsSync(privateDir) || existsSync(publicDir)) throw new Error('Run ID exists; never overwrite');
   mkdirSync(privateDir, { recursive: true }); mkdirSync(publicDir, { recursive: true });
