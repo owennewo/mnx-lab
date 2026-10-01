@@ -19,6 +19,7 @@ is visible: a process that gains rules every time is getting heavier, not better
 | R7 | 2026-09-30 | [028](reports/028-other-bars-suite.md) | Sol 6.1 (high) in Codex | Held; mixed verdict supported, oracle coverage incomplete | [Landed with this entry](#r7-after-experiment-028) | No new decision; different-model milestone review remains due | +1 −0 |
 | R8 | 2026-09-30 | [audit 3](bench/oracle-events/audit-3.md) and [029](reports/029-oracle-coverage.md) | Sol 6.1 (high) in Codex | Held; audit procedure needed clarification | [Landed with this entry](#r8-after-audit-3-and-experiment-029) | No new decision; different-model milestone review remains due | +0 −1 |
 | R9 | 2026-10-01 | The batch of [030](reports/030-current-instruments.md) and [031](reports/031-other-bars-reporting.md), with [audit 4](bench/oracle-events/audit-4.md) and the batch opening | Claude Fable 5.1 in Claude Code | Held; the batch stopped by its own rule on a runner defect | [Landed with this entry](#r9-after-the-batch-of-030-and-031) | Sweep completion (decided: g031b); baselines in sweeps; next batch's goal | +2 −1 |
+| R10 | 2026-10-01 | The resumed batch: [g031b](reports/031-other-bars-reporting.md#completion-g031b-by-the-users-authority), [032](reports/032-held-note-hesitation.md), [033](reports/033-rushed-bar.md) and [034](reports/034-missing-event-sweep.md), with the full direction review | Claude Fable 5.1 in Claude Code | Held; the sine staircase is sound, and now the slow part | [Landed with this entry](#r10-after-the-resumed-batch-g031b-and-032034-with-the-direction-review) | Sentinel rule; baselines in sweeps (again); a guitar-sound thermometer before the remaining sine deviations | +0 −0 |
 
 Reviews R1–R3 were given in conversation with the user and recorded here when this file
 was created. The same reviewer wrote contract 2 and most of the process it reviewed.
@@ -664,3 +665,180 @@ model is still recommended when stage 2 is passed or g031b records D1.
 removed one. Both additions here are earned by a recorded cost: a discarded sweep
 and a misstated reading order. The refusal rule removed is the one that cost the
 sweep.
+
+## R10, after the resumed batch (g031b and 032–034), with the direction review
+
+**Held: four D1 verdicts, each earned under rules frozen before its run, and the batch
+closed where it said it would.** Reviewed everything landed since R9 (`cf486de4`): the
+g031b runner repair and record, then 032, 033 and 034. No experiment or audit is
+mid-flight; no worktree or branch of the batch remains. Reviewer: **Claude Fable 5.1 in
+Claude Code**, as stated at launch. That is a different model from the process's author
+(Claude Opus 5.5) and from both experimenters (Sol 6.1 and Claude Opus 5.5), and the
+same model as R9, audit 4 and the parent session. This entry carries the
+different-model review of the whole process that the log had recorded as due since R5,
+so the next outside review should come from a model other than this one.
+
+**Integrity.** Main's reflog and the four session logs agree on every order, all times
+UTC. g031b ran in 031's own Claude Code session (`e3698ad5…`, `claude-opus-5-5`,
+continued by message): the prefix-check repair committed at 15:46:54, the dry assembly
+R9 asked for at 15:46:15, the run from about 15:47 to 16:15 (1,683 s), results at
+16:17:23, landed 16:18:31. Its tag `2f41c63e` differs from the rebased `95bdf916` by
+exactly R9's review commit. 032 (Codex `01a0f843-bd00…`, `gpt-6.1-sol`, effort high,
+launched with the model line): pre-registration on main 16:24:52, first stimulus file
+16:27:12, runner commit 16:36:04, run 16:36:27, landed 16:45:22. 033 (Claude Code
+`4a6d448f…`, `claude-opus-5-5`): on main 16:52:04, stimulus written 16:53:03, runner
+commit 16:55:25, tag and run 16:56:13 (47 s), landed 17:03:42. 034 (Codex
+`01a0f86c-e02f…`, `gpt-6.1-sol`, high): on main 17:10:23, stimulus 17:12:51, commit
+17:17:55, run 17:18:10 (2,712 s), landed 18:06:57. No line was removed from any of the
+four pre-registrations. The diff since R9 is new files plus the log, ledger, registries,
+the suite record, one runner line and `compare031.ts`, a read-only diagnostic; no
+listener, instrument, oracle, contract, score, baseline, earlier set or archive file
+changed. All seven source tags resolve locally and on origin. Recomputed: the four
+public summaries' sizes and hashes, the three new frozen manifests, all 83 private
+artifacts the four summaries cite, all 45 sentinel artifacts in the suite record, and
+the exporter's source-hash check for 031–034. Re-derived without running a listener:
+034's identity claim on every shared example (516 with g031b, 161 with g032, 479 with
+g033, all byte-equal on record, report, following and assessment), and all 45 sentinels
+from the margin rule applied to g034's records (45 of 45 reproduce). Ledger rows,
+reports and commit bodies carry the same model strings as the session logs.
+
+**Rules and claims.** Each experiment stayed inside its pre-registered scope, changed
+no listener, used the gates unchanged, ran its controls and sentinels, created no
+oracle, and carried the stopping count as 0, which is right: unchanged-listener
+diagnostics add no version. g031b completed 031's frozen pre-registration with runner
+repairs only, each committed before measuring. Candour held: 032 disclosed its reuse
+guard's fallback (161 fresh instead of 120) and the vacuous `groups.regressions`
+field; 033 disclosed four bars outside its own ±0.015 bound and that both misses are
+coin flips at the exact threshold; 034 claimed no stage and listed what one interior
+omission does not establish. The easy and vacuous items are all named: wrong, dead and
+extra-note gates still have no positive anywhere; 034's comparator prediction that
+each time warper fails at least one omission could not be contradicted since all fail
+all 32; 033's f = 1.10 rows put two positives a few millionths over the threshold by
+construction, so its 64/66 includes two coin flips the design itself created. One
+omission: g031b's six "Held" rows are reported without the caveat R9 asked for, that
+g031a's diagnostics were read before the completion ran; the section above them makes
+that plain, but the rows do not say it. 032 also realigned two stale labels in the
+suite record that g031b's own record commit should have updated; disclosed, and no
+verdict.
+
+**Findings.**
+
+- **The sentinel rule chooses by quantum and by name.** Every substage's performance
+  sentinels are its three least-margin examples, as the contract says. But the
+  limiting margin is always an acquisition delay or an interval error, both quantised
+  by the analysis hop, so most examples tie: at the third pick, 2 of 8 stage-1
+  performances tie, 5 of 40 hesitations, 5 of 40 slowed bars, 13 of 84 four-bar
+  examples, 5 of 48 held notes, 2 of 152 rushed bars and 4 of 40 omissions, and the
+  ASCII tie-break decides. The result: of 21 performance sentinels, 14 are at tempo 99
+  and 7 at 90, none at 45 or 63; the clean parents `s2-99` and `s3-99` are sentinels of
+  the held-note and four-bar substages. The routine suite therefore never re-runs a
+  half-speed example, a two-second pause at 45 or a bar at 50% unless that substage is
+  being attempted; only the sweep does, every fifth experiment. The rule was followed
+  to the letter, and R9 predicted this; the rule does not do what the contract's
+  "hardest examples keep running" intends.
+- **The sweep paid R9's undecided escalation again.** g034 took 2,712 s, of which the
+  incumbent, provenance checks included, took 118 s; the frozen baselines took the rest
+  running fresh on 648 new examples each. R9's second escalation (baselines fresh only
+  on sentinels and controls at a sweep) is still open.
+- **Grouping was available and unused.** 032, 033 and 034 each predicted a pass from
+  unchanged code and each got one. The contract's grouping rule, adopted after R5,
+  would have let 032 and 033 share one experiment. Not a breach; a cost of two
+  experiment overheads in a five-run batch, and a sign the sine staircase is now
+  confirmation rather than discovery.
+- **Minor.** g031b's record commit extended `compare031.ts`, a file its run had
+  pinned, which is what made 032's conservative reuse guard rerun 41 examples (seconds
+  lost, nothing else). The experimenter prompt's trap 2 says editing pinned bench
+  files is safe, and it is for verdicts; reuse guards that pin every bench file pay for
+  it. 032's own Next already advises pinning the producer's import closure instead.
+
+**Direction, in full.** This is the different-model review of the process as a whole.
+
+1. *Does the loop measure what the user asked for?* Each of the user's four directions
+   now has at least one passed substage on sines, under audited instruments: the
+   cursor sits on the event (024) and waits through a silent (025) and a sounding
+   (032) hesitation; it recovers at the next event after a missed one (034); the
+   end-of-piece assessment judges each bar against the player's other bars (g031b,
+   033) and marks every note, including the missing one (034); a slow steady player
+   gets a low overall tempo and no flag (every clean half-speed example). The
+   instruments were hand-oracled and audited by a different model before any listener
+   was judged by them. On the user's own 2026-09-30 worry, the loop is no longer
+   optimising for the wrong thing: it grades the player, not the listener's tracking
+   error.
+2. *Is synthetic progress carrying over?* Thirteen experiments under contract 2 have
+   produced three listener versions; ten experiments built instruments, audited them,
+   or confirmed an unchanged listener. Every report since 024 names the same split:
+   the event chain's stay-and-skip states, offline interval accounting and other-bars
+   flags should survive chords, longer scores and guitar; the zero-crossing sine pitch
+   front end with exact-pitch emission will not. Every one of the 1,164 examples in the
+   latest sweep stands on that front end. No real-music or recorded-guitar thermometer
+   has run under contract 2, and with that front end the Winner clip would say
+   nothing. The remaining stage-2 deviations are mostly questions about that front end
+   (a wrong note it must follow rather than reject, a dead note, a frequency offset), so
+   the next experiment will very likely need a listener version; that is the right
+   place to meet the question, on sines, cheaply, as the user directed.
+3. *Are the gates rewarding the wrong thing, or unreachable?* Neither. Per-example
+   gates have wide headroom (worst acquisition delay 49.5 ms against 200; worst interval
+   error 18.9 ms against 30 or more). The only tight measure is a bar flag at exactly
+   0.90 or 1.10, where hop-quantised onsets make a coin flip; the pooled 90% recall gate
+   absorbs it and 033 said so. Nothing has been loosened.
+4. *Time.* Routine runs took 11 s and 47 s; the incumbent's share of the full sweep
+   118 s; the routine union grew from 24 to 44 IDs over three substages, still seconds
+   of listener time. The baselines are the only cost that matters, and it is on the
+   user's desk.
+5. *The rising tide.* Nothing retired, correctly: each earlier substage has two
+   complete-set incumbent passes and the rule needs three. Sentinels were chosen by the
+   rule, which is the finding above. The sweep ran when due, confirmed what it should,
+   and re-chose sentinels at that moment only. Nothing was retired or re-chosen after a
+   failure.
+6. *The process as a whole.* Thirteen experiments and four audits, run by three models
+   in two tools, with no disputed verdict, one discarded run (g031a) and one invented
+   rule (031's one-rerun) that the process then removed. The things earning their
+   place are the ones every reviewer has named: pre-registration landed first, frozen
+   sets and records by hash, oracles audited by a different model, source tags, and
+   session-log-checkable attribution. Where it is heavier than its evidence standard
+   needs: reports restate carried-over counts and budgets three times each; every
+   pre-registration, results section and the log now quote the launcher's
+   "cannot ask the user" line verbatim as if it were research direction (it is a
+   session instruction, and quoting it once in the batch section is enough); and the
+   research log's current state has become a narrative. These are weight, not risk,
+   and no rule is added for them.
+
+**Fixed directly.** [PROMPT_REVIEWER.md](PROMPT_REVIEWER.md): where Claude Code's
+session log actually is (the launch directory's slug, not the worktree's; a session
+continued by message stays in its file), a stale line that cost this review a search.
+[PROMPT_EXPERIMENTER.md](PROMPT_EXPERIMENTER.md) section 9: a batch ended early may be
+reopened by the user, recorded in the Current batch section with the count continuing,
+as happened. The research log's review-due sentence and its awaiting-the-user line.
+No verdict, pre-registration, contract, gate, code or frozen evidence was edited.
+
+**Escalated to the user.**
+
+1. **The sentinel rule.** Recommended: sentinels are drawn from a substage's deviation
+   examples only (the clean parents are already stage 1's sentinels), and ties on
+   margin are broken by severity in the direction of difficulty (slowest tempo, longest
+   pause, most extreme bar factor) before by name. It is a tightening, but it changes a
+   rule the user adopted and the frozen chooser, so it is the user's call; re-choosing
+   would happen at the next full sweep.
+2. **Baselines in full sweeps**, R9's second escalation, unchanged: at a sweep the
+   frozen time warpers run fresh only on each set's sentinels and controls, the clock
+   on everything. g034 is the second sweep to pay about 43 minutes for them.
+3. **A thermometer on the stage-4 sound before the remaining sine deviations.** s1 and
+   s2 rendered with the existing guitar sample renderer (`sample-render@1`, the
+   samples in the private data), perfect performance plus controls, event-chain@3
+   unchanged, no gate and no selection, reported as a thermometer. It would say how
+   much of the chain survives a real attack and decay before five more sine substages
+   are built on it, and it supplies the evidence the standing "gates before stage 4"
+   decision needs. It is not in contract 2's order of work, so the user decides. If
+   declined, the next batch should group the deviations the unchanged listener is
+   predicted to pass and expect the wrong note to need a version.
+
+**Could not check.** No listener was run. The effort setting of the Claude Code
+sessions is not in their logs. Session logs show recorded tool use, not the absence
+of unrecorded reading. The margin re-derivation follows the contract's rule as the
+evaluator code states it, so it checks that nothing was hand-picked, not that the rule
+is the right one.
+
+**Trend:** +0 −0, two clarifications. R1–R4 added ten rules and relaxed four; R5–R8
+added one and removed one; R9 added two and removed one. Nothing in this batch asked
+for a rule, and the one real weakness found is a rule that needs the user, not a new
+one.

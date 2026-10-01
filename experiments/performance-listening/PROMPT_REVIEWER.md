@@ -68,7 +68,10 @@ For each experiment:
   `~/.codex/sessions/` files carry `model` and `effort` fields; Claude Code's
   `~/.claude/projects/<cwd-slug>/<session>.jsonl` carries `model` on every assistant
   turn and the launch line in its first user message, and its tool calls are
-  timestamped, so the order of writes, commits and runs can be read from it. Add a
+  timestamped, so the order of writes, commits and runs can be read from it. The slug
+  is the directory the session was launched in, normally the primary checkout, not
+  the worktree it then made; a session continued by message (g031b ran in 031's)
+  stays in its original file. Add a
   correction beside a vaguer record, as R3 and R4 did, without rewriting it.
 
 ### 3.2 Rule-following

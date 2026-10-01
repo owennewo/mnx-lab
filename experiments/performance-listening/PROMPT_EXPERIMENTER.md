@@ -297,7 +297,9 @@ request, gives the count, and is updated by each experiment ("run 2 of 5").
   stage, a wider range or a product decision, record the proposal in the report and the
   log, and either continue with work that does not need it or end the batch there,
   saying which. Never proceed on your own authority.
-- An inconclusive or infrastructure outcome ends the batch.
+- An inconclusive or infrastructure outcome ends the batch. The user may reopen it:
+  the parent quotes their words in the Current batch section, and the count continues
+  from where it stopped (the batch of 030–034 was reopened at run 2 of 5).
 - The last experiment of a batch, or the one that ends it early, closes the Current
   batch section: how far the goal got, and why it stopped. A process review of the
   whole batch follows ([PROMPT_REVIEWER.md](PROMPT_REVIEWER.md)). A parent session

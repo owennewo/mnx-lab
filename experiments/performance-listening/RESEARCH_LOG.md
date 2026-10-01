@@ -86,9 +86,9 @@ review R9 covers 030–031 as closed; the batch's remaining runs get their own r
 **Closed at 5 of 5.** The resumed batch passed held-note hesitation, rushed bar and
 one missing interior event on simple sines; its final full sweep confirms every
 previously passed substage, with earlier outputs preserved. Stage 2 remains incomplete.
-An independent process review of the resumed batch (032–034, with g031b as inherited
-sweep evidence) is due through the parent session; R9's original 030–031 review stays
-recorded. This experimenter stops after landing and retiring its worktree.
+Process review [R10](reviews.md#r10-after-the-resumed-batch-g031b-and-032034-with-the-direction-review)
+covers g031b and 032–034, and carries the different-model direction review of the whole
+process that had been due since R5; R9's original 030–031 review stays recorded.
 
 2026-10-01. [Contract 2](contracts/development-contract-2.md) remains in force and
 **event-chain@3 remains incumbent**. [034](reports/034-missing-event-sweep.md#results)
@@ -107,10 +107,13 @@ version, no qualification evidence, Winner bars 5–8 unexamined. Earlier substa
 now have a second recorded complete-set incumbent pass, the new omission substage one.
 
 [Audit 4](bench/oracle-events/audit-4.md) remains the current oracle audit. 034 created
-no oracle, so no audit is due. The required independent batch process review remains
-the next process action, outside this experimenter's one-experiment scope.
+no oracle, so no audit is due. The next process review is due after the next experiment
+or audit, by a model other than Claude Fable 5.1 where one is available (R9 and R10 were
+both by it).
 
-**Awaiting the user:** nothing new for this result or the next sine substage.
+**Awaiting the user:** nothing from 034 itself. R10 escalates three decisions: the
+sentinel rule's tie-break and pool, baselines in full sweeps (R9's second escalation,
+still open), and a guitar-sound thermometer before the remaining sine deviations.
 Evidence-based recorded-guitar gates before stage 4 and eventual qualification/product
 choices remain standing future decisions. This session's direction is preserved:
 
