@@ -63,7 +63,22 @@ process review are not counted. The batch ends early under
 [section 9 of the experimenter prompt](PROMPT_EXPERIMENTER.md#9-batches); the
 contract, the gates and the rules of the loop are unchanged by it.
 
-**Progress. Closed early at run 2 of 5.** Run 1: [030](reports/030-current-instruments.md), Sol 6.1 (high) in Codex: a resolved reporting failure. Run 2: [031](reports/031-other-bars-reporting.md), Claude Opus 5.5 in Claude Code: an **unresolved infrastructure outcome**, which ends the batch under [section 9](PROMPT_EXPERIMENTER.md#9-batches). How far the goal got: the reporting repair (event-chain@3) and the overdue full sweep were built and measured, but neither was recorded, because both of 031's runs failed in the runner. g031 failed on path handling before measuring anything. g031a, the one rerun its rules allowed, measured everything and then refused to write its public summary for size. No later deviation was reached. A process review of the batch is due.
+**Progress. Reopened by the user at run 2 of 5; three runs remain.** Run 1:
+[030](reports/030-current-instruments.md), Sol 6.1 (high) in Codex: a resolved
+reporting failure. Run 2: [031](reports/031-other-bars-reporting.md), Claude Opus 5.5
+in Claude Code: an **unresolved infrastructure outcome**, which closed the batch under
+[section 9](PROMPT_EXPERIMENTER.md#9-batches). The parent reported the closure and
+031's two routes to the user, who answered on 2026-10-01:
+
+> claude usage is back. Can you get things spinning again
+
+> g031b is fine
+
+So the overdue sweep is completed as **`g031b-reporting-sweep` under 031's frozen
+pre-registration**, by the user's authority (open question 20), and the batch continues
+with its remaining three numbered experiments, 032–034, under the unchanged goal. The
+completion run's verdict is recorded against 031; it adds no run to the count. Process
+review R9 covers 030–031 as closed; the batch's remaining runs get their own review.
 
 2026-10-01. [Contract 2](contracts/development-contract-2.md) remains in force. **event-chain@2 remains the incumbent of record.** [031](reports/031-other-bars-reporting.md) built **event-chain@3**, which changes only the end-of-piece bar flags to the audited other-bars rule. Its sweep did not complete a run record, so @3 has no verdict and the [suite record](bench/suite-record.json) is unchanged: stage 1 passed; hesitation, slowedBar and four-bar open; the 19 old sentinels frozen. The full sweep owed by 031 is **overdue**. g031a's private records are diagnostic only, with no verdict. They show @3 identical to @2 everywhere but its flags, no short-score flags, no false findings, and four-bar slow recall 89/91. They suggest a completion run would pass. **Awaiting the user:** whether to complete the sweep as `g031b` under 031's frozen pre-registration or through a pre-registered 032; [031 Next](reports/031-other-bars-reporting.md#next) has both routes.
 
