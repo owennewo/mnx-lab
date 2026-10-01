@@ -248,7 +248,8 @@ if (import.meta.url === `file://${process.argv[1]}`) {
       sets: [{ id: historic.manifest.id, dir: join(dataRoot, SLOWED_BAR_SET), sha256: historic.sha256 },
         { id: fresh.manifest.id, dir: join(dataRoot, FOUR_BAR_SET), sha256: fresh.sha256 }],
       citations: [g025.cited, g026.cited, g027a.cited, g030.cited],
-      results, groups, fourBarClean, fourBarSlow, slowMisses, falseAlarmRows, sentinelChecks, states, sentinels, listenerMeasures, baselines,
+      // g031a exceeded the size limit with per-example results inline; they are private, named by hash.
+      results: artifact('results.json', results), groups, fourBarClean, fourBarSlow, slowMisses, falseAlarmRows, sentinelChecks, states, sentinels, listenerMeasures, baselines,
       counts: { examples: rows.length, freshPrefixes: freshRows.reduce((s, r) => s + r.causality.length, 0), prefixPass: prefixPass(rows),
         identicalRecords: rows.filter(r => r.identity?.record).length, identicalMusical: rows.filter(r => r.identity?.musical).length },
       freshCost: { machine: freshRows[0]?.cost?.machine, maxSustained: Math.max(...freshRows.map(r => r.cost?.sustainedRatio ?? Infinity)),

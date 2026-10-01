@@ -125,3 +125,12 @@ integrity. `test/event-oracle-4.test.ts` pins all110 checks and8 wrong-answer pr
 The [version4 definitions](../contracts/event-instruments-4.md) state adapter and
 procedural limits. Use the research log for the current audit prerequisite; these
 checks never constitute an independent audit or a listener approval.
+
+**Experiment 031, other-bars reporting (no recorded verdict).** `src/listeners/eventChain3.ts`
+is `event-chain@3`: @2's live chain, tokens, notes and intervals, with bar flags from
+the other-bars reference and three-other-bar eligibility (`assessment-report@3`).
+Its tests are in `test/event-chain-3.test.ts`. `src/stages/run031.ts` is the full-sweep
+runner: @3 fresh, identity checks against @2, and baselines cited or run fresh.
+Both of its runs failed in the runner, so no evaluation is recorded; the research
+log says what is awaited. `compare031.ts` is the read-only comparison of bar
+summaries with 030.

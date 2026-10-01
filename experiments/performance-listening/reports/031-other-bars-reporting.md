@@ -163,3 +163,159 @@ worktree; no 031 report, ledger row, tag, run or private run directory existed; 
 landed and its worktree is retired. Dependencies installed once; ffmpeg present;
 both frozen sets, g026/g025/g027a/g030 private artifacts readable; the private data
 root is writable. No question awaits the user.
+
+## Results
+
+**D3, unresolved: an infrastructure outcome, and the batch ends.** Neither run
+produced its run record. The one technical rerun the decision rules allowed,
+`g031a`, failed at its last step, after every measurement was complete, so no
+listener verdict, suite state, sentinel or confirmation is recorded. The private
+measurements below are **diagnostic observations, not a verdict**: they come from
+a run whose own completion check failed, and their hashes were taken after the
+failure rather than by the runner.
+
+### The two attempts
+
+| Run | Source tag | What happened | Cause | Repair |
+|---|---|---|---|---|
+| [g031](../runs/g031-reporting-sweep/summary.json) | `g031-reporting-sweep-source` | Stopped in the provenance checks before any example was measured | `git show <commit>:<path>` does not normalise `..`; g026 pins repository sources as `../../src/…`, which 030's runner resolved and this one did not | Resolve each pinned path against the repository, as 030 did. Runner only |
+| [g031a](../runs/g031a-reporting-sweep/summary.json) | `g031a-reporting-sweep-source` | Measured all 516 examples with event-chain@3 and all four baselines (1,578 s), then refused to write a public summary over the 300 KB size limit | The summary carried every example's result inline, with the source-hash table, and exceeded 300 KB | Per-example results move to a private artifact named by hash (committed after the failure; **not run**) |
+
+Both failures are runner defects of the kind D3 anticipates, and neither touched a
+listener, an instrument or the evidence. But the rules fixed before the run say
+"rerun once as `g031a-…` … If unresolved, the batch ends", and g031a did not resolve
+the infrastructure outcome. A third attempt would be a branch invented after
+seeing the results, so it is not made here. Each attempt's `attempt.json` and
+`failure.json` are kept in its private directory, and each public summary records
+`infrastructure-failed`.
+
+### Diagnostic observations from g031a's private records
+
+g031a's private directory holds 1,532 files: one record for each of event-chain@3's
+516 examples, the @3 aggregate, every baseline's records and sweep tables, and the
+reuse validation. [`post-failure-inventory.json`](#provenance-of-the-observations)
+hashes them all. Read-only analysis of those files gives:
+
+| Evidence | Performances / controls | @3 cursor pass | @3 assessment pass | Pooled flags | Identity with @2 |
+|---|---|---|---|---|---|
+| Stage 1 | 8 / 16 | 24/24 | 24/24 | No flags; false alarms 0/12 slow, 0/12 fast | 24/24 |
+| Silent hesitation | 40 / 80 | 120/120 | 120/120 | No flags; false alarms 0/60 slow, 0/60 fast (030: 35/60) | 120/120 |
+| Slowed s2 bar | 40 / 80 | 120/120 | 120/120 | No flags; false alarms 0/80 each way (030: 16/80 each) | 120/120 |
+| Four-bar clean + slowed | 84 / 168 | 252/252 | 252/252 | Slow found 89/91; false alarms 0/208 slow, 0/299 fast | 252/252 |
+
+- **Identity.** On all 516 examples, @3's decision record (IDs included), note
+  statements, overall tempo and intervals are byte-identical to @2's stored
+  outputs. Its bar summaries equal 030's promoted summaries exactly: 1,320 bars,
+  no structural difference, relative difference 0 (`bench/src/stages/compare031.ts`).
+- **Short scores.** No flag is emitted on any s1/s2 example. Every s1/s2 bar is
+  ineligible (at most one other contributing bar), and the 18 clean failures of 030 pass.
+- **Four bars.** The two misses are the boundary cases 030 found, `sb-s3-90-b1-90`
+  and `sb-s3-99-b1-90`, with truth ratios 0.89999719 and 0.90000000. The four clean
+  performances carry no flag. There are no false alarms in either direction,
+  including bars whose other-bars reference contains a slowed neighbour.
+- **Everything else in the record.** 1,952 performance notes; 1,780 intervals
+  (maximum error 18.90 ms); 1,952 events reached (maximum delay 49.29 ms; minimum
+  on-event fraction 99.21%); 344 controls rejected, with no claimed note or tempo.
+- **Causality and cost.** 3,096/3,096 prefix checks pass; maximum sustained ratio
+  0.002445, chunk p99 0.148 ms, backlog 0 ms (i7-8750H, Node 22.22.1, provisional).
+- **What the sweep would have recorded.** Applying stage-gates@2 with
+  `fullSweep: true`, the aggregate gives stage1 `confirmed` and hesitation, slowedBar
+  and four-bar `passed`, with sentinels re-chosen and nothing retired. **None of this
+  is written to the suite record.** One detail is worth recording for whoever
+  completes the sweep: most performance margins tie at 0.75 or 0.735, set by the
+  50 ms event-delay quantum (`(0.2 − 0.05)/0.2`). Re-chosen performance sentinels
+  are therefore decided by the ASCII tie-break more than by real margin.
+
+The baselines in g031a's records, with 264 examples cited after verification and 252 fresh:
+
+| Baseline | Four-bar performances, cursor pass | At 45, cursor fail | Four-bar controls, cursor pass | Historical, as cited | Fresh cost max (ratio / p99) | Prefixes |
+|---|---|---|---|---|---|---|
+| clock-follower@1 | 1/84 | 21/21 | 0/168 | Fails every control; no performance passes | 0.0021 / 0.035 ms | 24 pass |
+| online-time-warp@8 | 5/84 | 21/21 | 168/168 | Rejects all 176 controls; no performance passes | 0.171 / 3.57 ms | 24 pass |
+| online-time-warp@12 | 1/84 | 21/21 | 168/168 | The same | 0.140 / 3.51 ms | 24 pass |
+| online-time-warp@14 | 1/84 | 21/21 | 168/168 | The same | 0.145 / 2.52 ms | 24 pass |
+
+No baseline makes an assessment, so none passes any example. All 264 cited
+baseline evaluations reproduce exactly from their hash-verified records, and every
+TypeScript producer at g025's and g026's commits is byte-identical today.
+
+### Provenance of the observations
+
+| Item | Value |
+|---|---|
+| Private directory | `/home/williao/dev/mnx-listening-data/diagnostic-runs/g031a-reporting-sweep/` |
+| `post-failure-inventory.json` (1,532 file hashes, written after the failure by this session) | `826e380ec5aec22e0e53d0027e897b22087e16eb7308f14974a224d75a0678ad` |
+| `failure.json`, `measuredExamples: 516` | `09d0df5358e326f4400454fbfb4626078726e743dd7e531e19cdc58a997aef83` |
+| Runner source for g031a | tag `g031a-reporting-sweep-source` |
+| Frozen sets | `contract2-slowed-bar-v1` `553d4e7e…`, `contract2-four-bar-tempo-v1` `870363f2…`, both verified by the runner |
+
+## Against the predictions
+
+None of these is a verdict, because the run record was not completed. Each row
+says what the diagnostic observations show.
+
+| # | Status | Observation |
+|---|---|---|
+| 1 | Not answerable as a verdict; observations agree | 516/516 identical records and musical output |
+| 2 | Not answerable as a verdict; observations agree | No flag on 264 short-score examples; all pass; zero false alarms |
+| 3 | Not answerable as a verdict; observations agree | 89/91 slow, same two misses; zero false alarms; summaries identical to 030 |
+| 4 | Not answerable as a verdict; observations agree | 3,096 prefix checks pass; ratio 0.0024 ≤ 0.005; p99 0.148 ms ≤ 0.5 ms |
+| 5 | Not answerable | No state is written: the run record is incomplete |
+| 6 | Not answerable as a verdict; observations agree | Every listed baseline expectation holds |
+
+## Decision
+
+**D3, unresolved.** Applying the rule fixed before the run: g031 failed on
+infrastructure, its one permitted rerun g031a failed on infrastructure too, and the
+outcome stays unresolved. **The batch ends here, at run 2 of 5.** For this experiment:
+
+- **No listener verdict.** event-chain@3 is a committed development version with no
+  recorded evaluation. event-chain@2 stays the incumbent of record.
+- **No state change.** The suite record is unchanged: stage1 passed, hesitation,
+  slowedBar and four-bar open, the 19 old sentinels frozen, nothing confirmed or retired.
+- **The full sweep is still owed**, and overdue as of 031. It was attempted and
+  measured, but not recorded.
+- **Stopping count.** @3 neither cleared nor failed a substage on the record, so
+  the count stays **0**.
+
+The diagnostic observations are strong evidence that a completion run would reach
+D1. That is advice for the next decision, not a result of this one.
+
+### Resulting stopping count, budgets and evidence access
+
+**0 consecutive failing listener versions.** Three development listener versions,
+event-chain@3 unjudged. Five completed listener comparisons: 031's comparison did not
+complete. All six qualification versions and twelve assessment slots and every
+reserved/final access remain unused. Winner bars 5–8 unexamined. No set retired. The
+full sweep is overdue. The batch is closed early at 2 of 5 by this infrastructure outcome.
+
+## Next
+
+- **For the user, or a session they direct:** complete the sweep. The repaired
+  runner is committed, but it is untested in a run because running it would exceed
+  the rule. Two routes: authorise a completion run of 031's frozen pre-registration
+  as `g031b-reporting-sweep` (about 27 minutes, nearly all of it baselines), or let
+  experiment 032 pre-register the same measurement. Either should check the
+  size-limit fix first by writing a summary from a dry assembly. A reviewer may also
+  judge whether a one-rerun rule should distinguish failures that come before
+  measurement from failures in writing the record afterwards. That is a process
+  question, not one for this report.
+- After a recorded D1: the held-note hesitation (question 19), then the order of
+  work. Before that, consider recording the margin-tie observation with the sentinels.
+- **Direction of travel.** The event-driven live cursor and the other-bars reporting
+  are unchanged by chords or longer scores in principle. The other-bars rule needs
+  four or more bars to say anything, which Winner bars 1–4 just meets. The
+  monophonic sine pitch estimator and the 0.9 boundary sensitivity on millisecond
+  onsets will need replacing or hardening for chords and recorded guitar.
+
+**Awaiting the user:** a decision on completing the overdue sweep, by one of the two
+routes above. The standing request for recorded-guitar gates before stage 4 also
+remains. No contract relaxation is proposed.
+
+## Attribution and validation
+
+Designed, implemented, executed and recorded by **Claude Opus 5.5 in Claude Code**.
+Pre-registration landed at `00665bba` before implementation. It passed the gate
+(489 bench tests, 44 files). event-chain@3's three behavioural tests and the bench
+TypeScript passed before execution. No oracle was created or re-versioned, so no
+audit is due from this experiment.

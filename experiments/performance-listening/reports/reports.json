@@ -118,6 +118,20 @@
         "href": "029-oracle-coverage.html",
         "label": "Experiment029"
       }
+    },
+    {
+      "number": "031",
+      "slug": "031-other-bars-reporting",
+      "title": "031 \u00b7 Report bar flags against the other bars, in a full sweep",
+      "banner": "Unresolved infrastructure \u00b7 g031 and its one rerun g031a both failed in the runner \u00b7 no verdict, no state change \u00b7 batch ends at 2 of 5",
+      "runs": [
+        "g031-reporting-sweep",
+        "g031a-reporting-sweep"
+      ],
+      "previous": {
+        "href": "030-current-instruments.html",
+        "label": "Experiment030"
+      }
     }
   ]
 }
