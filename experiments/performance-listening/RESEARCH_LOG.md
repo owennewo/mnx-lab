@@ -38,6 +38,33 @@ How to maintain it:
 
 ## Current state
 
+### Current batch
+
+Opened 2026-10-01 by the user: **five numbered experiments on the main track**, 030
+onwards, run through a parent session (Claude Fable 5.1 in Claude Code) that launches
+the experimenters, auditors and the reviewer as separate sessions in herdr. Three
+sessions are available to it: Claude Opus 5.5 in Claude Code, Claude Fable 5.1 in
+Claude Code, and Sol 6.1 in Codex; each run's ledger row names which ran it. The
+user's request:
+
+> you are running in herdr and can use it to contact and instruct different agents.
+> you have bob (claude opus 5.5) and carol (claude Fable 5.1) and dave (codex sol 6.1)
+> at your disposal. You can chose which you want to be reviewer or experimentor, etc.
+> We won't start a new track. Lets continue our main track. Can you continue. I want
+> you to run 5 experiments (happy for you to also do related things (e.g. full test,
+> oracle tweaks). Is it clear what your scope is?
+
+**Goal.** Continue the main track under [contract 2](contracts/development-contract-2.md)'s
+order of work. No new track is opened and nothing in [TRACK_PROPOSALS.md](TRACK_PROPOSALS.md)
+is adopted. Related work the loop already owes is in scope: the full sweep due by 031,
+oracle corrections and the audits they require, and revalidation of historical passes
+under the current instruments. The count is five numbered experiments; audits and the
+process review are not counted. The batch ends early under
+[section 9 of the experimenter prompt](PROMPT_EXPERIMENTER.md#9-batches); the
+contract, the gates and the rules of the loop are unchanged by it.
+
+**Progress.** Run 0 of 5.
+
 2026-09-30. [Development contract2](contracts/development-contract-2.md) remains in force. **event-chain@2** remains the incumbent, with stage1, silent hesitation and slowed-bar passes under audited instruments2 from [027](reports/027-live-confirmation.md). Stage2 is incomplete. [029](reports/029-oracle-coverage.md) corrects audit3's B1 arithmetic, reshapes B11 with exact onset values, and freezes missing report/suite cases as event-oracle@4. The existing implementation agrees with the new hand answers; no listener was developed, executed or judged.
 
 **[Audit 4](bench/oracle-events/audit-4.md) is done and agrees in full**: an independent session re-derived every case of oracle 4 and a sample of the inherited following, note and control cases from oracle 2, with no disagreement and no ambiguity, so the audit prerequisite to judging a listener with instruments 3 is met. Oracle3, [audit3](bench/oracle-events/audit-3.md) and [028](reports/028-other-bars-suite.md)'s mixed verdict remain unchanged as history. [Instruments4](contracts/event-instruments-4.md) versions the corrected oracle coverage without changing musical definitions, evaluator implementation or approved numerical gates; the audit lists the rules still without a frozen case, none read by a gate on the stages in hand. The next numbered experiment can take up stage 2's remaining deviations under the [order of work](contracts/development-contract-2.md#order-of-work). Synthetic missing-evidence/parent-score adapters are not end-to-end stage evidence; the historical record has no retirement, so its retirement-record check remains vacuous.
