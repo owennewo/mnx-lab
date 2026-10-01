@@ -84,7 +84,7 @@ review R9 covers 030–031 as closed; the batch's remaining runs get their own r
 
 Under the current instruments, [030](reports/030-current-instruments.md) found the four-bar set passing its own measurements but held open by the failing earlier sentinels. That remains the recorded state. [031's resulting state](reports/031-other-bars-reporting.md#resulting-stopping-count-budgets-and-evidence-access) carries the stopping count (0), the budgets and access: no qualification evidence used, and Winner bars 5–8 unexamined.
 
-[Audit4](bench/oracle-events/audit-4.md) independently agrees on every frozen case and permits instruments3 measurement; oracle3, audit3 and028's mixed verdict remain unchanged. Synthetic adapter/procedural coverage retains its stated limits. Neither 030 nor 031 created an oracle, so no audit is due. [Process review R8](reviews.md#r8-after-audit-3-and-experiment-029) is the latest process review. The closed batch (030–031) now needs its own review, which should also weigh 031's one-rerun rule (see [031 Next](reports/031-other-bars-reporting.md#next)).
+[Audit4](bench/oracle-events/audit-4.md) independently agrees on every frozen case and permits instruments3 measurement; oracle3, audit3 and028's mixed verdict remain unchanged. Synthetic adapter/procedural coverage retains its stated limits. Neither 030 nor 031 created an oracle, so no audit is due. [Process review R9](reviews.md#r9-after-the-batch-of-030-and-031) reviewed the closed batch, held it, and weighed 031's one-rerun rule: the gap was a record writer unchecked before measuring, now fixed in the experimenter prompt. No process review is due until the next experiment or audit lands.
 
 ## Inherited lessons
 

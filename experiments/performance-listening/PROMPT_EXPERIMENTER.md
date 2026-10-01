@@ -125,7 +125,8 @@ research log says is current.
   - numbered predictions, with numbers wherever possible;
   - what would contradict them;
   - decision rules for each outcome, fixed now, including mixed or inconclusive
-    evidence and infrastructure failure;
+    evidence and infrastructure failure, which say separately what happens when a run
+    fails before measuring and when it fails only in writing its record afterwards;
   - the carried-over stopping count and budget state, with the records establishing it.
 - **Land the pre-registration before anything runs.** In your worktree, follow
   `CLAUDE.md`'s full landing sequence: rebase, gate, fast-forward and push.
@@ -141,7 +142,13 @@ experiment writes the runner it needs, following the same rules:
 - It writes a public `runs/<run-id>/summary.json` that names private artifacts by path
   and hash, and pins the git commit and source hashes. Keep it small, a few hundred KB
   at most: provenance, per-example gate results and aggregates. Per-decision, per-frame
-  and per-note detail belongs in the private records, named there by path and hash. Tag that commit
+  and per-note detail belongs in the private records, named there by path and hash.
+  The size is a target the next review reads, not a check the runner enforces: a
+  runner that has measured writes its record and reports the excess, never refuses
+  (031's one rerun measured a 26-minute sweep and then refused its own summary for
+  size). It writes each private record, with its hash, as that example is measured,
+  and checks the public record's shape on a dry assembly before measuring, so a
+  defect in the record writer cannot discard a completed measurement. Tag that commit
   `<run-id>-source` and push the tag when you land: if `main` moved meanwhile, the
   landing rebase rewrites the commit and only the tag keeps the pinned source reachable.
 - It checks causality and cost for any live listener.
@@ -224,10 +231,11 @@ Everything else is yours to decide within the contract. When you decide, record 
 
 ## 8. Running through a parent session (optional)
 
-A user may start one session that runs the next step through subagents, each with a
-fresh context, instead of starting each session by hand. The rules are unchanged: each
-subagent is one session, one model runs each experiment, and an audit is done by a
-session that did not write the oracle. If you were asked to act as the parent, this is
+A user may start one session that runs the next step through subagents, or through
+separate agent sessions it can message (herdr, for example), each with a fresh
+context, instead of starting each session by hand. "Subagent" below means either. The
+rules are unchanged: each subagent is one session, one model runs each experiment, and
+an audit is done by a session that did not write the oracle. If you were asked to act as the parent, this is
 your whole job:
 
 1. **Do no work yourself.** Do not edit files, design, run or interpret. Read `CLAUDE.md`
@@ -267,8 +275,9 @@ your whole job:
    research log's audit question links it.
 5. **Stop** before any further experiment, even if the audit agrees, unless the user
    asked for a batch: then return to step 2 for the next run, until the count is reached
-   or the batch ends early under section 9. Do not run the process review yourself. At
-   the end, report to the user:
+   or the batch ends early under section 9. Do not run the process review yourself;
+   after a batch, launch it as one more session (section 9). At the end, report to the
+   user:
    what the experiment did and showed, anything awaiting their approval, and the audit's
    verdict case by case, quoting every disagreement or ambiguity in full. Subagents'
    replies are not shown to the user, so what matters must be in your report.
@@ -291,4 +300,11 @@ request, gives the count, and is updated by each experiment ("run 2 of 5").
 - An inconclusive or infrastructure outcome ends the batch.
 - The last experiment of a batch, or the one that ends it early, closes the Current
   batch section: how far the goal got, and why it stopped. A process review of the
-  whole batch follows ([PROMPT_REVIEWER.md](PROMPT_REVIEWER.md)).
+  whole batch follows ([PROMPT_REVIEWER.md](PROMPT_REVIEWER.md)). A parent session
+  launches it as a separate session, on a model that ran none of the batch's
+  experiments where one is available, with exactly this prompt plus the model line:
+
+  > Read experiments/performance-listening/PROMPT_REVIEWER.md and follow it. You cannot
+  > ask the user questions: record anything that needs them in your review entry and
+  > the research log. When you have landed and retired your worktree, stop, and reply
+  > with your verdict, what you fixed directly, and what you escalated to the user.

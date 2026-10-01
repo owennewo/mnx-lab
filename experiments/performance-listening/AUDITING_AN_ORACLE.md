@@ -49,7 +49,10 @@ Do **not** read:
 - any run's results.
 
 They carry the author's reading of the rules, which is exactly what you are checking.
-During re-derivation, run no evaluator, listener or test. If a rule cannot be applied
+An earlier audit in `bench/oracle-events/` carries another reader's arithmetic: open it
+only after your own derivations are written down, for its list of uncovered rules, and
+say in your audit when you read it. During re-derivation, run no evaluator, listener or
+test. If a rule cannot be applied
 without reading code, that is a finding about the rule; record it.
 
 After committing the completed audit, run the mandatory repository landing gate

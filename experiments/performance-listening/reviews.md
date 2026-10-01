@@ -18,6 +18,7 @@ is visible: a process that gains rules every time is getting heavier, not better
 | R6 | 2026-09-30 | [027](reports/027-live-confirmation.md) and post-R5 user decisions | Sol 6.1 (high) in Codex | Held; bounded repair supported | [Landed with this entry](#r6-after-experiment-027-and-the-post-r5-decisions) | Different-model milestone review remains due; no new decision for 028 | +0 −0 |
 | R7 | 2026-09-30 | [028](reports/028-other-bars-suite.md) | Sol 6.1 (high) in Codex | Held; mixed verdict supported, oracle coverage incomplete | [Landed with this entry](#r7-after-experiment-028) | No new decision; different-model milestone review remains due | +1 −0 |
 | R8 | 2026-09-30 | [audit 3](bench/oracle-events/audit-3.md) and [029](reports/029-oracle-coverage.md) | Sol 6.1 (high) in Codex | Held; audit procedure needed clarification | [Landed with this entry](#r8-after-audit-3-and-experiment-029) | No new decision; different-model milestone review remains due | +0 −1 |
+| R9 | 2026-10-01 | The batch of [030](reports/030-current-instruments.md) and [031](reports/031-other-bars-reporting.md), with [audit 4](bench/oracle-events/audit-4.md) and the batch opening | Claude Fable 5.1 in Claude Code | Held; the batch stopped by its own rule on a runner defect | [Landed with this entry](#r9-after-the-batch-of-030-and-031) | Sweep completion (decided: g031b); baselines in sweeps; next batch's goal | +2 −1 |
 
 Reviews R1–R3 were given in conversation with the user and recorded here when this file
 was created. The same reviewer wrote contract 2 and most of the process it reviewed.
@@ -542,3 +543,124 @@ procedural prohibition without reducing independent evidence. Inherited sampling
 reading boundaries and bookkeeping clarify existing obligations. R7 added one rule;
 R5–R6 added none, and this review removes a conflict rather than adding a new stage
 or approval flow. Independence and preserving counterexamples still earn their place.
+
+
+## R9, after the batch of 030 and 031
+
+**Held: both experiments followed their rules, and the batch stopped where its own
+rule said.** Reviewed everything landed since R8 (`fd52e617`): TRACK_PROPOSALS.md
+(a record of the user's question, nothing adopted), audit 4, the batch opening, 030
+and 031. No experiment or audit was mid-flight; every worktree and branch is retired.
+Reviewer: **Claude Fable 5.1 in Claude Code**, as stated at launch, a different model
+from the process's author (Claude Opus 5.5) and from R5–R8's reviewer (Sol 6.1), but
+the same model as audit 4 and as the parent session that launched this batch.
+
+**Integrity.** Main's reflog and the session logs agree on the order for both runs.
+030 (Codex session `01a0f779-9ef3…`, `gpt-6.1-sol`, effort high): pre-registration
+on main at 12:45:16Z, runner written 12:48–12:50Z, run at 12:50:11Z one second after
+its commit, results landed 12:57:28Z. 031 (Claude Code session `e3698ad5…`,
+`claude-opus-5-5`): pre-registration on main at 13:05:36Z, listener file created
+13:05:53Z, runner 13:07:56Z, g031 at 13:08:53Z, g031a at 13:09:35Z, results landed
+13:40:05Z. Both landings ran the gate on the rebased tree. No line was removed from
+either pre-registration. No frozen path changed since R8: the diff is new files plus
+the log, ledger, registries and the suite record, which 030 was entitled to change
+(failing sentinels reopen their substage; the 19 sentinel IDs stay frozen). All
+three source tags resolve locally and on origin. Recomputed: all 522 artifacts g030
+cites, all 1,532 files in g031a's post-failure inventory, both frozen manifests, and
+the exporter's source-hash check for 030 and 031. The parent session (`4396a475…`,
+Claude Fable 5.1) sent the experimenter prompt verbatim through herdr with only the
+model line added, and did no work itself beyond landing the batch section.
+
+**Claims.** 030's D2 follows its rules: every cursor, note, interval and control
+passes, and the 67 false findings and 18 clean failures are all short-score flags
+that the approved other-bars rule makes ineligible; it predicted its own failure
+from unchanged code and said so. 031's unresolved D3 follows its rule to the letter:
+g031 failed before measuring, its one permitted rerun g031a measured all 516
+examples and every baseline and then refused its own summary for size. The
+diagnostics it reports reproduce from g031a's private aggregate (516/516 identity
+with @2, no short-score flag, 0 false findings, four-bar slow 89/91) and are
+correctly withheld as a verdict: their hashes were taken after the failure, not by
+the runner. Neither experiment tuned, retired, confirmed or touched reserved
+evidence. The stopping count is 0 on the record. Audit 4 re-derived every oracle-4
+case and 49 inherited samples, agrees on all 138, and lists the rules still
+uncovered, none gate-read on the stages in hand.
+
+**Findings.**
+
+- **The batch ended on a self-inflicted runner rule.** The size limit in
+  PROMPT_EXPERIMENTER is guidance; 031's runner made it a post-measurement
+  assertion, so a 26-minute sweep whose every measurement was complete produced no
+  record. The one-rerun rule was 031's own, not the process's; the gap is that
+  nothing said a record writer is checked before measuring, or that private records
+  are hashed as they are produced.
+- **Audit 4's reading order is misstated.** Its text says audit 3 was read after
+  its own derivations; the session log shows audit 3's header, headings and
+  uncovered-rules section read at 22:21, twelve minutes before the audit file was
+  written. It also read the research log through its findings, before R8 narrowed
+  that reading, so no rule was broken. The verdicts are unaffected; a provenance
+  note now sits beside the wording, as R8 did for audit 3.
+- **The batch, as a whole.** It pursued its goal within the contract and the gates,
+  built on itself (030 isolated the failure; 031 repaired only that), and stopped
+  where its rules said. But it reached no new listening capability: since 027, four
+  experiments (028–031), two audits and four reviews have been instrument and
+  bookkeeping work, all of it owed by the user's other-bars and rising-tide
+  decisions, and the held-note hesitation has waited since 2026-09-30. No real-music
+  thermometer has run under contract 2, and with a sine-only front end none would
+  say anything yet.
+- **Sweep cost.** g031a took 1,578 s, of which about 26 minutes were the four frozen
+  baselines running fresh on the four-bar set; @3 itself took about a minute. Every
+  new set will cost the same at each sweep while the contract says baselines run on
+  everything. 030, a routine run, took 35 s.
+- **Sentinel margins tie.** 031 observed that most performance margins sit at 0.75
+  or 0.735, set by the 50 ms event-delay quantum, so re-chosen performance sentinels
+  are decided by the ASCII tie-break. A rule-chosen sentinel that is in fact chosen
+  by name is a weak spot for the rising tide to watch when g031b re-chooses them.
+- **Minor.** A Codex auto-review session (effort low) read 030's tree at 12:42Z and
+  wrote nothing; it is a tool feature, not a process step. Finding 22 in the research
+  log is a process fact rather than a belief about sound or measurement; harmless,
+  but the findings table is meant for the latter.
+
+**Fixed directly.** [PROMPT_EXPERIMENTER.md](PROMPT_EXPERIMENTER.md): the public
+summary's size is a target the next review reads, never a refusal after measuring
+(−1); a runner writes each private record with its hash as it is measured and checks
+its record writer on a dry assembly first (+1); infrastructure decision rules say
+separately what happens before and after measurement; section 8 covers separate
+agent sessions as well as subagents, and section 9 gives the parent the reviewer's
+launch line. [PROMPT_REVIEWER.md](PROMPT_REVIEWER.md) names Claude Code's session
+log beside Codex's. [AUDITING_AN_ORACLE.md](AUDITING_AN_ORACLE.md): an earlier audit
+is opened only after the auditor's own derivations are written, and the audit says
+when (+1). The provenance note in audit 4, and the research log's review-due
+sentence. No verdict, pre-registration, contract, gate, code or frozen evidence was
+edited.
+
+**Escalated to the user.**
+
+1. **Completing the sweep.** Decided since 031 landed: the user chose `g031b` under
+   031's frozen pre-registration; the parent session records it in the batch section.
+   What that route must keep honest: 031's recorded D3 is not rewritten but followed
+   by a results addendum for g031b, g031b's predictions are not predictions (g031a's
+   diagnostics were read first) and the report should say so, and the repaired
+   summary writer is checked on a dry assembly before the 27-minute run.
+2. **Baselines in full sweeps.** The contract has them run on everything; they are
+   nearly all of a sweep's time and no longer tell the instruments anything a sample
+   would not. Recommended: at a full sweep the frozen time warpers run fresh only on
+   each set's sentinels and controls, with the clock (cheap) still on everything.
+   This loosens the sweep rule, so it is the user's call.
+3. **The next batch's goal.** Recommended: name the deviations as the goal (held-note
+   hesitation, then the rushed bar, missing event, wrong note with `w1`, grouped where
+   the unchanged listener is predicted to pass), with instrument work only where a
+   deviation forces it, so that five experiments produce listening evidence rather
+   than bookkeeping.
+
+**Could not check.** No listener was run; g031a's diagnostics are its own private
+records, hashed after the fact. Session logs show recorded tool use, not the absence
+of unrecorded reading. The effort setting of 031's and this review's Claude Code
+sessions is not in their logs. R9 is every third review, and this one is by a model
+different from the process's author and from the last four reviewers, but it is a
+light review with a glance at direction; the full direction review by a different
+model is still recommended when stage 2 is passed or g031b records D1.
+
+**Trend:** +2 −1. R1–R4 added ten rules and relaxed four; R5–R8 added one and
+removed one. Both additions here are earned by a recorded cost: a discarded sweep
+and a misstated reading order. The refusal rule removed is the one that cost the
+sweep.

@@ -65,8 +65,11 @@ For each experiment:
 - the experiment's worktree is retired, and its model and tool are recorded in the
   format `<model> (<effort, if known>) in <tool>`, as stated at
   launch. Where the tool keeps a session log, check the record against it: Codex's
-  `~/.codex/sessions/` files carry `model` and `effort` fields. Add a correction beside
-  a vaguer record, as R3 and R4 did, without rewriting it.
+  `~/.codex/sessions/` files carry `model` and `effort` fields; Claude Code's
+  `~/.claude/projects/<cwd-slug>/<session>.jsonl` carries `model` on every assistant
+  turn and the launch line in its first user message, and its tool calls are
+  timestamped, so the order of writes, commits and runs can be read from it. Add a
+  correction beside a vaguer record, as R3 and R4 did, without rewriting it.
 
 ### 3.2 Rule-following
 

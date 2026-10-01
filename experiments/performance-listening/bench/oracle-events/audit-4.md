@@ -28,6 +28,15 @@ frozen decimal onsets of B8–B10 in double precision (see [Precision](#precisio
 mandatory repository landing gate ran only after this file was committed, as the prompt
 requires; nothing here was changed from its output.
 
+> *Provenance note, review R9 (2026-10-01), added beside the original wording:* the
+> session log (`a4315720…`) shows audit 3's header, headings and uncovered-rules
+> section read at 22:21:27 and 22:21:46, before any derivation was written (this file
+> was written at 22:33:10); the derivations were made in the same session after that
+> reading. The research log was read through its findings, under the prompt as it
+> stood before review R8 narrowed that reading. The verdicts above are unchanged.
+> [AUDITING_AN_ORACLE.md](../../AUDITING_AN_ORACLE.md) now says when an earlier audit
+> may be opened.
+
 **Scope.** Comparing `oracle-4.json` with `oracle-3.json` by case: B1 and B11 changed;
 B13–B15, S9–S13, three headroom cases, one retirement case and ten whole sections
 (`reports`, `reportArithmetic`, `pools`, `requiredEvidence`, `selectionCases`,
