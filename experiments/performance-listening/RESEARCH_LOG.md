@@ -63,7 +63,7 @@ process review are not counted. The batch ends early under
 [section 9 of the experimenter prompt](PROMPT_EXPERIMENTER.md#9-batches); the
 contract, the gates and the rules of the loop are unchanged by it.
 
-**Progress.** Run 1 of 5 completed: [030](reports/030-current-instruments.md), Sol 6.1 (high) in Codex. Resolved reporting failure, not infrastructure or inconclusive: the batch may continue. Repair current bar-reporting policy before adding the next deviation; 031 owes a full sweep.
+**Progress.** Run 1 of 5 completed: [030](reports/030-current-instruments.md), Sol 6.1 (high) in Codex. Resolved reporting failure, not infrastructure or inconclusive: the batch may continue. Repair current bar-reporting policy before adding the next deviation; 031 owes a full sweep. Run 2 of 5 is in progress: [031 pre-registration](reports/031-other-bars-reporting.md), owned by Claude Opus 5.5 in Claude Code in `listening-031`: event-chain@3 changes only its bar-reporting policy, in the full sweep.
 
 2026-10-01. [Contract2](contracts/development-contract-2.md) remains in force. **event-chain@2** is unchanged. [030](reports/030-current-instruments.md) remeasures its historical outputs under independently audited instruments3/4 and executes the frozen four-bar tempo evidence. Stage1 remains passed. Silent hesitation and slowedBar reopen because the old assessor flags ineligible short-score bars; following, note/interval accuracy and controls remain intact. Historical instruments2 verdicts are preserved.
 
