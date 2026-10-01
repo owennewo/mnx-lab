@@ -129,3 +129,178 @@ listening-032 isolated worktree acquired, dependencies installed once, ffmpeg pr
 required parent sets/g031b records readable, private output write probe passed.
 No prerequisite evidence is substituted. No new gate/range/product decision is
 needed here; recorded-guitar gates remain a standing future user decision.
+
+## Results
+
+**D1: held-note hesitation passes.** The unchanged event-chain@3 held through
+all 40 inserted pauses while the preceding sine remained audible, reached every
+event within the approved deadline and assessed every note and interval correctly.
+Every control, clean parent and earlier sentinel passed. This is one substage pass,
+not completion of stage 2 or evidence for recorded guitar.
+
+[g032-held-note-hesitation](../runs/g032-held-note-hesitation/summary.json)
+completed once in **11.080 s**, at `cee5bff178d25071a3ddada16ca6652b8a87fea8`, pinned by
+`g032-held-note-hesitation-source`. The pre-registration landed/pushed at
+`9895e657` before implementation, stimulus generation or measurement and remains
+unchanged. Public summary **44,082 bytes**, SHA-256 `1925e9ce3ed85b154376e768a0e383372f35529b6e96cd7981543a4877c74185`.
+Each detailed record was written/hashed immediately after its measurement; a dry
+public-record assembly passed before measurements. No infrastructure attempt failed
+and no technical or musical rerun occurred.
+
+### Both outputs, controls and regressions
+
+| Evidence | Performances / controls | Cursor pass | Assessment pass | Events reached | Notes matched | Intervals within tolerance |
+|---|---|---|---|---|---|---|
+| Held-note pauses and paired controls | 40 / 80 | 120/120 | 120/120 | 240/240 | 240/240 | 200/200 |
+| Clean parents, including half speed | 8 / 16 | 24/24 | 24/24 | 48/48 | 48/48 | 40/40 |
+| Additional earlier sentinels (after deduplication) | 9 / 8 | 17/17 | 17/17 | 96/96 | 96/96 | 87/87 |
+| Entire active suite | 57 / 104 | 161/161 | 161/161 | 384/384 | 384/384 | 327/327 |
+
+All **24 earlier sentinels** pass (seven overlap clean parents). No false findings
+occur anywhere. The held/clean sets emit zero bar flags; the four-bar sentinels
+retain four correct slow flags. Both declared new-substage pools (own 144 and
+held-only 120) pass separately. Missing/wrong/dead finding recall, missing-event
+recovery and extra-note hold have no positive cases in this experiment.
+
+| Held-performance measure | Result |
+|---|---|
+| Cursor throughout each added pause | 40/40 holds; no movement or abstention |
+| Supported-time on event | 100% after the instrument's acquisition/deadline exclusion |
+| Ahead exposure | 0 s |
+| Maximum event acquisition delay | 48.104 ms |
+| Resumed-event acquisition delay | 27.875–47.875 ms |
+| Maximum interval-duration error | 16.667 ms |
+| Maximum overall-tempo relative error | 0.4367% |
+| False findings / bar flags | 0 / 0 |
+
+100% is the audited instrument's supported **answerable** denominator; it does not
+mean the cursor moves at zero latency. The entire active suite's minimum on-event
+fraction is 99.448%, maximum delay 48.625 ms, maximum interval error 17.625 ms and maximum
+overall error 0.5026%. Silence and distant-w2 controls reject and claim no score note
+played and no tempo.
+
+### Construction and the silent counterparts
+
+The private manifest freezes **40 full rendered boundary lists**, each with exact
+sample onsets and a single changed preceding-note end. All 40 reproduce the original
+silent counterpart's cursor segments and onsets exactly. Every PCM sample outside
+that note's original release-through-new-release region is unchanged. The predecessor
+keeps its phase and amplitude, with one 10 ms release at resumption; no overlap, extra
+onset, frequency change or decay is introduced. The 40 examples are transformations
+of two authored scores at fixed locations, not 40 independent players.
+
+Read-only paired diagnostics verify each g031b silent artifact by hash. In 39/40
+pairs the held note delays resumed acquisition by up to 20 ms and moves the adjacent
+interval estimates by equal/opposite amounts; one pair is unchanged. Overall and
+interval gates still pass. The likely cause is the changed mixed-pitch release window
+and confirmation history, inferred from the period estimator and frozen trace; phase
+and release effects have not been independently isolated. This does not establish
+anything about overlapping notes or decaying guitar.
+
+### Provenance fallback, causality and cost
+
+The pre-registered conservative reuse guard checks every existing TypeScript file
+pinned by g031b. It found **one changed file**, `bench/src/stages/compare031.ts`,
+which was extended after g031b's measured source to read completed-run artifacts.
+This is a read-only diagnostic, outside the listener, seam runner and evaluator's
+import graph; their bytes are unchanged. Nevertheless the fixed guard chose its
+allowed fresh-execution fallback. Thus **161 examples ran fresh, 0 reused** rather
+than the predicted120 fresh / 41 reused. All 966 fresh prefix checks pass; none is counted
+as cited. No listener changed and this was not a failed infrastructure attempt.
+
+After measurement, a separately hashed identity check verifies every old selected
+artifact and finds **41/41 fresh decision records, raw reports, following evaluations
+and assessment evaluations exactly equal to g031b**. That check was written after
+the run, explicitly distinguished from the runner's per-example hashing. The
+`groups.regressions` field is the zero-sized **reused-record** subset, so its vacuous
+`passed:false` is not a regression verdict; the actual regression evidence is the
+41 fresh records and the 24 passing sentinel checks.
+
+| Cost (Intel Core i7-8750H, Node22.22.1; provisional host only) | Result | Approved gate |
+|---|---|---|
+| Maximum sustained ratio (initialization and finish included) | 0.002294 | <=0.25 |
+| Maximum chunk p99 | 0.192189ms | <=10 ms |
+| Maximum backlog | 0ms | informational |
+| Prefix checks | 966/966 | every check |
+| Evaluation wall time | 11.080s | routine target about 2 minutes |
+
+| Artifact | Path / hash |
+|---|---|
+| Frozen set | `/home/williao/dev/mnx-listening-data/contract2-held-note-hesitation-v1/manifest.json`; `716ecb099ec8e0a501af16ca123f265deba584a77e55542433e96defdecba650` |
+| Measured details | The summary's `results`, `measures`, `pairedDiagnostics` and `validation` artifacts, each with an absolute private path and SHA-256 |
+| Post-run identity check | `/home/williao/dev/mnx-listening-data/diagnostic-runs/g032-held-note-hesitation/post-run-regression-identity.json`; `696b03fd35f59f86e4feb8c921a10b1f34c1ae8ef8dda969d4241e1251db8110` |
+
+No shared harness, frozen baseline, listener, evaluator, oracle, contract, score or
+previous set is edited. The baseline evidence remains cited from g031b without
+fresh baseline execution. Preparation caught a wrong output working directory and
+a sentinel-kind TypeScript annotation before the committed source; these consumed
+no measurement attempt and changed no frozen prediction.
+
+## Against the predictions
+
+| # | Verdict | Evidence |
+|---|---|---|
+| 1 | Held | 40/40 cursor passes; 240/240 events; zero ahead; every pause holds |
+| 2 | Held | 240/240 matched notes; 200/200 intervals; zero false findings/flags; overall error <=0.4367% |
+| 3 | Held | All 80 held controls, 24 clean parents/controls and 24 earlier sentinels pass; 41 historical artifacts and fresh outputs verified identical |
+| 4 | Mixed: prefix-reuse counts contradicted; quality/cost/state held | The allowed fallback gives 966 fresh / 0 cited rather than 720 fresh / 246 cited prefixes, all passing; ratio 0.002294, p99 0.192189 ms; held passed, earlier states unchanged |
+
+## Decision
+
+**D1 applies**: every active example, both required pools, every earlier sentinel
+and every prefix/cost gate passes with valid construction and provenance. The
+count prediction's contradiction is explained by the pre-registered fallback and
+cannot turn these fresh passing measurements into a failure or a reuse claim.
+
+event-chain@3 remains incumbent. Held-note hesitation becomes **passed**, with
+sentinels chosen by the frozen margin rule. Earlier states stay stage 1 confirmed,
+silent hesitation/slowedBar/four-bar passed. Existing sentinel IDs stay frozen;
+the new seven sentinels add four unique active IDs (routine union 28). One new
+sentinel is clean `s2-99`: its delay margin ties the two selected held examples,
+and the approved ASCII tie-break selects it. Preserve this result rather than
+hand-picking harder examples. No substage confirmed and nothing retired; earlier
+sentinel-only checks do not count as new full-set passes for retirement.
+
+The suite's obsolete root audit3-pending label and stale version3-failed labels
+are aligned with the already recorded audit4/g031b verdict; their historical
+records remain intact. No oracle was created/re-versioned, so no oracle audit is
+due. This session runs no auditor or process reviewer.
+
+### Resulting stopping count, budgets and evidence access
+
+**0 consecutive failing listener versions**, **three** development listener
+versions, **seven** completed listener comparisons (this adds one unchanged-version
+diagnostic). All six qualification versions, twelve assessment slots and every
+reserved/final access remain unused. Winner bars 5–8 unexamined. Full sweep last
+g031b, next due by 036 or earlier at batch end 034, new gates or a whole-stage claim.
+Batch advances to **3 of 5**, with 033–034 remaining; no early-closing condition applies.
+
+## Next
+
+Next is **one rushed bar**, the next deviation in contract 2's order, with current
+sentinels and clean/control evidence. The held-note case supplies no new permission
+to skip that stage. Avoid treating a changed independent diagnostic file as a changed
+output producer in future reuse guards: pin the actual producer/import closure and
+keep checking inputs and raw records. This is efficiency advice, not a change to
+this experiment's frozen guard or evidence.
+
+Direction of travel: event-state holding and offline inter-onset reporting are
+plausible parts to keep through chords, longer scores and guitar. The zero-crossing
+sine estimator and constant, non-overlapping sustain assumptions will need richer
+acoustic treatment there. This result supplies no chord, decay, real-music or
+missing/wrong/dead/extra-note claim.
+
+**Awaiting the user:** nothing new for the next experiment. The standing requirement
+for evidence-based gates before recorded guitar (stage 4), and later qualification
+and Studio product decisions, remains. The session direction is recorded verbatim:
+
+> You cannot ask the user questions: record anything that needs them in your report and the research log.
+
+## Attribution and validation
+
+Designed, implemented, executed and recorded by **Sol 6.1 (high) in Codex**, as
+specified by the user. Pre-registration landing gate passed 492 bench tests plus
+37 targeted root tests, static checks and build. Two new stimulus boundary tests
+and bench TypeScript passed before source commitment. Report export verifies all
+pinned source hashes; the final rebased-tree gate is required before landing.
+Stop after landing and retiring listening-032; do not start 033.

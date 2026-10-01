@@ -4,7 +4,7 @@
   "definition": "contracts/event-instruments-3.md",
   "bootstrapRun": "g028-other-bars-suite",
   "listener": "event-chain@3",
-  "instrumentAudit": "event-oracle@3 pending; B1 discrepancy requires independent resolution",
+  "instrumentAudit": "event-oracle@4 independently audited in bench/oracle-events/audit-4.md; current instruments approved for measurement",
   "stages": [
     {
       "id": "stage1",
@@ -24,7 +24,7 @@
         "path": "runs/g031b-reporting-sweep/summary.json",
         "sha256": "d73ce41accb59ec42d56f87cf06b01d480d806ecb1bffd14faf09b936ad305ab"
       },
-      "version3Revalidation": "completed: passed",
+      "version3Revalidation": "completed: passed (g031b)",
       "examples": [
         "s1-45",
         "s1-63",
@@ -230,7 +230,17 @@
           "g027a-live-confirmation",
           "g030-current-instruments"
         ]
-      }
+      },
+      "routineChecks": [
+        {
+          "evidence": {
+            "path": "runs/g032-held-note-hesitation/summary.json",
+            "sha256": "1925e9ce3ed85b154376e768a0e383372f35529b6e96cd7981543a4877c74185"
+          },
+          "scope": "frozen sentinels only; no additional full-set retirement pass",
+          "passed": true
+        }
+      ]
     },
     {
       "id": "hesitation",
@@ -247,7 +257,7 @@
         "sha256": "d73ce41accb59ec42d56f87cf06b01d480d806ecb1bffd14faf09b936ad305ab"
       },
       "confirmedEvidence": null,
-      "version3Revalidation": "completed: failed; owning substage reopened",
+      "version3Revalidation": "completed: passed (g031b)",
       "examples": [
         "h-s1-45-1000",
         "h-s1-45-2000",
@@ -548,7 +558,17 @@
         "incumbentPassHistory": [
           "g027a-live-confirmation"
         ]
-      }
+      },
+      "routineChecks": [
+        {
+          "evidence": {
+            "path": "runs/g032-held-note-hesitation/summary.json",
+            "sha256": "1925e9ce3ed85b154376e768a0e383372f35529b6e96cd7981543a4877c74185"
+          },
+          "scope": "frozen sentinels only; no additional full-set retirement pass",
+          "passed": true
+        }
+      ]
     },
     {
       "id": "slowedBar",
@@ -565,7 +585,7 @@
         "sha256": "d73ce41accb59ec42d56f87cf06b01d480d806ecb1bffd14faf09b936ad305ab"
       },
       "confirmedEvidence": null,
-      "version3Revalidation": "completed: failed; owning substage reopened",
+      "version3Revalidation": "completed: passed (g031b)",
       "examples": [
         "sb-s2-45-b1-50",
         "sb-s2-45-b1-60",
@@ -826,7 +846,17 @@
         "incumbentPassHistory": [
           "g027a-live-confirmation"
         ]
-      }
+      },
+      "routineChecks": [
+        {
+          "evidence": {
+            "path": "runs/g032-held-note-hesitation/summary.json",
+            "sha256": "1925e9ce3ed85b154376e768a0e383372f35529b6e96cd7981543a4877c74185"
+          },
+          "scope": "frozen sentinels only; no additional full-set retirement pass",
+          "passed": true
+        }
+      ]
     },
     {
       "id": "four-bar-tempo-revalidation",
@@ -1180,11 +1210,262 @@
         "passEvidence": null,
         "sentinels": [],
         "incumbentPassHistory": []
+      },
+      "routineChecks": [
+        {
+          "evidence": {
+            "path": "runs/g032-held-note-hesitation/summary.json",
+            "sha256": "1925e9ce3ed85b154376e768a0e383372f35529b6e96cd7981543a4877c74185"
+          },
+          "scope": "frozen sentinels only; no additional full-set retirement pass",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "held-note-hesitation",
+      "status": "passed",
+      "listener": "event-chain@3",
+      "instruments": {
+        "following": "following-evaluator@2",
+        "assessment": "assessment-evaluator@3",
+        "gates": "stage-gates@2",
+        "oracle": "event-oracle@4"
+      },
+      "passEvidence": {
+        "path": "runs/g032-held-note-hesitation/summary.json",
+        "sha256": "1925e9ce3ed85b154376e768a0e383372f35529b6e96cd7981543a4877c74185"
+      },
+      "confirmedEvidence": null,
+      "examples": [
+        "s1-45",
+        "sil-s1-45",
+        "w2-s1-45",
+        "s1-63",
+        "sil-s1-63",
+        "w2-s1-63",
+        "s1-90",
+        "sil-s1-90",
+        "w2-s1-90",
+        "s1-99",
+        "sil-s1-99",
+        "w2-s1-99",
+        "s2-45",
+        "sil-s2-45",
+        "w2-s2-45",
+        "s2-63",
+        "sil-s2-63",
+        "w2-s2-63",
+        "s2-90",
+        "sil-s2-90",
+        "w2-s2-90",
+        "s2-99",
+        "sil-s2-99",
+        "w2-s2-99",
+        "hh-s1-45-300",
+        "sil-hh-s1-45-300",
+        "w2-hh-s1-45-300",
+        "hh-s1-45-500",
+        "sil-hh-s1-45-500",
+        "w2-hh-s1-45-500",
+        "hh-s1-45-700",
+        "sil-hh-s1-45-700",
+        "w2-hh-s1-45-700",
+        "hh-s1-45-1000",
+        "sil-hh-s1-45-1000",
+        "w2-hh-s1-45-1000",
+        "hh-s1-45-2000",
+        "sil-hh-s1-45-2000",
+        "w2-hh-s1-45-2000",
+        "hh-s1-63-300",
+        "sil-hh-s1-63-300",
+        "w2-hh-s1-63-300",
+        "hh-s1-63-500",
+        "sil-hh-s1-63-500",
+        "w2-hh-s1-63-500",
+        "hh-s1-63-700",
+        "sil-hh-s1-63-700",
+        "w2-hh-s1-63-700",
+        "hh-s1-63-1000",
+        "sil-hh-s1-63-1000",
+        "w2-hh-s1-63-1000",
+        "hh-s1-63-2000",
+        "sil-hh-s1-63-2000",
+        "w2-hh-s1-63-2000",
+        "hh-s1-90-300",
+        "sil-hh-s1-90-300",
+        "w2-hh-s1-90-300",
+        "hh-s1-90-500",
+        "sil-hh-s1-90-500",
+        "w2-hh-s1-90-500",
+        "hh-s1-90-700",
+        "sil-hh-s1-90-700",
+        "w2-hh-s1-90-700",
+        "hh-s1-90-1000",
+        "sil-hh-s1-90-1000",
+        "w2-hh-s1-90-1000",
+        "hh-s1-90-2000",
+        "sil-hh-s1-90-2000",
+        "w2-hh-s1-90-2000",
+        "hh-s1-99-300",
+        "sil-hh-s1-99-300",
+        "w2-hh-s1-99-300",
+        "hh-s1-99-500",
+        "sil-hh-s1-99-500",
+        "w2-hh-s1-99-500",
+        "hh-s1-99-700",
+        "sil-hh-s1-99-700",
+        "w2-hh-s1-99-700",
+        "hh-s1-99-1000",
+        "sil-hh-s1-99-1000",
+        "w2-hh-s1-99-1000",
+        "hh-s1-99-2000",
+        "sil-hh-s1-99-2000",
+        "w2-hh-s1-99-2000",
+        "hh-s2-45-300",
+        "sil-hh-s2-45-300",
+        "w2-hh-s2-45-300",
+        "hh-s2-45-500",
+        "sil-hh-s2-45-500",
+        "w2-hh-s2-45-500",
+        "hh-s2-45-700",
+        "sil-hh-s2-45-700",
+        "w2-hh-s2-45-700",
+        "hh-s2-45-1000",
+        "sil-hh-s2-45-1000",
+        "w2-hh-s2-45-1000",
+        "hh-s2-45-2000",
+        "sil-hh-s2-45-2000",
+        "w2-hh-s2-45-2000",
+        "hh-s2-63-300",
+        "sil-hh-s2-63-300",
+        "w2-hh-s2-63-300",
+        "hh-s2-63-500",
+        "sil-hh-s2-63-500",
+        "w2-hh-s2-63-500",
+        "hh-s2-63-700",
+        "sil-hh-s2-63-700",
+        "w2-hh-s2-63-700",
+        "hh-s2-63-1000",
+        "sil-hh-s2-63-1000",
+        "w2-hh-s2-63-1000",
+        "hh-s2-63-2000",
+        "sil-hh-s2-63-2000",
+        "w2-hh-s2-63-2000",
+        "hh-s2-90-300",
+        "sil-hh-s2-90-300",
+        "w2-hh-s2-90-300",
+        "hh-s2-90-500",
+        "sil-hh-s2-90-500",
+        "w2-hh-s2-90-500",
+        "hh-s2-90-700",
+        "sil-hh-s2-90-700",
+        "w2-hh-s2-90-700",
+        "hh-s2-90-1000",
+        "sil-hh-s2-90-1000",
+        "w2-hh-s2-90-1000",
+        "hh-s2-90-2000",
+        "sil-hh-s2-90-2000",
+        "w2-hh-s2-90-2000",
+        "hh-s2-99-300",
+        "sil-hh-s2-99-300",
+        "w2-hh-s2-99-300",
+        "hh-s2-99-500",
+        "sil-hh-s2-99-500",
+        "w2-hh-s2-99-500",
+        "hh-s2-99-700",
+        "sil-hh-s2-99-700",
+        "w2-hh-s2-99-700",
+        "hh-s2-99-1000",
+        "sil-hh-s2-99-1000",
+        "w2-hh-s2-99-1000",
+        "hh-s2-99-2000",
+        "sil-hh-s2-99-2000",
+        "w2-hh-s2-99-2000"
+      ],
+      "sentinels": [
+        {
+          "id": "hh-s2-99-2000",
+          "score": "s2",
+          "kind": "performance",
+          "margin": 0.734969578220063,
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g032-held-note-hesitation/event-chain-3.hh-s2-99-2000.json",
+            "sha256": "c5d95d446f6aefe40f4e1b1a9b5e31fd19b583dc024da5505e3fbfffceca134a"
+          }
+        },
+        {
+          "id": "hh-s2-99-500",
+          "score": "s2",
+          "kind": "performance",
+          "margin": 0.734969578220063,
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g032-held-note-hesitation/event-chain-3.hh-s2-99-500.json",
+            "sha256": "931b2f185970a3d0f12eec4be795832708868596dc220bef74b634d7f74b629b"
+          }
+        },
+        {
+          "id": "s2-99",
+          "score": "s2",
+          "kind": "performance",
+          "margin": 0.734969578220063,
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g032-held-note-hesitation/event-chain-3.s2-99.json",
+            "sha256": "b14c7f4fb4f795b75b63f3abb05806707b18b79b364b2aa5b9ae85e10c001ee0"
+          }
+        },
+        {
+          "id": "sil-hh-s1-45-700",
+          "score": "s1",
+          "kind": "silence",
+          "margin": 0.9974187999999999,
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g032-held-note-hesitation/event-chain-3.sil-hh-s1-45-700.json",
+            "sha256": "16c3b39b57efae4ab0287424344023cfb737d73667d28f6cfdebfeda6eca33a5"
+          }
+        },
+        {
+          "id": "w2-hh-s1-99-1000",
+          "score": "s1",
+          "kind": "wrong-score",
+          "margin": 0.996390904,
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g032-held-note-hesitation/event-chain-3.w2-hh-s1-99-1000.json",
+            "sha256": "1c29a7826963966de753c19206ccdaa734041911e6dca3e9970f2b1dc070cd87"
+          }
+        },
+        {
+          "id": "sil-s2-90",
+          "score": "s2",
+          "kind": "silence",
+          "margin": 0.997872372,
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g032-held-note-hesitation/event-chain-3.sil-s2-90.json",
+            "sha256": "6cc0989d47319352be1a19e8aac36a113c909677292c338869adac17471d2df6"
+          }
+        },
+        {
+          "id": "w2-s2-90",
+          "score": "s2",
+          "kind": "wrong-score",
+          "margin": 0.998017924,
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g032-held-note-hesitation/event-chain-3.w2-s2-90.json",
+            "sha256": "2101be7a77e384474bf9a4a575301299737eb1896aac99ee750a657031180197"
+          }
+        }
+      ],
+      "incumbentPassHistory": [
+        "g032-held-note-hesitation"
+      ],
+      "retired": false,
+      "set": {
+        "manifest": "/home/williao/dev/mnx-listening-data/contract2-held-note-hesitation-v1/manifest.json",
+        "sha256": "716ecb099ec8e0a501af16ca123f265deba584a77e55542433e96defdecba650"
       }
     }
   ],
   "openSubstages": [
-    "held-note-hesitation",
     "rushed-bar",
     "missing-event",
     "wrong-note-with-w1",
@@ -1197,7 +1478,7 @@
     "stage5-categories"
   ],
   "retiredSets": [],
-  "retirementReason": "No performance retirement: event-chain@3 has one evaluation (g031b); retirement needs three successive passes and named harder active evidence.",
+  "retirementReason": "No performance retirement: previous substages receive sentinel-only checks at g032, not additional complete-set incumbent passes; held-note has one evaluation.",
   "baselinePolicy": {
     "mode": "sweep-only",
     "since": "2026-09-30",
@@ -1233,6 +1514,8 @@
     "h-s2-90-1000",
     "h-s2-90-2000",
     "h-s2-90-300",
+    "hh-s2-99-2000",
+    "hh-s2-99-500",
     "s1-90",
     "s2-90",
     "s2-99",
@@ -1244,12 +1527,14 @@
     "sb-s3-99-b3-60",
     "sil-h-s1-90-300",
     "sil-h-s2-63-1000",
+    "sil-hh-s1-45-700",
     "sil-s1-99",
     "sil-s2-90",
     "sil-sb-s2-90-b1-70",
     "sil-sb-s3-45-b2-90",
     "w2-h-s1-99-1000",
     "w2-h-s2-90-1000",
+    "w2-hh-s1-99-1000",
     "w2-s1-99",
     "w2-s2-90",
     "w2-sb-s2-99-b1-60",
@@ -1269,7 +1554,7 @@
     "sha256": "94e5f2f8bb1b16e0fa630813a00a0c3de96ad072219ddee0974815e3c97bbf5a"
   },
   "currentEvaluation": {
-    "path": "runs/g031b-reporting-sweep/summary.json",
-    "sha256": "d73ce41accb59ec42d56f87cf06b01d480d806ecb1bffd14faf09b936ad305ab"
+    "path": "runs/g032-held-note-hesitation/summary.json",
+    "sha256": "1925e9ce3ed85b154376e768a0e383372f35529b6e96cd7981543a4877c74185"
   }
 }

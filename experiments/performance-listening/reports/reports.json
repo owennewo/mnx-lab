@@ -133,6 +133,19 @@
         "href": "030-current-instruments.html",
         "label": "Experiment030"
       }
+    },
+    {
+      "number": "032",
+      "slug": "032-held-note-hesitation",
+      "title": "032 \u00b7 Hold through a hesitation while the preceding note sounds",
+      "banner": "D1 \u00b7 unchanged event-chain@3 \u00b7 all40 held-note pauses and80 controls pass \u00b7 earlier sentinels preserved \u00b7 966 causal prefixes \u00b7 no new user decision",
+      "runs": [
+        "g032-held-note-hesitation"
+      ],
+      "previous": {
+        "href": "031-other-bars-reporting.html",
+        "label": "Experiment031"
+      }
     }
   ]
 }

@@ -24,6 +24,8 @@ not here. The first series' reports, 001–021, are in
 
 | 031 | [Report bar flags against the other bars, in a full sweep](031-other-bars-reporting.html) | Unresolved infrastructure: [g031](../runs/g031-reporting-sweep/summary.json) and [g031a](../runs/g031a-reporting-sweep/summary.json), both preserved failures; completed by [g031b](../runs/g031b-reporting-sweep/summary.json), D1 |
 
+| 032 | [Hold through a hesitation while the preceding note sounds](032-held-note-hesitation.html) | [g032](../runs/g032-held-note-hesitation/summary.json), D1 |
+
 ## One experiment, one file
 
 Its pre-registration section is committed and landed before anything runs: the
