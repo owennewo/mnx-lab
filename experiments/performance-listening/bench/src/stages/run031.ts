@@ -96,7 +96,8 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     }));
     assert(producerChecks.every(c => c.unchanged), 'A baseline producer changed; cited records cannot be reused');
     for (const s of [g025, g026]) for (const [path, hash] of Object.entries(s.json.sourceHashes as Record<string, string>)) {
-      assert.equal(sha(execFileSync('git', ['show', `${s.json.gitCommit}:experiments/performance-listening/${path}`], { cwd: repo, maxBuffer: 32 << 20 })), hash, `Pinned ${path}`);
+      // git's rev:path syntax does not normalise '..'; g026 pins repository sources as ../../src/….
+      assert.equal(sha(execFileSync('git', ['show', `${s.json.gitCommit}:${relative(repo, resolve(EXPERIMENT, path))}`], { cwd: repo, maxBuffer: 32 << 20 })), hash, `Pinned ${path}`);
     }
     const validation = artifact('reuse-validation.json', { citations: [g025.cited, g026.cited, g027a.cited, g030.cited], producerChecks,
       manifests: [historic.sha256, fresh.sha256], suite: { path: 'bench/suite-record.json', sha256: sha(suiteBytes) } });
