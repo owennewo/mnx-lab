@@ -21,10 +21,10 @@
         "sha256": "10ab4aa8faaa1b3f8f49bef674bbfe0bc0e8cab3e41705302aceadfda728f840"
       },
       "confirmedEvidence": {
-        "path": "runs/g031b-reporting-sweep/summary.json",
-        "sha256": "d73ce41accb59ec42d56f87cf06b01d480d806ecb1bffd14faf09b936ad305ab"
+        "path": "runs/g034-missing-event-sweep/summary.json",
+        "sha256": "59f6b6aeed5583c5aecb281f8a085c874d1f238ec3c0e5655b2ff4348ae093d8"
       },
-      "version3Revalidation": "completed: passed (g031b)",
+      "version3Revalidation": "confirmed in g034 batch-end full sweep",
       "examples": [
         "s1-45",
         "s1-63",
@@ -58,8 +58,8 @@
           "kind": "performance",
           "margin": 0.734969578220063,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g031b-reporting-sweep/event-chain-3.s2-99.json",
-            "sha256": "6c929dcf95caa7a86c29a610a4443c6c051d4f24b4c20fbc0991f047ce7328ba"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g034-missing-event-sweep/event-chain-3.s2-99.json",
+            "sha256": "2a517d0df335371eb29d7bf0cae3e8275db8527a732338cfca9ab7aaca9d410d"
           }
         },
         {
@@ -68,8 +68,8 @@
           "kind": "performance",
           "margin": 0.7499999999999942,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g031b-reporting-sweep/event-chain-3.s1-90.json",
-            "sha256": "4175571d79c5fbfbfadab26d012aeb0bfbba5e76163b3c8f5840fa0cb7cbdd53"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g034-missing-event-sweep/event-chain-3.s1-90.json",
+            "sha256": "5e56590ec658bc843dbd4be1c4dc160773a4c0519b1afe32ae108d9368d03823"
           }
         },
         {
@@ -78,59 +78,60 @@
           "kind": "performance",
           "margin": 0.7499999999999942,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g031b-reporting-sweep/event-chain-3.s2-90.json",
-            "sha256": "cec186c928b4db181674079f51737812144c6d59f39ef19a3a52a93d6779e99d"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g034-missing-event-sweep/event-chain-3.s2-90.json",
+            "sha256": "4b3d4221414c0025f136932399dfe5186a4288893091493e6a33f279cd2519d6"
           }
         },
         {
           "id": "sil-s1-99",
           "score": "s1",
           "kind": "silence",
-          "margin": 0.997705392,
+          "margin": 0.997557244,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g031b-reporting-sweep/event-chain-3.sil-s1-99.json",
-            "sha256": "ab8f0bf8280bb7b9903682876ca2ee1b442e9b6f2f8a62d23309f891367f902f"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g034-missing-event-sweep/event-chain-3.sil-s1-99.json",
+            "sha256": "c3cd5e2f8709f3f2e9d504cc43cb6b76b4af2b329716b3befdd68f750b4bcb2b"
           }
         },
         {
           "id": "w2-s1-99",
           "score": "s1",
           "kind": "wrong-score",
-          "margin": 0.997453728,
+          "margin": 0.99733642,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g031b-reporting-sweep/event-chain-3.w2-s1-99.json",
-            "sha256": "7d04b2f6eb82cd60f885b95e6c4dfa905fc7ab42cce908b1f6ae3ecc40fb8f6e"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g034-missing-event-sweep/event-chain-3.w2-s1-99.json",
+            "sha256": "b229a86bc43b24e5235ae0ec41c7e39ad7c186c20bf5c034a7c3df582174647f"
           }
         },
         {
-          "id": "sil-s2-90",
+          "id": "sil-s2-99",
           "score": "s2",
           "kind": "silence",
-          "margin": 0.998004288,
+          "margin": 0.997906616,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g031b-reporting-sweep/event-chain-3.sil-s2-90.json",
-            "sha256": "64e704b0a03a96202fd302676c101556c1d865a97f60698045aa312ab3c92c59"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g034-missing-event-sweep/event-chain-3.sil-s2-99.json",
+            "sha256": "5344b5ed130dc6557a3c8c4b762058481c2c4f0fe453763bb30a3b18bd5220cc"
           }
         },
         {
           "id": "w2-s2-90",
           "score": "s2",
           "kind": "wrong-score",
-          "margin": 0.997896624,
+          "margin": 0.997913644,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g031b-reporting-sweep/event-chain-3.w2-s2-90.json",
-            "sha256": "b5bd5efe450d6c9d2391b546fe9bfc3b477b4ee75d0abf3ca0f991500246155d"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g034-missing-event-sweep/event-chain-3.w2-s2-90.json",
+            "sha256": "2f80d6ff4fd3e297b325673d2ecbec9204ea260f4676a5d48cd272e90619154d"
           }
         }
       ],
       "incumbentPassHistory": [
-        "g031b-reporting-sweep"
+        "g031b-reporting-sweep",
+        "g034-missing-event-sweep"
       ],
       "retired": false,
       "currentRevalidation": {
         "evidence": {
-          "path": "runs/g031b-reporting-sweep/summary.json",
-          "sha256": "d73ce41accb59ec42d56f87cf06b01d480d806ecb1bffd14faf09b936ad305ab"
+          "path": "runs/g034-missing-event-sweep/summary.json",
+          "sha256": "59f6b6aeed5583c5aecb281f8a085c874d1f238ec3c0e5655b2ff4348ae093d8"
         },
         "instruments": {
           "following": "following-evaluator@2",
@@ -252,7 +253,7 @@
     },
     {
       "id": "hesitation",
-      "status": "passed",
+      "status": "confirmed",
       "listener": "event-chain@3",
       "instruments": {
         "following": "following-evaluator@2",
@@ -264,8 +265,11 @@
         "path": "runs/g031b-reporting-sweep/summary.json",
         "sha256": "d73ce41accb59ec42d56f87cf06b01d480d806ecb1bffd14faf09b936ad305ab"
       },
-      "confirmedEvidence": null,
-      "version3Revalidation": "completed: passed (g031b)",
+      "confirmedEvidence": {
+        "path": "runs/g034-missing-event-sweep/summary.json",
+        "sha256": "59f6b6aeed5583c5aecb281f8a085c874d1f238ec3c0e5655b2ff4348ae093d8"
+      },
+      "version3Revalidation": "confirmed in g034 batch-end full sweep",
       "examples": [
         "h-s1-45-1000",
         "h-s1-45-2000",
@@ -395,8 +399,8 @@
           "kind": "performance",
           "margin": 0.7499999999999942,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g031b-reporting-sweep/event-chain-3.h-s2-90-1000.json",
-            "sha256": "a70addfdbff4211bfa76b12323c20e024e68dd06277d0f065c06d5ca815017ee"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g034-missing-event-sweep/event-chain-3.h-s2-90-1000.json",
+            "sha256": "44561670805cac89b7fd79b7624b90cb12430224161c4ffc02b588cb95d133ae"
           }
         },
         {
@@ -405,8 +409,8 @@
           "kind": "performance",
           "margin": 0.7499999999999942,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g031b-reporting-sweep/event-chain-3.h-s2-90-2000.json",
-            "sha256": "ce922e7fc9e7c4a85bd83d7484cd06c131721aa0f7ea77188836f49be6400856"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g034-missing-event-sweep/event-chain-3.h-s2-90-2000.json",
+            "sha256": "ddc6509e29a5e0bcc60b1869f74c7d08f9cf4b5962094f954c51a4f87f10152c"
           }
         },
         {
@@ -415,59 +419,60 @@
           "kind": "performance",
           "margin": 0.7499999999999942,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g031b-reporting-sweep/event-chain-3.h-s2-90-300.json",
-            "sha256": "a49974b164fc64e0f89608153d7126a7ccd76ad1509ac4ee43229d099b782e76"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g034-missing-event-sweep/event-chain-3.h-s2-90-300.json",
+            "sha256": "b4967c7f8676e4adbf0d12a152fd0d22a1240a27782e3c9a8f9d281d626cc2ce"
           }
         },
         {
-          "id": "sil-h-s1-90-300",
+          "id": "sil-h-s1-99-300",
           "score": "s1",
           "kind": "silence",
-          "margin": 0.99760456,
+          "margin": 0.99758928,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g031b-reporting-sweep/event-chain-3.sil-h-s1-90-300.json",
-            "sha256": "a728ea8181edc2a63daaca11c3ea62f435c469d8e4f7b505b1df2ddbc859181d"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g034-missing-event-sweep/event-chain-3.sil-h-s1-99-300.json",
+            "sha256": "55ce2d94a126f8e359e307953262ed02962ddd01c3877c019ef966f119dc77be"
           }
         },
         {
-          "id": "w2-h-s1-99-1000",
+          "id": "w2-h-s1-99-300",
           "score": "s1",
           "kind": "wrong-score",
-          "margin": 0.997112944,
+          "margin": 0.997275912,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g031b-reporting-sweep/event-chain-3.w2-h-s1-99-1000.json",
-            "sha256": "4fcd0212f82c56353793cc5c38b252c1d74c4606ec6b129cf19f1a446b73cd96"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g034-missing-event-sweep/event-chain-3.w2-h-s1-99-300.json",
+            "sha256": "1807f3a579b484940e53277e30b2b6c9b02f6c0b1407f0bea41d2beec1fa87a8"
           }
         },
         {
-          "id": "sil-h-s2-63-1000",
+          "id": "sil-h-s2-63-2000",
           "score": "s2",
           "kind": "silence",
-          "margin": 0.996510188,
+          "margin": 0.997806028,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g031b-reporting-sweep/event-chain-3.sil-h-s2-63-1000.json",
-            "sha256": "d43feef352c2042960579bb61ce20028f902e30a46c954877b88db2e9981e87f"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g034-missing-event-sweep/event-chain-3.sil-h-s2-63-2000.json",
+            "sha256": "41aa0475df447e2798a8767808ec89b5b30b6895e0c2c1083800a03aa8821354"
           }
         },
         {
-          "id": "w2-h-s2-90-1000",
+          "id": "w2-h-s2-63-500",
           "score": "s2",
           "kind": "wrong-score",
-          "margin": 0.996343244,
+          "margin": 0.99770924,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g031b-reporting-sweep/event-chain-3.w2-h-s2-90-1000.json",
-            "sha256": "8e15c210a02dc14c58029a3eaf61ee6138123d9a436e6e838834c933e238bc2c"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g034-missing-event-sweep/event-chain-3.w2-h-s2-63-500.json",
+            "sha256": "de4d95b49429a7a40ea2b0b89a6162ba13f93421a9cdb3f298e812ec50d8128e"
           }
         }
       ],
       "incumbentPassHistory": [
-        "g031b-reporting-sweep"
+        "g031b-reporting-sweep",
+        "g034-missing-event-sweep"
       ],
       "retired": false,
       "currentRevalidation": {
         "evidence": {
-          "path": "runs/g031b-reporting-sweep/summary.json",
-          "sha256": "d73ce41accb59ec42d56f87cf06b01d480d806ecb1bffd14faf09b936ad305ab"
+          "path": "runs/g034-missing-event-sweep/summary.json",
+          "sha256": "59f6b6aeed5583c5aecb281f8a085c874d1f238ec3c0e5655b2ff4348ae093d8"
         },
         "instruments": {
           "following": "following-evaluator@2",
@@ -477,7 +482,7 @@
         },
         "passed": true,
         "sentinelsPassed": true,
-        "status": "passed",
+        "status": "confirmed",
         "outputProducer": "event-chain@3, fresh in the full sweep"
       },
       "previousIncumbent": {
@@ -588,7 +593,7 @@
     },
     {
       "id": "slowedBar",
-      "status": "passed",
+      "status": "confirmed",
       "listener": "event-chain@3",
       "instruments": {
         "following": "following-evaluator@2",
@@ -600,8 +605,11 @@
         "path": "runs/g031b-reporting-sweep/summary.json",
         "sha256": "d73ce41accb59ec42d56f87cf06b01d480d806ecb1bffd14faf09b936ad305ab"
       },
-      "confirmedEvidence": null,
-      "version3Revalidation": "completed: passed (g031b)",
+      "confirmedEvidence": {
+        "path": "runs/g034-missing-event-sweep/summary.json",
+        "sha256": "59f6b6aeed5583c5aecb281f8a085c874d1f238ec3c0e5655b2ff4348ae093d8"
+      },
+      "version3Revalidation": "confirmed in g034 batch-end full sweep",
       "examples": [
         "sb-s2-45-b1-50",
         "sb-s2-45-b1-60",
@@ -731,8 +739,8 @@
           "kind": "performance",
           "margin": 0.7349695782200701,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g031b-reporting-sweep/event-chain-3.sb-s2-99-b1-90.json",
-            "sha256": "71cb48808a8ab15bc46ec6edba72cd0ddfada178f529ef5de16624284795fe7d"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g034-missing-event-sweep/event-chain-3.sb-s2-99-b1-90.json",
+            "sha256": "3ab1c62dec3481c61ea3c987c4d9a1371b5f63943750da32dcfe8cf8e7964447"
           }
         },
         {
@@ -741,8 +749,8 @@
           "kind": "performance",
           "margin": 0.7349695782200704,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g031b-reporting-sweep/event-chain-3.sb-s2-99-b1-70.json",
-            "sha256": "6b78d46565a623e53f04d358b3c3ec9fe25e484b356777455527797fb185fab4"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g034-missing-event-sweep/event-chain-3.sb-s2-99-b1-70.json",
+            "sha256": "54013928b8ed7c4e839e6e588fc213a38be2bee336914ee4e1371a4eec7a81be"
           }
         },
         {
@@ -751,39 +759,40 @@
           "kind": "performance",
           "margin": 0.7499999999999942,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g031b-reporting-sweep/event-chain-3.sb-s2-90-b2-50.json",
-            "sha256": "f7076b27a6d0d334f7412992016e06e404655921c1917d6798d459c58ec99728"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g034-missing-event-sweep/event-chain-3.sb-s2-90-b2-50.json",
+            "sha256": "20f26cefb61a5e7bba3dc6113f5613718dee6859d0dac9fc3c3d9130e9e40537"
           }
         },
         {
-          "id": "sil-sb-s2-90-b1-70",
+          "id": "sil-sb-s2-45-b2-50",
           "score": "s2",
           "kind": "silence",
-          "margin": 0.997001532,
+          "margin": 0.996345592,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g031b-reporting-sweep/event-chain-3.sil-sb-s2-90-b1-70.json",
-            "sha256": "9fd2635826303b8630ff6fc0b4883f7984f3972c7acde548ad55ce37a0d50808"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g034-missing-event-sweep/event-chain-3.sil-sb-s2-45-b2-50.json",
+            "sha256": "4f169f93e8f7fe80d914e61d240dacdc5f4b122594fe9912eed70e6c783ad93a"
           }
         },
         {
-          "id": "w2-sb-s2-99-b1-60",
+          "id": "w2-sb-s2-90-b2-80",
           "score": "s2",
           "kind": "wrong-score",
-          "margin": 0.997183132,
+          "margin": 0.997844864,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g031b-reporting-sweep/event-chain-3.w2-sb-s2-99-b1-60.json",
-            "sha256": "5770c918c84ad2234cf471211f30411dd4563e214109fd1231e43947fcf35994"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g034-missing-event-sweep/event-chain-3.w2-sb-s2-90-b2-80.json",
+            "sha256": "470e6522fea648246fb22866e8e6b1cf30c86b0c64dde69085c4b3552d50e4e7"
           }
         }
       ],
       "incumbentPassHistory": [
-        "g031b-reporting-sweep"
+        "g031b-reporting-sweep",
+        "g034-missing-event-sweep"
       ],
       "retired": false,
       "currentRevalidation": {
         "evidence": {
-          "path": "runs/g031b-reporting-sweep/summary.json",
-          "sha256": "d73ce41accb59ec42d56f87cf06b01d480d806ecb1bffd14faf09b936ad305ab"
+          "path": "runs/g034-missing-event-sweep/summary.json",
+          "sha256": "59f6b6aeed5583c5aecb281f8a085c874d1f238ec3c0e5655b2ff4348ae093d8"
         },
         "instruments": {
           "following": "following-evaluator@2",
@@ -793,7 +802,7 @@
         },
         "passed": true,
         "sentinelsPassed": true,
-        "status": "passed",
+        "status": "confirmed",
         "outputProducer": "event-chain@3, fresh in the full sweep"
       },
       "previousIncumbent": {
@@ -884,7 +893,7 @@
     },
     {
       "id": "four-bar-tempo-revalidation",
-      "status": "passed",
+      "status": "confirmed",
       "listener": "event-chain@3",
       "instruments": {
         "following": "following-evaluator@2",
@@ -896,7 +905,10 @@
         "path": "runs/g031b-reporting-sweep/summary.json",
         "sha256": "d73ce41accb59ec42d56f87cf06b01d480d806ecb1bffd14faf09b936ad305ab"
       },
-      "confirmedEvidence": null,
+      "confirmedEvidence": {
+        "path": "runs/g034-missing-event-sweep/summary.json",
+        "sha256": "59f6b6aeed5583c5aecb281f8a085c874d1f238ec3c0e5655b2ff4348ae093d8"
+      },
       "examples": [
         "s3-45",
         "s3-63",
@@ -1158,8 +1170,8 @@
           "kind": "performance",
           "margin": 0.734969578220063,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g031b-reporting-sweep/event-chain-3.s3-99.json",
-            "sha256": "0d98cf2c783eb9c2de8514870ba81760f0287d13126de1f7a99e716793a0c151"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g034-missing-event-sweep/event-chain-3.s3-99.json",
+            "sha256": "1d5c1170cf11efdbfd079137ed2db15250926d84337b1b49b20d3c4e3f3e9022"
           }
         },
         {
@@ -1168,8 +1180,8 @@
           "kind": "performance",
           "margin": 0.734969578220063,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g031b-reporting-sweep/event-chain-3.sb-s3-99-b3-50.json",
-            "sha256": "14a58d7b1c036152c24ed73ee88ca9afb2f4a488eb1d860d04a9feae32a76b19"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g034-missing-event-sweep/event-chain-3.sb-s3-99-b3-50.json",
+            "sha256": "af3181d8f948e74d24f43fa9ef2b9eb15516feeac0e6bb55cf4990a48957c5dd"
           }
         },
         {
@@ -1178,39 +1190,40 @@
           "kind": "performance",
           "margin": 0.734969578220063,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g031b-reporting-sweep/event-chain-3.sb-s3-99-b3-60.json",
-            "sha256": "7510f0bd9f324e46f196418f6a1d45c447e76bd5b03df5c2db9c0b42b61f06a0"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g034-missing-event-sweep/event-chain-3.sb-s3-99-b3-60.json",
+            "sha256": "522701db208df43664c6de56f4e4add5ef779b9e528c566c8f24566f8842ed89"
           }
         },
         {
-          "id": "sil-sb-s3-45-b2-90",
+          "id": "sil-sb-s3-63-b4-60",
           "score": "s3",
           "kind": "silence",
-          "margin": 0.996853344,
+          "margin": 0.99639878,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g031b-reporting-sweep/event-chain-3.sil-sb-s3-45-b2-90.json",
-            "sha256": "20cf9f7663ddb5d2cd24f20cd84dc6858fced368be285970810480b49e26110f"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g034-missing-event-sweep/event-chain-3.sil-sb-s3-63-b4-60.json",
+            "sha256": "4381517161c40d7efc1c9266fb04b275b7dc67198719f83f0a43c813c1be105e"
           }
         },
         {
-          "id": "w2-sb-s3-99-b1-80",
+          "id": "w2-sb-s3-90-b4-50",
           "score": "s3",
           "kind": "wrong-score",
-          "margin": 0.997553396,
+          "margin": 0.997017916,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g031b-reporting-sweep/event-chain-3.w2-sb-s3-99-b1-80.json",
-            "sha256": "ef41243b3f73697935d1e334c9dad336c8ebfcd41a7219a6a2c787aa8b1e75d6"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g034-missing-event-sweep/event-chain-3.w2-sb-s3-90-b4-50.json",
+            "sha256": "f8bb7bd8c7630406ba5fdd2cacf5d9fec86167bf2ceafef682cf9de7705b0662"
           }
         }
       ],
       "incumbentPassHistory": [
-        "g031b-reporting-sweep"
+        "g031b-reporting-sweep",
+        "g034-missing-event-sweep"
       ],
       "retired": false,
       "currentRevalidation": {
         "evidence": {
-          "path": "runs/g031b-reporting-sweep/summary.json",
-          "sha256": "d73ce41accb59ec42d56f87cf06b01d480d806ecb1bffd14faf09b936ad305ab"
+          "path": "runs/g034-missing-event-sweep/summary.json",
+          "sha256": "59f6b6aeed5583c5aecb281f8a085c874d1f238ec3c0e5655b2ff4348ae093d8"
         },
         "instruments": {
           "following": "following-evaluator@2",
@@ -1220,7 +1233,7 @@
         },
         "passed": true,
         "sentinelsPassed": true,
-        "status": "passed",
+        "status": "confirmed",
         "outputProducer": "event-chain@3, fresh in the full sweep"
       },
       "previousIncumbent": {
@@ -1256,7 +1269,7 @@
     },
     {
       "id": "held-note-hesitation",
-      "status": "passed",
+      "status": "confirmed",
       "listener": "event-chain@3",
       "instruments": {
         "following": "following-evaluator@2",
@@ -1268,7 +1281,10 @@
         "path": "runs/g032-held-note-hesitation/summary.json",
         "sha256": "1925e9ce3ed85b154376e768a0e383372f35529b6e96cd7981543a4877c74185"
       },
-      "confirmedEvidence": null,
+      "confirmedEvidence": {
+        "path": "runs/g034-missing-event-sweep/summary.json",
+        "sha256": "59f6b6aeed5583c5aecb281f8a085c874d1f238ec3c0e5655b2ff4348ae093d8"
+      },
       "examples": [
         "s1-45",
         "sil-s1-45",
@@ -1422,8 +1438,8 @@
           "kind": "performance",
           "margin": 0.734969578220063,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g032-held-note-hesitation/event-chain-3.hh-s2-99-2000.json",
-            "sha256": "c5d95d446f6aefe40f4e1b1a9b5e31fd19b583dc024da5505e3fbfffceca134a"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g034-missing-event-sweep/event-chain-3.hh-s2-99-2000.json",
+            "sha256": "edd2a958dc5b71586c3620e5d6e0c2058ffb50523dffe18a7a00987e67d557c9"
           }
         },
         {
@@ -1432,8 +1448,8 @@
           "kind": "performance",
           "margin": 0.734969578220063,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g032-held-note-hesitation/event-chain-3.hh-s2-99-500.json",
-            "sha256": "931b2f185970a3d0f12eec4be795832708868596dc220bef74b634d7f74b629b"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g034-missing-event-sweep/event-chain-3.hh-s2-99-500.json",
+            "sha256": "953e42ce252fa414d62ef63d63f51d6812be7f58d08419be739d9cb46bb7754b"
           }
         },
         {
@@ -1442,53 +1458,54 @@
           "kind": "performance",
           "margin": 0.734969578220063,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g032-held-note-hesitation/event-chain-3.s2-99.json",
-            "sha256": "b14c7f4fb4f795b75b63f3abb05806707b18b79b364b2aa5b9ae85e10c001ee0"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g034-missing-event-sweep/event-chain-3.s2-99.json",
+            "sha256": "2a517d0df335371eb29d7bf0cae3e8275db8527a732338cfca9ab7aaca9d410d"
           }
         },
         {
-          "id": "sil-hh-s1-45-700",
+          "id": "sil-hh-s1-99-300",
           "score": "s1",
           "kind": "silence",
-          "margin": 0.9974187999999999,
+          "margin": 0.99712908,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g032-held-note-hesitation/event-chain-3.sil-hh-s1-45-700.json",
-            "sha256": "16c3b39b57efae4ab0287424344023cfb737d73667d28f6cfdebfeda6eca33a5"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g034-missing-event-sweep/event-chain-3.sil-hh-s1-99-300.json",
+            "sha256": "ec72ed16b85b956d3688d4eb30e0ed2645d7ca1f1f97425cbb532affc109388a"
           }
         },
         {
-          "id": "w2-hh-s1-99-1000",
+          "id": "w2-hh-s1-63-500",
           "score": "s1",
           "kind": "wrong-score",
-          "margin": 0.996390904,
+          "margin": 0.996418812,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g032-held-note-hesitation/event-chain-3.w2-hh-s1-99-1000.json",
-            "sha256": "1c29a7826963966de753c19206ccdaa734041911e6dca3e9970f2b1dc070cd87"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g034-missing-event-sweep/event-chain-3.w2-hh-s1-63-500.json",
+            "sha256": "b8d5df011045cd94b410a03da762cba3c0c5b1214a44ce63056a39aa5d884dec"
           }
         },
         {
-          "id": "sil-s2-90",
+          "id": "sil-hh-s2-45-300",
           "score": "s2",
           "kind": "silence",
-          "margin": 0.997872372,
+          "margin": 0.99014806,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g032-held-note-hesitation/event-chain-3.sil-s2-90.json",
-            "sha256": "6cc0989d47319352be1a19e8aac36a113c909677292c338869adac17471d2df6"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g034-missing-event-sweep/event-chain-3.sil-hh-s2-45-300.json",
+            "sha256": "8f12662364acad05489998f97733f50944eca5183ff107907295ac1df592f460"
           }
         },
         {
-          "id": "w2-s2-90",
+          "id": "w2-hh-s2-99-700",
           "score": "s2",
           "kind": "wrong-score",
-          "margin": 0.998017924,
+          "margin": 0.997186664,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g032-held-note-hesitation/event-chain-3.w2-s2-90.json",
-            "sha256": "2101be7a77e384474bf9a4a575301299737eb1896aac99ee750a657031180197"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g034-missing-event-sweep/event-chain-3.w2-hh-s2-99-700.json",
+            "sha256": "7c6d703cad8e0511f854f506b0ae29d7c8a02d2d8926d82e2cfbf9d095fd5c23"
           }
         }
       ],
       "incumbentPassHistory": [
-        "g032-held-note-hesitation"
+        "g032-held-note-hesitation",
+        "g034-missing-event-sweep"
       ],
       "retired": false,
       "set": {
@@ -1504,11 +1521,27 @@
           "scope": "frozen sentinels only; no additional full-set retirement pass",
           "passed": true
         }
-      ]
+      ],
+      "currentRevalidation": {
+        "evidence": {
+          "path": "runs/g034-missing-event-sweep/summary.json",
+          "sha256": "59f6b6aeed5583c5aecb281f8a085c874d1f238ec3c0e5655b2ff4348ae093d8"
+        },
+        "instruments": {
+          "following": "following-evaluator@2",
+          "assessment": "assessment-evaluator@3",
+          "gates": "stage-gates@2",
+          "oracle": "event-oracle@4"
+        },
+        "passed": true,
+        "sentinelsPassed": true,
+        "status": "confirmed",
+        "outputProducer": "event-chain@3, fresh in the full sweep"
+      }
     },
     {
       "id": "rushed-bar",
-      "status": "passed",
+      "status": "confirmed",
       "listener": "event-chain@3",
       "instruments": {
         "following": "following-evaluator@2",
@@ -1520,7 +1553,10 @@
         "path": "runs/g033-rushed-bar/summary.json",
         "sha256": "a8c7bad94f319ce838786f81805d262c6ac040d7101a050e6773c6c10f753a18"
       },
-      "confirmedEvidence": null,
+      "confirmedEvidence": {
+        "path": "runs/g034-missing-event-sweep/summary.json",
+        "sha256": "59f6b6aeed5583c5aecb281f8a085c874d1f238ec3c0e5655b2ff4348ae093d8"
+      },
       "examples": [
         "s2-45",
         "sil-s2-45",
@@ -1986,8 +2022,8 @@
           "kind": "performance",
           "margin": 0.6774193548387032,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g033-rushed-bar/event-chain-3.rb-s2-99-b2-115.json",
-            "sha256": "083318bc5848d1d963aeb737c40d8b2e56d4b06c5d47a0898b72e5493a543cdf"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g034-missing-event-sweep/event-chain-3.rb-s2-99-b2-115.json",
+            "sha256": "c5dc0ff88bc1708a1d34c4d594b8f9125bb2823a1e3c68d0d911b75b8a7dc3d8"
           }
         },
         {
@@ -1996,8 +2032,8 @@
           "kind": "performance",
           "margin": 0.6774193548387032,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g033-rushed-bar/event-chain-3.rb-s3-99-b2-115.json",
-            "sha256": "68239b4d4cec64c93495174a29a5e2df88e03bbf2ab9b4a817f5daf03f8e8de8"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g034-missing-event-sweep/event-chain-3.rb-s3-99-b2-115.json",
+            "sha256": "8bf2aa03463d6f9c1874472ff1ca5cf4beaa56f230231093bc3ef2ff0aed3c44"
           }
         },
         {
@@ -2006,63 +2042,297 @@
           "kind": "performance",
           "margin": 0.6874999999999969,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g033-rushed-bar/event-chain-3.rb-s2-90-b1-125.json",
-            "sha256": "a2f9629fae273240382144c6b136715e69fc6acb4b4f27abf0e703a9411d2cbf"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g034-missing-event-sweep/event-chain-3.rb-s2-90-b1-125.json",
+            "sha256": "053d4bd244ecba6143a75c842d8e50a910a03b2b182aafff5ddc7f9f4c560d0d"
           }
         },
         {
-          "id": "sil-s2-45",
+          "id": "sil-rb-s2-99-b1-130",
           "score": "s2",
           "kind": "silence",
-          "margin": 0.9947722,
+          "margin": 0.997185496,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g033-rushed-bar/event-chain-3.sil-s2-45.json",
-            "sha256": "f34bec4748b981e702e52160aac1b841450854b98fa3dc06fa3e7e4819a5260f"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g034-missing-event-sweep/event-chain-3.sil-rb-s2-99-b1-130.json",
+            "sha256": "5023acae72722813c24f3b0b697c2e5532a8701d363218d00a7510a7424d494c"
           }
         },
         {
-          "id": "w2-rb-s2-63-b1-125",
+          "id": "w2-rb-s2-99-b1-105",
           "score": "s2",
           "kind": "wrong-score",
-          "margin": 0.997336912,
+          "margin": 0.996257836,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g033-rushed-bar/event-chain-3.w2-rb-s2-63-b1-125.json",
-            "sha256": "e6563c2c29e916e3d92c9984f1fd4f934277f5ea1dc334a1f02d99e1494f2507"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g034-missing-event-sweep/event-chain-3.w2-rb-s2-99-b1-105.json",
+            "sha256": "d1e7647bc12eb2dd1da6e6f11371c701e66f883dd9e5998460d55a90489b96b3"
           }
         },
         {
-          "id": "sil-rb-s3-63-b1-130",
+          "id": "sil-rb-s3-90-b1-125",
           "score": "s3",
           "kind": "silence",
-          "margin": 0.99606224,
+          "margin": 0.989861856,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g033-rushed-bar/event-chain-3.sil-rb-s3-63-b1-130.json",
-            "sha256": "649e3320a7a72e8c591d4c6ad4436ba920b590274bcaac27ed0e760f243fa2e2"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g034-missing-event-sweep/event-chain-3.sil-rb-s3-90-b1-125.json",
+            "sha256": "3e3cf4a2eb9fed18acb0be51991497ca78ec36e1cb01a5dc0dc35a7f75ec801b"
           }
         },
         {
-          "id": "w2-rb-s3-90-b2-125",
+          "id": "w2-rb-s3-99-b2-105",
           "score": "s3",
           "kind": "wrong-score",
-          "margin": 0.997766596,
+          "margin": 0.996454936,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g033-rushed-bar/event-chain-3.w2-rb-s3-90-b2-125.json",
-            "sha256": "a46b5bafaeb3f5d729b9eca7b8e5051016a3646e7ec755a9bdb6eb4fc9d8d098"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g034-missing-event-sweep/event-chain-3.w2-rb-s3-99-b2-105.json",
+            "sha256": "aeec98b47302e0dd1016de4513d20a535044cbcd3dc1dcbd8c7534f43f704110"
           }
         }
       ],
       "incumbentPassHistory": [
-        "g033-rushed-bar"
+        "g033-rushed-bar",
+        "g034-missing-event-sweep"
       ],
       "retired": false,
       "set": {
         "manifest": "/home/williao/dev/mnx-listening-data/contract2-rushed-bar-v1/manifest.json",
         "sha256": "102915fe315a1fb84a810a9755353a76d87258c35b008b00d02a3db4f5e364d3"
+      },
+      "currentRevalidation": {
+        "evidence": {
+          "path": "runs/g034-missing-event-sweep/summary.json",
+          "sha256": "59f6b6aeed5583c5aecb281f8a085c874d1f238ec3c0e5655b2ff4348ae093d8"
+        },
+        "instruments": {
+          "following": "following-evaluator@2",
+          "assessment": "assessment-evaluator@3",
+          "gates": "stage-gates@2",
+          "oracle": "event-oracle@4"
+        },
+        "passed": true,
+        "sentinelsPassed": true,
+        "status": "confirmed",
+        "outputProducer": "event-chain@3, fresh in the full sweep"
+      }
+    },
+    {
+      "id": "missing-event",
+      "status": "passed",
+      "listener": "event-chain@3",
+      "instruments": {
+        "following": "following-evaluator@2",
+        "assessment": "assessment-evaluator@3",
+        "gates": "stage-gates@2",
+        "oracle": "event-oracle@4"
+      },
+      "passEvidence": {
+        "path": "runs/g034-missing-event-sweep/summary.json",
+        "sha256": "59f6b6aeed5583c5aecb281f8a085c874d1f238ec3c0e5655b2ff4348ae093d8"
+      },
+      "confirmedEvidence": null,
+      "examples": [
+        "me-s1-45-e2",
+        "me-s1-45-e3",
+        "me-s1-63-e2",
+        "me-s1-63-e3",
+        "me-s1-90-e2",
+        "me-s1-90-e3",
+        "me-s1-99-e2",
+        "me-s1-99-e3",
+        "me-s2-45-e2",
+        "me-s2-45-e3",
+        "me-s2-45-e4",
+        "me-s2-45-e5",
+        "me-s2-45-e6",
+        "me-s2-45-e7",
+        "me-s2-63-e2",
+        "me-s2-63-e3",
+        "me-s2-63-e4",
+        "me-s2-63-e5",
+        "me-s2-63-e6",
+        "me-s2-63-e7",
+        "me-s2-90-e2",
+        "me-s2-90-e3",
+        "me-s2-90-e4",
+        "me-s2-90-e5",
+        "me-s2-90-e6",
+        "me-s2-90-e7",
+        "me-s2-99-e2",
+        "me-s2-99-e3",
+        "me-s2-99-e4",
+        "me-s2-99-e5",
+        "me-s2-99-e6",
+        "me-s2-99-e7",
+        "s1-45",
+        "s1-63",
+        "s1-90",
+        "s1-99",
+        "s2-45",
+        "s2-63",
+        "s2-90",
+        "s2-99",
+        "sil-me-s1-45-e2",
+        "sil-me-s1-45-e3",
+        "sil-me-s1-63-e2",
+        "sil-me-s1-63-e3",
+        "sil-me-s1-90-e2",
+        "sil-me-s1-90-e3",
+        "sil-me-s1-99-e2",
+        "sil-me-s1-99-e3",
+        "sil-me-s2-45-e2",
+        "sil-me-s2-45-e3",
+        "sil-me-s2-45-e4",
+        "sil-me-s2-45-e5",
+        "sil-me-s2-45-e6",
+        "sil-me-s2-45-e7",
+        "sil-me-s2-63-e2",
+        "sil-me-s2-63-e3",
+        "sil-me-s2-63-e4",
+        "sil-me-s2-63-e5",
+        "sil-me-s2-63-e6",
+        "sil-me-s2-63-e7",
+        "sil-me-s2-90-e2",
+        "sil-me-s2-90-e3",
+        "sil-me-s2-90-e4",
+        "sil-me-s2-90-e5",
+        "sil-me-s2-90-e6",
+        "sil-me-s2-90-e7",
+        "sil-me-s2-99-e2",
+        "sil-me-s2-99-e3",
+        "sil-me-s2-99-e4",
+        "sil-me-s2-99-e5",
+        "sil-me-s2-99-e6",
+        "sil-me-s2-99-e7",
+        "sil-s1-45",
+        "sil-s1-63",
+        "sil-s1-90",
+        "sil-s1-99",
+        "sil-s2-45",
+        "sil-s2-63",
+        "sil-s2-90",
+        "sil-s2-99",
+        "w2-me-s1-45-e2",
+        "w2-me-s1-45-e3",
+        "w2-me-s1-63-e2",
+        "w2-me-s1-63-e3",
+        "w2-me-s1-90-e2",
+        "w2-me-s1-90-e3",
+        "w2-me-s1-99-e2",
+        "w2-me-s1-99-e3",
+        "w2-me-s2-45-e2",
+        "w2-me-s2-45-e3",
+        "w2-me-s2-45-e4",
+        "w2-me-s2-45-e5",
+        "w2-me-s2-45-e6",
+        "w2-me-s2-45-e7",
+        "w2-me-s2-63-e2",
+        "w2-me-s2-63-e3",
+        "w2-me-s2-63-e4",
+        "w2-me-s2-63-e5",
+        "w2-me-s2-63-e6",
+        "w2-me-s2-63-e7",
+        "w2-me-s2-90-e2",
+        "w2-me-s2-90-e3",
+        "w2-me-s2-90-e4",
+        "w2-me-s2-90-e5",
+        "w2-me-s2-90-e6",
+        "w2-me-s2-90-e7",
+        "w2-me-s2-99-e2",
+        "w2-me-s2-99-e3",
+        "w2-me-s2-99-e4",
+        "w2-me-s2-99-e5",
+        "w2-me-s2-99-e6",
+        "w2-me-s2-99-e7",
+        "w2-s1-45",
+        "w2-s1-63",
+        "w2-s1-90",
+        "w2-s1-99",
+        "w2-s2-45",
+        "w2-s2-63",
+        "w2-s2-90",
+        "w2-s2-99"
+      ],
+      "sentinels": [
+        {
+          "id": "me-s1-99-e3",
+          "score": "s1",
+          "kind": "performance",
+          "margin": 0.7302461503877744,
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g034-missing-event-sweep/event-chain-3.me-s1-99-e3.json",
+            "sha256": "dfe64e7d5def707f1a91bd492945ae0ce51fbfd8d9d8d27ecd9891bb893bb112"
+          }
+        },
+        {
+          "id": "me-s2-99-e2",
+          "score": "s2",
+          "kind": "performance",
+          "margin": 0.734969578220063,
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g034-missing-event-sweep/event-chain-3.me-s2-99-e2.json",
+            "sha256": "50ef452f0be9a33d45753b97c925c4b0532df4906e8729cd2b2792e156ddde97"
+          }
+        },
+        {
+          "id": "me-s2-99-e3",
+          "score": "s2",
+          "kind": "performance",
+          "margin": 0.734969578220063,
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g034-missing-event-sweep/event-chain-3.me-s2-99-e3.json",
+            "sha256": "93c5ab27373241f620c744d25e76dc9e89cd16683ee91aef4efc8d655f94f126"
+          }
+        },
+        {
+          "id": "sil-me-s1-63-e2",
+          "score": "s1",
+          "kind": "silence",
+          "margin": 0.995959272,
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g034-missing-event-sweep/event-chain-3.sil-me-s1-63-e2.json",
+            "sha256": "84e2d7ed08ebdbdc178c2819254434419794d0dfa96df71f4fe2f22a7e1bf8d3"
+          }
+        },
+        {
+          "id": "w2-me-s1-99-e3",
+          "score": "s1",
+          "kind": "wrong-score",
+          "margin": 0.995545792,
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g034-missing-event-sweep/event-chain-3.w2-me-s1-99-e3.json",
+            "sha256": "0c8be3957973d3e8316fc812b890904c9f06fd4b3ed0d6c42735bbb42bccf902"
+          }
+        },
+        {
+          "id": "sil-me-s2-90-e4",
+          "score": "s2",
+          "kind": "silence",
+          "margin": 0.996909428,
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g034-missing-event-sweep/event-chain-3.sil-me-s2-90-e4.json",
+            "sha256": "8a21c80446f75dc7f2967bed524a7fb01a6eea1de0d1b359ada92a68bbdf177e"
+          }
+        },
+        {
+          "id": "w2-me-s2-99-e7",
+          "score": "s2",
+          "kind": "wrong-score",
+          "margin": 0.996664232,
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g034-missing-event-sweep/event-chain-3.w2-me-s2-99-e7.json",
+            "sha256": "672d5843a788e0ee7d739984b43d0a02136fbdcdbd036ebe8ad816c50b9eb69a"
+          }
+        }
+      ],
+      "incumbentPassHistory": [
+        "g034-missing-event-sweep"
+      ],
+      "retired": false,
+      "set": {
+        "manifest": "/home/williao/dev/mnx-listening-data/contract2-missing-event-v1/manifest.json",
+        "sha256": "2963093a18f7327652c5e3bbeb1f67ae779acce3f54ec6b9c6cc04b695a73880"
       }
     }
   ],
   "openSubstages": [
-    "missing-event",
     "wrong-note-with-w1",
     "dead-note",
     "extra-note",
@@ -2073,7 +2343,7 @@
     "stage5-categories"
   ],
   "retiredSets": [],
-  "retirementReason": "No performance retirement: earlier substages receive sentinel-only checks at g032 and g033, not additional complete-set incumbent passes; held-note and rushed-bar each have one evaluation.",
+  "retirementReason": "No retirement in 034: the pre-registration retains all sets. Each earlier incumbent substage now has two complete-set passing evaluations recorded; missing-event has one.",
   "baselinePolicy": {
     "mode": "sweep-only",
     "since": "2026-09-30",
@@ -2099,18 +2369,26 @@
         "path": "runs/g031b-reporting-sweep/summary.json",
         "sha256": "d73ce41accb59ec42d56f87cf06b01d480d806ecb1bffd14faf09b936ad305ab",
         "use": "Full sweep: historical baseline records cited by hash; four-bar baseline records fresh."
+      },
+      {
+        "path": "runs/g034-missing-event-sweep/summary.json",
+        "sha256": "59f6b6aeed5583c5aecb281f8a085c874d1f238ec3c0e5655b2ff4348ae093d8",
+        "use": "Full sweep: 516 examples per baseline reused after provenance checks, 648 per baseline fresh; complete per-example private records pinned by hash."
       }
     ]
   },
-  "lastFullComparison": "g031b-reporting-sweep",
-  "nextFullSweepNoLaterThan": 36,
-  "confirmation": "g031b, the full sweep owed by 031, confirms stage1 and passes hesitation, slowedBar and four-bar for event-chain@3. Sentinels were re-chosen at that sweep. Earlier instruments2 passes remain historical provenance under previousIncumbent.",
+  "lastFullComparison": "g034-missing-event-sweep",
+  "nextFullSweepNoLaterThan": 39,
+  "confirmation": "g034 batch-end sweep confirms every earlier complete substage under current instruments; missing-event passes for the first time. Historical verdicts and earlier evidence remain preserved.",
   "routineRegressionIds": [
     "h-s2-90-1000",
     "h-s2-90-2000",
     "h-s2-90-300",
     "hh-s2-99-2000",
     "hh-s2-99-500",
+    "me-s1-99-e3",
+    "me-s2-99-e2",
+    "me-s2-99-e3",
     "rb-s2-90-b1-125",
     "rb-s2-99-b2-115",
     "rb-s3-99-b2-115",
@@ -2123,32 +2401,38 @@
     "sb-s2-99-b1-90",
     "sb-s3-99-b3-50",
     "sb-s3-99-b3-60",
-    "sil-h-s1-90-300",
-    "sil-h-s2-63-1000",
-    "sil-hh-s1-45-700",
-    "sil-rb-s3-63-b1-130",
+    "sil-h-s1-99-300",
+    "sil-h-s2-63-2000",
+    "sil-hh-s1-99-300",
+    "sil-hh-s2-45-300",
+    "sil-me-s1-63-e2",
+    "sil-me-s2-90-e4",
+    "sil-rb-s2-99-b1-130",
+    "sil-rb-s3-90-b1-125",
     "sil-s1-99",
-    "sil-s2-45",
-    "sil-s2-90",
-    "sil-sb-s2-90-b1-70",
-    "sil-sb-s3-45-b2-90",
-    "w2-h-s1-99-1000",
-    "w2-h-s2-90-1000",
-    "w2-hh-s1-99-1000",
-    "w2-rb-s2-63-b1-125",
-    "w2-rb-s3-90-b2-125",
+    "sil-s2-99",
+    "sil-sb-s2-45-b2-50",
+    "sil-sb-s3-63-b4-60",
+    "w2-h-s1-99-300",
+    "w2-h-s2-63-500",
+    "w2-hh-s1-63-500",
+    "w2-hh-s2-99-700",
+    "w2-me-s1-99-e3",
+    "w2-me-s2-99-e7",
+    "w2-rb-s2-99-b1-105",
+    "w2-rb-s3-99-b2-105",
     "w2-s1-99",
     "w2-s2-90",
-    "w2-sb-s2-99-b1-60",
-    "w2-sb-s3-99-b1-80"
+    "w2-sb-s2-90-b2-80",
+    "w2-sb-s3-90-b4-50"
   ],
   "futureEvidence": {
     "manifest": "/home/williao/dev/mnx-listening-data/contract2-four-bar-tempo-v1/manifest.json",
     "sha256": "870363f2f36aa19a13aeee4d0faccff4e59d55ff8183fe8c32c868a803b5b60e",
     "listenerEvaluated": true,
     "evaluation": {
-      "path": "runs/g031b-reporting-sweep/summary.json",
-      "sha256": "d73ce41accb59ec42d56f87cf06b01d480d806ecb1bffd14faf09b936ad305ab"
+      "path": "runs/g034-missing-event-sweep/summary.json",
+      "sha256": "59f6b6aeed5583c5aecb281f8a085c874d1f238ec3c0e5655b2ff4348ae093d8"
     }
   },
   "validation": {
@@ -2156,7 +2440,7 @@
     "sha256": "94e5f2f8bb1b16e0fa630813a00a0c3de96ad072219ddee0974815e3c97bbf5a"
   },
   "currentEvaluation": {
-    "path": "runs/g033-rushed-bar/summary.json",
-    "sha256": "a8c7bad94f319ce838786f81805d262c6ac040d7101a050e6773c6c10f753a18"
+    "path": "runs/g034-missing-event-sweep/summary.json",
+    "sha256": "59f6b6aeed5583c5aecb281f8a085c874d1f238ec3c0e5655b2ff4348ae093d8"
   }
 }

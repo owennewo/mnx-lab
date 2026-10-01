@@ -159,6 +159,19 @@
         "href": "032-held-note-hesitation.html",
         "label": "Experiment 032"
       }
+    },
+    {
+      "number": "034",
+      "slug": "034-missing-event-sweep",
+      "title": "034 \u00b7 One missing interior event and the batch-end full sweep",
+      "banner": "D1 \u00b7 unchanged event-chain@3 \u00b7 32/32 recoveries and missing findings \u00b7 all 1164 sweep examples pass \u00b7 earlier outputs identical \u00b7 batch closes at 5/5",
+      "runs": [
+        "g034-missing-event-sweep"
+      ],
+      "previous": {
+        "href": "033-rushed-bar.html",
+        "label": "Experiment 033"
+      }
     }
   ]
 }

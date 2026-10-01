@@ -81,17 +81,38 @@ completion run's verdict is recorded against 031; it adds no run to the count. P
 review R9 covers 030–031 as closed; the batch's remaining runs get their own review.
 
 **Run 3 done: [032](reports/032-held-note-hesitation.md), Sol 6.1 (high) in Codex, D1.**
-**Run 4 done: [033](reports/033-rushed-bar.md), Claude Opus 5.5 in Claude Code, D1.** Next
-is run 5 of 5, experiment 034, the batch's last: it closes this section, and the batch
-end makes the full sweep due in it.
+**Run 4 done: [033](reports/033-rushed-bar.md), Claude Opus 5.5 in Claude Code, D1.**
+**Run 5 done: [034](reports/034-missing-event-sweep.md), Sol 6.1 (high) in Codex, D1.**
+**Closed at 5 of 5.** The resumed batch passed held-note hesitation, rushed bar and
+one missing interior event on simple sines; its final full sweep confirms every
+previously passed substage, with earlier outputs preserved. Stage 2 remains incomplete.
+An independent process review of the resumed batch (032–034, with g031b as inherited
+sweep evidence) is due through the parent session; R9's original 030–031 review stays
+recorded. This experimenter stops after landing and retiring its worktree.
 
-2026-10-01. [Contract 2](contracts/development-contract-2.md) remains in force and **event-chain@3 remains incumbent**. [033](reports/033-rushed-bar.md#results) passes a single rushed bar on the two-bar scale and the four-bar melody: the live cursor follows every quicker note, every note and interval is assessed, and the assessment raises the loop's first fast flags, missing only the two bars whose true ratio lies on the threshold itself, with no false alarm. Controls, clean parents and every earlier sentinel pass, and every re-measured earlier example reproduces its last record byte for byte. The [suite record](bench/suite-record.json) adds the rushed-bar sentinels and preserves earlier IDs and states. Stage 2 continues with a missing event.
+2026-10-01. [Contract 2](contracts/development-contract-2.md) remains in force and
+**event-chain@3 remains incumbent**. [034](reports/034-missing-event-sweep.md#results)
+passes a missing interior event on the one- and two-bar scores: the cursor holds the
+predecessor and recovers at the next sound, the assessment identifies the omitted
+note, and the interval spanning it preserves the steady tempo. The complete batch-end
+sweep passes every earlier substage and control, preserving all earlier outputs.
+The [suite record](bench/suite-record.json) confirms earlier states, adds the passed
+missing-event substage and re-chooses sentinels by the frozen rule; no set is retired.
+Next is the single wrong note with w1, a capability this deletion result does not establish.
 
-The latest full sweep is still g031b; it falls due in 034, the batch's last run. [033's resulting state](reports/033-rushed-bar.md#resulting-stopping-count-budgets-and-evidence-access) carries stopping count 0 and all budgets and access unchanged: no new listener version, no qualification evidence, Winner bars 5–8 unexamined. Sentinel-only checks of earlier substages add no complete-set retirement history.
+The latest full sweep is g034; next due no later than 039, or sooner on a stage claim,
+new gates or batch end. [034's resulting state](reports/034-missing-event-sweep.md#resulting-stopping-count-budgets-and-evidence-access)
+carries stopping count 0 and unchanged qualification budgets/access: no new listener
+version, no qualification evidence, Winner bars 5–8 unexamined. Earlier substages
+now have a second recorded complete-set incumbent pass, the new omission substage one.
 
-[Audit 4](bench/oracle-events/audit-4.md) remains the current oracle audit. 033 created no oracle, so no audit is due. The process review follows the batch, under the existing parent-session procedure. [033's next advice](reports/033-rushed-bar.md#next) records that exact-threshold flags remain a near coin flip at the event chain's onset resolution, within the approved gate.
+[Audit 4](bench/oracle-events/audit-4.md) remains the current oracle audit. 034 created
+no oracle, so no audit is due. The required independent batch process review remains
+the next process action, outside this experimenter's one-experiment scope.
 
-**Awaiting the user:** nothing new for the missing-event experiment or the sweep. Evidence-based recorded-guitar gates before stage 4 and eventual qualification/product choices remain standing future decisions. This session's user direction is preserved:
+**Awaiting the user:** nothing new for this result or the next sine substage.
+Evidence-based recorded-guitar gates before stage 4 and eventual qualification/product
+choices remain standing future decisions. This session's direction is preserved:
 
 > You cannot ask the user questions: record anything that needs them in your report and the research log.
 
@@ -145,6 +166,7 @@ Status is `holds`, `superseded` or `withdrawn`.
 | 23 | event-chain@3, @2 with flags only on eligible bars against the other bars, passes the full sweep. Live records and musical output are identical to @2 on 516/516 examples. It raises no flag on one- and two-bar scores, has no false findings anywhere, and finds 89/91 four-bar slow bars, the two misses at a true ratio of exactly 0.90 | [031 completion](reports/031-other-bars-reporting.md#completion-g031b-by-the-users-authority), [g031b](runs/g031b-reporting-sweep/summary.json) | holds | 031 (g031b) | Monophonic sine scores only. Missing/wrong/dead/extra have no positives. Boundary recall rests on millisecond onset estimates |
 | 24 | event-chain@3 holds through a single hesitation with the previous sine sustained, passes both outputs and controls, and preserves every active earlier regression output; resumption estimates shift by up to two hops from silent counterparts within the approved gates | [032](reports/032-held-note-hesitation.md#both-outputs-controls-and-regressions), [g032](runs/g032-held-note-hesitation/summary.json) | holds | 032 | Two short monophonic scores, constant sustain with no overlap/decay; no bar-flag positives or new wrong/missing/dead/extra capability |
 | 25 | event-chain@3 passes a single rushed bar at 1.05–1.30 of base tempo on s2 and s3: every event, note and interval, and 64/66 expected fast flags with no false alarm; both misses are bars whose true ratio is 1.10 to within 3e-6 | [033](reports/033-rushed-bar.md#results), [g033](runs/g033-rushed-bar/summary.json) | holds | 033 | Monophonic sine scores only; the first fast-flag positives. With g031b's slowed bars, four of five exact-threshold positives are missed, all on the side of 1.0: a near coin flip at 10 ms onset resolution, too few cases to establish a bias |
+| 26 | event-chain@3 recovers after every single interior omission on s1/s2, identifies all missing notes, and preserves spanning-interval tempo; the batch-end sweep confirms earlier substages and reproduces all earlier outputs | [034](reports/034-missing-event-sweep.md#results), [g034](runs/g034-missing-event-sweep/summary.json) | holds | 034 | Distinct-pitch monophonic sines, one silent beat per example; no first/last or multiple omission, repeated-pitch ambiguity, wrong/dead note or guitar claim |
 
 ## Open questions
 
@@ -153,7 +175,8 @@ given when a question opens and never reused.
 
 | Rank | Question | Why it is ranked here | Status | Owner item |
 |---|---|---|---|---|
-| 22 | Does the unchanged incumbent recover after a single missing event (cursor recovery, `missing` findings, the spanning interval) while retaining every passed substage, and does the full sweep due at batch end 034 confirm the substages passed since g031b? | Next deviation in contract 2's order; rushed bar now passed (finding 25); the sweep is due at the batch's end | open | [Contract 2 order](contracts/development-contract-2.md#order-of-work), [033 next](reports/033-rushed-bar.md#next) |
+| 23 | Does the incumbent follow and identify a single wrong note, while rejecting near-miss w1 and retaining every confirmed substage and the passed omission sentinels? | Next deviation in contract 2 after missing-event passes; exact-pitch deletion success does not establish wrong-note following/assessment | open | [034 next](reports/034-missing-event-sweep.md#next), [contract 2 order](contracts/development-contract-2.md#order-of-work) |
+| 22 | Does the unchanged incumbent recover after a single missing event (cursor recovery, `missing` findings, the spanning interval) while retaining every passed substage, and does the full sweep due at batch end 034 confirm the substages passed since g031b? | Next deviation in contract 2's order; rushed bar now passed (finding 25); the sweep is due at the batch's end | answered: yes, D1 (finding 26) | [Contract 2 order](contracts/development-contract-2.md#order-of-work), [034](reports/034-missing-event-sweep.md) |
 | 21 | Does the unchanged incumbent pass one rushed bar, retaining the held-note and earlier substages under current gates? | Answered by 033: all 479 active examples pass; fast flags 64/66, misses only at the exact threshold | answered: yes, D1 (finding 25) | [033](reports/033-rushed-bar.md) |
 | 19 | After reporting repair, does the incumbent hold a hesitation while the previous note keeps ringing, before rushed/missing/wrong/dead/extra deviations? | Answered by 032 on constant non-overlapping sine sustain; ringing/overlapping guitar remains outside this stage | answered: yes, D1 (finding 24) | [032](reports/032-held-note-hesitation.md) |
 | 20 | Does a completion of 031's frozen pre-registration (event-chain@3 in the full sweep, with the repaired summary writer) record D1: stage 1 confirmed, hesitation/slowedBar/four-bar passed, sentinels re-chosen? | Answered by g031b: all 516 examples, pools, sentinels, causality and cost pass | answered: yes, D1 (finding 23); route chosen by the user, "g031b is fine" | [031 completion](reports/031-other-bars-reporting.md#completion-g031b-by-the-users-authority) |
