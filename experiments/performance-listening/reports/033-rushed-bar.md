@@ -176,3 +176,165 @@ g031b's and g032's private records readable; private data root writable. No user
 decision is needed for this substage. The session's direction is recorded verbatim:
 
 > You cannot ask the user questions: record anything that needs them in your report and the research log.
+
+## Results
+
+**D1: the rushed bar passes.** The unchanged event-chain@3 followed every rushed bar
+with its live cursor, matched every note, reported every interval within tolerance
+and flagged 64 of the 66 bars the audited instruments expect `fast`, with no false
+alarm anywhere. Every control, clean parent and earlier sentinel passed. The two
+missed flags are the two bars whose true ratio sits on the threshold itself. This
+passes one substage; it completes neither stage 2 nor anything on recorded guitar.
+
+[g033-rushed-bar](../runs/g033-rushed-bar/summary.json) ran once, in **47.0 s**, at
+`eea40ef3e5c2d6185239f24b87965f83f12375c8`, pinned by the tag
+`g033-rushed-bar-source`. The pre-registration landed at `e5925746` before any
+stimulus or runner code existed and is unchanged above. The set
+**contract2-rushed-bar-v1** was frozen at the same source commit; its construction
+checks all passed (3,840 note boundaries recomputed beat by beat; 1,249 unrushed
+notes byte-identical to their steady parent, the other 95 within one sample of its
+length; silences exactly zero). Each private record was written and hashed as it was
+measured, after a dry assembly of the public record. No attempt failed and nothing
+was rerun.
+
+### Both outputs, controls and regressions
+
+| Evidence | Performances / controls | Cursor pass | Assessment pass | Events reached | Notes matched | Intervals within tolerance |
+|---|---|---|---|---|---|---|
+| Rushed s2 (two bars) | 48 / 96 | 144/144 | 144/144 | 384/384 | 384/384 | 336/336 |
+| Rushed s3 (four bars) | 96 / 192 | 288/288 | 288/288 | 1,536/1,536 | 1,536/1,536 | 1,440/1,440 |
+| Clean s2/s3 parents, half speed included | 8 / 16 | 24/24 | 24/24 | 96/96 | 96/96 | 88/88 |
+| Earlier sentinels not already above | 11 / 12 | 23/23 | 23/23 | 100/100 | 100/100 | 89/89 |
+| Entire active suite | 163 / 316 | 479/479 | 479/479 | 2,116/2,116 | 2,116/2,116 | 1,953/1,953 |
+
+| Rushed-performance measure | Result |
+|---|---|
+| Ahead exposure | 0 s |
+| Minimum on-event fraction of supported answerable time | 100% |
+| Maximum event acquisition delay | 49.5 ms |
+| Maximum interval-duration error | 18.9 ms |
+| Maximum overall-tempo error | 0.21% |
+| False findings | 0 |
+
+Every earlier substage's sentinel group passes (stage 1, hesitation, slowed bar,
+four-bar, held-note); the four-bar sentinels keep their 4/4 slow flags. All 304 new
+controls and the 12 earlier ones reject, and their assessments claim no note, tempo
+or flag. Missing, wrong, dead and extra-note gates have no positives here.
+
+### The first fast flags
+
+| Pool | Fast found | Fast false alarms | Slow false alarms |
+|---|---|---|---|
+| New set's own 456 examples | **64/66** (97.0%) | 0/398 | 0/464 |
+| The 144 rushed performances and their controls | 64/66 | 0/374 | 0/440 |
+
+Both pooled gates pass (found ≥ 90%, false alarms ≤ 5%). Every positive and
+negative count equals the pre-registered design arithmetic.
+
+| Missed bar | True ratio | Reported ratio | Error |
+|---|---|---|---|
+| rb-s3-45-b1-110, bar 0 | 1.100003 | 1.096154 | −0.0038 |
+| rb-s3-99-b1-110, bar 0 | 1.100001 | 1.093299 | −0.0067 |
+
+Both misses are the two bars that sample rounding puts a few millionths **above**
+1.10, so a 1–2% onset-precision error decides them either way. The twelve thin
+positives at true ratio 1.1084 (bars 1–3 at f = 1.15) were all found. In g031b the
+mirror case, bar 0 slowed to exactly 0.90, gave three expected-slow bars (rounding made
+the fourth `either`) and missed two. Four misses in five exact-threshold positives
+over the two runs fits a near coin flip at millisecond onset precision; in both
+directions the misses lie on the side of 1.0, but five cases cannot establish a bias.
+
+Reported bar ratios (informational, no gate) differ from the truth by −0.0173 to
++0.0256 over all 480 rushed-performance bars. Four bars exceed the predicted ±0.015:
+three are ineligible s2 bars, whose reference is one other bar's three or four
+intervals, and one is an s3 bar after a rushed bar, expected `none` at true ratio
+1.0526 and reported 1.035. None changes a flag.
+
+### Regression identity, causality and cost
+
+All 47 re-measured examples that already had an event-chain@3 record (28 sentinels and
+19 clean parents and controls, latest record in g032 or g031b, verified by hash) have
+byte-identical decision records, raw reports, following and assessment evaluations.
+
+| Cost (Intel Core i7-8750H, Node 22.22.1; provisional host only) | Result | Approved gate |
+|---|---|---|
+| Maximum sustained ratio, finish included | 0.00183 | ≤ 0.25 |
+| Maximum chunk p99 | 0.166 ms | ≤ 10 ms |
+| Prefix checks | 2,874/2,874 | every check |
+| Evaluation wall time | 47.0 s | routine target about 2 minutes |
+
+| Artifact | Path / hash |
+|---|---|
+| Frozen set | `/home/williao/dev/mnx-listening-data/contract2-rushed-bar-v1/manifest.json`; `102915fe315a1fb84a810a9755353a76d87258c35b008b00d02a3db4f5e364d3` |
+| Per-example results | `…/diagnostic-runs/g033-rushed-bar/results.json`; `2981a5a2138fdeb9de70b47c18f9479c1bf19c9a2ad4cf287fef3e1928b49168` |
+| Aggregates, margins, identity and per-bar flag rows | `…/diagnostic-runs/g033-rushed-bar/aggregate-details.json`; `a46fcdf9bbeb70ec13769d13572b8ee691f7ea11af6b6e4960915fb629c52d79` |
+| Public summary | 49,830 bytes; `a8c7bad94f319ce838786f81805d262c6ac040d7101a050e6773c6c10f753a18` |
+
+No listener, evaluator, oracle, contract, score, frozen baseline or earlier set was
+edited.
+
+## Against the predictions
+
+| # | Verdict | Evidence |
+|---|---|---|
+| 1 | Held | 144/144 cursor passes; 1,920/1,920 events; zero ahead; maximum delay 49.5 ms; on-event 100% |
+| 2 | Held | 1,920/1,920 notes; 1,776/1,776 intervals, maximum error 18.9 ms; overall error ≤ 0.21%; zero false findings |
+| 3 | Mixed: flag counts held, ratio-error bound contradicted | 64/66 fast, both misses at the threshold; zero false alarms; but 4 of 480 bar ratios err by more than ±0.015 (up to +0.0256 on an ineligible s2 bar); none affects a flag, and the bound is tighter than any gate |
+| 4 | Held | All 304 new controls reject; 8 clean parents with no flags; every earlier sentinel group passes |
+| 5 | Held | 2,874/2,874 prefixes; sustained 0.00183, p99 0.166 ms; 47/47 earlier records byte-identical |
+
+## Decision
+
+**D1 applies**: every active example, both declared pools, every earlier sentinel
+group and every prefix and cost gate passes, with valid construction and provenance.
+The ratio-error contradiction is a prediction tighter than any gate, recorded with
+its cause, and does not change the decision.
+
+event-chain@3 remains incumbent. **Rushed bar becomes passed**, with sentinels chosen
+by the frozen margin rule: performances rb-s2-99-b2-115, rb-s3-99-b2-115 and
+rb-s2-90-b1-125; controls sil-s2-45 and w2-rb-s2-63-b1-125 (s2),
+sil-rb-s3-63-b1-130 and w2-rb-s3-90-b2-125 (s3). The routine union grows from 28 to
+35 IDs. Every earlier state is preserved: stage 1 confirmed; hesitation, slowed bar,
+four-bar and held-note passed. Nothing is confirmed or retired: earlier substages
+again had sentinel-only checks, and rushed-bar has one evaluation. No oracle was
+created or re-versioned, so no audit is due.
+
+### Resulting stopping count, budgets and evidence access
+
+**0** consecutive failing listener versions; **three** development listener versions;
+**eight** completed listener comparisons (this adds one unchanged-version diagnostic).
+All six qualification versions, twelve assessment slots and every reserved and final
+access remain unused; Winner bars 5–8 unexamined. Full sweep last g031b. The batch
+advances to **4 of 5**; 034 is its last run, and the batch end makes a full sweep due
+there.
+
+## Next
+
+Next in contract 2's order is **a missing event**, the first deviation that changes
+what sounds rather than when. It is also the first test of the live cursor's recovery
+gate and of `missing` findings. Because 034 ends the batch, the full sweep falls due
+there: 034 can attempt the missing event and run the sweep in the same evaluation, as
+031 did, or run the sweep alone; that is its experimenter's choice to pre-register.
+
+Exact-threshold flags remain a coin flip at the event chain's 10 ms onset resolution
+(four misses in five such positives over g031b and g033), within the approved pooled gate.
+That would matter only if a later stage puts many bars near the threshold or coarsens
+onsets, as recorded guitar may; it is an observation, not a proposal.
+
+Direction of travel: the event-state cursor and the offline interval and bar-flag
+reporting survive a change of local tempo in both directions, and are plausible to
+keep through chords and longer scores. The sine zero-crossing pitch estimator and its
+hop-quantised onsets are the parts expected to need replacing for recorded guitar.
+
+**Awaiting the user:** nothing new. Evidence-based gates before stage 4 (recorded
+guitar) and later qualification and Studio product decisions remain standing. The
+session's direction is recorded verbatim:
+
+> You cannot ask the user questions: record anything that needs them in your report and the research log.
+
+## Attribution
+
+Designed, implemented, executed and recorded by **Claude Opus 5.5 in Claude Code**.
+The pre-registration passed the landing gate before any code existed; the stimulus
+tests and bench type check passed before the source commit; the final rebased-tree
+gate runs before landing.

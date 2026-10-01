@@ -26,6 +26,8 @@ not here. The first series' reports, 001–021, are in
 
 | 032 | [Hold through a hesitation while the preceding note sounds](032-held-note-hesitation.html) | [g032](../runs/g032-held-note-hesitation/summary.json), D1 |
 
+| 033 | [One rushed bar, on the two-bar scale and the four-bar melody](033-rushed-bar.html) | [g033](../runs/g033-rushed-bar/summary.json), D1 |
+
 ## One experiment, one file
 
 Its pre-registration section is committed and landed before anything runs: the

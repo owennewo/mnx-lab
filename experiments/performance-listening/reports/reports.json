@@ -146,6 +146,19 @@
         "href": "031-other-bars-reporting.html",
         "label": "Experiment031"
       }
+    },
+    {
+      "number": "033",
+      "slug": "033-rushed-bar",
+      "title": "033 \u00b7 One rushed bar, on the two-bar scale and the four-bar melody",
+      "banner": "D1 \u00b7 unchanged event-chain@3 \u00b7 all 144 rushed bars and 288 controls pass \u00b7 first fast flags 64/66, both misses on the threshold, zero false alarms \u00b7 earlier sentinels byte-identical",
+      "runs": [
+        "g033-rushed-bar"
+      ],
+      "previous": {
+        "href": "032-held-note-hesitation.html",
+        "label": "Experiment 032"
+      }
     }
   ]
 }
