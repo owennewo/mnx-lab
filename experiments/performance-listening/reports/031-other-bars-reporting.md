@@ -319,3 +319,110 @@ Pre-registration landed at `00665bba` before implementation. It passed the gate
 (489 bench tests, 44 files). event-chain@3's three behavioural tests and the bench
 TypeScript passed before execution. No oracle was created or re-versioned, so no
 audit is due from this experiment.
+
+## Completion: g031b, by the user's authority
+
+The D3 decision above stands as recorded. After it, the user chose the first route
+in **Next**. Their words are quoted in the research log's Current batch section:
+
+> g031b is fine
+
+So the frozen pre-registration above was completed **unchanged** as
+[g031b-reporting-sweep](../runs/g031b-reporting-sweep/summary.json): same question,
+method, listener (event-chain@3), evidence, predictions and decision rules. It ran
+from tag `g031b-reporting-sweep-source` (`2f41c63e`, before any rebase) and was run
+by **Claude Opus 5.5 in Claude Code**. It adds no run to the batch's count.
+
+**Runner repairs only, each committed before measuring:**
+
+1. Per-example results move to a private artifact named by hash (committed after
+   g031a). Before measuring, a dry assembly rebuilt the would-be summary from g031a's
+   private aggregates under this writer: about 60 KB against the 300 KB limit. The
+   overflow had been the inlined per-example results. The real summary is 58,202 bytes.
+2. The first g031b start refused at its first check, before creating any run
+   directory: the runner compared the whole report with the pre-registration, and
+   results are now appended below it. It now requires that the pre-registration be an
+   unchanged prefix. No run ID was consumed.
+
+### Results
+
+**D1: passed.** All 516 examples, every pool, every frozen sentinel, causality and
+cost pass. Run time 1,683 s, almost all of it fresh baselines on four bars.
+
+| Evidence | Performances / controls | Cursor pass | Assessment pass | Pooled flags | Identity with @2 | State |
+|---|---|---|---|---|---|---|
+| Stage 1 | 8 / 16 | 24/24 | 24/24 | No flags; false alarms 0/12 slow, 0/12 fast | 24/24 | passed → **confirmed** |
+| Silent hesitation | 40 / 80 | 120/120 | 120/120 | No flags; false alarms 0/60, 0/60 (030: 35/60 slow) | 120/120 | open → **passed** |
+| Slowed s2 bar | 40 / 80 | 120/120 | 120/120 | No flags; false alarms 0/80, 0/80 (030: 16/80 each way) | 120/120 | open → **passed** |
+| Four-bar clean + slowed | 84 / 168 | 252/252 | 252/252 | Slow found **89/91**; false alarms 0/208 slow, 0/299 fast | 252/252 | open → **passed** |
+
+- **Identity.** On all 516 examples @3's decision records (IDs included), notes,
+  overall tempo and intervals are byte-identical to @2's stored outputs. The bar
+  summaries equal 030's promoted summaries: 1,320 bars, no structural difference,
+  relative difference 0 (`compare031.ts` on g031b).
+- **The two misses** are 030's boundary cases, `sb-s3-90-b1-90` and
+  `sb-s3-99-b1-90`, with truth ratios 0.89999719 and 0.90000000.
+- **Everything else.** 1,952 events reached (maximum delay 49.29 ms; minimum on-event
+  fraction 99.21%); 1,780/1,780 intervals within tolerance (maximum error 18.90 ms);
+  every note assessed; 344/344 controls reject, with no claimed note or tempo.
+- **Causality and cost.** 3,096/3,096 prefix checks pass; maximum sustained ratio
+  0.002278, chunk p99 0.120 ms, backlog 0 (i7-8750H, Node 22.22.1, provisional).
+- **Agreement with g031a's diagnostics.** Every musical and identity count equals
+  the observations recorded above.
+
+**Baselines** (264 examples cited after hash and producer verification, 252 fresh):
+
+| Baseline | Four-bar performance cursor pass | At 45, cursor fail | Four-bar controls cursor pass | Historical controls cursor pass | Examples passed | Fresh cost max (ratio / p99) | Prefixes |
+|---|---|---|---|---|---|---|---|
+| clock-follower@1 | 1/84 | 21/21 | 0/168 | 0/176 | 0/516 | 0.0018 / 0.035 ms | 24 pass |
+| online-time-warp@8 | 5/84 | 21/21 | 168/168 | 176/176 | 0/516 | 0.152 / 3.09 ms | 24 pass |
+| online-time-warp@12 | 1/84 | 21/21 | 168/168 | 176/176 | 0/516 | 0.160 / 3.16 ms | 24 pass |
+| online-time-warp@14 | 1/84 | 21/21 | 168/168 | 176/176 | 0/516 | 0.147 / 2.21 ms | 24 pass |
+
+### Against the predictions
+
+| # | Verdict | Evidence |
+|---|---|---|
+| 1 | Held | 516/516 identical records and musical output |
+| 2 | Held | No flag on any s1/s2 example; every s1/s2 bar ineligible; 264/264 pass; zero false alarms; 030's 18 clean failures pass |
+| 3 | Held | Four clean performances unflagged; slow 89/91 (inside 87–89), both known misses remain; zero false alarms; summaries identical to 030's |
+| 4 | Held | 3,096 prefix checks; ratio 0.0023 ≤ 0.005, p99 0.120 ms ≤ 0.5 ms |
+| 5 | Held | stage1 confirmed; hesitation, slowedBar, four-bar passed; sentinels re-chosen; zero retirements |
+| 6 | Held | Cited evaluations reproduce; no baseline passes any four-bar performance; all fail every 45 performance; the clock fails all 168 four-bar controls; each time warper passes 168/168 |
+
+### Decision on the completion
+
+**D1.** event-chain@3 is the incumbent. The [suite record](../bench/suite-record.json)
+is updated only as method 7 says:
+
+- stage1 is `confirmed`; hesitation, slowedBar and four-bar are `passed`, all with
+  g031b as evidence;
+- sentinels are re-chosen by the frozen rule (24 routine IDs);
+- earlier passes and sentinels are kept under `previousIncumbent`;
+- nothing retires; the next full sweep is due no later than 036, or earlier at
+  batch end, new gates or a stage claim.
+
+The stopping count resets to **0** (the version cleared the lowest open substage).
+
+One observation on sentinels. The performance sentinels equal g031a's, but three of
+the control sentinels differ (for example `sil-s1-99` here, `sil-s1-90` in g031a).
+Control margins include measured cost terms, so run-to-run timing noise breaks
+near-ties among controls. Performance margins mostly tie at 0.75 or 0.735, the
+50 ms event-delay quantum, and are separated by the ASCII tie-break. Both are
+consequences of the frozen rule. Neither is a gate question; this is flagged for the reviewer.
+
+### Resulting stopping count, budgets and evidence access, after g031b
+
+**0 consecutive failing listener versions.** Three development listener versions,
+with event-chain@3 the incumbent. Six completed listener comparisons. All six
+qualification versions and twelve assessment slots and every reserved/final access
+remain unused. Winner bars 5–8 unexamined. No set retired. Full sweep done (g031b);
+the next is due by 036. The batch continues at run 3 of 5 (032).
+
+### Next, after the completion
+
+Stage 2 continues in the order of work: the **held-note hesitation** (question 19),
+the previous note ringing through the pause. Its routine suite is its own examples
+plus the 24 sentinels and their controls. The four-bar boundary sensitivity stays a
+monitoring item, not a reason to tune. **Awaiting the user:** nothing new. The
+standing request for recorded-guitar gates before stage 4 remains.

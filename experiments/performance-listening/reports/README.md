@@ -22,7 +22,7 @@ not here. The first series' reports, 001–021, are in
 
 | 030 | [Revalidate the incumbent with audited current instruments](030-current-instruments.html) | [g030](../runs/g030-current-instruments/summary.json) |
 
-| 031 | [Report bar flags against the other bars, in a full sweep](031-other-bars-reporting.html) | Unresolved infrastructure: [g031](../runs/g031-reporting-sweep/summary.json) and [g031a](../runs/g031a-reporting-sweep/summary.json), both preserved failures |
+| 031 | [Report bar flags against the other bars, in a full sweep](031-other-bars-reporting.html) | Unresolved infrastructure: [g031](../runs/g031-reporting-sweep/summary.json) and [g031a](../runs/g031a-reporting-sweep/summary.json), both preserved failures; completed by [g031b](../runs/g031b-reporting-sweep/summary.json), D1 |
 
 ## One experiment, one file
 

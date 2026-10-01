@@ -123,10 +123,11 @@
       "number": "031",
       "slug": "031-other-bars-reporting",
       "title": "031 \u00b7 Report bar flags against the other bars, in a full sweep",
-      "banner": "Unresolved infrastructure \u00b7 g031 and its one rerun g031a both failed in the runner \u00b7 no verdict, no state change \u00b7 batch ends at 2 of 5",
+      "banner": "D3 on g031/g031a, then completed as g031b by the user's authority: D1 \u00b7 event-chain@3 identical to @2 but its flags \u00b7 no short-score flags \u00b7 four-bar slow 89/91 \u00b7 stage1 confirmed, hesitation/slowedBar/four-bar passed",
       "runs": [
         "g031-reporting-sweep",
-        "g031a-reporting-sweep"
+        "g031a-reporting-sweep",
+        "g031b-reporting-sweep"
       ],
       "previous": {
         "href": "030-current-instruments.html",

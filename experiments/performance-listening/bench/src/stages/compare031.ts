@@ -1,8 +1,8 @@
 /** 031, read-only: event-chain@3's bar summaries against 030's promoted summaries of @2's
  * intervals (prediction 3). Runs no listener; reads verified private artifacts only. */
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { existsSync, readFileSync } from 'node:fs';
+import { basename, join } from 'node:path';
 import { encode, EXPERIMENT } from '../io.ts';
 import { sha } from '../ladder/privateSets.ts';
 
@@ -12,7 +12,11 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const [privateRun] = process.argv.slice(2);
   if (!privateRun) throw new Error('Usage: compare031.ts <private 031 run directory>');
   // g031a wrote no public summary; its files are named by the post-failure inventory's hashes.
-  const inventory = JSON.parse(readFileSync(join(privateRun, 'post-failure-inventory.json'), 'utf8')).files as Record<string, string>;
+  // g031b's are named by its results artifact.
+  const inventory: Record<string, string> = existsSync(join(privateRun, 'results.json'))
+    ? Object.fromEntries(Object.values(JSON.parse(readFileSync(join(privateRun, 'results.json'), 'utf8')) as Record<string, { artifact: Artifact }>)
+      .map(r => [basename(r.artifact.path), r.artifact.sha256]))
+    : JSON.parse(readFileSync(join(privateRun, 'post-failure-inventory.json'), 'utf8')).files;
   const read = (a: Artifact) => { const bytes = readFileSync(a.path); assert.equal(sha(bytes), a.sha256, a.path); return JSON.parse(bytes.toString()); };
   const old = JSON.parse(readFileSync(join(EXPERIMENT, 'runs/g030-current-instruments/summary.json'), 'utf8')).results as Record<string, { artifact: Artifact }>;
   let bars = 0, structural = 0, maxRelative = 0;

@@ -3,23 +3,27 @@
   "policy": "contracts/development-contract-2.md",
   "definition": "contracts/event-instruments-3.md",
   "bootstrapRun": "g028-other-bars-suite",
-  "listener": "event-chain@2",
+  "listener": "event-chain@3",
   "instrumentAudit": "event-oracle@3 pending; B1 discrepancy requires independent resolution",
   "stages": [
     {
       "id": "stage1",
-      "status": "passed",
-      "listener": "event-chain@2",
+      "status": "confirmed",
+      "listener": "event-chain@3",
       "instruments": {
         "following": "following-evaluator@2",
-        "assessment": "assessment-evaluator@2",
-        "gates": "stage-gates@1"
+        "assessment": "assessment-evaluator@3",
+        "gates": "stage-gates@2",
+        "oracle": "event-oracle@4"
       },
       "passEvidence": {
         "path": "runs/g027a-live-confirmation/summary.json",
         "sha256": "10ab4aa8faaa1b3f8f49bef674bbfe0bc0e8cab3e41705302aceadfda728f840"
       },
-      "confirmedEvidence": null,
+      "confirmedEvidence": {
+        "path": "runs/g031b-reporting-sweep/summary.json",
+        "sha256": "d73ce41accb59ec42d56f87cf06b01d480d806ecb1bffd14faf09b936ad305ab"
+      },
       "version3Revalidation": "completed: passed",
       "examples": [
         "s1-45",
@@ -54,8 +58,8 @@
           "kind": "performance",
           "margin": 0.734969578220063,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.s2-99.json",
-            "sha256": "7b03e3e680737107ca2ac31c81f59d83ff53f1448f235395f04a330ad884c928"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g031b-reporting-sweep/event-chain-3.s2-99.json",
+            "sha256": "6c929dcf95caa7a86c29a610a4443c6c051d4f24b4c20fbc0991f047ce7328ba"
           }
         },
         {
@@ -64,8 +68,8 @@
           "kind": "performance",
           "margin": 0.7499999999999942,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.s1-90.json",
-            "sha256": "bf2fba6b3b47bece3cd5c893820f352d69aff433b5acdd32370cbdc6779bec03"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g031b-reporting-sweep/event-chain-3.s1-90.json",
+            "sha256": "4175571d79c5fbfbfadab26d012aeb0bfbba5e76163b3c8f5840fa0cb7cbdd53"
           }
         },
         {
@@ -74,60 +78,59 @@
           "kind": "performance",
           "margin": 0.7499999999999942,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.s2-90.json",
-            "sha256": "2b244f8448bc96899be8f64177fbd330bb90a56fa1f1d0e163712746d4e03660"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g031b-reporting-sweep/event-chain-3.s2-90.json",
+            "sha256": "cec186c928b4db181674079f51737812144c6d59f39ef19a3a52a93d6779e99d"
           }
         },
         {
-          "id": "sil-s1-45",
+          "id": "sil-s1-99",
           "score": "s1",
           "kind": "silence",
-          "margin": 0.997613772,
+          "margin": 0.997705392,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.sil-s1-45.json",
-            "sha256": "cbf020220f40c316d648a51a63d20eb9b9fe9ff423ea1f7364e41a5293fc792c"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g031b-reporting-sweep/event-chain-3.sil-s1-99.json",
+            "sha256": "ab8f0bf8280bb7b9903682876ca2ee1b442e9b6f2f8a62d23309f891367f902f"
           }
         },
         {
           "id": "w2-s1-99",
           "score": "s1",
           "kind": "wrong-score",
-          "margin": 0.997513884,
+          "margin": 0.997453728,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.w2-s1-99.json",
-            "sha256": "1bccc2422549c220a41a63780fbb67e7009a4a8adb4a07251605d5582fe4d37c"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g031b-reporting-sweep/event-chain-3.w2-s1-99.json",
+            "sha256": "7d04b2f6eb82cd60f885b95e6c4dfa905fc7ab42cce908b1f6ae3ecc40fb8f6e"
           }
         },
         {
-          "id": "sil-s2-99",
+          "id": "sil-s2-90",
           "score": "s2",
           "kind": "silence",
-          "margin": 0.99782828,
+          "margin": 0.998004288,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.sil-s2-99.json",
-            "sha256": "08d8ce211ab2cce0efedc4b807ad99416a81860ebf1ab59f7387060d11a6468c"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g031b-reporting-sweep/event-chain-3.sil-s2-90.json",
+            "sha256": "64e704b0a03a96202fd302676c101556c1d865a97f60698045aa312ab3c92c59"
           }
         },
         {
-          "id": "w2-s2-99",
+          "id": "w2-s2-90",
           "score": "s2",
           "kind": "wrong-score",
-          "margin": 0.997750812,
+          "margin": 0.997896624,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.w2-s2-99.json",
-            "sha256": "6f3005982908776ab340b94a6d66574c8069b12e85164cac29e350e8cec4df5f"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g031b-reporting-sweep/event-chain-3.w2-s2-90.json",
+            "sha256": "b5bd5efe450d6c9d2391b546fe9bfc3b477b4ee75d0abf3ca0f991500246155d"
           }
         }
       ],
       "incumbentPassHistory": [
-        "g027a-live-confirmation",
-        "g030-current-instruments"
+        "g031b-reporting-sweep"
       ],
       "retired": false,
       "currentRevalidation": {
         "evidence": {
-          "path": "runs/g030-current-instruments/summary.json",
-          "sha256": "e171eb948d599b695b9a14d96dd3236941cb0d1af7e0edb1b86eda3d244a5496"
+          "path": "runs/g031b-reporting-sweep/summary.json",
+          "sha256": "d73ce41accb59ec42d56f87cf06b01d480d806ecb1bffd14faf09b936ad305ab"
         },
         "instruments": {
           "following": "following-evaluator@2",
@@ -136,23 +139,112 @@
           "oracle": "event-oracle@4"
         },
         "passed": true,
-        "ownSentinelsPassed": true,
-        "status": "passed",
-        "outputProducer": "unchanged event-chain@2; lossless report030 promotion"
+        "sentinelsPassed": true,
+        "status": "confirmed",
+        "outputProducer": "event-chain@3, fresh in the full sweep"
+      },
+      "previousIncumbent": {
+        "listener": "event-chain@2",
+        "instruments": {
+          "following": "following-evaluator@2",
+          "assessment": "assessment-evaluator@2",
+          "gates": "stage-gates@1"
+        },
+        "passEvidence": {
+          "path": "runs/g027a-live-confirmation/summary.json",
+          "sha256": "10ab4aa8faaa1b3f8f49bef674bbfe0bc0e8cab3e41705302aceadfda728f840"
+        },
+        "sentinels": [
+          {
+            "id": "s2-99",
+            "score": "s2",
+            "kind": "performance",
+            "margin": 0.734969578220063,
+            "artifact": {
+              "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.s2-99.json",
+              "sha256": "7b03e3e680737107ca2ac31c81f59d83ff53f1448f235395f04a330ad884c928"
+            }
+          },
+          {
+            "id": "s1-90",
+            "score": "s1",
+            "kind": "performance",
+            "margin": 0.7499999999999942,
+            "artifact": {
+              "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.s1-90.json",
+              "sha256": "bf2fba6b3b47bece3cd5c893820f352d69aff433b5acdd32370cbdc6779bec03"
+            }
+          },
+          {
+            "id": "s2-90",
+            "score": "s2",
+            "kind": "performance",
+            "margin": 0.7499999999999942,
+            "artifact": {
+              "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.s2-90.json",
+              "sha256": "2b244f8448bc96899be8f64177fbd330bb90a56fa1f1d0e163712746d4e03660"
+            }
+          },
+          {
+            "id": "sil-s1-45",
+            "score": "s1",
+            "kind": "silence",
+            "margin": 0.997613772,
+            "artifact": {
+              "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.sil-s1-45.json",
+              "sha256": "cbf020220f40c316d648a51a63d20eb9b9fe9ff423ea1f7364e41a5293fc792c"
+            }
+          },
+          {
+            "id": "w2-s1-99",
+            "score": "s1",
+            "kind": "wrong-score",
+            "margin": 0.997513884,
+            "artifact": {
+              "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.w2-s1-99.json",
+              "sha256": "1bccc2422549c220a41a63780fbb67e7009a4a8adb4a07251605d5582fe4d37c"
+            }
+          },
+          {
+            "id": "sil-s2-99",
+            "score": "s2",
+            "kind": "silence",
+            "margin": 0.99782828,
+            "artifact": {
+              "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.sil-s2-99.json",
+              "sha256": "08d8ce211ab2cce0efedc4b807ad99416a81860ebf1ab59f7387060d11a6468c"
+            }
+          },
+          {
+            "id": "w2-s2-99",
+            "score": "s2",
+            "kind": "wrong-score",
+            "margin": 0.997750812,
+            "artifact": {
+              "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.w2-s2-99.json",
+              "sha256": "6f3005982908776ab340b94a6d66574c8069b12e85164cac29e350e8cec4df5f"
+            }
+          }
+        ],
+        "incumbentPassHistory": [
+          "g027a-live-confirmation",
+          "g030-current-instruments"
+        ]
       }
     },
     {
       "id": "hesitation",
-      "status": "open",
-      "listener": "event-chain@2",
+      "status": "passed",
+      "listener": "event-chain@3",
       "instruments": {
         "following": "following-evaluator@2",
-        "assessment": "assessment-evaluator@2",
-        "gates": "stage-gates@1"
+        "assessment": "assessment-evaluator@3",
+        "gates": "stage-gates@2",
+        "oracle": "event-oracle@4"
       },
       "passEvidence": {
-        "path": "runs/g027a-live-confirmation/summary.json",
-        "sha256": "10ab4aa8faaa1b3f8f49bef674bbfe0bc0e8cab3e41705302aceadfda728f840"
+        "path": "runs/g031b-reporting-sweep/summary.json",
+        "sha256": "d73ce41accb59ec42d56f87cf06b01d480d806ecb1bffd14faf09b936ad305ab"
       },
       "confirmedEvidence": null,
       "version3Revalidation": "completed: failed; owning substage reopened",
@@ -285,8 +377,8 @@
           "kind": "performance",
           "margin": 0.7499999999999942,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.h-s2-90-1000.json",
-            "sha256": "06a92d615348423b447a812ecff2153bd6c592b8e0ae707fb2888347da18a27d"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g031b-reporting-sweep/event-chain-3.h-s2-90-1000.json",
+            "sha256": "a70addfdbff4211bfa76b12323c20e024e68dd06277d0f065c06d5ca815017ee"
           }
         },
         {
@@ -295,8 +387,8 @@
           "kind": "performance",
           "margin": 0.7499999999999942,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.h-s2-90-2000.json",
-            "sha256": "c34c84bea0ba287abbb7ce1abb7234a788f6c85496b3a29991a1ba47a5d5ab6f"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g031b-reporting-sweep/event-chain-3.h-s2-90-2000.json",
+            "sha256": "ce922e7fc9e7c4a85bd83d7484cd06c131721aa0f7ea77188836f49be6400856"
           }
         },
         {
@@ -305,59 +397,59 @@
           "kind": "performance",
           "margin": 0.7499999999999942,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.h-s2-90-300.json",
-            "sha256": "23966716dee8e6324d744f464093c4bcdf11b8781715d5d656d532921e3d0800"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g031b-reporting-sweep/event-chain-3.h-s2-90-300.json",
+            "sha256": "a49974b164fc64e0f89608153d7126a7ccd76ad1509ac4ee43229d099b782e76"
           }
         },
         {
-          "id": "sil-h-s1-99-1000",
+          "id": "sil-h-s1-90-300",
           "score": "s1",
           "kind": "silence",
-          "margin": 0.996156392,
+          "margin": 0.99760456,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.sil-h-s1-99-1000.json",
-            "sha256": "4563545b17ebd62741e69d129bc0af968fa53b1989ab2038ad4df14bb688d847"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g031b-reporting-sweep/event-chain-3.sil-h-s1-90-300.json",
+            "sha256": "a728ea8181edc2a63daaca11c3ea62f435c469d8e4f7b505b1df2ddbc859181d"
           }
         },
         {
-          "id": "w2-h-s1-63-1000",
+          "id": "w2-h-s1-99-1000",
           "score": "s1",
           "kind": "wrong-score",
-          "margin": 0.996385788,
+          "margin": 0.997112944,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.w2-h-s1-63-1000.json",
-            "sha256": "a649bfcf7ae020d82597f7c831212350f4313d105df3ef8678e443293bd865bb"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g031b-reporting-sweep/event-chain-3.w2-h-s1-99-1000.json",
+            "sha256": "4fcd0212f82c56353793cc5c38b252c1d74c4606ec6b129cf19f1a446b73cd96"
           }
         },
         {
-          "id": "sil-h-s2-63-2000",
+          "id": "sil-h-s2-63-1000",
           "score": "s2",
           "kind": "silence",
-          "margin": 0.995925368,
+          "margin": 0.996510188,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.sil-h-s2-63-2000.json",
-            "sha256": "df1cc8c7dcfab7d2a070008d0b1031431f5b446d06a27536e1db14211b2e8330"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g031b-reporting-sweep/event-chain-3.sil-h-s2-63-1000.json",
+            "sha256": "d43feef352c2042960579bb61ce20028f902e30a46c954877b88db2e9981e87f"
           }
         },
         {
-          "id": "w2-h-s2-99-300",
+          "id": "w2-h-s2-90-1000",
           "score": "s2",
           "kind": "wrong-score",
-          "margin": 0.997352592,
+          "margin": 0.996343244,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.w2-h-s2-99-300.json",
-            "sha256": "d2dc85d94f814390ef69bb173d4268bbe2e01cfbdcca371b6ac47c3b342e7f9c"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g031b-reporting-sweep/event-chain-3.w2-h-s2-90-1000.json",
+            "sha256": "8e15c210a02dc14c58029a3eaf61ee6138123d9a436e6e838834c933e238bc2c"
           }
         }
       ],
       "incumbentPassHistory": [
-        "g027a-live-confirmation"
+        "g031b-reporting-sweep"
       ],
       "retired": false,
       "currentRevalidation": {
         "evidence": {
-          "path": "runs/g030-current-instruments/summary.json",
-          "sha256": "e171eb948d599b695b9a14d96dd3236941cb0d1af7e0edb1b86eda3d244a5496"
+          "path": "runs/g031b-reporting-sweep/summary.json",
+          "sha256": "d73ce41accb59ec42d56f87cf06b01d480d806ecb1bffd14faf09b936ad305ab"
         },
         "instruments": {
           "following": "following-evaluator@2",
@@ -365,24 +457,112 @@
           "gates": "stage-gates@2",
           "oracle": "event-oracle@4"
         },
-        "passed": false,
-        "ownSentinelsPassed": false,
-        "status": "open",
-        "outputProducer": "unchanged event-chain@2; lossless report030 promotion"
+        "passed": true,
+        "sentinelsPassed": true,
+        "status": "passed",
+        "outputProducer": "event-chain@3, fresh in the full sweep"
+      },
+      "previousIncumbent": {
+        "listener": "event-chain@2",
+        "instruments": {
+          "following": "following-evaluator@2",
+          "assessment": "assessment-evaluator@2",
+          "gates": "stage-gates@1"
+        },
+        "passEvidence": {
+          "path": "runs/g027a-live-confirmation/summary.json",
+          "sha256": "10ab4aa8faaa1b3f8f49bef674bbfe0bc0e8cab3e41705302aceadfda728f840"
+        },
+        "sentinels": [
+          {
+            "id": "h-s2-90-1000",
+            "score": "s2",
+            "kind": "performance",
+            "margin": 0.7499999999999942,
+            "artifact": {
+              "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.h-s2-90-1000.json",
+              "sha256": "06a92d615348423b447a812ecff2153bd6c592b8e0ae707fb2888347da18a27d"
+            }
+          },
+          {
+            "id": "h-s2-90-2000",
+            "score": "s2",
+            "kind": "performance",
+            "margin": 0.7499999999999942,
+            "artifact": {
+              "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.h-s2-90-2000.json",
+              "sha256": "c34c84bea0ba287abbb7ce1abb7234a788f6c85496b3a29991a1ba47a5d5ab6f"
+            }
+          },
+          {
+            "id": "h-s2-90-300",
+            "score": "s2",
+            "kind": "performance",
+            "margin": 0.7499999999999942,
+            "artifact": {
+              "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.h-s2-90-300.json",
+              "sha256": "23966716dee8e6324d744f464093c4bcdf11b8781715d5d656d532921e3d0800"
+            }
+          },
+          {
+            "id": "sil-h-s1-99-1000",
+            "score": "s1",
+            "kind": "silence",
+            "margin": 0.996156392,
+            "artifact": {
+              "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.sil-h-s1-99-1000.json",
+              "sha256": "4563545b17ebd62741e69d129bc0af968fa53b1989ab2038ad4df14bb688d847"
+            }
+          },
+          {
+            "id": "w2-h-s1-63-1000",
+            "score": "s1",
+            "kind": "wrong-score",
+            "margin": 0.996385788,
+            "artifact": {
+              "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.w2-h-s1-63-1000.json",
+              "sha256": "a649bfcf7ae020d82597f7c831212350f4313d105df3ef8678e443293bd865bb"
+            }
+          },
+          {
+            "id": "sil-h-s2-63-2000",
+            "score": "s2",
+            "kind": "silence",
+            "margin": 0.995925368,
+            "artifact": {
+              "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.sil-h-s2-63-2000.json",
+              "sha256": "df1cc8c7dcfab7d2a070008d0b1031431f5b446d06a27536e1db14211b2e8330"
+            }
+          },
+          {
+            "id": "w2-h-s2-99-300",
+            "score": "s2",
+            "kind": "wrong-score",
+            "margin": 0.997352592,
+            "artifact": {
+              "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.w2-h-s2-99-300.json",
+              "sha256": "d2dc85d94f814390ef69bb173d4268bbe2e01cfbdcca371b6ac47c3b342e7f9c"
+            }
+          }
+        ],
+        "incumbentPassHistory": [
+          "g027a-live-confirmation"
+        ]
       }
     },
     {
       "id": "slowedBar",
-      "status": "open",
-      "listener": "event-chain@2",
+      "status": "passed",
+      "listener": "event-chain@3",
       "instruments": {
         "following": "following-evaluator@2",
-        "assessment": "assessment-evaluator@2",
-        "gates": "stage-gates@1"
+        "assessment": "assessment-evaluator@3",
+        "gates": "stage-gates@2",
+        "oracle": "event-oracle@4"
       },
       "passEvidence": {
-        "path": "runs/g027a-live-confirmation/summary.json",
-        "sha256": "10ab4aa8faaa1b3f8f49bef674bbfe0bc0e8cab3e41705302aceadfda728f840"
+        "path": "runs/g031b-reporting-sweep/summary.json",
+        "sha256": "d73ce41accb59ec42d56f87cf06b01d480d806ecb1bffd14faf09b936ad305ab"
       },
       "confirmedEvidence": null,
       "version3Revalidation": "completed: failed; owning substage reopened",
@@ -515,8 +695,8 @@
           "kind": "performance",
           "margin": 0.7349695782200701,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.sb-s2-99-b1-90.json",
-            "sha256": "106d97ad2dd944e7d2883246ed0cce43e701c9e2efb572bc7d5a11352fc3d427"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g031b-reporting-sweep/event-chain-3.sb-s2-99-b1-90.json",
+            "sha256": "71cb48808a8ab15bc46ec6edba72cd0ddfada178f529ef5de16624284795fe7d"
           }
         },
         {
@@ -525,8 +705,8 @@
           "kind": "performance",
           "margin": 0.7349695782200704,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.sb-s2-99-b1-70.json",
-            "sha256": "7b82299498d3f2a076e8127260ca973e3db01ac745b515e3df67a11b79f4efa9"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g031b-reporting-sweep/event-chain-3.sb-s2-99-b1-70.json",
+            "sha256": "6b78d46565a623e53f04d358b3c3ec9fe25e484b356777455527797fb185fab4"
           }
         },
         {
@@ -535,39 +715,39 @@
           "kind": "performance",
           "margin": 0.7499999999999942,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.sb-s2-90-b2-50.json",
-            "sha256": "309bbef2ba87e57b30870e0f22143995ea9b9c46b6634cdc56640bc3cc4366ea"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g031b-reporting-sweep/event-chain-3.sb-s2-90-b2-50.json",
+            "sha256": "f7076b27a6d0d334f7412992016e06e404655921c1917d6798d459c58ec99728"
           }
         },
         {
-          "id": "sil-sb-s2-63-b1-60",
+          "id": "sil-sb-s2-90-b1-70",
           "score": "s2",
           "kind": "silence",
-          "margin": 0.995845436,
+          "margin": 0.997001532,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.sil-sb-s2-63-b1-60.json",
-            "sha256": "2bd23a21c8e637d526f2ce96bcfcffdd6c02b37453433f23f5248ef9eb1adc19"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g031b-reporting-sweep/event-chain-3.sil-sb-s2-90-b1-70.json",
+            "sha256": "9fd2635826303b8630ff6fc0b4883f7984f3972c7acde548ad55ce37a0d50808"
           }
         },
         {
-          "id": "w2-sb-s2-90-b2-50",
+          "id": "w2-sb-s2-99-b1-60",
           "score": "s2",
           "kind": "wrong-score",
-          "margin": 0.996809424,
+          "margin": 0.997183132,
           "artifact": {
-            "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.w2-sb-s2-90-b2-50.json",
-            "sha256": "013b14bab86e23693dea0fe290569dd35f5b8beb8224163eb54b85fcb2024602"
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g031b-reporting-sweep/event-chain-3.w2-sb-s2-99-b1-60.json",
+            "sha256": "5770c918c84ad2234cf471211f30411dd4563e214109fd1231e43947fcf35994"
           }
         }
       ],
       "incumbentPassHistory": [
-        "g027a-live-confirmation"
+        "g031b-reporting-sweep"
       ],
       "retired": false,
       "currentRevalidation": {
         "evidence": {
-          "path": "runs/g030-current-instruments/summary.json",
-          "sha256": "e171eb948d599b695b9a14d96dd3236941cb0d1af7e0edb1b86eda3d244a5496"
+          "path": "runs/g031b-reporting-sweep/summary.json",
+          "sha256": "d73ce41accb59ec42d56f87cf06b01d480d806ecb1bffd14faf09b936ad305ab"
         },
         "instruments": {
           "following": "following-evaluator@2",
@@ -575,23 +755,93 @@
           "gates": "stage-gates@2",
           "oracle": "event-oracle@4"
         },
-        "passed": false,
-        "ownSentinelsPassed": false,
-        "status": "open",
-        "outputProducer": "unchanged event-chain@2; lossless report030 promotion"
+        "passed": true,
+        "sentinelsPassed": true,
+        "status": "passed",
+        "outputProducer": "event-chain@3, fresh in the full sweep"
+      },
+      "previousIncumbent": {
+        "listener": "event-chain@2",
+        "instruments": {
+          "following": "following-evaluator@2",
+          "assessment": "assessment-evaluator@2",
+          "gates": "stage-gates@1"
+        },
+        "passEvidence": {
+          "path": "runs/g027a-live-confirmation/summary.json",
+          "sha256": "10ab4aa8faaa1b3f8f49bef674bbfe0bc0e8cab3e41705302aceadfda728f840"
+        },
+        "sentinels": [
+          {
+            "id": "sb-s2-99-b1-90",
+            "score": "s2",
+            "kind": "performance",
+            "margin": 0.7349695782200701,
+            "artifact": {
+              "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.sb-s2-99-b1-90.json",
+              "sha256": "106d97ad2dd944e7d2883246ed0cce43e701c9e2efb572bc7d5a11352fc3d427"
+            }
+          },
+          {
+            "id": "sb-s2-99-b1-70",
+            "score": "s2",
+            "kind": "performance",
+            "margin": 0.7349695782200704,
+            "artifact": {
+              "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.sb-s2-99-b1-70.json",
+              "sha256": "7b82299498d3f2a076e8127260ca973e3db01ac745b515e3df67a11b79f4efa9"
+            }
+          },
+          {
+            "id": "sb-s2-90-b2-50",
+            "score": "s2",
+            "kind": "performance",
+            "margin": 0.7499999999999942,
+            "artifact": {
+              "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.sb-s2-90-b2-50.json",
+              "sha256": "309bbef2ba87e57b30870e0f22143995ea9b9c46b6634cdc56640bc3cc4366ea"
+            }
+          },
+          {
+            "id": "sil-sb-s2-63-b1-60",
+            "score": "s2",
+            "kind": "silence",
+            "margin": 0.995845436,
+            "artifact": {
+              "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.sil-sb-s2-63-b1-60.json",
+              "sha256": "2bd23a21c8e637d526f2ce96bcfcffdd6c02b37453433f23f5248ef9eb1adc19"
+            }
+          },
+          {
+            "id": "w2-sb-s2-90-b2-50",
+            "score": "s2",
+            "kind": "wrong-score",
+            "margin": 0.996809424,
+            "artifact": {
+              "path": "/home/williao/dev/mnx-listening-data/contract2-slowed-bar-v1/runs/g027a-live-confirmation/event-chain-2.w2-sb-s2-90-b2-50.json",
+              "sha256": "013b14bab86e23693dea0fe290569dd35f5b8beb8224163eb54b85fcb2024602"
+            }
+          }
+        ],
+        "incumbentPassHistory": [
+          "g027a-live-confirmation"
+        ]
       }
     },
     {
       "id": "four-bar-tempo-revalidation",
-      "status": "open",
-      "listener": "event-chain@2",
+      "status": "passed",
+      "listener": "event-chain@3",
       "instruments": {
         "following": "following-evaluator@2",
         "assessment": "assessment-evaluator@3",
         "gates": "stage-gates@2",
         "oracle": "event-oracle@4"
       },
-      "passEvidence": null,
+      "passEvidence": {
+        "path": "runs/g031b-reporting-sweep/summary.json",
+        "sha256": "d73ce41accb59ec42d56f87cf06b01d480d806ecb1bffd14faf09b936ad305ab"
+      },
       "confirmedEvidence": null,
       "examples": [
         "s3-45",
@@ -847,24 +1097,93 @@
         "w2-sb-s3-99-b4-80",
         "w2-sb-s3-99-b4-90"
       ],
-      "sentinels": [],
-      "incumbentPassHistory": [],
+      "sentinels": [
+        {
+          "id": "s3-99",
+          "score": "s3",
+          "kind": "performance",
+          "margin": 0.734969578220063,
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g031b-reporting-sweep/event-chain-3.s3-99.json",
+            "sha256": "0d98cf2c783eb9c2de8514870ba81760f0287d13126de1f7a99e716793a0c151"
+          }
+        },
+        {
+          "id": "sb-s3-99-b3-50",
+          "score": "s3",
+          "kind": "performance",
+          "margin": 0.734969578220063,
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g031b-reporting-sweep/event-chain-3.sb-s3-99-b3-50.json",
+            "sha256": "14a58d7b1c036152c24ed73ee88ca9afb2f4a488eb1d860d04a9feae32a76b19"
+          }
+        },
+        {
+          "id": "sb-s3-99-b3-60",
+          "score": "s3",
+          "kind": "performance",
+          "margin": 0.734969578220063,
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g031b-reporting-sweep/event-chain-3.sb-s3-99-b3-60.json",
+            "sha256": "7510f0bd9f324e46f196418f6a1d45c447e76bd5b03df5c2db9c0b42b61f06a0"
+          }
+        },
+        {
+          "id": "sil-sb-s3-45-b2-90",
+          "score": "s3",
+          "kind": "silence",
+          "margin": 0.996853344,
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g031b-reporting-sweep/event-chain-3.sil-sb-s3-45-b2-90.json",
+            "sha256": "20cf9f7663ddb5d2cd24f20cd84dc6858fced368be285970810480b49e26110f"
+          }
+        },
+        {
+          "id": "w2-sb-s3-99-b1-80",
+          "score": "s3",
+          "kind": "wrong-score",
+          "margin": 0.997553396,
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g031b-reporting-sweep/event-chain-3.w2-sb-s3-99-b1-80.json",
+            "sha256": "ef41243b3f73697935d1e334c9dad336c8ebfcd41a7219a6a2c787aa8b1e75d6"
+          }
+        }
+      ],
+      "incumbentPassHistory": [
+        "g031b-reporting-sweep"
+      ],
       "retired": false,
       "currentRevalidation": {
         "evidence": {
-          "path": "runs/g030-current-instruments/summary.json",
-          "sha256": "e171eb948d599b695b9a14d96dd3236941cb0d1af7e0edb1b86eda3d244a5496"
+          "path": "runs/g031b-reporting-sweep/summary.json",
+          "sha256": "d73ce41accb59ec42d56f87cf06b01d480d806ecb1bffd14faf09b936ad305ab"
         },
-        "ownMeasurementsPassed": true,
-        "earlierSentinelsPassed": false,
-        "status": "open"
+        "instruments": {
+          "following": "following-evaluator@2",
+          "assessment": "assessment-evaluator@3",
+          "gates": "stage-gates@2",
+          "oracle": "event-oracle@4"
+        },
+        "passed": true,
+        "sentinelsPassed": true,
+        "status": "passed",
+        "outputProducer": "event-chain@3, fresh in the full sweep"
+      },
+      "previousIncumbent": {
+        "listener": "event-chain@2",
+        "instruments": {
+          "following": "following-evaluator@2",
+          "assessment": "assessment-evaluator@3",
+          "gates": "stage-gates@2",
+          "oracle": "event-oracle@4"
+        },
+        "passEvidence": null,
+        "sentinels": [],
+        "incumbentPassHistory": []
       }
     }
   ],
   "openSubstages": [
-    "hesitation",
-    "slowedBar",
-    "four-bar-tempo-revalidation",
     "held-note-hesitation",
     "rushed-bar",
     "missing-event",
@@ -878,7 +1197,7 @@
     "stage5-categories"
   ],
   "retiredSets": [],
-  "retirementReason": "No performance retirement: historical deviations reopened; only two incumbent evaluations, no qualifying harder active replacement.",
+  "retirementReason": "No performance retirement: event-chain@3 has one evaluation (g031b); retirement needs three successive passes and named harder active evidence.",
   "baselinePolicy": {
     "mode": "sweep-only",
     "since": "2026-09-30",
@@ -899,28 +1218,50 @@
         "path": "runs/g026-single-slowed-bar/summary.json",
         "sha256": "758ea9410c44dddfe2066e47cb9286ba2a933945c5e5ac37756f907aee000f34",
         "use": "Frozen baseline sweep-only evidence, no fresh baseline execution."
+      },
+      {
+        "path": "runs/g031b-reporting-sweep/summary.json",
+        "sha256": "d73ce41accb59ec42d56f87cf06b01d480d806ecb1bffd14faf09b936ad305ab",
+        "use": "Full sweep: historical baseline records cited by hash; four-bar baseline records fresh."
       }
     ]
   },
-  "lastFullComparison": "g026-single-slowed-bar",
-  "nextFullSweepNoLaterThan": 31,
-  "confirmation": "030 is routine diagnostic revalidation, no new confirmation; earlier instruments2 passes remain historical provenance.",
+  "lastFullComparison": "g031b-reporting-sweep",
+  "nextFullSweepNoLaterThan": 36,
+  "confirmation": "g031b, the full sweep owed by 031, confirms stage1 and passes hesitation, slowedBar and four-bar for event-chain@3. Sentinels were re-chosen at that sweep. Earlier instruments2 passes remain historical provenance under previousIncumbent.",
   "routineRegressionIds": [
+    "h-s2-90-1000",
+    "h-s2-90-2000",
+    "h-s2-90-300",
     "s1-90",
     "s2-90",
     "s2-99",
-    "sil-s1-45",
-    "sil-s2-99",
+    "s3-99",
+    "sb-s2-90-b2-50",
+    "sb-s2-99-b1-70",
+    "sb-s2-99-b1-90",
+    "sb-s3-99-b3-50",
+    "sb-s3-99-b3-60",
+    "sil-h-s1-90-300",
+    "sil-h-s2-63-1000",
+    "sil-s1-99",
+    "sil-s2-90",
+    "sil-sb-s2-90-b1-70",
+    "sil-sb-s3-45-b2-90",
+    "w2-h-s1-99-1000",
+    "w2-h-s2-90-1000",
     "w2-s1-99",
-    "w2-s2-99"
+    "w2-s2-90",
+    "w2-sb-s2-99-b1-60",
+    "w2-sb-s3-99-b1-80"
   ],
   "futureEvidence": {
     "manifest": "/home/williao/dev/mnx-listening-data/contract2-four-bar-tempo-v1/manifest.json",
     "sha256": "870363f2f36aa19a13aeee4d0faccff4e59d55ff8183fe8c32c868a803b5b60e",
     "listenerEvaluated": true,
     "evaluation": {
-      "path": "runs/g030-current-instruments/summary.json",
-      "sha256": "e171eb948d599b695b9a14d96dd3236941cb0d1af7e0edb1b86eda3d244a5496"
+      "path": "runs/g031b-reporting-sweep/summary.json",
+      "sha256": "d73ce41accb59ec42d56f87cf06b01d480d806ecb1bffd14faf09b936ad305ab"
     }
   },
   "validation": {
@@ -928,7 +1269,7 @@
     "sha256": "94e5f2f8bb1b16e0fa630813a00a0c3de96ad072219ddee0974815e3c97bbf5a"
   },
   "currentEvaluation": {
-    "path": "runs/g030-current-instruments/summary.json",
-    "sha256": "e171eb948d599b695b9a14d96dd3236941cb0d1af7e0edb1b86eda3d244a5496"
+    "path": "runs/g031b-reporting-sweep/summary.json",
+    "sha256": "d73ce41accb59ec42d56f87cf06b01d480d806ecb1bffd14faf09b936ad305ab"
   }
 }
