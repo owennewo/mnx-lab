@@ -20,6 +20,8 @@ not here. The first series' reports, 001–021, are in
 
 | 029 | [Correct and complete the event oracle](029-oracle-coverage.html) | [g029](../runs/g029-oracle-coverage/summary.json) |
 
+| 030 | [Revalidate the incumbent with audited current instruments](030-current-instruments.html) | [g030](../runs/g030-current-instruments/summary.json) |
+
 ## One experiment, one file
 
 Its pre-registration section is committed and landed before anything runs: the

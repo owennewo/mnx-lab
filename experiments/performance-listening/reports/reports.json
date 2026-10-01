@@ -105,6 +105,19 @@
         "href": "028-other-bars-suite.html",
         "label": "Experiment 028"
       }
+    },
+    {
+      "number": "030",
+      "slug": "030-current-instruments",
+      "title": "030 \u00b7 Revalidate the incumbent with audited current instruments",
+      "banner": "Resolved reporting failure \u00b7 all516 cursors pass \u00b767 short-score false flags \u00b7 hesitation/slowedBar reopen \u00b7 four-bar own measures pass",
+      "runs": [
+        "g030-current-instruments"
+      ],
+      "previous": {
+        "href": "029-oracle-coverage.html",
+        "label": "Experiment029"
+      }
     }
   ]
 }
