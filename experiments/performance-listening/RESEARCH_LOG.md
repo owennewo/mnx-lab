@@ -24,7 +24,10 @@ How to maintain it:
   later evidence contradicts a finding, its status becomes `superseded` and the row
   gains the evidence that did it; the row is never deleted or reworded to fit.
 - **Open questions** are ranked by the contract's order of work first, then by how much
-  uncertainty an answer would remove. The top row is the next question. A question
+  uncertainty an answer would remove. The top row is the next question. While a
+  challenger track is open, each track's highest open row is that track's next
+  question, as the contract's challenger section keeps the incumbent's questions in
+  their rank; which track runs next is the user's call or a batch's goal. A question
   that becomes a finding moves down with its evidence; one that a budget closes is
   marked `stopped`, with the reason.
 - A finding's numbers stay in the report it cites.
@@ -76,7 +79,7 @@ review of the batch: the Opus session, which writes none of it and is not the mo
 R9 and R10. The count is one numbered experiment; the audit and the review are not
 counted.
 
-**Closed at 1 of 1:** [035](reports/035-challenger-basic-pitch.md), GPT-6.1-Sol (high) in Codex, D1 continuation. Its assessment clears the fixed three-source criterion; Martin controls fail. The live spike has useful untrimmed observations but fails compute, and trimming misses deadlines. The independent [observation-seam@1 audit](bench/oracle-events/audit-observation-seam-1.md) agrees on all eight timing cases and lists two rule ambiguities and the uncovered rules (question 27); the independent batch process review follows. No promotion or incumbent change.
+**Closed at 1 of 1:** [035](reports/035-challenger-basic-pitch.md), GPT-6.1-Sol (high) in Codex, D1 continuation. Its assessment clears the fixed three-source criterion; Martin controls fail. The live spike has useful untrimmed observations but fails compute, and trimming misses deadlines. The independent [observation-seam@1 audit](bench/oracle-events/audit-observation-seam-1.md) agrees on all eight timing cases and lists two rule ambiguities and the uncovered rules (question 27); process review [R11](reviews.md#r11-after-the-challenger-batch-035-and-the-observation-seam-audit) covers the batch. No promotion or incumbent change.
 
 ### Previous batch, closed: 030–034
 
@@ -154,12 +157,15 @@ Latest fresh incumbent sweep is g034, next due no later than 039, with both trac
 numbers counting. No set is retired. [Audit 4](bench/oracle-events/audit-4.md) remains
 the current evaluator audit; the **observation-seam@1** timing audit is done
 ([audit](bench/oracle-events/audit-observation-seam-1.md): 8 agree, 0 disagree, 0
-ambiguous), its two rule ambiguities and uncovered rules are the new top question for
-the next numbered experiment, and the separate process review of this closed one-run
-batch follows.
+ambiguous), and its two rule ambiguities and uncovered rules are the challenger
+track's top question. Process review
+[R11](reviews.md#r11-after-the-challenger-batch-035-and-the-observation-seam-audit)
+covers this closed one-run batch; no review is due until the next experiment lands.
 
 **Awaiting the user:** whether the observation seam becomes a progression amendment,
-and recorded-guitar numerical gates before a formal stage-4 claim. R10's standing
+and recorded-guitar numerical gates before a formal stage-4 claim. R11 adds three: the
+incumbent on the challenger's guitar set, the promotion rule's wording, and whether the
+challenger's continuation must carry its live path. R10's standing
 sentinel tie-break/pool and baseline-sweep decisions remain open. The guitar-sound
 thermometer now has challenger evidence in 035, with no incumbent guitar comparison
 or microphone claim. Qualification and Studio product choices remain future decisions.
@@ -225,7 +231,8 @@ Status is `holds`, `superseded` or `withdrawn`.
 ## Open questions
 
 Ranked by row order; the top row is the next question. The number is an identifier
-given when a question opens and never reused.
+given when a question opens and never reused. Questions 24–27 belong to the challenger
+track; the highest open row of the rest, question 23, is the main track's next.
 
 | Rank | Question | Why it is ranked here | Status | Owner item |
 |---|---|---|---|---|

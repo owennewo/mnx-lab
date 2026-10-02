@@ -23,7 +23,13 @@ disagreement is as valuable as an agreement. Do not soften one to be polite.
 
 The research log's top open question names the oracle awaiting audit and the experiment
 that created or re-versioned it. Use the current state and top audit question to
-identify the work; do not read the findings or completed run results for that purpose.
+identify the work: read the log's Current state and Open questions sections, and skip
+its Findings table, which summarises completed run results.
+
+The same procedure audits any contract the contract says is audited like an oracle,
+such as a challenger's `contracts/observation-seam-N.md`. Read "oracle" as that
+contract's hand-worked cases, "instrument definitions" as its rules, and "the evaluator
+code" as the code that implements those rules (for a seam, its producers and adapter).
 Check that no audit of that version already exists in
 `bench/oracle-events/` and that no other worktree is doing one. If the log names no
 oracle awaiting an audit, stop and say so.
@@ -91,7 +97,8 @@ verdict:
 
 ## 4. Record, land, stop
 
-Write `bench/oracle-events/audit-N.md`, with N the oracle's version:
+Write `bench/oracle-events/audit-N.md`, with N the oracle's version, or
+`audit-<contract>-N.md` for another audited contract (`audit-observation-seam-1.md`):
 
 - the oracle's version and frozen hash, and the rule text you worked from, by file and
   version;
@@ -105,7 +112,8 @@ Write `bench/oracle-events/audit-N.md`, with N the oracle's version:
 
 Then update the research log: the question for this audit, its status to `answered`
 with the verdict and a link, or, where there are disagreements or ambiguities, a new top
-question for the next numbered experiment to resolve them; and the **current state**
+question, of the track whose rules were audited, for the next numbered experiment to
+resolve them; and the **current state**
 paragraph, whose sentence about the oracle awaiting its audit becomes the audit's
 outcome. You may also fill in the oracle README's audit entry for this version with a
 link and the summary line. Change nothing else: not the oracle, the instrument

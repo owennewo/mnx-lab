@@ -105,7 +105,10 @@ research log says is current.
   which binds it: its first experiment pre-registers an exploration budget in place of
   numbered predictions; it runs every example of every set it claims, not the incumbent's
   sentinels; its report slug and run IDs carry `challenger-` after the number; it may add
-  `contracts/observation-seam-N.md`. Everything else here applies unchanged.
+  `contracts/observation-seam-N.md`, whose hand-worked cases go in a file of their own
+  beside it, as an event oracle's do, so that its auditor can work from the rules before
+  seeing the answers. While a challenger track is open, "the top open question" means the
+  top of your own track's questions. Everything else here applies unchanged.
 - **Preserve the rules, not a predecessor's assumptions.** Contract 2, user directions
   and frozen evaluation rules bind you. A report's scientific explanation or
   restriction on future methods is not itself a contract: you may challenge it in a new
@@ -203,8 +206,8 @@ Then:
   re-ranked questions. Record the resulting stopping count and budget state in the report (one
   line if unchanged) and point to it from the log.
 
-If your experiment created or re-versioned an oracle, make its audit the research log's
-top open question, naming the oracle version.
+If your experiment created or re-versioned an oracle, or an observation seam, make its
+audit the top open question of your track, naming the version.
 
 Every commit you make has a short body saying what changed and why, and names your
 model and tool; `git log` should be readable without opening the report.

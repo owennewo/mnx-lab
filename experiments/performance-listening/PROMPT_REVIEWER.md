@@ -103,6 +103,9 @@ This is the check that matters most. The first series followed its rules faithfu
   each stage's listener is a throwaway or a step toward chords, recorded guitar and real
   playing (each report's Next now names what should survive).
 - Are the gates rewarding something the user would not want, or becoming unreachable?
+- While a challenger track is open ([TRACK_PROPOSALS.md](TRACK_PROPOSALS.md) proposal 1):
+  is the challenger still aimed at both outputs, and can its promotion rule be applied
+  on the evidence the two tracks have?
 - Is test and run time growing? The user wants fast iterations: a routine evaluation
   should take about two minutes, and one over five calls for proposed retirements.
 - **The rising tide.** Were retirements justified by the rule (three passing

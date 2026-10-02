@@ -20,6 +20,7 @@ is visible: a process that gains rules every time is getting heavier, not better
 | R8 | 2026-09-30 | [audit 3](bench/oracle-events/audit-3.md) and [029](reports/029-oracle-coverage.md) | Sol 6.1 (high) in Codex | Held; audit procedure needed clarification | [Landed with this entry](#r8-after-audit-3-and-experiment-029) | No new decision; different-model milestone review remains due | +0 −1 |
 | R9 | 2026-10-01 | The batch of [030](reports/030-current-instruments.md) and [031](reports/031-other-bars-reporting.md), with [audit 4](bench/oracle-events/audit-4.md) and the batch opening | Claude Fable 5.1 in Claude Code | Held; the batch stopped by its own rule on a runner defect | [Landed with this entry](#r9-after-the-batch-of-030-and-031) | Sweep completion (decided: g031b); baselines in sweeps; next batch's goal | +2 −1 |
 | R10 | 2026-10-01 | The resumed batch: [g031b](reports/031-other-bars-reporting.md#completion-g031b-by-the-users-authority), [032](reports/032-held-note-hesitation.md), [033](reports/033-rushed-bar.md) and [034](reports/034-missing-event-sweep.md), with the full direction review | Claude Fable 5.1 in Claude Code | Held; the sine staircase is sound, and now the slow part | [Landed with this entry](#r10-after-the-resumed-batch-g031b-and-032034-with-the-direction-review) | Sentinel rule; baselines in sweeps (again); a guitar-sound thermometer before the remaining sine deviations | +0 −0 |
+| R11 | 2026-10-02 | The challenger batch: the track's opening, [035](reports/035-challenger-basic-pitch.md) and the [observation-seam@1 audit](bench/oracle-events/audit-observation-seam-1.md) | Claude Opus 5.5 in Claude Code | Held; the challenger's cursor is the open half | [Landed with this entry](#r11-after-the-challenger-batch-035-and-the-observation-seam-audit) | The incumbent on the guitar set; the promotion rule's wording; whether continuation must carry the live path; R10's sentinel and baseline items | +1 −0 |
 
 Reviews R1–R3 were given in conversation with the user and recorded here when this file
 was created. The same reviewer wrote contract 2 and most of the process it reviewed.
@@ -842,3 +843,185 @@ is the right one.
 added one and removed one; R9 added two and removed one. Nothing in this batch asked
 for a rule, and the one real weakness found is a rule that needs the user, not a new
 one.
+
+## R11, after the challenger batch (035 and the observation-seam audit)
+
+**Held: one experiment, honestly run and reported, and an audit that found what it
+should. The challenger's assessment output is real progress; its cursor is the open
+half, and the track's own rules let it continue without closing that half.** Reviewed
+everything landed since R10 (`af639be6`): the track's opening (`06f6d2d4`), 035
+(`b87a4c16`, `6db69b42`, `cf8a6a6f`) and the seam audit (`0e1bb8a9`). Nothing is
+mid-flight; no worktree or branch of the batch remains. Reviewer: **Claude Opus 5.5 in
+Claude Code**, as stated at launch, effort not in the log. That is a different model
+from the experimenter (GPT-6.1-Sol), the auditor and the parent (both Claude Fable 5.1),
+but **the same model as the process's author**, so the light that this review sheds on
+the process is partly the design grading itself; the next milestone review should come
+from Sol or Fable.
+
+**Integrity.** All times UTC, from main's reflog and the three session logs.
+*Opening:* the parent session (`bba06c56…`, `claude-fable-5-1`) put the plan to the
+user at 09:36:53, with its budget, stage order and promotion rule; the user answered
+"I'm happy for you to decide on those decisions (I allow all the options)" at 09:38:33;
+the contract section, track entry and experimenter-prompt line landed at 09:44:36,
+before anything ran. The adopted terms differ from the plan in four places, three of
+them tighter (one experimenter session instead of two; a seam audit where the plan said
+none was due; hesitation on all four guitars instead of deviations on one) and one in
+wording only: both the plan and the contract say the challenger is promoted if it
+passes a substage the incumbent "cannot attempt", where TRACK_PROPOSALS' proposal 1,
+the text the user adopted, says "has failed". *035* (Codex `01a0fbf7-e1ce…`,
+`gpt-6.1-sol`, effort high, launched with its model line): pre-registration written
+09:48:47, on main 09:49:55; the guitar-nn sources committed at 09:50:03 (`f2f8e2fd`, the
+repository's only commit, a clean tree); producers written 09:53–10:02; commit, source
+tag and run in one command at 10:02:56; dry assembly 10:03:39 before any observation;
+offline observations and all 1,740 assessments done by 10:08:10, the live spike from
+then to 11:06:01 (3,776 s in all); landed 11:20:05. The results text was drafted from
+10:11:54 from completed, hashed assessment records while the live phase still ran,
+which is harmless with the code frozen at its tag. No line was removed from the
+pre-registration. Recomputed: the public summary (152,559 bytes, its recorded hash), the
+guitar manifest and all 14 private artifacts the summary cites, the seam's hash
+(`19e109dc…`, as cited); the source tag resolves locally and on origin; the 1,740
+per-example verdicts hold exactly 24 failures, all `martin-w2` claims, as the report,
+ledger and finding 27 say. The diff since R10 is new files plus the log, ledger,
+registries, the user-directed contract and track amendments, the bench's
+`package.json` and the root lockfile (the approved `onnxruntime-node`); no listener,
+evaluator, oracle, earlier set, baseline or archive file changed. *Audit*
+(`22487b52…`, `claude-fable-5-1`): 11:21:24 to 11:30:09, landed after its gate; it
+opened no challenger or seam code and not report 035, and used `node` as a calculator.
+
+**Rules and claims.** 035 stayed inside its budget: one candidate at published decoder
+defaults, two live policies fixed in advance, no fitting, no rerun. D1 follows its
+fixed rule: three of four development guitars pass the assessment gates with controls,
+and Martin's failure is reported as a failure, diagnosed to a decoded G2 ghost, with a
+privileged-input check that isolates the front end and is labelled as such. Candour
+held: the easy controls are named (digital-zero silence, which the avenue itself says
+cannot make Basic Pitch hallucinate; the distant `w2`), the sine pass is assessment
+only and "says nothing about a causal cursor", the nominal availability clock is
+stated as excluding compute, and the 63-minute run is flagged by its own author. One
+departure, disclosed: the pre-registration both prescribes the official 11-frame
+decoder and says to "retain" the incumbent's two-frame offline confirmation; the run
+did the first and said so. The audit agreed on T1–T8 and found two real ambiguities,
+one of which (B) changes which frames reach the live confirmation; it correctly made
+them a question rather than verdicts.
+
+Three smaller things. **The guitar-nn commit has no remote**: the source 035 cites
+exists only on this machine. **The landing gate failed once**: in the parallel gate two
+frozen `online-time-warp` bench tests ran 5.4 and 5.9 s against vitest's 5 s default;
+the experimenter reran with `--sequential`, which passed everything, and landed. That
+is the documented flag, but the report was written before the gate and does not say
+so, and the latent timeout will catch the next agent whose diff reaches the bench.
+**"Takes up R10's third escalation"** is half true: R10 asked for the *incumbent*,
+unchanged, on guitar renders; 035 put the challenger there. The log says "no incumbent
+guitar comparison", so nothing is hidden, but that measurement is still missing.
+
+**Findings about the documents.**
+
+- **Two tracks, one ranking.** The contract keeps the incumbent's questions "in their
+  rank", but the log has one table whose top row is "the next question", and the
+  audit procedure says its question goes on top. Question 27, a challenger seam
+  question, now sits above question 23, the main track's wrong note, so a main-track
+  experimenter following the prompt would take the challenger's question. Fixed: each
+  track's highest open row is its next question; which track runs is the user's call
+  or a batch's goal; the log says which rows are the challenger's.
+- **The audit procedure was written for event oracles.** The seam is "audited like an
+  oracle", and the auditor adapted file names, the forbidden code and the scope
+  sensibly but on its own reading. Clarified. One structural limit it could not adapt
+  around: **the seam's answers sit in the same file as its rules**, so the auditor saw
+  T1–T8's numbers while reading the rules it derived them from; an event oracle keeps
+  its cases in a frozen file of their own. New rule: a seam's hand cases go beside it,
+  in their own file.
+- **Auditors keep reading the Findings table.** Audit 4 read it (R9), and this audit
+  read the whole log, findings 27–28 included, disclosed as "in passing". Harmless
+  here, since timing arithmetic does not depend on results, but it recurs. Clarified:
+  read Current state and Open questions, skip Findings.
+- **The adopted reviewer question was never added.** Proposal 1 says the reviewer's
+  direction check gains "whether the challenger is still aimed at the same two
+  outputs"; PROMPT_REVIEWER now carries it, with the promotion rule beside it.
+
+**Direction.** A milestone: a new track, a surprising result (Basic Pitch clears the
+whole sine suite's assessment), and stage-4 gates pending.
+
+1. *Is it measuring what the user wants?* Half of it. For the first time under contract
+   2, something hears a sampled guitar attack end to end and judges every note and
+   interval correctly. But these renders are the easiest guitar there is: monophonic,
+   exact schedules, notes cut at their written end by a 30 ms release
+   (`RELEASE_SAMPLES`, so lesson L5's ringing decay is not exercised), digital-zero
+   silence and a distant wrong score. The cursor, the user's first direction, is the
+   weak half: the only cursor pass (edge 0) is on a nominal clock that excludes an
+   inference whose chunk p99 is 44–72 ms against a 10 ms gate, so its 138 ms worst
+   nominal delay is a lower bound; the trimmed policy misses the first deadline in
+   every performance; both fail sustained cost by about two times.
+2. *Can the promotion rule be applied?* Not on present evidence. Clause one needs every
+   substage the incumbent has passed, all on sines, with cursors, while decision 3
+   says a sine failure "is not the challenger's verdict". Clause two turns on "cannot
+   attempt", which the incumbent never meets literally (it can be run on anything),
+   and the incumbent has never been run on the guitar set, so nobody knows whether it
+   fails there. That run is cheap (576 examples, unchanged code, about a minute at the
+   incumbent's g034 rate), and it is R10's thermometer as R10 meant it.
+3. *Does the track's continuation reward the right thing?* Its rule for a second
+   experiment reads the assessment output only, and so does the next question
+   (Martin's ghost). Each further challenger experiment can pass on assessment repairs
+   while the live path stays a costly spike. That is a milder form of the first
+   series' failure, a proxy improving while the user's goal waits, and it is the
+   user's rule, so it is theirs to tighten or not.
+4. *Time.* 035 took 63 minutes: about 5 for 712 model inferences and 1,740
+   assessments, 58 for the live spike (192 records, each run seven times, every run
+   recomputing a two-second window every 100 ms). With observations reused by audio
+   and producer hash, an assessment-only challenger evaluation is minutes; a live
+   phase at this design cannot become routine. The 5 minutes is itself over the
+   two-minute aim, and the challenger runs the full sine suite every time though its
+   verdict never rests on it.
+5. *The rising tide.* Nothing retired or re-chosen; g034 cited by verified hash, which
+   is what the contract allows and avoided R10's 43-minute baseline cost. R10's two
+   rising-tide escalations are still open after a day; the second has now cost two
+   sweeps and was dodged a third time only by reuse.
+
+**Fixed directly.** [AUDITING_AN_ORACLE.md](AUDITING_AN_ORACLE.md): the procedure
+covers any contract audited like an oracle (cases, rules and implementing code mapped
+for a seam; file name `audit-<contract>-N.md`); read the log's Current state and Open
+questions, not its Findings; the audit's question goes to the top of its own track.
+[PROMPT_EXPERIMENTER.md](PROMPT_EXPERIMENTER.md): a seam's hand cases in their own file
+(+1); "top open question" means one's own track's. [PROMPT_REVIEWER.md](PROMPT_REVIEWER.md)
+§3.4: the challenger question proposal 1 adopted. [RESEARCH_LOG.md](RESEARCH_LOG.md):
+per-track next questions in the maintenance rules and the Open questions preface, the
+review-due sentences, the awaiting-the-user line. [TRACK_PROPOSALS.md](TRACK_PROPOSALS.md):
+a pointer that the contract's promotion wording differs and governs. No verdict,
+pre-registration, contract, gate, code, question rank or frozen evidence was edited.
+
+**Escalated to the user.**
+
+1. **Run the incumbent on the challenger's guitar set.** event-chain@3 unchanged on
+   `contract2-challenger-guitar-v1`, both outputs, as a thermometer with no gate. It is
+   R10's third escalation as written, costs about a minute, and is the comparison any
+   promotion under clause two needs. As a numbered experiment on either track, or a
+   diagnostic beside the next one; the user's call, since it is not in either
+   track's order of work.
+2. **The promotion rule's wording.** "Cannot attempt" (contract, and the plan the user
+   approved) or "has failed" (proposal 1 as written), and whether clause one's "every
+   substage the incumbent has passed" includes the sine cursors that decision 3 excuses.
+   As it stands, the rule cannot promote on any evidence the track is set up to
+   produce, or promotes on a reading nobody fixed.
+3. **Whether the challenger's continuation must carry its live path.** Recommended: the
+   second challenger experiment's rule for a third reads the cursor as well as the
+   assessment, at least as a bounded cost or latency target on the clean guitar
+   examples, so the track cannot spend its experiments on assessment alone. And ask the
+   track to time its evaluations: observations reused by hash, sines only at a sweep or
+   a promotion claim.
+4. **Standing, unchanged:** R10's sentinel rule and baselines in sweeps; the seam as a
+   progression amendment and recorded-guitar gates (035's own). For the latter, the
+   evidence here says a guitar stage's silence control should not be digital zero,
+   since that is the one input Basic Pitch is known to handle.
+
+Not escalated, for the user's information: the guitar-nn commit has no remote, and the
+bench's `online-time-warp` tests sit just over vitest's default timeout under the
+parallel gate.
+
+**Could not check.** No listener, model or test was run; the claims were checked from
+records, hashes and session logs. Session logs show recorded tool use, not the absence
+of unrecorded reading. Effort for the Claude Code sessions is not in their logs. The
+parent's conversation with the user was read only around the delegation.
+
+**Trend:** +1 −0, with six clarifications. R1–R4 added ten rules and relaxed four;
+R5–R8 added one and removed one; R9 added two and removed one; R10 none. The one rule
+added protects an audit's independence, which is what the audit rule exists for; the
+clarifications all come from one cause, a second track that the documents were not
+written for.
