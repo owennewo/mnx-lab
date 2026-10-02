@@ -76,7 +76,7 @@ review of the batch: the Opus session, which writes none of it and is not the mo
 R9 and R10. The count is one numbered experiment; the audit and the review are not
 counted.
 
-**Progress.** Run 1 of 1: not yet started.
+**Progress.** Run 1 of 1: [035 pre-registration](reports/035-challenger-basic-pitch.md#pre-registration) landed before measurement; GPT-6.1-Sol (high) in Codex is the experimenter.
 
 ### Previous batch, closed: 030–034
 

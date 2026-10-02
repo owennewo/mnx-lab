@@ -11,6 +11,7 @@
     "report": "tsx src/cli.ts report"
   },
   "devDependencies": {
+    "onnxruntime-node": "1.23.2",
     "tsx": "^4.20.6"
   }
 }
