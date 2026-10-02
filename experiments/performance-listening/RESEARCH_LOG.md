@@ -76,7 +76,7 @@ review of the batch: the Opus session, which writes none of it and is not the mo
 R9 and R10. The count is one numbered experiment; the audit and the review are not
 counted.
 
-**Closed at 1 of 1:** [035](reports/035-challenger-basic-pitch.md), GPT-6.1-Sol (high) in Codex, D1 continuation. Its assessment clears the fixed three-source criterion; Martin controls fail. The live spike has useful untrimmed observations but fails compute, and trimming misses deadlines. The next session audits observation-seam@1; the independent batch process review follows. No promotion or incumbent change.
+**Closed at 1 of 1:** [035](reports/035-challenger-basic-pitch.md), GPT-6.1-Sol (high) in Codex, D1 continuation. Its assessment clears the fixed three-source criterion; Martin controls fail. The live spike has useful untrimmed observations but fails compute, and trimming misses deadlines. The independent [observation-seam@1 audit](bench/oracle-events/audit-observation-seam-1.md) agrees on all eight timing cases and lists two rule ambiguities and the uncovered rules (question 27); the independent batch process review follows. No promotion or incumbent change.
 
 ### Previous batch, closed: 030–034
 
@@ -135,8 +135,9 @@ process that had been due since R5; R9's original 030–031 review stays recorde
 opens a usable Basic Pitch assessment path on development guitars, while exposing a
 repeatable Martin wrong-score false claim. Its exploratory live policies separate
 recent-frame accuracy from trimmed-frame lateness; both exceed compute gates.
-The observation timing convention still needs its independent audit, including the
-availability-clock limitation and the report's offline-confirmation clarification.
+The observation timing convention has its independent audit: all eight hand cases
+agree; the availability clock is nominal input time, a lower bound on real latency,
+and first-window parity is unreachable by rule, so both stay measured limits.
 No guitar stage, live qualification or promotion is claimed.
 
 The incumbent's [034 sweep](reports/034-missing-event-sweep.md#results) remains valid
@@ -151,8 +152,11 @@ carries both stopping counts, version/comparison totals and unused qualification
 budgets/access. Held-out guitars remain unused and Winner bars 5–8 unexamined.
 Latest fresh incumbent sweep is g034, next due no later than 039, with both tracks'
 numbers counting. No set is retired. [Audit 4](bench/oracle-events/audit-4.md) remains
-the current evaluator audit; the new **observation-seam@1** timing audit is now the
-top question, and the separate process review of this closed one-run batch follows.
+the current evaluator audit; the **observation-seam@1** timing audit is done
+([audit](bench/oracle-events/audit-observation-seam-1.md): 8 agree, 0 disagree, 0
+ambiguous), its two rule ambiguities and uncovered rules are the new top question for
+the next numbered experiment, and the separate process review of this closed one-run
+batch follows.
 
 **Awaiting the user:** whether the observation seam becomes a progression amendment,
 and recorded-guitar numerical gates before a formal stage-4 claim. R10's standing
@@ -225,7 +229,8 @@ given when a question opens and never reused.
 
 | Rank | Question | Why it is ranked here | Status | Owner item |
 |---|---|---|---|---|
-| 25 | Does an independent session rederive observation-seam@1's timing cases and producer arithmetic, checking resampling, padding, nominal availability versus CPU/wall time, and the limits of first-window runtime parity? | Required before any live-cursor verdict from the new observation seam; the author cannot audit it | open | [Observation seam 1](contracts/observation-seam-1.md), [035 timing limits](reports/035-challenger-basic-pitch.md#implementation-and-timing-limits-to-preserve-for-review) |
+| 27 | Does a re-versioned observation-seam@2 settle the two ambiguities the audit found, by stating whether `floor(p)+1` is an index or a count and whether "times already emitted" means equal times or times at or before the last emitted, and freeze hand cases for them and for the rules the audit could not exercise (a second run's emitted set and its shared availableAt, the reduction above threshold and its tie-break, the offline trim count, a stitched frame at i ≥ 344, the bin-to-MIDI map), with the audit's note on the stitched-time offset carried into any offline-versus-live comparison, and does an independent audit agree? | The audit rule makes this a prerequisite to any live-cursor verdict from the seam: ambiguity B changes which frames reach the three-frame confirmation and so the cursor's timing; the assessment path is unaffected | open | [Audit](bench/oracle-events/audit-observation-seam-1.md#rules-i-could-not-exercise), [observation seam 1](contracts/observation-seam-1.md) |
+| 25 | Does an independent session rederive observation-seam@1's timing cases and producer arithmetic, checking resampling, padding, nominal availability versus CPU/wall time, and the limits of first-window runtime parity? | Answered: T1–T8 re-derived, 8 agree, 0 disagree, 0 ambiguous; availableAt is the nominal input clock and so a lower bound on physical latency; exact first-window parity is unreachable under the rules (layouts match only at N = 40004, not a run boundary, with different resamplers); the upstream stitched time sits up to about 8.5 ms off the seam's own grid; two rule ambiguities (the existence rule's `floor(p)+1`, and "times already emitted") and the uncovered rules go to question 27 | answered | [Audit](bench/oracle-events/audit-observation-seam-1.md), Claude Fable 5.1 |
 | 26 | Can a bounded Basic Pitch front-end/decoder repair reject Martin's spurious low-pitch wrong-score claims while preserving the passing development-guitar and sine assessments? | D1 spends the one exploration and permits a second challenger experiment; repair its lowest unresolved assessment/control failure, with any fitted thresholds calibrated on separate development examples; audit and batch review first | open after audit/review | [035 next](reports/035-challenger-basic-pitch.md#next) |
 | 24 | With Basic Pitch observations as its front end and the incumbent's chain unchanged, does the challenger pass the assessment gates, controls included, on `sample-render@1` renders of the stage-1 scores from the development guitars, what does it do on the frozen sine sets, and what look-ahead and cost does an in-process live path need against the 200 ms cursor gate? | The user opened the challenger track on 2026-10-02 (current batch); the first experiment carries an exploration budget, so this is the question it explores rather than predicts | answered: D1 continuation, three sources; Martin controls fail; live exploratory (findings 27–28) | [Contract 2, challenger track](contracts/development-contract-2.md#the-challenger-track-basic-pitch-observations), [avenue A2](TRACK_PROPOSALS.md#a2-basic-pitch-observations-through-the-event-chain) |
 | 23 | Does the incumbent follow and identify a single wrong note, while rejecting near-miss w1 and retaining every confirmed substage and the passed omission sentinels? | Next deviation in contract 2 after missing-event passes; exact-pitch deletion success does not establish wrong-note following/assessment | open | [034 next](reports/034-missing-event-sweep.md#next), [contract 2 order](contracts/development-contract-2.md#order-of-work) |
