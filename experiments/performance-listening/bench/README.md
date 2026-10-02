@@ -133,3 +133,16 @@ Its tests are in `test/event-chain-3.test.ts`. `src/stages/run031.ts` is the ful
 runner: @3 fresh, identity checks against @2, and baselines cited or run fresh.
 g031 and g031a failed in the runner; g031b, authorised by the user, recorded D1. `compare031.ts` is the read-only comparison of bar
 summaries with 030.
+
+**Experiment 035, Basic Pitch challenger.** `src/challenger/observations.py` runs the
+pinned official score-blind offline model/decoder in the existing guitar-nn environment.
+`guitars.ts` freezes sample-render@1 versions of the simple clean/hesitation schedules
+from development sources only. `chain.ts` preserves the incumbent's score-event,
+stay/skip, exact-pitch alignment and reporting logic behind new observation inputs.
+`native.ts`, `nativeWorker.mjs` and `live.ts` implement the in-process CPU spike;
+`parity.py` compares identical model tensors across Python and Node. `run035.ts`
+records complete-set assessments and exploratory live timing/cost/prefix checks, with
+prior incumbent/baseline evidence verified by hash. Behavioral adapter checks are in
+`test/challenger-035.test.ts`. The new [observation seam](../contracts/observation-seam-1.md)
+needs its independent timing audit; consult [the research log](../RESEARCH_LOG.md) for
+results, authority to continue, and what remains open.

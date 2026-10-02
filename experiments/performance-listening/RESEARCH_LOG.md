@@ -76,7 +76,7 @@ review of the batch: the Opus session, which writes none of it and is not the mo
 R9 and R10. The count is one numbered experiment; the audit and the review are not
 counted.
 
-**Progress.** Run 1 of 1: [035 pre-registration](reports/035-challenger-basic-pitch.md#pre-registration) landed before measurement; GPT-6.1-Sol (high) in Codex is the experimenter.
+**Closed at 1 of 1:** [035](reports/035-challenger-basic-pitch.md), GPT-6.1-Sol (high) in Codex, D1 continuation. Its assessment clears the fixed three-source criterion; Martin controls fail. The live spike has useful untrimmed observations but fails compute, and trimming misses deadlines. The next session audits observation-seam@1; the independent batch process review follows. No promotion or incumbent change.
 
 ### Previous batch, closed: 030–034
 
@@ -130,33 +130,37 @@ Process review [R10](reviews.md#r10-after-the-resumed-batch-g031b-and-032034-wit
 covers g031b and 032–034, and carries the different-model direction review of the whole
 process that had been due since R5; R9's original 030–031 review stays recorded.
 
-2026-10-01. [Contract 2](contracts/development-contract-2.md) remains in force and
-**event-chain@3 remains incumbent**. [034](reports/034-missing-event-sweep.md#results)
-passes a missing interior event on the one- and two-bar scores: the cursor holds the
-predecessor and recovers at the next sound, the assessment identifies the omitted
-note, and the interval spanning it preserves the steady tempo. The complete batch-end
-sweep passes every earlier substage and control, preserving all earlier outputs.
-The [suite record](bench/suite-record.json) confirms earlier states, adds the passed
-missing-event substage and re-chooses sentinels by the frozen rule; no set is retired.
-Next is the single wrong note with w1, a capability this deletion result does not establish.
+2026-10-02. [Contract 2](contracts/development-contract-2.md) remains in force and
+**event-chain@3 remains incumbent**. [035](reports/035-challenger-basic-pitch.md#results)
+opens a usable Basic Pitch assessment path on development guitars, while exposing a
+repeatable Martin wrong-score false claim. Its exploratory live policies separate
+recent-frame accuracy from trimmed-frame lateness; both exceed compute gates.
+The observation timing convention still needs its independent audit, including the
+availability-clock limitation and the report's offline-confirmation clarification.
+No guitar stage, live qualification or promotion is claimed.
 
-The latest full sweep is g034; next due no later than 039, or sooner on a stage claim,
-new gates or batch end. [034's resulting state](reports/034-missing-event-sweep.md#resulting-stopping-count-budgets-and-evidence-access)
-carries stopping count 0 and unchanged qualification budgets/access: no new listener
-version, no qualification evidence, Winner bars 5–8 unexamined. Earlier substages
-now have a second recorded complete-set incumbent pass, the new omission substage one.
+The incumbent's [034 sweep](reports/034-missing-event-sweep.md#results) remains valid
+and is cited by verified hash at this challenger batch end. Its suite states and
+sentinels are unchanged; the main track's next question remains one wrong note with
+near-miss w1. The challenger has spent its one exploration budget and meets the fixed
+criterion for a second experiment, after the timing audit and batch review. Its lowest
+unresolved guitar assessment failure is Martin's control claims; live cost is separate.
 
-[Audit 4](bench/oracle-events/audit-4.md) remains the current oracle audit. 034 created
-no oracle, so no audit is due. The next process review is due after the next experiment
-or audit, by a model other than Claude Fable 5.1 where one is available (R9 and R10 were
-both by it).
+[035's resulting state](reports/035-challenger-basic-pitch.md#resulting-stopping-count-budgets-and-evidence-access)
+carries both stopping counts, version/comparison totals and unused qualification
+budgets/access. Held-out guitars remain unused and Winner bars 5–8 unexamined.
+Latest fresh incumbent sweep is g034, next due no later than 039, with both tracks'
+numbers counting. No set is retired. [Audit 4](bench/oracle-events/audit-4.md) remains
+the current evaluator audit; the new **observation-seam@1** timing audit is now the
+top question, and the separate process review of this closed one-run batch follows.
 
-**Awaiting the user:** nothing from 034 itself. Of R10's three escalations, the
-sentinel rule's tie-break and pool and baselines in full sweeps (R9's second escalation)
-are still open; the guitar-sound thermometer is taken up by the challenger track
-(experiment 035, above).
-Evidence-based recorded-guitar gates before stage 4 and eventual qualification/product
-choices remain standing future decisions. This session's direction is preserved:
+**Awaiting the user:** whether the observation seam becomes a progression amendment,
+and recorded-guitar numerical gates before a formal stage-4 claim. R10's standing
+sentinel tie-break/pool and baseline-sweep decisions remain open. The guitar-sound
+thermometer now has challenger evidence in 035, with no incumbent guitar comparison
+or microphone claim. Qualification and Studio product choices remain future decisions.
+The audit/review are independent-session work, not approvals supplied by this author.
+This session's direction is preserved:
 
 > You cannot ask the user questions: record anything that needs them in your report and the research log.
 
@@ -211,6 +215,8 @@ Status is `holds`, `superseded` or `withdrawn`.
 | 24 | event-chain@3 holds through a single hesitation with the previous sine sustained, passes both outputs and controls, and preserves every active earlier regression output; resumption estimates shift by up to two hops from silent counterparts within the approved gates | [032](reports/032-held-note-hesitation.md#both-outputs-controls-and-regressions), [g032](runs/g032-held-note-hesitation/summary.json) | holds | 032 | Two short monophonic scores, constant sustain with no overlap/decay; no bar-flag positives or new wrong/missing/dead/extra capability |
 | 25 | event-chain@3 passes a single rushed bar at 1.05–1.30 of base tempo on s2 and s3: every event, note and interval, and 64/66 expected fast flags with no false alarm; both misses are bars whose true ratio is 1.10 to within 3e-6 | [033](reports/033-rushed-bar.md#results), [g033](runs/g033-rushed-bar/summary.json) | holds | 033 | Monophonic sine scores only; the first fast-flag positives. With g031b's slowed bars, four of five exact-threshold positives are missed, all on the side of 1.0: a near coin flip at 10 ms onset resolution, too few cases to establish a bias |
 | 26 | event-chain@3 recovers after every single interior omission on s1/s2, identifies all missing notes, and preserves spanning-interval tempo; the batch-end sweep confirms earlier substages and reproduces all earlier outputs | [034](reports/034-missing-event-sweep.md#results), [g034](runs/g034-missing-event-sweep/summary.json) | holds | 034 | Distinct-pitch monophonic sines, one silent beat per example; no first/last or multiple omission, repeated-pitch ambiguity, wrong/dead note or guitar claim |
+| 27 | Basic Pitch through the unchanged offline aligner/assessor clears clean and silent-hesitation assessment comparisons on three development guitars; Martin correctly matches performances but makes isolated low-G2 claims on the distant wrong score; all frozen sine assessments also clear the shared thresholds | [035 assessment](reports/035-challenger-basic-pitch.md#assessment-including-controls), [g035](runs/g035-challenger-basic-pitch/summary.json) | holds | 035 | D1 permits continuation; no guitar-stage approval, held-out transfer or microphone claim; offline frontend uses the prescribed 11-frame decoder, not an extra sine-token filter |
+| 28 | In an exploratory in-process spike, untrimmed recent frames reach every clean-guitar event within nominal runner deadlines, withholding 15 frames makes every performance miss a deadline, and both policies exceed CPU cost gates; every future-prefix and sampled same-tensor runtime comparison agrees | [035 live](reports/035-challenger-basic-pitch.md#live-spike-observations-deadlines-and-cost) | holds | 035 | Nominal input-delivery timestamps, not physical feedback latency; observation-seam@1 audit pending; no formal live verdict |
 
 ## Open questions
 
@@ -219,7 +225,9 @@ given when a question opens and never reused.
 
 | Rank | Question | Why it is ranked here | Status | Owner item |
 |---|---|---|---|---|
-| 24 | With Basic Pitch observations as its front end and the incumbent's chain unchanged, does the challenger pass the assessment gates, controls included, on `sample-render@1` renders of the stage-1 scores from the development guitars, what does it do on the frozen sine sets, and what look-ahead and cost does an in-process live path need against the 200 ms cursor gate? | The user opened the challenger track on 2026-10-02 (current batch); the first experiment carries an exploration budget, so this is the question it explores rather than predicts | open | [Contract 2, challenger track](contracts/development-contract-2.md#the-challenger-track-basic-pitch-observations), [avenue A2](TRACK_PROPOSALS.md#a2-basic-pitch-observations-through-the-event-chain) |
+| 25 | Does an independent session rederive observation-seam@1's timing cases and producer arithmetic, checking resampling, padding, nominal availability versus CPU/wall time, and the limits of first-window runtime parity? | Required before any live-cursor verdict from the new observation seam; the author cannot audit it | open | [Observation seam 1](contracts/observation-seam-1.md), [035 timing limits](reports/035-challenger-basic-pitch.md#implementation-and-timing-limits-to-preserve-for-review) |
+| 26 | Can a bounded Basic Pitch front-end/decoder repair reject Martin's spurious low-pitch wrong-score claims while preserving the passing development-guitar and sine assessments? | D1 spends the one exploration and permits a second challenger experiment; repair its lowest unresolved assessment/control failure, with any fitted thresholds calibrated on separate development examples; audit and batch review first | open after audit/review | [035 next](reports/035-challenger-basic-pitch.md#next) |
+| 24 | With Basic Pitch observations as its front end and the incumbent's chain unchanged, does the challenger pass the assessment gates, controls included, on `sample-render@1` renders of the stage-1 scores from the development guitars, what does it do on the frozen sine sets, and what look-ahead and cost does an in-process live path need against the 200 ms cursor gate? | The user opened the challenger track on 2026-10-02 (current batch); the first experiment carries an exploration budget, so this is the question it explores rather than predicts | answered: D1 continuation, three sources; Martin controls fail; live exploratory (findings 27–28) | [Contract 2, challenger track](contracts/development-contract-2.md#the-challenger-track-basic-pitch-observations), [avenue A2](TRACK_PROPOSALS.md#a2-basic-pitch-observations-through-the-event-chain) |
 | 23 | Does the incumbent follow and identify a single wrong note, while rejecting near-miss w1 and retaining every confirmed substage and the passed omission sentinels? | Next deviation in contract 2 after missing-event passes; exact-pitch deletion success does not establish wrong-note following/assessment | open | [034 next](reports/034-missing-event-sweep.md#next), [contract 2 order](contracts/development-contract-2.md#order-of-work) |
 | 22 | Does the unchanged incumbent recover after a single missing event (cursor recovery, `missing` findings, the spanning interval) while retaining every passed substage, and does the full sweep due at batch end 034 confirm the substages passed since g031b? | Next deviation in contract 2's order; rushed bar now passed (finding 25); the sweep is due at the batch's end | answered: yes, D1 (finding 26) | [Contract 2 order](contracts/development-contract-2.md#order-of-work), [034](reports/034-missing-event-sweep.md) |
 | 21 | Does the unchanged incumbent pass one rushed bar, retaining the held-note and earlier substages under current gates? | Answered by 033: all 479 active examples pass; fast flags 64/66, misses only at the exact threshold | answered: yes, D1 (finding 25) | [033](reports/033-rushed-bar.md) |

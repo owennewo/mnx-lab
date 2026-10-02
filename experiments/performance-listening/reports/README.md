@@ -52,3 +52,5 @@ node experiments/performance-listening/reports/export-report.mjs --check    # ve
 The exporter reads each registered report's run summaries from `runs/` and checks
 every source hash they pin against the run's own commit. `serve-private-review.mjs`
 serves a private review folder over localhost; private audio never enters git.
+
+| 035 | [Basic Pitch observations through the unchanged event chain](035-challenger-basic-pitch.html) | [g035](../runs/g035-challenger-basic-pitch/summary.json), D1 continuation; timing audit pending |

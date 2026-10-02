@@ -172,6 +172,19 @@
         "href": "033-rushed-bar.html",
         "label": "Experiment 033"
       }
+    },
+    {
+      "number": "035",
+      "slug": "035-challenger-basic-pitch",
+      "title": "035 \u00b7 Basic Pitch observations through the unchanged event chain",
+      "banner": "D1 continuation \u00b7 assessment passes three of four guitars \u00b7 Martin wrong-score claims \u00b7 untrimmed live cursor comparisons pass but compute fails \u00b7 trimmed frames late \u00b7 seam audit pending",
+      "runs": [
+        "g035-challenger-basic-pitch"
+      ],
+      "previous": {
+        "href": "034-missing-event-sweep.html",
+        "label": "Experiment 034"
+      }
     }
   ]
 }
