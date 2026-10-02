@@ -80,6 +80,7 @@ research log says is current.
 | What | Where |
 |---|---|
 | The rules | [`contracts/development-contract-2.md`](contracts/development-contract-2.md) |
+| A challenger track's terms | [TRACK_PROPOSALS.md](TRACK_PROPOSALS.md) proposal 1 and [the contract's challenger section](contracts/development-contract-2.md#the-challenger-track-basic-pitch-observations) |
 | Which code to reuse, which is frozen, and where new code goes | [`bench/README.md`](bench/README.md#the-code-under-contract-2) |
 | Simple committed scores for the first stage | [`sources/`](sources/) |
 | Rendering notes as sines or recorded guitar at exact times; tempo maps | `bench/src/ladder/render.ts`, `samples.ts`, `tempo.ts` |
@@ -98,6 +99,13 @@ research log says is current.
   experiment is one of its runs: choose the question that best serves the batch's goal
   within the contract and the approved gates, and say how it does. Consider alternative explanations and
   state how the experiment distinguishes them.
+- **A challenger experiment** belongs to a track opened under
+  [TRACK_PROPOSALS.md](TRACK_PROPOSALS.md) proposal 1 and recorded in
+  [the contract's challenger section](contracts/development-contract-2.md#the-challenger-track-basic-pitch-observations),
+  which binds it: its first experiment pre-registers an exploration budget in place of
+  numbered predictions; it runs every example of every set it claims, not the incumbent's
+  sentinels; its report slug and run IDs carry `challenger-` after the number; it may add
+  `contracts/observation-seam-N.md`. Everything else here applies unchanged.
 - **Preserve the rules, not a predecessor's assumptions.** Contract 2, user directions
   and frozen evaluation rules bind you. A report's scientific explanation or
   restriction on future methods is not itself a contract: you may challenge it in a new

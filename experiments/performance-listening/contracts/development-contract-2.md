@@ -450,6 +450,76 @@ it. The assessment can start from a whole-recording offline alignment.
    note, onset jitter and a frequency offset. Then stages 3–5, each passed stage
    retiring its gimmes under the rising tide.
 
+## The challenger track: Basic Pitch observations
+
+Added 2026-10-02 by the user's direction. [TRACK_PROPOSALS.md](../TRACK_PROPOSALS.md#proposal-1-a-challenger-track-under-the-same-contract)'s
+proposal 1 is adopted for one challenger, [avenue A2](../TRACK_PROPOSALS.md#a2-basic-pitch-observations-through-the-event-chain):
+a listener whose pitch front end is Spotify's Basic Pitch (the pinned ICASSP 2022 ONNX
+model shipped in `basic-pitch` 0.4.0) and whose live chain, offline alignment and
+assessment are the incumbent's, unchanged. Nothing above changes: the two outputs, the
+instruments, the gates, the controls and the stages judge the challenger exactly as they
+judge the incumbent.
+
+The user's direction, after a comparison of this loop with the score-blind transcription
+work in `~/dev/guitar-nn`:
+
+> Lets suppose that Basic Pitch is promising. Perhaps we should consider a new contract
+> that is more "midi" based wdyt?
+
+> ok - can you plan the basic pitch challenger
+
+> I'm happy for you to decide on those decisions (I allow all the options)
+
+The decisions the user delegated, taken by the parent session (Claude Fable 5.1 in
+Claude Code) and binding on the challenger:
+
+1. **The track is open** under proposal 1's terms: shared instruments, frozen sets,
+   controls, ledger, numbering and landing sequence; its own stopping count, not started
+   until the exploration budget is spent; evaluation by full sweep of every set it claims,
+   since the sentinels are the incumbent's; its own stage order, stated in its first
+   pre-registration; report slugs and run IDs carry `challenger-` after the number
+   (`reports/035-challenger-<slug>.md`, `g035-challenger-<slug>`).
+2. **Exploration budget, once.** The first challenger experiment pre-registers what it
+   builds, the sets it runs and this budget in place of numbered predictions: one
+   experimenter session, with the one technical rerun the contract already allows. A
+   second challenger experiment follows only if the assessment output passes its approved
+   gates, controls included, on the guitar stage-1 performances of at least three of the
+   four development guitar sample sets, or if a failure is attributed to one component
+   with a stated repair. Otherwise the track records what it saw and stops. Numbered
+   predictions begin with the second experiment.
+3. **Stage order.** The challenger takes the stage-4 sound first: the stage-1 and stage-2
+   scores rendered with `sample-render@1` from the **development** guitar sample sets
+   only, beside the frozen sine sets. The held-out guitars stay unused until a promotion
+   claim (lesson L11). Pure sines are out of distribution for a model trained on real
+   instruments, so a sine failure is reported as that and is not the challenger's
+   verdict; the guitar renders are.
+4. **Promotion, fixed now.** The challenger becomes the incumbent when it passes every
+   substage the incumbent has passed, or passes one the incumbent cannot attempt, in
+   each case under the shared gates with controls. The loser freezes as a comparator and
+   is never developed further.
+5. **The observation seam.** The challenger introduces a versioned contract file,
+   `contracts/observation-seam-N.md`, the second kind of contract file an experiment may
+   add. It defines what passes from the front end to the chain: per-frame activations
+   (Basic Pitch's onset, note and contour maps) and decoded events, every frame and event
+   carrying two times, the audio time it describes and the time it became available,
+   with confidence, a representation for a pitchless onset, and hashes and model
+   provenance. The seam's timing arithmetic is audited like an oracle, by a different
+   session, before any live-cursor verdict is claimed from it; the first experiment's
+   cursor measurements are exploratory. Whether the seam becomes an amendment to this
+   contract's progression is decided on that experiment's evidence.
+6. **Tooling.** The listening bench may take `onnxruntime-node` as a development
+   dependency so the model runs in process and the unchanged runner measures causality
+   and cost. The pinned Python environment in `~/dev/guitar-nn`
+   (`environments/basic-pitch/`, model SHA-256
+   `2c3c1d144bfa61ad236e92e169c13535c880469a12a047d4e73451f2c059a0ec`) may produce
+   offline observations, cited by output hash; the experiment puts that repository under
+   version control so a source commit can be cited, and changes nothing else in it. Any
+   decoder threshold the challenger uses is fitted on the development guitars only,
+   never on evidence it is scored on.
+
+The incumbent track continues unchanged and its questions keep their rank. Its next
+full sweep is still due no later than experiment 039, counting both tracks' numbers.
+
 ## Still open for the user
 
 - New gates before stage 4, recorded guitar, from the evidence of stages 1–3.

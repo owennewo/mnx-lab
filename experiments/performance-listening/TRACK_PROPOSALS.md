@@ -1,10 +1,12 @@
 # Track proposals
 
 Proposals for running more than one line of listener development at once, and the
-avenues that would run on a second line. Nothing here is adopted: a proposal becomes
-binding only when the user directs it and [development contract 2](contracts/development-contract-2.md)
-quotes that direction. Until then this file is where the case is made and the avenues
-are kept, so that they are not lost between experiments and are not filed as
+avenues that would run on a second line. A proposal becomes binding only when the user
+directs it and [development contract 2](contracts/development-contract-2.md) quotes that
+direction. On 2026-10-02 the user did so for proposal 1 and avenue A2, recorded in
+[the contract's challenger section](contracts/development-contract-2.md#the-challenger-track-basic-pitch-observations);
+everything else here remains proposed. This file is where the case is made and the
+avenues are kept, so that they are not lost between experiments and are not filed as
 experiments before the loop can hold them.
 
 Opened 2026-09-30 by the user. Their request:
@@ -180,6 +182,64 @@ and a frequency label, so the live cursor and the per-note and per-interval asse
 fit the instruments unchanged. This is a proposal 1 avenue, not a proposal 2 one.
 
 **Status.** Proposed. No track opened, no experiment numbered.
+
+### A2. Basic Pitch observations through the event chain
+
+Proposed by the user, 2026-10-02, after comparing this loop with the score-blind
+transcription work in `~/dev/guitar-nn`:
+
+> Lets suppose that Basic Pitch is promising. Perhaps we should consider a new contract
+> that is more "midi" based wdyt?
+
+**How it differs from the incumbent.** `event-chain@3`
+([`bench/src/listeners/eventChain3.ts`](bench/src/listeners/eventChain3.ts)) reuses @1's
+`sinePitch`: a zero-crossing estimate over a 20 ms window every 10 ms, a token when the
+label changes and holds for two windows offline or three live, and a 20 ms boundary dip
+as its only energy cue. Everything after the token stream, the stay-and-skip cost chain,
+the offline `alignPitches`, the intervals, notes and other-bars flags, is front-end
+agnostic. A2 keeps all of that and replaces `sinePitch` with observations from Spotify's
+Basic Pitch, a 17K-parameter convolutional model over a harmonic constant-Q transform
+that emits onset, note and contour activations at 86 frames per second for 88 pitches,
+polyphonic and instrument-agnostic, already shipped as ONNX and runnable in a browser.
+
+**The case for it, on the direction of travel.**
+
+- It is the only front end in reach that already hears recorded guitar: 69.7% note F1
+  (pitch and onset, 50 ms) on 24 GuitarSet microphone recordings, 79.6% on solos, and
+  81.6% pitch-activity F1, measured in `~/dev/guitar-nn` under a frozen policy, with the
+  caveat that its training overlap with GuitarSet is unknown. Nothing in this loop has
+  passed recorded guitar.
+- It is polyphonic, so stage 3's chords stop being a front-end problem.
+- It has an onset head: avenue A1's energy-first idea in a learned form.
+- The score prior should recover much of what it loses blind: octave ghosts the score
+  does not contain are extra notes, same-pitch splits collapse onto one event, and the
+  chain decides between a few hypotheses rather than transcribing.
+
+**What it must answer.**
+
+- Lesson L1: develop on exact labels first. Its proving ground is therefore the stage-1
+  and stage-2 scores rendered with `sample-render@1`, not GuitarSet.
+- Lessons L2, L3 and L8: unchanged, because the chain and the controls are unchanged.
+- Lesson L4: thresholds shift per timbre. Any decoder threshold is fitted on the
+  development guitars and never on what it is scored on.
+- Lesson L5: decay. Basic Pitch's biggest measured guitar failure is a missed
+  re-articulation under a same-pitch sustain (462 of 1,043 misses), the same repeated-note
+  blind spot the incumbent has; the chain must not make it worse.
+- Latency. Upstream trims 15 frames from each window edge, about 174 ms of look-ahead
+  before any hop, against a 200 ms cursor gate. The live path has to measure what
+  untrimmed edge frames cost in accuracy, and what running overlapping windows costs in
+  compute.
+- Per-window normalisation: a window of quiet non-zero audio is stretched to full scale
+  and hallucinates notes. Digital-zero silence does not. The frozen controls are exact
+  zeros; real rooms are not.
+- Its 127.7 ms minimum note length against the shortest written note in each score.
+- Pure sines are out of distribution for it; a sine result is reported, not judged.
+
+**Outputs.** The same two, through the same chain: a proposal 1 avenue. The seam between
+front end and chain is written as `contracts/observation-seam-1.md`.
+
+**Status.** Track opened 2026-10-02 under proposal 1; the terms, budget, stage order and
+promotion rule are in the contract's challenger section. First experiment: 035.
 
 ## Adding to this file
 

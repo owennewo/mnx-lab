@@ -38,7 +38,47 @@ How to maintain it:
 
 ## Current state
 
-### Current batch
+### Current batch: the challenger track, experiment 035
+
+Opened 2026-10-02 by the user, run through a parent session (Claude Fable 5.1 in Claude
+Code) that launches the experimenter, the seam auditor and the reviewer as separate
+herdr sessions: GPT-6.1-Sol (high) in Codex, Claude Fable 5.1 in Claude Code and Claude
+Opus 5.5 in Claude Code. The user's request, in order:
+
+> I've done more research - some of this points towards me training a "better than basic
+> pitch" model
+
+> Lets suppose that Basic Pitch is promising. Perhaps we should consider a new contract
+> that is more "midi" based wdyt?
+
+> ok - can you plan the basic pitch challenger
+
+> I'm happy for you to decide on those decisions (I allow all the options)
+
+> you are running in herdr and there are other agents in your space including alice
+> (Opus 5.5), bob (Fable 5.1) and Dave (codex opus 6.1). Can you use these agents to
+> complete this plan
+
+**Goal.** One challenger experiment, 035, under
+[the contract's challenger section](contracts/development-contract-2.md#the-challenger-track-basic-pitch-observations)
+and [avenue A2](TRACK_PROPOSALS.md#a2-basic-pitch-observations-through-the-event-chain):
+Basic Pitch observations through the unchanged event chain, judged by the unchanged
+instruments and controls on the frozen sine sets and on new `sample-render@1` renders of
+the stage-1 and stage-2 scores from the development guitars, assessment output first,
+with an in-process live spike that measures parity with the offline model, look-ahead
+and cost. It carries an exploration budget, not predictions; the rule for a second
+experiment is in the contract. It also takes up R10's third escalation, the guitar
+thermometer. The main track is not run in this batch and its questions keep their rank.
+
+**Roles.** Experimenter: the Codex session. Audit of the observation seam's timing, after
+the seam and its producer land: the Fable session, which writes none of it. Process
+review of the batch: the Opus session, which writes none of it and is not the model of
+R9 and R10. The count is one numbered experiment; the audit and the review are not
+counted.
+
+**Progress.** Run 1 of 1: not yet started.
+
+### Previous batch, closed: 030–034
 
 Opened 2026-10-01 by the user: **five numbered experiments on the main track**, 030
 onwards, run through a parent session (Claude Fable 5.1 in Claude Code) that launches
@@ -111,9 +151,10 @@ no oracle, so no audit is due. The next process review is due after the next exp
 or audit, by a model other than Claude Fable 5.1 where one is available (R9 and R10 were
 both by it).
 
-**Awaiting the user:** nothing from 034 itself. R10 escalates three decisions: the
-sentinel rule's tie-break and pool, baselines in full sweeps (R9's second escalation,
-still open), and a guitar-sound thermometer before the remaining sine deviations.
+**Awaiting the user:** nothing from 034 itself. Of R10's three escalations, the
+sentinel rule's tie-break and pool and baselines in full sweeps (R9's second escalation)
+are still open; the guitar-sound thermometer is taken up by the challenger track
+(experiment 035, above).
 Evidence-based recorded-guitar gates before stage 4 and eventual qualification/product
 choices remain standing future decisions. This session's direction is preserved:
 
@@ -178,6 +219,7 @@ given when a question opens and never reused.
 
 | Rank | Question | Why it is ranked here | Status | Owner item |
 |---|---|---|---|---|
+| 24 | With Basic Pitch observations as its front end and the incumbent's chain unchanged, does the challenger pass the assessment gates, controls included, on `sample-render@1` renders of the stage-1 scores from the development guitars, what does it do on the frozen sine sets, and what look-ahead and cost does an in-process live path need against the 200 ms cursor gate? | The user opened the challenger track on 2026-10-02 (current batch); the first experiment carries an exploration budget, so this is the question it explores rather than predicts | open | [Contract 2, challenger track](contracts/development-contract-2.md#the-challenger-track-basic-pitch-observations), [avenue A2](TRACK_PROPOSALS.md#a2-basic-pitch-observations-through-the-event-chain) |
 | 23 | Does the incumbent follow and identify a single wrong note, while rejecting near-miss w1 and retaining every confirmed substage and the passed omission sentinels? | Next deviation in contract 2 after missing-event passes; exact-pitch deletion success does not establish wrong-note following/assessment | open | [034 next](reports/034-missing-event-sweep.md#next), [contract 2 order](contracts/development-contract-2.md#order-of-work) |
 | 22 | Does the unchanged incumbent recover after a single missing event (cursor recovery, `missing` findings, the spanning interval) while retaining every passed substage, and does the full sweep due at batch end 034 confirm the substages passed since g031b? | Next deviation in contract 2's order; rushed bar now passed (finding 25); the sweep is due at the batch's end | answered: yes, D1 (finding 26) | [Contract 2 order](contracts/development-contract-2.md#order-of-work), [034](reports/034-missing-event-sweep.md) |
 | 21 | Does the unchanged incumbent pass one rushed bar, retaining the held-note and earlier substages under current gates? | Answered by 033: all 479 active examples pass; fast flags 64/66, misses only at the exact threshold | answered: yes, D1 (finding 25) | [033](reports/033-rushed-bar.md) |
