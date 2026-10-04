@@ -30,7 +30,8 @@ row, the attribution and your commit bodies. The reviewer confirms it from the t
 session log where one exists.
 
 **Start simple.** The user's direction is to get the happy path right first: the
-simplest scores, one synth, a perfect performance. Then add one deviation at a time,
+simplest scores, one sound, a perfect performance. Since 2026-10-04 that sound is
+sampled guitar, not a synth ([the contract's amendment](contracts/development-contract-2.md#amendment-2026-10-04-sampled-guitar-replaces-the-sines-and-the-promotion-rule)). Then add one deviation at a time,
 such as a hesitation or a wrong note, and only then more sounds, bars, scores and real
 music. Be clear about that direction of travel, but do not jump ahead of the stage the
 research log says is current.

@@ -41,6 +41,56 @@ How to maintain it:
 
 ## Current state
 
+### Current batch: towards promotion on sampled guitar, 037–042
+
+Opened 2026-10-04 by the user, after 036. Their words, in order:
+
+> I'm prepared to promote, but before I do - I'd like to dot the i's and cross the t's.  Also tell me about the lag
+
+> lets drop the sine wave - its not useful.  what do you recommend we do on your decisions
+
+> yes - write them in and set up the batch - slight preference of sol 6.1 (Dave) or astra 6 (new agent eric)  as I have more openai tokens left.
+
+The decisions are in [the contract's 2026-10-04 amendment](contracts/development-contract-2.md#amendment-2026-10-04-sampled-guitar-replaces-the-sines-and-the-promotion-rule): the sines are
+retired, the progression is rebased onto sampled guitar, the silence control becomes
+pink noise at −60 dBFS, the chunk p99 gate gives way to a compute-inclusive cursor
+deadline, a stage passes only on all four development guitars, and the promotion rule
+is rewritten around a one-shot held-out confirmation, after which the user promotes.
+
+**Goal.** Bring the challenger to the point where the user can promote it, or show why
+it can't be: every condition of the amendment's decision 5 met and checked, or the
+first one that fails found and reported. Work in rank order: question 27 (the seam's
+timing and the compute-inclusive clock, then its audit), question 29 (the quiet-noise
+controls), question 26 (Martin's wrong-score claims), question 30 (a streaming live
+path within the cost gate and the deadline), question 31 (the guitar stage claim), and
+question 32 (the held-out confirmation, once, and only after 31 passes). Each
+experiment changes one thing; a listener change gets its own experiment. The main
+track is paused.
+
+**Count:** six numbered experiments, 037 onwards; audits and the review are not
+counted. The batch ends early under
+[section 9 of the experimenter prompt](PROMPT_EXPERIMENTER.md#9-batches), and in any
+case **stops before promotion**: the promotion itself is the user's.
+
+**Roles,** following the user's preference for the OpenAI sessions:
+
+- **Experimenter: Dave** (herdr `dave`), **GPT-6.1-Sol (high) in Codex**, a fresh
+  session for every numbered run.
+- **Seam audit (question 27's) and any other oracle audit: Eric** (herdr `eric`),
+  **GPT-6-Astra (medium) in Codex**, a different model from the author, as the audit
+  rule requires.
+- **Closing process review:** a model that ran none of the experiments and wrote none of
+  the audits, so not Dave or Eric. Claude Fable 5.1 or Claude Opus 5.5; Opus 5.5 wrote
+  this amendment, R11 and 036, so **Fable 5.1** is preferred.
+
+The parent is this session, Claude Opus 5.5 in Claude Code, which wrote the amendment
+and does no experiment, audit or review work. It launches each with the exact prompts of
+[PROMPT_EXPERIMENTER.md section 8](PROMPT_EXPERIMENTER.md#8-running-through-a-parent-session-optional),
+adding only the model line. Each launch line states the model and tool as the session
+reports them.
+
+**Progress.** Run 1 of 6: not yet started.
+
 ### Experiment 036, by the user's direction
 
 On 2026-10-04 the user took up R11's first escalation:
@@ -55,10 +105,11 @@ none of the four development guitars, where the challenger met three. It rejects
 control but fails almost every performance on both outputs. Its zero-crossing front end
 is wrong or late on every guitar (finding 29); the chain is not implicated. No
 promotion, version, suite or stopping-count change; event-chain@3 remains incumbent and
-the main track's next question is 23 again. A process review of 036 is due, by a
-session other than this one, which also wrote R11.
+the main track's next question was 23 again, until the amendment paused it. A process review of 036 is due, by a
+session other than this one, which also wrote R11; the current batch's closing review
+covers it.
 
-### Current batch: the challenger track, experiment 035
+### Previous batch, closed: the challenger track, experiment 035
 
 Opened 2026-10-02 by the user, run through a parent session (Claude Fable 5.1 in Claude
 Code) that launches the experimenter, the seam auditor and the reviewer as separate
@@ -171,7 +222,8 @@ unresolved guitar assessment failure is Martin's control claims; live cost is se
 carries both stopping counts, version/comparison totals and unused qualification
 budgets/access. Held-out guitars remain unused and Winner bars 5–8 unexamined.
 Latest fresh incumbent sweep is g034, next due no later than 039, with both tracks'
-numbers counting. No set is retired. [Audit 4](bench/oracle-events/audit-4.md) remains
+numbers counting. No set is retired. *(Superseded 2026-10-04: the amendment retires every
+sine set and pauses the main track; see the current batch.)* [Audit 4](bench/oracle-events/audit-4.md) remains
 the current evaluator audit; the **observation-seam@1** timing audit is done
 ([audit](bench/oracle-events/audit-observation-seam-1.md): 8 agree, 0 disagree, 0
 ambiguous), and its two rule ambiguities and uncovered rules are the challenger
@@ -250,18 +302,22 @@ Status is `holds`, `superseded` or `withdrawn`.
 ## Open questions
 
 Ranked by row order; the top row is the next question. The number is an identifier
-given when a question opens and never reused. Questions 24–27 belong to the challenger
-track; the highest open row of the rest is the main track's next: question 23, now that
-question 28, taken ahead of it by the user's direction of 2026-10-04, is answered.
+given when a question opens and never reused. Since the 2026-10-04 amendment the main
+track is paused, so the open rows are the challenger's, in the current batch's order.
+Questions 1–23 and 28 are the main track's.
 
 | Rank | Question | Why it is ranked here | Status | Owner item |
 |---|---|---|---|---|
+| 27 | Does a re-versioned observation-seam@2, which also states how measured compute enters `availableAt` and `madeAt` under [the amendment's compute-inclusive deadline](contracts/development-contract-2.md#amendment-2026-10-04-sampled-guitar-replaces-the-sines-and-the-promotion-rule), settle the two ambiguities the audit found, by stating whether `floor(p)+1` is an index or a count and whether "times already emitted" means equal times or times at or before the last emitted, and freeze hand cases for them and for the rules the audit could not exercise (a second run's emitted set and its shared availableAt, the reduction above threshold and its tie-break, the offline trim count, a stitched frame at i ≥ 344, the bin-to-MIDI map), with the audit's note on the stitched-time offset carried into any offline-versus-live comparison, and does an independent audit agree? | The audit rule makes this a prerequisite to any live-cursor verdict from the seam: ambiguity B changes which frames reach the three-frame confirmation and so the cursor's timing; the assessment path is unaffected | open | [Audit](bench/oracle-events/audit-observation-seam-1.md#rules-i-could-not-exercise), [observation seam 1](contracts/observation-seam-1.md) |
+| 29 | With the quiet-noise silence control frozen (pink noise at −60 dBFS RMS, each performance's length, fixed generator and seed, beside every guitar example), do the current challenger and the incumbent reject it on both outputs, or does Basic Pitch's per-window normalisation invent notes in it? | The amendment makes it every guitar stage's silence control; digital zero told neither listener apart, and every later repair must be judged with it | open | [Amendment](contracts/development-contract-2.md#amendment-2026-10-04-sampled-guitar-replaces-the-sines-and-the-promotion-rule) |
+| 26 | Can a bounded Basic Pitch front-end/decoder repair reject Martin's spurious low-pitch wrong-score claims while preserving every passing development-guitar assessment and the quiet-noise controls? | Promotion needs all four development guitars; any fitted threshold is calibrated on separate development examples, never on what it is scored on | open | [035 next](reports/035-challenger-basic-pitch.md#next) |
+| 30 | Can a streaming Basic Pitch live path, computing only new frames rather than the whole window every 100 ms, meet the sustained cost ratio of 0.25 and every 0.2 s event deadline on the compute-inclusive clock, on the clean and hesitation guitar examples with all controls? | 035's untrimmed live path met the nominal deadline (median 95 ms) but cost about twice the gate, and its nominal clock omits 40–65 ms of inference; the cursor is half of every stage | open | [035 live](reports/035-challenger-basic-pitch.md#live-spike-observations-deadlines-and-cost) |
+| 31 | Does the challenger pass guitar stage 1 and the silent-hesitation substage, both outputs and all controls, on all four development guitars under the amended gates, with the incumbent measured on the same examples and controls? | Conditions (a) and (b) of the amendment's decision 5; a full run of every example, since the sentinels are the incumbent's | open | [Amendment](contracts/development-contract-2.md#amendment-2026-10-04-sampled-guitar-replaces-the-sines-and-the-promotion-rule) |
+| 32 | Does the challenger, fixed in a pre-registration before rendering, pass the same schedules and controls rendered from the three held-out guitar sets (`tonejs-nylon`, `tonejs-electric`, `shinyguitar`; two independent origins), every guitar on both outputs, in one run? | Condition (c), the last before the user promotes; one shot, and a failure turns the held-out sets into development evidence | open, after 31 passes | [Amendment](contracts/development-contract-2.md#amendment-2026-10-04-sampled-guitar-replaces-the-sines-and-the-promotion-rule) |
 | 28 | On 035's frozen guitar renders (576 examples, controls included), what do the unchanged event-chain@3's two outputs do under the current instruments, and how does each example compare with 035's challenger assessment? | The user's direction of 2026-10-04, after R11: the challenger's promotion rule needs the incumbent's guitar result, and R10's guitar thermometer asked for exactly this | answered: E2, the renders separate the front ends; incumbent 0/4 guitars on 035's criterion (finding 29) | [036](reports/036-incumbent-guitar.md) |
-| 27 | Does a re-versioned observation-seam@2 settle the two ambiguities the audit found, by stating whether `floor(p)+1` is an index or a count and whether "times already emitted" means equal times or times at or before the last emitted, and freeze hand cases for them and for the rules the audit could not exercise (a second run's emitted set and its shared availableAt, the reduction above threshold and its tie-break, the offline trim count, a stitched frame at i ≥ 344, the bin-to-MIDI map), with the audit's note on the stitched-time offset carried into any offline-versus-live comparison, and does an independent audit agree? | The audit rule makes this a prerequisite to any live-cursor verdict from the seam: ambiguity B changes which frames reach the three-frame confirmation and so the cursor's timing; the assessment path is unaffected | open | [Audit](bench/oracle-events/audit-observation-seam-1.md#rules-i-could-not-exercise), [observation seam 1](contracts/observation-seam-1.md) |
 | 25 | Does an independent session rederive observation-seam@1's timing cases and producer arithmetic, checking resampling, padding, nominal availability versus CPU/wall time, and the limits of first-window runtime parity? | Answered: T1–T8 re-derived, 8 agree, 0 disagree, 0 ambiguous; availableAt is the nominal input clock and so a lower bound on physical latency; exact first-window parity is unreachable under the rules (layouts match only at N = 40004, not a run boundary, with different resamplers); the upstream stitched time sits up to about 8.5 ms off the seam's own grid; two rule ambiguities (the existence rule's `floor(p)+1`, and "times already emitted") and the uncovered rules go to question 27 | answered | [Audit](bench/oracle-events/audit-observation-seam-1.md), Claude Fable 5.1 |
-| 26 | Can a bounded Basic Pitch front-end/decoder repair reject Martin's spurious low-pitch wrong-score claims while preserving the passing development-guitar and sine assessments? | D1 spends the one exploration and permits a second challenger experiment; repair its lowest unresolved assessment/control failure, with any fitted thresholds calibrated on separate development examples; audit and batch review first | open after audit/review | [035 next](reports/035-challenger-basic-pitch.md#next) |
 | 24 | With Basic Pitch observations as its front end and the incumbent's chain unchanged, does the challenger pass the assessment gates, controls included, on `sample-render@1` renders of the stage-1 scores from the development guitars, what does it do on the frozen sine sets, and what look-ahead and cost does an in-process live path need against the 200 ms cursor gate? | The user opened the challenger track on 2026-10-02 (current batch); the first experiment carries an exploration budget, so this is the question it explores rather than predicts | answered: D1 continuation, three sources; Martin controls fail; live exploratory (findings 27–28) | [Contract 2, challenger track](contracts/development-contract-2.md#the-challenger-track-basic-pitch-observations), [avenue A2](TRACK_PROPOSALS.md#a2-basic-pitch-observations-through-the-event-chain) |
-| 23 | Does the incumbent follow and identify a single wrong note, while rejecting near-miss w1 and retaining every confirmed substage and the passed omission sentinels? | Next deviation in contract 2 after missing-event passes; exact-pitch deletion success does not establish wrong-note following/assessment | open | [034 next](reports/034-missing-event-sweep.md#next), [contract 2 order](contracts/development-contract-2.md#order-of-work) |
+| 23 | Does the incumbent follow and identify a single wrong note, while rejecting near-miss w1 and retaining every confirmed substage and the passed omission sentinels? | Next deviation in contract 2 after missing-event passes; exact-pitch deletion success does not establish wrong-note following/assessment | paused by the [2026-10-04 amendment](contracts/development-contract-2.md#amendment-2026-10-04-sampled-guitar-replaces-the-sines-and-the-promotion-rule): the sines are retired; returns as a guitar deviation in stage 2 | [034 next](reports/034-missing-event-sweep.md#next), [contract 2 order](contracts/development-contract-2.md#order-of-work) |
 | 22 | Does the unchanged incumbent recover after a single missing event (cursor recovery, `missing` findings, the spanning interval) while retaining every passed substage, and does the full sweep due at batch end 034 confirm the substages passed since g031b? | Next deviation in contract 2's order; rushed bar now passed (finding 25); the sweep is due at the batch's end | answered: yes, D1 (finding 26) | [Contract 2 order](contracts/development-contract-2.md#order-of-work), [034](reports/034-missing-event-sweep.md) |
 | 21 | Does the unchanged incumbent pass one rushed bar, retaining the held-note and earlier substages under current gates? | Answered by 033: all 479 active examples pass; fast flags 64/66, misses only at the exact threshold | answered: yes, D1 (finding 25) | [033](reports/033-rushed-bar.md) |
 | 19 | After reporting repair, does the incumbent hold a hesitation while the previous note keeps ringing, before rushed/missing/wrong/dead/extra deviations? | Answered by 032 on constant non-overlapping sine sustain; ringing/overlapping guitar remains outside this stage | answered: yes, D1 (finding 24) | [032](reports/032-held-note-hesitation.md) |

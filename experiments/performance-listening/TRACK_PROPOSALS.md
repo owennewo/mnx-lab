@@ -102,7 +102,9 @@ incumbent has failed, in each case under the shared gates and with controls. The
 loser freezes as a comparator, never developed further, which is the pattern contract
 2 already uses for the time-warp family. (As adopted, [the contract's decision 4](contracts/development-contract-2.md#the-challenger-track-basic-pitch-observations)
 reads "one the incumbent cannot attempt" where this says "has failed"; the contract
-governs, and R11 asks the user which is meant.) Until promotion, the incumbent track
+governs, and R11 asks the user which is meant. Resolved 2026-10-04: the contract's
+amendment rewrites the rule around "has failed" on the same examples and a held-out
+confirmation.) Until promotion, the incumbent track
 continues unchanged and its questions keep their rank.
 
 **Cost.** One more listener in the full sweep, and a second stopping count for the

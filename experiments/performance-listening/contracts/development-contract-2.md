@@ -9,6 +9,10 @@ approval; loosening a range, a gate or the exit rule needs the user. **The numer
 gates below are placeholders** until the oracle cases exist and the user approves
 numbers chosen from them.
 
+**Amended 2026-10-04** by the user's direction: the sines are dropped, the progression
+is rebased onto sampled guitar, and the promotion rule is rewritten. See
+[the amendment](#amendment-2026-10-04-sampled-guitar-replaces-the-sines-and-the-promotion-rule).
+
 ## The user's direction
 
 After experiment 021, the user questioned the measurement itself (2026-09-30):
@@ -249,6 +253,9 @@ listener, and its sync anchors are uncertain. It is judged at bar level with an
 uncertainty band around each anchor, and *indeterminate* where the band prevents a
 judgement. The assessment never reads sync.
 
+Since 2026-10-04 the sound of stages 1–3 is sampled guitar and stage 4 is microphone
+recordings: see [the amendment](#amendment-2026-10-04-sampled-guitar-replaces-the-sines-and-the-promotion-rule).
+
 ### The categories
 
 Each category is a bundle of settings for synthetic performances, not a grade for a
@@ -378,6 +385,10 @@ loosened under pressure once a stage proves them unreachable.
 | Assessment, pooled over a stage | For each kind of finding: at least 90% found and false alarms at most 5% of negatives |
 | Bar-flag threshold θ | 0.10, as defined in the instruments, against the other bars' typical tempo, and only with at least three other bars |
 
+On the guitar stages these gates apply with two changes, a quiet-noise silence control
+and a compute-inclusive deadline in place of the chunk p99: see
+[the amendment](#amendment-2026-10-04-sampled-guitar-replaces-the-sines-and-the-promotion-rule).
+
 ### Auditing an oracle
 
 A new or re-versioned oracle is audited before any listener is judged by it. A session
@@ -496,7 +507,8 @@ Claude Code) and binding on the challenger:
 4. **Promotion, fixed now.** The challenger becomes the incumbent when it passes every
    substage the incumbent has passed, or passes one the incumbent cannot attempt, in
    each case under the shared gates with controls. The loser freezes as a comparator and
-   is never developed further.
+   is never developed further. *Replaced on 2026-10-04 by
+   [the amendment's decision 5](#amendment-2026-10-04-sampled-guitar-replaces-the-sines-and-the-promotion-rule).*
 5. **The observation seam.** The challenger introduces a versioned contract file,
    `contracts/observation-seam-N.md`, the second kind of contract file an experiment may
    add. It defines what passes from the front end to the chain: per-frame activations
@@ -520,7 +532,86 @@ Claude Code) and binding on the challenger:
 The incumbent track continues unchanged and its questions keep their rank. Its next
 full sweep is still due no later than experiment 039, counting both tracks' numbers.
 
+## Amendment, 2026-10-04: sampled guitar replaces the sines, and the promotion rule
+
+Added 2026-10-04 by the user's direction, after experiment 036 measured the incumbent
+on the challenger's guitar renders. Where it differs from a section above, this section
+governs; those sections carry a pointer here and are otherwise left as they were.
+
+The user's direction, in order:
+
+> I'm prepared to promote, but before I do - I'd like to dot the i's and cross the t's.  Also tell me about the lag
+
+> lets drop the sine wave - its not useful.  what do you recommend we do on your decisions
+
+> yes - write them in and set up the batch - slight preference of sol 6.1 (Dave) or astra 6 (new agent eric)  as I have more openai tokens left.
+
+The decisions below are the recommendations the user accepted with that "yes", drafted
+by Claude Opus 5.5 in Claude Code.
+
+1. **The sines are dropped.** Every sine set is retired: frozen and cited as history,
+   never run again, in a routine run or a sweep. The sine passes of event-chain@1–@3
+   stand as historical records. The full-sweep obligation now applies to the guitar sets
+   below, from the first experiment that claims a guitar stage.
+2. **The progression is rebased onto sampled guitar.** The sound of stages 1–3 is
+   `sample-render@1` from the four development guitar sample sets (`tonejs-acoustic`,
+   `martin`, `spanish`, `fender`). Exact note schedules keep lesson L1. Stage 1 is s1 and
+   s2, perfect, at the four tempi; stage 2 adds the deviations one at a time, in the
+   order of [the progression](#the-progression-start-simple-one-change-at-a-time),
+   re-rendered from the frozen sine schedules; stage 3 is Winner bars 1–4 with chords.
+   Stage 4, which was one recorded guitar sample set, becomes **recordings through a
+   microphone**, with its own gates proposed from evidence before it starts. Stage 5 is
+   unchanged.
+3. **Gates for the guitar stages.** [The approved gates](#the-gates-approved-for-stages-13)
+   apply unchanged, with two changes:
+   - **The silence control is quiet noise, not digital zero:** pink noise at −60 dBFS
+     RMS, the length of the performance, from a fixed, recorded generator and seed. The
+     level is fixed here and never tuned. Digital zero tells no listener apart: both
+     passed it in 035 and 036, and Basic Pitch's per-window normalisation is untested
+     without it. The wrong-score control stays `w2`.
+   - **Cost and delay:** the sustained cost ratio stays at most 0.25. The chunk p99 of at
+     most 10 ms is replaced by the cursor deadline (every event within 0.2 s, or 95%
+     where an example has 20 or more) measured on a clock that **includes the
+     listener's measured compute time**: a decision is made no earlier than the delivery
+     clock plus the wall time spent producing it. The p99 gate was written for listeners
+     that work every chunk and would forbid a batched model that meets its deadline;
+     the replacement tightens the deadline to count real compute and drops the jitter
+     limit. Cost stays provisional to the measuring host.
+4. **Passing a guitar stage means all four development guitars,** both outputs and
+   controls, under these gates. A guitar or a part is never chosen after its results
+   are seen.
+5. **Promotion, replacing [challenger decision 4](#the-challenger-track-basic-pitch-observations).**
+   The challenger becomes the incumbent when (a) it passes guitar stage 1 and the
+   silent-hesitation substage (the sets 035 and 036 measured, with the quiet-noise
+   control added), both outputs and controls, on all four development guitars; (b) the
+   incumbent fails that stage on the same examples (036 records its assessment failure;
+   its cursor and noise controls are measured beside the challenger's); and (c) it passes
+   the **held-out confirmation**. "Cannot attempt" and "every substage the incumbent has
+   passed" are withdrawn: the first was undefined, and the second referred to the
+   sines. The loser still freezes as a comparator and is never developed further.
+6. **The held-out confirmation, once.** The same schedules, controls included, are
+   rendered from the three held-out sample sets (`tonejs-nylon`, `tonejs-electric`,
+   `shinyguitar`; the last two share the Karoryfer origin, so this is two independent
+   sources, not three). The experiment first checks that none of them has been examined
+   under contract 2. The candidate, its configuration and the criterion are fixed in a
+   pre-registration before rendering. It passes only if every held-out guitar passes
+   both outputs and controls. It runs once. If it fails, there is no promotion, and the
+   held-out sets become development evidence (lesson L11): a later claim needs fresh
+   held-out guitars.
+7. **The user promotes.** When (a)–(c) hold, the batch stops; a process review by a
+   model that ran none of its experiments checks the evidence, and the user makes the
+   promotion. On promotion, event-chain@3 freezes as a comparator, the new incumbent's
+   sentinels are chosen by the rising-tide rule from its own guitar evidence, and a full
+   sweep of the guitar sets is run as the new incumbent.
+8. **The main track is paused.** No further event-chain version is developed. Question
+   23 (one wrong note) returns as a guitar deviation in stage 2.
+
+The [observation seam](#the-challenger-track-basic-pitch-observations)'s timing must be
+settled before any cursor verdict (question 27), and decision 3's compute-inclusive clock
+is part of that settlement: the next seam version states how measured compute enters
+`availableAt` and `madeAt`, and its audit covers it.
+
 ## Still open for the user
 
-- New gates before stage 4, recorded guitar, from the evidence of stages 1–3.
+- New gates before stage 4, now microphone recordings, from the evidence of stages 1–3.
 - The category figures, if experience says the estimates are wrong.
