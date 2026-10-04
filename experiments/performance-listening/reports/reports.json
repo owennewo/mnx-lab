@@ -211,6 +211,19 @@
         "href": "036-incumbent-guitar.html",
         "label": "Experiment 036"
       }
+    },
+    {
+      "number": "038",
+      "slug": "038-challenger-quiet-noise",
+      "title": "038 \u00b7 Quiet-noise controls for both unchanged listeners",
+      "banner": "D1 \u00b7 both listeners reject all 192 quiet-noise controls \u00b7 Basic Pitch decodes low pitches on every clip but claims no score note \u00b7 live nominal only; sustained cost still over target",
+      "runs": [
+        "g038-challenger-quiet-noise"
+      ],
+      "previous": {
+        "href": "037-challenger-observation-seam.html",
+        "label": "Experiment 037"
+      }
     }
   ]
 }

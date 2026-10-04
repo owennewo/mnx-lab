@@ -98,25 +98,28 @@ govern; cursor verdicts stay blocked until that seam version is audited. The use
 
 So the order is 29, 26, 30 (with 34), 31, 32.
 
-**Progress.** Run 1 of 6 done: [037](reports/037-challenger-observation-seam.md),
-GPT-6.1-Sol (high) in Codex, **D1 implementation agreement**; the independent audit
-outcome follows below.
-Observation-seam@2 settles the two rule ambiguities and specifies measured serial
-completion, including backlog; no listener is run or live pass claimed. Its separate
-hand oracle and arithmetic agree (finding 30). **The independent seam-2 audit is
-complete:** [audit](bench/oracle-events/audit-observation-seam-2.md), GPT-6-Astra (high)
-in Codex, agrees on every checked case, including the inherited samples. It confirms
-the index and strict-watermark clarifications, but leaves uncovered rules and a
-cost-ratio wording ambiguity. *(Reordered below by the user: question 29 is next, and
-question 34 is folded into 30.)* Question 34 as the auditor ranked it: the next numbered challenger
-experiment resolves those gaps before listener judgment; quiet-noise controls remain
-queued after that resolution. The experiment author audits neither its own cases nor
-this batch. [037's resulting state](reports/037-challenger-observation-seam.md#resulting-stopping-count-budgets-and-evidence-access)
-keeps both stopping counts, versions/comparisons and qualification/held-out access
-unchanged. The amendment retires the sine suite; guitar sweeps begin with the first
-guitar-stage claim. No new decision awaits the user from 037; promotion and the future
-microphone, qualification and Studio decisions remain theirs. Standing R10 questions
-remain recorded below.
+**Progress.** Run **2 of 6 done**: [038](reports/038-challenger-quiet-noise.md),
+GPT-6.1-Sol (high) in Codex, **D1 rejection**. Both unchanged listeners reject the
+fixed quiet-noise controls. Basic Pitch nonetheless decodes low pitches on them;
+score context rejects those pitches on s1/s2, not a universal model silence rule
+(finding 31). Its unchanged live spike still exceeds sustained cost, and its control
+comparisons are on nominal time only. **Question 26 (Martin) is next**, then question
+30 with 34, the stage claim, and held-out confirmation in the approved order.
+
+Run 1, [037](reports/037-challenger-observation-seam.md), established seam-2 arithmetic
+agreement; the independent [audit](bench/oracle-events/audit-observation-seam-2.md),
+GPT-6-Astra (high) in Codex, agrees on its cases but leaves rule coverage and cost-wording
+gaps. The user folded those into question 30's streaming producer, seam@3 and audit.
+**No cursor verdict before that audit.** No new oracle or seam was introduced by 038.
+
+[038's resulting state](reports/038-challenger-quiet-noise.md#resulting-stopping-count-budgets-and-evidence-access)
+keeps both stopping counts unchanged, adds an unchanged-version comparison to each
+track and spends no qualification or held-out access. Sines remain retired; guitar
+sweeps begin with the first guitar-stage claim. The main track stays paused and
+event-chain@3 remains incumbent. **No new user decision from 038**; promotion,
+future microphone, qualification and Studio decisions remain theirs, as do the
+standing R10 sentinel tie-break/pool and baseline-sweep questions. This session's
+instruction to record user needs without asking questions is preserved in 038.
 
 ### Experiment 036, by the user's direction
 
@@ -328,6 +331,8 @@ Status is `holds`, `superseded` or `withdrawn`.
 | 29 | On 035's frozen guitar renders, the unchanged event-chain@3 meets 035's continuation criterion on none of four development guitars (the challenger met three): assessment passes 10 of 192 performances and the cursor none, while all 384 controls pass. Its zero-crossing front end reads 2.7–57.3% of in-note windows exactly, failing on different notes per guitar, and acquires notes late where it reads them | [036](reports/036-incumbent-guitar.md#results), [g036](runs/g036-incumbent-guitar/summary.json) | holds | 036 | Thermometer, sine-stage gates as comparisons; sampled monophonic renders with digital silence. The controls are cheap for a listener that hears little (L8). Chain not implicated, by 035's privileged-input check |
 | 30 | Explicit sample-index/watermark rules and a serial compute-inclusive completion clock in observation-seam@2 reproduce its independently hand-written arithmetic; distinguishing probes separate the ambiguous/nominal alternatives without changing frozen producers | [037](reports/037-challenger-observation-seam.md#results), [g037](runs/g037-challenger-observation-seam/summary.json) | holds | 037 | Implementation agreement only; independent audit pending (question 33). No native inference, live causality/cost or guitar latency measured; future versioned producer adoption required |
 
+| 31 | On the fixed −60 dBFS pink-noise controls, both unchanged listeners reject every s1/s2 assessment and nominal cursor comparison, although Basic Pitch decodes low pitches on every clip; none reaches the score register, so exact pitch matching rather than model-level silence rejection explains these particular controls | [038](reports/038-challenger-quiet-noise.md#results), [g038](runs/g038-challenger-quiet-noise/summary.json) | holds | 038 | One seed and correlated length prefixes; no lower-register, microphone or noise-distribution claim. Live nominal/exploratory, cost still over target; seam@3/audit prerequisite unchanged |
+
 ## Open questions
 
 Ranked by row order; the top row is the next question. The number is an identifier
@@ -337,12 +342,12 @@ Questions 1–23 and 28 are the main track's.
 
 | Rank | Question | Why it is ranked here | Status | Owner item |
 |---|---|---|---|---|
-| 29 | With the quiet-noise silence control frozen (pink noise at −60 dBFS RMS, each performance's length, fixed generator and seed, beside every guitar example), do the current challenger and the incumbent reject it on both outputs, or does Basic Pitch's per-window normalisation invent notes in it? | The amendment makes it every guitar stage's silence control; digital zero told neither listener apart, and every later repair must be judged with it | open | [Amendment](contracts/development-contract-2.md#amendment-2026-10-04-sampled-guitar-replaces-the-sines-and-the-promotion-rule) |
 | 26 | Can a bounded Basic Pitch front-end/decoder repair reject Martin's spurious low-pitch wrong-score claims while preserving every passing development-guitar assessment and the quiet-noise controls? | Promotion needs all four development guitars; any fitted threshold is calibrated on separate development examples, never on what it is scored on | open | [035 next](reports/035-challenger-basic-pitch.md#next) |
 | 30 | Can a streaming Basic Pitch live path, specified by an observation-seam@3 that resolves question 34's gaps (the cost-ratio wording and the uncovered live and cost rules) and is audited before any cursor verdict, computing only new frames rather than the whole window every 100 ms, meet the sustained cost ratio of 0.25 and every 0.2 s event deadline on the compute-inclusive clock, on the clean and hesitation guitar examples with all controls? | 035's untrimmed live path met the nominal deadline (median 95 ms) but cost about twice the gate, and its nominal clock omits 40–65 ms of inference; the cursor is half of every stage | open | [035 live](reports/035-challenger-basic-pitch.md#live-spike-observations-deadlines-and-cost) |
 | 34 | Can the next numbered challenger experiment resolve seam-2 audit coverage gaps, explicitly define the sustained-cost numerator and denominator, and freeze cases for the remaining gate-relevant rules (including variable-wall-time prefix equality, refersTo/backdating, start/finish and empty-call cost accounting, cadence/window/watermark lifecycle and fractional interpolation), with explicit boundaries for pinned DSP/procedural obligations and an independent audit before listener judgment? | The audit agrees on all supplied numbers but agreement is not complete rule coverage; the full uncovered-rule table is the resolution checklist. This precedes quiet-noise controls and any seam-2 cursor verdict | folded into question 30 by the user (2026-10-04): resolved by the experiment that builds the streaming producer, with seam@3 and its audit; no cursor verdict before that audit | [Audit: uncovered rules](bench/oracle-events/audit-observation-seam-2.md#rules-i-could-not-exercise), [cost wording](bench/oracle-events/audit-observation-seam-2.md#cost-wording-needs-clarification) |
 | 31 | Does the challenger pass guitar stage 1 and the silent-hesitation substage, both outputs and all controls, on all four development guitars under the amended gates, with the incumbent measured on the same examples and controls? | Conditions (a) and (b) of the amendment's decision 5; a full run of every example, since the sentinels are the incumbent's | open | [Amendment](contracts/development-contract-2.md#amendment-2026-10-04-sampled-guitar-replaces-the-sines-and-the-promotion-rule) |
 | 32 | Does the challenger, fixed in a pre-registration before rendering, pass the same schedules and controls rendered from the three held-out guitar sets (`tonejs-nylon`, `tonejs-electric`, `shinyguitar`; two independent origins), every guitar on both outputs, in one run? | Condition (c), the last before the user promotes; one shot, and a failure turns the held-out sets into development evidence | open, after 31 passes | [Amendment](contracts/development-contract-2.md#amendment-2026-10-04-sampled-guitar-replaces-the-sines-and-the-promotion-rule) |
+| 29 | With the quiet-noise silence control frozen (pink noise at −60 dBFS RMS, each performance's length, fixed generator and seed, beside every guitar example), do the current challenger and the incumbent reject it on both outputs, or does Basic Pitch's per-window normalisation invent notes in it? | The amendment makes it every guitar stage's silence control; digital zero told neither listener apart, and every later repair must be judged with it | answered: 038 D1 on fixed controls; front end invents low pitches but no score claim (finding 31) | [038](reports/038-challenger-quiet-noise.md), [Amendment](contracts/development-contract-2.md#amendment-2026-10-04-sampled-guitar-replaces-the-sines-and-the-promotion-rule) |
 | 27 | Does a re-versioned observation-seam@2, which also states how measured compute enters `availableAt` and `madeAt` under [the amendment's compute-inclusive deadline](contracts/development-contract-2.md#amendment-2026-10-04-sampled-guitar-replaces-the-sines-and-the-promotion-rule), settle the two ambiguities the audit found, by stating whether `floor(p)+1` is an index or a count and whether "times already emitted" means equal times or times at or before the last emitted, and freeze hand cases for them and for the rules the audit could not exercise (a second run's emitted set and its shared availableAt, the reduction above threshold and its tie-break, the offline trim count, a stitched frame at i ≥ 344, the bin-to-MIDI map), with the audit's note on the stitched-time offset carried into any offline-versus-live comparison, and does an independent audit agree? | The audit rule makes this a prerequisite to any live-cursor verdict from the seam: ambiguity B changes which frames reach the three-frame confirmation and so the cursor's timing; the assessment path is unaffected | answered: 037 D1 and independent audit question 33 agree on supplied cases; remaining coverage and wording go to question 34 | [037](reports/037-challenger-observation-seam.md), [Audit](bench/oracle-events/audit-observation-seam-1.md#rules-i-could-not-exercise), [observation seam 1](contracts/observation-seam-1.md) |
 | 28 | On 035's frozen guitar renders (576 examples, controls included), what do the unchanged event-chain@3's two outputs do under the current instruments, and how does each example compare with 035's challenger assessment? | The user's direction of 2026-10-04, after R11: the challenger's promotion rule needs the incumbent's guitar result, and R10's guitar thermometer asked for exactly this | answered: E2, the renders separate the front ends; incumbent 0/4 guitars on 035's criterion (finding 29) | [036](reports/036-incumbent-guitar.md) |
 | 25 | Does an independent session rederive observation-seam@1's timing cases and producer arithmetic, checking resampling, padding, nominal availability versus CPU/wall time, and the limits of first-window runtime parity? | Answered: T1–T8 re-derived, 8 agree, 0 disagree, 0 ambiguous; availableAt is the nominal input clock and so a lower bound on physical latency; exact first-window parity is unreachable under the rules (layouts match only at N = 40004, not a run boundary, with different resamplers); the upstream stitched time sits up to about 8.5 ms off the seam's own grid; two rule ambiguities (the existence rule's `floor(p)+1`, and "times already emitted") and the uncovered rules go to question 27 | answered | [Audit](bench/oracle-events/audit-observation-seam-1.md), Claude Fable 5.1 |

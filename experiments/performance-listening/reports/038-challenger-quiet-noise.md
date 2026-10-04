@@ -118,3 +118,165 @@ is checked before generation. No other experiment is in progress. The user direc
 > Your model and tool: GPT-6.1-Sol (high) in Codex.
 
 > You cannot ask the user questions: record anything that needs them in your report and the research log.
+
+## Results
+
+**D1: both unchanged listeners reject the fixed quiet-noise controls.** Every noise
+assessment claims no score note played and no overall tempo, interval or flag. Every
+nominal live comparison has zero false-following exposure and zero position emissions.
+Basic Pitch nevertheless decodes low pitches in every clip. This answers question 29
+for these controls; it is neither model-level silence rejection nor a formal live pass.
+
+### Both outputs and the paired performance evidence
+
+| Noise controls | Incumbent assessment | Challenger assessment | Incumbent nominal cursor | Challenger nominal cursor |
+|---|---|---|---|---|
+| Tone.js acoustic: clean; hesitation | 8/8; 40/40 | 8/8; 40/40 | 8/8; 40/40 | 8/8; 40/40 |
+| Martin: clean; hesitation | 8/8; 40/40 | 8/8; 40/40 | 8/8; 40/40 | 8/8; 40/40 |
+| Spanish: clean; hesitation | 8/8; 40/40 | 8/8; 40/40 | 8/8; 40/40 | 8/8; 40/40 |
+| Fender: clean; hesitation | 8/8; 40/40 | 8/8; 40/40 | 8/8; 40/40 | 8/8; 40/40 |
+| **All attachments** | **192/192** | **192/192** | **192/192** | **192/192** |
+
+These are **48 distinct score/audio inputs**, measured once each and cited for their
+identical attachments across guitars; **42 unique noise WAVs**, not 192 independent
+noise realizations. Their evaluated label fields are checked identical before reuse.
+All 384 retained performance and w2 examples, including their labels, are unchanged.
+The g035/g036 assessment evidence is reused after producer/input/artifact verification:
+
+| Paired evidence, all four guitars | Incumbent g036 | Challenger g035 |
+|---|---|---|
+| Guitar performance assessments | 10/192 | 192/192 |
+| w2 assessments | 192/192 | 168/192 |
+| New noise assessments | 192/192 | 192/192 |
+
+Martin's 24 w2 claims remain failures. The incumbent's rejection remains cheap beside
+its poor performance acceptance (L8). Incumbent performance cursors remain 0/192;
+challenger clean edge0 cursors were exploratory in 035. Its hesitation live performances
+are still unmeasured. These citations do not turn partial evidence into a stage pass.
+
+### Noise response and its limits
+
+| Observation | Result |
+|---|---|
+| Actual WAV RMS range | -60.000203 to -59.999412 dBFS |
+| Maximum absolute sample | 0.004241943; no clipping |
+| Welch log-power slope, 100–10,000 Hz | -1.0089 to -0.9947 (pink is approximately −1) |
+| Offline clips with decoded pitches | 42/42 |
+| Offline decoded events, unique WAVs | 259; 2–12 per clip |
+| Maximum offline note activation | 0.622382, above the unchanged 0.3 frame threshold |
+| Distinct live inputs with pitched frames | 48/48; 8,852 pitch-bearing frames over those executions |
+| Score-note claims / cursor position emissions | 0 / 0, both listeners |
+| False-following exposure / longest episode | 0 s / 0 s, both listeners |
+
+Offline decoded MIDI pitches are `27, 28, 29, 30, 32, 33, 35, 36, 40, 41, 49, 53`; live frame pitches
+span MIDI 24–53. None is in s1/s2's MIDI 60–72 register.
+The front end therefore **does invent low pitches on the noise**, while the unchanged
+exact-pitch chain/aligner has no score pitch to accept. The measured rejection does not
+establish safety on scores in that lower register, another seed, another noise color,
+or microphone audio. This is one fixed, correlated development stimulus, not a noise
+robustness distribution. The normalization source motivates the hypothesis, but there
+is no ablation here, so its causal responsibility remains an inference, not a result.
+The [source note](../research/quiet-noise-038.md) records the bounded primary-source check.
+
+### Causality, cost and execution
+
+All **48 sampled future-prefix probes** agree: four preselected inputs × six futures
+for each listener. They compare decisions on nominal delivery time, not activations or
+compute-inclusive availability. The absence of score positions makes these checks weak
+against defects that affect only successful acquisitions. No exhaustive live causality
+or seam-2/3 adoption is claimed.
+
+| Cost on this i7-8750H / Node 22.22.1 host | Incumbent | Challenger edge0 |
+|---|---|---|
+| Maximum sustained ratio | 0.002305 | 0.481118 |
+| Maximum chunk p99 | 0.150 ms | 56.260 ms |
+| Maximum runner backlog | 0.000 ms | 82.187 ms |
+
+The frozen spike still exceeds the **0.25** sustained target; p99 is descriptive since
+the amendment dropped that gate. Native model load was 200.655 ms,
+reported separately and excluded from these per-input ratios. These are executeSeam's
+measured cost quantities, provisional to this host; its decisions and frame availability
+still use the nominal clock. They supply no physical feedback latency measurement and
+cannot clear the amendment's live gates. Question 30 owns that producer, its complete
+cost definition, compute-inclusive clock, seam-3 cases and independent audit.
+
+The single run completed **2026-10-04T22:00:05.368Z–2026-10-04T22:03:51.597Z**, in **226.229 s**
+(3.77 minutes: above the two-minute routine target, below the five-minute review trigger).
+No infrastructure failure or technical rerun. Source **4a0684c38f06b8b1a58bd32e2ba09def3a255c30**,
+tagged `g038-challenger-quiet-noise-source`; pre-registration **ef752e4102b0e1ff21ce114bed3f4ba06281ec14**
+had already landed and pushed before generation. Dry public-record assembly preceded
+generation/measurement; observations and pair records were written and hashed as made.
+
+**2,107 distinct prior artifacts** verified before measurement, including the original
+387 set assets, both listeners' guitar evaluation records, guitar observations and
+challenger clean edge0 records. Original relevant producer sources, model, decoder,
+environment lock and guitar-nn commit agree with their pinned records. Historical sine
+and baseline behavior is preserved by unchanged source/record bytes; no retired sine
+set, held-out guitar, reserved/final evidence or Winner bars 5–8 was executed or examined.
+The installed FFmpeg binary and arguments are pinned; repeated raw generation agreed.
+FFmpeg emitted stream-fd warnings but returned success with exact length, identical raw
+hashes and validated levels. They are preserved in the execution log, not a failed run.
+
+| Artifact | Path / SHA-256 |
+|---|---|
+| Public summary, 70,782 bytes | [g038](../runs/g038-challenger-quiet-noise/summary.json); `72560e5e4365e14ee48034c2eabc662323e121de1dcf70d4e3fcd02ca44d57c4` |
+| Frozen noise manifest | `/home/williao/dev/mnx-listening-data/contract2-challenger-guitar-noise-v1/manifest.json`; `961d5dce4a152af17da006c2f86dfdd48fee32acae74f38b9def988462b229e8` |
+| Private input/attachment results | `/home/williao/dev/mnx-listening-data/diagnostic-runs/g038-challenger-quiet-noise/results.json`; `3385893e27f85ab3fd618b834fdd1e8f0b995ba058486e42c1427ce58c05f2e2` |
+| Spectral and offline-map diagnostic | `/home/williao/dev/mnx-listening-data/diagnostic-runs/g038-challenger-quiet-noise/noise-diagnostics.json`; `067b328ef0878130373b551ab676fd807b7302e8739daeadf2009ef1e72af841` |
+| Full execution log | `/home/williao/dev/mnx-listening-data/diagnostic-runs/g038-challenger-quiet-noise/execution.log`; `92c349808811def83307e648fea203b4b3c31bc46190691c0640e3ddb6770563` |
+
+Individual observation and pair record paths/hashes are named by the summary and private
+results index. Focused stimulus/adapter checks passed **5/5** and the bench TypeScript
+check passed before the committed run. The pre-registration gate passed **507 bench
+tests**, targeted root tests, static checks and build. The final rebased landing gate
+must pass separately; its output is kept with the private execution record.
+
+## Against the predictions
+
+| # | Outcome | Evidence |
+|---|---|---|
+| 1 | Held | Incumbent 192/192 assessments and nominal cursor controls |
+| 2 | Held | Every unique noise clip decodes pitches; every live input has pitch-bearing frames |
+| 3 | Held, within scope | Challenger 192/192 assessments and nominal cursor controls; no exact score pitch detected |
+| 4 | Held | 48/48 sampled prefixes; prior producer/input/record hashes verify; all 384 retained examples unchanged |
+
+## Decision
+
+**D1 applies.** Question 29 is answered on the fixed control. Noise pitches are measured,
+not score claims, and cost alone was explicitly excluded from this decision. Both
+listeners, instruments, suite states, sentinels and incumbent remain unchanged. No
+formal live, guitar-stage or promotion verdict follows. No new oracle needs an audit.
+The ongoing batch advances to question 26, Martin's wrong-score claims.
+
+### Resulting stopping count, budgets and evidence access
+
+Main stopping **0**, **3 versions/11 comparisons**; challenger stopping **0**,
+**1 version/2 comparisons**, exploration spent. This unchanged-version diagnostic adds
+one comparison to each track, no failed version. Qualification **6 versions/12 slots**
+unused; held-out guitars, reserved/final evidence and Winner bars 5–8 untouched.
+Sines remain retired; guitar sweeps begin with the first guitar-stage claim. Batch
+**2 of 6 completed**, continuing; this session stops after landing and retiring.
+
+## Next
+
+**Question 26:** repair Martin's isolated false low-G2 claims in a separately versioned
+challenger while preserving every passing development-guitar assessment and these frozen
+noise controls. Any fitted limit needs separate calibration examples, as the contract
+and L11 require. Then question 30 with 34: streaming cost/clock and seam-3 audit, before
+any cursor verdict; then full guitar-stage claim and the one-shot held-out confirmation.
+This report author neither runs the next experiment nor performs the batch review.
+
+**Awaiting the user:** no new decision from 038. Promotion stays with the user after
+the remaining evidence and independent review. Microphone-stage gates, qualification
+and Studio choices, and R10's standing sentinel tie-break/pool and baseline-sweep
+questions remain future or standing user decisions; none is bypassed here.
+
+**Direction of travel.** Exact-pitch sequence context rejects this noise on the short
+upper-register scores and can remain useful as scores lengthen. Noise-triggered low
+pitches, lower registers, chords and microphone conditions still need evidence; the
+monophonic reduction and expensive repeated-window live producer will need development.
+
+## Attribution
+
+Pre-registered, implemented, run and recorded by **GPT-6.1-Sol (high) in Codex**.
+Independent oracle audits and closing process review are other sessions.
