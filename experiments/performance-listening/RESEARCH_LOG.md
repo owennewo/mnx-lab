@@ -77,8 +77,8 @@ case **stops before promotion**: the promotion itself is the user's.
 - **Experimenter: Dave** (herdr `dave`), **GPT-6.1-Sol (high) in Codex**, a fresh
   session for every numbered run.
 - **Seam audit (question 27's) and any other oracle audit: Eric** (herdr `eric`),
-  **GPT-6-Astra (medium) in Codex**, a different model from the author, as the audit
-  rule requires.
+  **GPT-6-Astra (high) in Codex** (moved from medium by the user on 2026-10-04, before
+  any audit), a different model from the author, as the audit rule requires.
 - **Closing process review:** a model that ran none of the experiments and wrote none of
   the audits, so not Dave or Eric. Claude Fable 5.1 or Claude Opus 5.5; Opus 5.5 wrote
   this amendment, R11 and 036, so **Fable 5.1** is preferred.
