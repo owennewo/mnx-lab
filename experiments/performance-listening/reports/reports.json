@@ -185,6 +185,19 @@
         "href": "034-missing-event-sweep.html",
         "label": "Experiment 034"
       }
+    },
+    {
+      "number": "036",
+      "slug": "036-incumbent-guitar",
+      "title": "036 \u00b7 The incumbent on the challenger's guitar renders",
+      "banner": "E2 \u00b7 unchanged event-chain@3 meets 035's criterion on 0 of 4 guitars (challenger 3) \u00b7 assessment 10/192 and cursor 0/192 performances, all 384 controls \u00b7 zero-crossing front end under 58% exact, 3% on the electric",
+      "runs": [
+        "g036-incumbent-guitar"
+      ],
+      "previous": {
+        "href": "035-challenger-basic-pitch.html",
+        "label": "Experiment 035"
+      }
     }
   ]
 }

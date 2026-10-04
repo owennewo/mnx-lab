@@ -54,3 +54,4 @@ every source hash they pin against the run's own commit. `serve-private-review.m
 serves a private review folder over localhost; private audio never enters git.
 
 | 035 | [Basic Pitch observations through the unchanged event chain](035-challenger-basic-pitch.html) | [g035](../runs/g035-challenger-basic-pitch/summary.json), D1 continuation; timing audit pending |
+| 036 | [The incumbent on the challenger's guitar renders](036-incumbent-guitar.html) | [g036](../runs/g036-incumbent-guitar/summary.json), E2: the guitar renders separate the front ends |
