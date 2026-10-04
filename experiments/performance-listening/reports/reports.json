@@ -198,6 +198,19 @@
         "href": "035-challenger-basic-pitch.html",
         "label": "Experiment 035"
       }
+    },
+    {
+      "number": "037",
+      "slug": "037-challenger-observation-seam",
+      "title": "037 \u00b7 Settle observation timing and count compute",
+      "banner": "D1 implementation agreement \u00b7 36/36 frozen hand cases \u00b7 eight wrong-rule families detected \u00b7 no listener run \u00b7 independent seam-2 audit next",
+      "runs": [
+        "g037-challenger-observation-seam"
+      ],
+      "previous": {
+        "href": "036-incumbent-guitar.html",
+        "label": "Experiment 036"
+      }
     }
   ]
 }

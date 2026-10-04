@@ -1,0 +1,357 @@
+{
+  "id": "g037-challenger-observation-seam",
+  "kind": "observation-seam-arithmetic-validation",
+  "modelAndTool": "GPT-6.1-Sol (high) in Codex",
+  "gitCommit": "726a8c320e2d5a969d7e33771e4a9b8e81052862",
+  "preregistration": "reports/037-challenger-observation-seam.md",
+  "preregistrationCommit": "c1fe83fa146d32a8efdeee057fefe35f59627895",
+  "sourceHashes": {
+    "bench/src/challenger/run037.ts": "407daf55e6d6ce2335ce27415b8e93069c5a2e4b4f59a86ddd23d7757d550a51",
+    "bench/src/challenger/observation2.ts": "044069e13c12cc10c4b474825c40b7927075a37cd2517d1f16dd39b1c85f89a0",
+    "bench/src/challenger/validateObservation2.ts": "e2040adcd4f0b8f9ce019b742686634452a19fa2085a30bff3958a5559e56c81",
+    "bench/src/challenger/native.ts": "653ce712826545a832b74a28cc3a8005fdffa41c2ab667830983d80b595764ab",
+    "bench/src/io.ts": "62c62365425f2ca12ebca5290ad5164b851125a55bc45a2d1224a346af5c6a7e",
+    "bench/src/ladder/privateSets.ts": "9845c8b026317f285f1199948098b71a66045041883a14b4a6a950d075047004",
+    "bench/test/observation-seam-2.test.ts": "be2be06a33d7b5dc5ff9e73945107c92b3802994160819660670b6ada347391c",
+    "bench/oracle-events/observation-seam-2.json": "1a353ed0e56f4b2e3b765832c8b373d9147f02002238cab4efcc34d6fccddcac",
+    "bench/oracle-events/freeze-observation-seam-2.json": "9f565e394aad18f92345348377b4b5902bddf63c8054492c8fa8fd2612af431a",
+    "contracts/observation-seam-2.md": "73d0faa966e5f68500a5e749c725f8eddd945fbc7e97c3441b21c105caaafb45",
+    "contracts/development-contract-2.md": "8bdad5f0cc9af6d50c350431c4bbc3049b8edcf9e2e66a3edb406b4ad80e61ce",
+    "research/observation-clock-037.md": "c850c95eeb1216c9283e67e70429d5099bad18ee375ad8b628d17e3f17409122",
+    "reports/037-challenger-observation-seam.md": "f0699f82f822fa78588ef794f2e4c9796bf3c999e36ea433f16dad97a77ba423"
+  },
+  "definition": "observation-seam@2",
+  "independentAudit": false,
+  "listenersExecuted": 0,
+  "modelInferences": 0,
+  "listenerVerdictsChanged": 0,
+  "suiteChanges": 0,
+  "reservedFinalHeldOutAccesses": 0,
+  "status": "D1-agreement-pending-independent-audit",
+  "elapsedSeconds": 1.906633209,
+  "oracle": {
+    "cases": 36,
+    "agree": 36,
+    "sha256": "1a353ed0e56f4b2e3b765832c8b373d9147f02002238cab4efcc34d6fccddcac",
+    "perCase": [
+      {
+        "id": "R0",
+        "agrees": true,
+        "artifact": {
+          "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g037-challenger-observation-seam/case-R0.json",
+          "sha256": "48806494b954228bb671bcff7e51b1de3b57409e34e05acb61b4cef057d8c64c"
+        }
+      },
+      {
+        "id": "R1",
+        "agrees": true,
+        "artifact": {
+          "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g037-challenger-observation-seam/case-R1.json",
+          "sha256": "f4e4fbec33c3b15ade544705b6a504ef9a3d1d6bf0183bb347c3a3adeb99a215"
+        }
+      },
+      {
+        "id": "R2",
+        "agrees": true,
+        "artifact": {
+          "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g037-challenger-observation-seam/case-R2.json",
+          "sha256": "32b9c1867553950ee668c41fd9ac508c9934c9aa9b8305e175516d7f9c45f870"
+        }
+      },
+      {
+        "id": "R3",
+        "agrees": true,
+        "artifact": {
+          "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g037-challenger-observation-seam/case-R3.json",
+          "sha256": "720056a3f464e46d021bef4d27db6f2318625cfdb1238346c10caa13822f1470"
+        }
+      },
+      {
+        "id": "R4",
+        "agrees": true,
+        "artifact": {
+          "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g037-challenger-observation-seam/case-R4.json",
+          "sha256": "77b17ec984c662b77df3a01d96c8f0745f6873f878e1f0e0538b1dde2d08440c"
+        }
+      },
+      {
+        "id": "R5",
+        "agrees": true,
+        "artifact": {
+          "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g037-challenger-observation-seam/case-R5.json",
+          "sha256": "be79f5b584e851bf7ac8ba6a96a6669cc94e40af93cf59ca3a31fa1d218da055"
+        }
+      },
+      {
+        "id": "R6",
+        "agrees": true,
+        "artifact": {
+          "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g037-challenger-observation-seam/case-R6.json",
+          "sha256": "35eb4948b7f1a4d51ba8cb06380777cca3035e28768608ade7012697100cee88"
+        }
+      },
+      {
+        "id": "R7",
+        "agrees": true,
+        "artifact": {
+          "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g037-challenger-observation-seam/case-R7.json",
+          "sha256": "073fd3d6c25682e164b705c1db67ae787507e6e060f7206d6369c78e06782f6f"
+        }
+      },
+      {
+        "id": "L1",
+        "agrees": true,
+        "artifact": {
+          "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g037-challenger-observation-seam/case-L1.json",
+          "sha256": "a4cc23777312900927a57df8d657df34927e0cd5393a743cee4220f484040d20"
+        }
+      },
+      {
+        "id": "L2",
+        "agrees": true,
+        "artifact": {
+          "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g037-challenger-observation-seam/case-L2.json",
+          "sha256": "678d7bc7988b9c702070c5b5c1c6297bf40a8a12d943ab140d369cef6ebd1276"
+        }
+      },
+      {
+        "id": "L3",
+        "agrees": true,
+        "artifact": {
+          "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g037-challenger-observation-seam/case-L3.json",
+          "sha256": "3cb73d7b3ba9fa37279521048b3886973f3911f08620c1a2e952d8e10b8220a2"
+        }
+      },
+      {
+        "id": "L4",
+        "agrees": true,
+        "artifact": {
+          "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g037-challenger-observation-seam/case-L4.json",
+          "sha256": "ff47bb1bd11768f4580de49a1a5a1ad3533bf0a291ae1558e7a95a1a39caa046"
+        }
+      },
+      {
+        "id": "L5",
+        "agrees": true,
+        "artifact": {
+          "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g037-challenger-observation-seam/case-L5.json",
+          "sha256": "ab422f069fe83402f48390f9c1c8e8e9e48e934082c8aadb79bb187f3e368452"
+        }
+      },
+      {
+        "id": "L6",
+        "agrees": true,
+        "artifact": {
+          "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g037-challenger-observation-seam/case-L6.json",
+          "sha256": "0332885bc768c5ab3664584bd2afbd2017ea8a9240e9bdd6467f99abd47f73a0"
+        }
+      },
+      {
+        "id": "W1",
+        "agrees": true,
+        "artifact": {
+          "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g037-challenger-observation-seam/case-W1.json",
+          "sha256": "b4a88ae180cf06ec5b3b794c2c9be348e3df068902d5e8de69fb5c0c8820bd8e"
+        }
+      },
+      {
+        "id": "W2",
+        "agrees": true,
+        "artifact": {
+          "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g037-challenger-observation-seam/case-W2.json",
+          "sha256": "de90c9ad2a8767c5acf169eb4e571af903bf60c68f961db0bc7a2a16a3960dc0"
+        }
+      },
+      {
+        "id": "W3",
+        "agrees": true,
+        "artifact": {
+          "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g037-challenger-observation-seam/case-W3.json",
+          "sha256": "c80e4b6481caded5447fb447efc77af07551072e88c484ac57a5ad3a360f7898"
+        }
+      },
+      {
+        "id": "C1",
+        "agrees": true,
+        "artifact": {
+          "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g037-challenger-observation-seam/case-C1.json",
+          "sha256": "ed24f828501e301676ff0a34fc29827cbac5fb01c9ef13be344650e22e6abb24"
+        }
+      },
+      {
+        "id": "C2",
+        "agrees": true,
+        "artifact": {
+          "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g037-challenger-observation-seam/case-C2.json",
+          "sha256": "710df281081ea3ff68d8c768838dc646661889f2f4735799806cd423dfd21f3a"
+        }
+      },
+      {
+        "id": "C3",
+        "agrees": true,
+        "artifact": {
+          "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g037-challenger-observation-seam/case-C3.json",
+          "sha256": "68c0f132ac5d6fc75f9d5fe34a5b1070d25bfe77080036b286ba46dcf752cf07"
+        }
+      },
+      {
+        "id": "C4",
+        "agrees": true,
+        "artifact": {
+          "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g037-challenger-observation-seam/case-C4.json",
+          "sha256": "fdc963fbe9e635818b84fb515fdd19dfd4aa40abf5b199e39045fffea1060424"
+        }
+      },
+      {
+        "id": "C5",
+        "agrees": true,
+        "artifact": {
+          "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g037-challenger-observation-seam/case-C5.json",
+          "sha256": "7859afc504269e9979165f0ea1008e2e74f42ee0470eac6158e5e3217c6485ea"
+        }
+      },
+      {
+        "id": "C6",
+        "agrees": true,
+        "artifact": {
+          "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g037-challenger-observation-seam/case-C6.json",
+          "sha256": "0e12ea3d439212584fb9ebf603961caa7ac78948aa0a6418234a36d038afd7dc"
+        }
+      },
+      {
+        "id": "C7",
+        "agrees": true,
+        "artifact": {
+          "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g037-challenger-observation-seam/case-C7.json",
+          "sha256": "a9dc9f6d47c5fe94223eaceb01b2e2d06b3203d8dd4a071ea7c6cbd963286ebe"
+        }
+      },
+      {
+        "id": "P1",
+        "agrees": true,
+        "artifact": {
+          "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g037-challenger-observation-seam/case-P1.json",
+          "sha256": "89adc3bc715333eb8a6888980bca2fc620b10f4623c5d0df36a89068c59f0599"
+        }
+      },
+      {
+        "id": "P2",
+        "agrees": true,
+        "artifact": {
+          "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g037-challenger-observation-seam/case-P2.json",
+          "sha256": "1d3b3018ed43b76c59705b4c2235156cb2586716cdd0691e70866599c12b2dad"
+        }
+      },
+      {
+        "id": "P3",
+        "agrees": true,
+        "artifact": {
+          "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g037-challenger-observation-seam/case-P3.json",
+          "sha256": "243d1ad2394b05ce3f5578057d7bf23d8cebd642d7089a4ad6d41644799d0fd7"
+        }
+      },
+      {
+        "id": "P4",
+        "agrees": true,
+        "artifact": {
+          "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g037-challenger-observation-seam/case-P4.json",
+          "sha256": "e8ba2dbd2ccea37f342b0139d5a4069af59cc2f55eb467ac3b3bde4065b7ceff"
+        }
+      },
+      {
+        "id": "P5",
+        "agrees": true,
+        "artifact": {
+          "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g037-challenger-observation-seam/case-P5.json",
+          "sha256": "73a30d66f792aac8687df3b59bad20d5301cd2779b242fd83c4517027fc9e6b4"
+        }
+      },
+      {
+        "id": "O1",
+        "agrees": true,
+        "artifact": {
+          "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g037-challenger-observation-seam/case-O1.json",
+          "sha256": "b8db892cb10b161dbb88d6eb036c8ff7b17de92d798f637a4fe6720c40020cd0"
+        }
+      },
+      {
+        "id": "O2",
+        "agrees": true,
+        "artifact": {
+          "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g037-challenger-observation-seam/case-O2.json",
+          "sha256": "840ba43c0bdae942e61f4ed72d664e91559d8052f2cf0a6453862025c26e99d9"
+        }
+      },
+      {
+        "id": "O3",
+        "agrees": true,
+        "artifact": {
+          "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g037-challenger-observation-seam/case-O3.json",
+          "sha256": "dd43a8b942615297749b4966084c1cd7d2e8983c21e7147459fd6869667e1ed7"
+        }
+      },
+      {
+        "id": "O4",
+        "agrees": true,
+        "artifact": {
+          "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g037-challenger-observation-seam/case-O4.json",
+          "sha256": "966c382ff4c656965fb241afb7811a6bcef56f1982514468cb7b4b4354fb0009"
+        }
+      },
+      {
+        "id": "O5",
+        "agrees": true,
+        "artifact": {
+          "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g037-challenger-observation-seam/case-O5.json",
+          "sha256": "891e80109664556d9b51642a8f9548cbc970b886fad7cef09a8aea46fa0a1f5e"
+        }
+      },
+      {
+        "id": "O6",
+        "agrees": true,
+        "artifact": {
+          "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g037-challenger-observation-seam/case-O6.json",
+          "sha256": "f42114ccb6ec939a4f940585616e63119d5b393444bd9eaf5069b33746f56611"
+        }
+      },
+      {
+        "id": "O7",
+        "agrees": true,
+        "artifact": {
+          "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g037-challenger-observation-seam/case-O7.json",
+          "sha256": "455ea0183b69a1475972d5ab7afb651bfa697e20698b3b0495ce9dedf6196365"
+        }
+      }
+    ]
+  },
+  "counts": {
+    "protectedFiles": 390,
+    "historicalRuns": 2,
+    "citedArtifacts": 19,
+    "legacy": 14,
+    "probes": 8
+  },
+  "validation": {
+    "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g037-challenger-observation-seam/validation.json",
+    "sha256": "7a9ded1f5b8b6f44c9baa2236fc2f17c8227daf0aea398da368fe1d0d673caf1"
+  },
+  "stopping": {
+    "main": 0,
+    "challenger": 0,
+    "mainVersions": 3,
+    "mainComparisons": 10,
+    "challengerVersions": 1,
+    "challengerComparisons": 1,
+    "explorationSpent": true,
+    "qualificationVersionsSpent": 0,
+    "qualificationSlotsSpent": 0
+  },
+  "fullSweep": "No listener stage claim; sines retired by amendment; guitar sweep due from first guitar-stage claim.",
+  "startedAt": "2026-10-04T21:08:58.423Z",
+  "finishedAt": "2026-10-04T21:09:00.333Z",
+  "attempt": {
+    "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g037-challenger-observation-seam/attempt.json",
+    "sha256": "7733a4bc7a4d5451142c6ebae97c8698afd5a6023cc376a00c4f25708874d3fd"
+  },
+  "decision": "D1: implementation agreement only; independent observation-seam@2 audit next, no live verdict."
+}

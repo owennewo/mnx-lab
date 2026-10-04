@@ -55,3 +55,4 @@ serves a private review folder over localhost; private audio never enters git.
 
 | 035 | [Basic Pitch observations through the unchanged event chain](035-challenger-basic-pitch.html) | [g035](../runs/g035-challenger-basic-pitch/summary.json), D1 continuation; timing audit pending |
 | 036 | [The incumbent on the challenger's guitar renders](036-incumbent-guitar.html) | [g036](../runs/g036-incumbent-guitar/summary.json), E2: the guitar renders separate the front ends |
+| 037 | [Settle observation timing and count compute](037-challenger-observation-seam.html) | [g037](../runs/g037-challenger-observation-seam/summary.json), D1 implementation agreement; independent seam-2 audit required |
