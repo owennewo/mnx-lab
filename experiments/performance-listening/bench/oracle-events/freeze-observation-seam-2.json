@@ -1,0 +1,8 @@
+{
+  "version": "observation-seam@2",
+  "path": "observation-seam-2.json",
+  "sha256": "1a353ed0e56f4b2e3b765832c8b373d9147f02002238cab4efcc34d6fccddcac",
+  "cases": 36,
+  "author": "GPT-6.1-Sol (high) in Codex",
+  "independentAudit": false
+}

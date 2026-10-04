@@ -1,0 +1,581 @@
+{
+  "version": "observation-seam@2",
+  "author": "GPT-6.1-Sol (high) in Codex",
+  "definition": "contracts/observation-seam-2.md",
+  "note": "Independent hand answers frozen before implementation. Rational objects in expected values mean numerator/denominator. No listener output.",
+  "cases": [
+    {
+      "id": "R0",
+      "op": "resample",
+      "input": {
+        "samples": 0
+      },
+      "expected": 0,
+      "arithmetic": "No samples: no output."
+    },
+    {
+      "id": "R1",
+      "op": "resample",
+      "input": {
+        "samples": 321
+      },
+      "expected": 147,
+      "arithmetic": "j147 needs index321, not delivered; j146 needs318. Count reading incorrectly includes j147."
+    },
+    {
+      "id": "R2",
+      "op": "resample",
+      "input": {
+        "samples": 322
+      },
+      "expected": 148,
+      "arithmetic": "j147 needs index321, now delivered; j148 needs323."
+    },
+    {
+      "id": "R3",
+      "op": "resample",
+      "input": {
+        "samples": 480
+      },
+      "expected": 221,
+      "arithmetic": "j220 needs479, j221 needs482."
+    },
+    {
+      "id": "R4",
+      "op": "resample",
+      "input": {
+        "samples": 4800
+      },
+      "expected": 2205,
+      "arithmetic": "j2204 needs4798; j2205 needs4801."
+    },
+    {
+      "id": "R5",
+      "op": "resample",
+      "input": {
+        "samples": 48000
+      },
+      "expected": 22050,
+      "arithmetic": "j22049 needs47998; j22050 needs48001."
+    },
+    {
+      "id": "R6",
+      "op": "interpolate",
+      "input": {
+        "samples": 322,
+        "j": 147
+      },
+      "expected": {
+        "exists": true,
+        "left": 320,
+        "right": 321,
+        "value": 320
+      },
+      "arithmetic": "Ramp input x[k]=k. p147=320 exactly, right321 still required, weight zero."
+    },
+    {
+      "id": "R7",
+      "op": "interpolate",
+      "input": {
+        "samples": 321,
+        "j": 147
+      },
+      "expected": {
+        "exists": false
+      },
+      "arithmetic": "Index321 is missing, even though p is an integer."
+    },
+    {
+      "id": "L1",
+      "op": "batch",
+      "input": {
+        "samples": 4800,
+        "edge": 0,
+        "last": null,
+        "previous": 0,
+        "costMs": 45
+      },
+      "expected": {
+        "indices": [
+          163,
+          164,
+          165,
+          166,
+          167,
+          168,
+          169,
+          170,
+          171
+        ],
+        "coordinates": [
+          89,
+          345,
+          601,
+          857,
+          1113,
+          1369,
+          1625,
+          1881,
+          2137
+        ],
+        "deliveryAt": 0.1,
+        "availableAt": 0.145,
+        "madeAt": 0.145
+      },
+      "arithmetic": "N2205, start\u221241639; j163 coordinate89; all nine share .1+.045=.145."
+    },
+    {
+      "id": "L2",
+      "op": "batch",
+      "input": {
+        "samples": 9600,
+        "edge": 0,
+        "last": 2137,
+        "previous": 0.145,
+        "costMs": 45
+      },
+      "expected": {
+        "indices": [
+          163,
+          164,
+          165,
+          166,
+          167,
+          168,
+          169,
+          170,
+          171
+        ],
+        "coordinates": [
+          2294,
+          2550,
+          2806,
+          3062,
+          3318,
+          3574,
+          3830,
+          4086,
+          4342
+        ],
+        "deliveryAt": 0.2,
+        "availableAt": 0.245,
+        "madeAt": 0.245
+      },
+      "arithmetic": "N4410,start\u221239434; j162=2038\u22642137 discarded; j163=2294. Equality-only would start at j155=246."
+    },
+    {
+      "id": "L3",
+      "op": "batch",
+      "input": {
+        "samples": 4800,
+        "edge": 15,
+        "last": null,
+        "previous": 0,
+        "costMs": 45
+      },
+      "expected": {
+        "indices": [],
+        "coordinates": [],
+        "deliveryAt": 0.1,
+        "availableAt": 0.145,
+        "madeAt": 0.145
+      },
+      "arithmetic": "j156=\u22121703; every permitted coordinate negative."
+    },
+    {
+      "id": "L4",
+      "op": "batch",
+      "input": {
+        "samples": 9600,
+        "edge": 15,
+        "last": null,
+        "previous": 0.145,
+        "costMs": 45
+      },
+      "expected": {
+        "indices": [
+          155,
+          156
+        ],
+        "coordinates": [
+          246,
+          502
+        ],
+        "deliveryAt": 0.2,
+        "availableAt": 0.245,
+        "madeAt": 0.245
+      },
+      "arithmetic": "j154=\u221210; j155=246,j156=502; both share .245 completion."
+    },
+    {
+      "id": "L5",
+      "op": "batch",
+      "input": {
+        "samples": 14400,
+        "edge": 15,
+        "last": 502,
+        "previous": 0.245,
+        "costMs": 45
+      },
+      "expected": {
+        "indices": [
+          148,
+          149,
+          150,
+          151,
+          152,
+          153,
+          154,
+          155,
+          156
+        ],
+        "coordinates": [
+          659,
+          915,
+          1171,
+          1427,
+          1683,
+          1939,
+          2195,
+          2451,
+          2707
+        ],
+        "deliveryAt": 0.3,
+        "availableAt": 0.345,
+        "madeAt": 0.345
+      },
+      "arithmetic": "N6615,start\u221237229; j147=403\u2264502, j148=659."
+    },
+    {
+      "id": "L6",
+      "op": "batch",
+      "input": {
+        "samples": 9600,
+        "edge": 0,
+        "last": 4342,
+        "previous": 0.245,
+        "costMs": 5
+      },
+      "expected": {
+        "indices": [],
+        "coordinates": [],
+        "deliveryAt": 0.2,
+        "availableAt": 0.25,
+        "madeAt": 0.25
+      },
+      "arithmetic": "Latest coordinate4342 equals watermark: strict comparison discards all. Prior completion causes .05 backlog."
+    },
+    {
+      "id": "W1",
+      "op": "cadence",
+      "input": {
+        "samples": 4799,
+        "nextSamples": 4800
+      },
+      "expected": false,
+      "arithmetic": "Not yet the .1-second sample boundary."
+    },
+    {
+      "id": "W2",
+      "op": "cadence",
+      "input": {
+        "samples": 4800,
+        "nextSamples": 4800
+      },
+      "expected": true,
+      "arithmetic": "Exactly .1-second delivery boundary is eligible."
+    },
+    {
+      "id": "W3",
+      "op": "waiting",
+      "input": {
+        "onset": 0.100001,
+        "nextDelivery": 0.2
+      },
+      "expected": 0.099999,
+      "arithmetic": ".2\u2212.100001=.099999; no event-recognition assertion."
+    },
+    {
+      "id": "C1",
+      "op": "clock",
+      "input": {
+        "delivery": 0.1,
+        "previous": 0,
+        "costMs": 45
+      },
+      "expected": 0.145,
+      "arithmetic": "No backlog: .1+.045=.145."
+    },
+    {
+      "id": "C2",
+      "op": "clock",
+      "input": {
+        "delivery": 0.1,
+        "previous": 0,
+        "costMs": 101
+      },
+      "expected": 0.201,
+      "arithmetic": "Nominal100ms passes first-event deadline; completion201ms misses it."
+    },
+    {
+      "id": "C3",
+      "op": "clock",
+      "input": {
+        "delivery": 0.2,
+        "previous": 0.24,
+        "costMs": 60
+      },
+      "expected": 0.3,
+      "arithmetic": "Backlog40ms: .24+.06=.30, not .26."
+    },
+    {
+      "id": "C4",
+      "op": "clock",
+      "input": {
+        "delivery": 0.2,
+        "previous": 0.13,
+        "costMs": 40
+      },
+      "expected": 0.24,
+      "arithmetic": "Idle clears backlog: .2+.04=.24, not .17 or .33."
+    },
+    {
+      "id": "C5",
+      "op": "clock",
+      "input": {
+        "delivery": 0.01,
+        "previous": 0.02,
+        "costMs": 10
+      },
+      "expected": 0.03,
+      "arithmetic": "20ms initialization at t0 delays first feed to20ms, finishes30ms."
+    },
+    {
+      "id": "C6",
+      "op": "clock",
+      "input": {
+        "delivery": 0.3,
+        "previous": 0.35,
+        "costMs": 20
+      },
+      "expected": 0.37,
+      "arithmetic": "Finish uses clip duration as delivery, preserves previous backlog, plus20ms."
+    },
+    {
+      "id": "C7",
+      "op": "clock",
+      "input": {
+        "delivery": 10,
+        "previous": 0,
+        "costMs": 2000
+      },
+      "expected": 12,
+      "arithmetic": "Offline whole-clip work:10+2=12; no causal cursor verdict."
+    },
+    {
+      "id": "P1",
+      "op": "pitch",
+      "input": {
+        "bins": {
+          "39": 0.8,
+          "41": 0.9
+        }
+      },
+      "expected": {
+        "midi": 62,
+        "confidence": 0.9,
+        "kind": "pitched"
+      },
+      "arithmetic": "Maximum bin41 -> MIDI62, not first active bin39."
+    },
+    {
+      "id": "P2",
+      "op": "pitch",
+      "input": {
+        "bins": {
+          "39": 0.8,
+          "41": 0.8
+        }
+      },
+      "expected": {
+        "midi": 60,
+        "confidence": 0.8,
+        "kind": "pitched"
+      },
+      "arithmetic": "Equal maxima: lowest bin39 -> MIDI60."
+    },
+    {
+      "id": "P3",
+      "op": "pitch",
+      "input": {
+        "bins": {
+          "0": 0.3
+        }
+      },
+      "expected": {
+        "midi": 21,
+        "confidence": 0.3,
+        "kind": "pitched"
+      },
+      "arithmetic": "Threshold inclusive; first bin0 -> MIDI21."
+    },
+    {
+      "id": "P4",
+      "op": "pitch",
+      "input": {
+        "bins": {
+          "87": 0.5
+        }
+      },
+      "expected": {
+        "midi": 108,
+        "confidence": 0.5,
+        "kind": "pitched"
+      },
+      "arithmetic": "Last bin87 -> MIDI108."
+    },
+    {
+      "id": "P5",
+      "op": "pitch",
+      "input": {
+        "bins": {
+          "39": 0.299
+        }
+      },
+      "expected": {
+        "midi": null,
+        "confidence": 0.299,
+        "kind": "unpitched"
+      },
+      "arithmetic": "Below threshold; no pitchless onset and no silence assertion."
+    },
+    {
+      "id": "O1",
+      "op": "trim",
+      "input": {
+        "length": 1323000,
+        "windows": 37
+      },
+      "expected": {
+        "retained": 5160,
+        "available": 5254,
+        "discardedTail": 94
+      },
+      "arithmetic": "60 seconds*86=5160;37*142=5254;retain prefix,drop94 tail.256-hop count would5167."
+    },
+    {
+      "id": "O2",
+      "op": "trim",
+      "input": {
+        "length": 22050,
+        "windows": 1
+      },
+      "expected": {
+        "retained": 86,
+        "available": 142,
+        "discardedTail": 56
+      },
+      "arithmetic": "1 second keeps86 of142,not floor22050/256=86 coincidentally;explicit tail."
+    },
+    {
+      "id": "O3",
+      "op": "offline",
+      "input": {
+        "index": 0
+      },
+      "expected": {
+        "window": 0,
+        "raw": 15,
+        "gridTime": 0,
+        "decoderTime": 0,
+        "difference": 0
+      },
+      "arithmetic": "First raw15 cancels3840 leading zeros."
+    },
+    {
+      "id": "O4",
+      "op": "offline",
+      "input": {
+        "index": 142
+      },
+      "expected": {
+        "window": 1,
+        "raw": 15,
+        "gridTime": {
+          "numerator": 36164,
+          "denominator": 22050
+        },
+        "decoderTime": {
+          "numerator": 36352,
+          "denominator": 22050
+        },
+        "difference": {
+          "numerator": 188,
+          "denominator": 22050
+        }
+      },
+      "arithmetic": "First frame next142-block: grid36164, decoder36352; difference188/22050."
+    },
+    {
+      "id": "O5",
+      "op": "offline",
+      "input": {
+        "index": 172
+      },
+      "expected": {
+        "window": 1,
+        "raw": 45,
+        "gridTime": {
+          "numerator": 43844,
+          "denominator": 22050
+        },
+        "decoderTime": {
+          "numerator": 438043100,
+          "denominator": 220500000
+        },
+        "difference": -0.0018
+      },
+      "arithmetic": "One172 reset subtracts188/22050+.0018; grid43844/22050."
+    },
+    {
+      "id": "O6",
+      "op": "offline",
+      "input": {
+        "index": 344
+      },
+      "expected": {
+        "window": 2,
+        "raw": 75,
+        "gridTime": {
+          "numerator": 87688,
+          "denominator": 22050
+        },
+        "decoderTime": {
+          "numerator": 876086200,
+          "denominator": 220500000
+        },
+        "difference": -0.0036
+      },
+      "arithmetic": "344*256=88064;two resets subtract376+79.38 samples;grid88064\u2212376=87688."
+    },
+    {
+      "id": "O7",
+      "op": "eventTimes",
+      "input": {
+        "onsetIndex": 142,
+        "endIndex": 172
+      },
+      "expected": {
+        "onset": {
+          "numerator": 36352,
+          "denominator": 22050
+        },
+        "end": {
+          "numerator": 438043100,
+          "denominator": 220500000
+        }
+      },
+      "arithmetic": "Both endpoints use upstream frame axis; duration is their difference."
+    }
+  ]
+}
