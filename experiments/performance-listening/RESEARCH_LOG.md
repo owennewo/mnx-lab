@@ -41,6 +41,17 @@ How to maintain it:
 
 ## Current state
 
+### Experiment 036, by the user's direction
+
+On 2026-10-04 the user took up R11's first escalation:
+
+> yep - lets run teh incumbent against same guitar samples.
+
+[036](reports/036-incumbent-guitar.md) runs the unchanged event-chain@3 on 035's frozen
+guitar renders, controls included, as a thermometer beside 035's challenger
+assessment (question 28). Claude Opus 5.5 in Claude Code; no batch is open.
+**Pre-registered; not yet run.**
+
 ### Current batch: the challenger track, experiment 035
 
 Opened 2026-10-02 by the user, run through a parent session (Claude Fable 5.1 in Claude
@@ -232,10 +243,12 @@ Status is `holds`, `superseded` or `withdrawn`.
 
 Ranked by row order; the top row is the next question. The number is an identifier
 given when a question opens and never reused. Questions 24–27 belong to the challenger
-track; the highest open row of the rest, question 23, is the main track's next.
+track; the highest open row of the rest is the main track's next: question 28, taken
+ahead of 23 by the user's direction of 2026-10-04.
 
 | Rank | Question | Why it is ranked here | Status | Owner item |
 |---|---|---|---|---|
+| 28 | On 035's frozen guitar renders (576 examples, controls included), what do the unchanged event-chain@3's two outputs do under the current instruments, and how does each example compare with 035's challenger assessment? | The user's direction of 2026-10-04, after R11: the challenger's promotion rule needs the incumbent's guitar result, and R10's guitar thermometer asked for exactly this | open | [036](reports/036-incumbent-guitar.md) |
 | 27 | Does a re-versioned observation-seam@2 settle the two ambiguities the audit found, by stating whether `floor(p)+1` is an index or a count and whether "times already emitted" means equal times or times at or before the last emitted, and freeze hand cases for them and for the rules the audit could not exercise (a second run's emitted set and its shared availableAt, the reduction above threshold and its tie-break, the offline trim count, a stitched frame at i ≥ 344, the bin-to-MIDI map), with the audit's note on the stitched-time offset carried into any offline-versus-live comparison, and does an independent audit agree? | The audit rule makes this a prerequisite to any live-cursor verdict from the seam: ambiguity B changes which frames reach the three-frame confirmation and so the cursor's timing; the assessment path is unaffected | open | [Audit](bench/oracle-events/audit-observation-seam-1.md#rules-i-could-not-exercise), [observation seam 1](contracts/observation-seam-1.md) |
 | 25 | Does an independent session rederive observation-seam@1's timing cases and producer arithmetic, checking resampling, padding, nominal availability versus CPU/wall time, and the limits of first-window runtime parity? | Answered: T1–T8 re-derived, 8 agree, 0 disagree, 0 ambiguous; availableAt is the nominal input clock and so a lower bound on physical latency; exact first-window parity is unreachable under the rules (layouts match only at N = 40004, not a run boundary, with different resamplers); the upstream stitched time sits up to about 8.5 ms off the seam's own grid; two rule ambiguities (the existence rule's `floor(p)+1`, and "times already emitted") and the uncovered rules go to question 27 | answered | [Audit](bench/oracle-events/audit-observation-seam-1.md), Claude Fable 5.1 |
 | 26 | Can a bounded Basic Pitch front-end/decoder repair reject Martin's spurious low-pitch wrong-score claims while preserving the passing development-guitar and sine assessments? | D1 spends the one exploration and permits a second challenger experiment; repair its lowest unresolved assessment/control failure, with any fitted thresholds calibrated on separate development examples; audit and batch review first | open after audit/review | [035 next](reports/035-challenger-basic-pitch.md#next) |
