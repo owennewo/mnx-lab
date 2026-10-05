@@ -120,3 +120,152 @@ unchanged. Only main existed at pickup; 048 unused in report registry/archive/pr
 Own listening-048 worktree and npm ci once; ffmpeg/frozen private inputs available, write
 preflight required before measurement. Inventory has own Dave w4:pA working; other panes
 idle/done, load1 1.40 at preflight, rechecked after gates. No user question is asked.
+
+
+## Results
+
+**D1: retain `basic-pitch-chain@5-note-output` as a development resource variant.**
+Removing unused live onset/contour bridge copies preserves every complete request note
+tensor, input/crop, ordered live payload and causal prefix on the frozen development set.
+Allocation batch advances to **2 of at most 3**. This establishes resource savings,
+not historical stall repair, a formal stage pass or promotion; 043/045 D2 and 046 D3 stand.
+
+| Measurement | Frozen @4 / full-output bridge | New @5 / note-only bridge |
+|---|---:|---:|
+| Complete examples (192 performances, 384 controls) | 576 | 576 |
+| Fresh primary executions | 576 | 576 |
+| Requests / complete neural frames returned | 34,848 / 662,112 | Identical |
+| Complete note tensor hashes / input-crop-request identities | Reference | All agree |
+| Explicit main-thread output slice result arrays | 104,544 | 34,848 |
+| Explicit output slice backing bytes | 1,165,317,120 | 233,063,424 |
+| Worker-to-shared-output copied bytes | 1,165,317,120 | 233,063,424 |
+| Shared output backing capacity per model | 302,720 bytes | 60,544 bytes |
+| Complete payload identities, also against 047 | Reference | 576/576 |
+| Input-storage allocation identities against 047 | Reference | 576/576 |
+| Candidate prefix executions / agreeing checks | Unchanged checker | 592/592 |
+| Verified unchanged offline artifacts/producers | 039 reference | 576/576 |
+
+Exactly **80% fewer bytes** at each targeted output-copy site: **932,253,696 bytes**
+avoided in main-thread slice destinations, and the same reduction in worker shared-output
+copy work. Slice result objects fall by **66.6667%** (69,696 objects avoided), and one
+loaded model uses **242,176 fewer shared output bytes**. These are distinct operation/
+capacity counts; they are not total V8/native allocation, resident memory, GC traffic or
+allocator bookkeeping. The unchanged ONNX graph still computes all three result tensors
+and recomputes full normalized DSP. Input/window/chunk allocation behavior is unchanged.
+
+### Complete parity and output ownership
+
+For every example, the unchanged parent and candidate are both measured fresh on the
+same input, alternating which runs first by manifest ordinal. Every request's complete
+returned note array hashes identically, including nonselected frames. All model-window
+hashes, selected indices, crop begin/length and every non-wall payload agree with each
+other and with hash-verified 047. Input-storage allocation objects agree with 047.
+The note slices remain independent snapshots across later predictions; no shared view
+or borrowed note-buffer lifetime is introduced.
+
+All **576 bounded half-prefix** and **16 full changed-future** executions agree under
+unchanged prefixEqual3. All four development guitars' clean/hesitation examples and
+quiet-noise/w2 controls are included. Frozen offline @2 still uses all three maps;
+its 039 observations, decoded events, artifacts and producing sources are verified and
+cited rather than reselected or rerun. No observation definition, scalar oracle, chain,
+offline policy, graph, normalization, inference cadence, gate or sentinel changes.
+The behavioral note-only/throwing-unused-map compatibility test passes and confirms
+that diagnostic hooks do not enter service clocks. Bench type checking passes.
+
+### Timing, host and limits
+
+| Informational primary service | Parent | Candidate |
+|---|---:|---:|
+| Service seconds / audio seconds | 518.181376 / 3506.493 | 513.876214 / 3506.493 |
+| Weighted service/audio ratio | .147778 | .146550 |
+| Median per-example ratio | .148281 | .143848 |
+| Maximum per-example ratio | .185537 | .194327 |
+
+These are paired diagnostic observations on this host, with both model sessions loaded
+and fixed alternating execution order. Weighted/median candidate service is lower,
+but its maximum is higher. There is no speed acceptance gate and this evidence does
+not establish improved worst-case latency or ownership/removal of historical stalls.
+All service, including start/feed/finish and any wall outlier, stays in the clocks;
+reference work and diagnostic hashing remain outside candidate service. Candidate's
+576 informational cursor/cost comparisons clear their existing thresholds, with maximum
+event delay **.156427 s**; no formal claim is authorized by this resource result.
+
+**69 valid quiet-host samples:** start load1 **1.60**, maximum **1.82**, maximum gap
+**21.782679 s**; no competing working pane, two consecutive loads above 4, unreadable
+inventory, lost own identity or over-30-second gap. This certifies the specified sampled
+condition, not complete host exclusivity. One measurement,
+**2026-10-05T20:29:58.855Z–2026-10-05T20:53:10.354Z**, **1391.498468 s**
+(23.19 minutes). The complete paired resource/native/prefix workload
+exceeds the routine two-minute aim; it is not a formal stage/baseline sweep.
+
+### Integrity and read-only verification
+
+Pre-registration **f847240b** reached main/origin after its landing gate passed, before
+source commit/measurement. Tag **g048-challenger-output-copies-source** pins
+**f6ed34d6**. The read-only verifier passes on its first execution, checking
+**415 source hashes at that commit**, **3,609 distinct artifact hashes** and
+**889,016 service intervals**, complete payload/request/note-hash equality, snapshots,
+prefixes and exact independently reconstructed resource totals. Tracked paths resolve
+at the pinned commit after retirement. Each execution was saved before proceeding;
+no writer/reader repair, discarded measurement or inference repeat was needed.
+Public summary is **131,916 bytes** (about 129 KiB), below the size target.
+
+| Artifact | Path / SHA-256 |
+|---|---|
+| Public summary | [g048](../runs/g048-challenger-output-copies/summary.json); `77f50365ace383c44161d5839349ac0b5d15415fe2548005707695ad363df720` |
+| Read-only statistics | `/home/williao/dev/mnx-listening-data/diagnostic-runs/g048-challenger-output-copies/statistics.json`; `d5ef5e58fcd81c1ab4293d8f5f364247a629a7e64fcefa91c556ad0def966296` |
+| Per-execution note hashes, arrays/counts, live records, prefixes, host and validation | Private paths/hashes indexed in the public summary/results |
+
+## Against the predictions
+
+| # | Outcome | Evidence and limit |
+|---|---|---|
+| 1 | Held | 576 complete fresh note/request/payload pairs agree, also against 047; wall timing excluded as pre-registered |
+| 2 | Held | Exactly 80% fewer slice/copy bytes and shared output capacity; three-to-one slice objects; targeted sites only |
+| 3 | Held | 592/592 prefixes and 576/576 offline/input-storage identities; snapshots independent |
+| 4 | Held | First read-only verification passes complete sources/artifacts/clocks/counts and 69 valid host samples |
+
+## Decision
+
+**D1 applies.** Retain the additive live note-output resource variant as the development
+parent for the already approved, separately pre-registered full-DSP caching candidate.
+No formal stage, speed gate, historical stall attribution, incumbent/suite/sentinel/oracle
+change, held-out confirmation or promotion follows. The allocation batch stays open at
+**2 of at most 3**; this session lands, retires and stops after exactly 048.
+
+### Resulting stopping count, budgets and evidence access
+
+Main stopping **0**, **3 versions/11 comparisons** unchanged. Challenger stopping
+**2**, now **5 implementation versions/8 development comparisons**, exploration spent.
+This resource comparison neither attempts/clears the lowest open formal substage nor
+resets its stopping count or counts as a third failed stage attempt. Qualification
+**6 versions/12 slots unused**. 048 technical repeat unused; 041 spent, 043–047 unused.
+Held-out/reserved/final and Winner 5–8 untouched; sines retired. Incumbent, suite,
+sentinels, oracles and gates unchanged.
+
+## Next
+
+A fresh experimenter takes the third approved candidate: whether full-DSP caching can
+reduce measured work while preserving current global normalization, complete numerical
+output and causal behavior. This experiment leaves full DSP recomputation intact. Any
+cache that needs stale normalization or different output semantics is deferred, not
+adopted. That question gets its own method/pre-registration; this author does not design
+or execute it. An independent process review follows the batch's final run or early stop.
+
+**Awaiting the user:** no new decision blocks that authorized resource question. The
+standing guitar-faust pause/release decision remains with the user/parent; this session's
+timing has finished, but the batch has one candidate remaining. A future formal claim,
+held-out confirmation/promotion, microphone gates, qualification and Studio decisions
+remain separate user directions. No questions are asked.
+
+**Direction of travel.** The output-bridge savings can survive longer scores and other
+sounds wherever the live consumer needs only note activations. Chords, pitchless/dead
+notes or future onset/contour consumers may require another explicit transport, and this
+variant gives no permission to delete their model outputs or offline observations.
+The chain/strongest-pitch/chord and microphone limitations remain separate development.
+
+## Attribution
+
+Pre-registration, implementation, complete paired measurement, first read-only verification
+and recording by **GPT-6.1-Sol (high) in Codex**. One numbered experiment, one measurement,
+no technical/inference repeat. Independent batch process review is another session.

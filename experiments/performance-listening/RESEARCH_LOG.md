@@ -93,12 +93,25 @@ event-chain@3 remains incumbent. This is no historical stall repair or formal st
 carries stage stopping counts unchanged and records the new resource version/comparison,
 unused technical repeat and untouched protected evidence. Record-only path/reader repairs
 preserve the raw writer and failed read-only verification; no inference was repeated.
-The batch remains open at **1 of at most 3**, closing process review due at its end.
+The batch remains open at **2 of at most 3**, closing process review due at its end.
 This current direction answers the prior reopening decision (question 48); the
 experimenter updates the ranked questions when its record lands. The standing
 `guitar-faust` pause/release decision is unchanged; timing sessions verify the required
 host conditions rather than assuming exclusivity. Any user-dependent work is recorded
 in the report and research log without asking questions.
+
+**Run 2 complete: [048 unused output copies](reports/048-challenger-output-copies.md), D1 resource variant.**
+The additive note-only live bridge preserves complete fresh request note tensors, inputs,
+live payloads and causal prefixes while removing copies of unused onset/contour outputs.
+The graph still computes all outputs and full normalized DSP; offline @2 remains unchanged.
+This variant becomes the development parent for the third approved, independently
+pre-registered contract-preserving DSP-cache question. Event-chain@3 stays incumbent;
+no speed, historical-stall repair or formal stage claim. [048 resulting state](reports/048-challenger-output-copies.md#resulting-stopping-count-budgets-and-evidence-access)
+carries unchanged stage stopping and protected access, one resource version/comparison
+and unused technical repeat. First read-only verification passes without record repair.
+Batch open at **2 of at most 3**; independent closing process review follows its final
+experiment or early stop. No new user decision blocks the authorized resource question;
+the standing guitar-faust release and future formal/protected/product decisions remain theirs.
 
 ### Latest continuation: closed at 1 of at most 3, full-workload no attribution
 
@@ -616,6 +629,7 @@ Status is `holds`, `superseded` or `withdrawn`.
 | 39 | The frozen challenger passes all development-guitar assessments and costs on a contract-valid quiet host, but two Martin silent-hesitation events miss compute-inclusive deadlines after no-inference feed stalls | [045](reports/045-challenger-quiet-host-stage.md#results), [g045](runs/g045-challenger-quiet-host-stage/summary.json) | holds | 045 | No cause attributed, redraw, stage-2 pass or held-out use; all clean stage-1 gates and frozen identities agree |
 | 40 | A complete accumulated-evidence workload and a bounded isolated listener process preserve every development-guitar payload, assessment and prefix but reproduce no no-inference stall; storage isolation alone supplies no demonstrated repair | [046](reports/046-challenger-full-workload-trace.md#results), [g046](runs/g046-challenger-full-workload-trace/summary.json) | holds | 046 | Full fixed A-then-B traced workloads; historical cause remains unresolved, no formal claim or held-out use |
 | 41 | Reusable raw-input capacity and one borrowed model window preserve complete development-corpus tensors, native outputs and prefixes while removing recurring explicit allocations at those storage sites | [047](reports/047-challenger-input-buffers.md#results), [g047](runs/g047-challenger-input-buffers/summary.json) | holds | 047 | Exact targeted allocation counts, not total V8/native allocation, speed, historical stall ownership or stage approval; synchronous consumer lifecycle |
+| 42 | Copying only the consumed live note map preserves complete fresh development-corpus tensors, payloads and prefixes while removing explicit unused onset/contour bridge copy work and destination allocations | [048](reports/048-challenger-output-copies.md#results), [g048](runs/g048-challenger-output-copies/summary.json) | holds | 048 | Targeted bridge savings only; graph still computes all outputs/full DSP, offline unchanged; no tail-speed, stall ownership or stage claim |
 
 ## Open questions
 
@@ -626,7 +640,8 @@ Questions 1–23 and 28 are the main track's.
 
 | Rank | Question | Why it is ranked here | Status | Owner item |
 |---|---|---|---|---|
-| 50 | Can eliminating copies of unused onset/contour maps, independently of input-buffer reuse, preserve complete numerical/live/prefix output while reducing measured allocation/work? | Next candidate in the approved allocation batch; 047 supplies the parity-preserving storage parent | open; allocation batch run 2 | [Current batch](#current-batch-allocation-optimizations-at-most-3-experiments), [047 next](reports/047-challenger-input-buffers.md#next) |
+| 51 | Can full-DSP caching reduce measured work while preserving current global normalization, complete numerical/live output and causal prefixes? | Third candidate in the approved allocation batch; 048 supplies the parity-preserving note-output parent; changed semantics must be deferred | open; allocation batch run 3 | [Current batch](#current-batch-allocation-optimizations-at-most-3-experiments), [048 next](reports/048-challenger-output-copies.md#next) |
+| 50 | Can eliminating copies of unused onset/contour maps, independently of input-buffer reuse, preserve complete numerical/live/prefix output while reducing measured allocation/work? | Second candidate in the approved allocation batch; 047 supplies the storage parent | answered D1 resource variant by 048; no stage or stall-repair claim | [048](reports/048-challenger-output-copies.md) |
 | 49 | Can reusable raw-input and model-window storage preserve exact corpus inputs/outputs and causal prefixes while removing recurring explicit allocations? | First candidate in the approved allocation batch; does not depend on historical stall reproduction | answered D1 resource variant by 047; no stage claim or stall attribution | [047](reports/047-challenger-input-buffers.md) |
 | 48 | Does the user reopen for further attributable stall evidence or redirect after 046's complete full-workload non-reproduction, following the independent closing review? | The accepted attribution continuation stops on no attribution; storage isolation is not a demonstrated stall repair | answered by the user: reopen for independent input/window reuse, unused-output-copy and contract-preserving DSP-cache resource experiments; no formal claim authorized | [Current batch](#current-batch-allocation-optimizations-at-most-3-experiments) |
 | 47 | Can the complete 576-example challenger workload reproduce a no-inference stall with evidence/GC/CPU/scheduler ownership and distinguish accumulated harness evidence from isolated listener work? | Approved diagnosis follows R14; attribution precedes any repair or fresh formal claim | answered D3 no attribution by 046; no target in either arm | [046](reports/046-challenger-full-workload-trace.md) |

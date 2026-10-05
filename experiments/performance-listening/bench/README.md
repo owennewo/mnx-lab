@@ -185,3 +185,13 @@ hash-verified frozen outputs. `verify047.py` is the documented read-only verifie
 resolves tracked sources at the tagged commit after retirement. Window ownership is
 synchronous: consume before the next feed/reset. See [047](../reports/047-challenger-input-buffers.md)
 for D1's resource scope, record-only corrections and unchanged formal failures.
+
+
+**Experiment 048, unused live-output copies.** `src/challenger/incremental048.ts` and
+`incrementalWorker048.mjs` copy only the live consumer's note output over the unchanged
+ONNX graph; all outputs/full normalized DSP are still computed. `run048.ts` records
+fresh parent/candidate complete note/request/live parity, explicit bridge copy/array
+counts and candidate prefixes over every development example. `verify048.py` checks
+saved evidence without inference and resolves tagged sources after retirement. Offline
+@2 remains unchanged. See [048](../reports/048-challenger-output-copies.md) for D1's
+resource scope and the research log for the third approved candidate.

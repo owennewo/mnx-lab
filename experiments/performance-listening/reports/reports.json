@@ -342,6 +342,19 @@
         "href": "046-challenger-full-workload-trace.html",
         "label": "Experiment 046"
       }
+    },
+    {
+      "number": "048",
+      "slug": "048-challenger-output-copies",
+      "title": "048 \u00b7 Stop copying unused live neural outputs",
+      "banner": "D1 resource variant \u00b7 80% fewer explicit output slice/copy bytes \u00b7 complete fresh note/live/prefix parity \u00b7 no stage claim",
+      "runs": [
+        "g048-challenger-output-copies"
+      ],
+      "previous": {
+        "href": "047-challenger-input-buffers.html",
+        "label": "Experiment 047"
+      }
     }
   ]
 }
