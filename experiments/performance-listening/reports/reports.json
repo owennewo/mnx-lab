@@ -316,6 +316,19 @@
         "href": "044-challenger-stall-diagnosis.html",
         "label": "Experiment 044"
       }
+    },
+    {
+      "number": "046",
+      "slug": "046-challenger-full-workload-trace",
+      "title": "046 \u00b7 Full-workload service-stall attribution",
+      "banner": "D3 no attribution \u00b7 full 576-example workloads preserve every output \u00b7 no stall reproduced \u00b7 continuation stops at 1 of at most 3",
+      "runs": [
+        "g046-challenger-full-workload-trace"
+      ],
+      "previous": {
+        "href": "045-challenger-quiet-host-stage.html",
+        "label": "Experiment 045"
+      }
     }
   ]
 }

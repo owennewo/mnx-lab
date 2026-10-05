@@ -19,7 +19,8 @@ for arm in result['arms']:
  own=[r for r in result['rows'] if r['arm']==arm['arm']];gcmax=[];wall=0;seconds=0;targets=[];exact=[];phase={} ;profiles=[]
  for r in own:
   d=verify(r['artifact']);t=d['trace'];n=len(t)//8;services+=n
-  assert n==math.ceil(d['cost']['audioSeconds']*100)+2,(d['id'],d['kind'],n)
+  samples=round(d['cost']['audioSeconds']*48000);assert abs(samples/48000-d['cost']['audioSeconds'])<1e-12
+  assert n==(samples+479)//480+2,(d['id'],d['kind'],n)
   elapsed=[(t[i*8+1]-t[i*8])/1000 for i in range(n)];assert abs(sum(elapsed)-d['cost']['work'])<1e-9,d['id'];assert abs(elapsed[0]-d['cost']['setup'])<1e-9;assert abs(elapsed[-1]-d['cost']['finish'])<1e-9
   completion=elapsed[0];completions=[completion]
   for i in range(1,n):

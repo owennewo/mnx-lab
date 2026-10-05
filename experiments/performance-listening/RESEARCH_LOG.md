@@ -41,7 +41,7 @@ How to maintain it:
 
 ## Current state
 
-### Current batch: stall attribution and targeted repair, up to three experiments
+### Latest continuation: closed at 1 of at most 3, full-workload no attribution
 
 Opened 2026-10-05 after 045, by the user's direction:
 
@@ -82,15 +82,26 @@ process reviewer is a separate GPT-6-Sol (high) in Codex session; experimenters 
 fresh GPT-6.1-Sol (high) in Codex sessions, one per numbered run. Any oracle audit and
 the closing process review use independent sessions/models under the existing rules.
 
-**Progress:** 0 of at most 3 numbered experiments; the opening independent
-[R14 process review](reviews.md#r14-after-experiment-045-and-the-approved-continuation)
-held 045’s D2 and is complete. [046 full-workload diagnosis](reports/046-challenger-full-workload-trace.md) is pre-registered and in progress under the approved order.
-Carried state is [045's resulting state](reports/045-challenger-quiet-host-stage.md#resulting-stopping-count-budgets-and-evidence-access).
-No held-out access or formal redraw starts before a supported repair. The standing
-quiet-host/guitar-faust hold is retained for the planned timing work; no other agent
-is instructed or stopped by this parent. Pending product/qualification decisions stay
-with the user. Question 46's reopening is answered by this quoted direction; the first
-experiment will record its diagnostic question after the independent review.
+**Closed at 1 of at most 3:** [046 full-workload diagnosis](reports/046-challenger-full-workload-trace.md),
+**GPT-6.1-Sol (high) in Codex**, **D3 no attribution**. Both complete accumulated-evidence
+and bounded isolated listener workloads preserve every payload, fresh assessment and
+prefix, but neither reproduces a no-inference attribution target. Storage isolation is
+observed; no stall cause or demonstrated repair is established. The continuation ends
+under its fixed rule, with no fresh formal claim or held-out use. 043 D2, 044 D3 and
+045 D2 remain unchanged. The still-running measurement was recovered by a fresh session
+of the same model, without restarting or changing its pre-registration; a read-only
+verifier count bug was repaired after measurement, never a listener rerun.
+
+**Next:** independent closing process review of this approved continuation, then the
+user decides reopening or redirection. No 047 or protected evidence is authorized by
+046's outcome. The parent/user's standing guitar-faust release decision is pending now
+that timing work is finished; this author stops after landing and retirement. Promotion,
+future microphone gates, qualification and Studio decisions stay with the user.
+[046's resulting state](reports/046-challenger-full-workload-trace.md#resulting-stopping-count-budgets-and-evidence-access)
+carries unchanged stopping counts, version/comparison totals and untouched protected
+evidence; its technical repeat remains unused. The independent opening
+[R14 review](reviews.md#r14-after-experiment-045-and-the-approved-continuation) remains
+complete. Closing review is independent-session work, not supplied by this experimenter.
 
 ### Previous batch: closed at 9 of 10, quiet-host claim fails, 037–045
 
@@ -536,6 +547,7 @@ Status is `holds`, `superseded` or `withdrawn`.
 | 37 | Separating direct diagnostic hashes/snapshots preserves frozen challenger outputs, but fresh no-inference service stalls fail the formal guitar cost/deadline gates | [043 results](reports/043-challenger-guitar-stage.md#results), [g043](runs/g043-challenger-guitar-stage/summary.json) | holds | 043 | All development guitars measured; stall cause unresolved; no stage/promotion or held-out use |
 | 38 | A fixed traced panel preserves the frozen payloads with original and isolated evidence harnesses but does not reproduce the original no-inference stalls; historical cause remains unresolved | [044 results](reports/044-challenger-stall-diagnosis.md#results), [g044](runs/g044-challenger-stall-diagnosis/summary.json) | holds | 044 | B also has an inference cost failure; no harness attribution, stage pass or held-out authorization |
 | 39 | The frozen challenger passes all development-guitar assessments and costs on a contract-valid quiet host, but two Martin silent-hesitation events miss compute-inclusive deadlines after no-inference feed stalls | [045](reports/045-challenger-quiet-host-stage.md#results), [g045](runs/g045-challenger-quiet-host-stage/summary.json) | holds | 045 | No cause attributed, redraw, stage-2 pass or held-out use; all clean stage-1 gates and frozen identities agree |
+| 40 | A complete accumulated-evidence workload and a bounded isolated listener process preserve every development-guitar payload, assessment and prefix but reproduce no no-inference stall; storage isolation alone supplies no demonstrated repair | [046](reports/046-challenger-full-workload-trace.md#results), [g046](runs/g046-challenger-full-workload-trace/summary.json) | holds | 046 | Full fixed A-then-B traced workloads; historical cause remains unresolved, no formal claim or held-out use |
 
 ## Open questions
 
@@ -546,12 +558,13 @@ Questions 1–23 and 28 are the main track's.
 
 | Rank | Question | Why it is ranked here | Status | Owner item |
 |---|---|---|---|---|
-| 47 | Can the complete 576-example challenger workload reproduce a no-inference stall with evidence/GC/CPU/scheduler ownership and distinguish accumulated harness evidence from isolated listener work? | Approved diagnosis follows R14; attribution precedes any repair or fresh formal claim | pre-registered, experiment 046 in progress | [046](reports/046-challenger-full-workload-trace.md) |
+| 48 | Does the user reopen for further attributable stall evidence or redirect after 046's complete full-workload non-reproduction, following the independent closing review? | The accepted continuation stops on no attribution; storage isolation is not a demonstrated repair and formal failures stand | awaiting user direction after review; fresh formal claim and held-out use blocked | [046 next](reports/046-challenger-full-workload-trace.md#next) |
+| 47 | Can the complete 576-example challenger workload reproduce a no-inference stall with evidence/GC/CPU/scheduler ownership and distinguish accumulated harness evidence from isolated listener work? | Approved diagnosis follows R14; attribution precedes any repair or fresh formal claim | answered D3 no attribution by 046; no target in either arm | [046](reports/046-challenger-full-workload-trace.md) |
 | 46 | Does the user reopen for attributable full-sweep no-inference-stall diagnosis or redirect after 045's valid quiet-host deadline failures, following independent review? | Failed promotion condition (a) stops the batch; quiet state supplies no allocation/runtime attribution | answered by the user: review, full-workload diagnosis, demonstrated fix, then formal claim; current batch above | [045 next](reports/045-challenger-quiet-host-stage.md#next) |
 | 42 | Does the challenger pass the formal guitar stage-1 and silent-hesitation claim, both outputs and every control on all four development guitars under unchanged gates, measured once on a quiet host as the second amendment defines it, with the incumbent on every example and the frozen baselines on stage 1's clean examples? | Condition (a), freshly authorized by the user after R13 without assuming stall attribution | answered D2 by 045: two Martin hesitation deadlines fail on a valid quiet host | [Second amendment](contracts/development-contract-2.md#amendment-2026-10-05-host-stalls-guitar-sweeps-sentinels-and-the-outside-review) |
 | 45 | Can one listener version reduce the challenger's live inference cost enough to leave a clear margin under .25 on every development guitar, Fender included, without changing any assessment or failing any cursor deadline or control? | 043 measured up to .2578 with a stall and 041 .2355 on Fender; 044's isolated arm .291 on a Fender noise control. A formal claim on that margin would not hold on a slower device | withdrawn by the user (2026-10-05) on R13's evidence: 043's clean Fender cost peaked at .211; spent only if 045 fails on cost | [044](reports/044-challenger-stall-diagnosis.md), [Second amendment](contracts/development-contract-2.md#amendment-2026-10-05-host-stalls-guitar-sweeps-sentinels-and-the-outside-review) |
 | 44 | Does the user reopen or redirect the stopped batch to obtain attributable evidence beyond 044's quiet fixed panel? | D3 stops the batch; historical stalls remain unresolved and no harness-cause branch authorizes 045 | answered by the user (2026-10-05): latest revision reopened at 8 of 10 for fresh quiet-host 045 then held-out 046; cost-margin version withdrawn unless 045 fails on cost | [044 next](reports/044-challenger-stall-diagnosis.md#next) |
-| 32 | Does the challenger, fixed in a pre-registration before rendering, pass the same schedules and controls rendered from the three held-out guitar sets (`tonejs-nylon`, `tonejs-electric`, `shinyguitar`; two independent origins), every guitar on both outputs, in one run? | Condition (c), the last before the user promotes; one shot, and a failure turns the held-out sets into development evidence | blocked by 045 D2; only after a valid fresh all-guitar formal pass | [Amendment](contracts/development-contract-2.md#amendment-2026-10-04-sampled-guitar-replaces-the-sines-and-the-promotion-rule) |
+| 32 | Does the challenger, fixed in a pre-registration before rendering, pass the same schedules and controls rendered from the three held-out guitar sets (`tonejs-nylon`, `tonejs-electric`, `shinyguitar`; two independent origins), every guitar on both outputs, in one run? | Condition (c), the last before the user promotes; one shot, and a failure turns the held-out sets into development evidence | blocked by 045 D2 and 046 no attribution; only after an authorized valid fresh all-guitar formal pass | [Amendment](contracts/development-contract-2.md#amendment-2026-10-04-sampled-guitar-replaces-the-sines-and-the-promotion-rule) |
 | 43 | Does a new stage-gates version implement R10's sentinel rule (deviation examples only; ties by severity in the direction of difficulty before name), with hand-worked cases and an independent audit, before promotion's sentinel selection uses it? | Adopted by the user on 2026-10-05; needed only at promotion | open, before promotion | [Second amendment](contracts/development-contract-2.md#amendment-2026-10-05-host-stalls-guitar-sweeps-sentinels-and-the-outside-review), [R10](reviews.md#r10-after-the-resumed-batch-g031b-and-032034-with-the-direction-review) |
 | 41 | Can a separately pre-registered diagnosis distinguish native/input work, runtime collection, scheduler stalls and indirect evidence-memory pressure behind 043's no-inference service outliers? | Original failures remain; fixed panel did not reproduce an attributable target | answered D3 no attribution by 044; batch stops at 8 of 10 | [044](reports/044-challenger-stall-diagnosis.md) |
 | 39 | Can the next numbered experiment resolve 041's candidate-only timer attribution, with diagnostic tensor hashing and parity-snapshot copying separated from measured listener work, retaining fresh complete setup/feed/finish evidence before a formal claim? | Independent implementation review found conservative diagnostic work inside service; the saved durations cannot isolate it. Resolve attribution without rewriting 041 or changing gates | answered by 043 at the direct timer boundary; indirect runtime stall attribution is question 41 | [Implementation review 041: timers](bench/oracle-events/implementation-review-041.md#1-timers--does-not-hold-for-strict-candidate-only-scope) |
