@@ -1,0 +1,1004 @@
+{
+  "id": "g042-challenger-finish-length",
+  "modelAndTool": "GPT-6.1-Sol (high) in Codex",
+  "gitCommit": "b39acc37f695863a03caffc579a0aa0524ea5375",
+  "preregistrationCommit": "c445424ed707031215b22b51b46fda81d9dc78bf",
+  "definition": "observation-seam@5",
+  "independentAudit": false,
+  "nativeInferences": 0,
+  "listenersExecuted": 0,
+  "cursorVerdicts": 0,
+  "suiteChanges": 0,
+  "heldOutReservedFinalAccesses": 0,
+  "stopping": {
+    "main": 0,
+    "challenger": 2,
+    "mainVersions": 3,
+    "mainComparisons": 11,
+    "challengerVersions": 3,
+    "challengerComparisons": 4,
+    "explorationSpent": true,
+    "qualificationVersionsSpent": 0,
+    "qualificationSlotsSpent": 0
+  },
+  "status": "D1-agreement-pending-independent-audit",
+  "cases": [
+    {
+      "id": "S10",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/case-S10.json",
+        "sha256": "1c2cbc0bc211289ab750e57fe91236d2d0d57655a3c67e34af936d82d2e39a12"
+      }
+    },
+    {
+      "id": "S11",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/case-S11.json",
+        "sha256": "81eec0216cc9c332e3592cdf68d8327624902639347c0ac46538dd7da9d0dc48"
+      }
+    },
+    {
+      "id": "O19",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/case-O19.json",
+        "sha256": "bd5e8b7ade4be5bfc4ac81fd79b20a4741e99143fa8a1b379ce79625517e3568"
+      }
+    },
+    {
+      "id": "O20",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/case-O20.json",
+        "sha256": "faf052073ad7f62573fe51ee87b13e8df7137e7f89fb4336e212fcf56969051f"
+      }
+    },
+    {
+      "id": "O21",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/case-O21.json",
+        "sha256": "11539dcc4e493db3734c38b231ce69ef401341b63ebc593da56a7e8acec1d351"
+      }
+    },
+    {
+      "id": "seam4-I1",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-I1.json",
+        "sha256": "52db093b0b02b8f5c521949dfe3cec7d8de5ae6106522d6124a1b1592ec0fb0e"
+      }
+    },
+    {
+      "id": "seam4-I2",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-I2.json",
+        "sha256": "67246517bec594fffea01e65936aa87e82d3b9a6965e5b3c9ed938b39a40d1b0"
+      }
+    },
+    {
+      "id": "seam4-I3",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-I3.json",
+        "sha256": "e60c0d47e2e5af093e598e0870e082fc7191ecac124fa4b3b4a190fbf38bf23c"
+      }
+    },
+    {
+      "id": "seam4-I4",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-I4.json",
+        "sha256": "123b17ff4318ac0d21e2bd90287d4806d74813e8eb95f0aa9319bad6bbeb4cb8"
+      }
+    },
+    {
+      "id": "seam4-K1",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-K1.json",
+        "sha256": "c3ee2f86250b7b0e2b9b0fb360fba81a437fe108da62c5875747ec201228a0c4"
+      }
+    },
+    {
+      "id": "seam4-K2",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-K2.json",
+        "sha256": "e0cc90b426f69b9051fed28eec5dcc15ccdc70117bce826978b6eff0c473117b"
+      }
+    },
+    {
+      "id": "seam4-K3",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-K3.json",
+        "sha256": "13a1b1be1eb82fd2d01512434a3d14a3ea458e32d5003b22e75e78f874d4d5ab"
+      }
+    },
+    {
+      "id": "seam4-K4",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-K4.json",
+        "sha256": "6b2271cc4c93d5c728f0275db47c45934f43074208735e7a8cef41680c75753e"
+      }
+    },
+    {
+      "id": "seam4-D1",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-D1.json",
+        "sha256": "509ddbe6bac7abb2989eccf2e09298bd861840c522a7a091051c8015e502458f"
+      }
+    },
+    {
+      "id": "seam4-D2",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-D2.json",
+        "sha256": "a4c67df64a59a15ebeb8d2f19329c405fd411958d4961b0be9803f6189d37dc9"
+      }
+    },
+    {
+      "id": "seam4-D3",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-D3.json",
+        "sha256": "0390bc5874084e4d1545d57189ff1acc3ef42d9f86fed8008bc87d8e18518b72"
+      }
+    },
+    {
+      "id": "seam4-F1",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-F1.json",
+        "sha256": "14edcc9e59c734ac229742ce93945e5143229ca827428960ef84197c71259c30"
+      }
+    },
+    {
+      "id": "seam4-F2",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-F2.json",
+        "sha256": "07fe27fc7525e0a69df30285aaa3ae9e30095057a5821552ebf0b2bee1aeeeeb"
+      }
+    },
+    {
+      "id": "seam4-F3",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-F3.json",
+        "sha256": "5088788cfeb776930f33dc95848a590b7f8384911dcf6ed2dfee0edfa6b38604"
+      }
+    },
+    {
+      "id": "seam4-S1",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-S1.json",
+        "sha256": "1a10bee6c123d9508e6959b02d97e75af2007a1dd251f4aced30659a6f9421a7"
+      }
+    },
+    {
+      "id": "seam4-S2",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-S2.json",
+        "sha256": "82b1e0d192b5f9210f72e6ebbe70a26b293d929abdcdf02ef61527b40921bc78"
+      }
+    },
+    {
+      "id": "seam4-S3",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-S3.json",
+        "sha256": "45e4498a646ba05b2c5a0db1e4cb115d09404bbdb28245baabaac64cd5d3afc5"
+      }
+    },
+    {
+      "id": "seam4-S4",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-S4.json",
+        "sha256": "a27cd2ca504c5f6ab70b6e738e19de6c96dd0d0d418f1f186866afcd1e3a6e64"
+      }
+    },
+    {
+      "id": "seam4-S5",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-S5.json",
+        "sha256": "3f231a81babe01a1533a07109bac87713db95314554464f4ca9d54b9ecaf24d4"
+      }
+    },
+    {
+      "id": "seam4-O8",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-O8.json",
+        "sha256": "c9a96143ba3235eabd6efeea4dc9e029274c5714fd278ccac41a90d2f19a3be0"
+      }
+    },
+    {
+      "id": "seam4-O9",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-O9.json",
+        "sha256": "d60e52c0f7413fd37c05c1aa5737f459216a4da82541db8332edc9fbc56f6a93"
+      }
+    },
+    {
+      "id": "seam4-O10",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-O10.json",
+        "sha256": "9046ea462f384db0cf095e7baf7cb39193b4f4b0847e8dd995a28fe2ae3e4672"
+      }
+    },
+    {
+      "id": "seam4-O11",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-O11.json",
+        "sha256": "0950447a811e1ed057eabece45acbc0daf50bfe94a5a2cad8cc0f7b056f14f6b"
+      }
+    },
+    {
+      "id": "seam4-P6",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-P6.json",
+        "sha256": "4c2adac233c6c69a2067070ada74910541ac7fc0af4ee49ebdb08e540bf0175d"
+      }
+    },
+    {
+      "id": "seam4-E1",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-E1.json",
+        "sha256": "eb752b393c0a0a1a093081ad854ed361e100b11ca45545089df4d6169d3ccb22"
+      }
+    },
+    {
+      "id": "seam4-E2",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-E2.json",
+        "sha256": "4f3bb1cea24918db26c5e2b3f1458fd2d9108e33b9dc9716b86a6c4e0ae99556"
+      }
+    },
+    {
+      "id": "seam4-N1",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-N1.json",
+        "sha256": "9950cc2b7246134b2fe7b84bc9bd6eb014f939a10a3294fc94355d379fe6e8df"
+      }
+    },
+    {
+      "id": "seam4-N2",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-N2.json",
+        "sha256": "6a394877b6d369d25f7d8afd63a177bab18c5a400f3de6feca96f6f8921fbffc"
+      }
+    },
+    {
+      "id": "seam4-O12",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-O12.json",
+        "sha256": "c1f0342b0ff0fe2227a8cd87b51196cc3168701d3e04b59aaafce104570c527f"
+      }
+    },
+    {
+      "id": "seam4-P7",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-P7.json",
+        "sha256": "5f85e03c5ebfeaae81f9aa2ea9f90a939fa87ca514b326a3076ccbb2fe28f46f"
+      }
+    },
+    {
+      "id": "seam4-P8",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-P8.json",
+        "sha256": "d2db23f03af8a1ace8833b8a97b8d4bcdd79dfc5804e3b6e7c75575c6a2f52db"
+      }
+    },
+    {
+      "id": "seam4-P9",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-P9.json",
+        "sha256": "edcd510928e0fc6dff58c1f22972bd846b34ff5f02883601fff7c854cdcd0f96"
+      }
+    },
+    {
+      "id": "seam4-P10",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-P10.json",
+        "sha256": "a1aa1ed2db0cfeb0786c347652fe26dbd19342da2746db1c3c986cba98e5b816"
+      }
+    },
+    {
+      "id": "seam4-P11",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-P11.json",
+        "sha256": "f0254591d84cdc50f66eb4000ae6593c38d584422e67fd1d2b6bd7d13a602003"
+      }
+    },
+    {
+      "id": "seam4-N3",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-N3.json",
+        "sha256": "c883c43112ced8cd0f991987285af749e2c308ba97757ae88fe3fc383453b4ae"
+      }
+    },
+    {
+      "id": "seam4-S6",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-S6.json",
+        "sha256": "ee6c3983a90bdd7acf6e2f681de07b1622b8d6f8098d32f0f50666a7f9414e06"
+      }
+    },
+    {
+      "id": "seam4-S7",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-S7.json",
+        "sha256": "e2fc4d0d0215824006f90514eb85fb0f20e60111dde1f77bd93395cec28f5299"
+      }
+    },
+    {
+      "id": "seam4-S8",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-S8.json",
+        "sha256": "88455bc2c4166c391b2ef8e1033ed42ce3b038acc71b9daa12826b7c9b689721"
+      }
+    },
+    {
+      "id": "seam4-S9",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-S9.json",
+        "sha256": "fac3f012c90293d995f8157da7d1fb803b4db9a2a2312137c84daeb731aa4b41"
+      }
+    },
+    {
+      "id": "seam4-F4",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-F4.json",
+        "sha256": "063ac2683cbc20924502a77c033be50c797406646a0da8155e2729c4e5d8a586"
+      }
+    },
+    {
+      "id": "seam4-D4",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-D4.json",
+        "sha256": "27926b584365c82f76f941ffca22fcad2ea241f0fde5409c7faf9261facceef4"
+      }
+    },
+    {
+      "id": "seam4-D5",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-D5.json",
+        "sha256": "a43148dd10da0a32cb2b1b634901352c4c5ee1fd44a039c596aab3cceec90288"
+      }
+    },
+    {
+      "id": "seam4-D6",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-D6.json",
+        "sha256": "379154cd641b300ded25765d26068dc0a7a3f49eef3f9fdbff4638f328f7d12a"
+      }
+    },
+    {
+      "id": "seam4-D7",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-D7.json",
+        "sha256": "127e56877b30f8e2df4ce12a053415d58898c21b3b17f9646b1b85396b260e67"
+      }
+    },
+    {
+      "id": "seam4-D8",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-D8.json",
+        "sha256": "a58c6db1cec903a8adf2c8f3a5b8f9958ebab997a83e77ad8442a4252ac80c4f"
+      }
+    },
+    {
+      "id": "seam4-O13",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-O13.json",
+        "sha256": "d7711981292dfded265d1ee53b413a16f9e56625930152c954a31df827047f92"
+      }
+    },
+    {
+      "id": "seam4-O14",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-O14.json",
+        "sha256": "4217ab6a35d43e0af29e7e7ac80cfbcc07f9afa1c494c19c7fbcf7e9c53edf41"
+      }
+    },
+    {
+      "id": "seam4-O15",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-O15.json",
+        "sha256": "594ec98dcbf1a96e9531f7acbd3b438236f4455e7fd77bee39488d274702b4b7"
+      }
+    },
+    {
+      "id": "seam4-O16",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-O16.json",
+        "sha256": "337a6be1b7a35ca74aab9b9139e9856d6f77428bb646b461bfd74095b1c72d9a"
+      }
+    },
+    {
+      "id": "seam4-O17",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-O17.json",
+        "sha256": "b7281a367e6d3f59be9ce197fef3c94d9bf25ddbb86ba654b4a2db27acfb9d87"
+      }
+    },
+    {
+      "id": "seam4-O18",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam4-O18.json",
+        "sha256": "b872be8d5623e69ce2765c8f799a1370c3686ea25964c659d1486025de69441b"
+      }
+    },
+    {
+      "id": "seam2-R0",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam2-R0.json",
+        "sha256": "00200a418eedfc66f86fde39e9ee8cfa1bf92ce7eea4332b935336b2df5d6db8"
+      }
+    },
+    {
+      "id": "seam2-R1",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam2-R1.json",
+        "sha256": "b51f069a8d8aa378ec5461402aa69a219a0de4c1788d6739e5706347bd896bf2"
+      }
+    },
+    {
+      "id": "seam2-R2",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam2-R2.json",
+        "sha256": "b68694db0a5ad0ce568d46fce3ac70e8dd1ed7915ec5d4406de6a845c6d0628c"
+      }
+    },
+    {
+      "id": "seam2-R3",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam2-R3.json",
+        "sha256": "cb5081bbe8bb0af72b0c7b1106e32feddd9a55801116d204ce2e796767961a94"
+      }
+    },
+    {
+      "id": "seam2-R4",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam2-R4.json",
+        "sha256": "cfa05d3a1305976504ab32d97c6d154aa0d33f5309a01fb56de54b755d59e3c4"
+      }
+    },
+    {
+      "id": "seam2-R5",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam2-R5.json",
+        "sha256": "0a7355431f182b87516eb2eb49da5dfe9ed0cc1961594ef5b0ae1feef35f1866"
+      }
+    },
+    {
+      "id": "seam2-R6",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam2-R6.json",
+        "sha256": "5615fefef9e0fdf95588ebfac7625021c0294bae002c09ba6d77dc0b521c74e1"
+      }
+    },
+    {
+      "id": "seam2-R7",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam2-R7.json",
+        "sha256": "8a3b473e8340f1a5acb38b12770394f2c34a582ab6722e62e0bf9fd322c28678"
+      }
+    },
+    {
+      "id": "seam2-L1",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam2-L1.json",
+        "sha256": "5b9617c6abbb9b631500d0fa69e3d8201b8780aeea17f55e80b65e5ba926ec0a"
+      }
+    },
+    {
+      "id": "seam2-L2",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam2-L2.json",
+        "sha256": "5ee8ade6acd18605774edc0356f8749d9ecd444f426a6742321499ee1938325d"
+      }
+    },
+    {
+      "id": "seam2-L3",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam2-L3.json",
+        "sha256": "539bf405be638909767bc8074404a36587e0a2c4daab213c5716e30367ab780e"
+      }
+    },
+    {
+      "id": "seam2-L4",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam2-L4.json",
+        "sha256": "1c08665d473649d75a552312cb21ce184eedd97d1757a02a346b27c6a5293125"
+      }
+    },
+    {
+      "id": "seam2-L5",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam2-L5.json",
+        "sha256": "89e507629858be50cb2754826e66ef151e71d4e3683d6297b25bd87eca49dddf"
+      }
+    },
+    {
+      "id": "seam2-L6",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam2-L6.json",
+        "sha256": "8ec158812618bada6d7bd49b92c43a6e4d7bad6c9e91ca166746e46248171318"
+      }
+    },
+    {
+      "id": "seam2-W1",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam2-W1.json",
+        "sha256": "bb85405f603c4e186a67287d31b0c21e9d636047425346dc67e1ced62ce874cf"
+      }
+    },
+    {
+      "id": "seam2-W2",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam2-W2.json",
+        "sha256": "2c6f26e0be0ce030da6bffcf591b3a6dab2793ae3f669b4428aabd4276f8b922"
+      }
+    },
+    {
+      "id": "seam2-W3",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam2-W3.json",
+        "sha256": "f522fd56c360757bb39ae0a0ea3d3162d0b9a1c4b62a45f09f6f42d8e9554a40"
+      }
+    },
+    {
+      "id": "seam2-C1",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam2-C1.json",
+        "sha256": "b31a86149324517543ac7a93623abab754a326fa52f345ca8e33d56243235842"
+      }
+    },
+    {
+      "id": "seam2-C2",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam2-C2.json",
+        "sha256": "d55ab5380aa64e9f853c4c2896e4d62f823654f759f6200f101175f79c951542"
+      }
+    },
+    {
+      "id": "seam2-C3",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam2-C3.json",
+        "sha256": "36e7212e4653459cb10021b394dfe201c716cc56e22d3a0e0de9d02739e66882"
+      }
+    },
+    {
+      "id": "seam2-C4",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam2-C4.json",
+        "sha256": "27c413b1de2eed037902a0bab0b24604d3deaa4251fe30d19c253dfdd04fbbce"
+      }
+    },
+    {
+      "id": "seam2-C5",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam2-C5.json",
+        "sha256": "9026b67a1544b123707bd67cb81667b7e6e67032908fcc8b940f6895cda2b011"
+      }
+    },
+    {
+      "id": "seam2-C6",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam2-C6.json",
+        "sha256": "e75bcac2d93e5fc3e0fbde55ef257299f66d4f351eb83d37b7f9b69e358709b3"
+      }
+    },
+    {
+      "id": "seam2-C7",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam2-C7.json",
+        "sha256": "e886b7adc30458068e5b60afa24c5f5cd11362983fab10d1a8f79502dd386aee"
+      }
+    },
+    {
+      "id": "seam2-P1",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam2-P1.json",
+        "sha256": "61abbef2f7a5cf268b08c3ee73cd864a44c8d7a31fc2953a34be08f779bf246a"
+      }
+    },
+    {
+      "id": "seam2-P2",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam2-P2.json",
+        "sha256": "b8e3e20fe68bc3f4c84d7bfb46774ff0c4fb6c165475fd589b973fd20d64d620"
+      }
+    },
+    {
+      "id": "seam2-P3",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam2-P3.json",
+        "sha256": "2572b24d571a5d5239bc2a55949d2c229e795235319aaddff329e5fd895569bb"
+      }
+    },
+    {
+      "id": "seam2-P4",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam2-P4.json",
+        "sha256": "3c7cbb64ebe3a987875e4347e27616aa892a73d8f5a8cf620d3379ebc7dae205"
+      }
+    },
+    {
+      "id": "seam2-P5",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam2-P5.json",
+        "sha256": "2a8b5fdc586089075b67719c9fbe92c5827516fe4e01347b2d2af945d9fb6c9c"
+      }
+    },
+    {
+      "id": "seam2-O1",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam2-O1.json",
+        "sha256": "d488688ceee3387ca63cce78e162638b9a934f74d3e1aee269f6bf0fc248c3c1"
+      }
+    },
+    {
+      "id": "seam2-O2",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam2-O2.json",
+        "sha256": "9b9924c954e6cf5c796ebb10051d6d6edda42592954705066c25322a53bd2df9"
+      }
+    },
+    {
+      "id": "seam2-O3",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam2-O3.json",
+        "sha256": "d9c99d7b8612bcb5cad2076fb535a0f33aa428dee4b079e4e2b2c73a640e62fb"
+      }
+    },
+    {
+      "id": "seam2-O4",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam2-O4.json",
+        "sha256": "8e96129ec7481fe61c332eb590a498de257afbe8f7ff1e8c28b86183b51c2b3d"
+      }
+    },
+    {
+      "id": "seam2-O5",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam2-O5.json",
+        "sha256": "fb7be075c36cc50b74c6d826dd0c70faaa04a8e9c664fb942b43fdb561569d89"
+      }
+    },
+    {
+      "id": "seam2-O6",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam2-O6.json",
+        "sha256": "66705c961b1975ab51875942333f510cf850e140ce6b231c70d34a98c522f518"
+      }
+    },
+    {
+      "id": "seam2-O7",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam2-O7.json",
+        "sha256": "40726bf2450ce0646b7f84151560c1182f4893432b03f94dd02ab6e4b049c647"
+      }
+    },
+    {
+      "id": "seam3-I1",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam3-I1.json",
+        "sha256": "5dc8efb82fc691e9ad872261ccf3dc010fa6580f7b3c74774fc0bed8c535e4cb"
+      }
+    },
+    {
+      "id": "seam3-I2",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam3-I2.json",
+        "sha256": "1f9e84f3f0fe7d933b68341fbb26256a593c4173ba5a0da85dc31764bb93cb4d"
+      }
+    },
+    {
+      "id": "seam3-I3",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam3-I3.json",
+        "sha256": "1d53cd7035515681f7efdcd6c4b4e00d1dd724787a3ce917bb5d8815d68103cf"
+      }
+    },
+    {
+      "id": "seam3-I4",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam3-I4.json",
+        "sha256": "a1515ec97d906ca1bbddee7ddc2b4f97a98e91fb731b2682f4044c6b0e7db929"
+      }
+    },
+    {
+      "id": "seam3-K1",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam3-K1.json",
+        "sha256": "4b66b90ccfda5c1a0b996c2212427b9f35ae21d7ecc2a65ae46b012e55d07d5a"
+      }
+    },
+    {
+      "id": "seam3-K2",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam3-K2.json",
+        "sha256": "4da11d66d9db7478e34a98e255660983bf028f50582c435a17f70ca925856279"
+      }
+    },
+    {
+      "id": "seam3-K3",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam3-K3.json",
+        "sha256": "dbbcd8c6822bcf5dc7a0860f053b95f35f2b8bc5b115de0de6b0220762db5535"
+      }
+    },
+    {
+      "id": "seam3-K4",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam3-K4.json",
+        "sha256": "fef7fcd204adeb9df8cc761d1167341e45ff63827b5a2bfd22f5cfff61840512"
+      }
+    },
+    {
+      "id": "seam3-D1",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam3-D1.json",
+        "sha256": "6b0005beda3200690615662c34fb8b516ed0c175fddde05d7244c5c197b56447"
+      }
+    },
+    {
+      "id": "seam3-D2",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam3-D2.json",
+        "sha256": "2fd87c9b5e1c4bb0d2a255911e5eeb041a600f8b0f04fd0dd5de5fa25d0c2baa"
+      }
+    },
+    {
+      "id": "seam3-D3",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam3-D3.json",
+        "sha256": "f9510aeb313290a07f77585c79355fd396092c2bb337096eb51e62271ef85553"
+      }
+    },
+    {
+      "id": "seam3-F1",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam3-F1.json",
+        "sha256": "5998a553739b1e9e0ff6e78e8f09fce51564c8534ac4e59ffaf3b5d482507f54"
+      }
+    },
+    {
+      "id": "seam3-F2",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam3-F2.json",
+        "sha256": "989c9e8c56cd9d5743dd00c39befe27fe2c96a4e0c9d8f06d7d6a5a6457077ca"
+      }
+    },
+    {
+      "id": "seam3-F3",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam3-F3.json",
+        "sha256": "6acd0772bbecd56e475045e21a61d0634106d68e4e5b0587e20d809445c204c6"
+      }
+    },
+    {
+      "id": "seam3-S1",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam3-S1.json",
+        "sha256": "9ee094a7a63a0256ff655b792ea6fdab36d8fac287ace6a8f55c3030c47857cf"
+      }
+    },
+    {
+      "id": "seam3-S2",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam3-S2.json",
+        "sha256": "15c8a8fff9e212dc6136047e3cd6bdd4fa722c0c9aba7560c7727e130d12d0cc"
+      }
+    },
+    {
+      "id": "seam3-S3",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam3-S3.json",
+        "sha256": "e6dcdcabf62090fd33783ea86ae30b0a7e1940e612dc2a2b7ed2f5edfc6900bd"
+      }
+    },
+    {
+      "id": "seam3-S4",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam3-S4.json",
+        "sha256": "9f266f30e69c0f473d4d0385dec4f8f74883a57ca41a54221fab4186d24f09ef"
+      }
+    },
+    {
+      "id": "seam3-O8",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam3-O8.json",
+        "sha256": "b0697f0384968c519c932384aa19550e30b637b7f29d8d7aef89004c5c50de09"
+      }
+    },
+    {
+      "id": "seam3-O9",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam3-O9.json",
+        "sha256": "2b180732e0d03800eb706786b4da6ff813e957e27e4fe8cc0d8776f5f29bd68a"
+      }
+    },
+    {
+      "id": "seam3-O10",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam3-O10.json",
+        "sha256": "0d873fd64e641a40dda54601e5463055ea70b8c16e5d3e870e3c163c669bf47f"
+      }
+    },
+    {
+      "id": "seam3-P6",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam3-P6.json",
+        "sha256": "53b2cc080d3f8f5c9b7fb4a50c25e89250dc365b1b58956f76c102051e262aff"
+      }
+    },
+    {
+      "id": "seam3-E1",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam3-E1.json",
+        "sha256": "be35781960875251d7bfb61ca24c350bb3e771a7df39ca67b96d2fae7c075f4f"
+      }
+    },
+    {
+      "id": "seam3-E2",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam3-E2.json",
+        "sha256": "c860cd5bb26991383ce5c521cd2aa932a62fc28e21735d95abdadc5ea147abbc"
+      }
+    },
+    {
+      "id": "seam3-N1",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam3-N1.json",
+        "sha256": "bccbc1dc56394f680c60914f9ccbf3f7d3be0b66313a8ec4e17014003907e02d"
+      }
+    },
+    {
+      "id": "seam3-N2",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/inherited-seam3-N2.json",
+        "sha256": "0e3a79738275872d28e9135fba13155da537a82cf060e678f81023981a045f39"
+      }
+    }
+  ],
+  "validation": {
+    "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/validation.json",
+    "sha256": "462a9966456a01c1ca7fa90c98165d94563354c90b35f1fe6fc6146629191348"
+  },
+  "elapsedSeconds": 2.0766037980000003,
+  "decision": "Independent seam5 audit and separate native 041 implementation review before formal guitar-stage judgment.",
+  "attempt": {
+    "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/attempt.json",
+    "sha256": "50ec089c196858040154529ac8afa581fc9fbbb47d1fb32cdcdc2fbc085710f4"
+  },
+  "provenance": {
+    "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g042-challenger-finish-length/provenance.json",
+    "sha256": "e656e6f48aa7e3d324194943c77d09080bead7848c659b6949bc7e0f42cfbd2f"
+  },
+  "sourceHashes": {
+    "bench/src/challenger/seam5.ts": "ec18745c7e05860c7a7eb495a807b67d84da71d9d65fd188995f5de20c5acef4",
+    "bench/src/challenger/run042.ts": "e39e8e407824b0844165d4f4654da96db0ba8f68859754dc36d3a8db38703d14",
+    "bench/test/observation-seam-5.test.ts": "1f58b78be9fa46578e9fc804288559a58b49cc578f28052dff58b2e112a5a4b7",
+    "bench/oracle-events/observation-seam-5.json": "001fdee43d19ebb89bef83cecdcb0922c36669e7f21ce3f7f7ecd854c756e1de",
+    "bench/oracle-events/freeze-observation-seam-5.json": "11e47daf3e8177d3971cb581bf397b641c75ca90fa2cf639808349fbe5d7d726",
+    "contracts/observation-seam-5.md": "1a69239db370cf4af181fbc3725466109c49192418f4977035e661fe43c3ddb4",
+    "reports/042-challenger-finish-length.md": "a074d5b7d0cc6d4c66ae62409e5ffcd6979315cd482746c674edb4b9b61d0695",
+    "../../package-lock.json": "9879cfb7683ccc0b8c0c9311fed045313134ef9befa4a0e11f5d02d1a2ef59e6"
+  },
+  "startedAt": "2026-10-05T10:43:06.947Z",
+  "finishedAt": "2026-10-05T10:43:09.024Z",
+  "counts": {
+    "newCases": 5,
+    "inheritedCases": 113,
+    "agree": 118,
+    "probesDetected": 4,
+    "protectedFiles": 437
+  }
+}

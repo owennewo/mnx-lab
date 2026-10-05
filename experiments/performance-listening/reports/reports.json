@@ -264,6 +264,19 @@
         "href": "040-challenger-streaming-state.html",
         "label": "Experiment 040"
       }
+    },
+    {
+      "number": "042",
+      "slug": "042-challenger-finish-length",
+      "title": "042 \u00b7 Finish state and safe offline lengths",
+      "banner": "D1 author agreement \u00b7 118/118 cases \u00b7 4/4 fault probes \u00b7 independent seam-5 audit and 041 review before stage verdict",
+      "runs": [
+        "g042-challenger-finish-length"
+      ],
+      "previous": {
+        "href": "041-challenger-incremental-neural.html",
+        "label": "Experiment 041"
+      }
     }
   ]
 }

@@ -130,59 +130,45 @@ the code to the closing review, was declined. The user:
 
 > yes please
 
-**Progress.** Run **5 of 8 done**: [041](reports/041-challenger-incremental-neural.md),
-GPT-6.1-Sol (high) in Codex, **D1 compatible exploratory evidence pending independent
-seam-4 audit**. The separately versioned live backend crops neural time computation
-after recomputing full-window CQT/global normalization; sampled selected maps are
-exactly preserved and every corrected development-guitar live/cost/control/prefix
-comparison clears (finding 35). Its offline @2 component retains verified earlier
-assessment passes. The first attempt omitted state construction from setup timing;
-its evidence is preserved and the single technical rerun resolves that defect without
-neural/listener tuning. No formal cursor/stage verdict or promotion is granted.
+**Progress.** Run **6 of 8 done**: [042](reports/042-challenger-finish-length.md),
+GPT-6.1-Sol (high) in Codex, **D1 author agreement pending independent seam-5 audit**.
+Observation-seam@5 adds observable finish-state/nonempty-emission and safe-length
+fixtures under unchanged inherited rules (finding 36). It changes no native producer,
+listener, gate or historical verdict, and makes no cursor/stage claim.
 
-**Independent observation-seam@4 audit completed, question 37:**
-[audit 4](bench/oracle-events/audit-observation-seam-4.md), GPT-6-Astra (high) in Codex,
-rederives all 51 current cases and 39 inherited samples: **90 agree, 0 disagree,
-0 ambiguous**. The earlier arithmetic/representation ambiguities are resolved, but
-coverage and native adoption adequacy are incomplete. **Question 38 retains the scalar work:** freeze
-and audit the remaining scalar finish-state/emission and safe-length cases, and arrange
-independent native context/map/timer/provenance/prefix review. The audit prompt forbids
-reading implementation or run results, so this audit cannot approve 041's native
-adoption evidence; author agreement and sampled parity do not replace that review.
-Formal cursor judgment remains blocked before question 31's guitar stage claim and
-question 32's one-shot held-out confirmation. The main track stays paused;
-event-chain@3 remains incumbent. No held-out input ran.
+**Question 40 is next:** independent observation-seam@5 audit of 042's five added
+scalar cases. [Audit 4](bench/oracle-events/audit-observation-seam-4.md) agreed on its
+cases but left these finish/safe-length observable gaps; author agreement in 042 is
+not the required independent audit.
 
-**Independent implementation review of 041 completed, question 38's native half:**
+**Independent implementation review of 041 completed during 042's landing:**
 [review 041](bench/oracle-events/implementation-review-041.md), **GPT-6-Astra (high)
-in Codex**. Native normalization/context and selected-map equivalence, causal access
-and prefixes, delivery/completion clocks, provenance/reuse, pinned offline DSP/decoder
-and inherited listener behavior **hold** on the reviewed evidence and sample replays.
-The strict candidate-only timer scope **does not hold**: tensor hashing and diagnostic
-snapshot copying occur inside live service. This conservatively adds evidence work;
-no omitted listener work or failed recorded cost/deadline comparison was found.
-**Question 39 is now the next numbered resolution**, to resolve timer attribution
-before a formal candidate-only claim; no 041 record or verdict is rewritten. Question
-38's separate scalar-case work and audit remain with 042. Formal stage and held-out
-work remain after the unresolved prerequisites.
+in Codex**, holds on native context/maps, causal access/prefixes, delivery/completion
+clocks, provenance/reuse, pinned offline DSP/decoder and inherited listener behavior.
+The strict candidate-only timer scope **does not hold**: diagnostic tensor hashing and
+parity snapshot copying occur inside live service. This conservatively adds evidence
+work; the review found no omitted listener work or failed recorded comparison.
+**Question 39 requires a separately numbered timer-attribution resolution** before a
+formal candidate-only claim. It follows the new oracle's audit; no 041 measurement or
+verdict is rewritten. Question 38's scalar cases are frozen by 042, audit pending;
+its native review is complete with that timer finding. Formal guitar-stage question
+31 and held-out question 32 wait for both remaining prerequisites. The main track
+stays paused, event-chain@3 remains incumbent and no held-out input ran.
 
-Previous batch runs remain recorded: [040](reports/040-challenger-streaming-state.md)
-built the input/state kernel and seam 3; its [independent audit](bench/oracle-events/audit-observation-seam-3.md)
-identified the findings addressed by 041. [039](reports/039-challenger-dominant-pitch.md)
-repaired offline Martin claims; [038](reports/038-challenger-quiet-noise.md) measured
-the fixed noise controls; [037](reports/037-challenger-observation-seam.md) and its
-[seam-2 audit](bench/oracle-events/audit-observation-seam-2.md) settled earlier timing
-arithmetic. Earlier recorded verdicts remain unchanged.
+Previous batch runs and verdicts remain intact: [041](reports/041-challenger-incremental-neural.md),
+[040](reports/040-challenger-streaming-state.md),
+[039](reports/039-challenger-dominant-pitch.md),
+[038](reports/038-challenger-quiet-noise.md) and
+[037](reports/037-challenger-observation-seam.md).
 
-[041's resulting state](reports/041-challenger-incremental-neural.md#resulting-stopping-count-budgets-and-evidence-access)
-records the conservative uncleared-substage charge, version/comparison totals and
-spent technical rerun. Qualification, held-out and reserved/final budgets remain
-unused, Winner 5–8 unexamined, sines retired. Guitar sweeps start at the formal stage
-claim. **No new user decision from 041**; promotion, microphone, qualification and
-Studio decisions remain theirs, as do R10's standing sentinel/pool and baseline-sweep
-questions. The native sweep exceeded the routine time aim; closing review should
-assess lean regression reuse. The audit is separate-session work; this experimenter
-neither supplies it nor starts the next experiment.
+[042's resulting state](reports/042-challenger-finish-length.md#resulting-stopping-count-budgets-and-evidence-access)
+carries stopping counts, version/comparison totals and budgets unchanged from 041;
+instrument work adds no listener charge. Qualification, held-out, reserved/final and
+Winner 5–8 remain untouched, sines retired. Guitar sweeps start at the formal claim.
+**No new user decision from 042**; promotion, microphone, qualification and Studio
+choices remain theirs, as do R10's standing sentinel/pool and baseline-sweep questions.
+The closing review should assess lean regression reuse after 041's long native sweep.
+This session lands and retires after exactly 042, without starting the next experiment.
 
 ### Experiment 036, by the user's direction
 
@@ -400,6 +386,7 @@ Status is `holds`, `superseded` or `withdrawn`.
 
 | 34 | The separately versioned streaming input/state kernel preserves frozen float32 model inputs and coordinates on regular/irregular synthetic delivery, while seam 3 reproduces new lifecycle/cost/prefix hand arithmetic; global normalization can alter retained features | [040](reports/040-challenger-streaming-state.md#results), [g040](runs/g040-challenger-streaming-state/summary.json) | holds | 040 | Implementation agreement pending independent seam 3 audit; injected maps/costs only, no neural incremental inference, native speed, live cursor or guitar-stage claim |
 | 35 | Cropping neural time computation after recomputing full global normalization preserves sampled selected float32 maps and brings every measured development-guitar live cost/deadline/control comparison within the current thresholds | [041](reports/041-challenger-incremental-neural.md#results), [g041a](runs/g041a-challenger-incremental-neural/summary.json) | holds | 041 | Exploratory author evidence; independent seam 4 audit next, no formal stage claim. Full DSP recomputed; monophonic sampled development only. Invalid first-attempt setup timing preserved, technical rerun repaired it |
+| 36 | Observable pre/post finish state and nonempty returned decisions reproduce inherited no-flush/stamp/history rules; unsafe integral and nonfinite offline lengths are rejected while all declared earlier cases remain unchanged | [042](reports/042-challenger-finish-length.md#results), [g042](runs/g042-challenger-finish-length/summary.json) | holds | 042 | Author agreement only; independent seam-5 audit next. Injected state/service, no native or stage verdict |
 
 ## Open questions
 
@@ -410,8 +397,9 @@ Questions 1–23 and 28 are the main track's.
 
 | Rank | Question | Why it is ranked here | Status | Owner item |
 |---|---|---|---|---|
+| 40 | Does an independent session rederive observation-seam@5's pending/populated finish snapshots, nonempty returned decision stamps and immutable history, and unsafe/nonfinite length refusals, agree on all five new cases and sample inherited rules in their declared layers? | New scalar fixtures require independent audit; author agreement cannot clear formal cursor judgment | open; next challenger question; timer resolution 39 follows | [042](reports/042-challenger-finish-length.md), [seam 5](contracts/observation-seam-5.md) |
 | 39 | Can the next numbered experiment resolve 041's candidate-only timer attribution, with diagnostic tensor hashing and parity-snapshot copying separated from measured listener work, retaining fresh complete setup/feed/finish evidence before a formal claim? | Independent implementation review found conservative diagnostic work inside service; the saved durations cannot isolate it. Resolve attribution without rewriting 041 or changing gates | open; precedes the formal guitar-stage claim, alongside question 38's remaining scalar audit prerequisite | [Implementation review 041: timers](bench/oracle-events/implementation-review-041.md#1-timers--does-not-hold-for-strict-candidate-only-scope) |
-| 38 | Can the next numbered challenger resolution freeze and independently audit the remaining seam-4 scalar finish-state/nonempty-finish-emission and safe-length cases, and explicitly arrange independent native context/map/timer/provenance/prefix review with the implementation/results access that the oracle-audit prompt prohibits? | Audit 4 agrees on all 90 checked cases but lists uncovered rules and cannot grant native adoption approval; resolve these before formal cursor judgment | partly answered: [implementation review 041](bench/oracle-events/implementation-review-041.md) holds on native/maps/causality/clocks/provenance/reuse; strict candidate-only timer scope does not hold (question 39). Scalar cases and independent audit remain with 042, as split by the user on 2026-10-05; both prerequisites precede formal cursor judgment | [Audit 4: uncovered rules](bench/oracle-events/audit-observation-seam-4.md#rules-i-could-not-exercise), [resolution](bench/oracle-events/audit-observation-seam-4.md#resolution-and-verdict) |
+| 38 | Can the next numbered challenger resolution freeze and independently audit the remaining seam-4 scalar finish-state/nonempty-finish-emission and safe-length cases, and explicitly arrange independent native context/map/timer/provenance/prefix review with the implementation/results access that the oracle-audit prompt prohibits? | Audit 4 agrees on all 90 checked cases but lists uncovered rules and cannot grant native adoption approval; resolve these before formal cursor judgment | scalar fixtures frozen by 042, independent audit 40 next; native review holds except strict timer attribution, separately resolved by 39 | [Audit 4: uncovered rules](bench/oracle-events/audit-observation-seam-4.md#rules-i-could-not-exercise), [resolution](bench/oracle-events/audit-observation-seam-4.md#resolution-and-verdict) |
 | 37 | Does an independent session rederive observation-seam@4's physical representation and complete state/cost fixtures, agree on every added/reworked case and inherited samples in their declared layers, and assess native adoption/context/timer/prefix evidence before any formal cursor judgment? | New seam/oracle needs independent adequacy audit; author agreement and native parity cannot supply it | answered: 90 agree, 0 disagree, 0 ambiguous; remaining coverage and native adoption review are question 38 | [Audit 4](bench/oracle-events/audit-observation-seam-4.md), GPT-6-Astra (high) in Codex |
 | 30 | Can a streaming Basic Pitch live path compute only new neural frames plus context, meeting sustained cost .25 and every .2-second compute-inclusive event deadline on clean/hesitation development guitars and all controls? | Original whole-model spike was too expensive; seam/native implementation and audit precede formal judgment | answered by 041 as exploratory comparisons; formal stage verdict is 31 after audit 37 | [041](reports/041-challenger-incremental-neural.md), [035](reports/035-challenger-basic-pitch.md#live-spike-observations-deadlines-and-cost) |
 | 36 | Can the next numbered challenger experiment resolve seam-3 audit I3's float32 discrepancy, S5's missing lifecycle/reset inputs, O11's irregular-delivery scheduling, N1/N2's unstated normalization formula and P1/P2/P3/P5's physical-versus-abstract confidence layer, freeze the remaining gate-relevant state/cost cases, and obtain independent audit before native cursor judgment? | Challenger instrument resolution precedes question 30's listener verdict; the audit's full uncovered-rule table is the checklist, with pinned DSP/procedural obligations retained for native adoption | 041 versions seam 4/cases and builds/measures incremental neural inference; independent adequacy audit is 37, before formal cursor judgment | [041](reports/041-challenger-incremental-neural.md), [audit 3](bench/oracle-events/audit-observation-seam-3.md#resolution-and-verdict) |

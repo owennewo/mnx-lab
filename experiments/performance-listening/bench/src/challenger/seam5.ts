@@ -55,12 +55,12 @@ export function evaluate5(c: HandCase, fault?: Fault5): unknown {
  if (fault === 'finish-flush') input.feed(Float32Array.of(v.feed.tail)); // Forbidden tail neighbor.
  const finishFrames = input.finish(), after = snapshot(), newWindow = Buffer.from(input.window().buffer);
  const finishDecisions = lane.call(input.samples/48000, v.finish, v.finishEmissions); completions.push(lane.completion);
- if (fault === 'finish-backdate') finishDecisions.forEach((e,i) => { e.madeAt = v.finishEmissions[i]!.madeAt; });
+ if (fault === 'finish-backdate') finishDecisions.forEach((e,i) => { e.madeAt = v.finishEmissions[i]!.madeAt!; });
  const returnedFinish = structuredClone(finishDecisions);
  const oldHistoryUnchanged = oldHistory === JSON.stringify(lane.history.slice(0,oldCount));
  const appendedFinishMatches = equal4(lane.history.slice(oldCount),finishDecisions);
  const savedHistory = JSON.stringify(lane.history);
- const returned = fault === 'finish-history-alias' ? lane.history.slice(oldCount) : finishDecisions;
+ const returned: TimedPayload[] = fault === 'finish-history-alias' ? lane.history.slice(oldCount) : finishDecisions;
  if (returned.length) { returned[0]!.refersTo = -1; returned[0]!.id = 'mutated-return'; }
  const returnedMutationIsolated = savedHistory === JSON.stringify(lane.history);
  const result = {before,after,windowBitsEqual:oldWindow.equals(newWindow),finishFrames,
