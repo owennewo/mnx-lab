@@ -303,6 +303,19 @@
         "href": "043-challenger-guitar-stage.html",
         "label": "Experiment 043"
       }
+    },
+    {
+      "number": "045",
+      "slug": "045-challenger-quiet-host-stage",
+      "title": "045 \u00b7 Formal guitar stage claim on a quiet host",
+      "banner": "D2 \u00b7 quiet host valid \u00b7 all assessments and costs pass \u00b7 two Martin cursor deadlines fail \u00b7 no held-out run",
+      "runs": [
+        "g045-challenger-quiet-host-stage"
+      ],
+      "previous": {
+        "href": "044-challenger-stall-diagnosis.html",
+        "label": "Experiment 044"
+      }
     }
   ]
 }

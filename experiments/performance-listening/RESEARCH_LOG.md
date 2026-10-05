@@ -41,7 +41,27 @@ How to maintain it:
 
 ## Current state
 
-### Current batch: reopened at 8 of 10, the quiet-host stage claim then held-out, 037–046
+### Current batch: closed at 9 of 10, quiet-host claim fails, 037–045
+
+**Latest result: [045](reports/045-challenger-quiet-host-stage.md),
+GPT-6.1-Sol (high) in Codex, D2 on a valid quiet host.** The unchanged challenger
+passes every clean stage-1, assessment and cost gate, but Martin silent-hesitation
+cursor deadlines fail. Both largest feeds emit no model frames; their cause remains
+unattributed. Quiet-host sampling meets the amended rule and does not remove this
+failure class. Frozen payloads/reports and all prefixes agree; incumbent still fails
+every guitar/substage. Promotion condition (a) fails, (b) holds, and (c) stays untouched.
+The batch closes at 9 of 10. No repeat, new listener, instrument, incumbent or sentinel.
+
+**Next:** independent closing process review of this resumed continuation; no 046
+or held-out access. After review, the user decides whether to reopen for attributable
+full-sweep stall tracing or redirect. The standing guitar-faust pause until 046 lands
+also needs the user/parent's release decision now that 046 is blocked; this experiment's
+timing work is finished. No user question was asked. Promotion, microphone gates,
+qualification and Studio choices remain future decisions.
+[045's resulting state](reports/045-challenger-quiet-host-stage.md#resulting-stopping-count-budgets-and-evidence-access)
+carries unchanged stopping counts, no version, one additional valid comparison,
+unused 045 repeat and untouched protected evidence. Earlier verdicts stand. Historical
+batch directions/closures below are preserved; the latest 045 result governs pickup.
 
 Opened 2026-10-04 by the user, after 036. Their words, in order:
 
@@ -464,6 +484,7 @@ Status is `holds`, `superseded` or `withdrawn`.
 | 36 | Observable pre/post finish state and nonempty returned decisions reproduce inherited no-flush/stamp/history rules; unsafe integral and nonfinite offline lengths are rejected while all declared earlier cases remain unchanged | [042](reports/042-challenger-finish-length.md#results), [g042](runs/g042-challenger-finish-length/summary.json) | holds | 042 | Author agreement only; independent seam-5 audit next. Injected state/service, no native or stage verdict |
 | 37 | Separating direct diagnostic hashes/snapshots preserves frozen challenger outputs, but fresh no-inference service stalls fail the formal guitar cost/deadline gates | [043 results](reports/043-challenger-guitar-stage.md#results), [g043](runs/g043-challenger-guitar-stage/summary.json) | holds | 043 | All development guitars measured; stall cause unresolved; no stage/promotion or held-out use |
 | 38 | A fixed traced panel preserves the frozen payloads with original and isolated evidence harnesses but does not reproduce the original no-inference stalls; historical cause remains unresolved | [044 results](reports/044-challenger-stall-diagnosis.md#results), [g044](runs/g044-challenger-stall-diagnosis/summary.json) | holds | 044 | B also has an inference cost failure; no harness attribution, stage pass or held-out authorization |
+| 39 | The frozen challenger passes all development-guitar assessments and costs on a contract-valid quiet host, but two Martin silent-hesitation events miss compute-inclusive deadlines after no-inference feed stalls | [045](reports/045-challenger-quiet-host-stage.md#results), [g045](runs/g045-challenger-quiet-host-stage/summary.json) | holds | 045 | No cause attributed, redraw, stage-2 pass or held-out use; all clean stage-1 gates and frozen identities agree |
 
 ## Open questions
 
@@ -474,10 +495,11 @@ Questions 1–23 and 28 are the main track's.
 
 | Rank | Question | Why it is ranked here | Status | Owner item |
 |---|---|---|---|---|
-| 42 | Does the challenger pass the formal guitar stage-1 and silent-hesitation claim, both outputs and every control on all four development guitars under unchanged gates, measured once on a quiet host as the second amendment defines it, with the incumbent on every example and the frozen baselines on stage 1's clean examples? | Condition (a) of promotion, measured once more with the cause removed; only if 044 finds a harness cause | open: next, 045 | [Second amendment](contracts/development-contract-2.md#amendment-2026-10-05-host-stalls-guitar-sweeps-sentinels-and-the-outside-review) |
+| 46 | Does the user reopen for attributable full-sweep no-inference-stall diagnosis or redirect after 045's valid quiet-host deadline failures, following independent review? | Failed promotion condition (a) stops the batch; quiet state supplies no allocation/runtime attribution | open: next after closing review; also settle the guitar-faust pause while 046 is blocked | [045 next](reports/045-challenger-quiet-host-stage.md#next) |
+| 42 | Does the challenger pass the formal guitar stage-1 and silent-hesitation claim, both outputs and every control on all four development guitars under unchanged gates, measured once on a quiet host as the second amendment defines it, with the incumbent on every example and the frozen baselines on stage 1's clean examples? | Condition (a), freshly authorized by the user after R13 without assuming stall attribution | answered D2 by 045: two Martin hesitation deadlines fail on a valid quiet host | [Second amendment](contracts/development-contract-2.md#amendment-2026-10-05-host-stalls-guitar-sweeps-sentinels-and-the-outside-review) |
 | 45 | Can one listener version reduce the challenger's live inference cost enough to leave a clear margin under .25 on every development guitar, Fender included, without changing any assessment or failing any cursor deadline or control? | 043 measured up to .2578 with a stall and 041 .2355 on Fender; 044's isolated arm .291 on a Fender noise control. A formal claim on that margin would not hold on a slower device | withdrawn by the user (2026-10-05) on R13's evidence: 043's clean Fender cost peaked at .211; spent only if 045 fails on cost | [044](reports/044-challenger-stall-diagnosis.md), [Second amendment](contracts/development-contract-2.md#amendment-2026-10-05-host-stalls-guitar-sweeps-sentinels-and-the-outside-review) |
-| 44 | Does the user reopen or redirect the stopped batch to obtain attributable evidence beyond 044's quiet fixed panel? | D3 stops the batch; historical stalls remain unresolved and no harness-cause branch authorizes 045 | answered by the user (2026-10-05): reopened at 8 of 11 for a cost-margin version (question 45), one fresh quiet-host stage claim (question 42) and the held-out run (question 32) | [044 next](reports/044-challenger-stall-diagnosis.md#next) |
-| 32 | Does the challenger, fixed in a pre-registration before rendering, pass the same schedules and controls rendered from the three held-out guitar sets (`tonejs-nylon`, `tonejs-electric`, `shinyguitar`; two independent origins), every guitar on both outputs, in one run? | Condition (c), the last before the user promotes; one shot, and a failure turns the held-out sets into development evidence | blocked by 043 and 044 D3; only after a valid fresh all-guitar formal pass | [Amendment](contracts/development-contract-2.md#amendment-2026-10-04-sampled-guitar-replaces-the-sines-and-the-promotion-rule) |
+| 44 | Does the user reopen or redirect the stopped batch to obtain attributable evidence beyond 044's quiet fixed panel? | D3 stops the batch; historical stalls remain unresolved and no harness-cause branch authorizes 045 | answered by the user (2026-10-05): latest revision reopened at 8 of 10 for fresh quiet-host 045 then held-out 046; cost-margin version withdrawn unless 045 fails on cost | [044 next](reports/044-challenger-stall-diagnosis.md#next) |
+| 32 | Does the challenger, fixed in a pre-registration before rendering, pass the same schedules and controls rendered from the three held-out guitar sets (`tonejs-nylon`, `tonejs-electric`, `shinyguitar`; two independent origins), every guitar on both outputs, in one run? | Condition (c), the last before the user promotes; one shot, and a failure turns the held-out sets into development evidence | blocked by 045 D2; only after a valid fresh all-guitar formal pass | [Amendment](contracts/development-contract-2.md#amendment-2026-10-04-sampled-guitar-replaces-the-sines-and-the-promotion-rule) |
 | 43 | Does a new stage-gates version implement R10's sentinel rule (deviation examples only; ties by severity in the direction of difficulty before name), with hand-worked cases and an independent audit, before promotion's sentinel selection uses it? | Adopted by the user on 2026-10-05; needed only at promotion | open, before promotion | [Second amendment](contracts/development-contract-2.md#amendment-2026-10-05-host-stalls-guitar-sweeps-sentinels-and-the-outside-review), [R10](reviews.md#r10-after-the-resumed-batch-g031b-and-032034-with-the-direction-review) |
 | 41 | Can a separately pre-registered diagnosis distinguish native/input work, runtime collection, scheduler stalls and indirect evidence-memory pressure behind 043's no-inference service outliers? | Original failures remain; fixed panel did not reproduce an attributable target | answered D3 no attribution by 044; batch stops at 8 of 10 | [044](reports/044-challenger-stall-diagnosis.md) |
 | 39 | Can the next numbered experiment resolve 041's candidate-only timer attribution, with diagnostic tensor hashing and parity-snapshot copying separated from measured listener work, retaining fresh complete setup/feed/finish evidence before a formal claim? | Independent implementation review found conservative diagnostic work inside service; the saved durations cannot isolate it. Resolve attribution without rewriting 041 or changing gates | answered by 043 at the direct timer boundary; indirect runtime stall attribution is question 41 | [Implementation review 041: timers](bench/oracle-events/implementation-review-041.md#1-timers--does-not-hold-for-strict-candidate-only-scope) |

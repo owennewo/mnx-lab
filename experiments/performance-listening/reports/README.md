@@ -64,3 +64,4 @@ serves a private review folder over localhost; private audio never enters git.
 | 042 | [Finish state and safe offline lengths](042-challenger-finish-length.html) | [g042](../runs/g042-challenger-finish-length/summary.json), D1 author agreement; independent seam-5 audit and 041 implementation review before stage verdict |
 | 043 | [Timer attribution and formal guitar stage](043-challenger-guitar-stage.html) | [g043](../runs/g043-challenger-guitar-stage/summary.json), D2: cost/deadline failures |
 | 044 | [Trace the no-inference service stalls](044-challenger-stall-diagnosis.html) | [g044](../runs/g044-challenger-stall-diagnosis/summary.json), D3: no attribution; batch stops at 8 of 10 |
+| 045 | [Formal guitar stage on a quiet host](045-challenger-quiet-host-stage.html) | [g045](../runs/g045-challenger-quiet-host-stage/summary.json), D2: two Martin deadline misses; valid quiet host |
