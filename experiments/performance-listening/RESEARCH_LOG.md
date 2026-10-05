@@ -41,7 +41,7 @@ How to maintain it:
 
 ## Current state
 
-### Current batch: towards promotion on sampled guitar, 037–042
+### Current batch: towards promotion on sampled guitar, 037–044
 
 Opened 2026-10-04 by the user, after 036. Their words, in order:
 
@@ -67,7 +67,8 @@ question 32 (the held-out confirmation, once, and only after 31 passes). Each
 experiment changes one thing; a listener change gets its own experiment. The main
 track is paused.
 
-**Count:** six numbered experiments, 037 onwards; audits and the review are not
+**Count:** eight numbered experiments, 037 onwards (six until the user extended it on
+2026-10-05, below); audits and the review are not
 counted. The batch ends early under
 [section 9 of the experimenter prompt](PROMPT_EXPERIMENTER.md#9-batches), and in any
 case **stops before promotion**: the promotion itself is the user's.
@@ -98,7 +99,24 @@ govern; cursor verdicts stay blocked until that seam version is audited. The use
 
 So the order is 29, 26, 30 (with 34), 31, 32.
 
-**Progress.** Run **4 of 6 done**: [040](reports/040-challenger-streaming-state.md),
+**Extended by the user on 2026-10-05, after the seam-3 audit.** Seam versions 2 and 3
+each closed the previous audit's gaps and drew new ones, mostly wording and float32
+precision, while incremental inference and its measured cost and lag were still
+unbuilt with four runs spent. The parent recommended: one experiment writes
+observation-seam@4 to resolve question 36 **and** builds incremental neural inference,
+measuring cost and compute-inclusive lag on every development-guitar example as
+exploratory evidence, with Eric auditing seam 4 against that implementation; hand cases
+compare model-produced values as float32 to a stated tolerance; and the batch grows to
+eight runs: 041 seam 4 and streaming, 042 the guitar stage claim with the formal cursor
+verdict, 043 the held-out run, one spare. The user:
+
+> Happy with your reecommendations. 8 runs (or more) is fine
+
+So the order is 30 with 36, then 31, then 32. **The count is now eight**, and the user
+allows more if the work needs it; the parent reports to the user at the eighth run
+rather than running past it unasked.
+
+**Progress.** Run **4 of 8 done**: [040](reports/040-challenger-streaming-state.md),
 GPT-6.1-Sol (high) in Codex, **D1 implementation agreement pending independent audit**.
 The streaming input/state kernel preserves frozen model input tensors and frame
 selection and adds observation-seam@3 with the remaining clock/cost/lifecycle cases
@@ -358,9 +376,9 @@ Questions 1–23 and 28 are the main track's.
 
 | Rank | Question | Why it is ranked here | Status | Owner item |
 |---|---|---|---|---|
-| 36 | Can the next numbered challenger experiment resolve seam-3 audit I3's float32 discrepancy, S5's missing lifecycle/reset inputs, O11's irregular-delivery scheduling, N1/N2's unstated normalization formula and P1/P2/P3/P5's physical-versus-abstract confidence layer, freeze the remaining gate-relevant state/cost cases, and obtain independent audit before native cursor judgment? | Challenger instrument resolution precedes question 30's listener verdict; the audit's full uncovered-rule table is the checklist, with pinned DSP/procedural obligations retained for native adoption | open, next | [Audit 3: resolution](bench/oracle-events/audit-observation-seam-3.md#resolution-and-verdict), [uncovered rules](bench/oracle-events/audit-observation-seam-3.md#rules-i-could-not-exercise) |
-| 35 | Does an independent session rederive observation-seam@3's 28 added cases and inherited samples, agree on all answers and assess the explicit remaining DSP/procedural coverage boundaries, before any native cursor verdict? | Instrument audit precedes listener judgment; implementation agreement cannot establish independent adequacy | answered: 66 cases, 57 agree, 1 disagree, 8 ambiguous; coverage incomplete; resolution is question 36 | [Audit 3](bench/oracle-events/audit-observation-seam-3.md), GPT-6-Astra (high) in Codex |
 | 30 | Can a streaming Basic Pitch live path, specified by an observation-seam@3 that resolves question 34's gaps (the cost-ratio wording and the uncovered live and cost rules) and is audited before any cursor verdict, computing only new frames rather than the whole window every 100 ms, meet the sustained cost ratio of 0.25 and every 0.2 s event deadline on the compute-inclusive clock, on the clean and hesitation guitar examples with all controls? | 035's untrimmed live path met the nominal deadline (median 95 ms) but cost about twice the gate, and its nominal clock omits 40–65 ms of inference; the cursor is half of every stage | open after question 36 and any required independent re-audit; 040 input/state kernel is not neural optimization | [035 live](reports/035-challenger-basic-pitch.md#live-spike-observations-deadlines-and-cost), [040](reports/040-challenger-streaming-state.md) |
+| 36 | Can the next numbered challenger experiment resolve seam-3 audit I3's float32 discrepancy, S5's missing lifecycle/reset inputs, O11's irregular-delivery scheduling, N1/N2's unstated normalization formula and P1/P2/P3/P5's physical-versus-abstract confidence layer, freeze the remaining gate-relevant state/cost cases, and obtain independent audit before native cursor judgment? | Challenger instrument resolution precedes question 30's listener verdict; the audit's full uncovered-rule table is the checklist, with pinned DSP/procedural obligations retained for native adoption | taken together with question 30 by the user (2026-10-05): one experiment writes observation-seam@4 resolving these cases and builds incremental neural inference against it; independent audit before any cursor verdict | [Audit 3: resolution](bench/oracle-events/audit-observation-seam-3.md#resolution-and-verdict), [uncovered rules](bench/oracle-events/audit-observation-seam-3.md#rules-i-could-not-exercise) |
+| 35 | Does an independent session rederive observation-seam@3's 28 added cases and inherited samples, agree on all answers and assess the explicit remaining DSP/procedural coverage boundaries, before any native cursor verdict? | Instrument audit precedes listener judgment; implementation agreement cannot establish independent adequacy | answered: 66 cases, 57 agree, 1 disagree, 8 ambiguous; coverage incomplete; resolution is question 36 | [Audit 3](bench/oracle-events/audit-observation-seam-3.md), GPT-6-Astra (high) in Codex |
 | 34 | Can the next numbered challenger experiment resolve seam-2 audit coverage gaps, explicitly define the sustained-cost numerator and denominator, and freeze cases for the remaining gate-relevant rules (including variable-wall-time prefix equality, refersTo/backdating, start/finish and empty-call cost accounting, cadence/window/watermark lifecycle and fractional interpolation), with explicit boundaries for pinned DSP/procedural obligations and an independent audit before listener judgment? | The audit agrees on all supplied numbers but agreement is not complete rule coverage; the full uncovered-rule table is the resolution checklist. This precedes quiet-noise controls and any seam-2 cursor verdict | 040 specification/state implementation agreement; independent seam 3 adequacy audit is question 35; folded into question 30 by the user (2026-10-04), no cursor verdict before audit | [Audit: uncovered rules](bench/oracle-events/audit-observation-seam-2.md#rules-i-could-not-exercise), [cost wording](bench/oracle-events/audit-observation-seam-2.md#cost-wording-needs-clarification) |
 | 31 | Does the challenger pass guitar stage 1 and the silent-hesitation substage, both outputs and all controls, on all four development guitars under the amended gates, with the incumbent measured on the same examples and controls? | Conditions (a) and (b) of the amendment's decision 5; a full run of every example, since the sentinels are the incumbent's | open | [Amendment](contracts/development-contract-2.md#amendment-2026-10-04-sampled-guitar-replaces-the-sines-and-the-promotion-rule) |
 | 32 | Does the challenger, fixed in a pre-registration before rendering, pass the same schedules and controls rendered from the three held-out guitar sets (`tonejs-nylon`, `tonejs-electric`, `shinyguitar`; two independent origins), every guitar on both outputs, in one run? | Condition (c), the last before the user promotes; one shot, and a failure turns the held-out sets into development evidence | open, after 31 passes | [Amendment](contracts/development-contract-2.md#amendment-2026-10-04-sampled-guitar-replaces-the-sines-and-the-promotion-rule) |

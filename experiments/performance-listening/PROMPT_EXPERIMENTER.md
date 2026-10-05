@@ -108,7 +108,8 @@ research log says is current.
   sentinels; its report slug and run IDs carry `challenger-` after the number; it may add
   `contracts/observation-seam-N.md`, whose hand-worked cases go in a file of their own
   beside it, as an event oracle's do, so that its auditor can work from the rules before
-  seeing the answers. While a challenger track is open, "the top open question" means the
+  seeing the answers. Its cases state model-produced values as float32, compared to a stated
+  tolerance, not as decimals, so that representation is never an audit ambiguity. While a challenger track is open, "the top open question" means the
   top of your own track's questions. Everything else here applies unchanged.
 - **Preserve the rules, not a predecessor's assumptions.** Contract 2, user directions
   and frozen evaluation rules bind you. A report's scientific explanation or
