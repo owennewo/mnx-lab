@@ -41,6 +41,31 @@ How to maintain it:
 
 ## Current state
 
+### Current batch: one formal claim of @5, then held-out, 050–051
+
+Opened 2026-10-05 by the user, after the allocation batch's closing review. Parent:
+Claude Opus 5.5 in Claude Code; experimenter: Dave, GPT-6.1-Sol (high) in Codex, a
+fresh session per run. The parent's summary of the position: the untraced formal
+sweeps 043 and 045 each stalled (about 280–340 ms on feeds with no inference) while all
+four traced arms of 044 and 046, one at full length, ran clean; `basic-pitch-chain@5`
+is output-identical to the challenger 045 judged and cuts explicit model-window and
+output-copy allocation by 98% and 80%. It recommended one fresh formal stage claim with
+@5 on a quiet host under unchanged gates, and if that stalls again, running the same
+claim on a second machine instead of pursuing the stall on this laptop. The user:
+
+> Lets do your recommendation
+
+So: **050** is the formal guitar stage-1 and silent-hesitation claim of @5, both outputs
+and every control on all four development guitars, on a quiet host as
+[the second amendment](contracts/development-contract-2.md#amendment-2026-10-05-host-stalls-guitar-sweeps-sentinels-and-the-outside-review) defines it, with the incumbent on every example and the
+frozen baselines on stage 1's clean examples (question 54). If it passes, **051** is the
+held-out run, once (question 32); then the sentinel instrument and its audit (question
+43), the outside review at promotion by a model new to the loop (GPT-6-Sol has now
+reviewed in it, so not that one), and the user's decision. If 050 fails on a stall,
+the batch stops: the next step is the same claim on a second machine, which only the
+user can provide. **Count: two.** The `guitar-faust` agent stays paused while a formal
+run measures.
+
 <a id="current-batch-allocation-optimizations-at-most-3-experiments"></a>
 
 ### Latest batch: allocation optimizations, closed at 3 of 3
@@ -662,8 +687,9 @@ Questions 1–23 and 28 are the main track's.
 
 | Rank | Question | Why it is ranked here | Status | Owner item |
 |---|---|---|---|---|
+| 54 | Does `basic-pitch-chain@5-note-output` pass the formal guitar stage-1 and silent-hesitation claim, both outputs and every control on all four development guitars under unchanged gates, measured once on a quiet host as the second amendment defines it, with the incumbent on every example and the frozen baselines on stage 1's clean examples? | Promotion condition (a), with the retained allocation reductions; the user's direction of 2026-10-05 | open: next, 050 | [Current batch](#current-batch-one-formal-claim-of-5-then-held-out-050051) |
 | 52 | Does an independent process session check 047–049's retained resource changes, complete parity evidence and bounded DSP-cache rejection, before further work? | Required closing review of the completed allocation batch; experimenters do not review their own batch | answered: R17 holds the bounded D1/D1/D2 results; no formal stage or stall-repair claim | [R17](reviews.md#r17-after-the-allocation-batch-047049), [Current batch](#latest-batch-allocation-optimizations-closed-at-3-of-3) |
-| 53 | After the closing review, does the user authorize fresh formal evaluation of retained @5 or redirect to a broader contract-preserving DSP/resource method? | Allocation savings do not repair historical stalls or authorize a formal/held-out claim; the three approved candidates are complete | awaiting user direction after review | [049 next](reports/049-challenger-dsp-cache.md#next) |
+| 53 | After the closing review, does the user authorize fresh formal evaluation of retained @5 or redirect to a broader contract-preserving DSP/resource method? | Allocation savings do not repair historical stalls or authorize a formal/held-out claim; the three approved candidates are complete | answered by the user (2026-10-05): a fresh formal claim of @5 (question 54), then held-out | [049 next](reports/049-challenger-dsp-cache.md#next) |
 | 51 | Can full-DSP caching reduce measured work while preserving current global normalization, complete numerical/live output and causal prefixes? | Third candidate in the approved allocation batch; 048 supplies the parity-preserving note-output parent; changed semantics must be deferred | answered D2 bounded negative by 049 for ordinary whole-window/same-grid reuse; broader methods untested | [Current batch](#current-batch-allocation-optimizations-at-most-3-experiments), [048 next](reports/048-challenger-output-copies.md#next) |
 | 50 | Can eliminating copies of unused onset/contour maps, independently of input-buffer reuse, preserve complete numerical/live/prefix output while reducing measured allocation/work? | Second candidate in the approved allocation batch; 047 supplies the storage parent | answered D1 resource variant by 048; no stage or stall-repair claim | [048](reports/048-challenger-output-copies.md) |
 | 49 | Can reusable raw-input and model-window storage preserve exact corpus inputs/outputs and causal prefixes while removing recurring explicit allocations? | First candidate in the approved allocation batch; does not depend on historical stall reproduction | answered D1 resource variant by 047; no stage claim or stall attribution | [047](reports/047-challenger-input-buffers.md) |
