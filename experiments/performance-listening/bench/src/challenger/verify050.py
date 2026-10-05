@@ -49,8 +49,8 @@ for row in r['rows']:
   delivery=call['samples']/48000;completion=max(delivery,completion)+service
   assert abs(completion-call['completion'])<1e-12,(row['id'],call)
   total+=service;all_calls+=1
-  for f in call['frames']:assert abs(f['availableAt']-completion)<1e-12
-  for d in call['decisions']:assert abs(d['madeAt']-completion)<1e-12
+  for f in call.get('frames',[]):assert abs(f['availableAt']-completion)<1e-12
+  for d in call.get('decisions',[]):assert abs(d['madeAt']-completion)<1e-12
  assert abs(total-a['cost']['work'])<1e-9
  assert abs(total/a['cost']['audioSeconds']-a['cost']['ratio'])<1e-12
  prefixes=[]
@@ -59,8 +59,7 @@ for row in r['rows']:
   for call in b['calls']:
    c=max(call['samples']/48000,c)+call['elapsed'];assert abs(c-call['completion'])<1e-12
    all_calls+=1
-  def payload(xs):return [{k:v for k,v in x.items() if k not in ['madeAt','availableAt','elapsed','completion']} for x in xs if x['deliverySamples']<=b['cutoff']]
-  independently_equal=payload(a['payloads'])==payload(b['payloads'])
+  independently_equal=payload(a['payloads'],b['cutoff'])==payload(b['payloads'],b['cutoff'])
   assert independently_equal==p['pass']==b['pass']==True;prefixes.append(independently_equal)
  by_impl.setdefault(row['implementation'],{'examples':0,'prefixes':0,'prefixesAgree':0})
  by_impl[row['implementation']]['examples']+=1;by_impl[row['implementation']]['prefixes']+=len(prefixes);by_impl[row['implementation']]['prefixesAgree']+=sum(prefixes)

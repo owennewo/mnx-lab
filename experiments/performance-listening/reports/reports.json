@@ -368,6 +368,19 @@
         "href": "048-challenger-output-copies.html",
         "label": "Experiment 048"
       }
+    },
+    {
+      "number": "050",
+      "slug": "050-challenger-optimized-stage",
+      "title": "050 \u00b7 Formal guitar claim of retained @5",
+      "banner": "D1 \u00b7 all development guitars pass both outputs and controls \u00b7 max event delay 162.731 ms \u00b7 held-out next, no promotion",
+      "runs": [
+        "g050-challenger-optimized-stage"
+      ],
+      "previous": {
+        "href": "049-challenger-dsp-cache.html",
+        "label": "Experiment 049"
+      }
     }
   ]
 }

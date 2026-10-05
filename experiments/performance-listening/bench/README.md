@@ -204,3 +204,14 @@ native graph metadata without inference; `verify049.py` independently reconstruc
 saved counts and resolves sources at the tagged commit after retirement. No cache
 or listener version is implemented. See [049](../reports/049-challenger-dsp-cache.md)
 for the bounded negative, untested broader methods and completed allocation batch.
+
+**Experiment 050, formal optimized guitar sweep.** `src/challenger/run050.ts`
+uses frozen execute047/IncrementalModel048 and the audited comparator/evaluation paths
+for every development-guitar example, with amended clean-only baseline scope and
+quiet-host sampling. Run from the repository root with `npx tsx
+experiments/performance-listening/bench/src/challenger/run050.ts
+/home/williao/dev/mnx-listening-data g050-challenger-optimized-stage`; the existing run
+ID refuses reuse. `verify050.py` is a read-only saved-record verifier (usage in its
+header), resolving sources at the tagged commit after worktree retirement. See
+[050](../reports/050-challenger-optimized-stage.md) for D1, reader-only corrections
+and the separately authorized held-out next step; no promotion occurred.
