@@ -164,6 +164,9 @@ experiment writes the runner it needs, following the same rules:
   defect in the record writer cannot discard a completed measurement. Tag that commit
   `<run-id>-source` and push the tag when you land: if `main` moved meanwhile, the
   landing rebase rewrites the commit and only the tag keeps the pinned source reachable.
+  A documented read-only verifier must still resolve tracked sources after this
+  worktree is retired: use the pinned commit or repository-relative paths, not this
+  worktree’s absolute path.
 - It checks causality and cost for any live listener.
 
 **Run only the active suite.** A routine run evaluates the substages you attempt, the

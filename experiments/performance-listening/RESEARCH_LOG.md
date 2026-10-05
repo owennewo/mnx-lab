@@ -82,7 +82,10 @@ process reviewer is a separate GPT-6-Sol (high) in Codex session; experimenters 
 fresh GPT-6.1-Sol (high) in Codex sessions, one per numbered run. Any oracle audit and
 the closing process review use independent sessions/models under the existing rules.
 
-**Progress:** 0 of at most 3 numbered experiments; opening independent review due.
+**Progress:** 0 of at most 3 numbered experiments; the opening independent
+[R14 process review](reviews.md#r14-after-experiment-045-and-the-approved-continuation)
+held 045’s D2 and is complete. The first diagnostic experiment is next under the
+approved order.
 Carried state is [045's resulting state](reports/045-challenger-quiet-host-stage.md#resulting-stopping-count-budgets-and-evidence-access).
 No held-out access or formal redraw starts before a supported repair. The standing
 quiet-host/guitar-faust hold is retained for the planned timing work; no other agent
