@@ -381,6 +381,19 @@
         "href": "049-challenger-dsp-cache.html",
         "label": "Experiment 049"
       }
+    },
+    {
+      "number": "051",
+      "slug": "051-challenger-heldout-confirmation",
+      "title": "051 \u00b7 One-shot held-out guitar confirmation",
+      "banner": "D1 \u00b7 both outputs and controls pass all three held-out guitars \u00b7 1,200 causal prefixes agree \u00b7 batch closes 2/2 \u00b7 promotion pending prerequisites and user",
+      "runs": [
+        "g051-challenger-heldout-confirmation"
+      ],
+      "previous": {
+        "href": "050-challenger-optimized-stage.html",
+        "label": "Experiment 050"
+      }
     }
   ]
 }
