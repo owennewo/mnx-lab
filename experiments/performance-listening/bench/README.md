@@ -215,3 +215,14 @@ ID refuses reuse. `verify050.py` is a read-only saved-record verifier (usage in 
 header), resolving sources at the tagged commit after worktree retirement. See
 [050](../reports/050-challenger-optimized-stage.md) for D1, reader-only corrections
 and the separately authorized held-out next step; no promotion occurred.
+
+
+**Experiment 051, one-shot held-out confirmation.** `src/challenger/run051.ts`
+freezes the three approved held-out guitar sets with inherited schedules and identical
+quiet-noise controls, then measures the unchanged @5 live / @2 offline candidate,
+incumbent and clean baselines under existing audited gates. Run from the repository
+root with `npx tsx experiments/performance-listening/bench/src/challenger/run051.ts
+/home/williao/dev/mnx-listening-data g051-challenger-heldout-confirmation`. Used IDs
+refuse reuse. `verify051.py` checks saved evidence only (usage in its header), resolving
+tracked sources at the source tag after retirement. No sentinel selection or promotion
+is performed; see [051](../reports/051-challenger-heldout-confirmation.md).
