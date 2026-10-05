@@ -640,6 +640,18 @@ Code):
      allocations): the stall is real, the gate stands, and the next step is a listener
      version that removes it;
    - **no attribution:** the batch stops and the evidence goes to the user.
+   *Applied 2026-10-05 after experiment 044 found no attribution:* no stall recurred on a
+   quiet host (0 of 53,676 no-inference services over 100 ms in each of two traced
+   arms), and the host logs show another agent working throughout the window in which
+   043 measured both failing examples. The user then directed, on the parent's
+   recommendation, a listener version that widens the cost margin (044's isolated arm
+   measured a Fender noise control at .291), followed by **one** fresh formal stage
+   claim on a quiet host with its load recorded, and the held-out run:
+
+   > I agree with your recommendation - lets get started.  Let me know when its safe to start guitar-faust again
+
+   The re-claim is a fresh measurement under unchanged gates, not a remeasurement of
+   043; 043's D2 stands.
    Formal timing runs are made with no other agent working on the host, and record the
    host's load while they run.
 2. **Baselines in guitar sweeps.** The incumbent runs on every guitar example of a full
