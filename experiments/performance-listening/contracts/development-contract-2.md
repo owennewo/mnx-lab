@@ -663,6 +663,24 @@ Code):
    under the same tracing, peaked at .154 on all 99 examples. The report calls both arms'
    cost diagnostic, not production. The user's decision stands; what it rested on is
    weaker than its text says. See [R13](../reviews.md#r13-after-experiment-044-and-the-reopening).
+   *Parent's correction to that note and revision, 2026-10-05:* the `guitar-faust`
+   session (rollout `01a108bf…`) did run commands and browser tool calls from 11:25 to
+   11:34:55 UTC, finished its turn at 11:35, and was idle until a new user message at
+   11:56. The note's conclusion holds: nothing of it was running at 11:38 or 11:48, and the
+   stalls are unattributed. 043's clean per-example cost on Fender was median .158 and
+   maximum .211; only the stalled Martin control exceeded .25 on any guitar. On that
+   evidence the parent withdrew the cost-margin version and the user agreed:
+
+   > you have my ok
+
+   So **045 is the fresh formal stage claim on a quiet host, and 046 the held-out run**;
+   a listener version for cost is spent only if 045 fails on cost. **A quiet host,
+   for any formal timing run,** means: at the start, no herdr agent other than the
+   experimenter's own session is in a working state and the one-minute load average is
+   below 2.0; during the run, the same two things are sampled at least every 30 seconds
+   and recorded with the run; any sample with another agent working, or two consecutive
+   samples with load above 4.0, voids the run, which may be repeated once. The thresholds
+   are fixed here and never tuned.
    Formal timing runs are made with no other agent working on the host, and record the
    host's load while they run.
 2. **Baselines in guitar sweeps.** The incumbent runs on every guitar example of a full

@@ -41,7 +41,7 @@ How to maintain it:
 
 ## Current state
 
-### Current batch: reopened at 8 of 11, cost margin then the stage claim, 037–047
+### Current batch: reopened at 8 of 10, the quiet-host stage claim then held-out, 037–046
 
 Opened 2026-10-04 by the user, after 036. Their words, in order:
 
@@ -164,7 +164,20 @@ If 044 cannot attribute the stalls, or attributes them to the listener's own pat
 batch stops and reports to the user. The outside review at promotion and the new
 sentinel version follow the amendment.
 
-**Reopened again by the user on 2026-10-05, after 044.** 044 found no attribution;
+**Revised by the user on 2026-10-05, after R13.** R13 showed both premises below were
+overstated: the `guitar-faust` agent was idle from 11:35 to 11:56 UTC, so nothing of it
+ran at either stall, and 043's clean Fender cost peaked at .211 (median .158). The
+parent withdrew the cost-margin version; the user:
+
+> you have my ok
+
+So the count is **ten**: **045** is the fresh formal stage claim (question 42) on a quiet
+host as [the second amendment now defines it](contracts/development-contract-2.md#amendment-2026-10-05-host-stalls-guitar-sweeps-sentinels-and-the-outside-review)
+(no other herdr agent working, load below 2.0 at start, sampled every 30 s, a violation
+voids the run, one repeat); **046** is the held-out run (question 32). A listener version
+for cost is spent only if 045 fails on cost. `guitar-faust` stays paused until 046 lands.
+
+**Reopened again by the user on 2026-10-05, after 044 (superseded by the revision above).** 044 found no attribution;
 no stall recurred on a quiet host, and the parent found in the Codex logs that an
 agent working in `~/dev/guitar-faust` was active from 11:30 to 12:04 UTC, the window in
 which 043 measured both failing examples (11:38 and 11:48 UTC), though no command of
@@ -461,9 +474,9 @@ Questions 1–23 and 28 are the main track's.
 
 | Rank | Question | Why it is ranked here | Status | Owner item |
 |---|---|---|---|---|
-| 45 | Can one listener version reduce the challenger's live inference cost enough to leave a clear margin under .25 on every development guitar, Fender included, without changing any assessment or failing any cursor deadline or control? | 043 measured up to .2578 with a stall and 041 .2355 on Fender; 044's isolated arm .291 on a Fender noise control. A formal claim on that margin would not hold on a slower device | open: next, 045 | [044](reports/044-challenger-stall-diagnosis.md), [Second amendment](contracts/development-contract-2.md#amendment-2026-10-05-host-stalls-guitar-sweeps-sentinels-and-the-outside-review) |
+| 42 | Does the challenger pass the formal guitar stage-1 and silent-hesitation claim, both outputs and every control on all four development guitars under unchanged gates, measured once on a quiet host as the second amendment defines it, with the incumbent on every example and the frozen baselines on stage 1's clean examples? | Condition (a) of promotion, measured once more with the cause removed; only if 044 finds a harness cause | open: next, 045 | [Second amendment](contracts/development-contract-2.md#amendment-2026-10-05-host-stalls-guitar-sweeps-sentinels-and-the-outside-review) |
+| 45 | Can one listener version reduce the challenger's live inference cost enough to leave a clear margin under .25 on every development guitar, Fender included, without changing any assessment or failing any cursor deadline or control? | 043 measured up to .2578 with a stall and 041 .2355 on Fender; 044's isolated arm .291 on a Fender noise control. A formal claim on that margin would not hold on a slower device | withdrawn by the user (2026-10-05) on R13's evidence: 043's clean Fender cost peaked at .211; spent only if 045 fails on cost | [044](reports/044-challenger-stall-diagnosis.md), [Second amendment](contracts/development-contract-2.md#amendment-2026-10-05-host-stalls-guitar-sweeps-sentinels-and-the-outside-review) |
 | 44 | Does the user reopen or redirect the stopped batch to obtain attributable evidence beyond 044's quiet fixed panel? | D3 stops the batch; historical stalls remain unresolved and no harness-cause branch authorizes 045 | answered by the user (2026-10-05): reopened at 8 of 11 for a cost-margin version (question 45), one fresh quiet-host stage claim (question 42) and the held-out run (question 32) | [044 next](reports/044-challenger-stall-diagnosis.md#next) |
-| 42 | After a listener version widens the cost margin (question 45), does the challenger pass the formal guitar stage-1 and silent-hesitation claim, both outputs and every control on all four development guitars under unchanged gates, measured once on a quiet host with its load recorded, with the incumbent on every example and the frozen baselines on stage 1's clean examples? | Condition (a) of promotion, measured once more with the cause removed; only if 044 finds a harness cause | open, 046, after 045 | [Second amendment](contracts/development-contract-2.md#amendment-2026-10-05-host-stalls-guitar-sweeps-sentinels-and-the-outside-review) |
 | 32 | Does the challenger, fixed in a pre-registration before rendering, pass the same schedules and controls rendered from the three held-out guitar sets (`tonejs-nylon`, `tonejs-electric`, `shinyguitar`; two independent origins), every guitar on both outputs, in one run? | Condition (c), the last before the user promotes; one shot, and a failure turns the held-out sets into development evidence | blocked by 043 and 044 D3; only after a valid fresh all-guitar formal pass | [Amendment](contracts/development-contract-2.md#amendment-2026-10-04-sampled-guitar-replaces-the-sines-and-the-promotion-rule) |
 | 43 | Does a new stage-gates version implement R10's sentinel rule (deviation examples only; ties by severity in the direction of difficulty before name), with hand-worked cases and an independent audit, before promotion's sentinel selection uses it? | Adopted by the user on 2026-10-05; needed only at promotion | open, before promotion | [Second amendment](contracts/development-contract-2.md#amendment-2026-10-05-host-stalls-guitar-sweeps-sentinels-and-the-outside-review), [R10](reviews.md#r10-after-the-resumed-batch-g031b-and-032034-with-the-direction-review) |
 | 41 | Can a separately pre-registered diagnosis distinguish native/input work, runtime collection, scheduler stalls and indirect evidence-memory pressure behind 043's no-inference service outliers? | Original failures remain; fixed panel did not reproduce an attributable target | answered D3 no attribution by 044; batch stops at 8 of 10 | [044](reports/044-challenger-stall-diagnosis.md) |
