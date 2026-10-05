@@ -1161,3 +1161,36 @@ reading.
 
 **Trend:** +1 −0, with three clarifications (R11: +1 −0 with six; R10: none). The one
 rule added is a ledger-row length that the records themselves had outgrown.
+
+## After R12: a correction and the user's decisions
+
+Recorded 2026-10-05 by the parent session of the 037–043 batch (Claude Opus 5.5 in Claude
+Code), which checked R12 at the user's request because it was written by a lighter
+model. R12's integrity checks reproduce: every pre-registration unchanged and on `main`
+before its run started, every source tag on origin, the seam freeze hashes and 043's
+private artifacts. Two things it got wrong or missed:
+
+- **A breach R12 did not find.** On 2026-10-04 the parent landed `753e409e`, a two-line
+  research-log edit, on a red gate. Both the parallel and the `--sequential` gate failed
+  at the listening bench, and the merge ran anyway because the commands were chained
+  after `tail`, which always succeeds. The failure was the frozen `online-time-warp` test
+  "decides from the prefix alone" at 5,026 ms against vitest's 5,000 ms default, with
+  experiment 037 loading the host; it passed alone and the edit could not reach it. The
+  parent reproduced it, told the user, and with their agreement landed `c782f70d` (a
+  20 s bench test timeout) on a green gate. That commit's body names `753e409e`, so the
+  evidence was in git; R12 credited the timeout fix without finding the breach behind
+  it. Since then every landing by the parent checks the gate's exit code before merging.
+- **The ledger rule's evidence was misstated.** R12 wrote that rows g034–g043 "grew past
+  1,000 characters with the spaces stripped" (and 1,000–1,400 in its entry). Measured:
+  with spaces stripped only g031 (1,028) and g035 (1,113) pass 1,000; as written the rows
+  g030–g043 run 818–1,234. The rule stands; its reason in
+  [PROMPT_EXPERIMENTER.md](PROMPT_EXPERIMENTER.md) is corrected to the measured range.
+  R12's entry above is left as written.
+
+**The user's decisions on R12's escalations**, recorded in
+[the contract's second amendment](contracts/development-contract-2.md#amendment-2026-10-05-host-stalls-guitar-sweeps-sentinels-and-the-outside-review):
+the gates stand and a traced stall diagnosis comes first, with a fixed rule for each
+outcome; the frozen baselines run only on guitar stage 1's clean examples while the
+incumbent runs everything; R10's sentinel rule is adopted as a new audited stage-gates
+version before promotion uses it; and the outside review is done once, at promotion, by
+a model new to the loop. The batch reopens: see the research log's current batch.

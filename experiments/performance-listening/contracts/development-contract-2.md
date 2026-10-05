@@ -12,6 +12,8 @@ numbers chosen from them.
 **Amended 2026-10-04** by the user's direction: the sines are dropped, the progression
 is rebased onto sampled guitar, and the promotion rule is rewritten. See
 [the amendment](#amendment-2026-10-04-sampled-guitar-replaces-the-sines-and-the-promotion-rule).
+**Amended 2026-10-05** on host stalls, guitar sweeps, sentinels and the outside review:
+see [the second amendment](#amendment-2026-10-05-host-stalls-guitar-sweeps-sentinels-and-the-outside-review).
 
 ## The user's direction
 
@@ -610,6 +612,53 @@ The [observation seam](#the-challenger-track-basic-pitch-observations)'s timing 
 settled before any cursor verdict (question 27), and decision 3's compute-inclusive clock
 is part of that settlement: the next seam version states how measured compute enters
 `availableAt` and `madeAt`, and its audit covers it.
+
+## Amendment, 2026-10-05: host stalls, guitar sweeps, sentinels and the outside review
+
+Added 2026-10-05 by the user's direction, after [process review R12](../reviews.md)
+escalated four questions on experiment 043's evidence. Where it differs from a section
+above, this section governs. The user, in order:
+
+> Happy with you fixing ledger and recording the breach, but first can I get some recommendations on r12s escalations
+
+> I agree to these propoposal, lets get started
+
+The proposals they agreed to, drafted by the parent session (Claude Opus 5.5 in Claude
+Code):
+
+1. **The gates stand, and a stall is diagnosed before anything else.** 043 failed one
+   cost comparison and one event deadline on feeds that ran no inference. No gate
+   changes; no best-of-N, median or re-measurement rule is adopted, because a cursor
+   that is late once on stage is late for the player. A pre-registered diagnosis with
+   CPU, runtime-collection and scheduler tracing, and with evidence writing isolated
+   from the measured process, comes first, and its outcome decides what follows:
+   - **a cause in the measuring harness** (evidence writing, harness allocations or
+     host load the listener does not create): the harness is fixed and the full
+     formal stage claim is run again, once, under the same gates. That is a fresh
+     measurement with the cause removed, not a favourable redraw;
+   - **a cause in the listener's own path** (for example collection driven by its
+     allocations): the stall is real, the gate stands, and the next step is a listener
+     version that removes it;
+   - **no attribution:** the batch stops and the evidence goes to the user.
+   Formal timing runs are made with no other agent working on the host, and record the
+   host's load while they run.
+2. **Baselines in guitar sweeps.** The incumbent runs on every guitar example of a full
+   sweep, since [promotion condition (b)](#amendment-2026-10-04-sampled-guitar-replaces-the-sines-and-the-promotion-rule)
+   needs its result on the same examples. The frozen clock and time-warp baselines
+   (`clock-follower@1`, `online-time-warp@8`, `@12`, `@14`) run only on guitar stage 1's
+   clean examples, so the comparison stays visible; on guitar they fail 210 to 564 of
+   576 cursor checks (043). This settles R10's escalation for the guitar stages.
+3. **Sentinels.** R10's recommendation is adopted: a substage's sentinels are drawn from
+   its deviation examples only (clean parents are stage 1's), and ties on margin are
+   broken by severity in the direction of difficulty (slowest tempo, longest pause,
+   most extreme bar factor) before by name. The chooser is part of an instrument, so it
+   is implemented as a new stage-gates version with hand-worked cases and an
+   independent audit before its first use, which is the sentinel selection that
+   promotion triggers.
+4. **An outside review at promotion.** The closing review before the user decides on
+   promotion is done, once, by a model that has never worked in this loop, and covers
+   both the promotion evidence and the process's auditing regime, including what the
+   five seam versions cost against what they caught.
 
 ## Still open for the user
 
