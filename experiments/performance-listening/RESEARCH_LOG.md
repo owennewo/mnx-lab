@@ -126,8 +126,9 @@ historical-stall repair, stage pass or protected access is claimed.
 
 **Closed at 3 of 3.** Input/window reuse and unused-output-copy savings were retained;
 the two tested ordinary DSP-cache methods were rejected. Independent closing process
-review of 047–049 is now due, followed by the user's direction on fresh formal evaluation
-or broader resource work. No 050 is authorized automatically. The standing guitar-faust
+review [R17](reviews.md#r17-after-the-allocation-batch-047049) holds the bounded D1/D1/D2
+results. The user's direction on fresh formal evaluation or broader resource work is next;
+no 050 is authorized automatically. The standing guitar-faust
 pause/release decision remains with the user/parent now that batch work has finished.
 [049 resulting state](reports/049-challenger-dsp-cache.md#resulting-stopping-count-budgets-and-evidence-access)
 carries unchanged stage stopping and protected access, no new version, one resource
@@ -661,7 +662,7 @@ Questions 1–23 and 28 are the main track's.
 
 | Rank | Question | Why it is ranked here | Status | Owner item |
 |---|---|---|---|---|
-| 52 | Does an independent process session check 047–049's retained resource changes, complete parity evidence and bounded DSP-cache rejection, before further work? | Required closing review of the completed allocation batch; experimenters do not review their own batch | open; next, independent session | [049 next](reports/049-challenger-dsp-cache.md#next), [Current batch](#latest-batch-allocation-optimizations-closed-at-3-of-3) |
+| 52 | Does an independent process session check 047–049's retained resource changes, complete parity evidence and bounded DSP-cache rejection, before further work? | Required closing review of the completed allocation batch; experimenters do not review their own batch | answered: R17 holds the bounded D1/D1/D2 results; no formal stage or stall-repair claim | [R17](reviews.md#r17-after-the-allocation-batch-047049), [Current batch](#latest-batch-allocation-optimizations-closed-at-3-of-3) |
 | 53 | After the closing review, does the user authorize fresh formal evaluation of retained @5 or redirect to a broader contract-preserving DSP/resource method? | Allocation savings do not repair historical stalls or authorize a formal/held-out claim; the three approved candidates are complete | awaiting user direction after review | [049 next](reports/049-challenger-dsp-cache.md#next) |
 | 51 | Can full-DSP caching reduce measured work while preserving current global normalization, complete numerical/live output and causal prefixes? | Third candidate in the approved allocation batch; 048 supplies the parity-preserving note-output parent; changed semantics must be deferred | answered D2 bounded negative by 049 for ordinary whole-window/same-grid reuse; broader methods untested | [Current batch](#current-batch-allocation-optimizations-at-most-3-experiments), [048 next](reports/048-challenger-output-copies.md#next) |
 | 50 | Can eliminating copies of unused onset/contour maps, independently of input-buffer reuse, preserve complete numerical/live/prefix output while reducing measured allocation/work? | Second candidate in the approved allocation batch; 047 supplies the storage parent | answered D1 resource variant by 048; no stage or stall-repair claim | [048](reports/048-challenger-output-copies.md) |
