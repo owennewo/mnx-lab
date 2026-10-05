@@ -13,7 +13,7 @@ import {execute044} from './live044.ts';
 import {encode} from '../io.ts';
 const [configPath,arm]=process.argv.slice(2),config=JSON.parse(readFileSync(configPath!,'utf8'));
 assert(arm==='A'||arm==='B');
-const gc:any[]=[],observer=new PerformanceObserver(items=>{for(const e of items.getEntries())gc.push({start:e.startTime,end:e.startTime+e.duration,duration:e.duration,detail:e.detail});});observer.observe({entryTypes:['gc']});
+const gc:any[]=[],observer=new PerformanceObserver(items=>{for(const e of items.getEntries())gc.push({start:e.startTime,end:e.startTime+e.duration,duration:e.duration,detail:(e as typeof e & {detail?:unknown}).detail});});observer.observe({entryTypes:['gc']});
 const flush=()=>new Promise<void>(resolve=>setImmediate(()=>setImmediate(resolve)));
 const sched=()=>readFileSync('/proc/thread-self/schedstat','utf8').trim().split(/\s+/).map(Number);
 const model=new IncrementalModel041(config.graph),retained:any[]=[];
@@ -32,4 +32,4 @@ for(const e of config.examples){
  if(arm==='A'){retained.push(result);writeFileSync(`${config.privateDir}/A.${e.id}.json`,encode(result),{flag:'wx'});}
  process.send!({type:'example',result});await new Promise<void>(resolve=>process.once('message',()=>resolve()));
 }
-await model.close();await flush();process.send!({type:'done',gcTail:gc});observer.disconnect();process.disconnect();
+await model.close();await flush();process.send!({type:'done',gcTail:gc});observer.disconnect();process.disconnect!();
