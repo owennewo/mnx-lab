@@ -284,7 +284,13 @@ your whole job:
    > case.
 
    Give it nothing about the experiment except the same final line naming its model
-   and tool. Then check that the audit file landed and the
+   and tool. When the research log asks for an **implementation review** of an
+   experiment, launch it the same way, on a model other than the experiment's, with:
+
+   > Read experiments/performance-listening/REVIEWING_AN_IMPLEMENTATION.md and follow
+   > it. When you have landed and retired your worktree, stop, and reply with your
+   > verdict check by check.
+ Then check that the audit file landed and the
    research log's audit question links it.
 5. **Stop** before any further experiment, even if the audit agrees, unless the user
    asked for a batch: then return to step 2 for the next run, until the count is reached

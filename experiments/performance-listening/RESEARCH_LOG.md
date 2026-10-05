@@ -116,6 +116,20 @@ So the order is 30 with 36, then 31, then 32. **The count is now eight**, and th
 allows more if the work needs it; the parent reports to the user at the eighth run
 rather than running past it unasked.
 
+**After the seam-4 audit, 2026-10-05.** The audit agreed on all 90 cases but left
+two scalar rules without a frozen case (finish must not flush; an offline length must
+be a safe integer) and said that 041's native code and measurements, which its prompt
+forbids it to read, had no independent check. The parent recommended: **042** freezes
+the two missing cases, adding no seam rules unless they are needed, for Eric to audit;
+**alongside it**, Eric reviews 041's native implementation and evidence in a separate
+session under a new brief, [REVIEWING_AN_IMPLEMENTATION.md](REVIEWING_AN_IMPLEMENTATION.md),
+which allows reading the code and records and re-executing a sample; **043** is the
+formal guitar stage claim; **044** the held-out run; then the closing review and the
+user's decision. The faster alternative, ruling the two cases non-blocking and leaving
+the code to the closing review, was declined. The user:
+
+> yes please
+
 **Progress.** Run **5 of 8 done**: [041](reports/041-challenger-incremental-neural.md),
 GPT-6.1-Sol (high) in Codex, **D1 compatible exploratory evidence pending independent
 seam-4 audit**. The separately versioned live backend crops neural time computation
@@ -383,7 +397,7 @@ Questions 1–23 and 28 are the main track's.
 
 | Rank | Question | Why it is ranked here | Status | Owner item |
 |---|---|---|---|---|
-| 38 | Can the next numbered challenger resolution freeze and independently audit the remaining seam-4 scalar finish-state/nonempty-finish-emission and safe-length cases, and explicitly arrange independent native context/map/timer/provenance/prefix review with the implementation/results access that the oracle-audit prompt prohibits? | Audit 4 agrees on all 90 checked cases but lists uncovered rules and cannot grant native adoption approval; resolve these before formal cursor judgment | open, next; challenger track | [Audit 4: uncovered rules](bench/oracle-events/audit-observation-seam-4.md#rules-i-could-not-exercise), [resolution](bench/oracle-events/audit-observation-seam-4.md#resolution-and-verdict) |
+| 38 | Can the next numbered challenger resolution freeze and independently audit the remaining seam-4 scalar finish-state/nonempty-finish-emission and safe-length cases, and explicitly arrange independent native context/map/timer/provenance/prefix review with the implementation/results access that the oracle-audit prompt prohibits? | Audit 4 agrees on all 90 checked cases but lists uncovered rules and cannot grant native adoption approval; resolve these before formal cursor judgment | open, split by the user (2026-10-05): the scalar cases go to 042 and Eric's audit; the native context/map/timer/provenance/prefix review is Eric's [implementation review of 041](REVIEWING_AN_IMPLEMENTATION.md), run alongside; both precede the formal cursor verdict in 043 | [Audit 4: uncovered rules](bench/oracle-events/audit-observation-seam-4.md#rules-i-could-not-exercise), [resolution](bench/oracle-events/audit-observation-seam-4.md#resolution-and-verdict) |
 | 37 | Does an independent session rederive observation-seam@4's physical representation and complete state/cost fixtures, agree on every added/reworked case and inherited samples in their declared layers, and assess native adoption/context/timer/prefix evidence before any formal cursor judgment? | New seam/oracle needs independent adequacy audit; author agreement and native parity cannot supply it | answered: 90 agree, 0 disagree, 0 ambiguous; remaining coverage and native adoption review are question 38 | [Audit 4](bench/oracle-events/audit-observation-seam-4.md), GPT-6-Astra (high) in Codex |
 | 30 | Can a streaming Basic Pitch live path compute only new neural frames plus context, meeting sustained cost .25 and every .2-second compute-inclusive event deadline on clean/hesitation development guitars and all controls? | Original whole-model spike was too expensive; seam/native implementation and audit precede formal judgment | answered by 041 as exploratory comparisons; formal stage verdict is 31 after audit 37 | [041](reports/041-challenger-incremental-neural.md), [035](reports/035-challenger-basic-pitch.md#live-spike-observations-deadlines-and-cost) |
 | 36 | Can the next numbered challenger experiment resolve seam-3 audit I3's float32 discrepancy, S5's missing lifecycle/reset inputs, O11's irregular-delivery scheduling, N1/N2's unstated normalization formula and P1/P2/P3/P5's physical-versus-abstract confidence layer, freeze the remaining gate-relevant state/cost cases, and obtain independent audit before native cursor judgment? | Challenger instrument resolution precedes question 30's listener verdict; the audit's full uncovered-rule table is the checklist, with pinned DSP/procedural obligations retained for native adoption | 041 versions seam 4/cases and builds/measures incremental neural inference; independent adequacy audit is 37, before formal cursor judgment | [041](reports/041-challenger-incremental-neural.md), [audit 3](bench/oracle-events/audit-observation-seam-3.md#resolution-and-verdict) |
