@@ -92,8 +92,9 @@ under its fixed rule, with no fresh formal claim or held-out use. 043 D2, 044 D3
 of the same model, without restarting or changing its pre-registration; a read-only
 verifier count bug was repaired after measurement, never a listener rerun.
 
-**Next:** independent closing process review of this approved continuation, then the
-user decides reopening or redirection. No 047 or protected evidence is authorized by
+**Next:** independent closing process review of this approved continuation is complete
+([R15](reviews.md#r15-after-experiment-046-and-the-bounded-continuation)); the user
+decides reopening or redirection. No 047 or protected evidence is authorized by
 046's outcome. The parent/user's standing guitar-faust release decision is pending now
 that timing work is finished; this author stops after landing and retirement. Promotion,
 future microphone gates, qualification and Studio decisions stay with the user.
