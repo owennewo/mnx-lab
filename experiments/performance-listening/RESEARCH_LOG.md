@@ -130,6 +130,23 @@ the code to the closing review, was declined. The user:
 
 > yes please
 
+**After 041's implementation review and the seam-5 audit, 2026-10-05.** The review
+held on every check but one: 041's timer counted diagnostic hashing and snapshot
+copying as listener work, so its cost and lag overstate, never understate (question
+39). Seam 5's audit agreed on all 95 cases, closing the scalar prerequisites. The
+parent recommended combining question 39 with the formal stage claim (question 31) in
+**043**: the claim re-measures everything fresh anyway, and the timer scope is the
+measuring harness, not the listener, so one listener version is still judged. The
+user:
+
+> lets do the combined
+
+So **043** fixes the timer attribution and makes the formal guitar stage-1 and
+silent-hesitation claim, both outputs and every control on all four development
+guitars, with the incumbent's results on the same examples beside it; **044** is the
+held-out run, once, only if 043 passes. Then the closing review and the user's
+decision.
+
 **Progress.** Run **6 of 8 done**: [042](reports/042-challenger-finish-length.md),
 GPT-6.1-Sol (high) in Codex, **D1 author agreement; independent seam-5 scalar audit agrees**.
 Observation-seam@5 adds observable finish-state/nonempty-emission and safe-length
@@ -398,7 +415,7 @@ Questions 1–23 and 28 are the main track's.
 
 | Rank | Question | Why it is ranked here | Status | Owner item |
 |---|---|---|---|---|
-| 39 | Can the next numbered experiment resolve 041's candidate-only timer attribution, with diagnostic tensor hashing and parity-snapshot copying separated from measured listener work, retaining fresh complete setup/feed/finish evidence before a formal claim? | Independent implementation review found conservative diagnostic work inside service; the saved durations cannot isolate it. Resolve attribution without rewriting 041 or changing gates | open; precedes the formal guitar-stage claim, question 40 has closed question 38's scalar audit prerequisite | [Implementation review 041: timers](bench/oracle-events/implementation-review-041.md#1-timers--does-not-hold-for-strict-candidate-only-scope) |
+| 39 | Can the next numbered experiment resolve 041's candidate-only timer attribution, with diagnostic tensor hashing and parity-snapshot copying separated from measured listener work, retaining fresh complete setup/feed/finish evidence before a formal claim? | Independent implementation review found conservative diagnostic work inside service; the saved durations cannot isolate it. Resolve attribution without rewriting 041 or changing gates | open; taken together with question 31 in 043 by the user (2026-10-05) | [Implementation review 041: timers](bench/oracle-events/implementation-review-041.md#1-timers--does-not-hold-for-strict-candidate-only-scope) |
 | 40 | Does an independent session rederive observation-seam@5's pending/populated finish snapshots, nonempty returned decision stamps and immutable history, and unsafe/nonfinite length refusals, agree on all five new cases and sample inherited rules in their declared layers? | Independent audit closes the scalar finish and safe-length gaps; native timer attribution remains question 39 | answered: 95 agree, 0 disagree, 0 ambiguous (5 new, 90 inherited); native obligations remain separate | [Audit 5](bench/oracle-events/audit-observation-seam-5.md), GPT-6-Astra (high) in Codex |
 | 38 | Can the next numbered challenger resolution freeze and independently audit the remaining seam-4 scalar finish-state/nonempty-finish-emission and safe-length cases, and explicitly arrange independent native context/map/timer/provenance/prefix review with the implementation/results access that the oracle-audit prompt prohibits? | Audit 4 agrees on all 90 checked cases but lists uncovered rules and cannot grant native adoption approval; resolve these before formal cursor judgment | scalar fixtures frozen by 042 and agreed by audit 40; native review holds except strict timer attribution, separately resolved by 39 | [Audit 4: uncovered rules](bench/oracle-events/audit-observation-seam-4.md#rules-i-could-not-exercise), [resolution](bench/oracle-events/audit-observation-seam-4.md#resolution-and-verdict) |
 | 37 | Does an independent session rederive observation-seam@4's physical representation and complete state/cost fixtures, agree on every added/reworked case and inherited samples in their declared layers, and assess native adoption/context/timer/prefix evidence before any formal cursor judgment? | New seam/oracle needs independent adequacy audit; author agreement and native parity cannot supply it | answered: 90 agree, 0 disagree, 0 ambiguous; remaining coverage and native adoption review are question 38 | [Audit 4](bench/oracle-events/audit-observation-seam-4.md), GPT-6-Astra (high) in Codex |
