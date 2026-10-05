@@ -165,3 +165,12 @@ independent observation-seam 4 audit; no existing producer or evaluator is chang
 `postStats041.py` verifies saved-record hashes, selected map bytes and serial
 clock recurrences, then aggregates existing records without inference. See the
 [research log](../RESEARCH_LOG.md) for state, counts and next required audit.
+
+**Experiment 043, timer attribution and formal guitar sweep.** `src/challenger/live043.ts`
+keeps the frozen candidate operations and stops service before evidence hashes;
+`compare043.ts` applies the serial completion clock to unchanged comparators.
+`run043.ts` guards and records every frozen development-guitar example, fresh live
+services/assessment alignment, baseline sweep and prefix checks. `postStats043.py`
+verifies saved hashes/clocks/payloads without inference. `test/timer-043.test.ts`
+checks that slow evidence hooks do not enter service clocks. See the research log
+for the resulting decision and batch state; no incumbent source or oracle is changed.

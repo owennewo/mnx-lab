@@ -277,6 +277,19 @@
         "href": "041-challenger-incremental-neural.html",
         "label": "Experiment 041"
       }
+    },
+    {
+      "number": "043",
+      "slug": "043-challenger-guitar-stage",
+      "title": "043 \u00b7 Timer attribution and formal guitar stage",
+      "banner": "D2 \u00b7 all 576 assessments pass \u00b7 one cost failure and one cursor deadline miss \u00b7 no stage/promotion or held-out run",
+      "runs": [
+        "g043-challenger-guitar-stage"
+      ],
+      "previous": {
+        "href": "042-challenger-finish-length.html",
+        "label": "Experiment 042"
+      }
     }
   ]
 }
