@@ -84,8 +84,7 @@ the closing process review use independent sessions/models under the existing ru
 
 **Progress:** 0 of at most 3 numbered experiments; the opening independent
 [R14 process review](reviews.md#r14-after-experiment-045-and-the-approved-continuation)
-held 045’s D2 and is complete. The first diagnostic experiment is next under the
-approved order.
+held 045’s D2 and is complete. [046 full-workload diagnosis](reports/046-challenger-full-workload-trace.md) is pre-registered and in progress under the approved order.
 Carried state is [045's resulting state](reports/045-challenger-quiet-host-stage.md#resulting-stopping-count-budgets-and-evidence-access).
 No held-out access or formal redraw starts before a supported repair. The standing
 quiet-host/guitar-faust hold is retained for the planned timing work; no other agent
@@ -547,6 +546,7 @@ Questions 1–23 and 28 are the main track's.
 
 | Rank | Question | Why it is ranked here | Status | Owner item |
 |---|---|---|---|---|
+| 47 | Can the complete 576-example challenger workload reproduce a no-inference stall with evidence/GC/CPU/scheduler ownership and distinguish accumulated harness evidence from isolated listener work? | Approved diagnosis follows R14; attribution precedes any repair or fresh formal claim | pre-registered, experiment 046 in progress | [046](reports/046-challenger-full-workload-trace.md) |
 | 46 | Does the user reopen for attributable full-sweep no-inference-stall diagnosis or redirect after 045's valid quiet-host deadline failures, following independent review? | Failed promotion condition (a) stops the batch; quiet state supplies no allocation/runtime attribution | answered by the user: review, full-workload diagnosis, demonstrated fix, then formal claim; current batch above | [045 next](reports/045-challenger-quiet-host-stage.md#next) |
 | 42 | Does the challenger pass the formal guitar stage-1 and silent-hesitation claim, both outputs and every control on all four development guitars under unchanged gates, measured once on a quiet host as the second amendment defines it, with the incumbent on every example and the frozen baselines on stage 1's clean examples? | Condition (a), freshly authorized by the user after R13 without assuming stall attribution | answered D2 by 045: two Martin hesitation deadlines fail on a valid quiet host | [Second amendment](contracts/development-contract-2.md#amendment-2026-10-05-host-stalls-guitar-sweeps-sentinels-and-the-outside-review) |
 | 45 | Can one listener version reduce the challenger's live inference cost enough to leave a clear margin under .25 on every development guitar, Fender included, without changing any assessment or failing any cursor deadline or control? | 043 measured up to .2578 with a stall and 041 .2355 on Fender; 044's isolated arm .291 on a Fender noise control. A formal claim on that margin would not hold on a slower device | withdrawn by the user (2026-10-05) on R13's evidence: 043's clean Fender cost peaked at .211; spent only if 045 fails on cost | [044](reports/044-challenger-stall-diagnosis.md), [Second amendment](contracts/development-contract-2.md#amendment-2026-10-05-host-stalls-guitar-sweeps-sentinels-and-the-outside-review) |
