@@ -1,0 +1,208 @@
+{
+  "version": "observation-seam@5",
+  "author": "GPT-6.1-Sol (high) in Codex",
+  "inherits": "observation-seam@4",
+  "comparison": "Exact integers/IDs/null/booleans; physical f32Bits exact; times/rational arithmetic tolerance 1e-12 seconds.",
+  "cases": [
+    {
+      "id": "S10",
+      "op": "finishState5",
+      "input": {
+        "setup": 0,
+        "startEmissions": [
+          {
+            "id": "start",
+            "kind": "cursor",
+            "refersTo": 0,
+            "madeAt": -1
+          }
+        ],
+        "feed": {
+          "samples": 3,
+          "tail": 10,
+          "service": 0.001,
+          "zeroMaps": false,
+          "emissions": []
+        },
+        "finish": 0.002,
+        "finishEmissions": [
+          {
+            "id": "finish",
+            "kind": "cursor",
+            "refersTo": 0,
+            "madeAt": 0.001
+          }
+        ],
+        "continuation": [
+          24
+        ]
+      },
+      "expected": {
+        "before": {
+          "samples": 3,
+          "generated": 1,
+          "retainedInput": 1,
+          "retainedModel": 1,
+          "nextSamples": 4800,
+          "watermark": null
+        },
+        "after": {
+          "samples": 3,
+          "generated": 1,
+          "retainedInput": 1,
+          "retainedModel": 1,
+          "nextSamples": 4800,
+          "watermark": null
+        },
+        "windowBitsEqual": true,
+        "finishFrames": [],
+        "modelCallsBefore": 0,
+        "modelCallsAfter": 0,
+        "completions": [
+          0,
+          0.0010625,
+          0.0030625
+        ],
+        "work": 0.003,
+        "ratio": 48,
+        "returnedFinish": [
+          {
+            "id": "finish",
+            "kind": "cursor",
+            "refersTo": 0,
+            "madeAt": 0.0030625
+          }
+        ],
+        "oldHistoryUnchanged": true,
+        "appendedFinishMatches": true,
+        "historyCount": 2,
+        "returnedMutationIsolated": true,
+        "continuation": {
+          "generated": 2,
+          "retainedInput": 0,
+          "retainedModel": 2,
+          "last": {
+            "f32Bits": "41479e7a"
+          }
+        }
+      },
+      "arithmetic": "No tail flush: finish leaves input/ring/count/cadence/watermark and window bits intact. M=3 generates j0 only and retains input index2=10; supplying index3=24 AFTER the snapshot is a diagnostic of preserved pending state, not a live post-finish API claim. j1=1834/147 stores 0x41479e7a. Ffeed=1/16000+.001=.0010625; Ffinish=.0030625; work=.003; ratio=48. Nonempty finish decision retains refersTo, overwrites madeAt with Ffinish, appends after unchanged old history; returned payload is cloned away from saved history."
+    },
+    {
+      "id": "S11",
+      "op": "finishState5",
+      "input": {
+        "setup": 0.02,
+        "startEmissions": [
+          {
+            "id": "start",
+            "kind": "cursor",
+            "refersTo": 0,
+            "madeAt": -1
+          }
+        ],
+        "feed": {
+          "samples": 4803,
+          "tail": 10,
+          "service": 0.045,
+          "zeroMaps": true,
+          "emissions": [
+            {
+              "id": "feed",
+              "kind": "cursor",
+              "refersTo": 0.08,
+              "madeAt": 0.001
+            }
+          ]
+        },
+        "finish": 0.005,
+        "finishEmissions": [
+          {
+            "id": "finish",
+            "kind": "cursor",
+            "refersTo": 0.08,
+            "madeAt": 0.001
+          }
+        ],
+        "continuation": []
+      },
+      "expected": {
+        "before": {
+          "samples": 4803,
+          "generated": 2206,
+          "retainedInput": 1,
+          "retainedModel": 2206,
+          "nextSamples": 9600,
+          "watermark": 2138
+        },
+        "after": {
+          "samples": 4803,
+          "generated": 2206,
+          "retainedInput": 1,
+          "retainedModel": 2206,
+          "nextSamples": 9600,
+          "watermark": 2138
+        },
+        "windowBitsEqual": true,
+        "finishFrames": [],
+        "modelCallsBefore": 1,
+        "modelCallsAfter": 1,
+        "completions": [
+          0.02,
+          0.14506249999999998,
+          0.1500625
+        ],
+        "work": 0.07,
+        "ratio": {
+          "numerator": 1120,
+          "denominator": 1601
+        },
+        "returnedFinish": [
+          {
+            "id": "finish",
+            "kind": "cursor",
+            "refersTo": 0.08,
+            "madeAt": 0.1500625
+          }
+        ],
+        "oldHistoryUnchanged": true,
+        "appendedFinishMatches": true,
+        "historyCount": 3,
+        "returnedMutationIsolated": true,
+        "continuation": null
+      },
+      "arithmetic": "No tail flush: finish leaves input/ring/count/cadence/watermark and window bits intact. M=4803: ceil(4802*147/320)=2206, next j2206 needs input4802/right4803 so one neighbor remains. The first scheduled zero map emits q90..2138 step256; watermark2138, next9600. D=1601/16000=.1000625; Ffeed=.1450625; Ffinish=.1500625; work=.07; ratio=1120/1601. Nonempty finish decision retains refersTo, overwrites madeAt with Ffinish, appends after unchanged old history; returned payload is cloned away from saved history."
+    },
+    {
+      "id": "O19",
+      "op": "invalidLength",
+      "input": {
+        "length": 9007199254740992
+      },
+      "expected": true,
+      "arithmetic": "2^53 is integral but exceeds the maximum safe integer 2^53-1. Refuse before geometry/allocation; do not round, clamp or allocate."
+    },
+    {
+      "id": "O20",
+      "op": "invalidLength",
+      "input": {
+        "length": {
+          "special": "Infinity"
+        }
+      },
+      "expected": true,
+      "arithmetic": "Infinity is nonfinite and not a safe integer. Refuse before geometry/allocation; do not round, clamp or allocate."
+    },
+    {
+      "id": "O21",
+      "op": "invalidLength",
+      "input": {
+        "length": {
+          "special": "NaN"
+        }
+      },
+      "expected": true,
+      "arithmetic": "NaN is nonfinite and not a safe integer. Refuse before geometry/allocation; do not round, clamp or allocate."
+    }
+  ]
+}
