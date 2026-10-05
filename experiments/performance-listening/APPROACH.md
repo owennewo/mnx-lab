@@ -147,8 +147,9 @@ noise, recording level, and other instruments or voices sounding alongside the
 performer. Success on generated audio does not establish success on
 recordings of real instruments. The previous experiment's largest measured loss was
 timbre and recording transfer, not musical complexity. That remains a transfer risk
-for sine results. Contract 2 fixes when timbre enters: stages 1–3 use sines, stage 4
-adds one recorded guitar sample set, and further sounds follow the approved progression.
+for sine results. Contract 2 fixes when timbre enters: since its 2026-10-04 amendment
+stages 1–3 use sampled guitar (the sines are retired), stage 4 is microphone recordings,
+and further sounds follow the approved progression.
 
 **Develop on a synthetic ladder first.** Experiments 002 and 003 went to a real
 recording before any candidate had been run on audio with an exact answer, and a

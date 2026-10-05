@@ -24,7 +24,9 @@ disagreement is as valuable as an agreement. Do not soften one to be polite.
 The research log's top open question names the oracle awaiting audit and the experiment
 that created or re-versioned it. Use the current state and top audit question to
 identify the work: read the log's Current state and Open questions sections, and skip
-its Findings table, which summarises completed run results.
+its Findings table, which summarises completed run results. Open those two sections by
+line range; never search the whole log (`rg`, `grep`), because a search prints Findings
+rows, which is how audits 4, seam 1 and seam 5 each saw a verdict they were meant not to.
 
 The same procedure audits any contract the contract says is audited like an oracle,
 such as a challenger's `contracts/observation-seam-N.md`. Read "oracle" as that

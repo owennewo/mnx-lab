@@ -21,6 +21,7 @@ is visible: a process that gains rules every time is getting heavier, not better
 | R9 | 2026-10-01 | The batch of [030](reports/030-current-instruments.md) and [031](reports/031-other-bars-reporting.md), with [audit 4](bench/oracle-events/audit-4.md) and the batch opening | Claude Fable 5.1 in Claude Code | Held; the batch stopped by its own rule on a runner defect | [Landed with this entry](#r9-after-the-batch-of-030-and-031) | Sweep completion (decided: g031b); baselines in sweeps; next batch's goal | +2 −1 |
 | R10 | 2026-10-01 | The resumed batch: [g031b](reports/031-other-bars-reporting.md#completion-g031b-by-the-users-authority), [032](reports/032-held-note-hesitation.md), [033](reports/033-rushed-bar.md) and [034](reports/034-missing-event-sweep.md), with the full direction review | Claude Fable 5.1 in Claude Code | Held; the sine staircase is sound, and now the slow part | [Landed with this entry](#r10-after-the-resumed-batch-g031b-and-032034-with-the-direction-review) | Sentinel rule; baselines in sweeps (again); a guitar-sound thermometer before the remaining sine deviations | +0 −0 |
 | R11 | 2026-10-02 | The challenger batch: the track's opening, [035](reports/035-challenger-basic-pitch.md) and the [observation-seam@1 audit](bench/oracle-events/audit-observation-seam-1.md) | Claude Opus 5.5 in Claude Code | Held; the challenger's cursor is the open half | [Landed with this entry](#r11-after-the-challenger-batch-035-and-the-observation-seam-audit) | The incumbent on the guitar set; the promotion rule's wording; whether continuation must carry the live path; R10's sentinel and baseline items | +1 −0 |
+| R12 | 2026-10-05 | The sampled-guitar batch: [036](reports/036-incumbent-guitar.md), [037](reports/037-challenger-observation-seam.md)–[043](reports/043-challenger-guitar-stage.md), [seam audits 2–5](bench/oracle-events/audit-observation-seam-5.md) and [041 implementation review](bench/oracle-events/implementation-review-041.md) | Claude Sonnet 5.5 in Claude Code (effort not in log) | Held; the stopped batch is honestly stopped, on a 3% cost overshoot and a 58 ms deadline miss that are host stalls | [Landed with this entry](#r12-after-the-sampled-guitar-batch-036-043) | Whether a single-example host stall may fail a stage; whether to fund question 41; the seam-arithmetic share of the batch; an outside review | +1 −0 |
 
 Reviews R1–R3 were given in conversation with the user and recorded here when this file
 was created. The same reviewer wrote contract 2 and most of the process it reviewed.
@@ -1025,3 +1026,138 @@ R5–R8 added one and removed one; R9 added two and removed one; R10 none. The o
 added protects an audit's independence, which is what the audit rule exists for; the
 clarifications all come from one cause, a second track that the documents were not
 written for.
+
+## R12, after the sampled-guitar batch (036–043)
+
+**Held: eight experiments in two days, every pre-registration ahead of its code, every
+result inside its rules, and a stop where the batch's own goal said to stop. The loop is
+pointed at the right outputs; its two live questions now sit on measurement, not on
+listening.** Reviewed everything since R11 (`09d32b73`): 036, the amendment and the
+batch opening (`63225227`), 037–043, audits of seams 2–5, and the 041 implementation
+review. Nothing is mid-flight: `git worktree list` shows only the primary checkout, no
+experiment branch remains, and `origin/main` equals `main`. Reviewer: **Claude Sonnet 5.5
+in Claude Code**, effort not in the log. It is a model that ran none of these
+experiments or audits (Opus 5.5 ran 036 and wrote the amendment and R11; Sol 6.1 ran
+037–043; Astra audited), and it did not write the process. It is the same vendor family
+as the process's authors, which limits the independence of the process-level view.
+
+**Integrity** (from `git reflog show main`, tags, the Codex session logs and recomputed
+hashes). Each pre-registration reached `main` before any code that ran: 036 21:25 (code
+21:27, tag 21:27); 037 22:07/22:08; 038 22:53/23:00; 039 08:58/09:04; 040 09:24/09:28;
+041 09:59/10:08; 042 11:39/11:43; 043 12:28 (reflog) against source tag 12:34 and run
+start 11:34 UTC, i.e. 12:34 local. `git diff <prereg> HEAD` shows **zero removed lines**
+in all eight reports. Since R11 the diff touches no earlier listener, evaluator, oracle,
+set or baseline: the only modified files are the log, ledger, registries, the
+user-directed contract, the experimenter prompt and track proposals, and the bench's
+test timeout (which fixes the latent parallel-gate timeout R11 noted). The four seam
+freeze hashes (2–5) and 043's public summary and three private result files recompute to
+the recorded values; the source tags `g040`–`g043` are on origin. Model records match
+the Codex logs: `gpt-6.1-sol` at effort high for the experimenter sessions,
+`gpt-6-astra` high for the audits. The reasoning-effort field exists only in those logs;
+the Claude Code logs have none, as before. The one record I could not close from logs
+is 036's effort (Opus 5.5, as stated).
+
+**Rules and claims.** 043 is the model: it predicted identity with 041 (held, 576/576
+payloads and reports), predicted all gates would pass (contradicted by two examples) and
+said in advance that "aggregate success cannot hide an individual failure". It then
+reported D2, named the first failed promotion condition, refused to subtract the stalls,
+rerun for a favourable draw, or loosen a gate, and left held-out untouched. Vacuous
+passes are disclosed (no positive trials for missing, wrong, dead, extra and bar-flag
+at stages 1 and silent hesitation). The challenger stopping count (2 of 3) is carried
+correctly and was counted conservatively at 039. The batch obeyed the user's two
+stops: the amendment, the order, the extension to eight and the "combine" decision are
+all quoted from the user before the work they shape.
+
+Smaller things. (1) **The auditors saw Findings again.** The seam-5 audit opened with a
+broad `rg` that printed Findings rows including the author's agreement claim, and
+disclosed it. That is the third occurrence (audits 4, seam 1, seam 5), after R11
+clarified the rule: the clarification said what to read, not how not to search. (2)
+**Ledger rows became unreadable.** From g034 on, rows reach 1,000-1,400 characters with
+spaces dropped ("full sweep1164 / following2,assessment3"). (3) **043's summary is 712 KB
+and its run took 50 minutes**; both disclosed, and the target is documented as a
+target. (4) **036's ledger row names Opus 5.5 as the experimenter with the same session
+having written R11**: disclosed in its own pre-registration, and this review is the
+different-session check it asked for. Its pre-registration, frozen runner, 29.9 s run and
+"the front end, not the chain" diagnosis stand as reported.
+
+**Direction.** A milestone: the first complete guitar sweep and the first failed
+promotion condition.
+
+1. *Does it measure what the user wants?* More than before. 043 judges the live cursor
+   and the end-of-piece assessment on all 576 sampled-guitar examples, with controls, on
+   a compute-inclusive clock. The challenger passes every assessment (576/576) and every
+   cursor deadline but one; the incumbent passes 0 of 192 performance cursors on
+   guitar. The weak parts are still named honestly: monophonic strongest-pitch,
+   exact schedules, sampled rather than microphone sound, no positive trials for the
+   later deviations, no real playing.
+2. *Is the gate reward sensible?* One example in 576 failed on **a feed that ran no
+   inference** (a 291 ms and a 342 ms service on zero model frames), 0.2578 against a
+   0.25 cost gate on a control, and 258 ms against 0.2 s on one event. Both look
+   like a host stall (collection, scheduling or evidence memory), which 043 says it cannot
+   attribute. The gate is the user's and unchanged. But as written a per-example maximum
+   over a single wall-time measurement makes a stage claim a lottery on the host:
+   the next full sweep may fail a different example, or none. This is the thing most
+   likely to make a gate "unreachable" in the sense of PROMPT_REVIEWER 3.4, and it is
+   a decision, not an oversight.
+3. *Thrash and share of effort.* Seam versions @2–@5 and their four audits took
+   037, 040 and 042 (three of eight runs), none with acoustic evidence; each audit found
+   new float32, wording and scalar gaps, which the next version closed. The user
+   approved each step, and the stage now has independent agreement on 95 cases, so the
+   spend was real. But 041 needed a technical rerun for omitted setup allocation and
+   the timer then needed a second correction in 043, so seam arithmetic and measurement attribution
+   together took most of the eight runs. Question 41 would add another. Count that before
+   funding it.
+4. *Time.* 043: 50 minutes, 3,552 prefix checks, six implementations. The sweep is
+   obliged by the full-sweep rule; the two-minute aim is not reachable for a sweep, and
+   043 asks the closing review for lean reuse. My view: a routine challenger evaluation
+   (offline, reused observations) is minutes; the stage claim should stay full, but the
+   four sine-era baselines add little on guitar (each fails at least 210 of 576 cursor checks, clock-follower 564)
+   and could be sentinel-only until promotion. That relaxes no evidence standard that
+   a candidate's own pass depends on; it is the user's to decide because sweeps and
+   baselines were R10's escalation.
+5. *The rising tide.* No retirement occurred. R10's standing escalations (the sentinel
+   rule, baselines in sweeps) are unanswered four days on and now interact with
+   promotion: the contract says a promotion triggers sentinel selection from "its own
+   guitar evidence", which exists only after 043.
+
+**Fixed directly.** [APPROACH.md](APPROACH.md): the stale line saying stages 1-3 use
+sines and stage 4 one recorded guitar set (the amendment replaced both).
+[AUDITING_AN_ORACLE.md](AUDITING_AN_ORACLE.md): open the log's two sections by line range
+and never search the log, which is what printed Findings (a tightening of R11's rule,
+not a new one). [PROMPT_EXPERIMENTER.md](PROMPT_EXPERIMENTER.md): a ledger row is a
+pointer, about 700 characters, readable prose (+1). [RESEARCH_LOG.md](RESEARCH_LOG.md):
+the stale "review due" sentences for 036 and the batch. No verdict, pre-registration,
+contract, gate, code or frozen file was touched.
+
+**Escalated to the user.**
+
+1. **Host stalls and the per-example maximum.** Whether the cost and deadline gates
+   should keep a single-measurement maximum, or take a pre-registered stability protocol
+   (for example any failing example re-measured k times in isolation, with the median
+   and every attempt recorded) that is fixed before the run and never chosen after it. I
+   recommend deciding this before funding question 41, because a diagnosis of the stall
+   does not decide whether one stall may fail a stage. Not done by me: it changes a
+   gate.
+2. **Whether to reopen the batch for question 41 or stop here.** If reopened, ask it to
+   fix the stall observation (CPU/GC/scheduler trace, isolated evidence writing) in its
+   pre-registration and to name how it will separate those from candidate work; 043's
+   own wording already does.
+3. **Baselines in sweeps** (R10's, still open), now concrete: the four sine-era baselines
+   cost a share of the 50 minutes (their share is not broken out in the record) and fail
+   hundreds of cursor checks on guitar.
+4. **An outside review of the process as a whole.** Due by cadence (R5 was the last
+   outside review; milestone reached; the author model of this process is the same
+   family as this reviewer). A model from a different vendor reading APPROACH,
+   contract 2 and the seam sequence would test whether the auditing regime is still
+   proportionate to a challenger that has not yet passed its stage.
+
+**Could not check.** No listener or model was run; the claims were checked from records,
+hashes, tags and Codex session metadata. I did not read the full audits or the 17 MB
+seam-2 audit session log, recompute the 3.2 million completion recurrences, or verify
+that the old `guitar-nn` source commit R11 flagged has since been published (it is cited
+by tag, not path, now). The 043 timer harness has had no independent review; 043 says so
+itself, and I did not provide one. Session logs show recorded tool use, not unrecorded
+reading.
+
+**Trend:** +1 −0, with three clarifications (R11: +1 −0 with six; R10: none). The one
+rule added is a ledger-row length that the records themselves had outgrown.

@@ -164,12 +164,10 @@ formal stage claim. **Question 31 is answered D2**; question 32 stays blocked.
 No-inference feed stalls are measured facts, not an established GC/scheduling or
 acoustic diagnosis. Their wall times remain in the cost and completion clocks.
 
-**Next: independent closing process review of 037–043**, including its oracle audits,
-native review and outstanding review of 036, by a model that ran none of the batch.
-Assess the gate verdict, direct versus indirect evidence-work attribution and lean
-regression reuse after this first complete guitar sweep. Afterwards, a new numbered
-pre-registration may diagnose question 41 if the user reopens the batch. This author
-runs neither that review nor another experiment.
+**Next: the closing process review of 037–043 is done** ([R12](reviews.md#r12-after-the-sampled-guitar-batch-036-043),
+Claude Sonnet 5.5 in Claude Code; it covered the audits, the native review and 036). A
+new numbered pre-registration may diagnose question 41 if the user reopens the batch.
+This author runs neither that review nor another experiment.
 
 [043's resulting state](reports/043-challenger-guitar-stage.md#resulting-stopping-count-budgets-and-evidence-access)
 carries stopping counts and budgets. No new listener version, no qualification or
@@ -179,8 +177,10 @@ sines retired. Earlier [037](reports/037-challenger-observation-seam.md),
 [040](reports/040-challenger-streaming-state.md), [041](reports/041-challenger-incremental-neural.md)
 and [042](reports/042-challenger-finish-length.md) preserve their verdicts.
 
-**Awaiting the user:** after independent review, whether to reopen/extend the stopped
-batch for cost/deadline diagnosis. No gate change is requested or assumed. Promotion,
+**Awaiting the user:** after [R12](reviews.md#r12-after-the-sampled-guitar-batch-036-043),
+first whether one host stall may fail a stage (a single-measurement maximum against a
+pre-registered re-measurement protocol), then whether to reopen/extend the stopped
+batch for cost/deadline diagnosis; also baselines in sweeps and an outside process review. No gate change is requested or assumed. Promotion,
 future microphone gates, qualification and Studio choices remain theirs, with R10's
 standing sentinel/pool and baseline-sweep questions. The main track stays paused and
 event-chain@3 remains incumbent. This session lands and retires after exactly 043.
@@ -199,9 +199,8 @@ none of the four development guitars, where the challenger met three. It rejects
 control but fails almost every performance on both outputs. Its zero-crossing front end
 is wrong or late on every guitar (finding 29); the chain is not implicated. No
 promotion, version, suite or stopping-count change; event-chain@3 remains incumbent and
-the main track's next question was 23 again, until the amendment paused it. A process review of 036 is due, by a
-session other than this one, which also wrote R11; the current batch's closing review
-covers it.
+the main track's next question was 23 again, until the amendment paused it. Process review
+[R12](reviews.md#r12-after-the-sampled-guitar-batch-036-043) reviewed 036 with the batch.
 
 ### Previous batch, closed: the challenger track, experiment 035
 

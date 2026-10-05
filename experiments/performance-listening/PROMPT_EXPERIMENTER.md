@@ -203,7 +203,10 @@ Then:
 
 - add a row to `reports/reports.json`, and run `node reports/export-report.mjs NNN`;
 - add a row to the table in `reports/README.md`;
-- add a ledger row whose conditions name you;
+- add a ledger row whose conditions name you. A row is a pointer, not a second report:
+  ordinary prose with spaces, under about 700 characters in all, results and
+  decision in a sentence each; numbers live in the report (rows g034–g043 grew past 1,000
+  characters with the spaces stripped, and no longer read);
 - update the research log: the current state, findings with their evidence, and the
   re-ranked questions. Record the resulting stopping count and budget state in the report (one
   line if unchanged) and point to it from the log.
