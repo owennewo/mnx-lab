@@ -41,6 +41,54 @@ How to maintain it:
 
 ## Current state
 
+### Current batch: allocation optimizations, at most 3 experiments
+
+Opened after 046 and its independent reviews by the user's direction:
+
+> ill follow your recommendations
+
+This accepts the preceding recommendation:
+
+> My recommendation is to evaluate the buffer reuse and unused-output copies first, each separately with output-parity and allocation measurements. Full DSP caching is the more involved follow-up. That would require reopening the stopped continuation.
+
+**Goal and order:** reopen for the identified allocation/work reductions: first input/window
+buffer reuse; then eliminating copies of unused onset/contour outputs; then the more
+involved full-DSP caching follow-up, only if the unchanged normalization and numerical
+contracts can be preserved. At most three numbered experiments, one change per new
+version, beginning with the next unused number (047 if still unused). Each experiment
+chooses and pre-registers its own bounded method and measures output parity and
+allocation/work savings independently. Preserve frozen predecessors and compare with
+the appropriate unchanged version; do not combine unmeasured changes.
+
+This is a new optimization goal after the closed attribution continuation. Historical
+stall reproduction is not a prerequisite for evaluating avoidable allocations, and a
+resource reduction is not a claim to have repaired the historical stalls. 043/045's
+formal failures and 046's D3 stand. The accepted work does not authorize a new formal
+stage claim, held-out confirmation, promotion, new numerical gates, microphone or
+Studio work. The 200-ms deadline, existing gates, normalization/output contracts and
+protected-evidence restrictions remain unchanged.
+
+**Bound and stops:** complete the three candidates in order where the evidence and
+contract permit it, retaining only demonstrated improvements with the required parity.
+An inconclusive/infrastructure outcome, output-parity failure that cannot be resolved
+within the frozen pre-registration, unsupported contract change, or a contract stopping
+condition ends the batch and records what awaits the user. A valid negative result is
+recorded honestly under its fixed decision rule, without a favorable redraw. DSP caching
+that needs changed semantics is deferred rather than adopted. Existing stopping counts
+and budgets carry over; reopening never resets them. Any new oracle requires its
+independent audit before judgment. After the last experiment or an early stop, an
+independent process review closes the batch. Each experiment lands and retires before
+the next begins; the final gate must finish successfully before any merge/push.
+
+**Roles and status:** GPT-6.1-Sol (high) in Codex coordinates only and lands this Current
+batch record. Fresh GPT-6.1-Sol (high) in Codex sessions run one numbered experiment each;
+audits and the closing review use independent sessions/models. No experiment has begun.
+This current direction answers the prior reopening decision (question 48); the
+experimenter updates the ranked questions when its record lands. The standing
+`guitar-faust` pause/release decision is unchanged; timing sessions verify the required
+host conditions rather than assuming exclusivity. Any user-dependent work is recorded
+in the report and research log without asking questions.
+
 ### Latest continuation: closed at 1 of at most 3, full-workload no attribution
 
 Opened 2026-10-05 after 045, by the user's direction:
