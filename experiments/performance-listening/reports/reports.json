@@ -250,6 +250,20 @@
         "href": "039-challenger-dominant-pitch.html",
         "label": "Experiment 039"
       }
+    },
+    {
+      "number": "041",
+      "slug": "041-challenger-incremental-neural",
+      "title": "041 \u00b7 Incremental neural inference and seam 4",
+      "banner": "D1 exploratory \u00b7 all 576 live comparisons clear \u00b7 702 exact selected maps \u00b7 independent seam-4 audit before formal cursor/stage verdict",
+      "runs": [
+        "g041-challenger-incremental-neural",
+        "g041a-challenger-incremental-neural"
+      ],
+      "previous": {
+        "href": "040-challenger-streaming-state.html",
+        "label": "Experiment 040"
+      }
     }
   ]
 }

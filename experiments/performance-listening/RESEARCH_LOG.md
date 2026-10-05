@@ -116,40 +116,40 @@ So the order is 30 with 36, then 31, then 32. **The count is now eight**, and th
 allows more if the work needs it; the parent reports to the user at the eighth run
 rather than running past it unasked.
 
-**Progress.** Run **4 of 8 done**: [040](reports/040-challenger-streaming-state.md),
-GPT-6.1-Sol (high) in Codex, **D1 implementation agreement pending independent audit**.
-The streaming input/state kernel preserves frozen model input tensors and frame
-selection and adds observation-seam@3 with the remaining clock/cost/lifecycle cases
-and explicit DSP/procedural boundaries (finding 34). It is input-state caching, not
-incremental neural inference; native speed and cursor accuracy remain unmeasured.
-**The independent seam 3 audit (question 35) is answered:**
-[GPT-6-Astra (high) in Codex](bench/oracle-events/audit-observation-seam-3.md) found
-agreement on most supplied arithmetic, an interpolation/float32 disagreement,
-ambiguous lifecycle/scheduling/normalization and inherited confidence cases, and
-remaining state/cost coverage gaps. **Question 36 is next:** the next numbered
-challenger experiment resolves these findings before question 30's native cursor
-judgment. No cursor verdict is authorized by this audit. Question31's guitar stage
-and question 32's one-shot held-out confirmation remain after question 30.
+**Progress.** Run **5 of 8 done**: [041](reports/041-challenger-incremental-neural.md),
+GPT-6.1-Sol (high) in Codex, **D1 compatible exploratory evidence pending independent
+seam-4 audit**. The separately versioned live backend crops neural time computation
+after recomputing full-window CQT/global normalization; sampled selected maps are
+exactly preserved and every corrected development-guitar live/cost/control/prefix
+comparison clears (finding 35). Its offline @2 component retains verified earlier
+assessment passes. The first attempt omitted state construction from setup timing;
+its evidence is preserved and the single technical rerun resolves that defect without
+neural/listener tuning. No formal cursor/stage verdict or promotion is granted.
 
-Run 3, [039](reports/039-challenger-dominant-pitch.md), repaired Martin's offline
-wrong-score claims. **basic-pitch-chain@2's offline component** remains the challenger
-candidate; event-chain@3 remains incumbent and the old live spike is unchanged.
-Run 2, [038](reports/038-challenger-quiet-noise.md), answered the fixed noise-control
-question; lower-register decoded noise pitches remain despite score rejection.
-Run 1, [037](reports/037-challenger-observation-seam.md), and its independent
-[seam 2 audit](bench/oracle-events/audit-observation-seam-2.md) established arithmetic
-agreement while identifying the gaps addressed by 040. The user's order folded those
-into question 30's streaming producer; 040 builds that producer's state/seam prerequisite,
-with neural compute explicitly still open.
+**Independent observation-seam@4 audit is next, question 37.** 041 versions the seam
+and hand cases for the seam-3 audit's float32, lifecycle, scheduling, normalization,
+representation and remaining state/cost findings. Author agreement and sampled native
+parity are not independent adequacy approval. After audit agreement, question 31's
+formal guitar stage claim remains, then question 32's one-shot held-out confirmation.
+The main track stays paused; event-chain@3 remains incumbent. No held-out input ran.
 
-[040's resulting state](reports/040-challenger-streaming-state.md#resulting-stopping-count-budgets-and-evidence-access)
-keeps stopping counts and all budgets unchanged from 039: this instrument/state run
-adds no listener version or comparison. The challenger still inherits 039's conservative
-uncleared-substage charge. No qualification or held-out access was spent; sines remain
-retired and guitar sweeps begin at the first stage claim. **No new user decision from 040**;
-promotion, microphone, qualification and Studio decisions remain theirs, as do R10's
-standing sentinel/pool and baseline-sweep questions. Independent audit is separate-session
-work; this experimenter neither supplies it nor starts the next experiment.
+Previous batch runs remain recorded: [040](reports/040-challenger-streaming-state.md)
+built the input/state kernel and seam 3; its [independent audit](bench/oracle-events/audit-observation-seam-3.md)
+identified the findings addressed by 041. [039](reports/039-challenger-dominant-pitch.md)
+repaired offline Martin claims; [038](reports/038-challenger-quiet-noise.md) measured
+the fixed noise controls; [037](reports/037-challenger-observation-seam.md) and its
+[seam-2 audit](bench/oracle-events/audit-observation-seam-2.md) settled earlier timing
+arithmetic. Earlier recorded verdicts remain unchanged.
+
+[041's resulting state](reports/041-challenger-incremental-neural.md#resulting-stopping-count-budgets-and-evidence-access)
+records the conservative uncleared-substage charge, version/comparison totals and
+spent technical rerun. Qualification, held-out and reserved/final budgets remain
+unused, Winner 5–8 unexamined, sines retired. Guitar sweeps start at the formal stage
+claim. **No new user decision from 041**; promotion, microphone, qualification and
+Studio decisions remain theirs, as do R10's standing sentinel/pool and baseline-sweep
+questions. The native sweep exceeded the routine time aim; closing review should
+assess lean regression reuse. The audit is separate-session work; this experimenter
+neither supplies it nor starts the next experiment.
 
 ### Experiment 036, by the user's direction
 
@@ -366,6 +366,7 @@ Status is `holds`, `superseded` or `withdrawn`.
 | 32 | Fixed frame-local strongest-pitch masking before the official decoder removes Martin's false low-G2 wrong-score claims while preserving all clean/hesitation assessment gates and quiet-noise rejection on the four development guitars | [039](reports/039-challenger-dominant-pitch.md#results), [g039](runs/g039-challenger-dominant-pitch/summary.json) | holds | 039 | Offline monophonic component only; timing fields change within gates. No fitted threshold, live/stage pass or independent transfer claim; genuine chord tones would be suppressed |
 
 | 34 | The separately versioned streaming input/state kernel preserves frozen float32 model inputs and coordinates on regular/irregular synthetic delivery, while seam 3 reproduces new lifecycle/cost/prefix hand arithmetic; global normalization can alter retained features | [040](reports/040-challenger-streaming-state.md#results), [g040](runs/g040-challenger-streaming-state/summary.json) | holds | 040 | Implementation agreement pending independent seam 3 audit; injected maps/costs only, no neural incremental inference, native speed, live cursor or guitar-stage claim |
+| 35 | Cropping neural time computation after recomputing full global normalization preserves sampled selected float32 maps and brings every measured development-guitar live cost/deadline/control comparison within the current thresholds | [041](reports/041-challenger-incremental-neural.md#results), [g041a](runs/g041a-challenger-incremental-neural/summary.json) | holds | 041 | Exploratory author evidence; independent seam 4 audit next, no formal stage claim. Full DSP recomputed; monophonic sampled development only. Invalid first-attempt setup timing preserved, technical rerun repaired it |
 
 ## Open questions
 
@@ -376,8 +377,9 @@ Questions 1–23 and 28 are the main track's.
 
 | Rank | Question | Why it is ranked here | Status | Owner item |
 |---|---|---|---|---|
-| 30 | Can a streaming Basic Pitch live path, specified by an observation-seam@3 that resolves question 34's gaps (the cost-ratio wording and the uncovered live and cost rules) and is audited before any cursor verdict, computing only new frames rather than the whole window every 100 ms, meet the sustained cost ratio of 0.25 and every 0.2 s event deadline on the compute-inclusive clock, on the clean and hesitation guitar examples with all controls? | 035's untrimmed live path met the nominal deadline (median 95 ms) but cost about twice the gate, and its nominal clock omits 40–65 ms of inference; the cursor is half of every stage | open after question 36 and any required independent re-audit; 040 input/state kernel is not neural optimization | [035 live](reports/035-challenger-basic-pitch.md#live-spike-observations-deadlines-and-cost), [040](reports/040-challenger-streaming-state.md) |
-| 36 | Can the next numbered challenger experiment resolve seam-3 audit I3's float32 discrepancy, S5's missing lifecycle/reset inputs, O11's irregular-delivery scheduling, N1/N2's unstated normalization formula and P1/P2/P3/P5's physical-versus-abstract confidence layer, freeze the remaining gate-relevant state/cost cases, and obtain independent audit before native cursor judgment? | Challenger instrument resolution precedes question 30's listener verdict; the audit's full uncovered-rule table is the checklist, with pinned DSP/procedural obligations retained for native adoption | taken together with question 30 by the user (2026-10-05): one experiment writes observation-seam@4 resolving these cases and builds incremental neural inference against it; independent audit before any cursor verdict | [Audit 3: resolution](bench/oracle-events/audit-observation-seam-3.md#resolution-and-verdict), [uncovered rules](bench/oracle-events/audit-observation-seam-3.md#rules-i-could-not-exercise) |
+| 37 | Does an independent session rederive observation-seam@4's physical representation and complete state/cost fixtures, agree on every added/reworked case and inherited samples in their declared layers, and assess native adoption/context/timer/prefix evidence before any formal cursor judgment? | New seam/oracle needs independent adequacy audit; author agreement and native parity cannot supply it | open, next; separate session/model from 041 | [041](reports/041-challenger-incremental-neural.md#next), [seam 4](contracts/observation-seam-4.md) |
+| 30 | Can a streaming Basic Pitch live path compute only new neural frames plus context, meeting sustained cost .25 and every .2-second compute-inclusive event deadline on clean/hesitation development guitars and all controls? | Original whole-model spike was too expensive; seam/native implementation and audit precede formal judgment | answered by 041 as exploratory comparisons; formal stage verdict is 31 after audit 37 | [041](reports/041-challenger-incremental-neural.md), [035](reports/035-challenger-basic-pitch.md#live-spike-observations-deadlines-and-cost) |
+| 36 | Can the next numbered challenger experiment resolve seam-3 audit I3's float32 discrepancy, S5's missing lifecycle/reset inputs, O11's irregular-delivery scheduling, N1/N2's unstated normalization formula and P1/P2/P3/P5's physical-versus-abstract confidence layer, freeze the remaining gate-relevant state/cost cases, and obtain independent audit before native cursor judgment? | Challenger instrument resolution precedes question 30's listener verdict; the audit's full uncovered-rule table is the checklist, with pinned DSP/procedural obligations retained for native adoption | 041 versions seam 4/cases and builds/measures incremental neural inference; independent adequacy audit is 37, before formal cursor judgment | [041](reports/041-challenger-incremental-neural.md), [audit 3](bench/oracle-events/audit-observation-seam-3.md#resolution-and-verdict) |
 | 35 | Does an independent session rederive observation-seam@3's 28 added cases and inherited samples, agree on all answers and assess the explicit remaining DSP/procedural coverage boundaries, before any native cursor verdict? | Instrument audit precedes listener judgment; implementation agreement cannot establish independent adequacy | answered: 66 cases, 57 agree, 1 disagree, 8 ambiguous; coverage incomplete; resolution is question 36 | [Audit 3](bench/oracle-events/audit-observation-seam-3.md), GPT-6-Astra (high) in Codex |
 | 34 | Can the next numbered challenger experiment resolve seam-2 audit coverage gaps, explicitly define the sustained-cost numerator and denominator, and freeze cases for the remaining gate-relevant rules (including variable-wall-time prefix equality, refersTo/backdating, start/finish and empty-call cost accounting, cadence/window/watermark lifecycle and fractional interpolation), with explicit boundaries for pinned DSP/procedural obligations and an independent audit before listener judgment? | The audit agrees on all supplied numbers but agreement is not complete rule coverage; the full uncovered-rule table is the resolution checklist. This precedes quiet-noise controls and any seam-2 cursor verdict | 040 specification/state implementation agreement; independent seam 3 adequacy audit is question 35; folded into question 30 by the user (2026-10-04), no cursor verdict before audit | [Audit: uncovered rules](bench/oracle-events/audit-observation-seam-2.md#rules-i-could-not-exercise), [cost wording](bench/oracle-events/audit-observation-seam-2.md#cost-wording-needs-clarification) |
 | 31 | Does the challenger pass guitar stage 1 and the silent-hesitation substage, both outputs and all controls, on all four development guitars under the amended gates, with the incumbent measured on the same examples and controls? | Conditions (a) and (b) of the amendment's decision 5; a full run of every example, since the sentinels are the incumbent's | open | [Amendment](contracts/development-contract-2.md#amendment-2026-10-04-sampled-guitar-replaces-the-sines-and-the-promotion-rule) |

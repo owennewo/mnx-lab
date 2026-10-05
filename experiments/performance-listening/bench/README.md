@@ -154,3 +154,14 @@ chain/report logic. `run039.ts` verifies and reuses guitar/noise model maps, fre
 decodes and assesses every frozen example, retaining per-input/per-example artifacts.
 It does not implement a new live producer or change the observation timing seam;
 see the research log for the next streaming/audit prerequisite.
+
+**Experiment 041, native new-frame neural producer.** `src/challenger/buildIncremental041.py`
+inserts a temporal slice after full-window normalization, preserving weights and
+adding dynamic neural time reshapes. `incremental041.ts`/`incrementalWorker041.mjs`
+run the score-blind backend. `seam4.ts` checks separately frozen physical/state hand
+cases; `run041.ts` times allocation/setup/feed/finish and retains complete private
+native/parity/prefix evidence. Its corrected technical run is exploratory until the
+independent observation-seam 4 audit; no existing producer or evaluator is changed.
+`postStats041.py` verifies saved-record hashes, selected map bytes and serial
+clock recurrences, then aggregates existing records without inference. See the
+[research log](../RESEARCH_LOG.md) for state, counts and next required audit.
