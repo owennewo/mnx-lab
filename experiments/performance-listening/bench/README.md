@@ -195,3 +195,12 @@ counts and candidate prefixes over every development example. `verify048.py` che
 saved evidence without inference and resolves tagged sources after retirement. Offline
 @2 remains unchanged. See [048](../reports/048-challenger-output-copies.md) for D1's
 resource scope and the research log for the third approved candidate.
+
+
+**Experiment 049, bounded DSP-cache eligibility.** `src/challenger/run049.ts`
+collects complete unchanged streaming request hashes and counts consecutive tensor
+identity and same-CQT-phase overlapping windows. `inspectDsp049.py` reads pinned
+native graph metadata without inference; `verify049.py` independently reconstructs
+saved counts and resolves sources at the tagged commit after retirement. No cache
+or listener version is implemented. See [049](../reports/049-challenger-dsp-cache.md)
+for the bounded negative, untested broader methods and completed allocation batch.

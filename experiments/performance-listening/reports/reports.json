@@ -355,6 +355,19 @@
         "href": "047-challenger-input-buffers.html",
         "label": "Experiment 047"
       }
+    },
+    {
+      "number": "049",
+      "slug": "049-challenger-dsp-cache",
+      "title": "049 \u00b7 Exact DSP-cache eligibility at the frozen cadence",
+      "banner": "D2 bounded negative \u00b7 complete request parity \u00b7 no exact memo or same-grid overlap \u00b7 retain @5 \u00b7 allocation batch closes 3/3",
+      "runs": [
+        "g049-challenger-dsp-cache"
+      ],
+      "previous": {
+        "href": "048-challenger-output-copies.html",
+        "label": "Experiment 048"
+      }
     }
   ]
 }

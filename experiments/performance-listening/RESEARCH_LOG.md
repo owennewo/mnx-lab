@@ -41,7 +41,9 @@ How to maintain it:
 
 ## Current state
 
-### Current batch: allocation optimizations, at most 3 experiments
+<a id="current-batch-allocation-optimizations-at-most-3-experiments"></a>
+
+### Latest batch: allocation optimizations, closed at 3 of 3
 
 Opened after 046 and its independent reviews by the user's direction:
 
@@ -112,6 +114,24 @@ and unused technical repeat. First read-only verification passes without record 
 Batch open at **2 of at most 3**; independent closing process review follows its final
 experiment or early stop. No new user decision blocks the authorized resource question;
 the standing guitar-faust release and future formal/protected/product decisions remain theirs.
+
+**Run 3 complete: [049 DSP-cache eligibility](reports/049-challenger-dsp-cache.md), D2 bounded negative.**
+Complete request traces match the fresh parent evidence, but neither consecutive whole-input
+memoization nor prior same-grid CQT-column reuse has an eligible hit on the development
+inputs. The moving CQT stride phase explains why ordinary audio overlap cannot supply
+that reuse. No cache or listener version was adopted; broader primitive-content or
+multi-phase methods remain untested, not ruled out. Retained development parent is
+`basic-pitch-chain@5-note-output`; event-chain@3 stays incumbent. No new native timing,
+historical-stall repair, stage pass or protected access is claimed.
+
+**Closed at 3 of 3.** Input/window reuse and unused-output-copy savings were retained;
+the two tested ordinary DSP-cache methods were rejected. Independent closing process
+review of 047–049 is now due, followed by the user's direction on fresh formal evaluation
+or broader resource work. No 050 is authorized automatically. The standing guitar-faust
+pause/release decision remains with the user/parent now that batch work has finished.
+[049 resulting state](reports/049-challenger-dsp-cache.md#resulting-stopping-count-budgets-and-evidence-access)
+carries unchanged stage stopping and protected access, no new version, one resource
+comparison and unused technical repeat. The author lands, retires and stops.
 
 ### Latest continuation: closed at 1 of at most 3, full-workload no attribution
 
@@ -630,6 +650,7 @@ Status is `holds`, `superseded` or `withdrawn`.
 | 40 | A complete accumulated-evidence workload and a bounded isolated listener process preserve every development-guitar payload, assessment and prefix but reproduce no no-inference stall; storage isolation alone supplies no demonstrated repair | [046](reports/046-challenger-full-workload-trace.md#results), [g046](runs/g046-challenger-full-workload-trace/summary.json) | holds | 046 | Full fixed A-then-B traced workloads; historical cause remains unresolved, no formal claim or held-out use |
 | 41 | Reusable raw-input capacity and one borrowed model window preserve complete development-corpus tensors, native outputs and prefixes while removing recurring explicit allocations at those storage sites | [047](reports/047-challenger-input-buffers.md#results), [g047](runs/g047-challenger-input-buffers/summary.json) | holds | 047 | Exact targeted allocation counts, not total V8/native allocation, speed, historical stall ownership or stage approval; synchronous consumer lifecycle |
 | 42 | Copying only the consumed live note map preserves complete fresh development-corpus tensors, payloads and prefixes while removing explicit unused onset/contour bridge copy work and destination allocations | [048](reports/048-challenger-output-copies.md#results), [g048](runs/g048-challenger-output-copies/summary.json) | holds | 048 | Targeted bridge savings only; graph still computes all outputs/full DSP, offline unchanged; no tail-speed, stall ownership or stage claim |
+| 43 | Complete current-cadence development inputs provide no consecutive full-window memo hits or overlapping prior requests on the same native CQT stride phase | [049](reports/049-challenger-dsp-cache.md#results), [g049](runs/g049-challenger-dsp-cache/summary.json) | holds | 049 | Necessary eligibility for two ordinary cache methods only; no new native cache, broader impossibility, speed or formal stage claim |
 
 ## Open questions
 
@@ -640,7 +661,9 @@ Questions 1–23 and 28 are the main track's.
 
 | Rank | Question | Why it is ranked here | Status | Owner item |
 |---|---|---|---|---|
-| 51 | Can full-DSP caching reduce measured work while preserving current global normalization, complete numerical/live output and causal prefixes? | Third candidate in the approved allocation batch; 048 supplies the parity-preserving note-output parent; changed semantics must be deferred | open; allocation batch run 3 | [Current batch](#current-batch-allocation-optimizations-at-most-3-experiments), [048 next](reports/048-challenger-output-copies.md#next) |
+| 52 | Does an independent process session check 047–049's retained resource changes, complete parity evidence and bounded DSP-cache rejection, before further work? | Required closing review of the completed allocation batch; experimenters do not review their own batch | open; next, independent session | [049 next](reports/049-challenger-dsp-cache.md#next), [Current batch](#latest-batch-allocation-optimizations-closed-at-3-of-3) |
+| 53 | After the closing review, does the user authorize fresh formal evaluation of retained @5 or redirect to a broader contract-preserving DSP/resource method? | Allocation savings do not repair historical stalls or authorize a formal/held-out claim; the three approved candidates are complete | awaiting user direction after review | [049 next](reports/049-challenger-dsp-cache.md#next) |
+| 51 | Can full-DSP caching reduce measured work while preserving current global normalization, complete numerical/live output and causal prefixes? | Third candidate in the approved allocation batch; 048 supplies the parity-preserving note-output parent; changed semantics must be deferred | answered D2 bounded negative by 049 for ordinary whole-window/same-grid reuse; broader methods untested | [Current batch](#current-batch-allocation-optimizations-at-most-3-experiments), [048 next](reports/048-challenger-output-copies.md#next) |
 | 50 | Can eliminating copies of unused onset/contour maps, independently of input-buffer reuse, preserve complete numerical/live/prefix output while reducing measured allocation/work? | Second candidate in the approved allocation batch; 047 supplies the storage parent | answered D1 resource variant by 048; no stage or stall-repair claim | [048](reports/048-challenger-output-copies.md) |
 | 49 | Can reusable raw-input and model-window storage preserve exact corpus inputs/outputs and causal prefixes while removing recurring explicit allocations? | First candidate in the approved allocation batch; does not depend on historical stall reproduction | answered D1 resource variant by 047; no stage claim or stall attribution | [047](reports/047-challenger-input-buffers.md) |
 | 48 | Does the user reopen for further attributable stall evidence or redirect after 046's complete full-workload non-reproduction, following the independent closing review? | The accepted attribution continuation stops on no attribution; storage isolation is not a demonstrated stall repair | answered by the user: reopen for independent input/window reuse, unused-output-copy and contract-preserving DSP-cache resource experiments; no formal claim authorized | [Current batch](#current-batch-allocation-optimizations-at-most-3-experiments) |

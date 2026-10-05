@@ -115,3 +115,147 @@ Own listening-049 worktree and npm ci once; FFmpeg/frozen private inputs availab
 private write preflight required. Required model-inspection onnx tooling is the same
 /tmp/listening-041-tools used by 041, not an altered inference environment. Read-only
 inventory shows own Dave working and other panes idle/done; no timing claim is planned.
+
+
+## Results
+
+**D2: reject ordinary full-window and same-grid CQT-column reuse at this cadence.**
+The complete eligibility census finds no reuse at either tested site. Keep
+`basic-pitch-chain@5-note-output` unchanged, retaining 047/048's proven resource
+improvements. The approved allocation batch closes at **3 of 3**, with independent
+process review due. No cache, listener version or formal stage claim was introduced.
+
+| Measurement | Result |
+|---|---:|
+| Development examples, all guitars and controls | 576 |
+| Regular input feeds / complete model-window requests | 350,856 / 34,848 |
+| Exact request traces matching fresh 048 native records | 576/576 |
+| Adjacent request shifts | 34,272, all 2,205 samples |
+| Exact consecutive complete-window memo hits | 0 |
+| Prior request pairs with overlapping raw windows | 552,672 |
+| Same-CQT-phase pairs among those overlaps | 0 |
+| Full-DSP calls eligible to avoid through the tested memo | 0 |
+| Cited complete native primaries / causal prefix executions | 576 / 592 |
+| Verified unchanged offline examples | 576 |
+| New native inference calls / listener versions | 0 / 0 |
+
+Each development guitar contributes 1,272 clean/control requests and 7,440
+hesitation/control requests; all eight guitar/substage groups have zero memo hits
+and zero phase-compatible overlaps. The exact whole-input comparison includes
+float32 representation, with a bounded previous-input snapshot; it does not rely
+on similar sounds or hash equality alone in the collector.
+
+### Why overlap does not suffice
+
+The pinned ONNX graph confirms the highest-octave CQT convolution uses a 256-sample
+stride and a 256-sample kernel relative to each input window. The collector observes
+a 2,205-sample shift at every adjacent regular request. Since those numbers are
+coprime, the same phase returns after **256 requests**, **564,480 samples**
+(**25.6 seconds**), beyond the **43,844-sample** input window (about **1.988 seconds**).
+Only the previous 19 regular request windows can overlap the current one, and none
+has the same stride phase. This is an explanation of the measured necessary-coordinate
+failure, not native output parity for a rewritten DSP pipeline.
+
+Global log-power extrema remain current-window operations. Earlier normalized values
+cannot simply be carried forward when those extrema move. Caching pre-normalization
+CQT would address that issue in principle, but ordinary same-grid temporal reuse has
+no eligible overlapping columns here. Matching phase would still not prove that
+reflection boundaries, octave decimation or float32 operation order are identical.
+
+**Scope of the negative:** consecutive full-window memoization and previous same-grid
+CQT-column reuse. Equal-content primitive patches (including padding/silence), a
+multi-phase filter bank, partial-octave caching and a different DSP execution algorithm
+were not implemented or measured. Some of those may preserve the current semantics;
+this experiment does not prove all DSP caching impossible. Changing cadence or input
+alignment to manufacture same-grid overlap is outside this frozen method and was not
+adopted. No numerical contract was loosened to obtain an optimization.
+
+### Parity, resources and cost boundaries
+
+Every collected complete tensor hash, delivery count, selected index and crop agrees
+with 048's fresh candidate request trace. Complete 048 native note/live records and
+592 prefix executions, plus unchanged 039 offline artifacts, are verified and cited.
+No producing listener/graph/adapter/input bytes changed. This is source/trace identity
+and reuse of existing output evidence; it is **not new native cache parity**, because
+no runtime cache was adopted. No new assessment, deadline or stage result is claimed.
+
+The census allocates one **175,376-byte** previous-input snapshot per example and
+copies **6,111,502,848 bytes** into those snapshots across its complete requests. This
+is measurement instrumentation, not an optimization or listener allocation change.
+Zero eligible memo hits implies zero whole-DSP calls saved by the tested memo; no new
+native MAC count, total allocator, GC, heap, cost ratio or speed measurement is claimed.
+Start/end inventory and load are recorded; this non-timing census claims no sampled
+formal quiet-host condition. Listener service clocks are not run or redrawn.
+
+One measurement, **2026-10-05T21:05:19.323Z–2026-10-05T21:06:00.131Z**, **40.805265 s**.
+No technical repeat, reader correction or record loss. Source tag
+**g049-challenger-dsp-cache-source** pins **85b42905**; pre-registration **c1d62c3d**
+reached main/origin after its completed gate and before source execution. The first
+read-only verifier passes **418 tracked source hashes**, **3,038 artifact hashes**,
+all complete trace/citation identities and independently reconstructed hit/phase counts.
+The public summary is **96,968 bytes** (about 95 KiB). Source resolution works at the
+pinned commit after retirement; the verifier never runs inference or the collector.
+
+| Artifact | Path / SHA-256 |
+|---|---|
+| Public summary | [g049](../runs/g049-challenger-dsp-cache/summary.json); `29c0630f79d787f1ec3218619189d5aa219d5cf10db97df1dc7f9fdfa28de966` |
+| Read-only statistics | `/home/williao/dev/mnx-listening-data/diagnostic-runs/g049-challenger-dsp-cache/statistics.json`; `13ede1adc313498d5551843b7d0ab78ff82da591875964c02b29940a50cf187f` |
+| Per-example request/cache counts, graph inspection and cited native/prefix/offline evidence | Private paths/hashes indexed in summary/results/validation |
+
+## Against the predictions
+
+| # | Outcome | Evidence and limit |
+|---|---|---|
+| 1 | Held | All 576 complete request traces match the fresh 048 candidate records |
+| 2 | Held | No identical consecutive input window, no eligible full-DSP memo call saved |
+| 3 | Held | Every adjacent shift is 2205; no same-phase overlapping prior pair; necessary coordinate condition only |
+| 4 | Held | First read-only verification passes complete saved records, sources and cited outputs; no inference repeat |
+
+## Decision
+
+**D2 applies.** Reject this ordinary full-window/time-column reuse method on the valid,
+complete negative evidence. Retain unchanged @5, with no new implementation version,
+cache adoption, gate, oracle, sentinel, incumbent, formal claim, protected access or
+historical-stall attribution. The batch has completed its three approved candidates:
+input reuse and unused-output copies retained; these DSP-cache methods deferred.
+A different bounded cache design would need a new direction and pre-registration.
+This session lands, retires and stops after exactly 049; the independent process
+review is another session's work.
+
+### Resulting stopping count, budgets and evidence access
+
+Main stopping **0**, **3 versions/11 comparisons** unchanged. Challenger stopping
+**2**, **5 implementation versions/9 development comparisons**, exploration spent.
+No listener version was built; the eligibility comparison is not an attempt to clear
+the lowest open formal substage, so its negative result neither increments nor resets
+the stage stopping count. Qualification **6 versions/12 slots unused**. 049 technical
+repeat unused; 041 spent, 043–048 unused. Held-out/reserved/final and Winner 5–8
+untouched; sines retired. Incumbent/suite/sentinels/oracles/gates unchanged. No full
+formal stage/baseline sweep or new approval is claimed by this resource census.
+
+## Next
+
+Independent closing process review of **047–049** comes first. It should check each
+optimization's scope/parity and the bounded nature of this negative result, including
+that existing native outputs were cited unchanged rather than described as fresh
+cache output. The user then decides whether to authorize a fresh formal comparison
+of retained @5, redirect resource work, or investigate a broader contract-preserving
+DSP method. None follows automatically from allocation savings or zero cache hits.
+
+**Awaiting the user:** that direction after review, and the standing guitar-faust
+pause/release decision now that this batch's work is finished. A future formal claim,
+held-out confirmation/promotion, microphone gates, qualification and Studio product
+decisions remain separate. No question was asked and no protected evidence was opened.
+
+**Direction of travel.** The two retained storage/bridge improvements can survive
+longer scores wherever the synchronous live consumer remains note-only. Current
+normalization and moving-window CQT geometry still govern any DSP reuse, including
+on chords and real audio. Content-specific memo gains on simple silence would need
+separate evidence before generalizing to those sounds; chain/strongest-pitch and
+microphone limitations remain independent work.
+
+## Attribution
+
+Pre-registration, complete census, first read-only verification and recording by
+**GPT-6.1-Sol (high) in Codex**. One numbered experiment, one measurement; no native
+inference, technical rerun or independent review supplied by this author.
