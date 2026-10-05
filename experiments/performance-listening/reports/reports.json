@@ -237,6 +237,19 @@
         "href": "038-challenger-quiet-noise.html",
         "label": "Experiment 038"
       }
+    },
+    {
+      "number": "040",
+      "slug": "040-challenger-streaming-state",
+      "title": "040 \u00b7 Streaming state and the compute-inclusive seam",
+      "banner": "D1 implementation agreement \u00b7 64/64 hand cases \u00b7 89 identical input tensors \u00b7 no native/listener verdict \u00b7 independent seam-3 audit next",
+      "runs": [
+        "g040-challenger-streaming-state"
+      ],
+      "previous": {
+        "href": "039-challenger-dominant-pitch.html",
+        "label": "Experiment 039"
+      }
     }
   ]
 }

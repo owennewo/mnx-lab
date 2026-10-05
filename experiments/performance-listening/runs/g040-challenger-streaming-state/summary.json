@@ -1,0 +1,615 @@
+{
+  "id": "g040-challenger-streaming-state",
+  "modelAndTool": "GPT-6.1-Sol (high) in Codex",
+  "gitCommit": "f29421b538858a42f961d0a6deb7b5cf7982380f",
+  "preregistrationCommit": "22e01eb08680ba4182dcb2daffa4617b34436847",
+  "sourceHashes": {
+    "bench/src/challenger/streaming3.ts": "d59f68839744f1c65348273f2cb1f391cd765cbe3dd669e0745b91cf2c581970",
+    "bench/src/challenger/validateObservation3.ts": "16e9b706827b15bd1dcc2d7fa6c424f0d24d512955512995ff63f6803adb58da",
+    "bench/src/challenger/run040.ts": "4ef269c00dd252057e154b5a2037a7c3888b8cda441876508aac094ebc4a4475",
+    "bench/src/challenger/observation2.ts": "044069e13c12cc10c4b474825c40b7927075a37cd2517d1f16dd39b1c85f89a0",
+    "bench/src/challenger/validateObservation2.ts": "e2040adcd4f0b8f9ce019b742686634452a19fa2085a30bff3958a5559e56c81",
+    "bench/src/challenger/native.ts": "653ce712826545a832b74a28cc3a8005fdffa41c2ab667830983d80b595764ab",
+    "bench/oracle-events/observation-seam-3.json": "83f48b1c37199a58f4d646bffb9986fac21bd7f122f4d89296c9c53d3f8bd0dc",
+    "bench/oracle-events/freeze-observation-seam-3.json": "e4cdcea3b1d07fe1888a68de1e9adcb9b85b7c421635298cfb78bdf479e4cf27",
+    "bench/oracle-events/observation-seam-2.json": "1a353ed0e56f4b2e3b765832c8b373d9147f02002238cab4efcc34d6fccddcac",
+    "contracts/observation-seam-3.md": "cc6970b978dd87aab0c3f99b79ac5d911a3b7c4354a7a073b424f49db5af1478",
+    "research/streaming-state-040.md": "d8449d931d3f7324ec4721020b2a4271845eef0a5ac1069d5ea7da532c50cd9a",
+    "reports/040-challenger-streaming-state.md": "1595e7a34d4634c67ee9cc13c0b3c55b5bf6e32f648acdc0f18a7229bf080391",
+    "bench/test/observation-seam-3.test.ts": "f276ff3584e88002eac96ba224b4f502514b49728a105083bb83fd064a7bf854"
+  },
+  "definition": "observation-seam@3",
+  "independentAudit": false,
+  "nativeInferences": 0,
+  "listenersExecuted": 0,
+  "cursorVerdicts": 0,
+  "suiteChanges": 0,
+  "reservedFinalHeldOutAccesses": 0,
+  "stopping": {
+    "main": 0,
+    "challenger": 1,
+    "mainVersions": 3,
+    "mainComparisons": 11,
+    "challengerVersions": 2,
+    "challengerComparisons": 3,
+    "explorationSpent": true,
+    "qualificationVersionsSpent": 0,
+    "qualificationSlotsSpent": 0
+  },
+  "status": "D1-agreement-pending-independent-audit",
+  "cases": [
+    {
+      "id": "I1",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/case-I1.json",
+        "sha256": "86e20f499f1da96b3893ed2d319cc264e145802630559f2a2682dfcce38ba34d"
+      }
+    },
+    {
+      "id": "I2",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/case-I2.json",
+        "sha256": "db79d53e6da4d521b28a2d73806f0a4b98145b9d9409a2fd5e05f0b6cc615eb1"
+      }
+    },
+    {
+      "id": "I3",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/case-I3.json",
+        "sha256": "55c3eb6219511c8d1a5fe53b64a8accd48f7d8de49d2eca7f24cf08072df5748"
+      }
+    },
+    {
+      "id": "I4",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/case-I4.json",
+        "sha256": "8cc1a8273c5564be27bd860aeb96ea234e4269c1b50ecb78553fb0a62421e6a9"
+      }
+    },
+    {
+      "id": "K1",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/case-K1.json",
+        "sha256": "4e1c9ac31ad5ca6803f7f0cdc13629e4d97ac44f89787f922d4079b91c53f155"
+      }
+    },
+    {
+      "id": "K2",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/case-K2.json",
+        "sha256": "315f465bc6b7a0f4cfbde3dcd54b6ea9e17a9eb4a0903804f2cf7a64633bdb60"
+      }
+    },
+    {
+      "id": "K3",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/case-K3.json",
+        "sha256": "c82bbdfe0fb68c6402c0db7e05e0a2c72793bec9d3e02cf2e4cf0277e3c740d4"
+      }
+    },
+    {
+      "id": "K4",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/case-K4.json",
+        "sha256": "9c6ece3164ce22f74cb41fb3a60223db69cf55c91604ce8cd0141ebc21de91a8"
+      }
+    },
+    {
+      "id": "D1",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/case-D1.json",
+        "sha256": "50ba896664974ce845a2ded55675ac4a7b60c8ac45b26aedaefb7c9823742ee8"
+      }
+    },
+    {
+      "id": "D2",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/case-D2.json",
+        "sha256": "20e895875cc190de5317b6e4959be46b68e0a1e00252697a496f50f30d64802b"
+      }
+    },
+    {
+      "id": "D3",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/case-D3.json",
+        "sha256": "b2bdc148dc828fad1fd750d026e9d86136b7e7c0af04b518414613e41fbccc0a"
+      }
+    },
+    {
+      "id": "F1",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/case-F1.json",
+        "sha256": "1caf53f402572f13683b7638655589b21f3f9a23fdb661fd0adacda51a8d8171"
+      }
+    },
+    {
+      "id": "F2",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/case-F2.json",
+        "sha256": "ebd6ba90dc6e4730f1e6b71d13db02b058f8e323ed2445face23842135fc4146"
+      }
+    },
+    {
+      "id": "F3",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/case-F3.json",
+        "sha256": "4ed8b0b65bcec0eccbcf3b18e045c53d8a95843ba19f4b1001fe15c103bcf566"
+      }
+    },
+    {
+      "id": "S1",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/case-S1.json",
+        "sha256": "2c98df5d37503df314f97d71ab7bc02a413f586ece772c5727f8ce06e04c72d6"
+      }
+    },
+    {
+      "id": "S2",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/case-S2.json",
+        "sha256": "41f7655790b39bfe11bb61ca84e02e84820a9671369d849420dd13bfd34c10c9"
+      }
+    },
+    {
+      "id": "S3",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/case-S3.json",
+        "sha256": "3ae154ebfda17601a17026f2cf508e651fd66903c083fdbcfb3a3768f1d2a71d"
+      }
+    },
+    {
+      "id": "S4",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/case-S4.json",
+        "sha256": "22827e48389e30e2878cc5f03cec26d98b9d65a9774afb29bb0334f1c7f77dd6"
+      }
+    },
+    {
+      "id": "S5",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/case-S5.json",
+        "sha256": "50a5b989e29795fde450cfe0fdbed3089d7fdaa3b7c87dbc70f7de14c02afed9"
+      }
+    },
+    {
+      "id": "O8",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/case-O8.json",
+        "sha256": "b8c885266e3dd70ecb552ddec4b7c71280843851cfd489ab4ca01406e735e626"
+      }
+    },
+    {
+      "id": "O9",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/case-O9.json",
+        "sha256": "a4f4717c6c896ba002a0f2ce39c64d8921b928c1728a2d0e07d131044462ee76"
+      }
+    },
+    {
+      "id": "O10",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/case-O10.json",
+        "sha256": "a2ecdb4fe7bc8a733898921c2dacda2668291a5b4f976a19a1a2ab8a5d6e1957"
+      }
+    },
+    {
+      "id": "O11",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/case-O11.json",
+        "sha256": "6936e4561c7d09eff00dd299a1ffcbbc912f83cc75c8808247e82956eea45e0f"
+      }
+    },
+    {
+      "id": "P6",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/case-P6.json",
+        "sha256": "008f40849c32edabd649383643ba3c017bf4e5cb66fabb6e617a8e28f6ab9c44"
+      }
+    },
+    {
+      "id": "E1",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/case-E1.json",
+        "sha256": "c0329ceb6e2f0d3493f0f5457df5829422a4aa40e684e52128bf1de300ccc29c"
+      }
+    },
+    {
+      "id": "E2",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/case-E2.json",
+        "sha256": "6e61b3a43a3b4cc3ab35ba0a655bd46bc13fcb4a01fbb698ea9de0406f727694"
+      }
+    },
+    {
+      "id": "N1",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/case-N1.json",
+        "sha256": "d5f61ec2a0bc17ebcc123c8115b1a2e996dc6dde21eeb47e25f090af948552ad"
+      }
+    },
+    {
+      "id": "N2",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/case-N2.json",
+        "sha256": "ea7cf7f73341a0f29f86eef506c6619a1b81d0108534dedd266d0809a1bc057e"
+      }
+    },
+    {
+      "id": "inherited-R0",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/inherited-R0.json",
+        "sha256": "48806494b954228bb671bcff7e51b1de3b57409e34e05acb61b4cef057d8c64c"
+      }
+    },
+    {
+      "id": "inherited-R1",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/inherited-R1.json",
+        "sha256": "f4e4fbec33c3b15ade544705b6a504ef9a3d1d6bf0183bb347c3a3adeb99a215"
+      }
+    },
+    {
+      "id": "inherited-R2",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/inherited-R2.json",
+        "sha256": "32b9c1867553950ee668c41fd9ac508c9934c9aa9b8305e175516d7f9c45f870"
+      }
+    },
+    {
+      "id": "inherited-R3",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/inherited-R3.json",
+        "sha256": "720056a3f464e46d021bef4d27db6f2318625cfdb1238346c10caa13822f1470"
+      }
+    },
+    {
+      "id": "inherited-R4",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/inherited-R4.json",
+        "sha256": "77b17ec984c662b77df3a01d96c8f0745f6873f878e1f0e0538b1dde2d08440c"
+      }
+    },
+    {
+      "id": "inherited-R5",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/inherited-R5.json",
+        "sha256": "be79f5b584e851bf7ac8ba6a96a6669cc94e40af93cf59ca3a31fa1d218da055"
+      }
+    },
+    {
+      "id": "inherited-R6",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/inherited-R6.json",
+        "sha256": "35eb4948b7f1a4d51ba8cb06380777cca3035e28768608ade7012697100cee88"
+      }
+    },
+    {
+      "id": "inherited-R7",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/inherited-R7.json",
+        "sha256": "073fd3d6c25682e164b705c1db67ae787507e6e060f7206d6369c78e06782f6f"
+      }
+    },
+    {
+      "id": "inherited-L1",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/inherited-L1.json",
+        "sha256": "a4cc23777312900927a57df8d657df34927e0cd5393a743cee4220f484040d20"
+      }
+    },
+    {
+      "id": "inherited-L2",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/inherited-L2.json",
+        "sha256": "678d7bc7988b9c702070c5b5c1c6297bf40a8a12d943ab140d369cef6ebd1276"
+      }
+    },
+    {
+      "id": "inherited-L3",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/inherited-L3.json",
+        "sha256": "3cb73d7b3ba9fa37279521048b3886973f3911f08620c1a2e952d8e10b8220a2"
+      }
+    },
+    {
+      "id": "inherited-L4",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/inherited-L4.json",
+        "sha256": "ff47bb1bd11768f4580de49a1a5a1ad3533bf0a291ae1558e7a95a1a39caa046"
+      }
+    },
+    {
+      "id": "inherited-L5",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/inherited-L5.json",
+        "sha256": "ab422f069fe83402f48390f9c1c8e8e9e48e934082c8aadb79bb187f3e368452"
+      }
+    },
+    {
+      "id": "inherited-L6",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/inherited-L6.json",
+        "sha256": "0332885bc768c5ab3664584bd2afbd2017ea8a9240e9bdd6467f99abd47f73a0"
+      }
+    },
+    {
+      "id": "inherited-W1",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/inherited-W1.json",
+        "sha256": "b4a88ae180cf06ec5b3b794c2c9be348e3df068902d5e8de69fb5c0c8820bd8e"
+      }
+    },
+    {
+      "id": "inherited-W2",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/inherited-W2.json",
+        "sha256": "de90c9ad2a8767c5acf169eb4e571af903bf60c68f961db0bc7a2a16a3960dc0"
+      }
+    },
+    {
+      "id": "inherited-W3",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/inherited-W3.json",
+        "sha256": "c80e4b6481caded5447fb447efc77af07551072e88c484ac57a5ad3a360f7898"
+      }
+    },
+    {
+      "id": "inherited-C1",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/inherited-C1.json",
+        "sha256": "ed24f828501e301676ff0a34fc29827cbac5fb01c9ef13be344650e22e6abb24"
+      }
+    },
+    {
+      "id": "inherited-C2",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/inherited-C2.json",
+        "sha256": "710df281081ea3ff68d8c768838dc646661889f2f4735799806cd423dfd21f3a"
+      }
+    },
+    {
+      "id": "inherited-C3",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/inherited-C3.json",
+        "sha256": "68c0f132ac5d6fc75f9d5fe34a5b1070d25bfe77080036b286ba46dcf752cf07"
+      }
+    },
+    {
+      "id": "inherited-C4",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/inherited-C4.json",
+        "sha256": "fdc963fbe9e635818b84fb515fdd19dfd4aa40abf5b199e39045fffea1060424"
+      }
+    },
+    {
+      "id": "inherited-C5",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/inherited-C5.json",
+        "sha256": "7859afc504269e9979165f0ea1008e2e74f42ee0470eac6158e5e3217c6485ea"
+      }
+    },
+    {
+      "id": "inherited-C6",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/inherited-C6.json",
+        "sha256": "0e12ea3d439212584fb9ebf603961caa7ac78948aa0a6418234a36d038afd7dc"
+      }
+    },
+    {
+      "id": "inherited-C7",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/inherited-C7.json",
+        "sha256": "a9dc9f6d47c5fe94223eaceb01b2e2d06b3203d8dd4a071ea7c6cbd963286ebe"
+      }
+    },
+    {
+      "id": "inherited-P1",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/inherited-P1.json",
+        "sha256": "89adc3bc715333eb8a6888980bca2fc620b10f4623c5d0df36a89068c59f0599"
+      }
+    },
+    {
+      "id": "inherited-P2",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/inherited-P2.json",
+        "sha256": "1d3b3018ed43b76c59705b4c2235156cb2586716cdd0691e70866599c12b2dad"
+      }
+    },
+    {
+      "id": "inherited-P3",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/inherited-P3.json",
+        "sha256": "243d1ad2394b05ce3f5578057d7bf23d8cebd642d7089a4ad6d41644799d0fd7"
+      }
+    },
+    {
+      "id": "inherited-P4",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/inherited-P4.json",
+        "sha256": "e8ba2dbd2ccea37f342b0139d5a4069af59cc2f55eb467ac3b3bde4065b7ceff"
+      }
+    },
+    {
+      "id": "inherited-P5",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/inherited-P5.json",
+        "sha256": "73a30d66f792aac8687df3b59bad20d5301cd2779b242fd83c4517027fc9e6b4"
+      }
+    },
+    {
+      "id": "inherited-O1",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/inherited-O1.json",
+        "sha256": "b8db892cb10b161dbb88d6eb036c8ff7b17de92d798f637a4fe6720c40020cd0"
+      }
+    },
+    {
+      "id": "inherited-O2",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/inherited-O2.json",
+        "sha256": "840ba43c0bdae942e61f4ed72d664e91559d8052f2cf0a6453862025c26e99d9"
+      }
+    },
+    {
+      "id": "inherited-O3",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/inherited-O3.json",
+        "sha256": "dd43a8b942615297749b4966084c1cd7d2e8983c21e7147459fd6869667e1ed7"
+      }
+    },
+    {
+      "id": "inherited-O4",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/inherited-O4.json",
+        "sha256": "966c382ff4c656965fb241afb7811a6bcef56f1982514468cb7b4b4354fb0009"
+      }
+    },
+    {
+      "id": "inherited-O5",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/inherited-O5.json",
+        "sha256": "891e80109664556d9b51642a8f9548cbc970b886fad7cef09a8aea46fa0a1f5e"
+      }
+    },
+    {
+      "id": "inherited-O6",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/inherited-O6.json",
+        "sha256": "f42114ccb6ec939a4f940585616e63119d5b393444bd9eaf5069b33746f56611"
+      }
+    },
+    {
+      "id": "inherited-O7",
+      "agrees": true,
+      "artifact": {
+        "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/inherited-O7.json",
+        "sha256": "455ea0183b69a1475972d5ab7afb651bfa697e20698b3b0495ce9dedf6196365"
+      }
+    }
+  ],
+  "validation": {
+    "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/validation.json",
+    "sha256": "90b5dd8d8438154fc2080f659b461b84f76df954650dd20a515a655086794eb6"
+  },
+  "elapsedSeconds": 3.22880329,
+  "nativeCostAndAccuracy": "Unmeasured; synthetic injected backend/costs only. Independent audit before any listener verdict.",
+  "attempt": {
+    "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g040-challenger-streaming-state/attempt.json",
+    "sha256": "883c60416c56a7501e472161272f26144ad0ad6af6865e93db661e61dfd90dad"
+  },
+  "startedAt": "2026-10-05T08:28:30.484Z",
+  "finishedAt": "2026-10-05T08:28:33.713Z",
+  "counts": {
+    "newCases": 28,
+    "inheritedCases": 36,
+    "agree": 64,
+    "probesDetected": 6,
+    "syntheticPrefixes": 6,
+    "syntheticPrefixesAgree": 6,
+    "protectedFiles": 409
+  },
+  "parity": [
+    {
+      "partition": [
+        480
+      ],
+      "audioSamples": 288000,
+      "generated": 132300,
+      "calls": 60,
+      "tensorChecks": 60,
+      "maxRetainedInput": 0,
+      "maxRetainedModel": 43844,
+      "eachOutputGeneratedOnce": true,
+      "byteIdentical": true,
+      "selectionIdentical": true,
+      "noFinishFlush": true
+    },
+    {
+      "partition": [
+        1,
+        321,
+        1,
+        4799,
+        7000,
+        13,
+        480,
+        20000
+      ],
+      "audioSamples": 288000,
+      "generated": 132300,
+      "calls": 29,
+      "tensorChecks": 29,
+      "maxRetainedInput": 1,
+      "maxRetainedModel": 43844,
+      "eachOutputGeneratedOnce": true,
+      "byteIdentical": true,
+      "selectionIdentical": true,
+      "noFinishFlush": true
+    }
+  ],
+  "decision": "Independent seam3 audit next; native optimization/cost/cursor still open."
+}
