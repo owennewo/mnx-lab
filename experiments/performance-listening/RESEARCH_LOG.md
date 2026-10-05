@@ -92,8 +92,15 @@ under its fixed rule, with no fresh formal claim or held-out use. 043 D2, 044 D3
 of the same model, without restarting or changing its pre-registration; a read-only
 verifier count bug was repaired after measurement, never a listener rerun.
 
-**Next:** independent closing process review of this approved continuation is complete
-([R15](reviews.md#r15-after-experiment-046-and-the-bounded-continuation)); the user
+**Process correction:** [R16](reviews.md#r16-correction-to-046s-pre-registration-landing)
+records that the 046 pre-registration was fast-forwarded and pushed while its landing
+gate was still running. The gate later passed before the source commit and measurement.
+This breached the required landing order; it does not change 046's D3 result or the
+continuation's stop. R15's unqualified process verdict is corrected there.
+
+**Next:** independent closing process review and its process correction are complete
+([R15](reviews.md#r15-after-experiment-046-and-the-bounded-continuation),
+[R16](reviews.md#r16-correction-to-046s-pre-registration-landing)); the user
 decides reopening or redirection. No 047 or protected evidence is authorized by
 046's outcome. The parent/user's standing guitar-faust release decision is pending now
 that timing work is finished; this author stops after landing and retirement. Promotion,
