@@ -41,7 +41,7 @@ How to maintain it:
 
 ## Current state
 
-### Current batch: reopened at 7 of 10, sampled-guitar promotion, 037–046
+### Current batch: closed at 8 of 10, no stall attribution, 037–044
 
 Opened 2026-10-04 by the user, after 036. Their words, in order:
 
@@ -164,6 +164,19 @@ If 044 cannot attribute the stalls, or attributes them to the listener's own pat
 batch stops and reports to the user. The outside review at promotion and the new
 sentinel version follow the amendment.
 
+**Closed again at 8 of 10:** [044](reports/044-challenger-stall-diagnosis.md),
+**GPT-6.1-Sol (high) in Codex**, **D3 no attribution**. The fixed traced panel preserves
+043's payloads in both evidence harnesses but does not reproduce its no-inference
+stalls. The isolated arm also has an inference cost failure. Quiet non-reproduction
+cannot identify the original cause or meet the amendment's harness-attribution branch;
+045 and held-out confirmation stay blocked. The batch stops under its fixed rule.
+A broader memory-accumulation or quiet-host trace is advice awaiting reopening, not an
+extra run authorized here. Independent process review of this continuation is due.
+[044's resulting state](reports/044-challenger-stall-diagnosis.md#resulting-stopping-count-budgets-and-evidence-access)
+carries unchanged stopping counts and budgets. No listener, oracle, stage, incumbent
+or sentinel change; protected evidence remains untouched. This author lands, retires
+and stops after exactly 044.
+
 **Was closed at 7 of 8:** [043](reports/043-challenger-guitar-stage.md),
 **GPT-6.1-Sol (high) in Codex**, **D2 resolved development limitation**. The direct
 hash/snapshot timer issue is repaired in a separate harness with unchanged listener
@@ -182,9 +195,10 @@ No-inference feed stalls are measured facts, not an established GC/scheduling or
 acoustic diagnosis. Their wall times remain in the cost and completion clocks.
 
 **Next: the closing process review of 037–043 is done** ([R12](reviews.md#r12-after-the-sampled-guitar-batch-036-043),
-Claude Sonnet 5.5 in Claude Code; it covered the audits, the native review and 036). A
-new numbered pre-registration may diagnose question 41 if the user reopens the batch.
-This author runs neither that review nor another experiment.
+Claude Sonnet 5.5 in Claude Code; it covered the audits, the native review and 036).
+The user reopened the batch for 044; its no-attribution result closes it again.
+A new diagnosis now needs another reopening or redirection. This author runs no review
+or further experiment.
 
 [043's resulting state](reports/043-challenger-guitar-stage.md#resulting-stopping-count-budgets-and-evidence-access)
 carries stopping counts and budgets. No new listener version, no qualification or
@@ -194,13 +208,12 @@ sines retired. Earlier [037](reports/037-challenger-observation-seam.md),
 [040](reports/040-challenger-streaming-state.md), [041](reports/041-challenger-incremental-neural.md)
 and [042](reports/042-challenger-finish-length.md) preserve their verdicts.
 
-**Awaiting the user:** after [R12](reviews.md#r12-after-the-sampled-guitar-batch-036-043),
-first whether one host stall may fail a stage (a single-measurement maximum against a
-pre-registered re-measurement protocol), then whether to reopen/extend the stopped
-batch for cost/deadline diagnosis; also baselines in sweeps and an outside process review. No gate change is requested or assumed. Promotion,
-future microphone gates, qualification and Studio choices remain theirs, with R10's
-standing sentinel/pool and baseline-sweep questions. The main track stays paused and
-event-chain@3 remains incumbent. This session lands and retires after exactly 043.
+**Awaiting the user:** whether to reopen or redirect the batch after 044's no-attribution
+result. The second amendment already settled the stall gate, baseline sweeps, sentinel
+rule and outside review: no gate change or formal redraw is assumed. The sentinel
+instrument and its audit remain pending before promotion. Promotion, microphone gates,
+qualification and Studio choices remain the user's. Main stays paused and event-chain@3
+remains incumbent. Independent process review of 044 is a separate-session obligation.
 
 ### Experiment 036, by the user's direction
 
@@ -419,6 +432,7 @@ Status is `holds`, `superseded` or `withdrawn`.
 | 35 | Cropping neural time computation after recomputing full global normalization preserves sampled selected float32 maps and brings every measured development-guitar live cost/deadline/control comparison within the current thresholds | [041](reports/041-challenger-incremental-neural.md#results), [g041a](runs/g041a-challenger-incremental-neural/summary.json) | holds | 041 | Exploratory author evidence; independent seam 4 audit next, no formal stage claim. Full DSP recomputed; monophonic sampled development only. Invalid first-attempt setup timing preserved, technical rerun repaired it |
 | 36 | Observable pre/post finish state and nonempty returned decisions reproduce inherited no-flush/stamp/history rules; unsafe integral and nonfinite offline lengths are rejected while all declared earlier cases remain unchanged | [042](reports/042-challenger-finish-length.md#results), [g042](runs/g042-challenger-finish-length/summary.json) | holds | 042 | Author agreement only; independent seam-5 audit next. Injected state/service, no native or stage verdict |
 | 37 | Separating direct diagnostic hashes/snapshots preserves frozen challenger outputs, but fresh no-inference service stalls fail the formal guitar cost/deadline gates | [043 results](reports/043-challenger-guitar-stage.md#results), [g043](runs/g043-challenger-guitar-stage/summary.json) | holds | 043 | All development guitars measured; stall cause unresolved; no stage/promotion or held-out use |
+| 38 | A fixed traced panel preserves the frozen payloads with original and isolated evidence harnesses but does not reproduce the original no-inference stalls; historical cause remains unresolved | [044 results](reports/044-challenger-stall-diagnosis.md#results), [g044](runs/g044-challenger-stall-diagnosis/summary.json) | holds | 044 | B also has an inference cost failure; no harness attribution, stage pass or held-out authorization |
 
 ## Open questions
 
@@ -429,10 +443,11 @@ Questions 1–23 and 28 are the main track's.
 
 | Rank | Question | Why it is ranked here | Status | Owner item |
 |---|---|---|---|---|
-| 41 | Can a separately pre-registered diagnosis distinguish native/input work, runtime collection, scheduler stalls and indirect evidence-memory pressure behind 043's no-inference service outliers, retaining candidate-only clocks and every frozen gate before a fresh formal stage claim? | 043 preserves unchanged payloads/assessments but fails cost and one deadline; no CPU/GC/scheduler trace establishes cause. Closing independent batch review and user reopening precede another run | open: next, 044, reopened by the user (2026-10-05); outcomes fixed in the [second amendment](contracts/development-contract-2.md#amendment-2026-10-05-host-stalls-guitar-sweeps-sentinels-and-the-outside-review) | [043 failures](reports/043-challenger-guitar-stage.md#the-two-failures) |
-| 42 | After 044's diagnosis attributes 043's stalls to the measuring harness and fixes it, does the challenger pass the formal guitar stage-1 and silent-hesitation claim again, both outputs and every control on all four development guitars under unchanged gates, with the incumbent on every example and the frozen baselines on stage 1's clean examples? | Condition (a) of promotion, measured once more with the cause removed; only if 044 finds a harness cause | open, after 044's diagnosis | [Second amendment](contracts/development-contract-2.md#amendment-2026-10-05-host-stalls-guitar-sweeps-sentinels-and-the-outside-review) |
-| 32 | Does the challenger, fixed in a pre-registration before rendering, pass the same schedules and controls rendered from the three held-out guitar sets (`tonejs-nylon`, `tonejs-electric`, `shinyguitar`; two independent origins), every guitar on both outputs, in one run? | Condition (c), the last before the user promotes; one shot, and a failure turns the held-out sets into development evidence | open, blocked by 043; only after a valid fresh all-guitar formal pass | [Amendment](contracts/development-contract-2.md#amendment-2026-10-04-sampled-guitar-replaces-the-sines-and-the-promotion-rule) |
+| 44 | Does the user reopen or redirect the stopped batch to obtain attributable evidence beyond 044's quiet fixed panel? | D3 stops the batch; historical stalls remain unresolved and no harness-cause branch authorizes 045 | open: user decision before further numbered work; independent process review of 044 due | [044 next](reports/044-challenger-stall-diagnosis.md#next) |
+| 42 | After 044's diagnosis attributes 043's stalls to the measuring harness and fixes it, does the challenger pass the formal guitar stage-1 and silent-hesitation claim again, both outputs and every control on all four development guitars under unchanged gates, with the incumbent on every example and the frozen baselines on stage 1's clean examples? | Condition (a) of promotion, measured once more with the cause removed; only if 044 finds a harness cause | blocked: 044 D3 supplies no harness attribution | [Second amendment](contracts/development-contract-2.md#amendment-2026-10-05-host-stalls-guitar-sweeps-sentinels-and-the-outside-review) |
+| 32 | Does the challenger, fixed in a pre-registration before rendering, pass the same schedules and controls rendered from the three held-out guitar sets (`tonejs-nylon`, `tonejs-electric`, `shinyguitar`; two independent origins), every guitar on both outputs, in one run? | Condition (c), the last before the user promotes; one shot, and a failure turns the held-out sets into development evidence | blocked by 043 and 044 D3; only after a valid fresh all-guitar formal pass | [Amendment](contracts/development-contract-2.md#amendment-2026-10-04-sampled-guitar-replaces-the-sines-and-the-promotion-rule) |
 | 43 | Does a new stage-gates version implement R10's sentinel rule (deviation examples only; ties by severity in the direction of difficulty before name), with hand-worked cases and an independent audit, before promotion's sentinel selection uses it? | Adopted by the user on 2026-10-05; needed only at promotion | open, before promotion | [Second amendment](contracts/development-contract-2.md#amendment-2026-10-05-host-stalls-guitar-sweeps-sentinels-and-the-outside-review), [R10](reviews.md#r10-after-the-resumed-batch-g031b-and-032034-with-the-direction-review) |
+| 41 | Can a separately pre-registered diagnosis distinguish native/input work, runtime collection, scheduler stalls and indirect evidence-memory pressure behind 043's no-inference service outliers? | Original failures remain; fixed panel did not reproduce an attributable target | answered D3 no attribution by 044; batch stops at 8 of 10 | [044](reports/044-challenger-stall-diagnosis.md) |
 | 39 | Can the next numbered experiment resolve 041's candidate-only timer attribution, with diagnostic tensor hashing and parity-snapshot copying separated from measured listener work, retaining fresh complete setup/feed/finish evidence before a formal claim? | Independent implementation review found conservative diagnostic work inside service; the saved durations cannot isolate it. Resolve attribution without rewriting 041 or changing gates | answered by 043 at the direct timer boundary; indirect runtime stall attribution is question 41 | [Implementation review 041: timers](bench/oracle-events/implementation-review-041.md#1-timers--does-not-hold-for-strict-candidate-only-scope) |
 | 40 | Does an independent session rederive observation-seam@5's pending/populated finish snapshots, nonempty returned decision stamps and immutable history, and unsafe/nonfinite length refusals, agree on all five new cases and sample inherited rules in their declared layers? | Independent audit closes the scalar finish and safe-length gaps; native timer attribution remains question 39 | answered: 95 agree, 0 disagree, 0 ambiguous (5 new, 90 inherited); native obligations remain separate | [Audit 5](bench/oracle-events/audit-observation-seam-5.md), GPT-6-Astra (high) in Codex |
 | 38 | Can the next numbered challenger resolution freeze and independently audit the remaining seam-4 scalar finish-state/nonempty-finish-emission and safe-length cases, and explicitly arrange independent native context/map/timer/provenance/prefix review with the implementation/results access that the oracle-audit prompt prohibits? | Audit 4 agrees on all 90 checked cases but lists uncovered rules and cannot grant native adoption approval; resolve these before formal cursor judgment | scalar fixtures frozen by 042 and agreed by audit 40; native review holds except strict timer attribution, separately resolved by 39 | [Audit 4: uncovered rules](bench/oracle-events/audit-observation-seam-4.md#rules-i-could-not-exercise), [resolution](bench/oracle-events/audit-observation-seam-4.md#resolution-and-verdict) |

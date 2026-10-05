@@ -290,6 +290,19 @@
         "href": "042-challenger-finish-length.html",
         "label": "Experiment 042"
       }
+    },
+    {
+      "number": "044",
+      "slug": "044-challenger-stall-diagnosis",
+      "title": "044 \u00b7 Trace the no-inference service stalls",
+      "banner": "D3 no attribution \u00b7 198 matching payloads \u00b7 original stalls not reproduced \u00b7 batch stops at 8 of 10",
+      "runs": [
+        "g044-challenger-stall-diagnosis"
+      ],
+      "previous": {
+        "href": "043-challenger-guitar-stage.html",
+        "label": "Experiment 043"
+      }
     }
   ]
 }
