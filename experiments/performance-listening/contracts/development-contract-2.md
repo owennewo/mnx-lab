@@ -652,6 +652,17 @@ Code):
 
    The re-claim is a fresh measurement under unchanged gates, not a remeasurement of
    043; 043's D2 stands.
+   *Reviewer's note, R13 (2026-10-05), beside the record above and not replacing it:* two
+   premises of that application do not survive the logs. The `guitar-faust` Codex session
+   (11:20-13:32 UTC) logged model turns of a few seconds each but **no command at all**
+   between 11:25 and 12:04 UTC, and nothing whatever between 11:34:10 and 12:00:30, which
+   contains both failing measurements (11:38, 11:48); "working throughout the window" is
+   not what the logs show, and background processes it started are unobservable. And
+   .291 came from arm B, the profiled child-process harness, whose three slow services
+   spent 53 ms of wall time on 3-4 ms of main-thread CPU; arm A, the original harness
+   under the same tracing, peaked at .154 on all 99 examples. The report calls both arms'
+   cost diagnostic, not production. The user's decision stands; what it rested on is
+   weaker than its text says. See [R13](../reviews.md#r13-after-experiment-044-and-the-reopening).
    Formal timing runs are made with no other agent working on the host, and record the
    host's load while they run.
 2. **Baselines in guitar sweeps.** The incumbent runs on every guitar example of a full

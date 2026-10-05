@@ -168,7 +168,8 @@ sentinel version follow the amendment.
 no stall recurred on a quiet host, and the parent found in the Codex logs that an
 agent working in `~/dev/guitar-faust` was active from 11:30 to 12:04 UTC, the window in
 which 043 measured both failing examples (11:38 and 11:48 UTC), though no command of
-its was logged at those moments. 044's isolated arm also measured a Fender noise
+its was logged at those moments (R13: the session logged no command at all from 11:25 to
+12:04 and nothing between 11:34 and 12:00, so the claim is weaker than this sentence reads). 044's isolated arm also measured a Fender noise
 control at a cost of .291, so the margin is thin without stalls. The parent
 recommended: **045**, a listener version that widens the cost margin (for example
 running inference less often or on a smaller crop, the experimenter's choice,
@@ -188,7 +189,7 @@ stalls. The isolated arm also has an inference cost failure. Quiet non-reproduct
 cannot identify the original cause or meet the amendment's harness-attribution branch;
 045 and held-out confirmation stay blocked. The batch stops under its fixed rule.
 A broader memory-accumulation or quiet-host trace is advice awaiting reopening, not an
-extra run authorized here. Independent process review of this continuation is due.
+extra run authorized here. Independent process review of this continuation is done ([R13](reviews.md#r13-after-experiment-044-and-the-reopening)).
 [044's resulting state](reports/044-challenger-stall-diagnosis.md#resulting-stopping-count-budgets-and-evidence-access)
 carries unchanged stopping counts and budgets. No listener, oracle, stage, incumbent
 or sentinel change; protected evidence remains untouched. This author lands, retires
@@ -230,7 +231,7 @@ result. The second amendment already settled the stall gate, baseline sweeps, se
 rule and outside review: no gate change or formal redraw is assumed. The sentinel
 instrument and its audit remain pending before promotion. Promotion, microphone gates,
 qualification and Studio choices remain the user's. Main stays paused and event-chain@3
-remains incumbent. Independent process review of 044 is a separate-session obligation.
+remains incumbent. Independent process review of 044 is done ([R13](reviews.md#r13-after-experiment-044-and-the-reopening)), which also questions the premises of the reopening: see its escalations.
 
 ### Experiment 036, by the user's direction
 

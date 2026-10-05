@@ -22,6 +22,7 @@ is visible: a process that gains rules every time is getting heavier, not better
 | R10 | 2026-10-01 | The resumed batch: [g031b](reports/031-other-bars-reporting.md#completion-g031b-by-the-users-authority), [032](reports/032-held-note-hesitation.md), [033](reports/033-rushed-bar.md) and [034](reports/034-missing-event-sweep.md), with the full direction review | Claude Fable 5.1 in Claude Code | Held; the sine staircase is sound, and now the slow part | [Landed with this entry](#r10-after-the-resumed-batch-g031b-and-032034-with-the-direction-review) | Sentinel rule; baselines in sweeps (again); a guitar-sound thermometer before the remaining sine deviations | +0 −0 |
 | R11 | 2026-10-02 | The challenger batch: the track's opening, [035](reports/035-challenger-basic-pitch.md) and the [observation-seam@1 audit](bench/oracle-events/audit-observation-seam-1.md) | Claude Opus 5.5 in Claude Code | Held; the challenger's cursor is the open half | [Landed with this entry](#r11-after-the-challenger-batch-035-and-the-observation-seam-audit) | The incumbent on the guitar set; the promotion rule's wording; whether continuation must carry the live path; R10's sentinel and baseline items | +1 −0 |
 | R12 | 2026-10-05 | The sampled-guitar batch: [036](reports/036-incumbent-guitar.md), [037](reports/037-challenger-observation-seam.md)–[043](reports/043-challenger-guitar-stage.md), [seam audits 2–5](bench/oracle-events/audit-observation-seam-5.md) and [041 implementation review](bench/oracle-events/implementation-review-041.md) | Claude Sonnet 5.5 in Claude Code (effort not in log) | Held; the stopped batch is honestly stopped, on a 3% cost overshoot and a 58 ms deadline miss that are host stalls | [Landed with this entry](#r12-after-the-sampled-guitar-batch-036-043) | Whether a single-example host stall may fail a stage; whether to fund question 41; the seam-arithmetic share of the batch; an outside review | +1 −0 |
+| R13 | 2026-10-05 | [044](reports/044-challenger-stall-diagnosis.md) and the reopening that followed it | Claude Sonnet 5.5 in Claude Code (effort not in log) | Held; D3 is honestly reported, but the reopening's two stated reasons are weaker than written | [Landed with this entry](#r13-after-experiment-044-and-the-reopening) | Whether 045 (a listener version for cost margin) is needed before a quiet-host re-claim; what "quiet" means for 046 | +0 −0 |
 
 Reviews R1–R3 were given in conversation with the user and recorded here when this file
 was created. The same reviewer wrote contract 2 and most of the process it reviewed.
@@ -1194,3 +1195,88 @@ outcome; the frozen baselines run only on guitar stage 1's clean examples while 
 incumbent runs everything; R10's sentinel rule is adopted as a new audited stage-gates
 version before promotion uses it; and the outside review is done once, at promotion, by
 a model new to the loop. The batch reopens: see the research log's current batch.
+
+## R13, after experiment 044 and the reopening
+
+Light review (3.1-3.3, 3.5, a look at 3.4) of one experiment and of the parent's landing
+of its consequences. No experiment or audit is in flight (`git worktree list`: only
+`main`). I did not re-review 043 or earlier; R12 and its correction cover them.
+
+**Held.** 044's pre-registration (4fcd5276) reached `main` at 18:00:46 and no line of it
+has been removed since. The harness code (9ad95d71, 1f19e0df) was written after it
+landed, and the run began 18:04:47, one second after the pinned source commit, with the
+tag `g044-challenger-stall-diagnosis-source` on origin. The two recorded hashes
+(`summary.json` a6416df4..., `statistics.json` 7ee1dd7a...) recompute. Between R12 and
+now no pre-existing bench, oracle, instrument or frozen file changed: the diff shows only
+additions there, plus the expected edits to the log, ledger, report index and contracts.
+The worktree is retired. The experimenter's session log
+(`~/.codex/sessions/2026/10/05/rollout-...17-54-06-...a53d`) says `gpt-6.1-sol`, effort
+`high`: the record is right. Its timestamps put the run (17:04Z) after the pre-registration
+(16:58Z) and the 169 s run inside the hour. The report is candid: prediction 2 is marked
+contradicted, a held prediction 3 is not allowed to carry a causal claim, the sub-millisecond
+scheduler read is disclosed as coarse, and D3 is applied exactly as pre-registered, without
+spending the technical rerun on a valid quiet result.
+
+**Findings.**
+
+1. **The reopening's host premise is not what the logs show.** The parent's note says an
+   agent in `~/dev/guitar-faust` "was active from 11:30 to 12:04 UTC", and the contract
+   now says "another agent working throughout the window". The only overlapping Codex
+   session there (11:20-13:32 UTC) has model turns of 2-6 s but **zero command or tool
+   calls** in 11:25-12:04, and no event of any kind between 11:34:10 and 12:00:30, which
+   holds both failing measurements. It may have had a background process; session logs
+   cannot show that, and the parent's own research-log sentence admits no command was
+   logged. The record was corrected beside, not rewritten (contract and research log).
+2. **The cost-margin premise rests on the diagnostic arm.** .291 is arm B's maximum, in the
+   profiled child-process harness, from a noise-control service of 53 ms wall on 4 ms of
+   main-thread CPU. Arm A, the original harness under the same tracing, peaked at .154 on
+   all 99 examples. 044 says the arms' difference cannot be read causally (profiling, IPC,
+   fixed A-then-B order) and that B is not production cost. 043's own failing .2578 came
+   with the stall that 044 could not reproduce. So "the margin is thin without stalls" is
+   one number from the arm the report disclaims, against .154 from the other.
+3. **Consequence.** 045 as reopened spends a challenger listener version (budget 3
+   versions/5 comparisons, stopping count 2) to widen a margin that may not be thin, and
+   a version that runs inference less often or on a smaller crop moves the lag the user
+   also gates. It is a development-set change judged on development guitars, so its pass
+   would carry less than it appears to. This is a decision for the user, not mine.
+4. **"Quiet host" has no operational definition.** 044's monitor flagged a competing
+   session only above five CPU ticks and says itself it "cannot certify host exclusivity".
+   The amendment requires "no other agent working on the host" for formal runs, and 046
+   will be the first run held to it. The parent's plan (pause guitar-faust, record load) is
+   reasonable, but a pre-registration needs a checkable rule or a failed 046 will be
+   un-attributable again.
+5. **Records.** The ledger row g044 is about 650 characters, readable. The stop at D3 and
+   the reopening are both quoted from the user before the work they shape. A D3 "the
+   batch stops" followed by a user reopening is allowed, but the second amendment does not
+   say so; I count that as the user's authority, not a loophole.
+
+**Direction (glance).** Still aimed at both outputs. Time: 044 ran 169 s. Eleven runs for
+a promotion that began as "I'm prepared to promote" is long, and three of the last four
+(041 timing, 043, 044) have been about the measuring of cost, not the listening. No
+retirement or sentinel event occurred. The sentinel version the second amendment requires
+remains unbuilt, with promotion gated on it.
+
+**Fixed directly.** Dated reviewer's notes beside the contract paragraph and the research
+log sentence (finding 1 and 2), and the log's two stale "review due" sentences. No rule
+added or removed; no verdict, gate, pre-registration or frozen file touched.
+
+**Escalated to the user.**
+
+1. **Is 045 needed before 046?** Option: run 046 first, the fresh formal claim on a verified
+   quiet host, and spend a listener version only if cost then fails a gate. It saves a
+   version and a development-set tune, and tests the stall hypothesis directly. The parent's
+   order guards the thin-margin risk; the cost is a possible stop at 046 and a version spent
+   after, which is the same outcome as spending it now.
+2. **What counts as quiet for 046**, fixed before the run: for example, no Codex or Claude
+   Code session processes other than the experimenter's and the monitor's, checked at start
+   and sampled during, with any violation voiding the run as infrastructure. I recommend
+   it be written into 046's pre-registration, not a process rule.
+3. **The outside review** stays deferred to promotion, per the amendment; this is the
+   fourth review in a row by the same family of model as the process author.
+
+**Could not check.** No listener or harness was run. I did not recompute the 356 artifact
+hashes or read the private traces, so integrity beyond the two public hashes and the diff
+is the report's word. Whether any process outside Codex logs (a desktop app, a build in
+`guitar-faust`) loaded the host at 11:38 or 11:48 UTC is not recorded anywhere I could read.
+
+**Trend:** +0 −0.
