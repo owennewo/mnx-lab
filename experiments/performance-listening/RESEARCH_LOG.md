@@ -41,7 +41,56 @@ How to maintain it:
 
 ## Current state
 
-### Current batch: closed at 9 of 10, quiet-host claim fails, 037–045
+### Current batch: stall attribution and targeted repair, up to three experiments
+
+Opened 2026-10-05 after 045, by the user's direction:
+
+> ok - lets do this in your preferred order
+
+This accepts the preceding recommendation, whose preferred order was:
+
+> independent review → full-workload tracing → fix the demonstrated cause → fresh formal claim
+
+**Goal:** explain the rare no-inference service stalls with a full-workload traced
+comparison, fix only the demonstrated cause, and measure the repaired path in a fresh
+formal guitar claim under unchanged gates. The recommendation also keeps the 200-ms
+deadline and held-out guitars unchanged. 045's D2 and all earlier verdicts stand;
+no historical stall attribution is presumed.
+
+**Order and bound:** first an independent process review of landed 045. Then at most
+three numbered experiments, beginning with the next unused number: one pre-registered
+full-workload diagnosis; a separate listener version if the evidence attributes the
+cause to listener work; and a fresh formal claim after a demonstrated repair. A
+harness repair can be carried by its diagnostic experiment without a listener version.
+Each experimenter chooses and pre-registers its own bounded method from the evidence;
+the accepted diagnostic recommendation is to reuse 044's tracing over the full
+576-example workload/memory accumulation, compare the original harness with a
+separate listener process and bounded evidence storage, and record phase timings,
+GC/memory, thread CPU and scheduler evidence. Instrumentation overhead is diagnostic;
+formal timing is measured afterwards. No inference-frequency change is assumed.
+
+**Stopping:** an inconclusive/infrastructure outcome, no attribution, unsupported
+repair, or valid failed formal claim ends this continuation and records the need for
+the user. A successful formal claim also ends it: held-out confirmation, promotion,
+sentinel selection and the outside promotion review are not performed in this batch.
+Existing contract rules, oracle audits, quiet-host conditions, budgets and one-experiment
+per session still apply. No gate or evidence standard is loosened.
+
+**Roles:** this parent, GPT-6.1-Sol (high) in Codex, coordinates and records this direction
+but performs no experiment or independent review in the continuation. The opening
+process reviewer is a separate GPT-6-Sol (high) in Codex session; experimenters are
+fresh GPT-6.1-Sol (high) in Codex sessions, one per numbered run. Any oracle audit and
+the closing process review use independent sessions/models under the existing rules.
+
+**Progress:** 0 of at most 3 numbered experiments; opening independent review due.
+Carried state is [045's resulting state](reports/045-challenger-quiet-host-stage.md#resulting-stopping-count-budgets-and-evidence-access).
+No held-out access or formal redraw starts before a supported repair. The standing
+quiet-host/guitar-faust hold is retained for the planned timing work; no other agent
+is instructed or stopped by this parent. Pending product/qualification decisions stay
+with the user. Question 46's reopening is answered by this quoted direction; the first
+experiment will record its diagnostic question after the independent review.
+
+### Previous batch: closed at 9 of 10, quiet-host claim fails, 037–045
 
 **Latest result: [045](reports/045-challenger-quiet-host-stage.md),
 GPT-6.1-Sol (high) in Codex, D2 on a valid quiet host.** The unchanged challenger
@@ -495,7 +544,7 @@ Questions 1–23 and 28 are the main track's.
 
 | Rank | Question | Why it is ranked here | Status | Owner item |
 |---|---|---|---|---|
-| 46 | Does the user reopen for attributable full-sweep no-inference-stall diagnosis or redirect after 045's valid quiet-host deadline failures, following independent review? | Failed promotion condition (a) stops the batch; quiet state supplies no allocation/runtime attribution | open: next after closing review; also settle the guitar-faust pause while 046 is blocked | [045 next](reports/045-challenger-quiet-host-stage.md#next) |
+| 46 | Does the user reopen for attributable full-sweep no-inference-stall diagnosis or redirect after 045's valid quiet-host deadline failures, following independent review? | Failed promotion condition (a) stops the batch; quiet state supplies no allocation/runtime attribution | answered by the user: review, full-workload diagnosis, demonstrated fix, then formal claim; current batch above | [045 next](reports/045-challenger-quiet-host-stage.md#next) |
 | 42 | Does the challenger pass the formal guitar stage-1 and silent-hesitation claim, both outputs and every control on all four development guitars under unchanged gates, measured once on a quiet host as the second amendment defines it, with the incumbent on every example and the frozen baselines on stage 1's clean examples? | Condition (a), freshly authorized by the user after R13 without assuming stall attribution | answered D2 by 045: two Martin hesitation deadlines fail on a valid quiet host | [Second amendment](contracts/development-contract-2.md#amendment-2026-10-05-host-stalls-guitar-sweeps-sentinels-and-the-outside-review) |
 | 45 | Can one listener version reduce the challenger's live inference cost enough to leave a clear margin under .25 on every development guitar, Fender included, without changing any assessment or failing any cursor deadline or control? | 043 measured up to .2578 with a stall and 041 .2355 on Fender; 044's isolated arm .291 on a Fender noise control. A formal claim on that margin would not hold on a slower device | withdrawn by the user (2026-10-05) on R13's evidence: 043's clean Fender cost peaked at .211; spent only if 045 fails on cost | [044](reports/044-challenger-stall-diagnosis.md), [Second amendment](contracts/development-contract-2.md#amendment-2026-10-05-host-stalls-guitar-sweeps-sentinels-and-the-outside-review) |
 | 44 | Does the user reopen or redirect the stopped batch to obtain attributable evidence beyond 044's quiet fixed panel? | D3 stops the batch; historical stalls remain unresolved and no harness-cause branch authorizes 045 | answered by the user (2026-10-05): latest revision reopened at 8 of 10 for fresh quiet-host 045 then held-out 046; cost-margin version withdrawn unless 045 fails on cost | [044 next](reports/044-challenger-stall-diagnosis.md#next) |
