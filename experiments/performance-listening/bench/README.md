@@ -146,3 +146,11 @@ prior incumbent/baseline evidence verified by hash. Behavioral adapter checks ar
 `test/challenger-035.test.ts`. The new [observation seam](../contracts/observation-seam-1.md)
 needs its independent timing audit; consult [the research log](../RESEARCH_LOG.md) for
 results, authority to continue, and what remains open.
+
+**Experiment 039, offline monophonic decoder variant.** `src/challenger/dominantPitch.py`
+keeps each frame's strongest note bin (lowest-bin tie), masks losing note/onset entries,
+and applies the pinned official decoder unchanged. `chain2.ts` inherits the frozen
+chain/report logic. `run039.ts` verifies and reuses guitar/noise model maps, freshly
+decodes and assesses every frozen example, retaining per-input/per-example artifacts.
+It does not implement a new live producer or change the observation timing seam;
+see the research log for the next streaming/audit prerequisite.

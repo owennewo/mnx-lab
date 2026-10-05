@@ -58,3 +58,4 @@ serves a private review folder over localhost; private audio never enters git.
 | 037 | [Settle observation timing and count compute](037-challenger-observation-seam.html) | [g037](../runs/g037-challenger-observation-seam/summary.json), D1 implementation agreement; independent seam-2 audit required |
 
 | 038 | [Quiet-noise controls for both unchanged listeners](038-challenger-quiet-noise.html) | [g038](../runs/g038-challenger-quiet-noise/summary.json), D1; nominal live only |
+| 039 | [Dominant-pitch decoding for Martin’s wrong-score claims](039-challenger-dominant-pitch.html) | [g039](../runs/g039-challenger-dominant-pitch/summary.json), D1 component repair; live still unresolved |

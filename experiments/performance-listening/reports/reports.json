@@ -224,6 +224,19 @@
         "href": "037-challenger-observation-seam.html",
         "label": "Experiment 037"
       }
+    },
+    {
+      "number": "039",
+      "slug": "039-challenger-dominant-pitch",
+      "title": "039 \u00b7 Dominant-pitch decoding for Martin\u2019s wrong-score claims",
+      "banner": "D1 component repair \u00b7 576/576 assessments pass \u00b7 all 24 Martin claims removed \u00b7 no live/stage/promotion verdict",
+      "runs": [
+        "g039-challenger-dominant-pitch"
+      ],
+      "previous": {
+        "href": "038-challenger-quiet-noise.html",
+        "label": "Experiment 038"
+      }
     }
   ]
 }
