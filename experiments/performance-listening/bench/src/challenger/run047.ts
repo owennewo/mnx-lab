@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import {execFileSync} from 'node:child_process';
 import {appendFileSync,existsSync,mkdirSync,readFileSync,writeFileSync} from 'node:fs';
-import {join,resolve,isAbsolute} from 'node:path';
+import {join,resolve,relative,isAbsolute} from 'node:path';
 import type {MnxStructure} from '../../../../../src/model/mnx.ts';
 import {compilePerformance} from '../../../../../src/audio/performance.ts';
 import {rational} from '../../../../../src/audio/time.ts';
@@ -31,7 +31,7 @@ git('merge-base','--is-ancestor',prereg,'origin/main');assert.equal(git('show',`
 assert.equal(git('rev-parse',`${runId}-source^{commit}`),commit);
 const root=requireOutsideGit(dataRoot),privateDir=join(root,'diagnostic-runs',runId),publicDir=join(EXPERIMENT,'runs',runId);assert(!existsSync(privateDir)&&!existsSync(publicDir),'Run ID exists');
 const sourcePaths=git('ls-files','--','src/audio','src/model','experiments/performance-listening/bench','experiments/performance-listening/listen','experiments/performance-listening/contracts','experiments/performance-listening/sources','experiments/performance-listening/research/input-buffers-047.md').split('\n').filter(p=>/\.(ts|mjs|py|json|md)$/.test(p));
-const sourceHashes=Object.fromEntries([...sourcePaths,'package-lock.json',reportPath].map(p=>[p,sha256(readFileSync(resolve(repo,p)))]));
+const sourceHashes=Object.fromEntries([...sourcePaths,'package-lock.json',reportPath].map(p=>[relative(EXPERIMENT,resolve(repo,p)),sha256(readFileSync(resolve(repo,p)))]));
 const common={id:runId,modelAndTool:'GPT-6.1-Sol (high) in Codex',gitCommit:commit,preregistrationCommit:prereg,sourceHashes,
  listener:'basic-pitch-chain@4-input-buffers',parent:'basic-pitch-chain@3',definition:'observation-seam@5',stageClaim:false,promotion:false,newVersions:1,formalComparisons:0,
  suiteMode:'complete active development-guitar storage/native parity; unchanged comparator/offline evidence cited; no stage/baseline sweep',machine:machine(),heldOutReservedAccesses:0};

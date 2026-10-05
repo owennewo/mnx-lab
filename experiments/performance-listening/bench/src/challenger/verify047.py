@@ -4,15 +4,17 @@ Usage: python3 experiments/performance-listening/bench/src/challenger/verify047.
 It hashes source/private/input records and recomputes clock, prefix and explicit-count
 aggregates. It neither runs neural inference nor measures V8/native allocator traffic.
 """
-import json,sys,hashlib,subprocess,math
+import json,sys,hashlib,subprocess,math,posixpath
 from pathlib import Path
 sp=Path(sys.argv[1]).resolve();s=json.loads(sp.read_text());exp=sp.parents[2];repo=exp.parents[1];verified={}
 def sha_bytes(b):return hashlib.sha256(b).hexdigest()
-def read(a):
+def read(a,parse=True):
  p=Path(a['path']);p=p if p.is_absolute() else exp/p
- b=p.read_bytes();assert sha_bytes(b)==a['sha256'],str(p);verified[str(p)]=a['sha256'];return json.loads(b)
+ b=p.read_bytes();assert sha_bytes(b)==a['sha256'],str(p);verified[str(p)]=a['sha256'];return json.loads(b) if parse else None
 for p,h in s['sourceHashes'].items():
- b=subprocess.check_output(['git','show',f"{s['gitCommit']}:{p}"],cwd=repo);assert sha_bytes(b)==h,p
+ tracked=posixpath.normpath('experiments/performance-listening/'+p)
+ b=subprocess.check_output(['git','show',f"{s['gitCommit']}:{tracked}"],cwd=repo);assert sha_bytes(b)==h,p
+read(s['assemblyRepair']);read(s['recordMaintenance']['verificationFailure']);read(s['recordMaintenance']['passedVerificationBeforeThisMetadata']);raw=read(s['rawWriterSummary']);assert raw['counts']==s['counts'] and raw['allocation']==s['allocation']
 r=read(s['results']);v=read(s['validation']);k=read(r['kernelResults']);synthetic=read(r['synthetic'])
 for p,h in v['verifiedPrivateArtifacts'].items():assert sha_bytes(Path(p).read_bytes())==h,p;verified[p]=h
 for a in v['citations']:read(a)
@@ -48,7 +50,7 @@ for e,row,kr in zip(manifest['examples'],r['rows'],k['rows']):
  assert [(x[0],x[1],x[2]) for x in request(a)]==[(x['samples'],x['hash'],x['indices']) for x in kernel['digest']]
  all_calls+=clocks(a);work+=a['cost']['work'];audio+=a['cost']['audioSeconds'];ratios.append(a['cost']['ratio'])
  delays.extend(x['delay'] for x in a['following']['byEvent']['events'] if x['delay'] is not None)
- offline=read(a['offlineCitation']);read(offline['observations']['masked']);read(offline['observations']['decoded']);assert a['offlineUnchanged']
+ offline=read(a['offlineCitation']);read(offline['observations']['masked'],False);read(offline['observations']['decoded']);assert a['offlineUnchanged']
  for pr in row['prefixes']:
   p=read(pr['artifact']);assert payload(a['payloads'],p['cutoff'])==payload(p['payloads'],p['cutoff']);assert p['pass']==pr['pass']==True;all_calls+=clocks(p);prefix_count+=1
  feeds+=kernel['feeds'];windows+=kernel['requests'];bytes_old+=kernel['baseline']['windowBytes'];bytes_new+=a['allocations']['windowBytes'];raw_elems+=kernel['baseline']['rawSliceElements']

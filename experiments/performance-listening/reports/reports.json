@@ -329,6 +329,19 @@
         "href": "045-challenger-quiet-host-stage.html",
         "label": "Experiment 045"
       }
+    },
+    {
+      "number": "047",
+      "slug": "047-challenger-input-buffers",
+      "title": "047 \u00b7 Reuse streaming input and model-window buffers",
+      "banner": "D1 resource variant \u00b7 98.35% fewer explicit window bytes \u00b7 complete numerical/output/prefix parity \u00b7 no stage claim",
+      "runs": [
+        "g047-challenger-input-buffers"
+      ],
+      "previous": {
+        "href": "046-challenger-full-workload-trace.html",
+        "label": "Experiment 046"
+      }
     }
   ]
 }

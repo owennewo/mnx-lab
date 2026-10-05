@@ -82,7 +82,18 @@ the next begins; the final gate must finish successfully before any merge/push.
 
 **Roles and status:** GPT-6.1-Sol (high) in Codex coordinates only and lands this Current
 batch record. Fresh GPT-6.1-Sol (high) in Codex sessions run one numbered experiment each;
-audits and the closing review use independent sessions/models. No experiment has begun.
+audits and the closing review use independent sessions/models.
+
+**Run 1 complete: [047 input buffers](reports/047-challenger-input-buffers.md), D1 resource variant.**
+The separately named live storage variant preserves complete development-corpus tensors,
+outputs and causal prefixes while removing recurring explicit window/raw-slice allocation.
+It becomes the development parent for the next independent unused-output-copy experiment;
+event-chain@3 remains incumbent. This is no historical stall repair or formal stage pass.
+[047's resulting state](reports/047-challenger-input-buffers.md#resulting-stopping-count-budgets-and-evidence-access)
+carries stage stopping counts unchanged and records the new resource version/comparison,
+unused technical repeat and untouched protected evidence. Record-only path/reader repairs
+preserve the raw writer and failed read-only verification; no inference was repeated.
+The batch remains open at **1 of at most 3**, closing process review due at its end.
 This current direction answers the prior reopening decision (question 48); the
 experimenter updates the ranked questions when its record lands. The standing
 `guitar-faust` pause/release decision is unchanged; timing sessions verify the required
@@ -604,6 +615,7 @@ Status is `holds`, `superseded` or `withdrawn`.
 | 38 | A fixed traced panel preserves the frozen payloads with original and isolated evidence harnesses but does not reproduce the original no-inference stalls; historical cause remains unresolved | [044 results](reports/044-challenger-stall-diagnosis.md#results), [g044](runs/g044-challenger-stall-diagnosis/summary.json) | holds | 044 | B also has an inference cost failure; no harness attribution, stage pass or held-out authorization |
 | 39 | The frozen challenger passes all development-guitar assessments and costs on a contract-valid quiet host, but two Martin silent-hesitation events miss compute-inclusive deadlines after no-inference feed stalls | [045](reports/045-challenger-quiet-host-stage.md#results), [g045](runs/g045-challenger-quiet-host-stage/summary.json) | holds | 045 | No cause attributed, redraw, stage-2 pass or held-out use; all clean stage-1 gates and frozen identities agree |
 | 40 | A complete accumulated-evidence workload and a bounded isolated listener process preserve every development-guitar payload, assessment and prefix but reproduce no no-inference stall; storage isolation alone supplies no demonstrated repair | [046](reports/046-challenger-full-workload-trace.md#results), [g046](runs/g046-challenger-full-workload-trace/summary.json) | holds | 046 | Full fixed A-then-B traced workloads; historical cause remains unresolved, no formal claim or held-out use |
+| 41 | Reusable raw-input capacity and one borrowed model window preserve complete development-corpus tensors, native outputs and prefixes while removing recurring explicit allocations at those storage sites | [047](reports/047-challenger-input-buffers.md#results), [g047](runs/g047-challenger-input-buffers/summary.json) | holds | 047 | Exact targeted allocation counts, not total V8/native allocation, speed, historical stall ownership or stage approval; synchronous consumer lifecycle |
 
 ## Open questions
 
@@ -614,7 +626,9 @@ Questions 1–23 and 28 are the main track's.
 
 | Rank | Question | Why it is ranked here | Status | Owner item |
 |---|---|---|---|---|
-| 48 | Does the user reopen for further attributable stall evidence or redirect after 046's complete full-workload non-reproduction, following the independent closing review? | The accepted continuation stops on no attribution; storage isolation is not a demonstrated repair and formal failures stand | awaiting user direction after review; fresh formal claim and held-out use blocked | [046 next](reports/046-challenger-full-workload-trace.md#next) |
+| 50 | Can eliminating copies of unused onset/contour maps, independently of input-buffer reuse, preserve complete numerical/live/prefix output while reducing measured allocation/work? | Next candidate in the approved allocation batch; 047 supplies the parity-preserving storage parent | open; allocation batch run 2 | [Current batch](#current-batch-allocation-optimizations-at-most-3-experiments), [047 next](reports/047-challenger-input-buffers.md#next) |
+| 49 | Can reusable raw-input and model-window storage preserve exact corpus inputs/outputs and causal prefixes while removing recurring explicit allocations? | First candidate in the approved allocation batch; does not depend on historical stall reproduction | answered D1 resource variant by 047; no stage claim or stall attribution | [047](reports/047-challenger-input-buffers.md) |
+| 48 | Does the user reopen for further attributable stall evidence or redirect after 046's complete full-workload non-reproduction, following the independent closing review? | The accepted attribution continuation stops on no attribution; storage isolation is not a demonstrated stall repair | answered by the user: reopen for independent input/window reuse, unused-output-copy and contract-preserving DSP-cache resource experiments; no formal claim authorized | [Current batch](#current-batch-allocation-optimizations-at-most-3-experiments) |
 | 47 | Can the complete 576-example challenger workload reproduce a no-inference stall with evidence/GC/CPU/scheduler ownership and distinguish accumulated harness evidence from isolated listener work? | Approved diagnosis follows R14; attribution precedes any repair or fresh formal claim | answered D3 no attribution by 046; no target in either arm | [046](reports/046-challenger-full-workload-trace.md) |
 | 46 | Does the user reopen for attributable full-sweep no-inference-stall diagnosis or redirect after 045's valid quiet-host deadline failures, following independent review? | Failed promotion condition (a) stops the batch; quiet state supplies no allocation/runtime attribution | answered by the user: review, full-workload diagnosis, demonstrated fix, then formal claim; current batch above | [045 next](reports/045-challenger-quiet-host-stage.md#next) |
 | 42 | Does the challenger pass the formal guitar stage-1 and silent-hesitation claim, both outputs and every control on all four development guitars under unchanged gates, measured once on a quiet host as the second amendment defines it, with the incumbent on every example and the frozen baselines on stage 1's clean examples? | Condition (a), freshly authorized by the user after R13 without assuming stall attribution | answered D2 by 045: two Martin hesitation deadlines fail on a valid quiet host | [Second amendment](contracts/development-contract-2.md#amendment-2026-10-05-host-stalls-guitar-sweeps-sentinels-and-the-outside-review) |

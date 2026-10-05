@@ -174,3 +174,14 @@ services/assessment alignment, baseline sweep and prefix checks. `postStats043.p
 verifies saved hashes/clocks/payloads without inference. `test/timer-043.test.ts`
 checks that slow evidence hooks do not enter service clocks. See the research log
 for the resulting decision and batch state; no incumbent source or oracle is changed.
+
+
+**Experiment 047, storage-only resource variant.** `src/challenger/streaming047.ts`
+reuses raw capacity and a borrowed contiguous inference window, preserving the frozen
+streaming arithmetic. `live047.ts` retains 043's service boundary and model/chain;
+`compareInput047.ts` checks exact complete-corpus/synthetic tensors and counts explicit
+allocation sites. `run047.ts` records all native payloads and causal prefixes against
+hash-verified frozen outputs. `verify047.py` is the documented read-only verifier and
+resolves tracked sources at the tagged commit after retirement. Window ownership is
+synchronous: consume before the next feed/reset. See [047](../reports/047-challenger-input-buffers.md)
+for D1's resource scope, record-only corrections and unchanged formal failures.
