@@ -70,14 +70,19 @@ Studio headroom.
 **052 landed D1** ([report](reports/052-sentinel-instrument.md)): stage-gates@3 implements
 R10's sentinel rule and a guitar margin with no chunk-p99 entry, agrees with all 30 cases
 of the new event-oracle@5, and chose 14 guitar sentinels from 050's records into
-[the guitar suite record](bench/suite-record-guitar.json), **provisional until the
-oracle's audit**. On guitar the margins are timings, so the new tie-break decided nothing
+[the guitar suite record](bench/suite-record-guitar.json). **The oracle audit now agrees**
+([audit 5](bench/oracle-events/audit-5.md): 30 fresh cases, 30 agree, 0 disagree,
+0 ambiguous). The suite record still needs its writer to record the audit path/hash
+and activation; this audit does not edit it. On guitar the margins are timings, so the
+new tie-break decided nothing
 and the selection equals the old rule's; the stage-1 sentinels are one systematic late
 event (s2 at 63 bpm), but which guitar carries it, and every control sentinel, is decided
 by host timing noise.
 
-**Next, in order.** Question 59, the audit of event-oracle@5, by a session on a model
-other than Claude Opus (Sonnet or a Sol model), runs no listener. Then **question 57, the
+**Audit 59 is answered**, by GPT-6.1-Sol (high) in Codex; no listener ran.
+Inherited uncovered rules and procedural limits are carried to question 61 for the
+next numbered instrument resolution, before judgment that depends on them.
+**Next timing run: question 57, the
 first routine run on the 14 sentinels, judges lag and cost: the parent stops before it
 and asks the user for solo access to the host.** Two choices are the user's: question
 60, the routine suite's coverage (one sentinel per guitar; the held-out 185 ms case),
@@ -759,7 +764,8 @@ one track again, with `basic-pitch-chain@5` as its incumbent.
 
 | Rank | Question | Why it is ranked here | Status | Owner item |
 |---|---|---|---|---|
-| 59 | Does an independent session rederive event-oracle@5 (stage-gates@3: guitar margins without a chunk-p99 entry, the deviation-only pool, severity before name, the refusals) from [event instruments 5](contracts/event-instruments-5.md) alone, and agree on all 30 cases? | The audit rule: the guitar sentinels stay provisional, and no run uses them, until it agrees. Every case in oracle 5 is new; inherited rules are cited by hash under the revised audit brief | open: next; a model other than Claude Opus; runs no listener | [052](reports/052-sentinel-instrument.md), [oracle 5](bench/oracle-events/README.md) |
+| 61 | Can the next numbered instrument resolution freeze and independently audit the inherited ≥20-event gate/headroom composition, null-ratio and unplaced bar flags, and sentinel replacement/reselection lifecycle, and account separately for the procedural record obligations listed by audit 5? | Carried forward from audit 4; no existing frozen case closes these gaps, and author tests cannot substitute for an oracle. Resolve before listener judgment that depends on the uncovered rules; no disagreement with the 30 new sentinel cases | open: next instrument resolution, before affected judgment | [Audit 5: uncovered rules](bench/oracle-events/audit-5.md#rules-i-could-not-exercise) |
+| 59 | Does an independent session rederive event-oracle@5 (stage-gates@3: guitar margins without a chunk-p99 entry, the deviation-only pool, severity before name, the refusals) from [event instruments 5](contracts/event-instruments-5.md) alone, and agree on all 30 cases? | The audit rule: the guitar sentinels stay provisional, and no run uses them, until it agrees. Every case in oracle 5 is new; inherited rules are cited by hash under the revised audit brief | answered: 30 fresh cases agree, 0 disagree, 0 ambiguous; inherited coverage limits carried to 61; no listener run | [Audit 5](bench/oracle-events/audit-5.md), [052](reports/052-sentinel-instrument.md), [oracle 5](bench/oracle-events/README.md) |
 | 55 | Does a model that has never worked in this loop independently review 050–051 promotion evidence and the auditing regime before the user decides? | The batch is complete and the second amendment requires an outside review; the experimenter cannot supply it | answered: R18 holds the narrow promotion evidence and relaxes repeated inherited-rule audit work; promotion had already been decoupled by the third amendment | [R18](reviews.md#r18-after-050051-and-promotion) |
 | 57 | Does the incumbent pass its first routine run on the new guitar sentinels (every passed guitar substage's sentinels and controls), within the five-minute target and the unchanged gates? | Proves the fast loop of the third amendment; it judges lag and cost, so it needs a quiet host and the user's grant of solo access first | open, after the oracle-5 audit (59), and after the user's word on 60 if they change the suite; **needs solo access** | [Third amendment](contracts/development-contract-2.md#amendment-2026-10-06-promotion-and-a-fast-loop) |
 | 58 | Which direction next: chords (stage 3, Winner bars 1–4, needing polyphonic ghost rejection in place of strongest-pitch masking) or real playing (stage 4, microphone recordings, with gates proposed from evidence and lag measured on a target device)? | The user's choice; both run on the fast loop | open: the user's | [Plan, step 6](../../roadmap/inprogress/lab-listening-promotion.md#6-the-next-direction-the-user-chooses) |
