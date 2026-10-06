@@ -27,6 +27,7 @@ is visible: a process that gains rules every time is getting heavier, not better
 | R15 | 2026-10-05 | [046](reports/046-challenger-full-workload-trace.md) and the closing of its bounded continuation | GPT-6-Sol (high) in Codex | Held; complete non-reproduction supports D3 and the stop | [Landed with this entry](#r15-after-experiment-046-and-the-bounded-continuation) | Reopen or redirect; release the guitar-faust pause | +0 −0 |
 | R16 | 2026-10-05 | Correction to [R15](#r15-after-experiment-046-and-the-bounded-continuation): 046 pre-registration landing | GPT-6-Sol (high) in Codex | Gate-order breach; D3 and the stop still hold | [Landed with this entry](#r16-correction-to-046s-pre-registration-landing) | R15's decisions remain pending | +0 −0 |
 | R17 | 2026-10-05 | Allocation batch: [047](reports/047-challenger-input-buffers.md)–[049](reports/049-challenger-dsp-cache.md) | GPT-6-Sol (high) in Codex | Held; two bounded resource gains and one bounded negative | [Landed with this entry](#r17-after-the-allocation-batch-047049) | Fresh formal evaluation or broader resource work; guitar-faust release | +0 −0 |
+| R18 | 2026-10-06 | Promotion milestone: [050](reports/050-challenger-optimized-stage.md), [051](reports/051-challenger-heldout-confirmation.md), and the promotion | GPT-5.6-Sol (high) in Codex | Held; promotion evidence supports its narrow claim, process can be lighter | [Landed with this entry](#r18-after-050051-and-promotion) | Chords or real playing; target-device timing | +0 −1 |
 
 Reviews R1–R3 were given in conversation with the user and recorded here when this file
 was created. The same reviewer wrote contract 2 and most of the process it reviewed.
@@ -1344,3 +1345,111 @@ I ran each documented read-only verifier after the experiment worktrees were ret
 **Escalated to the user.** Choose whether to authorize a fresh formal evaluation of retained `basic-pitch-chain@5-note-output` under the unchanged guitar gates, or direct another bounded resource/DSP experiment. Allocation counts and informal service ratios do not settle that choice. Decide whether the `guitar-faust` pause can be released now that this batch has ended. No 050 or protected evaluation follows from this review itself.
 
 **Could not check.** I did not independently rerun native inference, validate the DSP graph from first principles, or establish the cause of 043/045's historical host stalls. Session metadata verifies model identity; I did not independently reconstruct every landing gate's asynchronous completion order from tool logs. The read-only verifiers and reports establish sampled host conditions for 047/048, not absence of every background process.
+
+## R18, after 050–051 and promotion
+
+Milestone review of everything landed since R17: the two-run formal/held-out batch,
+the promotion plan, and the user's adoption of it. Only `main` was present at pickup;
+no experiment or audit was in flight. Reviewer: **GPT-5.6-Sol (high) in Codex**, a model
+not previously used in this loop and a separate session from both GPT-6.1-Sol
+experimenters and the Claude Opus 5.5 parent. This supplies the outside review promised
+at promotion and the plan's requested review of the process as a whole.
+After pickup, 052 landed its pre-registration and opened a worktree. It is in flight and
+outside this review; none of its frozen report, oracle or instrument files is changed here.
+
+**Verdict: held, at the scope the records claim.** Main's reflog places 050's
+pre-registration on `main` before its source commit and its 21:31:38Z measurement; 051's
+pre-registration likewise precedes its source commit and 22:06:23Z measurement. Each
+pre-registration is an unchanged prefix of its final report. The source tags dereference
+to `fe113bfc` and `a7a4e5df`. Codex session metadata records `gpt-6.1-sol`, effort `high`,
+for both experimenters, matching the reports and ledger. Changed paths add the two
+runners, held-out builder, verifiers and records; no earlier listener, oracle, instrument,
+set or archive file changed. The later contract change is the user's quoted promotion
+decision, not an experimenter's adjustment after seeing a run.
+
+I ran both documented verifiers after retirement. 050 checked 419 source hashes, 5,003
+artifacts, 1,400,096 clock recurrences and 1,600 causal prefixes; 051 checked 422 source
+hashes, 8,319 artifacts, 1,050,072 recurrences and 1,200 prefixes, including all reused
+050 measurements and the held-out preflight. Both independently return D1. The two
+reader defects after 050's measurement are preserved and affect only record reading;
+no inference or timing was repeated. The batch therefore followed its order: one valid
+formal development claim, then one held-out access, with no tuning, redraw or gate
+change between them.
+
+**Claims and promotion.** 050 supports conditions (a) and (b): the frozen challenger
+passes both outputs, cost, controls and causality on every development example, while
+the incumbent passes no performance cursor. 051 supports condition (c): the same
+listener and criterion pass every example from three guitar sets that had not been
+examined under contract 2 before rendering. The report correctly limits their
+independence to two sample origins and acknowledges historical first-series use. The
+user then explicitly adopted a plan that promoted the listener and moved the sentinel
+instrument and outside review after promotion. That changed the order fixed by the
+earlier amendment, but it was the user's contract decision and is recorded before any
+post-promotion experiment. No post-promotion sweep was needed: 050 and 051 already are
+complete sweeps of the promoted bytes.
+
+The promotion is deliberately narrow. It establishes short, monophonic, generated
+sampled-guitar performances with perfect playing or one silent hesitation. It establishes
+no wrong, missing, dead or extra-note positive, chord, microphone, room, real-player or
+production-device result. The strongest-pitch mask cannot survive chords as written.
+The held-out maximum event delay is 184.920 ms against 200 ms, before microphone,
+driver, browser and UI delay. Historical 043/045 stalls remain unattributed. Those are
+material limits, and the reports, plan and current state all preserve them.
+
+**Direction and batch.** The batch pursued its approved goal coherently and stopped at
+two of two. It did not trade a gate for promotion: every per-example deadline and cost
+gate remained unchanged, and the one-shot evidence is now marked examined. Both outputs
+the user asked for are evaluated, but only on the narrow source above. The work is a
+real step from sines to sampled guitar; it is not yet evidence about the actual Studio
+experience. No substage was retired and no sentinel was selected, so the rising-tide
+rule was not applied prematurely. The two measurements alone took 35.5 minutes, and the
+user reported more than two hours of elapsed loop time. The third amendment's active
+suite, reuse and comparator rules address the right cost. The first routine run still
+has to demonstrate the under-five-minute target.
+
+**Which process earned its place.** Pre-registration before code and measurement,
+frozen/versioned evidence, protected one-shot access, negative controls, source tags,
+hash-addressed reuse, candid limits and an independent audit of changed oracle logic
+all caught or prevented concrete failures. The seam audits were not empty ceremony:
+seam 1 exposed two rule ambiguities, seam 3 found one disagreement and eight ambiguous
+cases, and seam 4 found uncovered finish and timer obligations before seam 5 closed the
+scalar gaps. The expensive part was re-deriving the settled inheritance on every later
+version: the seam audits grew through 38, 66, 90 and 95 case verdicts even when most rules and
+answers were byte-identical. That repetition supplied little additional independence.
+
+Per-run verification also grew bespoke. It remains valuable—the saved verifiers made
+this review possible and caught 050's two reader bugs—but a new verifier file for every
+unchanged record shape is maintenance rather than evidence. Reports, the compact ledger
+and the research log have distinct jobs now; keeping their rows as pointers avoids the
+earlier restatement problem.
+
+**Fixed directly.** [AUDITING_AN_ORACLE.md](AUDITING_AN_ORACLE.md) now fully re-derives
+new or changed rules and cases plus every carried gap, while unchanged inherited rules
+reuse the earlier independent audit by frozen hash (one procedural relaxation, −1).
+[PROMPT_EXPERIMENTER.md](PROMPT_EXPERIMENTER.md) uses the adopted under-five-minute
+routine target and prefers a reusable verifier for an unchanged evidence shape.
+[The promotion plan](../../../roadmap/inprogress/lab-listening-promotion.md) now agrees
+with the contract's quiet-host rule, describes 051's evidence without calling the sample
+sets universally untouched, corrects the false implication that 050's 270 ms backlog
+missed an event, and removes its stale pre-adoption sentence. The g050 ledger run now
+links to its summary. The research log records this completed review and the decisions
+still belonging to the user. No gate, verdict, pre-registration, frozen evidence or
+contract term changed.
+
+**Escalated to the user.** Choose the next product direction, chords or real playing.
+From a process perspective, the 15 ms held-out timing margin makes a target-device
+microphone/driver/browser feasibility measurement urgent; stage-4 gates and the target
+device remain the user's decision. I would have made sentinel selection a deterministic
+bookkeeping task rather than a numbered experiment plus audit, because it only chooses
+routine regression examples and full sweeps decide stage claims. But 052 pre-registered
+under the current contract after this review began, so that recommendation is not applied
+retroactively; 052 should finish or stop by its own frozen rules.
+
+**Could not check.** I did not rerun native inference, independently annotate the sample
+attacks, or identify the cause of the historical stalls. The saved verifiers establish
+record integrity and arithmetic, not acoustic truth outside the frozen instruments.
+Quiet-host sampling cannot prove the absence of every unrecorded host process.
+
+**Trend:** +0 −1, with stale wording and bookkeeping corrections. This is the first
+review to remove a recurring audit obligation. The core integrity rules stay; repeated
+derivation of unchanged audited material does not.

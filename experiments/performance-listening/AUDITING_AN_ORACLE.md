@@ -73,13 +73,17 @@ independent while allowing the required landing checks.
 
 Re-derive by hand, from the rules alone:
 
-- **at least one case for every rule** in the instrument definitions, including rules
-  inherited from earlier versions; and
-- **every case the version added or changed.**
+- **at least one case for every rule this version added or changed**;
+- **every case the version added or changed**; and
+- every disagreement, ambiguity or uncovered rule carried forward from the preceding
+  audit.
 
-Cases for unchanged inherited rules may live in earlier oracle files. Sample them
-under the current definitions and name them in the audit table; checking every case
-in the newest file alone does not establish inherited-rule coverage.
+For an unchanged inherited rule, case and expected answer, cite the earlier independent
+audit and the frozen hashes instead of deriving it again. Re-derive it when any of those
+bytes changed, when the earlier audit left a gap, or when the new version changes how
+the rule composes with another rule. The audit table distinguishes fresh derivations
+from inherited audited coverage. This reuse preserves the independent check while
+preventing each version from repeating an ever-growing body of settled arithmetic.
 
 A rule without a frozen hand-worked case is **uncovered**, not agreement. Record it
 under the rules you could not exercise, and carry it into the next numbered

@@ -58,11 +58,21 @@ What promotion does **not** settle stays open: the lag margin on real devices (1
 `shinyguitar` against 200 ms, before microphone and UI delay), the unexplained 043/045
 stalls, chords (039's strongest-pitch masking cannot carry into them) and real playing.
 
-**Next, in order.** Question 43, the sentinel instrument (052), measures no lag or cost:
+The outside process review is complete: [R18](reviews.md#r18-after-050051-and-promotion)
+holds the promotion at that narrow scope and removes repeated re-derivation of unchanged,
+already audited oracle rules. R18 found the full numbered-experiment-plus-audit treatment
+of sentinel selection heavier than its risk, but 052 pre-registered under the current
+contract after the review began and is outside its scope; the recommendation is not
+applied retroactively. R18 recommends settling the target device and
+microphone/driver/browser timing path before treating the 15 ms held-out margin as usable
+Studio headroom.
+
+**Next, in order.** Question 43, the sentinel instrument (052), is in progress and
+measures no lag or cost:
 an experimenter on Claude Opus on high effort writes the stage-gates version and its hand
 cases and chooses the guitar substages' sentinels from 050/051's recorded margins,
 writing the guitar suite record; a session on a different, cheaper model audits it.
-Question 55, the outside process review, runs alongside and gates nothing. Then
+Question 55, the outside process review, is answered by R18. Then
 **question 57, the first routine run on the sentinels, judges lag and cost: the parent
 stops before it and asks the user for solo access to the host.** Question 58, the next
 direction (chords or real playing), is the user's. Parent: Claude Opus 5.5 in Claude
@@ -742,8 +752,8 @@ one track again, with `basic-pitch-chain@5` as its incumbent.
 
 | Rank | Question | Why it is ranked here | Status | Owner item |
 |---|---|---|---|---|
-| 43 | Does a new stage-gates version implement R10's sentinel rule (deviation examples only; ties by severity in the direction of difficulty before name), with hand-worked cases and an independent audit, before promotion's sentinel selection uses it? | Adopted by the user on 2026-10-05; needed only at promotion | open: next, 052, after promotion (third amendment); writes the guitar suite record from 050/051's recorded margins; runs no listener and measures no lag or cost | [Second amendment](contracts/development-contract-2.md#amendment-2026-10-05-host-stalls-guitar-sweeps-sentinels-and-the-outside-review), [R10](reviews.md#r10-after-the-resumed-batch-g031b-and-032034-with-the-direction-review) |
-| 55 | Does a model that has never worked in this loop independently review 050–051 promotion evidence and the auditing regime before the user decides? | The batch is complete and the second amendment requires an outside review; the experimenter cannot supply it | open: alongside 052; gates nothing; brief: slim the process (third amendment) | [051 next](reports/051-challenger-heldout-confirmation.md#next), [Second amendment](contracts/development-contract-2.md#amendment-2026-10-05-host-stalls-guitar-sweeps-sentinels-and-the-outside-review) |
+| 43 | Does a new stage-gates version implement R10's sentinel rule (deviation examples only; ties by severity in the direction of difficulty before name), with hand-worked cases and an independent audit, before the post-promotion sentinel selection is first used? | Adopted by the user on 2026-10-05; needed for the first post-promotion routine suite | in progress: 052 pre-registration `3121c5f4` landed after R18's pickup; 052 and its audit are outside that review | [Second amendment](contracts/development-contract-2.md#amendment-2026-10-05-host-stalls-guitar-sweeps-sentinels-and-the-outside-review), [R10](reviews.md#r10-after-the-resumed-batch-g031b-and-032034-with-the-direction-review), [R18](reviews.md#r18-after-050051-and-promotion) |
+| 55 | Does a model that has never worked in this loop independently review 050–051 promotion evidence and the auditing regime before the user decides? | The batch is complete and the second amendment requires an outside review; the experimenter cannot supply it | answered: R18 holds the narrow promotion evidence and relaxes repeated inherited-rule audit work; promotion had already been decoupled by the third amendment | [R18](reviews.md#r18-after-050051-and-promotion) |
 | 57 | Does the incumbent pass its first routine run on the new guitar sentinels (every passed guitar substage's sentinels and controls), within the five-minute target and the unchanged gates? | Proves the fast loop of the third amendment; it judges lag and cost, so it needs a quiet host and the user's grant of solo access first | open, after 052 and its audit; **needs solo access** | [Third amendment](contracts/development-contract-2.md#amendment-2026-10-06-promotion-and-a-fast-loop) |
 | 58 | Which direction next: chords (stage 3, Winner bars 1–4, needing polyphonic ghost rejection in place of strongest-pitch masking) or real playing (stage 4, microphone recordings, with gates proposed from evidence and lag measured on a target device)? | The user's choice; both run on the fast loop | open: the user's | [Plan, step 6](../../roadmap/inprogress/lab-listening-promotion.md#6-the-next-direction-the-user-chooses) |
 | 56 | After the sentinel instrument/audit and outside review, does the user promote the confirmed challenger? | Conditions (a)–(c) hold, but promotion belongs to the user | answered by the user (2026-10-06): promoted on 050/051; sentinel instrument and outside review decoupled ([third amendment](contracts/development-contract-2.md#amendment-2026-10-06-promotion-and-a-fast-loop)) | [051](reports/051-challenger-heldout-confirmation.md#next) |

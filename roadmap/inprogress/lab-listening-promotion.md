@@ -1,8 +1,8 @@
 # Promote the Basic Pitch listener, then make the listening loop fast
 
-**Status: in progress from 2026-10-06; adopted by the user** ("can you implement this plan but stop before a time/compute sensitive section and request solo access"), recorded in [the contract's third amendment](../../experiments/performance-listening/contracts/development-contract-2.md#amendment-2026-10-06-promotion-and-a-fast-loop). Step 1 is done; step 3 is 052; the first routine run waits for the user's grant of solo access. Originally **proposed 2026-10-06**. Written at the user's request
-by Claude Opus 5.5 in Claude Code, the parent session of the listening batches 037–051. Nothing
-here is adopted until the user says so; on adoption, step 1 records their words in
+**Status: in progress from 2026-10-06; adopted by the user** ("can you implement this plan but stop before a time/compute sensitive section and request solo access"), recorded in [the contract's third amendment](../../experiments/performance-listening/contracts/development-contract-2.md#amendment-2026-10-06-promotion-and-a-fast-loop). Step 1 is done; step 3's 052 pre-registration has landed; the first routine run waits for the user's grant of solo access. Originally **proposed 2026-10-06**. Written at the user's request
+by Claude Opus 5.5 in Claude Code, the parent session of the listening batches 037–051.
+The adopted terms live in
 [development contract 2](../../experiments/performance-listening/contracts/development-contract-2.md),
 as every earlier amendment did.
 
@@ -22,7 +22,7 @@ has three conditions, and all three are met:
 |---|---|---|
 | (a) The challenger passes guitar stage 1 and silent hesitation on all four development guitars | [050](../../experiments/performance-listening/reports/050-challenger-optimized-stage.md), `basic-pitch-chain@5-note-output`, quiet host | 576/576 on cursor, assessment and cost; lag median 109 ms, max 163 ms; cost max .200 |
 | (b) The incumbent fails the same examples | 036, 043, 045, 050 | event-chain@3 passes no guitar performance cursor; 10/192 performance assessments |
-| (c) One-shot held-out confirmation | [051](../../experiments/performance-listening/reports/051-challenger-heldout-confirmation.md), three untouched guitars, criterion fixed before rendering | 432/432; lag max 185 ms; cost max .164 |
+| (c) One-shot held-out confirmation | [051](../../experiments/performance-listening/reports/051-challenger-heldout-confirmation.md), three guitar sets unexamined under contract 2 before rendering, criterion fixed first | 432/432; lag max 185 ms; cost max .164 |
 
 The two remaining pre-promotion steps don't bear on the choice of listener. The **sentinel
 instrument** (question 43) decides which examples a routine run repeats: a speed tool. The
@@ -44,7 +44,8 @@ It does not settle, and the next work has to:
 - **Lag margin on real devices.** 185 ms against a 200 ms gate on `shinyguitar`, on an i7,
   before microphone, audio-driver, browser and UI delay.
 - **The unexplained stalls.** 043 and 045 had 280–340 ms stalls on feeds with no inference;
-  traced runs (044, 046) never did; 050 had a 270 ms backlog that missed every event.
+  traced runs (044, 046) never did; 050 had a 270 ms backlog while every event still met
+  its deadline.
 - **Chords.** The Martin repair (039) keeps only each frame's strongest pitch, which cannot
   carry into stage 3's chords.
 - **Real playing**: microphones, rooms, timing as a person plays.
@@ -76,8 +77,8 @@ four frozen baselines, 1,200–1,600 prefix checks, under the quiet-host rule. 0
   afterwards.
 - **Offline observations are reused by hash** whenever the model, decoder and input are
   unchanged.
-- **The quiet-host rule and full sweeps apply only to formal stage claims** and to the
-  full-sweep cadence the contract already sets.
+- **The quiet-host rule applies to every run that judges lag or cost.** Full sweeps keep
+  the cadence the contract already sets.
 - **Audits happen only when an instrument or seam actually changes.** Observation-seam@5
   stays until something forces a version.
 
@@ -103,7 +104,13 @@ By a model new to the loop (GPT-6.1-Sol, GPT-6-Astra, GPT-6-Sol, Sonnet 5.5, Fab
 Opus 5.5 have all worked in it; GPT-5.6-Sol has not). Its brief: **slim the process**.
 Which rules earned their place across 022–051, which cost more than they caught (the four
 seam versions and their audits, the per-run ceremony), and what a lighter loop keeps. It
-gates nothing and runs alongside the next batch.
+gates nothing and runs alongside the next batch. **Completed by
+[R18](../../experiments/performance-listening/reviews.md#r18-after-050051-and-promotion):**
+the promotion evidence holds; unchanged audited oracle inheritance may now be reused by
+hash; reusable saved-record verifiers are preferred. R18 found the form of 052 heavier
+than its risk and leaves the next product direction with the user. Because 052
+pre-registered after R18 began, the review's lighter sentinel-selection recommendation
+is not applied retroactively.
 
 ### 6. The next direction (the user chooses)
 
@@ -114,12 +121,12 @@ gates nothing and runs alongside the next batch.
   evidence first, and the device question: the same listener in a browser, on a target
   device, with microphone and UI delay measured.
 
-## Decisions for the user
+## Decision record
 
-1. Promote now on 050 and 051, with the sentinel instrument and outside review decoupled
-   (step 1)?
-2. Adopt step 2's speed rules?
-3. Which direction next: chords or real playing (step 6)?
+The user adopted promotion and the speed rules on 2026-10-06. One decision remains:
+which direction comes next, chords or real playing (step 6), including the target device
+and timing path before stage-4 gates are set. Experiment 052 has begun under the current
+sentinel-instrument contract and keeps its own frozen decision rules.
 
 Nothing in this plan changes a gate, a pre-registration, a recorded verdict or frozen
 evidence.

@@ -166,7 +166,9 @@ experiment writes the runner it needs, following the same rules:
   landing rebase rewrites the commit and only the tag keeps the pinned source reachable.
   A documented read-only verifier must still resolve tracked sources after this
   worktree is retired: use the pinned commit or repository-relative paths, not this
-  worktree’s absolute path.
+  worktree’s absolute path. Reuse or extend an existing verifier when the evidence
+  shape is unchanged; add a per-run verifier only for checks the shared path cannot
+  express.
 - It checks causality and cost for any live listener.
 
 **Since the promotion of 2026-10-06** ([the contract's third amendment](contracts/development-contract-2.md#amendment-2026-10-06-promotion-and-a-fast-loop)):
@@ -181,8 +183,9 @@ sentinels of every passed substage and their controls, as
 [the rising tide](contracts/development-contract-2.md#keeping-the-suite-lean-the-rising-tide)
 defines them; retired sets and the frozen baselines run only in a full sweep, which is
 due when you claim a stage passed, at the end of a batch, and at least every fifth
-experiment. Say in the pre-registration which you are running and why. A routine
-evaluation should take about two minutes.
+experiment. Say in the pre-registration which you are running and why. Since the third
+amendment, a routine evaluation targets under five minutes; about two minutes remains a
+useful aim when the active suite permits it.
 
 Run time grows with every regression set, and the user wants fast iterations. A
 listener need not be rerun on inputs it already has records for, if nothing that
