@@ -169,6 +169,13 @@ experiment writes the runner it needs, following the same rules:
   worktree’s absolute path.
 - It checks causality and cost for any live listener.
 
+**Since the promotion of 2026-10-06** ([the contract's third amendment](contracts/development-contract-2.md#amendment-2026-10-06-promotion-and-a-fast-loop)):
+a routine run aims for under five minutes, frozen comparators are cited by hash after
+their first run on a set, offline observations are reused by hash, and **any run that
+judges lag or cost waits for the user's grant of solo access to the host** and records
+the quiet-host samples. If you reach such a run without that grant recorded in the
+research log, stop and record what is needed.
+
 **Run only the active suite.** A routine run evaluates the substages you attempt, the
 sentinels of every passed substage and their controls, as
 [the rising tide](contracts/development-contract-2.md#keeping-the-suite-lean-the-rising-tide)
@@ -257,6 +264,8 @@ rules are unchanged: each subagent is one session, one model runs each experimen
 an audit is done by a session that did not write the oracle. If you were asked to act as the parent, this is
 your whole job:
 
+0. **Before launching a run that judges lag or cost**, ask the user for solo access to
+   the host and wait for it; quote the grant in the current batch section.
 1. **Do no work yourself.** Do not edit files, design, run or interpret. Read `CLAUDE.md`
    and the research log's current state and top question, only to check facts. The one
    exception: if the user asked for a batch, first land the research log's **Current

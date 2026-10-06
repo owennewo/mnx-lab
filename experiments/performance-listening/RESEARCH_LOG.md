@@ -41,6 +41,33 @@ How to maintain it:
 
 ## Current state
 
+### Promoted: `basic-pitch-chain@5` is the incumbent (2026-10-06)
+
+On the user's direction, recorded in [the contract's third amendment](contracts/development-contract-2.md#amendment-2026-10-06-promotion-and-a-fast-loop), the
+challenger is promoted on 050, 036–050 and 051, which met all three promotion
+conditions. `event-chain@3` freezes as a comparator; the two tracks are one again. The
+user, after 051:
+
+> I kind of feel its obvious that this is going to be promoted - and I also feel that the tests are taking a long time.  We've been at this for over 2hrs!
+> Thoughts - keep me honest
+
+> can you implement this plan but stop before a time/compute sensitive section and request solo access
+
+The plan is [roadmap/inprogress/lab-listening-promotion.md](../../roadmap/inprogress/lab-listening-promotion.md).
+What promotion does **not** settle stays open: the lag margin on real devices (185 ms on
+`shinyguitar` against 200 ms, before microphone and UI delay), the unexplained 043/045
+stalls, chords (039's strongest-pitch masking cannot carry into them) and real playing.
+
+**Next, in order.** Question 43, the sentinel instrument (052), measures no lag or cost:
+an experimenter on Claude Opus on high effort writes the stage-gates version and its hand
+cases and chooses the guitar substages' sentinels from 050/051's recorded margins,
+writing the guitar suite record; a session on a different, cheaper model audits it.
+Question 55, the outside process review, runs alongside and gates nothing. Then
+**question 57, the first routine run on the sentinels, judges lag and cost: the parent
+stops before it and asks the user for solo access to the host.** Question 58, the next
+direction (chords or real playing), is the user's. Parent: Claude Opus 5.5 in Claude
+Code.
+
 <a id="current-batch-one-formal-claim-of-5-then-held-out-050051"></a>
 
 ### Current batch: one formal claim of @5, then held-out, 050–051 (closed at 2 of 2)
@@ -710,15 +737,16 @@ Status is `holds`, `superseded` or `withdrawn`.
 ## Open questions
 
 Ranked by row order; the top row is the next question. The number is an identifier
-given when a question opens and never reused. Since the 2026-10-04 amendment the main
-track is paused, so the open rows are the challenger's, in the current batch's order.
-Questions 1–23 and 28 are the main track's.
+given when a question opens and never reused. Since the promotion of 2026-10-06 there is
+one track again, with `basic-pitch-chain@5` as its incumbent.
 
 | Rank | Question | Why it is ranked here | Status | Owner item |
 |---|---|---|---|---|
-| 43 | Does a new stage-gates version implement R10's sentinel rule (deviation examples only; ties by severity in the direction of difficulty before name), with hand-worked cases and an independent audit, before promotion's sentinel selection uses it? | Adopted by the user on 2026-10-05; needed only at promotion | open: next, instrument/audit before selection and promotion | [Second amendment](contracts/development-contract-2.md#amendment-2026-10-05-host-stalls-guitar-sweeps-sentinels-and-the-outside-review), [R10](reviews.md#r10-after-the-resumed-batch-g031b-and-032034-with-the-direction-review) |
-| 55 | Does a model that has never worked in this loop independently review 050–051 promotion evidence and the auditing regime before the user decides? | The batch is complete and the second amendment requires an outside review; the experimenter cannot supply it | open: closing outside review due, with sentinel instrument/audit before promotion | [051 next](reports/051-challenger-heldout-confirmation.md#next), [Second amendment](contracts/development-contract-2.md#amendment-2026-10-05-host-stalls-guitar-sweeps-sentinels-and-the-outside-review) |
-| 56 | After the sentinel instrument/audit and outside review, does the user promote the confirmed challenger? | Conditions (a)–(c) hold, but promotion belongs to the user | awaiting user after prerequisites; no automatic promotion | [051](reports/051-challenger-heldout-confirmation.md#next) |
+| 43 | Does a new stage-gates version implement R10's sentinel rule (deviation examples only; ties by severity in the direction of difficulty before name), with hand-worked cases and an independent audit, before promotion's sentinel selection uses it? | Adopted by the user on 2026-10-05; needed only at promotion | open: next, 052, after promotion (third amendment); writes the guitar suite record from 050/051's recorded margins; runs no listener and measures no lag or cost | [Second amendment](contracts/development-contract-2.md#amendment-2026-10-05-host-stalls-guitar-sweeps-sentinels-and-the-outside-review), [R10](reviews.md#r10-after-the-resumed-batch-g031b-and-032034-with-the-direction-review) |
+| 55 | Does a model that has never worked in this loop independently review 050–051 promotion evidence and the auditing regime before the user decides? | The batch is complete and the second amendment requires an outside review; the experimenter cannot supply it | open: alongside 052; gates nothing; brief: slim the process (third amendment) | [051 next](reports/051-challenger-heldout-confirmation.md#next), [Second amendment](contracts/development-contract-2.md#amendment-2026-10-05-host-stalls-guitar-sweeps-sentinels-and-the-outside-review) |
+| 57 | Does the incumbent pass its first routine run on the new guitar sentinels (every passed guitar substage's sentinels and controls), within the five-minute target and the unchanged gates? | Proves the fast loop of the third amendment; it judges lag and cost, so it needs a quiet host and the user's grant of solo access first | open, after 052 and its audit; **needs solo access** | [Third amendment](contracts/development-contract-2.md#amendment-2026-10-06-promotion-and-a-fast-loop) |
+| 58 | Which direction next: chords (stage 3, Winner bars 1–4, needing polyphonic ghost rejection in place of strongest-pitch masking) or real playing (stage 4, microphone recordings, with gates proposed from evidence and lag measured on a target device)? | The user's choice; both run on the fast loop | open: the user's | [Plan, step 6](../../roadmap/inprogress/lab-listening-promotion.md#6-the-next-direction-the-user-chooses) |
+| 56 | After the sentinel instrument/audit and outside review, does the user promote the confirmed challenger? | Conditions (a)–(c) hold, but promotion belongs to the user | answered by the user (2026-10-06): promoted on 050/051; sentinel instrument and outside review decoupled ([third amendment](contracts/development-contract-2.md#amendment-2026-10-06-promotion-and-a-fast-loop)) | [051](reports/051-challenger-heldout-confirmation.md#next) |
 | 32 | Does the challenger, fixed in a pre-registration before rendering, pass the same schedules and controls rendered from the three held-out guitar sets (`tonejs-nylon`, `tonejs-electric`, `shinyguitar`; two independent origins), every guitar on both outputs, in one run? | Condition (c), the last before the user promotes; one shot, and a failure turns the held-out sets into development evidence | answered D1 by 051; one-shot spent, (c) holds; no promotion | [Amendment](contracts/development-contract-2.md#amendment-2026-10-04-sampled-guitar-replaces-the-sines-and-the-promotion-rule) |
 | 54 | Does `basic-pitch-chain@5-note-output` pass the formal guitar stage-1 and silent-hesitation claim, both outputs and every control on all four development guitars under unchanged gates, measured once on a quiet host as the second amendment defines it, with the incumbent on every example and the frozen baselines on stage 1's clean examples? | Promotion condition (a), with the retained allocation reductions; the user's direction of 2026-10-05 | answered D1 by 050; both outputs/controls pass, (a)/(b) hold | [050](reports/050-challenger-optimized-stage.md) |
 | 52 | Does an independent process session check 047–049's retained resource changes, complete parity evidence and bounded DSP-cache rejection, before further work? | Required closing review of the completed allocation batch; experimenters do not review their own batch | answered: R17 holds the bounded D1/D1/D2 results; no formal stage or stall-repair claim | [R17](reviews.md#r17-after-the-allocation-batch-047049), [Current batch](#latest-batch-allocation-optimizations-closed-at-3-of-3) |

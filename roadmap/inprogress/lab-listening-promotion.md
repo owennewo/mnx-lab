@@ -1,6 +1,6 @@
 # Promote the Basic Pitch listener, then make the listening loop fast
 
-**Status: proposed 2026-10-06, awaiting the user's decision.** Written at the user's request
+**Status: in progress from 2026-10-06; adopted by the user** ("can you implement this plan but stop before a time/compute sensitive section and request solo access"), recorded in [the contract's third amendment](../../experiments/performance-listening/contracts/development-contract-2.md#amendment-2026-10-06-promotion-and-a-fast-loop). Step 1 is done; step 3 is 052; the first routine run waits for the user's grant of solo access. Originally **proposed 2026-10-06**. Written at the user's request
 by Claude Opus 5.5 in Claude Code, the parent session of the listening batches 037–051. Nothing
 here is adopted until the user says so; on adoption, step 1 records their words in
 [development contract 2](../../experiments/performance-listening/contracts/development-contract-2.md),

@@ -14,6 +14,8 @@ is rebased onto sampled guitar, and the promotion rule is rewritten. See
 [the amendment](#amendment-2026-10-04-sampled-guitar-replaces-the-sines-and-the-promotion-rule).
 **Amended 2026-10-05** on host stalls, guitar sweeps, sentinels and the outside review:
 see [the second amendment](#amendment-2026-10-05-host-stalls-guitar-sweeps-sentinels-and-the-outside-review).
+**Amended 2026-10-06:** `basic-pitch-chain@5` is promoted and the loop made fast; see
+[the third amendment](#amendment-2026-10-06-promotion-and-a-fast-loop).
 
 ## The user's direction
 
@@ -700,6 +702,56 @@ Code):
    promotion is done, once, by a model that has never worked in this loop, and covers
    both the promotion evidence and the process's auditing regime, including what the
    five seam versions cost against what they caught.
+
+## Amendment, 2026-10-06: promotion, and a fast loop
+
+Added 2026-10-06 by the user's direction, after experiments 050 and 051 met all three
+promotion conditions. It carries out
+[the promotion plan](../../../roadmap/inprogress/lab-listening-promotion.md); where it
+differs from a section above, this section governs. The user, in order:
+
+> I kind of feel its obvious that this is going to be promoted - and I also feel that the tests are taking a long time.  We've been at this for over 2hrs!
+> Thoughts - keep me honest
+
+> can you implement this plan but stop before a time/compute sensitive section and request solo access
+
+1. **Promotion.** `basic-pitch-chain@5-note-output` is the **incumbent** from 2026-10-06,
+   on [050](../reports/050-challenger-optimized-stage.md) (condition a, all four
+   development guitars, quiet host), 036–050 (condition b) and
+   [051](../reports/051-challenger-heldout-confirmation.md) (condition c, the one-shot
+   held-out confirmation). `event-chain@3` freezes as a comparator and is never developed
+   further. The two tracks are one again; the challenger's stopping count and budgets
+   become the main track's. What the promotion establishes, and what it does not (lag
+   margin on devices, the unexplained 043/045 stalls, chords, real playing), is set out in
+   the plan.
+2. **Decoupled from promotion, on the record.** The
+   [2026-10-04 amendment's decision 7](#amendment-2026-10-04-sampled-guitar-replaces-the-sines-and-the-promotion-rule)
+   put the sentinel selection and the outside review before promotion. Both now follow
+   it: the sentinel instrument
+   ([second amendment, decision 3](#amendment-2026-10-05-host-stalls-guitar-sweeps-sentinels-and-the-outside-review))
+   is the first experiment after promotion, and the outside review
+   ([decision 4](#amendment-2026-10-05-host-stalls-guitar-sweeps-sentinels-and-the-outside-review))
+   runs later and gates nothing.
+3. **No post-promotion sweep.** 050 and 051 are complete sweeps of exactly this listener on
+   every development and held-out guitar example, with the incumbent and baselines beside
+   it; the new incumbent's suite record cites them by hash.
+4. **A routine run takes minutes.** It evaluates the substage attempted and the sentinels
+   of passed substages, nothing else, with a target of under five minutes. Frozen
+   comparators (`event-chain@3` and the four baselines) run once on a set's examples the
+   first time it is used, and are cited by hash afterwards. Offline observations are
+   reused by hash whenever model, decoder and input are unchanged. Full sweeps keep the
+   cadence above. An oracle, instrument or seam is audited only when it changes;
+   observation-seam@5 stands until something forces a version.
+5. **Solo access for timing.** Any run that judges lag or cost, routine or formal, is made
+   on a quiet host as [the second amendment](#amendment-2026-10-05-host-stalls-guitar-sweeps-sentinels-and-the-outside-review)
+   defines it, and **the user grants the host first**: the parent stops before such a run
+   and asks for solo access, because other work on the host (the CPU-heavy `guitar-faust`
+   synthesizer, for one) makes timings erratic. Work that measures no lag or cost needs
+   neither.
+6. **Model roles,** as [CLAUDE.md](../../../CLAUDE.md) now sets them: experimenters on
+   Claude Opus on high effort; audits and reviews by a cheaper model genuinely different
+   from the author's (Sonnet, or a Sol model in Codex); Fable and Astra only for a stated,
+   very strong reason.
 
 ## Still open for the user
 
