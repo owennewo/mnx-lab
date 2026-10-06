@@ -402,6 +402,12 @@ CLI: `npx --no -- musicxml-mnx|guitarpro-mnx --import|--export <file> [--output 
 
 ## Conventions
 
+- **Model choice.** The workhorse is **Claude Opus on high effort**: the default for
+  sessions, subagents, experimenters and auditors alike. **Claude Fable and OpenAI's
+  Astra models are expensive**; don't launch them unless there is a very strong reason,
+  and state the reason when you do. Where a rule asks for a *different* model (an oracle
+  audit, an independent review), pick a cheaper model that is genuinely different from
+  the author's, such as Sonnet or an OpenAI Sol model, never Fable or Astra by default.
 - **`.ts` extensions in imports are required** (`moduleResolution: bundler`).
 - **Decorator config**: `experimentalDecorators` + `emitDecoratorMetadata` for Lit —
   don't flip to standard decorators without testing the whole tree.
@@ -450,7 +456,8 @@ the current instance, and its documents are the reference:
 - The user may ask for a **batch** of experiments, often five, with a goal and no review
   in between; the batch stops where it needs the user, and the reviewer then assesses
   the batch as a whole.
-- Whoever launches a session states its model and tool; the records carry it.
+- Whoever launches a session states its model and tool; the records carry it. Model choice
+  follows *Conventions → Model choice* above.
 
 ## Roadmap-driven development
 

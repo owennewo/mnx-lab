@@ -45,6 +45,7 @@ proposals that name their campaign.
 
 ### proposed/
 
+- **[lab-listening-promotion.md](proposed/lab-listening-promotion.md)** — promote the Basic Pitch listener (`basic-pitch-chain@5`) on experiments 050 and 051, with the sentinel instrument and outside review decoupled on the record; then make routine listening runs take minutes (sentinels, cited comparators, reused observations, quiet host only for formal claims); then the user picks chords or real playing.
 - **[core-musicxml-accidental-fidelity.md](proposed/core-musicxml-accidental-fidelity.md)** — MusicXML campaign item 24: explicit accidental enclosure import/render, named-glyph diagnostics, direct qualifier editing and the measured Studio GP save losses from `01a`/`01e`.
 - **[core-musicxml-rest-fidelity.md](proposed/core-musicxml-rest-fidelity.md)** — MusicXML campaign item 25: preserve multimeasure rest groups, explicit rest placement, 256th–1024th values and `03d`'s noncanonical one-bar full rests; diagnose unsupported symbol-style requests.
 - **[core-musicxml-rhythm-fidelity.md](proposed/core-musicxml-rhythm-fidelity.md)** — MusicXML campaign item 26: preserve the full `03a` written-note ladder, draw long noteheads, and keep `03b`/`03f` cursor gaps invisible.
