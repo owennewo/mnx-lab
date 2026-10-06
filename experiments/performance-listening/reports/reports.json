@@ -394,6 +394,19 @@
         "href": "050-challenger-optimized-stage.html",
         "label": "Experiment 050"
       }
+    },
+    {
+      "number": "052",
+      "slug": "052-sentinel-instrument",
+      "title": "052 \u00b7 The sentinel instrument for the guitar stages",
+      "banner": "D1 \u00b7 stage-gates@3 agrees with all 30 oracle-5 cases \u00b7 14 guitar sentinels chosen from g050, provisional until the audit \u00b7 R10's rule inert on continuous guitar margins",
+      "runs": [
+        "g052-sentinel-instrument"
+      ],
+      "previous": {
+        "href": "051-challenger-heldout-confirmation.html",
+        "label": "Experiment 051"
+      }
     }
   ]
 }

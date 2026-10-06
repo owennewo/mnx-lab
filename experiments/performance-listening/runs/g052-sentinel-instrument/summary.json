@@ -1,0 +1,543 @@
+{
+  "id": "g052-sentinel-instrument",
+  "modelAndTool": "Claude Opus 5.5 (high) in Claude Code",
+  "gitCommit": "261c999ff5d9fd8c1048ddcd4923c1580420f1de",
+  "preregistrationCommit": "3121c5f4a9ea57d6576b094d4e911086d7d2a72a",
+  "sourceHashes": {
+    "bench/oracle-events/freeze-5.json": "df00e9b7fef82f45c590de5298f9b3e862b6a66b0abd6cc0f75d016cc117ca4e",
+    "bench/oracle-events/oracle-5.json": "de432ac584f04c051d3812cbbc9fd9467af2fdb5b5f1bfd62ae9800dc81842fb",
+    "bench/src/events/assessment.ts": "d8c76ce14523f2664d1c1e190f0a7a69814cd2bc7849cd383ecda1b440570ae0",
+    "bench/src/events/assessment2.ts": "d3a0b19c9fb4e18c026c88c30abb56f70e4c25f9808c010a98ae1f4f4e515a57",
+    "bench/src/events/assessment3.ts": "bfcab4f77a616b8d369e8536a58a22fda417295aa8a911717442b26216cd8bf5",
+    "bench/src/events/following.ts": "644ba7adc9b43be5ad96768fcaa2ed85e78a655e8f54a204f66a058a9b363353",
+    "bench/src/events/gates.ts": "60647d6c7caaeb399e79a91e8f886909d1a92aeb1ff45355e5a921466767b108",
+    "bench/src/events/gates2.ts": "8f506176bae2bde8af186a315c623c4a63c749cd68a4dcbf11e74d3d0ffa2aba",
+    "bench/src/events/gates3.ts": "494163af9aaec45d02f21dc38dcb9ace3da1808b6d6a1814b5540fbf893fae02",
+    "bench/src/events/label.ts": "e250c46b8068b02862cdb1f6bdf3085453f52e9e7155e3d5680b29deb8a524ca",
+    "bench/src/events/oracle.ts": "b8e0aee77377c490c719f445246412a99b4f539fcd9c213b9ae3200ba9d23b64",
+    "bench/src/events/oracle3.ts": "4829638aa660239520bc080aea77d1e5d884e2bbaff8d5ff6ad1a43cb6b9f7f0",
+    "bench/src/events/oracle4.ts": "2319cef7ee498b216b94fe111597586af09c1f8603785a547f1edf84d9f7c83c",
+    "bench/src/events/oracle5.ts": "802409761b42081f98fd0f487161101a46a4d7dba9bd7bc71d6e7f8739dcb7d5",
+    "bench/src/events/validateOracle4.ts": "a3e65fbabcf2ee15d3e8deff4dd1a234fc53b56689de07ad4fd9b363d81116b2",
+    "bench/src/stages/run052.ts": "500c07a3783b7293807ee6a0d8dce76149f2852b7eec18aa964001a37d038500",
+    "contracts/event-instruments-5.md": "5659bf274c1e2d803dfe677cb947b8f1c4128f0d0ae8cdf1e24d3c8e4fb56de8",
+    "reports/052-sentinel-instrument.md": "18b01fc160868486aa152d0cadbf3b079e1a380f746d7aef188103abaeec4786"
+  },
+  "definition": "contracts/event-instruments-5.md",
+  "instrument": "stage-gates@3",
+  "oracle": "event-oracle@5",
+  "listenerRuns": 0,
+  "lagOrCostMeasured": false,
+  "listener": "basic-pitch-chain@5-note-output",
+  "offlineListener": "basic-pitch-chain@2",
+  "status": "complete",
+  "startedAt": "2026-10-06T07:09:34.886Z",
+  "finishedAt": "2026-10-06T07:09:36.574Z",
+  "elapsedSeconds": 1.679212952,
+  "oracleValidation": {
+    "cases": 30,
+    "agree": 30,
+    "disagree": [],
+    "faults": 9,
+    "faultsDetected": 9
+  },
+  "evidence": {
+    "summary": {
+      "path": "runs/g050-challenger-optimized-stage/summary.json",
+      "sha256": "eb6b51c725a8d4671c77614c80a058f42ba7f9ce6524eea0748dc0f323f0e659"
+    },
+    "results": {
+      "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g050-challenger-optimized-stage/results.json",
+      "sha256": "9f3f30312cf73e5457d02a1f37e86e5d6137a331226469ec31f7a19b66ba363e"
+    },
+    "manifest": {
+      "path": "/home/williao/dev/mnx-listening-data/contract2-challenger-guitar-noise-v1/manifest.json",
+      "sha256": "961d5dce4a152af17da006c2f86dfdd48fee32acae74f38b9def988462b229e8"
+    }
+  },
+  "margins": {
+    "path": "/home/williao/dev/mnx-listening-data/instrument-runs/g052-sentinel-instrument/margins.json",
+    "sha256": "1bad32eef1c9a39eefa95ab5783a4ee1819367a53baaedb19696b95af26e8796"
+  },
+  "counts": {
+    "examples": 576,
+    "performances": 192,
+    "controls": 384,
+    "refused": 0,
+    "artifactsVerified": 576,
+    "limiting": {
+      "performances": {
+        "delay": 153,
+        "sustained": 37,
+        "interval": 2
+      },
+      "controls": {
+        "sustained": 384
+      }
+    },
+    "leastMargin": {
+      "performance": {
+        "id": "spanish-h-s2-45-1000",
+        "margin": 0.18634415333295268,
+        "limiting": [
+          "delay"
+        ]
+      },
+      "control": {
+        "id": "spanish-w2-h-s2-99-300",
+        "margin": 0.29008960866335975,
+        "limiting": [
+          "sustained"
+        ]
+      }
+    }
+  },
+  "selections": {
+    "guitar-stage1": {
+      "deviation": null,
+      "examples": 96,
+      "candidates": {
+        "performances": 32,
+        "controls": 64
+      },
+      "exactTies": {
+        "performances": 0,
+        "controls": 0
+      },
+      "limiting": {
+        "performances": {
+          "delay": 28,
+          "sustained": 4
+        },
+        "controls": {
+          "sustained": 64
+        }
+      },
+      "leastMargin": {
+        "performance": 0.23654998166670632,
+        "control": 0.31651823350003205
+      },
+      "performances": [
+        {
+          "id": "martin-s2-63",
+          "guitar": "martin",
+          "score": "s2",
+          "kind": "performance",
+          "margin": 0.23654998166670632,
+          "limiting": [
+            "delay"
+          ],
+          "severity": [
+            -63
+          ],
+          "tempo": 63,
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g050-challenger-optimized-stage/challenger.martin-s2-63.json",
+            "sha256": "ec7156ccd03749f6ab67951b8f012c05b5c3be80897d7316d60c351ea3f07d7b"
+          }
+        },
+        {
+          "id": "spanish-s2-63",
+          "guitar": "spanish",
+          "score": "s2",
+          "kind": "performance",
+          "margin": 0.23915929166667654,
+          "limiting": [
+            "delay"
+          ],
+          "severity": [
+            -63
+          ],
+          "tempo": 63,
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g050-challenger-optimized-stage/challenger.spanish-s2-63.json",
+            "sha256": "eb8cfc7960b5ea9249c9261943f0eaf7ab702761d6d23df978eb8d1ce3d17f04"
+          }
+        },
+        {
+          "id": "fender-s2-63",
+          "guitar": "fender",
+          "score": "s2",
+          "kind": "performance",
+          "margin": 0.23930137166675275,
+          "limiting": [
+            "delay"
+          ],
+          "severity": [
+            -63
+          ],
+          "tempo": 63,
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g050-challenger-optimized-stage/challenger.fender-s2-63.json",
+            "sha256": "2970f69dd51bf6ab8cd4899b3f743fc95d35d435052bbc0f1b67053ca9ea0a77"
+          }
+        }
+      ],
+      "controls": [
+        {
+          "id": "noise-tonejs-acoustic-s1-90",
+          "guitar": "tonejs-acoustic",
+          "score": "s1",
+          "kind": "silence",
+          "margin": 0.31651823350003205,
+          "limiting": [
+            "sustained"
+          ],
+          "severity": [
+            -90
+          ],
+          "tempo": 90,
+          "parent": "tonejs-acoustic-s1-90",
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g050-challenger-optimized-stage/challenger.noise-tonejs-acoustic-s1-90.json",
+            "sha256": "8a1783d7d3e2094a14d9713fb56c845af30b4f10be63833413db1bdd92ec466c"
+          }
+        },
+        {
+          "id": "spanish-w2-s1-63",
+          "guitar": "spanish",
+          "score": "s1",
+          "kind": "wrong-score",
+          "margin": 0.3858810159195811,
+          "limiting": [
+            "sustained"
+          ],
+          "severity": [
+            -63
+          ],
+          "tempo": 63,
+          "parent": "spanish-s1-63",
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g050-challenger-optimized-stage/challenger.spanish-w2-s1-63.json",
+            "sha256": "4255aca16b936937d60970eaca4efaa1746a90ac952908d4cc2a3085c961b4ee"
+          }
+        },
+        {
+          "id": "noise-spanish-s2-99",
+          "guitar": "spanish",
+          "score": "s2",
+          "kind": "silence",
+          "margin": 0.38505098495676027,
+          "limiting": [
+            "sustained"
+          ],
+          "severity": [
+            -99
+          ],
+          "tempo": 99,
+          "parent": "spanish-s2-99",
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g050-challenger-optimized-stage/challenger.noise-spanish-s2-99.json",
+            "sha256": "0f747e3f2a1c326385bbb13704ed14e0f4430e2dbde718fa76e92ac12ef01394"
+          }
+        },
+        {
+          "id": "spanish-w2-s2-99",
+          "guitar": "spanish",
+          "score": "s2",
+          "kind": "wrong-score",
+          "margin": 0.3503429426577447,
+          "limiting": [
+            "sustained"
+          ],
+          "severity": [
+            -99
+          ],
+          "tempo": 99,
+          "parent": "spanish-s2-99",
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g050-challenger-optimized-stage/challenger.spanish-w2-s2-99.json",
+            "sha256": "c271875bd66d5837501e4d948c04f97e25dd7932276cf1d324d71627476039e7"
+          }
+        }
+      ]
+    },
+    "guitar-silent-hesitation": {
+      "deviation": "hesitation",
+      "examples": 480,
+      "candidates": {
+        "performances": 160,
+        "controls": 320
+      },
+      "exactTies": {
+        "performances": 2,
+        "controls": 0
+      },
+      "limiting": {
+        "performances": {
+          "delay": 125,
+          "interval": 2,
+          "sustained": 33
+        },
+        "controls": {
+          "sustained": 320
+        }
+      },
+      "leastMargin": {
+        "performance": 0.18634415333295268,
+        "control": 0.29008960866335975
+      },
+      "performances": [
+        {
+          "id": "spanish-h-s2-45-1000",
+          "guitar": "spanish",
+          "score": "s2",
+          "kind": "performance",
+          "margin": 0.18634415333295268,
+          "limiting": [
+            "delay"
+          ],
+          "severity": [
+            1,
+            -45
+          ],
+          "tempo": 45,
+          "pause": 1,
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g050-challenger-optimized-stage/challenger.spanish-h-s2-45-1000.json",
+            "sha256": "c43e0c0f4d34855394fa11422fbc8ec0546b48d08ff82616220121f2984e71e7"
+          }
+        },
+        {
+          "id": "martin-h-s2-90-500",
+          "guitar": "martin",
+          "score": "s2",
+          "kind": "performance",
+          "margin": 0.20024508777180972,
+          "limiting": [
+            "sustained"
+          ],
+          "severity": [
+            0.5,
+            -90
+          ],
+          "tempo": 90,
+          "pause": 0.5,
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g050-challenger-optimized-stage/challenger.martin-h-s2-90-500.json",
+            "sha256": "5a6a7eb4b533c2d0244ae7c6d3273dd81fd5c378238302fbb7e5c1a734445864"
+          }
+        },
+        {
+          "id": "fender-h-s2-63-700",
+          "guitar": "fender",
+          "score": "s2",
+          "kind": "performance",
+          "margin": 0.22638689666676287,
+          "limiting": [
+            "delay"
+          ],
+          "severity": [
+            0.7,
+            -63
+          ],
+          "tempo": 63,
+          "pause": 0.7,
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g050-challenger-optimized-stage/challenger.fender-h-s2-63-700.json",
+            "sha256": "e8218fb64db41178122d2beb3a24b09124c9b56953f483d67ac3f59403b68220"
+          }
+        }
+      ],
+      "controls": [
+        {
+          "id": "noise-spanish-h-s1-99-300",
+          "guitar": "spanish",
+          "score": "s1",
+          "kind": "silence",
+          "margin": 0.3191042466740721,
+          "limiting": [
+            "sustained"
+          ],
+          "severity": [
+            0.3,
+            -99
+          ],
+          "tempo": 99,
+          "pause": 0.3,
+          "parent": "spanish-h-s1-99-300",
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g050-challenger-optimized-stage/challenger.noise-spanish-h-s1-99-300.json",
+            "sha256": "2c0253083fb2587f4bfb3e10adea4790da5c26d1bd9d230ee605f707712bc648"
+          }
+        },
+        {
+          "id": "spanish-w2-h-s1-99-2000",
+          "guitar": "spanish",
+          "score": "s1",
+          "kind": "wrong-score",
+          "margin": 0.3392070728381673,
+          "limiting": [
+            "sustained"
+          ],
+          "severity": [
+            2,
+            -99
+          ],
+          "tempo": 99,
+          "pause": 2,
+          "parent": "spanish-h-s1-99-2000",
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g050-challenger-optimized-stage/challenger.spanish-w2-h-s1-99-2000.json",
+            "sha256": "e692b2a144912bbed19132b6cb222b2d8a661ecd2ce3e3e78dfe63e1075fe974"
+          }
+        },
+        {
+          "id": "noise-fender-h-s2-63-1000",
+          "guitar": "fender",
+          "score": "s2",
+          "kind": "silence",
+          "margin": 0.329000962791243,
+          "limiting": [
+            "sustained"
+          ],
+          "severity": [
+            1,
+            -63
+          ],
+          "tempo": 63,
+          "pause": 1,
+          "parent": "fender-h-s2-63-1000",
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g050-challenger-optimized-stage/challenger.noise-fender-h-s2-63-1000.json",
+            "sha256": "56636f6d2a69edcd5378466819effef07d52419df786d5227d1d436062b126de"
+          }
+        },
+        {
+          "id": "spanish-w2-h-s2-99-300",
+          "guitar": "spanish",
+          "score": "s2",
+          "kind": "wrong-score",
+          "margin": 0.29008960866335975,
+          "limiting": [
+            "sustained"
+          ],
+          "severity": [
+            0.3,
+            -99
+          ],
+          "tempo": 99,
+          "pause": 0.3,
+          "parent": "spanish-h-s2-99-300",
+          "artifact": {
+            "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g050-challenger-optimized-stage/challenger.spanish-w2-h-s2-99-300.json",
+            "sha256": "5cfc1cb65f3102a94bd13005283a3964372bea30a71c3aeca99818d905e9f880"
+          }
+        }
+      ]
+    }
+  },
+  "comparisonStageGates2": {
+    "guitar-stage1": {
+      "performances": [
+        "martin-s2-63",
+        "spanish-s2-63",
+        "fender-s2-63"
+      ],
+      "controls": [
+        "noise-tonejs-acoustic-s1-90",
+        "spanish-w2-s1-63",
+        "noise-spanish-s2-99",
+        "spanish-w2-s2-99"
+      ],
+      "identical": true
+    },
+    "guitar-silent-hesitation": {
+      "performances": [
+        "spanish-h-s2-45-1000",
+        "martin-h-s2-90-500",
+        "fender-h-s2-63-700"
+      ],
+      "controls": [
+        "noise-spanish-h-s1-99-300",
+        "spanish-w2-h-s1-99-2000",
+        "noise-fender-h-s2-63-1000",
+        "spanish-w2-h-s2-99-300"
+      ],
+      "identical": true
+    }
+  },
+  "heldOut": {
+    "summary": {
+      "path": "runs/g051-challenger-heldout-confirmation/summary.json",
+      "sha256": "be8f3ae9c6e2c2a5c19d386ffda49ec5ec6f5e7a3b1ac408016f3f0c98dbfd80"
+    },
+    "results": {
+      "path": "/home/williao/dev/mnx-listening-data/diagnostic-runs/g051-challenger-heldout-confirmation/results.json",
+      "sha256": "1a093cd79ef64862a23d6a8dcb491c864fb73bfa531159149370af36d7b6b718"
+    },
+    "examples": 432,
+    "perGuitar": {
+      "shinyguitar": {
+        "performance": {
+          "id": "shinyguitar-s2-99",
+          "margin": 0.07540101499995094,
+          "limiting": [
+            "delay"
+          ]
+        },
+        "control": {
+          "id": "shinyguitar-sil-h-s2-45-500",
+          "margin": 0.3512009536710693,
+          "limiting": [
+            "sustained"
+          ]
+        }
+      },
+      "tonejs-electric": {
+        "performance": {
+          "id": "tonejs-electric-h-s1-63-2000",
+          "margin": 0.18350165500014476,
+          "limiting": [
+            "delay"
+          ]
+        },
+        "control": {
+          "id": "tonejs-electric-sil-h-s1-45-1000",
+          "margin": 0.35964849557913814,
+          "limiting": [
+            "sustained"
+          ]
+        }
+      },
+      "tonejs-nylon": {
+        "performance": {
+          "id": "tonejs-nylon-h-s2-63-700",
+          "margin": 0.23264855166659798,
+          "limiting": [
+            "delay"
+          ]
+        },
+        "control": {
+          "id": "tonejs-nylon-sil-h-s2-99-2000",
+          "margin": 0.3494073519737404,
+          "limiting": [
+            "sustained"
+          ]
+        }
+      }
+    },
+    "note": "Informational. The held-out sets are examined confirmation evidence; the contract chooses sentinels from a substage's passing evaluation (g050)."
+  },
+  "suiteRecord": {
+    "path": "bench/suite-record-guitar.json",
+    "sha256": "9a0fba809b325b3db3a106402e870aa456c68d8c9eef5d9bbbb366441df50b0a",
+    "selection": "provisional"
+  },
+  "routineRegressionIds": [
+    "fender-h-s2-63-700",
+    "fender-s2-63",
+    "martin-h-s2-90-500",
+    "martin-s2-63",
+    "noise-fender-h-s2-63-1000",
+    "noise-spanish-h-s1-99-300",
+    "noise-spanish-s2-99",
+    "noise-tonejs-acoustic-s1-90",
+    "spanish-h-s2-45-1000",
+    "spanish-s2-63",
+    "spanish-w2-h-s1-99-2000",
+    "spanish-w2-h-s2-99-300",
+    "spanish-w2-s1-63",
+    "spanish-w2-s2-99"
+  ]
+}

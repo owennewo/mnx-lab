@@ -142,3 +142,162 @@ bars 5–8 untouched; sines retired. Last full sweep 050; the next is due no lat
 055. Instrument work adds no listener version and no comparison. No other experiment
 had an owner at pickup: `main` was the only worktree, and 052 was unused in the
 reports, runs, tags and private directories.
+
+## Results
+
+**D1: the instrument agrees with its oracle, and the guitar sentinels are chosen,
+provisionally until the audit.** stage-gates@3 reproduces all 30 event-oracle@5 cases
+and catches all 9 injected faults. All 576 challenger examples of g050 verify by hash
+and receive a margin; none is refused. The run took 1.7 s of measured time (4.7 s wall),
+read no audio and ran no listener.
+
+| Check | Result |
+|---|---|
+| event-oracle@5: margin, selection, refusal cases | 12/12, 10/10, 8/8 agree |
+| Injected faults detected | 9/9, including stage-gates@2's rule failing K1 and K2, and a p99 entry kept on a guitar stage failing G3a |
+| g050 summary, results, manifest and 576 per-example artifacts | all hashes agree |
+| Examples refused | 0 of 576 |
+| Read-only verifier (`bench/src/stages/verify052.ts`) | 576 margins recomputed exactly; selection and suite record agree |
+
+### What limits each example
+
+| Pool | Event delay | Sustained cost | Interval | Other |
+|---|---:|---:|---:|---:|
+| Stage 1, 32 performances | 28 | 4 | 0 | 0 |
+| Silent hesitation, 160 performances | 125 | 33 | 2 | 0 |
+| All 384 controls | — | 384 | — | 0 |
+
+Exact margin ties: none among stage 1's performances or any control group; one pair among
+the hesitation performances, `tonejs-acoustic-h-s1-99-500` and `martin-h-s1-99-500` at
+0.407822, both limited by the same interval error (hop-quantised, as on the sines). They
+rank 126th and 127th of 160, so the tie-break decided nothing.
+
+### The sentinels
+
+| Substage | Sentinel | Kind | Margin | Limited by | Severity |
+|---|---|---|---:|---|---|
+| guitar stage 1 | `martin-s2-63` | performance | 0.236550 | delay 152.690 ms | tempo 63 |
+| | `spanish-s2-63` | performance | 0.239159 | delay 152.168 ms | tempo 63 |
+| | `fender-s2-63` | performance | 0.239301 | delay 152.140 ms | tempo 63 |
+| | `noise-tonejs-acoustic-s1-90` | s1 silence | 0.316518 | cost | tempo 90 |
+| | `spanish-w2-s1-63` | s1 wrong score | 0.385881 | cost | tempo 63 |
+| | `noise-spanish-s2-99` | s2 silence | 0.385051 | cost | tempo 99 |
+| | `spanish-w2-s2-99` | s2 wrong score | 0.350343 | cost | tempo 99 |
+| silent hesitation | `spanish-h-s2-45-1000` | performance | 0.186344 | delay 162.731 ms | pause 1 s, tempo 45 |
+| | `martin-h-s2-90-500` | performance | 0.200245 | cost 0.19994 | pause 0.5 s, tempo 90 |
+| | `fender-h-s2-63-700` | performance | 0.226387 | delay 154.723 ms | pause 0.7 s, tempo 63 |
+| | `noise-spanish-h-s1-99-300` | s1 silence | 0.319104 | cost | pause 0.3 s, tempo 99 |
+| | `spanish-w2-h-s1-99-2000` | s1 wrong score | 0.339207 | cost | pause 2 s, tempo 99 |
+| | `noise-fender-h-s2-63-1000` | s2 silence | 0.329001 | cost | pause 1 s, tempo 63 |
+| | `spanish-w2-h-s2-99-300` | s2 wrong score | 0.290090 | cost | pause 0.3 s, tempo 99 |
+
+The routine suite these make is 14 examples (`routineRegressionIds` in the summary and
+the suite record). The stage-gates@2 rule over the same margins chooses exactly the same
+14: on this evidence R10's rule changes nothing, because the guitar margins are
+continuous and the hesitation set has no clean parents in it.
+
+Coverage, reported rather than predicted: all six performance sentinels are on s2;
+Martin, Spanish and Fender have two each and `tonejs-acoustic` none; stage 1's three are
+all at tempo 63, so no half-speed example; the hesitation sentinels have pauses of 1,
+0.5 and 0.7 s, so neither the 2 s pause nor the 0.3 s one. Every performance sentinel is
+a timing margin, and every control sentinel is a cost margin.
+
+### Held-out, informational
+
+| Held-out guitar | Least performance margin | Limited by | Least control margin |
+|---|---:|---|---:|
+| `shinyguitar` | 0.075401 (`shinyguitar-s2-99`) | delay 184.92 ms | 0.351201 |
+| `tonejs-electric` | 0.183502 (`tonejs-electric-h-s1-63-2000`) | delay 163.30 ms | 0.359648 |
+| `tonejs-nylon` | 0.232649 (`tonejs-nylon-h-s2-63-700`) | delay 153.47 ms | 0.349407 |
+
+The tightest known example on any guitar is a held-out one, with less than half the
+development minimum's margin. Under the contract's rule it chooses no sentinel.
+
+### Two exploratory observations, not pre-registered
+
+Both read only the saved margins and g050's per-example records.
+
+1. **The stage-1 sentinels are one systematic event, and timing noise picks the guitar.**
+   On Martin, Spanish and Fender the latest event of every s2-at-63 performance is event 5
+   of 8, at 152.14–152.69 ms clean and 152.10–153.91 ms with a 1 s pause, while
+   `tonejs-acoustic` reaches its latest event in about 146.4 ms. So the hardest stage-1
+   case is real and repeatable (s2's sixth note at 63 bpm, on three of four guitars); which
+   of the three guitars becomes a sentinel is decided by 0.55 ms.
+2. **Control margins are dominated by host timing.** The 48 groups of four silence
+   controls that share one audio file and one handed score, one per guitar, differ only
+   in when they ran; their cost margins spread by a median of 0.089 (90th percentile
+   0.123, maximum 0.167), against a range of 0.317–0.494 across all 192 silence controls.
+   A remeasurement would very likely choose different control sentinels.
+
+## Against the predictions
+
+| # | Outcome | Evidence and limit |
+|---|---|---|
+| 1 | Held | 30/30 cases, 9/9 faults; oracle 1–4 tests unchanged and passing |
+| 2 | Held | 576/576 verified and ranked, 0 refused |
+| 3 | Contradicted, in part | 190 of 192 performances and all 384 controls are timing-limited, but two hesitation performances are limited by an interval error (margin 0.4078, far from selection) |
+| 4 | Contradicted, in part | One exact tie (the interval-limited pair, ranks 126–127); the selection equals the stage-gates@2-rule comparison in both substages, so the tie-break decided nothing |
+| 5 | Held | `spanish-h-s2-45-1000`, 0.186344, first silent-hesitation sentinel |
+| 6 | Held | Held-out least margin 0.075401 on `shinyguitar`, below 0.1863 |
+
+## Decision
+
+**D1.** Prediction 1 holds and the run wrote the margins, the summary and
+`bench/suite-record-guitar.json`, with `"selection": "provisional"`. Under the mixed
+clause: musical gates limited 2 of 576 examples and one exact tie occurred, but neither
+reached the selection; on g050, R10's rule chooses what stage-gates@2's would have.
+Question 43 now becomes the **independent audit of event-oracle@5**, by a session on a
+model other than Claude Opus, under the revised
+[AUDITING_AN_ORACLE.md](../AUDITING_AN_ORACLE.md) (every case of oracle 5 is new, so all
+30 are re-derived; unchanged inherited rules are cited by hash). Its agreement puts the
+selection in force; question 57's first routine run follows it and needs the user's
+grant of solo access.
+
+### Resulting stopping count, budgets and evidence access
+
+Unchanged from the pre-registration's carried state: stopping count 0; 5 implementation
+versions, 10 development comparisons; no listener version or comparison added. Held-out
+evidence was read only as recorded margins (no listener, no audio), and remains
+examined, sweep-only evidence. Qualification, reserved and final evidence and Winner
+bars 5–8 untouched. Next full sweep due no later than 055.
+
+## Next
+
+1. **The audit of event-oracle@5** (question 43's remainder), on Sonnet or a Sol model.
+2. **Then question 57**, the first routine run on these 14 examples, after the user's grant
+   of solo access. Expected to be well under five minutes: 14 examples, with offline
+   observations reused by hash.
+
+**For the user, two choices about the routine suite, neither needed for the audit.** The
+rule as adopted works, and it is inert on guitar: the margins are timings, and the
+sentinels it picks are the tightest timing cases, which is the right thing for a lag- and
+cost-limited listener to re-test. But it leaves gaps a routine run will not see:
+
+- **Per-guitar coverage.** No `tonejs-acoustic` performance and no s1 performance is a
+  sentinel, and the guitar chosen among the three tied-by-structure examples is decided
+  by sub-millisecond noise. *Recommended:* one performance sentinel per development
+  guitar per substage (the least-margin one), in place of three overall: 8 performance
+  sentinels instead of 6, controls unchanged, about 16 examples a routine run. This
+  tightens the rule but changes one the user adopted, so it is theirs to decide, and it
+  would be stage-gates@4 with its own cases.
+- **The held-out tightest case.** `shinyguitar-s2-99`, at 185 ms, is the closest any
+  example has come to the 200 ms deadline, and as sweep-only evidence a routine run will
+  not repeat it. Admitting the examined held-out sets' least-margin examples as sentinels
+  would keep it under watch. The contract chooses sentinels from a substage's passing
+  evaluation, so this too is the user's call.
+
+R18 judged a numbered experiment plus audit heavier than sentinel selection needs. This
+run supports that for the selection itself (seconds of bookkeeping, no tie decided by the
+new rule); the audit is still owed under the second amendment as written.
+
+**Direction of travel.** The margin, pool and severity code is score- and sound-agnostic
+and should survive chords, microphones and longer scores; each new deviation needs a
+severity row before its substage can choose sentinels. What will not survive is the
+assumption that margins rank musical difficulty: on guitar they rank host timing, so on a
+target device (stage 4) the sentinels will be re-chosen there and may differ.
+
+## Attribution
+
+Pre-registration, event instruments 5, event-oracle@5, stage-gates@3, the run, the
+verifier and this record by **Claude Opus 5.5 (high) in Claude Code**. One run, no
+repeat; no listener executed; no lag or cost measured.
