@@ -1,6 +1,6 @@
 # Promote the Basic Pitch listener, then make the listening loop fast
 
-**Status: in progress from 2026-10-06; adopted by the user** ("can you implement this plan but stop before a time/compute sensitive section and request solo access"), recorded in [the contract's third amendment](../../experiments/performance-listening/contracts/development-contract-2.md#amendment-2026-10-06-promotion-and-a-fast-loop). Step 1 is done; step 3's 052 pre-registration has landed; the first routine run waits for the user's grant of solo access. Originally **proposed 2026-10-06**. Written at the user's request
+**Status: in progress from 2026-10-06; adopted by the user** ("can you implement this plan but stop before a time/compute sensitive section and request solo access"), recorded in [the contract's third amendment](../../experiments/performance-listening/contracts/development-contract-2.md#amendment-2026-10-06-promotion-and-a-fast-loop). Step 1 is done; step 3's experiment 052 has landed (D1: stage-gates@3 and 14 guitar sentinels, provisional until the oracle-5 audit); the first routine run waits for the user's grant of solo access. Originally **proposed 2026-10-06**. Written at the user's request
 by Claude Opus 5.5 in Claude Code, the parent session of the listening batches 037–051.
 The adopted terms live in
 [development contract 2](../../experiments/performance-listening/contracts/development-contract-2.md),
@@ -125,8 +125,9 @@ is not applied retroactively.
 
 The user adopted promotion and the speed rules on 2026-10-06. One decision remains:
 which direction comes next, chords or real playing (step 6), including the target device
-and timing path before stage-4 gates are set. Experiment 052 has begun under the current
-sentinel-instrument contract and keeps its own frozen decision rules.
+and timing path before stage-4 gates are set. Experiment 052 landed D1 and adds a
+second: whether the routine suite covers each guitar and the held-out 185 ms case
+([research log question 60](../../experiments/performance-listening/RESEARCH_LOG.md#open-questions)).
 
 Nothing in this plan changes a gate, a pre-registration, a recorded verdict or frozen
 evidence.

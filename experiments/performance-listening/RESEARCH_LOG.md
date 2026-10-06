@@ -67,16 +67,22 @@ applied retroactively. R18 recommends settling the target device and
 microphone/driver/browser timing path before treating the 15 ms held-out margin as usable
 Studio headroom.
 
-**Next, in order.** Question 43, the sentinel instrument (052), is in progress and
-measures no lag or cost:
-an experimenter on Claude Opus on high effort writes the stage-gates version and its hand
-cases and chooses the guitar substages' sentinels from 050/051's recorded margins,
-writing the guitar suite record; a session on a different, cheaper model audits it.
-Question 55, the outside process review, is answered by R18. Then
-**question 57, the first routine run on the sentinels, judges lag and cost: the parent
-stops before it and asks the user for solo access to the host.** Question 58, the next
-direction (chords or real playing), is the user's. Parent: Claude Opus 5.5 in Claude
-Code.
+**052 landed D1** ([report](reports/052-sentinel-instrument.md)): stage-gates@3 implements
+R10's sentinel rule and a guitar margin with no chunk-p99 entry, agrees with all 30 cases
+of the new event-oracle@5, and chose 14 guitar sentinels from 050's records into
+[the guitar suite record](bench/suite-record-guitar.json), **provisional until the
+oracle's audit**. On guitar the margins are timings, so the new tie-break decided nothing
+and the selection equals the old rule's; the stage-1 sentinels are one systematic late
+event (s2 at 63 bpm), but which guitar carries it, and every control sentinel, is decided
+by host timing noise.
+
+**Next, in order.** Question 59, the audit of event-oracle@5, by a session on a model
+other than Claude Opus (Sonnet or a Sol model), runs no listener. Then **question 57, the
+first routine run on the 14 sentinels, judges lag and cost: the parent stops before it
+and asks the user for solo access to the host.** Two choices are the user's: question
+60, the routine suite's coverage (one sentinel per guitar; the held-out 185 ms case),
+best settled before 57, and question 58, the next direction. Parent: Claude Opus 5.5 in
+Claude Code.
 
 <a id="current-batch-one-formal-claim-of-5-then-held-out-050051"></a>
 
@@ -743,6 +749,7 @@ Status is `holds`, `superseded` or `withdrawn`.
 | 43 | Complete current-cadence development inputs provide no consecutive full-window memo hits or overlapping prior requests on the same native CQT stride phase | [049](reports/049-challenger-dsp-cache.md#results), [g049](runs/g049-challenger-dsp-cache/summary.json) | holds | 049 | Necessary eligibility for two ordinary cache methods only; no new native cache, broader impossibility, speed or formal stage claim |
 | 44 | The retained @5 passes the fresh formal development-guitar stage-1 and silent-hesitation claim, both outputs and every control on all four guitars, while the incumbent fails each corresponding substage | [050](reports/050-challenger-optimized-stage.md#results), [g050](runs/g050-challenger-optimized-stage/summary.json) | holds | 050 | One valid quiet-host short monophonic development sweep; no historical stall attribution, held-out transfer or promotion |
 | 45 | The unchanged @5 passes the one-shot held-out stage-1 and silent-hesitation confirmation on every approved guitar, both outputs and controls, with the incumbent failing each corresponding substage | [051](reports/051-challenger-heldout-confirmation.md#results), [g051](runs/g051-challenger-heldout-confirmation/summary.json) | holds | 051 | Three sample sets/two origins, short monophonic schedules on one valid quiet host; no tuning, historical stall attribution, microphone or promotion claim |
+| 46 | On 050's guitar evidence, stage-gates@3's margin is limited by event delay or sustained cost on 574 of 576 examples (interval on 2), with one exact tie far from selection; R10's rule therefore chooses the same 14 sentinels as stage-gates@2's rule. The stage-1 sentinels share one systematic late event (s2's sixth note at 63 bpm, 152.1–152.7 ms on three guitars), while the guitar that carries it and every control sentinel are decided by host timing | [052](reports/052-sentinel-instrument.md#results), [g052](runs/g052-sentinel-instrument/summary.json) | holds | 052 | Selection provisional until the oracle-5 audit (question 59). The systematic-event and control-noise readings are exploratory, from saved records only |
 
 ## Open questions
 
@@ -752,10 +759,12 @@ one track again, with `basic-pitch-chain@5` as its incumbent.
 
 | Rank | Question | Why it is ranked here | Status | Owner item |
 |---|---|---|---|---|
-| 43 | Does a new stage-gates version implement R10's sentinel rule (deviation examples only; ties by severity in the direction of difficulty before name), with hand-worked cases and an independent audit, before the post-promotion sentinel selection is first used? | Adopted by the user on 2026-10-05; needed for the first post-promotion routine suite | in progress: 052 pre-registration `3121c5f4` landed after R18's pickup; 052 and its audit are outside that review | [Second amendment](contracts/development-contract-2.md#amendment-2026-10-05-host-stalls-guitar-sweeps-sentinels-and-the-outside-review), [R10](reviews.md#r10-after-the-resumed-batch-g031b-and-032034-with-the-direction-review), [R18](reviews.md#r18-after-050051-and-promotion) |
+| 59 | Does an independent session rederive event-oracle@5 (stage-gates@3: guitar margins without a chunk-p99 entry, the deviation-only pool, severity before name, the refusals) from [event instruments 5](contracts/event-instruments-5.md) alone, and agree on all 30 cases? | The audit rule: the guitar sentinels stay provisional, and no run uses them, until it agrees. Every case in oracle 5 is new; inherited rules are cited by hash under the revised audit brief | open: next; a model other than Claude Opus; runs no listener | [052](reports/052-sentinel-instrument.md), [oracle 5](bench/oracle-events/README.md) |
 | 55 | Does a model that has never worked in this loop independently review 050–051 promotion evidence and the auditing regime before the user decides? | The batch is complete and the second amendment requires an outside review; the experimenter cannot supply it | answered: R18 holds the narrow promotion evidence and relaxes repeated inherited-rule audit work; promotion had already been decoupled by the third amendment | [R18](reviews.md#r18-after-050051-and-promotion) |
-| 57 | Does the incumbent pass its first routine run on the new guitar sentinels (every passed guitar substage's sentinels and controls), within the five-minute target and the unchanged gates? | Proves the fast loop of the third amendment; it judges lag and cost, so it needs a quiet host and the user's grant of solo access first | open, after 052 and its audit; **needs solo access** | [Third amendment](contracts/development-contract-2.md#amendment-2026-10-06-promotion-and-a-fast-loop) |
+| 57 | Does the incumbent pass its first routine run on the new guitar sentinels (every passed guitar substage's sentinels and controls), within the five-minute target and the unchanged gates? | Proves the fast loop of the third amendment; it judges lag and cost, so it needs a quiet host and the user's grant of solo access first | open, after the oracle-5 audit (59), and after the user's word on 60 if they change the suite; **needs solo access** | [Third amendment](contracts/development-contract-2.md#amendment-2026-10-06-promotion-and-a-fast-loop) |
 | 58 | Which direction next: chords (stage 3, Winner bars 1–4, needing polyphonic ghost rejection in place of strongest-pitch masking) or real playing (stage 4, microphone recordings, with gates proposed from evidence and lag measured on a target device)? | The user's choice; both run on the fast loop | open: the user's | [Plan, step 6](../../roadmap/inprogress/lab-listening-promotion.md#6-the-next-direction-the-user-chooses) |
+| 60 | Should the routine guitar suite cover each development guitar (one performance sentinel per guitar per substage, about 16 examples instead of 14), and keep the held-out tightest case (`shinyguitar-s2-99`, 185 ms) under watch? | 052: no `tonejs-acoustic` or s1 performance is a sentinel, the guitar carrying the systematic s2-at-63 event is chosen by 0.55 ms, and the closest case to the deadline is sweep-only. Either change alters a rule the user adopted | open: the user's; best decided before 57, since a change needs stage-gates@4 and its audit | [052 next](reports/052-sentinel-instrument.md#next) |
+| 43 | Does a new stage-gates version implement R10's sentinel rule (deviation examples only; ties by severity in the direction of difficulty before name), with hand-worked cases and an independent audit, before the post-promotion sentinel selection is first used? | Adopted by the user on 2026-10-05; needed for the first post-promotion routine suite | answered D1 by 052: stage-gates@3 agrees with event-oracle@5 (30/30); 14 sentinels chosen, provisional; the audit is question 59 | [Second amendment](contracts/development-contract-2.md#amendment-2026-10-05-host-stalls-guitar-sweeps-sentinels-and-the-outside-review), [R10](reviews.md#r10-after-the-resumed-batch-g031b-and-032034-with-the-direction-review), [R18](reviews.md#r18-after-050051-and-promotion), [052](reports/052-sentinel-instrument.md) |
 | 56 | After the sentinel instrument/audit and outside review, does the user promote the confirmed challenger? | Conditions (a)–(c) hold, but promotion belongs to the user | answered by the user (2026-10-06): promoted on 050/051; sentinel instrument and outside review decoupled ([third amendment](contracts/development-contract-2.md#amendment-2026-10-06-promotion-and-a-fast-loop)) | [051](reports/051-challenger-heldout-confirmation.md#next) |
 | 32 | Does the challenger, fixed in a pre-registration before rendering, pass the same schedules and controls rendered from the three held-out guitar sets (`tonejs-nylon`, `tonejs-electric`, `shinyguitar`; two independent origins), every guitar on both outputs, in one run? | Condition (c), the last before the user promotes; one shot, and a failure turns the held-out sets into development evidence | answered D1 by 051; one-shot spent, (c) holds; no promotion | [Amendment](contracts/development-contract-2.md#amendment-2026-10-04-sampled-guitar-replaces-the-sines-and-the-promotion-rule) |
 | 54 | Does `basic-pitch-chain@5-note-output` pass the formal guitar stage-1 and silent-hesitation claim, both outputs and every control on all four development guitars under unchanged gates, measured once on a quiet host as the second amendment defines it, with the incumbent on every example and the frozen baselines on stage 1's clean examples? | Promotion condition (a), with the retained allocation reductions; the user's direction of 2026-10-05 | answered D1 by 050; both outputs/controls pass, (a)/(b) hold | [050](reports/050-challenger-optimized-stage.md) |
