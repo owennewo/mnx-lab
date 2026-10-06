@@ -8,6 +8,7 @@ before any listener is judged by it.
 
 | Version | File | Freeze | Instruments | Audit |
 |---|---|---|---|---|
+| event-oracle@5 | [oracle-5.json](oracle-5.json), 12 margin, 10 selection and 8 refusal cases | [freeze-5.json](freeze-5.json) | [event instruments 5](../../contracts/event-instruments-5.md), stage-gates@3: guitar margins and R10's sentinel rule | pending: an independent session on a different model; the guitar sentinels it governs stay provisional until it agrees |
 | observation-seam@5 | [observation-seam-5.json](observation-seam-5.json), 5 new cases plus inherited samples | [freeze-observation-seam-5.json](freeze-observation-seam-5.json) | [observation seam 5](../../contracts/observation-seam-5.md), finish observability and safe lengths | [audit-observation-seam-5.md](audit-observation-seam-5.md): 95 cases, 95 agree, 0 disagree, 0 ambiguous; scalar gaps closed; separate native timer-attribution resolution remains question 39 |
 | observation-seam@4 | [observation-seam-4.json](observation-seam-4.json), 51 cases plus inherited samples | [freeze-observation-seam-4.json](freeze-observation-seam-4.json) | [observation seam 4](../../contracts/observation-seam-4.md), physical representation and complete state fixtures | [audit-observation-seam-4.md](audit-observation-seam-4.md): 90 cases, 90 agree, 0 disagree, 0 ambiguous; uncovered scalar rules and separate native adoption review go to question 38 before formal cursor judgment |
 | observation-seam@3 | [observation-seam-3.json](observation-seam-3.json), 28 new cases plus inherited cases | [freeze-observation-seam-3.json](freeze-observation-seam-3.json) | [observation seam 3](../../contracts/observation-seam-3.md), streaming lifecycle and explicit cost accounting | [audit-observation-seam-3.md](audit-observation-seam-3.md): 66 cases, 57 agree, 1 disagree, 8 ambiguous; remaining representation/lifecycle/scheduling/normalization and coverage findings go to question 36 before native cursor judgment |
@@ -17,6 +18,20 @@ before any listener is judged by it.
 | event-oracle@3 | `oracle-3.json` | `freeze-3.json` | [event instruments 3](../../contracts/event-instruments-3.md) | [audit-3.md](audit-3.md): 34 cases, 32 agree, 1 disagree (B1's bar 0 reference and ratio: 30 and 1, not 60 and 0.5, as the freeze recorded), 1 ambiguous (B11's decimal onsets read literally give `none` and clean; as the intended rationals, `either` and unclean); report-level bar measures, the null reference and several suite states uncovered. A corrected version is required before any listener is judged |
 | event-oracle@2 | `oracle-2.json` | `freeze-2.json` | [event instruments 2](../../contracts/event-instruments-2.md) | [audit-2.md](audit-2.md): 63 agree, 0 disagree, 3 ambiguous (F9's `indeterminate` figure; no gate affected), settled by the [clarification](../../contracts/event-instruments-2.md#clarification-2026-09-30) |
 | event-oracle@1 | `oracle.json` | `freeze.json` | [event instruments 1](../../contracts/event-instruments-1.md) | none; written before the audit rule |
+
+## Event oracle, version 5
+
+Frozen and landed with [experiment 052](../../reports/052-sentinel-instrument.md)'s
+pre-registration, before any implementation and before any margin was read from
+recorded evidence, by **Claude Opus 5.5 (high) in Claude Code**. It covers stage-gates@3
+only: the guitar margin (no chunk-p99 entry; event delays as the compute-inclusive
+record gives them), the deviation-only candidate pool, the severity tie-break (slower,
+longer pause, more extreme bar factor) before the name, and the refusals. Inputs are
+synthetic and every expected answer is a literal hand number with its arithmetic in the
+case. Margin cases (`G*`) give gate measurements; selection cases (`K*`) and refusals
+(`Z*`) give margins directly, so their ties are exact. Suite states, retirement and run
+plans are unchanged and stay covered by version 4. An independent session must
+rederive these cases before the selection they govern comes into force.
 
 ## Event oracle, version 4
 

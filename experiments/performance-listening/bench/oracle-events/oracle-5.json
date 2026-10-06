@@ -1,0 +1,1682 @@
+{
+ "format": "event-oracle@5",
+ "author": "Claude Opus 5.5 (high) in Claude Code",
+ "definition": "contracts/event-instruments-5.md",
+ "implements": "stage-gates@3",
+ "tolerance": 1e-12,
+ "note": "Synthetic inputs, hand-worked from the rules alone; no listener output was consulted. Margins in selection cases are given; margin cases give gate measurements. Fractions are of answerable (supported answerable for onEvent/ahead) time. null delay = unreached event; null overallError = no expected overall tempo.",
+ "marginCases": [
+  {
+   "id": "G1-delay",
+   "clock": "compute-inclusive",
+   "supported": true,
+   "onEvent": 1,
+   "ahead": 0,
+   "exposure": 0,
+   "longest": 0,
+   "delays": [
+    0.11,
+    0.16
+   ],
+   "overallError": 0.01,
+   "intervals": [
+    {
+     "expectedSeconds": 1.2,
+     "errorSeconds": -0.03
+    }
+   ],
+   "sustained": 0.15,
+   "gates": true,
+   "causality": [
+    true,
+    true
+   ],
+   "arithmetic": "exposure (.05-0)/.05=1; episode (.5-0)/.5=1; cost (.25-.15)/.25=.4; onEvent (1-.95)/.05=1; ahead (.01-0)/.01=1; delays (.2-.11)/.2=.45 and (.2-.16)/.2=.2; overall (.05-.01)/.05=.8; interval tolerance max(.1*1.2,.03)=.12, (.12-.03)/.12=.75. Minimum .2, the second event's delay.",
+   "expected": 0.2
+  },
+  {
+   "id": "G2-cost",
+   "clock": "compute-inclusive",
+   "supported": true,
+   "onEvent": 0.99,
+   "ahead": 0,
+   "exposure": 0,
+   "longest": 0,
+   "delays": [
+    0.12,
+    0.15
+   ],
+   "overallError": 0,
+   "intervals": [
+    {
+     "expectedSeconds": 0.6,
+     "errorSeconds": 0.02
+    }
+   ],
+   "sustained": 0.21,
+   "gates": true,
+   "causality": [
+    true,
+    true
+   ],
+   "arithmetic": "onEvent (.99-.95)/.05=.8; ahead 1; exposure 1; episode 1; delays (.2-.12)/.2=.4, (.2-.15)/.2=.25; overall (.05-0)/.05=1; interval tolerance max(.06,.03)=.06, (.06-.02)/.06=2/3; cost (.25-.21)/.25=.16. Minimum .16, the cost.",
+   "expected": 0.16
+  },
+  {
+   "id": "G3a-p99-absent",
+   "clock": "compute-inclusive",
+   "supported": true,
+   "onEvent": 1,
+   "ahead": 0,
+   "exposure": 0,
+   "longest": 0,
+   "delays": [
+    0.11,
+    0.16
+   ],
+   "overallError": 0.01,
+   "intervals": [
+    {
+     "expectedSeconds": 1.2,
+     "errorSeconds": -0.03
+    }
+   ],
+   "sustained": 0.15,
+   "gates": true,
+   "causality": [
+    true,
+    true
+   ],
+   "p99": 9.9,
+   "arithmetic": "G1's inputs with a chunk p99 of 9.9 ms supplied. A guitar stage has no p99 entry, so the value is not read: minimum stays .2 as in G1.",
+   "expected": 0.2
+  },
+  {
+   "id": "G3b-p99-present",
+   "clock": "chunk-p99",
+   "supported": true,
+   "onEvent": 1,
+   "ahead": 0,
+   "exposure": 0,
+   "longest": 0,
+   "delays": [
+    0.11,
+    0.16
+   ],
+   "overallError": 0.01,
+   "intervals": [
+    {
+     "expectedSeconds": 1.2,
+     "errorSeconds": -0.03
+    }
+   ],
+   "sustained": 0.15,
+   "gates": true,
+   "causality": [
+    true,
+    true
+   ],
+   "p99": 9.9,
+   "clockNote": "stage-gates@2 behaviour, unchanged",
+   "arithmetic": "The same inputs on a chunk-p99 (sine) stage: the p99 entry (10-9.9)/10=.01 joins G1's entries and is the minimum: .01.",
+   "expected": 0.01
+  },
+  {
+   "id": "G4-control-cost",
+   "clock": "compute-inclusive",
+   "supported": false,
+   "rejection": 1,
+   "exposure": 0,
+   "longest": 0,
+   "sustained": 0.14,
+   "gates": true,
+   "causality": [
+    true
+   ],
+   "arithmetic": "Control: rejection (1-.95)/.05=1; exposure 1; episode 1; cost (.25-.14)/.25=.44. Minimum .44.",
+   "expected": 0.44
+  },
+  {
+   "id": "G5-control-rejection",
+   "clock": "compute-inclusive",
+   "supported": false,
+   "rejection": 0.97,
+   "exposure": 0.01,
+   "longest": 0.1,
+   "sustained": 0.05,
+   "gates": true,
+   "causality": [
+    true
+   ],
+   "arithmetic": "Control: rejection (.97-.95)/.05=.4; exposure (.05-.01)/.05=.8; episode (.5-.1)/.5=.8; cost (.25-.05)/.25=.8. Minimum .4.",
+   "expected": 0.4
+  },
+  {
+   "id": "G6-episode",
+   "clock": "compute-inclusive",
+   "supported": true,
+   "onEvent": 0.98,
+   "ahead": 0.002,
+   "exposure": 0.02,
+   "longest": 0.45,
+   "delays": [
+    0.05
+   ],
+   "overallError": null,
+   "intervals": [],
+   "sustained": 0.1,
+   "gates": true,
+   "causality": [
+    true,
+    true
+   ],
+   "arithmetic": "onEvent (.98-.95)/.05=.6; ahead (.01-.002)/.01=.8; exposure (.05-.02)/.05=.6; episode (.5-.45)/.5=.1; delay (.2-.05)/.2=.75; no expected overall tempo, so no overall entry; no intervals; cost (.25-.1)/.25=.6. Minimum .1, the episode.",
+   "expected": 0.1
+  },
+  {
+   "id": "G7-unreached",
+   "clock": "compute-inclusive",
+   "supported": true,
+   "onEvent": 1,
+   "ahead": 0,
+   "exposure": 0,
+   "longest": 0,
+   "delays": [
+    0.05,
+    null
+   ],
+   "overallError": 0,
+   "intervals": [],
+   "sustained": 0.1,
+   "gates": true,
+   "causality": [
+    true,
+    true
+   ],
+   "arithmetic": "delays (.2-.05)/.2=.75 and an unreached event, which contributes 0. Minimum 0.",
+   "expected": 0
+  },
+  {
+   "id": "G8-failed-gate",
+   "clock": "compute-inclusive",
+   "supported": true,
+   "onEvent": 1,
+   "ahead": 0,
+   "exposure": 0,
+   "longest": 0,
+   "delays": [
+    0.11,
+    0.16
+   ],
+   "overallError": 0.01,
+   "intervals": [
+    {
+     "expectedSeconds": 1.2,
+     "errorSeconds": -0.03
+    }
+   ],
+   "sustained": 0.15,
+   "gates": false,
+   "causality": [
+    true,
+    true
+   ],
+   "arithmetic": "A failed binary gate refuses the example; it is not ranked.",
+   "reject": true
+  },
+  {
+   "id": "G9-failed-prefix",
+   "clock": "compute-inclusive",
+   "supported": true,
+   "onEvent": 1,
+   "ahead": 0,
+   "exposure": 0,
+   "longest": 0,
+   "delays": [
+    0.11,
+    0.16
+   ],
+   "overallError": 0.01,
+   "intervals": [
+    {
+     "expectedSeconds": 1.2,
+     "errorSeconds": -0.03
+    }
+   ],
+   "sustained": 0.15,
+   "gates": true,
+   "causality": [
+    true,
+    false
+   ],
+   "arithmetic": "One failed prefix check refuses the example.",
+   "reject": true
+  },
+  {
+   "id": "G10-no-prefix",
+   "clock": "compute-inclusive",
+   "supported": true,
+   "onEvent": 1,
+   "ahead": 0,
+   "exposure": 0,
+   "longest": 0,
+   "delays": [
+    0.11,
+    0.16
+   ],
+   "overallError": 0.01,
+   "intervals": [
+    {
+     "expectedSeconds": 1.2,
+     "errorSeconds": -0.03
+    }
+   ],
+   "sustained": 0.15,
+   "gates": true,
+   "causality": [],
+   "arithmetic": "No prefix check at all refuses the example.",
+   "reject": true
+  },
+  {
+   "id": "G11-late-event",
+   "clock": "compute-inclusive",
+   "supported": true,
+   "onEvent": 1,
+   "ahead": 0,
+   "exposure": 0,
+   "longest": 0,
+   "delays": [
+    0.11,
+    0.21
+   ],
+   "overallError": 0.01,
+   "intervals": [
+    {
+     "expectedSeconds": 1.2,
+     "errorSeconds": -0.03
+    }
+   ],
+   "sustained": 0.15,
+   "gates": true,
+   "causality": [
+    true,
+    true
+   ],
+   "arithmetic": "An event at .21 s gives (.2-.21)/.2=-.05, below zero by more than 1e-12: a failed gate, refused.",
+   "reject": true
+  }
+ ],
+ "selectionCases": [
+  {
+   "id": "K1-deviation-only",
+   "substage": {
+    "id": "silent-hesitation",
+    "deviation": "hesitation"
+   },
+   "performances": [
+    {
+     "id": "p-s2-45",
+     "score": "s2",
+     "deviation": null,
+     "tempo": 45,
+     "margin": 0.05
+    },
+    {
+     "id": "h-a",
+     "score": "s2",
+     "deviation": "hesitation",
+     "tempo": 90,
+     "margin": 0.3,
+     "pause": 0.3
+    },
+    {
+     "id": "h-b",
+     "score": "s2",
+     "deviation": "hesitation",
+     "tempo": 45,
+     "margin": 0.2,
+     "pause": 2
+    },
+    {
+     "id": "h-c",
+     "score": "s2",
+     "deviation": "hesitation",
+     "tempo": 63,
+     "margin": 0.25,
+     "pause": 0.5
+    },
+    {
+     "id": "h-d",
+     "score": "s2",
+     "deviation": "hesitation",
+     "tempo": 99,
+     "margin": 0.4,
+     "pause": 1
+    }
+   ],
+   "controls": [
+    {
+     "id": "sil-p",
+     "parent": "p-s2-45",
+     "kind": "silence",
+     "handedScore": "s2",
+     "margin": 0.01
+    },
+    {
+     "id": "w2-p",
+     "parent": "p-s2-45",
+     "kind": "wrong-score",
+     "handedScore": "w2",
+     "margin": 0.01
+    },
+    {
+     "id": "sil-h-a",
+     "parent": "h-a",
+     "kind": "silence",
+     "handedScore": "s2",
+     "margin": 0.5
+    },
+    {
+     "id": "w2-h-a",
+     "parent": "h-a",
+     "kind": "wrong-score",
+     "handedScore": "w2",
+     "margin": 0.7
+    },
+    {
+     "id": "sil-h-b",
+     "parent": "h-b",
+     "kind": "silence",
+     "handedScore": "s2",
+     "margin": 0.6
+    },
+    {
+     "id": "w2-h-b",
+     "parent": "h-b",
+     "kind": "wrong-score",
+     "handedScore": "w2",
+     "margin": 0.3
+    },
+    {
+     "id": "sil-h-c",
+     "parent": "h-c",
+     "kind": "silence",
+     "handedScore": "s2",
+     "margin": 0.9
+    },
+    {
+     "id": "w2-h-c",
+     "parent": "h-c",
+     "kind": "wrong-score",
+     "handedScore": "w2",
+     "margin": 0.9
+    },
+    {
+     "id": "sil-h-d",
+     "parent": "h-d",
+     "kind": "silence",
+     "handedScore": "s2",
+     "margin": 0.1
+    },
+    {
+     "id": "w2-h-d",
+     "parent": "h-d",
+     "kind": "wrong-score",
+     "handedScore": "w2",
+     "margin": 0.2
+    }
+   ],
+   "expected": {
+    "performances": [
+     "h-b",
+     "h-c",
+     "h-a"
+    ],
+    "controls": [
+     "sil-h-d",
+     "w2-h-d"
+    ]
+   },
+   "arithmetic": "The clean parent p-s2-45 (margin .05) and its controls (.01) are not candidates of a deviation substage. Hesitations by margin: h-b .2, h-c .25, h-a .3, h-d .4; first three h-b, h-c, h-a. Score s2 only. Silence candidates: sil-h-d .1 < sil-h-a .5 < sil-h-b .6 < sil-h-c .9: sil-h-d. Wrong-score: w2-h-d .2 < w2-h-b .3 < w2-h-a .7 < w2-h-c .9: w2-h-d."
+  },
+  {
+   "id": "K2-pause-then-tempo",
+   "substage": {
+    "id": "silent-hesitation",
+    "deviation": "hesitation"
+   },
+   "performances": [
+    {
+     "id": "h-s1-90-300",
+     "score": "s1",
+     "deviation": "hesitation",
+     "tempo": 90,
+     "margin": 0.25,
+     "pause": 0.3
+    },
+    {
+     "id": "h-s1-45-300",
+     "score": "s1",
+     "deviation": "hesitation",
+     "tempo": 45,
+     "margin": 0.25,
+     "pause": 0.3
+    },
+    {
+     "id": "h-s1-90-2000",
+     "score": "s1",
+     "deviation": "hesitation",
+     "tempo": 90,
+     "margin": 0.25,
+     "pause": 2
+    },
+    {
+     "id": "h-s1-45-2000",
+     "score": "s1",
+     "deviation": "hesitation",
+     "tempo": 45,
+     "margin": 0.25,
+     "pause": 2
+    },
+    {
+     "id": "h-s1-63-700",
+     "score": "s1",
+     "deviation": "hesitation",
+     "tempo": 63,
+     "margin": 0.25,
+     "pause": 0.7
+    }
+   ],
+   "controls": [
+    {
+     "id": "sil-h-s1-90-300",
+     "parent": "h-s1-90-300",
+     "kind": "silence",
+     "handedScore": "s1",
+     "margin": 0.5
+    },
+    {
+     "id": "sil-h-s1-45-300",
+     "parent": "h-s1-45-300",
+     "kind": "silence",
+     "handedScore": "s1",
+     "margin": 0.5
+    },
+    {
+     "id": "sil-h-s1-90-2000",
+     "parent": "h-s1-90-2000",
+     "kind": "silence",
+     "handedScore": "s1",
+     "margin": 0.5
+    },
+    {
+     "id": "sil-h-s1-45-2000",
+     "parent": "h-s1-45-2000",
+     "kind": "silence",
+     "handedScore": "s1",
+     "margin": 0.5
+    },
+    {
+     "id": "sil-h-s1-63-700",
+     "parent": "h-s1-63-700",
+     "kind": "silence",
+     "handedScore": "s1",
+     "margin": 0.5
+    },
+    {
+     "id": "w2-h-s1-90-300",
+     "parent": "h-s1-90-300",
+     "kind": "wrong-score",
+     "handedScore": "w2",
+     "margin": 0.4
+    },
+    {
+     "id": "w2-h-s1-45-300",
+     "parent": "h-s1-45-300",
+     "kind": "wrong-score",
+     "handedScore": "w2",
+     "margin": 0.5
+    },
+    {
+     "id": "w2-h-s1-90-2000",
+     "parent": "h-s1-90-2000",
+     "kind": "wrong-score",
+     "handedScore": "w2",
+     "margin": 0.5
+    },
+    {
+     "id": "w2-h-s1-45-2000",
+     "parent": "h-s1-45-2000",
+     "kind": "wrong-score",
+     "handedScore": "w2",
+     "margin": 0.5
+    },
+    {
+     "id": "w2-h-s1-63-700",
+     "parent": "h-s1-63-700",
+     "kind": "wrong-score",
+     "handedScore": "w2",
+     "margin": 0.5
+    }
+   ],
+   "expected": {
+    "performances": [
+     "h-s1-45-2000",
+     "h-s1-90-2000",
+     "h-s1-63-700"
+    ],
+    "controls": [
+     "sil-h-s1-45-2000",
+     "w2-h-s1-90-300"
+    ]
+   },
+   "arithmetic": "All five performances tie at .25. Severities (pause, -tempo): h-s1-45-2000 (2,-45), h-s1-90-2000 (2,-90), h-s1-63-700 (.7,-63), h-s1-45-300 (.3,-45), h-s1-90-300 (.3,-90); descending gives the first three as listed. (Under stage-gates@2's name tie-break the first three would be h-s1-45-2000, h-s1-45-300, h-s1-63-700.) Silence controls all tie at .5: the parent with the greatest severity is h-s1-45-2000, so sil-h-s1-45-2000. Wrong-score: w2-h-s1-90-300 has the least margin .4, which beats the severity of every other parent: w2-h-s1-90-300."
+  },
+  {
+   "id": "K3-base-tempo",
+   "substage": {
+    "id": "stage1",
+    "deviation": null
+   },
+   "performances": [
+    {
+     "id": "s1-99",
+     "score": "s1",
+     "deviation": null,
+     "tempo": 99,
+     "margin": 0.3
+    },
+    {
+     "id": "s1-45",
+     "score": "s1",
+     "deviation": null,
+     "tempo": 45,
+     "margin": 0.3
+    },
+    {
+     "id": "s1-63",
+     "score": "s1",
+     "deviation": null,
+     "tempo": 63,
+     "margin": 0.3
+    },
+    {
+     "id": "s1-90",
+     "score": "s1",
+     "deviation": null,
+     "tempo": 90,
+     "margin": 0.3
+    },
+    {
+     "id": "s2-99",
+     "score": "s2",
+     "deviation": null,
+     "tempo": 99,
+     "margin": 0.1
+    },
+    {
+     "id": "s2-45",
+     "score": "s2",
+     "deviation": null,
+     "tempo": 45,
+     "margin": 0.5
+    },
+    {
+     "id": "h-s1-45-2000",
+     "score": "s1",
+     "deviation": "hesitation",
+     "tempo": 45,
+     "margin": 0.01,
+     "pause": 2
+    }
+   ],
+   "controls": [
+    {
+     "id": "sil-s1-99",
+     "parent": "s1-99",
+     "kind": "silence",
+     "handedScore": "s1",
+     "margin": 0.6
+    },
+    {
+     "id": "sil-s1-45",
+     "parent": "s1-45",
+     "kind": "silence",
+     "handedScore": "s1",
+     "margin": 0.6
+    },
+    {
+     "id": "w2-s1-63",
+     "parent": "s1-63",
+     "kind": "wrong-score",
+     "handedScore": "w2",
+     "margin": 0.5
+    },
+    {
+     "id": "w2-s1-90",
+     "parent": "s1-90",
+     "kind": "wrong-score",
+     "handedScore": "w2",
+     "margin": 0.45
+    },
+    {
+     "id": "sil-s2-99",
+     "parent": "s2-99",
+     "kind": "silence",
+     "handedScore": "s2",
+     "margin": 0.7
+    },
+    {
+     "id": "sil-s2-45",
+     "parent": "s2-45",
+     "kind": "silence",
+     "handedScore": "s2",
+     "margin": 0.7
+    },
+    {
+     "id": "w2-s2-99",
+     "parent": "s2-99",
+     "kind": "wrong-score",
+     "handedScore": "w2",
+     "margin": 0.2
+    },
+    {
+     "id": "w2-s2-45",
+     "parent": "s2-45",
+     "kind": "wrong-score",
+     "handedScore": "w2",
+     "margin": 0.8
+    },
+    {
+     "id": "sil-h-s1-45-2000",
+     "parent": "h-s1-45-2000",
+     "kind": "silence",
+     "handedScore": "s1",
+     "margin": 0.01
+    },
+    {
+     "id": "w2-h-s1-45-2000",
+     "parent": "h-s1-45-2000",
+     "kind": "wrong-score",
+     "handedScore": "w2",
+     "margin": 0.01
+    }
+   ],
+   "expected": {
+    "performances": [
+     "s2-99",
+     "s1-45",
+     "s1-63"
+    ],
+    "controls": [
+     "sil-s1-45",
+     "w2-s1-90",
+     "sil-s2-45",
+     "w2-s2-99"
+    ]
+   },
+   "arithmetic": "Base substage: the hesitation h-s1-45-2000 (.01) and its controls are not candidates. s2-99 .1 first; four s1 performances tie at .3, severity (-tempo) descending is slowest first: s1-45, s1-63, s1-90, s1-99; s2-45 .5 last. First three s2-99, s1-45, s1-63. Scores in ASCII order s1, s2. s1 silence: sil-s1-99 and sil-s1-45 tie at .6, parent s1-45 is slower: sil-s1-45. s1 wrong: w2-s1-90 .45 < w2-s1-63 .5: w2-s1-90. s2 silence: tie at .7, slower parent s2-45: sil-s2-45. s2 wrong: w2-s2-99 .2 < .8: w2-s2-99."
+  },
+  {
+   "id": "K4-margin-beats-severity",
+   "substage": {
+    "id": "silent-hesitation",
+    "deviation": "hesitation"
+   },
+   "performances": [
+    {
+     "id": "h-x",
+     "score": "s1",
+     "deviation": "hesitation",
+     "tempo": 99,
+     "margin": 0.1,
+     "pause": 0.3
+    },
+    {
+     "id": "h-y",
+     "score": "s1",
+     "deviation": "hesitation",
+     "tempo": 45,
+     "margin": 0.2,
+     "pause": 2
+    },
+    {
+     "id": "h-z",
+     "score": "s1",
+     "deviation": "hesitation",
+     "tempo": 45,
+     "margin": 0.2,
+     "pause": 1
+    },
+    {
+     "id": "h-w",
+     "score": "s1",
+     "deviation": "hesitation",
+     "tempo": 63,
+     "margin": 0.2,
+     "pause": 2
+    }
+   ],
+   "controls": [
+    {
+     "id": "sil-h-x",
+     "parent": "h-x",
+     "kind": "silence",
+     "handedScore": "s1",
+     "margin": 0.9
+    },
+    {
+     "id": "sil-h-y",
+     "parent": "h-y",
+     "kind": "silence",
+     "handedScore": "s1",
+     "margin": 0.9
+    },
+    {
+     "id": "sil-h-z",
+     "parent": "h-z",
+     "kind": "silence",
+     "handedScore": "s1",
+     "margin": 0.9
+    },
+    {
+     "id": "sil-h-w",
+     "parent": "h-w",
+     "kind": "silence",
+     "handedScore": "s1",
+     "margin": 0.9
+    },
+    {
+     "id": "w2-h-x",
+     "parent": "h-x",
+     "kind": "wrong-score",
+     "handedScore": "w2",
+     "margin": 0.9
+    },
+    {
+     "id": "w2-h-y",
+     "parent": "h-y",
+     "kind": "wrong-score",
+     "handedScore": "w2",
+     "margin": 0.9
+    },
+    {
+     "id": "w2-h-z",
+     "parent": "h-z",
+     "kind": "wrong-score",
+     "handedScore": "w2",
+     "margin": 0.9
+    },
+    {
+     "id": "w2-h-w",
+     "parent": "h-w",
+     "kind": "wrong-score",
+     "handedScore": "w2",
+     "margin": 0.9
+    }
+   ],
+   "expected": {
+    "performances": [
+     "h-x",
+     "h-y",
+     "h-w"
+    ],
+    "controls": [
+     "sil-h-y",
+     "w2-h-y"
+    ]
+   },
+   "arithmetic": "h-x has the least margin .1 and the least severity (.3,-99); margin decides first, so h-x leads. The rest tie at .2: severities h-y (2,-45), h-w (2,-63), h-z (1,-45); descending h-y, h-w, h-z. First three h-x, h-y, h-w. All controls tie at .9: the parent of greatest severity is h-y (2,-45), so sil-h-y and w2-h-y."
+  },
+  {
+   "id": "K5-name-last",
+   "substage": {
+    "id": "silent-hesitation",
+    "deviation": "hesitation"
+   },
+   "performances": [
+    {
+     "id": "tonejs-acoustic-h-s1-45-2000",
+     "score": "s1",
+     "deviation": "hesitation",
+     "tempo": 45,
+     "margin": 0.25,
+     "pause": 2
+    },
+    {
+     "id": "martin-h-s1-45-2000",
+     "score": "s1",
+     "deviation": "hesitation",
+     "tempo": 45,
+     "margin": 0.25,
+     "pause": 2
+    },
+    {
+     "id": "spanish-h-s1-45-2000",
+     "score": "s1",
+     "deviation": "hesitation",
+     "tempo": 45,
+     "margin": 0.25,
+     "pause": 2
+    },
+    {
+     "id": "fender-h-s1-45-2000",
+     "score": "s1",
+     "deviation": "hesitation",
+     "tempo": 45,
+     "margin": 0.25,
+     "pause": 2
+    }
+   ],
+   "controls": [
+    {
+     "id": "noise-martin-h-s1-45-2000",
+     "parent": "martin-h-s1-45-2000",
+     "kind": "silence",
+     "handedScore": "s1",
+     "margin": 0.5
+    },
+    {
+     "id": "noise-fender-h-s1-45-2000",
+     "parent": "fender-h-s1-45-2000",
+     "kind": "silence",
+     "handedScore": "s1",
+     "margin": 0.5
+    },
+    {
+     "id": "w2-martin-h-s1-45-2000",
+     "parent": "martin-h-s1-45-2000",
+     "kind": "wrong-score",
+     "handedScore": "w2",
+     "margin": 0.4
+    },
+    {
+     "id": "w2-fender-h-s1-45-2000",
+     "parent": "fender-h-s1-45-2000",
+     "kind": "wrong-score",
+     "handedScore": "w2",
+     "margin": 0.5
+    }
+   ],
+   "expected": {
+    "performances": [
+     "fender-h-s1-45-2000",
+     "martin-h-s1-45-2000",
+     "spanish-h-s1-45-2000"
+    ],
+    "controls": [
+     "noise-fender-h-s1-45-2000",
+     "w2-martin-h-s1-45-2000"
+    ]
+   },
+   "arithmetic": "Same recipe on four guitars: equal margin .25 and equal severity (2,-45), so ascending ASCII ID decides: fender, martin, spanish, tonejs-acoustic. Silence controls tie at .5 with equal parent severity: ASCII gives noise-fender-\u2026. Wrong-score: w2-martin-\u2026 .4 < .5."
+  },
+  {
+   "id": "K6-slowed-bar",
+   "substage": {
+    "id": "slowed-bar",
+    "deviation": "slowed-bar"
+   },
+   "performances": [
+    {
+     "id": "sb-s2-45-b1-90",
+     "score": "s2",
+     "deviation": "slowed-bar",
+     "tempo": 45,
+     "margin": 0.3,
+     "factor": 0.9
+    },
+    {
+     "id": "sb-s2-99-b2-50",
+     "score": "s2",
+     "deviation": "slowed-bar",
+     "tempo": 99,
+     "margin": 0.3,
+     "factor": 0.5
+    },
+    {
+     "id": "sb-s2-45-b2-70",
+     "score": "s2",
+     "deviation": "slowed-bar",
+     "tempo": 45,
+     "margin": 0.3,
+     "factor": 0.7
+    },
+    {
+     "id": "sb-s2-90-b2-70",
+     "score": "s2",
+     "deviation": "slowed-bar",
+     "tempo": 90,
+     "margin": 0.3,
+     "factor": 0.7
+    }
+   ],
+   "controls": [
+    {
+     "id": "sil-sb-s2-45-b1-90",
+     "parent": "sb-s2-45-b1-90",
+     "kind": "silence",
+     "handedScore": "s2",
+     "margin": 0.5
+    },
+    {
+     "id": "sil-sb-s2-99-b2-50",
+     "parent": "sb-s2-99-b2-50",
+     "kind": "silence",
+     "handedScore": "s2",
+     "margin": 0.5
+    },
+    {
+     "id": "sil-sb-s2-45-b2-70",
+     "parent": "sb-s2-45-b2-70",
+     "kind": "silence",
+     "handedScore": "s2",
+     "margin": 0.5
+    },
+    {
+     "id": "sil-sb-s2-90-b2-70",
+     "parent": "sb-s2-90-b2-70",
+     "kind": "silence",
+     "handedScore": "s2",
+     "margin": 0.5
+    },
+    {
+     "id": "w2-sb-s2-45-b1-90",
+     "parent": "sb-s2-45-b1-90",
+     "kind": "wrong-score",
+     "handedScore": "w2",
+     "margin": 0.5
+    },
+    {
+     "id": "w2-sb-s2-99-b2-50",
+     "parent": "sb-s2-99-b2-50",
+     "kind": "wrong-score",
+     "handedScore": "w2",
+     "margin": 0.5
+    },
+    {
+     "id": "w2-sb-s2-45-b2-70",
+     "parent": "sb-s2-45-b2-70",
+     "kind": "wrong-score",
+     "handedScore": "w2",
+     "margin": 0.5
+    },
+    {
+     "id": "w2-sb-s2-90-b2-70",
+     "parent": "sb-s2-90-b2-70",
+     "kind": "wrong-score",
+     "handedScore": "w2",
+     "margin": 0.5
+    }
+   ],
+   "expected": {
+    "performances": [
+     "sb-s2-99-b2-50",
+     "sb-s2-45-b2-70",
+     "sb-s2-90-b2-70"
+    ],
+    "controls": [
+     "sil-sb-s2-99-b2-50",
+     "w2-sb-s2-99-b2-50"
+    ]
+   },
+   "arithmetic": "All tie at .3. |factor-1|: .5 for factor .5; .3 for both factor-.7 bars (the same double, so tempo decides: 45 before 90); .1 for factor .9. Order sb-s2-99-b2-50, sb-s2-45-b2-70, sb-s2-90-b2-70, sb-s2-45-b1-90. Controls tie at .5: the most severe parent is sb-s2-99-b2-50."
+  },
+  {
+   "id": "K7-rushed-bar",
+   "substage": {
+    "id": "rushed-bar",
+    "deviation": "rushed-bar"
+   },
+   "performances": [
+    {
+     "id": "rb-a",
+     "score": "s2",
+     "deviation": "rushed-bar",
+     "tempo": 99,
+     "margin": 0.2,
+     "factor": 1.05
+    },
+    {
+     "id": "rb-b",
+     "score": "s2",
+     "deviation": "rushed-bar",
+     "tempo": 99,
+     "margin": 0.2,
+     "factor": 1.3
+    },
+    {
+     "id": "rb-c",
+     "score": "s2",
+     "deviation": "rushed-bar",
+     "tempo": 45,
+     "margin": 0.2,
+     "factor": 1.15
+    },
+    {
+     "id": "rb-d",
+     "score": "s2",
+     "deviation": "rushed-bar",
+     "tempo": 45,
+     "margin": 0.2,
+     "factor": 1.3
+    }
+   ],
+   "controls": [
+    {
+     "id": "sil-rb-a",
+     "parent": "rb-a",
+     "kind": "silence",
+     "handedScore": "s2",
+     "margin": 0.3
+    },
+    {
+     "id": "sil-rb-b",
+     "parent": "rb-b",
+     "kind": "silence",
+     "handedScore": "s2",
+     "margin": 0.6
+    },
+    {
+     "id": "sil-rb-c",
+     "parent": "rb-c",
+     "kind": "silence",
+     "handedScore": "s2",
+     "margin": 0.6
+    },
+    {
+     "id": "sil-rb-d",
+     "parent": "rb-d",
+     "kind": "silence",
+     "handedScore": "s2",
+     "margin": 0.6
+    },
+    {
+     "id": "w2-rb-a",
+     "parent": "rb-a",
+     "kind": "wrong-score",
+     "handedScore": "w2",
+     "margin": 0.6
+    },
+    {
+     "id": "w2-rb-b",
+     "parent": "rb-b",
+     "kind": "wrong-score",
+     "handedScore": "w2",
+     "margin": 0.6
+    },
+    {
+     "id": "w2-rb-c",
+     "parent": "rb-c",
+     "kind": "wrong-score",
+     "handedScore": "w2",
+     "margin": 0.6
+    },
+    {
+     "id": "w2-rb-d",
+     "parent": "rb-d",
+     "kind": "wrong-score",
+     "handedScore": "w2",
+     "margin": 0.6
+    }
+   ],
+   "expected": {
+    "performances": [
+     "rb-d",
+     "rb-b",
+     "rb-c"
+    ],
+    "controls": [
+     "sil-rb-a",
+     "w2-rb-d"
+    ]
+   },
+   "arithmetic": "All tie at .2. |factor-1|: .3 for both factor-1.3 bars (tempo decides: rb-d at 45 before rb-b at 99); .15 for rb-c; .05 for rb-a. First three rb-d, rb-b, rb-c. Silence: sil-rb-a has the least margin .3, ahead of any severity. Wrong-score all .6: most severe parent rb-d."
+  },
+  {
+   "id": "K8-fewer-every-score",
+   "substage": {
+    "id": "silent-hesitation",
+    "deviation": "hesitation"
+   },
+   "performances": [
+    {
+     "id": "h-s1",
+     "score": "s1",
+     "deviation": "hesitation",
+     "tempo": 90,
+     "margin": 0.2,
+     "pause": 0.5
+    },
+    {
+     "id": "h-s2",
+     "score": "s2",
+     "deviation": "hesitation",
+     "tempo": 90,
+     "margin": 0.4,
+     "pause": 0.5
+    }
+   ],
+   "controls": [
+    {
+     "id": "sil-h-s1",
+     "parent": "h-s1",
+     "kind": "silence",
+     "handedScore": "s1",
+     "margin": 0.5
+    },
+    {
+     "id": "w2-h-s1",
+     "parent": "h-s1",
+     "kind": "wrong-score",
+     "handedScore": "w2",
+     "margin": 0.5
+    },
+    {
+     "id": "sil-h-s2",
+     "parent": "h-s2",
+     "kind": "silence",
+     "handedScore": "s2",
+     "margin": 0.5
+    },
+    {
+     "id": "w2-h-s2",
+     "parent": "h-s2",
+     "kind": "wrong-score",
+     "handedScore": "w2",
+     "margin": 0.5
+    }
+   ],
+   "expected": {
+    "performances": [
+     "h-s1",
+     "h-s2"
+    ],
+    "controls": [
+     "sil-h-s1",
+     "w2-h-s1",
+     "sil-h-s2",
+     "w2-h-s2"
+    ]
+   },
+   "arithmetic": "Two candidates, fewer than three: both, h-s1 (.2) then h-s2 (.4). Performed scores s1 then s2, each with its silence then its wrong-score control."
+  },
+  {
+   "id": "K9-input-order",
+   "substage": {
+    "id": "silent-hesitation",
+    "deviation": "hesitation"
+   },
+   "performances": [
+    {
+     "id": "h-s1-63-700",
+     "score": "s1",
+     "deviation": "hesitation",
+     "tempo": 63,
+     "margin": 0.25,
+     "pause": 0.7
+    },
+    {
+     "id": "h-s1-45-2000",
+     "score": "s1",
+     "deviation": "hesitation",
+     "tempo": 45,
+     "margin": 0.25,
+     "pause": 2
+    },
+    {
+     "id": "h-s1-90-2000",
+     "score": "s1",
+     "deviation": "hesitation",
+     "tempo": 90,
+     "margin": 0.25,
+     "pause": 2
+    },
+    {
+     "id": "h-s1-45-300",
+     "score": "s1",
+     "deviation": "hesitation",
+     "tempo": 45,
+     "margin": 0.25,
+     "pause": 0.3
+    },
+    {
+     "id": "h-s1-90-300",
+     "score": "s1",
+     "deviation": "hesitation",
+     "tempo": 90,
+     "margin": 0.25,
+     "pause": 0.3
+    }
+   ],
+   "controls": [
+    {
+     "id": "w2-h-s1-63-700",
+     "parent": "h-s1-63-700",
+     "kind": "wrong-score",
+     "handedScore": "w2",
+     "margin": 0.5
+    },
+    {
+     "id": "w2-h-s1-45-2000",
+     "parent": "h-s1-45-2000",
+     "kind": "wrong-score",
+     "handedScore": "w2",
+     "margin": 0.5
+    },
+    {
+     "id": "w2-h-s1-90-2000",
+     "parent": "h-s1-90-2000",
+     "kind": "wrong-score",
+     "handedScore": "w2",
+     "margin": 0.5
+    },
+    {
+     "id": "w2-h-s1-45-300",
+     "parent": "h-s1-45-300",
+     "kind": "wrong-score",
+     "handedScore": "w2",
+     "margin": 0.5
+    },
+    {
+     "id": "w2-h-s1-90-300",
+     "parent": "h-s1-90-300",
+     "kind": "wrong-score",
+     "handedScore": "w2",
+     "margin": 0.4
+    },
+    {
+     "id": "sil-h-s1-63-700",
+     "parent": "h-s1-63-700",
+     "kind": "silence",
+     "handedScore": "s1",
+     "margin": 0.5
+    },
+    {
+     "id": "sil-h-s1-45-2000",
+     "parent": "h-s1-45-2000",
+     "kind": "silence",
+     "handedScore": "s1",
+     "margin": 0.5
+    },
+    {
+     "id": "sil-h-s1-90-2000",
+     "parent": "h-s1-90-2000",
+     "kind": "silence",
+     "handedScore": "s1",
+     "margin": 0.5
+    },
+    {
+     "id": "sil-h-s1-45-300",
+     "parent": "h-s1-45-300",
+     "kind": "silence",
+     "handedScore": "s1",
+     "margin": 0.5
+    },
+    {
+     "id": "sil-h-s1-90-300",
+     "parent": "h-s1-90-300",
+     "kind": "silence",
+     "handedScore": "s1",
+     "margin": 0.5
+    }
+   ],
+   "expected": {
+    "performances": [
+     "h-s1-45-2000",
+     "h-s1-90-2000",
+     "h-s1-63-700"
+    ],
+    "controls": [
+     "sil-h-s1-45-2000",
+     "w2-h-s1-90-300"
+    ]
+   },
+   "arithmetic": "K2's examples given in a different order, with the wrong-score controls listed before the silence controls: the same answer as K2."
+  },
+  {
+   "id": "K10-parent-score",
+   "substage": {
+    "id": "silent-hesitation",
+    "deviation": "hesitation"
+   },
+   "performances": [
+    {
+     "id": "h-p",
+     "score": "s1",
+     "deviation": "hesitation",
+     "tempo": 90,
+     "margin": 0.2,
+     "pause": 1
+    }
+   ],
+   "controls": [
+    {
+     "id": "sil-h-p",
+     "parent": "h-p",
+     "kind": "silence",
+     "handedScore": "s1",
+     "margin": 0.4
+    },
+    {
+     "id": "w2-h-p",
+     "parent": "h-p",
+     "kind": "wrong-score",
+     "handedScore": "w2",
+     "margin": 0.3
+    }
+   ],
+   "expected": {
+    "performances": [
+     "h-p"
+    ],
+    "controls": [
+     "sil-h-p",
+     "w2-h-p"
+    ]
+   },
+   "arithmetic": "w2-h-p is handed score w2 but its parent was performed from s1, so it is s1's wrong-score control. There is no performed score w2."
+  }
+ ],
+ "refusals": [
+  {
+   "id": "Z1-undefined-severity",
+   "substage": {
+    "id": "wrong-note",
+    "deviation": "wrong-note"
+   },
+   "performances": [
+    {
+     "id": "wn-a",
+     "score": "s1",
+     "deviation": "wrong-note",
+     "tempo": 90,
+     "margin": 0.2
+    }
+   ],
+   "controls": [
+    {
+     "id": "sil-wn-a",
+     "parent": "wn-a",
+     "kind": "silence",
+     "handedScore": "s1",
+     "margin": 0.5
+    },
+    {
+     "id": "w2-wn-a",
+     "parent": "wn-a",
+     "kind": "wrong-score",
+     "handedScore": "w2",
+     "margin": 0.5
+    }
+   ],
+   "reject": true,
+   "arithmetic": "This version defines no severity for wrong-note: refused."
+  },
+  {
+   "id": "Z2-missing-field",
+   "substage": {
+    "id": "silent-hesitation",
+    "deviation": "hesitation"
+   },
+   "performances": [
+    {
+     "id": "h-a",
+     "score": "s1",
+     "deviation": "hesitation",
+     "tempo": 90,
+     "margin": 0.2,
+     "pause": 0.5
+    },
+    {
+     "id": "h-b",
+     "score": "s1",
+     "deviation": "hesitation",
+     "tempo": 90,
+     "margin": 0.3
+    }
+   ],
+   "controls": [
+    {
+     "id": "sil-h-a",
+     "parent": "h-a",
+     "kind": "silence",
+     "handedScore": "s1",
+     "margin": 0.5
+    },
+    {
+     "id": "w2-h-a",
+     "parent": "h-a",
+     "kind": "wrong-score",
+     "handedScore": "w2",
+     "margin": 0.5
+    }
+   ],
+   "reject": true,
+   "arithmetic": "Candidate h-b has no pause: refused, even though its severity would not be needed to break a tie."
+  },
+  {
+   "id": "Z3-no-candidate",
+   "substage": {
+    "id": "silent-hesitation",
+    "deviation": "hesitation"
+   },
+   "performances": [
+    {
+     "id": "s1-90",
+     "score": "s1",
+     "deviation": null,
+     "tempo": 90,
+     "margin": 0.2
+    }
+   ],
+   "controls": [
+    {
+     "id": "sil-s1-90",
+     "parent": "s1-90",
+     "kind": "silence",
+     "handedScore": "s1",
+     "margin": 0.5
+    },
+    {
+     "id": "w2-s1-90",
+     "parent": "s1-90",
+     "kind": "wrong-score",
+     "handedScore": "w2",
+     "margin": 0.5
+    }
+   ],
+   "reject": true,
+   "arithmetic": "A deviation substage whose examples contain no performance of its deviation: refused."
+  },
+  {
+   "id": "Z4-absent-parent",
+   "substage": {
+    "id": "silent-hesitation",
+    "deviation": "hesitation"
+   },
+   "performances": [
+    {
+     "id": "h-a",
+     "score": "s1",
+     "deviation": "hesitation",
+     "tempo": 90,
+     "margin": 0.2,
+     "pause": 0.5
+    }
+   ],
+   "controls": [
+    {
+     "id": "sil-h-a",
+     "parent": "h-a",
+     "kind": "silence",
+     "handedScore": "s1",
+     "margin": 0.5
+    },
+    {
+     "id": "w2-h-a",
+     "parent": "h-a",
+     "kind": "wrong-score",
+     "handedScore": "w2",
+     "margin": 0.5
+    },
+    {
+     "id": "w2-h-gone",
+     "parent": "h-gone",
+     "kind": "wrong-score",
+     "handedScore": "w2",
+     "margin": 0.1
+    }
+   ],
+   "reject": true,
+   "arithmetic": "w2-h-gone's parent is not among the evaluated examples: refused."
+  },
+  {
+   "id": "Z5-missing-kind",
+   "substage": {
+    "id": "silent-hesitation",
+    "deviation": "hesitation"
+   },
+   "performances": [
+    {
+     "id": "h-a",
+     "score": "s1",
+     "deviation": "hesitation",
+     "tempo": 90,
+     "margin": 0.2,
+     "pause": 0.5
+    },
+    {
+     "id": "s1-90",
+     "score": "s1",
+     "deviation": null,
+     "tempo": 90,
+     "margin": 0.3
+    }
+   ],
+   "controls": [
+    {
+     "id": "sil-h-a",
+     "parent": "h-a",
+     "kind": "silence",
+     "handedScore": "s1",
+     "margin": 0.5
+    },
+    {
+     "id": "w2-s1-90",
+     "parent": "s1-90",
+     "kind": "wrong-score",
+     "handedScore": "w2",
+     "margin": 0.5
+    }
+   ],
+   "reject": true,
+   "arithmetic": "Performed score s1 has a candidate silence control but its only wrong-score control belongs to the clean parent, which is not a candidate: refused."
+  },
+  {
+   "id": "Z6-duplicate",
+   "substage": {
+    "id": "silent-hesitation",
+    "deviation": "hesitation"
+   },
+   "performances": [
+    {
+     "id": "h-a",
+     "score": "s1",
+     "deviation": "hesitation",
+     "tempo": 90,
+     "margin": 0.2,
+     "pause": 0.5
+    }
+   ],
+   "controls": [
+    {
+     "id": "sil-h-a",
+     "parent": "h-a",
+     "kind": "silence",
+     "handedScore": "s1",
+     "margin": 0.5
+    },
+    {
+     "id": "h-a",
+     "parent": "h-a",
+     "kind": "wrong-score",
+     "handedScore": "w2",
+     "margin": 0.5
+    }
+   ],
+   "reject": true,
+   "arithmetic": "Example ID h-a appears twice: refused."
+  },
+  {
+   "id": "Z7-negative-margin",
+   "substage": {
+    "id": "silent-hesitation",
+    "deviation": "hesitation"
+   },
+   "performances": [
+    {
+     "id": "h-a",
+     "score": "s1",
+     "deviation": "hesitation",
+     "tempo": 90,
+     "margin": -0.1,
+     "pause": 0.5
+    }
+   ],
+   "controls": [
+    {
+     "id": "sil-h-a",
+     "parent": "h-a",
+     "kind": "silence",
+     "handedScore": "s1",
+     "margin": 0.5
+    },
+    {
+     "id": "w2-h-a",
+     "parent": "h-a",
+     "kind": "wrong-score",
+     "handedScore": "w2",
+     "margin": 0.5
+    }
+   ],
+   "reject": true,
+   "arithmetic": "A margin below 0: refused."
+  },
+  {
+   "id": "Z8-nonfinite-margin",
+   "substage": {
+    "id": "silent-hesitation",
+    "deviation": "hesitation"
+   },
+   "performances": [
+    {
+     "id": "h-a",
+     "score": "s1",
+     "deviation": "hesitation",
+     "tempo": 90,
+     "margin": "NaN",
+     "pause": 0.5
+    }
+   ],
+   "controls": [
+    {
+     "id": "sil-h-a",
+     "parent": "h-a",
+     "kind": "silence",
+     "handedScore": "s1",
+     "margin": 0.5
+    },
+    {
+     "id": "w2-h-a",
+     "parent": "h-a",
+     "kind": "wrong-score",
+     "handedScore": "w2",
+     "margin": 0.5
+    }
+   ],
+   "reject": true,
+   "arithmetic": "A margin that is not a finite number (the string NaN stands for one): refused."
+  }
+ ]
+}
