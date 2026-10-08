@@ -1,6 +1,7 @@
 {
   "name": "mnx-listening-bench",
   "version": "0.1.0",
+  "license": "AGPL-3.0-only OR LicenseRef-Commercial",
   "private": true,
   "type": "module",
   "scripts": {

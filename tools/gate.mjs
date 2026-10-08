@@ -23,6 +23,8 @@ const DATA = [
   /^worker\/generated\//, /^worker\/models[^/]*\.json$/,
   /^package(-lock)?\.json$/, /^tsconfig[^/]*\.json$/, /^[^/]*\.config\.ts$/, /^wrangler\.jsonc$/,
   /^\.dependency-cruiser\.cjs$/, /^(studio|workbench)\/index\.html$/, /^embed\.html$/,
+  // The home and notices pages and their sources (core-campaign-synth Phase 3).
+  /^index\.html$/, /^notices\//, /^site\//, /^(NOTICE|LICENSE)\.md$/,
 ];
 // Tests that read SOURCE from disk (a boundary check, a source census, a token
 // scan of the shells' styles), so a code change reaches them without an import:
@@ -50,7 +52,7 @@ const SYNTH_PROSE = /^synth\/[^/]+\.md$/;
 
 /** The areas a smoke may declare in `covers` (harness/verify/run-smokes.mjs).
  *  `audio` is reached through the shared src/ layers, which run every smoke. */
-export const SMOKE_AREAS = ['workbench', 'studio', 'library', 'embed', 'lib', 'audio', 'synth'];
+export const SMOKE_AREAS = ['workbench', 'studio', 'library', 'embed', 'lib', 'audio', 'synth', 'home'];
 
 const SHARED_SRC = /^src\/(model|engine|audio|edit|elements|storage|importers|corpus|assist)\//;
 const CONVERTERS = ['guitarpro-mnx', 'musicxml-mnx'];
@@ -68,6 +70,7 @@ function smokeAreas(file, coverage) {
   if (/^src\/entries\/lib\.ts$|^vite\.lib\.config\.ts$/.test(file)) return ['lib'];
   if (/^(worker|migrations)\/|^tools\/library-local-auth\.mjs$/.test(file)) return ['library'];
   if (SYNTH.test(file) && !SYNTH_PROSE.test(file)) return ['synth'];
+  if (/^index\.html$|^notices\/|^site\/|^(NOTICE|LICENSE)\.md$|^tools\/notices\.mjs$/.test(file)) return ['home'];
   // The corpus is bundled into the workbench, which the workbench smokes open.
   if (/^scenarios\//.test(file)) return ['workbench'];
   return [];

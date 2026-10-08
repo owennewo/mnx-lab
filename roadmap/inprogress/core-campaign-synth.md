@@ -118,9 +118,9 @@ mnx-lab (monorepo; github.com/owennewo/mnx-lab is PUBLIC; deployed at mnx-lab.to
 | Phase | Title | Status | Exit evidence |
 |---|---|---|---|
 | 0 | Readiness and decisions | ☑ Done | this campaign doc (`f9e87a32`); decisions S1–S17 agreed; licence AGPL-3.0-only + commercial |
-| 1 | Move the synth into `mnx-lab/synth/` | ☑ Done in worktree `core-synth-move` (lands with Phase 3) | synth suite 119 pass + cost inside mnx-lab; references unchanged; DSP reproduces; full mnx-lab gate green |
-| 2 | The `/synth/` shell: build, CSP, smokes | ☐ Not started | |
-| 3 | Home page, licences and notices; **first landing** | ☐ Not started | |
+| 1 | Move the synth into `mnx-lab/synth/` | ☑ Done | synth suite 119 pass + cost inside mnx-lab; references unchanged; DSP reproduces; full mnx-lab gate green |
+| 2 | The `/synth/` shell: build, CSP, smokes | ☑ Done | `vite build` places the synth's app at `/synth/`; CSP `'wasm-unsafe-eval'`; `synth` smoke (22 flows under the deployed CSP) |
+| 3 | Home page, licences and notices; **first landing** | ☑ Done | home page at `/`, `/notices/`, `LICENSE.md`, `NOTICE.md`, `CONTRIBUTING.md`; `home` smoke; notices test; landed with Phases 1–2 |
 | 4 | Contract adoption in the transport | ☐ Not started | |
 | 5 | Host backend and part router | ☐ Not started | |
 | 6 | Studio: choosing instruments and rigs | ☐ Not started | |
@@ -174,28 +174,28 @@ start); the licence chosen (S8); this doc landed. The notices work itself is Pha
   - TypeScript and dependency-cruiser treat `synth/` as an external package;
   - the gate maps `synth/**` to the synth's suites (S12);
   - `vitest` excludes it.
-- [ ] Notices and licence files present (S8).
+- [x] Notices and licence files present (S8).
 
 **Exit:** green synth suites and a green mnx-lab gate in the worktree; reference hashes
 unchanged; nothing landed until S8 allows it.
 
 ## Phase 2 — The `/synth/` shell
 
-- [ ] Build the synth app into mnx-lab's client output at `/synth/` (its own build, or a Vite
+- [x] Build the synth app into mnx-lab's client output at `/synth/` (its own build, or a Vite
   input), with same-origin worklet and WASM loading.
-- [ ] CSP: `'wasm-unsafe-eval'` in `script-src`; `smoke:csp` covers WASM compilation and the
+- [x] CSP: `'wasm-unsafe-eval'` in `script-src`; `smoke:csp` covers WASM compilation and the
   worklet.
-- [ ] Open access (S11): no Cloudflare Access rule for `/synth/`. The synth's app flows join
+- [x] Open access (S11): no Cloudflare Access rule for `/synth/`. The synth's app flows join
   mnx-lab's smoke runner with their `covers`.
 - [ ] Nothing lands or deploys before Phase 3 (S8).
 
 ## Phase 3 — Home page, licences and notices; first landing
 
-- [ ] **Home page at `/`**, replacing the Worker's redirect to `/studio/` (`worker/index.ts`).
+- [x] **Home page at `/`**, replacing the Worker's redirect to `/studio/` (`worker/index.ts`).
   It is a static page in mnx-lab's build, plain and accessible, with links to `/studio/`
   (behind Access), `/synth/` and `/workbench/` and a one-line description of each, plus a
   link to the notices page.
-- [ ] **Licences and notices page** (`/notices/`), linked from the home page:
+- [x] **Licences and notices page** (`/notices/`), linked from the home page:
   - the site's own licence (S8);
   - every third-party component the deployed site ships, with its notice and licence text.
     That means the synth's FAUST library functions (STK-4.3, LGPL with exception) and the
@@ -204,10 +204,10 @@ unchanged; nothing landed until S8 allows it.
     the MNX schema copy, and anything else the inventory finds;
   - the inventory generated from the bundle or the lockfile where possible, so it cannot fall
     behind.
-- [ ] **Repository files:** `LICENSE.md` (the AGPL-3.0 text, S8/S17), `NOTICE.md` (the same
+- [x] **Repository files:** `LICENSE.md` (the AGPL-3.0 text, S8/S17), `NOTICE.md` (the same
   third-party inventory, the synth's notices folded in), a "Commercial licensing" section in the
   README (enquiries via GitHub, S17) and `CONTRIBUTING.md` (S16); `package.json` licence fields.
-- [ ] Smokes: the home page and the notices page load and link correctly; the CSP still holds.
+- [x] Smokes: the home page and the notices page load and link correctly; the CSP still holds.
 - [ ] **First landing** (mnx-lab's process: rebase, `npm run gate`, `--ff-only`, push `main`)
   of Phases 1–3 together, only once S8 is settled; then deploy.
 
@@ -331,4 +331,15 @@ unchanged; nothing landed until S8 allows it.
     - `build:v2` reproduces the published Engine2 binary byte for byte from `synth/`; blocks and basic instruments rebuild identically (`diff -r` of `web/generated` against guitar-faust is empty).
     - The synth's app flows pass, as do worklet = Node and the packaged-library smoke with its browser case.
     - **mnx-lab's full gate passed:** every root test, the static checks, the build, all 24 smokes, the listening bench and the new synth lane.
+- 2026-10-08 — **Phase 2 done** (worktree `core-synth-move`).
+  - **Build:** a Vite plugin (`synthShell` in `vite.config.ts`) runs the synth's own deterministic app build into `<client outDir>/synth/` (89 files, 944 KB), so its worklet, Worker and WASM URLs are not rewritten. The dev server serves `synth/web/` at `/synth/` unchanged (checked: HTML, JS, WASM and JSON with the right types).
+  - **CSP:** `public/_headers` admits `'wasm-unsafe-eval'` (WebAssembly compilation only, not `eval`), with the reason recorded beside the policy.
+  - **Smoke:** `harness/verify/synth-smoke.mjs` serves the built site with the headers read from `public/_headers` and runs the synth's 22 app flows (Playwright via `playwright-core` 1.63.0, a dev dependency of the synth workspace, on the system Chrome) against `/synth/`; any CSP refusal is a page error. The gate maps `synth/**` to the build and this smoke. `/synth/` is open access (S11): Cloudflare Access covers only `/studio/` (checked on the live site: `/` and `/workbench/` answer without Access).
+- 2026-10-08 — **Phase 3 done.**
+  - **Pages:**
+    - `/` is a static home page (`index.html`, styled by `site/site.css` with Archivo, light and dark) linking studio (sign-in), the synth, the workbench, the notices page and the source. The Worker's root redirect to `/studio/` is removed; the library-access test now expects the Worker to leave `/` to the asset.
+    - `/notices/` and `NOTICE.md` are generated by `tools/notices.mjs` from one inventory of 20 components, with full licence texts in `public/licenses/` (served at `/licenses/`): AGPL-3.0, BSD-3-Clause (Lit), OFL-1.1 (Archivo, Bravura), MIT (fflate, xmldom, Hono, jose), CC0-1.0 (samples), STK-4.3 and LGPL-2.1 + the FAUST exception (from the pinned FAUST libraries), and V8 and fdlibm.
+  - **Licences to confirm:** the SMuFL glyph names, the MNX schema and mirrored examples, and the MNX sources carry no licence upstream, so they are listed as "W3C Music Notation Community Group (licence to confirm)". They were already shipped before this campaign.
+  - **Repository files:** `LICENSE.md` (the AGPL-3.0 text from gnu.org), `NOTICE.md`, `CONTRIBUTING.md` (S16), a Licence section in the README, and `"license": "AGPL-3.0-only OR LicenseRef-Commercial"` in every `package.json`. The synth's `THIRD_PARTY_NOTICES.md` now states the licence.
+  - **Tests:** `harness/conformance/notices.test.ts` requires the generated files to be current, every production package in `package-lock.json` to have a notice, and every named licence text to exist. The `home` smoke resolves every same-origin link on both pages (25) on the built site. The gate maps the new paths to every test plus the `home` smoke.
 

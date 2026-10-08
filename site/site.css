@@ -1,0 +1,23 @@
+/* The site's plain pages: the home page (/) and the licences and notices page (/notices/). */
+@import '@fontsource/archivo/latin-400.css';
+@import '@fontsource/archivo/latin-500.css';
+:root { color-scheme: light dark; --ink: light-dark(#1d2326, #e8ecec); --muted: light-dark(#5a6468, #9aa5a8); --line: light-dark(#d9dfe1, #2c3538);
+  --panel: light-dark(#ffffff, #171d20); --bg: light-dark(#f4f6f6, #0f1416); --accent: light-dark(#1f6f5f, #8fd8c4); }
+html, body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 Archivo, system-ui, sans-serif; }
+a { color: var(--accent); }
+.page { max-width: 880px; margin: 0 auto; padding: 32px 16px 56px; }
+h1 { font-size: 28px; font-weight: 500; margin: 8px 0 4px; }
+h2 { font-size: 18px; font-weight: 500; margin: 32px 0 12px; }
+h3 { font-size: 16px; font-weight: 500; margin: 0 0 4px; }
+.muted { color: var(--muted); }
+.apps { list-style: none; padding: 0; margin: 24px 0; display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.apps a { display: block; height: 100%; box-sizing: border-box; padding: 18px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: inherit; text-decoration: none; }
+.apps a:hover, .apps a:focus-visible { border-color: var(--accent); }
+.apps .name { display: block; font-size: 20px; font-weight: 500; color: var(--accent); }
+.apps .path { font-size: 13px; color: var(--muted); }
+.notices { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+.notices li { padding: 14px 16px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); }
+.notices p { margin: 2px 0; }
+.licence { font-weight: 500; }
+footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 14px; color: var(--muted); }
+code { font-size: 0.92em; }

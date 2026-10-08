@@ -1,6 +1,7 @@
 {
   "name": "@mnx-lab/synth",
   "version": "0.2.0",
+  "license": "AGPL-3.0-only OR LicenseRef-Commercial",
   "private": true,
   "type": "module",
   "description": "The synth: physically modelled guitar, basic keys and kit, effect chains and the mnx-sound/2 instrument host, with its app (served at /synth/).",

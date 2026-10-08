@@ -57,6 +57,8 @@ const SMOKES = {
   'csp': one('csp-smoke.mjs', WORKBENCH), // 4
   'sync-rederive': one('sync-rederive-smoke.mjs', STUDIO), // 3
   'audio': one('audio-smoke.mjs', ['audio'], { build: null }), // 3
+  // The home page and the licences and notices page, links resolved on the built site (core-campaign-synth Phase 3).
+  'home': one('home-smoke.mjs', ['home']), // 1
 };
 
 /** Every smoke with the areas it covers and the files that are its own. */

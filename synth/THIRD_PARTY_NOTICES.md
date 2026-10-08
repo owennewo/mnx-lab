@@ -1,9 +1,10 @@
-# Third-party notice inventory — review pending
+# Third-party notices — the synth
 
-Local use only (lead's decision, 8 Oct 2026): nothing is published or distributed.
-Internal/private candidate only. This inventory is not a legal clearance or a
-complete distribution notice. Do not distribute publicly until the project
-licence and the third-party licence texts/requirements have been reviewed.
+Copyright © 2026 Owen Williams. The synth is part of MNX Lab and is licensed under the GNU
+AGPL-3.0-only, with commercial licences available from the copyright holder (see the
+repository's `LICENSE.md` and `NOTICE.md`, and the site's `/notices/` page, which list every
+component with its full licence text). This file records what the synth's own DSP and code
+contain.
 
 ## FAUST libraries in the compiled DSP
 
@@ -54,5 +55,4 @@ revision attribution still need to be incorporated before distribution.
 
 ## Project code
 
-No public project licence has been chosen. `private: true` / `UNLICENSED` does
-not replace the notices or permissions applicable to third-party material.
+AGPL-3.0-only OR a commercial licence (`package.json`: `AGPL-3.0-only OR LicenseRef-Commercial`).

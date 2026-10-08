@@ -60,10 +60,10 @@ it('separates browser and machine authority and fails closed on storage/config e
   env.LIBRARY_ACCESS_AUD = undefined; expect((await request('/me')).status).toBe(503);
   env.LIBRARY_ACCESS_AUD = 'browser-test'; await env.LIBRARY_DB.exec('DROP TABLE users'); expect((await request('/me')).status).toBe(503);
 });
-it('has no login route — sign-in is the edge redirect on /studio/ — and sends the root to studio', async () => {
+it('has no login route — sign-in is the edge redirect on /studio/ — and leaves the root to the home page asset', async () => {
   expect((await request('/login?return=https://attacker.test')).status).toBe(404);
-  // The root is studio's; the workbench keeps its own directory (workbench-path-prefix, studio-shell).
-  const root = await app.request('http://localhost/', {}, env); expect(root.status).toBe(302); expect(root.headers.get('location')).toBe('/studio/');
+  // The root is the home page, an asset (core-campaign-synth Phase 3); the Worker no longer redirects it.
+  const root = await app.request('http://localhost/', {}, env); expect(root.status).toBe(404);
   expect((await app.request('https://mnx-lab.totai.uk/api/library/me', { headers: { 'Cf-Access-Jwt-Assertion': jwt } }, env)).status).toBe(503);
 });
 

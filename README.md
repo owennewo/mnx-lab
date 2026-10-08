@@ -24,6 +24,21 @@ npm run dev        # studio + workbench + Worker API at localhost:5173
 npm test           # harness suites over the corpus
 ```
 
+The deployed site (mnx-lab.totai.uk) has a home page at `/` linking the three shells —
+**studio** (`/studio/`, sign-in required), the **synth** (`/synth/`, the synth in
+[`synth/`](synth/README.md), moved here by
+[core-campaign-synth](roadmap/inprogress/core-campaign-synth.md)) and the **workbench**
+(`/workbench/`) — and the licences and notices page (`/notices/`).
+
+## Licence
+
+Copyright © 2026 Owen Williams. MNX Lab, including the synth, is free software under the
+**GNU Affero General Public License, version 3 only** ([LICENSE.md](LICENSE.md)).
+**Commercial licences** are available for uses the AGPL does not suit: contact the copyright
+holder through GitHub ([github.com/owennewo](https://github.com/owennewo)). Third-party
+components keep their own licences: [NOTICE.md](NOTICE.md). Contributions:
+[CONTRIBUTING.md](CONTRIBUTING.md).
+
 Structure, conventions and the full command list: **[CLAUDE.md](CLAUDE.md)**. Planning
 history: [roadmap/](roadmap/README.md). The repo was rebuilt fresh-slate in 2026-07
 ([roadmap/complete/lab-structure-lab.md](roadmap/complete/lab-structure-lab.md)); the previous

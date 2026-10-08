@@ -263,6 +263,9 @@ export default defineConfig(async ({ command }) => {
         build: {
           rollupOptions: {
             input: {
+              // The home page at / and the licences and notices page (core-campaign-synth, Phase 3).
+              home: 'index.html',
+              notices: 'notices/index.html',
               main: 'workbench/index.html',
               // Studio — the consumer product, served at /studio/ (apps/studio/).
               studio: 'studio/index.html',

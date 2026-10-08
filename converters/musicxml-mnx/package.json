@@ -1,6 +1,7 @@
 {
   "name": "@mnx-editor/musicxml-mnx",
   "version": "0.1.0",
+  "license": "AGPL-3.0-only OR LicenseRef-Commercial",
   "type": "module",
   "description": "Bi-directional MusicXML <-> MNX converter CLI and library",
   "main": "./dist/index.js",

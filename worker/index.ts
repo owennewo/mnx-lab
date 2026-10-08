@@ -17,11 +17,9 @@ import type { Env } from './env.ts';
 
 const app = new Hono<{ Bindings: Env }>();
 
-// The root is studio's (apps/studio/, served at /studio/); the workbench, the
-// lab's own instrument, lives at /workbench/. No asset answers `/`, so the
-// request falls through to the Worker. Access gates /studio at the edge, so
-// an anonymous visitor lands on the OTP prompt from here.
-app.get('/', c => c.redirect('/studio/', 302));
+// The root is the site's home page (index.html, an asset: it links /studio/,
+// /synth/, /workbench/ and /notices/), so `/` never reaches the Worker
+// (core-campaign-synth.md, Phase 3). Access gates /studio at the edge.
 
 app.route('/api/edit-notation', editNotation);
 app.route('/api/models', modelsRoute);

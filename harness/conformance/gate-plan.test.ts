@@ -95,4 +95,11 @@ it('the synth runs its own functional suite, the build and its smoke; its prose 
   expect(planGate(['src/engine/layout/spacing.ts']).synth).toBe(false);
   expect(planGate(['package-lock.json']).synth, 'shared data reaches the synth too').toBe(true);
 });
+it('the home and notices pages run every test, the build and the home smoke (core-campaign-synth Phase 3)', () => {
+  for (const file of ['index.html', 'notices/index.html', 'site/site.css', 'NOTICE.md', 'LICENSE.md']) {
+    const plan = planGate([file]);
+    expect(plan.tests, file).toEqual({ mode: 'full' });
+    expect(plan.smokes, file).toContain('home');
+  }
+});
 
