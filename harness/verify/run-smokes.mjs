@@ -31,6 +31,8 @@ const STUDIO_LIBRARY = ['studio', 'library'];
 // starting last (paired runs 2026-09-24: 61.5–63.0 s → 58.1–59.5 s). Only the
 // ranking matters; seconds from a green gate run at the time are in the comments.
 const SMOKES = {
+  // The synth's 22 app flows on the built /synth/ under the deployed CSP (core-campaign-synth S12).
+  'synth': one('synth-smoke.mjs', ['synth']), // ~60
   'inspector': one('inspector-smoke.mjs', WORKBENCH), // 15
   'workbench-editor': one('workbench-editor-smoke.mjs', WORKBENCH), // 15
   'save-pipeline': one('save-pipeline-smoke.mjs', STUDIO_LIBRARY), // 15

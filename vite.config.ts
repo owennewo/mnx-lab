@@ -1,7 +1,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { execSync } from 'node:child_process';
+import { execFileSync, execSync } from 'node:child_process';
+import os from 'node:os';
 import { defineConfig, type Plugin } from 'vite';
 import { cloudflare } from '@cloudflare/vite-plugin';
 
@@ -194,6 +195,47 @@ function commit(): string {
   try { return execSync('git rev-parse --short HEAD', { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim(); } catch { return ''; }
 }
 
+/**
+ * The synth's shell at /synth/ (roadmap/inprogress/core-campaign-synth.md). The synth is
+ * plain ES modules with its own deterministic app build (synth/scripts/build_app.mjs:
+ * the HTML entry, its import closure including the AudioWorklet and Worker modules, and
+ * the WASM and data it fetches by relative URL). Bundling it through Vite would rewrite
+ * those URLs, so a build copies the synth's own output to <client outDir>/synth/, and the
+ * dev server serves synth/web/ there unchanged.
+ */
+function synthShell(): Plugin {
+  const WEB = path.join(ROOT, 'synth/web');
+  const TYPES: Record<string, string> = {
+    '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8',
+    '.json': 'application/json; charset=utf-8', '.wasm': 'application/wasm', '.md': 'text/markdown; charset=utf-8'
+  };
+  return {
+    name: 'mnx-lab:synth-shell',
+    configureServer(server) {
+      server.middlewares.use('/synth', (req, res, next) => {
+        const rel = decodeURIComponent((req.url ?? '/').split('?')[0]);
+        let file = path.join(WEB, rel);
+        if (!file.startsWith(WEB)) { next(); return; }
+        if (fs.existsSync(file) && fs.statSync(file).isDirectory()) file = path.join(file, 'index.html');
+        if (!fs.existsSync(file)) { next(); return; }
+        res.setHeader('content-type', TYPES[path.extname(file)] ?? 'application/octet-stream');
+        fs.createReadStream(file).pipe(res);
+      });
+    },
+    writeBundle(options) {
+      if (this.environment?.name !== 'client' || !options.dir) return;
+      const staging = fs.mkdtempSync(path.join(os.tmpdir(), 'mnx-synth-'));
+      try {
+        const out = path.join(staging, 'app');
+        execFileSync(process.execPath, [path.join(ROOT, 'synth/scripts/build_app.mjs'), out], { stdio: 'inherit' });
+        fs.cpSync(out, path.join(options.dir, 'synth'), { recursive: true });
+      } finally {
+        fs.rmSync(staging, { recursive: true, force: true });
+      }
+    }
+  };
+}
+
 export default defineConfig(async ({ command }) => {
   const { devPort, isWorktree } = await import('./tools/dev-port.mjs');
   if (command === 'serve') {
@@ -208,7 +250,8 @@ export default defineConfig(async ({ command }) => {
       // backend process. Reads OPENROUTER_API_KEY from .dev.vars.
       cloudflare(),
       specMedia(),
-      localLibraryLogin()
+      localLibraryLogin(),
+      synthShell()
     ],
     build: {
       target: 'es2022',

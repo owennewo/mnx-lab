@@ -42,15 +42,15 @@ const INERT = /^(docs\/|roadmap\/|research\/|\.claude\/)|^[^/]+\.md$|^apps\/[^/]
 // Code the build and vitest's import graph see.
 const CODE = /^(src|apps|worker|converters|harness|tools|experiments)\//;
 // The synth (synth/, core-campaign-synth.md S12): its own workspace and runner, like the
-// converters. Any change there except its prose runs its functional suite; its timing-based
-// cost check, benchmark and DSP reproducibility check stay manual (they need a quiet machine
-// or the FAUST compiler).
+// converters. Any change there except its prose runs its functional suite, the build (its
+// shell is in the site bundle) and the `synth` smoke; its timing-based cost check, benchmark
+// and DSP reproducibility check stay manual (they need a quiet machine or the FAUST compiler).
 const SYNTH = /^synth\//;
 const SYNTH_PROSE = /^synth\/[^/]+\.md$/;
 
 /** The areas a smoke may declare in `covers` (harness/verify/run-smokes.mjs).
  *  `audio` is reached through the shared src/ layers, which run every smoke. */
-export const SMOKE_AREAS = ['workbench', 'studio', 'library', 'embed', 'lib', 'audio'];
+export const SMOKE_AREAS = ['workbench', 'studio', 'library', 'embed', 'lib', 'audio', 'synth'];
 
 const SHARED_SRC = /^src\/(model|engine|audio|edit|elements|storage|importers|corpus|assist)\//;
 const CONVERTERS = ['guitarpro-mnx', 'musicxml-mnx'];
@@ -67,6 +67,7 @@ function smokeAreas(file, coverage) {
   if (/^src\/entries\/embed\.ts$|^vite\.embed\.config\.ts$|^embed\.html$|^apps\/viewer-embedded\//.test(file)) return ['embed'];
   if (/^src\/entries\/lib\.ts$|^vite\.lib\.config\.ts$/.test(file)) return ['lib'];
   if (/^(worker|migrations)\/|^tools\/library-local-auth\.mjs$/.test(file)) return ['library'];
+  if (SYNTH.test(file) && !SYNTH_PROSE.test(file)) return ['synth'];
   // The corpus is bundled into the workbench, which the workbench smokes open.
   if (/^scenarios\//.test(file)) return ['workbench'];
   return [];
@@ -113,7 +114,8 @@ export function planGate(files, { full = false } = {}) {
     : CONVERTERS.filter(name => files.some(file => file.startsWith(`converters/${name}/`)));
   if (converters.length) reasons.push(`converter suites: ${converters.join(', ')}`);
 
-  const build = data.length > 0 || code.length > 0;
+  // The synth's shell is part of the site bundle its smoke loads.
+  const build = data.length > 0 || code.length > 0 || files.some(file => SYNTH.test(file) && !SYNTH_PROSE.test(file));
   if (!build) reasons.push('no build: nothing it compiles changed');
 
   const areas = new Set(files.flatMap(file => smokeAreas(file, coverage)));

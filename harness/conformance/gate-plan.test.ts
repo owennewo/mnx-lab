@@ -82,11 +82,13 @@ it('the listening workspace gates its code, disk-read evidence, and shared timin
   expect(planGate(['src/workbench/main.ts']).listeningBench).toBe(false);
   expect(planGate([], { full: true }).listeningBench).toBe(true);
 });
-it('the synth runs its own functional suite; its prose runs nothing (core-campaign-synth S12)', () => {
+it('the synth runs its own functional suite, the build and its smoke; its prose runs nothing (core-campaign-synth S12)', () => {
   const code = planGate(['synth/web/host/host-core.js']);
   expect(code.synth).toBe(true);
   expect(code.tests).toEqual({ mode: 'none' });
-  expect(code.build).toBe(false);
+  expect(code.build, 'its shell is in the site bundle').toBe(true);
+  expect(code.smokes).toEqual(['synth']);
+  expect(planGate(['synth/README.md']).smokes).toEqual([]);
   expect(code.reasons.join(' ')).not.toMatch(/unrecognised/);
   expect(planGate(['synth/web/data/pieces/band-groove.json']).synth).toBe(true);
   expect(planGate(['synth/README.md']).synth).toBe(false);
