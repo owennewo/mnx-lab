@@ -1,0 +1,47 @@
+{
+  "builderSha256": "2742608cbac099a19f6abe8b287df6e3625dc746c9418413665797f94353338d",
+  "blocks": {
+    "drive": {
+      "source": "dsp/blocks/drive.dsp",
+      "sourceSha256": "08f6b1aaaa766c211404da23b359d9b40a5da955dc24179b260660e48566b0cb",
+      "wasmSha256": "817d357cc42da9d416a0d7690bc2cbea982dd5abfbc146fb769245d3392b2487",
+      "inputs": 2,
+      "outputs": 2
+    },
+    "echo": {
+      "source": "dsp/blocks/echo.dsp",
+      "sourceSha256": "98d38910d0ebb0ed13893d26ba82111844d40526b05788151fe46200d198d216",
+      "wasmSha256": "318fee2fd5a50d7156818139194db58b58e8cdb7bcf02adf3a41d67f8fa6187b",
+      "inputs": 2,
+      "outputs": 2
+    },
+    "master": {
+      "source": "dsp/blocks/master.dsp",
+      "sourceSha256": "c58ff6ba593f3baa424d20c1dd794bb576d118bfce7aa0ac00cacae8646861f0",
+      "wasmSha256": "07d526a60462b7fdecfd2daa52c09ecc8e5db7af32d4466eabf834c52a5dce3d",
+      "inputs": 2,
+      "outputs": 3
+    },
+    "room": {
+      "source": "dsp/blocks/room.dsp",
+      "sourceSha256": "ff7d8de47407a5a303b0304efaffad468c5a24b6def30f5ca9a0cc1cff2929e8",
+      "wasmSha256": "d8347d8877b221cb4fe3f72218c3e2cc4ff58fd5fc16755cc9d7a337759cce27",
+      "inputs": 2,
+      "outputs": 2
+    },
+    "tremolo": {
+      "source": "dsp/blocks/tremolo.dsp",
+      "sourceSha256": "3f2062c22c69082764a22894185e4099ae8a0d4d511dd5df35289f642c0958d0",
+      "wasmSha256": "5ab5538276271b1714761b11dc2c21c42beefed81a723f9e8fb49afd829da059",
+      "inputs": 2,
+      "outputs": 2
+    },
+    "vibrato": {
+      "source": "dsp/blocks/vibrato.dsp",
+      "sourceSha256": "2c7dc7654ee122603c7945a04c72998b6a5beba9710f8a461989d7b6498587a8",
+      "wasmSha256": "9477642251eab78d8fb50425ec0cb70284be581f51dc8a6eccb2bffbbbd5c53f",
+      "inputs": 2,
+      "outputs": 2
+    }
+  }
+}

@@ -1,0 +1,353 @@
+{
+ "contract": "mnx-sound/2",
+ "fixture": {
+  "id": "multi-part-mix",
+  "description": "Plucked, keys and kit through one room bus, delivered in three lookahead batches: the second upserts a future note, the third cancels from 5 s (as a seek does) and schedules replacements."
+ },
+ "setup": {
+  "contract": "mnx-sound/2",
+  "session": {
+   "buses": [
+    {
+     "id": "room",
+     "type": "room",
+     "params": {
+      "level": 0.18,
+      "decay": 0.6,
+      "predelay": 8,
+      "damping": 8500,
+      "width": 0.8
+     }
+    }
+   ],
+   "master": {
+    "volumeDb": 0
+   }
+  },
+  "parts": [
+   {
+    "id": "gtr",
+    "instrument": {
+     "kind": "plucked",
+     "design": "clear-steel"
+    },
+    "strip": {
+     "levelDb": 3.5,
+     "pan": -0.3,
+     "sends": {
+      "room": 0.6
+     }
+    }
+   },
+   {
+    "id": "keys",
+    "instrument": {
+     "kind": "keys",
+     "design": "basic-piano"
+    },
+    "strip": {
+     "levelDb": -0.5,
+     "pan": 0.3,
+     "sends": {
+      "room": 0.3
+     }
+    }
+   },
+   {
+    "id": "drums",
+    "instrument": {
+     "kind": "kit",
+     "design": "basic-kit"
+    },
+    "strip": {
+     "levelDb": 1.5,
+     "pan": 0,
+     "sends": {
+      "room": 0.15
+     }
+    }
+   }
+  ]
+ },
+ "batches": [
+  {
+   "through": 2.5,
+   "notes": [
+    {
+     "id": "g1",
+     "part": "gtr",
+     "at": 0.5,
+     "duration": 0.6,
+     "velocity": 0.65,
+     "target": {
+      "pitch": 52
+     },
+     "fingering": {
+      "string": 4,
+      "fret": 2
+     }
+    },
+    {
+     "id": "g2",
+     "part": "gtr",
+     "at": 1.125,
+     "duration": 0.6,
+     "velocity": 0.65,
+     "target": {
+      "pitch": 55
+     },
+     "fingering": {
+      "string": 3,
+      "fret": 0
+     }
+    },
+    {
+     "id": "g3",
+     "part": "gtr",
+     "at": 1.75,
+     "duration": 0.6,
+     "velocity": 0.65,
+     "target": {
+      "pitch": 59
+     },
+     "fingering": {
+      "string": 2,
+      "fret": 0
+     }
+    },
+    {
+     "id": "kk1",
+     "part": "keys",
+     "at": 0.5,
+     "duration": 1.8,
+     "velocity": 0.5,
+     "target": {
+      "pitch": 40
+     }
+    },
+    {
+     "id": "dk1",
+     "part": "drums",
+     "at": 0.5,
+     "duration": 0.25,
+     "velocity": 0.75,
+     "target": {
+      "piece": "kick"
+     }
+    },
+    {
+     "id": "ds1",
+     "part": "drums",
+     "at": 1.125,
+     "duration": 0.25,
+     "velocity": 0.75,
+     "target": {
+      "piece": "snare"
+     }
+    },
+    {
+     "id": "dk2",
+     "part": "drums",
+     "at": 1.75,
+     "duration": 0.25,
+     "velocity": 0.75,
+     "target": {
+      "piece": "kick"
+     }
+    },
+    {
+     "id": "g4",
+     "part": "gtr",
+     "at": 3,
+     "duration": 0.6,
+     "velocity": 0.65,
+     "target": {
+      "pitch": 64
+     },
+     "fingering": {
+      "string": 1,
+      "fret": 0
+     }
+    }
+   ],
+   "controls": [
+    {
+     "id": "tempo",
+     "at": 0,
+     "type": "tempo",
+     "bpm": 96
+    },
+    {
+     "id": "kp1",
+     "part": "keys",
+     "at": 0.45,
+     "type": "sustainPedal",
+     "value": 1
+    }
+   ]
+  },
+  {
+   "through": 5,
+   "notes": [
+    {
+     "id": "g4",
+     "part": "gtr",
+     "at": 3,
+     "duration": 0.8,
+     "velocity": 0.65,
+     "target": {
+      "pitch": 62
+     },
+     "fingering": {
+      "string": 2,
+      "fret": 3
+     }
+    },
+    {
+     "id": "g5",
+     "part": "gtr",
+     "at": 3.75,
+     "duration": 0.6,
+     "velocity": 0.65,
+     "target": {
+      "pitch": 59
+     },
+     "fingering": {
+      "string": 2,
+      "fret": 0
+     }
+    },
+    {
+     "id": "kk2",
+     "part": "keys",
+     "at": 3,
+     "duration": 1.5,
+     "velocity": 0.5,
+     "target": {
+      "pitch": 43
+     }
+    },
+    {
+     "id": "dk3",
+     "part": "drums",
+     "at": 3,
+     "duration": 0.25,
+     "velocity": 0.75,
+     "target": {
+      "piece": "kick"
+     }
+    },
+    {
+     "id": "ds2",
+     "part": "drums",
+     "at": 3.75,
+     "duration": 0.25,
+     "velocity": 0.75,
+     "target": {
+      "piece": "snare"
+     }
+    },
+    {
+     "id": "dc1",
+     "part": "drums",
+     "at": 5.5,
+     "duration": 0.25,
+     "velocity": 0.75,
+     "target": {
+      "piece": "crash"
+     }
+    }
+   ],
+   "controls": [
+    {
+     "id": "kp2",
+     "part": "keys",
+     "at": 4.6,
+     "type": "sustainPedal",
+     "value": 0
+    }
+   ]
+  },
+  {
+   "through": 8,
+   "cancel": {
+    "from": 5
+   },
+   "notes": [
+    {
+     "id": "g6",
+     "part": "gtr",
+     "at": 5.5,
+     "duration": 1.5,
+     "velocity": 0.65,
+     "target": {
+      "pitch": 57
+     },
+     "fingering": {
+      "string": 3,
+      "fret": 2
+     }
+    },
+    {
+     "id": "kk3",
+     "part": "keys",
+     "at": 5.5,
+     "duration": 1.5,
+     "velocity": 0.5,
+     "target": {
+      "pitch": 45
+     }
+    },
+    {
+     "id": "dk4",
+     "part": "drums",
+     "at": 5.5,
+     "duration": 0.25,
+     "velocity": 0.75,
+     "target": {
+      "piece": "kick"
+     }
+    },
+    {
+     "id": "dr1",
+     "part": "drums",
+     "at": 6.25,
+     "duration": 0.25,
+     "velocity": 0.75,
+     "target": {
+      "piece": "ride"
+     }
+    }
+   ]
+  }
+ ],
+ "render": {
+  "rate": 48000,
+  "seconds": 9
+ },
+ "expect": [
+  {
+   "kind": "partActive",
+   "part": "gtr",
+   "aboveDb": -40
+  },
+  {
+   "kind": "partActive",
+   "part": "keys",
+   "aboveDb": -40
+  },
+  {
+   "kind": "partActive",
+   "part": "drums",
+   "aboveDb": -40
+  },
+  {
+   "kind": "noDiagnostics",
+   "severity": "warning"
+  },
+  {
+   "kind": "peakBelow",
+   "dbfs": -0.3
+  }
+ ]
+}

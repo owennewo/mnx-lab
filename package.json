@@ -5,7 +5,8 @@
   "type": "module",
   "workspaces": [
     "converters/*",
-    "experiments/performance-listening/bench"
+    "experiments/performance-listening/bench",
+    "synth"
   ],
   "files": [
     "dist/lib",

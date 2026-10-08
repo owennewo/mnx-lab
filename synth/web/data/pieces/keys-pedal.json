@@ -1,0 +1,629 @@
+{
+ "contract": "mnx-sound/2",
+ "fixture": {
+  "id": "keys-pedal",
+  "name": "Keys – pedal & rolled chords",
+  "group": "Keys",
+  "description": "Short chords without the pedal, the same chords with it, a chord rolled up and one rolled down, then a melody over a held chord until the pedal lifts."
+ },
+ "setup": {
+  "contract": "mnx-sound/2",
+  "session": {
+   "buses": [
+    {
+     "id": "room",
+     "type": "room",
+     "state": "on",
+     "preset": "Studio",
+     "basePreset": "Studio",
+     "params": {
+      "level": 0.18,
+      "decay": 0.6,
+      "predelay": 8,
+      "damping": 8500,
+      "width": 0.8
+     }
+    }
+   ],
+   "master": {
+    "volumeDb": 0,
+    "ceilingDb": -1
+   }
+  },
+  "parts": [
+   {
+    "id": "keys",
+    "name": "Keys",
+    "instrument": {
+     "kind": "keys",
+     "design": {
+      "id": "basic-piano"
+     }
+    },
+    "chain": [],
+    "strip": {
+     "levelDb": 0,
+     "pan": 0,
+     "mute": false,
+     "solo": false,
+     "sends": {
+      "room": 0.15
+     }
+    }
+   }
+  ]
+ },
+ "notes": [
+  {
+   "id": "keys-1",
+   "part": "keys",
+   "at": 0.2,
+   "duration": 0.31579,
+   "velocity": 0.55,
+   "target": {
+    "pitch": 48
+   }
+  },
+  {
+   "id": "keys-2",
+   "part": "keys",
+   "at": 0.2,
+   "duration": 0.31579,
+   "velocity": 0.55,
+   "target": {
+    "pitch": 52
+   }
+  },
+  {
+   "id": "keys-3",
+   "part": "keys",
+   "at": 0.2,
+   "duration": 0.31579,
+   "velocity": 0.55,
+   "target": {
+    "pitch": 55
+   }
+  },
+  {
+   "id": "keys-4",
+   "part": "keys",
+   "at": 0.2,
+   "duration": 0.31579,
+   "velocity": 0.55,
+   "target": {
+    "pitch": 60
+   }
+  },
+  {
+   "id": "keys-5",
+   "part": "keys",
+   "at": 0.989474,
+   "duration": 0.31579,
+   "velocity": 0.55,
+   "target": {
+    "pitch": 48
+   }
+  },
+  {
+   "id": "keys-6",
+   "part": "keys",
+   "at": 0.989474,
+   "duration": 0.31579,
+   "velocity": 0.55,
+   "target": {
+    "pitch": 52
+   }
+  },
+  {
+   "id": "keys-7",
+   "part": "keys",
+   "at": 0.989474,
+   "duration": 0.31579,
+   "velocity": 0.55,
+   "target": {
+    "pitch": 55
+   }
+  },
+  {
+   "id": "keys-8",
+   "part": "keys",
+   "at": 0.989474,
+   "duration": 0.31579,
+   "velocity": 0.55,
+   "target": {
+    "pitch": 60
+   }
+  },
+  {
+   "id": "keys-9",
+   "part": "keys",
+   "at": 1.778947,
+   "duration": 0.31579,
+   "velocity": 0.55,
+   "target": {
+    "pitch": 48
+   }
+  },
+  {
+   "id": "keys-10",
+   "part": "keys",
+   "at": 1.778947,
+   "duration": 0.31579,
+   "velocity": 0.55,
+   "target": {
+    "pitch": 52
+   }
+  },
+  {
+   "id": "keys-11",
+   "part": "keys",
+   "at": 1.778947,
+   "duration": 0.31579,
+   "velocity": 0.55,
+   "target": {
+    "pitch": 55
+   }
+  },
+  {
+   "id": "keys-12",
+   "part": "keys",
+   "at": 1.778947,
+   "duration": 0.31579,
+   "velocity": 0.55,
+   "target": {
+    "pitch": 60
+   }
+  },
+  {
+   "id": "keys-13",
+   "part": "keys",
+   "at": 2.568421,
+   "duration": 0.31579,
+   "velocity": 0.55,
+   "target": {
+    "pitch": 48
+   }
+  },
+  {
+   "id": "keys-14",
+   "part": "keys",
+   "at": 2.568421,
+   "duration": 0.31579,
+   "velocity": 0.55,
+   "target": {
+    "pitch": 52
+   }
+  },
+  {
+   "id": "keys-15",
+   "part": "keys",
+   "at": 2.568421,
+   "duration": 0.31579,
+   "velocity": 0.55,
+   "target": {
+    "pitch": 55
+   }
+  },
+  {
+   "id": "keys-16",
+   "part": "keys",
+   "at": 2.568421,
+   "duration": 0.31579,
+   "velocity": 0.55,
+   "target": {
+    "pitch": 60
+   }
+  },
+  {
+   "id": "keys-17",
+   "part": "keys",
+   "at": 3.357895,
+   "duration": 0.31579,
+   "velocity": 0.55,
+   "target": {
+    "pitch": 48
+   }
+  },
+  {
+   "id": "keys-18",
+   "part": "keys",
+   "at": 3.357895,
+   "duration": 0.31579,
+   "velocity": 0.55,
+   "target": {
+    "pitch": 52
+   }
+  },
+  {
+   "id": "keys-19",
+   "part": "keys",
+   "at": 3.357895,
+   "duration": 0.31579,
+   "velocity": 0.55,
+   "target": {
+    "pitch": 55
+   }
+  },
+  {
+   "id": "keys-20",
+   "part": "keys",
+   "at": 3.357895,
+   "duration": 0.31579,
+   "velocity": 0.55,
+   "target": {
+    "pitch": 60
+   }
+  },
+  {
+   "id": "keys-21",
+   "part": "keys",
+   "at": 4.936842,
+   "duration": 0.31579,
+   "velocity": 0.55,
+   "target": {
+    "pitch": 48
+   }
+  },
+  {
+   "id": "keys-22",
+   "part": "keys",
+   "at": 4.936842,
+   "duration": 0.31579,
+   "velocity": 0.55,
+   "target": {
+    "pitch": 52
+   }
+  },
+  {
+   "id": "keys-23",
+   "part": "keys",
+   "at": 4.936842,
+   "duration": 0.31579,
+   "velocity": 0.55,
+   "target": {
+    "pitch": 55
+   }
+  },
+  {
+   "id": "keys-24",
+   "part": "keys",
+   "at": 4.936842,
+   "duration": 0.31579,
+   "velocity": 0.55,
+   "target": {
+    "pitch": 60
+   }
+  },
+  {
+   "id": "keys-25",
+   "part": "keys",
+   "at": 6.515789,
+   "duration": 1.528948,
+   "velocity": 0.55,
+   "target": {
+    "pitch": 41
+   },
+   "gesture": {
+    "id": "r1",
+    "type": "roll",
+    "direction": "up",
+    "spreadSeconds": 0.12
+   }
+  },
+  {
+   "id": "keys-26",
+   "part": "keys",
+   "at": 6.515789,
+   "duration": 1.528948,
+   "velocity": 0.55,
+   "target": {
+    "pitch": 48
+   },
+   "gesture": {
+    "id": "r1",
+    "type": "roll",
+    "direction": "up",
+    "spreadSeconds": 0.12
+   }
+  },
+  {
+   "id": "keys-27",
+   "part": "keys",
+   "at": 6.515789,
+   "duration": 1.528948,
+   "velocity": 0.55,
+   "target": {
+    "pitch": 53
+   },
+   "gesture": {
+    "id": "r1",
+    "type": "roll",
+    "direction": "up",
+    "spreadSeconds": 0.12
+   }
+  },
+  {
+   "id": "keys-28",
+   "part": "keys",
+   "at": 6.515789,
+   "duration": 1.528948,
+   "velocity": 0.55,
+   "target": {
+    "pitch": 57
+   },
+   "gesture": {
+    "id": "r1",
+    "type": "roll",
+    "direction": "up",
+    "spreadSeconds": 0.12
+   }
+  },
+  {
+   "id": "keys-29",
+   "part": "keys",
+   "at": 6.515789,
+   "duration": 1.528948,
+   "velocity": 0.55,
+   "target": {
+    "pitch": 60
+   },
+   "gesture": {
+    "id": "r1",
+    "type": "roll",
+    "direction": "up",
+    "spreadSeconds": 0.12
+   }
+  },
+  {
+   "id": "keys-30",
+   "part": "keys",
+   "at": 8.094737,
+   "duration": 1.528947,
+   "velocity": 0.55,
+   "target": {
+    "pitch": 43
+   },
+   "gesture": {
+    "id": "r2",
+    "type": "roll",
+    "direction": "down",
+    "spreadSeconds": 0.12
+   }
+  },
+  {
+   "id": "keys-31",
+   "part": "keys",
+   "at": 8.094737,
+   "duration": 1.528947,
+   "velocity": 0.55,
+   "target": {
+    "pitch": 50
+   },
+   "gesture": {
+    "id": "r2",
+    "type": "roll",
+    "direction": "down",
+    "spreadSeconds": 0.12
+   }
+  },
+  {
+   "id": "keys-32",
+   "part": "keys",
+   "at": 8.094737,
+   "duration": 1.528947,
+   "velocity": 0.55,
+   "target": {
+    "pitch": 55
+   },
+   "gesture": {
+    "id": "r2",
+    "type": "roll",
+    "direction": "down",
+    "spreadSeconds": 0.12
+   }
+  },
+  {
+   "id": "keys-33",
+   "part": "keys",
+   "at": 8.094737,
+   "duration": 1.528947,
+   "velocity": 0.55,
+   "target": {
+    "pitch": 59
+   },
+   "gesture": {
+    "id": "r2",
+    "type": "roll",
+    "direction": "down",
+    "spreadSeconds": 0.12
+   }
+  },
+  {
+   "id": "keys-34",
+   "part": "keys",
+   "at": 8.094737,
+   "duration": 1.528947,
+   "velocity": 0.55,
+   "target": {
+    "pitch": 62
+   },
+   "gesture": {
+    "id": "r2",
+    "type": "roll",
+    "direction": "down",
+    "spreadSeconds": 0.12
+   }
+  },
+  {
+   "id": "keys-35",
+   "part": "keys",
+   "at": 9.673684,
+   "duration": 0.789474,
+   "velocity": 0.4,
+   "target": {
+    "pitch": 45
+   }
+  },
+  {
+   "id": "keys-36",
+   "part": "keys",
+   "at": 9.673684,
+   "duration": 0.789474,
+   "velocity": 0.4,
+   "target": {
+    "pitch": 52
+   }
+  },
+  {
+   "id": "keys-37",
+   "part": "keys",
+   "at": 9.673684,
+   "duration": 0.789474,
+   "velocity": 0.4,
+   "target": {
+    "pitch": 57
+   }
+  },
+  {
+   "id": "keys-38",
+   "part": "keys",
+   "at": 9.673684,
+   "duration": 0.31579,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 72
+   }
+  },
+  {
+   "id": "keys-39",
+   "part": "keys",
+   "at": 10.068421,
+   "duration": 0.31579,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 71
+   }
+  },
+  {
+   "id": "keys-40",
+   "part": "keys",
+   "at": 10.463158,
+   "duration": 0.31579,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 69
+   }
+  },
+  {
+   "id": "keys-41",
+   "part": "keys",
+   "at": 10.857895,
+   "duration": 0.31579,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 67
+   }
+  },
+  {
+   "id": "keys-42",
+   "part": "keys",
+   "at": 11.252632,
+   "duration": 0.31579,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 64
+   }
+  },
+  {
+   "id": "keys-43",
+   "part": "keys",
+   "at": 11.647368,
+   "duration": 0.31579,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 67
+   }
+  },
+  {
+   "id": "keys-44",
+   "part": "keys",
+   "at": 12.042105,
+   "duration": 0.31579,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 69
+   }
+  },
+  {
+   "id": "keys-45",
+   "part": "keys",
+   "at": 12.436842,
+   "duration": 0.31579,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 72
+   }
+  }
+ ],
+ "controls": [
+  {
+   "id": "tempo",
+   "at": 0,
+   "type": "tempo",
+   "bpm": 76
+  },
+  {
+   "id": "pd1",
+   "part": "keys",
+   "at": 3.357895,
+   "type": "sustainPedal",
+   "value": 1
+  },
+  {
+   "id": "pu1",
+   "part": "keys",
+   "at": 6.465789,
+   "type": "sustainPedal",
+   "value": 0
+  },
+  {
+   "id": "pd3",
+   "part": "keys",
+   "at": 9.673684,
+   "type": "sustainPedal",
+   "value": 1
+  },
+  {
+   "id": "pu3",
+   "part": "keys",
+   "at": 12.831579,
+   "type": "sustainPedal",
+   "value": 0
+  }
+ ],
+ "render": {
+  "rate": 48000,
+  "seconds": 15.3
+ },
+ "expect": [
+  {
+   "kind": "noDiagnostics",
+   "severity": "warning"
+  },
+  {
+   "kind": "peakBelow",
+   "dbfs": -0.5
+  },
+  {
+   "kind": "partActive",
+   "part": "keys",
+   "aboveDb": -40
+  },
+  {
+   "kind": "releasedWithin",
+   "control": "pu3",
+   "seconds": 0.5,
+   "belowDb": -40
+  }
+ ]
+}

@@ -1,0 +1,31 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Host check</title>
+<p>Instrument host worklet check: renders a fixture-like session through an OfflineAudioContext. Used by tests/host-browser.mjs.</p>
+<script type="module">
+import {InstrumentHost} from './instrument-host.js';
+// Render {setup, batches} through the worklet; batch k is delivered while the
+// context is suspended at `deliverAt[k]` seconds (frame-exact, quantum aligned).
+window.renderInWorklet=async({setup,batches,deliverAt,seconds,rate=48000,timingOnly=false})=>{
+ const context=new OfflineAudioContext({numberOfChannels:2,length:Math.round(seconds*rate),sampleRate:rate});
+ const host=(await InstrumentHost.create(context)).connect(),diagnostics=[],sounding=[];
+ host.on('diagnostic',d=>diagnostics.push(d));host.on('sounding',s=>sounding.push(...s));
+ await host.configure(setup);
+ const deliver=async b=>{if(b.cancel)await host.cancel(b.cancel);await host.schedule({notes:b.notes??[],controls:b.controls??[],through:b.through});};
+ await deliver(batches[0]);
+ batches.slice(1).forEach((b,k)=>context.suspend(deliverAt[k]).then(async()=>{await deliver(b);context.resume();}));
+ const started=performance.now(),buffer=await context.startRendering(),renderMs=performance.now()-started;host.dispose();
+ if(timingOnly)return {renderMs,frames:buffer.length};
+ return {L:Array.from(buffer.getChannelData(0)),R:Array.from(buffer.getChannelData(1)),diagnostics,sounding:sounding.length,renderMs};
+};
+// Live stress run: a real-time AudioContext with per-part metering from the worklet.
+window.liveProfile=async({setup,notes,controls=[],seconds,rate=48000})=>{
+ const context=new AudioContext({sampleRate:rate,latencyHint:'interactive'});await context.resume();
+ const host=(await InstrumentHost.create(context)).connect();await host.configure(setup);
+ const at=context.currentTime+.3,shift=n=>({...n,at:n.at+at});
+ await host.schedule({notes:notes.map(shift),controls:controls.map(shift)});await host.profile('start');
+ await new Promise(resolve=>setTimeout(resolve,(seconds+.3)*1000));
+ const report=await host.profile('snapshot');host.dispose();await context.close();return {...report,baseLatency:context.baseLatency};
+};
+window.hostCheckReady=true;
+</script>

@@ -1,0 +1,362 @@
+{
+ "contract": "mnx-sound/2",
+ "fixture": {
+  "id": "plucked-techniques",
+  "description": "Every native plucked technique on a standard-tuned guitar, each isolated in time, with a plain reference note for the mute comparison. The harmonic is lowered on every kind this revision."
+ },
+ "setup": {
+  "contract": "mnx-sound/2",
+  "session": {
+   "master": {
+    "volumeDb": 0
+   }
+  },
+  "parts": [
+   {
+    "id": "gtr",
+    "instrument": {
+     "kind": "plucked",
+     "design": "rounded-steel",
+     "layout": {
+      "strings": [
+       {
+        "pitch": 64
+       },
+       {
+        "pitch": 59
+       },
+       {
+        "pitch": 55
+       },
+       {
+        "pitch": 50
+       },
+       {
+        "pitch": 45
+       },
+       {
+        "pitch": 40
+       }
+      ],
+      "capo": 0
+     }
+    },
+    "strip": {
+     "levelDb": 6.5,
+     "pan": 0
+    }
+   }
+  ]
+ },
+ "notes": [
+  {
+   "id": "open1",
+   "part": "gtr",
+   "at": 0.5,
+   "duration": 1.5,
+   "velocity": 0.7,
+   "target": {
+    "pitch": 57
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 2
+   }
+  },
+  {
+   "id": "pm1",
+   "part": "gtr",
+   "at": 2.5,
+   "duration": 1.5,
+   "velocity": 0.7,
+   "target": {
+    "pitch": 57
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 2
+   },
+   "techniques": [
+    {
+     "type": "mute",
+     "kind": "palm",
+     "amount": 0.6
+    }
+   ]
+  },
+  {
+   "id": "x1",
+   "part": "gtr",
+   "at": 4.5,
+   "duration": 0.5,
+   "velocity": 0.7,
+   "target": {
+    "pitch": 57
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 2
+   },
+   "techniques": [
+    {
+     "type": "mute",
+     "kind": "dead"
+    }
+   ]
+  },
+  {
+   "id": "b1",
+   "part": "gtr",
+   "at": 5.5,
+   "duration": 1.5,
+   "velocity": 0.7,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 5
+   },
+   "techniques": [
+    {
+     "type": "bend",
+     "points": [
+      {
+       "at": 0,
+       "cents": 0
+      },
+      {
+       "at": 0.3,
+       "cents": 200
+      },
+      {
+       "at": 1,
+       "cents": 200
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "v1",
+   "part": "gtr",
+   "at": 7.5,
+   "duration": 1.5,
+   "velocity": 0.7,
+   "target": {
+    "pitch": 62
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 3
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 25,
+     "rateHz": 5.5,
+     "delaySeconds": 0.15
+    }
+   ]
+  },
+  {
+   "id": "si1",
+   "part": "gtr",
+   "at": 9.5,
+   "duration": 1,
+   "velocity": 0.7,
+   "target": {
+    "pitch": 60
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 1
+   },
+   "techniques": [
+    {
+     "type": "slide",
+     "direction": "in",
+     "cents": -200,
+     "span": 0.25
+    }
+   ]
+  },
+  {
+   "id": "so1",
+   "part": "gtr",
+   "at": 10.75,
+   "duration": 1,
+   "velocity": 0.7,
+   "target": {
+    "pitch": 60
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 1
+   },
+   "techniques": [
+    {
+     "type": "slide",
+     "direction": "out",
+     "cents": -500,
+     "span": 0.3
+    }
+   ]
+  },
+  {
+   "id": "h1",
+   "part": "gtr",
+   "at": 12.25,
+   "duration": 0.5,
+   "velocity": 0.7,
+   "target": {
+    "pitch": 52
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 2
+   }
+  },
+  {
+   "id": "h2",
+   "part": "gtr",
+   "at": 12.75,
+   "duration": 0.75,
+   "velocity": 0.7,
+   "target": {
+    "pitch": 54
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 4
+   },
+   "techniques": [
+    {
+     "type": "legato",
+     "from": "h1",
+     "via": "hammer"
+    }
+   ]
+  },
+  {
+   "id": "harm1",
+   "part": "gtr",
+   "at": 14,
+   "duration": 1.5,
+   "velocity": 0.7,
+   "target": {
+    "pitch": 76
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 12
+   },
+   "techniques": [
+    {
+     "type": "harmonic",
+     "kind": "natural"
+    }
+   ]
+  },
+  {
+   "id": "lr1",
+   "part": "gtr",
+   "at": 16,
+   "duration": 0.3,
+   "velocity": 0.7,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "letRing"
+    }
+   ]
+  }
+ ],
+ "controls": [
+  {
+   "id": "tempo",
+   "at": 0,
+   "type": "tempo",
+   "bpm": 96
+  }
+ ],
+ "render": {
+  "rate": 48000,
+  "seconds": 19
+ },
+ "expect": [
+  {
+   "kind": "pitch",
+   "note": "b1",
+   "curve": "commanded",
+   "toleranceCents": 15,
+   "maxCents": 35
+  },
+  {
+   "kind": "pitch",
+   "note": "v1",
+   "curve": "commanded",
+   "toleranceCents": 15,
+   "maxCents": 35
+  },
+  {
+   "kind": "pitch",
+   "note": "si1",
+   "curve": "commanded",
+   "toleranceCents": 15,
+   "maxCents": 35
+  },
+  {
+   "kind": "pitch",
+   "note": "so1",
+   "curve": "commanded",
+   "toleranceCents": 15,
+   "maxCents": 35
+  },
+  {
+   "kind": "pitch",
+   "note": "h2",
+   "curve": "nominal",
+   "toleranceCents": 15,
+   "maxCents": 35
+  },
+  {
+   "kind": "noNewAttack",
+   "note": "h2",
+   "maxFluxRatio": 0.25
+  },
+  {
+   "kind": "decayRatio",
+   "note": "pm1",
+   "reference": "open1",
+   "max": 0.5
+  },
+  {
+   "kind": "silentWithin",
+   "note": "x1",
+   "seconds": 0.08,
+   "belowDb": -40
+  },
+  {
+   "kind": "sustainedPast",
+   "note": "lr1",
+   "seconds": 1,
+   "aboveDb": -40
+  },
+  {
+   "kind": "diagnostic",
+   "code": "approximated",
+   "note": "harm1"
+  },
+  {
+   "kind": "peakBelow",
+   "dbfs": -0.3
+  }
+ ]
+}

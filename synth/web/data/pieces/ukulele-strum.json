@@ -1,0 +1,2030 @@
+{
+ "contract": "mnx-sound/2",
+ "fixture": {
+  "id": "ukulele-strum",
+  "name": "Ukulele – re-entrant strum",
+  "group": "Ukulele",
+  "description": "An island strum on a GCEA ukulele. String 4 is the high G, so a down strum starts high, dips to C and climbs: the strum follows the strings, not the pitch."
+ },
+ "setup": {
+  "contract": "mnx-sound/2",
+  "session": {
+   "buses": [
+    {
+     "id": "room",
+     "type": "room",
+     "state": "on",
+     "preset": "Studio",
+     "basePreset": "Studio",
+     "params": {
+      "level": 0.18,
+      "decay": 0.6,
+      "predelay": 8,
+      "damping": 8500,
+      "width": 0.8
+     }
+    }
+   ],
+   "master": {
+    "volumeDb": 0,
+    "ceilingDb": -1
+   }
+  },
+  "parts": [
+   {
+    "id": "ukulele",
+    "name": "Ukulele",
+    "instrument": {
+     "kind": "plucked",
+     "design": "nail-nylon",
+     "layout": {
+      "strings": [
+       {
+        "pitch": 69
+       },
+       {
+        "pitch": 64
+       },
+       {
+        "pitch": 60
+       },
+       {
+        "pitch": 67
+       }
+      ],
+      "capo": 0
+     }
+    },
+    "chain": [],
+    "strip": {
+     "levelDb": 0,
+     "pan": 0,
+     "mute": false,
+     "solo": false,
+     "sends": {
+      "room": 0.3
+     }
+    }
+   }
+  ]
+ },
+ "notes": [
+  {
+   "id": "ukulele-2",
+   "part": "ukulele",
+   "at": 0.2,
+   "duration": 0.57,
+   "velocity": 0.8,
+   "target": {
+    "pitch": 67
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g1",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.02
+   }
+  },
+  {
+   "id": "ukulele-3",
+   "part": "ukulele",
+   "at": 0.2,
+   "duration": 0.57,
+   "velocity": 0.8,
+   "target": {
+    "pitch": 60
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g1",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.02
+   }
+  },
+  {
+   "id": "ukulele-4",
+   "part": "ukulele",
+   "at": 0.2,
+   "duration": 0.57,
+   "velocity": 0.8,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g1",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.02
+   }
+  },
+  {
+   "id": "ukulele-5",
+   "part": "ukulele",
+   "at": 0.2,
+   "duration": 0.57,
+   "velocity": 0.8,
+   "target": {
+    "pitch": 72
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 3
+   },
+   "gesture": {
+    "id": "ukulele-g1",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.02
+   }
+  },
+  {
+   "id": "ukulele-7",
+   "part": "ukulele",
+   "at": 0.8,
+   "duration": 0.285,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 67
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g6",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.02
+   }
+  },
+  {
+   "id": "ukulele-8",
+   "part": "ukulele",
+   "at": 0.8,
+   "duration": 0.285,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 60
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g6",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.02
+   }
+  },
+  {
+   "id": "ukulele-9",
+   "part": "ukulele",
+   "at": 0.8,
+   "duration": 0.285,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g6",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.02
+   }
+  },
+  {
+   "id": "ukulele-10",
+   "part": "ukulele",
+   "at": 0.8,
+   "duration": 0.285,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 72
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 3
+   },
+   "gesture": {
+    "id": "ukulele-g6",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.02
+   }
+  },
+  {
+   "id": "ukulele-12",
+   "part": "ukulele",
+   "at": 1.1,
+   "duration": 0.57,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 67
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g11",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.015
+   }
+  },
+  {
+   "id": "ukulele-13",
+   "part": "ukulele",
+   "at": 1.1,
+   "duration": 0.57,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 60
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g11",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.015
+   }
+  },
+  {
+   "id": "ukulele-14",
+   "part": "ukulele",
+   "at": 1.1,
+   "duration": 0.57,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g11",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.015
+   }
+  },
+  {
+   "id": "ukulele-15",
+   "part": "ukulele",
+   "at": 1.1,
+   "duration": 0.57,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 72
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 3
+   },
+   "gesture": {
+    "id": "ukulele-g11",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.015
+   }
+  },
+  {
+   "id": "ukulele-17",
+   "part": "ukulele",
+   "at": 1.7,
+   "duration": 0.285,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 67
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g16",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.015
+   }
+  },
+  {
+   "id": "ukulele-18",
+   "part": "ukulele",
+   "at": 1.7,
+   "duration": 0.285,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 60
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g16",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.015
+   }
+  },
+  {
+   "id": "ukulele-19",
+   "part": "ukulele",
+   "at": 1.7,
+   "duration": 0.285,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g16",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.015
+   }
+  },
+  {
+   "id": "ukulele-20",
+   "part": "ukulele",
+   "at": 1.7,
+   "duration": 0.285,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 72
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 3
+   },
+   "gesture": {
+    "id": "ukulele-g16",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.015
+   }
+  },
+  {
+   "id": "ukulele-22",
+   "part": "ukulele",
+   "at": 2,
+   "duration": 0.285,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 67
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g21",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.02
+   }
+  },
+  {
+   "id": "ukulele-23",
+   "part": "ukulele",
+   "at": 2,
+   "duration": 0.285,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 60
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g21",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.02
+   }
+  },
+  {
+   "id": "ukulele-24",
+   "part": "ukulele",
+   "at": 2,
+   "duration": 0.285,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g21",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.02
+   }
+  },
+  {
+   "id": "ukulele-25",
+   "part": "ukulele",
+   "at": 2,
+   "duration": 0.285,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 72
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 3
+   },
+   "gesture": {
+    "id": "ukulele-g21",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.02
+   }
+  },
+  {
+   "id": "ukulele-27",
+   "part": "ukulele",
+   "at": 2.3,
+   "duration": 0.285,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 67
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g26",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.015
+   }
+  },
+  {
+   "id": "ukulele-28",
+   "part": "ukulele",
+   "at": 2.3,
+   "duration": 0.285,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 60
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g26",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.015
+   }
+  },
+  {
+   "id": "ukulele-29",
+   "part": "ukulele",
+   "at": 2.3,
+   "duration": 0.285,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g26",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.015
+   }
+  },
+  {
+   "id": "ukulele-30",
+   "part": "ukulele",
+   "at": 2.3,
+   "duration": 0.285,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 72
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 3
+   },
+   "gesture": {
+    "id": "ukulele-g26",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.015
+   }
+  },
+  {
+   "id": "ukulele-32",
+   "part": "ukulele",
+   "at": 2.6,
+   "duration": 0.57,
+   "velocity": 0.8,
+   "target": {
+    "pitch": 69
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "ukulele-g31",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.02
+   }
+  },
+  {
+   "id": "ukulele-33",
+   "part": "ukulele",
+   "at": 2.6,
+   "duration": 0.57,
+   "velocity": 0.8,
+   "target": {
+    "pitch": 60
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g31",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.02
+   }
+  },
+  {
+   "id": "ukulele-34",
+   "part": "ukulele",
+   "at": 2.6,
+   "duration": 0.57,
+   "velocity": 0.8,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g31",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.02
+   }
+  },
+  {
+   "id": "ukulele-35",
+   "part": "ukulele",
+   "at": 2.6,
+   "duration": 0.57,
+   "velocity": 0.8,
+   "target": {
+    "pitch": 69
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g31",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.02
+   }
+  },
+  {
+   "id": "ukulele-37",
+   "part": "ukulele",
+   "at": 3.2,
+   "duration": 0.285,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 69
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "ukulele-g36",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.02
+   }
+  },
+  {
+   "id": "ukulele-38",
+   "part": "ukulele",
+   "at": 3.2,
+   "duration": 0.285,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 60
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g36",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.02
+   }
+  },
+  {
+   "id": "ukulele-39",
+   "part": "ukulele",
+   "at": 3.2,
+   "duration": 0.285,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g36",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.02
+   }
+  },
+  {
+   "id": "ukulele-40",
+   "part": "ukulele",
+   "at": 3.2,
+   "duration": 0.285,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 69
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g36",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.02
+   }
+  },
+  {
+   "id": "ukulele-42",
+   "part": "ukulele",
+   "at": 3.5,
+   "duration": 0.57,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 69
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "ukulele-g41",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.015
+   }
+  },
+  {
+   "id": "ukulele-43",
+   "part": "ukulele",
+   "at": 3.5,
+   "duration": 0.57,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 60
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g41",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.015
+   }
+  },
+  {
+   "id": "ukulele-44",
+   "part": "ukulele",
+   "at": 3.5,
+   "duration": 0.57,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g41",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.015
+   }
+  },
+  {
+   "id": "ukulele-45",
+   "part": "ukulele",
+   "at": 3.5,
+   "duration": 0.57,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 69
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g41",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.015
+   }
+  },
+  {
+   "id": "ukulele-47",
+   "part": "ukulele",
+   "at": 4.1,
+   "duration": 0.285,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 69
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "ukulele-g46",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.015
+   }
+  },
+  {
+   "id": "ukulele-48",
+   "part": "ukulele",
+   "at": 4.1,
+   "duration": 0.285,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 60
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g46",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.015
+   }
+  },
+  {
+   "id": "ukulele-49",
+   "part": "ukulele",
+   "at": 4.1,
+   "duration": 0.285,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g46",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.015
+   }
+  },
+  {
+   "id": "ukulele-50",
+   "part": "ukulele",
+   "at": 4.1,
+   "duration": 0.285,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 69
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g46",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.015
+   }
+  },
+  {
+   "id": "ukulele-52",
+   "part": "ukulele",
+   "at": 4.4,
+   "duration": 0.285,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 69
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "ukulele-g51",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.02
+   }
+  },
+  {
+   "id": "ukulele-53",
+   "part": "ukulele",
+   "at": 4.4,
+   "duration": 0.285,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 60
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g51",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.02
+   }
+  },
+  {
+   "id": "ukulele-54",
+   "part": "ukulele",
+   "at": 4.4,
+   "duration": 0.285,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g51",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.02
+   }
+  },
+  {
+   "id": "ukulele-55",
+   "part": "ukulele",
+   "at": 4.4,
+   "duration": 0.285,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 69
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g51",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.02
+   }
+  },
+  {
+   "id": "ukulele-57",
+   "part": "ukulele",
+   "at": 4.7,
+   "duration": 0.285,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 69
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "ukulele-g56",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.015
+   }
+  },
+  {
+   "id": "ukulele-58",
+   "part": "ukulele",
+   "at": 4.7,
+   "duration": 0.285,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 60
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g56",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.015
+   }
+  },
+  {
+   "id": "ukulele-59",
+   "part": "ukulele",
+   "at": 4.7,
+   "duration": 0.285,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g56",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.015
+   }
+  },
+  {
+   "id": "ukulele-60",
+   "part": "ukulele",
+   "at": 4.7,
+   "duration": 0.285,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 69
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g56",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.015
+   }
+  },
+  {
+   "id": "ukulele-62",
+   "part": "ukulele",
+   "at": 5,
+   "duration": 0.57,
+   "velocity": 0.8,
+   "target": {
+    "pitch": 69
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "ukulele-g61",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.02
+   }
+  },
+  {
+   "id": "ukulele-63",
+   "part": "ukulele",
+   "at": 5,
+   "duration": 0.57,
+   "velocity": 0.8,
+   "target": {
+    "pitch": 60
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g61",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.02
+   }
+  },
+  {
+   "id": "ukulele-64",
+   "part": "ukulele",
+   "at": 5,
+   "duration": 0.57,
+   "velocity": 0.8,
+   "target": {
+    "pitch": 65
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 1
+   },
+   "gesture": {
+    "id": "ukulele-g61",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.02
+   }
+  },
+  {
+   "id": "ukulele-65",
+   "part": "ukulele",
+   "at": 5,
+   "duration": 0.57,
+   "velocity": 0.8,
+   "target": {
+    "pitch": 69
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g61",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.02
+   }
+  },
+  {
+   "id": "ukulele-67",
+   "part": "ukulele",
+   "at": 5.6,
+   "duration": 0.285,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 69
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "ukulele-g66",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.02
+   }
+  },
+  {
+   "id": "ukulele-68",
+   "part": "ukulele",
+   "at": 5.6,
+   "duration": 0.285,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 60
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g66",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.02
+   }
+  },
+  {
+   "id": "ukulele-69",
+   "part": "ukulele",
+   "at": 5.6,
+   "duration": 0.285,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 65
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 1
+   },
+   "gesture": {
+    "id": "ukulele-g66",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.02
+   }
+  },
+  {
+   "id": "ukulele-70",
+   "part": "ukulele",
+   "at": 5.6,
+   "duration": 0.285,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 69
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g66",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.02
+   }
+  },
+  {
+   "id": "ukulele-72",
+   "part": "ukulele",
+   "at": 5.9,
+   "duration": 0.57,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 69
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "ukulele-g71",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.015
+   }
+  },
+  {
+   "id": "ukulele-73",
+   "part": "ukulele",
+   "at": 5.9,
+   "duration": 0.57,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 60
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g71",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.015
+   }
+  },
+  {
+   "id": "ukulele-74",
+   "part": "ukulele",
+   "at": 5.9,
+   "duration": 0.57,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 65
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 1
+   },
+   "gesture": {
+    "id": "ukulele-g71",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.015
+   }
+  },
+  {
+   "id": "ukulele-75",
+   "part": "ukulele",
+   "at": 5.9,
+   "duration": 0.57,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 69
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g71",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.015
+   }
+  },
+  {
+   "id": "ukulele-77",
+   "part": "ukulele",
+   "at": 6.5,
+   "duration": 0.285,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 69
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "ukulele-g76",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.015
+   }
+  },
+  {
+   "id": "ukulele-78",
+   "part": "ukulele",
+   "at": 6.5,
+   "duration": 0.285,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 60
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g76",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.015
+   }
+  },
+  {
+   "id": "ukulele-79",
+   "part": "ukulele",
+   "at": 6.5,
+   "duration": 0.285,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 65
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 1
+   },
+   "gesture": {
+    "id": "ukulele-g76",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.015
+   }
+  },
+  {
+   "id": "ukulele-80",
+   "part": "ukulele",
+   "at": 6.5,
+   "duration": 0.285,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 69
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g76",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.015
+   }
+  },
+  {
+   "id": "ukulele-82",
+   "part": "ukulele",
+   "at": 6.8,
+   "duration": 0.285,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 69
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "ukulele-g81",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.02
+   }
+  },
+  {
+   "id": "ukulele-83",
+   "part": "ukulele",
+   "at": 6.8,
+   "duration": 0.285,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 60
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g81",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.02
+   }
+  },
+  {
+   "id": "ukulele-84",
+   "part": "ukulele",
+   "at": 6.8,
+   "duration": 0.285,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 65
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 1
+   },
+   "gesture": {
+    "id": "ukulele-g81",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.02
+   }
+  },
+  {
+   "id": "ukulele-85",
+   "part": "ukulele",
+   "at": 6.8,
+   "duration": 0.285,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 69
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g81",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.02
+   }
+  },
+  {
+   "id": "ukulele-87",
+   "part": "ukulele",
+   "at": 7.1,
+   "duration": 0.285,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 69
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "ukulele-g86",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.015
+   }
+  },
+  {
+   "id": "ukulele-88",
+   "part": "ukulele",
+   "at": 7.1,
+   "duration": 0.285,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 60
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g86",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.015
+   }
+  },
+  {
+   "id": "ukulele-89",
+   "part": "ukulele",
+   "at": 7.1,
+   "duration": 0.285,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 65
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 1
+   },
+   "gesture": {
+    "id": "ukulele-g86",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.015
+   }
+  },
+  {
+   "id": "ukulele-90",
+   "part": "ukulele",
+   "at": 7.1,
+   "duration": 0.285,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 69
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g86",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.015
+   }
+  },
+  {
+   "id": "ukulele-92",
+   "part": "ukulele",
+   "at": 7.4,
+   "duration": 0.57,
+   "velocity": 0.8,
+   "target": {
+    "pitch": 67
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g91",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.02
+   }
+  },
+  {
+   "id": "ukulele-93",
+   "part": "ukulele",
+   "at": 7.4,
+   "duration": 0.57,
+   "velocity": 0.8,
+   "target": {
+    "pitch": 62
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "ukulele-g91",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.02
+   }
+  },
+  {
+   "id": "ukulele-94",
+   "part": "ukulele",
+   "at": 7.4,
+   "duration": 0.57,
+   "velocity": 0.8,
+   "target": {
+    "pitch": 65
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 1
+   },
+   "gesture": {
+    "id": "ukulele-g91",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.02
+   }
+  },
+  {
+   "id": "ukulele-95",
+   "part": "ukulele",
+   "at": 7.4,
+   "duration": 0.57,
+   "velocity": 0.8,
+   "target": {
+    "pitch": 71
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "ukulele-g91",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.02
+   }
+  },
+  {
+   "id": "ukulele-97",
+   "part": "ukulele",
+   "at": 8,
+   "duration": 0.285,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 67
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g96",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.02
+   }
+  },
+  {
+   "id": "ukulele-98",
+   "part": "ukulele",
+   "at": 8,
+   "duration": 0.285,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 62
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "ukulele-g96",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.02
+   }
+  },
+  {
+   "id": "ukulele-99",
+   "part": "ukulele",
+   "at": 8,
+   "duration": 0.285,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 65
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 1
+   },
+   "gesture": {
+    "id": "ukulele-g96",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.02
+   }
+  },
+  {
+   "id": "ukulele-100",
+   "part": "ukulele",
+   "at": 8,
+   "duration": 0.285,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 71
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "ukulele-g96",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.02
+   }
+  },
+  {
+   "id": "ukulele-102",
+   "part": "ukulele",
+   "at": 8.3,
+   "duration": 0.57,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 67
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g101",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.015
+   }
+  },
+  {
+   "id": "ukulele-103",
+   "part": "ukulele",
+   "at": 8.3,
+   "duration": 0.57,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 62
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "ukulele-g101",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.015
+   }
+  },
+  {
+   "id": "ukulele-104",
+   "part": "ukulele",
+   "at": 8.3,
+   "duration": 0.57,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 65
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 1
+   },
+   "gesture": {
+    "id": "ukulele-g101",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.015
+   }
+  },
+  {
+   "id": "ukulele-105",
+   "part": "ukulele",
+   "at": 8.3,
+   "duration": 0.57,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 71
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "ukulele-g101",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.015
+   }
+  },
+  {
+   "id": "ukulele-107",
+   "part": "ukulele",
+   "at": 8.9,
+   "duration": 0.285,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 67
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g106",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.015
+   }
+  },
+  {
+   "id": "ukulele-108",
+   "part": "ukulele",
+   "at": 8.9,
+   "duration": 0.285,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 62
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "ukulele-g106",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.015
+   }
+  },
+  {
+   "id": "ukulele-109",
+   "part": "ukulele",
+   "at": 8.9,
+   "duration": 0.285,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 65
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 1
+   },
+   "gesture": {
+    "id": "ukulele-g106",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.015
+   }
+  },
+  {
+   "id": "ukulele-110",
+   "part": "ukulele",
+   "at": 8.9,
+   "duration": 0.285,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 71
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "ukulele-g106",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.015
+   }
+  },
+  {
+   "id": "ukulele-112",
+   "part": "ukulele",
+   "at": 9.2,
+   "duration": 0.285,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 67
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g111",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.02
+   }
+  },
+  {
+   "id": "ukulele-113",
+   "part": "ukulele",
+   "at": 9.2,
+   "duration": 0.285,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 62
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "ukulele-g111",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.02
+   }
+  },
+  {
+   "id": "ukulele-114",
+   "part": "ukulele",
+   "at": 9.2,
+   "duration": 0.285,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 65
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 1
+   },
+   "gesture": {
+    "id": "ukulele-g111",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.02
+   }
+  },
+  {
+   "id": "ukulele-115",
+   "part": "ukulele",
+   "at": 9.2,
+   "duration": 0.285,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 71
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "ukulele-g111",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.02
+   }
+  },
+  {
+   "id": "ukulele-117",
+   "part": "ukulele",
+   "at": 9.5,
+   "duration": 0.285,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 67
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "ukulele-g116",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.015
+   }
+  },
+  {
+   "id": "ukulele-118",
+   "part": "ukulele",
+   "at": 9.5,
+   "duration": 0.285,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 62
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "ukulele-g116",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.015
+   }
+  },
+  {
+   "id": "ukulele-119",
+   "part": "ukulele",
+   "at": 9.5,
+   "duration": 0.285,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 65
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 1
+   },
+   "gesture": {
+    "id": "ukulele-g116",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.015
+   }
+  },
+  {
+   "id": "ukulele-120",
+   "part": "ukulele",
+   "at": 9.5,
+   "duration": 0.285,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 71
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "ukulele-g116",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.015
+   }
+  }
+ ],
+ "controls": [
+  {
+   "id": "tempo",
+   "at": 0,
+   "type": "tempo",
+   "bpm": 100
+  }
+ ],
+ "render": {
+  "rate": 48000,
+  "seconds": 12.3
+ },
+ "expect": [
+  {
+   "kind": "noDiagnostics",
+   "severity": "warning"
+  },
+  {
+   "kind": "peakBelow",
+   "dbfs": -0.5
+  },
+  {
+   "kind": "partActive",
+   "part": "ukulele",
+   "aboveDb": -40
+  },
+  {
+   "kind": "onsetAt",
+   "note": "ukulele-2",
+   "seconds": 0
+  },
+  {
+   "kind": "onsetAt",
+   "note": "ukulele-5",
+   "seconds": 0.02
+  }
+ ]
+}

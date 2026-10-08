@@ -1,0 +1,220 @@
+{
+ "contract": "mnx-sound/2",
+ "fixture": {
+  "id": "ukulele-layout",
+  "description": "Reentrant 4-string ukulele (G4 C4 E4 A4, string 1 = A4): each open string alone, then a strummed C chord. Two DSP slots stay parked."
+ },
+ "setup": {
+  "contract": "mnx-sound/2",
+  "session": {
+   "master": {
+    "volumeDb": 0
+   }
+  },
+  "parts": [
+   {
+    "id": "uke",
+    "instrument": {
+     "kind": "plucked",
+     "design": "soft-nylon",
+     "layout": {
+      "strings": [
+       {
+        "pitch": 69
+       },
+       {
+        "pitch": 64
+       },
+       {
+        "pitch": 60
+       },
+       {
+        "pitch": 67
+       }
+      ],
+      "capo": 0
+     }
+    },
+    "strip": {
+     "levelDb": 3
+    }
+   }
+  ]
+ },
+ "notes": [
+  {
+   "id": "u4",
+   "part": "uke",
+   "at": 0.5,
+   "duration": 0.9,
+   "velocity": 0.65,
+   "target": {
+    "pitch": 67
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 0
+   }
+  },
+  {
+   "id": "u3",
+   "part": "uke",
+   "at": 1.5,
+   "duration": 0.9,
+   "velocity": 0.65,
+   "target": {
+    "pitch": 60
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 0
+   }
+  },
+  {
+   "id": "u2",
+   "part": "uke",
+   "at": 2.5,
+   "duration": 0.9,
+   "velocity": 0.65,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 0
+   }
+  },
+  {
+   "id": "u1",
+   "part": "uke",
+   "at": 3.5,
+   "duration": 0.9,
+   "velocity": 0.65,
+   "target": {
+    "pitch": 69
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 0
+   }
+  },
+  {
+   "id": "c4",
+   "part": "uke",
+   "at": 5,
+   "duration": 1.5,
+   "velocity": 0.65,
+   "target": {
+    "pitch": 67
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 0
+   }
+  },
+  {
+   "id": "c3",
+   "part": "uke",
+   "at": 5.02,
+   "duration": 1.48,
+   "velocity": 0.65,
+   "target": {
+    "pitch": 60
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 0
+   }
+  },
+  {
+   "id": "c2",
+   "part": "uke",
+   "at": 5.04,
+   "duration": 1.46,
+   "velocity": 0.65,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 0
+   }
+  },
+  {
+   "id": "c1",
+   "part": "uke",
+   "at": 5.06,
+   "duration": 1.44,
+   "velocity": 0.65,
+   "target": {
+    "pitch": 72
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 3
+   }
+  }
+ ],
+ "controls": [
+  {
+   "id": "tempo",
+   "at": 0,
+   "type": "tempo",
+   "bpm": 96
+  }
+ ],
+ "render": {
+  "rate": 48000,
+  "seconds": 8
+ },
+ "expect": [
+  {
+   "kind": "pitch",
+   "note": "u1",
+   "curve": "nominal",
+   "toleranceCents": 15,
+   "maxCents": 35
+  },
+  {
+   "kind": "pitch",
+   "note": "u2",
+   "curve": "nominal",
+   "toleranceCents": 15,
+   "maxCents": 35
+  },
+  {
+   "kind": "pitch",
+   "note": "u3",
+   "curve": "nominal",
+   "toleranceCents": 15,
+   "maxCents": 35
+  },
+  {
+   "kind": "pitch",
+   "note": "u4",
+   "curve": "nominal",
+   "toleranceCents": 15,
+   "maxCents": 35
+  },
+  {
+   "kind": "pitch",
+   "note": "c1",
+   "curve": "nominal",
+   "toleranceCents": 15,
+   "maxCents": 35
+  },
+  {
+   "kind": "activeStrings",
+   "part": "uke",
+   "count": 4
+  },
+  {
+   "kind": "noDiagnostics",
+   "severity": "warning"
+  },
+  {
+   "kind": "peakBelow",
+   "dbfs": -0.3
+  }
+ ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "guitar-lab",
+  "generation": 3,
+  "sourceSha256": "f3e8e1b703f561fb0ddd2e0662daf6541b06ae240145ace96a6bc95db7dc3022",
+  "eventPolicy": "latest-pluck-v1",
+  "bodyModeCount": 24,
+  "bodyRadiation": "Experimental, disabled in factory designs",
+  "hardnessMaximum": 40,
+  "browserAssets": {
+    "guitar": "22cc119bcee9b2c0c49a853cfd51c25cc39577bd108d75b7c88cdf770620377f"
+  },
+  "controlPolicy": "Continuous controls ramp; excitation is next-pluck; tuning/setup retains owned ringing-note trajectories. Fixed topology within this candidate; engine-version changes reload and end playback.",
+  "build": {
+    "sourceSha256": "f3e8e1b703f561fb0ddd2e0662daf6541b06ae240145ace96a6bc95db7dc3022",
+    "sources": {
+      "dsp/engine2/guitar.dsp": "42b858bf6d82258a2cac9d0d5483dfd2852ff434487c19d6f7bd5e47fc681e6a",
+      "dsp/engine2/instrument-bridge.dsp": "3778f5d135d86ea913f2b43b7c94aed0a9c879f5654f5b0fbe2ed606f19224f2",
+      "dsp/engine2/instrument-pickups.dsp": "5fcf6d25f830a61027a9474deaa4a3c92d668360e041336967e4c0d953196b7a",
+      "dsp/engine2/instrument-stage1.dsp": "5f65010cc446ac0406a604660dec41db514fcb7dea961954f85729de2a97d4ad",
+      "dsp/engine2/instrument-stage2.dsp": "2a3f4e8652b950d1ac2c0a22d585b1815b74b6827d97ded9f5adffc2b8079aea",
+      "dsp/engine2/instrument-stage3.dsp": "2e17a54f4a1921f7fa42f26c9b7b4b8676e70d4575cecd00e7918846dce9bff9",
+      "dsp/engine2/instrument-stage4.dsp": "fc8e45c3e55274e17a02bfc11ad9cce552960a30d86d9c879c50babdbdd4804b",
+      "dsp/engine2/instrument-stage5.dsp": "67d848cfba9f68174c5573252f9bbb1c0e0ec2e7815f7e5a729169b13dcd6e38",
+      "dsp/engine2/instrument-stage6.dsp": "d793aaea2e90ff4406606659d18c7b7e3cf051a392701bc5b2d60a69d0700b81"
+    },
+    "rawGuitarSha256": "2830250e61bf0d187ec3534a1d052474f45ab8eff347eb66bd90b529fd960fc4",
+    "guitar": "22cc119bcee9b2c0c49a853cfd51c25cc39577bd108d75b7c88cdf770620377f",
+    "transforms": {
+      "memo": "59bc3178753cb59a335ab89573ee685b9784851c44cf429e7e761d5540192cd5",
+      "knockGuard": "2bdbabaf3d8b3292b48ad7b84d05c38a5cafa61bd769ec78ca6af4e4fcfd7ecf"
+    }
+  },
+  "status": "Engine2 (generation 3): the plucked instrument of the synth. Source dsp/engine2; reproduced byte for byte by npm run build:v2. Designs name it by id and generation.",
+  "thwack": {
+    "method": "Real-time shadow DSP snapshot per sounding string; shared clean baseline, bounded resonant difference added before the rack. No worker or PCM preparation",
+    "strengthMaximum": 1.5,
+    "tone": "100% weightier",
+    "holdSeconds": 0.02,
+    "settlingSeconds": 0.1,
+    "liveUpdates": "Next pluck, without preparation delay; current layer retained; same-string re-pluck replaces it"
+  }
+}

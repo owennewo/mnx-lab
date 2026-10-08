@@ -1,0 +1,300 @@
+{
+ "contract": "mnx-sound/2",
+ "fixture": {
+  "id": "guitar-sustain",
+  "name": "Guitar – sustain & let ring",
+  "group": "Guitar",
+  "description": "A low open string and a high 12th-fret note left to ring, then a chord struck once and let ring through two bars: decay and the bridge’s sympathetic response."
+ },
+ "setup": {
+  "contract": "mnx-sound/2",
+  "session": {
+   "buses": [
+    {
+     "id": "room",
+     "type": "room",
+     "state": "on",
+     "preset": "Studio",
+     "basePreset": "Studio",
+     "params": {
+      "level": 0.18,
+      "decay": 0.6,
+      "predelay": 8,
+      "damping": 8500,
+      "width": 0.8
+     }
+    }
+   ],
+   "master": {
+    "volumeDb": 0,
+    "ceilingDb": -1
+   }
+  },
+  "parts": [
+   {
+    "id": "guitar",
+    "name": "Guitar",
+    "instrument": {
+     "kind": "plucked",
+     "design": "wide-ringing",
+     "layout": {
+      "strings": [
+       {
+        "pitch": 64
+       },
+       {
+        "pitch": 59
+       },
+       {
+        "pitch": 55
+       },
+       {
+        "pitch": 50
+       },
+       {
+        "pitch": 45
+       },
+       {
+        "pitch": 40
+       }
+      ],
+      "capo": 0
+     }
+    },
+    "chain": [],
+    "strip": {
+     "levelDb": -2,
+     "pan": 0,
+     "mute": false,
+     "solo": false,
+     "sends": {
+      "room": 0.3
+     }
+    }
+   }
+  ]
+ },
+ "notes": [
+  {
+   "id": "guitar-1",
+   "part": "guitar",
+   "at": 0.2,
+   "duration": 4,
+   "velocity": 0.75,
+   "target": {
+    "pitch": 40
+   },
+   "fingering": {
+    "string": 6,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "letRing"
+    }
+   ]
+  },
+  {
+   "id": "guitar-2",
+   "part": "guitar",
+   "at": 4.2,
+   "duration": 4,
+   "velocity": 0.75,
+   "target": {
+    "pitch": 76
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 12
+   },
+   "techniques": [
+    {
+     "type": "letRing"
+    }
+   ]
+  },
+  {
+   "id": "guitar-4",
+   "part": "guitar",
+   "at": 8.2,
+   "duration": 1,
+   "velocity": 0.8,
+   "target": {
+    "pitch": 43
+   },
+   "fingering": {
+    "string": 6,
+    "fret": 3
+   },
+   "gesture": {
+    "id": "guitar-g3",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.04
+   },
+   "techniques": [
+    {
+     "type": "letRing"
+    }
+   ]
+  },
+  {
+   "id": "guitar-5",
+   "part": "guitar",
+   "at": 8.2,
+   "duration": 1,
+   "velocity": 0.8,
+   "target": {
+    "pitch": 47
+   },
+   "fingering": {
+    "string": 5,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "guitar-g3",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.04
+   },
+   "techniques": [
+    {
+     "type": "letRing"
+    }
+   ]
+  },
+  {
+   "id": "guitar-6",
+   "part": "guitar",
+   "at": 8.2,
+   "duration": 1,
+   "velocity": 0.8,
+   "target": {
+    "pitch": 50
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "guitar-g3",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.04
+   },
+   "techniques": [
+    {
+     "type": "letRing"
+    }
+   ]
+  },
+  {
+   "id": "guitar-7",
+   "part": "guitar",
+   "at": 8.2,
+   "duration": 1,
+   "velocity": 0.8,
+   "target": {
+    "pitch": 55
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "guitar-g3",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.04
+   },
+   "techniques": [
+    {
+     "type": "letRing"
+    }
+   ]
+  },
+  {
+   "id": "guitar-8",
+   "part": "guitar",
+   "at": 8.2,
+   "duration": 1,
+   "velocity": 0.8,
+   "target": {
+    "pitch": 59
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "guitar-g3",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.04
+   },
+   "techniques": [
+    {
+     "type": "letRing"
+    }
+   ]
+  },
+  {
+   "id": "guitar-9",
+   "part": "guitar",
+   "at": 8.2,
+   "duration": 1,
+   "velocity": 0.8,
+   "target": {
+    "pitch": 67
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 3
+   },
+   "gesture": {
+    "id": "guitar-g3",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.04
+   },
+   "techniques": [
+    {
+     "type": "letRing"
+    }
+   ]
+  }
+ ],
+ "controls": [
+  {
+   "id": "tempo",
+   "at": 0,
+   "type": "tempo",
+   "bpm": 60
+  }
+ ],
+ "render": {
+  "rate": 48000,
+  "seconds": 15.2
+ },
+ "expect": [
+  {
+   "kind": "noDiagnostics",
+   "severity": "warning"
+  },
+  {
+   "kind": "peakBelow",
+   "dbfs": -0.5
+  },
+  {
+   "kind": "partActive",
+   "part": "guitar",
+   "aboveDb": -40
+  },
+  {
+   "kind": "sustainedPast",
+   "note": "guitar-9",
+   "seconds": 1,
+   "aboveDb": -40
+  }
+ ]
+}

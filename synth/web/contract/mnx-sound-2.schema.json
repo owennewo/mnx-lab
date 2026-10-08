@@ -1,0 +1,904 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "mnx-sound-2.schema.json",
+  "title": "mnx-sound/2 event log",
+  "description": "Structural schema for mnx-sound/2. Unknown fields are allowed everywhere. Cross-object rules (unique ids, known parts, backward legato references, one technique of each known type) are enforced by web/contract/validate.js.",
+  "$ref": "#/$defs/eventLog",
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_.:-]{1,128}$"
+    },
+    "time": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 86400
+    },
+    "fraction": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "cents": {
+      "type": "number",
+      "minimum": -2400,
+      "maximum": 2400
+    },
+    "layout": {
+      "type": "object",
+      "required": [
+        "strings"
+      ],
+      "properties": {
+        "strings": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 6,
+          "items": {
+            "type": "object",
+            "required": [
+              "pitch"
+            ],
+            "properties": {
+              "pitch": {
+                "type": "number",
+                "minimum": 36,
+                "maximum": 76
+              }
+            }
+          }
+        },
+        "capo": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 12
+        }
+      }
+    },
+    "part": {
+      "type": "object",
+      "required": [
+        "id",
+        "instrument"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "instrument": {
+          "type": "object",
+          "required": [
+            "kind",
+            "design"
+          ],
+          "properties": {
+            "kind": {
+              "type": "string",
+              "minLength": 1
+            },
+            "design": {
+              "type": [
+                "string",
+                "object"
+              ]
+            }
+          },
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "plucked"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "layout": {
+                "$ref": "#/$defs/layout"
+              }
+            }
+          }
+        },
+        "seed": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4294967295
+        },
+        "name": {
+          "type": "string"
+        },
+        "chain": {
+          "type": "array",
+          "maxItems": 16,
+          "items": {
+            "$ref": "#/$defs/block"
+          }
+        },
+        "strip": {
+          "type": "object",
+          "properties": {
+            "levelDb": {
+              "type": "number",
+              "minimum": -60,
+              "maximum": 12
+            },
+            "pan": {
+              "type": "number",
+              "minimum": -1,
+              "maximum": 1
+            },
+            "mute": {
+              "type": "boolean"
+            },
+            "solo": {
+              "type": "boolean"
+            },
+            "sends": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "setup": {
+      "type": "object",
+      "required": [
+        "contract",
+        "session",
+        "parts"
+      ],
+      "properties": {
+        "contract": {
+          "const": "mnx-sound/2"
+        },
+        "session": {
+          "type": "object",
+          "properties": {
+            "buses": {
+              "type": "array",
+              "maxItems": 8,
+              "items": {
+                "$ref": "#/$defs/bus"
+              }
+            },
+            "master": {
+              "type": "object",
+              "properties": {
+                "volumeDb": {
+                  "type": "number",
+                  "minimum": -60,
+                  "maximum": 12
+                },
+                "ceilingDb": {
+                  "type": "number",
+                  "minimum": -24,
+                  "maximum": 0
+                }
+              }
+            }
+          }
+        },
+        "parts": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "items": {
+            "$ref": "#/$defs/part"
+          }
+        }
+      }
+    },
+    "technique": {
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "bend"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "points"
+            ],
+            "properties": {
+              "points": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 256,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "at",
+                    "cents"
+                  ],
+                  "properties": {
+                    "at": {
+                      "$ref": "#/$defs/fraction"
+                    },
+                    "cents": {
+                      "$ref": "#/$defs/cents"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "vibrato"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "depthCents",
+              "rateHz"
+            ],
+            "properties": {
+              "depthCents": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 200
+              },
+              "rateHz": {
+                "type": "number",
+                "minimum": 0.1,
+                "maximum": 20
+              },
+              "start": {
+                "$ref": "#/$defs/fraction"
+              },
+              "delaySeconds": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 60
+              },
+              "fadeSeconds": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 10
+              },
+              "phase": {
+                "type": "number",
+                "minimum": -1000,
+                "maximum": 1000
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "slide"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "direction"
+            ],
+            "properties": {
+              "direction": {
+                "enum": [
+                  "in",
+                  "out"
+                ]
+              },
+              "cents": {
+                "$ref": "#/$defs/cents"
+              },
+              "span": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "maximum": 1
+              },
+              "fretted": {
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "legato"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "from",
+              "via"
+            ],
+            "properties": {
+              "from": {
+                "$ref": "#/$defs/id"
+              },
+              "via": {
+                "enum": [
+                  "hammer",
+                  "pull",
+                  "slide"
+                ]
+              },
+              "glide": {
+                "$ref": "#/$defs/fraction"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "mute"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "kind"
+            ],
+            "properties": {
+              "kind": {
+                "enum": [
+                  "palm",
+                  "dead"
+                ]
+              },
+              "amount": {
+                "$ref": "#/$defs/fraction"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "harmonic"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "kind"
+            ],
+            "properties": {
+              "kind": {
+                "enum": [
+                  "natural",
+                  "artificial",
+                  "pinch",
+                  "tap",
+                  "semi",
+                  "feedback"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "note": {
+      "type": "object",
+      "required": [
+        "id",
+        "part",
+        "at",
+        "duration",
+        "velocity",
+        "target"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "part": {
+          "$ref": "#/$defs/id"
+        },
+        "at": {
+          "$ref": "#/$defs/time"
+        },
+        "duration": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 3600
+        },
+        "velocity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "target": {
+          "anyOf": [
+            {
+              "type": "object",
+              "required": [
+                "pitch"
+              ],
+              "properties": {
+                "pitch": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 127
+                }
+              },
+              "not": {
+                "required": [
+                  "piece"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "piece"
+              ],
+              "properties": {
+                "piece": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "not": {
+                "required": [
+                  "pitch"
+                ]
+              }
+            }
+          ]
+        },
+        "fingering": {
+          "type": "object",
+          "required": [
+            "string"
+          ],
+          "properties": {
+            "string": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 12
+            },
+            "fret": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 36
+            }
+          }
+        },
+        "techniques": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/technique"
+          }
+        },
+        "nuance": {
+          "type": "object",
+          "properties": {
+            "intonationCents": {
+              "type": "number",
+              "minimum": -100,
+              "maximum": 100
+            },
+            "attackBendCents": {
+              "type": "number",
+              "minimum": -100,
+              "maximum": 100
+            },
+            "excitation": {
+              "type": "object",
+              "properties": {
+                "positionDelta": {
+                  "type": "number",
+                  "minimum": -0.5,
+                  "maximum": 0.5
+                },
+                "hardnessDelta": {
+                  "type": "number",
+                  "minimum": -40,
+                  "maximum": 40
+                }
+              }
+            }
+          }
+        },
+        "gesture": {
+          "type": "object",
+          "required": [
+            "id",
+            "type"
+          ],
+          "properties": {
+            "id": {
+              "$ref": "#/$defs/id"
+            },
+            "type": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "type": {
+                    "enum": [
+                      "strum",
+                      "roll"
+                    ]
+                  }
+                }
+              },
+              "then": {
+                "required": [
+                  "direction",
+                  "spreadSeconds"
+                ],
+                "properties": {
+                  "direction": {
+                    "enum": [
+                      "down",
+                      "up"
+                    ]
+                  },
+                  "spreadSeconds": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 2
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "control": {
+      "type": "object",
+      "required": [
+        "id",
+        "at",
+        "type"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "part": {
+          "$ref": "#/$defs/id"
+        },
+        "at": {
+          "$ref": "#/$defs/time"
+        },
+        "type": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "sustainPedal"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "value"
+            ],
+            "properties": {
+              "value": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "mute"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "value"
+            ],
+            "properties": {
+              "value": {
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "tempo"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "bpm"
+            ],
+            "not": {
+              "required": [
+                "part"
+              ]
+            },
+            "properties": {
+              "bpm": {
+                "type": "number",
+                "minimum": 20,
+                "maximum": 400
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "not": {
+              "properties": {
+                "type": {
+                  "const": "tempo"
+                }
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "part"
+            ]
+          }
+        }
+      ]
+    },
+    "eventLog": {
+      "type": "object",
+      "required": [
+        "contract",
+        "setup"
+      ],
+      "properties": {
+        "contract": {
+          "const": "mnx-sound/2"
+        },
+        "setup": {
+          "$ref": "#/$defs/setup"
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/note"
+          }
+        },
+        "controls": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/control"
+          }
+        }
+      }
+    },
+    "fixture": {
+      "type": "object",
+      "required": [
+        "contract",
+        "fixture",
+        "setup",
+        "render",
+        "expect"
+      ],
+      "properties": {
+        "contract": {
+          "const": "mnx-sound/2"
+        },
+        "fixture": {
+          "type": "object",
+          "required": [
+            "id",
+            "description"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "setup": {
+          "$ref": "#/$defs/setup"
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/note"
+          }
+        },
+        "controls": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/control"
+          }
+        },
+        "batches": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "properties": {
+              "through": {
+                "$ref": "#/$defs/time"
+              },
+              "notes": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/note"
+                }
+              },
+              "controls": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/control"
+                }
+              },
+              "cancel": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "from"
+                    ],
+                    "properties": {
+                      "from": {
+                        "$ref": "#/$defs/time"
+                      }
+                    },
+                    "not": {
+                      "required": [
+                        "ids"
+                      ]
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "required": [
+                      "ids"
+                    ],
+                    "properties": {
+                      "ids": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "not": {
+                      "required": [
+                        "from"
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "render": {
+          "type": "object",
+          "required": [
+            "rate",
+            "seconds"
+          ],
+          "properties": {
+            "rate": {
+              "enum": [
+                44100,
+                48000,
+                96000
+              ]
+            },
+            "seconds": {
+              "type": "number",
+              "minimum": 0.1,
+              "maximum": 120
+            }
+          }
+        },
+        "expect": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "kind"
+            ],
+            "properties": {
+              "kind": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "block": {
+      "type": "object",
+      "required": [
+        "id",
+        "type"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "state": {
+          "enum": [
+            "on",
+            "off"
+          ]
+        },
+        "params": {
+          "type": "object"
+        }
+      }
+    },
+    "bus": {
+      "type": "object",
+      "required": [
+        "id",
+        "type"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "state": {
+          "enum": [
+            "on",
+            "off"
+          ]
+        },
+        "params": {
+          "type": "object"
+        }
+      }
+    }
+  }
+}

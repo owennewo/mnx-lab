@@ -1,0 +1,554 @@
+{
+ "contract": "mnx-sound/2",
+ "fixture": {
+  "id": "guitar-fingerpick",
+  "name": "Guitar – fingerpicked arpeggio",
+  "group": "Guitar",
+  "description": "A Travis-style pattern: the thumb alternates the bass on the beat, the fingers pick the treble strings between."
+ },
+ "setup": {
+  "contract": "mnx-sound/2",
+  "session": {
+   "buses": [
+    {
+     "id": "room",
+     "type": "room",
+     "state": "on",
+     "preset": "Studio",
+     "basePreset": "Studio",
+     "params": {
+      "level": 0.18,
+      "decay": 0.6,
+      "predelay": 8,
+      "damping": 8500,
+      "width": 0.8
+     }
+    }
+   ],
+   "master": {
+    "volumeDb": 0,
+    "ceilingDb": -1
+   }
+  },
+  "parts": [
+   {
+    "id": "guitar",
+    "name": "Guitar",
+    "instrument": {
+     "kind": "plucked",
+     "design": "soft-nylon",
+     "layout": {
+      "strings": [
+       {
+        "pitch": 64
+       },
+       {
+        "pitch": 59
+       },
+       {
+        "pitch": 55
+       },
+       {
+        "pitch": 50
+       },
+       {
+        "pitch": 45
+       },
+       {
+        "pitch": 40
+       }
+      ],
+      "capo": 0
+     }
+    },
+    "chain": [],
+    "strip": {
+     "levelDb": 0,
+     "pan": 0,
+     "mute": false,
+     "solo": false,
+     "sends": {
+      "room": 0.3
+     }
+    }
+   }
+  ]
+ },
+ "notes": [
+  {
+   "id": "guitar-1",
+   "part": "guitar",
+   "at": 0.2,
+   "duration": 0.714286,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 48
+   },
+   "fingering": {
+    "string": 5,
+    "fret": 3
+   }
+  },
+  {
+   "id": "guitar-2",
+   "part": "guitar",
+   "at": 0.557143,
+   "duration": 0.714286,
+   "velocity": 0.48,
+   "target": {
+    "pitch": 55
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 0
+   }
+  },
+  {
+   "id": "guitar-3",
+   "part": "guitar",
+   "at": 0.914286,
+   "duration": 0.714285,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 52
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 2
+   }
+  },
+  {
+   "id": "guitar-4",
+   "part": "guitar",
+   "at": 1.271429,
+   "duration": 0.714285,
+   "velocity": 0.48,
+   "target": {
+    "pitch": 60
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 1
+   }
+  },
+  {
+   "id": "guitar-5",
+   "part": "guitar",
+   "at": 1.628571,
+   "duration": 0.714286,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 48
+   },
+   "fingering": {
+    "string": 5,
+    "fret": 3
+   }
+  },
+  {
+   "id": "guitar-6",
+   "part": "guitar",
+   "at": 1.985714,
+   "duration": 0.714286,
+   "velocity": 0.48,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 0
+   }
+  },
+  {
+   "id": "guitar-7",
+   "part": "guitar",
+   "at": 2.342857,
+   "duration": 0.714286,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 52
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 2
+   }
+  },
+  {
+   "id": "guitar-8",
+   "part": "guitar",
+   "at": 2.7,
+   "duration": 0.714286,
+   "velocity": 0.48,
+   "target": {
+    "pitch": 60
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 1
+   }
+  },
+  {
+   "id": "guitar-9",
+   "part": "guitar",
+   "at": 3.057143,
+   "duration": 0.714286,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 45
+   },
+   "fingering": {
+    "string": 5,
+    "fret": 0
+   }
+  },
+  {
+   "id": "guitar-10",
+   "part": "guitar",
+   "at": 3.414286,
+   "duration": 0.714285,
+   "velocity": 0.48,
+   "target": {
+    "pitch": 57
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 2
+   }
+  },
+  {
+   "id": "guitar-11",
+   "part": "guitar",
+   "at": 3.771429,
+   "duration": 0.714285,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 52
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 2
+   }
+  },
+  {
+   "id": "guitar-12",
+   "part": "guitar",
+   "at": 4.128571,
+   "duration": 0.714286,
+   "velocity": 0.48,
+   "target": {
+    "pitch": 60
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 1
+   }
+  },
+  {
+   "id": "guitar-13",
+   "part": "guitar",
+   "at": 4.485714,
+   "duration": 0.714286,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 45
+   },
+   "fingering": {
+    "string": 5,
+    "fret": 0
+   }
+  },
+  {
+   "id": "guitar-14",
+   "part": "guitar",
+   "at": 4.842857,
+   "duration": 0.714286,
+   "velocity": 0.48,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 0
+   }
+  },
+  {
+   "id": "guitar-15",
+   "part": "guitar",
+   "at": 5.2,
+   "duration": 0.714286,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 52
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 2
+   }
+  },
+  {
+   "id": "guitar-16",
+   "part": "guitar",
+   "at": 5.557143,
+   "duration": 0.714286,
+   "velocity": 0.48,
+   "target": {
+    "pitch": 60
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 1
+   }
+  },
+  {
+   "id": "guitar-17",
+   "part": "guitar",
+   "at": 5.914286,
+   "duration": 0.714285,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 53
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 3
+   }
+  },
+  {
+   "id": "guitar-18",
+   "part": "guitar",
+   "at": 6.271429,
+   "duration": 0.714285,
+   "velocity": 0.48,
+   "target": {
+    "pitch": 57
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 2
+   }
+  },
+  {
+   "id": "guitar-19",
+   "part": "guitar",
+   "at": 6.628571,
+   "duration": 0.714286,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 57
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 2
+   }
+  },
+  {
+   "id": "guitar-20",
+   "part": "guitar",
+   "at": 6.985714,
+   "duration": 0.714286,
+   "velocity": 0.48,
+   "target": {
+    "pitch": 60
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 1
+   }
+  },
+  {
+   "id": "guitar-21",
+   "part": "guitar",
+   "at": 7.342857,
+   "duration": 0.714286,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 53
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 3
+   }
+  },
+  {
+   "id": "guitar-22",
+   "part": "guitar",
+   "at": 7.7,
+   "duration": 0.714286,
+   "velocity": 0.48,
+   "target": {
+    "pitch": 65
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 1
+   }
+  },
+  {
+   "id": "guitar-23",
+   "part": "guitar",
+   "at": 8.057143,
+   "duration": 0.714286,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 57
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 2
+   }
+  },
+  {
+   "id": "guitar-24",
+   "part": "guitar",
+   "at": 8.414286,
+   "duration": 0.714285,
+   "velocity": 0.48,
+   "target": {
+    "pitch": 60
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 1
+   }
+  },
+  {
+   "id": "guitar-25",
+   "part": "guitar",
+   "at": 8.771429,
+   "duration": 0.714285,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 43
+   },
+   "fingering": {
+    "string": 6,
+    "fret": 3
+   }
+  },
+  {
+   "id": "guitar-26",
+   "part": "guitar",
+   "at": 9.128571,
+   "duration": 0.714286,
+   "velocity": 0.48,
+   "target": {
+    "pitch": 55
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 0
+   }
+  },
+  {
+   "id": "guitar-27",
+   "part": "guitar",
+   "at": 9.485714,
+   "duration": 0.714286,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 47
+   },
+   "fingering": {
+    "string": 5,
+    "fret": 2
+   }
+  },
+  {
+   "id": "guitar-28",
+   "part": "guitar",
+   "at": 9.842857,
+   "duration": 0.714286,
+   "velocity": 0.48,
+   "target": {
+    "pitch": 59
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 0
+   }
+  },
+  {
+   "id": "guitar-29",
+   "part": "guitar",
+   "at": 10.2,
+   "duration": 0.714286,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 43
+   },
+   "fingering": {
+    "string": 6,
+    "fret": 3
+   }
+  },
+  {
+   "id": "guitar-30",
+   "part": "guitar",
+   "at": 10.557143,
+   "duration": 0.714286,
+   "velocity": 0.48,
+   "target": {
+    "pitch": 67
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 3
+   }
+  },
+  {
+   "id": "guitar-31",
+   "part": "guitar",
+   "at": 10.914286,
+   "duration": 0.714285,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 47
+   },
+   "fingering": {
+    "string": 5,
+    "fret": 2
+   }
+  },
+  {
+   "id": "guitar-32",
+   "part": "guitar",
+   "at": 11.271429,
+   "duration": 0.714285,
+   "velocity": 0.48,
+   "target": {
+    "pitch": 59
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 0
+   }
+  }
+ ],
+ "controls": [
+  {
+   "id": "tempo",
+   "at": 0,
+   "type": "tempo",
+   "bpm": 84
+  }
+ ],
+ "render": {
+  "rate": 48000,
+  "seconds": 14.5
+ },
+ "expect": [
+  {
+   "kind": "noDiagnostics",
+   "severity": "warning"
+  },
+  {
+   "kind": "peakBelow",
+   "dbfs": -0.5
+  },
+  {
+   "kind": "partActive",
+   "part": "guitar",
+   "aboveDb": -40
+  }
+ ]
+}

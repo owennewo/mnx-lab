@@ -1,0 +1,53 @@
+{
+  "name": "@mnx-lab/synth",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "description": "The synth: physically modelled guitar, basic keys and kit, effect chains and the mnx-sound/2 instrument host, with its app (served at /synth/).",
+  "engines": {
+    "node": ">=22"
+  },
+  "exports": {
+    ".": {
+      "types": "./web/host/index.d.ts",
+      "default": "./web/host/index.js"
+    },
+    "./node": {
+      "types": "./web/host/node.d.ts",
+      "default": "./web/host/node.js"
+    },
+    "./contract": {
+      "types": "./web/contract/index.d.ts",
+      "default": "./web/contract/index.js"
+    },
+    "./conformance": "./web/contract/conformance/index.js",
+    "./processor": "./web/host/host-processor.js",
+    "./schema": "./web/contract/mnx-sound-2.schema.json",
+    "./fixtures/*": "./web/contract/fixtures/*",
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "start": "python3 scripts/serve.py",
+    "test": "node --test --test-concurrency=6 tests/contract.test.mjs tests/host-core.test.mjs tests/blocks.test.mjs tests/references.test.mjs tests/loudness.test.mjs tests/rig.test.mjs tests/conformance-measure.test.mjs tests/plucked.test.mjs tests/basic-instruments.test.mjs tests/lib-smoke.test.mjs tests/live-thwack.test.mjs tests/prepared-note-ownership.test.mjs tests/wasm-effects-memo.test.mjs tests/live-thwack-cache.test.mjs tests/math-kernel.test.mjs tests/app-player.test.mjs tests/app-state.test.mjs tests/pieces.test.mjs tests/build-output.test.mjs && npm run -s test:cost",
+    "test:cost": "node tests/basic-instruments-cost.test.mjs",
+    "test:app-unit": "node --test tests/app-player.test.mjs tests/app-state.test.mjs",
+    "test:contract": "node tests/contract.test.mjs",
+    "test:plucked": "node tests/plucked.test.mjs",
+    "test:app": "node tests/app-browser.mjs",
+    "test:host-browser": "node tests/host-browser.mjs",
+    "benchmark:host": "node scripts/benchmark_host.mjs",
+    "build:v2": "node scripts/build_engine2.mjs",
+    "build:basic": "node scripts/build_basic_instruments.mjs",
+    "build:lib": "node scripts/build_lib.mjs",
+    "build:app": "node scripts/build_app.mjs",
+    "release:prepare": "node scripts/release_prepare.mjs",
+    "release:verify": "node scripts/release_verify.mjs",
+    "release:check": "node scripts/release_check.mjs",
+    "test:release": "node --test tests/build-output.test.mjs tests/release-artifacts.test.mjs tests/release-gate.test.mjs",
+    "test:pieces": "node --test tests/pieces.test.mjs",
+    "verify:math-kernel": "node scripts/verify_math_kernel.mjs",
+    "build:blocks": "node scripts/build_blocks.mjs",
+    "measure:loudness": "node scripts/measure_loudness.mjs",
+    "test:gate": "node --test --test-concurrency=6 tests/contract.test.mjs tests/host-core.test.mjs tests/blocks.test.mjs tests/references.test.mjs tests/loudness.test.mjs tests/rig.test.mjs tests/conformance-measure.test.mjs tests/plucked.test.mjs tests/basic-instruments.test.mjs tests/lib-smoke.test.mjs tests/live-thwack.test.mjs tests/prepared-note-ownership.test.mjs tests/wasm-effects-memo.test.mjs tests/live-thwack-cache.test.mjs tests/math-kernel.test.mjs tests/app-player.test.mjs tests/app-state.test.mjs tests/pieces.test.mjs tests/build-output.test.mjs"
+  }
+}

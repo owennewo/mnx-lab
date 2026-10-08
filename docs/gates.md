@@ -30,6 +30,7 @@ is easier to read when chasing a failure.
 | prose a test reads (`docs/`, `README.md`, `CLAUDE.md`) | the link check | none | none |
 | data read from disk (below) | **all** (`npm test`) | yes | by area |
 | code (`src/`, `apps/`, `worker/`, `converters/`, `harness/`, `tools/`, `experiments/`) | what imports it (`vitest --changed`) + the source readers | yes | by area |
+| the synth (`synth/`, except its top-level prose) | its own functional suite (`npm -w @mnx-lab/synth run test:gate`), not the root tests | none | none (until the `/synth/` shell's smokes exist) |
 | anything else | **all** | yes | **all** |
 
 **Data read from disk** runs every test because vitest's import graph cannot see it:

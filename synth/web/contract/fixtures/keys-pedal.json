@@ -1,0 +1,328 @@
+{
+ "contract": "mnx-sound/2",
+ "fixture": {
+  "id": "keys-pedal",
+  "description": "Basic keys: an arpeggio held by the sustain pedal past its key releases, a pedal release, an unpedalled reference note, and a 20-note burst that exceeds 16 voices."
+ },
+ "setup": {
+  "contract": "mnx-sound/2",
+  "session": {
+   "master": {
+    "volumeDb": 0
+   }
+  },
+  "parts": [
+   {
+    "id": "keys",
+    "instrument": {
+     "kind": "keys",
+     "design": "basic-piano"
+    },
+    "strip": {
+     "levelDb": -3
+    }
+   }
+  ]
+ },
+ "notes": [
+  {
+   "id": "k1",
+   "part": "keys",
+   "at": 0.5,
+   "duration": 0.4,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 60
+   }
+  },
+  {
+   "id": "k2",
+   "part": "keys",
+   "at": 1,
+   "duration": 0.4,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 64
+   }
+  },
+  {
+   "id": "k3",
+   "part": "keys",
+   "at": 1.5,
+   "duration": 0.4,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 67
+   }
+  },
+  {
+   "id": "k4",
+   "part": "keys",
+   "at": 4,
+   "duration": 0.4,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 60
+   }
+  },
+  {
+   "id": "burst1",
+   "part": "keys",
+   "at": 6,
+   "duration": 2,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 48
+   }
+  },
+  {
+   "id": "burst2",
+   "part": "keys",
+   "at": 6.05,
+   "duration": 2,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 49
+   }
+  },
+  {
+   "id": "burst3",
+   "part": "keys",
+   "at": 6.1,
+   "duration": 2,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 50
+   }
+  },
+  {
+   "id": "burst4",
+   "part": "keys",
+   "at": 6.15,
+   "duration": 2,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 51
+   }
+  },
+  {
+   "id": "burst5",
+   "part": "keys",
+   "at": 6.2,
+   "duration": 2,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 52
+   }
+  },
+  {
+   "id": "burst6",
+   "part": "keys",
+   "at": 6.25,
+   "duration": 2,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 53
+   }
+  },
+  {
+   "id": "burst7",
+   "part": "keys",
+   "at": 6.3,
+   "duration": 2,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 54
+   }
+  },
+  {
+   "id": "burst8",
+   "part": "keys",
+   "at": 6.35,
+   "duration": 2,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 55
+   }
+  },
+  {
+   "id": "burst9",
+   "part": "keys",
+   "at": 6.4,
+   "duration": 2,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 56
+   }
+  },
+  {
+   "id": "burst10",
+   "part": "keys",
+   "at": 6.45,
+   "duration": 2,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 57
+   }
+  },
+  {
+   "id": "burst11",
+   "part": "keys",
+   "at": 6.5,
+   "duration": 2,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 58
+   }
+  },
+  {
+   "id": "burst12",
+   "part": "keys",
+   "at": 6.55,
+   "duration": 2,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 59
+   }
+  },
+  {
+   "id": "burst13",
+   "part": "keys",
+   "at": 6.6,
+   "duration": 2,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 60
+   }
+  },
+  {
+   "id": "burst14",
+   "part": "keys",
+   "at": 6.65,
+   "duration": 2,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 61
+   }
+  },
+  {
+   "id": "burst15",
+   "part": "keys",
+   "at": 6.7,
+   "duration": 2,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 62
+   }
+  },
+  {
+   "id": "burst16",
+   "part": "keys",
+   "at": 6.75,
+   "duration": 2,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 63
+   }
+  },
+  {
+   "id": "burst17",
+   "part": "keys",
+   "at": 6.8,
+   "duration": 2,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 64
+   }
+  },
+  {
+   "id": "burst18",
+   "part": "keys",
+   "at": 6.85,
+   "duration": 2,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 65
+   }
+  },
+  {
+   "id": "burst19",
+   "part": "keys",
+   "at": 6.9,
+   "duration": 2,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 66
+   }
+  },
+  {
+   "id": "burst20",
+   "part": "keys",
+   "at": 6.95,
+   "duration": 2,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 67
+   }
+  }
+ ],
+ "controls": [
+  {
+   "id": "tempo",
+   "at": 0,
+   "type": "tempo",
+   "bpm": 96
+  },
+  {
+   "id": "p1",
+   "part": "keys",
+   "at": 0.4,
+   "type": "sustainPedal",
+   "value": 1
+  },
+  {
+   "id": "p2",
+   "part": "keys",
+   "at": 3,
+   "type": "sustainPedal",
+   "value": 0
+  }
+ ],
+ "render": {
+  "rate": 48000,
+  "seconds": 10
+ },
+ "expect": [
+  {
+   "kind": "sustainedPast",
+   "note": "k1",
+   "seconds": 1.5,
+   "aboveDb": -30
+  },
+  {
+   "kind": "releasedWithin",
+   "control": "p2",
+   "seconds": 0.5,
+   "belowDb": -40
+  },
+  {
+   "kind": "silentWithin",
+   "note": "k4",
+   "seconds": 1,
+   "belowDb": -40
+  },
+  {
+   "kind": "clickFree",
+   "part": "keys",
+   "maxStep": 0.05
+  },
+  {
+   "kind": "diagnostic",
+   "code": "voice-stolen"
+  },
+  {
+   "kind": "peakBelow",
+   "dbfs": -0.3
+  }
+ ]
+}

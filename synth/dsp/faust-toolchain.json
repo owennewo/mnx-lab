@@ -1,0 +1,18 @@
+{
+  "note": "FAUST compiler and library pins for every DSP in dsp/. Builds refuse a different version or library file.",
+  "version": "2.81.10",
+  "librarySha256": {
+    "basics.lib": "855d280f983a5d3c3943183c51fd31698b420da9f0d1f8d31561b23338dd3cf3",
+    "delays.lib": "a2a6dd6ce935566a3285236921f40c22fe6488556fa62b108f9ef4d5f37084aa",
+    "envelopes.lib": "587387cb4baeb574a9c845ad5efdbbc7dd05cebaeadb9e1c00e3ea6b3fb805af",
+    "filters.lib": "ff5dc252814660c1172e9fa44af8435f35816d62f72db6d4ed793a2f32b8fa9b",
+    "maths.lib": "d9647d09009647e4c727c4621f78979d088e94453b97af58fa3947f5670df6bf",
+    "noises.lib": "c8514b73e9fa845aab83e74681a54a9dc4679cdecca5a8d0191ffbe99fbea096",
+    "oscillators.lib": "14a6fecff688244a7f8195d45cf474b7da5cdcbcfa77c241afb33c7b5b226ba7",
+    "platform.lib": "e142c1e9643c38c6c7223b005067abd393b007e9966938b6c78f8968a9b8d5a3",
+    "reverbs.lib": "a7bc415fc55f6a249d3d07194e1574548b5c89ad168108c1ee7251f5170d8306",
+    "routes.lib": "51b4593d8f3d5f0106463fffc0d12514b7d7d758a18f9bf4660b42b2d89d0851",
+    "signals.lib": "8b85de979268836be1c989b475c3126ec1953c5558f03c9add20d073acdb5b5f",
+    "stdfaust.lib": "536d6270c7925239a0cdd0b6f26addd070ca009e6554e1036d770d61fae1b1a5"
+  }
+}

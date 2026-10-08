@@ -1,0 +1,108 @@
+{
+ "schema": "synth-references/1",
+ "version": "0.2.0-rc.2",
+ "captured": "2026-10-08",
+ "note": "Float32 interleaved output hashes at 48 kHz. Re-capture only for a deliberate sound change (chain campaign C3).",
+ "cases": {
+  "fixture:chord-gestures": {
+   "frames": 360000,
+   "peak": 0.5047642588615417,
+   "sha256": "73ecddf7bbb756aa331b1c0e1fafae06e59363f26e6f607df8d9dc3374ecaa22"
+  },
+  "fixture:keys-pedal": {
+   "frames": 480000,
+   "peak": 0.6970127820968628,
+   "sha256": "3401762fdd0f7788240416af08f6a08d75cfab5995217a68cfa6ef584e99b182"
+  },
+  "fixture:kit-chokes": {
+   "frames": 696000,
+   "peak": 0.8895969390869141,
+   "sha256": "53de3ff34ef1135f277d4fb3ce83216d283d5c735091784f2a399b18423fa6fb"
+  },
+  "fixture:multi-part-mix": {
+   "frames": 432000,
+   "peak": 0.8581803441047668,
+   "sha256": "f128057fd44ea3b251f5a6a1f228067a196cf958956eab2ad8e7458d85966691"
+  },
+  "fixture:plucked-techniques": {
+   "frames": 912000,
+   "peak": 0.8487318158149719,
+   "sha256": "322ca5c41ce5f3b6634eb708e7f94ac1cacdb25c78c1d4f49445c9053f24429f"
+  },
+  "fixture:ukulele-layout": {
+   "frames": 384000,
+   "peak": 0.8623912334442139,
+   "sha256": "15f238732eec2fef35b50b81a1ce0b1503b298bf1cb2e9af60a29aa86e971b90"
+  },
+  "piece:band-ballad": {
+   "frames": 835200,
+   "peak": 0.8429358601570129,
+   "sha256": "d4709f0eaa548eaa9d6c3e1103c83ea6cf4e57ad030951f52aa9c4287e2f8f3e"
+  },
+  "piece:band-groove": {
+   "frames": 590400,
+   "peak": 0.7856413125991821,
+   "sha256": "332849745c573ed37dcacc00d023e7e4a6a9c239d9aa7a63fb57c647056746c0"
+  },
+  "piece:guitar-bends": {
+   "frames": 705600,
+   "peak": 0.25458669662475586,
+   "sha256": "b60999a2c0e8391c601fa6452b5cf207ba788badbdf7c8fb13eb1779344c5cb1"
+  },
+  "piece:guitar-dynamics": {
+   "frames": 643200,
+   "peak": 0.7336977124214172,
+   "sha256": "c00abd1af7339a1c120b967f262cf45bb948920e717a930c9d235d610d3520af"
+  },
+  "piece:guitar-fingerpick": {
+   "frames": 696000,
+   "peak": 0.8285470008850098,
+   "sha256": "9bd2a9426c3f938fac047c98a045c572f1daef9c3d712bcab542bc0fa43c3954"
+  },
+  "piece:guitar-legato": {
+   "frames": 604800,
+   "peak": 0.5397706031799316,
+   "sha256": "df6c9d86f6b3a8d837ca2f0fae5eb8b7b9c660f1b3a9a096fe9363a7ccbe8103"
+  },
+  "piece:guitar-recorded": {
+   "frames": 1118400,
+   "peak": 0.8895715475082397,
+   "sha256": "e8954e4663ecb1ccbf7113215085b2efc278239eb379ae0b431ef7acfd30a0c9"
+  },
+  "piece:guitar-strums": {
+   "frames": 667200,
+   "peak": 0.7106701135635376,
+   "sha256": "f78fa4d69f730950efb233494416b2b9ed340dd08e94700f63a60ffb64ed81c1"
+  },
+  "piece:guitar-sustain": {
+   "frames": 729600,
+   "peak": 0.7303025126457214,
+   "sha256": "ac4c35981fb661d0c4ff2fe1a4b0d4b186d80278ad9ef98edc688a5f3e6a1446"
+  },
+  "piece:guitar-tempo-echo": {
+   "frames": 595200,
+   "peak": 0.20492714643478394,
+   "sha256": "274e120642690e931dd0b4d69ff35ec8d0ed38311998a030650de19359263a16"
+  },
+  "piece:keys-pedal": {
+   "frames": 734400,
+   "peak": 0.7045759558677673,
+   "sha256": "99a22cbdcc0f6041952ab7fa5336a91fe790a0df43e262bbf76dbac01be69d3c"
+  },
+  "piece:kit-groove": {
+   "frames": 619200,
+   "peak": 0.7199487090110779,
+   "sha256": "36b1ca2dfbf4cf98d36c74d87700463cebc9b8e88fec50d3a66bed78c23d2f99"
+  },
+  "piece:ukulele-strum": {
+   "frames": 590400,
+   "peak": 0.4758719205856323,
+   "sha256": "4b79adeb30c7f98c1bbda31183086e02cae29948680775a62ac9da6507ce96d1"
+  },
+  "session:reference": {
+   "frames": 1098322,
+   "peak": 0.8912509679794312,
+   "sha256": "2937e2d9d2fc5824d1fd42d086a3d1aec091b4158c539aa645446192100579f4"
+  }
+ }
+}

@@ -1,0 +1,483 @@
+{
+ "contract": "mnx-sound/2",
+ "fixture": {
+  "id": "kit-chokes",
+  "description": "Basic kit: every piece alone, 0.5 s apart, hi-hat chokes by a closed hit and by the pedal, a two-bar groove, and an unknown piece that must be reported and stay silent."
+ },
+ "setup": {
+  "contract": "mnx-sound/2",
+  "session": {
+   "master": {
+    "volumeDb": 0
+   }
+  },
+  "parts": [
+   {
+    "id": "drums",
+    "instrument": {
+     "kind": "kit",
+     "design": "basic-kit"
+    },
+    "strip": {
+     "levelDb": 0
+    }
+   }
+  ]
+ },
+ "notes": [
+  {
+   "id": "solo-kick",
+   "part": "drums",
+   "at": 0.25,
+   "duration": 0.25,
+   "velocity": 0.75,
+   "target": {
+    "piece": "kick"
+   }
+  },
+  {
+   "id": "solo-snare",
+   "part": "drums",
+   "at": 0.75,
+   "duration": 0.25,
+   "velocity": 0.75,
+   "target": {
+    "piece": "snare"
+   }
+  },
+  {
+   "id": "solo-side-stick",
+   "part": "drums",
+   "at": 1.25,
+   "duration": 0.25,
+   "velocity": 0.75,
+   "target": {
+    "piece": "side-stick"
+   }
+  },
+  {
+   "id": "solo-tom-high",
+   "part": "drums",
+   "at": 1.75,
+   "duration": 0.25,
+   "velocity": 0.75,
+   "target": {
+    "piece": "tom-high"
+   }
+  },
+  {
+   "id": "solo-tom-mid",
+   "part": "drums",
+   "at": 2.25,
+   "duration": 0.25,
+   "velocity": 0.75,
+   "target": {
+    "piece": "tom-mid"
+   }
+  },
+  {
+   "id": "solo-tom-low",
+   "part": "drums",
+   "at": 2.75,
+   "duration": 0.25,
+   "velocity": 0.75,
+   "target": {
+    "piece": "tom-low"
+   }
+  },
+  {
+   "id": "solo-hihat-closed",
+   "part": "drums",
+   "at": 3.25,
+   "duration": 0.25,
+   "velocity": 0.75,
+   "target": {
+    "piece": "hihat-closed"
+   }
+  },
+  {
+   "id": "solo-hihat-open",
+   "part": "drums",
+   "at": 3.75,
+   "duration": 0.25,
+   "velocity": 0.75,
+   "target": {
+    "piece": "hihat-open"
+   }
+  },
+  {
+   "id": "solo-hihat-pedal",
+   "part": "drums",
+   "at": 4.25,
+   "duration": 0.25,
+   "velocity": 0.75,
+   "target": {
+    "piece": "hihat-pedal"
+   }
+  },
+  {
+   "id": "solo-crash",
+   "part": "drums",
+   "at": 4.75,
+   "duration": 0.25,
+   "velocity": 0.75,
+   "target": {
+    "piece": "crash"
+   }
+  },
+  {
+   "id": "solo-ride",
+   "part": "drums",
+   "at": 5.25,
+   "duration": 0.25,
+   "velocity": 0.75,
+   "target": {
+    "piece": "ride"
+   }
+  },
+  {
+   "id": "ho1",
+   "part": "drums",
+   "at": 6.5,
+   "duration": 0.25,
+   "velocity": 0.75,
+   "target": {
+    "piece": "hihat-open"
+   }
+  },
+  {
+   "id": "choke1",
+   "part": "drums",
+   "at": 6.9,
+   "duration": 0.25,
+   "velocity": 0.75,
+   "target": {
+    "piece": "hihat-closed"
+   }
+  },
+  {
+   "id": "ho2",
+   "part": "drums",
+   "at": 7.5,
+   "duration": 0.25,
+   "velocity": 0.75,
+   "target": {
+    "piece": "hihat-open"
+   }
+  },
+  {
+   "id": "choke2",
+   "part": "drums",
+   "at": 7.9,
+   "duration": 0.25,
+   "velocity": 0.75,
+   "target": {
+    "piece": "hihat-pedal"
+   }
+  },
+  {
+   "id": "hat1",
+   "part": "drums",
+   "at": 8.5,
+   "duration": 0.25,
+   "velocity": 0.55,
+   "target": {
+    "piece": "hihat-closed"
+   }
+  },
+  {
+   "id": "hatoff1",
+   "part": "drums",
+   "at": 8.75,
+   "duration": 0.25,
+   "velocity": 0.4,
+   "target": {
+    "piece": "hihat-closed"
+   }
+  },
+  {
+   "id": "kick1",
+   "part": "drums",
+   "at": 8.5,
+   "duration": 0.25,
+   "velocity": 0.9,
+   "target": {
+    "piece": "kick"
+   }
+  },
+  {
+   "id": "hat2",
+   "part": "drums",
+   "at": 9,
+   "duration": 0.25,
+   "velocity": 0.55,
+   "target": {
+    "piece": "hihat-closed"
+   }
+  },
+  {
+   "id": "hatoff2",
+   "part": "drums",
+   "at": 9.25,
+   "duration": 0.25,
+   "velocity": 0.4,
+   "target": {
+    "piece": "hihat-closed"
+   }
+  },
+  {
+   "id": "snare1",
+   "part": "drums",
+   "at": 9,
+   "duration": 0.25,
+   "velocity": 0.8,
+   "target": {
+    "piece": "snare"
+   }
+  },
+  {
+   "id": "hat3",
+   "part": "drums",
+   "at": 9.5,
+   "duration": 0.25,
+   "velocity": 0.55,
+   "target": {
+    "piece": "hihat-closed"
+   }
+  },
+  {
+   "id": "hatoff3",
+   "part": "drums",
+   "at": 9.75,
+   "duration": 0.25,
+   "velocity": 0.4,
+   "target": {
+    "piece": "hihat-closed"
+   }
+  },
+  {
+   "id": "kick2",
+   "part": "drums",
+   "at": 9.5,
+   "duration": 0.25,
+   "velocity": 0.9,
+   "target": {
+    "piece": "kick"
+   }
+  },
+  {
+   "id": "hat4",
+   "part": "drums",
+   "at": 10,
+   "duration": 0.25,
+   "velocity": 0.55,
+   "target": {
+    "piece": "hihat-closed"
+   }
+  },
+  {
+   "id": "hatoff4",
+   "part": "drums",
+   "at": 10.25,
+   "duration": 0.25,
+   "velocity": 0.4,
+   "target": {
+    "piece": "hihat-closed"
+   }
+  },
+  {
+   "id": "snare2",
+   "part": "drums",
+   "at": 10,
+   "duration": 0.25,
+   "velocity": 0.8,
+   "target": {
+    "piece": "snare"
+   }
+  },
+  {
+   "id": "hat5",
+   "part": "drums",
+   "at": 10.5,
+   "duration": 0.25,
+   "velocity": 0.55,
+   "target": {
+    "piece": "hihat-closed"
+   }
+  },
+  {
+   "id": "hatoff5",
+   "part": "drums",
+   "at": 10.75,
+   "duration": 0.25,
+   "velocity": 0.4,
+   "target": {
+    "piece": "hihat-closed"
+   }
+  },
+  {
+   "id": "kick3",
+   "part": "drums",
+   "at": 10.5,
+   "duration": 0.25,
+   "velocity": 0.9,
+   "target": {
+    "piece": "kick"
+   }
+  },
+  {
+   "id": "hat6",
+   "part": "drums",
+   "at": 11,
+   "duration": 0.25,
+   "velocity": 0.55,
+   "target": {
+    "piece": "hihat-closed"
+   }
+  },
+  {
+   "id": "hatoff6",
+   "part": "drums",
+   "at": 11.25,
+   "duration": 0.25,
+   "velocity": 0.4,
+   "target": {
+    "piece": "hihat-closed"
+   }
+  },
+  {
+   "id": "snare3",
+   "part": "drums",
+   "at": 11,
+   "duration": 0.25,
+   "velocity": 0.8,
+   "target": {
+    "piece": "snare"
+   }
+  },
+  {
+   "id": "hat7",
+   "part": "drums",
+   "at": 11.5,
+   "duration": 0.25,
+   "velocity": 0.55,
+   "target": {
+    "piece": "hihat-closed"
+   }
+  },
+  {
+   "id": "hatoff7",
+   "part": "drums",
+   "at": 11.75,
+   "duration": 0.25,
+   "velocity": 0.4,
+   "target": {
+    "piece": "hihat-closed"
+   }
+  },
+  {
+   "id": "kick4",
+   "part": "drums",
+   "at": 11.5,
+   "duration": 0.25,
+   "velocity": 0.9,
+   "target": {
+    "piece": "kick"
+   }
+  },
+  {
+   "id": "hat8",
+   "part": "drums",
+   "at": 12,
+   "duration": 0.25,
+   "velocity": 0.55,
+   "target": {
+    "piece": "hihat-closed"
+   }
+  },
+  {
+   "id": "hatoff8",
+   "part": "drums",
+   "at": 12.25,
+   "duration": 0.25,
+   "velocity": 0.4,
+   "target": {
+    "piece": "hihat-closed"
+   }
+  },
+  {
+   "id": "snare4",
+   "part": "drums",
+   "at": 12,
+   "duration": 0.25,
+   "velocity": 0.8,
+   "target": {
+    "piece": "snare"
+   }
+  },
+  {
+   "id": "cow1",
+   "part": "drums",
+   "at": 13,
+   "duration": 0.25,
+   "velocity": 0.75,
+   "target": {
+    "piece": "cowbell"
+   }
+  }
+ ],
+ "controls": [
+  {
+   "id": "tempo",
+   "at": 0,
+   "type": "tempo",
+   "bpm": 120
+  }
+ ],
+ "render": {
+  "rate": 48000,
+  "seconds": 14.5
+ },
+ "expect": [
+  {
+   "kind": "choked",
+   "note": "ho1",
+   "by": "choke1",
+   "seconds": 0.03,
+   "belowDb": -40
+  },
+  {
+   "kind": "choked",
+   "note": "ho2",
+   "by": "choke2",
+   "seconds": 0.03,
+   "belowDb": -40
+  },
+  {
+   "kind": "distinctPieces",
+   "notes": [
+    "solo-kick",
+    "solo-snare",
+    "solo-side-stick",
+    "solo-tom-high",
+    "solo-tom-mid",
+    "solo-tom-low",
+    "solo-hihat-closed",
+    "solo-hihat-open",
+    "solo-hihat-pedal",
+    "solo-crash",
+    "solo-ride"
+   ],
+   "minDistance": 0.5
+  },
+  {
+   "kind": "diagnostic",
+   "code": "unknown-piece",
+   "note": "cow1"
+  },
+  {
+   "kind": "peakBelow",
+   "dbfs": -0.3
+  }
+ ]
+}

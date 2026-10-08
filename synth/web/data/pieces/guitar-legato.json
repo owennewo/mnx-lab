@@ -1,0 +1,863 @@
+{
+ "contract": "mnx-sound/2",
+ "fixture": {
+  "id": "guitar-legato",
+  "name": "Guitar – hammer-ons, pull-offs & palm mutes",
+  "group": "Guitar",
+  "description": "Triplet hammer-on/pull-off runs, a hammered climb and a pulled descent (no new picks), then palm-muted chugs with an open accent and dead notes."
+ },
+ "setup": {
+  "contract": "mnx-sound/2",
+  "session": {
+   "buses": [
+    {
+     "id": "room",
+     "type": "room",
+     "state": "on",
+     "preset": "Studio",
+     "basePreset": "Studio",
+     "params": {
+      "level": 0.18,
+      "decay": 0.6,
+      "predelay": 8,
+      "damping": 8500,
+      "width": 0.8
+     }
+    }
+   ],
+   "master": {
+    "volumeDb": 0,
+    "ceilingDb": -1
+   }
+  },
+  "parts": [
+   {
+    "id": "guitar",
+    "name": "Guitar",
+    "instrument": {
+     "kind": "plucked",
+     "design": "bridge-electric",
+     "layout": {
+      "strings": [
+       {
+        "pitch": 64
+       },
+       {
+        "pitch": 59
+       },
+       {
+        "pitch": 55
+       },
+       {
+        "pitch": 50
+       },
+       {
+        "pitch": 45
+       },
+       {
+        "pitch": 40
+       }
+      ],
+      "capo": 0
+     }
+    },
+    "chain": [
+     {
+      "id": "drive",
+      "type": "drive",
+      "state": "on",
+      "preset": "Crunch",
+      "basePreset": "Crunch",
+      "params": {
+       "gain": 22,
+       "mix": 0.9,
+       "tone": 5500
+      }
+     }
+    ],
+    "strip": {
+     "levelDb": -6,
+     "pan": 0,
+     "mute": false,
+     "solo": false,
+     "sends": {
+      "room": 0.3
+     }
+    }
+   }
+  ]
+ },
+ "notes": [
+  {
+   "id": "guitar-1",
+   "part": "guitar",
+   "at": 0.2,
+   "duration": 0.197917,
+   "velocity": 0.7,
+   "target": {
+    "pitch": 69
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 5
+   }
+  },
+  {
+   "id": "guitar-2",
+   "part": "guitar",
+   "at": 0.408333,
+   "duration": 0.197917,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 71
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 7
+   },
+   "techniques": [
+    {
+     "type": "legato",
+     "from": "guitar-1",
+     "via": "hammer"
+    }
+   ]
+  },
+  {
+   "id": "guitar-3",
+   "part": "guitar",
+   "at": 0.616667,
+   "duration": 0.197917,
+   "velocity": 0.55,
+   "target": {
+    "pitch": 69
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 5
+   },
+   "techniques": [
+    {
+     "type": "legato",
+     "from": "guitar-2",
+     "via": "pull"
+    }
+   ]
+  },
+  {
+   "id": "guitar-4",
+   "part": "guitar",
+   "at": 0.825,
+   "duration": 0.197917,
+   "velocity": 0.7,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 5
+   }
+  },
+  {
+   "id": "guitar-5",
+   "part": "guitar",
+   "at": 1.033333,
+   "duration": 0.197917,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 66
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 7
+   },
+   "techniques": [
+    {
+     "type": "legato",
+     "from": "guitar-4",
+     "via": "hammer"
+    }
+   ]
+  },
+  {
+   "id": "guitar-6",
+   "part": "guitar",
+   "at": 1.241667,
+   "duration": 0.197917,
+   "velocity": 0.55,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 5
+   },
+   "techniques": [
+    {
+     "type": "legato",
+     "from": "guitar-5",
+     "via": "pull"
+    }
+   ]
+  },
+  {
+   "id": "guitar-7",
+   "part": "guitar",
+   "at": 1.45,
+   "duration": 0.197917,
+   "velocity": 0.7,
+   "target": {
+    "pitch": 69
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 5
+   }
+  },
+  {
+   "id": "guitar-8",
+   "part": "guitar",
+   "at": 1.658333,
+   "duration": 0.197917,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 71
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 7
+   },
+   "techniques": [
+    {
+     "type": "legato",
+     "from": "guitar-7",
+     "via": "hammer"
+    }
+   ]
+  },
+  {
+   "id": "guitar-9",
+   "part": "guitar",
+   "at": 1.866667,
+   "duration": 0.197917,
+   "velocity": 0.55,
+   "target": {
+    "pitch": 69
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 5
+   },
+   "techniques": [
+    {
+     "type": "legato",
+     "from": "guitar-8",
+     "via": "pull"
+    }
+   ]
+  },
+  {
+   "id": "guitar-10",
+   "part": "guitar",
+   "at": 2.075,
+   "duration": 0.197917,
+   "velocity": 0.7,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 5
+   }
+  },
+  {
+   "id": "guitar-11",
+   "part": "guitar",
+   "at": 2.283333,
+   "duration": 0.197917,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 66
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 7
+   },
+   "techniques": [
+    {
+     "type": "legato",
+     "from": "guitar-10",
+     "via": "hammer"
+    }
+   ]
+  },
+  {
+   "id": "guitar-12",
+   "part": "guitar",
+   "at": 2.491667,
+   "duration": 0.197917,
+   "velocity": 0.55,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 5
+   },
+   "techniques": [
+    {
+     "type": "legato",
+     "from": "guitar-11",
+     "via": "pull"
+    }
+   ]
+  },
+  {
+   "id": "guitar-13",
+   "part": "guitar",
+   "at": 2.7,
+   "duration": 0.3125,
+   "velocity": 0.7,
+   "target": {
+    "pitch": 55
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 0
+   }
+  },
+  {
+   "id": "guitar-14",
+   "part": "guitar",
+   "at": 3.0125,
+   "duration": 0.3125,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 57
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 2
+   },
+   "techniques": [
+    {
+     "type": "legato",
+     "from": "guitar-13",
+     "via": "hammer"
+    }
+   ]
+  },
+  {
+   "id": "guitar-15",
+   "part": "guitar",
+   "at": 3.325,
+   "duration": 0.625,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 59
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 4
+   },
+   "techniques": [
+    {
+     "type": "legato",
+     "from": "guitar-14",
+     "via": "hammer"
+    }
+   ]
+  },
+  {
+   "id": "guitar-16",
+   "part": "guitar",
+   "at": 3.95,
+   "duration": 0.3125,
+   "velocity": 0.7,
+   "target": {
+    "pitch": 72
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 8
+   }
+  },
+  {
+   "id": "guitar-17",
+   "part": "guitar",
+   "at": 4.2625,
+   "duration": 0.3125,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 69
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 5
+   },
+   "techniques": [
+    {
+     "type": "legato",
+     "from": "guitar-16",
+     "via": "pull"
+    }
+   ]
+  },
+  {
+   "id": "guitar-18",
+   "part": "guitar",
+   "at": 4.575,
+   "duration": 0.625,
+   "velocity": 0.55,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "legato",
+     "from": "guitar-17",
+     "via": "pull"
+    }
+   ]
+  },
+  {
+   "id": "guitar-19",
+   "part": "guitar",
+   "at": 5.2,
+   "duration": 0.296875,
+   "velocity": 0.65,
+   "target": {
+    "pitch": 40
+   },
+   "fingering": {
+    "string": 6,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "mute",
+     "kind": "palm",
+     "amount": 0.6
+    }
+   ]
+  },
+  {
+   "id": "guitar-20",
+   "part": "guitar",
+   "at": 5.2,
+   "duration": 0.296875,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 47
+   },
+   "fingering": {
+    "string": 5,
+    "fret": 2
+   },
+   "techniques": [
+    {
+     "type": "mute",
+     "kind": "palm",
+     "amount": 0.6
+    }
+   ]
+  },
+  {
+   "id": "guitar-21",
+   "part": "guitar",
+   "at": 5.5125,
+   "duration": 0.296875,
+   "velocity": 0.65,
+   "target": {
+    "pitch": 40
+   },
+   "fingering": {
+    "string": 6,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "mute",
+     "kind": "palm",
+     "amount": 0.6
+    }
+   ]
+  },
+  {
+   "id": "guitar-22",
+   "part": "guitar",
+   "at": 5.825,
+   "duration": 0.296875,
+   "velocity": 0.65,
+   "target": {
+    "pitch": 40
+   },
+   "fingering": {
+    "string": 6,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "mute",
+     "kind": "palm",
+     "amount": 0.6
+    }
+   ]
+  },
+  {
+   "id": "guitar-23",
+   "part": "guitar",
+   "at": 6.1375,
+   "duration": 0.296875,
+   "velocity": 0.65,
+   "target": {
+    "pitch": 40
+   },
+   "fingering": {
+    "string": 6,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "mute",
+     "kind": "palm",
+     "amount": 0.6
+    }
+   ]
+  },
+  {
+   "id": "guitar-24",
+   "part": "guitar",
+   "at": 6.45,
+   "duration": 0.296875,
+   "velocity": 0.65,
+   "target": {
+    "pitch": 40
+   },
+   "fingering": {
+    "string": 6,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "mute",
+     "kind": "palm",
+     "amount": 0.6
+    }
+   ]
+  },
+  {
+   "id": "guitar-25",
+   "part": "guitar",
+   "at": 6.45,
+   "duration": 0.296875,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 47
+   },
+   "fingering": {
+    "string": 5,
+    "fret": 2
+   },
+   "techniques": [
+    {
+     "type": "mute",
+     "kind": "palm",
+     "amount": 0.6
+    }
+   ]
+  },
+  {
+   "id": "guitar-26",
+   "part": "guitar",
+   "at": 6.7625,
+   "duration": 0.296875,
+   "velocity": 0.65,
+   "target": {
+    "pitch": 40
+   },
+   "fingering": {
+    "string": 6,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "mute",
+     "kind": "palm",
+     "amount": 0.6
+    }
+   ]
+  },
+  {
+   "id": "guitar-27",
+   "part": "guitar",
+   "at": 7.075,
+   "duration": 0.296875,
+   "velocity": 0.65,
+   "target": {
+    "pitch": 40
+   },
+   "fingering": {
+    "string": 6,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "mute",
+     "kind": "palm",
+     "amount": 0.6
+    }
+   ]
+  },
+  {
+   "id": "guitar-28",
+   "part": "guitar",
+   "at": 7.3875,
+   "duration": 0.296875,
+   "velocity": 0.65,
+   "target": {
+    "pitch": 40
+   },
+   "fingering": {
+    "string": 6,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "mute",
+     "kind": "palm",
+     "amount": 0.6
+    }
+   ]
+  },
+  {
+   "id": "guitar-29",
+   "part": "guitar",
+   "at": 7.7,
+   "duration": 0.59375,
+   "velocity": 0.9,
+   "target": {
+    "pitch": 40
+   },
+   "fingering": {
+    "string": 6,
+    "fret": 0
+   }
+  },
+  {
+   "id": "guitar-30",
+   "part": "guitar",
+   "at": 7.7,
+   "duration": 0.59375,
+   "velocity": 0.85,
+   "target": {
+    "pitch": 47
+   },
+   "fingering": {
+    "string": 5,
+    "fret": 2
+   }
+  },
+  {
+   "id": "guitar-31",
+   "part": "guitar",
+   "at": 8.0125,
+   "duration": 0.296875,
+   "velocity": 0.65,
+   "target": {
+    "pitch": 40
+   },
+   "fingering": {
+    "string": 6,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "mute",
+     "kind": "palm",
+     "amount": 0.6
+    }
+   ]
+  },
+  {
+   "id": "guitar-32",
+   "part": "guitar",
+   "at": 8.325,
+   "duration": 0.296875,
+   "velocity": 0.65,
+   "target": {
+    "pitch": 40
+   },
+   "fingering": {
+    "string": 6,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "mute",
+     "kind": "palm",
+     "amount": 0.6
+    }
+   ]
+  },
+  {
+   "id": "guitar-33",
+   "part": "guitar",
+   "at": 8.6375,
+   "duration": 0.148437,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 40
+   },
+   "fingering": {
+    "string": 6,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "mute",
+     "kind": "dead"
+    }
+   ]
+  },
+  {
+   "id": "guitar-34",
+   "part": "guitar",
+   "at": 8.95,
+   "duration": 0.296875,
+   "velocity": 0.65,
+   "target": {
+    "pitch": 40
+   },
+   "fingering": {
+    "string": 6,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "mute",
+     "kind": "palm",
+     "amount": 0.6
+    }
+   ]
+  },
+  {
+   "id": "guitar-35",
+   "part": "guitar",
+   "at": 8.95,
+   "duration": 0.296875,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 47
+   },
+   "fingering": {
+    "string": 5,
+    "fret": 2
+   },
+   "techniques": [
+    {
+     "type": "mute",
+     "kind": "palm",
+     "amount": 0.6
+    }
+   ]
+  },
+  {
+   "id": "guitar-36",
+   "part": "guitar",
+   "at": 9.2625,
+   "duration": 0.296875,
+   "velocity": 0.65,
+   "target": {
+    "pitch": 40
+   },
+   "fingering": {
+    "string": 6,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "mute",
+     "kind": "palm",
+     "amount": 0.6
+    }
+   ]
+  },
+  {
+   "id": "guitar-37",
+   "part": "guitar",
+   "at": 9.575,
+   "duration": 0.296875,
+   "velocity": 0.65,
+   "target": {
+    "pitch": 40
+   },
+   "fingering": {
+    "string": 6,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "mute",
+     "kind": "palm",
+     "amount": 0.6
+    }
+   ]
+  },
+  {
+   "id": "guitar-38",
+   "part": "guitar",
+   "at": 9.8875,
+   "duration": 0.148437,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 40
+   },
+   "fingering": {
+    "string": 6,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "mute",
+     "kind": "dead"
+    }
+   ]
+  }
+ ],
+ "controls": [
+  {
+   "id": "tempo",
+   "at": 0,
+   "type": "tempo",
+   "bpm": 96
+  }
+ ],
+ "render": {
+  "rate": 48000,
+  "seconds": 12.6
+ },
+ "expect": [
+  {
+   "kind": "noDiagnostics",
+   "severity": "warning"
+  },
+  {
+   "kind": "peakBelow",
+   "dbfs": -0.5
+  },
+  {
+   "kind": "partActive",
+   "part": "guitar",
+   "aboveDb": -40
+  },
+  {
+   "kind": "noNewAttack",
+   "note": "guitar-2"
+  }
+ ]
+}

@@ -1,0 +1,3274 @@
+{
+ "contract": "mnx-sound/2",
+ "fixture": {
+  "id": "guitar-recorded",
+  "name": "Guitar – recorded performance",
+  "group": "Guitar",
+  "description": "The recorded reference passage as played, with its own timing, touch, vibrato and intonation: performance travels in the stream."
+ },
+ "setup": {
+  "contract": "mnx-sound/2",
+  "session": {
+   "buses": [
+    {
+     "id": "room",
+     "type": "room",
+     "state": "on",
+     "preset": "Studio",
+     "basePreset": "Studio",
+     "params": {
+      "level": 0.18,
+      "decay": 0.6,
+      "predelay": 8,
+      "damping": 8500,
+      "width": 0.8
+     }
+    }
+   ],
+   "master": {
+    "volumeDb": 0,
+    "ceilingDb": -1
+   }
+  },
+  "parts": [
+   {
+    "id": "guitar",
+    "name": "Guitar",
+    "instrument": {
+     "kind": "plucked",
+     "design": "clear-steel",
+     "layout": {
+      "strings": [
+       {
+        "pitch": 64
+       },
+       {
+        "pitch": 59
+       },
+       {
+        "pitch": 55
+       },
+       {
+        "pitch": 50
+       },
+       {
+        "pitch": 45
+       },
+       {
+        "pitch": 40
+       }
+      ],
+      "capo": 0
+     }
+    },
+    "chain": [],
+    "strip": {
+     "levelDb": 0,
+     "pan": 0,
+     "mute": false,
+     "solo": false,
+     "sends": {
+      "room": 0.3
+     }
+    }
+   }
+  ]
+ },
+ "notes": [
+  {
+   "id": "p00",
+   "at": 0.153875,
+   "duration": 1.091792,
+   "velocity": 0.755395,
+   "target": {
+    "pitch": 40
+   },
+   "fingering": {
+    "string": 6,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 2.19415,
+     "rateHz": 5.337313,
+     "phase": 5.811933,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": -0.957838,
+    "attackBendCents": 1.83715,
+    "excitation": {
+     "positionDelta": -0.011192,
+     "hardnessDelta": 0.01958
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p01",
+   "at": 0.452167,
+   "duration": 1.113938,
+   "velocity": 0.644494,
+   "target": {
+    "pitch": 55
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.109993,
+     "rateHz": 4.745846,
+     "phase": 1.97949,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": -0.200328,
+    "attackBendCents": 3.99948,
+    "excitation": {
+     "positionDelta": -0.009108,
+     "hardnessDelta": -0.04146
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p02",
+   "at": 0.777167,
+   "duration": 1.092938,
+   "velocity": 0.633737,
+   "target": {
+    "pitch": 59
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.516194,
+     "rateHz": 4.908601,
+     "phase": 3.760506,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": -0.102397,
+    "attackBendCents": 1.581929,
+    "excitation": {
+     "positionDelta": 0.024308,
+     "hardnessDelta": -0.000632
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p03",
+   "at": 1.092625,
+   "duration": 1.098333,
+   "velocity": 0.629437,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.802709,
+     "rateHz": 5.666384,
+     "phase": 0.722343,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.708908,
+    "attackBendCents": 2.961146,
+    "excitation": {
+     "positionDelta": 0.009525,
+     "hardnessDelta": -0.012834
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p04",
+   "at": 1.413083,
+   "duration": 1.117229,
+   "velocity": 0.751101,
+   "target": {
+    "pitch": 52
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 2
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.608796,
+     "rateHz": 4.938958,
+     "phase": 0.318482,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": -0.512571,
+    "attackBendCents": 4.771874,
+    "excitation": {
+     "positionDelta": -0.003321,
+     "hardnessDelta": -0.0045
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p05",
+   "at": 1.730208,
+   "duration": 1.110479,
+   "velocity": 0.6448,
+   "target": {
+    "pitch": 55
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.601958,
+     "rateHz": 5.232891,
+     "phase": 3.192937,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.500092,
+    "attackBendCents": 4.079929,
+    "excitation": {
+     "positionDelta": -0.005902,
+     "hardnessDelta": -0.016754
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p06",
+   "at": 2.03775,
+   "duration": 1.111354,
+   "velocity": 0.617415,
+   "target": {
+    "pitch": 59
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.512014,
+     "rateHz": 5.418813,
+     "phase": 1.55902,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": -1.269833,
+    "attackBendCents": 3.881791,
+    "excitation": {
+     "positionDelta": 0.001085,
+     "hardnessDelta": -0.024831
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p07",
+   "at": 2.358896,
+   "duration": 1.101104,
+   "velocity": 0.651132,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 2.14386,
+     "rateHz": 4.520554,
+     "phase": 3.948926,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.27628,
+    "attackBendCents": 2.971797,
+    "excitation": {
+     "positionDelta": -0.027937,
+     "hardnessDelta": -0.008309
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p08",
+   "at": 2.670979,
+   "duration": 1.1195,
+   "velocity": 0.773191,
+   "target": {
+    "pitch": 48
+   },
+   "fingering": {
+    "string": 5,
+    "fret": 3
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.896886,
+     "rateHz": 4.979466,
+     "phase": 6.0284,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": -0.58182,
+    "attackBendCents": 4.192076,
+    "excitation": {
+     "positionDelta": -0.016483,
+     "hardnessDelta": 0.004173
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p09",
+   "at": 2.983667,
+   "duration": 1.131958,
+   "velocity": 0.68758,
+   "target": {
+    "pitch": 55
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 2.154072,
+     "rateHz": 5.330355,
+     "phase": 5.14999,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.194369,
+    "attackBendCents": 3.498816,
+    "excitation": {
+     "positionDelta": -0.012556,
+     "hardnessDelta": 0.039942
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p10",
+   "at": 3.303271,
+   "duration": 1.100271,
+   "velocity": 0.653227,
+   "target": {
+    "pitch": 60
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 1
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.852071,
+     "rateHz": 4.594709,
+     "phase": 2.687671,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.062209,
+    "attackBendCents": 1.541879,
+    "excitation": {
+     "positionDelta": -0.011664,
+     "hardnessDelta": -0.027294
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p11",
+   "at": 3.628,
+   "duration": 1.101938,
+   "velocity": 0.622158,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 0.924938,
+     "rateHz": 5.273789,
+     "phase": 1.087464,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.67439,
+    "attackBendCents": 3.239562,
+    "excitation": {
+     "positionDelta": -0.002823,
+     "hardnessDelta": -0.00149
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p12",
+   "at": 3.950104,
+   "duration": 1.100188,
+   "velocity": 0.857674,
+   "target": {
+    "pitch": 52
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 2
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 0.521024,
+     "rateHz": 5.595957,
+     "phase": 3.785673,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.212259,
+    "attackBendCents": 1.041826,
+    "excitation": {
+     "positionDelta": -0.010553,
+     "hardnessDelta": 0.065463
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p13",
+   "at": 4.253292,
+   "duration": 1.134188,
+   "velocity": 0.612447,
+   "target": {
+    "pitch": 55
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.939422,
+     "rateHz": 5.400886,
+     "phase": 3.234581,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": -0.245473,
+    "attackBendCents": 2.259997,
+    "excitation": {
+     "positionDelta": 0.008956,
+     "hardnessDelta": 0.019287
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p14",
+   "at": 4.568104,
+   "duration": 1.113583,
+   "velocity": 0.748369,
+   "target": {
+    "pitch": 60
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 1
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.471315,
+     "rateHz": 5.001201,
+     "phase": 3.639671,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": -0.138692,
+    "attackBendCents": 1.449035,
+    "excitation": {
+     "positionDelta": -0.006483,
+     "hardnessDelta": -0.058065
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p15",
+   "at": 4.886813,
+   "duration": 1.100167,
+   "velocity": 0.64031,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 0.966313,
+     "rateHz": 5.463849,
+     "phase": 6.170084,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": -0.128079,
+    "attackBendCents": 2.46606,
+    "excitation": {
+     "positionDelta": 0.016326,
+     "hardnessDelta": 0.004536
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p16",
+   "at": 5.207458,
+   "duration": 1.100563,
+   "velocity": 0.811949,
+   "target": {
+    "pitch": 43
+   },
+   "fingering": {
+    "string": 6,
+    "fret": 3
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 0.559748,
+     "rateHz": 4.718626,
+     "phase": 5.931847,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": -0.794719,
+    "attackBendCents": 1.348755,
+    "excitation": {
+     "positionDelta": -0.011325,
+     "hardnessDelta": 0.038181
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p17",
+   "at": 5.52375,
+   "duration": 1.097708,
+   "velocity": 0.669164,
+   "target": {
+    "pitch": 55
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.418525,
+     "rateHz": 4.762511,
+     "phase": 3.033728,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": -0.472856,
+    "attackBendCents": 2.634019,
+    "excitation": {
+     "positionDelta": -0.003736,
+     "hardnessDelta": -0.023617
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p18",
+   "at": 5.832896,
+   "duration": 1.085896,
+   "velocity": 0.66316,
+   "target": {
+    "pitch": 59
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 0.837859,
+     "rateHz": 5.242904,
+     "phase": 4.969901,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": -0.542067,
+    "attackBendCents": 4.420856,
+    "excitation": {
+     "positionDelta": -0.002549,
+     "hardnessDelta": 0.041892
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p19",
+   "at": 6.140167,
+   "duration": 1.098063,
+   "velocity": 0.691273,
+   "target": {
+    "pitch": 67
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 3
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.607557,
+     "rateHz": 5.059821,
+     "phase": 2.482683,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": -0.155238,
+    "attackBendCents": 2.019823,
+    "excitation": {
+     "positionDelta": -0.001184,
+     "hardnessDelta": -0.08508
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p20",
+   "at": 6.446479,
+   "duration": 1.088021,
+   "velocity": 0.83008,
+   "target": {
+    "pitch": 50
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.278193,
+     "rateHz": 5.655802,
+     "phase": 4.268571,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.138305,
+    "attackBendCents": 2.908038,
+    "excitation": {
+     "positionDelta": 0.000431,
+     "hardnessDelta": 0.011665
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p21",
+   "at": 6.758833,
+   "duration": 1.097333,
+   "velocity": 0.625213,
+   "target": {
+    "pitch": 55
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.949187,
+     "rateHz": 5.296672,
+     "phase": 4.486759,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": -0.745815,
+    "attackBendCents": 4.179135,
+    "excitation": {
+     "positionDelta": -0.006905,
+     "hardnessDelta": 0.024112
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p22",
+   "at": 7.07,
+   "duration": 1.111646,
+   "velocity": 0.649849,
+   "target": {
+    "pitch": 59
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 0.679946,
+     "rateHz": 5.29366,
+     "phase": 6.084106,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.449878,
+    "attackBendCents": 2.8314,
+    "excitation": {
+     "positionDelta": 0.008144,
+     "hardnessDelta": -0.032284
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p23",
+   "at": 7.371104,
+   "duration": 1.088333,
+   "velocity": 0.687876,
+   "target": {
+    "pitch": 67
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 3
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 2.067493,
+     "rateHz": 5.560257,
+     "phase": 1.543623,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.12137,
+    "attackBendCents": 4.305877,
+    "excitation": {
+     "positionDelta": 0.00233,
+     "hardnessDelta": -0.068175
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p24",
+   "at": 7.685208,
+   "duration": 1.089479,
+   "velocity": 0.79029,
+   "target": {
+    "pitch": 50
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.901833,
+     "rateHz": 4.543556,
+     "phase": 1.154819,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": -0.090555,
+    "attackBendCents": 1.779084,
+    "excitation": {
+     "positionDelta": 0.00991,
+     "hardnessDelta": 0.009545
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p25",
+   "at": 8.002667,
+   "duration": 1.080208,
+   "velocity": 0.661807,
+   "target": {
+    "pitch": 57
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 2
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 0.876351,
+     "rateHz": 5.189264,
+     "phase": 2.132088,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.22491,
+    "attackBendCents": 2.47081,
+    "excitation": {
+     "positionDelta": 0.015771,
+     "hardnessDelta": -0.025961
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p26",
+   "at": 8.313292,
+   "duration": 1.097375,
+   "velocity": 0.646769,
+   "target": {
+    "pitch": 62
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 3
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.601298,
+     "rateHz": 5.19444,
+     "phase": 4.24342,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.344872,
+    "attackBendCents": 1.805996,
+    "excitation": {
+     "positionDelta": -0.008443,
+     "hardnessDelta": 0.032383
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p27",
+   "at": 8.620042,
+   "duration": 1.077146,
+   "velocity": 0.614682,
+   "target": {
+    "pitch": 66
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 2
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 0.898779,
+     "rateHz": 4.642109,
+     "phase": 3.469054,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.917885,
+    "attackBendCents": 2.195611,
+    "excitation": {
+     "positionDelta": 0.003673,
+     "hardnessDelta": 0.045215
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p28",
+   "at": 8.926479,
+   "duration": 1.083896,
+   "velocity": 0.780791,
+   "target": {
+    "pitch": 50
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 0.461796,
+     "rateHz": 5.587708,
+     "phase": 4.473584,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.325689,
+    "attackBendCents": 3.617098,
+    "excitation": {
+     "positionDelta": -0.005064,
+     "hardnessDelta": -0.021755
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p29",
+   "at": 9.251125,
+   "duration": 0.940479,
+   "velocity": 0.656183,
+   "target": {
+    "pitch": 57
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 2
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.055708,
+     "rateHz": 5.083724,
+     "phase": 5.165407,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": -0.106401,
+    "attackBendCents": 3.337334,
+    "excitation": {
+     "positionDelta": 0.002535,
+     "hardnessDelta": -0.024324
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p30",
+   "at": 9.560125,
+   "duration": 0.649938,
+   "velocity": 0.63208,
+   "target": {
+    "pitch": 62
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 3
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 2.055626,
+     "rateHz": 5.163893,
+     "phase": 0.785757,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.737658,
+    "attackBendCents": 4.468696,
+    "excitation": {
+     "positionDelta": -0.001172,
+     "hardnessDelta": -0.060329
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p31",
+   "at": 9.873896,
+   "duration": 0.349167,
+   "velocity": 0.651947,
+   "target": {
+    "pitch": 66
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 2
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.348331,
+     "rateHz": 5.228461,
+     "phase": 2.738685,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": -0.197048,
+    "attackBendCents": 1.892219,
+    "excitation": {
+     "positionDelta": -0.00887,
+     "hardnessDelta": -0.034779
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p32",
+   "at": 10.174229,
+   "duration": 0.883271,
+   "velocity": 0.846889,
+   "target": {
+    "pitch": 40
+   },
+   "fingering": {
+    "string": 6,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 2.03775,
+     "rateHz": 5.496111,
+     "phase": 1.249129,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.618326,
+    "attackBendCents": 1.453084,
+    "excitation": {
+     "positionDelta": -0.01878,
+     "hardnessDelta": 0.027112
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p33",
+   "at": 10.185438,
+   "duration": 0.893396,
+   "velocity": 0.858607,
+   "target": {
+    "pitch": 47
+   },
+   "fingering": {
+    "string": 5,
+    "fret": 2
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.385022,
+     "rateHz": 5.35698,
+     "phase": 5.941132,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": -0.703858,
+    "attackBendCents": 3.96533,
+    "excitation": {
+     "positionDelta": 0.004588,
+     "hardnessDelta": 0.026629
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p34",
+   "at": 10.200792,
+   "duration": 0.875979,
+   "velocity": 0.835314,
+   "target": {
+    "pitch": 52
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 2
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.541933,
+     "rateHz": 4.788912,
+     "phase": 5.671842,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": -0.864944,
+    "attackBendCents": 4.438812,
+    "excitation": {
+     "positionDelta": -0.007722,
+     "hardnessDelta": 0.049751
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p35",
+   "at": 10.216604,
+   "duration": 0.847479,
+   "velocity": 0.857506,
+   "target": {
+    "pitch": 55
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.184925,
+     "rateHz": 4.623232,
+     "phase": 5.483036,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": -0.46411,
+    "attackBendCents": 1.357975,
+    "excitation": {
+     "positionDelta": 0.014593,
+     "hardnessDelta": 0.004846
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p36",
+   "at": 10.235063,
+   "duration": 0.81275,
+   "velocity": 0.896706,
+   "target": {
+    "pitch": 59
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.220413,
+     "rateHz": 5.142507,
+     "phase": 2.251814,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": -0.065814,
+    "attackBendCents": 1.578732,
+    "excitation": {
+     "positionDelta": -0.020053,
+     "hardnessDelta": 0.03404
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p37",
+   "at": 10.248063,
+   "duration": 0.814833,
+   "velocity": 0.843465,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.053877,
+     "rateHz": 5.640125,
+     "phase": 4.46685,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": -0.360641,
+    "attackBendCents": 4.84457,
+    "excitation": {
+     "positionDelta": 0.007,
+     "hardnessDelta": -0.0033
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p38",
+   "at": 11.120521,
+   "duration": 0.373208,
+   "velocity": 0.661789,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.256632,
+     "rateHz": 5.416173,
+     "phase": 4.684503,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": -0.871425,
+    "attackBendCents": 2.659832,
+    "excitation": {
+     "positionDelta": -0.004146,
+     "hardnessDelta": -0.058985
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p39",
+   "at": 11.134917,
+   "duration": 0.344813,
+   "velocity": 0.658581,
+   "target": {
+    "pitch": 59
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 2.124322,
+     "rateHz": 4.711472,
+     "phase": 5.205712,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.250994,
+    "attackBendCents": 1.265206,
+    "excitation": {
+     "positionDelta": -0.010415,
+     "hardnessDelta": 0.044964
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p40",
+   "at": 11.143833,
+   "duration": 0.324146,
+   "velocity": 0.6375,
+   "target": {
+    "pitch": 55
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.492789,
+     "rateHz": 5.09573,
+     "phase": 3.315496,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": -1.185044,
+    "attackBendCents": 3.032963,
+    "excitation": {
+     "positionDelta": -0.013939,
+     "hardnessDelta": 0.004794
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p41",
+   "at": 11.459646,
+   "duration": 0.87,
+   "velocity": 0.7494,
+   "target": {
+    "pitch": 40
+   },
+   "fingering": {
+    "string": 6,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.559805,
+     "rateHz": 5.077866,
+     "phase": 3.641701,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.459689,
+    "attackBendCents": 4.427481,
+    "excitation": {
+     "positionDelta": -0.015064,
+     "hardnessDelta": 0.045301
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p42",
+   "at": 11.468854,
+   "duration": 0.869458,
+   "velocity": 0.746665,
+   "target": {
+    "pitch": 47
+   },
+   "fingering": {
+    "string": 5,
+    "fret": 2
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 0.580722,
+     "rateHz": 4.664636,
+     "phase": 1.00754,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.310263,
+    "attackBendCents": 1.550349,
+    "excitation": {
+     "positionDelta": -0.011561,
+     "hardnessDelta": 0.001134
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p43",
+   "at": 11.483708,
+   "duration": 0.840521,
+   "velocity": 0.726249,
+   "target": {
+    "pitch": 52
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 2
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.472544,
+     "rateHz": 5.196039,
+     "phase": 5.366665,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": -0.239434,
+    "attackBendCents": 2.135009,
+    "excitation": {
+     "positionDelta": 0.041258,
+     "hardnessDelta": -0.059059
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p44",
+   "at": 11.492979,
+   "duration": 0.846938,
+   "velocity": 0.767788,
+   "target": {
+    "pitch": 55
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 2.024702,
+     "rateHz": 4.727788,
+     "phase": 0.97401,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.083254,
+    "attackBendCents": 4.78679,
+    "excitation": {
+     "positionDelta": -0.01758,
+     "hardnessDelta": 0.055724
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p45",
+   "at": 11.504729,
+   "duration": 0.833354,
+   "velocity": 0.729122,
+   "target": {
+    "pitch": 59
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 0.557925,
+     "rateHz": 4.513739,
+     "phase": 0.564688,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": -0.071381,
+    "attackBendCents": 2.311769,
+    "excitation": {
+     "positionDelta": -0.011715,
+     "hardnessDelta": -0.043073
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p46",
+   "at": 11.518729,
+   "duration": 0.800333,
+   "velocity": 0.729351,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.896962,
+     "rateHz": 5.443918,
+     "phase": 1.430309,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.990851,
+    "attackBendCents": 3.499375,
+    "excitation": {
+     "positionDelta": 0.011647,
+     "hardnessDelta": 0.033899
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p47",
+   "at": 12.396479,
+   "duration": 0.336375,
+   "velocity": 0.700502,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.667172,
+     "rateHz": 5.591949,
+     "phase": 6.273047,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.418606,
+    "attackBendCents": 3.5454,
+    "excitation": {
+     "positionDelta": 0.022775,
+     "hardnessDelta": -0.013591
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p48",
+   "at": 12.410542,
+   "duration": 0.313271,
+   "velocity": 0.708518,
+   "target": {
+    "pitch": 59
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 2.055814,
+     "rateHz": 4.996266,
+     "phase": 3.626566,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.578533,
+    "attackBendCents": 3.487652,
+    "excitation": {
+     "positionDelta": 0.00868,
+     "hardnessDelta": -0.016323
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p49",
+   "at": 12.424042,
+   "duration": 0.285958,
+   "velocity": 0.66438,
+   "target": {
+    "pitch": 55
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 0.614297,
+     "rateHz": 4.544057,
+     "phase": 5.734963,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.701412,
+    "attackBendCents": 2.749238,
+    "excitation": {
+     "positionDelta": 0.006876,
+     "hardnessDelta": -0.038558
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p50",
+   "at": 12.712667,
+   "duration": 0.883521,
+   "velocity": 0.908387,
+   "target": {
+    "pitch": 48
+   },
+   "fingering": {
+    "string": 5,
+    "fret": 3
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.758599,
+     "rateHz": 5.699864,
+     "phase": 1.53722,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.281031,
+    "attackBendCents": 1.676624,
+    "excitation": {
+     "positionDelta": 0.007161,
+     "hardnessDelta": 0.008218
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p51",
+   "at": 12.725417,
+   "duration": 0.87325,
+   "velocity": 0.916768,
+   "target": {
+    "pitch": 52
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 2
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.763149,
+     "rateHz": 5.308211,
+     "phase": 2.153744,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 1.182187,
+    "attackBendCents": 3.091033,
+    "excitation": {
+     "positionDelta": -0.015234,
+     "hardnessDelta": -0.026522
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p52",
+   "at": 12.735,
+   "duration": 0.854667,
+   "velocity": 0.906237,
+   "target": {
+    "pitch": 55
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 0.554138,
+     "rateHz": 5.122974,
+     "phase": 5.128362,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.395106,
+    "attackBendCents": 1.33008,
+    "excitation": {
+     "positionDelta": 0.007894,
+     "hardnessDelta": 0.049935
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p53",
+   "at": 12.748813,
+   "duration": 0.850292,
+   "velocity": 0.843421,
+   "target": {
+    "pitch": 60
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 1
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 0.523792,
+     "rateHz": 4.56852,
+     "phase": 1.67933,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.328961,
+    "attackBendCents": 4.028962,
+    "excitation": {
+     "positionDelta": 0.000601,
+     "hardnessDelta": 0.009137
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p54",
+   "at": 12.757854,
+   "duration": 0.8315,
+   "velocity": 0.948238,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.30513,
+     "rateHz": 4.978193,
+     "phase": 0.025055,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.409643,
+    "attackBendCents": 2.200033,
+    "excitation": {
+     "positionDelta": -0.014922,
+     "hardnessDelta": -0.009817
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p55",
+   "at": 13.658979,
+   "duration": 0.347563,
+   "velocity": 0.573124,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 2.048823,
+     "rateHz": 5.394478,
+     "phase": 4.4503,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.098948,
+    "attackBendCents": 1.883972,
+    "excitation": {
+     "positionDelta": 0.012143,
+     "hardnessDelta": -0.018709
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p56",
+   "at": 13.674042,
+   "duration": 0.318521,
+   "velocity": 0.603525,
+   "target": {
+    "pitch": 60
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 1
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 0.952387,
+     "rateHz": 4.700507,
+     "phase": 1.850554,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 1.245207,
+    "attackBendCents": 1.14623,
+    "excitation": {
+     "positionDelta": 0.009824,
+     "hardnessDelta": 0.010367
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p57",
+   "at": 13.685104,
+   "duration": 0.292583,
+   "velocity": 0.532062,
+   "target": {
+    "pitch": 55
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 2.022128,
+     "rateHz": 5.361434,
+     "phase": 0.859862,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.21312,
+    "attackBendCents": 1.7335,
+    "excitation": {
+     "positionDelta": -0.011146,
+     "hardnessDelta": -0.054364
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p58",
+   "at": 13.974146,
+   "duration": 0.902833,
+   "velocity": 0.777235,
+   "target": {
+    "pitch": 48
+   },
+   "fingering": {
+    "string": 5,
+    "fret": 3
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 0.455583,
+     "rateHz": 4.959772,
+     "phase": 3.635322,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.004509,
+    "attackBendCents": 1.081815,
+    "excitation": {
+     "positionDelta": 0.014963,
+     "hardnessDelta": 0.020283
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p59",
+   "at": 13.987271,
+   "duration": 0.873854,
+   "velocity": 0.801069,
+   "target": {
+    "pitch": 52
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 2
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 0.586074,
+     "rateHz": 4.827201,
+     "phase": 5.079769,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.540149,
+    "attackBendCents": 3.615446,
+    "excitation": {
+     "positionDelta": 0.015919,
+     "hardnessDelta": -0.036665
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p60",
+   "at": 14.002688,
+   "duration": 0.879375,
+   "velocity": 0.765805,
+   "target": {
+    "pitch": 55
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.913356,
+     "rateHz": 4.617438,
+     "phase": 2.269853,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 1.197624,
+    "attackBendCents": 2.547433,
+    "excitation": {
+     "positionDelta": -0.002068,
+     "hardnessDelta": 0.016345
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p61",
+   "at": 14.017563,
+   "duration": 0.829896,
+   "velocity": 0.785077,
+   "target": {
+    "pitch": 60
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 1
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.766939,
+     "rateHz": 4.521579,
+     "phase": 5.330162,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": -0.65057,
+    "attackBendCents": 4.202331,
+    "excitation": {
+     "positionDelta": -0.011407,
+     "hardnessDelta": 0.038777
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p62",
+   "at": 14.031542,
+   "duration": 0.828479,
+   "velocity": 0.780998,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 2.088862,
+     "rateHz": 4.922248,
+     "phase": 5.110002,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": -0.209415,
+    "attackBendCents": 3.496039,
+    "excitation": {
+     "positionDelta": -0.002459,
+     "hardnessDelta": 0.020249
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p63",
+   "at": 14.92175,
+   "duration": 0.362958,
+   "velocity": 0.693998,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 0.688552,
+     "rateHz": 5.335371,
+     "phase": 3.51764,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": -0.838954,
+    "attackBendCents": 4.741615,
+    "excitation": {
+     "positionDelta": 0.014517,
+     "hardnessDelta": 0.025539
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p64",
+   "at": 14.936313,
+   "duration": 0.334167,
+   "velocity": 0.636794,
+   "target": {
+    "pitch": 60
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 1
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.387118,
+     "rateHz": 5.098022,
+     "phase": 4.339673,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.611571,
+    "attackBendCents": 3.405127,
+    "excitation": {
+     "positionDelta": 0.008554,
+     "hardnessDelta": -0.111827
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p65",
+   "at": 14.949271,
+   "duration": 0.306333,
+   "velocity": 0.601352,
+   "target": {
+    "pitch": 55
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.34257,
+     "rateHz": 5.32071,
+     "phase": 1.987062,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": -0.279388,
+    "attackBendCents": 2.601814,
+    "excitation": {
+     "positionDelta": 0.005963,
+     "hardnessDelta": -0.047989
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p66",
+   "at": 15.235188,
+   "duration": 0.850917,
+   "velocity": 0.844701,
+   "target": {
+    "pitch": 43
+   },
+   "fingering": {
+    "string": 6,
+    "fret": 3
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 0.606706,
+     "rateHz": 4.986592,
+     "phase": 1.482005,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.29935,
+    "attackBendCents": 3.481063,
+    "excitation": {
+     "positionDelta": 0.013902,
+     "hardnessDelta": 0.070626
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p67",
+   "at": 15.249563,
+   "duration": 0.868208,
+   "velocity": 0.86295,
+   "target": {
+    "pitch": 47
+   },
+   "fingering": {
+    "string": 5,
+    "fret": 2
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.868405,
+     "rateHz": 4.670308,
+     "phase": 4.58308,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.787035,
+    "attackBendCents": 4.550366,
+    "excitation": {
+     "positionDelta": -0.013685,
+     "hardnessDelta": 0.003877
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p68",
+   "at": 15.267708,
+   "duration": 0.832625,
+   "velocity": 0.856243,
+   "target": {
+    "pitch": 50
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.132962,
+     "rateHz": 5.512564,
+     "phase": 3.353574,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": -0.993133,
+    "attackBendCents": 4.850162,
+    "excitation": {
+     "positionDelta": 0.002315,
+     "hardnessDelta": 0.021843
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p69",
+   "at": 15.280604,
+   "duration": 0.818958,
+   "velocity": 0.842413,
+   "target": {
+    "pitch": 55
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.366731,
+     "rateHz": 4.549148,
+     "phase": 0.104582,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.995849,
+    "attackBendCents": 2.553709,
+    "excitation": {
+     "positionDelta": 0.045618,
+     "hardnessDelta": -0.049428
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p70",
+   "at": 15.295479,
+   "duration": 0.837458,
+   "velocity": 0.80741,
+   "target": {
+    "pitch": 59
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.320946,
+     "rateHz": 4.744725,
+     "phase": 3.352599,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.812419,
+    "attackBendCents": 4.045636,
+    "excitation": {
+     "positionDelta": -0.015898,
+     "hardnessDelta": 0.06672
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p71",
+   "at": 15.309708,
+   "duration": 0.801792,
+   "velocity": 0.833314,
+   "target": {
+    "pitch": 67
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 3
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 0.580468,
+     "rateHz": 5.558041,
+     "phase": 0.057084,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": -1.247839,
+    "attackBendCents": 4.822231,
+    "excitation": {
+     "positionDelta": 0.002733,
+     "hardnessDelta": -0.014525
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p72",
+   "at": 16.162458,
+   "duration": 0.349938,
+   "velocity": 0.631416,
+   "target": {
+    "pitch": 67
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 3
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.175134,
+     "rateHz": 4.519666,
+     "phase": 1.304345,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": -0.039833,
+    "attackBendCents": 3.537367,
+    "excitation": {
+     "positionDelta": 0.007825,
+     "hardnessDelta": -0.04087
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p73",
+   "at": 16.179313,
+   "duration": 0.321208,
+   "velocity": 0.625662,
+   "target": {
+    "pitch": 59
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 0.70156,
+     "rateHz": 4.801697,
+     "phase": 1.148116,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.387711,
+    "attackBendCents": 1.360849,
+    "excitation": {
+     "positionDelta": 0.006937,
+     "hardnessDelta": 0.030954
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p74",
+   "at": 16.190625,
+   "duration": 0.300417,
+   "velocity": 0.653876,
+   "target": {
+    "pitch": 55
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 0.459734,
+     "rateHz": 5.681052,
+     "phase": 1.876159,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": -0.884386,
+    "attackBendCents": 4.69397,
+    "excitation": {
+     "positionDelta": -0.009831,
+     "hardnessDelta": 0.037466
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p75",
+   "at": 16.487333,
+   "duration": 0.850521,
+   "velocity": 0.700529,
+   "target": {
+    "pitch": 43
+   },
+   "fingering": {
+    "string": 6,
+    "fret": 3
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 0.544747,
+     "rateHz": 4.625718,
+     "phase": 2.398495,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": -0.488039,
+    "attackBendCents": 3.730777,
+    "excitation": {
+     "positionDelta": -0.003001,
+     "hardnessDelta": -0.012344
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p76",
+   "at": 16.494958,
+   "duration": 0.838729,
+   "velocity": 0.775419,
+   "target": {
+    "pitch": 47
+   },
+   "fingering": {
+    "string": 5,
+    "fret": 2
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.234686,
+     "rateHz": 5.299245,
+     "phase": 4.91863,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.052222,
+    "attackBendCents": 3.03416,
+    "excitation": {
+     "positionDelta": -0.021424,
+     "hardnessDelta": -0.075563
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p77",
+   "at": 16.506521,
+   "duration": 0.843708,
+   "velocity": 0.737793,
+   "target": {
+    "pitch": 50
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.846824,
+     "rateHz": 5.212273,
+     "phase": 3.19133,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.849756,
+    "attackBendCents": 3.47186,
+    "excitation": {
+     "positionDelta": -0.027809,
+     "hardnessDelta": -0.023286
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p78",
+   "at": 16.516042,
+   "duration": 0.830438,
+   "velocity": 0.703829,
+   "target": {
+    "pitch": 55
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 2.097912,
+     "rateHz": 4.699426,
+     "phase": 5.977216,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": -0.563642,
+    "attackBendCents": 2.573709,
+    "excitation": {
+     "positionDelta": -0.023894,
+     "hardnessDelta": -0.028379
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p79",
+   "at": 16.525521,
+   "duration": 0.820625,
+   "velocity": 0.763269,
+   "target": {
+    "pitch": 59
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.999913,
+     "rateHz": 4.678705,
+     "phase": 5.99278,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.253816,
+    "attackBendCents": 2.843676,
+    "excitation": {
+     "positionDelta": 0.006543,
+     "hardnessDelta": -0.032263
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p80",
+   "at": 16.537396,
+   "duration": 0.775854,
+   "velocity": 0.703768,
+   "target": {
+    "pitch": 67
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 3
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 2.031599,
+     "rateHz": 5.032708,
+     "phase": 4.991255,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 1.288401,
+    "attackBendCents": 1.144483,
+    "excitation": {
+     "positionDelta": 0.018007,
+     "hardnessDelta": 0.018874
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p81",
+   "at": 17.408542,
+   "duration": 0.306896,
+   "velocity": 0.591522,
+   "target": {
+    "pitch": 67
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 3
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 0.652764,
+     "rateHz": 4.697404,
+     "phase": 2.200264,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.086943,
+    "attackBendCents": 2.400427,
+    "excitation": {
+     "positionDelta": 0.015101,
+     "hardnessDelta": -0.021161
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p82",
+   "at": 17.419896,
+   "duration": 0.285958,
+   "velocity": 0.62679,
+   "target": {
+    "pitch": 59
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.918852,
+     "rateHz": 5.17861,
+     "phase": 3.040526,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.52331,
+    "attackBendCents": 4.59355,
+    "excitation": {
+     "positionDelta": -0.008529,
+     "hardnessDelta": 0.009301
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p83",
+   "at": 17.433292,
+   "duration": 0.259625,
+   "velocity": 0.579423,
+   "target": {
+    "pitch": 55
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 2.058015,
+     "rateHz": 5.491329,
+     "phase": 2.003933,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.855818,
+    "attackBendCents": 3.118389,
+    "excitation": {
+     "positionDelta": -0.007876,
+     "hardnessDelta": -0.020552
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p84",
+   "at": 17.709,
+   "duration": 0.878375,
+   "velocity": 0.871865,
+   "target": {
+    "pitch": 50
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 2.046941,
+     "rateHz": 4.941648,
+     "phase": 0.438276,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": -0.160802,
+    "attackBendCents": 4.159922,
+    "excitation": {
+     "positionDelta": -0.018843,
+     "hardnessDelta": 0.077568
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p85",
+   "at": 17.717917,
+   "duration": 0.877021,
+   "velocity": 0.866999,
+   "target": {
+    "pitch": 57
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 2
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.443994,
+     "rateHz": 5.44475,
+     "phase": 6.026422,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": -0.444452,
+    "attackBendCents": 3.489577,
+    "excitation": {
+     "positionDelta": 0.005905,
+     "hardnessDelta": -0.019609
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p86",
+   "at": 17.730854,
+   "duration": 0.84,
+   "velocity": 0.832437,
+   "target": {
+    "pitch": 62
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 3
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 0.84425,
+     "rateHz": 4.9911,
+     "phase": 5.926378,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.320457,
+    "attackBendCents": 2.112195,
+    "excitation": {
+     "positionDelta": -0.040027,
+     "hardnessDelta": 0.032713
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p87",
+   "at": 17.740438,
+   "duration": 0.823458,
+   "velocity": 0.886737,
+   "target": {
+    "pitch": 66
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 2
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 2.047963,
+     "rateHz": 5.698965,
+     "phase": 5.997316,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": -0.786969,
+    "attackBendCents": 4.41861,
+    "excitation": {
+     "positionDelta": -0.011102,
+     "hardnessDelta": 0.026194
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p88",
+   "at": 18.634396,
+   "duration": 0.337563,
+   "velocity": 0.60233,
+   "target": {
+    "pitch": 66
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 2
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.119493,
+     "rateHz": 5.220532,
+     "phase": 4.703112,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.007435,
+    "attackBendCents": 4.872525,
+    "excitation": {
+     "positionDelta": -0.015432,
+     "hardnessDelta": -0.008238
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p89",
+   "at": 18.644271,
+   "duration": 0.307813,
+   "velocity": 0.572085,
+   "target": {
+    "pitch": 62
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 3
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 0.688893,
+     "rateHz": 4.814911,
+     "phase": 1.397815,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": -1.493013,
+    "attackBendCents": 3.850106,
+    "excitation": {
+     "positionDelta": 0.017095,
+     "hardnessDelta": -0.011049
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p90",
+   "at": 18.655146,
+   "duration": 0.282021,
+   "velocity": 0.58607,
+   "target": {
+    "pitch": 57
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 2
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.338078,
+     "rateHz": 5.670893,
+     "phase": 4.305902,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.294041,
+    "attackBendCents": 1.11965,
+    "excitation": {
+     "positionDelta": -0.01627,
+     "hardnessDelta": 0.030736
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p91",
+   "at": 18.943708,
+   "duration": 0.862271,
+   "velocity": 0.779729,
+   "target": {
+    "pitch": 50
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.496446,
+     "rateHz": 5.094486,
+     "phase": 1.053055,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.567375,
+    "attackBendCents": 1.886925,
+    "excitation": {
+     "positionDelta": 0.025791,
+     "hardnessDelta": -0.015092
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p92",
+   "at": 18.962167,
+   "duration": 0.864,
+   "velocity": 0.732532,
+   "target": {
+    "pitch": 57
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 2
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 0.807944,
+     "rateHz": 5.490334,
+     "phase": 0.434187,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.690902,
+    "attackBendCents": 1.388798,
+    "excitation": {
+     "positionDelta": 0.007943,
+     "hardnessDelta": 0.058637
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p93",
+   "at": 18.977083,
+   "duration": 0.835792,
+   "velocity": 0.73671,
+   "target": {
+    "pitch": 62
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 3
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.599982,
+     "rateHz": 5.232119,
+     "phase": 2.015758,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 1.047982,
+    "attackBendCents": 3.624936,
+    "excitation": {
+     "positionDelta": -0.002356,
+     "hardnessDelta": -0.031227
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p94",
+   "at": 18.996958,
+   "duration": 0.561646,
+   "velocity": 0.760811,
+   "target": {
+    "pitch": 66
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 2
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.091388,
+     "rateHz": 4.91714,
+     "phase": 3.144326,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": -0.164176,
+    "attackBendCents": 3.541888,
+    "excitation": {
+     "positionDelta": 0.002363,
+     "hardnessDelta": 0.030551
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p95",
+   "at": 19.583604,
+   "duration": 0.265917,
+   "velocity": 0.891268,
+   "target": {
+    "pitch": 67
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 3
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 2.063989,
+     "rateHz": 5.31685,
+     "phase": 1.356929,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": -0.999671,
+    "attackBendCents": 3.666115,
+    "excitation": {
+     "positionDelta": -0.005135,
+     "hardnessDelta": 0.063969
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p96",
+   "at": 19.884333,
+   "duration": 0.873375,
+   "velocity": 0.588484,
+   "target": {
+    "pitch": 66
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 2
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 1.136689,
+     "rateHz": 4.828121,
+     "phase": 0.993677,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": 0.675699,
+    "attackBendCents": 1.37035,
+    "excitation": {
+     "positionDelta": 0.002288,
+     "hardnessDelta": -0.001154
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p97",
+   "at": 19.894125,
+   "duration": 0.861208,
+   "velocity": 0.563642,
+   "target": {
+    "pitch": 62
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 3
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 0.882361,
+     "rateHz": 4.613078,
+     "phase": 3.055914,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": -0.694854,
+    "attackBendCents": 4.653825,
+    "excitation": {
+     "positionDelta": 0.015681,
+     "hardnessDelta": -0.005914
+    }
+   },
+   "part": "guitar"
+  },
+  {
+   "id": "p98",
+   "at": 19.900417,
+   "duration": 0.866521,
+   "velocity": 0.613392,
+   "target": {
+    "pitch": 57
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 2
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 0.538813,
+     "rateHz": 5.674978,
+     "phase": 2.332631,
+     "delaySeconds": 0.18,
+     "fadeSeconds": 0.2
+    }
+   ],
+   "nuance": {
+    "intonationCents": -0.207814,
+    "attackBendCents": 2.305541,
+    "excitation": {
+     "positionDelta": -0.004277,
+     "hardnessDelta": -0.016039
+    }
+   },
+   "part": "guitar"
+  }
+ ],
+ "controls": [
+  {
+   "id": "tempo",
+   "at": 0,
+   "type": "tempo",
+   "bpm": 96
+  }
+ ],
+ "render": {
+  "rate": 48000,
+  "seconds": 23.3
+ },
+ "expect": [
+  {
+   "kind": "noDiagnostics",
+   "severity": "warning"
+  },
+  {
+   "kind": "peakBelow",
+   "dbfs": -0.5
+  },
+  {
+   "kind": "partActive",
+   "part": "guitar",
+   "aboveDb": -40
+  }
+ ]
+}

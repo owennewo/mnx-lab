@@ -1,0 +1,1581 @@
+{
+ "contract": "mnx-sound/2",
+ "fixture": {
+  "id": "guitar-strums",
+  "name": "Guitar – strums down & up",
+  "group": "Guitar",
+  "description": "Chord gestures: eighth-note strums down (low string first) and lighter up strums, then a slow rake down and up, and one big strum left ringing."
+ },
+ "setup": {
+  "contract": "mnx-sound/2",
+  "session": {
+   "buses": [
+    {
+     "id": "room",
+     "type": "room",
+     "state": "on",
+     "preset": "Studio",
+     "basePreset": "Studio",
+     "params": {
+      "level": 0.18,
+      "decay": 0.6,
+      "predelay": 8,
+      "damping": 8500,
+      "width": 0.8
+     }
+    }
+   ],
+   "master": {
+    "volumeDb": 0,
+    "ceilingDb": -1
+   }
+  },
+  "parts": [
+   {
+    "id": "guitar",
+    "name": "Guitar",
+    "instrument": {
+     "kind": "plucked",
+     "design": "clear-steel",
+     "layout": {
+      "strings": [
+       {
+        "pitch": 64
+       },
+       {
+        "pitch": 59
+       },
+       {
+        "pitch": 55
+       },
+       {
+        "pitch": 50
+       },
+       {
+        "pitch": 45
+       },
+       {
+        "pitch": 40
+       }
+      ],
+      "capo": 0
+     }
+    },
+    "chain": [],
+    "strip": {
+     "levelDb": -3,
+     "pan": 0,
+     "mute": false,
+     "solo": false,
+     "sends": {
+      "room": 0.3
+     }
+    }
+   }
+  ]
+ },
+ "notes": [
+  {
+   "id": "guitar-2",
+   "part": "guitar",
+   "at": 0.2,
+   "duration": 0.633334,
+   "velocity": 0.8,
+   "target": {
+    "pitch": 40
+   },
+   "fingering": {
+    "string": 6,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "guitar-g1",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.025
+   }
+  },
+  {
+   "id": "guitar-3",
+   "part": "guitar",
+   "at": 0.2,
+   "duration": 0.633334,
+   "velocity": 0.8,
+   "target": {
+    "pitch": 47
+   },
+   "fingering": {
+    "string": 5,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "guitar-g1",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.025
+   }
+  },
+  {
+   "id": "guitar-4",
+   "part": "guitar",
+   "at": 0.2,
+   "duration": 0.633334,
+   "velocity": 0.8,
+   "target": {
+    "pitch": 52
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "guitar-g1",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.025
+   }
+  },
+  {
+   "id": "guitar-5",
+   "part": "guitar",
+   "at": 0.2,
+   "duration": 0.633334,
+   "velocity": 0.8,
+   "target": {
+    "pitch": 56
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 1
+   },
+   "gesture": {
+    "id": "guitar-g1",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.025
+   }
+  },
+  {
+   "id": "guitar-6",
+   "part": "guitar",
+   "at": 0.2,
+   "duration": 0.633334,
+   "velocity": 0.8,
+   "target": {
+    "pitch": 59
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "guitar-g1",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.025
+   }
+  },
+  {
+   "id": "guitar-7",
+   "part": "guitar",
+   "at": 0.2,
+   "duration": 0.633334,
+   "velocity": 0.8,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "guitar-g1",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.025
+   }
+  },
+  {
+   "id": "guitar-9",
+   "part": "guitar",
+   "at": 0.866667,
+   "duration": 0.316666,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 40
+   },
+   "fingering": {
+    "string": 6,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "guitar-g8",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.025
+   }
+  },
+  {
+   "id": "guitar-10",
+   "part": "guitar",
+   "at": 0.866667,
+   "duration": 0.316666,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 47
+   },
+   "fingering": {
+    "string": 5,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "guitar-g8",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.025
+   }
+  },
+  {
+   "id": "guitar-11",
+   "part": "guitar",
+   "at": 0.866667,
+   "duration": 0.316666,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 52
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "guitar-g8",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.025
+   }
+  },
+  {
+   "id": "guitar-12",
+   "part": "guitar",
+   "at": 0.866667,
+   "duration": 0.316666,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 56
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 1
+   },
+   "gesture": {
+    "id": "guitar-g8",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.025
+   }
+  },
+  {
+   "id": "guitar-13",
+   "part": "guitar",
+   "at": 0.866667,
+   "duration": 0.316666,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 59
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "guitar-g8",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.025
+   }
+  },
+  {
+   "id": "guitar-14",
+   "part": "guitar",
+   "at": 0.866667,
+   "duration": 0.316666,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "guitar-g8",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.025
+   }
+  },
+  {
+   "id": "guitar-16",
+   "part": "guitar",
+   "at": 1.2,
+   "duration": 0.633334,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 52
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "guitar-g15",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.018
+   }
+  },
+  {
+   "id": "guitar-17",
+   "part": "guitar",
+   "at": 1.2,
+   "duration": 0.633334,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 56
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 1
+   },
+   "gesture": {
+    "id": "guitar-g15",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.018
+   }
+  },
+  {
+   "id": "guitar-18",
+   "part": "guitar",
+   "at": 1.2,
+   "duration": 0.633334,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 59
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "guitar-g15",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.018
+   }
+  },
+  {
+   "id": "guitar-19",
+   "part": "guitar",
+   "at": 1.2,
+   "duration": 0.633334,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "guitar-g15",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.018
+   }
+  },
+  {
+   "id": "guitar-21",
+   "part": "guitar",
+   "at": 1.866667,
+   "duration": 0.316666,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 52
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "guitar-g20",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.018
+   }
+  },
+  {
+   "id": "guitar-22",
+   "part": "guitar",
+   "at": 1.866667,
+   "duration": 0.316666,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 56
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 1
+   },
+   "gesture": {
+    "id": "guitar-g20",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.018
+   }
+  },
+  {
+   "id": "guitar-23",
+   "part": "guitar",
+   "at": 1.866667,
+   "duration": 0.316666,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 59
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "guitar-g20",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.018
+   }
+  },
+  {
+   "id": "guitar-24",
+   "part": "guitar",
+   "at": 1.866667,
+   "duration": 0.316666,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "guitar-g20",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.018
+   }
+  },
+  {
+   "id": "guitar-26",
+   "part": "guitar",
+   "at": 2.2,
+   "duration": 0.316666,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 40
+   },
+   "fingering": {
+    "string": 6,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "guitar-g25",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.025
+   }
+  },
+  {
+   "id": "guitar-27",
+   "part": "guitar",
+   "at": 2.2,
+   "duration": 0.316666,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 47
+   },
+   "fingering": {
+    "string": 5,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "guitar-g25",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.025
+   }
+  },
+  {
+   "id": "guitar-28",
+   "part": "guitar",
+   "at": 2.2,
+   "duration": 0.316666,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 52
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "guitar-g25",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.025
+   }
+  },
+  {
+   "id": "guitar-29",
+   "part": "guitar",
+   "at": 2.2,
+   "duration": 0.316666,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 56
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 1
+   },
+   "gesture": {
+    "id": "guitar-g25",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.025
+   }
+  },
+  {
+   "id": "guitar-30",
+   "part": "guitar",
+   "at": 2.2,
+   "duration": 0.316666,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 59
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "guitar-g25",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.025
+   }
+  },
+  {
+   "id": "guitar-31",
+   "part": "guitar",
+   "at": 2.2,
+   "duration": 0.316666,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "guitar-g25",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.025
+   }
+  },
+  {
+   "id": "guitar-33",
+   "part": "guitar",
+   "at": 2.533333,
+   "duration": 0.316667,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 52
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "guitar-g32",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.018
+   }
+  },
+  {
+   "id": "guitar-34",
+   "part": "guitar",
+   "at": 2.533333,
+   "duration": 0.316667,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 56
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 1
+   },
+   "gesture": {
+    "id": "guitar-g32",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.018
+   }
+  },
+  {
+   "id": "guitar-35",
+   "part": "guitar",
+   "at": 2.533333,
+   "duration": 0.316667,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 59
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "guitar-g32",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.018
+   }
+  },
+  {
+   "id": "guitar-36",
+   "part": "guitar",
+   "at": 2.533333,
+   "duration": 0.316667,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "guitar-g32",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.018
+   }
+  },
+  {
+   "id": "guitar-38",
+   "part": "guitar",
+   "at": 2.866667,
+   "duration": 0.633333,
+   "velocity": 0.8,
+   "target": {
+    "pitch": 45
+   },
+   "fingering": {
+    "string": 5,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "guitar-g37",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.025
+   }
+  },
+  {
+   "id": "guitar-39",
+   "part": "guitar",
+   "at": 2.866667,
+   "duration": 0.633333,
+   "velocity": 0.8,
+   "target": {
+    "pitch": 52
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "guitar-g37",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.025
+   }
+  },
+  {
+   "id": "guitar-40",
+   "part": "guitar",
+   "at": 2.866667,
+   "duration": 0.633333,
+   "velocity": 0.8,
+   "target": {
+    "pitch": 57
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "guitar-g37",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.025
+   }
+  },
+  {
+   "id": "guitar-41",
+   "part": "guitar",
+   "at": 2.866667,
+   "duration": 0.633333,
+   "velocity": 0.8,
+   "target": {
+    "pitch": 61
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "guitar-g37",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.025
+   }
+  },
+  {
+   "id": "guitar-42",
+   "part": "guitar",
+   "at": 2.866667,
+   "duration": 0.633333,
+   "velocity": 0.8,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "guitar-g37",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.025
+   }
+  },
+  {
+   "id": "guitar-44",
+   "part": "guitar",
+   "at": 3.533333,
+   "duration": 0.316667,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 45
+   },
+   "fingering": {
+    "string": 5,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "guitar-g43",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.025
+   }
+  },
+  {
+   "id": "guitar-45",
+   "part": "guitar",
+   "at": 3.533333,
+   "duration": 0.316667,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 52
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "guitar-g43",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.025
+   }
+  },
+  {
+   "id": "guitar-46",
+   "part": "guitar",
+   "at": 3.533333,
+   "duration": 0.316667,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 57
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "guitar-g43",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.025
+   }
+  },
+  {
+   "id": "guitar-47",
+   "part": "guitar",
+   "at": 3.533333,
+   "duration": 0.316667,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 61
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "guitar-g43",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.025
+   }
+  },
+  {
+   "id": "guitar-48",
+   "part": "guitar",
+   "at": 3.533333,
+   "duration": 0.316667,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "guitar-g43",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.025
+   }
+  },
+  {
+   "id": "guitar-50",
+   "part": "guitar",
+   "at": 3.866667,
+   "duration": 0.633333,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 52
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "guitar-g49",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.018
+   }
+  },
+  {
+   "id": "guitar-51",
+   "part": "guitar",
+   "at": 3.866667,
+   "duration": 0.633333,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 57
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "guitar-g49",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.018
+   }
+  },
+  {
+   "id": "guitar-52",
+   "part": "guitar",
+   "at": 3.866667,
+   "duration": 0.633333,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 61
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "guitar-g49",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.018
+   }
+  },
+  {
+   "id": "guitar-53",
+   "part": "guitar",
+   "at": 3.866667,
+   "duration": 0.633333,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "guitar-g49",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.018
+   }
+  },
+  {
+   "id": "guitar-55",
+   "part": "guitar",
+   "at": 4.533333,
+   "duration": 0.316667,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 52
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "guitar-g54",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.018
+   }
+  },
+  {
+   "id": "guitar-56",
+   "part": "guitar",
+   "at": 4.533333,
+   "duration": 0.316667,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 57
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "guitar-g54",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.018
+   }
+  },
+  {
+   "id": "guitar-57",
+   "part": "guitar",
+   "at": 4.533333,
+   "duration": 0.316667,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 61
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "guitar-g54",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.018
+   }
+  },
+  {
+   "id": "guitar-58",
+   "part": "guitar",
+   "at": 4.533333,
+   "duration": 0.316667,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "guitar-g54",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.018
+   }
+  },
+  {
+   "id": "guitar-60",
+   "part": "guitar",
+   "at": 4.866667,
+   "duration": 0.316666,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 45
+   },
+   "fingering": {
+    "string": 5,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "guitar-g59",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.025
+   }
+  },
+  {
+   "id": "guitar-61",
+   "part": "guitar",
+   "at": 4.866667,
+   "duration": 0.316666,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 52
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "guitar-g59",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.025
+   }
+  },
+  {
+   "id": "guitar-62",
+   "part": "guitar",
+   "at": 4.866667,
+   "duration": 0.316666,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 57
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "guitar-g59",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.025
+   }
+  },
+  {
+   "id": "guitar-63",
+   "part": "guitar",
+   "at": 4.866667,
+   "duration": 0.316666,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 61
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "guitar-g59",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.025
+   }
+  },
+  {
+   "id": "guitar-64",
+   "part": "guitar",
+   "at": 4.866667,
+   "duration": 0.316666,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "guitar-g59",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.025
+   }
+  },
+  {
+   "id": "guitar-66",
+   "part": "guitar",
+   "at": 5.2,
+   "duration": 0.316666,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 52
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "guitar-g65",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.018
+   }
+  },
+  {
+   "id": "guitar-67",
+   "part": "guitar",
+   "at": 5.2,
+   "duration": 0.316666,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 57
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "guitar-g65",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.018
+   }
+  },
+  {
+   "id": "guitar-68",
+   "part": "guitar",
+   "at": 5.2,
+   "duration": 0.316666,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 61
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "guitar-g65",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.018
+   }
+  },
+  {
+   "id": "guitar-69",
+   "part": "guitar",
+   "at": 5.2,
+   "duration": 0.316666,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "guitar-g65",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.018
+   }
+  },
+  {
+   "id": "guitar-71",
+   "part": "guitar",
+   "at": 5.533333,
+   "duration": 1.333334,
+   "velocity": 0.7,
+   "target": {
+    "pitch": 50
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "guitar-g70",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.15
+   }
+  },
+  {
+   "id": "guitar-72",
+   "part": "guitar",
+   "at": 5.533333,
+   "duration": 1.333334,
+   "velocity": 0.7,
+   "target": {
+    "pitch": 57
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "guitar-g70",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.15
+   }
+  },
+  {
+   "id": "guitar-73",
+   "part": "guitar",
+   "at": 5.533333,
+   "duration": 1.333334,
+   "velocity": 0.7,
+   "target": {
+    "pitch": 62
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 3
+   },
+   "gesture": {
+    "id": "guitar-g70",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.15
+   }
+  },
+  {
+   "id": "guitar-74",
+   "part": "guitar",
+   "at": 5.533333,
+   "duration": 1.333334,
+   "velocity": 0.7,
+   "target": {
+    "pitch": 66
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "guitar-g70",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.15
+   }
+  },
+  {
+   "id": "guitar-76",
+   "part": "guitar",
+   "at": 6.866667,
+   "duration": 1.333333,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 50
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "guitar-g75",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.1
+   }
+  },
+  {
+   "id": "guitar-77",
+   "part": "guitar",
+   "at": 6.866667,
+   "duration": 1.333333,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 57
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "guitar-g75",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.1
+   }
+  },
+  {
+   "id": "guitar-78",
+   "part": "guitar",
+   "at": 6.866667,
+   "duration": 1.333333,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 62
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 3
+   },
+   "gesture": {
+    "id": "guitar-g75",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.1
+   }
+  },
+  {
+   "id": "guitar-79",
+   "part": "guitar",
+   "at": 6.866667,
+   "duration": 1.333333,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 66
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "guitar-g75",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.1
+   }
+  },
+  {
+   "id": "guitar-81",
+   "part": "guitar",
+   "at": 8.2,
+   "duration": 2.666667,
+   "velocity": 0.95,
+   "target": {
+    "pitch": 40
+   },
+   "fingering": {
+    "string": 6,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "guitar-g80",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.03
+   },
+   "techniques": [
+    {
+     "type": "letRing"
+    }
+   ]
+  },
+  {
+   "id": "guitar-82",
+   "part": "guitar",
+   "at": 8.2,
+   "duration": 2.666667,
+   "velocity": 0.95,
+   "target": {
+    "pitch": 47
+   },
+   "fingering": {
+    "string": 5,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "guitar-g80",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.03
+   },
+   "techniques": [
+    {
+     "type": "letRing"
+    }
+   ]
+  },
+  {
+   "id": "guitar-83",
+   "part": "guitar",
+   "at": 8.2,
+   "duration": 2.666667,
+   "velocity": 0.95,
+   "target": {
+    "pitch": 52
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 2
+   },
+   "gesture": {
+    "id": "guitar-g80",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.03
+   },
+   "techniques": [
+    {
+     "type": "letRing"
+    }
+   ]
+  },
+  {
+   "id": "guitar-84",
+   "part": "guitar",
+   "at": 8.2,
+   "duration": 2.666667,
+   "velocity": 0.95,
+   "target": {
+    "pitch": 56
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 1
+   },
+   "gesture": {
+    "id": "guitar-g80",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.03
+   },
+   "techniques": [
+    {
+     "type": "letRing"
+    }
+   ]
+  },
+  {
+   "id": "guitar-85",
+   "part": "guitar",
+   "at": 8.2,
+   "duration": 2.666667,
+   "velocity": 0.95,
+   "target": {
+    "pitch": 59
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "guitar-g80",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.03
+   },
+   "techniques": [
+    {
+     "type": "letRing"
+    }
+   ]
+  },
+  {
+   "id": "guitar-86",
+   "part": "guitar",
+   "at": 8.2,
+   "duration": 2.666667,
+   "velocity": 0.95,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 0
+   },
+   "gesture": {
+    "id": "guitar-g80",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.03
+   },
+   "techniques": [
+    {
+     "type": "letRing"
+    }
+   ]
+  }
+ ],
+ "controls": [
+  {
+   "id": "tempo",
+   "at": 0,
+   "type": "tempo",
+   "bpm": 90
+  }
+ ],
+ "render": {
+  "rate": 48000,
+  "seconds": 13.9
+ },
+ "expect": [
+  {
+   "kind": "noDiagnostics",
+   "severity": "warning"
+  },
+  {
+   "kind": "peakBelow",
+   "dbfs": -0.5
+  },
+  {
+   "kind": "partActive",
+   "part": "guitar",
+   "aboveDb": -40
+  },
+  {
+   "kind": "onsetAt",
+   "note": "guitar-2",
+   "seconds": 0
+  },
+  {
+   "kind": "onsetAt",
+   "note": "guitar-7",
+   "seconds": 0.025
+  },
+  {
+   "kind": "onsetAt",
+   "note": "guitar-74",
+   "seconds": 0.15
+  },
+  {
+   "kind": "onsetAt",
+   "note": "guitar-79",
+   "seconds": 0
+  },
+  {
+   "kind": "onsetAt",
+   "note": "guitar-76",
+   "seconds": 0.1
+  }
+ ]
+}

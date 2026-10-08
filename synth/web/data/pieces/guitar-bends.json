@@ -1,0 +1,362 @@
+{
+ "contract": "mnx-sound/2",
+ "fixture": {
+  "id": "guitar-bends",
+  "name": "Guitar – bends, slides & vibrato",
+  "group": "Guitar",
+  "description": "A lead line: a full-step bend and a pre-bend release, a slide in and a slide shift, wide and narrow vibrato, a half-step bend and a slide out."
+ },
+ "setup": {
+  "contract": "mnx-sound/2",
+  "session": {
+   "buses": [
+    {
+     "id": "room",
+     "type": "room",
+     "state": "on",
+     "preset": "Studio",
+     "basePreset": "Studio",
+     "params": {
+      "level": 0.18,
+      "decay": 0.6,
+      "predelay": 8,
+      "damping": 8500,
+      "width": 0.8
+     }
+    }
+   ],
+   "master": {
+    "volumeDb": 0,
+    "ceilingDb": -1
+   }
+  },
+  "parts": [
+   {
+    "id": "guitar",
+    "name": "Guitar",
+    "instrument": {
+     "kind": "plucked",
+     "design": "bright-metallic",
+     "layout": {
+      "strings": [
+       {
+        "pitch": 64
+       },
+       {
+        "pitch": 59
+       },
+       {
+        "pitch": 55
+       },
+       {
+        "pitch": 50
+       },
+       {
+        "pitch": 45
+       },
+       {
+        "pitch": 40
+       }
+      ],
+      "capo": 0
+     }
+    },
+    "chain": [],
+    "strip": {
+     "levelDb": 0,
+     "pan": 0,
+     "mute": false,
+     "solo": false,
+     "sends": {
+      "room": 0.3
+     }
+    }
+   }
+  ]
+ },
+ "notes": [
+  {
+   "id": "guitar-1",
+   "part": "guitar",
+   "at": 0.2,
+   "duration": 1.125,
+   "velocity": 0.7,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 5
+   },
+   "techniques": [
+    {
+     "type": "bend",
+     "points": [
+      {
+       "at": 0,
+       "cents": 0
+      },
+      {
+       "at": 0.3,
+       "cents": 200
+      },
+      {
+       "at": 1,
+       "cents": 200
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "guitar-2",
+   "part": "guitar",
+   "at": 1.7,
+   "duration": 1.5,
+   "velocity": 0.7,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 5
+   },
+   "techniques": [
+    {
+     "type": "bend",
+     "points": [
+      {
+       "at": 0,
+       "cents": 200
+      },
+      {
+       "at": 0.4,
+       "cents": 200
+      },
+      {
+       "at": 0.8,
+       "cents": 0
+      },
+      {
+       "at": 1,
+       "cents": 0
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "guitar-3",
+   "part": "guitar",
+   "at": 3.2,
+   "duration": 0.75,
+   "velocity": 0.7,
+   "target": {
+    "pitch": 62
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 7
+   },
+   "techniques": [
+    {
+     "type": "slide",
+     "direction": "in",
+     "cents": -200,
+     "span": 0.25
+    }
+   ]
+  },
+  {
+   "id": "guitar-4",
+   "part": "guitar",
+   "at": 3.95,
+   "duration": 0.75,
+   "velocity": 0.7,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 9
+   },
+   "techniques": [
+    {
+     "type": "legato",
+     "from": "guitar-3",
+     "via": "slide"
+    }
+   ]
+  },
+  {
+   "id": "guitar-5",
+   "part": "guitar",
+   "at": 4.7,
+   "duration": 1.5,
+   "velocity": 0.7,
+   "target": {
+    "pitch": 67
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 8
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 30,
+     "rateHz": 5.5,
+     "delaySeconds": 0.15
+    }
+   ]
+  },
+  {
+   "id": "guitar-6",
+   "part": "guitar",
+   "at": 6.2,
+   "duration": 0.75,
+   "velocity": 0.75,
+   "target": {
+    "pitch": 72
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 8
+   },
+   "techniques": [
+    {
+     "type": "bend",
+     "points": [
+      {
+       "at": 0,
+       "cents": 0
+      },
+      {
+       "at": 0.25,
+       "cents": 100
+      },
+      {
+       "at": 1,
+       "cents": 100
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "guitar-7",
+   "part": "guitar",
+   "at": 6.95,
+   "duration": 2.25,
+   "velocity": 0.7,
+   "target": {
+    "pitch": 74
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 10
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 50,
+     "rateHz": 4.5,
+     "delaySeconds": 0.1
+    }
+   ]
+  },
+  {
+   "id": "guitar-8",
+   "part": "guitar",
+   "at": 9.2,
+   "duration": 1.5,
+   "velocity": 0.7,
+   "target": {
+    "pitch": 69
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 10
+   },
+   "techniques": [
+    {
+     "type": "slide",
+     "direction": "out",
+     "cents": -700,
+     "span": 0.4
+    }
+   ]
+  },
+  {
+   "id": "guitar-9",
+   "part": "guitar",
+   "at": 10.7,
+   "duration": 1.5,
+   "velocity": 0.65,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 9
+   },
+   "techniques": [
+    {
+     "type": "vibrato",
+     "depthCents": 15,
+     "rateHz": 6,
+     "delaySeconds": 0.2
+    }
+   ]
+  }
+ ],
+ "controls": [
+  {
+   "id": "tempo",
+   "at": 0,
+   "type": "tempo",
+   "bpm": 80
+  }
+ ],
+ "render": {
+  "rate": 48000,
+  "seconds": 14.7
+ },
+ "expect": [
+  {
+   "kind": "noDiagnostics",
+   "severity": "warning"
+  },
+  {
+   "kind": "peakBelow",
+   "dbfs": -0.5
+  },
+  {
+   "kind": "partActive",
+   "part": "guitar",
+   "aboveDb": -40
+  },
+  {
+   "kind": "pitch",
+   "note": "guitar-1",
+   "curve": "commanded",
+   "toleranceCents": 15,
+   "maxCents": 35
+  },
+  {
+   "kind": "pitch",
+   "note": "guitar-5",
+   "curve": "commanded",
+   "toleranceCents": 15,
+   "maxCents": 60
+  },
+  {
+   "kind": "pitch",
+   "note": "guitar-3",
+   "curve": "commanded",
+   "toleranceCents": 15,
+   "maxCents": 35,
+   "from": 0.3
+  }
+ ]
+}

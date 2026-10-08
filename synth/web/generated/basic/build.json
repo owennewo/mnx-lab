@@ -1,0 +1,19 @@
+{
+  "builderSha256": "ca3eb52baf401f030930cdce48ed0ed43adfdcbaae2fac499ffef27c3c8b0ef0",
+  "instruments": {
+    "keys": {
+      "source": "dsp/keys-basic.dsp",
+      "sourceSha256": "273fe46493fdebe2fef8b097dc935eeb2355c18f195dfa5c5afef02659753f85",
+      "wasmSha256": "2f03953cfc0215ca2e5a3d05ca8948df0e27a74d2a496b1400b4c48c251de612",
+      "inputs": 0,
+      "outputs": 2
+    },
+    "kit": {
+      "source": "dsp/kit-basic.dsp",
+      "sourceSha256": "f267ba8864f5deb122f252c7f4d110f370de55e94609a4e5679c1f4d71af84d0",
+      "wasmSha256": "d383870a58aa92e70752f3245fd7af6a7b3af53850c077bbc3e0966ee039e59c",
+      "inputs": 0,
+      "outputs": 2
+    }
+  }
+}

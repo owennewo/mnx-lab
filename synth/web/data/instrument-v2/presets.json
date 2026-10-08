@@ -1,0 +1,2322 @@
+[
+ {
+  "schemaVersion": 3,
+  "engine": {
+   "id": "guitar-lab",
+   "generation": 3
+  },
+  "id": "rounded-steel",
+  "name": "Rounded steel",
+  "family": "Acoustic",
+  "description": "Broad finger attack; warm upper-partial decay and slow string motion.",
+  "factory": true,
+  "instrument": {
+   "parameters": {
+    "decay": 5.2,
+    "brightness": 0.6,
+    "dispersion": 0.12,
+    "release": 0.08,
+    "pickup": 0.18,
+    "electric": 0,
+    "body_mix": 0,
+    "pluck_body": 2.6,
+    "pick_texture": 0.18,
+    "treble_decay": 1.1,
+    "initial_damping": 0,
+    "initial_damping_time": 0.12,
+    "beating_cents": 0.8,
+    "motion_exchange": 0.0003,
+    "motion_loss_ratio": 1,
+    "contact_width": 0.055,
+    "pluck_release_time": 0.001,
+    "texture_colour": 0.7,
+    "velocity_tone": 0,
+    "body_size": 1,
+    "body_low_weight": 1,
+    "body_damping": 1,
+    "body_breadth": 1,
+    "bridge_transfer": 0.02,
+    "bridge_rolloff": 250,
+    "sympathetic_response": 0.3,
+    "pickup_width": 0,
+    "pickup2": 0.32,
+    "pickup_blend": 0
+   },
+   "excitation": {
+    "position": 0.23,
+    "hardness": 0.4,
+    "thwack": 0.05
+   },
+   "modes": [
+    {
+     "frequency_hz": 96,
+     "t60_seconds": 0.16,
+     "gain": 1.3
+    },
+    {
+     "frequency_hz": 188,
+     "t60_seconds": 0.1528,
+     "gain": 1.0656
+    },
+    {
+     "frequency_hz": 224,
+     "t60_seconds": 0.1456,
+     "gain": 0.9028
+    },
+    {
+     "frequency_hz": 305,
+     "t60_seconds": 0.1384,
+     "gain": 0.7831
+    },
+    {
+     "frequency_hz": 420,
+     "t60_seconds": 0.1312,
+     "gain": 0.6915
+    },
+    {
+     "frequency_hz": 575,
+     "t60_seconds": 0.124,
+     "gain": 0.619
+    },
+    {
+     "frequency_hz": 740,
+     "t60_seconds": 0.1168,
+     "gain": 0.5603
+    },
+    {
+     "frequency_hz": 980,
+     "t60_seconds": 0.1096,
+     "gain": 0.5118
+    },
+    {
+     "frequency_hz": 1320,
+     "t60_seconds": 0.1024,
+     "gain": 0.471
+    },
+    {
+     "frequency_hz": 1770,
+     "t60_seconds": 0.0952,
+     "gain": 0.4362
+    },
+    {
+     "frequency_hz": 2360,
+     "t60_seconds": 0.088,
+     "gain": 0.4062
+    },
+    {
+     "frequency_hz": 3200,
+     "t60_seconds": 0.0808,
+     "gain": 0.3801
+    }
+   ],
+   "strings": {
+    "register": [
+     40,
+     45,
+     50,
+     55,
+     59,
+     64
+    ],
+    "detuneCents": [
+     -1.8,
+     0.7,
+     -0.6,
+     1.1,
+     -0.8,
+     0.4
+    ],
+    "decayScale": [
+     1.15,
+     1.1,
+     1.03,
+     0.96,
+     0.89,
+     0.83
+    ],
+    "lossProfile": [
+     0.85,
+     0.9099999999999999,
+     0.97,
+     1.03,
+     1.0899999999999999,
+     1.15
+    ],
+    "trebleScale": [
+     0.85,
+     0.9,
+     0.95,
+     1,
+     1.05,
+     1.1
+    ],
+    "stiffnessScale": [
+     1.15,
+     1.0899999999999999,
+     1.0299999999999998,
+     0.97,
+     0.9099999999999999,
+     0.8499999999999999
+    ],
+    "beatingScale": [
+     0.65,
+     0.72,
+     0.79,
+     0.8600000000000001,
+     0.93,
+     1
+    ],
+    "pluckDirection": [
+     0.08,
+     0.08,
+     0.08,
+     0.08,
+     0.08,
+     0.08
+    ],
+    "freeRinging": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ]
+   },
+   "setup": {
+    "fret12Cents": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "fret24Cents": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "tensionCents": 0,
+    "tensionSeconds": 0.045
+   }
+  },
+  "defaultLayout": {
+   "strings": [
+    {
+     "pitch": 64
+    },
+    {
+     "pitch": 59
+    },
+    {
+     "pitch": 55
+    },
+    {
+     "pitch": 50
+    },
+    {
+     "pitch": 45
+    },
+    {
+     "pitch": 40
+    }
+   ],
+   "capo": 0
+  },
+  "recording": {
+   "levelDb": 12.9911
+  }
+ },
+ {
+  "schemaVersion": 3,
+  "engine": {
+   "id": "guitar-lab",
+   "generation": 3
+  },
+  "id": "clear-steel",
+  "name": "Clear steel",
+  "family": "Acoustic",
+  "description": "Narrow pick contact, sustained upper partials and a firm attack.",
+  "factory": true,
+  "instrument": {
+   "parameters": {
+    "decay": 4.3,
+    "brightness": 0.8,
+    "dispersion": 0.095,
+    "release": 0.08,
+    "pickup": 0.18,
+    "electric": 0,
+    "body_mix": 0,
+    "pluck_body": 2.2,
+    "pick_texture": 0.65,
+    "treble_decay": 2.3,
+    "initial_damping": 0,
+    "initial_damping_time": 0.12,
+    "beating_cents": 0.4,
+    "motion_exchange": 0,
+    "motion_loss_ratio": 1,
+    "contact_width": 0.008,
+    "pluck_release_time": 0.00012,
+    "texture_colour": 0.9,
+    "velocity_tone": 0,
+    "body_size": 1,
+    "body_low_weight": 1,
+    "body_damping": 1,
+    "body_breadth": 1,
+    "bridge_transfer": 0.025,
+    "bridge_rolloff": 250,
+    "sympathetic_response": 0,
+    "pickup_width": 0,
+    "pickup2": 0.32,
+    "pickup_blend": 0
+   },
+   "excitation": {
+    "position": 0.15,
+    "hardness": 0.85,
+    "thwack": 0.08
+   },
+   "modes": [
+    {
+     "frequency_hz": 108,
+     "t60_seconds": 0.16,
+     "gain": 1.3
+    },
+    {
+     "frequency_hz": 205,
+     "t60_seconds": 0.1528,
+     "gain": 1.0656
+    },
+    {
+     "frequency_hz": 252,
+     "t60_seconds": 0.1456,
+     "gain": 0.9028
+    },
+    {
+     "frequency_hz": 345,
+     "t60_seconds": 0.1384,
+     "gain": 0.7831
+    },
+    {
+     "frequency_hz": 465,
+     "t60_seconds": 0.1312,
+     "gain": 0.6915
+    },
+    {
+     "frequency_hz": 620,
+     "t60_seconds": 0.124,
+     "gain": 0.619
+    },
+    {
+     "frequency_hz": 815,
+     "t60_seconds": 0.1168,
+     "gain": 0.5603
+    },
+    {
+     "frequency_hz": 1080,
+     "t60_seconds": 0.1096,
+     "gain": 0.5118
+    },
+    {
+     "frequency_hz": 1430,
+     "t60_seconds": 0.1024,
+     "gain": 0.471
+    },
+    {
+     "frequency_hz": 1920,
+     "t60_seconds": 0.0952,
+     "gain": 0.4362
+    },
+    {
+     "frequency_hz": 2560,
+     "t60_seconds": 0.088,
+     "gain": 0.4062
+    },
+    {
+     "frequency_hz": 3450,
+     "t60_seconds": 0.0808,
+     "gain": 0.3801
+    }
+   ],
+   "strings": {
+    "register": [
+     40,
+     45,
+     50,
+     55,
+     59,
+     64
+    ],
+    "detuneCents": [
+     -1.8,
+     0.7,
+     -0.6,
+     1.1,
+     -0.8,
+     0.4
+    ],
+    "decayScale": [
+     1.15,
+     1.1,
+     1.03,
+     0.96,
+     0.89,
+     0.83
+    ],
+    "lossProfile": [
+     0.85,
+     0.9099999999999999,
+     0.97,
+     1.03,
+     1.0899999999999999,
+     1.15
+    ],
+    "trebleScale": [
+     0.85,
+     0.9,
+     0.95,
+     1,
+     1.05,
+     1.1
+    ],
+    "stiffnessScale": [
+     1.15,
+     1.0899999999999999,
+     1.0299999999999998,
+     0.97,
+     0.9099999999999999,
+     0.8499999999999999
+    ],
+    "beatingScale": [
+     0.65,
+     0.72,
+     0.79,
+     0.8600000000000001,
+     0.93,
+     1
+    ],
+    "pluckDirection": [
+     0.08,
+     0.08,
+     0.08,
+     0.08,
+     0.08,
+     0.08
+    ],
+    "freeRinging": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ]
+   },
+   "setup": {
+    "fret12Cents": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "fret24Cents": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "tensionCents": 0,
+    "tensionSeconds": 0.045
+   }
+  },
+  "defaultLayout": {
+   "strings": [
+    {
+     "pitch": 64
+    },
+    {
+     "pitch": 59
+    },
+    {
+     "pitch": 55
+    },
+    {
+     "pitch": 50
+    },
+    {
+     "pitch": 45
+    },
+    {
+     "pitch": 40
+    }
+   ],
+   "capo": 0
+  },
+  "recording": {
+   "levelDb": 2.6125
+  }
+ },
+ {
+  "schemaVersion": 3,
+  "engine": {
+   "id": "guitar-lab",
+   "generation": 3
+  },
+  "id": "dry-small",
+  "name": "Dry small voice",
+  "family": "Acoustic",
+  "description": "Short woody decay with strong initial damping; no experimental body colouring.",
+  "factory": true,
+  "instrument": {
+   "parameters": {
+    "decay": 2.1,
+    "brightness": 0.5,
+    "dispersion": 0.1,
+    "release": 0.08,
+    "pickup": 0.18,
+    "electric": 0,
+    "body_mix": 0,
+    "pluck_body": 1.8,
+    "pick_texture": 0.35,
+    "treble_decay": 0.35,
+    "initial_damping": 0.4,
+    "initial_damping_time": 0.07,
+    "beating_cents": 0,
+    "motion_exchange": 0,
+    "motion_loss_ratio": 1,
+    "contact_width": 0.035,
+    "pluck_release_time": 0.0007,
+    "texture_colour": 0.7,
+    "velocity_tone": 0,
+    "body_size": 1,
+    "body_low_weight": 1,
+    "body_damping": 1,
+    "body_breadth": 1,
+    "bridge_transfer": 0.045,
+    "bridge_rolloff": 250,
+    "sympathetic_response": 0,
+    "pickup_width": 0,
+    "pickup2": 0.32,
+    "pickup_blend": 0
+   },
+   "excitation": {
+    "position": 0.27,
+    "hardness": 0.5,
+    "thwack": 0.05
+   },
+   "modes": [
+    {
+     "frequency_hz": 132,
+     "t60_seconds": 0.16,
+     "gain": 1.3
+    },
+    {
+     "frequency_hz": 245,
+     "t60_seconds": 0.1528,
+     "gain": 1.0656
+    },
+    {
+     "frequency_hz": 295,
+     "t60_seconds": 0.1456,
+     "gain": 0.9028
+    },
+    {
+     "frequency_hz": 390,
+     "t60_seconds": 0.1384,
+     "gain": 0.7831
+    },
+    {
+     "frequency_hz": 530,
+     "t60_seconds": 0.1312,
+     "gain": 0.6915
+    },
+    {
+     "frequency_hz": 700,
+     "t60_seconds": 0.124,
+     "gain": 0.619
+    },
+    {
+     "frequency_hz": 930,
+     "t60_seconds": 0.1168,
+     "gain": 0.5603
+    },
+    {
+     "frequency_hz": 1200,
+     "t60_seconds": 0.1096,
+     "gain": 0.5118
+    },
+    {
+     "frequency_hz": 1580,
+     "t60_seconds": 0.1024,
+     "gain": 0.471
+    },
+    {
+     "frequency_hz": 2090,
+     "t60_seconds": 0.0952,
+     "gain": 0.4362
+    },
+    {
+     "frequency_hz": 2780,
+     "t60_seconds": 0.088,
+     "gain": 0.4062
+    },
+    {
+     "frequency_hz": 3700,
+     "t60_seconds": 0.0808,
+     "gain": 0.3801
+    }
+   ],
+   "strings": {
+    "register": [
+     40,
+     45,
+     50,
+     55,
+     59,
+     64
+    ],
+    "detuneCents": [
+     -1.8,
+     0.7,
+     -0.6,
+     1.1,
+     -0.8,
+     0.4
+    ],
+    "decayScale": [
+     1.15,
+     1.1,
+     1.03,
+     0.96,
+     0.89,
+     0.83
+    ],
+    "lossProfile": [
+     0.85,
+     0.9099999999999999,
+     0.97,
+     1.03,
+     1.0899999999999999,
+     1.15
+    ],
+    "trebleScale": [
+     0.85,
+     0.9,
+     0.95,
+     1,
+     1.05,
+     1.1
+    ],
+    "stiffnessScale": [
+     1.15,
+     1.0899999999999999,
+     1.0299999999999998,
+     0.97,
+     0.9099999999999999,
+     0.8499999999999999
+    ],
+    "beatingScale": [
+     0.65,
+     0.72,
+     0.79,
+     0.8600000000000001,
+     0.93,
+     1
+    ],
+    "pluckDirection": [
+     0.08,
+     0.08,
+     0.08,
+     0.08,
+     0.08,
+     0.08
+    ],
+    "freeRinging": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ]
+   },
+   "setup": {
+    "fret12Cents": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "fret24Cents": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "tensionCents": 0,
+    "tensionSeconds": 0.045
+   }
+  },
+  "defaultLayout": {
+   "strings": [
+    {
+     "pitch": 64
+    },
+    {
+     "pitch": 59
+    },
+    {
+     "pitch": 55
+    },
+    {
+     "pitch": 50
+    },
+    {
+     "pitch": 45
+    },
+    {
+     "pitch": 40
+    }
+   ],
+   "capo": 0
+  },
+  "recording": {
+   "levelDb": 15.2056
+  }
+ },
+ {
+  "schemaVersion": 3,
+  "engine": {
+   "id": "guitar-lab",
+   "generation": 3
+  },
+  "id": "wide-ringing",
+  "name": "Wide ringing steel",
+  "family": "Acoustic",
+  "description": "Long bass sustain and audible two-component movement, with free strings.",
+  "factory": true,
+  "instrument": {
+   "parameters": {
+    "decay": 7,
+    "brightness": 0.65,
+    "dispersion": 0.15,
+    "release": 0.08,
+    "pickup": 0.18,
+    "electric": 0,
+    "body_mix": 0,
+    "pluck_body": 3,
+    "pick_texture": 0.25,
+    "treble_decay": 1.8,
+    "initial_damping": 0,
+    "initial_damping_time": 0.12,
+    "beating_cents": 2.8,
+    "motion_exchange": 0.0002,
+    "motion_loss_ratio": 0.6,
+    "contact_width": 0.028,
+    "pluck_release_time": 0.00045,
+    "texture_colour": 0.7,
+    "velocity_tone": 0,
+    "body_size": 1,
+    "body_low_weight": 1,
+    "body_damping": 1,
+    "body_breadth": 1,
+    "bridge_transfer": 0.015,
+    "bridge_rolloff": 250,
+    "sympathetic_response": 0.65,
+    "pickup_width": 0,
+    "pickup2": 0.32,
+    "pickup_blend": 0
+   },
+   "excitation": {
+    "position": 0.2,
+    "hardness": 0.55,
+    "thwack": 0.05
+   },
+   "modes": [
+    {
+     "frequency_hz": 83,
+     "t60_seconds": 0.16,
+     "gain": 1.3
+    },
+    {
+     "frequency_hz": 165,
+     "t60_seconds": 0.1528,
+     "gain": 1.0656
+    },
+    {
+     "frequency_hz": 203,
+     "t60_seconds": 0.1456,
+     "gain": 0.9028
+    },
+    {
+     "frequency_hz": 280,
+     "t60_seconds": 0.1384,
+     "gain": 0.7831
+    },
+    {
+     "frequency_hz": 375,
+     "t60_seconds": 0.1312,
+     "gain": 0.6915
+    },
+    {
+     "frequency_hz": 510,
+     "t60_seconds": 0.124,
+     "gain": 0.619
+    },
+    {
+     "frequency_hz": 670,
+     "t60_seconds": 0.1168,
+     "gain": 0.5603
+    },
+    {
+     "frequency_hz": 890,
+     "t60_seconds": 0.1096,
+     "gain": 0.5118
+    },
+    {
+     "frequency_hz": 1190,
+     "t60_seconds": 0.1024,
+     "gain": 0.471
+    },
+    {
+     "frequency_hz": 1620,
+     "t60_seconds": 0.0952,
+     "gain": 0.4362
+    },
+    {
+     "frequency_hz": 2150,
+     "t60_seconds": 0.088,
+     "gain": 0.4062
+    },
+    {
+     "frequency_hz": 2900,
+     "t60_seconds": 0.0808,
+     "gain": 0.3801
+    }
+   ],
+   "strings": {
+    "register": [
+     40,
+     45,
+     50,
+     55,
+     59,
+     64
+    ],
+    "detuneCents": [
+     -1.8,
+     0.7,
+     -0.6,
+     1.1,
+     -0.8,
+     0.4
+    ],
+    "decayScale": [
+     1.15,
+     1.1,
+     1.03,
+     0.96,
+     0.89,
+     0.83
+    ],
+    "lossProfile": [
+     0.85,
+     0.9099999999999999,
+     0.97,
+     1.03,
+     1.0899999999999999,
+     1.15
+    ],
+    "trebleScale": [
+     0.85,
+     0.9,
+     0.95,
+     1,
+     1.05,
+     1.1
+    ],
+    "stiffnessScale": [
+     1.15,
+     1.0899999999999999,
+     1.0299999999999998,
+     0.97,
+     0.9099999999999999,
+     0.8499999999999999
+    ],
+    "beatingScale": [
+     0.65,
+     0.72,
+     0.79,
+     0.8600000000000001,
+     0.93,
+     1
+    ],
+    "pluckDirection": [
+     0.5,
+     0.5,
+     0.5,
+     0.5,
+     0.5,
+     0.5
+    ],
+    "freeRinging": [
+     1,
+     1,
+     1,
+     1,
+     1,
+     1
+    ]
+   },
+   "setup": {
+    "fret12Cents": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "fret24Cents": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "tensionCents": 6,
+    "tensionSeconds": 0.08
+   }
+  },
+  "defaultLayout": {
+   "strings": [
+    {
+     "pitch": 64
+    },
+    {
+     "pitch": 59
+    },
+    {
+     "pitch": 55
+    },
+    {
+     "pitch": 50
+    },
+    {
+     "pitch": 45
+    },
+    {
+     "pitch": 40
+    }
+   ],
+   "capo": 0
+  },
+  "recording": {
+   "levelDb": 0.6509
+  }
+ },
+ {
+  "schemaVersion": 3,
+  "engine": {
+   "id": "guitar-lab",
+   "generation": 3
+  },
+  "id": "soft-nylon",
+  "name": "Soft nylon design",
+  "family": "Acoustic",
+  "description": "Broad, slow release with low stiffness and quickly warming upper partials.",
+  "factory": true,
+  "instrument": {
+   "parameters": {
+    "decay": 3.7,
+    "brightness": 0.4,
+    "dispersion": 0.035,
+    "release": 0.08,
+    "pickup": 0.18,
+    "electric": 0,
+    "body_mix": 0,
+    "pluck_body": 3.2,
+    "pick_texture": 0.08,
+    "treble_decay": 0.45,
+    "initial_damping": 0,
+    "initial_damping_time": 0.12,
+    "beating_cents": 0.6,
+    "motion_exchange": 0,
+    "motion_loss_ratio": 1,
+    "contact_width": 0.075,
+    "pluck_release_time": 0.0018,
+    "texture_colour": 0.7,
+    "velocity_tone": 0.55,
+    "body_size": 1,
+    "body_low_weight": 1,
+    "body_damping": 1,
+    "body_breadth": 1,
+    "bridge_transfer": 0.025,
+    "bridge_rolloff": 250,
+    "sympathetic_response": 0,
+    "pickup_width": 0,
+    "pickup2": 0.32,
+    "pickup_blend": 0
+   },
+   "excitation": {
+    "position": 0.3,
+    "hardness": 0.3,
+    "thwack": 0.05
+   },
+   "modes": [
+    {
+     "frequency_hz": 102,
+     "t60_seconds": 0.16,
+     "gain": 1.3
+    },
+    {
+     "frequency_hz": 198,
+     "t60_seconds": 0.1528,
+     "gain": 1.0656
+    },
+    {
+     "frequency_hz": 240,
+     "t60_seconds": 0.1456,
+     "gain": 0.9028
+    },
+    {
+     "frequency_hz": 325,
+     "t60_seconds": 0.1384,
+     "gain": 0.7831
+    },
+    {
+     "frequency_hz": 440,
+     "t60_seconds": 0.1312,
+     "gain": 0.6915
+    },
+    {
+     "frequency_hz": 585,
+     "t60_seconds": 0.124,
+     "gain": 0.619
+    },
+    {
+     "frequency_hz": 780,
+     "t60_seconds": 0.1168,
+     "gain": 0.5603
+    },
+    {
+     "frequency_hz": 1030,
+     "t60_seconds": 0.1096,
+     "gain": 0.5118
+    },
+    {
+     "frequency_hz": 1380,
+     "t60_seconds": 0.1024,
+     "gain": 0.471
+    },
+    {
+     "frequency_hz": 1840,
+     "t60_seconds": 0.0952,
+     "gain": 0.4362
+    },
+    {
+     "frequency_hz": 2450,
+     "t60_seconds": 0.088,
+     "gain": 0.4062
+    },
+    {
+     "frequency_hz": 3250,
+     "t60_seconds": 0.0808,
+     "gain": 0.3801
+    }
+   ],
+   "strings": {
+    "register": [
+     40,
+     45,
+     50,
+     55,
+     59,
+     64
+    ],
+    "detuneCents": [
+     -1.8,
+     0.7,
+     -0.6,
+     1.1,
+     -0.8,
+     0.4
+    ],
+    "decayScale": [
+     1.15,
+     1.1,
+     1.03,
+     0.96,
+     0.89,
+     0.83
+    ],
+    "lossProfile": [
+     0.85,
+     0.9099999999999999,
+     0.97,
+     1.03,
+     1.0899999999999999,
+     1.15
+    ],
+    "trebleScale": [
+     0.85,
+     0.9,
+     0.95,
+     1,
+     1.05,
+     1.1
+    ],
+    "stiffnessScale": [
+     1.15,
+     1.0899999999999999,
+     1.0299999999999998,
+     0.97,
+     0.9099999999999999,
+     0.8499999999999999
+    ],
+    "beatingScale": [
+     0.65,
+     0.72,
+     0.79,
+     0.8600000000000001,
+     0.93,
+     1
+    ],
+    "pluckDirection": [
+     0.18,
+     0.18,
+     0.18,
+     0.18,
+     0.18,
+     0.18
+    ],
+    "freeRinging": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ]
+   },
+   "setup": {
+    "fret12Cents": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "fret24Cents": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "tensionCents": 0,
+    "tensionSeconds": 0.045
+   }
+  },
+  "defaultLayout": {
+   "strings": [
+    {
+     "pitch": 64
+    },
+    {
+     "pitch": 59
+    },
+    {
+     "pitch": 55
+    },
+    {
+     "pitch": 50
+    },
+    {
+     "pitch": 45
+    },
+    {
+     "pitch": 40
+    }
+   ],
+   "capo": 0
+  },
+  "recording": {
+   "levelDb": 22.4687
+  }
+ },
+ {
+  "schemaVersion": 3,
+  "engine": {
+   "id": "guitar-lab",
+   "generation": 3
+  },
+  "id": "nail-nylon",
+  "name": "Nail nylon design",
+  "family": "Acoustic",
+  "description": "Short bass decay, sharp release and bright independent contact texture.",
+  "factory": true,
+  "instrument": {
+   "parameters": {
+    "decay": 2.5,
+    "brightness": 0.65,
+    "dispersion": 0.025,
+    "release": 0.08,
+    "pickup": 0.18,
+    "electric": 0,
+    "body_mix": 0,
+    "pluck_body": 2.4,
+    "pick_texture": 0.8,
+    "treble_decay": 0.9,
+    "initial_damping": 0.15,
+    "initial_damping_time": 0.04,
+    "beating_cents": 0,
+    "motion_exchange": 0,
+    "motion_loss_ratio": 1,
+    "contact_width": 0.009,
+    "pluck_release_time": 0.00008,
+    "texture_colour": 0.95,
+    "velocity_tone": 0,
+    "body_size": 1,
+    "body_low_weight": 1,
+    "body_damping": 1,
+    "body_breadth": 1,
+    "bridge_transfer": 0.035,
+    "bridge_rolloff": 250,
+    "sympathetic_response": 0,
+    "pickup_width": 0,
+    "pickup2": 0.32,
+    "pickup_blend": 0
+   },
+   "excitation": {
+    "position": 0.18,
+    "hardness": 0.9,
+    "thwack": 0.15
+   },
+   "modes": [
+    {
+     "frequency_hz": 115,
+     "t60_seconds": 0.16,
+     "gain": 1.3
+    },
+    {
+     "frequency_hz": 220,
+     "t60_seconds": 0.1528,
+     "gain": 1.0656
+    },
+    {
+     "frequency_hz": 275,
+     "t60_seconds": 0.1456,
+     "gain": 0.9028
+    },
+    {
+     "frequency_hz": 365,
+     "t60_seconds": 0.1384,
+     "gain": 0.7831
+    },
+    {
+     "frequency_hz": 490,
+     "t60_seconds": 0.1312,
+     "gain": 0.6915
+    },
+    {
+     "frequency_hz": 650,
+     "t60_seconds": 0.124,
+     "gain": 0.619
+    },
+    {
+     "frequency_hz": 860,
+     "t60_seconds": 0.1168,
+     "gain": 0.5603
+    },
+    {
+     "frequency_hz": 1140,
+     "t60_seconds": 0.1096,
+     "gain": 0.5118
+    },
+    {
+     "frequency_hz": 1520,
+     "t60_seconds": 0.1024,
+     "gain": 0.471
+    },
+    {
+     "frequency_hz": 2020,
+     "t60_seconds": 0.0952,
+     "gain": 0.4362
+    },
+    {
+     "frequency_hz": 2680,
+     "t60_seconds": 0.088,
+     "gain": 0.4062
+    },
+    {
+     "frequency_hz": 3580,
+     "t60_seconds": 0.0808,
+     "gain": 0.3801
+    }
+   ],
+   "strings": {
+    "register": [
+     40,
+     45,
+     50,
+     55,
+     59,
+     64
+    ],
+    "detuneCents": [
+     -1.8,
+     0.7,
+     -0.6,
+     1.1,
+     -0.8,
+     0.4
+    ],
+    "decayScale": [
+     1.15,
+     1.1,
+     1.03,
+     0.96,
+     0.89,
+     0.83
+    ],
+    "lossProfile": [
+     0.85,
+     0.9099999999999999,
+     0.97,
+     1.03,
+     1.0899999999999999,
+     1.15
+    ],
+    "trebleScale": [
+     0.85,
+     0.9,
+     0.95,
+     1,
+     1.05,
+     1.1
+    ],
+    "stiffnessScale": [
+     1.15,
+     1.0899999999999999,
+     1.0299999999999998,
+     0.97,
+     0.9099999999999999,
+     0.8499999999999999
+    ],
+    "beatingScale": [
+     0.65,
+     0.72,
+     0.79,
+     0.8600000000000001,
+     0.93,
+     1
+    ],
+    "pluckDirection": [
+     0.08,
+     0.08,
+     0.08,
+     0.08,
+     0.08,
+     0.08
+    ],
+    "freeRinging": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ]
+   },
+   "setup": {
+    "fret12Cents": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "fret24Cents": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "tensionCents": 0,
+    "tensionSeconds": 0.045
+   }
+  },
+  "defaultLayout": {
+   "strings": [
+    {
+     "pitch": 64
+    },
+    {
+     "pitch": 59
+    },
+    {
+     "pitch": 55
+    },
+    {
+     "pitch": 50
+    },
+    {
+     "pitch": 45
+    },
+    {
+     "pitch": 40
+    }
+   ],
+   "capo": 0
+  },
+  "recording": {
+   "levelDb": 4.0123
+  }
+ },
+ {
+  "schemaVersion": 3,
+  "engine": {
+   "id": "guitar-lab",
+   "generation": 3
+  },
+  "id": "muted-jazz",
+  "name": "Muted jazz design",
+  "family": "Acoustic",
+  "description": "Fast upper-partial loss and a soft, thick displacement-led attack.",
+  "factory": true,
+  "instrument": {
+   "parameters": {
+    "decay": 2.8,
+    "brightness": 0.32,
+    "dispersion": 0.11,
+    "release": 0.08,
+    "pickup": 0.18,
+    "electric": 0,
+    "body_mix": 0,
+    "pluck_body": 2,
+    "pick_texture": 0.12,
+    "treble_decay": 0.22,
+    "initial_damping": 0.25,
+    "initial_damping_time": 0.1,
+    "beating_cents": 0,
+    "motion_exchange": 0,
+    "motion_loss_ratio": 1,
+    "contact_width": 0.09,
+    "pluck_release_time": 0.0012,
+    "texture_colour": 0.7,
+    "velocity_tone": 0,
+    "body_size": 1,
+    "body_low_weight": 1,
+    "body_damping": 1,
+    "body_breadth": 1,
+    "bridge_transfer": 0.04,
+    "bridge_rolloff": 250,
+    "sympathetic_response": 0,
+    "pickup_width": 0,
+    "pickup2": 0.32,
+    "pickup_blend": 0
+   },
+   "excitation": {
+    "position": 0.33,
+    "hardness": 0.35,
+    "thwack": 0.05
+   },
+   "modes": [
+    {
+     "frequency_hz": 125,
+     "t60_seconds": 0.16,
+     "gain": 1.3
+    },
+    {
+     "frequency_hz": 235,
+     "t60_seconds": 0.1528,
+     "gain": 1.0656
+    },
+    {
+     "frequency_hz": 310,
+     "t60_seconds": 0.1456,
+     "gain": 0.9028
+    },
+    {
+     "frequency_hz": 410,
+     "t60_seconds": 0.1384,
+     "gain": 0.7831
+    },
+    {
+     "frequency_hz": 555,
+     "t60_seconds": 0.1312,
+     "gain": 0.6915
+    },
+    {
+     "frequency_hz": 730,
+     "t60_seconds": 0.124,
+     "gain": 0.619
+    },
+    {
+     "frequency_hz": 960,
+     "t60_seconds": 0.1168,
+     "gain": 0.5603
+    },
+    {
+     "frequency_hz": 1260,
+     "t60_seconds": 0.1096,
+     "gain": 0.5118
+    },
+    {
+     "frequency_hz": 1660,
+     "t60_seconds": 0.1024,
+     "gain": 0.471
+    },
+    {
+     "frequency_hz": 2200,
+     "t60_seconds": 0.0952,
+     "gain": 0.4362
+    },
+    {
+     "frequency_hz": 2920,
+     "t60_seconds": 0.088,
+     "gain": 0.4062
+    },
+    {
+     "frequency_hz": 3900,
+     "t60_seconds": 0.0808,
+     "gain": 0.3801
+    }
+   ],
+   "strings": {
+    "register": [
+     40,
+     45,
+     50,
+     55,
+     59,
+     64
+    ],
+    "detuneCents": [
+     -1.8,
+     0.7,
+     -0.6,
+     1.1,
+     -0.8,
+     0.4
+    ],
+    "decayScale": [
+     1.15,
+     1.1,
+     1.03,
+     0.96,
+     0.89,
+     0.83
+    ],
+    "lossProfile": [
+     0.85,
+     0.9099999999999999,
+     0.97,
+     1.03,
+     1.0899999999999999,
+     1.15
+    ],
+    "trebleScale": [
+     0.85,
+     0.9,
+     0.95,
+     1,
+     1.05,
+     1.1
+    ],
+    "stiffnessScale": [
+     1.15,
+     1.0899999999999999,
+     1.0299999999999998,
+     0.97,
+     0.9099999999999999,
+     0.8499999999999999
+    ],
+    "beatingScale": [
+     0.65,
+     0.72,
+     0.79,
+     0.8600000000000001,
+     0.93,
+     1
+    ],
+    "pluckDirection": [
+     0.08,
+     0.08,
+     0.08,
+     0.08,
+     0.08,
+     0.08
+    ],
+    "freeRinging": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ]
+   },
+   "setup": {
+    "fret12Cents": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "fret24Cents": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "tensionCents": 0,
+    "tensionSeconds": 0.045
+   }
+  },
+  "defaultLayout": {
+   "strings": [
+    {
+     "pitch": 64
+    },
+    {
+     "pitch": 59
+    },
+    {
+     "pitch": 55
+    },
+    {
+     "pitch": 50
+    },
+    {
+     "pitch": 45
+    },
+    {
+     "pitch": 40
+    }
+   ],
+   "capo": 0
+  },
+  "recording": {
+   "levelDb": 21.1642
+  }
+ },
+ {
+  "schemaVersion": 3,
+  "engine": {
+   "id": "guitar-lab",
+   "generation": 3
+  },
+  "id": "bright-metallic",
+  "name": "Bright metallic design",
+  "family": "Acoustic",
+  "description": "Stiff strings, lingering upper partials and conspicuous motion; not a measured resonator.",
+  "factory": true,
+  "instrument": {
+   "parameters": {
+    "decay": 5,
+    "brightness": 0.86,
+    "dispersion": 0.25,
+    "release": 0.08,
+    "pickup": 0.18,
+    "electric": 0,
+    "body_mix": 0,
+    "pluck_body": 1.5,
+    "pick_texture": 0.9,
+    "treble_decay": 3.8,
+    "initial_damping": 0,
+    "initial_damping_time": 0.12,
+    "beating_cents": 4,
+    "motion_exchange": 0.0004,
+    "motion_loss_ratio": 0.9,
+    "contact_width": 0.004,
+    "pluck_release_time": 0.00006,
+    "texture_colour": 0.9,
+    "velocity_tone": 0,
+    "body_size": 1,
+    "body_low_weight": 1,
+    "body_damping": 1,
+    "body_breadth": 1,
+    "bridge_transfer": 0.035,
+    "bridge_rolloff": 250,
+    "sympathetic_response": 0,
+    "pickup_width": 0,
+    "pickup2": 0.32,
+    "pickup_blend": 0
+   },
+   "excitation": {
+    "position": 0.11,
+    "hardness": 1.1,
+    "thwack": 0.5
+   },
+   "modes": [
+    {
+     "frequency_hz": 180,
+     "t60_seconds": 0.32,
+     "gain": 1.3
+    },
+    {
+     "frequency_hz": 325,
+     "t60_seconds": 0.3056,
+     "gain": 1.0656
+    },
+    {
+     "frequency_hz": 470,
+     "t60_seconds": 0.2912,
+     "gain": 0.9028
+    },
+    {
+     "frequency_hz": 685,
+     "t60_seconds": 0.2768,
+     "gain": 0.7831
+    },
+    {
+     "frequency_hz": 920,
+     "t60_seconds": 0.2624,
+     "gain": 0.6915
+    },
+    {
+     "frequency_hz": 1230,
+     "t60_seconds": 0.248,
+     "gain": 0.619
+    },
+    {
+     "frequency_hz": 1580,
+     "t60_seconds": 0.2336,
+     "gain": 0.5603
+    },
+    {
+     "frequency_hz": 2040,
+     "t60_seconds": 0.2192,
+     "gain": 0.5118
+    },
+    {
+     "frequency_hz": 2650,
+     "t60_seconds": 0.2048,
+     "gain": 0.471
+    },
+    {
+     "frequency_hz": 3420,
+     "t60_seconds": 0.1904,
+     "gain": 0.4362
+    },
+    {
+     "frequency_hz": 4410,
+     "t60_seconds": 0.176,
+     "gain": 0.4062
+    },
+    {
+     "frequency_hz": 5650,
+     "t60_seconds": 0.1616,
+     "gain": 0.3801
+    }
+   ],
+   "strings": {
+    "register": [
+     40,
+     45,
+     50,
+     55,
+     59,
+     64
+    ],
+    "detuneCents": [
+     -1.8,
+     0.7,
+     -0.6,
+     1.1,
+     -0.8,
+     0.4
+    ],
+    "decayScale": [
+     1.15,
+     1.1,
+     1.03,
+     0.96,
+     0.89,
+     0.83
+    ],
+    "lossProfile": [
+     0.85,
+     0.9099999999999999,
+     0.97,
+     1.03,
+     1.0899999999999999,
+     1.15
+    ],
+    "trebleScale": [
+     0.85,
+     0.9,
+     0.95,
+     1,
+     1.05,
+     1.1
+    ],
+    "stiffnessScale": [
+     1.15,
+     1.0899999999999999,
+     1.0299999999999998,
+     0.97,
+     0.9099999999999999,
+     0.8499999999999999
+    ],
+    "beatingScale": [
+     0.65,
+     0.72,
+     0.79,
+     0.8600000000000001,
+     0.93,
+     1
+    ],
+    "pluckDirection": [
+     0.5,
+     0.5,
+     0.5,
+     0.5,
+     0.5,
+     0.5
+    ],
+    "freeRinging": [
+     1,
+     1,
+     1,
+     1,
+     1,
+     1
+    ]
+   },
+   "setup": {
+    "fret12Cents": [
+     -3,
+     -2,
+     -1,
+     1,
+     2,
+     3
+    ],
+    "fret24Cents": [
+     -6,
+     -4,
+     -2,
+     2,
+     4,
+     6
+    ],
+    "tensionCents": 0,
+    "tensionSeconds": 0.045
+   }
+  },
+  "defaultLayout": {
+   "strings": [
+    {
+     "pitch": 64
+    },
+    {
+     "pitch": 59
+    },
+    {
+     "pitch": 55
+    },
+    {
+     "pitch": 50
+    },
+    {
+     "pitch": 45
+    },
+    {
+     "pitch": 40
+    }
+   ],
+   "capo": 0
+  },
+  "recording": {
+   "levelDb": 1.9291
+  }
+ },
+ {
+  "schemaVersion": 3,
+  "engine": {
+   "id": "guitar-lab",
+   "generation": 3
+  },
+  "id": "bridge-electric",
+  "name": "Bridge electric",
+  "family": "Electric",
+  "description": "Narrow bridge pickup, long bright decay and crisp pick contact before effects.",
+  "factory": true,
+  "instrument": {
+   "parameters": {
+    "decay": 8,
+    "brightness": 0.85,
+    "dispersion": 0.07,
+    "release": 0.08,
+    "pickup": 0.085,
+    "electric": 1,
+    "body_mix": 0,
+    "pluck_body": 1.7,
+    "pick_texture": 0.45,
+    "treble_decay": 4,
+    "initial_damping": 0,
+    "initial_damping_time": 0.12,
+    "beating_cents": 0.3,
+    "motion_exchange": 0,
+    "motion_loss_ratio": 1,
+    "contact_width": 0.006,
+    "pluck_release_time": 0.0001,
+    "texture_colour": 0.7,
+    "velocity_tone": 0,
+    "body_size": 1,
+    "body_low_weight": 1,
+    "body_damping": 1,
+    "body_breadth": 1,
+    "bridge_transfer": 0.008,
+    "bridge_rolloff": 250,
+    "sympathetic_response": 0,
+    "pickup_width": 0.012,
+    "pickup2": 0.32,
+    "pickup_blend": 0
+   },
+   "excitation": {
+    "position": 0.17,
+    "hardness": 0.8,
+    "thwack": 0.5
+   },
+   "modes": [
+    {
+     "frequency_hz": 125,
+     "t60_seconds": 0.16,
+     "gain": 1.3
+    },
+    {
+     "frequency_hz": 215,
+     "t60_seconds": 0.1528,
+     "gain": 1.0656
+    },
+    {
+     "frequency_hz": 310,
+     "t60_seconds": 0.1456,
+     "gain": 0.9028
+    },
+    {
+     "frequency_hz": 430,
+     "t60_seconds": 0.1384,
+     "gain": 0.7831
+    },
+    {
+     "frequency_hz": 590,
+     "t60_seconds": 0.1312,
+     "gain": 0.6915
+    },
+    {
+     "frequency_hz": 780,
+     "t60_seconds": 0.124,
+     "gain": 0.619
+    },
+    {
+     "frequency_hz": 1050,
+     "t60_seconds": 0.1168,
+     "gain": 0.5603
+    },
+    {
+     "frequency_hz": 1400,
+     "t60_seconds": 0.1096,
+     "gain": 0.5118
+    },
+    {
+     "frequency_hz": 1850,
+     "t60_seconds": 0.1024,
+     "gain": 0.471
+    },
+    {
+     "frequency_hz": 2450,
+     "t60_seconds": 0.0952,
+     "gain": 0.4362
+    },
+    {
+     "frequency_hz": 3250,
+     "t60_seconds": 0.088,
+     "gain": 0.4062
+    },
+    {
+     "frequency_hz": 4300,
+     "t60_seconds": 0.0808,
+     "gain": 0.3801
+    }
+   ],
+   "strings": {
+    "register": [
+     40,
+     45,
+     50,
+     55,
+     59,
+     64
+    ],
+    "detuneCents": [
+     -1.8,
+     0.7,
+     -0.6,
+     1.1,
+     -0.8,
+     0.4
+    ],
+    "decayScale": [
+     1.15,
+     1.1,
+     1.03,
+     0.96,
+     0.89,
+     0.83
+    ],
+    "lossProfile": [
+     0.85,
+     0.9099999999999999,
+     0.97,
+     1.03,
+     1.0899999999999999,
+     1.15
+    ],
+    "trebleScale": [
+     0.85,
+     0.9,
+     0.95,
+     1,
+     1.05,
+     1.1
+    ],
+    "stiffnessScale": [
+     1.15,
+     1.0899999999999999,
+     1.0299999999999998,
+     0.97,
+     0.9099999999999999,
+     0.8499999999999999
+    ],
+    "beatingScale": [
+     0.65,
+     0.72,
+     0.79,
+     0.8600000000000001,
+     0.93,
+     1
+    ],
+    "pluckDirection": [
+     0.08,
+     0.08,
+     0.08,
+     0.08,
+     0.08,
+     0.08
+    ],
+    "freeRinging": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ]
+   },
+   "setup": {
+    "fret12Cents": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "fret24Cents": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "tensionCents": 0,
+    "tensionSeconds": 0.045
+   }
+  },
+  "defaultLayout": {
+   "strings": [
+    {
+     "pitch": 64
+    },
+    {
+     "pitch": 59
+    },
+    {
+     "pitch": 55
+    },
+    {
+     "pitch": 50
+    },
+    {
+     "pitch": 45
+    },
+    {
+     "pitch": 40
+    }
+   ],
+   "capo": 0
+  },
+  "recording": {
+   "levelDb": 7.4014
+  }
+ },
+ {
+  "schemaVersion": 3,
+  "engine": {
+   "id": "guitar-lab",
+   "generation": 3
+  },
+  "id": "warm-dual-electric",
+  "name": "Warm dual pickup",
+  "family": "Electric",
+  "description": "Wide pickup aperture and two-position cancellation, with rounded contact.",
+  "factory": true,
+  "instrument": {
+   "parameters": {
+    "decay": 8.5,
+    "brightness": 0.7,
+    "dispersion": 0.085,
+    "release": 0.08,
+    "pickup": 0.23,
+    "electric": 1,
+    "body_mix": 0,
+    "pluck_body": 2,
+    "pick_texture": 0.15,
+    "treble_decay": 1.3,
+    "initial_damping": 0,
+    "initial_damping_time": 0.12,
+    "beating_cents": 1.2,
+    "motion_exchange": 0.0003,
+    "motion_loss_ratio": 1,
+    "contact_width": 0.045,
+    "pluck_release_time": 0.0008,
+    "texture_colour": 0.7,
+    "velocity_tone": 0,
+    "body_size": 1,
+    "body_low_weight": 1,
+    "body_damping": 1,
+    "body_breadth": 1,
+    "bridge_transfer": 0.01,
+    "bridge_rolloff": 250,
+    "sympathetic_response": 0,
+    "pickup_width": 0.08,
+    "pickup2": 0.35,
+    "pickup_blend": 0.5
+   },
+   "excitation": {
+    "position": 0.26,
+    "hardness": 0.45,
+    "thwack": 0.08
+   },
+   "modes": [
+    {
+     "frequency_hz": 110,
+     "t60_seconds": 0.16,
+     "gain": 1.3
+    },
+    {
+     "frequency_hz": 195,
+     "t60_seconds": 0.1528,
+     "gain": 1.0656
+    },
+    {
+     "frequency_hz": 280,
+     "t60_seconds": 0.1456,
+     "gain": 0.9028
+    },
+    {
+     "frequency_hz": 385,
+     "t60_seconds": 0.1384,
+     "gain": 0.7831
+    },
+    {
+     "frequency_hz": 525,
+     "t60_seconds": 0.1312,
+     "gain": 0.6915
+    },
+    {
+     "frequency_hz": 705,
+     "t60_seconds": 0.124,
+     "gain": 0.619
+    },
+    {
+     "frequency_hz": 940,
+     "t60_seconds": 0.1168,
+     "gain": 0.5603
+    },
+    {
+     "frequency_hz": 1260,
+     "t60_seconds": 0.1096,
+     "gain": 0.5118
+    },
+    {
+     "frequency_hz": 1670,
+     "t60_seconds": 0.1024,
+     "gain": 0.471
+    },
+    {
+     "frequency_hz": 2240,
+     "t60_seconds": 0.0952,
+     "gain": 0.4362
+    },
+    {
+     "frequency_hz": 2960,
+     "t60_seconds": 0.088,
+     "gain": 0.4062
+    },
+    {
+     "frequency_hz": 3980,
+     "t60_seconds": 0.0808,
+     "gain": 0.3801
+    }
+   ],
+   "strings": {
+    "register": [
+     40,
+     45,
+     50,
+     55,
+     59,
+     64
+    ],
+    "detuneCents": [
+     -1.8,
+     0.7,
+     -0.6,
+     1.1,
+     -0.8,
+     0.4
+    ],
+    "decayScale": [
+     1.15,
+     1.1,
+     1.03,
+     0.96,
+     0.89,
+     0.83
+    ],
+    "lossProfile": [
+     0.85,
+     0.9099999999999999,
+     0.97,
+     1.03,
+     1.0899999999999999,
+     1.15
+    ],
+    "trebleScale": [
+     0.85,
+     0.9,
+     0.95,
+     1,
+     1.05,
+     1.1
+    ],
+    "stiffnessScale": [
+     1.15,
+     1.0899999999999999,
+     1.0299999999999998,
+     0.97,
+     0.9099999999999999,
+     0.8499999999999999
+    ],
+    "beatingScale": [
+     0.65,
+     0.72,
+     0.79,
+     0.8600000000000001,
+     0.93,
+     1
+    ],
+    "pluckDirection": [
+     0.08,
+     0.08,
+     0.08,
+     0.08,
+     0.08,
+     0.08
+    ],
+    "freeRinging": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ]
+   },
+   "setup": {
+    "fret12Cents": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "fret24Cents": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "tensionCents": 0,
+    "tensionSeconds": 0.045
+   }
+  },
+  "defaultLayout": {
+   "strings": [
+    {
+     "pitch": 64
+    },
+    {
+     "pitch": 59
+    },
+    {
+     "pitch": 55
+    },
+    {
+     "pitch": 50
+    },
+    {
+     "pitch": 45
+    },
+    {
+     "pitch": 40
+    }
+   ],
+   "capo": 0
+  },
+  "recording": {
+   "levelDb": 8.7361
+  }
+ }
+]

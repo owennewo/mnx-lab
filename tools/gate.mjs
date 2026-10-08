@@ -41,6 +41,12 @@ const MARKDOWN_READ = /^(docs\/|README\.md$|CLAUDE\.md$|apps\/[^/]+\/README\.md$
 const INERT = /^(docs\/|roadmap\/|research\/|\.claude\/)|^[^/]+\.md$|^apps\/[^/]+\/README\.md$|^\.gitignore$|^\.dev\.vars\.example$/;
 // Code the build and vitest's import graph see.
 const CODE = /^(src|apps|worker|converters|harness|tools|experiments)\//;
+// The synth (synth/, core-campaign-synth.md S12): its own workspace and runner, like the
+// converters. Any change there except its prose runs its functional suite; its timing-based
+// cost check, benchmark and DSP reproducibility check stay manual (they need a quiet machine
+// or the FAUST compiler).
+const SYNTH = /^synth\//;
+const SYNTH_PROSE = /^synth\/[^/]+\.md$/;
 
 /** The areas a smoke may declare in `covers` (harness/verify/run-smokes.mjs).
  *  `audio` is reached through the shared src/ layers, which run every smoke. */
@@ -74,12 +80,12 @@ function smokeAreas(file, coverage) {
 export function planGate(files, { full = false } = {}) {
   const coverage = smokeCoverage();
   const reasons = [];
-  const unknown = files.filter(file => !INERT.test(file) && !CODE.test(file) && !DATA.some(re => re.test(file)));
+  const unknown = files.filter(file => !INERT.test(file) && !CODE.test(file) && !SYNTH.test(file) && !DATA.some(re => re.test(file)));
   if (full || unknown.length) {
     if (unknown.length) reasons.push(`unrecognised paths run everything: ${unknown.join(', ')}`);
     else reasons.push('--full');
     return {
-      tests: { mode: 'full' }, converters: CONVERTERS, listeningBench: true, build: true,
+      tests: { mode: 'full' }, converters: CONVERTERS, listeningBench: true, synth: true, build: true,
       smokes: coverage.map(smoke => smoke.name), reasons,
     };
   }
@@ -117,7 +123,9 @@ export function planGate(files, { full = false } = {}) {
   reasons.push(smokes.length === coverage.length ? 'every smoke' : smokes.length ? `smokes for ${[...areas].join(', ')}` : 'no smokes');
   const listeningBench = files.some(file => /^experiments\/performance-listening\/(?!archive\/)|^src\/(audio|model)\/|^package(-lock)?\.json$|^spec\/mnx-schema\.json$|^tools\/gate\.mjs$/.test(file));
   if (listeningBench) reasons.push('listening bench: whole workspace suite (including disk-read contracts and oracles)');
-  return { tests, converters, listeningBench, build, smokes, reasons };
+  const synth = data.length > 0 || files.some(file => SYNTH.test(file) && !SYNTH_PROSE.test(file));
+  if (synth) reasons.push('synth: its functional suite');
+  return { tests, converters, listeningBench, synth, build, smokes, reasons };
 }
 
 /**
@@ -179,6 +187,7 @@ async function main() {
   console.log(`  tests:      ${plan.tests.mode === 'full' ? 'npm test (all)' : tests.length ? `${tests.length} file(s)` : 'none'}`);
   console.log(`  converters: ${plan.converters.join(', ') || 'none'}`);
   console.log(`  bench:      ${plan.listeningBench ? 'mnx-listening-bench' : 'none'}`);
+  console.log(`  synth:      ${plan.synth ? '@mnx-lab/synth test:gate' : 'none'}`);
   console.log(`  build:      ${plan.build ? 'npm run build' : 'none'}`);
   console.log(`  smokes:     ${plan.smokes.join(' ') || 'none'}`);
   if (args.includes('--plan')) {
@@ -192,6 +201,7 @@ async function main() {
     ...(plan.tests.mode === 'full' ? [['tests', 'npm', ['test']]] : tests.length ? [['tests', 'npx', ['vitest', 'run', ...tests]]] : []),
     ...plan.converters.map(name => [`converter ${name}`, 'npm', ['-w', `@mnx-editor/${name}`, 'test']]),
     ...(plan.listeningBench ? [['listening bench', 'npm', ['-w', 'mnx-listening-bench', 'test']]] : []),
+    ...(plan.synth ? [['synth', 'npm', ['-w', '@mnx-lab/synth', 'run', 'test:gate']]] : []),
   ];
   // The gate build is the site face; embed and lib still build their own.
   const onlySite = plan.smokes.length && planSmokes(plan.smokes).builds.every(build => build.args[1] === 'build:site');

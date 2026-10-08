@@ -1,0 +1,12 @@
+.tools/
+build/
+output/
+dist/
+__pycache__/
+*.pyc
+.venv/
+node_modules/
+/references/
+# Local research audio from the guitar-model work (not part of the synth).
+/web/data/instrument-model/
+/web/data/dry-comparison/

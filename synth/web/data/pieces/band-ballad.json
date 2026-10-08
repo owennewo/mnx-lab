@@ -1,0 +1,1315 @@
+{
+ "contract": "mnx-sound/2",
+ "fixture": {
+  "id": "band-ballad",
+  "name": "Band – slow ballad",
+  "group": "Band",
+  "description": "A fingerpicked guitar with a dotted echo (it follows the tempo), soft keys pads with the pedal, and a light ride and side-stick pattern."
+ },
+ "setup": {
+  "contract": "mnx-sound/2",
+  "session": {
+   "buses": [
+    {
+     "id": "room",
+     "type": "room",
+     "state": "on",
+     "preset": "Studio",
+     "basePreset": "Studio",
+     "params": {
+      "level": 0.18,
+      "decay": 0.6,
+      "predelay": 8,
+      "damping": 8500,
+      "width": 0.8
+     }
+    }
+   ],
+   "master": {
+    "volumeDb": 0,
+    "ceilingDb": -1
+   }
+  },
+  "parts": [
+   {
+    "id": "guitar",
+    "name": "Guitar",
+    "instrument": {
+     "kind": "plucked",
+     "design": "rounded-steel",
+     "layout": {
+      "strings": [
+       {
+        "pitch": 64
+       },
+       {
+        "pitch": 59
+       },
+       {
+        "pitch": 55
+       },
+       {
+        "pitch": 50
+       },
+       {
+        "pitch": 45
+       },
+       {
+        "pitch": 40
+       }
+      ],
+      "capo": 0
+     }
+    },
+    "chain": [
+     {
+      "id": "echo",
+      "type": "echo",
+      "state": "on",
+      "preset": "Dotted echo",
+      "basePreset": "Dotted echo",
+      "params": {
+       "mix": 0.25,
+       "beats": 0.75,
+       "feedback": 0.5,
+       "tone": 5000,
+       "pingPong": true
+      }
+     }
+    ],
+    "strip": {
+     "levelDb": -2,
+     "pan": 0,
+     "mute": false,
+     "solo": false,
+     "sends": {
+      "room": 0.3
+     }
+    }
+   },
+   {
+    "id": "keys",
+    "name": "Keys",
+    "instrument": {
+     "kind": "keys",
+     "design": {
+      "id": "basic-piano"
+     }
+    },
+    "chain": [],
+    "strip": {
+     "levelDb": 0,
+     "pan": 0,
+     "mute": false,
+     "solo": false,
+     "sends": {
+      "room": 0.15
+     }
+    }
+   },
+   {
+    "id": "kit",
+    "name": "Kit",
+    "instrument": {
+     "kind": "kit",
+     "design": {
+      "id": "basic-kit"
+     }
+    },
+    "chain": [],
+    "strip": {
+     "levelDb": -3,
+     "pan": 0,
+     "mute": false,
+     "solo": false,
+     "sends": {
+      "room": 0.15
+     }
+    }
+   }
+  ]
+ },
+ "notes": [
+  {
+   "id": "guitar-1",
+   "part": "guitar",
+   "at": 0.2,
+   "duration": 1.25,
+   "velocity": 0.62,
+   "target": {
+    "pitch": 48
+   },
+   "fingering": {
+    "string": 5,
+    "fret": 3
+   },
+   "techniques": [
+    {
+     "type": "letRing"
+    }
+   ]
+  },
+  {
+   "id": "guitar-2",
+   "part": "guitar",
+   "at": 0.616667,
+   "duration": 1.25,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 55
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "letRing"
+    }
+   ]
+  },
+  {
+   "id": "guitar-3",
+   "part": "guitar",
+   "at": 1.033333,
+   "duration": 1.25,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 60
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 1
+   },
+   "techniques": [
+    {
+     "type": "letRing"
+    }
+   ]
+  },
+  {
+   "id": "guitar-4",
+   "part": "guitar",
+   "at": 1.45,
+   "duration": 1.25,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "letRing"
+    }
+   ]
+  },
+  {
+   "id": "guitar-5",
+   "part": "guitar",
+   "at": 1.866667,
+   "duration": 1.25,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 60
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 1
+   },
+   "techniques": [
+    {
+     "type": "letRing"
+    }
+   ]
+  },
+  {
+   "id": "guitar-6",
+   "part": "guitar",
+   "at": 2.283333,
+   "duration": 1.25,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 55
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "letRing"
+    }
+   ]
+  },
+  {
+   "id": "guitar-7",
+   "part": "guitar",
+   "at": 2.7,
+   "duration": 1.25,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 60
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 1
+   },
+   "techniques": [
+    {
+     "type": "letRing"
+    }
+   ]
+  },
+  {
+   "id": "guitar-8",
+   "part": "guitar",
+   "at": 3.116667,
+   "duration": 1.25,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "letRing"
+    }
+   ]
+  },
+  {
+   "id": "guitar-9",
+   "part": "guitar",
+   "at": 3.533333,
+   "duration": 1.25,
+   "velocity": 0.62,
+   "target": {
+    "pitch": 45
+   },
+   "fingering": {
+    "string": 5,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "letRing"
+    }
+   ]
+  },
+  {
+   "id": "guitar-10",
+   "part": "guitar",
+   "at": 3.95,
+   "duration": 1.25,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 57
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 2
+   },
+   "techniques": [
+    {
+     "type": "letRing"
+    }
+   ]
+  },
+  {
+   "id": "guitar-11",
+   "part": "guitar",
+   "at": 4.366667,
+   "duration": 1.25,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 60
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 1
+   },
+   "techniques": [
+    {
+     "type": "letRing"
+    }
+   ]
+  },
+  {
+   "id": "guitar-12",
+   "part": "guitar",
+   "at": 4.783333,
+   "duration": 1.25,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "letRing"
+    }
+   ]
+  },
+  {
+   "id": "guitar-13",
+   "part": "guitar",
+   "at": 5.2,
+   "duration": 1.25,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 60
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 1
+   },
+   "techniques": [
+    {
+     "type": "letRing"
+    }
+   ]
+  },
+  {
+   "id": "guitar-14",
+   "part": "guitar",
+   "at": 5.616667,
+   "duration": 1.25,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 57
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 2
+   },
+   "techniques": [
+    {
+     "type": "letRing"
+    }
+   ]
+  },
+  {
+   "id": "guitar-15",
+   "part": "guitar",
+   "at": 6.033333,
+   "duration": 1.25,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 60
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 1
+   },
+   "techniques": [
+    {
+     "type": "letRing"
+    }
+   ]
+  },
+  {
+   "id": "guitar-16",
+   "part": "guitar",
+   "at": 6.45,
+   "duration": 1.25,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "letRing"
+    }
+   ]
+  },
+  {
+   "id": "guitar-17",
+   "part": "guitar",
+   "at": 6.866667,
+   "duration": 1.25,
+   "velocity": 0.62,
+   "target": {
+    "pitch": 53
+   },
+   "fingering": {
+    "string": 4,
+    "fret": 3
+   },
+   "techniques": [
+    {
+     "type": "letRing"
+    }
+   ]
+  },
+  {
+   "id": "guitar-18",
+   "part": "guitar",
+   "at": 7.283333,
+   "duration": 1.25,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 57
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 2
+   },
+   "techniques": [
+    {
+     "type": "letRing"
+    }
+   ]
+  },
+  {
+   "id": "guitar-19",
+   "part": "guitar",
+   "at": 7.7,
+   "duration": 1.25,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 60
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 1
+   },
+   "techniques": [
+    {
+     "type": "letRing"
+    }
+   ]
+  },
+  {
+   "id": "guitar-20",
+   "part": "guitar",
+   "at": 8.116667,
+   "duration": 1.25,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 65
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 1
+   },
+   "techniques": [
+    {
+     "type": "letRing"
+    }
+   ]
+  },
+  {
+   "id": "guitar-21",
+   "part": "guitar",
+   "at": 8.533333,
+   "duration": 1.25,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 60
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 1
+   },
+   "techniques": [
+    {
+     "type": "letRing"
+    }
+   ]
+  },
+  {
+   "id": "guitar-22",
+   "part": "guitar",
+   "at": 8.95,
+   "duration": 1.25,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 57
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 2
+   },
+   "techniques": [
+    {
+     "type": "letRing"
+    }
+   ]
+  },
+  {
+   "id": "guitar-23",
+   "part": "guitar",
+   "at": 9.366667,
+   "duration": 1.25,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 60
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 1
+   },
+   "techniques": [
+    {
+     "type": "letRing"
+    }
+   ]
+  },
+  {
+   "id": "guitar-24",
+   "part": "guitar",
+   "at": 9.783333,
+   "duration": 1.25,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 65
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 1
+   },
+   "techniques": [
+    {
+     "type": "letRing"
+    }
+   ]
+  },
+  {
+   "id": "guitar-25",
+   "part": "guitar",
+   "at": 10.2,
+   "duration": 1.25,
+   "velocity": 0.62,
+   "target": {
+    "pitch": 43
+   },
+   "fingering": {
+    "string": 6,
+    "fret": 3
+   },
+   "techniques": [
+    {
+     "type": "letRing"
+    }
+   ]
+  },
+  {
+   "id": "guitar-26",
+   "part": "guitar",
+   "at": 10.616667,
+   "duration": 1.25,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 55
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "letRing"
+    }
+   ]
+  },
+  {
+   "id": "guitar-27",
+   "part": "guitar",
+   "at": 11.033333,
+   "duration": 1.25,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 59
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "letRing"
+    }
+   ]
+  },
+  {
+   "id": "guitar-28",
+   "part": "guitar",
+   "at": 11.45,
+   "duration": 1.25,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 67
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 3
+   },
+   "techniques": [
+    {
+     "type": "letRing"
+    }
+   ]
+  },
+  {
+   "id": "guitar-29",
+   "part": "guitar",
+   "at": 11.866667,
+   "duration": 1.25,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 59
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "letRing"
+    }
+   ]
+  },
+  {
+   "id": "guitar-30",
+   "part": "guitar",
+   "at": 12.283333,
+   "duration": 1.25,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 55
+   },
+   "fingering": {
+    "string": 3,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "letRing"
+    }
+   ]
+  },
+  {
+   "id": "guitar-31",
+   "part": "guitar",
+   "at": 12.7,
+   "duration": 1.25,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 59
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 0
+   },
+   "techniques": [
+    {
+     "type": "letRing"
+    }
+   ]
+  },
+  {
+   "id": "guitar-32",
+   "part": "guitar",
+   "at": 13.116667,
+   "duration": 1.25,
+   "velocity": 0.5,
+   "target": {
+    "pitch": 67
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 3
+   },
+   "techniques": [
+    {
+     "type": "letRing"
+    }
+   ]
+  },
+  {
+   "id": "keys-1",
+   "part": "keys",
+   "at": 0.2,
+   "duration": 3.283333,
+   "velocity": 0.32,
+   "target": {
+    "pitch": 48
+   }
+  },
+  {
+   "id": "keys-2",
+   "part": "keys",
+   "at": 0.2,
+   "duration": 3.283333,
+   "velocity": 0.32,
+   "target": {
+    "pitch": 55
+   }
+  },
+  {
+   "id": "keys-3",
+   "part": "keys",
+   "at": 0.2,
+   "duration": 3.283333,
+   "velocity": 0.32,
+   "target": {
+    "pitch": 60
+   }
+  },
+  {
+   "id": "keys-4",
+   "part": "keys",
+   "at": 0.2,
+   "duration": 3.283333,
+   "velocity": 0.32,
+   "target": {
+    "pitch": 64
+   }
+  },
+  {
+   "id": "keys-5",
+   "part": "keys",
+   "at": 3.533333,
+   "duration": 3.283334,
+   "velocity": 0.32,
+   "target": {
+    "pitch": 45
+   }
+  },
+  {
+   "id": "keys-6",
+   "part": "keys",
+   "at": 3.533333,
+   "duration": 3.283334,
+   "velocity": 0.32,
+   "target": {
+    "pitch": 52
+   }
+  },
+  {
+   "id": "keys-7",
+   "part": "keys",
+   "at": 3.533333,
+   "duration": 3.283334,
+   "velocity": 0.32,
+   "target": {
+    "pitch": 57
+   }
+  },
+  {
+   "id": "keys-8",
+   "part": "keys",
+   "at": 3.533333,
+   "duration": 3.283334,
+   "velocity": 0.32,
+   "target": {
+    "pitch": 60
+   }
+  },
+  {
+   "id": "keys-9",
+   "part": "keys",
+   "at": 6.866667,
+   "duration": 3.283333,
+   "velocity": 0.32,
+   "target": {
+    "pitch": 41
+   }
+  },
+  {
+   "id": "keys-10",
+   "part": "keys",
+   "at": 6.866667,
+   "duration": 3.283333,
+   "velocity": 0.32,
+   "target": {
+    "pitch": 48
+   }
+  },
+  {
+   "id": "keys-11",
+   "part": "keys",
+   "at": 6.866667,
+   "duration": 3.283333,
+   "velocity": 0.32,
+   "target": {
+    "pitch": 53
+   }
+  },
+  {
+   "id": "keys-12",
+   "part": "keys",
+   "at": 6.866667,
+   "duration": 3.283333,
+   "velocity": 0.32,
+   "target": {
+    "pitch": 57
+   }
+  },
+  {
+   "id": "keys-13",
+   "part": "keys",
+   "at": 10.2,
+   "duration": 3.283333,
+   "velocity": 0.32,
+   "target": {
+    "pitch": 43
+   }
+  },
+  {
+   "id": "keys-14",
+   "part": "keys",
+   "at": 10.2,
+   "duration": 3.283333,
+   "velocity": 0.32,
+   "target": {
+    "pitch": 50
+   }
+  },
+  {
+   "id": "keys-15",
+   "part": "keys",
+   "at": 10.2,
+   "duration": 3.283333,
+   "velocity": 0.32,
+   "target": {
+    "pitch": 55
+   }
+  },
+  {
+   "id": "keys-16",
+   "part": "keys",
+   "at": 10.2,
+   "duration": 3.283333,
+   "velocity": 0.32,
+   "target": {
+    "pitch": 59
+   }
+  },
+  {
+   "id": "kit-1",
+   "part": "kit",
+   "at": 0.2,
+   "duration": 0.1,
+   "velocity": 0.4,
+   "target": {
+    "piece": "ride"
+   }
+  },
+  {
+   "id": "kit-2",
+   "part": "kit",
+   "at": 0.2,
+   "duration": 0.1,
+   "velocity": 0.6,
+   "target": {
+    "piece": "kick"
+   }
+  },
+  {
+   "id": "kit-3",
+   "part": "kit",
+   "at": 1.033333,
+   "duration": 0.1,
+   "velocity": 0.4,
+   "target": {
+    "piece": "ride"
+   }
+  },
+  {
+   "id": "kit-4",
+   "part": "kit",
+   "at": 1.033333,
+   "duration": 0.1,
+   "velocity": 0.5,
+   "target": {
+    "piece": "side-stick"
+   }
+  },
+  {
+   "id": "kit-5",
+   "part": "kit",
+   "at": 1.866667,
+   "duration": 0.1,
+   "velocity": 0.4,
+   "target": {
+    "piece": "ride"
+   }
+  },
+  {
+   "id": "kit-6",
+   "part": "kit",
+   "at": 1.866667,
+   "duration": 0.1,
+   "velocity": 0.6,
+   "target": {
+    "piece": "kick"
+   }
+  },
+  {
+   "id": "kit-7",
+   "part": "kit",
+   "at": 2.7,
+   "duration": 0.1,
+   "velocity": 0.4,
+   "target": {
+    "piece": "ride"
+   }
+  },
+  {
+   "id": "kit-8",
+   "part": "kit",
+   "at": 2.7,
+   "duration": 0.1,
+   "velocity": 0.5,
+   "target": {
+    "piece": "side-stick"
+   }
+  },
+  {
+   "id": "kit-9",
+   "part": "kit",
+   "at": 3.533333,
+   "duration": 0.1,
+   "velocity": 0.4,
+   "target": {
+    "piece": "ride"
+   }
+  },
+  {
+   "id": "kit-10",
+   "part": "kit",
+   "at": 3.533333,
+   "duration": 0.1,
+   "velocity": 0.6,
+   "target": {
+    "piece": "kick"
+   }
+  },
+  {
+   "id": "kit-11",
+   "part": "kit",
+   "at": 4.366667,
+   "duration": 0.1,
+   "velocity": 0.4,
+   "target": {
+    "piece": "ride"
+   }
+  },
+  {
+   "id": "kit-12",
+   "part": "kit",
+   "at": 4.366667,
+   "duration": 0.1,
+   "velocity": 0.5,
+   "target": {
+    "piece": "side-stick"
+   }
+  },
+  {
+   "id": "kit-13",
+   "part": "kit",
+   "at": 5.2,
+   "duration": 0.1,
+   "velocity": 0.4,
+   "target": {
+    "piece": "ride"
+   }
+  },
+  {
+   "id": "kit-14",
+   "part": "kit",
+   "at": 5.2,
+   "duration": 0.1,
+   "velocity": 0.6,
+   "target": {
+    "piece": "kick"
+   }
+  },
+  {
+   "id": "kit-15",
+   "part": "kit",
+   "at": 6.033333,
+   "duration": 0.1,
+   "velocity": 0.4,
+   "target": {
+    "piece": "ride"
+   }
+  },
+  {
+   "id": "kit-16",
+   "part": "kit",
+   "at": 6.033333,
+   "duration": 0.1,
+   "velocity": 0.5,
+   "target": {
+    "piece": "side-stick"
+   }
+  },
+  {
+   "id": "kit-17",
+   "part": "kit",
+   "at": 6.866667,
+   "duration": 0.1,
+   "velocity": 0.4,
+   "target": {
+    "piece": "ride"
+   }
+  },
+  {
+   "id": "kit-18",
+   "part": "kit",
+   "at": 6.866667,
+   "duration": 0.1,
+   "velocity": 0.6,
+   "target": {
+    "piece": "kick"
+   }
+  },
+  {
+   "id": "kit-19",
+   "part": "kit",
+   "at": 7.7,
+   "duration": 0.1,
+   "velocity": 0.4,
+   "target": {
+    "piece": "ride"
+   }
+  },
+  {
+   "id": "kit-20",
+   "part": "kit",
+   "at": 7.7,
+   "duration": 0.1,
+   "velocity": 0.5,
+   "target": {
+    "piece": "side-stick"
+   }
+  },
+  {
+   "id": "kit-21",
+   "part": "kit",
+   "at": 8.533333,
+   "duration": 0.1,
+   "velocity": 0.4,
+   "target": {
+    "piece": "ride"
+   }
+  },
+  {
+   "id": "kit-22",
+   "part": "kit",
+   "at": 8.533333,
+   "duration": 0.1,
+   "velocity": 0.6,
+   "target": {
+    "piece": "kick"
+   }
+  },
+  {
+   "id": "kit-23",
+   "part": "kit",
+   "at": 9.366667,
+   "duration": 0.1,
+   "velocity": 0.4,
+   "target": {
+    "piece": "ride"
+   }
+  },
+  {
+   "id": "kit-24",
+   "part": "kit",
+   "at": 9.366667,
+   "duration": 0.1,
+   "velocity": 0.5,
+   "target": {
+    "piece": "side-stick"
+   }
+  },
+  {
+   "id": "kit-25",
+   "part": "kit",
+   "at": 10.2,
+   "duration": 0.1,
+   "velocity": 0.4,
+   "target": {
+    "piece": "ride"
+   }
+  },
+  {
+   "id": "kit-26",
+   "part": "kit",
+   "at": 10.2,
+   "duration": 0.1,
+   "velocity": 0.6,
+   "target": {
+    "piece": "kick"
+   }
+  },
+  {
+   "id": "kit-27",
+   "part": "kit",
+   "at": 11.033333,
+   "duration": 0.1,
+   "velocity": 0.4,
+   "target": {
+    "piece": "ride"
+   }
+  },
+  {
+   "id": "kit-28",
+   "part": "kit",
+   "at": 11.033333,
+   "duration": 0.1,
+   "velocity": 0.5,
+   "target": {
+    "piece": "side-stick"
+   }
+  },
+  {
+   "id": "kit-29",
+   "part": "kit",
+   "at": 11.866667,
+   "duration": 0.1,
+   "velocity": 0.4,
+   "target": {
+    "piece": "ride"
+   }
+  },
+  {
+   "id": "kit-30",
+   "part": "kit",
+   "at": 11.866667,
+   "duration": 0.1,
+   "velocity": 0.6,
+   "target": {
+    "piece": "kick"
+   }
+  },
+  {
+   "id": "kit-31",
+   "part": "kit",
+   "at": 12.7,
+   "duration": 0.1,
+   "velocity": 0.4,
+   "target": {
+    "piece": "ride"
+   }
+  },
+  {
+   "id": "kit-32",
+   "part": "kit",
+   "at": 12.7,
+   "duration": 0.1,
+   "velocity": 0.5,
+   "target": {
+    "piece": "side-stick"
+   }
+  }
+ ],
+ "controls": [
+  {
+   "id": "tempo",
+   "at": 0,
+   "type": "tempo",
+   "bpm": 72
+  },
+  {
+   "id": "pd0",
+   "part": "keys",
+   "at": 0.2,
+   "type": "sustainPedal",
+   "value": 1
+  },
+  {
+   "id": "pu0",
+   "part": "keys",
+   "at": 3.483333,
+   "type": "sustainPedal",
+   "value": 0
+  },
+  {
+   "id": "pd1",
+   "part": "keys",
+   "at": 3.533333,
+   "type": "sustainPedal",
+   "value": 1
+  },
+  {
+   "id": "pu1",
+   "part": "keys",
+   "at": 6.816667,
+   "type": "sustainPedal",
+   "value": 0
+  },
+  {
+   "id": "pd2",
+   "part": "keys",
+   "at": 6.866667,
+   "type": "sustainPedal",
+   "value": 1
+  },
+  {
+   "id": "pu2",
+   "part": "keys",
+   "at": 10.15,
+   "type": "sustainPedal",
+   "value": 0
+  },
+  {
+   "id": "pd3",
+   "part": "keys",
+   "at": 10.2,
+   "type": "sustainPedal",
+   "value": 1
+  },
+  {
+   "id": "pu3",
+   "part": "keys",
+   "at": 13.483333,
+   "type": "sustainPedal",
+   "value": 0
+  }
+ ],
+ "render": {
+  "rate": 48000,
+  "seconds": 17.4
+ },
+ "expect": [
+  {
+   "kind": "noDiagnostics",
+   "severity": "warning"
+  },
+  {
+   "kind": "peakBelow",
+   "dbfs": -0.5
+  },
+  {
+   "kind": "partActive",
+   "part": "guitar",
+   "aboveDb": -40
+  },
+  {
+   "kind": "partActive",
+   "part": "keys",
+   "aboveDb": -40
+  },
+  {
+   "kind": "partActive",
+   "part": "kit",
+   "aboveDb": -40
+  }
+ ]
+}

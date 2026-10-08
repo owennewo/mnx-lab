@@ -1,0 +1,596 @@
+{
+  "name": "Basic kit",
+  "filename": "kit-basic.dsp",
+  "version": "2.81.10",
+  "compile_options": "-lang wasm -ct 1 -cn KitDSP -es 1 -mcd 16 -mdd 1024 -mdy 33 -single -ftz 2",
+  "size": 263584,
+  "inputs": 0,
+  "outputs": 2,
+  "meta": [
+    {
+      "author": "Guitar Faust project"
+    },
+    {
+      "basic": "true"
+    },
+    {
+      "basics.lib/name": "Faust Basic Element Library"
+    },
+    {
+      "basics.lib/version": "1.22.0"
+    },
+    {
+      "compile_options": "-lang wasm -ct 1 -cn KitDSP -es 1 -mcd 16 -mdd 1024 -mdy 33 -single -ftz 2"
+    },
+    {
+      "filename": "kit-basic.dsp"
+    },
+    {
+      "filters.lib/bandpass0_bandstop1:author": "Julius O. Smith III"
+    },
+    {
+      "filters.lib/bandpass0_bandstop1:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+    },
+    {
+      "filters.lib/bandpass0_bandstop1:license": "MIT-style STK-4.3 license"
+    },
+    {
+      "filters.lib/bandpass:author": "Julius O. Smith III"
+    },
+    {
+      "filters.lib/bandpass:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+    },
+    {
+      "filters.lib/bandpass:license": "MIT-style STK-4.3 license"
+    },
+    {
+      "filters.lib/fir:author": "Julius O. Smith III"
+    },
+    {
+      "filters.lib/fir:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+    },
+    {
+      "filters.lib/fir:license": "MIT-style STK-4.3 license"
+    },
+    {
+      "filters.lib/highpass:author": "Julius O. Smith III"
+    },
+    {
+      "filters.lib/highpass:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+    },
+    {
+      "filters.lib/iir:author": "Julius O. Smith III"
+    },
+    {
+      "filters.lib/iir:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+    },
+    {
+      "filters.lib/iir:license": "MIT-style STK-4.3 license"
+    },
+    {
+      "filters.lib/lowpass0_highpass1": "MIT-style STK-4.3 license"
+    },
+    {
+      "filters.lib/lowpass0_highpass1:author": "Julius O. Smith III"
+    },
+    {
+      "filters.lib/lowpass:author": "Julius O. Smith III"
+    },
+    {
+      "filters.lib/lowpass:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+    },
+    {
+      "filters.lib/lowpass:license": "MIT-style STK-4.3 license"
+    },
+    {
+      "filters.lib/name": "Faust Filters Library"
+    },
+    {
+      "filters.lib/tf1:author": "Julius O. Smith III"
+    },
+    {
+      "filters.lib/tf1:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+    },
+    {
+      "filters.lib/tf1:license": "MIT-style STK-4.3 license"
+    },
+    {
+      "filters.lib/tf1s:author": "Julius O. Smith III"
+    },
+    {
+      "filters.lib/tf1s:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+    },
+    {
+      "filters.lib/tf1s:license": "MIT-style STK-4.3 license"
+    },
+    {
+      "filters.lib/tf1sb:author": "Julius O. Smith III"
+    },
+    {
+      "filters.lib/tf1sb:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+    },
+    {
+      "filters.lib/tf1sb:license": "MIT-style STK-4.3 license"
+    },
+    {
+      "filters.lib/tf2:author": "Julius O. Smith III"
+    },
+    {
+      "filters.lib/tf2:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+    },
+    {
+      "filters.lib/tf2:license": "MIT-style STK-4.3 license"
+    },
+    {
+      "filters.lib/tf2s:author": "Julius O. Smith III"
+    },
+    {
+      "filters.lib/tf2s:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+    },
+    {
+      "filters.lib/tf2s:license": "MIT-style STK-4.3 license"
+    },
+    {
+      "filters.lib/version": "1.7.1"
+    },
+    {
+      "maths.lib/author": "GRAME"
+    },
+    {
+      "maths.lib/copyright": "GRAME"
+    },
+    {
+      "maths.lib/license": "LGPL with exception"
+    },
+    {
+      "maths.lib/name": "Faust Math Library"
+    },
+    {
+      "maths.lib/version": "2.9.0"
+    },
+    {
+      "name": "Basic kit"
+    },
+    {
+      "noises.lib/name": "Faust Noise Generator Library"
+    },
+    {
+      "noises.lib/version": "1.5.0"
+    },
+    {
+      "oscillators.lib/lf_sawpos:author": "Bart Brouns, revised by Stéphane Letz"
+    },
+    {
+      "oscillators.lib/lf_sawpos:licence": "STK-4.3"
+    },
+    {
+      "oscillators.lib/name": "Faust Oscillator Library"
+    },
+    {
+      "oscillators.lib/version": "1.6.0"
+    },
+    {
+      "platform.lib/name": "Generic Platform Library"
+    },
+    {
+      "platform.lib/version": "1.3.0"
+    }
+  ],
+  "ui": [
+    {
+      "type": "vgroup",
+      "label": "Basic kit",
+      "items": [
+        {
+          "type": "hslider",
+          "label": "crash-active",
+          "varname": "fHslider3",
+          "shortname": "crash_active",
+          "address": "/Basic_kit/crash-active",
+          "index": 262436,
+          "init": 1,
+          "min": 0,
+          "max": 1,
+          "step": 1
+        },
+        {
+          "type": "hslider",
+          "label": "crash-trigger",
+          "varname": "fHslider4",
+          "shortname": "crash_trigger",
+          "address": "/Basic_kit/crash-trigger",
+          "index": 262484,
+          "init": 0,
+          "min": 0,
+          "max": 1,
+          "step": 1
+        },
+        {
+          "type": "hslider",
+          "label": "crash-velocity",
+          "varname": "fHslider5",
+          "shortname": "crash_velocity",
+          "address": "/Basic_kit/crash-velocity",
+          "index": 262512,
+          "init": 0.75,
+          "min": 0,
+          "max": 1,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "hihat-closed-trigger",
+          "varname": "fHslider19",
+          "shortname": "hihat_closed_trigger",
+          "address": "/Basic_kit/hihat-closed-trigger",
+          "index": 262804,
+          "init": 0,
+          "min": 0,
+          "max": 1,
+          "step": 1
+        },
+        {
+          "type": "hslider",
+          "label": "hihat-closed-velocity",
+          "varname": "fHslider20",
+          "shortname": "hihat_closed_velocity",
+          "address": "/Basic_kit/hihat-closed-velocity",
+          "index": 262828,
+          "init": 0.75,
+          "min": 0,
+          "max": 1,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "hihat-open-active",
+          "varname": "fHslider6",
+          "shortname": "hihat_open_active",
+          "address": "/Basic_kit/hihat-open-active",
+          "index": 262524,
+          "init": 1,
+          "min": 0,
+          "max": 1,
+          "step": 1
+        },
+        {
+          "type": "hslider",
+          "label": "hihat-open-choke",
+          "varname": "fHslider8",
+          "shortname": "hihat_open_choke",
+          "address": "/Basic_kit/hihat-open-choke",
+          "index": 262588,
+          "init": 0,
+          "min": 0,
+          "max": 1,
+          "step": 1
+        },
+        {
+          "type": "hslider",
+          "label": "hihat-open-trigger",
+          "varname": "fHslider7",
+          "shortname": "hihat_open_trigger",
+          "address": "/Basic_kit/hihat-open-trigger",
+          "index": 262572,
+          "init": 0,
+          "min": 0,
+          "max": 1,
+          "step": 1
+        },
+        {
+          "type": "hslider",
+          "label": "hihat-open-velocity",
+          "varname": "fHslider9",
+          "shortname": "hihat_open_velocity",
+          "address": "/Basic_kit/hihat-open-velocity",
+          "index": 262624,
+          "init": 0.75,
+          "min": 0,
+          "max": 1,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "hihat-pedal-active",
+          "varname": "fHslider10",
+          "shortname": "hihat_pedal_active",
+          "address": "/Basic_kit/hihat-pedal-active",
+          "index": 262636,
+          "init": 1,
+          "min": 0,
+          "max": 1,
+          "step": 1
+        },
+        {
+          "type": "hslider",
+          "label": "hihat-pedal-trigger",
+          "varname": "fHslider17",
+          "shortname": "hihat_pedal_trigger",
+          "address": "/Basic_kit/hihat-pedal-trigger",
+          "index": 262724,
+          "init": 0,
+          "min": 0,
+          "max": 1,
+          "step": 1
+        },
+        {
+          "type": "hslider",
+          "label": "hihat-pedal-velocity",
+          "varname": "fHslider18",
+          "shortname": "hihat_pedal_velocity",
+          "address": "/Basic_kit/hihat-pedal-velocity",
+          "index": 262752,
+          "init": 0.75,
+          "min": 0,
+          "max": 1,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "kick-active",
+          "varname": "fHslider16",
+          "shortname": "kick_active",
+          "address": "/Basic_kit/kick-active",
+          "index": 262700,
+          "init": 1,
+          "min": 0,
+          "max": 1,
+          "step": 1
+        },
+        {
+          "type": "hslider",
+          "label": "kick-trigger",
+          "varname": "fHslider31",
+          "shortname": "kick_trigger",
+          "address": "/Basic_kit/kick-trigger",
+          "index": 263468,
+          "init": 0,
+          "min": 0,
+          "max": 1,
+          "step": 1
+        },
+        {
+          "type": "hslider",
+          "label": "kick-velocity",
+          "varname": "fHslider32",
+          "shortname": "kick_velocity",
+          "address": "/Basic_kit/kick-velocity",
+          "index": 263556,
+          "init": 0.75,
+          "min": 0,
+          "max": 1,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "ride-active",
+          "varname": "fHslider0",
+          "shortname": "ride_active",
+          "address": "/Basic_kit/ride-active",
+          "index": 262144,
+          "init": 1,
+          "min": 0,
+          "max": 1,
+          "step": 1
+        },
+        {
+          "type": "hslider",
+          "label": "ride-trigger",
+          "varname": "fHslider1",
+          "shortname": "ride_trigger",
+          "address": "/Basic_kit/ride-trigger",
+          "index": 262148,
+          "init": 0,
+          "min": 0,
+          "max": 1,
+          "step": 1
+        },
+        {
+          "type": "hslider",
+          "label": "ride-velocity",
+          "varname": "fHslider2",
+          "shortname": "ride_velocity",
+          "address": "/Basic_kit/ride-velocity",
+          "index": 262428,
+          "init": 0.75,
+          "min": 0,
+          "max": 1,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "side-stick-active",
+          "varname": "fHslider14",
+          "shortname": "side_stick_active",
+          "address": "/Basic_kit/side-stick-active",
+          "index": 262692,
+          "init": 1,
+          "min": 0,
+          "max": 1,
+          "step": 1
+        },
+        {
+          "type": "hslider",
+          "label": "side-stick-trigger",
+          "varname": "fHslider27",
+          "shortname": "side_stick_trigger",
+          "address": "/Basic_kit/side-stick-trigger",
+          "index": 263164,
+          "init": 0,
+          "min": 0,
+          "max": 1,
+          "step": 1
+        },
+        {
+          "type": "hslider",
+          "label": "side-stick-velocity",
+          "varname": "fHslider28",
+          "shortname": "side_stick_velocity",
+          "address": "/Basic_kit/side-stick-velocity",
+          "index": 263276,
+          "init": 0.75,
+          "min": 0,
+          "max": 1,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "snare-active",
+          "varname": "fHslider15",
+          "shortname": "snare_active",
+          "address": "/Basic_kit/snare-active",
+          "index": 262696,
+          "init": 1,
+          "min": 0,
+          "max": 1,
+          "step": 1
+        },
+        {
+          "type": "hslider",
+          "label": "snare-trigger",
+          "varname": "fHslider29",
+          "shortname": "snare_trigger",
+          "address": "/Basic_kit/snare-trigger",
+          "index": 263332,
+          "init": 0,
+          "min": 0,
+          "max": 1,
+          "step": 1
+        },
+        {
+          "type": "hslider",
+          "label": "snare-velocity",
+          "varname": "fHslider30",
+          "shortname": "snare_velocity",
+          "address": "/Basic_kit/snare-velocity",
+          "index": 263424,
+          "init": 0.75,
+          "min": 0,
+          "max": 1,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "tom-high-active",
+          "varname": "fHslider13",
+          "shortname": "tom_high_active",
+          "address": "/Basic_kit/tom-high-active",
+          "index": 262688,
+          "init": 1,
+          "min": 0,
+          "max": 1,
+          "step": 1
+        },
+        {
+          "type": "hslider",
+          "label": "tom-high-trigger",
+          "varname": "fHslider25",
+          "shortname": "tom_high_trigger",
+          "address": "/Basic_kit/tom-high-trigger",
+          "index": 263060,
+          "init": 0,
+          "min": 0,
+          "max": 1,
+          "step": 1
+        },
+        {
+          "type": "hslider",
+          "label": "tom-high-velocity",
+          "varname": "fHslider26",
+          "shortname": "tom_high_velocity",
+          "address": "/Basic_kit/tom-high-velocity",
+          "index": 263136,
+          "init": 0.75,
+          "min": 0,
+          "max": 1,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "tom-low-active",
+          "varname": "fHslider11",
+          "shortname": "tom_low_active",
+          "address": "/Basic_kit/tom-low-active",
+          "index": 262680,
+          "init": 1,
+          "min": 0,
+          "max": 1,
+          "step": 1
+        },
+        {
+          "type": "hslider",
+          "label": "tom-low-trigger",
+          "varname": "fHslider21",
+          "shortname": "tom_low_trigger",
+          "address": "/Basic_kit/tom-low-trigger",
+          "index": 262884,
+          "init": 0,
+          "min": 0,
+          "max": 1,
+          "step": 1
+        },
+        {
+          "type": "hslider",
+          "label": "tom-low-velocity",
+          "varname": "fHslider22",
+          "shortname": "tom_low_velocity",
+          "address": "/Basic_kit/tom-low-velocity",
+          "index": 262968,
+          "init": 0.75,
+          "min": 0,
+          "max": 1,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "tom-mid-active",
+          "varname": "fHslider12",
+          "shortname": "tom_mid_active",
+          "address": "/Basic_kit/tom-mid-active",
+          "index": 262684,
+          "init": 1,
+          "min": 0,
+          "max": 1,
+          "step": 1
+        },
+        {
+          "type": "hslider",
+          "label": "tom-mid-trigger",
+          "varname": "fHslider23",
+          "shortname": "tom_mid_trigger",
+          "address": "/Basic_kit/tom-mid-trigger",
+          "index": 262976,
+          "init": 0,
+          "min": 0,
+          "max": 1,
+          "step": 1
+        },
+        {
+          "type": "hslider",
+          "label": "tom-mid-velocity",
+          "varname": "fHslider24",
+          "shortname": "tom_mid_velocity",
+          "address": "/Basic_kit/tom-mid-velocity",
+          "index": 263052,
+          "init": 0.75,
+          "min": 0,
+          "max": 1,
+          "step": 0.001
+        }
+      ]
+    }
+  ],
+  "librarySha256": {
+    "stdfaust.lib": "536d6270c7925239a0cdd0b6f26addd070ca009e6554e1036d770d61fae1b1a5",
+    "maths.lib": "d9647d09009647e4c727c4621f78979d088e94453b97af58fa3947f5670df6bf",
+    "platform.lib": "e142c1e9643c38c6c7223b005067abd393b007e9966938b6c78f8968a9b8d5a3",
+    "noises.lib": "c8514b73e9fa845aab83e74681a54a9dc4679cdecca5a8d0191ffbe99fbea096",
+    "oscillators.lib": "14a6fecff688244a7f8195d45cf474b7da5cdcbcfa77c241afb33c7b5b226ba7",
+    "basics.lib": "855d280f983a5d3c3943183c51fd31698b420da9f0d1f8d31561b23338dd3cf3",
+    "filters.lib": "ff5dc252814660c1172e9fa44af8435f35816d62f72db6d4ed793a2f32b8fa9b"
+  },
+  "kind": "kit",
+  "basic": true,
+  "sourceSha256": "f267ba8864f5deb122f252c7f4d110f370de55e94609a4e5679c1f4d71af84d0",
+  "wasmSha256": "d383870a58aa92e70752f3245fd7af6a7b3af53850c077bbc3e0966ee039e59c"
+}

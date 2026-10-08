@@ -1,0 +1,599 @@
+{
+ "contract": "mnx-sound/2",
+ "fixture": {
+  "id": "chord-gestures",
+  "description": "Chord gestures (C18): a guitar strummed down then up (string 6 first, then string 1 first), a re-entrant ukulele strummed down (string 4, the high G, first), a keys chord rolled up and one strummed (approximated by pitch). Members keep their written end."
+ },
+ "setup": {
+  "contract": "mnx-sound/2",
+  "session": {
+   "master": {
+    "volumeDb": 0
+   }
+  },
+  "parts": [
+   {
+    "id": "gtr",
+    "instrument": {
+     "kind": "plucked",
+     "design": "clear-steel",
+     "layout": {
+      "strings": [
+       {
+        "pitch": 64
+       },
+       {
+        "pitch": 59
+       },
+       {
+        "pitch": 55
+       },
+       {
+        "pitch": 50
+       },
+       {
+        "pitch": 45
+       },
+       {
+        "pitch": 40
+       }
+      ],
+      "capo": 0
+     }
+    },
+    "strip": {
+     "levelDb": -2
+    }
+   },
+   {
+    "id": "uke",
+    "instrument": {
+     "kind": "plucked",
+     "design": "nail-nylon",
+     "layout": {
+      "strings": [
+       {
+        "pitch": 69
+       },
+       {
+        "pitch": 64
+       },
+       {
+        "pitch": 60
+       },
+       {
+        "pitch": 67
+       }
+      ],
+      "capo": 0
+     }
+    },
+    "strip": {
+     "levelDb": -2
+    }
+   },
+   {
+    "id": "keys",
+    "instrument": {
+     "kind": "keys",
+     "design": "basic-piano"
+    },
+    "strip": {
+     "levelDb": -2
+    }
+   }
+  ]
+ },
+ "notes": [
+  {
+   "id": "gd1",
+   "part": "gtr",
+   "at": 0.3,
+   "duration": 1,
+   "velocity": 0.75,
+   "target": {
+    "pitch": 40
+   },
+   "fingering": {
+    "string": 6
+   },
+   "gesture": {
+    "id": "gd",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.05
+   }
+  },
+  {
+   "id": "gd2",
+   "part": "gtr",
+   "at": 0.3,
+   "duration": 1,
+   "velocity": 0.75,
+   "target": {
+    "pitch": 47
+   },
+   "fingering": {
+    "string": 5
+   },
+   "gesture": {
+    "id": "gd",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.05
+   }
+  },
+  {
+   "id": "gd3",
+   "part": "gtr",
+   "at": 0.3,
+   "duration": 1,
+   "velocity": 0.75,
+   "target": {
+    "pitch": 52
+   },
+   "fingering": {
+    "string": 4
+   },
+   "gesture": {
+    "id": "gd",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.05
+   }
+  },
+  {
+   "id": "gd4",
+   "part": "gtr",
+   "at": 0.3,
+   "duration": 1,
+   "velocity": 0.75,
+   "target": {
+    "pitch": 56
+   },
+   "fingering": {
+    "string": 3
+   },
+   "gesture": {
+    "id": "gd",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.05
+   }
+  },
+  {
+   "id": "gd5",
+   "part": "gtr",
+   "at": 0.3,
+   "duration": 1,
+   "velocity": 0.75,
+   "target": {
+    "pitch": 59
+   },
+   "fingering": {
+    "string": 2
+   },
+   "gesture": {
+    "id": "gd",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.05
+   }
+  },
+  {
+   "id": "gd6",
+   "part": "gtr",
+   "at": 0.3,
+   "duration": 1,
+   "velocity": 0.75,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 1
+   },
+   "gesture": {
+    "id": "gd",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.05
+   }
+  },
+  {
+   "id": "gu1",
+   "part": "gtr",
+   "at": 1.6,
+   "duration": 1,
+   "velocity": 0.75,
+   "target": {
+    "pitch": 40
+   },
+   "fingering": {
+    "string": 6
+   },
+   "gesture": {
+    "id": "gu",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.05
+   }
+  },
+  {
+   "id": "gu2",
+   "part": "gtr",
+   "at": 1.6,
+   "duration": 1,
+   "velocity": 0.75,
+   "target": {
+    "pitch": 47
+   },
+   "fingering": {
+    "string": 5
+   },
+   "gesture": {
+    "id": "gu",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.05
+   }
+  },
+  {
+   "id": "gu3",
+   "part": "gtr",
+   "at": 1.6,
+   "duration": 1,
+   "velocity": 0.75,
+   "target": {
+    "pitch": 52
+   },
+   "fingering": {
+    "string": 4
+   },
+   "gesture": {
+    "id": "gu",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.05
+   }
+  },
+  {
+   "id": "gu4",
+   "part": "gtr",
+   "at": 1.6,
+   "duration": 1,
+   "velocity": 0.75,
+   "target": {
+    "pitch": 56
+   },
+   "fingering": {
+    "string": 3
+   },
+   "gesture": {
+    "id": "gu",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.05
+   }
+  },
+  {
+   "id": "gu5",
+   "part": "gtr",
+   "at": 1.6,
+   "duration": 1,
+   "velocity": 0.75,
+   "target": {
+    "pitch": 59
+   },
+   "fingering": {
+    "string": 2
+   },
+   "gesture": {
+    "id": "gu",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.05
+   }
+  },
+  {
+   "id": "gu6",
+   "part": "gtr",
+   "at": 1.6,
+   "duration": 1,
+   "velocity": 0.75,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 1
+   },
+   "gesture": {
+    "id": "gu",
+    "type": "strum",
+    "direction": "up",
+    "spreadSeconds": 0.05
+   }
+  },
+  {
+   "id": "ud1",
+   "part": "uke",
+   "at": 2.9,
+   "duration": 1,
+   "velocity": 0.75,
+   "target": {
+    "pitch": 67
+   },
+   "fingering": {
+    "string": 4
+   },
+   "gesture": {
+    "id": "ud",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.045
+   }
+  },
+  {
+   "id": "ud2",
+   "part": "uke",
+   "at": 2.9,
+   "duration": 1,
+   "velocity": 0.75,
+   "target": {
+    "pitch": 60
+   },
+   "fingering": {
+    "string": 3
+   },
+   "gesture": {
+    "id": "ud",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.045
+   }
+  },
+  {
+   "id": "ud3",
+   "part": "uke",
+   "at": 2.9,
+   "duration": 1,
+   "velocity": 0.75,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 2
+   },
+   "gesture": {
+    "id": "ud",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.045
+   }
+  },
+  {
+   "id": "ud4",
+   "part": "uke",
+   "at": 2.9,
+   "duration": 1,
+   "velocity": 0.75,
+   "target": {
+    "pitch": 72
+   },
+   "fingering": {
+    "string": 1
+   },
+   "gesture": {
+    "id": "ud",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.045
+   }
+  },
+  {
+   "id": "kr1",
+   "part": "keys",
+   "at": 4.2,
+   "duration": 1,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 48
+   },
+   "gesture": {
+    "id": "kr",
+    "type": "roll",
+    "direction": "up",
+    "spreadSeconds": 0.06
+   }
+  },
+  {
+   "id": "kr2",
+   "part": "keys",
+   "at": 4.2,
+   "duration": 1,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 55
+   },
+   "gesture": {
+    "id": "kr",
+    "type": "roll",
+    "direction": "up",
+    "spreadSeconds": 0.06
+   }
+  },
+  {
+   "id": "kr3",
+   "part": "keys",
+   "at": 4.2,
+   "duration": 1,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 60
+   },
+   "gesture": {
+    "id": "kr",
+    "type": "roll",
+    "direction": "up",
+    "spreadSeconds": 0.06
+   }
+  },
+  {
+   "id": "kr4",
+   "part": "keys",
+   "at": 4.2,
+   "duration": 1,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 64
+   },
+   "gesture": {
+    "id": "kr",
+    "type": "roll",
+    "direction": "up",
+    "spreadSeconds": 0.06
+   }
+  },
+  {
+   "id": "ks1",
+   "part": "keys",
+   "at": 5.5,
+   "duration": 1,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 48
+   },
+   "gesture": {
+    "id": "ks",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.06
+   }
+  },
+  {
+   "id": "ks2",
+   "part": "keys",
+   "at": 5.5,
+   "duration": 1,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 55
+   },
+   "gesture": {
+    "id": "ks",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.06
+   }
+  },
+  {
+   "id": "ks3",
+   "part": "keys",
+   "at": 5.5,
+   "duration": 1,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 60
+   },
+   "gesture": {
+    "id": "ks",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.06
+   }
+  },
+  {
+   "id": "ks4",
+   "part": "keys",
+   "at": 5.5,
+   "duration": 1,
+   "velocity": 0.6,
+   "target": {
+    "pitch": 64
+   },
+   "gesture": {
+    "id": "ks",
+    "type": "strum",
+    "direction": "down",
+    "spreadSeconds": 0.06
+   }
+  }
+ ],
+ "controls": [
+  {
+   "id": "tempo",
+   "at": 0,
+   "type": "tempo",
+   "bpm": 96
+  }
+ ],
+ "render": {
+  "rate": 48000,
+  "seconds": 7.5
+ },
+ "expect": [
+  {
+   "kind": "onsetAt",
+   "note": "gd1",
+   "seconds": 0
+  },
+  {
+   "kind": "onsetAt",
+   "note": "gd6",
+   "seconds": 0.05
+  },
+  {
+   "kind": "onsetAt",
+   "note": "gu6",
+   "seconds": 0
+  },
+  {
+   "kind": "onsetAt",
+   "note": "gu1",
+   "seconds": 0.05
+  },
+  {
+   "kind": "onsetAt",
+   "note": "ud1",
+   "seconds": 0
+  },
+  {
+   "kind": "onsetAt",
+   "note": "ud2",
+   "seconds": 0.015
+  },
+  {
+   "kind": "onsetAt",
+   "note": "ud4",
+   "seconds": 0.045
+  },
+  {
+   "kind": "onsetAt",
+   "note": "kr1",
+   "seconds": 0
+  },
+  {
+   "kind": "onsetAt",
+   "note": "kr4",
+   "seconds": 0.06
+  },
+  {
+   "kind": "onsetAt",
+   "note": "ks1",
+   "seconds": 0
+  },
+  {
+   "kind": "onsetAt",
+   "note": "ks4",
+   "seconds": 0.06
+  },
+  {
+   "kind": "diagnostic",
+   "code": "approximated",
+   "note": "ks1"
+  },
+  {
+   "kind": "noDiagnostics",
+   "severity": "warning"
+  }
+ ]
+}

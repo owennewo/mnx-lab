@@ -1,0 +1,582 @@
+{
+ "contract": "mnx-sound/2",
+ "fixture": {
+  "id": "kit-groove",
+  "name": "Kit – groove, fill & hi-hat chokes",
+  "group": "Kit",
+  "description": "Two bars of groove with ghost notes on the snare, an open hi-hat closed by the pedal, then a tom fill into a crash."
+ },
+ "setup": {
+  "contract": "mnx-sound/2",
+  "session": {
+   "buses": [
+    {
+     "id": "room",
+     "type": "room",
+     "state": "on",
+     "preset": "Studio",
+     "basePreset": "Studio",
+     "params": {
+      "level": 0.18,
+      "decay": 0.6,
+      "predelay": 8,
+      "damping": 8500,
+      "width": 0.8
+     }
+    }
+   ],
+   "master": {
+    "volumeDb": 0,
+    "ceilingDb": -1
+   }
+  },
+  "parts": [
+   {
+    "id": "kit",
+    "name": "Kit",
+    "instrument": {
+     "kind": "kit",
+     "design": {
+      "id": "basic-kit"
+     }
+    },
+    "chain": [],
+    "strip": {
+     "levelDb": -2,
+     "pan": 0,
+     "mute": false,
+     "solo": false,
+     "sends": {
+      "room": 0.15
+     }
+    }
+   }
+  ]
+ },
+ "notes": [
+  {
+   "id": "kit-1",
+   "part": "kit",
+   "at": 0.2,
+   "duration": 0.1,
+   "velocity": 0.55,
+   "target": {
+    "piece": "hihat-closed"
+   }
+  },
+  {
+   "id": "kit-2",
+   "part": "kit",
+   "at": 0.2,
+   "duration": 0.1,
+   "velocity": 0.85,
+   "target": {
+    "piece": "kick"
+   }
+  },
+  {
+   "id": "kit-3",
+   "part": "kit",
+   "at": 0.5,
+   "duration": 0.1,
+   "velocity": 0.35,
+   "target": {
+    "piece": "hihat-closed"
+   }
+  },
+  {
+   "id": "kit-4",
+   "part": "kit",
+   "at": 0.8,
+   "duration": 0.1,
+   "velocity": 0.55,
+   "target": {
+    "piece": "hihat-closed"
+   }
+  },
+  {
+   "id": "kit-5",
+   "part": "kit",
+   "at": 0.8,
+   "duration": 0.1,
+   "velocity": 0.75,
+   "target": {
+    "piece": "snare"
+   }
+  },
+  {
+   "id": "kit-6",
+   "part": "kit",
+   "at": 1.1,
+   "duration": 0.1,
+   "velocity": 0.35,
+   "target": {
+    "piece": "hihat-closed"
+   }
+  },
+  {
+   "id": "kit-7",
+   "part": "kit",
+   "at": 1.4,
+   "duration": 0.1,
+   "velocity": 0.55,
+   "target": {
+    "piece": "hihat-closed"
+   }
+  },
+  {
+   "id": "kit-8",
+   "part": "kit",
+   "at": 1.4,
+   "duration": 0.1,
+   "velocity": 0.85,
+   "target": {
+    "piece": "kick"
+   }
+  },
+  {
+   "id": "kit-9",
+   "part": "kit",
+   "at": 1.7,
+   "duration": 0.1,
+   "velocity": 0.35,
+   "target": {
+    "piece": "hihat-closed"
+   }
+  },
+  {
+   "id": "kit-10",
+   "part": "kit",
+   "at": 2,
+   "duration": 0.1,
+   "velocity": 0.55,
+   "target": {
+    "piece": "hihat-closed"
+   }
+  },
+  {
+   "id": "kit-11",
+   "part": "kit",
+   "at": 2,
+   "duration": 0.1,
+   "velocity": 0.75,
+   "target": {
+    "piece": "snare"
+   }
+  },
+  {
+   "id": "kit-12",
+   "part": "kit",
+   "at": 2.3,
+   "duration": 0.1,
+   "velocity": 0.35,
+   "target": {
+    "piece": "hihat-closed"
+   }
+  },
+  {
+   "id": "kit-13",
+   "part": "kit",
+   "at": 2.3,
+   "duration": 0.1,
+   "velocity": 0.2,
+   "target": {
+    "piece": "snare"
+   }
+  },
+  {
+   "id": "kit-14",
+   "part": "kit",
+   "at": 2.6,
+   "duration": 0.1,
+   "velocity": 0.55,
+   "target": {
+    "piece": "hihat-closed"
+   }
+  },
+  {
+   "id": "kit-15",
+   "part": "kit",
+   "at": 2.6,
+   "duration": 0.1,
+   "velocity": 0.85,
+   "target": {
+    "piece": "kick"
+   }
+  },
+  {
+   "id": "kit-16",
+   "part": "kit",
+   "at": 2.9,
+   "duration": 0.1,
+   "velocity": 0.35,
+   "target": {
+    "piece": "hihat-closed"
+   }
+  },
+  {
+   "id": "kit-17",
+   "part": "kit",
+   "at": 3.2,
+   "duration": 0.1,
+   "velocity": 0.55,
+   "target": {
+    "piece": "hihat-closed"
+   }
+  },
+  {
+   "id": "kit-18",
+   "part": "kit",
+   "at": 3.2,
+   "duration": 0.1,
+   "velocity": 0.75,
+   "target": {
+    "piece": "snare"
+   }
+  },
+  {
+   "id": "kit-19",
+   "part": "kit",
+   "at": 3.5,
+   "duration": 0.1,
+   "velocity": 0.35,
+   "target": {
+    "piece": "hihat-closed"
+   }
+  },
+  {
+   "id": "kit-20",
+   "part": "kit",
+   "at": 3.5,
+   "duration": 0.1,
+   "velocity": 0.2,
+   "target": {
+    "piece": "snare"
+   }
+  },
+  {
+   "id": "kit-21",
+   "part": "kit",
+   "at": 3.8,
+   "duration": 0.1,
+   "velocity": 0.55,
+   "target": {
+    "piece": "hihat-closed"
+   }
+  },
+  {
+   "id": "kit-22",
+   "part": "kit",
+   "at": 3.8,
+   "duration": 0.1,
+   "velocity": 0.85,
+   "target": {
+    "piece": "kick"
+   }
+  },
+  {
+   "id": "kit-23",
+   "part": "kit",
+   "at": 4.1,
+   "duration": 0.1,
+   "velocity": 0.35,
+   "target": {
+    "piece": "hihat-closed"
+   }
+  },
+  {
+   "id": "kit-24",
+   "part": "kit",
+   "at": 4.1,
+   "duration": 0.1,
+   "velocity": 0.85,
+   "target": {
+    "piece": "kick"
+   }
+  },
+  {
+   "id": "kit-25",
+   "part": "kit",
+   "at": 4.4,
+   "duration": 0.1,
+   "velocity": 0.55,
+   "target": {
+    "piece": "hihat-closed"
+   }
+  },
+  {
+   "id": "kit-26",
+   "part": "kit",
+   "at": 4.4,
+   "duration": 0.1,
+   "velocity": 0.75,
+   "target": {
+    "piece": "snare"
+   }
+  },
+  {
+   "id": "kit-27",
+   "part": "kit",
+   "at": 4.7,
+   "duration": 0.1,
+   "velocity": 0.35,
+   "target": {
+    "piece": "hihat-closed"
+   }
+  },
+  {
+   "id": "kit-28",
+   "part": "kit",
+   "at": 5,
+   "duration": 0.1,
+   "velocity": 0.55,
+   "target": {
+    "piece": "hihat-closed"
+   }
+  },
+  {
+   "id": "kit-29",
+   "part": "kit",
+   "at": 5,
+   "duration": 0.1,
+   "velocity": 0.85,
+   "target": {
+    "piece": "kick"
+   }
+  },
+  {
+   "id": "kit-30",
+   "part": "kit",
+   "at": 5.3,
+   "duration": 0.1,
+   "velocity": 0.35,
+   "target": {
+    "piece": "hihat-closed"
+   }
+  },
+  {
+   "id": "kit-31",
+   "part": "kit",
+   "at": 5.6,
+   "duration": 0.1,
+   "velocity": 0.55,
+   "target": {
+    "piece": "hihat-closed"
+   }
+  },
+  {
+   "id": "kit-32",
+   "part": "kit",
+   "at": 5.6,
+   "duration": 0.1,
+   "velocity": 0.75,
+   "target": {
+    "piece": "snare"
+   }
+  },
+  {
+   "id": "kit-33",
+   "part": "kit",
+   "at": 5.9,
+   "duration": 0.1,
+   "velocity": 0.35,
+   "target": {
+    "piece": "hihat-closed"
+   }
+  },
+  {
+   "id": "kit-34",
+   "part": "kit",
+   "at": 6.2,
+   "duration": 0.1,
+   "velocity": 0.55,
+   "target": {
+    "piece": "hihat-closed"
+   }
+  },
+  {
+   "id": "kit-35",
+   "part": "kit",
+   "at": 6.2,
+   "duration": 0.1,
+   "velocity": 0.85,
+   "target": {
+    "piece": "kick"
+   }
+  },
+  {
+   "id": "kit-36",
+   "part": "kit",
+   "at": 6.5,
+   "duration": 0.1,
+   "velocity": 0.35,
+   "target": {
+    "piece": "hihat-closed"
+   }
+  },
+  {
+   "id": "kit-37",
+   "part": "kit",
+   "at": 6.8,
+   "duration": 0.1,
+   "velocity": 0.6,
+   "target": {
+    "piece": "hihat-open"
+   }
+  },
+  {
+   "id": "kit-38",
+   "part": "kit",
+   "at": 6.8,
+   "duration": 0.1,
+   "velocity": 0.75,
+   "target": {
+    "piece": "snare"
+   }
+  },
+  {
+   "id": "kit-39",
+   "part": "kit",
+   "at": 7.1,
+   "duration": 0.1,
+   "velocity": 0.55,
+   "target": {
+    "piece": "hihat-pedal"
+   }
+  },
+  {
+   "id": "kit-40",
+   "part": "kit",
+   "at": 7.4,
+   "duration": 0.1,
+   "velocity": 0.75,
+   "target": {
+    "piece": "snare"
+   }
+  },
+  {
+   "id": "kit-41",
+   "part": "kit",
+   "at": 7.7,
+   "duration": 0.1,
+   "velocity": 0.75,
+   "target": {
+    "piece": "snare"
+   }
+  },
+  {
+   "id": "kit-42",
+   "part": "kit",
+   "at": 8,
+   "duration": 0.1,
+   "velocity": 0.75,
+   "target": {
+    "piece": "tom-high"
+   }
+  },
+  {
+   "id": "kit-43",
+   "part": "kit",
+   "at": 8.3,
+   "duration": 0.1,
+   "velocity": 0.75,
+   "target": {
+    "piece": "tom-high"
+   }
+  },
+  {
+   "id": "kit-44",
+   "part": "kit",
+   "at": 8.6,
+   "duration": 0.1,
+   "velocity": 0.75,
+   "target": {
+    "piece": "tom-mid"
+   }
+  },
+  {
+   "id": "kit-45",
+   "part": "kit",
+   "at": 8.9,
+   "duration": 0.1,
+   "velocity": 0.75,
+   "target": {
+    "piece": "tom-mid"
+   }
+  },
+  {
+   "id": "kit-46",
+   "part": "kit",
+   "at": 9.2,
+   "duration": 0.1,
+   "velocity": 0.75,
+   "target": {
+    "piece": "tom-low"
+   }
+  },
+  {
+   "id": "kit-47",
+   "part": "kit",
+   "at": 9.5,
+   "duration": 0.1,
+   "velocity": 0.75,
+   "target": {
+    "piece": "tom-low"
+   }
+  },
+  {
+   "id": "kit-48",
+   "part": "kit",
+   "at": 9.8,
+   "duration": 0.1,
+   "velocity": 0.8,
+   "target": {
+    "piece": "crash"
+   }
+  },
+  {
+   "id": "kit-49",
+   "part": "kit",
+   "at": 9.8,
+   "duration": 0.1,
+   "velocity": 0.85,
+   "target": {
+    "piece": "kick"
+   }
+  }
+ ],
+ "controls": [
+  {
+   "id": "tempo",
+   "at": 0,
+   "type": "tempo",
+   "bpm": 100
+  }
+ ],
+ "render": {
+  "rate": 48000,
+  "seconds": 12.9
+ },
+ "expect": [
+  {
+   "kind": "noDiagnostics",
+   "severity": "warning"
+  },
+  {
+   "kind": "peakBelow",
+   "dbfs": -0.5
+  },
+  {
+   "kind": "partActive",
+   "part": "kit",
+   "aboveDb": -40
+  },
+  {
+   "kind": "choked",
+   "note": "kit-37",
+   "by": "kit-39",
+   "seconds": 0.03,
+   "belowDb": -40
+  }
+ ]
+}

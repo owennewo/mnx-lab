@@ -1,0 +1,2147 @@
+{
+  "name": "Guitar linear pickup prototype",
+  "filename": "instrument-stage6.dsp",
+  "version": "2.81.10",
+  "compile_options": "-lang wasm -ct 1 -cn GuitarDSP -es 1 -mcd 16 -mdd 1024 -mdy 33 -single -ftz 2",
+  "size": 643224,
+  "inputs": 6,
+  "outputs": 9,
+  "meta": [
+    {
+      "basics.lib/name": "Faust Basic Element Library"
+    },
+    {
+      "basics.lib/sAndH:author": "Romain Michon"
+    },
+    {
+      "basics.lib/version": "1.22.0"
+    },
+    {
+      "compile_options": "-lang wasm -ct 1 -cn GuitarDSP -es 1 -mcd 16 -mdd 1024 -mdy 33 -single -ftz 2"
+    },
+    {
+      "delays.lib/fdelay4:author": "Julius O. Smith III"
+    },
+    {
+      "delays.lib/fdelayltv:author": "Julius O. Smith III"
+    },
+    {
+      "delays.lib/name": "Faust Delay Library"
+    },
+    {
+      "delays.lib/version": "1.2.0"
+    },
+    {
+      "envelopes.lib/ar:author": "Yann Orlarey, Stéphane Letz"
+    },
+    {
+      "envelopes.lib/author": "GRAME"
+    },
+    {
+      "envelopes.lib/copyright": "GRAME"
+    },
+    {
+      "envelopes.lib/license": "LGPL with exception"
+    },
+    {
+      "envelopes.lib/name": "Faust Envelope Library"
+    },
+    {
+      "envelopes.lib/version": "1.3.0"
+    },
+    {
+      "filename": "instrument-stage6.dsp"
+    },
+    {
+      "filters.lib/fir:author": "Julius O. Smith III"
+    },
+    {
+      "filters.lib/fir:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+    },
+    {
+      "filters.lib/fir:license": "MIT-style STK-4.3 license"
+    },
+    {
+      "filters.lib/highpass:author": "Julius O. Smith III"
+    },
+    {
+      "filters.lib/highpass:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+    },
+    {
+      "filters.lib/iir:author": "Julius O. Smith III"
+    },
+    {
+      "filters.lib/iir:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+    },
+    {
+      "filters.lib/iir:license": "MIT-style STK-4.3 license"
+    },
+    {
+      "filters.lib/lowpass0_highpass1": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+    },
+    {
+      "filters.lib/lowpass0_highpass1:author": "Julius O. Smith III"
+    },
+    {
+      "filters.lib/lowpass:author": "Julius O. Smith III"
+    },
+    {
+      "filters.lib/lowpass:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+    },
+    {
+      "filters.lib/lowpass:license": "MIT-style STK-4.3 license"
+    },
+    {
+      "filters.lib/name": "Faust Filters Library"
+    },
+    {
+      "filters.lib/pole:author": "Julius O. Smith III"
+    },
+    {
+      "filters.lib/pole:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+    },
+    {
+      "filters.lib/pole:license": "MIT-style STK-4.3 license"
+    },
+    {
+      "filters.lib/tf1:author": "Julius O. Smith III"
+    },
+    {
+      "filters.lib/tf1:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+    },
+    {
+      "filters.lib/tf1:license": "MIT-style STK-4.3 license"
+    },
+    {
+      "filters.lib/tf2:author": "Julius O. Smith III"
+    },
+    {
+      "filters.lib/tf2:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+    },
+    {
+      "filters.lib/tf2:license": "MIT-style STK-4.3 license"
+    },
+    {
+      "filters.lib/tf2s:author": "Julius O. Smith III"
+    },
+    {
+      "filters.lib/tf2s:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+    },
+    {
+      "filters.lib/tf2s:license": "MIT-style STK-4.3 license"
+    },
+    {
+      "filters.lib/version": "1.7.1"
+    },
+    {
+      "guitar.dsp/author": "Guitar Faust project"
+    },
+    {
+      "guitar.dsp/name": "Guitar laboratory"
+    },
+    {
+      "instrument-pickups.dsp/name": "Dual pickup observation prototype"
+    },
+    {
+      "instrument-stage1.dsp/name": "Guitar construction prototype"
+    },
+    {
+      "instrument-stage2.dsp/name": "Guitar two-component motion prototype"
+    },
+    {
+      "instrument-stage3.dsp/name": "Guitar contact and release prototype"
+    },
+    {
+      "instrument-stage4.dsp/name": "Guitar radiation family prototype"
+    },
+    {
+      "instrument-stage5.dsp/name": "Guitar passive bridge prototype"
+    },
+    {
+      "maths.lib/author": "GRAME"
+    },
+    {
+      "maths.lib/copyright": "GRAME"
+    },
+    {
+      "maths.lib/license": "LGPL with exception"
+    },
+    {
+      "maths.lib/name": "Faust Math Library"
+    },
+    {
+      "maths.lib/version": "2.9.0"
+    },
+    {
+      "name": "Guitar linear pickup prototype"
+    },
+    {
+      "platform.lib/name": "Generic Platform Library"
+    },
+    {
+      "platform.lib/version": "1.3.0"
+    },
+    {
+      "signals.lib/name": "Faust Signal Routing Library"
+    },
+    {
+      "signals.lib/version": "1.6.0"
+    }
+  ],
+  "ui": [
+    {
+      "type": "vgroup",
+      "label": "Guitar linear pickup prototype",
+      "items": [
+        {
+          "type": "hslider",
+          "label": "attack_amount",
+          "varname": "fHslider26",
+          "shortname": "attack_amount",
+          "address": "/Guitar_linear_pickup_prototype/attack_amount",
+          "index": 284,
+          "init": 0.65,
+          "min": 0,
+          "max": 1,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "attack_string",
+          "varname": "fHslider25",
+          "shortname": "attack_string",
+          "address": "/Guitar_linear_pickup_prototype/attack_string",
+          "index": 268,
+          "init": -1,
+          "min": -1,
+          "max": 5,
+          "step": 1
+        },
+        {
+          "type": "hslider",
+          "label": "attack_trial",
+          "varname": "fHslider24",
+          "shortname": "attack_trial",
+          "address": "/Guitar_linear_pickup_prototype/attack_trial",
+          "index": 252,
+          "init": 0,
+          "min": 0,
+          "max": 3,
+          "step": 1
+        },
+        {
+          "type": "hslider",
+          "label": "beating_cents",
+          "varname": "fHslider11",
+          "shortname": "beating_cents",
+          "address": "/Guitar_linear_pickup_prototype/beating_cents",
+          "index": 136,
+          "init": 1.2,
+          "min": 0,
+          "max": 12,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "body_breadth",
+          "varname": "fHslider4",
+          "shortname": "body_breadth",
+          "address": "/Guitar_linear_pickup_prototype/body_breadth",
+          "index": 80,
+          "init": 1,
+          "min": 0.5,
+          "max": 3,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "body_damping",
+          "varname": "fHslider5",
+          "shortname": "body_damping",
+          "address": "/Guitar_linear_pickup_prototype/body_damping",
+          "index": 84,
+          "init": 1,
+          "min": 0.25,
+          "max": 4,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "body_low_weight",
+          "varname": "fHslider121",
+          "shortname": "body_low_weight",
+          "address": "/Guitar_linear_pickup_prototype/body_low_weight",
+          "index": 642708,
+          "init": 1,
+          "min": 0,
+          "max": 2,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "body_mix",
+          "varname": "fHslider0",
+          "shortname": "body_mix",
+          "address": "/Guitar_linear_pickup_prototype/body_mix",
+          "index": 56,
+          "init": 0.6,
+          "min": 0,
+          "max": 1,
+          "step": 0.01
+        },
+        {
+          "type": "hslider",
+          "label": "body_size",
+          "varname": "fHslider1",
+          "shortname": "body_size",
+          "address": "/Guitar_linear_pickup_prototype/body_size",
+          "index": 64,
+          "init": 1,
+          "min": 0.6,
+          "max": 1.8,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "bridge_rolloff",
+          "varname": "fHslider49",
+          "shortname": "bridge_rolloff",
+          "address": "/Guitar_linear_pickup_prototype/bridge_rolloff",
+          "index": 33444,
+          "init": 250,
+          "min": 20,
+          "max": 4000,
+          "step": 0.1
+        },
+        {
+          "type": "hslider",
+          "label": "bridge_transfer",
+          "varname": "fHslider48",
+          "shortname": "bridge_transfer",
+          "address": "/Guitar_linear_pickup_prototype/bridge_transfer",
+          "index": 33440,
+          "init": 0.035,
+          "min": 0,
+          "max": 0.3,
+          "step": 0.0001
+        },
+        {
+          "type": "hslider",
+          "label": "brightness",
+          "varname": "fHslider16",
+          "shortname": "brightness",
+          "address": "/Guitar_linear_pickup_prototype/brightness",
+          "index": 164,
+          "init": 0.65,
+          "min": 0,
+          "max": 1,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "contact_width",
+          "varname": "fHslider32",
+          "shortname": "contact_width",
+          "address": "/Guitar_linear_pickup_prototype/contact_width",
+          "index": 400,
+          "init": 0.025,
+          "min": 0,
+          "max": 0.2,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "decay",
+          "varname": "fHslider21",
+          "shortname": "decay",
+          "address": "/Guitar_linear_pickup_prototype/decay",
+          "index": 188,
+          "init": 4,
+          "min": 0.05,
+          "max": 60,
+          "step": 0.01
+        },
+        {
+          "type": "hslider",
+          "label": "dispersion",
+          "varname": "fHslider52",
+          "shortname": "dispersion",
+          "address": "/Guitar_linear_pickup_prototype/dispersion",
+          "index": 33480,
+          "init": 0.12,
+          "min": 0.001,
+          "max": 0.65,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "electric",
+          "varname": "fHslider6",
+          "shortname": "electric",
+          "address": "/Guitar_linear_pickup_prototype/electric",
+          "index": 92,
+          "init": 0,
+          "min": 0,
+          "max": 1,
+          "step": 0.01
+        },
+        {
+          "type": "hslider",
+          "label": "initial_damping",
+          "varname": "fHslider13",
+          "shortname": "initial_damping",
+          "address": "/Guitar_linear_pickup_prototype/initial_damping",
+          "index": 144,
+          "init": 0,
+          "min": 0,
+          "max": 1,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "initial_damping_time",
+          "varname": "fHslider9",
+          "shortname": "initial_damping_time",
+          "address": "/Guitar_linear_pickup_prototype/initial_damping_time",
+          "index": 124,
+          "init": 0.12,
+          "min": 0.01,
+          "max": 0.5,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "m0-freq",
+          "varname": "fHslider118",
+          "shortname": "m0_freq",
+          "address": "/Guitar_linear_pickup_prototype/m0-freq",
+          "index": 642600,
+          "init": 200,
+          "min": 50,
+          "max": 8000,
+          "step": 0.1
+        },
+        {
+          "type": "hslider",
+          "label": "m0-gain",
+          "varname": "fHslider120",
+          "shortname": "m0_gain",
+          "address": "/Guitar_linear_pickup_prototype/m0-gain",
+          "index": 642632,
+          "init": 0.5,
+          "min": 0,
+          "max": 8,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "m0-t60",
+          "varname": "fHslider119",
+          "shortname": "m0_t60",
+          "address": "/Guitar_linear_pickup_prototype/m0-t60",
+          "index": 642604,
+          "init": 0.12,
+          "min": 0.005,
+          "max": 4,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "m1-freq",
+          "varname": "fHslider115",
+          "shortname": "m1_freq",
+          "address": "/Guitar_linear_pickup_prototype/m1-freq",
+          "index": 642564,
+          "init": 200,
+          "min": 50,
+          "max": 8000,
+          "step": 0.1
+        },
+        {
+          "type": "hslider",
+          "label": "m1-gain",
+          "varname": "fHslider117",
+          "shortname": "m1_gain",
+          "address": "/Guitar_linear_pickup_prototype/m1-gain",
+          "index": 642596,
+          "init": 0.5,
+          "min": 0,
+          "max": 8,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "m1-t60",
+          "varname": "fHslider116",
+          "shortname": "m1_t60",
+          "address": "/Guitar_linear_pickup_prototype/m1-t60",
+          "index": 642568,
+          "init": 0.12,
+          "min": 0.005,
+          "max": 4,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "m10-freq",
+          "varname": "fHslider140",
+          "shortname": "m10_freq",
+          "address": "/Guitar_linear_pickup_prototype/m10-freq",
+          "index": 643072,
+          "init": 200,
+          "min": 50,
+          "max": 8000,
+          "step": 0.1
+        },
+        {
+          "type": "hslider",
+          "label": "m10-gain",
+          "varname": "fHslider142",
+          "shortname": "m10_gain",
+          "address": "/Guitar_linear_pickup_prototype/m10-gain",
+          "index": 643128,
+          "init": 0.5,
+          "min": 0,
+          "max": 8,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "m10-t60",
+          "varname": "fHslider141",
+          "shortname": "m10_t60",
+          "address": "/Guitar_linear_pickup_prototype/m10-t60",
+          "index": 643076,
+          "init": 0.12,
+          "min": 0.005,
+          "max": 4,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "m11-freq",
+          "varname": "fHslider143",
+          "shortname": "m11_freq",
+          "address": "/Guitar_linear_pickup_prototype/m11-freq",
+          "index": 643132,
+          "init": 200,
+          "min": 50,
+          "max": 8000,
+          "step": 0.1
+        },
+        {
+          "type": "hslider",
+          "label": "m11-gain",
+          "varname": "fHslider145",
+          "shortname": "m11_gain",
+          "address": "/Guitar_linear_pickup_prototype/m11-gain",
+          "index": 643188,
+          "init": 0.5,
+          "min": 0,
+          "max": 8,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "m11-t60",
+          "varname": "fHslider144",
+          "shortname": "m11_t60",
+          "address": "/Guitar_linear_pickup_prototype/m11-t60",
+          "index": 643136,
+          "init": 0.12,
+          "min": 0.005,
+          "max": 4,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "m2-freq",
+          "varname": "fHslider112",
+          "shortname": "m2_freq",
+          "address": "/Guitar_linear_pickup_prototype/m2-freq",
+          "index": 642528,
+          "init": 200,
+          "min": 50,
+          "max": 8000,
+          "step": 0.1
+        },
+        {
+          "type": "hslider",
+          "label": "m2-gain",
+          "varname": "fHslider114",
+          "shortname": "m2_gain",
+          "address": "/Guitar_linear_pickup_prototype/m2-gain",
+          "index": 642560,
+          "init": 0.5,
+          "min": 0,
+          "max": 8,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "m2-t60",
+          "varname": "fHslider113",
+          "shortname": "m2_t60",
+          "address": "/Guitar_linear_pickup_prototype/m2-t60",
+          "index": 642532,
+          "init": 0.12,
+          "min": 0.005,
+          "max": 4,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "m3-freq",
+          "varname": "fHslider2",
+          "shortname": "m3_freq",
+          "address": "/Guitar_linear_pickup_prototype/m3-freq",
+          "index": 68,
+          "init": 200,
+          "min": 50,
+          "max": 8000,
+          "step": 0.1
+        },
+        {
+          "type": "hslider",
+          "label": "m3-gain",
+          "varname": "fHslider111",
+          "shortname": "m3_gain",
+          "address": "/Guitar_linear_pickup_prototype/m3-gain",
+          "index": 642524,
+          "init": 0.5,
+          "min": 0,
+          "max": 8,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "m3-t60",
+          "varname": "fHslider3",
+          "shortname": "m3_t60",
+          "address": "/Guitar_linear_pickup_prototype/m3-t60",
+          "index": 76,
+          "init": 0.12,
+          "min": 0.005,
+          "max": 4,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "m4-freq",
+          "varname": "fHslider122",
+          "shortname": "m4_freq",
+          "address": "/Guitar_linear_pickup_prototype/m4-freq",
+          "index": 642712,
+          "init": 200,
+          "min": 50,
+          "max": 8000,
+          "step": 0.1
+        },
+        {
+          "type": "hslider",
+          "label": "m4-gain",
+          "varname": "fHslider124",
+          "shortname": "m4_gain",
+          "address": "/Guitar_linear_pickup_prototype/m4-gain",
+          "index": 642768,
+          "init": 0.5,
+          "min": 0,
+          "max": 8,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "m4-t60",
+          "varname": "fHslider123",
+          "shortname": "m4_t60",
+          "address": "/Guitar_linear_pickup_prototype/m4-t60",
+          "index": 642716,
+          "init": 0.12,
+          "min": 0.005,
+          "max": 4,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "m5-freq",
+          "varname": "fHslider125",
+          "shortname": "m5_freq",
+          "address": "/Guitar_linear_pickup_prototype/m5-freq",
+          "index": 642772,
+          "init": 200,
+          "min": 50,
+          "max": 8000,
+          "step": 0.1
+        },
+        {
+          "type": "hslider",
+          "label": "m5-gain",
+          "varname": "fHslider127",
+          "shortname": "m5_gain",
+          "address": "/Guitar_linear_pickup_prototype/m5-gain",
+          "index": 642828,
+          "init": 0.5,
+          "min": 0,
+          "max": 8,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "m5-t60",
+          "varname": "fHslider126",
+          "shortname": "m5_t60",
+          "address": "/Guitar_linear_pickup_prototype/m5-t60",
+          "index": 642776,
+          "init": 0.12,
+          "min": 0.005,
+          "max": 4,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "m6-freq",
+          "varname": "fHslider128",
+          "shortname": "m6_freq",
+          "address": "/Guitar_linear_pickup_prototype/m6-freq",
+          "index": 642832,
+          "init": 200,
+          "min": 50,
+          "max": 8000,
+          "step": 0.1
+        },
+        {
+          "type": "hslider",
+          "label": "m6-gain",
+          "varname": "fHslider130",
+          "shortname": "m6_gain",
+          "address": "/Guitar_linear_pickup_prototype/m6-gain",
+          "index": 642888,
+          "init": 0.5,
+          "min": 0,
+          "max": 8,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "m6-t60",
+          "varname": "fHslider129",
+          "shortname": "m6_t60",
+          "address": "/Guitar_linear_pickup_prototype/m6-t60",
+          "index": 642836,
+          "init": 0.12,
+          "min": 0.005,
+          "max": 4,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "m7-freq",
+          "varname": "fHslider131",
+          "shortname": "m7_freq",
+          "address": "/Guitar_linear_pickup_prototype/m7-freq",
+          "index": 642892,
+          "init": 200,
+          "min": 50,
+          "max": 8000,
+          "step": 0.1
+        },
+        {
+          "type": "hslider",
+          "label": "m7-gain",
+          "varname": "fHslider133",
+          "shortname": "m7_gain",
+          "address": "/Guitar_linear_pickup_prototype/m7-gain",
+          "index": 642948,
+          "init": 0.5,
+          "min": 0,
+          "max": 8,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "m7-t60",
+          "varname": "fHslider132",
+          "shortname": "m7_t60",
+          "address": "/Guitar_linear_pickup_prototype/m7-t60",
+          "index": 642896,
+          "init": 0.12,
+          "min": 0.005,
+          "max": 4,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "m8-freq",
+          "varname": "fHslider134",
+          "shortname": "m8_freq",
+          "address": "/Guitar_linear_pickup_prototype/m8-freq",
+          "index": 642952,
+          "init": 200,
+          "min": 50,
+          "max": 8000,
+          "step": 0.1
+        },
+        {
+          "type": "hslider",
+          "label": "m8-gain",
+          "varname": "fHslider136",
+          "shortname": "m8_gain",
+          "address": "/Guitar_linear_pickup_prototype/m8-gain",
+          "index": 643008,
+          "init": 0.5,
+          "min": 0,
+          "max": 8,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "m8-t60",
+          "varname": "fHslider135",
+          "shortname": "m8_t60",
+          "address": "/Guitar_linear_pickup_prototype/m8-t60",
+          "index": 642956,
+          "init": 0.12,
+          "min": 0.005,
+          "max": 4,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "m9-freq",
+          "varname": "fHslider137",
+          "shortname": "m9_freq",
+          "address": "/Guitar_linear_pickup_prototype/m9-freq",
+          "index": 643012,
+          "init": 200,
+          "min": 50,
+          "max": 8000,
+          "step": 0.1
+        },
+        {
+          "type": "hslider",
+          "label": "m9-gain",
+          "varname": "fHslider139",
+          "shortname": "m9_gain",
+          "address": "/Guitar_linear_pickup_prototype/m9-gain",
+          "index": 643068,
+          "init": 0.5,
+          "min": 0,
+          "max": 8,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "m9-t60",
+          "varname": "fHslider138",
+          "shortname": "m9_t60",
+          "address": "/Guitar_linear_pickup_prototype/m9-t60",
+          "index": 643016,
+          "init": 0.12,
+          "min": 0.005,
+          "max": 4,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "motion_exchange",
+          "varname": "fHslider50",
+          "shortname": "motion_exchange",
+          "address": "/Guitar_linear_pickup_prototype/motion_exchange",
+          "index": 33456,
+          "init": 0.0008,
+          "min": 0,
+          "max": 0.03,
+          "step": 0.00001
+        },
+        {
+          "type": "hslider",
+          "label": "motion_loss_ratio",
+          "varname": "fHslider53",
+          "shortname": "motion_loss_ratio",
+          "address": "/Guitar_linear_pickup_prototype/motion_loss_ratio",
+          "index": 66276,
+          "init": 0.7,
+          "min": 0.35,
+          "max": 1.5,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "pick_texture",
+          "varname": "fHslider35",
+          "shortname": "pick_texture",
+          "address": "/Guitar_linear_pickup_prototype/pick_texture",
+          "index": 33364,
+          "init": 0.7,
+          "min": 0,
+          "max": 8,
+          "step": 0.01
+        },
+        {
+          "type": "hslider",
+          "label": "pickup",
+          "varname": "fHslider110",
+          "shortname": "pickup",
+          "address": "/Guitar_linear_pickup_prototype/pickup",
+          "index": 601372,
+          "init": 0.18,
+          "min": 0.04,
+          "max": 0.45,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "pickup2",
+          "varname": "fHslider109",
+          "shortname": "pickup2",
+          "address": "/Guitar_linear_pickup_prototype/pickup2",
+          "index": 601364,
+          "init": 0.32,
+          "min": 0.04,
+          "max": 0.45,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "pickup_blend",
+          "varname": "fHslider8",
+          "shortname": "pickup_blend",
+          "address": "/Guitar_linear_pickup_prototype/pickup_blend",
+          "index": 100,
+          "init": 0,
+          "min": 0,
+          "max": 1,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "pickup_width",
+          "varname": "fHslider7",
+          "shortname": "pickup_width",
+          "address": "/Guitar_linear_pickup_prototype/pickup_width",
+          "index": 96,
+          "init": 0,
+          "min": 0,
+          "max": 0.15,
+          "step": 0.0001
+        },
+        {
+          "type": "hslider",
+          "label": "pluck_body",
+          "varname": "fHslider33",
+          "shortname": "pluck_body",
+          "address": "/Guitar_linear_pickup_prototype/pluck_body",
+          "index": 456,
+          "init": 0.3,
+          "min": 0,
+          "max": 4,
+          "step": 0.01
+        },
+        {
+          "type": "hslider",
+          "label": "pluck_release_time",
+          "varname": "fHslider30",
+          "shortname": "pluck_release_time",
+          "address": "/Guitar_linear_pickup_prototype/pluck_release_time",
+          "index": 320,
+          "init": 0.0004,
+          "min": 0.00003,
+          "max": 0.02,
+          "step": 0.00001
+        },
+        {
+          "type": "hslider",
+          "label": "release",
+          "varname": "fHslider22",
+          "shortname": "release",
+          "address": "/Guitar_linear_pickup_prototype/release",
+          "index": 192,
+          "init": 0.08,
+          "min": 0.015,
+          "max": 0.5,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s0-beating_scale",
+          "varname": "fHslider10",
+          "shortname": "s0_beating_scale",
+          "address": "/Guitar_linear_pickup_prototype/s0-beating_scale",
+          "index": 132,
+          "init": 0.65,
+          "min": 0,
+          "max": 1.5,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s0-decay_scale",
+          "varname": "fHslider20",
+          "shortname": "s0_decay_scale",
+          "address": "/Guitar_linear_pickup_prototype/s0-decay_scale",
+          "index": 184,
+          "init": 1,
+          "min": 0.4,
+          "max": 1.6,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s0-excite",
+          "varname": "fHslider23",
+          "shortname": "s0_excite",
+          "address": "/Guitar_linear_pickup_prototype/s0-excite",
+          "index": 224,
+          "init": 1,
+          "min": 0,
+          "max": 1,
+          "step": 1
+        },
+        {
+          "type": "hslider",
+          "label": "s0-free_ringing",
+          "varname": "fHslider14",
+          "shortname": "s0_free_ringing",
+          "address": "/Guitar_linear_pickup_prototype/s0-free_ringing",
+          "index": 152,
+          "init": 1,
+          "min": 0,
+          "max": 1,
+          "step": 1
+        },
+        {
+          "type": "hslider",
+          "label": "s0-frequency",
+          "varname": "fHslider12",
+          "shortname": "s0_frequency",
+          "address": "/Guitar_linear_pickup_prototype/s0-frequency",
+          "index": 140,
+          "init": 110,
+          "min": 60,
+          "max": 1400,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s0-hardness",
+          "varname": "fHslider28",
+          "shortname": "s0_hardness",
+          "address": "/Guitar_linear_pickup_prototype/s0-hardness",
+          "index": 312,
+          "init": 0.6,
+          "min": 0.025,
+          "max": 40,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s0-loss_profile",
+          "varname": "fHslider17",
+          "shortname": "s0_loss_profile",
+          "address": "/Guitar_linear_pickup_prototype/s0-loss_profile",
+          "index": 168,
+          "init": 0.85,
+          "min": 0.4,
+          "max": 2,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s0-pluck_direction",
+          "varname": "fHslider36",
+          "shortname": "s0_pluck_direction",
+          "address": "/Guitar_linear_pickup_prototype/s0-pluck_direction",
+          "index": 33384,
+          "init": 0.5,
+          "min": 0,
+          "max": 1,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s0-position",
+          "varname": "fHslider31",
+          "shortname": "s0_position",
+          "address": "/Guitar_linear_pickup_prototype/s0-position",
+          "index": 360,
+          "init": 0.2,
+          "min": 0.01,
+          "max": 0.49,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s0-stiffness_scale",
+          "varname": "fHslider51",
+          "shortname": "s0_stiffness_scale",
+          "address": "/Guitar_linear_pickup_prototype/s0-stiffness_scale",
+          "index": 33476,
+          "init": 1,
+          "min": 0.3,
+          "max": 2,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s0-sustain",
+          "varname": "fHslider15",
+          "shortname": "s0_sustain",
+          "address": "/Guitar_linear_pickup_prototype/s0-sustain",
+          "index": 156,
+          "init": 0,
+          "min": 0,
+          "max": 1,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s0-treble_scale",
+          "varname": "fHslider18",
+          "shortname": "s0_treble_scale",
+          "address": "/Guitar_linear_pickup_prototype/s0-treble_scale",
+          "index": 176,
+          "init": 1,
+          "min": 0.4,
+          "max": 1.6,
+          "step": 0.001
+        },
+        {
+          "type": "button",
+          "label": "s0-trigger",
+          "varname": "fButton0",
+          "shortname": "s0_trigger",
+          "address": "/Guitar_linear_pickup_prototype/s0-trigger",
+          "index": 104
+        },
+        {
+          "type": "hslider",
+          "label": "s0-velocity",
+          "varname": "fHslider27",
+          "shortname": "s0_velocity",
+          "address": "/Guitar_linear_pickup_prototype/s0-velocity",
+          "index": 300,
+          "init": 0.7,
+          "min": 0,
+          "max": 1,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s1-beating_scale",
+          "varname": "fHslider54",
+          "shortname": "s1_beating_scale",
+          "address": "/Guitar_linear_pickup_prototype/s1-beating_scale",
+          "index": 99132,
+          "init": 0.72,
+          "min": 0,
+          "max": 1.5,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s1-decay_scale",
+          "varname": "fHslider58",
+          "shortname": "s1_decay_scale",
+          "address": "/Guitar_linear_pickup_prototype/s1-decay_scale",
+          "index": 99148,
+          "init": 1,
+          "min": 0.4,
+          "max": 1.6,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s1-excite",
+          "varname": "fHslider59",
+          "shortname": "s1_excite",
+          "address": "/Guitar_linear_pickup_prototype/s1-excite",
+          "index": 99176,
+          "init": 1,
+          "min": 0,
+          "max": 1,
+          "step": 1
+        },
+        {
+          "type": "hslider",
+          "label": "s1-free_ringing",
+          "varname": "fHslider47",
+          "shortname": "s1_free_ringing",
+          "address": "/Guitar_linear_pickup_prototype/s1-free_ringing",
+          "index": 33436,
+          "init": 1,
+          "min": 0,
+          "max": 1,
+          "step": 1
+        },
+        {
+          "type": "hslider",
+          "label": "s1-frequency",
+          "varname": "fHslider55",
+          "shortname": "s1_frequency",
+          "address": "/Guitar_linear_pickup_prototype/s1-frequency",
+          "index": 99136,
+          "init": 110,
+          "min": 60,
+          "max": 1400,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s1-hardness",
+          "varname": "fHslider61",
+          "shortname": "s1_hardness",
+          "address": "/Guitar_linear_pickup_prototype/s1-hardness",
+          "index": 99240,
+          "init": 0.6,
+          "min": 0.025,
+          "max": 40,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s1-loss_profile",
+          "varname": "fHslider56",
+          "shortname": "s1_loss_profile",
+          "address": "/Guitar_linear_pickup_prototype/s1-loss_profile",
+          "index": 99140,
+          "init": 0.91,
+          "min": 0.4,
+          "max": 2,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s1-pluck_direction",
+          "varname": "fHslider63",
+          "shortname": "s1_pluck_direction",
+          "address": "/Guitar_linear_pickup_prototype/s1-pluck_direction",
+          "index": 132276,
+          "init": 0.5,
+          "min": 0,
+          "max": 1,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s1-position",
+          "varname": "fHslider62",
+          "shortname": "s1_position",
+          "address": "/Guitar_linear_pickup_prototype/s1-position",
+          "index": 99280,
+          "init": 0.2,
+          "min": 0.01,
+          "max": 0.49,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s1-stiffness_scale",
+          "varname": "fHslider64",
+          "shortname": "s1_stiffness_scale",
+          "address": "/Guitar_linear_pickup_prototype/s1-stiffness_scale",
+          "index": 132296,
+          "init": 1,
+          "min": 0.3,
+          "max": 2,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s1-sustain",
+          "varname": "fHslider46",
+          "shortname": "s1_sustain",
+          "address": "/Guitar_linear_pickup_prototype/s1-sustain",
+          "index": 33432,
+          "init": 0,
+          "min": 0,
+          "max": 1,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s1-treble_scale",
+          "varname": "fHslider57",
+          "shortname": "s1_treble_scale",
+          "address": "/Guitar_linear_pickup_prototype/s1-treble_scale",
+          "index": 99144,
+          "init": 1,
+          "min": 0.4,
+          "max": 1.6,
+          "step": 0.001
+        },
+        {
+          "type": "button",
+          "label": "s1-trigger",
+          "varname": "fButton1",
+          "shortname": "s1_trigger",
+          "address": "/Guitar_linear_pickup_prototype/s1-trigger",
+          "index": 99112
+        },
+        {
+          "type": "hslider",
+          "label": "s1-velocity",
+          "varname": "fHslider60",
+          "shortname": "s1_velocity",
+          "address": "/Guitar_linear_pickup_prototype/s1-velocity",
+          "index": 99228,
+          "init": 0.7,
+          "min": 0,
+          "max": 1,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s2-beating_scale",
+          "varname": "fHslider65",
+          "shortname": "s2_beating_scale",
+          "address": "/Guitar_linear_pickup_prototype/s2-beating_scale",
+          "index": 197944,
+          "init": 0.79,
+          "min": 0,
+          "max": 1.5,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s2-decay_scale",
+          "varname": "fHslider69",
+          "shortname": "s2_decay_scale",
+          "address": "/Guitar_linear_pickup_prototype/s2-decay_scale",
+          "index": 197960,
+          "init": 1,
+          "min": 0.4,
+          "max": 1.6,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s2-excite",
+          "varname": "fHslider70",
+          "shortname": "s2_excite",
+          "address": "/Guitar_linear_pickup_prototype/s2-excite",
+          "index": 197988,
+          "init": 1,
+          "min": 0,
+          "max": 1,
+          "step": 1
+        },
+        {
+          "type": "hslider",
+          "label": "s2-free_ringing",
+          "varname": "fHslider45",
+          "shortname": "s2_free_ringing",
+          "address": "/Guitar_linear_pickup_prototype/s2-free_ringing",
+          "index": 33428,
+          "init": 1,
+          "min": 0,
+          "max": 1,
+          "step": 1
+        },
+        {
+          "type": "hslider",
+          "label": "s2-frequency",
+          "varname": "fHslider66",
+          "shortname": "s2_frequency",
+          "address": "/Guitar_linear_pickup_prototype/s2-frequency",
+          "index": 197948,
+          "init": 110,
+          "min": 60,
+          "max": 1400,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s2-hardness",
+          "varname": "fHslider72",
+          "shortname": "s2_hardness",
+          "address": "/Guitar_linear_pickup_prototype/s2-hardness",
+          "index": 198052,
+          "init": 0.6,
+          "min": 0.025,
+          "max": 40,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s2-loss_profile",
+          "varname": "fHslider67",
+          "shortname": "s2_loss_profile",
+          "address": "/Guitar_linear_pickup_prototype/s2-loss_profile",
+          "index": 197952,
+          "init": 0.97,
+          "min": 0.4,
+          "max": 2,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s2-pluck_direction",
+          "varname": "fHslider74",
+          "shortname": "s2_pluck_direction",
+          "address": "/Guitar_linear_pickup_prototype/s2-pluck_direction",
+          "index": 231088,
+          "init": 0.5,
+          "min": 0,
+          "max": 1,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s2-position",
+          "varname": "fHslider73",
+          "shortname": "s2_position",
+          "address": "/Guitar_linear_pickup_prototype/s2-position",
+          "index": 198092,
+          "init": 0.2,
+          "min": 0.01,
+          "max": 0.49,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s2-stiffness_scale",
+          "varname": "fHslider75",
+          "shortname": "s2_stiffness_scale",
+          "address": "/Guitar_linear_pickup_prototype/s2-stiffness_scale",
+          "index": 231108,
+          "init": 1,
+          "min": 0.3,
+          "max": 2,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s2-sustain",
+          "varname": "fHslider44",
+          "shortname": "s2_sustain",
+          "address": "/Guitar_linear_pickup_prototype/s2-sustain",
+          "index": 33424,
+          "init": 0,
+          "min": 0,
+          "max": 1,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s2-treble_scale",
+          "varname": "fHslider68",
+          "shortname": "s2_treble_scale",
+          "address": "/Guitar_linear_pickup_prototype/s2-treble_scale",
+          "index": 197956,
+          "init": 1,
+          "min": 0.4,
+          "max": 1.6,
+          "step": 0.001
+        },
+        {
+          "type": "button",
+          "label": "s2-trigger",
+          "varname": "fButton2",
+          "shortname": "s2_trigger",
+          "address": "/Guitar_linear_pickup_prototype/s2-trigger",
+          "index": 197924
+        },
+        {
+          "type": "hslider",
+          "label": "s2-velocity",
+          "varname": "fHslider71",
+          "shortname": "s2_velocity",
+          "address": "/Guitar_linear_pickup_prototype/s2-velocity",
+          "index": 198040,
+          "init": 0.7,
+          "min": 0,
+          "max": 1,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s3-beating_scale",
+          "varname": "fHslider76",
+          "shortname": "s3_beating_scale",
+          "address": "/Guitar_linear_pickup_prototype/s3-beating_scale",
+          "index": 296756,
+          "init": 0.86,
+          "min": 0,
+          "max": 1.5,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s3-decay_scale",
+          "varname": "fHslider80",
+          "shortname": "s3_decay_scale",
+          "address": "/Guitar_linear_pickup_prototype/s3-decay_scale",
+          "index": 296772,
+          "init": 1,
+          "min": 0.4,
+          "max": 1.6,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s3-excite",
+          "varname": "fHslider81",
+          "shortname": "s3_excite",
+          "address": "/Guitar_linear_pickup_prototype/s3-excite",
+          "index": 296800,
+          "init": 1,
+          "min": 0,
+          "max": 1,
+          "step": 1
+        },
+        {
+          "type": "hslider",
+          "label": "s3-free_ringing",
+          "varname": "fHslider43",
+          "shortname": "s3_free_ringing",
+          "address": "/Guitar_linear_pickup_prototype/s3-free_ringing",
+          "index": 33420,
+          "init": 1,
+          "min": 0,
+          "max": 1,
+          "step": 1
+        },
+        {
+          "type": "hslider",
+          "label": "s3-frequency",
+          "varname": "fHslider77",
+          "shortname": "s3_frequency",
+          "address": "/Guitar_linear_pickup_prototype/s3-frequency",
+          "index": 296760,
+          "init": 110,
+          "min": 60,
+          "max": 1400,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s3-hardness",
+          "varname": "fHslider83",
+          "shortname": "s3_hardness",
+          "address": "/Guitar_linear_pickup_prototype/s3-hardness",
+          "index": 296864,
+          "init": 0.6,
+          "min": 0.025,
+          "max": 40,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s3-loss_profile",
+          "varname": "fHslider78",
+          "shortname": "s3_loss_profile",
+          "address": "/Guitar_linear_pickup_prototype/s3-loss_profile",
+          "index": 296764,
+          "init": 1.03,
+          "min": 0.4,
+          "max": 2,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s3-pluck_direction",
+          "varname": "fHslider85",
+          "shortname": "s3_pluck_direction",
+          "address": "/Guitar_linear_pickup_prototype/s3-pluck_direction",
+          "index": 329900,
+          "init": 0.5,
+          "min": 0,
+          "max": 1,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s3-position",
+          "varname": "fHslider84",
+          "shortname": "s3_position",
+          "address": "/Guitar_linear_pickup_prototype/s3-position",
+          "index": 296904,
+          "init": 0.2,
+          "min": 0.01,
+          "max": 0.49,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s3-stiffness_scale",
+          "varname": "fHslider86",
+          "shortname": "s3_stiffness_scale",
+          "address": "/Guitar_linear_pickup_prototype/s3-stiffness_scale",
+          "index": 329920,
+          "init": 1,
+          "min": 0.3,
+          "max": 2,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s3-sustain",
+          "varname": "fHslider42",
+          "shortname": "s3_sustain",
+          "address": "/Guitar_linear_pickup_prototype/s3-sustain",
+          "index": 33416,
+          "init": 0,
+          "min": 0,
+          "max": 1,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s3-treble_scale",
+          "varname": "fHslider79",
+          "shortname": "s3_treble_scale",
+          "address": "/Guitar_linear_pickup_prototype/s3-treble_scale",
+          "index": 296768,
+          "init": 1,
+          "min": 0.4,
+          "max": 1.6,
+          "step": 0.001
+        },
+        {
+          "type": "button",
+          "label": "s3-trigger",
+          "varname": "fButton3",
+          "shortname": "s3_trigger",
+          "address": "/Guitar_linear_pickup_prototype/s3-trigger",
+          "index": 296736
+        },
+        {
+          "type": "hslider",
+          "label": "s3-velocity",
+          "varname": "fHslider82",
+          "shortname": "s3_velocity",
+          "address": "/Guitar_linear_pickup_prototype/s3-velocity",
+          "index": 296852,
+          "init": 0.7,
+          "min": 0,
+          "max": 1,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s4-beating_scale",
+          "varname": "fHslider87",
+          "shortname": "s4_beating_scale",
+          "address": "/Guitar_linear_pickup_prototype/s4-beating_scale",
+          "index": 395568,
+          "init": 0.93,
+          "min": 0,
+          "max": 1.5,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s4-decay_scale",
+          "varname": "fHslider91",
+          "shortname": "s4_decay_scale",
+          "address": "/Guitar_linear_pickup_prototype/s4-decay_scale",
+          "index": 395584,
+          "init": 1,
+          "min": 0.4,
+          "max": 1.6,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s4-excite",
+          "varname": "fHslider92",
+          "shortname": "s4_excite",
+          "address": "/Guitar_linear_pickup_prototype/s4-excite",
+          "index": 395612,
+          "init": 1,
+          "min": 0,
+          "max": 1,
+          "step": 1
+        },
+        {
+          "type": "hslider",
+          "label": "s4-free_ringing",
+          "varname": "fHslider41",
+          "shortname": "s4_free_ringing",
+          "address": "/Guitar_linear_pickup_prototype/s4-free_ringing",
+          "index": 33412,
+          "init": 1,
+          "min": 0,
+          "max": 1,
+          "step": 1
+        },
+        {
+          "type": "hslider",
+          "label": "s4-frequency",
+          "varname": "fHslider88",
+          "shortname": "s4_frequency",
+          "address": "/Guitar_linear_pickup_prototype/s4-frequency",
+          "index": 395572,
+          "init": 110,
+          "min": 60,
+          "max": 1400,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s4-hardness",
+          "varname": "fHslider94",
+          "shortname": "s4_hardness",
+          "address": "/Guitar_linear_pickup_prototype/s4-hardness",
+          "index": 395676,
+          "init": 0.6,
+          "min": 0.025,
+          "max": 40,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s4-loss_profile",
+          "varname": "fHslider89",
+          "shortname": "s4_loss_profile",
+          "address": "/Guitar_linear_pickup_prototype/s4-loss_profile",
+          "index": 395576,
+          "init": 1.09,
+          "min": 0.4,
+          "max": 2,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s4-pluck_direction",
+          "varname": "fHslider96",
+          "shortname": "s4_pluck_direction",
+          "address": "/Guitar_linear_pickup_prototype/s4-pluck_direction",
+          "index": 428712,
+          "init": 0.5,
+          "min": 0,
+          "max": 1,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s4-position",
+          "varname": "fHslider95",
+          "shortname": "s4_position",
+          "address": "/Guitar_linear_pickup_prototype/s4-position",
+          "index": 395716,
+          "init": 0.2,
+          "min": 0.01,
+          "max": 0.49,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s4-stiffness_scale",
+          "varname": "fHslider97",
+          "shortname": "s4_stiffness_scale",
+          "address": "/Guitar_linear_pickup_prototype/s4-stiffness_scale",
+          "index": 428732,
+          "init": 1,
+          "min": 0.3,
+          "max": 2,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s4-sustain",
+          "varname": "fHslider40",
+          "shortname": "s4_sustain",
+          "address": "/Guitar_linear_pickup_prototype/s4-sustain",
+          "index": 33408,
+          "init": 0,
+          "min": 0,
+          "max": 1,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s4-treble_scale",
+          "varname": "fHslider90",
+          "shortname": "s4_treble_scale",
+          "address": "/Guitar_linear_pickup_prototype/s4-treble_scale",
+          "index": 395580,
+          "init": 1,
+          "min": 0.4,
+          "max": 1.6,
+          "step": 0.001
+        },
+        {
+          "type": "button",
+          "label": "s4-trigger",
+          "varname": "fButton4",
+          "shortname": "s4_trigger",
+          "address": "/Guitar_linear_pickup_prototype/s4-trigger",
+          "index": 395548
+        },
+        {
+          "type": "hslider",
+          "label": "s4-velocity",
+          "varname": "fHslider93",
+          "shortname": "s4_velocity",
+          "address": "/Guitar_linear_pickup_prototype/s4-velocity",
+          "index": 395664,
+          "init": 0.7,
+          "min": 0,
+          "max": 1,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s5-beating_scale",
+          "varname": "fHslider98",
+          "shortname": "s5_beating_scale",
+          "address": "/Guitar_linear_pickup_prototype/s5-beating_scale",
+          "index": 494380,
+          "init": 1,
+          "min": 0,
+          "max": 1.5,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s5-decay_scale",
+          "varname": "fHslider102",
+          "shortname": "s5_decay_scale",
+          "address": "/Guitar_linear_pickup_prototype/s5-decay_scale",
+          "index": 494396,
+          "init": 1,
+          "min": 0.4,
+          "max": 1.6,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s5-excite",
+          "varname": "fHslider103",
+          "shortname": "s5_excite",
+          "address": "/Guitar_linear_pickup_prototype/s5-excite",
+          "index": 494424,
+          "init": 1,
+          "min": 0,
+          "max": 1,
+          "step": 1
+        },
+        {
+          "type": "hslider",
+          "label": "s5-free_ringing",
+          "varname": "fHslider39",
+          "shortname": "s5_free_ringing",
+          "address": "/Guitar_linear_pickup_prototype/s5-free_ringing",
+          "index": 33404,
+          "init": 1,
+          "min": 0,
+          "max": 1,
+          "step": 1
+        },
+        {
+          "type": "hslider",
+          "label": "s5-frequency",
+          "varname": "fHslider99",
+          "shortname": "s5_frequency",
+          "address": "/Guitar_linear_pickup_prototype/s5-frequency",
+          "index": 494384,
+          "init": 110,
+          "min": 60,
+          "max": 1400,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s5-hardness",
+          "varname": "fHslider105",
+          "shortname": "s5_hardness",
+          "address": "/Guitar_linear_pickup_prototype/s5-hardness",
+          "index": 494488,
+          "init": 0.6,
+          "min": 0.025,
+          "max": 40,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s5-loss_profile",
+          "varname": "fHslider100",
+          "shortname": "s5_loss_profile",
+          "address": "/Guitar_linear_pickup_prototype/s5-loss_profile",
+          "index": 494388,
+          "init": 1.15,
+          "min": 0.4,
+          "max": 2,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s5-pluck_direction",
+          "varname": "fHslider107",
+          "shortname": "s5_pluck_direction",
+          "address": "/Guitar_linear_pickup_prototype/s5-pluck_direction",
+          "index": 527524,
+          "init": 0.5,
+          "min": 0,
+          "max": 1,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s5-position",
+          "varname": "fHslider106",
+          "shortname": "s5_position",
+          "address": "/Guitar_linear_pickup_prototype/s5-position",
+          "index": 494528,
+          "init": 0.2,
+          "min": 0.01,
+          "max": 0.49,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s5-stiffness_scale",
+          "varname": "fHslider108",
+          "shortname": "s5_stiffness_scale",
+          "address": "/Guitar_linear_pickup_prototype/s5-stiffness_scale",
+          "index": 527544,
+          "init": 1,
+          "min": 0.3,
+          "max": 2,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s5-sustain",
+          "varname": "fHslider37",
+          "shortname": "s5_sustain",
+          "address": "/Guitar_linear_pickup_prototype/s5-sustain",
+          "index": 33396,
+          "init": 0,
+          "min": 0,
+          "max": 1,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "s5-treble_scale",
+          "varname": "fHslider101",
+          "shortname": "s5_treble_scale",
+          "address": "/Guitar_linear_pickup_prototype/s5-treble_scale",
+          "index": 494392,
+          "init": 1,
+          "min": 0.4,
+          "max": 1.6,
+          "step": 0.001
+        },
+        {
+          "type": "button",
+          "label": "s5-trigger",
+          "varname": "fButton5",
+          "shortname": "s5_trigger",
+          "address": "/Guitar_linear_pickup_prototype/s5-trigger",
+          "index": 494360
+        },
+        {
+          "type": "hslider",
+          "label": "s5-velocity",
+          "varname": "fHslider104",
+          "shortname": "s5_velocity",
+          "address": "/Guitar_linear_pickup_prototype/s5-velocity",
+          "index": 494476,
+          "init": 0.7,
+          "min": 0,
+          "max": 1,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "sympathetic_response",
+          "varname": "fHslider38",
+          "shortname": "sympathetic_response",
+          "address": "/Guitar_linear_pickup_prototype/sympathetic_response",
+          "index": 33400,
+          "init": 1,
+          "min": 0,
+          "max": 1,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "texture_colour",
+          "varname": "fHslider34",
+          "shortname": "texture_colour",
+          "address": "/Guitar_linear_pickup_prototype/texture_colour",
+          "index": 504,
+          "init": 0.7,
+          "min": 0,
+          "max": 1,
+          "step": 0.001
+        },
+        {
+          "type": "hslider",
+          "label": "treble_decay",
+          "varname": "fHslider19",
+          "shortname": "treble_decay",
+          "address": "/Guitar_linear_pickup_prototype/treble_decay",
+          "index": 180,
+          "init": 1.2,
+          "min": 0.03,
+          "max": 30,
+          "step": 0.01
+        },
+        {
+          "type": "hslider",
+          "label": "velocity_tone",
+          "varname": "fHslider29",
+          "shortname": "velocity_tone",
+          "address": "/Guitar_linear_pickup_prototype/velocity_tone",
+          "index": 316,
+          "init": 0.35,
+          "min": 0,
+          "max": 1,
+          "step": 0.001
+        }
+      ]
+    }
+  ],
+  "sourceSha256": "f3e8e1b703f561fb0ddd2e0662daf6541b06ae240145ace96a6bc95db7dc3022",
+  "candidateWasmSha256": "22cc119bcee9b2c0c49a853cfd51c25cc39577bd108d75b7c88cdf770620377f",
+  "liveThwack": true,
+  "baseSourceSha256": "836d0460056e79273154a4330fadef0836693018a08ab1074900645425e60964",
+  "coefficientCache": {
+    "sourceSha256": "48c1ac0578cf907997f7fc292ffa8d8fd537cb11920681ce2f36ddc8a6e7d6e1",
+    "originalAsset": "web/generated/instrument-v2/raw/guitar.wasm",
+    "originalWasmSha256": "056bc334bd234a046c4185e59edf79e3421561de427b34ea98a88f5e6c71e17e",
+    "candidateWasmSha256": "a25c9c691b5f9850bbc55c51cc0d4eae1fc7ddb18ed46348ad61017cd94742d5",
+    "transformSha256": "59bc3178753cb59a335ab89573ee685b9784851c44cf429e7e761d5540192cd5",
+    "knockGuardSha256": "d2b4bd3db0b398a54d01f5fb8ecb059dc8eb4ce2dad398804a10556e6bb824c3",
+    "knockGuardSites": [
+      {
+        "string": 0,
+        "functionIndex": 8,
+        "start": 35046,
+        "end": 35173,
+        "ageLocal": 1219,
+        "selectorOffset": 232,
+        "trialOffset": 220
+      },
+      {
+        "string": 1,
+        "functionIndex": 8,
+        "start": 38785,
+        "end": 38917,
+        "ageLocal": 1282,
+        "selectorOffset": 99044,
+        "trialOffset": 99036
+      },
+      {
+        "string": 2,
+        "functionIndex": 8,
+        "start": 42150,
+        "end": 42282,
+        "ageLocal": 1335,
+        "selectorOffset": 197736,
+        "trialOffset": 197728
+      },
+      {
+        "string": 3,
+        "functionIndex": 8,
+        "start": 45515,
+        "end": 45647,
+        "ageLocal": 1388,
+        "selectorOffset": 296428,
+        "trialOffset": 296420
+      },
+      {
+        "string": 4,
+        "functionIndex": 8,
+        "start": 48880,
+        "end": 49012,
+        "ageLocal": 1441,
+        "selectorOffset": 395120,
+        "trialOffset": 395112
+      },
+      {
+        "string": 5,
+        "functionIndex": 8,
+        "start": 52245,
+        "end": 52377,
+        "ageLocal": 1494,
+        "selectorOffset": 493812,
+        "trialOffset": 493804
+      }
+    ],
+    "builderSha256": "efa74e9458c691ea371bc9f7b9830dd4fd3940184fdb60377d99cffa7ffb9682",
+    "sites": {
+      "_cosf": 24,
+      "_expf": 20,
+      "_powf": 168,
+      "_tanf": 27
+    },
+    "skippedSampleLoopSites": [
+      {
+        "name": "_expf",
+        "type": 4,
+        "arity": 1,
+        "importIndex": 2,
+        "functionIndex": 8,
+        "offset": 35208,
+        "loopDepth": 1
+      },
+      {
+        "name": "_expf",
+        "type": 4,
+        "arity": 1,
+        "importIndex": 2,
+        "functionIndex": 8,
+        "offset": 39018,
+        "loopDepth": 1
+      },
+      {
+        "name": "_expf",
+        "type": 4,
+        "arity": 1,
+        "importIndex": 2,
+        "functionIndex": 8,
+        "offset": 42449,
+        "loopDepth": 1
+      },
+      {
+        "name": "_expf",
+        "type": 4,
+        "arity": 1,
+        "importIndex": 2,
+        "functionIndex": 8,
+        "offset": 45880,
+        "loopDepth": 1
+      },
+      {
+        "name": "_expf",
+        "type": 4,
+        "arity": 1,
+        "importIndex": 2,
+        "functionIndex": 8,
+        "offset": 49311,
+        "loopDepth": 1
+      },
+      {
+        "name": "_expf",
+        "type": 4,
+        "arity": 1,
+        "importIndex": 2,
+        "functionIndex": 8,
+        "offset": 52742,
+        "loopDepth": 1
+      }
+    ],
+    "addedGlobalCount": 885,
+    "method": "Exact per-site coefficient cache outside loops; six knock waveform branches skip two sin and one exp only when selector or 25ms injection window is zero. Active arithmetic, all DSP state and live body history unchanged. No approximations."
+  },
+  "integratedEngine": {
+    "id": "guitar-lab",
+    "version": "2.0.0",
+    "sourceSha256": "48c1ac0578cf907997f7fc292ffa8d8fd537cb11920681ce2f36ddc8a6e7d6e1"
+  },
+  "librarySha256": {
+    "stdfaust.lib": "536d6270c7925239a0cdd0b6f26addd070ca009e6554e1036d770d61fae1b1a5",
+    "signals.lib": "8b85de979268836be1c989b475c3126ec1953c5558f03c9add20d073acdb5b5f",
+    "filters.lib": "ff5dc252814660c1172e9fa44af8435f35816d62f72db6d4ed793a2f32b8fa9b",
+    "maths.lib": "d9647d09009647e4c727c4621f78979d088e94453b97af58fa3947f5670df6bf",
+    "platform.lib": "e142c1e9643c38c6c7223b005067abd393b007e9966938b6c78f8968a9b8d5a3",
+    "basics.lib": "855d280f983a5d3c3943183c51fd31698b420da9f0d1f8d31561b23338dd3cf3",
+    "envelopes.lib": "587387cb4baeb574a9c845ad5efdbbc7dd05cebaeadb9e1c00e3ea6b3fb805af",
+    "delays.lib": "a2a6dd6ce935566a3285236921f40c22fe6488556fa62b108f9ef4d5f37084aa"
+  }
+}

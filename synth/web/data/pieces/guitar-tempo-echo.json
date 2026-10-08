@@ -1,0 +1,239 @@
+{
+ "contract": "mnx-sound/2",
+ "fixture": {
+  "id": "guitar-tempo-echo",
+  "name": "Guitar – tempo change: the echo follows",
+  "group": "Guitar",
+  "description": "Short notes through a dotted echo: two bars at 80 bpm, then the music speeds up to 120 bpm and the echo’s repeats tighten with it. Tempo travels in the stream."
+ },
+ "setup": {
+  "contract": "mnx-sound/2",
+  "session": {
+   "buses": [
+    {
+     "id": "room",
+     "type": "room",
+     "state": "on",
+     "preset": "Studio",
+     "basePreset": "Studio",
+     "params": {
+      "level": 0.18,
+      "decay": 0.6,
+      "predelay": 8,
+      "damping": 8500,
+      "width": 0.8
+     }
+    }
+   ],
+   "master": {
+    "volumeDb": 0,
+    "ceilingDb": -1
+   }
+  },
+  "parts": [
+   {
+    "id": "guitar",
+    "name": "Guitar",
+    "instrument": {
+     "kind": "plucked",
+     "design": "clear-steel",
+     "layout": {
+      "strings": [
+       {
+        "pitch": 64
+       },
+       {
+        "pitch": 59
+       },
+       {
+        "pitch": 55
+       },
+       {
+        "pitch": 50
+       },
+       {
+        "pitch": 45
+       },
+       {
+        "pitch": 40
+       }
+      ],
+      "capo": 0
+     }
+    },
+    "chain": [
+     {
+      "id": "echo",
+      "type": "echo",
+      "state": "on",
+      "preset": "Dotted echo",
+      "basePreset": "Dotted echo",
+      "params": {
+       "mix": 0.4,
+       "beats": 0.75,
+       "feedback": 0.5,
+       "tone": 5000,
+       "pingPong": true
+      }
+     }
+    ],
+    "strip": {
+     "levelDb": 0,
+     "pan": 0,
+     "mute": false,
+     "solo": false,
+     "sends": {
+      "room": 0.3
+     }
+    }
+   }
+  ]
+ },
+ "notes": [
+  {
+   "id": "guitar-1",
+   "part": "guitar",
+   "at": 0.2,
+   "duration": 0.15,
+   "velocity": 0.75,
+   "target": {
+    "pitch": 69
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 5
+   }
+  },
+  {
+   "id": "guitar-2",
+   "part": "guitar",
+   "at": 1.7,
+   "duration": 0.15,
+   "velocity": 0.75,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 5
+   }
+  },
+  {
+   "id": "guitar-3",
+   "part": "guitar",
+   "at": 3.2,
+   "duration": 0.15,
+   "velocity": 0.75,
+   "target": {
+    "pitch": 69
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 5
+   }
+  },
+  {
+   "id": "guitar-4",
+   "part": "guitar",
+   "at": 4.7,
+   "duration": 0.15,
+   "velocity": 0.75,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 5
+   }
+  },
+  {
+   "id": "guitar-5",
+   "part": "guitar",
+   "at": 6.2,
+   "duration": 0.15,
+   "velocity": 0.75,
+   "target": {
+    "pitch": 69
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 5
+   }
+  },
+  {
+   "id": "guitar-6",
+   "part": "guitar",
+   "at": 7.2,
+   "duration": 0.15,
+   "velocity": 0.75,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 5
+   }
+  },
+  {
+   "id": "guitar-7",
+   "part": "guitar",
+   "at": 8.2,
+   "duration": 0.15,
+   "velocity": 0.75,
+   "target": {
+    "pitch": 69
+   },
+   "fingering": {
+    "string": 1,
+    "fret": 5
+   }
+  },
+  {
+   "id": "guitar-8",
+   "part": "guitar",
+   "at": 9.2,
+   "duration": 0.15,
+   "velocity": 0.75,
+   "target": {
+    "pitch": 64
+   },
+   "fingering": {
+    "string": 2,
+    "fret": 5
+   }
+  }
+ ],
+ "controls": [
+  {
+   "id": "tempo",
+   "at": 0,
+   "type": "tempo",
+   "bpm": 80
+  },
+  {
+   "id": "tempo2",
+   "at": 6.2,
+   "type": "tempo",
+   "bpm": 120
+  }
+ ],
+ "render": {
+  "rate": 48000,
+  "seconds": 12.4
+ },
+ "expect": [
+  {
+   "kind": "noDiagnostics",
+   "severity": "warning"
+  },
+  {
+   "kind": "peakBelow",
+   "dbfs": -0.5
+  },
+  {
+   "kind": "partActive",
+   "part": "guitar",
+   "aboveDb": -40
+  }
+ ]
+}
