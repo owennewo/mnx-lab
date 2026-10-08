@@ -118,7 +118,7 @@ mnx-lab (monorepo; github.com/owennewo/mnx-lab is PUBLIC; deployed at mnx-lab.to
 | Phase | Title | Status | Exit evidence |
 |---|---|---|---|
 | 0 | Readiness and decisions | ☑ Done | this campaign doc (`f9e87a32`); decisions S1–S17 agreed; licence AGPL-3.0-only + commercial |
-| 1 | Move the synth into `mnx-lab/synth/` | ☐ Not started | |
+| 1 | Move the synth into `mnx-lab/synth/` | ☑ Done in worktree `core-synth-move` (lands with Phase 3) | synth suite 119 pass + cost inside mnx-lab; references unchanged; DSP reproduces; full mnx-lab gate green |
 | 2 | The `/synth/` shell: build, CSP, smokes | ☐ Not started | |
 | 3 | Home page, licences and notices; **first landing** | ☐ Not started | |
 | 4 | Contract adoption in the transport | ☐ Not started | |
@@ -163,14 +163,14 @@ start); the licence chosen (S8); this doc landed. The notices work itself is Pha
 
 ## Phase 1 — Move the synth into `mnx-lab/synth/`
 
-- [ ] Copy the moving tree into `synth/` as an npm workspace (`@mnx-lab/synth`, private,
+- [x] Copy the moving tree into `synth/` as an npm workspace (`@mnx-lab/synth`, private,
   version 0.2.0).
   - Paths that assume the repo root become workspace-relative.
   - FAUST staging (`/tmp/guitar-faust-dsp`) keeps a fixed path, so builds still reproduce byte
     for byte.
-- [ ] The synth's suites run inside mnx-lab (`npm -w @mnx-lab/synth test`): reference hashes,
+- [x] The synth's suites run inside mnx-lab (`npm -w @mnx-lab/synth test`): reference hashes,
   app flows from its own server, worklet parity, the cost check.
-- [ ] Root tooling learns the area:
+- [x] Root tooling learns the area:
   - TypeScript and dependency-cruiser treat `synth/` as an external package;
   - the gate maps `synth/**` to the synth's suites (S12);
   - `vitest` excludes it.
@@ -321,4 +321,14 @@ unchanged; nothing landed until S8 allows it.
 - 2026-10-08 — **Phase 0 done.** The lead accepted the recommendations for S12 (the gate), S14
   (archiving guitar-faust) and S16 (no CLA yet; `CONTRIBUTING.md`), and the licence details (S17).
   No commercial-enquiry address will be published: contact goes through GitHub.
+- 2026-10-08 — **Phase 1 done in the worktree `core-synth-move`** (not landed: S8/Phase 3).
+  - **Moved:** guitar-faust's tracked tree at `2a3785e`, without `plans/`, copied into `synth/`. That is 184 files, 2.2 MB; the 566 MB of untracked research data stayed behind.
+  - **Package:** renamed `@mnx-lab/synth` (workspace and built library, tarball `mnx-lab-synth-<v>.tgz`), with `exports` mirroring the library's subpaths onto `web/`. Registered in the root `workspaces`; the lockfile gained only the workspace link.
+  - **Contract document:** `plans/instrument-host-contract.md` moved to `synth/docs/contract.md`, links rewritten. The synth README points here and to guitar-faust for history.
+  - **Gate (S12):** `tools/gate.mjs` has a `synth` area. `synth/**` (except top-level prose) runs `npm -w @mnx-lab/synth run test:gate`, which is the synth suite without its timing-based cost check. Pinned in `gate-plan.test.ts` and documented in `docs/gates.md`. TypeScript, vitest and dependency-cruiser already exclude `synth/`.
+  - **Evidence:**
+    - `npm -w @mnx-lab/synth test`: 119 pass, 1 skip, cost check keys 0.20 and kit 0.10. The reference hashes are unchanged, so the move changed no audio.
+    - `build:v2` reproduces the published Engine2 binary byte for byte from `synth/`; blocks and basic instruments rebuild identically (`diff -r` of `web/generated` against guitar-faust is empty).
+    - The synth's app flows pass, as do worklet = Node and the packaged-library smoke with its browser case.
+    - **mnx-lab's full gate passed:** every root test, the static checks, the build, all 24 smokes, the listening bench and the new synth lane.
 
