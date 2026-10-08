@@ -12,6 +12,7 @@ import { beforeEach, expect, it } from 'vitest';
 import type { Miniflare } from 'miniflare';
 import { libraryBindings, useLibraryRuntime } from '../helpers/libraryRuntime.ts';
 import app from '../../worker/index.ts';
+import { MAX_PIECE_PREFS_BYTES } from '../../worker/api/library.ts';
 import type { Env } from '../../worker/env.ts';
 import { testIdentity } from '../helpers/libraryIdentity.ts';
 import { LibraryClient, LibraryRequestError } from '../../src/storage/libraryClient.ts';
@@ -72,9 +73,11 @@ it('refuses a setup for a piece that is not the owner’s, and one too large to 
   expect(await status(client().savePrefs(piece.piece.id, { source: 'synth' }))).toBe(404);
 
   const big = await make(blank('Big'));
-  expect(await status(client().savePrefs(big.piece.id, { note: 'x'.repeat(9000) }))).toBe(400);
+  expect(await status(client().savePrefs(big.piece.id, { note: 'x'.repeat(MAX_PIECE_PREFS_BYTES) }))).toBe(400);
   expect(await status(client().savePrefs(big.piece.id, ['not', 'an', 'object'] as unknown as Record<string, unknown>))).toBe(400);
   expect((await client().piece(big.piece.id)).snapshot.prefs ?? null).toBe(null);
+  // A mix carrying imported synth rigs (about 4 KB each, core-campaign-synth Phase 6) fits.
+  expect(await status(client().savePrefs(big.piece.id, { note: 'x'.repeat(9000) }))).toBe(200);
 });
 
 it('opens a piece whose stored setup is unreadable, carrying none', async () => {

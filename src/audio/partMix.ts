@@ -18,6 +18,28 @@ export interface PartMixEntry {
   readonly muted?: boolean;
   /** Absent: the player's `voicePreset`. */
   readonly sound?: VoicePreset;
+  /** What the part plays on the synth's instrument host (the `?synth=host` engine; the
+   *  sink ignores it). Absent: the part router's default (src/audio/hostSetup.ts). */
+  readonly instrument?: PartInstrument;
+}
+/**
+ * A part's instrument on the host (core-campaign-synth.md, Phase 6):
+ *  - `design`: a factory design — a guitar design id, `basic-piano` or `basic-kit`;
+ *  - `rig`: a part rig 3.0.0 exported from the synth (`/synth/`, Export part): its
+ *    instrument, chain and strip; the score keeps its strings and capo (D4);
+ *  - `sink`: the old player's sound (`sound`) for this part, beside the host, until the
+ *    sink retires (S6, S21).
+ */
+export type PartInstrument =
+  | { readonly kind: 'design'; readonly design: string }
+  | { readonly kind: 'rig'; readonly rig: PartRig }
+  | { readonly kind: 'sink' };
+/** A rig 3.0.0 holding one part (and the buses it sends to). Its shape is the synth's;
+ *  src/audio/hostInstruments.ts checks it. */
+export interface PartRig {
+  readonly rig: '3.0.0';
+  readonly name: string;
+  readonly setup: { readonly contract: 'mnx-sound/2'; readonly session: object; readonly parts: readonly object[] };
 }
 export type PartMix = Readonly<Record<number, PartMixEntry>>;
 

@@ -12,6 +12,7 @@ import { HtmlAudioPort } from '../audio/native/htmlAudio.ts';
 import { SynthBackend } from '../audio/native/synthBackend.ts';
 import { HostBackend } from '../audio/hostBackend.ts';
 import { NativeHostPort } from '../audio/native/hostPort.ts';
+import { NativeSink } from '../audio/native/sink.ts';
 import { readSynthEngine, type SynthEngine } from './synthEngine.ts';
 import { createRecordingSync } from '../audio/recordingSync.ts';
 import { scorePositionAt } from '../audio/scorePosition.ts';
@@ -644,9 +645,12 @@ export class Player extends LitElement {
     }
     if (this.syncMode && (this.sourceId === 'synth' || !this.syncEditable)) this.setSyncMode(false);
     if (!reinstall && changed.has('partMix') && this.session?.backend instanceof SynthBackend)
-      this.applyPartLevels(this.session.backend);
-    if (!reinstall && changed.has('partMix') && this.session?.backend instanceof HostBackend)
+      this.applyPartLevels(this.session.backend.sink);
+    if (!reinstall && changed.has('partMix') && this.session?.backend instanceof HostBackend) {
       this.session.backend.setPartMix(this.partMix);
+      const legacy = this.session.backend.legacySink;
+      if (legacy instanceof NativeSink) this.applyPartLevels(legacy);
+    }
     const sounds = this.soundSignature();
     const soundsMoved = sounds !== this.lastSounds;
     this.lastSounds = sounds;
@@ -654,6 +658,15 @@ export class Player extends LitElement {
       const resume = this.playback?.wantsPlayback;
       this.pause();
       this.session.backend.sink.setVoicePreset(this.sinkPreset(), this.requiredSamples());
+      this.localError = '';
+      if (resume) void this.play();
+    }
+    // On the host, a part moving to or from the old player's sound, or that sound changing:
+    // playing again unlocks (and so makes, and loads the packs of) the sink beside the host.
+    if (!reinstall && soundsMoved && this.session?.backend instanceof HostBackend) {
+      const resume = this.playback?.wantsPlayback;
+      this.pause();
+      this.session.backend.resetLegacySink();
       this.localError = '';
       if (resume) void this.play();
     }
@@ -734,6 +747,13 @@ export class Player extends LitElement {
   private requiredSamples(): SamplePreset[] {
     return this.performance ? requiredPresets(this.performance, this.partMix, this.voicePreset) : [];
   }
+  /** On the host, only the parts kept on the old player's sound need its sample packs. */
+  private legacySamples(): SamplePreset[] {
+    const performance = this.performance;
+    if (!performance) return [];
+    const voices = performance.voices.filter(v => this.partMix[v.partIndex]?.instrument?.kind === 'sink');
+    return requiredPresets({ ...performance, voices }, this.partMix, this.voicePreset);
+  }
   /** Held while the transport wants playback — a stand's screen must not
    *  sleep mid-song. Driven from publish(), the one place that knows. */
   private readonly wakeLock = screenWakeLock();
@@ -741,11 +761,13 @@ export class Player extends LitElement {
    *  pauses to swap sounds. */
   private lastSounds = '';
   private soundSignature(): string {
-    return JSON.stringify(this.performance?.voices.map((v) => (v.kit ? 'synth' : partSound(this.partMix, v.partIndex, this.voicePreset))) ?? []);
+    // On the host, whether a part is on the old player's sound matters as much as which sound.
+    return JSON.stringify(this.performance?.voices.map((v) => [v.kit ? 'synth' : partSound(this.partMix, v.partIndex, this.voicePreset),
+      this.synthEngine === 'host' && this.partMix[v.partIndex]?.instrument?.kind === 'sink']) ?? []);
   }
-  private applyPartLevels(backend: SynthBackend) {
+  private applyPartLevels(sink: NativeSink) {
     for (const part of new Set(this.performance?.voices.map((v) => v.partIndex)))
-      backend.sink.setBusLevel(String(part), partLevel(this.partMix[part]));
+      sink.setBusLevel(String(part), partLevel(this.partMix[part]));
   }
   private install() {
     this.teardown(); this.localError = '';
@@ -758,7 +780,17 @@ export class Player extends LitElement {
       if (!performance) throw new Error('There is no performance to play.');
       if (id === 'synth' && this.synthEngine === 'host' && this.document) {
         const port = new NativeHostPort({ volume: this.volume, onError: message => { if (revision === this.revision) this.localError = message; } });
-        return new HostBackend(performance, this.document, port, { volume: this.volume, partMix: this.partMix }, event => {
+        const buses = partBuses(performance);
+        // Parts kept on the old player's sound play on a sink into the host's own output.
+        const legacySink = () => {
+          const audio = port.audio;
+          if (!audio) throw new Error('The synth host is not running.');
+          const sink = new NativeSink({ context: audio.context, destination: audio.output, voicePreset: this.sinkPreset(), sampleBase: this.sampleBase,
+            sampleBases: this.sampleBases, samplePresets: this.legacySamples(), sampleLoader: this.sampleLoader, voiceBus: voice => buses.get(voice) });
+          this.applyPartLevels(sink);
+          return sink;
+        };
+        return new HostBackend(performance, this.document, port, { volume: this.volume, partMix: this.partMix, legacySink }, event => {
           if (revision === this.revision && event.kind === 'onset') this.dispatchEvent(new CustomEvent('onset', {
             detail: { ...event, documentId: this.documentId }, bubbles: true, composed: true,
           }));
@@ -775,7 +807,7 @@ export class Player extends LitElement {
             detail: { ...event, documentId: this.documentId }, bubbles: true, composed: true,
           }));
         });
-        this.applyPartLevels(synth);
+        this.applyPartLevels(synth.sink);
         return synth;
       }
       const matches = this.recordings.filter(r => r.id === id);

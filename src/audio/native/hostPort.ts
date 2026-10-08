@@ -6,6 +6,7 @@
  */
 import type { Control, Diagnostic, InstrumentHost, Note, Setup } from '@mnx-lab/synth';
 import type { HostPort } from '../hostBackend.ts';
+import type { FactoryDesign } from '../hostInstruments.ts';
 
 type HostModule = typeof import('@mnx-lab/synth');
 export interface NativeHostPortOptions {
@@ -28,6 +29,10 @@ export class NativeHostPort implements HostPort {
   private disposed = false;
   constructor(private readonly options: NativeHostPortOptions = {}) { this.volume = options.volume ?? 1; }
   now() { return this.context?.currentTime ?? 0; }
+  /** The audio context and the master gain the host plays into, once unlocked. */
+  get audio(): { context: AudioContext; output: GainNode } | undefined {
+    return this.context && this.output ? { context: this.context, output: this.output } : undefined;
+  }
   async unlock() {
     if (this.disposed) throw new Error('The synth host is disposed.');
     // The context is made inside the gesture; loading the host may take longer than one.
@@ -67,4 +72,17 @@ export class NativeHostPort implements HostPort {
     this.output?.disconnect();
     void this.context?.close().catch(() => {});
   }
+}
+
+/** The synth's factory guitar designs, as its shell serves them; Clear steel alone if that fails. */
+export async function loadFactoryDesigns(base = '/synth/'): Promise<FactoryDesign[]> {
+  try {
+    const response = await fetch(new URL(`${base}data/instrument-v2/presets.json`, location.href));
+    if (!response.ok) throw new Error(String(response.status));
+    const presets = await response.json() as { id?: unknown; name?: unknown; family?: unknown }[];
+    const designs = presets.filter(p => typeof p.id === 'string' && typeof p.name === 'string')
+      .map(p => ({ id: p.id as string, name: p.name as string, ...(typeof p.family === 'string' ? { family: p.family } : {}) }));
+    if (designs.length) return designs;
+  } catch { /* the default stands in */ }
+  return [{ id: 'clear-steel', name: 'Clear steel' }];
 }

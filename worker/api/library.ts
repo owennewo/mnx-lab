@@ -11,8 +11,9 @@ export const INGEST_OWNER = 'operator';
 export const MAX_INGEST_BYTES = 24 * 1024 * 1024;
 /** A score Studio wrote: a GP7 container is tens of KB, and it travels as base64 inside a JSON write. */
 export const MAX_STUDIO_SCORE_BYTES = 1024 * 1024;
-/** One piece's preferences: a source id and a mix of a handful of parts. Room to spare, and a bound. */
-export const MAX_PIECE_PREFS_BYTES = 8 * 1024;
+/** One piece's preferences: a source id and a mix of a handful of parts. A part may carry an
+ *  imported synth rig (about 4 KB: a guitar design and its chain), so room for a dozen, and a bound. */
+export const MAX_PIECE_PREFS_BYTES = 64 * 1024;
 const encoder = new TextEncoder();
 async function authentic(candidate: string, secret: string) {
   const key = (value: string) => crypto.subtle.importKey('raw', encoder.encode(value), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign', 'verify']);

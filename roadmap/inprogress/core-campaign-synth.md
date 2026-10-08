@@ -123,8 +123,8 @@ mnx-lab (monorepo; github.com/owennewo/mnx-lab is PUBLIC; deployed at mnx-lab.to
 | 3 | Home page, licences and notices; **first landing** | ☑ Done | home page at `/`, `/notices/`, `LICENSE.md`, `NOTICE.md`, `CONTRIBUTING.md`; `home` smoke; notices test; landed with Phases 1–2 |
 | 4 | Contract adoption: the performance as a contract stream | ☑ Done | `src/audio/contractStream.ts`; every valid corpus scenario is an event log the synth accepts (`contract-stream.test.ts`) |
 | 5 | Host backend and part router | ☑ Done (behind `?synth=host`) | `src/audio/hostBackend.ts`, `hostSetup.ts`, `native/hostPort.ts`; HostCore-driven tests over 7 scenarios; `synth-host` smoke in Chrome |
-| 6 | Studio: choosing instruments and rigs | ☐ Not started | |
-| 7 | Persistence: rig references in D1 | ☐ Probably not needed (S19) | |
+| 6 | Studio: choosing instruments and rigs | ☑ Done (behind `?synth=host`) | Instruments sheet: factory designs, Import rig…, the old player; `host-instruments.test.ts`; `studio-instruments` smoke |
+| 7 | Persistence: rig references in D1 | ☒ Not needed (S23) | choices ride `piece_views.prefs`; its cap raised to 64 KB |
 | 8 | Retire the old sink | ☐ Not started | |
 | 9 | Performance, smokes and archiving guitar-faust | ☐ Not started | |
 
@@ -264,19 +264,41 @@ intermediate form, so a pure converter maps it to mnx-sound/2.
   with no warning; rate, seek, pause and loops behave. The `synth-host` smoke plays a scenario
   in Chrome through the worklet (every note acknowledged sounding, highlights moving), pauses,
   and turns the flag off.
-- [ ] Studio shows the router's diagnostics and the host's meters (with Phase 6's sheet).
+- [x] Studio shows the router's diagnostics (Phase 6's sheet). The host's meters are not shown yet.
 
 ## Phase 6 — Studio: choosing instruments and rigs
 
-- [ ] `InstrumentsSheet`: per part, a factory design or a rig 3.0.0 from `/synth/`. File import
-  comes first, a same-origin hand-off later (S9). The score stays the tuning authority
-  (contract D4).
-- [ ] An "Open in /synth/" link for editing; the edited rig comes back by export and import.
+- [x] The choice (`PartMixEntry.instrument`, `src/audio/partMix.ts`) rides the per-person mix
+  (S19): a factory design, an imported part rig 3.0.0, or `sink` — the old player's sound kept
+  for that part (S6, S21). `src/audio/hostInstruments.ts` checks rig files and stored choices.
+- [x] The router (`hostSetup.ts`) honours a choice where it fits the part — guitar designs and
+  guitar rigs only on parts whose strings the guitar can play, kit only on percussion — and
+  says why where it does not. A rig brings its instrument, chain and strip (its level adds to
+  the mix's); the score keeps its strings and capo (D4); its sends to buses other than the
+  piece's one room are dropped, with a note (S20).
+- [x] `sink` parts are left out of the host's setup; the backend sends the transport's events
+  for their voices to a `NativeSink` on the host's audio context, a lead later (one clock,
+  one output, the master volume after both). Moving a part between the host and the sink
+  re-plans; changing a design only reconfigures.
+- [x] `InstrumentsSheet` on the host: per part a dropdown of the synth's factory guitar designs
+  (read from `/synth/data/instrument-v2/presets.json`) where the part can take them, Basic
+  keys, Basic kit for percussion, "Your rig" with **Import rig…** (file import first, S9), and
+  the old player's sounds; a line under the part says why it plays something other than what
+  was asked, or why a file was refused. Beneath the parts: make a sound in **the synth**
+  (`/synth/`, new tab), **Export part**, then **Import rig…**.
+- [x] Evidence: `harness/conformance/host-instruments.test.ts` (router choices, rig files, stored
+  choices); `host-backend.test.ts` adds the sink beside the host, an exported design with a
+  drive and echo chain playing with no warning, and re-planning; the `studio-instruments`
+  smoke drives the sheet in Chrome against the local library — designs offered from `/synth/`,
+  a design, an imported rig and the old player each reaching the host and playing, a
+  two-part rig refused with its reason, the choice kept across a reload.
+- [ ] Later: a same-origin hand-off from `/synth/` (S9), and the host's meters in the sheet.
 
 ## Phase 7 — Persistence: rig references in D1
 
-Probably not needed: instrument choices are per person (S19) and ride the piece's existing
-preferences. Kept until Phase 6 shows whether a rig blob fits there.
+Not needed (S23): instrument choices are per person (S19) and ride the piece's existing
+preferences; a part rig is about 4 KB, so the Worker's preferences cap went from 8 KB to
+64 KB.
 
 - [ ] A migration storing, per (piece, part), a factory design reference or an opaque rig 3.0.0
   blob, with the contract, rig and synth versions.
@@ -319,6 +341,7 @@ preferences. Kept until Phase 6 shows whether a rig blob fits there.
 | S20 | **One shared room and master per piece**, at the synth's defaults; a part's rig brings its own chain and strip | agreed (lead, 8 Oct 2026) |
 | S21 | **Defaults with the flag on:** guitars play Clear steel, pianos basic keys, the kit the basic kit; the old "Synth" oscillator stays available until the sink retires | agreed (lead, 8 Oct 2026) |
 | S22 | **Phase 5:** a `HostBackend` (a `PlaybackBackend`) and a part router behind a feature flag; the old player stays the default | agreed (lead, 8 Oct 2026) |
+| S23 | Phase 7 is not needed: a part's rig is stored in the piece's view preferences, whose cap rises from 8 KB to 64 KB (room for a dozen rigs) | agent's call within S19 (9 Oct 2026); open to the lead's change |
 | S12 | `synth/` is a workspace with its own runner, like the converters. Root `vitest` excludes it. The gate gets a `synth` area: `synth/**` runs the synth's functional suite in the checks lane, and its browser flows and worklet parity become smokes covering `synth`, run against the built `/synth/`. The timing-based cost check, the benchmark and the DSP reproducibility check (`synth:verify-dsp`, where FAUST is installed, S7) stay manual. `gate-plan.test.ts` pins the rule | agreed (lead, 8 Oct 2026) |
 | S13 | mnx-lab's performance-listening work is paused for the migration | agreed (lead, 8 Oct 2026) |
 | S14 | Once Phase 3 has landed and the synth's suites are green here, guitar-faust gets one final commit: a README banner pointing to `synth/` and saying development stops there. Plans, evidence, references and the 0.2.0 release folder are kept; its local servers are stopped. The synth's version continues here, 0.2.0 at the move and `0.3.0-dev` next. guitar-faust stays unlicensed and private; only this copy is AGPL | agreed (lead, 8 Oct 2026) |

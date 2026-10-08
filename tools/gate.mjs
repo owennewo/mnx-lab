@@ -51,7 +51,7 @@ const SYNTH = /^synth\//;
 const SYNTH_PROSE = /^synth\/[^/]+\.md$/;
 // Root tests that play mnx-lab's performances through the synth (they read its WASM and data
 // from disk, which vitest's import graph cannot see): they run with any synth change.
-export const SYNTH_READERS = ['contract-stream', 'host-backend'].map(name => `harness/conformance/${name}.test.ts`);
+export const SYNTH_READERS = ['contract-stream', 'host-backend', 'host-instruments'].map(name => `harness/conformance/${name}.test.ts`);
 
 /** The areas a smoke may declare in `covers` (harness/verify/run-smokes.mjs).
  *  `audio` is reached through the shared src/ layers, which run every smoke. */

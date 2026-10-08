@@ -76,6 +76,9 @@ import { pieceFilename } from '../../../src/storage/pieceSaveContext.ts';
 import { JUST_DELETED_KEY, libraryHref, pieceHref } from './StudioApp.ts';
 import type { EditPieceSnapshot } from './EditPieceSheet.ts';
 import type { InstrumentPart } from './InstrumentsSheet.ts';
+import { hostSetup } from '../../../src/audio/hostSetup.ts';
+import type { FactoryDesign } from '../../../src/audio/hostInstruments.ts';
+import { loadFactoryDesigns } from '../../../src/audio/native/hostPort.ts';
 
 import { VIEW_KEY, DISPLAY_KEY, UNROLLED_KEY, STAFF_SP_KEY, SPACE_SP_KEY, SPACING_MODE_KEY, FOCUSED_KEY, write, readView, readDisplay, readUnrolled, readSpacingMode, readStaffSp, readSpaceSp, readFocused, readParts, writeParts, normalizePiecePrefs, canonicalJson, type PiecePreferences } from './scorePreferences.ts';
 
@@ -132,6 +135,9 @@ export class PiecePage extends LitElement {
   /** The piece's parts as the reader left them: off the score, and the mix. */
   @state() private hiddenParts: readonly number[] = [];
   @state() private partMix: PartMix = {};
+  /** The synth's guitar designs, loaded when the sheet first opens on the host engine. */
+  @state() private factoryDesigns: FactoryDesign[] = [];
+  private designsRequested = false;
   /** What is playing — a recording has no parts to mix. */
   @state() private playbackKind: string | undefined;
   @state() private selectedRecordingId: string | null = null;
@@ -960,6 +966,16 @@ export class PiecePage extends LitElement {
     writeParts(this.pieceId, { hidden, mix });
     this.schedulePrefs();
   }
+  /** On the synth's host: how each part is routed now, and the designs to offer. */
+  private hostRouting(doc: MnxDocument) {
+    const performance = this.player?.performance;
+    if (this.player?.synthEngine !== 'host' || !performance) return null;
+    if (!this.designsRequested) {
+      this.designsRequested = true;
+      void loadFactoryDesigns().then(designs => { this.factoryDesigns = designs; });
+    }
+    return hostSetup(performance, doc.mnxJson, this.partMix);
+  }
   private instrumentParts(doc: MnxDocument): InstrumentPart[] {
     const performance = this.player?.performance ?? null;
     return doc.mnxJson.parts.map((part, index) => {
@@ -983,6 +999,7 @@ export class PiecePage extends LitElement {
     const title = this.doc ? (fromDocument ? documentTitle(this.doc.mnxJson) ?? sidecar('title') : this.tag('title')) ?? this.doc.name : '';
     const artist = this.doc ? (fromDocument ? documentArtist(this.doc.mnxJson) ?? sidecar('artist') : this.tag('artist') ?? documentArtist(this.doc.mnxJson)) ?? '' : '';
     const chip = this.save ? saveChip(this.save, this.now) : null;
+    const routing = this.instrumentsOpen && this.doc ? this.hostRouting(this.doc) : null;
     const activeId = this.selectedRecordingId ?? 'synth';
     const activeRecording = this.snapshot?.recordings.find(r => r.id === this.selectedRecordingId);
     // The tools row is icons alone; these are the words its tooltips carry.
@@ -1167,6 +1184,10 @@ export class PiecePage extends LitElement {
         ${this.instrumentsOpen && this.doc
           ? html`<mnx-studio-instruments slot="side"
               .parts=${this.instrumentParts(this.doc)}
+              .engine=${this.player?.synthEngine ?? 'native'}
+              .routing=${routing?.parts ?? []}
+              .routingNotes=${routing?.diagnostics ?? []}
+              .designs=${this.factoryDesigns}
               .hiddenParts=${this.hiddenParts}
               .mix=${this.partMix}
               .mixAvailable=${!this.playbackKind || this.playbackKind === 'synth'}

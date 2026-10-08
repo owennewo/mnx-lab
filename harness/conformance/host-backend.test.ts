@@ -7,7 +7,9 @@ import path from 'node:path';
 import { HostCore, INSTRUMENTS, type Control, type Note, type Setup } from '@mnx-lab/synth';
 import { hostAssets } from '@mnx-lab/synth/node';
 import { compilePerformance } from '../../src/audio/performance.ts';
-import { HostBackend, type HostPort } from '../../src/audio/hostBackend.ts';
+import { HostBackend, type HostBackendOptions, type HostPort } from '../../src/audio/hostBackend.ts';
+import type { Sink, SinkEvent } from '../../src/audio/sink.ts';
+import type { PartMix } from '../../src/audio/partMix.ts';
 import { performanceToStream } from '../../src/audio/contractStream.ts';
 import { scorePositionAt } from '../../src/audio/scorePosition.ts';
 import { rational } from '../../src/audio/time.ts';
@@ -37,7 +39,7 @@ class CorePort implements HostPort {
   dispose() {}
 }
 /** Timers on the host's clock; each callback runs in its own turn, as in a browser. */
-function rig(document: MnxStructure) {
+function rig(document: MnxStructure, options: Partial<HostBackendOptions> = {}) {
   const compiled = compilePerformance(document);
   if (!compiled.ok) throw new Error(JSON.stringify(compiled.diagnostics));
   const port = new CorePort(), timers: { at: number; fn: () => void; handle: number }[] = [];
@@ -47,6 +49,7 @@ function rig(document: MnxStructure) {
       setTimeout: (fn, ms) => { const handle = ++handles; timers.push({ at: port.now() + ms / 1000, fn, handle }); return handle; },
       clearTimeout: handle => { const i = timers.findIndex(t => t.handle === handle); if (i >= 0) timers.splice(i, 1); },
     },
+    ...options,
   }, () => {});
   const flush = () => new Promise<void>(resolve => setImmediate(resolve));
   /** Render `seconds` of host audio, firing timers as they fall due. */
@@ -146,3 +149,73 @@ it('the mix reconfigures the parts in place', () => {
   expect(backend.setup.parts[0]!.strip).toMatchObject({ mute: true });
   expect(backend.setup.parts[0]!.strip!.levelDb).toBeCloseTo(20 * Math.log10(0.25), 9);
 });
+
+/** A sink that records what reaches it. */
+function recordingSink() {
+  const log = { scheduled: [] as { events: readonly SinkEvent[]; at: number }[], cancels: [] as number[], unlocked: 0, disposed: false };
+  const sink: Sink = {
+    now: () => 0, unlock: async () => { log.unlocked++; }, schedule: (events, at) => { log.scheduled.push({ events, at }); },
+    cancel: at => { log.cancels.push(at); }, release: () => {}, bend: () => {}, dispose: () => { log.disposed = true; },
+  };
+  return { sink, log };
+}
+
+it('a part kept on the old player’s sound plays on the sink, a lead later; the host plays the rest', async () => {
+  const document = scenario('lab/document/twelve-bar-blues');
+  const keys = document.parts.findIndex(p => !p._x?.mnxLab?.strings?.length);
+  const { sink, log } = recordingSink();
+  const mix: PartMix = { [keys]: { sound: 'synth', instrument: { kind: 'sink' } } };
+  const { backend, port, run, flush, performance } = rig(document, { partMix: mix, legacySink: () => sink });
+  const keyVoices = new Set(performance.voices.filter(v => v.partIndex === keys).map(v => v.id));
+  await backend.play(); await flush();
+  const start = port.now();
+  await run(3);
+  expect(log.unlocked).toBe(1);
+  const voices = new Set(log.scheduled.flatMap(s => s.events.map(e => e.voice)));
+  expect([...voices].every(v => keyVoices.has(v)), 'only the kept part reaches the sink').toBe(true);
+  expect(log.scheduled.some(s => s.events.some(e => e.kind === 'attack'))).toBe(true);
+  expect(Math.min(...log.scheduled.map(s => s.at)) - start, 'a lead later, like the host').toBeGreaterThanOrEqual(0.25 - 1e-9);
+  const hostNotes = port.batches.flatMap(b => b.notes);
+  expect(hostNotes.length).toBeGreaterThan(0);
+  expect(hostNotes.every(n => n.part !== `part${keys}`)).toBe(true);
+  expect(backend.setup.parts.map(p => p.id)).not.toContain(`part${keys}`);
+  expect(warnings(port), JSON.stringify(warnings(port))).toEqual([]);
+  // Seek cancels the sink too; dispose disposes it.
+  const cancels = log.cancels.length;
+  backend.pause(); await flush();
+  expect(log.cancels.length).toBeGreaterThan(cancels);
+  backend.dispose();
+  expect(log.disposed).toBe(true);
+}, 60_000);
+
+it('a part rig with an exported design and an effects chain plays on the host with no warning', async () => {
+  const document = scenario('vibrato-and-palm-mute');
+  const presets = JSON.parse(fs.readFileSync('synth/web/data/instrument-v2/presets.json', 'utf8')) as { id: string }[];
+  const design = presets.find(p => p.id === 'warm-dual-electric')!;
+  const exported = { rig: '3.0.0' as const, name: 'Crunch', setup: { contract: 'mnx-sound/2' as const, session: { buses: [{ id: 'room', type: 'room', state: 'on', params: {} }], master: {} },
+    parts: [{ id: 'gtr', name: 'Guitar', instrument: { kind: 'plucked', design, layout: { strings: [{ pitch: 64 }, { pitch: 59 }, { pitch: 55 }, { pitch: 50 }, { pitch: 45 }, { pitch: 40 }] } },
+      chain: [{ id: 'drive', type: 'drive', state: 'on', params: {} }, { id: 'echo', type: 'echo', state: 'on', params: {} }], strip: { levelDb: -2, sends: { room: 0.2 } } }] } };
+  const { backend, port, run, flush, stream } = rig(document, { partMix: { 0: { instrument: { kind: 'rig', rig: exported } } } });
+  expect(backend.routing[0]).toMatchObject({ source: 'rig', rig: 'Crunch' });
+  expect(backend.setup.parts[0]!.chain!.map(b => b.type)).toEqual(['drive', 'echo']);
+  await backend.play(); await flush();
+  await run(stream.seconds + 1);
+  expect(warnings(port), JSON.stringify(warnings(port))).toEqual([]);
+  expect(new Set(port.sounding.map(s => base(s.id)))).toEqual(new Set(stream.notes.map(n => n.id)));
+  expect(port.peak).toBeGreaterThan(1e-3);
+}, 60_000);
+
+it('moving a part between the host and the sink re-plans; a design change only reconfigures', async () => {
+  const document = scenario('lab/document/twelve-bar-blues');
+  const keys = document.parts.findIndex(p => !p._x?.mnxLab?.strings?.length);
+  const { sink } = recordingSink();
+  const { backend, port, run, flush } = rig(document, { legacySink: () => sink });
+  await backend.play(); await flush(); await run(0.5);
+  const cancels = port.cancels.length;
+  backend.setPartMix({ 0: { instrument: { kind: 'design', design: 'bridge-electric' } } }); await flush();
+  expect(port.cancels.length, 'a design change keeps the plan').toBe(cancels);
+  backend.setPartMix({ [keys]: { instrument: { kind: 'sink' } } }); await flush(); await run(0.6);
+  expect(port.cancels.length, 'a part leaving the host re-plans').toBeGreaterThan(cancels);
+  const after = port.batches.at(-1)!.notes;
+  expect(after.every(n => n.part !== `part${keys}`)).toBe(true);
+}, 60_000);

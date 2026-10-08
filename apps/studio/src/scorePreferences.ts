@@ -9,6 +9,7 @@ import {
 import type { ViewSetting } from '../../../src/elements/DocumentViewer.ts';
 import { isSamplePreset } from '../../../src/audio/sampleSelection.ts';
 import type { PartMix, PartMixEntry } from '../../../src/audio/partMix.ts';
+import { normalizeInstrument } from '../../../src/audio/hostInstruments.ts';
 import { clampStaffSp } from '../../../src/engine/render/scale.ts';
 import {
   DEFAULT_SPACE_SP,
@@ -97,10 +98,12 @@ export function normalizeParts(raw: unknown): PartsPreference {
     const index = Number(key);
     if (!Number.isInteger(index) || index < 0 || !value || typeof value !== 'object') continue;
     const { volume, muted, sound } = value as Record<string, unknown>;
+    const instrument = normalizeInstrument((value as Record<string, unknown>).instrument);
     mix[index] = {
       ...(typeof volume === 'number' && volume >= 0 && volume <= 1 ? { volume } : {}),
       ...(muted === true ? { muted } : {}),
       ...(sound === 'synth' || isSamplePreset(sound) ? { sound } : {}),
+      ...(instrument ? { instrument } : {}),
     };
   }
   return { hidden, mix };

@@ -17,6 +17,10 @@
  * follow one another exactly, as the transport's do; notes crossing the loop's end are cut
  * there (the transport releases every voice at a visit's end). Note ids carry the plan's
  * generation and the visit, so a repeat is a new note, not an edit of one already played.
+ *
+ * Parts the person keeps on the old player's sound (`instrument: {kind: 'sink'}`, Phase 6)
+ * are left out of the host's setup; the transport's events for their voices go to a real
+ * sink on the host's audio context (`legacySink`), shifted by the same lead.
  */
 import type { Control, Note, Setup, Technique } from '@mnx-lab/synth/contract';
 import { Transport, type Clock, type TransportEvent } from './transport.ts';
@@ -52,6 +56,8 @@ export interface HostBackendOptions {
   aheadSeconds?: number;
   /** Timers for the transport's poll (defaults to the global ones). */
   timers?: Pick<Clock, 'setTimeout' | 'clearTimeout'>;
+  /** Makes the sink for parts on the old player's sound; called after the port unlocks. */
+  legacySink?: () => Sink;
 }
 
 /** The stream's controls are its tempo changes (contractStream.ts). */
@@ -108,6 +114,10 @@ export class HostBackend implements PlaybackBackend {
   private plan: Plan | undefined;
   private closed = false;
   private listeners = new Set<() => void>();
+  private readonly legacyFactory: (() => Sink) | undefined;
+  private legacy: Sink | undefined;
+  /** Voices whose part plays on the old player's sound. */
+  private sinkVoices = new Set<string>();
   constructor(performance: Performance, document: MnxStructure, private readonly port: HostPort,
     options: HostBackendOptions, private readonly onEvent: (event: TransportEvent) => void) {
     this.performance = performance;
@@ -117,6 +127,7 @@ export class HostBackend implements PlaybackBackend {
     this.lead = options.leadSeconds ?? LEAD;
     this.ahead = options.aheadSeconds ?? AHEAD;
     const timers = options.timers ?? globalTimers;
+    this.legacyFactory = options.legacySink;
     this.clock = {
       now: () => {
         if (this.frozen === undefined) {
@@ -129,13 +140,24 @@ export class HostBackend implements PlaybackBackend {
     };
     this.sink = {
       now: () => this.clock.now(),
-      unlock: () => this.port.unlock(),
-      schedule: () => {},
+      unlock: async () => {
+        await this.port.unlock();
+        if (this.sinkVoices.size && this.legacyFactory) {
+          this.legacy ??= this.legacyFactory();
+          await this.legacy.unlock();
+        }
+      },
+      // Only the old player's parts sound here, a lead later on the host's clock.
+      schedule: (events, audioTime) => {
+        const mine = this.legacy && events.filter(e => this.sinkVoices.has(e.voice));
+        if (mine?.length) this.legacy!.schedule(mine, audioTime + this.lead);
+      },
       release: () => {},
       bend: () => {},
       // Called by every restart before it reads its anchor (and by pause, stop and dispose).
       cancel: () => {
         this.dirty = true;
+        this.legacy?.cancel(this.port.now());
         this.hold = this.port.now();
         this.frozen = this.hold;
         queueMicrotask(() => { this.frozen = undefined; });
@@ -152,9 +174,18 @@ export class HostBackend implements PlaybackBackend {
   get diagnostics() { return this.routed.diagnostics; }
   /** The setup the host is configured with. */
   get setup(): Setup { return this.routed.setup; }
+  /** How each part is routed (the Instruments sheet says so). */
+  get routing() { return this.routed.parts; }
+  /** The sink for parts on the old player's sound, once made (levels and presets are the host's to set). */
+  get legacySink(): Sink | undefined { return this.legacy; }
 
-  private derive() {
+  private route() {
     this.routed = hostSetup(this.performance, this.document, this.mix);
+    const onSink = new Set(this.routed.parts.filter(p => p.kind === 'sink').map(p => p.partIndex));
+    this.sinkVoices = new Set(this.performance.voices.filter(v => onSink.has(v.partIndex)).map(v => v.id));
+  }
+  private derive() {
+    this.route();
     this.stream = performanceToStream(this.performance, { partOf: this.routed.partOf, document: this.document });
     this.notes = [...this.stream.notes].sort((a, b) => a.at - b.at || (a.id < b.id ? -1 : 1));
     this.tempos = (this.stream.controls as Tempo[]).filter(c => c.type === 'tempo').sort((a, b) => a.at - b.at);
@@ -268,12 +299,25 @@ export class HostBackend implements PlaybackBackend {
     return { ...rest, id: `${n.id}:${p.gen}.${v.k}`, at, duration: Math.max(1e-4, (end - v.vs) / p.speed), ...(techniques.length ? { techniques } : {}) };
   }
 
+  /** The old player's sounds changed: the next play makes the sink afresh (call while paused). */
+  resetLegacySink() {
+    this.legacy?.dispose();
+    this.legacy = undefined;
+  }
   /** The mix moved: the parts' strips are reconfigured in place (no pause). */
   setPartMix(mix: PartMix) {
     if (this.closed) return;
+    const before = JSON.stringify(this.routed.parts.map(p => p.kind === 'sink'));
     this.mix = mix;
-    this.routed = hostSetup(this.performance, this.document, mix);
+    this.route();
     this.port.configure(this.routed.setup);
+    // A part moved between the host and the sink: its notes are in the wrong place, so the
+    // plan starts again from here (a level or a design change needs nothing more).
+    if (JSON.stringify(this.routed.parts.map(p => p.kind === 'sink')) !== before) {
+      this.stream = performanceToStream(this.performance, { partOf: this.routed.partOf, document: this.document });
+      this.notes = [...this.stream.notes].sort((a, b) => a.at - b.at || (a.id < b.id ? -1 : 1));
+      if (this.live.snapshot.state === 'playing') this.live.seek(this.live.position);
+    }
   }
   /** An edit: as SynthBackend.replacePerformance, with the stream and setup derived again. */
   replacePerformance(performance: Performance, document: MnxStructure = this.document) {
@@ -332,6 +376,7 @@ export class HostBackend implements PlaybackBackend {
     this.listeners.clear();
     this.live.dispose();
     this.port.cancel({ from: this.port.now(), silence: true });
+    this.legacy?.dispose();
     this.port.dispose();
   }
 }

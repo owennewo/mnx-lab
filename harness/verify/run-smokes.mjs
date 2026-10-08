@@ -34,6 +34,8 @@ const SMOKES = {
   // The synth's 22 app flows on the built /synth/ under the deployed CSP (core-campaign-synth S12).
   'synth': one('synth-smoke.mjs', ['synth']), // ~60
   'synth-host': one('synth-host-smoke.mjs', ['synth', 'workbench']), // ~10
+  // Studio's Instruments sheet choosing the host's instruments (core-campaign-synth Phase 6).
+  'studio-instruments': one('studio-instruments-smoke.mjs', [...STUDIO_LIBRARY, 'synth']), // ~20
   'inspector': one('inspector-smoke.mjs', WORKBENCH), // 15
   'workbench-editor': one('workbench-editor-smoke.mjs', WORKBENCH), // 15
   'save-pipeline': one('save-pipeline-smoke.mjs', STUDIO_LIBRARY), // 15

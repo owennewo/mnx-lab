@@ -313,7 +313,7 @@ Beside WHEN a piece was last opened, the same row keeps HOW it was last set up: 
 that was playing (`synth` or a recording id), where the video divider was left
 (`videoDividerPercent`, a share of the score frame's width, so it fits whatever window
 reopens it) and the Instruments sheet's hidden parts and mix, the sound of each part
-included. Server-side for the reason `opened_at` is — a nylon
+included — on the synth's host, its instrument too (a factory design, an imported part rig, or the old player's sound). Server-side for the reason `opened_at` is — a nylon
 guitar chosen on the laptop is still chosen on the tablet — and per owner, because it is a
 preference, not a property of the piece that everyone sharing it would see. Migration
 `0006_piece_prefs.sql` adds two columns to `piece_views`; a preference on a piece never
@@ -325,7 +325,7 @@ ALTER TABLE piece_views ADD COLUMN prefs_updated_at TEXT;
 ```
 
 **The service keeps it opaque.** `PUT /api/library/pieces/:id/prefs` takes a JSON object,
-caps it at `MAX_PIECE_PREFS_BYTES` (8 KiB) and stores the text; `getPiece` hands it back on
+caps it at `MAX_PIECE_PREFS_BYTES` (64 KiB since 2026-10-09: a part's imported synth rig, about 4 KiB, rides in the mix — core-campaign-synth Phase 6) and stores the text; `getPiece` hands it back on
 the snapshot, treating anything unreadable as absent so a junk value can never stop a piece
 opening. The Worker's ceiling is `model` + `assist`, and a part mix and a sample preset live
 in `src/audio`, so the shell that writes a shape is the one that checks it
