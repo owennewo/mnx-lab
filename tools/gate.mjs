@@ -49,6 +49,9 @@ const CODE = /^(src|apps|worker|converters|harness|tools|experiments)\//;
 // and DSP reproducibility check stay manual (they need a quiet machine or the FAUST compiler).
 const SYNTH = /^synth\//;
 const SYNTH_PROSE = /^synth\/[^/]+\.md$/;
+// Root tests that play mnx-lab's performances through the synth (they read its WASM and data
+// from disk, which vitest's import graph cannot see): they run with any synth change.
+export const SYNTH_READERS = ['contract-stream', 'host-backend'].map(name => `harness/conformance/${name}.test.ts`);
 
 /** The areas a smoke may declare in `covers` (harness/verify/run-smokes.mjs).
  *  `audio` is reached through the shared src/ layers, which run every smoke. */
@@ -110,6 +113,13 @@ export function planGate(files, { full = false } = {}) {
   } else {
     tests = { mode: 'none' };
     reasons.push('nothing any test reads changed');
+  }
+
+  if (files.some(file => SYNTH.test(file) && !SYNTH_PROSE.test(file))) {
+    if (tests.mode === 'none') tests = { mode: 'files', files: SYNTH_READERS };
+    else if (tests.mode === 'files') tests = { ...tests, files: [...tests.files, ...SYNTH_READERS] };
+    else if (tests.mode === 'changed') tests = { ...tests, always: [...tests.always, ...SYNTH_READERS] };
+    if (tests.mode !== 'full') reasons.push('synth changed: the root tests that play through it');
   }
 
   const converters = files.some(file => /^src\/model\/|^converters\/fixtures\//.test(file))

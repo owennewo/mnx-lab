@@ -10,6 +10,9 @@ import { NativeYouTubePort } from '../audio/native/youtube.ts';
 import { youtubeVideoId } from '../audio/youtubeUrl.ts';
 import { HtmlAudioPort } from '../audio/native/htmlAudio.ts';
 import { SynthBackend } from '../audio/native/synthBackend.ts';
+import { HostBackend } from '../audio/hostBackend.ts';
+import { NativeHostPort } from '../audio/native/hostPort.ts';
+import { readSynthEngine, type SynthEngine } from './synthEngine.ts';
 import { createRecordingSync } from '../audio/recordingSync.ts';
 import { scorePositionAt } from '../audio/scorePosition.ts';
 import { linearizePasses } from '../model/passes.ts';
@@ -69,6 +72,9 @@ export class Player extends LitElement {
   @property({ type: String }) documentId = '';
   /** The sound for every part the mix does not choose one for. */
   @property({ attribute: 'voice-preset' }) voicePreset: VoicePreset = 'synth';
+  /** Which synth plays the score: 'native' (the sink) or 'host' — the synth's instrument
+   *  host, behind the `?synth=host` flag until it replaces the sink (./synthEngine.ts). */
+  @property({ attribute: 'synth-engine' }) synthEngine: SynthEngine = readSynthEngine();
   /** Per-part level, mute and sound beneath the master volume, keyed by part
    *  index (src/audio/partMix.ts). Synth only: a recording has no parts. */
   @property({ attribute: false }) partMix: PartMix = {};
@@ -607,6 +613,7 @@ export class Player extends LitElement {
       changed.has('sampleBase') ||
       changed.has('sampleBases') ||
       changed.has('sampleLoader') ||
+      changed.has('synthEngine') ||
       (scoreMoved && (!this.session || !this.performance));
     if (!reinstall && scoreMoved) this.replacePerformance();
     if (reinstall) {
@@ -638,6 +645,8 @@ export class Player extends LitElement {
     if (this.syncMode && (this.sourceId === 'synth' || !this.syncEditable)) this.setSyncMode(false);
     if (!reinstall && changed.has('partMix') && this.session?.backend instanceof SynthBackend)
       this.applyPartLevels(this.session.backend);
+    if (!reinstall && changed.has('partMix') && this.session?.backend instanceof HostBackend)
+      this.session.backend.setPartMix(this.partMix);
     const sounds = this.soundSignature();
     const soundsMoved = sounds !== this.lastSounds;
     this.lastSounds = sounds;
@@ -747,6 +756,14 @@ export class Player extends LitElement {
     const factory = (id: string): PlaybackBackend => {
       const performance = this.performance;
       if (!performance) throw new Error('There is no performance to play.');
+      if (id === 'synth' && this.synthEngine === 'host' && this.document) {
+        const port = new NativeHostPort({ volume: this.volume, onError: message => { if (revision === this.revision) this.localError = message; } });
+        return new HostBackend(performance, this.document, port, { volume: this.volume, partMix: this.partMix }, event => {
+          if (revision === this.revision && event.kind === 'onset') this.dispatchEvent(new CustomEvent('onset', {
+            detail: { ...event, documentId: this.documentId }, bubbles: true, composed: true,
+          }));
+        });
+      }
       if (id === 'synth') {
         const buses = partBuses(performance);
         const synth = new SynthBackend(performance, {
@@ -810,6 +827,7 @@ export class Player extends LitElement {
     if (!session || !performance) return;
     const backend = session.backend;
     if (backend instanceof SynthBackend) backend.replacePerformance(performance);
+    else if (backend instanceof HostBackend) backend.replacePerformance(performance, this.document);
     else if (backend instanceof RecordingBackend) {
       const source = this.activeRecording, id = backend.id, duration = this.status?.mediaDuration;
       if (!source) return;
@@ -926,7 +944,7 @@ export class Player extends LitElement {
     const target = { ordinal, metricOffset: within };
     // An explicit bar click includes the grace/hold at its start. Handoffs
     // deliberately omit this edge because they must not guess within an insertion.
-    const edge = this.session.backend instanceof SynthBackend ? 'before' : undefined;
+    const edge = this.session.backend instanceof SynthBackend || this.session.backend instanceof HostBackend ? 'before' : undefined;
     const problem = this.session.backend.canSeek(target, edge);
     if (problem) { this.localError = ''; void this.session.seek(target, edge); return false; }
     void this.session.seek(target, edge);
@@ -939,7 +957,7 @@ export class Player extends LitElement {
   /** Existing API takes expanded synth positions; media endpoints must map uniquely. */
   setLoop(loop?: LoopRegion) {
     if (!this.session || !this.performance) return;
-    if (this.session.backend instanceof SynthBackend) { this.session.backend.transport.setLoop(loop); return; }
+    if (this.session.backend instanceof SynthBackend || this.session.backend instanceof HostBackend) { this.session.backend.transport.setLoop(loop); return; }
     if (!loop) { this.session.setLoop(); return; }
     const start = scorePositionAt(this.performance, loop.start), end = scorePositionAt(this.performance, loop.end);
     if (!start.ok || !end.ok) throw new Error(!start.ok ? start.diagnostic.message : !end.ok ? end.diagnostic.message : 'Invalid loop.');

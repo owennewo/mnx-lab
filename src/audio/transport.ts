@@ -247,6 +247,10 @@ export class Transport {
     }
     return seconds >= end ? this.duration : min(this.duration, this.tempo.positionAt(seconds));
   }
+  /** The loop region set, if any (a backend that schedules its own audio follows it). */
+  get loopRegion(): LoopRegion | undefined {
+    return this.loop;
+  }
   get snapshot(): TransportSnapshot {
     const position = this.position;
     return {
