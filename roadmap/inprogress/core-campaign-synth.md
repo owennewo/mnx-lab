@@ -36,6 +36,9 @@ becomes the read-only record after the move (S1, S14).
 
 > ok lets go with agpl + commercial
 
+> I accept your recommendations - i don't particularly want to be and address for commercial
+> enquiries - they can work out contact from github
+
 Earlier the same day: "Only local usage is allowed for now" (no npm or other registry).
 
 ## What changes from the 7 October plan
@@ -114,7 +117,7 @@ mnx-lab (monorepo; github.com/owennewo/mnx-lab is PUBLIC; deployed at mnx-lab.to
 
 | Phase | Title | Status | Exit evidence |
 |---|---|---|---|
-| 0 | Readiness and decisions | ◐ In progress | this plan; decisions S1–S16; licence AGPL-3.0 + commercial (S8) |
+| 0 | Readiness and decisions | ☑ Done | this campaign doc (`f9e87a32`); decisions S1–S17 agreed; licence AGPL-3.0-only + commercial |
 | 1 | Move the synth into `mnx-lab/synth/` | ☐ Not started | |
 | 2 | The `/synth/` shell: build, CSP, smokes | ☐ Not started | |
 | 3 | Home page, licences and notices; **first landing** | ☐ Not started | |
@@ -141,10 +144,9 @@ mnx-lab (monorepo; github.com/owennewo/mnx-lab is PUBLIC; deployed at mnx-lab.to
 - [x] Rewrite this plan for the move and quote the lead's directions.
 - [x] **S8 settled:** AGPL-3.0 + commercial (the lead); applied to the whole repository.
 - [x] S11: `/synth/` is open access (the lead).
-- [ ] Settle S12 (how the synth's tests join mnx-lab's gate) and S14 (archiving guitar-faust).
-- [ ] Complete `THIRD_PARTY_NOTICES` for the synth and add the chosen project licence. That
-  means the eight untagged FAUST functions, plus the full licence texts for STK-4.3, FAUST's
-  LGPL with exception and V8/fdlibm.
+- [x] S12, S14, S16 and the licence details (S17) settled: the agent's recommendations, accepted by the lead.
+- [x] The notices work (the eight untagged FAUST functions; full texts for STK-4.3, FAUST's LGPL
+  with exception and V8/fdlibm) moved into Phase 3 with `LICENSE.md` and `NOTICE.md`.
 - [x] This campaign doc, its index line in `roadmap/README.md`, and the pause recorded in
   `roadmap/inprogress/lab-listening-promotion.md` with the lead's words (worktree
   `core-campaign-synth`).
@@ -202,8 +204,9 @@ unchanged; nothing landed until S8 allows it.
     the MNX schema copy, and anything else the inventory finds;
   - the inventory generated from the bundle or the lockfile where possible, so it cannot fall
     behind.
-- [ ] **Repository files:** `LICENSE.md` (S8) and `NOTICE.md` (the same third-party inventory)
-  at the root; the synth's notices folded in.
+- [ ] **Repository files:** `LICENSE.md` (the AGPL-3.0 text, S8/S17), `NOTICE.md` (the same
+  third-party inventory, the synth's notices folded in), a "Commercial licensing" section in the
+  README (enquiries via GitHub, S17) and `CONTRIBUTING.md` (S16); `package.json` licence fields.
 - [ ] Smokes: the home page and the notices page load and link correctly; the CSP still holds.
 - [ ] **First landing** (mnx-lab's process: rebase, `npm run gate`, `--ff-only`, push `main`)
   of Phases 1–3 together, only once S8 is settled; then deploy.
@@ -268,14 +271,15 @@ unchanged; nothing landed until S8 allows it.
 | S6 | Sample packs stay for keys until the synth's keys are better than basic (was M7) | agreed (lead, 8 Oct 2026) |
 | S7 | FAUST never runs in mnx-lab's CI: compiled WASM is committed, and the reproducibility check runs where FAUST is installed (was M8) | agreed (lead, 8 Oct 2026) |
 | S8 | **Licence: AGPL-3.0 + commercial (dual licensing)**, copyright Owen Williams, for the whole mnx-lab repository including `synth/`. `LICENSE.md` carries the AGPL-3.0 text; a commercial licence is available from the copyright holder. Third-party components keep their own licences (`NOTICE.md`, `/notices/`). The notices must be complete **before** any synth file reaches mnx-lab's pushed `main` or the deployed site (was M9) | agreed (lead, 8 Oct 2026); scope (whole repository) applied on the agent's recommendation, open to the lead's change before the first landing |
-| S16 | Outside contributions need a contributor licence agreement granting relicensing rights, so dual licensing stays possible (none exist today: the lead and AI agents under the lead's direction) | proposed |
+| S16 | No CLA yet. A short `CONTRIBUTING.md` says outside contributions need a signed agreement allowing relicensing, and none are accepted until one exists; then a standard agreement (Harmony, or an adapted Apache CLA) with a lawyer. A DCO is not enough for dual licensing | agreed (lead, 8 Oct 2026) |
+| S17 | **Licence details**: **AGPL-3.0-only**; "Copyright © 2026 Owen Williams"; AGPL covers all code and content here except where `NOTICE.md` says otherwise (W3C MNX copies and mirrored scenarios, the MusicXML test suite (MIT), sample packs (CC0), fonts (OFL), the FAUST and V8 code); `package.json` `"license": "AGPL-3.0-only OR LicenseRef-Commercial"`, no per-file headers; the home and notices pages link the source on GitHub; a lawyer reviews the commercial licence text before any deal. **Commercial enquiries go to the copyright holder through GitHub (`github.com/owennewo`); no email address is published** | agreed (lead, 8 Oct 2026) |
 | S9 | Custom rigs reach studio by file import first; a same-origin hand-off from `/synth/` later (was M10) | agreed (lead, 8 Oct 2026) |
 | S10 | Same-origin only: everything is served from mnx-lab's own build (was M11) | agreed (lead, 8 Oct 2026) |
 | S11 | `/synth/` on the deployed site is **open access**, like `/workbench/` | agreed (lead, 8 Oct 2026) |
 | S15 | The site's root becomes a **home page** linking to `/studio/`, `/synth/`, `/workbench/` and a **licences and notices page**; the repository carries `LICENSE.md` and `NOTICE.md` | agreed (lead, 8 Oct 2026) |
-| S12 | The synth keeps its own test runner (`node --test`) and tooling in its workspace. mnx-lab's gate maps `synth/**` to them, and the synth's browser flows join the smoke runner | proposed |
+| S12 | `synth/` is a workspace with its own runner, like the converters. Root `vitest` excludes it. The gate gets a `synth` area: `synth/**` runs the synth's functional suite in the checks lane, and its browser flows and worklet parity become smokes covering `synth`, run against the built `/synth/`. The timing-based cost check, the benchmark and the DSP reproducibility check (`synth:verify-dsp`, where FAUST is installed, S7) stay manual. `gate-plan.test.ts` pins the rule | agreed (lead, 8 Oct 2026) |
 | S13 | mnx-lab's performance-listening work is paused for the migration | agreed (lead, 8 Oct 2026) |
-| S14 | After the move, guitar-faust is archived: a final pointer commit, then no further development there | proposed |
+| S14 | Once Phase 3 has landed and the synth's suites are green here, guitar-faust gets one final commit: a README banner pointing to `synth/` and saying development stops there. Plans, evidence, references and the 0.2.0 release folder are kept; its local servers are stopped. The synth's version continues here, 0.2.0 at the move and `0.3.0-dev` next. guitar-faust stays unlicensed and private; only this copy is AGPL | agreed (lead, 8 Oct 2026) |
 
 ## Risks
 
@@ -314,4 +318,7 @@ unchanged; nothing landed until S8 allows it.
 - 2026-10-08 — This doc filed in mnx-lab as the plan of record (worktree `core-campaign-synth`),
   with the performance-listening pause recorded in `lab-listening-promotion.md`. guitar-faust's
   copy becomes a pointer here.
+- 2026-10-08 — **Phase 0 done.** The lead accepted the recommendations for S12 (the gate), S14
+  (archiving guitar-faust) and S16 (no CLA yet; `CONTRIBUTING.md`), and the licence details (S17).
+  No commercial-enquiry address will be published: contact goes through GitHub.
 
