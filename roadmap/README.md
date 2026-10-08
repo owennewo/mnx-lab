@@ -151,6 +151,15 @@ back up to `proposed/` the moment it is.
 
 ### inprogress/
 
+- **[core-campaign-synth.md](inprogress/core-campaign-synth.md)** — **campaign**: the guitar-faust
+  synth (physically modelled guitar, basic keys and kit, effect chains, contract `mnx-sound/2`)
+  **moves into `synth/`** as its own module and a third shell at `/synth/`, open access; the
+  site root becomes a **home page** linking `/studio/`, `/synth/` and `/workbench/` and a
+  **licences and notices** page; the repository is licensed **AGPL-3.0 + commercial** with
+  `LICENSE.md`/`NOTICE.md`; then studio's transport plays scores through the synth (contract
+  notes and controls, part router, instrument choice, D1 rig references, old sink retired).
+  Opened 2026-10-08 at the lead's direction; nothing of the synth lands before the notices are
+  complete (the repository is public).
 - **[lab-listening-promotion.md](inprogress/lab-listening-promotion.md)** — promote the Basic Pitch listener (`basic-pitch-chain@5`) on experiments 050 and 051, with the sentinel instrument and outside review decoupled on the record; then make routine listening runs take minutes (sentinels, cited comparators, reused observations, quiet host only for formal claims); then the user picks chords or real playing.
 - **[core-single-cursor.md](inprogress/core-single-cursor.md)** — studio authoring item 10,
   **built 2026-09-22**, awaiting the owner's hands-on check: one cursor. The edit cursor is a
