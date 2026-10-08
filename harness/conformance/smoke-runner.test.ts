@@ -25,6 +25,7 @@ it('declares for every smoke areas the gate reaches, and each area really is rea
   const probes: Record<string, string> = {
     workbench: 'src/workbench/ScenarioPage.ts', studio: 'apps/studio/src/PiecePage.ts', library: 'worker/api/library.ts',
     embed: 'src/entries/embed.ts', lib: 'src/entries/lib.ts', audio: 'src/audio/transport.ts',
+    synth: 'synth/web/host/host-core.js', home: 'index.html',
   };
   expect(Object.keys(probes).sort()).toEqual([...SMOKE_AREAS].sort());
   for (const [area, file] of Object.entries(probes)) {

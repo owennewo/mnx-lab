@@ -27,9 +27,9 @@ const manifest = { expected_revision: snapshot?.piece.revision ?? null,
 const form = new FormData(); form.set('manifest',JSON.stringify(manifest)); form.set('score',new Blob([bytes]),'Sun-did-glide.gp');
 const stored = await fetch(origin+'/api/library/ingest',{method:'POST',headers,body:form}); assert.equal(stored.status,200);
 const pieceId = (await stored.json()).snapshot.piece.id; assert.match(pieceId, /^[0-9a-f]{16}$/);
-// The root is studio's.
+// The root is the site's home page, which links studio (core-campaign-synth Phase 3).
 const rootResponse = await fetch(origin + '/', { redirect: 'manual' });
-assert.equal(rootResponse.status, 302); assert.equal(rootResponse.headers.get('location'), '/studio/');
+assert.equal(rootResponse.status, 200); assert.match(await rootResponse.text(), /href="\/studio\/"/);
 const profile = await fs.mkdtemp(`${os.tmpdir()}/mnx-studio-browser-`);
 const chrome = spawn(process.env.CHROME_BIN ?? 'google-chrome',['--headless=new','--no-sandbox','--disable-dev-shm-usage','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],{stdio:'ignore'});
 let ws;
