@@ -8,7 +8,7 @@
 > below). It replaces guitar-faust's "headless library" integration plan of 2026-10-07, which
 > kept the synth in its own repository.
 
-**Status: Phase 0 (readiness and decisions) in progress, 2026-10-08.** The synth's own history,
+**Status: Phases 0–3 done and landed (`9e0bfd9d`), 2026-10-08; the deploy is waiting for the lead.** The synth's own history,
 its campaigns and their evidence logs (the instrument host campaign, the chain campaign that
 produced synth 0.2.0) stay in the guitar-faust repository (`~/dev/guitar-faust/plans/`), which
 becomes the read-only record after the move (S1, S14).
@@ -342,4 +342,8 @@ unchanged; nothing landed until S8 allows it.
   - **Licences to confirm:** the SMuFL glyph names, the MNX schema and mirrored examples, and the MNX sources carry no licence upstream, so they are listed as "W3C Music Notation Community Group (licence to confirm)". They were already shipped before this campaign.
   - **Repository files:** `LICENSE.md` (the AGPL-3.0 text from gnu.org), `NOTICE.md`, `CONTRIBUTING.md` (S16), a Licence section in the README, and `"license": "AGPL-3.0-only OR LicenseRef-Commercial"` in every `package.json`. The synth's `THIRD_PARTY_NOTICES.md` now states the licence.
   - **Tests:** `harness/conformance/notices.test.ts` requires the generated files to be current, every production package in `package-lock.json` to have a notice, and every named licence text to exist. The `home` smoke resolves every same-origin link on both pages (25) on the built site. The gate maps the new paths to every test plus the `home` smoke.
+- 2026-10-08 — **Phases 1–3 landed** on `main` (`9cc889aa`, `9e0bfd9d`, rebased onto `63d1a116`) after a full gate: every root test, the synth lane, static checks, the build and all 26 smokes, including `synth`, `home` and `csp`.
+  - The first gate run failed on the removed root redirect (the studio smoke still expected `/` → `/studio/`) and on the smoke-runner test's area probes. Both were fixed, along with `CLAUDE.md`'s build-faces table and `docs/workbench.md`.
+  - **Deploy not done:** `npm run deploy` was refused by the agent's permission system as a production deploy. It is the lead's to run, or to approve for the agent. The live site still serves the previous build: `/` redirects to `/studio/`, and `/synth/` and `/notices/` answer 404.
+  - guitar-faust archived (S14).
 
