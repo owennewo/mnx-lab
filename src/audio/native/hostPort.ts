@@ -55,8 +55,18 @@ export class NativeHostPort implements HostPort {
   /** Play has been asked for since the last idle: the prepared context stays running. */
   private wanted = false;
   private idleTimer: ReturnType<typeof setTimeout> | undefined;
+  /** The master limiter delays everything the host plays by its look-ahead. */
+  private lookahead = 0;
   constructor(private readonly options: NativeHostPortOptions = {}) { this.volume = options.volume ?? 1; }
   now() { return this.context?.currentTime ?? 0; }
+  /** The browser's word for what lies between the worklet and the speaker — its own buffer
+   *  (baseLatency) and the system's and device's (outputLatency, which Safari may not give) —
+   *  plus the limiter's look-ahead. Only a running context reports the device's. */
+  latency() {
+    const context = this.context as (AudioContext & { outputLatency?: number }) | undefined;
+    if (!context || context.state !== 'running') return 0;
+    return (context.baseLatency || 0) + (context.outputLatency || 0) + this.lookahead;
+  }
   /** The audio context and the master gain the host plays into, once unlocked. */
   get audio(): { context: AudioContext; output: GainNode } | undefined {
     return this.context && this.output ? { context: this.context, output: this.output } : undefined;
@@ -118,6 +128,7 @@ export class NativeHostPort implements HostPort {
     // Configuring warms the worklet (host-processor.js warm): play waits for it, so the
     // first beats do not pay for compiling the DSP.
     const host = await module.InstrumentHost.create(context, { assets });
+    this.lookahead = module.MASTER_LOOKAHEAD_SECONDS || 0;
     playbackTrace.context(context);
     if (this.disposed) { host.dispose(); return; }
     this.output = new GainNode(context, { gain: this.volume });

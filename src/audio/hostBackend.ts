@@ -5,9 +5,11 @@
  *
  * The transport stays what it is for the old backend — position, highlights, loop, rate,
  * seek, the edit carry — but plays into a sink that makes no sound. Its clock runs `lead`
- * behind the host's, so what it reports is what is heard. Each restart it makes (play,
- * seek, rate, loop) cancels the sink; there the clock steps forward to the host's time and
- * holds for the lead — the cursor waits for the first note — and the backend silences the
+ * behind the host's, and the output's latency further still (what the host renders reaches
+ * the speaker that much later: the browser's buffer, the system's, a Bluetooth link), so
+ * what it reports is what is heard. Each restart it makes (play, seek, rate, loop) cancels
+ * the sink; there the clock steps forward to the host's time and holds for the lead and the
+ * latency — the cursor waits for the first note — and the backend silences the
  * host and plans afresh from the transport's anchor, sending contract notes (src/audio/contractStream.ts)
  * about a second ahead: past the plucked instrument's commit horizon (D15), and in
  * batches large enough that the worklet is not chattered at.
@@ -50,6 +52,9 @@ export interface HostPort {
   idle?(): void;
   /** How busy the host's audio thread is, as the worklet reports it (hostStrain.ts). */
   watchLoad?(listener: (report: LoadReport) => void): void;
+  /** Optional: seconds from the host rendering a frame to it being heard, as the platform
+   *  reports it (0 if it cannot say). */
+  latency?(): number;
   /** Optional: the host's per-part cost metering, started at play and read at stop (playbackTrace.ts). */
   profile?(action: 'start' | 'snapshot'): Promise<unknown>;
 }
@@ -111,8 +116,12 @@ export class HostBackend implements PlaybackBackend {
   /** The transport's clock holds still for a synchronous turn, so a restart's cancel and
    *  its anchor read the same time (see `follow`). */
   private frozen: number | undefined;
-  /** Where the clock holds after a restart, until the host's time is `lead` past it. */
+  /** Where the clock holds after a restart, until the host's time is `lead` + `latency` past it. */
   private hold = -Infinity;
+  /** The output latency the clock runs behind by. Read only while the clock holds: a
+   *  reading that moved mid-play would jump the cursor, and one taken just as the audio
+   *  starts may not be the device's yet. */
+  private latency = 0;
   private dirty = false;
   private generation = 0;
   private plan: Plan | undefined;
@@ -136,7 +145,9 @@ export class HostBackend implements PlaybackBackend {
     this.clock = {
       now: () => {
         if (this.frozen === undefined) {
-          this.frozen = Math.max(this.port.now() - this.lead, this.hold);
+          const now = this.port.now() - this.lead;
+          if (now - this.latency <= this.hold) this.latency = Math.max(0, this.port.latency?.() || 0);
+          this.frozen = Math.max(now - this.latency, this.hold);
           queueMicrotask(() => { this.frozen = undefined; });
         }
         return this.frozen;
@@ -219,7 +230,7 @@ export class HostBackend implements PlaybackBackend {
       if (wasPlaying) { this.port.idle?.(); this.endTrace(); }
       this.plan = undefined; this.strain.reset(); return;
     }
-    if (this.plan && !this.plan.done && this.plan.through - this.clock.now() < this.ahead / 2) this.topUp(this.plan);
+    if (this.plan && !this.plan.done && this.plan.through - this.rendered() < this.ahead / 2) this.topUp(this.plan);
   }
   private newPlan(position: Performance['sounding'][number]['position'], speed: number): Plan {
     // The frozen clock is the transport's anchor time: restart() read it, then pumped and emitted.
@@ -245,9 +256,11 @@ export class HostBackend implements PlaybackBackend {
     for (const c of this.tempos) if (c.at <= seconds) bpm = c.bpm;
     return bpm;
   }
+  /** The transport time the host is rendering: the supply runs ahead of that, not of what is heard. */
+  private rendered() { return this.clock.now() + this.latency; }
   /** Supply the host from where the plan stands to `ahead` past now. */
   private topUp(p: Plan) {
-    const to = this.clock.now() + this.ahead, notes: Note[] = [], controls: Control[] = [];
+    const to = this.rendered() + this.ahead, notes: Note[] = [], controls: Control[] = [];
     const host = (v: Visit, seconds: number) => v.va + (seconds - v.vs) / p.speed + this.lead;
     let wraps = 0;
     for (;;) {

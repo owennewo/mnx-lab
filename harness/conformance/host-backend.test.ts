@@ -40,12 +40,16 @@ class CorePort implements HostPort {
   idle() { this.idles++; }
   load: ((report: LoadReport) => void) | undefined;
   watchLoad(listener: (report: LoadReport) => void) { this.load = listener; }
+  /** Output latency, reported from host time `latencyFrom` on (a device reports it once running). */
+  outputLatency = 0;
+  latencyFrom = 0;
+  latency() { return this.now() >= this.latencyFrom ? this.outputLatency : 0; }
 }
 /** Timers on the host's clock; each callback runs in its own turn, as in a browser. */
 function rig(document: MnxStructure, options: Partial<HostBackendOptions> = {}) {
   const compiled = compilePerformance(document);
   if (!compiled.ok) throw new Error(JSON.stringify(compiled.diagnostics));
-  const port = new CorePort(), timers: { at: number; fn: () => void; handle: number }[] = [];
+  const port = new CorePort(), events: { kind: string; now: number }[] = [], timers: { at: number; fn: () => void; handle: number }[] = [];
   let handles = 0;
   const backend = new HostBackend(compiled.performance, document, port, {
     timers: {
@@ -53,7 +57,7 @@ function rig(document: MnxStructure, options: Partial<HostBackendOptions> = {}) 
       clearTimeout: handle => { const i = timers.findIndex(t => t.handle === handle); if (i >= 0) timers.splice(i, 1); },
     },
     ...options,
-  }, () => {});
+  }, event => events.push({ kind: event.kind, now: port.now() }));
   const flush = () => new Promise<void>(resolve => setImmediate(resolve));
   /** Render `seconds` of host audio, firing timers as they fall due. */
   async function run(seconds: number) {
@@ -66,7 +70,7 @@ function rig(document: MnxStructure, options: Partial<HostBackendOptions> = {}) 
     }
   }
   const stream = performanceToStream(compiled.performance, { document });
-  return { backend, port, run, flush, performance: compiled.performance, stream };
+  return { backend, port, events, run, flush, performance: compiled.performance, stream };
 }
 const scenario = (name: string) => {
   const id = name.includes('/') ? name : `lab/tab-techniques/${name}`;
@@ -95,6 +99,31 @@ it.each(['vibrato-and-palm-mute', 'hammer-pull-chain', 'bend-shapes', 'natural-h
   // Topped up when less than half the second ahead remains: batches, not a call per poll.
   for (let i = 1; i < port.batches.length; i++)
     expect(port.batches[i]!.now - port.batches[i - 1]!.now, 'batched about a second ahead').toBeGreaterThan(0.45);
+}, 60_000);
+
+it('the cursor waits out the output latency: it colours a note when it is heard, not when it is rendered', async () => {
+  const { backend, port, events, run, flush, stream } = rig(scenario('lab/document/twelve-bar-blues'));
+  await run(0.1);
+  // The device says nothing until the audio has been running a moment, then 0.4 s.
+  port.outputLatency = 0.4; port.latencyFrom = port.now() + 0.05;
+  const start = port.now();
+  await backend.play(); await flush();
+  await run(3);
+  // Rendered a lead after play, as without latency; coloured once that has reached the speaker
+  // (within a transport poll and a block). The note play starts on is coloured at once, as ever.
+  const notes = port.batches.flatMap(b => b.notes);
+  for (const n of notes) expect(n.at).toBeCloseTo(start + 0.25 + stream.notes.find(m => m.id === base(n.id))!.at, 3);
+  const times = [...new Set(stream.notes.map(n => n.at))].sort((x, y) => x - y);
+  const second = times.find(t => t > times[0]! + 0.01)!, onset = events.find(e => e.kind === 'onset' && e.now > start + 0.01)!;
+  expect(onset.now - (start + 0.25 + second)).toBeGreaterThanOrEqual(0.4 - 1e-9);
+  expect(onset.now - (start + 0.25 + second)).toBeLessThan(0.4 + 0.03);
+  // Still supplied past every commit horizon, though the clock runs further behind.
+  for (const b of port.batches) for (const n of b.notes) expect(n.at - b.now, 'past the commit horizon').toBeGreaterThan(0.1);
+  expect(warnings(port), JSON.stringify(warnings(port))).toEqual([]);
+  // Pausing leaves the cursor where the music was heard, so play picks up from there.
+  const heard = backend.transport.snapshot.position;
+  backend.pause(); await flush();
+  expect(backend.transport.snapshot.position).toEqual(heard);
 }, 60_000);
 
 it('rate retimes the notes; a seek while playing silences and plans afresh', async () => {
