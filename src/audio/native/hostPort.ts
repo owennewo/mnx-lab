@@ -16,6 +16,7 @@ import type { Control, Diagnostic, HostAssets, InstrumentHost, Note, Setup } fro
 import type { HostPort } from '../hostBackend.ts';
 import type { LoadReport } from '../hostStrain.ts';
 import type { FactoryDesign } from '../hostInstruments.ts';
+import { playbackTrace } from '../playbackTrace.ts';
 
 type HostModule = typeof import('@mnx-lab/synth');
 /** Where the synth's runtime is served (its `host/`, `generated/` and `data/`): the site's
@@ -117,6 +118,7 @@ export class NativeHostPort implements HostPort {
     // Configuring warms the worklet (host-processor.js warm): play waits for it, so the
     // first beats do not pay for compiling the DSP.
     const host = await module.InstrumentHost.create(context, { assets });
+    playbackTrace.context(context);
     if (this.disposed) { host.dispose(); return; }
     this.output = new GainNode(context, { gain: this.volume });
     this.output.connect(context.destination);
@@ -133,6 +135,7 @@ export class NativeHostPort implements HostPort {
     this.host = host;
   }
   watchLoad(listener: (report: LoadReport) => void) { this.loadListener = listener; }
+  profile(action: 'start' | 'snapshot') { return this.host ? this.host.profile(action) : Promise.resolve(undefined); }
   configure(setup: Setup) { this.setup = setup; void this.host?.configure(setup).catch(this.reject); }
   schedule(batch: { notes?: Note[]; controls?: Control[]; through?: number }) { clearTimeout(this.idleTimer); void this.host?.schedule(batch).catch(this.reject); }
   cancel(cancel: { from?: number; silence?: boolean }) { void this.host?.cancel(cancel).catch(this.reject); }

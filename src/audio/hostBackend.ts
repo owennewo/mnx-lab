@@ -30,6 +30,7 @@ import type { PartMix } from './partMix.ts';
 import { performanceToStream, type ContractStream } from './contractStream.ts';
 import { hostSetup, type HostSetup } from './hostSetup.ts';
 import { StrainMonitor, type LoadReport } from './hostStrain.ts';
+import { playbackTrace, type TraceProfile } from './playbackTrace.ts';
 import { ZERO, compare } from './time.ts';
 
 /** What the backend needs of an instrument host and its audio output. */
@@ -49,6 +50,8 @@ export interface HostPort {
   idle?(): void;
   /** How busy the host's audio thread is, as the worklet reports it (hostStrain.ts). */
   watchLoad?(listener: (report: LoadReport) => void): void;
+  /** Optional: the host's per-part cost metering, started at play and read at stop (playbackTrace.ts). */
+  profile?(action: 'start' | 'snapshot'): Promise<unknown>;
 }
 export interface HostBackendOptions {
   volume?: number;
@@ -161,6 +164,7 @@ export class HostBackend implements PlaybackBackend {
     // Strain matters only while playing and sounding — from the first note plus one report
     // window (half a second) — and clears when playback stops.
     this.port.watchLoad?.(report => {
+      if (playbackTrace.active) playbackTrace.load(report, this.port.now() - this.audibleAt);
       if (this.closed || this.live.snapshot.state !== 'playing' || this.port.now() < this.audibleAt + 0.5) return;
       // The browser counts underruns late: the first report that counts only sets the baseline,
       // so the start-up stall's (in silence) never count.
@@ -212,7 +216,7 @@ export class HostBackend implements PlaybackBackend {
     }
     // At the end of the piece the transport stops by itself: what is scheduled plays out.
     if (snapshot.state !== 'playing') {
-      if (wasPlaying) this.port.idle?.();
+      if (wasPlaying) { this.port.idle?.(); this.endTrace(); }
       this.plan = undefined; this.strain.reset(); return;
     }
     if (this.plan && !this.plan.done && this.plan.through - this.clock.now() < this.ahead / 2) this.topUp(this.plan);
@@ -222,6 +226,11 @@ export class HostBackend implements PlaybackBackend {
     const audio = this.clock.now(), score = this.stream.secondsAt(position);
     this.audibleAt = audio + this.lead;
     this.underrunBase = undefined;
+    if (playbackTrace.on) {
+      if (playbackTrace.active) playbackTrace.end();
+      playbackTrace.begin(globalThis.document?.title || 'piece');
+      void this.port.profile?.('start').catch(() => {});
+    }
     const region = this.live.loopRegion;
     const loop = region ? { start: this.stream.secondsAt(region.start), end: this.stream.secondsAt(region.end) } : undefined;
     return {
@@ -364,8 +373,16 @@ export class HostBackend implements PlaybackBackend {
     if (!start.ok || !end.ok) throw new Error(!start.ok ? start.diagnostic.message : !end.ok ? end.diagnostic.message : 'Invalid loop.');
     this.live.setLoop({ start: start.value, end: end.value });
   }
+  /** The trace's run ends at stop, with the host's per-part profile where it has one. */
+  private endTrace() {
+    if (!playbackTrace.active) return;
+    const snapshot = this.port.profile?.('snapshot');
+    if (!snapshot) { playbackTrace.end(); return; }
+    snapshot.then(p => playbackTrace.end((p ?? undefined) as TraceProfile | undefined), () => playbackTrace.end());
+  }
   dispose() {
     if (this.closed) return;
+    this.endTrace();
     this.closed = true;
     this.listeners.clear();
     this.live.dispose();
