@@ -2,6 +2,7 @@
 // clock is the AudioContext frame counter, so note times are context seconds (D5).
 import {HostCore} from './host-core.js';
 import {INSTRUMENTS} from './instruments/index.js';
+import {warmHost} from './warm.js';
 class InstrumentHostProcessor extends AudioWorkletProcessor{
  constructor(options){
   super();
@@ -29,24 +30,8 @@ class InstrumentHostProcessor extends AudioWorkletProcessor{
    }catch(error){this.port.postMessage({type:'reply',id:data.id,error:String(error.message||error)});}
   });
  }
- // Warm-up. V8 compiles WebAssembly lazily, on a function's first call, so the first blocks
- // of a new instrument paid for it in the audio callback — ~30 ms on a laptop, enough on a
- // tablet to break up the first beats. While configuring (the page waits for the reply
- // before it starts the music), a throwaway host with the same instruments, chains and buses
- // plays one note per part for a fifth of a second: compiled code is shared by every
- // instance of a module, so the real host starts warm. Once per instrument kind and chain.
- warm(setup){
-  try{
-   const key=p=>[p.instrument?.kind,...(p.chain??[]).map(b=>b.type)].join(' '),fresh=setup.parts.filter(p=>INSTRUMENTS.has(p.instrument?.kind)&&!this.warmed.has(key(p)));
-   if(!fresh.length)return;
-   const scratch=new HostCore({rate:sampleRate,block:128,instruments:INSTRUMENTS,assets:this.assets,history:false});
-   scratch.configure({...setup,parts:fresh.map(p=>({...p,strip:{...p.strip,mute:false,solo:false}}))});
-   const target=p=>p.instrument.kind==='kit'?{piece:'snare'}:{pitch:p.instrument.kind==='plucked'?Math.min(...(p.instrument.layout?.strings??[{pitch:40}]).map(s=>s.pitch))+3:60};
-   scratch.schedule({notes:fresh.map((p,i)=>({id:`warm-${i}`,part:p.id,at:.01,duration:.1,velocity:.5,target:target(p)})),through:1});
-   for(let k=0;k<75;k++)scratch.render(128);
-   for(const p of fresh)this.warmed.add(key(p));
-  }catch{/* a cold start is slower, not wrong */}
- }
+ // Warm-up (warm.js), while configuring: the page waits for the reply before it plays.
+ warm(setup){warmHost(setup,{rate:sampleRate,block:128,instruments:INSTRUMENTS,assets:this.assets,HostCore},this.warmed);}
  // Each report also says what the time went on, by kind ('render', or the message type:
  // 'schedule', 'configure', 'cancel'…): its total, longest single stretch and stretches over
  // 8 ms (playbackTrace.ts in mnx-lab), and which kind the window's longest stretch was.

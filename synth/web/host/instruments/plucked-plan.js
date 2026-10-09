@@ -98,7 +98,10 @@ export function gestureEntries(entries,resolved,rate,state){
  return [...out.values()];
 }
 
-export function planPlucked(entries,resolved,rate,state){
+// `from`: the engine's position. Pitch events before it are not made (the engine keeps only
+// events at or after its position, and they decide nothing else), so a re-plan of notes
+// already sounding costs only their future.
+export function planPlucked(entries,resolved,rate,state,from=-Infinity){
  const {assigned,diagnostics,lastPluck,busy}=assignStrings(entries,resolved,rate,state),{preset}=resolved,exc=preset.instrument.excitation;
  const events=[],law=[],fingerMuted=new Map(state?.fingerMuted);
  const put=(frame,key,value,noteStart,note)=>{const e={frame:Math.round(frame),key,value,noteStart};events.push(e);if(note)law.push([e,note]);};
@@ -128,18 +131,19 @@ export function planPlucked(entries,resolved,rate,state){
   const attack=a.previous?0:n.nuance?.attackBendCents??0,velocity=a.root.lowered.velocity,seconds=n.duration;
   const hammer=a.previous&&!curves.some(t=>t.type==='legato')?(a.previous.pitch-a.pitch)*100:0,glide=Math.round(LEGATO_GLIDE_SECONDS*rate);
   // Plain and vibrato notes keep the pre-host 200 Hz grid; pitch curves use 1 kHz.
-  const grid=curves.length?Math.max(1,Math.round(rate/1000)):step,fine=1;
+  const grid=curves.length?Math.max(1,Math.round(rate/1000)):step,fine=1,key=`s${s}-frequency`,note={slot:s,fret:a.setupFret,velocity};
   for(let frame=start;frame<stop;frame+=hammer&&frame-start<glide?fine:grid){
+   if(frame<from)continue;
    const age=(frame-start)/rate,bend=attack*Math.exp(-age/ATTACK_BEND_SECONDS),vib=vibrato?vibratoCents(vibrato,age,seconds):0;
    let cents=bend+vib;
    if(curves.length){const x=(frame-start)/e.lengthFrames;for(const t of curves)cents+=techniqueCents(t,n,x,a.previous?.entry.lowered);}
    if(hammer&&frame-start<glide)cents+=hammer*(1-(frame-start)/glide);
-   put(frame,`s${s}-frequency`,clamp(a.base*2**(cents/1200),60,1400),owner,{slot:s,fret:a.setupFret,velocity});
+   put(frame,key,clamp(a.base*2**(cents/1200),60,1400),owner,note);
   }
  }
  applySetupLaw(law,preset.instrument.setup,rate);
  events.sort((x,y)=>x.frame-y.frame);
- return {events:latestPluckEvents(events).map(({frame,key,value})=>({frame,key,value})),assigned,diagnostics,state:{lastPluck,busy,fingerMuted}};
+ return {events:latestPluckEvents(events,true),assigned,diagnostics,state:{lastPluck,busy,fingerMuted}};
 }
 
 // instrument-setup.js withInstrumentSetup, per sounding note (a legato target uses

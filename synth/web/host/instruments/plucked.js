@@ -54,10 +54,10 @@ export class Plucked{
  // note (forget.js): the plan of the rest is unchanged, and stays small.
  forget(ids){
   forgetLeading(this,ids,()=>gestureEntries([...this.entries.values()],this.resolved,this.rate,this.memory),
-   prefix=>{this.memory=planPlucked(prefix,this.resolved,this.rate,this.memory).state;});
+   prefix=>{this.memory=planPlucked(prefix,this.resolved,this.rate,this.memory,Infinity).state;});
  }
  replan(){
-  const {events,diagnostics,assigned}=planPlucked(gestureEntries([...this.entries.values()],this.resolved,this.rate,this.memory),this.resolved,this.rate,this.memory);this.assigned=assigned;
+  const {events,diagnostics,assigned}=planPlucked(gestureEntries([...this.entries.values()],this.resolved,this.rate,this.memory),this.resolved,this.rate,this.memory,this.started?this.engine.position:-Infinity);this.assigned=assigned;
   for(const d of diagnostics){const key=`${d.code}:${d.noteId}`;if(!this.reported.has(key)){this.reported.add(key);this.emit('diagnostic',d);}}
   // Before the first block the engine loads exactly as processor.js loads a packet.
   // Excitation off until each string's first pluck (the planner gates it per pluck).

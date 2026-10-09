@@ -208,3 +208,28 @@ reference renders stay reproducible at a given sample rate (synth/docs/contract.
   - **The remaining steps are measured on the laptop**, with one Android round at the end to
     confirm them together. Stalls on the laptop are about a quarter of the tablet's, so a
     step is judged by the stall times the trace records, not by whether the laptop skips.
+- **9 Oct 2026: step 4, first part: a cheaper re-plan, still on the audio thread.** Every
+  `schedule` batch re-plans the guitar's remembered notes (about 20: two seconds back, a
+  second and a half ahead). Measured on Vestapol (`harness/tools/plan-stalls.ts`, with
+  `plan-bench.ts` replaying the captured planner inputs):
+  - **Where the time went:** 55% was `latestPluckEvents`, mostly a regular expression and a
+    built string per event; most of the rest was re-making pitch events already in the past,
+    which the engine throws away.
+  - **The changes:** strings are read by character code; there is one copy per event; the
+    planner skips pitch events before the engine's position. The worklet's warm-up re-plans
+    five small batches, with a vibrato and a bend, so the planner is compiled before the
+    first note.
+  - **The engine's events are identical** (hashed over 177 captured re-plans, and a test).
+  - **Results on the laptop:**
+
+    | | Before | After |
+    |---|---|---|
+    | Re-plan alone (warm) | 1.1 ms | 0.21 ms |
+    | `schedule` median | 1.7 ms | 0.5 ms |
+    | `schedule` p90 | 2.5 ms | 0.7 ms |
+    | Worst first-seconds batch | 3.1 ms | 1.4 ms |
+
+    The warm-up costs about 17 ms more, once per page.
+  - **Expected on the tablet:** the tablet ran about 4–8× the laptop's times, so a 10–38 ms
+    stall should now be about 3–10 ms. Moving planning to a Worker stays on the list in case
+    the end-of-plan Android round still shows stalls.

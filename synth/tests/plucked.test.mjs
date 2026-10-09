@@ -77,6 +77,21 @@ test('planPlucked reproduces automation() + setup law + ownership for plain and 
  }
 });
 
+// A re-plan from the engine's position skips pitch events before it: what it keeps is
+// exactly the full plan's events from there on, techniques included.
+test('planPlucked from a position plans exactly the full plan\'s events at and after it',()=>{
+ const rate=48000,resolved=resolveDesign(factory[0],STANDARD_GUITAR);
+ const take=performanceToNotes(selectPassage(reference,'fingerpick'),{part:'gtr'}).slice(0,12);
+ const curves=[note('v',.2,.8,52,{techniques:[{type:'vibrato',depthCents:30,rateHz:5}]}),note('b',.5,.6,57,{techniques:[{type:'bend',points:[{at:0,cents:0},{at:1,cents:200}]}]})];
+ const entries=[...take,...curves].map(n=>{const frame=frameAt(n.at,rate),endFrame=frameAt(n.at+n.duration,rate);return {id:n.id,note:n,lowered:n,primitives:{},frame,endFrame,lengthFrames:endFrame-frame};});
+ const full=planPlucked(entries,resolved,rate).events;
+ for(const from of [0,1,9600,24001,48000,Infinity]){
+  const later=planPlucked(entries,resolved,rate,undefined,from).events;
+  assert.deepEqual(later.filter(e=>e.frame>=from),full.filter(e=>e.frame>=from),`from ${from}`);
+  assert.ok(!later.some(e=>e.frame<from&&e.key.endsWith('-frequency')),`no pitch events before ${from}`);
+ }
+});
+
 test('steady notes measure within ±3 cents on every string, standard and ukulele layouts (pitch tolerance calibration)',()=>{
  for(const [layout,design] of [[STANDARD_GUITAR,'rounded-steel'],[STANDARD_GUITAR,'bridge-electric'],[UKULELE,'soft-nylon']]){
   const notes=layout.strings.flatMap((s,i)=>[0,5].map((fret,k)=>note(`s${i+1}f${fret}`,.2+(2*i+k)*1.2,1,s.pitch+fret,{fingering:{string:i+1,fret}})));

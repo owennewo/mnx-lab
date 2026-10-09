@@ -5,7 +5,11 @@ export function validateNotePolicy(policy){
  if(policy!==LEGACY_NOTE_POLICY&&policy!==LATEST_NOTE_POLICY)throw Error('Unknown note ownership policy: '+policy);
  return policy;
 }
-const stringOf=event=>/^s([0-5])-/.exec(event.key)?.[1];
+// The string of an `s0-`…`s5-` key (0–5), else undefined. Called per event on every re-plan,
+// so by character code rather than a regular expression.
+const stringOf=event=>{const k=event.key,s=k.charCodeAt(1)-48;return k.charCodeAt(0)===115&&k.charCodeAt(2)===45&&s>=0&&s<=5?s:undefined;};
+// `s<n>-trigger`, for a key stringOf has accepted.
+const isTriggerKey=key=>key.length===10&&key.endsWith('-trigger');
 
 // Keep the uncut trajectories, including historical onsets. Cutting this bank
 // would freeze a ringing note if a future pluck were subsequently delayed or
@@ -36,21 +40,24 @@ export class NoteOwnershipSchedule{
  }
 }
 
-// Also usable before native TSV export, where noteStart metadata is lost.
-export function latestPluckEvents(events){
- const notes=Array.from({length:6},()=>new Map());
- for(const e of events){
+// Also usable before native TSV export, where noteStart metadata is lost. `strip` returns
+// plain {frame,key,value} events, without the ownership metadata (the planner's form).
+export function latestPluckEvents(events,strip=false){
+ const notes=Array.from({length:6},()=>new Map()),owner=new Array(events.length);
+ for(let i=0;i<events.length;i++){
+  const e=events[i];
   if(!Number.isInteger(e.frame)||e.frame<0||!Number.isFinite(e.value)||typeof e.key!=='string')throw Error('Invalid note event');
   if(e.noteStart===undefined)continue; // Direct manual controls remain direct.
   const s=stringOf(e);
   if(s===undefined||!Number.isInteger(e.noteStart)||e.noteStart<0||e.frame<e.noteStart)throw Error('Invalid owned note event');
   let n=notes[s].get(e.noteStart);
   if(!n){n={start:e.noteStart,triggers:0,resets:[]};notes[s].set(e.noteStart,n);}
-  if(e.key===`s${s}-trigger`&&e.value===1){
+  owner[i]=n;
+  if(isTriggerKey(e.key)&&e.value===1){
    if(e.frame!==e.noteStart)throw Error('Owned pluck must trigger at its onset');
    n.triggers++;
   }
-  if(e.key===`s${s}-trigger`&&e.value===0)n.resets.push(e.frame);
+  if(isTriggerKey(e.key)&&e.value===0)n.resets.push(e.frame);
  }
  for(const bank of notes){
   const ordered=[...bank.values()].sort((a,b)=>a.start-b.start);
@@ -64,12 +71,12 @@ export function latestPluckEvents(events){
    n.reset=Math.min(n.resets[0],n.next-1);
   }
  }
- const result=[];
- for(const e of events){
-  if(e.noteStart===undefined){result.push({...e});continue;}
-  const s=stringOf(e),n=notes[s].get(e.noteStart);
-  if(e.key===`s${s}-trigger`&&e.value===0)result.push({...e,frame:n.reset});
-  else if(e.frame<n.next)result.push({...e});
+ const result=[],copy=strip?(e,frame)=>({frame,key:e.key,value:e.value}):(e,frame)=>({...e,frame});
+ for(let i=0;i<events.length;i++){
+  const e=events[i],n=owner[i];
+  if(!n){result.push(copy(e,e.frame));continue;}
+  if(isTriggerKey(e.key)&&e.value===0)result.push(copy(e,n.reset));
+  else if(e.frame<n.next)result.push(copy(e,e.frame));
  }
  return result.sort((a,b)=>a.frame-b.frame);
 }
