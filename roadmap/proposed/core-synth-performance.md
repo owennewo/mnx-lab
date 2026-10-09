@@ -305,7 +305,8 @@ reference renders stay reproducible at a given sample rate (synth/docs/contract.
     - sustained notes lose 1–6 dB at 2–8 kHz on most designs: the 4-tap Lagrange
       interpolation takes more treble per loop pass at the lower rate;
     - above 12 kHz drops 7–13 dB (bandwidth).
-    The lead listened to pairs of the same pieces and kept it as an option.
+    With listening pairs of the same pieces at both rates, the lead chose to keep it as an
+    option.
   - **A bug it found:** the guitar's fixed 18 kHz output low-pass was unstable at 32 kHz
     (every note turned to NaN within 20 ms). It is now min(18000, 0.45·SR), bit-identical
     at 44.1 and 48 kHz; the engine is republished with that one change.
