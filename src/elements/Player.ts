@@ -249,6 +249,14 @@ export class Player extends LitElement {
     @media (prefers-reduced-motion: reduce) {
       button.primary.strained { animation: none; box-shadow: 0 0 0 2px var(--player-ground), 0 0 0 4px oklch(0.78 0.16 75); }
     }
+    /* A prepared synth starts in tens of milliseconds: say "Preparing" only if it takes longer. */
+    p.preparing {
+      animation: preparing 0.15s ease 0.35s both;
+    }
+    @keyframes preparing {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
     button:disabled {
       opacity: 0.4;
       cursor: default;
@@ -1439,8 +1447,8 @@ export class Player extends LitElement {
       </section>` : nothing}
       ${this.videoPaneHosted ? nothing : this.renderYouTubeNotice()}
       ${this.loading
-        ? html`<p role="status">
-            Preparing ${this.sourceId === 'synth' && this.requiredSamples().length ? 'samples' : 'audio'}…
+        ? html`<p role="status" class="preparing">
+            Preparing ${this.sourceId === 'synth' && (this.synthEngine === 'host' ? this.legacySamples() : this.requiredSamples()).length ? 'samples' : 'audio'}…
           </p>`
         : nothing}
       ${this.error ? html`<p role="alert">Playback unavailable: ${this.error}</p>` : nothing}

@@ -38,6 +38,8 @@ class CorePort implements HostPort {
   cancel(cancel: { from?: number; silence?: boolean }) { this.cancels.push(cancel); this.diagnostics.push(...this.core.cancel(cancel)); }
   setVolume(volume: number) { this.volume = volume; }
   dispose() {}
+  idles = 0;
+  idle() { this.idles++; }
   load: ((report: LoadReport) => void) | undefined;
   watchLoad(listener: (report: LoadReport) => void) { this.load = listener; }
 }
@@ -251,4 +253,18 @@ it('the worklet’s load reports raise strain while playing; stopping clears it'
   expect(backend.snapshot.strained).toBeUndefined();
   port.load!({ busy: 0.2, peakMs: 1, underrunsTotal: 5 });
   expect(backend.snapshot.strained).toBe(true);
+}, 60_000);
+
+it('the port hears when playback stops — paused, stopped or at the end — and not before', async () => {
+  const { backend, port, run, flush, stream } = rig(scenario('vibrato-and-palm-mute'));
+  await backend.play(); await flush(); await run(0.5);
+  expect(port.idles).toBe(0);
+  backend.pause(); await flush();
+  expect(port.idles).toBe(1);
+  await backend.play(); await flush(); await run(0.3);
+  backend.seek(backend.snapshot.scorePosition!); await flush();
+  expect(port.idles, 'a seek while playing is not a stop').toBe(1);
+  await run(stream.seconds + 1);
+  expect(backend.snapshot.state).toBe('stopped');
+  expect(port.idles, 'the end of the piece').toBe(2);
 }, 60_000);

@@ -47,8 +47,10 @@ export interface HostPort {
   cancel(cancel: { from?: number; silence?: boolean }): void;
   setVolume(volume: number): void;
   dispose(): void;
-  /** Optional: fetch and compile ahead of play (no audio context needed). */
+  /** Optional: get ready to play — fetch, compile, configure, warm — before play is pressed. */
   preload?(): Promise<void>;
+  /** Optional: playback has stopped (the port may stop computing silence until the next unlock). */
+  idle?(): void;
   /** How busy the host's audio thread is, as the worklet reports it (hostStrain.ts). */
   watchLoad?(listener: (report: LoadReport) => void): void;
 }
@@ -176,7 +178,7 @@ export class HostBackend implements PlaybackBackend {
       dispose: () => {},
     };
     this.port.setVolume(this.volume);
-    // The host's code and DSP download and compile while the score is read, not on play.
+    // The host gets ready while the score is read, not on play.
     void this.port.preload?.().catch(() => {});
     // Strain matters only while playing and sounding — from the first note plus one report
     // window (half a second) — and clears when playback stops.
@@ -228,14 +230,17 @@ export class HostBackend implements PlaybackBackend {
 
   /** After every transport state frame: re-plan after a restart, else keep the host supplied. */
   private follow() {
-    const snapshot = this.live.snapshot;
+    const snapshot = this.live.snapshot, wasPlaying = this.plan !== undefined;
     if (this.dirty || (snapshot.state === 'playing' && !this.plan)) {
       this.dirty = false;
       this.port.cancel({ from: this.port.now(), silence: true });
       this.plan = snapshot.state === 'playing' ? this.newPlan(snapshot.position, snapshot.rate) : undefined;
     }
     // At the end of the piece the transport stops by itself: what is scheduled plays out.
-    if (snapshot.state !== 'playing') { this.plan = undefined; this.strain.reset(); return; }
+    if (snapshot.state !== 'playing') {
+      if (wasPlaying) this.port.idle?.();
+      this.plan = undefined; this.strain.reset(); return;
+    }
     if (this.plan && !this.plan.done && this.plan.through - this.clock.now() < this.ahead / 2) this.topUp(this.plan);
   }
   private newPlan(position: Performance['sounding'][number]['position'], speed: number): Plan {

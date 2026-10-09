@@ -357,6 +357,16 @@ worst early block 32 → 3 ms; the warm-up (~0.1 s on the laptop) happens before
 since play waits for configure. The worklet still renders bit-identically to Node
 (`synth/tests/host-browser.mjs`, all five steps).
 
+Then "Preparing audio" still showed on play (the lead): making the context, loading the
+worklet, configuring and warming all waited for the gesture. A page may make an
+AudioContext without one — it starts suspended — and the worklet loads, configures and warms
+in it all the same (checked in Chrome with its desktop policy,
+`--autoplay-policy=document-user-activation-required`). `NativeHostPort.preload` now does all
+of it as the score opens; play only resumes the context: play resolves in ~40 ms, the first
+note at the 0.25 s lead. A prepared context that could run is suspended until play, and the
+context is suspended 3 s after playback stops (`HostPort.idle`) — a silent host computes
+every block. "Preparing audio" appears only if preparing takes longer than 0.35 s.
+
 ## Decisions register
 
 | # | Decision | Status |
