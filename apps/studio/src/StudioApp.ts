@@ -10,11 +10,15 @@
 //   #/new              make a piece (roadmap/complete/studio-piece-create.md)
 //   #/deleted          what was deleted, restorable (roadmap/complete/studio-piece-lifecycle.md)
 //   #/not-permitted    Access admitted the address, D1 did not
+// The header names the build that is running, and offers Update once a newer
+// one is deployed (deployWatch.ts) — an installed app has no reload button.
 import { LitElement, css, html, nothing } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { LibraryClient, type LibrarySort } from '../../../src/storage/libraryClient.ts';
 import { loadSession, signIn, type Session } from './session.ts';
 import { nextTheme, readTheme, resolvedTheme, setTheme, themeGlyph, type ThemeSetting } from './theme.ts';
+import { BUILD, COMMIT } from './build.ts';
+import { watchDeploy } from './deployWatch.ts';
 import './LibraryPage.ts';
 import './PiecePage.ts';
 import './AliasesPage.ts';
@@ -89,6 +93,9 @@ export class StudioApp extends LitElement {
   /** The theme, read again whenever the header returns — the piece page has
    *  its own toggle over the same stored setting. */
   @state() private theme: ThemeSetting = readTheme();
+  /** The commit the site serves, once it is not this page's: the build here is stale. */
+  @state() private newerCommit: string | null = null;
+  private stopWatch: () => void = () => {};
 
   static styles = css`
     :host {
@@ -135,9 +142,18 @@ export class StudioApp extends LitElement {
       white-space: nowrap;
       font-weight: 500;
     }
-    .who {
+    .who,
+    .build {
       color: var(--ink-dim);
       white-space: nowrap;
+    }
+    .build {
+      font-size: 12px;
+      font-variant-numeric: tabular-nums;
+    }
+    button.update {
+      border-color: var(--accent);
+      color: var(--accent);
     }
     a,
     button,
@@ -221,6 +237,7 @@ export class StudioApp extends LitElement {
   connectedCallback() {
     super.connectedCallback();
     window.addEventListener('hashchange', this.onHashChange);
+    this.stopWatch = watchDeploy(commit => (this.newerCommit = commit));
     void loadSession(this.client).then(session => {
       this.session = session;
       if (session.kind === 'not-permitted' && this.route.page !== 'not-permitted') location.hash = '#/not-permitted';
@@ -229,6 +246,7 @@ export class StudioApp extends LitElement {
 
   disconnectedCallback() {
     window.removeEventListener('hashchange', this.onHashChange);
+    this.stopWatch();
     super.disconnectedCallback();
   }
 
@@ -245,6 +263,11 @@ export class StudioApp extends LitElement {
         ? nothing
         : html`<header>
             <a class="brand" href=${libraryHref}>MNX <b>Studio</b></a>
+            ${COMMIT ? html`<span class="build" title=${`Build ${BUILD}`}>${COMMIT}</span>` : nothing}
+            ${this.newerCommit
+              ? html`<button class="update" title=${`Build ${this.newerCommit} is deployed; this is ${COMMIT}. Reload to use it.`}
+                  @click=${() => location.reload()}>Update</button>`
+              : nothing}
             <span class="title"></span>
             ${this.route.page === 'aliases' || this.route.page === 'new' || this.route.page === 'deleted' ? html`<a class="button" href=${libraryReturnHref()} @click=${returnToLibrary}>Library</a>` : nothing}
             ${this.route.page === 'library' && email ? html`<a class="button" href=${newPieceHref}>New piece</a>` : nothing}
@@ -283,6 +306,7 @@ export class StudioApp extends LitElement {
       return html`<mnx-studio-piece
         .client=${this.client}
         .pieceId=${this.route.id}
+        .newerCommit=${this.newerCommit}
       ></mnx-studio-piece>`;
     if (this.route.page === 'aliases') return html`<mnx-studio-aliases .client=${this.client}></mnx-studio-aliases>`;
     if (this.route.page === 'new') return html`<mnx-studio-new-piece .client=${this.client}></mnx-studio-new-piece>`;

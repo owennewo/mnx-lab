@@ -4,4 +4,6 @@
 import { version } from '../../../package.json';
 
 declare const __MNX_COMMIT__: string | undefined;
-export const BUILD = `${version}+${typeof __MNX_COMMIT__ === 'string' && __MNX_COMMIT__ ? __MNX_COMMIT__ : 'dev'}`;
+/** The short commit this page was built from, or '' when git could not say. */
+export const COMMIT = typeof __MNX_COMMIT__ === 'string' ? __MNX_COMMIT__ : '';
+export const BUILD = `${version}+${COMMIT || 'dev'}`;

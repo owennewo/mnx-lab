@@ -208,10 +208,28 @@ try {
   const aliases = `${app}.querySelector('mnx-studio-aliases').shadowRoot`;
   await c.evaluate(`${aliases}.querySelector('button[aria-label="Remove alias"]').click()`);
   await wait(`${aliases}.textContent.includes('No aliases yet')`);
+  // The header names the build, and the build serves its commit for an
+  // installed app to compare against (deployWatch.ts). Coming back to the
+  // foreground after a deploy offers Update — in the header, and in the
+  // piece's head row — and never reloads by itself.
+  const served = await (await fetch(origin + '/studio/version.json')).json();
+  assert.match(served.commit, /^[0-9a-f]{7,}$/);
+  assert.equal(await c.evaluate(`${app}.querySelector('header .build').textContent`), served.commit);
+  assert.equal(await c.evaluate(`!!${app}.querySelector('button.update')`), false);
+  await c.send('Fetch.enable', { patterns: [{ urlPattern: '*/studio/version.json' }] });
+  const newer = event => { const message = JSON.parse(event.data); if (message.method !== 'Fetch.requestPaused') return;
+    void c.send('Fetch.fulfillRequest', { requestId: message.params.requestId, responseCode: 200, responseHeaders: [{ name: 'Content-Type', value: 'application/json' }],
+      body: Buffer.from(JSON.stringify({ commit: 'f00dfeed' })).toString('base64') }); };
+  ws.addEventListener('message', newer);
+  await c.evaluate(`document.dispatchEvent(new Event('visibilitychange'))`);
+  await wait(`${app}.querySelector('header button.update')?.title.includes('f00dfeed')`);
+  await c.send('Page.navigate',{url:origin+`/studio/#/piece/${pieceId}`});
+  await wait(`${piece}?.querySelector('[slot=chips] button.update')?.textContent === 'Update'`);
+  ws.removeEventListener('message', newer); await c.send('Fetch.disable');
   // A missing piece is a page, not a blank screen.
   await c.send('Page.navigate',{url:origin+'/studio/#/piece/soundslice%3ANoSuchPiece'});
   await wait(`${piece}?.textContent.includes('Could not open this piece')`);
   assert.equal(await c.evaluate(`Object.values(localStorage).some(v=>v.includes('Studio smoke piece') || v.includes('local@example.test'))`),false);
-  console.log('Studio smoke passed: root redirect, signed-out page, library list + filter, canonical .gp converted into the score frame + player, the tools row and tray (Zoom, Settings, the focus mark), Tags sheet add + alias, rail facets + favourite + sort, alias page, missing piece, no private localStorage.');
+  console.log('Studio smoke passed: root redirect, signed-out page, library list + filter, canonical .gp converted into the score frame + player, the tools row and tray (Zoom, Settings, the focus mark), Tags sheet add + alias, rail facets + favourite + sort, alias page, build stamp + Update after a newer deploy, missing piece, no private localStorage.');
   if (c.logs.length) throw new Error('Browser console errors: '+c.logs.join('\n'));
 } finally { ws?.close(); await stopChrome(chrome); await fs.rm(profile,{recursive:true,force:true,maxRetries:10,retryDelay:200}); await library.close(); }

@@ -196,6 +196,22 @@ function commit(): string {
 }
 
 /**
+ * /studio/version.json: the commit this deploy was built from — the same one
+ * `__MNX_COMMIT__` stamps into the bundle. An installed studio is resumed from
+ * memory rather than reloaded, so it asks this file whether the site has moved
+ * on (apps/studio/src/deployWatch.ts); public/_headers keeps it uncached.
+ */
+function deployStamp(commit: string): Plugin {
+  return {
+    name: 'mnx-deploy-stamp',
+    generateBundle() {
+      if (this.environment?.name !== 'client') return;
+      this.emitFile({ type: 'asset', fileName: 'studio/version.json', source: `${JSON.stringify({ commit })}\n` });
+    }
+  };
+}
+
+/**
  * The synth's shell at /synth/ (roadmap/complete/core-campaign-synth.md). The synth is
  * plain ES modules with its own deterministic app build (synth/scripts/build_app.mjs:
  * the HTML entry, its import closure including the AudioWorklet and Worker modules, and
@@ -236,8 +252,9 @@ export default defineConfig(async ({ command }) => {
     console.log(`dev: serving ${isWorktree() ? `worktree ${path.basename(ROOT)}` : 'the primary checkout'} on port ${devPort()}`);
     await prepareLocalLibrary();
   }
+  const built = commit();
   return {
-    define: { __MNX_COMMIT__: JSON.stringify(commit()) },
+    define: { __MNX_COMMIT__: JSON.stringify(built) },
     plugins: [
       // Runs the Worker (worker/index.ts) inside the Vite dev server via
       // workerd, so `npm run dev` serves both the app and /api/* — no separate
@@ -245,7 +262,8 @@ export default defineConfig(async ({ command }) => {
       cloudflare(),
       specMedia(),
       localLibraryLogin(),
-      synthShell()
+      synthShell(),
+      deployStamp(built)
     ],
     build: {
       target: 'es2022',

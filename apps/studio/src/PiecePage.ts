@@ -71,7 +71,7 @@ import './RecordingsSheet.ts';
 import './InstrumentsSheet.ts';
 import { sourceGlyph } from './SourceSheet.ts';
 import './SaveSheet.ts';
-import { BUILD } from './build.ts';
+import { BUILD, COMMIT } from './build.ts';
 import { pieceFilename } from '../../../src/storage/pieceSaveContext.ts';
 import { JUST_DELETED_KEY, libraryHref, pieceHref } from './StudioApp.ts';
 import type { EditPieceSnapshot } from './EditPieceSheet.ts';
@@ -99,6 +99,8 @@ const pencilGlyph = html`<svg width="15" height="15" viewBox="0 0 24 24" fill="n
 export class PiecePage extends LitElement {
   @property({ attribute: false }) client!: LibraryClient;
   @property({ type: String }) pieceId = '';
+  /** A newer deployed build than this page's (the shell's deployWatch.ts): the head row offers Update. */
+  @property({ attribute: false }) newerCommit: string | null = null;
   @state() private snapshot: LibrarySnapshot | null = null;
   @state() private recordings: readonly RecordingSource[] = [];
   @state() private doc: MnxDocument | null = null;
@@ -348,7 +350,25 @@ export class PiecePage extends LitElement {
     button.save.warn {
       color: light-dark(#a12121, #ffb4ab);
     }
+    /* Update rides with the save chip for the same reason: on screen at any width. */
+    button.update {
+      padding: 2px 8px;
+      border: 1px solid var(--accent);
+      border-radius: 3px;
+      background: transparent;
+      font: inherit;
+      font-size: 13px;
+      color: var(--accent);
+      white-space: nowrap;
+      cursor: pointer;
+    }
   `;
+
+  /** Whatever is unsaved goes to the library first; the recovery record covers what cannot. */
+  private async reloadForUpdate() {
+    await this.session?.flush().catch(() => {});
+    location.reload();
+  }
 
   private onThemeChange(event: CustomEvent<ThemeSetting>) {
     this.theme = event.detail;
@@ -1045,20 +1065,29 @@ export class PiecePage extends LitElement {
               aria-label=${instrumentsLabel} title=${instrumentsLabel} @click=${() => this.openPanel(this.instrumentsOpen ? null : 'instruments')}>
               ${mixerGlyph}
             </button>
-            ${this.save
-              ? html`${this.playOnly ? nothing : html`<button slot="actions" class="icon" type="button" aria-label="Keys" title="Keys" aria-pressed=${this.keysOpen} @click=${() => this.openPanel(this.keysOpen ? null : 'keys')}>
+            ${this.save && !this.playOnly
+              ? html`<button slot="actions" class="icon" type="button" aria-label="Keys" title="Keys" aria-pressed=${this.keysOpen} @click=${() => this.openPanel(this.keysOpen ? null : 'keys')}>
                   ${keysGlyph}
-                </button>`}
-                <span slot="chips">
+                </button>`
+              : nothing}`
+          : nothing}
+        ${this.newerCommit || (this.doc && this.save)
+          ? html`<span slot="chips">
+              ${this.newerCommit
+                ? html`<button type="button" class="update" title=${`Build ${this.newerCommit} is deployed; this is ${COMMIT}. Reload to use it.`}
+                    @click=${() => void this.reloadForUpdate()}>Update</button>`
+                : nothing}
+              ${this.doc && this.save
+                ? html`
                   <!-- Play only is the glyph alone, its words in the tooltip: on a
                        phone the title is what the head row has room for. -->
                   <button type="button" class=${`save ${chip!.tone}`} data-save=${this.save.status} aria-pressed=${this.saveOpen}
                     aria-label=${this.playOnly ? 'Play only on this device' : nothing} title=${this.playOnly ? 'Play only on this device' : nothing}
                     @click=${() => this.openPanel(this.saveOpen ? null : 'save')}>
                     ${saveGlyph}${this.playOnly ? nothing : html`<span>${this.readOnly ? 'Open in another tab · read only' : chip!.text}</span>`}
-                  </button>
-                </span>`
-              : nothing}`
+                  </button>`
+                : nothing}
+            </span>`
           : nothing}
         ${this.loading ? html`<p class="notice" role="status">Loading…</p>` : nothing}
         ${!this.loading && !this.doc
