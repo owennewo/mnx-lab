@@ -1,7 +1,7 @@
 // The playback trace's summaries (src/audio/playbackTrace.ts; roadmap core-synth-performance,
 // the baseline): reports split at ten seconds from the first note, hostStrain.ts's hot rule.
 import { it, expect } from 'vitest';
-import { summarise, longByKind, describe as describeRun, playbackTrace, type TraceRun } from '../../src/audio/playbackTrace.ts';
+import { summarise, longByKind, parseLatency, describe as describeRun, playbackTrace, type TraceRun } from '../../src/audio/playbackTrace.ts';
 
 const reports = [
   { t: -0.4, busy: 0.9, peakMs: 30, underruns: 0 },   // the start-up stall, before the first note
@@ -37,6 +37,11 @@ it('describes a run in a few lines, with the buffer, the long stretches and the 
     '  longest by kind: schedule 9 ms, render 4 ms',
     '  main-thread long tasks 3 (412 ms) · guitar (plucked) 44.5 ms/s',
   ].join('\n'));
+});
+it('takes a latencyHint category, the browser default or seconds', () => {
+  expect(['default', 'interactive', 'balanced', 'playback'].map(parseLatency)).toEqual(['default', 'interactive', 'balanced', 'playback']);
+  expect(parseLatency('0.1')).toBe(0.1);
+  expect([null, '', 'fast', '0', '-1', '2'].map(parseLatency)).toEqual([undefined, undefined, undefined, undefined, undefined, undefined]);
 });
 it('is off outside a page that asks for it', () => {
   expect(playbackTrace.on).toBe(false);

@@ -12,8 +12,9 @@
  *
  * Each report also says what the audio thread's time went on (rendering, or a message: a
  * schedule batch, a cancel, a configure) and which kind its longest stretch was. The
- * panel's Buffer button switches the audio output buffer between the browser's default and
- * `latencyHint: 'playback'` (roadmap step 2), applied when the page reloads.
+ * panel's Buffer buttons choose the AudioContext's latencyHint (roadmap step 2): the browser's
+ * default, 'balanced' (the trace's own default) or 'playback', applied when the page reloads;
+ * `?latency=` takes those or a number of seconds.
  */
 import type { LoadReport } from './hostStrain.ts';
 
@@ -97,22 +98,31 @@ function enabled(): boolean {
   return param !== null ? param !== 'off' : store?.getItem(FLAG) === '1';
 }
 
-/** The output buffer asked for under a trace: `?latency=playback` (or the panel) stores it, `?latency=default` clears it. */
-function latency(on: boolean): AudioContextLatencyCategory | undefined {
-  if (!on) return undefined;
-  const param = new URLSearchParams(location.search).get('latency'), store = storage();
-  try {
-    if (param === 'default') store?.removeItem(LATENCY);
-    else if (param === 'playback' || param === 'balanced' || param === 'interactive') store?.setItem(LATENCY, param);
-  } catch { /* this page only */ }
-  const value = param && param !== 'default' ? param : param === 'default' ? null : store?.getItem(LATENCY);
-  return value === 'playback' || value === 'balanced' || value === 'interactive' ? value : undefined;
+/** The output buffer asked for under a trace: the browser's default, a latencyHint category
+ *  or seconds. `?latency=` (default, interactive, balanced, playback or seconds) and the panel
+ *  store it; with nothing stored it is 'balanced'. */
+export type LatencyChoice = 'default' | AudioContextLatencyCategory | number;
+export function parseLatency(value: string | null | undefined): LatencyChoice | undefined {
+  if (value === 'default' || value === 'interactive' || value === 'balanced' || value === 'playback') return value;
+  const seconds = Number(value);
+  return value && Number.isFinite(seconds) && seconds > 0 && seconds <= 1 ? seconds : undefined;
 }
+function latency(on: boolean): LatencyChoice | undefined {
+  if (!on) return undefined;
+  const param = parseLatency(new URLSearchParams(location.search).get('latency')), store = storage();
+  if (param !== undefined) try { store?.setItem(LATENCY, String(param)); } catch { /* this page only */ }
+  return param ?? parseLatency(store?.getItem(LATENCY)) ?? 'balanced';
+}
+const latencyLabel = (c: LatencyChoice) => typeof c === 'number' ? `${c} s` : c;
 
 class PlaybackTrace {
   readonly on = enabled();
-  /** The AudioContext's latencyHint under this trace, if one was chosen. */
-  readonly latencyHint = latency(this.on);
+  /** The output buffer chosen under this trace (undefined when the trace is off). */
+  readonly latencyChoice = latency(this.on);
+  /** The AudioContext's latencyHint: undefined for the browser's default. */
+  get latencyHint(): AudioContextLatencyCategory | number | undefined {
+    return this.latencyChoice === undefined || this.latencyChoice === 'default' ? undefined : this.latencyChoice;
+  }
   private runs: TraceRun[] = [];
   private current: TraceRun | undefined;
   private underrunsSeen: number | undefined;
@@ -123,7 +133,7 @@ class PlaybackTrace {
     if (!this.on) return;
     try { this.runs = JSON.parse(storage()?.getItem(KEY) ?? '[]') as TraceRun[]; } catch { this.runs = []; }
     const nav = navigator as Navigator & { deviceMemory?: number };
-    Object.assign(this.device, { cores: nav.hardwareConcurrency, ...(nav.deviceMemory ? { memoryGb: nav.deviceMemory } : {}), ...(this.latencyHint ? { latencyHint: this.latencyHint } : {}) });
+    Object.assign(this.device, { cores: nav.hardwareConcurrency, ...(nav.deviceMemory ? { memoryGb: nav.deviceMemory } : {}), ...(this.latencyChoice !== undefined ? { latencyHint: latencyLabel(this.latencyChoice) } : {}) });
     try {
       new PerformanceObserver(list => {
         if (!this.current) return;
@@ -176,9 +186,12 @@ class PlaybackTrace {
 
   private render() {
     if (typeof document === 'undefined' || !document.body) return;
-    const panel = this.panel ??= document.body.appendChild(document.createElement('aside'));
+    // A manual popover lives in the browser's top layer, above whatever the app stacks there
+    // (the workbench and studio shells covered a fixed panel and took its taps).
+    const panel = this.panel ??= document.body.appendChild(Object.assign(document.createElement('aside'), { popover: 'manual' }));
     panel.setAttribute('aria-label', 'Playback trace');
-    Object.assign(panel.style, { position: 'fixed', left: '8px', bottom: '8px', zIndex: '99999', maxWidth: 'min(560px, calc(100vw - 16px))',
+    if (!panel.matches(':popover-open')) try { panel.showPopover(); } catch { /* no popover support: a fixed panel */ }
+    Object.assign(panel.style, { position: 'fixed', inset: 'auto auto 8px 8px', margin: '0', border: '0', zIndex: '99999', maxWidth: 'min(560px, calc(100vw - 16px))',
       maxHeight: '45vh', overflow: 'auto', padding: '8px 10px', borderRadius: '8px', font: '12px/1.4 ui-monospace, monospace',
       background: 'rgba(16, 24, 28, 0.94)', color: '#e6efe9', boxShadow: '0 4px 18px rgba(0,0,0,.4)', whiteSpace: 'pre-wrap' });
     panel.replaceChildren();
@@ -192,15 +205,27 @@ class PlaybackTrace {
       button('Copy', () => { void navigator.clipboard.writeText(this.text()).then(() => { head.lastChild!.textContent = ' copied'; }, () => { head.lastChild!.textContent = ' copy failed'; }); }),
       button('Clear', () => { this.runs = []; try { storage()?.removeItem(KEY); } catch { /* */ } this.render(); }),
       button('Off', () => { try { storage()?.removeItem(FLAG); storage()?.removeItem(KEY); storage()?.removeItem(LATENCY); } catch { /* */ } panel.remove(); }),
-      // The output buffer is chosen when the audio starts: switching reloads the page.
-      button(`Buffer: ${this.latencyHint ?? 'default'}`, () => {
-        try { if (this.latencyHint === 'playback') storage()?.removeItem(LATENCY); else storage()?.setItem(LATENCY, 'playback'); } catch { /* */ }
-        const url = new URL(location.href); url.searchParams.delete('latency'); location.replace(url.href);
-      }),
       document.createElement('span'));
+    // The output buffer is chosen when the audio starts: choosing reloads the page. Big
+    // targets: these are tapped on a phone between plays.
+    const buffers = document.createElement('div');
+    Object.assign(buffers.style, { display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px', margin: '8px 0' });
+    buffers.append('Buffer:', ...(['default', 'balanced', 'playback'] as const).map(choice => {
+      const on = this.latencyChoice === choice;
+      const b = button(choice[0]!.toUpperCase() + choice.slice(1), () => {
+        try { storage()?.setItem(LATENCY, choice); } catch { /* */ }
+        const url = new URL(location.href);
+        if (url.searchParams.has('latency')) { url.searchParams.delete('latency'); location.replace(url.href); } else location.reload();
+      });
+      b.setAttribute('aria-pressed', String(on));
+      Object.assign(b.style, { minHeight: '44px', minWidth: '96px', padding: '10px 16px', fontSize: '15px', marginRight: '0',
+        ...(on ? { background: '#3f8f78', borderColor: '#9fe0c9', fontWeight: '700' } : {}) });
+      return b;
+    }));
+    if (typeof this.latencyChoice === 'number') buffers.append(`(now ${latencyLabel(this.latencyChoice)})`);
     const body = document.createElement('div');
     body.textContent = this.runs.length ? this.runs.map(describe).join('\n') : 'Play a piece: each play from its first note to stop is one run.';
-    panel.append(head, body);
+    panel.append(head, buffers, body);
   }
   /** Everything, for pasting back: the summaries, then the runs as JSON. */
   private text() {

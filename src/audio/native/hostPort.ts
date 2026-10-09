@@ -83,7 +83,7 @@ export class NativeHostPort implements HostPort {
   private prepare(): AudioContext {
     // Under a playback trace the output buffer can be chosen (playbackTrace.ts), for A/B on a device.
     const latencyHint = playbackTrace.latencyHint;
-    const context = this.context ??= (this.options.createContext ?? (() => new AudioContext(latencyHint ? { latencyHint } : {})))();
+    const context = this.context ??= (this.options.createContext ?? (() => new AudioContext(latencyHint !== undefined ? { latencyHint } : {})))();
     this.loading ??= this.load(context).then(() => { if (!this.wanted && context.state === 'running') void context.suspend(); });
     return context;
   }
