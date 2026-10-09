@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {effectsMemoProbe} from '../scripts/wasm_effects_memo_probe.mjs';
+import {sha256} from '../scripts/faust.mjs';
 import {inactiveKnockGuard} from '../scripts/wasm_inactive_knock_guard.mjs';
 import {LiveThwackEngine} from '../web/audio/live-thwack.js';
 import {GuitarEngine} from '../web/audio/engine.js';
@@ -15,7 +16,7 @@ const presets=factoryPresets(),reference=read('web/data/performance.json');
 const plan=(p,performance,rate)=>instrumentPlanV2(enginePlan(performance,p,rate),{preset:p,rate});
 function same(a,b,n,label){for(let c=0;c<9;c++)assert.ok(Buffer.from(a[c].buffer,a[c].byteOffset,n*4).equals(Buffer.from(b[c].buffer,b[c].byteOffset,n*4)),`${label}, channel ${c}`);}
 test('cached live instrument reproduces from the original binary with unchanged ABI and DSP state layout',()=>{
- const guard=inactiveKnockGuard(original),rebuilt=effectsMemoProbe(guard.bytes,{cacheSite:site=>site.loopDepth===0});assert.deepEqual(guard.sites.map(s=>s.string),[0,1,2,3,4,5]);assert.deepEqual(rebuilt.bytes,cached);assert.equal(rebuilt.skippedSites.length,6);assert.ok(rebuilt.skippedSites.every(s=>s.name==='_expf'));assert.equal(cachedMeta.size,meta.size);assert.equal(cachedMeta.sourceSha256,meta.sourceSha256);assert.deepEqual(cachedMeta.ui,meta.ui);
+ const guard=inactiveKnockGuard(original),rebuilt=effectsMemoProbe(guard.bytes,{cacheSite:site=>site.loopDepth===0});assert.deepEqual(guard.sites.map(s=>s.string),[0,1,2,3,4,5]);assert.equal(sha256(rebuilt.bytes),sha256(cached),'Rebuilt guitar binary differs from the published one');assert.equal(rebuilt.skippedSites.length,6);assert.ok(rebuilt.skippedSites.every(s=>s.name==='_expf'));assert.equal(cachedMeta.size,meta.size);assert.equal(cachedMeta.sourceSha256,meta.sourceSha256);assert.deepEqual(cachedMeta.ui,meta.ui);
 });
 test('actual main and shadow audio is bit-identical across all ten voices, rapid chords, extreme attacks, live edits, resets and three rates',()=>{
  const performance=structuredClone(reference);
