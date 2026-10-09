@@ -81,7 +81,9 @@ export class NativeHostPort implements HostPort {
   }
   /** The context and a configured, warm host (no gesture needed: the context starts suspended). */
   private prepare(): AudioContext {
-    const context = this.context ??= (this.options.createContext ?? (() => new AudioContext()))();
+    // Under a playback trace the output buffer can be chosen (playbackTrace.ts), for A/B on a device.
+    const latencyHint = playbackTrace.latencyHint;
+    const context = this.context ??= (this.options.createContext ?? (() => new AudioContext(latencyHint ? { latencyHint } : {})))();
     this.loading ??= this.load(context).then(() => { if (!this.wanted && context.state === 'running') void context.suspend(); });
     return context;
   }
@@ -135,10 +137,11 @@ export class NativeHostPort implements HostPort {
     this.output.connect(context.destination);
     host.connect(this.output);
     host.on('diagnostic', (d: Diagnostic) => this.options.onDiagnostic?.(d));
-    host.on('load', (load: { busy: number; peakMs: number }) => {
+    host.on('load', (load: { busy: number; peakMs: number; peakKind?: string; kinds?: LoadReport['kinds'] }) => {
       // Chrome counts output underruns where it can (AudioContext.playbackStats); elsewhere load alone.
       const counted = (context as AudioContext & { playbackStats?: { underrunEvents?: number } }).playbackStats?.underrunEvents;
-      this.loadListener?.({ busy: load.busy, peakMs: load.peakMs, ...(typeof counted === 'number' ? { underrunsTotal: counted } : {}) });
+      this.loadListener?.({ busy: load.busy, peakMs: load.peakMs, ...(typeof counted === 'number' ? { underrunsTotal: counted } : {}),
+        ...(load.peakKind ? { peakKind: load.peakKind } : {}), ...(load.kinds ? { kinds: load.kinds } : {}) });
     });
     host.on('error', (e: unknown) => this.options.onError?.(String((e as { message?: unknown })?.message ?? e)));
     let configured: Setup | undefined;

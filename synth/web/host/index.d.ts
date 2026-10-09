@@ -63,7 +63,8 @@ export class InstrumentHost {
   cancel(cancel: { from?: number; ids?: string[]; silence?: boolean }): Promise<Diagnostic[]>;
   profile(action: 'start' | 'snapshot'): Promise<unknown>;
   now(): number;
-  /** 'load' (twice a second): `{busy, peakMs, windowMs}` — the share of the audio thread the host took, and its longest single stretch. */
+  /** 'load' (twice a second): `{busy, peakMs, peakKind, kinds, windowMs}` — the share of the audio thread the host took, its longest single stretch
+   *  and what that was ('render' or a message type), and per kind `{ms, max, long}` (long: stretches over 8 ms). */
   on(type: 'diagnostic' | 'meter' | 'sounding' | 'error' | 'load', fn: (data: any) => void): () => void;
   connect(destination?: AudioNode): this;
   dispose(): void;

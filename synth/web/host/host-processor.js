@@ -15,8 +15,8 @@ class InstrumentHostProcessor extends AudioWorkletProcessor{
   // up. The worklet may have no clock finer than Date.now; over half a second of calls its
   // millisecond steps average out.
   this.clock=globalThis.performance?.now?.bind(globalThis.performance)??Date.now;
-  this.load={since:this.clock(),busy:0,peak:0};
-  this.port.onmessage=({data})=>this.timed(()=>{
+  this.load={since:this.clock(),busy:0,peak:0,peakKind:'',kinds:{}};
+  this.port.onmessage=({data})=>this.timed(String(data?.type??'message'),()=>{
    try{
     // Messages carry their reply id so the client can await them (offline tests do).
     let result;
@@ -47,15 +47,19 @@ class InstrumentHostProcessor extends AudioWorkletProcessor{
    for(const p of fresh)this.warmed.add(key(p));
   }catch{/* a cold start is slower, not wrong */}
  }
- timed(work){
+ // Each report also says what the time went on, by kind ('render', or the message type:
+ // 'schedule', 'configure', 'cancel'…): its total, longest single stretch and stretches over
+ // 8 ms (playbackTrace.ts in mnx-lab), and which kind the window's longest stretch was.
+ timed(kind,work){
   const start=this.clock();work();const now=this.clock(),spent=now-start,load=this.load;
-  load.busy+=spent;load.peak=Math.max(load.peak,spent);
-  if(now-load.since>=500){this.port.postMessage({type:'load',data:{busy:load.busy/(now-load.since),peakMs:load.peak,windowMs:now-load.since}});this.load={since:now,busy:0,peak:0};}
+  load.busy+=spent;if(spent>load.peak){load.peak=spent;load.peakKind=kind;}
+  const k=load.kinds[kind]??={ms:0,max:0,long:0};k.ms+=spent;k.max=Math.max(k.max,spent);if(spent>8)k.long++;
+  if(now-load.since>=500){this.port.postMessage({type:'load',data:{busy:load.busy/(now-load.since),peakMs:load.peak,peakKind:load.peakKind,kinds:load.kinds,windowMs:now-load.since}});this.load={since:now,busy:0,peak:0,peakKind:'',kinds:{}};}
  }
  process(_,outputs){
   const output=outputs[0],n=output[0].length;
   if(!this.started){this.host.position=currentFrame;this.started=true;}
-  this.timed(()=>{
+  this.timed('render',()=>{
    try{
     const [l,r]=this.host.render(n);output[0].set(l.subarray(0,n));output[1]?.set(r.subarray(0,n));
    }catch(error){output.forEach(c=>c.fill(0));this.port.postMessage({type:'error',message:String(error.message||error)});}

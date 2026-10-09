@@ -27,7 +27,7 @@ import { SYNTH_CAPABILITIES, type BackendSnapshot, type PlaybackBackend, type Sc
 import { performancePositionAt, scorePositionAt } from './scorePosition.ts';
 import { carryPlace } from './carryPlace.ts';
 import type { Performance } from './performanceTypes.ts';
-import type { MnxStructure } from '../model/mnx.ts';
+import { documentTitle, type MnxStructure } from '../model/mnx.ts';
 import type { PartMix } from './partMix.ts';
 import { performanceToStream, type ContractStream } from './contractStream.ts';
 import { hostSetup, type HostSetup } from './hostSetup.ts';
@@ -239,7 +239,7 @@ export class HostBackend implements PlaybackBackend {
     this.underrunBase = undefined;
     if (playbackTrace.on) {
       if (playbackTrace.active) playbackTrace.end();
-      playbackTrace.begin(globalThis.document?.title || 'piece');
+      playbackTrace.begin(documentTitle(this.document) || globalThis.document?.title || 'piece');
       void this.port.profile?.('start').catch(() => {});
     }
     const region = this.live.loopRegion;

@@ -17,6 +17,10 @@ export interface LoadReport {
   underruns?: number;
   /** The browser's running count of underruns (the port reports this; the backend turns it into `underruns`). */
   underrunsTotal?: number;
+  /** What the window's longest stretch was ('render' or a message type) and, per kind, the total,
+   *  the longest stretch and the stretches over 8 ms (playbackTrace.ts). */
+  peakKind?: string;
+  kinds?: Record<string, { ms: number; max: number; long: number }>;
 }
 export const STRAIN = Object.freeze({ busy: 0.7, peakMs: 8, clearAfterMs: 3000 });
 export class StrainMonitor {

@@ -9,17 +9,28 @@
  * browser's underruns, the main thread's long tasks, and at stop the host's per-part
  * profile. A small panel sums each run up and copies every run as JSON. Runs are kept in
  * localStorage on the device; nothing is sent anywhere.
+ *
+ * Each report also says what the audio thread's time went on (rendering, or a message: a
+ * schedule batch, a cancel, a configure) and which kind its longest stretch was. The
+ * panel's Buffer button switches the audio output buffer between the browser's default and
+ * `latencyHint: 'playback'` (roadmap step 2), applied when the page reloads.
  */
 import type { LoadReport } from './hostStrain.ts';
 
 declare const __MNX_COMMIT__: string | undefined;
 const KEY = 'mnx.playbackTrace';
 const FLAG = 'mnx.playbackTrace.on';
+const LATENCY = 'mnx.playbackTrace.latency';
 /** Reports before the first note further than this are the start-up stall, not playback. */
 const BEFORE_SECONDS = 2;
 export const WINDOW_SECONDS = 10;
 
-export interface TraceReport { t: number; busy: number; peakMs: number; underruns: number }
+export interface TraceReport {
+  t: number; busy: number; peakMs: number; underruns: number;
+  /** What the longest stretch was, and the kinds with stretches over 8 ms (count). */
+  peak?: string; long?: Record<string, number>;
+}
+export interface KindTotal { ms: number; max: number; long: number }
 export interface TraceProfile { realTimeFactor?: number; parts?: Record<string, { kind: string; msPerAudioSecond: number }> }
 export interface TraceRun {
   label: string;
@@ -27,7 +38,9 @@ export interface TraceRun {
   /** Seconds the page had been open when play was pressed, and the play's number on this page. */
   pageSeconds: number;
   playInPage: number;
-  device: { userAgent: string; cores?: number; memoryGb?: number; sampleRate?: number; baseLatency?: number; outputLatency?: number };
+  device: { userAgent: string; cores?: number; memoryGb?: number; sampleRate?: number; baseLatency?: number; outputLatency?: number; latencyHint?: string };
+  /** Per kind over the run: total ms, longest stretch, stretches over 8 ms. */
+  kinds?: Record<string, KindTotal>;
   reports: TraceReport[];
   longTasks: { count: number; ms: number };
   profile?: TraceProfile;
@@ -51,13 +64,23 @@ const pct = (x: number) => `${Math.round(x * 100)}%`;
 const line = (name: string, w: WindowSummary) => w.reports
   ? `${name}: busy ${pct(w.busyMean)} mean, ${pct(w.busyMax)} max · longest ${w.peakMsMax.toFixed(1)} ms · hot ${w.hot}/${w.reports} · underruns ${w.underruns}`
   : `${name}: no reports`;
+/** The kinds' stretches over 8 ms in one window, most first: "schedule 3, render 1". Pure. */
+export function longByKind(reports: TraceReport[], first: number, last = Infinity): string {
+  const counts: Record<string, number> = {};
+  for (const r of reports) if (r.t >= first && r.t < last) for (const [k, n] of Object.entries(r.long ?? {})) counts[k] = (counts[k] ?? 0) + n;
+  return Object.entries(counts).sort((a, b) => b[1] - a[1]).map(([k, n]) => `${k} ${n}`).join(', ') || 'none';
+}
 /** A run as a few lines of text. Pure. */
 export function describe(run: TraceRun, index: number): string {
   const parts = Object.entries(run.profile?.parts ?? {}).map(([id, p]) => `${id} (${p.kind}) ${p.msPerAudioSecond.toFixed(1)} ms/s`).join(', ');
+  const kinds = Object.entries(run.kinds ?? {}).sort((a, b) => b[1].max - a[1].max).map(([k, v]) => `${k} ${v.max.toFixed(0)} ms`).join(', ');
+  const buffer = `buffer ${run.device.latencyHint ?? 'default'}${run.device.outputLatency !== undefined ? ` (output ${Math.round(run.device.outputLatency * 1000)} ms)` : ''}`;
   return [
-    `Run ${index + 1}: ${run.label} — play ${run.playInPage} on the page, ${run.pageSeconds.toFixed(0)} s after it opened`,
+    `Run ${index + 1}: ${run.label} — play ${run.playInPage} on the page, ${run.pageSeconds.toFixed(0)} s after it opened, ${buffer}`,
     `  ${line(`first ${WINDOW_SECONDS} s`, summarise(run.reports, 0, WINDOW_SECONDS))}`,
     `  ${line('after', summarise(run.reports, WINDOW_SECONDS))}`,
+    `  stretches over 8 ms: first ${WINDOW_SECONDS} s ${longByKind(run.reports, 0, WINDOW_SECONDS)}; after ${longByKind(run.reports, WINDOW_SECONDS)}`,
+    ...(kinds ? [`  longest by kind: ${kinds}`] : []),
     `  main-thread long tasks ${run.longTasks.count} (${Math.round(run.longTasks.ms)} ms)${parts ? ` · ${parts}` : ''}`,
   ].join('\n');
 }
@@ -74,8 +97,22 @@ function enabled(): boolean {
   return param !== null ? param !== 'off' : store?.getItem(FLAG) === '1';
 }
 
+/** The output buffer asked for under a trace: `?latency=playback` (or the panel) stores it, `?latency=default` clears it. */
+function latency(on: boolean): AudioContextLatencyCategory | undefined {
+  if (!on) return undefined;
+  const param = new URLSearchParams(location.search).get('latency'), store = storage();
+  try {
+    if (param === 'default') store?.removeItem(LATENCY);
+    else if (param === 'playback' || param === 'balanced' || param === 'interactive') store?.setItem(LATENCY, param);
+  } catch { /* this page only */ }
+  const value = param && param !== 'default' ? param : param === 'default' ? null : store?.getItem(LATENCY);
+  return value === 'playback' || value === 'balanced' || value === 'interactive' ? value : undefined;
+}
+
 class PlaybackTrace {
   readonly on = enabled();
+  /** The AudioContext's latencyHint under this trace, if one was chosen. */
+  readonly latencyHint = latency(this.on);
   private runs: TraceRun[] = [];
   private current: TraceRun | undefined;
   private underrunsSeen: number | undefined;
@@ -86,7 +123,7 @@ class PlaybackTrace {
     if (!this.on) return;
     try { this.runs = JSON.parse(storage()?.getItem(KEY) ?? '[]') as TraceRun[]; } catch { this.runs = []; }
     const nav = navigator as Navigator & { deviceMemory?: number };
-    Object.assign(this.device, { cores: nav.hardwareConcurrency, ...(nav.deviceMemory ? { memoryGb: nav.deviceMemory } : {}) });
+    Object.assign(this.device, { cores: nav.hardwareConcurrency, ...(nav.deviceMemory ? { memoryGb: nav.deviceMemory } : {}), ...(this.latencyHint ? { latencyHint: this.latencyHint } : {}) });
     try {
       new PerformanceObserver(list => {
         if (!this.current) return;
@@ -114,7 +151,13 @@ class PlaybackTrace {
     const total = report.underrunsTotal;
     const underruns = total === undefined ? report.underruns ?? 0 : this.underrunsSeen === undefined ? 0 : Math.max(0, total - this.underrunsSeen);
     if (total !== undefined) this.underrunsSeen = total;
-    run.reports.push({ t: Math.round(t * 100) / 100, busy: Math.round(report.busy * 1000) / 1000, peakMs: Math.round(report.peakMs * 100) / 100, underruns });
+    const long = Object.fromEntries(Object.entries(report.kinds ?? {}).filter(([, k]) => k.long > 0).map(([name, k]) => [name, k.long]));
+    run.reports.push({ t: Math.round(t * 100) / 100, busy: Math.round(report.busy * 1000) / 1000, peakMs: Math.round(report.peakMs * 100) / 100, underruns,
+      ...(report.peakKind ? { peak: report.peakKind } : {}), ...(Object.keys(long).length ? { long } : {}) });
+    for (const [name, k] of Object.entries(report.kinds ?? {})) {
+      const total = (run.kinds ??= {})[name] ??= { ms: 0, max: 0, long: 0 };
+      total.ms = Math.round((total.ms + k.ms) * 10) / 10; total.max = Math.max(total.max, Math.round(k.max * 10) / 10); total.long += k.long;
+    }
     if (run.device.outputLatency === undefined && this.device.outputLatency !== undefined) run.device = { ...this.device };
   }
   /** Playback stopped; `profile` is the host's report when it has one. */
@@ -148,7 +191,12 @@ class PlaybackTrace {
     head.append(`Playback trace · ${this.runs.length} run${this.runs.length === 1 ? '' : 's'} `,
       button('Copy', () => { void navigator.clipboard.writeText(this.text()).then(() => { head.lastChild!.textContent = ' copied'; }, () => { head.lastChild!.textContent = ' copy failed'; }); }),
       button('Clear', () => { this.runs = []; try { storage()?.removeItem(KEY); } catch { /* */ } this.render(); }),
-      button('Off', () => { try { storage()?.removeItem(FLAG); storage()?.removeItem(KEY); } catch { /* */ } panel.remove(); }),
+      button('Off', () => { try { storage()?.removeItem(FLAG); storage()?.removeItem(KEY); storage()?.removeItem(LATENCY); } catch { /* */ } panel.remove(); }),
+      // The output buffer is chosen when the audio starts: switching reloads the page.
+      button(`Buffer: ${this.latencyHint ?? 'default'}`, () => {
+        try { if (this.latencyHint === 'playback') storage()?.removeItem(LATENCY); else storage()?.setItem(LATENCY, 'playback'); } catch { /* */ }
+        const url = new URL(location.href); url.searchParams.delete('latency'); location.replace(url.href);
+      }),
       document.createElement('span'));
     const body = document.createElement('div');
     body.textContent = this.runs.length ? this.runs.map(describe).join('\n') : 'Play a piece: each play from its first note to stop is one run.';
