@@ -45,9 +45,10 @@ proposals that name their campaign.
 
 ### proposed/
 
-- **[core-synth-performance.md](proposed/core-synth-performance.md)** — stub: the synth's
-  steady-state cost on phones and tablets (measure on the devices, idle strings, a lighter
-  guitar mode, effects cost, playback latency); from the synth campaign's close.
+- **[core-synth-performance.md](proposed/core-synth-performance.md)** — the synth's cost on
+  phones and tablets: a physical thwack (tension modulation) replacing the full-engine shadows,
+  then nine further steps, each tried alone against a fixed baseline and adopted together at
+  the end; the unsteady first ten seconds; fp8/GPU considered and rejected.
 - **[core-musicxml-accidental-fidelity.md](proposed/core-musicxml-accidental-fidelity.md)** — MusicXML campaign item 24: explicit accidental enclosure import/render, named-glyph diagnostics, direct qualifier editing and the measured Studio GP save losses from `01a`/`01e`.
 - **[core-musicxml-rest-fidelity.md](proposed/core-musicxml-rest-fidelity.md)** — MusicXML campaign item 25: preserve multimeasure rest groups, explicit rest placement, 256th–1024th values and `03d`'s noncanonical one-bar full rests; diagnose unsupported symbol-style requests.
 - **[core-musicxml-rhythm-fidelity.md](proposed/core-musicxml-rhythm-fidelity.md)** — MusicXML campaign item 26: preserve the full `03a` written-note ladder, draw long noteheads, and keep `03b`/`03f` cursor gaps invisible.
