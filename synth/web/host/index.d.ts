@@ -84,6 +84,8 @@ export const BUS_TYPES: readonly string[];
 export const BLOCK_STATES: readonly ('on' | 'off')[];
 export const ECHO_BEATS: readonly number[];
 export const MASTER_PARAMS: Readonly<{ volumeDb: ParamSpec; ceilingDb: ParamSpec }>;
+/** The master limiter's look-ahead: all output is this much later than the scheduled frames. */
+export const MASTER_LOOKAHEAD_SECONDS: number;
 export function defaultParams(type: string): Record<string, number | boolean>;
 export function resolveParams(type: string, params?: Record<string, unknown>): { params: Record<string, number | boolean>; problems: string[] };
 

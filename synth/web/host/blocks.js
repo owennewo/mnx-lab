@@ -37,6 +37,9 @@ export const BLOCK_TYPES=Object.freeze({
 export const EFFECT_TYPES=Object.freeze(Object.keys(BLOCK_TYPES).filter(t=>BLOCK_TYPES[t].role==='effect'));
 export const BUS_TYPES=Object.freeze(Object.keys(BLOCK_TYPES).filter(t=>BLOCK_TYPES[t].role==='bus'));
 export const BLOCK_STATES=Object.freeze(['on','off']);
+// The master limiter looks 3 ms ahead (dsp/blocks/master.dsp): all output is that much later
+// than the frames the host schedules on.
+export const MASTER_LOOKAHEAD_SECONDS=.003;
 export const MASTER_PARAMS=Object.freeze({volumeDb:p('Volume',-60,12,0,{unit:'dB'}),ceilingDb:p('Ceiling',-24,0,-1,{unit:'dBFS'})});
 
 export const defaultParams=type=>Object.fromEntries(Object.entries(BLOCK_TYPES[type].params).map(([k,d])=>[k,d.default]));

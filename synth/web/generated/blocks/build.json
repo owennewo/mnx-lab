@@ -17,8 +17,8 @@
     },
     "master": {
       "source": "dsp/blocks/master.dsp",
-      "sourceSha256": "c58ff6ba593f3baa424d20c1dd794bb576d118bfce7aa0ac00cacae8646861f0",
-      "wasmSha256": "07d526a60462b7fdecfd2daa52c09ecc8e5db7af32d4466eabf834c52a5dce3d",
+      "sourceSha256": "9537a238ba98d765d77d83f546b9657b1b453f107586be2a87ce8b1bfa256963",
+      "wasmSha256": "fbe2e442ecc4a0774713b424022db53e691b4b6ab56cda0ed66e86e58f3be82c",
       "inputs": 2,
       "outputs": 3
     },

@@ -25,6 +25,9 @@ part DSP → part gain/pan → insert chain (rack 3.0.0) ─┬─ dry ───
 
 Same code in the AudioWorklet, in Node and offline. Native C++ stays guitar-only (D14).
 
+The master's limiter looks 3 ms ahead (`MASTER_LOOKAHEAD_SECONDS`, 9 Oct 2026): everything sounds 3 ms
+after the frame it is scheduled on, offline and live alike.
+
 ## 2. Data types
 
 All objects are plain JSON. Times are seconds (D5). Unknown fields are ignored on read and

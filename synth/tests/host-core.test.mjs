@@ -6,6 +6,7 @@ import {HostCore} from '../web/host/host-core.js';
 import {renderOffline} from '../web/host/offline.js';
 import {hostAssets} from '../web/host/node-assets.js';
 import {TestTone} from '../web/host/instruments/test-tone.js';
+import {MASTER_LOOKAHEAD_SECONDS} from '../web/host/blocks.js';
 
 const instruments={'test-tone':TestTone},assets=hostAssets();
 const read=p=>JSON.parse(fs.readFileSync(p));
@@ -81,7 +82,7 @@ test('strip level, pan, send and mute behave as documented',()=>{
  assert.ok(rms(sendless.audio[0],60000,72000)<1e-6&&rms(sent.audio[0],60000,72000)>1e-3,'no reverb tail without a send');
  const off=one({strip:{sends:{room:1}}},{buses:[{...wet,state:'off'}]});assert.ok(rms(off.audio[0],60000,72000)<1e-6,'a bus that is off adds nothing');
  const muted=one({},{controls:[{id:'m1',part:'a',at:.5,type:'mute',value:true},{id:'m2',part:'a',at:.8,type:'mute',value:false}]});
- assert.ok(rms(muted.audio[0],Math.round(.506*48000),Math.round(.8*48000))<1e-12,'muted within 5 ms');
+ assert.ok(rms(muted.audio[0],Math.round((.506+MASTER_LOOKAHEAD_SECONDS)*48000),Math.round(.8*48000))<1e-12,'muted within 5 ms (after the master look-ahead)');
  assert.ok(rms(muted.audio[0],Math.round(.81*48000),Math.round(1*48000))>.01,'unmuted');
  assert.ok(rms(one({strip:{mute:true}}).audio[0],0,72000)<1e-12,'a muted strip is silent from the start');
 });

@@ -3,7 +3,7 @@
   "filename": "master.dsp",
   "version": "2.81.10",
   "compile_options": "-lang wasm -ct 1 -cn MasterDSP -es 1 -mcd 16 -mdd 1024 -mdy 33 -single -ftz 2",
-  "size": 48,
+  "size": 24728,
   "inputs": 2,
   "outputs": 3,
   "meta": [
@@ -11,10 +11,25 @@
       "basics.lib/name": "Faust Basic Element Library"
     },
     {
+      "basics.lib/parallelOp:author": "Bart Brouns"
+    },
+    {
+      "basics.lib/parallelOp:copyright": "Copyright (c) 2020 Bart Brouns <bart@magnetophon.nl>"
+    },
+    {
+      "basics.lib/parallelOp:licence": "GPL-3.0"
+    },
+    {
       "basics.lib/version": "1.22.0"
     },
     {
       "compile_options": "-lang wasm -ct 1 -cn MasterDSP -es 1 -mcd 16 -mdd 1024 -mdy 33 -single -ftz 2"
+    },
+    {
+      "delays.lib/name": "Faust Delay Library"
+    },
+    {
+      "delays.lib/version": "1.2.0"
     },
     {
       "filename": "master.dsp"
@@ -61,7 +76,7 @@
           "varname": "fHslider2",
           "shortname": "ceiling",
           "address": "/Master/ceiling",
-          "index": 44,
+          "index": 16472,
           "init": -1,
           "min": -24,
           "max": 0,
@@ -73,8 +88,8 @@
           "varname": "fHslider0",
           "shortname": "release",
           "address": "/Master/release",
-          "index": 0,
-          "init": 0.15,
+          "index": 20,
+          "init": 0.06,
           "min": 0.01,
           "max": 2,
           "step": 0.01
@@ -85,7 +100,7 @@
           "varname": "fHslider1",
           "shortname": "volume",
           "address": "/Master/volume",
-          "index": 20,
+          "index": 40,
           "init": -3,
           "min": -60,
           "max": 12,
@@ -99,9 +114,10 @@
     "basics.lib": "855d280f983a5d3c3943183c51fd31698b420da9f0d1f8d31561b23338dd3cf3",
     "maths.lib": "d9647d09009647e4c727c4621f78979d088e94453b97af58fa3947f5670df6bf",
     "platform.lib": "e142c1e9643c38c6c7223b005067abd393b007e9966938b6c78f8968a9b8d5a3",
-    "signals.lib": "8b85de979268836be1c989b475c3126ec1953c5558f03c9add20d073acdb5b5f"
+    "signals.lib": "8b85de979268836be1c989b475c3126ec1953c5558f03c9add20d073acdb5b5f",
+    "delays.lib": "a2a6dd6ce935566a3285236921f40c22fe6488556fa62b108f9ef4d5f37084aa"
   },
   "block": "master",
-  "sourceSha256": "c58ff6ba593f3baa424d20c1dd794bb576d118bfce7aa0ac00cacae8646861f0",
-  "wasmSha256": "07d526a60462b7fdecfd2daa52c09ecc8e5db7af32d4466eabf834c52a5dce3d"
+  "sourceSha256": "9537a238ba98d765d77d83f546b9657b1b453f107586be2a87ce8b1bfa256963",
+  "wasmSha256": "fbe2e442ecc4a0774713b424022db53e691b4b6ab56cda0ed66e86e58f3be82c"
 }

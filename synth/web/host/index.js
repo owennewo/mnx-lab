@@ -7,5 +7,5 @@ export {renderOffline} from './offline.js';
 export {InstrumentHost,loadHostAssets} from './instrument-host.js';
 export {INSTRUMENTS} from './instruments/index.js';
 export {RIG_VERSION,makeRig,validateRig} from './rig.js';
-export {BLOCK_TYPES,EFFECT_TYPES,BUS_TYPES,BLOCK_STATES,ECHO_BEATS,MASTER_PARAMS,defaultParams,resolveParams} from './blocks.js';
+export {BLOCK_TYPES,EFFECT_TYPES,BUS_TYPES,BLOCK_STATES,ECHO_BEATS,MASTER_PARAMS,MASTER_LOOKAHEAD_SECONDS,defaultParams,resolveParams} from './blocks.js';
 export {DESIGN_SCHEMA,STANDARD_GUITAR,UKULELE,migrateDesign,resolveDesign,validateDesign,curveAt} from './instruments/plucked-design.js';
