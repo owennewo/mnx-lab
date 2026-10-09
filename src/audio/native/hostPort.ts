@@ -67,6 +67,18 @@ export class NativeHostPort implements HostPort {
     if (!context || context.state !== 'running') return 0;
     return (context.baseLatency || 0) + (context.outputLatency || 0) + this.lookahead;
   }
+  /** The context time at the speaker now: the output timestamp the browser measures, carried
+   *  forward on the page's clock (smooth where the context's time steps a whole output chunk at
+   *  a time), never past what has been rendered, less the limiter's look-ahead. Undefined until
+   *  the output is running and the browser can say. */
+  heard() {
+    const context = this.context as (AudioContext & { getOutputTimestamp?: () => AudioTimestamp }) | undefined;
+    if (!context || context.state !== 'running' || typeof context.getOutputTimestamp !== 'function') return undefined;
+    const stamp = context.getOutputTimestamp();
+    if (!stamp.contextTime || !stamp.performanceTime) return undefined;
+    const at = stamp.contextTime + (performance.now() - stamp.performanceTime) / 1000;
+    return Math.min(at, context.currentTime) - this.lookahead;
+  }
   /** The audio context and the master gain the host plays into, once unlocked. */
   get audio(): { context: AudioContext; output: GainNode } | undefined {
     return this.context && this.output ? { context: this.context, output: this.output } : undefined;

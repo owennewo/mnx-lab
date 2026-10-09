@@ -5,11 +5,11 @@ import { summarise, longByKind, parseLatency, describe as describeRun, playbackT
 
 const reports = [
   { t: -0.4, busy: 0.9, peakMs: 30, underruns: 0 },   // the start-up stall, before the first note
-  { t: 0.1, busy: 0.5, peakMs: 4, underruns: 0 },
-  { t: 0.6, busy: 0.8, peakMs: 5, underruns: 0 },     // hot: busy
+  { t: 0.1, busy: 0.5, peakMs: 4, underruns: 0, latencyMs: 600 },
+  { t: 0.6, busy: 0.8, peakMs: 5, underruns: 0, latencyMs: 610 },     // hot: busy
   { t: 9.6, busy: 0.2, peakMs: 9, underruns: 0, peak: 'schedule', long: { schedule: 1 } },     // hot: one long stretch
   { t: 10.1, busy: 0.2, peakMs: 2, underruns: 1 },    // hot: an underrun
-  { t: 10.6, busy: 0.1, peakMs: 1, underruns: 0 },
+  { t: 10.6, busy: 0.1, peakMs: 1, underruns: 0, latencyMs: 620 },
 ];
 it('splits a run at ten seconds and counts hot reports as the strain monitor does', () => {
   expect(summarise(reports, 0, 10)).toEqual({ reports: 3, busyMean: 0.5, busyMax: 0.8, peakMsMax: 9, hot: 2, underruns: 0 });
@@ -30,7 +30,7 @@ it('describes a run in a few lines, with the buffer, the long stretches and the 
     longTasks: { count: 3, ms: 412.4 }, kinds: { render: { ms: 900, max: 4, long: 0 }, schedule: { ms: 40, max: 9, long: 1 } },
     profile: { parts: { guitar: { kind: 'plucked', msPerAudioSecond: 44.5 } } } };
   expect(describeRun(run, 0)).toBe([
-    'Run 1: Anji — play 2 on the page, 32 s after it opened, buffer playback (output 24 ms)',
+    'Run 1: Anji — play 2 on the page, 32 s after it opened, buffer playback (output 24 ms reported, 610 ms measured)',
     '  first 10 s: busy 50% mean, 80% max · longest 9.0 ms · hot 2/3 · underruns 0',
     '  after: busy 15% mean, 20% max · longest 2.0 ms · hot 1/2 · underruns 1',
     '  stretches over 8 ms: first 10 s schedule 1; after none',

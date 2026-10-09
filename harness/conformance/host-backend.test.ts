@@ -47,6 +47,9 @@ class CorePort implements HostPort {
   outputLatency = 0;
   latencyFrom = 0;
   latency() { return this.now() >= this.latencyFrom ? this.outputLatency : 0; }
+  /** What the speaker is playing, measured: `heardLatency` behind the render (undefined: cannot say). */
+  heardLatency: number | undefined = undefined;
+  heard() { return this.heardLatency === undefined ? undefined : this.core.seconds - this.heardLatency; }
 }
 /** Timers on the host's clock; each callback runs in its own turn, as in a browser. */
 function rig(document: MnxStructure, options: Partial<HostBackendOptions> = {}) {
@@ -127,6 +130,40 @@ it('the cursor waits out the output latency: it colours a note when it is heard,
   const heard = backend.transport.snapshot.position;
   backend.pause(); await flush();
   expect(backend.transport.snapshot.position).toEqual(heard);
+}, 60_000);
+
+it('the cursor follows the latency measured at the speaker, not the one reported', async () => {
+  // The tablet reported 40 ms under latencyHint 'playback' while the sound came about a second
+  // after the cursor; the measured output timestamp knows.
+  const { backend, port, events, run, flush, stream } = rig(scenario('lab/document/twelve-bar-blues'));
+  port.outputLatency = 0.04; port.heardLatency = 0.9;
+  await run(0.1);
+  const start = port.now();
+  await backend.play(); await flush();
+  await run(4);
+  const times = [...new Set(stream.notes.map(n => n.at))].sort((x, y) => x - y);
+  const second = times.find(t => t > times[0]! + 0.01)!, onset = events.find(e => e.kind === 'onset' && e.now > start + 0.01)!;
+  expect(onset.now - (start + 0.25 + second)).toBeGreaterThanOrEqual(0.9 - 1e-9);
+  expect(onset.now - (start + 0.25 + second)).toBeLessThan(0.9 + 0.03);
+  // Rendering and the supply are unchanged: a lead ahead, past every commit horizon.
+  for (const n of port.batches.flatMap(b => b.notes)) expect(n.at).toBeCloseTo(start + 0.25 + stream.notes.find(m => m.id === base(n.id))!.at, 3);
+  for (const b of port.batches) for (const n of b.notes) expect(n.at - b.now, 'past the commit horizon').toBeGreaterThan(0.1);
+  expect(port.cancels.length, 'no restarts').toBe(1);
+}, 60_000);
+
+it('with a measured output the cursor moves smoothly though the audio clock steps a chunk at a time', async () => {
+  const { backend, port, run, flush } = rig(scenario('lab/document/twelve-bar-blues'));
+  port.clockStep = 0.17; port.heardLatency = 0.3;
+  await run(0.2);
+  await backend.play(); await flush();
+  await run(1.5);
+  // Sample every 8 blocks (21 ms) of rendering: run() itself waits on the stepped clock.
+  const clock = (backend as unknown as { clock: { now(): number } }).clock, seen: number[] = [];
+  for (let i = 0; i < 40; i++) { for (let k = 0; k < 8; k++) port.core.render(128); await flush(); seen.push(clock.now()); }
+  const steps = seen.slice(1).map((x, i) => x - seen[i]!);
+  expect(Math.max(...steps), 'no chunk-sized jumps').toBeLessThan(0.05);
+  expect(Math.min(...steps), 'never runs back').toBeGreaterThanOrEqual(0);
+  expect(port.cancels.length).toBe(1);
 }, 60_000);
 
 it('an audio clock that advances a chunk at a time does not restart playback', async () => {

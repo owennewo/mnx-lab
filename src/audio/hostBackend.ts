@@ -55,6 +55,12 @@ export interface HostPort {
   /** Optional: seconds from the host rendering a frame to it being heard, as the platform
    *  reports it (0 if it cannot say). */
   latency?(): number;
+  /** Optional: the host time being heard now, as the platform measures it at the speaker
+   *  (AudioContext.getOutputTimestamp, interpolated: smooth between the audio clock's steps),
+   *  or undefined where it cannot say. Preferred over `latency()`, which is only what the
+   *  platform reports: on a phone or tablet under a large buffer that was 40 ms against a
+   *  measured second (roadmap core-synth-performance). */
+  heard?(): number | undefined;
   /** Optional: the host's per-part cost metering, started at play and read at stop (playbackTrace.ts). */
   profile?(action: 'start' | 'snapshot'): Promise<unknown>;
 }
@@ -128,6 +134,9 @@ export class HostBackend implements PlaybackBackend {
    *  reading that moved mid-play would jump the cursor, and one taken just as the audio
    *  starts may not be the device's yet. */
   private latency = 0;
+  /** The clock follows the port's measured `heard()` (else the reported latency), and never runs back. */
+  private measured = false;
+  private last = -Infinity;
   private dirty = false;
   private generation = 0;
   private plan: Plan | undefined;
@@ -151,9 +160,18 @@ export class HostBackend implements PlaybackBackend {
     this.clock = {
       now: () => {
         if (this.frozen === undefined) {
-          const now = this.port.now() - this.lead;
-          if (now - this.latency <= this.hold) this.latency = Math.max(0, this.port.latency?.() || 0);
-          this.frozen = Math.max(now - this.latency, this.hold);
+          const heard = this.port.heard?.();
+          let now: number;
+          this.measured = heard !== undefined;
+          if (heard !== undefined) now = heard - this.lead;
+          else {
+            const rendered = this.port.now() - this.lead;
+            if (rendered - this.latency <= this.hold) this.latency = Math.max(0, this.port.latency?.() || 0);
+            now = rendered - this.latency;
+          }
+          // A fresh output timestamp can land a little behind the last interpolation: audio
+          // time does not run back.
+          this.frozen = this.last = Math.max(now, this.hold, this.last);
           queueMicrotask(() => { this.frozen = undefined; });
         }
         return this.frozen;
@@ -181,7 +199,10 @@ export class HostBackend implements PlaybackBackend {
     // Strain matters only while playing and sounding — from the first note plus one report
     // window (half a second) — and clears when playback stops.
     this.port.watchLoad?.(report => {
-      if (playbackTrace.active) playbackTrace.load(report, this.port.now() - this.audibleAt);
+      if (playbackTrace.active) {
+        const heard = this.port.heard?.();
+        playbackTrace.load(report, this.port.now() - this.audibleAt, heard === undefined ? undefined : this.port.now() - heard);
+      }
       if (this.closed || this.live.snapshot.state !== 'playing' || this.port.now() < this.audibleAt + 0.5) return;
       // The browser counts underruns late: the first report that counts only sets the baseline,
       // so the start-up stall's (in silence) never count.
@@ -263,7 +284,10 @@ export class HostBackend implements PlaybackBackend {
     return bpm;
   }
   /** The transport time the host is rendering: the supply runs ahead of that, not of what is heard. */
-  private rendered() { return this.clock.now() + this.latency; }
+  private rendered() {
+    const now = this.clock.now();
+    return this.measured ? Math.max(now, this.port.now() - this.lead) : now + this.latency;
+  }
   /** Supply the host from where the plan stands to `ahead` past now. */
   private topUp(p: Plan) {
     const to = this.rendered() + this.ahead, notes: Note[] = [], controls: Control[] = [];

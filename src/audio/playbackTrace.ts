@@ -28,6 +28,8 @@ export const WINDOW_SECONDS = 10;
 
 export interface TraceReport {
   t: number; busy: number; peakMs: number; underruns: number;
+  /** The latency measured at the speaker (render to heard), ms, where the browser can say. */
+  latencyMs?: number;
   /** What the longest stretch was, and the kinds with stretches over 8 ms (count). */
   peak?: string; long?: Record<string, number>;
 }
@@ -75,7 +77,10 @@ export function longByKind(reports: TraceReport[], first: number, last = Infinit
 export function describe(run: TraceRun, index: number): string {
   const parts = Object.entries(run.profile?.parts ?? {}).map(([id, p]) => `${id} (${p.kind}) ${p.msPerAudioSecond.toFixed(1)} ms/s`).join(', ');
   const kinds = Object.entries(run.kinds ?? {}).sort((a, b) => b[1].max - a[1].max).map(([k, v]) => `${k} ${v.max.toFixed(0)} ms`).join(', ');
-  const buffer = `buffer ${run.device.latencyHint ?? 'default'}${run.device.outputLatency !== undefined ? ` (output ${Math.round(run.device.outputLatency * 1000)} ms)` : ''}`;
+  const measured = run.reports.map(r => r.latencyMs).filter((x): x is number => x !== undefined).sort((a, b) => a - b);
+  const reported = run.device.outputLatency !== undefined ? `output ${Math.round(run.device.outputLatency * 1000)} ms reported` : '';
+  const heard = measured.length ? `${measured[measured.length >> 1]} ms measured` : '';
+  const buffer = `buffer ${run.device.latencyHint ?? 'default'}${reported || heard ? ` (${[reported, heard].filter(Boolean).join(', ')})` : ''}`;
   return [
     `Run ${index + 1}: ${run.label} — play ${run.playInPage} on the page, ${run.pageSeconds.toFixed(0)} s after it opened, ${buffer}`,
     `  ${line(`first ${WINDOW_SECONDS} s`, summarise(run.reports, 0, WINDOW_SECONDS))}`,
@@ -155,7 +160,7 @@ class PlaybackTrace {
     this.underrunsSeen = undefined;
   }
   /** A load report, `t` seconds after the first note was due (negative before it). */
-  load(report: LoadReport, t: number) {
+  load(report: LoadReport, t: number, measured?: number) {
     const run = this.current;
     if (!run || t < -BEFORE_SECONDS) return;
     const total = report.underrunsTotal;
@@ -163,7 +168,8 @@ class PlaybackTrace {
     if (total !== undefined) this.underrunsSeen = total;
     const long = Object.fromEntries(Object.entries(report.kinds ?? {}).filter(([, k]) => k.long > 0).map(([name, k]) => [name, k.long]));
     run.reports.push({ t: Math.round(t * 100) / 100, busy: Math.round(report.busy * 1000) / 1000, peakMs: Math.round(report.peakMs * 100) / 100, underruns,
-      ...(report.peakKind ? { peak: report.peakKind } : {}), ...(Object.keys(long).length ? { long } : {}) });
+      ...(report.peakKind ? { peak: report.peakKind } : {}), ...(Object.keys(long).length ? { long } : {}),
+      ...(measured !== undefined && Number.isFinite(measured) ? { latencyMs: Math.round(measured * 1000) } : {}) });
     for (const [name, k] of Object.entries(report.kinds ?? {})) {
       const total = (run.kinds ??= {})[name] ??= { ms: 0, max: 0, long: 0 };
       total.ms = Math.round((total.ms + k.ms) * 10) / 10; total.max = Math.max(total.max, Math.round(k.max * 10) / 10); total.long += k.long;
