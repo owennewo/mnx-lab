@@ -1,5 +1,5 @@
 /**
- * Playback trace (roadmap/proposed/core-synth-performance.md, the baseline): what the synth's
+ * Playback trace (roadmap/complete/core-synth-performance.md, the baseline): what the synth's
  * audio thread costs on a real device, play by play, so the first ten seconds can be told
  * apart from the rest and a change judged on the lead's phone and tablet.
  *

@@ -45,10 +45,6 @@ proposals that name their campaign.
 
 ### proposed/
 
-- **[core-synth-performance.md](proposed/core-synth-performance.md)** — the synth's cost on
-  phones and tablets: a physical thwack (tension modulation) replacing the full-engine shadows,
-  then nine further steps, each tried alone against a fixed baseline and adopted together at
-  the end; the unsteady first ten seconds; fp8/GPU considered and rejected.
 - **[core-musicxml-accidental-fidelity.md](proposed/core-musicxml-accidental-fidelity.md)** — MusicXML campaign item 24: explicit accidental enclosure import/render, named-glyph diagnostics, direct qualifier editing and the measured Studio GP save losses from `01a`/`01e`.
 - **[core-musicxml-rest-fidelity.md](proposed/core-musicxml-rest-fidelity.md)** — MusicXML campaign item 25: preserve multimeasure rest groups, explicit rest placement, 256th–1024th values and `03d`'s noncanonical one-bar full rests; diagnose unsupported symbol-style requests.
 - **[core-musicxml-rhythm-fidelity.md](proposed/core-musicxml-rhythm-fidelity.md)** — MusicXML campaign item 26: preserve the full `03a` written-note ladder, draw long noteheads, and keep `03b`/`03f` cursor gaps invisible.
@@ -522,6 +518,14 @@ back up to `proposed/` the moment it is.
 
 ### complete/
 
+- **[core-synth-performance.md](complete/core-synth-performance.md)** — **complete
+  2026-10-09**: the synth on phones and tablets. The guitar's thwack became an attack soak
+  (engine generation 4, a guitar part 35% cheaper, no per-pluck spikes); a Balanced output buffer with
+  the cursor on the measured output time; re-plans a quarter of the cost; the room, drive and
+  echo no longer recompute filters every sample; a Light (32 kHz) sound in the Instruments
+  sheet; a look-ahead master limiter and the `?trace` playback trace. Clang and a Worker
+  planner were measured and not needed. Left open: one dropout ~0.7 s into a play.
+
 - **[core-campaign-synth.md](complete/core-campaign-synth.md)** — **campaign, complete
   2026-10-09**: the guitar-faust synth moved into `synth/` (its own workspace and app at
   `/synth/`, open access); the site root became a home page with licences and notices
@@ -529,7 +533,7 @@ back up to `proposed/` the moment it is.
   contract stream, part router, per-person instruments and imported rigs in studio, ready
   before play, strain on the play button — in studio, the workbench, the embed (the synth
   ships beside its script) and the library. The old Web Audio sink and its sample packs are
-  gone. Left open: synth optimisation (proposed/core-synth-performance.md), Instruments-sheet
+  gone. Left open: synth optimisation (since done: complete/core-synth-performance.md), Instruments-sheet
   meters and a rig hand-off, resuming performance-listening.
 - **[studio-installable-app.md](complete/studio-installable-app.md)** — **complete 2026-09-25**:
   studio installs as a real app rather than a bookmark shortcut — a manifest and a drawn

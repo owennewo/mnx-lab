@@ -126,7 +126,7 @@ mnx-lab (monorepo; github.com/owennewo/mnx-lab is PUBLIC; deployed at mnx-lab.to
 | 6 | Studio: choosing instruments and rigs | ☑ Done | Instruments sheet: factory designs, Import rig…; `host-instruments.test.ts`; `studio-instruments` smoke |
 | 7 | Persistence: rig references in D1 | ☒ Not needed (S23) | choices ride `piece_views.prefs`; its cap raised to 64 KB |
 | 8 | Retire the old sink | ☑ Done (S25) | sink, oscillators, `SynthBackend`, sample packs and the flag removed; embed plays on the synth beside its script (S26); `embed` smoke cross-origin |
-| 9 | Performance, smokes and archiving guitar-faust | ☑ Done | forgetting, warm-up, ready-before-play, strain; multi-part leg in the `synth-host` smoke; optimisation plan `roadmap/proposed/core-synth-performance.md`; guitar-faust archived (S14) |
+| 9 | Performance, smokes and archiving guitar-faust | ☑ Done | forgetting, warm-up, ready-before-play, strain; multi-part leg in the `synth-host` smoke; optimisation plan `roadmap/complete/core-synth-performance.md`; guitar-faust archived (S14) |
 
 ## Phase 0 — Readiness and decisions
 
@@ -337,7 +337,7 @@ preferences; a part rig is about 4 KB, so the Worker's preferences cap went from
   signal on the play button (below). The `synth-host` smoke plays the multi-part twelve-bar
   blues (guitar and keys) and fails if the worklet's load is high or climbs (strain is not
   asserted there: the gate runs smokes in parallel, and a shared machine stalls on its own). Further optimisation is a
-  later plan: `roadmap/proposed/core-synth-performance.md`.
+  later plan: `roadmap/complete/core-synth-performance.md`.
 - [x] guitar-faust: archived with a README banner pointing here (S14, `f71b1c1`).
 - [ ] Resume performance-listening — the lead's call (S13); its bench keeps working, with the
   guitar packs it renders from now under `experiments/performance-listening/bench/samples/`.
@@ -429,7 +429,7 @@ every block. "Preparing audio" appears only if preparing takes longer than 0.35 
 
 Phases 0–9 done; Phase 7 not needed (S23). The player plays every score on the synth, in
 studio, the workbench, the embed and the library; the old Web Audio sink is gone. What it
-leaves open: synth optimisation (`roadmap/proposed/core-synth-performance.md`), level meters
+leaves open: synth optimisation (`roadmap/complete/core-synth-performance.md`), level meters
 and a same-origin rig hand-off in the Instruments sheet (Phase 6 follow-ups), MIDI export via
 `lower()` (dropped above), and resuming performance-listening (S13, the lead's call).
 

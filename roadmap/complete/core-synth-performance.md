@@ -1,9 +1,34 @@
 # Synth performance on slower devices
 
-**Status:** proposed, from roadmap/complete/core-campaign-synth.md (9 Oct 2026); steps agreed
-with the lead on 9 Oct 2026. The lead: "there may be room for synth optimisations but that will
-be for a later plan." Sound may change where a different approach gives similar quality for less
-compute; the current engine need not be reproduced bit for bit.
+> **Status: COMPLETE 2026-10-09.** Proposed from roadmap/complete/core-campaign-synth.md and
+> agreed with the lead on 9 Oct 2026; closed the same day after the Android round, at the
+> lead's direction ("move to complete"). Sound was allowed to change where a different
+> approach gives similar quality for less compute. The audible changes (the attack soak, the
+> limiter, the Light sound) were heard and signed off by the lead; the rest measured at or
+> below −55 dB against the signal.
+
+## Outcome
+
+On the lead's phone and tablet, studio playback has no dropouts after the first ten seconds,
+and at most one about 0.7 s into a play, where there were 2–5 at the start and stalls of
+23–38 ms throughout. The tablet's audio thread went from 39% to 29% busy. The table is under
+*Progress*, 9 Oct, the Android round.
+
+| Step | Result |
+|---|---|
+| 1. Physical thwack | **Adopted** as the attack soak, engine generation 4: a guitar part 35% cheaper on the reference take, with no per-pluck spikes. In-loop tension modulation was tried first and rejected (20–25% dearer). |
+| 2. Playback latency | **Adopted** as `balanced` (`playback` skipped on the tablet). The cursor now follows the measured output time. |
+| 3. Start-up warmth | **Not done.** One dropout at ~0.7 s per play and `configure` (60–150 ms) before a page's first play remain: the follow-up if wanted. |
+| 4. Planning off the audio thread | **Done in place:** each re-plan costs a quarter of what it did, and the warm-up compiles the planner; a Worker was not needed. |
+| 5. clang | **Rejected:** 1–5% faster than FAUST's own WebAssembly. |
+| 6. One polarisation | Not needed. |
+| 7. A leaner loop | **Pitch events on block boundaries** (about 7%) adopted with step 1; taking the loss smoothing to control rate was measured and dropped (audible); 7b not needed. |
+| 8. A cheaper room | **Done:** the room, drive and echo stopped recomputing filters every sample (room 3.7× cheaper; −21% on the reference session). |
+| 9. Diagnostics-only work | **Dropped:** measured at 0%. |
+| 10. 32 kHz | **Adopted as an option:** Sound → Light in studio's Instruments sheet. A third less work on the laptop, 10–17% less time on the phone (its CPU clocks down). |
+
+Also landed along the way: the master's 3 ms look-ahead limiter, and the playback trace
+(`?trace`) used to measure all of it. Budget D13 (and D9) is now a third of a plucked part.
 
 ## What is known
 
