@@ -146,3 +146,43 @@ reference renders stay reproducible at a given sample rate (synth/docs/contract.
   available in an AudioWorklet.
 - **Quality that adapts to strain mid-piece.** Output would then depend on the device's
   timing and stop being reproducible. Any lighter mode is chosen before playback starts.
+
+## Progress
+
+- **9 Oct 2026: step 1 signed off acoustically** by the lead ("The thwack is signed off
+  acoustically, I like it"). It waits on branch `synth-perf-thwack` for adoption at the end.
+  - **What it became.** In-loop tension modulation was tried first (kept as
+    `dsp/engine2-experiments/stage7-tension.dsp`). It cost 20–25% because the loop delay
+    became per-sample, and the planner already had the same pitch glide for free (the
+    setup's tension law).
+  - **The adopted form, an "attack soak"** (`stage7-soak.dsp`):
+    - a velocity² envelope per string drains a hard pluck's extra energy (treble faster);
+    - the drained signal sounds through the design's body modes, pitched with the note;
+    - the glide is the planner's tension law.
+  - **The editor's Attack tab** holds Thwack, Thwack time, Thwack body, Thwack treble, Glide
+    and Glide time, with a Thwack On/Off button for A/B listening.
+  - **Thwack body is calibrated per design** from its resonance table
+    (`plucked-body.js`): averages at body 1 span 5.4–7.8 dB across the factory designs,
+    where they spanned 2.5–7.9 uncalibrated (bright metallic's resonances sit above most
+    of a note's energy).
+  - **Cost** (Node, i7, median ms per audio second and 99th-percentile block):
+
+    | Workload | Old thwack | Thwack off | New thwack |
+    |---|---|---|---|
+    | Guitar strums | 61.8 · 0.84 ms | 43.0 · 0.24 ms | 47.1 · 0.25 ms |
+    | Fingerpicking | 47.8 · 0.28 ms | 42.1 · 0.22 ms | 47.5 · 0.27 ms |
+    | Band groove | 91.6 · 1.03 ms | 59.1 · 0.37 ms | 63.8 · 0.38 ms |
+    | Reference session | 81.1 · 0.70 ms | 65.7 · 0.32 ms | 71.2 · 0.37 ms |
+
+    The old thwack's spikes are gone. The new one costs 8–13% over none: the body is 6–9%,
+    the soak about 2%. Pausing the body while nothing soaks saves only ~1%, because an
+    envelope lasts ~1.4 s and real music plucks more often than that.
+  - **Learnings.**
+    - A loss in a waveguide loop is met once per pass (f times a second), not once per
+      sample.
+    - FAUST's WASM backend turns `x*x` into a per-sample `pow` call; `x*max(0,x)` avoids it.
+    - Synth tests run one file at a time under a memory cap when the engine is replaced: a
+      failing `deepEqual` on two wasm Buffers once grew to 12 GB.
+- **9 Oct 2026: the master limiter landed on main** (c192f6b6), outside this plan's steps:
+  3 ms look-ahead, soft knee and two-stage release, signed off by the lead while listening
+  to step 1. All output is 3 ms later than its scheduled frame (`MASTER_LOOKAHEAD_SECONDS`).
