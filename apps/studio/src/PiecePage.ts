@@ -80,7 +80,7 @@ import { hostSetup } from '../../../src/audio/hostSetup.ts';
 import type { FactoryDesign } from '../../../src/audio/hostInstruments.ts';
 import { loadFactoryDesigns } from '../../../src/audio/native/hostPort.ts';
 
-import { VIEW_KEY, DISPLAY_KEY, UNROLLED_KEY, STAFF_SP_KEY, SPACE_SP_KEY, SPACING_MODE_KEY, FOCUSED_KEY, write, readView, readDisplay, readUnrolled, readSpacingMode, readStaffSp, readSpaceSp, readFocused, readParts, writeParts, normalizePiecePrefs, canonicalJson, type PiecePreferences } from './scorePreferences.ts';
+import { VIEW_KEY, DISPLAY_KEY, UNROLLED_KEY, STAFF_SP_KEY, SPACE_SP_KEY, SPACING_MODE_KEY, FOCUSED_KEY, SOUND_KEY, write, readSound, soundRate, readView, readDisplay, readUnrolled, readSpacingMode, readStaffSp, readSpaceSp, readFocused, readParts, writeParts, normalizePiecePrefs, canonicalJson, type PiecePreferences } from './scorePreferences.ts';
 
 const back = html`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"></path></svg>`;
 /** Instruments: three faders, each knob at its own level. */
@@ -154,6 +154,8 @@ export class PiecePage extends LitElement {
   @state() private staffSp: number | null = readStaffSp();
   @state() private densityH: number | null = readSpaceSp();
   @state() private spacingMode: 'natural' | 'fill' = readSpacingMode();
+  /** The synth's sound on this device (the Instruments sheet): 'light' plays at 32 kHz. */
+  @state() private sound: 'full' | 'light' = readSound();
   @state() private effectiveStaffSp = 1;
   /** Whether the reader left the score focused (the frame's strips hidden) — a per-browser preference. */
   @state() private focused = readFocused();
@@ -1130,7 +1132,7 @@ export class PiecePage extends LitElement {
           @render-scale=${(e: CustomEvent<RenderScale>) => (this.effectiveStaffSp = e.detail.staffSp)}
         ></mnx-document-viewer>
         <mnx-player slot="player" .recordings=${this.recordings} .syncWarningsInPanel=${true}
-          .partMix=${this.partMix} .sourceControl=${false}
+          .partMix=${this.partMix} .sampleRate=${soundRate(this.sound)} .sourceControl=${false}
           .syncEditable=${!!this.snapshot} @sync-edit=${this.onSyncEdit} @sync-refresh=${this.onSyncEdit}
           @playback-position=${(e: CustomEvent<{ sourceId?: string; kind?: string; syncWarning?: string }>) => {
             const { sourceId, kind, syncWarning } = e.detail;
@@ -1222,6 +1224,8 @@ export class PiecePage extends LitElement {
               .sourceName=${this.recordings.find(r => r.id === this.player?.sourceId)?.name ?? ''}
               @hidden-change=${(e: CustomEvent<number[]>) => this.setParts(e.detail, this.partMix)}
               @mix-change=${(e: CustomEvent<PartMix>) => this.setParts(this.hiddenParts, e.detail)}
+              .sound=${this.sound}
+              @sound-change=${(e: CustomEvent<'full' | 'light'>) => { this.sound = e.detail; write(SOUND_KEY, this.sound === 'light' ? 'light' : null); }}
               @close=${() => (this.instrumentsOpen = false)}></mnx-studio-instruments>`
           : nothing}
       </mnx-score-frame>

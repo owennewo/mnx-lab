@@ -44,6 +44,8 @@ export class InstrumentsSheet extends LitElement {
   @property({ attribute: false }) routing: readonly RoutedPart[] = [];
   @property({ attribute: false }) routingNotes: readonly { partIndex: number; message: string }[] = [];
   @property({ attribute: false }) designs: readonly FactoryDesign[] = [];
+  /** The synth's sound on this device: Light plays at 32 kHz, a third less work. */
+  @property() sound: 'full' | 'light' = 'full';
   /** A rig file that could not be imported, by part. */
   @state() private importProblem: { index: number; message: string } | null = null;
 
@@ -76,6 +78,12 @@ export class InstrumentsSheet extends LitElement {
     .sound.disabled { opacity: 0.45; }
     .note { padding-left: 48px; font-size: 12px; line-height: 1.4; color: var(--ink-dim); }
     .note.problem { color: light-dark(#a3341f, #f0907c); }
+    .quality { display: flex; gap: 8px; }
+    .quality button { flex: 1; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 8px 10px; min-height: 44px; text-align: left; }
+    .quality button b { font-weight: 500; font-size: 13px; }
+    .quality button span { font-size: 12px; color: var(--ink-dim); }
+    .quality button[aria-checked='true'] { background: light-dark(oklch(0.9 0.004 60), oklch(0.26 0.006 60)); border-color: var(--ink-3); }
+    .quality-note { padding-left: 0; }
     .synth-link { font-size: 13px; line-height: 1.5; color: var(--ink-dim); }
     .synth-link a { color: var(--accent); }
     input[type='file'] { display: none; }
@@ -184,6 +192,13 @@ export class InstrumentsSheet extends LitElement {
           : html`<div class="notice" role="status">Playing ${this.sourceName ? html`<b>${this.sourceName}</b>` : 'a recording'}. A recording has no separate parts, so instrument, volume and mute apply when the source is Synth. Hiding still works.</div>`}
         <div class="label"><span>Parts</span><small>the eye hides from the score, the speaker mutes the mix</small></div>
         <div>${this.parts.map((part) => this.row(part, visibleCount))}</div>
+        <div class="label"><span>Sound</span><small>on this device</small></div>
+        <div class="quality" role="radiogroup" aria-label="Sound">
+          ${(['full', 'light'] as const).map((sound) => html`<button type="button" role="radio" aria-checked=${String(this.sound === sound)}
+            @click=${() => { if (this.sound !== sound) this.dispatchEvent(new CustomEvent('sound-change', { detail: sound, bubbles: true, composed: true })); }}>
+            <b>${sound === 'full' ? 'Full' : 'Light'}</b><span>${sound === 'full' ? 'The device’s sample rate' : '32 kHz, a third less work'}</span></button>`)}
+        </div>
+        <p class="note quality-note">Light is for phones and tablets that skip. Notes above 16 kHz are lost, and the top of a ringing note fades a little sooner.</p>
         <p class="synth-link">Make a sound in <a href="/synth/" target="_blank" rel="noopener">the synth</a>, choose <b>Export part</b>, then <b>Import rig…</b> here.</p>
       </section>
     `;

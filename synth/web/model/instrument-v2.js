@@ -8,7 +8,7 @@ import {LATEST_NOTE_POLICY} from './note-ownership.js';
 import {PROTOTYPE_CONTROLS,PICKUP_CONTROLS,nextPluckControl} from './instrument-controls.js';
 import {THWACK_V2} from './thwack.js';
 
-export const GUITAR_ENGINE=Object.freeze({id:'guitar-lab',generation:3,sourceSha256:'f3e8e1b703f561fb0ddd2e0662daf6541b06ae240145ace96a6bc95db7dc3022'});
+export const GUITAR_ENGINE=Object.freeze({id:'guitar-lab',generation:3,sourceSha256:'be20116050559c4be0ac261f086451e12551b91c35a4434891eb27b7327049d1'});
 export {THWACK_V2};
 export const HARDNESS_V2={min:.025,max:40,normal:[.1,1],step:.001,log:true};
 const spec=(key,min,max,value,step=.001)=>({name:(PROTOTYPE_CONTROLS[key]||PICKUP_CONTROLS[key])?.label||key,min,max,default:value,step,

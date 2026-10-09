@@ -99,7 +99,8 @@ mode(i) = pm.modeFilter(
 body(x) = (x + 1.25*bodyMix*(x <: par(i,12,mode(i)) :> _))/(1+0.4*bodyMix);
 // Output: rumble high-pass and a fixed 18 kHz top. Saturation, tone and room are
 // the chain's blocks now (Drive, the Room bus), not part of the instrument.
-output = fi.highpass(2,45) : fi.lowpass(2,18000) <: _,_;
+// The 18 kHz lowpass stays below Nyquist at low rates (unstable above it: 32 kHz is 16 kHz).
+output = fi.highpass(2,45) : fi.lowpass(2,min(18000,0.45*ma.SR)) <: _,_;
 mixdown = par(i,6,observe(i)) :> *(0.4);
 // Outputs: stereo presentation, dry mono, six diagnostic string signals.
 process = strings <: (mixdown <: (body : output),_), si.bus(6);

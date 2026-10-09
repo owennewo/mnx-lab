@@ -36,6 +36,9 @@ export interface NativeHostPortOptions {
   /** Where the synth's runtime is served (default: `setSynthBase`); its host module is `<base>host/index.js`. */
   base?: string;
   volume?: number;
+  /** The context's sample rate (default: the device's). 32000 is the studio's Light sound:
+   *  every instrument and the room cost a third less, for devices that cannot keep up. */
+  sampleRate?: number;
   createContext?: () => AudioContext;
   onDiagnostic?: (diagnostic: Diagnostic) => void;
   /** The host failed (a worklet error, a rejected request). */
@@ -98,7 +101,8 @@ export class NativeHostPort implements HostPort {
     // delay too small to see (roadmap core-synth-performance, step 2). Under a playback trace
     // the buffer can be chosen (playbackTrace.ts), for A/B on a device.
     const latencyHint = playbackTrace.on ? playbackTrace.latencyHint : 'balanced';
-    const context = this.context ??= (this.options.createContext ?? (() => new AudioContext(latencyHint !== undefined ? { latencyHint } : {})))();
+    const sampleRate = this.options.sampleRate;
+    const context = this.context ??= (this.options.createContext ?? (() => new AudioContext({ ...(latencyHint !== undefined ? { latencyHint } : {}), ...(sampleRate ? { sampleRate } : {}) })))();
     this.loading ??= this.load(context).then(() => { if (!this.wanted && context.state === 'running') void context.suspend(); });
     return context;
   }

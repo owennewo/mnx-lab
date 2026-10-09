@@ -38,7 +38,7 @@ export function inactiveKnockGuard(input){
  const bytes=Buffer.from(input);
  // Raw FAUST output of dsp/engine2 compiled from the fixed staging path (see
  // scripts/build_engine2.mjs); FAUST embeds include paths in the binary's data.
- assert.equal(createHash('sha256').update(bytes).digest('hex'),'2830250e61bf0d187ec3534a1d052474f45ab8eff347eb66bd90b529fd960fc4','Unexpected Engine2 raw binary');
+ assert.equal(createHash('sha256').update(bytes).digest('hex'),'0324233da79dae7ccf1ecb90eeb1c21742f373e7914bbc6f7c82ddbe9aae9eef','Unexpected Engine2 raw binary');
  const sections=sectionsOf(bytes),bodies=codeBodies(bytes),body=bodies[1],ins=decodeBody(body).instructions,sites=[],parts=[];
  const shape='43,41,2a,41,2a,94,41,2a,43,5b,41,2a,43,5b,72,41,2a,43,5b,6c,b2,94,41,2a,20,94,10,43,41,2a,20,94,10,94,92,94,43,41,2a,20,94,94,10,94,41,2a,20,94,43,5d,b2,94,94,92';
  const concat=items=>Buffer.concat(items.map(x=>x.bytes));let cursor=0;

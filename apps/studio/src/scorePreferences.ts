@@ -24,6 +24,8 @@ const RETIRED_STAFF_SCALE_KEY = 'mnx-studio.staff-scale';
 /** Space in staff spaces (core-space-units-sp.md). */
 export const SPACE_SP_KEY = 'mnx-studio.space-sp';
 export const SPACING_MODE_KEY = 'mnx-studio.spacing-mode';
+/** The synth's sound on this device: 'light' plays at 32 kHz (InstrumentsSheet). */
+export const SOUND_KEY = 'mnx-studio.sound';
 /** The score frame: whether the reader left the score focused, its strips hidden. */
 export const FOCUSED_KEY = 'mnx-studio.focused';
 export const VIEWS: ViewSetting[] = ['auto', 'notation', 'tab', 'both'];
@@ -50,6 +52,11 @@ export function readUnrolled(): boolean {
 export function readSpacingMode(): 'natural' | 'fill' {
   return read(SPACING_MODE_KEY) === 'natural' ? 'natural' : DEFAULT_SPACING_MODE;
 }
+export function readSound(): 'full' | 'light' {
+  return read(SOUND_KEY) === 'light' ? 'light' : 'full';
+}
+/** The synth's sample rate for a sound choice (undefined: the device's own). */
+export const soundRate = (sound: 'full' | 'light') => sound === 'light' ? 32000 : undefined;
 export function readFocused(): boolean {
   // The strips' own keys (each drawn out on its own) retired with the edge
   // grips, 2026-09-15; a browser that still carries them is tidied here.

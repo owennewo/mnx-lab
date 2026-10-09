@@ -68,6 +68,9 @@ export class Player extends LitElement {
   /** Per-part level, mute and instrument beneath the master volume, keyed by part index
    *  (src/audio/partMix.ts). Synth only: a recording has no parts. */
   @property({ attribute: false }) partMix: PartMix = {};
+  /** The synth's sample rate (undefined: the device's). A change rebuilds the synth: an
+   *  AudioContext's rate is fixed when it is made. */
+  @property({ type: Number }) sampleRate: number | undefined;
   /** Whether the tray offers the Source select and its `source-tools` slot. A
    *  host that chooses sources elsewhere (studio's Source sheet) turns it off;
    *  `selectSource()` is the same either way. */
@@ -642,6 +645,10 @@ export class Player extends LitElement {
       }
     }
     if (this.syncMode && (this.sourceId === 'synth' || !this.syncEditable)) this.setSyncMode(false);
+    if (!reinstall && changed.has('sampleRate') && changed.get('sampleRate') !== this.sampleRate && this.session?.backend instanceof HostBackend) {
+      this.session.pause();
+      void this.selectSource('synth', true);
+    }
     // The mix — levels, mutes, instruments — reconfigures the host in place.
     if (!reinstall && changed.has('partMix') && this.session?.backend instanceof HostBackend)
       this.session.backend.setPartMix(this.partMix);
@@ -730,7 +737,7 @@ export class Player extends LitElement {
       // The synth: its instrument host (src/audio/hostBackend.ts), loaded from beside the
       // page's synth shell or the embed's script (setSynthBase).
       if (id === 'synth') {
-        const port = new NativeHostPort({ volume: this.volume, onError: message => { if (revision === this.revision) this.localError = message; } });
+        const port = new NativeHostPort({ volume: this.volume, sampleRate: this.sampleRate, onError: message => { if (revision === this.revision) this.localError = message; } });
         return new HostBackend(performance, this.document ?? NO_DOCUMENT, port, { volume: this.volume, partMix: this.partMix }, event => {
           if (revision === this.revision && event.kind === 'onset') this.dispatchEvent(new CustomEvent('onset', {
             detail: { ...event, documentId: this.documentId }, bubbles: true, composed: true,

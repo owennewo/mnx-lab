@@ -2,7 +2,8 @@
 // Phase 6), in a real browser against the local Worker/D1/R2. The Instruments sheet offers
 // the synth's factory designs (read from /synth/), Basic keys and "Import rig…"; a design
 // and an imported part rig each reach the player's host as chosen and play; a file that is
-// not a part rig says why; and the choice is still there after a reload.
+// not a part rig says why; and the choice is still there after a reload. The Sound choice
+// Light plays the synth at 32 kHz and stays on the device across a reload.
 //
 // Its own private library, like studio-smoke.mjs. Usage: npm run build:site && node harness/verify/studio-instruments-smoke.mjs
 import os from 'node:os';
@@ -116,8 +117,25 @@ try {
   await openSheet();
   await wait(`${select}.value === 'design:soft-nylon'`);
 
+  // ── Light sound: the synth at 32 kHz, kept on this device ───────────────────
+  const soundButton = name => `[...${sheet}.querySelectorAll('.quality button')].find(b => b.querySelector('b').textContent === ${JSON.stringify(name)})`;
+  const rate = `${backend}?.port?.context?.sampleRate`;
+  await c.evaluate(`${soundButton('Light')}.click()`);
+  await wait(`${soundButton('Light')}.getAttribute('aria-checked') === 'true'`);
+  assert.ok(await listen() >= 1, 'Light played nothing');
+  assert.equal(await c.evaluate(rate), 32000, 'Light does not play at 32 kHz');
+  await c.send('Page.reload');
+  await wait(`(${player}?.performance?.sounding.length ?? 0) >= 3`);
+  await openSheet();
+  await wait(`${soundButton('Light')}.getAttribute('aria-checked') === 'true'`);
+  assert.ok(await listen() >= 1, 'Light played nothing after a reload');
+  assert.equal(await c.evaluate(rate), 32000, 'Light was not kept across a reload');
+  await c.evaluate(`${soundButton('Full')}.click()`);
+  assert.ok(await listen() >= 1, 'Full played nothing');
+  assert.notEqual(await c.evaluate(rate), 32000, 'Full still plays at 32 kHz');
+
   const shot = await c.send('Page.captureScreenshot'); await fs.writeFile('/tmp/mnx-studio-instruments.png', Buffer.from(shot.result.data, 'base64'));
-  console.log('Studio instruments smoke passed: the sheet offers the synth’s designs, Basic keys and Import rig…; a design and an imported rig (with its chain) each reach the host and play; the old player’s sounds are gone; a two-part rig is refused with a reason; the choice survives a reload.');
+  console.log('Studio instruments smoke passed: the sheet offers the synth’s designs, Basic keys and Import rig…; a design and an imported rig (with its chain) each reach the host and play; the old player’s sounds are gone; a two-part rig is refused with a reason; the choice survives a reload; Light plays at 32 kHz and is kept on the device.');
   if (c.logs.length) throw new Error('Browser console errors: ' + c.logs.join('\n'));
 } finally {
   ws?.close(); await stopChrome(chrome);

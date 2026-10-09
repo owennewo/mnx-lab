@@ -1,19 +1,19 @@
 {
   "id": "guitar-lab",
   "generation": 3,
-  "sourceSha256": "f3e8e1b703f561fb0ddd2e0662daf6541b06ae240145ace96a6bc95db7dc3022",
+  "sourceSha256": "be20116050559c4be0ac261f086451e12551b91c35a4434891eb27b7327049d1",
   "eventPolicy": "latest-pluck-v1",
   "bodyModeCount": 24,
   "bodyRadiation": "Experimental, disabled in factory designs",
   "hardnessMaximum": 40,
   "browserAssets": {
-    "guitar": "22cc119bcee9b2c0c49a853cfd51c25cc39577bd108d75b7c88cdf770620377f"
+    "guitar": "ea20381ec1ab133cf39be7f9d1bdcd05aba24bf167441ed489e65bd83e6873b2"
   },
   "controlPolicy": "Continuous controls ramp; excitation is next-pluck; tuning/setup retains owned ringing-note trajectories. Fixed topology within this candidate; engine-version changes reload and end playback.",
   "build": {
-    "sourceSha256": "f3e8e1b703f561fb0ddd2e0662daf6541b06ae240145ace96a6bc95db7dc3022",
+    "sourceSha256": "be20116050559c4be0ac261f086451e12551b91c35a4434891eb27b7327049d1",
     "sources": {
-      "dsp/engine2/guitar.dsp": "42b858bf6d82258a2cac9d0d5483dfd2852ff434487c19d6f7bd5e47fc681e6a",
+      "dsp/engine2/guitar.dsp": "a457fe1ba5e21c5ec0fd4eff90911915f1c407d7bb5c3f844c0b76b6e732951e",
       "dsp/engine2/instrument-bridge.dsp": "3778f5d135d86ea913f2b43b7c94aed0a9c879f5654f5b0fbe2ed606f19224f2",
       "dsp/engine2/instrument-pickups.dsp": "5fcf6d25f830a61027a9474deaa4a3c92d668360e041336967e4c0d953196b7a",
       "dsp/engine2/instrument-stage1.dsp": "5f65010cc446ac0406a604660dec41db514fcb7dea961954f85729de2a97d4ad",
@@ -23,11 +23,11 @@
       "dsp/engine2/instrument-stage5.dsp": "67d848cfba9f68174c5573252f9bbb1c0e0ec2e7815f7e5a729169b13dcd6e38",
       "dsp/engine2/instrument-stage6.dsp": "d793aaea2e90ff4406606659d18c7b7e3cf051a392701bc5b2d60a69d0700b81"
     },
-    "rawGuitarSha256": "2830250e61bf0d187ec3534a1d052474f45ab8eff347eb66bd90b529fd960fc4",
-    "guitar": "22cc119bcee9b2c0c49a853cfd51c25cc39577bd108d75b7c88cdf770620377f",
+    "rawGuitarSha256": "0324233da79dae7ccf1ecb90eeb1c21742f373e7914bbc6f7c82ddbe9aae9eef",
+    "guitar": "ea20381ec1ab133cf39be7f9d1bdcd05aba24bf167441ed489e65bd83e6873b2",
     "transforms": {
       "memo": "59bc3178753cb59a335ab89573ee685b9784851c44cf429e7e761d5540192cd5",
-      "knockGuard": "2bdbabaf3d8b3292b48ad7b84d05c38a5cafa61bd769ec78ca6af4e4fcfd7ecf"
+      "knockGuard": "b46e7fce8378842fbdce8f39ff404570dbedc1fbbeb915573f6f3252b798d17b"
     }
   },
   "status": "Engine2 (generation 3): the plucked instrument of the synth. Source dsp/engine2; reproduced byte for byte by npm run build:v2. Designs name it by id and generation.",
