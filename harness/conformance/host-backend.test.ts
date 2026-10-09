@@ -26,7 +26,10 @@ class CorePort implements HostPort {
   volume = 1;
   peak = 0;
   constructor() { this.core.on('sounding', (list: { id: string; at: number }[]) => this.sounding.push(...list)); }
-  now() { return this.core.seconds; }
+  /** The audio clock's step: a large output buffer (or Bluetooth) hands the worklet big chunks,
+   *  so the context's time advances a chunk at a time (0: every block). */
+  clockStep = 0;
+  now() { return this.clockStep ? Math.floor(this.core.seconds / this.clockStep + 1e-9) * this.clockStep : this.core.seconds; }
   unlock() { return Promise.resolve(); }
   configure(setup: Setup) { this.diagnostics.push(...this.core.configure(setup)); }
   schedule(batch: { notes?: Note[]; controls?: Control[]; through?: number }) {
@@ -124,6 +127,24 @@ it('the cursor waits out the output latency: it colours a note when it is heard,
   const heard = backend.transport.snapshot.position;
   backend.pause(); await flush();
   expect(backend.transport.snapshot.position).toEqual(heard);
+}, 60_000);
+
+it('an audio clock that advances a chunk at a time does not restart playback', async () => {
+  // On a phone with latencyHint 'playback' (output 272 ms) the transport's backlog guard read
+  // each chunk as a sleeping tab and restarted about once a second: gaps, then the last half
+  // second again, 30 s of music taking 90 (roadmap core-synth-performance, the baseline).
+  const { backend, port, run, flush, stream } = rig(scenario('lab/document/twelve-bar-blues'));
+  port.clockStep = 0.17; port.outputLatency = 0.3;
+  await run(0.2);
+  await backend.play(); await flush();
+  await run(6);
+  expect(port.cancels.length, 'one plan: no restarts').toBe(1);
+  const notes = port.batches.flatMap(b => b.notes).map(n => base(n.id));
+  expect(new Set(notes).size, 'every note once').toBe(notes.length);
+  expect(notes.length).toBeGreaterThan(0);
+  expect(backend.snapshot.state).toBe('playing');
+  expect(warnings(port), JSON.stringify(warnings(port))).toEqual([]);
+  void stream;
 }, 60_000);
 
 it('rate retimes the notes; a seek while playing silences and plans afresh', async () => {

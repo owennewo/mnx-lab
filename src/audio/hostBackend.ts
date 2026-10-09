@@ -85,6 +85,12 @@ interface Plan {
 }
 
 const LEAD = 0.25, AHEAD = 1, MAX_WRAPS = 10000;
+/** How far ahead the transport schedules into its silent sink. Its backlog guard restarts
+ *  playback when the clock jumps past that (a tab that slept), and an audio clock steps a
+ *  whole output chunk at a time: 170 ms and more under a large buffer or on Bluetooth, which
+ *  the transport's 0.1 s default read as sleep, restarting about once a second. The sink
+ *  makes no sound, so looking a second ahead costs nothing. */
+const TRANSPORT_LOOKAHEAD = 1;
 const globalTimers: Pick<Clock, 'setTimeout' | 'clearTimeout'> = {
   setTimeout: (fn, ms) => globalThis.setTimeout(fn, ms),
   clearTimeout: handle => { if (handle !== undefined) globalThis.clearTimeout(handle as ReturnType<typeof setTimeout>); },
@@ -207,7 +213,7 @@ export class HostBackend implements PlaybackBackend {
     this.port.configure(this.routed.setup);
   }
   private makeTransport(performance: Performance) {
-    const transport = new Transport(performance, this.clock, this.sink, { onEvent: event => {
+    const transport = new Transport(performance, this.clock, this.sink, { lookaheadSeconds: TRANSPORT_LOOKAHEAD, onEvent: event => {
       if (this.closed || transport !== this.live) return;
       if (event.kind === 'state') this.follow();
       this.onEvent(event);
