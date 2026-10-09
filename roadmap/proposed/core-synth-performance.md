@@ -256,3 +256,43 @@ reference renders stay reproducible at a given sample rate (synth/docs/contract.
     the multi-part mix the difference is −134 dB (rounding).
   - **Not done:** sizing the room for 48 kHz saved only another 5%, and would break devices
     that run at 96 kHz. A half-rate room or a 4-line network can wait for the device round.
+- **9 Oct 2026: the guitar loop (steps 5 and 7), measured on the stage 7 soak engine.** It
+  costs about 29 ms per audio second on the laptop, guitar alone. Unlike the room, there
+  are no transcendental calls in its sample loop. Switching parts off one at a time
+  (strums and fingerpicking):
+
+  | Part switched off | Saving |
+  |---|---|
+  | Loss-target smoothing | 8% |
+  | 4-tap Lagrange delay, made linear | 8% |
+  | Thwack body | 6–8% |
+  | Bridge scatter | 3% |
+  | Radiation modes | 2–4% |
+  | Output filters | 1–2% |
+  | Diagnostic outputs | 0% |
+  | Denormal flushing (`-ftz 0`) | 2.4–4× slower |
+
+  The rest, about two thirds, is the 12 string loops' plain arithmetic.
+  - **Excitation.** Removing it "saved" 20%, but that was strings left silent. It is on for
+    only 8.5% of string-blocks (about 1.5 ms/s), and its 0.1 s window floor does not
+    matter.
+  - **Loss smoothing stays:** without it, renders differ by −12 to −19 dB.
+  - **Taken, on the experiment branch:** plain notes' pitch events now fall on
+    render-quantum boundaries (a 256-frame grid in host frames). Before, they split the
+    engine's blocks, and each split re-ran the DSP's per-call setup (about 5 µs). Calls per
+    audio second fell from 680–830 to about 385, about 7%; renders differ by −55 to −62 dB.
+  - **Step 5 rejected.** I built FAUST's C output with clang 21 for WebAssembly, with the
+    same math imports.
+
+    | clang build | Saving |
+    |---|---|
+    | `-O3` | 1–2% |
+    | with SIMD | about 2% |
+    | with fast-math (a sound change at −56 to −70 dB) | 3–5% |
+
+    V8 already optimises FAUST's WebAssembly about as well, so a second pinned toolchain,
+    and redoing the knock-guard and memo transforms, is not worth it. (FAUST 2.81.10's C
+    backend also writes a malformed cast for `-ftz 2`.)
+  - **Step 1 adoption note:** with the soak engine, a dead-muted note is −34 dB after
+    80 ms where the conformance test wants −40. Two plucked tests fail on the branch for
+    this.
