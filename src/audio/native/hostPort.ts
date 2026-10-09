@@ -4,7 +4,7 @@
  * built by vite.config.ts `synthShell`), not bundled: its AudioWorklet module and DSP assets
  * resolve against its own URL there, the same files the synth app plays.
  */
-import type { Control, Diagnostic, InstrumentHost, Note, Setup } from '@mnx-lab/synth';
+import type { Control, Diagnostic, HostAssets, InstrumentHost, Note, Setup } from '@mnx-lab/synth';
 import type { HostPort } from '../hostBackend.ts';
 import type { LoadReport } from '../hostStrain.ts';
 import type { FactoryDesign } from '../hostInstruments.ts';
@@ -25,6 +25,7 @@ export class NativeHostPort implements HostPort {
   private output: GainNode | undefined;
   private host: InstrumentHost | undefined;
   private loading: Promise<void> | undefined;
+  private fetching: Promise<{ module: HostModule; assets: HostAssets }> | undefined;
   private setup: Setup | undefined;
   private volume: number;
   private disposed = false;
@@ -43,11 +44,23 @@ export class NativeHostPort implements HostPort {
     try { await this.loading; } catch (error) { this.loading = undefined; throw error; }
     if (context.state !== 'running') await context.resume();
   }
+  /** Fetch and compile the host and its DSP before play is pressed (no audio needed). */
+  preload() {
+    this.fetching ??= (async () => {
+      // Absolute: the host resolves its data files against this base.
+      const base = new URL(this.options.base ?? '/synth/', location.href).href;
+      const module = await import(/* @vite-ignore */ `${base}host/index.js`) as HostModule;
+      return { module, assets: await module.loadHostAssets(`${base}generated/`) };
+    })();
+    this.fetching.catch(() => { this.fetching = undefined; });
+    return this.fetching.then(() => {});
+  }
   private async load(context: AudioContext) {
-    // Absolute: the host resolves its data files against this base.
-    const base = new URL(this.options.base ?? '/synth/', location.href).href;
-    const module = await import(/* @vite-ignore */ `${base}host/index.js`) as HostModule;
-    const host = await module.InstrumentHost.create(context, { assets: await module.loadHostAssets(`${base}generated/`) });
+    void this.preload();
+    const { module, assets } = await this.fetching!;
+    // Configuring warms the worklet (host-processor.js warm): play waits for it, so the
+    // first beats do not pay for compiling the DSP.
+    const host = await module.InstrumentHost.create(context, { assets });
     if (this.disposed) { host.dispose(); return; }
     this.output = new GainNode(context, { gain: this.volume });
     this.output.connect(context.destination);

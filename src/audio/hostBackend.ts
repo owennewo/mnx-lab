@@ -47,6 +47,8 @@ export interface HostPort {
   cancel(cancel: { from?: number; silence?: boolean }): void;
   setVolume(volume: number): void;
   dispose(): void;
+  /** Optional: fetch and compile ahead of play (no audio context needed). */
+  preload?(): Promise<void>;
   /** How busy the host's audio thread is, as the worklet reports it (hostStrain.ts). */
   watchLoad?(listener: (report: LoadReport) => void): void;
 }
@@ -174,6 +176,8 @@ export class HostBackend implements PlaybackBackend {
       dispose: () => {},
     };
     this.port.setVolume(this.volume);
+    // The host's code and DSP download and compile while the score is read, not on play.
+    void this.port.preload?.().catch(() => {});
     // Strain matters only while playing and sounding — from the first note plus one report
     // window (half a second) — and clears when playback stops.
     this.port.watchLoad?.(report => {

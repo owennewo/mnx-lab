@@ -5,7 +5,8 @@ import {INSTRUMENTS} from './instruments/index.js';
 class InstrumentHostProcessor extends AudioWorkletProcessor{
  constructor(options){
   super();
-  this.host=new HostCore({rate:sampleRate,block:128,instruments:INSTRUMENTS,assets:options.processorOptions.assets,history:false});
+  this.assets=options.processorOptions.assets;this.warmed=new Set();
+  this.host=new HostCore({rate:sampleRate,block:128,instruments:INSTRUMENTS,assets:this.assets,history:false});
   for(const type of ['diagnostic','meter'])this.host.on(type,data=>this.port.postMessage({type,data}));
   this.host.on('sounding',data=>this.port.postMessage({type:'sounding',data}));
   this.started=false;
@@ -19,7 +20,7 @@ class InstrumentHostProcessor extends AudioWorkletProcessor{
    try{
     // Messages carry their reply id so the client can await them (offline tests do).
     let result;
-    if(data.type==='configure')result=this.host.configure(data.setup);
+    if(data.type==='configure'){result=this.host.configure(data.setup);this.warm(data.setup);}
     else if(data.type==='schedule')result=this.host.schedule(data.batch);
     else if(data.type==='cancel')result=this.host.cancel(data.cancel);
     else if(data.type==='audition')this.host.setAudition(data.audition);
@@ -27,6 +28,24 @@ class InstrumentHostProcessor extends AudioWorkletProcessor{
     this.port.postMessage({type:'reply',id:data.id,diagnostics:result??[]});
    }catch(error){this.port.postMessage({type:'reply',id:data.id,error:String(error.message||error)});}
   });
+ }
+ // Warm-up. V8 compiles WebAssembly lazily, on a function's first call, so the first blocks
+ // of a new instrument paid for it in the audio callback — ~30 ms on a laptop, enough on a
+ // tablet to break up the first beats. While configuring (the page waits for the reply
+ // before it starts the music), a throwaway host with the same instruments, chains and buses
+ // plays one note per part for a fifth of a second: compiled code is shared by every
+ // instance of a module, so the real host starts warm. Once per instrument kind and chain.
+ warm(setup){
+  try{
+   const key=p=>[p.instrument?.kind,...(p.chain??[]).map(b=>b.type)].join(' '),fresh=setup.parts.filter(p=>INSTRUMENTS.has(p.instrument?.kind)&&!this.warmed.has(key(p)));
+   if(!fresh.length)return;
+   const scratch=new HostCore({rate:sampleRate,block:128,instruments:INSTRUMENTS,assets:this.assets,history:false});
+   scratch.configure({...setup,parts:fresh.map(p=>({...p,strip:{...p.strip,mute:false,solo:false}}))});
+   const target=p=>p.instrument.kind==='kit'?{piece:'snare'}:{pitch:p.instrument.kind==='plucked'?Math.min(...(p.instrument.layout?.strings??[{pitch:40}]).map(s=>s.pitch))+3:60};
+   scratch.schedule({notes:fresh.map((p,i)=>({id:`warm-${i}`,part:p.id,at:.01,duration:.1,velocity:.5,target:target(p)})),through:1});
+   for(let k=0;k<75;k++)scratch.render(128);
+   for(const p of fresh)this.warmed.add(key(p));
+  }catch{/* a cold start is slower, not wrong */}
  }
  timed(work){
   const start=this.clock();work();const now=this.clock(),spent=now-start,load=this.load;

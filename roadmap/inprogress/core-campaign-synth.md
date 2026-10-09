@@ -346,6 +346,17 @@ before any note sounds, and Chrome counts the resulting underruns of silence hal
 late. Reports now count from the first note plus one report window, and the underrun count
 starts from the first report that counts.
 
+On the lead's tablet the start-up stall was audible in the first beats. It is V8 compiling
+the DSP's WebAssembly lazily, inside the audio callback (Node: first block 30 ms, then
+~0.5 ms). Now (a) the host's code and DSP download and compile while the score is read
+(`NativeHostPort.preload`, from the backend's constructor), and (b) on configure the worklet
+plays one note per part through a throwaway host with the same instruments and chains
+(`host-processor.js warm`, once per instrument kind and chain): compiled code is shared by
+every instance of a module, so the real host starts warm. Measured: first block 30 → 0.3 ms,
+worst early block 32 → 3 ms; the warm-up (~0.1 s on the laptop) happens before the music,
+since play waits for configure. The worklet still renders bit-identically to Node
+(`synth/tests/host-browser.mjs`, all five steps).
+
 ## Decisions register
 
 | # | Decision | Status |
