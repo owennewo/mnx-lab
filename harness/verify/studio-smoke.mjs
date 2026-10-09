@@ -152,13 +152,15 @@ try {
   await wait(`${instruments}.querySelector('button[aria-label^="Hide"]').disabled`);
   await c.evaluate(`${instruments}.querySelector('button[aria-label^="Mute"]').click()`);
   await wait(`${player}.partMix[0]?.muted === true && JSON.parse(localStorage.getItem('mnx-studio.parts.${pieceId}')).mix[0].muted === true`);
-  await c.evaluate(`{ const s = ${instruments}.querySelector('select'); s.value = 'piano'; s.dispatchEvent(new Event('change')); }`);
-  await wait(`${player}.partMix[0]?.sound === 'piano'`);
+  // On the synth's host (studio's default, core-campaign-synth S24) a sample pack is the old
+  // player's sound kept for the part.
+  await c.evaluate(`{ const s = ${instruments}.querySelector('select'); s.value = 'sink:piano'; s.dispatchEvent(new Event('change')); }`);
+  await wait(`${player}.partMix[0]?.sound === 'piano' && ${player}.partMix[0]?.instrument?.kind === 'sink'`);
   const mixShot = await c.send('Page.captureScreenshot'); await fs.writeFile('/tmp/mnx-studio-instruments.png',Buffer.from(mixShot.result.data,'base64'));
   // Put the mix back so the next run starts from the default.
   await c.evaluate(`${instruments}.querySelector('button[aria-label^="Unmute"]').click()`);
-  await c.evaluate(`{ const s = ${instruments}.querySelector('select'); s.value = 'synth'; s.dispatchEvent(new Event('change')); }`);
-  await wait(`${player}.partMix[0]?.muted === false && ${player}.partMix[0]?.sound === 'synth'`);
+  await c.evaluate(`{ const s = ${instruments}.querySelector('select'); s.value = s.options[0].value; s.dispatchEvent(new Event('change')); }`);
+  await wait(`${player}.partMix[0]?.muted === false && ${player}.partMix[0]?.instrument?.kind === 'design'`);
   await c.evaluate(`${instruments}.querySelector('button[aria-label="Close instruments"]').click()`);
   await wait(`!${piece}.querySelector('mnx-studio-instruments')`);
   // The Source sheet: the tools row names what plays, the tray has no source

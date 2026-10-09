@@ -125,7 +125,7 @@ mnx-lab (monorepo; github.com/owennewo/mnx-lab is PUBLIC; deployed at mnx-lab.to
 | 5 | Host backend and part router | ☑ Done (behind `?synth=host`) | `src/audio/hostBackend.ts`, `hostSetup.ts`, `native/hostPort.ts`; HostCore-driven tests over 7 scenarios; `synth-host` smoke in Chrome |
 | 6 | Studio: choosing instruments and rigs | ☑ Done (behind `?synth=host`) | Instruments sheet: factory designs, Import rig…, the old player; `host-instruments.test.ts`; `studio-instruments` smoke |
 | 7 | Persistence: rig references in D1 | ☒ Not needed (S23) | choices ride `piece_views.prefs`; its cap raised to 64 KB |
-| 8 | Retire the old sink | ☐ Not started | |
+| 8 | Retire the old sink | ◐ Host is the default in studio and the workbench (S24); sink still there | |
 | 9 | Performance, smokes and archiving guitar-faust | ☐ Not started | |
 
 ## Phase 0 — Readiness and decisions
@@ -307,6 +307,13 @@ preferences; a part rig is about 4 KB, so the Worker's preferences cap went from
 
 ## Phase 8 — Retire the old sink
 
+- [x] Step 1 (S24): the host is the default in studio and the workbench
+  (`setDefaultSynthEngine('host')` in their entries); the embed and the library build stay on
+  the sink, since they run on other sites without `/synth/`. `?synth=native` keeps a browser
+  on the sink, `?synth=host` on the host, `?synth=default` forgets the choice.
+- [ ] Step 2, after the lead has listened on phone and tablet and Phase 9 has measured the
+  cost: remove the oscillator voice and the flag; sample packs stay on the sink (S6).
+
 - [ ] Remove `Sink`/`SynthBackend` playback for covered parts.
 - [ ] Sample packs per S6; MIDI export via `lower()`.
 - [ ] Remove the feature flag.
@@ -342,6 +349,7 @@ preferences; a part rig is about 4 KB, so the Worker's preferences cap went from
 | S21 | **Defaults with the flag on:** guitars play Clear steel, pianos basic keys, the kit the basic kit; the old "Synth" oscillator stays available until the sink retires | agreed (lead, 8 Oct 2026) |
 | S22 | **Phase 5:** a `HostBackend` (a `PlaybackBackend`) and a part router behind a feature flag; the old player stays the default | agreed (lead, 8 Oct 2026) |
 | S23 | Phase 7 is not needed: a part's rig is stored in the piece's view preferences, whose cap rises from 8 KB to 64 KB (room for a dozen rigs) | agent's call within S19 (9 Oct 2026); open to the lead's change |
+| S24 | **The new player is the default** in studio and the workbench, with `?synth=native` as the way back; embeds stay on the old player | agreed (lead, 9 Oct 2026: "can you switch new player to be the default") |
 | S12 | `synth/` is a workspace with its own runner, like the converters. Root `vitest` excludes it. The gate gets a `synth` area: `synth/**` runs the synth's functional suite in the checks lane, and its browser flows and worklet parity become smokes covering `synth`, run against the built `/synth/`. The timing-based cost check, the benchmark and the DSP reproducibility check (`synth:verify-dsp`, where FAUST is installed, S7) stay manual. `gate-plan.test.ts` pins the rule | agreed (lead, 8 Oct 2026) |
 | S13 | mnx-lab's performance-listening work is paused for the migration | agreed (lead, 8 Oct 2026) |
 | S14 | Once Phase 3 has landed and the synth's suites are green here, guitar-faust gets one final commit: a README banner pointing to `synth/` and saying development stops there. Plans, evidence, references and the 0.2.0 release folder are kept; its local servers are stopped. The synth's version continues here, 0.2.0 at the move and `0.3.0-dev` next. guitar-faust stays unlicensed and private; only this copy is AGPL | agreed (lead, 8 Oct 2026) |

@@ -1,8 +1,8 @@
 // The player on the synth's instrument host (roadmap/inprogress/core-campaign-synth.md,
-// Phase 5), in a real browser: `?synth=host` turns the flag on; the workbench player then
+// Phases 5 and 8), in a real browser: the workbench's default (no flag); its player
 // loads the host from the synth's shell (/synth/), plays a technique scenario through its
 // AudioWorklet — every note acknowledged as sounding, the playhead and the highlights moving
-// as they do on the sink — pauses into silence, and `?synth=native` turns the flag off again.
+// as they do on the sink — pauses into silence, and `?synth=native` keeps the browser on the sink.
 //
 // Usage: npm run build:site && node harness/verify/synth-host-smoke.mjs
 import fs from 'node:fs';
@@ -31,11 +31,12 @@ try {
     }
     throw new Error('Workbench player did not load');
   };
-  await open('?synth=host');
+  // A fresh browser, no flag: the workbench plays on the host by default (Phase 8).
+  await open('');
   const played = JSON.parse(await cdp.evaluate(`(async()=>{
     const check=(v,m)=>{if(!v)throw new Error(m);},delay=ms=>new Promise(r=>setTimeout(r,ms));
     const player=document.querySelector('mnx-workbench').shadowRoot.querySelector('mnx-scenario-page').shadowRoot.querySelector('mnx-player');
-    check(player.synthEngine==='host','?synth=host did not turn the flag on');
+    check(player.synthEngine==='host','The workbench does not default to the host');
     const backend=player.session.backend;
     check(typeof backend.setPartMix==='function','The player is not on the host backend');
     const notes=player.performance.sounding.length;
@@ -63,7 +64,7 @@ try {
   await open('?synth=native');
   const native = await cdp.evaluate(`(()=>{const p=document.querySelector('mnx-workbench').shadowRoot.querySelector('mnx-scenario-page').shadowRoot.querySelector('mnx-player');
     return p.synthEngine+' '+(typeof p.session.backend.setPartMix);})()`);
-  if (native !== 'native undefined') throw new Error(`?synth=native did not turn the flag off: ${native}`);
+  if (native !== 'native undefined') throw new Error(`?synth=native did not keep the browser on the sink: ${native}`);
   console.log(`Synth host smoke passed: ${SCENARIO} played on the instrument host — ${played.sounding}/${played.notes} notes sounding, ${played.lit} highlighted, audio ${played.context}; paused; the flag off again.`);
   if (cdp.logs.length) throw new Error('Browser console errors: ' + cdp.logs.join('\n'));
 } finally {
