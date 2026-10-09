@@ -1,9 +1,8 @@
-// Studio choosing instruments on the synth's host (roadmap/inprogress/core-campaign-synth.md,
-// Phase 6), in a real browser against the local Worker/D1/R2. With `?synth=host`, the
-// Instruments sheet offers the synth's factory designs (read from /synth/), Basic keys,
-// "Import rig…" and the old player's sounds; a design, an imported part rig and the old
-// player each reach the player's host as chosen and play; a file that is not a part rig
-// says why; and the choice is still there after a reload.
+// Studio choosing instruments on the synth's host (roadmap/complete/core-campaign-synth.md,
+// Phase 6), in a real browser against the local Worker/D1/R2. The Instruments sheet offers
+// the synth's factory designs (read from /synth/), Basic keys and "Import rig…"; a design
+// and an imported part rig each reach the player's host as chosen and play; a file that is
+// not a part rig says why; and the choice is still there after a reload.
 //
 // Its own private library, like studio-smoke.mjs. Usage: npm run build:site && node harness/verify/studio-instruments-smoke.mjs
 import os from 'node:os';
@@ -67,7 +66,7 @@ try {
   })()`);
 
   await c.send('Network.setCookie', { name: 'CF_Authorization', value: session.browser, url: origin, httpOnly: true, sameSite: 'Lax' });
-  await c.send('Page.navigate', { url: origin + '/studio/?synth=host#/new' }); await c.send('Page.reload');
+  await c.send('Page.navigate', { url: origin + '/studio/#/new' }); await c.send('Page.reload');
   await wait(`!!${form}?.querySelector('form')`);
   await c.evaluate(`{ const i = ${form}.querySelector('label input'); i.value = ${JSON.stringify(title)}; i.dispatchEvent(new Event('input')); ${form}.querySelector('form').requestSubmit(); }`);
   await wait(`/^#\\/piece\\/[0-9a-f]{16}$/.test(location.hash)`);
@@ -77,13 +76,12 @@ try {
   // Three frets: something to hear.
   for (const fret of ['3', '5', '7']) { await key(fret.replace(/./, d => `Digit${d}`), fret); await new Promise(r => setTimeout(r, 700)); await key('ArrowRight'); }
   await wait(`(${player}.performance?.sounding.length ?? 0) >= 3`);
-  assert.equal(await c.evaluate(`${player}.synthEngine`), 'host', '?synth=host did not reach studio’s player');
 
   // ── the sheet offers the host's instruments ─────────────────────────────────
   await openSheet();
   await wait(`${options}.includes('Clear steel')`);
   const offered = await c.evaluate(options);
-  for (const expected of ['Clear steel', 'Bridge electric', 'Basic keys', 'Import rig…', 'Synth'])
+  for (const expected of ['Clear steel', 'Bridge electric', 'Basic keys', 'Import rig…'])
     assert.ok(offered.includes(expected), `the sheet does not offer ${expected}: ${offered.join(' · ')}`);
   assert.equal(await c.evaluate(`${select}.value`), 'design:clear-steel', 'a guitar part does not default to Clear steel');
   assert.match(await c.evaluate(`${sheet}.querySelector('.synth-link').textContent`), /Export part/);
@@ -106,12 +104,8 @@ try {
   assert.equal(await c.evaluate(`!!${sheet}.querySelector('.note.problem')`), false, 'the import problem outlived a good import');
   assert.ok(await listen() >= 1, 'the imported rig played nothing');
 
-  // The old player's sound, beside the host.
-  await choose('sink:synth');
-  await wait(`${backend}.routing[0].kind === 'sink'`);
-  await c.evaluate(`(async () => { const p = ${player}; p.stop(); await p.play(); await new Promise(r => setTimeout(r, 800)); p.stop(); })()`);
-  assert.equal(await c.evaluate(`!!${backend}.legacySink`), true, 'no sink was made for the old player’s sound');
-  assert.equal(await c.evaluate(`${player}.error ?? ''`) || '', '', 'the player reported an error');
+  // The retired old player offers nothing.
+  assert.ok(!(await c.evaluate(options)).some(o => /^Synth$|Piano|Spanish|Fender|Martin|Shiny/.test(o)), 'old-player sounds are still offered');
 
   // Back to the rig, then reload: the choice is the person's, kept with the piece.
   await choose('design:soft-nylon');
@@ -123,7 +117,7 @@ try {
   await wait(`${select}.value === 'design:soft-nylon'`);
 
   const shot = await c.send('Page.captureScreenshot'); await fs.writeFile('/tmp/mnx-studio-instruments.png', Buffer.from(shot.result.data, 'base64'));
-  console.log('Studio instruments smoke passed: on ?synth=host the sheet offers the synth’s designs, Basic keys, Import rig… and the old player; a design, an imported rig (with its chain) and the old player’s sound each reach the host and play; a two-part rig is refused with a reason; the choice survives a reload.');
+  console.log('Studio instruments smoke passed: the sheet offers the synth’s designs, Basic keys and Import rig…; a design and an imported rig (with its chain) each reach the host and play; the old player’s sounds are gone; a two-part rig is refused with a reason; the choice survives a reload.');
   if (c.logs.length) throw new Error('Browser console errors: ' + c.logs.join('\n'));
 } finally {
   ws?.close(); await stopChrome(chrome);

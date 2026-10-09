@@ -87,6 +87,11 @@ try {
   const html = `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Performance evidence review</title><style>@font-face{font-family:Bravura;src:url(data:font/woff2;base64,${font}) format("woff2")}body{font:15px system-ui;margin:24px;color:#202020;background:#faf9f6}section{border-top:2px solid #888;margin-top:40px;padding-top:16px}h2{margin-bottom:8px}h3{margin-top:24px}.scroll{overflow:auto;max-height:560px;border:1px solid #ccc}table{border-collapse:collapse;font:12px monospace;white-space:nowrap;width:100%}th,td{padding:7px 10px;border-bottom:1px solid #ddd;text-align:left}th{position:sticky;top:0;background:#eee}figure{overflow:auto;background:white;padding:12px}figure svg{max-width:100%;height:auto}figcaption{font-size:12px;color:#555}.pair{display:grid;grid-template-columns:1fr;gap:8px}a{color:#154daa}.playing{fill:#175eb5!important;stroke:#175eb5!important}.listen{position:sticky;top:0;background:#faf9f6;z-index:2;max-width:700px}[data-source-id]{cursor:pointer}</style><h1>Performance evidence review</h1><p>${sections.length} scenarios. Time values are exact whole-note fractions; ordinals are zero-based. Review the engraving and both linked tables. This page does not approve anything.</p>${sections.join('\n')}<script>${listenCode}</script></html>`;
   fs.mkdirSync(path.dirname(output), { recursive: true });
   fs.writeFileSync(output, html);
+  // Listen plays on the synth (docs/player-synth.md): its runtime beside the page, at /synth/.
+  const { copySynthRuntime } = await import('../../tools/synth-runtime.mjs');
+  const synthDir = path.join(path.dirname(output), 'synth');
+  fs.rmSync(synthDir, { recursive: true, force: true });
+  copySynthRuntime(synthDir);
   fs.writeFileSync(`${output}.receipt.json`, JSON.stringify(receipt, null, 2) + '\n');
   console.log(`Review: ${output}\nReceipt: ${output}.receipt.json`);
 } finally {

@@ -196,7 +196,7 @@ function commit(): string {
 }
 
 /**
- * The synth's shell at /synth/ (roadmap/inprogress/core-campaign-synth.md). The synth is
+ * The synth's shell at /synth/ (roadmap/complete/core-campaign-synth.md). The synth is
  * plain ES modules with its own deterministic app build (synth/scripts/build_app.mjs:
  * the HTML entry, its import closure including the AudioWorklet and Worker modules, and
  * the WASM and data it fetches by relative URL). Bundling it through Vite would rewrite
@@ -222,16 +222,10 @@ function synthShell(): Plugin {
         fs.createReadStream(file).pipe(res);
       });
     },
-    writeBundle(options) {
+    async writeBundle(options) {
       if (this.environment?.name !== 'client' || !options.dir) return;
-      const staging = fs.mkdtempSync(path.join(os.tmpdir(), 'mnx-synth-'));
-      try {
-        const out = path.join(staging, 'app');
-        execFileSync(process.execPath, [path.join(ROOT, 'synth/scripts/build_app.mjs'), out], { stdio: 'inherit' });
-        fs.cpSync(out, path.join(options.dir, 'synth'), { recursive: true });
-      } finally {
-        fs.rmSync(staging, { recursive: true, force: true });
-      }
+      const { copySynthRuntime } = await import('./tools/synth-runtime.mjs');
+      copySynthRuntime(path.join(options.dir, 'synth'));
     }
   };
 }

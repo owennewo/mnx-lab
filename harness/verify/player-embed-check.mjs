@@ -32,27 +32,20 @@ export async function checkPlayer(cdp, base, format) {
     binding.follow();check(viewer.playbackState.inspectionIteration===2 && viewer.playbackState.followPlayback,'Follow erased inspection');
     check(viewer.revealOccurrence({noteKey:key,ordinal:0}),'Public reveal missed known ink');
 
-    check(!performance.getEntriesByType('resource').some(e=>e.name.includes('/samples/')),
-      'Samples downloaded before selecting Guitar');
-    const sound=player.shadowRoot.querySelector('select[aria-label="Playback sound"]');
-    sound.value='guitar';sound.dispatchEvent(new Event('change'));await player.updateComplete;
-    for(let i=0;i<200 && player.snapshot?.state!=='playing';i++) await delay(50);
-    check(player.snapshot?.state==='playing','Guitar selection did not resume playback');
-    check(performance.getEntriesByType('resource').some(e=>e.name.startsWith(${JSON.stringify(base + '/samples/')})),
-      'Embed did not resolve samples beside its own script');
-    check(!player.shadowRoot.querySelector('[role=alert]'),'Sample loading produced an error');
-
-    for (const [preset,folder] of [['guitar2','spanish-guitar-v1'],['guitar3','martin-guitar-v1'],['guitar4','fender-guitar-v1']]) {
-      const before=player.position;
-      check(!performance.getEntriesByType('resource').some(e=>e.name.includes('/'+folder+'/')),
-        'Unselected preset downloaded early: '+preset);
-      sound.value=preset;sound.dispatchEvent(new Event('change'));await player.updateComplete;
-      for(let i=0;i<200 && player.snapshot?.state!=='playing';i++) await delay(50);
-      check(player.snapshot?.state==='playing','Preset did not resume: '+preset);
-      check(performance.getEntriesByType('resource').some(e=>e.name.startsWith(${JSON.stringify(base + '/samples/')}+folder+'/')),
-        'Preset not loaded from artifact origin: '+preset);
-      {const after=player.position;check(after.num*before.den>=before.num*after.den,'Preset reset playback position: '+preset+' from '+before.num+'/'+before.den+' to '+after.num+'/'+after.den+', then '+player.position.num+'/'+player.position.den+' on a second read (state '+player.snapshot?.state+', rate '+player.snapshot?.rate+', wants '+player.playback?.wantsPlayback+')');}
-    }
+    // The synth (core-campaign-synth, option A): loaded from beside the artifact — another
+    // origin than this page — and heard through its worklet. No sample pack is ever asked for.
+    const backend=player.session.backend;
+    for(let i=0;i<100&&!backend.port.host;i++)await delay(50);
+    check(!!backend.port.host,'The synth host did not load: '+(player.error||''));
+    check(performance.getEntriesByType('resource').some(e=>e.name.startsWith(${JSON.stringify(base + '/synth/host/')})),
+      'Embed did not load the synth beside its own script');
+    check(performance.getEntriesByType('resource').some(e=>e.name.startsWith(${JSON.stringify(base + '/synth/generated/')})&&e.name.endsWith('.wasm')),
+      'Embed did not load the synth DSP beside its own script');
+    check(!performance.getEntriesByType('resource').some(e=>e.name.includes('/samples/')),'A sample pack was requested');
+    {const heard=new Set(),off=backend.port.host.on('sounding',l=>l.forEach(x=>heard.add(x.id)));
+     player.seek(0);await player.play();for(let i=0;i<80&&!heard.size;i++)await delay(50);off();
+     check(heard.size>0,'No note sounded through the synth');}
+    check(!player.shadowRoot.querySelector('[role=alert]'),'Playback reported an error');
     player.pause();const frozen=player.position;await delay(60);{const now=player.position;check(now.num===frozen.num && now.den===frozen.den,'Pause did not freeze');}
     const rate=player.shadowRoot.querySelector('input[aria-label="Playback rate"]');rate.value='1.5';rate.dispatchEvent(new Event('input'));await player.updateComplete;check(player.snapshot.rate===1.5,'Rate control did not reach transport');
     const volume=player.shadowRoot.querySelector('input[aria-label="Volume"]');volume.value='0';volume.dispatchEvent(new Event('input'));await player.play();
@@ -61,7 +54,7 @@ export async function checkPlayer(cdp, base, format) {
     await player.play();await delay(40);player.remove();await delay(40);
     check(!viewer.playbackState.highlight.length && !player.snapshot,'Disconnect retained live state');
     binding.dispose();host.remove();
-    return {format:${JSON.stringify(format)},registered:true,context:true,repeatSeek:true,views:3,replacement:true,disposal:true};
+    return {format:${JSON.stringify(format)},registered:true,context:true,repeatSeek:true,views:3,synth:'beside the artifact',replacement:true,disposal:true};
   })()`);
   console.log('player embed OK', JSON.stringify(result));
 }

@@ -60,14 +60,10 @@ These numbers are MNX Lab playback conventions, not requirements of MNX.
    pins natural/artificial, capo, missing string/touching metadata, and the corpus's
    already resolved harmonic pitches.
 
-The native sink renders harmonic hints with a triangle oscillator; its fundamental
-stays the sounded pitch. Other notes use sine. Legato keeps the attack's patch until a new attack;
-changing oscillator type while scheduling would retroactively change earlier audio. Palm mute's audible change is already
-encoded in velocity and gate; the sink receives its flag for future patches. This is
-a simple review patch, not a sampled guitar. Legato amplitude changes use the existing
-5 ms smoothing. To preserve an incoming ramp across an instantaneous bend reset,
-the native adapter places its final incoming endpoint one sample before the step;
-no performance time is changed.
+Playback is the synth's (player-synth.md). The compiler still lowers palm mutes, dead notes
+and harmonics into velocity and gate (and a `harmonic` timbre hint), which MIDI export keeps;
+the contract stream undoes that lowering when it has the document and sends the techniques
+as intent, so the synth renders them itself (`src/audio/contractStream.ts`).
 
 MIDI omits zero-velocity events with a silent-note diagnostic. It exports numeric velocity, duration and independent string pitch curves within
 ±12 semitones, with clipping diagnostics. It retriggers logical legato targets and
@@ -75,8 +71,9 @@ omits harmonic/damped timbre hints, explicitly reported per affected event. This
 still a bounded export, not an independent musical oracle.
 
 `expression.test.ts` pins hand-stated values and compiled transport behavior.
-`smoke:audio` measures a compiled bend/hammer, attenuation, harmonic third partial
-and palm-mute release in an OfflineAudioContext. The existing `/verify` performance
+The synth's rendering of these techniques is proven on its side (synth/docs/contract.md,
+its reference renders and conformance fixtures) and, through mnx-lab's stream, by
+`contract-stream.test.ts` (player-synth.md). The existing `/verify` performance
 page exposes velocity, curves and flags alongside Listen and the written engraving.
 The [expression review batch](../roadmap/inprogress/lab-verify.md#player-expression--2026-09-09)
 requires human review; passing automated checks grants no approval.

@@ -14,7 +14,7 @@ export function developmentSources(root:string,repo:string):SampleSource[]{
   const tone=join(root,'samples/tonejs-instruments-622c2f1/guitar-acoustic');
   const sources:SampleSource[]=[{id:'tonejs-acoustic',name:'steel-string acoustic',group:'development',origin:'University of Iowa',source:'tonejs-instruments@622c2f1',licence:'CC-BY-3.0',attribution:'Nicholas Brosowsky tonejs-instruments',files:readdirSync(tone).filter(f=>f.endsWith('.wav')).map(f=>({midi:tonejsMidi(f),path:join(tone,f),sha256:sha(readFileSync(join(tone,f)))}))}];
   for(const id of ['martin','spanish','fender']) {
-    const dir=join(repo,'public/samples',`${id}-guitar-v1`),m=JSON.parse(readFileSync(join(dir,'manifest.json'),'utf8'));
+    const dir=join(repo,'experiments/performance-listening/bench/samples',`${id}-guitar-v1`),m=JSON.parse(readFileSync(join(dir,'manifest.json'),'utf8'));
     const chosen=new Map<number,{midi:number;file:string;layer?:number;take?:number;sha256:string}>();
     for(const s of m.samples){const c=chosen.get(s.midi);if(!c||(s.layer??0)>(c.layer??0)||((s.layer??0)===(c.layer??0)&&(s.take??0)<(c.take??0)))chosen.set(s.midi,s);}
     sources.push({id,name:m.name,group:'development',source:dir,origin:m.name,licence:m.license,attribution:m.name,files:[...chosen.values()].map(s=>({midi:s.midi,path:join(dir,s.file),sha256:s.sha256}))});

@@ -152,10 +152,9 @@ try {
   await wait(`${instruments}.querySelector('button[aria-label^="Hide"]').disabled`);
   await c.evaluate(`${instruments}.querySelector('button[aria-label^="Mute"]').click()`);
   await wait(`${player}.partMix[0]?.muted === true && JSON.parse(localStorage.getItem('mnx-studio.parts.${pieceId}')).mix[0].muted === true`);
-  // On the synth's host (studio's default, core-campaign-synth S24) a sample pack is the old
-  // player's sound kept for the part.
-  await c.evaluate(`{ const s = ${instruments}.querySelector('select'); s.value = 'sink:piano'; s.dispatchEvent(new Event('change')); }`);
-  await wait(`${player}.partMix[0]?.sound === 'piano' && ${player}.partMix[0]?.instrument?.kind === 'sink'`);
+  // An instrument is a synth design (core-campaign-synth Phase 6).
+  await c.evaluate(`{ const s = ${instruments}.querySelector('select'); s.value = 'design:basic-piano'; s.dispatchEvent(new Event('change')); }`);
+  await wait(`${player}.partMix[0]?.instrument?.design === 'basic-piano'`);
   const mixShot = await c.send('Page.captureScreenshot'); await fs.writeFile('/tmp/mnx-studio-instruments.png',Buffer.from(mixShot.result.data,'base64'));
   // Put the mix back so the next run starts from the default.
   await c.evaluate(`${instruments}.querySelector('button[aria-label^="Unmute"]').click()`);

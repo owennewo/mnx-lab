@@ -7,7 +7,6 @@ import {
   normalizeDisplayPreferences
 } from '../../../src/elements/displayDefaults.ts';
 import type { ViewSetting } from '../../../src/elements/DocumentViewer.ts';
-import { isSamplePreset } from '../../../src/audio/sampleSelection.ts';
 import type { PartMix, PartMixEntry } from '../../../src/audio/partMix.ts';
 import { normalizeInstrument } from '../../../src/audio/hostInstruments.ts';
 import { clampStaffSp } from '../../../src/engine/render/scale.ts';
@@ -89,7 +88,7 @@ const partsKey = (pieceId: string) => `mnx-studio.parts.${pieceId}`;
 /** Parts as stored, checked value by value. The same function serves this
  *  browser's copy and the library's, because neither is trusted: localStorage is
  *  editable and the service keeps preferences opaque (it may not import
- *  `src/audio`, so a sample preset means nothing to it). */
+ *  `src/audio`, so an instrument choice means nothing to it). */
 export function normalizeParts(raw: unknown): PartsPreference {
   const source = (raw && typeof raw === 'object' ? raw : {}) as { hidden?: unknown; mix?: unknown };
   const hidden = Array.isArray(source.hidden) ? source.hidden.filter((i): i is number => Number.isInteger(i) && i >= 0) : [];
@@ -97,12 +96,12 @@ export function normalizeParts(raw: unknown): PartsPreference {
   for (const [key, value] of Object.entries(source.mix && typeof source.mix === 'object' ? source.mix : {})) {
     const index = Number(key);
     if (!Number.isInteger(index) || index < 0 || !value || typeof value !== 'object') continue;
-    const { volume, muted, sound } = value as Record<string, unknown>;
+    // A `sound` (the retired sink's sample packs) is dropped: the part plays its default.
+    const { volume, muted } = value as Record<string, unknown>;
     const instrument = normalizeInstrument((value as Record<string, unknown>).instrument);
     mix[index] = {
       ...(typeof volume === 'number' && volume >= 0 && volume <= 1 ? { volume } : {}),
       ...(muted === true ? { muted } : {}),
-      ...(sound === 'synth' || isSamplePreset(sound) ? { sound } : {}),
       ...(instrument ? { instrument } : {}),
     };
   }

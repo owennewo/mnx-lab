@@ -21,8 +21,5 @@ import '@fontsource/archivo/latin-500.css';
 import '@fontsource/archivo/latin-600.css';
 import '@fontsource/archivo/latin-700.css';
 
-import { setDefaultSynthEngine } from '../elements/synthEngine.ts';
 import './workbench.css';
 import '../workbench/WorkbenchApp.ts';
-// Served beside /synth/: the synth's instrument host plays by default (core-campaign-synth Phase 8).
-setDefaultSynthEngine('host');

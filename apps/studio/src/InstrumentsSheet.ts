@@ -1,16 +1,14 @@
 // The Instruments sheet on a piece: one row per part, with the eye (take it off
-// the score, it keeps playing), the speaker (mute it in the mix), its sound and
+// the score, it keeps playing), the speaker (mute it in the mix), its instrument and
 // its level beneath the tray's master volume. From the Instruments Panel design
 // canvas (2026-09-14). It owns nothing: every change leaves as an event for the
 // page to store and hand to the viewer and the player.
 //
-// On the synth's instrument host (`?synth=host`, core-campaign-synth.md Phase 6) the sound
-// is an instrument: a factory design, a part rig imported from the synth's app, or the old
-// player's sound kept for that part. Studio never edits an instrument; "Open the synth"
+// The instrument plays on the synth (core-campaign-synth.md Phase 6): a factory design, or a
+// part rig imported from the synth's app. Studio never edits an instrument; "the synth" link
 // is where one is made, and "Import rig…" brings it back.
 import { LitElement, css, html, nothing, svg } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { SAMPLE_PRESETS, type VoicePreset } from '../../../src/audio/sampleSelection.ts';
 import type { PartMix, PartMixEntry } from '../../../src/audio/partMix.ts';
 import { BASIC_KEYS, BASIC_KIT, parsePartRig, type FactoryDesign } from '../../../src/audio/hostInstruments.ts';
 import type { RoutedPart } from '../../../src/audio/hostSetup.ts';
@@ -21,11 +19,10 @@ export interface InstrumentPart {
   name: string;
   /** The sub-line: strings and capo, or "Percussion". */
   detail: string;
-  /** Plays only kit voices, which always use the synth. */
+  /** Plays only kit voices. */
   kit: boolean;
 }
 
-const SOUNDS: { id: VoicePreset; label: string }[] = [{ id: 'synth', label: 'Synth' }, ...SAMPLE_PRESETS];
 
 const line = (d: string, px = 18) => svg`<svg width=${px} height=${px} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d=${d}></path></svg>`;
 const cross = html`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>`;
@@ -43,9 +40,7 @@ export class InstrumentsSheet extends LitElement {
   @property({ type: Boolean }) mixAvailable = true;
   /** The recording playing, named in the notice when the mix is unavailable. */
   @property() sourceName = '';
-  /** Which synth the player uses (src/elements/synthEngine.ts). */
-  @property() engine: 'native' | 'host' = 'native';
-  /** On the host: how each part is routed, why when it is not what was asked, and the guitar designs. */
+  /** How each part is routed, why when it is not what was asked, and the guitar designs. */
   @property({ attribute: false }) routing: readonly RoutedPart[] = [];
   @property({ attribute: false }) routingNotes: readonly { partIndex: number; message: string }[] = [];
   @property({ attribute: false }) designs: readonly FactoryDesign[] = [];
@@ -93,10 +88,9 @@ export class InstrumentsSheet extends LitElement {
     this.dispatchEvent(new CustomEvent<PartMix>('mix-change', { detail: next, bubbles: true, composed: true }));
   }
 
-  /** The host's dropdown value for a part: what it plays now. */
+  /** The dropdown value for a part: what it plays now. */
   private hostValue(part: InstrumentPart, entry: PartMixEntry): string {
     const choice = entry.instrument, routed = this.routing.find(r => r.partIndex === part.index);
-    if (choice?.kind === 'sink') return `sink:${entry.sound ?? 'synth'}`;
     if (choice?.kind === 'rig' && routed?.source === 'rig') return 'rig';
     return `design:${routed?.design ?? (part.kit ? BASIC_KIT.id : BASIC_KEYS.id)}`;
   }
@@ -108,8 +102,7 @@ export class InstrumentsSheet extends LitElement {
     }
     this.importProblem = null;
     if (value === 'rig') return;
-    if (value.startsWith('sink:')) this.setMix(part.index, { instrument: { kind: 'sink' }, sound: value.slice(5) as VoicePreset });
-    else this.setMix(part.index, { instrument: { kind: 'design', design: value.slice(7) } });
+    this.setMix(part.index, { instrument: { kind: 'design', design: value.slice(7) } });
   }
   private async importRig(part: InstrumentPart, input: HTMLInputElement) {
     const file = input.files?.[0];
@@ -137,7 +130,6 @@ export class InstrumentsSheet extends LitElement {
           : html`${routed?.pluckable ? html`<optgroup label="Guitar">${this.designs.map(d => option(`design:${d.id}`, d.name))}</optgroup>` : nothing}
             <optgroup label="Keys">${option(`design:${BASIC_KEYS.id}`, BASIC_KEYS.name)}</optgroup>`}
         <optgroup label="Your rig">${rig ? option('rig', `Rig: ${rig.name}`) : nothing}${option('import', 'Import rig…')}</optgroup>
-        <optgroup label="Old player">${(part.kit ? [{ id: 'synth' as VoicePreset, label: 'Synth kit' }] : SOUNDS).map(s => option(`sink:${s.id}`, s.label))}</optgroup>
       </select></label>
       <input type="file" accept=".json,application/json" data-part=${part.index} @change=${(e: Event) => void this.importRig(part, e.target as HTMLInputElement)} />`;
   }
@@ -172,18 +164,13 @@ export class InstrumentsSheet extends LitElement {
           @click=${() => this.setMix(part.index, { muted: !muted })}>${speaker(muted)}</button>
       </div>
       <div class="mix">
-        ${this.engine === 'host' ? this.hostSound(part, entry, off) : part.kit
-          ? html`<span class=${off ? 'sound disabled' : 'sound'} title="Percussion always plays the synth kit">${wave}<span class="fixed">Kit · Synth</span></span>`
-          : html`<label class=${off ? 'sound disabled' : 'sound'} title="Sound">${wave}<select aria-label=${`${part.name} sound`} ?disabled=${off}
-              @change=${(e: Event) => this.setMix(part.index, { sound: (e.target as HTMLSelectElement).value as VoicePreset })}>
-              ${SOUNDS.map((s) => html`<option value=${s.id} ?selected=${(entry.sound ?? 'synth') === s.id}>${s.label}</option>`)}
-            </select></label>`}
+        ${this.hostSound(part, entry, off)}
         <input type="range" min="0" max="1" step="0.05" aria-label=${`${part.name} volume`} ?disabled=${off || muted}
           .value=${String(entry.volume ?? 1)}
           @input=${(e: Event) => this.setMix(part.index, { volume: Number((e.target as HTMLInputElement).value) })} />
         <span class="val">${muted ? '—' : volume}</span>
       </div>
-      ${this.engine === 'host' ? this.hostNote(part) : nothing}
+      ${this.hostNote(part)}
     </div>`;
   }
 
@@ -194,12 +181,10 @@ export class InstrumentsSheet extends LitElement {
       <section>
         ${this.mixAvailable
           ? nothing
-          : html`<div class="notice" role="status">Playing ${this.sourceName ? html`<b>${this.sourceName}</b>` : 'a recording'}. A recording has no separate parts, so sound, volume and mute apply when the source is Synth. Hiding still works.</div>`}
+          : html`<div class="notice" role="status">Playing ${this.sourceName ? html`<b>${this.sourceName}</b>` : 'a recording'}. A recording has no separate parts, so instrument, volume and mute apply when the source is Synth. Hiding still works.</div>`}
         <div class="label"><span>Parts</span><small>the eye hides from the score, the speaker mutes the mix</small></div>
         <div>${this.parts.map((part) => this.row(part, visibleCount))}</div>
-        ${this.engine === 'host'
-          ? html`<p class="synth-link">Make a sound in <a href="/synth/" target="_blank" rel="noopener">the synth</a>, choose <b>Export part</b>, then <b>Import rig…</b> here.</p>`
-          : nothing}
+        <p class="synth-link">Make a sound in <a href="/synth/" target="_blank" rel="noopener">the synth</a>, choose <b>Export part</b>, then <b>Import rig…</b> here.</p>
       </section>
     `;
   }

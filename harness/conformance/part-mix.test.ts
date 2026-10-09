@@ -1,11 +1,11 @@
 // Studio's Instruments sheet: hiding a part keeps every other note's key, and
-// the per-part mix resolves levels, sounds and sample packs.
+// the per-part mix knows its kit parts (levels and instruments: host-instruments.test.ts).
 import { beforeAll, describe, expect, it } from 'vitest';
 import fs from 'node:fs';
 import { computePrimitives, initSmufl } from '../helpers/corpusPrimitives.ts';
 import { forEachNoteAddress, noteKeysOf } from '../../src/model/noteWalk.ts';
 import { withHiddenParts } from '../../src/model/partVisibility.ts';
-import { isKitPart, partBuses, partLevel, requiredPresets, voicePresetFor } from '../../src/audio/partMix.ts';
+import { isKitPart } from '../../src/audio/partMix.ts';
 import type { MnxStructure } from '../../src/model/mnx.ts';
 import type { Performance } from '../../src/audio/performanceTypes.ts';
 
@@ -67,36 +67,6 @@ describe('partMix', () => {
       { id: 'c', partIndex: 2 },
     ],
   } as unknown as Performance;
-
-  it('routes each voice to its part', () => {
-    expect(Object.fromEntries(partBuses(performance))).toEqual({ a: '0', b: '0', k: '1', c: '2' });
-  });
-
-  it('silences a muted part and clamps a level', () => {
-    expect(partLevel(undefined)).toBe(1);
-    expect(partLevel({ volume: 0.4 })).toBe(0.4);
-    expect(partLevel({ volume: 0.4, muted: true })).toBe(0);
-    expect(partLevel({ volume: 3 })).toBe(1);
-    expect(partLevel({ volume: Number.NaN })).toBe(1);
-  });
-
-  it('keeps the single-preset path until parts disagree, and kits on the synth', () => {
-    expect(voicePresetFor(performance, {}, 'synth')).toBe('synth');
-    const mixed = voicePresetFor(performance, { 0: { sound: 'guitar' } }, 'synth');
-    expect(typeof mixed).toBe('function');
-    const pick = mixed as (voice: string) => string;
-    expect([pick('a'), pick('b'), pick('k'), pick('c')]).toEqual(['guitar', 'guitar', 'synth', 'synth']);
-    const allPiano = voicePresetFor(performance, {}, 'piano') as (voice: string) => string;
-    expect(pick('k')).toBe('synth');
-    expect(allPiano('k')).toBe('synth');
-    expect(allPiano('c')).toBe('piano');
-  });
-
-  it('loads every pack the parts use, once', () => {
-    expect(requiredPresets(performance, { 0: { sound: 'guitar' }, 2: { sound: 'piano' } }, 'synth')).toEqual(['guitar', 'piano']);
-    expect(requiredPresets(performance, {}, 'piano')).toEqual(['piano']);
-    expect(requiredPresets(performance, {}, 'synth')).toEqual([]);
-  });
 
   it('knows a part that plays only kit voices', () => {
     expect(isKitPart(performance, 1)).toBe(true);

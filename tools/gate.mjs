@@ -53,9 +53,9 @@ const SYNTH_PROSE = /^synth\/[^/]+\.md$/;
 // from disk, which vitest's import graph cannot see): they run with any synth change.
 export const SYNTH_READERS = ['contract-stream', 'host-backend', 'host-instruments'].map(name => `harness/conformance/${name}.test.ts`);
 
-/** The areas a smoke may declare in `covers` (harness/verify/run-smokes.mjs).
- *  `audio` is reached through the shared src/ layers, which run every smoke. */
-export const SMOKE_AREAS = ['workbench', 'studio', 'library', 'embed', 'lib', 'audio', 'synth', 'home'];
+/** The areas a smoke may declare in `covers` (harness/verify/run-smokes.mjs). Playback in
+ *  src/audio is reached through the shared src/ layers, which run every smoke. */
+export const SMOKE_AREAS = ['workbench', 'studio', 'library', 'embed', 'lib', 'synth', 'home'];
 
 const SHARED_SRC = /^src\/(model|engine|audio|edit|elements|storage|importers|corpus|assist)\//;
 const CONVERTERS = ['guitarpro-mnx', 'musicxml-mnx'];

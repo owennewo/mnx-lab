@@ -1,8 +1,7 @@
 /**
- * Choosing a part's instrument on the synth's host (roadmap/inprogress/core-campaign-synth.md,
+ * Choosing a part's instrument on the synth's host (roadmap/complete/core-campaign-synth.md,
  * Phase 6). Pure. Studio never edits an instrument: it picks a factory design, or imports a
- * part rig made in the synth's own app (`/synth/`, Export part), or keeps the old player's
- * sound for the part.
+ * part rig made in the synth's own app (`/synth/`, Export part).
  */
 import { validateSetup, type Part } from '@mnx-lab/synth/contract';
 import type { PartInstrument, PartRig } from './partMix.ts';
@@ -35,7 +34,6 @@ export function parsePartRig(raw: unknown): RigResult {
 export function normalizeInstrument(raw: unknown): PartInstrument | undefined {
   if (!raw || typeof raw !== 'object') return undefined;
   const value = raw as Record<string, unknown>;
-  if (value.kind === 'sink') return { kind: 'sink' };
   if (value.kind === 'design' && typeof value.design === 'string' && DESIGN_ID.test(value.design)) return { kind: 'design', design: value.design };
   if (value.kind === 'rig') { const parsed = parsePartRig(value.rig); if (parsed.ok) return { kind: 'rig', rig: parsed.rig }; }
   return undefined;

@@ -1,5 +1,5 @@
 /**
- * Is the synth's audio thread keeping up? (roadmap/inprogress/core-campaign-synth.md.) The
+ * Is the synth's audio thread keeping up? (roadmap/complete/core-campaign-synth.md.) The
  * worklet reports twice a second the share of its time the host took and its longest single
  * stretch (synth/web/host/host-processor.js `load`); where the browser counts audio
  * underruns, they are added. Pure.

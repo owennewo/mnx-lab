@@ -1,22 +1,26 @@
-# Player transport and native sink
+# Player transport
 
 Implementation loop, player campaign item 6. The public `mnx-lab/audio` entry exports
-`Transport`, `eventsBetween`, `centsAt`, `NativeSink`, `nativeClock`, and their types.
-The [player element](player-element.md) supplies the controls and host wiring.
+`Transport`, `eventsBetween`, `centsAt` and their types. The
+[player element](player-element.md) supplies the controls and host wiring.
+
+The transport is the player's musical clock: position, highlights, loops, rate, seeking.
+Sound is the synth's (since 2026-10-09; [player synth](player-synth.md)): `HostBackend`
+runs a transport over a sink that makes no sound and sends the score to the synth's
+instrument host as contract notes, a lead ahead. The old Web Audio sink — oscillators and
+sample packs — is retired (roadmap/complete/core-campaign-synth.md).
 
 ```ts
-import { compilePerformance, Transport, NativeSink, nativeClock } from 'mnx-lab/audio';
+import { compilePerformance, HostBackend, NativeHostPort } from 'mnx-lab/audio';
 const result = compilePerformance(document);
 if (!result.ok) throw new Error(result.diagnostics.map(d => d.message).join('\n'));
-const sink = new NativeSink();
-const transport = new Transport(result.performance, nativeClock(sink), sink, {
-  onEvent(event) { /* host updates its separate playback state */ }
+const backend = new HostBackend(result.performance, document, new NativeHostPort(), {}, event => {
+  /* onset / end / state, as the transport reports them */
 });
 // From a user gesture:
-await transport.play();
+await backend.play();
 // On host teardown:
-transport.dispose();
-sink.dispose();
+backend.dispose();
 ```
 
 ## Musical state and the audio clock
@@ -69,59 +73,24 @@ Bends and vibrato sum per logical voice. Rate is bounded to 1/16–16, lookahead
 (0,5] seconds, and polling must be shorter than lookahead. Loops must fit inside the
 performance, last at least 1 ms at rate 1, and fit a 10,000-wrap window budget.
 A curve is bounded to 100,000 sampled points per sounding event. These bounds reject
-requests; they do not silently change musical durations. Timbral hints remain for
-later campaign items; this sink is a plain sine patch.
+requests; they do not silently change musical durations.
 
-## Native renderer and ownership
+## The sink it drives
 
-`audio/native/sink.ts` is the only production browser-audio implementation. Neither
-module import nor `new NativeSink()` accesses an `AudioContext`; `unlock()` creates
-one lazily or resumes the supplied live context. An offline context needs no resume.
-The sink accepts a host context and optional destination from that context; a
-host-owned context is never closed. A sink-created context is closed on disposal.
+`Sink` (`src/audio/sink.ts`) is the transport's renderer contract: timed attacks,
+releases, pitch and bend actions, `cancel` and `unlock`. In production the only sink is
+`HostBackend`'s silent one: its `cancel` marks a restart, its `unlock` gets the synth
+ready, and its clock runs the backend's lead behind the host's (player-synth.md).
 
-Each attack owns an oscillator, gain and automation histories. Voices are addressed
-by their compiler identity, so declared strings remain independently bendable.
-Attack and release use 5 ms linear amplitude ramps, with peak amplitude
-`0.2 * velocity`. Retuning preserves phase, envelope and the current bend.
-
-Queued actions resolve the generation active at their timestamp, including when a
-future attack was scheduled before a bend on an earlier note. Cancel truncates
-crossing automation using owned timeline values, silences future starts and fades
-active sources within 5 ms. Cancelled future generations cannot shorten replacement
-voices, and old `onended` cleanup only removes its own source. Ended/disposed nodes
-are disconnected. Parameter scheduling follows the
-[Web Audio scheduling contract](https://www.w3.org/TR/2021/REC-webaudio-20210617/#AudioScheduledSourceNode).
-
-The dependency-cruiser fence rejects native imports from pure audio, model, engine,
-worker and Node conformance code. Only the native backend, elements, entries and
-`harness/browser/` may import it. The conformance test proves both a rejected pure
-import and an admitted browser test import.
-
-## Proof and bundle budget
+## Proof
 
 `harness/conformance/transport.test.ts` uses a fake clock and recording sink. It
 covers half-open fractions, onset timing, pause/resume, stop, seek through ties and
 tempo/bends, stale callbacks/unlocks, rate changes, loop reconstruction, legato,
 rests, combined controllers, final note ends and the inverse-clock rounding boundary.
 
-`npm run smoke:audio` renders the real compiler → transport → native sink in Chrome's
-48 kHz `OfflineAudioContext`. It checks hello-world C4 and onset/release energy;
-independent 440/220 Hz voices; +200-cent bend; envelope-preserving re-pitch to 660 Hz;
-crossing-ramp cancellation; cancelled future attacks; replacement lifetime and disposal.
-This is a signal test, not a human listening approval or a browser/device coverage claim.
-`smoke:lib` also instantiates/disposes the idle native sink under bare Node.
-
-`node harness/verify/audio-bundle-cost.mjs` rebuilds the real embed configuration in
-IIFE and ESM, retaining exports to prevent tree shaking. It compares the unchanged
-viewer, viewer plus the complete sink, and viewer plus compiler/transport/sink. The
-measurement is preparation for item 7's bundled player, not a claim that this item
-has added player UI or changed the viewer payload. Results are recorded in the
-[campaign log](../roadmap/inprogress/core-campaign-player.md).
+The synth's side — the contract stream, the backend against the synth's real host on a
+manual clock, the worklet in Chrome — is proven as player-synth.md lists.
 
 No scenario golden or human verification record changes in this item. Item 5's
 performance/MIDI review batch remains pending in the standing ledger.
-
-The same NativeSink also supports [sample packs](player-sample-packs.md) through
-independent buffer sources. Pitch automation and cancellation remain shared with
-the oscillator backend; the compiler and transport timeline are unchanged.

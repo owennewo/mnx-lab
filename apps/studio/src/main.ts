@@ -15,11 +15,8 @@ import '../studio.css';
 import { applyTheme, readTheme } from './theme.ts';
 import '../../../src/elements/DocumentViewer.ts';
 import '../../../src/elements/Player.ts';
-import { setDefaultSynthEngine } from '../../../src/elements/synthEngine.ts';
 import '../../../src/elements/ScoreFrame.ts';
 import './StudioApp.ts';
-// Served beside /synth/: the synth's instrument host plays by default (core-campaign-synth Phase 8).
-setDefaultSynthEngine('host');
 
 // The remembered theme, before the first paint: a pinned scheme must not
 // flash the machine's.

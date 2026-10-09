@@ -122,11 +122,11 @@ mnx-lab (monorepo; github.com/owennewo/mnx-lab is PUBLIC; deployed at mnx-lab.to
 | 2 | The `/synth/` shell: build, CSP, smokes | ☑ Done | `vite build` places the synth's app at `/synth/`; CSP `'wasm-unsafe-eval'`; `synth` smoke (22 flows under the deployed CSP) |
 | 3 | Home page, licences and notices; **first landing** | ☑ Done | home page at `/`, `/notices/`, `LICENSE.md`, `NOTICE.md`, `CONTRIBUTING.md`; `home` smoke; notices test; landed with Phases 1–2 |
 | 4 | Contract adoption: the performance as a contract stream | ☑ Done | `src/audio/contractStream.ts`; every valid corpus scenario is an event log the synth accepts (`contract-stream.test.ts`) |
-| 5 | Host backend and part router | ☑ Done (behind `?synth=host`) | `src/audio/hostBackend.ts`, `hostSetup.ts`, `native/hostPort.ts`; HostCore-driven tests over 7 scenarios; `synth-host` smoke in Chrome |
-| 6 | Studio: choosing instruments and rigs | ☑ Done (behind `?synth=host`) | Instruments sheet: factory designs, Import rig…, the old player; `host-instruments.test.ts`; `studio-instruments` smoke |
+| 5 | Host backend and part router | ☑ Done | `src/audio/hostBackend.ts`, `hostSetup.ts`, `native/hostPort.ts`; HostCore-driven tests over 7 scenarios; `synth-host` smoke in Chrome |
+| 6 | Studio: choosing instruments and rigs | ☑ Done | Instruments sheet: factory designs, Import rig…; `host-instruments.test.ts`; `studio-instruments` smoke |
 | 7 | Persistence: rig references in D1 | ☒ Not needed (S23) | choices ride `piece_views.prefs`; its cap raised to 64 KB |
-| 8 | Retire the old sink | ◐ Host is the default in studio and the workbench (S24); sink still there | |
-| 9 | Performance, smokes and archiving guitar-faust | ☐ Not started | |
+| 8 | Retire the old sink | ☑ Done (S25) | sink, oscillators, `SynthBackend`, sample packs and the flag removed; embed plays on the synth beside its script (S26); `embed` smoke cross-origin |
+| 9 | Performance, smokes and archiving guitar-faust | ☑ Done | forgetting, warm-up, ready-before-play, strain; multi-part leg in the `synth-host` smoke; optimisation plan `roadmap/proposed/core-synth-performance.md`; guitar-faust archived (S14) |
 
 ## Phase 0 — Readiness and decisions
 
@@ -311,19 +311,36 @@ preferences; a part rig is about 4 KB, so the Worker's preferences cap went from
   (`setDefaultSynthEngine('host')` in their entries); the embed and the library build stay on
   the sink, since they run on other sites without `/synth/`. `?synth=native` keeps a browser
   on the sink, `?synth=host` on the host, `?synth=default` forgets the choice.
-- [ ] Step 2, after the lead has listened on phone and tablet and Phase 9 has measured the
-  cost: remove the oscillator voice and the flag; sample packs stay on the sink (S6).
-
-- [ ] Remove `Sink`/`SynthBackend` playback for covered parts.
-- [ ] Sample packs per S6; MIDI export via `lower()`.
-- [ ] Remove the feature flag.
+- [x] Step 2 (S25, the lead after listening on phone and tablet): the old synth is gone
+  entirely — `NativeSink`, the oscillator voices, `SynthBackend`, the sample packs and their
+  loaders, the `?synth` flag and `setDefaultSynthEngine`, the Instruments sheet's "Old player",
+  the Player's Sound selector (`voicePreset`, `soundControl`, `sample-base`). Pianos play Basic
+  keys. A stored `sound` is dropped (the part plays its default). The four guitar packs moved
+  to `experiments/performance-listening/bench/samples/` as the listening bench's research
+  data (still CC0, noticed as repository-only); the piano pack was deleted. The `audio` smoke
+  (an OfflineAudioContext probe of the sink) and `sample-packs.test.ts` went with them; the
+  `Sink` interface stays as the transport's renderer contract.
+- [x] Embeds on the synth (S26, option A): `vite.embed.config.ts` copies the synth's runtime to
+  `synth/` beside the artifact (`tools/synth-runtime.mjs`, shared with the site's `/synth/`);
+  `src/entries/embed.ts` calls `setSynthBase` from its own script URL (a `synth-base` attribute
+  overrides). The `embed` smoke serves artifact and page from two origins and plays through the
+  synth, ESM and IIFE. `mnx-lab/audio` exports `HostBackend`, `NativeHostPort`, `setSynthBase`,
+  `performanceToStream`, `hostSetup` in place of the sink and pack loaders
+  (docs/player-synth.md, Embedding).
+- [ ] Dropped: MIDI export via the synth's `lower()`. MIDI export keeps the compiler's own
+  lowering, which is what it has always exported; a later plan may revisit it.
 
 ## Phase 9 — Performance, smokes and archiving guitar-faust
 
-- [ ] A studio performance smoke for a multi-part piece; the synth's benchmark inside mnx-lab's
-  build, compared with its own results.
-- [ ] guitar-faust: a final commit pointing to `mnx-lab/synth/`; the repository kept read-only.
-- [ ] Resume performance-listening (the lead's call).
+- [x] Performance: the fixes the lead's phone and tablet found — forgetting finished notes,
+  warming the worklet, getting ready before play, suspending when idle — and the strain
+  signal on the play button (below). The `synth-host` smoke plays the multi-part twelve-bar
+  blues (guitar and keys) and fails if the worklet's load is high or climbs (strain is not
+  asserted there: the gate runs smokes in parallel, and a shared machine stalls on its own). Further optimisation is a
+  later plan: `roadmap/proposed/core-synth-performance.md`.
+- [x] guitar-faust: archived with a README banner pointing here (S14, `f71b1c1`).
+- [ ] Resume performance-listening — the lead's call (S13); its bench keeps working, with the
+  guitar packs it renders from now under `experiments/performance-listening/bench/samples/`.
 
 ### Found on a phone: re-planning a whole piece's history (9 Oct 2026)
 
@@ -392,6 +409,8 @@ every block. "Preparing audio" appears only if preparing takes longer than 0.35 
 | S22 | **Phase 5:** a `HostBackend` (a `PlaybackBackend`) and a part router behind a feature flag; the old player stays the default | agreed (lead, 8 Oct 2026) |
 | S23 | Phase 7 is not needed: a part's rig is stored in the piece's view preferences, whose cap rises from 8 KB to 64 KB (room for a dozen rigs) | agent's call within S19 (9 Oct 2026); open to the lead's change |
 | S24 | **The new player is the default** in studio and the workbench, with `?synth=native` as the way back; embeds stay on the old player | agreed (lead, 9 Oct 2026: "can you switch new player to be the default") |
+| S25 | **The old synth goes entirely**, sample packs included; the piano improves later on the synth | agreed (lead, 9 Oct 2026: "I want to get rid of the old synth entirely including piano sample packs. We can improve piano later.") |
+| S26 | **Embeds use the synth by option A**: the synth's runtime ships beside the embed's script, found from its own URL; CORS and a page CSP are the embedding site's requirements. Options C (a second, bundled synth script) and D (an iframe embed) remain for later | agreed (lead, 9 Oct 2026: "lets go with A for now") |
 | S12 | `synth/` is a workspace with its own runner, like the converters. Root `vitest` excludes it. The gate gets a `synth` area: `synth/**` runs the synth's functional suite in the checks lane, and its browser flows and worklet parity become smokes covering `synth`, run against the built `/synth/`. The timing-based cost check, the benchmark and the DSP reproducibility check (`synth:verify-dsp`, where FAUST is installed, S7) stay manual. `gate-plan.test.ts` pins the rule | agreed (lead, 8 Oct 2026) |
 | S13 | mnx-lab's performance-listening work is paused for the migration | agreed (lead, 8 Oct 2026) |
 | S14 | Once Phase 3 has landed and the synth's suites are green here, guitar-faust gets one final commit: a README banner pointing to `synth/` and saying development stops there. Plans, evidence, references and the 0.2.0 release folder are kept; its local servers are stopped. The synth's version continues here, 0.2.0 at the move and `0.3.0-dev` next. guitar-faust stays unlicensed and private; only this copy is AGPL | agreed (lead, 8 Oct 2026) |
@@ -405,6 +424,14 @@ every block. "Preparing audio" appears only if preparing takes longer than 0.35 
 | Two test runners and two styles in one repo | Low | The synth is a workspace with its own conventions, like the converters |
 | Bundle and asset size in studio (WASM) | Medium | Lazy-load the synth only when a part plays; record the sizes |
 | CPU contention with mnx-lab's timing experiments | Low | Paused by the lead (S13) |
+
+## Closed (9 Oct 2026)
+
+Phases 0–9 done; Phase 7 not needed (S23). The player plays every score on the synth, in
+studio, the workbench, the embed and the library; the old Web Audio sink is gone. What it
+leaves open: synth optimisation (`roadmap/proposed/core-synth-performance.md`), level meters
+and a same-origin rig hand-off in the Instruments sheet (Phase 6 follow-ups), MIDI export via
+`lower()` (dropped above), and resuming performance-listening (S13, the lead's call).
 
 ## Evidence log
 
@@ -462,3 +489,5 @@ every block. "Preparing audio" appears only if preparing takes longer than 0.35 
   - **Deploy not done:** `npm run deploy` was refused by the agent's permission system as a production deploy. It is the lead's to run, or to approve for the agent. The live site still serves the previous build: `/` redirects to `/studio/`, and `/synth/` and `/notices/` answer 404.
   - guitar-faust archived (S14).
 
+- 2026-10-08/09 — **Phases 4–6 landed** behind `?synth=host` (`4f4f7942`, `069a39b1`), then the host became the default in studio and the workbench (`39d1e246`, S24) and was deployed for the lead's phone and tablet. Fixes from that listening, each landed and deployed: forgetting finished notes (`384d6ee9`), strain counted only once the music sounds (`50aba113`), a warm-up before the music (`c5d71c8c`), ready before play on a suspended context (`25963b5c`).
+- 2026-10-09 — **Phases 8–9 done; campaign closed** (worktree `core-synth-retire`). The old synth removed entirely (S25); embeds play on the synth beside their script (S26). Checked before landing: the `synth-host` smoke (including the twelve-bar blues at a flat load, median 12–25%), `studio-instruments`, `studio`, both `embed` formats cross-origin, the library smoke, the notices test and the static checks; then the full gate.

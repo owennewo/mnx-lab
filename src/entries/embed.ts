@@ -1,4 +1,3 @@
-import { SAMPLE_PRESETS } from '../audio/sampleSelection.ts';
 // Build face: the embed (dist/embed/mnx-lab.js, IIFE + ESM) — one script tag
 // registers the elements/ custom elements and nothing else. The workbench
 // shell must never be reachable from here (the old embed was the app shell
@@ -16,7 +15,14 @@ import { SAMPLE_PRESETS } from '../audio/sampleSelection.ts';
 // So this face derives its asset base from ITS OWN script URL and registers
 // the font itself. A host may still override with the `smufl-base` attribute
 // on the script tag (assets mirrored elsewhere, or split to a CDN).
-import { setSampleBase } from '../audio/native/samplePacks.ts';
+//
+// THE SYNTH TOO (roadmap/complete/core-campaign-synth.md, option A). The player plays
+// on the synth's instrument host, whose runtime (host code, AudioWorklet, DSP) the build
+// copies to `synth/` beside this script (vite.embed.config.ts). Only a page with a player
+// loads it. On a page of another origin the artifact's server must send CORS headers for
+// `synth/` (the worklet and modules load in cors mode), and a page CSP must admit the
+// artifact's origin and 'wasm-unsafe-eval'. A `synth-base` attribute overrides the location.
+import { setSynthBase } from '../audio/native/hostPort.ts';
 import { setSmuflBasePath } from '../engine/smufl/smufl.ts';
 import '../elements/DocumentViewer.ts';
 
@@ -41,25 +47,24 @@ function scriptDirectory(): string | null {
   }
 }
 
-/** An explicit `smufl-base` on the script tag wins over the derived default. */
-function declaredBase(): string | null {
+/** An explicit `smufl-base` (or `synth-base`) on the script tag wins over the derived default. */
+function declaredBase(name: 'smufl-base' | 'synth-base'): string | null {
   if (typeof document === 'undefined') return null;
   const current = document.currentScript as HTMLScriptElement | null;
   const attr =
-    current?.getAttribute('smufl-base') ??
-    document.querySelector('script[smufl-base]')?.getAttribute('smufl-base');
+    current?.getAttribute(name) ??
+    document.querySelector(`script[${name}]`)?.getAttribute(name);
   return attr ? attr.replace(/\/+$/, '') : null;
 }
 
-const sampleDirectory = scriptDirectory();
-if (sampleDirectory)
-  for (const preset of SAMPLE_PRESETS)
-    setSampleBase(`${sampleDirectory}/samples/${preset.directory}`, preset.id);
-const base = declaredBase() ?? scriptDirectory();
+const directory = scriptDirectory();
+const base = declaredBase('smufl-base') ?? directory;
 if (base) {
   setSmuflBasePath(`${base}/smufl`);
   registerBravura(`${base}/smufl/Bravura.woff2`);
 }
+const synth = declaredBase('synth-base') ?? (directory && `${directory}/synth`);
+if (synth) setSynthBase(synth);
 
 /**
  * Register the notation face with the DOCUMENT (fonts are document-scoped —

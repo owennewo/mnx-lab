@@ -1,5 +1,5 @@
 /**
- * The part router (roadmap/inprogress/core-campaign-synth.md, Phases 5 and 6): an mnx-sound/2
+ * The part router (roadmap/complete/core-campaign-synth.md, Phases 5 and 6): an mnx-sound/2
  * setup for the synth's instrument host, built from the score and the person's per-part mix.
  * Pure.
  *
@@ -12,9 +12,8 @@
  *    instrument cannot take (a bass, a seven-string) says so as a diagnostic.
  * A part's chosen instrument (`PartMixEntry.instrument`, Phase 6) replaces the default when
  * it fits the part — a factory design, or a part rig's instrument, chain and strip (its
- * layout gives way to the score's) — or keeps the old player's sound (`sink`: the part is
- * left out of the setup, and the backend plays it on the sink). A choice that does not fit
- * the part (a guitar design on a part with no fingerboard) falls back with a diagnostic.
+ * layout gives way to the score's). A choice that does not fit the part (a guitar design on
+ * a part with no fingerboard) falls back with a diagnostic.
  *
  * The mix: a part's level and mute become its channel strip (added to a rig's own level).
  * One Room bus (Studio) and a master at 0 dB serve the whole piece (S20); a rig's sends to
@@ -37,10 +36,9 @@ const PLUCKED_RANGE = [36, 76] as const;
 export interface RoutedPart {
   partIndex: number;
   id: string;
-  /** `sink`: the part plays the old player's sound beside the host. */
-  kind: HostKind | 'sink';
+  kind: HostKind;
   /** Where its instrument comes from. */
-  source: 'default' | 'design' | 'rig' | 'sink';
+  source: 'default' | 'design' | 'rig';
   /** The design id it plays (a rig's own design when it carries an id), if any. */
   design?: string;
   /** The rig's name, for a rig. */
@@ -53,7 +51,7 @@ export interface RoutedPart {
 export interface HostSetup {
   setup: Setup;
   parts: RoutedPart[];
-  /** The contract part a performance voice plays on; undefined for parts on the sink. */
+  /** The contract part a performance voice plays on. */
   partOf: (voice: PerformanceVoice) => string | undefined;
   diagnostics: { partIndex: number; message: string }[];
 }
@@ -83,10 +81,6 @@ export function hostSetup(performance: Performance, document: MnxStructure, mix:
     const pluckable = layout !== undefined;
     const fallback: HostKind = kit ? 'kit' : pluckable ? 'plucked' : 'keys';
     const entry = mix[partIndex], choice = entry?.instrument;
-    if (choice?.kind === 'sink') {
-      routed.push({ partIndex, id, kind: 'sink', source: 'sink', pluckable, kit });
-      continue;
-    }
     const fits = (wanted: HostKind) => (kit ? wanted === 'kit' : wanted === 'keys' || (wanted === 'plucked' && pluckable));
     let kind: HostKind = fallback, design: Part['instrument']['design'] = DEFAULT_DESIGNS[fallback];
     let from: RoutedPart['source'] = 'default', rigName: string | undefined;
@@ -118,7 +112,7 @@ export function hostSetup(performance: Performance, document: MnxStructure, mix:
     const designId = typeof design === 'string' ? design : typeof (design as { id?: unknown }).id === 'string' ? (design as { id: string }).id : undefined;
     routed.push({ partIndex, id, kind, source: from, pluckable, kit, ...(designId ? { design: designId } : {}), ...(rigName ? { rig: rigName } : {}) });
   }
-  const byIndex = new Map(routed.filter(r => r.kind !== 'sink').map(r => [r.partIndex, r.id]));
+  const byIndex = new Map(routed.map(r => [r.partIndex, r.id]));
   return {
     setup: { contract: 'mnx-sound/2', session: { buses: [ROOM], master: { volumeDb: 0, ceilingDb: -1 } }, parts },
     parts: routed, partOf: voice => byIndex.get(voice.partIndex), diagnostics,

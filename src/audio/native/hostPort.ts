@@ -18,10 +18,21 @@ import type { LoadReport } from '../hostStrain.ts';
 import type { FactoryDesign } from '../hostInstruments.ts';
 
 type HostModule = typeof import('@mnx-lab/synth');
+/** Where the synth's runtime is served (its `host/`, `generated/` and `data/`): the site's
+ *  synth shell by default; the embed sets it beside its own script, a library host wherever
+ *  it serves the files. Relative URLs resolve against the page. */
+let synthBase = '/synth/';
+export function setSynthBase(base: string) { synthBase = base.endsWith('/') ? base : `${base}/`; }
+/** One download and compile of the host and its DSP per page and base, shared by every player. */
+const fetched = new Map<string, Promise<{ module: HostModule; assets: HostAssets }>>();
+/** Players that prepare their audio before play. A page of many players (the review page)
+ *  prepares the first few; the rest prepare when played — each would be a context and a worklet. */
+const EAGER_PORTS = 2;
+let eagerPorts = 0;
 /** Seconds after playback stops before the context is suspended (tails and the room ring out). */
 const IDLE_SECONDS = 3;
 export interface NativeHostPortOptions {
-  /** Where the synth's shell is served; its host module is `<base>host/index.js`. */
+  /** Where the synth's runtime is served (default: `setSynthBase`); its host module is `<base>host/index.js`. */
   base?: string;
   volume?: number;
   createContext?: () => AudioContext;
@@ -73,21 +84,31 @@ export class NativeHostPort implements HostPort {
     }, IDLE_SECONDS * 1000);
   }
   /** Fetch and compile the host and its DSP, then prepare it — everything but sound. */
+  private eager = false;
   async preload() {
     if (this.disposed) return;
     this.fetchHost();
     await this.fetching;
-    if (this.disposed) return;
+    if (this.disposed || this.eager || eagerPorts >= EAGER_PORTS) return;
+    this.eager = true;
+    eagerPorts++;
     this.prepare();
     await this.loading;
   }
   private fetchHost() {
-    this.fetching ??= (async () => {
-      // Absolute: the host resolves its data files against this base.
-      const base = new URL(this.options.base ?? '/synth/', location.href).href;
-      const module = await import(/* @vite-ignore */ `${base}host/index.js`) as HostModule;
-      return { module, assets: await module.loadHostAssets(`${base}generated/`) };
-    })();
+    // Absolute: the host resolves its data files against this base.
+    const base = new URL(this.options.base ?? synthBase, location.href).href;
+    let shared = fetched.get(base);
+    if (!shared) {
+      shared = (async () => {
+        const module = await import(/* @vite-ignore */ `${base}host/index.js`) as HostModule;
+        return { module, assets: await module.loadHostAssets(`${base}generated/`) };
+      })();
+      fetched.set(base, shared);
+      const mine = shared;
+      mine.catch(() => { if (fetched.get(base) === mine) fetched.delete(base); });
+    }
+    this.fetching ??= shared;
     this.fetching.catch(() => { this.fetching = undefined; });
   }
   private async load(context: AudioContext) {
@@ -125,6 +146,7 @@ export class NativeHostPort implements HostPort {
   dispose() {
     if (this.disposed) return;
     this.disposed = true;
+    if (this.eager) eagerPorts--;
     clearTimeout(this.idleTimer);
     this.host?.dispose();
     this.output?.disconnect();
@@ -133,7 +155,7 @@ export class NativeHostPort implements HostPort {
 }
 
 /** The synth's factory guitar designs, as its shell serves them; Clear steel alone if that fails. */
-export async function loadFactoryDesigns(base = '/synth/'): Promise<FactoryDesign[]> {
+export async function loadFactoryDesigns(base = synthBase): Promise<FactoryDesign[]> {
   try {
     const response = await fetch(new URL(`${base}data/instrument-v2/presets.json`, location.href));
     if (!response.ok) throw new Error(String(response.status));

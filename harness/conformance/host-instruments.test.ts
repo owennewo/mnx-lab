@@ -76,14 +76,6 @@ it('a part rig brings its instrument, chain and strip; the score keeps the strin
   expect(hostSetup(performance, document, { [ki]: { instrument: { kind: 'rig', rig: keysRig } } }).parts.find(p => p.partIndex === ki)).toMatchObject({ kind: 'keys', source: 'rig' });
 });
 
-it('the old player’s sound keeps a part off the host', () => {
-  const { document, performance } = blues(), ki = keysIndex(document);
-  const routed = hostSetup(performance, document, { [ki]: { sound: 'synth', instrument: { kind: 'sink' } } });
-  expect(routed.parts.find(p => p.partIndex === ki)).toMatchObject({ kind: 'sink', source: 'sink' });
-  expect(routed.setup.parts.map(p => p.id)).not.toContain(`part${ki}`);
-  for (const v of performance.voices) expect(routed.partOf(v) === undefined).toBe(v.partIndex === ki);
-});
-
 it('rig files: a single-part rig 3.0.0 is accepted; anything else says why', () => {
   expect(parsePartRig(guitarRig())).toMatchObject({ ok: true, kind: 'plucked' });
   expect(parsePartRig({ ...guitarRig(), rig: '2.0.0' })).toMatchObject({ ok: false, message: expect.stringMatching(/rig 3\.0\.0/) });
@@ -96,7 +88,7 @@ it('rig files: a single-part rig 3.0.0 is accepted; anything else says why', () 
 it('stored choices survive normalisation; damaged ones are dropped', () => {
   expect(normalizeInstrument({ kind: 'design', design: 'clear-steel' })).toEqual({ kind: 'design', design: 'clear-steel' });
   expect(normalizeInstrument({ kind: 'design', design: 'no spaces allowed' })).toBeUndefined();
-  expect(normalizeInstrument({ kind: 'sink' })).toEqual({ kind: 'sink' });
+  expect(normalizeInstrument({ kind: 'sink' }), 'the retired old player').toBeUndefined();
   expect(normalizeInstrument({ kind: 'rig', rig: { rig: '3.0.0' } })).toBeUndefined();
   // A rig survives the JSON round trip storage makes (studio's normalizeParts calls this; the
   // studio-instruments smoke proves the choice survives a reload).

@@ -16,7 +16,7 @@ export function freezeHeldout051(root:string,repo:string){
   const source=join(root,'samples/tonejs-instruments-622c2f1',set!);
   sources.push({id:id!,name:set!,source:'tonejs-instruments@622c2f1/'+set,origin:origin!,group:'held-out',licence:'CC-BY-3.0',attribution:'Nicholas Brosowsky tonejs-instruments',files:readdirSync(source).filter(f=>f.endsWith('.wav')).map(f=>({midi:tonejsMidi(f),path:join(source,f),sha256:sha256(readFileSync(join(source,f)))}))});
  }
- const sampleDir=join(repo,'public/samples/shinyguitar-v1'),m=JSON.parse(readFileSync(join(sampleDir,'manifest.json'),'utf8'));
+ const sampleDir=join(repo,'experiments/performance-listening/bench/samples/shinyguitar-v1'),m=JSON.parse(readFileSync(join(sampleDir,'manifest.json'),'utf8'));
  const chosen=new Map<number,any>();for(const s of m.samples){const c=chosen.get(s.midi);if(!c||(s.layer??0)>(c.layer??0)||((s.layer??0)===(c.layer??0)&&(s.take??0)<(c.take??0)))chosen.set(s.midi,s);}
  sources.push({id:'shinyguitar',name:m.name,source:'public/samples/shinyguitar-v1',origin:'Karoryfer',group:'held-out',licence:m.license,attribution:m.name,files:[...chosen.values()].map(s=>({midi:s.midi,path:relative(EXPERIMENT,join(sampleDir,s.file)),sha256:s.sha256}))});
  const parentPath=join(root,'contract2-hesitation-v1/manifest.json'),noisePath=join(root,'contract2-challenger-guitar-noise-v1/manifest.json');

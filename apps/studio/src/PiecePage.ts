@@ -135,7 +135,7 @@ export class PiecePage extends LitElement {
   /** The piece's parts as the reader left them: off the score, and the mix. */
   @state() private hiddenParts: readonly number[] = [];
   @state() private partMix: PartMix = {};
-  /** The synth's guitar designs, loaded when the sheet first opens on the host engine. */
+  /** The synth's guitar designs, loaded when the sheet first opens. */
   @state() private factoryDesigns: FactoryDesign[] = [];
   private designsRequested = false;
   /** What is playing — a recording has no parts to mix. */
@@ -966,10 +966,10 @@ export class PiecePage extends LitElement {
     writeParts(this.pieceId, { hidden, mix });
     this.schedulePrefs();
   }
-  /** On the synth's host: how each part is routed now, and the designs to offer. */
+  /** How each part is routed now, and the designs to offer. */
   private hostRouting(doc: MnxDocument) {
     const performance = this.player?.performance;
-    if (this.player?.synthEngine !== 'host' || !performance) return null;
+    if (!performance) return null;
     if (!this.designsRequested) {
       this.designsRequested = true;
       void loadFactoryDesigns().then(designs => { this.factoryDesigns = designs; });
@@ -1101,7 +1101,7 @@ export class PiecePage extends LitElement {
           @render-scale=${(e: CustomEvent<RenderScale>) => (this.effectiveStaffSp = e.detail.staffSp)}
         ></mnx-document-viewer>
         <mnx-player slot="player" .recordings=${this.recordings} .syncWarningsInPanel=${true}
-          .partMix=${this.partMix} .soundControl=${false} .sourceControl=${false}
+          .partMix=${this.partMix} .sourceControl=${false}
           .syncEditable=${!!this.snapshot} @sync-edit=${this.onSyncEdit} @sync-refresh=${this.onSyncEdit}
           @playback-position=${(e: CustomEvent<{ sourceId?: string; kind?: string; syncWarning?: string }>) => {
             const { sourceId, kind, syncWarning } = e.detail;
@@ -1184,7 +1184,6 @@ export class PiecePage extends LitElement {
         ${this.instrumentsOpen && this.doc
           ? html`<mnx-studio-instruments slot="side"
               .parts=${this.instrumentParts(this.doc)}
-              .engine=${this.player?.synthEngine ?? 'native'}
               .routing=${routing?.parts ?? []}
               .routingNotes=${routing?.diagnostics ?? []}
               .designs=${this.factoryDesigns}

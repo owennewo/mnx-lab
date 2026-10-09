@@ -1,6 +1,6 @@
 /**
  * The compiled performance as an mnx-sound/2 stream for the synth's instrument host
- * (roadmap/inprogress/core-campaign-synth.md, Phase 4). Pure: no DOM, importable from Node.
+ * (roadmap/complete/core-campaign-synth.md, Phase 4). Pure: no DOM, importable from Node.
  *
  * The performance is already the player's intermediate form — sounding events per voice
  * with velocity, bend and vibrato curves, legato and timbre — and the transport plays it

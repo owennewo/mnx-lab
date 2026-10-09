@@ -327,10 +327,11 @@ ALTER TABLE piece_views ADD COLUMN prefs_updated_at TEXT;
 **The service keeps it opaque.** `PUT /api/library/pieces/:id/prefs` takes a JSON object,
 caps it at `MAX_PIECE_PREFS_BYTES` (64 KiB since 2026-10-09: a part's imported synth rig, about 4 KiB, rides in the mix — core-campaign-synth Phase 6) and stores the text; `getPiece` hands it back on
 the snapshot, treating anything unreadable as absent so a junk value can never stop a piece
-opening. The Worker's ceiling is `model` + `assist`, and a part mix and a sample preset live
-in `src/audio`, so the shell that writes a shape is the one that checks it
-(`normalizePiecePrefs` in `apps/studio/src/scorePreferences.ts`). A new sample pack is
-therefore never a migration.
+opening. The Worker's ceiling is `model` + `assist`, and a part mix and an instrument choice
+live in `src/audio`, so the shell that writes a shape is the one that checks it
+(`normalizePiecePrefs` in `apps/studio/src/scorePreferences.ts`). A new instrument is
+therefore never a migration — and a retired one is dropped there: since the old player
+went (2026-10-09), a stored `sound` (a sample pack) is ignored and the part plays its default.
 
 **A preference is not an edit.** The write carries no expected revision, never moves the
 piece's revision, and the last write wins — otherwise choosing a sound would conflict with

@@ -11,8 +11,7 @@
   ],
   "files": [
     "dist/lib",
-    "public/smufl",
-    "public/samples"
+    "public/smufl"
   ],
   "exports": {
     ".": "./dist/lib/index.js",
@@ -20,8 +19,7 @@
     "./engine": "./dist/lib/engine.js",
     "./audio": "./dist/lib/audio.js",
     "./elements": "./dist/lib/elements.js",
-    "./smufl/*": "./public/smufl/*",
-    "./samples/*": "./public/samples/*"
+    "./smufl/*": "./public/smufl/*"
   },
   "scripts": {
     "dev": "NODE_OPTIONS=--disable-warning=DEP0040 vite",
@@ -74,7 +72,7 @@
     "defects:library": "node tools/library-defects.mjs",
     "deploy": "npm run build && wrangler deploy",
     "update:traversal": "UPDATE_TRAVERSAL=1 vitest run harness/conformance/traversal.test.ts",
-    "smoke:audio": "node harness/verify/run-smokes.mjs audio",
+    "smoke:synth-host": "node harness/verify/run-smokes.mjs synth-host",
     "smoke:player": "node harness/verify/run-smokes.mjs player",
     "capture:midi-oracle": "node harness/verify/capture-midi-oracle.mjs",
     "check:midi-oracle-live": "node harness/verify/capture-midi-oracle.mjs --check",

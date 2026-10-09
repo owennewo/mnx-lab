@@ -15,7 +15,7 @@ channel strip, return buses and a limited master, behind one versioned note cont
 
 This is the 0.2.0 line, a fresh start with no compatibility with earlier rigs, saved data or
 0.1.0. It lives in mnx-lab as `synth/` (its own workspace and the `/synth/` shell), moved here
-by [core-campaign-synth](../roadmap/inprogress/core-campaign-synth.md). The contract is
+by [core-campaign-synth](../roadmap/complete/core-campaign-synth.md). The contract is
 [docs/contract.md](docs/contract.md). The campaigns that built it (the instrument host and
 chain campaigns, with their decisions and evidence logs) and the guitar-model research stay in
 the guitar-faust repository, the read-only record of the synth's history.

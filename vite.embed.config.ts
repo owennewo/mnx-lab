@@ -8,9 +8,28 @@
 // behind "one script tag is enough" — do not prune the copy
 // (roadmap/proposed/core-viewer-embedded-app.md). `npm run smoke:embed`
 // serves this directory cross-origin and would fail if it went away.
-import { defineConfig } from 'vite';
+//
+// THE SYNTH TOO: the player plays on the synth's instrument host, so the synth's runtime
+// is copied to `synth/` beside the artifact (tools/synth-runtime.mjs), where the entry
+// points the player (src/entries/embed.ts). Once, after both formats are written.
+import path from 'node:path';
+import { defineConfig, type Plugin } from 'vite';
+
+function synthBeside(): Plugin {
+  let copied = false;
+  return {
+    name: 'mnx-lab:embed-synth',
+    async writeBundle(options) {
+      if (copied || !options.dir) return;
+      copied = true;
+      const { copySynthRuntime } = await import('./tools/synth-runtime.mjs');
+      copySynthRuntime(path.join(options.dir, 'synth'));
+    }
+  };
+}
 
 export default defineConfig({
+  plugins: [synthBeside()],
   build: {
     target: 'es2022',
     outDir: 'dist/embed',

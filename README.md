@@ -27,7 +27,7 @@ npm test           # harness suites over the corpus
 The deployed site (mnx-lab.totai.uk) has a home page at `/` linking the three shells —
 **studio** (`/studio/`, sign-in required), the **synth** (`/synth/`, the synth in
 [`synth/`](synth/README.md), moved here by
-[core-campaign-synth](roadmap/inprogress/core-campaign-synth.md)) and the **workbench**
+[core-campaign-synth](roadmap/complete/core-campaign-synth.md)) and the **workbench**
 (`/workbench/`) — and the licences and notices page (`/notices/`).
 
 ## Licence

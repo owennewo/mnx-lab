@@ -24,7 +24,7 @@ it('declares for every smoke areas the gate reaches, and each area really is rea
   // A representative change in each area, and a smoke covering it that the gate then runs.
   const probes: Record<string, string> = {
     workbench: 'src/workbench/ScenarioPage.ts', studio: 'apps/studio/src/PiecePage.ts', library: 'worker/api/library.ts',
-    embed: 'src/entries/embed.ts', lib: 'src/entries/lib.ts', audio: 'src/audio/transport.ts',
+    embed: 'src/entries/embed.ts', lib: 'src/entries/lib.ts',
     synth: 'synth/web/host/host-core.js', home: 'index.html',
   };
   expect(Object.keys(probes).sort()).toEqual([...SMOKE_AREAS].sort());
@@ -57,8 +57,8 @@ it('builds each selected face once, bundle only, and removes duplicate requests'
   expect(jobs.filter((j: Job) => files(j).includes('selection-smoke.mjs'))).toHaveLength(1);
 });
 it('starts the longest smokes first, whatever order they were asked for', () => {
-  const labels = (planSmokes(['audio', 'selection', 'inspector']).jobs as Job[]).map(j => j.label);
-  expect(labels).toEqual(['inspector', 'selection', 'audio']);
+  const labels = (planSmokes(['home', 'selection', 'inspector']).jobs as Job[]).map(j => j.label);
+  expect(labels).toEqual(['inspector', 'selection', 'home']);
 });
 it('runs the two embed formats as independent jobs', () => {
   const embeds = planSmokes(['embed']).jobs as Job[];
@@ -78,7 +78,6 @@ it('reuses supplied builds while retaining every selected check', () => {
   expect(built.builds).toEqual([]);
   expect(built.jobs).toEqual(normal.jobs);
   expect(built.artifacts).toEqual(['dist/client/workbench/index.html']);
-  expect(planSmokes(['audio']).artifacts).toEqual([]);
 });
 it('rejects absent or unknown selections before starting builds or smokes', () => {
   expect(() => planSmokes([])).toThrow('Select');

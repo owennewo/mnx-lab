@@ -2,8 +2,8 @@
 
 Implementation loop, player campaign item 7. `<mnx-player>` is registered by both
 embed formats and `mnx-lab/elements`. It consumes item 5's exact `Performance` and
-uses item 6's transport and native sink. There is no backend service or new runtime
-dependency. It does not own the viewer's context or the editor selection.
+uses item 6's transport, and plays on the synth ([player synth](player-synth.md)). There is
+no backend service. It does not own the viewer's context or the editor selection.
 
 The element supplies Play/Pause, Stop, a rail over the written bars, rate
 (0.25×–2× in 0.05 steps), and master volume. API ordinals and `at=` links are
@@ -44,21 +44,18 @@ in a text field. It overrides a focused button's own Space activation on purpose
 the button). Focus in the SCORE plays too, by the same rule and for the same reason: the viewer
 reports the keystroke as `transport-toggle` — the two-finger tap's event — and the host calls
 `toggle()`. The two scopes are disjoint, so nothing fires twice, and the editor keeps `N` for
-note entry rather than Space (`src/edit/keymap.ts`). The Sound selector sits beside them unless the
-host sets `soundControl = false` — studio does, because its Instruments sheet chooses a
-sound per part, and the rail gets the room. Likewise the Source select (and the host's
+note entry rather than Space (`src/edit/keymap.ts`). The Source select (and the host's
 `source-tools` slot beside it) shows unless `sourceControl = false`; studio chooses what
 plays in its Source sheet and calls `selectSource()`, which behaves the same either way.
 
 ## The part mix
 
-`partMix` (src/audio/partMix.ts) is a per-part level, mute and sound keyed by part index,
-beneath the master volume: the tray's volume stays the whole mix, a part's level sits
-under it. The native sink routes each voice through its part's bus (`voiceBus`, a gain
-per part, smoothed like the master), so a level or mute change is live and never pauses;
-a sound change pauses, loads the packs the parts now use and resumes, as the Sound
-selector always did. A part with no entry plays at full level in `voicePreset`; kit voices
-stay on the synth whatever the part chooses. Synth only — a recording has no parts
+`partMix` (src/audio/partMix.ts) is a per-part level, mute and instrument keyed by part
+index, beneath the master volume: the tray's volume stays the whole mix, a part's level sits
+under it. The part router turns it into the synth's channel strips and instruments
+(player-synth.md); a change reconfigures the host in place and never pauses. A part with no
+entry plays at full level on its default instrument (the guitar for a part with strings,
+the kit for percussion, Basic keys otherwise). Synth only — a recording has no parts
 (`capabilities.parts`), so a host disables its mix controls while one plays. Hiding a part
 from the score is the viewer's `hiddenParts`, and never silences it.
 
@@ -67,8 +64,7 @@ from the score is the viewer's `hiddenParts`, and never silences it.
 - `performance: Performance | null`, `documentId: string`, and optional
   `document: MnxStructure` (meter/bar-number formatting). A new performance for the **same**
   `documentId` is an edit and keeps the session (below); a new `documentId`, a performance
-  appearing or vanishing, or new sample options dispose the old transport and sources
-  before installing new ones.
+  appearing or vanishing dispose the old session before installing a new one.
 - `play(): Promise<void>`, `pause()`, `stop()`, `seek(ordinal, metricOffset?): boolean`,
   `setLoop(region?)`, plus read-only `position` and `snapshot`. Seek selects a BEAT of
   that performed measure — `metricOffset` is where in the written bar to land, clamped
@@ -92,21 +88,20 @@ from the score is the viewer's `hiddenParts`, and never silences it.
   Identical context updates
   are suppressed. `seek`, `onset` and `bar` are bubbling, composed events;
   onsets include the transport's scheduled audio time and written occurrence id.
-- `voicePreset`, `partMix` and `soundControl` — the sound every unmixed part plays, the
-  per-part mix above, and whether the tray offers the Sound selector.
-- Audio creation/unlock happens on Play. Errors appear in an alert. Rate and volume
-  are the only localStorage preferences. Volume is a smoothed master gain owned by
-  `NativeSink.setVolume()`, independent of note velocities. No AudioContext or audio
-  nodes are created by importing or constructing the player.
-- Disconnect invalidates callbacks, clears live state, stops sources and disposes the
-  owned sink/context. Reconnection installs a fresh transport; it never resumes itself.
+- `partMix` — the per-part mix above.
+- The synth gets ready as the performance arrives (player-synth.md, Ready before play): its
+  context starts suspended, and Play resumes it. Errors appear in an alert. Rate and volume
+  are the only localStorage preferences. Volume is a smoothed master gain after the synth,
+  independent of note velocities. Importing or constructing the player creates no audio.
+- Disconnect invalidates callbacks, clears live state and disposes the synth and its
+  context. Reconnection installs a fresh transport; it never resumes itself.
 
 ## An edit keeps the session
 
 [core-player-live-edit](../roadmap/complete/core-player-live-edit.md). Every edit hands the
 player a new performance. Until 2026-09-19 that took the same path as opening another file:
-the session was disposed and a fresh one started on the synth — the AudioContext closed and
-its sample packs refetched, the audio element or YouTube iframe removed, the source silently
+the session was disposed and a fresh one started on the synth — the AudioContext closed, the
+audio element or YouTube iframe removed, the source silently
 reset. Now the player tells an edit (same `documentId`) from a new document and, for an edit,
 keeps the session and hands the live backend the performance in place.
 
@@ -125,8 +120,8 @@ The backends:
   derives the sync again against the bars as they are now — the sync bar's live segments,
   the stored segments, or an imported sync's tuples — as the factory does on first
   selection, and emits `sync-refresh` when the stored tuples no longer match.
-- `SynthBackend.replacePerformance` rebuilds the transport (pure derivation) over the same
-  sink, keeping the context and the sample banks. The place carries over by score position,
+- `HostBackend.replacePerformance` rebuilds the transport (pure derivation) and derives the
+  stream and setup again, keeping the synth and its context. The place carries over by score position,
   bar and offset, and the state with it: playing plays on, paused stays. A place the new
   performance no longer has, or a stopped transport, starts at the beginning, stopped. A
   loop is not carried.
@@ -226,8 +221,8 @@ MIDI downloads retain the original evidence contract; sound is not an approval.
   routing (including reordered parameters and later same-score navigation), unchanged
   editor selection, an actual edit stopping playback, a timed D.S. return, and Listen
   highlighting on the static review page.
-- `smoke:audio` measures master-volume attenuation in the offline buffer as well as
-  the existing onset/pitch/cancellation checks. `smoke:lib` remains Node-safe.
+- `smoke:synth-host` plays through the synth's worklet (player-synth.md). `smoke:lib`
+  remains Node-safe.
 - Existing engraving and performance goldens remain unchanged. The 32-scenario
   performance/MIDI batch still awaits human review in the standing verification ledger.
 
@@ -239,10 +234,6 @@ Occurrence click events add `ordinal` while retaining the written `noteId`;
 the host seeks that exact visit. `revealOccurrence` and playback paint address
 only that occurrence when unrolled, and reject excluded partial-bar ink.
 See [the unrolled contract](player-unrolled.md).
-
-The Sound selector adds an explicit Guitar preset with lazy static samples.
-See [sample packs](player-sample-packs.md) for the pack, host loader/base URL,
-loading/error behavior and recorded-articulation limits.
 
 Recorded audio sources, musical-position handoffs, media delivery and the common
 `playback` snapshot are documented in [player-recordings.md](player-recordings.md).

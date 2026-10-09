@@ -9,22 +9,13 @@ import { RecordingBackend } from '../audio/recordingBackend.ts';
 import { NativeYouTubePort } from '../audio/native/youtube.ts';
 import { youtubeVideoId } from '../audio/youtubeUrl.ts';
 import { HtmlAudioPort } from '../audio/native/htmlAudio.ts';
-import { SynthBackend } from '../audio/native/synthBackend.ts';
 import { HostBackend } from '../audio/hostBackend.ts';
 import { NativeHostPort } from '../audio/native/hostPort.ts';
-import { NativeSink } from '../audio/native/sink.ts';
-import { readSynthEngine, type SynthEngine } from './synthEngine.ts';
 import { createRecordingSync } from '../audio/recordingSync.ts';
 import { scorePositionAt } from '../audio/scorePosition.ts';
 import { linearizePasses } from '../model/passes.ts';
 import { restSpansOf, restsAt, type RestSpan } from '../model/restSpans.ts';
-import {
-  SAMPLE_PRESETS,
-  type SamplePreset,
-  type VoicePreset,
-} from '../audio/sampleSelection.ts';
-import type { SamplePackLoader } from '../audio/native/samplePacks.ts';
-import { partBuses, partLevel, partSound, requiredPresets, voicePresetFor, type PartMix } from '../audio/partMix.ts';
+import type { PartMix } from '../audio/partMix.ts';
 import { formatPlaybackPosition, formatScorePlaybackPosition, measureAt, placeLabel, playbackPositionParts, scorePlaybackPositionParts, widestPlaceLabel, type PlaybackPositionParts } from '../audio/playbackPosition.ts';
 import { ZERO, compare, type Rational } from '../audio/time.ts';
 import type { MnxStructure } from '../model/mnx.ts';
@@ -66,29 +57,21 @@ function stacked(scope: string) {
   `;
 }
 
+/** A player given a performance without its document: parts play their defaults (keys, kit). */
+const NO_DOCUMENT = { parts: [] } as unknown as MnxStructure;
+
 @customElement('mnx-player')
 export class Player extends LitElement {
   @property({ attribute: false }) performance: Performance | null = null;
   @property({ attribute: false }) document: MnxStructure | undefined;
   @property({ type: String }) documentId = '';
-  /** The sound for every part the mix does not choose one for. */
-  @property({ attribute: 'voice-preset' }) voicePreset: VoicePreset = 'synth';
-  /** Which synth plays the score: 'native' (the sink) or 'host' — the synth's instrument
-   *  host, behind the `?synth=host` flag until it replaces the sink (./synthEngine.ts). */
-  @property({ attribute: 'synth-engine' }) synthEngine: SynthEngine = readSynthEngine();
-  /** Per-part level, mute and sound beneath the master volume, keyed by part
-   *  index (src/audio/partMix.ts). Synth only: a recording has no parts. */
+  /** Per-part level, mute and instrument beneath the master volume, keyed by part index
+   *  (src/audio/partMix.ts). Synth only: a recording has no parts. */
   @property({ attribute: false }) partMix: PartMix = {};
-  /** Whether the tray offers the Sound selector. A host with its own
-   *  per-part sound control (studio's Instruments sheet) turns it off. */
-  @property({ attribute: false }) soundControl = true;
   /** Whether the tray offers the Source select and its `source-tools` slot. A
    *  host that chooses sources elsewhere (studio's Source sheet) turns it off;
    *  `selectSource()` is the same either way. */
   @property({ attribute: false }) sourceControl = true;
-  @property({ attribute: 'sample-base' }) sampleBase: string | undefined;
-  @property({ attribute: false }) sampleBases: Partial<Record<SamplePreset, string>> | undefined;
-  @property({ attribute: false }) sampleLoader: SamplePackLoader | undefined;
   @property({ attribute: false }) writtenBarDurations: readonly Rational[] | undefined;
   @property({ attribute: false }) recordings: readonly RecordingSource[] = [];
   /** Host supplies recording management; standalone players omit the add action. */
@@ -630,10 +613,6 @@ export class Player extends LitElement {
     const scoreMoved = changed.has('performance') || changed.has('document') || changed.has('writtenBarDurations');
     const reinstall =
       changed.has('documentId') ||
-      changed.has('sampleBase') ||
-      changed.has('sampleBases') ||
-      changed.has('sampleLoader') ||
-      changed.has('synthEngine') ||
       (scoreMoved && (!this.session || !this.performance));
     if (!reinstall && scoreMoved) this.replacePerformance();
     if (reinstall) {
@@ -663,32 +642,9 @@ export class Player extends LitElement {
       }
     }
     if (this.syncMode && (this.sourceId === 'synth' || !this.syncEditable)) this.setSyncMode(false);
-    if (!reinstall && changed.has('partMix') && this.session?.backend instanceof SynthBackend)
-      this.applyPartLevels(this.session.backend.sink);
-    if (!reinstall && changed.has('partMix') && this.session?.backend instanceof HostBackend) {
+    // The mix — levels, mutes, instruments — reconfigures the host in place.
+    if (!reinstall && changed.has('partMix') && this.session?.backend instanceof HostBackend)
       this.session.backend.setPartMix(this.partMix);
-      const legacy = this.session.backend.legacySink;
-      if (legacy instanceof NativeSink) this.applyPartLevels(legacy);
-    }
-    const sounds = this.soundSignature();
-    const soundsMoved = sounds !== this.lastSounds;
-    this.lastSounds = sounds;
-    if (!reinstall && soundsMoved && this.session?.backend instanceof SynthBackend) {
-      const resume = this.playback?.wantsPlayback;
-      this.pause();
-      this.session.backend.sink.setVoicePreset(this.sinkPreset(), this.requiredSamples());
-      this.localError = '';
-      if (resume) void this.play();
-    }
-    // On the host, a part moving to or from the old player's sound, or that sound changing:
-    // playing again unlocks (and so makes, and loads the packs of) the sink beside the host.
-    if (!reinstall && soundsMoved && this.session?.backend instanceof HostBackend) {
-      const resume = this.playback?.wantsPlayback;
-      this.pause();
-      this.session.backend.resetLegacySink();
-      this.localError = '';
-      if (resume) void this.play();
-    }
   }
   /** Rests built once per document; the publish runs every beat. */
   private restCache: { doc: MnxStructure; spans: readonly RestSpan[] } | null = null;
@@ -759,35 +715,9 @@ export class Player extends LitElement {
     this.session?.dispose(); this.session = undefined;
     this.status = undefined; this.lastOrdinal = null; this.publish();
   }
-  /** Each voice's timbre: its part's sound, kit voices always on the synth. */
-  private sinkPreset(): VoicePreset | ((voice: string) => VoicePreset) {
-    return this.performance ? voicePresetFor(this.performance, this.partMix, this.voicePreset) : 'synth';
-  }
-  private requiredSamples(): SamplePreset[] {
-    return this.performance ? requiredPresets(this.performance, this.partMix, this.voicePreset) : [];
-  }
-  /** On the host, only the parts kept on the old player's sound need its sample packs. */
-  private legacySamples(): SamplePreset[] {
-    const performance = this.performance;
-    if (!performance) return [];
-    const voices = performance.voices.filter(v => this.partMix[v.partIndex]?.instrument?.kind === 'sink');
-    return requiredPresets({ ...performance, voices }, this.partMix, this.voicePreset);
-  }
   /** Held while the transport wants playback — a stand's screen must not
    *  sleep mid-song. Driven from publish(), the one place that knows. */
   private readonly wakeLock = screenWakeLock();
-  /** What every voice plays, so a mix change that moves only a level never
-   *  pauses to swap sounds. */
-  private lastSounds = '';
-  private soundSignature(): string {
-    // On the host, whether a part is on the old player's sound matters as much as which sound.
-    return JSON.stringify(this.performance?.voices.map((v) => [v.kit ? 'synth' : partSound(this.partMix, v.partIndex, this.voicePreset),
-      this.synthEngine === 'host' && this.partMix[v.partIndex]?.instrument?.kind === 'sink']) ?? []);
-  }
-  private applyPartLevels(sink: NativeSink) {
-    for (const part of new Set(this.performance?.voices.map((v) => v.partIndex)))
-      sink.setBusLevel(String(part), partLevel(this.partMix[part]));
-  }
   private install() {
     this.teardown(); this.localError = '';
     if (!this.performance || !this.isConnected) return;
@@ -797,37 +727,15 @@ export class Player extends LitElement {
     const factory = (id: string): PlaybackBackend => {
       const performance = this.performance;
       if (!performance) throw new Error('There is no performance to play.');
-      if (id === 'synth' && this.synthEngine === 'host' && this.document) {
-        const port = new NativeHostPort({ volume: this.volume, onError: message => { if (revision === this.revision) this.localError = message; } });
-        const buses = partBuses(performance);
-        // Parts kept on the old player's sound play on a sink into the host's own output.
-        const legacySink = () => {
-          const audio = port.audio;
-          if (!audio) throw new Error('The synth host is not running.');
-          const sink = new NativeSink({ context: audio.context, destination: audio.output, voicePreset: this.sinkPreset(), sampleBase: this.sampleBase,
-            sampleBases: this.sampleBases, samplePresets: this.legacySamples(), sampleLoader: this.sampleLoader, voiceBus: voice => buses.get(voice) });
-          this.applyPartLevels(sink);
-          return sink;
-        };
-        return new HostBackend(performance, this.document, port, { volume: this.volume, partMix: this.partMix, legacySink }, event => {
-          if (revision === this.revision && event.kind === 'onset') this.dispatchEvent(new CustomEvent('onset', {
-            detail: { ...event, documentId: this.documentId }, bubbles: true, composed: true,
-          }));
-        });
-      }
+      // The synth: its instrument host (src/audio/hostBackend.ts), loaded from beside the
+      // page's synth shell or the embed's script (setSynthBase).
       if (id === 'synth') {
-        const buses = partBuses(performance);
-        const synth = new SynthBackend(performance, {
-          volume: this.volume, voicePreset: this.sinkPreset(), sampleBase: this.sampleBase,
-          sampleBases: this.sampleBases, samplePresets: this.requiredSamples(), sampleLoader: this.sampleLoader,
-          voiceBus: voice => buses.get(voice),
-        }, event => {
+        const port = new NativeHostPort({ volume: this.volume, onError: message => { if (revision === this.revision) this.localError = message; } });
+        return new HostBackend(performance, this.document ?? NO_DOCUMENT, port, { volume: this.volume, partMix: this.partMix }, event => {
           if (revision === this.revision && event.kind === 'onset') this.dispatchEvent(new CustomEvent('onset', {
             detail: { ...event, documentId: this.documentId }, bubbles: true, composed: true,
           }));
         });
-        this.applyPartLevels(synth.sink);
-        return synth;
       }
       const matches = this.recordings.filter(r => r.id === id);
       if (!id || matches.length !== 1) throw new Error('The selected recording is unavailable or has a duplicate identity.');
@@ -877,8 +785,7 @@ export class Player extends LitElement {
     const session = this.session, performance = this.performance;
     if (!session || !performance) return;
     const backend = session.backend;
-    if (backend instanceof SynthBackend) backend.replacePerformance(performance);
-    else if (backend instanceof HostBackend) backend.replacePerformance(performance, this.document);
+    if (backend instanceof HostBackend) backend.replacePerformance(performance, this.document);
     else if (backend instanceof RecordingBackend) {
       const source = this.activeRecording, id = backend.id, duration = this.status?.mediaDuration;
       if (!source) return;
@@ -995,7 +902,7 @@ export class Player extends LitElement {
     const target = { ordinal, metricOffset: within };
     // An explicit bar click includes the grace/hold at its start. Handoffs
     // deliberately omit this edge because they must not guess within an insertion.
-    const edge = this.session.backend instanceof SynthBackend || this.session.backend instanceof HostBackend ? 'before' : undefined;
+    const edge = this.session.backend instanceof HostBackend ? 'before' : undefined;
     const problem = this.session.backend.canSeek(target, edge);
     if (problem) { this.localError = ''; void this.session.seek(target, edge); return false; }
     void this.session.seek(target, edge);
@@ -1008,7 +915,7 @@ export class Player extends LitElement {
   /** Existing API takes expanded synth positions; media endpoints must map uniquely. */
   setLoop(loop?: LoopRegion) {
     if (!this.session || !this.performance) return;
-    if (this.session.backend instanceof SynthBackend || this.session.backend instanceof HostBackend) { this.session.backend.transport.setLoop(loop); return; }
+    if (this.session.backend instanceof HostBackend) { this.session.backend.transport.setLoop(loop); return; }
     if (!loop) { this.session.setLoop(); return; }
     const start = scorePositionAt(this.performance, loop.start), end = scorePositionAt(this.performance, loop.end);
     if (!start.ok || !end.ok) throw new Error(!start.ok ? start.diagnostic.message : !end.ok ? end.diagnostic.message : 'Invalid loop.');
@@ -1381,8 +1288,7 @@ export class Player extends LitElement {
   render() {
     const playing = this.status?.wantsPlayback ?? false;
     const busy = this.syncEditable && this.sourceId !== 'synth'
-      || this.sourceControl && (this.recordings.length > 0 || this.canAddRecording)
-      || this.soundControl && this.sourceId === 'synth';
+      || this.sourceControl && (this.recordings.length > 0 || this.canAddRecording);
     return html` <div class=${busy ? 'controls busy' : 'controls'}>
         <button
           class=${playing && this.status?.strained ? 'primary strained' : 'primary'}
@@ -1420,23 +1326,6 @@ export class Player extends LitElement {
         </select></label>` : nothing}
         ${this.sourceControl ? html`<slot name="source-tools"></slot>` : nothing}
         <span class="settings">
-        ${this.soundControl && this.sourceId === 'synth' ? html`<label class="select" title="Sound"
-          >${Player.stroke('M3 12h2l2-6 3 12 3-9 2 5 2-2h4')}<select
-            aria-label="Playback sound"
-            .value=${this.voicePreset}
-            @change=${(event: Event) => {
-              this.voicePreset = (event.target as HTMLSelectElement).value as VoicePreset;
-            }}
-          >
-            <option value="synth" ?selected=${this.voicePreset === 'synth'}>Synth</option>
-            ${SAMPLE_PRESETS.map(
-              (p) =>
-                html`<option value=${p.id} ?selected=${this.voicePreset === p.id}>
-                  ${p.label}
-                </option>`,
-            )}
-          </select></label
-        >` : nothing}
         ${this.rateControl()}
         ${this.volumeControl()}
         </span>
@@ -1448,7 +1337,7 @@ export class Player extends LitElement {
       ${this.videoPaneHosted ? nothing : this.renderYouTubeNotice()}
       ${this.loading
         ? html`<p role="status" class="preparing">
-            Preparing ${this.sourceId === 'synth' && (this.synthEngine === 'host' ? this.legacySamples() : this.requiredSamples()).length ? 'samples' : 'audio'}…
+            Preparing audio…
           </p>`
         : nothing}
       ${this.error ? html`<p role="alert">Playback unavailable: ${this.error}</p>` : nothing}

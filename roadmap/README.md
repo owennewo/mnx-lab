@@ -45,6 +45,9 @@ proposals that name their campaign.
 
 ### proposed/
 
+- **[core-synth-performance.md](proposed/core-synth-performance.md)** — stub: the synth's
+  steady-state cost on phones and tablets (measure on the devices, idle strings, a lighter
+  guitar mode, effects cost, playback latency); from the synth campaign's close.
 - **[core-musicxml-accidental-fidelity.md](proposed/core-musicxml-accidental-fidelity.md)** — MusicXML campaign item 24: explicit accidental enclosure import/render, named-glyph diagnostics, direct qualifier editing and the measured Studio GP save losses from `01a`/`01e`.
 - **[core-musicxml-rest-fidelity.md](proposed/core-musicxml-rest-fidelity.md)** — MusicXML campaign item 25: preserve multimeasure rest groups, explicit rest placement, 256th–1024th values and `03d`'s noncanonical one-bar full rests; diagnose unsupported symbol-style requests.
 - **[core-musicxml-rhythm-fidelity.md](proposed/core-musicxml-rhythm-fidelity.md)** — MusicXML campaign item 26: preserve the full `03a` written-note ladder, draw long noteheads, and keep `03b`/`03f` cursor gaps invisible.
@@ -151,15 +154,6 @@ back up to `proposed/` the moment it is.
 
 ### inprogress/
 
-- **[core-campaign-synth.md](inprogress/core-campaign-synth.md)** — **campaign**: the guitar-faust
-  synth (physically modelled guitar, basic keys and kit, effect chains, contract `mnx-sound/2`)
-  **moves into `synth/`** as its own module and a third shell at `/synth/`, open access; the
-  site root becomes a **home page** linking `/studio/`, `/synth/` and `/workbench/` and a
-  **licences and notices** page; the repository is licensed **AGPL-3.0 + commercial** with
-  `LICENSE.md`/`NOTICE.md`; then studio's transport plays scores through the synth (contract
-  notes and controls, part router, instrument choice, D1 rig references, old sink retired).
-  Opened 2026-10-08 at the lead's direction; nothing of the synth lands before the notices are
-  complete (the repository is public).
 - **[lab-listening-promotion.md](inprogress/lab-listening-promotion.md)** — promote the Basic Pitch listener (`basic-pitch-chain@5`) on experiments 050 and 051, with the sentinel instrument and outside review decoupled on the record; then make routine listening runs take minutes (sentinels, cited comparators, reused observations, quiet host only for formal claims); then the user picks chords or real playing.
 - **[core-single-cursor.md](inprogress/core-single-cursor.md)** — studio authoring item 10,
   **built 2026-09-22**, awaiting the owner's hands-on check: one cursor. The edit cursor is a
@@ -527,6 +521,15 @@ back up to `proposed/` the moment it is.
 
 ### complete/
 
+- **[core-campaign-synth.md](complete/core-campaign-synth.md)** — **campaign, complete
+  2026-10-09**: the guitar-faust synth moved into `synth/` (its own workspace and app at
+  `/synth/`, open access); the site root became a home page with licences and notices
+  (AGPL-3.0 + commercial); the player now plays every score on the synth's instrument host —
+  contract stream, part router, per-person instruments and imported rigs in studio, ready
+  before play, strain on the play button — in studio, the workbench, the embed (the synth
+  ships beside its script) and the library. The old Web Audio sink and its sample packs are
+  gone. Left open: synth optimisation (proposed/core-synth-performance.md), Instruments-sheet
+  meters and a rig hand-off, resuming performance-listening.
 - **[studio-installable-app.md](complete/studio-installable-app.md)** — **complete 2026-09-25**:
   studio installs as a real app rather than a bookmark shortcut — a manifest and a drawn
   icon set (fret 0 on the open string), a `theme-color` that follows the tri-state toggle
